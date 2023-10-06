@@ -1,107 +1,107 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E4E1C69B
-	for <kvmarm@lists.linux.dev>; Fri,  6 Oct 2023 12:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 623431D683
+	for <kvmarm@lists.linux.dev>; Fri,  6 Oct 2023 12:34:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D6ltmfDm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55541C433C7;
-	Fri,  6 Oct 2023 12:17:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NYnQmo58"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D05E4C433C7;
+	Fri,  6 Oct 2023 12:34:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696594630;
-	bh=EqGDo44ijwt3PzVq3fJt0gXvMnUdPHnl13/q3Gh+IJA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D6ltmfDmvp/75b1XYAh+EJYFw/UiG6APNmLiR0Md1c9oGsu9Fiy31mMH20KZXQuYw
-	 FKgRMGjTR644c3uzTx61Cm80OZQhHhsiyjqVSP+9hqVdDS0OVgHeu/G8tpH/31UT+b
-	 0YUh9zl6+KPXMGMBPuckQKhdexTkruFBEKPFFXXQBC/eLNKiLVjlv2VGlAJZHHCa0p
-	 lfCcMGqLD5ybTYvxe7rNBO1RZGUbORUTxeQIcTKtggoyf5KQ/ljs9Xi34jkXztew5n
-	 5Tr5syleMJi8nkG5skjcn/oaxRzGS0K/pDWsXyFl+a9uj+kpWutmxRROX/rZ7FFEdK
-	 fdZspU9mRq+gw==
-Date: Fri, 6 Oct 2023 13:17:01 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Will Deacon <will@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	s=k20201202; t=1696595676;
+	bh=oDjUTju2r3BG2ETE24d4qauYsFDz+99C3MZq1+eZau4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NYnQmo58tcG0rxJYuwC4KAckCZo/2eLfB7a4qgxa1AB+Dzbhy0acfXXYbBK5lgSwK
+	 T3QBHoQ6UwbhLoBAukSECiT5VyKf42pU7bPQES6lABL8tnYTIQ6xO5MzH5qg72VO8c
+	 cwShMTku9thW/hyy+11qO8s9974u66yK+l2sXcI1+9rmIr8/N56RryAlx51rwazLfk
+	 YrObmCmjM+/m8mxcK6EVhqzI3z3/H0J9hpQeoOPpVBKtWUguxVgBN3tPB46IKniO5F
+	 IIJWuGoKFKonYqBbOJqoksuSX4vQHoy6A2YE8zpt9jEiS49AKHSK+1x0SWs2T4pCvp
+	 qZRpp7mzjFTLQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qok2M-001ifF-9n;
+	Fri, 06 Oct 2023 13:34:34 +0100
+Date: Fri, 06 Oct 2023 13:34:34 +0100
+Message-ID: <861qe8nd45.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
- Stacks
-Message-ID: <638a7be5-6662-471d-a3ce-0de0ac768e99@sirena.org.uk>
-References: <aaea542c-929c-4c9b-8caa-ca67e0eb9c1e@sirena.org.uk>
- <ZOTnL1SDJWZjHPUW@arm.com>
- <43ec219d-bf20-47b8-a5f8-32bc3b64d487@sirena.org.uk>
- <ZOXa98SqwYPwxzNP@arm.com>
- <ZOYFazB1gYjzDRdA@arm.com>
- <ZRWw7aa3C0LlMPTH@arm.com>
- <38edb5c3-367e-4ab7-8cb7-aa1a5c0e330c@sirena.org.uk>
- <ZRvUxLgMse8QYlGS@arm.com>
- <a7d2fd66-c06b-4033-bca2-4b14afc4904f@sirena.org.uk>
- <ZR7w/mr0xZbpIPc5@arm.com>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/3] KVM: arm64: Load the stage-2 MMU from vcpu_load() for VHE
+In-Reply-To: <8634yongw3.wl-maz@kernel.org>
+References: <20231006093600.1250986-1-oliver.upton@linux.dev>
+	<8634yongw3.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="fv2LrnWqf0aiVt0H"
-Content-Disposition: inline
-In-Reply-To: <ZR7w/mr0xZbpIPc5@arm.com>
-X-Cookie: Rome wasn't burnt in a day.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Fri, 06 Oct 2023 12:13:00 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> On Fri, 06 Oct 2023 10:35:57 +0100,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> > 
+> > Unlike nVHE, there is no need to switch the stage-2 MMU around on guest
+> > entry/exit in VHE mode as the host is running at EL2. Despite this KVM
+> > reloads the stage-2 on every guest entry, which is needless.
+> > 
+> > This series moves the setup of the stage-2 MMU context to vcpu_load()
+> > when running in VHE mode. This is likely to be a win across the board,
+> > but also allows us to remove an ISB on the guest entry path for systems
+> > with one of the speculative AT errata.
+> > 
+> > None of my machines affected by the AT errata are VHE-capable, so it'd
+> > be appreciated if someone could give this series a go and make sure I
+> > haven't wrecked anything.
+> 
+> It totally breaks on my A55 board. Running a single guest seems OK,
+> but running a number of the concurrently makes them explode early on
+> (faults in EFI...)
+> 
+> I guess we end-up running with the wrong VTTBR at times, which would
+> be interesting...
 
---fv2LrnWqf0aiVt0H
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Fun fact:
 
-On Thu, Oct 05, 2023 at 06:23:10PM +0100, Catalin Marinas wrote:
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index b0cafd7c5f8f..40c84db5884a 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -195,6 +195,11 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	sysreg_restore_guest_state_vhe(guest_ctxt);
+ 	__debug_switch_to_guest(vcpu);
+ 
++	WARN_ONCE(kvm_get_vttbr(vcpu->arch.hw_mmu) != read_sysreg(vttbr_el2),
++		  "Oh crap %llx vs %llx\n",
++		  kvm_get_vttbr(vcpu->arch.hw_mmu),
++		  read_sysreg(vttbr_el2));
++
+ 	if (is_hyp_ctxt(vcpu))
+ 		vcpu_set_flag(vcpu, VCPU_HYP_CONTEXT);
+ 	else
 
-> It's not just the default size that I dislike (I think the x86
-> RLIMIT_STACK or clone3() stack_size is probably good enough) but the
-> kernel allocating the shadow stack and inserting it into the user
-> address space. The actual thread stack is managed by the user but the
-> shadow stack is not (and we don't do this very often). Anyway, I don't
-> have a better solution for direct uses of clone() or clone3(), other
-> than running those threads with the shadow stack disabled. Not sure
-> that's desirable.
+[   36.190355] Oh crap 10000057a6001 vs 57a6001
 
-Running threads with the shadow stack disabled if they don't explicitly
-request it feels like it's asking for trouble - as well as the escape
-route from the protection it'd provide I'd expect there to be trouble
-for things that do stack pivots, potentially random issues if there's a
-mix of ways threads are started.  It's going to be a tradeoff whatever
-we do.
+My bet is that the VMID isn't allocated on first load, and everything
+goes downhill from there.
 
---fv2LrnWqf0aiVt0H
-Content-Type: application/pgp-signature; name="signature.asc"
+	M.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUf+rwACgkQJNaLcl1U
-h9AHQQf7BUjbkJGRbqVL5lGyELqXE64nUXJxqNVQXzkHQ1ujZqDV/cLF9uojqJh6
-yo1MngEonxyKeJjgqupcA6TzR0LGD9KvuzahtnPwSfluLAxLQG5iY2L+sA2Tdwb4
-kPqoRiUS0++v1w/Oud9y0kcF6an3/im18MenqLAPGtnHPH+xE3EHipQsrYN53Fos
-vsFAhXwuDhqGVonMiS+J1OxVsYZ9cRcVlStwZI0JbcCPGjS/vMUsCiE1j8ERuLYr
-ZUNLyxMMQy35iW2uIdk67nRdv03mjTOw9yYr3akjxNW5eJeFrc804fBdZZ7YqrEE
-Ju28oLb7xq1zQUOX3lYKlNKWsex4KA==
-=iNQp
------END PGP SIGNATURE-----
-
---fv2LrnWqf0aiVt0H--
+-- 
+Without deviation from the norm, progress is not possible.
