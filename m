@@ -1,149 +1,194 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E4821F959
-	for <kvmarm@lists.linux.dev>; Fri,  6 Oct 2023 13:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA7A4414
+	for <kvmarm@lists.linux.dev>; Fri,  6 Oct 2023 13:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r7kN1bhY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B6A1C433C8;
-	Fri,  6 Oct 2023 13:23:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VWvYqsus"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56F77C433CA;
+	Fri,  6 Oct 2023 13:33:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696598608;
-	bh=EaTnbJI4I15tCsE5PAEOFEMV2gEpZ5O8xv29SdDb+qM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=r7kN1bhYCxtxsrayiH2/Qvakhgo3xCg+wGyDWqoba/ZC5pHVgpQDCCyLUBMq5h54g
-	 ECPy9lW5VnfDNKExrrh7fEdQi/U/bsZ892xqQHM3S72mb56W82U4MfmqpjVIrrIJyB
-	 qr4LzQDOov95/YlKhpIXNX+7KimqRGoyORxBH1I2m/XYsnYxcLtqw4e1YjQNFIDBA5
-	 tnW4b6DBxOSfdtiaDHBr9QAGaSCEQWZ729s1flrAd+bmsOCjhqUZ+msIzUEQjcpObI
-	 fcYAdK0dvdOg+7/O/AD46RjkpZyTdrX3BsQGRWK8UKSyIfp93PxVJs9Zo8bm/vRFfv
-	 hsYBCwh6ppprg==
-Date: Fri, 6 Oct 2023 14:23:18 +0100
-From: Mark Brown <broonie@kernel.org>
-To: "Eric W. Biederman" <ebiederm@xmission.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	s=k20201202; t=1696599187;
+	bh=zM9U6OE2wsu5l+eoLqm1nLAA0FmuNcoDectJceqzya4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VWvYqsuswcyUpaopuhu/HDRF4GakesEOiRaWKel+kPfAABpGn8I32oDbWQW3ygY9s
+	 odswpBsewZqhF41o031Cm6K7+SZ5PFmsH54FVtsCtEjZ4jSOFwMUD6H6VChQYbwei+
+	 RDnTtURR4/XbGHKbS3Yg/17MwTPL18cA7Kf/U8R3cTWV1mxnRd4HcnjPtgXBYw9avB
+	 s6uOvzEJRGjf7AP2+8xrH45mFIDiw13u+gsMCetAhMzCzYk+I2elgAAj0KoYQm4pIX
+	 GZJJe+h/LDVozcT7MphOKIuz5xw+Ph/NJKF6jwxvvSnzyURxra9vd63qt/MCqfkTjk
+	 /dYv55ZWsIUKg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qokwy-001jZ2-Mv;
+	Fri, 06 Oct 2023 14:33:05 +0100
+Date: Fri, 06 Oct 2023 14:33:04 +0100
+Message-ID: <86zg0vnaen.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
- Stacks
-Message-ID: <b100a80c-4460-4258-92b8-d232f553cab6@sirena.org.uk>
-References: <43ec219d-bf20-47b8-a5f8-32bc3b64d487@sirena.org.uk>
- <ZOXa98SqwYPwxzNP@arm.com>
- <ZOYFazB1gYjzDRdA@arm.com>
- <ZRWw7aa3C0LlMPTH@arm.com>
- <38edb5c3-367e-4ab7-8cb7-aa1a5c0e330c@sirena.org.uk>
- <ZRvUxLgMse8QYlGS@arm.com>
- <a7d2fd66-c06b-4033-bca2-4b14afc4904f@sirena.org.uk>
- <ZR7w/mr0xZbpIPc5@arm.com>
- <638a7be5-6662-471d-a3ce-0de0ac768e99@sirena.org.uk>
- <87y1ggylvq.fsf@email.froward.int.ebiederm.org>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/3] KVM: arm64: Load the stage-2 MMU from vcpu_load() for VHE
+In-Reply-To: <861qe8nd45.wl-maz@kernel.org>
+References: <20231006093600.1250986-1-oliver.upton@linux.dev>
+	<8634yongw3.wl-maz@kernel.org>
+	<861qe8nd45.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Ji8GpeD8VVTZwCCT"
-Content-Disposition: inline
-In-Reply-To: <87y1ggylvq.fsf@email.froward.int.ebiederm.org>
-X-Cookie: Rome wasn't burnt in a day.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Fri, 06 Oct 2023 13:34:34 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> On Fri, 06 Oct 2023 12:13:00 +0100,
+> Marc Zyngier <maz@kernel.org> wrote:
+> > 
+> > On Fri, 06 Oct 2023 10:35:57 +0100,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > 
+> > > Unlike nVHE, there is no need to switch the stage-2 MMU around on guest
+> > > entry/exit in VHE mode as the host is running at EL2. Despite this KVM
+> > > reloads the stage-2 on every guest entry, which is needless.
+> > > 
+> > > This series moves the setup of the stage-2 MMU context to vcpu_load()
+> > > when running in VHE mode. This is likely to be a win across the board,
+> > > but also allows us to remove an ISB on the guest entry path for systems
+> > > with one of the speculative AT errata.
+> > > 
+> > > None of my machines affected by the AT errata are VHE-capable, so it'd
+> > > be appreciated if someone could give this series a go and make sure I
+> > > haven't wrecked anything.
+> > 
+> > It totally breaks on my A55 board. Running a single guest seems OK,
+> > but running a number of the concurrently makes them explode early on
+> > (faults in EFI...)
+> > 
+> > I guess we end-up running with the wrong VTTBR at times, which would
+> > be interesting...
+> 
+> Fun fact:
+> 
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index b0cafd7c5f8f..40c84db5884a 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -195,6 +195,11 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>  	sysreg_restore_guest_state_vhe(guest_ctxt);
+>  	__debug_switch_to_guest(vcpu);
+>  
+> +	WARN_ONCE(kvm_get_vttbr(vcpu->arch.hw_mmu) != read_sysreg(vttbr_el2),
+> +		  "Oh crap %llx vs %llx\n",
+> +		  kvm_get_vttbr(vcpu->arch.hw_mmu),
+> +		  read_sysreg(vttbr_el2));
+> +
+>  	if (is_hyp_ctxt(vcpu))
+>  		vcpu_set_flag(vcpu, VCPU_HYP_CONTEXT);
+>  	else
+> 
+> [   36.190355] Oh crap 10000057a6001 vs 57a6001
+> 
+> My bet is that the VMID isn't allocated on first load, and everything
+> goes downhill from there.
 
---Ji8GpeD8VVTZwCCT
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+So I was correct that the VMID isn't allocated on the first run, and
+the following patch should address that particular problem:
 
-On Fri, Oct 06, 2023 at 07:29:45AM -0500, Eric W. Biederman wrote:
-> Mark Brown <broonie@kernel.org> writes:
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e2d38c7d6555..759adee42018 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1025,7 +1025,7 @@ int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
+ extern unsigned int __ro_after_init kvm_arm_vmid_bits;
+ int __init kvm_arm_vmid_alloc_init(void);
+ void __init kvm_arm_vmid_alloc_free(void);
+-void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid);
++bool kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid);
+ void kvm_arm_vmid_clear_active(void);
+ 
+ static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 39c969c05990..584be562b1d4 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -950,7 +950,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		 * making a thread's VMID inactive. So we need to call
+ 		 * kvm_arm_vmid_update() in non-premptible context.
+ 		 */
+-		kvm_arm_vmid_update(&vcpu->arch.hw_mmu->vmid);
++		if (kvm_arm_vmid_update(&vcpu->arch.hw_mmu->vmid) &&
++		    has_vhe())
++			__load_stage2(vcpu->arch.hw_mmu,
++				      vcpu->arch.hw_mmu->arch);
+ 
+ 		kvm_pmu_flush_hwstate(vcpu);
+ 
+diff --git a/arch/arm64/kvm/vmid.c b/arch/arm64/kvm/vmid.c
+index 7fe8ba1a2851..281e4f86d9a2 100644
+--- a/arch/arm64/kvm/vmid.c
++++ b/arch/arm64/kvm/vmid.c
+@@ -135,10 +135,11 @@ void kvm_arm_vmid_clear_active(void)
+ 	atomic64_set(this_cpu_ptr(&active_vmids), VMID_ACTIVE_INVALID);
+ }
+ 
+-void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
++bool kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
+ {
+ 	unsigned long flags;
+ 	u64 vmid, old_active_vmid;
++	bool updated = false;
+ 
+ 	vmid = atomic64_read(&kvm_vmid->id);
+ 
+@@ -156,17 +157,21 @@ void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
+ 	if (old_active_vmid != 0 && vmid_gen_match(vmid) &&
+ 	    0 != atomic64_cmpxchg_relaxed(this_cpu_ptr(&active_vmids),
+ 					  old_active_vmid, vmid))
+-		return;
++		return false;
+ 
+ 	raw_spin_lock_irqsave(&cpu_vmid_lock, flags);
+ 
+ 	/* Check that our VMID belongs to the current generation. */
+ 	vmid = atomic64_read(&kvm_vmid->id);
+-	if (!vmid_gen_match(vmid))
++	if (!vmid_gen_match(vmid)) {
+ 		vmid = new_vmid(kvm_vmid);
++		updated = true;
++	}
+ 
+ 	atomic64_set(this_cpu_ptr(&active_vmids), vmid);
+ 	raw_spin_unlock_irqrestore(&cpu_vmid_lock, flags);
++
++	return updated;
+ }
+ 
+ /*
 
-> >> It's not just the default size that I dislike (I think the x86
-> >> RLIMIT_STACK or clone3() stack_size is probably good enough) but the
-> >> kernel allocating the shadow stack and inserting it into the user
-> >> address space. The actual thread stack is managed by the user but the
-> >> shadow stack is not (and we don't do this very often). Anyway, I don't
-> >> have a better solution for direct uses of clone() or clone3(), other
-> >> than running those threads with the shadow stack disabled. Not sure
-> >> that's desirable.
+However, this isn't enough.
 
-> > Running threads with the shadow stack disabled if they don't explicitly
-> > request it feels like it's asking for trouble - as well as the escape
-> > route from the protection it'd provide I'd expect there to be trouble
-> > for things that do stack pivots, potentially random issues if there's a
-> > mix of ways threads are started.  It's going to be a tradeoff whatever
-> > we do.
+[   63.450113] Oh crap 400000435c001 vs 3000004430001
 
-> Something I haven't seen in the discussion is that one of the ways I
-> have seen a non-libc clone used is to implement a fork with flags.
-> That is a new mm is created, and effectively a new process.  Which
-> makes the characterization different.
+So there are situations where we end-up with the wrong VTTBR, rather
+than the wrong VMID, which is even worse. Haven't worked out the
+scenario yet, but it apparently involves being preempted by a vcpu
+from a different VM and not doing the right thing.
 
-> In general creating a thread with clone and bypassing libc is
-> incompatible with pthreads, and the caller gets to keep both pieces.
+	M.
 
-> As long as there is enough information code can detect that
-> shadow stacks are in use, and the code is able to create their own
-> I don't see why it shouldn't be the callers responsibility.
-
-> On the other hand I don't see the maintainer of clone Christian Brauner
-> or the libc folks especially Florian cc'd on this thread.  So I really
-> don't think you have the right folks in on this conversation.
-
-Well, copying them in now.  The discussion here is about allocation of
-shadow stacks for the arm64 implementation of the feature (the arm64
-feature is called Guarded Control Stack in the architecture).  These
-maintain a second copy of the stack with only the return targets in
-memory allocated with special protections so userspace can't write to it
-directly and use this when doing returns to ensure that the returns
-haven't been redirected.  These shadow stacks can be allocated directly
-by userspace using a new system call map_shadow_stack(), doing this via
-mmap() was extensively discussed but it was concluded that this was very
-likely to lead to security problems so we've got this new syscall that
-ensures that shadow stack memory is never accessible to userspace via
-other means.
-
-The x86 implementation that has already been merged into mainline will
-allocate a new shadow stack for newly created threads when the creating
-thread has one.  There was a suggestion to have arm64 diverge and
-require that threads be created with clone3() and manualy provide a
-shadow stack but then concerns were raised that as well as the issues
-with divergence this would be too disruptive for adoption due to
-non-libc thread creation.  It's not controversial that it'd be good to
-have clone3() by able to explicitly specify a shadow stack, just if it
-should be required.
-
---Ji8GpeD8VVTZwCCT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUgCkUACgkQJNaLcl1U
-h9DirQf/ftVM53t8n7Iz/c70/XaZOa6o2/1qaxs00hlLIEkmuVk5LjL0TViJlfRw
-qIRUvbR8y9MkOCjJOTAErDvidq4rFwmPiuk9mFZViDpRkDxpG13xvHCHIqZ4NPUe
-Eve09ZqsJK5dCaW8G4/FCkSIZF2yD1lGttWRhYwckUPBSHMVZevuylvin7vdrWAr
-sPCe3qp4gWYgplUtfxKadGeowpldz9LRCbARrBYB1jqSXcJbskcDd0L3KUH9ElFv
-kYT+Iyoh0j36gEZFuwWXioYTEbQcD5qsqcftvc5LW0vRiUlKo/MUND/c07YdRoBy
-DfP12K7+lLpdbS17lq6f6DfTuLAwcg==
-=J8v2
------END PGP SIGNATURE-----
-
---Ji8GpeD8VVTZwCCT--
+-- 
+Without deviation from the norm, progress is not possible.
