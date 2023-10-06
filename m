@@ -1,82 +1,126 @@
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A194343693
-	for <kvmarm@lists.linux.dev>; Thu,  5 Oct 2023 23:58:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24DF197
+	for <kvmarm@lists.linux.dev>; Fri,  6 Oct 2023 00:17:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CtbXz72I"
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3ae388eb437so1368512b6e.0
-        for <kvmarm@lists.linux.dev>; Thu, 05 Oct 2023 16:58:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GKhlf/1b"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-59c09bcf078so21307417b3.1
+        for <kvmarm@lists.linux.dev>; Thu, 05 Oct 2023 17:17:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696550282; x=1697155082; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=44rKSvYUH7JAJmQ5V9S1+ZcFwK9XiGadHatQeMpWa7M=;
-        b=CtbXz72Isjv/h/fOeTwSc5WeaQI82HVcQZZEeD40Z4M2uoXo5SwCaasusFnjbgpdGv
-         BBZl9c9RGvsIzOSFhg2DW3t6RMiPkCdddM5Yc1k6gP5DF77Rzmzm4pohlPg08W5VxOwa
-         bh4N3Dm9WP3sD1cIz1QiMU5usGD6AuY0dchyU53OccIC195d4hUnDwMCSmP/p9D9dFpi
-         rjurVN+18iYp+GjQFKHmyGgLgRVOvemsiz4ML6r0vd7q2PJmVJLVEjDK+5FuRa70PUjs
-         LYabTxL5spxOjKvAGAISo3RyB+8IKBkeXDTJDaRZjj9iOCv8iwlt7mRRZ8dQecHcc0+C
-         8gAA==
+        d=google.com; s=20230601; t=1696551470; x=1697156270; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=McJdi/j/1GKFjqEOteMsFmQa6CgQZT5EeqPYROfMhbk=;
+        b=GKhlf/1bciDNM4KSxGpsoz/quZJjTzCRAZzDEUHGfoM5RGVdC/9i9auuCIWrTpbACP
+         xIVKz7O7V9oXncLys9iXZgoSETwDU89qHtTc+T+m+cyL9YpMpSL+WXEDi/IiDyE+cal3
+         H2kJmfa9K9baxMB6bG+ahDLFU5eb2ejWOPlFZJScAcPwns+qwHYzMeF0BKkRwW4WNTAN
+         RzVkjZLbXVxqslym+DxaOfZIo+sDt1FNt4rvhhTpqFUjeo5xsqDRVSMv0JPIOGB/6JK5
+         kkHh5mpIJTHWTEdYqSFbHxNhuePC9VJQwc9MXR8BfJlqvN95NMrdvwW94ZMCSOBz91Nn
+         Xw1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696550282; x=1697155082;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=44rKSvYUH7JAJmQ5V9S1+ZcFwK9XiGadHatQeMpWa7M=;
-        b=grkZlhATHrWni7hqumAC+WksAR6wYVqmupy1bcJ7npFmg5OIKq9qDLr4BcAqfuF1kT
-         JPEWHXSROTRU+M1v5J+CO2wSFTl/XmINtQVCbEU7VwZ+jHniEOsYPg67cn8SOnvVD5l0
-         XkeHjn/oLDh3BPaRrpZ+3+4nv6M+JDZR1L5B7efsY6zeO9STr4vp/87T1Sc5e2E4ulA+
-         1dBgs9ivF7c2zAqdESqoMJC3FcymuDzDkBE6dYEJQwgZUI0PnF8dGNF9KZ7pPYBqihOc
-         D7Osc84+ixzYq3itE5Uod3Eyzt3imH45YmwK3zTbaMWcTIzVH3YdZLkQNNVFEClvYa2u
-         GtYw==
-X-Gm-Message-State: AOJu0Yz5q7JBU6M0XttUNrUAiAYJpxJpoKu3M6RiAZv+5yXniVMrnb9T
-	nTkMp9CXpjEsZGBMIRuVgNfPl//3zsRoihqHAf8YQw==
-X-Google-Smtp-Source: AGHT+IHmJEBw3FEwSKl+ovMIRs4++7rLKFDnnPFE12KkBwrbdRxv2j2rQxvCOnfcPRcXdkpqGTXMw5Ql84/AguKeHyM=
-X-Received: by 2002:a05:6808:15a1:b0:3a1:db91:c5ef with SMTP id
- t33-20020a05680815a100b003a1db91c5efmr1811913oiw.23.1696550282493; Thu, 05
- Oct 2023 16:58:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696551470; x=1697156270;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=McJdi/j/1GKFjqEOteMsFmQa6CgQZT5EeqPYROfMhbk=;
+        b=M5tWwgxbtut4YrdRrMA24DJZtiF6NZTl0UHF1QVMOHiQrd2/RNKzrx4DbB6GxWC2fp
+         2J993d0cbO4hz+ngRw3VttWimNMqbV3jovAcRVg6TLKrJQfQWeziRghl/GqOTUUESkSZ
+         TV78E7zOZyegLd+SwhEHdN8/pZCPSs3VDtLcikNq8dnubfoN3GkQeHY/YYk4a6cpXiM+
+         zTmrPQfS9AM3O7s9MlVPqfHfVkzdB9wHt9SzHni1ztCTQ7vfjaPG0iqO1D8vy4LDfu2y
+         DhXfPZswxZWYzjGONNQVB4/tNhdb6X8uB5ff9IUVeG2anajjtcRIGXUbQycU4MwvVKpS
+         rivg==
+X-Gm-Message-State: AOJu0YwsgnnESj5kT/WsWTiTKCnqRHGtJP5+vXBn5oV3bwtIH+3kjX5w
+	JVQ76ST4W9oGbJmyGXMJ12AJHBMvXLg=
+X-Google-Smtp-Source: AGHT+IHitULJr7kPwzCJOPk3YaN6WA3g1yti650435QLOqCIesvbT6fAE5o/0S84/9L7cBx2w8foopHaCq0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:4197:0:b0:d78:f45:d7bd with SMTP id
+ o145-20020a254197000000b00d780f45d7bdmr104941yba.4.1696551470557; Thu, 05 Oct
+ 2023 17:17:50 -0700 (PDT)
+Date: Fri, 6 Oct 2023 00:17:48 +0000
+In-Reply-To: <CAF7b7mqUkP1jDf_TF_DpGcAKqn+nYx4ZPasW00qT4nOr-76e_Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-7-amoorthy@google.com>
- <ZR4Qr4Yzj7nUNIT3@google.com>
-In-Reply-To: <ZR4Qr4Yzj7nUNIT3@google.com>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Thu, 5 Oct 2023 16:57:26 -0700
-Message-ID: <CAF7b7mp9VDu3hEFrOys9-9wfS+nKAJX7vcnBYgk_pBZ-NnJE2g@mail.gmail.com>
-Subject: Re: [PATCH v5 06/17] KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
-To: Sean Christopherson <seanjc@google.com>
+Mime-Version: 1.0
+References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-11-amoorthy@google.com>
+ <ZR4U_czGstnDrVxo@google.com> <CAF7b7mqUkP1jDf_TF_DpGcAKqn+nYx4ZPasW00qT4nOr-76e_Q@mail.gmail.com>
+Message-ID: <ZR9SLOQcFEqPg01A@google.com>
+Subject: Re: [PATCH v5 10/17] KVM: Implement KVM_CAP_USERFAULT_ON_MISSING by
+ atomizing __gfn_to_pfn_memslot() calls
+From: Sean Christopherson <seanjc@google.com>
+To: Anish Moorthy <amoorthy@google.com>
 Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
 	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
 	jthoughton@google.com, ricarkol@google.com, axelrasmussen@google.com, 
 	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
 	kconsul@linux.vnet.ibm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 4, 2023 at 6:26=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> ...isn't helpful because it doesn't provide any
-> insight into the actual impact of the change, i.e. requires the reader to=
- already
-> know exactly how and when kvm_handle_error_pfn() is used.
+On Thu, Oct 05, 2023, Anish Moorthy wrote:
+> On Wed, Oct 4, 2023 at 6:44=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> >
+> > Eh, the shortlog basically says "do work" with a lot of fancy words.  I=
+t really
+> > just boils down to:
+> >
+> >   KVM: Let callers of __gfn_to_pfn_memslot() opt-out of USERFAULT_ON_MI=
+SSING
+> >
+> > On Fri, Sep 08, 2023, Anish Moorthy wrote:
+> > > Change the "atomic" parameter of __gfn_to_pfn_memslot() to an enum wh=
+ich
+> >
+> > I've pushed back on more booleans multiple times, but IMO this is even =
+worse.
+> > E.g. what does an "upgrade" to atomic even mean?
+>=20
+> Oh, that bad huh? Based on what you mentioned earlier about some
+> callers of __gfn_to_pfn_memslot() needing to opt out of the memslot
+> flag, it seemed like there were basically three ways (wrt to @atomic)
+> that function needed to be called
+>=20
+> 1. With atomic =3D true
+> 2. With atomic =3D false, and some way to make sure that's respected
+> whatever the memslot flag says
+> 3. With atomic =3D false, but respecting the memslot flag (ie, changing
+> to atomic =3D true when it's set).
+>=20
+> An "upgrade" in this context was meant to describe case 3 (when the
+> memslot flag is set). Anyways despite terminology issues, the idea of
+> an enum encapsulating those three cases seems like, essentially, the
+> right thing to do. Though of course, let me know if you disagree :)
 
-Ah, true. Hopefully the following is better?
+The problem is that the three possibilities aren't directly related.  The e=
+xisting
+use of atomic truly means "this call can't sleep/block".  The userfault-on-=
+missing
+case has nothing to do with sleeping being illegal, the behavior of @atomic=
+ just
+happens to align exactly with what is needed *today*.
 
-> KVM: x86: Annotate hva->hpa translation failures in stage-2 fault path
->
-> Set up a KVM_EXIT_MEMORY_FAULT in cases where the stage-2 fault exit
-> handler successfully translates a GPA to an HVA, but fails to translate
-> the HVA to an HPA via GUP. This provides information to userspace which i=
-t
-> could potentially use, for instance to resolve the failure.
+E.g. if there was a flavor of gup() that could fault in memory without slee=
+ping,
+that could be used for the @atomic case but not the userfault-on-missing ca=
+se.
+I doubt such a variation will ever exist, but "that probably won't happen" =
+isn't
+a good reason to conflate the two things.
 
-Maybe the "via GUP" isn't really doing anything there
+> > Since we have line of sight to getting out of boolean hell via David's =
+series,
+> > just bite the bullet for now.  Deciphering the callers will suck, but n=
+ot really
+> > anymore than it already sucks.
+>=20
+> Sorry, what exactly are you suggesting via "bite the bullet" here?
+
+Add another boolean, the "bool can_do_userfault" from the diff that got sni=
+pped.
