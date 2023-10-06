@@ -1,37 +1,59 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065671C69C
-	for <kvmarm@lists.linux.dev>; Fri,  6 Oct 2023 11:33:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E4E1C69B
+	for <kvmarm@lists.linux.dev>; Fri,  6 Oct 2023 12:17:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GmMjlVvg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83086C433C7;
-	Fri,  6 Oct 2023 11:33:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D6ltmfDm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55541C433C7;
+	Fri,  6 Oct 2023 12:17:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696592033;
-	bh=Wmpj47eWouOy0s3yGBvFb02dB4bwUEGYO5sCAS2bLU0=;
+	s=k20201202; t=1696594630;
+	bh=EqGDo44ijwt3PzVq3fJt0gXvMnUdPHnl13/q3Gh+IJA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GmMjlVvgMoMeEf5Y6WeYQoxMj/XfnZ0MtZQzru6bWszmCBvN6FDBkqIQaB6XwhJJL
-	 uCZ6k3K/RvizdaTiSNwPcRd37P/OnUFapLcLtdhkkFJAiH1qpRUHpB8aSkU0pzrKNX
-	 VmcOnAssCNYQoG0PfIO61vPnvfX9+3LVymoGqL4VZUtJGwdgtUVxB6TsLYq6PTBBOK
-	 p6JtdB2PreMA76Nq6+4T+0gqptSckEl8MQuqDYR3inpQz401Xq455AkLLh+Wk8US51
-	 Eqi1TJYROcYzZKWk4nxbb86kOZQcBKEPEm6DhWsDzC6NdBg2P3iPGJ54WKL0khwMIM
-	 JDdi+GUUeqJ4A==
-Date: Fri, 6 Oct 2023 12:33:48 +0100
+	b=D6ltmfDmvp/75b1XYAh+EJYFw/UiG6APNmLiR0Md1c9oGsu9Fiy31mMH20KZXQuYw
+	 FKgRMGjTR644c3uzTx61Cm80OZQhHhsiyjqVSP+9hqVdDS0OVgHeu/G8tpH/31UT+b
+	 0YUh9zl6+KPXMGMBPuckQKhdexTkruFBEKPFFXXQBC/eLNKiLVjlv2VGlAJZHHCa0p
+	 lfCcMGqLD5ybTYvxe7rNBO1RZGUbORUTxeQIcTKtggoyf5KQ/ljs9Xi34jkXztew5n
+	 5Tr5syleMJi8nkG5skjcn/oaxRzGS0K/pDWsXyFl+a9uj+kpWutmxRROX/rZ7FFEdK
+	 fdZspU9mRq+gw==
+Date: Fri, 6 Oct 2023 13:17:01 +0100
 From: Mark Brown <broonie@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Will Deacon <will@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH 1/2] tools: arm64: Add a copy of sysreg-defs.h generated
- from the kernel
-Message-ID: <ec96d303-f0c4-470c-b23c-e59054c52008@sirena.org.uk>
-References: <20231005180325.525236-1-oliver.upton@linux.dev>
- <20231005180325.525236-2-oliver.upton@linux.dev>
- <66914631-c2fe-4a20-bfd6-561657cfe8e8@sirena.org.uk>
- <ZR_SLyTfkhmdZoXI@linux.dev>
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
+ Stacks
+Message-ID: <638a7be5-6662-471d-a3ce-0de0ac768e99@sirena.org.uk>
+References: <aaea542c-929c-4c9b-8caa-ca67e0eb9c1e@sirena.org.uk>
+ <ZOTnL1SDJWZjHPUW@arm.com>
+ <43ec219d-bf20-47b8-a5f8-32bc3b64d487@sirena.org.uk>
+ <ZOXa98SqwYPwxzNP@arm.com>
+ <ZOYFazB1gYjzDRdA@arm.com>
+ <ZRWw7aa3C0LlMPTH@arm.com>
+ <38edb5c3-367e-4ab7-8cb7-aa1a5c0e330c@sirena.org.uk>
+ <ZRvUxLgMse8QYlGS@arm.com>
+ <a7d2fd66-c06b-4033-bca2-4b14afc4904f@sirena.org.uk>
+ <ZR7w/mr0xZbpIPc5@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -39,66 +61,47 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="9m+I37GxfCApkzWQ"
+	protocol="application/pgp-signature"; boundary="fv2LrnWqf0aiVt0H"
 Content-Disposition: inline
-In-Reply-To: <ZR_SLyTfkhmdZoXI@linux.dev>
+In-Reply-To: <ZR7w/mr0xZbpIPc5@arm.com>
 X-Cookie: Rome wasn't burnt in a day.
 
 
---9m+I37GxfCApkzWQ
+--fv2LrnWqf0aiVt0H
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Fri, Oct 06, 2023 at 09:23:59AM +0000, Oliver Upton wrote:
-> On Fri, Oct 06, 2023 at 01:23:08AM +0100, Mark Brown wrote:
+On Thu, Oct 05, 2023 at 06:23:10PM +0100, Catalin Marinas wrote:
 
-> > That said I'm not 100% clear why this isn't being added to "make
-> > headers" and/or the perf build stuff?
+> It's not just the default size that I dislike (I think the x86
+> RLIMIT_STACK or clone3() stack_size is probably good enough) but the
+> kernel allocating the shadow stack and inserting it into the user
+> address space. The actual thread stack is managed by the user but the
+> shadow stack is not (and we don't do this very often). Anyway, I don't
+> have a better solution for direct uses of clone() or clone3(), other
+> than running those threads with the shadow stack disabled. Not sure
+> that's desirable.
 
-> Isn't 'make headers' just for UAPI headers though? Also, perf is just an
+Running threads with the shadow stack disabled if they don't explicitly
+request it feels like it's asking for trouble - as well as the escape
+route from the protection it'd provide I'd expect there to be trouble
+for things that do stack pivots, potentially random issues if there's a
+mix of ways threads are started.  It's going to be a tradeoff whatever
+we do.
 
-Possibly, I didn't look closely.  It'd certainly be more tasteful.
-
-> incidental user of this via cputype.h, KVM selftests is what's taking
-> the direct dependency.
-
-If perf doesn't care perhaps just restructure things so it doesn't pull
-it in and do whatever you were doing originally then?
-
-> > Surely if perf is happy to peer into the main kernel source it could
-> > just as well do the generation as part of the build?  There's no great
-> > obstacle to having a target which runs the generation script that I
-> > can see.
-
-> That'd be less than ideal, IMO. tools maintaining a separate set of kernel
-> headers from the authoritative source avoids the need to coordinate
-> changes across kernel and tools. To keep things that way we either need
-> to copy the script+encoding or the header output. The latter isn't that
-> bothersome if/when we need an update.
-
-The error Stephen found was:
-
-| In file included from util/../../arch/arm64/include/asm/cputype.h:201,
-|                  from util/arm-spe.c:37:
-| tools/arch/arm64/include/asm/sysreg.h:132:10: fatal error: asm/sysreg-defs.h: No such file or directory
-
-so that's already happening - see perf's arm-spe.c.  You could also fix
-perf by avoiding spelunking in the main kernel source like it's
-currently doing.
-
---9m+I37GxfCApkzWQ
+--fv2LrnWqf0aiVt0H
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUf8JsACgkQJNaLcl1U
-h9D43gf+KthLRpX4SbHMrpSO1jtnzw/gUASBohZj6copHrQmZDwZhbuFi0Sj8VWd
-Fao7nKtMwboFJ94TSh/xvYx9o5m63MUYzsVJBQdFlHRnsENznHX8d9E0Ve0B2xK+
-51RAPNNBv7FYsGIRR/kU8/Y5WBpCOeKhJ4fQ0WxQXTmAYD+/4IixdFJaEmY3i+H7
-gF+5Pd1RghykREOtqdciakEBTzQ2pCuxvAS2emvyWrlNjK2JEb7T8DdulwWhC9nq
-4t53fZ0J+ByIDkW8Dne74XvFU9Ws+brhni1iynySWo7BmqKgHFpXV4CaeN1bEEpK
-lVtS3LAXzwdCHuB573s8cYJu4DefUw==
-=yH5q
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUf+rwACgkQJNaLcl1U
+h9AHQQf7BUjbkJGRbqVL5lGyELqXE64nUXJxqNVQXzkHQ1ujZqDV/cLF9uojqJh6
+yo1MngEonxyKeJjgqupcA6TzR0LGD9KvuzahtnPwSfluLAxLQG5iY2L+sA2Tdwb4
+kPqoRiUS0++v1w/Oud9y0kcF6an3/im18MenqLAPGtnHPH+xE3EHipQsrYN53Fos
+vsFAhXwuDhqGVonMiS+J1OxVsYZ9cRcVlStwZI0JbcCPGjS/vMUsCiE1j8ERuLYr
+ZUNLyxMMQy35iW2uIdk67nRdv03mjTOw9yYr3akjxNW5eJeFrc804fBdZZ7YqrEE
+Ju28oLb7xq1zQUOX3lYKlNKWsex4KA==
+=iNQp
 -----END PGP SIGNATURE-----
 
---9m+I37GxfCApkzWQ--
+--fv2LrnWqf0aiVt0H--
