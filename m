@@ -1,166 +1,133 @@
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out03.mta.xmission.com (out03.mta.xmission.com [166.70.13.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072FC1CA93
-	for <kvmarm@lists.linux.dev>; Fri,  6 Oct 2023 12:47:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nkHFSmnL"
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-d862533ea85so2420760276.0
-        for <kvmarm@lists.linux.dev>; Fri, 06 Oct 2023 05:47:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696596459; x=1697201259; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kE5lcMpcuRWxeOB9S6L9Si7YaWv5hLYl1VeNlBZzT/8=;
-        b=nkHFSmnLcrYptqsudVHa5sl0sqnX3A86TxJwlhN3sgm5x/VaW0W6glcTs69BTSRZIU
-         pj3SmYWCdAjIDZmPeRWYz+566hcx1nq1wljtU8/0lMNhHOqhulFxQ/0MG0xW9JfXro/M
-         UyMMGo+N3aPVq4UJOmWqC0UccrdV3Sz7J6MNo7OdygHsmhN7Gnc3/t08RiG3FE1jKd2w
-         L+CvbGibOySB0RgzrJdQBKwH0H+KaSjev+ubk+5Hzy8bWFCFML62LI5u4T2FTngW+51X
-         8O2a0pmy81zb9gg++marAlgo50QUpE1Gm7vYH7hHaUspJXZSVXY7fSW52gQnwIZ8Flih
-         ui2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696596459; x=1697201259;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kE5lcMpcuRWxeOB9S6L9Si7YaWv5hLYl1VeNlBZzT/8=;
-        b=Q5jCP0Htp3K16KOnHISmYri8s9dDMruhC8ou87wAikGzw+Twp+4nMxs6vhmo2D7mFD
-         iGpbwlXE3n2LxzlW/Nc8799O/oYoXhG9CKqgbegPoIy2yg7dWtitLNOcUwk58mP9HMYB
-         i0XhjMohYMJuvYLhhPfib4LJ0pfiapkot2dQQ5SGSbNOCuyPcxOf3JV+tUfL+bo0r3LO
-         v/mrTmRpueISVGD3m9bvhJ91z678RogMjbx6Qq0MIRtjvn55d3w4a0WngD9P6eRVTpvn
-         gZqLVDyhhAv1du8dhGdRb246RX5Ar09Nh8Nj64Ya+VHXqI7j80cJQiMtOpeDU+A29pL6
-         d5Fw==
-X-Gm-Message-State: AOJu0YwoSEY+AKxXzDhxGwzNR8liEUiGlKtT0OFDSeEqj4yPjSQH/jM+
-	B9bu2NLtf0WK33oMXlzhsOCAyqV4BU7ndvtasBQZLQ==
-X-Google-Smtp-Source: AGHT+IGILgsJf+f8eayHVHqX0rISrGr9tP06v0nLvKR1oTcr5riaw9zUWCGoAJpDUWeKMDK50UY6pLVZ+E+8O7Aw+dY=
-X-Received: by 2002:a5b:807:0:b0:d47:8db3:8bcf with SMTP id
- x7-20020a5b0807000000b00d478db38bcfmr7283393ybp.49.1696596458614; Fri, 06 Oct
- 2023 05:47:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1081D690
+	for <kvmarm@lists.linux.dev>; Fri,  6 Oct 2023 12:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xmission.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xmission.com
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from in02.mta.xmission.com ([166.70.13.52]:37482)
+	by out03.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.93)
+	(envelope-from <ebiederm@xmission.com>)
+	id 1qojy7-00AOeg-9W; Fri, 06 Oct 2023 06:30:11 -0600
+Received: from ip68-227-168-167.om.om.cox.net ([68.227.168.167]:49692 helo=email.froward.int.ebiederm.org.xmission.com)
+	by in02.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.93)
+	(envelope-from <ebiederm@xmission.com>)
+	id 1qojy5-001oHA-T0; Fri, 06 Oct 2023 06:30:10 -0600
+From: "Eric W. Biederman" <ebiederm@xmission.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,  Szabolcs Nagy
+ <Szabolcs.Nagy@arm.com>,  Will Deacon <will@kernel.org>,  Jonathan Corbet
+ <corbet@lwn.net>,  Andrew Morton <akpm@linux-foundation.org>,  Marc
+ Zyngier <maz@kernel.org>,  Oliver Upton <oliver.upton@linux.dev>,  James
+ Morse <james.morse@arm.com>,  Suzuki K Poulose <suzuki.poulose@arm.com>,
+  Arnd Bergmann <arnd@arndb.de>,  Oleg Nesterov <oleg@redhat.com>,  Kees
+ Cook <keescook@chromium.org>,  Shuah Khan <shuah@kernel.org>,  "Rick P.
+ Edgecombe" <rick.p.edgecombe@intel.com>,  Deepak Gupta
+ <debug@rivosinc.com>,  Ard Biesheuvel <ardb@kernel.org>,  "H.J. Lu"
+ <hjl.tools@gmail.com>,  Paul Walmsley <paul.walmsley@sifive.com>,  Palmer
+ Dabbelt <palmer@dabbelt.com>,  Albert Ou <aou@eecs.berkeley.edu>,
+  linux-arm-kernel@lists.infradead.org,  linux-doc@vger.kernel.org,
+  kvmarm@lists.linux.dev,  linux-fsdevel@vger.kernel.org,
+  linux-arch@vger.kernel.org,  linux-mm@kvack.org,
+  linux-kselftest@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  linux-riscv@lists.infradead.org
+References: <aaea542c-929c-4c9b-8caa-ca67e0eb9c1e@sirena.org.uk>
+	<ZOTnL1SDJWZjHPUW@arm.com>
+	<43ec219d-bf20-47b8-a5f8-32bc3b64d487@sirena.org.uk>
+	<ZOXa98SqwYPwxzNP@arm.com> <ZOYFazB1gYjzDRdA@arm.com>
+	<ZRWw7aa3C0LlMPTH@arm.com>
+	<38edb5c3-367e-4ab7-8cb7-aa1a5c0e330c@sirena.org.uk>
+	<ZRvUxLgMse8QYlGS@arm.com>
+	<a7d2fd66-c06b-4033-bca2-4b14afc4904f@sirena.org.uk>
+	<ZR7w/mr0xZbpIPc5@arm.com>
+	<638a7be5-6662-471d-a3ce-0de0ac768e99@sirena.org.uk>
+Date: Fri, 06 Oct 2023 07:29:45 -0500
+In-Reply-To: <638a7be5-6662-471d-a3ce-0de0ac768e99@sirena.org.uk> (Mark
+	Brown's message of "Fri, 6 Oct 2023 13:17:01 +0100")
+Message-ID: <87y1ggylvq.fsf@email.froward.int.ebiederm.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <CA+EHjTwTgEVtea7wgef5G6EEgFa0so_GbNXTMZNKyFE=ucyV0g@mail.gmail.com>
- <ZR99K_ZuWXEtfDuR@google.com>
-In-Reply-To: <ZR99K_ZuWXEtfDuR@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 6 Oct 2023 13:47:01 +0100
-Message-ID: <CA+EHjTyDPEY7B_a8GC7RS8gzfoT2q9kJqJPuHB58ZXQ_61NGkQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v12 11/33] KVM: Introduce per-page memory attributes
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Paul Moore <paul@paul-moore.com>, 
-	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, KVM <kvm@vger.kernel.org>, 
-	"moderated list:ARM64 PORT (AARCH64 ARCHITECTURE)" <linux-arm-kernel@lists.infradead.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	LinuxMIPS <linux-mips@vger.kernel.org>, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-security-module@vger.kernel.org, 
-	open list <linux-kernel@vger.kernel.org>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Vlastimil Babka <vbabka@suse.cz>, 
-	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
-	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-XM-SPF: eid=1qojy5-001oHA-T0;;;mid=<87y1ggylvq.fsf@email.froward.int.ebiederm.org>;;;hst=in02.mta.xmission.com;;;ip=68.227.168.167;;;frm=ebiederm@xmission.com;;;spf=pass
+X-XM-AID: U2FsdGVkX1+LvOjycHAoB6LT49HjM3IrRBVDb8ivK8I=
+X-SA-Exim-Connect-IP: 68.227.168.167
+X-SA-Exim-Mail-From: ebiederm@xmission.com
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on sa05.xmission.com
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.3 required=8.0 tests=ALL_TRUSTED,BAYES_40,
+	DCC_CHECK_NEGATIVE,T_TM2_M_HEADER_IN_MSG,XMSubLong shortcircuit=no
+	autolearn=disabled version=3.4.2
+X-Spam-Report: 
+	* -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
+	* -0.0 BAYES_40 BODY: Bayes spam probability is 20 to 40%
+	*      [score: 0.2176]
+	*  0.7 XMSubLong Long Subject
+	*  0.0 T_TM2_M_HEADER_IN_MSG BODY: No description available.
+	* -0.0 DCC_CHECK_NEGATIVE Not listed in DCC
+	*      [sa05 1397; Body=1 Fuz1=1 Fuz2=1]
+X-Spam-DCC: XMission; sa05 1397; Body=1 Fuz1=1 Fuz2=1 
+X-Spam-Combo: ;Mark Brown <broonie@kernel.org>
+X-Spam-Relay-Country: 
+X-Spam-Timing: total 551 ms - load_scoreonly_sql: 0.05 (0.0%),
+	signal_user_changed: 9 (1.6%), b_tie_ro: 8 (1.4%), parse: 1.11 (0.2%),
+	extract_message_metadata: 3.3 (0.6%), get_uri_detail_list: 1.27 (0.2%),
+	 tests_pri_-2000: 3.5 (0.6%), tests_pri_-1000: 4.8 (0.9%),
+	tests_pri_-950: 1.21 (0.2%), tests_pri_-900: 1.03 (0.2%),
+	tests_pri_-200: 0.80 (0.1%), tests_pri_-100: 3.3 (0.6%),
+	tests_pri_-90: 226 (41.0%), check_bayes: 222 (40.3%), b_tokenize: 10
+	(1.8%), b_tok_get_all: 123 (22.2%), b_comp_prob: 3.0 (0.5%),
+	b_tok_touch_all: 82 (14.9%), b_finish: 1.17 (0.2%), tests_pri_0: 271
+	(49.3%), check_dkim_signature: 0.68 (0.1%), check_dkim_adsp: 3.1
+	(0.6%), poll_dns_idle: 0.87 (0.2%), tests_pri_10: 4.3 (0.8%),
+	tests_pri_500: 13 (2.4%), rewrite_mail: 0.00 (0.0%)
+Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded
+ Control Stacks
+X-SA-Exim-Version: 4.2.1 (built Sat, 08 Feb 2020 21:53:50 +0000)
+X-SA-Exim-Scanned: Yes (on in02.mta.xmission.com)
 
-Hi Sean,
+Mark Brown <broonie@kernel.org> writes:
 
-On Fri, Oct 6, 2023 at 4:21=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
+> On Thu, Oct 05, 2023 at 06:23:10PM +0100, Catalin Marinas wrote:
 >
-> On Thu, Oct 05, 2023, Fuad Tabba wrote:
-> > Hi Sean,
-> >
-> > On Tue, Oct 3, 2023 at 9:51=E2=80=AFPM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> > > > Like I said, pKVM doesn't need a userspace ABI for managing PRIVATE=
-/SHARED,
-> > > > just a way of tracking in the host kernel of what is shared (as opp=
-osed to
-> > > > the hypervisor, which already has the knowledge). The solution coul=
-d simply
-> > > > be that pKVM does not enable KVM_GENERIC_MEMORY_ATTRIBUTES, has its=
- own
-> > > > tracking of the status of the guest pages, and only selects KVM_PRI=
-VATE_MEM.
-> > >
-> > > At the risk of overstepping my bounds, I think that effectively givin=
-g the guest
-> > > full control over what is shared vs. private is a mistake.  It more o=
-r less locks
-> > > pKVM into a single model, and even within that model, dealing with er=
-rors and/or
-> > > misbehaving guests becomes unnecessarily problematic.
-> > >
-> > > Using KVM_SET_MEMORY_ATTRIBUTES may not provide value *today*, e.g. t=
-he userspace
-> > > side of pKVM could simply "reflect" all conversion hypercalls, and te=
-rminate the
-> > > VM on errors.  But the cost is very minimal, e.g. a single extra ioct=
-l() per
-> > > converion, and the upside is that pKVM won't be stuck if a use case c=
-omes along
-> > > that wants to go beyond "all conversion requests either immediately s=
-ucceed or
-> > > terminate the guest".
-> >
-> > Now that I understand the purpose of KVM_SET_MEMORY_ATTRIBUTES, I
-> > agree. However, pKVM needs to track at the host kernel (i.e., EL1)
-> > whether guest memory is shared or private.
+>> It's not just the default size that I dislike (I think the x86
+>> RLIMIT_STACK or clone3() stack_size is probably good enough) but the
+>> kernel allocating the shadow stack and inserting it into the user
+>> address space. The actual thread stack is managed by the user but the
+>> shadow stack is not (and we don't do this very often). Anyway, I don't
+>> have a better solution for direct uses of clone() or clone3(), other
+>> than running those threads with the shadow stack disabled. Not sure
+>> that's desirable.
 >
-> Why does EL1 need it's own view/opinion?  E.g. is it to avoid a accessing=
- data
-> that is still private according to EL2 (on behalf of the guest)?
->
-> Assuming that's the case, why can't EL1 wait until it gets confirmation f=
-rom EL2
-> that the data is fully shared before doing whatever it is that needs to b=
-e done?
->
-> Ah, is the problem that whether or not .mmap() is allowed keys off of the=
- state
-> of the memory attributes?  If that's so, then yeah, an internal flag in a=
-ttributes
-> is probably the way to go.  It doesn't need to be a "host kernel private"=
- flag
-> though, e.g. an IN_FLUX flag to capture that the attributes aren't fully =
-realized
-> might be more intuitive for readers, and might have utility for other att=
-ributes
-> in the future too.
+> Running threads with the shadow stack disabled if they don't explicitly
+> request it feels like it's asking for trouble - as well as the escape
+> route from the protection it'd provide I'd expect there to be trouble
+> for things that do stack pivots, potentially random issues if there's a
+> mix of ways threads are started.  It's going to be a tradeoff whatever
+> we do.
 
-Yes, it's because of mmap. I think that an IN_FLUX flag might work
-here. I'll have a go at it and see how it turns out.
+Something I haven't seen in the discussion is that one of the ways I
+have seen a non-libc clone used is to implement a fork with flags.
+That is a new mm is created, and effectively a new process.  Which
+makes the characterization different.
 
-Thanks,
-/fuad
+In general creating a thread with clone and bypassing libc is
+incompatible with pthreads, and the caller gets to keep both pieces.
 
->
-> > One approach would be to add another flag to the attributes that
-> > tracks the host kernel view. The way KVM_SET_MEMORY_ATTRIBUTES is
-> > implemented now, userspace can zero it, so in that case, that
-> > operation would need to be masked to avoid that.
-> >
-> > Another approach would be to have a pKVM-specific xarray (or similar)
-> > to do the tracking, but since there is a structure that's already
-> > doing something similar (i.e.,the attributes array), it seems like it
-> > would be unnecessary overhead.
-> >
-> > Do you have any ideas or preferences?
-> >
-> > Cheers,
-> > /fuad
+As long as there is enough information code can detect that
+shadow stacks are in use, and the code is able to create their own
+I don't see why it shouldn't be the callers responsibility.
+
+On the other hand I don't see the maintainer of clone Christian Brauner
+or the libc folks especially Florian cc'd on this thread.  So I really
+don't think you have the right folks in on this conversation.
+
+Eric
+k
