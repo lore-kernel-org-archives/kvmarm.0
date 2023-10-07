@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5222E638
-	for <kvmarm@lists.linux.dev>; Sat,  7 Oct 2023 16:05:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819BB2E648
+	for <kvmarm@lists.linux.dev>; Sat,  7 Oct 2023 16:06:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dD3wfOSh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBD24C433C8;
-	Sat,  7 Oct 2023 16:05:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h5tS+aKI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53385C433C8;
+	Sat,  7 Oct 2023 16:06:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696694709;
-	bh=AHTvfCEWzZwSEFfhzOED113jeYXJItB22tDlhfS8dsM=;
+	s=k20201202; t=1696694801;
+	bh=0wtMv/vo5MiySmjAydqxAX8+IfcmvmzhN4ViYm6ohuc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dD3wfOShdBK4cnTjofam23C6WT8tZmBzzJbyOnOv+OaUQUz1Tn1HmEc/l+IkZDrvO
-	 nErDEWAmTIuJTedWF//XIqyjK92kqw68UX8ajW5DRhqmdtV0x5xHT789didEqrS2nM
-	 K2s037JhwkbjoCjjaDfz4wPIad+YgNbg0Hw5h0GaM7bgSeBlAxtlpt7g6m39oG7KSW
-	 e6xy5EhH9fw62RLHM+xHt22T+H2u/Ull2XX6WTft1YoBxRKtzGTaM238mS1gWnuRoX
-	 RX8gjfjpFdzQ0cHP+dTq2BN0cY24FbTcwZcZqKcyZw5oG6tA4cm0tDKn1oWRZu71Zh
-	 lNYKJ8ZIe5OgA==
+	b=h5tS+aKIieH1SH1zC3GiYY/lM2lzXidn4BJMAC/mkfGRUeMzKpkajmm9iY1c6dXnN
+	 HE2yPufjcx0yM6RsvgGeiJokRPWj8c8WlNUcDsm03f+X/Gmo/R4N7G8qcxkDSJKIR7
+	 O6sAVnKop1YWCPUnuM8U43rw8Pfk/0hPbV4V3S2Xbo+S2OCzCLzC7p1Q/OKeHfQsAF
+	 dfft3owo0DQYLKo5XLTT7ECU/pEbq/jURKFiZF9UxTeM0IvGHweJhKW4jHvlLD0BJV
+	 gghaen7M1fx7EFwJPUPe2Y9SCDh8gsp977qASmDxsv9tqu4bSq1C3MKlhF41iP1TZ8
+	 auurS6zSMPzOQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qp9nf-0020hd-DR;
-	Sat, 07 Oct 2023 17:05:07 +0100
-Date: Sat, 07 Oct 2023 17:05:05 +0100
-Message-ID: <877cnymn9q.wl-maz@kernel.org>
+	id 1qp9p9-0020ia-7o;
+	Sat, 07 Oct 2023 17:06:39 +0100
+Date: Sat, 07 Oct 2023 17:06:37 +0100
+Message-ID: <875y3imn76.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Zenghui Yu <yuzenghui@huawei.com>
 Cc: <kvmarm@lists.linux.dev>,
@@ -34,9 +34,10 @@ Cc: <kvmarm@lists.linux.dev>,
 	<suzuki.poulose@arm.com>,
 	<ricarkol@google.com>,
 	<wanghaibin.wang@huawei.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: selftest: Add the missing .guest_prepare()
-In-Reply-To: <20231007124043.626-1-yuzenghui@huawei.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: selftest: Perform ISB before reading PAR_EL1
+In-Reply-To: <20231007124043.626-2-yuzenghui@huawei.com>
 References: <20231007124043.626-1-yuzenghui@huawei.com>
+	<20231007124043.626-2-yuzenghui@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -52,32 +53,32 @@ X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kerne
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, 07 Oct 2023 13:40:42 +0100,
+On Sat, 07 Oct 2023 13:40:43 +0100,
 Zenghui Yu <yuzenghui@huawei.com> wrote:
 > 
-> Running page_fault_test on a Cortex A72 fails with
+> It looks like a mistake to issue ISB *after* reading PAR_EL1, we should
+> instead perform it between the AT instruction and the reads of PAR_EL1.
 > 
-> Test: ro_memslot_no_syndrome_guest_cas
-> Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
-> Testing memory backing src type: anonymous
+> As according to DDI0487J.a IJTYVP,
+> 
+> "When an address translation instruction is executed, explicit
+>  synchronization is required to guarantee the result is visible to
+>  subsequent direct reads of PAR_EL1."
+> 
+> Otherwise all guest_at testcases fail on my box with
+> 
 > ==== Test Assertion Failure ====
->   aarch64/page_fault_test.c:117: guest_check_lse()
->   pid=1944087 tid=1944087 errno=4 - Interrupted system call
->      1	0x00000000004028b3: vcpu_run_loop at page_fault_test.c:682
->      2	0x0000000000402d93: run_test at page_fault_test.c:731
->      3	0x0000000000403957: for_each_guest_mode at guest_modes.c:100
->      4	0x00000000004019f3: for_each_test_and_guest_mode at page_fault_test.c:1108
->      5	 (inlined by) main at page_fault_test.c:1134
->      6	0x0000ffff868e503b: ?? ??:0
->      7	0x0000ffff868e5113: ?? ??:0
+>   aarch64/page_fault_test.c:142: par & 1 == 0
+>   pid=1355864 tid=1355864 errno=4 - Interrupted system call
+>      1	0x0000000000402853: vcpu_run_loop at page_fault_test.c:681
+>      2	0x0000000000402cdb: run_test at page_fault_test.c:730
+>      3	0x0000000000403897: for_each_guest_mode at guest_modes.c:100
+>      4	0x00000000004019f3: for_each_test_and_guest_mode at page_fault_test.c:1105
+>      5	 (inlined by) main at page_fault_test.c:1131
+>      6	0x0000ffffb153c03b: ?? ??:0
+>      7	0x0000ffffb153c113: ?? ??:0
 >      8	0x0000000000401aaf: _start at ??:?
->   guest_check_lse()
-> 
-> because we don't have a guest_prepare stage to check the presence of
-> FEAT_LSE and skip the related guest_cas testing, and we end-up failing in
-> GUEST_ASSERT(guest_check_lse()).
-> 
-> Add the missing .guest_prepare() where it's indeed required.
+>   0x1 != 0x0 (par & 1 != 0)
 > 
 > Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 
