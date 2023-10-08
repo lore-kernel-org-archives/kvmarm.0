@@ -1,184 +1,137 @@
-Received: from AUS01-ME3-obe.outbound.protection.outlook.com (mail-me3aus01olkn2173.outbound.protection.outlook.com [40.92.63.173])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B24C8EAC1
-	for <kvmarm@lists.linux.dev>; Sun,  8 Oct 2023 14:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF72711725;
+	Sun,  8 Oct 2023 19:58:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="FKhXYTsr"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nYHA7nfuRuhvLMy72MpWJ4mK3Jm0xZBoL4TvC3AZpUGkObu3MqIGpPAdNq6CRxINikHisMUbFuSjGEW38COSqRnkdr0BS1DGvEQ9QHfyr/27lCyP6i6gPKQCOluAdUv1ijgPUhEDqzJLAC9iKs1IDbr2WB3w8TnEsncomocLtFx6xqk/qr1o+fQK5rVVpDVRLH/96fyWeprLL0SJ3+tT9CwDGbCS/lUcdfEAfR/vWTU+poS2FW3bG7UUM+j+xYxfelQ8Pgdnj2uWlolyIOXOqLALv9jxTtvHsmiwl++kzpAkfHeTjwFAW3ihnqKl6P9flpSLpTT5fbWlYXEbut82pg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=I/lFtn/nLc2LrnucpQ3epHICG2GV9+ahNS6ImpVxMfc=;
- b=TkGgw0cIwiupQksITQIn8jAh0E54fPLFY/XgrbEEwAiUI20Z6gsXfFk7YK+4wEdrVZL72hlU/UR232OEju1DszJGkUVQmkunHFUzz7KkntaX8a5aoUEO7zqby4cLCxW+HXdRO7Pad/Gvn0M+4ZuYe8LCLJhk+YC+Q6U6Eyaif01HL7FGbG2fsohqqdku4QU/1SLpVNOudvIvZgyIfhyZACRmNICa/tpfk7Rkgl72RDr4aJxRXNEuCWpwDQb73ydN6FaOPweVXebbg3OZCKHk+wXt0raryqspNrob9XxJxEfXA0nd/9/FmjLgXLq+Pw5NZiLUg4DDTgfLYnbGR2cpxQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I/lFtn/nLc2LrnucpQ3epHICG2GV9+ahNS6ImpVxMfc=;
- b=FKhXYTsr2zTk/gvEePAaOzVmVfxlx3K2gXV4OWq4nlAeFmALWbAbOAA+tZ04CR1hcUeHcLj2mdGbmmqAreDA2dE+618R5jU2bbzf+QoxyJWx/66qtESsEu4rOyaKQFhwq/GXSqOHTkLpRHGQmVn4rD1N9hxla2jYhKfWdfHh2pUqVRoeydGjQnsEiQXYu2dP+RIP+P6c1wlRX5GU0442yW46ciOBVvrk1u7BRUW2swZmARqXG8E6k88WTItcfFuvjUyTkaXmxX/SSdLtB3nV3WJxiLTGxZgH0tNiWTISUgmt/o11x+nVcftwMJxEEYfgtu9MQcOdZRBR+HAMAu127Q==
-Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13) by
- SYYP282MB1101.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:bf::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6863.36; Sun, 8 Oct 2023 14:58:06 +0000
-Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
- ([fe80::e39e:17fc:36d8:1ea8]) by SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
- ([fe80::e39e:17fc:36d8:1ea8%3]) with mapi id 15.20.6838.040; Sun, 8 Oct 2023
- 14:58:06 +0000
-From: Tianyi Liu <i.pear@outlook.com>
-To: seanjc@google.com,
-	pbonzini@redhat.com,
-	peterz@infradead.org,
-	mingo@redhat.com,
-	acme@kernel.org
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org,
-	kvm@vger.kernel.org,
-	x86@kernel.org,
-	mark.rutland@arm.com,
-	alexander.shishkin@linux.intel.com,
-	jolsa@kernel.org,
-	namhyung@kernel.org,
-	irogers@google.com,
-	adrian.hunter@intel.com,
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ou+PosWm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696795099; x=1728331099;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=cKwxlSWZrewmQgKrJB6brf7XXi0sqVpTNLHHsR9nXbk=;
+  b=Ou+PosWmcK1D22k4oNyOjzJFGvJmqdXBiBCwqFrHD7G/WdLHokd39SF3
+   RmWW+rEcyB6/p76Ggi3J645Q9vxNdkV02uBFqzfollJamLxdBfcOI8HRr
+   9lP4OTikHimihd1OvKnrNUsBfpwfjw+TtDoJz7l8iHg/KBKuSRPucgwjZ
+   eMQWFZ5QNieRgiqTyfLK7+YC8KqTb/IjjFYYqWSYi/0j/Q9RX1di1Xj6E
+   PeSC/T/we/mjkUDh4a5upTkmcLGcOJhoWkTD2s3XaE5Jfl5FprA7sgh//
+   fikpGicmuP4UHO2zw2u+47Rongdj5jyKCeRCv3tTOK+/C9qrBO3beIULj
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10857"; a="415019064"
+X-IronPort-AV: E=Sophos;i="6.03,207,1694761200"; 
+   d="scan'208";a="415019064"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2023 12:58:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10857"; a="869002523"
+X-IronPort-AV: E=Sophos;i="6.03,207,1694761200"; 
+   d="scan'208";a="869002523"
+Received: from lkp-server01.sh.intel.com (HELO 8a3a91ad4240) ([10.239.97.150])
+  by fmsmga002.fm.intel.com with ESMTP; 08 Oct 2023 12:58:13 -0700
+Received: from kbuild by 8a3a91ad4240 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qpZul-0005hz-1T;
+	Sun, 08 Oct 2023 19:58:11 +0000
+Date: Mon, 9 Oct 2023 03:57:51 +0800
+From: kernel test robot <lkp@intel.com>
+To: Tianyi Liu <i.pear@outlook.com>, seanjc@google.com, pbonzini@redhat.com,
+	peterz@infradead.org, mingo@redhat.com, acme@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, kvm@vger.kernel.org,
+	x86@kernel.org, mark.rutland@arm.com,
+	alexander.shishkin@linux.intel.com, jolsa@kernel.org,
+	namhyung@kernel.org, irogers@google.com, adrian.hunter@intel.com,
 	Tianyi Liu <i.pear@outlook.com>
-Subject: [PATCH v2 5/5] perf tools: Support PERF_CONTEXT_GUEST_* flags
-Date: Sun,  8 Oct 2023 22:57:29 +0800
-Message-ID:
- <SY4P282MB108462B1895A79A8920DD6849DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <SY4P282MB1084ECBCC1B176153B9E2A009DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
-References: <SY4P282MB1084ECBCC1B176153B9E2A009DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [brT8iFehEOwCNXRw/nHup347yUJJMi8XhYPK+wacExEAGNvB18G62w==]
-X-ClientProxiedBy: SG2PR06CA0235.apcprd06.prod.outlook.com
- (2603:1096:4:ac::19) To SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
- (2603:10c6:10:ac::13)
-X-Microsoft-Original-Message-ID: <20231008145729.7886-1-i.pear@outlook.com>
+Subject: Re: [PATCH v2 4/5] perf kvm: Support sampling guest callchains
+Message-ID: <202310090338.4PmYjmBS-lkp@intel.com>
+References: <SY4P282MB108433024762F1F292D47C2A9DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SY4P282MB1084:EE_|SYYP282MB1101:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9c550b0c-fb1d-492c-ce93-08dbc80efa0a
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	KHeHlcHDe59T0Nksh3RMSTCkhCHOh9vZsPg/95V2XqN0q2P2+7r29qRIwKl/SpRRUHFpxFWeQA2OWsl3JMvr98XswCt7ZZkNa0XhTUQ0576IDW9Op3WoUzC1o/mJyyyK0W/deJGGZPVKkVhCwNjrOqE3jGe6gSyG8LX2bDNDTjs0QzFexZvY5uR1Lkbm+Wsh6edF8mdkMeLkoCKC5X6ApUHQWFRB1KAr07rKdcQhVsZA8Kgahnj67XsmXCYq0BU7gTDm+AyCnG5SZtR6kxNaDTt1GGFW5xjcIu2ytfgs1OJ1vlHfHdE8pDgMpQUdsYERkTBpoJEr+I0ytXrwWQEOF3edIAvJdN7d1zfhwYxBJE6dyVgJQV7qEjE+9EZHflohxX2T59pgd3BYjKndmKiapv4okGjGKGgoCOdUoVRI/k0zerPYAyUuSwfa1z4zk4pqg/QFYVjN8YVEuSiAM2/F4UE0dc0sNQrrrP3c7d74zR8RkJAXfdzh5l5ntC6BlckEUA1z8MAob0rqQQQllxVmqMfM49i4BFAOix4tPTz/GNCWgWJsnDeOaBA1PXUaHzQlmmGyZIaA9oHGSjsW5FrZPg5jUtubzil3k5ZOXMbuZ3SJkvfFPOMe4BWGcQIE9vbG
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?+73wY44Qoc4JgWLeOlFDx2MdotZXzfNBpG1vDLXXeAS77wHJ6rAV8Em7MIWp?=
- =?us-ascii?Q?4wS4b5KEJOVr+TqtGtc/EnWLH8bxZwm2ECFoG2HC0eEFiMogpDhqWln19jDu?=
- =?us-ascii?Q?7DCU52FlF8JD56pMvo8wj+j5XW163sn/Rex5gMh02odQ73H4z5OgQEcd1Icn?=
- =?us-ascii?Q?RyysmTxC1JtdfBWtWWq4x9Ll+t60vEOldCa1nbBGo0GESV61Z4t1/Pa3G3JM?=
- =?us-ascii?Q?aZ9V+A7GudImH0WLGD6EJvIkb2YtfuV0TTmQUlpy/TZEqSQxx0yOIK1bOSh0?=
- =?us-ascii?Q?2B/YGdvfdqGg+zU5iSBVNH6y65uAjOhpdbGBpM86ItMjiX9FejVmXs2ZaENk?=
- =?us-ascii?Q?RzkdETbvS1gja0OyRrQde6NjtWt4SHForgSk9LrJfdaEvCj8toDta6c4Y3+1?=
- =?us-ascii?Q?8xagzTKQgVyac69M6OJNLGXa7dVkTHpGaRh429liIsTCuXxFSd4AxfFDIRbX?=
- =?us-ascii?Q?NXnlcZeVevGsSsq+9sPmq+FvC9pLquk9iGfA28GAnMD/UyE1A2tHah+2juKb?=
- =?us-ascii?Q?Jb+Jd38huKeBTYIJU5iiJRpjdiEDMPYkGxuedoUH+ib6xc76qzgoGIrLEeCC?=
- =?us-ascii?Q?3Us8pXXBBDh2eOZXkRKuuiGcgE7liaK06uWaV8Uh3lGQOfQF6sqFi7f/1y7e?=
- =?us-ascii?Q?cTALLew/HFHuEufTjA0X5DitkzNY5EugXM3DGYIhJrl67F9f4w0yy+rzctiJ?=
- =?us-ascii?Q?lsjhR8JOrjp3YAqBlIdj0lu9YgmD0zP8UP4XUwJ8kOZ4P6tV+/SOBvos71Is?=
- =?us-ascii?Q?Coc5BBBtp47OkJZlrTlD3eSn5BGmrUlo1iKY4uPvpBtt+taQfQqHpvGPMVGP?=
- =?us-ascii?Q?ElPpKRnhs659Ua7G06vzhgzfA4ziHq1UIO6/dIgyDuAf4mIglFR/e5vg4Zp1?=
- =?us-ascii?Q?MwmPtfRzaDZlEH3reuXRct0sdxvdREyDmGtprQ8YFA6xeSuvw1GuH+uL+6x7?=
- =?us-ascii?Q?nvgNly33F8TyuzOhQXJHWYBr+u0BLnwTK3drNG2NUf8VIWEmY1t/ZfYWI4GM?=
- =?us-ascii?Q?mQgKEhK8RpH8aQu1bC5PnPDj2cXxlfkbv4H4H8h+Y269AjDIqW4dwmeF9p/0?=
- =?us-ascii?Q?H18ww4F7DhumaM6X6lnDZT3+sGinTM6yBftC7QT0c9opy7MCMjqOTOBjRA85?=
- =?us-ascii?Q?9svMAQXHsL0bJa7vzN1GL38k25Cp9rDCTkRbWgcnJwCpry4uN9SLhXcryuOM?=
- =?us-ascii?Q?X1h+vqDd9hDe5Ib1e6vpd+PN14ksHpSALXVjGLmUNrRnp3/cq1dBMb4dQD8y?=
- =?us-ascii?Q?BYPSUKcM2EC49AWARdg7?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9c550b0c-fb1d-492c-ce93-08dbc80efa0a
-X-MS-Exchange-CrossTenant-AuthSource: SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Oct 2023 14:58:06.4846
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SYYP282MB1101
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SY4P282MB108433024762F1F292D47C2A9DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
 
-The `perf` util currently has a incomplete implementation for the
-following event flags, that events with these flags will be dropped or
-be identified as unknown types:
+Hi Tianyi,
 
-`PERF_CONTEXT_GUEST_KERNEL`
-`PERF_CONTEXT_GUEST_USER`
+kernel test robot noticed the following build warnings:
 
-This patch makes `perf script`, `perf timechart` and `perf data`
-to correctly identify these flags.
+[auto build test WARNING on 8a749fd1a8720d4619c91c8b6e7528c0a355c0aa]
 
-Signed-off-by: Tianyi Liu <i.pear@outlook.com>
----
- tools/perf/builtin-timechart.c      | 6 ++++++
- tools/perf/util/data-convert-json.c | 6 ++++++
- tools/perf/util/machine.c           | 6 ++++++
- 3 files changed, 18 insertions(+)
+url:    https://github.com/intel-lab-lkp/linux/commits/Tianyi-Liu/KVM-Add-arch-specific-interfaces-for-sampling-guest-callchains/20231008-230042
+base:   8a749fd1a8720d4619c91c8b6e7528c0a355c0aa
+patch link:    https://lore.kernel.org/r/SY4P282MB108433024762F1F292D47C2A9DCFA%40SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+patch subject: [PATCH v2 4/5] perf kvm: Support sampling guest callchains
+config: i386-tinyconfig (https://download.01.org/0day-ci/archive/20231009/202310090338.4PmYjmBS-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231009/202310090338.4PmYjmBS-lkp@intel.com/reproduce)
 
-diff --git a/tools/perf/builtin-timechart.c b/tools/perf/builtin-timechart.c
-index 19d4542ea..6a368b6a3 100644
---- a/tools/perf/builtin-timechart.c
-+++ b/tools/perf/builtin-timechart.c
-@@ -536,6 +536,12 @@ static const char *cat_backtrace(union perf_event *event,
- 			case PERF_CONTEXT_USER:
- 				cpumode = PERF_RECORD_MISC_USER;
- 				break;
-+			case PERF_CONTEXT_GUEST_KERNEL:
-+				cpumode = PERF_RECORD_MISC_GUEST_KERNEL;
-+				break;
-+			case PERF_CONTEXT_GUEST_USER:
-+				cpumode = PERF_RECORD_MISC_GUEST_USER;
-+				break;
- 			default:
- 				pr_debug("invalid callchain context: "
- 					 "%"PRId64"\n", (s64) ip);
-diff --git a/tools/perf/util/data-convert-json.c b/tools/perf/util/data-convert-json.c
-index 5bb3c2ba9..62686f78d 100644
---- a/tools/perf/util/data-convert-json.c
-+++ b/tools/perf/util/data-convert-json.c
-@@ -205,6 +205,12 @@ static int process_sample_event(struct perf_tool *tool,
- 				case PERF_CONTEXT_USER:
- 					cpumode = PERF_RECORD_MISC_USER;
- 					break;
-+				case PERF_CONTEXT_GUEST_KERNEL:
-+					cpumode = PERF_RECORD_MISC_GUEST_KERNEL;
-+					break;
-+				case PERF_CONTEXT_GUEST_USER:
-+					cpumode = PERF_RECORD_MISC_GUEST_USER;
-+					break;
- 				default:
- 					pr_debug("invalid callchain context: %"
- 							PRId64 "\n", (s64) ip);
-diff --git a/tools/perf/util/machine.c b/tools/perf/util/machine.c
-index 88f31b3a6..d88458c3b 100644
---- a/tools/perf/util/machine.c
-+++ b/tools/perf/util/machine.c
-@@ -2346,6 +2346,12 @@ static int add_callchain_ip(struct thread *thread,
- 			case PERF_CONTEXT_USER:
- 				*cpumode = PERF_RECORD_MISC_USER;
- 				break;
-+			case PERF_CONTEXT_GUEST_KERNEL:
-+				*cpumode = PERF_RECORD_MISC_GUEST_KERNEL;
-+				break;
-+			case PERF_CONTEXT_GUEST_USER:
-+				*cpumode = PERF_RECORD_MISC_GUEST_USER;
-+				break;
- 			default:
- 				pr_debug("invalid callchain context: "
- 					 "%"PRId64"\n", (s64) ip);
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310090338.4PmYjmBS-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   arch/x86/events/core.c: In function 'perf_callchain_guest32':
+>> arch/x86/events/core.c:2784:43: warning: passing argument 1 of 'perf_guest_read_virt' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+    2784 |                 if (!perf_guest_read_virt(&fp->next_frame, &frame.next_frame,
+         |                                           ^~~~~~~~~~~~~~~
+   In file included from arch/x86/events/core.c:15:
+   include/linux/perf_event.h:1531:41: note: expected 'void *' but argument is of type 'const u32 *' {aka 'const unsigned int *'}
+    1531 | static inline bool perf_guest_read_virt(void*, void*, unsigned int)     { return 0; }
+         |                                         ^~~~~
+   arch/x86/events/core.c:2787:43: warning: passing argument 1 of 'perf_guest_read_virt' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+    2787 |                 if (!perf_guest_read_virt(&fp->return_address, &frame.return_address,
+         |                                           ^~~~~~~~~~~~~~~~~~~
+   include/linux/perf_event.h:1531:41: note: expected 'void *' but argument is of type 'const u32 *' {aka 'const unsigned int *'}
+    1531 | static inline bool perf_guest_read_virt(void*, void*, unsigned int)     { return 0; }
+         |                                         ^~~~~
+   arch/x86/events/core.c: In function 'perf_callchain_guest':
+   arch/x86/events/core.c:2808:51: warning: passing argument 1 of 'perf_guest_read_virt' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+    2808 |                         if (!perf_guest_read_virt(&fp->next_frame, &frame.next_frame,
+         |                                                   ^~~~~~~~~~~~~~~
+   include/linux/perf_event.h:1531:41: note: expected 'void *' but argument is of type 'struct stack_frame * const*'
+    1531 | static inline bool perf_guest_read_virt(void*, void*, unsigned int)     { return 0; }
+         |                                         ^~~~~
+   arch/x86/events/core.c:2811:51: warning: passing argument 1 of 'perf_guest_read_virt' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+    2811 |                         if (!perf_guest_read_virt(&fp->return_address, &frame.return_address,
+         |                                                   ^~~~~~~~~~~~~~~~~~~
+   include/linux/perf_event.h:1531:41: note: expected 'void *' but argument is of type 'const long unsigned int *'
+    1531 | static inline bool perf_guest_read_virt(void*, void*, unsigned int)     { return 0; }
+         |                                         ^~~~~
+
+
+vim +2784 arch/x86/events/core.c
+
+  2775	
+  2776	static inline void
+  2777	perf_callchain_guest32(struct perf_callchain_entry_ctx *entry)
+  2778	{
+  2779		struct stack_frame_ia32 frame;
+  2780		const struct stack_frame_ia32 *fp;
+  2781	
+  2782		fp = (void *)perf_guest_get_frame_pointer();
+  2783		while (fp && entry->nr < entry->max_stack) {
+> 2784			if (!perf_guest_read_virt(&fp->next_frame, &frame.next_frame,
+  2785				sizeof(frame.next_frame)))
+  2786				break;
+  2787			if (!perf_guest_read_virt(&fp->return_address, &frame.return_address,
+  2788				sizeof(frame.return_address)))
+  2789				break;
+  2790			perf_callchain_store(entry, frame.return_address);
+  2791			fp = (void *)frame.next_frame;
+  2792		}
+  2793	}
+  2794	
+
 -- 
-2.42.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
