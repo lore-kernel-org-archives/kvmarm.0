@@ -1,161 +1,80 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 255DB18C15
-	for <kvmarm@lists.linux.dev>; Mon,  9 Oct 2023 12:15:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 220CE18C04
+	for <kvmarm@lists.linux.dev>; Mon,  9 Oct 2023 14:49:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H6L2zm3O"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6D4BC433B6;
-	Mon,  9 Oct 2023 12:14:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="arSRzQAS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2C75C433C8;
+	Mon,  9 Oct 2023 14:49:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696853700;
-	bh=o3F0gqwirOzTh8gwGkZMmsXM7Yu/yi+gPnGo/AGnFQM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=H6L2zm3OMsRyXQZfw5aCB2cQkw9G1wWr2dacwbrbjZXZPIvYK/weMVGb/cCzZKiC7
-	 ZWZE+3KXbORqpB/LvrPa2XKaZcYAjAFSMj4QWQFzw3QNTXKDYCgERhCXIRuk6Sjumc
-	 zB5fHswdhfFPA4MwUbxsr8ag7wUXWXMvOwCfogAugBxO+lLIGF8fBuDPcfcrWt9bL/
-	 UfwoJNGMVjZIYaA2ZzmhBY6HI7q3jqJtDEajWrgfdPB+xTlJBBPSLdojTFkIx10j12
-	 ZNBSMSXaS2qYh9yW/wlBi/EargZA/4mUtrGrQO91UPNkTiaKE8IffZTX8D3vhoHTR8
-	 OG9JYN3wJLxnw==
+	s=k20201202; t=1696862976;
+	bh=MSivuo8AKmLVLL5BhIEYGzpxs7sNu4scT3T+p4zcemc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=arSRzQASZCM61uyG5UNNz0oX5n+yrneIH1O4kajySq+txAE5n7374cLDr4YU+donp
+	 Pu2A0W/6GYgakZhpZKz6uc5tqfI6zE9SoMUMnrSsgZ8gwMAXucX1WrEwrr2sCn51Vg
+	 eMk1tejZZ8PEQAwGGeS5o7tdvc2mVBAHg8K0hvDRbk/IAgp+dAh7H8W/dpUxCUhISi
+	 +Yf3emEUX/VnwzprwkSWlgnuxPSF6OMtnxqVgQYuTM0/C2qD7hagnM5gILiL6TSLAp
+	 mzluUf9RJm79G+L4Fr066DkxQmlv3LZHAz78TA4RsUXQ2z61JbcnpjVg2RsAIpvVHC
+	 9MHKddnlx8oqQ==
+Date: Mon, 9 Oct 2023 15:49:29 +0100
 From: Mark Brown <broonie@kernel.org>
-Date: Mon, 09 Oct 2023 13:09:12 +0100
-Subject: [PATCH v6 38/38] kselftest/arm64: Enable GCS for the FP stress
- tests
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, nd@arm.com,
+	akpm@linux-foundation.org, aneesh.kumar@linux.ibm.com,
+	catalin.marinas@arm.com, dave.hansen@linux.intel.com,
+	maz@kernel.org, oliver.upton@linux.dev, shuah@kernel.org,
+	will@kernel.org, kvmarm@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v1 15/20] arm64: add POE signal support
+Message-ID: <9fd11f36-3987-4f45-94be-7cf89a05ad04@sirena.org.uk>
+References: <20230927140123.5283-1-joey.gouly@arm.com>
+ <20230927140123.5283-16-joey.gouly@arm.com>
+ <a6e6c8a3-15b1-48e3-84fa-810ce575c09a@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231009-arm64-gcs-v6-38-78e55deaa4dd@kernel.org>
-References: <20231009-arm64-gcs-v6-0-78e55deaa4dd@kernel.org>
-In-Reply-To: <20231009-arm64-gcs-v6-0-78e55deaa4dd@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Andrew Morton <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, 
- Oleg Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, 
- Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, 
- "Rick P. Edgecombe" <rick.p.edgecombe@intel.com>, 
- Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, 
- Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Cc: "H.J. Lu" <hjl.tools@gmail.com>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- Florian Weimer <fweimer@redhat.com>, Christian Brauner <brauner@kernel.org>, 
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
- kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
- linux-arch@vger.kernel.org, linux-mm@kvack.org, 
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-riscv@lists.infradead.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.13-dev-0438c
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3085; i=broonie@kernel.org;
- h=from:subject:message-id; bh=o3F0gqwirOzTh8gwGkZMmsXM7Yu/yi+gPnGo/AGnFQM=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBlI+2vG7XbuVEpS5pxDaAIrEX013t37tEVAfRK24qD
- lhEdNXWJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZSPtrwAKCRAk1otyXVSH0O9gB/
- 9FoGr0eST8WBd+FIsUjhsE3d9wYovTCREYw/+Ayy30NkoVgB2HmjZh7K+hb1YN/LMp4ABI6gQv9m7U
- CD4WfBwvZ66QhtkrTfCIAGZpIQukSOsbVk6gdZYFnG7YW+e8eW3WDSRw9MC8WvY4S8Se1kCKCSUCeb
- Qz3siqGYszHBGhCUXtGLknYBqrkRfkRcrLwD25GetvYNDznn9zMYXqk6yRPx0AfSoebviB+WXqPi2L
- dbp5/fysyysuQlZh6LF/DXv7rc3dApbApo0DQVkQsmIg1LX6vsrhlBVTV2UmFdpn3sqVmIl8CtGlBA
- iYNaW3vGcLHl9DSvc6WgiC/Kg5uRyg
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="nmKS1l7Zjsd4RYgP"
+Content-Disposition: inline
+In-Reply-To: <a6e6c8a3-15b1-48e3-84fa-810ce575c09a@sirena.org.uk>
+X-Cookie: What is the sound of one hand clapping?
 
-While it's a bit off topic for them the floating point stress tests do give
-us some coverage of context thrashing cases, and also of active signal
-delivery separate to the relatively complicated framework in the actual
-signals tests. Have the tests enable GCS on startup, ignoring failures so
-they continue to work as before on systems without GCS.
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/arm64/fp/assembler.h   | 15 +++++++++++++++
- tools/testing/selftests/arm64/fp/fpsimd-test.S |  2 ++
- tools/testing/selftests/arm64/fp/sve-test.S    |  2 ++
- tools/testing/selftests/arm64/fp/za-test.S     |  2 ++
- tools/testing/selftests/arm64/fp/zt-test.S     |  2 ++
- 5 files changed, 23 insertions(+)
+--nmKS1l7Zjsd4RYgP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-diff --git a/tools/testing/selftests/arm64/fp/assembler.h b/tools/testing/selftests/arm64/fp/assembler.h
-index 9b38a0da407d..7012f9f796de 100644
---- a/tools/testing/selftests/arm64/fp/assembler.h
-+++ b/tools/testing/selftests/arm64/fp/assembler.h
-@@ -65,4 +65,19 @@ endfunction
- 	bl	puts
- .endm
- 
-+#define PR_SET_SHADOW_STACK_STATUS      72
-+# define PR_SHADOW_STACK_ENABLE         (1UL << 0)
-+
-+.macro enable_gcs
-+	// Run with GCS
-+	mov	x0, PR_SET_SHADOW_STACK_STATUS
-+	mov	x1, PR_SHADOW_STACK_ENABLE
-+	mov	x2, xzr
-+	mov	x3, xzr
-+	mov	x4, xzr
-+	mov	x5, xzr
-+	mov	x8, #__NR_prctl
-+	svc	#0
-+.endm
-+
- #endif /* ! ASSEMBLER_H */
-diff --git a/tools/testing/selftests/arm64/fp/fpsimd-test.S b/tools/testing/selftests/arm64/fp/fpsimd-test.S
-index 8b960d01ed2e..b16fb7f42e3e 100644
---- a/tools/testing/selftests/arm64/fp/fpsimd-test.S
-+++ b/tools/testing/selftests/arm64/fp/fpsimd-test.S
-@@ -215,6 +215,8 @@ endfunction
- // Main program entry point
- .globl _start
- function _start
-+	enable_gcs
-+
- 	mov	x23, #0		// signal count
- 
- 	mov	w0, #SIGINT
-diff --git a/tools/testing/selftests/arm64/fp/sve-test.S b/tools/testing/selftests/arm64/fp/sve-test.S
-index 4328895dfc87..486634bc7def 100644
---- a/tools/testing/selftests/arm64/fp/sve-test.S
-+++ b/tools/testing/selftests/arm64/fp/sve-test.S
-@@ -378,6 +378,8 @@ endfunction
- // Main program entry point
- .globl _start
- function _start
-+	enable_gcs
-+
- 	mov	x23, #0		// Irritation signal count
- 
- 	mov	w0, #SIGINT
-diff --git a/tools/testing/selftests/arm64/fp/za-test.S b/tools/testing/selftests/arm64/fp/za-test.S
-index 9dcd70911397..f789694fa3ea 100644
---- a/tools/testing/selftests/arm64/fp/za-test.S
-+++ b/tools/testing/selftests/arm64/fp/za-test.S
-@@ -231,6 +231,8 @@ endfunction
- // Main program entry point
- .globl _start
- function _start
-+	enable_gcs
-+
- 	mov	x23, #0		// signal count
- 
- 	mov	w0, #SIGINT
-diff --git a/tools/testing/selftests/arm64/fp/zt-test.S b/tools/testing/selftests/arm64/fp/zt-test.S
-index d63286397638..ea5e55310705 100644
---- a/tools/testing/selftests/arm64/fp/zt-test.S
-+++ b/tools/testing/selftests/arm64/fp/zt-test.S
-@@ -200,6 +200,8 @@ endfunction
- // Main program entry point
- .globl _start
- function _start
-+	enable_gcs
-+
- 	mov	x23, #0		// signal count
- 
- 	mov	w0, #SIGINT
+On Thu, Oct 05, 2023 at 03:34:29PM +0100, Mark Brown wrote:
+> On Wed, Sep 27, 2023 at 03:01:18PM +0100, Joey Gouly wrote:
+> > Add PKEY support to signals, by saving and restoring POR_EL0 from the stackframe.
 
--- 
-2.30.2
+> It'd be nice to have at least a basic test that validates that we
+> generate a POE signal frame when expected, though that should be a very
+> minor thing which is unlikely to ever actually spot anything.
 
+Actually, now I think about it we at least need an update to the frame
+parser in userspace so it knows about the new frame.  Without that it'll
+warn whenver it parses the signal context on any system that has POE
+enabled.
+
+--nmKS1l7Zjsd4RYgP
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUkEvgACgkQJNaLcl1U
+h9AVigf9GW/Sur/45PGTLZb/7jQO+xOnDx1zRfo2IrXNG3IyiCvy6MJbw4Wv1Me+
+ggms5XnKqT0GLbnGF/OKAODHgjJj4hF3aSGtBk7/bockrXXG3xiUamZrQrGUjsmN
+d+Q/1QqnNT3uw+VDK19MmpcSpEChFwiEkjqXll4dGoPzedG0OaGcnOG1P/qZeMre
+lsNGs5TaxU6CCmmXeFblLiNusTDroowNsgBI52wN5Y2c56fxOljdzTvgqdiMfHoC
+d25fd46QkLNVA7YZBsDz3ILcv09PJ7FBeiLO5K2deQN9QbNgvGPgW0mkhrcRNAgZ
+MTyYe0dvsQn3/Bj85noS1xH4idZ7OQ==
+=e4nN
+-----END PGP SIGNATURE-----
+
+--nmKS1l7Zjsd4RYgP--
