@@ -1,127 +1,309 @@
-Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2167.outbound.protection.outlook.com [40.92.62.167])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270B44411
-	for <kvmarm@lists.linux.dev>; Mon,  9 Oct 2023 03:20:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53EB18C16
+	for <kvmarm@lists.linux.dev>; Mon,  9 Oct 2023 12:10:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="OK1uwD50"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YxK1le7cgBP8DclGA3FYVd7NwvcAjQmQ1PXoFQ4S/H7oKay6CVZN5Vpvvlxj/lwX/YpF7xEPggEPgFbETEuFKPBb43HojwOeetRZwVrY0M1aqWmnZRkwPvm5EZFLietWUzqbrFV+X3GYyb/ym62vn1gaHLO9seYuNUQ+ixNvFKKZxheatUD51o372tz8H72uBkmKMZIlGCXPMee2r+5XP6+QA4Vc6+pAuo5Ey+AK0LoX1mOYYpe9KeUv5UdDX93VLsgKqFMhAKk2LaafJV4pmBDQaXQVWmTRVgODuDwUy9Z8M5YxHNu8q3Z9vgI0zgZJ9v4CQPeVRjijouae6NlUGQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bP174MRXsKg75uCVcUBGkPpb9klkKIrMdFUTLbBM4L8=;
- b=WLLqT4eenT8Yt44K9GgyjlWEWJVOkCvPXglhKznqGnWuT8fwhDTUQ57T/5PHI68uYYxNo0hPgg6p4BadsixqXIneIpfpsXv78NadW+iCi+YsFzcwCdn18l3ZOwve97RAUDpv1Lh9VS+n7q0a9uSxFG0imJW2trGyqnBRhOW3aBWeW3bTHHIWZe7Ue+GP8djU6sHIFn5Hv8oAB7FkIl4ygEci4C4N9PcgBt9N+2Y5G3UnA0DRA+8P0hlpO3wQD0gPuBjdNTGoKjhrF6P8dKmYFe70/UpgFn4moAOBRxZ1FdFWn5pmLVYhvtT3eGgRscZbz2rJ14ZLIZS9hkHY2tRj4w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bP174MRXsKg75uCVcUBGkPpb9klkKIrMdFUTLbBM4L8=;
- b=OK1uwD50vcpH2qvyyHwBwBHC83rz4e1NOKFLsVrOP4wTrZ4CTC+9xBbw3Lymo3Z4QtgNmY01qpcj5oVzoo6QY9kFfVPrTjo+K2jqXgjeUFeXT3fcpPnpmEDvIECZd9uvJyi1oLyeR+h0PZKft3+USjuAgdMK1VJObmIbNACnue22Li2fXRZSn21et4FDH7aHo8hERUSlMT/XJBqEg/xHV2oMaFsckctIe2EFkh/OD0kZXltGufE80mMVMYdlG0L4ebHj7p9wBTzwJ2dpU0WIaGG8aCm/UgAYBY8DvuJpwOlIp9ysJZxxoOLsYuc8cHySXjqohC7ip2XxokAD+og8og==
-Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13) by
- SYZP282MB3332.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:16d::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6838.43; Mon, 9 Oct 2023 03:20:29 +0000
-Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
- ([fe80::e39e:17fc:36d8:1ea8]) by SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
- ([fe80::e39e:17fc:36d8:1ea8%3]) with mapi id 15.20.6838.040; Mon, 9 Oct 2023
- 03:20:29 +0000
-From: Tianyi Liu <i.pear@outlook.com>
-To: i.pear@outlook.com
-Cc: acme@kernel.org,
-	adrian.hunter@intel.com,
-	alexander.shishkin@linux.intel.com,
-	irogers@google.com,
-	jolsa@kernel.org,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org,
-	mark.rutland@arm.com,
-	mingo@redhat.com,
-	namhyung@kernel.org,
-	pbonzini@redhat.com,
-	peterz@infradead.org,
-	seanjc@google.com,
-	x86@kernel.org
-Subject: Re: [PATCH v2 1/5] KVM: Add arch specific interfaces for sampling guest callchains
-Date: Mon,  9 Oct 2023 11:17:51 +0800
-Message-ID:
- <SY4P282MB1084FD036E733BBBE4D476FF9DCEA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <SY4P282MB10840154D4F09917D6528BC69DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
-References: <SY4P282MB10840154D4F09917D6528BC69DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [fZ6jKpMVpMREBgPTFIRAkP8nV6804dbjmsKjbX/fT2pASNeEM7lkDQ==]
-X-ClientProxiedBy: SG2PR04CA0155.apcprd04.prod.outlook.com (2603:1096:4::17)
- To SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13)
-X-Microsoft-Original-Message-ID: <20231009031751.15378-1-i.pear@outlook.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rGD7zNg/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88D35C433C8;
+	Mon,  9 Oct 2023 12:10:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696853435;
+	bh=LsnQjQpjuA94o4nfxk3wobfdDnvix2UTQn2rBFOyehI=;
+	h=From:Subject:Date:To:Cc:From;
+	b=rGD7zNg/+CNH8ttwN1pHEKt6auD4F/BiezEuRA3ExORRs85qZOhGtjM0/JIUOGG0V
+	 2NrFoHJ8HFjEeVAxnfKtwP0Ap+kpKsZFsstDL7YbtjK0wl0xwKxc5gIJNOEY2q6BC/
+	 /atp/Ir6cyJVW562ZYGcYQTccLrYk4S/XGk/QJrl1D6eT263skYqHujWR2ln8l6Lke
+	 w5lJGPa4m4EbN26J7ecyvXO3okTyBbucKjIivXXtwxwdtYznLkxv3vxotVN+Npq5k9
+	 meqIcG7zQ+h8cPwIgZY3qL+TnPTpH+MHsKM2SdZjr8b316OOuTkhQwReljMJVTBxAs
+	 YYOyz3qEr/2BA==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v6 00/38] arm64/gcs: Provide support for GCS in userspace
+Date: Mon, 09 Oct 2023 13:08:34 +0100
+Message-Id: <20231009-arm64-gcs-v6-0-78e55deaa4dd@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SY4P282MB1084:EE_|SYZP282MB3332:EE_
-X-MS-Office365-Filtering-Correlation-Id: 61188962-8834-4754-09c2-08dbc876af6b
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	yRRkY5fZ0TK9tsijbxuha8+MdE1FGYHZoK4OWDO2uxLAQi6FGnMVkE488bLSOgkD2Sh+zkmzPmuNHxVMqGSWtChJvvi3U/R2ui1+WHIq1pYKxfGcQNnXA9blGK0mkkjA5VSvUXRf1wU2ZhYn/dSbygWwj6YoDVa6QIrELmrADH+Tied/9NzotbnOmQP2VMBREqGBF8Ei+7+wxfhdfOKLTsebGuUNXugA3hKKSTv54agec4Qud6G4MFIcQFceUFi/D9JdT2/YWOpHDbLgNOyf9kyc3TrGGP80DLlHnBF5uFSykHQ+vcrrq3VwC9tg1e/fpGqn39vVw/zBMwPYuOh+CLMDaLEiwSZ/iFfAiSu4tmM+ICYWINXKdBypmUa7tGumGWye5qgbA8Y0RQRdRIaO9rn99TVXIKzHJYsc999YBzZsc71lno5Jn2C2cWDE8OrJ2J5z5GRUTSlUlW/jrMqLB9zsZotiU3xLlQFDNos6ZWMF5XaY580S7ajkG+7dtwiD3oo21YED8PoqcClo8qjoG6xAaAQgWmNFKhN5g+CKE0immFF8M6i8awZl06UDd7tvyJ3q3c9GzlwvTCNBXE6C1+Wr4qNyVdco859bsTTcxV4=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ZSJNkYO58PcKPWcUlqFU80uRG9NLIYVoEz5Q9DJUo60FMx7t8akE0aN35xdr?=
- =?us-ascii?Q?JLH/LbrKcUs6sVFLRsJQgJzIf3EkWqK46tOHxZE0SFjomJ0jdmyvCGYOJbZy?=
- =?us-ascii?Q?BvlHvM+rsGFS73O921dknJribiz1Zax0fon9XkRKR9bTG+j2WJQHjQMPOX16?=
- =?us-ascii?Q?NVR+ns4jp0iiotH2hahdHe8C6IA7BTx1s/JLPP0Ncn2ku/NuYtkiw3SEzeN7?=
- =?us-ascii?Q?0/Vynu601MI5tyMlQSixpplT7LbuUXzc5pTsUWOiZTsUX5Dn/dZ+2jNuXxiz?=
- =?us-ascii?Q?OAmQsUpxcArkHf0lfe+dNuSg6jFJSYlX/R/1u2bVbuD+hPfUECfL3KfwAmX7?=
- =?us-ascii?Q?nRITXQd7/v2SKbRs3be69YnQ+kW4uCshc6QHtaYPanCFl7K3HiS1ZTeruEIJ?=
- =?us-ascii?Q?/DCO92+giGOqnt1z1SHd2ZFPNrfqOPQ17iMcpsmC4eyF7Nb0gZXAXxF/nj78?=
- =?us-ascii?Q?SWKaG/KOOTW3yJbny5ClcKVXTxecetqEJ+2+N563m0CY/M6y6Hd0M/VyeYj4?=
- =?us-ascii?Q?okNae/hQCdCH7Ri5y50tGkq/3QuC9lCwoj4TwUOxpqjrl/Wq+WaO9afDuGDB?=
- =?us-ascii?Q?oEXZWFr7hIyY8+8tE9URfy3Wzs/FASYTeoJuB1iOrccBuwjfIkADbRV7xdOB?=
- =?us-ascii?Q?4rqDiuRxrTH6T7RtY6mYqzLWeN9j0RV8JqG2WQUR9o+k5AYo2UDABz0j4KNW?=
- =?us-ascii?Q?1zt+ZBHbID/UAa5Pj6uSwYR7ls/luaMWqhq7r2tap6xyxsP96uqBjpqaZwiZ?=
- =?us-ascii?Q?5So3zFJn+GQM3kDf7Zdg00l3eMiiTLmUOrPz8hKglWBAcyjDdSkeMZ9lFMN0?=
- =?us-ascii?Q?bfzLpfVFY18+qmum9iBuwkychPwXLW9zoqbSXz5nYs+hr4yzRY11GTYrhkyv?=
- =?us-ascii?Q?gATF76Bz4JTkApcyTQo93u/CE0bwEeGEw51UcZPoIz0IECR00W33fAqxJYTs?=
- =?us-ascii?Q?mtxq7msyJkoCcQcUzv4P0JBYh9GkAZpSQ4Vm/DWmRRnK6MHKvnDC40dD3iRS?=
- =?us-ascii?Q?ZP/zHKo3mz6wdwQO+FwgmKBPW9mReBXGE51yMpO2kEpbeL5sdp5KgGQy1N2W?=
- =?us-ascii?Q?O0a7vRD8Sh3flkcErVsLsGytZG4rLYN41TzVxhzg3Qn6eU7eOguz9G7y63H4?=
- =?us-ascii?Q?dF8Io80kYaiqsaEaeoum61SrXOXtT56KMH1Mu62XGubunER18yJyMkh7wBun?=
- =?us-ascii?Q?g2ZRsvUcCyHtgHxO0HlJ3iLeEXVZflHiGJGG9O2ZlQnA2VAcbnsx64dIL+FO?=
- =?us-ascii?Q?M/Om2+9DyYuTDD0SIzg9?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 61188962-8834-4754-09c2-08dbc876af6b
-X-MS-Exchange-CrossTenant-AuthSource: SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Oct 2023 03:20:29.1280
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SYZP282MB3332
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAEPtI2UC/2XOTW7DIBAF4KtErEsFA8bQVe9RdcHP4KA2dgSR1
+ Sry3TtOF6WyWL0R35u5s4a1YGMvpzuruJZWlpmCeTqxePbzhLwkygwEKEGP+3oxmk+xcVRS+iC
+ SHcEx+h98Qx6qn+N5F7fLdZ9eK+by9djw9k75XNptqd+Phavcp7/dozRd9yq54CEPZsxOheDN6
+ wfWGT+flzqxvWaFjoLuKRBNEaJMWkfAcKCqo0r2VBGNKWWXnRXJ2QPVf9SKsaeaqLExe0UnC+M
+ OdOgoQE8Hog6ztDIlo0D/o9u2/QDkzr5EpQEAAA==
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+ Andrew Morton <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, 
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, 
+ Oleg Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, 
+ Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, 
+ "Rick P. Edgecombe" <rick.p.edgecombe@intel.com>, 
+ Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, 
+ Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Cc: "H.J. Lu" <hjl.tools@gmail.com>, 
+ Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+ Florian Weimer <fweimer@redhat.com>, Christian Brauner <brauner@kernel.org>, 
+ linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+ kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+ linux-arch@vger.kernel.org, linux-mm@kvack.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-riscv@lists.infradead.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.13-dev-0438c
+X-Developer-Signature: v=1; a=openpgp-sha256; l=12926; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=LsnQjQpjuA94o4nfxk3wobfdDnvix2UTQn2rBFOyehI=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBlI+2RpqSvd9DZCjuZNVm1fTUcTskZgMxHViRiwYwT
+ ieP5k0iJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZSPtkQAKCRAk1otyXVSH0HYPB/
+ 9Xew+pup/mVT3LhVQYn9v+CS1MLZRwe/bnYiPhKXjcOmMcQbRQLg9gFbUlynQvI7qutfswTnHbSwha
+ /PiZTS6lWKL46dPKGlXcEeuFeF/Z0vxbV8oxmvpv2BZLIpqA635ABbSlTewSa9LexNUeeFBQaMu20e
+ eutz1OvuyZBFsXjU3FeN3XasUF2w0vBGSwaipivZOhHDXqsOUUHfl1Qw4PzVwFIotO5eEkRgE9pCZd
+ aN1WmwuBsWG57FiTzZi/5uTrxmDbSwco7VTBOJZbugyKphgDYvEVYoRU8CZSix7Gt417lrOanlr/8H
+ v4SnmpTe94QpLYwT7cU9BpRwNIXQKS
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-> All warnings (new ones prefixed by >>):
-> 
->    arch/x86/kvm/x86.c: In function 'kvm_arch_vcpu_read_virt':
-> >> arch/x86/kvm/x86.c:12917:42: warning: passing argument 2 of 'kvm_read_guest_virt' makes integer from pointer without a cast [-Wint-conversion]
->    12917 |         return kvm_read_guest_virt(vcpu, addr, dest, length, &e) == X86EMUL_CONTINUE;
->          |                                          ^~~~
->          |                                          |
->          |                                          void *
->    arch/x86/kvm/x86.c:7388:38: note: expected 'gva_t' {aka 'long unsigned int'} but argument is of type 'void *'
->     7388 |                                gva_t addr, void *val, unsigned int bytes,
->          |                                ~~~~~~^~~~
-> 
+The arm64 Guarded Control Stack (GCS) feature provides support for
+hardware protected stacks of return addresses, intended to provide
+hardening against return oriented programming (ROP) attacks and to make
+it easier to gather call stacks for applications such as profiling.
 
-Terribly sorry for the build warnings, which is caused by type casting.
-Will be fixed in the next version.
+When GCS is active a secondary stack called the Guarded Control Stack is
+maintained, protected with a memory attribute which means that it can
+only be written with specific GCS operations.  The current GCS pointer
+can not be directly written to by userspace.  When a BL is executed the
+value stored in LR is also pushed onto the GCS, and when a RET is
+executed the top of the GCS is popped and compared to LR with a fault
+being raised if the values do not match.  GCS operations may only be
+performed on GCS pages, a data abort is generated if they are not.
+
+The combination of hardware enforcement and lack of extra instructions
+in the function entry and exit paths should result in something which
+has less overhead and is more difficult to attack than a purely software
+implementation like clang's shadow stacks.
+
+This series implements support for use of GCS by userspace, along with
+support for use of GCS within KVM guests.  It does not enable use of GCS
+by either EL1 or EL2, this will be implemented separately.  Executables
+are started without GCS and must use a prctl() to enable it, it is
+expected that this will be done very early in application execution by
+the dynamic linker or other startup code.  For dynamic linking this will
+be done by checking that everything in the executable is marked as GCS
+compatible.
+
+x86 has an equivalent feature called shadow stacks, this series depends
+on the x86 patches for generic memory management support for the new
+guarded/shadow stack page type and shares APIs as much as possible.  As
+there has been extensive discussion with the wider community around the
+ABI for shadow stacks I have as far as practical kept implementation
+decisions close to those for x86, anticipating that review would lead to
+similar conclusions in the absence of strong reasoning for divergence.
+
+The main divergence I am concious of is that x86 allows shadow stack to
+be enabled and disabled repeatedly, freeing the shadow stack for the
+thread whenever disabled, while this implementation keeps the GCS
+allocated after disable but refuses to reenable it.  This is to avoid
+races with things actively walking the GCS during a disable, we do
+anticipate that some systems will wish to disable GCS at runtime but are
+not aware of any demand for subsequently reenabling it.
+
+x86 uses an arch_prctl() to manage enable and disable, since only x86
+and S/390 use arch_prctl() a generic prctl() was proposed[1] as part of a
+patch set for the equivalent RISC-V zisslpcfi feature which I initially
+adopted fairly directly but following review feedback has been revised
+quite a bit.
+
+There is an open issue with support for CRIU, on x86 this required the
+ability to set the GCS mode via ptrace.  This series supports
+configuring mode bits other than enable/disable via ptrace but it needs
+to be confirmed if this is sufficient.
+
+There's a few bits where I'm not convinced with where I've placed
+things, in particular the GCS write operation is in the GCS header not
+in uaccess.h, I wasn't sure what was clearest there and am probably too
+close to the code to have a clear opinion.  The reporting of GCS in
+/proc/PID/smaps is also a bit awkward.
+
+The series depends on the x86 shadow stack support:
+
+   https://lore.kernel.org/lkml/20230227222957.24501-1-rick.p.edgecombe@intel.com/
+
+I've rebased this onto v6.5-rc4 but not included it in the series in
+order to avoid confusion with Rick's work and cut down the size of the
+series, you can see the branch at:
+
+   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/misc.git arm64-gcs
+
+[1] https://lore.kernel.org/lkml/20230213045351.3945824-1-debug@rivosinc.com/
+
+Pending feedback from Catalin:
+ - Use clone3() paramaters to size/place the GCS.
+ - Switch copy_to_user_gcs() to be put_user_gcs().
+
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v6:
+- Rebase onto v6.6-rc3.
+- Add some more gcsb_dsync() barriers following spec clarifications.
+- Due to ongoing discussion around clone()/clone3() I've not updated
+  anything there, the behaviour is the same as on previous versions.
+- Link to v5: https://lore.kernel.org/r/20230822-arm64-gcs-v5-0-9ef181dd6324@kernel.org
+
+Changes in v5:
+- Don't map any permissions for user GCSs, we always use EL0 accessors
+  or use a separate mapping of the page.
+- Reduce the standard size of the GCS to RLIMIT_STACK/2.
+- Enforce a PAGE_SIZE alignment requirement on map_shadow_stack().
+- Clarifications and fixes to documentation.
+- More tests.
+- Link to v4: https://lore.kernel.org/r/20230807-arm64-gcs-v4-0-68cfa37f9069@kernel.org
+
+Changes in v4:
+- Implement flags for map_shadow_stack() allowing the cap and end of
+  stack marker to be enabled independently or not at all.
+- Relax size and alignment requirements for map_shadow_stack().
+- Add more blurb explaining the advantages of hardware enforcement.
+- Link to v3: https://lore.kernel.org/r/20230731-arm64-gcs-v3-0-cddf9f980d98@kernel.org
+
+Changes in v3:
+- Rebase onto v6.5-rc4.
+- Add a GCS barrier on context switch.
+- Add a GCS stress test.
+- Link to v2: https://lore.kernel.org/r/20230724-arm64-gcs-v2-0-dc2c1d44c2eb@kernel.org
+
+Changes in v2:
+- Rebase onto v6.5-rc3.
+- Rework prctl() interface to allow each bit to be locked independently.
+- map_shadow_stack() now places the cap token based on the size
+  requested by the caller not the actual space allocated.
+- Mode changes other than enable via ptrace are now supported.
+- Expand test coverage.
+- Various smaller fixes and adjustments.
+- Link to v1: https://lore.kernel.org/r/20230716-arm64-gcs-v1-0-bf567f93bba6@kernel.org
+
+---
+Mark Brown (38):
+      arm64/mm: Restructure arch_validate_flags() for extensibility
+      prctl: arch-agnostic prctl for shadow stack
+      mman: Add map_shadow_stack() flags
+      arm64: Document boot requirements for Guarded Control Stacks
+      arm64/gcs: Document the ABI for Guarded Control Stacks
+      arm64/sysreg: Add new system registers for GCS
+      arm64/sysreg: Add definitions for architected GCS caps
+      arm64/gcs: Add manual encodings of GCS instructions
+      arm64/gcs: Provide copy_to_user_gcs()
+      arm64/cpufeature: Runtime detection of Guarded Control Stack (GCS)
+      arm64/mm: Allocate PIE slots for EL0 guarded control stack
+      mm: Define VM_SHADOW_STACK for arm64 when we support GCS
+      arm64/mm: Map pages for guarded control stack
+      KVM: arm64: Manage GCS registers for guests
+      arm64/gcs: Allow GCS usage at EL0 and EL1
+      arm64/idreg: Add overrride for GCS
+      arm64/hwcap: Add hwcap for GCS
+      arm64/traps: Handle GCS exceptions
+      arm64/mm: Handle GCS data aborts
+      arm64/gcs: Context switch GCS state for EL0
+      arm64/gcs: Allocate a new GCS for threads with GCS enabled
+      arm64/gcs: Implement shadow stack prctl() interface
+      arm64/mm: Implement map_shadow_stack()
+      arm64/signal: Set up and restore the GCS context for signal handlers
+      arm64/signal: Expose GCS state in signal frames
+      arm64/ptrace: Expose GCS via ptrace and core files
+      arm64: Add Kconfig for Guarded Control Stack (GCS)
+      kselftest/arm64: Verify the GCS hwcap
+      kselftest/arm64: Add GCS as a detected feature in the signal tests
+      kselftest/arm64: Add framework support for GCS to signal handling tests
+      kselftest/arm64: Allow signals tests to specify an expected si_code
+      kselftest/arm64: Always run signals tests with GCS enabled
+      kselftest/arm64: Add very basic GCS test program
+      kselftest/arm64: Add a GCS test program built with the system libc
+      kselftest/arm64: Add test coverage for GCS mode locking
+      selftests/arm64: Add GCS signal tests
+      kselftest/arm64: Add a GCS stress test
+      kselftest/arm64: Enable GCS for the FP stress tests
+
+ Documentation/admin-guide/kernel-parameters.txt    |   6 +
+ Documentation/arch/arm64/booting.rst               |  22 +
+ Documentation/arch/arm64/elf_hwcaps.rst            |   3 +
+ Documentation/arch/arm64/gcs.rst                   | 233 +++++++
+ Documentation/arch/arm64/index.rst                 |   1 +
+ Documentation/filesystems/proc.rst                 |   2 +-
+ arch/arm64/Kconfig                                 |  19 +
+ arch/arm64/include/asm/cpufeature.h                |   6 +
+ arch/arm64/include/asm/el2_setup.h                 |  17 +
+ arch/arm64/include/asm/esr.h                       |  28 +-
+ arch/arm64/include/asm/exception.h                 |   2 +
+ arch/arm64/include/asm/gcs.h                       | 106 +++
+ arch/arm64/include/asm/hwcap.h                     |   1 +
+ arch/arm64/include/asm/kvm_arm.h                   |   4 +-
+ arch/arm64/include/asm/kvm_host.h                  |  12 +
+ arch/arm64/include/asm/mman.h                      |  23 +-
+ arch/arm64/include/asm/pgtable-prot.h              |  14 +-
+ arch/arm64/include/asm/processor.h                 |   7 +
+ arch/arm64/include/asm/sysreg.h                    |  20 +
+ arch/arm64/include/asm/uaccess.h                   |  42 ++
+ arch/arm64/include/uapi/asm/hwcap.h                |   1 +
+ arch/arm64/include/uapi/asm/ptrace.h               |   8 +
+ arch/arm64/include/uapi/asm/sigcontext.h           |   9 +
+ arch/arm64/kernel/cpufeature.c                     |  19 +
+ arch/arm64/kernel/cpuinfo.c                        |   1 +
+ arch/arm64/kernel/entry-common.c                   |  23 +
+ arch/arm64/kernel/idreg-override.c                 |   2 +
+ arch/arm64/kernel/process.c                        |  92 +++
+ arch/arm64/kernel/ptrace.c                         |  59 ++
+ arch/arm64/kernel/signal.c                         | 237 ++++++-
+ arch/arm64/kernel/traps.c                          |  11 +
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h         |  17 +
+ arch/arm64/kvm/sys_regs.c                          |  22 +
+ arch/arm64/mm/Makefile                             |   1 +
+ arch/arm64/mm/fault.c                              |  79 ++-
+ arch/arm64/mm/gcs.c                                | 228 +++++++
+ arch/arm64/mm/mmap.c                               |  13 +-
+ arch/arm64/tools/cpucaps                           |   1 +
+ arch/arm64/tools/sysreg                            |  55 ++
+ arch/x86/include/uapi/asm/mman.h                   |   3 -
+ fs/proc/task_mmu.c                                 |   3 +
+ include/linux/mm.h                                 |  16 +-
+ include/uapi/asm-generic/mman.h                    |   4 +
+ include/uapi/asm-generic/unistd.h                  |   5 +-
+ include/uapi/linux/elf.h                           |   1 +
+ include/uapi/linux/prctl.h                         |  22 +
+ kernel/sys.c                                       |  30 +
+ tools/testing/selftests/arm64/Makefile             |   2 +-
+ tools/testing/selftests/arm64/abi/hwcap.c          |  19 +
+ tools/testing/selftests/arm64/fp/assembler.h       |  15 +
+ tools/testing/selftests/arm64/fp/fpsimd-test.S     |   2 +
+ tools/testing/selftests/arm64/fp/sve-test.S        |   2 +
+ tools/testing/selftests/arm64/fp/za-test.S         |   2 +
+ tools/testing/selftests/arm64/fp/zt-test.S         |   2 +
+ tools/testing/selftests/arm64/gcs/.gitignore       |   5 +
+ tools/testing/selftests/arm64/gcs/Makefile         |  24 +
+ tools/testing/selftests/arm64/gcs/asm-offsets.h    |   0
+ tools/testing/selftests/arm64/gcs/basic-gcs.c      | 356 ++++++++++
+ tools/testing/selftests/arm64/gcs/gcs-locking.c    | 200 ++++++
+ .../selftests/arm64/gcs/gcs-stress-thread.S        | 311 +++++++++
+ tools/testing/selftests/arm64/gcs/gcs-stress.c     | 532 +++++++++++++++
+ tools/testing/selftests/arm64/gcs/gcs-util.h       | 100 +++
+ tools/testing/selftests/arm64/gcs/libc-gcs.c       | 742 +++++++++++++++++++++
+ tools/testing/selftests/arm64/signal/.gitignore    |   1 +
+ .../testing/selftests/arm64/signal/test_signals.c  |  17 +-
+ .../testing/selftests/arm64/signal/test_signals.h  |   6 +
+ .../selftests/arm64/signal/test_signals_utils.c    |  32 +-
+ .../selftests/arm64/signal/test_signals_utils.h    |  39 ++
+ .../arm64/signal/testcases/gcs_exception_fault.c   |  59 ++
+ .../selftests/arm64/signal/testcases/gcs_frame.c   |  78 +++
+ .../arm64/signal/testcases/gcs_write_fault.c       |  67 ++
+ .../selftests/arm64/signal/testcases/testcases.c   |   7 +
+ .../selftests/arm64/signal/testcases/testcases.h   |   1 +
+ 73 files changed, 4110 insertions(+), 41 deletions(-)
+---
+base-commit: 6465e260f48790807eef06b583b38ca9789b6072
+change-id: 20230303-arm64-gcs-e311ab0d8729
+
+Best regards,
+-- 
+Mark Brown <broonie@kernel.org>
+
