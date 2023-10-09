@@ -1,15 +1,15 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8373936B0E
-	for <kvmarm@lists.linux.dev>; Mon,  9 Oct 2023 18:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A27FBE3
+	for <kvmarm@lists.linux.dev>; Mon,  9 Oct 2023 18:50:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0F5591FB;
-	Mon,  9 Oct 2023 11:51:14 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C3F59FEC;
+	Mon,  9 Oct 2023 11:51:15 -0700 (PDT)
 Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.26])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BED9B3F5A1;
-	Mon,  9 Oct 2023 11:50:31 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 806703F5A1;
+	Mon,  9 Oct 2023 11:50:33 -0700 (PDT)
 From: Ryan Roberts <ryan.roberts@arm.com>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
@@ -23,9 +23,9 @@ To: Catalin Marinas <catalin.marinas@arm.com>,
 Cc: Ryan Roberts <ryan.roberts@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: [PATCH v4 09/12] KVM: arm64: Support up to 5 levels of translation in kvm_pgtable
-Date: Mon,  9 Oct 2023 19:50:05 +0100
-Message-Id: <20231009185008.3803879-10-ryan.roberts@arm.com>
+Subject: [PATCH v4 10/12] KVM: arm64: Allow guests with >48-bit IPA size on FEAT_LPA2 systems
+Date: Mon,  9 Oct 2023 19:50:06 +0100
+Message-Id: <20231009185008.3803879-11-ryan.roberts@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231009185008.3803879-1-ryan.roberts@arm.com>
 References: <20231009185008.3803879-1-ryan.roberts@arm.com>
@@ -37,92 +37,36 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-FEAT_LPA2 increases the maximum levels of translation from 4 to 5 for
-the 4KB page case, when IA is >48 bits. While we can still use 4 levels
-for stage2 translation in this case (due to stage2 allowing concatenated
-page tables for first level lookup), the same kvm_pgtable library is
-used for the hyp stage1 page tables and stage1 does not support
-concatenation.
-
-Therefore, modify the library to support up to 5 levels. Previous
-patches already laid the groundwork for this by refactoring code to work
-in terms of KVM_PGTABLE_FIRST_LEVEL and KVM_PGTABLE_LAST_LEVEL. So we
-just need to change these macros.
-
-The hardware sometimes encodes the new level differently from the
-others: One such place is when reading the level from the FSC field in
-the ESR_EL2 register. We never expect to see the lowest level (-1) here
-since the stage 2 page tables always use concatenated tables for first
-level lookup and therefore only use 4 levels of lookup. So we get away
-with just adding a comment to explain why we are not being careful about
-decoding level -1.
-
-For stage2 VTCR_EL2.SL2 is introduced to encode the new start level.
-However, since we always use concatenated page tables for first level
-look up at stage2 (and therefore we will never need the new extra level)
-we never touch this new field.
+With all the page-table infrastructure in place, we can finally increase
+the maximum permisable IPA size to 52-bits on 4KB and 16KB page systems
+that have FEAT_LPA2.
 
 Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 10 ++++++++++
- arch/arm64/include/asm/kvm_pgtable.h |  2 +-
- arch/arm64/kvm/hyp/pgtable.c         |  9 +++++++++
- 3 files changed, 20 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/reset.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index bf3ef66eb51f..9afce5e42352 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -406,6 +406,16 @@ static __always_inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vc
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 7a65a35ee4ac..7816c64d4701 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -316,12 +316,11 @@ int __init kvm_set_ipa_limit(void)
+ 	parange = cpuid_feature_extract_unsigned_field(mmfr0,
+ 				ID_AA64MMFR0_EL1_PARANGE_SHIFT);
+ 	/*
+-	 * IPA size beyond 48 bits could not be supported
+-	 * on either 4K or 16K page size. Hence let's cap
+-	 * it to 48 bits, in case it's reported as larger
+-	 * on the system.
++	 * IPA size beyond 48 bits for 4K and 16K page size is only supported
++	 * when LPA2 is available. So if we have LPA2, enable it, else cap to 48
++	 * bits, in case it's reported as larger on the system.
+ 	 */
+-	if (PAGE_SIZE != SZ_64K)
++	if (!system_supports_lpa2() && PAGE_SIZE != SZ_64K)
+ 		parange = min(parange, (unsigned int)ID_AA64MMFR0_EL1_PARANGE_48);
  
- static __always_inline s8 kvm_vcpu_trap_get_fault_level(const struct kvm_vcpu *vcpu)
- {
-+	/*
-+	 * Note: With the introduction of FEAT_LPA2 an extra level of
-+	 * translation (level -1) is added. This level (obviously) doesn't
-+	 * follow the previous convention of encoding the 4 levels in the 2 LSBs
-+	 * of the FSC so this function breaks if the fault is for level -1.
-+	 *
-+	 * However, stage2 tables always use concatenated tables for first level
-+	 * lookup and therefore it is guaranteed that the level will be between
-+	 * 0 and 3, and this function continues to work.
-+	 */
- 	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC_LEVEL;
- }
- 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index c61bb9709201..3d2cde571553 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -11,7 +11,7 @@
- #include <linux/kvm_host.h>
- #include <linux/types.h>
- 
--#define KVM_PGTABLE_FIRST_LEVEL		0
-+#define KVM_PGTABLE_FIRST_LEVEL		-1
- #define KVM_PGTABLE_LAST_LEVEL		3
- 
- /*
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 8e79ff6972ce..20a2322fa45a 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -643,6 +643,15 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
- 	lvls = stage2_pgtable_levels(phys_shift);
- 	if (lvls < 2)
- 		lvls = 2;
-+
-+	/*
-+	 * When LPA2 is enabled, the HW supports an extra level of translation
-+	 * (for 5 in total) when using 4K pages. It also introduces VTCR_EL2.SL2
-+	 * to as an addition to SL0 to enable encoding this extra start level.
-+	 * However, since we always use concatenated pages for the first level
-+	 * lookup, we will never need this extra level and therefore do not need
-+	 * to touch SL2.
-+	 */
- 	vtcr |= VTCR_EL2_LVLS_TO_SL0(lvls);
- 
- #ifdef CONFIG_ARM64_HW_AFDBM
+ 	/*
 -- 
 2.25.1
 
