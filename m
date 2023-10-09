@@ -1,107 +1,127 @@
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2167.outbound.protection.outlook.com [40.92.62.167])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5771EFC04;
-	Sun,  8 Oct 2023 22:25:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270B44411
+	for <kvmarm@lists.linux.dev>; Mon,  9 Oct 2023 03:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AU2GoFws"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696803927; x=1728339927;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=yPD6DsIdg9+uokcveGmkjl3wIt7hKAzaaoSXHfIFMT8=;
-  b=AU2GoFwsVRQ4jc41D/qBsOlQDuFenhqbFRFfhJWVAL2Rzn0xWPFNVwBr
-   1UlY//ZOqfdP20tTOiMB/rGumzS/JHldQwsCuhSeYWrOhfdJW7Ylx28O+
-   1PqbjxUDJRxxwEsraa2SRWHOXvUy2zT0JWIueh9NA8+tcU8yEPDkf4GhO
-   1Ax/kcwzf9KPn3bQ23rpynuA8Si7j7welqB1Wg84MldaqgjN6ykOL8BjZ
-   LM6ebnDcotuFKHuBwy6Ui/tZiktNZk9aoxxaRGb0sqTQYy4JGGAMQZ10w
-   PvZMpXXBmQ/qlDUAKdPXLpLhOIf+fJbIMtOTMOrFBQVhBf/YUloc2VKpy
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10857"; a="387900176"
-X-IronPort-AV: E=Sophos;i="6.03,207,1694761200"; 
-   d="scan'208";a="387900176"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2023 15:25:26 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10857"; a="869025176"
-X-IronPort-AV: E=Sophos;i="6.03,207,1694761200"; 
-   d="scan'208";a="869025176"
-Received: from lkp-server01.sh.intel.com (HELO 8a3a91ad4240) ([10.239.97.150])
-  by fmsmga002.fm.intel.com with ESMTP; 08 Oct 2023 15:25:21 -0700
-Received: from kbuild by 8a3a91ad4240 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qpcD9-0005p2-1q;
-	Sun, 08 Oct 2023 22:25:19 +0000
-Date: Mon, 9 Oct 2023 06:25:00 +0800
-From: kernel test robot <lkp@intel.com>
-To: Tianyi Liu <i.pear@outlook.com>, seanjc@google.com, pbonzini@redhat.com,
-	peterz@infradead.org, mingo@redhat.com, acme@kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
-	kvm@vger.kernel.org, x86@kernel.org, mark.rutland@arm.com,
-	alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-	namhyung@kernel.org, irogers@google.com, adrian.hunter@intel.com,
-	Tianyi Liu <i.pear@outlook.com>
-Subject: Re: [PATCH v2 1/5] KVM: Add arch specific interfaces for sampling
- guest callchains
-Message-ID: <202310090652.6TMWiCuU-lkp@intel.com>
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="OK1uwD50"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YxK1le7cgBP8DclGA3FYVd7NwvcAjQmQ1PXoFQ4S/H7oKay6CVZN5Vpvvlxj/lwX/YpF7xEPggEPgFbETEuFKPBb43HojwOeetRZwVrY0M1aqWmnZRkwPvm5EZFLietWUzqbrFV+X3GYyb/ym62vn1gaHLO9seYuNUQ+ixNvFKKZxheatUD51o372tz8H72uBkmKMZIlGCXPMee2r+5XP6+QA4Vc6+pAuo5Ey+AK0LoX1mOYYpe9KeUv5UdDX93VLsgKqFMhAKk2LaafJV4pmBDQaXQVWmTRVgODuDwUy9Z8M5YxHNu8q3Z9vgI0zgZJ9v4CQPeVRjijouae6NlUGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bP174MRXsKg75uCVcUBGkPpb9klkKIrMdFUTLbBM4L8=;
+ b=WLLqT4eenT8Yt44K9GgyjlWEWJVOkCvPXglhKznqGnWuT8fwhDTUQ57T/5PHI68uYYxNo0hPgg6p4BadsixqXIneIpfpsXv78NadW+iCi+YsFzcwCdn18l3ZOwve97RAUDpv1Lh9VS+n7q0a9uSxFG0imJW2trGyqnBRhOW3aBWeW3bTHHIWZe7Ue+GP8djU6sHIFn5Hv8oAB7FkIl4ygEci4C4N9PcgBt9N+2Y5G3UnA0DRA+8P0hlpO3wQD0gPuBjdNTGoKjhrF6P8dKmYFe70/UpgFn4moAOBRxZ1FdFWn5pmLVYhvtT3eGgRscZbz2rJ14ZLIZS9hkHY2tRj4w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bP174MRXsKg75uCVcUBGkPpb9klkKIrMdFUTLbBM4L8=;
+ b=OK1uwD50vcpH2qvyyHwBwBHC83rz4e1NOKFLsVrOP4wTrZ4CTC+9xBbw3Lymo3Z4QtgNmY01qpcj5oVzoo6QY9kFfVPrTjo+K2jqXgjeUFeXT3fcpPnpmEDvIECZd9uvJyi1oLyeR+h0PZKft3+USjuAgdMK1VJObmIbNACnue22Li2fXRZSn21et4FDH7aHo8hERUSlMT/XJBqEg/xHV2oMaFsckctIe2EFkh/OD0kZXltGufE80mMVMYdlG0L4ebHj7p9wBTzwJ2dpU0WIaGG8aCm/UgAYBY8DvuJpwOlIp9ysJZxxoOLsYuc8cHySXjqohC7ip2XxokAD+og8og==
+Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13) by
+ SYZP282MB3332.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:16d::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6838.43; Mon, 9 Oct 2023 03:20:29 +0000
+Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::e39e:17fc:36d8:1ea8]) by SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::e39e:17fc:36d8:1ea8%3]) with mapi id 15.20.6838.040; Mon, 9 Oct 2023
+ 03:20:29 +0000
+From: Tianyi Liu <i.pear@outlook.com>
+To: i.pear@outlook.com
+Cc: acme@kernel.org,
+	adrian.hunter@intel.com,
+	alexander.shishkin@linux.intel.com,
+	irogers@google.com,
+	jolsa@kernel.org,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	mark.rutland@arm.com,
+	mingo@redhat.com,
+	namhyung@kernel.org,
+	pbonzini@redhat.com,
+	peterz@infradead.org,
+	seanjc@google.com,
+	x86@kernel.org
+Subject: Re: [PATCH v2 1/5] KVM: Add arch specific interfaces for sampling guest callchains
+Date: Mon,  9 Oct 2023 11:17:51 +0800
+Message-ID:
+ <SY4P282MB1084FD036E733BBBE4D476FF9DCEA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <SY4P282MB10840154D4F09917D6528BC69DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
 References: <SY4P282MB10840154D4F09917D6528BC69DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [fZ6jKpMVpMREBgPTFIRAkP8nV6804dbjmsKjbX/fT2pASNeEM7lkDQ==]
+X-ClientProxiedBy: SG2PR04CA0155.apcprd04.prod.outlook.com (2603:1096:4::17)
+ To SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13)
+X-Microsoft-Original-Message-ID: <20231009031751.15378-1-i.pear@outlook.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SY4P282MB10840154D4F09917D6528BC69DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SY4P282MB1084:EE_|SYZP282MB3332:EE_
+X-MS-Office365-Filtering-Correlation-Id: 61188962-8834-4754-09c2-08dbc876af6b
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	yRRkY5fZ0TK9tsijbxuha8+MdE1FGYHZoK4OWDO2uxLAQi6FGnMVkE488bLSOgkD2Sh+zkmzPmuNHxVMqGSWtChJvvi3U/R2ui1+WHIq1pYKxfGcQNnXA9blGK0mkkjA5VSvUXRf1wU2ZhYn/dSbygWwj6YoDVa6QIrELmrADH+Tied/9NzotbnOmQP2VMBREqGBF8Ei+7+wxfhdfOKLTsebGuUNXugA3hKKSTv54agec4Qud6G4MFIcQFceUFi/D9JdT2/YWOpHDbLgNOyf9kyc3TrGGP80DLlHnBF5uFSykHQ+vcrrq3VwC9tg1e/fpGqn39vVw/zBMwPYuOh+CLMDaLEiwSZ/iFfAiSu4tmM+ICYWINXKdBypmUa7tGumGWye5qgbA8Y0RQRdRIaO9rn99TVXIKzHJYsc999YBzZsc71lno5Jn2C2cWDE8OrJ2J5z5GRUTSlUlW/jrMqLB9zsZotiU3xLlQFDNos6ZWMF5XaY580S7ajkG+7dtwiD3oo21YED8PoqcClo8qjoG6xAaAQgWmNFKhN5g+CKE0immFF8M6i8awZl06UDd7tvyJ3q3c9GzlwvTCNBXE6C1+Wr4qNyVdco859bsTTcxV4=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?ZSJNkYO58PcKPWcUlqFU80uRG9NLIYVoEz5Q9DJUo60FMx7t8akE0aN35xdr?=
+ =?us-ascii?Q?JLH/LbrKcUs6sVFLRsJQgJzIf3EkWqK46tOHxZE0SFjomJ0jdmyvCGYOJbZy?=
+ =?us-ascii?Q?BvlHvM+rsGFS73O921dknJribiz1Zax0fon9XkRKR9bTG+j2WJQHjQMPOX16?=
+ =?us-ascii?Q?NVR+ns4jp0iiotH2hahdHe8C6IA7BTx1s/JLPP0Ncn2ku/NuYtkiw3SEzeN7?=
+ =?us-ascii?Q?0/Vynu601MI5tyMlQSixpplT7LbuUXzc5pTsUWOiZTsUX5Dn/dZ+2jNuXxiz?=
+ =?us-ascii?Q?OAmQsUpxcArkHf0lfe+dNuSg6jFJSYlX/R/1u2bVbuD+hPfUECfL3KfwAmX7?=
+ =?us-ascii?Q?nRITXQd7/v2SKbRs3be69YnQ+kW4uCshc6QHtaYPanCFl7K3HiS1ZTeruEIJ?=
+ =?us-ascii?Q?/DCO92+giGOqnt1z1SHd2ZFPNrfqOPQ17iMcpsmC4eyF7Nb0gZXAXxF/nj78?=
+ =?us-ascii?Q?SWKaG/KOOTW3yJbny5ClcKVXTxecetqEJ+2+N563m0CY/M6y6Hd0M/VyeYj4?=
+ =?us-ascii?Q?okNae/hQCdCH7Ri5y50tGkq/3QuC9lCwoj4TwUOxpqjrl/Wq+WaO9afDuGDB?=
+ =?us-ascii?Q?oEXZWFr7hIyY8+8tE9URfy3Wzs/FASYTeoJuB1iOrccBuwjfIkADbRV7xdOB?=
+ =?us-ascii?Q?4rqDiuRxrTH6T7RtY6mYqzLWeN9j0RV8JqG2WQUR9o+k5AYo2UDABz0j4KNW?=
+ =?us-ascii?Q?1zt+ZBHbID/UAa5Pj6uSwYR7ls/luaMWqhq7r2tap6xyxsP96uqBjpqaZwiZ?=
+ =?us-ascii?Q?5So3zFJn+GQM3kDf7Zdg00l3eMiiTLmUOrPz8hKglWBAcyjDdSkeMZ9lFMN0?=
+ =?us-ascii?Q?bfzLpfVFY18+qmum9iBuwkychPwXLW9zoqbSXz5nYs+hr4yzRY11GTYrhkyv?=
+ =?us-ascii?Q?gATF76Bz4JTkApcyTQo93u/CE0bwEeGEw51UcZPoIz0IECR00W33fAqxJYTs?=
+ =?us-ascii?Q?mtxq7msyJkoCcQcUzv4P0JBYh9GkAZpSQ4Vm/DWmRRnK6MHKvnDC40dD3iRS?=
+ =?us-ascii?Q?ZP/zHKo3mz6wdwQO+FwgmKBPW9mReBXGE51yMpO2kEpbeL5sdp5KgGQy1N2W?=
+ =?us-ascii?Q?O0a7vRD8Sh3flkcErVsLsGytZG4rLYN41TzVxhzg3Qn6eU7eOguz9G7y63H4?=
+ =?us-ascii?Q?dF8Io80kYaiqsaEaeoum61SrXOXtT56KMH1Mu62XGubunER18yJyMkh7wBun?=
+ =?us-ascii?Q?g2ZRsvUcCyHtgHxO0HlJ3iLeEXVZflHiGJGG9O2ZlQnA2VAcbnsx64dIL+FO?=
+ =?us-ascii?Q?M/Om2+9DyYuTDD0SIzg9?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 61188962-8834-4754-09c2-08dbc876af6b
+X-MS-Exchange-CrossTenant-AuthSource: SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Oct 2023 03:20:29.1280
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SYZP282MB3332
 
-Hi Tianyi,
+> All warnings (new ones prefixed by >>):
+> 
+>    arch/x86/kvm/x86.c: In function 'kvm_arch_vcpu_read_virt':
+> >> arch/x86/kvm/x86.c:12917:42: warning: passing argument 2 of 'kvm_read_guest_virt' makes integer from pointer without a cast [-Wint-conversion]
+>    12917 |         return kvm_read_guest_virt(vcpu, addr, dest, length, &e) == X86EMUL_CONTINUE;
+>          |                                          ^~~~
+>          |                                          |
+>          |                                          void *
+>    arch/x86/kvm/x86.c:7388:38: note: expected 'gva_t' {aka 'long unsigned int'} but argument is of type 'void *'
+>     7388 |                                gva_t addr, void *val, unsigned int bytes,
+>          |                                ~~~~~~^~~~
+> 
 
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on 8a749fd1a8720d4619c91c8b6e7528c0a355c0aa]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Tianyi-Liu/KVM-Add-arch-specific-interfaces-for-sampling-guest-callchains/20231008-230042
-base:   8a749fd1a8720d4619c91c8b6e7528c0a355c0aa
-patch link:    https://lore.kernel.org/r/SY4P282MB10840154D4F09917D6528BC69DCFA%40SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
-patch subject: [PATCH v2 1/5] KVM: Add arch specific interfaces for sampling guest callchains
-config: x86_64-rhel-8.3-rust (https://download.01.org/0day-ci/archive/20231009/202310090652.6TMWiCuU-lkp@intel.com/config)
-compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231009/202310090652.6TMWiCuU-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310090652.6TMWiCuU-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> arch/x86/kvm/x86.c:12917:35: error: incompatible pointer to integer conversion passing 'void *' to parameter of type 'gva_t' (aka 'unsigned long') [-Wint-conversion]
-           return kvm_read_guest_virt(vcpu, addr, dest, length, &e) == X86EMUL_CONTINUE;
-                                            ^~~~
-   arch/x86/kvm/x86.c:7403:19: note: passing argument to parameter here
-   EXPORT_SYMBOL_GPL(kvm_read_guest_virt);
-                     ^
-   1 error generated.
-
-
-vim +12917 arch/x86/kvm/x86.c
-
- 12911	
- 12912	bool kvm_arch_vcpu_read_virt(struct kvm_vcpu *vcpu, void *addr, void *dest, unsigned int length)
- 12913	{
- 12914		struct x86_exception e;
- 12915	
- 12916		/* Return true on success */
- 12917		return kvm_read_guest_virt(vcpu, addr, dest, length, &e) == X86EMUL_CONTINUE;
- 12918	}
- 12919	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Terribly sorry for the build warnings, which is caused by type casting.
+Will be fixed in the next version.
