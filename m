@@ -1,44 +1,44 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56FFD45F59
-	for <kvmarm@lists.linux.dev>; Mon,  9 Oct 2023 23:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05EEA47354
+	for <kvmarm@lists.linux.dev>; Mon,  9 Oct 2023 23:09:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Titsczc0"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d9a538026d1so292852276.0
-        for <kvmarm@lists.linux.dev>; Mon, 09 Oct 2023 16:09:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ttSafjon"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d9a5a16fa94so48546276.0
+        for <kvmarm@lists.linux.dev>; Mon, 09 Oct 2023 16:09:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696892954; x=1697497754; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1696892956; x=1697497756; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oU4noWX+M22GGQML7cBNq1w1ZUMxVHTzQhjdHmQVeoI=;
-        b=Titsczc09uBpUrIgKIG3wOeHaSLhlGb1mm19qVLhoTRqrBNDs/r5q8x6mm4cjekm8Q
-         sobsfWwKOZooMe0L0VJNndkJUuNauMep3EjyeINofC0RA4OIsErTAER45V586BvIECnk
-         mqO4+sfcZxfBsPVe69K+U8XABdGVImh8yLbwn1DIcP3QJmRxCpRtlesx6Rn2g3Bg3uWz
-         f2RzxcCoD2VfS+wlQ95AKg4eBlkcn+y/VXcrE8gHeMKvI8bNZTYwdS+FqvacMAyZ+Cu6
-         DkIy1WX6mUpZLZgMQV8avEoCgbK0bRP1gPuvYFoQffPbXGlL1GnN2NKKFNQTev5U8+qU
-         UGcA==
+        bh=YnaZ+HwT0CqGHphe+RXzr+4BdI3+Wxoy/2h4yWVjWqk=;
+        b=ttSafjonRW5WMi+7KpAZ2qWy4DsyKfvTEUQKjuedtcLORdfQQLOx0vG5vMonKbqOu5
+         9RgRlKw2Xe7TBnKPuoO/jhPzyR87zVH103CCvQEwePLT7UMNzmX2MG7cZhyVcVl7ceUw
+         EUYU0Hs0BZ4w9hV3hCn7wZ6hJ7GSuxt32NN1pW+oErtEc9/7IA+wuLT1+rMWPIkfk0Ur
+         Bdn3vj/INLAESDwK13ZN5WE+DqrwCPhKzcx5exz/z/k7NQ+pyosx+x5rnCcffEz+meW6
+         1K7E31zZJ43B9m/UaM4G6d/5zW/gRLW487pCnoOA4lukpNnKpRdX8uYFOHnb1rwuYHkP
+         vCUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696892954; x=1697497754;
+        d=1e100.net; s=20230601; t=1696892956; x=1697497756;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oU4noWX+M22GGQML7cBNq1w1ZUMxVHTzQhjdHmQVeoI=;
-        b=gbB4Y9qViS80ohlOtZ4BQgg3SNtQDa9mK+zqzpLrl7w0fb2MeXlpKqUOVZ9ZTZy/L2
-         FHyoqB7OmrtRncyGD1NeqOpBnpSvWPXWl2MmCEWr6yLDuq4uVB98qXsrkhwOv1lmsMwE
-         OKx6KsPEK4taxN2YM/R2WZcwtgIgrTSXL4UgSo4MtPwQOtecd1cFxhvs1n7Aevpgu+4o
-         i93lsg7E7x+gSV1/1xJDSbi9WpWs0D10jjFwpWGlNw0dKznH08E84vRifCTibZlNQX1u
-         JGeYR6gbAOkfh4sjqfWGrheseGvtAiRCVhjtV9jhVfu7Tj/CSUC+QT5NlfWpV5gBOb9H
-         M0Vw==
-X-Gm-Message-State: AOJu0Yy9Tgf7RKGBaqmUeBuQN/kOdmuIEdPoXdsPl+nGvPxsQOPpcuM/
-	uKUBW4eZd70oYC895c+EE887nPwGlupb
-X-Google-Smtp-Source: AGHT+IEXDzH1+afJ8cf7TDx9pdO2F95eZQD6ZkN/B4VvJbmw/2ecN6YJPeH0PWJ5WjhnKMQLNDzpvdGbPQAP
+        bh=YnaZ+HwT0CqGHphe+RXzr+4BdI3+Wxoy/2h4yWVjWqk=;
+        b=RjikNn5YFEDDr2mGmkzyJW7nawx2r20fH3ONSNO3G/SzQuFi0dYrVkL1cOZ825U2YN
+         TQM1/HXe/jyVZbNhhGaCc9dawaKEY5fRlkuHZF54ELHYPSAS3VqsCtJ97R5D0v42E7by
+         oMg+H+y8oHUlPByss2jx6dZ/xv2fKqmeQ72nw2fcQkOuCU659UtU6LARcQDWJCLdzq+w
+         TKpOzSpl6kbJoNUmZo5QB9MIBnVamHbwY61VfcpWilOsBUnwHDk+K5eN8Ro8JaURIMsk
+         RC0lQjUI7PTFil2Op00dJyKVPZah4qiYRlGvZzw03lf2FhJVhMOBbiArH7pZHa0I1Byu
+         gchg==
+X-Gm-Message-State: AOJu0Yz/fpl8Iqu75bn0gfpv9uXVZsVO02SIZHX4rRhT58XdS6z/B9Xp
+	gN6j4hDwgRRS3h4maYY1FcoXg5+gbl0A
+X-Google-Smtp-Source: AGHT+IH1FjsEh0LooC7Dv3FFBpESan9OVAH7g70S+Mf8O6PjhBewcaz+ezN3g+mcbaXqTeognYK/Mgxj9zy3
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:20a1])
- (user=rananta job=sendgmr) by 2002:a25:910f:0:b0:d9a:59cb:8bed with SMTP id
- v15-20020a25910f000000b00d9a59cb8bedmr4492ybl.5.1696892954182; Mon, 09 Oct
- 2023 16:09:14 -0700 (PDT)
-Date: Mon,  9 Oct 2023 23:08:56 +0000
+ (user=rananta job=sendgmr) by 2002:a25:d64f:0:b0:d9a:4cc1:b59a with SMTP id
+ n76-20020a25d64f000000b00d9a4cc1b59amr23035ybg.1.1696892956142; Mon, 09 Oct
+ 2023 16:09:16 -0700 (PDT)
+Date: Mon,  9 Oct 2023 23:08:58 +0000
 In-Reply-To: <20231009230858.3444834-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -48,9 +48,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20231009230858.3444834-1-rananta@google.com>
 X-Mailer: git-send-email 2.42.0.609.gbb76f46606-goog
-Message-ID: <20231009230858.3444834-11-rananta@google.com>
-Subject: [PATCH v7 10/12] KVM: selftests: aarch64: Introduce
- vpmu_counter_access test
+Message-ID: <20231009230858.3444834-13-rananta@google.com>
+Subject: [PATCH v7 12/12] KVM: selftests: aarch64: vPMU register test for
+ unimplemented counters
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
 Cc: Alexandru Elisei <alexandru.elisei@arm.com>, James Morse <james.morse@arm.com>, 
@@ -64,287 +64,180 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Reiji Watanabe <reijiw@google.com>
 
-Introduce vpmu_counter_access test for arm64 platforms.
-The test configures PMUv3 for a vCPU, sets PMCR_EL0.N for the vCPU,
-and check if the guest can consistently see the same number of the
-PMU event counters (PMCR_EL0.N) that userspace sets.
-This test case is done with each of the PMCR_EL0.N values from
-0 to 31 (With the PMCR_EL0.N values greater than the host value,
-the test expects KVM_SET_ONE_REG for the PMCR_EL0 to fail).
+Add a new test case to the vpmu_counter_access test to check
+if PMU registers or their bits for unimplemented counters are not
+accessible or are RAZ, as expected.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/aarch64/vpmu_counter_access.c         | 247 ++++++++++++++++++
- 2 files changed, 248 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+ .../kvm/aarch64/vpmu_counter_access.c         | 95 +++++++++++++++++--
+ .../selftests/kvm/include/aarch64/processor.h |  1 +
+ 2 files changed, 87 insertions(+), 9 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index a3bb36fb3cfc..416700aa196c 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -149,6 +149,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
- TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
-+TEST_GEN_PROGS_aarch64 += aarch64/vpmu_counter_access
- TEST_GEN_PROGS_aarch64 += access_tracking_perf_test
- TEST_GEN_PROGS_aarch64 += demand_paging_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
 diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-new file mode 100644
-index 000000000000..58949b17d76e
---- /dev/null
+index e92af3c0db03..788386ac0894 100644
+--- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
 +++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-@@ -0,0 +1,247 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * vpmu_counter_access - Test vPMU event counter access
-+ *
-+ * Copyright (c) 2022 Google LLC.
-+ *
-+ * This test checks if the guest can see the same number of the PMU event
-+ * counters (PMCR_EL0.N) that userspace sets.
-+ * This test runs only when KVM_CAP_ARM_PMU_V3 is supported on the host.
-+ */
-+#include <kvm_util.h>
-+#include <processor.h>
-+#include <test_util.h>
-+#include <vgic.h>
-+#include <perf/arm_pmuv3.h>
-+#include <linux/bitfield.h>
+@@ -5,8 +5,8 @@
+  * Copyright (c) 2022 Google LLC.
+  *
+  * This test checks if the guest can see the same number of the PMU event
+- * counters (PMCR_EL0.N) that userspace sets, and if the guest can access
+- * those counters.
++ * counters (PMCR_EL0.N) that userspace sets, if the guest can access
++ * those counters, and if the guest cannot access any other counters.
+  * This test runs only when KVM_CAP_ARM_PMU_V3 is supported on the host.
+  */
+ #include <kvm_util.h>
+@@ -131,9 +131,9 @@ static void write_pmevtypern(int n, unsigned long val)
+ }
+ 
+ /*
+- * The pmc_accessor structure has pointers to PMEVT{CNTR,TYPER}<n>_EL0
++ * The pmc_accessor structure has pointers to PMEV{CNTR,TYPER}<n>_EL0
+  * accessors that test cases will use. Each of the accessors will
+- * either directly reads/writes PMEVT{CNTR,TYPER}<n>_EL0
++ * either directly reads/writes PMEV{CNTR,TYPER}<n>_EL0
+  * (i.e. {read,write}_pmev{cnt,type}rn()), or reads/writes them through
+  * PMXEV{CNTR,TYPER}_EL0 (i.e. {read,write}_sel_ev{cnt,type}r()).
+  *
+@@ -291,25 +291,85 @@ static void test_access_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
+ 		       pmc_idx, PMC_ACC_TO_IDX(acc), read_data, write_data);
+ }
+ 
++#define INVALID_EC	(-1ul)
++uint64_t expected_ec = INVALID_EC;
++uint64_t op_end_addr;
 +
-+/* The max number of the PMU event counters (excluding the cycle counter) */
-+#define ARMV8_PMU_MAX_GENERAL_COUNTERS	(ARMV8_PMU_MAX_COUNTERS - 1)
+ static void guest_sync_handler(struct ex_regs *regs)
+ {
+ 	uint64_t esr, ec;
+ 
+ 	esr = read_sysreg(esr_el1);
+ 	ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
+-	__GUEST_ASSERT(0, "PC: 0x%lx; ESR: 0x%lx; EC: 0x%lx", regs->pc, esr, ec);
 +
-+struct vpmu_vm {
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+	int gic_fd;
-+};
++	__GUEST_ASSERT(op_end_addr && (expected_ec == ec),
++			"PC: 0x%lx; ESR: 0x%lx; EC: 0x%lx; EC expected: 0x%lx",
++			regs->pc, esr, ec, expected_ec);
 +
-+static struct vpmu_vm vpmu_vm;
-+
-+static uint64_t get_pmcr_n(uint64_t pmcr)
-+{
-+	return (pmcr >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
-+}
-+
-+static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
-+{
-+	*pmcr = *pmcr & ~(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
-+	*pmcr |= (pmcr_n << ARMV8_PMU_PMCR_N_SHIFT);
-+}
-+
-+static void guest_sync_handler(struct ex_regs *regs)
-+{
-+	uint64_t esr, ec;
-+
-+	esr = read_sysreg(esr_el1);
-+	ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
-+	__GUEST_ASSERT(0, "PC: 0x%lx; ESR: 0x%lx; EC: 0x%lx", regs->pc, esr, ec);
-+}
-+
-+/*
-+ * The guest is configured with PMUv3 with @expected_pmcr_n number of
-+ * event counters.
-+ * Check if @expected_pmcr_n is consistent with PMCR_EL0.N.
-+ */
-+static void guest_code(uint64_t expected_pmcr_n)
-+{
-+	uint64_t pmcr, pmcr_n;
-+
-+	__GUEST_ASSERT(expected_pmcr_n <= ARMV8_PMU_MAX_GENERAL_COUNTERS,
-+			"Expected PMCR.N: 0x%lx; ARMv8 general counters: 0x%lx",
-+			expected_pmcr_n, ARMV8_PMU_MAX_GENERAL_COUNTERS);
-+
-+	pmcr = read_sysreg(pmcr_el0);
-+	pmcr_n = get_pmcr_n(pmcr);
-+
-+	/* Make sure that PMCR_EL0.N indicates the value userspace set */
-+	__GUEST_ASSERT(pmcr_n == expected_pmcr_n,
-+			"Expected PMCR.N: 0x%lx, PMCR.N: 0x%lx",
-+			pmcr_n, expected_pmcr_n);
-+
-+	GUEST_DONE();
-+}
-+
-+#define GICD_BASE_GPA	0x8000000ULL
-+#define GICR_BASE_GPA	0x80A0000ULL
-+
-+/* Create a VM that has one vCPU with PMUv3 configured. */
-+static void create_vpmu_vm(void *guest_code)
-+{
-+	struct kvm_vcpu_init init;
-+	uint8_t pmuver, ec;
-+	uint64_t dfr0, irq = 23;
-+	struct kvm_device_attr irq_attr = {
-+		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-+		.attr = KVM_ARM_VCPU_PMU_V3_IRQ,
-+		.addr = (uint64_t)&irq,
-+	};
-+	struct kvm_device_attr init_attr = {
-+		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-+		.attr = KVM_ARM_VCPU_PMU_V3_INIT,
-+	};
-+
-+	/* The test creates the vpmu_vm multiple times. Ensure a clean state */
-+	memset(&vpmu_vm, 0, sizeof(vpmu_vm));
-+
-+	vpmu_vm.vm = vm_create(1);
-+	vm_init_descriptor_tables(vpmu_vm.vm);
-+	for (ec = 0; ec < ESR_EC_NUM; ec++) {
-+		vm_install_sync_handler(vpmu_vm.vm, VECTOR_SYNC_CURRENT, ec,
-+					guest_sync_handler);
-+	}
-+
-+	/* Create vCPU with PMUv3 */
-+	vm_ioctl(vpmu_vm.vm, KVM_ARM_PREFERRED_TARGET, &init);
-+	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
-+	vpmu_vm.vcpu = aarch64_vcpu_add(vpmu_vm.vm, 0, &init, guest_code);
-+	vcpu_init_descriptor_tables(vpmu_vm.vcpu);
-+	vpmu_vm.gic_fd = vgic_v3_setup(vpmu_vm.vm, 1, 64,
-+					GICD_BASE_GPA, GICR_BASE_GPA);
-+
-+	/* Make sure that PMUv3 support is indicated in the ID register */
-+	vcpu_get_reg(vpmu_vm.vcpu,
-+		     KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &dfr0);
-+	pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER), dfr0);
-+	TEST_ASSERT(pmuver != ID_AA64DFR0_PMUVER_IMP_DEF &&
-+		    pmuver >= ID_AA64DFR0_PMUVER_8_0,
-+		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
-+
-+	/* Initialize vPMU */
-+	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
-+	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
-+}
-+
-+static void destroy_vpmu_vm(void)
-+{
-+	close(vpmu_vm.gic_fd);
-+	kvm_vm_free(vpmu_vm.vm);
-+}
-+
-+static void run_vcpu(struct kvm_vcpu *vcpu, uint64_t pmcr_n)
-+{
-+	struct ucall uc;
-+
-+	vcpu_args_set(vcpu, 1, pmcr_n);
-+	vcpu_run(vcpu);
-+	switch (get_ucall(vcpu, &uc)) {
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(uc);
-+		break;
-+	case UCALL_DONE:
-+		break;
-+	default:
-+		TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		break;
-+	}
-+}
-+
-+/*
-+ * Create a guest with one vCPU, set the PMCR_EL0.N for the vCPU to @pmcr_n,
-+ * and run the test.
-+ */
-+static void run_test(uint64_t pmcr_n)
-+{
-+	struct kvm_vcpu *vcpu;
-+	uint64_t sp, pmcr;
-+	struct kvm_vcpu_init init;
-+
-+	pr_debug("Test with pmcr_n %lu\n", pmcr_n);
-+	create_vpmu_vm(guest_code);
-+
-+	vcpu = vpmu_vm.vcpu;
-+
-+	/* Save the initial sp to restore them later to run the guest again */
-+	vcpu_get_reg(vcpu, ARM64_CORE_REG(sp_el1), &sp);
-+
-+	/* Update the PMCR_EL0.N with @pmcr_n */
-+	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr);
-+	set_pmcr_n(&pmcr, pmcr_n);
-+	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
-+
-+	run_vcpu(vcpu, pmcr_n);
++	/* Will go back to op_end_addr after the handler exits */
++	regs->pc = op_end_addr;
 +
 +	/*
-+	 * Reset and re-initialize the vCPU, and run the guest code again to
-+	 * check if PMCR_EL0.N is preserved.
++	 * Clear op_end_addr, and setting expected_ec to INVALID_EC
++	 * as a sign that an exception has occurred.
 +	 */
-+	vm_ioctl(vpmu_vm.vm, KVM_ARM_PREFERRED_TARGET, &init);
-+	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
-+	aarch64_vcpu_setup(vcpu, &init);
-+	vcpu_init_descriptor_tables(vcpu);
-+	vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), sp);
-+	vcpu_set_reg(vcpu, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code);
-+
-+	run_vcpu(vcpu, pmcr_n);
-+
-+	destroy_vpmu_vm();
++	op_end_addr = 0;
++	expected_ec = INVALID_EC;
 +}
 +
 +/*
-+ * Create a guest with one vCPU, and attempt to set the PMCR_EL0.N for
-+ * the vCPU to @pmcr_n, which is larger than the host value.
-+ * The attempt should fail as @pmcr_n is too big to set for the vCPU.
++ * Run the given operation that should trigger an exception with the
++ * given exception class. The exception handler (guest_sync_handler)
++ * will reset op_end_addr to 0, and expected_ec to INVALID_EC, and
++ * will come back to the instruction at the @done_label.
++ * The @done_label must be a unique label in this test program.
 + */
-+static void run_error_test(uint64_t pmcr_n)
++#define TEST_EXCEPTION(ec, ops, done_label)		\
++{							\
++	extern int done_label;				\
++							\
++	WRITE_ONCE(op_end_addr, (uint64_t)&done_label);	\
++	GUEST_ASSERT(ec != INVALID_EC);			\
++	WRITE_ONCE(expected_ec, ec);			\
++	dsb(ish);					\
++	ops;						\
++	asm volatile(#done_label":");			\
++	GUEST_ASSERT(!op_end_addr);			\
++	GUEST_ASSERT(expected_ec == INVALID_EC);	\
++}
++
++/*
++ * Tests for reading/writing registers for the unimplemented event counter
++ * specified by @pmc_idx (>= PMCR_EL0.N).
++ */
++static void test_access_invalid_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
 +{
-+	struct kvm_vcpu *vcpu;
-+	uint64_t pmcr, pmcr_orig;
-+
-+	pr_debug("Error test with pmcr_n %lu (larger than the host)\n", pmcr_n);
-+	create_vpmu_vm(guest_code);
-+	vcpu = vpmu_vm.vcpu;
-+
-+	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr_orig);
-+	pmcr = pmcr_orig;
-+
 +	/*
-+	 * Setting a larger value of PMCR.N should not modify the field, and
-+	 * return a success.
++	 * Reading/writing the event count/type registers should cause
++	 * an UNDEFINED exception.
 +	 */
-+	set_pmcr_n(&pmcr, pmcr_n);
-+	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
-+	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr);
-+	TEST_ASSERT(pmcr_orig == pmcr,
-+		    "PMCR.N modified by KVM to a larger value (PMCR: 0x%lx) for pmcr_n: 0x%lx\n",
-+		    pmcr, pmcr_n);
++	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_cntr(pmc_idx), inv_rd_cntr);
++	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_cntr(pmc_idx, 0), inv_wr_cntr);
++	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_typer(pmc_idx), inv_rd_typer);
++	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_typer(pmc_idx, 0), inv_wr_typer);
++	/*
++	 * The bit corresponding to the (unimplemented) counter in
++	 * {PMCNTEN,PMOVS}{SET,CLR}_EL1 registers should be RAZ.
++	 */
++	test_bitmap_pmu_regs(pmc_idx, 1);
++	test_bitmap_pmu_regs(pmc_idx, 0);
+ }
+ 
+ /*
+  * The guest is configured with PMUv3 with @expected_pmcr_n number of
+  * event counters.
+  * Check if @expected_pmcr_n is consistent with PMCR_EL0.N, and
+- * if reading/writing PMU registers for implemented counters can work
+- * as expected.
++ * if reading/writing PMU registers for implemented or unimplemented
++ * counters can work as expected.
+  */
+ static void guest_code(uint64_t expected_pmcr_n)
+ {
+-	uint64_t pmcr, pmcr_n;
++	uint64_t pmcr, pmcr_n, unimp_mask;
+ 	int i, pmc;
+ 
+ 	__GUEST_ASSERT(expected_pmcr_n <= ARMV8_PMU_MAX_GENERAL_COUNTERS,
+@@ -324,15 +384,32 @@ static void guest_code(uint64_t expected_pmcr_n)
+ 			"Expected PMCR.N: 0x%lx, PMCR.N: 0x%lx",
+ 			pmcr_n, expected_pmcr_n);
+ 
++	/*
++	 * Make sure that (RAZ) bits corresponding to unimplemented event
++	 * counters in {PMCNTEN,PMOVS}{SET,CLR}_EL1 registers are reset to zero.
++	 * (NOTE: bits for implemented event counters are reset to UNKNOWN)
++	 */
++	unimp_mask = GENMASK_ULL(ARMV8_PMU_MAX_GENERAL_COUNTERS - 1, pmcr_n);
++	check_bitmap_pmu_regs(unimp_mask, false);
 +
-+	destroy_vpmu_vm();
-+}
+ 	/*
+ 	 * Tests for reading/writing PMU registers for implemented counters.
+-	 * Use each combination of PMEVT{CNTR,TYPER}<n>_EL0 accessor functions.
++	 * Use each combination of PMEV{CNTR,TYPER}<n>_EL0 accessor functions.
+ 	 */
+ 	for (i = 0; i < ARRAY_SIZE(pmc_accessors); i++) {
+ 		for (pmc = 0; pmc < pmcr_n; pmc++)
+ 			test_access_pmc_regs(&pmc_accessors[i], pmc);
+ 	}
+ 
++	/*
++	 * Tests for reading/writing PMU registers for unimplemented counters.
++	 * Use each combination of PMEV{CNTR,TYPER}<n>_EL0 accessor functions.
++	 */
++	for (i = 0; i < ARRAY_SIZE(pmc_accessors); i++) {
++		for (pmc = pmcr_n; pmc < ARMV8_PMU_MAX_GENERAL_COUNTERS; pmc++)
++			test_access_invalid_pmc_regs(&pmc_accessors[i], pmc);
++	}
 +
-+/*
-+ * Return the default number of implemented PMU event counters excluding
-+ * the cycle counter (i.e. PMCR_EL0.N value) for the guest.
-+ */
-+static uint64_t get_pmcr_n_limit(void)
-+{
-+	uint64_t pmcr;
-+
-+	create_vpmu_vm(guest_code);
-+	vcpu_get_reg(vpmu_vm.vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr);
-+	destroy_vpmu_vm();
-+	return get_pmcr_n(pmcr);
-+}
-+
-+int main(void)
-+{
-+	uint64_t i, pmcr_n;
-+
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
-+
-+	pmcr_n = get_pmcr_n_limit();
-+	for (i = 0; i <= pmcr_n; i++)
-+		run_test(i);
-+
-+	for (i = pmcr_n + 1; i < ARMV8_PMU_MAX_COUNTERS; i++)
-+		run_error_test(i);
-+
-+	return 0;
-+}
+ 	GUEST_DONE();
+ }
+ 
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index cb537253a6b9..c42d683102c7 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -104,6 +104,7 @@ enum {
+ #define ESR_EC_SHIFT		26
+ #define ESR_EC_MASK		(ESR_EC_NUM - 1)
+ 
++#define ESR_EC_UNKNOWN		0x0
+ #define ESR_EC_SVC64		0x15
+ #define ESR_EC_IABT		0x21
+ #define ESR_EC_DABT		0x25
 -- 
 2.42.0.609.gbb76f46606-goog
 
