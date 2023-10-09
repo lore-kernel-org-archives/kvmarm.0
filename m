@@ -1,15 +1,15 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB34FBE3
-	for <kvmarm@lists.linux.dev>; Mon,  9 Oct 2023 18:50:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE73236B0E
+	for <kvmarm@lists.linux.dev>; Mon,  9 Oct 2023 18:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1F15B1FB;
-	Mon,  9 Oct 2023 11:50:58 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D446EC15;
+	Mon,  9 Oct 2023 11:50:59 -0700 (PDT)
 Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.26])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CDE173F5A1;
-	Mon,  9 Oct 2023 11:50:15 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 90E4D3F5A1;
+	Mon,  9 Oct 2023 11:50:17 -0700 (PDT)
 From: Ryan Roberts <ryan.roberts@arm.com>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
@@ -23,10 +23,12 @@ To: Catalin Marinas <catalin.marinas@arm.com>,
 Cc: Ryan Roberts <ryan.roberts@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: [PATCH v4 00/12] KVM: arm64: Support FEAT_LPA2 at hyp s1 and vm s2
-Date: Mon,  9 Oct 2023 19:49:56 +0100
-Message-Id: <20231009185008.3803879-1-ryan.roberts@arm.com>
+Subject: [PATCH v4 01/12] arm64/mm: Update non-range tlb invalidation routines for FEAT_LPA2
+Date: Mon,  9 Oct 2023 19:49:57 +0100
+Message-Id: <20231009185008.3803879-2-ryan.roberts@arm.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20231009185008.3803879-1-ryan.roberts@arm.com>
+References: <20231009185008.3803879-1-ryan.roberts@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,141 +37,154 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi All,
+FEAT_LPA2 impacts tlb invalidation in 2 ways; Firstly, the TTL field in
+the non-range tlbi instructions can now validly take a 0 value for the
+4KB granule (this is due to the extra level of translation). Secondly,
+the BADDR field in the range tlbi instructions must be aligned to 64KB
+when LPA2 is in use (TCR.DS=1). Changes are required for tlbi to
+continue to operate correctly when LPA2 is in use.
 
-This adds support for FEAT_LPA2 to KVM for both hypervisor stage 1 (for the
-nvhe/protected modes) and the vm stage 2 translation tables (for all modes).
-FEAT_LPA2 enables 52 bit PAs and VAs for 4KB and 16KB granules (note this is
-already supported for 64KB granules via the FEAT_LPA and FEAT_LVA extensions).
-The series does not include support for FEAT_LPA2 in the kernel stage 1. This
-support is provided separately by Ard Biesheuvel's series at [4]. The two series
-are mostly independent.
+KVM only uses the non-range (__tlbi_level()) routines. Therefore we only
+solve the first problem with this patch.
 
-This is a small update from v3, rebased onto v6.6-rc5 and incorporating some
-minor changes based on review comments from Oliver.
+It is solved by always adding the level hint if the level is between [0,
+3] (previously anything other than 0 was hinted, which breaks in the new
+level -1 case from kvm). When running on non-LPA2 HW, 0 is still safe to
+hint as the HW will fall back to non-hinted. While we are at it, we
+replace the notion of 0 being the non-hinted seninel with a macro,
+TLBI_TTL_UNKNOWN. This means callers won't need updating if/when
+translation depth increases in future.
 
-NOTE: I've included my patch to update the range-based tlbi functions to work
-with LPA2 in this version, because KVM has started using range-based tlbi
-invalidation as of v6.6-rc1. I've done this in such a way that KVM-originated
-calls will use the LPA2 format if LPA2 is in use by KVM, but the
-kernel-originated calls are hardcoded to never use the LPA2 format. If merging
-with Ard's series, you will need to update the 2 calls to __flush_tlb_range_op()
-from __flush_tlb_range() appropriately.
+Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+---
+ arch/arm64/include/asm/tlb.h      |  9 ++++---
+ arch/arm64/include/asm/tlbflush.h | 43 +++++++++++++++++++------------
+ 2 files changed, 31 insertions(+), 21 deletions(-)
 
-
-Testing
-=======
-
-Testing has been done exclusively on the FVP and covers my boot matrix tests
-and kvm selftests.
-
-The host/guest config boot matrix gives the same (expected) results as for the
-v3 submission; of 180 conifgs, 12 fail, and these are all due to attempting to
-load the host kernel into high memory which isn't expected to work until the
-kernel has FEAT_LPA2 support for its stage 1. (refer to v1 posting for details
-on the exact configs).
-
-KVM selftests have been enhanced to support P52V48 4K and 16K guest modes, and
-all tests have been run against a P48V48_4K host and a P52V52_4K host (a run
-takes about 10 hours on FVP, sigh, but I can test a few more host configs if
-useful). All tests pass except "memslot_perf_test", which fails due to a timeout
-while syncing. This test fails in the same way for plain v6.6-rc1, so I'm
-confident this is not a regression caused by this series. (the issue is that
-alarm(2) is issued and the signal is received before alarm(0) is issued. I
-expect this is an FVP-time related problem, although I'm not sure how to fix
-robustly for the FVP without potentially hanging real systems for long periods
-of time).
-
-
-Changes since v3 [2]
-====================
-
- - rebased onto v6.6-rc5.
- - has_lpa2() only requires consistency between s1 and s2 when
-   kvm_get_mode() != KVM_MODE_NONE.
- - squashed 2 patches that enabled hyp s1 and vm s2 to use LPA2 pgtable format
-   respectively, into 1 patch. There were shared accessors so the intermediate
-   state was invalid.
- - use FIELD_PREP() to insert PS into TCR_EL2 instead of raw shift.
-
-
-Changes since v2 [2]
-====================
-
- - rebased onto v6.6-rc1
- - removed small amount of dead code eroneously introduced by previous rebase
- - reworked range-based tlbi to work with LPA2 (KVM has started using
-   range-based tlbi as of v6.6-rc1)
-
-
-Changes since v1 [1]
-====================
-
- - Create CPU feature for LPA2 (enabled if both S1 and S2 report LPA2 support).
- - Use the CPU feature (and therefore code patching) to globally decide whether
-   or not to use LPA2 PTE format; no more per-pgtable flag to pass around.
- - Removed the range-based TLBI changes, which are not required by KVM; leaves
-   only minor changes to the non-range-based invalidation code.
- - Removed patch to encode/decode VTCR_EL2.SL2, and replaced with a comment
-   describing why we never need to touch SL2 (stage 2 always uses concatenated
-   first level lookup).
- - Added support for LPA2 guests in KVM selftests (VM_MODE_P52V48_4K enabled and
-   new VM_MODE_P52V48_16K added).
- - Rebased onto 6.3-rc1.
-
-
-[1] https://lore.kernel.org/kvmarm/20221206135930.3277585-1-ryan.roberts@arm.com/
-[2] https://lore.kernel.org/kvmarm/20230306195438.1557851-1-ryan.roberts@arm.com/
-[3] https://lore.kernel.org/kvmarm/20230918065740.3670662-1-ryan.roberts@arm.com/
-[4] https://lore.kernel.org/linux-arm-kernel/20230912141549.278777-63-ardb@google.com/
-
-Thanks,
-Ryan
-
-
-Anshuman Khandual (1):
-  arm64/mm: Add FEAT_LPA2 specific ID_AA64MMFR0.TGRAN[2]
-
-Ryan Roberts (11):
-  arm64/mm: Update non-range tlb invalidation routines for FEAT_LPA2
-  arm64/mm: Update range-based tlb invalidation routines for FEAT_LPA2
-  KVM: arm64: Add ARM64_HAS_LPA2 CPU capability
-  KVM: arm64: Add new (V)TCR_EL2 field definitions for FEAT_LPA2
-  KVM: arm64: Use LPA2 page-tables for stage2 and hyp stage1
-  KVM: arm64: Prepare TCR_EL2.PS in cpu_prepare_hyp_mode()
-  KVM: arm64: Convert translation level parameter to s8
-  KVM: arm64: Support up to 5 levels of translation in kvm_pgtable
-  KVM: arm64: Allow guests with >48-bit IPA size on FEAT_LPA2 systems
-  KVM: selftests: arm64: Determine max ipa size per-page size
-  KVM: selftests: arm64: Support P52V48 4K and 16K guest_modes
-
- arch/arm64/include/asm/cpufeature.h           |  5 ++
- arch/arm64/include/asm/kvm_arm.h              |  2 +
- arch/arm64/include/asm/kvm_emulate.h          | 12 ++-
- arch/arm64/include/asm/kvm_pgtable.h          | 78 ++++++++++------
- arch/arm64/include/asm/kvm_pkvm.h             |  5 +-
- arch/arm64/include/asm/sysreg.h               |  5 ++
- arch/arm64/include/asm/tlb.h                  | 15 ++--
- arch/arm64/include/asm/tlbflush.h             | 85 +++++++++++-------
- arch/arm64/kernel/cpufeature.c                | 46 ++++++++++
- arch/arm64/kvm/arm.c                          |  4 +
- arch/arm64/kvm/hyp/nvhe/hyp-init.S            |  4 -
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  6 +-
- arch/arm64/kvm/hyp/nvhe/mm.c                  |  4 +-
- arch/arm64/kvm/hyp/nvhe/setup.c               |  2 +-
- arch/arm64/kvm/hyp/nvhe/tlb.c                 |  3 +-
- arch/arm64/kvm/hyp/pgtable.c                  | 88 ++++++++++++-------
- arch/arm64/kvm/hyp/vhe/tlb.c                  |  3 +-
- arch/arm64/kvm/mmu.c                          | 16 ++--
- arch/arm64/kvm/reset.c                        |  9 +-
- arch/arm64/tools/cpucaps                      |  1 +
- .../selftests/kvm/include/aarch64/processor.h |  4 +-
- .../selftests/kvm/include/kvm_util_base.h     |  1 +
- .../selftests/kvm/lib/aarch64/processor.c     | 66 +++++++++++---
- tools/testing/selftests/kvm/lib/guest_modes.c | 42 ++++-----
- tools/testing/selftests/kvm/lib/kvm_util.c    |  3 +
- 25 files changed, 348 insertions(+), 161 deletions(-)
-
---
+diff --git a/arch/arm64/include/asm/tlb.h b/arch/arm64/include/asm/tlb.h
+index 2c29239d05c3..93c537635dbb 100644
+--- a/arch/arm64/include/asm/tlb.h
++++ b/arch/arm64/include/asm/tlb.h
+@@ -22,15 +22,16 @@ static void tlb_flush(struct mmu_gather *tlb);
+ #include <asm-generic/tlb.h>
+ 
+ /*
+- * get the tlbi levels in arm64.  Default value is 0 if more than one
+- * of cleared_* is set or neither is set.
++ * get the tlbi levels in arm64.  Default value is TLBI_TTL_UNKNOWN if more than
++ * one of cleared_* is set or neither is set - this elides the level hinting to
++ * the hardware.
+  * Arm64 doesn't support p4ds now.
+  */
+ static inline int tlb_get_level(struct mmu_gather *tlb)
+ {
+ 	/* The TTL field is only valid for the leaf entry. */
+ 	if (tlb->freed_tables)
+-		return 0;
++		return TLBI_TTL_UNKNOWN;
+ 
+ 	if (tlb->cleared_ptes && !(tlb->cleared_pmds ||
+ 				   tlb->cleared_puds ||
+@@ -47,7 +48,7 @@ static inline int tlb_get_level(struct mmu_gather *tlb)
+ 				   tlb->cleared_p4ds))
+ 		return 1;
+ 
+-	return 0;
++	return TLBI_TTL_UNKNOWN;
+ }
+ 
+ static inline void tlb_flush(struct mmu_gather *tlb)
+diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
+index b149cf9f91bc..e688246b3b13 100644
+--- a/arch/arm64/include/asm/tlbflush.h
++++ b/arch/arm64/include/asm/tlbflush.h
+@@ -94,19 +94,22 @@ static inline unsigned long get_trans_granule(void)
+  * When ARMv8.4-TTL exists, TLBI operations take an additional hint for
+  * the level at which the invalidation must take place. If the level is
+  * wrong, no invalidation may take place. In the case where the level
+- * cannot be easily determined, a 0 value for the level parameter will
+- * perform a non-hinted invalidation.
++ * cannot be easily determined, the value TLBI_TTL_UNKNOWN will perform
++ * a non-hinted invalidation. Any provided level outside the hint range
++ * will also cause fall-back to non-hinted invalidation.
+  *
+  * For Stage-2 invalidation, use the level values provided to that effect
+  * in asm/stage2_pgtable.h.
+  */
+ #define TLBI_TTL_MASK		GENMASK_ULL(47, 44)
+ 
++#define TLBI_TTL_UNKNOWN	(-1)
++
+ #define __tlbi_level(op, addr, level) do {				\
+ 	u64 arg = addr;							\
+ 									\
+ 	if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL) &&		\
+-	    level) {							\
++	    level >= 0 && level <= 3) {					\
+ 		u64 ttl = level & 3;					\
+ 		ttl |= get_trans_granule() << 2;			\
+ 		arg &= ~TLBI_TTL_MASK;					\
+@@ -134,16 +137,17 @@ static inline unsigned long get_trans_granule(void)
+  * [BADDR, BADDR + (NUM + 1) * 2^(5*SCALE + 1) * PAGESIZE)
+  *
+  */
+-#define __TLBI_VADDR_RANGE(addr, asid, scale, num, ttl)		\
+-	({							\
+-		unsigned long __ta = (addr) >> PAGE_SHIFT;	\
+-		__ta &= GENMASK_ULL(36, 0);			\
+-		__ta |= (unsigned long)(ttl) << 37;		\
+-		__ta |= (unsigned long)(num) << 39;		\
+-		__ta |= (unsigned long)(scale) << 44;		\
+-		__ta |= get_trans_granule() << 46;		\
+-		__ta |= (unsigned long)(asid) << 48;		\
+-		__ta;						\
++#define __TLBI_VADDR_RANGE(addr, asid, scale, num, ttl)				\
++	({									\
++		unsigned long __ta = (addr) >> PAGE_SHIFT;			\
++		unsigned long __ttl = (ttl >= 1 && ttl <= 3) ? ttl : 0;		\
++		__ta &= GENMASK_ULL(36, 0);					\
++		__ta |= __ttl << 37;						\
++		__ta |= (unsigned long)(num) << 39;				\
++		__ta |= (unsigned long)(scale) << 44;				\
++		__ta |= get_trans_granule() << 46;				\
++		__ta |= (unsigned long)(asid) << 48;				\
++		__ta;								\
+ 	})
+ 
+ /* These macros are used by the TLBI RANGE feature. */
+@@ -216,12 +220,16 @@ static inline unsigned long get_trans_granule(void)
+  *		CPUs, ensuring that any walk-cache entries associated with the
+  *		translation are also invalidated.
+  *
+- *	__flush_tlb_range(vma, start, end, stride, last_level)
++ *	__flush_tlb_range(vma, start, end, stride, last_level, tlb_level)
+  *		Invalidate the virtual-address range '[start, end)' on all
+  *		CPUs for the user address space corresponding to 'vma->mm'.
+  *		The invalidation operations are issued at a granularity
+  *		determined by 'stride' and only affect any walk-cache entries
+- *		if 'last_level' is equal to false.
++ *		if 'last_level' is equal to false. tlb_level is the level at
++ *		which the invalidation must take place. If the level is wrong,
++ *		no invalidation may take place. In the case where the level
++ *		cannot be easily determined, the value TLBI_TTL_UNKNOWN will
++ *		perform a non-hinted invalidation.
+  *
+  *
+  *	Finally, take a look at asm/tlb.h to see how tlb_flush() is implemented
+@@ -442,9 +450,10 @@ static inline void flush_tlb_range(struct vm_area_struct *vma,
+ 	/*
+ 	 * We cannot use leaf-only invalidation here, since we may be invalidating
+ 	 * table entries as part of collapsing hugepages or moving page tables.
+-	 * Set the tlb_level to 0 because we can not get enough information here.
++	 * Set the tlb_level to TLBI_TTL_UNKNOWN because we can not get enough
++	 * information here.
+ 	 */
+-	__flush_tlb_range(vma, start, end, PAGE_SIZE, false, 0);
++	__flush_tlb_range(vma, start, end, PAGE_SIZE, false, TLBI_TTL_UNKNOWN);
+ }
+ 
+ static inline void flush_tlb_kernel_range(unsigned long start, unsigned long end)
+-- 
 2.25.1
 
