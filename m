@@ -1,23 +1,23 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4290E387;
-	Tue, 10 Oct 2023 17:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E1DD18639;
+	Tue, 10 Oct 2023 17:53:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WwCmMnxE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF2CAC433C7;
-	Tue, 10 Oct 2023 17:50:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nhVR5y3I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 012F1C433C8;
+	Tue, 10 Oct 2023 17:53:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696960233;
-	bh=Mo9lqyFkQXXEXAFmp24RRwmqCIlZ0kZbVyXTlYQiD34=;
+	s=k20201202; t=1696960396;
+	bh=cx2JxC0iURoRrWYffKAIdyccngOQUSODrrfk6c46CX0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WwCmMnxEeWi69FrbQxpiGl0f2JnQCje5HKRtCzMAX4eAONn5k1wVlicDh/3LWVK3I
-	 OvI5XbhukfiUNJEyyenK/0l+drjWmEldavMl93Uae15ux1aD+9Ew/41UQvZl11+N7A
-	 XMvmXniMqzC9OKjwwXM1HRsoyfXH5420mqNf/ePLw7Axma4yCBPRr51FpcmUlqCUjZ
-	 Y9zC4V5rCx7bcmF2chkrIf/24laI2ZQ40euckGLDM/zYQt4AUHzraLSOaL9iJRzEMj
-	 YJEaF2RR3rGWbKJYzzAslkNfUmfoIWo6X1to4c6qMvOy818USfW1jjbOZ/9yRrI2wp
-	 lz5i2ytrjrOUg==
-Date: Tue, 10 Oct 2023 18:50:25 +0100
+	b=nhVR5y3ImuE6z+RPfhVgYEQnhivVmAi97QFivStdWin4b8hzgp9FcFx0Qiv7k5Wm2
+	 tnkTOqWE/sQiYNH8Pxe678vlCddD4B44/Q9wvG2r53eJtg23BqWf7sCgqlwkfGBLhP
+	 E/gSvEFy/mgt7p7kLzsB2X/PNIF0Z+Bk0xsdkowb9FVeab53gA40sHtoTmWeMG8Z3A
+	 Otc6jznPjdLktcWeP5xM/lQm1lKlyUQDbcyu51BxO9OT3SwK8eCfaSHIbqIknbHgcF
+	 CtRDcEKjk1nCMCJP5IpMUuYlql+TSlLv5dKUDqj3zS6NM6q2HlrFltDNBOCLxaYFaA
+	 XUNAw21CgYUlw==
+Date: Tue, 10 Oct 2023 18:53:08 +0100
 From: Mark Brown <broonie@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
@@ -36,11 +36,11 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 	Arnaldo Carvalho de Melo <acme@kernel.org>,
 	Ingo Molnar <mingo@redhat.com>,
 	Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v2 1/5] tools headers arm64: Copy sysreg-defs generation
- from kernel source
-Message-ID: <b80e1d8c-0632-4678-b901-fca04e54702a@sirena.org.uk>
+Subject: Re: [PATCH v2 3/5] KVM: selftests: Generate sysreg-defs.h and add to
+ include path
+Message-ID: <cc827136-c62f-4460-a49e-94d1b42c1f1b@sirena.org.uk>
 References: <20231010011023.2497088-1-oliver.upton@linux.dev>
- <20231010011023.2497088-2-oliver.upton@linux.dev>
+ <20231010011023.2497088-4-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,37 +48,45 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="OfKkgm1QQ5YBS8gp"
+	protocol="application/pgp-signature"; boundary="zcteXYz5fZJBP43J"
 Content-Disposition: inline
-In-Reply-To: <20231010011023.2497088-2-oliver.upton@linux.dev>
+In-Reply-To: <20231010011023.2497088-4-oliver.upton@linux.dev>
 X-Cookie: I feel partially hydrogenated!
 
 
---OfKkgm1QQ5YBS8gp
+--zcteXYz5fZJBP43J
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Tue, Oct 10, 2023 at 01:10:18AM +0000, Oliver Upton wrote:
-> The system register definitions are now generated with a script over in
-> the kernel sources. Pull a copy into tools in anticipation of updating
-> dependent header files and add a common makefile for generating the
-> header.
+On Tue, Oct 10, 2023 at 01:10:20AM +0000, Oliver Upton wrote:
+
+> Start generating sysreg-defs.h for arm64 builds in anticipation of
+> updating sysreg.h to a version that depends on it.
 
 Reviewed-by: Mark Brown <broonie@kernel.org>
 
---OfKkgm1QQ5YBS8gp
+> +ifeq ($(ARCH),arm64)
+> +arm64_tools_dir := $(top_srcdir)/tools/arch/arm64/tools/
+> +GEN_HDRS := $(top_srcdir)/tools/arch/arm64/include/generated/
+> +CFLAGS += -I$(GEN_HDRS)
+
+We might want to hoist this up to the top level lib.mk at some point if
+other kselftests want it too but let's not worry about it until it's a
+practical issue.
+
+--zcteXYz5fZJBP43J
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUljuAACgkQJNaLcl1U
-h9Ayjwf/Sf7xWekjbJb0Igp7EednDFE2qisnUaz9s0smFr87OX1Wnf2JwTZMyPKs
-e/Y29fY4jVLbPswcu9Hl9MaFaf7jezEpm+hXcTxtH7VHPuYn/iZ5KAaraUIB7rrQ
-Ao7JxyzRV4A8db0YUX9YL+2WdejLPccCemxGV9uDrY1KlL2G30UW/8NceHXdxZQV
-yFfdYIjO+QPqjIo29jmqAi8CCzrPqS7lLCG3wstSJbOI2gFCrvmip5QyC0jjIPjq
-9WK8IxjwHo8CdKiE7pvb2EfWv2UJkj9Y0ePtLPnFDeJIf3lKNpqS8hvRayuplbiW
-GKa6LgmnOJso7nRD7H9u+GQ1nD9tQA==
-=H8a+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUlj4QACgkQJNaLcl1U
+h9CG2wf+LXRRosmuRsHr2KwWjh2URdt60VoRwaDmXhh7/pGe09afffuBz2c6/3So
+So6ZdTfUue2ois6c+GACxKsjhcBOYxaNEkXubiv0KrqCNHsALoxTjB6uhD+3+Nuo
+9Xz8ieecM9loqu7AYV+69udmy7bIKyt+aDm6bRtL0OoixTbAuH6qPzfOv1cV2AoK
+ESB9tqrPI1MnK+I5O9peYaBvEevsB1CnI47LU4Mjb9679mN+1I0WeT4cMLmwHN8b
+BWry5Nw7cQpiYosGLCvw3ZBbeBywPcYHc60h/O7DgJ8Ti53tTWsB/ndx1cxvlY/u
+DSOo/pPUSSEO5bTag4/mlztczNALwA==
+=0wtO
 -----END PGP SIGNATURE-----
 
---OfKkgm1QQ5YBS8gp--
+--zcteXYz5fZJBP43J--
