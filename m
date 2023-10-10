@@ -1,56 +1,57 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF9D43550B
-	for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 23:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33BCB354E1
+	for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 23:17:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WnWGPZNJ"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4064876e8b8so61403205e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 16:01:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sU2rBA7M"
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-307d20548adso5684652f8f.0
+        for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 16:17:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696978916; x=1697583716; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1696979827; x=1697584627; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AdRL4y1cTCFXmyMFKustVLIgbPKJzRBqwfNfiJOWZO8=;
-        b=WnWGPZNJFYUR/Fbdqv6fCGJseaJ9WvFIII5AvWRnJh9Xct3mDYZHNYRyt9VBw6rf0N
-         ctYQuWC+dkf1mtC+0FbV9dwiW3eWv0C8Q8WUlfhgYWR6cGDqrH6qm8jAK+KLH/XfndAp
-         H9KHLH2BN5c4Aw2vzDxbU+iGh5E1b3Vwyh+8fwZwB+CSFKojJMLFmjukxVXqrJoiAUwB
-         HRfHmCRJHfOjxHNElXFxsbYH+9nNQWcdEWZLu6UUkmci6rN93lBGUH22ZtZEY9xFbnC6
-         aEMg6f9SbcZN4M4jSAptQd3buAm2FkeYGcm8MA8FwnCxmqtu5I23d+fvmYOwLf7zYPyD
-         wYCQ==
+        bh=EIjKveupCC73cR3+NCpTtLF6c9Fas/4Eu5RGdKgMqzY=;
+        b=sU2rBA7Mw5bC+7Sx4m8UV9l5hIvdEqfJ82xu8T9C7gy/Ma+C7a/iyYn3dWuxk3YtYb
+         cfRgksvGUjsHf7El89L8WY2bT4fZ75kbFLWI1aa3mMaY20BQe/nT1ArFTU+uIwDlE64G
+         Xk5ll+q3UEO2YVZA21Mr3NqVzoudLXkeAHSFWKGsnFO1MofMV/OzBI1Y96+FILdShCBu
+         2zh3IquOq06197KxqBkhj7EvFw3AI3wPxCFB/ryIemdbTBdVLqCD3yN1MJn19v3PkNIp
+         5EW+L1dCxisNAGz2CLfGygbvirl6+IIWkiN0UzsCh198z7K7NR+I6UFIX4zOJEgDmNsb
+         l3kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696978916; x=1697583716;
+        d=1e100.net; s=20230601; t=1696979827; x=1697584627;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AdRL4y1cTCFXmyMFKustVLIgbPKJzRBqwfNfiJOWZO8=;
-        b=D0HnAjOnELf27ImS3grcl2n3aH0z0LXy1bvfeG0Qg7gHq4O/0nKyokInp9PIrgBWx7
-         M/KfBslnnGbsYKNN2ScN4Aujz9eQkGw1EqobTCpbAw+9vTBgp/KF8aR47xvP2Al5Kltd
-         TcZlFnikPc3FCyzUqJFHPaOzrH/M1+NXPcb9DLZUwc+5FbUWlxa+yBsHs1oEH3FAzh0t
-         jv7TFf0KR3Xo6YL5OSCXyfnJMraHAaLXjNe3D7SkIeWpYjH4CGrLv/Uixd54UKWwK2Sy
-         uxcsocuBwLMZCrEP9yuwx1uXail4Ow4i0W4UTmlR+Tm6GOXa84bSdZezFh1SLKPE3Fl0
-         dv7A==
-X-Gm-Message-State: AOJu0YxNbtIEfm5dNu7ABa7MrqC0zYUfVP1iFF9KF4WvYqu3M9lQ3A6l
-	QnUlB2Z9GX1OgAE+I03NtZ+x6WT8gkljpMnLNN3byA==
-X-Google-Smtp-Source: AGHT+IHzhd3JKjUkEBkPi958g3DnO7+xRps/XVocUHHHRRU2TV7BqApmiCT22okMhkBb70Feyl/KpPt3TmnyND1MuRc=
-X-Received: by 2002:a05:6000:1f02:b0:32c:d7e6:4054 with SMTP id
- bv2-20020a0560001f0200b0032cd7e64054mr2728992wrb.53.1696978915793; Tue, 10
- Oct 2023 16:01:55 -0700 (PDT)
+        bh=EIjKveupCC73cR3+NCpTtLF6c9Fas/4Eu5RGdKgMqzY=;
+        b=lc5kayjPPztV0gI7N9dfat4taS4fk2rVG6MeccSPWQi1FfmFPF6JhkYR5aM7f5fgHe
+         Gq5Jd+s+oW/c8sZuc6GbUO+6QQ5nx1i4tG8RSEj0YnA+OHX89LBbbUak6l7a3WxJUkeF
+         T5QggDS53JJZATMR9f+8loj8dkGn9dxlCUjJxUyU/rSlD12ncKBS6B4RHuBLk1/m6Dy7
+         3UyzCZneHtoWmhcZosycoI7ObSajx7Ma5b+saHXLxpD/DmwAcq7x5yvWcDGoIY7+KQFj
+         W8Jr83rlGfBDQqi9XUmncJZ8v7JKgbngVYD8sgghK6T5Sq995lKGhJ6MgrmuA4H5Vx2+
+         xbWw==
+X-Gm-Message-State: AOJu0YzdIuBuBovxEgWLmBBYlD2tt/cS451vrBS75+0nOgwztjWdZHRa
+	G2BWruJ1JqPzGAfmvdmdpAe3yPkSX5LSLTz22f27uQ==
+X-Google-Smtp-Source: AGHT+IHjix4DDviN0OKHAnA6wMPqxVL734sjSysWmwhkzJGmcQobD9amuMZACosgKD0dy8qkGg+a8jYHMlBO/2KAZjE=
+X-Received: by 2002:a5d:5a06:0:b0:32d:23b7:49af with SMTP id
+ bq6-20020a5d5a06000000b0032d23b749afmr3115151wrb.36.1696979827335; Tue, 10
+ Oct 2023 16:17:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-8-amoorthy@google.com>
-In-Reply-To: <20230908222905.1321305-8-amoorthy@google.com>
+References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-10-amoorthy@google.com>
+In-Reply-To: <20230908222905.1321305-10-amoorthy@google.com>
 From: David Matlack <dmatlack@google.com>
-Date: Tue, 10 Oct 2023 16:01:29 -0700
-Message-ID: <CALzav=fZ6cEJO+YO1vHFBxiTmLj3kv0pX=ss1f-NCC=Opp==Ag@mail.gmail.com>
-Subject: Re: [PATCH v5 07/17] KVM: arm64: Annotate -EFAULT from user_mem_abort()
+Date: Tue, 10 Oct 2023 16:16:40 -0700
+Message-ID: <CALzav=f8YDdqxVXNRASNWxuM2WzgBwj=hErj1Yc5da552ecG5Q@mail.gmail.com>
+Subject: Re: [PATCH v5 09/17] KVM: Introduce KVM_CAP_USERFAULT_ON_MISSING
+ without implementation
 To: Anish Moorthy <amoorthy@google.com>
 Cc: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, 
 	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org, 
@@ -63,66 +64,40 @@ Content-Transfer-Encoding: quoted-printable
 On Fri, Sep 8, 2023 at 3:30=E2=80=AFPM Anish Moorthy <amoorthy@google.com> =
 wrote:
 >
-> Implement KVM_CAP_MEMORY_FAULT_INFO for guest access failure in
-> user_mem_abort().
+> Add documentation, memslot flags, useful helper functions, and the
+> definition of the capability. Implementation is provided in a subsequent
+> commit.
 >
+> Memory fault exits on absent mappings are particularly useful for
+> userfaultfd-based postcopy live migration, where contention within uffd
+> can lead to slowness When many vCPUs fault on a single uffd/vma.
+> Bypassing the uffd entirely by returning information directly to the
+> vCPU via an exit avoids contention and can greatly improves the fault
+> rate.
+>
+> Suggested-by: James Houghton <jthoughton@google.com>
 > Signed-off-by: Anish Moorthy <amoorthy@google.com>
 > ---
->  arch/arm64/kvm/mmu.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
+>  Documentation/virt/kvm/api.rst | 28 +++++++++++++++++++++++++---
+>  include/linux/kvm_host.h       |  9 +++++++++
+>  include/uapi/linux/kvm.h       |  2 ++
+>  tools/include/uapi/linux/kvm.h |  1 +
+>  virt/kvm/Kconfig               |  3 +++
+>  virt/kvm/kvm_main.c            |  5 +++++
+>  6 files changed, 45 insertions(+), 3 deletions(-)
 >
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 587a104f66c3..8ede6c5edc5f 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1408,6 +1408,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, ph=
-ys_addr_t fault_ipa,
->         long vma_pagesize, fault_granule;
->         enum kvm_pgtable_prot prot =3D KVM_PGTABLE_PROT_R;
->         struct kvm_pgtable *pgt;
-> +       uint64_t memory_fault_flags;
->
->         fault_granule =3D 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level=
-);
->         write_fault =3D kvm_is_write_fault(vcpu);
-> @@ -1507,8 +1508,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, p=
-hys_addr_t fault_ipa,
->                 kvm_send_hwpoison_signal(hva, vma_shift);
->                 return 0;
->         }
-> -       if (is_error_noslot_pfn(pfn))
-> +       if (is_error_noslot_pfn(pfn)) {
-> +               memory_fault_flags =3D 0;
-> +               if (write_fault)
-> +                       memory_fault_flags =3D KVM_MEMORY_FAULT_FLAG_EXEC=
-;
-> +               else if (exec_fault)
-> +                       memory_fault_flags =3D KVM_MEMORY_FAULT_FLAG_EXEC=
-;
-> +               else
-> +                       memory_fault_flags =3D KVM_MEMORY_FAULT_FLAG_READ=
-;
-> +               kvm_handle_guest_uaccess_fault(vcpu, round_down(gfn * PAG=
-E_SIZE, vma_pagesize),
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
+rst
+> index 92fd3faa6bab..c2eaacb6dc63 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -1312,6 +1312,7 @@ yet and must be cleared on entry.
+>    /* for kvm_userspace_memory_region::flags */
+>    #define KVM_MEM_LOG_DIRTY_PAGES      (1UL << 0)
+>    #define KVM_MEM_READONLY     (1UL << 1)
+> +  #define KVM_MEM_USERFAULT_ON_MISSING  (1UL << 2)
 
-I think gfn * PAGE_SIZE is already rounded down to vma_pagesize. See
-earlier in this function:
-
-1484         vma_pagesize =3D 1UL << vma_shift;
-1485         if (vma_pagesize =3D=3D PMD_SIZE || vma_pagesize =3D=3D PUD_SI=
-ZE)
-1486                 fault_ipa &=3D ~(vma_pagesize - 1);
-1487
-1488         gfn =3D fault_ipa >> PAGE_SHIFT;
-
-
-> +                                              vma_pagesize, memory_fault=
-_flags);
->                 return -EFAULT;
-> +       }
->
->         if (kvm_is_device_pfn(pfn)) {
->                 /*
-> --
-> 2.42.0.283.g2d96d420d3-goog
->
+Bike Shedding! Maybe KVM_MEM_EXIT_ON_MISSING? "Exiting" has concrete
+meaning in the KVM UAPI whereas "userfault" doesn't and could suggest
+going through userfaultfd, which is the opposite of what this
+capability is doing.
