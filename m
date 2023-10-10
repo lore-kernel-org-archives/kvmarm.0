@@ -1,88 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7DDDF44
-	for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 11:56:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cFRk+rVP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24079C433CA;
-	Tue, 10 Oct 2023 11:56:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696938996;
-	bh=0AsCbMCrI7tvcpSVF4Jgy/rDJw8pbCcpiPc+/XLXw0Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cFRk+rVPpc3FOAiT8Od45wyxyPPnbtz6S5U823POW2R56qGu9e5slu/QdzGo7C0yk
-	 HzIqkLZiq0iLFTmVAoQd2fjlG4KUg6hDtcsj+Au2jf+fj7jGWREV83JqoBAbb1Mx6O
-	 LdWAD542yHPL097UbVE19BP0g4frWS6u2Yv7SlTZJ6zQFVWPnVuotU9R9DBTh2HtxX
-	 1O9AOOKrdUENiTO+CmeKJiCvYXEgTBI8SYyzFDG021IGOu9VK1c22yWoy/fqVaZt+x
-	 VT16pRttM5pCyAD719k+ohC3ndo2qph8Ziy23+LMwk3w9jQnoq63rzplfWD9784xzA
-	 KghZr/QCYAsTQ==
-Date: Tue, 10 Oct 2023 12:56:30 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, nd@arm.com,
-	akpm@linux-foundation.org, aneesh.kumar@linux.ibm.com,
-	catalin.marinas@arm.com, dave.hansen@linux.intel.com,
-	maz@kernel.org, oliver.upton@linux.dev, shuah@kernel.org,
-	will@kernel.org, kvmarm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v1 15/20] arm64: add POE signal support
-Message-ID: <88728437-2486-43c3-9fdb-fcd14ff39f11@sirena.org.uk>
-References: <20230927140123.5283-1-joey.gouly@arm.com>
- <20230927140123.5283-16-joey.gouly@arm.com>
- <a6e6c8a3-15b1-48e3-84fa-810ce575c09a@sirena.org.uk>
- <20231010095702.GB2098677@e124191.cambridge.arm.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7857E1FBA
+	for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 12:53:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2FBDF1FB;
+	Tue, 10 Oct 2023 05:54:04 -0700 (PDT)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 523E23F762;
+	Tue, 10 Oct 2023 05:53:20 -0700 (PDT)
+Message-ID: <099dc48f-454a-40cc-aef1-f186643d2a02@arm.com>
+Date: Tue, 10 Oct 2023 13:53:18 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="L3OvJ2NHt06D34tb"
-Content-Disposition: inline
-In-Reply-To: <20231010095702.GB2098677@e124191.cambridge.arm.com>
-X-Cookie: I feel partially hydrogenated!
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/3] arm: perf: Include threshold control fields valid
+ in PMEVTYPER mask
+Content-Language: en-US
+To: James Clark <james.clark@arm.com>, linux-arm-kernel@lists.infradead.org,
+ linux-perf-users@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Russell King <linux@armlinux.org.uk>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Mark Rutland <mark.rutland@arm.com>, Reiji Watanabe <reijiw@google.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Zaid Al-Bassam <zalbassam@google.com>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+References: <20231010104048.1923484-1-james.clark@arm.com>
+ <20231010104048.1923484-2-james.clark@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20231010104048.1923484-2-james.clark@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 10/10/2023 11:40, James Clark wrote:
+> FEAT_PMUv3_TH (Armv8.8) adds two new fields to PMEVTYPER, so include
+> them in the mask. These aren't writable on 32 bit kernels as they are in
+> the high part of the register, so split the mask definition to the asm
+> files for each platform.
+> 
+> Now where the value is used in some parts of KVM, include the asm file.
+> 
+> Despite not being used on aarch32, TH and TC macros are added to the
+> shared header file, because they are used in arm_pmuv3.c which is
+> compiled for both platforms.
+> 
+> Signed-off-by: James Clark <james.clark@arm.com>
+> ---
+>   arch/arm/include/asm/arm_pmuv3.h   | 3 +++
+>   arch/arm64/include/asm/arm_pmuv3.h | 4 ++++
+>   arch/arm64/kvm/pmu-emul.c          | 1 +
+>   arch/arm64/kvm/sys_regs.c          | 1 +
+>   include/linux/perf/arm_pmuv3.h     | 3 ++-
+>   5 files changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm/include/asm/arm_pmuv3.h b/arch/arm/include/asm/arm_pmuv3.h
+> index 72529f5e2bed..491310133d09 100644
+> --- a/arch/arm/include/asm/arm_pmuv3.h
+> +++ b/arch/arm/include/asm/arm_pmuv3.h
+> @@ -9,6 +9,9 @@
+>   #include <asm/cp15.h>
+>   #include <asm/cputype.h>
+>   
+> +/* Mask for writable bits */
+> +#define ARMV8_PMU_EVTYPE_MASK	0xc800ffff
+> +
+>   #define PMCCNTR			__ACCESS_CP15_64(0, c9)
+>   
+>   #define PMCR			__ACCESS_CP15(c9,  0, c12, 0)
+> diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/arm_pmuv3.h
+> index 18dc2fb3d7b7..4faf4f7385a5 100644
+> --- a/arch/arm64/include/asm/arm_pmuv3.h
+> +++ b/arch/arm64/include/asm/arm_pmuv3.h
+> @@ -11,6 +11,10 @@
+>   #include <asm/cpufeature.h>
+>   #include <asm/sysreg.h>
+>   
+> +/* Mask for writable bits */
+> +#define ARMV8_PMU_EVTYPE_MASK	(0xc800ffffUL | ARMV8_PMU_EVTYPE_TH | \
+> +				ARMV8_PMU_EVTYPE_TC)
+> +
+>   #define RETURN_READ_PMEVCNTRN(n) \
+>   	return read_sysreg(pmevcntr##n##_el0)
+>   static inline unsigned long read_pmevcntrn(int n)
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 6b066e04dc5d..0666212c0c15 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -11,6 +11,7 @@
+>   #include <linux/perf_event.h>
+>   #include <linux/perf/arm_pmu.h>
+>   #include <linux/uaccess.h>
+> +#include <asm/arm_pmuv3.h>
+>   #include <asm/kvm_emulate.h>
+>   #include <kvm/arm_pmu.h>
+>   #include <kvm/arm_vgic.h>
 
---L3OvJ2NHt06D34tb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+You may want to mention in the commit description that there is no
+impact on the KVM emulating the Guest PMU with this change, as it
+ignores the fields in the upper half for setting up the attributes
+for the backing event.
 
-On Tue, Oct 10, 2023 at 10:57:02AM +0100, Joey Gouly wrote:
-> On Thu, Oct 05, 2023 at 03:34:29PM +0100, Mark Brown wrote:
-> > On Wed, Sep 27, 2023 at 03:01:18PM +0100, Joey Gouly wrote:
-
-> > > Add PKEY support to signals, by saving and restoring POR_EL0 from the stackframe.
-
-> > It'd be nice to have at least a basic test that validates that we
-> > generate a POE signal frame when expected, though that should be a very
-> > minor thing which is unlikely to ever actually spot anything.
-
-> The selftests/mm/protection_keys.c looks for the POE signal frame, do you think
-> we need a separate test?
-
-Like I say it'd be a very minor thing to have one - it is more just a
-thing you'd go looking for in the signals tests rather than something
-that's absolutely essential.  For trivial things like TPIDR2 I've just
-added a trivial thing that verifies that the frame is present iff the
-matching HWCAP is set.  Having the test in the mm tests is probably fine
-though.
-
---L3OvJ2NHt06D34tb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUlO+0ACgkQJNaLcl1U
-h9ALhQf+MAF7Qb061DA3jMKL8gAGgi2jobi8C9/WrJz95wSSl4KzgskqrM2Kxh8d
-ZLh0UpnLrsEk9Qze9IOzzdnbbn/VD6ENZ/vDRlWzvih8xVZxpoL1MiLqBSRsU78W
-WANs6c4fPBTQMLGlFEzz3YwYXcwQEqUyY4xmp8O8jbCzu1GYU29kafcXb6aypmgT
-YIPw2K8RecnKlhbjZRULjPa1TPZrGiq0/6zR1BhauqiJmVoYwcpvqc+WK4ZBSb+w
-5Td1tJT8KYSK43lBFqHY8gUk2s6M+BtANBsGCgyDjGlPjsvgusWNevKkaZ/l9mRO
-M9fyqG5gtyPbIU7dRP51Mnw19dgsxw==
-=hd/I
------END PGP SIGNATURE-----
-
---L3OvJ2NHt06D34tb--
+Suzuki
