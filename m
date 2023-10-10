@@ -1,103 +1,137 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33BCB354E1
-	for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 23:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E25354EF
+	for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 23:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sU2rBA7M"
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-307d20548adso5684652f8f.0
-        for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 16:17:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X7eSqRib"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d9a5995aa42so1765951276.2
+        for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 16:40:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696979827; x=1697584627; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EIjKveupCC73cR3+NCpTtLF6c9Fas/4Eu5RGdKgMqzY=;
-        b=sU2rBA7Mw5bC+7Sx4m8UV9l5hIvdEqfJ82xu8T9C7gy/Ma+C7a/iyYn3dWuxk3YtYb
-         cfRgksvGUjsHf7El89L8WY2bT4fZ75kbFLWI1aa3mMaY20BQe/nT1ArFTU+uIwDlE64G
-         Xk5ll+q3UEO2YVZA21Mr3NqVzoudLXkeAHSFWKGsnFO1MofMV/OzBI1Y96+FILdShCBu
-         2zh3IquOq06197KxqBkhj7EvFw3AI3wPxCFB/ryIemdbTBdVLqCD3yN1MJn19v3PkNIp
-         5EW+L1dCxisNAGz2CLfGygbvirl6+IIWkiN0UzsCh198z7K7NR+I6UFIX4zOJEgDmNsb
-         l3kQ==
+        d=google.com; s=20230601; t=1696981209; x=1697586009; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cLHhlCA6SVyHFYWwV93GW9D+Ewl3smDZeYf93/ceN0Y=;
+        b=X7eSqRibjudXD1YQfmcAxEoThREC9/3CqCl51hXcdWRPzwRIPCpRhAflV9w1xi46Ab
+         em4x5ResmG1SfG/x8Iw9P44lk+TICq+ibwzYkwwCfrN7mkLVVXxVhAEZuwGMBozvT5CH
+         vmFZRZ+d5x7Yck1rHA8CPB+6s4YxFnz8/QVyyMF9Wtw1p40/IyDeitn6FgHk7JAhs94q
+         zWTDojEml5kVJHwWNKwci9i+K0mJjqQq3BhhyQfOq8dfTA0Y0ThBlJkwsrksXjvYhdfU
+         K0NJLkLdyKTGzxnZa13U1QMiZPlcQTad1XCAaNAKZPn4QD+zx+zkC5NlPuBbGyfMmrl3
+         ec9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696979827; x=1697584627;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EIjKveupCC73cR3+NCpTtLF6c9Fas/4Eu5RGdKgMqzY=;
-        b=lc5kayjPPztV0gI7N9dfat4taS4fk2rVG6MeccSPWQi1FfmFPF6JhkYR5aM7f5fgHe
-         Gq5Jd+s+oW/c8sZuc6GbUO+6QQ5nx1i4tG8RSEj0YnA+OHX89LBbbUak6l7a3WxJUkeF
-         T5QggDS53JJZATMR9f+8loj8dkGn9dxlCUjJxUyU/rSlD12ncKBS6B4RHuBLk1/m6Dy7
-         3UyzCZneHtoWmhcZosycoI7ObSajx7Ma5b+saHXLxpD/DmwAcq7x5yvWcDGoIY7+KQFj
-         W8Jr83rlGfBDQqi9XUmncJZ8v7JKgbngVYD8sgghK6T5Sq995lKGhJ6MgrmuA4H5Vx2+
-         xbWw==
-X-Gm-Message-State: AOJu0YzdIuBuBovxEgWLmBBYlD2tt/cS451vrBS75+0nOgwztjWdZHRa
-	G2BWruJ1JqPzGAfmvdmdpAe3yPkSX5LSLTz22f27uQ==
-X-Google-Smtp-Source: AGHT+IHjix4DDviN0OKHAnA6wMPqxVL734sjSysWmwhkzJGmcQobD9amuMZACosgKD0dy8qkGg+a8jYHMlBO/2KAZjE=
-X-Received: by 2002:a5d:5a06:0:b0:32d:23b7:49af with SMTP id
- bq6-20020a5d5a06000000b0032d23b749afmr3115151wrb.36.1696979827335; Tue, 10
- Oct 2023 16:17:07 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696981209; x=1697586009;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cLHhlCA6SVyHFYWwV93GW9D+Ewl3smDZeYf93/ceN0Y=;
+        b=jii0t32kWC9QFAFfZhRRzOGZQThrKTpFU25jZJRcPBMSkts+5+uR8+QrDckgWXCd4v
+         qN2HNDfDSRbW/ammdM2ikcNLtEKKUkCIuKZFRerPParEggZFYnM9qU+B6XCWRSmTF3zw
+         c3EhsCSiSfQT+Kmg659KnGcbxWs/Hr6MlnssAhiMHUsuyC1xzxA0xnP5lMRk7F9BT3c7
+         muO/mFze1RtmxgXq1et2bqahWiHtKFjrj+AKapKIX30p8mMOFgp/8swKH5+2K564UKQg
+         c4FThssRjVR7kPp0i4bcdnrbrX8TBwDqsuwwAmVBuPoGB9dhbduJ5zTeW8RRxun69Jej
+         7EHQ==
+X-Gm-Message-State: AOJu0Yye0oavl4DHWkqLRa8LLafcV/A52rOKegE1C2Kty1CcrfpfcAGk
+	d3JoTfHq387jl7sqJvWg07+bcThzJ5k=
+X-Google-Smtp-Source: AGHT+IEu6vz/xlJWvZL8I5SvgfFc5v5rUNmLRU3fOUbQ9vo/AgeOeVtzHLQG68iQTxM6YVfRHff9q0T4lYI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:13cc:b0:d91:8876:2040 with SMTP id
+ y12-20020a05690213cc00b00d9188762040mr336788ybu.5.1696981209800; Tue, 10 Oct
+ 2023 16:40:09 -0700 (PDT)
+Date: Tue, 10 Oct 2023 16:40:08 -0700
+In-Reply-To: <CALzav=crDptzFeAoyLrAekp--mM3Y7mFcPMW5W3YdPctkS6YUQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-10-amoorthy@google.com>
-In-Reply-To: <20230908222905.1321305-10-amoorthy@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Tue, 10 Oct 2023 16:16:40 -0700
-Message-ID: <CALzav=f8YDdqxVXNRASNWxuM2WzgBwj=hErj1Yc5da552ecG5Q@mail.gmail.com>
-Subject: Re: [PATCH v5 09/17] KVM: Introduce KVM_CAP_USERFAULT_ON_MISSING
- without implementation
-To: Anish Moorthy <amoorthy@google.com>
-Cc: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, 
+Mime-Version: 1.0
+References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-5-amoorthy@google.com>
+ <CALzav=crDptzFeAoyLrAekp--mM3Y7mFcPMW5W3YdPctkS6YUQ@mail.gmail.com>
+Message-ID: <ZSXg2CjvVb0ugikT@google.com>
+Subject: Re: [PATCH v5 04/17] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+From: Sean Christopherson <seanjc@google.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Anish Moorthy <amoorthy@google.com>, oliver.upton@linux.dev, kvm@vger.kernel.org, 
 	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org, 
 	robert.hoo.linux@gmail.com, jthoughton@google.com, ricarkol@google.com, 
 	axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com, 
 	isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 8, 2023 at 3:30=E2=80=AFPM Anish Moorthy <amoorthy@google.com> =
-wrote:
->
-> Add documentation, memslot flags, useful helper functions, and the
-> definition of the capability. Implementation is provided in a subsequent
-> commit.
->
-> Memory fault exits on absent mappings are particularly useful for
-> userfaultfd-based postcopy live migration, where contention within uffd
-> can lead to slowness When many vCPUs fault on a single uffd/vma.
-> Bypassing the uffd entirely by returning information directly to the
-> vCPU via an exit avoids contention and can greatly improves the fault
-> rate.
->
-> Suggested-by: James Houghton <jthoughton@google.com>
-> Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> ---
->  Documentation/virt/kvm/api.rst | 28 +++++++++++++++++++++++++---
->  include/linux/kvm_host.h       |  9 +++++++++
->  include/uapi/linux/kvm.h       |  2 ++
->  tools/include/uapi/linux/kvm.h |  1 +
->  virt/kvm/Kconfig               |  3 +++
->  virt/kvm/kvm_main.c            |  5 +++++
->  6 files changed, 45 insertions(+), 3 deletions(-)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
-rst
-> index 92fd3faa6bab..c2eaacb6dc63 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -1312,6 +1312,7 @@ yet and must be cleared on entry.
->    /* for kvm_userspace_memory_region::flags */
->    #define KVM_MEM_LOG_DIRTY_PAGES      (1UL << 0)
->    #define KVM_MEM_READONLY     (1UL << 1)
-> +  #define KVM_MEM_USERFAULT_ON_MISSING  (1UL << 2)
+On Tue, Oct 10, 2023, David Matlack wrote:
+> On Fri, Sep 8, 2023 at 3:30=E2=80=AFPM Anish Moorthy <amoorthy@google.com=
+> wrote:
+> >
+> > KVM_CAP_MEMORY_FAULT_INFO allows kvm_run to return useful information
+> > besides a return value of -1 and errno of EFAULT when a vCPU fails an
+> > access to guest memory which may be resolvable by userspace.
+> >
+> > Add documentation, updates to the KVM headers, and a helper function
+> > (kvm_handle_guest_uaccess_fault()) for implementing the capability.
+> >
+> > Mark KVM_CAP_MEMORY_FAULT_INFO as available on arm64 and x86, even
+> > though EFAULT annotation are currently totally absent. Picking a point
+> > to declare the implementation "done" is difficult because
+> >
+> >   1. Annotations will be performed incrementally in subsequent commits
+> >      across both core and arch-specific KVM.
+> >   2. The initial series will very likely miss some cases which need
+> >      annotation. Although these omissions are to be fixed in the future=
+,
+> >      userspace thus still needs to expect and be able to handle
+> >      unannotated EFAULTs.
+> >
+> > Given these qualifications, just marking it available here seems the
+> > least arbitrary thing to do.
+> >
+> > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> > ---
+> [...]
+> > +::
+> > +       union {
+> > +               /* KVM_SPEC_EXIT_MEMORY_FAULT */
+> > +               struct {
+> > +                       __u64 flags;
+> > +                       __u64 gpa;
+> > +                       __u64 len; /* in bytes */
+>=20
+> I wonder if `gpa` and `len` should just be replaced with `gfn`.
+>=20
+> - We don't seem to care about returning an exact `gpa` out to
+> userspace since this series just returns gpa =3D gfn * PAGE_SIZE out to
+> userspace.
+> - The len we return seems kind of arbitrary. PAGE_SIZE on x86 and
+> vma_pagesize on ARM64. But at the end of the day we're not asking the
+> kernel to fault in any specific length of mapping. We're just asking
+> for gfn-to-pfn for a specific gfn.
+> - I'm not sure userspace will want to do anything with this information.
 
-Bike Shedding! Maybe KVM_MEM_EXIT_ON_MISSING? "Exiting" has concrete
-meaning in the KVM UAPI whereas "userfault" doesn't and could suggest
-going through userfaultfd, which is the opposite of what this
-capability is doing.
+Extending ABI is tricky.  E.g. if a use case comes along that needs/wants t=
+o
+return a range, then we'd need to add a flag and also update userspace to a=
+ctually
+do the right thing.
+
+The page fault path doesn't need such information because hardware gives a =
+very
+precise faulting address.  But if we ever get to a point where KVM provides=
+ info
+for uaccess failures, then we'll likely want to provide the range.  E.g. if=
+ a
+uaccess splits a page, on x86, we'd either need to register our own excepti=
+on
+fixup and use custom uaccess macros (eww), or convice the world that extend=
+ing
+ex_handler_uaccess() and all of the uaccess macros that they need to provid=
+e the
+exact address that failed.
+
+And for SNP and TDX, I believe the range will be used when the guest uses a
+hardware-vendor-defined hypercall to request conversions between private an=
+d
+shared.  Or maybe the plan is to funnel those into KVM_HC_MAP_GPA_RANGE?
