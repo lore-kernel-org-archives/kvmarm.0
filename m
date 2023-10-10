@@ -1,343 +1,203 @@
-Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2057.outbound.protection.outlook.com [40.107.249.57])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2071.outbound.protection.outlook.com [40.107.93.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2454724C6A
-	for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 15:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DF6624C82
+	for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 15:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="YiIGlfYu";
-	dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="YiIGlfYu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kva2NKMkG3+SHPd1GwnlMzxq2idQjKmA52DhGdUiaNg=;
- b=YiIGlfYuNAFh+Gg9hRRDSimF3rUX9jYv0W/ysH3DA67xemQXrU6zBw4/V8MsCv02eeRtSI/lkU1mGNYhRC8DwTzcWgIQemVz0ACX5rbXr8LLw+BDVL4Cfz0eBzmMldnvHmPUf1wsrOesvAtEr8+r0axiTbDvUUNwW9hU7ihep34=
-Received: from DU2P250CA0024.EURP250.PROD.OUTLOOK.COM (2603:10a6:10:231::29)
- by AS8PR08MB8567.eurprd08.prod.outlook.com (2603:10a6:20b:566::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.37; Tue, 10 Oct
- 2023 15:00:53 +0000
-Received: from DBAEUR03FT030.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:10:231:cafe::61) by DU2P250CA0024.outlook.office365.com
- (2603:10a6:10:231::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.36 via Frontend
- Transport; Tue, 10 Oct 2023 15:00:53 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
- client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
- pr=C
-Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- DBAEUR03FT030.mail.protection.outlook.com (100.127.142.197) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6886.27 via Frontend Transport; Tue, 10 Oct 2023 15:00:53 +0000
-Received: ("Tessian outbound ab4fc72d2cd4:v211"); Tue, 10 Oct 2023 15:00:52 +0000
-X-CheckRecipientChecked: true
-X-CR-MTA-CID: 365f917152ea58d9
-X-CR-MTA-TID: 64aa7808
-Received: from 9a9358688d33.2
-	by 64aa7808-outbound-1.mta.getcheckrecipient.com id 41F37A45-F550-4012-83DF-C68705986F73.1;
-	Tue, 10 Oct 2023 15:00:41 +0000
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 9a9358688d33.2
-    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Tue, 10 Oct 2023 15:00:41 +0000
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Rl/3uTRW"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=g6n3X0foma5Nr5NBjarFgf5Wx0caw7gPiHQ0Fkrl36cVDNSDii0fVR0GMUBND8wgNlHugoTO4wqWEQSQkI9kqiNxDHdWc/aJNncD71JExKd9afWdByVhgkO1EZPgDZMFe6fa5VIQcHqEoQwlvgeEitH+QQSH22/eEamdXzRVZny1hppJXgdOnc5vOF+o6UjZj8NEdXdCkmuNAJZr7VHHoP8tMAvqsHBLm0mXUcAr2WqNJfpGWicQtHpePxxzIK6w4HHaX/vZfKj/SllxMjw1DCyd0fw3QfadbnRc1UaUAvisRj+8wG6mkP0E3j5ljGACqKzOA0xd+DbO0bZgjnn2QA==
+ b=haCmri6TbCBW5vhn7Gs1av8rCbd2iHotQvLL9Cu9gu5rqIGmRN77Bn7NaqC9mIkoruXHozvsEDBsll6FWjdYVeuhvMMumVFrxTbsQMs6roRhrEB38n49h7DMcwVcZ3mG3G5W//CuFJt+/xowJ0UCMUG0RV6O+4jzUSdloB0XDl2K01qFNRqUNZW8Pt4EIJ3NsBcqlIhb36lS3UN2BMJBRwcNQLaWkORjiNstpgNmuhJq75qF0+R45hfHLId6CSZSSiSNqyncb+Auh8S+XeBE6TYhA9Mk897tv+Yfa9ef78ZwEvzysHXx2i5jVYxqYdCGNdgjGZK3Cuv7+NwbvL5d/w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kva2NKMkG3+SHPd1GwnlMzxq2idQjKmA52DhGdUiaNg=;
- b=eCp+jOrJAphgqKqtLE1qmnOTHij6G7GCMqkac2SVjU7LRpLBwoxzJe/8Z8pc9A4MbDfWhqU3ZqLHZoz7onkrrJ8v+Z+EvXgFekFxNewSWeWVeRG3s71PSG0+XBnlzqb6SOICkR+AvUXgNaigVxOKxtWHGgus/yMwFAwj7J37U9QKN1hcTXT9W6RO5dySjs7gLvQzhdVBc8x8Nfmt54u/KJoydTbRStA8Q7yZsG2LLBp2a59Nusu7YuAhGrnxFt76KFFNgVF4EOgiSXrBqgM9Esm7YuHPPf763d3xaObFbB98cFQLVNUVR7NzA+VkHSqInhvt5yyuPaPqLoRQNFUslA==
+ bh=qdoA2s+zlCMdVPDkNoKQUGzFUMH9X37i0XVRnBBtf1I=;
+ b=LFxoIQPDiR/LBq99bm8kUogyvUequcH149EN5adcddllXktruKohrrp9/raoa72uTtT1zF1Z718KWJh1Scq6YVm37+CGNzEn7U2X4J/eXtaSuHhT/7LH2hGKMfKMl/19Dl69f/HwGGILByJDZCF4U3mdb+MYpo6XLYbIeYR0Tpqu8z8rc3DLZoeK3JPRc2pnQS+I6ti60F3DdbiUihndWjZ/RyUXTcVxOR4Xz8yHmc75E62cFzhptsithKHjiqJDLH2nSRAfCHZygY8CdOjxkbzsCFuY/GtSPdNdUQQj/1nGdpIZBd361F2n46q+SJjExGAYCk6G1hvIGizV4dbqMQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kva2NKMkG3+SHPd1GwnlMzxq2idQjKmA52DhGdUiaNg=;
- b=YiIGlfYuNAFh+Gg9hRRDSimF3rUX9jYv0W/ysH3DA67xemQXrU6zBw4/V8MsCv02eeRtSI/lkU1mGNYhRC8DwTzcWgIQemVz0ACX5rbXr8LLw+BDVL4Cfz0eBzmMldnvHmPUf1wsrOesvAtEr8+r0axiTbDvUUNwW9hU7ihep34=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from GVXPR08MB7727.eurprd08.prod.outlook.com (2603:10a6:150:6b::6)
- by DU0PR08MB9823.eurprd08.prod.outlook.com (2603:10a6:10:444::22) with
+ bh=qdoA2s+zlCMdVPDkNoKQUGzFUMH9X37i0XVRnBBtf1I=;
+ b=Rl/3uTRWHBsLH/VyrTg1/EQRaVzEJ/Ibc9SRInNfMcDre38+KeY+HgQWae0EV3WfyGETRYn/ElvWs1MR9qV3Yj3vh4LfnXXtgmSWg2Xx0QvDkl/gIUYS3vzsxVGS+XScUc8qr2G7VJ3RDo08O4F9ldJ0PmD18yTgkx3Y1Uxspk7IMEQ0wXsLlCtDSCcSmP0YHoYA9VcEFpscf5wuo4qom32qESMjvzgbm6aFcWtiOHRf6PANh+8yJbo1GCxysArAMWHbR8sWBq2VRQQPOYNaniHwTvCXALTV8JowmoF2TH9K393fo9k6JHbE+VG94b2ueR+qqnoHxB6maJi+uADdwA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by CY8PR12MB7563.namprd12.prod.outlook.com (2603:10b6:930:96::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.36; Tue, 10 Oct
- 2023 15:00:39 +0000
-Received: from GVXPR08MB7727.eurprd08.prod.outlook.com
- ([fe80::7556:1a83:73f0:cf7]) by GVXPR08MB7727.eurprd08.prod.outlook.com
- ([fe80::7556:1a83:73f0:cf7%7]) with mapi id 15.20.6863.032; Tue, 10 Oct 2023
- 15:00:37 +0000
-Message-ID: <c978b02b-2c82-06a6-f63a-67729524bf6c@arm.com>
-Date: Tue, 10 Oct 2023 16:00:32 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v2 2/3] arm64: perf: Add support for event counting
- threshold
-To: James Clark <james.clark@arm.com>, linux-arm-kernel@lists.infradead.org,
- linux-perf-users@vger.kernel.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Russell King <linux@armlinux.org.uk>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Mark Rutland <mark.rutland@arm.com>, Reiji Watanabe <reijiw@google.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Zaid Al-Bassam <zalbassam@google.com>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
-References: <20231010104048.1923484-1-james.clark@arm.com>
- <20231010104048.1923484-3-james.clark@arm.com>
-In-Reply-To: <20231010104048.1923484-3-james.clark@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P123CA0340.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:18c::21) To GVXPR08MB7727.eurprd08.prod.outlook.com
- (2603:10a6:150:6b::6)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.38; Tue, 10 Oct
+ 2023 15:05:03 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6863.032; Tue, 10 Oct 2023
+ 15:05:03 +0000
+Date: Tue, 10 Oct 2023 12:05:02 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: ankita@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
+	will@kernel.org, aniketa@nvidia.com, cjia@nvidia.com,
+	kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
+	acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
+	danw@nvidia.com, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 1/2] KVM: arm64: determine memory type from VMA
+Message-ID: <20231010150502.GM3952@nvidia.com>
+References: <20230907181459.18145-1-ankita@nvidia.com>
+ <20230907181459.18145-2-ankita@nvidia.com>
+ <ZR7hKYU1Wj+VTqpO@arm.com>
+ <20231005165458.GM682044@nvidia.com>
+ <ZSVe0nb02S4kz5D2@arm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZSVe0nb02S4kz5D2@arm.com>
+X-ClientProxiedBy: BL1PR13CA0103.namprd13.prod.outlook.com
+ (2603:10b6:208:2b9::18) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	GVXPR08MB7727:EE_|DU0PR08MB9823:EE_|DBAEUR03FT030:EE_|AS8PR08MB8567:EE_
-X-MS-Office365-Filtering-Correlation-Id: e428684e-331b-4819-9f40-08dbc9a1b2e5
-x-checkrecipientrouted: true
-NoDisclaimer: true
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CY8PR12MB7563:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7be5086b-f018-4fae-aa8b-08dbc9a247fa
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original:
- VCD34SmuDnbTXzxPhZMx5bbSRHS9iaZHQRms5KYx5xYwzw0rB5sRQAPacC0sUBEmkekSdeqQHBE0liqIuOqUT33GxveKV4UTr2C7BavIw4J4JdZxzY8Zn/GDx/bWkrOV+K/l/lRVJrS3Qjo8CleHH6yK4z1UqQ95j0r/h9MXwtd5fZYr12ZDFVmQvC6dCWnUKfWEZ9+2f+9FAFyxSVZ2PzXcYs6tGWwQweaYGcFvl3UuxUx9L0t2s+NOFHBRR8Rdrfnm5gAdEzUYh+m3yMeX1X8mVBp0aTbAr+UqdCfGCVXEer/Ule8BfqnfInCjA9LqbTLqEWIIEDFesnAqLjGSVbgM6oV/iBl8zcdHQe96JjtcUTXZrf1YFI3fD9J3s0f6xjjHFRK2rwA4uCtekf5YmsRV15mn/eA3ees78Y9f17dX+ww/fs1WnSEuHsI9ljdOA6dp+i++Q8VT31e7aNO0El9wtqYdIYSHbQuf/EqXxmUljW/2QHa4TM1b3VwpaeX+OPehAQRdoe7BQ9rNUtDMphYgPzjTQR/Gc33bXBdOc7EdRr5mJSiDYFGB9ALAEqruJPrvVbWwQhO0KMML9MIES4ApAHRC0B2hjGTW3X2xpEfjCGugqd1nK3aNEJ6mez6+ydJv/2+6xzyz6m8Lb5YY4g==
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GVXPR08MB7727.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(136003)(396003)(366004)(346002)(230922051799003)(186009)(451199024)(1800799009)(64100799003)(6512007)(2616005)(53546011)(6506007)(41300700001)(6486002)(478600001)(83380400001)(2906002)(7416002)(5660300002)(66556008)(54906003)(66476007)(66946007)(8936002)(8676002)(4326008)(316002)(26005)(31696002)(36756003)(38100700002)(86362001)(31686004)(6666004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR08MB9823
-Original-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DBAEUR03FT030.eop-EUR03.prod.protection.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	b585c1a0-03b9-4c89-1057-08dbc9a1a945
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	hUh7+fkRk6fNYiXYmJaaRcl8K5Rm3nQX8rXayl1z4wwYvquy6MDh72Wo2oFbEsrKOWaix2pSTznkhUkxbM17Z5h8Avd25IzivBYn8vWQPJuN+Ow2w+2pzccDubRQui2FYww8cxsPzEuWecIFOZZcJwxfd2NJhzvD0wL1/u3ToYHTJY+7hjoKb6oaOTM4/G33FkshEpt/b0cVuKBTXA0fBUg+EeMkHRVIRQ5aZ1rhw42rnDDQxpvlH2RZwSQtBz2Q0qAl6NrktQbwueX8hUczeWbBlzPjyM5pNLz/SiQBa2px+PFUVn56Ad0L2RLhDEWtqsFqLYk1Xp0cylnYfQ3+eRSbabx7jUDhRTMTMm0KJ9QWBtasmOIBlgW3GulXsnpzteITfxWzRTyUJ2IHeIsYAxx7bVxIJoO/cuBRVTe5Z2OAqDcdW0/aTvpIBlMqPdI75HwurbKgkMA2HvHjCM3f7SeZHq3pHn7VefQJ5inT2+18RKYrd4l77Rl/Pc1RKhUe94M8pLLoAKixj5xdWHbxirzFvT1+8qeka7GXG7Ec5RX3QTiYZgGGGnWkQnHZi0ggssRU3pN+NxENOhJ8hyJpZUj/kRA3rduEPrjucRvN7l5Z3DkHSePa6q+k7kEDR7u9ry/WgFJHRMOBcvvpXBnqZ3xQ9nG8jxCoY13fKroac2IQqUyg5hlaKI2JszdrpW+CDPRKfZOnsptQo9NbiF7vsW7c1n/OeN1rXHCdmIDsxpFPxorLOrmiI0zX6/5Rk1aA5daQ4qAnhPSkeJXMh5qYig==
+	khikcPI9nJ+HNkhn1Jjh89CQmyXWY/phu6MpKswyEvOndU5oI+OVomLoueUEyIs+17vsKG4wFvcBebBFmiTIAcnS5tTGLaXVdlEvdyfEU2Fp/84M2FRuH28rrISnw4O7AMOb9To+SgcTGGGTuajMm8l5pYDpBdkNCQb8bpPpPJKK+09TEEt6FiJpVJTY0lQxRFwdisd4LqIVZJD1IQuIOKudLvjiLp9dloKOCbGBPU24NnM9zbp7eIjMoGt1n42p181hyJq4voUzIxKWaCaTyqUq7nsJr8la1d5TpkuIT5JNiiJUHSmudHdTMLXJJUSbNf2LH9EXpT+MXry/MUWjEn4rKaKhkVjF6VvrE3V4M/cI/vv40N9oBUeSWjw3RBxTul9pYKKz4MBduYPfbblajvj6k/aJXB6sJbWHumEXtQsccYm1c5Duxq7VcETccjpF6mrVOIbVozb5U6n+/j68KgzlvY58ODB6moMH4Eh54THRWgFOZUtSlsbb7SiYz/6BowcK3ASHNvdx+VEswHW54TgexrNUhJG0/xIgPXMYOIZ71DsAtUxvBTHdV4exnaE5
 X-Forefront-Antispam-Report:
-	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(39860400002)(136003)(396003)(346002)(230922051799003)(82310400011)(186009)(451199024)(1800799009)(64100799003)(36840700001)(40470700004)(46966006)(82740400003)(6512007)(2616005)(53546011)(6506007)(41300700001)(6486002)(478600001)(336012)(83380400001)(47076005)(2906002)(70586007)(5660300002)(54906003)(70206006)(8936002)(8676002)(4326008)(316002)(26005)(40480700001)(31696002)(36756003)(36860700001)(356005)(81166007)(40460700003)(86362001)(31686004)(6666004)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2023 15:00:53.0898
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(346002)(39860400002)(366004)(396003)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(6512007)(66899024)(83380400001)(66946007)(2616005)(1076003)(26005)(6916009)(66556008)(66476007)(316002)(5660300002)(8676002)(4326008)(41300700001)(8936002)(2906002)(6506007)(6486002)(478600001)(33656002)(36756003)(86362001)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?bRpkjZBWzAcw8rcNoBxHAkBW7/4PGQIxMKVblmq55C6DSU7+enlOo3uUHiHY?=
+ =?us-ascii?Q?BUwj1RRFKLtIEdzA8ZSXf5Jm/7sths/kA/jkN6KBuOJGe2Zi56ac5NUGM9Xp?=
+ =?us-ascii?Q?KpETGEW/TMhLI2jzXm2LNsiwLMCnY4+CiyEWLZCdOZHGtjWYMzkTxyalFVHX?=
+ =?us-ascii?Q?wyl0pgtQQs0tyy6Iz61/MjzTAL6XrB487dbHM50yAuTvQiIlRpmj8G4R1iVc?=
+ =?us-ascii?Q?mp3lgAZVdgzaWKXujWbsGzsgF5O4OGf4hs/ZOELCpjQtzBxnQmHtuZuGwThH?=
+ =?us-ascii?Q?EW2VmHxpnBdHgwvctNJ4FDrSRjXyFSS7eEGgSXsTauA/rBCcrjMxuimeroCu?=
+ =?us-ascii?Q?E9i5IcdRC2xTyLgwlcu+1FUwCytFVF089Y2EPm5rK12pVX3lqJ/bHQW/DsP6?=
+ =?us-ascii?Q?IzAv3ymen1tInN3/IQz4ZWH7lvY4xQDXYRecx+sj8ZYfli/1UXVQ+adWdTZq?=
+ =?us-ascii?Q?nDDnDEPtxDu9ASq7PG9guX14bttEH+3JsVz76y+f9vFp8JVJEEpwRjtHvint?=
+ =?us-ascii?Q?rtWv+mA8da13fhSnM8x35HZDLMY40aCBVvNNPDcqFCWHnp1iM7z7iQ6/FtPF?=
+ =?us-ascii?Q?nrixez/vXOv4vBWeI9+oYaudSrSkaYbGUue8w/1ZA5+sVZsTZxk93PLdLpOT?=
+ =?us-ascii?Q?+p8OL9ewouH86tc42bqDITH3ktlYSm8FDW9xYLrWiJxXsJzopQL0n1mPiSA0?=
+ =?us-ascii?Q?u2wGXxtW18a36frWczBElQkA99izCSnmLXlT+PWAg8YxZa2TokhaxIvQeiYW?=
+ =?us-ascii?Q?bY2Q88t8Ome0b4uZvO/2dBslgwBbCIjRDhuuJVjZKk10QWm8jP1WQQFS76IY?=
+ =?us-ascii?Q?2gWlz8ctDy3mPjVIGpoKTGg5Ysll97Y1mWaz4Jki5pvL9GeDePyp443mNfYo?=
+ =?us-ascii?Q?2CrztJxUdOj8HKbIa6rajFReqy5wx/Sy1unezUXzzMQVDTvfHfffhskhceuf?=
+ =?us-ascii?Q?gs39k1uuOZnukb8YD4aR2LCv+eG7UEgh4iDs0dKp7QeLD3dKXTRteWWKv2Cw?=
+ =?us-ascii?Q?MvPVI2sgjLsvD75SVJACMdni3UDePpUMrvMvvbsIFzms9dNXQpugWcR8YT66?=
+ =?us-ascii?Q?DbllzmKv0wWKW2c/dAOcfeE8atRGkY2fZwP+n3Ks9yr+KkLT4YVrIq4cjEeS?=
+ =?us-ascii?Q?5a21OkEaNtejjURciQ4DrFxPJ1j/NpXD6xwYENR8tQJllZwljT34VjLQmcVJ?=
+ =?us-ascii?Q?oV8uB+zK+jcqlQPMUTkNVb4kYS6uHMTDvLcUzjgRNwQqnGw6TLupz6X0E4+/?=
+ =?us-ascii?Q?l3wOTfpjAniMd7fHwJEXJB4x4AA0ci1/2+zMyEfQdGmYZoK59vHSTVvqsP78?=
+ =?us-ascii?Q?hRno3suZCTgvTE60l/J6XcHzKe2jM2x0+36cSKGbbxxYvWxFIyROz3zJpg25?=
+ =?us-ascii?Q?GT/6hTl5naGjuA85jU6rmGxLUj/4eZXYa/i1h/lQ2Gb9X2Tw1xYyFwhJtKtj?=
+ =?us-ascii?Q?xCEZRS1e6gYpA3mImum4QSpKhM2huDuSb228S9WkLWHRepfnBJRqqH8Vwj9V?=
+ =?us-ascii?Q?2mONo/bBeNlVrBEufUerBc4UvY1JaeVCcWLh5JALCXsBcFtO5hegQa82epM7?=
+ =?us-ascii?Q?Dfg4F587EZdT6xgbb8k60VOj2nP7gEBvy9r9iTTZ?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7be5086b-f018-4fae-aa8b-08dbc9a247fa
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2023 15:05:03.4006
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e428684e-331b-4819-9f40-08dbc9a1b2e5
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DBAEUR03FT030.eop-EUR03.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB8567
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: som5HS7qfdcB23JOHr2p9YDsATC5cDkBVGIiw8erzbD9RPWAqAtjdsDJb7kX7XXD
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7563
 
-On 10/10/2023 11:40, James Clark wrote:
-> FEAT_PMUv3_TH (Armv8.8) permits a PMU counter to increment only on
-> events whose count meets a specified threshold condition. For example if
-> PMEVTYPERn.TC (Threshold Control) is set to 0b101 (Greater than or
-> equal, count), and the threshold is set to 2, then the PMU counter will
-> now only increment by 1 when an event would have previously incremented
-> the PMU counter by 2 or more on a single processor cycle.
+On Tue, Oct 10, 2023 at 03:25:22PM +0100, Catalin Marinas wrote:
+> On Thu, Oct 05, 2023 at 01:54:58PM -0300, Jason Gunthorpe wrote:
+> > On Thu, Oct 05, 2023 at 05:15:37PM +0100, Catalin Marinas wrote:
+> > > On Thu, Sep 07, 2023 at 11:14:58AM -0700, ankita@nvidia.com wrote:
+> > > > From: Ankit Agrawal <ankita@nvidia.com>
+> > > > Currently KVM determines if a VMA is pointing at IO memory by checking
+> > > > pfn_is_map_memory(). However, the MM already gives us a way to tell what
+> > > > kind of memory it is by inspecting the VMA.
+> > > 
+> > > Well, it doesn't. It tells us what attributes the user mapped that
+> > > memory with, not whether it's I/O memory or standard RAM.
+> > 
+> > There is VM_IO which is intended to be used for address space with
+> > side effects.
+> > 
+> > And there is VM_PFNMAP which is intended to be used for address space
+> > without struct page (IO or not)
+> > 
+> > And finally we have the pgprot bit which define the cachability.
+> > 
+> > Do you have a definition of IO memory that those three things don't
+> > cover?
+> > 
+> > I would propose that, for KVM's purpose, IO memory is marked with
+> > VM_IO or a non-cachable pgprot
+> > 
+> > And "standard RAM" is defined by a cachable pgprot. Linux never makes
+> > something that is VM_IO cachable.
 > 
-> Two new Perf event config fields, 'threshold' and 'threshold_control'
-> have been added for controlling the feature:
-> 
->    $ perf stat -e stall_slot/threshold=2,threshold_control=5/
-> 
-> A new capability for reading out the maximum supported threshold value
-> has also been added:
-> 
->    $ cat /sys/bus/event_source/devices/armv8_pmuv3/caps/threshold_max
-> 
->    0x000000ff
-> 
-> If a threshold higher than threshold_max is provided, then no error is
-> generated but the threshold is clamped to the max value. If
-> FEAT_PMUv3_TH isn't implemented or a 32 bit kernel is running, then
-> threshold_max reads zero, and neither the 'threshold' nor
-> 'threshold_control' parameters will be used.
-> 
-> The threshold is per PMU counter, and there are potentially different
-> threshold_max values per PMU type on heterogeneous systems.
-> 
-> Bits higher than 32 now need to be written into PMEVTYPER, so
-> armv8pmu_write_evtype() has to be updated to take an unsigned long value
-> rather than u32 which gives the correct behavior on both aarch32 and 64.
-> 
-> Signed-off-by: James Clark <james.clark@arm.com>
-> ---
->   drivers/perf/arm_pmuv3.c       | 67 +++++++++++++++++++++++++++++++++-
->   include/linux/perf/arm_pmuv3.h |  1 +
->   2 files changed, 67 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
-> index 8fcaa26f0f8a..6d669b16a2bc 100644
-> --- a/drivers/perf/arm_pmuv3.c
-> +++ b/drivers/perf/arm_pmuv3.c
-> @@ -15,6 +15,7 @@
->   #include <clocksource/arm_arch_timer.h>
->   
->   #include <linux/acpi.h>
-> +#include <linux/bitfield.h>
->   #include <linux/clocksource.h>
->   #include <linux/of.h>
->   #include <linux/perf/arm_pmu.h>
-> @@ -294,9 +295,16 @@ static const struct attribute_group armv8_pmuv3_events_attr_group = {
->   	.is_visible = armv8pmu_event_attr_is_visible,
->   };
->   
-> +#define TH_LO	2
-> +#define TH_HI	13
-> +#define TH_CNTL_LO	14
-> +#define TH_CNTL_HI	16
-> +
->   PMU_FORMAT_ATTR(event, "config:0-15");
->   PMU_FORMAT_ATTR(long, "config1:0");
->   PMU_FORMAT_ATTR(rdpmc, "config1:1");
-> +PMU_FORMAT_ATTR(threshold, "config1:" __stringify(TH_LO) "-" __stringify(TH_HI));
-> +PMU_FORMAT_ATTR(threshold_control, "config1:" __stringify(TH_CNTL_LO) "-" __stringify(TH_CNTL_HI));
+> I think we can safely set a stage 2 Normal NC for a vma with pgprot
+> other than MT_NORMAL or MT_NORMAL_TAGGED. But the other way around is
+> not that simple. Just because the VMM was allowed to map it as cacheable
+> does not mean that it supports all the CPU features. One example is MTE
+> where we can only guarantee that the RAM given to the OS at boot
+> supports tagged accesses. 
 
+Is there a use case to supply the VMM with cachable memory that is not
+full featured? At least the vfio cases I am aware of do not actually
+want to do this and would probably like the arch to prevent these
+corner cases upfront.
 
->   
->   static int sysctl_perf_user_access __read_mostly;
->   
-> @@ -310,10 +318,22 @@ static inline bool armv8pmu_event_want_user_access(struct perf_event *event)
->   	return event->attr.config1 & 0x2;
->   }
->   
-> +static inline u32 armv8pmu_event_threshold(struct perf_event_attr *attr)
-> +{
-> +	return FIELD_GET(GENMASK(TH_HI, TH_LO), attr->config1);
-> +}
-> +
-> +static inline u8 armv8pmu_event_threshold_control(struct perf_event_attr *attr)
-> +{
-> +	return FIELD_GET(GENMASK(TH_CNTL_HI, TH_CNTL_LO), attr->config1);
-> +}
-> +
->   static struct attribute *armv8_pmuv3_format_attrs[] = {
->   	&format_attr_event.attr,
->   	&format_attr_long.attr,
->   	&format_attr_rdpmc.attr,
+> I've seen something similar in the past with
+> LSE atomics (or was it exclusives?) not being propagated. These don't
+> make the memory safe for a guest to use as general purpose RAM.
 
-> +	&format_attr_threshold.attr,
-> +	&format_attr_threshold_control.attr,
+At least from a mm perspective, I think it is important that cachable
+struct pages are all the same and all interchangable. If the arch
+cannot provide this it should not allow the pgmap/memremap to succeed
+at all. Otherwise drivers using these new APIs are never going to work
+fully right..
 
-Given this is not supported for !CONFIG_ARM64, does it make sense to 
-remove them for that case, given we already take care of this in
-the code using IS_ENABLED(CONFIG_ARM64) ? The nice part is that
-the arm32 doesn't see something that is never usable. I understand
-the maxthreshold=0 already gives out the hint.
+That leaves open the question of what to do with a cachable VM_PFNMAP,
+but if the arch can deal with the memremap issue then it seems like it
+can use the same logic when inspecting the VMA contents?
 
-Rest looks fine to me.
+> I was thinking more about keeping things simpler and avoid any lack of
+> coherence between the VMM and the VM, in case the latter maps it as
+> Normal NC. But if the VMM doesn't touch it, the initial cache
+> maintenance by the KVM would do.
 
->   	NULL,
->   };
->   
-> @@ -365,10 +385,38 @@ static ssize_t bus_width_show(struct device *dev, struct device_attribute *attr,
->   
->   static DEVICE_ATTR_RO(bus_width);
->   
-> +static u32 threshold_max(struct arm_pmu *cpu_pmu)
-> +{
-> +	/*
-> +	 * PMMIR.WIDTH is readable and non-zero on aarch32, but it would be
-> +	 * impossible to write the threshold in the upper 32 bits of PMEVTYPER.
-> +	 */
-> +	if (IS_ENABLED(CONFIG_ARM))
-> +		return 0;
-> +
-> +	/*
-> +	 * The largest value that can be written to PMEVTYPER<n>_EL0.TH is
-> +	 * (2 ^ PMMIR.THWIDTH) - 1.
-> +	 */
-> +	return (1 << FIELD_GET(ARMV8_PMU_THWIDTH, cpu_pmu->reg_pmmir)) - 1;
-> +}
-> +
-> +static ssize_t threshold_max_show(struct device *dev,
-> +				  struct device_attribute *attr, char *page)
-> +{
-> +	struct pmu *pmu = dev_get_drvdata(dev);
-> +	struct arm_pmu *cpu_pmu = container_of(pmu, struct arm_pmu, pmu);
-> +
-> +	return sysfs_emit(page, "0x%08x\n", threshold_max(cpu_pmu));
-> +}
-> +
-> +static DEVICE_ATTR_RO(threshold_max);
-> +
->   static struct attribute *armv8_pmuv3_caps_attrs[] = {
->   	&dev_attr_slots.attr,
->   	&dev_attr_bus_slots.attr,
->   	&dev_attr_bus_width.attr,
-> +	&dev_attr_threshold_max.attr,
+I see, in general we usually don't have use cases for the VMM touching
+the vfio memory as it is hard to make that secure. I would like it if
+that memory could be a FD instead of a VMA. Maybe someday..
 
-Similarly here and could avoid the IS_ENABLED(CONFIG_ARM) above.
+> See above on the characteristics of the memory. If some of them are not
+> supported, it's probably fine (atomics not working) but others like MTE
+> accesses could either cause external aborts or access random addresses
+> from elsewhere. Currently we rely on pfn_is_map_memory() for this but we
+> need a way to tell that other ranges outside the initial RAM supports
+> all features. 
 
-Suzuki
+Indeed, I did not realize this about arm. See above on my note that at
+the mm level we should not have different types of cachable struct
+pages. So I think the right thing to do is fix that and still rely on
+the struct page test here in kvm.
 
+> IOW, is any of this memory (mapped as cacheable in the
+> VMM) special purpose with only a subset of the CPU features supported?
 
->   	NULL,
->   };
->   
-> @@ -552,7 +600,7 @@ static void armv8pmu_write_counter(struct perf_event *event, u64 value)
->   		armv8pmu_write_hw_counter(event, value);
->   }
->   
-> -static inline void armv8pmu_write_evtype(int idx, u32 val)
-> +static inline void armv8pmu_write_evtype(int idx, unsigned long val)
->   {
->   	u32 counter = ARMV8_IDX_TO_COUNTER(idx);
->   
-> @@ -914,6 +962,10 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
->   				     struct perf_event_attr *attr)
->   {
->   	unsigned long config_base = 0;
-> +	struct perf_event *perf_event = container_of(attr, struct perf_event,
-> +						     attr);
-> +	struct arm_pmu *cpu_pmu = to_arm_pmu(perf_event->pmu);
-> +	u32 th, th_max;
->   
->   	if (attr->exclude_idle)
->   		return -EPERM;
-> @@ -945,6 +997,19 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
->   	if (attr->exclude_user)
->   		config_base |= ARMV8_PMU_EXCLUDE_EL0;
->   
-> +	/*
-> +	 * Insert event counting threshold (FEAT_PMUv3_TH) values. If
-> +	 * FEAT_PMUv3_TH isn't implemented, then THWIDTH (threshold_max) will be
-> +	 * 0 and no values will be written.
-> +	 */
-> +	th_max = threshold_max(cpu_pmu);
-> +	if (IS_ENABLED(CONFIG_ARM64) && th_max) {
-> +		th = min(armv8pmu_event_threshold(attr), th_max);
-> +		config_base |= FIELD_PREP(ARMV8_PMU_EVTYPE_TH, th);
-> +		config_base |= FIELD_PREP(ARMV8_PMU_EVTYPE_TC,
-> +					  armv8pmu_event_threshold_control(attr));
-> +	}
-> +
->   	/*
->   	 * Install the filter into config_base as this is used to
->   	 * construct the event type.
-> diff --git a/include/linux/perf/arm_pmuv3.h b/include/linux/perf/arm_pmuv3.h
-> index ec3a01502e7c..753f8dbd9d10 100644
-> --- a/include/linux/perf/arm_pmuv3.h
-> +++ b/include/linux/perf/arm_pmuv3.h
-> @@ -255,6 +255,7 @@
->   #define ARMV8_PMU_BUS_SLOTS_MASK 0xff
->   #define ARMV8_PMU_BUS_WIDTH_SHIFT 16
->   #define ARMV8_PMU_BUS_WIDTH_MASK 0xf
-> +#define ARMV8_PMU_THWIDTH GENMASK(23, 20)
->   
->   /*
->    * This code is really good
+At least the use cases I am interested in has the memory be
+functionally indistinguishable from boot time DDR.
 
+Cachable memory that does not function the same as DDR is something
+else, maybe that is your "cachable IO memory" concept. I don't have a
+use case for it. If we do decide to create it then it likely should be
+tagged as MEMORY_DEVICE_PCI_P2PDMA in the mm side and not get into any
+code paths that assume DDR.
+
+Jason
