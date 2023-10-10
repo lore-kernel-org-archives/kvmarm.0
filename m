@@ -1,16 +1,16 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98911524F
-	for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 09:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F6E817727
+	for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 09:57:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 344C01FB;
-	Tue, 10 Oct 2023 02:55:16 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3E1C01FB;
+	Tue, 10 Oct 2023 02:57:47 -0700 (PDT)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 96DBF3F762;
-	Tue, 10 Oct 2023 02:54:28 -0700 (PDT)
-Date: Tue, 10 Oct 2023 10:54:23 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A36973F762;
+	Tue, 10 Oct 2023 02:57:04 -0700 (PDT)
+Date: Tue, 10 Oct 2023 10:57:02 +0100
 From: Joey Gouly <joey.gouly@arm.com>
 To: Mark Brown <broonie@kernel.org>
 Cc: linux-arm-kernel@lists.infradead.org, nd@arm.com,
@@ -20,11 +20,11 @@ Cc: linux-arm-kernel@lists.infradead.org, nd@arm.com,
 	will@kernel.org, kvmarm@lists.linux.dev,
 	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
 	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v1 05/20] arm64: context switch POR_EL0 register
-Message-ID: <20231010095423.GA2098677@e124191.cambridge.arm.com>
+Subject: Re: [PATCH v1 15/20] arm64: add POE signal support
+Message-ID: <20231010095702.GB2098677@e124191.cambridge.arm.com>
 References: <20230927140123.5283-1-joey.gouly@arm.com>
- <20230927140123.5283-6-joey.gouly@arm.com>
- <b1e43c42-111f-43e3-9e24-89ddef76fedc@sirena.org.uk>
+ <20230927140123.5283-16-joey.gouly@arm.com>
+ <a6e6c8a3-15b1-48e3-84fa-810ce575c09a@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -33,33 +33,24 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b1e43c42-111f-43e3-9e24-89ddef76fedc@sirena.org.uk>
+In-Reply-To: <a6e6c8a3-15b1-48e3-84fa-810ce575c09a@sirena.org.uk>
 
 Hi Mark,
 
-On Thu, Oct 05, 2023 at 03:14:50PM +0100, Mark Brown wrote:
-> On Wed, Sep 27, 2023 at 03:01:08PM +0100, Joey Gouly wrote:
+On Thu, Oct 05, 2023 at 03:34:29PM +0100, Mark Brown wrote:
+> On Wed, Sep 27, 2023 at 03:01:18PM +0100, Joey Gouly wrote:
+> > Add PKEY support to signals, by saving and restoring POR_EL0 from the stackframe.
 > 
-> > +/* Initial value for Permission Overlay Extension for EL0 */
-> > +#define POR_EL0_INIT	UL(0x7)
+> It'd be nice to have at least a basic test that validates that we
+> generate a POE signal frame when expected, though that should be a very
+> minor thing which is unlikely to ever actually spot anything.
 > 
-> Might be useful to explain why this is the default (and possibly also
-> define in terms of the constants for POR values)?
-> 
-> > +static void permission_overlay_switch(struct task_struct *next)
-> > +{
-> > +	if (alternative_has_cap_unlikely(ARM64_HAS_S1POE)) {
-> 
-> Why the _unlikely here?
+> I'd also expect to see matching support added to ptrace.
 
-The only options are alternative_has_cap_{likely,unlikely}().
-I went with unlikely as currently it is unlikely!
+The selftests/mm/protection_keys.c looks for the POE signal frame, do you think
+we need a separate test?
+
+I will look into ptrace.
 
 Thanks,
 Joey
-
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-
