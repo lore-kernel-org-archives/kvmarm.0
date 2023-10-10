@@ -1,128 +1,108 @@
-Received: from out-203.mta1.migadu.com (out-203.mta1.migadu.com [95.215.58.203])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3235D31594
-	for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 22:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04E1354E8
+	for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 22:59:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oaZYsJNm"
-Date: Tue, 10 Oct 2023 22:30:31 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1696977037;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/lM90Up6SI7d/uT4OcCpfnqLaN2bM1VE++77i6UZHLg=;
-	b=oaZYsJNm62P+DG0gECk9TGwg1Rvb25tEqRmt+8I4Vt24ltE+ubl4Ksj2iTkpsKf0Lz9SAc
-	GDjT4LfvV3vkJtIiVgkNYEBt9JlLmDEyPy8AlD4DelofZNOVn6GW9JSW1Vo7qSjP23anU4
-	Q6vUTqEojDviyiXttF+ECliCoHG4gJo=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Marc Zyngier <maz@kernel.org>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Reiji Watanabe <reijiw@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v7 06/12] KVM: arm64: PMU: Add a helper to read the
- number of counters
-Message-ID: <ZSXQh2P_l5xcj7zS@linux.dev>
-References: <20231009230858.3444834-1-rananta@google.com>
- <20231009230858.3444834-7-rananta@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wue7V3oA"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-32799639a2aso5995339f8f.3
+        for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 15:59:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696978753; x=1697583553; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2nacyxABp1UL03gZHXlkGoDpYi4y+fBMtTei3+pcLfc=;
+        b=wue7V3oAtAFcxXUuxM3h9KEea1C3pryfB+7hxP6MvVUDz1rkx73e3NxLVpfmmsLV0k
+         Wl8RzNaiDwhQLb6lb1eYyNW4JOrRD05k2ebmCQVdJRVKQaUadHIC/2r3O0rYatSlTrmn
+         2fkTlXvtuPjpVJntxZIIYUolIJ6Ce28UJjQ3Lysc+PDs8oZosd/LYlPVSevwJRJiYzyA
+         +khS+FxzotYb21jtMsPiSe8+IK2ao3Ze5F1ByWRYi86gg8wywBacnuWdz2Y5yST63CIB
+         qmW7D06JVnNcrqSveHFhVW3dFBM6O4BGqFqNz0+Ip9Oy2eAD16pFr/I+MKYEh6JA8h8t
+         wy1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696978753; x=1697583553;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2nacyxABp1UL03gZHXlkGoDpYi4y+fBMtTei3+pcLfc=;
+        b=YdXsw7tTDQ08VoeSaFgTSfn2pN/8XVvqXrR4G+bxsS7TpPxkj7K0nbBUOtw0dTrHTn
+         bGr6AJlRyEwN4tNOqIguGMbBQbuKqvcqBmM1grgEhU/1Kij3tdzFATuMTDGI8VhLgmty
+         UNB9Shc/9Ot/3ys7ujDTY55xv3JdU0Z6bd4RgxOZldG3NdfU/IaT1seNCBc17Tgb6qPf
+         32jwATypWnF1qXMTYQvCnQ3x6DTIRJQjW2/8q1GR+t0KSoVHZEpY425v44Z/RudA94M4
+         9fJsFVcuPyIiYB+DYBW+ZEoN3jK1Il7ocsFmJs+8Qh7FFbTLmeOn1PONupPjokFdozXC
+         gzHw==
+X-Gm-Message-State: AOJu0YzUg4KiAwP7q2aMEPvLav6XAUQGqELz3lWSIDcJtakd/7qebBUD
+	kDJs/1Mw0Kln6Tfr6I8OlmMtci1H4MZNv5SyUzOAhA==
+X-Google-Smtp-Source: AGHT+IFH+SOajooUfNwv0nZc5mlpLm234ee1vlA7EQQjes00sGcgpxOTQ+PCLWi4VGGu6ePaHkbbxNCMiY0cEJ/uN34=
+X-Received: by 2002:adf:e852:0:b0:315:9e1b:4ea6 with SMTP id
+ d18-20020adfe852000000b003159e1b4ea6mr16525699wrn.58.1696978752971; Tue, 10
+ Oct 2023 15:59:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231009230858.3444834-7-rananta@google.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-5-amoorthy@google.com>
+In-Reply-To: <20230908222905.1321305-5-amoorthy@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Tue, 10 Oct 2023 15:58:43 -0700
+Message-ID: <CALzav=crDptzFeAoyLrAekp--mM3Y7mFcPMW5W3YdPctkS6YUQ@mail.gmail.com>
+Subject: Re: [PATCH v5 04/17] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+To: Anish Moorthy <amoorthy@google.com>
+Cc: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	robert.hoo.linux@gmail.com, jthoughton@google.com, ricarkol@google.com, 
+	axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com, 
+	isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 09, 2023 at 11:08:52PM +0000, Raghavendra Rao Ananta wrote:
-> Add a helper, kvm_arm_get_num_counters(), to read the number
-> of counters from the arm_pmu associated to the VM. Make the
-> function global as upcoming patches will be interested to
-> know the value while setting the PMCR.N of the guest from
-> userspace.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+On Fri, Sep 8, 2023 at 3:30=E2=80=AFPM Anish Moorthy <amoorthy@google.com> =
+wrote:
+>
+> KVM_CAP_MEMORY_FAULT_INFO allows kvm_run to return useful information
+> besides a return value of -1 and errno of EFAULT when a vCPU fails an
+> access to guest memory which may be resolvable by userspace.
+>
+> Add documentation, updates to the KVM headers, and a helper function
+> (kvm_handle_guest_uaccess_fault()) for implementing the capability.
+>
+> Mark KVM_CAP_MEMORY_FAULT_INFO as available on arm64 and x86, even
+> though EFAULT annotation are currently totally absent. Picking a point
+> to declare the implementation "done" is difficult because
+>
+>   1. Annotations will be performed incrementally in subsequent commits
+>      across both core and arch-specific KVM.
+>   2. The initial series will very likely miss some cases which need
+>      annotation. Although these omissions are to be fixed in the future,
+>      userspace thus still needs to expect and be able to handle
+>      unannotated EFAULTs.
+>
+> Given these qualifications, just marking it available here seems the
+> least arbitrary thing to do.
+>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Anish Moorthy <amoorthy@google.com>
 > ---
->  arch/arm64/kvm/pmu-emul.c | 17 +++++++++++++++++
->  include/kvm/arm_pmu.h     |  6 ++++++
->  2 files changed, 23 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index a161d6266a5c..84aa8efd9163 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -873,6 +873,23 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
->  	return true;
->  }
->  
-> +/**
-> + * kvm_arm_get_num_counters - Get the number of general-purpose PMU counters.
-> + * @kvm: The kvm pointer
-> + */
-> +int kvm_arm_get_num_counters(struct kvm *kvm)
+[...]
+> +::
+> +       union {
+> +               /* KVM_SPEC_EXIT_MEMORY_FAULT */
+> +               struct {
+> +                       __u64 flags;
+> +                       __u64 gpa;
+> +                       __u64 len; /* in bytes */
 
-nit: the naming suggests this returns the configured number of PMCs, not
-the limit.
+I wonder if `gpa` and `len` should just be replaced with `gfn`.
 
-Maybe kvm_arm_pmu_get_max_counters()?
-
-> +{
-> +	struct arm_pmu *arm_pmu = kvm->arch.arm_pmu;
-> +
-> +	lockdep_assert_held(&kvm->arch.config_lock);
-> +
-> +	/*
-> +	 * The arm_pmu->num_events considers the cycle counter as well.
-> +	 * Ignore that and return only the general-purpose counters.
-> +	 */
-> +	return arm_pmu->num_events - 1;
-> +}
-> +
->  static void kvm_arm_set_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
->  {
->  	lockdep_assert_held(&kvm->arch.config_lock);
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index cd980d78b86b..672f3e9d7eea 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -102,6 +102,7 @@ void kvm_vcpu_pmu_resync_el0(void);
->  
->  u8 kvm_arm_pmu_get_pmuver_limit(void);
->  int kvm_arm_set_default_pmu(struct kvm *kvm);
-> +int kvm_arm_get_num_counters(struct kvm *kvm);
->  
->  u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu);
->  #else
-> @@ -181,6 +182,11 @@ static inline int kvm_arm_set_default_pmu(struct kvm *kvm)
->  	return -ENODEV;
->  }
->  
-> +static inline int kvm_arm_get_num_counters(struct kvm *kvm)
-> +{
-> +	return -ENODEV;
-> +}
-> +
->  static inline u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu)
->  {
->  	return 0;
-> -- 
-> 2.42.0.609.gbb76f46606-goog
-> 
-
--- 
-Thanks,
-Oliver
+- We don't seem to care about returning an exact `gpa` out to
+userspace since this series just returns gpa =3D gfn * PAGE_SIZE out to
+userspace.
+- The len we return seems kind of arbitrary. PAGE_SIZE on x86 and
+vma_pagesize on ARM64. But at the end of the day we're not asking the
+kernel to fault in any specific length of mapping. We're just asking
+for gfn-to-pfn for a specific gfn.
+- I'm not sure userspace will want to do anything with this information.
