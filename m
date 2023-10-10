@@ -1,121 +1,120 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16E6624C8A
-	for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 14:16:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 327A024C9A
+	for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 14:25:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6EBC51FB;
-	Tue, 10 Oct 2023 07:17:16 -0700 (PDT)
-Received: from localhost.localdomain (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 2FD073F762;
-	Tue, 10 Oct 2023 07:16:33 -0700 (PDT)
-From: James Clark <james.clark@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	linux-perf-users@vger.kernel.org,
-	suzuki.poulose@arm.com
-Cc: James Clark <james.clark@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Reiji Watanabe <reijiw@google.com>,
-	Zaid Al-Bassam <zalbassam@google.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: [PATCH v3 3/3] Documentation: arm64: Document the PMU event counting threshold feature
-Date: Tue, 10 Oct 2023 15:15:43 +0100
-Message-Id: <20231010141551.2262059-4-james.clark@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231010141551.2262059-1-james.clark@arm.com>
-References: <20231010141551.2262059-1-james.clark@arm.com>
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCDD1C433C8;
+	Tue, 10 Oct 2023 14:25:24 +0000 (UTC)
+Date: Tue, 10 Oct 2023 15:25:22 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: ankita@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
+	will@kernel.org, aniketa@nvidia.com, cjia@nvidia.com,
+	kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
+	acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
+	danw@nvidia.com, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 1/2] KVM: arm64: determine memory type from VMA
+Message-ID: <ZSVe0nb02S4kz5D2@arm.com>
+References: <20230907181459.18145-1-ankita@nvidia.com>
+ <20230907181459.18145-2-ankita@nvidia.com>
+ <ZR7hKYU1Wj+VTqpO@arm.com>
+ <20231005165458.GM682044@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231005165458.GM682044@nvidia.com>
 
-Add documentation for the new Perf event open parameters and
-the threshold_max capability file.
+On Thu, Oct 05, 2023 at 01:54:58PM -0300, Jason Gunthorpe wrote:
+> On Thu, Oct 05, 2023 at 05:15:37PM +0100, Catalin Marinas wrote:
+> > On Thu, Sep 07, 2023 at 11:14:58AM -0700, ankita@nvidia.com wrote:
+> > > From: Ankit Agrawal <ankita@nvidia.com>
+> > > Currently KVM determines if a VMA is pointing at IO memory by checking
+> > > pfn_is_map_memory(). However, the MM already gives us a way to tell what
+> > > kind of memory it is by inspecting the VMA.
+> > 
+> > Well, it doesn't. It tells us what attributes the user mapped that
+> > memory with, not whether it's I/O memory or standard RAM.
+> 
+> There is VM_IO which is intended to be used for address space with
+> side effects.
+> 
+> And there is VM_PFNMAP which is intended to be used for address space
+> without struct page (IO or not)
+> 
+> And finally we have the pgprot bit which define the cachability.
+> 
+> Do you have a definition of IO memory that those three things don't
+> cover?
+> 
+> I would propose that, for KVM's purpose, IO memory is marked with
+> VM_IO or a non-cachable pgprot
+> 
+> And "standard RAM" is defined by a cachable pgprot. Linux never makes
+> something that is VM_IO cachable.
 
-Signed-off-by: James Clark <james.clark@arm.com>
----
- Documentation/arch/arm64/perf.rst | 56 +++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
+I think we can safely set a stage 2 Normal NC for a vma with pgprot
+other than MT_NORMAL or MT_NORMAL_TAGGED. But the other way around is
+not that simple. Just because the VMM was allowed to map it as cacheable
+does not mean that it supports all the CPU features. One example is MTE
+where we can only guarantee that the RAM given to the OS at boot
+supports tagged accesses. I've seen something similar in the past with
+LSE atomics (or was it exclusives?) not being propagated. These don't
+make the memory safe for a guest to use as general purpose RAM.
 
-diff --git a/Documentation/arch/arm64/perf.rst b/Documentation/arch/arm64/perf.rst
-index 1f87b57c2332..36b8111a710d 100644
---- a/Documentation/arch/arm64/perf.rst
-+++ b/Documentation/arch/arm64/perf.rst
-@@ -164,3 +164,59 @@ and should be used to mask the upper bits as needed.
-    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/perf/arch/arm64/tests/user-events.c
- .. _tools/lib/perf/tests/test-evsel.c:
-    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/lib/perf/tests/test-evsel.c
-+
-+Event Counting Threshold
-+==========================================
-+
-+Overview
-+--------
-+
-+FEAT_PMUv3_TH (Armv8.8) permits a PMU counter to increment only on
-+events whose count meets a specified threshold condition. For example if
-+threshold_compare is set to 2 ('Greater than or equal'), and the
-+threshold is set to 2, then the PMU counter will now only increment by
-+when an event would have previously incremented the PMU counter by 2 or
-+more on a single processor cycle.
-+
-+To increment by 1 after passing the threshold condition instead of the
-+number of events on that cycle, add the 'threshold_count' option to the
-+commandline.
-+
-+How-to
-+------
-+
-+The threshold, threshold_compare and threshold_count values can be
-+provided per event:
-+
-+.. code-block:: sh
-+
-+  perf stat -e stall_slot/threshold=2,threshold_compare=2/ \
-+            -e dtlb_walk/threshold=10,threshold_compare=3,threshold_count/
-+
-+And the following comparison values are supported:
-+
-+.. code-block::
-+
-+  0: Not-equal
-+  1: Equals
-+  2: Greater-than-or-equal
-+  3: Less-than
-+
-+The maximum supported threshold value can be read from the caps of each
-+PMU, for example:
-+
-+.. code-block:: sh
-+
-+  cat /sys/bus/event_source/devices/armv8_pmuv3/caps/threshold_max
-+
-+  0x000000ff
-+
-+If a value higher than this is given, then it will be silently clamped
-+to the maximum. The highest possible maximum is 4095, as the config
-+field for threshold is limited to 12 bits, and the Perf tool will refuse
-+to parse higher values.
-+
-+If the PMU doesn't support FEAT_PMUv3_TH, then threshold_max will read
-+0, and both threshold and threshold_compare will be silently ignored.
-+threshold_max will also read as 0 on aarch32 guests, even if the host
-+is running on hardware with the feature.
+I don't have a nice solution, it looks more like the host kernel being
+able to trust what the VMM maps and gives to a guest (or we map
+everything as Device at Stage 2 as we currently do). An alternative
+would be for the host to know which physical address ranges support
+which attributes and ignore the vma but not sure we have such
+information in the ACPI tables (we can make something up for DT).
+
+> > > Unfortunately when FWB is not enabled, the kernel expects to naively do
+> > > cache management by flushing the memory using an address in the
+> > > kernel's map. This does not work in several of the newly allowed
+> > > cases such as dcache_clean_inval_poc(). Check whether the targeted pfn
+> > > and its mapping KVA is valid in case the FWB is absent before continuing.
+> > 
+> > I would only allow cacheable stage 2 mappings if FWB is enabled.
+> > Otherwise we end up with a mismatch between the VMM mapping and whatever
+> > the guest may do.
+> 
+> Does it need to be stronger? If FWB is disabled and the cache flush
+> works then what is the issue?
+
+I was thinking more about keeping things simpler and avoid any lack of
+coherence between the VMM and the VM, in case the latter maps it as
+Normal NC. But if the VMM doesn't touch it, the initial cache
+maintenance by the KVM would do.
+
+> I think there are two issues here. 
+> 
+> 1) KVM uses pfn_is_map_memory() which does not cover all our modern
+> NUMA and memory hotplug cases for normal struct page backed cachable
+> memory.
+> 
+> 2) KVM doesn't work with normal cachable memory that does not have
+> struct pages.
+> 
+> For 1 the test should be 'does the pfn have a struct page, does the
+> struct page refer to cachable memory?'
+> 
+> For 2 the test should be 'does the VMA have pgprot = cachable,
+> VM_PFNMAP and not VM_IO (both implied)'
+
+See above on the characteristics of the memory. If some of them are not
+supported, it's probably fine (atomics not working) but others like MTE
+accesses could either cause external aborts or access random addresses
+from elsewhere. Currently we rely on pfn_is_map_memory() for this but we
+need a way to tell that other ranges outside the initial RAM supports
+all features. IOW, is any of this memory (mapped as cacheable in the
+VMM) special purpose with only a subset of the CPU features supported?
+
 -- 
-2.34.1
-
+Catalin
