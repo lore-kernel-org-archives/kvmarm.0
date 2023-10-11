@@ -1,181 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE32A41
-	for <kvmarm@lists.linux.dev>; Wed, 11 Oct 2023 17:45:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 767B8C433C7;
-	Wed, 11 Oct 2023 17:45:55 +0000 (UTC)
-Date: Wed, 11 Oct 2023 18:45:52 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: ankita@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
-	will@kernel.org, aniketa@nvidia.com, cjia@nvidia.com,
-	kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
-	acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
-	danw@nvidia.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 1/2] KVM: arm64: determine memory type from VMA
-Message-ID: <ZSbfUNLwDkaYL4ts@arm.com>
-References: <20230907181459.18145-1-ankita@nvidia.com>
- <20230907181459.18145-2-ankita@nvidia.com>
- <ZR7hKYU1Wj+VTqpO@arm.com>
- <20231005165458.GM682044@nvidia.com>
- <ZSVe0nb02S4kz5D2@arm.com>
- <20231010150502.GM3952@nvidia.com>
- <ZSWHkvhutlnvVLUZ@arm.com>
- <20231010182328.GS3952@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60BA939944
+	for <kvmarm@lists.linux.dev>; Wed, 11 Oct 2023 17:55:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d5tdNCCO"
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3af5b5d7f16so28604b6e.0
+        for <kvmarm@lists.linux.dev>; Wed, 11 Oct 2023 10:55:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697046921; x=1697651721; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=+qr3lgrcrbP/5gkIgkGNw3UMoeYR1RXB4GZuAt+u7kM=;
+        b=d5tdNCCOrBtApEaOflgwhZdkGt6hSaRJ1x0nM4FWKIq6I9kusU7gVqGLiposgaWKi6
+         MJ139VJtdJalAqp+FtXX8mlMeoM0kvAlk0K7tgx4y94wWXUwIAH/GhRULMgAFDk+aUZP
+         EcqBWj65p9QI1ULz/CtxWVpF7i5q1O1iY9riQeeaC7chJL2jLFNXTCnlGxa3nues4fJp
+         sQf5SC5S2XKGeAjZC4pbknr0ALQQdiOGU3uOxsh4eJ4jAhxhrdOH4eh7T/Z7mRgQ+bE9
+         2zsLscRqGtXYT7q7wwfOND9wNCS+O4UfWVTgsihuZPd+CO7wWkHDax/CU5gJWKk5mxFR
+         tBsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697046921; x=1697651721;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+qr3lgrcrbP/5gkIgkGNw3UMoeYR1RXB4GZuAt+u7kM=;
+        b=lBomSl+5yNj46b77pWUgFAS0Jkcyp8JHgVsQdMmylfRW73UIztTG4oImz3+YwHgFvd
+         z0sRRcI+VjdrdKdoMYdzOiIin8BqiJTxj05SypixT/VZJ2/hvZknrCxJpszAb9+PJFLR
+         ePzYBxhDedeEnmdPw19znYYkdVo4ejiNE+6ItVxQwFqQzUczhxKNa8qNvk4m9Pkj3jyo
+         rFEBMgunijziNiQQtzr9CieHxnkE3bRRrUchytsbjXx5n/9WFKL8BGKDLf0eqoc1klII
+         Vaqyu59pCKhii4och85uZTDNZfl3r1nKIVh6M2VMV8ypR37ijU0R3GcoL4e7T4AV2LUA
+         mQQA==
+X-Gm-Message-State: AOJu0Yx0Rfp0HtgA+Elo/Ngta5IO+ecFzXFyKRcsZd1eZkmt3+McB03s
+	YVvriOApaIvxI+kJi3KgyXx3tmfqcmiBR/2GrC+ZvQ==
+X-Google-Smtp-Source: AGHT+IH1xR3vjV99+M/LkuCERrf8FFb6dhrZO5dQtTRdGG7+xvAKomWG5ggluYGHUD3vZWhYu7IBXcl8FWzcBM1cD+k=
+X-Received: by 2002:a05:6808:2897:b0:3af:d1d6:8a59 with SMTP id
+ eu23-20020a056808289700b003afd1d68a59mr14716017oib.38.1697046921341; Wed, 11
+ Oct 2023 10:55:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231010182328.GS3952@nvidia.com>
+References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-10-amoorthy@google.com>
+ <CALzav=f8YDdqxVXNRASNWxuM2WzgBwj=hErj1Yc5da552ecG5Q@mail.gmail.com>
+In-Reply-To: <CALzav=f8YDdqxVXNRASNWxuM2WzgBwj=hErj1Yc5da552ecG5Q@mail.gmail.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Wed, 11 Oct 2023 10:54:45 -0700
+Message-ID: <CAF7b7mrt-iWduEQusKHhP3TLiWwL1gQjGj0HB=u1R2Vd5yEP0A@mail.gmail.com>
+Subject: Re: [PATCH v5 09/17] KVM: Introduce KVM_CAP_USERFAULT_ON_MISSING
+ without implementation
+To: David Matlack <dmatlack@google.com>
+Cc: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	robert.hoo.linux@gmail.com, jthoughton@google.com, ricarkol@google.com, 
+	axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com, 
+	isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Oct 10, 2023 at 03:23:28PM -0300, Jason Gunthorpe wrote:
-> On Tue, Oct 10, 2023 at 06:19:14PM +0100, Catalin Marinas wrote:
-> > This has been fixed in newer architecture versions but we haven't
-> > added Linux support for it yet (and there's no hardware available
-> > either). AFAIK, there's no MTE support for CXL-attached memory at
-> > the moment in the current interconnects, so better not pretend it's
-> > general purpose memory that supports all the features.
-> 
-> I don't know much about MTE, but the use case imagined for CXL memory
-> allows the MM to exchange any system page with a CXL page. So there
-> cannot be a behavioral difference.
-> 
-> Can usespace continue to use tagged pointers even if the mm has moved
-> the pages to CXL that doesn't support it?
+> Bike Shedding! Maybe KVM_MEM_EXIT_ON_MISSING? "Exiting" has concrete
+> meaning in the KVM UAPI whereas "userfault" doesn't and could suggest
+> going through userfaultfd, which is the opposite of what this
+> capability is doing.
 
-That would lead to external aborts in the worst case or just losing tags
-in the best. But none of them ideal.
+You know, in the three or four names this thing has had, I'm not sure
+if "exit" has ever appeared :D
 
-> The main purpose for this is to tier VM memory, so having CXL
-> behaviorally different in a VM seems fatal to me.
+It is accurate, which is a definite plus. But since the exit in
+question is special due to accompanying EFAULT, I think we've been
+trying to reflect that in the nomenclature ("memory faults" or
+"userfault")- maybe that's not worth doing though.
 
-Yes, that's why if you can't tell the memory supports MTE, either it
-should not be given to a guest with KVM_CAP_ARM_MTE or MTE gets disabled
-in the guest.
+Wrt the current name, I agree w/ you on the potential for userfaultfd
+confusion but I sort of see Sean's argument as well [1]. I see you've
+re-raised the question of the exit accompanying EFAULT in [2] though,
+so we should probably resolve that first.
 
-> Linux drivers need a way to understand this, like we can't have a CXL
-> memory pool driver or GPU driver calling memremap_pages() and getting
-> a somewhat broken system because of MTE incompatibilities. So maybe
-> ARM really should block memremap_pages() in case of MTE until
-> everything is resolved?
-
-I need to understand this part of the kernel a bit more but see below
-(and MTE as it currently stands doesn't play well with server-like
-systems, memory hotplug etc.)
-
-> From the mm perspective we can't have two kinds of cachable struct
-> pages running around that are functionally different.
-
-From a Linux+MTE perspective, what goes into ZONE_MOVABLE should work
-fine, all pages interchangeable (if it doesn't, the hardware is broken).
-These are added via the add_memory_resource() hotplug path. If a
-platform is known not to support this, it better not advertise MTE as a
-feature (the CPUs usually have some tie-off signal when the rest of the
-SoC cannot handle MTE). We could claim it's a hardware erratum if it
-does.
-
-But for ZONE_DEVICE ranges, these are not guaranteed to support all the
-characteristics of the main RAM. I think that's what memremap_pages()
-gives us. I'm not too familiar with this part of the kernel but IIUC
-that falls under the HMM category, so not interchangeable with the
-normal RAM (hotplugged or not).
-
-> > Other than preventing malicious guest behaviour, it depends what the VM
-> > needs cacheable access for: some GPU memory that's only used for sharing
-> > data and we don't need all features or general purpose memory that a VM
-> > can use to run applications from etc. The former may not need all the
-> > features (e.g. can skip exclusives) but the latter does.
-> 
-> Like CXL memory pooling GPU memory is used interchangably with every
-> kind of DDR memory in every context. It must be completely transparent
-> and interchangable via the mm's migration machinery.
-
-I don't see the mm code doing this but I haven't looked deep enough.
-At least not in the way of doing an mmap(MAP_ANONYMOUS) and the kernel
-allocating ZONE_DEVICE pages and passing them to the user.
-
-> > > > I've seen something similar in the past with
-> > > > LSE atomics (or was it exclusives?) not being propagated. These don't
-> > > > make the memory safe for a guest to use as general purpose RAM.
-> > > 
-> > > At least from a mm perspective, I think it is important that cachable
-> > > struct pages are all the same and all interchangable. If the arch
-> > > cannot provide this it should not allow the pgmap/memremap to succeed
-> > > at all. Otherwise drivers using these new APIs are never going to work
-> > > fully right..
-> > 
-> > Yes, for struct page backed memory, the current assumption is that all
-> > are the same, support all CPU features. It's the PFN-based memory where
-> > we don't have such guarantees.
-> 
-> I see it got a bit confused, I am talking about memremap_pages() (ie
-> include/linux/memremap.h), not memremap (include/linux/io.h) for
-> getting non-struct page memory. It is confusing :|
-> 
-> memremap_pages() is one of the entry points of the struct page hotplug
-> machinery. Things like CXL drivers assume they can hot plug in new
-> memory through these APIs and get new cachable struct pages that are
-> functionally identical to boot time cachable struct pages.
-
-We have two mechanisms, one in memremap.c and another in
-memory_hotplug.c. So far my assumption is that only the memory added by
-the latter ends up in ZONE_MOVABLE and can be used by the kernel as any
-of the ZONE_NORMAL RAM, transparently to the user. For ZONE_DEVICE
-allocations, one would have to explicitly mmap() it via a device fd.
-
-If a VMM wants to mmap() such GPU memory and give it to the guest as
-general purpose RAM, it should make sure it has all the characteristics
-as advertised by the CPU or disable certain features (if it can).
-Currently we don't have a way to tell what such memory supports (neither
-ACPI tables nor any hardware probing). The same assumption w.r.t. MTE is
-that it doesn't.
-
-> > We have an additional flag, VM_MTE_ALLOWED, only set for mappings backed
-> > by struct page. We could probe that in KVM and either fall back to
-> > non-cacheable or allow cacheable if MTE is disable at the vCPU level.
-> 
-> I'm not sure what this does, it is only set by shmem_map? That is
-> much stricter than "mappings backed by struct page"
-
-This flag is similar to the VM_MAYWRITE etc. On an mmap(), the vma gets
-the VM_MTE_ALLOWED flag if the mapping is MAP_ANONYMOUS (see
-arch_calc_vm_flag_bits()) or the (driver) mmap function knows that the
-memory supports MTE and sets the flag explicitly. Currently that's only
-done in shmem_mmap() as we know where this memory is coming from. When
-the user wants an mmap(PROT_MTE), the arch code checks whether
-VM_MTE_ALLOWED is set on the vma before allowing tag accesses.
-
-Memory mapped from ZONE_DEVICE won't have such flag set, so
-mmap(PROT_MTE) will fail. But for KVM guests, there's no such mmap()
-call into the hypervisor. A guest can simply enable MTE at stage 1
-without the hypervisor being able to tell.
-
-> Still, I'm not sure how to proceed here - we veered into this MTE
-> stuff I don't know we have experiance with yet.
-
-We veered mostly because on arm64 such GPU memory is not guaranteed to
-have all the characteristics of the generic RAM. I think only MTE is the
-dangerous one and it needs extra care but I wouldn't be surprised if we
-notice atomics failing.
-
-It looks like memremap_pages() also takes a memory type and I suspect
-it's only safe to map MEMORY_DEVICE_COHERENT into a guest (as generic
-RAM). Is there any sanity check on the host kernel side to allow VMM
-cacheable mappings only for such memory and not the other
-MEMORY_DEVICE_* types?
-
-Going back to KVM, we can relax to cacheable mapping at Stage 2 if the
-vma is cacheable and either VM_MTE_ALLOWED is set or KVM_CAP_ARM_MTE is
-disabled. From the earlier discussions, we can probably ignore VM_IO
-since we won't have a cacheable mapping with this flag. Not sure about
-VM_PFNMAP.
-
--- 
-Catalin
+[1] https://lore.kernel.org/kvm/20230602161921.208564-1-amoorthy@google.com/T/#t
+[2] https://lore.kernel.org/kvm/CALzav=csPcd3f5CYc=6Fa4JnsYP8UTVeSex0-7LvUBnTDpHxLQ@mail.gmail.com/
