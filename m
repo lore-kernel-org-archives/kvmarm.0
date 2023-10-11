@@ -1,82 +1,66 @@
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-203.mta1.migadu.com (out-203.mta1.migadu.com [95.215.58.203])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CA3DC2DF
-	for <kvmarm@lists.linux.dev>; Wed, 11 Oct 2023 03:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49F7199D6
+	for <kvmarm@lists.linux.dev>; Wed, 11 Oct 2023 08:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X041fokF"
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5333fb34be3so10760363a12.1
-        for <kvmarm@lists.linux.dev>; Tue, 10 Oct 2023 20:40:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696995631; x=1697600431; darn=lists.linux.dev;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Kb+3zqaQcMqQZMwRUDmn06YBTHO0A/ndW+8Em55WBrk=;
-        b=X041fokFp8xgR6uqBbpfVWxqIJYSCv80cKSw7j9ZDr1mvYJIs7kv0BMiistMfzMrIk
-         DHqim8Z5juBCyIhifu2nskBxTl8UCRokodl+QsUSBvCNCvKYppwTBQ6S2Mrt4q7dflPc
-         6kGfDt8tgjZ3bjvR+NGEZ+98n+6T5Z2Jbitt2PCroTP2ttI6GgPqy8OUZaN/LIgygKlQ
-         49BvKU2e6KbozsApAHnxQFqcX/xjMjtm5ug/fHY/nDHDhGcjyob+YBo9+fut9ThPvCtB
-         8uPGrts49k1rqiszudKBtIzgZEk8EagsudwRA+EgBYJ9QIo3yAxPNsumgfUXv1YJLvA2
-         c64g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696995631; x=1697600431;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Kb+3zqaQcMqQZMwRUDmn06YBTHO0A/ndW+8Em55WBrk=;
-        b=QxJJKIqnLeCsNtLVTsuo3FZFX4Pqg9EF4RgMbq95BLibz5hQHNNs08lpuISRGCjDLs
-         gcRKxOr37UrJftcsRMRO1J6rLvK/vEKcS5qI+rbUN7yAbc6HTz8OjhC7f0itO3FPqofW
-         Wl5qH8tCWQH/wkz5B8U7Rlv6CMUTHxbyTy2/AxUb3KhdOYVXXoXci2Jb8FN3O6cCR0LF
-         bafYT4tZf+Eh2RudI19kI4KOeXyyihcOMNsqVnIj+mgtZ53YMccWsu9FLiSpg8c5NSjL
-         i7+PHGoXOyoomWGU3F9KaY0sT4whM+wFFJ1LbM5finpw+8m6kd7Mn7G1Iodn7jqeR4Tu
-         UibQ==
-X-Gm-Message-State: AOJu0YyLcJlDap6nXTkblPsn7HHwMiEKwk/cyRWGi6nE2/XfnziHmX01
-	Y/9mPyEl/HJMsSePSD/BOsv/vf9+j48uQd3JA5fOTEj8pg==
-X-Google-Smtp-Source: AGHT+IFYn5z4a4BYNZsmv2sv9J5Y+EY0yUHnHF4IvY8l+48ttsSeSq9eQN/6/fv9/CbMvIz76rnWRmjGO5fSzdYus60=
-X-Received: by 2002:a05:6402:d59:b0:53d:e0cf:cb95 with SMTP id
- ec25-20020a0564020d5900b0053de0cfcb95mr103559edb.21.1696995630789; Tue, 10
- Oct 2023 20:40:30 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uFEnhuM+"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1697012232;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1hHZDVIa3yDoGKax+wmO5RAUIx6mrtYgB/XXBr+eb8Y=;
+	b=uFEnhuM+BGPf1YuGb9CPn2gfCts1MbrrWNExCJpBpN9lmXEkzzSeBEmbda8Bek4yNGGXwc
+	iRGPh1cLkFxLaTI7jXUK1mcchyzX43L1B9Fkk/dnWklAFzwBQJfkgNpcIDzTzUsjG+BVke
+	3b3JL800ai1t79zg2Eu3br0fx0wUmLA=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Clark <james.clark@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH 0/2] KVM: arm64: vPMU fixes for NV/EL2
+Date: Wed, 11 Oct 2023 08:16:46 +0000
+Message-ID: <20231011081649.3226792-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-From: KVMR <kvmrdy@gmail.com>
-Date: Wed, 11 Oct 2023 09:10:19 +0530
-Message-ID: <CAC=5qx_EDYCifRGNbXaJ96psuqQ-Y7zw8O_V_q-_kYpkuD52RQ@mail.gmail.com>
-Subject: pKVM: Which kernel version has support for pKVM?
-To: kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi KVM team,
+KVM allows userspace to select both the vPMU and NV feature flags, which
+is an absolute no-go since we do not handle any of the EL2 controls.
+Furthermore, our sysreg emulation allows the guest to set the NSH bit
+responsible for counting events at EL2 despite the fact it does
+absolutely nothing.
 
-We are interested in using Protected KVM (pKVM) in one of our
-projects. Our goal is to launch protected VMs on Linux with KVM,
-ARM64. We have a few queries and would appreciate your assistance in
-addressing them:
+Series to address the both of these issues. While neither of them are
+really a big deal at the moment, the second patch is relevant to James
+C's PMU event threshold series [*].
 
-1. We'd like to know which mainline kernel version offers complete
-support for pKVM. We've observed that the current TOT kernel (6.6.rc5)
-may not have all the necessary changes. Specifically, we couldn't
-locate the KVM_CAP_ARM_PROTECTED_VM symbol in the code. If all the
-required changes have not yet been merged into the mainline kernel,
-could you please provide information on the specific branch or
-repository that contains these changes?
+[*] https://lore.kernel.org/kvmarm/20231010141551.2262059-1-james.clark@arm.com/
 
-2. Are there any additional changes planned for pKVM, and is there a
-roadmap page where we can find more information on the project's
-future developments?
+Oliver Upton (2):
+  KVM: arm64: Disallow vPMU for NV guests
+  KVM: arm64: Treat PMEVTYPER<n>_EL0.NSH as RES0
 
-3. In order to verify the pKVM memory protection features, we are
-seeking readily available test cases. Could you guide us to where we
-can find such test cases for this purpose?
+ arch/arm64/kvm/arm.c      | 5 +++--
+ arch/arm64/kvm/pmu-emul.c | 3 +--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-If this mailing list is not the appropriate channel for these queries,
-can you please direct us to the correct one.
+-- 
+2.42.0.609.gbb76f46606-goog
 
-Thank you in advance for your assistance.
-
-Best regards,
-Venkat
