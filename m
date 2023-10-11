@@ -1,82 +1,112 @@
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60BA939944
-	for <kvmarm@lists.linux.dev>; Wed, 11 Oct 2023 17:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A3439945
+	for <kvmarm@lists.linux.dev>; Wed, 11 Oct 2023 18:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d5tdNCCO"
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3af5b5d7f16so28604b6e.0
-        for <kvmarm@lists.linux.dev>; Wed, 11 Oct 2023 10:55:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697046921; x=1697651721; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+qr3lgrcrbP/5gkIgkGNw3UMoeYR1RXB4GZuAt+u7kM=;
-        b=d5tdNCCOrBtApEaOflgwhZdkGt6hSaRJ1x0nM4FWKIq6I9kusU7gVqGLiposgaWKi6
-         MJ139VJtdJalAqp+FtXX8mlMeoM0kvAlk0K7tgx4y94wWXUwIAH/GhRULMgAFDk+aUZP
-         EcqBWj65p9QI1ULz/CtxWVpF7i5q1O1iY9riQeeaC7chJL2jLFNXTCnlGxa3nues4fJp
-         sQf5SC5S2XKGeAjZC4pbknr0ALQQdiOGU3uOxsh4eJ4jAhxhrdOH4eh7T/Z7mRgQ+bE9
-         2zsLscRqGtXYT7q7wwfOND9wNCS+O4UfWVTgsihuZPd+CO7wWkHDax/CU5gJWKk5mxFR
-         tBsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697046921; x=1697651721;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+qr3lgrcrbP/5gkIgkGNw3UMoeYR1RXB4GZuAt+u7kM=;
-        b=lBomSl+5yNj46b77pWUgFAS0Jkcyp8JHgVsQdMmylfRW73UIztTG4oImz3+YwHgFvd
-         z0sRRcI+VjdrdKdoMYdzOiIin8BqiJTxj05SypixT/VZJ2/hvZknrCxJpszAb9+PJFLR
-         ePzYBxhDedeEnmdPw19znYYkdVo4ejiNE+6ItVxQwFqQzUczhxKNa8qNvk4m9Pkj3jyo
-         rFEBMgunijziNiQQtzr9CieHxnkE3bRRrUchytsbjXx5n/9WFKL8BGKDLf0eqoc1klII
-         Vaqyu59pCKhii4och85uZTDNZfl3r1nKIVh6M2VMV8ypR37ijU0R3GcoL4e7T4AV2LUA
-         mQQA==
-X-Gm-Message-State: AOJu0Yx0Rfp0HtgA+Elo/Ngta5IO+ecFzXFyKRcsZd1eZkmt3+McB03s
-	YVvriOApaIvxI+kJi3KgyXx3tmfqcmiBR/2GrC+ZvQ==
-X-Google-Smtp-Source: AGHT+IH1xR3vjV99+M/LkuCERrf8FFb6dhrZO5dQtTRdGG7+xvAKomWG5ggluYGHUD3vZWhYu7IBXcl8FWzcBM1cD+k=
-X-Received: by 2002:a05:6808:2897:b0:3af:d1d6:8a59 with SMTP id
- eu23-20020a056808289700b003afd1d68a59mr14716017oib.38.1697046921341; Wed, 11
- Oct 2023 10:55:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="O3lSyLLC"
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39BHE2Ku020157;
+	Wed, 11 Oct 2023 18:01:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2023-03-30; bh=LANmNJdueyvQi7c+RbU1YOnVyO963av3fCML/59OnNg=;
+ b=O3lSyLLCbj4f96Jv4+r7OqeiTyynS/aleT1b1LCzjeLQ+9NT6NjqkqvWj8KEDNr/oLCK
+ yPfokbmH2DDEOHbkeaN2okWNlpNKDs2J/eti1VBwkAQyaCJvxHPlVLlKBVQ9xaNrWWDm
+ ujXo52LdSew/4MCE0EoAz5nZvLP77gYhO1I3vqQnEzpjD7+XMWaWHeHiiTGoaEI27wEV
+ 1EydeADLcnvmW3VW6iE8faOBf9NGMUr+W6VBamQCDWVV5vJETnGTKya+E8/7bHiIadnN
+ a8PONg/o5ZBWsEsdx4UUOkHle1+6SKvd0E3Xm4XQ8az/VCUe2hP3crEZLj+M8DlGW8+1 Dw== 
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tjx43rypq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 11 Oct 2023 18:01:41 +0000
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39BGjwdH002618;
+	Wed, 11 Oct 2023 18:01:41 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3tjwsedrkh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 11 Oct 2023 18:01:40 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39BI1eE0029797;
+	Wed, 11 Oct 2023 18:01:40 GMT
+Received: from mlluis-mac.uk.oracle.com (dhcp-10-175-192-63.vpn.oracle.com [10.175.192.63])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3tjwsedrg7-1;
+	Wed, 11 Oct 2023 18:01:39 +0000
+From: Miguel Luis <miguel.luis@oracle.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+        Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, Jing Zhang <jingzhangos@google.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvmarm@lists.linux.dev
+Cc: miguel.luis@oracle.com
+Subject: [PATCH v3 0/3] Fine grain sysregs allowed to trap for nested virtualization
+Date: Wed, 11 Oct 2023 18:00:59 +0000
+Message-Id: <20231011180103.91774-1-miguel.luis@oracle.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-10-amoorthy@google.com>
- <CALzav=f8YDdqxVXNRASNWxuM2WzgBwj=hErj1Yc5da552ecG5Q@mail.gmail.com>
-In-Reply-To: <CALzav=f8YDdqxVXNRASNWxuM2WzgBwj=hErj1Yc5da552ecG5Q@mail.gmail.com>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Wed, 11 Oct 2023 10:54:45 -0700
-Message-ID: <CAF7b7mrt-iWduEQusKHhP3TLiWwL1gQjGj0HB=u1R2Vd5yEP0A@mail.gmail.com>
-Subject: Re: [PATCH v5 09/17] KVM: Introduce KVM_CAP_USERFAULT_ON_MISSING
- without implementation
-To: David Matlack <dmatlack@google.com>
-Cc: seanjc@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org, 
-	robert.hoo.linux@gmail.com, jthoughton@google.com, ricarkol@google.com, 
-	axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com, 
-	isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-11_12,2023-10-11_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 spamscore=0 adultscore=0
+ suspectscore=0 mlxlogscore=999 phishscore=0 bulkscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2310110159
+X-Proofpoint-ORIG-GUID: xzf-n6Ewm7oFwSQkaKcFwZ04a9JY1xaN
+X-Proofpoint-GUID: xzf-n6Ewm7oFwSQkaKcFwZ04a9JY1xaN
 
-> Bike Shedding! Maybe KVM_MEM_EXIT_ON_MISSING? "Exiting" has concrete
-> meaning in the KVM UAPI whereas "userfault" doesn't and could suggest
-> going through userfaultfd, which is the opposite of what this
-> capability is doing.
+The current HCR_EL2 description defines ranges of system register encodings in
+which accesses should trap for NV. These ranges include encodings which aren't
+defined in the reference manual. In order avoid this, let's rather implement a
+more fine grained approach excluding those undefined.
 
-You know, in the three or four names this thing has had, I'm not sure
-if "exit" has ever appeared :D
+Changes v2 -> v3
+ patch 1:
+	Fix BRBCR_EL12. (Eric)
+	Add Eric's R-b. Thanks!
+ patch 2:
+	New patch to add missing _EL2 encodings for patch 3.
+ patch 3:
+	Previously patch 2 in v2.
+	Add Fixes tag. (Eric)
+	Merge contiguous ranges and exclude undefined encodings. (Eric)
 
-It is accurate, which is a definite plus. But since the exit in
-question is special due to accompanying EFAULT, I think we've been
-trying to reflect that in the nomenclature ("memory faults" or
-"userfault")- maybe that's not worth doing though.
+v1 -> v2
+ patch 1:
+	fix indentation
+ patch 2:
+	improve commit message (Marc)
+	fix indentation (Marc)
+	follow kernel comment format (Marc)
+	describe LRs in ranges (Marc)
+	include AMEVCNTVOFF0<n>_EL2 and AMEVCNTVOFF1<n>_EL2
+ patch 3:
+	drop. Excluded IMPDEF range is trapped by HCR_EL2.TIDCP
 
-Wrt the current name, I agree w/ you on the potential for userfaultfd
-confusion but I sort of see Sean's argument as well [1]. I see you've
-re-raised the question of the exit accompanying EFAULT in [2] though,
-so we should probably resolve that first.
+v2: https://lore.kernel.org/kvmarm/20230925162057.27548-1-miguel.luis@oracle.com/
+v1: https://lore.kernel.org/kvmarm/20230913185209.32282-1-miguel.luis@oracle.com/
 
-[1] https://lore.kernel.org/kvm/20230602161921.208564-1-amoorthy@google.com/T/#t
-[2] https://lore.kernel.org/kvm/CALzav=csPcd3f5CYc=6Fa4JnsYP8UTVeSex0-7LvUBnTDpHxLQ@mail.gmail.com/
+Miguel Luis (3):
+  arm64: Add missing _EL12 encodings
+  arm64: Add missing _EL2 encodings
+  arm64/kvm: Fine grain _EL2 system registers list that affect nested
+    virtualization
+
+ arch/arm64/include/asm/sysreg.h | 48 ++++++++++++++++++
+ arch/arm64/kvm/emulate-nested.c | 88 ++++++++++++++++++++++++++++++---
+ 2 files changed, 130 insertions(+), 6 deletions(-)
+
+--
+2.39.2
+
