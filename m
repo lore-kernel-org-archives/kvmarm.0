@@ -1,23 +1,23 @@
-Received: from out-195.mta1.migadu.com (out-195.mta1.migadu.com [95.215.58.195])
+Received: from out-208.mta1.migadu.com (out-208.mta1.migadu.com [95.215.58.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77A863D971
-	for <kvmarm@lists.linux.dev>; Thu, 12 Oct 2023 20:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94303B7B0
+	for <kvmarm@lists.linux.dev>; Thu, 12 Oct 2023 20:54:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RJSVLSkU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DVOcey/u"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1697144075;
+	t=1697144077;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ysKrMhA787sO5UVDC8NhNunti56cIWj9yanawa7g7NY=;
-	b=RJSVLSkUo1jGerM0C+jXC5LuQQOX0NXdEVkQulty3HZ4V8GJBZdNgx2SLjZ/v5G2kFNtNk
-	+4nlqlOw0tMlBpX4+AJrbtQvXhV4srN0X1b5Z9M+XaF8wuH8Di1egaTeNFcgi4+jBrGWQ7
-	48PIzaN4W4FSvw8nzDh2KCIjm6tEXWU=
+	bh=G3v4AfwsSErK80a0XO6d3BcxY96LblAlYK4wSGGTqtg=;
+	b=DVOcey/u6dGF+zMqoJNEwFxqJWaT+R159deGlq/dcbbZOJ/s3gE7i78b7JLaAhyjp80snT
+	8POaKn2D940zX70I5tBfUT5mimRPHHJQamBWfHsLhq7VWe1XUcvwKyY3cc1rrPjrZmWh2L
+	LXEd5LCifh+9/T382eZ68HyE4cD7yXE=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -26,9 +26,9 @@ Cc: kvm@vger.kernel.org,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 2/5] KVM: arm64: Restore the stage-2 context in VHE's __tlb_switch_to_host()
-Date: Thu, 12 Oct 2023 20:54:19 +0000
-Message-ID: <20231012205422.3924618-3-oliver.upton@linux.dev>
+Subject: [PATCH v2 3/5] KVM: arm64: Reload stage-2 for VMID change on VHE
+Date: Thu, 12 Oct 2023 20:54:20 +0000
+Message-ID: <20231012205422.3924618-4-oliver.upton@linux.dev>
 In-Reply-To: <20231012205422.3924618-1-oliver.upton@linux.dev>
 References: <20231012205422.3924618-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -42,67 +42,88 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Marc Zyngier <maz@kernel.org>
 
-An MMU notifier could cause us to clobber the stage-2 context loaded on
-a CPU when we switch to another VM's context to invalidate. This isn't
-an issue right now as the stage-2 context gets reloaded on every guest
-entry, but is disastrous when moving __load_stage2() into the
-vcpu_load() path.
-
-Restore the previous stage-2 context on the way out of a TLB
-invalidation if we installed something else. Deliberately do this after
-TGE=1 is synchronized to keep things safe in light of the speculative AT
-errata.
+Naturally, a change to the VMID for an MMU implies a new value for
+VTTBR. Reload on VMID change in anticipation of loading stage-2 on
+vcpu_load() instead of every guest entry.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/hyp/vhe/tlb.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  2 +-
+ arch/arm64/kvm/arm.c              |  5 ++++-
+ arch/arm64/kvm/vmid.c             | 11 ++++++++---
+ 3 files changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index f3f2e142e4f4..ef21153ce5fa 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -11,18 +11,25 @@
- #include <asm/tlbflush.h>
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index af06ccb7ee34..be0ab101c557 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1025,7 +1025,7 @@ int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
+ extern unsigned int __ro_after_init kvm_arm_vmid_bits;
+ int __init kvm_arm_vmid_alloc_init(void);
+ void __init kvm_arm_vmid_alloc_free(void);
+-void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid);
++bool kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid);
+ void kvm_arm_vmid_clear_active(void);
  
- struct tlb_inv_context {
--	unsigned long	flags;
--	u64		tcr;
--	u64		sctlr;
-+	struct kvm_s2_mmu	*mmu;
-+	unsigned long		flags;
-+	u64			tcr;
-+	u64			sctlr;
- };
+ static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 4866b3f7b4ea..3ab904adbd64 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -950,7 +950,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		 * making a thread's VMID inactive. So we need to call
+ 		 * kvm_arm_vmid_update() in non-premptible context.
+ 		 */
+-		kvm_arm_vmid_update(&vcpu->arch.hw_mmu->vmid);
++		if (kvm_arm_vmid_update(&vcpu->arch.hw_mmu->vmid) &&
++		    has_vhe())
++			__load_stage2(vcpu->arch.hw_mmu,
++				      vcpu->arch.hw_mmu->arch);
  
- static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
- 				  struct tlb_inv_context *cxt)
+ 		kvm_pmu_flush_hwstate(vcpu);
+ 
+diff --git a/arch/arm64/kvm/vmid.c b/arch/arm64/kvm/vmid.c
+index 7fe8ba1a2851..806223b7022a 100644
+--- a/arch/arm64/kvm/vmid.c
++++ b/arch/arm64/kvm/vmid.c
+@@ -135,10 +135,11 @@ void kvm_arm_vmid_clear_active(void)
+ 	atomic64_set(this_cpu_ptr(&active_vmids), VMID_ACTIVE_INVALID);
+ }
+ 
+-void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
++bool kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
  {
-+	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
- 	u64 val;
+ 	unsigned long flags;
+ 	u64 vmid, old_active_vmid;
++	bool updated = false;
  
- 	local_irq_save(cxt->flags);
+ 	vmid = atomic64_read(&kvm_vmid->id);
  
-+	if (vcpu && mmu != vcpu->arch.hw_mmu)
-+		cxt->mmu = mmu;
-+	else
-+		cxt->mmu = NULL;
+@@ -156,17 +157,21 @@ void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
+ 	if (old_active_vmid != 0 && vmid_gen_match(vmid) &&
+ 	    0 != atomic64_cmpxchg_relaxed(this_cpu_ptr(&active_vmids),
+ 					  old_active_vmid, vmid))
+-		return;
++		return false;
+ 
+ 	raw_spin_lock_irqsave(&cpu_vmid_lock, flags);
+ 
+ 	/* Check that our VMID belongs to the current generation. */
+ 	vmid = atomic64_read(&kvm_vmid->id);
+-	if (!vmid_gen_match(vmid))
++	if (!vmid_gen_match(vmid)) {
+ 		vmid = new_vmid(kvm_vmid);
++		updated = true;
++	}
+ 
+ 	atomic64_set(this_cpu_ptr(&active_vmids), vmid);
+ 	raw_spin_unlock_irqrestore(&cpu_vmid_lock, flags);
 +
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
- 		/*
- 		 * For CPUs that are affected by ARM errata 1165522 or 1530923,
-@@ -69,6 +76,10 @@ static void __tlb_switch_to_host(struct tlb_inv_context *cxt)
- 	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
- 	isb();
++	return updated;
+ }
  
-+	/* ... and the stage-2 MMU context that we switched away from */
-+	if (cxt->mmu)
-+		__load_stage2(cxt->mmu, cxt->mmu->arch);
-+
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
- 		/* Restore the registers to what they were */
- 		write_sysreg_el1(cxt->tcr, SYS_TCR);
+ /*
 -- 
 2.42.0.655.g421f12c284-goog
 
