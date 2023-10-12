@@ -1,160 +1,167 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2075.outbound.protection.outlook.com [40.107.220.75])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A941D27EE7
-	for <kvmarm@lists.linux.dev>; Thu, 12 Oct 2023 13:20:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21F2829436
+	for <kvmarm@lists.linux.dev>; Thu, 12 Oct 2023 13:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aTBzIoVe"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N3FbMY3bf+fbyiuWjIFsZRM4hZh6LymOIA6N1Wkw1wZYf0jM0Wb+NKq5mle2cri5xh9lmyM4fu7p9Z+RB+JMLJllwyuFwt8eWT8e2jUrbhcpdJbyQDu6YNTM+k7V10EWUvWor2DLxe8830Zu5Xya66R42S6uXeVzlrgXnAQ6jqz/Xt3n1X0MVXAfKbGUscpaZFDiZfM74v03yEOwWmwRga5O/YLYAPMMXEPBjPE4z7z8jTfR0GRiiC1HzRXdeJsMCcOxvN8pOx6yi0GSA78nlwcsfqDMUu6ohaF0Y934J6Aeq61DRrO90EQEscscEY0PbCRP02tfJONbPubT+8fOlQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SJJZKw4QXyxsVV++w8/o0cUom9IRcKIploB9B9mG+ps=;
- b=M6qdYyGIViyR3qWsyU/xNWlBDuChXSdV3rUOfld7QuRwRyxJOXJNtNtauHbLxkVhrGp4sQnjIu6l5lAPCeZpnJ0PBdc7hsKPLg0AZDfbFNjdKoX6HXwVcpp1a69xTLdht33m3hZ780pza47DSeCOhjQkLgAo6sKjztUiRO8Lnz9Cq4iVWOs7WgAhZIREXIJa5vodnf/pBNkKUjgmZCafF2eqgG1q50yt3Gw2j295xkZxB/Fy8YjSyO1rmkVjiJVkwEHv8QJAA92Uhs8BOpQwzD7QsbPEiqKnjX6weW4W/sbYlGz+6QnzCHX3T+XSuOKiJp+ose35RdBcQjuhLPgNyA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SJJZKw4QXyxsVV++w8/o0cUom9IRcKIploB9B9mG+ps=;
- b=aTBzIoVetvW21P3i0Yj4yb9DKVATzUKUT/KoW+98umI57wgENP5wEstkFDEyryjcK8qXzphatdoazJOV2ItZN/SkOWlU+pi/h8NZeMBI4sagruewq8jcjjg1gEBqq/3XTY+b7mclLttRrTckdMFWOoR3bUXoJq4DTT1WU/PJm314Ed5k9gAwSMkjNLpsf0zGc5AqFrfHI02B0W1BA9I7QuzbvrSvP4tgNXJV8KsSR6YdAOmBFVnEK7Q0ffgQ8KCGsdOgQB4USS69CyvtR1u8WMVA8WsJkkIjscNA3qtrSqaLAZ5Rve3DTc2ptMqhIKfOVGLWxas5f7p2tnOXycRSuA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH7PR12MB6395.namprd12.prod.outlook.com (2603:10b6:510:1fd::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.45; Thu, 12 Oct
- 2023 13:20:46 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6863.032; Thu, 12 Oct 2023
- 13:20:46 +0000
-Date: Thu, 12 Oct 2023 10:20:45 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Will Deacon <will@kernel.org>
-Cc: Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>, ankita@nvidia.com,
-	maz@kernel.org, oliver.upton@linux.dev, aniketa@nvidia.com,
-	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
-	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
-	jhubbard@nvidia.com, danw@nvidia.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 2/2] KVM: arm64: allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
-Message-ID: <20231012132045.GI3952@nvidia.com>
-References: <20230907181459.18145-1-ankita@nvidia.com>
- <20230907181459.18145-3-ankita@nvidia.com>
- <ZP8q71+YXoU6O9uh@lpieralisi>
- <ZP9MQdRYmlawNsbC@nvidia.com>
- <ZQHUifAfJ+lZikAn@lpieralisi>
- <ZQIFfqgR5zcidRR3@nvidia.com>
- <ZRKW6uDR/+eXYMzl@lpieralisi>
- <ZRLiDf204zCpO6Mv@arm.com>
- <ZR6IZwcFNw55asW0@lpieralisi>
- <20231012123541.GB11824@willie-the-truck>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231012123541.GB11824@willie-the-truck>
-X-ClientProxiedBy: MN2PR22CA0014.namprd22.prod.outlook.com
- (2603:10b6:208:238::19) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LWyJj6o7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697118391;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7lA6iK0/UHM5oGG1Zev7Ey/lrzl0SVmWqGH8Yx0ceXg=;
+	b=LWyJj6o7HzdkqeLDpEFAT42NWkHLfc8KOQn08zTBks2wX5Hp4nDFd73uniJa8z4p0VQAJ6
+	ZaGQaDtAETPGCiLmmAeX1g/jwNRrADSZmYoYL3lB5l3RlQOxzwbtSApGgshv2A5Sol/5rW
+	WY8VX3sBzlG0RqIPJBJk14EexlBIvmM=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-607-frqwESTpONKb8raIc5PGUw-1; Thu, 12 Oct 2023 09:46:30 -0400
+X-MC-Unique: frqwESTpONKb8raIc5PGUw-1
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-41975c9e66fso14473821cf.0
+        for <kvmarm@lists.linux.dev>; Thu, 12 Oct 2023 06:46:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697118390; x=1697723190;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7lA6iK0/UHM5oGG1Zev7Ey/lrzl0SVmWqGH8Yx0ceXg=;
+        b=vVldalnf7livxmELhTFWogRz7M9mx8nmEfXoFZg8K/48c8mx28blT2ZkVnNTMxP6+W
+         DDm7Hn/r1c1B20igsNPBLRVbLzFY+lSFCw7O/ItTZFtDI5y4h+u48k6l/8I7vqCdnbCi
+         MRQFIe+057hjnHdkv4uD9Ly1Y2HjaKvO1USz53GzirTtNh4uxsqJyw/a0lnq/J5ANY5Y
+         PmrQEsL8eCHvc+A8XwSrBqBe45YA5jv+yCS2CpXpq5HaHAvyVIZn6V9ef3my28ruTnFG
+         13ASDr2ypODDnEmCNv1/3w9xMeS1OU561G/D81lgDr0SG1VqYnLqBgDhsXDSGOu3tiC1
+         tnSw==
+X-Gm-Message-State: AOJu0YxJ7xG4ZHPwvDlYh/+Ecd3nso95EzAm7dg+3umtAd9ONxxgIlmE
+	TfHr2azG/a92K4Bm6aIA/c8DUXVnRVBdyvjohFjw3beYmpsYmyWvipTaYinCo90Ditk6TQPqRvb
+	8Gp5Dbsrhmqvrc8NU
+X-Received: by 2002:ac8:5895:0:b0:41a:b68:54d5 with SMTP id t21-20020ac85895000000b0041a0b6854d5mr28247539qta.0.1697118390113;
+        Thu, 12 Oct 2023 06:46:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFTGGdn/As7/O2x0iD1ySAEs+y/AqV8+MgJHJ0fH9dqt0fS7ZE6V6m6uVefR3MExhkSJpYHNw==
+X-Received: by 2002:ac8:5895:0:b0:41a:b68:54d5 with SMTP id t21-20020ac85895000000b0041a0b6854d5mr28247519qta.0.1697118389850;
+        Thu, 12 Oct 2023 06:46:29 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id bb36-20020a05622a1b2400b00403ad6ec2e8sm6182191qtb.26.2023.10.12.06.46.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Oct 2023 06:46:29 -0700 (PDT)
+Message-ID: <4c73e58f-13d3-7cb9-a706-b20ab7d2df18@redhat.com>
+Date: Thu, 12 Oct 2023 15:46:26 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB6395:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6cfd1de2-4754-406f-0437-08dbcb260b5c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	r+iChhI+V4DWAie3sH43wUZHC+/67UDW94hOu3saZetfnY489OBi4NCFi9p3w+g16Xpme5R5e7lkcD6IWfFOCsr6i3gV/f+kMIzNre+4E0NYm8I2q+SQjjuR9bv6AM+Tqfji9gayXuvAkfz7f8y6JemgCFWKGhY5f2sUdaPESEBuFqm7MffCawXOdExjlCR03kNpeqskNJRMXHBVGymLag33qpFdHqvz6raq6lI/EUFCAESgzOA+yoENqurgA6YLOMCLBXHlBagjdxGP+SGOJMcmAynCq1PkkrRuetLjcBPCAdLcEL3xO8/P99a+TTwKbW1VMmaTCNCGBtBH9rOZ1LvaxN5VmYak4JUtdSKVYDnvdZ4IbXeFD9A1qxFDZ8Cu4Cq+JFiKOS2jLitXApNIrQol7a0uBDdeSvtPWBLzyHzrJt2Y5YvUXLDYQXc6RPp78daKHm8p6LVcUVZhgX0D6VvadVHO2e78ONpPdSC9g/DfC3x73sZO3R5f3+ondGPd6g5n+l/LdxOeHCoVjbO593CY4lbVLiUQsnvoEJukLIRlrMmVWqAqmXVA5tS3sp2A
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(39860400002)(376002)(396003)(366004)(230922051799003)(1800799009)(186009)(451199024)(64100799003)(1076003)(2616005)(6512007)(36756003)(33656002)(86362001)(38100700002)(26005)(2906002)(83380400001)(6486002)(6506007)(478600001)(8936002)(8676002)(4326008)(6916009)(316002)(41300700001)(66556008)(66946007)(54906003)(66476007)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?QEmzUlXwxliFfPfi+RTaaI6R6FEWrTZhryi0cIQdoNjxeBb/rXVgXiyjX849?=
- =?us-ascii?Q?15HgrTJOPJxjeVTYqE+A9r20v5hCJf3Y/cHL9fjfycQ2NeBqJsjI+l6dLmGX?=
- =?us-ascii?Q?slJOx3jwjAceoDUAk4C/4u1aMkLSX+WSjifdf12rURGC0+8JA1g9A4YwJSQM?=
- =?us-ascii?Q?Ilr/RS/WqvaV02AqYM5MqlgG79XkMS9Ft5phgb3ioe/eht9TzJxjmyy0kdKy?=
- =?us-ascii?Q?o4NXgb1/qgrVgOR/Jq95cnnsezsXRdlW21CZ0BA4Qnk3BWOk8mYlrtjiBUmZ?=
- =?us-ascii?Q?Pd6wk0GhLaMdLMg7xqSRwnvKLl9Evd2MFtCfesdlkum/2m/l0OvTK3RRRZff?=
- =?us-ascii?Q?aM2cj8VOi+6uKBoZVPO1xT58oSKM3vv7jRORkoDNVXydChvyYycYEzb/9Ps5?=
- =?us-ascii?Q?PdfrfFBDIn2LakygQLWucSGk83iZ/YT5qJpsFnSoAaqy5LE4LoeuONf3445q?=
- =?us-ascii?Q?wFujABN9bAPxFwwZEkBNKMSUo8HH2LGvsylD1014wvXHrW7USXLZbYyk6eUW?=
- =?us-ascii?Q?3FpD6teHkE7ddp+B7jUtEeUSnLNUMVmfzr2w6jTnBHfUlpJuJ9DYZdGL3yFT?=
- =?us-ascii?Q?Ct35HHb23IheGPJI/ZQ88E36VND2e7HTsRJ8lHlBSbK29YX4QQdQKLLMg8BD?=
- =?us-ascii?Q?pSNPKhaYQsCa0BriezcNDSvJJhqb15AftzjKRsYzWHccxTocjbxAdjPDEU7d?=
- =?us-ascii?Q?cPfb3bzTM4sbx0h/6LQrVio9ZMs8X0DHA9mcC2e4kDsQc8f6Fr6vgjfaJVyx?=
- =?us-ascii?Q?k5GE3xWDNY1YBjd1RCQcXLw5n45LDTPApg0Nycy29i/PvQPxL57wDh88XJ3v?=
- =?us-ascii?Q?oPLvvkmQ9l8HoEV+N9djlfRv6t/2PH3AHoJl9FhQtc/ueFi1mYyJ1+ToHqcH?=
- =?us-ascii?Q?xdBhmaYC54kf6FOZJqzOUhFr4TShw7K63oQsqrAjtMRc0CnC/jG1C/osb7JM?=
- =?us-ascii?Q?1y426nvoS92XJDzCgBS/xIjzpzRk6ucr+c/baE2FMa1zZ8wOgz0rhMCa8kIE?=
- =?us-ascii?Q?eQ1OOIxMQIoMUvXnihI+rD+Opv8dVsGC+YNnmBAS2wV3u5o5vhnsHmxZUQay?=
- =?us-ascii?Q?LUI7ZO1YbqT5cTyoXDUuaANqWK2YB9njgFqsGMB3LeoWK+aIiwZACuQGbIUz?=
- =?us-ascii?Q?1MoPn9lo2A5d0RaWcQupiBNW51GWmGbEZZ4UwGzqRJ51+vRWTUsmT5b9cn3X?=
- =?us-ascii?Q?adfq1YpQroh22jTRBohB2bl4/9yBIo8Rd2pI3pHu4V8pn1XRgqjp+SdRBnAQ?=
- =?us-ascii?Q?TMWPo1BmH90usgRgpq2vpohDZYLUnrpUOgS6sWAlm1qNNAtMdBjuBuTesg8I?=
- =?us-ascii?Q?mL/6NZKXlyElEVB1V3KCFHY5lQiDaFjfoM8kp70Wa6wPIQfYC8TBQ4BRK97x?=
- =?us-ascii?Q?VUqcOPiyHZ6ZIIyJMKN7XUlyhewD31450R55RMBN1Nb2Y181NNOpw5n3PEXI?=
- =?us-ascii?Q?uFPiP2uO6v9t0kBaxCVmIiBoyut9Ma+U5mHO0tERq2mz1+uMY72Y1/SOOR8b?=
- =?us-ascii?Q?h6MZJAsBuftkDS5VHj9ahRwCzTP/Vg9NSkOsuYVpw+y1qAGiVtvOBuhPo7UK?=
- =?us-ascii?Q?nM+VOE5GifE+qcjyk0AUBdj+0lkmwuexX1ZC0ks8?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6cfd1de2-4754-406f-0437-08dbcb260b5c
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2023 13:20:46.4146
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gxHZva/Xtq4yRA3ltfafgX1EUWNHtGlGOlvL2K0jNhkbn4+tW7SumhkJDwGpgdvl
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6395
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v3 2/3] arm64: Add missing _EL2 encodings
+To: Miguel Luis <miguel.luis@oracle.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Jing Zhang <jingzhangos@google.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+References: <20231011180103.91774-1-miguel.luis@oracle.com>
+ <20231011180103.91774-3-miguel.luis@oracle.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20231011180103.91774-3-miguel.luis@oracle.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 12, 2023 at 01:35:41PM +0100, Will Deacon wrote:
+Hi Miguel,
 
-> > Failures containability is a property of the platform
-> > and is independent from the memory type used for MMIO
-> > device memory mappings (ie DEVICE_nGnRE memory type is
-> > even more problematic than NormalNC in terms of containability
-> > since eg aborts triggered on loads cannot be made synchronous,
-> > which make them harder to contain); this means that,
-> > regardless of the combined stage1+stage2 mappings a
-> > platform is safe if and only if device transactions cannot trigger
-> > uncontained failures; reworded, the default KVM device
-> > stage 2 memory attributes play no role in making device
-> > assignment safer for a given platform and therefore can
-> > be relaxed.
-> > 
-> > For all these reasons, relax the KVM stage 2 device
-> > memory attributes from DEVICE_nGnRE to NormalNC.
-> 
-> The reasoning above suggests to me that this should probably just be
-> Normal cacheable, as that is what actually allows the guest to control
-> the attributes. So what is the rationale behind stopping at Normal-NC?
+On 10/11/23 20:01, Miguel Luis wrote:
+> Some _EL2 encodings are missing. Add them.
+>
+> Signed-off-by: Miguel Luis <miguel.luis@oracle.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-I agree it would be very nice if the all the memory in the guest could
-just be cachable and the guest could select everything.
+Eric
+> ---
+>  arch/arm64/include/asm/sysreg.h | 37 +++++++++++++++++++++++++++++++++
+>  1 file changed, 37 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index ba5db50effec..d8e8607c9de8 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -484,6 +484,7 @@
+>  
+>  #define SYS_SCTLR_EL2			sys_reg(3, 4, 1, 0, 0)
+>  #define SYS_ACTLR_EL2			sys_reg(3, 4, 1, 0, 1)
+> +#define SYS_SCTLR2_EL2			sys_reg(3, 4, 1, 0, 3)
+>  #define SYS_HCR_EL2			sys_reg(3, 4, 1, 1, 0)
+>  #define SYS_MDCR_EL2			sys_reg(3, 4, 1, 1, 1)
+>  #define SYS_CPTR_EL2			sys_reg(3, 4, 1, 1, 2)
+> @@ -497,6 +498,10 @@
+>  #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+>  
+>  #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
+> +#define SYS_SDER32_EL2			sys_reg(3, 4, 1, 3, 1)
+> +#define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
+> +#define SYS_VSTTBR_EL2			sys_reg(3, 4, 2, 6, 0)
+> +#define SYS_VSTCR_EL2			sys_reg(3, 4, 2, 6, 2)
+>  #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
+>  #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+>  #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
+> @@ -514,6 +519,18 @@
+>  
+>  #define SYS_MAIR_EL2			sys_reg(3, 4, 10, 2, 0)
+>  #define SYS_AMAIR_EL2			sys_reg(3, 4, 10, 3, 0)
+> +#define SYS_MPAMHCR_EL2			sys_reg(3, 4, 10, 4, 0)
+> +#define SYS_MPAMVPMV_EL2		sys_reg(3, 4, 10, 4, 1)
+> +#define SYS_MPAM2_EL2			sys_reg(3, 4, 10, 5, 0)
+> +#define __SYS__MPAMVPMx_EL2(x)		sys_reg(3, 4, 10, 6, x)
+> +#define SYS_MPAMVPM0_EL2		__SYS__MPAMVPMx_EL2(0)
+> +#define SYS_MPAMVPM1_EL2		__SYS__MPAMVPMx_EL2(1)
+> +#define SYS_MPAMVPM2_EL2		__SYS__MPAMVPMx_EL2(2)
+> +#define SYS_MPAMVPM3_EL2		__SYS__MPAMVPMx_EL2(3)
+> +#define SYS_MPAMVPM4_EL2		__SYS__MPAMVPMx_EL2(4)
+> +#define SYS_MPAMVPM5_EL2		__SYS__MPAMVPMx_EL2(5)
+> +#define SYS_MPAMVPM6_EL2		__SYS__MPAMVPMx_EL2(6)
+> +#define SYS_MPAMVPM7_EL2		__SYS__MPAMVPMx_EL2(7)
+>  
+>  #define SYS_VBAR_EL2			sys_reg(3, 4, 12, 0, 0)
+>  #define SYS_RVBAR_EL2			sys_reg(3, 4, 12, 0, 1)
+> @@ -562,9 +579,29 @@
+>  
+>  #define SYS_CONTEXTIDR_EL2		sys_reg(3, 4, 13, 0, 1)
+>  #define SYS_TPIDR_EL2			sys_reg(3, 4, 13, 0, 2)
+> +#define SYS_SCXTNUM_EL2			sys_reg(3, 4, 13, 0, 7)
+> +
+> +#define __AMEV_op2(m)			(m & 0x7)
+> +#define __AMEV_CRm(n, m)		(n | ((m & 0x8) >> 3))
+> +#define __SYS__AMEVCNTVOFF0n_EL2(m)	sys_reg(3, 4, 13, __AMEV_CRm(0x8, m), __AMEV_op2(m))
+> +#define SYS_AMEVCNTVOFF0n_EL2(m)	__SYS__AMEVCNTVOFF0n_EL2(m)
+> +#define __SYS__AMEVCNTVOFF1n_EL2(m)	sys_reg(3, 4, 13, __AMEV_CRm(0xA, m), __AMEV_op2(m))
+> +#define SYS_AMEVCNTVOFF1n_EL2(m)	__SYS__AMEVCNTVOFF1n_EL2(m)
+>  
+>  #define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
+>  #define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
+> +#define SYS_CNTHP_TVAL_EL2		sys_reg(3, 4, 14, 2, 0)
+> +#define SYS_CNTHP_CTL_EL2		sys_reg(3, 4, 14, 2, 1)
+> +#define SYS_CNTHP_CVAL_EL2		sys_reg(3, 4, 14, 2, 2)
+> +#define SYS_CNTHV_TVAL_EL2		sys_reg(3, 4, 14, 3, 0)
+> +#define SYS_CNTHV_CTL_EL2		sys_reg(3, 4, 14, 3, 1)
+> +#define SYS_CNTHV_CVAL_EL2		sys_reg(3, 4, 14, 3, 2)
+> +#define SYS_CNTHVS_TVAL_EL2		sys_reg(3, 4, 14, 4, 0)
+> +#define SYS_CNTHVS_CTL_EL2		sys_reg(3, 4, 14, 4, 1)
+> +#define SYS_CNTHVS_CVAL_EL2		sys_reg(3, 4, 14, 4, 2)
+> +#define SYS_CNTHPS_TVAL_EL2		sys_reg(3, 4, 14, 5, 0)
+> +#define SYS_CNTHPS_CTL_EL2		sys_reg(3, 4, 14, 5, 1)
+> +#define SYS_CNTHPS_CVAL_EL2		sys_reg(3, 4, 14, 5, 2)
+>  
+>  /* VHE encodings for architectural EL0/1 system registers */
+>  #define SYS_BRBCR_EL12			sys_reg(2, 5, 9, 0, 0)
 
-However, I think Lorenzo over stated the argument. The off-list
-discussion was focused on NormalNC for MMIO only. Nobody raised the
-idea that cachable was safe from uncontained errors for MMIO.
-
-I'm looking through the conversations and I wouldn't jump to
-concluding that "cachable MMIO" is safe from uncontained failures.
-
-Catalin has already raised a number of conerns in the other patch
-about making actual "designed to be cachable memory" into KVM
-cachable.
-
-Regards,
-Jason
