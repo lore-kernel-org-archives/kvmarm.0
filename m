@@ -1,188 +1,200 @@
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+Received: from AUS01-ME3-obe.outbound.protection.outlook.com (mail-me3aus01olkn2173.outbound.protection.outlook.com [40.92.63.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A262658
-	for <kvmarm@lists.linux.dev>; Thu, 12 Oct 2023 01:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5531ACA77
+	for <kvmarm@lists.linux.dev>; Thu, 12 Oct 2023 06:37:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="lL+Z9oNP"
-Received: from epcas2p2.samsung.com (unknown [182.195.41.54])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20231012014516epoutp04c3ac5cb2248aba0ef58fba6a05c5bd6f~NONO2GwH41763017630epoutp04Z;
-	Thu, 12 Oct 2023 01:45:16 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20231012014516epoutp04c3ac5cb2248aba0ef58fba6a05c5bd6f~NONO2GwH41763017630epoutp04Z
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1697075116;
-	bh=mSSwdhO6iAHAOEF3p3uIGoMW4JID2KH+xXt+a7q18zI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lL+Z9oNPd3WBt7ClIJee/bGX23lhFYlt+FyXVO/vPzmWiiUFrjz66glJb3VqrIYaD
-	 hwKEnKLSmJb2/ORik1HXbq4t/FyKZhgx1/tbFIMIAx/ywuPW8WpARHtdbGRRMTLHDZ
-	 ujXQkYKJ+vLPDh/wAP8Wk7HF6UfsRPw4WBtq+4js=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-	epcas2p4.samsung.com (KnoxPortal) with ESMTP id
-	20231012014516epcas2p4820e15420eb03a034943d280d0743666~NONOeTaKW1250412504epcas2p4E;
-	Thu, 12 Oct 2023 01:45:16 +0000 (GMT)
-Received: from epsmges2p2.samsung.com (unknown [182.195.36.69]) by
-	epsnrtp3.localdomain (Postfix) with ESMTP id 4S5XWv33qJz4x9Pr; Thu, 12 Oct
-	2023 01:45:15 +0000 (GMT)
-Received: from epcas2p2.samsung.com ( [182.195.41.54]) by
-	epsmges2p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-	62.78.09649.BAF47256; Thu, 12 Oct 2023 10:45:15 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas2p3.samsung.com (KnoxPortal) with ESMTPA id
-	20231012014514epcas2p3ca99a067f3044c5753309a08cd0b05c4~NONNRgGSp1736217362epcas2p3Z;
-	Thu, 12 Oct 2023 01:45:14 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20231012014514epsmtrp11618661b71bca5b44530bba8ce23a48e~NONNO1nP52141621416epsmtrp1C;
-	Thu, 12 Oct 2023 01:45:14 +0000 (GMT)
-X-AuditID: b6c32a46-1c3eaa80000025b1-42-65274fab2c6b
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	04.0F.08742.AAF47256; Thu, 12 Oct 2023 10:45:14 +0900 (KST)
-Received: from tiffany (unknown [10.229.95.142]) by epsmtip1.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20231012014514epsmtip1831e5824c182001ced8785e96c927f36~NONM7MXAT1906819068epsmtip1g;
-	Thu, 12 Oct 2023 01:45:14 +0000 (GMT)
-Date: Thu, 12 Oct 2023 10:35:05 +0900
-From: Hyesoo Yu <hyesoo.yu@samsung.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
-	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org,
-	bsegall@google.com, mgorman@suse.de, bristot@redhat.com,
-	vschneid@redhat.com, mhiramat@kernel.org, rppt@kernel.org, hughd@google.com,
-	pcc@google.com, steven.price@arm.com, anshuman.khandual@arm.com,
-	vincenzo.frascino@arm.com, david@redhat.com, eugenis@google.com,
-	kcc@google.com, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC 17/37] arm64: mte: Disable dynamic tag storage
- management if HW KASAN is enabled
-Message-ID: <20231012013505.GB2426387@tiffany>
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="I8GDdjVd"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fjLXMoWRzO2jnOkhFdrVYem5JOSy5ONHbyDArJ23XuajWbx8V6itjTECSClQRnXM4tDI/oZR233mGwPFyllpvDNPEZsPzi4vUneRGnH6XlKIhuJ848e95VEIjTGx9ZKC1stehBOEcToNHxMKcm5OoBPiWqTUImxafTunIEXt1XDujsHCZcOZClNgLa5nQ7Q0w64dkA4a6nGPpZpHZ6quOtvs0DlUH6z+OX74QoPbVTKweqq6oZ8J5tHUZEZ159PlIQjDMaGu5tzBH0rFbI66zoqz/XMvDtWYIpLjJlq6E4VXA8kCUP9HGeun1jc/cPB3MaW/8mz7qIVOcnvZ6iSz9Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=i/zi1k5Bt8i5xY1TJf1ulJEh9dawMRmg0DMn+K+bGYc=;
+ b=MMcddldYOMi6TZovDNBfzT4SVGLzRrW27YECAIZpr+oGDx50ZoeWSWQA2ChVojIt1KC6h1FPFZkp+SMf9hPYlc+towHvBRKCX2xkT7h7Niznr2153s2eBOXz/iTcFK7/bV7+kU4EtJBfAoXHP4wpIzE142lGuLuYRA4zhx+q1HpdpfFdJIb4/orb4ommkmhXV7H3KqCJJM0s9wHx8x1tXS4m2P4tB0ZQePrJvdfHf4yTfx5CiSMAGnsrQkcKyaDHPvUgRkHpGSZY1rUT21bmC9FtpbjGPB3uJAha/Ev4GyBm/cAllqS1n/FbsIfbIRToRhjCOPDDwPe3OKV9a/V24g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=i/zi1k5Bt8i5xY1TJf1ulJEh9dawMRmg0DMn+K+bGYc=;
+ b=I8GDdjVd0Dw4ijRqJ9j6Vo6K66hsw5jJAz3JJquufAAdnP6fOBx2aukPJD2rl1Gb1HuYnRviQOjfp8vXwRw/lvi+ziGQ+f0eCV8DGg83afYAZzC2H6DpKcSgVSKdWzKGEV2sW98fjbGYCbCuJYYBQsTrcTBrEdj9Yp6ErXi+SPpgHuOEvflCtGhTs8DJsy39eo0ZU6EymnK2WNMgQs59mLSQHCHplpPsSsjKBuY3LPFvXssJPWyt2tuI2Gs4+/p4VbXQi0St6YA/Htfbl9r5ZuyUr1atST2+KryJleg1LN93zZLwR+EnULwmc7LnePdgD8TXZjTKzkISIO0q7txCjA==
+Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13) by
+ ME0P282MB4566.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:226::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6863.41; Thu, 12 Oct 2023 06:36:55 +0000
+Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::e39e:17fc:36d8:1ea8]) by SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::e39e:17fc:36d8:1ea8%3]) with mapi id 15.20.6863.043; Thu, 12 Oct 2023
+ 06:36:55 +0000
+From: Tianyi Liu <i.pear@outlook.com>
+To: maz@kernel.org
+Cc: acme@kernel.org,
+	adrian.hunter@intel.com,
+	alexander.shishkin@linux.intel.com,
+	i.pear@outlook.com,
+	irogers@google.com,
+	jolsa@kernel.org,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	mark.rutland@arm.com,
+	mingo@redhat.com,
+	namhyung@kernel.org,
+	pbonzini@redhat.com,
+	peterz@infradead.org,
+	seanjc@google.com,
+	x86@kernel.org
+Subject: Re: [PATCH v2 0/5] perf: KVM: Enable callchains for guests
+Date: Thu, 12 Oct 2023 14:35:42 +0800
+Message-ID:
+ <SY4P282MB108434CA47F2C55E490A1C6B9DD3A@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <8734yhm7km.wl-maz@kernel.org>
+References: <8734yhm7km.wl-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [cpHoawMzPf0CDk2dl+apQEcio79YiLmg2sq/SHXyET6gzhgV1W3Wmw==]
+X-ClientProxiedBy: SG2PR06CA0237.apcprd06.prod.outlook.com
+ (2603:1096:4:ac::21) To SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+ (2603:10c6:10:ac::13)
+X-Microsoft-Original-Message-ID: <20231012063542.13167-1-i.pear@outlook.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20230823131350.114942-18-alexandru.elisei@arm.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA02TeTBdVxzHe+69777H9MW1JDmRSapPs9BanvWQEJOit1uqk6SdyXTCG+54
-	guflLdJEJ0UREbUbJYiloRFCbEksr5YXW1UbirG2KBPEUmlIKOnjaif/fX7f8/2e3zm/M4eH
-	6/3CNeT5SRSMTCIKEJDaRHWziZ3Z7U8OMZZ/9+qgzNJiEqXd6iGRqs0brSe1cFH3RK9Gmg4j
-	0EJBLEDPSldxNJlQhaPGnHkCTS7FEeh3VSGGRuJTCXRvag5DM5XNBIqueUag8ok+DqqrbydQ
-	T00miUaLX3KQuvRnAj3IbOeg5PkpgPILD6LuhhwMpb54QqL44X4StX7bgCFV9B+YxnsPQ2Hq
-	BRKlDw0BFK1exlH9xgsCVT1c4aKIYVs0cLOM63KALs4uBvTaahKgI1SDXDqnXElHqOc4dMUP
-	pnR50VWSLl9K4tLDfXUk3fbdGkHnhqbidMX3X9OPK9IBvaDqJemKn0Lop+X7Pagz/kfFjMiH
-	kRkxEu8gHz+Jr5Pgw5Oe73ra2lkKzYQOyF5gJBEFMk4C1488zNz9AjTDFBgFiwKUGslDJJcL
-	LJyPyoKUCsZIHCRXOAkYqU+A1F5qLhcFypUSX3MJo3AUWlpa2WqMXv7ilIxeTKqivpy+cTwU
-	VPBjgBYPUjaw7PojbgzQ5ulR9wHsyr2CscUSgCMlidvFMoBj9QlkDOBtRYYGHFm9HsCohLZt
-	0ySA4U9XOJv7EtQBOHe3mNxkkjoE2yoLwCYbUBZwvGoGbAZwqoOEI9c7sc0FfeoczI0f2zLx
-	KXNYVn8XY1kXtqf/SWyyFuUCo0ZvbnWDVKo2rK1eBOyRXOHq8jH2QvpwprWSy7IhnI6P2mZ/
-	OPJXAsmyAt7pDN3WrWHG1JWtvjglhr9OjW9vaQzVgwQr74DRzetcVubD6Cg9NmkMfyzIJlje
-	A8dLrnBYCw07Vz5mR9KmmdvsGpYA9me8cpmMV5qx/A7MqV0iMzRxnNoLCzd4LJrA0hqLHMAp
-	ArsYqTzQl5FbSa3+f17voMBysPWzTN3vg5S5RfMmgPFAE4A8XGDAH/d7i9Hj+4guXmJkQZ4y
-	ZQAjbwK2mqdJxA13egdpvqZE4Sm0cbC0sbMT2lvZWtoLdvNHI7N89ChfkYLxZxgpI/svh/G0
-	DEOxq5FGR6y/Mnw473YmrGeuZfW9UwOL/bbG/5zsH53MG7vVJHZFs+cKq17qmLXmRQccPu/T
-	Mb3v2FKk/nN8IS3rdnNdBflm8jW5uIV6NOTWqB4pCQ3mhaZXZc8njtYKqXBl3I1vdh6kmd2w
-	2nP9cs1ojdfnyfgdXXXI6dff+O1wHD/rU8n4ieSUwRwP7Emavcfsjj6XDX/nyvOxWUO0g1G+
-	e5GN6bX3g5X5tVZ7HY/I7DpCpmoiL5xuUD8w4cTqhhuUYF5dzt6fdbs1nhhjXrOemN/3BUel
-	Y4hdsHhunKg8e3FPwSXM5u0qeojK0/tgsvlxdXXXogt+1gnXh5fzrU+t7FLWCwi5WCQ0xWVy
-	0b9Bj5x04gQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTZxiG855zenpaqZ4VXN9KxpKiEpqtiMzszbZs/PDHu2SOhWSQACqV
-	nvBZ7FpwfiwR0iIMQQgMhbZxMOVjXSdSyscQOgZV2lijwVhFGGxAGeqQQcMWZHSjkGX+u3Pf
-	15U8Px6GFF/k7WKy8ws4bb4yT0YLqe5hWcSbloQobp9pOBqZ2600uvTtfRo5XBloveYWH43O
-	PNionhRTaLGlAqCV9hck8lV3keinxucU8i1foNCUo5VAP1fVUahnboFAT+3DFCrrW6GQbcbL
-	Q/0Dbgrd7zPTaNL6Dw852+9Q6Aezm4dqn88BdKV1LxodbCRQ3ervNKqaeEijkcpBAjnKfiE2
-	2B4CFTsXadQwPg5QmfNPEg0EVinUdfMvPjJMHEBjzdf58Xuw9bIV4LUXNQAbHI/5uNFWiA3O
-	BR7ubJNjm+VLGtuWa/h4wttPY1f9GoWbiupI3Hn1LJ7vbAB40fGAxp23z2C/LeITNkX4norL
-	yz7BaWPeTxdmTX2jJzQB0UnrlB8UgYpt5YBhIPsWHB97pxwIGTF7A0BLST0oB4KNXgqNfjex
-	lUPhlMHJ24JmALxrD5DBgWL3wIUOKx3MNBsFXfaWTTmMjYHTXU9BUCBZDw0vfGfkBYdQNgc2
-	Vf26CYlYBbw+0EEErxCzBVBfK9qqX4HuhlkqmElWDh8FnmwiJBsOWwNMsBaw8fDcZDNRDVjj
-	S4bxJcP4v9EISAuQchqdOlOti9XE5nOfK3RKta4wP1ORcVxtA5uvI4/uBT2WPxRDgGDAEIAM
-	KQsTTWfv5sQilfLUaU57/Ki2MI/TDYFwhpJJRJL5SpWYzVQWcLkcp+G0/60EI9hVRMSFnXkj
-	cvCerfZgmSFxzd53Iydt6d2UuI/2dvSmSrtDtk/7S1xelSMQ+Oqknb+UViKMbOanpNbw5o79
-	XembK8SPdl6r6Ikylcadkh1jCi67Rkeks55cRfiY6aCkzRvx0H3r427VgSZJbtehBP2aMKX/
-	cG/S+dX4bfvPSfZHmNXL5ntHDt3JOJ2V5kl+tXof/fVOI/3Mr5+tf2xIf126FH1TEBKT4LCk
-	wuJk/Wt3L04mj6234IyFxMVr9fGmUO9Rwacn5GmXPDk+ZkWnbJvf0Xk4cfKIZbtL4ytNoj7j
-	cW+nG5IyvxgK2WG+vV561bEya4r11H448uMHv0V+bzp7Hj+TUbosZayc1OqU/wIpMteEqQMA
-	AA==
-X-CMS-MailID: 20231012014514epcas2p3ca99a067f3044c5753309a08cd0b05c4
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----E9vxk1eHFJMo0Hi_Q_rTTD2vXp5VKj0nvvVRz8vbSgBSYVSL=_d92b1_"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20231012014514epcas2p3ca99a067f3044c5753309a08cd0b05c4
-References: <20230823131350.114942-1-alexandru.elisei@arm.com>
-	<20230823131350.114942-18-alexandru.elisei@arm.com>
-	<CGME20231012014514epcas2p3ca99a067f3044c5753309a08cd0b05c4@epcas2p3.samsung.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SY4P282MB1084:EE_|ME0P282MB4566:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6d30b3c1-a455-4072-7769-08dbcaed9fe5
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	EnwI2d6YhylB4yVn9GiD8ne6Wq1WbWkRHv9Vn/JqujEx43bXRo+s3x5n/rCwHKx6hB43Dq7LY+G8l8G0JDLx928m0v2km0/BHUa44hnH/J1X0DeTCIEUe/6l0rzLepP73mkajOl9Vj8iSCMbX3XvR+9LBcbuJyzbjTlixMQQaE9jow3UtCNEEZ6UEY/vChSgT1AWVZLVoNjYuy6COzC9JuejxAK/iSYqZt0wcKFM45y3lx3yuH+L4nTC9bdB35CoXieuxkP22Jpr3AHfZ3vOk0V4LwUKysW3YUmSaPfOxdEMhWzVFNo76oPMifNshEed4OB/+hw809sXLCgVlaBvrgyfnzOmmxfedAcrLSp6L5O0+VYS87CKnVodD5i1fLzVLVXkhHAiBe2uRtKy5kkxLPJar0ww2gpGNFk7zLf2Z4uobvxxfl82hIwYLcTSM1NO0t+zYwB2L4m0zXV4YSKGBXjrq6EB2YuPS9W5atar6pryCThHcVNCbkHeE30qW0GHkUkQMnwSpyFNtDnUQSgXbrs1FGKGVCCOjAGqKml0VGjHDS0HXcH5zNvZTrtUOVcNv6m6PdGQVPa29vb0kJuTYD+XSVubG5CK8paXVz6pOP2yWEN+K7yLSzckySwwE3h3
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?SZlwvVk9U/VxBRpNav8g8J9W6y4cCoQ7sMRQPNOjMivvAUrT6L1YQ2i/7Bee?=
+ =?us-ascii?Q?MIlX2ZGNELi2l00p/LAlA1IkiC0JHuN6jsfXTwP/ZIOatOlDPqDsh/9URUyU?=
+ =?us-ascii?Q?7jqAKecjQciu6XY2MQQxQe6nSJA/dBjfbAo8NPu8Cwguy7T7fCTCkWelFCf4?=
+ =?us-ascii?Q?3Xcy0CH3DSFqhzziVeXZXkUfcnpEDM7ww8s5jUnuu2fYbRji4NFUUu5FFgvb?=
+ =?us-ascii?Q?nk0vDAAuzWMVumneEv4SnhHnSrpMXgdkMlSAHjAfUi15MuaVr8cCWMR16sp0?=
+ =?us-ascii?Q?emKhq6ln4xV65sUmjYnZeCYTb2G8f6EMZwwxRt5PMdHS8k2J0zonQ/eJFk9U?=
+ =?us-ascii?Q?azX3WkokAZJVe5r26SEH8JgsCiiGGFwui0ZIk03JY7eNKWEN0qZEiJQdCxMZ?=
+ =?us-ascii?Q?DumRX3cDnaAgBpsjhJJpWRMgEwrbu+VHvG0ZsdlHzji5C15WLS85u+PtFI5o?=
+ =?us-ascii?Q?NeNJpVYPceipBMc4ru7RQ+5leVGjGZJXKYbkmJ08wGg9oLkQtwlei01Wwuvu?=
+ =?us-ascii?Q?uv58VQsFDbYr8al3ytXWvPRTtoc6hsg16gtpFnog12afYnEnC6ZM4p57zDlq?=
+ =?us-ascii?Q?wdCjmK2uygTrbCl+MYw/8joniyNJBMLRhotHVJpcsNfvk4uPHLsGrYOWdNxJ?=
+ =?us-ascii?Q?P5hBzG+5tcPuhR2DQ6CCdIPaslWhhbhSJ0ZlA6UimqF4sSMyn8kw/whLwGUv?=
+ =?us-ascii?Q?Y9vMxyLd2FuOJPue8f26uSdhBLGPe7+3Q/8K8Z4RMVX/Iy1GOjRr8lpv5kyP?=
+ =?us-ascii?Q?JCIqxWSBtDCcDmyEOOOytHuxYtWMI+beyX28hpdvAAWKMlj8wMIGepwTXKNF?=
+ =?us-ascii?Q?syX4Xc5muq0VU3I/pmdN4yv3/KBMaSOWZKd6vyL+oUPmYzFhTe3VAA+37K8Z?=
+ =?us-ascii?Q?bS2SsU49ccxyc6WKy+w7BbcsmnycSNR6AE7KjQZ/I2zCCAncAU9H1Rn1bCS/?=
+ =?us-ascii?Q?MuyxiNX+c5kGV4+nziP76PhrlgB9A2y6ER5xfxE2oeola2PLm9WVCa4H9iMd?=
+ =?us-ascii?Q?vcQT1LOYrlVN6ILYhur/b2px+LulJMFCmrt13hGN4BnqsDfP3sBokBsXSyO9?=
+ =?us-ascii?Q?KoyoPnyTXd99LHahg/b6m0etABIYuxiU/hVZvi7UNBEgMssXS+GuPYbr2C9z?=
+ =?us-ascii?Q?CNqKr8teiwiKFk0rG5GHFF+ldPqIc7wnJ+sP8Wyi5qJJrZCaRTxNRgTR+WiA?=
+ =?us-ascii?Q?VZrsbCgwwcvoBr7DfoWJpuQY+W/75Cu7ctvV+zFmnYFqM3nGMkfG3GK1NR9b?=
+ =?us-ascii?Q?CSiNMgJBP5JexrDOKUdR?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6d30b3c1-a455-4072-7769-08dbcaed9fe5
+X-MS-Exchange-CrossTenant-AuthSource: SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2023 06:36:55.4181
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: ME0P282MB4566
 
-------E9vxk1eHFJMo0Hi_Q_rTTD2vXp5VKj0nvvVRz8vbSgBSYVSL=_d92b1_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
+Hi Marc,
 
-On Wed, Aug 23, 2023 at 02:13:30PM +0100, Alexandru Elisei wrote:
-> Reserving the tag storage associated with a tagged page requires the
-> ability to migrate existing data if the tag storage is in use for data.
+On Sun, 11 Oct 2023 16:45:17 +0000, Marc Zyngier wrote:
+> > The event processing flow is as follows (shown as backtrace):
+> >   #0 kvm_arch_vcpu_get_frame_pointer / kvm_arch_vcpu_read_virt (per arch)
+> >   #1 kvm_guest_get_frame_pointer / kvm_guest_read_virt
+> >      <callback function pointers in `struct perf_guest_info_callbacks`>
+> >   #2 perf_guest_get_frame_pointer / perf_guest_read_virt
+> >   #3 perf_callchain_guest
+> >   #4 get_perf_callchain
+> >   #5 perf_callchain
+> >
+> > Between #0 and #1 is the interface between KVM and the arch-specific
+> > impl, while between #1 and #2 is the interface between Perf and KVM.
+> > The 1st patch implements #0. The 2nd patch extends interfaces between #1
+> > and #2, while the 3rd patch implements #1. The 4th patch implements #3
+> > and modifies #4 #5. The last patch is for userspace utils.
+> >
+> > Since arm64 hasn't provided some foundational infrastructure (interface
+> > for reading from a virtual address of guest), the arm64 implementation
+> > is stubbed for now because it's a bit complex, and will be implemented
+> > later.
 > 
-> The kernel allocates pages, which are now tagged because of HW KASAN, in
-> non-preemptible contexts, which can make reserving the associate tag
-> storage impossible.
+> I hope you realise that such an "interface" would be, by definition,
+> fragile and very likely to break in a subtle way. The only existing
+> case where we walk the guest's page tables is for NV, and even that is
+> extremely fragile.
+>
+
+For walking the guest's page tables, yes, there're only very few
+use cases. Most of them are used in nested virtualization and XEN.
+
+> Given that, I really wonder why this needs to happen in the kernel.
+> Userspace has all the required information to interrupt a vcpu and
+> walk its current context, without any additional kernel support. What
+> are the bits here that cannot be implemented anywhere else?
+>
+
+Thanks for pointing this out, I agree with your opinion.
+Whether it's walking guest's contexts or performing an unwind,
+user space can indeed accomplish these tasks.
+The only reasons I see for implementing them in the kernel are performance
+and the access to a broader range of PMU events.
+
+Consider if I were to implement these functionalities in userspace:
+I could have `perf kvm` periodically access the guest through the KVM API
+to retrieve the necessary information. However, interrupting a VCPU
+through the KVM API from user space might introduce higher latency
+(not tested specifically), and the overhead of syscalls could also
+limit the sampling frequency.
+
+Additionally, it seems that user space can only interrupt the VCPU
+at a certain frequency, without harnessing the richness of the PMU's
+performance events. And if we incorporate the logic into the kernel,
+`perf kvm` can bind to various PMU events and sample with a faster
+performance in PMU interrupts.
+
+So, it appears to be a tradeoff -- whether it's necessary to introduce
+more complexity in the kernel to gain access to a broader range and more
+precise performance data with less overhead. In my current use case,
+I just require simple periodic sampling, which is sufficient for me,
+so I'm open to both approaches.
+
+> > Tianyi Liu (5):
+> >   KVM: Add arch specific interfaces for sampling guest callchains
+> >   perf kvm: Introduce guest interfaces for sampling callchains
+> >   KVM: implement new perf interfaces
+> >   perf kvm: Support sampling guest callchains
+> >   perf tools: Support PERF_CONTEXT_GUEST_* flags
+> >
+> >  arch/arm64/kvm/arm.c                | 17 +++++++++
 > 
-> Don't expose the tag storage pages to the memory allocator if HW KASAN is
-> enabled.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arch/arm64/kernel/mte_tag_storage.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/arch/arm64/kernel/mte_tag_storage.c b/arch/arm64/kernel/mte_tag_storage.c
-> index 4a6bfdf88458..f45128d0244e 100644
-> --- a/arch/arm64/kernel/mte_tag_storage.c
-> +++ b/arch/arm64/kernel/mte_tag_storage.c
-> @@ -314,6 +314,18 @@ static int __init mte_tag_storage_activate_regions(void)
->  		return 0;
->  	}
->  
-> +	/*
-> +	 * The kernel allocates memory in non-preemptible contexts, which makes
-> +	 * migration impossible when reserving the associated tag storage.
-> +	 *
-> +	 * The check is safe to make because KASAN HW tags are enabled before
-> +	 * the rest of the init functions are called, in smp_prepare_boot_cpu().
-> +	 */
-> +	if (kasan_hw_tags_enabled()) {
-> +		pr_info("KASAN HW tags enabled, disabling tag storage");
-> +		return 0;
-> +	}
-> +
+> Given that there is more to KVM than just arm64 and x86, I suggest
+> that you move the lack of support for this feature into the main KVM
+> code.
 
-Hi.
+Currently, sampling for KVM guests is only available for the guest's
+instruction pointer, and even the support is limited, it is available
+on only two architectures (x86 and arm64). This functionality relies on
+a kernel configuration option called `CONFIG_GUEST_PERF_EVENTS`,
+which will only be enabled on x86 and arm64.
+Within the main KVM code, these interfaces are enclosed within
+`#ifdef CONFIG_GUEST_PERF_EVENTS`. Do you think these are enough?
 
-Is there no plan to enable HW KASAN in the current design ? 
-I wonder if dynamic MTE is only used for user ? 
-
-Thanks,
-Hyesoo Yu.
-
-
->  	for (i = 0; i < num_tag_regions; i++) {
->  		tag_range = &tag_regions[i].tag_range;
->  		for (pfn = tag_range->start; pfn <= tag_range->end; pfn += pageblock_nr_pages) {
-> -- 
-> 2.41.0
-> 
-> 
-
-------E9vxk1eHFJMo0Hi_Q_rTTD2vXp5VKj0nvvVRz8vbSgBSYVSL=_d92b1_
-Content-Type: text/plain; charset="utf-8"
-
-
-------E9vxk1eHFJMo0Hi_Q_rTTD2vXp5VKj0nvvVRz8vbSgBSYVSL=_d92b1_--
+Best regards,
+Tianyi Liu
