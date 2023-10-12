@@ -1,44 +1,36 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-209.mta1.migadu.com (out-209.mta1.migadu.com [95.215.58.209])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4047521361
-	for <kvmarm@lists.linux.dev>; Thu, 12 Oct 2023 12:35:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C749124A09
+	for <kvmarm@lists.linux.dev>; Thu, 12 Oct 2023 12:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XZvoS9CG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44BC2C433C8;
-	Thu, 12 Oct 2023 12:35:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697114148;
-	bh=gB8zPjeOXQPwfuELYundQoAY/96rhccCXFynL9ryD2Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XZvoS9CGAOVcf6PYMQh+L/pEifbtHxh5jKqFlCbuHw68AockQbpki2L7v6s7FjpUd
-	 tHYxnrgxorK6R3EeK0LDrnLBNL+cl/P3TzOO8XO3YCU9Ci1y6qxV3RZyhemh10jG0B
-	 Mie57WfYWOh2XPgjnDQ4FyvOQgozkt7C+jbherHEwbLvolY43MM1uTxqibtHwjw/4H
-	 SzcUg+x3w0BDQ2BMIl48RLgs3tRji9VCquXi+3p+DM+V214yTXmmO6S+RNlmgOmuls
-	 b7s99r9BukUf8/GMqgJNgE73IQ+MsaFNewphhmABRFO19JWwD4gj/YyxvE1sHkmkNA
-	 suPmwPXJAaLxA==
-Date: Thu, 12 Oct 2023 13:35:41 +0100
-From: Will Deacon <will@kernel.org>
-To: Lorenzo Pieralisi <lpieralisi@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, ankita@nvidia.com, maz@kernel.org,
-	oliver.upton@linux.dev, aniketa@nvidia.com, cjia@nvidia.com,
-	kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
-	acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
-	danw@nvidia.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 2/2] KVM: arm64: allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
-Message-ID: <20231012123541.GB11824@willie-the-truck>
-References: <20230907181459.18145-1-ankita@nvidia.com>
- <20230907181459.18145-3-ankita@nvidia.com>
- <ZP8q71+YXoU6O9uh@lpieralisi>
- <ZP9MQdRYmlawNsbC@nvidia.com>
- <ZQHUifAfJ+lZikAn@lpieralisi>
- <ZQIFfqgR5zcidRR3@nvidia.com>
- <ZRKW6uDR/+eXYMzl@lpieralisi>
- <ZRLiDf204zCpO6Mv@arm.com>
- <ZR6IZwcFNw55asW0@lpieralisi>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rRGaIjbL"
+Date: Thu, 12 Oct 2023 12:47:16 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1697114841;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WZ9ACy9q0K8a//vgGJWNbpd56b9FY1ywZnapIJn+tJU=;
+	b=rRGaIjbL/RroesD2jDenYXaZsImfXC+68rPBgYiL69+Q/CmWrnjsYwZBYMc3NBAIKKnUnc
+	jWjqQ2SO5Kc18nTS0dx7iWHAorLtqg7fRvPI5Z6luG62NrJoRW2p5Xtg2cQw5gpg91TGfq
+	QTEIlyQqDXYjoUgGt/m3TKi8Sp37beI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: James Clark <james.clark@arm.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 2/2] KVM: arm64: Treat PMEVTYPER<n>_EL0.NSH as RES0
+Message-ID: <ZSfq1Im2k2JVIY5H@linux.dev>
+References: <20231011081649.3226792-1-oliver.upton@linux.dev>
+ <20231011081649.3226792-3-oliver.upton@linux.dev>
+ <2e724a19-1a58-ac6d-1697-c4a2b7a6962a@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,72 +39,19 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZR6IZwcFNw55asW0@lpieralisi>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <2e724a19-1a58-ac6d-1697-c4a2b7a6962a@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Oct 05, 2023 at 11:56:55AM +0200, Lorenzo Pieralisi wrote:
-> On Tue, Sep 26, 2023 at 02:52:13PM +0100, Catalin Marinas wrote:
-> 
-> [...]
-> 
-> > Anyway, the text looks fine to me. Thanks for putting it together
-> > Lorenzo.
-> 
-> Thanks !
-> 
-> > One thing not mentioned here is that pci-vfio still maps such memory as
-> > Device-nGnRnE in user space and relaxing this potentially creates an
-> > alias. But such alias is only relevant of both the VMM and the VM try to
-> > access the same device which I doubt is a realistic scenario.
-> 
-> A revised log, FWIW:
+On Thu, Oct 12, 2023 at 10:43:30AM +0100, James Clark wrote:
+> ARMV8_PMU_EVTYPE_MASK is still used in access_pmu_evtyper() and
+> reset_pmevtyper(), although it's not really an issue if you can't set
+> the bits in the first place. But it probably makes sense to use the same
+> mask everywhere.
 
-Thanks for putting this together, Lorenzo. Just one thing below:
+Agreed. Well, the masking done for reads in access_pmu_evtyper() is
+pointless since we sanitise the value when written. I'll update
+reset_pmevtyper() though.
 
-> ---
-> Currently, KVM for ARM64 maps at stage 2 memory that is
-> considered device (ie it is not RAM) with DEVICE_nGnRE
-> memory attributes; this setting overrides (as per the ARM
-> architecture [1]) any device MMIO mapping present at stage
-> 1, resulting in a set-up whereby a guest operating system
-> can't determine device MMIO mapping memory attributes on its
-> own but it is always overriden by the KVM stage 2 default.
-> 
-> This set-up does not allow guest operating systems to select
-> device memory attributes on a page by page basis independently
-> from KVM stage-2 mappings (refer to [1], "Combining stage 1 and stage
-> 2 memory type attributes"), which turns out to be an issue in that
-> guest operating systems (eg Linux) may request to map
-> devices MMIO regions with memory attributes that guarantee
-> better performance (eg gathering attribute - that for some
-> devices can generate larger PCIe memory writes TLPs)
-> and specific operations (eg unaligned transactions) such as
-> the NormalNC memory type.
-> 
-> The default device stage 2 mapping was chosen in KVM
-> for ARM64 since it was considered safer (ie it would
-> not allow guests to trigger uncontained failures
-> ultimately crashing the machine) but this turned out
-> to be imprecise.
-> 
-> Failures containability is a property of the platform
-> and is independent from the memory type used for MMIO
-> device memory mappings (ie DEVICE_nGnRE memory type is
-> even more problematic than NormalNC in terms of containability
-> since eg aborts triggered on loads cannot be made synchronous,
-> which make them harder to contain); this means that,
-> regardless of the combined stage1+stage2 mappings a
-> platform is safe if and only if device transactions cannot trigger
-> uncontained failures; reworded, the default KVM device
-> stage 2 memory attributes play no role in making device
-> assignment safer for a given platform and therefore can
-> be relaxed.
-> 
-> For all these reasons, relax the KVM stage 2 device
-> memory attributes from DEVICE_nGnRE to NormalNC.
-
-The reasoning above suggests to me that this should probably just be
-Normal cacheable, as that is what actually allows the guest to control
-the attributes. So what is the rationale behind stopping at Normal-NC?
-
-Will
+-- 
+Thanks,
+Oliver
