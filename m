@@ -1,91 +1,163 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2068.outbound.protection.outlook.com [40.107.92.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E29266B8
-	for <kvmarm@lists.linux.dev>; Thu, 12 Oct 2023 15:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204FE273D7
+	for <kvmarm@lists.linux.dev>; Thu, 12 Oct 2023 15:44:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NnslaW/J"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47B74C433C8;
-	Thu, 12 Oct 2023 15:33:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697124810;
-	bh=CwPhnvWDnEUB2iMIpyueJqopC6r4NltRgZimGQqlmpo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NnslaW/Jd/KRdVuwnn8qm9tC6AFgcxoSAQI2y2v82MBuQv3EGWVX/iqqOX9dYJswH
-	 NOt+xKjbiCNubMwcFqN0TRyuu5xdjlH9aoufJMxtJXKy54pj0semAuKfFCfxQ6ELaV
-	 B5B8RSWM2nlB5tDOyr7dbAPqwRNTf6OkFgyRI1e9bC03Bd5YX/o7dYFDS5QpKtZMWs
-	 ytwOiOwyPE7sPuDE7Os1iscZrD/fweJdYGb9cIg/ttztIt6dNMbI6yf1n8CCZZmYPp
-	 6tixvja0rhHbrRSg58x1i7YjDnaUXTFKJHW4Gc39RuHGMeIzUQEVHmXocUKOMWqDBP
-	 a8Iv8J2Kl/DFA==
-Received: from [104.132.0.108] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qqxgl-003a1O-Kf;
-	Thu, 12 Oct 2023 16:33:27 +0100
-Date: Thu, 12 Oct 2023 16:33:25 +0100
-Message-ID: <87zg0nlut6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	oliver.upton@linux.dev,
-	kvmarm@lists.linux.dev,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v1 1/2] KVM: arm64: add nPIR{E0}_EL1 to HFG traps
-In-Reply-To: <20231012123459.2820835-2-joey.gouly@arm.com>
-References: <20231012123459.2820835-1-joey.gouly@arm.com>
-	<20231012123459.2820835-2-joey.gouly@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="E88tCk4c"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EQpZ3bcY65+VTSgsEoSO8iNlsy/9suBVNVRzofXE2vGQ1otWqGeHvhxa+3FY8HpOCPjFyx1vRktMGP975RVq5tVwtlIx7pqGbBiwnMJpng09Z1otVT0TzS5JX/K7SeVDDo+kyvfEXHjXomZ6eQq4Q3we6cKZHd1mtZrfVdQBX4XduYardrPel4zBKaymagsxaiDXUNdUe1yPqp9kPQRdGeRUIk+F8gSBMG6vaKST8zrdfn4LvxAuvERZ9R9mHSI4hsN1hcyImdMwfSSuuOdLOlSm2fWmTxQY2/tvUfID9UAIPexVcNcJIMfG/GJ6fxWXn0vV6n601IcyUCqH5Ci9TQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uei7TCZLVM2MeDTgJnK3gdxRHHtzyOOsnTbPNy2WSFM=;
+ b=PAAwDGdqredSgCplhM3MqWNg0tyPiP5wFDJYDwCwHZ1XOPzzXAIaPMGOSjRlu1rRu9d48TWUZeWqFaZDf22xAEpLubReJmj+mMTnZreg+X9jECqjkd+8fQFZ5NRHtyefeFc4SJRT8UJUSsIJE0C7i6hwQMH97f1qjqNrZSz39xuo4lwOawpjoEPDLapv+cqfXSFBjDtfb9AguwjDekjWpt46F3g0M7DSr9yJpXpvkrq7ReBsLhQDtniIoSFMrzBD7aNAX9vOWTi/pKVYKoQ0zFEnG6+l/9RRXci+FIrSTJScG3WADrr0ZKbc6aR1Lx5xpzf1UfLhX2nHEz2DA1257w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uei7TCZLVM2MeDTgJnK3gdxRHHtzyOOsnTbPNy2WSFM=;
+ b=E88tCk4cYerF2R/z1nZpoq3Pv7zAJU7VYPN2pg5+i1tH1DcZiqDkYqZGC6END/QCcGLlGU2xvwEBuesd0+6hqWIYQ4Rs71a4I/att4AWH0A/njNw07I76yDIUzadim7vl6qHru52zPIbitBM6x1bI/NsXdzxI7fxOcdobczmQ7gD1crZqt8S1NBkXLPm4rNWGAc05piQAMSWSCwK7/feFZWDdhAMpeS6OH8rNVbiLlXYuZP3rtrYGpQcae91HANH8SVdsUcZKcattzcXWb/KwyFV3qhqQMCPJDTxYFTCIdys1OWyJWBXiLZhbilbY8qeJQ/3FRx8rfS8+ufCdrYoIQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DS7PR12MB6142.namprd12.prod.outlook.com (2603:10b6:8:9a::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.44; Thu, 12 Oct
+ 2023 15:44:41 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6863.032; Thu, 12 Oct 2023
+ 15:44:40 +0000
+Date: Thu, 12 Oct 2023 12:44:39 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Will Deacon <will@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>, ankita@nvidia.com,
+	maz@kernel.org, oliver.upton@linux.dev, aniketa@nvidia.com,
+	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
+	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
+	jhubbard@nvidia.com, danw@nvidia.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 2/2] KVM: arm64: allow the VM to select DEVICE_* and
+ NORMAL_NC for IO memory
+Message-ID: <20231012154439.GM3952@nvidia.com>
+References: <ZP8q71+YXoU6O9uh@lpieralisi>
+ <ZP9MQdRYmlawNsbC@nvidia.com>
+ <ZQHUifAfJ+lZikAn@lpieralisi>
+ <ZQIFfqgR5zcidRR3@nvidia.com>
+ <ZRKW6uDR/+eXYMzl@lpieralisi>
+ <ZRLiDf204zCpO6Mv@arm.com>
+ <ZR6IZwcFNw55asW0@lpieralisi>
+ <20231012123541.GB11824@willie-the-truck>
+ <ZSf6Ue09IO6QMBs1@arm.com>
+ <20231012144807.GA12374@willie-the-truck>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231012144807.GA12374@willie-the-truck>
+X-ClientProxiedBy: MN2PR02CA0002.namprd02.prod.outlook.com
+ (2603:10b6:208:fc::15) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 104.132.0.108
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, kvmarm@lists.linux.dev, suzuki.poulose@arm.com, james.morse@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS7PR12MB6142:EE_
+X-MS-Office365-Filtering-Correlation-Id: 91b6a8ba-45b3-4b22-e5ed-08dbcb3a25a5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	+tROLQtbr2aqx2pGkZC8Yq/YTR6Uua1Vv28i3RP5QyYuqO26oGxzCyqYaaCEmt3Mx6KOtcDM9IDY/oj5uoMoqQfrrk2faWfR54tYGr0EVxP9v1UOHbi+AvrmsQg5Ax5qrSxXsbK+u5iZgjetm0segIB0LrVOUe26CqenDcPWdrmtRnKGF6OfA0hLQVReQH7PlLQNHLgYiABfd/TCNuD2VNSQIdgPL36xUlLmycf9WC3wSNfl1J9vYeo2TCtzOvDeNkGHKpVXnQ/SnqKRN0JQsB2e4dPESw/N0EZ+tx5onbzA5VijpR9/M6L2pyuTsRijdHLPBSB8H2/BWfYcOAZZeHXbSxuAyOg6PLQEH0kfsvBwYXKWu6CyyJZAPeUvXlvXc7JjP+h1bHUAem5cz61VBW9DplEnObLAy6vHmzc0tt1iqAMmNiol118WnHWN9g9eFKGU47xcyFUZQ41XJSLiZYH7e1cRn33DQd9WcQW54yTVuzeS0HZE0EKDFqvI92Qu2HI6uTlxBWyf8lM3gzhIQ4jCOAGo5lekVMyl3gog4ORVOaM3KumZXdj3IYk5VBBj
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(376002)(396003)(346002)(39860400002)(230922051799003)(186009)(1800799009)(451199024)(64100799003)(66556008)(66946007)(66476007)(54906003)(6916009)(316002)(4326008)(8936002)(41300700001)(36756003)(8676002)(38100700002)(5660300002)(6512007)(33656002)(2906002)(6486002)(26005)(2616005)(478600001)(83380400001)(6506007)(86362001)(1076003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?sBO4Y3HF4VQ/+B6d0CcrjisNxyQa+IIbHHgOx2gAQKoULJHr3gnH8hfLjWt/?=
+ =?us-ascii?Q?nr3Inh3ugzAOxS3FDZlkZrihIXeNIsDJ1fv+c+kP86zj+RaXH0z0JchjxmOp?=
+ =?us-ascii?Q?ZeFLazcsNEaZaCS1LwxwB3FmyjOjYjI00jboVKma0GltfomMYnvHg6mvkYhk?=
+ =?us-ascii?Q?O59LHtJC1u8zq9WLVGZhLs8oiEHimvf/6Au72tqDv2DyrornEWutWrHPmi5P?=
+ =?us-ascii?Q?4zjdolwTMnZllbQsItTzJf4cBIYm4LIxHdxMmMIqOP5WxcSjFcHidmfkcwEz?=
+ =?us-ascii?Q?WM0jZjRXGBrlLieYu3/6hFvXanhsLLabr2BsW8X7c1mUrC01/JpnaAl2PHsW?=
+ =?us-ascii?Q?eyEU+uHFeb6wxHKZPIdPI51Yye9h98eeygl4TRLjgWSZ1ekuqWKE/y+a/ZII?=
+ =?us-ascii?Q?d+odcCIUT8etoVTsVPlJb3SKoPAJISfThhAOGc/e2hHcLZBSJy0qi1U+JBYI?=
+ =?us-ascii?Q?lcXmlewNb9PoI6wut+SrFoX91SjR82U5wslkSsQsZHlBTcOdAfKz6P12fJdw?=
+ =?us-ascii?Q?UuiwptAldsGOJQUiw8ihndz6jEOI72thGtGU8lmRyn+b/kM49QCbYHy3ehZ/?=
+ =?us-ascii?Q?8xMaSXUDvsu4w0mvWe5M5XD9TsdSSRPDbYbonCBmL4EVi/ZEOF1VEY1r35pN?=
+ =?us-ascii?Q?5OKlDFIuixJSN+Wm2Xx7i5SuTg4RiyJ7n+AV2Qf5+XCDBbqNNJK8ceHEttqJ?=
+ =?us-ascii?Q?NaqY/n0JnJWIfth1qsaAWJpBpG7IrGmj59C5lvCGGr4eh0ssE6EWeX8LCGgh?=
+ =?us-ascii?Q?fS7CUa3Lu3Yfk8ERpong+ZxiY3Xr/QFWt+6vfsNrbXvxiePoXDusrADIxY28?=
+ =?us-ascii?Q?SQSM53pkvmlInstvFplIp2gnX/0cW033vCrsESipPgKu9kwu2DM0SxQPtKJz?=
+ =?us-ascii?Q?s9wo3F1C5cOvfB8LFY/rOcYUAw7FY+r8e7U0nPrLg97T14iTylF9evVrDbTy?=
+ =?us-ascii?Q?2phGfP/gIJ2iVooqX6pOujFfYnARgQp9SZTAPl8S26GH47Xmlou7ripqmw6N?=
+ =?us-ascii?Q?jSwn7s1gM6qG1uXedpoI1D57xTJikLJSVLYViZh80apeyIKn1uHKon1wFCJj?=
+ =?us-ascii?Q?QnYm9l+YKTyNHRHKUAm/IO5dX5CUc1Kkwk1GBFKY+z+9J92KqKThnCej1jFL?=
+ =?us-ascii?Q?Bp5r9dwEjzqbCNf2aIyzoV9+KfFK+UuDG5SL056iFlchAFGHMTdXtNoYdr9Z?=
+ =?us-ascii?Q?cmcBxDvdYvSWRofFNTK/8z2aSAjKvFRDOfguFGx0DqnXLlgoZRnwTVM4PWBz?=
+ =?us-ascii?Q?wZ2HVVxt0q5RowFoxF3pM2JAoRXS/f0Q8akh+5GYLNliOE5M3GhrzNWAzDyS?=
+ =?us-ascii?Q?HR4a6G/xPtfSURHLyiT2W5VQQSXGLHq4Ogg5iuphrbKWFFUuYrlcy8mgZw6K?=
+ =?us-ascii?Q?Nh0EfeoWO/fsgNWs5W1gALNWym0S11Ycthcl1eaebe2aQ0vAVK44Ek1GxUj8?=
+ =?us-ascii?Q?1aLys2el5t0dGMa/ZS4LaE6Ieg4Oci7jHUUAz2bGvv42X8fh8cxPJDgsQ5aw?=
+ =?us-ascii?Q?huRO7UBjieSvzgjwsfd3IZ//BDPndZZywboNuKzppqQ8rvzL8ZJ3mwoxWRGa?=
+ =?us-ascii?Q?F6vPdiV8de8w8aljqtVBbSaZJtNTQRYSgJAwo75Y?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 91b6a8ba-45b3-4b22-e5ed-08dbcb3a25a5
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2023 15:44:40.5063
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GXRr415bNy4O0USnq63oii2zKkOsjYnxQqgYzjYNxmBYLLzGUxZmzITF311Q36Fl
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6142
 
-Hi Joey,
+On Thu, Oct 12, 2023 at 03:48:08PM +0100, Will Deacon wrote:
 
-Please Cc all the reviewers, not only Oliver and me.
+> I guess my wider point is that I'm not convinced that non-cacheable is
+> actually much better and I think we're going way off the deep end looking
+> at what particular implementations do and trying to justify to ourselves
+> that non-cacheable is safe, even though it's still a normal memory type
+> at the end of the day.
 
-On Thu, 12 Oct 2023 13:34:58 +0100,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> nPIR_EL1 and nPIREO_EL1 are part of the 'reverse polarity' set of bits, set
-> them so that we disable the traps for a guest.
+When we went over this with ARM it became fairly clear there wasn't an
+official statement that Device-* is safe from uncontained
+failures. For instance, looking at the actual IP, our architects
+pointed out that ARM IP already provides ways for Device-* to trigger
+uncontained failures today.
 
-It would have been helpful to indicate where these bits were defined,
-as they are not published in the ARM ARM. For the record, they live in
-the XML files available at [1]. If we're adding these, we also need to
-add the FGT emulation for nested, which doesn't describe these bits:
+We then mutually concluded that KVM safe implementations must already
+be preventing uncontained failures for Device-* at the system level
+and that same prevention will carry over to NormalNC as well.
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 34075185af8e..f564e9b075d5 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -977,6 +977,8 @@ enum fg_filter_id {
- 
- static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
- 	/* HFGRTR_EL2, HFGWTR_EL2 */
-+	SR_FGT(SYS_PIR_EL1,		HFGxTR, nPIR_EL1, 0),
-+	SR_FGT(SYS_PIRE0_EL1,		HFGxTR, nPIRE0_EL1, 0),
- 	SR_FGT(SYS_TPIDR2_EL0,		HFGxTR, nTPIDR2_EL0, 0),
- 	SR_FGT(SYS_SMPRI_EL1,		HFGxTR, nSMPRI_EL1, 0),
- 	SR_FGT(SYS_ACCDATA_EL1,		HFGxTR, nACCDATA_EL1, 0),
+IMHO, this seems to be a gap where ARM has not fully defined when
+uncontained failures are allowed and left that as an implementation
+choice.
 
-I'll amend the commit message locally and fold this in.
+In other words, KVM safety around uncontained failure is not a
+property that can be reasoned about from the ARM architecture alone.
 
-	M.
+> The current wording talks about use-cases (I get this) and error containment
+> (it's a property of the system) but doesn't talk at all about why Normal-NC
+> is the right result.
 
-[1] https://developer.arm.com/downloads/-/exploration-tools
+Given that Device-* and NormalNC are equally implementation defined
+with regards to uncontained failures, NormalNC allows more VM
+functionality.
 
--- 
-Without deviation from the norm, progress is not possible.
+Further, we have a broad agreement that this use case is important,
+and that NormalNC is the correct way to adress it.
+
+I think you are right to ask for more formality from ARM team but also
+we shouldn't hold up fixing real functional bugs in real shipping
+server ARM products.
+
+Jason
