@@ -1,17 +1,17 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77C4F21347
-	for <kvmarm@lists.linux.dev>; Thu, 12 Oct 2023 09:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 212AE21347
+	for <kvmarm@lists.linux.dev>; Thu, 12 Oct 2023 09:46:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14DDC13D5;
-	Thu, 12 Oct 2023 02:44:14 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 23A8813D5;
+	Thu, 12 Oct 2023 02:46:42 -0700 (PDT)
 Received: from [10.57.69.218] (unknown [10.57.69.218])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F27153F762;
-	Thu, 12 Oct 2023 02:43:31 -0700 (PDT)
-Message-ID: <2e724a19-1a58-ac6d-1697-c4a2b7a6962a@arm.com>
-Date: Thu, 12 Oct 2023 10:43:30 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1551B3F762;
+	Thu, 12 Oct 2023 02:45:58 -0700 (PDT)
+Message-ID: <998b90f4-1b04-72b0-7524-afe997db1b33@arm.com>
+Date: Thu, 12 Oct 2023 10:45:57 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -20,55 +20,55 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.1
-Subject: Re: [PATCH 2/2] KVM: arm64: Treat PMEVTYPER<n>_EL0.NSH as RES0
+Subject: Re: [PATCH v3 1/3] arm: perf: Include threshold control fields valid
+ in PMEVTYPER mask
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org,
+ suzuki.poulose@arm.com, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Russell King <linux@armlinux.org.uk>, Marc Zyngier <maz@kernel.org>,
+ James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Mark Rutland <mark.rutland@arm.com>, Zaid Al-Bassam <zalbassam@google.com>,
+ Reiji Watanabe <reijiw@google.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+References: <20231010141551.2262059-1-james.clark@arm.com>
+ <20231010141551.2262059-2-james.clark@arm.com> <ZSZb2H8O5fuU3UrA@linux.dev>
 Content-Language: en-US
-To: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Raghavendra Rao Ananta <rananta@google.com>,
- Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>
-References: <20231011081649.3226792-1-oliver.upton@linux.dev>
- <20231011081649.3226792-3-oliver.upton@linux.dev>
 From: James Clark <james.clark@arm.com>
-In-Reply-To: <20231011081649.3226792-3-oliver.upton@linux.dev>
+In-Reply-To: <ZSZb2H8O5fuU3UrA@linux.dev>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
-On 11/10/2023 09:16, Oliver Upton wrote:
-> Prevent the guest from setting the NSH bit, which enables event counting
-> while the PE is in EL2. kvm_pmu_create_perf_event() never wired up the
-> bit, nor does it make any sense in the context of a guest without NV.
+On 11/10/2023 09:24, Oliver Upton wrote:
+> Hi James,
 > 
-> While at it, build the event type mask using explicit field definitions
-> instead of relying on ARMV8_PMU_EVTYPE_MASK. KVM probably should've been
-> doing this in the first place, as it avoids changes to the
-> aforementioned mask affecting sysreg emulation.
+> On Tue, Oct 10, 2023 at 03:15:41PM +0100, James Clark wrote:
+>> FEAT_PMUv3_TH (Armv8.8) adds two new fields to PMEVTYPER, so include
+>> them in the mask. These aren't writable on 32 bit kernels as they are in
+>> the high part of the register, so split the mask definition to the asm
+>> files for each platform.
+>>
+>> Now where the value is used in some parts of KVM, include the asm file.
+>> There is no impact on guest PMUs emulated with KVM because the new
+>> fields are ignored when constructing the attributes for opening the
+>> event. But if threshold support is added to KVM at a later time no
+>> change to the mask will be needed.
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/pmu-emul.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 0666212c0c15..087764435390 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -663,8 +663,7 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
->  	if (!kvm_vcpu_has_pmu(vcpu))
->  		return;
->  
-> -	mask  =  ARMV8_PMU_EVTYPE_MASK;
+> KVM should treat TH and TC as RES0 if the feature isn't virtualized. I'd
 
-ARMV8_PMU_EVTYPE_MASK is still used in access_pmu_evtyper() and
-reset_pmevtyper(), although it's not really an issue if you can't set
-the bits in the first place. But it probably makes sense to use the same
-mask everywhere.
+Ok will keep that in mind for if we virtualize it in the future. It
+looks like it will have to happen conditionally depending on the
+presence of the feature. But it looks like your current patch has the
+res0 fix for now.
 
-> -	mask &= ~ARMV8_PMU_EVTYPE_EVENT;
-> +	mask = ARMV8_PMU_EXCLUDE_EL1 | ARMV8_PMU_EXCLUDE_EL0;
->  	mask |= kvm_pmu_event_mask(vcpu->kvm);
->  
->  	reg = counter_index_to_evtreg(pmc->idx);
+> rather move KVM away from using ARMV8_PMU_EVTYPE_MASK in the first
+> place. Looks like we already have an issue with the NSH bit, so I've
+> sent the below patch to fix it.
+> 
+> https://lore.kernel.org/kvmarm/20231011081649.3226792-3-oliver.upton@linux.dev/
+> 
+
+
