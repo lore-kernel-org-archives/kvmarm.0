@@ -1,79 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A651B281
-	for <kvmarm@lists.linux.dev>; Fri, 13 Oct 2023 15:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48FC1BDE2
+	for <kvmarm@lists.linux.dev>; Fri, 13 Oct 2023 15:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B6aOhjI4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E84CC433C8;
-	Fri, 13 Oct 2023 15:28:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697210897;
-	bh=iiew/laD+Q3haHwMxgaUmOJOpF//XuI1aJ4hOlOKh6s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=B6aOhjI4W3T3qqRBW/NsttzXu5HUYLUV0lP13HpcxULbCsY8haM+fvx/hkj6ifjtz
-	 5uZCpSp2yYae/IoUGpnXO1b3PAiCRuxJ2QNmSgt762IP05AQmV1jLJKNvfC3fo3Nff
-	 Z1eyDfRCPYIEucr4zoADjXI4vRzVrqegikLNsl094KykJc8hZMs9isjWNn37ugG4mL
-	 b7BS7rV1TDFjqx3xH9xB/2V45Bkqj8K5qirF/WyXBzb1dv9lhsMC7rfYLnjJAqVQfh
-	 xNspCeaor9aeIXP83je9bdwKF47wno/dy555mpvKuCdCi1hRXBYmhqlW+lJOw1Ar8m
-	 CQCLt2ppkzeJA==
-Date: Fri, 13 Oct 2023 17:28:10 +0200
-From: Lorenzo Pieralisi <lpieralisi@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
-	ankita@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
-	aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
-	targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
-	apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 2/2] KVM: arm64: allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
-Message-ID: <ZSliChc3poZNM4f9@lpieralisi>
-References: <ZQIFfqgR5zcidRR3@nvidia.com>
- <ZRKW6uDR/+eXYMzl@lpieralisi>
- <ZRLiDf204zCpO6Mv@arm.com>
- <ZR6IZwcFNw55asW0@lpieralisi>
- <20231012123541.GB11824@willie-the-truck>
- <ZSf6Ue09IO6QMBs1@arm.com>
- <20231012144807.GA12374@willie-the-truck>
- <ZSgsKSCv-zWgtWkm@arm.com>
- <20231013092934.GA13524@willie-the-truck>
- <ZSlBOiebenPKXBY4@arm.com>
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="WgHNkgc2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1697211658; x=1728747658;
+  h=from:to:cc:subject:date:message-id:
+   content-transfer-encoding:mime-version;
+  bh=+WMjQv6PYaqrft1OvG2kp1YAwxihJrr7iCkxSDlP7tw=;
+  b=WgHNkgc2RuyigI5k3gHltUy1b6LsX0guqHWGsAgZvr69nZDLmN1cAd25
+   QK9S57mkcEovrR9Qcx79hh2/vlmkwEhz5X78C4B9Sxuvbn3MmfUtJeJxy
+   w2C9bP6Uhlr5jhqKJfQWxJNG9gz/aP5MdmdMCP2X7iQe4dDvjXnLiheKs
+   w=;
+X-IronPort-AV: E=Sophos;i="6.03,222,1694736000"; 
+   d="scan'208";a="35687121"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-96feee09.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2023 15:40:55 +0000
+Received: from EX19D001EUA004.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+	by email-inbound-relay-iad-1a-m6i4x-96feee09.us-east-1.amazon.com (Postfix) with ESMTPS id 826864875D;
+	Fri, 13 Oct 2023 15:40:53 +0000 (UTC)
+Received: from EX19D026EUB002.ant.amazon.com (10.252.61.110) by
+ EX19D001EUA004.ant.amazon.com (10.252.50.19) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Fri, 13 Oct 2023 15:40:52 +0000
+Received: from EX19D047EUB002.ant.amazon.com (10.252.61.57) by
+ EX19D026EUB002.ant.amazon.com (10.252.61.110) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Fri, 13 Oct 2023 15:40:52 +0000
+Received: from EX19D047EUB002.ant.amazon.com ([fe80::a00c:a6ac:280e:2ca7]) by
+ EX19D047EUB002.ant.amazon.com ([fe80::a00c:a6ac:280e:2ca7%3]) with mapi id
+ 15.02.1118.037; Fri, 13 Oct 2023 15:40:52 +0000
+From: "Mancini, Riccardo" <mancio@amazon.com>
+To: Gavin Shan <gshan@redhat.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Graf (AWS), Alexander"
+	<graf@amazon.de>, "Teragni, Matias" <mteragni@amazon.com>, "Batalov, Eugene"
+	<bataloe@amazon.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton
+	<oliver.upton@linux.dev>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	Paolo Bonzini <pbonzini@redhat.com>, "vkuznets@redhat.com"
+	<vkuznets@redhat.com>
+Subject: RE: Bug? Incompatible APF for 4.14 guest on 5.10 and later host
+Thread-Topic: Bug? Incompatible APF for 4.14 guest on 5.10 and later host
+Thread-Index: Adn94wvULB16boopSLqi0qjVGsqqjw==
+Date: Fri, 13 Oct 2023 15:40:52 +0000
+Message-ID: <51bec52172df4a0a8bd5486dee7c0c26@amazon.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [10.106.82.29]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZSlBOiebenPKXBY4@arm.com>
 
-On Fri, Oct 13, 2023 at 02:08:10PM +0100, Catalin Marinas wrote:
-
-[...]
-
-> Yes, we end up with mismatched aliases but they only matter if the VMM
-> also accesses the I/O range via its own mapping. So far I haven't seen
-> case that suggests this.
-> 
-> > > Things can go wrong but that's not because Device does anything better.
-> > > Given the RAS implementation, external aborts caused on Device memory
-> > > (e.g. wrong size access) is uncontainable. For Normal NC it can be
-> > > contained (I can dig out the reasoning behind this if you want, IIUC
-> > > something to do with not being able to cancel an already issued Device
-> > > access since such accesses don't allow speculation due to side-effects;
-> > > for Normal NC, it's just about the software not getting the data).
-> > 
-> > I really think these details belong in the commit message.
-> 
-> I guess another task for Lorenzo ;).
-
-I will do, I start wondering though whether this documentation belongs
-in this commit log only or at Documentation/arch/arm64 level (or both),
-I am pretty sure this thread can turn out quite useful as a reference
-(it is for me) if we manage to summarize it that would benefit
-everyone.
-
-Lorenzo
+PiBBZGRpbmcgTWFyYywgT2xpdmVyIGFuZCBrdm1hcm1AbGlzdHMubGludXguZGV2DQo+IA0KPiBJ
+IHRyaWVkIHRvIG1ha2UgdGhlIGZlYXR1cmUgYXZhaWxhYmxlIHRvIEFSTTY0IGxvbmcgdGltZSBh
+Z28sIGJ1dCB0aGUNCj4gZWZmb3J0cyB3ZXJlIGRpc2NvbnRpbnVlZCBhcyB0aGUgc2lnbmlmaWNh
+bnQgY29uY2VybiB3YXMgbm8gdXNlcnMNCj4gZGVtYW5kaW5nIGZvciBpdCBbMV0uDQo+IEl0J3Mg
+ZGVmaW5pdGVseSBleGNpdGluZyBuZXdzIHRvIGtub3cgaXQncyBhIGltcG9ydGFudCBmZWF0dXJl
+IHRvIEFXUy4gSQ0KPiBndWVzcyBpdCdzIHByb2JhYmx5IGFub3RoZXIgY2hhbmNlIHRvIHJlLWV2
+YWx1YXRlIHRoZSBmZWF0dXJlIGZvciBBUk02ND8NCj4gDQo+IFsxXSBodHRwczovL2xvcmUua2Vy
+bmVsLm9yZy9rdm1hcm0vODdpbG9xMm9rZS53bC1tYXpAa2VybmVsLm9yZy8NCj4gDQo+IEFzeW5j
+IFBGIG5lZWRzIHR3byBzaWduYWxzIHNlbnQgZnJvbSBob3N0IHRvIGd1ZXN0LCBTREVJIChTb2Z0
+d2FyZQ0KPiBEZWxlZ2F0ZWQgRXhjZXB0aW9uIEludGVyZmFjZSkgaXMgbGV2ZXJhZ2VkIGZvciB0
+aGF0LiBTbyB0aGVyZSB3ZXJlIHR3bw0KPiBzZXJpZXMgdG8gc3VwcG9ydCBTREVJIHZpcnR1YWxp
+emF0aW9uIFsxXSBhbmQgQXN5bmMgUEYgb24gQVJNNjQgWzJdLg0KPiANCj4gWzFdIGh0dHBzOi8v
+bG9yZS5rZXJuZWwub3JnL2t2bWFybS8yMDIyMDUyNzA4MDI1My4xNTYyNTM4LTEtDQo+IGdzaGFu
+QHJlZGhhdC5jb20vDQo+IFsyXSBodHRwczovL2xvcmUua2VybmVsLm9yZy9rdm1hcm0vMjAyMTA4
+MTUwMDU5NDcuODM2OTktMS0NCj4gZ3NoYW5AcmVkaGF0LmNvbS8NCg0KVGhhbmtzIGZvciBhbGwg
+dGhlIGluZm9ybWF0aW9uISBUaGlzIG1pZ2h0IGJlY29tZSB1c2VmdWwgaW4gdGhlIGZ1dHVyZSwN
+CndoZW4gd2UnbGwgZW5hYmxlIHRoaXMgZmVhdHVyZSBvbiBBUk0sIGdpdmVuIHRoZSBpbXByb3Zl
+bWVudHMgd2Ugc2F3IGluIHg4Ni4NCg0KPiANCj4gSSBnb3Qgc2V2ZXJhbCBxdWVzdGlvbnMgZm9y
+IE1hbmNpbmkgdG8gYW5zd2VyLCBoZWxwZnVsIHVuZGVyc3RhbmQgdGhlDQo+IHNpdHVhdGlvbiBi
+ZXR0ZXIuDQo+IA0KPiAtIFZNIHNoYXBzaG90IGlzIHN0b3JlZCBzb21ld2hlcmUgcmVtb3RlbHku
+IEl0IG1lYW5zIHRoZSBwYWdlIGZhdWx0IG9uDQo+ICAgIGluc3RydWN0aW9uIGZldGNoIGJlY29t
+ZXMgZXhwZW5zaXZlLiBEbyB3ZSBoYXZlIGJlbmNobWFya3MgaG93IG11Y2gNCj4gICAgYmVuZWZp
+dHMgYnJvdWdodCBieSBBc3luYyBQRiBvbiB4ODYgaW4gQVdTIGVudmlyb25tZW50Pw0KDQpJbiBv
+dXIgc21hbGwgbG9jYWwgcmVwcm8gKG9ubHkgbG9jYWwgZGlzayBhY2Nlc3MpIHdoaWNoIHJ1bnMg
+YSBKYXZhIGxvYWQgYWZ0ZXINCnJlc3VtZSBvZiB0aGUgRmlyZWNyYWNrZXIgVk0sIHdlIHNhdyBh
+IDIwJSBwZXJmb3JtYW5jZSByZWdyZXNzaW9uIChmcm9tIH44MG1zIA0KdG8gfjEwMG1zKSBhbmQg
+dGhlIHRpbWUgc3BlbnQgb3V0c2lkZSB0aGUgVk0gZHVlIHRvIEVQVF9WSU9MQVRJT04gaW5jcmVh
+c2VkIDN4IA0KZnJvbSAzMG1zIHRvIDkwbXMuIFRoaXMgaW1wYWN0IGlzIGFtcGxpZmllZCB3aGVu
+IGFjY2VzcyBpcyBub3QgbG9jYWwuDQoNCj4gDQo+IC0gSSdtIHdhbmRlcmluZyBpZiB0aGUgZGF0
+YSBjYW4gYmUgZmV0Y2hlZCBmcm9tIHNvbWV3aGVyZSByZW1vdGVseSBpbiBBV1MNCj4gICAgZW52
+aXJvbm1lbnQ/DQoNCldpdGhvdXQgZ2V0dGluZyBpbnRvIGRldGFpbHMsIHllcywgYW55IG1lbW9y
+eSBwYWdlIGNvdWxkIGJlIHJlbW90ZWx5IGFjY2Vzc2VkDQppbiB0aGUgd29yc3QgY2FzZS4NCg0K
+PiANCj4gLSBUaGUgZGF0YSBjYW4gYmUgc3RvcmVkIGluIGxvY2FsIERSQU0gb3Igc3dhcHBpbmcg
+c3BhY2UsIHRoZSBwYWdlIGZhdWx0DQo+ICAgIHRvIGZldGNoIGRhdGEgYmVjb21lcyBleHBlbnNp
+dmUgaWYgdGhlIGRhdGEgaXMgc3RvcmVkIGluIHN3YXBwaW5nDQo+IHNwYWNlLg0KPiAgICBJJ20g
+bm90IHN1cmUgaWYgaXQncyBwb3NzaWJsZSB0aGUgZGF0YSByZXNpZGVzIGluIHRoZSBzd2FwcGlu
+ZyBzcGFjZSBpbg0KPiAgICBBV1MgZW52aXJvbm1lbnQ/IE5vdGUgdGhhdCB0aGUgc3dhcHBpbmcg
+c3BhY2UsIGNvcnJlc3BvbmRpbmcgdG8gZGlzaywNCj4gICAgY291bGQgYmUgc29tZXdoZXJlIHJl
+bW90ZWx5IHNlYXRlZC4NCg0KSW4gb3VyIHVzYWdlLCBkdXJpbmcgcmVzdW1wdGlvbiBhbG1vc3Qg
+YWxsIHBhZ2VzIGFyZSBtaXNzaW5nIGFuZCBhcmUgcG9wdWxhdGVkDQpvbiBkZW1hbmQgd2l0aCBh
+IHVzZXJmYXVsdGZkLCBlaXRoZXIgZnJvbSBhIGxvY2FsIGNhY2hlIChtZW1vcnkgb3IgZGlzaykg
+b3INCmZyb20gdGhlIG5ldHdvcmsuDQoNClRoYW5rcywNClJpY2NhcmRvDQoNCj4gDQo+IFRoYW5r
+cywNCj4gR2F2aW4NCj4gDQoNCg==
