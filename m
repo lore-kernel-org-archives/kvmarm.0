@@ -1,123 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA7BB27732
-	for <kvmarm@lists.linux.dev>; Mon, 16 Oct 2023 14:28:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B3828E03
+	for <kvmarm@lists.linux.dev>; Mon, 16 Oct 2023 14:58:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e3iKccS0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5348C433C7;
-	Mon, 16 Oct 2023 14:28:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697466490;
-	bh=3K01tEUdT9I3mg9aM3A3JnKAihTz9I2kU7f1gQDE72M=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=e3iKccS0oRTh6l0OUiXTOCCxgUo75/bvJFDWj65wr/KU0QGgfeMvqlQPu8B3yRs4k
-	 X/bQyIlV/s7UQdriXmY2UPTiDQo7zssCm/J9+fTVS695s0M6FPZ7l1LlSkhZdkOssJ
-	 QaWhtWQAqSIk/PBi5RnPj46+KszRaa4a/m7TwJWwVEgP9PjP+URgb6U//tHDPGVJRy
-	 RRe8QwesdVbNEP0eWz6RJ3xtuykEWouhlYHPjbRPVkmxzl5CPQOsAG5V59kkI2iXOq
-	 Gq+gR0SU/v7r1m4KmujpqmdS8922UTVVbGXQ7ZN42Njm+oeVC0AX+jxcbMV3XROyso
-	 tRQYRMvCgIQOw==
-Received: from 82-132-232-177.dab.02.net ([82.132.232.177] helo=[127.0.0.1])
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qsOZj-004cge-Bu;
-	Mon, 16 Oct 2023 15:28:08 +0100
-Date: Mon, 16 Oct 2023 15:28:04 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Miguel Luis <miguel.luis@oracle.com>
-CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH=5D_KVM=3A_arm64=3A_Do_not_let_a_L?= =?US-ASCII?Q?1_hypervisor_access_the_*32=5FEL2_sysregs?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <41C20D2D-BA87-41C5-85BE-611EF53FB5DC@oracle.com>
-References: <20231013223311.3950585-1-maz@kernel.org> <41C20D2D-BA87-41C5-85BE-611EF53FB5DC@oracle.com>
-Message-ID: <1DFF1105-A2C0-4249-9F71-3C9636C8FBCE@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QiouING9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697468292;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Zp4vUunKfHhqsgxWB38XGElijdQA95U7BhovNf/a+1w=;
+	b=QiouING91ljjFwhgHV3LCpsiZUEhS/SXr6D7xq6tcSSST95m2SiIAG7yY6NzNeDQBdAPCH
+	p8t1MxEvTX2QrTMmTCtPNrWbnjdoAUct8KOQCfVF9+W4+76e6Wj4qaaaAbluLowyr+hjNH
+	uKWXud09LAwuTZjdSrdfYnjM1DAndak=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-358-8CAONUHTPuKYXaWfjG5ABA-1; Mon, 16 Oct 2023 10:58:09 -0400
+X-MC-Unique: 8CAONUHTPuKYXaWfjG5ABA-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7742eeceeacso587371985a.3
+        for <kvmarm@lists.linux.dev>; Mon, 16 Oct 2023 07:58:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697468289; x=1698073089;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zp4vUunKfHhqsgxWB38XGElijdQA95U7BhovNf/a+1w=;
+        b=SXK9Vmu0JvN+Dap94Zn/44BPOlN/t0EJBwNTt2Qvy1TXoMY1SYMgVPfP3YW1nr4274
+         YXFFr+OM+EQtIE/XT8RaiztyeuuyKZSQ1KR7llIKTSjd4O4MATQC+cUxFnIpmnbRwGny
+         /8BhvgccRGvvKXEf7AlpLbOFyO1lreqRNKpzOFBgS7UAJhH8kKg7v956qcUKbVAn2nJm
+         vbWECrj0OA7bpQmpAICXreqMxJWruhIXv0VJ+2HIQJ36EpZl3wVH62EHLeZhsw7ysW3Q
+         VrmyQw/8UVVF5H8RVLG+8NGbrLsSh6JPxnuqDLSjVKPYQkNhFmX/ZP9tYA04cMFP4N7P
+         ULwQ==
+X-Gm-Message-State: AOJu0YxNR+Ch3WNWMMekzWPK6BnacXtL9os2iiKz9cE1R2anFIT87Icw
+	kHFxsfLucMnkZTe7t8zmHIBw6XTpOO6AD11nitHSfGyXJivX8Nt4yATgYZ/4KyDGdACgKG/Ei95
+	5wmHqdToJMYiYlQzh
+X-Received: by 2002:a05:620a:2443:b0:775:6cf8:8da8 with SMTP id h3-20020a05620a244300b007756cf88da8mr43237643qkn.32.1697468289004;
+        Mon, 16 Oct 2023 07:58:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFH1XUPIq/8zsNJ+zGr1DyiPdmgqD5oy4QXhwY1W2dDZ9ifLTBchtdNCC4MzTOvWKif9UHV6Q==
+X-Received: by 2002:a05:620a:2443:b0:775:6cf8:8da8 with SMTP id h3-20020a05620a244300b007756cf88da8mr43237619qkn.32.1697468288730;
+        Mon, 16 Oct 2023 07:58:08 -0700 (PDT)
+Received: from [192.168.43.95] ([37.170.191.221])
+        by smtp.gmail.com with ESMTPSA id o23-20020a05620a111700b007671cfe8a18sm3051684qkk.13.2023.10.16.07.58.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Oct 2023 07:58:07 -0700 (PDT)
+Message-ID: <75297f46-d1d7-2519-cd76-8b6c2246dbb5@redhat.com>
+Date: Mon, 16 Oct 2023 16:58:02 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 82.132.232.177
-X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH] KVM: arm64: Do not let a L1 hypervisor access the *32_EL2
+ sysregs
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20231013223311.3950585-1-maz@kernel.org>
+From: Eric Auger <eauger@redhat.com>
+In-Reply-To: <20231013223311.3950585-1-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+Hi Marc,
 
+On 10/14/23 00:33, Marc Zyngier wrote:
+> DBGVCR32_EL2, DACR32_EL2, IFSR32_EL2 and FPEXC32_EL2 are required to
+> UNDEF when AArch32 isn't implemented, which is definitely the case when
+> running NV.
+> 
+> Given that this is the only case where these registers can trap,
+> unconditionally inject an UNDEF exception.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-On 16 October 2023 15:15:02 BST, Miguel Luis <miguel=2Eluis@oracle=2Ecom> =
-wrote:
->Hi Marc,
->
->> On 13 Oct 2023, at 22:33, Marc Zyngier <maz@kernel=2Eorg> wrote:
->>=20
->> DBGVCR32_EL2, DACR32_EL2, IFSR32_EL2 and FPEXC32_EL2 are required to
->> UNDEF when AArch32 isn't implemented, which is definitely the case when
->> running NV=2E
->>=20
->> Given that this is the only case where these registers can trap,
->> unconditionally inject an UNDEF exception=2E
->>=20
->> Signed-off-by: Marc Zyngier <maz@kernel=2Eorg>
->> ---
->> arch/arm64/kvm/sys_regs=2Ec | 8 ++++----
->> 1 file changed, 4 insertions(+), 4 deletions(-)
->>=20
->> diff --git a/arch/arm64/kvm/sys_regs=2Ec b/arch/arm64/kvm/sys_regs=2Ec
->> index 0afd6136e275=2E=2E0071ccccaf00 100644
->> --- a/arch/arm64/kvm/sys_regs=2Ec
->> +++ b/arch/arm64/kvm/sys_regs=2Ec
->> @@ -1961,7 +1961,7 @@ static const struct sys_reg_desc sys_reg_descs[] =
-=3D {
->> // DBGDTR[TR]X_EL0 share the same encoding
->> { SYS_DESC(SYS_DBGDTRTX_EL0), trap_raz_wi },
->>=20
->> - { SYS_DESC(SYS_DBGVCR32_EL2), NULL, reset_val, DBGVCR32_EL2, 0 },
->> + { SYS_DESC(SYS_DBGVCR32_EL2), trap_undef, reset_val, DBGVCR32_EL2, 0 =
-},
->>=20
->> { SYS_DESC(SYS_MPIDR_EL1), NULL, reset_mpidr, MPIDR_EL1 },
->>=20
->> @@ -2380,18 +2380,18 @@ static const struct sys_reg_desc sys_reg_descs[=
-] =3D {
->> EL2_REG(VTTBR_EL2, access_rw, reset_val, 0),
->> EL2_REG(VTCR_EL2, access_rw, reset_val, 0),
->>=20
->> - { SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
->> + { SYS_DESC(SYS_DACR32_EL2), trap_undef, reset_unknown, DACR32_EL2 },
->> EL2_REG(HDFGRTR_EL2, access_rw, reset_val, 0),
->> EL2_REG(HDFGWTR_EL2, access_rw, reset_val, 0),
->> EL2_REG(SPSR_EL2, access_rw, reset_val, 0),
->> EL2_REG(ELR_EL2, access_rw, reset_val, 0),
->> { SYS_DESC(SYS_SP_EL1), access_sp_el1},
->>=20
->> - { SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
->> + { SYS_DESC(SYS_IFSR32_EL2), trap_undef, reset_unknown, IFSR32_EL2 },
->> EL2_REG(AFSR0_EL2, access_rw, reset_val, 0),
->> EL2_REG(AFSR1_EL2, access_rw, reset_val, 0),
->> EL2_REG(ESR_EL2, access_rw, reset_val, 0),
->> - { SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x700 },
->> + { SYS_DESC(SYS_FPEXC32_EL2), trap_undef, reset_val, FPEXC32_EL2, 0x70=
-0 },
->>=20
->
->Should SDER32_EL2 be considered to this same list?
->
+Eric
 
-This wouldn't make much sense=2E
+> ---
+>  arch/arm64/kvm/sys_regs.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 0afd6136e275..0071ccccaf00 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1961,7 +1961,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	// DBGDTR[TR]X_EL0 share the same encoding
+>  	{ SYS_DESC(SYS_DBGDTRTX_EL0), trap_raz_wi },
+>  
+> -	{ SYS_DESC(SYS_DBGVCR32_EL2), NULL, reset_val, DBGVCR32_EL2, 0 },
+> +	{ SYS_DESC(SYS_DBGVCR32_EL2), trap_undef, reset_val, DBGVCR32_EL2, 0 },
+>  
+>  	{ SYS_DESC(SYS_MPIDR_EL1), NULL, reset_mpidr, MPIDR_EL1 },
+>  
+> @@ -2380,18 +2380,18 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	EL2_REG(VTTBR_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(VTCR_EL2, access_rw, reset_val, 0),
+>  
+> -	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
+> +	{ SYS_DESC(SYS_DACR32_EL2), trap_undef, reset_unknown, DACR32_EL2 },
+>  	EL2_REG(HDFGRTR_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(HDFGWTR_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(SPSR_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(ELR_EL2, access_rw, reset_val, 0),
+>  	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
+>  
+> -	{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
+> +	{ SYS_DESC(SYS_IFSR32_EL2), trap_undef, reset_unknown, IFSR32_EL2 },
+>  	EL2_REG(AFSR0_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(AFSR1_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(ESR_EL2, access_rw, reset_val, 0),
+> -	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x700 },
+> +	{ SYS_DESC(SYS_FPEXC32_EL2), trap_undef, reset_val, FPEXC32_EL2, 0x700 },
+>  
+>  	EL2_REG(FAR_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(HPFAR_EL2, access_rw, reset_val, 0),
 
-This register is only available when running in secure mode, and KVM is fi=
-rmly non-secure=2E
-
-Thanks,
-
-        M=2E
-
-Jazz is not dead, it just smells funny
