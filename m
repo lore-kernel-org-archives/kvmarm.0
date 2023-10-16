@@ -1,92 +1,146 @@
-Received: from out-201.mta0.migadu.com (out-201.mta0.migadu.com [91.218.175.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5427029425
-	for <kvmarm@lists.linux.dev>; Mon, 16 Oct 2023 19:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22A229425
+	for <kvmarm@lists.linux.dev>; Mon, 16 Oct 2023 19:14:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pRUczDuU"
-Date: Mon, 16 Oct 2023 19:07:41 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1697483267;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pILx/2lrkDmB5qBrw02D6T3Y8qSsKRYkqLY+DvWzLoY=;
-	b=pRUczDuUT5JWBO3E5Y3ZUUZr1EtHR9nWgiI6KG2m2FY6oPHNB3nTbdBa4jUTmfv6hIMknz
-	WDnYZ3ydr4bKo6NcvV6DaBNob93UWogZ17Pt0MOFqGf6iQuOn2zG+bkVlNmMn8hWM8IHru
-	x3svYa2N2piyzNpiJpqexgNL2LG5qUY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Sebastian Ott <sebott@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	Reiji Watanabe <reijiw@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v7 10/12] KVM: selftests: aarch64: Introduce
- vpmu_counter_access test
-Message-ID: <ZS2J_QbL0zYcsPhG@linux.dev>
-References: <20231009230858.3444834-1-rananta@google.com>
- <20231009230858.3444834-11-rananta@google.com>
- <44608d30-c97a-c725-e8b2-0c5a81440869@redhat.com>
- <65b8bbdb-2187-3c85-0e5d-24befcf01333@redhat.com>
- <CAJHc60zPc6eM+t7pOM19aKbf_9cMvj_LnPnG1EO35=EP0jG+Tg@mail.gmail.com>
- <ZS2HTdhFO2aywPpe@linux.dev>
- <CAJHc60xFwcDu6e6GTY3WYowBxnbkCWU-EgwEOVGd4Qu5F_h10A@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CTUuPYhN"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5a7b10c488cso75349977b3.2
+        for <kvmarm@lists.linux.dev>; Mon, 16 Oct 2023 12:14:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697483675; x=1698088475; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Urt752QAUTG+QLCfz+VOUbWX9PJy66chHqheNOJce0Q=;
+        b=CTUuPYhNUd2iKR4k+vf/vUDV3z2mIp4sD3OcOtiVvGZfbsr/uxTWFqRigvbYqzN/KH
+         /29AWOj7d+LBkzwg2IJy++AdnNZBPaBHEMZCOSa2MtQ+q/UrHUdZ7eXj6+H1cKpqXxaO
+         IcsC+YEJra/h/PQy5usQGhFkyQd4zcCbxtB4YSxiuwX1pEIUmVO4quU0vRwi3ndCj+vT
+         enXsa0ZEvp1fJqOlaghulDb4RJhUcTdw7nPyA7IeFfaC7K134Ge/ZbbcjHdsCmalmEJ1
+         OkZCjNcrDGuJWfC1+72qrK5BL/IWVbJQApL7WXidvZc5ngvd/KiQt/YqahXRq5serODG
+         RpSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697483675; x=1698088475;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Urt752QAUTG+QLCfz+VOUbWX9PJy66chHqheNOJce0Q=;
+        b=dkvFGoVIBf7aFddZDfLyQH5s8KQxoy7z9FslhTUAxlqkKsMfxn9z5gBybxTaeWpd/X
+         OdXRZPwLZaZJD3PrITjotmRyv5wmY0OKN/dqVPUNxUjmvEPl1H27H00c9s5YjwYSXyau
+         WMNGgtUBtbR07zKbpKrTVSbP/IFNQItdLqk23UL6RoT67QOPk3JzPNPAz9H+5Pi8T5pV
+         yKlqbOc2kC6PViNCutIjbXvol5g85cc3PhLW8TLgMyFRBuSMLizt74eo0a3ghFQoN32c
+         zYtbN/Knb79KJG0Qeb4hOyWuTb4MJTybYLYgGBMvwklWSK0leKcN3w/3iXaKhsqukY7E
+         VCng==
+X-Gm-Message-State: AOJu0YxmSveKkNj5lQVofsXLeaekTOBqUp6nOoX4hHr6B2w4spOX9ZkA
+	wzmqShQoFJq4RS2x71UgoJeM0ugCjxA=
+X-Google-Smtp-Source: AGHT+IFuvny0MZNa7a9RUY8XH9UIYONJrj/oxI+S+CEVGHd5ENG2Wt9KYaXY5plpQtr+z5nMfo9Et8ZO5gQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:58c3:0:b0:d9b:dae4:4987 with SMTP id
+ m186-20020a2558c3000000b00d9bdae44987mr78248ybb.3.1697483674889; Mon, 16 Oct
+ 2023 12:14:34 -0700 (PDT)
+Date: Mon, 16 Oct 2023 12:14:33 -0700
+In-Reply-To: <CALzav=fX+cCXQBXhxvRx0KZvHP=GdbP88Kvk9pnx=Ndsf9awEw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJHc60xFwcDu6e6GTY3WYowBxnbkCWU-EgwEOVGd4Qu5F_h10A@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-5-amoorthy@google.com>
+ <CALzav=crDptzFeAoyLrAekp--mM3Y7mFcPMW5W3YdPctkS6YUQ@mail.gmail.com>
+ <ZSXg2CjvVb0ugikT@google.com> <CALzav=fX+cCXQBXhxvRx0KZvHP=GdbP88Kvk9pnx=Ndsf9awEw@mail.gmail.com>
+Message-ID: <ZS2LmY4BnOM8vP2C@google.com>
+Subject: Re: [PATCH v5 04/17] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+From: Sean Christopherson <seanjc@google.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Anish Moorthy <amoorthy@google.com>, oliver.upton@linux.dev, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	robert.hoo.linux@gmail.com, jthoughton@google.com, ricarkol@google.com, 
+	axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com, 
+	isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 16, 2023 at 12:05:16PM -0700, Raghavendra Rao Ananta wrote:
-> On Mon, Oct 16, 2023 at 11:56 AM Oliver Upton <oliver.upton@linux.dev> wrote:
+On Mon, Oct 16, 2023, David Matlack wrote:
+> On Tue, Oct 10, 2023 at 4:40=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
 > >
-> > On Fri, Oct 13, 2023 at 02:05:29PM -0700, Raghavendra Rao Ananta wrote:
-> > > Oliver,
+> > On Tue, Oct 10, 2023, David Matlack wrote:
+> > > On Fri, Sep 8, 2023 at 3:30=E2=80=AFPM Anish Moorthy <amoorthy@google=
+.com> wrote:
+> > > >
+> > > > +::
+> > > > +       union {
+> > > > +               /* KVM_SPEC_EXIT_MEMORY_FAULT */
+> > > > +               struct {
+> > > > +                       __u64 flags;
+> > > > +                       __u64 gpa;
+> > > > +                       __u64 len; /* in bytes */
 > > >
-> > > Aren't the selftest patches from the 'Enable writable ID regs' series
-> > > [1] merged into kvmarm/next? Looking at the log, I couldn't find them
-> > > and the last patch that went from the series was [2]. Am I missing
-> > > something?
+> > > I wonder if `gpa` and `len` should just be replaced with `gfn`.
 > > >
-> > > Thank you.
-> > > Raghavendra
-> > >
-> > > [1]: https://lore.kernel.org/all/169644154288.3677537.15121340860793882283.b4-ty@linux.dev/
-> > > [2]: https://lore.kernel.org/all/20231003230408.3405722-11-oliver.upton@linux.dev/
+> > > - We don't seem to care about returning an exact `gpa` out to
+> > > userspace since this series just returns gpa =3D gfn * PAGE_SIZE out =
+to
+> > > userspace.
+> > > - The len we return seems kind of arbitrary. PAGE_SIZE on x86 and
+> > > vma_pagesize on ARM64. But at the end of the day we're not asking the
+> > > kernel to fault in any specific length of mapping. We're just asking
+> > > for gfn-to-pfn for a specific gfn.
+> > > - I'm not sure userspace will want to do anything with this informati=
+on.
 > >
-> > This is intentional, updating the tools headers as it was done in the
-> > original series broke the perftool build. I backed out the selftest
-> > patches, but took the rest of the kernel changes into kvmarm/next so
-> > they could soak while we sort out the selftests mess. Hopefully we can
-> > get the fix reviewed in time [*]...
+> > Extending ABI is tricky.  E.g. if a use case comes along that needs/wan=
+ts to
+> > return a range, then we'd need to add a flag and also update userspace =
+to actually
+> > do the right thing.
 > >
-> > [*] https://lore.kernel.org/kvmarm/20231011195740.3349631-1-oliver.upton@linux.dev/
-> >
-> > --
-> Ah, I see. In that case, since it impacts this series, do you want me
-> to rebase my series on top of your selftests series for v8?
+> > The page fault path doesn't need such information because hardware give=
+s a very
+> > precise faulting address.  But if we ever get to a point where KVM prov=
+ides info
+> > for uaccess failures, then we'll likely want to provide the range.  E.g=
+. if a
+> > uaccess splits a page, on x86, we'd either need to register our own exc=
+eption
+> > fixup and use custom uaccess macros (eww), or convice the world that ex=
+tending
+> > ex_handler_uaccess() and all of the uaccess macros that they need to pr=
+ovide the
+> > exact address that failed.
+>=20
+> I wonder if userspace might need a precise fault address in some
+> situations? e.g. If KVM returns -HWPOISON for an access that spans a
+> page boundary, userspace won't know which is poisoned.
 
-No, please keep the two independent for now. I can fix it up when
-applying the series.
+As things currently stand, the -EHWPOISON case is guaranteed to be precise =
+because
+uaccess failures only ever return -EFAULT.  The resulting BUS_MCEERR_AR fro=
+m the
+kernel's #MC handler will provide the necessary precision to userspace.
 
--- 
-Thanks,
-Oliver
+Though even if -EHWPOISON were imprecise, userspace should be able to figur=
+e out
+which page is poisoned, e.g. by probing each possible page (gross, but doab=
+le).
+
+Ah, and a much more concrete reason to report gpa+len is that it's possible=
+ that
+KVM may someday support faults at sub-page granularity, e.g. if something l=
+ike
+HEKI[*] wants to use Intel's Sub-Page Write Permissions to make a minimal a=
+mount
+of guest code writable when the guest kernel is doing code patching.
+
+> Maybe SNP/TDX need precise fault addresses as well? I don't know enough a=
+bout
+> how SNP and TDX plan to use this UAPI.
+
+FWIW, SNP and TDX usage are limited to the KVM page fault path, i.e. always=
+ do
+precise, single-page reporting.
+
+[*] https://lore.kernel.org/all/20230505152046.6575-1-mic@digikod.net
