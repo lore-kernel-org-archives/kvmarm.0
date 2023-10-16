@@ -1,108 +1,123 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2016129418
-	for <kvmarm@lists.linux.dev>; Mon, 16 Oct 2023 15:30:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B05A273EB
+	for <kvmarm@lists.linux.dev>; Mon, 16 Oct 2023 17:07:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ABWAmiVe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697470218;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CRf3fYGKsTrlOhUDvR5Nm0aYucqIml+Eu+5HAJHgZQY=;
-	b=ABWAmiVe3cAqGGRNprZnJHipIwlTRv2mkDzw0mLF2T/XpJcNXRpcYDq1KrW1c2i3IZZODA
-	pEwJttyLr9bJwVWDKv8vCSqxMc/1pGtxRs6VJsasrGQqWj9xS3QFWV9ESRl/XZWZbwik6K
-	6d7zFDTtO0VSVkpnv76Y5z7k91gA4RI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-459-5rnxzrkYOMSSC8X6SHVcYg-1; Mon, 16 Oct 2023 11:30:16 -0400
-X-MC-Unique: 5rnxzrkYOMSSC8X6SHVcYg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7A50881B15E;
-	Mon, 16 Oct 2023 15:30:15 +0000 (UTC)
-Received: from localhost (unknown [10.39.195.34])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7448B492BFA;
-	Mon, 16 Oct 2023 15:30:12 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-perf-users@vger.kernel.org, Mark Brown <broonie@kernel.org>, Jing
- Zhang <jingzhangos@google.com>, Zenghui Yu <yuzenghui@huawei.com>, Suzuki
- K Poulose <suzuki.poulose@arm.com>, James Morse <james.morse@arm.com>,
- Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Adrian
- Hunter <adrian.hunter@intel.com>, Ian Rogers <irogers@google.com>,
- Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>, Mark Rutland
- <mark.rutland@arm.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, Ingo
- Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Oliver
- Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v3 5/5] KVM: arm64: selftests: Test for setting ID
- register from usersapce
-In-Reply-To: <20231011195740.3349631-6-oliver.upton@linux.dev>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Michael O'Neill, Amy
- Ross"
-References: <20231011195740.3349631-1-oliver.upton@linux.dev>
- <20231011195740.3349631-6-oliver.upton@linux.dev>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date: Mon, 16 Oct 2023 17:30:06 +0200
-Message-ID: <87fs2aegap.fsf@redhat.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SXEDHdvl"
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3296b3f03e5so4126975f8f.2
+        for <kvmarm@lists.linux.dev>; Mon, 16 Oct 2023 10:07:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697476062; x=1698080862; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0+zQrYEvXnLCHkkOB8VHblH7XpBcPGsp++uxmjtzIDQ=;
+        b=SXEDHdvl+NijqeZZrBG1BikgjOcKQ/bKLBM9WyaA/10gJastPKrMBglcSgXS48mMLH
+         pItLBmRUEmKS4bDIHjh889km6hfvXakGbmwX5aP8+xW2USllpQcjejr4HfPNHqxgPd6y
+         ZlTLhdf12K+UmBKDx/g48hcfSaEy9+sJbxRqKZsVG6936U1fqKfNUSY5mMennaSAIjkZ
+         E0WaiCVl99nEgYWU4bbTbVJtUSUdZwo3Kw4gxs4v4j8V5msGE2uWpMvrVYjts4JkpDio
+         73ay31yW8T8degf/KoU8kbHDA5rBNlQk6tObYwbIJGYTymftBnb/+gV3Iy80T6Li8jFW
+         WAiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697476062; x=1698080862;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0+zQrYEvXnLCHkkOB8VHblH7XpBcPGsp++uxmjtzIDQ=;
+        b=X8s7hp4jS9+aBQsoHuaR/nn6xnXcDK7Hn28tJaqmXMH5FfFe+2drtNCHSi3LCtfNdd
+         okAsjnk7o6oS+h2FXb/Q0Peicm9j0+Hhb0apm6oKL/lxjujxN4JcvUSl2a6FBGsQlKzV
+         hSgeHoD2k27u3HTUEuZuFTkrweG+U2f+ayaYrjPL6KVEyvQqwNdtj02b1ncdlvhjgv0W
+         lOrFES1MzlA2yVDiaTTTunp6AB/1e9ZSXmURS5vBC39BQTTGEQcq4B2cuZhQquQzRbOF
+         Gzcj1a+1n3w7U1ON6JG3LF4zelT8axakDErP59Jqbwe27MpjiU9lEEIurCb6FDKvn9Oc
+         OfSQ==
+X-Gm-Message-State: AOJu0YzxYiql9FTAGPxlKJbChdyiR75kNP1dQg/P9keS+gw0jicR2Kd3
+	lRz1xK45JREAorzdyWXOsAUanOB07Gc+9IP9ac9xmw==
+X-Google-Smtp-Source: AGHT+IFK6RKBNEvODd5aHPnTEVKQvQycQVUxoXfxKTVAtpxKSS6i088tsqV/S0xtwtYtI9wGd7+5xo/c/eRvSQ8KRHg=
+X-Received: by 2002:a5d:5247:0:b0:32d:9585:8680 with SMTP id
+ k7-20020a5d5247000000b0032d95858680mr36710wrc.4.1697476062129; Mon, 16 Oct
+ 2023 10:07:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-5-amoorthy@google.com>
+ <CALzav=crDptzFeAoyLrAekp--mM3Y7mFcPMW5W3YdPctkS6YUQ@mail.gmail.com> <ZSXg2CjvVb0ugikT@google.com>
+In-Reply-To: <ZSXg2CjvVb0ugikT@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Mon, 16 Oct 2023 10:07:12 -0700
+Message-ID: <CALzav=fX+cCXQBXhxvRx0KZvHP=GdbP88Kvk9pnx=Ndsf9awEw@mail.gmail.com>
+Subject: Re: [PATCH v5 04/17] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+To: Sean Christopherson <seanjc@google.com>
+Cc: Anish Moorthy <amoorthy@google.com>, oliver.upton@linux.dev, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	robert.hoo.linux@gmail.com, jthoughton@google.com, ricarkol@google.com, 
+	axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com, 
+	isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 11 2023, Oliver Upton <oliver.upton@linux.dev> wrote:
-
-> From: Jing Zhang <jingzhangos@google.com>
+On Tue, Oct 10, 2023 at 4:40=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
 >
-> Add tests to verify setting ID registers from userspace is handled
-> correctly by KVM. Also add a test case to use ioctl
-> KVM_ARM_GET_REG_WRITABLE_MASKS to get writable masks.
+> On Tue, Oct 10, 2023, David Matlack wrote:
+> > On Fri, Sep 8, 2023 at 3:30=E2=80=AFPM Anish Moorthy <amoorthy@google.c=
+om> wrote:
+> > >
+> > > +::
+> > > +       union {
+> > > +               /* KVM_SPEC_EXIT_MEMORY_FAULT */
+> > > +               struct {
+> > > +                       __u64 flags;
+> > > +                       __u64 gpa;
+> > > +                       __u64 len; /* in bytes */
+> >
+> > I wonder if `gpa` and `len` should just be replaced with `gfn`.
+> >
+> > - We don't seem to care about returning an exact `gpa` out to
+> > userspace since this series just returns gpa =3D gfn * PAGE_SIZE out to
+> > userspace.
+> > - The len we return seems kind of arbitrary. PAGE_SIZE on x86 and
+> > vma_pagesize on ARM64. But at the end of the day we're not asking the
+> > kernel to fault in any specific length of mapping. We're just asking
+> > for gfn-to-pfn for a specific gfn.
+> > - I'm not sure userspace will want to do anything with this information=
+.
 >
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/aarch64/set_id_regs.c       | 479 ++++++++++++++++++
->  2 files changed, 480 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
+> Extending ABI is tricky.  E.g. if a use case comes along that needs/wants=
+ to
+> return a range, then we'd need to add a flag and also update userspace to=
+ actually
+> do the right thing.
+>
+> The page fault path doesn't need such information because hardware gives =
+a very
+> precise faulting address.  But if we ever get to a point where KVM provid=
+es info
+> for uaccess failures, then we'll likely want to provide the range.  E.g. =
+if a
+> uaccess splits a page, on x86, we'd either need to register our own excep=
+tion
+> fixup and use custom uaccess macros (eww), or convice the world that exte=
+nding
+> ex_handler_uaccess() and all of the uaccess macros that they need to prov=
+ide the
+> exact address that failed.
 
-(...)
+I wonder if userspace might need a precise fault address in some
+situations? e.g. If KVM returns -HWPOISON for an access that spans a
+page boundary, userspace won't know which is poisoned. Maybe SNP/TDX
+need precise fault addresses as well? I don't know enough about how
+SNP and TDX plan to use this UAPI.
 
-> +static void test_user_set_reg(struct kvm_vcpu *vcpu, bool aarch64_only)
-> +{
-> +	uint64_t masks[KVM_ARM_FEATURE_ID_RANGE_SIZE];
-> +	struct reg_mask_range range = {
-> +		.addr = (__u64)masks,
-> +	};
-> +	int ret;
-> +
-> +	/* KVM should return error when reserved field is not zero */
-> +	range.reserved[0] = 1;
-> +	ret = __vm_ioctl(vcpu->vm, KVM_ARM_GET_REG_WRITABLE_MASKS, &range);
-> +	TEST_ASSERT(ret, "KVM doesn't check invalid parameters.");
 
-I think the code should first check for
-KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES -- newer kselftests are supposed
-to be able to run on older kernels, and we should just skip all of this
-if the API isn't there.
-
-> +
-> +	/* Get writable masks for feature ID registers */
-> +	memset(range.reserved, 0, sizeof(range.reserved));
-> +	vm_ioctl(vcpu->vm, KVM_ARM_GET_REG_WRITABLE_MASKS, &range);
-
+>
+> And for SNP and TDX, I believe the range will be used when the guest uses=
+ a
+> hardware-vendor-defined hypercall to request conversions between private =
+and
+> shared.  Or maybe the plan is to funnel those into KVM_HC_MAP_GPA_RANGE?
