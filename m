@@ -1,251 +1,157 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC861CFAD
-	for <kvmarm@lists.linux.dev>; Mon, 16 Oct 2023 09:54:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70391CF8D
+	for <kvmarm@lists.linux.dev>; Mon, 16 Oct 2023 10:02:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XiFwCBCP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YWhzyIOy"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697450091;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	s=mimecast20190719; t=1697450519;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=n0jE8MAcqywJFlB1trMu8LPmdKPf81U9Nw3AO9okGcQ=;
-	b=XiFwCBCPb4PXO/L6IOx53orXzis3aHFQyGmiAKrQoJlgGsFsX9bdD+B6V4Pili4MAgZ6bN
-	M561abiz0L139m1ZGn71QWyfIv2jID7DF4MQFviCBjf+oL/KWv7X2bJV93qPQdgPEy3l3J
-	Aogb+uSKHXFZQSVxsmwvjSkPISXdPYY=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=OuEOcL2qbq7eVck3MGPHSrjZwbWdqBjY6QVxzyLw4GU=;
+	b=YWhzyIOyznHlzGi6dGO2tbwOABUoXe3f16LczUs2FPmBmf+Qmc79+Xyxwgpc5GIyQ0ftu8
+	04i7X8r2I4xrRZm9B262/A60ak7Jh1SqWXckJ+fBiPEB/qTFghdPvzHoS5xzM66rlHqNU8
+	KlebEUhE3C7Fo2RI7/t6TxZSBBxs5vw=
+Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
+ [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-593--5uF2bzdPO-82tAV30_LBg-1; Mon, 16 Oct 2023 05:54:49 -0400
-X-MC-Unique: -5uF2bzdPO-82tAV30_LBg-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7740c35073bso542161485a.3
-        for <kvmarm@lists.linux.dev>; Mon, 16 Oct 2023 02:54:49 -0700 (PDT)
+ us-mta-240-5aJ3B6smOeC2f36hGdQYKA-1; Mon, 16 Oct 2023 06:01:53 -0400
+X-MC-Unique: 5aJ3B6smOeC2f36hGdQYKA-1
+Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-457c7e76d30so1212847137.1
+        for <kvmarm@lists.linux.dev>; Mon, 16 Oct 2023 03:01:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697450089; x=1698054889;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=n0jE8MAcqywJFlB1trMu8LPmdKPf81U9Nw3AO9okGcQ=;
-        b=T82cyKdeaYAe0vrNLycdO2kXh3YEiANQF+3ll8xXroibceS8yNtI+/gD7Q8YUrnnIY
-         fZR9DsDxGHOHXWSI5pxM1wzmzwkKPBx47QRxBsHVGs0cwlRFadXUyWCgYdwLosMICRhv
-         Ts0oiY5lrL3Zv5ZfQHhv/YFBou4xZfFsXYIiFJMmsVw3wKec0vWOqs6GDVxYRvyfsJch
-         xgOadH1Ile2gK5Xd5mdr+toCgb7X8zPSS/dG/e0GIz87MkQOQ6fULkL0ipMqCDV7kUiz
-         zwaRgWGrwsEQdI4VXwRRjyaWQx9rumHAIYjfZ1foorJxNApapz+lp6nh0xEvO2l4eVBn
-         I4Qg==
-X-Gm-Message-State: AOJu0YyOelvsmTH89rwtT1vmBBXNRKasRSx5kpv7MpGgNVpN5FBm7seG
-	3P0Yuxrlmt7uzOajsZoxe6eJbuTgvrmONkHiqV3jIRlbejrVKTy83aQvpRw2bUNhc/iJ5fmQx2i
-	oju9IfQ0feSlEzVh4
-X-Received: by 2002:a05:620a:2885:b0:76d:bc1b:c491 with SMTP id j5-20020a05620a288500b0076dbc1bc491mr36613442qkp.14.1697450089415;
-        Mon, 16 Oct 2023 02:54:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHera92CisFmHnwAu7Oxn3Cd+9Ukc/Ecqin7fRG2h5uJVMp61qGtVvfoOcqM0b7EG/MpKN+3w==
-X-Received: by 2002:a05:620a:2885:b0:76d:bc1b:c491 with SMTP id j5-20020a05620a288500b0076dbc1bc491mr36613424qkp.14.1697450089132;
-        Mon, 16 Oct 2023 02:54:49 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id h4-20020a37de04000000b007659935ce64sm2845228qkj.71.2023.10.16.02.54.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Oct 2023 02:54:48 -0700 (PDT)
-Message-ID: <72b67c49-423a-e88a-62c9-6b3cc9211f88@redhat.com>
-Date: Mon, 16 Oct 2023 11:54:44 +0200
+        d=1e100.net; s=20230601; t=1697450512; x=1698055312;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7Rvdf5GF7NssmVrOVN5fIpBg7Q/eJJlAGQ4ASt6ni/o=;
+        b=IpDcxGF3mZvHLUyVIMXehPzKSOtpKcwXBTlSft9CZ3N0HME1CtAagciHRxSfApouJe
+         7m1vL4UvVHthnBcUckJgUI31GyNgGexqFRJINFPNqcFz/+NSxRTLc8VLpaJw6ze3k6Pl
+         i4G5wm9kRPhq4esUiuOGaD1c8CWP4qW8bhSFkUJ5Zaj1CB4iioa6b3LVRAd3//Fsx3nF
+         hj/43glcLMoJ/aNtlDzVXRpvnWQJKgFYzawe6ovoUVaKylMa5yIzp6S9y8LjOImGZd0h
+         jvh/54o4E+bjuTqjcgLhDc4cFeRooMGWG6zJFQ/mCbpRsqxovolJupwUAwtEmBbLGwa6
+         4UPA==
+X-Gm-Message-State: AOJu0YxpTJFbDElvIFJuhVEa7UmyIY5UpEafc3Pj82s037zL+4dF735T
+	PdF+p4cU2DPPXROkHJWcNbk0QQvS8XMFxQ1xmqWKeVb+WW5cK2FkERBzmMY66sv5NVzb/fqefQD
+	E+BGbioQcVY0UXf0T
+X-Received: by 2002:a05:6102:1250:b0:458:16ac:bcad with SMTP id p16-20020a056102125000b0045816acbcadmr77253vsg.32.1697450512552;
+        Mon, 16 Oct 2023 03:01:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH6harqCGifXrM0+4AN5WIM0FRUrWBf8RWML7HaIo1VltVJ/nTSF6hWksPJbMyBcx5ZRlWB+Q==
+X-Received: by 2002:a05:6102:1250:b0:458:16ac:bcad with SMTP id p16-20020a056102125000b0045816acbcadmr77235vsg.32.1697450512287;
+        Mon, 16 Oct 2023 03:01:52 -0700 (PDT)
+Received: from rh (p200300c93f0047001ec25c15da4a4a7b.dip0.t-ipconnect.de. [2003:c9:3f00:4700:1ec2:5c15:da4a:4a7b])
+        by smtp.gmail.com with ESMTPSA id h4-20020ac87444000000b004179e79069asm2890615qtr.21.2023.10.16.03.01.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Oct 2023 03:01:52 -0700 (PDT)
+Date: Mon, 16 Oct 2023 12:01:48 +0200 (CEST)
+From: Sebastian Ott <sebott@redhat.com>
+To: Raghavendra Rao Ananta <rananta@google.com>
+cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
+    Alexandru Elisei <alexandru.elisei@arm.com>, 
+    James Morse <james.morse@arm.com>, 
+    Suzuki K Poulose <suzuki.poulose@arm.com>, 
+    Paolo Bonzini <pbonzini@redhat.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+    Shaoqin Huang <shahuang@redhat.com>, Jing Zhang <jingzhangos@google.com>, 
+    Reiji Watanabe <reijiw@google.com>, Colton Lewis <coltonlewis@google.com>, 
+    linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+    linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v7 10/12] KVM: selftests: aarch64: Introduce vpmu_counter_access
+ test
+In-Reply-To: <CAJHc60zPc6eM+t7pOM19aKbf_9cMvj_LnPnG1EO35=EP0jG+Tg@mail.gmail.com>
+Message-ID: <2714abd6-40a4-17f8-e997-843bc69d9319@redhat.com>
+References: <20231009230858.3444834-1-rananta@google.com> <20231009230858.3444834-11-rananta@google.com> <44608d30-c97a-c725-e8b2-0c5a81440869@redhat.com> <65b8bbdb-2187-3c85-0e5d-24befcf01333@redhat.com>
+ <CAJHc60zPc6eM+t7pOM19aKbf_9cMvj_LnPnG1EO35=EP0jG+Tg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v3 3/3] arm64/kvm: Fine grain _EL2 system registers list
- that affect nested virtualization
-To: Miguel Luis <miguel.luis@oracle.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Jing Zhang <jingzhangos@google.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-References: <20231011180103.91774-1-miguel.luis@oracle.com>
- <20231011180103.91774-4-miguel.luis@oracle.com>
- <7df53e6b-9141-de85-b7a3-b9eb092ef7b4@redhat.com>
- <9D159B58-D336-4560-AF6A-294D910CF775@oracle.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <9D159B58-D336-4560-AF6A-294D910CF775@oracle.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/mixed; boundary="-1463795790-956281928-1697450511=:6267"
 
-Hi Miguel,
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+---1463795790-956281928-1697450511=:6267
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8BIT
 
-On 10/13/23 20:41, Miguel Luis wrote:
-> Hi Eric,
->
->> On 12 Oct 2023, at 15:22, Eric Auger <eric.auger@redhat.com> wrote:
+On Fri, 13 Oct 2023, Raghavendra Rao Ananta wrote:
+> On Thu, Oct 12, 2023 at 8:02 AM Sebastian Ott <sebott@redhat.com> wrote:
 >>
->> Hi Miguel,
->>
->> On 10/11/23 20:01, Miguel Luis wrote:
->>> Implement a fine grained approach in the _EL2 sysreg ranges.
+>> On Thu, 12 Oct 2023, Sebastian Ott wrote:
+>>> On Mon, 9 Oct 2023, Raghavendra Rao Ananta wrote:
+>>>>  +/* Create a VM that has one vCPU with PMUv3 configured. */
+>>>>  +static void create_vpmu_vm(void *guest_code)
+>>>>  +{
+>>>>  +   struct kvm_vcpu_init init;
+>>>>  +   uint8_t pmuver, ec;
+>>>>  +   uint64_t dfr0, irq = 23;
+>>>>  +   struct kvm_device_attr irq_attr = {
+>>>>  +           .group = KVM_ARM_VCPU_PMU_V3_CTRL,
+>>>>  +           .attr = KVM_ARM_VCPU_PMU_V3_IRQ,
+>>>>  +           .addr = (uint64_t)&irq,
+>>>>  +   };
+>>>>  +   struct kvm_device_attr init_attr = {
+>>>>  +           .group = KVM_ARM_VCPU_PMU_V3_CTRL,
+>>>>  +           .attr = KVM_ARM_VCPU_PMU_V3_INIT,
+>>>>  +   };
+>>>>  +
+>>>>  +   /* The test creates the vpmu_vm multiple times. Ensure a clean state
+>>>>  */
+>>>>  +   memset(&vpmu_vm, 0, sizeof(vpmu_vm));
+>>>>  +
+>>>>  +   vpmu_vm.vm = vm_create(1);
+>>>>  +   vm_init_descriptor_tables(vpmu_vm.vm);
+>>>>  +   for (ec = 0; ec < ESR_EC_NUM; ec++) {
+>>>>  +           vm_install_sync_handler(vpmu_vm.vm, VECTOR_SYNC_CURRENT, ec,
+>>>>  +                                   guest_sync_handler);
+>>>>  +   }
+>>>>  +
+>>>>  +   /* Create vCPU with PMUv3 */
+>>>>  +   vm_ioctl(vpmu_vm.vm, KVM_ARM_PREFERRED_TARGET, &init);
+>>>>  +   init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
+>>>>  +   vpmu_vm.vcpu = aarch64_vcpu_add(vpmu_vm.vm, 0, &init, guest_code);
+>>>>  +   vcpu_init_descriptor_tables(vpmu_vm.vcpu);
+>>>>  +   vpmu_vm.gic_fd = vgic_v3_setup(vpmu_vm.vm, 1, 64,
+>>>>  +                                   GICD_BASE_GPA, GICR_BASE_GPA);
+>>>>  +
+>>>>  +   /* Make sure that PMUv3 support is indicated in the ID register */
+>>>>  +   vcpu_get_reg(vpmu_vm.vcpu,
+>>>>  +                KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &dfr0);
+>>>>  +   pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER), dfr0);
+>>>>  +   TEST_ASSERT(pmuver != ID_AA64DFR0_PMUVER_IMP_DEF &&
+>>>>  +               pmuver >= ID_AA64DFR0_PMUVER_8_0,
+>>>>  +               "Unexpected PMUVER (0x%x) on the vCPU with PMUv3",
+>>>>  pmuver);
+>>>>  +
+>>>>  +   /* Initialize vPMU */
+>>>>  +   vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
+>>>>  +   vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
+>>>>  +}
 >>>
->>> Fixes: d0fc0a2519a6 ("KVM: arm64: nv: Add trap forwarding for HCR_EL2")
->>> Signed-off-by: Miguel Luis <miguel.luis@oracle.com>
->>> ---
->>> arch/arm64/kvm/emulate-nested.c | 88 ++++++++++++++++++++++++++++++---
->>> 1 file changed, 82 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
->>> index 9ced1bf0c2b7..3af49e130ee6 100644
->>> --- a/arch/arm64/kvm/emulate-nested.c
->>> +++ b/arch/arm64/kvm/emulate-nested.c
->>> @@ -648,15 +648,91 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
->>> SR_TRAP(SYS_APGAKEYLO_EL1, CGT_HCR_APK),
->>> SR_TRAP(SYS_APGAKEYHI_EL1, CGT_HCR_APK),
->>> /* All _EL2 registers */
->>> - SR_RANGE_TRAP(sys_reg(3, 4, 0, 0, 0),
->>> -       sys_reg(3, 4, 3, 15, 7), CGT_HCR_NV),
->>> + SR_TRAP(SYS_VPIDR_EL2, CGT_HCR_NV),
->> I think you miss DBGVCR32_EL2
-> That would be op0 == 10, which I indeed didn't considered given the ranges
-> previously defined. From its pseudocode I see it would make sense only if EL1
-> would support AArch32 but that seems not to be in the plans.
->
->>> + SR_TRAP(SYS_VMPIDR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_SCTLR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_ACTLR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_SCTLR2_EL2, CGT_HCR_NV),
->>> + SR_RANGE_TRAP(SYS_HCR_EL2,
->>> +       SYS_HCRX_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_SMPRIMAP_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_SMCR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_SDER32_EL2, CGT_HCR_NV),
->>> + SR_RANGE_TRAP(SYS_TTBR0_EL2,
->>> +       SYS_TCR2_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_VTTBR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_VTCR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_VNCR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_VSTTBR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_VSTCR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_DACR32_EL2, CGT_HCR_NV),
->>> + SR_RANGE_TRAP(SYS_HDFGRTR_EL2,
->>> +       SYS_HAFGRTR_EL2, CGT_HCR_NV),
->>> /* Skip the SP_EL1 encoding... */
->>> SR_TRAP(SYS_SPSR_EL2, CGT_HCR_NV),
->>> SR_TRAP(SYS_ELR_EL2, CGT_HCR_NV),
->>> - SR_RANGE_TRAP(sys_reg(3, 4, 4, 1, 1),
->>> -       sys_reg(3, 4, 10, 15, 7), CGT_HCR_NV),
->>> - SR_RANGE_TRAP(sys_reg(3, 4, 12, 0, 0),
->>> -       sys_reg(3, 4, 14, 15, 7), CGT_HCR_NV),
->>> + /* SPSR_irq, SPSR_abt, SPSR_und, SPSR_fiq */
->>> + SR_RANGE_TRAP(sys_reg(3, 4, 4, 3, 0),
->>> +       sys_reg(3, 4, 4, 3, 3), CGT_HCR_NV),
->>> + SR_TRAP(SYS_IFSR32_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_AFSR0_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_AFSR1_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_ESR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_VSESR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_FPEXC32_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_TFSR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_FAR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_HPFAR_EL2, CGT_HCR_NV),
->> you miss BRBCR_EL2
-> Yes, definitely. Same as above, didn't considered op0 == 10, (Table D18-1).
-> This one seems to me the only one missing too.
-
-yep
->
->>> + SR_TRAP(SYS_PMSCR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_MAIR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_AMAIR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_MPAMHCR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_MPAMVPMV_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_MPAM2_EL2, CGT_HCR_NV),
->>> + SR_RANGE_TRAP(SYS_MPAMVPM0_EL2,
->>> +       SYS_MPAMVPM7_EL2, CGT_HCR_NV),
->> About the MPAM where did you find the pseudo code?
-> The pseucode isn't available on the document. I'm following the statement when
-> HCR_EL2.NV is 1, where:
->
-> "The System or Special-purpose registers for which accesses are trapped and
-> reported using EC syndrome value 0x18 are as follows:
-> — Registers accessed using MRS or MSR with a name ending in _EL2, except, [...]"
-
-ok thank you for the clarification. With
-
-BRBCR_EL2 handling, feel free to add my
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-(I guess you will handle 
-DBGVCR32_EL2 in a separate patch)
-
-Eric
-
->
->>> + /*
->>> +  * Note that the spec. describes a group of MEC registers
->>> +  * whose access should not trap, therefore skip the following:
->>> +  * MECID_A0_EL2, MECID_A1_EL2, MECID_P0_EL2,
->>> +  * MECID_P1_EL2, MECIDR_EL2, VMECID_A_EL2,
->>> +  * VMECID_P_EL2.
->>> +  */
->>> + SR_RANGE_TRAP(SYS_VBAR_EL2,
->>> +       SYS_RMR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_VDISR_EL2, CGT_HCR_NV),
->>> + /* ICH_AP0R<m>_EL2 */
->>> + SR_RANGE_TRAP(SYS_ICH_AP0R0_EL2,
->>> +       SYS_ICH_AP0R3_EL2, CGT_HCR_NV),
->>> + /* ICH_AP1R<m>_EL2 */
->>> + SR_RANGE_TRAP(SYS_ICH_AP1R0_EL2,
->>> +       SYS_ICH_AP1R3_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_ICC_SRE_EL2, CGT_HCR_NV),
->>> + SR_RANGE_TRAP(SYS_ICH_HCR_EL2,
->>> +       SYS_ICH_EISR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_ICH_ELRSR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_ICH_VMCR_EL2, CGT_HCR_NV),
->>> + /* ICH_LR<m>_EL2 */
->>> + SR_RANGE_TRAP(SYS_ICH_LR0_EL2,
->>> +       SYS_ICH_LR15_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_CONTEXTIDR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_TPIDR_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_SCXTNUM_EL2, CGT_HCR_NV),
->>> + /* AMEVCNTVOFF0<n>_EL2, AMEVCNTVOFF1<n>_EL2  */
->>> + SR_RANGE_TRAP(SYS_AMEVCNTVOFF0n_EL2(0),
->>> +       SYS_AMEVCNTVOFF1n_EL2(15), CGT_HCR_NV),
->>> + /* CNT*_EL2 */
->>> + SR_TRAP(SYS_CNTVOFF_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_CNTPOFF_EL2, CGT_HCR_NV),
->>> + SR_TRAP(SYS_CNTHCTL_EL2, CGT_HCR_NV),
->>> + SR_RANGE_TRAP(SYS_CNTHP_TVAL_EL2,
->>> +       SYS_CNTHP_CVAL_EL2, CGT_HCR_NV),
->>> + SR_RANGE_TRAP(SYS_CNTHV_TVAL_EL2,
->>> +       SYS_CNTHV_CVAL_EL2, CGT_HCR_NV),
->>> + SR_RANGE_TRAP(SYS_CNTHVS_TVAL_EL2,
->>> +       SYS_CNTHVS_CVAL_EL2, CGT_HCR_NV),
->>> + SR_RANGE_TRAP(SYS_CNTHPS_TVAL_EL2,
->>> +       SYS_CNTHPS_CVAL_EL2, CGT_HCR_NV),
->>> /* All _EL02, _EL12 registers */
->>> SR_RANGE_TRAP(sys_reg(3, 5, 0, 0, 0),
->>>       sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
->> Besides this looks good to me and to me this looks safer than the
->> previous large span approach but that's my taste ;-)
+>>> This one fails to build for me:
+>>> aarch64/vpmu_counter_access.c: In function ‘create_vpmu_vm’:
+>>> aarch64/vpmu_counter_access.c:456:47: error: ‘ID_AA64DFR0_PMUVER_MASK’
+>>> undeclared (first use in this function); did you mean
+>>> ‘ID_AA64DFR0_EL1_PMUVer_MASK’?
+>>>   456 |         pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER),
+>>>   dfr0);
 >>
-> Your suggestions made total sense to me.
+>> Looks like there's a clash with
+>> "KVM: arm64: selftests: Import automatic generation of sysreg defs"
+>> from:
+>>         https://lore.kernel.org/r/20231003230408.3405722-12-oliver.upton@linux.dev
+> Thanks for the pointer, Sebastian! Surprisingly, I don't see the patch
+> when I sync to kvmarm/next.
 >
-> Thanks!
-> Miguel
->
->> Thanks
->>
->> Eric
->
+
+Yea, sry - I've had both of these series applied locally.
+
+Sebastian
+---1463795790-956281928-1697450511=:6267--
 
