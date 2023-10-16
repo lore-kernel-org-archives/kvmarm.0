@@ -1,199 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D77723766
-	for <kvmarm@lists.linux.dev>; Mon, 16 Oct 2023 10:35:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 924DE23769
+	for <kvmarm@lists.linux.dev>; Mon, 16 Oct 2023 11:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PFXE+a7A"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43E0AC433C7;
-	Mon, 16 Oct 2023 10:35:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697452509;
-	bh=KR2AMN+HMC6H4qN9SDzN3tWCnpdF7dCi/m3CWhQ796w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PFXE+a7AiudwEChB0+tH7/rF0Ud41eL8+5KpFfYpMhjcqi0USueJXVRsmvW3U3orH
-	 2BU/Eyy9NmGKr7LEJ/iiTdD+2r0YeYvw2qvtL1ONPAAc5G3cskQm8FS4Rciqit3a4f
-	 shot/XyasEUt+UlV0Oedev6OgUXZjF+kDP5HfYnUBvBH+Vl+rQ89OFPQHKyk4iPSW7
-	 V7ZeCLdi8RBJ+X0F23E8XepWFMNBA79Ba6+XhJoDqlV7iLIbj4w/ntoc2qaM4nZTKM
-	 wgE9hABWG/ImYZ2yWWDLrW+LeRS5Hxv4KCuRHhoAKq+w6JcEJqxeZO/geqiMXc6gDY
-	 +WGHNNx//mpUQ==
-Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qsKwE-004XvQ-H0;
-	Mon, 16 Oct 2023 11:35:06 +0100
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="iZ543Q5k"
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39G6n4sp022827;
+	Mon, 16 Oct 2023 11:17:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2023-03-30;
+ bh=LQD2EetfkBTJWECVsOuu7oX2KWF9Y6xgxdXIpIDsyrQ=;
+ b=iZ543Q5kN6c+I4R5BPWrv7uA4s4DP9hx05b01KeJUxgbYS9GU/oUIqfk/OWUO5f9tsF7
+ B4EYRIwdDVZV7MC+g/W/ah8Oyb07olnrFmZWQV1nfLyg8P+3BKgZALkS7tq3EsUwIm45
+ L+IngUhQKb7EGgRDGHUBtGQNjMiL2SakZV7DMuUfaoqOroMIfycs14nAcf9vNNg+/Tey
+ PuWvf2KsSwmna7gjctx+wrQVU0HC6soXphPWIqDaoyIDyZzFiDy17Z3edvCWL6Z0W2Z6
+ 7ajAm2iN+QwxZspoc+IFjk06ckgmpSJtQtdcgMQR8ZhR5eJDxiL02V4l5ZzufdYiHyUf NQ== 
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tqk1bjena-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 16 Oct 2023 11:17:58 +0000
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39G9SOj9027132;
+	Mon, 16 Oct 2023 11:17:57 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3trg529h4a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 16 Oct 2023 11:17:57 +0000
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39GBHqSA040637;
+	Mon, 16 Oct 2023 11:17:57 GMT
+Received: from mlluis-mac.uk.oracle.com (dhcp-10-175-197-167.vpn.oracle.com [10.175.197.167])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3trg529gvb-2;
+	Mon, 16 Oct 2023 11:17:56 +0000
+From: Miguel Luis <miguel.luis@oracle.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+        Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>, Eric Auger <eric.auger@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvmarm@lists.linux.dev
+Cc: miguel.luis@oracle.com
+Subject: [PATCH v4 1/3] arm64: Add missing _EL12 encodings
+Date: Mon, 16 Oct 2023 11:17:40 +0000
+Message-Id: <20231016111743.30331-2-miguel.luis@oracle.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20231016111743.30331-1-miguel.luis@oracle.com>
+References: <20231016111743.30331-1-miguel.luis@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Date: Mon, 16 Oct 2023 11:35:06 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Miguel Luis <miguel.luis@oracle.com>
-Cc: Eric Auger <eric.auger@redhat.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Oliver Upton
- <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Jing
- Zhang <jingzhangos@google.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 3/3] arm64/kvm: Fine grain _EL2 system registers list
- that affect nested virtualization
-In-Reply-To: <15851D9D-5FF5-4900-B70F-0141B8392503@oracle.com>
-References: <20231011180103.91774-1-miguel.luis@oracle.com>
- <20231011180103.91774-4-miguel.luis@oracle.com>
- <7df53e6b-9141-de85-b7a3-b9eb092ef7b4@redhat.com>
- <9D159B58-D336-4560-AF6A-294D910CF775@oracle.com>
- <72b67c49-423a-e88a-62c9-6b3cc9211f88@redhat.com>
- <15851D9D-5FF5-4900-B70F-0141B8392503@oracle.com>
-User-Agent: Roundcube Webmail/1.4.14
-Message-ID: <72e79b9ff7a451c583f0adb643befcda@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 217.182.43.188
-X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, eric.auger@redhat.com, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, jingzhangos@google.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-16_04,2023-10-12_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 phishscore=0
+ malwarescore=0 suspectscore=0 mlxlogscore=999 spamscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2310160099
+X-Proofpoint-GUID: Anh1M0APXLrCVE472GkqfXQ60jvScldR
+X-Proofpoint-ORIG-GUID: Anh1M0APXLrCVE472GkqfXQ60jvScldR
 
-On 2023-10-16 11:11, Miguel Luis wrote:
-> Hi Eric,
-> 
->> On 16 Oct 2023, at 09:54, Eric Auger <eric.auger@redhat.com> wrote:
->> 
->> Hi Miguel,
->> 
->> On 10/13/23 20:41, Miguel Luis wrote:
->>> Hi Eric,
->>> 
->>>> On 12 Oct 2023, at 15:22, Eric Auger <eric.auger@redhat.com> wrote:
->>>> 
->>>> Hi Miguel,
->>>> 
->>>> On 10/11/23 20:01, Miguel Luis wrote:
->>>>> Implement a fine grained approach in the _EL2 sysreg ranges.
->>>>> 
->>>>> Fixes: d0fc0a2519a6 ("KVM: arm64: nv: Add trap forwarding for 
->>>>> HCR_EL2")
->>>>> Signed-off-by: Miguel Luis <miguel.luis@oracle.com>
->>>>> ---
->>>>> arch/arm64/kvm/emulate-nested.c | 88 
->>>>> ++++++++++++++++++++++++++++++---
->>>>> 1 file changed, 82 insertions(+), 6 deletions(-)
->>>>> 
->>>>> diff --git a/arch/arm64/kvm/emulate-nested.c 
->>>>> b/arch/arm64/kvm/emulate-nested.c
->>>>> index 9ced1bf0c2b7..3af49e130ee6 100644
->>>>> --- a/arch/arm64/kvm/emulate-nested.c
->>>>> +++ b/arch/arm64/kvm/emulate-nested.c
->>>>> @@ -648,15 +648,91 @@ static const struct encoding_to_trap_config 
->>>>> encoding_to_cgt[] __initconst = {
->>>>> SR_TRAP(SYS_APGAKEYLO_EL1, CGT_HCR_APK),
->>>>> SR_TRAP(SYS_APGAKEYHI_EL1, CGT_HCR_APK),
->>>>> /* All _EL2 registers */
->>>>> - SR_RANGE_TRAP(sys_reg(3, 4, 0, 0, 0),
->>>>> -       sys_reg(3, 4, 3, 15, 7), CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_VPIDR_EL2, CGT_HCR_NV),
->>>> I think you miss DBGVCR32_EL2
->>> That would be op0 == 10, which I indeed didn't considered given the 
->>> ranges
->>> previously defined. From its pseudocode I see it would make sense 
->>> only if EL1
->>> would support AArch32 but that seems not to be in the plans.
->>> 
->>>>> + SR_TRAP(SYS_VMPIDR_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_SCTLR_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_ACTLR_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_SCTLR2_EL2, CGT_HCR_NV),
->>>>> + SR_RANGE_TRAP(SYS_HCR_EL2,
->>>>> +       SYS_HCRX_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_SMPRIMAP_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_SMCR_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_SDER32_EL2, CGT_HCR_NV),
->>>>> + SR_RANGE_TRAP(SYS_TTBR0_EL2,
->>>>> +       SYS_TCR2_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_VTTBR_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_VTCR_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_VNCR_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_VSTTBR_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_VSTCR_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_DACR32_EL2, CGT_HCR_NV),
->>>>> + SR_RANGE_TRAP(SYS_HDFGRTR_EL2,
->>>>> +       SYS_HAFGRTR_EL2, CGT_HCR_NV),
->>>>> /* Skip the SP_EL1 encoding... */
->>>>> SR_TRAP(SYS_SPSR_EL2, CGT_HCR_NV),
->>>>> SR_TRAP(SYS_ELR_EL2, CGT_HCR_NV),
->>>>> - SR_RANGE_TRAP(sys_reg(3, 4, 4, 1, 1),
->>>>> -       sys_reg(3, 4, 10, 15, 7), CGT_HCR_NV),
->>>>> - SR_RANGE_TRAP(sys_reg(3, 4, 12, 0, 0),
->>>>> -       sys_reg(3, 4, 14, 15, 7), CGT_HCR_NV),
->>>>> + /* SPSR_irq, SPSR_abt, SPSR_und, SPSR_fiq */
->>>>> + SR_RANGE_TRAP(sys_reg(3, 4, 4, 3, 0),
->>>>> +       sys_reg(3, 4, 4, 3, 3), CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_IFSR32_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_AFSR0_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_AFSR1_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_ESR_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_VSESR_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_FPEXC32_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_TFSR_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_FAR_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_HPFAR_EL2, CGT_HCR_NV),
->>>> you miss BRBCR_EL2
->>> Yes, definitely. Same as above, didn't considered op0 == 10, (Table 
->>> D18-1).
->>> This one seems to me the only one missing too.
->> 
->> yep
-> 
-> Thanks for confirming it!
-> 
->>> 
->>>>> + SR_TRAP(SYS_PMSCR_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_MAIR_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_AMAIR_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_MPAMHCR_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_MPAMVPMV_EL2, CGT_HCR_NV),
->>>>> + SR_TRAP(SYS_MPAM2_EL2, CGT_HCR_NV),
->>>>> + SR_RANGE_TRAP(SYS_MPAMVPM0_EL2,
->>>>> +       SYS_MPAMVPM7_EL2, CGT_HCR_NV),
->>>> About the MPAM where did you find the pseudo code?
->>> The pseucode isn't available on the document. I'm following the 
->>> statement when
->>> HCR_EL2.NV is 1, where:
->>> 
->>> "The System or Special-purpose registers for which accesses are 
->>> trapped and
->>> reported using EC syndrome value 0x18 are as follows:
->>> — Registers accessed using MRS or MSR with a name ending in _EL2, 
->>> except, [...]"
->> 
->> ok thank you for the clarification. With
->> 
->> BRBCR_EL2 handling, feel free to add my
->> 
->> Reviewed-by: Eric Auger <eric.auger@redhat.com>
->> 
-> 
-> Thank you Eric!
-> 
->> (I guess you will handle
->> DBGVCR32_EL2 in a separate patch)
->> 
-> 
-> I think that Marc is addressing it here:
-> https://lore.kernel.org/kvmarm/20231013223311.3950585-1-maz@kernel.org/
-> but I can be wrong.
-> 
-> Marc, could you please confirm ?
+Some _EL12 encodings are missing. Add them.
 
-Indeed, that's the fix. If you respin this series *now*, I can take
-this patch and your series as a set of fixes for 6.6.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Miguel Luis <miguel.luis@oracle.com>
+---
+ arch/arm64/include/asm/sysreg.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-Thanks,
-
-         M.
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 38296579a4fd..ba5db50effec 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -567,19 +567,30 @@
+ #define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
+ 
+ /* VHE encodings for architectural EL0/1 system registers */
++#define SYS_BRBCR_EL12			sys_reg(2, 5, 9, 0, 0)
+ #define SYS_SCTLR_EL12			sys_reg(3, 5, 1, 0, 0)
++#define SYS_CPACR_EL12			sys_reg(3, 5, 1, 0, 2)
++#define SYS_SCTLR2_EL12			sys_reg(3, 5, 1, 0, 3)
++#define SYS_ZCR_EL12			sys_reg(3, 5, 1, 2, 0)
++#define SYS_TRFCR_EL12			sys_reg(3, 5, 1, 2, 1)
++#define SYS_SMCR_EL12			sys_reg(3, 5, 1, 2, 6)
+ #define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
+ #define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
+ #define SYS_TCR_EL12			sys_reg(3, 5, 2, 0, 2)
++#define SYS_TCR2_EL12			sys_reg(3, 5, 2, 0, 3)
+ #define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
+ #define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
+ #define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
+ #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
+ #define SYS_ESR_EL12			sys_reg(3, 5, 5, 2, 0)
+ #define SYS_TFSR_EL12			sys_reg(3, 5, 5, 6, 0)
++#define SYS_FAR_EL12			sys_reg(3, 5, 6, 0, 0)
++#define SYS_PMSCR_EL12			sys_reg(3, 5, 9, 9, 0)
+ #define SYS_MAIR_EL12			sys_reg(3, 5, 10, 2, 0)
+ #define SYS_AMAIR_EL12			sys_reg(3, 5, 10, 3, 0)
+ #define SYS_VBAR_EL12			sys_reg(3, 5, 12, 0, 0)
++#define SYS_CONTEXTIDR_EL12		sys_reg(3, 5, 13, 0, 1)
++#define SYS_SCXTNUM_EL12		sys_reg(3, 5, 13, 0, 7)
+ #define SYS_CNTKCTL_EL12		sys_reg(3, 5, 14, 1, 0)
+ #define SYS_CNTP_TVAL_EL02		sys_reg(3, 5, 14, 2, 0)
+ #define SYS_CNTP_CTL_EL02		sys_reg(3, 5, 14, 2, 1)
 -- 
-Jazz is not dead. It just smells funny...
+2.39.2
+
