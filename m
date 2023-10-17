@@ -1,68 +1,382 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C084123D;
-	Tue, 17 Oct 2023 10:26:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20331C433C8;
-	Tue, 17 Oct 2023 10:26:38 +0000 (UTC)
-Date: Tue, 17 Oct 2023 11:26:36 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Hyesoo Yu <hyesoo.yu@samsung.com>, will@kernel.org,
-	oliver.upton@linux.dev, maz@kernel.org, james.morse@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, arnd@arndb.de,
-	akpm@linux-foundation.org, mingo@redhat.com, peterz@infradead.org,
-	juri.lelli@redhat.com, vincent.guittot@linaro.org,
-	dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
-	mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com,
-	mhiramat@kernel.org, rppt@kernel.org, hughd@google.com,
-	pcc@google.com, steven.price@arm.com, anshuman.khandual@arm.com,
-	vincenzo.frascino@arm.com, david@redhat.com, eugenis@google.com,
-	kcc@google.com, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC 06/37] mm: page_alloc: Allocate from movable pcp
- lists only if ALLOC_FROM_METADATA
-Message-ID: <ZS5hXFHs08zQOboi@arm.com>
-References: <20230823131350.114942-1-alexandru.elisei@arm.com>
- <20230823131350.114942-7-alexandru.elisei@arm.com>
- <CGME20231012013524epcas2p4b50f306e3e4d0b937b31f978022844e5@epcas2p4.samsung.com>
- <20231010074823.GA2536665@tiffany>
- <ZS0va9nICZo8bF03@monolith>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618F743AA6
+	for <kvmarm@lists.linux.dev>; Tue, 17 Oct 2023 14:51:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zsc8hC9M"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697554282;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=On5sJ31uN4Ra8ik6/DRV/F2IIWr320vzwCyo3Oos02o=;
+	b=Zsc8hC9MiDcUJsb0EDr4+KTyGJ43pJCBBeV1MxMvYVDWfYLlodblQfkU8eUWLjZp60zPjn
+	kHzxrbHY+LQrypilWVi8YoKPEJr1nYVKblPEnAWuMjbjYOVYMo4fG3gcXrvhqG0PSfVnoR
+	a4Gfas1374HhANzmU8dbpf9ZTLwtaGg=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-352-eRLsa6g8O7WQx416uR_-hQ-1; Tue, 17 Oct 2023 10:51:14 -0400
+X-MC-Unique: eRLsa6g8O7WQx416uR_-hQ-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-66d4aa946ceso41941046d6.1
+        for <kvmarm@lists.linux.dev>; Tue, 17 Oct 2023 07:51:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697554274; x=1698159074;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=On5sJ31uN4Ra8ik6/DRV/F2IIWr320vzwCyo3Oos02o=;
+        b=vAdj+xn742SkiNhJLzpuMX1wakv4BCGIi0q9P+wk8ArzUvpxu767XIjTOG1OT9U5Dr
+         ETDDfI8gEO7eiTjXyPU0AEDzhFGiS6Khqv6nAoZLJirF7ZnGS3ciJzFfYCA1MrHrF0Vo
+         20wZUBjAIdq5SxFqrOgTBzvaz3eu+GxDa++maM0QT/vrFRzJw7XFyxnaQZH588BvLJ6J
+         JdAzl0YiAMpMqXbMz8fIJCvxepGIyRieTE78peLgByErEqo8oCLI+uIs3yEQs7bFZ8oZ
+         gpH17acqlVQ0Dq/AWn1++RwyFVs2DnZRkxKr3sQmQXbv8kTjQskSJCo9pMPOfGMIGQ0a
+         3Ksw==
+X-Gm-Message-State: AOJu0Yy9Goh7OUlnPct+1moH8LofXY+tuhEvQD5VZB8G/wcU7m5dcw9K
+	v4bmj4lYvNkPkxpDwtiaIcRpMgo+qsbONzTo25aP99PhuJq7HsyqfVbyxHSrYsn/4cGvYjNGCje
+	E/NGAQNbR8cAgVFT4
+X-Received: by 2002:a0c:df0a:0:b0:66d:5bed:35f3 with SMTP id g10-20020a0cdf0a000000b0066d5bed35f3mr2798147qvl.20.1697554274325;
+        Tue, 17 Oct 2023 07:51:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFNHWTiPeUH75hyUb6CD7+pJ8o+547/VfZVUXz9z+btwuN1qTKk/BS6fBNhVW82n5y9oGZWlQ==
+X-Received: by 2002:a0c:df0a:0:b0:66d:5bed:35f3 with SMTP id g10-20020a0cdf0a000000b0066d5bed35f3mr2798125qvl.20.1697554274004;
+        Tue, 17 Oct 2023 07:51:14 -0700 (PDT)
+Received: from [192.168.43.95] ([37.170.237.139])
+        by smtp.gmail.com with ESMTPSA id h13-20020a37c44d000000b0076ee973b9a7sm717632qkm.27.2023.10.17.07.51.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Oct 2023 07:51:13 -0700 (PDT)
+Message-ID: <66eade47-54bb-bcf4-931a-9acfbdd5483d@redhat.com>
+Date: Tue, 17 Oct 2023 16:51:07 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZS0va9nICZo8bF03@monolith>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v7 10/12] KVM: selftests: aarch64: Introduce
+ vpmu_counter_access test
+To: Raghavendra Rao Ananta <rananta@google.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Shaoqin Huang <shahuang@redhat.com>,
+ Jing Zhang <jingzhangos@google.com>, Reiji Watanabe <reijiw@google.com>,
+ Colton Lewis <coltonlewis@google.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20231009230858.3444834-1-rananta@google.com>
+ <20231009230858.3444834-11-rananta@google.com>
+From: Eric Auger <eauger@redhat.com>
+In-Reply-To: <20231009230858.3444834-11-rananta@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 16, 2023 at 01:41:15PM +0100, Alexandru Elisei wrote:
-> On Thu, Oct 12, 2023 at 10:25:11AM +0900, Hyesoo Yu wrote:
-> > I don't think it would be effcient when the majority of movable pages
-> > do not use GFP_TAGGED.
-> > 
-> > Metadata pages have a low probability of being in the pcp list
-> > because metadata pages is bypassed when freeing pages.
-> > 
-> > The allocation performance of most movable pages is likely to decrease
-> > if only the request with ALLOC_FROM_METADATA could be allocated.
+Hi Raghavendra,
+On 10/10/23 01:08, Raghavendra Rao Ananta wrote:
+> From: Reiji Watanabe <reijiw@google.com>
 > 
-> You're right, I hadn't considered that.
+> Introduce vpmu_counter_access test for arm64 platforms.
+> The test configures PMUv3 for a vCPU, sets PMCR_EL0.N for the vCPU,
+> and check if the guest can consistently see the same number of the
+> PMU event counters (PMCR_EL0.N) that userspace sets.
+> This test case is done with each of the PMCR_EL0.N values from
+> 0 to 31 (With the PMCR_EL0.N values greater than the host value,
+> the test expects KVM_SET_ONE_REG for the PMCR_EL0 to fail).
 > 
-> > 
-> > How about not including metadata pages in the pcp list at all ?
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../kvm/aarch64/vpmu_counter_access.c         | 247 ++++++++++++++++++
+>  2 files changed, 248 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
 > 
-> Sounds reasonable, I will keep it in mind for the next iteration of the
-> series.
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index a3bb36fb3cfc..416700aa196c 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -149,6 +149,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
+>  TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
+>  TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
+>  TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
+> +TEST_GEN_PROGS_aarch64 += aarch64/vpmu_counter_access
+>  TEST_GEN_PROGS_aarch64 += access_tracking_perf_test
+>  TEST_GEN_PROGS_aarch64 += demand_paging_test
+>  TEST_GEN_PROGS_aarch64 += dirty_log_test
+> diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+> new file mode 100644
+> index 000000000000..58949b17d76e
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+> @@ -0,0 +1,247 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * vpmu_counter_access - Test vPMU event counter access
+> + *
+> + * Copyright (c) 2022 Google LLC.
+2023 ;-)
+> + *
+> + * This test checks if the guest can see the same number of the PMU event
+> + * counters (PMCR_EL0.N) that userspace sets.
+> + * This test runs only when KVM_CAP_ARM_PMU_V3 is supported on the host.
+> + */
+> +#include <kvm_util.h>
+> +#include <processor.h>
+> +#include <test_util.h>
+> +#include <vgic.h>
+> +#include <perf/arm_pmuv3.h>
+> +#include <linux/bitfield.h>
+> +
+> +/* The max number of the PMU event counters (excluding the cycle counter) */
+> +#define ARMV8_PMU_MAX_GENERAL_COUNTERS	(ARMV8_PMU_MAX_COUNTERS - 1)
+> +
+> +struct vpmu_vm {
+> +	struct kvm_vm *vm;
+> +	struct kvm_vcpu *vcpu;
+> +	int gic_fd;
+> +};
+> +
+> +static struct vpmu_vm vpmu_vm;
+> +
+> +static uint64_t get_pmcr_n(uint64_t pmcr)
+> +{
+> +	return (pmcr >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
+> +}
+> +
+> +static void set_pmcr_n(uint64_t *pmcr, uint64_t pmcr_n)
+> +{
+> +	*pmcr = *pmcr & ~(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
+> +	*pmcr |= (pmcr_n << ARMV8_PMU_PMCR_N_SHIFT);
+> +}
+> +
+> +static void guest_sync_handler(struct ex_regs *regs)
+> +{
+> +	uint64_t esr, ec;
+> +
+> +	esr = read_sysreg(esr_el1);
+> +	ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
+> +	__GUEST_ASSERT(0, "PC: 0x%lx; ESR: 0x%lx; EC: 0x%lx", regs->pc, esr, ec);
+> +}
+> +
+> +/*
+> + * The guest is configured with PMUv3 with @expected_pmcr_n number of
+> + * event counters.
+> + * Check if @expected_pmcr_n is consistent with PMCR_EL0.N.
+> + */
+> +static void guest_code(uint64_t expected_pmcr_n)
+> +{
+> +	uint64_t pmcr, pmcr_n;
+> +
+> +	__GUEST_ASSERT(expected_pmcr_n <= ARMV8_PMU_MAX_GENERAL_COUNTERS,
+> +			"Expected PMCR.N: 0x%lx; ARMv8 general counters: 0x%lx",
+> +			expected_pmcr_n, ARMV8_PMU_MAX_GENERAL_COUNTERS);
+> +
+> +	pmcr = read_sysreg(pmcr_el0);
+> +	pmcr_n = get_pmcr_n(pmcr);
+> +
+> +	/* Make sure that PMCR_EL0.N indicates the value userspace set */
+> +	__GUEST_ASSERT(pmcr_n == expected_pmcr_n,
+> +			"Expected PMCR.N: 0x%lx, PMCR.N: 0x%lx",
+> +			pmcr_n, expected_pmcr_n);
+> +
+> +	GUEST_DONE();
+> +}
+> +
+> +#define GICD_BASE_GPA	0x8000000ULL
+> +#define GICR_BASE_GPA	0x80A0000ULL
+> +
+> +/* Create a VM that has one vCPU with PMUv3 configured. */
+> +static void create_vpmu_vm(void *guest_code)
+> +{
+> +	struct kvm_vcpu_init init;
+> +	uint8_t pmuver, ec;
+> +	uint64_t dfr0, irq = 23;
+> +	struct kvm_device_attr irq_attr = {
+> +		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
+> +		.attr = KVM_ARM_VCPU_PMU_V3_IRQ,
+> +		.addr = (uint64_t)&irq,
+> +	};
+> +	struct kvm_device_attr init_attr = {
+> +		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
+> +		.attr = KVM_ARM_VCPU_PMU_V3_INIT,
+> +	};
+> +
+> +	/* The test creates the vpmu_vm multiple times. Ensure a clean state */
+> +	memset(&vpmu_vm, 0, sizeof(vpmu_vm));
+> +
+> +	vpmu_vm.vm = vm_create(1);
+> +	vm_init_descriptor_tables(vpmu_vm.vm);
+> +	for (ec = 0; ec < ESR_EC_NUM; ec++) {
+> +		vm_install_sync_handler(vpmu_vm.vm, VECTOR_SYNC_CURRENT, ec,
+> +					guest_sync_handler);
+> +	}
+> +
+> +	/* Create vCPU with PMUv3 */
+> +	vm_ioctl(vpmu_vm.vm, KVM_ARM_PREFERRED_TARGET, &init);
+> +	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
+> +	vpmu_vm.vcpu = aarch64_vcpu_add(vpmu_vm.vm, 0, &init, guest_code);
+> +	vcpu_init_descriptor_tables(vpmu_vm.vcpu);
+> +	vpmu_vm.gic_fd = vgic_v3_setup(vpmu_vm.vm, 1, 64,
+> +					GICD_BASE_GPA, GICR_BASE_GPA);
+__TEST_REQUIRE(vpmu_vm.gic_fd >= 0, "Failed to create vgic-v3, skipping");
+as done in some other tests
 
-BTW, I suggest for the next iteration we drop MIGRATE_METADATA, only use
-CMA and assume that the tag storage itself supports tagging. Hopefully
-it makes the patches a bit simpler.
+> +
+> +	/* Make sure that PMUv3 support is indicated in the ID register */
+> +	vcpu_get_reg(vpmu_vm.vcpu,
+> +		     KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &dfr0);
+> +	pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER), dfr0);
+> +	TEST_ASSERT(pmuver != ID_AA64DFR0_PMUVER_IMP_DEF &&
+> +		    pmuver >= ID_AA64DFR0_PMUVER_8_0,
+> +		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
+> +
+> +	/* Initialize vPMU */
+> +	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
+> +	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
+> +}
+> +
+> +static void destroy_vpmu_vm(void)
+> +{
+> +	close(vpmu_vm.gic_fd);
+> +	kvm_vm_free(vpmu_vm.vm);
+> +}
+> +
+> +static void run_vcpu(struct kvm_vcpu *vcpu, uint64_t pmcr_n)
+> +{
+> +	struct ucall uc;
+> +
+> +	vcpu_args_set(vcpu, 1, pmcr_n);
+> +	vcpu_run(vcpu);
+> +	switch (get_ucall(vcpu, &uc)) {
+> +	case UCALL_ABORT:
+> +		REPORT_GUEST_ASSERT(uc);
+> +		break;
+> +	case UCALL_DONE:
+> +		break;
+> +	default:
+> +		TEST_FAIL("Unknown ucall %lu", uc.cmd);
+> +		break;
+> +	}
+> +}
+> +
+> +/*
+> + * Create a guest with one vCPU, set the PMCR_EL0.N for the vCPU to @pmcr_n,
+> + * and run the test.
+> + */
+> +static void run_test(uint64_t pmcr_n)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	uint64_t sp, pmcr;
+> +	struct kvm_vcpu_init init;
+> +
+> +	pr_debug("Test with pmcr_n %lu\n", pmcr_n);
+> +	create_vpmu_vm(guest_code);
+> +
+> +	vcpu = vpmu_vm.vcpu;
+> +
+> +	/* Save the initial sp to restore them later to run the guest again */
+> +	vcpu_get_reg(vcpu, ARM64_CORE_REG(sp_el1), &sp);
+> +
+> +	/* Update the PMCR_EL0.N with @pmcr_n */
+> +	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr);
+> +	set_pmcr_n(&pmcr, pmcr_n);
+> +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
+> +
+> +	run_vcpu(vcpu, pmcr_n);
+> +
+> +	/*
+> +	 * Reset and re-initialize the vCPU, and run the guest code again to
+> +	 * check if PMCR_EL0.N is preserved.
+> +	 */
+> +	vm_ioctl(vpmu_vm.vm, KVM_ARM_PREFERRED_TARGET, &init);
+> +	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
+> +	aarch64_vcpu_setup(vcpu, &init);
+> +	vcpu_init_descriptor_tables(vcpu);
+> +	vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), sp);
+> +	vcpu_set_reg(vcpu, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code);
+> +
+> +	run_vcpu(vcpu, pmcr_n);
+> +
+> +	destroy_vpmu_vm();
+> +}
+> +
+> +/*
+> + * Create a guest with one vCPU, and attempt to set the PMCR_EL0.N for
+> + * the vCPU to @pmcr_n, which is larger than the host value.
+> + * The attempt should fail as @pmcr_n is too big to set for the vCPU.
+> + */
+> +static void run_error_test(uint64_t pmcr_n)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	uint64_t pmcr, pmcr_orig;
+> +
+> +	pr_debug("Error test with pmcr_n %lu (larger than the host)\n", pmcr_n);
+> +	create_vpmu_vm(guest_code);
+> +	vcpu = vpmu_vm.vcpu;
+> +
+> +	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr_orig);
+> +	pmcr = pmcr_orig;
+> +
+> +	/*
+> +	 * Setting a larger value of PMCR.N should not modify the field, and
+> +	 * return a success.
+> +	 */
+> +	set_pmcr_n(&pmcr, pmcr_n);
+> +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
+> +	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr);
+> +	TEST_ASSERT(pmcr_orig == pmcr,
+> +		    "PMCR.N modified by KVM to a larger value (PMCR: 0x%lx) for pmcr_n: 0x%lx\n",
+> +		    pmcr, pmcr_n);
+nit: you could introduce a set_pmcr_n() routine  which creates the
+vpmu_vm and set the PMCR.N and check whether the setting is applied. An
+arg could tell the helper whether this is supposed to fail. This could
+be used in both run_error_test and run_test which both mostly use the
+same code.
+> +
+> +	destroy_vpmu_vm();
+> +}
+> +
+> +/*
+> + * Return the default number of implemented PMU event counters excluding
+> + * the cycle counter (i.e. PMCR_EL0.N value) for the guest.
+> + */
+> +static uint64_t get_pmcr_n_limit(void)
+> +{
+> +	uint64_t pmcr;
+> +
+> +	create_vpmu_vm(guest_code);
+> +	vcpu_get_reg(vpmu_vm.vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr);
+> +	destroy_vpmu_vm();
+> +	return get_pmcr_n(pmcr);
+> +}
+> +
+> +int main(void)
+> +{
+> +	uint64_t i, pmcr_n;
+> +
+> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
+> +
+> +	pmcr_n = get_pmcr_n_limit();
+> +	for (i = 0; i <= pmcr_n; i++)
+> +		run_test(i);
+> +
+> +	for (i = pmcr_n + 1; i < ARMV8_PMU_MAX_COUNTERS; i++)
+> +		run_error_test(i);
+> +
+> +	return 0;
+> +}
 
--- 
-Catalin
+Besides this looks good to me.
+
+Thanks
+
+Eric
+
