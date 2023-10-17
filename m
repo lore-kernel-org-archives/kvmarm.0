@@ -1,60 +1,63 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714CE3D3A8
-	for <kvmarm@lists.linux.dev>; Tue, 17 Oct 2023 17:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A772D030
+	for <kvmarm@lists.linux.dev>; Tue, 17 Oct 2023 17:26:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W99mATUJ"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1c9d4f08d7cso10945ad.0
-        for <kvmarm@lists.linux.dev>; Tue, 17 Oct 2023 10:11:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="snEU7hv1"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1c9c496c114so11195ad.0
+        for <kvmarm@lists.linux.dev>; Tue, 17 Oct 2023 10:26:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697562667; x=1698167467; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1697563563; x=1698168363; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GYRiu9lSScYzjuPNTRfPjUaha4Cty0VP8HNHJXHNDls=;
-        b=W99mATUJJC2ZI9s7VVyp8CDbC2uGI6bk/x0woYsI3v0xbfluHE47OaH5ZeVhyARQmV
-         PpCRDmZ2yOf17qX8woC1SZe1pMFdI8UkeDImwOSS5uDsS9hsZiAgvjarv7up27Ey38xD
-         WXzXFAQiz2rkcvZ6boseEesCQa/gl+NT9zbBI50gVwLdTnf7bhTouxKlpTN61lkHMQWX
-         2ttTSO1YZj6FzgzG/hyvaWzViYrspCdRmJ7sg1pVuFspLyz11nKZylsqm3Yz3pgKAlZP
-         3uWaXEl5hCOIiaccTYnFid7Kxu8mSOueDtilzSyhaHK0oWwus1ZtxCLY0cwypfBfrFIu
-         e89A==
+        bh=b98W+/GnlYMBBaEIRZ/yrKu+yROp6z3ItYJheiFNfWY=;
+        b=snEU7hv1ZtoYZ057qeu04j0giTwGif9nwgfPokpphq5wyH/o8AGML2xLvWxT6INh+e
+         vEmOrrAtykGtiyLEYWvA2M+TqF9WJwPtGOmfv9Kw8OMnGoQ8jp5ZvUDnlwWZbc9AYiqy
+         NVzyIXKFVXOv/uMEvBYkx5l4XIOVw/bOzURBlw65H+LRPTY+urYUh/8PlnVb92lEymNq
+         MclR1G/dkyUaIN0QEOEZ102+CVjd9/cfYtg0K6LWiuSQnZMuLfUme8iBsM4jcgDOVscM
+         AuWCELVOiM23BgK05uE4603VInhnIhoc+dxH2e8rCWK2mV793mepv0/cqgVqkRFm9QFz
+         KcIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697562667; x=1698167467;
+        d=1e100.net; s=20230601; t=1697563563; x=1698168363;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GYRiu9lSScYzjuPNTRfPjUaha4Cty0VP8HNHJXHNDls=;
-        b=R4YOLJjFhgydTMy7q86fMO8+RkaAmfnhl9aRYiNSBgDFvrZTJf7zkzL5S0tE6BUdN4
-         k36Y/kf7Ur2oWeoGm8Fs8v0nnTgf3OIRmP1BEakP18j/EYKtsN6qi3cQkuopk42sLa2Z
-         xlI6dtYSChP44mRBwTw5YK5SrJD2ZiliSRRgZhDWT1mzCni6TG2BhjcBEWJ73MfwEygV
-         c0mHmwVXJBl/LETSfCZziMdwq0+tFBmMucj1mxDZxxrPlmauiOcZgzNADbSWULmdGGwL
-         weC0p8/TPQ6aNUTKw+H61G1NfPsWtXcsjvIBoJJqcsCBEozRakPQ/QJA2fCt643ss2eo
-         g5hg==
-X-Gm-Message-State: AOJu0YwmEm4+WT2nFTu+OKD+Ba+tFyOm8YwHiPYcJAjMDgase1RG7mIQ
-	kCmmbb2L+kZaBdgbriGNwiY+zGoWTmL/Zg6eD2aLQA==
-X-Google-Smtp-Source: AGHT+IFRYWvFaJ0WInRTJyr+F9zMf0+RQKXl4mnaUaW2eO670fDT8aRdRXn0jZoCF3qiP5KSAr97AZqkZIqNS1w8Bx0=
-X-Received: by 2002:a17:902:6b47:b0:1c9:d7d8:862c with SMTP id
- g7-20020a1709026b4700b001c9d7d8862cmr17098plt.10.1697562667428; Tue, 17 Oct
- 2023 10:11:07 -0700 (PDT)
+        bh=b98W+/GnlYMBBaEIRZ/yrKu+yROp6z3ItYJheiFNfWY=;
+        b=ZYpbmhAWFndsH6m/Dqx7WVDG+pnd/m7XXdIX9qBMiA3oXKo0HPTATjNcW17iMF4iah
+         pxqXDU9qiHBLsHYWjhgvO/XaXzRB8JY8wknnD12Ai8V27WGdku6x+iuOzuuojEN96Pw6
+         0SUrkI6ZX0flIDfmVuVvSMw8LHHpZ8rs3+zRq8ynINqsLON3cJQhJdyPbjV28MasgSPH
+         o7vCgz3c05jRl54fT2y7jKg6af4JsvED42PGgLOpjsm7SvFt8wyt3Aw3TKXjVQ7sAuCn
+         feHWfjDBnbq7klttJ8hUcRqQqlFB/S05MnlmONmglzrejZG0endgKh0E5iUHp9hAUvqC
+         lv8w==
+X-Gm-Message-State: AOJu0Yy3MMRH5o1M9a4Wxzz2qwnmtPGxAmh3Ns5rv8nFBndxzVr9Aibs
+	gp8eNCb4LTZ9Ludy+iy71yIuHaQSDgdvG84HyvmYSA==
+X-Google-Smtp-Source: AGHT+IHb5B0YZuQ8upjbjeL9ha316DU4/zeX9v9YItDefLh84Iu+cQVZ7EJdEAX5vIIp6CqyfVqxyGhsl1ayop2hEX8=
+X-Received: by 2002:a17:902:f611:b0:1b8:b564:b528 with SMTP id
+ n17-20020a170902f61100b001b8b564b528mr8101plg.7.1697563563148; Tue, 17 Oct
+ 2023 10:26:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20231009230858.3444834-1-rananta@google.com> <20231009230858.3444834-11-rananta@google.com>
- <e0fdb0ea-2f08-6343-1765-afe32510f3a7@redhat.com>
-In-Reply-To: <e0fdb0ea-2f08-6343-1765-afe32510f3a7@redhat.com>
+References: <20231009230858.3444834-1-rananta@google.com> <20231009230858.3444834-8-rananta@google.com>
+ <b4739328-5dba-a3a6-54ef-2db2d34201d8@redhat.com> <CAJHc60zpH8Y8h72=jUbshGoqye20FaHRcsb+TFDxkk7rhJAUxQ@mail.gmail.com>
+ <ZS2L6uIlUtkltyrF@linux.dev> <CAJHc60wvMSHuLuRsZJOn7+r7LxZ661xEkDfqxGHed5Y+95Fxeg@mail.gmail.com>
+ <ZS4hGL5RIIuI1KOC@linux.dev> <CAJHc60zQb0akx2Opbh3_Q8JShBC_9NFNvtAE+bPNi9QqXUGncA@mail.gmail.com>
+ <ZS6_tdkS6GyNlt4l@linux.dev>
+In-Reply-To: <ZS6_tdkS6GyNlt4l@linux.dev>
 From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Tue, 17 Oct 2023 10:10:55 -0700
-Message-ID: <CAJHc60wQuCM_H_ksSWUdCjJj30Stzn1aEr4=jvzqM0ZvhuN5gQ@mail.gmail.com>
-Subject: Re: [PATCH v7 10/12] KVM: selftests: aarch64: Introduce
- vpmu_counter_access test
-To: Sebastian Ott <sebott@redhat.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
+Date: Tue, 17 Oct 2023 10:25:50 -0700
+Message-ID: <CAJHc60w-CsqdYX8JG-CRutwg0UyWmvk1TyoR-y9JBV_mqWUVKw@mail.gmail.com>
+Subject: Re: [PATCH v7 07/12] KVM: arm64: PMU: Set PMCR_EL0.N for vCPU based
+ on the associated PMU
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Sebastian Ott <sebott@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Alexandru Elisei <alexandru.elisei@arm.com>, James Morse <james.morse@arm.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Zenghui Yu <yuzenghui@huawei.com>, Shaoqin Huang <shahuang@redhat.com>, 
@@ -64,72 +67,61 @@ Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 17, 2023 at 8:48=E2=80=AFAM Sebastian Ott <sebott@redhat.com> w=
-rote:
+On Tue, Oct 17, 2023 at 10:09=E2=80=AFAM Oliver Upton <oliver.upton@linux.d=
+ev> wrote:
 >
-> On Mon, 9 Oct 2023, Raghavendra Rao Ananta wrote:
-> > +static void guest_code(uint64_t expected_pmcr_n)
-> > +{
-> > +     uint64_t pmcr, pmcr_n;
-> > +
-> > +     __GUEST_ASSERT(expected_pmcr_n <=3D ARMV8_PMU_MAX_GENERAL_COUNTER=
-S,
-> > +                     "Expected PMCR.N: 0x%lx; ARMv8 general counters: =
-0x%lx",
-> > +                     expected_pmcr_n, ARMV8_PMU_MAX_GENERAL_COUNTERS);
-> > +
-> > +     pmcr =3D read_sysreg(pmcr_el0);
-> > +     pmcr_n =3D get_pmcr_n(pmcr);
-> > +
-> > +     /* Make sure that PMCR_EL0.N indicates the value userspace set */
-> > +     __GUEST_ASSERT(pmcr_n =3D=3D expected_pmcr_n,
-> > +                     "Expected PMCR.N: 0x%lx, PMCR.N: 0x%lx",
-> > +                     pmcr_n, expected_pmcr_n);
+> On Tue, Oct 17, 2023 at 09:58:08AM -0700, Raghavendra Rao Ananta wrote:
+> > On Mon, Oct 16, 2023 at 10:52=E2=80=AFPM Oliver Upton <oliver.upton@lin=
+ux.dev> wrote:
+> > >
+> > > On Mon, Oct 16, 2023 at 02:35:52PM -0700, Raghavendra Rao Ananta wrot=
+e:
+> > >
+> > > [...]
+> > >
+> > > > > What's the point of doing this in the first place? The implementa=
+tion of
+> > > > > kvm_vcpu_read_pmcr() is populating PMCR_EL0.N using the VM-scoped=
+ value.
+> > > > >
+> > > > I guess originally the change replaced read_sysreg(pmcr_el0) with
+> > > > kvm_vcpu_read_pmcr(vcpu) to maintain consistency with others.
+> > > > But if you and Sebastian feel that it's an overkill and directly
+> > > > getting the value via vcpu->kvm->arch.pmcr_n is more readable, I'm
+> > > > happy to make the change.
+> > >
+> > > No, I'd rather you delete the line where PMCR_EL0.N altogether.
+> > > reset_pmcr() tries to initialize the field, but your
+> > > kvm_vcpu_read_pmcr() winds up replacing it with pmcr_n.
+> > >
+> > I didn't get this comment. We still do initialize pmcr, but using the
+> > pmcr.n read via kvm_vcpu_read_pmcr() instead of the actual system
+> > register.
 >
-> Expected vs read value is swapped.
+> You have two bits of code trying to do the exact same thing:
 >
-Good catch! I'll fix this in v8.
+>  1) reset_pmcr() initializes __vcpu_sys_reg(vcpu, PMCR_EL0) with the N
+>     field set up.
 >
-> Also, since the kernel has special handling for this, should we add a
-> test like below?
+>  2) kvm_vcpu_read_pmcr() takes whatever is in __vcpu_sys_reg(vcpu, PMCR_E=
+L0),
+>     *masks out* the N field and re-initializes it with vcpu->kvm->arch.pm=
+cr_n
 >
-> +static void immutable_test(void)
-> +{
-> +       struct kvm_vcpu *vcpu;
-> +       uint64_t sp, pmcr, pmcr_n;
-> +       struct kvm_vcpu_init init;
-> +
-> +       create_vpmu_vm(guest_code);
-> +
-> +       vcpu =3D vpmu_vm.vcpu;
-> +
-> +       /* Save the initial sp to restore them later to run the guest aga=
-in */
-> +       vcpu_get_reg(vcpu, ARM64_CORE_REG(sp_el1), &sp);
-> +
-> +       vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr);
-> +       pmcr_n =3D get_pmcr_n(pmcr);
-> +
-> +       run_vcpu(vcpu, pmcr_n);
-> +
-> +       vm_ioctl(vpmu_vm.vm, KVM_ARM_PREFERRED_TARGET, &init);
-> +       init.features[0] |=3D (1 << KVM_ARM_VCPU_PMU_V3);
-> +       aarch64_vcpu_setup(vcpu, &init);
-> +       vcpu_init_descriptor_tables(vcpu);
-> +       vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), sp);
-> +       vcpu_set_reg(vcpu, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code)=
-;
-> +
-> +       /* Update the PMCR_EL0.N after the VM ran once */
-> +       set_pmcr_n(&pmcr, 0);
-> +       vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
-> +
-> +       /* Verify that the guest still gets the unmodified value */
-> +       run_vcpu(vcpu, pmcr_n);
-> +
-> +       destroy_vpmu_vm();
-> +}
-Thanks for the suggestion! I'll add this test case in v8.
+> Why do you need (1) if you do (2)?
+>
+Okay, I see what you mean now. In that case, let reset_pmcr():
+- Initialize 'pmcr' using  vcpu->kvm->arch.pmcr_n
+- Set ARMV8_PMU_PMCR_LC as appropriate in 'pmcr'
+- Write 'pmcr' to the vcpu reg
 
-- Raghavendra
->
+From here on out, kvm_vcpu_read_pmcr() would read off of this
+initialized value, unless of course, userspace updates the pmcr.n.
+Is this the flow that you were suggesting?
+
+Thank you.
+Raghavendra
+
+> --
+> Thanks,
+> Oliver
