@@ -1,55 +1,55 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752328C0C
-	for <kvmarm@lists.linux.dev>; Wed, 18 Oct 2023 09:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4D68488
+	for <kvmarm@lists.linux.dev>; Wed, 18 Oct 2023 09:52:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A0GAnyp/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E76jPTTz"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697622637;
+	s=mimecast20190719; t=1697622738;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=NLpCBnDLvfXNYYi67xC1Ssv/noZY9gzp0KbFkKx9aOs=;
-	b=A0GAnyp/UUjRpeMHeGjsAC5ZDjD+b5XSA9HTvinG3i7f56TvBQdWZeXY6HlSv9EetmZTit
-	+YozkcrLUygbGfyvoaSGSXtH6SNR3QgqeqF7aj4j5wevXPrQWh/agouNJB/Z8JLWA9QGZd
-	AgMETQxHQqfqvtIdIPIY1LdD0E4GEaU=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=MTy9u72AvKpymhTEXgz7cOJwTX00iefFLAvlM+p6PJw=;
+	b=E76jPTTz1M4xscg2bEGlWZcC2ChGB4nHYMKU21qQf3DNZwEFMduN2SbTYoFX6nP01IGqY6
+	bi25HyqaDMJivFHgqnrn/P7Y76MgXhzDY/SLLI641K2SaxSONBZNgQ085zAiOlxQrCEuwr
+	emBehEnOgeBvB0YibkuiG2obJnF5ie8=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-134-p8Z9PcuwPWeiTePLyzILLA-1; Wed, 18 Oct 2023 05:50:35 -0400
-X-MC-Unique: p8Z9PcuwPWeiTePLyzILLA-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-77405179afdso734993785a.1
-        for <kvmarm@lists.linux.dev>; Wed, 18 Oct 2023 02:50:35 -0700 (PDT)
+ us-mta-433-TTRBYrg5M9OirthexLkyng-1; Wed, 18 Oct 2023 05:52:17 -0400
+X-MC-Unique: TTRBYrg5M9OirthexLkyng-1
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-41cb5ff64b0so12594971cf.2
+        for <kvmarm@lists.linux.dev>; Wed, 18 Oct 2023 02:52:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697622635; x=1698227435;
+        d=1e100.net; s=20230601; t=1697622736; x=1698227536;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NLpCBnDLvfXNYYi67xC1Ssv/noZY9gzp0KbFkKx9aOs=;
-        b=hW9Et4fVU+l92kGIIlVuMPw4LAj/jURJDg9HYcP8sdnzld/MIzt0HoEDycIz0ooipO
-         1BMuTCcDfff+k4DS1C1uxZDzPTZ98SWptbprYf3pvdglAaUexPex5ZTsLM1pMY/Akz+r
-         /MMu445w7YON/dyTiMtTbq9UQ4+VO7dazVt+9L/sNdQsMbYV8hYN/S3u4kjW+KM8gw2i
-         guJsk38xh4hALiK6pIg9O/V4ef4XpMncLoZPrdu8MsqvmledSIRcY7HkTv350GsCMCQb
-         H/TTjSzIhRmwPCPaCnPSHED853czXo+NfGujYIcZR7aQmzdL7k17sxKZK0HWcqhqOyRZ
-         QStw==
-X-Gm-Message-State: AOJu0YzSZw4jNnZo8/rEWgWP23BjGJhZbNHgBDaXCpdbxgUN8X6IVwGX
-	RaWbOgehRgVeUQy0KFGNDpNyeTnluhUKPU74REb94fysOUkkPfUP3yX8SLMSDQmp9Q9YTkMNi6u
-	0sRov6X27O+NAkqzx
-X-Received: by 2002:a05:620a:25d3:b0:774:1d2c:c412 with SMTP id y19-20020a05620a25d300b007741d2cc412mr4926123qko.44.1697622635303;
-        Wed, 18 Oct 2023 02:50:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFJzybtWarVKQQszbGViLQUiJB1FoBZ7kxdl8szeiXBGLOy9SIafzQrmXJGJp4Ev7uirtyyTw==
-X-Received: by 2002:a05:620a:25d3:b0:774:1d2c:c412 with SMTP id y19-20020a05620a25d300b007741d2cc412mr4926097qko.44.1697622634967;
-        Wed, 18 Oct 2023 02:50:34 -0700 (PDT)
+        bh=MTy9u72AvKpymhTEXgz7cOJwTX00iefFLAvlM+p6PJw=;
+        b=eSLGujnavg52EyJQCVYgUEITGqr/tqSi+nDg9fkpgolXVxxoTLQlLDDrPDjgd2U/eH
+         GGPjtQw46zrPVVgDUT4EgPJbeDVEKVN1z7f57lbKMTraZL97CMsI7rIkTCkd50ZhaaSg
+         coJUzeHjePZnXMlVQGIbLcQ/zE2Z7zwhZDeq6+XPn6cN34/LCkvVjdv+CMj33VdZYcEr
+         LS+p6AAbUKqDtKq/GWISDcDBmTwXUYg0CCe8wvXmomCNkubPYAJt8WtcALOeGDSSxBkA
+         JHEycOwiMT8+2xonq8rbsapaLNqBiwEDcIsk9lUrfz2qyXP2yMZbng9AksIOoIficcOV
+         IDHg==
+X-Gm-Message-State: AOJu0YyexLdzECWBclMXSckP/f9wI5htQEbFHl0NYqFnIjHPRFaWeEk7
+	I2iBorWUNw2ifqGuPVw9B7NMjM3rfOVEFqlVZ8/apIKHwrXN1aralOx/Ab7vhM/VgdqjWedNF50
+	5ekPL+M9m1YiGqDbm
+X-Received: by 2002:a05:6214:c2c:b0:66d:32ad:77ba with SMTP id a12-20020a0562140c2c00b0066d32ad77bamr4707748qvd.1.1697622736530;
+        Wed, 18 Oct 2023 02:52:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFVIoia+AvL7oQ7X+AY+YoEIrdAelNbHiwY+7nsEk5kM6AwK4l8oKJhaiX3l5rnuZ9MhTTUxQ==
+X-Received: by 2002:a05:6214:c2c:b0:66d:32ad:77ba with SMTP id a12-20020a0562140c2c00b0066d32ad77bamr4707727qvd.1.1697622736269;
+        Wed, 18 Oct 2023 02:52:16 -0700 (PDT)
 Received: from [192.168.43.95] ([37.170.189.211])
-        by smtp.gmail.com with ESMTPSA id de26-20020a05620a371a00b007743446efd1sm1342740qkb.35.2023.10.18.02.50.30
+        by smtp.gmail.com with ESMTPSA id ea11-20020ad458ab000000b0065b09512e14sm1217347qvb.21.2023.10.18.02.52.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Oct 2023 02:50:34 -0700 (PDT)
-Message-ID: <4aa5d142-462f-24d9-8f13-ead19c15ae99@redhat.com>
-Date: Wed, 18 Oct 2023 11:50:28 +0200
+        Wed, 18 Oct 2023 02:52:15 -0700 (PDT)
+Message-ID: <1c99fb73-3420-e12d-9828-5e501edef8b2@redhat.com>
+Date: Wed, 18 Oct 2023 11:52:09 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH v3 1/5] tools: arm64: Add a Makefile for generating
- sysreg-defs.h
+Subject: Re: [PATCH v3 3/5] KVM: selftests: Generate sysreg-defs.h and add to
+ include path
 To: Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
  linux-perf-users@vger.kernel.org, Mark Brown <broonie@kernel.org>,
@@ -74,9 +74,9 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
  Arnaldo Carvalho de Melo <acme@kernel.org>, Ingo Molnar <mingo@redhat.com>,
  Peter Zijlstra <peterz@infradead.org>
 References: <20231011195740.3349631-1-oliver.upton@linux.dev>
- <20231011195740.3349631-2-oliver.upton@linux.dev>
+ <20231011195740.3349631-4-oliver.upton@linux.dev>
 From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <20231011195740.3349631-2-oliver.upton@linux.dev>
+In-Reply-To: <20231011195740.3349631-4-oliver.upton@linux.dev>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -86,74 +86,73 @@ Content-Transfer-Encoding: 7bit
 Hi Oliver,
 
 On 10/11/23 21:57, Oliver Upton wrote:
-> Use a common Makefile for generating sysreg-defs.h, which will soon be
-> needed by perf and KVM selftests. The naming scheme of the generated
-> macros is not expected to change, so just refer to the canonical
-> script/data in the kernel source rather than copying to tools.
+> Start generating sysreg-defs.h for arm64 builds in anticipation of
+> updating sysreg.h to a version that depends on it.
 > 
-> Co-developed-by: Jing Zhang <jingzhangos@google.com>
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > Reviewed-by: Mark Brown <broonie@kernel.org>
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks
 
 Eric
+
 > ---
->  tools/arch/arm64/include/.gitignore |  1 +
->  tools/arch/arm64/tools/Makefile     | 38 +++++++++++++++++++++++++++++
->  2 files changed, 39 insertions(+)
->  create mode 100644 tools/arch/arm64/include/.gitignore
->  create mode 100644 tools/arch/arm64/tools/Makefile
+>  tools/testing/selftests/kvm/Makefile | 23 ++++++++++++++++++++---
+>  1 file changed, 20 insertions(+), 3 deletions(-)
 > 
-> diff --git a/tools/arch/arm64/include/.gitignore b/tools/arch/arm64/include/.gitignore
-> new file mode 100644
-> index 000000000000..9ab870da897d
-> --- /dev/null
-> +++ b/tools/arch/arm64/include/.gitignore
-> @@ -0,0 +1 @@
-> +generated/
-> diff --git a/tools/arch/arm64/tools/Makefile b/tools/arch/arm64/tools/Makefile
-> new file mode 100644
-> index 000000000000..f867e6036c62
-> --- /dev/null
-> +++ b/tools/arch/arm64/tools/Makefile
-> @@ -0,0 +1,38 @@
-> +# SPDX-License-Identifier: GPL-2.0
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index a3bb36fb3cfc..07b3f4dc1a77 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -17,6 +17,17 @@ else
+>  	ARCH_DIR := $(ARCH)
+>  endif
+>  
+> +ifeq ($(ARCH),arm64)
+> +arm64_tools_dir := $(top_srcdir)/tools/arch/arm64/tools/
+> +GEN_HDRS := $(top_srcdir)/tools/arch/arm64/include/generated/
+> +CFLAGS += -I$(GEN_HDRS)
 > +
-> +ifeq ($(srctree),)
-> +srctree := $(patsubst %/,%,$(dir $(CURDIR)))
-> +srctree := $(patsubst %/,%,$(dir $(srctree)))
-> +srctree := $(patsubst %/,%,$(dir $(srctree)))
-> +srctree := $(patsubst %/,%,$(dir $(srctree)))
-> +endif
-> +
-> +include $(srctree)/tools/scripts/Makefile.include
-> +
-> +AWK	?= awk
-> +MKDIR	?= mkdir
-> +RM	?= rm
-> +
-> +ifeq ($(V),1)
-> +Q =
+> +prepare:
+> +	$(MAKE) -C $(arm64_tools_dir)
 > +else
-> +Q = @
+> +prepare:
 > +endif
 > +
-> +arm64_tools_dir = $(srctree)/arch/arm64/tools
-> +arm64_sysreg_tbl = $(arm64_tools_dir)/sysreg
-> +arm64_gen_sysreg = $(arm64_tools_dir)/gen-sysreg.awk
-> +arm64_generated_dir = $(srctree)/tools/arch/arm64/include/generated
-> +arm64_sysreg_defs = $(arm64_generated_dir)/asm/sysreg-defs.h
-> +
-> +all: $(arm64_sysreg_defs)
-> +	@:
-> +
-> +$(arm64_sysreg_defs): $(arm64_gen_sysreg) $(arm64_sysreg_tbl)
-> +	$(Q)$(MKDIR) -p $(dir $@)
-> +	$(QUIET_GEN)$(AWK) -f $^ > $@
-> +
-> +clean:
-> +	$(Q)$(RM) -rf $(arm64_generated_dir)
-> +
-> +.PHONY: all clean
+>  LIBKVM += lib/assert.c
+>  LIBKVM += lib/elf.c
+>  LIBKVM += lib/guest_modes.c
+> @@ -256,13 +267,18 @@ $(TEST_GEN_OBJ): $(OUTPUT)/%.o: %.c
+>  $(SPLIT_TESTS_TARGETS): %: %.o $(SPLIT_TESTS_OBJS)
+>  	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
+>  
+> -EXTRA_CLEAN += $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) $(SPLIT_TESTS_OBJS) cscope.*
+> +EXTRA_CLEAN += $(GEN_HDRS) \
+> +	       $(LIBKVM_OBJS) \
+> +	       $(SPLIT_TESTS_OBJS) \
+> +	       $(TEST_DEP_FILES) \
+> +	       $(TEST_GEN_OBJ) \
+> +	       cscope.*
+>  
+>  x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
+> -$(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
+> +$(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c prepare
+>  	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+>  
+> -$(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S
+> +$(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S prepare
+>  	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+>  
+>  # Compile the string overrides as freestanding to prevent the compiler from
+> @@ -274,6 +290,7 @@ $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
+>  x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
+>  $(TEST_GEN_PROGS): $(LIBKVM_OBJS)
+>  $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
+> +$(TEST_GEN_OBJ): prepare
+>  
+>  cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include lib ..
+>  cscope:
 
