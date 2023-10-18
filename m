@@ -1,163 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-210.mta1.migadu.com (out-210.mta1.migadu.com [95.215.58.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3539C36B1A;
-	Wed, 18 Oct 2023 14:12:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3944E43A98
+	for <kvmarm@lists.linux.dev>; Wed, 18 Oct 2023 18:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W+Gvms76"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D05EC433C9;
-	Wed, 18 Oct 2023 14:12:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697638376;
-	bh=51fIDWCVKB8uS2JBPxXFm+H74EFZkbMSdzM2pSNC22c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=W+Gvms76pV5hSiJAOrI7JIk44J4aJD7XIdf7yMDCPx20skfodeyV+Cp8GCsFRftJh
-	 qz+RiAq7N/TbfgTkm1dyIZ4LCHrmPMhyJYbYbzSGW4OnqNp1Ht5FdCWP0knGAjbLNw
-	 ukttiawgU6pYBeK4MaphTHoLfctNQ/ntcCNwaHhFwLCVyn7UT4NZu82tLUXFk+JBAh
-	 2mI8IKAxvFfmhVvoUNrHiABrwtp9a07fXKQC1xmVXku52jGP4l0nF9YllHc33owMIw
-	 JRL/RW9l5ne/Prnc1Dk6oMQFiEs1CLsbeWW3uiGULtPDGvHGoRWDp0Xv05zBckuotp
-	 FGdLs3ivRIO5Q==
-Received: by quaco.ghostprotocols.net (Postfix, from userid 1000)
-	id A57F140016; Wed, 18 Oct 2023 11:12:53 -0300 (-03)
-Date: Wed, 18 Oct 2023 11:12:53 -0300
-From: Arnaldo Carvalho de Melo <acme@kernel.org>
-To: Namhyung Kim <namhyung@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-perf-users@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-	Jing Zhang <jingzhangos@google.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NIh9liS5"
+Date: Wed, 18 Oct 2023 18:24:11 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1697653455;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tZgmiugmq/HuBF5Zgqs1/aVDylBOTyMyklK/nxHkNZ4=;
+	b=NIh9liS5bJh/WOPbD55WnlgC/C/wMZrQeknCxk9fU1J9HgF3P7ntRtml/Yf43ORrP9GqDa
+	/2lsDFGE/pCnVvkNFcvsmGmTx8jCdyb67VZJMlIhtcdS47Wn0NibkCgIOfo9iHC8OWOmFY
+	wKUtYOOZ8ymffr2i2K5EqJHJX9W3dWE=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>, Marc Zyngier <maz@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Ian Rogers <irogers@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Mark Rutland <mark.rutland@arm.com>, Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v3 2/5] perf build: Generate arm64's sysreg-defs.h and
- add to include path
-Message-ID: <ZS/n5dqo6dZE40HE@kernel.org>
-References: <20231011195740.3349631-1-oliver.upton@linux.dev>
- <20231011195740.3349631-3-oliver.upton@linux.dev>
- <CAM9d7cjxkAmEc=g0jWBPQ9d6GYmfdZSKjqi5v0UsoPvkQy-fSw@mail.gmail.com>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 2/2] KVM: arm64: Virtualise PMEVTYPER<n>_EL1.{NSU,NSK}
+Message-ID: <ZTAiy7Ijq2UmySyX@linux.dev>
+References: <20231013052901.170138-1-oliver.upton@linux.dev>
+ <20231013052901.170138-3-oliver.upton@linux.dev>
+ <86o7gwm50g.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAM9d7cjxkAmEc=g0jWBPQ9d6GYmfdZSKjqi5v0UsoPvkQy-fSw@mail.gmail.com>
-X-Url: http://acmel.wordpress.com
+In-Reply-To: <86o7gwm50g.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-Em Tue, Oct 17, 2023 at 03:23:40PM -0700, Namhyung Kim escreveu:
-> Hello,
+On Wed, Oct 18, 2023 at 02:31:11PM +0100, Marc Zyngier wrote:
+> On Fri, 13 Oct 2023 06:29:01 +0100,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> > 
+> > Suzuki noticed that KVM's PMU emulation is oblivious to the NSU and NSK
+> > event filter bits. On systems that have EL3 these bits modify the
+> > filter behavior in non-secure EL0 and EL1, respectively. Even though the
+> > kernel doesn't use these bits, it is entirely possible some other guest
+> > OS does.
 > 
-> On Wed, Oct 11, 2023 at 12:58 PM Oliver Upton <oliver.upton@linux.dev> wrote:
-> >
-> > Start generating sysreg-defs.h in anticipation of updating sysreg.h to a
-> > version that needs the generated output.
-> >
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> 
-> It seems we also need this on non-ARM archs to process ARM SPE data.
-> 
-> Acked-by: Namhyung Kim <namhyung@kernel.org>
+> But what does it mean for KVM itself? We have no EL3 to speak of as
+> far as a guest is concerned. And the moment we allow things like
+> NSU/NSK to be set, why don't we allow M as well?
 
-When building with CORESIGHT=1, yes.
+Yeah, we need to have a think about all these extra bits TBH.
 
-I have it in my tests and:
+KVM doesn't filter the advertised ELs in PFR0, so from the guest POV
+both EL2 and EL3 could potentially be implemented by the vCPU. Based
+on that I think the bits at least need to be stateful, even though KVM's
+emulation will never let the guest count events in a higher EL.
 
-⬢[acme@toolbox perf-tools-next]$ ls -la /tmp/build/perf-tools-next/util/arm-spe.o
--rw-r--r--. 1 acme acme 135432 Oct 17 16:49 /tmp/build/perf-tools-next/util/arm-spe.o
-⬢[acme@toolbox perf-tools-next]$ ldd /tmp/build/perf-tools-next/perf | grep csd
-	libopencsd_c_api.so.1 => /lib64/libopencsd_c_api.so.1 (0x00007f36bfca5000)
-	libopencsd.so.1 => /lib64/libopencsd.so.1 (0x00007f36be2e0000)
-⬢[acme@toolbox perf-tools-next]$ rpm -qf /lib64/libopencsd.so.1
-opencsd-1.3.3-1.fc38.x86_64
-⬢[acme@toolbox perf-tools-next]$ rpm -q --qf "%{summary}\n" opencsd
-An open source CoreSight(tm) Trace Decode library
-⬢[acme@toolbox perf-tools-next]$
+My patches aren't even consistent with the above statement, as NSH gets
+RES0 treatment and the NS{U,K} bits do not. So how about this:
 
-Well, double checked and arm-spe.o is built by default, only way to
-disable it is using NO_AUXTRACE=1 in the make command line, but then
-IIRC one needs linking with opencsd to decode all those traces, right?
+ - If EL3 is advertised in the guest's ID registers NS{U,K}, and M can
+   be set. NS{U,K} work as proposed, M is ignored in KVM emulation.
 
-Anyway:
+ - If EL2 is advertised in the guest's ID registers NSH can be set but
+   is ignored in KVM emulation.
 
-Acked-by: Arnaldo Carvalho de Melo <acme@redhat.com>
-
-- Arnaldo
- 
-> Thanks,
-> Namhyung
-> 
-> 
-> > ---
-> >  tools/perf/Makefile.perf | 15 +++++++++++++--
-> >  tools/perf/util/Build    |  2 +-
-> >  2 files changed, 14 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/tools/perf/Makefile.perf b/tools/perf/Makefile.perf
-> > index 37af6df7b978..14dedd11a1f5 100644
-> > --- a/tools/perf/Makefile.perf
-> > +++ b/tools/perf/Makefile.perf
-> > @@ -443,6 +443,15 @@ drm_ioctl_tbl := $(srctree)/tools/perf/trace/beauty/drm_ioctl.sh
-> >  # Create output directory if not already present
-> >  _dummy := $(shell [ -d '$(beauty_ioctl_outdir)' ] || mkdir -p '$(beauty_ioctl_outdir)')
-> >
-> > +arm64_gen_sysreg_dir := $(srctree)/tools/arch/arm64/tools
-> > +
-> > +arm64-sysreg-defs: FORCE
-> > +       $(Q)$(MAKE) -C $(arm64_gen_sysreg_dir)
-> > +
-> > +arm64-sysreg-defs-clean:
-> > +       $(call QUIET_CLEAN,arm64-sysreg-defs)
-> > +       $(Q)$(MAKE) -C $(arm64_gen_sysreg_dir) clean > /dev/null
-> > +
-> >  $(drm_ioctl_array): $(drm_hdr_dir)/drm.h $(drm_hdr_dir)/i915_drm.h $(drm_ioctl_tbl)
-> >         $(Q)$(SHELL) '$(drm_ioctl_tbl)' $(drm_hdr_dir) > $@
-> >
-> > @@ -716,7 +725,9 @@ endif
-> >  __build-dir = $(subst $(OUTPUT),,$(dir $@))
-> >  build-dir   = $(or $(__build-dir),.)
-> >
-> > -prepare: $(OUTPUT)PERF-VERSION-FILE $(OUTPUT)common-cmds.h archheaders $(drm_ioctl_array) \
-> > +prepare: $(OUTPUT)PERF-VERSION-FILE $(OUTPUT)common-cmds.h archheaders \
-> > +       arm64-sysreg-defs \
-> > +       $(drm_ioctl_array) \
-> >         $(fadvise_advice_array) \
-> >         $(fsconfig_arrays) \
-> >         $(fsmount_arrays) \
-> > @@ -1125,7 +1136,7 @@ endif # BUILD_BPF_SKEL
-> >  bpf-skel-clean:
-> >         $(call QUIET_CLEAN, bpf-skel) $(RM) -r $(SKEL_TMP_OUT) $(SKELETONS)
-> >
-> > -clean:: $(LIBAPI)-clean $(LIBBPF)-clean $(LIBSUBCMD)-clean $(LIBSYMBOL)-clean $(LIBPERF)-clean fixdep-clean python-clean bpf-skel-clean tests-coresight-targets-clean
-> > +clean:: $(LIBAPI)-clean $(LIBBPF)-clean $(LIBSUBCMD)-clean $(LIBSYMBOL)-clean $(LIBPERF)-clean arm64-sysreg-defs-clean fixdep-clean python-clean bpf-skel-clean tests-coresight-targets-clean
-> >         $(call QUIET_CLEAN, core-objs)  $(RM) $(LIBPERF_A) $(OUTPUT)perf-archive $(OUTPUT)perf-iostat $(LANG_BINDINGS)
-> >         $(Q)find $(or $(OUTPUT),.) -name '*.o' -delete -o -name '\.*.cmd' -delete -o -name '\.*.d' -delete
-> >         $(Q)$(RM) $(OUTPUT).config-detected
-> > diff --git a/tools/perf/util/Build b/tools/perf/util/Build
-> > index 6d657c9927f7..2f76230958ad 100644
-> > --- a/tools/perf/util/Build
-> > +++ b/tools/perf/util/Build
-> > @@ -345,7 +345,7 @@ CFLAGS_rbtree.o        += -Wno-unused-parameter -DETC_PERFCONFIG="BUILD_STR($(ET
-> >  CFLAGS_libstring.o     += -Wno-unused-parameter -DETC_PERFCONFIG="BUILD_STR($(ETC_PERFCONFIG_SQ))"
-> >  CFLAGS_hweight.o       += -Wno-unused-parameter -DETC_PERFCONFIG="BUILD_STR($(ETC_PERFCONFIG_SQ))"
-> >  CFLAGS_header.o        += -include $(OUTPUT)PERF-VERSION-FILE
-> > -CFLAGS_arm-spe.o       += -I$(srctree)/tools/arch/arm64/include/
-> > +CFLAGS_arm-spe.o       += -I$(srctree)/tools/arch/arm64/include/ -I$(srctree)/tools/arch/arm64/include/generated/
-> >
-> >  $(OUTPUT)util/argv_split.o: ../lib/argv_split.c FORCE
-> >         $(call rule_mkdir)
-> > --
-> > 2.42.0.609.gbb76f46606-goog
-> >
+Thoughts?
 
 -- 
-
-- Arnaldo
+Thanks,
+Oliver
