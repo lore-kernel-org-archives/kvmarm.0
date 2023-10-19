@@ -1,112 +1,301 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67CC3D382
-	for <kvmarm@lists.linux.dev>; Thu, 19 Oct 2023 20:18:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516CA208B8
+	for <kvmarm@lists.linux.dev>; Thu, 19 Oct 2023 21:06:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m2C/vaJe"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1c9b70b9671so9805ad.1
-        for <kvmarm@lists.linux.dev>; Thu, 19 Oct 2023 13:18:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697746690; x=1698351490; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=re69crmlRFvuit7vgWY0A8Ey7T/2hSy2QGFgqasYm7Y=;
-        b=m2C/vaJeUZqvddeFluzu8Rl2HhaTZSWxCrxUG7O2HAvSsRdJ5IrCoEdgHFIRMWKUJM
-         bOT3IvbzeSGhgYQMprRIscTOcfeRO6ZEwXfDyCGdWtGAyECjlWrAAUt5UqpwiWD2bwaq
-         DOd0qsnDMV7QCvgU7axes6/3xMWPjrsl60DWd+mZ8s3OnQv/R5j/tOTQX5ICnyFA6Oa0
-         oM+zyxd7+lmu6mxXbFw3+A89XQHT1OipOlf4vnYGCkFzjlhz0iU/vZPb7439XPH2uA8k
-         AuLPQhf6HM4eyjLEw1T1C1Pud3PC8grKWyMb4ihvCVj6OanIX2PIJUaKsukoekbWTivF
-         yRfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697746690; x=1698351490;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=re69crmlRFvuit7vgWY0A8Ey7T/2hSy2QGFgqasYm7Y=;
-        b=jCSMdNRubYdH/eJeuepsbVNbj5pd17XisA9w90S6aASXguuWkPOIHUd466CzvSJG+e
-         Ho4JapXRQfGmHOBipSnKrRKHBkVjkk6/jPcc9oRlwCx7xv7H1yALFqmNxTQFB8QEXzln
-         /R0Mkgz9egLBMXM4Q2VXjJdWAS82+EV+I+uUxZ8gzPr/sgX0m/GR734LqTpDh5NNrEBC
-         U9Mw2xJJxFLwb7maXhdx2rMCDa48kf2/hK9ibzJurcb75CullRdXwuWnVGfcM0ddoU7j
-         WsmQcHyhiDV6pWH1m537bu4PBqmBkbG8v+NTDXoVCzLZxubLSdc8oWjZQmHb2rUidElY
-         aFNw==
-X-Gm-Message-State: AOJu0YzrTXSOKOKEvRDOvyPYrfoI+XQUR0A3YkDEN60yqJke+KuY30yI
-	GqbR5/JpTyv0LBCZiLiNmnVXbxOQI5sEaPY0vneAng==
-X-Google-Smtp-Source: AGHT+IHBuZ18aPFC5tbiN39OPHUSbaheZLj3eZFoc72z1OMOJqTRu9TrdQCDkRczySNC2f1yEKxOHu95/xwWlWnDbA8=
-X-Received: by 2002:a17:903:40cb:b0:1b9:d96c:bca7 with SMTP id
- t11-20020a17090340cb00b001b9d96cbca7mr42965pld.25.1697746689771; Thu, 19 Oct
- 2023 13:18:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f0fhRjzR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8ABBEC433C8;
+	Thu, 19 Oct 2023 21:06:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697749570;
+	bh=nr13Fxcmy5xfhau/WVo3CZW7I0qv9qUiEt7gHdEK3JU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=f0fhRjzRL2wiLU3rgpqLOgrC0fqXYnCcMlmzuUt+6QkwIFdWli3bBMQN88JfkcJSp
+	 fpIrqpRcfmE7pmHj90f/PR3zQvR6ovIGPW6T23Nf02baa2QDptX+p3Sd4tPl9YsJIh
+	 cAJNX/V7d6l9UIIXXg9TEKZH5ZY1sg/mnEsbcztkTpOy3yLwjeiSX6TrPbWjUXDl3L
+	 LymOCnZiiKV3C0qPh3Trbh1BMz8Tw8mhA+37eL8S01vA9Wbx0AgM2fb+FA5axbccUV
+	 4UU2cJQctKQJP13/QEX9/9Lg2WG2pbGvJkfiJhflrrAfDEgmWBzRHNepRrYAQC3nWX
+	 SG3dkud7gl15Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qtaDX-005uiV-QH;
+	Thu, 19 Oct 2023 22:06:07 +0100
+Date: Thu, 19 Oct 2023 22:06:07 +0100
+Message-ID: <87y1fy5nls.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 02/12] arm64/mm: Update range-based tlb invalidation routines for FEAT_LPA2
+In-Reply-To: <20231009185008.3803879-3-ryan.roberts@arm.com>
+References: <20231009185008.3803879-1-ryan.roberts@arm.com>
+	<20231009185008.3803879-3-ryan.roberts@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20231009230858.3444834-1-rananta@google.com> <20231009230858.3444834-4-rananta@google.com>
- <53546f35-f2cc-4c75-171c-26719550f7df@redhat.com> <CAJHc60wYyfsJPiFEyLYLyv9femNzDUXy+xFaGx59=2HrUGScyw@mail.gmail.com>
- <34959db4-01e9-8c1e-110e-c52701e2fb19@redhat.com> <CAJHc60xc1dM_d4W+hOOnM5+DceF45htTfrbmdv=Q4vPf8T04Ow@mail.gmail.com>
- <CAJHc60yr5U+sxSAaZipei_4TNaU0_EAWKLG8cr+5v_Z1WYRMuw@mail.gmail.com>
- <CAJHc60yQSzsuTJLcyzs5vffgRzR5i0vKQwLnhavAon6hoSkb+A@mail.gmail.com> <ZTF-FlDtvha-6Pw1@linux.dev>
-In-Reply-To: <ZTF-FlDtvha-6Pw1@linux.dev>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Thu, 19 Oct 2023 13:17:58 -0700
-Message-ID: <CAJHc60yNfGo8A+RLozgEsDO=75SQAB5dswAWgFzc3OS7_3FfKQ@mail.gmail.com>
-Subject: Re: [PATCH v7 03/12] KVM: arm64: PMU: Clear PM{C,I}NTEN{SET,CLR} and
- PMOVS{SET,CLR} on vCPU reset
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Eric Auger <eauger@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Jing Zhang <jingzhangos@google.com>, Reiji Watanabe <reijiw@google.com>, 
-	Colton Lewis <coltonlewis@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, james.morse@arm.com, yuzenghui@huawei.com, ardb@kernel.org, anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Oct 19, 2023 at 12:06=E2=80=AFPM Oliver Upton <oliver.upton@linux.d=
-ev> wrote:
->
-> Hi Raghu,
->
-> Can you please make sure you include leading and trailing whitespace for
-> your inline replies? The message gets extremely dense and is difficult
-> to read.
->
-> Also -- delete any unrelated context from your replies. If there's a
-> localized conversation about a particular detail there's no reason to
-> keep the entire thread in the body.
->
-Sorry about that. I'll try to keep it clean.
+On Mon, 09 Oct 2023 19:49:58 +0100,
+Ryan Roberts <ryan.roberts@arm.com> wrote:
+> 
+> The BADDR field of the range-based tlbi instructions is specified in
+> 64KB units when LPA2 is in use (TCR.DS=1), whereas it is in page units
+> otherwise.
+> 
+> When LPA2 is enabled, use the non-range tlbi instructions to forward
+> align to a 64KB boundary first, then use range-based tlbi from there on,
+> until we have either invalidated all pages or we have a single page
+> remaining. If the latter, that is done with non-range tlbi. (Previously
+> we invalidated a single odd page first, but we can no longer do this
+> because it could wreck our 64KB alignment). When LPA2 is not in use, we
+> don't need the initial alignemnt step. However, the bigger impact is
+> that we can no longer use the previous method of iterating from smallest
+> to largest 'scale', since this would likely unalign the boundary again
+> for the LPA2 case. So instead we iterate from highest to lowest scale,
+> which guarrantees that we remain 64KB aligned until the last op (at
+> scale=0).
+> 
+> The original commit (d1d3aa98 "arm64: tlb: Use the TLBI RANGE feature in
+> arm64") stated this as the reason for incrementing scale:
+> 
+>   However, in most scenarios, the pages = 1 when flush_tlb_range() is
+>   called. Start from scale = 3 or other proper value (such as scale
+>   =ilog2(pages)), will incur extra overhead. So increase 'scale' from 0
+>   to maximum, the flush order is exactly opposite to the example.
+> 
+> But pages=1 is already special cased by the non-range invalidation path,
+> which will take care of it the first time through the loop (both in the
+> original commit and in my change), so I don't think switching to
+> decrement scale should have any extra performance impact after all.
 
-> On Thu, Oct 19, 2023 at 11:46:22AM -0700, Raghavendra Rao Ananta wrote:
-> > On Wed, Oct 18, 2023 at 2:16=E2=80=AFPM Raghavendra Rao Ananta
-> > <rananta@google.com> wrote:
-> > > I had a brief discussion about this with Oliver, and it looks like we
-> > > might need a couple of additional changes for these register accesses=
-:
-> > > - For the userspace accesses, we have to implement explicit get_user
-> > > and set_user callbacks that to filter out the unimplemented counters
-> > > using kvm_pmu_valid_counter_mask().
-> > Re-thinking the first case: Since these registers go through a reset
-> > (reset_pmu_reg()) during initialization, where the valid counter mask
-> > is applied, and since we are sanitizing the registers with the mask
-> > before running the guest (below case), will implementing the
-> > {get,set}_user() add any value, apart from just keeping userspace in
-> > sync with every update of PMCR.N?
->
-> KVM's sysreg emulation (as seen from userspace) fails to uphold the RES0
-> bits of these registers. That's a bug.
->
-Got it. Thanks for the confirmation. I'll implement these as originally pla=
-nned.
+Surely this can be benchmarked. After all, HW supporting range
+invalidation is common enough these days.
 
-Thank you.
-Raghavendra
+> 
+> Note: This patch uses LPA2 range-based tlbi based on the new lpa2 param
+> passed to __flush_tlb_range_op(). This allows both KVM and the kernel to
+> opt-in/out of LPA2 usage independently. But once both are converted over
+> (and keyed off the same static key), the parameter could be dropped and
+> replaced by the static key directly in the macro.
 
-> --
-> Thanks,
-> Oliver
+Why can't this be done right away? Have a patch common to the two
+series that exposes the static key, and use that from the start. This
+would avoid the current (and rather ugly) extra parameter that I find
+unnecessarily hard to parse.
+
+And if the 64kB alignment above is cheap enough, maybe this could
+become the one true way?
+
+> 
+> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
+> ---
+>  arch/arm64/include/asm/tlb.h      |  6 +++-
+>  arch/arm64/include/asm/tlbflush.h | 46 ++++++++++++++++++++-----------
+>  arch/arm64/kvm/hyp/nvhe/tlb.c     |  2 +-
+>  arch/arm64/kvm/hyp/vhe/tlb.c      |  2 +-
+>  4 files changed, 37 insertions(+), 19 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/tlb.h b/arch/arm64/include/asm/tlb.h
+> index 93c537635dbb..396ba9b4872c 100644
+> --- a/arch/arm64/include/asm/tlb.h
+> +++ b/arch/arm64/include/asm/tlb.h
+> @@ -25,7 +25,6 @@ static void tlb_flush(struct mmu_gather *tlb);
+>   * get the tlbi levels in arm64.  Default value is TLBI_TTL_UNKNOWN if more than
+>   * one of cleared_* is set or neither is set - this elides the level hinting to
+>   * the hardware.
+> - * Arm64 doesn't support p4ds now.
+>   */
+>  static inline int tlb_get_level(struct mmu_gather *tlb)
+>  {
+> @@ -48,6 +47,11 @@ static inline int tlb_get_level(struct mmu_gather *tlb)
+>  				   tlb->cleared_p4ds))
+>  		return 1;
+>  
+> +	if (tlb->cleared_p4ds && !(tlb->cleared_ptes ||
+> +				   tlb->cleared_pmds ||
+> +				   tlb->cleared_puds))
+> +		return 0;
+> +
+>  	return TLBI_TTL_UNKNOWN;
+>  }
+>  
+> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
+> index e688246b3b13..4d34035fe7d6 100644
+> --- a/arch/arm64/include/asm/tlbflush.h
+> +++ b/arch/arm64/include/asm/tlbflush.h
+> @@ -136,10 +136,14 @@ static inline unsigned long get_trans_granule(void)
+>   * The address range is determined by below formula:
+>   * [BADDR, BADDR + (NUM + 1) * 2^(5*SCALE + 1) * PAGESIZE)
+>   *
+> + * If LPA2 is in use, BADDR holds addr[52:16]. Else BADDR holds page number.
+> + * See ARM DDI 0487I.a C5.5.21.
+
+Please update this to the latest published ARM ARM. I know it will be
+obsolete quickly enough, but still. Also, "page number" is rather
+imprecise, and doesn't match the language of the architecture.
+
+> + *
+>   */
+> -#define __TLBI_VADDR_RANGE(addr, asid, scale, num, ttl)				\
+> +#define __TLBI_VADDR_RANGE(addr, asid, scale, num, ttl, lpa2)			\
+>  	({									\
+> -		unsigned long __ta = (addr) >> PAGE_SHIFT;			\
+> +		unsigned long __addr_shift = lpa2 ? 16 : PAGE_SHIFT;		\
+> +		unsigned long __ta = (addr) >> __addr_shift;			\
+>  		unsigned long __ttl = (ttl >= 1 && ttl <= 3) ? ttl : 0;		\
+>  		__ta &= GENMASK_ULL(36, 0);					\
+>  		__ta |= __ttl << 37;						\
+> @@ -354,34 +358,44 @@ static inline void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
+>   * @tlb_level:	Translation Table level hint, if known
+>   * @tlbi_user:	If 'true', call an additional __tlbi_user()
+>   *              (typically for user ASIDs). 'flase' for IPA instructions
+> + * @lpa2:	If 'true', the lpa2 scheme is used as set out below
+>   *
+>   * When the CPU does not support TLB range operations, flush the TLB
+>   * entries one by one at the granularity of 'stride'. If the TLB
+>   * range ops are supported, then:
+>   *
+> - * 1. If 'pages' is odd, flush the first page through non-range
+> - *    operations;
+> + * 1. If FEAT_LPA2 is in use, the start address of a range operation
+> + *    must be 64KB aligned, so flush pages one by one until the
+> + *    alignment is reached using the non-range operations. This step is
+> + *    skipped if LPA2 is not in use.
+>   *
+>   * 2. For remaining pages: the minimum range granularity is decided
+>   *    by 'scale', so multiple range TLBI operations may be required.
+> - *    Start from scale = 0, flush the corresponding number of pages
+> - *    ((num+1)*2^(5*scale+1) starting from 'addr'), then increase it
+> - *    until no pages left.
+> + *    Start from scale = 3, flush the corresponding number of pages
+> + *    ((num+1)*2^(5*scale+1) starting from 'addr'), then descrease it
+> + *    until one or zero pages are left. We must start from highest scale
+> + *    to ensure 64KB start alignment is maintained in the LPA2 case.
+
+Surely the algorithm is a bit more subtle than this, because always
+starting with scale==3 means that you're invalidating at least 64k
+*pages*, which is an awful lot (a minimum of 256MB?).
+
+> + *
+> + * 3. If there is 1 page remaining, flush it through non-range
+> + *    operations. Range operations can only span an even number of
+> + *    pages. We save this for last to ensure 64KB start alignment is
+> + *    maintained for the LPA2 case.
+>   *
+>   * Note that certain ranges can be represented by either num = 31 and
+>   * scale or num = 0 and scale + 1. The loop below favours the latter
+>   * since num is limited to 30 by the __TLBI_RANGE_NUM() macro.
+>   */
+>  #define __flush_tlb_range_op(op, start, pages, stride,			\
+> -				asid, tlb_level, tlbi_user)		\
+> +				asid, tlb_level, tlbi_user, lpa2)	\
+>  do {									\
+>  	int num = 0;							\
+> -	int scale = 0;							\
+> +	int scale = 3;							\
+>  	unsigned long addr;						\
+>  									\
+>  	while (pages > 0) {						\
+
+Not an issue with your patch, but we could be more robust here. If
+'pages' is an unsigned quantity and what we have a bug in converging
+to 0 below, we'll be looping for a long time. Not to mention the side
+effects on pages and start.
+
+>  		if (!system_supports_tlb_range() ||			\
+> -		    pages % 2 == 1) {					\
+> +		    pages == 1 ||					\
+> +		    (lpa2 && start != ALIGN(start, SZ_64K))) {		\
+>  			addr = __TLBI_VADDR(start, asid);		\
+>  			__tlbi_level(op, addr, tlb_level);		\
+>  			if (tlbi_user)					\
+> @@ -394,19 +408,19 @@ do {									\
+>  		num = __TLBI_RANGE_NUM(pages, scale);			\
+>  		if (num >= 0) {						\
+>  			addr = __TLBI_VADDR_RANGE(start, asid, scale,	\
+> -						  num, tlb_level);	\
+> +						num, tlb_level, lpa2);	\
+>  			__tlbi(r##op, addr);				\
+>  			if (tlbi_user)					\
+>  				__tlbi_user(r##op, addr);		\
+>  			start += __TLBI_RANGE_PAGES(num, scale) << PAGE_SHIFT; \
+>  			pages -= __TLBI_RANGE_PAGES(num, scale);	\
+>  		}							\
+> -		scale++;						\
+> +		scale--;						\
+>  	}								\
+>  } while (0)
+>  
+> -#define __flush_s2_tlb_range_op(op, start, pages, stride, tlb_level) \
+> -	__flush_tlb_range_op(op, start, pages, stride, 0, tlb_level, false)
+> +#define __flush_s2_tlb_range_op(op, start, pages, stride, tlb_level, lpa2) \
+> +	__flush_tlb_range_op(op, start, pages, stride, 0, tlb_level, false, lpa2)
+>  
+>  static inline void __flush_tlb_range(struct vm_area_struct *vma,
+>  				     unsigned long start, unsigned long end,
+> @@ -436,9 +450,9 @@ static inline void __flush_tlb_range(struct vm_area_struct *vma,
+>  	asid = ASID(vma->vm_mm);
+>  
+>  	if (last_level)
+> -		__flush_tlb_range_op(vale1is, start, pages, stride, asid, tlb_level, true);
+> +		__flush_tlb_range_op(vale1is, start, pages, stride, asid, tlb_level, true, false);
+>  	else
+> -		__flush_tlb_range_op(vae1is, start, pages, stride, asid, tlb_level, true);
+> +		__flush_tlb_range_op(vae1is, start, pages, stride, asid, tlb_level, true, false);
+>  
+>  	dsb(ish);
+>  	mmu_notifier_arch_invalidate_secondary_tlbs(vma->vm_mm, start, end);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> index 1b265713d6be..d42b72f78a9b 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> @@ -198,7 +198,7 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+>  	/* Switch to requested VMID */
+>  	__tlb_switch_to_guest(mmu, &cxt, false);
+>  
+> -	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride, 0);
+> +	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride, 0, false);
+>  
+>  	dsb(ish);
+>  	__tlbi(vmalle1is);
+> diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
+> index 46bd43f61d76..6041c6c78984 100644
+> --- a/arch/arm64/kvm/hyp/vhe/tlb.c
+> +++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+> @@ -161,7 +161,7 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+>  	/* Switch to requested VMID */
+>  	__tlb_switch_to_guest(mmu, &cxt);
+>  
+> -	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride, 0);
+> +	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride, 0, false);
+>  
+>  	dsb(ish);
+>  	__tlbi(vmalle1is);
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
