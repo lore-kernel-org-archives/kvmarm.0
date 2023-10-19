@@ -1,177 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C218A2FE2B;
-	Thu, 19 Oct 2023 17:08:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F72C14F90
+	for <kvmarm@lists.linux.dev>; Thu, 19 Oct 2023 18:05:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iuYT4D0V"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6BCAC433C8;
-	Thu, 19 Oct 2023 17:08:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697735301;
-	bh=pG0Qit3AqQuyW6KGy3cTGUjC4taxXCYceYbhQqKPpi0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iuYT4D0VMaEuj+thGqbHAXol5XSAP+gpQW0FvmhrZUDfxLXv+/ZVEXa7HboYTdjfS
-	 6IW13fpGKYOraD3SUYgFKSKngtaiTn4eZnS5/t4No3Bd9JUpA/YN36SlzCfxP3r8Qo
-	 GSGIhhQuUcl2bZWr7R2xIlGjz0vg5FexGBIpOTGda3+rKYYtVhgWVsIhxkX6hbI0gm
-	 mcLC1qwZc2f1UoNDZu97OVSCneDpDNOnMk0J/9pg1MhLPNaMhehC5h9M8hK61gX85H
-	 oCvpdUL6LgDGxSu2UPoMDo+pZMMxQOrswwQOGCVnwHabAhbK25KaSViVEB0JO0/a2D
-	 NKmdSxXCL95kQ==
-Date: Thu, 19 Oct 2023 18:08:12 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Will Deacon <will@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
- Stacks
-Message-ID: <8a158486-f0b9-4f25-b673-998726a40528@sirena.org.uk>
-References: <aaea542c-929c-4c9b-8caa-ca67e0eb9c1e@sirena.org.uk>
- <ZOTnL1SDJWZjHPUW@arm.com>
- <43ec219d-bf20-47b8-a5f8-32bc3b64d487@sirena.org.uk>
- <ZOXa98SqwYPwxzNP@arm.com>
- <ZOYFazB1gYjzDRdA@arm.com>
- <ZRWw7aa3C0LlMPTH@arm.com>
- <38edb5c3-367e-4ab7-8cb7-aa1a5c0e330c@sirena.org.uk>
- <ZRvUxLgMse8QYlGS@arm.com>
- <a7d2fd66-c06b-4033-bca2-4b14afc4904f@sirena.org.uk>
- <ZR7w/mr0xZbpIPc5@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="igBtlNjr"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1c9d4f08d7cso20565ad.0
+        for <kvmarm@lists.linux.dev>; Thu, 19 Oct 2023 11:05:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697738729; x=1698343529; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X79WPuk0kI/Em6qMbs24oISDzyvT6ZbjodD9ilXj+Jg=;
+        b=igBtlNjrL+KbZ7Nba3tWO1KNZdWe/CcEC4xWoJj7e8OZV0XmZDwNMYYm1iMiTpNcuR
+         bEuDrou82POPEjPiYHmtXrBS9AFL4iUQRkpjVI1n8b5QwKauWQg8mm3/raGZZCg/XRR3
+         V6756AQRwonmC34YYSvdzXpMTeP6m8QQd/m635d1jKemnN9J+R/E7uNsBtwvtO8bXcv9
+         kNEq0i1K/D992uSB6HGsv6/j20qoaBo1/9CwEb9A9707xkhiLAg4JXrUWkZTw7MHg2Ci
+         Z4mddsDWvo14FlZeCrInFcP6FHXXqi6vWJtlmqBTBKZOCkpdaqHGyBzVWzc2/hCmoHjv
+         vf6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697738729; x=1698343529;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X79WPuk0kI/Em6qMbs24oISDzyvT6ZbjodD9ilXj+Jg=;
+        b=OTkKdjDXN4ii5JdrASybsQeXiEKAk/4NC8JzFVEyByjrc57ADT5oyJvrfCj3g2Ior+
+         TlVOOIPC+jvGhQSb7yqDxFIJAAJaCRFzky+L/GgRgZQxTVD/YwQSCv9NRzAIvnHOolHJ
+         XFbhXP8kBKAKFJZVE7YdiZPPQazjrzexerPlopyyVWbPglWUC+VxrJ3aWpWtGDTFeuA/
+         XBd5CxtUECxkNAIRZuGfnJxeowUkCIA5t+kzpQc1JlREuihIw8Xl7ZrJ26zz24gQQzuL
+         HKZh/8S2Ox42Ca5/UFMFhk1g3OUcJA7uVnuGk5G+UZsQ5pRdWfmP1tfzTFE6TI8eWxfL
+         IAgg==
+X-Gm-Message-State: AOJu0Yx7NSrVwE7QXFs1d+27xwgwJmHHQHpTHktZz9jnwNTG67U0r8PA
+	LdIv5eecnrBO/M+O5NcLUtBKlnVYn9z87GOHp3ohAQ==
+X-Google-Smtp-Source: AGHT+IGPFLME4RoxjHjo1Pf3PTYmSxKaORuw3AAyosh0yvejALLkHkk75EQDfaXWAFN6tu+Lh+D7VkjaPKVDnv/kJOo=
+X-Received: by 2002:a17:902:ebc4:b0:1c4:1392:e4b5 with SMTP id
+ p4-20020a170902ebc400b001c41392e4b5mr5130plg.21.1697738729250; Thu, 19 Oct
+ 2023 11:05:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="kNvCjmZsgc4H4SyY"
-Content-Disposition: inline
-In-Reply-To: <ZR7w/mr0xZbpIPc5@arm.com>
-X-Cookie: Beware of dog.
+References: <20231009230858.3444834-1-rananta@google.com> <20231009230858.3444834-9-rananta@google.com>
+ <5d35c9f3-455e-6aa9-fd6a-4433cf70803a@redhat.com> <CAJHc60z7U1-irTy-6URb_V0PTW+TYS4qodf2akSg33_7CJgjyw@mail.gmail.com>
+ <f7cd9b3d-c817-7082-d60a-a529e1c82f1e@redhat.com>
+In-Reply-To: <f7cd9b3d-c817-7082-d60a-a529e1c82f1e@redhat.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Thu, 19 Oct 2023 11:05:17 -0700
+Message-ID: <CAJHc60xJs+NzjfG_ESvQuyYdV0bDSwAetuam7yO35FOZBBJ9fQ@mail.gmail.com>
+Subject: Re: [PATCH v7 08/12] KVM: arm64: PMU: Allow userspace to limit
+ PMCR_EL0.N for the guest
+To: Sebastian Ott <sebott@redhat.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Jing Zhang <jingzhangos@google.com>, Reiji Watanabe <reijiw@google.com>, 
+	Colton Lewis <coltonlewis@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Oct 19, 2023 at 3:45=E2=80=AFAM Sebastian Ott <sebott@redhat.com> w=
+rote:
+>
+> On Tue, 17 Oct 2023, Raghavendra Rao Ananta wrote:
+> > On Tue, Oct 17, 2023 at 8:52=E2=80=AFAM Sebastian Ott <sebott@redhat.co=
+m> wrote:
+> >>
+> >> On Mon, 9 Oct 2023, Raghavendra Rao Ananta wrote:
+> >>> +static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc=
+ *r,
+> >>> +                 u64 val)
+> >>> +{
+> >>> +     struct kvm *kvm =3D vcpu->kvm;
+> >>> +     u64 new_n, mutable_mask;
+> >>> +
+> >>> +     mutex_lock(&kvm->arch.config_lock);
+> >>> +
+> >>> +     /*
+> >>> +      * Make PMCR immutable once the VM has started running, but do
+> >>> +      * not return an error (-EBUSY) to meet the existing expectatio=
+ns.
+> >>> +      */
+> >>
+> >> Why should we mention which error we're _not_ returning?
+> >>
+> > Oh, it's not to break the existing userspace expectations. Before this
+> > series, any 'write' from userspace was possible. Returning -EBUSY all
+> > of a sudden might tamper with this expectation.
+>
+> Yes I get that part. What I've meant is why specifically mention -EBUSY?
+> You're also not returning -EFAULT nor -EINVAL.
+>
+> /*
+>   * Make PMCR immutable once the VM has started running, but do
+>   * not return an error to meet the existing expectations.
+>   */
+> IMHO provides the same info to the reader and is less confusing
+>
+Sounds good. I'll apply this.
 
---kNvCjmZsgc4H4SyY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Thu, Oct 05, 2023 at 06:23:10PM +0100, Catalin Marinas wrote:
-
-> I haven't checked how many clone() or clone3() uses outside the libc are
-> (I tried some quick search in Debian but did not dig into the specifics
-> to see how generic that code is). I agree that having to change valid
-> cases outside of libc is not ideal. Even if we have the same clone3()
-> interface for x86 and arm64, we'd have other architectures that need
-> #ifdef'ing.
-
-FTR the set of Debian source packages that have references to the string
-__NR_clone (which picks up clone3 too) is below.  At least some (eg,
-kore) just have things that look like a copy of the syscall table rather
-than things that look like calls, though equally it's likely we're
-missing some.
-
-aflplusplus
-android-platform-tools
-binutils-avr
-box64
-brltty
-bubblewrap
-chromium
-chrony
-crash
-criu
-crun
-dietlibc
-elogind
-emscripten
-fakeroot-ng
-falcosecurity-libs
-firefox
-firefox-esr
-flatpak
-gcc-9
-gcc-10
-gcc-11
-gcc-12
-gcc-13
-gcc-arm-none-eabi
-gcc-snapshot
-gdb-msp430
-glibc
-gnumach
-hurd
-klibc
-kore
-libpod
-libseccomp
-linux
-llvm-toolchain-14
-llvm-toolchain-15
-llvm-toolchain-16
-lxc
-lxcfs
-lxd
-musl
-newlib
-notcurses
-purelibc
-pwntools
-qemu
-qt6-base
-qt6-webengine
-qtbase-opensource-src
-qtbase-opensource-src-gles
-qtwebengine-opensource-src
-radare2
-rumur
-rustc
-rust-linux-raw-sys
-rust-rustix
-strace
-stress-ng
-swtpm
-systemd
-systemtap
-termpaint
-thunderbird
-tor
-uclibc
-umview
-valgrind
-vsftpd
-wasi-libc
-webkit2gtk
-wpewebkit
-
---kNvCjmZsgc4H4SyY
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUxYnsACgkQJNaLcl1U
-h9BPuwf/ckJjx9BnOVP9ZzZPFpa7pKsXZe4D8gbrhkTsTNPX6DKdD77294DX72gh
-Q3LR3m5Xdw3nFoR/pP6cUgZ24o8sV/iUz8fLdBvuOOnemVmgoPIRcB/TNueOcq9P
-1rIwQ44UzdUfxc/5Ny1QKCvurTnCs4dFc3Llt0GdVvDy+Ec6FK9hX/Wwe48hsvLr
-6kDkKqvYz3IF3xnnTmGyHxD7EdaHnYPHrU8mWr33e1j8/MWMn6ywGyCRV6ZgrQxW
-VuTTod0EwhsDlW/u8yYNGmLBirZQszpmt3Wp2QCv4vcjHbjxa+xh7SYq8P5BNRj3
-ZgUagp/WsyNXXW6iGiQlgqb1YHdFdg==
-=ZvaR
------END PGP SIGNATURE-----
-
---kNvCjmZsgc4H4SyY--
+Thank you.
+Raghavendra
+> Sebastian
