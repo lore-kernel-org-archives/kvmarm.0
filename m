@@ -1,240 +1,116 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D19215AF5
-	for <kvmarm@lists.linux.dev>; Thu, 19 Oct 2023 09:22:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B24032F4;
-	Thu, 19 Oct 2023 02:23:21 -0700 (PDT)
-Received: from [10.57.68.54] (unknown [10.57.68.54])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2DFDA3F5A1;
-	Thu, 19 Oct 2023 02:22:39 -0700 (PDT)
-Message-ID: <dc65e68c-379f-4dfa-a7af-f066e943177c@arm.com>
-Date: Thu, 19 Oct 2023 10:22:37 +0100
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5717123B0
+	for <kvmarm@lists.linux.dev>; Thu, 19 Oct 2023 10:45:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hvh6moc+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697712337;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nZU5n3KTDTfUWmADsG196A6CHko6IR01XuC7O+Kf4xw=;
+	b=Hvh6moc+LfQVJzHc7AgxVfGWFY1xHN0lR98Fl9kJsPQMI/JiAW4JawLXsK/W/K6g0SSFoj
+	i5z9pJQ/J+yFm77jk9ZVjjN/XgSuqV84Zro2h8eJ81EgGtt3jnqNakXXfa2ym4dbPRlzlG
+	8WyVX+wsj04Q1gU5P8zf4qJtV9tU/7I=
+Received: from mail-ua1-f71.google.com (mail-ua1-f71.google.com
+ [209.85.222.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-645-rBN1xh0GONudPKMzZZWHNw-1; Thu, 19 Oct 2023 06:45:35 -0400
+X-MC-Unique: rBN1xh0GONudPKMzZZWHNw-1
+Received: by mail-ua1-f71.google.com with SMTP id a1e0cc1a2514c-7ab4118be99so2024096241.3
+        for <kvmarm@lists.linux.dev>; Thu, 19 Oct 2023 03:45:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697712335; x=1698317135;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lxd5MODsmAGKbTuOienYvfNws4TA5AoutDP3QGe6tEs=;
+        b=MdyPurANqBzWSZOHlUCPuNLnySIuAm03Q0dPEoDER/vPEsBgmCBM58l38WcQEQmUr6
+         Mx8BYDxy+orBg9Y+Deek2s6BVmgL8hS6WBSnjn4zTR8SDYUIVzg2+ChmaxaOS8Fa2+HH
+         JnKUzy6jWsYKXaRVFUL6F21jqWIXeyvBXMuCBn9VM8/tWYJjWw7OAA8OnF0PinH5LRdb
+         BPiRLc7lyj3UGQ9EuGKLCgj/EBjVu+2mnBTdd4AXXIB+OGcWg5rMNf0Njd5TgII2oa1O
+         hLXnfmYKFJHu2RdgXNauaJjRXCn1ksNx0O1CvGiQtjx/hcUWqtWFkKqncXj4XThU7wsv
+         PDcw==
+X-Gm-Message-State: AOJu0YzjkQIOrXfmuRLHQvOgEhHmmWL0ciayx135SHscGRJFE8y/WLyu
+	Dl5SiQgH1okMw6mBlj/bWinvYySk0eRycp/fgn47S3nscHCB8i55CNJfFW6By46wjyVE3EkN/Nv
+	f8yDHASNiq0FfnopC
+X-Received: by 2002:a67:b702:0:b0:44e:ac98:c65d with SMTP id h2-20020a67b702000000b0044eac98c65dmr1269385vsf.27.1697712335132;
+        Thu, 19 Oct 2023 03:45:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFYky3whGsAgdNN+wxhIzNqJbdy0LW6MrG6Q0VPEs7UbfeSBAf1GMlgRpft6IJk9K4PeYFSrA==
+X-Received: by 2002:a67:b702:0:b0:44e:ac98:c65d with SMTP id h2-20020a67b702000000b0044eac98c65dmr1269373vsf.27.1697712334816;
+        Thu, 19 Oct 2023 03:45:34 -0700 (PDT)
+Received: from rh (p200300c93f0047001ec25c15da4a4a7b.dip0.t-ipconnect.de. [2003:c9:3f00:4700:1ec2:5c15:da4a:4a7b])
+        by smtp.gmail.com with ESMTPSA id em17-20020ad44f91000000b0064f43efc844sm687385qvb.32.2023.10.19.03.45.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Oct 2023 03:45:34 -0700 (PDT)
+Date: Thu, 19 Oct 2023 12:45:30 +0200 (CEST)
+From: Sebastian Ott <sebott@redhat.com>
+To: Raghavendra Rao Ananta <rananta@google.com>
+cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
+    Alexandru Elisei <alexandru.elisei@arm.com>, 
+    James Morse <james.morse@arm.com>, 
+    Suzuki K Poulose <suzuki.poulose@arm.com>, 
+    Paolo Bonzini <pbonzini@redhat.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+    Shaoqin Huang <shahuang@redhat.com>, Jing Zhang <jingzhangos@google.com>, 
+    Reiji Watanabe <reijiw@google.com>, Colton Lewis <coltonlewis@google.com>, 
+    linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+    linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v7 08/12] KVM: arm64: PMU: Allow userspace to limit
+ PMCR_EL0.N for the guest
+In-Reply-To: <CAJHc60z7U1-irTy-6URb_V0PTW+TYS4qodf2akSg33_7CJgjyw@mail.gmail.com>
+Message-ID: <f7cd9b3d-c817-7082-d60a-a529e1c82f1e@redhat.com>
+References: <20231009230858.3444834-1-rananta@google.com> <20231009230858.3444834-9-rananta@google.com> <5d35c9f3-455e-6aa9-fd6a-4433cf70803a@redhat.com> <CAJHc60z7U1-irTy-6URb_V0PTW+TYS4qodf2akSg33_7CJgjyw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 01/12] arm64/mm: Update non-range tlb invalidation
- routines for FEAT_LPA2
-Content-Language: en-GB
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, James Morse
- <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Ard Biesheuvel <ardb@kernel.org>,
- Anshuman Khandual <anshuman.khandual@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-References: <20231009185008.3803879-1-ryan.roberts@arm.com>
- <20231009185008.3803879-2-ryan.roberts@arm.com>
- <87zg0f59ae.wl-maz@kernel.org>
-From: Ryan Roberts <ryan.roberts@arm.com>
-In-Reply-To: <87zg0f59ae.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/mixed; boundary="-1463795790-1917350782-1697712334=:15494"
 
-On 19/10/2023 09:03, Marc Zyngier wrote:
-> On Mon, 09 Oct 2023 19:49:57 +0100,
-> Ryan Roberts <ryan.roberts@arm.com> wrote:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+---1463795790-1917350782-1697712334=:15494
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8BIT
+
+On Tue, 17 Oct 2023, Raghavendra Rao Ananta wrote:
+> On Tue, Oct 17, 2023 at 8:52 AM Sebastian Ott <sebott@redhat.com> wrote:
 >>
->> FEAT_LPA2 impacts tlb invalidation in 2 ways; Firstly, the TTL field in
->> the non-range tlbi instructions can now validly take a 0 value for the
->> 4KB granule (this is due to the extra level of translation). Secondly,
-> 
-> nit: 0 was always valid. It just didn't indicate any level.
-
-True. I'll change to "can now validly take a 0 value as a TTL hint".
-
-> 
->> the BADDR field in the range tlbi instructions must be aligned to 64KB
->> when LPA2 is in use (TCR.DS=1). Changes are required for tlbi to
->> continue to operate correctly when LPA2 is in use.
+>> On Mon, 9 Oct 2023, Raghavendra Rao Ananta wrote:
+>>> +static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+>>> +                 u64 val)
+>>> +{
+>>> +     struct kvm *kvm = vcpu->kvm;
+>>> +     u64 new_n, mutable_mask;
+>>> +
+>>> +     mutex_lock(&kvm->arch.config_lock);
+>>> +
+>>> +     /*
+>>> +      * Make PMCR immutable once the VM has started running, but do
+>>> +      * not return an error (-EBUSY) to meet the existing expectations.
+>>> +      */
 >>
->> KVM only uses the non-range (__tlbi_level()) routines. Therefore we only
->> solve the first problem with this patch.
-> 
-> Is this still true? This patch changes __TLBI_VADDR_RANGE() and co.
-
-It is no longer true that KVM only uses the non-range routines. v6.6 adds a
-series where KVM will now use the range-based routines too. So that text is out
-of date and I should have spotted it when doing the rebase - I'll fix. KVM now
-using range-based ops is the reason I added patch 2 to this series.
-
-However, this patch doesn't really change __TLBI_VADDR_RANGE()'s behavior, it
-just makes it robust to the presence of TLBI_TTL_UNKNOWN, instead of 0 which was
-previously used as the "don't know" value.
-
-> 
+>> Why should we mention which error we're _not_ returning?
 >>
->> It is solved by always adding the level hint if the level is between [0,
->> 3] (previously anything other than 0 was hinted, which breaks in the new
->> level -1 case from kvm). When running on non-LPA2 HW, 0 is still safe to
->> hint as the HW will fall back to non-hinted. While we are at it, we
->> replace the notion of 0 being the non-hinted seninel with a macro,
->> TLBI_TTL_UNKNOWN. This means callers won't need updating if/when
->> translation depth increases in future.
->>
->> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
->> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
->> ---
->>  arch/arm64/include/asm/tlb.h      |  9 ++++---
->>  arch/arm64/include/asm/tlbflush.h | 43 +++++++++++++++++++------------
->>  2 files changed, 31 insertions(+), 21 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/tlb.h b/arch/arm64/include/asm/tlb.h
->> index 2c29239d05c3..93c537635dbb 100644
->> --- a/arch/arm64/include/asm/tlb.h
->> +++ b/arch/arm64/include/asm/tlb.h
->> @@ -22,15 +22,16 @@ static void tlb_flush(struct mmu_gather *tlb);
->>  #include <asm-generic/tlb.h>
->>  
->>  /*
->> - * get the tlbi levels in arm64.  Default value is 0 if more than one
->> - * of cleared_* is set or neither is set.
->> + * get the tlbi levels in arm64.  Default value is TLBI_TTL_UNKNOWN if more than
->> + * one of cleared_* is set or neither is set - this elides the level hinting to
->> + * the hardware.
->>   * Arm64 doesn't support p4ds now.
->>   */
->>  static inline int tlb_get_level(struct mmu_gather *tlb)
->>  {
->>  	/* The TTL field is only valid for the leaf entry. */
->>  	if (tlb->freed_tables)
->> -		return 0;
->> +		return TLBI_TTL_UNKNOWN;
->>  
->>  	if (tlb->cleared_ptes && !(tlb->cleared_pmds ||
->>  				   tlb->cleared_puds ||
->> @@ -47,7 +48,7 @@ static inline int tlb_get_level(struct mmu_gather *tlb)
->>  				   tlb->cleared_p4ds))
->>  		return 1;
->>  
->> -	return 0;
->> +	return TLBI_TTL_UNKNOWN;
->>  }
->>  
->>  static inline void tlb_flush(struct mmu_gather *tlb)
->> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
->> index b149cf9f91bc..e688246b3b13 100644
->> --- a/arch/arm64/include/asm/tlbflush.h
->> +++ b/arch/arm64/include/asm/tlbflush.h
->> @@ -94,19 +94,22 @@ static inline unsigned long get_trans_granule(void)
->>   * When ARMv8.4-TTL exists, TLBI operations take an additional hint for
->>   * the level at which the invalidation must take place. If the level is
->>   * wrong, no invalidation may take place. In the case where the level
->> - * cannot be easily determined, a 0 value for the level parameter will
->> - * perform a non-hinted invalidation.
->> + * cannot be easily determined, the value TLBI_TTL_UNKNOWN will perform
->> + * a non-hinted invalidation. Any provided level outside the hint range
->> + * will also cause fall-back to non-hinted invalidation.
->>   *
->>   * For Stage-2 invalidation, use the level values provided to that effect
->>   * in asm/stage2_pgtable.h.
->>   */
->>  #define TLBI_TTL_MASK		GENMASK_ULL(47, 44)
->>  
->> +#define TLBI_TTL_UNKNOWN	(-1)
-> 
-> I find this value somehow confusing, as it represent an actual level
-> number. It just happen to be one that cannot be provided as a TTL. So
-> having that as a return value from tlb_get_level() isn't great, and
-> I'd rather have something that cannot be mistaken for a valid level.
+> Oh, it's not to break the existing userspace expectations. Before this
+> series, any 'write' from userspace was possible. Returning -EBUSY all
+> of a sudden might tamper with this expectation.
 
-OK, how about INT_MAX?
+Yes I get that part. What I've meant is why specifically mention -EBUSY?
+You're also not returning -EFAULT nor -EINVAL.
 
-> 
->> +
->>  #define __tlbi_level(op, addr, level) do {				\
->>  	u64 arg = addr;							\
->>  									\
->>  	if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL) &&		\
->> -	    level) {							\
->> +	    level >= 0 && level <= 3) {					\
->>  		u64 ttl = level & 3;					\
->>  		ttl |= get_trans_granule() << 2;			\
->>  		arg &= ~TLBI_TTL_MASK;					\
->> @@ -134,16 +137,17 @@ static inline unsigned long get_trans_granule(void)
->>   * [BADDR, BADDR + (NUM + 1) * 2^(5*SCALE + 1) * PAGESIZE)
->>   *
->>   */
->> -#define __TLBI_VADDR_RANGE(addr, asid, scale, num, ttl)		\
->> -	({							\
->> -		unsigned long __ta = (addr) >> PAGE_SHIFT;	\
->> -		__ta &= GENMASK_ULL(36, 0);			\
->> -		__ta |= (unsigned long)(ttl) << 37;		\
->> -		__ta |= (unsigned long)(num) << 39;		\
->> -		__ta |= (unsigned long)(scale) << 44;		\
->> -		__ta |= get_trans_granule() << 46;		\
->> -		__ta |= (unsigned long)(asid) << 48;		\
->> -		__ta;						\
->> +#define __TLBI_VADDR_RANGE(addr, asid, scale, num, ttl)				\
->> +	({									\
->> +		unsigned long __ta = (addr) >> PAGE_SHIFT;			\
->> +		unsigned long __ttl = (ttl >= 1 && ttl <= 3) ? ttl : 0;		\
->> +		__ta &= GENMASK_ULL(36, 0);					\
->> +		__ta |= __ttl << 37;						\
->> +		__ta |= (unsigned long)(num) << 39;				\
->> +		__ta |= (unsigned long)(scale) << 44;				\
->> +		__ta |= get_trans_granule() << 46;				\
->> +		__ta |= (unsigned long)(asid) << 48;				\
->> +		__ta;								\
->>  	})
->>  
->>  /* These macros are used by the TLBI RANGE feature. */
->> @@ -216,12 +220,16 @@ static inline unsigned long get_trans_granule(void)
->>   *		CPUs, ensuring that any walk-cache entries associated with the
->>   *		translation are also invalidated.
->>   *
->> - *	__flush_tlb_range(vma, start, end, stride, last_level)
->> + *	__flush_tlb_range(vma, start, end, stride, last_level, tlb_level)
->>   *		Invalidate the virtual-address range '[start, end)' on all
->>   *		CPUs for the user address space corresponding to 'vma->mm'.
->>   *		The invalidation operations are issued at a granularity
->>   *		determined by 'stride' and only affect any walk-cache entries
->> - *		if 'last_level' is equal to false.
->> + *		if 'last_level' is equal to false. tlb_level is the level at
->> + *		which the invalidation must take place. If the level is wrong,
->> + *		no invalidation may take place. In the case where the level
->> + *		cannot be easily determined, the value TLBI_TTL_UNKNOWN will
->> + *		perform a non-hinted invalidation.
->>   *
->>   *
->>   *	Finally, take a look at asm/tlb.h to see how tlb_flush() is implemented
->> @@ -442,9 +450,10 @@ static inline void flush_tlb_range(struct vm_area_struct *vma,
->>  	/*
->>  	 * We cannot use leaf-only invalidation here, since we may be invalidating
->>  	 * table entries as part of collapsing hugepages or moving page tables.
->> -	 * Set the tlb_level to 0 because we can not get enough information here.
->> +	 * Set the tlb_level to TLBI_TTL_UNKNOWN because we can not get enough
->> +	 * information here.
->>  	 */
->> -	__flush_tlb_range(vma, start, end, PAGE_SIZE, false, 0);
->> +	__flush_tlb_range(vma, start, end, PAGE_SIZE, false, TLBI_TTL_UNKNOWN);
->>  }
->>  
->>  static inline void flush_tlb_kernel_range(unsigned long start, unsigned long end)
-> 
-> It feels like this range stuff would be better located in the second
-> patch. Not a huge deal though.
+/*
+  * Make PMCR immutable once the VM has started running, but do
+  * not return an error to meet the existing expectations.
+  */
+IMHO provides the same info to the reader and is less confusing
 
-As I said, this is the minimal change to the range-based side of things to
-robustly deal with the introduction of TLBI_TTL_UNKNOWN.
-
-But I wonder if I'm actually better of squashing both of the 2 patches into one.
-The only reason I split it previously was because KVM was only using the
-level-based ops.
-
-Thanks for the review!
-
-Ryan
-
-
-> 
-> 	M.
-> 
+Sebastian
+---1463795790-1917350782-1697712334=:15494--
 
