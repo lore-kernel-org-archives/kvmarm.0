@@ -1,264 +1,177 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F96C30F82
-	for <kvmarm@lists.linux.dev>; Thu, 19 Oct 2023 16:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C4942F4;
-	Thu, 19 Oct 2023 09:59:46 -0700 (PDT)
-Received: from [10.57.67.150] (unknown [10.57.67.150])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DBEFB3F5A1;
-	Thu, 19 Oct 2023 09:59:02 -0700 (PDT)
-Message-ID: <ec50ef51-e0f7-90f5-2c4a-01754e3b70ad@arm.com>
-Date: Thu, 19 Oct 2023 17:59:01 +0100
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C218A2FE2B;
+	Thu, 19 Oct 2023 17:08:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iuYT4D0V"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6BCAC433C8;
+	Thu, 19 Oct 2023 17:08:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697735301;
+	bh=pG0Qit3AqQuyW6KGy3cTGUjC4taxXCYceYbhQqKPpi0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iuYT4D0VMaEuj+thGqbHAXol5XSAP+gpQW0FvmhrZUDfxLXv+/ZVEXa7HboYTdjfS
+	 6IW13fpGKYOraD3SUYgFKSKngtaiTn4eZnS5/t4No3Bd9JUpA/YN36SlzCfxP3r8Qo
+	 GSGIhhQuUcl2bZWr7R2xIlGjz0vg5FexGBIpOTGda3+rKYYtVhgWVsIhxkX6hbI0gm
+	 mcLC1qwZc2f1UoNDZu97OVSCneDpDNOnMk0J/9pg1MhLPNaMhehC5h9M8hK61gX85H
+	 oCvpdUL6LgDGxSu2UPoMDo+pZMMxQOrswwQOGCVnwHabAhbK25KaSViVEB0JO0/a2D
+	 NKmdSxXCL95kQ==
+Date: Thu, 19 Oct 2023 18:08:12 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Szabolcs Nagy <Szabolcs.Nagy@arm.com>, Will Deacon <will@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v4 03/36] arm64/gcs: Document the ABI for Guarded Control
+ Stacks
+Message-ID: <8a158486-f0b9-4f25-b673-998726a40528@sirena.org.uk>
+References: <aaea542c-929c-4c9b-8caa-ca67e0eb9c1e@sirena.org.uk>
+ <ZOTnL1SDJWZjHPUW@arm.com>
+ <43ec219d-bf20-47b8-a5f8-32bc3b64d487@sirena.org.uk>
+ <ZOXa98SqwYPwxzNP@arm.com>
+ <ZOYFazB1gYjzDRdA@arm.com>
+ <ZRWw7aa3C0LlMPTH@arm.com>
+ <38edb5c3-367e-4ab7-8cb7-aa1a5c0e330c@sirena.org.uk>
+ <ZRvUxLgMse8QYlGS@arm.com>
+ <a7d2fd66-c06b-4033-bca2-4b14afc4904f@sirena.org.uk>
+ <ZR7w/mr0xZbpIPc5@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v2 5/6] arm64: KVM: Write TRFCR value on guest switch with
- nVHE
-Content-Language: en-US
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mike Leach <mike.leach@linaro.org>, Leo Yan <leo.yan@linaro.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
- <robh@kernel.org>, Jintack Lim <jintack.lim@linaro.org>,
- Akihiko Odaki <akihiko.odaki@daynix.com>, Fuad Tabba <tabba@google.com>,
- Joey Gouly <joey.gouly@arm.com>, linux-kernel@vger.kernel.org,
- coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, broonie@kernel.org, maz@kernel.org
-References: <20231005125757.649345-1-james.clark@arm.com>
- <20231005125757.649345-6-james.clark@arm.com>
- <3b41286f-d2b0-5fdf-88ef-1e63f302f9c8@arm.com>
-From: James Clark <james.clark@arm.com>
-In-Reply-To: <3b41286f-d2b0-5fdf-88ef-1e63f302f9c8@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="kNvCjmZsgc4H4SyY"
+Content-Disposition: inline
+In-Reply-To: <ZR7w/mr0xZbpIPc5@arm.com>
+X-Cookie: Beware of dog.
 
 
+--kNvCjmZsgc4H4SyY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 05/10/2023 19:05, Suzuki K Poulose wrote:
-> On 05/10/2023 13:57, James Clark wrote:
->> The guest value for TRFCR requested by the Coresight driver is saved
->> in sysregs[TRFCR_EL1]. On guest switch this value needs to be written to
->> the register. Currently TRFCR is only modified when we want to disable
->> trace completely in guests due to an issue with TRBE. Expand the
->> __debug_save_trace() function to always write to the register if a
->> different value for guests is required, but also keep the existing TRBE
->> disable behavior if that's required.
->>
->> The TRFCR restore function remains functionally the same, except a value
->> of 0 doesn't mean "don't restore" anymore. Now that we save both guest
->> and host values the register is restored any time the guest and host
->> values differ.
->>
->> Signed-off-by: James Clark <james.clark@arm.com>
->> ---
->>   arch/arm64/include/asm/kvm_hyp.h   |  6 ++-
->>   arch/arm64/kvm/debug.c             | 13 +++++-
->>   arch/arm64/kvm/hyp/nvhe/debug-sr.c | 63 ++++++++++++++++++------------
->>   arch/arm64/kvm/hyp/nvhe/switch.c   |  4 +-
->>   4 files changed, 57 insertions(+), 29 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_hyp.h
->> b/arch/arm64/include/asm/kvm_hyp.h
->> index 37e238f526d7..0383fd3d60b5 100644
->> --- a/arch/arm64/include/asm/kvm_hyp.h
->> +++ b/arch/arm64/include/asm/kvm_hyp.h
->> @@ -103,8 +103,10 @@ void __debug_switch_to_guest(struct kvm_vcpu *vcpu);
->>   void __debug_switch_to_host(struct kvm_vcpu *vcpu);
->>     #ifdef __KVM_NVHE_HYPERVISOR__
->> -void __debug_save_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt);
->> -void __debug_restore_host_buffers_nvhe(struct kvm_cpu_context
->> *host_ctxt);
->> +void __debug_save_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
->> +                    struct kvm_cpu_context *guest_ctxt);
->> +void __debug_restore_host_buffers_nvhe(struct kvm_cpu_context
->> *host_ctxt,
->> +                       struct kvm_cpu_context *guest_ctxt);
->>   #endif
->>     void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
->> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
->> index 19e722359154..d949dd354464 100644
->> --- a/arch/arm64/kvm/debug.c
->> +++ b/arch/arm64/kvm/debug.c
->> @@ -337,10 +337,21 @@ void kvm_arch_vcpu_load_debug_state_flags(struct
->> kvm_vcpu *vcpu)
->>           !(read_sysreg_s(SYS_PMBIDR_EL1) & BIT(PMBIDR_EL1_P_SHIFT)))
->>           vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_SPE);
->>   -    /* Check if we have TRBE implemented and available at the host */
->> +    /*
->> +     * Check if we have TRBE implemented and available at the host.
->> If it's
->> +     * in use at the time of guest switch it will need to be disabled
->> and
->> +     * then restored.
->> +     */
->>       if (cpuid_feature_extract_unsigned_field(dfr0,
->> ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
->>           !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
->>           vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
-> 
-> As per A3.1 Armv9-A architecture extensions (DDI 0487J.a), FEAT_TRBE
-> mandates FEAT_TRF. So, we could check FEAT_TRF and if we have a hit,
-> skip the TRBE checks. But, having read the code below, it looks like
-> we need separate flags for TRFCR and TRBE.
->     
->> +    /*
->> +     * Also save TRFCR on nVHE if FEAT_TRF (TraceFilt) exists. This
->> will be
->> +     * done in cases where use of TRBE doesn't completely disable
->> trace and
->> +     * handles the exclude_host/exclude_guest rules of the trace
->> session.
->> +     */
->> +    if (cpuid_feature_extract_unsigned_field(dfr0,
->> ID_AA64DFR0_EL1_TraceFilt_SHIFT))
->> +        vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
->     
->>   }
->>     void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
->> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
->> b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
->> index 128a57dddabf..c6252029c277 100644
->> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
->> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
->> @@ -51,42 +51,56 @@ static void __debug_restore_spe(struct
->> kvm_cpu_context *host_ctxt)
->>       write_sysreg_s(ctxt_sys_reg(host_ctxt, PMSCR_EL1), SYS_PMSCR_EL1);
->>   }
->>   -static void __debug_save_trace(struct kvm_cpu_context *host_ctxt)
->> +/*
->> + * Save TRFCR and disable trace completely if TRBE is being used,
->> otherwise
->> + * apply required guest TRFCR value.
->> + */
->> +static void __debug_save_trace(struct kvm_cpu_context *host_ctxt,
->> +                   struct kvm_cpu_context *guest_ctxt)
->>   {
->> -    ctxt_sys_reg(host_ctxt, TRFCR_EL1) = 0;
->> +    ctxt_sys_reg(host_ctxt, TRFCR_EL1) = read_sysreg_s(SYS_TRFCR_EL1);
->>         /* Check if the TRBE is enabled */
->> -    if (!(read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E))
->> -        return;
->> -    /*
->> -     * Prohibit trace generation while we are in guest.
->> -     * Since access to TRFCR_EL1 is trapped, the guest can't
->> -     * modify the filtering set by the host.
->> -     */
->> -    ctxt_sys_reg(host_ctxt, TRFCR_EL1) = read_sysreg_s(SYS_TRFCR_EL1);
->> -    write_sysreg_s(0, SYS_TRFCR_EL1);
->> -    isb();
->> -    /* Drain the trace buffer to memory */
->> -    tsb_csync();
->> +    if (read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E) {
-> 
-> This is problematic. At this point, we are not sure if TRBE is available
-> or not (e.g. we could be on a v8.4 CPU or a v9.0 with TRBE disabled by
-> higher EL). May be we need to add a separate flag to indicate the
-> presence of TRBE.
-> 
-> Suzuki
-> 
+On Thu, Oct 05, 2023 at 06:23:10PM +0100, Catalin Marinas wrote:
 
-Fixed in V3
+> I haven't checked how many clone() or clone3() uses outside the libc are
+> (I tried some quick search in Debian but did not dig into the specifics
+> to see how generic that code is). I agree that having to change valid
+> cases outside of libc is not ideal. Even if we have the same clone3()
+> interface for x86 and arm64, we'd have other architectures that need
+> #ifdef'ing.
 
->> +        /*
->> +         * Prohibit trace generation while we are in guest. Since access
->> +         * to TRFCR_EL1 is trapped, the guest can't modify the filtering
->> +         * set by the host.
->> +         */
->> +        ctxt_sys_reg(guest_ctxt, TRFCR_EL1) = 0;
->> +        write_sysreg_s(0, SYS_TRFCR_EL1);
->> +        isb();
->> +        /* Drain the trace buffer to memory */
->> +        tsb_csync();
->> +    } else {
->> +        /*
->> +         * Not using TRBE, so guest trace works. Apply the guest filters
->> +         * provided by the Coresight driver, if different.
->> +         */
->> +        if (ctxt_sys_reg(host_ctxt, TRFCR_EL1) !=
->> +            ctxt_sys_reg(guest_ctxt, TRFCR_EL1))
->> +            write_sysreg_s(ctxt_sys_reg(guest_ctxt, TRFCR_EL1),
->> +                       SYS_TRFCR_EL1);
->> +    }
->>   }
->>   -static void __debug_restore_trace(struct kvm_cpu_context *host_ctxt)
->> +static void __debug_restore_trace(struct kvm_cpu_context *host_ctxt,
->> +                  struct kvm_cpu_context *guest_ctxt)
->>   {
->> -    if (!ctxt_sys_reg(host_ctxt, TRFCR_EL1))
->> -        return;
->> -
->>       /* Restore trace filter controls */
->> -    write_sysreg_s(ctxt_sys_reg(host_ctxt, TRFCR_EL1), SYS_TRFCR_EL1);
->> +    if (ctxt_sys_reg(host_ctxt, TRFCR_EL1) !=
->> ctxt_sys_reg(guest_ctxt, TRFCR_EL1))
->> +        write_sysreg_s(ctxt_sys_reg(host_ctxt, TRFCR_EL1),
->> SYS_TRFCR_EL1);
->>   }
->>   -void __debug_save_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt)
->> +void __debug_save_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
->> +                    struct kvm_cpu_context *guest_ctxt)
->>   {
->>       /* Disable and flush SPE data generation */
->>       if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu,
->> DEBUG_STATE_SAVE_SPE))
->>           __debug_save_spe(host_ctxt);
->> -    /* Disable and flush Self-Hosted Trace generation */
->> +
->>       if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu,
->> DEBUG_STATE_SAVE_TRFCR))
->> -        __debug_save_trace(host_ctxt);
->> +        __debug_save_trace(host_ctxt, guest_ctxt);
->>   }
->>     void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
->> @@ -94,12 +108,13 @@ void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
->>       __debug_switch_to_guest_common(vcpu);
->>   }
->>   -void __debug_restore_host_buffers_nvhe(struct kvm_cpu_context
->> *host_ctxt)
->> +void __debug_restore_host_buffers_nvhe(struct kvm_cpu_context
->> *host_ctxt,
->> +                       struct kvm_cpu_context *guest_ctxt)
->>   {
->>       if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu,
->> DEBUG_STATE_SAVE_SPE))
->>           __debug_restore_spe(host_ctxt);
->>       if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu,
->> DEBUG_STATE_SAVE_TRFCR))
->> -        __debug_restore_trace(host_ctxt);
->> +        __debug_restore_trace(host_ctxt, guest_ctxt);
->>   }
->>     void __debug_switch_to_host(struct kvm_vcpu *vcpu)
->> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c
->> b/arch/arm64/kvm/hyp/nvhe/switch.c
->> index c8f15e4dab19..55207ec31bd3 100644
->> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
->> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
->> @@ -276,7 +276,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->>        * translation regime to EL2 (via MDCR_EL2_E2PB == 0) and
->>        * before we load guest Stage1.
->>        */
->> -    __debug_save_host_buffers_nvhe(host_ctxt);
->> +    __debug_save_host_buffers_nvhe(host_ctxt, guest_ctxt);
->>         /*
->>        * We're about to restore some new MMU state. Make sure
->> @@ -343,7 +343,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->>        * This must come after restoring the host sysregs, since a non-VHE
->>        * system may enable SPE here and make use of the TTBRs.
->>        */
->> -    __debug_restore_host_buffers_nvhe(host_ctxt);
->> +    __debug_restore_host_buffers_nvhe(host_ctxt, guest_ctxt);
->>         if (pmu_switch_needed)
->>           __pmu_switch_to_host(vcpu);
-> 
+FTR the set of Debian source packages that have references to the string
+__NR_clone (which picks up clone3 too) is below.  At least some (eg,
+kore) just have things that look like a copy of the syscall table rather
+than things that look like calls, though equally it's likely we're
+missing some.
+
+aflplusplus
+android-platform-tools
+binutils-avr
+box64
+brltty
+bubblewrap
+chromium
+chrony
+crash
+criu
+crun
+dietlibc
+elogind
+emscripten
+fakeroot-ng
+falcosecurity-libs
+firefox
+firefox-esr
+flatpak
+gcc-9
+gcc-10
+gcc-11
+gcc-12
+gcc-13
+gcc-arm-none-eabi
+gcc-snapshot
+gdb-msp430
+glibc
+gnumach
+hurd
+klibc
+kore
+libpod
+libseccomp
+linux
+llvm-toolchain-14
+llvm-toolchain-15
+llvm-toolchain-16
+lxc
+lxcfs
+lxd
+musl
+newlib
+notcurses
+purelibc
+pwntools
+qemu
+qt6-base
+qt6-webengine
+qtbase-opensource-src
+qtbase-opensource-src-gles
+qtwebengine-opensource-src
+radare2
+rumur
+rustc
+rust-linux-raw-sys
+rust-rustix
+strace
+stress-ng
+swtpm
+systemd
+systemtap
+termpaint
+thunderbird
+tor
+uclibc
+umview
+valgrind
+vsftpd
+wasi-libc
+webkit2gtk
+wpewebkit
+
+--kNvCjmZsgc4H4SyY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUxYnsACgkQJNaLcl1U
+h9BPuwf/ckJjx9BnOVP9ZzZPFpa7pKsXZe4D8gbrhkTsTNPX6DKdD77294DX72gh
+Q3LR3m5Xdw3nFoR/pP6cUgZ24o8sV/iUz8fLdBvuOOnemVmgoPIRcB/TNueOcq9P
+1rIwQ44UzdUfxc/5Ny1QKCvurTnCs4dFc3Llt0GdVvDy+Ec6FK9hX/Wwe48hsvLr
+6kDkKqvYz3IF3xnnTmGyHxD7EdaHnYPHrU8mWr33e1j8/MWMn6ywGyCRV6ZgrQxW
+VuTTod0EwhsDlW/u8yYNGmLBirZQszpmt3Wp2QCv4vcjHbjxa+xh7SYq8P5BNRj3
+ZgUagp/WsyNXXW6iGiQlgqb1YHdFdg==
+=ZvaR
+-----END PGP SIGNATURE-----
+
+--kNvCjmZsgc4H4SyY--
