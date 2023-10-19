@@ -1,113 +1,101 @@
-Received: from out-203.mta1.migadu.com (out-203.mta1.migadu.com [95.215.58.203])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97BB8361
-	for <kvmarm@lists.linux.dev>; Thu, 19 Oct 2023 00:06:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093F0D262
+	for <kvmarm@lists.linux.dev>; Thu, 19 Oct 2023 07:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Mu1Ho+y3"
-Date: Thu, 19 Oct 2023 00:06:25 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1697673992;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hzjaIWah6RYMVBvI14tFSfFydhLBL9+gD67Q8Qa+q8o=;
-	b=Mu1Ho+y3nPc2gCgNmE0x7g0+OC562KEeI3AkiOGEZgX2KWfHvGXyjVxRRNFtLT8RQB587x
-	4Z0HeLG3XVWB+f7VAvsy6IORv+ddsOuWlZoCfM4CQc7kVcQ1ytzyuqnVS21I/H/wBru5oY
-	LAAnco/ohZrd5G4pFILAwv7pMXd83bQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Eric Auger <eauger@redhat.com>
-Cc: Mark Brown <broonie@kernel.org>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-perf-users@vger.kernel.org,
-	Jing Zhang <jingzhangos@google.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bc9aJd28"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88366C433C7;
+	Thu, 19 Oct 2023 07:21:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697700060;
+	bh=SnrFhaZSmD0ROC/5wAvVn37d5U+f00s0nr48yYL0B7Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Bc9aJd28kZcrmmhY3ZE+yvl4piKSjOreHFgx0llEh9qlEBaB9bn/DV581gLKIycHP
+	 2g6JEAsLvlC+D2mq/p3GBZw+EZ4EP/m24Jni2fw4ZkU7aJ9e7UHUaAYDzdKNDBhWPZ
+	 okfp2bNeqOJ9/tAnhfVpROr2V6/atcojntTaaZGRJkD1sL4cMtyN2+a18fEEA01NKF
+	 xGRtLMnF5Qk/n5gN8BEbwof/BZSeQJvfmzDTNuuG743kLUyQn21Z37A8gEdhj9olHy
+	 RwFnte0Kj1vl5OEwbKoTN80yVcOkYlqsTmz7WKgmUVIEkq1wfgZk5+vqmk+DYqGZG8
+	 94HTQB1UHeR4g==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qtNKz-005eIo-SA;
+	Thu, 19 Oct 2023 08:20:58 +0100
+Date: Thu, 19 Oct 2023 08:20:56 +0100
+Message-ID: <871qdr6pt3.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>, Marc Zyngier <maz@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v3 4/5] tools headers arm64: Update sysreg.h with kernel
- sources
-Message-ID: <ZTBzAR1KsWuurob7@linux.dev>
-References: <20231011195740.3349631-1-oliver.upton@linux.dev>
- <20231011195740.3349631-5-oliver.upton@linux.dev>
- <73b94274-4561-1edd-6b1e-8c6245133af2@redhat.com>
- <3c5332b0-9035-4cb8-96ce-7a9b8d513c3a@sirena.org.uk>
- <8baca35a-9154-97e6-d682-032fc69d2da6@redhat.com>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 2/2] KVM: arm64: Virtualise PMEVTYPER<n>_EL1.{NSU,NSK}
+In-Reply-To: <ZTAiy7Ijq2UmySyX@linux.dev>
+References: <20231013052901.170138-1-oliver.upton@linux.dev>
+	<20231013052901.170138-3-oliver.upton@linux.dev>
+	<86o7gwm50g.wl-maz@kernel.org>
+	<ZTAiy7Ijq2UmySyX@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8baca35a-9154-97e6-d682-032fc69d2da6@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Eric,
-
-Thanks for reviewing the series.
-
-On Wed, Oct 18, 2023 at 03:06:12PM +0200, Eric Auger wrote:
-> Hi Mark, Oliver,
+On Wed, 18 Oct 2023 19:24:11 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> On 10/18/23 14:16, Mark Brown wrote:
-> > On Wed, Oct 18, 2023 at 01:57:31PM +0200, Eric Auger wrote:
-> >> On 10/11/23 21:57, Oliver Upton wrote:
+> On Wed, Oct 18, 2023 at 02:31:11PM +0100, Marc Zyngier wrote:
+> > On Fri, 13 Oct 2023 06:29:01 +0100,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > 
+> > > Suzuki noticed that KVM's PMU emulation is oblivious to the NSU and NSK
+> > > event filter bits. On systems that have EL3 these bits modify the
+> > > filter behavior in non-secure EL0 and EL1, respectively. Even though the
+> > > kernel doesn't use these bits, it is entirely possible some other guest
+> > > OS does.
 > > 
-> >>>  #define set_pstate_pan(x)		asm volatile(SET_PSTATE_PAN(x))
-> >>>  #define set_pstate_uao(x)		asm volatile(SET_PSTATE_UAO(x))
-> >>>  #define set_pstate_ssbs(x)		asm volatile(SET_PSTATE_SSBS(x))
-> >>> +#define set_pstate_dit(x)		asm volatile(SET_PSTATE_DIT(x))
-> > 
-> >> could you comment on the *DIT* addictions, what is it for?
-> > 
-> > DIT is data independent timing, this tells the processor to ensure that
-> > instructions take a constant time regardless of the data they are
-> > handling.
+> > But what does it mean for KVM itself? We have no EL3 to speak of as
+> > far as a guest is concerned. And the moment we allow things like
+> > NSU/NSK to be set, why don't we allow M as well?
 > 
-> > 
-> > Note that this file is just a copy of arch/arm64/include/asm/gpr-num.h,
-> > the main purpose here is to sync with the original.
+> Yeah, we need to have a think about all these extra bits TBH.
 > 
-> Ah thanks. that's helpful for me to understand where this gpr-num.h
-> comes from. This could be documented in the commit msg though.
+> KVM doesn't filter the advertised ELs in PFR0, so from the guest POV
+> both EL2 and EL3 could potentially be implemented by the vCPU. Based
+> on that I think the bits at least need to be stateful, even though KVM's
+> emulation will never let the guest count events in a higher EL.
 > 
-> Something like:
+> My patches aren't even consistent with the above statement, as NSH gets
+> RES0 treatment and the NS{U,K} bits do not. So how about this:
 > 
-> adding tools/arch/arm64/include/asm/gpr-num.h matching linux
-> arch/arm64/include/asm/gpr-num.h
+>  - If EL3 is advertised in the guest's ID registers NS{U,K}, and M can
+>    be set. NS{U,K} work as proposed, M is ignored in KVM emulation.
 > 
-> and syncing tools/arch/arm64/include/asm/sysreg.h with the fellow header
-> in the linux tree.
+>  - If EL2 is advertised in the guest's ID registers NSH can be set but
+>    is ignored in KVM emulation.
+> 
+> Thoughts?
 
-Yeah, I could've spelled it out a bit more. I already cracked this off
-of an even larger patch from before I picked up the series because the
-diff was massive.
+This would be consistent with the pseudocode (and what KVM can
+reasonably achieve at this stage).
 
-> tbh I did not initially understand that all this diffstat was aimed to
-> match the linux arch/arm64/include/asm/sysreg.h. Now diffing both I have
-> some diffs. Doesn't it need a refresh?
+Care to respin it?
 
-I'm worried it is a fool's errand at this point to keep the two in sync,
-as I'm sure there will be more in -rc1. The tools copy of sysreg.h isn't
-a verbatim copy either, there are some deliberate deletions in there as
-well.
+Thanks,
 
-I've taken this as is, we can always come back and update the headers
-afterwards if we find a need for it
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
