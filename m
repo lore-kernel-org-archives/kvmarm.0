@@ -1,127 +1,197 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E4391BDDA
-	for <kvmarm@lists.linux.dev>; Fri, 20 Oct 2023 13:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B11C1BDDA
+	for <kvmarm@lists.linux.dev>; Fri, 20 Oct 2023 13:44:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XAsxIRjP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7620AC433C8;
-	Fri, 20 Oct 2023 13:41:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697809297;
-	bh=eS67sD1yISfQLqPDdE+Cq/RTOgXOuafmzJQi+ljtjKE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XAsxIRjP7E885RVYA8a4KhWmPIW7VdAyaxBlFFFZNgl58hyNR4BIXNsS2ODfPLjDe
-	 oFRYi6vurCraEyJnCbPyvlcV4Dhc0kh+uKYoV0q6ZPt95stbly+Kvx5F8Igo+rrghK
-	 hDOVx6Jpad4tMv+eXZWtzybx3RN4bHdfYKLVUfWmDewGYejSrI6KWrd8N6Alo5m/IH
-	 8Y+aI9Ykt9ehibj3wWZdAhY5Yf3lc+3vBogNcMR5mVRRVM7pS6xl36zCKX41b0BMVq
-	 73sqsGJ6RWHSKKewvCt1saIF6dXktlczgrgewx4yS5zmlCHtFPl9Dsy4rEvGto2sF1
-	 1AfIplxZM1C4A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qtpks-0068Ol-Tx;
-	Fri, 20 Oct 2023 14:41:35 +0100
-Date: Fri, 20 Oct 2023 14:41:29 +0100
-Message-ID: <86pm19o1h2.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse
- <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Y30Q5KtP"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=EaJhZw0Zk+uukZ21AQLL1Wa3YNXD1P5PVQhDy79M9q0=; b=Y30Q5KtPVsMmfXmbaBaWKFuqkc
+	4bqAUIrotpwascfiGwvAM0YfAx5r4v8d/93HKciObRSjY7n+A0rEs934jpl7SxrlFtDG+3WRlsmNI
+	cNiSD21IKCVlHirpNr5MZGKmaa+Oy5SjiNPjHKJayZV2j9UbMHI/HvaNvluDtNQsUEyK3472J/14p
+	y+c/KUjPdCl7vBQCqJnu+X+2oSn2/Ja8aXwfAC619F6dVJm89BeZF21oAKs4/ZQdyCt7IyfaiOlbe
+	MXK7DC4bnANefohp3DoFA6aUIBc2qDKxDfx+OF9DeG9E3QSyDnqPLLiEvpXyDqZtG3SNsydKOetci
+	0CN/heNg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48962)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qtpno-0000T7-2b;
+	Fri, 20 Oct 2023 14:44:36 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qtpnn-0001aP-Tx; Fri, 20 Oct 2023 14:44:35 +0100
+Date: Fri, 20 Oct 2023 14:44:35 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
+	loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 01/12] arm64/mm: Update non-range tlb invalidation routines for FEAT_LPA2
-In-Reply-To: <59a62837-1adf-43a5-8716-8068ddbdb7cf@arm.com>
-References: <20231009185008.3803879-1-ryan.roberts@arm.com>
-	<20231009185008.3803879-2-ryan.roberts@arm.com>
-	<87zg0f59ae.wl-maz@kernel.org>
-	<dc65e68c-379f-4dfa-a7af-f066e943177c@arm.com>
-	<86edhpn2gd.wl-maz@kernel.org>
-	<8a098442-4de8-42f1-9308-848a1d54f21a@arm.com>
-	<87v8b15twh.wl-maz@kernel.org>
-	<59a62837-1adf-43a5-8716-8068ddbdb7cf@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com, gregkh@linuxfoundation.org
+Subject: Re: [RFC PATCH v2 11/35] arch_topology: Make
+ register_cpu_capacity_sysctl() tolerant to late CPUs
+Message-ID: <ZTKEQz0DJuv/tqNH@shell.armlinux.org.uk>
+References: <20230913163823.7880-1-james.morse@arm.com>
+ <20230913163823.7880-12-james.morse@arm.com>
+ <20230914130126.000069db@Huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, james.morse@arm.com, yuzenghui@huawei.com, ardb@kernel.org, anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230914130126.000069db@Huawei.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, 20 Oct 2023 14:21:39 +0100,
-Ryan Roberts <ryan.roberts@arm.com> wrote:
+On Thu, Sep 14, 2023 at 01:01:26PM +0100, Jonathan Cameron wrote:
+> On Wed, 13 Sep 2023 16:37:59 +0000
+> James Morse <james.morse@arm.com> wrote:
 > 
-> On 20/10/2023 14:02, Marc Zyngier wrote:
-> > On Fri, 20 Oct 2023 13:39:47 +0100,
-> > Ryan Roberts <ryan.roberts@arm.com> wrote:
-> >>
-> >> On 20/10/2023 09:05, Marc Zyngier wrote:
-> >>> Maybe. There is something to be said about making the range rework
-> >>> (decreasing scale) an independent patch, as it is a significant change
-> >>> on its own. But maybe the rest of the plumbing can be grouped
-> >>> together.
-> >>
-> >> But that's effectively the split I have now, isn't it? The first patch
-> >> introduces TLBI_TTL_UNKNOWN to enable use of 0 as a ttl hint. Then the second
-> >> patch reworks the range stuff. I don't quite follow what you are suggesting.
+> > register_cpu_capacity_sysctl() adds a property to sysfs that describes
+> > the CPUs capacity. This is done from a subsys_initcall() that assumes
+> > all possible CPUs are registered.
 > > 
-> > Not quite.
+> > With CPU hotplug, possible CPUs aren't registered until they become
+> > present, (or for arm64 enabled). This leads to messages during boot:
+> > | register_cpu_capacity_sysctl: too early to get CPU1 device!
+> > and once these CPUs are added to the system, the file is missing.
 > > 
-> > What I'm proposing is that you pull the scale changes in their own
-> > patch, and preferably without any change to the external API (i.e. no
-> > change to the signature of the helper). They any extra change, such as
-> > the TTL rework can go separately.
+> > Move this to a cpuhp callback, so that the file is created once
+> > CPUs are brought online. This covers CPUs that are added late by
+> > mechanisms like hotplug.
+> > One observable difference is the file is now missing for offline CPUs.
 > > 
-> > So while this is similar to your existing split, I'd like to see it
-> > without any churn around the calling convention. Which means turning
-> > the ordering around, and making use of a static key in the various
-> > helpers that need to know about LPA2.
+> > Signed-off-by: James Morse <james.morse@arm.com>
+> > ---
+> > If the offline CPUs thing is a problem for the tools that consume
+> > this value, we'd need to move cpu_capacity to be part of cpu.c's
+> > common_cpu_attr_groups.
 > 
-> I don't think we can embed the static key usage directly inside
-> __flush_tlb_range_op() (if that's what you were suggesting), because this macro
-> is used by both the kernel (for its stage 1) and the hypervisor (for stage 2).
-> And the kernel doesn't support LPA2 (until Ard's work is merged). So I think
-> this needs to be an argument to the macro.
+> I think we should do that anyway and then use an is_visible() if we want to
+> change whether it is visible in offline cpus.
+> 
+> Dynamic sysfs file creation is horrible - particularly when done
+> from an totally different file from where the rest of the attributes
+> are registered.  I'm curious what the history behind that is.
+> 
+> Whilst here, why is there a common_cpu_attr_groups which is
+> identical to the hotpluggable_cpu_attr_groups in base/cpu.c?
 
-I can see two outcomes here:
+Looking into doing this, the easy bit is adding the attribute group
+with an appropriate .is_visible dependent on cpu_present(), but we
+need to be able to call sysfs_update_groups() when the state of the
+.is_visible() changes.
 
-- either you create separate helpers that abstract the LPA2-ness for
-  KVM and stick to non-LPA2 for the kernel (until Ard's series makes
-  it in)
+Given the comment in sysfs_update_groups() about "if an error occurs",
+rather than making this part of common_cpu_attr_groups, would it be
+better that it's part of its own set of groups, thus limiting the
+damage from a possible error? I suspect, however, that any error at
+that point means that the system is rather fatally wounded.
 
-- or you leave the whole thing disabled until we have full LPA2
-  support.
+This is what I have so far to implement your idea, less the necessary
+sysfs_update_groups() call when we need to change the visibility of
+the attributes.
 
-Eventually, you replace the whole extra parameter with a static key,
-and nobody sees any churn.
-
-> Or are you asking that I make the scale change universally, even if LPA2 is not
-> in use? I could do that as its own change change (which I could benchmark), then
-> add the rest in a separate change. But my thinking was that we would not want to
-> change the algorithm for !LAP2 since it is not as effcient (due to the LPA2 64K
-> alignment requirement).
-
-I'm all for simplicity. If having an extra 15 potential TLBIs is
-acceptable from a performance perspective, I won't complain. But I can
-imagine that NV would be suffering from that (TLBIs on S2 have to
-trap).
-
-	M.
+diff --git a/drivers/base/arch_topology.c b/drivers/base/arch_topology.c
+index 9ccb7daee78e..06c9fc6620d2 100644
+--- a/drivers/base/arch_topology.c
++++ b/drivers/base/arch_topology.c
+@@ -215,43 +215,24 @@ static ssize_t cpu_capacity_show(struct device *dev,
+ 	return sysfs_emit(buf, "%lu\n", topology_get_cpu_scale(cpu->dev.id));
+ }
+ 
+-static void update_topology_flags_workfn(struct work_struct *work);
+-static DECLARE_WORK(update_topology_flags_work, update_topology_flags_workfn);
+-
+ static DEVICE_ATTR_RO(cpu_capacity);
+ 
+-static int cpu_capacity_sysctl_add(unsigned int cpu)
+-{
+-	struct device *cpu_dev = get_cpu_device(cpu);
+-
+-	if (!cpu_dev)
+-		return -ENOENT;
+-
+-	device_create_file(cpu_dev, &dev_attr_cpu_capacity);
+-
+-	return 0;
+-}
+-
+-static int cpu_capacity_sysctl_remove(unsigned int cpu)
++static umode_t cpu_present_attrs_visible(struct kobject *kobi,
++					 struct attribute *attr, int index)
+ {
+-	struct device *cpu_dev = get_cpu_device(cpu);
+-
+-	if (!cpu_dev)
+-		return -ENOENT;
+-
+-	device_remove_file(cpu_dev, &dev_attr_cpu_capacity);
++	struct device *dev = kobj_to_dev(kobj);
++	struct cpu *cpu = container_of(dev, struct cpu, dev);
+ 
+-	return 0;
++	return cpu_present(cpu->dev.id) ? attr->mode : 0;
+ }
+ 
+-static int register_cpu_capacity_sysctl(void)
+-{
+-	cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "topology/cpu-capacity",
+-			  cpu_capacity_sysctl_add, cpu_capacity_sysctl_remove);
++const struct attribute_group cpu_capacity_attr_group = {
++	.is_visible = cpu_present_attrs_visible,
++	.attrs = cpu_capacity_attrs
++};
+ 
+-	return 0;
+-}
+-subsys_initcall(register_cpu_capacity_sysctl);
++static void update_topology_flags_workfn(struct work_struct *work);
++static DECLARE_WORK(update_topology_flags_work, update_topology_flags_workfn);
+ 
+ static int update_topology;
+ 
+diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
+index a19a8be93102..954b045705c2 100644
+--- a/drivers/base/cpu.c
++++ b/drivers/base/cpu.c
+@@ -192,6 +192,9 @@ static const struct attribute_group crash_note_cpu_attr_group = {
+ static const struct attribute_group *common_cpu_attr_groups[] = {
+ #ifdef CONFIG_KEXEC
+ 	&crash_note_cpu_attr_group,
++#endif
++#ifdef CONFIG_GENERIC_ARCH_TOPOLOGY
++	&cpu_capacity_attr_group,
+ #endif
+ 	NULL
+ };
+diff --git a/include/linux/cpu.h b/include/linux/cpu.h
+index e117c06e0c6b..745ad21e3dc8 100644
+--- a/include/linux/cpu.h
++++ b/include/linux/cpu.h
+@@ -30,6 +30,8 @@ struct cpu {
+ 	struct device dev;
+ };
+ 
++extern const struct attribute_group cpu_capacity_attr_group;
++
+ extern void boot_cpu_init(void);
+ extern void boot_cpu_hotplug_init(void);
+ extern void cpu_init(void);
 
 -- 
-Without deviation from the norm, progress is not possible.
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
