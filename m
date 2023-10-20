@@ -1,35 +1,50 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58E318C24
-	for <kvmarm@lists.linux.dev>; Fri, 20 Oct 2023 11:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B91DC433C8;
-	Fri, 20 Oct 2023 11:21:53 +0000 (UTC)
-Date: Fri, 20 Oct 2023 12:21:50 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Will Deacon <will@kernel.org>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>, ankita@nvidia.com,
-	maz@kernel.org, oliver.upton@linux.dev, aniketa@nvidia.com,
-	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
-	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
-	jhubbard@nvidia.com, danw@nvidia.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 2/2] KVM: arm64: allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
-Message-ID: <ZTJizmxV4Gtb4g3S@arm.com>
-References: <ZR6IZwcFNw55asW0@lpieralisi>
- <20231012123541.GB11824@willie-the-truck>
- <ZSf6Ue09IO6QMBs1@arm.com>
- <20231012144807.GA12374@willie-the-truck>
- <ZSgsKSCv-zWgtWkm@arm.com>
- <20231013092934.GA13524@willie-the-truck>
- <ZSlBOiebenPKXBY4@arm.com>
- <20231013134541.GP3952@nvidia.com>
- <ZTEN_oe97VRWbnHb@arm.com>
- <20231019115142.GQ3952@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EFBA18C24
+	for <kvmarm@lists.linux.dev>; Fri, 20 Oct 2023 11:22:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YgzekWfu"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=H2KpfR5v8S4cDdfvm+k1Bez67vNujA5KyI4fx/Kz1ps=; b=YgzekWfuW0ZViZvyoL/HkzAklX
+	5nNW5eMYQMXCcU1QdSAFp2AF9Q1KXT5sTeSAtHnZQ/m8i4B1L6Ep823thvglTw3UyUImbkgwmhyDu
+	MWPWCuvm+LO5NStcvSOzrl1wG8pWuXD90e/dP8XNx6EIoA8ioI/CtepzCL35KbgwdacIxoz7mGI0F
+	aAGqzFHJ+LL7bswWK1eApS9KxsLw/kGe4s0eICUD05jcwZeCgM6IuF5ubji454/lne12SDBrPNFFP
+	ENRAcGT1B4VSpRgHHWxzJeLbxeXoi6OVeMDVOCfQ9ss1HnYNq3wNODcnMv5WKQEWbebV+eeFzrEiE
+	Y3Xx91tQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50880)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qtnUT-0000Id-1M;
+	Fri, 20 Oct 2023 12:16:29 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qtnUS-0001UG-19; Fri, 20 Oct 2023 12:16:28 +0100
+Date: Fri, 20 Oct 2023 12:16:27 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Gavin Shan <gshan@redhat.com>
+Cc: James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
+	loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com
+Subject: Re: [RFC PATCH v2 05/35] drivers: base: Print a warning instead of
+ panic() when register_cpu() fails
+Message-ID: <ZTJhi6OVaTSEdvvf@shell.armlinux.org.uk>
+References: <20230913163823.7880-1-james.morse@arm.com>
+ <20230913163823.7880-6-james.morse@arm.com>
+ <2c23ab17-7516-e310-8b79-b8c5fc02984a@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,44 +53,62 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231019115142.GQ3952@nvidia.com>
+In-Reply-To: <2c23ab17-7516-e310-8b79-b8c5fc02984a@redhat.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Oct 19, 2023 at 08:51:42AM -0300, Jason Gunthorpe wrote:
-> On Thu, Oct 19, 2023 at 12:07:42PM +0100, Catalin Marinas wrote:
-> > Talking to Will earlier, I think we can deem the PCIe scenario
-> > (somewhat) safe but not as a generic mechanism for other non-PCIe
-> > devices (e.g. platform). With this concern, can we make this Stage 2
-> > relaxation in KVM only for vfio-pci mappings? I don't have an example of
-> > non-PCIe device assignment to figure out how this should work though.
+On Mon, Sep 18, 2023 at 01:33:37PM +1000, Gavin Shan wrote:
 > 
-> It is not a KVM problem. As I implied above it is VFIO's
-> responsibility to reliably reset the device, not KVMs. If for some
-> reason VFIO cannot do that on some SOC then VFIO devices should not
-> exist.
 > 
-> It is not KVM's job to double guess VFIO's own security properties.
-
-I'd argue that since KVM is the one relaxing the memory attributes
-beyond what the VFIO driver allows the VMM to use, it is KVM's job to
-consider the security implications. This is fine for vfio-pci and
-Normal_NC but I'm not sure we can generalise.
-
-> Specifically about platform the generic VFIO platform driver is the
-> ACPI based one. If the FW provides an ACPI method for device reset
-> that is not properly serializing, that is a FW bug. We can quirk it in
-> VFIO and block using those devices if they actually exist.
+> On 9/14/23 02:37, James Morse wrote:
+> > loongarch, mips, parisc, riscv and sh all print a warning if
+> > register_cpu() returns an error. Architectures that use
+> > GENERIC_CPU_DEVICES call panic() instead.
+> > 
+> > Errors in this path indicate something is wrong with the firmware
+> > description of the platform, but the kernel is able to keep running.
+> > 
+> > Downgrade this to a warning to make it easier to debug this issue.
+> > 
+> > This will allow architectures that switching over to GENERIC_CPU_DEVICES
+> > to drop their warning, but keep the existing behaviour.
+> > 
+> > Signed-off-by: James Morse <james.morse@arm.com>
+> > ---
+> >   drivers/base/cpu.c | 7 ++++---
+> >   1 file changed, 4 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
+> > index 579064fda97b..d31c936f0955 100644
+> > --- a/drivers/base/cpu.c
+> > +++ b/drivers/base/cpu.c
+> > @@ -535,14 +535,15 @@ int __weak arch_register_cpu(int cpu)
+> >   static void __init cpu_dev_register_generic(void)
+> >   {
+> > -	int i;
+> > +	int i, ret;
+> >   	if (!IS_ENABLED(CONFIG_GENERIC_CPU_DEVICES))
+> >   		return;
+> >   	for_each_present_cpu(i) {
+> > -		if (arch_register_cpu(i))
+> > -			panic("Failed to register CPU device");
+> > +		ret = arch_register_cpu(i);
+> > +		if (ret)
+> > +			pr_warn("register_cpu %d failed (%d)\n", i, ret);
+> >   	}
+> >   }
 > 
-> I expect the non-generic VFIO platform drivers to take care of this
-> issue internally with, barriers, read from devices, whatver is
-> required to make their SOCs order properly. Just as I would expect a
-> normal Linux platform driver to directly manage whatever
-> implementation specific ordering quirks the SOC may have.
+> The same warning message has been printed by arch/loongarch/kernel/topology.c::arch_register_cpu().
+> In order to avoid the duplication, I think the warning message in arch/loongarch needs to be dropped?
 
-This would be a new requirement if an existing VFIO platform driver
-relied on all mappings being Device. But maybe that's just theoretical
-at the moment, are there any concrete examples outside vfio-pci? If not,
-we can document it as per Lorenzo's suggestion to summarise this
-discussion under Documentation/.
+No it doesn't, as far as Loongarch is concerned. Given where this change
+occurs in the series, it is correct as far as this is concerned.
+
+The reason is that this code path can only be reached when
+CONFIG_GENERIC_CPU_DEVICES is set, which is something the arch has to
+select. Loongarch doesn't select that until patch 9 in the series,
+"LoongArch: Switch over to GENERIC_CPU_DEVICES", and that patch is
+where the warning message in arch/loongarch is removed.
 
 -- 
-Catalin
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
