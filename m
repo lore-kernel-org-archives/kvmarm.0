@@ -1,123 +1,71 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from out-206.mta1.migadu.com (out-206.mta1.migadu.com [95.215.58.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B204200DF
-	for <kvmarm@lists.linux.dev>; Fri, 20 Oct 2023 18:47:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EF91DDC8
+	for <kvmarm@lists.linux.dev>; Fri, 20 Oct 2023 19:17:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="LtdVRAzT"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=p30D1Q3zE2qXAXYR3qzel/vvewRxpsqtgQHCmqUYVEc=; b=LtdVRAzT/5ZWoDw0QQ+xhklB9/
-	890ErFfVXqWVySS3OHD9I/gJXfSDCp+LFYKEA06AQdIWecu1WiROyi+hxGDfFV/1Exv8Gt3xM4/Zp
-	jrrxGUmPkdG5J+IZajAAnmyd74VJlPHVEd6cHT8P3HuEtGZFu4nHStDWYitjNYhSEtsZEfsaTRmW2
-	AKBY6J/S0UG58H67P4/tHOxwhdmNloeKleBA3MmXYEClCEnkM9S/Vl6Ya8vvoa7doTjRHhEfQKzy9
-	U2guXWrehQ2IB+qYklB2lYQl+pAwQlvbd1NpxiUJzLoUnup9N6znXpEammjKwPoK/XzTHp7WIHJpj
-	8IuirCgg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:59232 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1qtuWU-0000mU-1u;
-	Fri, 20 Oct 2023 19:47:02 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1qtuWW-00AQ7P-0W; Fri, 20 Oct 2023 19:47:04 +0100
-From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-To: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
-	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev
-Cc: x86@kernel.org, James Morse <james.morse@arm.com>, Salil Mehta
-	<salil.mehta@huawei.com>, Jonathan Cameron
-	<Jonathan.Cameron@Huawei.com>, Jean-Philippe Brucker
-	<jean-philippe@linaro.org>, jianyong.wu@arm.com, justin.he@arm.com,
-	"Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>,
-	linux-acpi@vger.kernel.org
-Subject: [PATCH] ACPI: Rename acpi_scan_device_not_present() to be about
- enumeration
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UuGnDEPc"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1697829449;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QJIDp3kn3J9YYqvI7e1P1Uh08vnn+UrS9mMpb3yPd6Q=;
+	b=UuGnDEPcvOoDcHuVVctCpYwXIpYG4p4fFch3ajCp9SJC1XZtdlum8UjoLQnLhQR8t7DwYD
+	zDdqL4SendwJ8cr58LzgBiOgxK0VEiBAXsJVYGDevHC17K5OvYzKYr0B6t6UKxKxZoimnd
+	PYSDr78UrJOiL86tCwix34r6vn8VaZo=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	kvm@vger.kernel.org,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v3 0/5] KVM: arm64: Load stage-2 in vcpu_load() on VHE
+Date: Fri, 20 Oct 2023 19:16:53 +0000
+Message-ID: <169782936475.237746.6910655136004742028.b4-ty@linux.dev>
+In-Reply-To: <20231018233212.2888027-1-oliver.upton@linux.dev>
+References: <20231018233212.2888027-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1qtuWW-00AQ7P-0W@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 20 Oct 2023 19:47:04 +0100
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-From: James Morse <james.morse@arm.com>
+On Wed, 18 Oct 2023 23:32:07 +0000, Oliver Upton wrote:
+> Thanks Zenghui for the review, I've addressed your feedback.
+> 
+> v2: https://lore.kernel.org/kvmarm/20231012205422.3924618-1-oliver.upton@linux.dev/
+> 
+> v2 -> v3:
+>  - Save the right context in __tlb_switch_to_guest()
+>  - Drop stale declarations from kvm_hyp.h
+>  - Fix typo in changelog
+> 
+> [...]
 
-acpi_scan_device_not_present() is called when a device in the
-hierarchy is not available for enumeration. Historically enumeration
-was only based on whether the device was present.
+Applied to kvmarm/next, thanks!
 
-To add support for only enumerating devices that are both present
-and enabled, this helper should be renamed. It was only ever about
-enumeration, rename it acpi_scan_device_not_enumerated().
+[1/5] KVM: arm64: Don't zero VTTBR in __tlb_switch_to_host()
+      https://git.kernel.org/kvmarm/kvmarm/c/38ce26bf2666
+[2/5] KVM: arm64: Restore the stage-2 context in VHE's __tlb_switch_to_host()
+      https://git.kernel.org/kvmarm/kvmarm/c/4288ff7ba195
+[3/5] KVM: arm64: Reload stage-2 for VMID change on VHE
+      https://git.kernel.org/kvmarm/kvmarm/c/5eba523e1e5e
+[4/5] KVM: arm64: Rename helpers for VHE vCPU load/put
+      https://git.kernel.org/kvmarm/kvmarm/c/27cde4c0fe28
+[5/5] KVM: arm64: Load the stage-2 MMU context in kvm_vcpu_load_vhe()
+      https://git.kernel.org/kvmarm/kvmarm/c/934bf871f011
 
-No change in behaviour is intended.
-
-Signed-off-by: James Morse <james.morse@arm.com>
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
-This is another patch from James' aarch64 hotplug vcpu series.
-
-I asked:
-> Is this another patch which ought to be submitted without waiting
-> for the rest of the series?
-to which Jonathan Cameron replied:
-> Looks like a valid standalone change to me.
-
-So let's get this queued up.
-
- drivers/acpi/scan.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/acpi/scan.c b/drivers/acpi/scan.c
-index ed01e19514ef..17ab875a7d4e 100644
---- a/drivers/acpi/scan.c
-+++ b/drivers/acpi/scan.c
-@@ -289,10 +289,10 @@ static int acpi_scan_hot_remove(struct acpi_device *device)
- 	return 0;
- }
- 
--static int acpi_scan_device_not_present(struct acpi_device *adev)
-+static int acpi_scan_device_not_enumerated(struct acpi_device *adev)
- {
- 	if (!acpi_device_enumerated(adev)) {
--		dev_warn(&adev->dev, "Still not present\n");
-+		dev_warn(&adev->dev, "Still not enumerated\n");
- 		return -EALREADY;
- 	}
- 	acpi_bus_trim(adev);
-@@ -327,7 +327,7 @@ static int acpi_scan_device_check(struct acpi_device *adev)
- 			error = -ENODEV;
- 		}
- 	} else {
--		error = acpi_scan_device_not_present(adev);
-+		error = acpi_scan_device_not_enumerated(adev);
- 	}
- 	return error;
- }
-@@ -339,7 +339,7 @@ static int acpi_scan_bus_check(struct acpi_device *adev, void *not_used)
- 
- 	acpi_bus_get_status(adev);
- 	if (!acpi_device_is_present(adev)) {
--		acpi_scan_device_not_present(adev);
-+		acpi_scan_device_not_enumerated(adev);
- 		return 0;
- 	}
- 	if (handler && handler->hotplug.scan_dependent)
--- 
-2.30.2
-
+--
+Best,
+Oliver
