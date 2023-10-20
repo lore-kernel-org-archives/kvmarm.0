@@ -1,25 +1,41 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2086.outbound.protection.outlook.com [40.107.244.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5D8E12E65
-	for <kvmarm@lists.linux.dev>; Fri, 20 Oct 2023 14:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E1F71D54D
+	for <kvmarm@lists.linux.dev>; Fri, 20 Oct 2023 14:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UYFEkk/I"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3145C433C7;
-	Fri, 20 Oct 2023 14:04:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697810645;
-	bh=jGn4CadJUGcXIko3cgZzK66leI6kgRcHdeUCJtNcI0A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UYFEkk/IKlj8DgLmPwUeClMRfq90ihEuyx4yBSkcedVTNV2yJxDvd+OsLv3APhEwV
-	 gbNf84Kh/fml3EUS9EBW41n5YkPP7+9sq0NW5kBqJUGfp4Yg4M5LW/Hy4CcBYi32AW
-	 yJvS4FgEl8L4weSx1t9K7jvndBgl7RaFAUK2LdqRAv4NMJkxc6Bp2XsoqBMtnfZ7UD
-	 /uP63cRltfuqbX1WVXlvpPN3I0I4Uw4wEIgM/bUIP1Rv0EYKBktdwRj7z6TgO4WnKd
-	 5zaSAg2zy3xB4fcmHpccuc8ckj4Nw9bfiUzZRZ2QEYoXuNSm9U/jU8L9Ljucb3dDOE
-	 t9rUyTLVj36HA==
-Date: Fri, 20 Oct 2023 16:03:57 +0200
-From: Lorenzo Pieralisi <lpieralisi@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="sRSWh7io"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hehMfuqgl1xh+pOSOseCWXKrcSQvmbBhlyxM1+hHZZl/CQAMITwJjEnOxoD0zzOVGarGTVvyYgIrnoxrEonzY2LDsmFiC0CigqPNpdg/hs5hKsWyiOY5rAGwPs8M265zX85q+qWtqlaqtn4Xsp4tvoj30z7kmACDeo2yKJbeNPoevok11qdrWPEXGTMx+65qk3cziroVSm0+ZjssxH56+gCVcbm/hvSwOWdMEpTge6hT/F3YDSL8tNvwlR4A+NMLzNT2LWSP9DqQgJqJl4q0C1eXZUrtAsMFNVSZK7X0H9oRtofhQHUNbfHS3s5WMwN50EKpC7pY8oYZwuARRHvmTw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=j31BCaDIQXsXSkWq9Xib7jbddEm8iZVJcnUPR674CYM=;
+ b=c3RVveqwRa8sFQllF3BJRWlJb+IrArRilocDRLfQGRq2QoPN45vGOseO9HTPLZEF8RJs7OHOiF/BsdFkDTp1VgR54wK5k3MMM0dtVS1A9j7cIE9dkOHF/UfIvzSqUR7bt9gSIoHDRaQMroLPx3RcHWv7IM1E8O3QkGc6Io5bqLxYK9G65QyJrliq92rkKiYjjbNa++mkFLdkM1J3sv+eQXU4n7xsabARMJ+8Fdrfr4+0phDRSUkEFekmFOvmWTZqJf7y0VzEUN9mTvP6HL3/PqaPuJZaVjZTieUdytHPm8O/N71W+Rl7ys1aqTugBqZev68tCzMYelX/bprPWsc7uw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j31BCaDIQXsXSkWq9Xib7jbddEm8iZVJcnUPR674CYM=;
+ b=sRSWh7ioNdghg7bVhoTrEmlY7OYuhWcAgWquXAsmVBKBr6rjpI3iWyAmD9jPR9vwkC+TwLsnS2eqhIs3pTUGv/tPCtjy/K/F4g4rXVo1wHDsVnhXyJvbWXOFYzaSmtCRKV2KvlkAQOLRWpNSrTTDGvdm4GZH60W0WY8Q7eOhUWP2C33rucrO9LPjbfupGyhA7JmpWDeU9DQgYm1PEd1AnEE9cDb+chixTpGZayuBQAXFx6xavttHJ1Gsy7tnFLV/fNq0+gLTfOJaZf/Q+QsSfj0obZaIYIyMReHTvuutQpj8OyvzlrSJkZtQDgmUyZFnnG8WE2SbjUnW7ngMIfXYqA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SA3PR12MB7860.namprd12.prod.outlook.com (2603:10b6:806:307::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36; Fri, 20 Oct
+ 2023 14:29:01 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6886.034; Fri, 20 Oct 2023
+ 14:29:00 +0000
+Date: Fri, 20 Oct 2023 11:28:58 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Lorenzo Pieralisi <lpieralisi@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>, ankita@nvidia.com, maz@kernel.org,
 	oliver.upton@linux.dev, aniketa@nvidia.com, cjia@nvidia.com,
@@ -29,9 +45,8 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v1 2/2] KVM: arm64: allow the VM to select DEVICE_* and
  NORMAL_NC for IO memory
-Message-ID: <ZTKIzZk3lGATLkGz@lpieralisi>
-References: <ZSf6Ue09IO6QMBs1@arm.com>
- <20231012144807.GA12374@willie-the-truck>
+Message-ID: <20231020142858.GH3952@nvidia.com>
+References: <20231012144807.GA12374@willie-the-truck>
  <ZSgsKSCv-zWgtWkm@arm.com>
  <20231013092934.GA13524@willie-the-truck>
  <ZSlBOiebenPKXBY4@arm.com>
@@ -40,82 +55,111 @@ References: <ZSf6Ue09IO6QMBs1@arm.com>
  <20231019115142.GQ3952@nvidia.com>
  <ZTJizmxV4Gtb4g3S@arm.com>
  <20231020114719.GE3952@nvidia.com>
+ <ZTKIzZk3lGATLkGz@lpieralisi>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZTKIzZk3lGATLkGz@lpieralisi>
+X-ClientProxiedBy: BN9PR03CA0788.namprd03.prod.outlook.com
+ (2603:10b6:408:13f::13) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231020114719.GE3952@nvidia.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA3PR12MB7860:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1e5dfbf9-3986-4971-8140-08dbd178e6e9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	tKrUjVOyyV6oCdYwGDezEjHSMjB7neTEqsCMMc+YNJcTHr/CtSS8fokpYfkfOAlTXFuJEuQR2/u5WMQsq/5qFioHwxJ36/mLI7pheTPOPuZEdzK0GnW47Gvy/NtgvNJ54dasEsg0s5S18YOgX9cunyVBh7RXFnAqB4xXvDjr3yq1CVN0tq6UEThLqh2fyrB7u+ME4BSPXJk/UO4rnQVq/1WXp9o0ECx7jO4LgkO/SkKtw5alxtugc/lT9eN7q/ilpGxahwjFw1fRRVwyTG3SsxE0Rztq6SpA3Kx7xVEelzAAWHgh/EMjpJgnUXnYsFLujLnncs3OEToBAFfS9zy01xOmFHfhW4VPC2rCa1tQpUnC7m0/EP5TrQlJPm1+Psi55KpkwMNAiB29PqwZqNM0RVqxmeKplCfflYvcm5A7XBE3y2H0S/XcCnpquHk3HmEHB0X6LcZTTIhoGPnIDhW54wZ6waKiGnAH3W/Kwu/t/3XWRq8NIiGkqnSe25U5d9ZQ/7eG1j0wQ3inhHigVGGf1rjfk/8HWjIA05CX1pCDN9waAk5OwmUE5wGus38031xe
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(376002)(39860400002)(346002)(396003)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(26005)(66946007)(66556008)(6486002)(66476007)(478600001)(6916009)(54906003)(1076003)(86362001)(38100700002)(2616005)(83380400001)(5660300002)(33656002)(316002)(6506007)(36756003)(6512007)(2906002)(4326008)(41300700001)(8936002)(8676002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?cGTHAByW6su7k3MekRbhWlttP8szHOVbtAt0wTIpCdhOVM9FhQ2hwD+M0yyb?=
+ =?us-ascii?Q?f89KGHxdqD+l1LChI3Wzz0sNAxt1KhcmjngaVzSw1njjDOWGHS998b154XwU?=
+ =?us-ascii?Q?l5ZnpyRt1lnZWRiO3Csx/c20gpU+dX7yvcDwuWcu7ath6MvW/rRPhoG0ymWQ?=
+ =?us-ascii?Q?08NYFuUF+M23RkIkYLXaIQEauVzJ7jJcvvsP6l+pdG2C0fL8r4mMN1/QPeoD?=
+ =?us-ascii?Q?NBocdzragffQEqLTpV10WYDmXjdwhJrs+5ALoW2BM5fXcdZxPt/ntYyUTy/n?=
+ =?us-ascii?Q?x84lxCRwSrS/pfY4TXPemyivlh5CbG4cKsMpATNfpuO8fWVPEBatgNBS9BgP?=
+ =?us-ascii?Q?wPh4X/t1kPMWUEAPM/Jx608aA6EAoFAGR7a/LLvKrItvi0AWslVSWsJ8V7ht?=
+ =?us-ascii?Q?Oug6iUelW2DXcnWiwfNhlB+di0UuV/tw9/so4BEPz5R6pS4vfMbtSfi+gt96?=
+ =?us-ascii?Q?kbK+AYeVxWqnJ7j29pkqlnZlbU0JK/j63coQQp8P/WfslWkHuYXcQcEiTZOL?=
+ =?us-ascii?Q?rodGIdGtQkXRvJJSzvkK2i+MedXs79+vrTHz3DUbGyIbAzBcQ12FzxmGYx1k?=
+ =?us-ascii?Q?OBPCPE3HDBVvBgBJxagl28sqxY3aKACmQ2xROnHguQc2dxd9GY12UNJ6e6l+?=
+ =?us-ascii?Q?xqG7pFMxEm9hI4wU1zZxRpHlS9QezyqyHbybAjwbCbQgHXt+9j+CIWnrFI5a?=
+ =?us-ascii?Q?qc+CjpsAwi8oIjaR0PnbflYrAs3V1Y0fzZ94+o3yG6zW8qOHIOE80XqfMAzH?=
+ =?us-ascii?Q?B3dgMk5Z9q8fti1zndYZu700jI8iohv7is73KWFgFobVx0TgvYRZrScCMw0N?=
+ =?us-ascii?Q?6pXM70OU7AJ8qq2U/VesQ8/LOTgtn4zgwirPMVxzTfs723mWZbiReV5wi0tp?=
+ =?us-ascii?Q?FJrv9BygO3h0Wm68nwiy5oVavps1853wuXP9cfUEmw3XhHece1SHhfzMnrTP?=
+ =?us-ascii?Q?AjNUPyF5OWf7oR/5sAEYna380LhKIKUBJDsF83OUEA9KoCTkc2ozxGX1eY/a?=
+ =?us-ascii?Q?gmodiIB0avUltLCOvOGfZ4uy0uCRKy94Kky1BtIZ11IVtyv8HRyjlhep2+uT?=
+ =?us-ascii?Q?TmE13xxIuw8b8Zm9YbjqSR2PrkmYf2pp92RwiGwf5VWgL89iGL2fC7e2yRF/?=
+ =?us-ascii?Q?MtDd4xuLu2A/vDHdfZKbmmwbDk3uNglZ06q3M/h1gshBFoaJBKMa4pYJyPGi?=
+ =?us-ascii?Q?levDvWIc/jzu25KG06VTaZkMv1H6XcNWCEjlreBa9/x7uri+IkkW76E2M2MU?=
+ =?us-ascii?Q?r8P7U06LlrVcBnWbTSsmp0H/XD+efBxdIRfLringJwxh4IOJHo6tXBMAhxo7?=
+ =?us-ascii?Q?5txcJag+FJ2/zFMu7h9JgA08M/Ns3IiPdVm1vVQfT2+EbnKrmvJY2DQQjXK1?=
+ =?us-ascii?Q?uGB57ozuHyTiIugpCkhSrmpUJoCBnEzVwapeZIjT9lRp9lH1sMP+u13BZxVz?=
+ =?us-ascii?Q?72De8AG+DeMaQCOkOIEq7ssBrUGhD60q84WoG9JTIalPCNr3W50uFfc06XNu?=
+ =?us-ascii?Q?nshLXKoAy9SJdUbINTrgAzeVLMoi+PWikKJvPcLkIJPHckRdxJS6Crh4Ov9X?=
+ =?us-ascii?Q?ePTKgROF6/E+a/qHmUo4+NV9mEXBDQ+GuGCejitp?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1e5dfbf9-3986-4971-8140-08dbd178e6e9
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2023 14:29:00.5505
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jCf3L0/lqfLAsMBojMyLdKRWktbNRmnCsCF/Z8QYfGDIUFsYREvGBZAPcPTgPD/F
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7860
 
-On Fri, Oct 20, 2023 at 08:47:19AM -0300, Jason Gunthorpe wrote:
-> On Fri, Oct 20, 2023 at 12:21:50PM +0100, Catalin Marinas wrote:
-> > On Thu, Oct 19, 2023 at 08:51:42AM -0300, Jason Gunthorpe wrote:
-> > > On Thu, Oct 19, 2023 at 12:07:42PM +0100, Catalin Marinas wrote:
-> > > > Talking to Will earlier, I think we can deem the PCIe scenario
-> > > > (somewhat) safe but not as a generic mechanism for other non-PCIe
-> > > > devices (e.g. platform). With this concern, can we make this Stage 2
-> > > > relaxation in KVM only for vfio-pci mappings? I don't have an example of
-> > > > non-PCIe device assignment to figure out how this should work though.
-> > > 
-> > > It is not a KVM problem. As I implied above it is VFIO's
-> > > responsibility to reliably reset the device, not KVMs. If for some
-> > > reason VFIO cannot do that on some SOC then VFIO devices should not
-> > > exist.
-> > > 
-> > > It is not KVM's job to double guess VFIO's own security properties.
-> > 
-> > I'd argue that since KVM is the one relaxing the memory attributes
-> > beyond what the VFIO driver allows the VMM to use, it is KVM's job to
-> > consider the security implications. This is fine for vfio-pci and
-> > Normal_NC but I'm not sure we can generalise.
+On Fri, Oct 20, 2023 at 04:03:57PM +0200, Lorenzo Pieralisi wrote:
+> > My point is if this becomes a real world concern we have a solid
+> > answer on how to resolve it - fix the VFIO driver to have a stronger
+> > barrier before reset.
 > 
-> I can see that, but I belive we should take this responsibility into
-> VFIO as a requirement. As I said in the other email we do want to
-> extend VFIO to support NormalNC VMAs for DPDK, so we need to take this
-> anyhow.
-> 
-> > > Specifically about platform the generic VFIO platform driver is the
-> > > ACPI based one. If the FW provides an ACPI method for device reset
-> > > that is not properly serializing, that is a FW bug. We can quirk it in
-> > > VFIO and block using those devices if they actually exist.
-> > > 
-> > > I expect the non-generic VFIO platform drivers to take care of this
-> > > issue internally with, barriers, read from devices, whatver is
-> > > required to make their SOCs order properly. Just as I would expect a
-> > > normal Linux platform driver to directly manage whatever
-> > > implementation specific ordering quirks the SOC may have.
-> > 
-> > This would be a new requirement if an existing VFIO platform driver
-> > relied on all mappings being Device. But maybe that's just theoretical
-> > at the moment, are there any concrete examples outside vfio-pci? If not,
-> > we can document it as per Lorenzo's suggestion to summarise this
-> > discussion under Documentation/.
-> 
-> My point is if this becomes a real world concern we have a solid
-> answer on how to resolve it - fix the VFIO driver to have a stronger
-> barrier before reset.
+> Just to make sure I am parsing this correctly: this case above is
+> related to a non-PCI VFIO device passthrough where a guest would want to
+> map the device MMIO at stage-1 with normal-NC memory type (well, let's
+> say with a memory attribute != device-nGnRE - that combined with the new
+> stage-2 default might cause transactions ordering/grouping trouble with
+> eg device resets), correct ? 
 
-Just to make sure I am parsing this correctly: this case above is
-related to a non-PCI VFIO device passthrough where a guest would want to
-map the device MMIO at stage-1 with normal-NC memory type (well, let's
-say with a memory attribute != device-nGnRE - that combined with the new
-stage-2 default might cause transactions ordering/grouping trouble with
-eg device resets), correct ? IIRC, all requests related to honouring
-"write-combine" style stage-1 mappings were for PCI(e) devices but
-that's as far as what *I* was made aware of goes.
+This is what I have understood was Will's concern, yes.
 
-> I'm confident it is not a problem for PCI and IIRC the remaining ARM
-> platform drivers were made primarily for DPDK, not KVM.
-> 
-> So I agree with documenting and perhaps a comment someplace in VFIO is
-> also warranted.
+> IIRC, all requests related to honouring "write-combine" style
+> stage-1 mappings were for PCI(e) devices but that's as far as what
+> *I* was made aware of goes.
 
-We will do that, I will start adding the recent discussions to the
-new documentation file. Side note: for those who attend LPC it would be
-useful to review the resulting documentation together there, it should
-happen around v6.7-rc1.
+Yes, this is what I am aware of as well.
 
-Lorenzo
+Though I do not object to the idea from the VFIO side that platform
+devices would also have to support NormalNC too.
+
+The theoretical missing peice is that someone would say they have a
+SOC issue XYZ and thus their VFIO platform devices must fully block
+NormalNC. I suggest if someone comes with this and really, really
+wants VFIO, then we could use a VMA flag to indicate that KVM must not
+upgrade it. Currently I have no knowledge of such a thing existing.
+
+With PCI we've made the argument that if NormalNC is broken unsafe for
+KVM in the SOC then probably so is Device-*. I think the same basic
+argument holds for platform devices too. Thus I'm skeptical that
+someone can come and say they have SOC issue XYZ and NormalNC is
+broken but Device-* is perfectly safe.
+
+> We will do that, I will start adding the recent discussions to the
+> new documentation file. Side note: for those who attend LPC it would be
+> useful to review the resulting documentation together there, it should
+> happen around v6.7-rc1.
+
+I will be there, let me know
+
+Thanks,
+Jason
