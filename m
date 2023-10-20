@@ -1,131 +1,190 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2148.outbound.protection.outlook.com [40.92.62.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A95D111A4
-	for <kvmarm@lists.linux.dev>; Fri, 20 Oct 2023 09:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D5E211CBE
+	for <kvmarm@lists.linux.dev>; Fri, 20 Oct 2023 09:24:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dk6keR7e"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D5C0C433C9;
-	Fri, 20 Oct 2023 09:21:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697793666;
-	bh=5acvZfHG+Td5gEft4rLHRBU1/ewqNTvB2G7cCYmr3lo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dk6keR7eDDJeaMBNQRw/WKxkOa4I7cJBa0EuJkGfIqmRRlCcnS5Odtw1d3JekucMb
-	 kO/wHxlFgDvCufnMEa0wDg5/CyezSOmSyIw3mLkJM6SJm0fGy44gfSmpWRWQ7VGgXL
-	 eb/o7LedkPTU/CKqAhFXaFvc5Nw/jnyqs8OO7HXbnUNXv6ygQ/VH55Nijp1sjilEa5
-	 CT0S/ZHzQnmaDcKERW/R/dHnL0AEccYLaqHMA0QW4WcOj1Wo8wbW3S2TMwh/WWBKXU
-	 VhMG/y4J08zzcP5OSrPnLlbkne6pBlVPC8X92mx4H9RkYHqQ7JccL06VB73A/Uwzcw
-	 DNnx3Up5KUU9Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qtlgl-0063mj-S9;
-	Fri, 20 Oct 2023 10:21:03 +0100
-Date: Fri, 20 Oct 2023 10:21:02 +0100
-Message-ID: <86a5sdmyyp.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="aY4cBmeB"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DnFjxroFIgbYeZ4x0EPCYSzzYcBfSNFNVb4Am/DwC+LPT7pNAKjZxFS1OTCiYAUw5tX0c48I1iTHDKEOij6/wLoG0Qw0Fp8nwP+VYHXxwiJQxvfDUHc4fw4p3dN6FbSnmOR2SjZGEnm8LKRNQv3OSAeu3jIgVw6/VAUO3+5mK5ZsQ5k9LnaFgQE7xHFwoFdCRpnKq9qBJzT+YEe2sFhH+e1Nsk85PZB84DuhFZieGsStBHZRhySWbEvaWoU+ztULrUXDANHxdv9gzygkPUgeaYV6eZ8W6YDQ4WuD4cTqJwG9ZK4MSNAxYKwK/C7Ad6iW7rGSqTK32CovGqlQr0AaOQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hjd54qI8ZxXJcpP229dyBk33amg3RvMFL4iyPlgR+Oc=;
+ b=d1jPpNAQzGcCFx0geVtImXz8vjiucbSj36vqTIXTuE4puvyOC2g2DirUadhobBJIkmCEgwQV0wTX3G19pCqf0eGDHwhaCSmyhH84lJNXkG2w0pjuc0hqEZPCKRcjcrs+xOY1XJAGIYgbq+eIQldMNxolaiLM1/59PcWq/Wj7tsPrMmc0OXGg03+15hFglIEm43uYpkhfpmt6nniUPr3s1V5ZpnErkzMgdDz51Kj9y1k2f5j23X87qklrvXVDEXWAsvvcrYKsICr2MY9LcKKNoEU+DxlrLM7GdhalCHQ/X12c8WzdMT1B1rnJwhojv0JwIj6VuFmanBjQm2khQ1EX7w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hjd54qI8ZxXJcpP229dyBk33amg3RvMFL4iyPlgR+Oc=;
+ b=aY4cBmeBtPnaWlrW0C6ki2ptAnRNAdH/1G51qU6kawZOQ85sT8X+LVl3CF1tSiDMsfO1RLlgzXZHQmn2EFDGC0oIn0x0dCYrJLHQSbbOAcHl6hTdss8cexwefJEue+h8EiZbfaoRtqKVO6y3+d5+ga76Z7V0TIcfPNH4a9MDNy1MU9OZLm5LuIUNcrlOFVZgKIbMPKEHLO7urL6Api+u2Topi67NlpyCteYNFdGGMMl6iRHftrAoxvzBJrd+DbVB6/37MBi9KiSBHuvvhvaDzAEp/t3t309sFfc3G6dNMCrQkta+IWG6Gig+AesI0dL10WdrR/QAYIVt815W+GfK3w==
+Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13) by
+ SYYP282MB0752.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:71::10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6907.24; Fri, 20 Oct 2023 09:24:22 +0000
+Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::e39e:17fc:36d8:1ea8]) by SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::e39e:17fc:36d8:1ea8%3]) with mapi id 15.20.6907.025; Fri, 20 Oct 2023
+ 09:24:22 +0000
+From: Tianyi Liu <i.pear@outlook.com>
+To: mark.rutland@arm.com
+Cc: acme@kernel.org,
+	adrian.hunter@intel.com,
+	alexander.shishkin@linux.intel.com,
+	i.pear@outlook.com,
+	irogers@google.com,
+	jolsa@kernel.org,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 07/12] KVM: arm64: Prepare TCR_EL2.PS in cpu_prepare_hyp_mode()
-In-Reply-To: <20231009185008.3803879-8-ryan.roberts@arm.com>
-References: <20231009185008.3803879-1-ryan.roberts@arm.com>
-	<20231009185008.3803879-8-ryan.roberts@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	maz@kernel.org,
+	mingo@redhat.com,
+	namhyung@kernel.org,
+	pbonzini@redhat.com,
+	peterz@infradead.org,
+	seanjc@google.com,
+	x86@kernel.org
+Subject: Re: [PATCH v2 0/5] perf: KVM: Enable callchains for guests
+Date: Fri, 20 Oct 2023 17:21:14 +0800
+Message-ID:
+ <SY4P282MB10848CE48E2605CFC347AD659DDBA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <ZSlNsn-f1j2bB8pW@FVFF77S0Q05N.cambridge.arm.com>
+References: <ZSlNsn-f1j2bB8pW@FVFF77S0Q05N.cambridge.arm.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [7UYIq8jZ07p1gQm1ShB5cGTFWmfZC1xVwcqfbEFDarFrrPHiHOoaHw==]
+X-ClientProxiedBy: SG2PR06CA0203.apcprd06.prod.outlook.com (2603:1096:4:1::35)
+ To SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13)
+X-Microsoft-Original-Message-ID: <20231020092114.143091-1-i.pear@outlook.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, james.morse@arm.com, yuzenghui@huawei.com, ardb@kernel.org, anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SY4P282MB1084:EE_|SYYP282MB0752:EE_
+X-MS-Office365-Filtering-Correlation-Id: c2a82c67-8639-474c-00bd-08dbd14e5848
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	2rRP/srRHzBw69owbbG2s3utbEq7wKBdm7bRIqSwihVWmHwrEx+xUpRYgjMAikvSq5kKoGv3CT2Bvt5FeMAZ+hAwdKwQxGskapzVnnEZI02+2DxF38nMciTAwL1bYvn44lW1t1rhsEIeXz+qsDoVujRhIafe0W89lt6+fAx1jKSPNKe59tW9PMfQ48VZHzuUxs/Ni0ORQJbumtLDMGd3cM339CKzCMkZOFHwKWkfKt8/ceWsOGzhBWEtuIwGqLRxYiEhW7Exvx8Lyf9RD4QVE/SDVvYutFzJHsHNRp5FtCD6LWwnDenrCsdAJLYW/uwq+JXWqegys5ZHncZuYvIFagt+eezxTHKlKVPLIOiObXtRRatsDXnEs5xZe2cIQkgE/3CwgxBwBozG0SGU6l6QtbABI0qYWzegYbMdu6ewlsE4P7zaW79d8GqNVmN486JDtSnf0vW501ZKEaF9gyvPtL53+4fZmi5qtLTE/xG/3Jg3q6X4cKhwsmRDM4JWQ2T7w20r4BfqdVUU7g+s/dKphSWZ4Mv9kiR1IyRP2MSDGnVPxydKr4LRIQ2FzO5frjMYOLbQ+XXG8R+YLeeDvTrJvuigcMxpAqztDjXTgLIVue9A26ewiYqXI0rq/mG8iS76
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?vK5oGDU6pZTV9NZEMYjjL2VXpKxHeh8w3wESNiSCapJfFRLRxN+GVapxOVJl?=
+ =?us-ascii?Q?wWkfa8bsK8fvxKj3KUmGHhzwftE05bFwyD/YCu6546yvdZVSWEngAyliG21O?=
+ =?us-ascii?Q?6cU1GkA0TFtayZzBRyDD4UBgJOrjkggN26c3k4eOldpN81rlUtWtXjdrojBi?=
+ =?us-ascii?Q?wUUpusOrAHWH5Epl4INEfZYETB4rfLr8SJija+R28eJDRmYwmiRffN0ac3Wi?=
+ =?us-ascii?Q?Hq26VTm7rS/9tmBMYK+EdOyKEb9HhZqCLhXh3VIJzOriVDZHY6AB5jQe1fsC?=
+ =?us-ascii?Q?PFNprDYtyQrXaEkxnSybIUMAP0t9AaeCzptkuUqgqgqL7hEsEJuw6YPNmIZ7?=
+ =?us-ascii?Q?iw0G08TRez9wiYSkY2IjBUkLpcD+NaT6TZlSDUIp2zWiGmOH91WRWyTlD63A?=
+ =?us-ascii?Q?peeg82/S8c5gXnKQDCjNqE9G+3rCWAilA0T0ijMH4c5TyncB65YWENKdEQIo?=
+ =?us-ascii?Q?7gZe/EBxppsYUOvS9E948rKPaDnCGBGiXUqWxXhWIUe/1UaOU0FBeuHPZqxZ?=
+ =?us-ascii?Q?NXkX9DjxUjllGHRcz8xoCbCkCcU2JM9reCIKn0+HWpn0j/9AiKpUdnnbXS8a?=
+ =?us-ascii?Q?7Z4r+wT/foJnMrQ1O8/SuuSFVsyxHSEaGYvQNJAg+GQOWVJ6PrdtsnBjHLvd?=
+ =?us-ascii?Q?1Qu4GUDY3PcyHdu+9QYuKOEuVl7i/vENXMvlfo5mrxuSlDJObmeKl9VNthOr?=
+ =?us-ascii?Q?ckAFgh23W3E7R9HjQx/DBxzTwBg2soGv1Lp++N7jEaGzFTCIsYMEXDefiHBS?=
+ =?us-ascii?Q?Kl3VLr+n29rj6DzFWUOqAT6Md3TZARmzZ+EofUp/YCcrI+AIdSKqoP55XdVG?=
+ =?us-ascii?Q?SXUFNL2mGnGAekbc7+sJ7qNJBL2Yme+CZq6yjZ9Kto+zbqYAXMrOQbSXWhzd?=
+ =?us-ascii?Q?+hdF2buLyh499LwKc7bUnq7/Oqw1HwIZgzbOs5oKFpH4I7PwzRIl1Uj2xYWA?=
+ =?us-ascii?Q?hQxm690c20d0galxWYu/aCX429ubhtpn0GN+vZH0yDqrYEEb2eYP7cODXlSE?=
+ =?us-ascii?Q?kdeZ09O90emfEqKO+y366iDQsCmnoy83mHA7ZOvf4W3NRo4py/KIgePcPFAp?=
+ =?us-ascii?Q?gn8pPLDM+s5BCJkU8JaVM9E8niveSob6iMwzLrvfq+UY1GNPpXqC0PJldXXc?=
+ =?us-ascii?Q?JH7s6nDkyziwLU+h0Re7e1YXiukllRNp3P3N45m+M5bcmziFkZHSltxPTFdq?=
+ =?us-ascii?Q?m3MRt3EFld2VOLBhJ3nbkNPmhz2ptXziV991S3T2U4mrEOGSADMopz1Fmkit?=
+ =?us-ascii?Q?T1CZGQfR9PuiWhYCGM8S?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c2a82c67-8639-474c-00bd-08dbd14e5848
+X-MS-Exchange-CrossTenant-AuthSource: SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2023 09:24:22.6958
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SYYP282MB0752
 
-On Mon, 09 Oct 2023 19:50:03 +0100,
-Ryan Roberts <ryan.roberts@arm.com> wrote:
-> 
-> With the addition of LPA2 support in the hypervisor, the PA size
-> supported by the HW must be capped with a runtime decision, rather than
-> simply using a compile-time decision based on PA_BITS. For example, on a
-> system that advertises 52 bit PA but does not support FEAT_LPA2, A 4KB
-> or 16KB kernel compiled with LPA2 support must still limit the PA size
-> to 48 bits.
-> 
-> Therefore, move the insertion of the PS field into TCR_EL2 out of
-> __kvm_hyp_init assembly code and instead do it in cpu_prepare_hyp_mode()
-> where the rest of TCR_EL2 is prepared. This allows us to figure out PS
-> with kvm_get_parange(), which has the appropriate logic to ensure the
-> above requirement. (and the PS field of VTCR_EL2 is already populated
-> this way).
-> 
-> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
-> ---
->  arch/arm64/kvm/arm.c               | 3 +++
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S | 4 ----
->  2 files changed, 3 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 73cc67c2a8a7..0bb8918475d2 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1726,6 +1726,7 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
->  {
->  	struct kvm_nvhe_init_params *params = per_cpu_ptr_nvhe_sym(kvm_init_params, cpu);
->  	unsigned long tcr;
-> +	u64 mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+Hi Mark,
 
-nit: move this one up by a line (yes, I'm being difficult).
+On Fri, 13 Oct 2023 15:01:22 +0100, Mark Rutland wrote:
+> > > > The event processing flow is as follows (shown as backtrace):
+> > > >   #0 kvm_arch_vcpu_get_frame_pointer / kvm_arch_vcpu_read_virt (per arch)
+> > > >   #1 kvm_guest_get_frame_pointer / kvm_guest_read_virt
+> > > >      <callback function pointers in `struct perf_guest_info_callbacks`>
+> > > >   #2 perf_guest_get_frame_pointer / perf_guest_read_virt
+> > > >   #3 perf_callchain_guest
+> > > >   #4 get_perf_callchain
+> > > >   #5 perf_callchain
+> > > >
+> > > > Between #0 and #1 is the interface between KVM and the arch-specific
+> > > > impl, while between #1 and #2 is the interface between Perf and KVM.
+> > > > The 1st patch implements #0. The 2nd patch extends interfaces between #1
+> > > > and #2, while the 3rd patch implements #1. The 4th patch implements #3
+> > > > and modifies #4 #5. The last patch is for userspace utils.
+> > > >
+> > > > Since arm64 hasn't provided some foundational infrastructure (interface
+> > > > for reading from a virtual address of guest), the arm64 implementation
+> > > > is stubbed for now because it's a bit complex, and will be implemented
+> > > > later.
+> > >
+> > > I hope you realise that such an "interface" would be, by definition,
+> > > fragile and very likely to break in a subtle way. The only existing
+> > > case where we walk the guest's page tables is for NV, and even that is
+> > > extremely fragile.
+> >
+> > For walking the guest's page tables, yes, there're only very few
+> > use cases. Most of them are used in nested virtualization and XEN.
+> 
+> The key point isn't the lack of use cases; the key point is that *this is
+> fragile*.
+> 
+> Consider that walking guest page tables is only safe because:
+> 
+> (a) The walks happen in the guest-physical / intermiediate-physical address
+>     space of the guest, and so are not themselves subject to translation via
+>     the guest's page tables.
+> 
+> (b) Special traps were added to the architecture (e.g. for TLB invalidation)
+>     which allow the host to avoid race conditions when the guest modifies page
+>     tables.
+> 
+> For unwind we'd have to walk structures in the guest's virtual address space,
+> which can change under our feet at any time the guest is running, and handling
+> that requires much more care.
+> 
+> I think this needs a stronger justification, and an explanation of how you
+> handle such races.
 
->  
->  	/*
->  	 * Calculate the raw per-cpu offset without a translation from the
-> @@ -1747,6 +1748,8 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
->  	}
->  	tcr &= ~TCR_T0SZ_MASK;
->  	tcr |= TCR_T0SZ(hyp_va_bits);
-> +	tcr &= ~TCR_EL2_PS_MASK;
-> +	tcr |= FIELD_PREP(TCR_EL2_PS_MASK, kvm_get_parange(mmfr0));
->  	if (system_supports_lpa2())
->  		tcr |= TCR_EL2_DS;
->  	params->tcr_el2 = tcr;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> index 1cc06e6797bd..f62a7d360285 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> @@ -122,11 +122,7 @@ alternative_if ARM64_HAS_CNP
->  alternative_else_nop_endif
->  	msr	ttbr0_el2, x2
->  
-> -	/*
-> -	 * Set the PS bits in TCR_EL2.
-> -	 */
->  	ldr	x0, [x0, #NVHE_INIT_TCR_EL2]
-> -	tcr_compute_pa_size x0, #TCR_EL2_PS_SHIFT, x1, x2
->  	msr	tcr_el2, x0
->  
->  	isb
+Yes, guests can modify the page tables at any time, so the page table
+we obtain may be corrupted. We may not be able to complete the traversal
+of the page table or may receive incorrect data.
 
-Ah, this is where this was hiding. This should be folded into the
-previous patch for consistency (this is otherwise non bisectable).
+However, these are not critical issues because we often encounter
+incorrect stack unwinding results. In fact, here we assume that the
+guest OS/program has stack frames (compiled with `fno-omit-frame-pointer`),
+but many programs do not adhere to such an assumption, which often leads
+to invalid results. This is almost unavoidable, especially when the
+guest OS is running third-party programs. The unwind results we record
+may be incorrect; if the unwind cannot continue, we only record the
+existing results. Addresses that cannot be resolved to symbols will be
+later marked as `[unknown]` by `perf kvm`, and this is very common.
+
+Our unwind strategy is conservative to ensure safety and do our best in
+readonly situations. If the guest page table is broken, or the address
+to be read is somehow not in the guest page table, we will not inject a
+page fault but simply stop the unwind. The function that walks the
+page table is done entirely in software and is readonly, having no
+additional impact on the guest. Some results could also be incorrect.
+It is sufficient as long as most of the records are correct for profiling.
+
+Do you think these address your concerns?
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Tianyi Liu
