@@ -1,49 +1,52 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516CA208B8
-	for <kvmarm@lists.linux.dev>; Thu, 19 Oct 2023 21:06:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA8C10941
+	for <kvmarm@lists.linux.dev>; Fri, 20 Oct 2023 08:05:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f0fhRjzR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8ABBEC433C8;
-	Thu, 19 Oct 2023 21:06:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Et5bY+e3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4D57C433C7;
+	Fri, 20 Oct 2023 08:05:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697749570;
-	bh=nr13Fxcmy5xfhau/WVo3CZW7I0qv9qUiEt7gHdEK3JU=;
+	s=k20201202; t=1697789141;
+	bh=pfd6pPJr8ufDxksvc355rpglL5JyMuBGgmvPPJZB+iA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=f0fhRjzRL2wiLU3rgpqLOgrC0fqXYnCcMlmzuUt+6QkwIFdWli3bBMQN88JfkcJSp
-	 fpIrqpRcfmE7pmHj90f/PR3zQvR6ovIGPW6T23Nf02baa2QDptX+p3Sd4tPl9YsJIh
-	 cAJNX/V7d6l9UIIXXg9TEKZH5ZY1sg/mnEsbcztkTpOy3yLwjeiSX6TrPbWjUXDl3L
-	 LymOCnZiiKV3C0qPh3Trbh1BMz8Tw8mhA+37eL8S01vA9Wbx0AgM2fb+FA5axbccUV
-	 4UU2cJQctKQJP13/QEX9/9Lg2WG2pbGvJkfiJhflrrAfDEgmWBzRHNepRrYAQC3nWX
-	 SG3dkud7gl15Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	b=Et5bY+e3P1P1EU69+JoB1ZarBTmZ2k/5KDvUuPeMDOD1Z0QGja08MBydnjU3hhG6f
+	 s7+7sQ8Wqe4ZcUEB5YZY7EWIdgbvNt6U4R5l9lDxsjBXTlqi/tdRlmp902PjiaEkXJ
+	 51tD1p1jtnVB46MiZQbjXUqDw3eFosOtkEYtZygqWVHD6VYepnAZ4XQMUzzDJ7Z39n
+	 EhYJxPK9rA7r924pNoLDuvDyA/Eelbp7vk9LktUE6r+ucLVK6Gd2AqIAHOWtU7v8by
+	 iTt3jBat0ntfGNQJM0zvpuo8s2eFe5J/E83r2MAp7I5wZSaJEVcif6ftlHLBo51PuP
+	 cBJfo5HtyTVoA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qtaDX-005uiV-QH;
-	Thu, 19 Oct 2023 22:06:07 +0100
-Date: Thu, 19 Oct 2023 22:06:07 +0100
-Message-ID: <87y1fy5nls.wl-maz@kernel.org>
+	id 1qtkVn-0062KV-1d;
+	Fri, 20 Oct 2023 09:05:39 +0100
+Date: Fri, 20 Oct 2023 09:05:38 +0100
+Message-ID: <86edhpn2gd.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Ryan Roberts <ryan.roberts@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>,
+	James Morse
+ <james.morse@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Ard Biesheuvel <ardb@kernel.org>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 02/12] arm64/mm: Update range-based tlb invalidation routines for FEAT_LPA2
-In-Reply-To: <20231009185008.3803879-3-ryan.roberts@arm.com>
+Subject: Re: [PATCH v4 01/12] arm64/mm: Update non-range tlb invalidation routines for FEAT_LPA2
+In-Reply-To: <dc65e68c-379f-4dfa-a7af-f066e943177c@arm.com>
 References: <20231009185008.3803879-1-ryan.roberts@arm.com>
-	<20231009185008.3803879-3-ryan.roberts@arm.com>
+	<20231009185008.3803879-2-ryan.roberts@arm.com>
+	<87zg0f59ae.wl-maz@kernel.org>
+	<dc65e68c-379f-4dfa-a7af-f066e943177c@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,242 +59,207 @@ X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, catalin.marinas@arm.com, will@kernel.or
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 09 Oct 2023 19:49:58 +0100,
+On Thu, 19 Oct 2023 10:22:37 +0100,
 Ryan Roberts <ryan.roberts@arm.com> wrote:
 > 
-> The BADDR field of the range-based tlbi instructions is specified in
-> 64KB units when LPA2 is in use (TCR.DS=1), whereas it is in page units
-> otherwise.
+> On 19/10/2023 09:03, Marc Zyngier wrote:
+> > On Mon, 09 Oct 2023 19:49:57 +0100,
+> > Ryan Roberts <ryan.roberts@arm.com> wrote:
+> >>
+> >> FEAT_LPA2 impacts tlb invalidation in 2 ways; Firstly, the TTL field in
+> >> the non-range tlbi instructions can now validly take a 0 value for the
+> >> 4KB granule (this is due to the extra level of translation). Secondly,
+> > 
+> > nit: 0 was always valid. It just didn't indicate any level.
 > 
-> When LPA2 is enabled, use the non-range tlbi instructions to forward
-> align to a 64KB boundary first, then use range-based tlbi from there on,
-> until we have either invalidated all pages or we have a single page
-> remaining. If the latter, that is done with non-range tlbi. (Previously
-> we invalidated a single odd page first, but we can no longer do this
-> because it could wreck our 64KB alignment). When LPA2 is not in use, we
-> don't need the initial alignemnt step. However, the bigger impact is
-> that we can no longer use the previous method of iterating from smallest
-> to largest 'scale', since this would likely unalign the boundary again
-> for the LPA2 case. So instead we iterate from highest to lowest scale,
-> which guarrantees that we remain 64KB aligned until the last op (at
-> scale=0).
+> True. I'll change to "can now validly take a 0 value as a TTL hint".
 > 
-> The original commit (d1d3aa98 "arm64: tlb: Use the TLBI RANGE feature in
-> arm64") stated this as the reason for incrementing scale:
+> > 
+> >> the BADDR field in the range tlbi instructions must be aligned to 64KB
+> >> when LPA2 is in use (TCR.DS=1). Changes are required for tlbi to
+> >> continue to operate correctly when LPA2 is in use.
+> >>
+> >> KVM only uses the non-range (__tlbi_level()) routines. Therefore we only
+> >> solve the first problem with this patch.
+> > 
+> > Is this still true? This patch changes __TLBI_VADDR_RANGE() and co.
 > 
->   However, in most scenarios, the pages = 1 when flush_tlb_range() is
->   called. Start from scale = 3 or other proper value (such as scale
->   =ilog2(pages)), will incur extra overhead. So increase 'scale' from 0
->   to maximum, the flush order is exactly opposite to the example.
+> It is no longer true that KVM only uses the non-range routines. v6.6 adds a
+> series where KVM will now use the range-based routines too. So that text is out
+> of date and I should have spotted it when doing the rebase - I'll fix. KVM now
+> using range-based ops is the reason I added patch 2 to this series.
 > 
-> But pages=1 is already special cased by the non-range invalidation path,
-> which will take care of it the first time through the loop (both in the
-> original commit and in my change), so I don't think switching to
-> decrement scale should have any extra performance impact after all.
+> However, this patch doesn't really change __TLBI_VADDR_RANGE()'s behavior, it
+> just makes it robust to the presence of TLBI_TTL_UNKNOWN, instead of 0 which was
+> previously used as the "don't know" value.
+> 
+> > 
+> >>
+> >> It is solved by always adding the level hint if the level is between [0,
+> >> 3] (previously anything other than 0 was hinted, which breaks in the new
+> >> level -1 case from kvm). When running on non-LPA2 HW, 0 is still safe to
+> >> hint as the HW will fall back to non-hinted. While we are at it, we
+> >> replace the notion of 0 being the non-hinted seninel with a macro,
+> >> TLBI_TTL_UNKNOWN. This means callers won't need updating if/when
+> >> translation depth increases in future.
+> >>
+> >> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
+> >> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> >> ---
+> >>  arch/arm64/include/asm/tlb.h      |  9 ++++---
+> >>  arch/arm64/include/asm/tlbflush.h | 43 +++++++++++++++++++------------
+> >>  2 files changed, 31 insertions(+), 21 deletions(-)
+> >>
+> >> diff --git a/arch/arm64/include/asm/tlb.h b/arch/arm64/include/asm/tlb.h
+> >> index 2c29239d05c3..93c537635dbb 100644
+> >> --- a/arch/arm64/include/asm/tlb.h
+> >> +++ b/arch/arm64/include/asm/tlb.h
+> >> @@ -22,15 +22,16 @@ static void tlb_flush(struct mmu_gather *tlb);
+> >>  #include <asm-generic/tlb.h>
+> >>  
+> >>  /*
+> >> - * get the tlbi levels in arm64.  Default value is 0 if more than one
+> >> - * of cleared_* is set or neither is set.
+> >> + * get the tlbi levels in arm64.  Default value is TLBI_TTL_UNKNOWN if more than
+> >> + * one of cleared_* is set or neither is set - this elides the level hinting to
+> >> + * the hardware.
+> >>   * Arm64 doesn't support p4ds now.
+> >>   */
+> >>  static inline int tlb_get_level(struct mmu_gather *tlb)
+> >>  {
+> >>  	/* The TTL field is only valid for the leaf entry. */
+> >>  	if (tlb->freed_tables)
+> >> -		return 0;
+> >> +		return TLBI_TTL_UNKNOWN;
+> >>  
+> >>  	if (tlb->cleared_ptes && !(tlb->cleared_pmds ||
+> >>  				   tlb->cleared_puds ||
+> >> @@ -47,7 +48,7 @@ static inline int tlb_get_level(struct mmu_gather *tlb)
+> >>  				   tlb->cleared_p4ds))
+> >>  		return 1;
+> >>  
+> >> -	return 0;
+> >> +	return TLBI_TTL_UNKNOWN;
+> >>  }
+> >>  
+> >>  static inline void tlb_flush(struct mmu_gather *tlb)
+> >> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
+> >> index b149cf9f91bc..e688246b3b13 100644
+> >> --- a/arch/arm64/include/asm/tlbflush.h
+> >> +++ b/arch/arm64/include/asm/tlbflush.h
+> >> @@ -94,19 +94,22 @@ static inline unsigned long get_trans_granule(void)
+> >>   * When ARMv8.4-TTL exists, TLBI operations take an additional hint for
+> >>   * the level at which the invalidation must take place. If the level is
+> >>   * wrong, no invalidation may take place. In the case where the level
+> >> - * cannot be easily determined, a 0 value for the level parameter will
+> >> - * perform a non-hinted invalidation.
+> >> + * cannot be easily determined, the value TLBI_TTL_UNKNOWN will perform
+> >> + * a non-hinted invalidation. Any provided level outside the hint range
+> >> + * will also cause fall-back to non-hinted invalidation.
+> >>   *
+> >>   * For Stage-2 invalidation, use the level values provided to that effect
+> >>   * in asm/stage2_pgtable.h.
+> >>   */
+> >>  #define TLBI_TTL_MASK		GENMASK_ULL(47, 44)
+> >>  
+> >> +#define TLBI_TTL_UNKNOWN	(-1)
+> > 
+> > I find this value somehow confusing, as it represent an actual level
+> > number. It just happen to be one that cannot be provided as a TTL. So
+> > having that as a return value from tlb_get_level() isn't great, and
+> > I'd rather have something that cannot be mistaken for a valid level.
+> 
+> OK, how about INT_MAX?
 
-Surely this can be benchmarked. After all, HW supporting range
-invalidation is common enough these days.
+Works for me.
 
 > 
-> Note: This patch uses LPA2 range-based tlbi based on the new lpa2 param
-> passed to __flush_tlb_range_op(). This allows both KVM and the kernel to
-> opt-in/out of LPA2 usage independently. But once both are converted over
-> (and keyed off the same static key), the parameter could be dropped and
-> replaced by the static key directly in the macro.
-
-Why can't this be done right away? Have a patch common to the two
-series that exposes the static key, and use that from the start. This
-would avoid the current (and rather ugly) extra parameter that I find
-unnecessarily hard to parse.
-
-And if the 64kB alignment above is cheap enough, maybe this could
-become the one true way?
-
+> > 
+> >> +
+> >>  #define __tlbi_level(op, addr, level) do {				\
+> >>  	u64 arg = addr;							\
+> >>  									\
+> >>  	if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL) &&		\
+> >> -	    level) {							\
+> >> +	    level >= 0 && level <= 3) {					\
+> >>  		u64 ttl = level & 3;					\
+> >>  		ttl |= get_trans_granule() << 2;			\
+> >>  		arg &= ~TLBI_TTL_MASK;					\
+> >> @@ -134,16 +137,17 @@ static inline unsigned long get_trans_granule(void)
+> >>   * [BADDR, BADDR + (NUM + 1) * 2^(5*SCALE + 1) * PAGESIZE)
+> >>   *
+> >>   */
+> >> -#define __TLBI_VADDR_RANGE(addr, asid, scale, num, ttl)		\
+> >> -	({							\
+> >> -		unsigned long __ta = (addr) >> PAGE_SHIFT;	\
+> >> -		__ta &= GENMASK_ULL(36, 0);			\
+> >> -		__ta |= (unsigned long)(ttl) << 37;		\
+> >> -		__ta |= (unsigned long)(num) << 39;		\
+> >> -		__ta |= (unsigned long)(scale) << 44;		\
+> >> -		__ta |= get_trans_granule() << 46;		\
+> >> -		__ta |= (unsigned long)(asid) << 48;		\
+> >> -		__ta;						\
+> >> +#define __TLBI_VADDR_RANGE(addr, asid, scale, num, ttl)				\
+> >> +	({									\
+> >> +		unsigned long __ta = (addr) >> PAGE_SHIFT;			\
+> >> +		unsigned long __ttl = (ttl >= 1 && ttl <= 3) ? ttl : 0;		\
+> >> +		__ta &= GENMASK_ULL(36, 0);					\
+> >> +		__ta |= __ttl << 37;						\
+> >> +		__ta |= (unsigned long)(num) << 39;				\
+> >> +		__ta |= (unsigned long)(scale) << 44;				\
+> >> +		__ta |= get_trans_granule() << 46;				\
+> >> +		__ta |= (unsigned long)(asid) << 48;				\
+> >> +		__ta;								\
+> >>  	})
+> >>  
+> >>  /* These macros are used by the TLBI RANGE feature. */
+> >> @@ -216,12 +220,16 @@ static inline unsigned long get_trans_granule(void)
+> >>   *		CPUs, ensuring that any walk-cache entries associated with the
+> >>   *		translation are also invalidated.
+> >>   *
+> >> - *	__flush_tlb_range(vma, start, end, stride, last_level)
+> >> + *	__flush_tlb_range(vma, start, end, stride, last_level, tlb_level)
+> >>   *		Invalidate the virtual-address range '[start, end)' on all
+> >>   *		CPUs for the user address space corresponding to 'vma->mm'.
+> >>   *		The invalidation operations are issued at a granularity
+> >>   *		determined by 'stride' and only affect any walk-cache entries
+> >> - *		if 'last_level' is equal to false.
+> >> + *		if 'last_level' is equal to false. tlb_level is the level at
+> >> + *		which the invalidation must take place. If the level is wrong,
+> >> + *		no invalidation may take place. In the case where the level
+> >> + *		cannot be easily determined, the value TLBI_TTL_UNKNOWN will
+> >> + *		perform a non-hinted invalidation.
+> >>   *
+> >>   *
+> >>   *	Finally, take a look at asm/tlb.h to see how tlb_flush() is implemented
+> >> @@ -442,9 +450,10 @@ static inline void flush_tlb_range(struct vm_area_struct *vma,
+> >>  	/*
+> >>  	 * We cannot use leaf-only invalidation here, since we may be invalidating
+> >>  	 * table entries as part of collapsing hugepages or moving page tables.
+> >> -	 * Set the tlb_level to 0 because we can not get enough information here.
+> >> +	 * Set the tlb_level to TLBI_TTL_UNKNOWN because we can not get enough
+> >> +	 * information here.
+> >>  	 */
+> >> -	__flush_tlb_range(vma, start, end, PAGE_SIZE, false, 0);
+> >> +	__flush_tlb_range(vma, start, end, PAGE_SIZE, false, TLBI_TTL_UNKNOWN);
+> >>  }
+> >>  
+> >>  static inline void flush_tlb_kernel_range(unsigned long start, unsigned long end)
+> > 
+> > It feels like this range stuff would be better located in the second
+> > patch. Not a huge deal though.
 > 
-> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
-> ---
->  arch/arm64/include/asm/tlb.h      |  6 +++-
->  arch/arm64/include/asm/tlbflush.h | 46 ++++++++++++++++++++-----------
->  arch/arm64/kvm/hyp/nvhe/tlb.c     |  2 +-
->  arch/arm64/kvm/hyp/vhe/tlb.c      |  2 +-
->  4 files changed, 37 insertions(+), 19 deletions(-)
+> As I said, this is the minimal change to the range-based side of things to
+> robustly deal with the introduction of TLBI_TTL_UNKNOWN.
 > 
-> diff --git a/arch/arm64/include/asm/tlb.h b/arch/arm64/include/asm/tlb.h
-> index 93c537635dbb..396ba9b4872c 100644
-> --- a/arch/arm64/include/asm/tlb.h
-> +++ b/arch/arm64/include/asm/tlb.h
-> @@ -25,7 +25,6 @@ static void tlb_flush(struct mmu_gather *tlb);
->   * get the tlbi levels in arm64.  Default value is TLBI_TTL_UNKNOWN if more than
->   * one of cleared_* is set or neither is set - this elides the level hinting to
->   * the hardware.
-> - * Arm64 doesn't support p4ds now.
->   */
->  static inline int tlb_get_level(struct mmu_gather *tlb)
->  {
-> @@ -48,6 +47,11 @@ static inline int tlb_get_level(struct mmu_gather *tlb)
->  				   tlb->cleared_p4ds))
->  		return 1;
->  
-> +	if (tlb->cleared_p4ds && !(tlb->cleared_ptes ||
-> +				   tlb->cleared_pmds ||
-> +				   tlb->cleared_puds))
-> +		return 0;
-> +
->  	return TLBI_TTL_UNKNOWN;
->  }
->  
-> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
-> index e688246b3b13..4d34035fe7d6 100644
-> --- a/arch/arm64/include/asm/tlbflush.h
-> +++ b/arch/arm64/include/asm/tlbflush.h
-> @@ -136,10 +136,14 @@ static inline unsigned long get_trans_granule(void)
->   * The address range is determined by below formula:
->   * [BADDR, BADDR + (NUM + 1) * 2^(5*SCALE + 1) * PAGESIZE)
->   *
-> + * If LPA2 is in use, BADDR holds addr[52:16]. Else BADDR holds page number.
-> + * See ARM DDI 0487I.a C5.5.21.
+> But I wonder if I'm actually better of squashing both of the 2 patches into one.
+> The only reason I split it previously was because KVM was only using the
+> level-based ops.
 
-Please update this to the latest published ARM ARM. I know it will be
-obsolete quickly enough, but still. Also, "page number" is rather
-imprecise, and doesn't match the language of the architecture.
-
-> + *
->   */
-> -#define __TLBI_VADDR_RANGE(addr, asid, scale, num, ttl)				\
-> +#define __TLBI_VADDR_RANGE(addr, asid, scale, num, ttl, lpa2)			\
->  	({									\
-> -		unsigned long __ta = (addr) >> PAGE_SHIFT;			\
-> +		unsigned long __addr_shift = lpa2 ? 16 : PAGE_SHIFT;		\
-> +		unsigned long __ta = (addr) >> __addr_shift;			\
->  		unsigned long __ttl = (ttl >= 1 && ttl <= 3) ? ttl : 0;		\
->  		__ta &= GENMASK_ULL(36, 0);					\
->  		__ta |= __ttl << 37;						\
-> @@ -354,34 +358,44 @@ static inline void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
->   * @tlb_level:	Translation Table level hint, if known
->   * @tlbi_user:	If 'true', call an additional __tlbi_user()
->   *              (typically for user ASIDs). 'flase' for IPA instructions
-> + * @lpa2:	If 'true', the lpa2 scheme is used as set out below
->   *
->   * When the CPU does not support TLB range operations, flush the TLB
->   * entries one by one at the granularity of 'stride'. If the TLB
->   * range ops are supported, then:
->   *
-> - * 1. If 'pages' is odd, flush the first page through non-range
-> - *    operations;
-> + * 1. If FEAT_LPA2 is in use, the start address of a range operation
-> + *    must be 64KB aligned, so flush pages one by one until the
-> + *    alignment is reached using the non-range operations. This step is
-> + *    skipped if LPA2 is not in use.
->   *
->   * 2. For remaining pages: the minimum range granularity is decided
->   *    by 'scale', so multiple range TLBI operations may be required.
-> - *    Start from scale = 0, flush the corresponding number of pages
-> - *    ((num+1)*2^(5*scale+1) starting from 'addr'), then increase it
-> - *    until no pages left.
-> + *    Start from scale = 3, flush the corresponding number of pages
-> + *    ((num+1)*2^(5*scale+1) starting from 'addr'), then descrease it
-> + *    until one or zero pages are left. We must start from highest scale
-> + *    to ensure 64KB start alignment is maintained in the LPA2 case.
-
-Surely the algorithm is a bit more subtle than this, because always
-starting with scale==3 means that you're invalidating at least 64k
-*pages*, which is an awful lot (a minimum of 256MB?).
-
-> + *
-> + * 3. If there is 1 page remaining, flush it through non-range
-> + *    operations. Range operations can only span an even number of
-> + *    pages. We save this for last to ensure 64KB start alignment is
-> + *    maintained for the LPA2 case.
->   *
->   * Note that certain ranges can be represented by either num = 31 and
->   * scale or num = 0 and scale + 1. The loop below favours the latter
->   * since num is limited to 30 by the __TLBI_RANGE_NUM() macro.
->   */
->  #define __flush_tlb_range_op(op, start, pages, stride,			\
-> -				asid, tlb_level, tlbi_user)		\
-> +				asid, tlb_level, tlbi_user, lpa2)	\
->  do {									\
->  	int num = 0;							\
-> -	int scale = 0;							\
-> +	int scale = 3;							\
->  	unsigned long addr;						\
->  									\
->  	while (pages > 0) {						\
-
-Not an issue with your patch, but we could be more robust here. If
-'pages' is an unsigned quantity and what we have a bug in converging
-to 0 below, we'll be looping for a long time. Not to mention the side
-effects on pages and start.
-
->  		if (!system_supports_tlb_range() ||			\
-> -		    pages % 2 == 1) {					\
-> +		    pages == 1 ||					\
-> +		    (lpa2 && start != ALIGN(start, SZ_64K))) {		\
->  			addr = __TLBI_VADDR(start, asid);		\
->  			__tlbi_level(op, addr, tlb_level);		\
->  			if (tlbi_user)					\
-> @@ -394,19 +408,19 @@ do {									\
->  		num = __TLBI_RANGE_NUM(pages, scale);			\
->  		if (num >= 0) {						\
->  			addr = __TLBI_VADDR_RANGE(start, asid, scale,	\
-> -						  num, tlb_level);	\
-> +						num, tlb_level, lpa2);	\
->  			__tlbi(r##op, addr);				\
->  			if (tlbi_user)					\
->  				__tlbi_user(r##op, addr);		\
->  			start += __TLBI_RANGE_PAGES(num, scale) << PAGE_SHIFT; \
->  			pages -= __TLBI_RANGE_PAGES(num, scale);	\
->  		}							\
-> -		scale++;						\
-> +		scale--;						\
->  	}								\
->  } while (0)
->  
-> -#define __flush_s2_tlb_range_op(op, start, pages, stride, tlb_level) \
-> -	__flush_tlb_range_op(op, start, pages, stride, 0, tlb_level, false)
-> +#define __flush_s2_tlb_range_op(op, start, pages, stride, tlb_level, lpa2) \
-> +	__flush_tlb_range_op(op, start, pages, stride, 0, tlb_level, false, lpa2)
->  
->  static inline void __flush_tlb_range(struct vm_area_struct *vma,
->  				     unsigned long start, unsigned long end,
-> @@ -436,9 +450,9 @@ static inline void __flush_tlb_range(struct vm_area_struct *vma,
->  	asid = ASID(vma->vm_mm);
->  
->  	if (last_level)
-> -		__flush_tlb_range_op(vale1is, start, pages, stride, asid, tlb_level, true);
-> +		__flush_tlb_range_op(vale1is, start, pages, stride, asid, tlb_level, true, false);
->  	else
-> -		__flush_tlb_range_op(vae1is, start, pages, stride, asid, tlb_level, true);
-> +		__flush_tlb_range_op(vae1is, start, pages, stride, asid, tlb_level, true, false);
->  
->  	dsb(ish);
->  	mmu_notifier_arch_invalidate_secondary_tlbs(vma->vm_mm, start, end);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> index 1b265713d6be..d42b72f78a9b 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-> @@ -198,7 +198,7 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
->  	/* Switch to requested VMID */
->  	__tlb_switch_to_guest(mmu, &cxt, false);
->  
-> -	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride, 0);
-> +	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride, 0, false);
->  
->  	dsb(ish);
->  	__tlbi(vmalle1is);
-> diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-> index 46bd43f61d76..6041c6c78984 100644
-> --- a/arch/arm64/kvm/hyp/vhe/tlb.c
-> +++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-> @@ -161,7 +161,7 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
->  	/* Switch to requested VMID */
->  	__tlb_switch_to_guest(mmu, &cxt);
->  
-> -	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride, 0);
-> +	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride, 0, false);
->  
->  	dsb(ish);
->  	__tlbi(vmalle1is);
+Maybe. There is something to be said about making the range rework
+(decreasing scale) an independent patch, as it is a significant change
+on its own. But maybe the rest of the plumbing can be grouped
+together.
 
 Thanks,
 
