@@ -1,190 +1,644 @@
-Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2148.outbound.protection.outlook.com [40.92.62.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D5E211CBE
-	for <kvmarm@lists.linux.dev>; Fri, 20 Oct 2023 09:24:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15729DDAB
+	for <kvmarm@lists.linux.dev>; Fri, 20 Oct 2023 10:42:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="aY4cBmeB"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DnFjxroFIgbYeZ4x0EPCYSzzYcBfSNFNVb4Am/DwC+LPT7pNAKjZxFS1OTCiYAUw5tX0c48I1iTHDKEOij6/wLoG0Qw0Fp8nwP+VYHXxwiJQxvfDUHc4fw4p3dN6FbSnmOR2SjZGEnm8LKRNQv3OSAeu3jIgVw6/VAUO3+5mK5ZsQ5k9LnaFgQE7xHFwoFdCRpnKq9qBJzT+YEe2sFhH+e1Nsk85PZB84DuhFZieGsStBHZRhySWbEvaWoU+ztULrUXDANHxdv9gzygkPUgeaYV6eZ8W6YDQ4WuD4cTqJwG9ZK4MSNAxYKwK/C7Ad6iW7rGSqTK32CovGqlQr0AaOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hjd54qI8ZxXJcpP229dyBk33amg3RvMFL4iyPlgR+Oc=;
- b=d1jPpNAQzGcCFx0geVtImXz8vjiucbSj36vqTIXTuE4puvyOC2g2DirUadhobBJIkmCEgwQV0wTX3G19pCqf0eGDHwhaCSmyhH84lJNXkG2w0pjuc0hqEZPCKRcjcrs+xOY1XJAGIYgbq+eIQldMNxolaiLM1/59PcWq/Wj7tsPrMmc0OXGg03+15hFglIEm43uYpkhfpmt6nniUPr3s1V5ZpnErkzMgdDz51Kj9y1k2f5j23X87qklrvXVDEXWAsvvcrYKsICr2MY9LcKKNoEU+DxlrLM7GdhalCHQ/X12c8WzdMT1B1rnJwhojv0JwIj6VuFmanBjQm2khQ1EX7w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hjd54qI8ZxXJcpP229dyBk33amg3RvMFL4iyPlgR+Oc=;
- b=aY4cBmeBtPnaWlrW0C6ki2ptAnRNAdH/1G51qU6kawZOQ85sT8X+LVl3CF1tSiDMsfO1RLlgzXZHQmn2EFDGC0oIn0x0dCYrJLHQSbbOAcHl6hTdss8cexwefJEue+h8EiZbfaoRtqKVO6y3+d5+ga76Z7V0TIcfPNH4a9MDNy1MU9OZLm5LuIUNcrlOFVZgKIbMPKEHLO7urL6Api+u2Topi67NlpyCteYNFdGGMMl6iRHftrAoxvzBJrd+DbVB6/37MBi9KiSBHuvvhvaDzAEp/t3t309sFfc3G6dNMCrQkta+IWG6Gig+AesI0dL10WdrR/QAYIVt815W+GfK3w==
-Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13) by
- SYYP282MB0752.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:71::10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6907.24; Fri, 20 Oct 2023 09:24:22 +0000
-Received: from SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
- ([fe80::e39e:17fc:36d8:1ea8]) by SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
- ([fe80::e39e:17fc:36d8:1ea8%3]) with mapi id 15.20.6907.025; Fri, 20 Oct 2023
- 09:24:22 +0000
-From: Tianyi Liu <i.pear@outlook.com>
-To: mark.rutland@arm.com
-Cc: acme@kernel.org,
-	adrian.hunter@intel.com,
-	alexander.shishkin@linux.intel.com,
-	i.pear@outlook.com,
-	irogers@google.com,
-	jolsa@kernel.org,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qkg4xe/9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B785C433C7;
+	Fri, 20 Oct 2023 10:42:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697798536;
+	bh=i3Z44WfVde9QeZ+ipeoAFQQufo90upOHL6pzPAJToEM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Qkg4xe/98ecIpW2lLesKSo1lBU3XqzFfxin5wnzg2ElfieeRRVSrihnI2B7XCp5RT
+	 G/JapF51ntpFWPonEhauLZg9X1ncn0zfT59ttryLS/hltLpMSXpOw9iSW3C3ctt0jB
+	 ly1AvW9ZcuR/Fz6RZ/4RzYU+5+QuvfuW759s3wPX07fMquOhxRkHBBeS85ZWrBWNRq
+	 3RwQIzuF8UH435s0tiQcc7J/oqQrhwSA0AgOiWoP5cwtxFJNXbeWUCCSe1CsTBulJb
+	 vi3InboJd39fIVdgbqa8rufueRQE1mugCUjyHjjRnwvZQ0GuwavN1doBIzdXVggrvw
+	 9zSzctq40xAYw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qtmxJ-0065Q7-T0;
+	Fri, 20 Oct 2023 11:42:14 +0100
+Date: Fri, 20 Oct 2023 11:42:12 +0100
+Message-ID: <868r7xmv7f.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org,
-	maz@kernel.org,
-	mingo@redhat.com,
-	namhyung@kernel.org,
-	pbonzini@redhat.com,
-	peterz@infradead.org,
-	seanjc@google.com,
-	x86@kernel.org
-Subject: Re: [PATCH v2 0/5] perf: KVM: Enable callchains for guests
-Date: Fri, 20 Oct 2023 17:21:14 +0800
-Message-ID:
- <SY4P282MB10848CE48E2605CFC347AD659DDBA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <ZSlNsn-f1j2bB8pW@FVFF77S0Q05N.cambridge.arm.com>
-References: <ZSlNsn-f1j2bB8pW@FVFF77S0Q05N.cambridge.arm.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [7UYIq8jZ07p1gQm1ShB5cGTFWmfZC1xVwcqfbEFDarFrrPHiHOoaHw==]
-X-ClientProxiedBy: SG2PR06CA0203.apcprd06.prod.outlook.com (2603:1096:4:1::35)
- To SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:ac::13)
-X-Microsoft-Original-Message-ID: <20231020092114.143091-1-i.pear@outlook.com>
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 08/12] KVM: arm64: Convert translation level parameter to s8
+In-Reply-To: <20231009185008.3803879-9-ryan.roberts@arm.com>
+References: <20231009185008.3803879-1-ryan.roberts@arm.com>
+	<20231009185008.3803879-9-ryan.roberts@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SY4P282MB1084:EE_|SYYP282MB0752:EE_
-X-MS-Office365-Filtering-Correlation-Id: c2a82c67-8639-474c-00bd-08dbd14e5848
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	2rRP/srRHzBw69owbbG2s3utbEq7wKBdm7bRIqSwihVWmHwrEx+xUpRYgjMAikvSq5kKoGv3CT2Bvt5FeMAZ+hAwdKwQxGskapzVnnEZI02+2DxF38nMciTAwL1bYvn44lW1t1rhsEIeXz+qsDoVujRhIafe0W89lt6+fAx1jKSPNKe59tW9PMfQ48VZHzuUxs/Ni0ORQJbumtLDMGd3cM339CKzCMkZOFHwKWkfKt8/ceWsOGzhBWEtuIwGqLRxYiEhW7Exvx8Lyf9RD4QVE/SDVvYutFzJHsHNRp5FtCD6LWwnDenrCsdAJLYW/uwq+JXWqegys5ZHncZuYvIFagt+eezxTHKlKVPLIOiObXtRRatsDXnEs5xZe2cIQkgE/3CwgxBwBozG0SGU6l6QtbABI0qYWzegYbMdu6ewlsE4P7zaW79d8GqNVmN486JDtSnf0vW501ZKEaF9gyvPtL53+4fZmi5qtLTE/xG/3Jg3q6X4cKhwsmRDM4JWQ2T7w20r4BfqdVUU7g+s/dKphSWZ4Mv9kiR1IyRP2MSDGnVPxydKr4LRIQ2FzO5frjMYOLbQ+XXG8R+YLeeDvTrJvuigcMxpAqztDjXTgLIVue9A26ewiYqXI0rq/mG8iS76
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?vK5oGDU6pZTV9NZEMYjjL2VXpKxHeh8w3wESNiSCapJfFRLRxN+GVapxOVJl?=
- =?us-ascii?Q?wWkfa8bsK8fvxKj3KUmGHhzwftE05bFwyD/YCu6546yvdZVSWEngAyliG21O?=
- =?us-ascii?Q?6cU1GkA0TFtayZzBRyDD4UBgJOrjkggN26c3k4eOldpN81rlUtWtXjdrojBi?=
- =?us-ascii?Q?wUUpusOrAHWH5Epl4INEfZYETB4rfLr8SJija+R28eJDRmYwmiRffN0ac3Wi?=
- =?us-ascii?Q?Hq26VTm7rS/9tmBMYK+EdOyKEb9HhZqCLhXh3VIJzOriVDZHY6AB5jQe1fsC?=
- =?us-ascii?Q?PFNprDYtyQrXaEkxnSybIUMAP0t9AaeCzptkuUqgqgqL7hEsEJuw6YPNmIZ7?=
- =?us-ascii?Q?iw0G08TRez9wiYSkY2IjBUkLpcD+NaT6TZlSDUIp2zWiGmOH91WRWyTlD63A?=
- =?us-ascii?Q?peeg82/S8c5gXnKQDCjNqE9G+3rCWAilA0T0ijMH4c5TyncB65YWENKdEQIo?=
- =?us-ascii?Q?7gZe/EBxppsYUOvS9E948rKPaDnCGBGiXUqWxXhWIUe/1UaOU0FBeuHPZqxZ?=
- =?us-ascii?Q?NXkX9DjxUjllGHRcz8xoCbCkCcU2JM9reCIKn0+HWpn0j/9AiKpUdnnbXS8a?=
- =?us-ascii?Q?7Z4r+wT/foJnMrQ1O8/SuuSFVsyxHSEaGYvQNJAg+GQOWVJ6PrdtsnBjHLvd?=
- =?us-ascii?Q?1Qu4GUDY3PcyHdu+9QYuKOEuVl7i/vENXMvlfo5mrxuSlDJObmeKl9VNthOr?=
- =?us-ascii?Q?ckAFgh23W3E7R9HjQx/DBxzTwBg2soGv1Lp++N7jEaGzFTCIsYMEXDefiHBS?=
- =?us-ascii?Q?Kl3VLr+n29rj6DzFWUOqAT6Md3TZARmzZ+EofUp/YCcrI+AIdSKqoP55XdVG?=
- =?us-ascii?Q?SXUFNL2mGnGAekbc7+sJ7qNJBL2Yme+CZq6yjZ9Kto+zbqYAXMrOQbSXWhzd?=
- =?us-ascii?Q?+hdF2buLyh499LwKc7bUnq7/Oqw1HwIZgzbOs5oKFpH4I7PwzRIl1Uj2xYWA?=
- =?us-ascii?Q?hQxm690c20d0galxWYu/aCX429ubhtpn0GN+vZH0yDqrYEEb2eYP7cODXlSE?=
- =?us-ascii?Q?kdeZ09O90emfEqKO+y366iDQsCmnoy83mHA7ZOvf4W3NRo4py/KIgePcPFAp?=
- =?us-ascii?Q?gn8pPLDM+s5BCJkU8JaVM9E8niveSob6iMwzLrvfq+UY1GNPpXqC0PJldXXc?=
- =?us-ascii?Q?JH7s6nDkyziwLU+h0Re7e1YXiukllRNp3P3N45m+M5bcmziFkZHSltxPTFdq?=
- =?us-ascii?Q?m3MRt3EFld2VOLBhJ3nbkNPmhz2ptXziV991S3T2U4mrEOGSADMopz1Fmkit?=
- =?us-ascii?Q?T1CZGQfR9PuiWhYCGM8S?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c2a82c67-8639-474c-00bd-08dbd14e5848
-X-MS-Exchange-CrossTenant-AuthSource: SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2023 09:24:22.6958
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SYYP282MB0752
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, james.morse@arm.com, yuzenghui@huawei.com, ardb@kernel.org, anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Mark,
+On Mon, 09 Oct 2023 19:50:04 +0100,
+Ryan Roberts <ryan.roberts@arm.com> wrote:
+> 
+> With the introduction of FEAT_LPA2, the Arm ARM adds a new level of
+> translation, level -1, so levels can now be in the range [-1;3]. 3 is
+> always the last level and the first level is determined based on the
+> number of VA bits in use.
+> 
+> Convert level variables to use a signed type in preparation for
+> supporting this new level -1.
+> 
+> Since the last level is always anchored at 3, and the first level varies
+> to suit the number of VA/IPA bits, take the opportunity to replace
+> KVM_PGTABLE_MAX_LEVELS with the 2 macros KVM_PGTABLE_FIRST_LEVEL and
+> KVM_PGTABLE_LAST_LEVEL. This removes the assumption from the code that
+> levels run from 0 to KVM_PGTABLE_MAX_LEVELS - 1, which will soon no
+> longer be true.
+> 
+> No behavioral changes intended.
 
-On Fri, 13 Oct 2023 15:01:22 +0100, Mark Rutland wrote:
-> > > > The event processing flow is as follows (shown as backtrace):
-> > > >   #0 kvm_arch_vcpu_get_frame_pointer / kvm_arch_vcpu_read_virt (per arch)
-> > > >   #1 kvm_guest_get_frame_pointer / kvm_guest_read_virt
-> > > >      <callback function pointers in `struct perf_guest_info_callbacks`>
-> > > >   #2 perf_guest_get_frame_pointer / perf_guest_read_virt
-> > > >   #3 perf_callchain_guest
-> > > >   #4 get_perf_callchain
-> > > >   #5 perf_callchain
-> > > >
-> > > > Between #0 and #1 is the interface between KVM and the arch-specific
-> > > > impl, while between #1 and #2 is the interface between Perf and KVM.
-> > > > The 1st patch implements #0. The 2nd patch extends interfaces between #1
-> > > > and #2, while the 3rd patch implements #1. The 4th patch implements #3
-> > > > and modifies #4 #5. The last patch is for userspace utils.
-> > > >
-> > > > Since arm64 hasn't provided some foundational infrastructure (interface
-> > > > for reading from a virtual address of guest), the arm64 implementation
-> > > > is stubbed for now because it's a bit complex, and will be implemented
-> > > > later.
-> > >
-> > > I hope you realise that such an "interface" would be, by definition,
-> > > fragile and very likely to break in a subtle way. The only existing
-> > > case where we walk the guest's page tables is for NV, and even that is
-> > > extremely fragile.
-> >
-> > For walking the guest's page tables, yes, there're only very few
-> > use cases. Most of them are used in nested virtualization and XEN.
-> 
-> The key point isn't the lack of use cases; the key point is that *this is
-> fragile*.
-> 
-> Consider that walking guest page tables is only safe because:
-> 
-> (a) The walks happen in the guest-physical / intermiediate-physical address
->     space of the guest, and so are not themselves subject to translation via
->     the guest's page tables.
-> 
-> (b) Special traps were added to the architecture (e.g. for TLB invalidation)
->     which allow the host to avoid race conditions when the guest modifies page
->     tables.
-> 
-> For unwind we'd have to walk structures in the guest's virtual address space,
-> which can change under our feet at any time the guest is running, and handling
-> that requires much more care.
-> 
-> I think this needs a stronger justification, and an explanation of how you
-> handle such races.
+Shrug. Unless you have compared the binaries before and after and
+proven that they are strictly identical, there will be behaviour
+changes, intended or otherwise.
 
-Yes, guests can modify the page tables at any time, so the page table
-we obtain may be corrupted. We may not be able to complete the traversal
-of the page table or may receive incorrect data.
+I know what you're trying to convey, but I've seen so many patches
+carrying a sentence of this sort and yet turning the kernel on its
+head that I've become allergic to it. Sorry.
 
-However, these are not critical issues because we often encounter
-incorrect stack unwinding results. In fact, here we assume that the
-guest OS/program has stack frames (compiled with `fno-omit-frame-pointer`),
-but many programs do not adhere to such an assumption, which often leads
-to invalid results. This is almost unavoidable, especially when the
-guest OS is running third-party programs. The unwind results we record
-may be incorrect; if the unwind cannot continue, we only record the
-existing results. Addresses that cannot be resolved to symbols will be
-later marked as `[unknown]` by `perf kvm`, and this is very common.
+> 
+> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h  |  2 +-
+>  arch/arm64/include/asm/kvm_pgtable.h  | 31 ++++++-------
+>  arch/arm64/include/asm/kvm_pkvm.h     |  5 ++-
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c |  6 +--
+>  arch/arm64/kvm/hyp/nvhe/mm.c          |  4 +-
+>  arch/arm64/kvm/hyp/nvhe/setup.c       |  2 +-
+>  arch/arm64/kvm/hyp/pgtable.c          | 64 ++++++++++++++-------------
+>  arch/arm64/kvm/mmu.c                  | 16 ++++---
+>  8 files changed, 69 insertions(+), 61 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 3d6725ff0bf6..bf3ef66eb51f 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -404,7 +404,7 @@ static __always_inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vc
+>  	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC_TYPE;
+>  }
+>  
+> -static __always_inline u8 kvm_vcpu_trap_get_fault_level(const struct kvm_vcpu *vcpu)
+> +static __always_inline s8 kvm_vcpu_trap_get_fault_level(const struct kvm_vcpu *vcpu)
+>  {
+>  	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC_LEVEL;
+>  }
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index b240158e1218..c61bb9709201 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -11,7 +11,8 @@
+>  #include <linux/kvm_host.h>
+>  #include <linux/types.h>
+>  
+> -#define KVM_PGTABLE_MAX_LEVELS		4U
+> +#define KVM_PGTABLE_FIRST_LEVEL		0
+> +#define KVM_PGTABLE_LAST_LEVEL		3
+>  
+>  /*
+>   * The largest supported block sizes for KVM (no 52-bit PA support):
+> @@ -20,9 +21,9 @@
+>   *  - 64K (level 2):	512MB
+>   */
+>  #ifdef CONFIG_ARM64_4K_PAGES
+> -#define KVM_PGTABLE_MIN_BLOCK_LEVEL	1U
+> +#define KVM_PGTABLE_MIN_BLOCK_LEVEL	1
+>  #else
+> -#define KVM_PGTABLE_MIN_BLOCK_LEVEL	2U
+> +#define KVM_PGTABLE_MIN_BLOCK_LEVEL	2
+>  #endif
+>  
+>  static inline u64 kvm_get_parange_max(void)
+> @@ -101,28 +102,28 @@ static inline kvm_pfn_t kvm_pte_to_pfn(kvm_pte_t pte)
+>  	return __phys_to_pfn(kvm_pte_to_phys(pte));
+>  }
+>  
+> -static inline u64 kvm_granule_shift(u32 level)
+> +static inline u64 kvm_granule_shift(s8 level)
+>  {
+> -	/* Assumes KVM_PGTABLE_MAX_LEVELS is 4 */
+> +	/* Assumes KVM_PGTABLE_LAST_LEVEL is 3 */
+>  	return ARM64_HW_PGTABLE_LEVEL_SHIFT(level);
 
-Our unwind strategy is conservative to ensure safety and do our best in
-readonly situations. If the guest page table is broken, or the address
-to be read is somehow not in the guest page table, we will not inject a
-page fault but simply stop the unwind. The function that walks the
-page table is done entirely in software and is readonly, having no
-additional impact on the guest. Some results could also be incorrect.
-It is sufficient as long as most of the records are correct for profiling.
+I'm amazed that the macro tolerates a negative level, but it really
+does.
 
-Do you think these address your concerns?
+>  }
+>  
+> -static inline u64 kvm_granule_size(u32 level)
+> +static inline u64 kvm_granule_size(s8 level)
+>  {
+>  	return BIT(kvm_granule_shift(level));
+>  }
+>  
+> -static inline bool kvm_level_supports_block_mapping(u32 level)
+> +static inline bool kvm_level_supports_block_mapping(s8 level)
+>  {
+>  	return level >= KVM_PGTABLE_MIN_BLOCK_LEVEL;
+>  }
+>  
+>  static inline u32 kvm_supported_block_sizes(void)
+>  {
+> -	u32 level = KVM_PGTABLE_MIN_BLOCK_LEVEL;
+> +	s8 level = KVM_PGTABLE_MIN_BLOCK_LEVEL;
+>  	u32 r = 0;
+>  
+> -	for (; level < KVM_PGTABLE_MAX_LEVELS; level++)
+> +	for (; level <= KVM_PGTABLE_LAST_LEVEL; level++)
+>  		r |= BIT(kvm_granule_shift(level));
+>  
+>  	return r;
+> @@ -167,7 +168,7 @@ struct kvm_pgtable_mm_ops {
+>  	void*		(*zalloc_page)(void *arg);
+>  	void*		(*zalloc_pages_exact)(size_t size);
+>  	void		(*free_pages_exact)(void *addr, size_t size);
+> -	void		(*free_unlinked_table)(void *addr, u32 level);
+> +	void		(*free_unlinked_table)(void *addr, s8 level);
+>  	void		(*get_page)(void *addr);
+>  	void		(*put_page)(void *addr);
+>  	int		(*page_count)(void *addr);
+> @@ -263,7 +264,7 @@ struct kvm_pgtable_visit_ctx {
+>  	u64					start;
+>  	u64					addr;
+>  	u64					end;
+> -	u32					level;
+> +	s8					level;
+>  	enum kvm_pgtable_walk_flags		flags;
+>  };
+>  
+> @@ -366,7 +367,7 @@ static inline bool kvm_pgtable_walk_lock_held(void)
+>   */
+>  struct kvm_pgtable {
+>  	u32					ia_bits;
+> -	u32					start_level;
+> +	s8					start_level;
+>  	kvm_pteref_t				pgd;
+>  	struct kvm_pgtable_mm_ops		*mm_ops;
+>  
+> @@ -500,7 +501,7 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
+>   * The page-table is assumed to be unreachable by any hardware walkers prior to
+>   * freeing and therefore no TLB invalidation is performed.
+>   */
+> -void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
+> +void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, s8 level);
+>  
+>  /**
+>   * kvm_pgtable_stage2_create_unlinked() - Create an unlinked stage-2 paging structure.
+> @@ -524,7 +525,7 @@ void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *p
+>   * an ERR_PTR(error) on failure.
+>   */
+>  kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> -					      u64 phys, u32 level,
+> +					      u64 phys, s8 level,
+>  					      enum kvm_pgtable_prot prot,
+>  					      void *mc, bool force_pte);
+>  
+> @@ -750,7 +751,7 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>   * Return: 0 on success, negative error code on failure.
+>   */
+>  int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
+> -			 kvm_pte_t *ptep, u32 *level);
+> +			 kvm_pte_t *ptep, s8 *level);
+>  
+>  /**
+>   * kvm_pgtable_stage2_pte_prot() - Retrieve the protection attributes of a
+> diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> index e46250a02017..ad9cfb5c1ff4 100644
+> --- a/arch/arm64/include/asm/kvm_pkvm.h
+> +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> @@ -56,10 +56,11 @@ static inline unsigned long hyp_vm_table_pages(void)
+>  
+>  static inline unsigned long __hyp_pgtable_max_pages(unsigned long nr_pages)
+>  {
+> -	unsigned long total = 0, i;
+> +	unsigned long total = 0;
+> +	int i;
+>  
+>  	/* Provision the worst case scenario */
+> -	for (i = 0; i < KVM_PGTABLE_MAX_LEVELS; i++) {
+> +	for (i = KVM_PGTABLE_FIRST_LEVEL; i <= KVM_PGTABLE_LAST_LEVEL; i++) {
+>  		nr_pages = DIV_ROUND_UP(nr_pages, PTRS_PER_PTE);
+>  		total += nr_pages;
+>  	}
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 9d703441278b..2cfb6352a8ea 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -91,7 +91,7 @@ static void host_s2_put_page(void *addr)
+>  	hyp_put_page(&host_s2_pool, addr);
+>  }
+>  
+> -static void host_s2_free_unlinked_table(void *addr, u32 level)
+> +static void host_s2_free_unlinked_table(void *addr, s8 level)
+>  {
+>  	kvm_pgtable_stage2_free_unlinked(&host_mmu.mm_ops, addr, level);
+>  }
+> @@ -443,7 +443,7 @@ static int host_stage2_adjust_range(u64 addr, struct kvm_mem_range *range)
+>  {
+>  	struct kvm_mem_range cur;
+>  	kvm_pte_t pte;
+> -	u32 level;
+> +	s8 level;
+>  	int ret;
+>  
+>  	hyp_assert_lock_held(&host_mmu.lock);
+> @@ -462,7 +462,7 @@ static int host_stage2_adjust_range(u64 addr, struct kvm_mem_range *range)
+>  		cur.start = ALIGN_DOWN(addr, granule);
+>  		cur.end = cur.start + granule;
+>  		level++;
+> -	} while ((level < KVM_PGTABLE_MAX_LEVELS) &&
+> +	} while ((level <= KVM_PGTABLE_LAST_LEVEL) &&
+>  			!(kvm_level_supports_block_mapping(level) &&
+>  			  range_included(&cur, range)));
+>  
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+> index 65a7a186d7b2..b01a3d1078a8 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+> @@ -260,7 +260,7 @@ static void fixmap_clear_slot(struct hyp_fixmap_slot *slot)
+>  	 * https://lore.kernel.org/kvm/20221017115209.2099-1-will@kernel.org/T/#mf10dfbaf1eaef9274c581b81c53758918c1d0f03
+>  	 */
+>  	dsb(ishst);
+> -	__tlbi_level(vale2is, __TLBI_VADDR(addr, 0), (KVM_PGTABLE_MAX_LEVELS - 1));
+> +	__tlbi_level(vale2is, __TLBI_VADDR(addr, 0), KVM_PGTABLE_LAST_LEVEL);
+>  	dsb(ish);
+>  	isb();
+>  }
+> @@ -275,7 +275,7 @@ static int __create_fixmap_slot_cb(const struct kvm_pgtable_visit_ctx *ctx,
+>  {
+>  	struct hyp_fixmap_slot *slot = per_cpu_ptr(&fixmap_slots, (u64)ctx->arg);
+>  
+> -	if (!kvm_pte_valid(ctx->old) || ctx->level != KVM_PGTABLE_MAX_LEVELS - 1)
+> +	if (!kvm_pte_valid(ctx->old) || ctx->level != KVM_PGTABLE_LAST_LEVEL)
+>  		return -EINVAL;
+>  
+>  	slot->addr = ctx->addr;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> index 0d5e0a89ddce..bc58d1b515af 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> @@ -181,7 +181,7 @@ static int fix_host_ownership_walker(const struct kvm_pgtable_visit_ctx *ctx,
+>  	if (!kvm_pte_valid(ctx->old))
+>  		return 0;
+>  
+> -	if (ctx->level != (KVM_PGTABLE_MAX_LEVELS - 1))
+> +	if (ctx->level != KVM_PGTABLE_LAST_LEVEL)
+>  		return -EINVAL;
+>  
+>  	phys = kvm_pte_to_phys(ctx->old);
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 062eb7bcdb8a..8e79ff6972ce 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -101,7 +101,7 @@ static bool kvm_block_mapping_supported(const struct kvm_pgtable_visit_ctx *ctx,
+>  	return IS_ALIGNED(ctx->addr, granule);
+>  }
+>  
+> -static u32 kvm_pgtable_idx(struct kvm_pgtable_walk_data *data, u32 level)
+> +static u32 kvm_pgtable_idx(struct kvm_pgtable_walk_data *data, s8 level)
+>  {
+>  	u64 shift = kvm_granule_shift(level);
+>  	u64 mask = BIT(PAGE_SHIFT - 3) - 1;
+> @@ -117,7 +117,7 @@ static u32 kvm_pgd_page_idx(struct kvm_pgtable *pgt, u64 addr)
+>  	return (addr & mask) >> shift;
+>  }
+>  
+> -static u32 kvm_pgd_pages(u32 ia_bits, u32 start_level)
+> +static u32 kvm_pgd_pages(u32 ia_bits, s8 start_level)
+>  {
+>  	struct kvm_pgtable pgt = {
+>  		.ia_bits	= ia_bits,
+> @@ -127,9 +127,9 @@ static u32 kvm_pgd_pages(u32 ia_bits, u32 start_level)
+>  	return kvm_pgd_page_idx(&pgt, -1ULL) + 1;
+>  }
+>  
+> -static bool kvm_pte_table(kvm_pte_t pte, u32 level)
+> +static bool kvm_pte_table(kvm_pte_t pte, s8 level)
+>  {
+> -	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
+> +	if (level == KVM_PGTABLE_LAST_LEVEL)
+>  		return false;
+>  
+>  	if (!kvm_pte_valid(pte))
+> @@ -157,11 +157,11 @@ static kvm_pte_t kvm_init_table_pte(kvm_pte_t *childp, struct kvm_pgtable_mm_ops
+>  	return pte;
+>  }
+>  
+> -static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
+> +static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, s8 level)
+>  {
+>  	kvm_pte_t pte = kvm_phys_to_pte(pa);
+> -	u64 type = (level == KVM_PGTABLE_MAX_LEVELS - 1) ? KVM_PTE_TYPE_PAGE :
+> -							   KVM_PTE_TYPE_BLOCK;
+> +	u64 type = (level == KVM_PGTABLE_LAST_LEVEL) ? KVM_PTE_TYPE_PAGE :
+> +						       KVM_PTE_TYPE_BLOCK;
+>  
+>  	pte |= attr & (KVM_PTE_LEAF_ATTR_LO | KVM_PTE_LEAF_ATTR_HI);
+>  	pte |= FIELD_PREP(KVM_PTE_TYPE, type);
+> @@ -206,11 +206,11 @@ static bool kvm_pgtable_walk_continue(const struct kvm_pgtable_walker *walker,
+>  }
+>  
+>  static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
+> -			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pteref_t pgtable, u32 level);
+> +			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pteref_t pgtable, s8 level);
+>  
+>  static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+>  				      struct kvm_pgtable_mm_ops *mm_ops,
+> -				      kvm_pteref_t pteref, u32 level)
+> +				      kvm_pteref_t pteref, s8 level)
+>  {
+>  	enum kvm_pgtable_walk_flags flags = data->walker->flags;
+>  	kvm_pte_t *ptep = kvm_dereference_pteref(data->walker, pteref);
+> @@ -275,12 +275,12 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+>  }
+>  
+>  static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
+> -			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pteref_t pgtable, u32 level)
+> +			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pteref_t pgtable, s8 level)
+>  {
+>  	u32 idx;
+>  	int ret = 0;
+>  
+> -	if (WARN_ON_ONCE(level >= KVM_PGTABLE_MAX_LEVELS))
+> +	if (WARN_ON_ONCE(level > KVM_PGTABLE_LAST_LEVEL))
+>  		return -EINVAL;
+
+Now that level can be negative, you may want to check it against
+KVM_PGTABLE_FIRST_LEVEL as well.
+
+>  
+>  	for (idx = kvm_pgtable_idx(data, level); idx < PTRS_PER_PTE; ++idx) {
+> @@ -343,7 +343,7 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  
+>  struct leaf_walk_data {
+>  	kvm_pte_t	pte;
+> -	u32		level;
+> +	s8		level;
+>  };
+>  
+>  static int leaf_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> @@ -358,7 +358,7 @@ static int leaf_walker(const struct kvm_pgtable_visit_ctx *ctx,
+>  }
+>  
+>  int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
+> -			 kvm_pte_t *ptep, u32 *level)
+> +			 kvm_pte_t *ptep, s8 *level)
+>  {
+>  	struct leaf_walk_data data;
+>  	struct kvm_pgtable_walker walker = {
+> @@ -471,7 +471,7 @@ static int hyp_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
+>  	if (hyp_map_walker_try_leaf(ctx, data))
+>  		return 0;
+>  
+> -	if (WARN_ON(ctx->level == KVM_PGTABLE_MAX_LEVELS - 1))
+> +	if (WARN_ON(ctx->level == KVM_PGTABLE_LAST_LEVEL))
+>  		return -EINVAL;
+
+Same thing.
+
+>  
+>  	childp = (kvm_pte_t *)mm_ops->zalloc_page(NULL);
+> @@ -567,14 +567,18 @@ u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>  int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits,
+>  			 struct kvm_pgtable_mm_ops *mm_ops)
+>  {
+> -	u64 levels = ARM64_HW_PGTABLE_LEVELS(va_bits);
+> +	s8 start_level = KVM_PGTABLE_LAST_LEVEL + 1 -
+> +			 ARM64_HW_PGTABLE_LEVELS(va_bits);
+> +	if (start_level < KVM_PGTABLE_FIRST_LEVEL ||
+> +	    start_level > KVM_PGTABLE_LAST_LEVEL)
+> +		return -EINVAL;
+
+Please add a new line between the variable definition and the if ()
+statement.
+
+>  
+>  	pgt->pgd = (kvm_pteref_t)mm_ops->zalloc_page(NULL);
+>  	if (!pgt->pgd)
+>  		return -ENOMEM;
+>  
+>  	pgt->ia_bits		= va_bits;
+> -	pgt->start_level	= KVM_PGTABLE_MAX_LEVELS - levels;
+> +	pgt->start_level	= start_level;
+>  	pgt->mm_ops		= mm_ops;
+>  	pgt->mmu		= NULL;
+>  	pgt->force_pte_cb	= NULL;
+> @@ -628,7 +632,7 @@ struct stage2_map_data {
+>  u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+>  {
+>  	u64 vtcr = VTCR_EL2_FLAGS;
+> -	u8 lvls;
+> +	s8 lvls;
+>  
+>  	vtcr |= kvm_get_parange(mmfr0) << VTCR_EL2_PS_SHIFT;
+>  	vtcr |= VTCR_EL2_T0SZ(phys_shift);
+> @@ -911,7 +915,7 @@ static bool stage2_leaf_mapping_allowed(const struct kvm_pgtable_visit_ctx *ctx,
+>  {
+>  	u64 phys = stage2_map_walker_phys_addr(ctx, data);
+>  
+> -	if (data->force_pte && (ctx->level < (KVM_PGTABLE_MAX_LEVELS - 1)))
+> +	if (data->force_pte && ctx->level < KVM_PGTABLE_LAST_LEVEL)
+>  		return false;
+>  
+>  	return kvm_block_mapping_supported(ctx, phys);
+> @@ -990,7 +994,7 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>  	if (ret != -E2BIG)
+>  		return ret;
+>  
+> -	if (WARN_ON(ctx->level == KVM_PGTABLE_MAX_LEVELS - 1))
+> +	if (WARN_ON(ctx->level == KVM_PGTABLE_LAST_LEVEL))
+>  		return -EINVAL;
+>  
+>  	if (!data->memcache)
+> @@ -1160,7 +1164,7 @@ struct stage2_attr_data {
+>  	kvm_pte_t			attr_set;
+>  	kvm_pte_t			attr_clr;
+>  	kvm_pte_t			pte;
+> -	u32				level;
+> +	s8				level;
+>  };
+>  
+>  static int stage2_attr_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> @@ -1203,7 +1207,7 @@ static int stage2_attr_walker(const struct kvm_pgtable_visit_ctx *ctx,
+>  static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
+>  				    u64 size, kvm_pte_t attr_set,
+>  				    kvm_pte_t attr_clr, kvm_pte_t *orig_pte,
+> -				    u32 *level, enum kvm_pgtable_walk_flags flags)
+> +				    s8 *level, enum kvm_pgtable_walk_flags flags)
+>  {
+>  	int ret;
+>  	kvm_pte_t attr_mask = KVM_PTE_LEAF_ATTR_LO | KVM_PTE_LEAF_ATTR_HI;
+> @@ -1305,7 +1309,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+>  				   enum kvm_pgtable_prot prot)
+>  {
+>  	int ret;
+> -	u32 level;
+> +	s8 level;
+>  	kvm_pte_t set = 0, clr = 0;
+>  
+>  	if (prot & KVM_PTE_LEAF_ATTR_HI_SW)
+> @@ -1358,7 +1362,7 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>  }
+>  
+>  kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> -					      u64 phys, u32 level,
+> +					      u64 phys, s8 level,
+>  					      enum kvm_pgtable_prot prot,
+>  					      void *mc, bool force_pte)
+>  {
+> @@ -1416,7 +1420,7 @@ kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+>   * fully populated tree up to the PTE entries. Note that @level is
+>   * interpreted as in "level @level entry".
+>   */
+> -static int stage2_block_get_nr_page_tables(u32 level)
+> +static int stage2_block_get_nr_page_tables(s8 level)
+>  {
+>  	switch (level) {
+>  	case 1:
+> @@ -1427,7 +1431,7 @@ static int stage2_block_get_nr_page_tables(u32 level)
+>  		return 0;
+>  	default:
+>  		WARN_ON_ONCE(level < KVM_PGTABLE_MIN_BLOCK_LEVEL ||
+> -			     level >= KVM_PGTABLE_MAX_LEVELS);
+> +			     level > KVM_PGTABLE_LAST_LEVEL);
+>  		return -EINVAL;
+>  	};
+>  }
+> @@ -1440,13 +1444,13 @@ static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
+>  	struct kvm_s2_mmu *mmu;
+>  	kvm_pte_t pte = ctx->old, new, *childp;
+>  	enum kvm_pgtable_prot prot;
+> -	u32 level = ctx->level;
+> +	s8 level = ctx->level;
+>  	bool force_pte;
+>  	int nr_pages;
+>  	u64 phys;
+>  
+>  	/* No huge-pages exist at the last level */
+> -	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
+> +	if (level == KVM_PGTABLE_LAST_LEVEL)
+>  		return 0;
+>  
+>  	/* We only split valid block mappings */
+> @@ -1523,7 +1527,7 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+>  	u64 vtcr = mmu->arch->vtcr;
+>  	u32 ia_bits = VTCR_EL2_IPA(vtcr);
+>  	u32 sl0 = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
+> -	u32 start_level = VTCR_EL2_TGRAN_SL0_BASE - sl0;
+> +	s8 start_level = VTCR_EL2_TGRAN_SL0_BASE - sl0;
+>  
+>  	pgd_sz = kvm_pgd_pages(ia_bits, start_level) * PAGE_SIZE;
+>  	pgt->pgd = (kvm_pteref_t)mm_ops->zalloc_pages_exact(pgd_sz);
+> @@ -1546,7 +1550,7 @@ size_t kvm_pgtable_stage2_pgd_size(u64 vtcr)
+>  {
+>  	u32 ia_bits = VTCR_EL2_IPA(vtcr);
+>  	u32 sl0 = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
+> -	u32 start_level = VTCR_EL2_TGRAN_SL0_BASE - sl0;
+> +	s8 start_level = VTCR_EL2_TGRAN_SL0_BASE - sl0;
+>  
+>  	return kvm_pgd_pages(ia_bits, start_level) * PAGE_SIZE;
+>  }
+> @@ -1582,7 +1586,7 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
+>  	pgt->pgd = NULL;
+>  }
+>  
+> -void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level)
+> +void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, s8 level)
+>  {
+>  	kvm_pteref_t ptep = (kvm_pteref_t)pgtable;
+>  	struct kvm_pgtable_walker walker = {
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 482280fe22d7..73110ba3624c 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -223,12 +223,12 @@ static void stage2_free_unlinked_table_rcu_cb(struct rcu_head *head)
+>  {
+>  	struct page *page = container_of(head, struct page, rcu_head);
+>  	void *pgtable = page_to_virt(page);
+> -	u32 level = page_private(page);
+> +	s8 level = page_private(page);
+>  
+>  	kvm_pgtable_stage2_free_unlinked(&kvm_s2_mm_ops, pgtable, level);
+>  }
+>  
+> -static void stage2_free_unlinked_table(void *addr, u32 level)
+> +static void stage2_free_unlinked_table(void *addr, s8 level)
+>  {
+>  	struct page *page = virt_to_page(addr);
+>  
+> @@ -804,13 +804,13 @@ static int get_user_mapping_size(struct kvm *kvm, u64 addr)
+>  	struct kvm_pgtable pgt = {
+>  		.pgd		= (kvm_pteref_t)kvm->mm->pgd,
+>  		.ia_bits	= vabits_actual,
+> -		.start_level	= (KVM_PGTABLE_MAX_LEVELS -
+> -				   CONFIG_PGTABLE_LEVELS),
+> +		.start_level	= (KVM_PGTABLE_LAST_LEVEL -
+> +				   CONFIG_PGTABLE_LEVELS + 1),
+>  		.mm_ops		= &kvm_user_mm_ops,
+>  	};
+>  	unsigned long flags;
+>  	kvm_pte_t pte = 0;	/* Keep GCC quiet... */
+> -	u32 level = ~0;
+> +	s8 level = ~0;
+
+Well, that's a semantic difference. ~0 == -1, which is a valid level,
+while the original code was trying to initialise level to something
+invalid. On the bright side, this function is going away in 6.7...
+
+>  	int ret;
+>  
+>  	/*
+> @@ -829,7 +829,9 @@ static int get_user_mapping_size(struct kvm *kvm, u64 addr)
+>  	 * Not seeing an error, but not updating level? Something went
+>  	 * deeply wrong...
+>  	 */
+> -	if (WARN_ON(level >= KVM_PGTABLE_MAX_LEVELS))
+> +	if (WARN_ON(level > KVM_PGTABLE_LAST_LEVEL))
+> +		return -EFAULT;
+> +	if (WARN_ON(level < KVM_PGTABLE_FIRST_LEVEL))
+>  		return -EFAULT;
+>  
+>  	/* Oops, the userspace PTs are gone... Replay the fault */
+> @@ -1407,7 +1409,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	gfn_t gfn;
+>  	kvm_pfn_t pfn;
+>  	bool logging_active = memslot_is_logging(memslot);
+> -	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
+> +	s8 fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
+>  	long vma_pagesize, fault_granule;
+>  	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+>  	struct kvm_pgtable *pgt;
 
 Thanks,
-Tianyi Liu
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
