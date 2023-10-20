@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1ECB1094A
-	for <kvmarm@lists.linux.dev>; Fri, 20 Oct 2023 08:16:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE8B847D
+	for <kvmarm@lists.linux.dev>; Fri, 20 Oct 2023 09:16:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I/2UpPnW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30131C433C7;
-	Fri, 20 Oct 2023 08:16:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b5u3WjtR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99C39C433C7;
+	Fri, 20 Oct 2023 09:16:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697789778;
-	bh=kYbBC1uCW/IrsU7Ie/AtvN1XKRDqHmtud5Ozeobgrms=;
+	s=k20201202; t=1697793372;
+	bh=zUzTstD/8ivzZ8wnaaA6XBHjpqgidslogrspjXbMiiA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I/2UpPnWrrzwbNclSrpunmBM7CvNuMrCzu0N3WGlmvCUlI9AS4n6QDwmDJD+81dGG
-	 BeXqNoD/JMMkyce9MqBuQsDE9gpnJSQsfuCDzZ4obl/hx4g9VpPyzINgUCtXk4Z3HN
-	 yJceJGoOvQku43DKWSQ+kxdXNL0MbYmCmFGF8+6mzvZcdXVJQGkUKb1YmWq48BxSM4
-	 M7gkkzt1c/h+08/K8hpF62xLvkI6dyPgHQ75/NIpaTDnV/apNCMKfFVCdcKBuKCUt9
-	 p+UgEcCnEbQtnUuJAhYv0DUQ3rqzEIhp/ulTJIZ29AUjHoYzNCkjMmrPo6+4ir0teG
-	 Lto3mKSVF6S1A==
+	b=b5u3WjtRzqaM3sxXDShMjyDpM709jSPUC9vRPfss1QrEaMYKI2QvkU0D0OH0h6ov7
+	 6ANJTT1l/+VS5/W8ZR/q4jgEqOuQuN+qoO6h1+zOZFkkfxy3p8ArkKPuxqJpA6MMFh
+	 74O9aSoKZ3DWeBfj9uNW3BdSBbW+ttdCYWij9qNZG7rXADsP6c1XXZ58PVgv/407Qm
+	 R4o1bgca6V0aW/h3lX3AOsHpu2gwQgfvCAVZlmWQH0Vx5h56An6lwimWnT1E3XHSEW
+	 jXpCbpkgOwlWiUAtyyIKg/q2hZwtdIL7aCgLpxwJuoW6RqR0DV38itODOes4IYjxYd
+	 UF6MW6fsn2yCg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qtkg3-0062Vb-K9;
-	Fri, 20 Oct 2023 09:16:15 +0100
-Date: Fri, 20 Oct 2023 09:16:14 +0100
-Message-ID: <86cyx9n1yp.wl-maz@kernel.org>
+	id 1qtlc2-0063cq-CH;
+	Fri, 20 Oct 2023 10:16:10 +0100
+Date: Fri, 20 Oct 2023 10:16:10 +0100
+Message-ID: <86bkctmz6t.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Ryan Roberts <ryan.roberts@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -37,10 +37,10 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 04/12] KVM: arm64: Add ARM64_HAS_LPA2 CPU capability
-In-Reply-To: <20231009185008.3803879-5-ryan.roberts@arm.com>
+Subject: Re: [PATCH v4 06/12] KVM: arm64: Use LPA2 page-tables for stage2 and hyp stage1
+In-Reply-To: <20231009185008.3803879-7-ryan.roberts@arm.com>
 References: <20231009185008.3803879-1-ryan.roberts@arm.com>
-	<20231009185008.3803879-5-ryan.roberts@arm.com>
+	<20231009185008.3803879-7-ryan.roberts@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -56,137 +56,220 @@ X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, catalin.marinas@arm.com, will@kernel.or
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 09 Oct 2023 19:50:00 +0100,
+On Mon, 09 Oct 2023 19:50:02 +0100,
 Ryan Roberts <ryan.roberts@arm.com> wrote:
 > 
-> Expose FEAT_LPA2 as a capability so that we can take advantage of
-> alternatives patching in both the kernel and hypervisor.
+> Implement a simple policy whereby if the HW supports FEAT_LPA2 for the
+> page size we are using, always use LPA2-style page-tables for stage 2
+> and hyp stage 1, regardless of the VMM-requested IPA size or
+> HW-implemented PA size. When in use we can now support up to 52-bit IPA
+> and PA sizes.
+
+Maybe worth stating that this S1 comment only applies to the
+standalone EL2 portion, and not the VHE S1 mappings.
+
 > 
-> Although FEAT_LPA2 presence is advertised separately for stage1 and
-> stage2, the expectation is that in practice both stages will either
-> support or not support it. Therefore, for the case where KVM is present,
-> we combine both into a single capability, allowing us to simplify the
-> implementation. For the case where KVM is not present, we only care
-> about stage1.
+> We use the previously created cpu feature to track whether LPA2 is
+> supported for deciding whether to use the LPA2 or classic pte format.
+> 
+> Note that FEAT_LPA2 brings support for bigger block mappings (512GB with
+> 4KB, 64GB with 16KB). We explicitly don't enable these in the library
+> because stage2_apply_range() works on batch sizes of the largest used
+> block mapping, and increasing the size of the batch would lead to soft
+> lockups. See commit 5994bc9e05c2 ("KVM: arm64: Limit
+> stage2_apply_range() batch size to largest block").
 > 
 > Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
 > ---
->  arch/arm64/include/asm/cpufeature.h |  5 ++++
->  arch/arm64/kernel/cpufeature.c      | 46 +++++++++++++++++++++++++++++
->  arch/arm64/tools/cpucaps            |  1 +
->  3 files changed, 52 insertions(+)
+>  arch/arm64/include/asm/kvm_pgtable.h | 47 +++++++++++++++++++++-------
+>  arch/arm64/kvm/arm.c                 |  2 ++
+>  arch/arm64/kvm/hyp/nvhe/tlb.c        |  3 +-
+>  arch/arm64/kvm/hyp/pgtable.c         | 15 +++++++--
+>  arch/arm64/kvm/hyp/vhe/tlb.c         |  3 +-
+>  5 files changed, 54 insertions(+), 16 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> index 5bba39376055..b1292ec88538 100644
-> --- a/arch/arm64/include/asm/cpufeature.h
-> +++ b/arch/arm64/include/asm/cpufeature.h
-> @@ -831,6 +831,11 @@ static inline bool system_supports_tlb_range(void)
->  		cpus_have_const_cap(ARM64_HAS_TLB_RANGE);
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index d3e354bb8351..b240158e1218 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -25,12 +25,22 @@
+>  #define KVM_PGTABLE_MIN_BLOCK_LEVEL	2U
+>  #endif
+>  
+> +static inline u64 kvm_get_parange_max(void)
+> +{
+> +	if (system_supports_lpa2() ||
+> +	   (IS_ENABLED(CONFIG_ARM64_PA_BITS_52) && PAGE_SIZE == SZ_64K))
+
+nit: the rest of the code uses PAGE_SHIFT instead of PAGE_SIZE. Not a
+big deal, but being consistent might help the reader.
+
+> +		return ID_AA64MMFR0_EL1_PARANGE_52;
+> +	else
+> +		return ID_AA64MMFR0_EL1_PARANGE_48;
+> +}
+> +
+>  static inline u64 kvm_get_parange(u64 mmfr0)
+>  {
+> +	u64 parange_max = kvm_get_parange_max();
+>  	u64 parange = cpuid_feature_extract_unsigned_field(mmfr0,
+>  				ID_AA64MMFR0_EL1_PARANGE_SHIFT);
+> -	if (parange > ID_AA64MMFR0_EL1_PARANGE_MAX)
+> -		parange = ID_AA64MMFR0_EL1_PARANGE_MAX;
+> +	if (parange > parange_max)
+> +		parange = parange_max;
+>  
+>  	return parange;
+>  }
+> @@ -41,6 +51,8 @@ typedef u64 kvm_pte_t;
+>  
+>  #define KVM_PTE_ADDR_MASK		GENMASK(47, PAGE_SHIFT)
+>  #define KVM_PTE_ADDR_51_48		GENMASK(15, 12)
+> +#define KVM_PTE_ADDR_MASK_LPA2		GENMASK(49, PAGE_SHIFT)
+> +#define KVM_PTE_ADDR_51_50_LPA2		GENMASK(9, 8)
+>  
+>  #define KVM_PHYS_INVALID		(-1ULL)
+>  
+> @@ -51,21 +63,34 @@ static inline bool kvm_pte_valid(kvm_pte_t pte)
+>  
+>  static inline u64 kvm_pte_to_phys(kvm_pte_t pte)
+>  {
+> -	u64 pa = pte & KVM_PTE_ADDR_MASK;
+> -
+> -	if (PAGE_SHIFT == 16)
+> -		pa |= FIELD_GET(KVM_PTE_ADDR_51_48, pte) << 48;
+> +	u64 pa;
+> +
+> +	if (system_supports_lpa2()) {
+> +		pa = pte & KVM_PTE_ADDR_MASK_LPA2;
+> +		pa |= FIELD_GET(KVM_PTE_ADDR_51_50_LPA2, pte) << 50;
+> +	} else {
+> +		pa = pte & KVM_PTE_ADDR_MASK;
+> +		if (PAGE_SHIFT == 16)
+> +			pa |= FIELD_GET(KVM_PTE_ADDR_51_48, pte) << 48;
+> +	}
+>  
+>  	return pa;
 >  }
 >  
-> +static inline bool system_supports_lpa2(void)
-> +{
-> +	return cpus_have_const_cap(ARM64_HAS_LPA2);
-
-cpus_have_const_cap() is going away. You may want to look at Mark's
-series to see how to replace this one.
-
-> +}
+>  static inline kvm_pte_t kvm_phys_to_pte(u64 pa)
+>  {
+> -	kvm_pte_t pte = pa & KVM_PTE_ADDR_MASK;
+> -
+> -	if (PAGE_SHIFT == 16) {
+> -		pa &= GENMASK(51, 48);
+> -		pte |= FIELD_PREP(KVM_PTE_ADDR_51_48, pa >> 48);
+> +	kvm_pte_t pte;
 > +
->  int do_emulate_mrs(struct pt_regs *regs, u32 sys_reg, u32 rt);
->  bool try_emulate_mrs(struct pt_regs *regs, u32 isn);
+> +	if (system_supports_lpa2()) {
+> +		pte = pa & KVM_PTE_ADDR_MASK_LPA2;
+> +		pa &= GENMASK(51, 50);
+> +		pte |= FIELD_PREP(KVM_PTE_ADDR_51_50_LPA2, pa >> 50);
+> +	} else {
+> +		pte = pa & KVM_PTE_ADDR_MASK;
+> +		if (PAGE_SHIFT == 16) {
+> +			pa &= GENMASK(51, 48);
+> +			pte |= FIELD_PREP(KVM_PTE_ADDR_51_48, pa >> 48);
+> +		}
+>  	}
 >  
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 444a73c2e638..1ccb1fe0e310 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -1746,6 +1746,46 @@ static bool unmap_kernel_at_el0(const struct arm64_cpu_capabilities *entry,
->  	return !meltdown_safe;
+>  	return pte;
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 4866b3f7b4ea..73cc67c2a8a7 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1747,6 +1747,8 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
+>  	}
+>  	tcr &= ~TCR_T0SZ_MASK;
+>  	tcr |= TCR_T0SZ(hyp_va_bits);
+> +	if (system_supports_lpa2())
+> +		tcr |= TCR_EL2_DS;
+>  	params->tcr_el2 = tcr;
+>  
+>  	params->pgd_pa = kvm_mmu_get_httbr();
+> diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> index d42b72f78a9b..c3cd16c6f95f 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> @@ -198,7 +198,8 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+>  	/* Switch to requested VMID */
+>  	__tlb_switch_to_guest(mmu, &cxt, false);
+>  
+> -	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride, 0, false);
+> +	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride, 0,
+> +				system_supports_lpa2());
+
+At this stage, I'd fully expect the flag to have been subsumed into
+the helper...
+
+>  
+>  	dsb(ish);
+>  	__tlbi(vmalle1is);
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index f155b8c9e98c..062eb7bcdb8a 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -79,7 +79,10 @@ static bool kvm_pgtable_walk_skip_cmo(const struct kvm_pgtable_visit_ctx *ctx)
+>  
+>  static bool kvm_phys_is_valid(u64 phys)
+>  {
+> -	return phys < BIT(id_aa64mmfr0_parange_to_phys_shift(ID_AA64MMFR0_EL1_PARANGE_MAX));
+> +	u64 parange_max = kvm_get_parange_max();
+> +	u8 shift = id_aa64mmfr0_parange_to_phys_shift(parange_max);
+> +
+> +	return phys < BIT(shift);
 >  }
 >  
-> +static inline bool has_lpa2_at_stage1(u64 mmfr0)
-
-Why inline? It isn't like this has any performance implication...
-
-> +{
-> +#if defined(CONFIG_ARM64_4K_PAGES) || defined(CONFIG_ARM64_16K_PAGES)
-> +	unsigned int tgran;
-> +
-> +	tgran = cpuid_feature_extract_unsigned_field(mmfr0,
-> +						ID_AA64MMFR0_EL1_TGRAN_SHIFT);
-> +	return tgran == ID_AA64MMFR0_EL1_TGRAN_LPA2;
-> +#else
-> +	return false;
-> +#endif
-
-Writing this using IS_ENABLED() would be slightly more pleasing to my
-tired eyes... ;-)
-
-> +}
-> +
-> +static inline bool has_lpa2_at_stage2(u64 mmfr0)
-> +{
-> +#if defined(CONFIG_ARM64_4K_PAGES) || defined(CONFIG_ARM64_16K_PAGES)
-> +	unsigned int tgran;
-> +
-> +	tgran = cpuid_feature_extract_unsigned_field(mmfr0,
-> +						ID_AA64MMFR0_EL1_TGRAN_2_SHIFT);
-> +	return tgran == ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_LPA2;
-> +#else
-> +	return false;
-> +#endif
-> +}
-> +
-> +static bool has_lpa2(const struct arm64_cpu_capabilities *entry, int scope)
-> +{
-> +	u64 mmfr0;
-> +	bool ret;
-> +
-> +	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
-> +	ret = has_lpa2_at_stage1(mmfr0);
-> +
-> +	if (kvm_get_mode() != KVM_MODE_NONE)
-> +		ret = ret && has_lpa2_at_stage2(mmfr0);
-
-Isn't it too late to go back on the decision to use LPA2 at S1 if you
-realise that S2 doesn't support it?
-
-> +
-> +	return ret;
-> +}
-> +
->  #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
->  #define KPTI_NG_TEMP_VA		(-(1UL << PMD_SHIFT))
+>  static bool kvm_block_mapping_supported(const struct kvm_pgtable_visit_ctx *ctx, u64 phys)
+> @@ -408,7 +411,8 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
+>  	}
 >  
-> @@ -2719,6 +2759,12 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->  		.matches = has_cpuid_feature,
->  		ARM64_CPUID_FIELDS(ID_AA64MMFR2_EL1, EVT, IMP)
->  	},
-> +	{
-> +		.desc = "Large Physical Address 2",
-> +		.capability = ARM64_HAS_LPA2,
-> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.matches = has_lpa2,
-> +	},
->  	{},
->  };
+>  	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_AP, ap);
+> -	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_SH, sh);
+> +	if (!system_supports_lpa2())
+> +		attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_SH, sh);
+>  	attr |= KVM_PTE_LEAF_ATTR_LO_S1_AF;
+>  	attr |= prot & KVM_PTE_LEAF_ATTR_HI_SW;
+>  	*ptep = attr;
+> @@ -654,6 +658,9 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+>  		vtcr |= VTCR_EL2_HA;
+>  #endif /* CONFIG_ARM64_HW_AFDBM */
 >  
-> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-> index dea3dc89234b..07f3957b8488 100644
-> --- a/arch/arm64/tools/cpucaps
-> +++ b/arch/arm64/tools/cpucaps
-> @@ -36,6 +36,7 @@ HAS_GIC_PRIO_MASKING
->  HAS_GIC_PRIO_RELAXED_SYNC
->  HAS_HCX
->  HAS_LDAPR
-> +HAS_LPA2
->  HAS_LSE_ATOMICS
->  HAS_MOPS
->  HAS_NESTED_VIRT
+> +	if (system_supports_lpa2())
+> +		vtcr |= VTCR_EL2_DS;
+> +
+>  	/* Set the vmid bits */
+>  	vtcr |= (get_vmid_bits(mmfr1) == 16) ?
+>  		VTCR_EL2_VS_16BIT :
+> @@ -711,7 +718,9 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
+>  	if (prot & KVM_PGTABLE_PROT_W)
+>  		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+>  
+> -	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
+> +	if (!system_supports_lpa2())
+> +		attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
+> +
+>  	attr |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
+>  	attr |= prot & KVM_PTE_LEAF_ATTR_HI_SW;
+>  	*ptep = attr;
+> diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
+> index 6041c6c78984..40cea2482a76 100644
+> --- a/arch/arm64/kvm/hyp/vhe/tlb.c
+> +++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+> @@ -161,7 +161,8 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+>  	/* Switch to requested VMID */
+>  	__tlb_switch_to_guest(mmu, &cxt);
+>  
+> -	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride, 0, false);
+> +	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride, 0,
+> +				system_supports_lpa2());
+>  
+>  	dsb(ish);
+>  	__tlbi(vmalle1is);
 
-Why isn't this patch the first or second in the series? You could use
-it to drive the LPA2 decision in the patch #2, avoiding the ugly lpa2
-flag...
+One thing I don't see here is how you update the tcr_compute_pa_size
+macro that is used on the initial nVHE setup, which is inconsistent
+with the kvm_get_parange_max() helper.
 
 Thanks,
 
