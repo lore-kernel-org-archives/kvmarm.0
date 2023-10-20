@@ -1,49 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA8C10941
-	for <kvmarm@lists.linux.dev>; Fri, 20 Oct 2023 08:05:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1ECB1094A
+	for <kvmarm@lists.linux.dev>; Fri, 20 Oct 2023 08:16:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Et5bY+e3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4D57C433C7;
-	Fri, 20 Oct 2023 08:05:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I/2UpPnW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30131C433C7;
+	Fri, 20 Oct 2023 08:16:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697789141;
-	bh=pfd6pPJr8ufDxksvc355rpglL5JyMuBGgmvPPJZB+iA=;
+	s=k20201202; t=1697789778;
+	bh=kYbBC1uCW/IrsU7Ie/AtvN1XKRDqHmtud5Ozeobgrms=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Et5bY+e3P1P1EU69+JoB1ZarBTmZ2k/5KDvUuPeMDOD1Z0QGja08MBydnjU3hhG6f
-	 s7+7sQ8Wqe4ZcUEB5YZY7EWIdgbvNt6U4R5l9lDxsjBXTlqi/tdRlmp902PjiaEkXJ
-	 51tD1p1jtnVB46MiZQbjXUqDw3eFosOtkEYtZygqWVHD6VYepnAZ4XQMUzzDJ7Z39n
-	 EhYJxPK9rA7r924pNoLDuvDyA/Eelbp7vk9LktUE6r+ucLVK6Gd2AqIAHOWtU7v8by
-	 iTt3jBat0ntfGNQJM0zvpuo8s2eFe5J/E83r2MAp7I5wZSaJEVcif6ftlHLBo51PuP
-	 cBJfo5HtyTVoA==
+	b=I/2UpPnWrrzwbNclSrpunmBM7CvNuMrCzu0N3WGlmvCUlI9AS4n6QDwmDJD+81dGG
+	 BeXqNoD/JMMkyce9MqBuQsDE9gpnJSQsfuCDzZ4obl/hx4g9VpPyzINgUCtXk4Z3HN
+	 yJceJGoOvQku43DKWSQ+kxdXNL0MbYmCmFGF8+6mzvZcdXVJQGkUKb1YmWq48BxSM4
+	 M7gkkzt1c/h+08/K8hpF62xLvkI6dyPgHQ75/NIpaTDnV/apNCMKfFVCdcKBuKCUt9
+	 p+UgEcCnEbQtnUuJAhYv0DUQ3rqzEIhp/ulTJIZ29AUjHoYzNCkjMmrPo6+4ir0teG
+	 Lto3mKSVF6S1A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qtkVn-0062KV-1d;
-	Fri, 20 Oct 2023 09:05:39 +0100
-Date: Fri, 20 Oct 2023 09:05:38 +0100
-Message-ID: <86edhpn2gd.wl-maz@kernel.org>
+	id 1qtkg3-0062Vb-K9;
+	Fri, 20 Oct 2023 09:16:15 +0100
+Date: Fri, 20 Oct 2023 09:16:14 +0100
+Message-ID: <86cyx9n1yp.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Ryan Roberts <ryan.roberts@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse
- <james.morse@arm.com>,
+	James Morse <james.morse@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Ard Biesheuvel <ardb@kernel.org>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 01/12] arm64/mm: Update non-range tlb invalidation routines for FEAT_LPA2
-In-Reply-To: <dc65e68c-379f-4dfa-a7af-f066e943177c@arm.com>
+Subject: Re: [PATCH v4 04/12] KVM: arm64: Add ARM64_HAS_LPA2 CPU capability
+In-Reply-To: <20231009185008.3803879-5-ryan.roberts@arm.com>
 References: <20231009185008.3803879-1-ryan.roberts@arm.com>
-	<20231009185008.3803879-2-ryan.roberts@arm.com>
-	<87zg0f59ae.wl-maz@kernel.org>
-	<dc65e68c-379f-4dfa-a7af-f066e943177c@arm.com>
+	<20231009185008.3803879-5-ryan.roberts@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,207 +56,137 @@ X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, catalin.marinas@arm.com, will@kernel.or
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 19 Oct 2023 10:22:37 +0100,
+On Mon, 09 Oct 2023 19:50:00 +0100,
 Ryan Roberts <ryan.roberts@arm.com> wrote:
 > 
-> On 19/10/2023 09:03, Marc Zyngier wrote:
-> > On Mon, 09 Oct 2023 19:49:57 +0100,
-> > Ryan Roberts <ryan.roberts@arm.com> wrote:
-> >>
-> >> FEAT_LPA2 impacts tlb invalidation in 2 ways; Firstly, the TTL field in
-> >> the non-range tlbi instructions can now validly take a 0 value for the
-> >> 4KB granule (this is due to the extra level of translation). Secondly,
-> > 
-> > nit: 0 was always valid. It just didn't indicate any level.
+> Expose FEAT_LPA2 as a capability so that we can take advantage of
+> alternatives patching in both the kernel and hypervisor.
 > 
-> True. I'll change to "can now validly take a 0 value as a TTL hint".
+> Although FEAT_LPA2 presence is advertised separately for stage1 and
+> stage2, the expectation is that in practice both stages will either
+> support or not support it. Therefore, for the case where KVM is present,
+> we combine both into a single capability, allowing us to simplify the
+> implementation. For the case where KVM is not present, we only care
+> about stage1.
 > 
-> > 
-> >> the BADDR field in the range tlbi instructions must be aligned to 64KB
-> >> when LPA2 is in use (TCR.DS=1). Changes are required for tlbi to
-> >> continue to operate correctly when LPA2 is in use.
-> >>
-> >> KVM only uses the non-range (__tlbi_level()) routines. Therefore we only
-> >> solve the first problem with this patch.
-> > 
-> > Is this still true? This patch changes __TLBI_VADDR_RANGE() and co.
+> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
+> ---
+>  arch/arm64/include/asm/cpufeature.h |  5 ++++
+>  arch/arm64/kernel/cpufeature.c      | 46 +++++++++++++++++++++++++++++
+>  arch/arm64/tools/cpucaps            |  1 +
+>  3 files changed, 52 insertions(+)
 > 
-> It is no longer true that KVM only uses the non-range routines. v6.6 adds a
-> series where KVM will now use the range-based routines too. So that text is out
-> of date and I should have spotted it when doing the rebase - I'll fix. KVM now
-> using range-based ops is the reason I added patch 2 to this series.
-> 
-> However, this patch doesn't really change __TLBI_VADDR_RANGE()'s behavior, it
-> just makes it robust to the presence of TLBI_TTL_UNKNOWN, instead of 0 which was
-> previously used as the "don't know" value.
-> 
-> > 
-> >>
-> >> It is solved by always adding the level hint if the level is between [0,
-> >> 3] (previously anything other than 0 was hinted, which breaks in the new
-> >> level -1 case from kvm). When running on non-LPA2 HW, 0 is still safe to
-> >> hint as the HW will fall back to non-hinted. While we are at it, we
-> >> replace the notion of 0 being the non-hinted seninel with a macro,
-> >> TLBI_TTL_UNKNOWN. This means callers won't need updating if/when
-> >> translation depth increases in future.
-> >>
-> >> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
-> >> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> >> ---
-> >>  arch/arm64/include/asm/tlb.h      |  9 ++++---
-> >>  arch/arm64/include/asm/tlbflush.h | 43 +++++++++++++++++++------------
-> >>  2 files changed, 31 insertions(+), 21 deletions(-)
-> >>
-> >> diff --git a/arch/arm64/include/asm/tlb.h b/arch/arm64/include/asm/tlb.h
-> >> index 2c29239d05c3..93c537635dbb 100644
-> >> --- a/arch/arm64/include/asm/tlb.h
-> >> +++ b/arch/arm64/include/asm/tlb.h
-> >> @@ -22,15 +22,16 @@ static void tlb_flush(struct mmu_gather *tlb);
-> >>  #include <asm-generic/tlb.h>
-> >>  
-> >>  /*
-> >> - * get the tlbi levels in arm64.  Default value is 0 if more than one
-> >> - * of cleared_* is set or neither is set.
-> >> + * get the tlbi levels in arm64.  Default value is TLBI_TTL_UNKNOWN if more than
-> >> + * one of cleared_* is set or neither is set - this elides the level hinting to
-> >> + * the hardware.
-> >>   * Arm64 doesn't support p4ds now.
-> >>   */
-> >>  static inline int tlb_get_level(struct mmu_gather *tlb)
-> >>  {
-> >>  	/* The TTL field is only valid for the leaf entry. */
-> >>  	if (tlb->freed_tables)
-> >> -		return 0;
-> >> +		return TLBI_TTL_UNKNOWN;
-> >>  
-> >>  	if (tlb->cleared_ptes && !(tlb->cleared_pmds ||
-> >>  				   tlb->cleared_puds ||
-> >> @@ -47,7 +48,7 @@ static inline int tlb_get_level(struct mmu_gather *tlb)
-> >>  				   tlb->cleared_p4ds))
-> >>  		return 1;
-> >>  
-> >> -	return 0;
-> >> +	return TLBI_TTL_UNKNOWN;
-> >>  }
-> >>  
-> >>  static inline void tlb_flush(struct mmu_gather *tlb)
-> >> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
-> >> index b149cf9f91bc..e688246b3b13 100644
-> >> --- a/arch/arm64/include/asm/tlbflush.h
-> >> +++ b/arch/arm64/include/asm/tlbflush.h
-> >> @@ -94,19 +94,22 @@ static inline unsigned long get_trans_granule(void)
-> >>   * When ARMv8.4-TTL exists, TLBI operations take an additional hint for
-> >>   * the level at which the invalidation must take place. If the level is
-> >>   * wrong, no invalidation may take place. In the case where the level
-> >> - * cannot be easily determined, a 0 value for the level parameter will
-> >> - * perform a non-hinted invalidation.
-> >> + * cannot be easily determined, the value TLBI_TTL_UNKNOWN will perform
-> >> + * a non-hinted invalidation. Any provided level outside the hint range
-> >> + * will also cause fall-back to non-hinted invalidation.
-> >>   *
-> >>   * For Stage-2 invalidation, use the level values provided to that effect
-> >>   * in asm/stage2_pgtable.h.
-> >>   */
-> >>  #define TLBI_TTL_MASK		GENMASK_ULL(47, 44)
-> >>  
-> >> +#define TLBI_TTL_UNKNOWN	(-1)
-> > 
-> > I find this value somehow confusing, as it represent an actual level
-> > number. It just happen to be one that cannot be provided as a TTL. So
-> > having that as a return value from tlb_get_level() isn't great, and
-> > I'd rather have something that cannot be mistaken for a valid level.
-> 
-> OK, how about INT_MAX?
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index 5bba39376055..b1292ec88538 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -831,6 +831,11 @@ static inline bool system_supports_tlb_range(void)
+>  		cpus_have_const_cap(ARM64_HAS_TLB_RANGE);
+>  }
+>  
+> +static inline bool system_supports_lpa2(void)
+> +{
+> +	return cpus_have_const_cap(ARM64_HAS_LPA2);
 
-Works for me.
+cpus_have_const_cap() is going away. You may want to look at Mark's
+series to see how to replace this one.
 
-> 
-> > 
-> >> +
-> >>  #define __tlbi_level(op, addr, level) do {				\
-> >>  	u64 arg = addr;							\
-> >>  									\
-> >>  	if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL) &&		\
-> >> -	    level) {							\
-> >> +	    level >= 0 && level <= 3) {					\
-> >>  		u64 ttl = level & 3;					\
-> >>  		ttl |= get_trans_granule() << 2;			\
-> >>  		arg &= ~TLBI_TTL_MASK;					\
-> >> @@ -134,16 +137,17 @@ static inline unsigned long get_trans_granule(void)
-> >>   * [BADDR, BADDR + (NUM + 1) * 2^(5*SCALE + 1) * PAGESIZE)
-> >>   *
-> >>   */
-> >> -#define __TLBI_VADDR_RANGE(addr, asid, scale, num, ttl)		\
-> >> -	({							\
-> >> -		unsigned long __ta = (addr) >> PAGE_SHIFT;	\
-> >> -		__ta &= GENMASK_ULL(36, 0);			\
-> >> -		__ta |= (unsigned long)(ttl) << 37;		\
-> >> -		__ta |= (unsigned long)(num) << 39;		\
-> >> -		__ta |= (unsigned long)(scale) << 44;		\
-> >> -		__ta |= get_trans_granule() << 46;		\
-> >> -		__ta |= (unsigned long)(asid) << 48;		\
-> >> -		__ta;						\
-> >> +#define __TLBI_VADDR_RANGE(addr, asid, scale, num, ttl)				\
-> >> +	({									\
-> >> +		unsigned long __ta = (addr) >> PAGE_SHIFT;			\
-> >> +		unsigned long __ttl = (ttl >= 1 && ttl <= 3) ? ttl : 0;		\
-> >> +		__ta &= GENMASK_ULL(36, 0);					\
-> >> +		__ta |= __ttl << 37;						\
-> >> +		__ta |= (unsigned long)(num) << 39;				\
-> >> +		__ta |= (unsigned long)(scale) << 44;				\
-> >> +		__ta |= get_trans_granule() << 46;				\
-> >> +		__ta |= (unsigned long)(asid) << 48;				\
-> >> +		__ta;								\
-> >>  	})
-> >>  
-> >>  /* These macros are used by the TLBI RANGE feature. */
-> >> @@ -216,12 +220,16 @@ static inline unsigned long get_trans_granule(void)
-> >>   *		CPUs, ensuring that any walk-cache entries associated with the
-> >>   *		translation are also invalidated.
-> >>   *
-> >> - *	__flush_tlb_range(vma, start, end, stride, last_level)
-> >> + *	__flush_tlb_range(vma, start, end, stride, last_level, tlb_level)
-> >>   *		Invalidate the virtual-address range '[start, end)' on all
-> >>   *		CPUs for the user address space corresponding to 'vma->mm'.
-> >>   *		The invalidation operations are issued at a granularity
-> >>   *		determined by 'stride' and only affect any walk-cache entries
-> >> - *		if 'last_level' is equal to false.
-> >> + *		if 'last_level' is equal to false. tlb_level is the level at
-> >> + *		which the invalidation must take place. If the level is wrong,
-> >> + *		no invalidation may take place. In the case where the level
-> >> + *		cannot be easily determined, the value TLBI_TTL_UNKNOWN will
-> >> + *		perform a non-hinted invalidation.
-> >>   *
-> >>   *
-> >>   *	Finally, take a look at asm/tlb.h to see how tlb_flush() is implemented
-> >> @@ -442,9 +450,10 @@ static inline void flush_tlb_range(struct vm_area_struct *vma,
-> >>  	/*
-> >>  	 * We cannot use leaf-only invalidation here, since we may be invalidating
-> >>  	 * table entries as part of collapsing hugepages or moving page tables.
-> >> -	 * Set the tlb_level to 0 because we can not get enough information here.
-> >> +	 * Set the tlb_level to TLBI_TTL_UNKNOWN because we can not get enough
-> >> +	 * information here.
-> >>  	 */
-> >> -	__flush_tlb_range(vma, start, end, PAGE_SIZE, false, 0);
-> >> +	__flush_tlb_range(vma, start, end, PAGE_SIZE, false, TLBI_TTL_UNKNOWN);
-> >>  }
-> >>  
-> >>  static inline void flush_tlb_kernel_range(unsigned long start, unsigned long end)
-> > 
-> > It feels like this range stuff would be better located in the second
-> > patch. Not a huge deal though.
-> 
-> As I said, this is the minimal change to the range-based side of things to
-> robustly deal with the introduction of TLBI_TTL_UNKNOWN.
-> 
-> But I wonder if I'm actually better of squashing both of the 2 patches into one.
-> The only reason I split it previously was because KVM was only using the
-> level-based ops.
+> +}
+> +
+>  int do_emulate_mrs(struct pt_regs *regs, u32 sys_reg, u32 rt);
+>  bool try_emulate_mrs(struct pt_regs *regs, u32 isn);
+>  
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 444a73c2e638..1ccb1fe0e310 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -1746,6 +1746,46 @@ static bool unmap_kernel_at_el0(const struct arm64_cpu_capabilities *entry,
+>  	return !meltdown_safe;
+>  }
+>  
+> +static inline bool has_lpa2_at_stage1(u64 mmfr0)
 
-Maybe. There is something to be said about making the range rework
-(decreasing scale) an independent patch, as it is a significant change
-on its own. But maybe the rest of the plumbing can be grouped
-together.
+Why inline? It isn't like this has any performance implication...
+
+> +{
+> +#if defined(CONFIG_ARM64_4K_PAGES) || defined(CONFIG_ARM64_16K_PAGES)
+> +	unsigned int tgran;
+> +
+> +	tgran = cpuid_feature_extract_unsigned_field(mmfr0,
+> +						ID_AA64MMFR0_EL1_TGRAN_SHIFT);
+> +	return tgran == ID_AA64MMFR0_EL1_TGRAN_LPA2;
+> +#else
+> +	return false;
+> +#endif
+
+Writing this using IS_ENABLED() would be slightly more pleasing to my
+tired eyes... ;-)
+
+> +}
+> +
+> +static inline bool has_lpa2_at_stage2(u64 mmfr0)
+> +{
+> +#if defined(CONFIG_ARM64_4K_PAGES) || defined(CONFIG_ARM64_16K_PAGES)
+> +	unsigned int tgran;
+> +
+> +	tgran = cpuid_feature_extract_unsigned_field(mmfr0,
+> +						ID_AA64MMFR0_EL1_TGRAN_2_SHIFT);
+> +	return tgran == ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_LPA2;
+> +#else
+> +	return false;
+> +#endif
+> +}
+> +
+> +static bool has_lpa2(const struct arm64_cpu_capabilities *entry, int scope)
+> +{
+> +	u64 mmfr0;
+> +	bool ret;
+> +
+> +	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+> +	ret = has_lpa2_at_stage1(mmfr0);
+> +
+> +	if (kvm_get_mode() != KVM_MODE_NONE)
+> +		ret = ret && has_lpa2_at_stage2(mmfr0);
+
+Isn't it too late to go back on the decision to use LPA2 at S1 if you
+realise that S2 doesn't support it?
+
+> +
+> +	return ret;
+> +}
+> +
+>  #ifdef CONFIG_UNMAP_KERNEL_AT_EL0
+>  #define KPTI_NG_TEMP_VA		(-(1UL << PMD_SHIFT))
+>  
+> @@ -2719,6 +2759,12 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+>  		.matches = has_cpuid_feature,
+>  		ARM64_CPUID_FIELDS(ID_AA64MMFR2_EL1, EVT, IMP)
+>  	},
+> +	{
+> +		.desc = "Large Physical Address 2",
+> +		.capability = ARM64_HAS_LPA2,
+> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> +		.matches = has_lpa2,
+> +	},
+>  	{},
+>  };
+>  
+> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+> index dea3dc89234b..07f3957b8488 100644
+> --- a/arch/arm64/tools/cpucaps
+> +++ b/arch/arm64/tools/cpucaps
+> @@ -36,6 +36,7 @@ HAS_GIC_PRIO_MASKING
+>  HAS_GIC_PRIO_RELAXED_SYNC
+>  HAS_HCX
+>  HAS_LDAPR
+> +HAS_LPA2
+>  HAS_LSE_ATOMICS
+>  HAS_MOPS
+>  HAS_NESTED_VIRT
+
+Why isn't this patch the first or second in the series? You could use
+it to drive the LPA2 decision in the patch #2, avoiding the ugly lpa2
+flag...
 
 Thanks,
 
