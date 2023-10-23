@@ -1,113 +1,142 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D8FB219F2
-	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 18:58:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B619F224C9
+	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 19:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gtirJysC"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=7A0pd5ea/mWj9XmmTvRG6wtE18VpprIFdxTUBKRhNM0=; b=gtirJysCoPrK4qOy7mI9wMUvVz
-	P33fMEnvCKyA74eRCvoEqjBQtXgT+ZfZaYwQdCj+oxzxDcBug/ZRYPHaMwfrVDsRg+SeYQ4ERiw3e
-	maPZCTvvgkS2b147zcO7rUOaomZAQ0kPL5PTN6DNCaANEnB1lTAFW0ykLuziDuf+Dy8K+AE8O2k19
-	PvdUnlkuD7/LMRkrQnfpX5g/p4kiD3Mj609pBiwd4YrNm3Zrc0ezR23xIBfNb1xScxybdK96le6aG
-	0NeJcWgxNT5jq7CPNUlJH/PqpwF9p1KbFSX+6WabCSjxQo+VlGAEyfwtwC06L6xyK1qMiXK41UoIG
-	5ILYltUQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45546)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qv08O-0003OY-1Z;
-	Mon, 23 Oct 2023 19:58:40 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qv08N-00052v-CV; Mon, 23 Oct 2023 19:58:39 +0100
-Date: Mon, 23 Oct 2023 19:58:39 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
-	x86@kernel.org, Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	jianyong.wu@arm.com, justin.he@arm.com
-Subject: Re: [RFC PATCH v2 29/35] irqchip/gic-v3: Don't return errors from
- gic_acpi_match_gicc()
-Message-ID: <ZTbCX0n2SrhUBESf@shell.armlinux.org.uk>
-References: <20230913163823.7880-1-james.morse@arm.com>
- <20230913163823.7880-30-james.morse@arm.com>
- <20230914160223.0000782f@Huawei.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a0SyXovJ"
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-53e751aeb3cso5666316a12.2
+        for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 12:30:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698089434; x=1698694234; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OOWHyp1apMK593shU2MRuweL3LwvBPDQ0MBY19ARFVk=;
+        b=a0SyXovJmEUyxvk6ldgbftgDsszsJGsijAxEO6BO12xIBwuMGxj4fOry6lXiSz68BH
+         sDmbGsyb1kDD4BubBkYEGXOYtNZGW4FdZvkTkqLNfWqGDNrL934AgBsZlJAhgHhE20HC
+         7q+u6LzNnxBbKmS1UeaN8fx/7BiDl7lLoT4bYCLgDVH7FFZwXRO/OKjUaRr/WwB0vhK4
+         Arnav8JpR2UWY6i0XVxpSRiXLEZ+5ddiZZIG/OPArnv7b8seE+Ua3vbmY7XA27AYS4K9
+         UgsezZh9NukLRlBIv7xwUqICzFK0vi8KtEvWn7npZG0QxJ6dDYmixOGnEnLI4w8CGVkP
+         VMxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698089434; x=1698694234;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OOWHyp1apMK593shU2MRuweL3LwvBPDQ0MBY19ARFVk=;
+        b=c/ENNJjO+fVJprKDVRrbSBK//DyGxDcwlnNv/i3Y6bpdsuNexGBBac/SGnilA4dLg4
+         cmy4v8pH9RWtqFXuDWPS+ISgrd9Bz3vMjBurK7G/8Ad092wHPNt5SRmqK/2qkUrAMj4b
+         AxfZb8rymm4IkpWjHXbDoNYPSkGWOIhQBvmaYcTJekW7N74WEfLN2Gxr9SXCVqjT57Eu
+         5cC1lGt9LlXkOquGwsGDqau+fxTMxlkdaNAVCTaP45NnO2XSkb1Ztf1qeNrLZNwDPNVo
+         KGNgh4JR5ugG+CUDOm67KDJs/hTg0GgiNHap4fFzDuFDPpe2eaVd4kiBpy/ipAoPgvbY
+         jN/w==
+X-Gm-Message-State: AOJu0YznNIrjWbb8J+a2RzYdwaz/WCJlnpQMk7MTBcNOu5VNOkMRBE7z
+	wQgYljv8pK8EKJAXl1jk+sC+reMmwB/HYq/ZUQ==
+X-Google-Smtp-Source: AGHT+IHtPEwEdv1R67ewmN3QjN2VewaqNbQmgLSCiAxqY2PPO146bleLuad9tzy+WrA1JY7N0hp+P6s9/af35JMl/6M=
+X-Received: by 2002:a50:d502:0:b0:53e:4c39:5608 with SMTP id
+ u2-20020a50d502000000b0053e4c395608mr7381578edi.17.1698089433624; Mon, 23 Oct
+ 2023 12:30:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230914160223.0000782f@Huawei.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <CAC=5qx_EDYCifRGNbXaJ96psuqQ-Y7zw8O_V_q-_kYpkuD52RQ@mail.gmail.com>
+ <20231023141639.GA3779@willie-the-truck>
+In-Reply-To: <20231023141639.GA3779@willie-the-truck>
+From: KVMR <kvmrdy@gmail.com>
+Date: Tue, 24 Oct 2023 01:00:22 +0530
+Message-ID: <CAC=5qx-Qq8+fzONjYCvEyUe4g+bZiMM80rfy3niyw-4xqZYf5g@mail.gmail.com>
+Subject: Re: pKVM: Which kernel version has support for pKVM?
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 14, 2023 at 04:02:23PM +0100, Jonathan Cameron wrote:
-> On Wed, 13 Sep 2023 16:38:17 +0000
-> James Morse <james.morse@arm.com> wrote:
-> 
-> > gic_acpi_match_gicc() is only called via gic_acpi_count_gicr_regions().
-> > It should only count the number of enabled redistributors, but it
-> > also tries to sanity check the GICC entry, currently returning an
-> > error if the Enabled bit is set, but the gicr_base_address is zero.
-> > 
-> > Adding support for the online-capable bit to the sanity check
-> > complicates it, for no benefit. The existing check implicitly
-> > depends on gic_acpi_count_gicr_regions() previous failing to find
-> > any GICR regions (as it is valid to have gicr_base_address of zero if
-> > the redistributors are described via a GICR entry).
-> > 
-> > Instead of complicating the check, remove it. Failures that happen
-> > at this point cause the irqchip not to register, meaning no irqs
-> > can be requested. The kernel grinds to a panic() pretty quickly.
-> > 
-> > Without the check, MADT tables that exhibit this problem are still
-> > caught by gic_populate_rdist(), which helpfully also prints what
-> > went wrong:
-> > | CPU4: mpidr 100 has no re-distributor!
-> > 
-> > Signed-off-by: James Morse <james.morse@arm.com>
-> > ---
-> >  drivers/irqchip/irq-gic-v3.c | 18 ++++++------------
-> >  1 file changed, 6 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-> > index 72d3cdebdad1..0f54811262eb 100644
-> > --- a/drivers/irqchip/irq-gic-v3.c
-> > +++ b/drivers/irqchip/irq-gic-v3.c
-> > @@ -2415,21 +2415,15 @@ static int __init gic_acpi_match_gicc(union acpi_subtable_headers *header,
-> >  
-> >  	/*
-> >  	 * If GICC is enabled and has valid gicr base address, then it means
-> > -	 * GICR base is presented via GICC
-> > +	 * GICR base is presented via GICC. The redistributor is only known to
-> > +	 * be accessible if the GICC is marked as enabled. If this bit is not
-> > +	 * set, we'd need to add the redistributor at runtime, which isn't
-> > +	 * supported.
-> >  	 */
-> > -	if (acpi_gicc_is_usable(gicc) && gicc->gicr_base_address) {
-> > +	if (gicc->flags & ACPI_MADT_ENABLED && gicc->gicr_base_address)
-> 
-> Going in circles...
+Hi Will,
 
-It does seem that way. Are you suggesting something should change here?
+Thank you very much for your response.
 
-Thanks.
+Regarding the test cases, I would like to see if you utilized any
+scripts or programs to validate the features. For instance, I'm
+interested in understanding how memory protection between the VM and
+the Host was verified. Did you automate the verification process? For
+instance, did you employ /proc/<pid>/mem or any other methods? I will
+check the Android CTS for similar test cases.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Additionally, I'd like to know if Crosvm VMM provides full support for
+pKVM. As mentioned in the 'AVF architecture' documentation, I used
+'Crosvm' from https://chromium.googlesource.com/crosvm/crosvm and
+successfully launched a protected VM with a Rootfs as initrd. However,
+I encountered an issue when trying to launch it as a block device
+(virtio-blk). The following command failed:
+
+```
+crosvm run -r rootfs.ext4 --protected-vm-without-firmware --no-balloon
+--cpus 1 --mem 1024 Image
+```
+
+The error message I received was:
+
+```
+[*** ERROR crosvm::crosvm::sys::linux] child pcivirtio-block (pid 829)
+exited: signo 17, status 11, code 2
+[*** ERROR devices::proxy] failed write to child device process
+pcivirtio-block: failed to send packet: Broken pipe (os error 32)
+```
+
+Is there a need for further modifications or updates to Crosvm's
+Virtio drivers to ensure full pKVM support or is my usage wrong?
+
+Thanks and regards,
+Venkat
+
+
+On Mon, Oct 23, 2023 at 7:46=E2=80=AFPM Will Deacon <will@kernel.org> wrote=
+:
+>
+> Hi Venkat [+Fuad],
+>
+> On Wed, Oct 11, 2023 at 09:10:19AM +0530, KVMR wrote:
+> > We are interested in using Protected KVM (pKVM) in one of our
+> > projects. Our goal is to launch protected VMs on Linux with KVM,
+> > ARM64. We have a few queries and would appreciate your assistance in
+> > addressing them:
+> >
+> > 1. We'd like to know which mainline kernel version offers complete
+> > support for pKVM. We've observed that the current TOT kernel (6.6.rc5)
+> > may not have all the necessary changes. Specifically, we couldn't
+> > locate the KVM_CAP_ARM_PROTECTED_VM symbol in the code. If all the
+> > required changes have not yet been merged into the mainline kernel,
+> > could you please provide information on the specific branch or
+> > repository that contains these changes?
+>
+> Upstreaming is currently blocked on support for the guestmem series [1],
+> but you can look at our integration branch at [2] which has everything
+> based on the last kernel release.
+>
+> > 2. Are there any additional changes planned for pKVM, and is there a
+> > roadmap page where we can find more information on the project's
+> > future developments?
+>
+> It's mainly driven by the Android annual roadmap, since that's still
+> the driving force behind pKVM.
+>
+> > 3. In order to verify the pKVM memory protection features, we are
+> > seeking readily available test cases. Could you guide us to where we
+> > can find such test cases for this purpose?
+>
+> We have high-level tests integrated with the Android CTS, but I'm not sur=
+e
+> whether that's what you're after.
+>
+> Will
+>
+> [1] https://lore.kernel.org/all/20230914015531.1419405-1-seanjc@google.co=
+m/
+> [2] https://android-kvm.googlesource.com/linux/+/refs/heads/for-upstream/=
+pkvm-integration
