@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B28F441D
-	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 12:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D0915EBF
+	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 13:00:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qb0gkoNJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD5ACC433C7;
-	Mon, 23 Oct 2023 12:42:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qqAmERNP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60339C433C7;
+	Mon, 23 Oct 2023 13:00:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698064928;
-	bh=Lqif46mCRudQTevrOAA5L+KHe8oQGS7ZwXRLj3li2O8=;
+	s=k20201202; t=1698066021;
+	bh=5vNKzUFnTZxBTFmvOk553jYtacD8+NX8XSvNevHZ89U=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qb0gkoNJydStCtXvnfiV44i4BWgozYdKqkJxBXoEuWoRMPNp4AvUYSSfDGVCJ1Vve
-	 Tys7uXBu0KZExUsZ5bkLSXKbzPPJlI7zeXExCDKTAN87vlZhGOMWxQQGdk8eiGSwz6
-	 eS4XsX90bmuIrZq+8WzG7zmwarYZrf8ULgwPt2N9vZZ5ngwTDVr8Hb4gxtqipm2oLV
-	 VlYH4HbeuCvEMoWqhWVZk8vO1ss3H6uSmw0BW2qaZ2K+td71WeeZgPMAK1DYnz2JWL
-	 mkTru2RbfWD22adftaZQ3N6bk4ezfRP7IaTXhL6/ghsXnYiONTeZMIR/3BF8P7qipv
-	 onMQM8KIODqdg==
+	b=qqAmERNPdoLo/4olYNqGDMpPDhYJC+kpGVRhkf+Ati5L7LfwbFFvCxIN2qvtupObb
+	 E+Ym0WVWDMzaJUeRaTEpWuDaCDplDJB06U7LUqCmE2Q/ap9l5N7Xj3RLajpFgleaz3
+	 M3xa5xu/BSnwmjqqXEsmw4ehzqDBdmgTmS8BX0IUogSG496/DBVITuCNGhqQ3m5F+3
+	 6BadGVuy5sOOyPbdjkYT6SmEMK5eQM6bvIXiyUQw+YaN0YE946VRJT4/EgwfF0KQGN
+	 q9uxfXlDIY39Nw7hfeAyayOnAC/QPMuwZVwCNDqjzKi8ufPBbm3cVNJeZQ10IRXSgV
+	 7vI9GfMo9KTEw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1quuFy-006qEF-A7;
-	Mon, 23 Oct 2023 13:42:06 +0100
-Date: Mon, 23 Oct 2023 13:42:05 +0100
-Message-ID: <86y1ft4ijm.wl-maz@kernel.org>
+	id 1quuXb-006qTD-3y;
+	Mon, 23 Oct 2023 14:00:19 +0100
+Date: Mon, 23 Oct 2023 14:00:18 +0100
+Message-ID: <86wmvd4hp9.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Raghavendra Rao Ananta <rananta@google.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
@@ -41,10 +41,10 @@ Cc: Oliver Upton <oliver.upton@linux.dev>,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
-Subject: Re: [PATCH v8 06/13] KVM: arm64: Sanitize PM{C,I}NTEN{SET,CLR}, PMOVS{SET,CLR} before first run
-In-Reply-To: <20231020214053.2144305-7-rananta@google.com>
+Subject: Re: [PATCH v8 07/13] KVM: arm64: PMU: Allow userspace to limit PMCR_EL0.N for the guest
+In-Reply-To: <20231020214053.2144305-8-rananta@google.com>
 References: <20231020214053.2144305-1-rananta@google.com>
-	<20231020214053.2144305-7-rananta@google.com>
+	<20231020214053.2144305-8-rananta@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,61 +60,124 @@ X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, alexandru.elisei@
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 20 Oct 2023 22:40:46 +0100,
+On Fri, 20 Oct 2023 22:40:47 +0100,
 Raghavendra Rao Ananta <rananta@google.com> wrote:
 > 
-> For unimplemented counters, the registers PM{C,I}NTEN{SET,CLR}
-> and PMOVS{SET,CLR} are expected to have the corresponding bits RAZ.
-> Hence to ensure correct KVM's PMU emulation, mask out the bits in
-> these registers for these unimplemented counters before the first
-> vCPU run.
+> From: Reiji Watanabe <reijiw@google.com>
 > 
+> KVM does not yet support userspace modifying PMCR_EL0.N (With
+> the previous patch, KVM ignores what is written by userspace).
+> Add support userspace limiting PMCR_EL0.N.
+> 
+> Disallow userspace to set PMCR_EL0.N to a value that is greater
+> than the host value as KVM doesn't support more event counters
+> than what the host HW implements. Also, make this register
+> immutable after the VM has started running. To maintain the
+> existing expectations, instead of returning an error, KVM
+> returns a success for these two cases.
+> 
+> Finally, ignore writes to read-only bits that are cleared on
+> vCPU reset, and RES{0,1} bits (including writable bits that
+> KVM doesn't support yet), as those bits shouldn't be modified
+> (at least with the current KVM).
+> 
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
 > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > ---
->  arch/arm64/kvm/arm.c      |  2 +-
->  arch/arm64/kvm/pmu-emul.c | 11 +++++++++++
->  include/kvm/arm_pmu.h     |  2 ++
->  3 files changed, 14 insertions(+), 1 deletion(-)
+>  arch/arm64/kvm/sys_regs.c | 57 +++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 55 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index e3074a9e23a8b..3c0bb80483fb1 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -857,7 +857,7 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
->  		}
->  
->  		if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
-> -			kvm_pmu_handle_pmcr(vcpu, kvm_vcpu_read_pmcr(vcpu));
-> +			kvm_vcpu_handle_request_reload_pmu(vcpu);
-
-Please rename this to kvm_vcpu_reload_pmu(). That's long enough. But
-see below.
-
->
->  		if (kvm_check_request(KVM_REQ_RESYNC_PMU_EL0, vcpu))
->  			kvm_vcpu_pmu_restore_guest(vcpu);
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 9e24581206c24..31e4933293b76 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -788,6 +788,17 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
->  	return val & mask;
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 2e5d497596ef8..a2c5f210b3d6b 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1176,6 +1176,59 @@ static int get_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+>  	return 0;
 >  }
 >  
-> +void kvm_vcpu_handle_request_reload_pmu(struct kvm_vcpu *vcpu)
+> +static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+> +		    u64 val)
 > +{
-> +	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
-> +
-> +	kvm_pmu_handle_pmcr(vcpu, kvm_vcpu_read_pmcr(vcpu));
-> +
-> +	__vcpu_sys_reg(vcpu, PMOVSSET_EL0) &= mask;
-> +	__vcpu_sys_reg(vcpu, PMINTENSET_EL1) &= mask;
-> +	__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) &= mask;
-> +}
+> +	struct kvm *kvm = vcpu->kvm;
+> +	u64 new_n, mutable_mask;
 
-Why is this done on a vcpu request? Why can't it be done upfront, when
-we're requesting the reload? Or when assigning the PMU? Or when
-setting PMCR_EL0?
+Really, this lacks consistency. Either you make N a u8 everywhere, or
+a u64 everywhere. I don't mind either, but the type confusion is not
+great.
+
+> +
+> +	mutex_lock(&kvm->arch.config_lock);
+> +
+> +	/*
+> +	 * Make PMCR immutable once the VM has started running, but
+> +	 * do not return an error to meet the existing expectations.
+> +	 */
+> +	if (kvm_vm_has_ran_once(vcpu->kvm)) {
+> +		mutex_unlock(&kvm->arch.config_lock);
+> +		return 0;
+> +	}
+> +
+> +	new_n = (val >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
+> +	if (new_n != kvm->arch.pmcr_n) {
+
+Why do we need to check this?
+
+> +		u8 pmcr_n_limit = kvm_arm_pmu_get_max_counters(kvm);
+
+Can you see why I'm annoyed?
+
+> +
+> +		/*
+> +		 * The vCPU can't have more counters than the PMU hardware
+> +		 * implements. Ignore this error to maintain compatibility
+> +		 * with the existing KVM behavior.
+> +		 */
+> +		if (new_n <= pmcr_n_limit)
+
+Isn't this the only thing that actually matters?
+
+> +			kvm->arch.pmcr_n = new_n;
+> +	}
+> +	mutex_unlock(&kvm->arch.config_lock);
+> +
+> +	/*
+> +	 * Ignore writes to RES0 bits, read only bits that are cleared on
+> +	 * vCPU reset, and writable bits that KVM doesn't support yet.
+> +	 * (i.e. only PMCR.N and bits [7:0] are mutable from userspace)
+> +	 * The LP bit is RES0 when FEAT_PMUv3p5 is not supported on the vCPU.
+> +	 * But, we leave the bit as it is here, as the vCPU's PMUver might
+> +	 * be changed later (NOTE: the bit will be cleared on first vCPU run
+> +	 * if necessary).
+> +	 */
+> +	mutable_mask = (ARMV8_PMU_PMCR_MASK |
+> +			(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT));
+
+Why is N part of the 'mutable' mask? The only bits that should make it
+into the register are ARMV8_PMU_PMCR_MASK.
+
+> +	val &= mutable_mask;
+> +	val |= (__vcpu_sys_reg(vcpu, r->reg) & ~mutable_mask);
+> +
+> +	/* The LC bit is RES1 when AArch32 is not supported */
+> +	if (!kvm_supports_32bit_el0())
+> +		val |= ARMV8_PMU_PMCR_LC;
+> +
+> +	__vcpu_sys_reg(vcpu, r->reg) = val;
+> +	return 0;
+
+I think this should be rewritten as:
+
+	val &= ARMV8_PMU_PMCR_MASK;
+	/* The LC bit is RES1 when AArch32 is not supported */
+	if (!kvm_supports_32bit_el0())
+		val |= ARMV8_PMU_PMCR_LC;
+
+	__vcpu_sys_reg(vcpu, r->reg) = val;
+	return 0;
+
+And that's it. Drop this 'mutable_mask' nonsense, as we should be
+getting the correct value (merge of the per-vcpu register and VM-wide
+N) since patch 4.
 
 	M.
 
