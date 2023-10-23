@@ -1,117 +1,93 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807301B26B
-	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 15:00:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 74AD42F4;
-	Mon, 23 Oct 2023 08:01:10 -0700 (PDT)
-Received: from [10.57.70.100] (unknown [10.57.70.100])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7B8243F64C;
-	Mon, 23 Oct 2023 08:00:27 -0700 (PDT)
-Message-ID: <b64a972a-b297-4e70-833d-8c832461a7f8@arm.com>
-Date: Mon, 23 Oct 2023 16:00:26 +0100
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DDEF1BDDE
+	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 15:24:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NtAWkSba"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698074684;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YrnXzVdFyG8cEywC86c0X/I901FAAiWZF1AhPDWq6c4=;
+	b=NtAWkSbad+KHtd/fIKf8rL7pJZYrfNBGemH063DgcImvxzsHwzSEiEXJZb/UvJe6SS4/sQ
+	BYSxmNInjpjevkHBdssfln1a18UEa5AaggDvTE+SM+NhIKrHiW9XWoz6Eg3Ri+2dm7MmIr
+	/lJ30S6Ohv8irZl7pCJEcTSUlm4/SCY=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-102-qcHB1mB7PW6ANTOQOEOMMg-1; Mon, 23 Oct 2023 11:24:42 -0400
+X-MC-Unique: qcHB1mB7PW6ANTOQOEOMMg-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7740829f2beso479470885a.2
+        for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 08:24:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698074682; x=1698679482;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YrnXzVdFyG8cEywC86c0X/I901FAAiWZF1AhPDWq6c4=;
+        b=u1A85Jg5Nzb+JVnN3uUC5CldC3q1hQLDtdUr02ii7oUdtO7w1RNGcDxJo8LAhUr7XS
+         kKMnMbvnUhM84ean7itLdxzI0WtOdC3gm1P7NWYm+9Hi3gv0XfTOuf92r46oraqaUvl+
+         1AUMm2Urwd0AE2ICEaWRxmdL55a+VzVdeggHKHjYRpwhEd7yIUv4Go3auKtznwkutog6
+         2zoh66Gq28nkq/g8alFAOjxA1a0z7/JPFYif1+HyMj3dvCUUJwEE8dH37QdsTbxiHx0y
+         C2scnXwU/rABFubyWu1ZI6TDj7CIwMsmssPRsoFQ2sBJYQITujY6wfOkJF4Q1UvspX5E
+         ZvcQ==
+X-Gm-Message-State: AOJu0YzCe06SygU2Dwqck6VLE/RLALhQZqF9svtZvxDFna0V9XyBgkJq
+	3pXSPMLx1vZhl65O+VscUwB2ImVoDk0H4KQroK4Ki4U121iI6tHLj8Mjo2/xW66Wt7OKRRsSu7x
+	ZYpFxPyWUjUDGbRgd
+X-Received: by 2002:a05:620a:2909:b0:779:db14:53bd with SMTP id m9-20020a05620a290900b00779db1453bdmr3606675qkp.32.1698074682214;
+        Mon, 23 Oct 2023 08:24:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE0oXNOI2bZ0Q7EOH0xkSQPuJV1uT5Nv9oLcwOjU3v7FEChoNMD+vNwx5JP/j0OgNyb9geOCQ==
+X-Received: by 2002:a05:620a:2909:b0:779:db14:53bd with SMTP id m9-20020a05620a290900b00779db1453bdmr3606648qkp.32.1698074682007;
+        Mon, 23 Oct 2023 08:24:42 -0700 (PDT)
+Received: from rh (p200300c93f0047001ec25c15da4a4a7b.dip0.t-ipconnect.de. [2003:c9:3f00:4700:1ec2:5c15:da4a:4a7b])
+        by smtp.gmail.com with ESMTPSA id w20-20020a05620a149400b0076cbcf8ad3bsm2757613qkj.55.2023.10.23.08.24.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Oct 2023 08:24:41 -0700 (PDT)
+Date: Mon, 23 Oct 2023 17:24:35 +0200 (CEST)
+From: Sebastian Ott <sebott@redhat.com>
+To: Raghavendra Rao Ananta <rananta@google.com>
+cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
+    Alexandru Elisei <alexandru.elisei@arm.com>, 
+    James Morse <james.morse@arm.com>, 
+    Suzuki K Poulose <suzuki.poulose@arm.com>, 
+    Paolo Bonzini <pbonzini@redhat.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+    Shaoqin Huang <shahuang@redhat.com>, Jing Zhang <jingzhangos@google.com>, 
+    Reiji Watanabe <reijiw@google.com>, Colton Lewis <coltonlewis@google.com>, 
+    linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+    linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+    Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v8 01/13] KVM: arm64: PMU: Introduce helpers to set the
+ guest's PMU
+In-Reply-To: <20231020214053.2144305-2-rananta@google.com>
+Message-ID: <ed5c4213-d4ee-2c51-fff4-a3906876ee5a@redhat.com>
+References: <20231020214053.2144305-1-rananta@google.com> <20231020214053.2144305-2-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 00/12] KVM: arm64: Support FEAT_LPA2 at hyp s1 and vm
- s2
-Content-Language: en-GB
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, James Morse
- <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Ard Biesheuvel <ardb@kernel.org>,
- Anshuman Khandual <anshuman.khandual@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-References: <20231009185008.3803879-1-ryan.roberts@arm.com>
- <867cnhmun2.wl-maz@kernel.org> <2a1c314b-1fa4-47ac-a977-fba1ce06d614@arm.com>
- <864jih65g3.wl-maz@kernel.org>
-From: Ryan Roberts <ryan.roberts@arm.com>
-In-Reply-To: <864jih65g3.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
-On 23/10/2023 10:42, Marc Zyngier wrote:
-> On Fri, 20 Oct 2023 16:22:29 +0100,
-> Ryan Roberts <ryan.roberts@arm.com> wrote:
->>
->> On 20/10/2023 11:54, Marc Zyngier wrote:
->>> Hi Ryan,
->>>
->>> On Mon, 09 Oct 2023 19:49:56 +0100,
->>> Ryan Roberts <ryan.roberts@arm.com> wrote:
->>>>
->>>> Hi All,
->>>>
->>>> This adds support for FEAT_LPA2 to KVM for both hypervisor stage 1 (for the
->>>> nvhe/protected modes) and the vm stage 2 translation tables (for all modes).
->>>> FEAT_LPA2 enables 52 bit PAs and VAs for 4KB and 16KB granules (note this is
->>>> already supported for 64KB granules via the FEAT_LPA and FEAT_LVA extensions).
->>>> The series does not include support for FEAT_LPA2 in the kernel stage 1. This
->>>> support is provided separately by Ard Biesheuvel's series at [4]. The two series
->>>> are mostly independent.
->>>>
->>>> This is a small update from v3, rebased onto v6.6-rc5 and incorporating some
->>>> minor changes based on review comments from Oliver.
->>>>
->>>> NOTE: I've included my patch to update the range-based tlbi functions to work
->>>> with LPA2 in this version, because KVM has started using range-based tlbi
->>>> invalidation as of v6.6-rc1. I've done this in such a way that KVM-originated
->>>> calls will use the LPA2 format if LPA2 is in use by KVM, but the
->>>> kernel-originated calls are hardcoded to never use the LPA2 format. If merging
->>>> with Ard's series, you will need to update the 2 calls to __flush_tlb_range_op()
->>>> from __flush_tlb_range() appropriately.
->>>>
->>>>
->>>> Testing
->>>> =======
->>>>
->>>> Testing has been done exclusively on the FVP and covers my boot matrix tests
->>>> and kvm selftests.
->>>>
->>>> The host/guest config boot matrix gives the same (expected) results as for the
->>>> v3 submission; of 180 conifgs, 12 fail, and these are all due to attempting to
->>>> load the host kernel into high memory which isn't expected to work until the
->>>> kernel has FEAT_LPA2 support for its stage 1. (refer to v1 posting for details
->>>> on the exact configs).
->>>>
->>>> KVM selftests have been enhanced to support P52V48 4K and 16K guest modes, and
->>>> all tests have been run against a P48V48_4K host and a P52V52_4K host (a run
->>>> takes about 10 hours on FVP, sigh, but I can test a few more host configs if
->>>> useful).
->>>
->>> Have you tried with the (brand new) "arm64_sw.hvhe=1" command-line
->>> option, which enables VHE for the EL2 hypervisor only? I expect things
->>> to work, but it would be good to make sure...
->>
->> No, I haven't tried. I did notice it when I rebased but convinced myself that it
->> doesn't affect the page table stuff. I'm happy to give it a spin once I've
->> rebased to v6.7-rc1 though.
-> 
-> It does affect the page-table format (KVM_PTE_LEAF_ATTR_LO_S1_AP_RO
-> and co), so I'm taking the view that whatever is not tested doesn't
-> work.
-> 
-> Thanks for giving it a go!
+On Fri, 20 Oct 2023, Raghavendra Rao Ananta wrote:
+> From: Reiji Watanabe <reijiw@google.com>
+>
+> Introduce new helper functions to set the guest's PMU
+> (kvm->arch.arm_pmu) either to a default probed instance or to a
+> caller requested one, and use it when the guest's PMU needs to
+> be set. These helpers will make it easier for the following
+> patches to modify the relevant code.
+>
+> No functional change intended.
+>
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-ACk to this and the other emails you sent today on this topic. Thanks for the
-fast responses - I'll come back to you on the TLBI benchmarks in a couple of
-weeks if they show anything that means we have to make a decision other than
-what we already discussed. Otherwise I'll be 4ish weeks when I post on top of
-v6.7-rc1.
-
-Thanks,
-Ryan
-
-
-> 
-> 	M.
-> 
+Reviewed-by: Sebastian Ott <sebott@redhat.com>
 
