@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EE2721340
-	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 18:07:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EFB51BDC6
+	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 18:19:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jXwRKzZw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B449AC433C7;
-	Mon, 23 Oct 2023 18:07:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SQlOiKX/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31B9CC433C9;
+	Mon, 23 Oct 2023 18:19:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698084436;
-	bh=jtuaBQVuX0vmQM7WsCi8Gb09fVhDqkHZSM6gB5rDtFo=;
+	s=k20201202; t=1698085184;
+	bh=oS4z+Mn7/hwPC7bpjt/NEir6aeKFv3WVk0pLVerqzFw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jXwRKzZwNj0FTw56MdTWNjLatEHZ0SDJgsD2oyj1/eliX3oztcakL7bkJfTh/Z/5h
-	 vclzVmNSg4qc8m1v/jxwSn/2d6bG0bzleBauMLAUMp6I+BMV9RSLpP7ih9JRZ2s2/i
-	 RSoGSmi0rEgHV3FC1hQIR5j6weIZQ9xLWDEYl0GWTFgWS9UcQCIezJN6V34ctaCZxh
-	 7rb5zdNJsPYztjj7uG54NurVMZpS3OVNHLHdThL1dOpxroDbKMHMM154JsME0uJE2I
-	 UHyzxTlwpaN+8tRrRU8bvcY8BFFk7SnTMcQ1XCxc8eDFkXCU8Mx9mQo5WU+gDyWji8
-	 XK0qir1ozJvgA==
+	b=SQlOiKX/tPZPymq+Xg2Z6Xpi9AS+MXP05zyw3Ng7z7apeSdOL+E/U8V+gToVXJxti
+	 j/QPFhH6ZQBPPqZIl25EZa2U2kAC/tXgHgbanJ5lFc5JDmjBQR5ZtyVMkgInHreYdh
+	 6YgKJbSzOWIsTJcJ7muXYx42fAYolMzOjwJsQ6gR7aTOdidcMRlbMcflr/16pJkfov
+	 IOQFMgTnKZF/BJtBziMQzskTpBowwToKN7gIbU+0uIeI27BthgK9ex3VPiWHa7WLuy
+	 qyoaidWIivH061C6n04JcJR87Z8HbLyNlJ2XD2pPa3I9YDrCRymN/rUHmrroP4g15A
+	 KbQKEFUgxoZwA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1quzKc-006wN9-16;
-	Mon, 23 Oct 2023 19:07:14 +0100
-Date: Mon, 23 Oct 2023 19:07:13 +0100
-Message-ID: <86ttqh43hq.wl-maz@kernel.org>
+	id 1quzWf-006wp4-Cd;
+	Mon, 23 Oct 2023 19:19:41 +0100
+Date: Mon, 23 Oct 2023 19:19:39 +0100
+Message-ID: <86sf6142x0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Raghavendra Rao Ananta <rananta@google.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
@@ -41,12 +41,11 @@ Cc: Oliver Upton <oliver.upton@linux.dev>,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
-Subject: Re: [PATCH v8 06/13] KVM: arm64: Sanitize PM{C,I}NTEN{SET,CLR}, PMOVS{SET,CLR} before first run
-In-Reply-To: <CAJHc60xijk_QpxK-eDzdY2g2OXXaQ3En=fBfBe45hAjuJMFNUw@mail.gmail.com>
+Subject: Re: [PATCH v8 00/13] KVM: arm64: PMU: Allow userspace to limit the number of PMCs on vCPU
+In-Reply-To: <CAJHc60yGk2Gfh-GRtOE94NS0K968iGTfn_3SSMYXxbgKaA_+Pg@mail.gmail.com>
 References: <20231020214053.2144305-1-rananta@google.com>
-	<20231020214053.2144305-7-rananta@google.com>
-	<86y1ft4ijm.wl-maz@kernel.org>
-	<CAJHc60xijk_QpxK-eDzdY2g2OXXaQ3En=fBfBe45hAjuJMFNUw@mail.gmail.com>
+	<86v8ax4hae.wl-maz@kernel.org>
+	<CAJHc60yGk2Gfh-GRtOE94NS0K968iGTfn_3SSMYXxbgKaA_+Pg@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,93 +62,65 @@ X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, alexandru.elisei@
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 23 Oct 2023 18:42:43 +0100,
+On Mon, 23 Oct 2023 18:58:19 +0100,
 Raghavendra Rao Ananta <rananta@google.com> wrote:
 >=20
-> On Mon, Oct 23, 2023 at 5:42=E2=80=AFAM Marc Zyngier <maz@kernel.org> wro=
+> On Mon, Oct 23, 2023 at 6:09=E2=80=AFAM Marc Zyngier <maz@kernel.org> wro=
 te:
 > >
-> > On Fri, 20 Oct 2023 22:40:46 +0100,
+> > On Fri, 20 Oct 2023 22:40:40 +0100,
 > > Raghavendra Rao Ananta <rananta@google.com> wrote:
 > > >
-> > > For unimplemented counters, the registers PM{C,I}NTEN{SET,CLR}
-> > > and PMOVS{SET,CLR} are expected to have the corresponding bits RAZ.
-> > > Hence to ensure correct KVM's PMU emulation, mask out the bits in
-> > > these registers for these unimplemented counters before the first
-> > > vCPU run.
+> > > Hello,
 > > >
-> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > > ---
-> > >  arch/arm64/kvm/arm.c      |  2 +-
-> > >  arch/arm64/kvm/pmu-emul.c | 11 +++++++++++
-> > >  include/kvm/arm_pmu.h     |  2 ++
-> > >  3 files changed, 14 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > index e3074a9e23a8b..3c0bb80483fb1 100644
-> > > --- a/arch/arm64/kvm/arm.c
-> > > +++ b/arch/arm64/kvm/arm.c
-> > > @@ -857,7 +857,7 @@ static int check_vcpu_requests(struct kvm_vcpu *v=
-cpu)
-> > >               }
-> > >
-> > >               if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
-> > > -                     kvm_pmu_handle_pmcr(vcpu, kvm_vcpu_read_pmcr(vc=
-pu));
-> > > +                     kvm_vcpu_handle_request_reload_pmu(vcpu);
+> > > The goal of this series is to allow userspace to limit the number
+> > > of PMU event counters on the vCPU.  We need this to support migration
+> > > across systems that implement different numbers of counters.
 > >
-> > Please rename this to kvm_vcpu_reload_pmu(). That's long enough. But
-> > see below.
+> > [...]
 > >
-> Sounds good.
->=20
-> > >
-> > >               if (kvm_check_request(KVM_REQ_RESYNC_PMU_EL0, vcpu))
-> > >                       kvm_vcpu_pmu_restore_guest(vcpu);
-> > > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > > index 9e24581206c24..31e4933293b76 100644
-> > > --- a/arch/arm64/kvm/pmu-emul.c
-> > > +++ b/arch/arm64/kvm/pmu-emul.c
-> > > @@ -788,6 +788,17 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bo=
-ol pmceid1)
-> > >       return val & mask;
-> > >  }
-> > >
-> > > +void kvm_vcpu_handle_request_reload_pmu(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +     u64 mask =3D kvm_pmu_valid_counter_mask(vcpu);
-> > > +
-> > > +     kvm_pmu_handle_pmcr(vcpu, kvm_vcpu_read_pmcr(vcpu));
-> > > +
-> > > +     __vcpu_sys_reg(vcpu, PMOVSSET_EL0) &=3D mask;
-> > > +     __vcpu_sys_reg(vcpu, PMINTENSET_EL1) &=3D mask;
-> > > +     __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) &=3D mask;
-> > > +}
+> > I've gone through the initial patches, and stopped before the tests
+> > (which I usually can't be bothered to review anyway).
 > >
-> > Why is this done on a vcpu request? Why can't it be done upfront, when
-> > we're requesting the reload? Or when assigning the PMU? Or when
-> > setting PMCR_EL0?
+> > The comments I have a relatively minor and could be applied as fixes
+> > on top if Oliver can be convinced to do so. Note that patch #4 has an
+> > attribution issue.
 > >
-> The idea was to do this only once, after userspace has configured the
-> PMCR.N (and has no option to change it), but before we run the guest
-> for the first time. So, I guess this can be done when we are
-> requesting the reload, if you prefer.
+> > > base-commit: 0a3a1665cbc59ee8d6326aa6c0b4a8d1cd67dda3
+> >
+> > maz@valley-girl:~/hot-poop/arm-platforms$ git describe 0a3a1665cbc59ee8=
+d6326aa6c0b4a8d1cd67dda3
+> > fatal: 0a3a1665cbc59ee8d6326aa6c0b4a8d1cd67dda3 is neither a commit nor=
+ blob
+> >
+> > Can you please make an effort to base your postings on a known, stable
+> > commit? A tagged -rc would be best. but certainly not a random commit.
+> >
+> I usually do base on a known -rc. But this series needed a couple of
+> series from kvmarm/next (mentioned in the original patch), and hence I
+> rebased on top of them.
 
-Well, I'm trying to limit the proliferation of these one-off "helpers"
-that make the code hard to follow. So it isn't "what I prefer", but
-what makes the code easier to understand without having to follow a
-maze of pointless abstraction.
+Well, that commit has since disappeared, as git cannot find it (as
+demonstrated above). Which is why I insist on a public tag as a base,
+as everything else is completely volatile.
 
-> When assigning the PMU, it could be too early to sanitize as the
-> userspace would not have configured the PMCR.N yet.
-> It can probably be done when userspace configures PMCR.N, but since
-> this field is per-guest, we may have to apply the setting for all the
-> vCPUs during the ioctl, which may get a little ugly.
+> How do you suggest I handle this in the future? Rebase to a known
+> -rc on mainline, apply the required series, and then my series on
+> top?
 
-Right. So it has to happen at the point where userspace cannot write
-to PMCR_EL0 anymore, for which any of the options I mentioned is too
-early. What you have is thus correct. But it would have helped if that
-rationale was captured in the commit message.
+No. You base your own series on an -rc (ideally, -rc3). If there is a
+conflict with another series, it is our job (Oliver and I) to fix it
+(bonus points if you indicate a resolution for the conflict in the
+cover letter).
+
+If there is a hard dependency (something that would actively prevent
+your series from working at all), you cherry-pick the minimal set of
+patches that makes your own series functional as a *prefix*, and post
+the whole thing, including the patches you depend on. Oliver and I
+will make sure the common prefix is dealt with without duplication.
+
+And for what it is worth, this series directly applies on v6.6-rc3
+without a conflict.
 
 	M.
 
