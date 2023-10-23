@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20465134B2
-	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 09:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92C613AC3
+	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 09:36:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PxTeNYTS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E20BC433C7;
-	Mon, 23 Oct 2023 09:35:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OoIaj4I/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7600DC433CB;
+	Mon, 23 Oct 2023 09:36:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698053705;
-	bh=OpjH4CLB0Ep8F60JOdq9CgTyteadUsPPUdB5cviLW94=;
+	s=k20201202; t=1698053795;
+	bh=ZSUewbvKop79mqdPaUFTNzU9LflnLNCqSMJdNuxAnAc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PxTeNYTS6/8B0uYP1YmOkhBqzzMRgjbiE77w5DQRCsFhGAVLLNYNUzPjcM8hoQ8GC
-	 9CNxYVIh+8gkVWS36F9dLWldGxoUV5K8GdiQMT9OSFm6bd2qK7bj8sjiYwZyduUWih
-	 avJU3026iHvaQTYwIXF5albqFnLOLn76YYEuJqZQN9nWYLg05vkkg2NHQtJ58QLAtn
-	 v/eU62yB2zG7+UoWB+J0Pk5xfYlOB9WDlSUtB7Dg2yFRk+FVr75F5vaXG1qe72V9wR
-	 X27P54T5XSvGiem4TLPigO4b6GE4yZv5DLfO3LtjFjT5nrkf7CY88KumPFulAx6E70
-	 eFJRnlio58D3w==
+	b=OoIaj4I/kXvOZHyqbZnIBsbnrOilgLIaQYAaAoixeIg5ipmgPyjAid1C9+2FdLFGz
+	 W4HQP9habfbsZcXYlePziXzdw0wlMCStu6OE88ZzydM7IvKBnwkQFlt1kA6Uj4m5SK
+	 WZQKBIVh65Ye6jfP6BO5gCSCCNNCG05CNrUJwZci6iYhkDzCkVqKWLFNJyDJUUHpJL
+	 3tIt28UQ0ahYAjMYTUYctjgL0ertzhS5JUx8QfYmVU1zn6f91qjTKHfNI9kep/Viqr
+	 JyTKQeLpgIK1+d84m6zhiQkPy2LwzwoPXrZs0RANoTHxRsOwQ+lfPB7DHC9w75J4zB
+	 ZEkecQ4MhcviQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qurKx-006myf-5D;
-	Mon, 23 Oct 2023 10:35:03 +0100
-Date: Mon, 23 Oct 2023 10:34:58 +0100
-Message-ID: <867cnd65rx.wl-maz@kernel.org>
+	id 1qurMP-006n2q-1v;
+	Mon, 23 Oct 2023 10:36:33 +0100
+Date: Mon, 23 Oct 2023 10:36:32 +0100
+Message-ID: <865y2x65pb.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Ryan Roberts <ryan.roberts@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -38,12 +38,12 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 04/12] KVM: arm64: Add ARM64_HAS_LPA2 CPU capability
-In-Reply-To: <e2dd92a1-a8bb-4421-a814-2d663acc7f11@arm.com>
+Subject: Re: [PATCH v4 06/12] KVM: arm64: Use LPA2 page-tables for stage2 and hyp stage1
+In-Reply-To: <9d4ac532-1642-411b-a826-ab90f0046a6c@arm.com>
 References: <20231009185008.3803879-1-ryan.roberts@arm.com>
-	<20231009185008.3803879-5-ryan.roberts@arm.com>
-	<86cyx9n1yp.wl-maz@kernel.org>
-	<e2dd92a1-a8bb-4421-a814-2d663acc7f11@arm.com>
+	<20231009185008.3803879-7-ryan.roberts@arm.com>
+	<86bkctmz6t.wl-maz@kernel.org>
+	<9d4ac532-1642-411b-a826-ab90f0046a6c@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,53 +59,33 @@ X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, catalin.marinas@arm.com, will@kernel.or
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 20 Oct 2023 16:03:37 +0100,
+On Fri, 20 Oct 2023 16:06:50 +0100,
 Ryan Roberts <ryan.roberts@arm.com> wrote:
 > 
-> On 20/10/2023 09:16, Marc Zyngier wrote:
-> > On Mon, 09 Oct 2023 19:50:00 +0100,
+> On 20/10/2023 10:16, Marc Zyngier wrote:
+> > On Mon, 09 Oct 2023 19:50:02 +0100,
 > > Ryan Roberts <ryan.roberts@arm.com> wrote:
 > >>
-> >> +static bool has_lpa2(const struct arm64_cpu_capabilities *entry, int scope)
-> >> +{
-> >> +	u64 mmfr0;
-> >> +	bool ret;
-> >> +
-> >> +	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
-> >> +	ret = has_lpa2_at_stage1(mmfr0);
-> >> +
-> >> +	if (kvm_get_mode() != KVM_MODE_NONE)
-> >> +		ret = ret && has_lpa2_at_stage2(mmfr0);
+> >> diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> >> index d42b72f78a9b..c3cd16c6f95f 100644
+> >> --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
+> >> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> >> @@ -198,7 +198,8 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+> >>  	/* Switch to requested VMID */
+> >>  	__tlb_switch_to_guest(mmu, &cxt, false);
+> >>  
+> >> -	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride, 0, false);
+> >> +	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride, 0,
+> >> +				system_supports_lpa2());
 > > 
-> > Isn't it too late to go back on the decision to use LPA2 at S1 if you
-> > realise that S2 doesn't support it?
+> > At this stage, I'd fully expect the flag to have been subsumed into
+> > the helper...
 > 
-> The KVM mode dependent part was a change that Oliver asked for. I guess you are
-> talking about kernel S1? I don't think it's too late here to decide whether the
-> (nvhe) hyp s1 should use LPA2. But I guess your point is that kernel s1 would
-> have had to decide much earlier in boot and will have had to take LPA2 support
-> in both S1 and S2 into account, and would not have the KVM mode info available
-> to it at that point?
+> ACK. I'm planning to have has_lpa2() always return false for now. Then once
+> Ard's changes are in, we can change it to report the system status. Then we can
+> move this inside __flush_s2_tlb_range_op(). Does that work for you?
 
-That's roughly my point. When we reach this point on a VHE system,
-we're pretty far along and I'm not sure we can turn back. In all
-honesty, if a system doesn't support LPA2 at S2, it is in a pretty bad
-shape and we shouldn't bother supporting it. Or at least not with KVM.
-
-Just because the architecture allows braindead configurations doesn't
-mean we have to go out of our way to support them. In this case, I'd
-be absolutely fine with disabling KVM altogether.
-
-> > Why isn't this patch the first or second in the series? You could use
-> > it to drive the LPA2 decision in the patch #2, avoiding the ugly lpa2
-> > flag...
-> 
-> I still only think this works if we put my patch and Ard's patch in atomically?
-> Or at least force has_lpa2() to always return false until both are in, then flip
-> the switch atomically.
-
-Whichever works for you. My only ask is to try to minimise the churn
-here.
+Sure, go for it and see what it looks like.
 
 Thanks,
 
