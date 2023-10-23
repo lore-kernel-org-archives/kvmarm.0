@@ -1,251 +1,288 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4EB1640A
-	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 11:55:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30D2318E12
+	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 12:31:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YgxtEHbD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698062127;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=o/9FLnbNSf/pR1bSdYODMnRrmn+49lv+yZ1gIhHzF7k=;
-	b=YgxtEHbDFNzWXlbaJvPfLwrvmm1wM/MhHrGS9sqmTPM5GvnzZaoHd5JEcT+Y6Odw3Ip9Zb
-	Xkfwr+fYdgrBjqTgBQvmJyZn3O3nVlfoK7+khfnTtmXuywMIllMsihasKpKrsmiJzDxiht
-	tYljqSa8495KRBzqOD8frphwbP0dJto=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-599-5RS0r3ZLPnWvOzRHU90_WQ-1; Mon, 23 Oct 2023 07:55:16 -0400
-X-MC-Unique: 5RS0r3ZLPnWvOzRHU90_WQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40854a8e7acso12191745e9.1
-        for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 04:55:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698062115; x=1698666915;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o/9FLnbNSf/pR1bSdYODMnRrmn+49lv+yZ1gIhHzF7k=;
-        b=rWTC/eIymRs44m3wyItlUGVGyC8KCCmCX+5vdJ5A6P662KkdkLP1fy2bfC2Caa/3py
-         JdPlSsLV3Xez4o42z6VORsVnALAzIzoSBENFqNdwapMkZQT/wJeP77TvMsT6GP0KQWY0
-         mDH4O0lWckmyYM/qam6VN26MsIHc9zVkTY7wip1tpJrYzIkynPxpkPdHzZ1LVaikd6qR
-         WRfC4NoX+xX1dQRKS2oM08Z/2IxOw4egIc/ymlg8QICUajDPAqUfsh0j7QBDW3oQfoNO
-         Yls0P72v/3h6lTYXIoAfCKKUY/gKPXqAWczMjXgr+/Z+UslV0Yl6Jpknfy5TGc8UhYNC
-         GJDg==
-X-Gm-Message-State: AOJu0Yz+qH71skhlW/7/1cAuvLexbanmC1POxUJ8NC6tzUq+OnKQB8ZD
-	y0fvE1hvquINrLRLBUXC0Jc4RSBbTDr3WWDGimQJ78Ep/XplYwP9k5VBu5BwlGe7EHpmYGAbSP1
-	yQJv/LYOAzx1XSYw7
-X-Received: by 2002:a05:600c:2b10:b0:407:73fc:6818 with SMTP id y16-20020a05600c2b1000b0040773fc6818mr11867966wme.2.1698062114866;
-        Mon, 23 Oct 2023 04:55:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGlr9qIwPl6k6OX+uZdhA5xuIhpGw+iftZpfgyQvE2XhPBIipN6WbijSbqNG+SHoesh1bMHHQ==
-X-Received: by 2002:a05:600c:2b10:b0:407:73fc:6818 with SMTP id y16-20020a05600c2b1000b0040773fc6818mr11867936wme.2.1698062114449;
-        Mon, 23 Oct 2023 04:55:14 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c738:1900:b6ea:5b9:62c0:34e? (p200300cbc7381900b6ea05b962c0034e.dip0.t-ipconnect.de. [2003:cb:c738:1900:b6ea:5b9:62c0:34e])
-        by smtp.gmail.com with ESMTPSA id z6-20020a05600c220600b0040684abb623sm13855577wml.24.2023.10.23.04.55.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Oct 2023 04:55:13 -0700 (PDT)
-Message-ID: <25fad62e-b1d9-4d63-9d95-08c010756231@redhat.com>
-Date: Mon, 23 Oct 2023 13:55:12 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sV+BPrw7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80F5CC433C7;
+	Mon, 23 Oct 2023 12:31:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698064280;
+	bh=vqvwI154cshBBrMmUKheC5NCWQ1/ynR+UUV9qp6rkWs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sV+BPrw7l9ZhjUGycj3+FYdcbY68ckuSY7HLf1EVSUhRtd99ldUqoBawO4+QzZJgm
+	 QhRrVUpePvLrb69JIVagjnGuMgJ+PEMVeoYH8Hfiux/b+qR2/yOmMAcDfrawH40+kz
+	 fuj5FzsfODCV+CFLn9IdrFaDcA9lwFQUPO+h74EuaSv/q+am1Bz48hOwrx69HMCveb
+	 OARvfJhlnfqvSqVMlFoGgEqlAkXi20V3wKiYV1BkFQ4ryiv5dRelvcjQmFiEY02q2I
+	 6yazLzhr4EgoV83KazEcHAOJX+CjnJWz2K3HK97W/zlwJ8M/ZTVErMey7aWCQd/64z
+	 lDLb9ppYc0Q5Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1quu5W-006q35-25;
+	Mon, 23 Oct 2023 13:31:18 +0100
+Date: Mon, 23 Oct 2023 13:31:15 +0100
+Message-ID: <86zg094j1o.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Reiji Watanabe <reijiw@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v8 05/13] KVM: arm64: Add {get,set}_user for PM{C,I}NTEN{SET,CLR}, PMOVS{SET,CLR}
+In-Reply-To: <20231020214053.2144305-6-rananta@google.com>
+References: <20231020214053.2144305-1-rananta@google.com>
+	<20231020214053.2144305-6-rananta@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 06/37] mm: page_alloc: Allocate from movable pcp lists
- only if ALLOC_FROM_METADATA
-To: Catalin Marinas <catalin.marinas@arm.com>,
- Hyesoo Yu <hyesoo.yu@samsung.com>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>, will@kernel.org,
- oliver.upton@linux.dev, maz@kernel.org, james.morse@arm.com,
- suzuki.poulose@arm.com, yuzenghui@huawei.com, arnd@arndb.de,
- akpm@linux-foundation.org, mingo@redhat.com, peterz@infradead.org,
- juri.lelli@redhat.com, vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
- rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
- bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
- rppt@kernel.org, hughd@google.com, pcc@google.com, steven.price@arm.com,
- anshuman.khandual@arm.com, vincenzo.frascino@arm.com, eugenis@google.com,
- kcc@google.com, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org, linux-mm@kvack.org
-References: <20230823131350.114942-1-alexandru.elisei@arm.com>
- <20230823131350.114942-7-alexandru.elisei@arm.com>
- <CGME20231012013524epcas2p4b50f306e3e4d0b937b31f978022844e5@epcas2p4.samsung.com>
- <20231010074823.GA2536665@tiffany> <ZS0va9nICZo8bF03@monolith>
- <ZS5hXFHs08zQOboi@arm.com> <20231023071656.GA344850@tiffany>
- <ZTZP66CA1r35yTmp@arm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <ZTZP66CA1r35yTmp@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, alexandru.elisei@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, yuzenghui@huawei.com, shahuang@redhat.com, jingzhangos@google.com, reijiw@google.com, coltonlewis@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 23.10.23 12:50, Catalin Marinas wrote:
-> On Mon, Oct 23, 2023 at 04:16:56PM +0900, Hyesoo Yu wrote:
->> On Tue, Oct 17, 2023 at 11:26:36AM +0100, Catalin Marinas wrote:
->>> BTW, I suggest for the next iteration we drop MIGRATE_METADATA, only use
->>> CMA and assume that the tag storage itself supports tagging. Hopefully
->>> it makes the patches a bit simpler.
->>
->> I am curious about the plan for the next iteration.
+On Fri, 20 Oct 2023 22:40:45 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
 > 
-> Alex is working on it.
+> For unimplemented counters, the bits in PM{C,I}NTEN{SET,CLR} and
+> PMOVS{SET,CLR} registers are expected to RAZ. To honor this,
+> explicitly implement the {get,set}_user functions for these
+> registers to mask out unimplemented counters for userspace reads
+> and writes.
 > 
->> Does tag storage itself supports tagging? Will the following version be unusable
->> if the hardware does not support it? The document of google said that
->> "If this memory is itself mapped as Tagged Normal (which should not happen!)
->> then tag updates on it either raise a fault or do nothing, but never change the
->> contents of any other page."
->> (https://github.com/google/sanitizers/blob/master/mte-dynamic-carveout/spec.md)
->>
->> The support of H/W is very welcome because it is good to make the patches simpler.
->> But if H/W doesn't support it, Can't the new solution be used?
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 91 ++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 85 insertions(+), 6 deletions(-)
 > 
-> AFAIK on the current interconnects this is supported but the offsets
-> will need to be configured by firmware in such a way that a tag access
-> to the tag carve-out range still points to physical RAM, otherwise, as
-> per Google's doc, you can get some unexpected behaviour.
-> 
-> Let's take a simplified example, we have:
-> 
->    phys_addr - physical address, linearised, starting from 0
->    ram_size - the size of RAM (also corresponds to the end of PA+1)
-> 
-> A typical configuration is to designate the top 1/32 of RAM for tags:
-> 
->    tag_offset = ram_size - ram_size / 32
->    tag_carveout_start = tag_offset
-> 
-> The tag address for a given phys_addr is calculated as:
-> 
->    tag_addr = phys_addr / 32 + tag_offset
-> 
-> To keep things simple, we reserve the top 1/(32*32) of the RAM as tag
-> storage for the main/reusable tag carveout.
-> 
->    tag_carveout2_start = tag_carveout_start / 32 + tag_offset
-> 
-> This gives us the end of the first reusable carveout:
-> 
->    tag_carveout_end = tag_carveout2_start - 1
-> 
-> and this way in Linux we can have (inclusive ranges):
-> 
->    0..(tag_carveout_start-1): normal memory, data only
->    tag_carveout_start..tag_carveout_end: CMA, reused as tags or data
->    tag_carveout2_start..(ram_size-1): reserved for tags (not touched by the OS)
-> 
-> For this to work, we need the last page in the first carveout to have
-> a tag storage within RAM. And, of course, all of the above need to be at
-> least 4K aligned.
-> 
-> The simple configuration of 1/(32*32) of RAM for the second carveout is
-> sufficient but not fully utilised. We could be a bit more efficient to
-> gain a few more pages. Apart from the page alignment requirements, the
-> only strict requirement we need is:
-> 
->    tag_carverout2_end < ram_size
-> 
-> where tag_carveout2_end is the tag storage corresponding to the end of
-> the main/reusable carveout, just before tag_carveout2_start:
-> 
->    tag_carveout2_end = tag_carveout_end / 32 + tag_offset
-> 
-> Assuming that my on-paper substitutions are correct, the inequality
-> above becomes:
-> 
->    tag_offset < (1024 * ram_size + 32) / 1057
-> 
-> and tag_offset is a multiple of PAGE_SIZE * 32 (so that the
-> tag_carveout2_start is a multiple of PAGE_SIZE).
-> 
-> As a concrete example, for 16GB of RAM starting from 0:
-> 
->    tag_offset = 0x3e0060000
->    tag_carverout2_start = 0x3ff063000
-> 
-> Without the optimal placement, the default tag_offset of top 1/32 of RAM
-> would have been:
-> 
->    tag_offset = 0x3e0000000
->    tag_carveou2_start = 0x3ff000000
-> 
-> so an extra 396KB gained with optimal placement (out of 16G, not sure
-> it's worth).
-> 
-> One can put the calculations in some python script to get the optimal
-> tag offset in case I got something wrong on paper.
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index faf97878dfbbb..2e5d497596ef8 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -987,6 +987,45 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	return true;
+>  }
+>  
+> +static void set_pmreg_for_valid_counters(struct kvm_vcpu *vcpu,
+> +					  u64 reg, u64 val, bool set)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +
+> +	mutex_lock(&kvm->arch.config_lock);
+> +
+> +	/* Make the register immutable once the VM has started running */
+> +	if (kvm_vm_has_ran_once(kvm)) {
+> +		mutex_unlock(&kvm->arch.config_lock);
+> +		return;
+> +	}
+> +
+> +	val &= kvm_pmu_valid_counter_mask(vcpu);
+> +	mutex_unlock(&kvm->arch.config_lock);
+> +
+> +	if (set)
+> +		__vcpu_sys_reg(vcpu, reg) |= val;
+> +	else
+> +		__vcpu_sys_reg(vcpu, reg) &= ~val;
+> +}
+> +
+> +static int get_pmcnten(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+> +			u64 *val)
+> +{
+> +	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
+> +
+> +	*val = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
+> +	return 0;
+> +}
+> +
+> +static int set_pmcnten(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+> +			u64 val)
+> +{
+> +	/* r->Op2 & 0x1: true for PMCNTENSET_EL0, else PMCNTENCLR_EL0 */
+> +	set_pmreg_for_valid_counters(vcpu, PMCNTENSET_EL0, val, r->Op2 & 0x1);
+> +	return 0;
+> +}
 
-I followed what you are saying, but I didn't quite read the following 
-clearly stated in your calculations: Using this model, how much memory 
-would you be able to reuse, and how much not?
+Huh, this is really ugly. Why the explosion of pointless helpers when
+the whole design of the sysreg infrastructure to have *common* helpers
+for registers that behave the same way?
 
-I suspect you would *not* be able to reuse "1/(32*32)" [second 
-carve-out] but be able to reuse "1/32 - 1/(32*32)" [first carve-out] or 
-am I completely off?
+I'd expect something like the hack below instead.
 
-Further, (just thinking about it) I assume you've taken care of the 
-condition that memory cannot self-host it's own tag memory. So that 
-cannot happen in the model proposed here, right?
+	M.
 
-Anyhow, happy to see that we might be able to make it work just by 
-mostly reusing existing CMA.
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index a2c5f210b3d6..8f560a2496f2 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -987,42 +987,46 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return true;
+ }
+ 
+-static void set_pmreg_for_valid_counters(struct kvm_vcpu *vcpu,
+-					  u64 reg, u64 val, bool set)
++static int set_pmreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r, u64 val)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
++	bool set;
+ 
+ 	mutex_lock(&kvm->arch.config_lock);
+ 
+ 	/* Make the register immutable once the VM has started running */
+ 	if (kvm_vm_has_ran_once(kvm)) {
+ 		mutex_unlock(&kvm->arch.config_lock);
+-		return;
++		return 0;
+ 	}
+ 
+ 	val &= kvm_pmu_valid_counter_mask(vcpu);
+ 	mutex_unlock(&kvm->arch.config_lock);
+ 
++	switch(r->reg) {
++	case PMOVSSET_EL0:
++		/* CRm[1] being set indicates a SET register, and CLR otherwise */
++	        set = r->CRm & 2;
++		break;
++	default:
++		/* Op2[0] being set indicates a SET register, and CLR otherwise */
++	        set = r->Op2 & 1;
++		break;
++	}
++
+ 	if (set)
+-		__vcpu_sys_reg(vcpu, reg) |= val;
++		__vcpu_sys_reg(vcpu, r->reg) |= val;
+ 	else
+-		__vcpu_sys_reg(vcpu, reg) &= ~val;
+-}
+-
+-static int get_pmcnten(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+-			u64 *val)
+-{
+-	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
++		__vcpu_sys_reg(vcpu, r->reg) &= ~val;
+ 
+-	*val = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
+ 	return 0;
+ }
+ 
+-static int set_pmcnten(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+-			u64 val)
++static int get_pmreg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r, u64 *val)
+ {
+-	/* r->Op2 & 0x1: true for PMCNTENSET_EL0, else PMCNTENCLR_EL0 */
+-	set_pmreg_for_valid_counters(vcpu, PMCNTENSET_EL0, val, r->Op2 & 0x1);
++	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
++
++	*val = __vcpu_sys_reg(vcpu, r->reg) & mask;
+ 	return 0;
+ }
+ 
+@@ -1054,23 +1058,6 @@ static bool access_pmcnten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return true;
+ }
+ 
+-static int get_pminten(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+-			u64 *val)
+-{
+-	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
+-
+-	*val = __vcpu_sys_reg(vcpu, PMINTENSET_EL1) & mask;
+-	return 0;
+-}
+-
+-static int set_pminten(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+-			u64 val)
+-{
+-	/* r->Op2 & 0x1: true for PMINTENSET_EL1, else PMINTENCLR_EL1 */
+-	set_pmreg_for_valid_counters(vcpu, PMINTENSET_EL1, val, r->Op2 & 0x1);
+-	return 0;
+-}
+-
+ static bool access_pminten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 			   const struct sys_reg_desc *r)
+ {
+@@ -1095,23 +1082,6 @@ static bool access_pminten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return true;
+ }
+ 
+-static int set_pmovs(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+-		      u64 val)
+-{
+-	/* r->CRm & 0x2: true for PMOVSSET_EL0, else PMOVSCLR_EL0 */
+-	set_pmreg_for_valid_counters(vcpu, PMOVSSET_EL0, val, r->CRm & 0x2);
+-	return 0;
+-}
+-
+-static int get_pmovs(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+-		      u64 *val)
+-{
+-	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
+-
+-	*val = __vcpu_sys_reg(vcpu, PMOVSSET_EL0) & mask;
+-	return 0;
+-}
+-
+ static bool access_pmovs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 			 const struct sys_reg_desc *r)
+ {
+@@ -2311,10 +2281,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 
+ 	{ PMU_SYS_REG(PMINTENSET_EL1),
+ 	  .access = access_pminten, .reg = PMINTENSET_EL1,
+-	  .get_user = get_pminten, .set_user = set_pminten },
++	  .get_user = get_pmreg, .set_user = set_pmreg },
+ 	{ PMU_SYS_REG(PMINTENCLR_EL1),
+ 	  .access = access_pminten, .reg = PMINTENSET_EL1,
+-	  .get_user = get_pminten, .set_user = set_pminten },
++	  .get_user = get_pmreg, .set_user = set_pmreg },
+ 	{ SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
+ 
+ 	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
+@@ -2366,13 +2336,13 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  .reg = PMCR_EL0, .get_user = get_pmcr, .set_user = set_pmcr },
+ 	{ PMU_SYS_REG(PMCNTENSET_EL0),
+ 	  .access = access_pmcnten, .reg = PMCNTENSET_EL0,
+-	  .get_user = get_pmcnten, .set_user = set_pmcnten },
++	  .get_user = get_pmreg, .set_user = set_pmreg },
+ 	{ PMU_SYS_REG(PMCNTENCLR_EL0),
+ 	  .access = access_pmcnten, .reg = PMCNTENSET_EL0,
+-	  .get_user = get_pmcnten, .set_user = set_pmcnten },
++	  .get_user = get_pmreg, .set_user = set_pmreg },
+ 	{ PMU_SYS_REG(PMOVSCLR_EL0),
+ 	  .access = access_pmovs, .reg = PMOVSSET_EL0,
+-	  .get_user = get_pmovs, .set_user = set_pmovs },
++	  .get_user = get_pmreg, .set_user = set_pmreg },
+ 	/*
+ 	 * PM_SWINC_EL0 is exposed to userspace as RAZ/WI, as it was
+ 	 * previously (and pointlessly) advertised in the past...
+@@ -2401,7 +2371,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  .reset = reset_val, .reg = PMUSERENR_EL0, .val = 0 },
+ 	{ PMU_SYS_REG(PMOVSSET_EL0),
+ 	  .access = access_pmovs, .reg = PMOVSSET_EL0,
+-	  .get_user = get_pmovs, .set_user = set_pmovs },
++	  .get_user = get_pmreg, .set_user = set_pmreg },
+ 
+ 	{ SYS_DESC(SYS_TPIDR_EL0), NULL, reset_unknown, TPIDR_EL0 },
+ 	{ SYS_DESC(SYS_TPIDRRO_EL0), NULL, reset_unknown, TPIDRRO_EL0 },
 
 -- 
-Cheers,
-
-David / dhildenb
-
+Without deviation from the norm, progress is not possible.
