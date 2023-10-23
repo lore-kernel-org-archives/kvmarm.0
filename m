@@ -1,240 +1,176 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E57C18AE7
-	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 13:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from kwepemm000018.china.huawei.com (unknown [172.30.72.54])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SDbLx3RYYzVlNJ;
-	Mon, 23 Oct 2023 21:16:57 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- kwepemm000018.china.huawei.com (7.193.23.4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Mon, 23 Oct 2023 21:20:44 +0800
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.031;
- Mon, 23 Oct 2023 14:20:42 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: "ankita@nvidia.com" <ankita@nvidia.com>, "jgg@nvidia.com"
-	<jgg@nvidia.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>
-CC: "aniketa@nvidia.com" <aniketa@nvidia.com>, "cjia@nvidia.com"
-	<cjia@nvidia.com>, "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-	"targupta@nvidia.com" <targupta@nvidia.com>, "vsethi@nvidia.com"
-	<vsethi@nvidia.com>, "acurrid@nvidia.com" <acurrid@nvidia.com>,
-	"apopple@nvidia.com" <apopple@nvidia.com>, "jhubbard@nvidia.com"
-	<jhubbard@nvidia.com>, "danw@nvidia.com" <danw@nvidia.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "tiantao (H)" <tiantao6@hisilicon.com>,
-	"linyufeng (A)" <linyufeng3@huawei.com>
-Subject: RE: [PATCH v1 1/2] KVM: arm64: determine memory type from VMA
-Thread-Topic: [PATCH v1 1/2] KVM: arm64: determine memory type from VMA
-Thread-Index: AQHZ4bdLehyCbll0tE+E3EeoI9km/7BXohtA
-Date: Mon, 23 Oct 2023 13:20:42 +0000
-Message-ID: <af13ed63dc9a4f26a6c958ebfa77d78a@huawei.com>
-References: <20230907181459.18145-1-ankita@nvidia.com>
- <20230907181459.18145-2-ankita@nvidia.com>
-In-Reply-To: <20230907181459.18145-2-ankita@nvidia.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [10.48.151.228]
-Content-Type: text/plain; charset="us-ascii"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E43D1A26B
+	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 13:54:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VzmHAbxa"
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39NDmPXA015890;
+	Mon, 23 Oct 2023 13:54:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=cJbwg2By3UMhLJDVKdBqmyJ5FfX444IdMU802RfnSA4=;
+ b=VzmHAbxaejgr7gyIFmCorNgJntdcOZ+uuFUOfN9MU+w9T8VQTUaX7pi+fnqWuE26Kvql
+ EEA885UKrdU3Y/fs5I5Rnn7zRC0aoaQWAXVHTbOPZJ/P2+pA+LjdhHGgyF0YxCESGpAt
+ RVBtnxctDV5QB99Lf4ccG6CYsTF+Cz/CDEH7fH47JxndtUp8gqz8R1ufWEp4imrySkvd
+ jz/JYeH311cXYczJTFMJEocRnykrHz3t7G7uSScvJBqb60iyFHBZLcTg4WgPQEd/I07M
+ hRArv4wsZ/NXwrMmFV0P6LqcyS7Vmverq/k92BBFCoHR4ZFQSA3ZiANAgkYjRzjORd0g +w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3twsfm9kbg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Oct 2023 13:54:05 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39NDmQ6c016082;
+	Mon, 23 Oct 2023 13:54:04 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3twsfm9kaq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Oct 2023 13:54:04 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39NCWngn010250;
+	Mon, 23 Oct 2023 13:54:03 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tvsby95q6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Oct 2023 13:54:03 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39NDs1xJ12714750
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 23 Oct 2023 13:54:01 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 583192004D;
+	Mon, 23 Oct 2023 13:54:01 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2FBC120043;
+	Mon, 23 Oct 2023 13:54:00 +0000 (GMT)
+Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.171.11.96])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 23 Oct 2023 13:54:00 +0000 (GMT)
+Message-ID: <d625c6b75a7ec5508470517b6744afbb95e22657.camel@linux.ibm.com>
+Subject: Re: [PATCH v3 3/5] KVM: selftests: Generate sysreg-defs.h and add
+ to include path
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To: Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        linux-perf-users@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Jing
+ Zhang <jingzhangos@google.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K
+ Poulose <suzuki.poulose@arm.com>,
+        James Morse <james.morse@arm.com>, Marc
+ Zyngier <maz@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Adrian
+ Hunter <adrian.hunter@intel.com>,
+        Ian Rogers <irogers@google.com>, Namhyung
+ Kim <namhyung@kernel.org>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Alexander Shishkin
+ <alexander.shishkin@linux.intel.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>
+Date: Mon, 23 Oct 2023 15:53:59 +0200
+In-Reply-To: <20231011195740.3349631-4-oliver.upton@linux.dev>
+References: <20231011195740.3349631-1-oliver.upton@linux.dev>
+	 <20231011195740.3349631-4-oliver.upton@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: NQWui_XPNTrQ_ku4TOM8zKHuT3yfYgfR
+X-Proofpoint-GUID: lkYEi09Gk5C1VfTU80ylIwFXaEls-a29
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-23_12,2023-10-19_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 mlxlogscore=999 bulkscore=0 spamscore=0 phishscore=0
+ adultscore=0 clxscore=1011 suspectscore=0 lowpriorityscore=0
+ priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2310170001 definitions=main-2310230121
 
-Hi,
-
-> -----Original Message-----
-> From: ankita@nvidia.com [mailto:ankita@nvidia.com]
-> Sent: 07 September 2023 19:15
-> To: ankita@nvidia.com; jgg@nvidia.com; maz@kernel.org;
-> oliver.upton@linux.dev; catalin.marinas@arm.com; will@kernel.org
-> Cc: aniketa@nvidia.com; cjia@nvidia.com; kwankhede@nvidia.com;
-> targupta@nvidia.com; vsethi@nvidia.com; acurrid@nvidia.com;
-> apopple@nvidia.com; jhubbard@nvidia.com; danw@nvidia.com;
-> linux-arm-kernel@lists.infradead.org; kvmarm@lists.linux.dev;
-> linux-kernel@vger.kernel.org
-> Subject: [PATCH v1 1/2] KVM: arm64: determine memory type from VMA
+On Wed, 2023-10-11 at 19:57 +0000, Oliver Upton wrote:
+> Start generating sysreg-defs.h for arm64 builds in anticipation of
+> updating sysreg.h to a version that depends on it.
 >=20
-> From: Ankit Agrawal <ankita@nvidia.com>
->=20
-> Currently KVM determines if a VMA is pointing at IO memory by checking
-> pfn_is_map_memory(). However, the MM already gives us a way to tell what
-> kind of memory it is by inspecting the VMA.
->=20
-> Replace pfn_is_map_memory() with a check on the VMA pgprot to
-> determine if
-> the memory is IO and thus needs stage-2 device mapping.
->=20
-> The VMA's pgprot is tested to determine the memory type with the
-> following mapping:
->=20
->  pgprot_noncached    MT_DEVICE_nGnRnE   device
->  pgprot_writecombine MT_NORMAL_NC       device
->  pgprot_device       MT_DEVICE_nGnRE    device
->  pgprot_tagged       MT_NORMAL_TAGGED   RAM
->=20
-> This patch solves a problems where it is possible for the kernel to
-> have VMAs pointing at cachable memory without causing
-> pfn_is_map_memory() to be true, eg DAX memremap cases and CXL/pre-CXL
-> devices. This memory is now properly marked as cachable in KVM.
->=20
-> Unfortunately when FWB is not enabled, the kernel expects to naively do
-> cache management by flushing the memory using an address in the
-> kernel's map. This does not work in several of the newly allowed
-> cases such as dcache_clean_inval_poc(). Check whether the targeted pfn
-> and its mapping KVA is valid in case the FWB is absent before continuing.
->=20
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> Reviewed-by: Mark Brown <broonie@kernel.org>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/include/asm/kvm_pgtable.h |  8 ++++++
->  arch/arm64/kvm/hyp/pgtable.c         |  2 +-
->  arch/arm64/kvm/mmu.c                 | 40
-> +++++++++++++++++++++++++---
->  3 files changed, 45 insertions(+), 5 deletions(-)
+>  tools/testing/selftests/kvm/Makefile | 23 ++++++++++++++++++++---
+>  1 file changed, 20 insertions(+), 3 deletions(-)
 >=20
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h
-> b/arch/arm64/include/asm/kvm_pgtable.h
-> index d3e354bb8351..0579dbe958b9 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -430,6 +430,14 @@ u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable
-> *pgt, u64 addr, u64 size);
->   */
->  u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift);
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftes=
+ts/kvm/Makefile
+> index a3bb36fb3cfc..07b3f4dc1a77 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -17,6 +17,17 @@ else
+>  	ARCH_DIR :=3D $(ARCH)
+>  endif
 >=20
-> +/**
-> + * stage2_has_fwb() - Determine whether FWB is supported
-> + * @pgt:    Page-table structure initialised by kvm_pgtable_stage2_init*=
-()
-> + *
-> + * Return: True if FWB is supported.
-> + */
-> +bool stage2_has_fwb(struct kvm_pgtable *pgt);
+> +ifeq ($(ARCH),arm64)
+> +arm64_tools_dir :=3D $(top_srcdir)/tools/arch/arm64/tools/
+> +GEN_HDRS :=3D $(top_srcdir)/tools/arch/arm64/include/generated/
+> +CFLAGS +=3D -I$(GEN_HDRS)
 > +
->  /**
->   * kvm_pgtable_stage2_pgd_size() - Helper to compute size of a stage-2
-> PGD
->   * @vtcr:	Content of the VTCR register.
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c
-> b/arch/arm64/kvm/hyp/pgtable.c
-> index f155b8c9e98c..ccd291b6893d 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -662,7 +662,7 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32
-> phys_shift)
->  	return vtcr;
->  }
->=20
-> -static bool stage2_has_fwb(struct kvm_pgtable *pgt)
-> +bool stage2_has_fwb(struct kvm_pgtable *pgt)
->  {
->  	if (!cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
->  		return false;
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 482280fe22d7..79f1caaa08a0 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1391,6 +1391,15 @@ static bool kvm_vma_mte_allowed(struct
-> vm_area_struct *vma)
->  	return vma->vm_flags & VM_MTE_ALLOWED;
->  }
->=20
-> +/*
-> + * Determine the memory region cacheability from VMA's pgprot. This
-> + * is used to set the stage 2 PTEs.
-> + */
-> +static unsigned long mapping_type(pgprot_t page_prot)
-> +{
-> +	return FIELD_GET(PTE_ATTRINDX_MASK, pgprot_val(page_prot));
-> +}
+> +prepare:
+> +	$(MAKE) -C $(arm64_tools_dir)
+> +else
+> +prepare:
+
+This is a force target, all targets depending on this one will always have =
+their recipe run,
+so we'll pretty much rebuild everything.
+Is this intentional?
+
+> +endif
 > +
->  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  			  struct kvm_memory_slot *memslot, unsigned long hva,
->  			  unsigned long fault_status)
-> @@ -1490,6 +1499,18 @@ static int user_mem_abort(struct kvm_vcpu
-> *vcpu, phys_addr_t fault_ipa,
->  	gfn =3D fault_ipa >> PAGE_SHIFT;
->  	mte_allowed =3D kvm_vma_mte_allowed(vma);
+>  LIBKVM +=3D lib/assert.c
+>  LIBKVM +=3D lib/elf.c
+>  LIBKVM +=3D lib/guest_modes.c
+> @@ -256,13 +267,18 @@ $(TEST_GEN_OBJ): $(OUTPUT)/%.o: %.c
+>  $(SPLIT_TESTS_TARGETS): %: %.o $(SPLIT_TESTS_OBJS)
+>  	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $=
+@
 >=20
-> +	/*
-> +	 * Figure out the memory type based on the user va mapping properties
-> +	 * Only MT_DEVICE_nGnRE and MT_DEVICE_nGnRnE will be set using
-> +	 * pgprot_device() and pgprot_noncached() respectively.
-> +	 */
-> +	if ((mapping_type(vma->vm_page_prot) =3D=3D MT_DEVICE_nGnRE) ||
-> +	    (mapping_type(vma->vm_page_prot) =3D=3D MT_DEVICE_nGnRnE) ||
-> +	    (mapping_type(vma->vm_page_prot) =3D=3D MT_NORMAL_NC))
-> +		prot |=3D KVM_PGTABLE_PROT_DEVICE;
-> +	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
-> +		prot |=3D KVM_PGTABLE_PROT_X;
-> +
->  	/* Don't use the VMA after the unlock -- it may have vanished */
->  	vma =3D NULL;
+> -EXTRA_CLEAN +=3D $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) $(SPLI=
+T_TESTS_OBJS) cscope.*
+> +EXTRA_CLEAN +=3D $(GEN_HDRS) \
+> +	       $(LIBKVM_OBJS) \
+> +	       $(SPLIT_TESTS_OBJS) \
+> +	       $(TEST_DEP_FILES) \
+> +	       $(TEST_GEN_OBJ) \
+> +	       cscope.*
 >=20
-> @@ -1576,10 +1597,21 @@ static int user_mem_abort(struct kvm_vcpu
-> *vcpu, phys_addr_t fault_ipa,
->  	if (exec_fault)
->  		prot |=3D KVM_PGTABLE_PROT_X;
+>  x :=3D $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
+> -$(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
+> +$(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c prepare
+>  	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
 >=20
-> -	if (device)
-> -		prot |=3D KVM_PGTABLE_PROT_DEVICE;
-> -	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
-> -		prot |=3D KVM_PGTABLE_PROT_X;
-> +	/*
-> +	 *  When FWB is unsupported KVM needs to do cache flushes
-> +	 *  (via dcache_clean_inval_poc()) of the underlying memory. This is
-> +	 *  only possible if the memory is already mapped into the kernel map
-> +	 *  at the usual spot.
-> +	 *
-> +	 *  Validate that there is a struct page for the PFN which maps
-> +	 *  to the KVA that the flushing code expects.
-> +	 */
-> +	if (!stage2_has_fwb(pgt) &&
-> +	    !(pfn_valid(pfn) &&
-> +	      page_to_virt(pfn_to_page(pfn)) =3D=3D
-> kvm_host_va(PFN_PHYS(pfn)))) {
-> +		ret =3D -EINVAL;
-> +		goto out_unlock;
-> +	}
-
-I don't quite follow the above check. Does no FWB matters for
-Non-cacheable/device memory as well?
-
-From a quick check, it breaks a n/w dev assignment on a platform that doesn=
-'t=20
-have FWB.
-
-Qemu reports,
-
-error: kvm run failed Invalid argument
- PC=3Dffff800080a95ed0 X00=3Dffff0000c7ff8090 X01=3Dffff0000c7ff80a0
-X02=3D00000000fe180000 X03=3Dffff800085327000 X04=3D0000000000000001
-X05=3D0000000000000040 X06=3D000000000000003f X07=3D0000000000000000
-X08=3Dffff0000be190000 X09=3D0000000000000000 X10=3D0000000000000040
-
-Please let me know.
-
-Thanks,
-Shameer
-
+> -$(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S
+> +$(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S prepare
+>  	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
 >=20
->  	/*
->  	 * Under the premise of getting a FSC_PERM fault, we just need to relax
-> --
-> 2.17.1
+>  # Compile the string overrides as freestanding to prevent the compiler f=
+rom
+> @@ -274,6 +290,7 @@ $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
+>  x :=3D $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
+>  $(TEST_GEN_PROGS): $(LIBKVM_OBJS)
+>  $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
+> +$(TEST_GEN_OBJ): prepare
 >=20
+>  cscope: include_paths =3D $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) includ=
+e lib ..
+>  cscope:
 
