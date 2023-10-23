@@ -1,142 +1,183 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B619F224C9
-	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 19:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD2A922EFB
+	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 20:02:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a0SyXovJ"
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-53e751aeb3cso5666316a12.2
-        for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 12:30:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698089434; x=1698694234; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OOWHyp1apMK593shU2MRuweL3LwvBPDQ0MBY19ARFVk=;
-        b=a0SyXovJmEUyxvk6ldgbftgDsszsJGsijAxEO6BO12xIBwuMGxj4fOry6lXiSz68BH
-         sDmbGsyb1kDD4BubBkYEGXOYtNZGW4FdZvkTkqLNfWqGDNrL934AgBsZlJAhgHhE20HC
-         7q+u6LzNnxBbKmS1UeaN8fx/7BiDl7lLoT4bYCLgDVH7FFZwXRO/OKjUaRr/WwB0vhK4
-         Arnav8JpR2UWY6i0XVxpSRiXLEZ+5ddiZZIG/OPArnv7b8seE+Ua3vbmY7XA27AYS4K9
-         UgsezZh9NukLRlBIv7xwUqICzFK0vi8KtEvWn7npZG0QxJ6dDYmixOGnEnLI4w8CGVkP
-         VMxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698089434; x=1698694234;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OOWHyp1apMK593shU2MRuweL3LwvBPDQ0MBY19ARFVk=;
-        b=c/ENNJjO+fVJprKDVRrbSBK//DyGxDcwlnNv/i3Y6bpdsuNexGBBac/SGnilA4dLg4
-         cmy4v8pH9RWtqFXuDWPS+ISgrd9Bz3vMjBurK7G/8Ad092wHPNt5SRmqK/2qkUrAMj4b
-         AxfZb8rymm4IkpWjHXbDoNYPSkGWOIhQBvmaYcTJekW7N74WEfLN2Gxr9SXCVqjT57Eu
-         5cC1lGt9LlXkOquGwsGDqau+fxTMxlkdaNAVCTaP45NnO2XSkb1Ztf1qeNrLZNwDPNVo
-         KGNgh4JR5ugG+CUDOm67KDJs/hTg0GgiNHap4fFzDuFDPpe2eaVd4kiBpy/ipAoPgvbY
-         jN/w==
-X-Gm-Message-State: AOJu0YznNIrjWbb8J+a2RzYdwaz/WCJlnpQMk7MTBcNOu5VNOkMRBE7z
-	wQgYljv8pK8EKJAXl1jk+sC+reMmwB/HYq/ZUQ==
-X-Google-Smtp-Source: AGHT+IHtPEwEdv1R67ewmN3QjN2VewaqNbQmgLSCiAxqY2PPO146bleLuad9tzy+WrA1JY7N0hp+P6s9/af35JMl/6M=
-X-Received: by 2002:a50:d502:0:b0:53e:4c39:5608 with SMTP id
- u2-20020a50d502000000b0053e4c395608mr7381578edi.17.1698089433624; Mon, 23 Oct
- 2023 12:30:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="pSY/eaDR"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=aZyGRwEv0iUdzK429NjcYATM8WFVnBChclCibm7Si3A=; b=pSY/eaDRzPVfujJtREsnNZj+LO
+	/p+NuKMtQPf/2JkoIfPYg79SLzNYeYhtWZOSComP7w9bgywGy/wzZZDFl0NLnmNFNXPESP0sWalS9
+	VG3DqEOlkmMikGXbr0VhQPXE/lyU5S+xhxhb/vfc+PGsidk3Nk97sdgk+qe1RSt/EC2X16PuOnbZM
+	0QhdrMpGn9tBUegcvYZl/6LVBSQyqABNIhnYDfZxZuPOLOAAHO85JkzyovjAAkuQkGTVpTiKd0imm
+	TqCx3RsW2GCf1fA/3dfVWzIsA6ghyq96uryRM+fe2equbXYHHK4tYinS3xHwE6EMpwOK1NpiUVdNB
+	mHe3Br5A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56976)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qv17W-0003Si-0l;
+	Mon, 23 Oct 2023 21:01:50 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qv17S-0005AN-Pc; Mon, 23 Oct 2023 21:01:46 +0100
+Date: Mon, 23 Oct 2023 21:01:46 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Gavin Shan <gshan@redhat.com>
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
+	loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com
+Subject: Re: [RFC PATCH v2 20/35] ACPI: Rename acpi_processor_hotadd_init and
+ remove pre-processor guards
+Message-ID: <ZTbRKgxtiq9XQKBr@shell.armlinux.org.uk>
+References: <20230913163823.7880-1-james.morse@arm.com>
+ <20230913163823.7880-21-james.morse@arm.com>
+ <20230914151720.00007105@Huawei.com>
+ <b8f430c1-c30f-191f-18c6-f750fa6ba476@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <CAC=5qx_EDYCifRGNbXaJ96psuqQ-Y7zw8O_V_q-_kYpkuD52RQ@mail.gmail.com>
- <20231023141639.GA3779@willie-the-truck>
-In-Reply-To: <20231023141639.GA3779@willie-the-truck>
-From: KVMR <kvmrdy@gmail.com>
-Date: Tue, 24 Oct 2023 01:00:22 +0530
-Message-ID: <CAC=5qx-Qq8+fzONjYCvEyUe4g+bZiMM80rfy3niyw-4xqZYf5g@mail.gmail.com>
-Subject: Re: pKVM: Which kernel version has support for pKVM?
-To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b8f430c1-c30f-191f-18c6-f750fa6ba476@redhat.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi Will,
+On Mon, Sep 18, 2023 at 03:50:09PM +1000, Gavin Shan wrote:
+> 
+> On 9/15/23 00:17, Jonathan Cameron wrote:
+> > On Wed, 13 Sep 2023 16:38:08 +0000
+> > James Morse <james.morse@arm.com> wrote:
+> > 
+> > > acpi_processor_hotadd_init() will make a CPU present by mapping it
+> > > based on its hardware id.
+> > > 
+> > > 'hotadd_init' is ambiguous once there are two different behaviours
+> > > for cpu hotplug. This is for toggling the _STA present bit. Subsequent
+> > > patches will add support for toggling the _STA enabled bit, named
+> > > acpi_processor_make_enabled().
+> > > 
+> > > Rename it acpi_processor_make_present() to make it clear this is
+> > > for CPUs that were not previously present.
+> > > 
+> > > Expose the function prototypes it uses to allow the preprocessor
+> > > guards to be removed. The IS_ENABLED() check will let the compiler
+> > > dead-code elimination pass remove this if it isn't going to be
+> > > used.
+> > > 
+> > > Signed-off-by: James Morse <james.morse@arm.com>
+> > > ---
+> > >   drivers/acpi/acpi_processor.c | 14 +++++---------
+> > >   include/linux/acpi.h          |  2 --
+> > >   2 files changed, 5 insertions(+), 11 deletions(-)
+> > > 
+> > > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.c
+> > > index 75257fae10e7..22a15a614f95 100644
+> > > --- a/drivers/acpi/acpi_processor.c
+> > > +++ b/drivers/acpi/acpi_processor.c
+> > > @@ -182,13 +182,15 @@ static void __init acpi_pcc_cpufreq_init(void) {}
+> > >   #endif /* CONFIG_X86 */
+> > >   /* Initialization */
+> > > -#ifdef CONFIG_ACPI_HOTPLUG_PRESENT_CPU
+> > > -static int acpi_processor_hotadd_init(struct acpi_processor *pr)
+> > > +static int acpi_processor_make_present(struct acpi_processor *pr)
+> > >   {
+> > >   	unsigned long long sta;
+> > >   	acpi_status status;
+> > >   	int ret;
+> > > +	if (!IS_ENABLED(CONFIG_ACPI_HOTPLUG_PRESENT_CPU))
+> > > +		return -ENODEV;
+> > > +
+> > >   	if (invalid_phys_cpuid(pr->phys_id))
+> > >   		return -ENODEV;
+> > > @@ -222,12 +224,6 @@ static int acpi_processor_hotadd_init(struct acpi_processor *pr)
+> > >   	cpu_maps_update_done();
+> > >   	return ret;
+> > >   }
+> > > -#else
+> > > -static inline int acpi_processor_hotadd_init(struct acpi_processor *pr)
+> > > -{
+> > > -	return -ENODEV;
+> > > -}
+> > > -#endif /* CONFIG_ACPI_HOTPLUG_PRESENT_CPU */
+> > >   static int acpi_processor_get_info(struct acpi_device *device)
+> > >   {
+> > > @@ -335,7 +331,7 @@ static int acpi_processor_get_info(struct acpi_device *device)
+> > >   	 *  because cpuid <-> apicid mapping is persistent now.
+> > >   	 */
+> > >   	if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
+> > > -		int ret = acpi_processor_hotadd_init(pr);
+> > > +		int ret = acpi_processor_make_present(pr);
+> > >   		if (ret)
+> > >   			return ret;
+> > > diff --git a/include/linux/acpi.h b/include/linux/acpi.h
+> > > index 651dd43976a9..b7ab85857bb7 100644
+> > > --- a/include/linux/acpi.h
+> > > +++ b/include/linux/acpi.h
+> > > @@ -316,12 +316,10 @@ static inline int acpi_processor_evaluate_cst(acpi_handle handle, u32 cpu,
+> > >   }
+> > >   #endif
+> > > -#ifdef CONFIG_ACPI_HOTPLUG_PRESENT_CPU
+> > >   /* Arch dependent functions for cpu hotplug support */
+> > >   int acpi_map_cpu(acpi_handle handle, phys_cpuid_t physid, u32 acpi_id,
+> > >   		 int *pcpu);
+> > >   int acpi_unmap_cpu(int cpu);
+> > 
+> > I've lost track somewhat but I think the definitions of these are still under ifdefs
+> > which is messy if nothing else and might cause build issues.
+> > 
+> 
+> Yup, it's not safe to use 'if (!IS_ENABLED(CONFIG_ACPI_HOTPLUG_PRESENT_CPU))' in
+> acpi_processor_make_present() until the ifdefs are removed for those two functions
+> in individual architectures.
 
-Thank you very much for your response.
+The same thing appears in a final patch that James seems to have added
+to the repository:
 
-Regarding the test cases, I would like to see if you utilized any
-scripts or programs to validate the features. For instance, I'm
-interested in understanding how memory protection between the VM and
-the Host was verified. Did you automate the verification process? For
-instance, did you employ /proc/<pid>/mem or any other methods? I will
-check the Android CTS for similar test cases.
+ACPI: processor: Only call arch_unregister_cpu() if HOTPLUG_CPU is selected
 
-Additionally, I'd like to know if Crosvm VMM provides full support for
-pKVM. As mentioned in the 'AVF architecture' documentation, I used
-'Crosvm' from https://chromium.googlesource.com/crosvm/crosvm and
-successfully launched a protected VM with a Rootfs as initrd. However,
-I encountered an issue when trying to launch it as a block device
-(virtio-blk). The following command failed:
+in which acpi_processor_post_eject() has this change:
 
-```
-crosvm run -r rootfs.ext4 --protected-vm-without-firmware --no-balloon
---cpus 1 --mem 1024 Image
-```
+-       if (!device)
++       if (!IS_ENABLED(CONFIG_HOTPLUG_CPU) || !device)
 
-The error message I received was:
+I'm wondering if that's caused by a previous patch making the weak
+definition of arch_unregister_cpu() dependent on HOTPLUG_CPU, and
+whether dropping that ifdef around the function would be better. I
+think I already asked that question, but this final patch seems to be
+the confirmation that we need to provide a definition of it.
 
-```
-[*** ERROR crosvm::crosvm::sys::linux] child pcivirtio-block (pid 829)
-exited: signo 17, status 11, code 2
-[*** ERROR devices::proxy] failed write to child device process
-pcivirtio-block: failed to send packet: Broken pipe (os error 32)
-```
+I think the reason James did it like that is because unregister_cpu()
+is dependent upon CONFIG_HOTPLUG_CPU, but it's probably better to do:
 
-Is there a need for further modifications or updates to Crosvm's
-Virtio drivers to ensure full pKVM support or is my usage wrong?
+#ifdef CONFIG_HOTPLUG_CPU
+void __weak arch_unregister_cpu(int num)
+{
+	unregister_cpu(&per_cpu(cpu_devices, num));
+}
+#else
+void __weak arch_unregister_cpu(int num)
+{
+}
+#endif
 
-Thanks and regards,
-Venkat
+Agreed?
 
-
-On Mon, Oct 23, 2023 at 7:46=E2=80=AFPM Will Deacon <will@kernel.org> wrote=
-:
->
-> Hi Venkat [+Fuad],
->
-> On Wed, Oct 11, 2023 at 09:10:19AM +0530, KVMR wrote:
-> > We are interested in using Protected KVM (pKVM) in one of our
-> > projects. Our goal is to launch protected VMs on Linux with KVM,
-> > ARM64. We have a few queries and would appreciate your assistance in
-> > addressing them:
-> >
-> > 1. We'd like to know which mainline kernel version offers complete
-> > support for pKVM. We've observed that the current TOT kernel (6.6.rc5)
-> > may not have all the necessary changes. Specifically, we couldn't
-> > locate the KVM_CAP_ARM_PROTECTED_VM symbol in the code. If all the
-> > required changes have not yet been merged into the mainline kernel,
-> > could you please provide information on the specific branch or
-> > repository that contains these changes?
->
-> Upstreaming is currently blocked on support for the guestmem series [1],
-> but you can look at our integration branch at [2] which has everything
-> based on the last kernel release.
->
-> > 2. Are there any additional changes planned for pKVM, and is there a
-> > roadmap page where we can find more information on the project's
-> > future developments?
->
-> It's mainly driven by the Android annual roadmap, since that's still
-> the driving force behind pKVM.
->
-> > 3. In order to verify the pKVM memory protection features, we are
-> > seeking readily available test cases. Could you guide us to where we
-> > can find such test cases for this purpose?
->
-> We have high-level tests integrated with the Android CTS, but I'm not sur=
-e
-> whether that's what you're after.
->
-> Will
->
-> [1] https://lore.kernel.org/all/20230914015531.1419405-1-seanjc@google.co=
-m/
-> [2] https://android-kvm.googlesource.com/linux/+/refs/heads/for-upstream/=
-pkvm-integration
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
