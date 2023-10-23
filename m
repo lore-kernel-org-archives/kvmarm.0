@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D0915EBF
-	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 13:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B6116439
+	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 13:09:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qqAmERNP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60339C433C7;
-	Mon, 23 Oct 2023 13:00:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kNeVJnqR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C740C433C8;
+	Mon, 23 Oct 2023 13:09:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698066021;
-	bh=5vNKzUFnTZxBTFmvOk553jYtacD8+NX8XSvNevHZ89U=;
+	s=k20201202; t=1698066556;
+	bh=KqmsNij6B7/UeR8V5bqRN/2YnaXHLM0xwEH6flkSV18=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qqAmERNPdoLo/4olYNqGDMpPDhYJC+kpGVRhkf+Ati5L7LfwbFFvCxIN2qvtupObb
-	 E+Ym0WVWDMzaJUeRaTEpWuDaCDplDJB06U7LUqCmE2Q/ap9l5N7Xj3RLajpFgleaz3
-	 M3xa5xu/BSnwmjqqXEsmw4ehzqDBdmgTmS8BX0IUogSG496/DBVITuCNGhqQ3m5F+3
-	 6BadGVuy5sOOyPbdjkYT6SmEMK5eQM6bvIXiyUQw+YaN0YE946VRJT4/EgwfF0KQGN
-	 q9uxfXlDIY39Nw7hfeAyayOnAC/QPMuwZVwCNDqjzKi8ufPBbm3cVNJeZQ10IRXSgV
-	 7vI9GfMo9KTEw==
+	b=kNeVJnqRvx47FjHIY468IWlqGlvHLcQ+oAjN3PRib5r8LWQ41AFf2ozWQHPhB0bGy
+	 E38szNZL3hpzt1ygV3ucFurrW6eVDDguzDeDd5BMPWdYzNV/suqzfw7Y5XuQB2fpNh
+	 j3VnXBvrBvpNLbmgkSKE3NxUDtZhoe0IavH7xcgTNiIf7NnETxVB56IqjJa/IV/u8H
+	 xIqza/70sJ0aeos+w3M7G+9HC/yKxQjGeOerM3yH+oYrHRNNBZqqyKB0uhOrQiScTd
+	 1kjfaN+DH1GLgIRtv0s6Y8kImMoj9FAr9ypX8BECzFYBjyCL2xnNPzkudteE6M/uJm
+	 a7w8C8f1K39mQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1quuXb-006qTD-3y;
-	Mon, 23 Oct 2023 14:00:19 +0100
-Date: Mon, 23 Oct 2023 14:00:18 +0100
-Message-ID: <86wmvd4hp9.wl-maz@kernel.org>
+	id 1quugD-006qbg-UQ;
+	Mon, 23 Oct 2023 14:09:14 +0100
+Date: Mon, 23 Oct 2023 14:09:13 +0100
+Message-ID: <86v8ax4hae.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Raghavendra Rao Ananta <rananta@google.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
@@ -41,10 +41,9 @@ Cc: Oliver Upton <oliver.upton@linux.dev>,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
-Subject: Re: [PATCH v8 07/13] KVM: arm64: PMU: Allow userspace to limit PMCR_EL0.N for the guest
-In-Reply-To: <20231020214053.2144305-8-rananta@google.com>
+Subject: Re: [PATCH v8 00/13] KVM: arm64: PMU: Allow userspace to limit the number of PMCs on vCPU
+In-Reply-To: <20231020214053.2144305-1-rananta@google.com>
 References: <20231020214053.2144305-1-rananta@google.com>
-	<20231020214053.2144305-8-rananta@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,124 +59,34 @@ X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, alexandru.elisei@
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 20 Oct 2023 22:40:47 +0100,
+On Fri, 20 Oct 2023 22:40:40 +0100,
 Raghavendra Rao Ananta <rananta@google.com> wrote:
 > 
-> From: Reiji Watanabe <reijiw@google.com>
+> Hello,
 > 
-> KVM does not yet support userspace modifying PMCR_EL0.N (With
-> the previous patch, KVM ignores what is written by userspace).
-> Add support userspace limiting PMCR_EL0.N.
-> 
-> Disallow userspace to set PMCR_EL0.N to a value that is greater
-> than the host value as KVM doesn't support more event counters
-> than what the host HW implements. Also, make this register
-> immutable after the VM has started running. To maintain the
-> existing expectations, instead of returning an error, KVM
-> returns a success for these two cases.
-> 
-> Finally, ignore writes to read-only bits that are cleared on
-> vCPU reset, and RES{0,1} bits (including writable bits that
-> KVM doesn't support yet), as those bits shouldn't be modified
-> (at least with the current KVM).
-> 
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 57 +++++++++++++++++++++++++++++++++++++--
->  1 file changed, 55 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 2e5d497596ef8..a2c5f210b3d6b 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1176,6 +1176,59 @@ static int get_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
->  	return 0;
->  }
->  
-> +static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
-> +		    u64 val)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	u64 new_n, mutable_mask;
+> The goal of this series is to allow userspace to limit the number
+> of PMU event counters on the vCPU.  We need this to support migration
+> across systems that implement different numbers of counters.
 
-Really, this lacks consistency. Either you make N a u8 everywhere, or
-a u64 everywhere. I don't mind either, but the type confusion is not
-great.
+[...]
 
-> +
-> +	mutex_lock(&kvm->arch.config_lock);
-> +
-> +	/*
-> +	 * Make PMCR immutable once the VM has started running, but
-> +	 * do not return an error to meet the existing expectations.
-> +	 */
-> +	if (kvm_vm_has_ran_once(vcpu->kvm)) {
-> +		mutex_unlock(&kvm->arch.config_lock);
-> +		return 0;
-> +	}
-> +
-> +	new_n = (val >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
-> +	if (new_n != kvm->arch.pmcr_n) {
+I've gone through the initial patches, and stopped before the tests
+(which I usually can't be bothered to review anyway).
 
-Why do we need to check this?
+The comments I have a relatively minor and could be applied as fixes
+on top if Oliver can be convinced to do so. Note that patch #4 has an
+attribution issue.
 
-> +		u8 pmcr_n_limit = kvm_arm_pmu_get_max_counters(kvm);
+> base-commit: 0a3a1665cbc59ee8d6326aa6c0b4a8d1cd67dda3
 
-Can you see why I'm annoyed?
+maz@valley-girl:~/hot-poop/arm-platforms$ git describe 0a3a1665cbc59ee8d6326aa6c0b4a8d1cd67dda3
+fatal: 0a3a1665cbc59ee8d6326aa6c0b4a8d1cd67dda3 is neither a commit nor blob
 
-> +
-> +		/*
-> +		 * The vCPU can't have more counters than the PMU hardware
-> +		 * implements. Ignore this error to maintain compatibility
-> +		 * with the existing KVM behavior.
-> +		 */
-> +		if (new_n <= pmcr_n_limit)
+Can you please make an effort to base your postings on a known, stable
+commit? A tagged -rc would be best. but certainly not a random commit.
 
-Isn't this the only thing that actually matters?
-
-> +			kvm->arch.pmcr_n = new_n;
-> +	}
-> +	mutex_unlock(&kvm->arch.config_lock);
-> +
-> +	/*
-> +	 * Ignore writes to RES0 bits, read only bits that are cleared on
-> +	 * vCPU reset, and writable bits that KVM doesn't support yet.
-> +	 * (i.e. only PMCR.N and bits [7:0] are mutable from userspace)
-> +	 * The LP bit is RES0 when FEAT_PMUv3p5 is not supported on the vCPU.
-> +	 * But, we leave the bit as it is here, as the vCPU's PMUver might
-> +	 * be changed later (NOTE: the bit will be cleared on first vCPU run
-> +	 * if necessary).
-> +	 */
-> +	mutable_mask = (ARMV8_PMU_PMCR_MASK |
-> +			(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT));
-
-Why is N part of the 'mutable' mask? The only bits that should make it
-into the register are ARMV8_PMU_PMCR_MASK.
-
-> +	val &= mutable_mask;
-> +	val |= (__vcpu_sys_reg(vcpu, r->reg) & ~mutable_mask);
-> +
-> +	/* The LC bit is RES1 when AArch32 is not supported */
-> +	if (!kvm_supports_32bit_el0())
-> +		val |= ARMV8_PMU_PMCR_LC;
-> +
-> +	__vcpu_sys_reg(vcpu, r->reg) = val;
-> +	return 0;
-
-I think this should be rewritten as:
-
-	val &= ARMV8_PMU_PMCR_MASK;
-	/* The LC bit is RES1 when AArch32 is not supported */
-	if (!kvm_supports_32bit_el0())
-		val |= ARMV8_PMU_PMCR_LC;
-
-	__vcpu_sys_reg(vcpu, r->reg) = val;
-	return 0;
-
-And that's it. Drop this 'mutable_mask' nonsense, as we should be
-getting the correct value (merge of the per-vcpu register and VM-wide
-N) since patch 4.
+This sort of information is just as useful as "No functional change
+intended"...
 
 	M.
 
