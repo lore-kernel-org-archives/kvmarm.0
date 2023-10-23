@@ -1,123 +1,115 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917DA23C5
-	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 08:55:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20465134B2
+	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 09:35:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="sT9ELYEd"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=DUu7jHK3cwMjrPkO/5tAgZHCLMP/K1QRkga1FP0LTZk=; b=sT9ELYEdhxi5/sCCZwm8mnuqGw
-	VC0VEu7ZsZUy6lYyqNo8+IHIW5Y/iaO7TrDl9G8KF1w8JUfUkGYr2EQTwsfqLAyql9o4cWnuRNgpn
-	4LUivt9JRLIxws9jStmY8RDdixkJM7hCPbHV6ie2Jf+BfbH9u7+QdJL3z3ytskg9JCnYXLA9WAfe8
-	so7r4fOvyPJhn4tAGg1DzR3bInek5wIkLBQCrZpPAL3SPnWZ1ZyBnm1BEqZMzNTBTFxyrGLdWXCoH
-	jOm+I2meKbbx24VFvlqBpPWDqK9EhANEYPTUKd1RgfiT6AXUAlYK1cy5eEh3SUIAku6C6owhy7MJW
-	WoiDRzpg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43922)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1quqiJ-0002hG-2D;
-	Mon, 23 Oct 2023 09:55:07 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1quqiK-0004gK-F9; Mon, 23 Oct 2023 09:55:08 +0100
-Date: Mon, 23 Oct 2023 09:55:08 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Gavin Shan <gshan@redhat.com>
-Cc: James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PxTeNYTS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E20BC433C7;
+	Mon, 23 Oct 2023 09:35:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698053705;
+	bh=OpjH4CLB0Ep8F60JOdq9CgTyteadUsPPUdB5cviLW94=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PxTeNYTS6/8B0uYP1YmOkhBqzzMRgjbiE77w5DQRCsFhGAVLLNYNUzPjcM8hoQ8GC
+	 9CNxYVIh+8gkVWS36F9dLWldGxoUV5K8GdiQMT9OSFm6bd2qK7bj8sjiYwZyduUWih
+	 avJU3026iHvaQTYwIXF5albqFnLOLn76YYEuJqZQN9nWYLg05vkkg2NHQtJ58QLAtn
+	 v/eU62yB2zG7+UoWB+J0Pk5xfYlOB9WDlSUtB7Dg2yFRk+FVr75F5vaXG1qe72V9wR
+	 X27P54T5XSvGiem4TLPigO4b6GE4yZv5DLfO3LtjFjT5nrkf7CY88KumPFulAx6E70
+	 eFJRnlio58D3w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qurKx-006myf-5D;
+	Mon, 23 Oct 2023 10:35:03 +0100
+Date: Mon, 23 Oct 2023 10:34:58 +0100
+Message-ID: <867cnd65rx.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	James Morse
+ <james.morse@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
-	x86@kernel.org, Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	jianyong.wu@arm.com, justin.he@arm.com
-Subject: Re: [RFC PATCH v2 24/35] drivers: base: Implement weak
- arch_unregister_cpu()
-Message-ID: <ZTY07FlviAL1DlNz@shell.armlinux.org.uk>
-References: <20230913163823.7880-1-james.morse@arm.com>
- <20230913163823.7880-25-james.morse@arm.com>
- <8be3a9dc-8f59-9ef9-3662-95814e177125@redhat.com>
- <ZTYygtKt4w9C0Oxw@shell.armlinux.org.uk>
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 04/12] KVM: arm64: Add ARM64_HAS_LPA2 CPU capability
+In-Reply-To: <e2dd92a1-a8bb-4421-a814-2d663acc7f11@arm.com>
+References: <20231009185008.3803879-1-ryan.roberts@arm.com>
+	<20231009185008.3803879-5-ryan.roberts@arm.com>
+	<86cyx9n1yp.wl-maz@kernel.org>
+	<e2dd92a1-a8bb-4421-a814-2d663acc7f11@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZTYygtKt4w9C0Oxw@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, james.morse@arm.com, yuzenghui@huawei.com, ardb@kernel.org, anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Oct 23, 2023 at 09:44:50AM +0100, Russell King (Oracle) wrote:
-> On Tue, Sep 19, 2023 at 10:59:23AM +1000, Gavin Shan wrote:
-> > On 9/14/23 02:38, James Morse wrote:
-> > > diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
-> > > index 677f963e02ce..c709747c4a18 100644
-> > > --- a/drivers/base/cpu.c
-> > > +++ b/drivers/base/cpu.c
-> > > @@ -531,7 +531,14 @@ int __weak arch_register_cpu(int cpu)
-> > >   {
-> > >   	return register_cpu(&per_cpu(cpu_devices, cpu), cpu);
-> > >   }
-> > > -#endif
-> > > +
-> > > +#ifdef CONFIG_HOTPLUG_CPU
-> > > +void __weak arch_unregister_cpu(int num)
-> > > +{
-> > > +	unregister_cpu(&per_cpu(cpu_devices, num));
-> > > +}
-> > > +#endif /* CONFIG_HOTPLUG_CPU */
-> > > +#endif /* CONFIG_GENERIC_CPU_DEVICES */
+On Fri, 20 Oct 2023 16:03:37 +0100,
+Ryan Roberts <ryan.roberts@arm.com> wrote:
+> 
+> On 20/10/2023 09:16, Marc Zyngier wrote:
+> > On Mon, 09 Oct 2023 19:50:00 +0100,
+> > Ryan Roberts <ryan.roberts@arm.com> wrote:
+> >>
+> >> +static bool has_lpa2(const struct arm64_cpu_capabilities *entry, int scope)
+> >> +{
+> >> +	u64 mmfr0;
+> >> +	bool ret;
+> >> +
+> >> +	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+> >> +	ret = has_lpa2_at_stage1(mmfr0);
+> >> +
+> >> +	if (kvm_get_mode() != KVM_MODE_NONE)
+> >> +		ret = ret && has_lpa2_at_stage2(mmfr0);
 > > 
-> > It seems conflicting with its declaration in include/linux/cpu.h.
+> > Isn't it too late to go back on the decision to use LPA2 at S1 if you
+> > realise that S2 doesn't support it?
 > 
-> How so? The declaration is:
-> 
-> extern void arch_unregister_cpu(int cpu);
-> 
-> So:
-> 
-> void __weak arch_unregister_cpu(int num)
-> 
-> is compatible.
-> 
-> > Besides, the function is still needed by
-> > drivers/acpi/acpi_processor.c::acpi_processor_make_not_present()
-> > even both CONFIG_HOTPLUG_CPU and CONFIG_GENERIC_CPU_DEVICES are disabled?
-> 
-> Yes, I agree - it needs to be present when ACPI is built, so I'm
-> thinking the right solution is to move it out from under at least
-> CONFIG_HOTPLUG_CPU.
-> 
-> It can't be moved out from under CONFIG_GENERIC_CPU_DEVICES because
-> then we end up referencing the per-cpu variable cpu_devices which only
-> exists when CONFIG_GENERIC_CPU_DEVICES is enabled. Is that a problem
-> though, because in the case of !CONFIG_GENERIC_CPU_DEVICES, aren't
-> architectures required to provide both arch_.*register_cpu() functions?
+> The KVM mode dependent part was a change that Oliver asked for. I guess you are
+> talking about kernel S1? I don't think it's too late here to decide whether the
+> (nvhe) hyp s1 should use LPA2. But I guess your point is that kernel s1 would
+> have had to decide much earlier in boot and will have had to take LPA2 support
+> in both S1 and S2 into account, and would not have the KVM mode info available
+> to it at that point?
 
-I'm also wondering why this patch isn't part of:
+That's roughly my point. When we reach this point on a VHE system,
+we're pretty far along and I'm not sure we can turn back. In all
+honesty, if a system doesn't support LPA2 at S2, it is in a pretty bad
+shape and we shouldn't bother supporting it. Or at least not with KVM.
 
-"drivers: base: Allow parts of GENERIC_CPU_DEVICES to be overridden"
-because it seems to be doing something very similar.
+Just because the architecture allows braindead configurations doesn't
+mean we have to go out of our way to support them. In this case, I'd
+be absolutely fine with disabling KVM altogether.
 
-The commit I refer to introduces a weak version of arch_register_cpu(),
-and it seems it would also be appropriate to introduce a weak version
-of its unregister paired function at the same time.
+> > Why isn't this patch the first or second in the series? You could use
+> > it to drive the LPA2 decision in the patch #2, avoiding the ugly lpa2
+> > flag...
+> 
+> I still only think this works if we put my patch and Ard's patch in atomically?
+> Or at least force has_lpa2() to always return false until both are in, then flip
+> the switch atomically.
 
-Any existing definitions of non-weak arch_unregister_cpu() would
-override it so it shouldn't cause any issues.
+Whichever works for you. My only ask is to try to minimise the churn
+here.
 
-Thanks.
+Thanks,
+
+	M.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Without deviation from the norm, progress is not possible.
