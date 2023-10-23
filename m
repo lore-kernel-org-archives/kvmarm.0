@@ -1,27 +1,27 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C6D123DC
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C76613AFB
 	for <kvmarm@lists.linux.dev>; Mon, 23 Oct 2023 09:54:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eBTlLJyx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46688C433CA;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TO/VZ6K6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33FF9C433C7;
 	Mon, 23 Oct 2023 09:54:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1698054893;
-	bh=1ZqVi5lYR2/pIO0fUmxQBXA2e6f805fwGTu5qVyjcAA=;
+	bh=zT2QPgw7vw5++jMkx6AuGaWC+WBl9BSFBzJHzx8LmAk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eBTlLJyxob5XO9ZSZRbwLp1959SIrvkAKWftyhj54mn3EjPM3i46vCZEIzBnAG4th
-	 k/npIHZlYNWKp11CDNlWw2V2US/vTeQ/li955/ZvBY/97Q8VpPChSoH3qKKLOP46uW
-	 BwFZG+NOYgjD15a2K8yusiH1tKVz4N5KadEuD+MG3KouwxZ1Mif8wO7s7N3o6HUYcH
-	 CUVCI72HbKnAszUuLvcupUP2ZRQwjwQrQwUpliELsJhj+qXxzHHSX50jWHMPwL3IX8
-	 B0Wiej7E0VUedT9F7WrLOgbhAeR15dVPMHS4hxO9lRi2GXjFECfPACLVPIMQFMpS/P
-	 771xQBfIrzZ8w==
+	b=TO/VZ6K6zoduZx6SVrM17xo/zqe7WCPAokDucHOaIuV/hKbZRQQV9Ez5YPybp6dm2
+	 ps0WrCBA8FI7VfD+btLYdOhOcKh9xJSDq285lnhJOBqRSU7+X6BxGamQLFSSH877R6
+	 njNLv1iApBBToURQ8bzKKCzzErCwf/hUmHOg+HJpRzpKdqcQDuwmzRf4FyF6cq1WMg
+	 TP6R2N9OY+swUxmVq9MPDhSWuAolB3wN6Nr4P5LgRQK2uawE9yvCtr/MfGBIfiZ0sb
+	 orOz/xLVHUWur1O0HqToQOrgwO+FPlBJtYdX+RM6M5yP50DhjNEcsdabgaJ7dYP7e8
+	 rKnn5IbJO84SQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1qure7-006nPT-C4;
+	id 1qure7-006nPT-00;
 	Mon, 23 Oct 2023 10:54:51 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -33,9 +33,9 @@ Cc: Eric Auger <eric.auger@redhat.com>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 3/5] KVM: arm64: Refine _EL2 system register list that require trap reinjection
-Date: Mon, 23 Oct 2023 10:54:42 +0100
-Message-Id: <20231023095444.1587322-4-maz@kernel.org>
+Subject: [PATCH 1/5] arm64: Add missing _EL12 encodings
+Date: Mon, 23 Oct 2023 10:54:40 +0100
+Message-Id: <20231023095444.1587322-2-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231023095444.1587322-1-maz@kernel.org>
 References: <20231023095444.1587322-1-maz@kernel.org>
@@ -53,112 +53,51 @@ X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to 
 
 From: Miguel Luis <miguel.luis@oracle.com>
 
-Implement a fine grained approach in the _EL2 sysreg range instead of
-the current wide cast trap. This ensures that we don't mistakenly
-inject the wrong exception into the guest.
+Some _EL12 encodings are missing. Add them.
 
-Fixes: d0fc0a2519a6 ("KVM: arm64: nv: Add trap forwarding for HCR_EL2")
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Miguel Luis <miguel.luis@oracle.com>
-[maz: commit message massaging, dropped secure and AArch32 registers
-      from the list]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20231016111743.30331-4-miguel.luis@oracle.com
+Link: https://lore.kernel.org/r/20231016111743.30331-2-miguel.luis@oracle.com
 ---
- arch/arm64/kvm/emulate-nested.c | 77 ++++++++++++++++++++++++++++++---
- 1 file changed, 71 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/sysreg.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index ee902ff2a50f..06185216a297 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -648,15 +648,80 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
- 	SR_TRAP(SYS_APGAKEYLO_EL1,	CGT_HCR_APK),
- 	SR_TRAP(SYS_APGAKEYHI_EL1,	CGT_HCR_APK),
- 	/* All _EL2 registers */
--	SR_RANGE_TRAP(sys_reg(3, 4, 0, 0, 0),
--		      sys_reg(3, 4, 3, 15, 7), CGT_HCR_NV),
-+	SR_TRAP(SYS_BRBCR_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_VPIDR_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_VMPIDR_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_SCTLR_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_ACTLR_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_SCTLR2_EL2,		CGT_HCR_NV),
-+	SR_RANGE_TRAP(SYS_HCR_EL2,
-+		      SYS_HCRX_EL2,	CGT_HCR_NV),
-+	SR_TRAP(SYS_SMPRIMAP_EL2,	CGT_HCR_NV),
-+	SR_TRAP(SYS_SMCR_EL2,		CGT_HCR_NV),
-+	SR_RANGE_TRAP(SYS_TTBR0_EL2,
-+		      SYS_TCR2_EL2,	CGT_HCR_NV),
-+	SR_TRAP(SYS_VTTBR_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_VTCR_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_VNCR_EL2,		CGT_HCR_NV),
-+	SR_RANGE_TRAP(SYS_HDFGRTR_EL2,
-+		      SYS_HAFGRTR_EL2,	CGT_HCR_NV),
- 	/* Skip the SP_EL1 encoding... */
- 	SR_TRAP(SYS_SPSR_EL2,		CGT_HCR_NV),
- 	SR_TRAP(SYS_ELR_EL2,		CGT_HCR_NV),
--	SR_RANGE_TRAP(sys_reg(3, 4, 4, 1, 1),
--		      sys_reg(3, 4, 10, 15, 7), CGT_HCR_NV),
--	SR_RANGE_TRAP(sys_reg(3, 4, 12, 0, 0),
--		      sys_reg(3, 4, 14, 15, 7), CGT_HCR_NV),
-+	/* Skip SPSR_irq, SPSR_abt, SPSR_und, SPSR_fiq */
-+	SR_TRAP(SYS_AFSR0_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_AFSR1_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_ESR_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_VSESR_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_TFSR_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_FAR_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_HPFAR_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_PMSCR_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_MAIR_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_AMAIR_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_MPAMHCR_EL2,	CGT_HCR_NV),
-+	SR_TRAP(SYS_MPAMVPMV_EL2,	CGT_HCR_NV),
-+	SR_TRAP(SYS_MPAM2_EL2,		CGT_HCR_NV),
-+	SR_RANGE_TRAP(SYS_MPAMVPM0_EL2,
-+		      SYS_MPAMVPM7_EL2,	CGT_HCR_NV),
-+	/*
-+	 * Note that the spec. describes a group of MEC registers
-+	 * whose access should not trap, therefore skip the following:
-+	 * MECID_A0_EL2, MECID_A1_EL2, MECID_P0_EL2,
-+	 * MECID_P1_EL2, MECIDR_EL2, VMECID_A_EL2,
-+	 * VMECID_P_EL2.
-+	 */
-+	SR_RANGE_TRAP(SYS_VBAR_EL2,
-+		      SYS_RMR_EL2,	CGT_HCR_NV),
-+	SR_TRAP(SYS_VDISR_EL2,		CGT_HCR_NV),
-+	/* ICH_AP0R<m>_EL2 */
-+	SR_RANGE_TRAP(SYS_ICH_AP0R0_EL2,
-+		      SYS_ICH_AP0R3_EL2, CGT_HCR_NV),
-+	/* ICH_AP1R<m>_EL2 */
-+	SR_RANGE_TRAP(SYS_ICH_AP1R0_EL2,
-+		      SYS_ICH_AP1R3_EL2, CGT_HCR_NV),
-+	SR_TRAP(SYS_ICC_SRE_EL2,	CGT_HCR_NV),
-+	SR_RANGE_TRAP(SYS_ICH_HCR_EL2,
-+		      SYS_ICH_EISR_EL2,	CGT_HCR_NV),
-+	SR_TRAP(SYS_ICH_ELRSR_EL2,	CGT_HCR_NV),
-+	SR_TRAP(SYS_ICH_VMCR_EL2,	CGT_HCR_NV),
-+	/* ICH_LR<m>_EL2 */
-+	SR_RANGE_TRAP(SYS_ICH_LR0_EL2,
-+		      SYS_ICH_LR15_EL2, CGT_HCR_NV),
-+	SR_TRAP(SYS_CONTEXTIDR_EL2,	CGT_HCR_NV),
-+	SR_TRAP(SYS_TPIDR_EL2,		CGT_HCR_NV),
-+	SR_TRAP(SYS_SCXTNUM_EL2,	CGT_HCR_NV),
-+	/* AMEVCNTVOFF0<n>_EL2, AMEVCNTVOFF1<n>_EL2  */
-+	SR_RANGE_TRAP(SYS_AMEVCNTVOFF0n_EL2(0),
-+		      SYS_AMEVCNTVOFF1n_EL2(15), CGT_HCR_NV),
-+	/* CNT*_EL2 */
-+	SR_TRAP(SYS_CNTVOFF_EL2,	CGT_HCR_NV),
-+	SR_TRAP(SYS_CNTPOFF_EL2,	CGT_HCR_NV),
-+	SR_TRAP(SYS_CNTHCTL_EL2,	CGT_HCR_NV),
-+	SR_RANGE_TRAP(SYS_CNTHP_TVAL_EL2,
-+		      SYS_CNTHP_CVAL_EL2, CGT_HCR_NV),
-+	SR_RANGE_TRAP(SYS_CNTHV_TVAL_EL2,
-+		      SYS_CNTHV_CVAL_EL2, CGT_HCR_NV),
- 	/* All _EL02, _EL12 registers */
- 	SR_RANGE_TRAP(sys_reg(3, 5, 0, 0, 0),
- 		      sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 38296579a4fd..ba5db50effec 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -567,19 +567,30 @@
+ #define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
+ 
+ /* VHE encodings for architectural EL0/1 system registers */
++#define SYS_BRBCR_EL12			sys_reg(2, 5, 9, 0, 0)
+ #define SYS_SCTLR_EL12			sys_reg(3, 5, 1, 0, 0)
++#define SYS_CPACR_EL12			sys_reg(3, 5, 1, 0, 2)
++#define SYS_SCTLR2_EL12			sys_reg(3, 5, 1, 0, 3)
++#define SYS_ZCR_EL12			sys_reg(3, 5, 1, 2, 0)
++#define SYS_TRFCR_EL12			sys_reg(3, 5, 1, 2, 1)
++#define SYS_SMCR_EL12			sys_reg(3, 5, 1, 2, 6)
+ #define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
+ #define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
+ #define SYS_TCR_EL12			sys_reg(3, 5, 2, 0, 2)
++#define SYS_TCR2_EL12			sys_reg(3, 5, 2, 0, 3)
+ #define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
+ #define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
+ #define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
+ #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
+ #define SYS_ESR_EL12			sys_reg(3, 5, 5, 2, 0)
+ #define SYS_TFSR_EL12			sys_reg(3, 5, 5, 6, 0)
++#define SYS_FAR_EL12			sys_reg(3, 5, 6, 0, 0)
++#define SYS_PMSCR_EL12			sys_reg(3, 5, 9, 9, 0)
+ #define SYS_MAIR_EL12			sys_reg(3, 5, 10, 2, 0)
+ #define SYS_AMAIR_EL12			sys_reg(3, 5, 10, 3, 0)
+ #define SYS_VBAR_EL12			sys_reg(3, 5, 12, 0, 0)
++#define SYS_CONTEXTIDR_EL12		sys_reg(3, 5, 13, 0, 1)
++#define SYS_SCXTNUM_EL12		sys_reg(3, 5, 13, 0, 7)
+ #define SYS_CNTKCTL_EL12		sys_reg(3, 5, 14, 1, 0)
+ #define SYS_CNTP_TVAL_EL02		sys_reg(3, 5, 14, 2, 0)
+ #define SYS_CNTP_CTL_EL02		sys_reg(3, 5, 14, 2, 1)
 -- 
 2.39.2
 
