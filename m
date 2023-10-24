@@ -1,33 +1,33 @@
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F9734CE9
-	for <kvmarm@lists.linux.dev>; Tue, 24 Oct 2023 15:18:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E014034CEC
+	for <kvmarm@lists.linux.dev>; Tue, 24 Oct 2023 15:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="iG1/WzYf"
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="RXKzMk8n"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
 	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=OJBhmyu/vU7K1KRJlvc2+ydilRGhWCEq5NT0Tp7+EuE=; b=iG1/WzYfoNKMjG2yRgqZ7a5B0t
-	WY8q8c75UjwIZGLwimqMAq+a5yTVtFo/3pMzO+5/QGwrpwXMxCov9HkQ7Dn1xzchPFUFPSzJImOvY
-	DwcMTnTgwJ0oSlPsItxxXEpaLM88bE1KJtLbUXsD+yhx9bjRTTSJSjIdQD9BjWYWTn5Y2oTZPOUU2
-	qJuUrhkO/SLTo/YujC5eGYjr4v+HOW00S+A21rFPqgc/w/RF2BqHzD7Gcm58inz/AwZgGKsjT4p10
-	6jybcpzSBfl4agcBvOuVM5jZrOfrhlUS7+RyIeP+amro9BXC+vhzHxrJ0TC39ACMtD5qSZOF60yB0
-	DuAqUghg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:47588 helo=rmk-PC.armlinux.org.uk)
+	bh=7mUed4j6JYeBkSblH2nqcvZsQbChg0c7FCSaYvctrZY=; b=RXKzMk8nxqLsHr4DrG64vwCDNl
+	L1dBvNRAboxbtvs9cSI1KCnV0hnPEd7IW2lznQwfui6jPeu3MJ5AAq2UCyu6FgD+8x2iGNf4iDs5W
+	Hw2gX7LecqKIJFAwAF1BKt8bxa1WBrvQMwLcjVSAzi89+ncVyvzw0koZvYsmjNUkGg+jRIE5r3U5x
+	orHxHls/n75Zzq/kBkYtZ0EOZfE8GldZzqesp2T03cpK4YGxXTcZiQmUuT5AYQwhg5tvCo9L0tXt9
+	NbmL3Te3xKJ1+ljcRqR+ihf1KD34wlPyBSMmb4jpyIB5r1SctfT0r+pSXWkYCf0HEW9QvzvWn9Ogc
+	wAFyW+YA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:44454 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1qvJAz-0004Uh-0A;
-	Tue, 24 Oct 2023 16:18:37 +0100
+	id 1qvJB9-0004VJ-12;
+	Tue, 24 Oct 2023 16:18:47 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1qvJB0-00AqRe-H9; Tue, 24 Oct 2023 16:18:38 +0100
+	id 1qvJBA-00AqRq-QW; Tue, 24 Oct 2023 16:18:48 +0100
 In-Reply-To: <ZTffkAdOqL2pI2la@shell.armlinux.org.uk>
 References: <ZTffkAdOqL2pI2la@shell.armlinux.org.uk>
 From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
@@ -49,10 +49,11 @@ Cc: Salil Mehta <salil.mehta@huawei.com>,
 	 jianyong.wu@arm.com,
 	 justin.he@arm.com,
 	 James Morse <james.morse@arm.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>
-Subject: [PATCH 29/39] LoongArch: Use the __weak version of
- arch_unregister_cpu()
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <lenb@kernel.org>,
+	Robert Moore <robert.moore@intel.com>,
+	acpica-devel@lists.linuxfoundation.org
+Subject: [PATCH 31/39] ACPICA: Add new MADT GICC flags fields
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -62,48 +63,43 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1qvJB0-00AqRe-H9@rmk-PC.armlinux.org.uk>
+Message-Id: <E1qvJBA-00AqRq-QW@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 24 Oct 2023 16:18:38 +0100
+Date: Tue, 24 Oct 2023 16:18:48 +0100
 
 From: James Morse <james.morse@arm.com>
 
-LoongArch provides its own arch_unregister_cpu(). This clears the
-hotpluggable flag, then unregisters the CPU.
+Add the new flag field to the MADT's GICC structure.
 
-It isn't necessary to clear the hotpluggable flag when unregistering
-a cpu. unregister_cpu() writes NULL to the percpu cpu_sys_devices
-pointer, meaning cpu_is_hotpluggable() will return false, as
-get_cpu_device() has returned NULL.
-
-Remove arch_unregister_cpu() and use the __weak version.
+'Online Capable' indicates a disabled CPU can be enabled later. See
+ACPI specification 6.5 Tabel 5.37: GICC CPU Interface Flags.
 
 Signed-off-by: James Morse <james.morse@arm.com>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- arch/loongarch/kernel/topology.c | 9 ---------
- 1 file changed, 9 deletions(-)
+This patch probably needs to go via the upstream acpica project,
+but is included here so the feature can be tested.
 
-diff --git a/arch/loongarch/kernel/topology.c b/arch/loongarch/kernel/topology.c
-index bf58351beac1..b595edbfdbcd 100644
---- a/arch/loongarch/kernel/topology.c
-+++ b/arch/loongarch/kernel/topology.c
-@@ -19,13 +19,4 @@ int arch_register_cpu(int cpu)
- 	return register_cpu(c, cpu);
- }
- EXPORT_SYMBOL(arch_register_cpu);
--
--void arch_unregister_cpu(int cpu)
--{
--	struct cpu *c = &per_cpu(cpu_devices, cpu);
--
--	c->hotpluggable = 0;
--	unregister_cpu(c);
--}
--EXPORT_SYMBOL(arch_unregister_cpu);
- #endif
+If the ACPICA header files are updated before merging this patch set,
+this patch will need to be dropped.
+
+Changes since RFC v2:
+ * Add ACPI specification reference.
+---
+ include/acpi/actbl2.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/acpi/actbl2.h b/include/acpi/actbl2.h
+index 3751ae69432f..c433a079d8e1 100644
+--- a/include/acpi/actbl2.h
++++ b/include/acpi/actbl2.h
+@@ -1046,6 +1046,7 @@ struct acpi_madt_generic_interrupt {
+ /* ACPI_MADT_ENABLED                    (1)      Processor is usable if set */
+ #define ACPI_MADT_PERFORMANCE_IRQ_MODE  (1<<1)	/* 01: Performance Interrupt Mode */
+ #define ACPI_MADT_VGIC_IRQ_MODE         (1<<2)	/* 02: VGIC Maintenance Interrupt mode */
++#define ACPI_MADT_GICC_CPU_CAPABLE      (1<<3)	/* 03: CPU is online capable */
+ 
+ /* 12: Generic Distributor (ACPI 5.0 + ACPI 6.0 changes) */
+ 
 -- 
 2.30.2
 
