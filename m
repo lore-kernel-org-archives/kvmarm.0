@@ -1,51 +1,42 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+Received: from out-196.mta1.migadu.com (out-196.mta1.migadu.com [95.215.58.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A967F1867;
-	Tue, 24 Oct 2023 02:48:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072471FDF
+	for <kvmarm@lists.linux.dev>; Tue, 24 Oct 2023 08:59:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vedm9pLI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698115722; x=1729651722;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Vn/fjV4P+zc9B3QmfEgLuMtyggmZPzlv8T3CRouHy8c=;
-  b=Vedm9pLIGWifFDLVLzMKo+kLud2c3EmjmAFZ6XHYwfALEB/qc94d2crS
-   Si2WiX3bs/ozP0C9iJolKTN93WB2y5RxuX8S9vIo1BqoP8CXsMwp4HUW9
-   wU9YtF5lJKgLPzmcHUHeaZFoASxUMhtHuoE7Dy3kjooQlWNQS96o+HUm5
-   +JiYMSYaXYdcpZ54OKIqv2zWwRLExoDBqd+mOhZsjbBDsHXLx3OmobtDT
-   6msTyj4rkDF2l9q1WaRvPHNLXwVfdXK0/LjMZbqpepTDiYTHQ0cWLCwW/
-   9cN9fI69AynxurSDoa4bwvFGrckbx4AHeLboaURj5oiBA487pb6vHAqM/
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="384172019"
-X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
-   d="scan'208";a="384172019"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 19:48:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
-   d="scan'208";a="6020662"
-Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 23 Oct 2023 19:47:20 -0700
-Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qv7T8-0007Uy-0h;
-	Tue, 24 Oct 2023 02:48:34 +0000
-Date: Tue, 24 Oct 2023 10:47:58 +0800
-From: kernel test robot <lkp@intel.com>
-To: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oFd6EYkL"
+Date: Tue, 24 Oct 2023 08:59:30 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1698137975;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=D6TYYpqy8N97kO8tVC2Cc3XTS86qRouwgud2Yw4OPK4=;
+	b=oFd6EYkL7idjhlxEaG6UTiY53c5RjtDdeG3QcRHlcOHPEzg95lcPHSAzMzHXNHO0bq+jwH
+	S0AjNrrfYFkVGFRIKIhvXqcpVLF/ujPhdmZwVQbJY99KGSuW/VvDTLLF9tS9aslIs6AP4R
+	wBfV8EFFpLCr8xGx0f3ThQAbDEldEms=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Marc Zyngier <maz@kernel.org>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v3 1/2] KVM: arm64: Make PMEVTYPER<n>_EL0.NSH RES0 if EL2
- isn't advertised
-Message-ID: <202310241025.FmLnpSTG-lkp@intel.com>
-References: <20231019185618.3442949-2-oliver.upton@linux.dev>
+	Shaoqin Huang <shahuang@redhat.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Reiji Watanabe <reijiw@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v8 05/13] KVM: arm64: Add {get,set}_user for
+ PM{C,I}NTEN{SET,CLR}, PMOVS{SET,CLR}
+Message-ID: <ZTeHcj97B8sLw6oI@linux.dev>
+References: <20231020214053.2144305-1-rananta@google.com>
+ <20231020214053.2144305-6-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,149 +45,60 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231019185618.3442949-2-oliver.upton@linux.dev>
+In-Reply-To: <20231020214053.2144305-6-rananta@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Oliver,
+On Fri, Oct 20, 2023 at 09:40:45PM +0000, Raghavendra Rao Ananta wrote:
+> For unimplemented counters, the bits in PM{C,I}NTEN{SET,CLR} and
+> PMOVS{SET,CLR} registers are expected to RAZ. To honor this,
+> explicitly implement the {get,set}_user functions for these
+> registers to mask out unimplemented counters for userspace reads
+> and writes.
+> 
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 91 ++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 85 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index faf97878dfbbb..2e5d497596ef8 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -987,6 +987,45 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	return true;
+>  }
+>  
+> +static void set_pmreg_for_valid_counters(struct kvm_vcpu *vcpu,
+> +					  u64 reg, u64 val, bool set)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +
+> +	mutex_lock(&kvm->arch.config_lock);
+> +
+> +	/* Make the register immutable once the VM has started running */
 
-kernel test robot noticed the following build errors:
+This is a considerable change from the existing behavior and lacks
+justification. These registers, or rather the state that these aliases
+update, is mutable from the guest. I see no reason for excluding
+userspace from this behavior.
 
-[auto build test ERROR on 6465e260f48790807eef06b583b38ca9789b6072]
+> +	if (kvm_vm_has_ran_once(kvm)) {
+> +		mutex_unlock(&kvm->arch.config_lock);
+> +		return;
+> +	}
+> +
+> +	val &= kvm_pmu_valid_counter_mask(vcpu);
+> +	mutex_unlock(&kvm->arch.config_lock);
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Oliver-Upton/KVM-arm64-Make-PMEVTYPER-n-_EL0-NSH-RES0-if-EL2-isn-t-advertised/20231020-025836
-base:   6465e260f48790807eef06b583b38ca9789b6072
-patch link:    https://lore.kernel.org/r/20231019185618.3442949-2-oliver.upton%40linux.dev
-patch subject: [PATCH v3 1/2] KVM: arm64: Make PMEVTYPER<n>_EL0.NSH RES0 if EL2 isn't advertised
-config: arm64-randconfig-004-20231023 (https://download.01.org/0day-ci/archive/20231024/202310241025.FmLnpSTG-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231024/202310241025.FmLnpSTG-lkp@intel.com/reproduce)
+I'm not entirely sold on taking the config_lock here.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310241025.FmLnpSTG-lkp@intel.com/
+ - If userspace is doing these ioctls in parallel then it cannot guarantee
+   ordering in the first place, even w/ locking under the hood. Any
+   garbage values will be discarded by KVM_REQ_RELOAD_PMU.
 
-All errors (new ones prefixed by >>):
-
-   arch/arm64/kvm/sys_regs.c: In function 'reset_pmevtyper':
->> arch/arm64/kvm/sys_regs.c:754:41: error: too many arguments to function 'kvm_pmu_evtyper_mask'
-     754 |         __vcpu_sys_reg(vcpu, r->reg) &= kvm_pmu_evtyper_mask(vcpu->kvm);
-         |                                         ^~~~~~~~~~~~~~~~~~~~
-   In file included from arch/arm64/include/asm/kvm_host.h:37,
-                    from include/linux/kvm_host.h:45,
-                    from arch/arm64/kvm/sys_regs.c:15:
-   include/kvm/arm_pmu.h:176:19: note: declared here
-     176 | static inline u64 kvm_pmu_evtyper_mask(void)
-         |                   ^~~~~~~~~~~~~~~~~~~~
-   arch/arm64/kvm/sys_regs.c: At top level:
-   arch/arm64/kvm/sys_regs.c:2174:20: warning: initialized field overwritten [-Woverride-init]
-    2174 |           .reset = reset_pmcr, .reg = PMCR_EL0 },
-         |                    ^~~~~~~~~~
-   arch/arm64/kvm/sys_regs.c:2174:20: note: (near initialization for 'sys_reg_descs[233].reset')
-   In file included from include/uapi/linux/posix_types.h:5,
-                    from include/uapi/linux/types.h:14,
-                    from include/linux/types.h:6,
-                    from include/linux/kasan-checks.h:5,
-                    from include/asm-generic/rwonce.h:26,
-                    from arch/arm64/include/asm/rwonce.h:71,
-                    from include/linux/compiler.h:246,
-                    from include/linux/build_bug.h:5,
-                    from include/linux/bitfield.h:10,
-                    from arch/arm64/kvm/sys_regs.c:12:
-   include/linux/stddef.h:8:14: warning: initialized field overwritten [-Woverride-init]
-       8 | #define NULL ((void *)0)
-         |              ^
-   arch/arm64/kvm/sys_regs.c:2187:46: note: in expansion of macro 'NULL'
-    2187 |           .access = access_pmswinc, .reset = NULL },
-         |                                              ^~~~
-   include/linux/stddef.h:8:14: note: (near initialization for 'sys_reg_descs[237].reset')
-       8 | #define NULL ((void *)0)
-         |              ^
-   arch/arm64/kvm/sys_regs.c:2187:46: note: in expansion of macro 'NULL'
-    2187 |           .access = access_pmswinc, .reset = NULL },
-         |                                              ^~~~
-   arch/arm64/kvm/sys_regs.c:2189:45: warning: initialized field overwritten [-Woverride-init]
-    2189 |           .access = access_pmselr, .reset = reset_pmselr, .reg = PMSELR_EL0 },
-         |                                             ^~~~~~~~~~~~
-   arch/arm64/kvm/sys_regs.c:2189:45: note: (near initialization for 'sys_reg_descs[238].reset')
-   include/linux/stddef.h:8:14: warning: initialized field overwritten [-Woverride-init]
-       8 | #define NULL ((void *)0)
-         |              ^
-   arch/arm64/kvm/sys_regs.c:2191:45: note: in expansion of macro 'NULL'
-    2191 |           .access = access_pmceid, .reset = NULL },
-         |                                             ^~~~
-   include/linux/stddef.h:8:14: note: (near initialization for 'sys_reg_descs[239].reset')
-       8 | #define NULL ((void *)0)
-         |              ^
-   arch/arm64/kvm/sys_regs.c:2191:45: note: in expansion of macro 'NULL'
-    2191 |           .access = access_pmceid, .reset = NULL },
-         |                                             ^~~~
-   include/linux/stddef.h:8:14: warning: initialized field overwritten [-Woverride-init]
-       8 | #define NULL ((void *)0)
-         |              ^
-   arch/arm64/kvm/sys_regs.c:2193:45: note: in expansion of macro 'NULL'
-    2193 |           .access = access_pmceid, .reset = NULL },
-         |                                             ^~~~
-   include/linux/stddef.h:8:14: note: (near initialization for 'sys_reg_descs[240].reset')
-       8 | #define NULL ((void *)0)
-         |              ^
-   arch/arm64/kvm/sys_regs.c:2193:45: note: in expansion of macro 'NULL'
-    2193 |           .access = access_pmceid, .reset = NULL },
-         |                                             ^~~~
-   arch/arm64/kvm/sys_regs.c:2195:49: warning: initialized field overwritten [-Woverride-init]
-    2195 |           .access = access_pmu_evcntr, .reset = reset_unknown,
-         |                                                 ^~~~~~~~~~~~~
-   arch/arm64/kvm/sys_regs.c:2195:49: note: (near initialization for 'sys_reg_descs[241].reset')
-   include/linux/stddef.h:8:14: warning: initialized field overwritten [-Woverride-init]
-       8 | #define NULL ((void *)0)
-         |              ^
-   arch/arm64/kvm/sys_regs.c:2198:50: note: in expansion of macro 'NULL'
-    2198 |           .access = access_pmu_evtyper, .reset = NULL },
-         |                                                  ^~~~
-   include/linux/stddef.h:8:14: note: (near initialization for 'sys_reg_descs[242].reset')
-       8 | #define NULL ((void *)0)
-         |              ^
-   arch/arm64/kvm/sys_regs.c:2198:50: note: in expansion of macro 'NULL'
-    2198 |           .access = access_pmu_evtyper, .reset = NULL },
-         |                                                  ^~~~
-   include/linux/stddef.h:8:14: warning: initialized field overwritten [-Woverride-init]
-       8 | #define NULL ((void *)0)
-         |              ^
-   arch/arm64/kvm/sys_regs.c:2200:49: note: in expansion of macro 'NULL'
-    2200 |           .access = access_pmu_evcntr, .reset = NULL },
-         |                                                 ^~~~
-   include/linux/stddef.h:8:14: note: (near initialization for 'sys_reg_descs[243].reset')
-       8 | #define NULL ((void *)0)
-         |              ^
-   arch/arm64/kvm/sys_regs.c:2200:49: note: in expansion of macro 'NULL'
-    2200 |           .access = access_pmu_evcntr, .reset = NULL },
-         |                                                 ^~~~
-   arch/arm64/kvm/sys_regs.c:2206:20: warning: initialized field overwritten [-Woverride-init]
-    2206 |           .reset = reset_val, .reg = PMUSERENR_EL0, .val = 0 },
-         |                    ^~~~~~~~~
-   arch/arm64/kvm/sys_regs.c:2206:20: note: (near initialization for 'sys_reg_descs[244].reset')
-   arch/arm64/kvm/sys_regs.c:1128:20: warning: initialized field overwritten [-Woverride-init]
-    1128 |           .reset = reset_pmevcntr, .get_user = get_pmu_evcntr,          \
-         |                    ^~~~~~~~~~~~~~
-   arch/arm64/kvm/sys_regs.c:2296:9: note: in expansion of macro 'PMU_PMEVCNTR_EL0'
-    2296 |         PMU_PMEVCNTR_EL0(0),
-
-
-vim +/kvm_pmu_evtyper_mask +754 arch/arm64/kvm/sys_regs.c
-
-   746	
-   747	static u64 reset_pmevtyper(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-   748	{
-   749		/* This thing will UNDEF, who cares about the reset value? */
-   750		if (!kvm_vcpu_has_pmu(vcpu))
-   751			return 0;
-   752	
-   753		reset_unknown(vcpu, r);
- > 754		__vcpu_sys_reg(vcpu, r->reg) &= kvm_pmu_evtyper_mask(vcpu->kvm);
-   755	
-   756		return __vcpu_sys_reg(vcpu, r->reg);
-   757	}
-   758	
+ - If the VM has already started PMCR.N is immutable, so there is no
+   race.
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+Oliver
