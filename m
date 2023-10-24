@@ -1,58 +1,56 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9072D23A7
-	for <kvmarm@lists.linux.dev>; Tue, 24 Oct 2023 11:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFDA114F74
+	for <kvmarm@lists.linux.dev>; Tue, 24 Oct 2023 11:31:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ZVtRI3i8"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=p9Xk6+oVu2eZSCHniKsbVUw777g3shFxugtPS4C2Azc=; b=ZVtRI3i8atfSABmwqYOam92raQ
-	sGbWV0A3UKiGLSAkdhisvJ/Q3AW4A8vqe+K9zP0mN5nimUsw9Q/zg1bAMTEvwX3VL9oPE208SBLW5
-	CdkR3e9MhuDKI0nOCcqkMgGfjmaH0CjVXYUptjRbTY24/ebqcC69b3MRM7jiKvWj/Z8icCFy6dtK+
-	hmRSLuuC/iJ9jau8xMEmZGgM8xSCFtfxZxyNWuwijdN5Pmzom9RlONQ+ddjwAj+YxHH8f4rP9LN8b
-	jx5jcWOGsmFNUeFBI7LlmTTt5LkAl3+llaabm8ykn15h2Okzsikzg1rvRM/CnB5RupJcx2+whac05
-	/7r1Emsw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47178)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qvFal-00045E-1p;
-	Tue, 24 Oct 2023 12:28:59 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qvFaj-0005rQ-FG; Tue, 24 Oct 2023 12:28:57 +0100
-Date: Tue, 24 Oct 2023 12:28:57 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Miguel Luis <miguel.luis@oracle.com>
-Cc: "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
-	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
-	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"x86@kernel.org" <x86@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	"jianyong.wu@arm.com" <jianyong.wu@arm.com>,
-	"justin.he@arm.com" <justin.he@arm.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Len Brown <lenb@kernel.org>
-Subject: Re: [PATCH] ACPI: Rename acpi_scan_device_not_present() to be about
- enumeration
-Message-ID: <ZTeqeRRbJgEdbMV3@shell.armlinux.org.uk>
-References: <E1qtuWW-00AQ7P-0W@rmk-PC.armlinux.org.uk>
- <5589E5A5-9F97-416A-9C48-9828B0BE58CD@oracle.com>
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="P4pga1sa"
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-507bd64814fso6351390e87.1
+        for <kvmarm@lists.linux.dev>; Tue, 24 Oct 2023 04:31:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1698147103; x=1698751903; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=BYH227TNmETvLgiFYzkkeDFOa5cAeGRjW0q0lGDqvfQ=;
+        b=P4pga1sabiTYRpKtyTKQ6FTgDbag+a3ydwWp9eOiVeJm84p1HuOHhFeStJY+4WoQZ0
+         4cHGF7HtdNi0UGDQ8T/tYtb9dSQNap2pV7o8A2I6hnGdsVaPGotOHw+wC5x/e8TdtBfz
+         nN67+Q1Qt+N/79dcoLQA23yZy5Y6rshCoauHlbCywcpFG5RlL9acfInkDnfpd7+sGBh0
+         3PnGJUppolvBvM+xwAVODcY01uyCaZL9b4L9BLHa01Tg0IE5SadrCFvEVYNNczKyUTxC
+         I3L/f6NGLBKtx2MI5NUZKgdqPBxTrISQeS2y415CTj9guFpzkluRVFUNax8xN4EoI8Ff
+         kkag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698147103; x=1698751903;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BYH227TNmETvLgiFYzkkeDFOa5cAeGRjW0q0lGDqvfQ=;
+        b=fjnA1MI8X0pbTTK6tVNBcrHWlK18rdEBypgn81HKQymmCj8aJaAOvaOfoS6z4mw4HM
+         zmuAM7+1tK+DeyX8wOF4OeBOi9+zPIEoS1wbX8I/EPCW7Vq43zYdgim/omupS+He61KN
+         MdhnuwAkz5XqgP1BCDo1OegE5lQSVK4WF9Db2pbTZmpmSq/dlS1RKwbrwtPkhZPYD6P8
+         shDW3L4pyuPDwpL1P8Jy3RPQyY9KnteOWe0ip0DPlwSltPBDAsspCg2gbU1WqjiV4cN9
+         u/asaTF0vqDzS9RSmvhl1rZBYma+dOkPWxFEzHDrPrvSbl+JrNALasLTiCrisWPOqWqX
+         hCoQ==
+X-Gm-Message-State: AOJu0YwKt+HsvNFfyq5CoX4DQpyDOAEWu4yPXI5SQO6ZgK52C/5Z6z0a
+	FJ7SztBRrZEmyh/h7vvsoLF7uQ==
+X-Google-Smtp-Source: AGHT+IFeJyUG+BU9vPz+IRDCZmjWiKngbqDyjvsC5ZvlsbdlYH+ryb1lqbxUSUqD1xb8tTeqWFPocA==
+X-Received: by 2002:a05:6512:4db:b0:507:a671:3231 with SMTP id w27-20020a05651204db00b00507a6713231mr7925311lfq.52.1698147102559;
+        Tue, 24 Oct 2023 04:31:42 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id a3-20020a5d4d43000000b003196b1bb528sm9700676wru.64.2023.10.24.04.31.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Oct 2023 04:31:42 -0700 (PDT)
+Date: Tue, 24 Oct 2023 13:31:41 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Matthias Rosenfelder <matthias.rosenfelder@nio.io>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	Andrew Jones <andrew.jones@linux.dev>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Eric Auger <eric.auger@redhat.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+Subject: Re: [kvm-unit-tests PATCH] arm: pmu: Fix overflow test condition
+Message-ID: <20231024-9418f5e7b9e014986bdd4b58@orel>
+References: <FRYP281MB31463EC1486883DDA477393DF2C0A@FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -62,42 +60,29 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <5589E5A5-9F97-416A-9C48-9828B0BE58CD@oracle.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <FRYP281MB31463EC1486883DDA477393DF2C0A@FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM>
 
-On Tue, Oct 24, 2023 at 10:15:07AM +0000, Miguel Luis wrote:
-> Hi Russell,
+On Fri, Sep 29, 2023 at 09:19:37PM +0000, Matthias Rosenfelder wrote:
+> Hello,
 > 
-> > On 20 Oct 2023, at 18:47, Russell King <rmk+kernel@armlinux.org.uk> wrote:
-> > 
-> > From: James Morse <james.morse@arm.com>
-> > 
-> > acpi_scan_device_not_present() is called when a device in the
-> > hierarchy is not available for enumeration. Historically enumeration
-> > was only based on whether the device was present.
-> > 
-> > To add support for only enumerating devices that are both present
-> > and enabled, this helper should be renamed. It was only ever about
-> > enumeration, rename it acpi_scan_device_not_enumerated().
-> > 
-> > No change in behaviour is intended.
-> > 
-> > Signed-off-by: James Morse <james.morse@arm.com>
-> > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> I think one of the test conditions for the KVM PMU unit test "basic_event_count" is not strong enough. It only checks whether an overflow occurred for counter #0, but it should also check that none happened for the other counter(s):
 > 
-> Fixes: 443fc8202272 ("ACPI / hotplug: Rework generic code to handle suprise removals”) ?
+> report(read_sysreg(pmovsclr_el0) & 0x1,
+>       "check overflow happened on #0 only");
+> 
+> This should be "==" instead of "&".
+> 
+> Note that this test uses one more counter (#1), which must not overflow. This should also be checked, even though this would be visible through the "report_info()" a few lines above. But the latter does not mark the test failing - it is purely informational, so any test automation will not notice.
+> 
+> 
+> I apologize in advance if my email program at work messes up any formatting. Please let me know and I will try to reconfigure and resend if necessary. Thank you.
 
-I'm not sure a patch that is merely renaming a function should ever
-have a Fixes tag, since it's just a naming issue, it doesn't fix a
-bug, change functionality or anything like that.
+Hey Matthias,
 
-I would suggest that there would need to be good reason why such a
-patch should be backported to stable kernels - for example, something
-else that does fix a user visible bug requires this change.
+We let you know the formatting was wrong, but we haven't yet received a
+resend. But, since Eric already reviewed it, I've gone ahead and applied
+it to arm/queue with this fixes tag
 
-Thanks.
+Fixes: 4ce2a8045624 ("arm: pmu: Basic event counter Tests")
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+drew
