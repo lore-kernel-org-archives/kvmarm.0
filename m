@@ -1,103 +1,164 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B003A27F
-	for <kvmarm@lists.linux.dev>; Tue, 24 Oct 2023 16:31:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C84927EDD
+	for <kvmarm@lists.linux.dev>; Tue, 24 Oct 2023 17:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="rsZIaVku"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Mv2+9gUUjwW5p4nAhtEkX5YZZx1pxyCR6znx1hs0kpI=; b=rsZIaVku++xS3FLshJEaUmBzq+
-	IZD6Cn2c0/et6Uo+JOt4WeR9dFq1Ut+rF5FrT6IV5KhIFvVMf+LLjBQLU47NDzgIwcmGbpVvhRTRU
-	gCMWRDcUie6kOaY2a7dMFClZ3267XEs/FktAYAglK9oyph9oihl1JtFf48qSzAA3ywoyWzC0GfK9M
-	PTB0JemBhYOU0lDTVo1ICvemFtxrnnzr1IC3EEZQvKuCtWm90ax0Ijo4QL9EWtWa0cPIQeUEmcXl+
-	LV7aHQWDApKmS5tOWVE6eDqhk5hYbwHCvkYKAl3o4s/teUj9wygTZAZpbtSMTDvDNzQIg9tkuFtyu
-	U9rcIOVQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33572)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qvKJm-0004fl-0V;
-	Tue, 24 Oct 2023 17:31:46 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qvKJl-00063d-WA; Tue, 24 Oct 2023 17:31:46 +0100
-Date: Tue, 24 Oct 2023 17:31:45 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
-	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
-	x86@kernel.org, acpica-devel@lists.linuxfoundation.org,
-	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org
-Cc: Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	jianyong.wu@arm.com, justin.he@arm.com,
-	James Morse <james.morse@arm.com>
-Subject: Re: [RFC PATCH v3 00/39] ACPI/arm64: add support for virtual
- cpuhotplug
-Message-ID: <ZTfxcU3EsBNOGIUm@shell.armlinux.org.uk>
-References: <ZTffkAdOqL2pI2la@shell.armlinux.org.uk>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lkoKW8J+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20A85C433C8;
+	Tue, 24 Oct 2023 17:25:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698168337;
+	bh=SnWhqOBzSfdQFKc2+NrPePJmpUyCSWtBX0wZvzDayBE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lkoKW8J+yBAbVUuHRsznJ7NJUM0vyd3HTPdO9NHQRh2oS1BQLKS266jIaCrBIuWPa
+	 8cemPvRda423dU7M/m3jkZ/SuM9BY/SxBv00jxHMO94kuQ5EW48ZyIM3pQgvgqjpj6
+	 Mff08eWSBDXdOsEprA4vs1GcEE50Wt7z+X5P1kFSOyyC7RnuWK9KAQy4isGA6Cg/ZY
+	 FJKlLGR4OrtDCKSPsd9+aVTMgLJCxRIc0mOx33qvgeo/Zb857HspXgzZbSADS3Ug/W
+	 fZFzCQ+EbqIT/maTBWpgnayzsUqczNYIEBuztSC10nVjCZyYC5jPDgl0XmNpD/jKzs
+	 Sg90Q7QBHdsLA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1qvL9q-007Iu3-9e;
+	Tue, 24 Oct 2023 18:25:34 +0100
+Date: Tue, 24 Oct 2023 18:25:33 +0100
+Message-ID: <86jzrc3pbm.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Miguel Luis <miguel.luis@oracle.com>
+Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	Eric Auger <eric.auger@redhat.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 5/5] KVM: arm64: Handle AArch32 SPSR_{irq,abt,und,fiq} as RAZ/WI
+In-Reply-To: <7DD05DC0-164E-440F-BEB1-E5040C512008@oracle.com>
+References: <20231023095444.1587322-1-maz@kernel.org>
+	<20231023095444.1587322-6-maz@kernel.org>
+	<7DD05DC0-164E-440F-BEB1-E5040C512008@oracle.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZTffkAdOqL2pI2la@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, eric.auger@redhat.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Oct 24, 2023 at 04:15:28PM +0100, Russell King (Oracle) wrote:
-> Hi,
-> 
-> I'm posting James' patch set updated with most of the review comments
-> from his RFC v2 series back in September. Individual patches have a
-> changelog attached at the bottom of the commit message. Those which
-> I have finished updating have my S-o-b on them, those which still have
-> outstanding review comments from RFC v2 do not. In some of these cases
-> I've asked questions and am waiting for responses.
-> 
-> I'm posting this as RFC v3 because there's still some unaddressed
-> comments and it's clearly not ready for merging. Even if it was ready
-> to be merged, it is too late in this development cycle to be taking
-> this change in, so there would be little point posting it non-RFC.
-> Also James stated that he's waiting for confirmation from the
-> Kubernetes/Kata folk - I have no idea what the status is there.
-> 
-> I will be sending each patch individually to a wider audience
-> appropriate for that patch - apologies to those missing out on this
-> cover message. I have added more mailing lists to the series with the
-> exception of the acpica list in a hope of this cover message also
-> reaching those folk.
-> 
-> The changes that aren't included are:
-> 
-> 1. Updates for my patch that was merged via Thomas (thanks!):
->    c4dd854f740c cpu-hotplug: Provide prototypes for arch CPU registration
->    rather than having this change spread through James' patches.
-> 
-> 2. New patch - simplification of PA-RISC's smp_prepare_boot_cpu()
-> 
-> 3. Moved "ACPI: Use the acpi_device_is_present() helper in more places"
->    and "ACPI: Rename acpi_scan_device_not_present() to be about
->    enumeration" to the beginning of the series - these two patches are
->    already queued up for merging into 6.7.
-> 
-> 4. Moved "arm64, irqchip/gic-v3, ACPI: Move MADT GICC enabled check into
->    a helper" to the beginning of the series, which has been submitted,
->    but as yet the fate of that posting isn't known.
+On Mon, 23 Oct 2023 19:55:10 +0100,
+Miguel Luis <miguel.luis@oracle.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> > On 23 Oct 2023, at 09:54, Marc Zyngier <maz@kernel.org> wrote:
+> >=20
+> > When trapping accesses from a NV guest that tries to access
+> > SPSR_{irq,abt,und,fiq}, make sure we handle them as RAZ/WI,
+> > as if AArch32 wasn't implemented.
+> >=20
+> > This involves a bit of repainting to make the visibility
+> > handler more generic.
+> >=20
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> > arch/arm64/include/asm/sysreg.h |  4 ++++
+> > arch/arm64/kvm/sys_regs.c       | 16 +++++++++++++---
+> > 2 files changed, 17 insertions(+), 3 deletions(-)
+> >=20
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/s=
+ysreg.h
+> > index 4a20a7dc5bc4..5e65f51c10d2 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -505,6 +505,10 @@
+> > #define SYS_SPSR_EL2 sys_reg(3, 4, 4, 0, 0)
+> > #define SYS_ELR_EL2 sys_reg(3, 4, 4, 0, 1)
+> > #define SYS_SP_EL1 sys_reg(3, 4, 4, 1, 0)
+> > +#define SYS_SPSR_irq sys_reg(3, 4, 4, 3, 0)
+> > +#define SYS_SPSR_abt sys_reg(3, 4, 4, 3, 1)
+> > +#define SYS_SPSR_und sys_reg(3, 4, 4, 3, 2)
+> > +#define SYS_SPSR_fiq sys_reg(3, 4, 4, 3, 3)
+> > #define SYS_IFSR32_EL2 sys_reg(3, 4, 5, 0, 1)
+> > #define SYS_AFSR0_EL2 sys_reg(3, 4, 5, 1, 0)
+> > #define SYS_AFSR1_EL2 sys_reg(3, 4, 5, 1, 1)
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 0071ccccaf00..be1ebd2c5ba0 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -1791,8 +1791,8 @@ static unsigned int el2_visibility(const struct k=
+vm_vcpu *vcpu,
+> >  * HCR_EL2.E2H=3D=3D1, and only in the sysreg table for convenience of
+> >  * handling traps. Given that, they are always hidden from userspace.
+> >  */
+> > -static unsigned int elx2_visibility(const struct kvm_vcpu *vcpu,
+> > -    const struct sys_reg_desc *rd)
+> > +static unsigned int hidden_user_visibility(const struct kvm_vcpu *vcpu,
+> > +   const struct sys_reg_desc *rd)
+> > {
+> > return REG_HIDDEN_USER;
+> > }
+> > @@ -1803,7 +1803,7 @@ static unsigned int elx2_visibility(const struct =
+kvm_vcpu *vcpu,
+> > .reset =3D rst, \
+> > .reg =3D name##_EL1, \
+> > .val =3D v, \
+> > - .visibility =3D elx2_visibility, \
+> > + .visibility =3D hidden_user_visibility, \
+> > }
+> >=20
+> > /*
+> > @@ -2387,6 +2387,16 @@ static const struct sys_reg_desc sys_reg_descs[]=
+ =3D {
+> > EL2_REG(ELR_EL2, access_rw, reset_val, 0),
+> > { SYS_DESC(SYS_SP_EL1), access_sp_el1},
+> >=20
+> > + /* AArch32 SPSR_* are RES0 if trapped from a NV guest */
+> > + { SYS_DESC(SYS_SPSR_irq), .access =3D trap_raz_wi,
+> > +  .visibility =3D hidden_user_visibility },
+> > + { SYS_DESC(SYS_SPSR_abt), .access =3D trap_raz_wi,
+> > +  .visibility =3D hidden_user_visibility },
+> > + { SYS_DESC(SYS_SPSR_und), .access =3D trap_raz_wi,
+> > +  .visibility =3D hidden_user_visibility },
+> > + { SYS_DESC(SYS_SPSR_fiq), .access =3D trap_raz_wi,
+> > +  .visibility =3D hidden_user_visibility },
+> > +
+>=20
+> I=E2=80=99m trying to understand this patch and its surroundings.
+>=20
+> Those SPSR_* registers UNDEF at EL0. I do not understand
+> why use REG_HIDDEN_USER instead of REG_HIDDEN.
 
-Update: Catalin has just merged this patch! Thanks.
+USER here means host userspace, not guest EL0. That's because the
+various SPSR_* registers are already visible from userspace as
+KVM_REG_ARM_CORE_REG(spsr[KVM_SPSR_*]), and the above entries are
+solely for the purpose of handling a trap (and thus must not be
+exposed in the list of available sysregs).
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+This is similar to what we are doing for the ELx2 registers, which are
+already exposed as EL0/EL1 registers.
+
+> Also, could you please explain what is happening at PSTATE.EL =3D=3D EL1
+> and if EL2Enabled() && HCR_EL2.NV =3D=3D =E2=80=981=E2=80=99  ?
+
+We directly take the trap and not forward it. This isn't exactly the
+letter of the architecture, but at the same time, treating these
+registers as RAZ/WI is the only valid implementation. I don't
+immediately see a problem with taking this shortcut.
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
