@@ -1,101 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C57111CA94
-	for <kvmarm@lists.linux.dev>; Wed, 25 Oct 2023 12:42:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188A52E632
+	for <kvmarm@lists.linux.dev>; Wed, 25 Oct 2023 19:07:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aTHVLM06"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92C1EC433C8;
-	Wed, 25 Oct 2023 12:42:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698237753;
-	bh=yzeS0gUSkHVygnq8OBWI5G21PAVnebjTnO/tgesGvY4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aTHVLM06ImMeTx5eBRFuUsk+lpLtp2AmANegiS100h0WJMrcqkmiH5TE+ISfV2oup
-	 qqBmFAfFfdShDPXmVPcGF4xrFj8/4CfOUIUNGKUsD7kO2K5mJ8awHlpOQk1dkOcH9x
-	 Tp5FsC0makMBovsRWQPIydexLyem0/Fn9AQ8KilDeIUPqtfZWNqgXAvhpCkchqw5mT
-	 rnGgNkehZWCaopERZ0+nbdMHuaG4M9YJZ/Kz9Zl8CfxzaMOWdBN7CkS7qrcjeRZAsR
-	 OrnYyObxWM2cyN17Dy0OuYjopi/3jfPQtW+vEVGV7whzPzSYK2cqQQVi8B4InjB6p5
-	 8a7wKr2YzZaYQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qvdDS-007YoD-RZ;
-	Wed, 25 Oct 2023 13:42:31 +0100
-Date: Wed, 25 Oct 2023 13:42:30 +0100
-Message-ID: <86cyx250w9.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jan Henrik Weinstock <jan@mwa.re>
-Cc: oliver.upton@linux.dev,	james.morse@arm.com,	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,	catalin.marinas@arm.com,	will@kernel.org,
-	linux-arm-kernel@lists.infradead.org,	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,	Lukas =?UTF-8?B?SsO8bmdlcg==?= <lukas@mwa.re>
-Subject: Re: KVM exit to userspace on WFI
-In-Reply-To: <CANi1PHieGooO0DK=6BPwq0UknHzsn9QM3rFQkh3HLMfWxDseUQ@mail.gmail.com>
-References: <CANi1PHhzk80HvwQbBM46gpJ6_AA_P6+m5Jo0Nuy_MAdA4C2BhQ@mail.gmail.com>
-	<87ttql5aq7.wl-maz@kernel.org>
-	<CANi1PHieGooO0DK=6BPwq0UknHzsn9QM3rFQkh3HLMfWxDseUQ@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="g1YIzv3U"
+Date: Wed, 25 Oct 2023 19:07:25 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1698260851;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1z86aOessVJf1f7xTckw9Z9ZagBGFYnpPIX+SQ4dj5k=;
+	b=g1YIzv3UzFcSTAdMrk9BTNrjuCINFTW1OhbSWcnaBmNZR5DUPH8XAefDSjxkTzC7PNSTf1
+	Z+lz63/exdLv+COn2chrk19epNG27mgBhnjORcmE4cfuh6+GjAo5021Wn3MpPnMmEdjnjz
+	ubr0VwIRVK0p6CXX0SH10P18OH7Q3Ok=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Aishwarya TCV <aishwarya.tcv@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-perf-users@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+	Jing Zhang <jingzhangos@google.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	James Morse <james.morse@arm.com>, Marc Zyngier <maz@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH v3 3/5] KVM: selftests: Generate sysreg-defs.h and add to
+ include path
+Message-ID: <ZTlnbQ2U9ZaAkXYE@linux.dev>
+References: <20231011195740.3349631-1-oliver.upton@linux.dev>
+ <20231011195740.3349631-4-oliver.upton@linux.dev>
+ <f25acdcb-269e-fae5-fbbc-54e8d6d05b23@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jan@mwa.re, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, lukas@mwa.re
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f25acdcb-269e-fae5-fbbc-54e8d6d05b23@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 25 Oct 2023 13:12:14 +0100,
-Jan Henrik Weinstock <jan@mwa.re> wrote:
+On Wed, Oct 25, 2023 at 10:02:36AM +0100, Aishwarya TCV wrote:
+> On 11/10/2023 20:57, Oliver Upton wrote:
+> > Start generating sysreg-defs.h for arm64 builds in anticipation of
+> > updating sysreg.h to a version that depends on it.
+> > 
+> > Reviewed-by: Mark Brown <broonie@kernel.org>
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >  tools/testing/selftests/kvm/Makefile | 23 ++++++++++++++++++++---
+> >  1 file changed, 20 insertions(+), 3 deletions(-)
+> > 
 > 
-> Hi Marc,
+> Hi Oliver,
 > 
-> Thanks for your feedback. I understand that request_interrupt_window
-> is not to be used. I assume a setting a flag is a better way,
-> something similar to KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER, e.g.
-> KVM_ARCH_FLAG_WFX_EXIT_TO_USER.
 > 
-> I will also check that WFx traps are always enabled while this mode is
-> active to make sure userspace does not get blocked/scheduled out.
+> Currently when building kselftest against next-master with arm64 arch
+> and defconfig+kselftest-kvm  “make[4]: *** [Makefile:26: prepare] Error
+> 2” is observed.
 
-Why would that be an acceptable behaviour?
+Looks like we're descending into tools/arch/arm64/tools/ w/
+$(srctree) == ".", which I believe is coming from the top makefile. The
+following diff fixes it for me, care to give it a go?
 
-> The reason for this is that we cannot have the thread that executes
-> KVM_RUN to be blocked or scheduled out whenever it hits a WFI.
-
-Why? If that's not acceptable, how do you even cope with the basic
-preemption?
-
-> Nop-WFIs are not a problem, since the PE will just continue executing
-> instructions, which is fine. We are currently using a timeout signal
-> that kicks KVM_RUN back into userspace, but we are seeing a lot of
-> time wasted because our KVM thread hangs in WFI/WFEs. It would be
-> better if we could just return from KVM_RUN immediately if the thread
-> would otherwise be blocked.
-
-On the face of it, this makes little sense:
-
-- While in userspace, no interrupt source that normally delivered
-  without any userpsace intervention will be blocked (timers,
-  VLPIs...). I cannot how this can be a good idea.
-
-- Trapping WFE is an important scheduling hint, and returning to
-  userspace defeats it. Contended spinlocks, for example, will be even
-  slower to acquire.
-
-I'm sure you have a particular use case for such a degraded behaviour,
-but since you are not describing it, I'm not at all inclined to
-actively break KVM's performance and scalability.
-
-Thanks,
-
-	M.
+diff --git a/tools/arch/arm64/tools/Makefile b/tools/arch/arm64/tools/Makefile
+index f867e6036c62..7f64b8bb5107 100644
+--- a/tools/arch/arm64/tools/Makefile
++++ b/tools/arch/arm64/tools/Makefile
+@@ -1,13 +1,13 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-ifeq ($(srctree),)
+-srctree := $(patsubst %/,%,$(dir $(CURDIR)))
+-srctree := $(patsubst %/,%,$(dir $(srctree)))
+-srctree := $(patsubst %/,%,$(dir $(srctree)))
+-srctree := $(patsubst %/,%,$(dir $(srctree)))
++ifeq ($(top_srcdir),)
++top_srcdir := $(patsubst %/,%,$(dir $(CURDIR)))
++top_srcdir := $(patsubst %/,%,$(dir $(top_srcdir)))
++top_srcdir := $(patsubst %/,%,$(dir $(top_srcdir)))
++top_srcdir := $(patsubst %/,%,$(dir $(top_srcdir)))
+ endif
+ 
+-include $(srctree)/tools/scripts/Makefile.include
++include $(top_srcdir)/tools/scripts/Makefile.include
+ 
+ AWK	?= awk
+ MKDIR	?= mkdir
+@@ -19,10 +19,10 @@ else
+ Q = @
+ endif
+ 
+-arm64_tools_dir = $(srctree)/arch/arm64/tools
++arm64_tools_dir = $(top_srcdir)/arch/arm64/tools
+ arm64_sysreg_tbl = $(arm64_tools_dir)/sysreg
+ arm64_gen_sysreg = $(arm64_tools_dir)/gen-sysreg.awk
+-arm64_generated_dir = $(srctree)/tools/arch/arm64/include/generated
++arm64_generated_dir = $(top_srcdir)/tools/arch/arm64/include/generated
+ arm64_sysreg_defs = $(arm64_generated_dir)/asm/sysreg-defs.h
+ 
+ all: $(arm64_sysreg_defs)
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
