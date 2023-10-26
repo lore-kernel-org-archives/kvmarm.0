@@ -1,146 +1,140 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62CF646
-	for <kvmarm@lists.linux.dev>; Thu, 26 Oct 2023 03:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46434849C
+	for <kvmarm@lists.linux.dev>; Thu, 26 Oct 2023 05:12:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XnuO03mp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SUwCuSAh"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698291652;
+	s=mimecast20190719; t=1698297175;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=lhkxc6ETah/XZ32WLeYNVGRCbB3KV39jeRBoHfU3kg4=;
-	b=XnuO03mp3p6GhBkIslWoBv1TK+fvAoBeU7ihD3/tg5KSS9AgSzEwOIjE8OS+Mx6iwJA0cx
-	7RpH/VgDjw/Egl4HE9NJ2CGKFXnuH8RajmHeNaxivdYv5klOrmDQIvsS4O3rVWUaXix3j5
-	wzcafPJK1U5/2UiJGxt1Nb9CEdcz7pc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=BVx1AcfmiusGDmDtqdB8zdIarJ1uI9ASHw/bYgS4xWw=;
+	b=SUwCuSAh7x80+kosBFrpawm6TWrXDMeEI7j0zd+zNLrIJK6I457Nd4DXbdPPHiia0m0vQm
+	daJkq3Pmhgy5vmAIh4QXDG8UZfVXwiU7SZHMOyQVi2+TSleXU04tqyN00im1piuAxxAWQc
+	QNTbTezWY72DmjwV8Uz6wFNekFO+XvA=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-492-J43d35xXNTOFhmOY9ni3Vw-1; Wed, 25 Oct 2023 23:40:48 -0400
-X-MC-Unique: J43d35xXNTOFhmOY9ni3Vw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A36B9802891;
-	Thu, 26 Oct 2023 03:40:47 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 91EB0502A;
-	Thu, 26 Oct 2023 03:40:47 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: andrew.jones@linux.dev,
-	kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
-	Nikos Nikoleris <nikos.nikoleris@arm.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Ricardo Koller <ricarkol@google.com>,
-	Thomas Huth <thuth@redhat.com>,
-	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v1] configure: arm64: Add support for dirty-ring in migration
-Date: Wed, 25 Oct 2023 23:40:42 -0400
-Message-Id: <20231026034042.812006-1-shahuang@redhat.com>
+ us-mta-271-rkNqIeU3PnGSNP4JXbl3xA-1; Thu, 26 Oct 2023 01:12:53 -0400
+X-MC-Unique: rkNqIeU3PnGSNP4JXbl3xA-1
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-5411d71889aso162741a12.2
+        for <kvmarm@lists.linux.dev>; Wed, 25 Oct 2023 22:12:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698297172; x=1698901972;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BVx1AcfmiusGDmDtqdB8zdIarJ1uI9ASHw/bYgS4xWw=;
+        b=lhbfeBiIzDusxNZt1HeoPTYmYoIiBa6SRYcthVPl6MxUU3hWgu8I3nZzHVwebumyeP
+         aDfxUo5PGMWqsdosbXexK3rjLZtH3GtgQVfqfNj4RJDvoc+Npx5l6l3NAL+EWH2BySNj
+         XTcH5Kgek8X3Od+HFLnMDixAuGeEfxMLufMv1MQp8XP9lwQhFtZejBxZ0D5U+LrRyDTN
+         JIMaXsaDIR54x2XjkFxij0kTINtiw6DqNJLC3NHZ4AlEuGomO4x3uQ5GhCCWvDHL0EL0
+         JvDXH6COHqhTJ0r1TXox6vAPTLWj24m5Mbh/9e4M3+KUqL+u85uug/gz9CiNEqQwXMi6
+         +GQQ==
+X-Gm-Message-State: AOJu0YzeBsxM86aLKxtrouncZLy6lzv4Z0FDfEp65Vfbo3PFNuE0CAKj
+	csed+6W3RZ/4EAl+6pvdHtgfXExXdB4GzSlhEpuh1xY4ljxrGacahxvCsEJ5bOfJ7YKwc0uec51
+	SQ4FC/+whG56s0nPi
+X-Received: by 2002:a17:907:36cc:b0:9ae:5523:3f84 with SMTP id bj12-20020a17090736cc00b009ae55233f84mr12610753ejc.72.1698297172642;
+        Wed, 25 Oct 2023 22:12:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG8kGQza57e77dxesG4rYr7dN11M4gYW3mVnVCFnI96yljz31I7VDbuVkUYpKD4fxOtL+CLqA==
+X-Received: by 2002:a17:907:36cc:b0:9ae:5523:3f84 with SMTP id bj12-20020a17090736cc00b009ae55233f84mr12610744ejc.72.1698297172318;
+        Wed, 25 Oct 2023 22:12:52 -0700 (PDT)
+Received: from [192.168.0.6] (ip-109-43-176-238.web.vodafone.de. [109.43.176.238])
+        by smtp.gmail.com with ESMTPSA id 10-20020a17090602ca00b009b2f2451381sm11082500ejk.182.2023.10.25.22.12.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Oct 2023 22:12:51 -0700 (PDT)
+Message-ID: <e318cd46-b871-448a-b95a-01647d8afc43@redhat.com>
+Date: Thu, 26 Oct 2023 07:12:50 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v1] configure: arm64: Add support for
+ dirty-ring in migration
+To: Shaoqin Huang <shahuang@redhat.com>, andrew.jones@linux.dev,
+ kvmarm@lists.linux.dev
+Cc: Nikos Nikoleris <nikos.nikoleris@arm.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org
+References: <20231026034042.812006-1-shahuang@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20231026034042.812006-1-shahuang@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add a new configure option "--dirty-ring-size" to support dirty-ring
-migration on arm64. By default, the dirty-ring is disabled, we can
-enable it by:
+On 26/10/2023 05.40, Shaoqin Huang wrote:
+> Add a new configure option "--dirty-ring-size" to support dirty-ring
+> migration on arm64. By default, the dirty-ring is disabled, we can
+> enable it by:
+> 
+>    # ./configure --dirty-ring-size=65536
+> 
+> This will generate one more entry in config.mak, it will look like:
+> 
+>    # cat config.mak
+>      :
+>    ACCEL=kvm,dirty-ring-size=65536
+> 
+> With this configure option, user can easy enable dirty-ring and specify
+> dirty-ring-size to test the dirty-ring in migration.
 
-  # ./configure --dirty-ring-size=65536
+Do we really need a separate configure switch for this? If it is just about 
+setting a value in the ACCEL variable, you can also run the tests like this:
 
-This will generate one more entry in config.mak, it will look like:
+ACCEL=kvm,dirty-ring-size=65536 ./run_tests.sh
 
-  # cat config.mak
-    :
-  ACCEL=kvm,dirty-ring-size=65536
-
-With this configure option, user can easy enable dirty-ring and specify
-dirty-ring-size to test the dirty-ring in migration.
-
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
- configure | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
-
-diff --git a/configure b/configure
-index 6ee9b27..54ce38a 100755
---- a/configure
-+++ b/configure
-@@ -32,6 +32,7 @@ enable_dump=no
- page_size=
- earlycon=
- efi=
-+dirty_ring_size=
- 
- # Enable -Werror by default for git repositories only (i.e. developer builds)
- if [ -e "$srcdir"/.git ]; then
-@@ -89,6 +90,9 @@ usage() {
- 	    --[enable|disable]-efi Boot and run from UEFI (disabled by default, x86_64 and arm64 only)
- 	    --[enable|disable]-werror
- 	                           Select whether to compile with the -Werror compiler flag
-+	    --dirty-ring-size=SIZE
-+                             Specify the dirty-ring size and enable dirty-ring for
-+                             migration(disable dirty-ring by default, arm64 only)
- EOF
-     exit 1
- }
-@@ -174,6 +178,9 @@ while [[ "$1" = -* ]]; do
- 	--disable-werror)
- 	    werror=
- 	    ;;
-+	--dirty-ring-size)
-+	    dirty_ring_size="$arg"
-+	    ;;
- 	--help)
- 	    usage
- 	    ;;
-@@ -213,6 +220,27 @@ if [ "$efi" ] && [ "$arch" != "x86_64" ] && [ "$arch" != "arm64" ]; then
-     usage
- fi
- 
-+if [ "$dirty_ring_size" ]; then
-+    if [ "$arch" != "arm64" ]; then
-+        echo "--dirty-ring-size is not supported for $arch"
-+        usage
-+    fi
-+    _size=$dirty_ring_size
-+    if [ ! "${_size//[0-9]}" ]; then
-+        if (( _size < 1024 )); then
-+            echo "--dirty-ring-size suggest minimum value is 1024"
-+            usage
-+        fi
-+        if (( _size & (_size - 1) )); then
-+            echo "--dirty-ring-size must be a power of two"
-+            usage
-+        fi
-+    else
-+        echo "--dirty-ring-size must be positive number and a power of two"
-+        usage
-+    fi
-+fi
-+
- if [ -z "$page_size" ]; then
-     if [ "$efi" = 'y' ] && [ "$arch" = "arm64" ]; then
-         page_size="4096"
-@@ -419,6 +447,9 @@ EOF
- if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
-     echo "TARGET=$target" >> config.mak
- fi
-+if [ "$arch" = "arm64" ] && [ "$dirty_ring_size" ]; then
-+    echo "ACCEL=kvm,dirty-ring-size=$dirty_ring_size" >> config.mak
-+fi
- 
- cat <<EOF > lib/config.h
- #ifndef _CONFIG_H_
--- 
-2.40.1
+  Thomas
 
