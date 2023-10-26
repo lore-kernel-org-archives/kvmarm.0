@@ -1,482 +1,183 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from DEU01-FR2-obe.outbound.protection.outlook.com (mail-fr2deu01on2134.outbound.protection.outlook.com [40.107.135.134])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC57813AF8
-	for <kvmarm@lists.linux.dev>; Thu, 26 Oct 2023 13:13:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C65222E411
+	for <kvmarm@lists.linux.dev>; Thu, 26 Oct 2023 14:24:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nio.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nio.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FGoQmYEN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0440CC433C7;
-	Thu, 26 Oct 2023 13:13:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698326020;
-	bh=5gbISpsYfiUXU0Z2Df+YYl055iyGsKdhEBg4kUZKzxY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FGoQmYEN9zTTgXpsOsQTzl54bVtgF0bvukWv+Y74bVkz7M695WpyaYO/1FZac08tD
-	 1DiFVDJX61Sv1x1QYKMKglgpEl87hUcSkmVtASZ+7IO0MIOdOq8gIh2qxnmr6G0l6x
-	 UkA8qplxDqgBhxJ1BDaZ319Urp7CVnhVzkeSkPxe2yBNmM/ef0hZFXohuRyKxJLdkE
-	 dzmdZiuIpeai6CmvSgw9KSKi4e+sOtDSskKyfQbfubxPAEnJXyh60RDi2IuPxJOPv3
-	 j0aaqIFoXcDzF4xiFXDG0hVkvSIejVTEeecoVHM1Nq7UMFFkC4OTER+xgVedL80xEV
-	 7qz5603/r5xgQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qw0B7-007twP-FM;
-	Thu, 26 Oct 2023 14:13:37 +0100
-Date: Thu, 26 Oct 2023 14:13:37 +0100
-Message-ID: <868r7p4jcu.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2] KVM: arm64: selftests: Add arch_timer_edge_cases selftest
-In-Reply-To: <20230928210201.1310536-1-coltonlewis@google.com>
-References: <20230928210201.1310536-1-coltonlewis@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=nio.io header.i=@nio.io header.b="qLjhyd9w"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=G5c0kqfNIj8szJcSKA2ci6oDb6PvTITapD9aih1cIffO6XwiGbmmYHqGDdmFULMIs8l5EeQ8udawCITIs6SVAHS30S400fpqdw/mqPLHgsOUkW4k/cEe0ZnDfyYbvqW2Nx5Lv84Tz4f8IBY6wty4ku4ofDHdOu6aKuIs1N0TAqRMbdkpp0GlZA70WaAuknPpjY4enzLkVC6RAI8wSdhfdXd9sJEm4kQbD9b2Pcwf8Bo6N9EdsBTvG/l0+MCAE82q5Z7pz1w8FGon1iKIMTcEYLbqn9buGXVfhW9GzK+7ppDMD+zkpWdj7NE0QuXva5XHW5+7wBkC4hGYU2rucuaHNQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cBTHJKcHCZN1z4N9P8P4DVg/1JM2htW9bdEkr6pTl+s=;
+ b=VQipeSPfi29dmC1iUy1j2T3T3AySxyBeLl9wj/sUZ5m8WqYMNMkxROIG7z7zug2iNIWnpuyhjvfDWCAsNh2QCvmISj6p1rCG/Fau7NN+KYV7UZ+tKX9Wv2Q7nG3IecLSosTA1INVvpU6qpLdiF1PqcQZ9kgasWOUQcWIWfK3JYcOyXJIKq1W+iThQ9D/5oUkLwKVyokejZjQr/M6byDTpugfPFHinD/V3igS9AqiR6m8IbAZX3YW4TaZQ8VVF4uH4TwOnAGCWV2d6rjLjepgMW7RugTRY0CPd1pvP5ykwRReWiqemkvDbq+cxb7/yuijA5wwx8pcYUvVoH4SCfVBUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nio.io; dmarc=pass action=none header.from=nio.io; dkim=pass
+ header.d=nio.io; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nio.io; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cBTHJKcHCZN1z4N9P8P4DVg/1JM2htW9bdEkr6pTl+s=;
+ b=qLjhyd9wglshQaA88zVqZLdV9sID/y2n5m9Xo+hRttW5P5yZEeOb5EwV5kPSaonVO3q2YpIh9ef/NJUTtTq9Vjg0HPxGUZkZRcTs07Kr4nhgbuQlhazTZ1ytuXXhhL875vh5leBuig9l2s6d5T6+3S8uBJnD9POwpCgzRi0SqBw=
+Received: from FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:73::12)
+ by FR2P281MB3021.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:61::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33; Thu, 26 Oct
+ 2023 14:24:07 +0000
+Received: from FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM
+ ([fe80::b5:c328:b599:1b78]) by FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM
+ ([fe80::b5:c328:b599:1b78%4]) with mapi id 15.20.6933.019; Thu, 26 Oct 2023
+ 14:24:07 +0000
+From: Matthias Rosenfelder <matthias.rosenfelder@nio.io>
+To: Andrew Jones <ajones@ventanamicro.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Andrew Jones
+	<andrew.jones@linux.dev>, Alexandru Elisei <alexandru.elisei@arm.com>, Eric
+ Auger <eric.auger@redhat.com>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>
+Subject: Re: [kvm-unit-tests PATCH] arm: pmu: Fix overflow test condition
+Thread-Topic: [kvm-unit-tests PATCH] arm: pmu: Fix overflow test condition
+Thread-Index: AQHZ8xUpYeZOzJqeV0mvBZBYrVbSDbBY9SaAgANRrZk=
+Date: Thu, 26 Oct 2023 14:24:07 +0000
+Message-ID:
+ <FRYP281MB3146C5D86DCCBBB6CA37D3ACF2DDA@FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM>
+References:
+ <FRYP281MB31463EC1486883DDA477393DF2C0A@FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM>
+ <20231024-9418f5e7b9e014986bdd4b58@orel>
+In-Reply-To: <20231024-9418f5e7b9e014986bdd4b58@orel>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_8300675a-ee59-4243-b135-8f223eac0639_Enabled=True;MSIP_Label_8300675a-ee59-4243-b135-8f223eac0639_SiteId=ea1b2f97-423f-4ab3-bf6d-45a36c09ce34;MSIP_Label_8300675a-ee59-4243-b135-8f223eac0639_SetDate=2023-10-26T14:24:06.536Z;MSIP_Label_8300675a-ee59-4243-b135-8f223eac0639_Name=NIO
+ Internal
+ (L2);MSIP_Label_8300675a-ee59-4243-b135-8f223eac0639_ContentBits=0;MSIP_Label_8300675a-ee59-4243-b135-8f223eac0639_Method=Standard;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nio.io;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: FRYP281MB3146:EE_|FR2P281MB3021:EE_
+x-ms-office365-filtering-correlation-id: f32fcd00-1c1d-4aff-1c8f-08dbd62f36c6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ HMmC5FRrNxoannVrcM/Eq7JpbPYajIaM+CFII/SYhFzgCzZkxnBRjFcEwEGEEpc8zYQIjExj9zWOK+KWqUVtBW5j1sLq1FbTVaQIrnMhLhDmWHFokuE9Sty8EE7jmrPa3dh/1R/CcPs53UFJNKQY/fvNNacpbuL5IgagqcoX/U3hbmJi7zQnEMXQsgcXi9klX1eloFYlbBIwP6/k+NKl5AWwGUhyzPQXw3+Z8IPcjIUH3AsWLpSsgeDJz1VDZKstMe+h/uNGTiy1iu0qpohaAMNbX9wIs2LPbSs/93QNzmiASnEIVw0forWNWQ1/tZtn5mqO48X53STsYM/rHgjy5odgFaUtoVGcsEpItcq93yFg9YY1iq/j9WbAXVlPp11nYBwCyOAowDLqVJ+1b0wSsCh4sGTEg0trvjN72H4bZBWgPn3pvZqERGpPlUORAfQqedOmiMcKCwOciQKIOXl+r9Ovg2f+eeptpNoURL+BUDe4XOWmgbB57nGWlvGsJYFqpTqwvAoWk3ZNcFVy9gVJEQCwxcnyM3VFAVSuBtapTBYwl0LI/YMvjR8VXzfKp7Y3Z1nB9gSoy3R/lgzFCpj7mx77o+t/UHao+7gaZ955zfYl2CVFNE/DKeVLBZay9mvd+xhZeQ2x45hRZN11Nh9Jn5/NS8lDHXI71K2ymU15uZI=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(346002)(136003)(39850400004)(376002)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(6916009)(122000001)(55016003)(2906002)(38100700002)(44832011)(6506007)(66946007)(54906003)(5660300002)(66446008)(64756008)(316002)(76116006)(66556008)(478600001)(7696005)(71200400001)(41300700001)(53546011)(9686003)(45080400002)(83380400001)(66476007)(86362001)(66574015)(52536014)(4326008)(33656002)(8676002)(8936002)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?Tm5FUzhuWEdKSzNwK3Z3cCtpTUJ4c1NmbGM1cm5FcVEzOHhmNkRSZ05VbWtP?=
+ =?utf-8?B?NkpMOXpVbkM1R3J4MXF1cnZUSStWMlFRcTJ0Nm1ZQUhiRnh1UzdHZTBzdmZm?=
+ =?utf-8?B?NGpZTWZqTHo3TWJ5bUhwWGFuc1R6V0RPODJ4YjBwSmFsdmFHck8zTmhvVFF2?=
+ =?utf-8?B?WHdyWG95ckZDUnNaZ2E1NThjcWJUWU1Rc1BmWEFLcjhkdFBWVWJ2NGwvaDFW?=
+ =?utf-8?B?TnJKbW1VME1rRnFQRDNWakxmdzdJZUFiQkhKRktCVmdDb3o4L3FFVzZHWk02?=
+ =?utf-8?B?amlsQ0hkOWhleTEwUVgwbk5qZW9COGFKZUJmWXJQaGgzdmNzWEtmSmVzSlUz?=
+ =?utf-8?B?NXh6eDBmMFdxMVdqVXdEVTd2eVRaYzQ5b1ZJVzNiSjNJTkdmSWcxeDR0T25N?=
+ =?utf-8?B?REIxcExCWWFWQ1BEOXNQb0dYRlhQQVlxRW02aXJtMHJCbjhKM0NvU2xqamFo?=
+ =?utf-8?B?d0tYQWxoQjIzTHdydUV5TENoKzliZDZsRlpxNWttcWNkK1dYMm5iVHJrc25W?=
+ =?utf-8?B?ZmNOTTI5VWJ4cnVUcXpaRlZnVnY1TTJsMHZWcUtHZTFoZWhNakFqdUpjQUtu?=
+ =?utf-8?B?czJtSisyK2haaXVkR0xrc3NyU3pOWnJpeStNdVJ0bTJpaGcycE15RWl1SUZn?=
+ =?utf-8?B?WC9rU1FTQWt0a3oxbUNmRkZReXB5YkswTGE1cldPRVU2T2x6alFVUlFIb3da?=
+ =?utf-8?B?enlHSzJlK1plNFErV2NNOGxNdlkxTUxiY0xXZlVvREFGbmtlVlZiS0dKelhi?=
+ =?utf-8?B?eDNqQlNQN3NtUFEyc3lIenpDTXN3UGhGTG1BT1NCb0dkbWg3UU1CbitHTCtP?=
+ =?utf-8?B?dEI1SWNYNG1nU3lBUEpNL3lwMTNhYTZRNG9DN1E0bW5WN3NxRWsvUVVOQU5E?=
+ =?utf-8?B?MTVlNEc4NU4wRDM3WndYR3VhbEpUMHFKM2tqRHYvZFhCZ3poTFIvdTdBSHVu?=
+ =?utf-8?B?RWU5ZW1sWWRmVkk0YjhoZk9QMFBiUzhHZlVQVXYyemttWUdQcVZiYlFOU08y?=
+ =?utf-8?B?QUdDKzNhSjVRWU1WbjliMWUwRGgwVW5wMnBuQWVwRlFXbTRwVkpCM0Z1VUx5?=
+ =?utf-8?B?WDRiRi9BWEZSdHEwTzBsRXYxOCtXVEdKOGJXbURWM2tjSmRJV0dQd2NrTFhM?=
+ =?utf-8?B?UExwRUNXMUlCZ0w4TEI2TTZadmNGRHhCdDZsQkhOMlJNOU9tdEFXM3ZsbWtR?=
+ =?utf-8?B?VUdRbDNvb2llamZmSVUrYzNiTEo3VGoyWFNHVjNYazRZOVliazlPMFR1OHBL?=
+ =?utf-8?B?bHlTYWVKSXU5YjJxYm4wL2FRTGZJUTBLSkpLM2hnOU50YXRaeko2YXB6K0ov?=
+ =?utf-8?B?bTgrSEZKVjRwRE13Z1BtTXQwaDM0QWtUdWF6TnFNNU1tU3ZIUnRJeS9yaXI3?=
+ =?utf-8?B?ejN6NlErWEg0bmh0WU9OR0N0NTdlSkNWTzhtR2czcVhKUC9Db1ExWFg2N3Zl?=
+ =?utf-8?B?MGtwaGIyRGRpWTZzQmRrcUhaYmFtaTZ1RVA0d0NidEdKT3RITU9OTVpyb3kz?=
+ =?utf-8?B?L21nSGpwaERSMFBLNTI4dkxrdUwyNDlSeHBxTDkrSzFWUVJ1Y25JZFlYMXlo?=
+ =?utf-8?B?U1B0VlUxdEpSSVRsSUYwcVM2VjlUREJPZUx3RzgyaVA0bjBNby9mL1loYTlF?=
+ =?utf-8?B?eEhBSXhHdUpGVTBnNE4xNDc2Ym5oNExrMDNNUjhwYjZxYWtLQkZPWHFlS3JC?=
+ =?utf-8?B?bWNOWXhKL01QbHhpOGYwK0Y0RnhMNXRjVDJJV25Jb2ZjRHVMbEVRQ2NzMmdS?=
+ =?utf-8?B?VXp4b09YMjkraWZGcktBRS8vZTJSdHhUUWkwb1dvT2h5TTlSS0wrU3JtQk1l?=
+ =?utf-8?B?cTFTdzJ3UVJDOHF0OTRjMVFINmhPaVMyRmcvQlBva2REdlJWZyszd0kxbUN1?=
+ =?utf-8?B?cklTWUlJUkNYT2Q0a2xOaXdqeDJ5Z0FoN2hndzJuc0EyRklHbEsrYWN4YU43?=
+ =?utf-8?B?Qy9tNXhDZHhFVm5iOERldG9XMnFXeWp2SiszVWlyNUZmTjZFTWtKbmhocHQw?=
+ =?utf-8?B?cHRJTElLa1NhbzdVd3VSZklZSU94UzExMHBWS1VzZGpmQ0x4b04wWEd0TWNK?=
+ =?utf-8?B?NlFTQzV6UkJ5QnFSK3dzQXVTZkFzVXVTK2FvTUZlVmMvVmZqZmVqMldTcDZX?=
+ =?utf-8?B?Vmo0RjF3TmE0V0dBeGVtYzE5V29ObXo0YjZPM0ZBSVNIdWlLemo0clpRYU1H?=
+ =?utf-8?Q?4cMNqcu7+chUz76w7LjMCyjvjZIhAUSvwqkDPZdUYS/5?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, ricarkol@google.com, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-OriginatorOrg: nio.io
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: f32fcd00-1c1d-4aff-1c8f-08dbd62f36c6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Oct 2023 14:24:07.3250
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: ea1b2f97-423f-4ab3-bf6d-45a36c09ce34
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2oXSKhKZJlBo2qm8TpuK2UM8vwuO66Eu4wuRwTcSqo/uqcOzptgVONiV6CuC7Bbzr90l/6vscs4ylayfpUKnLmJDxj+V+PUh67D+WayO9NA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: FR2P281MB3021
 
-On Thu, 28 Sep 2023 22:02:01 +0100,
-Colton Lewis <coltonlewis@google.com> wrote:
-> 
-> Add a new arch_timer_edge_cases selftests that validates:
-> 
-> * timers above the max TVAL value
-> * timers in the past
-> * moving counters ahead and behind pending timers
-> * reprograming timers
-> * timers fired multiple times
-> * masking/unmasking using the timer control mask
-> 
-> These are intentionally unusual scenarios to stress compliance with
-> the arm architecture.
-> 
-> Co-developed-by: Ricardo Koller <ricarkol@google.com>
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> ---
-> 
-> v2:
-> * Rebase to v6.6-rc3
-> * Use new GUEST_ASSERT macros
-> * Remove spinlock in favor of atomic operations
-> 
-> v1: https://lore.kernel.org/kvm/20230516213731.387132-1-coltonlewis@google.com/
-> 
->  tools/testing/selftests/kvm/Makefile          |    1 +
->  .../kvm/aarch64/arch_timer_edge_cases.c       | 1105 +++++++++++++++++
->  .../kvm/include/aarch64/arch_timer.h          |   18 +-
->  3 files changed, 1123 insertions(+), 1 deletion(-)
->  create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index a3bb36fb3cfc..e940b7c6b818 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -141,6 +141,7 @@ TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
-> 
->  TEST_GEN_PROGS_aarch64 += aarch64/aarch32_id_regs
->  TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
-> +TEST_GEN_PROGS_aarch64 += aarch64/arch_timer_edge_cases
->  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
->  TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
->  TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
-> diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c b/tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c
-> new file mode 100644
-> index 000000000000..a3761a361de9
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c
-> @@ -0,0 +1,1105 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * arch_timer_edge_cases.c - Tests the aarch64 timer IRQ functionality.
-> + *
-> + * The test validates some edge cases related to the arch-timer:
-> + * - timers above the max TVAL value.
-> + * - timers in the past
-> + * - moving counters ahead and behind pending timers.
-> + * - reprograming timers.
-> + * - timers fired multiple times.
-> + * - masking/unmasking using the timer control mask.
-> + *
-> + * Copyright (c) 2021, Google LLC.
-> + */
-> +
-> +#define _GNU_SOURCE
-> +
-> +#include <stdlib.h>
-> +#include <pthread.h>
-> +#include <linux/kvm.h>
-> +#include <linux/atomic.h>
-> +#include <linux/bitmap.h>
-> +#include <linux/sizes.h>
-> +#include <sched.h>
-> +#include <sys/sysinfo.h>
-> +
-> +#include "kvm_util.h"
-> +#include "processor.h"
-> +#include "delay.h"
-> +#include "arch_timer.h"
-> +#include "gic.h"
-> +#include "vgic.h"
-> +
-> +#define msecs_to_usecs(msec)		((msec) * 1000LL)
-> +
-> +#define CVAL_MAX			~0ULL
-> +/* tval is a signed 32-bit int. */
-> +#define TVAL_MAX			INT_MAX
-> +#define TVAL_MIN			INT_MIN
-> +
-> +#define GICD_BASE_GPA			0x8000000ULL
-> +#define GICR_BASE_GPA			0x80A0000ULL
-
-We already have 3 tests that do their own GIC setup. Maybe it is time
-someone either make vgic_v3_setup() deal with fixed addresses, or move
-this into a helper.
-
-> +
-> +/* After how much time we say there is no IRQ. */
-> +#define TIMEOUT_NO_IRQ_US		msecs_to_usecs(50)
-> +
-> +#define TEST_MARGIN_US			1000ULL
-> +
-> +/* A nice counter value to use as the starting one for most tests. */
-> +#define DEF_CNT				(CVAL_MAX / 2)
-> +
-> +/* Number of runs. */
-> +#define NR_TEST_ITERS_DEF		5
-> +
-> +/* Default wait test time in ms. */
-> +#define WAIT_TEST_MS			10
-> +
-> +/* Default "long" wait test time in ms. */
-> +#define LONG_WAIT_TEST_MS		100
-> +
-> +/* Shared with IRQ handler. */
-> +struct test_vcpu_shared_data {
-> +	atomic_t handled;
-> +	atomic_t spurious;
-> +} shared_data;
-> +
-> +struct test_args {
-> +	/* Virtual or physical timer and counter tests. */
-> +	enum arch_timer timer;
-> +	/* Delay used for most timer tests. */
-> +	uint64_t wait_ms;
-> +	/* Delay used in the test_long_timer_delays test. */
-> +	uint64_t long_wait_ms;
-> +	/* Number of iterations. */
-> +	int iterations;
-> +	/* Whether to test the physical timer. */
-> +	bool test_physical;
-> +	/* Whether to test the virtual timer. */
-> +	bool test_virtual;
-> +};
-> +
-> +struct test_args test_args = {
-> +	.wait_ms = WAIT_TEST_MS,
-> +	.long_wait_ms = LONG_WAIT_TEST_MS,
-> +	.iterations = NR_TEST_ITERS_DEF,
-> +	.test_physical = true,
-> +	.test_virtual = true,
-> +};
-> +
-> +static int vtimer_irq, ptimer_irq;
-> +
-> +enum sync_cmd {
-> +	SET_REG_KVM_REG_ARM_TIMER_CNT = 100001,
-> +	USERSPACE_USLEEP,
-> +	USERSPACE_SCHED_YIELD,
-> +	USERSPACE_MIGRATE_SELF,
-> +};
-> +
-> +typedef void (*sleep_method_t)(enum arch_timer timer, uint64_t usec);
-> +
-> +static void sleep_poll(enum arch_timer timer, uint64_t usec);
-> +static void sleep_sched_poll(enum arch_timer timer, uint64_t usec);
-> +static void sleep_in_userspace(enum arch_timer timer, uint64_t usec);
-> +static void sleep_migrate(enum arch_timer timer, uint64_t usec);
-> +
-> +sleep_method_t sleep_method[] = {
-> +	sleep_poll,
-> +	sleep_sched_poll,
-> +	sleep_migrate,
-> +	sleep_in_userspace,
-> +};
-> +
-> +typedef void (*wfi_method_t)(void);
-> +
-> +static void wait_for_non_spurious_irq(void);
-> +static void wait_poll_for_irq(void);
-> +static void wait_sched_poll_for_irq(void);
-> +static void wait_migrate_poll_for_irq(void);
-> +
-> +wfi_method_t wfi_method[] = {
-> +	wait_for_non_spurious_irq,
-> +	wait_poll_for_irq,
-> +	wait_sched_poll_for_irq,
-> +	wait_migrate_poll_for_irq,
-> +};
-> +
-> +#define for_each_wfi_method(i)							\
-> +	for ((i) = 0; (i) < ARRAY_SIZE(wfi_method); (i)++)
-> +
-> +#define for_each_sleep_method(i)						\
-> +	for ((i) = 0; (i) < ARRAY_SIZE(sleep_method); (i)++)
-> +
-> +enum timer_view {
-> +	TIMER_CVAL = 1,
-> +	TIMER_TVAL,
-> +};
-> +
-> +#define ASSERT_IRQS_HANDLED(_nr, _args...) do {				\
-> +		int _h = atomic_read(&shared_data.handled);		\
-> +		__GUEST_ASSERT(_h == (_nr), "Handled %d IRQS but expected %d", _h, _nr, ##_args); \
-> +	} while (0)
-> +
-> +#define GUEST_SYNC_CLOCK(__cmd, __val)						\
-> +	GUEST_SYNC_ARGS(__cmd, __val, 0, 0, 0)
-> +
-> +#define USERSPACE_CMD(__cmd)							\
-> +	GUEST_SYNC_ARGS(__cmd, 0, 0, 0, 0)
-> +
-> +#define USERSPACE_SCHEDULE()							\
-> +	USERSPACE_CMD(USERSPACE_SCHED_YIELD)
-> +
-> +#define USERSPACE_MIGRATE_VCPU()						\
-> +	USERSPACE_CMD(USERSPACE_MIGRATE_SELF)
-> +
-> +#define SLEEP_IN_USERSPACE(__usecs)						\
-> +	GUEST_SYNC_ARGS(USERSPACE_USLEEP, (__usecs), 0, 0, 0)
-> +
-> +#define IAR_SPURIOUS		1023
-> +
-> +static void set_counter(enum arch_timer timer, uint64_t counter)
-> +{
-> +	GUEST_SYNC_ARGS(SET_REG_KVM_REG_ARM_TIMER_CNT, counter, timer, 0, 0);
-> +}
-> +
-> +static uint32_t next_pcpu(void)
-> +{
-> +	uint32_t max = get_nprocs();
-> +	uint32_t cur = sched_getcpu();
-> +	uint32_t next = cur;
-> +	cpu_set_t cpuset;
-> +
-> +	TEST_ASSERT(max > 1, "Need at least two physical cpus");
-> +
-> +	sched_getaffinity(getpid(), sizeof(cpuset), &cpuset);
-> +
-> +	do {
-> +		next = (next + 1) % CPU_SETSIZE;
-> +	} while (!CPU_ISSET(next, &cpuset));
-> +
-> +	return next;
-> +}
-> +
-> +static void guest_irq_handler(struct ex_regs *regs)
-> +{
-> +	unsigned int intid = gic_get_and_ack_irq();
-> +	enum arch_timer timer;
-> +	uint64_t cnt, cval;
-> +	uint32_t ctl;
-> +	bool timer_condition, istatus;
-> +
-> +	if (intid == IAR_SPURIOUS) {
-> +		atomic_inc(&shared_data.spurious);
-> +		goto out;
-> +	}
-> +
-> +	if (intid == ptimer_irq)
-> +		timer = PHYSICAL;
-> +	else if (intid == vtimer_irq)
-> +		timer = VIRTUAL;
-> +	else
-> +		goto out;
-> +
-> +	ctl = timer_get_ctl(timer);
-> +	cval = timer_get_cval(timer);
-> +	cnt = timer_get_cntct(timer);
-> +	timer_condition = cnt >= cval;
-> +	istatus = (ctl & CTL_ISTATUS) && (ctl & CTL_ENABLE);
-> +	GUEST_ASSERT_EQ(timer_condition, istatus);
-> +
-> +	/* Disable and mask the timer. */
-> +	timer_set_ctl(timer, CTL_IMASK);
-
-What is the point of masking if the timer is disabled?
-
-> +
-> +	atomic_inc(&shared_data.handled);
-
-You don't have any ordering between atomic operations and system
-register access. Could it be a problem?
-
-> +
-> +out:
-> +	gic_set_eoi(intid);
-> +}
-> +
-> +static void set_cval_irq(enum arch_timer timer, uint64_t cval_cycles,
-> +			 uint32_t ctl)
-> +{
-> +	atomic_set(&shared_data.handled, 0);
-> +	atomic_set(&shared_data.spurious, 0);
-> +	timer_set_cval(timer, cval_cycles);
-> +	timer_set_ctl(timer, ctl);
-
-Same question.
-
-> +}
-> +
-> +static void set_tval_irq(enum arch_timer timer, uint64_t tval_cycles,
-> +			 uint32_t ctl)
-> +{
-> +	atomic_set(&shared_data.handled, 0);
-> +	atomic_set(&shared_data.spurious, 0);
-> +	timer_set_tval(timer, tval_cycles);
-> +	timer_set_ctl(timer, ctl);
-> +}
-> +
-> +static void set_xval_irq(enum arch_timer timer, uint64_t xval, uint32_t ctl,
-> +			 enum timer_view tv)
-> +{
-> +	switch (tv) {
-> +	case TIMER_CVAL:
-> +		set_cval_irq(timer, xval, ctl);
-> +		break;
-> +	case TIMER_TVAL:
-> +		set_tval_irq(timer, xval, ctl);
-> +		break;
-> +	default:
-> +		GUEST_FAIL("Could not get timer %d", timer);
-> +	}
-> +}
-> +
-> +/*
-> + * Should be called with IRQs masked.
-> + *
-> + * Note that this can theoretically hang forever, so we rely on having
-> + * a timeout mechanism in the "runner", like:
-> + * tools/testing/selftests/kselftest/runner.sh.
-> + */
-> +static void wait_for_non_spurious_irq(void)
-> +{
-> +	int h;
-> +
-> +	for (h = atomic_read(&shared_data.handled); h == atomic_read(&shared_data.handled);) {
-> +		asm volatile ("wfi\n"
-> +			      "msr daifclr, #2\n"
-> +			      /* handle IRQ */
-> +			      "msr daifset, #2\n":::"memory");
-
-There is no guarantee that a pending interrupt would fire at the point
-where the comment is. R_RBZYL clearly state that you need a context
-synchronisation event between these two instructions if you want
-interrupts to be handled.
-
-> +	}
-> +}
-> +
-> +/*
-> + * Wait for an non-spurious IRQ by polling in the guest (userspace=0) or in
-> + * userspace (e.g., userspace=1 and userspace_cmd=USERSPACE_SCHED_YIELD).
-> + *
-> + * Should be called with IRQs masked. Not really needed like the wfi above, but
-> + * it should match the others.
-> + *
-> + * Note that this can theoretically hang forever, so we rely on having
-> + * a timeout mechanism in the "runner", like:
-> + * tools/testing/selftests/kselftest/runner.sh.
-> + */
-> +static void poll_for_non_spurious_irq(bool userspace, enum sync_cmd userspace_cmd)
-> +{
-> +	int h;
-> +
-> +	h = atomic_read(&shared_data.handled);
-> +
-> +	local_irq_enable();
-
-So half of this code is using local_irq_*(), and the rest is directly
-poking at DAIF. Amusingly enough, the two aren't even playing with the
-same set of bits.
-
-> +	while (h == atomic_read(&shared_data.handled)) {
-> +		if (userspace)
-> +			USERSPACE_CMD(userspace_cmd);
-> +		else
-> +			cpu_relax();
-> +	}
-> +	local_irq_disable();
-> +}
-> +
-> +static void wait_poll_for_irq(void)
-> +{
-> +	poll_for_non_spurious_irq(false, -1);
-
-Am I the only one who cries when seeing this -1 cast on an unsuspected
-enum, together with a flag saying "hey, I'm giving you crap
-arguments"? What was wrong having an actual enum value for it?
-
-> +}
-> +
-> +static void wait_sched_poll_for_irq(void)
-> +{
-> +	poll_for_non_spurious_irq(true, USERSPACE_SCHED_YIELD);
-> +}
-> +
-> +static void wait_migrate_poll_for_irq(void)
-> +{
-> +	poll_for_non_spurious_irq(true, USERSPACE_MIGRATE_SELF);
-> +}
-> +
-> +/*
-> + * Sleep for usec microseconds by polling in the guest (userspace=0) or in
-> + * userspace (e.g., userspace=1 and userspace_cmd=USERSPACE_SCHEDULE).
-> + */
-> +static void guest_poll(enum arch_timer test_timer, uint64_t usec,
-> +		       bool userspace, enum sync_cmd userspace_cmd)
-> +{
-> +	uint64_t cycles = usec_to_cycles(usec);
-> +	/* Whichever timer we are testing with, sleep with the other. */
-> +	enum arch_timer sleep_timer = 1 - test_timer;
-> +	uint64_t start = timer_get_cntct(sleep_timer);
-> +
-> +	while ((timer_get_cntct(sleep_timer) - start) < cycles) {
-> +		if (userspace)
-> +			USERSPACE_CMD(userspace_cmd);
-> +		else
-> +			cpu_relax();
-> +	}
-> +}
-> +
-> +static void sleep_poll(enum arch_timer timer, uint64_t usec)
-> +{
-> +	guest_poll(timer, usec, false, -1);
-
-More of the same stuff...
-
-Frankly, I even have a hard time understanding what this code is
-trying to achieve, let alone the lack of correctness from an
-architecture perspective.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+SGkgZHJldywNCg0KdGhhbmtzIGZvciBjb21pbmcgYmFjayB0byBtZS4gSSB0cmllZCB1c2luZyAi
+Z2l0LXNlbmQtZW1haWwiIGJ1dCB3YXMgc3RydWdnbGluZyB3aXRoIHRoZSBTTVRQIGNvbmZpZ3Vy
+YXRpb24gb2YgbXkgY29tcGFueSAoTWljcm9zb2Z0IE91dGxvb2sgb25saW5lIGFjY291bnQuLi4p
+LiBTbyBmYXIgSSd2ZSBub3QgZm91bmQgYSB3YXkgdG8gYXV0aGVudGljYXRlIHdpdGggU01UUCwg
+c28gSSB3YXMgdW5mb3J0dW5hdGVseSB1bmFibGUgdG8gc2VuZCB0aGUgcGF0Y2ggKHdpdGggaW1w
+cm92ZWQgcmF0aW9uYWxlLCBhcyByZXF1ZXN0ZWQpLg0KDQpTaW5jZSBnaXZpbmcgYmFjayB0byB0
+aGUgb3BlbiBzb3VyY2UgY29tbXVuaXR5IGlzIG1vcmUgb2YgYSBwZXJzb25hbCB3aXNoIGFuZCBp
+cyBub3QgcmVxdWlyZWQgYnkgbWFuYWdlbWVudCAoYnV0IGFsc28gbm90IGZvcmJpZGRlbiksIGl0
+IGhhcyBsb3cgcHJpb3JpdHkgYW5kIEkgYWxyZWFkeSBzcGVudCBzb21lIHRpbWUgb24gdGhpcy4g
+SSB3aWxsIHNlbmQgcGF0Y2hlcyBpbiB0aGUgZnV0dXJlIGZyb20gbXkgcGVyc29uYWwgZW1haWwg
+YWNjb3VudC4NCg0KSSBhbSB0b3RhbGx5IGZpbmUgd2l0aCBzb21lb25lIGVsc2Ugc3VibWl0dGlu
+ZyB0aGUgcGF0Y2guDQpJZiBpdCdzIG5vdCB0b28gaW5jb252ZW5pZW50LCBjb3VsZCB5b3UgcGxl
+YXNlIGFkZCBhICJyZXBvcnRlZC1ieSIgdG8gdGhlIHBhdGNoPyAoTm8gcHJvYmxlbSBpZiBub3Qp
+DQpUaGFuayB5b3UuDQoNCkJlc3QgUmVnYXJkcywNCg0KTWF0dGhpYXMNCg0KX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fXw0KRnJvbTogQW5kcmV3IEpvbmVzIDxham9uZXNA
+dmVudGFuYW1pY3JvLmNvbT4NClNlbnQ6IFR1ZXNkYXksIE9jdG9iZXIgMjQsIDIwMjMgMTM6MzEN
+ClRvOiBNYXR0aGlhcyBSb3NlbmZlbGRlcg0KQ2M6IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IEFuZHJl
+dyBKb25lczsgQWxleGFuZHJ1IEVsaXNlaTsgRXJpYyBBdWdlcjsga3ZtYXJtQGxpc3RzLmxpbnV4
+LmRldg0KU3ViamVjdDogUmU6IFtrdm0tdW5pdC10ZXN0cyBQQVRDSF0gYXJtOiBwbXU6IEZpeCBv
+dmVyZmxvdyB0ZXN0IGNvbmRpdGlvbg0KDQpDQVVUSU9OISBFeHRlcm5hbCBFbWFpbC4gRG8gbm90
+IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0YWNobWVudHMgdW5sZXNzIHlvdSByZWNvZ25pemUgdGhl
+IHNlbmRlciBhbmQga25vdyB0aGUgY29udGVudCBpcyBzYWZlLg0KDQpPbiBGcmksIFNlcCAyOSwg
+MjAyMyBhdCAwOToxOTozN1BNICswMDAwLCBNYXR0aGlhcyBSb3NlbmZlbGRlciB3cm90ZToNCj4g
+SGVsbG8sDQo+DQo+IEkgdGhpbmsgb25lIG9mIHRoZSB0ZXN0IGNvbmRpdGlvbnMgZm9yIHRoZSBL
+Vk0gUE1VIHVuaXQgdGVzdCAiYmFzaWNfZXZlbnRfY291bnQiIGlzIG5vdCBzdHJvbmcgZW5vdWdo
+LiBJdCBvbmx5IGNoZWNrcyB3aGV0aGVyIGFuIG92ZXJmbG93IG9jY3VycmVkIGZvciBjb3VudGVy
+ICMwLCBidXQgaXQgc2hvdWxkIGFsc28gY2hlY2sgdGhhdCBub25lIGhhcHBlbmVkIGZvciB0aGUg
+b3RoZXIgY291bnRlcihzKToNCj4NCj4gcmVwb3J0KHJlYWRfc3lzcmVnKHBtb3ZzY2xyX2VsMCkg
+JiAweDEsDQo+IOKAguKAguKAguKAguKAguKAgiJjaGVjayBvdmVyZmxvdyBoYXBwZW5lZCBvbiAj
+MCBvbmx5Iik7DQo+DQo+IFRoaXMgc2hvdWxkIGJlICI9PSIgaW5zdGVhZCBvZiAiJiIuDQo+DQo+
+IE5vdGUgdGhhdCB0aGlzIHRlc3QgdXNlcyBvbmUgbW9yZSBjb3VudGVyICgjMSksIHdoaWNoIG11
+c3Qgbm90IG92ZXJmbG93LiBUaGlzIHNob3VsZCBhbHNvIGJlIGNoZWNrZWQsIGV2ZW4gdGhvdWdo
+IHRoaXMgd291bGQgYmUgdmlzaWJsZSB0aHJvdWdoIHRoZSAicmVwb3J0X2luZm8oKSIgYSBmZXcg
+bGluZXMgYWJvdmUuIEJ1dCB0aGUgbGF0dGVyIGRvZXMgbm90IG1hcmsgdGhlIHRlc3QgZmFpbGlu
+ZyAtIGl0IGlzIHB1cmVseSBpbmZvcm1hdGlvbmFsLCBzbyBhbnkgdGVzdCBhdXRvbWF0aW9uIHdp
+bGwgbm90IG5vdGljZS4NCj4NCj4NCj4gSSBhcG9sb2dpemUgaW4gYWR2YW5jZSBpZiBteSBlbWFp
+bCBwcm9ncmFtIGF0IHdvcmsgbWVzc2VzIHVwIGFueSBmb3JtYXR0aW5nLiBQbGVhc2UgbGV0IG1l
+IGtub3cgYW5kIEkgd2lsbCB0cnkgdG8gcmVjb25maWd1cmUgYW5kIHJlc2VuZCBpZiBuZWNlc3Nh
+cnkuIFRoYW5rIHlvdS4NCg0KSGV5IE1hdHRoaWFzLA0KDQpXZSBsZXQgeW91IGtub3cgdGhlIGZv
+cm1hdHRpbmcgd2FzIHdyb25nLCBidXQgd2UgaGF2ZW4ndCB5ZXQgcmVjZWl2ZWQgYQ0KcmVzZW5k
+LiBCdXQsIHNpbmNlIEVyaWMgYWxyZWFkeSByZXZpZXdlZCBpdCwgSSd2ZSBnb25lIGFoZWFkIGFu
+ZCBhcHBsaWVkDQppdCB0byBhcm0vcXVldWUgd2l0aCB0aGlzIGZpeGVzIHRhZw0KDQpGaXhlczog
+NGNlMmE4MDQ1NjI0ICgiYXJtOiBwbXU6IEJhc2ljIGV2ZW50IGNvdW50ZXIgVGVzdHMiKQ0KDQpk
+cmV3DQpbQmFubmVyXTxodHRwOi8vd3d3Lm5pby5pbz4NClRoaXMgZW1haWwgYW5kIGFueSBmaWxl
+cyB0cmFuc21pdHRlZCB3aXRoIGl0IGFyZSBjb25maWRlbnRpYWwgYW5kIGludGVuZGVkIHNvbGVs
+eSBmb3IgdGhlIHVzZSBvZiB0aGUgaW5kaXZpZHVhbCBvciBlbnRpdHkgdG8gd2hvbSB0aGV5IGFy
+ZSBhZGRyZXNzZWQuIFlvdSBtYXkgTk9UIHVzZSwgZGlzY2xvc2UsIGNvcHkgb3IgZGlzc2VtaW5h
+dGUgdGhpcyBpbmZvcm1hdGlvbi4gSWYgeW91IGhhdmUgcmVjZWl2ZWQgdGhpcyBlbWFpbCBpbiBl
+cnJvciwgcGxlYXNlIG5vdGlmeSB0aGUgc2VuZGVyIGFuZCBkZXN0cm95IGFsbCBjb3BpZXMgb2Yg
+dGhlIG9yaWdpbmFsIG1lc3NhZ2UgYW5kIGFsbCBhdHRhY2htZW50cy4gUGxlYXNlIG5vdGUgdGhh
+dCBhbnkgdmlld3Mgb3Igb3BpbmlvbnMgcHJlc2VudGVkIGluIHRoaXMgZW1haWwgYXJlIHNvbGVs
+eSB0aG9zZSBvZiB0aGUgYXV0aG9yIGFuZCBkbyBub3QgbmVjZXNzYXJpbHkgcmVwcmVzZW50IHRo
+b3NlIG9mIHRoZSBjb21wYW55LiBGaW5hbGx5LCB0aGUgcmVjaXBpZW50IHNob3VsZCBjaGVjayB0
+aGlzIGVtYWlsIGFuZCBhbnkgYXR0YWNobWVudHMgZm9yIHRoZSBwcmVzZW5jZSBvZiB2aXJ1c2Vz
+LiBUaGUgY29tcGFueSBhY2NlcHRzIG5vIGxpYWJpbGl0eSBmb3IgYW55IGRhbWFnZSBjYXVzZWQg
+YnkgYW55IHZpcnVzIHRyYW5zbWl0dGVkIGJ5IHRoaXMgZW1haWwuDQo=
