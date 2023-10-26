@@ -1,129 +1,134 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A1F13FEB
-	for <kvmarm@lists.linux.dev>; Thu, 26 Oct 2023 11:07:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BF2883A;
+	Thu, 26 Oct 2023 12:46:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="s0BWalfU"
-Date: Thu, 26 Oct 2023 13:07:28 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1698318450;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GTizDwaFqeSYDTa6kgZ/sR4mN6UauDoNIA8sRDmavHw=;
-	b=s0BWalfU3x+rCXDaIa4DTjlveSs3gpW6ZHNSyHWDOeZCOs7caMFRo1h5Ck3Km7IRL4IK5f
-	Reqv7P0uHrndKGe5e7a+otBHm2Lx9ttFOuu6wj+61iLVSorcph2mnc+1ZogdSXjLiFy85r
-	qWH9L59CfIpmf9BBwlBjTtx9fjPiMpI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Shaoqin Huang <shahuang@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, kvmarm@lists.linux.dev, 
-	Nikos Nikoleris <nikos.nikoleris@arm.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>, 
-	Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v1] configure: arm64: Add support for
- dirty-ring in migration
-Message-ID: <20231026-b6fc2692a0fe4a0415451781@orel>
-References: <20231026034042.812006-1-shahuang@redhat.com>
- <e318cd46-b871-448a-b95a-01647d8afc43@redhat.com>
- <9052ed87-e5cf-4d89-b480-54da4d8216c7@redhat.com>
- <20231026-38a5f6360752b10fdb086adc@orel>
- <907d8b7a-2cb0-f5b4-ac54-51aa1f6dd540@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gz6qPi/5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C53E9C433C7;
+	Thu, 26 Oct 2023 12:46:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698324392;
+	bh=o9jyzv53TdbTQ/JvbB6Pk8C3vEljuK7P7LZdyPhUN88=;
+	h=From:Subject:Date:To:Cc:From;
+	b=gz6qPi/5JL4iQYlYffY1glVPzhZWf6mcDmcHo2LK6FbvaJIEwSQSiAuZ0q36tug+Y
+	 viIGWSww7LN5yP6PggCkyPU1NAAzVWxqbU5PPTX/PRK5uBsYd8QH0a8AOm2dJ9UoNa
+	 szNuLjLm6SVwHROLU7bQhHu1zKSVbquQPUdyBPfztrifR0Qb7AdwYvYZrcWNpLtGT4
+	 p+tklhhfLNk3fo2pu0bs/zPh6MgPMgMkHqvDGu4aBaunoXXcsOgzsWqCyio2/BzYsm
+	 AcGQ5w2+QgMKxDVNRgdc2hmk7JQQJA76Te4heiZ9go+bnRd2ZKiVXefc8hxW0AulSP
+	 FZ7EF5Gcs665w==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH 00/21] arm64: Support for 2023 DPISA extensions
+Date: Thu, 26 Oct 2023 13:44:14 +0100
+Message-Id: <20231026-arm64-2023-dpisa-v1-0-8470dd989bb2@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <907d8b7a-2cb0-f5b4-ac54-51aa1f6dd540@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAB5fOmUC/x3MTQqAIBBA4avErBvwL4WuEi0kx5pFJgoRRHfPW
+ n6L926oVJgqjN0NhU6ufKQG2XewbD6thByaQQmlpRAafdmtwY8YMlePKuqgBmescQZalgtFvv7
+ lND/PC71mQf9iAAAA
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Jonathan Corbet <corbet@lwn.net>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ kvmarm@lists.linux.dev, linux-doc@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.13-dev-0438c
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4266; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=o9jyzv53TdbTQ/JvbB6Pk8C3vEljuK7P7LZdyPhUN88=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBlOl+UIx/5I6oPhxFmpNY8nGgSlVbxt2/Z5y6RQ2DI
+ 6MU1O5uJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZTpflAAKCRAk1otyXVSH0APsB/
+ 99XK8I3xOVs2O6LCrgWk38xQ/nVjwx/1RkJCdMy4iAmj+jJGIUWFzRLiY2yFMu6aAyZWtRgwyL5vs7
+ Tiey4Om12GAwXq2rw142vqUwmoVlfK5ZI9l//AeScOQ20D4ODHuo3ibOC9jGBZBCgZEr9SeapP4A5T
+ O6ZbyPhmybKATmRrTRRWZOszQLrvkHUvNwKhxUcA2ZV8e+bt4WOVCFoUDtIpqJMrSxEa/saZxWB38h
+ j08o8gPZsw16VWtZ5EaMM4x2lbIDOJv2IQinmuzxQMBdQRhbaA9C15Hytw9OOz2bKWwHQEcruE2A3f
+ EQnCBd8FUyX8JjsBH1DLmoFTQwVmZG
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Thu, Oct 26, 2023 at 04:44:26PM +0800, Shaoqin Huang wrote:
-> Hi drew,
-> 
-> On 10/26/23 15:40, Andrew Jones wrote:
-> > On Thu, Oct 26, 2023 at 01:54:55PM +0800, Shaoqin Huang wrote:
-> > > 
-> > > 
-> > > On 10/26/23 13:12, Thomas Huth wrote:
-> > > > On 26/10/2023 05.40, Shaoqin Huang wrote:
-> > > > > Add a new configure option "--dirty-ring-size" to support dirty-ring
-> > > > > migration on arm64. By default, the dirty-ring is disabled, we can
-> > > > > enable it by:
-> > > > > 
-> > > > >     # ./configure --dirty-ring-size=65536
-> > > > > 
-> > > > > This will generate one more entry in config.mak, it will look like:
-> > > > > 
-> > > > >     # cat config.mak
-> > > > >       :
-> > > > >     ACCEL=kvm,dirty-ring-size=65536
-> > > > > 
-> > > > > With this configure option, user can easy enable dirty-ring and specify
-> > > > > dirty-ring-size to test the dirty-ring in migration.
-> > > > 
-> > > > Do we really need a separate configure switch for this? If it is just
-> > > > about setting a value in the ACCEL variable, you can also run the tests
-> > > > like this:
-> > > > 
-> > > > ACCEL=kvm,dirty-ring-size=65536 ./run_tests.sh
-> > > > 
-> > > >    Thomas
-> > > > 
-> > > 
-> > > Hi Thomas,
-> > > 
-> > > You're right. We can do it by simply set the ACCEL when execute
-> > > ./run_tests.sh. I think maybe add a configure can make auto test to set the
-> > > dirty-ring easier? but I'm not 100% sure it will benefit to them.
-> > > 
-> > 
-> > For unit tests that require specific configurations, those configurations
-> > should be added to the unittests.cfg file. As we don't currently support
-> > adding accel properties, we should add a new parameter and extend the
-> > parsing.
-> 
-> So you mean we add the accel properties into the unittests.cfg like:
-> 
-> accel = kvm,dirty-ring-size=65536
-> 
-> Then let the `for_each_unittest` to parse the parameter?
-> In this way, should we copy the migration config to dirty-ring migration?
-> Just like:
-> 
-> [its-migration]
-> file = gic.flat
-> smp = $MAX_SMP
-> extra_params = -machine gic-version=3 -append 'its-migration'
-> groups = its migration
-> arch = arm64
-> 
-> [its-migration-dirty-ring]
-> file = gic.flat
-> smp = $MAX_SMP
-> extra_params = -machine gic-version=3 -append 'its-migration'
-> groups = its migration
-> arch = arm64
-> accel = kvm,dirty-ring-size=65536
-> 
-> So it will test both dirty bitmap and dirty ring.
+This series enables support for the data processing extensions in the
+newly released 2023 architecture, this is mainly support for 8 bit
+floating point formats.  Most of the extensions only introduce new
+instructions and therefore only require hwcaps but there is a new EL0
+visible control register FPMR used to control the 8 bit floating point
+formats, we need to manage traps for this and context switch it.
 
-Yup, either like you've outlined above with modifying the definition of
-'accel' to take an optional [,params...] or by creating another parameter,
-e.g. 'accel_props' and then doing
+The sharing of floating point save code between the host and guest
+kernels slightly complicates the introduction of KVM support, we first
+introduce host support with some placeholders for KVM then replace those
+with the actual KVM support.
 
- accel = kvm
- accel_props = dirty-ring-size=65536
+I've not added test coverage for ptrace, I've got a not quite finished
+test program which exercises all the FP ptrace interfaces and their
+interactions together, my plan is to cover it there rather than add
+another tiny test program that duplicates the boilerplace for tracing a
+target and doesn't actually run the traced program.
 
-Which of the two approaches to choose depends on how intrusive the
-modification of 'accel' would be and how well it would preserve its
-current behavior.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Mark Brown (21):
+      arm64/sysreg: Add definition for ID_AA64PFR2_EL1
+      arm64/sysreg: Update ID_AA64ISAR2_EL1 defintion for DDI0601 2023-09
+      arm64/sysreg: Add definition for ID_AA64ISAR3_EL1
+      arm64/sysreg: Add definition for ID_AA64FPFR0_EL1
+      arm64/sysreg: Update ID_AA64SMFR0_EL1 definition for DDI0601 2023-09
+      arm64/sysreg: Update SCTLR_EL1 for DDI0601 2023-09
+      arm64/sysreg: Update HCRX_EL2 definition for DDI0601 2023-09
+      arm64/sysreg: Add definition for FPMR
+      arm64/cpufeature: Hook new identification registers up to cpufeature
+      arm64/fpsimd: Enable host kernel access to FPMR
+      arm64/fpsimd: Support FEAT_FPMR
+      arm64/signal: Add FPMR signal handling
+      arm64/ptrace: Expose FPMR via ptrace
+      KVM: arm64: Add newly allocated ID registers to register descriptions
+      KVM: arm64: Support FEAT_FPMR for guests
+      arm64/hwcap: Define hwcaps for 2023 DPISA features
+      kselftest/arm64: Handle FPMR context in generic signal frame parser
+      kselftest/arm64: Add basic FPMR test
+      kselftest/arm64: Add 2023 DPISA hwcap test coverage
+      KVM: arm64: selftests: Document feature registers added in 2023 extensions
+      KVM: arm64: selftests: Teach get-reg-list about FPMR
 
-Thanks,
-drew
+ Documentation/arch/arm64/elf_hwcaps.rst            |  49 +++++
+ arch/arm64/include/asm/cpu.h                       |   3 +
+ arch/arm64/include/asm/cpufeature.h                |   5 +
+ arch/arm64/include/asm/fpsimd.h                    |   2 +
+ arch/arm64/include/asm/hwcap.h                     |  15 ++
+ arch/arm64/include/asm/kvm_arm.h                   |   4 +-
+ arch/arm64/include/asm/kvm_host.h                  |   3 +
+ arch/arm64/include/asm/processor.h                 |   2 +
+ arch/arm64/include/uapi/asm/hwcap.h                |  15 ++
+ arch/arm64/include/uapi/asm/sigcontext.h           |   8 +
+ arch/arm64/kernel/cpufeature.c                     |  72 +++++++
+ arch/arm64/kernel/cpuinfo.c                        |  18 ++
+ arch/arm64/kernel/fpsimd.c                         |  13 ++
+ arch/arm64/kernel/ptrace.c                         |  42 ++++
+ arch/arm64/kernel/signal.c                         |  59 ++++++
+ arch/arm64/kvm/fpsimd.c                            |  19 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h            |   7 +-
+ arch/arm64/kvm/sys_regs.c                          |  17 +-
+ arch/arm64/tools/cpucaps                           |   1 +
+ arch/arm64/tools/sysreg                            | 153 ++++++++++++++-
+ include/uapi/linux/elf.h                           |   1 +
+ tools/testing/selftests/arm64/abi/hwcap.c          | 217 +++++++++++++++++++++
+ tools/testing/selftests/arm64/signal/.gitignore    |   1 +
+ .../arm64/signal/testcases/fpmr_siginfo.c          |  82 ++++++++
+ .../selftests/arm64/signal/testcases/testcases.c   |   8 +
+ .../selftests/arm64/signal/testcases/testcases.h   |   1 +
+ tools/testing/selftests/kvm/aarch64/get-reg-list.c |  11 +-
+ 27 files changed, 810 insertions(+), 18 deletions(-)
+---
+base-commit: 05d3ef8bba77c1b5f98d941d8b2d4aeab8118ef1
+change-id: 20231003-arm64-2023-dpisa-2f3d25746474
+
+Best regards,
+-- 
+Mark Brown <broonie@kernel.org>
+
