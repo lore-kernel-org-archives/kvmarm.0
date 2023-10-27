@@ -1,46 +1,46 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E83BE3D965
-	for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 18:23:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD633D965
+	for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 18:23:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xP7fNGe9"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d9bc6447193so1955415276.3
-        for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 11:23:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lp+I1HWh"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-59b5a586da6so22568767b3.1
+        for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 11:23:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698431009; x=1699035809; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1698431011; x=1699035811; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=rHCSEdVT91A5ySy8HWpIrikDyrYgztwmDmnD7EhGGWM=;
-        b=xP7fNGe9Fc63HhxmsXTXqtM4EzYqtHHAhzNGXn30KPLyBURAsMXCy95943a885AF2N
-         KYSpk3jT5n3XsabvTr3ZvBqHK66ZjkUcJFqFDEE/9ZhGURd/+OtCCvU9PNULueyiC2dt
-         WmRKL2L8jbiWfODGePl2GtTMSzeQbwWS4W64fe0G9FO/qEwu2GaW8aws7YdF5WxESpmX
-         nsdYkLENQEZz2WT/BTSkxD7VyjxwsUdC8KZVqRKqL/hZ+lkh99MG51YFn0HHDBBK0b91
-         OKFM/6+nMaJny2eh3ylQJBnFIK2P8vLrpOYfs2nmdioHPfUJ6Jk8spW/t2wunbUazWK+
-         Dl7A==
+        bh=sbbTeqIjFnESn/3c//KYIg/yBP25ARIIaxIo9NdR+Rs=;
+        b=Lp+I1HWh6TbxhxXHwgau+RU2mitsMmgzYyfnasqz62vfeU/jlC1sbzCBzDCW+HK2gH
+         tS8enz7WN2NzN9w31/EjN/4xgIC11LA7azTPGSmS1UsGIUZAmpOtpYnSxel6JdJNdMiw
+         G6WRkonw5L4WAt3YtoT+HRxElfKnMtu6YFQducMaRazA7PEtIKyyHc6Kq4zOTOUrcVh1
+         up7BYSgudLwgaysDnCCt0hwpUTGpooOEMnVfD5E5fUtdVl7Ev6S7VZLfBIAKTwsi08gS
+         Tl0vxOG3iRcO3B7kASnyqtGjft1sEg/P6s8WPySgpOdw7cibEGjqsbse1Pr5t2Fj7j9W
+         L6kA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698431009; x=1699035809;
+        d=1e100.net; s=20230601; t=1698431011; x=1699035811;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=rHCSEdVT91A5ySy8HWpIrikDyrYgztwmDmnD7EhGGWM=;
-        b=g8lVlYkBV02/zFFGTpzbtk9IPWvcUqv/cnFNu2zAoZZkhCXJeEGW4V2j47gk20936J
-         UjwmhZsBp+AffTC9cc6DvwW/57XHPlEyjow3lQLmXEQTk47UG8ROzi7n/o8f1mLSpnk/
-         PMVLsPUXrBCal4ZLKrXNdKKdJXkgp5eNjR6m7fOORhTY5NFtMY6joUcNyE2plj7tT3fh
-         ZeDoeoCUgtsN6bua2oIYuRuCnzdTUyzdY4t8H8m/RhQNdb7dBQziVconI4i6Ao3vpP13
-         xArh86OyRMCYYRObFfsFEhbxgYsfIR+6Op72YDdBQGMDulxlyf+HYof4XNZ1Oe0VqvFq
-         oMAw==
-X-Gm-Message-State: AOJu0Yz3etZdf+D7cwxyTYPYxYT70JtNg+fpeUi+kfQnkyDxagQqUJxv
-	krHUAaSjipK+sQYUD8TkGUEuZjidQFk=
-X-Google-Smtp-Source: AGHT+IGBlPG7wn0887XfDb8cENXXLGU58G9yJP5jBeCkKIucbC9oYDwWXkdT4FgaevehYCQITd+4fshLciA=
+        bh=sbbTeqIjFnESn/3c//KYIg/yBP25ARIIaxIo9NdR+Rs=;
+        b=RhLEXjUdNkcxYmROesln7VsnBRU11mc1zDNs7Lt6NxcD6rpPJnZoXyr6ynpfYf4Oiy
+         5lO0pLbW58wmvH/n23MUHLyKNMvEix4vYMFvr5CQ9m/pjWbhWx5lVmoYzFqfWjISVo6P
+         KJjgiHEQgCn8UJvR7E4oMscli36UqOsd92H6ExNL6s/sI6boAX4JfNyKMneCjPBa5NpV
+         e8FiOfcqnf0UZ5q3xy5LXGywbIICPFjHd4+HjaBXmCq1qCUfm2Dkm+e3PTm3agVRxZAR
+         M+PHX+3sPZCTb2EPuJ+6ZkTRb0bOsps+6mIvD8TInEHR7gGLi3mZkavMN3FnGcDqUQ6s
+         TGqw==
+X-Gm-Message-State: AOJu0YxDHa58Ual8KLOluTY3YKFNbM3w1ncNyxYVK8L+YWJFw13DrbrO
+	hyOC4VmauMWrkku/TLP/f/lXGTq0RMA=
+X-Google-Smtp-Source: AGHT+IHBWIjPxzRJgKiud97ZCtykjvc4+klLDW+Sn0Y068ZaDLScSJEVBpBXvLWKn1zDVFylTXJJKJ/wubw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:565:b0:da0:c979:fd70 with SMTP id
- a5-20020a056902056500b00da0c979fd70mr69913ybt.9.1698431009012; Fri, 27 Oct
- 2023 11:23:29 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a0d:ca0f:0:b0:59b:e663:23b0 with SMTP id
+ m15-20020a0dca0f000000b0059be66323b0mr102894ywd.4.1698431011148; Fri, 27 Oct
+ 2023 11:23:31 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 27 Oct 2023 11:22:14 -0700
+Date: Fri, 27 Oct 2023 11:22:15 -0700
 In-Reply-To: <20231027182217.3615211-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -50,8 +50,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20231027182217.3615211-1-seanjc@google.com>
 X-Mailer: git-send-email 2.42.0.820.g83a721a137-goog
-Message-ID: <20231027182217.3615211-33-seanjc@google.com>
-Subject: [PATCH v13 32/35] KVM: selftests: Add KVM_SET_USER_MEMORY_REGION2 helper
+Message-ID: <20231027182217.3615211-34-seanjc@google.com>
+Subject: [PATCH v13 33/35] KVM: selftests: Expand set_memory_region_test to
+ validate guest_memfd()
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
@@ -80,79 +81,163 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Chao Peng <chao.p.peng@linux.intel.com>
 
-Add helpers to invoke KVM_SET_USER_MEMORY_REGION2 directly so that tests
-can validate of features that are unique to "version 2" of "set user
-memory region", e.g. do negative testing on gmem_fd and gmem_offset.
+Expand set_memory_region_test to exercise various positive and negative
+testcases for private memory.
 
-Provide a raw version as well as an assert-success version to reduce
-the amount of boilerplate code need for basic usage.
+ - Non-guest_memfd() file descriptor for private memory
+ - guest_memfd() from different VM
+ - Overlapping bindings
+ - Unaligned bindings
 
 Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+Co-developed-by: Ackerley Tng <ackerleytng@google.com>
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+[sean: trim the testcases to remove duplicate coverage]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/include/kvm_util_base.h     |  7 +++++
- tools/testing/selftests/kvm/lib/kvm_util.c    | 29 +++++++++++++++++++
- 2 files changed, 36 insertions(+)
+ .../selftests/kvm/include/kvm_util_base.h     |  10 ++
+ .../selftests/kvm/set_memory_region_test.c    | 100 ++++++++++++++++++
+ 2 files changed, 110 insertions(+)
 
 diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index 157508c071f3..8ec122f5fcc8 100644
+index 8ec122f5fcc8..e4d2cd9218b2 100644
 --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
 +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -522,6 +522,13 @@ void vm_set_user_memory_region(struct kvm_vm *vm, uint32_t slot, uint32_t flags,
- 			       uint64_t gpa, uint64_t size, void *hva);
- int __vm_set_user_memory_region(struct kvm_vm *vm, uint32_t slot, uint32_t flags,
- 				uint64_t gpa, uint64_t size, void *hva);
-+void vm_set_user_memory_region2(struct kvm_vm *vm, uint32_t slot, uint32_t flags,
-+				uint64_t gpa, uint64_t size, void *hva,
-+				uint32_t guest_memfd, uint64_t guest_memfd_offset);
-+int __vm_set_user_memory_region2(struct kvm_vm *vm, uint32_t slot, uint32_t flags,
-+				 uint64_t gpa, uint64_t size, void *hva,
-+				 uint32_t guest_memfd, uint64_t guest_memfd_offset);
-+
- void vm_userspace_mem_region_add(struct kvm_vm *vm,
- 	enum vm_mem_backing_src_type src_type,
- 	uint64_t guest_paddr, uint32_t slot, uint64_t npages,
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 52b131e3aca5..1620452c1cf7 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -873,6 +873,35 @@ void vm_set_user_memory_region(struct kvm_vm *vm, uint32_t slot, uint32_t flags,
- 		    errno, strerror(errno));
+@@ -819,6 +819,16 @@ static inline struct kvm_vm *vm_create_barebones(void)
+ 	return ____vm_create(VM_SHAPE_DEFAULT);
  }
  
-+int __vm_set_user_memory_region2(struct kvm_vm *vm, uint32_t slot, uint32_t flags,
-+				 uint64_t gpa, uint64_t size, void *hva,
-+				 uint32_t guest_memfd, uint64_t guest_memfd_offset)
++static inline struct kvm_vm *vm_create_barebones_protected_vm(void)
 +{
-+	struct kvm_userspace_memory_region2 region = {
-+		.slot = slot,
-+		.flags = flags,
-+		.guest_phys_addr = gpa,
-+		.memory_size = size,
-+		.userspace_addr = (uintptr_t)hva,
-+		.guest_memfd = guest_memfd,
-+		.guest_memfd_offset = guest_memfd_offset,
++	const struct vm_shape shape = {
++		.mode = VM_MODE_DEFAULT,
++		.type = KVM_X86_SW_PROTECTED_VM,
 +	};
 +
-+	return ioctl(vm->fd, KVM_SET_USER_MEMORY_REGION2, &region);
++	return ____vm_create(shape);
 +}
 +
-+void vm_set_user_memory_region2(struct kvm_vm *vm, uint32_t slot, uint32_t flags,
-+				uint64_t gpa, uint64_t size, void *hva,
-+				uint32_t guest_memfd, uint64_t guest_memfd_offset)
+ static inline struct kvm_vm *vm_create(uint32_t nr_runnable_vcpus)
+ {
+ 	return __vm_create(VM_SHAPE_DEFAULT, nr_runnable_vcpus, 0);
+diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+index b32960189f5f..ca83e3307a98 100644
+--- a/tools/testing/selftests/kvm/set_memory_region_test.c
++++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+@@ -385,6 +385,98 @@ static void test_add_max_memory_regions(void)
+ 	kvm_vm_free(vm);
+ }
+ 
++
++static void test_invalid_guest_memfd(struct kvm_vm *vm, int memfd,
++				     size_t offset, const char *msg)
 +{
-+	int ret = __vm_set_user_memory_region2(vm, slot, flags, gpa, size, hva,
-+					       guest_memfd, guest_memfd_offset);
-+
-+	TEST_ASSERT(!ret, "KVM_SET_USER_MEMORY_REGION2 failed, errno = %d (%s)",
-+		    errno, strerror(errno));
++	int r = __vm_set_user_memory_region2(vm, MEM_REGION_SLOT, KVM_MEM_PRIVATE,
++					     MEM_REGION_GPA, MEM_REGION_SIZE,
++					     0, memfd, offset);
++	TEST_ASSERT(r == -1 && errno == EINVAL, "%s", msg);
 +}
 +
++static void test_add_private_memory_region(void)
++{
++	struct kvm_vm *vm, *vm2;
++	int memfd, i;
 +
- /* FIXME: This thing needs to be ripped apart and rewritten. */
- void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
- 		uint64_t guest_paddr, uint32_t slot, uint64_t npages,
++	pr_info("Testing ADD of KVM_MEM_PRIVATE memory regions\n");
++
++	vm = vm_create_barebones_protected_vm();
++
++	test_invalid_guest_memfd(vm, vm->kvm_fd, 0, "KVM fd should fail");
++	test_invalid_guest_memfd(vm, vm->fd, 0, "VM's fd should fail");
++
++	memfd = kvm_memfd_alloc(MEM_REGION_SIZE, false);
++	test_invalid_guest_memfd(vm, memfd, 0, "Regular memfd() should fail");
++	close(memfd);
++
++	vm2 = vm_create_barebones_protected_vm();
++	memfd = vm_create_guest_memfd(vm2, MEM_REGION_SIZE, 0);
++	test_invalid_guest_memfd(vm, memfd, 0, "Other VM's guest_memfd() should fail");
++
++	vm_set_user_memory_region2(vm2, MEM_REGION_SLOT, KVM_MEM_PRIVATE,
++				   MEM_REGION_GPA, MEM_REGION_SIZE, 0, memfd, 0);
++	close(memfd);
++	kvm_vm_free(vm2);
++
++	memfd = vm_create_guest_memfd(vm, MEM_REGION_SIZE, 0);
++	for (i = 1; i < PAGE_SIZE; i++)
++		test_invalid_guest_memfd(vm, memfd, i, "Unaligned offset should fail");
++
++	vm_set_user_memory_region2(vm, MEM_REGION_SLOT, KVM_MEM_PRIVATE,
++				   MEM_REGION_GPA, MEM_REGION_SIZE, 0, memfd, 0);
++	close(memfd);
++
++	kvm_vm_free(vm);
++}
++
++static void test_add_overlapping_private_memory_regions(void)
++{
++	struct kvm_vm *vm;
++	int memfd;
++	int r;
++
++	pr_info("Testing ADD of overlapping KVM_MEM_PRIVATE memory regions\n");
++
++	vm = vm_create_barebones_protected_vm();
++
++	memfd = vm_create_guest_memfd(vm, MEM_REGION_SIZE * 4, 0);
++
++	vm_set_user_memory_region2(vm, MEM_REGION_SLOT, KVM_MEM_PRIVATE,
++				   MEM_REGION_GPA, MEM_REGION_SIZE * 2, 0, memfd, 0);
++
++	vm_set_user_memory_region2(vm, MEM_REGION_SLOT + 1, KVM_MEM_PRIVATE,
++				   MEM_REGION_GPA * 2, MEM_REGION_SIZE * 2,
++				   0, memfd, MEM_REGION_SIZE * 2);
++
++	/*
++	 * Delete the first memslot, and then attempt to recreate it except
++	 * with a "bad" offset that results in overlap in the guest_memfd().
++	 */
++	vm_set_user_memory_region2(vm, MEM_REGION_SLOT, KVM_MEM_PRIVATE,
++				   MEM_REGION_GPA, 0, NULL, -1, 0);
++
++	/* Overlap the front half of the other slot. */
++	r = __vm_set_user_memory_region2(vm, MEM_REGION_SLOT, KVM_MEM_PRIVATE,
++					 MEM_REGION_GPA * 2 - MEM_REGION_SIZE,
++					 MEM_REGION_SIZE * 2,
++					 0, memfd, 0);
++	TEST_ASSERT(r == -1 && errno == EEXIST, "%s",
++		    "Overlapping guest_memfd() bindings should fail with EEXIST");
++
++	/* And now the back half of the other slot. */
++	r = __vm_set_user_memory_region2(vm, MEM_REGION_SLOT, KVM_MEM_PRIVATE,
++					 MEM_REGION_GPA * 2 + MEM_REGION_SIZE,
++					 MEM_REGION_SIZE * 2,
++					 0, memfd, 0);
++	TEST_ASSERT(r == -1 && errno == EEXIST, "%s",
++		    "Overlapping guest_memfd() bindings should fail with EEXIST");
++
++	close(memfd);
++	kvm_vm_free(vm);
++}
++
+ int main(int argc, char *argv[])
+ {
+ #ifdef __x86_64__
+@@ -401,6 +493,14 @@ int main(int argc, char *argv[])
+ 
+ 	test_add_max_memory_regions();
+ 
++	if (kvm_has_cap(KVM_CAP_GUEST_MEMFD) &&
++	    (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM))) {
++		test_add_private_memory_region();
++		test_add_overlapping_private_memory_regions();
++	} else {
++		pr_info("Skipping tests for KVM_MEM_PRIVATE memory regions\n");
++	}
++
+ #ifdef __x86_64__
+ 	if (argc > 1)
+ 		loops = atoi_positive("Number of iterations", argv[1]);
 -- 
 2.42.0.820.g83a721a137-goog
 
