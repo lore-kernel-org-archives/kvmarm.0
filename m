@@ -1,68 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7720179CC;
-	Fri, 27 Oct 2023 11:04:42 +0000 (UTC)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D84E217732
+	for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 11:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CAC0C433C8;
-	Fri, 27 Oct 2023 11:04:35 +0000 (UTC)
-Date: Fri, 27 Oct 2023 12:04:33 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Hyesoo Yu <hyesoo.yu@samsung.com>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
-	David Hildenbrand <david@redhat.com>, will@kernel.org,
-	oliver.upton@linux.dev, maz@kernel.org, james.morse@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, arnd@arndb.de,
-	akpm@linux-foundation.org, mingo@redhat.com, peterz@infradead.org,
-	juri.lelli@redhat.com, vincent.guittot@linaro.org,
-	dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
-	mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com,
-	mhiramat@kernel.org, rppt@kernel.org, hughd@google.com,
-	pcc@google.com, steven.price@arm.com, anshuman.khandual@arm.com,
-	vincenzo.frascino@arm.com, eugenis@google.com, kcc@google.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC 00/37] Add support for arm64 MTE dynamic tag storage
- reuse
-Message-ID: <ZTuZQYjcYFILtGYI@arm.com>
-References: <0b9c122a-c05a-b3df-c69f-85f520294adc@redhat.com>
- <ZOd2LvUKMguWdlgq@arm.com>
- <ZPhfNVWXhabqnknK@monolith>
- <ZP7/e8YFiosElvTm@arm.com>
- <0cc8a118-2522-f666-5bcc-af06263fd352@redhat.com>
- <ZQHVVdlN9QQztc7Q@arm.com>
- <CGME20231025031004epcas2p485a0b7a9247bc61d54064d7f7bdd1e89@epcas2p4.samsung.com>
- <20231025025932.GA3953138@tiffany>
- <ZTjWKJ0K78jeCJr-@monolith>
- <20231025085258.GA1355131@tiffany>
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6BB811424;
+	Fri, 27 Oct 2023 04:57:25 -0700 (PDT)
+Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.26])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D65D03F738;
+	Fri, 27 Oct 2023 04:56:41 -0700 (PDT)
+From: Ryan Roberts <ryan.roberts@arm.com>
+To: Ard Biesheuvel <ardb@google.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Kees Cook <keescook@chromium.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Cc: Ryan Roberts <ryan.roberts@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: [RFC PATCH v1 0/3] Update tlb invalidation routines for FEAT_LPA2
+Date: Fri, 27 Oct 2023 12:56:31 +0100
+Message-Id: <20231027115634.1432154-1-ryan.roberts@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231025085258.GA1355131@tiffany>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 25, 2023 at 05:52:58PM +0900, Hyesoo Yu wrote:
-> If we only avoid using ALLOC_CMA for __GFP_TAGGED, would we still be able to use
-> the next iteration even if the hardware does not support "tag of tag" ? 
+Hi All,
 
-It depends on how the next iteration looks like. The plan was not to
-support this so that we avoid another complication where a non-tagged
-page is mprotect'ed to become tagged and it would need to be migrated
-out of the CMA range. Not sure how much code it would save.
+As raised yesterday against Ard's LPA2 series [1], we need to address the TLBI
+changes to properly support LPA2 before Ard's changes get merged. So far those
+changes have been part of my KVM LPA2 series [2]. So this is an attempt to split
+the TLBI changes to make them independent. The idea is that this series would go
+in first, then Ard's and the rest of my series can race eachother and it doesn't
+really matter who wins.
 
-> I am not sure every vendor will support tag of tag, since there is no information
-> related to that feature, like in the Google spec document.
+I've attempted to address all of Marc's feedback against the versions of these
+patches posted at [2], including adding benchmark data (see patch 1). Although
+if people are still nervous that this could regress non-lpa2 performance in some
+cases, I could rework so that there are lpa2 and non-lpa2 variants of
+__flush_tlb_range_op(), and the correct version is chosen at the higher level
+(based on lpa2_is_enabled() / kvm_lpa2_is_enabled()).
 
-If you are aware of any vendors not supporting this, please direct them
-to the Arm support team, it would be very useful information for us.
+It turns out that we won't be able to key LPA2 usage off the same static key for
+both the kernel and kvm usage because the kernel usage additionally depends on
+CONFIG_ARM64_LPA2 being enabled. So I've introduced 2 stub functions
+(lpa2_is_enabled() and kvm_lpa2_is_enabled()) to advertise it. Ard already
+defines and implements lpa2_is_enabled() in his series, so there will be a minor
+conflict to resolve there. I plan to define kvm_lpa2_is_enabled() to be the
+static key for kvm in my series. Marc, would you be happy with this approach?
 
-Thanks.
+Anyway, I wanted to put this out there as an RFC. If we are happy with it, then
+I'll re-post on 6.7-rc1.
 
--- 
-Catalin
+[1] https://lore.kernel.org/linux-arm-kernel/5651bb31-9ef6-4dfc-b146-64606279bbf7@arm.com/
+[2] https://lore.kernel.org/kvmarm/20231009185008.3803879-1-ryan.roberts@arm.com/
+
+Thanks,
+Ryan
+
+Ryan Roberts (3):
+  arm64/mm: Modify range-based tlbi to decrement scale
+  arm64/mm: Add lpa2_is_enabled() kvm_lpa2_is_enabled() stubs
+  arm64/mm: Update tlb invalidation routines for FEAT_LPA2
+
+ arch/arm64/include/asm/kvm_mmu.h      |   3 +
+ arch/arm64/include/asm/pgtable-prot.h |   2 +
+ arch/arm64/include/asm/tlb.h          |  15 ++--
+ arch/arm64/include/asm/tlbflush.h     | 100 ++++++++++++++++----------
+ 4 files changed, 78 insertions(+), 42 deletions(-)
+
+--
+2.25.1
+
