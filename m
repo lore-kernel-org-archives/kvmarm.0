@@ -1,15 +1,15 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D84E217732
-	for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 11:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADBDB1864D
+	for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 11:56:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6BB811424;
-	Fri, 27 Oct 2023 04:57:25 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9A24A143D;
+	Fri, 27 Oct 2023 04:57:27 -0700 (PDT)
 Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.26])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D65D03F738;
-	Fri, 27 Oct 2023 04:56:41 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 124AB3F738;
+	Fri, 27 Oct 2023 04:56:43 -0700 (PDT)
 From: Ryan Roberts <ryan.roberts@arm.com>
 To: Ard Biesheuvel <ardb@google.com>,
 	Ard Biesheuvel <ardb@kernel.org>,
@@ -27,10 +27,12 @@ To: Ard Biesheuvel <ardb@google.com>,
 Cc: Ryan Roberts <ryan.roberts@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: [RFC PATCH v1 0/3] Update tlb invalidation routines for FEAT_LPA2
-Date: Fri, 27 Oct 2023 12:56:31 +0100
-Message-Id: <20231027115634.1432154-1-ryan.roberts@arm.com>
+Subject: [RFC PATCH v1 1/3] arm64/mm: Modify range-based tlbi to decrement scale
+Date: Fri, 27 Oct 2023 12:56:32 +0100
+Message-Id: <20231027115634.1432154-2-ryan.roberts@arm.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20231027115634.1432154-1-ryan.roberts@arm.com>
+References: <20231027115634.1432154-1-ryan.roberts@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -39,49 +41,100 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi All,
+In preparation for adding support for LPA2 to the tlb invalidation
+routines, modify the algorithm used by range-based tlbi to start at the
+highest 'scale' and decrement instead of starting at the lowest 'scale'
+and incrementing. This new approach makes it possible to maintain 64K
+alignment as we work through the range, until the last op (at scale=0).
+This is required when LPA2 is enabled. (This part will be added in a
+subsequent commit).
 
-As raised yesterday against Ard's LPA2 series [1], we need to address the TLBI
-changes to properly support LPA2 before Ard's changes get merged. So far those
-changes have been part of my KVM LPA2 series [2]. So this is an attempt to split
-the TLBI changes to make them independent. The idea is that this series would go
-in first, then Ard's and the rest of my series can race eachother and it doesn't
-really matter who wins.
+This change is separated into its own patch because it will also impact
+non-LPA2 systems, and I want to make it easy to bisect in case it leads
+to performance regression (see below for benchmarks that suggest this
+should not be a problem).
 
-I've attempted to address all of Marc's feedback against the versions of these
-patches posted at [2], including adding benchmark data (see patch 1). Although
-if people are still nervous that this could regress non-lpa2 performance in some
-cases, I could rework so that there are lpa2 and non-lpa2 variants of
-__flush_tlb_range_op(), and the correct version is chosen at the higher level
-(based on lpa2_is_enabled() / kvm_lpa2_is_enabled()).
+The original commit (d1d3aa98 "arm64: tlb: Use the TLBI RANGE feature in
+arm64") stated this as the reason for _incrementing_ scale:
 
-It turns out that we won't be able to key LPA2 usage off the same static key for
-both the kernel and kvm usage because the kernel usage additionally depends on
-CONFIG_ARM64_LPA2 being enabled. So I've introduced 2 stub functions
-(lpa2_is_enabled() and kvm_lpa2_is_enabled()) to advertise it. Ard already
-defines and implements lpa2_is_enabled() in his series, so there will be a minor
-conflict to resolve there. I plan to define kvm_lpa2_is_enabled() to be the
-static key for kvm in my series. Marc, would you be happy with this approach?
+  However, in most scenarios, the pages = 1 when flush_tlb_range() is
+  called. Start from scale = 3 or other proper value (such as scale
+  =ilog2(pages)), will incur extra overhead. So increase 'scale' from 0
+  to maximum.
 
-Anyway, I wanted to put this out there as an RFC. If we are happy with it, then
-I'll re-post on 6.7-rc1.
+But pages=1 is already special cased by the non-range invalidation path,
+which will take care of it the first time through the loop (both in the
+original commit and in my change), so I don't think switching to
+decrement scale should have any extra performance impact after all.
 
-[1] https://lore.kernel.org/linux-arm-kernel/5651bb31-9ef6-4dfc-b146-64606279bbf7@arm.com/
-[2] https://lore.kernel.org/kvmarm/20231009185008.3803879-1-ryan.roberts@arm.com/
+Indeed benchmarking kernel compilation, a TLBI-heavy workload, suggests
+that this new approach actually _improves_ performance slightly (using a
+virtual machine on Apple M2):
 
-Thanks,
-Ryan
+Table shows time to execute kernel compilation workload with 8 jobs,
+relative to baseline without this patch (more negative number is
+bigger speedup). Repeated 9 times across 3 system reboots:
 
-Ryan Roberts (3):
-  arm64/mm: Modify range-based tlbi to decrement scale
-  arm64/mm: Add lpa2_is_enabled() kvm_lpa2_is_enabled() stubs
-  arm64/mm: Update tlb invalidation routines for FEAT_LPA2
+| counter   |       mean |     stdev |
+|:----------|-----------:|----------:|
+| real-time |      -0.6% |      0.0% |
+| kern-time |      -1.6% |      0.5% |
+| user-time |      -0.4% |      0.1% |
 
- arch/arm64/include/asm/kvm_mmu.h      |   3 +
- arch/arm64/include/asm/pgtable-prot.h |   2 +
- arch/arm64/include/asm/tlb.h          |  15 ++--
- arch/arm64/include/asm/tlbflush.h     | 100 ++++++++++++++++----------
- 4 files changed, 78 insertions(+), 42 deletions(-)
+Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
+---
+ arch/arm64/include/asm/tlbflush.h | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
+index b149cf9f91bc..e8153c16fcdf 100644
+--- a/arch/arm64/include/asm/tlbflush.h
++++ b/arch/arm64/include/asm/tlbflush.h
+@@ -351,14 +351,14 @@ static inline void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
+  * entries one by one at the granularity of 'stride'. If the TLB
+  * range ops are supported, then:
+  *
+- * 1. If 'pages' is odd, flush the first page through non-range
+- *    operations;
++ * 1. The minimum range granularity is decided by 'scale', so multiple range
++ *    TLBI operations may be required. Start from scale = 3, flush the largest
++ *    possible number of pages ((num+1)*2^(5*scale+1)) that fit into the
++ *    requested range, then decrement scale and continue until one or zero pages
++ *    are left.
+  *
+- * 2. For remaining pages: the minimum range granularity is decided
+- *    by 'scale', so multiple range TLBI operations may be required.
+- *    Start from scale = 0, flush the corresponding number of pages
+- *    ((num+1)*2^(5*scale+1) starting from 'addr'), then increase it
+- *    until no pages left.
++ * 2. If there is 1 page remaining, flush it through non-range operations. Range
++ *    operations can only span an even number of pages.
+  *
+  * Note that certain ranges can be represented by either num = 31 and
+  * scale or num = 0 and scale + 1. The loop below favours the latter
+@@ -368,12 +368,12 @@ static inline void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
+ 				asid, tlb_level, tlbi_user)		\
+ do {									\
+ 	int num = 0;							\
+-	int scale = 0;							\
++	int scale = 3;							\
+ 	unsigned long addr;						\
+ 									\
+ 	while (pages > 0) {						\
+ 		if (!system_supports_tlb_range() ||			\
+-		    pages % 2 == 1) {					\
++		    pages == 1) {					\
+ 			addr = __TLBI_VADDR(start, asid);		\
+ 			__tlbi_level(op, addr, tlb_level);		\
+ 			if (tlbi_user)					\
+@@ -393,7 +393,7 @@ do {									\
+ 			start += __TLBI_RANGE_PAGES(num, scale) << PAGE_SHIFT; \
+ 			pages -= __TLBI_RANGE_PAGES(num, scale);	\
+ 		}							\
+-		scale++;						\
++		scale--;						\
+ 	}								\
+ } while (0)
 
 --
 2.25.1
