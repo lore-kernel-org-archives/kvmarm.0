@@ -1,150 +1,166 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 898561946F
-	for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 17:41:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mwa.re
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mwa.re
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mwa.re header.i=@mwa.re header.b="L5llUmOv"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-507d1cc0538so3227824e87.2
-        for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 10:41:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mwa.re; s=google; t=1698428515; x=1699033315; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Zl9xOdOypts4WvQdyS7jVbRn41c2NCajV1vwM0e7soo=;
-        b=L5llUmOvoU6nZZgrBQ32r7XU4xLX9CNkke5lySS6OJ/xdeB2hW+JUNI0XlLvs5XVN+
-         3DUt7/cDwNFrkRbhZqbl3JYLg2qPN872rL7SA3htYywRTfApDKOBOF1UAKivlDYmgdru
-         5uGnDbsvxTtLOh1QSPJYnG9Z9Ick/CX17VPCMPZ5MMHdM4btb1UlkCVGXLV/chqoZJ0p
-         sbHIuveELoaEUYsDzjyj4qWadC0Cf70U5fHexvt/1mFvqXD9PbY4u/24mLKbFkddmA9O
-         GGRIunucVDcY7TQfL358r0vsx+WRhPXEm7opKEpI6kksNDchIUs29jOSs65iWLJipw7U
-         SzDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698428515; x=1699033315;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Zl9xOdOypts4WvQdyS7jVbRn41c2NCajV1vwM0e7soo=;
-        b=FF76Gm6Su+cjG12aOanL4Lbbq0SBkts0boH0+wWzDQgzl9CwDNSV43EP9+9XM2fenB
-         /ME9eTIl+RJN00V7d0tw4Y7vuiz3/kD2kHwNCi7+BT4J/nCQ0V5o4uvHxXUsGrOUl4g8
-         YZ76rwYcTkvSWg0emGvX0S1eR6rvNRf2jow2NylqQWKiE3NSe2rLF3rO7AT7UqtxP7IC
-         5jtbscahLvSzM3PuTUVKFj/HYwxu79Fnby7ouozA7TVPP21mxDzwQXX4dyeyHpi2i+gU
-         hP2DLV6vMnBfB0UajrTZavpsZ6dRGD9LwTkPiccp7NG2+hbUvxablRHXN+rlWT6iVuez
-         olew==
-X-Gm-Message-State: AOJu0YyWXUuDtLw5TL61PHdZOJZEIIMtdl9Py5bKNSGYf9hIh9vx9WWm
-	EDYsOPqmqTpQJ5iFjjolqSLm+kZLZPd6nnp1kP4axw==
-X-Google-Smtp-Source: AGHT+IFHRMYL4gdEZHBAtJc+AHbUz15+hTrEB000BnqewEz2QhmjMoLFLieXWb0l5S9dAxYJMOtNQSEd0QJsAJXcobs=
-X-Received: by 2002:a05:6512:282c:b0:508:2022:7738 with SMTP id
- cf44-20020a056512282c00b0050820227738mr2385452lfb.19.1698428515297; Fri, 27
- Oct 2023 10:41:55 -0700 (PDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A79B3B7AD
+	for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 18:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E70AB1424;
+	Fri, 27 Oct 2023 11:09:45 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 232DF3F64C;
+	Fri, 27 Oct 2023 11:09:02 -0700 (PDT)
+From: Joey Gouly <joey.gouly@arm.com>
+To: linux-arm-kernel@lists.infradead.org
+Cc: akpm@linux-foundation.org,
+	aneesh.kumar@linux.ibm.com,
+	broonie@kernel.org,
+	catalin.marinas@arm.com,
+	dave.hansen@linux.intel.com,
+	joey.gouly@arm.com,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	shuah@kernel.org,
+	will@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v2 00/20] Permission Overlay Extension
+Date: Fri, 27 Oct 2023 19:08:26 +0100
+Message-Id: <20231027180850.1068089-1-joey.gouly@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <CANi1PHhzk80HvwQbBM46gpJ6_AA_P6+m5Jo0Nuy_MAdA4C2BhQ@mail.gmail.com>
- <87ttql5aq7.wl-maz@kernel.org> <CANi1PHieGooO0DK=6BPwq0UknHzsn9QM3rFQkh3HLMfWxDseUQ@mail.gmail.com>
- <86cyx250w9.wl-maz@kernel.org>
-In-Reply-To: <86cyx250w9.wl-maz@kernel.org>
-From: Jan Henrik Weinstock <jan@mwa.re>
-Date: Fri, 27 Oct 2023 19:41:44 +0200
-Message-ID: <CANi1PHjAwLWAq9EW7r5Yh_xbvPiJMsq8342JwAGafz1d1NUhSA@mail.gmail.com>
-Subject: Re: KVM exit to userspace on WFI
-To: Marc Zyngier <maz@kernel.org>
-Cc: oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, =?UTF-8?Q?Lukas_J=C3=BCnger?= <lukas@mwa.re>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Marc,
+Hello everyone,
 
-the basic idea behind this is to have a (single-threaded) execution loop,
-something like this:
+This series implements the Permission Overlay Extension introduced in 2022
+VMSA enhancements [1]. It is based on v6.6-rc3.
 
-vcpu-thread:    vcpu-run | process-io-devices | vcpu-run | process-io...
-                         ^
-                  WFX or timeout
+Changes since v1[2]:
+	# Added Kconfig option
+	# Added KVM support
+	# Move VM_PKEY* defines into arch/
+	# Add isb() for POR_EL0 context switch
+	# Added hwcap test, get-reg-list-test, signal frame handling test
 
-We switch to simulating IO devices whenever the vcpu is idle (wfi) or excee=
-ds
-a certain budget of instructions (counted via pmu). Our fallback currently =
-is
-to kick the vcpu out of its execution using a signal (via a timeout/alarm).=
- But
-of course, if the cpu is stuck at a wfi, we are wasting a lot of time.
+ptrace support is missing, I will add that for v3.
 
-I understand that the proposed behavior is not desirable for most use cases=
-,
-which is why I suggest locking it behind a flag, e.g.
-KVM_ARCH_FLAG_WFX_EXIT_TO_USER.
+The Permission Overlay Extension allows to constrain permissions on memory
+regions. This can be used from userspace (EL0) without a system call or TLB
+invalidation.
 
+POE is used to implement the Memory Protection Keys [3] Linux syscall.
 
-Am Mi., 25. Okt. 2023 um 14:42 Uhr schrieb Marc Zyngier <maz@kernel.org>:
->
-> On Wed, 25 Oct 2023 13:12:14 +0100,
-> Jan Henrik Weinstock <jan@mwa.re> wrote:
-> >
-> > Hi Marc,
-> >
-> > Thanks for your feedback. I understand that request_interrupt_window
-> > is not to be used. I assume a setting a flag is a better way,
-> > something similar to KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER, e.g.
-> > KVM_ARCH_FLAG_WFX_EXIT_TO_USER.
-> >
-> > I will also check that WFx traps are always enabled while this mode is
-> > active to make sure userspace does not get blocked/scheduled out.
->
-> Why would that be an acceptable behaviour?
->
-> > The reason for this is that we cannot have the thread that executes
-> > KVM_RUN to be blocked or scheduled out whenever it hits a WFI.
->
-> Why? If that's not acceptable, how do you even cope with the basic
-> preemption?
->
-> > Nop-WFIs are not a problem, since the PE will just continue executing
-> > instructions, which is fine. We are currently using a timeout signal
-> > that kicks KVM_RUN back into userspace, but we are seeing a lot of
-> > time wasted because our KVM thread hangs in WFI/WFEs. It would be
-> > better if we could just return from KVM_RUN immediately if the thread
-> > would otherwise be blocked.
->
-> On the face of it, this makes little sense:
->
-> - While in userspace, no interrupt source that normally delivered
->   without any userpsace intervention will be blocked (timers,
->   VLPIs...). I cannot how this can be a good idea.
->
-> - Trapping WFE is an important scheduling hint, and returning to
->   userspace defeats it. Contended spinlocks, for example, will be even
->   slower to acquire.
->
-> I'm sure you have a particular use case for such a degraded behaviour,
-> but since you are not describing it, I'm not at all inclined to
-> actively break KVM's performance and scalability.
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+The first few patches add the basic framework, then the PKEYS interface is
+implemented, and then the selftests are made to work on arm64.
 
+There was discussion about what the 'default' protection key value should be,
+I used disallow-all (apart from pkey 0), which matches what x86 does.
 
+I have tested the modified protection_keys test on x86_64 [5], but not PPC.
+I haven't build tested the x86/ppc changes, will work on getting at least
+an x86 build environment working.
 
---=20
-Dr.-Ing. Jan Henrik Weinstock
-Managing Director
+Thanks,
+Joey
 
-MachineWare GmbH | www.machineware.de
-H=C3=BChnermarkt 19, 52062 Aachen, Germany
-Amtsgericht Aachen HRB25734
+[1] https://community.arm.com/arm-community-blogs/b/architectures-and-processors-blog/posts/arm-a-profile-architecture-2022
+[2] https://lore.kernel.org/linux-arm-kernel/20230927140123.5283-1-joey.gouly@arm.com/
+[3] Documentation/core-api/protection-keys.rst
+[4] https://lore.kernel.org/linux-arm-kernel/20230919092850.1940729-7-mark.rutland@arm.com/#t
+[5] test_ptrace_modifies_pkru asserts for me on a Ubuntu 5.4 kernel, but does so before my changes as well
 
-Gesch=C3=A4ftsf=C3=BChrung
-Lukas J=C3=BCnger
-Dr.-Ing. Jan Henrik Weinstock
+Joey Gouly (24):
+  arm64/sysreg: add system register POR_EL{0,1}
+  arm64/sysreg: update CPACR_EL1 register
+  arm64: cpufeature: add Permission Overlay Extension cpucap
+  arm64: disable trapping of POR_EL0 to EL2
+  arm64: context switch POR_EL0 register
+  KVM: arm64: Save/restore POE registers
+  arm64: enable the Permission Overlay Extension for EL0
+  arm64: add POIndex defines
+  arm64: define VM_PKEY_BIT* for arm64
+  arm64: mask out POIndex when modifying a PTE
+  arm64: enable ARCH_HAS_PKEYS on arm64
+  arm64: handle PKEY/POE faults
+  arm64: stop using generic mm_hooks.h
+  arm64: implement PKEYS support
+  arm64: add POE signal support
+  arm64: enable PKEY support for CPUs with S1POE
+  arm64: enable POE and PIE to coexist
+  kselftest/arm64: move get_header()
+  selftests: mm: move fpregs printing
+  selftests: mm: make protection_keys test work on arm64
+  kselftest/arm64: add HWCAP test for FEAT_S1POE
+  kselftest/arm64: parse POE_MAGIC in a signal frame
+  kselftest/arm64: Add test case for POR_EL0 signal frame records
+  KVM: selftests: get-reg-list: add Permission Overlay registers
+
+ Documentation/arch/arm64/elf_hwcaps.rst       |   3 +
+ arch/arm64/Kconfig                            |  18 +++
+ arch/arm64/include/asm/cpufeature.h           |   6 +
+ arch/arm64/include/asm/el2_setup.h            |  10 +-
+ arch/arm64/include/asm/hwcap.h                |   1 +
+ arch/arm64/include/asm/kvm_arm.h              |   4 +-
+ arch/arm64/include/asm/kvm_host.h             |   4 +
+ arch/arm64/include/asm/mman.h                 |   8 +-
+ arch/arm64/include/asm/mmu.h                  |   2 +
+ arch/arm64/include/asm/mmu_context.h          |  51 ++++++-
+ arch/arm64/include/asm/page.h                 |  10 ++
+ arch/arm64/include/asm/pgtable-hwdef.h        |  10 ++
+ arch/arm64/include/asm/pgtable-prot.h         |   8 +-
+ arch/arm64/include/asm/pgtable.h              |  26 +++-
+ arch/arm64/include/asm/pkeys.h                | 110 ++++++++++++++
+ arch/arm64/include/asm/por.h                  |  33 +++++
+ arch/arm64/include/asm/processor.h            |   1 +
+ arch/arm64/include/asm/sysreg.h               |  16 ++
+ arch/arm64/include/asm/traps.h                |   1 +
+ arch/arm64/include/uapi/asm/hwcap.h           |   1 +
+ arch/arm64/include/uapi/asm/sigcontext.h      |   7 +
+ arch/arm64/kernel/cpufeature.c                |  23 +++
+ arch/arm64/kernel/cpuinfo.c                   |   1 +
+ arch/arm64/kernel/process.c                   |  19 +++
+ arch/arm64/kernel/signal.c                    |  51 +++++++
+ arch/arm64/kernel/traps.c                     |  12 +-
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h    |  10 ++
+ arch/arm64/kvm/sys_regs.c                     |   2 +
+ arch/arm64/mm/fault.c                         |  44 +++++-
+ arch/arm64/mm/mmap.c                          |   9 ++
+ arch/arm64/mm/mmu.c                           |  40 +++++
+ arch/arm64/tools/cpucaps                      |   1 +
+ arch/arm64/tools/sysreg                       |  15 +-
+ arch/powerpc/include/asm/page.h               |  11 ++
+ arch/x86/include/asm/page.h                   |  10 ++
+ fs/proc/task_mmu.c                            |   2 +
+ include/linux/mm.h                            |  13 --
+ tools/testing/selftests/arm64/abi/hwcap.c     |  13 ++
+ .../testing/selftests/arm64/signal/.gitignore |   1 +
+ .../arm64/signal/testcases/poe_siginfo.c      |  86 +++++++++++
+ .../arm64/signal/testcases/testcases.c        |  27 +---
+ .../arm64/signal/testcases/testcases.h        |  28 +++-
+ .../selftests/kvm/aarch64/get-reg-list.c      |  14 ++
+ tools/testing/selftests/mm/Makefile           |   2 +-
+ tools/testing/selftests/mm/pkey-arm64.h       | 138 ++++++++++++++++++
+ tools/testing/selftests/mm/pkey-helpers.h     |   8 +
+ tools/testing/selftests/mm/pkey-powerpc.h     |   3 +
+ tools/testing/selftests/mm/pkey-x86.h         |   4 +
+ tools/testing/selftests/mm/protection_keys.c  |  29 ++--
+ 49 files changed, 880 insertions(+), 66 deletions(-)
+ create mode 100644 arch/arm64/include/asm/pkeys.h
+ create mode 100644 arch/arm64/include/asm/por.h
+ create mode 100644 tools/testing/selftests/arm64/signal/testcases/poe_siginfo.c
+ create mode 100644 tools/testing/selftests/mm/pkey-arm64.h
+
+-- 
+2.25.1
+
