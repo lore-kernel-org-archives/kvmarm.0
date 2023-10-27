@@ -1,15 +1,15 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5F8C3C066
-	for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 18:09:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F4B43C06B
+	for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 18:09:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5A43C143D;
-	Fri, 27 Oct 2023 11:09:48 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 37C331570;
+	Fri, 27 Oct 2023 11:09:53 -0700 (PDT)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8CE233F64C;
-	Fri, 27 Oct 2023 11:09:04 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 69FAF3F64C;
+	Fri, 27 Oct 2023 11:09:09 -0700 (PDT)
 From: Joey Gouly <joey.gouly@arm.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: akpm@linux-foundation.org,
@@ -29,9 +29,9 @@ Cc: akpm@linux-foundation.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 01/24] arm64/sysreg: add system register POR_EL{0,1}
-Date: Fri, 27 Oct 2023 19:08:27 +0100
-Message-Id: <20231027180850.1068089-2-joey.gouly@arm.com>
+Subject: [PATCH v2 03/24] arm64: cpufeature: add Permission Overlay Extension cpucap
+Date: Fri, 27 Oct 2023 19:08:29 +0100
+Message-Id: <20231027180850.1068089-4-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231027180850.1068089-1-joey.gouly@arm.com>
 References: <20231027180850.1068089-1-joey.gouly@arm.com>
@@ -43,64 +43,80 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add POR_EL{0,1} according to DDI0601 2023-03.
+This indicates if the system supports POE. This is a CPUCAP_BOOT_CPU_FEATURE
+as the boot CPU will enable POE if it has it, so secondary CPUs must also
+have this feature.
+
+Add a new config option: ARM64_POE
 
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>
-Reviewed-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h | 13 +++++++++++++
- arch/arm64/tools/sysreg         | 12 ++++++++++++
- 2 files changed, 25 insertions(+)
+ arch/arm64/Kconfig             | 16 ++++++++++++++++
+ arch/arm64/kernel/cpufeature.c |  9 +++++++++
+ arch/arm64/tools/cpucaps       |  1 +
+ 3 files changed, 26 insertions(+)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 38296579a4fd..cc2d61fd45c3 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -994,6 +994,19 @@
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index b10515c0200b..1f1a12e28c3f 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -2060,6 +2060,22 @@ config ARM64_EPAN
+ 	  if the cpu does not implement the feature.
+ endmenu # "ARMv8.7 architectural features"
  
- #define PIRx_ELx_PERM(idx, perm)	((perm) << ((idx) * 4))
++menu "ARMv8.9 architectural features"
++config ARM64_POE
++	prompt "Permission Overlay Extension"
++	def_bool y
++	help
++	  The Permission Overlay Extension is used to implement Memory
++	  Protection Keys. Memory Protection Keys provides a mechanism for
++	  enforcing page-based protections, but without requiring modification
++	  of the page tables when an application changes protection domains.
++
++	  For details, see Documentation/core-api/protection-keys.rst
++
++	  If unsure, say y.
++
++endmenu # "ARMv8.9 architectural features"
++
+ config ARM64_SVE
+ 	bool "ARM Scalable Vector Extension support"
+ 	default y
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 444a73c2e638..f1c1f348a31d 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2719,6 +2719,15 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = has_cpuid_feature,
+ 		ARM64_CPUID_FIELDS(ID_AA64MMFR2_EL1, EVT, IMP)
+ 	},
++#ifdef CONFIG_ARM64_POE
++	{
++		.desc = "Stage-1 Permission Overlay Extension (S1POE)",
++		.capability = ARM64_HAS_S1POE,
++		.type = ARM64_CPUCAP_BOOT_CPU_FEATURE,
++		.matches = has_cpuid_feature,
++		ARM64_CPUID_FIELDS(ID_AA64MMFR3_EL1, S1POE, IMP)
++	},
++#endif
+ 	{},
+ };
  
-+/*
-+ * Permission Overlay Extension (POE) permission encodings.
-+ */
-+#define POE_NONE	UL(0x0)
-+#define POE_R		UL(0x1)
-+#define POE_X		UL(0x2)
-+#define POE_RX		UL(0x3)
-+#define POE_W		UL(0x4)
-+#define POE_RW		UL(0x5)
-+#define POE_XW		UL(0x6)
-+#define POE_RXW		UL(0x7)
-+#define POE_MASK	UL(0xf)
-+
- #define ARM64_FEATURE_FIELD_BITS	4
- 
- /* Defined for compatibility only, do not add new users. */
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 76ce150e7347..dd91d0639bab 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -2504,6 +2504,18 @@ Sysreg	PIR_EL2		3	4	10	2	3
- Fields	PIRx_ELx
- EndSysreg
- 
-+Sysreg	POR_EL0		3	3	10	2	4
-+Fields	PIRx_ELx
-+EndSysreg
-+
-+Sysreg	POR_EL1		3	0	10	2	4
-+Fields	PIRx_ELx
-+EndSysreg
-+
-+Sysreg	POR_EL12	3	5	10	2	4
-+Fields	PIRx_ELx
-+EndSysreg
-+
- Sysreg	LORSA_EL1	3	0	10	4	0
- Res0	63:52
- Field	51:16	SA
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index c3f06fdef609..b8348e40f6d9 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -43,6 +43,7 @@ HAS_NO_FPSIMD
+ HAS_NO_HW_PREFETCH
+ HAS_PAN
+ HAS_S1PIE
++HAS_S1POE
+ HAS_RAS_EXTN
+ HAS_RNG
+ HAS_SB
 -- 
 2.25.1
 
