@@ -1,46 +1,46 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099BD3C080
-	for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 18:22:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5093F3C080
+	for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 18:22:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z1g2wIkQ"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1cc1ddb34ccso9088485ad.1
-        for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 11:22:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mj98UO5e"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-59b5a586da6so22562307b3.1
+        for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 11:22:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698430967; x=1699035767; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1698430969; x=1699035769; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=fLrd3AGy66HdihfPmI58EyyG3FCGELBv0TZMEZAIG4Y=;
-        b=z1g2wIkQNkXqI96iKlb/9aewGhg/T0i3qraOOSnN19tC84+SUl1yMLUwydr6dRzgUf
-         qJAGL9TJPvYxQlzlY1Y7UgkWjE/XDkJPZv5HKwb9X7HBIr4B1mETy1rCC9XIDiReMsKK
-         nPxCtGROrIaDfRXhxbB7za5JpNfqjR+U47n8MVy9SQa/R4SSxmnsMsuTALfeD6Aql/AO
-         ab2MN82d5I6xY9LcoaadEZ1YfC0h3jOg+vztcR6f9r0NrJLHRXeQpuU44R+xgQFKVeT6
-         bnWdioO2lKbRDzw4oLd0vuLQDrvpFiYtlYoV5a7YtTn1h+2aUpUhE/mO3lYLGeGHLpOK
-         vLaA==
+        bh=MfwjFnr1wNHEBMs743caMc0qlRTo5HMEnN08vNH/OXQ=;
+        b=mj98UO5eoleSgxOHeTgHP2K9/S4aOk7B1IlDqDLXLWhPNtrsoFFkg1wNAsIgJ23cob
+         E3t0ZlOHOKB9O32933/4K6NrYOHf883W1+5/+gyCdDij79FpNlx/R5J9wMtLwNXc4qcI
+         2LorHYEXHqrQxvaGvPZvoT8qp1UtaScaObmQ0cNAMERnOvwnPVsHCp86PSqDy5InIqCA
+         vl1XCC0BdZwNYpWq8LJ3QaJBxqrn+r6tFVQkONS8tYQzi/oCLTF/QeC57IfJEutBRmWO
+         T05IZBBwFvuY5nC8Qr0jyzpxpvfwUC0BjIJRnMPw/5PuqMApS1nJqMIk1TW21sU+rGcT
+         u+ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698430967; x=1699035767;
+        d=1e100.net; s=20230601; t=1698430969; x=1699035769;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=fLrd3AGy66HdihfPmI58EyyG3FCGELBv0TZMEZAIG4Y=;
-        b=pexUEV263h5YwsNyKx/69v56TJ3Vd8qHRdXXhcdrRhy4kA+2SEbUMQ8lS8ZLsr0Mz6
-         Nf/lIL4Bbyj2eyFI1303CB8wbfO2qKiKxZMorAqxntA0mtblR17alXqdXV+pIxOmwzWu
-         QfCNpX5PzOc2tVrNSA1tnzdpKhqWPH3ykI/FoTMeE0MWM4gRZ4e0oMj1f/MmKnTZv9O/
-         SJBB/aGVLMQNyVD4o1YlBb7isapYvqd/gqyIcNdkiofzftWmz6T/42oxu91xCHeuttG2
-         mHAuFct7WcpTM7fXjJW7lpoCYzykWlImskbTNiJWxeMGvRU8s0MSwlF7fz+6UX9zLopK
-         Igfw==
-X-Gm-Message-State: AOJu0YzVfRwCpxVxIBwXP4ZPvr45fl5bm4KqV4KoWuerlDUIXUdSZkCs
-	46mz4Bsi40HDRElgxqoJuealvGiREI0=
-X-Google-Smtp-Source: AGHT+IFw7CMiVxkdfLmPKgztX5f1RnQlL4BTlZlVKLxMz6aRVtHUrQY578kvMdkjnRTl6BBw2VS25sQYIRo=
+        bh=MfwjFnr1wNHEBMs743caMc0qlRTo5HMEnN08vNH/OXQ=;
+        b=km7tL0kIbKLkqD9q6UpZoKiy/lmd76O+j8uEsVNPioWK517PFqckKogrMm9aRVhNuR
+         IsMu7+/3tabfO9tnOkLkUnHgBZBHseB5dQcAL1x2CEoqaatvS9lta2jLELnK2UuKTnkY
+         JFkb+bdqiob7xgLkrr1zUu3HDuft1VUmWOq+cG5R/4qmmPRPFJYm27vJuTMnwrrr7F2w
+         2f9nLmf+pEVK8ksyRQXiP8z0a3MfeaifysPrcMl55ddCKtG7nkEbAfi4noPQeU3DJrei
+         kizMgNILFrw6NW96HCQEQGEDXbISakGSmOD6U5LJhtTgED+KHTDynHBmz2q6/1NuizFi
+         Y5Ug==
+X-Gm-Message-State: AOJu0YxtXFtyrnmxRHmby9JrhojNnqi+GeN7CPcP1iBKxVRTXgdbqMdK
+	sdOqGD41pgNHSqqF2e4uK5h+Pc39Bkk=
+X-Google-Smtp-Source: AGHT+IHtw6A7NuD1zDZw/j7xBoNpID5PTLHCLxD7YeudY/tlgoiYGQdJN9iuOebDV/xY0oQ2kV5qeLUK06Q=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:ee14:b0:1ca:b952:f5fa with SMTP id
- z20-20020a170902ee1400b001cab952f5famr63161plb.5.1698430967325; Fri, 27 Oct
- 2023 11:22:47 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a0d:ca0f:0:b0:59b:e663:23b0 with SMTP id
+ m15-20020a0dca0f000000b0059be66323b0mr102868ywd.4.1698430969394; Fri, 27 Oct
+ 2023 11:22:49 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 27 Oct 2023 11:21:53 -0700
+Date: Fri, 27 Oct 2023 11:21:54 -0700
 In-Reply-To: <20231027182217.3615211-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -50,8 +50,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20231027182217.3615211-1-seanjc@google.com>
 X-Mailer: git-send-email 2.42.0.820.g83a721a137-goog
-Message-ID: <20231027182217.3615211-12-seanjc@google.com>
-Subject: [PATCH v13 11/35] KVM: Drop .on_unlock() mmu_notifier hook
+Message-ID: <20231027182217.3615211-13-seanjc@google.com>
+Subject: [PATCH v13 12/35] KVM: Prepare for handling only shared mappings in
+ mmu_notifier events
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
@@ -78,98 +79,53 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Drop the .on_unlock() mmu_notifer hook now that it's no longer used for
-notifying arch code that memory has been reclaimed.  Adding .on_unlock()
-and invoking it *after* dropping mmu_lock was a terrible idea, as doing so
-resulted in .on_lock() and .on_unlock() having divergent and asymmetric
-behavior, and set future developers up for failure, i.e. all but asked for
-bugs where KVM relied on using .on_unlock() to try to run a callback while
-holding mmu_lock.
+Add flags to "struct kvm_gfn_range" to let notifier events target only
+shared and only private mappings, and write up the existing mmu_notifier
+events to be shared-only (private memory is never associated with a
+userspace virtual address, i.e. can't be reached via mmu_notifiers).
 
-Opportunistically add a lockdep assertion in kvm_mmu_invalidate_end() to
-guard against future bugs of this nature.
+Add two flags so that KVM can handle the three possibilities (shared,
+private, and shared+private) without needing something like a tri-state
+enum.
 
-Reported-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Link: https://lore.kernel.org/all/20230802203119.GB2021422@ls.amr.corp.intel.com
+Link: https://lore.kernel.org/all/ZJX0hk+KpQP0KUyB@google.com
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- virt/kvm/kvm_main.c | 13 +++----------
- 1 file changed, 3 insertions(+), 10 deletions(-)
+ include/linux/kvm_host.h | 2 ++
+ virt/kvm/kvm_main.c      | 7 +++++++
+ 2 files changed, 9 insertions(+)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 2bc04c8ae1f4..cb9376833c18 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -544,7 +544,6 @@ static inline struct kvm *mmu_notifier_to_kvm(struct mmu_notifier *mn)
- typedef bool (*gfn_handler_t)(struct kvm *kvm, struct kvm_gfn_range *range);
- 
- typedef void (*on_lock_fn_t)(struct kvm *kvm);
--typedef void (*on_unlock_fn_t)(struct kvm *kvm);
- 
- struct kvm_mmu_notifier_range {
- 	/*
-@@ -556,7 +555,6 @@ struct kvm_mmu_notifier_range {
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 96aa930536b1..89c1a991a3b8 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -263,6 +263,8 @@ struct kvm_gfn_range {
+ 	gfn_t start;
+ 	gfn_t end;
  	union kvm_mmu_notifier_arg arg;
- 	gfn_handler_t handler;
- 	on_lock_fn_t on_lock;
--	on_unlock_fn_t on_unlock;
- 	bool flush_on_ret;
++	bool only_private;
++	bool only_shared;
  	bool may_block;
  };
-@@ -663,11 +661,8 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
- 	if (range->flush_on_ret && r.ret)
- 		kvm_flush_remote_tlbs(kvm);
- 
--	if (r.found_memslot) {
-+	if (r.found_memslot)
- 		KVM_MMU_UNLOCK(kvm);
--		if (!IS_KVM_NULL_FN(range->on_unlock))
--			range->on_unlock(kvm);
--	}
- 
- 	srcu_read_unlock(&kvm->srcu, idx);
- 
-@@ -687,7 +682,6 @@ static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
- 		.arg		= arg,
- 		.handler	= handler,
- 		.on_lock	= (void *)kvm_null_fn,
--		.on_unlock	= (void *)kvm_null_fn,
- 		.flush_on_ret	= true,
- 		.may_block	= false,
- 	};
-@@ -706,7 +700,6 @@ static __always_inline int kvm_handle_hva_range_no_flush(struct mmu_notifier *mn
- 		.end		= end,
- 		.handler	= handler,
- 		.on_lock	= (void *)kvm_null_fn,
--		.on_unlock	= (void *)kvm_null_fn,
- 		.flush_on_ret	= false,
- 		.may_block	= false,
- 	};
-@@ -813,7 +806,6 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
- 		.end		= range->end,
- 		.handler	= kvm_mmu_unmap_gfn_range,
- 		.on_lock	= kvm_mmu_invalidate_begin,
--		.on_unlock	= (void *)kvm_null_fn,
- 		.flush_on_ret	= true,
- 		.may_block	= mmu_notifier_range_blockable(range),
- 	};
-@@ -858,6 +850,8 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
- 
- void kvm_mmu_invalidate_end(struct kvm *kvm)
- {
-+	lockdep_assert_held_write(&kvm->mmu_lock);
+ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index cb9376833c18..302ccb87b4c1 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -635,6 +635,13 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
+ 			 * the second or later invocation of the handler).
+ 			 */
+ 			gfn_range.arg = range->arg;
 +
- 	/*
- 	 * This sequence increase will notify the kvm page fault that
- 	 * the page that is going to be mapped in the spte could have
-@@ -889,7 +883,6 @@ static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
- 		.end		= range->end,
- 		.handler	= (void *)kvm_null_fn,
- 		.on_lock	= kvm_mmu_invalidate_end,
--		.on_unlock	= (void *)kvm_null_fn,
- 		.flush_on_ret	= false,
- 		.may_block	= mmu_notifier_range_blockable(range),
- 	};
++			/*
++			 * HVA-based notifications aren't relevant to private
++			 * mappings as they don't have a userspace mapping.
++			 */
++			gfn_range.only_private = false;
++			gfn_range.only_shared = true;
+ 			gfn_range.may_block = range->may_block;
+ 
+ 			/*
 -- 
 2.42.0.820.g83a721a137-goog
 
