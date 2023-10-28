@@ -1,244 +1,166 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38323D962
-	for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 18:23:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a2H47ZJI"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1cc29f3afe0so4670315ad.2
-        for <kvmarm@lists.linux.dev>; Fri, 27 Oct 2023 11:23:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698431015; x=1699035815; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=srZUoBPWZiKpBpFDSV5l36Sp6ql4zJFMGAxv8lh5kbY=;
-        b=a2H47ZJIceuE9YQtwWcCJSRZrRHs67Bw6B/OLUbldu3FcPp6YazSwWCTCtDITcGAGq
-         YxpNmiJPZAEp5MUpmT5tLHk4REdTtJ6ECcvyqj+JEKK9DG24bezCYZPrvJKYHz8bTDwb
-         nkviMakhePTA4YjpeANOTUFbYbeaxHOzD/g0SjdB5QvVmWjK2UXv62uYXhxCbAJ0j+Ho
-         IOpc5HsSPIsi3k58cFr9jfY+wtBq8iddpYJkeKOLAFtkFVYsaCbtkOkLFI6s2Wk8OYXl
-         pMGuRlgO0O8NvK4yUR5yONVsI0sBdaRk1wbeyp2c9tYqqHLHdHQ5iM7p1j/wcXaDArk9
-         fWsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698431015; x=1699035815;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=srZUoBPWZiKpBpFDSV5l36Sp6ql4zJFMGAxv8lh5kbY=;
-        b=StOzjmVe2rFCoo/7B+R3OYzTkRXFPn51+fy2LU/a+OKY5r1TXHBLvH/hHGFPQ0htK8
-         5xw28txWNxtEZ/L4SM80Lmc1ePyU3clds64GKJVictY5P9HXe5G33O2F1eBBtq21FJdC
-         X7Q+x7XbEXapobiXZ7kx7mBqVnW5+KYAX5ra2abXJ/tZtujpCex7epn5BXFjsl0xTkRX
-         2BkuiKxlY5R68QLUWD4GKvM4WJPYPoNVqBhHzKLgXn3smDGhNH1vsCMJzcwq+L8Ygc0l
-         mEdKx8JjD/JzyEwQF05V35KdUwWGxBBVEPr9Q+FUPXEOE4uoK+nNCGMIIC5G43d3/Kks
-         egzQ==
-X-Gm-Message-State: AOJu0YyA14JAN/OHPERlOuQgEc3GhSoTLArMhhL6NpAGcRrT5tay4ArH
-	xL2o9eZmila6bW52WsxKPrtmOpkCVMc=
-X-Google-Smtp-Source: AGHT+IGsD3GBqEIwxpRuMZy6ZOrqAgR6Um5/oe2tLnBOXdqBPG31+kuimftnouCNE0Glk06NnY7NvSmeibY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:442:b0:1cc:1e05:e0e7 with SMTP id
- iw2-20020a170903044200b001cc1e05e0e7mr49290plb.2.1698431015053; Fri, 27 Oct
- 2023 11:23:35 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 27 Oct 2023 11:22:17 -0700
-In-Reply-To: <20231027182217.3615211-1-seanjc@google.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4DF7945F
+	for <kvmarm@lists.linux.dev>; Sat, 28 Oct 2023 09:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0F6851424;
+	Sat, 28 Oct 2023 02:18:02 -0700 (PDT)
+Received: from [10.57.70.251] (unknown [10.57.70.251])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4C7493F762;
+	Sat, 28 Oct 2023 02:17:19 -0700 (PDT)
+Message-ID: <418313c5-2094-4aaf-ae43-a1f3bf8e936f@arm.com>
+Date: Sat, 28 Oct 2023 10:17:17 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com>
-X-Mailer: git-send-email 2.42.0.820.g83a721a137-goog
-Message-ID: <20231027182217.3615211-36-seanjc@google.com>
-Subject: [PATCH v13 35/35] KVM: selftests: Test KVM exit behavior for private memory/access
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Sean Christopherson <seanjc@google.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Andrew Morton <akpm@linux-foundation.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, Xu Yilun <yilun.xu@intel.com>, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"=?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
-	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
-	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] KVM: arm64: Use folio for THP adjustment
+Content-Language: en-GB
+To: Vincent Donnefort <vdonnefort@google.com>, maz@kernel.org,
+ oliver.upton@linux.dev
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ kernel-team@android.com, will@kernel.org, willy@infradead.org
+References: <20230928173205.2826598-1-vdonnefort@google.com>
+ <20230928173205.2826598-3-vdonnefort@google.com>
+From: Ryan Roberts <ryan.roberts@arm.com>
+In-Reply-To: <20230928173205.2826598-3-vdonnefort@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Ackerley Tng <ackerleytng@google.com>
+On 28/09/2023 18:32, Vincent Donnefort wrote:
+> Since commit cb196ee1ef39 ("mm/huge_memory: convert
+> do_huge_pmd_anonymous_page() to use vma_alloc_folio()"), transparent
+> huge pages use folios. It enables us to check efficiently if a page is
+> mapped by a block simply looking at the folio size. This is saving a
+> page table walk.
+> 
+> It is safe to read the folio in this path. We've just increased its
+> refcount (GUP from __gfn_to_pfn_memslot()). This will prevent attempts
+> of splitting the huge page.
+> 
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index de5e5148ef5d..69fcbcc7aca5 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -791,51 +791,6 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+>  	return 0;
+>  }
+>  
+> -static struct kvm_pgtable_mm_ops kvm_user_mm_ops = {
+> -	/* We shouldn't need any other callback to walk the PT */
+> -	.phys_to_virt		= kvm_host_va,
+> -};
+> -
+> -static int get_user_mapping_size(struct kvm *kvm, u64 addr)
+> -{
+> -	struct kvm_pgtable pgt = {
+> -		.pgd		= (kvm_pteref_t)kvm->mm->pgd,
+> -		.ia_bits	= vabits_actual,
+> -		.start_level	= (KVM_PGTABLE_MAX_LEVELS -
+> -				   CONFIG_PGTABLE_LEVELS),
+> -		.mm_ops		= &kvm_user_mm_ops,
+> -	};
+> -	unsigned long flags;
+> -	kvm_pte_t pte = 0;	/* Keep GCC quiet... */
+> -	u32 level = ~0;
+> -	int ret;
+> -
+> -	/*
+> -	 * Disable IRQs so that we hazard against a concurrent
+> -	 * teardown of the userspace page tables (which relies on
+> -	 * IPI-ing threads).
+> -	 */
+> -	local_irq_save(flags);
+> -	ret = kvm_pgtable_get_leaf(&pgt, addr, &pte, &level);
+> -	local_irq_restore(flags);
+> -
+> -	if (ret)
+> -		return ret;
+> -
+> -	/*
+> -	 * Not seeing an error, but not updating level? Something went
+> -	 * deeply wrong...
+> -	 */
+> -	if (WARN_ON(level >= KVM_PGTABLE_MAX_LEVELS))
+> -		return -EFAULT;
+> -
+> -	/* Oops, the userspace PTs are gone... Replay the fault */
+> -	if (!kvm_pte_valid(pte))
+> -		return -EAGAIN;
+> -
+> -	return BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(level));
+> -}
+> -
+>  static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
+>  	.zalloc_page		= stage2_memcache_zalloc_page,
+>  	.zalloc_pages_exact	= kvm_s2_zalloc_pages_exact,
+> @@ -1274,7 +1229,7 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
+>   *
+>   * Returns the size of the mapping.
+>   */
+> -static long
+> +static unsigned long
+>  transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
+>  			    unsigned long hva, kvm_pfn_t *pfnp,
+>  			    phys_addr_t *ipap)
+> @@ -1287,10 +1242,7 @@ transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
+>  	 * block map is contained within the memslot.
+>  	 */
+>  	if (fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE)) {
+> -		int sz = get_user_mapping_size(kvm, hva);
+> -
+> -		if (sz < 0)
+> -			return sz;
+> +		size_t sz = folio_size(pfn_folio(pfn));
 
-"Testing private access when memslot gets deleted" tests the behavior
-of KVM when a private memslot gets deleted while the VM is using the
-private memslot. When KVM looks up the deleted (slot = NULL) memslot,
-KVM should exit to userspace with KVM_EXIT_MEMORY_FAULT.
+Hi,
 
-In the second test, upon a private access to non-private memslot, KVM
-should also exit to userspace with KVM_EXIT_MEMORY_FAULT.
+Sorry this is an extremely late reply - I just noticed this because Marc
+mentioned it in another thread.
 
-Intentionally don't take a requirement on KVM_CAP_GUEST_MEMFD,
-KVM_CAP_MEMORY_FAULT_INFO, KVM_MEMORY_ATTRIBUTE_PRIVATE, etc., as it's a
-KVM bug to advertise KVM_X86_SW_PROTECTED_VM without its prerequisites.
+This doesn't look quite right to me; just because you have a folio of a given
+size, that doesn't mean the whole thing is mapped into this particular address
+space. For example, you could have a (PMD-sized) THP that gets partially
+munmapped - the folio is still PMD-sized but only some of it is mapped and
+should be accessible to the process. Or you could have a large file-backed folio
+(from a filesystem that supports large folios - e.g. XFS) but the application
+only mapped part of the file.
 
-Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-[sean: call out the similarities with set_memory_region_test]
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/x86_64/private_mem_kvm_exits_test.c   | 120 ++++++++++++++++++
- 2 files changed, 121 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c
+Perhaps I've misunderstood and those edge cases can't happen here for some reason?
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 2b1ef809d73a..f7fdd8244547 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -82,6 +82,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/nested_exceptions_test
- TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
- TEST_GEN_PROGS_x86_64 += x86_64/pmu_event_filter_test
- TEST_GEN_PROGS_x86_64 += x86_64/private_mem_conversions_test
-+TEST_GEN_PROGS_x86_64 += x86_64/private_mem_kvm_exits_test
- TEST_GEN_PROGS_x86_64 += x86_64/set_boot_cpu_id
- TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
- TEST_GEN_PROGS_x86_64 += x86_64/smaller_maxphyaddr_emulation_test
-diff --git a/tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c b/tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c
-new file mode 100644
-index 000000000000..7f7ca4475745
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c
-@@ -0,0 +1,120 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2022, Google LLC.
-+ */
-+#include <linux/kvm.h>
-+#include <pthread.h>
-+#include <stdint.h>
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+
-+/* Arbitrarily selected to avoid overlaps with anything else */
-+#define EXITS_TEST_GVA 0xc0000000
-+#define EXITS_TEST_GPA EXITS_TEST_GVA
-+#define EXITS_TEST_NPAGES 1
-+#define EXITS_TEST_SIZE (EXITS_TEST_NPAGES * PAGE_SIZE)
-+#define EXITS_TEST_SLOT 10
-+
-+static uint64_t guest_repeatedly_read(void)
-+{
-+	volatile uint64_t value;
-+
-+	while (true)
-+		value = *((uint64_t *) EXITS_TEST_GVA);
-+
-+	return value;
-+}
-+
-+static uint32_t run_vcpu_get_exit_reason(struct kvm_vcpu *vcpu)
-+{
-+	int r;
-+
-+	r = _vcpu_run(vcpu);
-+	if (r) {
-+		TEST_ASSERT(errno == EFAULT, KVM_IOCTL_ERROR(KVM_RUN, r));
-+		TEST_ASSERT_EQ(vcpu->run->exit_reason, KVM_EXIT_MEMORY_FAULT);
-+	}
-+	return vcpu->run->exit_reason;
-+}
-+
-+const struct vm_shape protected_vm_shape = {
-+	.mode = VM_MODE_DEFAULT,
-+	.type = KVM_X86_SW_PROTECTED_VM,
-+};
-+
-+static void test_private_access_memslot_deleted(void)
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+	pthread_t vm_thread;
-+	void *thread_return;
-+	uint32_t exit_reason;
-+
-+	vm = vm_create_shape_with_one_vcpu(protected_vm_shape, &vcpu,
-+					   guest_repeatedly_read);
-+
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+				    EXITS_TEST_GPA, EXITS_TEST_SLOT,
-+				    EXITS_TEST_NPAGES,
-+				    KVM_MEM_PRIVATE);
-+
-+	virt_map(vm, EXITS_TEST_GVA, EXITS_TEST_GPA, EXITS_TEST_NPAGES);
-+
-+	/* Request to access page privately */
-+	vm_mem_set_private(vm, EXITS_TEST_GPA, EXITS_TEST_SIZE);
-+
-+	pthread_create(&vm_thread, NULL,
-+		       (void *(*)(void *))run_vcpu_get_exit_reason,
-+		       (void *)vcpu);
-+
-+	vm_mem_region_delete(vm, EXITS_TEST_SLOT);
-+
-+	pthread_join(vm_thread, &thread_return);
-+	exit_reason = (uint32_t)(uint64_t)thread_return;
-+
-+	TEST_ASSERT_EQ(exit_reason, KVM_EXIT_MEMORY_FAULT);
-+	TEST_ASSERT_EQ(vcpu->run->memory_fault.flags, KVM_MEMORY_EXIT_FLAG_PRIVATE);
-+	TEST_ASSERT_EQ(vcpu->run->memory_fault.gpa, EXITS_TEST_GPA);
-+	TEST_ASSERT_EQ(vcpu->run->memory_fault.size, EXITS_TEST_SIZE);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void test_private_access_memslot_not_private(void)
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+	uint32_t exit_reason;
-+
-+	vm = vm_create_shape_with_one_vcpu(protected_vm_shape, &vcpu,
-+					   guest_repeatedly_read);
-+
-+	/* Add a non-private memslot (flags = 0) */
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+				    EXITS_TEST_GPA, EXITS_TEST_SLOT,
-+				    EXITS_TEST_NPAGES, 0);
-+
-+	virt_map(vm, EXITS_TEST_GVA, EXITS_TEST_GPA, EXITS_TEST_NPAGES);
-+
-+	/* Request to access page privately */
-+	vm_mem_set_private(vm, EXITS_TEST_GPA, EXITS_TEST_SIZE);
-+
-+	exit_reason = run_vcpu_get_exit_reason(vcpu);
-+
-+	TEST_ASSERT_EQ(exit_reason, KVM_EXIT_MEMORY_FAULT);
-+	TEST_ASSERT_EQ(vcpu->run->memory_fault.flags, KVM_MEMORY_EXIT_FLAG_PRIVATE);
-+	TEST_ASSERT_EQ(vcpu->run->memory_fault.gpa, EXITS_TEST_GPA);
-+	TEST_ASSERT_EQ(vcpu->run->memory_fault.size, EXITS_TEST_SIZE);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	TEST_REQUIRE(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM));
-+
-+	test_private_access_memslot_deleted();
-+	test_private_access_memslot_not_private();
-+}
--- 
-2.42.0.820.g83a721a137-goog
+Thanks,
+Ryan
+
+
+>  
+>  		if (sz < PMD_SIZE)
+>  			return PAGE_SIZE;
+> @@ -1385,7 +1337,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	kvm_pfn_t pfn;
+>  	bool logging_active = memslot_is_logging(memslot);
+>  	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
+> -	long vma_pagesize, fault_granule;
+> +	unsigned long vma_pagesize, fault_granule;
+>  	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+>  	struct kvm_pgtable *pgt;
+>  
+> @@ -1530,11 +1482,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  			vma_pagesize = transparent_hugepage_adjust(kvm, memslot,
+>  								   hva, &pfn,
+>  								   &fault_ipa);
+> -
+> -		if (vma_pagesize < 0) {
+> -			ret = vma_pagesize;
+> -			goto out_unlock;
+> -		}
+>  	}
+>  
+>  	if (fault_status != ESR_ELx_FSC_PERM && !device && kvm_has_mte(kvm)) {
 
