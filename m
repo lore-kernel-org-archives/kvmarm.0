@@ -1,55 +1,55 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CDD199A6
-	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 17:34:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D02125C7
+	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 17:36:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D4G6gZ4H"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IcA+ZLnp"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698687261;
+	s=mimecast20190719; t=1698687374;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=5fMqrw+qFhssxj8qhYVvLd8lvq+1o5oZc/SrI7TORTQ=;
-	b=D4G6gZ4HLMACQzR32SHjT3dTGnptJzUEopWxYoqPMRvkDk+IuYzPs8DJy4tTTLyeBsBjI4
-	E58vP76151+l/5Dk83g6T3AD+WesfBYbq1mMe10gAhRZuV+ji1mRF+sMffkm1V6rvaiJSs
-	VMl8iZQTqsqhY3YtMRmLnE8NNEXos6E=
+	bh=3jYLwfXXzRbH81zwo7MCV6nGPuDVHVRPsAgIWckITik=;
+	b=IcA+ZLnpKQJpkCRGDeb33JEkCn0qNxsf+T38lWM+J1FdtxfUv3d9OgweJu6+CVjKyNkrdb
+	xFUFoD42L/cV+VNMIP9EugPeJNCCu6ePeotPp/6SdlzGexxjJrJaQcjpo4kSnAW0weezRq
+	9i8t5ffjdsjeJr6mTv6hFVPs4mNBzpg=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-80-Z_TiL4dWNDu1am9mBQ088g-1; Mon, 30 Oct 2023 13:34:19 -0400
-X-MC-Unique: Z_TiL4dWNDu1am9mBQ088g-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-32da8de4833so2466018f8f.3
-        for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 10:34:17 -0700 (PDT)
+ us-mta-532-pYtHm1DqOOaE6hCNYLR1qg-1; Mon, 30 Oct 2023 13:36:13 -0400
+X-MC-Unique: pYtHm1DqOOaE6hCNYLR1qg-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-32de9f93148so2638072f8f.2
+        for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 10:36:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698687256; x=1699292056;
+        d=1e100.net; s=20230601; t=1698687372; x=1699292172;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5fMqrw+qFhssxj8qhYVvLd8lvq+1o5oZc/SrI7TORTQ=;
-        b=HCquoHHNSjzBBzgMXy22Fb3jSMcpVYVbegUsg6IT28Z639p9ssAugvonihc0VVvbIM
-         oMreX1Ke21cdUss0Et/zxVFGjA3gezI+k5f1nn6gbbvF/+LRjWQnPbxdKdrOLaynuYC4
-         ourk8/pIePdoYXa6QwFAGXcVC8Dz0Gf3M082JJpDlP5Zqagd/Qb+EauGJ2LNYIqSzguT
-         AWzSBONwT9aUz+7uWZNAFLWf09FbPL3ow8wwRJSPFOKfTrqCsxFjDTnqU41xavrPRCvQ
-         WUJWLsd+Jkcw/XvhcTiIBYlnJ8M0TGJVZBPr2a0JFPhjP/SkVgrPTD9+CAFtKV+AQ3cO
-         Ta3A==
-X-Gm-Message-State: AOJu0YweMLx6U0mIWBhxe2BJEFBVaQsYinYVN98qqMkWlxJDgsG73Tsw
-	aWRKGYtZ96wjo78suwmOwBVe2SM0o4Ubp28+t4dGwZ8/yzog7Pnwb2F705cd2fHrWJHSVIzoDbj
-	FCPtb6BIUwvyW1Ing
-X-Received: by 2002:a5d:674c:0:b0:32d:bc7d:c431 with SMTP id l12-20020a5d674c000000b0032dbc7dc431mr8595471wrw.1.1698687256655;
-        Mon, 30 Oct 2023 10:34:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGoSwHjCgF60i9p5iHFG+4s/5oKx7xoJBSRpuzoczO/1s/n65Z43CGXqwQnwC+DGZUjQ2L04A==
-X-Received: by 2002:a5d:674c:0:b0:32d:bc7d:c431 with SMTP id l12-20020a5d674c000000b0032dbc7dc431mr8595455wrw.1.1698687256340;
-        Mon, 30 Oct 2023 10:34:16 -0700 (PDT)
+        bh=3jYLwfXXzRbH81zwo7MCV6nGPuDVHVRPsAgIWckITik=;
+        b=xFNb/dSe7OGk+o19NHKXyVj4jPicqeaWJm2rVc+rj1i8YhYymivZTcqXMp3cEljN4J
+         QE9HI2UZRhhMzh9w3Sqsmicm+Jx6LFCkzPKKC3FUPofEZs8g4Ntg5bAvEX84omObqxHP
+         Ix5SSXlZBgY7f9fkR4Qkg6BL0bCbiaEhYduY2xs6S9eJFM4Ybu+S5vgG2kE4EU7O7MSg
+         79GRyeWG+EUzzLjJnoVJ/FBn2E6LPZd9KflHpsF0D4pqTQAKi1mAn32EOeDSbF/uleT2
+         cP5m6eAtWLYO7XbWMqvN3Hn7sygvQsH814rKIV5tQ4M9I598duIAlC61SlIhMH7m8PGl
+         NRRQ==
+X-Gm-Message-State: AOJu0YztOyNINHFT8BI2Zck4U+Y2yFQXPSNHtI/bMY0Wh/KuaF0BxKbu
+	XP15+NXOigTvhBcPsxqaoKYLCCGAjGidjUz3TYh+4jpyz2SJzfz1m44gwcoFQq4eSB7UX2ylZnV
+	1Gw5eYqtPIjKLOdC5
+X-Received: by 2002:adf:ec4f:0:b0:32d:8357:42dd with SMTP id w15-20020adfec4f000000b0032d835742ddmr6883282wrn.68.1698687371997;
+        Mon, 30 Oct 2023 10:36:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEboAELdFqaoOZREgnEhsC/lbRki6/0Jdh0l66f6RUru0wLk22AqSmUMVbSPZpU1ZFwEkh2hA==
+X-Received: by 2002:adf:ec4f:0:b0:32d:8357:42dd with SMTP id w15-20020adfec4f000000b0032d835742ddmr6883233wrn.68.1698687371568;
+        Mon, 30 Oct 2023 10:36:11 -0700 (PDT)
 Received: from [192.168.1.174] ([151.81.68.207])
-        by smtp.googlemail.com with ESMTPSA id o26-20020a5d58da000000b0032d2489a399sm8695806wrf.49.2023.10.30.10.34.13
+        by smtp.googlemail.com with ESMTPSA id p14-20020a5d68ce000000b003253523d767sm8703507wrw.109.2023.10.30.10.36.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Oct 2023 10:34:15 -0700 (PDT)
-Message-ID: <9bc69994-c98f-48e4-b956-08a8d98a6e6d@redhat.com>
-Date: Mon, 30 Oct 2023 18:34:12 +0100
+        Mon, 30 Oct 2023 10:36:10 -0700 (PDT)
+Message-ID: <a56e499f-c91c-45da-b404-444c22b2df24@redhat.com>
+Date: Mon, 30 Oct 2023 18:36:07 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,8 +57,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 22/35] KVM: Allow arch code to track number of memslot
- address spaces per VM
+Subject: Re: [PATCH v13 23/35] KVM: x86: Add support for "protected VMs" that
+ can utilize private memory
 To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
  Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
  Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
@@ -88,7 +88,7 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  Isaku Yamahata <isaku.yamahata@gmail.com>,
  "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-23-seanjc@google.com>
+ <20231027182217.3615211-24-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Autocrypt: addr=pbonzini@redhat.com; keydata=
  xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
@@ -125,7 +125,7 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20231027182217.3615211-23-seanjc@google.com>
+In-Reply-To: <20231027182217.3615211-24-seanjc@google.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -133,15 +133,35 @@ Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 10/27/23 20:22, Sean Christopherson wrote:
-> Let x86 track the number of address spaces on a per-VM basis so that KVM
-> can disallow SMM memslots for confidential VMs.  Confidentials VMs are
-> fundamentally incompatible with emulating SMM, which as the name suggests
-> requires being able to read and write guest memory and register state.
+> Add a new x86 VM type, KVM_X86_SW_PROTECTED_VM, to serve as a development
+> and testing vehicle for Confidential (CoCo) VMs, and potentially to even
+> become a "real" product in the distant future, e.g. a la pKVM.
 > 
-> Disallowing SMM will simplify support for guest private memory, as KVM
-> will not need to worry about tracking memory attributes for multiple
-> address spaces (SMM is the only "non-default" address space across all
-> architectures).
+> The private memory support in KVM x86 is aimed at AMD's SEV-SNP and
+> Intel's TDX, but those technologies are extremely complex (understatement),
+> difficult to debug, don't support running as nested guests, and require
+> hardware that's isn't universally accessible.  I.e. relying SEV-SNP or TDX
+> for maintaining guest private memory isn't a realistic option.
+> 
+> At the very least, KVM_X86_SW_PROTECTED_VM will enable a variety of
+> selftests for guest_memfd and private memory support without requiring
+> unique hardware.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+
+with one nit:
+
+> +---------------------
+> +
+> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> +:Architectures: x86
+> +:Type: system ioctl
+> +
+> +This capability returns a bitmap of support VM types.  The 1-setting of bit @n
+
+s/support/supported/
+
+Paolo
 
