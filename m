@@ -1,55 +1,55 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBDC8199A8
-	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 17:32:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CDD199A6
+	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 17:34:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UW9IFWg+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D4G6gZ4H"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698687119;
+	s=mimecast20190719; t=1698687261;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=3g1TVhpzsOzzHHVoXez8JAaDO7pX06gUTyU2b4+L2DI=;
-	b=UW9IFWg+mirR4VcbYwnpWdE6LgyvcCFK7+T+cnOpm9XYLp6qCAb1Gm2Mkmrmv/nrgjG7Ko
-	sNyfceqCTGtDV6J2klJA6XhPdWsT2Y/u975ND6Wvv4WK0/LbRL6a614rISQGq1+Wh1bc8N
-	qBNNM4izfK4ilOPzKamARfqjTO9nka8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=5fMqrw+qFhssxj8qhYVvLd8lvq+1o5oZc/SrI7TORTQ=;
+	b=D4G6gZ4HLMACQzR32SHjT3dTGnptJzUEopWxYoqPMRvkDk+IuYzPs8DJy4tTTLyeBsBjI4
+	E58vP76151+l/5Dk83g6T3AD+WesfBYbq1mMe10gAhRZuV+ji1mRF+sMffkm1V6rvaiJSs
+	VMl8iZQTqsqhY3YtMRmLnE8NNEXos6E=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-96-zlghZhNoMCKtCQe1ZBUasg-1; Mon, 30 Oct 2023 13:31:56 -0400
-X-MC-Unique: zlghZhNoMCKtCQe1ZBUasg-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4083a670d25so35424205e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 10:31:56 -0700 (PDT)
+ us-mta-80-Z_TiL4dWNDu1am9mBQ088g-1; Mon, 30 Oct 2023 13:34:19 -0400
+X-MC-Unique: Z_TiL4dWNDu1am9mBQ088g-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-32da8de4833so2466018f8f.3
+        for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 10:34:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698687115; x=1699291915;
+        d=1e100.net; s=20230601; t=1698687256; x=1699292056;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3g1TVhpzsOzzHHVoXez8JAaDO7pX06gUTyU2b4+L2DI=;
-        b=HPlt5Fv+yTj5ziYE6ovQXhakhzqBHx7yy68lhsQJ7GDaK4PY2aF0XthdfUYGaHbOPu
-         svMeQABI7Qesy0ZHTbO2aGswE21RvAPgZX1whdZcnbL6X2cIJKGF1pG9CEfa+l54p4q3
-         rdvu0xNFJHn8qV/kpC3+sLBm7fgr257zZnqBp2/fg0bTue6oQLNShD72bU2MKYi36vCe
-         ulhm+1GExdymP/u4DElc2k3ghi/umM4QaVPnKFRTbz39aXq1bJF1sGB/mkWmfplp/Si0
-         MdOGQJmIG2aR+l/oDmNOjTPKoFjwQrRrG2yzfifYow0ou6hPB5nVUJTWYm5Hg0rvXEHQ
-         kbWw==
-X-Gm-Message-State: AOJu0Yz0xie75zg/Z3zmYcPDmLMo+erNJ0XvW7M9rg1P5sZgwEz05Au4
-	/IYQkAnq97IV1stcr7g4C55PI/eggFQV1YNBqa3528Z7lZYY+eRiG0TGXerW4WKm0ZgZRASzkNI
-	/EWeXUmmf5Jm5BpbT
-X-Received: by 2002:a05:600c:3b13:b0:405:3455:567e with SMTP id m19-20020a05600c3b1300b004053455567emr8489623wms.5.1698687115244;
-        Mon, 30 Oct 2023 10:31:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFOw2pwrz3emhHHPGzRcEZaKdyXE5ETYrjkl0hP08/axAOlUIY6MyqVTu78CJe3u248QTKzww==
-X-Received: by 2002:a05:600c:3b13:b0:405:3455:567e with SMTP id m19-20020a05600c3b1300b004053455567emr8489569wms.5.1698687114826;
-        Mon, 30 Oct 2023 10:31:54 -0700 (PDT)
+        bh=5fMqrw+qFhssxj8qhYVvLd8lvq+1o5oZc/SrI7TORTQ=;
+        b=HCquoHHNSjzBBzgMXy22Fb3jSMcpVYVbegUsg6IT28Z639p9ssAugvonihc0VVvbIM
+         oMreX1Ke21cdUss0Et/zxVFGjA3gezI+k5f1nn6gbbvF/+LRjWQnPbxdKdrOLaynuYC4
+         ourk8/pIePdoYXa6QwFAGXcVC8Dz0Gf3M082JJpDlP5Zqagd/Qb+EauGJ2LNYIqSzguT
+         AWzSBONwT9aUz+7uWZNAFLWf09FbPL3ow8wwRJSPFOKfTrqCsxFjDTnqU41xavrPRCvQ
+         WUJWLsd+Jkcw/XvhcTiIBYlnJ8M0TGJVZBPr2a0JFPhjP/SkVgrPTD9+CAFtKV+AQ3cO
+         Ta3A==
+X-Gm-Message-State: AOJu0YweMLx6U0mIWBhxe2BJEFBVaQsYinYVN98qqMkWlxJDgsG73Tsw
+	aWRKGYtZ96wjo78suwmOwBVe2SM0o4Ubp28+t4dGwZ8/yzog7Pnwb2F705cd2fHrWJHSVIzoDbj
+	FCPtb6BIUwvyW1Ing
+X-Received: by 2002:a5d:674c:0:b0:32d:bc7d:c431 with SMTP id l12-20020a5d674c000000b0032dbc7dc431mr8595471wrw.1.1698687256655;
+        Mon, 30 Oct 2023 10:34:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGoSwHjCgF60i9p5iHFG+4s/5oKx7xoJBSRpuzoczO/1s/n65Z43CGXqwQnwC+DGZUjQ2L04A==
+X-Received: by 2002:a5d:674c:0:b0:32d:bc7d:c431 with SMTP id l12-20020a5d674c000000b0032dbc7dc431mr8595455wrw.1.1698687256340;
+        Mon, 30 Oct 2023 10:34:16 -0700 (PDT)
 Received: from [192.168.1.174] ([151.81.68.207])
-        by smtp.googlemail.com with ESMTPSA id c5-20020a05600c0a4500b004094d4292aesm449246wmq.18.2023.10.30.10.31.51
+        by smtp.googlemail.com with ESMTPSA id o26-20020a5d58da000000b0032d2489a399sm8695806wrf.49.2023.10.30.10.34.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Oct 2023 10:31:54 -0700 (PDT)
-Message-ID: <0731604e-8692-4c51-9427-78b4c629f9e9@redhat.com>
-Date: Mon, 30 Oct 2023 18:31:50 +0100
+        Mon, 30 Oct 2023 10:34:15 -0700 (PDT)
+Message-ID: <9bc69994-c98f-48e4-b956-08a8d98a6e6d@redhat.com>
+Date: Mon, 30 Oct 2023 18:34:12 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,8 +57,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 18/35] KVM: x86: "Reset" vcpu->run->exit_reason early
- in KVM_RUN
+Subject: Re: [PATCH v13 22/35] KVM: Allow arch code to track number of memslot
+ address spaces per VM
 To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
  Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
  Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
@@ -88,7 +88,7 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  Isaku Yamahata <isaku.yamahata@gmail.com>,
  "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-19-seanjc@google.com>
+ <20231027182217.3615211-23-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Autocrypt: addr=pbonzini@redhat.com; keydata=
  xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
@@ -125,7 +125,7 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20231027182217.3615211-19-seanjc@google.com>
+In-Reply-To: <20231027182217.3615211-23-seanjc@google.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -133,51 +133,15 @@ Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 10/27/23 20:22, Sean Christopherson wrote:
-> Initialize run->exit_reason to KVM_EXIT_UNKNOWN early in KVM_RUN to reduce
-> the probability of exiting to userspace with a stale run->exit_reason that
-> *appears* to be valid.
+> Let x86 track the number of address spaces on a per-VM basis so that KVM
+> can disallow SMM memslots for confidential VMs.  Confidentials VMs are
+> fundamentally incompatible with emulating SMM, which as the name suggests
+> requires being able to read and write guest memory and register state.
 > 
-> To support fd-based guest memory (guest memory without a corresponding
-> userspace virtual address), KVM will exit to userspace for various memory
-> related errors, which userspace *may* be able to resolve, instead of using
-> e.g. BUS_MCEERR_AR.  And in the more distant future, KVM will also likely
-> utilize the same functionality to let userspace "intercept" and handle
-> memory faults when the userspace mapping is missing, i.e. when fast gup()
-> fails.
-> 
-> Because many of KVM's internal APIs related to guest memory use '0' to
-> indicate "success, continue on" and not "exit to userspace", reporting
-> memory faults/errors to userspace will set run->exit_reason and
-> corresponding fields in the run structure fields in conjunction with a
-> a non-zero, negative return code, e.g. -EFAULT or -EHWPOISON.  And because
-> KVM already returns  -EFAULT in many paths, there's a relatively high
-> probability that KVM could return -EFAULT without setting run->exit_reason,
-> in which case reporting KVM_EXIT_UNKNOWN is much better than reporting
-> whatever exit reason happened to be in the run structure.
-> 
-> Note, KVM must wait until after run->immediate_exit is serviced to
-> sanitize run->exit_reason as KVM's ABI is that run->exit_reason is
-> preserved across KVM_RUN when run->immediate_exit is true.
-> 
-> Link: https://lore.kernel.org/all/20230908222905.1321305-1-amoorthy@google.com
-> Link: https://lore.kernel.org/all/ZFFbwOXZ5uI%2Fgdaf@google.com
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/x86.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ee3cd8c3c0ef..f41dbb1465a0 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10963,6 +10963,7 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
->   {
->   	int r;
->   
-> +	vcpu->run->exit_reason = KVM_EXIT_UNKNOWN;
->   	vcpu->arch.l1tf_flush_l1d = true;
->   
->   	for (;;) {
+> Disallowing SMM will simplify support for guest private memory, as KVM
+> will not need to worry about tracking memory attributes for multiple
+> address spaces (SMM is the only "non-default" address space across all
+> architectures).
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
