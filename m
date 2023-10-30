@@ -1,55 +1,55 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E93F6469E
-	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 17:11:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A899199A2
+	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 17:18:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cpLDJt2+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V005a3pA"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698685915;
+	s=mimecast20190719; t=1698686318;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=lo4ysHz5pmHfFsXnk84EoayTJ3hTlIhc3rVOfp1rxtc=;
-	b=cpLDJt2+6yxkZbmC7dAvXetuv6zb+Okf2WZrlidRuXr59dd4Ieo0D95vLh1pG3XpMitwSH
-	FIYEosZk7PEEkIiKFempJUazAQzvBf4NHCnThG1GmfPYeV/D6LBQVQBFS6toBJtoXUnkfc
-	xAd4JF24ptyQSHh5Q3SK3zFHgkxwjko=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Rk1z/nbke87TeFl+NzbMTW3BKeJ5hl7Q8glGeyBEAiE=;
+	b=V005a3pA+/KQ921ND+eANYyZKRw+vIVcRSlZnPmhssp3yne9N5xAdSMR2kGxwaToOPJm3i
+	FwV6EAarRT5UKZyJnlP245aHsHBmUB37TQZ3EhSu7rMo2yGt5hrcCI4qo+K1zSbCHsePSy
+	5JPgtpGrd/q5rncCXNVW4HvGzJEMnG0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-436-8-_ypHpkO-yzAG0JafuUuA-1; Mon, 30 Oct 2023 13:11:54 -0400
-X-MC-Unique: 8-_ypHpkO-yzAG0JafuUuA-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40845fe2d1cso34647845e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 10:11:53 -0700 (PDT)
+ us-mta-696-vw4qU3ePNb63JVqaZWnLew-1; Mon, 30 Oct 2023 13:18:36 -0400
+X-MC-Unique: vw4qU3ePNb63JVqaZWnLew-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4084001846eso35265735e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 10:18:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698685913; x=1699290713;
+        d=1e100.net; s=20230601; t=1698686315; x=1699291115;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lo4ysHz5pmHfFsXnk84EoayTJ3hTlIhc3rVOfp1rxtc=;
-        b=AnbpGoNSzhk38Ue9V3nWILBOwXMUpAMsdTbUuMXlkpLL0cwwzynagkIhr3ITEt3FbB
-         LP86gp2fu00bU5ObDnQKnH8FA9ni3MNXorahsiVEIJmlkdRd87vJ9BlKr/HL63Kbgmc5
-         d7kEGGt1TT3r3l2PwuJ3L5mfUp1nzGCs21unna74lgyDjN5DHcbdSTCxGwspgUy8l34o
-         VlWgLCfuySHqwYV9z+iAzvr3Tw7JUZPqv7fYQQj1O16QrXvs56cp6Dluf5EhbewX6ePo
-         u2dYBEAvSIC0H/SHzhJRdafJCGO1g4fkciohNfTmTdJxtsCj0NPqH6rBlAs/wyj1+QnG
-         zr2g==
-X-Gm-Message-State: AOJu0Yzhqk1+5na2VWAx1HRUX1fvcOh9h6t6nGlZFh4L5KlXdq43B9mu
-	/PoRYnV4bkiK1l70MvFJgNCVU323DsObY9P+HiyDjwzAUu85P8yLwkLNnlocAfOUkOsFilQ+yVj
-	t4rH/c8y3QXZdXkIx
-X-Received: by 2002:a05:600c:1c9a:b0:401:d803:6243 with SMTP id k26-20020a05600c1c9a00b00401d8036243mr8797118wms.32.1698685912903;
-        Mon, 30 Oct 2023 10:11:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEE3mzsAlLnekLWdY8A4rueILcmfn/0LGvZfOgJVm2OXLCsoyw1l1K7DLfNbIxoxk9UoBDhkg==
-X-Received: by 2002:a05:600c:1c9a:b0:401:d803:6243 with SMTP id k26-20020a05600c1c9a00b00401d8036243mr8797063wms.32.1698685912474;
-        Mon, 30 Oct 2023 10:11:52 -0700 (PDT)
+        bh=Rk1z/nbke87TeFl+NzbMTW3BKeJ5hl7Q8glGeyBEAiE=;
+        b=cdqVGme2gURj7NQ1MUq1puMYpbEGMxYF4Nh90EOaKh6ISme0Y5qB+25p6YQ7IuPwJL
+         a0uYJcKCqm9dMtTCZVgueoh359ozVoOzOig+iH8Ajf4eD1WoM8Q5pV9T/3cIc0r71p3a
+         Ks+s+eEuDOCCSWHszJyYQlreLCfuBAsCgfPMbAxP/mkwUCEjNFXfphe5E/S4oOc8NNON
+         +7SLcjCK/6+/KpUGSQbp4L250wtIHNg/ZrUJQ3D6awtqO7GPH4EEHrPtSeHCpKpT6pnM
+         qkbYtMGPIuq5ND9I3cg7dDZQOKbZhcC9DVRXE5g5FFFzN7Ip4I59F0XVkUzw0Vh4S7tU
+         Avkw==
+X-Gm-Message-State: AOJu0YwZnqVHKM5WqbW8m4ifMHpWNtc6NiU00aQRJV+OUe+2FJqN+xIS
+	oj8+hWLKKNTviD4mqFZTeZSbRFTwHY8Q9PN8IHHucSzxdvq3TrnwPlKYkzbAjKgFZDAIJRULOsY
+	GuLIDepzzJCUCvji7
+X-Received: by 2002:a05:600c:3512:b0:408:3e7a:82ea with SMTP id h18-20020a05600c351200b004083e7a82eamr9347574wmq.1.1698686315461;
+        Mon, 30 Oct 2023 10:18:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE2IYd31Kg1xsjAW7zrsQp03VV1LrLjkoWwzBfM1QTMJAHwovsXW/3FoijWAFrYv3Vz5FidRg==
+X-Received: by 2002:a05:600c:3512:b0:408:3e7a:82ea with SMTP id h18-20020a05600c351200b004083e7a82eamr9347545wmq.1.1698686315114;
+        Mon, 30 Oct 2023 10:18:35 -0700 (PDT)
 Received: from [192.168.1.174] ([151.81.68.207])
-        by smtp.googlemail.com with ESMTPSA id w16-20020adfcd10000000b0032da75af3easm8617198wrm.80.2023.10.30.10.11.40
+        by smtp.googlemail.com with ESMTPSA id l16-20020adffe90000000b003198a9d758dsm4171497wrr.78.2023.10.30.10.18.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Oct 2023 10:11:51 -0700 (PDT)
-Message-ID: <773328b3-0ef0-4e93-afb9-6fba3302b8a7@redhat.com>
-Date: Mon, 30 Oct 2023 18:11:39 +0100
+        Mon, 30 Oct 2023 10:18:34 -0700 (PDT)
+Message-ID: <22789e20-1a4a-48af-99ad-3e88c18dd231@redhat.com>
+Date: Mon, 30 Oct 2023 18:18:26 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,8 +57,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 10/35] KVM: Add a dedicated mmu_notifier flag for
- reclaiming freed memory
+Subject: Re: [PATCH v13 11/35] KVM: Drop .on_unlock() mmu_notifier hook
 To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
  Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
  Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
@@ -88,7 +87,7 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  Isaku Yamahata <isaku.yamahata@gmail.com>,
  "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-11-seanjc@google.com>
+ <20231027182217.3615211-12-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Autocrypt: addr=pbonzini@redhat.com; keydata=
  xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
@@ -125,7 +124,7 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20231027182217.3615211-11-seanjc@google.com>
+In-Reply-To: <20231027182217.3615211-12-seanjc@google.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -133,21 +132,26 @@ Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 10/27/23 20:21, Sean Christopherson wrote:
-> Handle AMD SEV's kvm_arch_guest_memory_reclaimed() hook by having
-> __kvm_handle_hva_range() return whether or not an overlapping memslot
-> was found, i.e. mmu_lock was acquired.  Using the .on_unlock() hook
-> works, but kvm_arch_guest_memory_reclaimed() needs to run after dropping
-> mmu_lock, which makes .on_lock() and .on_unlock() asymmetrical.
+> Drop the .on_unlock() mmu_notifer hook now that it's no longer used for
+> notifying arch code that memory has been reclaimed.  Adding .on_unlock()
+> and invoking it *after* dropping mmu_lock was a terrible idea, as doing so
+> resulted in .on_lock() and .on_unlock() having divergent and asymmetric
+> behavior, and set future developers up for failure, i.e. all but asked for
+> bugs where KVM relied on using .on_unlock() to try to run a callback while
+> holding mmu_lock.
 > 
-> Use a small struct to return the tuple of the notifier-specific return,
-> plus whether or not overlap was found.  Because the iteration helpers are
-> __always_inlined, practically speaking, the struct will never actually be
-> returned from a function call (not to mention the size of the struct will
-> be two bytes in practice).
+> Opportunistically add a lockdep assertion in kvm_mmu_invalidate_end() to
+> guard against future bugs of this nature.
 
-Could have been split in two patches, but it's fine anyway.
+This is what David suggested to do in patch 3, FWIW.
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
 Paolo
+
+> Reported-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Link: https://lore.kernel.org/all/20230802203119.GB2021422@ls.amr.corp.intel.com
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+
 
