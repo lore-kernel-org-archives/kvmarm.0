@@ -1,105 +1,144 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247BC15E99
-	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 12:36:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1AC718C15
+	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 16:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T/eyqJHU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2B04C433C7;
-	Mon, 30 Oct 2023 12:36:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698669373;
-	bh=/71kbiytdp/VoW3kuCJ1kqiDxE4ZD+L4PqRlfCczo0I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=T/eyqJHUuAonHxnuxkt6GEdACiAWxX9iI1QzI/1RvlpMqU+QIDFtVwJ77UdO0XvJC
-	 whof5OokBZX4wF9CnXOJilVIpV5+6Vm3nfMb9Dmn0iL21Ijq/oVFyOmGXToQ3b79uo
-	 +Px4uqo3N8WAbbkz+P6kLR1kTuGBpuT5r4SsJf1bH41QU76hfWLInxSyk8xNcNm5ss
-	 HbgM4IgDJY+Mr5i+VpNTJ3FnH/IQ+f10OD1v+xEPcU64+kY2ArVy3bmKZxvB7i6q4I
-	 k47oIEq2mQDF6WbGwAJZpWuAyBW/R5SZ9/+zn6LmcoBGl3Nm5hIALsSVer6hj82+ad
-	 4rxYLEkan3pew==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qxRV5-008vI6-5Z;
-	Mon, 30 Oct 2023 12:36:11 +0000
-Date: Mon, 30 Oct 2023 12:36:09 +0000
-Message-ID: <86msw01e4m.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jan Henrik Weinstock <jan@mwa.re>
-Cc: oliver.upton@linux.dev,	james.morse@arm.com,	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,	catalin.marinas@arm.com,	will@kernel.org,
-	linux-arm-kernel@lists.infradead.org,	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,	Lukas =?UTF-8?B?SsO8bmdlcg==?= <lukas@mwa.re>
-Subject: Re: KVM exit to userspace on WFI
-In-Reply-To: <CANi1PHjAwLWAq9EW7r5Yh_xbvPiJMsq8342JwAGafz1d1NUhSA@mail.gmail.com>
-References: <CANi1PHhzk80HvwQbBM46gpJ6_AA_P6+m5Jo0Nuy_MAdA4C2BhQ@mail.gmail.com>
-	<87ttql5aq7.wl-maz@kernel.org>
-	<CANi1PHieGooO0DK=6BPwq0UknHzsn9QM3rFQkh3HLMfWxDseUQ@mail.gmail.com>
-	<86cyx250w9.wl-maz@kernel.org>
-	<CANi1PHjAwLWAq9EW7r5Yh_xbvPiJMsq8342JwAGafz1d1NUhSA@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OVEeW0dF"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-da033914f7cso3990938276.0
+        for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 09:10:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698682249; x=1699287049; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3/eJ4eIlm/QBKFGigGc88HjjNKR0Bxic1+CMFaJ9ygg=;
+        b=OVEeW0dFYghTa15q2Mo6yQyJrpladLzfpF7iGt4dD177ZUvmbKWczin6NAlHEOV3xx
+         SswW4JSJEg2Aw140kUjdtk8MVKaCZCQGKE2qf/PQYVYbviMJoQ23T9bkN4t6Zy1bzsJl
+         xERQhB4M7wnZ871AUNZ+LjM4YImiP5flZFP9TVfX10BjhZdjATmlkUdu0je9gOv+HGcb
+         EKyNcGhSp6HwTronY7ITMuORjX7cE+ASFbOdEq/2R5OVhFDiSD8o/Dm4S0Q2YnAjRBLV
+         fZ3EegfL8SQ83gXpsAg3tbV22s+47lc7LaArrKpt2CPkeU1/ISCBVGudBcxHtfMenWKW
+         d/Tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698682249; x=1699287049;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3/eJ4eIlm/QBKFGigGc88HjjNKR0Bxic1+CMFaJ9ygg=;
+        b=mH2c5wOd/u5iOQmByE8BVcGcvSHtoSu57G6MSYUpKW8D1hFhXK+yNDaVGKKfiyBa5J
+         QkS46e389MuOrRfsqnKpZdTOMurDEMAaBhL7XNcmQPryxHPLkMA/FOTrcO2+3+sCdS0k
+         d1oEZe6+dA2/5jjcgDmdGvC7iOStkKcZ3MTjKlNqbq9O0IQxJ8mQT3gudFRP0U0sOEPW
+         itAnJ3G8msfDtGORnhiplRyb7W+Mp9Mdaj8bc64AUyE8tkcitspoR8le7o7ez/IVS4vI
+         uxar6tZ4xrzdwLoq2aBvwfeh0UKhSP6mmcV/GihQ7/kCMgCV6CdOP5u9yk+9ms5LVwWH
+         gguA==
+X-Gm-Message-State: AOJu0YwkNXXHdAfB2EByfqVv8RcfrZHvTHV+0cxFKS/IAxn+p31AK465
+	OR1objg03vNS2wg7UWQwieRKBx3OPoc=
+X-Google-Smtp-Source: AGHT+IG/nj4LaX3JPzHZqsehR5FWhArOOi7E0ApKeqEkunCLK98IonUlxUU55c5VBDsNlZFSGb1icvfnahw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1083:b0:d9a:c3b8:4274 with SMTP id
+ v3-20020a056902108300b00d9ac3b84274mr243782ybu.7.1698682249642; Mon, 30 Oct
+ 2023 09:10:49 -0700 (PDT)
+Date: Mon, 30 Oct 2023 16:10:48 +0000
+In-Reply-To: <ZT9lQ9c7Bik6FIpw@chao-email>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jan@mwa.re, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, lukas@mwa.re
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-14-seanjc@google.com>
+ <ZT9lQ9c7Bik6FIpw@chao-email>
+Message-ID: <ZT_ViJOW1p4TN_fI@google.com>
+Subject: Re: [PATCH v13 13/35] KVM: Introduce per-page memory attributes
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Anish Moorthy <amoorthy@google.com>, David Matlack <dmatlack@google.com>, 
+	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
+	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-[please make an effort not to top-post]
-
-On Fri, 27 Oct 2023 18:41:44 +0100,
-Jan Henrik Weinstock <jan@mwa.re> wrote:
+On Mon, Oct 30, 2023, Chao Gao wrote:
+> On Fri, Oct 27, 2023 at 11:21:55AM -0700, Sean Christopherson wrote:
+> >From: Chao Peng <chao.p.peng@linux.intel.com>
+> >
+> >In confidential computing usages, whether a page is private or shared is
+> >necessary information for KVM to perform operations like page fault
+> >handling, page zapping etc. There are other potential use cases for
+> >per-page memory attributes, e.g. to make memory read-only (or no-exec,
+> >or exec-only, etc.) without having to modify memslots.
+> >
+> >Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
+> >userspace to operate on the per-page memory attributes.
+> >  - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
+> >    a guest memory range.
 > 
-> Hi Marc,
+> >  - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
+> >    memory attributes.
 > 
-> the basic idea behind this is to have a (single-threaded) execution loop,
-> something like this:
+> This ioctl() is already removed. So, the changelog is out-of-date and needs
+> an update.
+
+Doh, I lost track of this and the fixup for KVM_CAP_MEMORY_ATTRIBUTES below.
+
+> >+:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> >+:Architectures: x86
+> >+:Type: vm ioctl
+> >+:Parameters: struct kvm_memory_attributes(in)
 > 
-> vcpu-thread:    vcpu-run | process-io-devices | vcpu-run | process-io...
->                          ^
->                   WFX or timeout
+> 					   ^ add one space here?
+
+Ah, yeah, that does appear to be the standard.
 > 
-> We switch to simulating IO devices whenever the vcpu is idle (wfi) or exceeds
-> a certain budget of instructions (counted via pmu). Our fallback currently is
-> to kick the vcpu out of its execution using a signal (via a timeout/alarm). But
-> of course, if the cpu is stuck at a wfi, we are wasting a lot of time.
 > 
-> I understand that the proposed behavior is not desirable for most use cases,
-> which is why I suggest locking it behind a flag, e.g.
-> KVM_ARCH_FLAG_WFX_EXIT_TO_USER.
+> >+static bool kvm_pre_set_memory_attributes(struct kvm *kvm,
+> >+					  struct kvm_gfn_range *range)
+> >+{
+> >+	/*
+> >+	 * Unconditionally add the range to the invalidation set, regardless of
+> >+	 * whether or not the arch callback actually needs to zap SPTEs.  E.g.
+> >+	 * if KVM supports RWX attributes in the future and the attributes are
+> >+	 * going from R=>RW, zapping isn't strictly necessary.  Unconditionally
+> >+	 * adding the range allows KVM to require that MMU invalidations add at
+> >+	 * least one range between begin() and end(), e.g. allows KVM to detect
+> >+	 * bugs where the add() is missed.  Rexlaing the rule *might* be safe,
+> 
+> 					    ^^^^^^^^ Relaxing
+> 
+> >@@ -4640,6 +4850,17 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+> > 	case KVM_CAP_BINARY_STATS_FD:
+> > 	case KVM_CAP_SYSTEM_EVENT_DATA:
+> > 		return 1;
+> >+#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+> >+	case KVM_CAP_MEMORY_ATTRIBUTES:
+> >+		u64 attrs = kvm_supported_mem_attributes(kvm);
+> >+
+> >+		r = -EFAULT;
+> >+		if (copy_to_user(argp, &attrs, sizeof(attrs)))
+> >+			goto out;
+> >+		r = 0;
+> >+		break;
+> 
+> This cannot work, e.g., no @argp in this function and is fixed by a later commit:
+> 
+> 	fcbef1e5e5d2 ("KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specific backing memory")
 
-But how do you reconcile the fact that exposing this to userspace
-breaks fundamental expectations that the guest has, such as getting
-its timer interrupts and directly injected LPIs? Implementing WFI in
-userspace breaks it. What about the case where we don't trap WFx and
-let the *guest* wait for an interrupt?
-
-Honestly, what you are describing seems to be a use model that doesn't
-fit KVM, which is a general purpose hypervisor, but more a simulation
-environment. Yes, the primitives are the same, but the plumbing is
-wildly different.
-
-*If* that's the stuff you're looking at, then I'm afraid you'll have
-to do it in different way, because what you are suggesting is
-fundamentally incompatible with the guarantees that KVM gives to guest
-and userspace. Because your KVM_ARCH_FLAG_WFX_EXIT_TO_USER is really a
-lie. It should really be named something more along the lines of
-KVM_ARCH_FLAG_WFX_EXIT_TO_USER_SOMETIME_AND_I_DONT_EVEN_KNOW_WHEN
-(probably with additional clauses related to breaking things).
-
-Overall, you are still asking for something that is not guaranteed at
-the architecture level, even less in KVM, and I'm not going to add
-support for something that can only work "sometime".
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+I'll post a fixup patch for all of these, thanks much!
