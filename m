@@ -1,44 +1,44 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0227319BA7
-	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 18:20:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5E219BA7
+	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 18:21:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EfUH45hl"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2c50305c5c4so69789291fa.1
-        for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 11:20:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lPjmhbB0"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40837ebba42so32156975e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 11:21:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698690013; x=1699294813; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1698690100; x=1699294900; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EYDArYAPbuwvLuQnLMgYzD5G3hQJ3JuyTKb70j8k5kM=;
-        b=EfUH45hl8xb+tt6MfPFNN/evgM8P68l0+gtXMjcTHwmG4jREySyxXF1kpwtmuK1+BP
-         sr8RvlgP6Man+EXm/EElkg5Ag77LPyEeZ7+xoXgdnA7Ix6/pQe3bkMcWvqUqjS0i9xaN
-         YYYofVmwiYXariLpDKLyktKnEcu6PpP/8W5oOCMR/X5J8bO6XeV2d7hahfNVkxmC8erd
-         UpxQfyIjmfDAODyag286HVugI7mwZh6vKmtuPAIsNunl7AZlHoMh00uqz6sWVTzYKEAl
-         eZSk8f0JPja98bjVoSbfIcND9iR8xMLZ0esFYKYOSPdzTRN/ZP/4xKvq5NIDGefVQzO/
-         jZEA==
+        bh=+/9ggluaJ++InohprDPxvdU7Uw478trPLaD3bhLrtl4=;
+        b=lPjmhbB0OEbekjw9ihkmpg+is1DedPodYO83HMF+zXNdru7RpeHjHmxkSaogBNEU+j
+         QZHGtRdDsGoo1lhQqbcBiFJ7ptLtIreL4Smv+gxHsFiSULcbC5FW+DUuF2wCsSoq2YGr
+         zBiNjbXzoA1aX6N9jSM3+iiDtedegqo0J0m0RoW6LCwhVoIQ09Rqvh1z/CfyMnebT+7E
+         B11fNYEqARnwGnCTZYeSXN/gVyaITu+pz42hwil3/qms7gzyXcx7Sgb5kbJYvbQIUSIZ
+         XLAQIjMgbDcrXlObVmFQgRuyAC8HHAuAeL/YUxFptO7KmVSKIcoqGZeTVORCoHE9chq3
+         c1qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698690013; x=1699294813;
+        d=1e100.net; s=20230601; t=1698690100; x=1699294900;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EYDArYAPbuwvLuQnLMgYzD5G3hQJ3JuyTKb70j8k5kM=;
-        b=EJovvv0Ge5SembV3QchbizpcQ0IFyxIRVEAxS1uHagmZG1+H87pCHAobmE8Zdmg6vA
-         wpxMaqiu2TkCc4UUFXPKYcbr8run4u61+x2aDc1WizFjzoXfL4v+3uPLj73Y9cecyopJ
-         nlOzTC2hN5RGzKEQKeegTjTQOVPcNKQm7L+DzfS+ynrHo5UB6mBIP49uMIIa5MwaBXHz
-         isc7vcfDJcY3sCpPvsO+9cpdN3S1IYyuO2gkycC+uiKc1sviuB5Upnugvte/LJPGtuz+
-         C+v+MqyIkr9NNcx+e3YiexZa2mFypHh8NTcPNrtK8PtgxIMmHoOkIYuA8JgS+w39FRxh
-         3qwQ==
-X-Gm-Message-State: AOJu0YyNneDq0lkv++/AKOM1HG1X0Wt8goMgrtpupTe9dqqPIWYQLZud
-	ucx16q/6vU2z5vjShwQScv/UYGVR4lD2PTkfXgJZpQ==
-X-Google-Smtp-Source: AGHT+IGWQtTaV5Bzkdlkn1e/3Zt5UNsfNX/Ijo670f/udb747Y9rnFPe4I+UgnAkk/OF+ECMZnUUXa4ItRfh9V5jdaA=
-X-Received: by 2002:a05:6512:10cb:b0:507:aaa9:b080 with SMTP id
- k11-20020a05651210cb00b00507aaa9b080mr9836391lfg.33.1698690012887; Mon, 30
- Oct 2023 11:20:12 -0700 (PDT)
+        bh=+/9ggluaJ++InohprDPxvdU7Uw478trPLaD3bhLrtl4=;
+        b=L0wOjcxYdlZbiq6BCIFsQiiUpSPWv3VMPuLeZ201oTYP5BNxEP0a6PpTW4N5KkLFm6
+         SC0UIGQxCQJb6r7BeChybh29VcD6TVQVbyhEZGbtMcaEmB421M8fgUv6o1V1/+ulqdMk
+         kQF+a0hJek5Cnc4OkWouDd1SdBNM/F5OUt3AbS3VzgDIKIUdRzb4gmx+U+eXPISx9LlX
+         /A3GpU21HDExfz3CAQsYCgRAmmK3qSvn0ijC5R5IgFmIjnl9S7wiP8Et9mcY+hwYCXlT
+         BxdYEQnwPQjQuEOEkIXmkbZCmrMIwznT9h/FFgbiKZBEn+6adpcBv99kSe0C9c0aUImC
+         BVjw==
+X-Gm-Message-State: AOJu0YyVe7cVyaD6GKCWt1n96zmjH4Xy0CKgtVh4VmFeqAPGYBYHyBTN
+	EvPJG7yJ+KUGNcn13EcG5FAj7zhVdDsvel1XaLAD4A==
+X-Google-Smtp-Source: AGHT+IEmwHEAyRl4O1ADBUXlJ8Ir1QajxdHcmQhP1+JwZ6AL7EQf1l2WpAn/vfiQDkHuuhxFizw+5mWU1UT2yp1CF+k=
+X-Received: by 2002:a05:600c:524a:b0:408:4160:1528 with SMTP id
+ fc10-20020a05600c524a00b0040841601528mr8760818wmb.30.1698690100370; Mon, 30
+ Oct 2023 11:21:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,14 +46,14 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-4-seanjc@google.com>
- <ZT_fnAcDAvuPCwws@google.com>
-In-Reply-To: <ZT_fnAcDAvuPCwws@google.com>
+ <ZT_fnAcDAvuPCwws@google.com> <CABgObfYM4nyb1K3xJVGvV+eQmZoLPAmz2-=1CG8++pCwvVW7Qg@mail.gmail.com>
+In-Reply-To: <CABgObfYM4nyb1K3xJVGvV+eQmZoLPAmz2-=1CG8++pCwvVW7Qg@mail.gmail.com>
 From: David Matlack <dmatlack@google.com>
-Date: Mon, 30 Oct 2023 11:19:43 -0700
-Message-ID: <CALzav=cjq_MbJgi3DMytVWwZLFxEPi1dp7YiBYRBw-sRf2+BLw@mail.gmail.com>
+Date: Mon, 30 Oct 2023 11:21:12 -0700
+Message-ID: <CALzav=djOS8T7AmUa3A7QmP1f0xAm2W-KRDmOov_H8ps77A2qA@mail.gmail.com>
 Subject: Re: [PATCH v13 03/35] KVM: Use gfn instead of hva for mmu_notifier_retry
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
 	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
 	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
@@ -78,15 +78,40 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 30, 2023 at 9:53=E2=80=AFAM David Matlack <dmatlack@google.com>=
- wrote:
+On Mon, Oct 30, 2023 at 10:01=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.com=
+> wrote:
 >
-> On 2023-10-27 11:21 AM, Sean Christopherson wrote:
-> > From: Chao Peng <chao.p.peng@linux.intel.com>
+> On Mon, Oct 30, 2023 at 5:53=E2=80=AFPM David Matlack <dmatlack@google.co=
+m> wrote:
 > >
-> > +void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t =
-end);
+> > On 2023-10-27 11:21 AM, Sean Christopherson wrote:
+> > > From: Chao Peng <chao.p.peng@linux.intel.com>
+> > >
+> > > Currently in mmu_notifier invalidate path, hva range is recorded and
+> > > then checked against by mmu_notifier_retry_hva() in the page fault
+> > > handling path. However, for the to be introduced private memory, a pa=
+ge
+> >                           ^^^^^^^^^^^^^^^^^^^^^^^^
+> >
+> > Is there a missing word here?
 >
-> What is the reason to separate range_add() from begin()?
+> No but there could be missing hyphens ("for the to-be-introduced
+> private memory"); possibly a "soon" could help parsing and that is
+> what you were talking about?
 
-Nevermind, I see how it's needed in kvm_mmu_unmap_gfn_range().
+Ah that explains it :)
+
+>
+> > >       if (likely(kvm->mmu_invalidate_in_progress =3D=3D 1)) {
+> > > +             kvm->mmu_invalidate_range_start =3D INVALID_GPA;
+> > > +             kvm->mmu_invalidate_range_end =3D INVALID_GPA;
+> >
+> > I don't think this is incorrect, but I was a little suprised to see thi=
+s
+> > here rather than in end() when mmu_invalidate_in_progress decrements to
+> > 0.
+>
+> I think that would be incorrect on the very first start?
+
+Good point. KVM could initialize start/end before registering
+notifiers, but that's extra code.
