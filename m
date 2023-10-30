@@ -1,128 +1,69 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08FB063D9
-	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 10:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E8E10941
+	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 10:47:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SyQr3ACP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85DE8C433C8;
-	Mon, 30 Oct 2023 10:40:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698662432;
-	bh=IC+XVlpEXDmeUZI867tbsHj8XCh7Alv+GZIJc0Uyfrg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SyQr3ACPAf+EYTKIg2Ox5AVtZDD7uIWUp0689SP+5YdBEtJIZM6wjnBExPDS5QfhW
-	 HVNs9LjIlMlE4Vu/5O680I5aF0aQs8w3jy1GVYfbyZACENQraFHdr4XHD4AeixonHk
-	 3WnL4aLvcal22WrQ9FMsvXc2ryx0K7rtBmvTrDjKJs2biyGVAQzdM9ZIkImWeqhKUW
-	 hcPKAbit3NaFBoYKiM2zBMpJWlQcrJgJoYS3mOd651muFpO+RUa/uPFDxLtjqdjbd8
-	 XUGfqk2Kg+JEzPGmwNSNeCTB0S+/QbQ8slF0POHTsbKxu0eIfrzsjUKOfqtu7UmEdR
-	 XoYvm2Pr9zUPg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qxPh7-008tWT-UA;
-	Mon, 30 Oct 2023 10:40:30 +0000
-Date: Mon, 30 Oct 2023 10:40:28 +0000
-Message-ID: <86o7gg1jhf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u1aAhIVq"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-507c91582fdso6193699e87.2
+        for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 03:47:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698662855; x=1699267655; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0jFvZ6/5AIaJJURA6NKcXW3eA3V6KUe/I3Cr+Qqfk1M=;
+        b=u1aAhIVqlKDqeNgzVWlBiLEDBz6breY0Q87c+ZBxHTgOLJmwmfclcTtMGYN2tzFEGU
+         uYLTC3X2aBhj3+JQB3OLAbtmZTqtHUho0GHDrmttbRoV4BTGu7nER73fP8/n9ROwaa7P
+         DrvDqCNkIvWq3VQNsOGQ5fOECvcMqru96wv9vUo7pfrn94jQZuUte1uaMDr/YoSqAO7g
+         5gsyRKngEJT0xPdc7d7/jAf63KoxuiR95aR/6cPStXTL9myHI3nz5OvXqYkmQHNEurd0
+         1QGqyIw8tIc54+CsJ4UrrCaozfkh3JIJift+wquNB7NUtoRCg6X/WDeVH4JQVuMCshPM
+         6MmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698662855; x=1699267655;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0jFvZ6/5AIaJJURA6NKcXW3eA3V6KUe/I3Cr+Qqfk1M=;
+        b=pRgi2ym5k/9dfOUIcm+STlnwdXdmghH+7Q0JkSfuxt6jKkw6EkiCRqQz+5E2wzZPuG
+         8e8ADnBALu80Y0j3u3l1puXfhcxQx8MAK7lP8wxnM48Rk4zhz7PH46DcQi05ieIj6SvA
+         HNTXkqmyWtbhTf/lGHqun9PHPD97OuKijxaQaWWYbZDS3v1PddQFPocWue5/WB4jmgf6
+         RdFkPB2WJyRORyNPk7QxqbieJ/cfdsFwiaJQ45ZwbfT02Aa9keSckJreHOKuRobenMQi
+         Q7IB05jGJbPpfGAQQrXIuSmDrY3+cDPBbmvWiYyVLViNi4q5RUuWbGtfC/yOFH4k0OCU
+         bOWA==
+X-Gm-Message-State: AOJu0YyJ0mQfhpEgXK+NKHvoRE0TqiPPzUNJ24ov13EvEujQY1GO1SRL
+	eDDt4y+MMFayh4Sl/s6Gr9j6Tg==
+X-Google-Smtp-Source: AGHT+IG4PwoQ4g30QKx2f/phGUdXG3+a48bnZhR5V4c2L5H4rLoYMERK+oqqlKTGJFNxNRTfoquHMw==
+X-Received: by 2002:a19:e057:0:b0:4ff:7f7f:22e7 with SMTP id g23-20020a19e057000000b004ff7f7f22e7mr6542787lfj.17.1698662855339;
+        Mon, 30 Oct 2023 03:47:35 -0700 (PDT)
+Received: from google.com (65.0.187.35.bc.googleusercontent.com. [35.187.0.65])
+        by smtp.gmail.com with ESMTPSA id j12-20020adfe50c000000b0032de6f95fb3sm7946156wrm.40.2023.10.30.03.47.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Oct 2023 03:47:35 -0700 (PDT)
+Date: Mon, 30 Oct 2023 10:47:31 +0000
+From: Vincent Donnefort <vdonnefort@google.com>
 To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: Vincent Donnefort <vdonnefort@google.com>,
-	oliver.upton@linux.dev,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kernel-team@android.com,
-	will@kernel.org,
-	willy@infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+	will@kernel.org, willy@infradead.org
 Subject: Re: [PATCH v2 2/2] KVM: arm64: Use folio for THP adjustment
-In-Reply-To: <418313c5-2094-4aaf-ae43-a1f3bf8e936f@arm.com>
+Message-ID: <ZT-Jw4SVJ6C1E6sc@google.com>
 References: <20230928173205.2826598-1-vdonnefort@google.com>
-	<20230928173205.2826598-3-vdonnefort@google.com>
-	<418313c5-2094-4aaf-ae43-a1f3bf8e936f@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20230928173205.2826598-3-vdonnefort@google.com>
+ <418313c5-2094-4aaf-ae43-a1f3bf8e936f@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, vdonnefort@google.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kernel-team@android.com, will@kernel.org, willy@infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <418313c5-2094-4aaf-ae43-a1f3bf8e936f@arm.com>
 
-On Sat, 28 Oct 2023 10:17:17 +0100,
-Ryan Roberts <ryan.roberts@arm.com> wrote:
-> 
-> On 28/09/2023 18:32, Vincent Donnefort wrote:
-> > Since commit cb196ee1ef39 ("mm/huge_memory: convert
-> > do_huge_pmd_anonymous_page() to use vma_alloc_folio()"), transparent
-> > huge pages use folios. It enables us to check efficiently if a page is
-> > mapped by a block simply looking at the folio size. This is saving a
-> > page table walk.
-> > 
-> > It is safe to read the folio in this path. We've just increased its
-> > refcount (GUP from __gfn_to_pfn_memslot()). This will prevent attempts
-> > of splitting the huge page.
-> > 
-> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> > 
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index de5e5148ef5d..69fcbcc7aca5 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -791,51 +791,6 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
-> >  	return 0;
-> >  }
-> >  
-> > -static struct kvm_pgtable_mm_ops kvm_user_mm_ops = {
-> > -	/* We shouldn't need any other callback to walk the PT */
-> > -	.phys_to_virt		= kvm_host_va,
-> > -};
-> > -
-> > -static int get_user_mapping_size(struct kvm *kvm, u64 addr)
-> > -{
-> > -	struct kvm_pgtable pgt = {
-> > -		.pgd		= (kvm_pteref_t)kvm->mm->pgd,
-> > -		.ia_bits	= vabits_actual,
-> > -		.start_level	= (KVM_PGTABLE_MAX_LEVELS -
-> > -				   CONFIG_PGTABLE_LEVELS),
-> > -		.mm_ops		= &kvm_user_mm_ops,
-> > -	};
-> > -	unsigned long flags;
-> > -	kvm_pte_t pte = 0;	/* Keep GCC quiet... */
-> > -	u32 level = ~0;
-> > -	int ret;
-> > -
-> > -	/*
-> > -	 * Disable IRQs so that we hazard against a concurrent
-> > -	 * teardown of the userspace page tables (which relies on
-> > -	 * IPI-ing threads).
-> > -	 */
-> > -	local_irq_save(flags);
-> > -	ret = kvm_pgtable_get_leaf(&pgt, addr, &pte, &level);
-> > -	local_irq_restore(flags);
-> > -
-> > -	if (ret)
-> > -		return ret;
-> > -
-> > -	/*
-> > -	 * Not seeing an error, but not updating level? Something went
-> > -	 * deeply wrong...
-> > -	 */
-> > -	if (WARN_ON(level >= KVM_PGTABLE_MAX_LEVELS))
-> > -		return -EFAULT;
-> > -
-> > -	/* Oops, the userspace PTs are gone... Replay the fault */
-> > -	if (!kvm_pte_valid(pte))
-> > -		return -EAGAIN;
-> > -
-> > -	return BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(level));
-> > -}
-> > -
+[...]
+
 > >  static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
 > >  	.zalloc_page		= stage2_memcache_zalloc_page,
 > >  	.zalloc_pages_exact	= kvm_s2_zalloc_pages_exact,
@@ -157,40 +98,18 @@ Ryan Roberts <ryan.roberts@arm.com> wrote:
 > should be accessible to the process. Or you could have a large file-backed folio
 > (from a filesystem that supports large folios - e.g. XFS) but the application
 > only mapped part of the file.
+
+I thought originally this would break the block and the folio with it, but a
+quick expriment showed it's not the case.
+
 > 
 > Perhaps I've misunderstood and those edge cases can't happen here for some reason?
 
-I went ahead and applied the following hack to the *current* tree,
-with this patch:
+And fault_supports_stage2_huge_mapping() would probably not be enough. we might
+end-up with a portion unmapped at stage-1 but mapped at stage-2. :-( 
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 482280fe22d7..de365489a62f 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1291,6 +1291,10 @@ transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 	 */
- 	if (fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE)) {
- 		int sz = get_user_mapping_size(kvm, hva);
-+		size_t fsz = folio_size(pfn_folio(pfn));
-+
-+		if (sz != fsz)
-+			pr_err("sz = %d fsz = %ld\n", sz,  fsz);
- 
- 		if (sz < 0)
- 			return sz;
-
-and sure enough, I see the check firing under *a lot* of memory
-pressure:
-
-	[84567.458803] sz = 4096 fsz = 2097152
-	[84620.166018] sz = 4096 fsz = 2097152
-
-So indeed, folio_size() doesn't provide what we need. We absolutely
-need to match what is actually mapped in userspace or things may turn
-out to be rather ugly should the other pages that are part of the same
-folio be allocated somewhere else. Is that even possible?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> 
+> Thanks,
+> Ryan
+> 
+> 
