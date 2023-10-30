@@ -1,108 +1,92 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AED610A2F
-	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 17:51:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0227319BA7
+	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 18:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="01c617rJ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Ni1GPgCl8w8Lwh/aSdbo/ks9Sgjz4jtglOS0ql7XSO4=; b=01c617rJlquZVt2QBAZvsxfiUn
-	We9Aa2YJR/FiIGF2DchKsF4HTzXH4x13XmbhOFjuOjjTLrSvKEbbIiIVeMQu4u7PR8HN2WFJmMyfQ
-	C6J8t3czF4AKG2F9u13+0fCagYzgASIqbySFKQ8DbW1a5cFRQtx6yrNueDmBMUQgJ3HEoQfA/tW2Y
-	6zKGiVKt5ORIV3bWGHSyvSBoiOH7RlM0U2llB7+2OXH2TD8iVukcZ8K6w4/w+3LY6bhMz5YBBMP6H
-	5M32zkEld5QtXKRKatFhDhrcgT9/IEWXaX/fsQh6kfxMZP7g104aTS23og0hO0W/VM5RGC4DF0bOO
-	lTqzoc7Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50422)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qxWPr-0001wo-2E;
-	Mon, 30 Oct 2023 17:51:07 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qxWPn-0004Co-Sm; Mon, 30 Oct 2023 17:51:03 +0000
-Date: Mon, 30 Oct 2023 17:51:03 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Miguel Luis <miguel.luis@oracle.com>
-Cc: "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
-	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
-	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"x86@kernel.org" <x86@kernel.org>,
-	"acpica-devel@lists.linuxfoundation.org" <acpica-devel@lists.linuxfoundation.org>,
-	"linux-csky@vger.kernel.org" <linux-csky@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>,
-	"linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	"jianyong.wu@arm.com" <jianyong.wu@arm.com>,
-	"justin.he@arm.com" <justin.he@arm.com>,
-	James Morse <james.morse@arm.com>
-Subject: Re: [RFC PATCH v3 00/39] ACPI/arm64: add support for virtual
- cpuhotplug
-Message-ID: <ZT/tB0ykr8JJd+E4@shell.armlinux.org.uk>
-References: <ZTffkAdOqL2pI2la@shell.armlinux.org.uk>
- <C2C5C292-AD2C-4D98-8225-39ABE68C5395@oracle.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EfUH45hl"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2c50305c5c4so69789291fa.1
+        for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 11:20:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698690013; x=1699294813; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EYDArYAPbuwvLuQnLMgYzD5G3hQJ3JuyTKb70j8k5kM=;
+        b=EfUH45hl8xb+tt6MfPFNN/evgM8P68l0+gtXMjcTHwmG4jREySyxXF1kpwtmuK1+BP
+         sr8RvlgP6Man+EXm/EElkg5Ag77LPyEeZ7+xoXgdnA7Ix6/pQe3bkMcWvqUqjS0i9xaN
+         YYYofVmwiYXariLpDKLyktKnEcu6PpP/8W5oOCMR/X5J8bO6XeV2d7hahfNVkxmC8erd
+         UpxQfyIjmfDAODyag286HVugI7mwZh6vKmtuPAIsNunl7AZlHoMh00uqz6sWVTzYKEAl
+         eZSk8f0JPja98bjVoSbfIcND9iR8xMLZ0esFYKYOSPdzTRN/ZP/4xKvq5NIDGefVQzO/
+         jZEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698690013; x=1699294813;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EYDArYAPbuwvLuQnLMgYzD5G3hQJ3JuyTKb70j8k5kM=;
+        b=EJovvv0Ge5SembV3QchbizpcQ0IFyxIRVEAxS1uHagmZG1+H87pCHAobmE8Zdmg6vA
+         wpxMaqiu2TkCc4UUFXPKYcbr8run4u61+x2aDc1WizFjzoXfL4v+3uPLj73Y9cecyopJ
+         nlOzTC2hN5RGzKEQKeegTjTQOVPcNKQm7L+DzfS+ynrHo5UB6mBIP49uMIIa5MwaBXHz
+         isc7vcfDJcY3sCpPvsO+9cpdN3S1IYyuO2gkycC+uiKc1sviuB5Upnugvte/LJPGtuz+
+         C+v+MqyIkr9NNcx+e3YiexZa2mFypHh8NTcPNrtK8PtgxIMmHoOkIYuA8JgS+w39FRxh
+         3qwQ==
+X-Gm-Message-State: AOJu0YyNneDq0lkv++/AKOM1HG1X0Wt8goMgrtpupTe9dqqPIWYQLZud
+	ucx16q/6vU2z5vjShwQScv/UYGVR4lD2PTkfXgJZpQ==
+X-Google-Smtp-Source: AGHT+IGWQtTaV5Bzkdlkn1e/3Zt5UNsfNX/Ijo670f/udb747Y9rnFPe4I+UgnAkk/OF+ECMZnUUXa4ItRfh9V5jdaA=
+X-Received: by 2002:a05:6512:10cb:b0:507:aaa9:b080 with SMTP id
+ k11-20020a05651210cb00b00507aaa9b080mr9836391lfg.33.1698690012887; Mon, 30
+ Oct 2023 11:20:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <C2C5C292-AD2C-4D98-8225-39ABE68C5395@oracle.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-4-seanjc@google.com>
+ <ZT_fnAcDAvuPCwws@google.com>
+In-Reply-To: <ZT_fnAcDAvuPCwws@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Mon, 30 Oct 2023 11:19:43 -0700
+Message-ID: <CALzav=cjq_MbJgi3DMytVWwZLFxEPi1dp7YiBYRBw-sRf2+BLw@mail.gmail.com>
+Subject: Re: [PATCH v13 03/35] KVM: Use gfn instead of hva for mmu_notifier_retry
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Anish Moorthy <amoorthy@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 30, 2023 at 04:41:19PM +0000, Miguel Luis wrote:
-> Hi Russell,
-> 
-> Tested on QEMU, based on Salil's RFC v2 [1], running with KVM.
-> - boot
-> - hotplug up to 'maxcpus'
-> - hotunplug down to the number of boot cpus
-> - hotplug vcpus and migrate with vcpus offline
-> - hotplug vcpus and migrate with vcpus online
-> - hotplug vcpus then unplug vcpus then migrate
-> - successive live migrations (up until 6)
-> 
-> Feel free to add:
-> Tested-by: Miguel Luis <miguel.luis@oracle.com>
-> 
-> Thank you
-> Miguel
-> 
-> [1] https://lore.kernel.org/qemu-devel/20230926100436.28284-1-salil.mehta@huawei.com/
+On Mon, Oct 30, 2023 at 9:53=E2=80=AFAM David Matlack <dmatlack@google.com>=
+ wrote:
+>
+> On 2023-10-27 11:21 AM, Sean Christopherson wrote:
+> > From: Chao Peng <chao.p.peng@linux.intel.com>
+> >
+> > +void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t =
+end);
+>
+> What is the reason to separate range_add() from begin()?
 
-That's good news, thanks for testing!
-
-I've pushed out an updated series against v6.6 earlier today in case
-anyone wants something specifically against v6.6, but I don't think
-there is any pressing reason to re-test. The only ACPI change
-between the two is:
-
-9b311b7313d6 ACPI: NFIT: Install Notify() handler before getting NFIT table
-
-and the only arm64 changes are in dts files. Nothing significant in
-kernel/ and nothing in drivers/base/.
-
-So I think at this point, I will pause waiting for 6.7-rc1 (which
-I'll do an updated patch set, since it will include changes queued
-up) and hopefully followed by Rafael's comments. Maybe James will
-also have some time to work on this again.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Nevermind, I see how it's needed in kvm_mmu_unmap_gfn_range().
