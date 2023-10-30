@@ -1,286 +1,108 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A18199B6
-	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 17:44:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AED610A2F
+	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 17:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ihcMVwUQ"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-da07b5e6f75so4948086276.0
-        for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 10:44:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698687882; x=1699292682; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=idn/LdV4vtD6KFi3tgjviSfh6YV722ckTPaKHt83kuI=;
-        b=ihcMVwUQLRpJV/ZlyD/Kj6JcVv6/QVKj/5G6YQnu0uU2duXtE2CSz11CxqBw6msRA1
-         uQSed1MoHDv3NsUF3Lp1ekS5ZB20qJjmjYc7EYoU+jdFIvIm99Lsnj2qtyWwEKeavppM
-         rrSbR8B0Ms0Nvjbk9OhAGPxSEE1cH3J2sVq0+UOvEj+L3UHQdTdHh/jEptisatWcuZ1k
-         MI8Niajc8KtEpw79W6whjEeSnYfA86gYPwu+omKAlI8sA/4JEa13ICNB/H8/cffSP34h
-         Yl26d+VdOPzCSqU4BwnQiY705qFL1l0RgS7jxTt81W1G2MJAkj/okuP+7jEX+5amq9u5
-         AoSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698687882; x=1699292682;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=idn/LdV4vtD6KFi3tgjviSfh6YV722ckTPaKHt83kuI=;
-        b=X63kG92AwFa0YgRQS2Juv/q9BWrer+xwPoHcnPLLxaW1Ng0oRuHIx7MUa8oUPybSCN
-         qjMc5wBmzP5ctKhIxjErsK8n7itRHoU7PATM2E39REMe25/5YHgW/BWZ64ZaLFDbql0i
-         Ia5CMpYPPeDbzB7IKt9pYLSfIfvhLmxmdG/AxIY1eEkK8B3IZCnW9QH5wy3f9k5j49Ow
-         uScOUQRPIB2Yk09qgziIHjcNEuKUtts8POalSk8FQW8U6U4oOI+K3nige6PGaie4GUFo
-         gwrLlyjLj95enpq9lY6JCVIRkDFp735CFqHd0gqoi/PVsfsqioGLBaEazXISmNoJsOLP
-         uocw==
-X-Gm-Message-State: AOJu0YzaZpzRggbNiFNrDfjESA7gzc9JlbNKlQfidLWpKCRk/rv+6luO
-	/Tn0N8wpzr9Un/R75PZBtC9JEHQ3sNmBuBPpcw==
-X-Google-Smtp-Source: AGHT+IFB7hq3hyYEyvOfqxVjMYr3FOMDXc/6nt3W+mjLMLoX3u9KaOlSY2ZZpo7pcaHfHXw7SVJehlJSAGRnJhvidA==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6902:1444:b0:d9a:ca20:1911 with
- SMTP id a4-20020a056902144400b00d9aca201911mr6525ybv.4.1698687882097; Mon, 30
- Oct 2023 10:44:42 -0700 (PDT)
-Date: Mon, 30 Oct 2023 17:44:41 +0000
-In-Reply-To: <868r7p4jcu.wl-maz@kernel.org> (message from Marc Zyngier on Thu,
- 26 Oct 2023 14:13:37 +0100)
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="01c617rJ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Ni1GPgCl8w8Lwh/aSdbo/ks9Sgjz4jtglOS0ql7XSO4=; b=01c617rJlquZVt2QBAZvsxfiUn
+	We9Aa2YJR/FiIGF2DchKsF4HTzXH4x13XmbhOFjuOjjTLrSvKEbbIiIVeMQu4u7PR8HN2WFJmMyfQ
+	C6J8t3czF4AKG2F9u13+0fCagYzgASIqbySFKQ8DbW1a5cFRQtx6yrNueDmBMUQgJ3HEoQfA/tW2Y
+	6zKGiVKt5ORIV3bWGHSyvSBoiOH7RlM0U2llB7+2OXH2TD8iVukcZ8K6w4/w+3LY6bhMz5YBBMP6H
+	5M32zkEld5QtXKRKatFhDhrcgT9/IEWXaX/fsQh6kfxMZP7g104aTS23og0hO0W/VM5RGC4DF0bOO
+	lTqzoc7Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50422)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qxWPr-0001wo-2E;
+	Mon, 30 Oct 2023 17:51:07 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qxWPn-0004Co-Sm; Mon, 30 Oct 2023 17:51:03 +0000
+Date: Mon, 30 Oct 2023 17:51:03 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Miguel Luis <miguel.luis@oracle.com>
+Cc: "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
+	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
+	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"x86@kernel.org" <x86@kernel.org>,
+	"acpica-devel@lists.linuxfoundation.org" <acpica-devel@lists.linuxfoundation.org>,
+	"linux-csky@vger.kernel.org" <linux-csky@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>,
+	"linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	"jianyong.wu@arm.com" <jianyong.wu@arm.com>,
+	"justin.he@arm.com" <justin.he@arm.com>,
+	James Morse <james.morse@arm.com>
+Subject: Re: [RFC PATCH v3 00/39] ACPI/arm64: add support for virtual
+ cpuhotplug
+Message-ID: <ZT/tB0ykr8JJd+E4@shell.armlinux.org.uk>
+References: <ZTffkAdOqL2pI2la@shell.armlinux.org.uk>
+ <C2C5C292-AD2C-4D98-8225-39ABE68C5395@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsntv8aouhrq.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v2] KVM: arm64: selftests: Add arch_timer_edge_cases selftest
-From: Colton Lewis <coltonlewis@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, ricarkol@google.com, 
-	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <C2C5C292-AD2C-4D98-8225-39ABE68C5395@oracle.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Thank you for the prompt review though the mailing list keeps you
-busy. For the record, I inherited this code a while ago with the request
-to make it acceptable for upstream and there was a lot of work to
-do. Most of your complaints aren't originally my doing, but it's my
-responsibility now.
+On Mon, Oct 30, 2023 at 04:41:19PM +0000, Miguel Luis wrote:
+> Hi Russell,
+> 
+> Tested on QEMU, based on Salil's RFC v2 [1], running with KVM.
+> - boot
+> - hotplug up to 'maxcpus'
+> - hotunplug down to the number of boot cpus
+> - hotplug vcpus and migrate with vcpus offline
+> - hotplug vcpus and migrate with vcpus online
+> - hotplug vcpus then unplug vcpus then migrate
+> - successive live migrations (up until 6)
+> 
+> Feel free to add:
+> Tested-by: Miguel Luis <miguel.luis@oracle.com>
+> 
+> Thank you
+> Miguel
+> 
+> [1] https://lore.kernel.org/qemu-devel/20230926100436.28284-1-salil.mehta@huawei.com/
 
-Marc Zyngier <maz@kernel.org> writes:
+That's good news, thanks for testing!
 
-> On Thu, 28 Sep 2023 22:02:01 +0100,
-> Colton Lewis <coltonlewis@google.com> wrote:
->> +#include "kvm_util.h"
->> +#include "processor.h"
->> +#include "delay.h"
->> +#include "arch_timer.h"
->> +#include "gic.h"
->> +#include "vgic.h"
->> +
->> +#define msecs_to_usecs(msec)		((msec) * 1000LL)
->> +
->> +#define CVAL_MAX			~0ULL
->> +/* tval is a signed 32-bit int. */
->> +#define TVAL_MAX			INT_MAX
->> +#define TVAL_MIN			INT_MIN
->> +
->> +#define GICD_BASE_GPA			0x8000000ULL
->> +#define GICR_BASE_GPA			0x80A0000ULL
+I've pushed out an updated series against v6.6 earlier today in case
+anyone wants something specifically against v6.6, but I don't think
+there is any pressing reason to re-test. The only ACPI change
+between the two is:
 
-> We already have 3 tests that do their own GIC setup. Maybe it is time
-> someone either make vgic_v3_setup() deal with fixed addresses, or move
-> this into a helper.
+9b311b7313d6 ACPI: NFIT: Install Notify() handler before getting NFIT table
 
-That's a good idea. I can work on something like that.
+and the only arm64 changes are in dts files. Nothing significant in
+kernel/ and nothing in drivers/base/.
 
->> +	ctl = timer_get_ctl(timer);
->> +	cval = timer_get_cval(timer);
->> +	cnt = timer_get_cntct(timer);
->> +	timer_condition = cnt >= cval;
->> +	istatus = (ctl & CTL_ISTATUS) && (ctl & CTL_ENABLE);
->> +	GUEST_ASSERT_EQ(timer_condition, istatus);
->> +
->> +	/* Disable and mask the timer. */
->> +	timer_set_ctl(timer, CTL_IMASK);
+So I think at this point, I will pause waiting for 6.7-rc1 (which
+I'll do an updated patch set, since it will include changes queued
+up) and hopefully followed by Rafael's comments. Maybe James will
+also have some time to work on this again.
 
-> What is the point of masking if the timer is disabled?
-
-There isn't a reason to both mask and disable the timer as this function
-call does. It was there when I started working on this code and I left
-it alone. Does it matter?
-
->> +
->> +	atomic_inc(&shared_data.handled);
-
-> You don't have any ordering between atomic operations and system
-> register access. Could it be a problem?
-
->> +
->> +out:
->> +	gic_set_eoi(intid);
->> +}
->> +
->> +static void set_cval_irq(enum arch_timer timer, uint64_t cval_cycles,
->> +			 uint32_t ctl)
->> +{
->> +	atomic_set(&shared_data.handled, 0);
->> +	atomic_set(&shared_data.spurious, 0);
->> +	timer_set_cval(timer, cval_cycles);
->> +	timer_set_ctl(timer, ctl);
-
-> Same question.
-
-Neither operation depends on whether the other is visible. Nothing
-written to the system registers depends on the shared_data recording
-variables (though that global deserves a better name). And after this
-the number of handled IRQs can't possibly increase again until the timer
-fires again, which happens long after the timer is reset here.
-
->> +}
->> +
->> +static void set_tval_irq(enum arch_timer timer, uint64_t tval_cycles,
->> +			 uint32_t ctl)
->> +{
->> +	atomic_set(&shared_data.handled, 0);
->> +	atomic_set(&shared_data.spurious, 0);
->> +	timer_set_tval(timer, tval_cycles);
->> +	timer_set_ctl(timer, ctl);
->> +}
->> +
->> +static void set_xval_irq(enum arch_timer timer, uint64_t xval, uint32_t  
->> ctl,
->> +			 enum timer_view tv)
->> +{
->> +	switch (tv) {
->> +	case TIMER_CVAL:
->> +		set_cval_irq(timer, xval, ctl);
->> +		break;
->> +	case TIMER_TVAL:
->> +		set_tval_irq(timer, xval, ctl);
->> +		break;
->> +	default:
->> +		GUEST_FAIL("Could not get timer %d", timer);
->> +	}
->> +}
->> +
->> +/*
->> + * Should be called with IRQs masked.
->> + *
->> + * Note that this can theoretically hang forever, so we rely on having
->> + * a timeout mechanism in the "runner", like:
->> + * tools/testing/selftests/kselftest/runner.sh.
->> + */
->> +static void wait_for_non_spurious_irq(void)
->> +{
->> +	int h;
->> +
->> +	for (h = atomic_read(&shared_data.handled); h ==  
->> atomic_read(&shared_data.handled);) {
->> +		asm volatile ("wfi\n"
->> +			      "msr daifclr, #2\n"
->> +			      /* handle IRQ */
->> +			      "msr daifset, #2\n":::"memory");
-
-> There is no guarantee that a pending interrupt would fire at the point
-> where the comment is. R_RBZYL clearly state that you need a context
-> synchronisation event between these two instructions if you want
-> interrupts to be handled.
-
-Understood. Thanks for pointing this out.
-
->> +	}
->> +}
->> +
->> +/*
->> + * Wait for an non-spurious IRQ by polling in the guest (userspace=0)  
->> or in
->> + * userspace (e.g., userspace=1 and  
->> userspace_cmd=USERSPACE_SCHED_YIELD).
->> + *
->> + * Should be called with IRQs masked. Not really needed like the wfi  
->> above, but
->> + * it should match the others.
->> + *
->> + * Note that this can theoretically hang forever, so we rely on having
->> + * a timeout mechanism in the "runner", like:
->> + * tools/testing/selftests/kselftest/runner.sh.
->> + */
->> +static void poll_for_non_spurious_irq(bool userspace, enum sync_cmd  
->> userspace_cmd)
->> +{
->> +	int h;
->> +
->> +	h = atomic_read(&shared_data.handled);
->> +
->> +	local_irq_enable();
-
-> So half of this code is using local_irq_*(), and the rest is directly
-> poking at DAIF. Amusingly enough, the two aren't even playing with the
-> same set of bits.
-
-I agree that's wrong. I don't think it makes a functional difference
-since the only difference is local_irq_*() includes FIQs which are
-irrelevant to the whole test, but it looks much better to be consistent.
-
->> +	while (h == atomic_read(&shared_data.handled)) {
->> +		if (userspace)
->> +			USERSPACE_CMD(userspace_cmd);
->> +		else
->> +			cpu_relax();
->> +	}
->> +	local_irq_disable();
->> +}
->> +
->> +static void wait_poll_for_irq(void)
->> +{
->> +	poll_for_non_spurious_irq(false, -1);
-
-> Am I the only one who cries when seeing this -1 cast on an unsuspected
-> enum, together with a flag saying "hey, I'm giving you crap
-> arguments"? What was wrong having an actual enum value for it?
-
-Don't cry. I'll fix that. I agree there should be an actual enum value.
-
->> +}
->> +
->> +static void wait_sched_poll_for_irq(void)
->> +{
->> +	poll_for_non_spurious_irq(true, USERSPACE_SCHED_YIELD);
->> +}
->> +
->> +static void wait_migrate_poll_for_irq(void)
->> +{
->> +	poll_for_non_spurious_irq(true, USERSPACE_MIGRATE_SELF);
->> +}
->> +
->> +/*
->> + * Sleep for usec microseconds by polling in the guest (userspace=0) or  
->> in
->> + * userspace (e.g., userspace=1 and userspace_cmd=USERSPACE_SCHEDULE).
->> + */
->> +static void guest_poll(enum arch_timer test_timer, uint64_t usec,
->> +		       bool userspace, enum sync_cmd userspace_cmd)
->> +{
->> +	uint64_t cycles = usec_to_cycles(usec);
->> +	/* Whichever timer we are testing with, sleep with the other. */
->> +	enum arch_timer sleep_timer = 1 - test_timer;
->> +	uint64_t start = timer_get_cntct(sleep_timer);
->> +
->> +	while ((timer_get_cntct(sleep_timer) - start) < cycles) {
->> +		if (userspace)
->> +			USERSPACE_CMD(userspace_cmd);
->> +		else
->> +			cpu_relax();
->> +	}
->> +}
->> +
->> +static void sleep_poll(enum arch_timer timer, uint64_t usec)
->> +{
->> +	guest_poll(timer, usec, false, -1);
-
-> More of the same stuff...
-
-> Frankly, I even have a hard time understanding what this code is
-> trying to achieve, let alone the lack of correctness from an
-> architecture perspective.
-
-I presume you are talking about the polling rather than the test as a
-whole. The goal is to provide a way to wait a while so there is a way to
-test functionality when interrupts are masked. Did you have any
-correctness concerns besides not having proper enum values?
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
