@@ -1,55 +1,55 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D02125C7
-	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 17:36:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F79B1945E
+	for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 17:39:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IcA+ZLnp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ag6UE2BA"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698687374;
+	s=mimecast20190719; t=1698687571;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=3jYLwfXXzRbH81zwo7MCV6nGPuDVHVRPsAgIWckITik=;
-	b=IcA+ZLnpKQJpkCRGDeb33JEkCn0qNxsf+T38lWM+J1FdtxfUv3d9OgweJu6+CVjKyNkrdb
-	xFUFoD42L/cV+VNMIP9EugPeJNCCu6ePeotPp/6SdlzGexxjJrJaQcjpo4kSnAW0weezRq
-	9i8t5ffjdsjeJr6mTv6hFVPs4mNBzpg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=+DXS2SMXoVtHIusoTNobzAVDxifuslX+O0gTNMn/npQ=;
+	b=Ag6UE2BAHIefNXhmix/VL8ONjRqROWaE6/41ZGC7ylIcnOP4F+x3INEoovmzt0X1oygXDG
+	0DrsMFWnJvB07D9Jyy5GZYP0tturANBfzxFw1/mqIEs++XR7293VZQsEAKSyG+s//rkeCW
+	t/AacLlEFUshELCV7IGu1gjdFstSu44=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-532-pYtHm1DqOOaE6hCNYLR1qg-1; Mon, 30 Oct 2023 13:36:13 -0400
-X-MC-Unique: pYtHm1DqOOaE6hCNYLR1qg-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-32de9f93148so2638072f8f.2
-        for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 10:36:12 -0700 (PDT)
+ us-mta-547-sLABBGCQM1GFEdSSy7VF0Q-1; Mon, 30 Oct 2023 13:39:29 -0400
+X-MC-Unique: sLABBGCQM1GFEdSSy7VF0Q-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4094d1e52daso1607925e9.2
+        for <kvmarm@lists.linux.dev>; Mon, 30 Oct 2023 10:39:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698687372; x=1699292172;
+        d=1e100.net; s=20230601; t=1698687568; x=1699292368;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3jYLwfXXzRbH81zwo7MCV6nGPuDVHVRPsAgIWckITik=;
-        b=xFNb/dSe7OGk+o19NHKXyVj4jPicqeaWJm2rVc+rj1i8YhYymivZTcqXMp3cEljN4J
-         QE9HI2UZRhhMzh9w3Sqsmicm+Jx6LFCkzPKKC3FUPofEZs8g4Ntg5bAvEX84omObqxHP
-         Ix5SSXlZBgY7f9fkR4Qkg6BL0bCbiaEhYduY2xs6S9eJFM4Ybu+S5vgG2kE4EU7O7MSg
-         79GRyeWG+EUzzLjJnoVJ/FBn2E6LPZd9KflHpsF0D4pqTQAKi1mAn32EOeDSbF/uleT2
-         cP5m6eAtWLYO7XbWMqvN3Hn7sygvQsH814rKIV5tQ4M9I598duIAlC61SlIhMH7m8PGl
-         NRRQ==
-X-Gm-Message-State: AOJu0YztOyNINHFT8BI2Zck4U+Y2yFQXPSNHtI/bMY0Wh/KuaF0BxKbu
-	XP15+NXOigTvhBcPsxqaoKYLCCGAjGidjUz3TYh+4jpyz2SJzfz1m44gwcoFQq4eSB7UX2ylZnV
-	1Gw5eYqtPIjKLOdC5
-X-Received: by 2002:adf:ec4f:0:b0:32d:8357:42dd with SMTP id w15-20020adfec4f000000b0032d835742ddmr6883282wrn.68.1698687371997;
-        Mon, 30 Oct 2023 10:36:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEboAELdFqaoOZREgnEhsC/lbRki6/0Jdh0l66f6RUru0wLk22AqSmUMVbSPZpU1ZFwEkh2hA==
-X-Received: by 2002:adf:ec4f:0:b0:32d:8357:42dd with SMTP id w15-20020adfec4f000000b0032d835742ddmr6883233wrn.68.1698687371568;
-        Mon, 30 Oct 2023 10:36:11 -0700 (PDT)
+        bh=+DXS2SMXoVtHIusoTNobzAVDxifuslX+O0gTNMn/npQ=;
+        b=Iw8RL7J80lTilxFXw9ei7AR90GEyophKClESGp/cmt97oYvBywqbG6PnMrmuXTiGN9
+         nC/za+VDm3BKrsfR0cxSunIXmpAXeCyjJZ4VajhuHW+gnKPg+1TVvaxDg11l1FKnPSgO
+         jbTjDd1WOe4L4FES8BIvhFCm8t7bIHTmfNrjQl4De2uFAYbRdGRZYyR89SW2qlSFZFwz
+         iIhblw6ACeCU0BrQPDz1B5mZgv1TX92ZEwwtfG29VtdGI4wkEaADZNW8cynS89empbhm
+         QlBuW+Xp0S493Fl5G2HMnHRcAfyrDA8JA35qs2nKvftLTX1+f5Ixfi89174lwU/hmmHF
+         HeKw==
+X-Gm-Message-State: AOJu0YyaewXDxHV77HEhLn9sqY6fejjHABVqzzGr7mP7AO6MbjNdttl7
+	Op0sM1Cu90htpviKwB7iOgsPSPsoRSEqr2AaxKuHXMC4Gv3hk0rvgn0xnrDUgN0c54wgV7LNp8A
+	4KDfVZVhHDHl0Ie8w
+X-Received: by 2002:a05:600c:4748:b0:409:325:e499 with SMTP id w8-20020a05600c474800b004090325e499mr8333087wmo.32.1698687568560;
+        Mon, 30 Oct 2023 10:39:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHjkVjq8oZnh05Prw8i0aF39OlPnVPmFNjtO6TXzNl6UxyV80hGH62Lh8Nc0yfk4QqAnWBdUg==
+X-Received: by 2002:a05:600c:4748:b0:409:325:e499 with SMTP id w8-20020a05600c474800b004090325e499mr8333053wmo.32.1698687568216;
+        Mon, 30 Oct 2023 10:39:28 -0700 (PDT)
 Received: from [192.168.1.174] ([151.81.68.207])
-        by smtp.googlemail.com with ESMTPSA id p14-20020a5d68ce000000b003253523d767sm8703507wrw.109.2023.10.30.10.36.08
+        by smtp.googlemail.com with ESMTPSA id c18-20020a05600c0a5200b0040770ec2c19sm13195773wmq.10.2023.10.30.10.39.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Oct 2023 10:36:10 -0700 (PDT)
-Message-ID: <a56e499f-c91c-45da-b404-444c22b2df24@redhat.com>
-Date: Mon, 30 Oct 2023 18:36:07 +0100
+        Mon, 30 Oct 2023 10:39:27 -0700 (PDT)
+Message-ID: <80471c15-a37e-4129-8101-d30b8f73cb9f@redhat.com>
+Date: Mon, 30 Oct 2023 18:39:25 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,8 +57,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 23/35] KVM: x86: Add support for "protected VMs" that
- can utilize private memory
+Subject: Re: [PATCH v13 00/35] KVM: guest_memfd() and per-page attributes
 To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
  Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
  Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
@@ -88,7 +87,6 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  Isaku Yamahata <isaku.yamahata@gmail.com>,
  "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-24-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Autocrypt: addr=pbonzini@redhat.com; keydata=
  xsEhBFRCcBIBDqDGsz4K0zZun3jh+U6Z9wNGLKQ0kSFyjN38gMqU1SfP+TUNQepFHb/Gc0E2
@@ -125,43 +123,48 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20231027182217.3615211-24-seanjc@google.com>
+In-Reply-To: <20231027182217.3615211-1-seanjc@google.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/27/23 20:22, Sean Christopherson wrote:
-> Add a new x86 VM type, KVM_X86_SW_PROTECTED_VM, to serve as a development
-> and testing vehicle for Confidential (CoCo) VMs, and potentially to even
-> become a "real" product in the distant future, e.g. a la pKVM.
+On 10/27/23 20:21, Sean Christopherson wrote:
+> Non-KVM people, please take a gander at two small-ish patches buried in the
+> middle of this series:
 > 
-> The private memory support in KVM x86 is aimed at AMD's SEV-SNP and
-> Intel's TDX, but those technologies are extremely complex (understatement),
-> difficult to debug, don't support running as nested guests, and require
-> hardware that's isn't universally accessible.  I.e. relying SEV-SNP or TDX
-> for maintaining guest private memory isn't a realistic option.
+>    fs: Export anon_inode_getfile_secure() for use by KVM
+>    mm: Add AS_UNMOVABLE to mark mapping as completely unmovable
 > 
-> At the very least, KVM_X86_SW_PROTECTED_VM will enable a variety of
-> selftests for guest_memfd and private memory support without requiring
-> unique hardware.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Our plan/hope is to take this through the KVM tree for 6.8, reviews (and acks!)
+> would be much appreciated.  Note, adding AS_UNMOVABLE isn't strictly required as
+> it's "just" an optimization, but we'd prefer to have it in place straightaway.
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reporting what I wrote in the other thread, for wider distribution:
 
-with one nit:
+I'm going to wait a couple days more for reviews to come in, post a v14
+myself, and apply the series to kvm/next as soon as Linus merges the 6.7
+changes.  The series will be based on the 6.7 tags/for-linus, and when
+6.7-rc1 comes up, I'll do this to straighten the history:
 
-> +---------------------
-> +
-> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> +:Architectures: x86
-> +:Type: system ioctl
-> +
-> +This capability returns a bitmap of support VM types.  The 1-setting of bit @n
+	git checkout kvm/next
+	git tag -s -f kvm-gmem HEAD
+	git reset --hard v6.7-rc1
+	git merge tags/kvm-gmem
+	# fix conflict with Christian Brauner's VFS series
+	git commit
+	git push kvm
 
-s/support/supported/
+6.8 is not going to be out for four months, and I'm pretty sure that
+anything that would be discovered within "a few weeks" can also be
+applied on top, and the heaviness of a 35-patch series will outweigh any
+imperfections by a long margin.
+
+(Full disclosure: this is _also_ because I want to apply this series to
+the RHEL kernel, and Red Hat has a high level of disdain for
+non-upstream patches.  But it's mostly because I want all dependencies
+to be able to move on and be developed on top of stock kvm/next).
 
 Paolo
 
