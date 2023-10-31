@@ -1,234 +1,126 @@
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D811FA4
-	for <kvmarm@lists.linux.dev>; Tue, 31 Oct 2023 19:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mwa.re
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mwa.re
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975A923769
+	for <kvmarm@lists.linux.dev>; Tue, 31 Oct 2023 21:18:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mwa.re header.i=@mwa.re header.b="l9FnxO94"
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-507a98517f3so8445986e87.0
-        for <kvmarm@lists.linux.dev>; Tue, 31 Oct 2023 12:21:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mwa.re; s=google; t=1698780087; x=1699384887; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=YQGtdtuvuIXq+hDVNEiOx2zG9p14csqbveXC6JidYr4=;
-        b=l9FnxO94s42xDTQJ/AfzzjU7ObZ409a938ZH7zv/L3pQEbq4jAhKHA/5R1usj9RuBd
-         PM91WqLB1eegC8S5Gd0eoPTt3R1sO4heOcgrEIl3fg2n/4SKc2DMfGUsapIl5mLlBs9X
-         kRMd8y+QOcE7EUyaESZVY92IyAi0ymQBLSOlL5YGVOGNcKwzeIq2o348KjQcoEaUv0U+
-         tscHBnXfEEBqFGrrNMVatyPODJSqIa5hcWwFNN6Zox6tZguOz4t5tEUioJPaYQOooG4x
-         VB0hrU+kg4elPGmRjdaNmqZuxZIGA0AzZaxf46Q0Wo9k2NmnmPXcgH61URb41faUOg8y
-         lOJg==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UKETZ8SA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698787111;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=2Rrjdi9DTty7aAk4woYQrRI31UDKjKoJPhnl+IoVTnI=;
+	b=UKETZ8SAxfFgXGY1X+B4p+dBjowPx8p860pUP41f1L+/XcbKpQWCJCjxlVji/8cYBzzrpu
+	Tb0CHDlJJf9e6JjFXkBQro0yBqBlI8dUsrS/8t3Jb7NGYEPvBkwzS98UwxyB6NicBgrLEP
+	Pmm4ThhBf8mPwQrH25/HNzezL4VVgfk=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-618-52XC2a-fNLG1JF52R38Qfw-1; Tue, 31 Oct 2023 17:18:20 -0400
+X-MC-Unique: 52XC2a-fNLG1JF52R38Qfw-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9d2606301eeso26396766b.0
+        for <kvmarm@lists.linux.dev>; Tue, 31 Oct 2023 14:18:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698780087; x=1699384887;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YQGtdtuvuIXq+hDVNEiOx2zG9p14csqbveXC6JidYr4=;
-        b=GMIAVQMLJ9sTpmweXEh8LSbNI4BUPHVVaZNovaiUHgmNwMcly4nvRWonHefRg2wDP4
-         w+wPM28SE6+oxadn9IAKod6TbBjnWLAZlLhmJ2u0nKwCtd8E1AHdOVqvFJLqdDFKQ9C1
-         Vm6rq6L5TVWixVj+n7cbL+g4T1w6x51yw6+bbBmAqPuckaZFADCVFkgKLn5p52AK3mVv
-         EZRdkYeOcmaKt/qU6TaR46wcyhz6EcqgV0nyvU12o/fprlwIzVrKcFDC1CAPCsLqClga
-         xUmFBXbG9onSTWXKG6kc+QedPuSMD+72IPT1rSQMDJVc089Al88UtlX5734D2RLhoD52
-         1fpA==
-X-Gm-Message-State: AOJu0YzPkxy2oui3QmoikwtkBJx8gmatQ1ZyKY8gezpRYyeMggQXZa1X
-	jIy8JYM3MqbMyrIshjbmEQOQWl15d/9RwObJnOgD2w==
-X-Google-Smtp-Source: AGHT+IGCH+klPMXc0w7VjcJBbqCwfyUeMTquMRG1n2bPoHM32RvfavLaz27FPzaBQ0GevoywwKxIv6oHiN/kfrx3Xhw=
-X-Received: by 2002:ac2:5ec3:0:b0:507:a16d:6699 with SMTP id
- d3-20020ac25ec3000000b00507a16d6699mr8954646lfq.13.1698780087341; Tue, 31 Oct
- 2023 12:21:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698787099; x=1699391899;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Rrjdi9DTty7aAk4woYQrRI31UDKjKoJPhnl+IoVTnI=;
+        b=OpReQEFp9Iagh3lZ8tZie5aJVuK1oFah4ssLRBXahbyySszjrgPGHDkVx0F8OmNGP8
+         GyjxIG8u5/xNdj/Ir6490w0/08SaNufxIv/1IBseGzHfPLTA1bSfE8cJQF3Zeuc0ftYX
+         y/7Zkv8fJDK9EsqUcZGPioJjG5PHaqTyKM9wOxKRGUl68tYNYrGHeLmqYYjCxw+1y+ec
+         ocRQaYg8uUhVf5+YGvNwnCREItpG9rjBTCyVCPML1d7PShTmysOGz9q0JwClZZTcwF5p
+         LaBcHynH/N8ubaPy6/QKW42gyBAeTQvkkKWl73OZkHLgtscM+DMjWDmCg1UTZmTBH2Y0
+         iGyw==
+X-Gm-Message-State: AOJu0YxpKIhmlvcvk3R2SmR3xkh7MKvqk7c2FoQJv/M2bzWdSZl+Bksr
+	00rHbUI0lp8j3VgHsB+1dPewDmdpzJaFxYXEhZSWZYzd2xYE5hNSHMtUuUebO8d6lQeYKuOenJz
+	g88Jvvc7eg6krcKTl
+X-Received: by 2002:a17:907:868d:b0:9b2:b15b:383d with SMTP id qa13-20020a170907868d00b009b2b15b383dmr513045ejc.11.1698787098961;
+        Tue, 31 Oct 2023 14:18:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFsIBOS6Ncn77FdPc/mtn7hXXc00pVJn3s0QpuyI9x/XC9nBdICVrabRywoSQShJQZnZZQnHA==
+X-Received: by 2002:a17:907:868d:b0:9b2:b15b:383d with SMTP id qa13-20020a170907868d00b009b2b15b383dmr513029ejc.11.1698787098616;
+        Tue, 31 Oct 2023 14:18:18 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id s25-20020a170906bc5900b009b9977867fbsm1525241ejv.109.2023.10.31.14.18.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 31 Oct 2023 14:18:18 -0700 (PDT)
+Message-ID: <03ff2765-2785-4590-8b92-19fdcf67d71e@redhat.com>
+Date: Tue, 31 Oct 2023 22:18:16 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <CANi1PHhzk80HvwQbBM46gpJ6_AA_P6+m5Jo0Nuy_MAdA4C2BhQ@mail.gmail.com>
- <87ttql5aq7.wl-maz@kernel.org> <CANi1PHieGooO0DK=6BPwq0UknHzsn9QM3rFQkh3HLMfWxDseUQ@mail.gmail.com>
- <86cyx250w9.wl-maz@kernel.org> <CANi1PHjAwLWAq9EW7r5Yh_xbvPiJMsq8342JwAGafz1d1NUhSA@mail.gmail.com>
- <86msw01e4m.wl-maz@kernel.org>
-In-Reply-To: <86msw01e4m.wl-maz@kernel.org>
-From: Jan Henrik Weinstock <jan@mwa.re>
-Date: Tue, 31 Oct 2023 20:21:16 +0100
-Message-ID: <CANi1PHiXFKz6VqBys=Xw=rgR_gJKPO661iW-TMrF20j5yS4unQ@mail.gmail.com>
-Subject: Re: KVM exit to userspace on WFI
-To: Marc Zyngier <maz@kernel.org>
-Cc: oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, =?UTF-8?Q?Lukas_J=C3=BCnger?= <lukas@mwa.re>
-Content-Type: multipart/mixed; boundary="000000000000a885060609080f6e"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] KVM/arm64 updates for 6.7
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Marc Zyngier
+ <maz@kernel.org>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Jing Zhang <jingzhangos@google.com>,
+ Raghavendra Rao Ananta <rananta@google.com>,
+ Vincent Donnefort <vdonnefort@google.com>,
+ Kristina Martsenko <kristina.martsenko@arm.com>,
+ Miguel Luis <miguel.luis@oracle.com>
+References: <ZUFL9AUV36xHGaBE@thinky-boi>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <ZUFL9AUV36xHGaBE@thinky-boi>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---000000000000a885060609080f6e
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 10/31/23 19:48, Oliver Upton wrote:
+> Hi Paolo, Here's the pile of KVM/arm64 changes for 6.7. Almost all of 
+> these changes have been baking in -next for a while, although I did need 
+> to rebase to back out a broken change last minute. I'm only aware of a 
+> single (trivial) conflict with the arm64 tree resulting from a moved 
+> cpucap check, resolution below. Please pull.
 
-Am Mo., 30. Okt. 2023 um 13:36 Uhr schrieb Marc Zyngier <maz@kernel.org>:
->
-> [please make an effort not to top-post]
->
-> On Fri, 27 Oct 2023 18:41:44 +0100,
-> Jan Henrik Weinstock <jan@mwa.re> wrote:
-> >
-> > Hi Marc,
-> >
-> > the basic idea behind this is to have a (single-threaded) execution loo=
-p,
-> > something like this:
-> >
-> > vcpu-thread:    vcpu-run | process-io-devices | vcpu-run | process-io..=
-.
-> >                          ^
-> >                   WFX or timeout
-> >
-> > We switch to simulating IO devices whenever the vcpu is idle (wfi) or e=
-xceeds
-> > a certain budget of instructions (counted via pmu). Our fallback curren=
-tly is
-> > to kick the vcpu out of its execution using a signal (via a timeout/ala=
-rm). But
-> > of course, if the cpu is stuck at a wfi, we are wasting a lot of time.
-> >
-> > I understand that the proposed behavior is not desirable for most use c=
-ases,
-> > which is why I suggest locking it behind a flag, e.g.
-> > KVM_ARCH_FLAG_WFX_EXIT_TO_USER.
->
-> But how do you reconcile the fact that exposing this to userspace
-> breaks fundamental expectations that the guest has, such as getting
-> its timer interrupts and directly injected LPIs? Implementing WFI in
-> userspace breaks it. What about the case where we don't trap WFx and
-> let the *guest* wait for an interrupt?
+Pulled, thanks.
 
-Timer interrupts etc. will be injected into the vcpu during the
-io-phases. When there are no interrupts present and the guest performs
-a WFI, we can just skip forward to the next timer event.
+Paolo
 
-> Honestly, what you are describing seems to be a use model that doesn't
-> fit KVM, which is a general purpose hypervisor, but more a simulation
-> environment. Yes, the primitives are the same, but the plumbing is
-> wildly different.
-
-Agreed.
-
-> *If* that's the stuff you're looking at, then I'm afraid you'll have
-> to do it in different way, because what you are suggesting is
-> fundamentally incompatible with the guarantees that KVM gives to guest
-> and userspace. Because your KVM_ARCH_FLAG_WFX_EXIT_TO_USER is really a
-> lie. It should really be named something more along the lines of
-> KVM_ARCH_FLAG_WFX_EXIT_TO_USER_SOMETIME_AND_I_DONT_EVEN_KNOW_WHEN
-> (probably with additional clauses related to breaking things).
-
-I have attached a reworked version of the patch as a reference (based
-on my 5.15 kernel). It puts the modified behavior behind a new
-capability so as to not interfere with the current expectations
-towards handling WFI/WFE.
-I think it should now trap all blocking calls to WFx on the vcpu and
-reliably return to the userspace. If I have missed something that
-would cause the vcpu to not trap on a WFI kindly let me know.
-
-> Overall, you are still asking for something that is not guaranteed at
-> the architecture level, even less in KVM, and I'm not going to add
-> support for something that can only work "sometime".
-
-I am not quite sure what you mean with "sometime". Are you referring
-to WFIs as NOPs? Or WFIs that do not yield because of pending
-interrupts?
-
-The point of my patch is not to accurately count every single WFI. The
-point is to prevent the host cpu from sleeping just because my vcpu
-executed a WFI somewhere in the guest software. If a WFI is executed
-by the guest and that does not result in my vcpu thread to block (in
-other words: the vcpu continues executing instructions beyond the WFI)
-then it also should not exit to userspace. So instead of
-"KVM_ARCH_FLAG_WFX_EXIT_TO_USER_SOMETIME_AND_I_DONT_EVEN_KNOW_WHEN" it
-is really "KVM_ARCH_FLAG_WFX_EXIT_TO_USER_WHENEVER_YOU_WOULD_OTHERWISE_YIEL=
-D_AND_I_CANNOT_GET_MY_THREAD_BACK".
-
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
-
-
-
---=20
-Dr.-Ing. Jan Henrik Weinstock
-Managing Director
-
-MachineWare GmbH | www.machineware.de
-H=C3=BChnermarkt 19, 52062 Aachen, Germany
-Amtsgericht Aachen HRB25734
-
-Gesch=C3=A4ftsf=C3=BChrung
-Lukas J=C3=BCnger
-Dr.-Ing. Jan Henrik Weinstock
-
---000000000000a885060609080f6e
-Content-Type: text/x-patch; charset="US-ASCII"; name="kvm.patch"
-Content-Disposition: attachment; filename="kvm.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_loeokjga0>
-X-Attachment-Id: f_loeokjga0
-
-ZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCBiL2FyY2gvYXJt
-NjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAppbmRleCBmYzZlZTZjNTkuLmMzMTA3NTA2YiAxMDA2
-NDQKLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCisrKyBiL2FyY2gvYXJt
-NjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaApAQCAtMTM2LDYgKzEzNiw5IEBAIHN0cnVjdCBrdm1f
-YXJjaCB7CiAKIAkvKiBNZW1vcnkgVGFnZ2luZyBFeHRlbnNpb24gZW5hYmxlZCBmb3IgdGhlIGd1
-ZXN0ICovCiAJYm9vbCBtdGVfZW5hYmxlZDsKKworCS8qIEV4aXQgb24gV0ZJL1dGRSAqLworCWJv
-b2wgZXhpdF9vbl93Zng7CiB9OwogCiBzdHJ1Y3Qga3ZtX3ZjcHVfZmF1bHRfaW5mbyB7CmRpZmYg
-LS1naXQgYS9hcmNoL2FybTY0L2t2bS9hcm0uYyBiL2FyY2gvYXJtNjQva3ZtL2FybS5jCmluZGV4
-IGYxODE1MjdmOS4uNmQ1NGRmYmFlIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2t2bS9hcm0uYwor
-KysgYi9hcmNoL2FybTY0L2t2bS9hcm0uYwpAQCAtMTAxLDYgKzEwMSwxMCBAQCBpbnQga3ZtX3Zt
-X2lvY3RsX2VuYWJsZV9jYXAoc3RydWN0IGt2bSAqa3ZtLAogCQl9CiAJCW11dGV4X3VubG9jaygm
-a3ZtLT5sb2NrKTsKIAkJYnJlYWs7CisJY2FzZSBLVk1fQ0FQX0VYSVRfT05fV0ZYOgorCQlyID0g
-MDsKKwkJa3ZtLT5hcmNoLmV4aXRfb25fd2Z4ID0gdHJ1ZTsKKwkJYnJlYWs7CiAJZGVmYXVsdDoK
-IAkJciA9IC1FSU5WQUw7CiAJCWJyZWFrOwpAQCAtMjE1LDYgKzIxOSw3IEBAIGludCBrdm1fdm1f
-aW9jdGxfY2hlY2tfZXh0ZW5zaW9uKHN0cnVjdCBrdm0gKmt2bSwgbG9uZyBleHQpCiAJY2FzZSBL
-Vk1fQ0FQX1NFVF9HVUVTVF9ERUJVRzoKIAljYXNlIEtWTV9DQVBfVkNQVV9BVFRSSUJVVEVTOgog
-CWNhc2UgS1ZNX0NBUF9QVFBfS1ZNOgorCWNhc2UgS1ZNX0NBUF9FWElUX09OX1dGWDoKIAkJciA9
-IDE7CiAJCWJyZWFrOwogCWNhc2UgS1ZNX0NBUF9TRVRfR1VFU1RfREVCVUcyOgpAQCAtMzk0LDgg
-KzM5OSwxMCBAQCB2b2lkIGt2bV9hcmNoX3ZjcHVfbG9hZChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUs
-IGludCBjcHUpCiB7CiAJc3RydWN0IGt2bV9zMl9tbXUgKm1tdTsKIAlpbnQgKmxhc3RfcmFuOwor
-CWJvb2wgZXhpdF9vbl93Zng7CiAKIAltbXUgPSB2Y3B1LT5hcmNoLmh3X21tdTsKKwlleGl0X29u
-X3dmeCA9IHZjcHUtPmt2bS0+YXJjaC5leGl0X29uX3dmeDsKIAlsYXN0X3JhbiA9IHRoaXNfY3B1
-X3B0cihtbXUtPmxhc3RfdmNwdV9yYW4pOwogCiAJLyoKQEAgLTQyMyw3ICs0MzAsNyBAQCB2b2lk
-IGt2bV9hcmNoX3ZjcHVfbG9hZChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGludCBjcHUpCiAJaWYg
-KGt2bV9hcm1faXNfcHZ0aW1lX2VuYWJsZWQoJnZjcHUtPmFyY2gpKQogCQlrdm1fbWFrZV9yZXF1
-ZXN0KEtWTV9SRVFfUkVDT1JEX1NURUFMLCB2Y3B1KTsKIAotCWlmIChzaW5nbGVfdGFza19ydW5u
-aW5nKCkpCisJaWYgKHNpbmdsZV90YXNrX3J1bm5pbmcoKSAmJiAhZXhpdF9vbl93ZngpCiAJCXZj
-cHVfY2xlYXJfd2Z4X3RyYXBzKHZjcHUpOwogCWVsc2UKIAkJdmNwdV9zZXRfd2Z4X3RyYXBzKHZj
-cHUpOwpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vaGFuZGxlX2V4aXQuYyBiL2FyY2gvYXJt
-NjQva3ZtL2hhbmRsZV9leGl0LmMKaW5kZXggYTVhYjUyMTUwLi44MGZhNmJkZWYgMTAwNjQ0Ci0t
-LSBhL2FyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMKKysrIGIvYXJjaC9hcm02NC9rdm0vaGFu
-ZGxlX2V4aXQuYwpAQCAtOTEsMTAgKzkxLDIxIEBAIHN0YXRpYyBpbnQga3ZtX2hhbmRsZV93Zngo
-c3RydWN0IGt2bV92Y3B1ICp2Y3B1KQogCWlmIChrdm1fdmNwdV9nZXRfZXNyKHZjcHUpICYgRVNS
-X0VMeF9XRnhfSVNTX1dGRSkgewogCQl0cmFjZV9rdm1fd2Z4X2FybTY0KCp2Y3B1X3BjKHZjcHUp
-LCB0cnVlKTsKIAkJdmNwdS0+c3RhdC53ZmVfZXhpdF9zdGF0Kys7CisJCWlmICh2Y3B1LT5rdm0t
-PmFyY2guZXhpdF9vbl93ZngpIHsKKwkJCXZjcHUtPnJ1bi0+ZXhpdF9yZWFzb24gPSBLVk1fRVhJ
-VF9XRlg7CisJCQl2Y3B1LT5ydW4tPndmeC5lc3IgPSBrdm1fdmNwdV9nZXRfZXNyKHZjcHUpOwor
-CQkJcmV0dXJuIDA7CisJCX0KKwogCQlrdm1fdmNwdV9vbl9zcGluKHZjcHUsIHZjcHVfbW9kZV9w
-cml2KHZjcHUpKTsKIAl9IGVsc2UgewogCQl0cmFjZV9rdm1fd2Z4X2FybTY0KCp2Y3B1X3BjKHZj
-cHUpLCBmYWxzZSk7CiAJCXZjcHUtPnN0YXQud2ZpX2V4aXRfc3RhdCsrOworCQlpZiAodmNwdS0+
-a3ZtLT5hcmNoLmV4aXRfb25fd2Z4KSB7CisJCQl2Y3B1LT5ydW4tPmV4aXRfcmVhc29uID0gS1ZN
-X0VYSVRfV0ZYOworCQkJdmNwdS0+cnVuLT53ZnguZXNyID0ga3ZtX3ZjcHVfZ2V0X2Vzcih2Y3B1
-KTsKKwkJCXJldHVybiAwOworCQl9CiAJCWt2bV92Y3B1X2Jsb2NrKHZjcHUpOwogCQlrdm1fY2xl
-YXJfcmVxdWVzdChLVk1fUkVRX1VOSEFMVCwgdmNwdSk7CiAJfQpkaWZmIC0tZ2l0IGEvaW5jbHVk
-ZS91YXBpL2xpbnV4L2t2bS5oIGIvaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oCmluZGV4IDBkNDdl
-MDdmNC4uMTU1ZGM3ZWFiIDEwMDY0NAotLS0gYS9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgKKysr
-IGIvaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oCkBAIC0yNjksNiArMjY5LDcgQEAgc3RydWN0IGt2
-bV94ZW5fZXhpdCB7CiAjZGVmaW5lIEtWTV9FWElUX0FQX1JFU0VUX0hPTEQgICAgMzIKICNkZWZp
-bmUgS1ZNX0VYSVRfWDg2X0JVU19MT0NLICAgICAzMwogI2RlZmluZSBLVk1fRVhJVF9YRU4gICAg
-ICAgICAgICAgIDM0CisjZGVmaW5lIEtWTV9FWElUX1dGWCAgICAgICAgICAgICAgMzUKIAogLyog
-Rm9yIEtWTV9FWElUX0lOVEVSTkFMX0VSUk9SICovCiAvKiBFbXVsYXRlIGluc3RydWN0aW9uIGZh
-aWxlZC4gKi8KQEAgLTQ2OSw2ICs0NzAsMTEgQEAgc3RydWN0IGt2bV9ydW4gewogCQl9IG1zcjsK
-IAkJLyogS1ZNX0VYSVRfWEVOICovCiAJCXN0cnVjdCBrdm1feGVuX2V4aXQgeGVuOworCQkvKiBL
-Vk1fRVhJVF9XRlggKi8KKwkJc3RydWN0IHsKKwkJCV9fdTY0IGVzcjsKKwkJfSB3Zng7CisKIAkJ
-LyogRml4IHRoZSBzaXplIG9mIHRoZSB1bmlvbi4gKi8KIAkJY2hhciBwYWRkaW5nWzI1Nl07CiAJ
-fTsKQEAgLTExMjMsNiArMTEyOSw3IEBAIHN0cnVjdCBrdm1fcHBjX3Jlc2l6ZV9ocHQgewogI2Rl
-ZmluZSBLVk1fQ0FQX1hTQVZFMiAyMDgKICNkZWZpbmUgS1ZNX0NBUF9TWVNfQVRUUklCVVRFUyAy
-MDkKICNkZWZpbmUgS1ZNX0NBUF9TMzkwX01FTV9PUF9FWFRFTlNJT04gMjExCisjZGVmaW5lIEtW
-TV9DQVBfRVhJVF9PTl9XRlggMjIyCiAKICNpZmRlZiBLVk1fQ0FQX0lSUV9ST1VUSU5HCiAK
---000000000000a885060609080f6e--
