@@ -1,57 +1,58 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C41F45255
-	for <kvmarm@lists.linux.dev>; Tue, 31 Oct 2023 14:04:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BDD01DDE0
+	for <kvmarm@lists.linux.dev>; Tue, 31 Oct 2023 14:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="31K+uYgz"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d9a5a3f2d4fso5398421276.3
-        for <kvmarm@lists.linux.dev>; Tue, 31 Oct 2023 07:04:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KHAqLBeV"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5afacc566f3so49349337b3.3
+        for <kvmarm@lists.linux.dev>; Tue, 31 Oct 2023 07:10:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698761092; x=1699365892; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1698761410; x=1699366210; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZsemryN+7v+wOBolNu7Hy0wHrULeaB9eFsfVkGp1/e8=;
-        b=31K+uYgzWFUwPzlVj/IRIh8hr6yVn6WmPfZh+7hEMGoLOcvZeHFmQj0Bf27dgRQA+b
-         4d68BDW226VvIVbr/R6glrBBuoQwuddbSIMZT1XaDsxNAQt/6y/98YFcE+hPz2LG2fYk
-         NJsmGm+T3SPQqLgXhTcW+MxDuCNQfmhme3meTMyalhS95KzFiWVCrEuuLb60hExNm7X/
-         I/7RtZ9s4pQB/Nd6slVQUDIOJvWIMAy8SB6p+sDU0Z2kstplh30cy4BAGBie5fZpAfuO
-         98a075NHP5yTEAEoCXwvZQvfrOeT1UWCgk0OF0PnKHyTNzlr20CHG0swzWqMfAnnj0Em
-         ZHjA==
+        bh=qnQOjymnTrZBwkJL50GP/1+n+ilT5bo3LZ+viwIL69A=;
+        b=KHAqLBeVAASN8oL2ZWoSCs/Bu1P2JCtoGB3aXkT+eSrZPVgShMjIfyX0ce7OjlFDbx
+         9fEgZEdHs2hmp7xrdftDY0bPqfQrEd10Y2GVCP+VVivBw0KU2NKssUhzZzHIh6/ElKJi
+         B1NvYsHgy9YrUQt3SzB7MPTVs++Qhkbp/uIaqBIvTlBhRT3ff64JHWez4NvNeLwPvjLk
+         jCI5ODS2iZYONtxP03M1iQL1Fd6I/vgsjqTAiDNPHInWKelwI+vMBfbdXxTtas0JTgot
+         25r2MWN/Ol80SLgD6/FbBxJT+4z1Isw+G1/eJTM6BVJbk89EUGdgrVQ+zjy3tDksiHZ2
+         2CqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698761092; x=1699365892;
+        d=1e100.net; s=20230601; t=1698761410; x=1699366210;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZsemryN+7v+wOBolNu7Hy0wHrULeaB9eFsfVkGp1/e8=;
-        b=JDHWL3mnXycSkn2Nneg2BCASvIb96IrLU8PYeGmaO2gm5W2+CDTDdGSMNpS1rVDiAT
-         XmhGaNs3XgD7u+wt+bu7bLz5UslsACNyym+X+fI5jmqyojkOqGNJAyeyE+ymMbjcTN91
-         S88ekykUhTvEvatcSN9aWcet1MZ5Gz8qAeJ2GYn0fvYE4GuK7luP5oNRsHQlbrwEjCQn
-         KI+qs1l2DUhBoCC4QnzTQzZCKS9FSX79jZ75Lb7MiuHYJtIrHqXjfbvCaliqdQG5F+6J
-         NR3Ysw4T3HJdYNTYyjnkfB5xO+o3hJ4Zh29qoprA23TwZ90/44Le0l9mik16go6s+4QJ
-         T2+A==
-X-Gm-Message-State: AOJu0YxCPn1D/dfkVFaSN9C7qLnBv6DsQ47mq0OvdZgS1C80aB7DdPCY
-	7Behdw4zbBr3PqZE1jfISYjkr9Pb654=
-X-Google-Smtp-Source: AGHT+IGMRYf422gsAhq04hJnKRMCzmHg+RO6tAl4JuMhPFGeve1lxsPBrReypZbUvK9g95iFN5O303NMZlw=
+        bh=qnQOjymnTrZBwkJL50GP/1+n+ilT5bo3LZ+viwIL69A=;
+        b=WcqiyVYkqpo32aLhkcjB3y5GP8uIiy9RjHBd+l+R18PTfhvaWZbJBUW6ynsn+fZypn
+         LZXO5RXpIbnqtYaOduD8vSZiD1TUe6LIypiNNdtNr00fN1QWMeKG7F4ZGes6nI0AMn7+
+         qRxQQbVLzh/4qA2gWzvI+WLjUdidc+2/U5NR9hMxNm2+LnWC8+zXAyywoUcU6ZXxj/MZ
+         4HH1KkwxH+TOKBNuyK40qLrGT0n3x4Bk1ri4fAb2U/pKvZklzsx88sD5JcBrrd+o55fN
+         pz5Rfw8OfemHCSjZOd6fpU8C1EjWRGzXPEchzfVUfbb4sYreWe0J6vZF6yDZKIScIYrf
+         V1BQ==
+X-Gm-Message-State: AOJu0YzsOBR3bmZkb+pQ5udad0yGF/SUsiPAEgt0YLDddT1Rj7x9TSZ7
+	u5tnBHmGLHCSZ8UdZ9U68tD58deb66I=
+X-Google-Smtp-Source: AGHT+IHZDXQi7UJsz3IrNX3ZHQxUCVwQKR+0lKBMLeJ46WZVaPkGJ08yzTLT3JODvkoGCJ0IGZA0c9r9iJw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1083:b0:d9a:c3b8:4274 with SMTP id
- v3-20020a056902108300b00d9ac3b84274mr301710ybu.7.1698761092559; Tue, 31 Oct
- 2023 07:04:52 -0700 (PDT)
-Date: Tue, 31 Oct 2023 07:04:51 -0700
-In-Reply-To: <2edd908a-9699-4d8e-9063-c655f1fc9712@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a81:a14c:0:b0:59b:eea4:a5a6 with SMTP id
+ y73-20020a81a14c000000b0059beea4a5a6mr274540ywg.0.1698761410163; Tue, 31 Oct
+ 2023 07:10:10 -0700 (PDT)
+Date: Tue, 31 Oct 2023 07:10:08 -0700
+In-Reply-To: <ZUCe/PGL2Q4OzDOX@chao-email>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-9-seanjc@google.com>
- <2edd908a-9699-4d8e-9063-c655f1fc9712@intel.com>
-Message-ID: <ZUEJg_rBf35NyCG3@google.com>
-Subject: Re: [PATCH v13 08/35] KVM: Introduce KVM_SET_USER_MEMORY_REGION2
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-17-seanjc@google.com>
+ <ZUCe/PGL2Q4OzDOX@chao-email>
+Message-ID: <ZUEKwOQoibAEWAzU@google.com>
+Subject: Re: [PATCH v13 16/35] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
 From: Sean Christopherson <seanjc@google.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
+To: Chao Gao <chao.gao@intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
 	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
@@ -63,11 +64,11 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
 	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
 	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
 	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xu Yilun <yilun.xu@intel.com>, 
-	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Anish Moorthy <amoorthy@google.com>, David Matlack <dmatlack@google.com>, 
+	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
 	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
 	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
 	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
@@ -76,61 +77,55 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
 	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Oct 31, 2023, Xiaoyao Li wrote:
-> On 10/28/2023 2:21 AM, Sean Christopherson wrote:
-> > Introduce a "version 2" of KVM_SET_USER_MEMORY_REGION so that additional
-> > information can be supplied without setting userspace up to fail.  The
-> > padding in the new kvm_userspace_memory_region2 structure will be used to
-> > pass a file descriptor in addition to the userspace_addr, i.e. allow
-> > userspace to point at a file descriptor and map memory into a guest that
-> > is NOT mapped into host userspace.
-> > 
-> > Alternatively, KVM could simply add "struct kvm_userspace_memory_region2"
-> > without a new ioctl(), but as Paolo pointed out, adding a new ioctl()
-> > makes detection of bad flags a bit more robust, e.g. if the new fd field
-> > is guarded only by a flag and not a new ioctl(), then a userspace bug
-> > (setting a "bad" flag) would generate out-of-bounds access instead of an
-> > -EINVAL error.
-> > 
-> > Cc: Jarkko Sakkinen <jarkko@kernel.org>
-> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >   Documentation/virt/kvm/api.rst | 21 +++++++++++++++++++
-> >   arch/x86/kvm/x86.c             |  2 +-
-> >   include/linux/kvm_host.h       |  4 ++--
-> >   include/uapi/linux/kvm.h       | 13 ++++++++++++
-> >   virt/kvm/kvm_main.c            | 38 +++++++++++++++++++++++++++-------
-> >   5 files changed, 67 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index 21a7578142a1..ace984acc125 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -6070,6 +6070,27 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 registers using the SET_ONE_REG
-> >   interface. No error will be returned, but the resulting offset will not be
-> >   applied.
-> > +4.139 KVM_SET_USER_MEMORY_REGION2
-> > +---------------------------------
-> > +
-> > +:Capability: KVM_CAP_USER_MEMORY2
-> > +:Architectures: all
-> > +:Type: vm ioctl
-> > +:Parameters: struct kvm_userspace_memory_region2 (in)
-> > +:Returns: 0 on success, -1 on error
-> > +
-> > +::
-> > +
-> > +  struct kvm_userspace_memory_region2 {
-> > +	__u32 slot;
-> > +	__u32 flags;
-> > +	__u64 guest_phys_addr;
-> > +	__u64 memory_size; /* bytes */
-> > +	__u64 userspace_addr; /* start of the userspace allocated memory */
+On Tue, Oct 31, 2023, Chao Gao wrote:
+> >+int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
+> >+{
+> >+	loff_t size = args->size;
+> >+	u64 flags = args->flags;
+> >+	u64 valid_flags = 0;
+> >+
+> >+	if (flags & ~valid_flags)
+> >+		return -EINVAL;
+> >+
+> >+	if (size < 0 || !PAGE_ALIGNED(size))
+> >+		return -EINVAL;
 > 
-> missing
-> 
-> 	__u64 pad[16];
+> is size == 0 a valid case?
 
-I can't even copy+paste correctly :-(
+Nope, this is a bug.
+
+> >+	if (!xa_empty(&gmem->bindings) &&
+> >+	    xa_find(&gmem->bindings, &start, end - 1, XA_PRESENT)) {
+> >+		filemap_invalidate_unlock(inode->i_mapping);
+> >+		goto err;
+> >+	}
+> >+
+> >+	/*
+> >+	 * No synchronize_rcu() needed, any in-flight readers are guaranteed to
+> >+	 * be see either a NULL file or this new file, no need for them to go
+> >+	 * away.
+> >+	 */
+> >+	rcu_assign_pointer(slot->gmem.file, file);
+> >+	slot->gmem.pgoff = start;
+> >+
+> >+	xa_store_range(&gmem->bindings, start, end - 1, slot, GFP_KERNEL);
+> >+	filemap_invalidate_unlock(inode->i_mapping);
+> >+
+> >+	/*
+> >+	 * Drop the reference to the file, even on success.  The file pins KVM,
+> >+	 * not the other way 'round.  Active bindings are invalidated if the
+> >+	 * file is closed before memslots are destroyed.
+> >+	 */
+> >+	fput(file);
+> >+	return 0;
+> >+
+> >+err:
+> >+	fput(file);
+> >+	return -EINVAL;
+> 
+> The cleanup, i.e., filemap_invalidate_unlock() and fput(), is common. So, I think it
+> may be slightly better to consolidate the common part e.g.,
+
+I would prefer to keep this as-is.  Only goto needs the unlock, and I find it easier
+to understand the success vs. error paths with explicit returns.  But it's not a
+super strong preference.
