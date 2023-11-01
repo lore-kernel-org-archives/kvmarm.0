@@ -1,57 +1,59 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99AC3DDA4
-	for <kvmarm@lists.linux.dev>; Wed,  1 Nov 2023 12:55:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72AD101D7
+	for <kvmarm@lists.linux.dev>; Wed,  1 Nov 2023 13:41:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="35HkZGZ9"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-66d0760cd20so7293776d6.0
-        for <kvmarm@lists.linux.dev>; Wed, 01 Nov 2023 05:55:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1JC8HtH7"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5b02ed0f886so61967917b3.0
+        for <kvmarm@lists.linux.dev>; Wed, 01 Nov 2023 06:41:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698843313; x=1699448113; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Kcbm3pgdDavcIpgSUdmAtURkVA09XH/izRcxwAHeEyo=;
-        b=35HkZGZ94fFByyVwLSgKnJD6AZhwfqNdjRl2bE4FvKz1Dx/JXfC9VH8b1/oAirVAvk
-         pwOi4aCPBb4sxh1/Pn7WCElKKbgnaD1C8raDFHQJTxdUyFkuJj0lfo5Xm9nlc4CLkJux
-         i7Ym4HGyjejlcyKTDu4vJI3agoKZ19z/LHbNClM9lcsf4vr44fBXBhrfDCI245nmiQMn
-         3YQmR1VEuZD3gSPAC8bgBwK51sFCPbBR4+6gURIKznhAPLZC6oOf7cWuHNkI6MZGzJCp
-         XDHNNjnbS8KhbiGdJ0a9TOme3Rq2BzRpG2yHq2whiIcfoPazGWyFEhCwhH5QVhU+3FLx
-         z8Bg==
+        d=google.com; s=20230601; t=1698846106; x=1699450906; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nFf6aEaGwk5ej5JezQy0IgMN87WPAcTCXufwbiE3fug=;
+        b=1JC8HtH7blzgtlXiz0gAALeFlMpdjIq11K23Xc1QGXvxRbe7LW8gsIvi/ksYq0aX4t
+         iNTmPt1Xs4TSMCb4zl0A/m+vEiwIvS/QG2vlNiPM08/liuJlYE4cnl56lkN1k+YDBKHZ
+         ndNh0pb1Ebx5GAiH0uEfNHrlrZSKLMN5yDLnUlijkpK5/5d9MzqPCvvSbSjpY7HoEoCs
+         Y/aCpb/Qxc6XRGbosup7f/CI5CmBnM3OpO0q571863w3JkLUeftqLYhYajWgHK1uGqGY
+         ylxkL88yCprcPYHvmJ2PAgntEwBzUc7qD4AA8RIG5+s+uJWHAI0Hfx7TK6aaI/l8A73F
+         O0YQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698843313; x=1699448113;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Kcbm3pgdDavcIpgSUdmAtURkVA09XH/izRcxwAHeEyo=;
-        b=rLFHa5YSkuJcYSyH9myEG/EhedWiqruVcFIBJOw2X++KcLChXPytaf9zSGD4hOATB3
-         9umZANJqSmkl6U7oM58DVDKwYcNtytyDyfn2zORpKgDmfdTgs+sD3C1uwaau/tteETtl
-         VHCmzO5wYuTsmeL5cw0EK0CXlmVwvhJs8Gmh/eQzR7g3Q7h7VTN7Jn2+9e+wE2MkgAfa
-         V29isfWIr5u7ZWPVPifPLkWRp0IkNWV0l3HL7dnzx6AY/7d0KOY2RgxOUTBG9Zo5dQk6
-         z8+WcLuerzo4ls5w9W/QtUjv0WGYZ4sWaWO+e3zBiMg6XYo5xZz2ykgOOrQ1evEamoUp
-         z8qQ==
-X-Gm-Message-State: AOJu0YwQ8R8lhAzg8xs1TscZZ9wuFUBWLWaxxefg3j6O0wglzKWYwyyD
-	dyRsI+UrWswlLZ6SiZz0TlrCz5ZEeI/1XbYH0SjbBw==
-X-Google-Smtp-Source: AGHT+IF/ktOWLkTr0vIBJTyx2IkHtp7uKWr0KOEDhG6yK9eOP39Rcd526AUvWlkdMjeNqRjSvUGFcj7XE4fSnIPoLYY=
-X-Received: by 2002:a05:6214:f0b:b0:66d:5cfe:82a6 with SMTP id
- gw11-20020a0562140f0b00b0066d5cfe82a6mr9652104qvb.27.1698843313194; Wed, 01
- Nov 2023 05:55:13 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698846106; x=1699450906;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nFf6aEaGwk5ej5JezQy0IgMN87WPAcTCXufwbiE3fug=;
+        b=Rp+xRkojwOPEKuH2ZvVJHp7Y/Dec+02pxgMM/sdP7HprblcIiC75naOA1e0thnfaTN
+         vIhNfbaMT1Jpnh0kqnEhlu3AdYvbcu6fVvj54XJjpjTtQrlaYfXYucwGX6GQDt1BP2ME
+         dyaUzMwTaFYypzOPUTiKQ8vmTcLsnb3Q14w7kFQIcHKP0EKAdZvkH4o1oZjhFwcqUeMj
+         hlCKoPUDkLFyKS6umzFr0qpKiTwzf3tfx4QCJWxzScIcNnFfzvARf0qX7pv1IewX2/2v
+         06sxcyKLxlq7nXZM5EsREW3KvVWt9H28rHX25y1pyQxLynF0ySTKb47D8G0x0w5plNOe
+         vbVA==
+X-Gm-Message-State: AOJu0YyYwDNMs/3c0JX2ylfqqK8bKMmrlSdRecspEuX7+M9PJpAk56Bd
+	u6qy7EY3/xOH/khrp1vM1nx9RjsrTEc=
+X-Google-Smtp-Source: AGHT+IEsRM1yQnQClQeVqyoNLxT9cYgRny7PWezkHcY0wXTm/cdeLyJgnrb+5OZENHYJQKvQlFBt8yx8E+I=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a0d:e689:0:b0:5a7:bfcf:2cb8 with SMTP id
+ p131-20020a0de689000000b005a7bfcf2cb8mr314827ywe.1.1698846106686; Wed, 01 Nov
+ 2023 06:41:46 -0700 (PDT)
+Date: Wed, 1 Nov 2023 06:41:45 -0700
+In-Reply-To: <92ba7ddd-2bc8-4a8d-bd67-d6614b21914f@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-8-seanjc@google.com>
-In-Reply-To: <20231027182217.3615211-8-seanjc@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 1 Nov 2023 12:54:37 +0000
-Message-ID: <CA+EHjTxKyGMzNDE+eWGgSAktwj7VpU=kAOHuBMLf-mMFMuL8+A@mail.gmail.com>
-Subject: Re: [PATCH v13 07/35] KVM: Convert KVM_ARCH_WANT_MMU_NOTIFIER to CONFIG_KVM_GENERIC_MMU_NOTIFIER
-To: Sean Christopherson <seanjc@google.com>
+Mime-Version: 1.0
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-18-seanjc@google.com>
+ <7c0844d8-6f97-4904-a140-abeabeb552c1@intel.com> <ZUEML6oJXDCFJ9fg@google.com>
+ <92ba7ddd-2bc8-4a8d-bd67-d6614b21914f@intel.com>
+Message-ID: <ZUJVfCkIYYFp5VwG@google.com>
+Subject: Re: [PATCH v13 17/35] KVM: Add transparent hugepage support for
+ dedicated guest memory
+From: Sean Christopherson <seanjc@google.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
 	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
@@ -63,359 +65,85 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
 	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
 	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
 	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	linux-kernel@vger.kernel.org, Xu Yilun <yilun.xu@intel.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
 	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
 	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
+	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
 	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
 	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Oct 27, 2023 at 7:22=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
+On Wed, Nov 01, 2023, Xiaoyao Li wrote:
+> On 10/31/2023 10:16 PM, Sean Christopherson wrote:
+> > On Tue, Oct 31, 2023, Xiaoyao Li wrote:
+> > > On 10/28/2023 2:21 AM, Sean Christopherson wrote:
+> > > > Extended guest_memfd to allow backing guest memory with transparent
+> > > > hugepages. Require userspace to opt-in via a flag even though there's no
+> > > > known/anticipated use case for forcing small pages as THP is optional,
+> > > > i.e. to avoid ending up in a situation where userspace is unaware that
+> > > > KVM can't provide hugepages.
+> > > 
+> > > Personally, it seems not so "transparent" if requiring userspace to opt-in.
+> > > 
+> > > People need to 1) check if the kernel built with TRANSPARENT_HUGEPAGE
+> > > support, or check is the sysfs of transparent hugepage exists; 2)get the
+> > > maximum support hugepage size 3) ensure the size satisfies the alignment;
+> > > before opt-in it.
+> > > 
+> > > Even simpler, userspace can blindly try to create guest memfd with
+> > > transparent hugapage flag. If getting error, fallback to create without the
+> > > transparent hugepage flag.
+> > > 
+> > > However, it doesn't look transparent to me.
+> > 
+> > The "transparent" part is referring to the underlying kernel mechanism, it's not
+> > saying anything about the API.  The "transparent" part of THP is that the kernel
+> > doesn't guarantee hugepages, i.e. whether or not hugepages are actually used is
+> > (mostly) transparent to userspace.
+> > 
+> > Paolo also isn't the biggest fan[*], but there are also downsides to always
+> > allowing hugepages, e.g. silent failure due to lack of THP or unaligned size,
+> > and there's precedent in the form of MADV_HUGEPAGE.
+> > 
+> > [*] https://lore.kernel.org/all/84a908ae-04c7-51c7-c9a8-119e1933a189@redhat.com
+> 
+> But it's different than MADV_HUGEPAGE, in a way. Per my understanding, the
+> failure of MADV_HUGEPAGE is not fatal, user space can ignore it and
+> continue.
 >
-> Convert KVM_ARCH_WANT_MMU_NOTIFIER into a Kconfig and select it where
-> appropriate to effectively maintain existing behavior.  Using a proper
-> Kconfig will simplify building more functionality on top of KVM's
-> mmu_notifier infrastructure.
->
-> Add a forward declaration of kvm_gfn_range to kvm_types.h so that
-> including arch/powerpc/include/asm/kvm_ppc.h's with CONFIG_KVM=3Dn doesn'=
-t
-> generate warnings due to kvm_gfn_range being undeclared.  PPC defines
-> hooks for PR vs. HV without guarding them via #ifdeffery, e.g.
->
->   bool (*unmap_gfn_range)(struct kvm *kvm, struct kvm_gfn_range *range);
->   bool (*age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
->   bool (*test_age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
->   bool (*set_spte_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
->
-> Alternatively, PPC could forward declare kvm_gfn_range, but there's no
-> good reason not to define it in common KVM.
->
-> Acked-by: Anup Patel <anup@brainfault.org>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
+> However, the failure of KVM_GUEST_MEMFD_ALLOW_HUGEPAGE is fatal, which leads
+> to failure of guest memfd creation.
 
-Reviewed-by: Fuad Tabba <tabba@google.com>
-Tested-by: Fuad Tabba <tabba@google.com>
-(Tested x86 and arm64 on qemu)
+Failing KVM_CREATE_GUEST_MEMFD isn't truly fatal, it just requires different
+action from userspace, i.e. instead of ignoring the error, userspace could redo
+KVM_CREATE_GUEST_MEMFD with KVM_GUEST_MEMFD_ALLOW_HUGEPAGE=0.
 
-Cheers,
-/fuad
+We could make the behavior more like MADV_HUGEPAGE, e.g. theoretically we could
+extend fadvise() with FADV_HUGEPAGE, or add a guest_memfd knob/ioctl() to let
+userspace provide advice/hints after creating a guest_memfd.  But I suspect that
+guest_memfd would be the only user of FADV_HUGEPAGE, and IMO a post-creation hint
+is actually less desirable.
 
->  arch/arm64/include/asm/kvm_host.h   |  2 --
->  arch/arm64/kvm/Kconfig              |  2 +-
->  arch/mips/include/asm/kvm_host.h    |  2 --
->  arch/mips/kvm/Kconfig               |  2 +-
->  arch/powerpc/include/asm/kvm_host.h |  2 --
->  arch/powerpc/kvm/Kconfig            |  8 ++++----
->  arch/powerpc/kvm/powerpc.c          |  4 +---
->  arch/riscv/include/asm/kvm_host.h   |  2 --
->  arch/riscv/kvm/Kconfig              |  2 +-
->  arch/x86/include/asm/kvm_host.h     |  2 --
->  arch/x86/kvm/Kconfig                |  2 +-
->  include/linux/kvm_host.h            |  6 +++---
->  include/linux/kvm_types.h           |  1 +
->  virt/kvm/Kconfig                    |  4 ++++
->  virt/kvm/kvm_main.c                 | 10 +++++-----
->  15 files changed, 22 insertions(+), 29 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/k=
-vm_host.h
-> index af06ccb7ee34..9e046b64847a 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -921,8 +921,6 @@ int __kvm_arm_vcpu_get_events(struct kvm_vcpu *vcpu,
->  int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
->                               struct kvm_vcpu_events *events);
->
-> -#define KVM_ARCH_WANT_MMU_NOTIFIER
-> -
->  void kvm_arm_halt_guest(struct kvm *kvm);
->  void kvm_arm_resume_guest(struct kvm *kvm);
->
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 83c1e09be42e..1a777715199f 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -22,7 +22,7 @@ menuconfig KVM
->         bool "Kernel-based Virtual Machine (KVM) support"
->         depends on HAVE_KVM
->         select KVM_GENERIC_HARDWARE_ENABLING
-> -       select MMU_NOTIFIER
-> +       select KVM_GENERIC_MMU_NOTIFIER
->         select PREEMPT_NOTIFIERS
->         select HAVE_KVM_CPU_RELAX_INTERCEPT
->         select KVM_MMIO
-> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm=
-_host.h
-> index 54a85f1d4f2c..179f320cc231 100644
-> --- a/arch/mips/include/asm/kvm_host.h
-> +++ b/arch/mips/include/asm/kvm_host.h
-> @@ -810,8 +810,6 @@ int kvm_mips_mkclean_gpa_pt(struct kvm *kvm, gfn_t st=
-art_gfn, gfn_t end_gfn);
->  pgd_t *kvm_pgd_alloc(void);
->  void kvm_mmu_free_memory_caches(struct kvm_vcpu *vcpu);
->
-> -#define KVM_ARCH_WANT_MMU_NOTIFIER
-> -
->  /* Emulation */
->  enum emulation_result update_pc(struct kvm_vcpu *vcpu, u32 cause);
->  int kvm_get_badinstr(u32 *opc, struct kvm_vcpu *vcpu, u32 *out);
-> diff --git a/arch/mips/kvm/Kconfig b/arch/mips/kvm/Kconfig
-> index a8cdba75f98d..c04987d2ed2e 100644
-> --- a/arch/mips/kvm/Kconfig
-> +++ b/arch/mips/kvm/Kconfig
-> @@ -25,7 +25,7 @@ config KVM
->         select HAVE_KVM_EVENTFD
->         select HAVE_KVM_VCPU_ASYNC_IOCTL
->         select KVM_MMIO
-> -       select MMU_NOTIFIER
-> +       select KVM_GENERIC_MMU_NOTIFIER
->         select INTERVAL_TREE
->         select KVM_GENERIC_HARDWARE_ENABLING
->         help
-> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/a=
-sm/kvm_host.h
-> index 14ee0dece853..4b5c3f2acf78 100644
-> --- a/arch/powerpc/include/asm/kvm_host.h
-> +++ b/arch/powerpc/include/asm/kvm_host.h
-> @@ -62,8 +62,6 @@
->
->  #include <linux/mmu_notifier.h>
->
-> -#define KVM_ARCH_WANT_MMU_NOTIFIER
-> -
->  #define HPTEG_CACHE_NUM                        (1 << 15)
->  #define HPTEG_HASH_BITS_PTE            13
->  #define HPTEG_HASH_BITS_PTE_LONG       12
-> diff --git a/arch/powerpc/kvm/Kconfig b/arch/powerpc/kvm/Kconfig
-> index 902611954200..b33358ee6424 100644
-> --- a/arch/powerpc/kvm/Kconfig
-> +++ b/arch/powerpc/kvm/Kconfig
-> @@ -42,7 +42,7 @@ config KVM_BOOK3S_64_HANDLER
->  config KVM_BOOK3S_PR_POSSIBLE
->         bool
->         select KVM_MMIO
-> -       select MMU_NOTIFIER
-> +       select KVM_GENERIC_MMU_NOTIFIER
->
->  config KVM_BOOK3S_HV_POSSIBLE
->         bool
-> @@ -85,7 +85,7 @@ config KVM_BOOK3S_64_HV
->         tristate "KVM for POWER7 and later using hypervisor mode in host"
->         depends on KVM_BOOK3S_64 && PPC_POWERNV
->         select KVM_BOOK3S_HV_POSSIBLE
-> -       select MMU_NOTIFIER
-> +       select KVM_GENERIC_MMU_NOTIFIER
->         select CMA
->         help
->           Support running unmodified book3s_64 guest kernels in
-> @@ -194,7 +194,7 @@ config KVM_E500V2
->         depends on !CONTEXT_TRACKING_USER
->         select KVM
->         select KVM_MMIO
-> -       select MMU_NOTIFIER
-> +       select KVM_GENERIC_MMU_NOTIFIER
->         help
->           Support running unmodified E500 guest kernels in virtual machin=
-es on
->           E500v2 host processors.
-> @@ -211,7 +211,7 @@ config KVM_E500MC
->         select KVM
->         select KVM_MMIO
->         select KVM_BOOKE_HV
-> -       select MMU_NOTIFIER
-> +       select KVM_GENERIC_MMU_NOTIFIER
->         help
->           Support running unmodified E500MC/E5500/E6500 guest kernels in
->           virtual machines on E500MC/E5500/E6500 host processors.
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index 8d3ec483bc2b..aac75c98a956 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -632,9 +632,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, lon=
-g ext)
->                 break;
->  #endif
->         case KVM_CAP_SYNC_MMU:
-> -#if !defined(CONFIG_MMU_NOTIFIER) || !defined(KVM_ARCH_WANT_MMU_NOTIFIER=
-)
-> -               BUILD_BUG();
-> -#endif
-> +               BUILD_BUG_ON(!IS_ENABLED(CONFIG_KVM_GENERIC_MMU_NOTIFIER)=
-);
->                 r =3D 1;
->                 break;
->  #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/k=
-vm_host.h
-> index 1ebf20dfbaa6..66ee9ff483e9 100644
-> --- a/arch/riscv/include/asm/kvm_host.h
-> +++ b/arch/riscv/include/asm/kvm_host.h
-> @@ -249,8 +249,6 @@ struct kvm_vcpu_arch {
->  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
->  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
->
-> -#define KVM_ARCH_WANT_MMU_NOTIFIER
-> -
->  #define KVM_RISCV_GSTAGE_TLB_MIN_ORDER         12
->
->  void kvm_riscv_local_hfence_gvma_vmid_gpa(unsigned long vmid,
-> diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
-> index dfc237d7875b..ae2e05f050ec 100644
-> --- a/arch/riscv/kvm/Kconfig
-> +++ b/arch/riscv/kvm/Kconfig
-> @@ -30,7 +30,7 @@ config KVM
->         select KVM_GENERIC_HARDWARE_ENABLING
->         select KVM_MMIO
->         select KVM_XFER_TO_GUEST_WORK
-> -       select MMU_NOTIFIER
-> +       select KVM_GENERIC_MMU_NOTIFIER
->         select PREEMPT_NOTIFIERS
->         help
->           Support hosting virtualized guest machines.
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
-ost.h
-> index 70d139406bc8..31e84668014e 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -2129,8 +2129,6 @@ enum {
->  # define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, 0)
->  #endif
->
-> -#define KVM_ARCH_WANT_MMU_NOTIFIER
-> -
->  int kvm_cpu_has_injectable_intr(struct kvm_vcpu *v);
->  int kvm_cpu_has_interrupt(struct kvm_vcpu *vcpu);
->  int kvm_cpu_has_extint(struct kvm_vcpu *v);
-> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index ed90f148140d..091b74599c22 100644
-> --- a/arch/x86/kvm/Kconfig
-> +++ b/arch/x86/kvm/Kconfig
-> @@ -24,7 +24,7 @@ config KVM
->         depends on HIGH_RES_TIMERS
->         depends on X86_LOCAL_APIC
->         select PREEMPT_NOTIFIERS
-> -       select MMU_NOTIFIER
-> +       select KVM_GENERIC_MMU_NOTIFIER
->         select HAVE_KVM_IRQCHIP
->         select HAVE_KVM_PFNCACHE
->         select HAVE_KVM_IRQFD
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 11d091688346..5faba69403ac 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -253,7 +253,7 @@ bool kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t =
-cr2_or_gpa,
->  int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
->  #endif
->
-> -#ifdef KVM_ARCH_WANT_MMU_NOTIFIER
-> +#ifdef CONFIG_KVM_GENERIC_MMU_NOTIFIER
->  union kvm_mmu_notifier_arg {
->         pte_t pte;
->  };
-> @@ -783,7 +783,7 @@ struct kvm {
->         struct hlist_head irq_ack_notifier_list;
->  #endif
->
-> -#if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
-> +#ifdef CONFIG_KVM_GENERIC_MMU_NOTIFIER
->         struct mmu_notifier mmu_notifier;
->         unsigned long mmu_invalidate_seq;
->         long mmu_invalidate_in_progress;
-> @@ -1946,7 +1946,7 @@ extern const struct _kvm_stats_desc kvm_vm_stats_de=
-sc[];
->  extern const struct kvm_stats_header kvm_vcpu_stats_header;
->  extern const struct _kvm_stats_desc kvm_vcpu_stats_desc[];
->
-> -#if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
-> +#ifdef CONFIG_KVM_GENERIC_MMU_NOTIFIER
->  static inline int mmu_invalidate_retry(struct kvm *kvm, unsigned long mm=
-u_seq)
->  {
->         if (unlikely(kvm->mmu_invalidate_in_progress))
-> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> index 6f4737d5046a..9d1f7835d8c1 100644
-> --- a/include/linux/kvm_types.h
-> +++ b/include/linux/kvm_types.h
-> @@ -6,6 +6,7 @@
->  struct kvm;
->  struct kvm_async_pf;
->  struct kvm_device_ops;
-> +struct kvm_gfn_range;
->  struct kvm_interrupt;
->  struct kvm_irq_routing_table;
->  struct kvm_memory_slot;
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index 484d0873061c..ecae2914c97e 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -92,3 +92,7 @@ config HAVE_KVM_PM_NOTIFIER
->
->  config KVM_GENERIC_HARDWARE_ENABLING
->         bool
-> +
-> +config KVM_GENERIC_MMU_NOTIFIER
-> +       select MMU_NOTIFIER
-> +       bool
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 4dba682586ee..6e708017064d 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -535,7 +535,7 @@ void kvm_destroy_vcpus(struct kvm *kvm)
->  }
->  EXPORT_SYMBOL_GPL(kvm_destroy_vcpus);
->
-> -#if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
-> +#ifdef CONFIG_KVM_GENERIC_MMU_NOTIFIER
->  static inline struct kvm *mmu_notifier_to_kvm(struct mmu_notifier *mn)
->  {
->         return container_of(mn, struct kvm, mmu_notifier);
-> @@ -960,14 +960,14 @@ static int kvm_init_mmu_notifier(struct kvm *kvm)
->         return mmu_notifier_register(&kvm->mmu_notifier, current->mm);
->  }
->
-> -#else  /* !(CONFIG_MMU_NOTIFIER && KVM_ARCH_WANT_MMU_NOTIFIER) */
-> +#else  /* !CONFIG_KVM_GENERIC_MMU_NOTIFIER */
->
->  static int kvm_init_mmu_notifier(struct kvm *kvm)
->  {
->         return 0;
->  }
->
-> -#endif /* CONFIG_MMU_NOTIFIER && KVM_ARCH_WANT_MMU_NOTIFIER */
-> +#endif /* CONFIG_KVM_GENERIC_MMU_NOTIFIER */
->
->  #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
->  static int kvm_pm_notifier_call(struct notifier_block *bl,
-> @@ -1287,7 +1287,7 @@ static struct kvm *kvm_create_vm(unsigned long type=
-, const char *fdname)
->  out_err_no_debugfs:
->         kvm_coalesced_mmio_free(kvm);
->  out_no_coalesced_mmio:
-> -#if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
-> +#ifdef CONFIG_KVM_GENERIC_MMU_NOTIFIER
->         if (kvm->mmu_notifier.ops)
->                 mmu_notifier_unregister(&kvm->mmu_notifier, current->mm);
->  #endif
-> @@ -1347,7 +1347,7 @@ static void kvm_destroy_vm(struct kvm *kvm)
->                 kvm->buses[i] =3D NULL;
->         }
->         kvm_coalesced_mmio_free(kvm);
-> -#if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
-> +#ifdef CONFIG_KVM_GENERIC_MMU_NOTIFIER
->         mmu_notifier_unregister(&kvm->mmu_notifier, kvm->mm);
->         /*
->          * At this point, pending calls to invalidate_range_start()
-> --
-> 2.42.0.820.g83a721a137-goog
->
+KVM_GUEST_MEMFD_ALLOW_HUGEPAGE will fail only if userspace didn't provide a
+compatible size or the kernel doesn't support THP.  An incompatible size is likely
+a userspace bug, and for most setups that want to utilize guest_memfd, lack of THP
+support is likely a configuration bug.  I.e. many/most uses *want* failures due to
+KVM_GUEST_MEMFD_ALLOW_HUGEPAGE to be fatal.
+
+> For current implementation, I think maybe KVM_GUEST_MEMFD_DESIRE_HUGEPAGE
+> fits better than KVM_GUEST_MEMFD_ALLOW_HUGEPAGE? or maybe *PREFER*?
+
+Why?  Verbs like "prefer" and "desire" aren't a good fit IMO because they suggest
+the flag is a hint, and hints are usually best effort only, i.e. are ignored if
+there is a fundamental incompatibility.
+
+"Allow" isn't perfect, e.g. I would much prefer a straight KVM_GUEST_MEMFD_USE_HUGEPAGES
+or KVM_GUEST_MEMFD_HUGEPAGES flag, but I wanted the name to convey that KVM doesn't
+(yet) guarantee hugepages.  I.e. KVM_GUEST_MEMFD_ALLOW_HUGEPAGE is stronger than
+a hint, but weaker than a requirement.  And if/when KVM supports a dedicated memory
+pool of some kind, then we can add KVM_GUEST_MEMFD_REQUIRE_HUGEPAGE.
