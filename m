@@ -1,137 +1,111 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76361CF86
-	for <kvmarm@lists.linux.dev>; Thu,  2 Nov 2023 16:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D6621DFE4
+	for <kvmarm@lists.linux.dev>; Thu,  2 Nov 2023 16:33:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xB11KmQf"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4084e49a5e5so10012335e9.3
-        for <kvmarm@lists.linux.dev>; Thu, 02 Nov 2023 09:28:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698942533; x=1699547333; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=20owt2l3/cxGLzLA2xbevoL+xSQuNASMB596X3+ow7c=;
-        b=xB11KmQfFQmpdeEk4hqf9avUVJ/5S6ctHqu6YSO/vnsLLCdyUyJay2UrMV28u7PytH
-         1veyRwl8IHbt5WV4awh2c8DJrM45JerWbkqKcAGFlxxUxfAJTqQQsH5vMGmK2r/sZoOz
-         pYQxCs5EaidRa5IBiJyBalojjOWNR07ARTMlXdSSeCr45Z9ZeXKXGwp/Zmy8PC/C7ohz
-         wAcT4CvuNmt1RvhGC32WolxeAHlRcjzn0qip02UxRuWWmdtQ7VKOq1H+b5AdhYYRi6d1
-         E9KzFmCNZeii7rg6hrJWkMKmYWdPXcp1UzlFgMpnjBws/f9DNI7RVN+ec+xwtZrCHtSM
-         FByw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698942533; x=1699547333;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=20owt2l3/cxGLzLA2xbevoL+xSQuNASMB596X3+ow7c=;
-        b=sDvaJAgD9dC22huIrcpLt6AObZx3NS8hjQBtr5yUq2NZ3bI6kbHPVDbdWccyOjkliX
-         /EZEfU3Xj+CpnSzFvARA4gr5OIUMTBEsiI1Mkmk3NPoXi68Jp6hDQKfAWw0sscuyWt/z
-         geW5od8L70w/uxzdXfxtdZwfQ+woab0re3Sm0JRBhxOfwKKPf1H+ShV0oc+bxSOM2h8k
-         lixgA7ARL4B/FNwFpVRFTfF89/xzqHfge/wQwOhWKMYWVFyfE07kBcCAbjek1iGuWz5F
-         mW/nT8hrVXSQjvz32yYYSe4RIpPRyb/jJxw+Tg6xtC9mnCZQD97H2p4uT4MAX2PURRhH
-         Nybw==
-X-Gm-Message-State: AOJu0YwliMemEzSq2yp3CKSsW3HzZdjGdWxSBeh+TTpWl875VfzRvJrS
-	iItDzmJZ2GSIEFgo8bm1BQHj6KaWfasjtfOW/VkGqA==
-X-Google-Smtp-Source: AGHT+IGzC+UPQWsYSxEKly7WToGYHThIxdsAXI0NVkPIoloyom3O4LGBjzNagfuu2dI4j91jKOVPOWF7c1N4gZ20sPc=
-X-Received: by 2002:a5d:4b51:0:b0:32d:8e54:29f6 with SMTP id
- w17-20020a5d4b51000000b0032d8e5429f6mr14415276wrs.47.1698942532901; Thu, 02
- Nov 2023 09:28:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gErGGiOi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698942788; x=1730478788;
+  h=from:to:cc:subject:date:message-id;
+  bh=cdPiSKd/31m3AqChZgVeKDRUhuu5sQ7j4sET0CgQF7k=;
+  b=gErGGiOiOVizYB4uNHK5WPNT1x/THiiCkkRhrU6YYxz7dJpbxaaqFLP/
+   d5kPvFBPvpZ5NiNbcbvvCa4Vu2e0hzPGL+Kh4aDUvhXDeCbVPUV23+DUD
+   7gxz2i0a7+uG/TLwbO3IhVJF917VbBC2vsGLz+nZpDJIlBOBSd4fym7fX
+   cR6B2orwPaxiNB5qnOHf8AWFhcUh5V1/sBo2+vI+stQd7yP8YxPnlLlHX
+   p5QGolILXZQfVBxfx2Q3ao/WR1mBHLSA9btLhI9y60MDoikDRTHFSY8qX
+   Zjlxo5orjBSNTcuo0wS5rpklmuYQB4rCT2NN7pFuiEeGIffO7yPmBfwya
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10882"; a="388570838"
+X-IronPort-AV: E=Sophos;i="6.03,272,1694761200"; 
+   d="scan'208";a="388570838"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 09:33:06 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,272,1694761200"; 
+   d="scan'208";a="9448383"
+Received: from arthur-vostro-3668.sh.intel.com ([10.239.159.65])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 09:33:00 -0700
+From: Zeng Guang <guang.zeng@intel.com>
+To: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	Zeng Guang <guang.zeng@intel.com>
+Subject: [RFC PATCH v1 0/8] KVM: seftests: Support guest user mode execution and running
+Date: Thu,  2 Nov 2023 23:51:03 +0800
+Message-Id: <20231102155111.28821-1-guang.zeng@intel.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-17-seanjc@google.com>
- <ZUFGRyQEuWj4RJS0@google.com> <ZUFzZf-YmCRYP6qo@google.com>
- <CALzav=d9eXZfK=op7A=UftbpuPpUbxqV6CmkqqxxBNuNsUU4nw@mail.gmail.com>
- <6642c379-1023-4716-904f-4bbf076744c2@redhat.com> <ZUPIXt1XzZrriswG@google.com>
-In-Reply-To: <ZUPIXt1XzZrriswG@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Thu, 2 Nov 2023 09:28:23 -0700
-Message-ID: <CALzav=eaVc5rzmHwnQr7aotyTKi9Agdte7NAL0NvBeE+f6zYoA@mail.gmail.com>
-Subject: Re: [PATCH v13 16/35] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Anish Moorthy <amoorthy@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 2, 2023 at 9:03=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Thu, Nov 02, 2023, Paolo Bonzini wrote:
-> > On 10/31/23 23:39, David Matlack wrote:
-> > > > > Maybe can you sketch out how you see this proposal being extensib=
-le to
-> > > > > using guest_memfd for shared mappings?
-> > > > For in-place conversions, e.g. pKVM, no additional guest_memfd is n=
-eeded.  What's
-> > > > missing there is the ability to (safely) mmap() guest_memfd, e.g. K=
-VM needs to
-> > > > ensure there are no outstanding references when converting back to =
-private.
-> > > >
-> > > > For TDX/SNP, assuming we don't find a performant and robust way to =
-do in-place
-> > > > conversions, a second fd+offset pair would be needed.
-> > > Is there a way to support non-in-place conversions within a single gu=
-est_memfd?
-> >
-> > For TDX/SNP, you could have a hook from KVM_SET_MEMORY_ATTRIBUTES to gu=
-est
-> > memory.  The hook would invalidate now-private parts if they have a VMA=
-,
-> > causing a SIGSEGV/EFAULT if the host touches them.
-> >
-> > It would forbid mappings from multiple gfns to a single offset of the
-> > guest_memfd, because then the shared vs. private attribute would be tie=
-d to
-> > the offset.  This should not be a problem; for example, in the case of =
-SNP,
-> > the RMP already requires a single mapping from host physical address to
-> > guest physical address.
->
-> I don't see how this can work.  It's not a M:1 scenario (where M is multi=
-ple gfns),
-> it's a 1:N scenario (wheren N is multiple offsets).  The *gfn* doesn't ch=
-ange on
-> a conversion, what needs to change to do non-in-place conversion is the p=
-fn, which
-> is effectively the guest_memfd+offset pair.
->
-> So yes, we *could* support non-in-place conversions within a single guest=
-_memfd,
-> but it would require a second offset,
+This patch series give a proposal to support guest VM running
+in user mode and in canonical linear address organization as
+well.
 
-Why can't KVM free the existing page at guest_memfd+offset and
-allocate a new one when doing non-in-place conversions?
+First design to parition the 64-bit canonical linear address space
+into two half parts belonging to user-mode and supervisor-mode
+respectively, similar as the organization of linear addresses used
+in linux OS. Currently the linear addresses use 48-bit canonical
+format in which bits 63:47 of the address are identical.
 
-> at which point it makes sense to add a
-> second file descriptor as well.  Userspace could still use a single guest=
-_memfd
-> instance, i.e. pass in the same file descriptor but different offsets.
+Secondly setup page table mapping the same guest physical address
+of test code and data segment onto both user-mode and supervisor-mode
+address space. It allows guest in different runtime mode, i.e.
+user or supervisor, can run one code base in the corresponding
+linear address space.
+
+Also provide the runtime environment setup API for switching to
+user mode execution.     
+
+
+Zeng Guang (8):
+  KVM: selftests: x86: Fix bug in addr_arch_gva2gpa()
+  KVM: selftests: x86: Support guest running on canonical linear-address
+    organization
+  KVM: selftests: Add virt_arch_ucall_prealloc() arch specific
+    implementation
+  KVM : selftests : Adapt selftest cases to kernel canonical linear
+    address
+  KVM: selftests: x86: Prepare setup for user mode support
+  KVM: selftests: x86: Allow user to access user-mode address and I/O
+    address space
+  KVM: selftests: x86: Support vcpu run in user mode
+  KVM: selftests: x86: Add KVM forced emulation prefix capability
+
+ .../selftests/kvm/include/kvm_util_base.h     |  20 ++-
+ .../selftests/kvm/include/x86_64/processor.h  |  48 ++++++-
+ .../selftests/kvm/lib/aarch64/processor.c     |   5 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   6 +-
+ .../selftests/kvm/lib/riscv/processor.c       |   5 +
+ .../selftests/kvm/lib/s390x/processor.c       |   5 +
+ .../testing/selftests/kvm/lib/ucall_common.c  |   2 +
+ .../selftests/kvm/lib/x86_64/processor.c      | 117 ++++++++++++++----
+ .../selftests/kvm/set_memory_region_test.c    |  13 +-
+ .../testing/selftests/kvm/x86_64/debug_regs.c |   2 +-
+ .../kvm/x86_64/userspace_msr_exit_test.c      |   9 +-
+ 11 files changed, 195 insertions(+), 37 deletions(-)
+
+-- 
+2.21.3
+
