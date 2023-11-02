@@ -1,330 +1,133 @@
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4D31C296
-	for <kvmarm@lists.linux.dev>; Thu,  2 Nov 2023 14:35:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.55])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4SLmWb4YYFzMmXM;
-	Thu,  2 Nov 2023 22:30:51 +0800 (CST)
-Received: from DESKTOP-6NKE0BC.china.huawei.com (10.174.185.210) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 2 Nov 2023 22:35:12 +0800
-From: Kunkun Jiang <jiangkunkun@huawei.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>, Jean-Philippe
- Brucker <jean-philippe@linaro.org>, "open list:IRQCHIP DRIVERS"
-	<linux-kernel@vger.kernel.org>
-CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<wanghaibin.wang@huawei.com>, Kunkun Jiang <jiangkunkun@huawei.com>
-Subject: [RFC PATCH] KVM: arm/arm64: GICv4: Support shared VLPI
-Date: Thu, 2 Nov 2023 22:35:07 +0800
-Message-ID: <20231102143507.840-1-jiangkunkun@huawei.com>
-X-Mailer: git-send-email 2.26.2.windows.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69BE91BDEA
+	for <kvmarm@lists.linux.dev>; Thu,  2 Nov 2023 14:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J/3yir1X"
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-778a92c06d6so58034985a.2
+        for <kvmarm@lists.linux.dev>; Thu, 02 Nov 2023 07:36:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698935773; x=1699540573; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xGQNRc9zE40ysVevY/WGU/Lu6W4371YJar5QqeiLOSY=;
+        b=J/3yir1XoEgMGAWIn/bgPPaJrtKrBdu6VmfzjNX4kkAp4UxO9bTo9upjNEnus/Ur6Z
+         SU/DwPywzIkFNf6OLX+rx/P1GKMXEjUZyNWPPH4Oxp0yd7ZdnML3h7MgkQ1MJsTfw0fx
+         dH1D05dDx+wQPVhxsFjMZF/YRB5/GvdqgbRspaJ7yy63mfFjBmHnPc/V05j6pkFzBLCf
+         PCXP7n4LvtoU93YWhXU66VxrP4FtdNMUU7pX6bIQz7KbS1p51OKvVGk3AujJERider+Z
+         Lxenn8nHYIbzHny4aHALtws8lrscZ60Sqq5kGkUVmTINJEIi2D0c0wND/cnS3IOuy9nD
+         Co0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698935773; x=1699540573;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xGQNRc9zE40ysVevY/WGU/Lu6W4371YJar5QqeiLOSY=;
+        b=gYEqqCXsh2fgxyscHJ0anNrPQBSWt7J3l0/6qLdJYti2pcwgQt1CZ74VOj7PntnbNN
+         JjjvkvJbNHTQNJ2XDcg1C2VK7SpwqzVxgbe7GM3ST+s+q0GGCtOvLaNlq79g272EIO3K
+         jWCUjz9b4+yXax+Bs+tQBw2gnEuMz5/10Cv90FHM9+8bS/VE7bHXzd0b9gV7cITLOuwb
+         /4HSgn7z1l6NYwVU5mKa+qo6K3JQMAaP7ZMDfCeRp9te1qqQ3WEoxjYcyyWd9OJ3zCvn
+         nOAYB80WQGd3XWVU84MIRC30kELKsje+HVw8P+BicF+6U28bZSJPRBeOLsCJvZ3w+zjb
+         4luw==
+X-Gm-Message-State: AOJu0Yx9evj5bJgUpvGsfy46icQmqlGLNirFM3NAZo4ZCuSCK8sLXzrU
+	a9IqEFE1y+OtNAqxpGdXJd40P2cbAVWAorjnTrxHDg==
+X-Google-Smtp-Source: AGHT+IG3zQONLtNNLFCBisiqnyb2KBBdAZoBcVXn8ZKHSOcO4zLCu8vZ+2T5E0OEe4jyHp5mk0SJgyrOfTeARfH9hlY=
+X-Received: by 2002:a05:6214:242e:b0:66d:a90f:c06 with SMTP id
+ gy14-20020a056214242e00b0066da90f0c06mr22425828qvb.14.1698935773112; Thu, 02
+ Nov 2023 07:36:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.185.210]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm000007.china.huawei.com (7.193.23.189)
-X-CFilter-Loop: Reflected
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-22-seanjc@google.com>
+In-Reply-To: <20231027182217.3615211-22-seanjc@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 2 Nov 2023 14:35:36 +0000
+Message-ID: <CA+EHjTzk0=24wGbxQUApAY4B-K3xO3+SOfLn1tPJk-hVJY0+GQ@mail.gmail.com>
+Subject: Re: [PATCH v13 21/35] KVM: Drop superfluous __KVM_VCPU_MULTIPLE_ADDRESS_SPACE
+ macro
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In some scenarios, the guest virtio-pci driver will request two MSI-X,
-one vector for config, one shared for queues. However, the host driver
-(vDPA or VFIO) will request a vector for each queue.
+On Fri, Oct 27, 2023 at 7:23=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> Drop __KVM_VCPU_MULTIPLE_ADDRESS_SPACE and instead check the value of
+> KVM_ADDRESS_SPACE_NUM.
+>
+> No functional change intended.
+>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
 
-In the current implementation of GICv4/4.1 direct injection of vLPI,
-pINTID and vINTID have one-to-one correspondence. Therefore, the
-above scenario cannot be handled correctly. The host kernel will
-execute its_map_vlpi multiple times but only execute its_unmap_vlpi
-once. This may cause guest hang[1].
+Reviewed-by: Fuad Tabba <tabba@google.com>
+Tested-by: Fuad Tabba <tabba@google.com>
 
-|	WARN_ON(!(irq->hw && irq->host_irq == virq));
-|	if (irq->hw) {
-|		atomic_dec(&irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count);
-|		irq->hw = false;
-|		ret = its_unmap_vlpi(virq);
-|	}
+Cheers,
+/fuad
 
-Add a list to struct vgic_irq to record all host irqs mapped to the vlpi.
-When performing an action on the vlpi, traverse the list and perform this
-action on all host irqs.
-
-Link: https://lore.kernel.org/all/0d9fdf42-76b1-afc6-85a9-159c5490bbd4@huawei.com/#t
-
-Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
----
- arch/arm64/kvm/vgic/vgic-its.c | 74 ++++++++++++++++++++++++----------
- arch/arm64/kvm/vgic/vgic-v4.c  | 37 ++++++++++++++---
- include/kvm/arm_vgic.h         |  7 ++++
- 3 files changed, 91 insertions(+), 27 deletions(-)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 5fe2365a629f..c4b453155fcf 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -54,6 +54,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
- 
- 	INIT_LIST_HEAD(&irq->lpi_list);
- 	INIT_LIST_HEAD(&irq->ap_list);
-+	INIT_LIST_HEAD(&irq->host_irq_head);
- 	raw_spin_lock_init(&irq->irq_lock);
- 
- 	irq->config = VGIC_CONFIG_EDGE;
-@@ -61,6 +62,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
- 	irq->intid = intid;
- 	irq->target_vcpu = vcpu;
- 	irq->group = 1;
-+	atomic_set(&irq->map_count, 0);
- 
- 	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
- 
-@@ -284,6 +286,7 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
- 	u8 prop;
- 	int ret;
- 	unsigned long flags;
-+	struct vlpi_host_irq *vlpi_hirq;
- 
- 	ret = kvm_read_guest_lock(kvm, propbase + irq->intid - GIC_LPI_OFFSET,
- 				  &prop, 1);
-@@ -305,8 +308,13 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
- 
- 	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
- 
--	if (irq->hw)
--		return its_prop_update_vlpi(irq->host_irq, prop, needs_inv);
-+	if (irq->hw) {
-+		list_for_each_entry(vlpi_hirq, &irq->host_irq_head, host_irq_list) {
-+			ret = its_prop_update_vlpi(vlpi_hirq->host_irq, prop, needs_inv);
-+			if (ret)
-+				return ret;
-+		}
-+	}
- 
- 	return 0;
- }
-@@ -354,25 +362,31 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
- static int update_affinity(struct vgic_irq *irq, struct kvm_vcpu *vcpu)
- {
- 	int ret = 0;
--	unsigned long flags;
-+	unsigned long flags, counts;
-+	struct vlpi_host_irq *vlpi_hirq;
- 
- 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 	irq->target_vcpu = vcpu;
- 	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
- 
- 	if (irq->hw) {
--		struct its_vlpi_map map;
-+		counts = atomic_read(&irq->map_count);
-+		list_for_each_entry(vlpi_hirq, &irq->host_irq_head, host_irq_list) {
-+			struct its_vlpi_map map;
- 
--		ret = its_get_vlpi(irq->host_irq, &map);
--		if (ret)
--			return ret;
-+			ret = its_get_vlpi(vlpi_hirq->host_irq, &map);
-+			if (ret)
-+				return ret;
- 
--		if (map.vpe)
--			atomic_dec(&map.vpe->vlpi_count);
--		map.vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
--		atomic_inc(&map.vpe->vlpi_count);
-+			counts--;
-+			if (map.vpe && !counts)
-+				atomic_dec(&map.vpe->vlpi_count);
-+			map.vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-+			if (!counts)
-+				atomic_inc(&map.vpe->vlpi_count);
- 
--		ret = its_map_vlpi(irq->host_irq, &map);
-+			ret = its_map_vlpi(vlpi_hirq->host_irq, &map);
-+		}
- 	}
- 
- 	return ret;
-@@ -731,6 +745,7 @@ static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
- 				u32 devid, u32 eventid)
- {
- 	struct vgic_irq *irq = NULL;
-+	struct vlpi_host_irq *vlpi_hirq;
- 	unsigned long flags;
- 	int err;
- 
-@@ -738,9 +753,15 @@ static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
- 	if (err)
- 		return err;
- 
--	if (irq->hw)
--		return irq_set_irqchip_state(irq->host_irq,
--					     IRQCHIP_STATE_PENDING, true);
-+	if (irq->hw) {
-+		list_for_each_entry(vlpi_hirq, &irq->host_irq_head, host_irq_list) {
-+			err = irq_set_irqchip_state(vlpi_hirq->host_irq,
-+						    IRQCHIP_STATE_PENDING, true);
-+			if (err)
-+				return err;
-+			return 0;
-+		}
-+	}
- 
- 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
- 	irq->pending_latch = true;
-@@ -806,12 +827,17 @@ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
- /* Requires the its_lock to be held. */
- static void its_free_ite(struct kvm *kvm, struct its_ite *ite)
- {
-+	struct vlpi_host_irq *vlpi_hirq;
-+
- 	list_del(&ite->ite_list);
- 
- 	/* This put matches the get in vgic_add_lpi. */
- 	if (ite->irq) {
--		if (ite->irq->hw)
--			WARN_ON(its_unmap_vlpi(ite->irq->host_irq));
-+		if (ite->irq->hw) {
-+			list_for_each_entry(vlpi_hirq, &ite->irq->host_irq_head, host_irq_list) {
-+				WARN_ON(its_unmap_vlpi(vlpi_hirq->host_irq));
-+			}
-+		}
- 
- 		vgic_put_irq(kvm, ite->irq);
- 	}
-@@ -1290,7 +1316,8 @@ static int vgic_its_cmd_handle_clear(struct kvm *kvm, struct vgic_its *its,
- 	u32 device_id = its_cmd_get_deviceid(its_cmd);
- 	u32 event_id = its_cmd_get_id(its_cmd);
- 	struct its_ite *ite;
--
-+	struct vlpi_host_irq *vlpi_hirq;
-+	int ret;
- 
- 	ite = find_ite(its, device_id, event_id);
- 	if (!ite)
-@@ -1298,9 +1325,14 @@ static int vgic_its_cmd_handle_clear(struct kvm *kvm, struct vgic_its *its,
- 
- 	ite->irq->pending_latch = false;
- 
--	if (ite->irq->hw)
--		return irq_set_irqchip_state(ite->irq->host_irq,
--					     IRQCHIP_STATE_PENDING, false);
-+	if (ite->irq->hw) {
-+		list_for_each_entry(vlpi_hirq, &ite->irq->host_irq_head, host_irq_list) {
-+			ret = irq_set_irqchip_state(vlpi_hirq->host_irq,
-+						    IRQCHIP_STATE_PENDING, false);
-+			if (ret)
-+				return ret;
-+		}
-+	}
- 
- 	return 0;
- }
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index 339a55194b2c..d634ba3dd225 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -413,6 +413,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
- {
- 	struct vgic_its *its;
- 	struct vgic_irq *irq;
-+	struct vlpi_host_irq *vlpi_hirq;
- 	struct its_vlpi_map map;
- 	unsigned long flags;
- 	int ret;
-@@ -456,9 +457,19 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
- 	if (ret)
- 		goto out;
- 
--	irq->hw		= true;
--	irq->host_irq	= virq;
--	atomic_inc(&map.vpe->vlpi_count);
-+	vlpi_hirq = kzalloc(sizeof(struct vlpi_host_irq), GFP_KERNEL_ACCOUNT);
-+	if (!vlpi_hirq)
-+		return -ENOMEM;
-+
-+	INIT_LIST_HEAD(&vlpi_hirq->host_irq_list);
-+	vlpi_hirq->host_irq = virq;
-+	list_add_tail(&vlpi_hirq->host_irq_list, &irq->host_irq_head);
-+
-+	if (!atomic_read(&irq->map_count)) {
-+		irq->hw = true;
-+		atomic_inc(&map.vpe->vlpi_count);
-+	}
-+	atomic_inc(&irq->map_count);
- 
- 	/* Transfer pending state */
- 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
-@@ -488,6 +499,8 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
- {
- 	struct vgic_its *its;
- 	struct vgic_irq *irq;
-+	struct vlpi_host_irq *vlpi_hirq;
-+	struct its_vpe *vpe;
- 	int ret;
- 
- 	if (!vgic_supports_direct_msis(kvm))
-@@ -508,10 +521,22 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
- 	if (ret)
- 		goto out;
- 
--	WARN_ON(!(irq->hw && irq->host_irq == virq));
-+	WARN_ON(!(irq->hw));
- 	if (irq->hw) {
--		atomic_dec(&irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count);
--		irq->hw = false;
-+		list_for_each_entry(vlpi_hirq, &irq->host_irq_head, host_irq_list) {
-+			if (vlpi_hirq->host_irq == virq) {
-+				list_del(&vlpi_hirq->host_irq_list);
-+				kfree(vlpi_hirq);
-+				break;
-+			}
-+		}
-+
-+		atomic_dec(&irq->map_count);
-+		if (!atomic_read(&irq->map_count)) {
-+			vpe = &irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-+			atomic_dec(&vpe->vlpi_count);
-+			irq->hw = false;
-+		}
- 		ret = its_unmap_vlpi(virq);
- 	}
- 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 5b27f94d4fad..2b8f25d1eff2 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -114,6 +114,11 @@ struct irq_ops {
- 	bool (*get_input_level)(int vintid);
- };
- 
-+struct vlpi_host_irq {
-+	struct list_head host_irq_list;
-+	unsigned int host_irq;
-+};
-+
- struct vgic_irq {
- 	raw_spinlock_t irq_lock;	/* Protects the content of the struct */
- 	struct list_head lpi_list;	/* Used to link all LPIs together */
-@@ -138,6 +143,8 @@ struct vgic_irq {
- 	bool active;			/* not used for LPIs */
- 	bool enabled;
- 	bool hw;			/* Tied to HW IRQ */
-+	atomic_t map_count;		/* record vLPI map times */
-+	struct list_head host_irq_head;	/* record host irqs list of a vLPI */
- 	struct kref refcount;		/* Used for LPIs */
- 	u32 hwintid;			/* HW INTID number */
- 	unsigned int host_irq;		/* linux irq corresponding to hwintid */
--- 
-2.33.0
-
+>  arch/x86/include/asm/kvm_host.h | 1 -
+>  include/linux/kvm_host.h        | 2 +-
+>  2 files changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
+ost.h
+> index 8d60e4745e8b..6702f795c862 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -2124,7 +2124,6 @@ enum {
+>  #define HF_SMM_MASK            (1 << 1)
+>  #define HF_SMM_INSIDE_NMI_MASK (1 << 2)
+>
+> -# define __KVM_VCPU_MULTIPLE_ADDRESS_SPACE
+>  # define KVM_ADDRESS_SPACE_NUM 2
+>  # define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_M=
+ASK ? 1 : 0)
+>  # define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role=
+).smm)
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index e3223cafd7db..c3cfe08b1300 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -692,7 +692,7 @@ bool kvm_arch_irqchip_in_kernel(struct kvm *kvm);
+>  #define KVM_MEM_SLOTS_NUM SHRT_MAX
+>  #define KVM_USER_MEM_SLOTS (KVM_MEM_SLOTS_NUM - KVM_INTERNAL_MEM_SLOTS)
+>
+> -#ifndef __KVM_VCPU_MULTIPLE_ADDRESS_SPACE
+> +#if KVM_ADDRESS_SPACE_NUM =3D=3D 1
+>  static inline int kvm_arch_vcpu_memslots_id(struct kvm_vcpu *vcpu)
+>  {
+>         return 0;
+> --
+> 2.42.0.820.g83a721a137-goog
+>
