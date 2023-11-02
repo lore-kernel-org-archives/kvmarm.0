@@ -1,144 +1,232 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85BA91B282
-	for <kvmarm@lists.linux.dev>; Thu,  2 Nov 2023 14:17:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB851BDE4
+	for <kvmarm@lists.linux.dev>; Thu,  2 Nov 2023 14:31:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dembSY+F"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-672096e0e89so5662106d6.1
-        for <kvmarm@lists.linux.dev>; Thu, 02 Nov 2023 07:17:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OHEedhRs"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5b31e000e97so14876697b3.1
+        for <kvmarm@lists.linux.dev>; Thu, 02 Nov 2023 07:31:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698934645; x=1699539445; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c7O2KSplInLsDb19B+zn/jm8iaKKD/NZ+yWSezVEL04=;
-        b=dembSY+F9vrcgINo1hryM2EAAv8Ck9GMmRcKb1OfEAl/v6kynYIMjgNUWA1sBLTLLb
-         9R91W6Md1qMCc7w0PTPAY+hYzDmV17zlY8xgSjkQQn8hVc+ShmfFiaS9Zx5BmAiRwWH5
-         YAmcgnASkT66x+dfCdUcNi+wItiuqsKp8ImMQzYrXph2vpD61qq/fjCWtLR1WDO5JSjO
-         fGFtP3LiEx8px3gVcAjzevCV0lz3tMSf8+GgbuF5PUJvHWnXb5R1NUfNSfAPAKJAcuZ0
-         5kirg9j4JV+DUmHDeevilZMUuzYBcUAQxDjMCPmUhIjDb0ao0Cd+N6J4wmHP7+3YVcqa
-         lOxg==
+        d=google.com; s=20230601; t=1698935488; x=1699540288; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lAaMrTmFkqkQBDJIun0NhM/ukv/V2L1IOTp3rGU5ITI=;
+        b=OHEedhRsECXudrtnag0+kLBECB7qeAuxIAdwAsqdUbZjPoyjEHxr///+pUG36Qfzi2
+         NIpVYaVaDWIr8Vi24ZjroIz/nxJO0ITMnHaCac0exKpX9wljvRc1QC2XfHDFS8P72UJO
+         YJQhA+oO7kZ10whv2uVmn7d1iHMmZoV0BJnBAVsf7xPlHuBFL/XFcaOdZN5x30y6Vef9
+         DtSMep88PgOLfEh2nE30iCAOvOjBcUtBsDCameCfkj7koW3SWR1wPxwtsXXwHYpgdTYv
+         +2/DSx783gk4mhx3CspP4PP/UnxetyUoDo6Vzt4CmkYJ4Tl6zRmcyAAmkaxOkpzPeF4H
+         6fGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698934645; x=1699539445;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=c7O2KSplInLsDb19B+zn/jm8iaKKD/NZ+yWSezVEL04=;
-        b=popH+O/TGKGNvUy+3HZTxndqKbwAbz+Wbk/yZooU1h2XNSBN1NPw/aYix2jhTKJZYi
-         l4wBDUHtLTRSpMIH2Mnxm7seE+SW94lSIug1W9zCQQ52mn3upWqtSZxJ1WhzT/12Ok0Q
-         ekrS6vw0TsGhuCQLJ23JGPc1CTmzH0F5P/azy1/e5/rig4eqvUxhA7eLK3JcITwWTpsN
-         5nbxbItTlb2w3Tn141R29xHIBuWyvV7U68jAAK2fbNVsrlUl1jiX5qx0tgkLPbnU5xgf
-         raNrw7AEIVTJZMlrWObD2vKwNohSDFvLKsAmWEp2jw2XPbOKSmtQ9eFyHJwIxsoe/Bf9
-         sY7g==
-X-Gm-Message-State: AOJu0Yzk/KWC6wr1jE+v7hEgz23vxoZYgZz926IsECVQP26OoEH2PxAT
-	e5T4GNKgGFU6Dh0DcfYB0dDbiofH9Uz5RgaWOzWIJQ==
-X-Google-Smtp-Source: AGHT+IGAosxm/0woyiCy5wtpQ5hw9PNiMnNT8Y+nXK7zRiDLlPKvw69895suNy2q5wz5DwPz9Dn0X+ha5Vtg4tVBUZc=
-X-Received: by 2002:a05:6214:d88:b0:66d:3a0f:97a with SMTP id
- e8-20020a0562140d8800b0066d3a0f097amr20020837qve.6.1698934645120; Thu, 02 Nov
- 2023 07:17:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698935488; x=1699540288;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lAaMrTmFkqkQBDJIun0NhM/ukv/V2L1IOTp3rGU5ITI=;
+        b=onQBF9t7TOl38NeZrloQ/IzzxrcWm9i66VTwFWm1Z32xvkog7gdQRO4oU53jBYVsAg
+         zqQsWmDD168tayP2XTgmiO4hp23d/bdd4C1t7DaKUx+x3OA9T4xWutgFQGbCpBVPWPYP
+         LZE1/e02GGJC+r3SP2AL3iM4VE9sf4BjSzcox5c16jm9kTCB47U0S8N0B6s/byFRkRvy
+         589lVS+L7h0vAeT19aeYhqw5BLKLLlGIyoKsalOxXZokGnqr+xwBUq5vpbgHNXA10C4e
+         c2+sMsNrCMvyWdcKPtrb+Kk/Vx0RhkusrihyvpOElYkIEk6pmTy6Bxw+mO/cW07h2pHH
+         YlEw==
+X-Gm-Message-State: AOJu0YxePxuwdVniiKGQd6gp2XTBO7QokQelYPj9cygdPnZVsd2dISpS
+	e+Wd84qKiDiZuGNku3c+2ELb4fhLnkc=
+X-Google-Smtp-Source: AGHT+IFt5OlbwPoWBLHdP1x9iWe1p/R5K4XFVEL+0pJMEt6E5XClHt/AagSNfWvU17EPnbEIB37aU8lKvgo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:4f4e:0:b0:586:50cf:e13f with SMTP id
+ d75-20020a814f4e000000b0058650cfe13fmr390775ywb.1.1698935488657; Thu, 02 Nov
+ 2023 07:31:28 -0700 (PDT)
+Date: Thu, 2 Nov 2023 07:31:27 -0700
+In-Reply-To: <CAF7b7mo0Pbju__J+58-0zHxNFn7R2=8WKTHmKYtcb_4eEa5bTw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-19-seanjc@google.com>
-In-Reply-To: <20231027182217.3615211-19-seanjc@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 2 Nov 2023 14:16:49 +0000
-Message-ID: <CA+EHjTwXdntKGMjb8Zj1M3iVVN5NX6iLwbzJjE72j_eVczTQYw@mail.gmail.com>
-Subject: Re: [PATCH v13 18/35] KVM: x86: "Reset" vcpu->run->exit_reason early
- in KVM_RUN
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20230908222905.1321305-1-amoorthy@google.com> <20230908222905.1321305-12-amoorthy@google.com>
+ <ZR4WzE1JOvq_0dhE@google.com> <CAF7b7mo0Pbju__J+58-0zHxNFn7R2=8WKTHmKYtcb_4eEa5bTw@mail.gmail.com>
+Message-ID: <ZUOyvwfLKlDKZKf8@google.com>
+Subject: Re: [PATCH v5 11/17] KVM: x86: Enable KVM_CAP_USERFAULT_ON_MISSING
+From: Sean Christopherson <seanjc@google.com>
+To: Anish Moorthy <amoorthy@google.com>
+Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
+	jthoughton@google.com, ricarkol@google.com, axelrasmussen@google.com, 
+	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
+	kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 27, 2023 at 7:23=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> Initialize run->exit_reason to KVM_EXIT_UNKNOWN early in KVM_RUN to reduc=
-e
-> the probability of exiting to userspace with a stale run->exit_reason tha=
-t
-> *appears* to be valid.
->
-> To support fd-based guest memory (guest memory without a corresponding
-> userspace virtual address), KVM will exit to userspace for various memory
-> related errors, which userspace *may* be able to resolve, instead of usin=
+On Wed, Nov 01, 2023, Anish Moorthy wrote:
+> On Wed, Oct 4, 2023 at 6:52=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> >
+> > On Fri, Sep 08, 2023, Anish Moorthy wrote:
+> > > The relevant __gfn_to_pfn_memslot() calls in __kvm_faultin_pfn()
+> > > already use MEMSLOT_ACCESS_NONATOMIC_MAY_UPGRADE.
+> >
+> > --verbose
+>=20
+> Alright, how about the following?
+>=20
+>     KVM: x86: Enable KVM_CAP_EXIT_ON_MISSING
+>=20
+>     __gfn_to_pfn_memslot(), used by the stage-2 fault handler, already
+>     checks the memslot flag to avoid faulting in missing pages as require=
+d.
+>     Therefore, enabling the capability is just a matter of selecting the =
+kconfig
+>     to allow the flag to actually be set.
+>=20
+> > Hmm, I vote to squash this patch with
+> >
+> >   KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
+> >
+> > or rather, squash that code into this patch.  Ditto for the ARM patches=
+.
+> >
+> > Since we're making KVM_EXIT_MEMORY_FAULT informational-only for flows t=
+hat KVM
+> > isn't committing to supporting, I think it makes sense to enable the ar=
+ch specific
+> > paths that *need* to return KVM_EXIT_MEMORY_FAULT at the same time as t=
+he feature
+> > that adds the requirement.
+> >
+> > E.g. without HAVE_KVM_USERFAULT_ON_MISSING support, per the contract we=
+ are creating,
+> > it would be totally fine for KVM to not use KVM_EXIT_MEMORY_FAULT for t=
+he page
+> > fault paths.  And that obviously has to be the case since KVM_CAP_MEMOR=
+Y_FAULT_INFO
+> > is introduced before the arch code is enabled.
+> >
+> > But as of this path, KVM *must* return KVM_EXIT_MEMORY_FAULT, so we sho=
+uld make
+> > it impossible to do a straight revert of that dependency.
+>=20
+> Should we really be concerned about people reverting the
+> KVM_CAP_MEMORY_FAULT_INFO commit(s) in this way?
+
+Yes.  A revert is highly unlikely, but possible.  Keep in mind that with up=
+stream
+KVM, there are a *lot* of end users that don't know the inner workings of K=
+VM
+(or the kernel).  When things break, the standard approach for such users i=
+s to
+bisect to find where things first broke, and then to try reverting the susp=
+ected
+commit to see if that fixes the problem.
+
+In the (again, highly unlikely) case that filling run->memory_fault breaks =
+something,
+an unsuspecting user will bisect to that commit and revert.  Then they're s=
+uddenly
+in a situation where they've unknowing broken KVM, and likely in a way that=
+ won't
+immediately fail.
+
+*Nothing* in either changelog gives any clue that there is a hard dependenc=
+y.
+Even the slightly more verbose version above provides almost no indication =
+of the
+real dependency, as it primarily talks about __gfn_to_pfn_memslot() and
+KVM_CAP_EXIT_ON_MISSING.
+=20
+And now that we've punted on trying annotate "everything", there's no sane =
+way
+for the "Annotate -EFAULTs from kvm_handle_error_pfn()" changelog to commun=
+icate
+that it will have a hard dependency in the future.  If the changelog says "=
+this
+will be used by blah blah blah", then it raises the question of "well why i=
+sn't
+this added there?".
+
+And the patches are tiny.  Having a final "enable and advertise XYZ" patch =
+is
+relatively common for new features, but that's often because the enabling o=
+f the
+new feature is spread across multiple patches.  E.g. see the LAM support si=
+tting
+in "https://github.com/kvm-x86/linux.git lam".  And in those cases, the har=
+d
+dependency is always very obvious, e.g. if someone complained that revertin=
 g
-> e.g. BUS_MCEERR_AR.  And in the more distant future, KVM will also likely
-> utilize the same functionality to let userspace "intercept" and handle
-> memory faults when the userspace mapping is missing, i.e. when fast gup()
-> fails.
->
-> Because many of KVM's internal APIs related to guest memory use '0' to
-> indicate "success, continue on" and not "exit to userspace", reporting
-> memory faults/errors to userspace will set run->exit_reason and
-> corresponding fields in the run structure fields in conjunction with a
-> a non-zero, negative return code, e.g. -EFAULT or -EHWPOISON.  And becaus=
-e
-> KVM already returns  -EFAULT in many paths, there's a relatively high
-> probability that KVM could return -EFAULT without setting run->exit_reaso=
-n,
-> in which case reporting KVM_EXIT_UNKNOWN is much better than reporting
-> whatever exit reason happened to be in the run structure.
->
-> Note, KVM must wait until after run->immediate_exit is serviced to
-> sanitize run->exit_reason as KVM's ABI is that run->exit_reason is
-> preserved across KVM_RUN when run->immediate_exit is true.
->
-> Link: https://lore.kernel.org/all/20230908222905.1321305-1-amoorthy@googl=
-e.com
-> Link: https://lore.kernel.org/all/ZFFbwOXZ5uI%2Fgdaf@google.com
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
+"Virtualize LAM for user pointer" but not "Advertise and enable LAM (user a=
+nd
+supervisor)" caused problems, we'd be like, "well, yeah".
 
-Reviewed-by: Fuad Tabba <tabba@google.com>
-Tested-by: Fuad Tabba <tabba@google.com>
+> I see what you're> saying- but it also seems to me that KVM could add oth=
+er
+> things akin to KVM_CAP_EXIT_ON_MISSING in the future, and then we end up =
+in
+> the exact same situation.
 
-Cheers,
-/fuad
+No, it's not the exact same situation.
 
->  arch/x86/kvm/x86.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ee3cd8c3c0ef..f41dbb1465a0 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10963,6 +10963,7 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
->  {
->         int r;
->
-> +       vcpu->run->exit_reason =3D KVM_EXIT_UNKNOWN;
->         vcpu->arch.l1tf_flush_l1d =3D true;
->
->         for (;;) {
-> --
-> 2.42.0.820.g83a721a137-goog
->
+First and foremost, we *can't* solve that problem, because some future feat=
+ure
+doesn't exist yet.
+
+Second, merging features into two different kernel releases creates a very =
+different
+situation.  Let's say this goes into kernel 6.9, and then some future featu=
+re
+lands in kernel 6.11 and has a hard dependency on the annotations.  The odd=
+s of
+needing to revert a patch from 6.9 while upgrading to 6.11 are significnatl=
+y lower
+than the odds of needing to revert a patch from 6.9-rc1 between when rc1 is=
+ released
+and a user upgrades to 6.9.  And users aren't stupid; they might not know t=
+he inner
+workings of KVM, but bisecting to a patch from 6.9 when upgrading to 6.11 w=
+ould
+give them pause.
+
+Third, with the patches squashed, to revert the annotations, a person would=
+ also
+be reverting _this_ patch (because they'd be one and the same).  At that po=
+int,
+they're no longer reverting a seemingly innocous "give userspace more info"=
+ commit,
+they're reverting something that clearly advertises a feature userspace, wh=
+ich
+again provides a clue that a straight revert might not be super safe.
+
+> Sure the squash might make sense for the specific commits in the series, =
+but
+> there's a general issue that isn't really being solved.
+
+Patches within a series and future series are two very different things.
+
+> Maybe I'm just letting the better be the enemy of the best,
+
+The "best" isn't even possible, unless we never ship anything, ever.
+
+> but I do like the current separation/single-focus of the commits.
+
+Because you already know what the entire series does.  Someone looking at t=
+his
+patch without already understanding the big picture is going to have no ide=
+a that
+these two patches are tightly coupled.
+
+And again, now that we've punted on annotating everything, I see zero reaso=
+n to
+split the patches.  Maybe you could argue it provides a new bisection point=
+, but
+again the patches are _tiny_, and that same bisection point is effectively =
+achieved
+by running with an "older" userspace, i.e. a userspace that doesn't utilize=
+ the
+KVM_MEM_EXIT_ON_MISSING, which is literally every userspace in existence ri=
+ght now.
+
+> That said, the squash is nbd and I can go ahead if you're not convinced.
