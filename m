@@ -1,267 +1,262 @@
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E49D63AC
-	for <kvmarm@lists.linux.dev>; Thu,  2 Nov 2023 09:35:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E699D14293
+	for <kvmarm@lists.linux.dev>; Thu,  2 Nov 2023 10:32:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gd5fyW/5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698917744; x=1730453744;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=UMBvCakKT8U88QbLtZU4M0lTyMosxIU9x7W7yrZ46u4=;
-  b=Gd5fyW/5jopmAG6yVqTk3N1DD1tsHRVF4bSt2Q4AMpyD+okuF2yBsvOI
-   a8/IFSNa+CWBwS+C5A8+tpM1cp/BbVGiPpncYrwSpEvx/2qgAbfeTH2/9
-   bkwjXAmFZXedJ1rYuiUNIderhqcMCOOnAmz2u32dDZARUyOjVlwbpQ+ZF
-   h0xZvMdNV10lHQAp0ElLPkblj+x6ylEn6WByyb436XpXCT74XViOcRd0J
-   5dGPOES49NZsLC594MfKFFwzKOCTjKCStHA2wXs0qs6/tWPFAlNRnRp4i
-   MgZA5fhvWxvEjFHgZ6VaE+sf1/nSR0JkMY1tbvDJMISSK49lSOqXhUOPj
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10881"; a="392559581"
-X-IronPort-AV: E=Sophos;i="6.03,271,1694761200"; 
-   d="scan'208";a="392559581"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 02:35:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10881"; a="737700570"
-X-IronPort-AV: E=Sophos;i="6.03,271,1694761200"; 
-   d="scan'208";a="737700570"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 02 Nov 2023 02:35:42 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 2 Nov 2023 02:35:42 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 2 Nov 2023 02:35:41 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Thu, 2 Nov 2023 02:35:41 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Thu, 2 Nov 2023 02:35:40 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=crBfvbFv0Nw4wYstkZJMvqReFKnvEIc4B2WnNKm6vCc5HmQy7QKfWfwcgkl/kluc0pTW/Y7grIn+7FLkpJHe7j52lIyjsfO/U/gYN0do6ttXLyXpeRgTs/hNpND6bR+sNtV2SXyWlVFjKI2OUgLqeyLPGWmMfqsoF5N04MaQ+23c9MXn+73YxF3c9a7N3xq67WetBSqu0x6t8noFpAeOmVEPkq53hbFBCcsAmNgTrMB5+rkeJJdWWm0shsbumXfZfHZDYROYSx+PIiDSW5mbtwi5H78VD3yqlVwciqUayFCCM3oyRnyzl2L2zaJUm+TmMfLaXX+MSq1Mx3cshw15zA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UMBvCakKT8U88QbLtZU4M0lTyMosxIU9x7W7yrZ46u4=;
- b=UV3B91ZvYIcLCMK6fNXASfDH6EFB1Emb8DlHJcoRF4+IYcAuLLegp6v2bDMwbSm3lIUk9T2Gj9dtUQutP7br/cXJJmQozh5VwmfWS0+SRfTuJjb54llACpngRGuo47E3WbxbyQV1Ms/9EYyjTA32NHuRIIWPUP7245pjp3wqCxQrBA177a33zvI3dpTiF8IJebVFK0pxYuX3Etx5nj4V4Q6wPJvXLO+lheHGoQdy82wxRL1iuhjXqco1oA9dCv/qFBHg0KRk5DgWsyqfXCUYdSSxQGChrI1ZAm+cXUQkZrsS63zj4NEPlyUhdNv/3xuyyht3Gmv+rZzmUQqbv86TTA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by SJ1PR11MB6179.namprd11.prod.outlook.com (2603:10b6:a03:45a::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.19; Thu, 2 Nov
- 2023 09:35:36 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::5d1:aa22:7c98:f3c6]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::5d1:aa22:7c98:f3c6%6]) with mapi id 15.20.6954.019; Thu, 2 Nov 2023
- 09:35:36 +0000
-From: "Huang, Kai" <kai.huang@intel.com>
-To: "Christopherson,, Sean" <seanjc@google.com>
-CC: "Li, Xiaoyao" <xiaoyao.li@intel.com>, "kvm-riscv@lists.infradead.org"
-	<kvm-riscv@lists.infradead.org>, "mic@digikod.net" <mic@digikod.net>,
-	"liam.merwick@oracle.com" <liam.merwick@oracle.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-	"david@redhat.com" <david@redhat.com>, "linux-mips@vger.kernel.org"
-	<linux-mips@vger.kernel.org>, "amoorthy@google.com" <amoorthy@google.com>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	"tabba@google.com" <tabba@google.com>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-fsdevel@vger.kernel.org"
-	<linux-fsdevel@vger.kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, "michael.roth@amd.com" <michael.roth@amd.com>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	"palmer@dabbelt.com" <palmer@dabbelt.com>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "mpe@ellerman.id.au"
-	<mpe@ellerman.id.au>, "Annapurve, Vishal" <vannapurve@google.com>,
-	"vbabka@suse.cz" <vbabka@suse.cz>, "mail@maciej.szmigiero.name"
-	<mail@maciej.szmigiero.name>, "linux-riscv@lists.infradead.org"
-	<linux-riscv@lists.infradead.org>, "maz@kernel.org" <maz@kernel.org>,
-	"willy@infradead.org" <willy@infradead.org>, "dmatlack@google.com"
-	<dmatlack@google.com>, "anup@brainfault.org" <anup@brainfault.org>,
-	"yu.c.zhang@linux.intel.com" <yu.c.zhang@linux.intel.com>, "Xu, Yilun"
-	<yilun.xu@intel.com>, "qperret@google.com" <qperret@google.com>,
-	"brauner@kernel.org" <brauner@kernel.org>, "isaku.yamahata@gmail.com"
-	<isaku.yamahata@gmail.com>, "ackerleytng@google.com"
-	<ackerleytng@google.com>, "jarkko@kernel.org" <jarkko@kernel.org>,
-	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-mm@kvack.org"
-	<linux-mm@kvack.org>, "Wang, Wei W" <wei.w.wang@intel.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>
-Subject: Re: [PATCH v13 09/35] KVM: Add KVM_EXIT_MEMORY_FAULT exit to report
- faults to userspace
-Thread-Topic: [PATCH v13 09/35] KVM: Add KVM_EXIT_MEMORY_FAULT exit to report
- faults to userspace
-Thread-Index: AQHaCQKnsgoTcbnsvUKkAITO6oVjaLBlURAAgABw5QCAAKIkgIAAabmA
-Date: Thu, 2 Nov 2023 09:35:35 +0000
-Message-ID: <32cb71700aedcbd1f65276cf44a601760ffc364b.camel@intel.com>
-References: <20231027182217.3615211-1-seanjc@google.com>
-	 <20231027182217.3615211-10-seanjc@google.com>
-	 <482bfea6f54ea1bb7d1ad75e03541d0ba0e5be6f.camel@intel.com>
-	 <ZUKMsOdg3N9wmEzy@google.com>
-	 <64e3764e36ba7a00d94cc7db1dea1ef06b620aaf.camel@intel.com>
-In-Reply-To: <64e3764e36ba7a00d94cc7db1dea1ef06b620aaf.camel@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.48.4 (3.48.4-1.fc38) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|SJ1PR11MB6179:EE_
-x-ms-office365-filtering-correlation-id: 82da4200-7f63-416f-6743-08dbdb87113e
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: TxLFXlVtDNnTyT8wpY9mhAPQ9sjguquwFou9ONyyELsPOh1zQRemHyhQjWzJ8Wfv8btLwTd53CezrVTwKdkDfOt446ZxTNPwmLzrM+7sHe1wYcEtplEvAsFaNIeKbbDBqQP55/+4CmqIJHc8pZX8Bf9NA/ZKHvW0+XFFMo2aVp9qkqIs7vSAVyw6uJLs9WYXnUWj6+MLsanACjRjB57IPG9+l5uWTma/T8XbSFaK19MOr6i25v+oG8qq4/RuqxlFwm9ca8y9mPUNuChT9+5vdm6Zei4/Hufai7+cDYhl4zx4fJdqx5iAiD1Nh4QX2NqcH7LoOV/2koRyyuFt47Yx6v7sG4qSEzwI5XlJEofTxjdvD6jTBDD2BBSiT4IJ5iZgruvC6T5fvVFz5RQ59eGj+BTTttAkRU5xLHy5Hj8sfnwdIzt5YT95SCePv9m43qkbrRzgglM0PUPXnXQCeX8dkxNcY4SWxVmuZjyQs1l8d0RjudUdTv2d2z2SvOmMBU8Tb3be17hup90dZ0WVkQDtt+xq66FLSh/+Sy+JSj04PqYpFJk1hR3+2Hns79OCke9lKDUwrr2Qcmhy0r7wUh0QA1mii+SOwMSBmft6M6LX5hQ=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(366004)(39860400002)(396003)(136003)(230922051799003)(451199024)(1800799009)(186009)(64100799003)(478600001)(6486002)(41300700001)(966005)(6506007)(71200400001)(2616005)(4326008)(64756008)(8676002)(66556008)(76116006)(8936002)(54906003)(66476007)(83380400001)(26005)(5660300002)(7416002)(7406005)(66446008)(2906002)(6916009)(91956017)(66946007)(316002)(38100700002)(86362001)(82960400001)(6512007)(122000001)(38070700009)(36756003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Y2xtSnl0aEpUVmNTSDVKWmFxU0V4RTE3NElhTnVuZ0dnTWlKUHZSeldQSEN0?=
- =?utf-8?B?em9iVU1LbFZDUGxENEcvKzkxYnhXNlAvamlDZGJQUng2NGRma3d0ai9GMzVz?=
- =?utf-8?B?MTl4cmxJWjdZdjArNHRoeU5FaUZOakxuMm40bGV5Si9Da0ZFRmJwdjY5dDZP?=
- =?utf-8?B?eHVpOHhFZk1NRzRFRlhlTGtLcEJIV3VjNDd3bHJMOHpnTXRoV3lqb3BSWEJP?=
- =?utf-8?B?VDVjK0VDU0tlaWlveHU0NGdicFdWdkFyVUg0UHVaOG9HekNtSW1wM3o0dXhw?=
- =?utf-8?B?b3QzbGVrTDJhaHdmUkNLWWJZc09SRExWR3I4QTgveFVQRmliV2JENHdoYkZv?=
- =?utf-8?B?d0lVTXV0bkg1MVZ3Uzc5dEZHcWd5UDBCK3RpVWQxb1ZCMExLZlUwSjZlSXZS?=
- =?utf-8?B?WHNPbUxBN21MUkhpOE9aVjlZU21sNStYamsrUWNUejFGck9iTG9DVllLSVpv?=
- =?utf-8?B?QmIxUWpWdElZQ2VSM0JUMFAwN0tlbWN3NTdpcUVkUTdCdUJUUnhIR2VDWTZ3?=
- =?utf-8?B?dW1Rd2MrcjdRMUh5aVNscENlU1djYllBUTdsT1RpMWhyWlQ3LzZ1OGR0RU05?=
- =?utf-8?B?UlZueEQ4NjlzbjRmNkZrdXpIazZYc1dYT2kwRlNhcTVOZUprNWxLNEM2TUVi?=
- =?utf-8?B?cWRvQTlubFRlWmNCV1BBRjg5bkZiTFFMNkxZQ3cvZzM4K0pmeUluOFNMWjhN?=
- =?utf-8?B?dmZ4Rjh2TGpTWXVYUm85VDBGZHhwakMvLzZNL1lxM1l6d1dhbEQ2YzhzbnNj?=
- =?utf-8?B?VnE3dlNpL1ZIelRBL3Fqa1hQNW9zRzFDM3VwN2pBdno4V2JTcWh3WlJMY1hQ?=
- =?utf-8?B?VWhqYU9ndlNxNW9QQTdySEk4S0FITWtoRk5zaVl4SzJmYVBYdU9xaDJiK1pP?=
- =?utf-8?B?Njh0QkVGTzJIRi9teTc2T0RSRmFheFFBMG1jUkdRNUl0ZTFLMXdrV29RaUxD?=
- =?utf-8?B?aFpkR25Kc243Z2EzYTA3QnJHdkVhUWZPOHE0K1ByQ2JJTEl6ZFpodEpwZ1d5?=
- =?utf-8?B?RWxnRWtIRnZ6Vnh1MWVPb1UwQW0rT2hUUEZUYUFXMW1VVkZ3VTBsTmxyRDhy?=
- =?utf-8?B?ZUNZSWpQUkxOYWZLeGkxUkxDNnpYU1NrLzRBYnBodFdTOGJTbktzTGZOZTNr?=
- =?utf-8?B?T045bjhFRWppTTZCZm9FTkJvaXBxbnJUSU9tQysycndUSnhLeG1ZdkhwZkxD?=
- =?utf-8?B?aCtZcGxkNzdGNDdneWVRRE1RQnlyYlhyQkdSd0tCQzJydnV2d3FTaUhaRDMr?=
- =?utf-8?B?cDIrNTdMOXpIVjcxU3kxWjFtMWZBTXhZSEZ3TkJvb2wzd0xYYWM3MmNsWHE1?=
- =?utf-8?B?ejBqSzFoNUs0RWFyWlZmYythT0UyZkdpejlKM2ptc2FOSWRtVXFNK3VublJq?=
- =?utf-8?B?cUN2TkxHMFZkWSswQ1cvZHlVQkFSTzZQQVlRek5ZOE5Fam5ZTUV3WmtnUGpz?=
- =?utf-8?B?MzFMUFBISU9BVEtEbFJUbGN6RVE2YWZtZnM4ZTlUWkF1a3Q0TEU5UllWc0dD?=
- =?utf-8?B?TDQvMnR3WCsvanJib1c3T0JjSEdIMG9ZNDJPejUvSWdLY2wwMG1VODFNYzAv?=
- =?utf-8?B?UXl1VnRpY2owTlRqUnFlR25peXIzTGVNSGlVMnBpVVNMN0QvMkt2VVdCelJV?=
- =?utf-8?B?U2tnU0RIaDQ4eElCY3RoQ3cyeFFnWnROUFNLNjJBcjRSeXk0eG5Pc1p6cmFJ?=
- =?utf-8?B?dTlnSE5jR0xrdzZGSlRqVGRDSWRrLzBoSXJZS052dTF6NEJMSlczUTdHOEc0?=
- =?utf-8?B?WVhFdEVCNUVZYnNqN0NucmxlRSs0ZjNETThxRkN0TjZzZmVsL042aGpaZHFq?=
- =?utf-8?B?NFdYSlR0cmk3VHFHanF6cGpvcFM4eGJNeFMrVk5ZbkF6WGZGYlN4aUVFbVhu?=
- =?utf-8?B?dmlIVzJhc0puZDlXV0kvcTdTa3Q0cEU3ZmcycU5qS1ZOTjVrZUxQQlJFUFhN?=
- =?utf-8?B?cCs0SElJN21pUHk0S0hLVHF2TjZoOFJkQzFIaklTUUwyUG55L2NSbnZOQy9s?=
- =?utf-8?B?WEVmLzNVc3A5aFdhVUg2eVFKL1phUklXZnVOOTZtSEs4TUYvaUM0TGlPdTJ5?=
- =?utf-8?B?RHdtNzdCYThEUm9WbDB6SjBFa21tODlYdnhkNWhBR3ZuK1MxSkpZTUcxcDAy?=
- =?utf-8?B?WHhCdGhuWGZkWU91UkQ3d1dMaVB4ODRmZEpHelNkSVZlOWpLSitIQWNWVk80?=
- =?utf-8?B?eEE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <AAECC48038C4554DA998B24D16B9332B@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L46DUtDI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698921162;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=EePgrsn5C6IrnNIxegoYsuWMp1Sc1phl1cmFpN1d7s8=;
+	b=L46DUtDIQz53ccRCdQJFJW+IAJeOTCUlk/sx4p80wcznfruR810GKiOwtP4ylzCiGlKFDX
+	podk5YYZT9sfsW7qPcP6fVrvomodgFreTYDjcy6BU0i0uaDplExrcjosRKYpmitAczB1Dh
+	2/MHXbm+gWrsNdckstPhqNzG0zDlYQ4=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-631--BBaYP_-M6GhBfevVT_y4g-1; Thu, 02 Nov 2023 06:32:41 -0400
+X-MC-Unique: -BBaYP_-M6GhBfevVT_y4g-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-9d4b8735f48so54139066b.1
+        for <kvmarm@lists.linux.dev>; Thu, 02 Nov 2023 03:32:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698921160; x=1699525960;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EePgrsn5C6IrnNIxegoYsuWMp1Sc1phl1cmFpN1d7s8=;
+        b=Bp8V0i05Yh0ureKE7EiCz4WEF2yKWi8u9cTpVdS0yK7NyJDQ1G11nHuugdBnuRyvpo
+         9BcMZhzxAsi/UXyxXLfsvNfcPB6+CH43PgbDLwt0dGHgdG/kT507AJdWkRfX8g6cnhxK
+         WYv5hOUFiz8BRxQ0Fkd40DiH7s9QUW8K0puhZn/xDVJJqTEfBdfuBDatjsmzBSMH+DQ/
+         jfYBolKgfYBYvdhXhhf7rH6GWYllHteAEGpYkctH92z+cwEcdPAsT8asWxhVzLPHEUyS
+         xJVRtTK1oYXiE6lag3uld93lcb3qkfGeflTb6H41iAnhE3Iu8Tja5mN9WvF/dxwip6/s
+         oQhA==
+X-Gm-Message-State: AOJu0YyCoMmRB9jdp6xz+6Ae7C4GGG9r+OiXMiqPT2gUPIeSNfQaibzj
+	02VJsAGmgbSnlwucMgKQIgpr/XaaNJkPFrtHbJ5qp5KnNGqvuUt6uqN4JftJWSwHM8y8oq30xMh
+	4t2uMmqcxoAkUz0ho
+X-Received: by 2002:a17:907:70a:b0:9bd:9bfe:e410 with SMTP id xb10-20020a170907070a00b009bd9bfee410mr4134674ejb.72.1698921160428;
+        Thu, 02 Nov 2023 03:32:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHdKWTZCjPNQtOILp1najbjDKUZt1gJ0TmclwPTaP4Nu9rDAFXiy/5MsPxAUlznxhN/2PedEg==
+X-Received: by 2002:a17:907:70a:b0:9bd:9bfe:e410 with SMTP id xb10-20020a170907070a00b009bd9bfee410mr4134618ejb.72.1698921159974;
+        Thu, 02 Nov 2023 03:32:39 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id y13-20020a170906470d00b0099bd1a78ef5sm957651ejq.74.2023.11.02.03.32.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Nov 2023 03:32:39 -0700 (PDT)
+Message-ID: <a03d0e36-7b38-4841-9c62-66c9029e388d@redhat.com>
+Date: Thu, 2 Nov 2023 11:32:34 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 82da4200-7f63-416f-6743-08dbdb87113e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Nov 2023 09:35:35.8679
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: enp1EsQGJT/bv7z7pycADECFt+caLxo1PZlXc/7uu/P2lV7Y3CPeU1vH3dznWl7/GdOfwsnzLoFFRhRCns1qMA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6179
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v13 13/35] KVM: Introduce per-page memory attributes
+To: "Huang, Kai" <kai.huang@intel.com>,
+ "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+ "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+ "Christopherson,, Sean" <seanjc@google.com>,
+ "brauner@kernel.org" <brauner@kernel.org>,
+ "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+ "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+ "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+ "palmer@dabbelt.com" <palmer@dabbelt.com>, "maz@kernel.org"
+ <maz@kernel.org>, "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+ "willy@infradead.org" <willy@infradead.org>,
+ "anup@brainfault.org" <anup@brainfault.org>,
+ "akpm@linux-foundation.org" <akpm@linux-foundation.org>
+Cc: "Li, Xiaoyao" <xiaoyao.li@intel.com>,
+ "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+ "mic@digikod.net" <mic@digikod.net>,
+ "liam.merwick@oracle.com" <liam.merwick@oracle.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+ "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+ "david@redhat.com" <david@redhat.com>, "tabba@google.com"
+ <tabba@google.com>, "amoorthy@google.com" <amoorthy@google.com>,
+ "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+ "michael.roth@amd.com" <michael.roth@amd.com>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+ "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+ "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+ "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+ "Annapurve, Vishal" <vannapurve@google.com>, "vbabka@suse.cz"
+ <vbabka@suse.cz>, "mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>,
+ "yu.c.zhang@linux.intel.com" <yu.c.zhang@linux.intel.com>,
+ "qperret@google.com" <qperret@google.com>,
+ "dmatlack@google.com" <dmatlack@google.com>, "Xu, Yilun"
+ <yilun.xu@intel.com>, "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+ "ackerleytng@google.com" <ackerleytng@google.com>,
+ "jarkko@kernel.org" <jarkko@kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>, "Wang, Wei W"
+ <wei.w.wang@intel.com>
+References: <20231027182217.3615211-1-seanjc@google.com>
+ <20231027182217.3615211-14-seanjc@google.com>
+ <b486ed5036fab6d6d4e13a6c68abddcb9541d51b.camel@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <b486ed5036fab6d6d4e13a6c68abddcb9541d51b.camel@intel.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-T24gVGh1LCAyMDIzLTExLTAyIGF0IDAzOjE3ICswMDAwLCBIdWFuZywgS2FpIHdyb3RlOg0KPiBP
-biBXZWQsIDIwMjMtMTEtMDEgYXQgMTA6MzYgLTA3MDAsIFNlYW4gQ2hyaXN0b3BoZXJzb24gd3Jv
-dGU6DQo+ID4gT24gV2VkLCBOb3YgMDEsIDIwMjMsIEthaSBIdWFuZyB3cm90ZToNCj4gPiA+IA0K
-PiA+ID4gPiArNy4zNCBLVk1fQ0FQX01FTU9SWV9GQVVMVF9JTkZPDQo+ID4gPiA+ICstLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gPiA+ID4gKw0KPiA+ID4gPiArOkFyY2hpdGVjdHVy
-ZXM6IHg4Ng0KPiA+ID4gPiArOlJldHVybnM6IEluZm9ybWF0aW9uYWwgb25seSwgLUVJTlZBTCBv
-biBkaXJlY3QgS1ZNX0VOQUJMRV9DQVAuDQo+ID4gPiA+ICsNCj4gPiA+ID4gK1RoZSBwcmVzZW5j
-ZSBvZiB0aGlzIGNhcGFiaWxpdHkgaW5kaWNhdGVzIHRoYXQgS1ZNX1JVTiB3aWxsIGZpbGwNCj4g
-PiA+ID4gK2t2bV9ydW4ubWVtb3J5X2ZhdWx0IGlmIEtWTSBjYW5ub3QgcmVzb2x2ZSBhIGd1ZXN0
-IHBhZ2UgZmF1bHQgVk0tRXhpdCwgZS5nLiBpZg0KPiA+ID4gPiArdGhlcmUgaXMgYSB2YWxpZCBt
-ZW1zbG90IGJ1dCBubyBiYWNraW5nIFZNQSBmb3IgdGhlIGNvcnJlc3BvbmRpbmcgaG9zdCB2aXJ0
-dWFsDQo+ID4gPiA+ICthZGRyZXNzLg0KPiA+ID4gPiArDQo+ID4gPiA+ICtUaGUgaW5mb3JtYXRp
-b24gaW4ga3ZtX3J1bi5tZW1vcnlfZmF1bHQgaXMgdmFsaWQgaWYgYW5kIG9ubHkgaWYgS1ZNX1JV
-TiByZXR1cm5zDQo+ID4gPiA+ICthbiBlcnJvciB3aXRoIGVycm5vPUVGQVVMVCBvciBlcnJubz1F
-SFdQT0lTT04gKmFuZCoga3ZtX3J1bi5leGl0X3JlYXNvbiBpcyBzZXQNCj4gPiA+ID4gK3RvIEtW
-TV9FWElUX01FTU9SWV9GQVVMVC4NCj4gPiA+IA0KPiA+ID4gSUlVQyByZXR1cm5pbmcgLUVGQVVM
-VCBvciB3aGF0ZXZlciAtZXJybm8gaXMgc29ydCBvZiBLVk0gaW50ZXJuYWwNCj4gPiA+IGltcGxl
-bWVudGF0aW9uLg0KPiA+IA0KPiA+IFRoZSBlcnJubyB0aGF0IGlzIHJldHVybmVkIHRvIHVzZXJz
-cGFjZSBpcyBBQkkuICBJbiBLVk0sIGl0J3MgYSBfdmVyeV8gcG9vcmx5DQo+ID4gZGVmaW5lZCBB
-QkkgZm9yIHRoZSB2YXN0IG1ham9yaXR5IG9mIGlvY3RscygpLCBidXQgaXQncyBzdGlsbCB0ZWNo
-bmljYWxseSBBQkkuDQo+ID4gS1ZNIGdldHMgYXdheSB3aXRoIGJlaW5nIGNhdmFsaWVyIHdpdGgg
-ZXJybm8gYmVjYXVzZSB0aGUgdmFzdCBtYWpvcml0eSBvZiBlcnJvcnMNCj4gPiBhcmUgY29uc2lk
-ZXJlZCBmYXRhbCBieSB1c2VyZXNwYWNlLCBpLmUuIGluIG1vc3QgY2FzZXMsIHVzZXJzcGFjZSBz
-aW1wbHkgZG9lc24ndA0KPiA+IGNhcmUgYWJvdXQgdGhlIGV4YWN0IGVycm5vLg0KPiA+IA0KPiA+
-IEEgZ29vZCBleGFtcGxlIGlzIEtWTV9SVU4gd2l0aCAtRUlOVFI7IGlmIEtWTSB3ZXJlIHRvIHJl
-dHVybiBzb21ldGhpbmcgb3RoZXIgdGhhbg0KPiA+IC1FSU5UUiBvbiBhIHBlbmRpbmcgc2lnbmFs
-IG9yIHZjcHUtPnJ1bi0+aW1tZWRpYXRlX2V4aXQsIHVzZXJzcGFjZSB3b3VsZCBmYWxsIG92ZXIu
-DQo+ID4gDQo+ID4gPiBJcyBpdCBiZXR0ZXIgdG8gcmVsYXggdGhlIHZhbGlkaXR5IG9mIGt2bV9y
-dW4ubWVtb3J5X2ZhdWx0IHdoZW4NCj4gPiA+IEtWTV9SVU4gcmV0dXJucyBhbnkgLWVycm5vPw0K
-PiA+IA0KPiA+IE5vdCB1bmxlc3MgdGhlcmUncyBhIG5lZWQgdG8gZG8gc28sIGFuZCBpZiB0aGVy
-ZSBpcyB0aGVuIHdlIGNhbiB1cGRhdGUgdGhlDQo+ID4gZG9jdW1lbnRhdGlvbiBhY2NvcmRpbmds
-eS4gIElmIEtWTSdzIEFCSSBpcyB0aGF0IGt2bV9ydW4ubWVtb3J5X2ZhdWx0IGlzIHZhbGlkDQo+
-ID4gZm9yIGFueSBlcnJubywgdGhlbiBLVk0gd291bGQgbmVlZCB0byBwdXJnZSBrdm1fcnVuLmV4
-aXRfcmVhc29uIHN1cGVyIGVhcmx5IGluDQo+ID4gS1ZNX1JVTiwgZS5nLiB0byBwcmV2ZW50IGFu
-IC1FSU5UUiByZXR1cm4gZHVlIHRvIGltbWVkaWF0ZV9leGl0IGZyb20gYmVpbmcNCj4gPiBtaXNp
-bnRlcnByZXRlZCBhcyBLVk1fRVhJVF9NRU1PUllfRkFVTFQuICBBbmQgcHVyZ2luZyBleGl0X3Jl
-YXNvbiBzdXBlciBlYXJseSBpcw0KPiA+IHN1YnRseSB0cmlja3kgYmVjYXVzZSBLVk0ncyAoYWdh
-aW4sIHBvb3JseSBkb2N1bWVudGVkKSBBQkkgaXMgdGhhdCAqc29tZSogZXhpdA0KPiA+IHJlYXNv
-bnMgYXJlIHByZXNlcnZlZCBhY3Jvc3MgS1ZNX1JVTiB3aXRoIHZjcHUtPnJ1bi0+aW1tZWRpYXRl
-X2V4aXQgKG9yIHdpdGggYQ0KPiA+IHBlbmRpbmcgc2lnbmFsKS4NCj4gPiANCj4gPiBodHRwczov
-L2xvcmUua2VybmVsLm9yZy9hbGwvWkZGYndPWFo1dUklMkZnZGFmQGdvb2dsZS5jb20NCj4gPiAN
-Cj4gPiANCj4gDQo+IEFncmVlZCB3aXRoIG5vdCB0byByZWxheCB0byBhbnkgZXJybm8uICBIb3dl
-dmVyIHVzaW5nIC1FRkFVTFQgYXMgcGFydCBvZiBBQkkNCj4gZGVmaW5pdGlvbiBzZWVtcyBhIGxp
-dHRsZSBiaXQgZGFuZ2Vyb3VzLCBlLmcuLCBzb21lb25lIGNvdWxkIGFjY2lkZW50YWxseSBvcg0K
-PiBtaXN0YWtlbmx5IHJldHVybiAtRUZBVUxUIGluIEtWTV9SVU4gYXQgZWFybHkgdGltZSBhbmQv
-b3IgaW4gYSBjb21wbGV0ZWx5DQo+IGRpZmZlcmVudCBjb2RlIHBhdGgsIGV0Yy4gwqAtRUlOVFIg
-aGFzIHdlbGwgZGVmaW5lZCBtZWFuaW5nLCBidXQgLUVGQVVMVCAod2hpY2gNCj4gaXMgIkJhZCBh
-ZGRyZXNzIikgc2VlbXMgZG9lc24ndCBidXQgSSBhbSBub3Qgc3VyZSBlaXRoZXIuIDotKQ0KPiAN
-Cj4gT25lIGV4YW1wbGUgaXMsIGZvciBiYWNraW5nIFZNQSB3aXRoIFZNX0lPIHwgVk1fUEZOTUFQ
-LCBodmFfdG9fcGZuKCkgcmV0dXJucw0KPiBLVk1fUEZOX0VSUl9GQVVMVCB3aGVuIHRoZSBrZXJu
-ZWwgY2Fubm90IGdldCBhIHZhbGlkIFBGTiAoZS5nLiB3aGVuIFNHWCB2ZXBjDQo+IGZhdWx0IGhh
-bmRsZXIgZmFpbGVkIHRvIGFsbG9jYXRlIEVQQykgYW5kIGt2bV9oYW5kbGVfZXJyb3JfcGZuKCkg
-d2lsbCBqdXN0DQo+IHJldHVybiAtRUZBVUxULiAgSWYga3ZtX3J1bi5leGl0X3JlYXNvbiBpc24n
-dCBwdXJnZWQgZWFybHkgdGhlbiBpcyBpdCBwb3NzaWJsZQ0KPiB0byBoYXZlIHNvbWUgaXNzdWUg
-aGVyZT8NCj4gDQoNCkFsc28sIHJlZ2FyZGxlc3Mgd2hldGhlciAtRUZBVUxUIGlzIHRvbyBhbWJp
-Z3VvdXMgdG8gYmUgcGFydCBvZiBBQkksIGNvdWxkIHlvdQ0KZWxhYm9yYXRlIHRoZSBFSFdQT0lT
-T04gcGFydD8gIElJVUMgS1ZNIGNhbiBhbHJlYWR5IGhhbmRsZSB0aGUgY2FzZSBvZiBwb2lzb25l
-ZA0KcGFnZSBieSBzZW5kaW5nIHNpZ25hbCB0byB1c2VyIGFwcDogDQoNCglzdGF0aWMgaW50IGt2
-bV9oYW5kbGVfZXJyb3JfcGZuKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgDQoJCQlzdHJ1Y3Qga3Zt
-X3BhZ2VfZmF1bHQgKmZhdWx0KSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgDQoJeyAgICAgICANCgkJLi4uDQoNCiAgICAgICAJCWlmIChmYXVsdC0+cGZuID09
-IEtWTV9QRk5fRVJSX0hXUE9JU09OKSB7DQogICAgICAgICAgICAgIAkJa3ZtX3NlbmRfaHdwb2lz
-b25fc2lnbmFsKGZhdWx0LT5zbG90LCBmYXVsdC0+Z2ZuKTsNCiAgICAgICAgICAgICAgICAJcmV0
-dXJuIFJFVF9QRl9SRVRSWTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICANCiAgICAgICAgCX0NCgl9DQoNCkFuZCAoc29ycnkgdG8gaGlqYWNrKSBJIGFtIHRoaW5raW5n
-IHdoZXRoZXIgIlNHWCB2ZXBjIHVuYWJsZSB0byBhbGxvY2F0ZSBFUEMiDQpjYW4gYWxzbyB1c2Ug
-dGhpcyBtZW1vcnlfZmF1bHQgbWVjaGFuaXNtLiAgQ3VycmVudGx5IGFzIG1lbnRpb25lZCBhYm92
-ZSB3aGVuDQp2ZXBjIGZhdWx0IGhhbmRsZXIgY2Fubm90IGFsbG9jYXRlIEVQQyBwYWdlIEtWTSBy
-ZXR1cm5zIC1FRkFVTFQgdG8gUWVtdSwgYW5kDQpRZW11IHByaW50cyAuLi4NCg0KCS4uLjogQmFk
-IGFkZHJlc3MNCgk8ZHVtcCBndWVzdCBjcHUgcmVnaXN0ZXJzPg0KDQouLi4gd2hpY2ggaXMgbm9u
-c2Vuc2UuDQoNCklmIHdlIGNhbiB1c2UgbWVtb3J5X2ZhdWx0LmZsYWdzIChvciBpcyAnZmF1bHRf
-cmVhc29uJyBhIGJldHRlciBuYW1lPykgdG8gY2FycnkNCmEgc3BlY2lmaWMgdmFsdWUgZm9yIEVQ
-QyB0byBsZXQgUWVtdSBrbm93IGFuZCBRZW11IGNhbiB0aGVuIGRvIG1vcmUgcmVhc29uYWJsZQ0K
-dGhpbmdzLg0KDQo=
+On 11/2/23 04:01, Huang, Kai wrote:
+> On Fri, 2023-10-27 at 11:21 -0700, Sean Christopherson wrote:
+>> From: Chao Peng <chao.p.peng@linux.intel.com>
+>>
+>> In confidential computing usages, whether a page is private or shared is
+>> necessary information for KVM to perform operations like page fault
+>> handling, page zapping etc. There are other potential use cases for
+>> per-page memory attributes, e.g. to make memory read-only (or no-exec,
+>> or exec-only, etc.) without having to modify memslots.
+>>
+>> Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
+>> userspace to operate on the per-page memory attributes.
+>>    - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
+>>      a guest memory range.
+>>    - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
+>>      memory attributes.
+>>
+>> Use an xarray to store the per-page attributes internally, with a naive,
+>> not fully optimized implementation, i.e. prioritize correctness over
+>> performance for the initial implementation.
+>>
+>> Use bit 3 for the PRIVATE attribute so that KVM can use bits 0-2 for RWX
+>> attributes/protections in the future, e.g. to give userspace fine-grained
+>> control over read, write, and execute protections for guest memory.
+>>
+>> Provide arch hooks for handling attribute changes before and after common
+>> code sets the new attributes, e.g. x86 will use the "pre" hook to zap all
+>> relevant mappings, and the "post" hook to track whether or not hugepages
+>> can be used to map the range.
+>>
+>> To simplify the implementation wrap the entire sequence with
+>> kvm_mmu_invalidate_{begin,end}() even though the operation isn't strictly
+>> guaranteed to be an invalidation.  For the initial use case, x86 *will*
+>> always invalidate memory, and preventing arch code from creating new
+>> mappings while the attributes are in flux makes it much easier to reason
+>> about the correctness of consuming attributes.
+>>
+>> It's possible that future usages may not require an invalidation, e.g.
+>> if KVM ends up supporting RWX protections and userspace grants _more_
+>> protections, but again opt for simplicity and punt optimizations to
+>> if/when they are needed.
+>>
+>> Suggested-by: Sean Christopherson <seanjc@google.com>
+>> Link: https://lore.kernel.org/all/Y2WB48kD0J4VGynX@google.com
+>> Cc: Fuad Tabba <tabba@google.com>
+>> Cc: Xu Yilun <yilun.xu@intel.com>
+>> Cc: Mickaël Salaün <mic@digikod.net>
+>> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+>> Co-developed-by: Sean Christopherson <seanjc@google.com>
+>> Signed-off-by: Sean Christopherson <seanjc@google.com>
+>>
+> 
+> [...]
+> 
+>> +Note, there is no "get" API.  Userspace is responsible for explicitly tracking
+>> +the state of a gfn/page as needed.
+>> +
+>>
+> 
+> [...]
+> 
+>>   
+>> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+>> +static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm, gfn_t gfn)
+>> +{
+>> +	return xa_to_value(xa_load(&kvm->mem_attr_array, gfn));
+>> +}
+> 
+> Only call xa_to_value() when xa_load() returns !NULL?
+
+This xarray does not store a pointer, therefore xa_load() actually 
+returns an integer that is tagged with 1 in the low bit:
+
+static inline unsigned long xa_to_value(const void *entry)
+{
+         return (unsigned long)entry >> 1;
+}
+
+Returning zero for an empty entry is okay, so the result of xa_load() 
+can be used directly.
+
+
+>> +
+>> +bool kvm_range_has_memory_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
+>> +				     unsigned long attrs);
+> 
+> Seems it's not immediately clear why this function is needed in this patch,
+> especially when you said there is no "get" API above.  Add some material to
+> changelog?
+
+It's used by later patches; even without a "get" API, it's a pretty 
+fundamental functionality.
+
+>> +bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
+>> +					struct kvm_gfn_range *range);
+>> +bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+>> +					 struct kvm_gfn_range *range);
+> 
+> Looks if this Kconfig is on, the above two arch hooks won't have implementation.
+> 
+> Is it better to have two __weak empty versions here in this patch?
+> 
+> Anyway, from the changelog it seems it's not mandatory for some ARCH to provide
+> the above two if one wants to turn this on, i.e., the two hooks can be empty and
+> the ARCH can just use the __weak version.
+
+I think this can be added by the first arch that needs memory attributes 
+and also doesn't need one of these hooks.  Or perhaps the x86 
+kvm_arch_pre_set_memory_attributes() could be made generic and thus that 
+would be the __weak version.  It's too early to tell, so it's better to 
+leave the implementation to the architectures for now.
+
+Paolo
+
