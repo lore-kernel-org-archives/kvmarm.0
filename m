@@ -1,413 +1,330 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03F81BDF0
-	for <kvmarm@lists.linux.dev>; Thu,  2 Nov 2023 14:35:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pLJ5tl7Y"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-66d12b3b479so5706206d6.1
-        for <kvmarm@lists.linux.dev>; Thu, 02 Nov 2023 07:35:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698935716; x=1699540516; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/2lJd6XsyJuryPcyY7Aaw/1637wZx+D1R9nKqgAWHhc=;
-        b=pLJ5tl7YgXvbfpwYfrPCp7vB0trZUYZDGL4E5lG/djrj2yHA+zsTO9Qfgmc2aqciK9
-         X9rI8Mi6egm/VTk+zV/VCSsnDi+e/HrcwrllVtfItC69XgtuGv2WRYWvpmN19J1EHKjJ
-         kz91a/Iu5dCDzvq48alhqm2H8ZUTYqwtLtbSbDh+lEQ7wpSH8qH2UuvrQSUBOYiaCRYK
-         w+27SyL79GK/VtqEhA0wuo6NLER5ZVFCRV2GK1yksxrJ/bF7tqe1LdZStq+QGLpIml81
-         yWU6QWIGIIqGyJNpIQgaR2xNz+/asWRowXocq1o4O9rV/t6SDnJCV2pD6zjCmUVhBItk
-         qY4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698935716; x=1699540516;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/2lJd6XsyJuryPcyY7Aaw/1637wZx+D1R9nKqgAWHhc=;
-        b=pT45EP7FRefCdPnKPjmmexrkzIrWaCPncan4FTQJ2J7Us/sY3pq9VRiPAjjIxYwgcc
-         lPWC9b+TiH/3la8aqx0vrVdjyiuS+hEpzY40cHvs6UdntmAY9TemH8UiMDu+EkWmGyuO
-         J8b5NgI2PZjevmvKkfu8K9EiiKw6kadHBELwgE/TnyugkPpP/3MNEFRXNHOZcoVpImL6
-         bPvs4B/1ZsCsi/tpKW8anbMdXJ+0VyKAfUlERt27QVa2EYrRz9LHpGeItDv5bqluJjlp
-         qM01/3z8UXCrD8wgEZnsB7mS6y4NMAqn4KqfWPyioZWI+uJV/PZORpof3DMN1lmL0vNW
-         XSFw==
-X-Gm-Message-State: AOJu0Yz5lnjXdlv8vNPkI+FJ8AFubLVvAZv2L1swhBgesK0rU8cfAJ5k
-	gfMUmBXQ8DhE8+lNj9C0SJBFdpZEe/DMHwNaWPSEww==
-X-Google-Smtp-Source: AGHT+IFd3hjmyLuXSjGnT5FsRtAzP075qFDK3w/9FA3uch9hEM0UvybnX5VOnaQIaLR3sNNdinYmhN8LWUDVv4d6UXk=
-X-Received: by 2002:ad4:5761:0:b0:671:6003:73b1 with SMTP id
- r1-20020ad45761000000b00671600373b1mr17968741qvx.60.1698935716453; Thu, 02
- Nov 2023 07:35:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4D31C296
+	for <kvmarm@lists.linux.dev>; Thu,  2 Nov 2023 14:35:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.55])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4SLmWb4YYFzMmXM;
+	Thu,  2 Nov 2023 22:30:51 +0800 (CST)
+Received: from DESKTOP-6NKE0BC.china.huawei.com (10.174.185.210) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Thu, 2 Nov 2023 22:35:12 +0800
+From: Kunkun Jiang <jiangkunkun@huawei.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>, Jean-Philippe
+ Brucker <jean-philippe@linaro.org>, "open list:IRQCHIP DRIVERS"
+	<linux-kernel@vger.kernel.org>
+CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<wanghaibin.wang@huawei.com>, Kunkun Jiang <jiangkunkun@huawei.com>
+Subject: [RFC PATCH] KVM: arm/arm64: GICv4: Support shared VLPI
+Date: Thu, 2 Nov 2023 22:35:07 +0800
+Message-ID: <20231102143507.840-1-jiangkunkun@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-21-seanjc@google.com>
-In-Reply-To: <20231027182217.3615211-21-seanjc@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 2 Nov 2023 14:34:40 +0000
-Message-ID: <CA+EHjTyRwz7rnqy_qRa2ayPWAu_tjW5OeieZJEsaAVvXu1XeMw@mail.gmail.com>
-Subject: Re: [PATCH v13 20/35] KVM: x86/mmu: Handle page fault for private memory
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.185.210]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
+X-CFilter-Loop: Reflected
 
-On Fri, Oct 27, 2023 at 7:23=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> From: Chao Peng <chao.p.peng@linux.intel.com>
->
-> Add support for resolving page faults on guest private memory for VMs
-> that differentiate between "shared" and "private" memory.  For such VMs,
-> KVM_MEM_PRIVATE memslots can include both fd-based private memory and
-> hva-based shared memory, and KVM needs to map in the "correct" variant,
-> i.e. KVM needs to map the gfn shared/private as appropriate based on the
-> current state of the gfn's KVM_MEMORY_ATTRIBUTE_PRIVATE flag.
->
-> For AMD's SEV-SNP and Intel's TDX, the guest effectively gets to request
-> shared vs. private via a bit in the guest page tables, i.e. what the gues=
-t
-> wants may conflict with the current memory attributes.  To support such
-> "implicit" conversion requests, exit to user with KVM_EXIT_MEMORY_FAULT
-> to forward the request to userspace.  Add a new flag for memory faults,
-> KVM_MEMORY_EXIT_FLAG_PRIVATE, to communicate whether the guest wants to
-> map memory as shared vs. private.
->
-> Like KVM_MEMORY_ATTRIBUTE_PRIVATE, use bit 3 for flagging private memory
-> so that KVM can use bits 0-2 for capturing RWX behavior if/when userspace
-> needs such information, e.g. a likely user of KVM_EXIT_MEMORY_FAULT is to
-> exit on missing mappings when handling guest page fault VM-Exits.  In
-> that case, userspace will want to know RWX information in order to
-> correctly/precisely resolve the fault.
->
-> Note, private memory *must* be backed by guest_memfd, i.e. shared mapping=
-s
-> always come from the host userspace page tables, and private mappings
-> always come from a guest_memfd instance.
->
-> Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
+In some scenarios, the guest virtio-pci driver will request two MSI-X,
+one vector for config, one shared for queues. However, the host driver
+(vDPA or VFIO) will request a vector for each queue.
 
-With my limited understanding of kvm-x86 mmu code:
-Reviewed-by: Fuad Tabba <tabba@google.com>
+In the current implementation of GICv4/4.1 direct injection of vLPI,
+pINTID and vINTID have one-to-one correspondence. Therefore, the
+above scenario cannot be handled correctly. The host kernel will
+execute its_map_vlpi multiple times but only execute its_unmap_vlpi
+once. This may cause guest hang[1].
 
-Tested the x86 code (as part of this patch series) on qemu. The x86
-fault handling code was used as a guide to how it should be done for
-pKVM/arm64 (with similar code added there):
-Tested-by: Fuad Tabba <tabba@google.com>
+|	WARN_ON(!(irq->hw && irq->host_irq == virq));
+|	if (irq->hw) {
+|		atomic_dec(&irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count);
+|		irq->hw = false;
+|		ret = its_unmap_vlpi(virq);
+|	}
 
-Cheers,
-/fuad
+Add a list to struct vgic_irq to record all host irqs mapped to the vlpi.
+When performing an action on the vlpi, traverse the list and perform this
+action on all host irqs.
 
->  Documentation/virt/kvm/api.rst  |   8 ++-
->  arch/x86/kvm/mmu/mmu.c          | 101 ++++++++++++++++++++++++++++++--
->  arch/x86/kvm/mmu/mmu_internal.h |   1 +
->  include/linux/kvm_host.h        |   8 ++-
->  include/uapi/linux/kvm.h        |   1 +
->  5 files changed, 110 insertions(+), 9 deletions(-)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
-rst
-> index 7f00c310c24a..38dc1fda4f45 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6837,6 +6837,7 @@ spec refer, https://github.com/riscv/riscv-sbi-doc.
->
->                 /* KVM_EXIT_MEMORY_FAULT */
->                 struct {
-> +  #define KVM_MEMORY_EXIT_FLAG_PRIVATE (1ULL << 3)
->                         __u64 flags;
->                         __u64 gpa;
->                         __u64 size;
-> @@ -6845,8 +6846,11 @@ spec refer, https://github.com/riscv/riscv-sbi-doc=
-.
->  KVM_EXIT_MEMORY_FAULT indicates the vCPU has encountered a memory fault =
-that
->  could not be resolved by KVM.  The 'gpa' and 'size' (in bytes) describe =
-the
->  guest physical address range [gpa, gpa + size) of the fault.  The 'flags=
-' field
-> -describes properties of the faulting access that are likely pertinent.
-> -Currently, no flags are defined.
-> +describes properties of the faulting access that are likely pertinent:
-> +
-> + - KVM_MEMORY_EXIT_FLAG_PRIVATE - When set, indicates the memory fault o=
-ccurred
-> +   on a private memory access.  When clear, indicates the fault occurred=
- on a
-> +   shared access.
->
->  Note!  KVM_EXIT_MEMORY_FAULT is unique among all KVM exit reasons in tha=
-t it
->  accompanies a return code of '-1', not '0'!  errno will always be set to=
- EFAULT
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 4167d557c577..c4e758f0aebb 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3147,9 +3147,9 @@ static int host_pfn_mapping_level(struct kvm *kvm, =
-gfn_t gfn,
->         return level;
->  }
->
-> -int kvm_mmu_max_mapping_level(struct kvm *kvm,
-> -                             const struct kvm_memory_slot *slot, gfn_t g=
-fn,
-> -                             int max_level)
-> +static int __kvm_mmu_max_mapping_level(struct kvm *kvm,
-> +                                      const struct kvm_memory_slot *slot=
-,
-> +                                      gfn_t gfn, int max_level, bool is_=
-private)
->  {
->         struct kvm_lpage_info *linfo;
->         int host_level;
-> @@ -3161,6 +3161,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
->                         break;
->         }
->
-> +       if (is_private)
-> +               return max_level;
-> +
->         if (max_level =3D=3D PG_LEVEL_4K)
->                 return PG_LEVEL_4K;
->
-> @@ -3168,6 +3171,16 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
->         return min(host_level, max_level);
->  }
->
-> +int kvm_mmu_max_mapping_level(struct kvm *kvm,
-> +                             const struct kvm_memory_slot *slot, gfn_t g=
-fn,
-> +                             int max_level)
-> +{
-> +       bool is_private =3D kvm_slot_can_be_private(slot) &&
-> +                         kvm_mem_is_private(kvm, gfn);
-> +
-> +       return __kvm_mmu_max_mapping_level(kvm, slot, gfn, max_level, is_=
-private);
-> +}
-> +
->  void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_faul=
-t *fault)
->  {
->         struct kvm_memory_slot *slot =3D fault->slot;
-> @@ -3188,8 +3201,9 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu,=
- struct kvm_page_fault *fault
->          * Enforce the iTLB multihit workaround after capturing the reque=
-sted
->          * level, which will be used to do precise, accurate accounting.
->          */
-> -       fault->req_level =3D kvm_mmu_max_mapping_level(vcpu->kvm, slot,
-> -                                                    fault->gfn, fault->m=
-ax_level);
-> +       fault->req_level =3D __kvm_mmu_max_mapping_level(vcpu->kvm, slot,
-> +                                                      fault->gfn, fault-=
->max_level,
-> +                                                      fault->is_private)=
-;
->         if (fault->req_level =3D=3D PG_LEVEL_4K || fault->huge_page_disal=
-lowed)
->                 return;
->
-> @@ -4261,6 +4275,55 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vc=
-pu, struct kvm_async_pf *work)
->         kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true, NULL);
->  }
->
-> +static inline u8 kvm_max_level_for_order(int order)
-> +{
-> +       BUILD_BUG_ON(KVM_MAX_HUGEPAGE_LEVEL > PG_LEVEL_1G);
-> +
-> +       KVM_MMU_WARN_ON(order !=3D KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G) &&
-> +                       order !=3D KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M) &&
-> +                       order !=3D KVM_HPAGE_GFN_SHIFT(PG_LEVEL_4K));
-> +
-> +       if (order >=3D KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G))
-> +               return PG_LEVEL_1G;
-> +
-> +       if (order >=3D KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M))
-> +               return PG_LEVEL_2M;
-> +
-> +       return PG_LEVEL_4K;
-> +}
-> +
-> +static void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
-> +                                             struct kvm_page_fault *faul=
-t)
-> +{
-> +       kvm_prepare_memory_fault_exit(vcpu, fault->gfn << PAGE_SHIFT,
-> +                                     PAGE_SIZE, fault->write, fault->exe=
-c,
-> +                                     fault->is_private);
-> +}
-> +
-> +static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> +                                  struct kvm_page_fault *fault)
-> +{
-> +       int max_order, r;
-> +
-> +       if (!kvm_slot_can_be_private(fault->slot)) {
-> +               kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> +               return -EFAULT;
-> +       }
-> +
-> +       r =3D kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault=
-->pfn,
-> +                            &max_order);
-> +       if (r) {
-> +               kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> +               return r;
-> +       }
-> +
-> +       fault->max_level =3D min(kvm_max_level_for_order(max_order),
-> +                              fault->max_level);
-> +       fault->map_writable =3D !(fault->slot->flags & KVM_MEM_READONLY);
-> +
-> +       return RET_PF_CONTINUE;
-> +}
-> +
->  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_faul=
-t *fault)
->  {
->         struct kvm_memory_slot *slot =3D fault->slot;
-> @@ -4293,6 +4356,14 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu=
-, struct kvm_page_fault *fault
->                         return RET_PF_EMULATE;
->         }
->
-> +       if (fault->is_private !=3D kvm_mem_is_private(vcpu->kvm, fault->g=
-fn)) {
-> +               kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> +               return -EFAULT;
-> +       }
-> +
-> +       if (fault->is_private)
-> +               return kvm_faultin_pfn_private(vcpu, fault);
-> +
->         async =3D false;
->         fault->pfn =3D __gfn_to_pfn_memslot(slot, fault->gfn, false, fals=
-e, &async,
->                                           fault->write, &fault->map_writa=
-ble,
-> @@ -7173,6 +7244,26 @@ void kvm_mmu_pre_destroy_vm(struct kvm *kvm)
->  }
->
->  #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
-> +                                       struct kvm_gfn_range *range)
-> +{
-> +       /*
-> +        * Zap SPTEs even if the slot can't be mapped PRIVATE.  KVM x86 o=
-nly
-> +        * supports KVM_MEMORY_ATTRIBUTE_PRIVATE, and so it *seems* like =
-KVM
-> +        * can simply ignore such slots.  But if userspace is making memo=
-ry
-> +        * PRIVATE, then KVM must prevent the guest from accessing the me=
-mory
-> +        * as shared.  And if userspace is making memory SHARED and this =
-point
-> +        * is reached, then at least one page within the range was previo=
-usly
-> +        * PRIVATE, i.e. the slot's possible hugepage ranges are changing=
-.
-> +        * Zapping SPTEs in this case ensures KVM will reassess whether o=
-r not
-> +        * a hugepage can be used for affected ranges.
-> +        */
-> +       if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
-> +               return false;
-> +
-> +       return kvm_unmap_gfn_range(kvm, range);
-> +}
-> +
->  static bool hugepage_test_mixed(struct kvm_memory_slot *slot, gfn_t gfn,
->                                 int level)
->  {
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_inter=
-nal.h
-> index decc1f153669..86c7cb692786 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -201,6 +201,7 @@ struct kvm_page_fault {
->
->         /* Derived from mmu and global state.  */
->         const bool is_tdp;
-> +       const bool is_private;
->         const bool nx_huge_page_workaround_enabled;
->
->         /*
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 7de93858054d..e3223cafd7db 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -2358,14 +2358,18 @@ static inline void kvm_account_pgtable_pages(void=
- *virt, int nr)
->  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
->
->  static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
-> -                                                gpa_t gpa, gpa_t size)
-> +                                                gpa_t gpa, gpa_t size,
-> +                                                bool is_write, bool is_e=
-xec,
-> +                                                bool is_private)
->  {
->         vcpu->run->exit_reason =3D KVM_EXIT_MEMORY_FAULT;
->         vcpu->run->memory_fault.gpa =3D gpa;
->         vcpu->run->memory_fault.size =3D size;
->
-> -       /* Flags are not (yet) defined or communicated to userspace. */
-> +       /* RWX flags are not (yet) defined or communicated to userspace. =
-*/
->         vcpu->run->memory_fault.flags =3D 0;
-> +       if (is_private)
-> +               vcpu->run->memory_fault.flags |=3D KVM_MEMORY_EXIT_FLAG_P=
-RIVATE;
->  }
->
->  #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 33d542de0a61..29e9eb51dec9 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -527,6 +527,7 @@ struct kvm_run {
->                 } notify;
->                 /* KVM_EXIT_MEMORY_FAULT */
->                 struct {
-> +#define KVM_MEMORY_EXIT_FLAG_PRIVATE   (1ULL << 3)
->                         __u64 flags;
->                         __u64 gpa;
->                         __u64 size;
-> --
-> 2.42.0.820.g83a721a137-goog
->
+Link: https://lore.kernel.org/all/0d9fdf42-76b1-afc6-85a9-159c5490bbd4@huawei.com/#t
+
+Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+---
+ arch/arm64/kvm/vgic/vgic-its.c | 74 ++++++++++++++++++++++++----------
+ arch/arm64/kvm/vgic/vgic-v4.c  | 37 ++++++++++++++---
+ include/kvm/arm_vgic.h         |  7 ++++
+ 3 files changed, 91 insertions(+), 27 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 5fe2365a629f..c4b453155fcf 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -54,6 +54,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 
+ 	INIT_LIST_HEAD(&irq->lpi_list);
+ 	INIT_LIST_HEAD(&irq->ap_list);
++	INIT_LIST_HEAD(&irq->host_irq_head);
+ 	raw_spin_lock_init(&irq->irq_lock);
+ 
+ 	irq->config = VGIC_CONFIG_EDGE;
+@@ -61,6 +62,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 	irq->intid = intid;
+ 	irq->target_vcpu = vcpu;
+ 	irq->group = 1;
++	atomic_set(&irq->map_count, 0);
+ 
+ 	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
+ 
+@@ -284,6 +286,7 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+ 	u8 prop;
+ 	int ret;
+ 	unsigned long flags;
++	struct vlpi_host_irq *vlpi_hirq;
+ 
+ 	ret = kvm_read_guest_lock(kvm, propbase + irq->intid - GIC_LPI_OFFSET,
+ 				  &prop, 1);
+@@ -305,8 +308,13 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
+ 
+ 	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+ 
+-	if (irq->hw)
+-		return its_prop_update_vlpi(irq->host_irq, prop, needs_inv);
++	if (irq->hw) {
++		list_for_each_entry(vlpi_hirq, &irq->host_irq_head, host_irq_list) {
++			ret = its_prop_update_vlpi(vlpi_hirq->host_irq, prop, needs_inv);
++			if (ret)
++				return ret;
++		}
++	}
+ 
+ 	return 0;
+ }
+@@ -354,25 +362,31 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
+ static int update_affinity(struct vgic_irq *irq, struct kvm_vcpu *vcpu)
+ {
+ 	int ret = 0;
+-	unsigned long flags;
++	unsigned long flags, counts;
++	struct vlpi_host_irq *vlpi_hirq;
+ 
+ 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
+ 	irq->target_vcpu = vcpu;
+ 	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+ 
+ 	if (irq->hw) {
+-		struct its_vlpi_map map;
++		counts = atomic_read(&irq->map_count);
++		list_for_each_entry(vlpi_hirq, &irq->host_irq_head, host_irq_list) {
++			struct its_vlpi_map map;
+ 
+-		ret = its_get_vlpi(irq->host_irq, &map);
+-		if (ret)
+-			return ret;
++			ret = its_get_vlpi(vlpi_hirq->host_irq, &map);
++			if (ret)
++				return ret;
+ 
+-		if (map.vpe)
+-			atomic_dec(&map.vpe->vlpi_count);
+-		map.vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
+-		atomic_inc(&map.vpe->vlpi_count);
++			counts--;
++			if (map.vpe && !counts)
++				atomic_dec(&map.vpe->vlpi_count);
++			map.vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
++			if (!counts)
++				atomic_inc(&map.vpe->vlpi_count);
+ 
+-		ret = its_map_vlpi(irq->host_irq, &map);
++			ret = its_map_vlpi(vlpi_hirq->host_irq, &map);
++		}
+ 	}
+ 
+ 	return ret;
+@@ -731,6 +745,7 @@ static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
+ 				u32 devid, u32 eventid)
+ {
+ 	struct vgic_irq *irq = NULL;
++	struct vlpi_host_irq *vlpi_hirq;
+ 	unsigned long flags;
+ 	int err;
+ 
+@@ -738,9 +753,15 @@ static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
+ 	if (err)
+ 		return err;
+ 
+-	if (irq->hw)
+-		return irq_set_irqchip_state(irq->host_irq,
+-					     IRQCHIP_STATE_PENDING, true);
++	if (irq->hw) {
++		list_for_each_entry(vlpi_hirq, &irq->host_irq_head, host_irq_list) {
++			err = irq_set_irqchip_state(vlpi_hirq->host_irq,
++						    IRQCHIP_STATE_PENDING, true);
++			if (err)
++				return err;
++			return 0;
++		}
++	}
+ 
+ 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
+ 	irq->pending_latch = true;
+@@ -806,12 +827,17 @@ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
+ /* Requires the its_lock to be held. */
+ static void its_free_ite(struct kvm *kvm, struct its_ite *ite)
+ {
++	struct vlpi_host_irq *vlpi_hirq;
++
+ 	list_del(&ite->ite_list);
+ 
+ 	/* This put matches the get in vgic_add_lpi. */
+ 	if (ite->irq) {
+-		if (ite->irq->hw)
+-			WARN_ON(its_unmap_vlpi(ite->irq->host_irq));
++		if (ite->irq->hw) {
++			list_for_each_entry(vlpi_hirq, &ite->irq->host_irq_head, host_irq_list) {
++				WARN_ON(its_unmap_vlpi(vlpi_hirq->host_irq));
++			}
++		}
+ 
+ 		vgic_put_irq(kvm, ite->irq);
+ 	}
+@@ -1290,7 +1316,8 @@ static int vgic_its_cmd_handle_clear(struct kvm *kvm, struct vgic_its *its,
+ 	u32 device_id = its_cmd_get_deviceid(its_cmd);
+ 	u32 event_id = its_cmd_get_id(its_cmd);
+ 	struct its_ite *ite;
+-
++	struct vlpi_host_irq *vlpi_hirq;
++	int ret;
+ 
+ 	ite = find_ite(its, device_id, event_id);
+ 	if (!ite)
+@@ -1298,9 +1325,14 @@ static int vgic_its_cmd_handle_clear(struct kvm *kvm, struct vgic_its *its,
+ 
+ 	ite->irq->pending_latch = false;
+ 
+-	if (ite->irq->hw)
+-		return irq_set_irqchip_state(ite->irq->host_irq,
+-					     IRQCHIP_STATE_PENDING, false);
++	if (ite->irq->hw) {
++		list_for_each_entry(vlpi_hirq, &ite->irq->host_irq_head, host_irq_list) {
++			ret = irq_set_irqchip_state(vlpi_hirq->host_irq,
++						    IRQCHIP_STATE_PENDING, false);
++			if (ret)
++				return ret;
++		}
++	}
+ 
+ 	return 0;
+ }
+diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+index 339a55194b2c..d634ba3dd225 100644
+--- a/arch/arm64/kvm/vgic/vgic-v4.c
++++ b/arch/arm64/kvm/vgic/vgic-v4.c
+@@ -413,6 +413,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+ {
+ 	struct vgic_its *its;
+ 	struct vgic_irq *irq;
++	struct vlpi_host_irq *vlpi_hirq;
+ 	struct its_vlpi_map map;
+ 	unsigned long flags;
+ 	int ret;
+@@ -456,9 +457,19 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+ 	if (ret)
+ 		goto out;
+ 
+-	irq->hw		= true;
+-	irq->host_irq	= virq;
+-	atomic_inc(&map.vpe->vlpi_count);
++	vlpi_hirq = kzalloc(sizeof(struct vlpi_host_irq), GFP_KERNEL_ACCOUNT);
++	if (!vlpi_hirq)
++		return -ENOMEM;
++
++	INIT_LIST_HEAD(&vlpi_hirq->host_irq_list);
++	vlpi_hirq->host_irq = virq;
++	list_add_tail(&vlpi_hirq->host_irq_list, &irq->host_irq_head);
++
++	if (!atomic_read(&irq->map_count)) {
++		irq->hw = true;
++		atomic_inc(&map.vpe->vlpi_count);
++	}
++	atomic_inc(&irq->map_count);
+ 
+ 	/* Transfer pending state */
+ 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
+@@ -488,6 +499,8 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
+ {
+ 	struct vgic_its *its;
+ 	struct vgic_irq *irq;
++	struct vlpi_host_irq *vlpi_hirq;
++	struct its_vpe *vpe;
+ 	int ret;
+ 
+ 	if (!vgic_supports_direct_msis(kvm))
+@@ -508,10 +521,22 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
+ 	if (ret)
+ 		goto out;
+ 
+-	WARN_ON(!(irq->hw && irq->host_irq == virq));
++	WARN_ON(!(irq->hw));
+ 	if (irq->hw) {
+-		atomic_dec(&irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count);
+-		irq->hw = false;
++		list_for_each_entry(vlpi_hirq, &irq->host_irq_head, host_irq_list) {
++			if (vlpi_hirq->host_irq == virq) {
++				list_del(&vlpi_hirq->host_irq_list);
++				kfree(vlpi_hirq);
++				break;
++			}
++		}
++
++		atomic_dec(&irq->map_count);
++		if (!atomic_read(&irq->map_count)) {
++			vpe = &irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
++			atomic_dec(&vpe->vlpi_count);
++			irq->hw = false;
++		}
+ 		ret = its_unmap_vlpi(virq);
+ 	}
+ 
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 5b27f94d4fad..2b8f25d1eff2 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -114,6 +114,11 @@ struct irq_ops {
+ 	bool (*get_input_level)(int vintid);
+ };
+ 
++struct vlpi_host_irq {
++	struct list_head host_irq_list;
++	unsigned int host_irq;
++};
++
+ struct vgic_irq {
+ 	raw_spinlock_t irq_lock;	/* Protects the content of the struct */
+ 	struct list_head lpi_list;	/* Used to link all LPIs together */
+@@ -138,6 +143,8 @@ struct vgic_irq {
+ 	bool active;			/* not used for LPIs */
+ 	bool enabled;
+ 	bool hw;			/* Tied to HW IRQ */
++	atomic_t map_count;		/* record vLPI map times */
++	struct list_head host_irq_head;	/* record host irqs list of a vLPI */
+ 	struct kref refcount;		/* Used for LPIs */
+ 	u32 hwintid;			/* HW INTID number */
+ 	unsigned int host_irq;		/* linux irq corresponding to hwintid */
+-- 
+2.33.0
+
