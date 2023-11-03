@@ -1,186 +1,104 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395E32904
-	for <kvmarm@lists.linux.dev>; Fri,  3 Nov 2023 14:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132A222F09
+	for <kvmarm@lists.linux.dev>; Fri,  3 Nov 2023 19:29:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="q8smHBP7"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=72hxmQCBkLT/0leJQbNO6c+d3oMFYZOQGMSD17s25rI=; b=q8smHBP7DkeRlLmtBpuVNpbR3l
-	Xsq9Jg+jETRWE9W6AuGqCDDiqxwTUQfqg0tFog/sx8M46baq9d88THW80uQlFB4fqAYCq/DzxQVtR
-	g+/2VpoltDLb+HANTiWd7cpJg0mw85W6TI5UDDVSr2mh9gorJBllB4eQsCGu1APZJcTsAOhGxLMOF
-	rSERDI7IL5O8ysT9mss7VBj65MH8WJWsPtnKokF1trUFWaDHPGx5/Vd1P9pA1ypJccnB9lslaWTOy
-	kAjrpoOnuaYuqlvim1kLdN33vhWIuNl3wQW0SUOYQZtw8JeMgy8G8ndUDUjLI2wchB2QT/eSQVcIQ
-	Y4XdND7w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54582)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qyvIX-0005cb-1Y;
-	Fri, 03 Nov 2023 14:37:21 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qyvIY-0008Tw-8D; Fri, 03 Nov 2023 14:37:22 +0000
-Date: Fri, 3 Nov 2023 14:37:22 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Gavin Shan <gshan@redhat.com>
-Cc: James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
-	x86@kernel.org, Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	jianyong.wu@arm.com, justin.he@arm.com
-Subject: Re: [RFC PATCH v2 22/35] ACPI: Check _STA present bit before making
- CPUs not present
-Message-ID: <ZUUFovp4x9TkWBYn@shell.armlinux.org.uk>
-References: <20230913163823.7880-1-james.morse@arm.com>
- <20230913163823.7880-23-james.morse@arm.com>
- <518859b1-64a9-d723-963c-56c7f6fc2da1@redhat.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r9Y/BSvC"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-da04fb79246so2804396276.2
+        for <kvmarm@lists.linux.dev>; Fri, 03 Nov 2023 12:29:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699039767; x=1699644567; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bEAfZyWhlsWU6we+1WUOdwYhBvWIiGNcSe/GN4oT0oY=;
+        b=r9Y/BSvC6NcQn+VW/TA+VESWYaNEbbE4oZLcgdcvi+cyUhhsWxv1Ore1AmWCylAsNT
+         rY83sXQYQCXVMqZEEO1veWUUc+6/BzFfC7Kr3kGejLVnk45L1hxeKGG0P5GepFW/HEyo
+         YKFqfPseKvvMoS8ceqkAGAvSjW8Dnp+mhu6t+/zwX6mVM8WzYz7BRLgZ9OOiWw9/+XSB
+         E9Vk3eRHMDrqHGPCVRQOg/Aw/d5/lpbgnOeG2ekKvKArWZmrDzzHd7iATyFL9gRCQBZ8
+         fjgb4YHH40f//6h8/927LSEWpGqR9VeWV/7YkB6yrLOijwSfEI30UeCI7UPckwuIfC7e
+         zPzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699039767; x=1699644567;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bEAfZyWhlsWU6we+1WUOdwYhBvWIiGNcSe/GN4oT0oY=;
+        b=MEmhhi3johpqnyKmZGVjWdNTc12pZTiZ1MZcREUPW8FT5MOZ6RYESHN1HtSVBM1Xu8
+         BB71eZf9Iq75EvGj4kdgCkCzxxZduuE0OPazqXeTqD6L1hbSCoCccF9TPxHx4HoAkrsJ
+         F+43GOKeghgdHzw0KCxh6YkOrFRW6l477K1ZkFqqkkTuCp7v4oNwQ6//G7q0u3o35N1Z
+         u+bYdn7NODXpjNl1Bak3LW1+BeRty9Gq8AdXEcQ6CTcoMjqEekeU0sY1bPPSJUlo3VCu
+         xkZcrs9wqXH5Fp4fDKQQFlITqNdBQ05gyD5Dwx0235wj7KB61o2Oj6PEMUfsp6iFGJ5n
+         IT7A==
+X-Gm-Message-State: AOJu0YzxR+X0PnWiUMGqP7ZdBKimy3JJvvtugSRi+ZbvlvQSK4U+i7D/
+	5VlrmJWT/MmW+GxVSExDaVIP+uwkv2M7eHnbMQ==
+X-Google-Smtp-Source: AGHT+IHKhte6SyveleGfndRKN5qF5FiLzkyOQTSM6UmB/7Ca1BYcGNMFHiQ2xWtcgmwtm27r2JFQyaL2fqKGSpkBeA==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a25:2688:0:b0:da0:29ba:668c with SMTP
+ id m130-20020a252688000000b00da029ba668cmr412348ybm.10.1699039766978; Fri, 03
+ Nov 2023 12:29:26 -0700 (PDT)
+Date: Fri,  3 Nov 2023 19:29:12 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <518859b1-64a9-d723-963c-56c7f6fc2da1@redhat.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
+Message-ID: <20231103192915.2209393-1-coltonlewis@google.com>
+Subject: [PATCH v3 0/3] Add arch_timer_edge_cases selftest
+From: Colton Lewis <coltonlewis@google.com>
+To: kvm@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Ricardo Koller <ricarkol@google.com>, kvmarm@lists.linux.dev, 
+	Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Sep 19, 2023 at 10:45:39AM +1000, Gavin Shan wrote:
-> On 9/14/23 02:38, James Morse wrote:
-> > When called acpi_processor_post_eject() unconditionally make a CPU
-> > not-present and unregisters it.
-> > 
-> > To add support for AML events where the CPU has become disabled, but
-> > remains present, the _STA method should be checked before calling
-> > acpi_processor_remove().
-> > 
-> > Rename acpi_processor_post_eject() acpi_processor_remove_possible(), and
-> > check the _STA before calling.
-> > 
-> > Adding the function prototype for arch_unregister_cpu() allows the
-> > preprocessor guards to be removed.
-> > 
-> > After this change CPUs will remain registered and visible to
-> > user-space as offline if buggy firmware triggers an eject-request,
-> > but doesn't clear the corresponding _STA bits after _EJ0 has been
-> > called.
-> > 
-> > Signed-off-by: James Morse <james.morse@arm.com>
-> > ---
-> >   drivers/acpi/acpi_processor.c | 31 +++++++++++++++++++++++++------
-> >   include/linux/cpu.h           |  1 +
-> >   2 files changed, 26 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.c
-> > index 00dcc23d49a8..2cafea1edc24 100644
-> > --- a/drivers/acpi/acpi_processor.c
-> > +++ b/drivers/acpi/acpi_processor.c
-> > @@ -457,13 +457,12 @@ static int acpi_processor_add(struct acpi_device *device,
-> >   	return result;
-> >   }
-> > -#ifdef CONFIG_ACPI_HOTPLUG_PRESENT_CPU
-> >   /* Removal */
-> > -static void acpi_processor_post_eject(struct acpi_device *device)
-> > +static void acpi_processor_make_not_present(struct acpi_device *device)
-> >   {
-> >   	struct acpi_processor *pr;
-> > -	if (!device || !acpi_driver_data(device))
-> > +	if (!IS_ENABLED(CONFIG_ACPI_HOTPLUG_PRESENT_CPU))
-> >   		return;
-> 
-> In order to use IS_ENABLED(),
+Add arch_timer_edge_cases selftest to test various corner cases of the
+ARM timers such as:
 
-And the rest of this statement is where?
+* timers above the max TVAL value
+* timers in the past
+* moving counters ahead and behind pending timers
+* reprograming timers
+* timers fired multiple times
+* masking/unmasking using the timer control mask
 
-> >   	pr = acpi_driver_data(device);
-> > @@ -501,7 +500,29 @@ static void acpi_processor_post_eject(struct acpi_device *device)
-> >   	free_cpumask_var(pr->throttling.shared_cpu_map);
-> >   	kfree(pr);
-> >   }
-> > -#endif /* CONFIG_ACPI_HOTPLUG_PRESENT_CPU */
-> > +
-> > +static void acpi_processor_post_eject(struct acpi_device *device)
-> > +{
-> > +	struct acpi_processor *pr;
-> > +	unsigned long long sta;
-> > +	acpi_status status;
-> > +
-> > +	if (!device)
-> > +		return;
-> > +
-> > +	pr = acpi_driver_data(device);
-> > +	if (!pr || pr->id >= nr_cpu_ids || invalid_phys_cpuid(pr->phys_id))
-> > +		return;
-> > +
-> 
-> Do we really need to validate the logic and hardware CPU IDs here? I think
-> the ACPI processor device can't be added successfully if one of them is
-> invalid.
-> 
-> > +	status = acpi_evaluate_integer(pr->handle, "_STA", NULL, &sta);
-> > +	if (ACPI_FAILURE(status))
-> > +		return;
-> > +
-> > +	if (cpu_present(pr->id) && !(sta & ACPI_STA_DEVICE_PRESENT)) {
-> > +		acpi_processor_make_not_present(device);
-> > +		return;
-> > +	}
-> > +}
-> >   #ifdef CONFIG_ARCH_MIGHT_HAVE_ACPI_PDC
-> >   bool __init processor_physically_present(acpi_handle handle)
-> > @@ -626,9 +647,7 @@ static const struct acpi_device_id processor_device_ids[] = {
-> >   static struct acpi_scan_handler processor_handler = {
-> >   	.ids = processor_device_ids,
-> >   	.attach = acpi_processor_add,
-> > -#ifdef CONFIG_ACPI_HOTPLUG_PRESENT_CPU
-> >   	.post_eject = acpi_processor_post_eject,
-> > -#endif
-> >   	.hotplug = {
-> >   		.enabled = true,
-> >   	},
-> > diff --git a/include/linux/cpu.h b/include/linux/cpu.h
-> > index a71691d7c2ca..e117c06e0c6b 100644
-> > --- a/include/linux/cpu.h
-> > +++ b/include/linux/cpu.h
-> > @@ -81,6 +81,7 @@ struct device *cpu_device_create(struct device *parent, void *drvdata,
-> >   				 const struct attribute_group **groups,
-> >   				 const char *fmt, ...);
-> >   extern int arch_register_cpu(int cpu);
-> > +extern void arch_unregister_cpu(int cpu);
-> 
-> arch_unregister_cpu() is protected by CONFIG_HOTPLUG_CPU in the individual architectures,
-> for example arch/ia64/kernel/topology.c
+These are intentionally unusual scenarios to stress compliance with
+the arm architecture.
 
-Yes, I agree, there _may_ be a reference to arch_unregister_cpu() if
-the compiler doesn't optimise the "if(0) return".
+v3:
+* Rebase to v6.6
+* Patch to standardize GIC base addresses across tests
+* Patch to guarantee interrupt handling in vgic_irq with context sync,
+  fixing an error there that was caught here
+* Expand sync_cmd enum for more logical arguments to waiting functions
 
-As things stand in my "head" tree (which I'll be posting once 6.7-rc1
-is out) at the point that this patch exists in the series, there are
-no architectures which provide arch_unregister_cpu(), and the only
-implementation of it is the __weak one in drivers/base/cpu.c
+v2:
+https://lore.kernel.org/kvmarm/20230928210201.1310536-1-coltonlewis@google.com/
 
-That implementation is also ifdef'd with CONFIG_HOTPLUG_CPU and also
-CONFIG_GENERIC_CPU_DEVICES.
+v1:
+https://lore.kernel.org/kvm/20230516213731.387132-1-coltonlewis@google.com/
 
-Meanwhile, acpi_processor.c is always built with ACPI, and while we
-have IS_ENABLED() clauses with James' patches for both of these
-symbols, if the compiler doesn't optimise the code away, we will end
-up with a reference and a link-time error. That being said, the 0-day
-bot has not reported anything as yet (and it builds my tree.)
+Colton Lewis (3):
+  KVM: arm64: selftests: Standardize GIC base addresses
+  KVM: arm64: selftests: Guarantee interrupts are handled
+  KVM: arm64: selftests: Add arch_timer_edge_cases selftest
 
-So, is this a problem that needs to be solved or not?
+ tools/testing/selftests/kvm/Makefile          |    1 +
+ .../selftests/kvm/aarch64/arch_timer.c        |    8 +-
+ .../kvm/aarch64/arch_timer_edge_cases.c       | 1104 +++++++++++++++++
+ .../testing/selftests/kvm/aarch64/vgic_irq.c  |   23 +-
+ .../selftests/kvm/dirty_log_perf_test.c       |    5 +-
+ .../kvm/include/aarch64/arch_timer.h          |   18 +-
+ .../selftests/kvm/include/aarch64/gic.h       |    8 +-
+ .../selftests/kvm/include/aarch64/vgic.h      |    3 +-
+ tools/testing/selftests/kvm/lib/aarch64/gic.c |   12 +-
+ .../testing/selftests/kvm/lib/aarch64/vgic.c  |    7 +-
+ 10 files changed, 1159 insertions(+), 30 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+--
+2.42.0.869.gea05f2083d-goog
