@@ -1,44 +1,44 @@
 Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6997E22F0B
-	for <kvmarm@lists.linux.dev>; Fri,  3 Nov 2023 19:29:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 987A822F09
+	for <kvmarm@lists.linux.dev>; Fri,  3 Nov 2023 19:29:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iUO8G/Sx"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-da04776a869so2940131276.0
-        for <kvmarm@lists.linux.dev>; Fri, 03 Nov 2023 12:29:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YyUNyENJ"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-d9a5a3f2d4fso2807706276.3
+        for <kvmarm@lists.linux.dev>; Fri, 03 Nov 2023 12:29:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699039768; x=1699644568; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1699039769; x=1699644569; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DcsXd0GFR+eHw7Zk01QzN5YVrXzmH+eGsiVjDLuLrbg=;
-        b=iUO8G/SxuUgrH20YyM6d0VNQYi59gWZx61fGxLGHqmFJ/WglXt/BPMuRyCNhf2HMij
-         RCX+5IuqdkUFlB5GdM4kzb4s5iYfGrT07oQ66rft5UgIN7jWIrUJqtdUg9KQ60t/OAC5
-         B/7QXCd2WI/FldD1yt592cftkbkkuIZ2SSWXkPaZYq9tGQXpYJmV7mxz6bj79KSSJkbv
-         P4vmco6Qb6xo2rY67LUdU/yDANOPzYs7k0vDAsUx+9B14Z9J04AxAIDANnMZuE2ycbEr
-         hcv1wmquwgoxrUPoszUoaCmpgPl6zK+/0qhmLpQepGhhVdtc4W0+6ynRaqIvESyB4Alu
-         7kNg==
+        bh=/ej9TKa7ZSJIOAJS1B/2lr9o03XnT9TFq89fTO+C5Ds=;
+        b=YyUNyENJlUFnR24LYni+ThQnEfdvw8ZLOsog6enqMKcWQ4pc1VZ1lUD5mEHGSzVgFr
+         e5HMu6b85JZWnvO9oI9ZekA1Vpg9r5ZVI0AayWDgYv2Q5oecL+KtRI/GXpp5U+oI/175
+         XH1NJR2ZfYVQhQSko9zgngeQQC5w4yBWfrIS5BNIJ/3thAwrrcLbnQyTBaOLy5SSWnYA
+         XQmqiGlTXLit1tOlVOK9Bg23rZp+H/Jg8eSyeA79xRzRhmIE8NDJjr+zP/boMGrMr87q
+         BhgyJzKUlx0yulDxSbYBQf5zeb+o02qP8U8rmgzASqc51YPd2HukJy0OenBLMGdASA36
+         hhng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699039768; x=1699644568;
+        d=1e100.net; s=20230601; t=1699039769; x=1699644569;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DcsXd0GFR+eHw7Zk01QzN5YVrXzmH+eGsiVjDLuLrbg=;
-        b=f4JRZb5B7o9qDPzlnrC/OMcAkRZ+brGlC7ZYMxpxSmuzifoSQCYqpxL2REFGRi7HgI
-         tbTK+nx3h5rsRNQeFDwi9YLB0e4KUDQ609UIlocYPq5m8eN51a0iYSxxct4OV6eCWjvF
-         BySrCa3IS4/F5tCyIVB02TwTMfiqvb0NYxe28gobmbcjoRoKslvvEhMk4u+BkTpcxr0g
-         3X+mEDfowRL+Z/eU4vceDTElaBaVlAUEO0/k/ztvNFvT56e4qzI0Czvazjxu1GjLq54Q
-         qoEy+d0LfDID1GDgRQEQpCjH+q2Gak1PK3QtkzHG0YEWHBPqnJue94S4rZ2L2drRX7uH
-         4O4A==
-X-Gm-Message-State: AOJu0Yzcu9phKGhFiKCOEV8s5TgRvWdgzsKCQ6qFPWSUpwcOUD7THB+V
-	5+dO0J4J8eDJLmXlS74e7+QIzMvmqCRR3koKRA==
-X-Google-Smtp-Source: AGHT+IHGX/OYyqwOZmrU0so7N+Il/tGEh7CejCMoEZfMDm9u+sO99+CKLZX94FrvOBKGkDnt0WUaY37ZjA0cDfL3dQ==
+        bh=/ej9TKa7ZSJIOAJS1B/2lr9o03XnT9TFq89fTO+C5Ds=;
+        b=vzwrYGPk6yExEGUH+flKyukG8KnbH2ZlTzXGZ1IaLRs8kc2UeZC8Hcre3iZtrLrJez
+         2XBTAOMaK5xrmw+Uz70W0tm6b7nzbN4WldMUtEVRVSB3IwnNBVwjElWvcW9wSBjoWKE+
+         3IcD5VZfR+xA7yt764OApmxUfUvKVAmzMhwzFDHVx6YpR2OZwRXNAsfpr0NQVHTQq2vf
+         Cnoshi03cQttjkpB/ScFMTTJuZKrB6Z+RdMF/H/Lxj4Ojwb5dM86ofEG5RCyC/P6G1+q
+         m4vP48xyCsABY4yUYPgY4ZQq25Z4V6u5h58W94pZzb7tn+M7qL1ao2n5EkG1fst7okb6
+         OVrw==
+X-Gm-Message-State: AOJu0YxDAgCvoXSeyskFr2s1qWv6fduklLJmPgTowC1zg1FjdUFHwXBH
+	V+ahsROUvZq16IC4GYXXd1wr0cJAF3elxyPDtw==
+X-Google-Smtp-Source: AGHT+IFHprlg+8CuBn3dAnKWLLisYwZoGaeLvdHj+lnYB5xuNReCG2ZD3zHPD6Ahxm/WYC4ajyf4OuQZtVCmY8RAOA==
 X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a25:aa07:0:b0:da0:c584:defe with SMTP
- id s7-20020a25aa07000000b00da0c584defemr403214ybi.13.1699039768395; Fri, 03
- Nov 2023 12:29:28 -0700 (PDT)
-Date: Fri,  3 Nov 2023 19:29:13 +0000
+ (user=coltonlewis job=sendgmr) by 2002:a25:2688:0:b0:da0:29ba:668c with SMTP
+ id m130-20020a252688000000b00da029ba668cmr412352ybm.10.1699039769635; Fri, 03
+ Nov 2023 12:29:29 -0700 (PDT)
+Date: Fri,  3 Nov 2023 19:29:14 +0000
 In-Reply-To: <20231103192915.2209393-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -48,8 +48,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20231103192915.2209393-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
-Message-ID: <20231103192915.2209393-2-coltonlewis@google.com>
-Subject: [PATCH v3 1/3] KVM: arm64: selftests: Standardize GIC base addresses
+Message-ID: <20231103192915.2209393-3-coltonlewis@google.com>
+Subject: [PATCH v3 2/3] KVM: arm64: selftests: Guarantee interrupts are handled
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
@@ -58,208 +58,67 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Use default values during GIC initialization and setup to avoid
-multiple tests needing to decide and declare base addresses for GICD
-and GICR. Remove the repeated definitions of these addresses across
-tests.
+Break up the asm instructions poking daifclr and daifset to handle
+interrupts. R_RBZYL specifies pending interrupts will be handle after
+context synchronization events such as an ISB.
+
+Introduce a function wrapper for the WFI instruction.
 
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- tools/testing/selftests/kvm/aarch64/arch_timer.c   |  8 ++------
- tools/testing/selftests/kvm/aarch64/vgic_irq.c     | 11 ++---------
- tools/testing/selftests/kvm/dirty_log_perf_test.c  |  5 +----
- tools/testing/selftests/kvm/include/aarch64/gic.h  |  5 ++++-
- tools/testing/selftests/kvm/include/aarch64/vgic.h |  3 ++-
- tools/testing/selftests/kvm/lib/aarch64/gic.c      |  7 ++++++-
- tools/testing/selftests/kvm/lib/aarch64/vgic.c     |  7 ++++++-
- 7 files changed, 23 insertions(+), 23 deletions(-)
+ tools/testing/selftests/kvm/aarch64/vgic_irq.c    | 12 ++++++------
+ tools/testing/selftests/kvm/include/aarch64/gic.h |  3 +++
+ tools/testing/selftests/kvm/lib/aarch64/gic.c     |  5 +++++
+ 3 files changed, 14 insertions(+), 6 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index 274b8465b42a..f5101898c46a 100644
---- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -59,9 +59,6 @@ static struct test_args test_args = {
- 
- #define msecs_to_usecs(msec)		((msec) * 1000LL)
- 
--#define GICD_BASE_GPA			0x8000000ULL
--#define GICR_BASE_GPA			0x80A0000ULL
--
- enum guest_stage {
- 	GUEST_STAGE_VTIMER_CVAL = 1,
- 	GUEST_STAGE_VTIMER_TVAL,
-@@ -204,8 +201,7 @@ static void guest_code(void)
- 
- 	local_irq_disable();
- 
--	gic_init(GIC_V3, test_args.nr_vcpus,
--		(void *)GICD_BASE_GPA, (void *)GICR_BASE_GPA);
-+	gic_init(GIC_V3, test_args.nr_vcpus);
- 
- 	timer_set_ctl(VIRTUAL, CTL_IMASK);
- 	timer_set_ctl(PHYSICAL, CTL_IMASK);
-@@ -391,7 +387,7 @@ static struct kvm_vm *test_vm_create(void)
- 		vcpu_init_descriptor_tables(vcpus[i]);
- 
- 	test_init_timer_irq(vm);
--	gic_fd = vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
-+	gic_fd = vgic_v3_setup(vm, nr_vcpus, 64);
- 	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3");
- 
- 	/* Make all the test's cmdline args visible to the guest */
 diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-index 2e64b4856e38..d3bf584d2cc1 100644
+index d3bf584d2cc1..85f182704d79 100644
 --- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
 +++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-@@ -19,9 +19,6 @@
- #include "gic_v3.h"
- #include "vgic.h"
- 
--#define GICD_BASE_GPA		0x08000000ULL
--#define GICR_BASE_GPA		0x080A0000ULL
--
- /*
-  * Stores the user specified args; it's passed to the guest and to every test
-  * function.
-@@ -49,9 +46,6 @@ struct test_args {
- #define IRQ_DEFAULT_PRIO	(LOWEST_PRIO - 1)
- #define IRQ_DEFAULT_PRIO_REG	(IRQ_DEFAULT_PRIO << KVM_PRIO_SHIFT) /* 0xf0 */
- 
--static void *dist = (void *)GICD_BASE_GPA;
--static void *redist = (void *)GICR_BASE_GPA;
--
- /*
-  * The kvm_inject_* utilities are used by the guest to ask the host to inject
-  * interrupts (e.g., using the KVM_IRQ_LINE ioctl).
-@@ -478,7 +472,7 @@ static void guest_code(struct test_args *args)
- 	bool level_sensitive = args->level_sensitive;
- 	struct kvm_inject_desc *f, *inject_fns;
- 
--	gic_init(GIC_V3, 1, dist, redist);
-+	gic_init(GIC_V3, 1);
- 
- 	for (i = 0; i < nr_irqs; i++)
- 		gic_irq_enable(i);
-@@ -764,8 +758,7 @@ static void test_vgic(uint32_t nr_irqs, bool level_sensitive, bool eoi_split)
- 	memcpy(addr_gva2hva(vm, args_gva), &args, sizeof(args));
- 	vcpu_args_set(vcpu, 1, args_gva);
- 
--	gic_fd = vgic_v3_setup(vm, 1, nr_irqs,
--			GICD_BASE_GPA, GICR_BASE_GPA);
-+	gic_fd = vgic_v3_setup(vm, 1, nr_irqs);
- 	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3, skipping");
- 
- 	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT,
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index d374dbcf9a53..53c9d7a2611d 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -22,9 +22,6 @@
- #ifdef __aarch64__
- #include "aarch64/vgic.h"
- 
--#define GICD_BASE_GPA			0x8000000ULL
--#define GICR_BASE_GPA			0x80A0000ULL
--
- static int gic_fd;
- 
- static void arch_setup_vm(struct kvm_vm *vm, unsigned int nr_vcpus)
-@@ -33,7 +30,7 @@ static void arch_setup_vm(struct kvm_vm *vm, unsigned int nr_vcpus)
- 	 * The test can still run even if hardware does not support GICv3, as it
- 	 * is only an optimization to reduce guest exits.
- 	 */
--	gic_fd = vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
-+	gic_fd = vgic_v3_setup(vm, nr_vcpus, 64);
- }
- 
- static void arch_cleanup_vm(struct kvm_vm *vm)
+@@ -269,13 +269,13 @@ static void guest_inject(struct test_args *args,
+ 	KVM_INJECT_MULTI(cmd, first_intid, num);
+
+ 	while (irq_handled < num) {
+-		asm volatile("wfi\n"
+-			     "msr daifclr, #2\n"
+-			     /* handle IRQ */
+-			     "msr daifset, #2\n"
+-			     : : : "memory");
++		gic_wfi();
++		local_irq_enable();
++		isb();
++		/* handle IRQ */
++		local_irq_disable();
+ 	}
+-	asm volatile("msr daifclr, #2" : : : "memory");
++	local_irq_enable();
+
+ 	GUEST_ASSERT_EQ(irq_handled, num);
+ 	for (i = first_intid; i < num + first_intid; i++)
 diff --git a/tools/testing/selftests/kvm/include/aarch64/gic.h b/tools/testing/selftests/kvm/include/aarch64/gic.h
-index b217ea17cac5..9043eaef1076 100644
+index 9043eaef1076..f474714e4cb2 100644
 --- a/tools/testing/selftests/kvm/include/aarch64/gic.h
 +++ b/tools/testing/selftests/kvm/include/aarch64/gic.h
-@@ -16,13 +16,16 @@ enum gic_type {
- #define MIN_SPI			32
- #define MAX_SPI			1019
- #define IAR_SPURIOUS		1023
-+#define GICD_BASE_GPA			0x8000000ULL
-+#define GICR_BASE_GPA			0x80A0000ULL
- 
- #define INTID_IS_SGI(intid)	(0       <= (intid) && (intid) < MIN_PPI)
- #define INTID_IS_PPI(intid)	(MIN_PPI <= (intid) && (intid) < MIN_SPI)
- #define INTID_IS_SPI(intid)	(MIN_SPI <= (intid) && (intid) <= MAX_SPI)
- 
--void gic_init(enum gic_type type, unsigned int nr_cpus,
-+void _gic_init(enum gic_type type, unsigned int nr_cpus,
- 		void *dist_base, void *redist_base);
-+void gic_init(enum gic_type type, unsigned int nr_cpus);
- void gic_irq_enable(unsigned int intid);
- void gic_irq_disable(unsigned int intid);
- unsigned int gic_get_and_ack_irq(void);
-diff --git a/tools/testing/selftests/kvm/include/aarch64/vgic.h b/tools/testing/selftests/kvm/include/aarch64/vgic.h
-index 0ac6f05c63f9..e116a815964a 100644
---- a/tools/testing/selftests/kvm/include/aarch64/vgic.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/vgic.h
-@@ -16,8 +16,9 @@
- 	((uint64_t)(flags) << 12) | \
- 	index)
- 
--int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs,
-+int _vgic_v3_setup(struct kvm_vm *vm, uint32_t nr_vcpus, uint32_t nr_irqs,
- 		uint64_t gicd_base_gpa, uint64_t gicr_base_gpa);
-+int vgic_v3_setup(struct kvm_vm *vm, uint32_t nr_vcpus, uint32_t nr_irqs);
- 
- #define VGIC_MAX_RESERVED	1023
- 
+@@ -47,4 +47,7 @@ void gic_irq_clear_pending(unsigned int intid);
+ bool gic_irq_get_pending(unsigned int intid);
+ void gic_irq_set_config(unsigned int intid, bool is_edge);
+
++/* Execute a Wait For Interrupt instruction. */
++void gic_wfi(void);
++
+ #endif /* SELFTEST_KVM_GIC_H */
 diff --git a/tools/testing/selftests/kvm/lib/aarch64/gic.c b/tools/testing/selftests/kvm/lib/aarch64/gic.c
-index 55668631d546..9d15598d4e34 100644
+index 9d15598d4e34..392e3f581ae0 100644
 --- a/tools/testing/selftests/kvm/lib/aarch64/gic.c
 +++ b/tools/testing/selftests/kvm/lib/aarch64/gic.c
-@@ -49,7 +49,7 @@ gic_dist_init(enum gic_type type, unsigned int nr_cpus, void *dist_base)
- 	spin_unlock(&gic_lock);
- }
- 
--void gic_init(enum gic_type type, unsigned int nr_cpus,
-+void _gic_init(enum gic_type type, unsigned int nr_cpus,
- 		void *dist_base, void *redist_base)
- {
- 	uint32_t cpu = guest_get_vcpuid();
-@@ -63,6 +63,11 @@ void gic_init(enum gic_type type, unsigned int nr_cpus,
- 	gic_cpu_init(cpu, redist_base);
- }
- 
-+void gic_init(enum gic_type type, unsigned int nr_cpus)
-+{
-+	_gic_init(type, nr_cpus, (void *)GICD_BASE_GPA, (void *)GICR_BASE_GPA);
-+}
-+
- void gic_irq_enable(unsigned int intid)
- {
+@@ -164,3 +164,8 @@ void gic_irq_set_config(unsigned int intid, bool is_edge)
  	GUEST_ASSERT(gic_common_ops);
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-index b5f28d21a947..7cd5be5351c8 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-@@ -30,7 +30,7 @@
-  * redistributor regions of the guest. Since it depends on the number of
-  * vCPUs for the VM, it must be called after all the vCPUs have been created.
-  */
--int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs,
-+int _vgic_v3_setup(struct kvm_vm *vm, uint32_t nr_vcpus, uint32_t nr_irqs,
- 		uint64_t gicd_base_gpa, uint64_t gicr_base_gpa)
- {
- 	int gic_fd;
-@@ -79,6 +79,11 @@ int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs,
- 	return gic_fd;
+ 	gic_common_ops->gic_irq_set_config(intid, is_edge);
  }
- 
-+int vgic_v3_setup(struct kvm_vm *vm, uint32_t nr_vcpus, uint32_t nr_irqs)
-+{
-+	return _vgic_v3_setup(vm, nr_vcpus, nr_irqs, GICD_BASE_GPA, GICR_BASE_GPA);
-+}
 +
- /* should only work for level sensitive interrupts */
- int _kvm_irq_set_level_info(int gic_fd, uint32_t intid, int level)
- {
--- 
++void gic_wfi(void)
++{
++	asm volatile("wfi");
++}
+--
 2.42.0.869.gea05f2083d-goog
-
