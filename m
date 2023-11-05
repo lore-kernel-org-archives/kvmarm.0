@@ -1,191 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284A115AE7
-	for <kvmarm@lists.linux.dev>; Sat,  4 Nov 2023 12:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD1023B3
+	for <kvmarm@lists.linux.dev>; Sun,  5 Nov 2023 13:04:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jXeaRUe4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86801C433C7;
-	Sat,  4 Nov 2023 12:13:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699100001;
-	bh=6oVaN3BzvpsPu9dUUFCNp1qKEANCS1fIs6Vl23jVrqE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jXeaRUe47YAHUXjzev5/Zhb1wcm5zk3IxuQvzkk9+6ZezK54J3j2VvBQ6C9SmTqaj
-	 CIYfYlEjgXBC5kacT18ermBNHZh97I0W/A1FdRivlSE2cnIy6pDP7Fe1/DSRqXn5EU
-	 Y/RAuUCX43at9eWn+Z7IOGRrfbT4BdG8SINXlAqfgThGOqVhT+0OAbQdg0kP9GIwBv
-	 WMxz46XZVS1lqtWrHVDwByzk55XU0OaCSgYfMkt5r0zPKVFlIQYRjUXya4BT0wxElr
-	 0QyBsC1cdHTJ8qONa0cXpjcsF8maRLgBIvSO1NKCLQnA9G4p7IrYpa+72+ffIfSA5m
-	 QcEX37QeGufKA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qzFWg-00AIQB-O1;
-	Sat, 04 Nov 2023 12:13:18 +0000
-Date: Sat, 04 Nov 2023 12:13:18 +0000
-Message-ID: <86il6h1ztt.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jan Henrik Weinstock <jan@mwa.re>
-Cc: oliver.upton@linux.dev,	james.morse@arm.com,	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,	catalin.marinas@arm.com,	will@kernel.org,
-	linux-arm-kernel@lists.infradead.org,	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,	Lukas =?UTF-8?B?SsO8bmdlcg==?= <lukas@mwa.re>
-Subject: Re: KVM exit to userspace on WFI
-In-Reply-To: <CANi1PHiXFKz6VqBys=Xw=rgR_gJKPO661iW-TMrF20j5yS4unQ@mail.gmail.com>
-References: <CANi1PHhzk80HvwQbBM46gpJ6_AA_P6+m5Jo0Nuy_MAdA4C2BhQ@mail.gmail.com>
-	<87ttql5aq7.wl-maz@kernel.org>
-	<CANi1PHieGooO0DK=6BPwq0UknHzsn9QM3rFQkh3HLMfWxDseUQ@mail.gmail.com>
-	<86cyx250w9.wl-maz@kernel.org>
-	<CANi1PHjAwLWAq9EW7r5Yh_xbvPiJMsq8342JwAGafz1d1NUhSA@mail.gmail.com>
-	<86msw01e4m.wl-maz@kernel.org>
-	<CANi1PHiXFKz6VqBys=Xw=rgR_gJKPO661iW-TMrF20j5yS4unQ@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l/7+cBYV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699189480; x=1730725480;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=mFE9c4kKSFVvQT9y1x5f+rwwI1//UOO/ul+Hvls5bPM=;
+  b=l/7+cBYVIf7uc8W+1N+ffCLoWuzaUYUnSAPMV2Fteh+D3rMH4/FgudPA
+   OoV33iD7J8N2XwIaQzj+iO5goL7EuR0IXh+xYzoYkY/3O07RZpo+zHSEr
+   aCMl/dfJQQRiiuw96x8GK3RrkPbFik2yw+TQzDDjIt9trFc6xGa9prI/o
+   d4cNMRlKRRVomp5woU7BzY8cYulj3+EkYPrFeInSRMJJYSoOKarUeSunf
+   Wfwwv4YkLow5e3FEfTT8AQB64OmZ196WkXX7xvI7ObND2uMRGyfWfXjFn
+   kG2cCcwLKY7w4uqNtZvH9jveqb6HC63LWc1tZvUoeJctmrW3n+16I5xZD
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10884"; a="388033712"
+X-IronPort-AV: E=Sophos;i="6.03,279,1694761200"; 
+   d="scan'208";a="388033712"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2023 05:04:11 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,279,1694761200"; 
+   d="scan'208";a="10206430"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by fmviesa001.fm.intel.com with ESMTP; 05 Nov 2023 05:04:02 -0800
+Date: Sun, 5 Nov 2023 21:02:32 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
+	Xu Yilun <yilun.xu@intel.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+	Anish Moorthy <amoorthy@google.com>,
+	David Matlack <dmatlack@google.com>,
+	Yu Zhang <yu.c.zhang@linux.intel.com>,
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Ackerley Tng <ackerleytng@google.com>,
+	Maciej Szmigiero <mail@maciej.szmigiero.name>,
+	David Hildenbrand <david@redhat.com>,
+	Quentin Perret <qperret@google.com>,
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+	Liam Merwick <liam.merwick@oracle.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [PATCH v13 20/35] KVM: x86/mmu: Handle page fault for private
+ memory
+Message-ID: <ZUeSaAKRemlSRQpO@yilunxu-OptiPlex-7050>
+References: <20231027182217.3615211-1-seanjc@google.com>
+ <20231027182217.3615211-21-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jan@mwa.re, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, lukas@mwa.re
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231027182217.3615211-21-seanjc@google.com>
 
-On Tue, 31 Oct 2023 19:21:16 +0000,
-Jan Henrik Weinstock <jan@mwa.re> wrote:
->=20
-> Am Mo., 30. Okt. 2023 um 13:36 Uhr schrieb Marc Zyngier <maz@kernel.org>:
-> >
-> > [please make an effort not to top-post]
-> >
-> > On Fri, 27 Oct 2023 18:41:44 +0100,
-> > Jan Henrik Weinstock <jan@mwa.re> wrote:
-> > >
-> > > Hi Marc,
-> > >
-> > > the basic idea behind this is to have a (single-threaded) execution l=
-oop,
-> > > something like this:
-> > >
-> > > vcpu-thread:    vcpu-run | process-io-devices | vcpu-run | process-io=
-...
-> > >                          ^
-> > >                   WFX or timeout
-> > >
-> > > We switch to simulating IO devices whenever the vcpu is idle (wfi) or=
- exceeds
-> > > a certain budget of instructions (counted via pmu). Our fallback curr=
-ently is
-> > > to kick the vcpu out of its execution using a signal (via a timeout/a=
-larm). But
-> > > of course, if the cpu is stuck at a wfi, we are wasting a lot of time.
-> > >
-> > > I understand that the proposed behavior is not desirable for most use=
- cases,
-> > > which is why I suggest locking it behind a flag, e.g.
-> > > KVM_ARCH_FLAG_WFX_EXIT_TO_USER.
-> >
-> > But how do you reconcile the fact that exposing this to userspace
-> > breaks fundamental expectations that the guest has, such as getting
-> > its timer interrupts and directly injected LPIs? Implementing WFI in
-> > userspace breaks it. What about the case where we don't trap WFx and
-> > let the *guest* wait for an interrupt?
->=20
-> Timer interrupts etc. will be injected into the vcpu during the
-> io-phases. When there are no interrupts present and the guest performs
-> a WFI, we can just skip forward to the next timer event.
+> +static void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
+> +					      struct kvm_page_fault *fault)
+> +{
+> +	kvm_prepare_memory_fault_exit(vcpu, fault->gfn << PAGE_SHIFT,
+> +				      PAGE_SIZE, fault->write, fault->exec,
+> +				      fault->is_private);
+> +}
+> +
+> +static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
+> +				   struct kvm_page_fault *fault)
+> +{
+> +	int max_order, r;
+> +
+> +	if (!kvm_slot_can_be_private(fault->slot)) {
+> +		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+> +		return -EFAULT;
+> +	}
+> +
+> +	r = kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault->pfn,
+> +			     &max_order);
+> +	if (r) {
+> +		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+> +		return r;
 
-Skip forward? What does that mean? Compress time and move along?
+Why report KVM_EXIT_MEMORY_FAULT here? even with a ret != -EFAULT? This is
+different from the decription where KVM_EXIT_MEMORY_FAULT is introduced:
 
->=20
-> > Honestly, what you are describing seems to be a use model that doesn't
-> > fit KVM, which is a general purpose hypervisor, but more a simulation
-> > environment. Yes, the primitives are the same, but the plumbing is
-> > wildly different.
->=20
-> Agreed.
->=20
-> > *If* that's the stuff you're looking at, then I'm afraid you'll have
-> > to do it in different way, because what you are suggesting is
-> > fundamentally incompatible with the guarantees that KVM gives to guest
-> > and userspace. Because your KVM_ARCH_FLAG_WFX_EXIT_TO_USER is really a
-> > lie. It should really be named something more along the lines of
-> > KVM_ARCH_FLAG_WFX_EXIT_TO_USER_SOMETIME_AND_I_DONT_EVEN_KNOW_WHEN
-> > (probably with additional clauses related to breaking things).
->=20
-> I have attached a reworked version of the patch as a reference (based
-> on my 5.15 kernel). It puts the modified behavior behind a new
-> capability so as to not interfere with the current expectations
-> towards handling WFI/WFE.
-> I think it should now trap all blocking calls to WFx on the vcpu and
-> reliably return to the userspace. If I have missed something that
-> would cause the vcpu to not trap on a WFI kindly let me know.
+  KVM_EXIT_MEMORY_FAULT will be used to report memory faults that appear to
+  be implicit conversions.
 
-Oh FFS. Please read my previous emails, the architecture spec, and
-understand that WFx is a *hint*. Given your line of work, I would hope
-you understand the implications of this.
+  To allow for future possibilities where KVM reports KVM_EXIT_MEMORY_FAULT
+  and fills run->memory_fault on _any_ unresolved fault, KVM returns
+  "-EFAULT"
 
->=20
-> > Overall, you are still asking for something that is not guaranteed at
-> > the architecture level, even less in KVM, and I'm not going to add
-> > support for something that can only work "sometime".
->=20
-> I am not quite sure what you mean with "sometime". Are you referring
-> to WFIs as NOPs? Or WFIs that do not yield because of pending
-> interrupts?
+Thanks,
+Yilun
 
-NOP is a valid implementation of WFx. WFx doesn't have to trap. Its
-only requirements are not to lose state. Nothing else. Trapping is a
-'quality of implementation' feature, and doesn't affect correctness.
-And yes, there are machines out there that will absolutely ignore any
-request for trapping.
-
-=46rom the architecture spec (ARM DDI 0487J.a, D19.2.48, TWI):
-
-<quote>
-Since a WFI can complete at any time, even without a Wakeup event, the
-traps on WFI are not guaranteed to be taken, even if the WFI is
-executed when there is no Wakeup event. The only guarantee is that if
-the instruction does not complete in finite time in the absence of a
-Wakeup event, the trap will be taken.
-</quote>
-
-Similar verbiage exists for WFE. Do you now see why your proposal
-makes little sense?
-
->=20
-> The point of my patch is not to accurately count every single WFI. The
-> point is to prevent the host cpu from sleeping just because my vcpu
-> executed a WFI somewhere in the guest software. If a WFI is executed
-> by the guest and that does not result in my vcpu thread to block (in
-> other words: the vcpu continues executing instructions beyond the WFI)
-> then it also should not exit to userspace. So instead of
-> "KVM_ARCH_FLAG_WFX_EXIT_TO_USER_SOMETIME_AND_I_DONT_EVEN_KNOW_WHEN" it
-> is really "KVM_ARCH_FLAG_WFX_EXIT_TO_USER_WHENEVER_YOU_WOULD_OTHERWISE_YI=
-ELD_AND_I_CANNOT_GET_MY_THREAD_BACK".
-
-You already must be able to handle a guest spinning in a loop without
-a WFI. So why would WFI be of interest more than anything else? You
-can always make an interrupt pending at any point, without having to
-wait for WFI to occur. Just make the interrupt pending (which, if you
-emulate everything in userspace, is just giving the vcpu thread a
-signal).
-
-My hunch is that your SW is trying to do the interrupt injection from
-the vcpu thread, which is a pretty broken model (it would badly model
-the concept of an interrupt being an asynchronous event).
-
-Honestly, if there was one thing I would add to the kernel, it would
-be an option to *prevent* any trap of WFx, because that at least is
-something we can universally enforce and guarantee to userspace.
-Anything else is only wishful thinking.
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+> +	}
+> +
+> +	fault->max_level = min(kvm_max_level_for_order(max_order),
+> +			       fault->max_level);
+> +	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
+> +
+> +	return RET_PF_CONTINUE;
+> +}
