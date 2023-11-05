@@ -1,130 +1,131 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD1023B3
-	for <kvmarm@lists.linux.dev>; Sun,  5 Nov 2023 13:04:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F283C3C28
+	for <kvmarm@lists.linux.dev>; Sun,  5 Nov 2023 16:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l/7+cBYV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699189480; x=1730725480;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=mFE9c4kKSFVvQT9y1x5f+rwwI1//UOO/ul+Hvls5bPM=;
-  b=l/7+cBYVIf7uc8W+1N+ffCLoWuzaUYUnSAPMV2Fteh+D3rMH4/FgudPA
-   OoV33iD7J8N2XwIaQzj+iO5goL7EuR0IXh+xYzoYkY/3O07RZpo+zHSEr
-   aCMl/dfJQQRiiuw96x8GK3RrkPbFik2yw+TQzDDjIt9trFc6xGa9prI/o
-   d4cNMRlKRRVomp5woU7BzY8cYulj3+EkYPrFeInSRMJJYSoOKarUeSunf
-   Wfwwv4YkLow5e3FEfTT8AQB64OmZ196WkXX7xvI7ObND2uMRGyfWfXjFn
-   kG2cCcwLKY7w4uqNtZvH9jveqb6HC63LWc1tZvUoeJctmrW3n+16I5xZD
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10884"; a="388033712"
-X-IronPort-AV: E=Sophos;i="6.03,279,1694761200"; 
-   d="scan'208";a="388033712"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2023 05:04:11 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,279,1694761200"; 
-   d="scan'208";a="10206430"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa001.fm.intel.com with ESMTP; 05 Nov 2023 05:04:02 -0800
-Date: Sun, 5 Nov 2023 21:02:32 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
-	Anish Moorthy <amoorthy@google.com>,
-	David Matlack <dmatlack@google.com>,
-	Yu Zhang <yu.c.zhang@linux.intel.com>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Maciej Szmigiero <mail@maciej.szmigiero.name>,
-	David Hildenbrand <david@redhat.com>,
-	Quentin Perret <qperret@google.com>,
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
-	Liam Merwick <liam.merwick@oracle.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH v13 20/35] KVM: x86/mmu: Handle page fault for private
- memory
-Message-ID: <ZUeSaAKRemlSRQpO@yilunxu-OptiPlex-7050>
-References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-21-seanjc@google.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qs3HRrP3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699201191;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5S45DCFEET4FUlleAs+X25SSP8exRtkoxGaiIZR36AY=;
+	b=Qs3HRrP3qIhpoKM72TcYby7LjkynOYF2uGUiYgOpf4cM1NTdPhrht9wGz/KnO3gBjJxfUq
+	mza5kadjnoQ8KRXMz4halkRbOGmF7JZQRnmEXEipVlcbqxqYJs2bJ/KxI1kMpBJJetCEJF
+	dDxtT0VknqS2ie5C9oxIB6gY14EdZkk=
+Received: from mail-vk1-f198.google.com (mail-vk1-f198.google.com
+ [209.85.221.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-623-GOl83YtPPCezcSugDwzm3g-1; Sun, 05 Nov 2023 11:19:50 -0500
+X-MC-Unique: GOl83YtPPCezcSugDwzm3g-1
+Received: by mail-vk1-f198.google.com with SMTP id 71dfb90a1353d-4abf1f457c2so964371e0c.3
+        for <kvmarm@lists.linux.dev>; Sun, 05 Nov 2023 08:19:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699201190; x=1699805990;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5S45DCFEET4FUlleAs+X25SSP8exRtkoxGaiIZR36AY=;
+        b=icsqxuccZdLfQXiTpxYkXj3F95gyeLYIrnq5B7xvSovXc/CitCp6x2WY/5tSOypa35
+         fg5vmhg6uecztqbbxPz4RwI07Dg92vyVKWqwl5x7XoBYKIeN+/05008iQ3rCwm0mlnGI
+         esHbRmg9W7wh0uv+SipIfDy3CElRu58YiB3SaXw1MUZv3Ml9Cmbup77ALKeemTumSzw7
+         WNMkwZr1d/2z3DtakOM5UCKgYy9mwis70adYH/VTUvgN9+TZeHQ5mYGuD6BnANLSoGKX
+         gYhD+Sgr+X9kIkNWV7Ck7Twj1Tp+r5WVLp4yCuTttQOFc14xjRrRLOt+bDzQOamVGF5r
+         mhYA==
+X-Gm-Message-State: AOJu0YwBGyABbfYkFzY4mtlSN0qCmDq5FQ47E8d2eS0USZVhsSzq4cn7
+	F4DWZsRK+ERzct/RnYiG+NA7x6LwYmO4XKDE+G0Lcc8bDI20Ops3su3yeW6MVcBniRjutS/OFk9
+	MESOg5JpNyh5KNJgCMGfGCewcVHQ1Fmew
+X-Received: by 2002:a05:6102:4743:b0:45d:8f83:e10f with SMTP id ej3-20020a056102474300b0045d8f83e10fmr5351488vsb.4.1699201189797;
+        Sun, 05 Nov 2023 08:19:49 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG9PY/ps/exIZhJtEiBPcrHL5I4MFvN3fWtoZJg4K/o1jMHEXmGlTLfpUZIUzDcxTZUf1dOb3c60KPU/ucxafo=
+X-Received: by 2002:a05:6102:4743:b0:45d:8f83:e10f with SMTP id
+ ej3-20020a056102474300b0045d8f83e10fmr5351461vsb.4.1699201189503; Sun, 05 Nov
+ 2023 08:19:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231027182217.3615211-21-seanjc@google.com>
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-21-seanjc@google.com>
+ <ZUeSaAKRemlSRQpO@yilunxu-OptiPlex-7050>
+In-Reply-To: <ZUeSaAKRemlSRQpO@yilunxu-OptiPlex-7050>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sun, 5 Nov 2023 17:19:36 +0100
+Message-ID: <CABgObfb1Wf2ptitGhJPM6VcmkCG9haMoQj2BsttjeoV=9F0O9Q@mail.gmail.com>
+Subject: Re: [PATCH v13 20/35] KVM: x86/mmu: Handle page fault for private memory
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Anish Moorthy <amoorthy@google.com>, David Matlack <dmatlack@google.com>, 
+	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> +static void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
-> +					      struct kvm_page_fault *fault)
-> +{
-> +	kvm_prepare_memory_fault_exit(vcpu, fault->gfn << PAGE_SHIFT,
-> +				      PAGE_SIZE, fault->write, fault->exec,
-> +				      fault->is_private);
-> +}
-> +
-> +static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> +				   struct kvm_page_fault *fault)
-> +{
-> +	int max_order, r;
-> +
-> +	if (!kvm_slot_can_be_private(fault->slot)) {
-> +		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> +		return -EFAULT;
-> +	}
-> +
-> +	r = kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault->pfn,
-> +			     &max_order);
-> +	if (r) {
-> +		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> +		return r;
+On Sun, Nov 5, 2023 at 2:04=E2=80=AFPM Xu Yilun <yilun.xu@linux.intel.com> =
+wrote:
+>
+> > +static void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
+> > +                                           struct kvm_page_fault *faul=
+t)
+> > +{
+> > +     kvm_prepare_memory_fault_exit(vcpu, fault->gfn << PAGE_SHIFT,
+> > +                                   PAGE_SIZE, fault->write, fault->exe=
+c,
+> > +                                   fault->is_private);
+> > +}
+> > +
+> > +static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
+> > +                                struct kvm_page_fault *fault)
+> > +{
+> > +     int max_order, r;
+> > +
+> > +     if (!kvm_slot_can_be_private(fault->slot)) {
+> > +             kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+> > +             return -EFAULT;
+> > +     }
+> > +
+> > +     r =3D kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault=
+->pfn,
+> > +                          &max_order);
+> > +     if (r) {
+> > +             kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+> > +             return r;
+>
+> Why report KVM_EXIT_MEMORY_FAULT here? even with a ret !=3D -EFAULT?
 
-Why report KVM_EXIT_MEMORY_FAULT here? even with a ret != -EFAULT? This is
-different from the decription where KVM_EXIT_MEMORY_FAULT is introduced:
+The cases are EFAULT, EHWPOISON (which can report
+KVM_EXIT_MEMORY_FAULT) and ENOMEM. I think it's fine
+that even -ENOMEM can return KVM_EXIT_MEMORY_FAULT,
+and it doesn't violate the documentation.  The docs tell you "what
+can you do if error if EFAULT or EHWPOISON?"; they don't
+exclude that other errnos result in KVM_EXIT_MEMORY_FAULT,
+it's just that you're not supposed to look at it
 
-  KVM_EXIT_MEMORY_FAULT will be used to report memory faults that appear to
-  be implicit conversions.
+Paolo
 
-  To allow for future possibilities where KVM reports KVM_EXIT_MEMORY_FAULT
-  and fills run->memory_fault on _any_ unresolved fault, KVM returns
-  "-EFAULT"
-
-Thanks,
-Yilun
-
-> +	}
-> +
-> +	fault->max_level = min(kvm_max_level_for_order(max_order),
-> +			       fault->max_level);
-> +	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
-> +
-> +	return RET_PF_CONTINUE;
-> +}
