@@ -1,149 +1,133 @@
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B50128E0F
-	for <kvmarm@lists.linux.dev>; Mon,  6 Nov 2023 15:35:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.55])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4SPFgG6CmhzMmW3;
-	Mon,  6 Nov 2023 23:31:06 +0800 (CST)
-Received: from [10.174.185.210] (10.174.185.210) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Mon, 6 Nov 2023 23:35:32 +0800
-Subject: Re: [RFC PATCH] KVM: arm/arm64: GICv4: Support shared VLPI
-To: Marc Zyngier <maz@kernel.org>
-CC: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
-	Gavin Shan <gshan@redhat.com>, Jean-Philippe Brucker
-	<jean-philippe@linaro.org>, "open list:IRQCHIP DRIVERS"
-	<linux-kernel@vger.kernel.org>, <kvmarm@lists.linux.dev>,
-	<wanghaibin.wang@huawei.com>
-References: <20231102143507.840-1-jiangkunkun@huawei.com>
- <87msvt6cc7.wl-maz@kernel.org>
-From: Kunkun Jiang <jiangkunkun@huawei.com>
-Message-ID: <12266a84-1148-954c-c6d6-67c8f9cc80b7@huawei.com>
-Date: Mon, 6 Nov 2023 23:33:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1D018AEB
+	for <kvmarm@lists.linux.dev>; Mon,  6 Nov 2023 15:43:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aBAyS1tX"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5a8d9dcdd2bso93832537b3.2
+        for <kvmarm@lists.linux.dev>; Mon, 06 Nov 2023 07:43:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699285403; x=1699890203; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ABS8rPoBy1ITQ62kUEvxWovIfmSWeQOAvNCpebOJLoI=;
+        b=aBAyS1tXClLkh8Ii9//sHtAv8qZWjwSEzNpd74Of9DUZeOCu/AO7v/lZqoce8RoYaA
+         Fj0eCMg5U+71bzSsyFVhUuYFeolMHzcZHAopWMIWArSGQDd8AOLbjR8evZY01UbYNCy/
+         +E+Fjcd217ffQMt2T33Pihh0gp+SQiwhPTTsMasHEM3XayulF1i0DuAZdUhfM5Ys+Xwa
+         aYuNVDu1+2WufgV4nPez2G7EJ8p2mtMkH3gokVA/FRyMWFbA4NphbvDxEef0yo5yCJeN
+         6WgA/ftWW2V+kiB2XufymV/uhywaNBOHwMU3WM6bM1GTegnCspeCa4EuwSb7sMp/4IhI
+         +4jA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699285403; x=1699890203;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ABS8rPoBy1ITQ62kUEvxWovIfmSWeQOAvNCpebOJLoI=;
+        b=Pma+fp8teET+N8bWzhSRBjgn5728pBu0j93sw93zcgP3B8PNPODJtysl/j1eKEwxoZ
+         hw8LAeLNAMEEhRsAjpCMW2Q4k6itkpBB/AtcvyajwItbJXgjZ8c2rGespq3qZAv+L6aG
+         lUf1a09J8cr80vC0S/DWW4Z0H+AwFGZ5zG19412GcD+ino0DL/6zAfdFMYLAXMsU2PlW
+         Ek5HGhfauQ2Fird/cleVngyPUesUh26xXnpoS5WY/U8AiWBgRK6BJTcSZXHUBt6HeLpt
+         h0IN9vHwZNYpgXtpuL+OiZWP4rYnyNuJNMM8myOu5tzRvG3Zw8nC/BIR35I8sf2lxxQ6
+         iqIw==
+X-Gm-Message-State: AOJu0YwI5zrBbtxWYrLsOh7s09OEA5Pr8msxFj51UkOS8TtmLLnSGkCW
+	rhmWeNnTnF6HSWoq55Pgrs8RfEf1zyU=
+X-Google-Smtp-Source: AGHT+IFZU6oilNAmMp5GLulg+dwoZ1zspXQbywwTDejvG8kP1K7yDCwH0QkLRrw/RyNVPmFev9uMuH6PQSU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:ce94:0:b0:da0:3bea:cdc7 with SMTP id
+ x142-20020a25ce94000000b00da03beacdc7mr527390ybe.2.1699285402751; Mon, 06 Nov
+ 2023 07:43:22 -0800 (PST)
+Date: Mon, 6 Nov 2023 07:43:07 -0800
+In-Reply-To: <ZUYcb6no9ADYytrx@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-In-Reply-To: <87msvt6cc7.wl-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Originating-IP: [10.174.185.210]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm000007.china.huawei.com (7.193.23.189)
-X-CFilter-Loop: Reflected
+Mime-Version: 1.0
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-17-seanjc@google.com>
+ <ZUYcb6no9ADYytrx@yilunxu-OptiPlex-7050>
+Message-ID: <ZUkJiwp8VHY0ICab@google.com>
+Subject: Re: [PATCH v13 16/35] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+From: Sean Christopherson <seanjc@google.com>
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Anish Moorthy <amoorthy@google.com>, David Matlack <dmatlack@google.com>, 
+	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
+	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Marc,
+On Sat, Nov 04, 2023, Xu Yilun wrote:
+> > +KVM_SET_USER_MEMORY_REGION2 is an extension to KVM_SET_USER_MEMORY_REGION that
+> > +allows mapping guest_memfd memory into a guest.  All fields shared with
+> > +KVM_SET_USER_MEMORY_REGION identically.  Userspace can set KVM_MEM_PRIVATE in
+> > +flags to have KVM bind the memory region to a given guest_memfd range of
+> > +[guest_memfd_offset, guest_memfd_offset + memory_size].  The target guest_memfd
+>                                                         ^
+> The range end should be exclusive, is it?
 
-On 2023/11/4 18:29, Marc Zyngier wrote:
-> On Thu, 02 Nov 2023 14:35:07 +0000,
-> Kunkun Jiang <jiangkunkun@huawei.com> wrote:
->> In some scenarios, the guest virtio-pci driver will request two MSI-X,
->> one vector for config, one shared for queues. However, the host driver
->> (vDPA or VFIO) will request a vector for each queue.
-> Well, VFIO will request *all* available MSI-X. It doesn't know what a
-> queue is.
->
->> In the current implementation of GICv4/4.1 direct injection of vLPI,
->> pINTID and vINTID have one-to-one correspondence. Therefore, the
-> This matching is a hard requirement that matches the architecture. You
-> cannot change it.
->
->> above scenario cannot be handled correctly. The host kernel will
->> execute its_map_vlpi multiple times but only execute its_unmap_vlpi
->> once. This may cause guest hang[1].
-> Why does it hang? As far as it is concerned, it has unmapped the
-> interrupts it cares about. Where are the calls to its_map_vlpi()
-> coming from? It should only occur if the guest actively programs the
-> MSI-X registers. What is your VMM? How can I reproduce this issue?
->
->> |	WARN_ON(!(irq->hw && irq->host_irq == virq));
->> |	if (irq->hw) {
->> |		atomic_dec(&irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count);
->> |		irq->hw = false;
->> |		ret = its_unmap_vlpi(virq);
->> |	}
->>
->> Add a list to struct vgic_irq to record all host irqs mapped to the vlpi.
->> When performing an action on the vlpi, traverse the list and perform this
->> action on all host irqs.
-> This makes no sense. You are blindly associating multiple host
-> interrupts with a single guest interrupt. This is a blatant violation
-> of the architecture. When unmapping a VLPI from a guest, only this one
-> should be turned again into an LPI. Not two, not all, just this one.
->
-> Maybe you have found an actual issue, but this patch is absolutely
-> unacceptable. Please fully describe the problem, provide traces, and
-> if possible a reproducer.
->
->> Link: https://lore.kernel.org/all/0d9fdf42-76b1-afc6-85a9-159c5490bbd4@huawei.com/#t
-> I tried to parse this, but it hardly makes sense either. You seem to
-> imply that the host driver pre-configures the device, which is
-> completely wrong. The host driver (VFIO) should simply request all
-> possible physical LPIs, and that's all. It is expected that this
-> requesting has no other effect on the HW. Also, since your guest
-> driver only configures a single vLPI, there should be only a single
-> its_map_vlpi() call.
-Sorry to replay so late.
+Yes, that should be a ')', not a ']'.
 
-The virtio-scsi device has seven vectors (entry0-6): one for config,
-six for queues. In Guest, e.g. centos 7.6 4.19, virtio-pci driver
-will request only one vLPI, which is shared for queues.
-The entry 0 is used for config. It's not relevant to this issue, so
-we're not going to discuss it. The virtio-pci driver write entry1-6
-massage.data in the msix-table and trap to QEMU for processing. The
-massage.data is as follow:
-> entry-0 0
-> entry-1 1
-> entry-2 1
-> entry-3 1
-> entry-4 1
-> entry-5 1
-> entry-6 1 
+> > +static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+> > +{
+> > +	const char *anon_name = "[kvm-gmem]";
+> > +	struct kvm_gmem *gmem;
+> > +	struct inode *inode;
+> > +	struct file *file;
+> > +	int fd, err;
+> > +
+> > +	fd = get_unused_fd_flags(0);
+> > +	if (fd < 0)
+> > +		return fd;
+> > +
+> > +	gmem = kzalloc(sizeof(*gmem), GFP_KERNEL);
+> > +	if (!gmem) {
+> > +		err = -ENOMEM;
+> > +		goto err_fd;
+> > +	}
+> > +
+> > +	/*
+> > +	 * Use the so called "secure" variant, which creates a unique inode
+> > +	 * instead of reusing a single inode.  Each guest_memfd instance needs
+> > +	 * its own inode to track the size, flags, etc.
+> > +	 */
+> > +	file = anon_inode_getfile_secure(anon_name, &kvm_gmem_fops, gmem,
+> > +					 O_RDWR, NULL);
+> > +	if (IS_ERR(file)) {
+> > +		err = PTR_ERR(file);
+> > +		goto err_gmem;
+> > +	}
+> > +
+> > +	file->f_flags |= O_LARGEFILE;
+> > +
+> > +	inode = file->f_inode;
+> > +	WARN_ON(file->f_mapping != inode->i_mapping);
+> 
+> Just curious, why should we check the mapping fields which is garanteed in
+> other subsystem?
 
-The calling process of kvm is as follows. its_map_vlpi_will be
-executed 6 times. Six host irqs are mapped to one vLPI.
-> kvm_irqfd_assign
->     irq_bypass_register_consumer
->         ...
->         kvm_arch_irq_bypass_add_producer
->             kvm_vgic_v4_set_forwarding
->                 its_map_vlpi 
-
-When executing the reboot command inside the Guest,
-kvm_vgic_v4_unset_forwarding will be execute 6 times. WARN_ON
-will also be triggered 6 times. But its_unmap_vlpi will only
-be executed the first time.
-> kvm_arch_irq_bypass_del_producer
->     kvm_vgic_v4_unset_forwarding
->         WARN_ON(!(irq->hw && irq->host_irq == virq));
->         if (irq->hw) {
->             irq->hw = false;
-> its_unmap_vlpi
->         } 
-
-Therefore, only the mapping between the first host irq and
-vLPI is unmapped. When the guest reboots into the BIOS phase,
-the remaining 5 host irqs may still send interrupts. This
-causes the guest to hang.
-
-Looking forward to your reply.
-
-Thanks,
-Kunkun Jiang
-> So it seems to me that your HW and SW are doing things that are not
-> expected at all.
->
-> 	M.
->
+Mostly to document the behavior.  The vast majority of folks that read this code
+will be KVM developers, not file systems developers, and will likely have no clue
+about the relationship between f_mapping and i_mapping.  And in the extremely
+unlikely scenario that anon_inode_getfile_secure() no longer sets f_mapping, a
+WARN detects the issue whereas a comment does not.
