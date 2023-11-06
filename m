@@ -1,63 +1,63 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F9F17730
-	for <kvmarm@lists.linux.dev>; Mon,  6 Nov 2023 11:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E282518C07
+	for <kvmarm@lists.linux.dev>; Mon,  6 Nov 2023 11:26:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mFsytMAd"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-66d0c777bf0so29099256d6.3
-        for <kvmarm@lists.linux.dev>; Mon, 06 Nov 2023 03:25:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PcIlVbHe"
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-777745f1541so313727485a.0
+        for <kvmarm@lists.linux.dev>; Mon, 06 Nov 2023 03:26:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699269931; x=1699874731; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1699270010; x=1699874810; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8FgFIIfzRIOk5S3UyWAM1hrnYX4eHCPdXXTgA8O3M1A=;
-        b=mFsytMAdBN6GuezTxEFabW57x/e7HHoX4Jt/3D+wgjrTFneSfnqrKIJEif6h0lvDr9
-         5lfwn7Di2c//71ZmWfJQrfYUwGaw6ILNtGqP+fkOWqYaPABxm5dQjIv+WwSuH2ceLJXo
-         89YpcC4aAVs4g6Ab8KJjV2XL6KW2IJQHEnqryI5ssARC8+s4/BiakzgBUEAxLe5nj8yp
-         MCOJE344DvvqjyvI27gpwBe1Bix1Gt0ZVIrT8WbdtuPCbH5a73XuvLoYIEDrbyqEX9C0
-         bFF+EnL31FGhE8RBAfaDV7OYn+45TJTKXD1jiFOAoKVedBnfbWgKg6ZvrwCvGLYoYUyL
-         zX7g==
+        bh=bcdCS6aA0hU/P/1Lxpxkfas8L67FF+zkKmd2vDLbKHk=;
+        b=PcIlVbHeJquFDAf/tqJBWcsYYoogESct90om+lwA3zg6OovTkCclCBRH2B1ob/vmm+
+         9H+H1wYm6jLnYsvouFvk1cQeIkfZCefT6YBLRwmL2IxvjmWd+zwNBwzQgThczJ86Vcc/
+         hwYYkgHrGM9jCceYfQY4WVHviY5zb/ffyx3MZleQsCH1RRWKmWbkbadK7ZQ6Mf504Qb/
+         DnmJGE1SmnDwc+//pM6hGtTqojwv5Zaba0i4F01wiE+UYh6ADETtCum8sEl2Jp+b7/2G
+         L9QbvZbFFHKPSo19y94v69dOI0+5HXOvA0A6RSqoDoh9Z6wUODAQ4Du0uS8xdGfpXXAo
+         /mQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699269931; x=1699874731;
+        d=1e100.net; s=20230601; t=1699270010; x=1699874810;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8FgFIIfzRIOk5S3UyWAM1hrnYX4eHCPdXXTgA8O3M1A=;
-        b=DA4jWyevvFtlQVAIaF2qM5mkhSSggm0blEjYsMp5yQ6ie9AqO3qvombS1sMCHd+jGO
-         FH5/kVfftIpmQtA/0g+CCBwJxBIVEufZur7cAvUIlhfPn4W970fBfB9kLRSCj36377PR
-         NSGVdrOKpYGpsxhVE0MEgk7sEkH2lT1skzX6x/3aPdamzEfcCcC93eWbM6SccvB2t6Ge
-         aAGlQMe9xtBylXCvl6DEIyLeiY4aen+tuPIgwuGeGL4V7m0Ok5FHiTgmfjyJu2rbo1xY
-         uv97FBKuChGRHF/ifIAvkyhmc8LIERG0/JbgkNv29LnbYP12ZL2XFG4V6Gf5rLlVecNS
-         YAsg==
-X-Gm-Message-State: AOJu0YyTk4dLRSWwHrozpZpmPF1yBHVtR0w5rxWVYQ6qVnG386D0ISfz
-	UQvKVNxO9RISPNfdwS9pg3HiFAlKjBPJ6fPlyXLd4Q==
-X-Google-Smtp-Source: AGHT+IF4yL2/LL4u2aXRMHdIO4tBxiGnD2Sg0p8AaFV/BRnT///c7YsCa6iLfBADu8SZkPGs+0c1ElvE1cEBNyIvvIQ=
-X-Received: by 2002:a05:6214:ac9:b0:671:7312:bf5 with SMTP id
- g9-20020a0562140ac900b0067173120bf5mr32557664qvi.17.1699269931062; Mon, 06
- Nov 2023 03:25:31 -0800 (PST)
+        bh=bcdCS6aA0hU/P/1Lxpxkfas8L67FF+zkKmd2vDLbKHk=;
+        b=ECXEntBoIrCKIwN4VLX/7LJrIq9CgBRV8XVmqWV1BGU3+6yhXEA39pAL4lPZXZ3zOh
+         XK7d4zyZBoZhQ+UxA4ccJM3sCw9jiXOnuL4y+sIj6x3fXk31vuxCNrobqqFaCkXftye7
+         ZCCGJ5RobfSsGUSIyOix8zCWbEOa+AoEI11d2CxwKHsvQbzjWEyDbZkSQI6EOzR1OOdL
+         kUYM2vRQLTU9dn65sl3L61bgaho7StYvNP51+xEs1aw8zHNlWSHRxmYmR3a9VOS7s1CC
+         quA08As5ImQflzVMDBoar7mzO6WeHP0gRWfbUn6DiJ2zWt8onCELAHzvDXLbAvHaLytr
+         t0bA==
+X-Gm-Message-State: AOJu0Yx0dKAEydTImFy/Geev9YzgNuY/qiTG93vEuMnPxMSNAKN5kWbn
+	tsyCOswkoFp3N/xR+Zf7TiQSXONm3Ubed7tG4PeYvA==
+X-Google-Smtp-Source: AGHT+IFasxLYHHudhBN/+4eIX1OsOhIRfSB2CWnjQO7Y6r4dz1/Ca+R2Pv6YHi7+A5fsQfNYO2/OlOsYvWwG9CsrzMM=
+X-Received: by 2002:a05:6214:2506:b0:658:26d7:72e0 with SMTP id
+ gf6-20020a056214250600b0065826d772e0mr20208405qvb.4.1699270009660; Mon, 06
+ Nov 2023 03:26:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-26-pbonzini@redhat.com>
-In-Reply-To: <20231105163040.14904-26-pbonzini@redhat.com>
+References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-28-seanjc@google.com>
+In-Reply-To: <20231027182217.3615211-28-seanjc@google.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Mon, 6 Nov 2023 11:24:54 +0000
-Message-ID: <CA+EHjTxy6TWM3oBG0Q6v5090XTrs+M8_m5=6Z2E1P-HyTkrGWg@mail.gmail.com>
-Subject: Re: [PATCH 25/34] KVM: selftests: Add helpers to convert guest memory
- b/w private and shared
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Sean Christopherson <seanjc@google.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+Date: Mon, 6 Nov 2023 11:26:13 +0000
+Message-ID: <CA+EHjTyjeKymYaJ3kTpVzRFPLKxeDEf9B-DGo7xif_FPN1dFBQ@mail.gmail.com>
+Subject: Re: [PATCH v13 27/35] KVM: selftests: Add helpers to convert guest
+ memory b/w private and shared
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
 	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
 	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
@@ -74,12 +74,12 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
 	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
 	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Nov 5, 2023 at 4:34=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
+On Fri, Oct 27, 2023 at 7:23=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
 >
 > From: Vishal Annapurve <vannapurve@google.com>
 >
@@ -89,7 +89,7 @@ wrote:
 )
 > when converting memory, as the attributes are the single source of true.
 
-nit: true->truth
+true->truth
 
 > Provide allocate() helpers so that tests can mimic a userspace that frees
 > private memory on conversion, e.g. to prioritize memory usage over
@@ -98,8 +98,6 @@ nit: true->truth
 > Signed-off-by: Vishal Annapurve <vannapurve@google.com>
 > Co-developed-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Message-Id: <20231027182217.3615211-28-seanjc@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
 >  .../selftests/kvm/include/kvm_util_base.h     | 48 +++++++++++++++++++
 >  tools/testing/selftests/kvm/lib/kvm_util.c    | 28 +++++++++++
@@ -176,10 +174,10 @@ pa,
 >
 > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/s=
 elftests/kvm/lib/kvm_util.c
-> index b63500fca627..95a553400ea9 100644
+> index 45050f54701a..a140aee8d0f5 100644
 > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -1167,6 +1167,34 @@ void vm_mem_region_delete(struct kvm_vm *vm, uint3=
+> @@ -1176,6 +1176,34 @@ void vm_mem_region_delete(struct kvm_vm *vm, uint3=
 2_t slot)
 >         __vm_mem_region_delete(vm, memslot2region(vm, slot), true);
 >  }
@@ -200,8 +198,8 @@ PUNCH_HOLE : 0);
 > +               uint64_t offset;
 > +
 > +               region =3D userspace_mem_region_find(vm, gpa, gpa);
-> +               TEST_ASSERT(region && region->region.flags & KVM_MEM_GUES=
-T_MEMFD,
+> +               TEST_ASSERT(region && region->region.flags & KVM_MEM_PRIV=
+ATE,
 > +                           "Private memory region not found for GPA 0x%l=
 x", gpa);
 > +
@@ -223,9 +221,6 @@ len,
 > +       }
 > +}
 > +
->  /* Returns the size of a vCPU's kvm_run structure. */
->  static int vcpu_mmap_sz(void)
->  {
 
 Nits aside:
 
@@ -235,7 +230,10 @@ Tested-by: Fuad Tabba <tabba@google.com>
 Cheers,
 /fuad
 
+
+>  /* Returns the size of a vCPU's kvm_run structure. */
+>  static int vcpu_mmap_sz(void)
+>  {
 > --
-> 2.39.1
->
+> 2.42.0.820.g83a721a137-goog
 >
