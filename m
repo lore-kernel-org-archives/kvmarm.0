@@ -1,57 +1,56 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C84182AC
-	for <kvmarm@lists.linux.dev>; Mon,  6 Nov 2023 11:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626481A5A2
+	for <kvmarm@lists.linux.dev>; Mon,  6 Nov 2023 11:03:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Vs/DZJCO"
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7781bc3783fso305310185a.1
-        for <kvmarm@lists.linux.dev>; Mon, 06 Nov 2023 03:03:17 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ofWNwAuP"
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-66d87554434so31043516d6.2
+        for <kvmarm@lists.linux.dev>; Mon, 06 Nov 2023 03:03:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699268596; x=1699873396; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1699268628; x=1699873428; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KU+b2mECXXvQ5slHB7/YEPM4eq1YPpk0J5Rl/yZ7AP8=;
-        b=Vs/DZJCOuFej78zSv1e7YmCAS0hSH+/0a/sQveUSHXk4BEEBqipHDFlqZxYXL4+h6X
-         pLfp7pN8suh642oRdmOBtlW5/djiskBT8ZIxA40lUxAYsxgYs7wYOKVlfXqa3kAYgKAY
-         mDGc5n+E2dL1xp/MxDSyPG1J7hYxjA8pUMdS6ZOeXqW38IqzsP7vF2NlGhceNLQNdyHz
-         n5G5ri6lkQFC2xUtzNngOr5ArXolrKja7czx8EKVDSdm68c6Yb8slLG/jJ/bkw6FRDu7
-         uH2Zs7MS5wYeUVS7FDSHAiYVs4dvG3bIXMnHw3OOKbIRCJB/pK/RyeZkkzxip1NkbpO3
-         zicw==
+        bh=MQ8TONDIpPhmTy6Gjm0dgeV6egeVVxfnh06xkrQleLY=;
+        b=ofWNwAuPkoSexE5OdTi9gPdQz37ZmxTfO/OU/cbg3uTobkUtvmipuE5g/DdZPrH2iy
+         +bxIRLs3LuOHaEivW8vXyudTPlpkToMN7NDDB/7rqZ0s1kVmErlpUQ4PwDfmFOV+rWnL
+         5dIMg+T4hG4jwLMPJ9pREDfjfx84v0K4bAOI8SNDjCUFti+0d+jaMKtZ1gMjAwi5p8Ww
+         dsyucqzdEuEGLlBE5J8wOATCgHsdIk4X7DyBCv7KLlSYJArLxj798f3lWFuP1K5aBnbL
+         CVLffThNF1mLesbu6dqdmFNNY972VTZrhmIUQiJqY6MutymWLOXWPaLTduZ2cMp6/fCK
+         6zpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699268596; x=1699873396;
+        d=1e100.net; s=20230601; t=1699268628; x=1699873428;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KU+b2mECXXvQ5slHB7/YEPM4eq1YPpk0J5Rl/yZ7AP8=;
-        b=gZNOMVAmYBTTmu4jPtkDJ0K3zWZmDfWLP1KuMHQ56Ual7LAM2GAT0osbgqc9UmaF2P
-         dwyX61GeRgDuWayCMWFW5ks916GHPKojxQ55uiFg4SqiCf3oFYElycWzIxW/z8m9PYX5
-         t7lUdlvag73B3rl6GTpBbLsaT0DIo30pzmOB6x/eFGrELm7wPgylrYSjYl2a8xUiB5Xb
-         7knP7xAJLDXSYpZmnwI2Xw+HdD3RRpRnFtoI5aF2HUZL6h9xuaOt6jj39ZSafhvcAid+
-         mgxGllN9ekF2PIZzTaOzTnOl3T5E67zCcg/SBh+Z7E/ZGw/pt9mnGMSh4fxsz2NtwGWD
-         nmUA==
-X-Gm-Message-State: AOJu0YzQcaeHg+fQ7Vf1PfY0zsW1B5/vhbad5+PjMph30zTOIOWoLsUt
-	XqQLsvrPsn7+o/9shHrCr7mFlSwi13lw84SEqAvjPw==
-X-Google-Smtp-Source: AGHT+IH064K0ZtIRC0Ddcf2wpRdR9qcn5N+rpiGlH1rS/nMIj84KwquVAyvAa55WjBkBZ58J/DOu2Zh9h49soweI3jk=
-X-Received: by 2002:a05:6214:2582:b0:671:3493:61e8 with SMTP id
- fq2-20020a056214258200b00671349361e8mr28685929qvb.26.1699268596310; Mon, 06
- Nov 2023 03:03:16 -0800 (PST)
+        bh=MQ8TONDIpPhmTy6Gjm0dgeV6egeVVxfnh06xkrQleLY=;
+        b=QhDprl5n4cIQrnKTOyhakDEqah6zf/+zwNRTUUNnfybZX6BXGh+8gpWWz7iyva4Yy3
+         vpmOj+ClHXpb/i0QJ5zbLe1F3RU9JEHlzHhEVVgpPFhirF1hm/PVfActW8G+snXOeq1b
+         Nf4H0LrknDSBA26G+fGNOuWxn33ukUChFtBKrpPBYoczNmAc7WAg7CTMOwRWpXVVHxXS
+         Cx8Bo3lLU8mWONaGLrqE3peFxndgVgEYPzWM3fhh/pSMuiVcCfi76et+hXgM2jCM9dAb
+         LuRnkjALHu+djjT1Kn9iKEbHMxnp1sbdLtLkhO30t1MwZ2Xp9XubOcnBHiQtT3Gbbr5C
+         OlYQ==
+X-Gm-Message-State: AOJu0YyI3PJrOjV5P1JukuIC1/Swn07rQhUVWEKfWcnNqTM18WLPBnJZ
+	CvZRazqE7FBvl88Iy/cmsyR7+zme+HGXODE2uX2+xA==
+X-Google-Smtp-Source: AGHT+IHHh4fCnCxDMnJOn7/R0pkHJKwXr6C+d2r8s0u73YKLv4MHtUig5I9yHuaqDmXCQ/Y0QVlMeO42z9uduKCvqDI=
+X-Received: by 2002:a0c:f1ca:0:b0:66d:28a5:d153 with SMTP id
+ u10-20020a0cf1ca000000b0066d28a5d153mr26974988qvl.47.1699268628158; Mon, 06
+ Nov 2023 03:03:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-23-pbonzini@redhat.com>
-In-Reply-To: <20231105163040.14904-23-pbonzini@redhat.com>
+References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-24-pbonzini@redhat.com>
+In-Reply-To: <20231105163040.14904-24-pbonzini@redhat.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Mon, 6 Nov 2023 11:02:40 +0000
-Message-ID: <CA+EHjTwB-jssz7+8ZiLgXdQREp8U3r3tYN2NOH28g54=QNdQmg@mail.gmail.com>
-Subject: Re: [PATCH 22/34] KVM: selftests: Drop unused kvm_userspace_memory_region_find()
- helper
+Date: Mon, 6 Nov 2023 11:03:12 +0000
+Message-ID: <CA+EHjTw1RGEKD6Zv_QEtzTLLA4STTQrS4WYCY-HUdScAKXfBGg@mail.gmail.com>
+Subject: Re: [PATCH 23/34] KVM: selftests: Convert lib's mem regions to KVM_SET_USER_MEMORY_REGION2
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
@@ -83,13 +82,17 @@ wrote:
 >
 > From: Sean Christopherson <seanjc@google.com>
 >
-> Drop kvm_userspace_memory_region_find(), it's unused and a terrible API
-> (probably why it's unused).  If anything outside of kvm_util.c needs to
-> get at the memslot, userspace_mem_region_find() can be exposed to give
-> others full access to all memory region/slot information.
+> Use KVM_SET_USER_MEMORY_REGION2 throughout KVM's selftests library so tha=
+t
+> support for guest private memory can be added without needing an entirely
+> separate set of helpers.
+>
+> Note, this obviously makes selftests backwards-incompatible with older KV=
+M
+> versions from this point forward.
 >
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Message-Id: <20231027182217.3615211-25-seanjc@google.com>
+> Message-Id: <20231027182217.3615211-26-seanjc@google.com>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
 
@@ -99,70 +102,103 @@ Tested-by: Fuad Tabba <tabba@google.com>
 Cheers,
 /fuad
 
->  .../selftests/kvm/include/kvm_util_base.h     |  4 ---
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 29 -------------------
->  2 files changed, 33 deletions(-)
+>  .../selftests/kvm/include/kvm_util_base.h     |  2 +-
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 19 ++++++++++---------
+>  2 files changed, 11 insertions(+), 10 deletions(-)
 >
 > diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/=
 testing/selftests/kvm/include/kvm_util_base.h
-> index a18db6a7b3cf..967eaaeacd75 100644
+> index 967eaaeacd75..9f144841c2ee 100644
 > --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
 > +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -776,10 +776,6 @@ vm_adjust_num_guest_pages(enum vm_guest_mode mode, u=
-nsigned int num_guest_pages)
->         return n;
->  }
+> @@ -44,7 +44,7 @@ typedef uint64_t vm_paddr_t; /* Virtual Machine (Guest)=
+ physical address */
+>  typedef uint64_t vm_vaddr_t; /* Virtual Machine (Guest) virtual address =
+*/
 >
-> -struct kvm_userspace_memory_region *
-> -kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
-> -                                uint64_t end);
-> -
->  #define sync_global_to_guest(vm, g) ({                         \
->         typeof(g) *_p =3D addr_gva2hva(vm, (vm_vaddr_t)&(g));     \
->         memcpy(_p, &(g), sizeof(g));                            \
+>  struct userspace_mem_region {
+> -       struct kvm_userspace_memory_region region;
+> +       struct kvm_userspace_memory_region2 region;
+>         struct sparsebit *unused_phy_pages;
+>         int fd;
+>         off_t offset;
 > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/s=
 elftests/kvm/lib/kvm_util.c
-> index 7a8af1821f5d..f09295d56c23 100644
+> index f09295d56c23..3676b37bea38 100644
 > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -590,35 +590,6 @@ userspace_mem_region_find(struct kvm_vm *vm, uint64_=
-t start, uint64_t end)
->         return NULL;
+> @@ -453,8 +453,9 @@ void kvm_vm_restart(struct kvm_vm *vmp)
+>                 vm_create_irqchip(vmp);
+>
+>         hash_for_each(vmp->regions.slot_hash, ctr, region, slot_node) {
+> -               int ret =3D ioctl(vmp->fd, KVM_SET_USER_MEMORY_REGION, &r=
+egion->region);
+> -               TEST_ASSERT(ret =3D=3D 0, "KVM_SET_USER_MEMORY_REGION IOC=
+TL failed,\n"
+> +               int ret =3D ioctl(vmp->fd, KVM_SET_USER_MEMORY_REGION2, &=
+region->region);
+> +
+> +               TEST_ASSERT(ret =3D=3D 0, "KVM_SET_USER_MEMORY_REGION2 IO=
+CTL failed,\n"
+>                             "  rc: %i errno: %i\n"
+>                             "  slot: %u flags: 0x%x\n"
+>                             "  guest_phys_addr: 0x%llx size: 0x%llx",
+> @@ -657,7 +658,7 @@ static void __vm_mem_region_delete(struct kvm_vm *vm,
+>         }
+>
+>         region->region.memory_size =3D 0;
+> -       vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION, &region->region);
+> +       vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &region->region);
+>
+>         sparsebit_free(&region->unused_phy_pages);
+>         ret =3D munmap(region->mmap_start, region->mmap_size);
+> @@ -1014,8 +1015,8 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+>         region->region.guest_phys_addr =3D guest_paddr;
+>         region->region.memory_size =3D npages * vm->page_size;
+>         region->region.userspace_addr =3D (uintptr_t) region->host_mem;
+> -       ret =3D __vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION, &region->regio=
+n);
+> -       TEST_ASSERT(ret =3D=3D 0, "KVM_SET_USER_MEMORY_REGION IOCTL faile=
+d,\n"
+> +       ret =3D __vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &region->regi=
+on);
+> +       TEST_ASSERT(ret =3D=3D 0, "KVM_SET_USER_MEMORY_REGION2 IOCTL fail=
+ed,\n"
+>                 "  rc: %i errno: %i\n"
+>                 "  slot: %u flags: 0x%x\n"
+>                 "  guest_phys_addr: 0x%lx size: 0x%lx",
+> @@ -1097,9 +1098,9 @@ void vm_mem_region_set_flags(struct kvm_vm *vm, uin=
+t32_t slot, uint32_t flags)
+>
+>         region->region.flags =3D flags;
+>
+> -       ret =3D __vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION, &region->regio=
+n);
+> +       ret =3D __vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &region->regi=
+on);
+>
+> -       TEST_ASSERT(ret =3D=3D 0, "KVM_SET_USER_MEMORY_REGION IOCTL faile=
+d,\n"
+> +       TEST_ASSERT(ret =3D=3D 0, "KVM_SET_USER_MEMORY_REGION2 IOCTL fail=
+ed,\n"
+>                 "  rc: %i errno: %i slot: %u flags: 0x%x",
+>                 ret, errno, slot, flags);
 >  }
+> @@ -1127,9 +1128,9 @@ void vm_mem_region_move(struct kvm_vm *vm, uint32_t=
+ slot, uint64_t new_gpa)
 >
-> -/*
-> - * KVM Userspace Memory Region Find
-> - *
-> - * Input Args:
-> - *   vm - Virtual Machine
-> - *   start - Starting VM physical address
-> - *   end - Ending VM physical address, inclusive.
-> - *
-> - * Output Args: None
-> - *
-> - * Return:
-> - *   Pointer to overlapping region, NULL if no such region.
-> - *
-> - * Public interface to userspace_mem_region_find. Allows tests to look u=
-p
-> - * the memslot datastructure for a given range of guest physical memory.
-> - */
-> -struct kvm_userspace_memory_region *
-> -kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
-> -                                uint64_t end)
-> -{
-> -       struct userspace_mem_region *region;
-> -
-> -       region =3D userspace_mem_region_find(vm, start, end);
-> -       if (!region)
-> -               return NULL;
-> -
-> -       return &region->region;
-> -}
-> -
->  __weak void vcpu_arch_free(struct kvm_vcpu *vcpu)
->  {
+>         region->region.guest_phys_addr =3D new_gpa;
 >
+> -       ret =3D __vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION, &region->regio=
+n);
+> +       ret =3D __vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &region->regi=
+on);
+>
+> -       TEST_ASSERT(!ret, "KVM_SET_USER_MEMORY_REGION failed\n"
+> +       TEST_ASSERT(!ret, "KVM_SET_USER_MEMORY_REGION2 failed\n"
+>                     "ret: %i errno: %i slot: %u new_gpa: 0x%lx",
+>                     ret, errno, slot, new_gpa);
+>  }
 > --
 > 2.39.1
 >
