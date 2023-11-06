@@ -1,56 +1,57 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E6918E05
-	for <kvmarm@lists.linux.dev>; Mon,  6 Nov 2023 11:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D135218E05
+	for <kvmarm@lists.linux.dev>; Mon,  6 Nov 2023 11:44:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zmskUZWy"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-41cbf31da84so28060141cf.0
-        for <kvmarm@lists.linux.dev>; Mon, 06 Nov 2023 03:42:10 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BKrKLzPq"
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-579de633419so51970147b3.3
+        for <kvmarm@lists.linux.dev>; Mon, 06 Nov 2023 03:44:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699270930; x=1699875730; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1699271092; x=1699875892; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sHi6HNfMoiiRWrk//ou0On9wauTiypiZpuQxJoOASgE=;
-        b=zmskUZWyayHk6uA/5ZlPcKoMQ1BEERQKV7pltVV8OXlpXXJLRaIxMhPjcAvvNsrvGU
-         sKkhac3t4ujDbySsR7Q2i1G96oVc5Aw0qe7pX5/cGMUW+F3v6KXzR9Ms+hA4252l0+KS
-         80+1zpHZfdGiGhZ+N2w364hP+Y0W6SvHsf/zjDdFGwxLAFbxbY/ud41U4AuwcOCNhrTY
-         YeGmVl2uCrF9Wyq3miCGrtUAGRezgNpaPzVfG7CVJZcTGe8gdpXjix6Wpsw6Esjjx/aK
-         02nrNvUp6Reqr4XPZjmfSHd2CPKsdj/vwOPg0oY/50odb2nTF158qevry+6mlXL6PXpJ
-         kSMg==
+        bh=DX7ek6JbnQBP3kmz+KR8GNUYI0kM1PtX+UUHfn3vax8=;
+        b=BKrKLzPqDcea+RUtqCy42rKvmdE2pBf+/gDBXBO2a++gbQRLcBdaQZ7HEl6F+SXLJs
+         4OTpSpQpIzFVIHLpoEyxz2bWdnc5JDkYCzkWJmgRwEm2K31+h0xrmA5zWQ0fwt2dEB1m
+         +7pMBTip1tvsv+18LZIMAo8fnSHXi0RAIUCKcQUXS/ODK3KoyrXECTuBiGXssiq3OTtX
+         MHU33ZT3wr2AzvlkXfOHyNWij6/UpSpBK7KyjfsH/3L0wPtY1IfZtByI1Zz/aC3elHex
+         O1YM7cH2ti8RPsIrFbz69m9GxQ+cW51X+4S8QG6gG0fckKCDXEOzphFUS1XcGFMhYIkX
+         jPEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699270930; x=1699875730;
+        d=1e100.net; s=20230601; t=1699271092; x=1699875892;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sHi6HNfMoiiRWrk//ou0On9wauTiypiZpuQxJoOASgE=;
-        b=nf7mkazpTkiHhY/kPGBNO5VVhXbGy35Tet8G9H2CvYb7f3Dz6YXVbnwyjfEew9vCKM
-         CHth8hE/9JWVnowHc4L4b9FLGsx0+YVb6Vdj+ehEH7zvRVyI1d+2eaBqGOsvDcXmiRsI
-         CfYSKe6nfyXFGYxvnCqV+TycZCdebPGpt3e0QMzA0xgkA1B61J940V3jLCmOUE+A4g4H
-         UKg3FsTJ4ojTBKPzLuQzCP1jOpnwwWt22zYNZw/BBqrZAsKZOMBXoLW1WnkI9LQXViBu
-         h07YZZOK+76Q8XE9WCPmR40fi5JL11FfDPWBL0ZnC8zhU/4Zh57HnIWR7zGvmnTvBVBx
-         rfdQ==
-X-Gm-Message-State: AOJu0YyzKV2iSg3mkwlEdUasIy918ALOSMmhLv87AmjLWEDMt7ncUvXW
-	vMw41Biy3C9tSkMRGs6nUMSrYtLAvkOvIjBYSyKhlw==
-X-Google-Smtp-Source: AGHT+IFqtL+i8IMlADOUnxNtS9BqYz4IVdy1FTYYXRfD2pg+wEXN2AL/1eIHCBiP2/6Ge2uIUEuwBkXjW7tgEM1U/80=
-X-Received: by 2002:a05:6214:dcf:b0:672:549c:15e8 with SMTP id
- 15-20020a0562140dcf00b00672549c15e8mr32468533qvt.55.1699270929722; Mon, 06
- Nov 2023 03:42:09 -0800 (PST)
+        bh=DX7ek6JbnQBP3kmz+KR8GNUYI0kM1PtX+UUHfn3vax8=;
+        b=L/mZDxhb5BoJcbNxFk3YQ/6Enhwrc9F9jhGugWePWQ+QmqZBsm97xui9L8i11D0F97
+         3GjNDH5uH8xTTcBcpy6X48IdcrYhbk9kNRAHkZsPAuy5RcJPOK/KYmE2+7novYr+Tveg
+         L7E6dU8DqW7jfXlZdUOXaBWDfDJkqCVLViSS23gvoy7ZW9+e9exUs/WTYluqNTQX9aEa
+         dMP9utYGgw7tjxr3/Cl20y+Yyd7yGsSGXWdZWlfJEbcaLB7Fzy/eZOF9pYM5nR9FUa71
+         3yCp8UsYS78mwfTEyUNdhSkwuMS61W6H7ydT/tikQDLV33xcgSlVYZlFgSfPeB8lk+zj
+         Cu/Q==
+X-Gm-Message-State: AOJu0YwLw1k5VY8FF447TRtGkeEJI3Y/7qNdnYNCnJc0JXgizYmMTNA4
+	QqoARs16EoHniijovSKREMijgvouAlFVxbqkbrUgZQ==
+X-Google-Smtp-Source: AGHT+IERnN25ZpQWhSoveHYhjH1bHINt0TuAVLiTz7wZcF5ueihZgXoSAZV3dV6i7b/f23cd983VPNMQFTyQCDpDsN0=
+X-Received: by 2002:a0d:ccc5:0:b0:5a7:e4fe:ea3 with SMTP id
+ o188-20020a0dccc5000000b005a7e4fe0ea3mr10768851ywd.22.1699271092440; Mon, 06
+ Nov 2023 03:44:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-15-pbonzini@redhat.com>
-In-Reply-To: <20231105163040.14904-15-pbonzini@redhat.com>
+References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-27-pbonzini@redhat.com>
+In-Reply-To: <20231105163040.14904-27-pbonzini@redhat.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Mon, 6 Nov 2023 11:41:33 +0000
-Message-ID: <CA+EHjTwJyiyUnQpMZedqBa1QVdURH4C0ZcJ1nUY7TmuMjppReg@mail.gmail.com>
-Subject: Re: [PATCH 14/34] fs: Rename anon_inode_getfile_secure() and anon_inode_getfd_secure()
+Date: Mon, 6 Nov 2023 11:44:16 +0000
+Message-ID: <CA+EHjTymGLsfHvdP4fPOFWTtaRwbtbCOBZ0XOC3gsX+nYm-cZQ@mail.gmail.com>
+Subject: Re: [PATCH 26/34] KVM: selftests: Add helpers to do
+ KVM_HC_MAP_GPA_RANGE hypercalls (x86)
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
@@ -77,34 +78,20 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Nov 5, 2023 at 4:32=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
+On Sun, Nov 5, 2023 at 4:34=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
 wrote:
 >
-> The call to the inode_init_security_anon() LSM hook is not the sole
-> reason to use anon_inode_getfile_secure() or anon_inode_getfd_secure().
-> For example, the functions also allow one to create a file with non-zero
-> size, without needing a full-blown filesystem.  In this case, you don't
-> need a "secure" version, just unique inodes; the current name of the
-> functions is confusing and does not explain well the difference with
-> the more "standard" anon_inode_getfile() and anon_inode_getfd().
+> From: Vishal Annapurve <vannapurve@google.com>
 >
-> Of course, there is another side of the coin; neither io_uring nor
-> userfaultfd strictly speaking need distinct inodes, and it is not
-> that clear anymore that anon_inode_create_get{file,fd}() allow the LSM
-> to intercept and block the inode's creation.  If one was so inclined,
-> anon_inode_getfile_secure() and anon_inode_getfd_secure() could be kept,
-> using the shared inode or a new one depending on CONFIG_SECURITY.
-> However, this is probably overkill, and potentially a cause of bugs in
-> different configurations.  Therefore, just add a comment to io_uring
-> and userfaultfd explaining the choice of the function.
+> Add helpers for x86 guests to invoke the KVM_HC_MAP_GPA_RANGE hypercall,
+> which KVM will forward to userspace and thus can be used by tests to
+> coordinate private<=3D>shared conversions between host userspace code and
+> guest code.
 >
-> While at it, remove the export for what is now anon_inode_create_getfd().
-> There is no in-tree module that uses it, and the old name is gone anyway.
-> If anybody actually needs the symbol, they can ask or they can just use
-> anon_inode_create_getfile(), which will be exported very soon for use
-> in KVM.
->
-> Suggested-by: Christian Brauner <brauner@kernel.org>
+> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+> [sean: drop shared/private helpers (let tests specify flags)]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Message-Id: <20231027182217.3615211-29-seanjc@google.com>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
 
@@ -114,228 +101,47 @@ Tested-by: Fuad Tabba <tabba@google.com>
 Cheers,
 /fuad
 
-
->  fs/anon_inodes.c            | 46 +++++++++++++++++++++++--------------
->  fs/userfaultfd.c            |  5 ++--
->  include/linux/anon_inodes.h |  4 ++--
->  io_uring/io_uring.c         |  3 ++-
->  4 files changed, 36 insertions(+), 22 deletions(-)
+>  .../selftests/kvm/include/x86_64/processor.h      | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
 >
-> diff --git a/fs/anon_inodes.c b/fs/anon_inodes.c
-> index 24192a7667ed..3d4a27f8b4fe 100644
-> --- a/fs/anon_inodes.c
-> +++ b/fs/anon_inodes.c
-> @@ -79,7 +79,7 @@ static struct file *__anon_inode_getfile(const char *na=
-me,
->                                          const struct file_operations *fo=
-ps,
->                                          void *priv, int flags,
->                                          const struct inode *context_inod=
-e,
-> -                                        bool secure)
-> +                                        bool make_inode)
->  {
->         struct inode *inode;
->         struct file *file;
-> @@ -87,7 +87,7 @@ static struct file *__anon_inode_getfile(const char *na=
-me,
->         if (fops->owner && !try_module_get(fops->owner))
->                 return ERR_PTR(-ENOENT);
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/too=
+ls/testing/selftests/kvm/include/x86_64/processor.h
+> index 25bc61dac5fb..a84863503fcb 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -15,6 +15,7 @@
+>  #include <asm/msr-index.h>
+>  #include <asm/prctl.h>
 >
-> -       if (secure) {
-> +       if (make_inode) {
->                 inode =3D anon_inode_make_secure_inode(name, context_inod=
-e);
->                 if (IS_ERR(inode)) {
->                         file =3D ERR_CAST(inode);
-> @@ -149,13 +149,10 @@ struct file *anon_inode_getfile(const char *name,
->  EXPORT_SYMBOL_GPL(anon_inode_getfile);
+> +#include <linux/kvm_para.h>
+>  #include <linux/stringify.h>
 >
->  /**
-> - * anon_inode_getfile_secure - Like anon_inode_getfile(), but creates a =
-new
-> + * anon_inode_create_getfile - Like anon_inode_getfile(), but creates a =
-new
->   *                             !S_PRIVATE anon inode rather than reuse t=
-he
->   *                             singleton anon inode and calls the
-> - *                             inode_init_security_anon() LSM hook.  Thi=
-s
-> - *                             allows for both the inode to have its own
-> - *                             security context and for the LSM to enfor=
-ce
-> - *                             policy on the inode's creation.
-> + *                             inode_init_security_anon() LSM hook.
->   *
->   * @name:    [in]    name of the "class" of the new file
->   * @fops:    [in]    file operations for the new file
-> @@ -164,11 +161,19 @@ EXPORT_SYMBOL_GPL(anon_inode_getfile);
->   * @context_inode:
->   *           [in]    the logical relationship with the new inode (option=
-al)
->   *
-> + * Create a new anonymous inode and file pair.  This can be done for two
-> + * reasons:
-> + * - for the inode to have its own security context, so that LSMs can en=
-force
-> + *   policy on the inode's creation;
-> + * - if the caller needs a unique inode, for example in order to customi=
-ze
-> + *   the size returned by fstat()
-> + *
->   * The LSM may use @context_inode in inode_init_security_anon(), but a
-> - * reference to it is not held.  Returns the newly created file* or an e=
-rror
-> - * pointer.  See the anon_inode_getfile() documentation for more informa=
-tion.
-> + * reference to it is not held.
-> + *
-> + * Returns the newly created file* or an error pointer.
->   */
-> -struct file *anon_inode_getfile_secure(const char *name,
-> +struct file *anon_inode_create_getfile(const char *name,
->                                        const struct file_operations *fops=
-,
->                                        void *priv, int flags,
->                                        const struct inode *context_inode)
-> @@ -181,7 +186,7 @@ static int __anon_inode_getfd(const char *name,
->                               const struct file_operations *fops,
->                               void *priv, int flags,
->                               const struct inode *context_inode,
-> -                             bool secure)
-> +                             bool make_inode)
->  {
->         int error, fd;
->         struct file *file;
-> @@ -192,7 +197,7 @@ static int __anon_inode_getfd(const char *name,
->         fd =3D error;
+>  #include "../kvm_util.h"
+> @@ -1194,6 +1195,20 @@ uint64_t kvm_hypercall(uint64_t nr, uint64_t a0, u=
+int64_t a1, uint64_t a2,
+>  uint64_t __xen_hypercall(uint64_t nr, uint64_t a0, void *a1);
+>  void xen_hypercall(uint64_t nr, uint64_t a0, void *a1);
 >
->         file =3D __anon_inode_getfile(name, fops, priv, flags, context_in=
-ode,
-> -                                   secure);
-> +                                   make_inode);
->         if (IS_ERR(file)) {
->                 error =3D PTR_ERR(file);
->                 goto err_put_unused_fd;
-> @@ -231,10 +236,9 @@ int anon_inode_getfd(const char *name, const struct =
-file_operations *fops,
->  EXPORT_SYMBOL_GPL(anon_inode_getfd);
+> +static inline uint64_t __kvm_hypercall_map_gpa_range(uint64_t gpa,
+> +                                                    uint64_t size, uint6=
+4_t flags)
+> +{
+> +       return kvm_hypercall(KVM_HC_MAP_GPA_RANGE, gpa, size >> PAGE_SHIF=
+T, flags, 0);
+> +}
+> +
+> +static inline void kvm_hypercall_map_gpa_range(uint64_t gpa, uint64_t si=
+ze,
+> +                                              uint64_t flags)
+> +{
+> +       uint64_t ret =3D __kvm_hypercall_map_gpa_range(gpa, size, flags);
+> +
+> +       GUEST_ASSERT(!ret);
+> +}
+> +
+>  void __vm_xsave_require_permission(uint64_t xfeature, const char *name);
 >
->  /**
-> - * anon_inode_getfd_secure - Like anon_inode_getfd(), but creates a new
-> + * anon_inode_create_getfd - Like anon_inode_getfd(), but creates a new
->   * !S_PRIVATE anon inode rather than reuse the singleton anon inode, and=
- calls
-> - * the inode_init_security_anon() LSM hook. This allows the inode to hav=
-e its
-> - * own security context and for a LSM to reject creation of the inode.
-> + * the inode_init_security_anon() LSM hook.
->   *
->   * @name:    [in]    name of the "class" of the new file
->   * @fops:    [in]    file operations for the new file
-> @@ -243,16 +247,24 @@ EXPORT_SYMBOL_GPL(anon_inode_getfd);
->   * @context_inode:
->   *           [in]    the logical relationship with the new inode (option=
-al)
->   *
-> + * Create a new anonymous inode and file pair.  This can be done for two
-> + * reasons:
-> + * - for the inode to have its own security context, so that LSMs can en=
-force
-> + *   policy on the inode's creation;
-> + * - if the caller needs a unique inode, for example in order to customi=
-ze
-> + *   the size returned by fstat()
-> + *
->   * The LSM may use @context_inode in inode_init_security_anon(), but a
->   * reference to it is not held.
-> + *
-> + * Returns a newly created file descriptor or an error code.
->   */
-> -int anon_inode_getfd_secure(const char *name, const struct file_operatio=
-ns *fops,
-> +int anon_inode_create_getfd(const char *name, const struct file_operatio=
-ns *fops,
->                             void *priv, int flags,
->                             const struct inode *context_inode)
->  {
->         return __anon_inode_getfd(name, fops, priv, flags, context_inode,=
- true);
->  }
-> -EXPORT_SYMBOL_GPL(anon_inode_getfd_secure);
->
->  static int __init anon_inode_init(void)
->  {
-> diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
-> index 56eaae9dac1a..7a1cf8bab5eb 100644
-> --- a/fs/userfaultfd.c
-> +++ b/fs/userfaultfd.c
-> @@ -1033,7 +1033,7 @@ static int resolve_userfault_fork(struct userfaultf=
-d_ctx *new,
->  {
->         int fd;
->
-> -       fd =3D anon_inode_getfd_secure("[userfaultfd]", &userfaultfd_fops=
-, new,
-> +       fd =3D anon_inode_create_getfd("[userfaultfd]", &userfaultfd_fops=
-, new,
->                         O_RDONLY | (new->flags & UFFD_SHARED_FCNTL_FLAGS)=
-, inode);
->         if (fd < 0)
->                 return fd;
-> @@ -2205,7 +2205,8 @@ static int new_userfaultfd(int flags)
->         /* prevent the mm struct to be freed */
->         mmgrab(ctx->mm);
->
-> -       fd =3D anon_inode_getfd_secure("[userfaultfd]", &userfaultfd_fops=
-, ctx,
-> +       /* Create a new inode so that the LSM can block the creation.  */
-> +       fd =3D anon_inode_create_getfd("[userfaultfd]", &userfaultfd_fops=
-, ctx,
->                         O_RDONLY | (flags & UFFD_SHARED_FCNTL_FLAGS), NUL=
-L);
->         if (fd < 0) {
->                 mmdrop(ctx->mm);
-> diff --git a/include/linux/anon_inodes.h b/include/linux/anon_inodes.h
-> index 5deaddbd7927..93a5f16d03f3 100644
-> --- a/include/linux/anon_inodes.h
-> +++ b/include/linux/anon_inodes.h
-> @@ -15,13 +15,13 @@ struct inode;
->  struct file *anon_inode_getfile(const char *name,
->                                 const struct file_operations *fops,
->                                 void *priv, int flags);
-> -struct file *anon_inode_getfile_secure(const char *name,
-> +struct file *anon_inode_create_getfile(const char *name,
->                                        const struct file_operations *fops=
-,
->                                        void *priv, int flags,
->                                        const struct inode *context_inode)=
-;
->  int anon_inode_getfd(const char *name, const struct file_operations *fop=
-s,
->                      void *priv, int flags);
-> -int anon_inode_getfd_secure(const char *name,
-> +int anon_inode_create_getfd(const char *name,
->                             const struct file_operations *fops,
->                             void *priv, int flags,
->                             const struct inode *context_inode);
-> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-> index 8d1bc6cdfe71..22b98f47bb28 100644
-> --- a/io_uring/io_uring.c
-> +++ b/io_uring/io_uring.c
-> @@ -3835,7 +3835,8 @@ static struct file *io_uring_get_file(struct io_rin=
-g_ctx *ctx)
->                 return ERR_PTR(ret);
->  #endif
->
-> -       file =3D anon_inode_getfile_secure("[io_uring]", &io_uring_fops, =
-ctx,
-> +       /* Create a new inode so that the LSM can block the creation.  */
-> +       file =3D anon_inode_create_getfile("[io_uring]", &io_uring_fops, =
-ctx,
->                                          O_RDWR | O_CLOEXEC, NULL);
->  #if defined(CONFIG_UNIX)
->         if (IS_ERR(file)) {
+>  #define vm_xsave_require_permission(xfeature)  \
 > --
 > 2.39.1
 >
