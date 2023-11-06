@@ -1,105 +1,90 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76091F95A;
-	Mon,  6 Nov 2023 15:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FDC28E07
+	for <kvmarm@lists.linux.dev>; Mon,  6 Nov 2023 15:33:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qMMyAp8P"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC322C433C8;
-	Mon,  6 Nov 2023 15:16:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QSe+LhMh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95FE8C433C7;
+	Mon,  6 Nov 2023 15:33:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699283789;
-	bh=zDZFduCEDJmeuVjp8rHp1YK3z18DtyX3wrd2wnaF+Bs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qMMyAp8P8d1YZR+ToLbBSMxg7E0h+nAM09J8k36AJrgWT3pLgMKJv3rUJwYZoBC+5
-	 /7HcfewbvKZBV+XxkAhBXKfAMpJI5v88gc4Hx8N8Z+ws3elm72tPTVmOM+mru/Ax7o
-	 hgKcBnrkjrOwDRP6ZT7ROB1Yw66jbjLQJ8E14gCmpX61VhuiBziDh0K7mRiqlcqPKr
-	 f2Apj/1uFkrm0Y9QqXxL4Y0uZAXlZ2WeCIdMR3xorlstgRMc5NC4/sI8S+JkZDghFD
-	 iwus793QJkToU2FLLBik2jgcjMG6YyKIg5FBdgreEw23GWddN78m4uMrF2NWf2K1cn
-	 BhSHwanj5lm1w==
-Date: Mon, 6 Nov 2023 16:16:16 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Sean Christopherson <seanjc@google.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
-	Anish Moorthy <amoorthy@google.com>,
-	David Matlack <dmatlack@google.com>,
-	Yu Zhang <yu.c.zhang@linux.intel.com>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Maciej Szmigiero <mail@maciej.szmigiero.name>,
-	David Hildenbrand <david@redhat.com>,
-	Quentin Perret <qperret@google.com>,
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
-	Liam Merwick <liam.merwick@oracle.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH 14/34] fs: Rename anon_inode_getfile_secure() and
- anon_inode_getfd_secure()
-Message-ID: <20231106-kondor-anfahren-23157efabaef@brauner>
-References: <20231105163040.14904-1-pbonzini@redhat.com>
- <20231105163040.14904-15-pbonzini@redhat.com>
+	s=k20201202; t=1699284797;
+	bh=xV7m5Axz6doc1+4iuhW6bs3XG18ZDG1RNL3LtMPk/bA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QSe+LhMhvFLDhezunvYjS91vcxuGdkNV3dRzxEHBsN2hfo6RPH/Pt2YTxiRrRmcAD
+	 OvgnVk5QNtmf4artyOZ1+svaV6jGvSQ6y6y/mlMVdK1eZ/b3E9RjHeYg6VOHt/QRES
+	 4qxEJlQ9pZnV6Bymj2bqCcqmMjYc9+47Z0Q7Bm5Xbj+pa39mwdQKMiI3MCY3N//fk2
+	 2AADPaFJc9/oKRhknESCqAhP7DjE7Jxn8eN/6n202w/G9Ioz/GqWmejgS4EMhpmbsJ
+	 bWJIxJ4lWSKBEs35tUSSjf48SDSbjVWyPJQozNEgzLGwXZFinq+fI8tQ1vHWUbliDV
+	 NbIa5ZTv5f+/A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1r01bG-00Ao8C-Rb;
+	Mon, 06 Nov 2023 15:33:15 +0000
+Date: Mon, 06 Nov 2023 15:33:14 +0000
+Message-ID: <86edh228xx.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kunkun Jiang <jiangkunkun@huawei.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Gavin Shan <gshan@redhat.com>,
+	Jean-Philippe Brucker
+	<jean-philippe@linaro.org>,
+	"open list:IRQCHIP DRIVERS"
+	<linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<wanghaibin.wang@huawei.com>
+Subject: Re: [RFC PATCH] KVM: arm/arm64: GICv4: Support shared VLPI
+In-Reply-To: <1fb8353e-e9c4-2570-c2ca-ec537c18ac4d@huawei.com>
+References: <20231102143507.840-1-jiangkunkun@huawei.com>
+	<87msvt6cc7.wl-maz@kernel.org>
+	<1fb8353e-e9c4-2570-c2ca-ec537c18ac4d@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231105163040.14904-15-pbonzini@redhat.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, gshan@redhat.com, jean-philippe@linaro.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sun, Nov 05, 2023 at 05:30:17PM +0100, Paolo Bonzini wrote:
-> The call to the inode_init_security_anon() LSM hook is not the sole
-> reason to use anon_inode_getfile_secure() or anon_inode_getfd_secure().
-> For example, the functions also allow one to create a file with non-zero
-> size, without needing a full-blown filesystem.  In this case, you don't
-> need a "secure" version, just unique inodes; the current name of the
-> functions is confusing and does not explain well the difference with
-> the more "standard" anon_inode_getfile() and anon_inode_getfd().
+On Mon, 06 Nov 2023 14:59:01 +0000,
+Kunkun Jiang <jiangkunkun@huawei.com> wrote:
 > 
-> Of course, there is another side of the coin; neither io_uring nor
-> userfaultfd strictly speaking need distinct inodes, and it is not
-> that clear anymore that anon_inode_create_get{file,fd}() allow the LSM
-> to intercept and block the inode's creation.  If one was so inclined,
-> anon_inode_getfile_secure() and anon_inode_getfd_secure() could be kept,
-> using the shared inode or a new one depending on CONFIG_SECURITY.
-> However, this is probably overkill, and potentially a cause of bugs in
-> different configurations.  Therefore, just add a comment to io_uring
-> and userfaultfd explaining the choice of the function.
-> 
-> While at it, remove the export for what is now anon_inode_create_getfd().
-> There is no in-tree module that uses it, and the old name is gone anyway.
+> The virtio-pci driver write entry1-6
+> massage.data in the msix-table and trap to QEMU for processing. The
+> massage.data is as follow:
+> > entry-0 0
+> > entry-1 1
+> > entry-2 1
+> > entry-3 1
+> > entry-4 1
+> > entry-5 1
+> > entry-6 1
 
-That's great, thanks.
+Urgh... is vp_modern_queue_vector() used in your configuration? This
+is ... terrible.
 
-> If anybody actually needs the symbol, they can ask or they can just use
-> anon_inode_create_getfile(), which will be exported very soon for use
-> in KVM.
-> 
-> Suggested-by: Christian Brauner <brauner@kernel.org>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
+I wonder if PCIe actually allows this sort of thing.
 
-Looks good to me,
-Reviewed-by: Christian Brauner <brauner@kernel.org>
+In any case, this sort of behaviour breaks so many thing in KVM's
+implementation that I'd recommend you disable GICv4 until we have a
+good solution for that.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
