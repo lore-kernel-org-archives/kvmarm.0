@@ -1,154 +1,214 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D949622EED
-	for <kvmarm@lists.linux.dev>; Mon,  6 Nov 2023 13:30:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 032F51799E
+	for <kvmarm@lists.linux.dev>; Mon,  6 Nov 2023 14:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bna4ZdUg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699277454; x=1730813454;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=GcPOwqKIRcSDpD/XkGdZ5KVAeJljJ23LDoDjt600Qfg=;
-  b=bna4ZdUgFmH30GcE992QPdyL7p7bl2FkYGyZL1/ICons/jTfZaaTi9iG
-   JTMLcVeELS53LTXXCKoYxkgwKjHqPH7w1bmRCEkK/HjJpojMy71dNoTBP
-   dI1Vfv0+FDNSCeDpKTxQ+K4FCW/5v9h/9OEmFrLNVN/xWK2Ub9TWei2TI
-   Q9qCtPdMmUo72doKkQS9oIC1+CDlRMvp+7kjHx6Y2aspjVRqMhjZ9t1rD
-   gHCiNcaGdcdsc7HV63uiAmwTGm7vLSKCWYilNyvGpH4ZdKlEvtDxVidcv
-   FLteqdDN9h5on7omX9Vj7hkKpHrH+c+dVhLT/ciMoaIYGgKiR8r3bae0O
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10885"; a="2263466"
-X-IronPort-AV: E=Sophos;i="6.03,281,1694761200"; 
-   d="scan'208";a="2263466"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2023 05:30:53 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10885"; a="755855766"
-X-IronPort-AV: E=Sophos;i="6.03,281,1694761200"; 
-   d="scan'208";a="755855766"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orsmga007.jf.intel.com with ESMTP; 06 Nov 2023 05:30:42 -0800
-Date: Mon, 6 Nov 2023 21:29:10 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
-	Anish Moorthy <amoorthy@google.com>,
-	David Matlack <dmatlack@google.com>,
-	Yu Zhang <yu.c.zhang@linux.intel.com>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Maciej Szmigiero <mail@maciej.szmigiero.name>,
-	David Hildenbrand <david@redhat.com>,
-	Quentin Perret <qperret@google.com>,
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
-	Liam Merwick <liam.merwick@oracle.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH v13 20/35] KVM: x86/mmu: Handle page fault for private
- memory
-Message-ID: <ZUjqJjz0Epf7ii8F@yilunxu-OptiPlex-7050>
-References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-21-seanjc@google.com>
- <ZUeSaAKRemlSRQpO@yilunxu-OptiPlex-7050>
- <CABgObfb1Wf2ptitGhJPM6VcmkCG9haMoQj2BsttjeoV=9F0O9Q@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gw9KfQ+X"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699280810;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=EQEY0yLpyjybbnIksSuJ4Z5QD7aeTkworRxg3pV8noA=;
+	b=gw9KfQ+X1O+MfbcCQxnNJC6CL99Wkg2OwASArQmi9tNKwqr3p5A6vRqSHszc3cpXkl5TWA
+	fIm5MYHJfrEwfbufMCAlOF2zQjVgfv71HcplV2w2VDpHUITblrwFStA4xcUIvFtxzkXGGq
+	u5t69z8o4Gb27sJyEgjvCULetiajfIQ=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-166-rsQaOzuoMkCuIf-WhRTMNQ-1; Mon, 06 Nov 2023 09:26:49 -0500
+X-MC-Unique: rsQaOzuoMkCuIf-WhRTMNQ-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2c6eec16401so47425431fa.2
+        for <kvmarm@lists.linux.dev>; Mon, 06 Nov 2023 06:26:49 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699280808; x=1699885608;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EQEY0yLpyjybbnIksSuJ4Z5QD7aeTkworRxg3pV8noA=;
+        b=cTDyuVmp84lRoBPrQz/FAVJK8k13pkZyAr7h4HPg8lck8WV7h5v2RD5CqNfMYyZ7B4
+         Dp/TaPnQhDcZb3H+rJgW8C2Hpr3moGNZm0blAmit8p+1wegeZx3Jts+IYzpD35BUup5u
+         dwhWVLLCLkSidK3hYKy8RTj9CHA9DzT31Xuu/bbZczxM2Q9bTPmUPV4oWizS9zF7PK61
+         lt2AoOU9VsvoJ8CaapbKCUur5d4+r9xPQ5g+maQvS7dvrt5A+Y4cweIlUVMmnvpEwRuI
+         6n7kqbw03VqXoo1L5/wjtAdKzVeT4Jxi6Tv8bA8g39ThELKLUc5/zbwWZpcdI4l2ZSID
+         UBJg==
+X-Gm-Message-State: AOJu0YyTbRLG9e62t7vT2NGfFsuxOTYPJddTo+HwkN8Zz6k6O7RrSLHa
+	M2YlNpeSl2qofkyBli9y4fybt0eh3CpDPZso4ipyP9OXy6oQ+gpI+3fvbxP8Ley5Z3w5yjgZaXc
+	VHWd648GBmWEqzau7
+X-Received: by 2002:a2e:b953:0:b0:2c5:2d02:ed14 with SMTP id 19-20020a2eb953000000b002c52d02ed14mr21572241ljs.23.1699280808169;
+        Mon, 06 Nov 2023 06:26:48 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGe0jlmDLWFqZf1fufd7JZlCly/w1zvo9x6RPHgHPz0rI92EPGNolcWdP4AapnywQ3Fs4WFBA==
+X-Received: by 2002:a2e:b953:0:b0:2c5:2d02:ed14 with SMTP id 19-20020a2eb953000000b002c52d02ed14mr21572194ljs.23.1699280807790;
+        Mon, 06 Nov 2023 06:26:47 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id l41-20020a05600c1d2900b004083a105f27sm12541348wms.26.2023.11.06.06.26.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Nov 2023 06:26:47 -0800 (PST)
+Message-ID: <affca7a8-116e-4b0f-9edf-6cdc05ba65ca@redhat.com>
+Date: Mon, 6 Nov 2023 15:26:44 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABgObfb1Wf2ptitGhJPM6VcmkCG9haMoQj2BsttjeoV=9F0O9Q@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 31/34] KVM: selftests: Expand set_memory_region_test to
+ validate guest_memfd()
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
+ Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Sean Christopherson <seanjc@google.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ Xiaoyao Li <xiaoyao.li@intel.com>, Xu Yilun <yilun.xu@intel.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>,
+ David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
+ =?UTF-8?Q?n?= <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>,
+ Vishal Annapurve <vannapurve@google.com>,
+ Ackerley Tng <ackerleytng@google.com>,
+ Maciej Szmigiero <mail@maciej.szmigiero.name>,
+ David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
+ Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+ Liam Merwick <liam.merwick@oracle.com>,
+ Isaku Yamahata <isaku.yamahata@gmail.com>,
+ "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20231105163040.14904-1-pbonzini@redhat.com>
+ <20231105163040.14904-32-pbonzini@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20231105163040.14904-32-pbonzini@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Nov 05, 2023 at 05:19:36PM +0100, Paolo Bonzini wrote:
-> On Sun, Nov 5, 2023 at 2:04 PM Xu Yilun <yilun.xu@linux.intel.com> wrote:
-> >
-> > > +static void kvm_mmu_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
-> > > +                                           struct kvm_page_fault *fault)
-> > > +{
-> > > +     kvm_prepare_memory_fault_exit(vcpu, fault->gfn << PAGE_SHIFT,
-> > > +                                   PAGE_SIZE, fault->write, fault->exec,
-> > > +                                   fault->is_private);
-> > > +}
-> > > +
-> > > +static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> > > +                                struct kvm_page_fault *fault)
-> > > +{
-> > > +     int max_order, r;
-> > > +
-> > > +     if (!kvm_slot_can_be_private(fault->slot)) {
-> > > +             kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> > > +             return -EFAULT;
-> > > +     }
-> > > +
-> > > +     r = kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault->pfn,
-> > > +                          &max_order);
-> > > +     if (r) {
-> > > +             kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-> > > +             return r;
-> >
-> > Why report KVM_EXIT_MEMORY_FAULT here? even with a ret != -EFAULT?
+On 11/5/23 17:30, Paolo Bonzini wrote:
+> From: Chao Peng <chao.p.peng@linux.intel.com>
 > 
-> The cases are EFAULT, EHWPOISON (which can report
-> KVM_EXIT_MEMORY_FAULT) and ENOMEM. I think it's fine
-> that even -ENOMEM can return KVM_EXIT_MEMORY_FAULT,
-> and it doesn't violate the documentation.  The docs tell you "what
-> can you do if error if EFAULT or EHWPOISON?"; they don't
-> exclude that other errnos result in KVM_EXIT_MEMORY_FAULT,
-> it's just that you're not supposed to look at it
+> Expand set_memory_region_test to exercise various positive and negative
+> testcases for private memory.
+> 
+>   - Non-guest_memfd() file descriptor for private memory
+>   - guest_memfd() from different VM
+>   - Overlapping bindings
+>   - Unaligned bindings
 
-Thanks, it's OK for ENOMEM + KVM_EXIT_MEMORY_FAULT.
+This needs a small fixup:
 
-Another concern is, now 3 places to report EFAULT + KVM_EXIT_MEMORY_FAULT:
-
-  if (!kvm_slot_can_be_private(fault->slot)) {
-	kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-	return -EFAULT;
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index e4d2cd9218b2..1b58f943562f 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -819,6 +819,7 @@ static inline struct kvm_vm *vm_create_barebones(void)
+  	return ____vm_create(VM_SHAPE_DEFAULT);
   }
-
-  file = kvm_gmem_get_file(slot);
-  if (!file)
-	return -EFAULT;
-
-  if (fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
-	kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
-	return -EFAULT;
+  
++#ifdef __x86_64__
+  static inline struct kvm_vm *vm_create_barebones_protected_vm(void)
+  {
+  	const struct vm_shape shape = {
+@@ -828,6 +829,7 @@ static inline struct kvm_vm *vm_create_barebones_protected_vm(void)
+  
+  	return ____vm_create(shape);
   }
++#endif
+  
+  static inline struct kvm_vm *vm_create(uint32_t nr_runnable_vcpus)
+  {
+diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+index 1891774eb6d4..302c7a46955b 100644
+--- a/tools/testing/selftests/kvm/set_memory_region_test.c
++++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+@@ -386,6 +386,7 @@ static void test_add_max_memory_regions(void)
+  }
+  
+  
++#ifdef __x86_64__
+  static void test_invalid_guest_memfd(struct kvm_vm *vm, int memfd,
+  				     size_t offset, const char *msg)
+  {
+@@ -476,14 +477,13 @@ static void test_add_overlapping_private_memory_regions(void)
+  	close(memfd);
+  	kvm_vm_free(vm);
+  }
++#endif
+  
+  int main(int argc, char *argv[])
+  {
+  #ifdef __x86_64__
+  	int i, loops;
+-#endif
+  
+-#ifdef __x86_64__
+  	/*
+  	 * FIXME: the zero-memslot test fails on aarch64 and s390x because
+  	 * KVM_RUN fails with ENOEXEC or EFAULT.
+@@ -493,6 +493,7 @@ int main(int argc, char *argv[])
+  
+  	test_add_max_memory_regions();
+  
++#ifdef __x86_64__
+  	if (kvm_has_cap(KVM_CAP_GUEST_MEMFD) &&
+  	    (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM))) {
+  		test_add_private_memory_region();
+@@ -501,7 +502,6 @@ int main(int argc, char *argv[])
+  		pr_info("Skipping tests for KVM_MEM_GUEST_MEMFD memory regions\n");
+  	}
+  
+-#ifdef __x86_64__
+  	if (argc > 1)
+  		loops = atoi_positive("Number of iterations", argv[1]);
+  	else
 
-They are different cases, and seems userspace should handle them
-differently, but not enough information to distinguish them.
+in order to compile successfully on non-x86 platforms.
 
-Thanks,
-Yilun
-
-> 
-> Paolo
-> 
-> 
