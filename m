@@ -1,56 +1,57 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7711A591
-	for <kvmarm@lists.linux.dev>; Mon,  6 Nov 2023 11:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F9F17730
+	for <kvmarm@lists.linux.dev>; Mon,  6 Nov 2023 11:25:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d1zfSIhz"
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-66d11fec9a5so24016066d6.1
-        for <kvmarm@lists.linux.dev>; Mon, 06 Nov 2023 03:10:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mFsytMAd"
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-66d0c777bf0so29099256d6.3
+        for <kvmarm@lists.linux.dev>; Mon, 06 Nov 2023 03:25:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699269023; x=1699873823; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1699269931; x=1699874731; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qnJqfkSSRV3TBP0JexdvtsqLHYDxALR7H+cYP6TRCJE=;
-        b=d1zfSIhzjzU/DNliZ6IPX66CpCSmflAbUg+UG38I83tdN75jWtrGEX2k9q5YdaqD9c
-         xKY4Z33PBuItGSlZaE+eVPML8+t5LHfcwAB3gdIOInwaDbRenCnYp4st9T3RvRIzX7kn
-         rfC+DnvyaE97d3fRr275pm/R/fljqHIXc2bQrQYkSCENMAVwuTRdNBr4snE5KCILZdnk
-         JUOcQeO/hy+/6cOz9vnGmc6Us+AlRkwXqNkacH8V5G3GSKsYY+SkgPt7MbVoVGy85MbX
-         kpK8iOx6Mt8S5M7FJe2ZyyHmruehI2CLhKIunw4e6lUvteDrNorYmGyltO43qvba/2nR
-         YzrA==
+        bh=8FgFIIfzRIOk5S3UyWAM1hrnYX4eHCPdXXTgA8O3M1A=;
+        b=mFsytMAdBN6GuezTxEFabW57x/e7HHoX4Jt/3D+wgjrTFneSfnqrKIJEif6h0lvDr9
+         5lfwn7Di2c//71ZmWfJQrfYUwGaw6ILNtGqP+fkOWqYaPABxm5dQjIv+WwSuH2ceLJXo
+         89YpcC4aAVs4g6Ab8KJjV2XL6KW2IJQHEnqryI5ssARC8+s4/BiakzgBUEAxLe5nj8yp
+         MCOJE344DvvqjyvI27gpwBe1Bix1Gt0ZVIrT8WbdtuPCbH5a73XuvLoYIEDrbyqEX9C0
+         bFF+EnL31FGhE8RBAfaDV7OYn+45TJTKXD1jiFOAoKVedBnfbWgKg6ZvrwCvGLYoYUyL
+         zX7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699269023; x=1699873823;
+        d=1e100.net; s=20230601; t=1699269931; x=1699874731;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qnJqfkSSRV3TBP0JexdvtsqLHYDxALR7H+cYP6TRCJE=;
-        b=KyLKwDfdBDFhw9YxwHWmIPD3WN+i9XaULBGS7jpHPn77vNsKQwh0S5QzksTH7dNdof
-         m9ppcgjM8Zyqy6Gur9Vnxca3eyYFlMTf1BtfJtpu+LTLb+85Tp50GlXCe1wlNI1GLfc1
-         Ro7+nrpe1XcatpQmmQBKtpWjyKUbRwern0oHH26K9jIUeBU11pVGCcE4Tt3t37oWJrBV
-         JbtzSNW6oURr5YoRADLMDIrwdeosun3jbYyvMITSgfDvPHORFy4krDdftcfTFSx3pNo7
-         Jsv5mjcFyXX7wmdSsQyEmbd11jTaIzv6ILbWvZTQbX1P0UNBQ9OfpAg+K61QPXdr4pJJ
-         WmoQ==
-X-Gm-Message-State: AOJu0YzrdIpgX9tNNSlfL9Wv47Nxlngcxz66QqrzyaFAVGjgsedUD0vQ
-	YM9fTaGGLZmcQj7axPKoI6M14VPWFtMgNFySQwx8Lw==
-X-Google-Smtp-Source: AGHT+IHU/+pefiFnPy+6hnE6koYxy9w/9xmRXHTMFvjZ+YNn5s7SNPQyF9p0CVa6tIfW5b4YJfx0jin9klIyZI5tK50=
-X-Received: by 2002:a05:6214:d62:b0:66d:2eab:85ec with SMTP id
- 2-20020a0562140d6200b0066d2eab85ecmr28750220qvs.61.1699269022903; Mon, 06 Nov
- 2023 03:10:22 -0800 (PST)
+        bh=8FgFIIfzRIOk5S3UyWAM1hrnYX4eHCPdXXTgA8O3M1A=;
+        b=DA4jWyevvFtlQVAIaF2qM5mkhSSggm0blEjYsMp5yQ6ie9AqO3qvombS1sMCHd+jGO
+         FH5/kVfftIpmQtA/0g+CCBwJxBIVEufZur7cAvUIlhfPn4W970fBfB9kLRSCj36377PR
+         NSGVdrOKpYGpsxhVE0MEgk7sEkH2lT1skzX6x/3aPdamzEfcCcC93eWbM6SccvB2t6Ge
+         aAGlQMe9xtBylXCvl6DEIyLeiY4aen+tuPIgwuGeGL4V7m0Ok5FHiTgmfjyJu2rbo1xY
+         uv97FBKuChGRHF/ifIAvkyhmc8LIERG0/JbgkNv29LnbYP12ZL2XFG4V6Gf5rLlVecNS
+         YAsg==
+X-Gm-Message-State: AOJu0YyTk4dLRSWwHrozpZpmPF1yBHVtR0w5rxWVYQ6qVnG386D0ISfz
+	UQvKVNxO9RISPNfdwS9pg3HiFAlKjBPJ6fPlyXLd4Q==
+X-Google-Smtp-Source: AGHT+IF4yL2/LL4u2aXRMHdIO4tBxiGnD2Sg0p8AaFV/BRnT///c7YsCa6iLfBADu8SZkPGs+0c1ElvE1cEBNyIvvIQ=
+X-Received: by 2002:a05:6214:ac9:b0:671:7312:bf5 with SMTP id
+ g9-20020a0562140ac900b0067173120bf5mr32557664qvi.17.1699269931062; Mon, 06
+ Nov 2023 03:25:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-25-pbonzini@redhat.com>
-In-Reply-To: <20231105163040.14904-25-pbonzini@redhat.com>
+References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-26-pbonzini@redhat.com>
+In-Reply-To: <20231105163040.14904-26-pbonzini@redhat.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Mon, 6 Nov 2023 11:09:46 +0000
-Message-ID: <CA+EHjTwOFAEMchVjob=3chD-TJ=Wau3iPnLdtFXBtiRUG4Dtug@mail.gmail.com>
-Subject: Re: [PATCH 24/34] KVM: selftests: Add support for creating private memslots
+Date: Mon, 6 Nov 2023 11:24:54 +0000
+Message-ID: <CA+EHjTxy6TWM3oBG0Q6v5090XTrs+M8_m5=6Z2E1P-HyTkrGWg@mail.gmail.com>
+Subject: Re: [PATCH 25/34] KVM: selftests: Add helpers to convert guest memory
+ b/w private and shared
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
@@ -77,177 +78,156 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
-
-Regarding the subject (and the commit message), should we still be
-calling them "private" slots, or guestmem_slots?
-
 On Sun, Nov 5, 2023 at 4:34=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
 wrote:
 >
-> From: Sean Christopherson <seanjc@google.com>
+> From: Vishal Annapurve <vannapurve@google.com>
 >
-> Add support for creating "private" memslots via KVM_CREATE_GUEST_MEMFD an=
-d
-> KVM_SET_USER_MEMORY_REGION2.  Make vm_userspace_mem_region_add() a wrappe=
-r
-> to its effective replacement, vm_mem_add(), so that private memslots are
-> fully opt-in, i.e. don't require update all tests that add memory regions=
-.
-
-nit: update->updating
-
->
-> Pivot on the KVM_MEM_PRIVATE flag instead of the validity of the "gmem"
-
-KVM_MEM_PRIVATE  -> KVM_MEM_GUEST_MEMFD
-
-> file descriptor so that simple tests can let vm_mem_add() do the heavy
-> lifting of creating the guest memfd, but also allow the caller to pass in
-> an explicit fd+offset so that fancier tests can do things like back
-> multiple memslots with a single file.  If the caller passes in a fd, dup(=
+> Add helpers to convert memory between private and shared via KVM's
+> memory attributes, as well as helpers to free/allocate guest_memfd memory
+> via fallocate().  Userspace, i.e. tests, is NOT required to do fallocate(=
 )
-> the fd so that (a) __vm_mem_region_delete() can close the fd associated
-> with the memory region without needing yet another flag, and (b) so that
-> the caller can safely close its copy of the fd without having to first
-> destroy memslots.
+> when converting memory, as the attributes are the single source of true.
+
+nit: true->truth
+
+> Provide allocate() helpers so that tests can mimic a userspace that frees
+> private memory on conversion, e.g. to prioritize memory usage over
+> performance.
 >
-> Co-developed-by: Ackerley Tng <ackerleytng@google.com>
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+> Co-developed-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Message-Id: <20231027182217.3615211-27-seanjc@google.com>
+> Message-Id: <20231027182217.3615211-28-seanjc@google.com>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  .../selftests/kvm/include/kvm_util_base.h     | 23 ++++++
->  .../testing/selftests/kvm/include/test_util.h |  5 ++
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 76 +++++++++++--------
->  3 files changed, 73 insertions(+), 31 deletions(-)
+>  .../selftests/kvm/include/kvm_util_base.h     | 48 +++++++++++++++++++
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 28 +++++++++++
+>  2 files changed, 76 insertions(+)
 >
 > diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/=
 testing/selftests/kvm/include/kvm_util_base.h
-> index 9f144841c2ee..9f861182c02a 100644
+> index 9f861182c02a..1441fca6c273 100644
 > --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
 > +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -431,6 +431,26 @@ static inline uint64_t vm_get_stat(struct kvm_vm *vm=
-, const char *stat_name)
+> @@ -333,6 +333,54 @@ static inline void vm_enable_cap(struct kvm_vm *vm, =
+uint32_t cap, uint64_t arg0)
+>         vm_ioctl(vm, KVM_ENABLE_CAP, &enable_cap);
+>  }
 >
->  void vm_create_irqchip(struct kvm_vm *vm);
->
-> +static inline int __vm_create_guest_memfd(struct kvm_vm *vm, uint64_t si=
-ze,
-> +                                       uint64_t flags)
+> +static inline void vm_set_memory_attributes(struct kvm_vm *vm, uint64_t =
+gpa,
+> +                                           uint64_t size, uint64_t attri=
+butes)
 > +{
-> +       struct kvm_create_guest_memfd guest_memfd =3D {
+> +       struct kvm_memory_attributes attr =3D {
+> +               .attributes =3D attributes,
+> +               .address =3D gpa,
 > +               .size =3D size,
-> +               .flags =3D flags,
+> +               .flags =3D 0,
 > +       };
 > +
-> +       return __vm_ioctl(vm, KVM_CREATE_GUEST_MEMFD, &guest_memfd);
+> +       /*
+> +        * KVM_SET_MEMORY_ATTRIBUTES overwrites _all_ attributes.  These =
+flows
+> +        * need significant enhancements to support multiple attributes.
+> +        */
+> +       TEST_ASSERT(!attributes || attributes =3D=3D KVM_MEMORY_ATTRIBUTE=
+_PRIVATE,
+> +                   "Update me to support multiple attributes!");
+> +
+> +       vm_ioctl(vm, KVM_SET_MEMORY_ATTRIBUTES, &attr);
 > +}
 > +
-> +static inline int vm_create_guest_memfd(struct kvm_vm *vm, uint64_t size=
-,
-> +                                       uint64_t flags)
+> +
+> +static inline void vm_mem_set_private(struct kvm_vm *vm, uint64_t gpa,
+> +                                     uint64_t size)
 > +{
-> +       int fd =3D __vm_create_guest_memfd(vm, size, flags);
-> +
-> +       TEST_ASSERT(fd >=3D 0, KVM_IOCTL_ERROR(KVM_CREATE_GUEST_MEMFD, fd=
-));
-> +       return fd;
+> +       vm_set_memory_attributes(vm, gpa, size, KVM_MEMORY_ATTRIBUTE_PRIV=
+ATE);
 > +}
 > +
->  void vm_set_user_memory_region(struct kvm_vm *vm, uint32_t slot, uint32_=
-t flags,
->                                uint64_t gpa, uint64_t size, void *hva);
->  int __vm_set_user_memory_region(struct kvm_vm *vm, uint32_t slot, uint32=
-_t flags,
-> @@ -439,6 +459,9 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
->         enum vm_mem_backing_src_type src_type,
->         uint64_t guest_paddr, uint32_t slot, uint64_t npages,
->         uint32_t flags);
-> +void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type=
-,
-> +               uint64_t guest_paddr, uint32_t slot, uint64_t npages,
-> +               uint32_t flags, int guest_memfd_fd, uint64_t guest_memfd_=
-offset);
->
->  void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t =
-flags);
->  void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_g=
-pa);
-> diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/test=
-ing/selftests/kvm/include/test_util.h
-> index 7e614adc6cf4..7257f2243ab9 100644
-> --- a/tools/testing/selftests/kvm/include/test_util.h
-> +++ b/tools/testing/selftests/kvm/include/test_util.h
-> @@ -142,6 +142,11 @@ static inline bool backing_src_is_shared(enum vm_mem=
-_backing_src_type t)
->         return vm_mem_backing_src_alias(t)->flag & MAP_SHARED;
->  }
->
-> +static inline bool backing_src_can_be_huge(enum vm_mem_backing_src_type =
-t)
+> +static inline void vm_mem_set_shared(struct kvm_vm *vm, uint64_t gpa,
+> +                                    uint64_t size)
 > +{
-> +       return t !=3D VM_MEM_SRC_ANONYMOUS && t !=3D VM_MEM_SRC_SHMEM;
+> +       vm_set_memory_attributes(vm, gpa, size, 0);
 > +}
 > +
->  /* Aligns x up to the next multiple of size. Size must be a power of 2. =
-*/
->  static inline uint64_t align_up(uint64_t x, uint64_t size)
->  {
+> +void vm_guest_mem_fallocate(struct kvm_vm *vm, uint64_t gpa, uint64_t si=
+ze,
+> +                           bool punch_hole);
+> +
+> +static inline void vm_guest_mem_punch_hole(struct kvm_vm *vm, uint64_t g=
+pa,
+> +                                          uint64_t size)
+> +{
+> +       vm_guest_mem_fallocate(vm, gpa, size, true);
+> +}
+> +
+> +static inline void vm_guest_mem_allocate(struct kvm_vm *vm, uint64_t gpa=
+,
+> +                                        uint64_t size)
+> +{
+> +       vm_guest_mem_fallocate(vm, gpa, size, false);
+> +}
+> +
+>  void vm_enable_dirty_ring(struct kvm_vm *vm, uint32_t ring_size);
+>  const char *vm_guest_mode_string(uint32_t i);
+>
 > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/s=
 elftests/kvm/lib/kvm_util.c
-> index 3676b37bea38..b63500fca627 100644
+> index b63500fca627..95a553400ea9 100644
 > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -669,6 +669,8 @@ static void __vm_mem_region_delete(struct kvm_vm *vm,
->                 TEST_ASSERT(!ret, __KVM_SYSCALL_ERROR("munmap()", ret));
->                 close(region->fd);
->         }
-> +       if (region->region.guest_memfd >=3D 0)
-> +               close(region->region.guest_memfd);
->
->         free(region);
->  }
-> @@ -870,36 +872,15 @@ void vm_set_user_memory_region(struct kvm_vm *vm, u=
-int32_t slot, uint32_t flags,
->                     errno, strerror(errno));
+> @@ -1167,6 +1167,34 @@ void vm_mem_region_delete(struct kvm_vm *vm, uint3=
+2_t slot)
+>         __vm_mem_region_delete(vm, memslot2region(vm, slot), true);
 >  }
 >
-> -/*
-> - * VM Userspace Memory Region Add
-> - *
-> - * Input Args:
-> - *   vm - Virtual Machine
-> - *   src_type - Storage source for this region.
-> - *              NULL to use anonymous memory.
+> +void vm_guest_mem_fallocate(struct kvm_vm *vm, uint64_t base, uint64_t s=
+ize,
+> +                           bool punch_hole)
+> +{
+> +       const int mode =3D FALLOC_FL_KEEP_SIZE | (punch_hole ? FALLOC_FL_=
+PUNCH_HOLE : 0);
+> +       struct userspace_mem_region *region;
+> +       uint64_t end =3D base + size;
+> +       uint64_t gpa, len;
+> +       off_t fd_offset;
+> +       int ret;
+> +
+> +       for (gpa =3D base; gpa < end; gpa +=3D len) {
+> +               uint64_t offset;
+> +
+> +               region =3D userspace_mem_region_find(vm, gpa, gpa);
+> +               TEST_ASSERT(region && region->region.flags & KVM_MEM_GUES=
+T_MEMFD,
+> +                           "Private memory region not found for GPA 0x%l=
+x", gpa);
+> +
+> +               offset =3D (gpa - region->region.guest_phys_addr);
 
-"VM_MEM_SRC_ANONYMOUS to use anonymous memory"
+nit: why the parentheses?
 
-> - *   guest_paddr - Starting guest physical address
-> - *   slot - KVM region slot
-> - *   npages - Number of physical pages
-> - *   flags - KVM memory region flags (e.g. KVM_MEM_LOG_DIRTY_PAGES)
-> - *
-> - * Output Args: None
-> - *
-> - * Return: None
-> - *
-> - * Allocates a memory area of the number of pages specified by npages
-> - * and maps it to the VM specified by vm, at a starting physical address
-> - * given by guest_paddr.  The region is created with a KVM region slot
-> - * given by slot, which must be unique and < KVM_MEM_SLOTS_NUM.  The
-> - * region is created with the flags given by flags.
-> - */
-> -void vm_userspace_mem_region_add(struct kvm_vm *vm,
-> -       enum vm_mem_backing_src_type src_type,
-> -       uint64_t guest_paddr, uint32_t slot, uint64_t npages,
-> -       uint32_t flags)
-> +/* FIXME: This thing needs to be ripped apart and rewritten. */
+> +               fd_offset =3D region->region.guest_memfd_offset + offset;
+> +               len =3D min_t(uint64_t, end - gpa, region->region.memory_=
+size - offset);
+> +
+> +               ret =3D fallocate(region->region.guest_memfd, mode, fd_of=
+fset, len);
+> +               TEST_ASSERT(!ret, "fallocate() failed to %s at %lx (len =
+=3D %lu), fd =3D %d, mode =3D %x, offset =3D %lx\n",
+> +                           punch_hole ? "punch hole" : "allocate", gpa, =
+len,
+> +                           region->region.guest_memfd, mode, fd_offset);
+> +       }
+> +}
+> +
+>  /* Returns the size of a vCPU's kvm_run structure. */
+>  static int vcpu_mmap_sz(void)
+>  {
 
-It sure does :)
-
-With these nits:
+Nits aside:
 
 Reviewed-by: Fuad Tabba <tabba@google.com>
 Tested-by: Fuad Tabba <tabba@google.com>
@@ -255,113 +235,6 @@ Tested-by: Fuad Tabba <tabba@google.com>
 Cheers,
 /fuad
 
-> +void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type=
-,
-> +               uint64_t guest_paddr, uint32_t slot, uint64_t npages,
-> +               uint32_t flags, int guest_memfd, uint64_t guest_memfd_off=
-set)
->  {
->         int ret;
->         struct userspace_mem_region *region;
->         size_t backing_src_pagesz =3D get_backing_src_pagesz(src_type);
-> +       size_t mem_size =3D npages * vm->page_size;
->         size_t alignment;
->
->         TEST_ASSERT(vm_adjust_num_guest_pages(vm->mode, npages) =3D=3D np=
-ages,
-> @@ -952,7 +933,7 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
->         /* Allocate and initialize new mem region structure. */
->         region =3D calloc(1, sizeof(*region));
->         TEST_ASSERT(region !=3D NULL, "Insufficient Memory");
-> -       region->mmap_size =3D npages * vm->page_size;
-> +       region->mmap_size =3D mem_size;
->
->  #ifdef __s390x__
->         /* On s390x, the host address must be aligned to 1M (due to PGSTE=
-s) */
-> @@ -999,14 +980,38 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
->         /* As needed perform madvise */
->         if ((src_type =3D=3D VM_MEM_SRC_ANONYMOUS ||
->              src_type =3D=3D VM_MEM_SRC_ANONYMOUS_THP) && thp_configured(=
-)) {
-> -               ret =3D madvise(region->host_mem, npages * vm->page_size,
-> +               ret =3D madvise(region->host_mem, mem_size,
->                               src_type =3D=3D VM_MEM_SRC_ANONYMOUS ? MADV=
-_NOHUGEPAGE : MADV_HUGEPAGE);
->                 TEST_ASSERT(ret =3D=3D 0, "madvise failed, addr: %p lengt=
-h: 0x%lx src_type: %s",
-> -                           region->host_mem, npages * vm->page_size,
-> +                           region->host_mem, mem_size,
->                             vm_mem_backing_src_alias(src_type)->name);
->         }
->
->         region->backing_src_type =3D src_type;
-> +
-> +       if (flags & KVM_MEM_GUEST_MEMFD) {
-> +               if (guest_memfd < 0) {
-> +                       uint32_t guest_memfd_flags =3D 0;
-> +                       TEST_ASSERT(!guest_memfd_offset,
-> +                                   "Offset must be zero when creating ne=
-w guest_memfd");
-> +                       guest_memfd =3D vm_create_guest_memfd(vm, mem_siz=
-e, guest_memfd_flags);
-> +               } else {
-> +                       /*
-> +                        * Install a unique fd for each memslot so that t=
-he fd
-> +                        * can be closed when the region is deleted witho=
-ut
-> +                        * needing to track if the fd is owned by the fra=
-mework
-> +                        * or by the caller.
-> +                        */
-> +                       guest_memfd =3D dup(guest_memfd);
-> +                       TEST_ASSERT(guest_memfd >=3D 0, __KVM_SYSCALL_ERR=
-OR("dup()", guest_memfd));
-> +               }
-> +
-> +               region->region.guest_memfd =3D guest_memfd;
-> +               region->region.guest_memfd_offset =3D guest_memfd_offset;
-> +       } else {
-> +               region->region.guest_memfd =3D -1;
-> +       }
-> +
->         region->unused_phy_pages =3D sparsebit_alloc();
->         sparsebit_set_num(region->unused_phy_pages,
->                 guest_paddr >> vm->page_shift, npages);
-> @@ -1019,9 +1024,10 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm=
-,
->         TEST_ASSERT(ret =3D=3D 0, "KVM_SET_USER_MEMORY_REGION2 IOCTL fail=
-ed,\n"
->                 "  rc: %i errno: %i\n"
->                 "  slot: %u flags: 0x%x\n"
-> -               "  guest_phys_addr: 0x%lx size: 0x%lx",
-> +               "  guest_phys_addr: 0x%lx size: 0x%lx guest_memfd: %d\n",
->                 ret, errno, slot, flags,
-> -               guest_paddr, (uint64_t) region->region.memory_size);
-> +               guest_paddr, (uint64_t) region->region.memory_size,
-> +               region->region.guest_memfd);
->
->         /* Add to quick lookup data structures */
->         vm_userspace_mem_region_gpa_insert(&vm->regions.gpa_tree, region)=
-;
-> @@ -1042,6 +1048,14 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm=
-,
->         }
->  }
->
-> +void vm_userspace_mem_region_add(struct kvm_vm *vm,
-> +                                enum vm_mem_backing_src_type src_type,
-> +                                uint64_t guest_paddr, uint32_t slot,
-> +                                uint64_t npages, uint32_t flags)
-> +{
-> +       vm_mem_add(vm, src_type, guest_paddr, slot, npages, flags, -1, 0)=
-;
-> +}
-> +
->  /*
->   * Memslot to region
->   *
 > --
 > 2.39.1
 >
