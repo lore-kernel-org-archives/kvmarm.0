@@ -1,25 +1,61 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B4211C8B
-	for <kvmarm@lists.linux.dev>; Tue,  7 Nov 2023 09:51:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 638E5FEC;
-	Tue,  7 Nov 2023 01:52:10 -0800 (PST)
-Received: from monolith (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 818D83F703;
-	Tue,  7 Nov 2023 01:51:24 -0800 (PST)
-Date: Tue, 7 Nov 2023 09:52:07 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	andrew.jones@linux.dev, maz@kernel.org, oliver.upton@linux.dev,
-	jarichte@redhat.com
-Subject: Re: [kvm-unit-tests PATCH] arm: pmu-overflow-interrupt: Increase
- count values
-Message-ID: <ZUoIxznZwPyti254@monolith>
-References: <20231103100139.55807-1-eric.auger@redhat.com>
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29AFE12E67
+	for <kvmarm@lists.linux.dev>; Tue,  7 Nov 2023 10:29:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Xvbg8rVw"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=mnU5AkoHae2A4t/6hUnkAeF1QeR2fa8gldl6fabdpys=; b=Xvbg8rVwQvptDasFluB1GivJJR
+	lkmYK9tHPkK3vfKg66aLbO07r9lL+qDWdsMtP1fVlOa8E6KTkOYoEs2lwy4BuATJgRxBHul9tXxli
+	QGqH/a1GwQbXH4Ty2qge3vzSS6Lc2LavAFmQ5ENfzpAimPTrAHwq4g364DPRdQkTj0tDP0qjcdxfK
+	STyjqt1AJWeyZh74VX0SvsNhUiKdGJQ5F9Q8X2OntVFa17qD+omT8nLqUX52QnKNsc7MXWynhIz17
+	xiLH8jwcSjSqGdcRk8+6xspJu1Yko/6rlvG1nsItzUsrSafRMYvzk7lo3JLicVij5zIccje25TllF
+	GUWgjCdw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37708)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r0JKK-0000DJ-2j;
+	Tue, 07 Nov 2023 10:28:56 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r0JKF-0006qX-KE; Tue, 07 Nov 2023 10:28:51 +0000
+Date: Tue, 7 Nov 2023 10:28:51 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, linux-csky@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-ia64@vger.kernel.org,
+	linux-parisc@vger.kernel.org
+Cc: Albert Ou <aou@eecs.berkeley.edu>, Borislav Petkov <bp@alien8.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Guo Ren <guoren@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+	Huacai Chen <chenhuacai@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com, Len Brown <lenb@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	WANG Xuerui <kernel@xen0n.name>, Will Deacon <will@kernel.org>
+Subject: [PATCH RFC 00/22] Initial cleanups for vCPU hotplug
+Message-ID: <ZUoRY33AAHMc5ThW@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -28,124 +64,64 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231103100139.55807-1-eric.auger@redhat.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi Eric,
+Hi,
 
-On Fri, Nov 03, 2023 at 11:01:39AM +0100, Eric Auger wrote:
-> On some hardware, some pmu-overflow-interrupt failures can be observed.
-> Although the even counter overflows, the interrupt is not seen as
-> expected. This happens in the subtest after "promote to 64-b" comment.
-> After analysis, the PMU overflow interrupt actually hits, ie.
-> kvm_pmu_perf_overflow() gets called and KVM_REQ_IRQ_PENDING is set,
-> as expected. However the PMCR.E is reset by the handle_exit path, at
-> kvm_pmu_handle_pmcr() before the next guest entry and
-> kvm_pmu_flush_hwstate/kvm_pmu_update_state subsequent call.
-> There, since the enable bit has been reset, kvm_pmu_update_state() does
-> not inject the interrupt into the guest.
-> 
-> This does not seem to be a KVM bug but rather an unfortunate
-> scenario where the test disables the PMCR.E too closely to the
-> advent of the overflow interrupt.
+Rather than posting the entire set of vCPU kernel patches, this is a
+subset of those patches which I hope will be able to be appropriately
+queued for the next merge window. I am also hoping that nothing here
+is covered by Rafael's concerns he alluded to in his response to the
+RFC v3 series.
 
-If I understand correctly, the KVM PMU, after receiving the hardware PMUIRQ and
-before injecting the interrupt, checks that the PMU is enabled according to the
-pseudocode for the function CheckForPMUOverflow(). CheckForPMUOverflow() returns
-false because PMCR_EL1.E is 0, so the KVM PMU decides not to inject the
-interrupt.
+This series aims to switch most architectures over to using generic CPU
+devices rather than arch specific implementations, which I think is
+worthwhile doing even if the vCPU hotplug series needs further work.
 
-Is that correct?
+Since this series changes the init order (node_dev_init() vs
+cpu_dev_init()) and later on in the vCPU hotplug series move the
+location that CPUs are registered, the first two patches head off
+problems with register_cpu_capacity_sysctl() and the intel_epb code.
+These two were ordered later in the original series.
 
-Changing the number of SW_INCR events might not be optimal - for example,
-COUNT_INT > 100 might hide an error that otherwise would have been triggered if
-the number of events were 100. Not very likely, but still a possibility.
+The next pair of patches are new and remove the exports of
+arch_*register_cpu() which are not necessary - these functions are only
+called from non-modular code - drivers/base/cpu.c and acpi_processor.c
+both of which can only be built-in.
 
-Another approach would be to wait for a set amount of time for the CPU to take
-the interrupt. There's something similar in timer.c::{test_timer_tval(),
-timer_do_wfi()}.
+The majority of the other patches come from the vCPU hotplug RFC v3
+series I posted earlier, rebased on Linus' current tip, but with some
+new patches adding arch_cpu_is_hotpluggable() as the remaining
+arch_register_cpu() functions only differ in the setting of the
+hotpluggable member of the CPU device - so let's get generic code
+doing that and provide a way for an architecture to specify whether a
+CPU is hotpluggable.
 
-Thanks,
-Alex
+I would appreciate testing reports on loongarch, riscv and x86
+platforms please.
 
-> 
-> Since it looks like a benign and inlikely case, let's resize the number
-> of iterations to prevent the PMCR enable bit from being resetted
-> at the same time as the actual overflow event.
-> 
-> COUNT_INT is introduced, arbitrarily set to 1000 iterations and is
-> used in this test.
-> 
-> Reported-by: Jan Richter <jarichte@redhat.com>
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  arm/pmu.c | 15 ++++++++-------
->  1 file changed, 8 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index a91a7b1f..acd88571 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -66,6 +66,7 @@
->  #define PRE_OVERFLOW_64		0xFFFFFFFFFFFFFFF0ULL
->  #define COUNT 250
->  #define MARGIN 100
-> +#define COUNT_INT 1000
->  /*
->   * PRE_OVERFLOW2 is set so that 1st @COUNT iterations do not
->   * produce 32b overflow and 2nd @COUNT iterations do. To accommodate
-> @@ -978,13 +979,13 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->  
->  	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
->  
-> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->  	report(expect_interrupts(0), "no overflow interrupt after preset");
->  
->  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->  	isb();
->  
-> -	for (i = 0; i < 100; i++)
-> +	for (i = 0; i < COUNT_INT; i++)
->  		write_sysreg(0x2, pmswinc_el0);
->  
->  	isb();
-> @@ -1002,15 +1003,15 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->  	write_sysreg(ALL_SET_32, pmintenset_el1);
->  	isb();
->  
-> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->  
->  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->  	isb();
->  
-> -	for (i = 0; i < 100; i++)
-> +	for (i = 0; i < COUNT_INT; i++)
->  		write_sysreg(0x3, pmswinc_el0);
->  
-> -	mem_access_loop(addr, 200, pmu.pmcr_ro);
-> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro);
->  	report_info("overflow=0x%lx", read_sysreg(pmovsclr_el0));
->  	report(expect_interrupts(0x3),
->  		"overflow interrupts expected on #0 and #1");
-> @@ -1029,7 +1030,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->  	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
->  	write_regn_el0(pmevcntr, 0, pre_overflow);
->  	isb();
-> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->  	report(expect_interrupts(0x1), "expect overflow interrupt");
->  
->  	/* overflow on odd counter */
-> @@ -1037,7 +1038,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->  	write_regn_el0(pmevcntr, 0, pre_overflow);
->  	write_regn_el0(pmevcntr, 1, all_set);
->  	isb();
-> -	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->  	if (overflow_at_64bits) {
->  		report(expect_interrupts(0x1),
->  		       "expect overflow interrupt on even counter");
-> -- 
-> 2.41.0
-> 
+Thanks!
+
+ arch/arm64/Kconfig               |  1 +
+ arch/arm64/include/asm/cpu.h     |  1 -
+ arch/arm64/kernel/setup.c        | 13 ++-----------
+ arch/loongarch/Kconfig           |  2 ++
+ arch/loongarch/kernel/topology.c | 42 ++--------------------------------------
+ arch/riscv/Kconfig               |  1 +
+ arch/riscv/kernel/setup.c        | 18 ++---------------
+ arch/x86/Kconfig                 |  2 ++
+ arch/x86/include/asm/cpu.h       |  4 ----
+ arch/x86/kernel/cpu/intel_epb.c  |  2 +-
+ arch/x86/kernel/topology.c       | 33 ++-----------------------------
+ drivers/acpi/Kconfig             |  1 -
+ drivers/acpi/acpi_processor.c    | 18 -----------------
+ drivers/base/arch_topology.c     | 38 ++++++++++++++++++++++++------------
+ drivers/base/cpu.c               | 39 +++++++++++++++++++++++++++++--------
+ drivers/base/init.c              |  2 +-
+ drivers/base/node.c              |  7 -------
+ include/linux/cpu.h              |  5 +++++
+ 18 files changed, 78 insertions(+), 151 deletions(-)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
