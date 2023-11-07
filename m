@@ -1,210 +1,151 @@
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571871FD2
-	for <kvmarm@lists.linux.dev>; Tue,  7 Nov 2023 06:10:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MeBD2FZv"
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-507a5edc2ebso1475e87.1
-        for <kvmarm@lists.linux.dev>; Mon, 06 Nov 2023 22:10:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699337441; x=1699942241; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7w492P8EaMyzzBXQGsoWoq23LSvZpwaYh30vR46ByNc=;
-        b=MeBD2FZvow0anHdX5Y+jlgHuY2FNVTyowIaqrog3K+8+ON5Q3LuZsREj6uLiVPlV6T
-         HN9FPRK3kVpVSL6r3oAzZVt+I2Chr1hZND+ivovQRmo+x5WDvTEb0nSgAo8IvUtn5GaU
-         Gl8sJii33o81NaujKukKu9zGSByBPfmMPYRihJ89aIe++vX4PEHCL7U2317ctKwbrgE7
-         IVZCV16sauCznHJ09sn6cM9B9j00z2ycIZVLeBhxdaOkhwrbTpdvnm9GrzmQrQdaawpz
-         cfgON87OI+1jOIFvlxBAIseVXOPzk2Xrn96I6PdoalApbLwCtaphTpW7KbNH5C18NXnB
-         kFVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699337441; x=1699942241;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7w492P8EaMyzzBXQGsoWoq23LSvZpwaYh30vR46ByNc=;
-        b=D2c31pSRQiS5Gh1HoNlkTb8GbhIkGTdst8sAT5mIwll0HWUIcXN+rpdMnClJyJjA3i
-         Oyxi/nF8R++/OPkyhA1IOIHQ5iLUv4/fuqjWRsxcV4ycPVA244eJpM18rwLxaWJnQyHr
-         UR7YPP9CRkFCpmHi0PX3h3Ga7xHBtrE8Cc2jlwq7H8xCWATnrnmD5B8zd0oR8vaNcPcH
-         EE9/EOBTKRDnowUT6PeyBExzL/NGpe3YnHjnDq/Hb4V6Nve6RtBA6cGB0qE6w9Lu1jJs
-         QFE0rQuSSIkfFyN54tOTzK8gLVjzNHOH4wEyVeCSX06nz9a6JiVFL7L3vXBuhm5lHX0Z
-         rotg==
-X-Gm-Message-State: AOJu0YyhyoMghHXZU7awwemgieMCVmBgbkLizN1k7VXzCZvU0SfBDrl9
-	reKETNMN6CL/pecB/erA/D9B9Wj2gUeLFHRNeNoDKw==
-X-Google-Smtp-Source: AGHT+IEQvtxnLlB7F29eRu/cA7awY+Kxexhgv1i34AQJasD2LNOF96/NDCw5kXIBvzx84FiV23+2NcPPv0JH3c6k38Q=
-X-Received: by 2002:a05:6512:108c:b0:501:a2b9:6046 with SMTP id
- j12-20020a056512108c00b00501a2b96046mr38300lfg.7.1699337441012; Mon, 06 Nov
- 2023 22:10:41 -0800 (PST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B4211C8B
+	for <kvmarm@lists.linux.dev>; Tue,  7 Nov 2023 09:51:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 638E5FEC;
+	Tue,  7 Nov 2023 01:52:10 -0800 (PST)
+Received: from monolith (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 818D83F703;
+	Tue,  7 Nov 2023 01:51:24 -0800 (PST)
+Date: Tue, 7 Nov 2023 09:52:07 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	andrew.jones@linux.dev, maz@kernel.org, oliver.upton@linux.dev,
+	jarichte@redhat.com
+Subject: Re: [kvm-unit-tests PATCH] arm: pmu-overflow-interrupt: Increase
+ count values
+Message-ID: <ZUoIxznZwPyti254@monolith>
+References: <20231103100139.55807-1-eric.auger@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20231011195740.3349631-1-oliver.upton@linux.dev>
- <20231011195740.3349631-3-oliver.upton@linux.dev> <CAM9d7cjxkAmEc=g0jWBPQ9d6GYmfdZSKjqi5v0UsoPvkQy-fSw@mail.gmail.com>
- <ZS/n5dqo6dZE40HE@kernel.org>
-In-Reply-To: <ZS/n5dqo6dZE40HE@kernel.org>
-From: Ian Rogers <irogers@google.com>
-Date: Mon, 6 Nov 2023 22:10:29 -0800
-Message-ID: <CAP-5=fWcrQqZz5vTEd_YHBcZ8rGF4Shj=QpZ9mTLDnXbwwLZmw@mail.gmail.com>
-Subject: Re: [PATCH v3 2/5] perf build: Generate arm64's sysreg-defs.h and add
- to include path
-To: Arnaldo Carvalho de Melo <acme@kernel.org>
-Cc: Namhyung Kim <namhyung@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-perf-users@vger.kernel.org, Mark Brown <broonie@kernel.org>, 
-	Jing Zhang <jingzhangos@google.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, James Morse <james.morse@arm.com>, 
-	Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Adrian Hunter <adrian.hunter@intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231103100139.55807-1-eric.auger@redhat.com>
 
-On Wed, Oct 18, 2023 at 7:12=E2=80=AFAM Arnaldo Carvalho de Melo
-<acme@kernel.org> wrote:
->
-> Em Tue, Oct 17, 2023 at 03:23:40PM -0700, Namhyung Kim escreveu:
-> > Hello,
-> >
-> > On Wed, Oct 11, 2023 at 12:58=E2=80=AFPM Oliver Upton <oliver.upton@lin=
-ux.dev> wrote:
-> > >
-> > > Start generating sysreg-defs.h in anticipation of updating sysreg.h t=
-o a
-> > > version that needs the generated output.
-> > >
-> > > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> >
-> > It seems we also need this on non-ARM archs to process ARM SPE data.
-> >
-> > Acked-by: Namhyung Kim <namhyung@kernel.org>
->
-> When building with CORESIGHT=3D1, yes.
->
-> I have it in my tests and:
->
-> =E2=AC=A2[acme@toolbox perf-tools-next]$ ls -la /tmp/build/perf-tools-nex=
-t/util/arm-spe.o
-> -rw-r--r--. 1 acme acme 135432 Oct 17 16:49 /tmp/build/perf-tools-next/ut=
-il/arm-spe.o
-> =E2=AC=A2[acme@toolbox perf-tools-next]$ ldd /tmp/build/perf-tools-next/p=
-erf | grep csd
->         libopencsd_c_api.so.1 =3D> /lib64/libopencsd_c_api.so.1 (0x00007f=
-36bfca5000)
->         libopencsd.so.1 =3D> /lib64/libopencsd.so.1 (0x00007f36be2e0000)
-> =E2=AC=A2[acme@toolbox perf-tools-next]$ rpm -qf /lib64/libopencsd.so.1
-> opencsd-1.3.3-1.fc38.x86_64
-> =E2=AC=A2[acme@toolbox perf-tools-next]$ rpm -q --qf "%{summary}\n" openc=
-sd
-> An open source CoreSight(tm) Trace Decode library
-> =E2=AC=A2[acme@toolbox perf-tools-next]$
->
-> Well, double checked and arm-spe.o is built by default, only way to
-> disable it is using NO_AUXTRACE=3D1 in the make command line, but then
-> IIRC one needs linking with opencsd to decode all those traces, right?
->
-> Anyway:
->
-> Acked-by: Arnaldo Carvalho de Melo <acme@redhat.com>
->
-> - Arnaldo
->
-> > Thanks,
-> > Namhyung
-> >
-> >
-> > > ---
-> > >  tools/perf/Makefile.perf | 15 +++++++++++++--
-> > >  tools/perf/util/Build    |  2 +-
-> > >  2 files changed, 14 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/tools/perf/Makefile.perf b/tools/perf/Makefile.perf
-> > > index 37af6df7b978..14dedd11a1f5 100644
-> > > --- a/tools/perf/Makefile.perf
-> > > +++ b/tools/perf/Makefile.perf
-> > > @@ -443,6 +443,15 @@ drm_ioctl_tbl :=3D $(srctree)/tools/perf/trace/b=
-eauty/drm_ioctl.sh
-> > >  # Create output directory if not already present
-> > >  _dummy :=3D $(shell [ -d '$(beauty_ioctl_outdir)' ] || mkdir -p '$(b=
-eauty_ioctl_outdir)')
-> > >
-> > > +arm64_gen_sysreg_dir :=3D $(srctree)/tools/arch/arm64/tools
-> > > +
-> > > +arm64-sysreg-defs: FORCE
-> > > +       $(Q)$(MAKE) -C $(arm64_gen_sysreg_dir)
+Hi Eric,
 
-Should this not build an install_headers target? The generated code is
-going into the source tree as is, ignoring O=3D options to make.
+On Fri, Nov 03, 2023 at 11:01:39AM +0100, Eric Auger wrote:
+> On some hardware, some pmu-overflow-interrupt failures can be observed.
+> Although the even counter overflows, the interrupt is not seen as
+> expected. This happens in the subtest after "promote to 64-b" comment.
+> After analysis, the PMU overflow interrupt actually hits, ie.
+> kvm_pmu_perf_overflow() gets called and KVM_REQ_IRQ_PENDING is set,
+> as expected. However the PMCR.E is reset by the handle_exit path, at
+> kvm_pmu_handle_pmcr() before the next guest entry and
+> kvm_pmu_flush_hwstate/kvm_pmu_update_state subsequent call.
+> There, since the enable bit has been reset, kvm_pmu_update_state() does
+> not inject the interrupt into the guest.
+> 
+> This does not seem to be a KVM bug but rather an unfortunate
+> scenario where the test disables the PMCR.E too closely to the
+> advent of the overflow interrupt.
+
+If I understand correctly, the KVM PMU, after receiving the hardware PMUIRQ and
+before injecting the interrupt, checks that the PMU is enabled according to the
+pseudocode for the function CheckForPMUOverflow(). CheckForPMUOverflow() returns
+false because PMCR_EL1.E is 0, so the KVM PMU decides not to inject the
+interrupt.
+
+Is that correct?
+
+Changing the number of SW_INCR events might not be optimal - for example,
+COUNT_INT > 100 might hide an error that otherwise would have been triggered if
+the number of events were 100. Not very likely, but still a possibility.
+
+Another approach would be to wait for a set amount of time for the CPU to take
+the interrupt. There's something similar in timer.c::{test_timer_tval(),
+timer_do_wfi()}.
 
 Thanks,
-Ian
+Alex
 
-> > > +
-> > > +arm64-sysreg-defs-clean:
-> > > +       $(call QUIET_CLEAN,arm64-sysreg-defs)
-> > > +       $(Q)$(MAKE) -C $(arm64_gen_sysreg_dir) clean > /dev/null
-> > > +
-> > >  $(drm_ioctl_array): $(drm_hdr_dir)/drm.h $(drm_hdr_dir)/i915_drm.h $=
-(drm_ioctl_tbl)
-> > >         $(Q)$(SHELL) '$(drm_ioctl_tbl)' $(drm_hdr_dir) > $@
-> > >
-> > > @@ -716,7 +725,9 @@ endif
-> > >  __build-dir =3D $(subst $(OUTPUT),,$(dir $@))
-> > >  build-dir   =3D $(or $(__build-dir),.)
-> > >
-> > > -prepare: $(OUTPUT)PERF-VERSION-FILE $(OUTPUT)common-cmds.h archheade=
-rs $(drm_ioctl_array) \
-> > > +prepare: $(OUTPUT)PERF-VERSION-FILE $(OUTPUT)common-cmds.h archheade=
-rs \
-> > > +       arm64-sysreg-defs \
-> > > +       $(drm_ioctl_array) \
-> > >         $(fadvise_advice_array) \
-> > >         $(fsconfig_arrays) \
-> > >         $(fsmount_arrays) \
-> > > @@ -1125,7 +1136,7 @@ endif # BUILD_BPF_SKEL
-> > >  bpf-skel-clean:
-> > >         $(call QUIET_CLEAN, bpf-skel) $(RM) -r $(SKEL_TMP_OUT) $(SKEL=
-ETONS)
-> > >
-> > > -clean:: $(LIBAPI)-clean $(LIBBPF)-clean $(LIBSUBCMD)-clean $(LIBSYMB=
-OL)-clean $(LIBPERF)-clean fixdep-clean python-clean bpf-skel-clean tests-c=
-oresight-targets-clean
-> > > +clean:: $(LIBAPI)-clean $(LIBBPF)-clean $(LIBSUBCMD)-clean $(LIBSYMB=
-OL)-clean $(LIBPERF)-clean arm64-sysreg-defs-clean fixdep-clean python-clea=
-n bpf-skel-clean tests-coresight-targets-clean
-> > >         $(call QUIET_CLEAN, core-objs)  $(RM) $(LIBPERF_A) $(OUTPUT)p=
-erf-archive $(OUTPUT)perf-iostat $(LANG_BINDINGS)
-> > >         $(Q)find $(or $(OUTPUT),.) -name '*.o' -delete -o -name '\.*.=
-cmd' -delete -o -name '\.*.d' -delete
-> > >         $(Q)$(RM) $(OUTPUT).config-detected
-> > > diff --git a/tools/perf/util/Build b/tools/perf/util/Build
-> > > index 6d657c9927f7..2f76230958ad 100644
-> > > --- a/tools/perf/util/Build
-> > > +++ b/tools/perf/util/Build
-> > > @@ -345,7 +345,7 @@ CFLAGS_rbtree.o        +=3D -Wno-unused-parameter=
- -DETC_PERFCONFIG=3D"BUILD_STR($(ET
-> > >  CFLAGS_libstring.o     +=3D -Wno-unused-parameter -DETC_PERFCONFIG=
-=3D"BUILD_STR($(ETC_PERFCONFIG_SQ))"
-> > >  CFLAGS_hweight.o       +=3D -Wno-unused-parameter -DETC_PERFCONFIG=
-=3D"BUILD_STR($(ETC_PERFCONFIG_SQ))"
-> > >  CFLAGS_header.o        +=3D -include $(OUTPUT)PERF-VERSION-FILE
-> > > -CFLAGS_arm-spe.o       +=3D -I$(srctree)/tools/arch/arm64/include/
-> > > +CFLAGS_arm-spe.o       +=3D -I$(srctree)/tools/arch/arm64/include/ -=
-I$(srctree)/tools/arch/arm64/include/generated/
-> > >
-> > >  $(OUTPUT)util/argv_split.o: ../lib/argv_split.c FORCE
-> > >         $(call rule_mkdir)
-> > > --
-> > > 2.42.0.609.gbb76f46606-goog
-> > >
->
-> --
->
-> - Arnaldo
+> 
+> Since it looks like a benign and inlikely case, let's resize the number
+> of iterations to prevent the PMCR enable bit from being resetted
+> at the same time as the actual overflow event.
+> 
+> COUNT_INT is introduced, arbitrarily set to 1000 iterations and is
+> used in this test.
+> 
+> Reported-by: Jan Richter <jarichte@redhat.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  arm/pmu.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index a91a7b1f..acd88571 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -66,6 +66,7 @@
+>  #define PRE_OVERFLOW_64		0xFFFFFFFFFFFFFFF0ULL
+>  #define COUNT 250
+>  #define MARGIN 100
+> +#define COUNT_INT 1000
+>  /*
+>   * PRE_OVERFLOW2 is set so that 1st @COUNT iterations do not
+>   * produce 32b overflow and 2nd @COUNT iterations do. To accommodate
+> @@ -978,13 +979,13 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+>  
+>  	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
+>  
+> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+>  	report(expect_interrupts(0), "no overflow interrupt after preset");
+>  
+>  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+>  	isb();
+>  
+> -	for (i = 0; i < 100; i++)
+> +	for (i = 0; i < COUNT_INT; i++)
+>  		write_sysreg(0x2, pmswinc_el0);
+>  
+>  	isb();
+> @@ -1002,15 +1003,15 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+>  	write_sysreg(ALL_SET_32, pmintenset_el1);
+>  	isb();
+>  
+> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+>  
+>  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+>  	isb();
+>  
+> -	for (i = 0; i < 100; i++)
+> +	for (i = 0; i < COUNT_INT; i++)
+>  		write_sysreg(0x3, pmswinc_el0);
+>  
+> -	mem_access_loop(addr, 200, pmu.pmcr_ro);
+> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro);
+>  	report_info("overflow=0x%lx", read_sysreg(pmovsclr_el0));
+>  	report(expect_interrupts(0x3),
+>  		"overflow interrupts expected on #0 and #1");
+> @@ -1029,7 +1030,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+>  	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
+>  	write_regn_el0(pmevcntr, 0, pre_overflow);
+>  	isb();
+> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+>  	report(expect_interrupts(0x1), "expect overflow interrupt");
+>  
+>  	/* overflow on odd counter */
+> @@ -1037,7 +1038,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+>  	write_regn_el0(pmevcntr, 0, pre_overflow);
+>  	write_regn_el0(pmevcntr, 1, all_set);
+>  	isb();
+> -	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+>  	if (overflow_at_64bits) {
+>  		report(expect_interrupts(0x1),
+>  		       "expect overflow interrupt on even counter");
+> -- 
+> 2.41.0
+> 
