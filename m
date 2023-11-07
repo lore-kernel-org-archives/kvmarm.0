@@ -1,36 +1,36 @@
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7D012E4B
-	for <kvmarm@lists.linux.dev>; Tue,  7 Nov 2023 10:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 062071CAB2
+	for <kvmarm@lists.linux.dev>; Tue,  7 Nov 2023 10:30:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="iWpNzX/i"
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aROF6+R2"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
 	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=AMLeOPj97UWFUJITi7pviQd/DMBECoV/Ju2iA1XroZM=; b=iWpNzX/iPGoOYZQkZm1FIQXbPq
-	l/1gVppyboPmC6oMcfXlstcdMZwkQemSDC3sAWAcxjAeobj3XzuPCbPhXny1YZMJO2nRHG63r3Mh0
-	jNvRH7k+2oC8ySGSAk8U2dvBaMevMXVHN0gC+MMpsqaWK0L8ihN0bQUJoxLPTYxrKgZM+Pjlih3fs
-	LcT8t4CZjhVC6MPxRxQ/d17Q4R2MW+G5mBgCs6797LrxnXap9B7GaDDQT/BHu44vMbeZ+KHsAGb5e
-	MKJai+jRkoPwqj8S97N9deRW2n8XWFl+QX4UABVhRevJwiRLKylNLlAEpPAjcV2W5jTxW4wJunXYc
-	Rs7uQr5g==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:54898 helo=rmk-PC.armlinux.org.uk)
+	bh=L39JlpOE9/9CplZsg27RCjms0dZNEQGXOpabTHId0/o=; b=aROF6+R2XtK3lBysJONjCeHJu/
+	U0NNYX04FcX0h+nxoECSlL4SEsjkNfvaaw4xMTtERNmuCQcpXy3lBZ/p1C2gXp2DLEUA3AGPzAike
+	GCMpQ66isY1S/EnSFhbj1irjZ5gi9Xhf3leVSG/I+988BPorw6vc2a/CHcZ7T08ZLnczR+jG805aN
+	jqer8K6Kevg8fYCGX6w8iTSJwDDXUf308eYJXMQ5ExiLUAwfJ4Un0bsKtRNXKblwQgzQj7MO8zdLW
+	jm21TPrOpkGvDW8oDhwIfnl7LetnsISGkqxbTU5KYqBO/J9vHp40UnF0UVjYTs8giDbilGTvza3Y1
+	6sknCDGg==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:54884 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1r0JLU-0000GD-0Y;
-	Tue, 07 Nov 2023 10:30:08 +0000
+	id 1r0JLQ-0000FU-0r;
+	Tue, 07 Nov 2023 10:30:04 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1r0JLV-00CTxS-QB; Tue, 07 Nov 2023 10:30:09 +0000
+	id 1r0JLQ-00CTxK-Ln; Tue, 07 Nov 2023 10:30:04 +0000
 In-Reply-To: <ZUoRY33AAHMc5ThW@shell.armlinux.org.uk>
 References: <ZUoRY33AAHMc5ThW@shell.armlinux.org.uk>
-From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 To: linux-pm@vger.kernel.org,
 	 loongarch@lists.linux.dev,
 	 linux-acpi@vger.kernel.org,
@@ -50,9 +50,10 @@ Cc: Salil Mehta <salil.mehta@huawei.com>,
 	 justin.he@arm.com,
 	 James Morse <james.morse@arm.com>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>
-Subject: [PATCH RFC 10/22] drivers: base: Move cpu_dev_init() after
- node_dev_init()
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Peter Zijlstra <peterz@infradead.org>
+Subject: [PATCH RFC 09/22] drivers: base: add arch_cpu_is_hotpluggable()
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -62,44 +63,57 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1r0JLV-00CTxS-QB@rmk-PC.armlinux.org.uk>
+Message-Id: <E1r0JLQ-00CTxK-Ln@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 07 Nov 2023 10:30:09 +0000
+Date: Tue, 07 Nov 2023 10:30:04 +0000
 
-From: James Morse <james.morse@arm.com>
+The differences between architecture specific implementations of
+arch_register_cpu() are down to whether the CPU is hotpluggable or not.
+Rather than overriding the weak version of arch_register_cpu(), provide
+a function that can be used to provide this detail instead.
 
-NUMA systems require the node descriptions to be ready before CPUs are
-registered. This is so that the node symlinks can be created in sysfs.
-
-Currently no NUMA platform uses GENERIC_CPU_DEVICES, meaning that CPUs
-are registered by arch code, instead of cpu_dev_init().
-
-Move cpu_dev_init() after node_dev_init() so that NUMA architectures
-can use GENERIC_CPU_DEVICES.
-
-Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
-Note: Jonathan's comment still needs addressing - see
-  https://lore.kernel.org/r/20230914121612.00006ac7@Huawei.com
----
- drivers/base/init.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/base/cpu.c  | 11 ++++++++++-
+ include/linux/cpu.h |  1 +
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/base/init.c b/drivers/base/init.c
-index 397eb9880cec..c4954835128c 100644
---- a/drivers/base/init.c
-+++ b/drivers/base/init.c
-@@ -35,8 +35,8 @@ void __init driver_init(void)
- 	of_core_init();
- 	platform_bus_init();
- 	auxiliary_bus_init();
--	cpu_dev_init();
- 	memory_dev_init();
- 	node_dev_init();
-+	cpu_dev_init();
- 	container_dev_init();
+diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
+index 58bb86091b34..221ffbeb1c9b 100644
+--- a/drivers/base/cpu.c
++++ b/drivers/base/cpu.c
+@@ -527,9 +527,18 @@ EXPORT_SYMBOL_GPL(cpu_is_hotpluggable);
+ #ifdef CONFIG_GENERIC_CPU_DEVICES
+ DEFINE_PER_CPU(struct cpu, cpu_devices);
+ 
++bool __weak arch_cpu_is_hotpluggable(int cpu)
++{
++	return false;
++}
++
+ int __weak arch_register_cpu(int cpu)
+ {
+-	return register_cpu(&per_cpu(cpu_devices, cpu), cpu);
++	struct cpu *c = &per_cpu(cpu_devices, cpu);
++
++	c->hotpluggable = arch_cpu_is_hotpluggable(cpu);
++
++	return register_cpu(c, cpu);
  }
+ 
+ #ifdef CONFIG_HOTPLUG_CPU
+diff --git a/include/linux/cpu.h b/include/linux/cpu.h
+index 1e982d63eae8..dcb89c987164 100644
+--- a/include/linux/cpu.h
++++ b/include/linux/cpu.h
+@@ -80,6 +80,7 @@ extern __printf(4, 5)
+ struct device *cpu_device_create(struct device *parent, void *drvdata,
+ 				 const struct attribute_group **groups,
+ 				 const char *fmt, ...);
++extern bool arch_cpu_is_hotpluggable(int cpu);
+ extern int arch_register_cpu(int cpu);
+ extern void arch_unregister_cpu(int cpu);
+ #ifdef CONFIG_HOTPLUG_CPU
 -- 
 2.30.2
 
