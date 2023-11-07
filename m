@@ -1,258 +1,146 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A0E8AD52
-	for <kvmarm@lists.linux.dev>; Tue,  7 Nov 2023 15:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E496C1476;
-	Tue,  7 Nov 2023 07:30:01 -0800 (PST)
-Received: from monolith (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CE22E3F703;
-	Tue,  7 Nov 2023 07:29:15 -0800 (PST)
-Date: Tue, 7 Nov 2023 15:29:57 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	andrew.jones@linux.dev, maz@kernel.org, oliver.upton@linux.dev,
-	jarichte@redhat.com
-Subject: Re: [kvm-unit-tests PATCH] arm: pmu-overflow-interrupt: Increase
- count values
-Message-ID: <ZUpX9VIlCB169opb@monolith>
-References: <20231103100139.55807-1-eric.auger@redhat.com>
- <ZUoIxznZwPyti254@monolith>
- <5d93f447-c2c5-4c41-b0ea-9108736a2372@redhat.com>
- <ZUpEPbILA-idXISd@monolith>
- <78773d4c-21b6-4366-a1ec-da42286d2458@redhat.com>
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F514321B3
+	for <kvmarm@lists.linux.dev>; Tue,  7 Nov 2023 17:48:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dabbelt.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="M0IFeJBw"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1cc53d0030fso47330625ad.0
+        for <kvmarm@lists.linux.dev>; Tue, 07 Nov 2023 09:48:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1699379288; x=1699984088; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ywd9froD7aOGJqc09ImjtHrARMhZvSCpgT2M8r3eM5I=;
+        b=M0IFeJBwiVQQPBAdHNhpUCFAvOxP04x0fNP8XmD6Tep2oy+KFEY4YY87uGHjYJcMm9
+         H4u8M7ATab1H1DNsRnvOvtD+cBQd2U188hMziaJ1y44szgYo3zwFD3IJpMQXtBt5S1rY
+         kA8vywsSlNj02rpyObPHwiXLYeD8JyFeV38kUNEAj0bD587sCDLBoWk2jUVqaAhXe0d+
+         Uangvs869jQZNlmJ8OWFWnT5pgzsj6ZZDc5JKjrT6vtaVIW0k11W38UCm4xcf+SINQ+n
+         s6P6VQyC0b/Fnq0qTkQFsoUQwU6Njz0LoLGyP2PSkZAt8TCl6dj2he1ffYQMWSa2IqjE
+         g0sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699379288; x=1699984088;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ywd9froD7aOGJqc09ImjtHrARMhZvSCpgT2M8r3eM5I=;
+        b=Yu3em8wvBMQzNK0TI+Bpqdz5wwOhKt641ypmE2RcsTDPgc5PgClgMbAV4Eu/uCni03
+         rbqikeXNYDjpUiGnqklRUtSrBb8KDc1g47JWgUs+OnJjsf4KyHzwjakCw4J6dgmEmvVN
+         bS02EvLxuUdENkGNiZnwTSuA0R2o3rYIUFbeHa0UDxU/GOW30pxsk+oqNiI1bSnuMn8t
+         NUYPepM3podYHQx1dTSCnuE3TWcRGkocN0VTPTRphiEpiHmwGXu7Ss3qsjSsy85/PxPx
+         lqDBshjMx8CXr6nCvGeICHjWeyeZ4VhRaleoQLO3qAS6kB40pt6TjpnyvGpKLyg5BTK6
+         Oo9Q==
+X-Gm-Message-State: AOJu0YxWA5lkf0HWcbIOzDAQCCgbPot+EwehcXN7bbekrU/kYX5OUXo3
+	hB4N3N03nOU/9jIhE3mg/guW2A==
+X-Google-Smtp-Source: AGHT+IE1O0IZeedx9DdABfISL9vUc/qLEJImXP8G88Ji0nXKSIqNVitCPYUEuOTU6Qgy+/VgBOwBhA==
+X-Received: by 2002:a17:902:d4ce:b0:1cc:32df:8ebd with SMTP id o14-20020a170902d4ce00b001cc32df8ebdmr5416391plg.25.1699379288440;
+        Tue, 07 Nov 2023 09:48:08 -0800 (PST)
+Received: from localhost ([192.184.165.199])
+        by smtp.gmail.com with ESMTPSA id iy3-20020a170903130300b001c9dac0fbbasm115552plb.63.2023.11.07.09.48.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Nov 2023 09:48:07 -0800 (PST)
+Date: Tue, 07 Nov 2023 09:48:07 -0800 (PST)
+X-Google-Original-Date: Tue, 07 Nov 2023 09:47:58 PST (-0800)
+Subject:     Re: [PATCH RFC 21/22] riscv: Switch over to GENERIC_CPU_DEVICES
+In-Reply-To: <E1r0JMQ-00CTyb-Ee@rmk-PC.armlinux.org.uk>
+CC: linux-pm@vger.kernel.org, loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
+  linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+  linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev, x86@kernel.org, linux-csky@vger.kernel.org,
+  linux-doc@vger.kernel.org, linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org,
+  salil.mehta@huawei.com, jean-philippe@linaro.org, jianyong.wu@arm.com, justin.he@arm.com,
+  james.morse@arm.com, Paul Walmsley <paul.walmsley@sifive.com>, aou@eecs.berkeley.edu
+From: Palmer Dabbelt <palmer@dabbelt.com>
+To: rmk+kernel@armlinux.org.uk
+Message-ID: <mhng-6d9a28af-d626-410e-913f-33bc01890537@palmer-ri-x1c9>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <78773d4c-21b6-4366-a1ec-da42286d2458@redhat.com>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi,
+On Tue, 07 Nov 2023 02:31:06 PST (-0800), rmk+kernel@armlinux.org.uk wrote:
+> From: James Morse <james.morse@arm.com>
+>
+> Now that GENERIC_CPU_DEVICES calls arch_register_cpu(), which can be
+> overridden by the arch code, switch over to this to allow common code
+> to choose when the register_cpu() call is made.
+>
+> This allows topology_init() to be removed.
+>
+> This is an intermediate step to the logic being moved to drivers/acpi,
+> where GENERIC_CPU_DEVICES will do the work when booting with acpi=off.
+>
+> This patch also has the effect of moving the registration of CPUs from
+> subsys to driver core initialisation, prior to any initcalls running.
+>
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+> Changes since RFC v2:
+>  * Add note about initialisation order change.
+> ---
+>  arch/riscv/Kconfig        |  1 +
+>  arch/riscv/kernel/setup.c | 19 ++++---------------
+>  2 files changed, 5 insertions(+), 15 deletions(-)
+>
+> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> index eaa15a20e6ae..264aa466aec3 100644
+> --- a/arch/riscv/Kconfig
+> +++ b/arch/riscv/Kconfig
+> @@ -69,6 +69,7 @@ config RISCV
+>  	select GENERIC_ARCH_TOPOLOGY
+>  	select GENERIC_ATOMIC64 if !64BIT
+>  	select GENERIC_CLOCKEVENTS_BROADCAST if SMP
+> +	select GENERIC_CPU_DEVICES
+>  	select GENERIC_EARLY_IOREMAP
+>  	select GENERIC_ENTRY
+>  	select GENERIC_GETTIMEOFDAY if HAVE_GENERIC_VDSO
+> diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
+> index 0624f44d43ec..f8875ae1b0aa 100644
+> --- a/arch/riscv/kernel/setup.c
+> +++ b/arch/riscv/kernel/setup.c
+> @@ -50,7 +50,6 @@ atomic_t hart_lottery __section(".sdata")
+>  #endif
+>  ;
+>  unsigned long boot_cpu_hartid;
+> -static DEFINE_PER_CPU(struct cpu, cpu_devices);
+>
+>  /*
+>   * Place kernel memory regions on the resource tree so that
+> @@ -295,23 +294,13 @@ void __init setup_arch(char **cmdline_p)
+>  	riscv_set_dma_cache_alignment();
+>  }
+>
+> -static int __init topology_init(void)
+> +int arch_register_cpu(int cpu)
+>  {
+> -	int i, ret;
+> +	struct cpu *c = &per_cpu(cpu_devices, cpu);
+>
+> -	for_each_possible_cpu(i) {
+> -		struct cpu *cpu = &per_cpu(cpu_devices, i);
+> -
+> -		cpu->hotpluggable = cpu_has_hotplug(i);
+> -		ret = register_cpu(cpu, i);
+> -		if (unlikely(ret))
+> -			pr_warn("Warning: %s: register_cpu %d failed (%d)\n",
+> -			       __func__, i, ret);
+> -	}
+> -
+> -	return 0;
+> +	c->hotpluggable = cpu_has_hotplug(cpu);
+> +	return register_cpu(c, cpu);
+>  }
+> -subsys_initcall(topology_init);
+>
+>  void free_initmem(void)
+>  {
 
-On Tue, Nov 07, 2023 at 03:28:12PM +0100, Eric Auger wrote:
-> 
-> 
-> On 11/7/23 15:05, Alexandru Elisei wrote:
-> > On Tue, Nov 07, 2023 at 02:34:05PM +0100, Eric Auger wrote:
-> >> Hi Alexandru,
-> >>
-> >> On 11/7/23 10:52, Alexandru Elisei wrote:
-> >>> Hi Eric,
-> >>>
-> >>> On Fri, Nov 03, 2023 at 11:01:39AM +0100, Eric Auger wrote:
-> >>>> On some hardware, some pmu-overflow-interrupt failures can be observed.
-> >>>> Although the even counter overflows, the interrupt is not seen as
-> >>>> expected. This happens in the subtest after "promote to 64-b" comment.
-> >>>> After analysis, the PMU overflow interrupt actually hits, ie.
-> >>>> kvm_pmu_perf_overflow() gets called and KVM_REQ_IRQ_PENDING is set,
-> >>>> as expected. However the PMCR.E is reset by the handle_exit path, at
-> >>>> kvm_pmu_handle_pmcr() before the next guest entry and
-> >>>> kvm_pmu_flush_hwstate/kvm_pmu_update_state subsequent call.
-> >>>> There, since the enable bit has been reset, kvm_pmu_update_state() does
-> >>>> not inject the interrupt into the guest.
-> >>>>
-> >>>> This does not seem to be a KVM bug but rather an unfortunate
-> >>>> scenario where the test disables the PMCR.E too closely to the
-> >>>> advent of the overflow interrupt.
-> >>> If I understand correctly, the KVM PMU, after receiving the hardware PMUIRQ and
-> >>> before injecting the interrupt, checks that the PMU is enabled according to the
-> >>> pseudocode for the function CheckForPMUOverflow(). CheckForPMUOverflow() returns
-> >>> false because PMCR_EL1.E is 0, so the KVM PMU decides not to inject the
-> >>> interrupt.
-> >>>
-> >>> Is that correct?
-> >> Yes that's correct
-> >>> Changing the number of SW_INCR events might not be optimal - for example,
-> >>> COUNT_INT > 100 might hide an error that otherwise would have been triggered if
-> >>> the number of events were 100. Not very likely, but still a possibility.
-> >> I also changed the COUNT for SW_INCR events to unify the code. However
-> >> this is not strictly necessary to fix the issue I encounter. I can
-> >> revert that change if you prefer.
-> > I don't understand how that would solve the problem. As I see it, the problem is
-> > that PMCR_EL1.E is cleared too fast after the PMU asserts the interrupt on
-> > overflow, not the time it takes to get to the overflow condition (i.e, the
-> > number of iterations mem_access_loop() does).
-> 
-> sorry I did not make my point clear. Indeed wrt SW_INCR overflow testing
-> I do not intend to fix any issue by this change. I just intended to use
-> the same number of iterations as for mem_access. So I will revert that
-> change.
-> >
-> >>> Another approach would be to wait for a set amount of time for the CPU to take
-> >>> the interrupt. There's something similar in timer.c::{test_timer_tval(),
-> >>> timer_do_wfi()}.
-> >> you're right. However this would urge me to have a separate asm code
-> >> that loops with wfi after doing the mem_access loop. I am not sure this
-> >> is worth the candle here?
-> > I think plain C would work, I was thinking something like this:
-> >
-> > diff --git a/arm/pmu.c b/arm/pmu.c
-> > index a91a7b1fd4be..fb2eb5fa2e50 100644
-> > --- a/arm/pmu.c
-> > +++ b/arm/pmu.c
-> > @@ -979,6 +979,23 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
-> >         /* interrupts are disabled (PMINTENSET_EL1 == 0) */
-> >
-> >         mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> Currently PMCR_E is reset by mem_access_loop() (at msr pmcr_el0,
-> xzr\n"). so if we want to introduce a delay between the overflow
-> interrupt and the PMCR.E disable, we need to either add extra MEM_ACCESS
-> or do wfi within mem_access_loop()
-
-Sorry, missed that.
-
-> Or we do something like what you suggest below and reset the PMCR_E
-> afterwards with the downside to add extra code execution accounted by
-> the PMU. I would prefer to avoid that since the purpose of having the
-> asm code was to "master" what we measure.
-
-Just an idea, we could re-enable the PMU in the C function right after the
-mem_loop(), which will get trapped and KVM will probably inject the
-interrupt because according to CheckForPMUOverflow() the PMUIRQ should be
-asserted.  This is just a theory, haven't tested this and haven't looked at
-the KVM code.
-
-I still think we should have the wait loop after re-enabling the PMU, just
-so the test is architecturally compliant (i.e., interrupts are not
-delivered instantaneously after the device asserts the interrupt to the
-GIC), but that could be left as an exercise for another patch.
-
-Thanks,
-Alex
-
-> > +
-> > +       if (!expect_interrupts(0)) {
-> > +                for (i = 0; i < 10; i++) {
-> > +                       local_irq_disable();
-> > +                       if (expect_interrupts(0)) {
-> > +                               local_irq_enable();
-> > +                               break;
-> > +                       }
-> > +                       report_info("waiting for interrupt...");
-> > +                       wfi();
-> > +                       local_irq_enable();
-> > +                       if (expect_interrupts(0))
-> > +                               break;
-> > +                        mdelay(100);
-> > +                }
-> > +       }
-> > +
-> >         report(expect_interrupts(0), "no overflow interrupt after preset");
-> >
-> >         set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >
-> > Can be cleaned up by moving it to separate function, etc. Has the downside that
-> > it may performs extra memory accesses in expect_interrupts(). Your choice.
-> >
-> > By the way, pmu_stats is not declared volatile, which means that the
-> > compiler is free to optimize accesses to the struct by caching previously
-> > read values in registers. Have you tried declaring it as volatile, in case
-> > that fixes the issues you were seeing?
-> In my case it won't fix the issue because the stats match what happens
-> but your suggestion makes total sense in general.
-> 
-> I will add that.
-> 
-> Eric
-> >
-> > If you do decide to go with the above suggestion, I strongly suggest
-> > pmu_stats is declared as volatile, otherwise the compiler will likely end
-> > up not reading from memory on every iteration.
-> >
-> > Thanks,
-> > Alex
-> >> Thanks!
-> >>
-> >> Eric
-> >>> Thanks,
-> >>> Alex
-> >>>
-> >>>> Since it looks like a benign and inlikely case, let's resize the number
-> >>>> of iterations to prevent the PMCR enable bit from being resetted
-> >>>> at the same time as the actual overflow event.
-> >>>>
-> >>>> COUNT_INT is introduced, arbitrarily set to 1000 iterations and is
-> >>>> used in this test.
-> >>>>
-> >>>> Reported-by: Jan Richter <jarichte@redhat.com>
-> >>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>>> ---
-> >>>>  arm/pmu.c | 15 ++++++++-------
-> >>>>  1 file changed, 8 insertions(+), 7 deletions(-)
-> >>>>
-> >>>> diff --git a/arm/pmu.c b/arm/pmu.c
-> >>>> index a91a7b1f..acd88571 100644
-> >>>> --- a/arm/pmu.c
-> >>>> +++ b/arm/pmu.c
-> >>>> @@ -66,6 +66,7 @@
-> >>>>  #define PRE_OVERFLOW_64		0xFFFFFFFFFFFFFFF0ULL
-> >>>>  #define COUNT 250
-> >>>>  #define MARGIN 100
-> >>>> +#define COUNT_INT 1000
-> >>>>  /*
-> >>>>   * PRE_OVERFLOW2 is set so that 1st @COUNT iterations do not
-> >>>>   * produce 32b overflow and 2nd @COUNT iterations do. To accommodate
-> >>>> @@ -978,13 +979,13 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
-> >>>>  
-> >>>>  	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
-> >>>>  
-> >>>> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >>>> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >>>>  	report(expect_interrupts(0), "no overflow interrupt after preset");
-> >>>>  
-> >>>>  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >>>>  	isb();
-> >>>>  
-> >>>> -	for (i = 0; i < 100; i++)
-> >>>> +	for (i = 0; i < COUNT_INT; i++)
-> >>>>  		write_sysreg(0x2, pmswinc_el0);
-> >>>>  
-> >>>>  	isb();
-> >>>> @@ -1002,15 +1003,15 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
-> >>>>  	write_sysreg(ALL_SET_32, pmintenset_el1);
-> >>>>  	isb();
-> >>>>  
-> >>>> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >>>> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >>>>  
-> >>>>  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >>>>  	isb();
-> >>>>  
-> >>>> -	for (i = 0; i < 100; i++)
-> >>>> +	for (i = 0; i < COUNT_INT; i++)
-> >>>>  		write_sysreg(0x3, pmswinc_el0);
-> >>>>  
-> >>>> -	mem_access_loop(addr, 200, pmu.pmcr_ro);
-> >>>> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro);
-> >>>>  	report_info("overflow=0x%lx", read_sysreg(pmovsclr_el0));
-> >>>>  	report(expect_interrupts(0x3),
-> >>>>  		"overflow interrupts expected on #0 and #1");
-> >>>> @@ -1029,7 +1030,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
-> >>>>  	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
-> >>>>  	write_regn_el0(pmevcntr, 0, pre_overflow);
-> >>>>  	isb();
-> >>>> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >>>> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >>>>  	report(expect_interrupts(0x1), "expect overflow interrupt");
-> >>>>  
-> >>>>  	/* overflow on odd counter */
-> >>>> @@ -1037,7 +1038,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
-> >>>>  	write_regn_el0(pmevcntr, 0, pre_overflow);
-> >>>>  	write_regn_el0(pmevcntr, 1, all_set);
-> >>>>  	isb();
-> >>>> -	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >>>> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >>>>  	if (overflow_at_64bits) {
-> >>>>  		report(expect_interrupts(0x1),
-> >>>>  		       "expect overflow interrupt on even counter");
-> >>>> -- 
-> >>>> 2.41.0
-> >>>>
-> 
+Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
