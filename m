@@ -1,101 +1,98 @@
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F90D270
-	for <kvmarm@lists.linux.dev>; Wed,  8 Nov 2023 09:46:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.53])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4SQKqV1w8kzMmdW;
-	Wed,  8 Nov 2023 17:41:58 +0800 (CST)
-Received: from [10.174.185.210] (10.174.185.210) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Wed, 8 Nov 2023 17:45:52 +0800
-Subject: Re: [RFC PATCH] KVM: arm/arm64: GICv4: Support shared VLPI
-To: Marc Zyngier <maz@kernel.org>, <dongli.zhang@oracle.com>,
-	<cohuck@redhat.com>, <jasowang@redhat.com>, <stefanha@redhat.com>,
-	<mst@redhat.com>
-CC: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
-	Gavin Shan <gshan@redhat.com>, Jean-Philippe Brucker
-	<jean-philippe@linaro.org>, "open list:IRQCHIP DRIVERS"
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <wanghaibin.wang@huawei.com>
-References: <20231102143507.840-1-jiangkunkun@huawei.com>
- <87msvt6cc7.wl-maz@kernel.org>
- <1fb8353e-e9c4-2570-c2ca-ec537c18ac4d@huawei.com>
- <86edh228xx.wl-maz@kernel.org>
-From: Kunkun Jiang <jiangkunkun@huawei.com>
-Message-ID: <952bd5dc-dd20-acc3-d77e-c9b14e5728d3@huawei.com>
-Date: Wed, 8 Nov 2023 17:45:51 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E411199A5
+	for <kvmarm@lists.linux.dev>; Wed,  8 Nov 2023 17:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l6cxZwmD"
+Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5844bc378feso3849486eaf.0
+        for <kvmarm@lists.linux.dev>; Wed, 08 Nov 2023 09:00:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699462842; x=1700067642; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1LRS4MOzwpv79nEdyxX9W+Fzi/lnfht07XTGfi+1KqQ=;
+        b=l6cxZwmDVwdUoEuIpz2D6UbTfnn5pCndEOirBvTZfzcXY54s95uMQfU41iuiP3EBWq
+         sgSB7Nk4G3fclQfopISpJ5PU62TwrkqenQ2GEypFGwW1uJvQ0oWiN3aIfs7sj902oQPV
+         0bAoBTPg9voZd003qUGxPKZ9+QmrULjz5mg+ELilzECbtPeY3SsVi2CtNeCTfpZdGMXs
+         rl9FLuXE8+vGQz2tawFxnO+h6nooycYMIklpH1cAuujBxF+nknA4rp0+DNGAyhworUCk
+         xV9j/kx2ixQnwilsZKrIL6Bicu+1IJRg3qV4FKDer3GsugyZh0pbTsdXEccNyibxbVmY
+         FLww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699462842; x=1700067642;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1LRS4MOzwpv79nEdyxX9W+Fzi/lnfht07XTGfi+1KqQ=;
+        b=Ljhz9EW8YuoQkng2ljGY99yA+D43rkUP+lo5eZ/mvqgcSVx4+MhJFPWpQ3V65hTBWz
+         1CsGnLaJdXLy69ENDffur8E41eUscoyKga8nr6wivJCu3eKA6jwBxFGfAUOss+OVojc1
+         gcdUL+fAStXuJG8wNx7VrA6w7ggLvXINPKpVVhwhQ+nOSyRFZ7m8ibbehFoYTRVbC+ht
+         LzV/QegHmPRQmRtQCvi+616nWgXxj+9tMR6Gf2UzQhx32wfaduEjs1oKjSqIj6vjf1Qh
+         oXBs47Wae8ZV9Be2f+IHwxZ3r1g7ms15K8Enixt1VKwGgINSz80Njr2sCJjEfib91qXl
+         dVWg==
+X-Gm-Message-State: AOJu0Yw0JwlVpYrED8ZhkaV8hV8I7/fx5rAXvuAnOda4D/n9g4ZllAnq
+	n63Cbf2vaUz4rurAdegsm+JHk8c5yXEFyWEwmBiW1g==
+X-Google-Smtp-Source: AGHT+IFUowk4ELsOivnzaXxc0QlUV4Wvcfh03Hm5SSyMQjwcPTJCFQB+7xIvrXwxFUaSBNJXJhJv8dNqTjB0k78gAdI=
+X-Received: by 2002:a4a:bd87:0:b0:589:df75:2d83 with SMTP id
+ k7-20020a4abd87000000b00589df752d83mr1373195oop.1.1699462842423; Wed, 08 Nov
+ 2023 09:00:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <86edh228xx.wl-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.174.185.210]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm000007.china.huawei.com (7.193.23.189)
-X-CFilter-Loop: Reflected
+References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-28-pbonzini@redhat.com>
+In-Reply-To: <20231105163040.14904-28-pbonzini@redhat.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Wed, 8 Nov 2023 09:00:00 -0800
+Message-ID: <CAF7b7mrGYuyjyEPAesYzZ6+KDuNAmvRxEonT7JC8NDPsSP+qDA@mail.gmail.com>
+Subject: Re: [PATCH 27/34] KVM: selftests: Introduce VM "shape" to allow tests
+ to specify the VM type
+To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Marc,
+This commit breaks the arm64 selftests build btw: looks like a simple overs=
+ight?
 
-On 2023/11/6 23:33, Marc Zyngier wrote:
-> On Mon, 06 Nov 2023 14:59:01 +0000,
-> Kunkun Jiang <jiangkunkun@huawei.com> wrote:
->> The virtio-pci driver write entry1-6
->> massage.data in the msix-table and trap to QEMU for processing. The
->> massage.data is as follow:
->>> entry-0 0
->>> entry-1 1
->>> entry-2 1
->>> entry-3 1
->>> entry-4 1
->>> entry-5 1
->>> entry-6 1
-> Urgh... is vp_modern_queue_vector() used in your configuration? This
-> is ... terrible.
-I encountered this problem using the 4.19 version kernel, but not the
-5.10 version. This vp_modern_queue_vector() function does not exist
-in 4.19, but it uses 'vp_iowrite16(msix_vec, &cfg->queue_msix_vector)',
-the same as vp_modern_queue_vector().
-
-In the past two days, I learned about the virtio driver and made some
-new discoveries. When 'num_queues' is greater than maxcpus, it will
-fall back into MSI-X with one shared for queues. The two patches[1],
-submitted by Dongli, limits the number of hw queues used by
-virtio-blk/virtio-scsi by 'nr_cpu_ids'. The two patches were merged
-in 5.1-rc2. And the patch related virtio-blk was merged into the 4.19
-stable branch.The patch related virtio-scsi was not merged.
-[1] 
-https://lore.kernel.org/all/1553682995-5682-1-git-send-email-dongli.zhang@oracle.com/
-
-This is the earliest discussion.
-https://lore.kernel.org/all/e4afe4c5-0262-4500-aeec-60f30734b4fc@default/
-
-I don't know if there are other circumstances that would cause it to
-fall back into MSI-X with one shared for queues. At least the hack
-method is possible.
-> I wonder if PCIe actually allows this sort of thing.
-Do you think the virtio driver should be modified?
-> In any case, this sort of behaviour breaks so many thing in KVM's
-> implementation that I'd recommend you disable GICv4 until we have a
-> good solution for that.
-There seems to be no restriction in the GIC specification that multiple
-host irqs cannot be mapped to the same vlpi. Or maybe I didn't notice.
-Do you think there are any risks?
-
-GICv3 does not have this issue, but is this configuration legal?
-
-Thanks,
-Kunkun Jiang
+$ cd ${LINUX_ROOT}/tools/testing/selftests/kvm
+$ CROSS_COMPILE=3Daarch64-linux-gnu- ARCH=3Darm64 make
+# ...
+aarch64/page_fault_test.c: In function =E2=80=98run_test=E2=80=99:
+aarch64/page_fault_test.c:708:28: error: incompatible type for
+argument 1 of =E2=80=98____vm_create=E2=80=99
+  708 |         vm =3D ____vm_create(mode);
+         |                            ^~~~
+         |                            |
+         |                            enum vm_guest_mode
+In file included from include/kvm_util.h:10,
+                 from aarch64/page_fault_test.c:14:
+include/kvm_util_base.h:806:46: note: expected =E2=80=98struct vm_shape=E2=
+=80=99 but
+argument is of type =E2=80=98enum vm_guest_mode=E2=80=99
+  806 | struct kvm_vm *____vm_create(struct vm_shape shape);
