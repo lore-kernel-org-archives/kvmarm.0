@@ -1,98 +1,99 @@
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E411199A5
-	for <kvmarm@lists.linux.dev>; Wed,  8 Nov 2023 17:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D59374FB
+	for <kvmarm@lists.linux.dev>; Wed,  8 Nov 2023 23:37:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l6cxZwmD"
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5844bc378feso3849486eaf.0
-        for <kvmarm@lists.linux.dev>; Wed, 08 Nov 2023 09:00:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lrf090ma"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5af592fed43so3375337b3.2
+        for <kvmarm@lists.linux.dev>; Wed, 08 Nov 2023 15:37:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699462842; x=1700067642; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1LRS4MOzwpv79nEdyxX9W+Fzi/lnfht07XTGfi+1KqQ=;
-        b=l6cxZwmDVwdUoEuIpz2D6UbTfnn5pCndEOirBvTZfzcXY54s95uMQfU41iuiP3EBWq
-         sgSB7Nk4G3fclQfopISpJ5PU62TwrkqenQ2GEypFGwW1uJvQ0oWiN3aIfs7sj902oQPV
-         0bAoBTPg9voZd003qUGxPKZ9+QmrULjz5mg+ELilzECbtPeY3SsVi2CtNeCTfpZdGMXs
-         rl9FLuXE8+vGQz2tawFxnO+h6nooycYMIklpH1cAuujBxF+nknA4rp0+DNGAyhworUCk
-         xV9j/kx2ixQnwilsZKrIL6Bicu+1IJRg3qV4FKDer3GsugyZh0pbTsdXEccNyibxbVmY
-         FLww==
+        d=google.com; s=20230601; t=1699486645; x=1700091445; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oIcgmcP1EY6htEGo1pN6EVJRVE+qt/I8BKL1s/KEy5I=;
+        b=Lrf090mabu0W+hlQ/Xzv+HUiFzdRgTojD1eZJqGusjWxhW0RGr0x94heXXmIoRCirr
+         emMWGf21U/ieFGDaSmQySCB/moTE0B13YkfpjgdcZ/+hMiDhzTGAPEZh+J+FMerA7tit
+         5WR+6oDZXR+cWb5zHKea5CzN/dQwjo8mLmRPgvmWblGAx9Sf8b9OREVSq525y7kw/pvS
+         4ICPXFJom+ERefzydGhAFb/lbwJASy+OuxdacQiPaNIuUGZf/lKsjpkUClvNuDtJylsX
+         1yYfIFg2hdAqMR0EqXsZEqdEfXsQuVTilEP22wUMVN8wi2uzdsi3q23dYbXlggpztcjx
+         hLtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699462842; x=1700067642;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1LRS4MOzwpv79nEdyxX9W+Fzi/lnfht07XTGfi+1KqQ=;
-        b=Ljhz9EW8YuoQkng2ljGY99yA+D43rkUP+lo5eZ/mvqgcSVx4+MhJFPWpQ3V65hTBWz
-         1CsGnLaJdXLy69ENDffur8E41eUscoyKga8nr6wivJCu3eKA6jwBxFGfAUOss+OVojc1
-         gcdUL+fAStXuJG8wNx7VrA6w7ggLvXINPKpVVhwhQ+nOSyRFZ7m8ibbehFoYTRVbC+ht
-         LzV/QegHmPRQmRtQCvi+616nWgXxj+9tMR6Gf2UzQhx32wfaduEjs1oKjSqIj6vjf1Qh
-         oXBs47Wae8ZV9Be2f+IHwxZ3r1g7ms15K8Enixt1VKwGgINSz80Njr2sCJjEfib91qXl
-         dVWg==
-X-Gm-Message-State: AOJu0Yw0JwlVpYrED8ZhkaV8hV8I7/fx5rAXvuAnOda4D/n9g4ZllAnq
-	n63Cbf2vaUz4rurAdegsm+JHk8c5yXEFyWEwmBiW1g==
-X-Google-Smtp-Source: AGHT+IFUowk4ELsOivnzaXxc0QlUV4Wvcfh03Hm5SSyMQjwcPTJCFQB+7xIvrXwxFUaSBNJXJhJv8dNqTjB0k78gAdI=
-X-Received: by 2002:a4a:bd87:0:b0:589:df75:2d83 with SMTP id
- k7-20020a4abd87000000b00589df752d83mr1373195oop.1.1699462842423; Wed, 08 Nov
- 2023 09:00:42 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699486645; x=1700091445;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=oIcgmcP1EY6htEGo1pN6EVJRVE+qt/I8BKL1s/KEy5I=;
+        b=ujSo2O9MaltWo5prWMbZpy3u355N55oaj/dgmntHU1IfCfzOoDCbtB8keAwCXO4+qj
+         J8S/qshmhzKGmHn9rKt/0U1+7eMX3AcYyRknDpgn1q/9UWz3A3M7ULA/8q9PfRYPjhmz
+         A6FijAzEacrkC7xj5zky5HwEfUp3e8XIIUiBIPwOfsOXvJ7Z8wIoZ3zNuZRhpdjtaZsZ
+         OMIu1thxN//u/j8zx2hze+5CnZ7OZeOBFAh35rTWGvsb0NoQnb/IPdwvKYdGPCWb52/7
+         OSsvInim+l/7Ja2QN2e3wmNGS5e1aE6ZiRG0dYPn6y5KwKTRQZF+0VTmxZMEhlDdJDnx
+         Xu5Q==
+X-Gm-Message-State: AOJu0YyBLFMMWSe3BLyY28D84SciMt4uXHGwt7aPkIH8kI53Bq2+PQSJ
+	3QQDBfFEMLUnLOrRBWd704doiXnz1k0Fmg==
+X-Google-Smtp-Source: AGHT+IEQyf2yih5ALlCfgSEkVLSLt0Zq5IBGBmP/Cna+y8K3zSa/6bcCrG6olPCsXpdGmctjh3MSlNk2LvNOvw==
+X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
+ (user=amoorthy job=sendgmr) by 2002:a05:6902:102:b0:da3:723b:b2a4 with SMTP
+ id o2-20020a056902010200b00da3723bb2a4mr72222ybh.7.1699486645232; Wed, 08 Nov
+ 2023 15:37:25 -0800 (PST)
+Date: Wed,  8 Nov 2023 23:37:19 +0000
+In-Reply-To: <CAF7b7mrGYuyjyEPAesYzZ6+KDuNAmvRxEonT7JC8NDPsSP+qDA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-28-pbonzini@redhat.com>
-In-Reply-To: <20231105163040.14904-28-pbonzini@redhat.com>
-From: Anish Moorthy <amoorthy@google.com>
-Date: Wed, 8 Nov 2023 09:00:00 -0800
-Message-ID: <CAF7b7mrGYuyjyEPAesYzZ6+KDuNAmvRxEonT7JC8NDPsSP+qDA@mail.gmail.com>
+Mime-Version: 1.0
+References: <CAF7b7mrGYuyjyEPAesYzZ6+KDuNAmvRxEonT7JC8NDPsSP+qDA@mail.gmail.com>
+X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
+Message-ID: <20231108233723.3380042-1-amoorthy@google.com>
 Subject: Re: [PATCH 27/34] KVM: selftests: Introduce VM "shape" to allow tests
  to specify the VM type
-To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+From: Anish Moorthy <amoorthy@google.com>
+To: amoorthy@google.com
+Cc: ackerleytng@google.com, akpm@linux-foundation.org, anup@brainfault.org, 
+	aou@eecs.berkeley.edu, brauner@kernel.org, chao.p.peng@linux.intel.com, 
+	chenhuacai@kernel.org, david@redhat.com, dmatlack@google.com, 
+	isaku.yamahata@gmail.com, isaku.yamahata@intel.com, jarkko@kernel.org, 
+	kirill.shutemov@linux.intel.com, kvm-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev, liam.merwick@oracle.com, 
+	linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org, linux-mm@kvack.org, 
+	linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, 
+	mail@maciej.szmigiero.name, maz@kernel.org, mic@digikod.net, 
+	michael.roth@amd.com, mpe@ellerman.id.au, oliver.upton@linux.dev, 
+	palmer@dabbelt.com, paul.walmsley@sifive.com, pbonzini@redhat.com, 
+	qperret@google.com, seanjc@google.com, tabba@google.com, 
+	vannapurve@google.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
+	wei.w.wang@intel.com, willy@infradead.org, xiaoyao.li@intel.com, 
+	yilun.xu@intel.com, yu.c.zhang@linux.intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-This commit breaks the arm64 selftests build btw: looks like a simple overs=
-ight?
+On Wed, Nov 8, 2023 at 9:00=E2=80=AFAM Anish Moorthy <amoorthy@google.com> =
+wrote:
+>
+> This commit breaks the arm64 selftests build btw: looks like a simple ove=
+rsight?
 
-$ cd ${LINUX_ROOT}/tools/testing/selftests/kvm
-$ CROSS_COMPILE=3Daarch64-linux-gnu- ARCH=3Darm64 make
-# ...
-aarch64/page_fault_test.c: In function =E2=80=98run_test=E2=80=99:
-aarch64/page_fault_test.c:708:28: error: incompatible type for
-argument 1 of =E2=80=98____vm_create=E2=80=99
-  708 |         vm =3D ____vm_create(mode);
-         |                            ^~~~
-         |                            |
-         |                            enum vm_guest_mode
-In file included from include/kvm_util.h:10,
-                 from aarch64/page_fault_test.c:14:
-include/kvm_util_base.h:806:46: note: expected =E2=80=98struct vm_shape=E2=
-=80=99 but
-argument is of type =E2=80=98enum vm_guest_mode=E2=80=99
-  806 | struct kvm_vm *____vm_create(struct vm_shape shape);
+Yup, fix is a one-liner. Posted below.
+
+diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/=
+testing/selftests/kvm/aarch64/page_fault_test.c
+index eb4217b7c768..08a5ca5bed56 100644
+--- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
++++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+@@ -705,7 +705,7 @@ static void run_test(enum vm_guest_mode mode, void *arg=
+)
+=20
+ 	print_test_banner(mode, p);
+=20
+-	vm =3D ____vm_create(mode);
++	vm =3D ____vm_create(VM_SHAPE(mode));
+ 	setup_memslots(vm, p);
+ 	kvm_vm_elf_load(vm, program_invocation_name);
+ 	setup_ucall(vm);
