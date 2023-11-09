@@ -1,206 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E672031C
-	for <kvmarm@lists.linux.dev>; Thu,  9 Nov 2023 15:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33546374DF
+	for <kvmarm@lists.linux.dev>; Thu,  9 Nov 2023 21:03:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lXoHv42F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E7A3C433C8;
-	Thu,  9 Nov 2023 15:34:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699544058;
-	bh=8jkAy+EFAO7hgfx3NOP4D1/XUrFECQWnDFFsKhV3lLg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lXoHv42F70vQWgFxCDIWo3Dm9YB2teGltGZaULFCw3jvw/Nc62Nglat6/ohYyt+k/
-	 T9SN+0StL14bxUHVms7KNVIsDhGxcY0MMhT3OECK6rxkOOFtqPlXESoXoO47CS/QxR
-	 5oU9tYxsLRZzi6Q81SMOOSsOYaP3UyXlIgmxIEdEWckgpw6gk6jMdPNL+bpsUj6cF5
-	 Stdc85X6OLRWQpxtHh0Mzq2EVdgQYng5fNrFS/Ib3mEbufpLO/ColwaluDTa+QB0H4
-	 sHa7CcJUIlmCOIb8GSaiwdLn+mRrq0ZPkBa0UBYTk086IcOBdWz1wMadu3y/psaeI+
-	 4ugw+qhvd5DQA==
-Date: Thu, 9 Nov 2023 16:34:10 +0100
-From: Lorenzo Pieralisi <lpieralisi@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
-	ankita@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
-	aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
-	targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
-	apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 2/2] KVM: arm64: allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
-Message-ID: <ZUz78gFPgMupew+m@lpieralisi>
-References: <ZQIFfqgR5zcidRR3@nvidia.com>
- <ZRKW6uDR/+eXYMzl@lpieralisi>
- <ZRLiDf204zCpO6Mv@arm.com>
- <ZR6IZwcFNw55asW0@lpieralisi>
- <20231012123541.GB11824@willie-the-truck>
- <ZSf6Ue09IO6QMBs1@arm.com>
- <20231012144807.GA12374@willie-the-truck>
- <ZSgsKSCv-zWgtWkm@arm.com>
- <20231013092934.GA13524@willie-the-truck>
- <ZSlBOiebenPKXBY4@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l/dSl1gf"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d9a5a3f2d4fso1598508276.3
+        for <kvmarm@lists.linux.dev>; Thu, 09 Nov 2023 13:03:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699563824; x=1700168624; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=e/ZPH+fW+W+TWa6v1thwgh3xl/A5VwjzOhARfEMfmNg=;
+        b=l/dSl1gfwS95xLJJcoYstPKj/MGu0JmqH1SEEZ/lzYuuNlOIh5RSFPVQwfKETOF11J
+         fzFCMqd0SGBCONGOuq28P6iyjL/X7l+mjihJSWOksgdntV7jSvqWblgqbsSYd0q7NZgJ
+         QGE6U0x9gBGnCVQJBkoPMkPwwT9yMFQsTmfJHZwdgn5Oh6Kv0tcgeGZYM9lnhzpkDxMe
+         y3fF7l1huIrh2feE2b2VIk25119jkHXKtoWV4u7RmYJlTAHhwez6cYMf/4txcGR97AQJ
+         B6pJWmmiFKwLJb62QN5B03oOZUKy6B58kvki/NJIK18K29Dt6FTKTrlDsVDIsotqJ1Hx
+         MvIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699563824; x=1700168624;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e/ZPH+fW+W+TWa6v1thwgh3xl/A5VwjzOhARfEMfmNg=;
+        b=IhlrwVBO5fxp4Vk03PGG/qliJLBxB2cE9def4N/2/F/v41bJywKdD9Ns7aFPkA0jLx
+         u2VZaK118U+OQDCaHROLyHgqzDqT2fm2IzZlr/Nv2K8F+CCiSzDV4jIYRw6YvtnK5SGQ
+         iYjc1RzKooRmtP74OuA+EsRfy6osAsGSUsHx2zOWxRa9s3gJOQ/bstiHydUKqQubXpwH
+         vtgfmXFOCcqTcmHZuydbxUUEJt7ztbHjMi0MMaX5/wRVbdR9fCeNy5oWkr1n8hWXhbUs
+         euTY7SLQOAl9JQPTyrCCY/RO+mM74svhKXYaeOcDvDsVZPOSZGWXmVBJ+OY58ujS32+Z
+         lnjA==
+X-Gm-Message-State: AOJu0YwlH7Clrm7w8bMBehJpdTSZnZQCaJmm69V1xbPF/vkBhOhrLJ78
+	eYk+jJ1fnlhOkxhlVXpzK1M3hgiW8+/86w==
+X-Google-Smtp-Source: AGHT+IGaEfaKBu+8pNYilCRAtbdsyMyIV0FpZwyPySRyn2xcyuTHN8dL3ZSfFTUzVJm9BYhJ0Q8k+CrUz239dw==
+X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
+ (user=amoorthy job=sendgmr) by 2002:a25:828e:0:b0:d9c:bdff:e45a with SMTP id
+ r14-20020a25828e000000b00d9cbdffe45amr176664ybk.12.1699563824210; Thu, 09 Nov
+ 2023 13:03:44 -0800 (PST)
+Date: Thu,  9 Nov 2023 21:03:12 +0000
+In-Reply-To: <20231109210325.3806151-1-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZSlBOiebenPKXBY4@arm.com>
+Mime-Version: 1.0
+References: <20231109210325.3806151-1-amoorthy@google.com>
+X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
+Message-ID: <20231109210325.3806151-2-amoorthy@google.com>
+Subject: [PATCH v6 01/14] KVM: Documentation: Clarify meaning of
+ hva_to_pfn()'s 'atomic' parameter
+From: Anish Moorthy <amoorthy@google.com>
+To: seanjc@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: oliver.upton@linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	robert.hoo.linux@gmail.com, jthoughton@google.com, amoorthy@google.com, 
+	dmatlack@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	nadav.amit@gmail.com, isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Oct 13, 2023 at 02:08:10PM +0100, Catalin Marinas wrote:
+The current docstring can be read as "atomic -> allowed to sleep," when
+in fact the intended statement is "atomic -> NOT allowed to sleep." Make
+that clearer in the docstring.
 
-[...]
+Signed-off-by: Anish Moorthy <amoorthy@google.com>
+---
+ virt/kvm/kvm_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> > > Things can go wrong but that's not because Device does anything better.
-> > > Given the RAS implementation, external aborts caused on Device memory
-> > > (e.g. wrong size access) is uncontainable. For Normal NC it can be
-> > > contained (I can dig out the reasoning behind this if you want, IIUC
-> > > something to do with not being able to cancel an already issued Device
-> > > access since such accesses don't allow speculation due to side-effects;
-> > > for Normal NC, it's just about the software not getting the data).
-> > 
-> > I really think these details belong in the commit message.
-> 
-> I guess another task for Lorenzo ;).
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 9170a61ea99f..687374138cfd 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2983,7 +2983,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
+ /*
+  * Pin guest page in memory and return its pfn.
+  * @addr: host virtual address which maps memory to the guest
+- * @atomic: whether this function can sleep
++ * @atomic: whether this function is forbidden from sleeping
+  * @interruptible: whether the process can be interrupted by non-fatal signals
+  * @async: whether this function need to wait IO complete if the
+  *         host page is not in the memory
+-- 
+2.42.0.869.gea05f2083d-goog
 
-Updated commit log (it might be [is] too verbose) below, it should probably
-be moved into a documentation file but to do that I should decouple
-it from this changeset (ie a document explaining memory attributes
-and error containment for ARM64 - indipendent from KVM S2 defaults).
-
-I'd also add a Link: to the lore archive entry for reference (did not
-add it in the log below).
-
-Please let me know what's the best option here.
-
-Thanks,
-Lorenzo
-
--- >8 --
-Currently, KVM for ARM64 maps at stage 2 memory that is
-considered device (ie it is not RAM) with DEVICE_nGnRE
-memory attributes; this setting overrides (as per the ARM
-architecture [1]) any device MMIO mapping present at stage
-1, resulting in a set-up whereby a guest operating system
-can't determine device MMIO mapping memory attributes on its
-own but it is always overriden by the KVM stage 2 default.
-
-This set-up does not allow guest operating systems to select
-device memory attributes on a page by page basis independently
-from KVM stage-2 mappings (refer to [1], "Combining stage 1 and stage
-2 memory type attributes"), which turns out to be an issue in that
-guest operating systems (eg Linux) may request to map
-devices MMIO regions with memory attributes that guarantee
-better performance (eg gathering attribute - that for some
-devices can generate larger PCIe memory writes TLPs)
-and specific operations (eg unaligned transactions) such as
-the NormalNC memory type.
-
-The default device stage 2 mapping was chosen in KVM
-for ARM64 since it was considered safer (ie it would
-not allow guests to trigger uncontained failures
-ultimately crashing the machine) but this turned out
-to be imprecise.
-
-Failures containability is a property of the platform
-and is independent from the memory type used for MMIO
-device memory mappings.
-
-Actually, DEVICE_nGnRE memory type is even more problematic
-than eg Normal-NC memory type in terms of faults containability
-in that eg aborts triggered on DEVICE_nGnRE loads cannot be made,
-architecturally, synchronous (ie that would imply that the processor
-should issue at most 1 load transaction at a time - ie it can't pipeline
-them - otherwise the synchronous abort semantics would break the
-no-speculation attribute attached to DEVICE_XXX memory).
-
-This means that regardless of the combined stage1+stage2 mappings a
-platform is safe if and only if device transactions cannot trigger
-uncontained failures and that in turn relies on platform
-capabilities and the device type being assigned (ie PCIe AER/DPC
-error containment and RAS architecture[3]); therefore the default
-KVM device stage 2 memory attributes play no role in making device
-assignment safer for a given platform (if the platform design
-adheres to design guidelines outlined in [3]) and therefore can
-be relaxed.
-
-For all these reasons, relax the KVM stage 2 device
-memory attributes from DEVICE_nGnRE to Normal-NC.
-
-A different Normal memory type default at stage-2
-(eg Normal Write-through) could have been chosen
-instead of Normal-NC but Normal-NC was chosen
-because:
-
-- Its attributes are well-understood compared to
-  other Normal memory types for MMIO mappings
-- On systems implementing S2FWB (FEAT_S2FWB), that's the only sensible
-  default for normal memory types. For systems implementing
-  FEAT_S2FWB (see [1] D8.5.5 S2=stage-2 - S2 MemAttr[3:0]), the options
-  to choose the memory types are as follows:
-
-  if S2 MemAttr[2] == 0, the mapping defaults to DEVICE_XXX
-  (XXX determined by S2 MemAttr[1:0]). This is what we have
-  today (MemAttr[2:0] == 0b001) and therefore it is not described
-  any further.
-
-  if S2 MemAttr[2] == 1, there are the following options:
- 
-  S2 MemAttr[2:0] | Resulting mapping
-  -----------------------------------------------------------------------------
-  0b101           | Prevent the guest from selecting cachable memory type, it
-		  | allows it to choose Device-* or Normal-NC
-  0b110           | It forces write-back memory type; it breaks MMIO.
-  0b111           | Allow the VM to select any memory type including cachable.
-		  | It is unclear whether this is safe from a platform
-		  | perspective, especially wrt uncontained failures and
-		  | cacheability (eg device reclaim/reset and cache
-		  | maintenance).
-  ------------------------------------------------------------------------------
-
-  - For !FEAT_S2FWB systems, it is logical to choose a default S2 mapping
-    identical to FEAT_S2FWB (that basically would force Normal-NC, see
-    option S2 MemAttr[2:0] == 0b101 above), to guarantee a coherent approach
-    between the two
-
-Relaxing S2 KVM device MMIO mappings to Normal-NC is not expected to
-trigger any issue on guest device reclaim use cases either (ie device
-MMIO unmap followed by a device reset) at least for PCIe devices, in that
-in PCIe a device reset is architected and carried out through PCI config
-space transactions that are naturally ordered wrt MMIO transactions
-according to the PCI ordering rules.
-
-Having Normal-NC S2 default puts guests in control (thanks to
-stage1+stage2 combined memory attributes rules [1]) of device MMIO
-regions memory mappings, according to the rules described in [1]
-and summarized here ([(S1) - stage1], [(S2) - stage 2]):
-
-S1	     |  S2	     | Result
-NORMAL-WB    |  NORMAL-NC    | NORMAL-NC
-NORMAL-WT    |  NORMAL-NC    | NORMAL-NC
-NORMAL-NC    |  NORMAL-NC    | NORMAL-NC
-DEVICE<attr> |  NORMAL-NC    | DEVICE<attr>
-
-It is worth noting that currently, to map devices MMIO space to user
-space in a device pass-through use case the VFIO framework applies memory
-attributes derived from pgprot_noncached() settings applied to VMAs, which
-result in device-nGnRnE memory attributes for the stage-1 VMM mappings.
-
-This means that a userspace mapping for device MMIO space carried
-out with the current VFIO framework and a guest OS mapping for the same
-MMIO space may result in a mismatched alias as described in [2].
-
-Defaulting KVM device stage-2 mappings to Normal-NC attributes does not change
-anything in this respect, in that the mismatched aliases would only affect
-(refer to [2] for a detailed explanation) ordering between the userspace and
-GuestOS mappings resulting stream of transactions (ie it does not cause loss of
-property for either stream of transactions on its own), which is harmless
-given that the userspace and GuestOS access to the device is carried
-out through independent transactions streams.
-
-[1] section D8.5 - DDI0487_I_a_a-profile_architecture_reference_manual.pdf
-[2] section B2.8 - DDI0487_I_a_a-profile_architecture_reference_manual.pdf
-[3] sections 1.7.7.3/1.8.5.2/appendix C - DEN0029H_SBSA_7.1.pdf
