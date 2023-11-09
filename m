@@ -1,119 +1,201 @@
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A04E46BA
-	for <kvmarm@lists.linux.dev>; Thu,  9 Nov 2023 08:55:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 429B112E48
+	for <kvmarm@lists.linux.dev>; Thu,  9 Nov 2023 09:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FpvZcgh6"
-Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-7b625ed7208so224695241.1
-        for <kvmarm@lists.linux.dev>; Thu, 09 Nov 2023 00:55:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699520132; x=1700124932; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LW/Fx883nWIRZKyM7HAb/UStNZnvbG60FpXDwf7xK7Y=;
-        b=FpvZcgh6vYlJhu3iN281wf9zUhSOfwuGV7Ii5dGwZSzacNxa5Klk+kSn6egRFPUfn2
-         UkqFGXV+Ftg02wlMDUfgqGEV9PO3yhCSEz3QohnFgWFMYENmJbeTcECxN8xg18EnYWhs
-         cX2HgYH7pffauo/4/ipVc+a4FjFWZH2tNl58KMjo5GAJmPxUoyKS9dQksMowQxGEXz8C
-         ZCLAOhhekoxH7K2j0Ag1womdTDTrL7JIqgY48b1rPuhCTDmYdcdj3AwKF+muEJZ2C6iS
-         /bTX4FYB7g8xjfgC4eLrgrl+Syoek5F29WXFdRRKYtX3xiKZGYlq6y3XFgwbElkAkH2W
-         Lgkw==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AOpw8rbB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699523029;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OEjQ7xxzDSW6bCsBCGR2pe6qDNDSEL6lx838tIM/GU8=;
+	b=AOpw8rbBznmAkUpRfgUB6x/PJiIpZ5LkWZHfzpnK7QpAxfSjta6AyMYhubRenhQ+goS1oV
+	Z99AcjVHpcg+Cgb8dPkl6QcwQspn8WWBKp5+Zy9tiHaeos8Vj2Jnnvq3jM5a20hbM9ExdN
+	BbrZndyMwImYEgcWKgPeKjMEnH18/ys=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-148-XphuRquXNj-WxAyr-Zfw1Q-1; Thu, 09 Nov 2023 04:43:45 -0500
+X-MC-Unique: XphuRquXNj-WxAyr-Zfw1Q-1
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2800fffc08eso186686a91.0
+        for <kvmarm@lists.linux.dev>; Thu, 09 Nov 2023 01:43:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699520132; x=1700124932;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LW/Fx883nWIRZKyM7HAb/UStNZnvbG60FpXDwf7xK7Y=;
-        b=CJskpsfbkGrCwV7JmKskDWHGHXwwl1HE1WHzXQ4yY+RQllOWUJlhGoK6lmWtvLdaR9
-         KXPDO/IB8UFOElkMQgFqi39JiPGCSFfQbk+8M6627dJ5GNaNeAMIi91QVddShmI7Jx5E
-         83uXMPg6qOF7qJH67voYHvN/3WKluXnYiS9Zpi5hXaiT82e2fh6TOX7XcQEryCsfloq2
-         X5g9dkalu2r0WHFyDSAcwE3ocamtsvI02Z+1vks34e6yx8g9jcIoIhXJUhsnH1xdqSj5
-         j/7/ZfiGFd7PLO0m1j7KM0PbU1isNemti7TpqZw+bGTGnryDYnjSKAN++fyh0a2kxIFG
-         jGsQ==
-X-Gm-Message-State: AOJu0Yy2xKHgI0whMu0ZC6dVXSvI7T/oAnz3k/kJsmBV85TSUMhh+UUp
-	B0Y6iUulhtr3gS03S2yHlVRi+Bk4FU7v+0yH/r+rWA==
-X-Google-Smtp-Source: AGHT+IFw1OMfZ7dogx5GHZ5PY3FJDFYi1Xj9fX4uGT6v90sIMw1YGf7XiATC8vKEmYII9um0nqZKnx8f2F+kXqvVgVE=
-X-Received: by 2002:a67:c282:0:b0:45f:65e9:f070 with SMTP id
- k2-20020a67c282000000b0045f65e9f070mr3952209vsj.12.1699520132149; Thu, 09 Nov
- 2023 00:55:32 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699523024; x=1700127824;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OEjQ7xxzDSW6bCsBCGR2pe6qDNDSEL6lx838tIM/GU8=;
+        b=ZGuero/g8u3xTUJLevgOhMDVdNDjItNLzooORvdNxqhYIDk2F2nkPpjJ3phiff6B7+
+         bGB59NjHhUk+zOSU/USlaRqHUTgWvoNvW4IFPJ6CsmbOw+mNOnzAFgjVf6aBMSfUnApZ
+         BZ9EnuU859qXtG7Vf2r5WwKSecivNNOcs0Uypp7wa06+b0CN4QZ81C7CFtQfVySZ8DJo
+         xG77usSDzUfh/Efzb769GZIL0h1NObu2xJgT30Y+qQpIfnQ5yEHyflcqsy5LSaOoguD/
+         ul6sOSdkeKq+Szm7U2S9l/yZzhwG2Yqlify3coI5mnY4WD/2DNEkNSNHtMFfN8ZQP6Rf
+         uMiw==
+X-Gm-Message-State: AOJu0YxO387C3ofyPIbOVxHFP33ZKYTElNOKFUYl1a/pZLXMtR2ZhqdG
+	oZFC9Idj0g2Zw5S4HPcjwszocpJh63gVpizqfpCayhIuBftXmHe2RHlao4BudXKvKsChFRNhp5B
+	fZkV3K4EmRRCOu2SO
+X-Received: by 2002:a17:902:d4cd:b0:1cc:2bc4:5157 with SMTP id o13-20020a170902d4cd00b001cc2bc45157mr4921096plg.1.1699523024547;
+        Thu, 09 Nov 2023 01:43:44 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF6RZnogij7LzQU0k7NFPHwR/unfu31fUk7J39NRmSg93ajKyOUqEekd23fy6SG5sWCfMu5eg==
+X-Received: by 2002:a17:902:d4cd:b0:1cc:2bc4:5157 with SMTP id o13-20020a170902d4cd00b001cc2bc45157mr4921073plg.1.1699523024112;
+        Thu, 09 Nov 2023 01:43:44 -0800 (PST)
+Received: from [10.66.61.39] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id h21-20020a170902eed500b001bf846dd2d0sm3105978plb.13.2023.11.09.01.43.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Nov 2023 01:43:43 -0800 (PST)
+Message-ID: <46faa2bd-9f27-2eea-f46d-f02715e2b540@redhat.com>
+Date: Thu, 9 Nov 2023 17:43:36 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-35-pbonzini@redhat.com>
- <CAF7b7mpmuYLTY6OQfRRoOryfO-2e1ZumQ6SCQDHHPD5XFyhFTQ@mail.gmail.com>
-In-Reply-To: <CAF7b7mpmuYLTY6OQfRRoOryfO-2e1ZumQ6SCQDHHPD5XFyhFTQ@mail.gmail.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 9 Nov 2023 08:54:55 +0000
-Message-ID: <CA+EHjTxxBUHX9Rg=vZ-UTWHUPKf0ujTsOsynueG7JAMt=GZQ0A@mail.gmail.com>
-Subject: Re: [PATCH 34/34] KVM: selftests: Add a memory region subtest to
- validate invalid flags
-To: Anish Moorthy <amoorthy@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Sean Christopherson <seanjc@google.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, David Matlack <dmatlack@google.com>, 
-	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH RFC 05/22] ACPI: Move ACPI_HOTPLUG_CPU to be disabled on
+ arm64 and riscv
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev, x86@kernel.org,
+ linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org
+Cc: Salil Mehta <salil.mehta@huawei.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com,
+ justin.he@arm.com, James Morse <james.morse@arm.com>,
+ Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Len Brown <lenb@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>
+References: <ZUoRY33AAHMc5ThW@shell.armlinux.org.uk>
+ <E1r0JL6-00CTws-3z@rmk-PC.armlinux.org.uk>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <E1r0JL6-00CTws-3z@rmk-PC.armlinux.org.uk>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Anish,
 
-On Thu, Nov 9, 2023 at 1:08=E2=80=AFAM Anish Moorthy <amoorthy@google.com> =
-wrote:
->
-> Applying [1] and [2] reveals that this also breaks non-x86 builds- the
-> MEM_REGION_GPA/SLOT definitions are guarded behind an #ifdef
-> __x86_64__, while the usages introduced here aren't.
->
-> Should
->
-> On Sun, Nov 5, 2023 at 8:35=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.com=
-> wrote:
-> >
-> > +       test_invalid_memory_region_flags();
->
-> be #ifdef'd, perhaps? I'm not quite sure what the intent is.
->
-> Side note: I wasn't able to get [2] to apply by copy-pasting the diff
-> and trying "git apply", and that was after checking out the relevant
-> commit. Eventually I just did it manually. If anyone can successfully
-> apply it, please let me know what you did so I can see what I was
-> doing wrong :)
 
-For me I applied the whole series as follows:
+On 11/7/23 18:29, Russell King (Oracle) wrote:
+> From: James Morse <james.morse@arm.com>
+> 
+> Neither arm64 nor riscv support physical hotadd of CPUs that were not
+> present at boot. For arm64 much of the platform description is in static
+> tables which do not have update methods. arm64 does support HOTPLUG_CPU,
+> which is backed by a firmware interface to turn CPUs on and off.
+> 
+> acpi_processor_hotadd_init() and acpi_processor_remove() are for adding
+> and removing CPUs that were not present at boot. arm64 systems that do this
+> are not supported as there is currently insufficient information in the
+> platform description. (e.g. did the GICR get removed too?)
+> 
+> arm64 currently relies on the MADT enabled flag check in map_gicc_mpidr()
+> to prevent CPUs that were not described as present at boot from being
+> added to the system. Similarly, riscv relies on the same check in
+> map_rintc_hartid(). Both architectures also rely on the weak 'always fails'
+> definitions of acpi_map_cpu() and arch_register_cpu().
+> 
+> Subsequent changes will redefine ACPI_HOTPLUG_CPU as making possible
+> CPUs present. Neither arm64 nor riscv support this.
+> 
+> Disable ACPI_HOTPLUG_CPU for arm64 and riscv by removing 'default y' and
+> selecting it on the other three ACPI architectures. This allows the weak
+> definitions of some symbols to be removed.
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+> Changes since RFC:
+>   * Expanded conditions to avoid ACPI_HOTPLUG_CPU being enabled when
+>     HOTPLUG_CPU isn't.
+> Changes since RFC v3:
+>   * Dropped ia64 changes
+> ---
+>   arch/loongarch/Kconfig        |  1 +
+>   arch/x86/Kconfig              |  1 +
+>   drivers/acpi/Kconfig          |  1 -
+>   drivers/acpi/acpi_processor.c | 18 ------------------
+>   4 files changed, 2 insertions(+), 19 deletions(-)
+> 
+> diff --git a/arch/loongarch/Kconfig b/arch/loongarch/Kconfig
+> index d889a0b97bc1..64620e90c12c 100644
+> --- a/arch/loongarch/Kconfig
+> +++ b/arch/loongarch/Kconfig
+> @@ -5,6 +5,7 @@ config LOONGARCH
+>   	select ACPI
+>   	select ACPI_GENERIC_GSI if ACPI
+>   	select ACPI_MCFG if ACPI
+> +	select ACPI_HOTPLUG_CPU if ACPI_PROCESSOR && HOTPLUG_CPU
+>   	select ACPI_PPTT if ACPI
+>   	select ACPI_SYSTEM_POWER_STATES_SUPPORT	if ACPI
+>   	select ARCH_BINFMT_ELF_STATE
+> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> index 3762f41bb092..dbdcfc708369 100644
+> --- a/arch/x86/Kconfig
+> +++ b/arch/x86/Kconfig
+> @@ -59,6 +59,7 @@ config X86
+>   	#
+>   	select ACPI_LEGACY_TABLES_LOOKUP	if ACPI
+>   	select ACPI_SYSTEM_POWER_STATES_SUPPORT	if ACPI
+> +	select ACPI_HOTPLUG_CPU			if ACPI_PROCESSOR && HOTPLUG_CPU
+>   	select ARCH_32BIT_OFF_T			if X86_32
+>   	select ARCH_CLOCKSOURCE_INIT
+>   	select ARCH_CORRECT_STACKTRACE_ON_KRETPROBE
+> diff --git a/drivers/acpi/Kconfig b/drivers/acpi/Kconfig
+> index f819e760ff19..a3acfc750fce 100644
+> --- a/drivers/acpi/Kconfig
+> +++ b/drivers/acpi/Kconfig
+> @@ -310,7 +310,6 @@ config ACPI_HOTPLUG_CPU
+>   	bool
+>   	depends on ACPI_PROCESSOR && HOTPLUG_CPU
+>   	select ACPI_CONTAINER
+> -	default y
+>   
+>   config ACPI_PROCESSOR_AGGREGATOR
+>   	tristate "Processor Aggregator"
+> diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.c
+> index 0f5218e361df..4fe2ef54088c 100644
+> --- a/drivers/acpi/acpi_processor.c
+> +++ b/drivers/acpi/acpi_processor.c
+> @@ -184,24 +184,6 @@ static void __init acpi_pcc_cpufreq_init(void) {}
+>   
+>   /* Initialization */
+>   #ifdef CONFIG_ACPI_HOTPLUG_CPU
+> -int __weak acpi_map_cpu(acpi_handle handle,
+> -		phys_cpuid_t physid, u32 acpi_id, int *pcpu)
+> -{
+> -	return -ENODEV;
+> -}
+> -
+> -int __weak acpi_unmap_cpu(int cpu)
+> -{
+> -	return -ENODEV;
+> -}
+> -
+> -int __weak arch_register_cpu(int cpu)
+> -{
+> -	return -ENODEV;
+> -}
+> -
+> -void __weak arch_unregister_cpu(int cpu) {}
+> -
+>   static int acpi_processor_hotadd_init(struct acpi_processor *pr)
+>   {
+>   	unsigned long long sta;
 
-Checkout kvm-x86-next-2023.11.01 (45b890f7689e) from
-https://github.com/kvm-x86/linux.git . Then use b4:
-b4 am -o -  20231105163040.14904-1-pbonzini@redhat.com  | git am -3
+-- 
+Shaoqin
 
-Cheers,
-/fuad
-
->
-> [1] https://lore.kernel.org/kvm/20231108233723.3380042-1-amoorthy@google.=
-com/
-> [2] https://lore.kernel.org/kvm/affca7a8-116e-4b0f-9edf-6cdc05ba65ca@redh=
-at.com/
