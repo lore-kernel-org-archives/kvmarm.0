@@ -1,146 +1,119 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE80C10953
-	for <kvmarm@lists.linux.dev>; Thu,  9 Nov 2023 08:25:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A04E46BA
+	for <kvmarm@lists.linux.dev>; Thu,  9 Nov 2023 08:55:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JqYgyJ4m"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699518349;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=odt/5xMXbjMgZlXR9oRA3wdW/adm1/gNuEpMj2VBGmk=;
-	b=JqYgyJ4mTafQAwU/hKRh//7IdyoYz4dnnrAg3UT9aSjVItRgL/Tsq9GUqYeQ4cYstp1B7I
-	QOr2kGxnfBv0LLFiZpEb/HzzPQDFsyRtBeOmqZXpUkMViG/ltwXW76hMxQJWX0w8Y1jSmL
-	aq9rS8Q3Ql4PHEbTFGGjmEMz12fLYDQ=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-361-jH_1ZEePNta-3E-iu6sg6Q-1; Thu, 09 Nov 2023 03:25:47 -0500
-X-MC-Unique: jH_1ZEePNta-3E-iu6sg6Q-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5411d71889aso415577a12.2
-        for <kvmarm@lists.linux.dev>; Thu, 09 Nov 2023 00:25:47 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FpvZcgh6"
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-7b625ed7208so224695241.1
+        for <kvmarm@lists.linux.dev>; Thu, 09 Nov 2023 00:55:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699520132; x=1700124932; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LW/Fx883nWIRZKyM7HAb/UStNZnvbG60FpXDwf7xK7Y=;
+        b=FpvZcgh6vYlJhu3iN281wf9zUhSOfwuGV7Ii5dGwZSzacNxa5Klk+kSn6egRFPUfn2
+         UkqFGXV+Ftg02wlMDUfgqGEV9PO3yhCSEz3QohnFgWFMYENmJbeTcECxN8xg18EnYWhs
+         cX2HgYH7pffauo/4/ipVc+a4FjFWZH2tNl58KMjo5GAJmPxUoyKS9dQksMowQxGEXz8C
+         ZCLAOhhekoxH7K2j0Ag1womdTDTrL7JIqgY48b1rPuhCTDmYdcdj3AwKF+muEJZ2C6iS
+         /bTX4FYB7g8xjfgC4eLrgrl+Syoek5F29WXFdRRKYtX3xiKZGYlq6y3XFgwbElkAkH2W
+         Lgkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699518347; x=1700123147;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=odt/5xMXbjMgZlXR9oRA3wdW/adm1/gNuEpMj2VBGmk=;
-        b=nM42vKIyPu4Tahd6DiMts/eOdBE70DbVNSm2FvLO8OXkGr3QqcyTzs2ZNN6IB/X3p/
-         f8wy0qrf0O3gtnUfm3i/5JQSPiYy0/LApSE8QDHq87yrRBHQPFR31R997b46FPytep+V
-         KxWHyC1bs9OzHBq8X8E7f6IMEKFZJY0XH/UlqnIh4mEtpi8xVu3fKnKElSOrpMx9W2Cj
-         6HSJtnXCXJuFG593+MgWVP77lKBHkon4J5biBwhyhtDAU12yfe+57zhEyuavriV+axFM
-         CXF0PVkImVvggjUJ+ddAb993LEJsamH1Q8n4rZ1XdcMieSxc1rnfjVgXlRtu+VL1TEW1
-         bZdw==
-X-Gm-Message-State: AOJu0YxHlTqw1kTjdBtDXgwLfKqfphllJIATAvawBfUBu1P0t5XL2b9h
-	4PnZ5mP1MxOtePymfYKj/g9a6h6hvhga/YE+NIH+BZGrTGoC0wAraEFmXtdjfQIC85kTr69PA0V
-	caNSJWPL6HeYd8Nz3
-X-Received: by 2002:a50:9f4e:0:b0:540:ccde:5 with SMTP id b72-20020a509f4e000000b00540ccde0005mr3348796edf.37.1699518346879;
-        Thu, 09 Nov 2023 00:25:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGc/8h7txNeYrJdeIJbeZLdKa5Ej0cD8Q6TYT5qVu8zzxOyeTh4hQuHi7CupWqz8J3PkKtaWg==
-X-Received: by 2002:a50:9f4e:0:b0:540:ccde:5 with SMTP id b72-20020a509f4e000000b00540ccde0005mr3348751edf.37.1699518346536;
-        Thu, 09 Nov 2023 00:25:46 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id j28-20020a508a9c000000b0053e3839fc79sm8007819edj.96.2023.11.09.00.25.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Nov 2023 00:25:45 -0800 (PST)
-Message-ID: <143f5411-9fc0-4e88-9e35-6f3679b6f930@redhat.com>
-Date: Thu, 9 Nov 2023 09:25:43 +0100
+        d=1e100.net; s=20230601; t=1699520132; x=1700124932;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LW/Fx883nWIRZKyM7HAb/UStNZnvbG60FpXDwf7xK7Y=;
+        b=CJskpsfbkGrCwV7JmKskDWHGHXwwl1HE1WHzXQ4yY+RQllOWUJlhGoK6lmWtvLdaR9
+         KXPDO/IB8UFOElkMQgFqi39JiPGCSFfQbk+8M6627dJ5GNaNeAMIi91QVddShmI7Jx5E
+         83uXMPg6qOF7qJH67voYHvN/3WKluXnYiS9Zpi5hXaiT82e2fh6TOX7XcQEryCsfloq2
+         X5g9dkalu2r0WHFyDSAcwE3ocamtsvI02Z+1vks34e6yx8g9jcIoIhXJUhsnH1xdqSj5
+         j/7/ZfiGFd7PLO0m1j7KM0PbU1isNemti7TpqZw+bGTGnryDYnjSKAN++fyh0a2kxIFG
+         jGsQ==
+X-Gm-Message-State: AOJu0Yy2xKHgI0whMu0ZC6dVXSvI7T/oAnz3k/kJsmBV85TSUMhh+UUp
+	B0Y6iUulhtr3gS03S2yHlVRi+Bk4FU7v+0yH/r+rWA==
+X-Google-Smtp-Source: AGHT+IFw1OMfZ7dogx5GHZ5PY3FJDFYi1Xj9fX4uGT6v90sIMw1YGf7XiATC8vKEmYII9um0nqZKnx8f2F+kXqvVgVE=
+X-Received: by 2002:a67:c282:0:b0:45f:65e9:f070 with SMTP id
+ k2-20020a67c282000000b0045f65e9f070mr3952209vsj.12.1699520132149; Thu, 09 Nov
+ 2023 00:55:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 27/34] KVM: selftests: Introduce VM "shape" to allow tests
- to specify the VM type
+References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-35-pbonzini@redhat.com>
+ <CAF7b7mpmuYLTY6OQfRRoOryfO-2e1ZumQ6SCQDHHPD5XFyhFTQ@mail.gmail.com>
+In-Reply-To: <CAF7b7mpmuYLTY6OQfRRoOryfO-2e1ZumQ6SCQDHHPD5XFyhFTQ@mail.gmail.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 9 Nov 2023 08:54:55 +0000
+Message-ID: <CA+EHjTxxBUHX9Rg=vZ-UTWHUPKf0ujTsOsynueG7JAMt=GZQ0A@mail.gmail.com>
+Subject: Re: [PATCH 34/34] KVM: selftests: Add a memory region subtest to
+ validate invalid flags
 To: Anish Moorthy <amoorthy@google.com>
-Cc: ackerleytng@google.com, akpm@linux-foundation.org, anup@brainfault.org,
- aou@eecs.berkeley.edu, brauner@kernel.org, chao.p.peng@linux.intel.com,
- chenhuacai@kernel.org, david@redhat.com, dmatlack@google.com,
- isaku.yamahata@gmail.com, isaku.yamahata@intel.com, jarkko@kernel.org,
- kirill.shutemov@linux.intel.com, kvm-riscv@lists.infradead.org,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev, liam.merwick@oracle.com,
- linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-mm@kvack.org, linux-riscv@lists.infradead.org,
- linuxppc-dev@lists.ozlabs.org, mail@maciej.szmigiero.name, maz@kernel.org,
- mic@digikod.net, michael.roth@amd.com, mpe@ellerman.id.au,
- oliver.upton@linux.dev, palmer@dabbelt.com, paul.walmsley@sifive.com,
- qperret@google.com, seanjc@google.com, tabba@google.com,
- vannapurve@google.com, vbabka@suse.cz, viro@zeniv.linux.org.uk,
- wei.w.wang@intel.com, willy@infradead.org, xiaoyao.li@intel.com,
- yilun.xu@intel.com, yu.c.zhang@linux.intel.com
-References: <CAF7b7mrGYuyjyEPAesYzZ6+KDuNAmvRxEonT7JC8NDPsSP+qDA@mail.gmail.com>
- <20231108233723.3380042-1-amoorthy@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20231108233723.3380042-1-amoorthy@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Sean Christopherson <seanjc@google.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, David Matlack <dmatlack@google.com>, 
+	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Vlastimil Babka <vbabka@suse.cz>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/9/23 00:37, Anish Moorthy wrote:
-> On Wed, Nov 8, 2023 at 9:00 AM Anish Moorthy <amoorthy@google.com> wrote:
->>
->> This commit breaks the arm64 selftests build btw: looks like a simple oversight?
-> 
-> Yup, fix is a one-liner. Posted below.
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> index eb4217b7c768..08a5ca5bed56 100644
-> --- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> @@ -705,7 +705,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   
->   	print_test_banner(mode, p);
->   
-> -	vm = ____vm_create(mode);
-> +	vm = ____vm_create(VM_SHAPE(mode));
+Hi Anish,
 
-Yes, this is similar to the s390 patch I sent yesterday 
-(https://patchew.org/linux/20231108094055.221234-1-pbonzini@redhat.com/).
+On Thu, Nov 9, 2023 at 1:08=E2=80=AFAM Anish Moorthy <amoorthy@google.com> =
+wrote:
+>
+> Applying [1] and [2] reveals that this also breaks non-x86 builds- the
+> MEM_REGION_GPA/SLOT definitions are guarded behind an #ifdef
+> __x86_64__, while the usages introduced here aren't.
+>
+> Should
+>
+> On Sun, Nov 5, 2023 at 8:35=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.com=
+> wrote:
+> >
+> > +       test_invalid_memory_region_flags();
+>
+> be #ifdef'd, perhaps? I'm not quite sure what the intent is.
+>
+> Side note: I wasn't able to get [2] to apply by copy-pasting the diff
+> and trying "git apply", and that was after checking out the relevant
+> commit. Eventually I just did it manually. If anyone can successfully
+> apply it, please let me know what you did so I can see what I was
+> doing wrong :)
 
-Paolo
+For me I applied the whole series as follows:
 
+Checkout kvm-x86-next-2023.11.01 (45b890f7689e) from
+https://github.com/kvm-x86/linux.git . Then use b4:
+b4 am -o -  20231105163040.14904-1-pbonzini@redhat.com  | git am -3
+
+Cheers,
+/fuad
+
+>
+> [1] https://lore.kernel.org/kvm/20231108233723.3380042-1-amoorthy@google.=
+com/
+> [2] https://lore.kernel.org/kvm/affca7a8-116e-4b0f-9edf-6cdc05ba65ca@redh=
+at.com/
