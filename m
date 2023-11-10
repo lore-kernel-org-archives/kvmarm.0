@@ -1,151 +1,170 @@
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2075.outbound.protection.outlook.com [40.107.94.75])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E071BDC9
-	for <kvmarm@lists.linux.dev>; Fri, 10 Nov 2023 14:26:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3BBA3A279
+	for <kvmarm@lists.linux.dev>; Fri, 10 Nov 2023 18:23:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FOnD76HW"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MAMSOqV9pP2EdHc7T7GjGKdDPl9UTnKD56K51eY2VgfuwTY8M4W6s0O5t95LtsJC996e1afOJylTVfojMeRVNElnJXvde8uAp4R9owbXTcyvI59SA+Y4S2Z5pmzjIht4V4Z3VGmf4yk/WzHvANpUSBwWU39HIdyJEQADvsR/KSK8BbjPjx3GpTNpINPnxlWYHhLew+EPwu3AXOL+gkmiNmnULz7lRHPQiYiR+SKr4Vfesmj9VTO1qRh1pG0CSa6EEvuBC916xVN5czIfCsrzAsK5hiou1ATBzKnD+HsQp9aSO11z0Za0446XLlTxG0ENG1LipzbBG0Bh19mmeM78YQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xgGCqMqul7q4lQCVRMNd8p0coaOrLfdPgFD69v6hjU4=;
- b=oLOe8TDa1B/GT8xEzPJ3POH9jg05Kdz9LJlpa069anOZmXketMktmgftUoIlH3SBkFMuAtNLj4j3jQImDxqxlMrb1dOp5sEkt2MZYNqYv2TH7T0Mcw3ZIhQOYy6n0Aca7SxEjYLfXrMWkz8SqegN+S9c0naqlsdIYrKgees5+c/nJU/tzQGYX573kUBuSzgFODBpZJjlDY2EGTucHG4scsEzCt3alX7+Wu8Egp78vuLNELLsL61GfsLhTFvga8/ezNLTYnGCQdOjSMhXwmGgVRwigidjfJ7UIivTWQD5u3RW8KaFAFnO9I9vcg8v8GCCmq8gOBhleE6tvE8dekNj7w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xgGCqMqul7q4lQCVRMNd8p0coaOrLfdPgFD69v6hjU4=;
- b=FOnD76HWlbDiDKDbKBnHnaKaFLx1hsYPSCrtemAJow3WbIFMKH1fWsx5GTiPUPOk+2LXlVqhuuzZZQNgALCA5VBrIGjGitmd7Lk8jPr9Ztu4ZwqLqRhiWrIiGxeBMq/vTPs2J9dZTpfk5V/iHccDkA807XgcYXYEzelPy5Ca/YOMAwCWbx/lDc+U+prGRa/oE0uicXi0c4wKxmDDShRbjsCcKOKmtsw+LFOpIM/ROeDLSp32OzuNQ0l6/H+oja5/Sbw/9Qfg4RfmpaMRumiybRAR8lqbxLsTxXfgFugPUblu2OlLBtumWsGLz6X1mfEQIuF50+pKN2NkzZtnOyhjZA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SJ2PR12MB9138.namprd12.prod.outlook.com (2603:10b6:a03:565::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.28; Fri, 10 Nov
- 2023 14:26:51 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.6977.018; Fri, 10 Nov 2023
- 14:26:51 +0000
-Date: Fri, 10 Nov 2023 10:26:49 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Lorenzo Pieralisi <lpieralisi@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, ankita@nvidia.com, maz@kernel.org,
-	oliver.upton@linux.dev, aniketa@nvidia.com, cjia@nvidia.com,
-	kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
-	acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
-	danw@nvidia.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 2/2] KVM: arm64: allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
-Message-ID: <20231110142649.GO4488@nvidia.com>
-References: <ZRKW6uDR/+eXYMzl@lpieralisi>
- <ZRLiDf204zCpO6Mv@arm.com>
- <ZR6IZwcFNw55asW0@lpieralisi>
- <20231012123541.GB11824@willie-the-truck>
- <ZSf6Ue09IO6QMBs1@arm.com>
- <20231012144807.GA12374@willie-the-truck>
- <ZSgsKSCv-zWgtWkm@arm.com>
- <20231013092934.GA13524@willie-the-truck>
- <ZSlBOiebenPKXBY4@arm.com>
- <ZUz78gFPgMupew+m@lpieralisi>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZUz78gFPgMupew+m@lpieralisi>
-X-ClientProxiedBy: SN7P220CA0003.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:806:123::8) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gzQtL+ol"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5b02ed0f886so31980697b3.0
+        for <kvmarm@lists.linux.dev>; Fri, 10 Nov 2023 10:23:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699640581; x=1700245381; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/u2JG0fndtvz5StB0AokXkOquj7NpP7M8gj3x0QBG2E=;
+        b=gzQtL+olN6w2uF9qh8/Ogohu2Fmonu7sDqK1tx+y3YKwDexVExLPcl5QAz48YwkjX1
+         Rdz5y7ZjHJbLBZaBx8D/4CMr9+7mkJWBcQVY7koFRnSetMbTDh/64gzRZ5bq9Cf8qSWE
+         ETiE4jMDWM6XZHoMQWXLetibYp7yBUc+Y/0UWRBaxb7LuDxP8eOhxCceaFepoKRfeRrm
+         XcBvjpnK7954nPk9LmRAMuJdSroajhW8TKbq5UfGIEpkixh7tMYuDnogJ128TwR1fdys
+         4pUR4eI1vJphCCA8w8enCA6PPLXqE9o3eEPz6icGDtStTix2NP9lq9Q1KIfqGA+jN/9V
+         SRkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699640581; x=1700245381;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/u2JG0fndtvz5StB0AokXkOquj7NpP7M8gj3x0QBG2E=;
+        b=P1JIpZt8+jxEa7jBeFZDHULfiwFzt3MrTHdROBi5n9YvESyVmFaxaH+zoB58pwepZr
+         67JgN70qjco5kR5hn1RU8LJ82FVzGvAXLNoQkGXeqm4qbya0HUCYMSR4cf3GkUBvOIOv
+         2QkApvk48kZz1M6le6T9/WNQfdIMpFgZXRm84yPXiutBlZmgVbL5wzH7HBZ4a7xSfBfR
+         fGM7f5as6suZm5QqwuNcKNLLtHnMKg3JGfN1zdRYlqkwmN62gmAsp3AMp6AAMOIwUQPl
+         ExbQJVMk3KDrvlAslPy7xU+si8kfr/WAMPEpBEXfRpO9qDxX+ZWPxZjnkwtbZqyu2uc7
+         QF6w==
+X-Gm-Message-State: AOJu0YyPmsU0IlUdiOi3qZ75nJMkvDN1/FFPJEewiYPqRwGyDMakjzeu
+	juJ13LMdT4FqvN9Abp8FJuZN3Ia8QLU=
+X-Google-Smtp-Source: AGHT+IFilgu1/Q1EZiEoL3sTFYKCQfnhtgAeMBBAfAGcs6DHfZF6Y3nZ5EepLJy80XYZ0ZRT2keQkzxRdJY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:ef0c:0:b0:5be:ae71:d70a with SMTP id
+ o12-20020a81ef0c000000b005beae71d70amr242444ywm.4.1699640580898; Fri, 10 Nov
+ 2023 10:23:00 -0800 (PST)
+Date: Fri, 10 Nov 2023 10:22:59 -0800
+In-Reply-To: <956d8ee3-8b63-4a2d-b0c4-c0d3d74a0f6f@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ2PR12MB9138:EE_
-X-MS-Office365-Filtering-Correlation-Id: 402569de-826b-4b4a-4bcf-08dbe1f9146b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Eq/1aGeSrgZKTp6Azl1ZYAloBXkHAT+Myj4z2273BGM+DC6PYoXriyl9uuLIbrD1bRdDO8nV7J142mosIaPEXr/YkExAr5fqJuikX7czCjaVQu7WpW6H1jo9soY2Psx5krLdWEW0VXG93mfr9NnU41X8N/5Pun6e9Bpl68v3ALNaN8nzsBeEzjVbBV2Yyh6OPmt6iGqo3/a4XUngn9cOdKSMoITQKHe8UNvBTmUjIAL862MUIGeUcc84e5SRwxIE0LmyOKJJw7jJ7WxV8pBtu0XEhd78H7ScZr972cAknQl0cl2QE69HZN/bwRC/vQNrGrEv04lxcJPO7A68g3XH2eVEpOmfZnzwrd7Genk2xBGVi3LnLIwErgo2ciC58vFrJvNbbxch3sBW5bdyB1yMi8Zvf78/z8+OKs0ZeFse2TLZ+KkgPO6R8E7njv2SMNv3hsFgFWYxjbW22shiJvBdFPX6wFBCVYVasbs5mc2FFJFP8IuSPQd0s9A6/vpzvx0BWVaf2u8OXJaavcL34FkH2pMLKoFKWvk9Djm9vNyQ32ceYSwCIaddw3eEG5ayUkIX
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(396003)(366004)(136003)(346002)(230922051799003)(186009)(1800799009)(64100799003)(451199024)(6486002)(83380400001)(38100700002)(66946007)(6916009)(6506007)(2616005)(66556008)(66476007)(26005)(6512007)(54906003)(1076003)(478600001)(5660300002)(8676002)(36756003)(86362001)(8936002)(2906002)(33656002)(41300700001)(4326008)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?j6izuEmhaG05QhXrhrNKyP3xgM27WjQ8PzmqjvX28Dm7oxPuThB+Cp0fZCBK?=
- =?us-ascii?Q?Lu+lD1CJr6/WKGvTODgMG17GcUmJ1ALFi7mepchcGa4h6wT/hjbq2txEZrvO?=
- =?us-ascii?Q?Xxp24O0QzeziCo82VidYiAZuSvRw6whimeL91Du6VAie79yY+lcYmYhewgPG?=
- =?us-ascii?Q?Qh/j2qHm+iJ+OYbHOjCNrfTqAYwQhmCORE1Fmb2tsZ9zY9JpNb2DNlsip+5T?=
- =?us-ascii?Q?NPQxHzNZQ01NzVvLsqgb7AewY9pFV0XPrqGzv+w1g97iwbrEJDjMCPJraVhX?=
- =?us-ascii?Q?iyIqj4rrhmWpl9HeVq89gbrqY9KtLMOXJdNfxRF8YXvrMhVbfaY1i1IlB7kV?=
- =?us-ascii?Q?Q+mda21UX3WWM3lnk3syXVjBwJ4fHTFkPcdnFjlAomQFszHzF3YhXDWjYciP?=
- =?us-ascii?Q?pH3sm7aU8+0Yn/UNAY458g6St7JHgFN/Vps1DH6yDvzZVbPPViLhxcIynwWq?=
- =?us-ascii?Q?bCGGKo3e5HBRMHhnWUIq2luTQxJxb6cgKZz/qUqa//zaLNxE/moebBlapV7s?=
- =?us-ascii?Q?uxtXFNM5KZYcS12Ud+0KN3seN6weJrbnKPNlOn2qXl+H0IBfjn71lnogPVD8?=
- =?us-ascii?Q?9fpjtvlkqkPUouFqkvK6HgRGCo+NkAnlcyqCRv5N7jQoBOtvnsD9aLA767t4?=
- =?us-ascii?Q?RliJCXr1MCVKjQCEYd+y4YCtqxR/fpxz4QbG4iQKVPLXu4GIY7wEm71Sjkn8?=
- =?us-ascii?Q?sz2E5NaUx8maTRjvIkoLFmIStPLIjAtJocidnDvwrUM7tRUnQkL3nWwQUz9x?=
- =?us-ascii?Q?R1CvvziMbzN1nuqjs+YsCzzUStdNOrGR93Zxx+9UdBf9Ux2Mc3QJUv1v5Bvu?=
- =?us-ascii?Q?OjIcTxrYYVPAV4ocykaWbagtzU6f1hVeijcG+dQdKtKjNZ//AcDcPX+DlIp9?=
- =?us-ascii?Q?yqNZVRCqfUqYnJOxGC3u6R1EzzkDyweQ1cuptAlXH/1YGDvk6eYGNUS7t5mw?=
- =?us-ascii?Q?ojHamikZvqrLZLVqV0twNfi/p0t2SWAKxIkBb0Y4mUBEHaVxUAPrJIOFqpCD?=
- =?us-ascii?Q?LCLrVNjx9XAHmKID2Wnbbuy0hyqgrXFGg3wlCI0UmxxoFeztGNtx98K2oYDF?=
- =?us-ascii?Q?cfoAnfYiHBOQ73CX7n0qJRYUqofCyVpzjvdcWq+jzR+mM7yvxg+Zo5YZmqnc?=
- =?us-ascii?Q?yGJp1o9Y0AMO1069KOS81bl3JB7AkMSA6P1cRfVL2QZmnwk/kygsADszVykp?=
- =?us-ascii?Q?74cZ85PJ5HIGg8y/NEpryQcjr2grlmDsUC9p4Uw2n+SourDd05rorUQMieQw?=
- =?us-ascii?Q?XMIW+SqD60HmIzfofDoZugn3G0NmaTu9/DSatxzTCsiPjp5c25NvgGEyGjcN?=
- =?us-ascii?Q?gBB9VBv+AacB9hfi737lv/Py3c+knnkf6x6js3OLj/kZWEW3SPtGkvMYHsY3?=
- =?us-ascii?Q?BR38nYXuqLw/MoNT1nz/aQKBk8hrDxRZmZ5eYmRY0HPeP8+Sl3AYL8pDocD7?=
- =?us-ascii?Q?9b2wNdSpfEHObUsp4L9f7oHi+LMlR6QZVLZgsgZhuUcWWG9Rh4RhTBMdMDuH?=
- =?us-ascii?Q?Om31E90ppQ2Z4WPbf7WxD2O21G1Zs5yuY0eQ1ws+HO8wW/KIW+RI9797rwc3?=
- =?us-ascii?Q?CsmEM6XdFtUUqrzyH/8=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 402569de-826b-4b4a-4bcf-08dbe1f9146b
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Nov 2023 14:26:51.0601
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Cr0FCYoTM0h6b36qLYXgJN8thjO/yKvMSfwy3d/Ric8ysfShF72tgI/dHPa/064s
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9138
+Mime-Version: 1.0
+References: <20231105163040.14904-1-pbonzini@redhat.com> <20231105163040.14904-16-pbonzini@redhat.com>
+ <956d8ee3-8b63-4a2d-b0c4-c0d3d74a0f6f@intel.com>
+Message-ID: <ZU51A3U6E3aZXayC@google.com>
+Subject: Re: [PATCH 15/34] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+From: Sean Christopherson <seanjc@google.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xu Yilun <yilun.xu@intel.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
+	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Nov 09, 2023 at 04:34:10PM +0100, Lorenzo Pieralisi wrote:
+On Fri, Nov 10, 2023, Xiaoyao Li wrote:
+> On 11/6/2023 12:30 AM, Paolo Bonzini wrote:
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 68a144cb7dbc..a6de526c0426 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -589,8 +589,20 @@ struct kvm_memory_slot {
+> >   	u32 flags;
+> >   	short id;
+> >   	u16 as_id;
+> > +
+> > +#ifdef CONFIG_KVM_PRIVATE_MEM
+> > +	struct {
+> > +		struct file __rcu *file;
+> > +		pgoff_t pgoff;
+> > +	} gmem;
+> > +#endif
+> >   };
+> > +static inline bool kvm_slot_can_be_private(const struct kvm_memory_slot *slot)
+> > +{
+> > +	return slot && (slot->flags & KVM_MEM_GUEST_MEMFD);
+> > +}
+> > +
+> 
+> maybe we can move this block and ...
+> 
+> <snip>
+> 
+> > @@ -2355,6 +2379,30 @@ bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
+> >   					struct kvm_gfn_range *range);
+> >   bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+> >   					 struct kvm_gfn_range *range);
+> > +
+> > +static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+> > +{
+> > +	return IS_ENABLED(CONFIG_KVM_PRIVATE_MEM) &&
+> > +	       kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
+> > +}
+> > +#else
+> > +static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+> > +{
+> > +	return false;
+> > +}
+> >   #endif /* CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES */
+> 
+> this block to Patch 18?
 
-> Relaxing S2 KVM device MMIO mappings to Normal-NC is not expected to
-> trigger any issue on guest device reclaim use cases either (ie device
-> MMIO unmap followed by a device reset) at least for PCIe devices, in that
-> in PCIe a device reset is architected and carried out through PCI config
-> space transactions that are naturally ordered wrt MMIO transactions
-> according to the PCI ordering rules.
+It would work, but my vote is to keep them here to minimize the changes to common
+KVM code in the x86 enabling.  It's not a strong preference though.  Of course,
+at this point, fiddling with this sort of thing is probably a bad idea in terms
+of landing guest_memfd.
 
-This is not how I see that thread concluding..
+> > @@ -4844,6 +4875,10 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+> >   #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+> >   	case KVM_CAP_MEMORY_ATTRIBUTES:
+> >   		return kvm_supported_mem_attributes(kvm);
+> > +#endif
+> > +#ifdef CONFIG_KVM_PRIVATE_MEM
+> > +	case KVM_CAP_GUEST_MEMFD:
+> > +		return !kvm || kvm_arch_has_private_mem(kvm);
+> >   #endif
+> >   	default:
+> >   		break;
+> > @@ -5277,6 +5312,18 @@ static long kvm_vm_ioctl(struct file *filp,
+> >   	case KVM_GET_STATS_FD:
+> >   		r = kvm_vm_ioctl_get_stats_fd(kvm);
+> >   		break;
+> > +#ifdef CONFIG_KVM_PRIVATE_MEM
+> > +	case KVM_CREATE_GUEST_MEMFD: {
+> > +		struct kvm_create_guest_memfd guest_memfd;
+> 
+> Do we need a guard of below?
+> 
+> 		r = -EINVAL;
+> 		if (!kvm_arch_has_private_mem(kvm))
+> 			goto out;
 
-The device reclaim problem belongs solely to VFIO, not KVM. VFIO must
-ensure global ordering of access before the VMA is unmaped and access
-after, that includes ordering whatever mechanism the VFIO driver uses
-for reset.
+Argh, yeah, that's weird since KVM_CAP_GUEST_MEMFD says "not supported" if the
+VM doesn't support private memory.
 
-If there are quirky SOCs, or non-PCI devices that need something
-stronger than the TLBI/etc sequence it should be fixed in VFIO (or
-maybe even the arch code), not by blocking NORMAL_NC in the KVM. Such
-a quirky SOC would broadly have security issues beyond KVM.
+Enforcing that would break guest_memfd_test.c though.  And having to create a
+"special" VM just to test basic guest_memfd functionality would be quite
+annoying.
 
-> It is worth noting that currently, to map devices MMIO space to user
-> space in a device pass-through use case the VFIO framework applies memory
-> attributes derived from pgprot_noncached() settings applied to VMAs, which
+So my vote is to do:
 
-Sometimes. VFIO uses a mix of pgprot_noncached and pgprot_device. AFAIK
-we should change to to always use pgprot_device..
+	case KVM_CAP_GUEST_MEMFD:
+		return IS_ENABLED(CONFIG_KVM_PRIVATE_MEM);
 
-Thanks,
-Jason
+There's no harm to KVM if userspace creates a file it can't use, and at some
+point KVM will hopefully support guest_memfd irrespective of private memory.
