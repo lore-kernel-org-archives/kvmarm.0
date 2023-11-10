@@ -1,118 +1,177 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD65A1852
-	for <kvmarm@lists.linux.dev>; Fri, 10 Nov 2023 03:37:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E7923D4
+	for <kvmarm@lists.linux.dev>; Fri, 10 Nov 2023 06:09:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b5345Xd4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699587444;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pROeszy9ePncz4nZyjZpb065/8N1ucMk0OODbP+hams=;
-	b=b5345Xd4CfAHxovucD90DpRX2u+HjGodmOo2tM1PmGl9pbs2YS6YMFg3bqB0yoWOn1BbbP
-	kSRaQ7GbD/VFxoBBbMZmqlPSaliyNc6mf939PPMsN/5At0ps8De3tzo/lvpMo0Zeyv3N1Z
-	QtstkZ2hLbue4IfyLhwRBcqnee8hqNw=
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
- [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-352-uufLiVeaOC2Sw6MjyKflKQ-1; Thu, 09 Nov 2023 22:37:23 -0500
-X-MC-Unique: uufLiVeaOC2Sw6MjyKflKQ-1
-Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-3b2ec6de4e4so63832b6e.1
-        for <kvmarm@lists.linux.dev>; Thu, 09 Nov 2023 19:37:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699587442; x=1700192242;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pROeszy9ePncz4nZyjZpb065/8N1ucMk0OODbP+hams=;
-        b=lwkYbRYq5aGo7e1yWZoBFa06yWl8jyKcXEVBcAQ9mOaSO/J/Kst+5NmD6aOOywlii7
-         fPU78duagzIW+i2TzjPEaztA4N5I2uKieO7GuqSTr2SpHKkCfNsUtNUEcJXnKwjcfh8T
-         JzdlIyigyzATmyf88HdzNCtLyWu7hFstM2qLR+SLDc7Gp75+lSzidDHxeX6fBdOsHe15
-         df8hOz+hNI7aEu0OwTUEz0RlMJ902oYkP0eqznWJFGDmvnwztbLGEsIOtGmVNKd/tQ5P
-         bEAeX/F88TG8qlW30QPFAdgQycUc4KLH8WiXKSkZkECBVCYcXvi1Uc5JbnkyC34VkxAn
-         8u0g==
-X-Gm-Message-State: AOJu0Yz/bZ2CZiGHX2gC3UHrWfDHXC7lKFeQek6vr0oWo1bBBJFW8NPU
-	Ob1F1TH2xjDGh0alTg8oY66nqJPANqsHEhvXS8lfUM17FdZCKjpziM8WIAQU+1QkkVg+UQBDT1s
-	6tXkdCddi6XanlqGK
-X-Received: by 2002:a05:6808:199c:b0:3a9:e8e2:579d with SMTP id bj28-20020a056808199c00b003a9e8e2579dmr8276250oib.2.1699587442424;
-        Thu, 09 Nov 2023 19:37:22 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFPdXOyaUAzV6aldemEymWFIQu5uK8SS6EoZEeBtta4Ue7SEB3JH44cFaCIyyqf1iZkLKsTPg==
-X-Received: by 2002:a05:6808:199c:b0:3a9:e8e2:579d with SMTP id bj28-20020a056808199c00b003a9e8e2579dmr8276228oib.2.1699587442206;
-        Thu, 09 Nov 2023 19:37:22 -0800 (PST)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id e8-20020a63d948000000b005a9b20408a7sm5370547pgj.23.2023.11.09.19.37.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Nov 2023 19:37:21 -0800 (PST)
-Message-ID: <fd78bb81-1f83-13a4-ec37-3fe0cd040ec0@redhat.com>
-Date: Fri, 10 Nov 2023 11:37:16 +0800
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="jPWd1wPt"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1699596544;
+	bh=5G9rtOiPMLhKQC5AIoNpGhSA0wYcSeHiXqfSAm3ZoEA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=jPWd1wPtNR/qo1bW493+Y7HQLJJGTd8Ft9ERkOPvVPie4/IBDR0Ph0z8yv6UbMWoe
+	 2easmJmn0g37TC1QS3WnUf5N0Xteevrdtjq3mnKYcSHXbgTbeNc+Z0iBU8bcp2wdZa
+	 iiEnHEo+GmvMi8nSVeZTwRMl9BoaS3HWGA252ZrquAXlRkgOZZXDfXoEylN+JwuMoy
+	 rKrTqdOqHLvXUTkdJY5exTmN2E7S41FmYxNmFrWLyQ/4Y71WnjUFmubxy1ghF2XNLj
+	 Z3suZ1pGDoaPy4ESbv+ZjYw5vibsZ+V9WAItUVYtJGqQ0Ke4jdre6OK1T+RYsV2fbU
+	 PwnMp45Q/XGlA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4SRT0r49trz4xPQ;
+	Fri, 10 Nov 2023 17:09:00 +1100 (AEDT)
+From: Michael Ellerman <mpe@ellerman.id.au>
+To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
+ <seanjc@google.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Borislav Petkov <bp@alien8.de>, Catalin
+ Marinas <catalin.marinas@arm.com>, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Dave Hansen <dave.hansen@linux.intel.com>,
+ David Hildenbrand <david@redhat.com>, Janosch Frank
+ <frankja@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens
+ <hca@linux.ibm.com>, "H. Peter Anvin" <hpa@zytor.com>, Claudio Imbrenda
+ <imbrenda@linux.ibm.com>, James Morse <james.morse@arm.com>,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, Marc Zyngier <maz@kernel.org>, Ingo Molnar
+ <mingo@redhat.com>, Nicholas Piggin <npiggin@gmail.com>, Oliver Upton
+ <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, Sven
+ Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Will
+ Deacon <will@kernel.org>, x86@kernel.org, Zenghui Yu
+ <yuzenghui@huawei.com>
+Subject: Ping? Re: [PATCH rc] kvm: Prevent compiling virt/kvm/vfio.c unless
+ VFIO is selected
+In-Reply-To: <0-v1-08396538817d+13c5-vfio_kvm_kconfig_jgg@nvidia.com>
+References: <0-v1-08396538817d+13c5-vfio_kvm_kconfig_jgg@nvidia.com>
+Date: Fri, 10 Nov 2023 17:08:55 +1100
+Message-ID: <87edgy87ig.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH RFC 14/22] arm64: convert to arch_cpu_is_hotpluggable()
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev, x86@kernel.org,
- linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org
-Cc: Salil Mehta <salil.mehta@huawei.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com,
- justin.he@arm.com, James Morse <james.morse@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-References: <ZUoRY33AAHMc5ThW@shell.armlinux.org.uk>
- <E1r0JLq-00CTxq-CF@rmk-PC.armlinux.org.uk>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <E1r0JLq-00CTxq-CF@rmk-PC.armlinux.org.uk>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
+Jason Gunthorpe <jgg@nvidia.com> writes:
+> There are a bunch of reported randconfig failures now because of this,
+> something like:
+>
+>>> arch/powerpc/kvm/../../../virt/kvm/vfio.c:89:7: warning: attribute declaration must precede definition [-Wignored-attributes]
+>            fn = symbol_get(vfio_file_iommu_group);
+>                 ^
+>    include/linux/module.h:805:60: note: expanded from macro 'symbol_get'
+>    #define symbol_get(x) ({ extern typeof(x) x __attribute__((weak,visibility("hidden"))); &(x); })
+>
+> It happens because the arch forces KVM_VFIO without knowing if VFIO is
+> even enabled.
 
+This is still breaking some builds. Can we get this fix in please?
 
-On 11/7/23 18:30, Russell King (Oracle) wrote:
-> Convert arm64 to use the arch_cpu_is_hotpluggable() helper rather than
-> arch_register_cpu().
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+cheers
+
+> Split the kconfig so the arch selects the usual HAVE_KVM_ARCH_VFIO and
+> then KVM_VFIO is only enabled if the arch wants it and VFIO is turned on.
+>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202308251949.5IiaV0sz-lkp@intel.com/
+> Closes: https://lore.kernel.org/oe-kbuild-all/202309030741.82aLACDG-lkp@intel.com/
+> Closes: https://lore.kernel.org/oe-kbuild-all/202309110914.QLH0LU6L-lkp@intel.com/
+> Cc: Nick Desaulniers <ndesaulniers@google.com>
+> Fixes: c1cce6d079b8 ("vfio: Compile vfio_group infrastructure optionally")
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 > ---
->   arch/arm64/kernel/setup.c | 8 ++------
->   1 file changed, 2 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-> index 165bd2c0dd5a..42c690bb2d60 100644
-> --- a/arch/arm64/kernel/setup.c
-> +++ b/arch/arm64/kernel/setup.c
-> @@ -402,13 +402,9 @@ static inline bool cpu_can_disable(unsigned int cpu)
->   	return false;
->   }
->   
-> -int arch_register_cpu(int num)
-> +bool arch_cpu_is_hotpluggable(int num)
->   {
-> -	struct cpu *cpu = &per_cpu(cpu_devices, num);
-> -
-> -	cpu->hotpluggable = cpu_can_disable(num);
-> -
-> -	return register_cpu(cpu, num);
-> +	return cpu_can_disable(num);
->   }
->   
->   static void dump_kernel_offset(void)
-
--- 
-Shaoqin
-
+>  arch/arm64/kvm/Kconfig   | 2 +-
+>  arch/powerpc/kvm/Kconfig | 2 +-
+>  arch/s390/kvm/Kconfig    | 2 +-
+>  arch/x86/kvm/Kconfig     | 2 +-
+>  virt/kvm/Kconfig         | 7 ++++++-
+>  5 files changed, 10 insertions(+), 5 deletions(-)
+>
+> Sean's large series will also address this:
+>
+> https://lore.kernel.org/kvm/20230916003118.2540661-7-seanjc@google.com/
+>
+> I don't know if it is sever enough to fix in the rc cycle, but here is the
+> patch.
+>
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 83c1e09be42e5b..7c43eaea51ce05 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -28,7 +28,7 @@ menuconfig KVM
+>  	select KVM_MMIO
+>  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+>  	select KVM_XFER_TO_GUEST_WORK
+> -	select KVM_VFIO
+> +	select HAVE_KVM_ARCH_VFIO
+>  	select HAVE_KVM_EVENTFD
+>  	select HAVE_KVM_IRQFD
+>  	select HAVE_KVM_DIRTY_RING_ACQ_REL
+> diff --git a/arch/powerpc/kvm/Kconfig b/arch/powerpc/kvm/Kconfig
+> index 902611954200df..b64824e4cbc1eb 100644
+> --- a/arch/powerpc/kvm/Kconfig
+> +++ b/arch/powerpc/kvm/Kconfig
+> @@ -22,7 +22,7 @@ config KVM
+>  	select PREEMPT_NOTIFIERS
+>  	select HAVE_KVM_EVENTFD
+>  	select HAVE_KVM_VCPU_ASYNC_IOCTL
+> -	select KVM_VFIO
+> +	select HAVE_KVM_ARCH_VFIO
+>  	select IRQ_BYPASS_MANAGER
+>  	select HAVE_KVM_IRQ_BYPASS
+>  	select INTERVAL_TREE
+> diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
+> index 45fdf2a9b2e326..d206ad3a777d5d 100644
+> --- a/arch/s390/kvm/Kconfig
+> +++ b/arch/s390/kvm/Kconfig
+> @@ -31,7 +31,7 @@ config KVM
+>  	select HAVE_KVM_IRQ_ROUTING
+>  	select HAVE_KVM_INVALID_WAKEUPS
+>  	select HAVE_KVM_NO_POLL
+> -	select KVM_VFIO
+> +	select HAVE_KVM_ARCH_VFIO
+>  	select INTERVAL_TREE
+>  	select MMU_NOTIFIER
+>  	help
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index ed90f148140dfe..8e70e693f90e30 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -45,7 +45,7 @@ config KVM
+>  	select HAVE_KVM_NO_POLL
+>  	select KVM_XFER_TO_GUEST_WORK
+>  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+> -	select KVM_VFIO
+> +	select HAVE_KVM_ARCH_VFIO
+>  	select INTERVAL_TREE
+>  	select HAVE_KVM_PM_NOTIFIER if PM
+>  	select KVM_GENERIC_HARDWARE_ENABLING
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index 484d0873061ca5..0bf34809e1bbfe 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -59,9 +59,14 @@ config HAVE_KVM_MSI
+>  config HAVE_KVM_CPU_RELAX_INTERCEPT
+>         bool
+>  
+> -config KVM_VFIO
+> +config HAVE_KVM_ARCH_VFIO
+>         bool
+>  
+> +config KVM_VFIO
+> +       def_bool y
+> +       depends on HAVE_KVM_ARCH_VFIO
+> +       depends on VFIO
+> +
+>  config HAVE_KVM_INVALID_WAKEUPS
+>         bool
+>  
+>
+> base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
+> -- 
+> 2.42.0
