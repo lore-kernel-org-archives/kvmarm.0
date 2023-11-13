@@ -1,104 +1,242 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A0D2134A
-	for <kvmarm@lists.linux.dev>; Mon, 13 Nov 2023 16:45:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3DA5224D7
+	for <kvmarm@lists.linux.dev>; Mon, 13 Nov 2023 17:41:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B8536FEC;
-	Mon, 13 Nov 2023 08:45:47 -0800 (PST)
-Received: from [10.57.73.13] (unknown [10.57.73.13])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EC3113F7B4;
-	Mon, 13 Nov 2023 08:44:59 -0800 (PST)
-Message-ID: <1bdcdd85-9470-408c-aaac-fa4548bb2385@arm.com>
-Date: Mon, 13 Nov 2023 16:44:58 +0000
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0F11C433C8;
+	Mon, 13 Nov 2023 17:41:41 +0000 (UTC)
+Date: Mon, 13 Nov 2023 17:41:39 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Lorenzo Pieralisi <lpieralisi@kernel.org>
+Cc: Will Deacon <will@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
+	ankita@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
+	aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
+	targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
+	apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 2/2] KVM: arm64: allow the VM to select DEVICE_* and
+ NORMAL_NC for IO memory
+Message-ID: <ZVJf06MoJs9Ld75C@arm.com>
+References: <ZRKW6uDR/+eXYMzl@lpieralisi>
+ <ZRLiDf204zCpO6Mv@arm.com>
+ <ZR6IZwcFNw55asW0@lpieralisi>
+ <20231012123541.GB11824@willie-the-truck>
+ <ZSf6Ue09IO6QMBs1@arm.com>
+ <20231012144807.GA12374@willie-the-truck>
+ <ZSgsKSCv-zWgtWkm@arm.com>
+ <20231013092934.GA13524@willie-the-truck>
+ <ZSlBOiebenPKXBY4@arm.com>
+ <ZUz78gFPgMupew+m@lpieralisi>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 0/3] Update tlb invalidation routines for FEAT_LPA2
-Content-Language: en-GB
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Ard Biesheuvel <ardb@google.com>, Ard Biesheuvel <ardb@kernel.org>,
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Mark Rutland <mark.rutland@arm.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>,
- Kees Cook <keescook@chromium.org>, Joey Gouly <joey.gouly@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, James Morse
- <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-References: <20231027115634.1432154-1-ryan.roberts@arm.com>
- <3800df70-73f2-44b7-a6ed-15ec0bd63f5f@arm.com> <ZVIkPm4uxbCNsOgh@arm.com>
-From: Ryan Roberts <ryan.roberts@arm.com>
-In-Reply-To: <ZVIkPm4uxbCNsOgh@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZUz78gFPgMupew+m@lpieralisi>
 
-On 13/11/2023 13:27, Catalin Marinas wrote:
-> On Mon, Nov 13, 2023 at 11:55:01AM +0000, Ryan Roberts wrote:
->> On 27/10/2023 12:56, Ryan Roberts wrote:
->>> As raised yesterday against Ard's LPA2 series [1], we need to address the TLBI
->>> changes to properly support LPA2 before Ard's changes get merged. So far those
->>> changes have been part of my KVM LPA2 series [2]. So this is an attempt to split
->>> the TLBI changes to make them independent. The idea is that this series would go
->>> in first, then Ard's and the rest of my series can race eachother and it doesn't
->>> really matter who wins.
->>>
->>> I've attempted to address all of Marc's feedback against the versions of these
->>> patches posted at [2], including adding benchmark data (see patch 1). Although
->>> if people are still nervous that this could regress non-lpa2 performance in some
->>> cases, I could rework so that there are lpa2 and non-lpa2 variants of
->>> __flush_tlb_range_op(), and the correct version is chosen at the higher level
->>> (based on lpa2_is_enabled() / kvm_lpa2_is_enabled()).
->>>
->>> It turns out that we won't be able to key LPA2 usage off the same static key for
->>> both the kernel and kvm usage because the kernel usage additionally depends on
->>> CONFIG_ARM64_LPA2 being enabled. So I've introduced 2 stub functions
->>> (lpa2_is_enabled() and kvm_lpa2_is_enabled()) to advertise it. Ard already
->>> defines and implements lpa2_is_enabled() in his series, so there will be a minor
->>> conflict to resolve there. I plan to define kvm_lpa2_is_enabled() to be the
->>> static key for kvm in my series. Marc, would you be happy with this approach?
->>>
->>> Anyway, I wanted to put this out there as an RFC. If we are happy with it, then
->>> I'll re-post on 6.7-rc1.
-> [...]
->> I polite bump; I never heard back on this. I'm planning to post my LPA2/KVM
->> series on top of v6.7-rc1 in the next day or 2.
+Hi Lorenzo,
+
+Thanks for putting this together. It looks fine to me, just some general
+comments below.
+
+On Thu, Nov 09, 2023 at 04:34:10PM +0100, Lorenzo Pieralisi wrote:
+> Updated commit log (it might be [is] too verbose) below, it should probably
+> be moved into a documentation file but to do that I should decouple
+> it from this changeset (ie a document explaining memory attributes
+> and error containment for ARM64 - indipendent from KVM S2 defaults).
 > 
-> I suspect that's what most maintainers wait for ;). Usually patches
-> posted just before or during the merging window get ignored, unless they
-> are urgent fixes.
+> I'd also add a Link: to the lore archive entry for reference (did not
+> add it in the log below).
 > 
->> By default, these 3 patches will
->> be the first 3 of the series. But if you have an issue with the approach it
->> would be good to work out an alternative plan to avoid wasting effort preparing
->> the series.
+> Please let me know what's the best option here.
+
+It would be good to have this under Documentation/arch/arm64/, though as
+a document at the end of the series describing what the new behaviour
+is, the kernel/KVM expectations (after the patches have been applied).
+We could even submit it separately once we agreed on how the series
+looks like.
+
+> -- >8 --
+> Currently, KVM for ARM64 maps at stage 2 memory that is
+> considered device (ie it is not RAM) with DEVICE_nGnRE
+> memory attributes; this setting overrides (as per the ARM
+> architecture [1]) any device MMIO mapping present at stage
+> 1, resulting in a set-up whereby a guest operating system
+> can't determine device MMIO mapping memory attributes on its
+> own but it is always overriden by the KVM stage 2 default.
+
+To be fully correct, stage 1 and stage 2 attributes combine in a way
+that results in the more restrictive properties, so not a simple
+override. But to keep things simple, especially if this part only goes
+in the commit log, leave it as is.
+
+> This set-up does not allow guest operating systems to select
+> device memory attributes on a page by page basis independently
+
+Not sure it's even worth specifying "page by page". It just doesn't
+allow the guest to relax the device map memory attributes at all.
+
+> from KVM stage-2 mappings (refer to [1], "Combining stage 1 and stage
+> 2 memory type attributes"), which turns out to be an issue in that
+> guest operating systems (eg Linux) may request to map
+> devices MMIO regions with memory attributes that guarantee
+> better performance (eg gathering attribute - that for some
+> devices can generate larger PCIe memory writes TLPs)
+> and specific operations (eg unaligned transactions) such as
+> the NormalNC memory type.
+
+Another case is correct guest behaviour where it would not expect
+unaligned accesses from Normal NC mappings.
+
+> The default device stage 2 mapping was chosen in KVM
+> for ARM64 since it was considered safer (ie it would
+> not allow guests to trigger uncontained failures
+> ultimately crashing the machine) but this turned out
+> to be imprecise.
+
+s/imprecise/asynchronous (SError)/
+
+Another reason was probably that it matches the default VFIO mapping
+(though the latter is slightly stricter as in Device_nGnRnE).
+
+> Failures containability is a property of the platform
+> and is independent from the memory type used for MMIO
+> device memory mappings.
 > 
-> If these patches are needed for Ard's series (I think they do), they
-> could be posted together. But first we need to split Ard's series into
-> at least two: reworking the memory map together with moving (some of)
-> the init code to C and the actual LPA2 stage 1 support. We might even
-> through LPA2 stage 2 on top if we feel brave ;). We can queue them all
-> together but having separate series gives us an option to drop bits if
-> needed.
+> Actually, DEVICE_nGnRE memory type is even more problematic
+> than eg Normal-NC memory type in terms of faults containability
+> in that eg aborts triggered on DEVICE_nGnRE loads cannot be made,
+> architecturally, synchronous (ie that would imply that the processor
+> should issue at most 1 load transaction at a time - ie it can't pipeline
+> them - otherwise the synchronous abort semantics would break the
+> no-speculation attribute attached to DEVICE_XXX memory).
+> 
+> This means that regardless of the combined stage1+stage2 mappings a
+> platform is safe if and only if device transactions cannot trigger
+> uncontained failures and that in turn relies on platform
+> capabilities and the device type being assigned (ie PCIe AER/DPC
+> error containment and RAS architecture[3]); therefore the default
+> KVM device stage 2 memory attributes play no role in making device
+> assignment safer for a given platform (if the platform design
+> adheres to design guidelines outlined in [3]) and therefore can
+> be relaxed.
+> 
+> For all these reasons, relax the KVM stage 2 device
+> memory attributes from DEVICE_nGnRE to Normal-NC.
 
-Sorry I'm not completely sure what you are suggesting I do here. In the context
-of the lpa2/kvm series, Marc previously said he would merge it for v6.8 if I
-posted against v6.7-rc1 (which is what I'm gearing up for now).
+I think this covers the safety aspect w.r.t. uncontained errors.
 
-My series and Ard's are independent except that they both depend on the 3
-patches in this RFC. Ard has just suggested he would prefix his series with
-these 3 patches and I would continue to do the same, then they can be handled as
-2 independent series (or more if Ard is splitting his) - the first 3 patches
-will just desolve to nothing for the series that goes in second.
+> A different Normal memory type default at stage-2
+> (eg Normal Write-through) could have been chosen
+> instead of Normal-NC but Normal-NC was chosen
+> because:
+> 
+> - Its attributes are well-understood compared to
+>   other Normal memory types for MMIO mappings
 
-Does that work for you, are are you suggesting I should re-post this as an
-independent series?
+Ideally we'd have gone for Device_GRE from a performance perspective but
+it doesn't support unaligned accesses. Basically at this stage we don't
+want cacheable accesses to MMIO until we gain a better understanding on
+what the impact would be.
 
-Thanks,
-Ryan
+> - On systems implementing S2FWB (FEAT_S2FWB), that's the only sensible
+>   default for normal memory types. For systems implementing
+>   FEAT_S2FWB (see [1] D8.5.5 S2=stage-2 - S2 MemAttr[3:0]), the options
+>   to choose the memory types are as follows:
+> 
+>   if S2 MemAttr[2] == 0, the mapping defaults to DEVICE_XXX
+>   (XXX determined by S2 MemAttr[1:0]). This is what we have
+>   today (MemAttr[2:0] == 0b001) and therefore it is not described
+>   any further.
+> 
+>   if S2 MemAttr[2] == 1, there are the following options:
+>  
+>   S2 MemAttr[2:0] | Resulting mapping
+>   -----------------------------------------------------------------------------
+>   0b101           | Prevent the guest from selecting cachable memory type, it
+> 		  | allows it to choose Device-* or Normal-NC
+>   0b110           | It forces write-back memory type; it breaks MMIO.
+>   0b111           | Allow the VM to select any memory type including cachable.
+> 		  | It is unclear whether this is safe from a platform
+> 		  | perspective, especially wrt uncontained failures and
+> 		  | cacheability (eg device reclaim/reset and cache
+> 		  | maintenance).
+>   ------------------------------------------------------------------------------
+> 
+>   - For !FEAT_S2FWB systems, it is logical to choose a default S2 mapping
+>     identical to FEAT_S2FWB (that basically would force Normal-NC, see
+>     option S2 MemAttr[2:0] == 0b101 above), to guarantee a coherent approach
+>     between the two
 
+Is this text only to say that we can't use write-through memory because
+with FEAT_S2FWB it is forced cacheable? I'd probably keep in simple and
+just state that we went for Normal NC to avoid cache
+allocation/snooping.
 
+It just crossed my mind, I think we also assume here that on platforms
+with transparent caches, Normal NC of MMIO won't be upgraded to
+cacheable (that's irrespective of KVM). This may need to be stated in
+some Arm BSA document (I'm not aware of any arch rules that prevent this
+from happening). AFAIK, platforms with transparent caches only do this
+for the memory ranges where the DRAM is expected.
+
+> Relaxing S2 KVM device MMIO mappings to Normal-NC is not expected to
+> trigger any issue on guest device reclaim use cases either (ie device
+> MMIO unmap followed by a device reset) at least for PCIe devices, in that
+> in PCIe a device reset is architected and carried out through PCI config
+> space transactions that are naturally ordered wrt MMIO transactions
+> according to the PCI ordering rules.
+
+We could state this in a doc that for device pass-through, there's an
+expectation that the device can be reclaimed along the lines of the PCIe
+reset behaviour. If one admin decides to allow device pass-through for
+some unsafe devices/platforms, it's their problem really. I don't think
+a Device_nGnRE mapping would help in those cases anyway.
+
+This could be expanded to Normal Cacheable at some point but KVM would
+have to do cache maintenance after unmapping the device from the guest
+(so let's leave this for a separate series).
+
+> Having Normal-NC S2 default puts guests in control (thanks to
+> stage1+stage2 combined memory attributes rules [1]) of device MMIO
+> regions memory mappings, according to the rules described in [1]
+> and summarized here ([(S1) - stage1], [(S2) - stage 2]):
+> 
+> S1	     |  S2	     | Result
+> NORMAL-WB    |  NORMAL-NC    | NORMAL-NC
+> NORMAL-WT    |  NORMAL-NC    | NORMAL-NC
+> NORMAL-NC    |  NORMAL-NC    | NORMAL-NC
+> DEVICE<attr> |  NORMAL-NC    | DEVICE<attr>
+> 
+> It is worth noting that currently, to map devices MMIO space to user
+> space in a device pass-through use case the VFIO framework applies memory
+> attributes derived from pgprot_noncached() settings applied to VMAs, which
+> result in device-nGnRnE memory attributes for the stage-1 VMM mappings.
+> 
+> This means that a userspace mapping for device MMIO space carried
+> out with the current VFIO framework and a guest OS mapping for the same
+> MMIO space may result in a mismatched alias as described in [2].
+> 
+> Defaulting KVM device stage-2 mappings to Normal-NC attributes does not change
+> anything in this respect, in that the mismatched aliases would only affect
+> (refer to [2] for a detailed explanation) ordering between the userspace and
+> GuestOS mappings resulting stream of transactions (ie it does not cause loss of
+> property for either stream of transactions on its own), which is harmless
+> given that the userspace and GuestOS access to the device is carried
+> out through independent transactions streams.
+
+I think this was a recent clarification from the architects (in private
+emails). My understanding for some time has been that the mere presence
+of a Normal alias would affect the semantics of the user (VMM) accesses
+to the Device mapping. Apparently, this only matters if there is some
+expected ordering between the user (VMM) access and the VM one with
+different aliases. I can't tell where the mismatched aliases rules state
+this but I haven't read them in a while.
+
+-- 
+Catalin
