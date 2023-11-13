@@ -1,17 +1,17 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6AA61CF8C
-	for <kvmarm@lists.linux.dev>; Mon, 13 Nov 2023 11:55:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6419E19465
+	for <kvmarm@lists.linux.dev>; Mon, 13 Nov 2023 11:57:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A1DBFEC;
-	Mon, 13 Nov 2023 03:55:50 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EA8ECFEC;
+	Mon, 13 Nov 2023 03:58:33 -0800 (PST)
 Received: from [10.57.73.13] (unknown [10.57.73.13])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DA6E63F6C4;
-	Mon, 13 Nov 2023 03:55:02 -0800 (PST)
-Message-ID: <3800df70-73f2-44b7-a6ed-15ec0bd63f5f@arm.com>
-Date: Mon, 13 Nov 2023 11:55:01 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E3DDB3F6C4;
+	Mon, 13 Nov 2023 03:57:46 -0800 (PST)
+Message-ID: <1d742c1f-2f2d-4d73-8530-b7e2b688287f@arm.com>
+Date: Mon, 13 Nov 2023 11:57:45 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -19,81 +19,125 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 0/3] Update tlb invalidation routines for FEAT_LPA2
+Subject: Re: [PATCH v4 04/12] KVM: arm64: Add ARM64_HAS_LPA2 CPU capability
 Content-Language: en-GB
-To: Ard Biesheuvel <ardb@google.com>, Ard Biesheuvel <ardb@kernel.org>,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Mark Rutland <mark.rutland@arm.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>,
- Kees Cook <keescook@chromium.org>, Joey Gouly <joey.gouly@arm.com>,
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>,
  Suzuki K Poulose <suzuki.poulose@arm.com>, James Morse
- <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-References: <20231027115634.1432154-1-ryan.roberts@arm.com>
+ <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Ard Biesheuvel <ardb@kernel.org>,
+ Anshuman Khandual <anshuman.khandual@arm.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+References: <20231009185008.3803879-1-ryan.roberts@arm.com>
+ <20231009185008.3803879-5-ryan.roberts@arm.com>
+ <86cyx9n1yp.wl-maz@kernel.org>
 From: Ryan Roberts <ryan.roberts@arm.com>
-In-Reply-To: <20231027115634.1432154-1-ryan.roberts@arm.com>
+In-Reply-To: <86cyx9n1yp.wl-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 27/10/2023 12:56, Ryan Roberts wrote:
-> Hi All,
+On 20/10/2023 09:16, Marc Zyngier wrote:
+> On Mon, 09 Oct 2023 19:50:00 +0100,
+> Ryan Roberts <ryan.roberts@arm.com> wrote:
+>>
+>> Expose FEAT_LPA2 as a capability so that we can take advantage of
+>> alternatives patching in both the kernel and hypervisor.
+>>
+>> Although FEAT_LPA2 presence is advertised separately for stage1 and
+>> stage2, the expectation is that in practice both stages will either
+>> support or not support it. Therefore, for the case where KVM is present,
+>> we combine both into a single capability, allowing us to simplify the
+>> implementation. For the case where KVM is not present, we only care
+>> about stage1.
+>>
+>> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
+>> ---
+>>  arch/arm64/include/asm/cpufeature.h |  5 ++++
+>>  arch/arm64/kernel/cpufeature.c      | 46 +++++++++++++++++++++++++++++
+>>  arch/arm64/tools/cpucaps            |  1 +
+>>  3 files changed, 52 insertions(+)
+>>
+>> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+>> index 5bba39376055..b1292ec88538 100644
+>> --- a/arch/arm64/include/asm/cpufeature.h
+>> +++ b/arch/arm64/include/asm/cpufeature.h
+>> @@ -831,6 +831,11 @@ static inline bool system_supports_tlb_range(void)
+>>  		cpus_have_const_cap(ARM64_HAS_TLB_RANGE);
+>>  }
+>>  
+>> +static inline bool system_supports_lpa2(void)
+>> +{
+>> +	return cpus_have_const_cap(ARM64_HAS_LPA2);
 > 
-> As raised yesterday against Ard's LPA2 series [1], we need to address the TLBI
-> changes to properly support LPA2 before Ard's changes get merged. So far those
-> changes have been part of my KVM LPA2 series [2]. So this is an attempt to split
-> the TLBI changes to make them independent. The idea is that this series would go
-> in first, then Ard's and the rest of my series can race eachother and it doesn't
-> really matter who wins.
+> cpus_have_const_cap() is going away. You may want to look at Mark's
+> series to see how to replace this one.
 > 
-> I've attempted to address all of Marc's feedback against the versions of these
-> patches posted at [2], including adding benchmark data (see patch 1). Although
-> if people are still nervous that this could regress non-lpa2 performance in some
-> cases, I could rework so that there are lpa2 and non-lpa2 variants of
-> __flush_tlb_range_op(), and the correct version is chosen at the higher level
-> (based on lpa2_is_enabled() / kvm_lpa2_is_enabled()).
+>> +}
+>> +
+>>  int do_emulate_mrs(struct pt_regs *regs, u32 sys_reg, u32 rt);
+>>  bool try_emulate_mrs(struct pt_regs *regs, u32 isn);
+>>  
+>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+>> index 444a73c2e638..1ccb1fe0e310 100644
+>> --- a/arch/arm64/kernel/cpufeature.c
+>> +++ b/arch/arm64/kernel/cpufeature.c
+>> @@ -1746,6 +1746,46 @@ static bool unmap_kernel_at_el0(const struct arm64_cpu_capabilities *entry,
+>>  	return !meltdown_safe;
+>>  }
+>>  
+>> +static inline bool has_lpa2_at_stage1(u64 mmfr0)
 > 
-> It turns out that we won't be able to key LPA2 usage off the same static key for
-> both the kernel and kvm usage because the kernel usage additionally depends on
-> CONFIG_ARM64_LPA2 being enabled. So I've introduced 2 stub functions
-> (lpa2_is_enabled() and kvm_lpa2_is_enabled()) to advertise it. Ard already
-> defines and implements lpa2_is_enabled() in his series, so there will be a minor
-> conflict to resolve there. I plan to define kvm_lpa2_is_enabled() to be the
-> static key for kvm in my series. Marc, would you be happy with this approach?
+> Why inline? It isn't like this has any performance implication...
 > 
-> Anyway, I wanted to put this out there as an RFC. If we are happy with it, then
-> I'll re-post on 6.7-rc1.
+>> +{
+>> +#if defined(CONFIG_ARM64_4K_PAGES) || defined(CONFIG_ARM64_16K_PAGES)
+>> +	unsigned int tgran;
+>> +
+>> +	tgran = cpuid_feature_extract_unsigned_field(mmfr0,
+>> +						ID_AA64MMFR0_EL1_TGRAN_SHIFT);
+>> +	return tgran == ID_AA64MMFR0_EL1_TGRAN_LPA2;
+>> +#else
+>> +	return false;
+>> +#endif
+> 
+> Writing this using IS_ENABLED() would be slightly more pleasing to my
+> tired eyes... ;-)
 
-Marc, All,
+Unfortunately this doesn't work because ID_AA64MMFR0_EL1_TGRAN_LPA2 is only
+defined for 4K and 16K configs (there is no field ofr 64K). So proposing to do
+it this way instead. Please shout if you have a better idea:
 
-I polite bump; I never heard back on this. I'm planning to post my LPA2/KVM
-series on top of v6.7-rc1 in the next day or 2. By default, these 3 patches will
-be the first 3 of the series. But if you have an issue with the approach it
-would be good to work out an alternative plan to avoid wasting effort preparing
-the series.
+#if defined(CONFIG_ARM64_4K_PAGES) || defined(CONFIG_ARM64_16K_PAGES)
+static bool has_lpa2_at_stage1(u64 mmfr0)
+{
+	unsigned int tgran;
 
-Thanks,
-Ryan
+	tgran = cpuid_feature_extract_unsigned_field(mmfr0,
+					ID_AA64MMFR0_EL1_TGRAN_SHIFT);
+	return tgran == ID_AA64MMFR0_EL1_TGRAN_LPA2;
+}
 
-> 
-> [1] https://lore.kernel.org/linux-arm-kernel/5651bb31-9ef6-4dfc-b146-64606279bbf7@arm.com/
-> [2] https://lore.kernel.org/kvmarm/20231009185008.3803879-1-ryan.roberts@arm.com/
-> 
-> Thanks,
-> Ryan
-> 
-> Ryan Roberts (3):
->   arm64/mm: Modify range-based tlbi to decrement scale
->   arm64/mm: Add lpa2_is_enabled() kvm_lpa2_is_enabled() stubs
->   arm64/mm: Update tlb invalidation routines for FEAT_LPA2
-> 
->  arch/arm64/include/asm/kvm_mmu.h      |   3 +
->  arch/arm64/include/asm/pgtable-prot.h |   2 +
->  arch/arm64/include/asm/tlb.h          |  15 ++--
->  arch/arm64/include/asm/tlbflush.h     | 100 ++++++++++++++++----------
->  4 files changed, 78 insertions(+), 42 deletions(-)
-> 
-> --
-> 2.25.1
-> 
+static bool has_lpa2_at_stage2(u64 mmfr0)
+{
+	unsigned int tgran;
+
+	tgran = cpuid_feature_extract_unsigned_field(mmfr0,
+					ID_AA64MMFR0_EL1_TGRAN_2_SHIFT);
+	return tgran == ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_LPA2;
+}
+
+static bool has_lpa2(const struct arm64_cpu_capabilities *entry, int scope)
+{
+	u64 mmfr0;
+
+	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+	return has_lpa2_at_stage1(mmfr0) && has_lpa2_at_stage2(mmfr0);
+}
+#else
+static bool has_lpa2(const struct arm64_cpu_capabilities *entry, int scope)
+{
+	return false;
+}
+#endif
 
