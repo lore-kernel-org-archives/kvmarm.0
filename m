@@ -1,69 +1,115 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C87224EA
-	for <kvmarm@lists.linux.dev>; Mon, 13 Nov 2023 17:50:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94859C433C7;
-	Mon, 13 Nov 2023 17:49:58 +0000 (UTC)
-Date: Mon, 13 Nov 2023 17:49:56 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: Ard Biesheuvel <ardb@google.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Kees Cook <keescook@chromium.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [RFC PATCH v1 0/3] Update tlb invalidation routines for FEAT_LPA2
-Message-ID: <ZVJhxF4y2Tds2dRn@arm.com>
-References: <20231027115634.1432154-1-ryan.roberts@arm.com>
- <3800df70-73f2-44b7-a6ed-15ec0bd63f5f@arm.com>
- <ZVIkPm4uxbCNsOgh@arm.com>
- <1bdcdd85-9470-408c-aaac-fa4548bb2385@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A85922EF1
+	for <kvmarm@lists.linux.dev>; Mon, 13 Nov 2023 18:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ufk8Ipnj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14064C433C8;
+	Mon, 13 Nov 2023 18:13:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699899214;
+	bh=zZ0ABhBNzUrMEKoajMk2OiQ2peqB51tlUR1tmzcZ7QE=;
+	h=From:Date:Subject:To:Cc:From;
+	b=Ufk8Ipnjch8hRwP6kbw4DrHyq2lNTBAttobjsEfozAApeXtbIhKWESGA1N7GxluFU
+	 bRyOsDwvEESSDsNuukk7lbmMVOO1uWNnwqE67u8ZsAtezZNhFpyLZpCo6A4myaDrWS
+	 d0xBeVYbC6q66VGw4Lk46kZav7VJUMdsxz7rnLDbj+9vx23VEDL0FJCOAYgPoNB1QI
+	 rhDG7/OOF3JZpKZYNWOTx2hX7NyVjsB97EMWmveu8M4vyVFnJPA6Etsom8QFK9RJog
+	 mjTKPPP0L0XbsbdnqyWMJ/m4ySgOIsojmDxIutBb4VsNRz+lNXbgqSFFVUc7OB4WX4
+	 0N5nCdXlwgxMA==
+From: Mark Brown <broonie@kernel.org>
+Date: Mon, 13 Nov 2023 18:09:18 +0000
+Subject: [PATCH v2] KVM: arm64: Only default to enabling SVE when present
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1bdcdd85-9470-408c-aaac-fa4548bb2385@arm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20231113-kvm-arm64-fp-init-v2-1-98867e5fd97f@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAE5mUmUC/22NQQ6CMBBFr0Jm7RgKxRRX3sOwqGWACVLIlDQaw
+ t2txKXL95L//gaBhCnANdtAKHLg2ScoThm4wfqekNvEUORFmde5wTFOaGW6aOwWZM8rmloba9q
+ qIq0h7Rahjl9H894kHjiss7yPi6i+9ldT5Z9aVKjQOKofVjmnnb6NJJ6e51l6aPZ9/wB8q9PIs
+ wAAAA==
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ James Morse <james.morse@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.13-dev-0438c
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2474; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=zZ0ABhBNzUrMEKoajMk2OiQ2peqB51tlUR1tmzcZ7QE=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBlUmdKzgYWsfK8IY0vjDLIDyiKtEJ/MwZ6WMxi7mip
+ PI6CWymJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZVJnSgAKCRAk1otyXVSH0I2zB/
+ 9/GohuiyHT41TGPna2JwnANYxSkfsGRbWEfszNUz92/SIPL07c93Ca2nyhCwjqj6pdZsUzGJ68VovD
+ gAMIr+RkYLVGkx4li6CfsXGFkZsIc+6uhqTyDy2f3jLoo7cWt5xAa+nuCeiwd2axTdKEAIdMfzL1Gh
+ mN4KU+VzCgV6mzKoIwj2E4BPrg1nLE+zNHa8STplZjHilVi/rx+DWBOg7pwgQD1N5wjtpNCt5ZrjuP
+ UeuTS+bv5we7VKG8NPgYO+5I2lMgOfbXg0h+MSfbYKRXbsVvQ45hwcJnVn/Lf3s3KEIYp4MPAPyz+S
+ cT+h8WCaXBOhuy6fdzf7iyPY1eZ1+T
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Mon, Nov 13, 2023 at 04:44:58PM +0000, Ryan Roberts wrote:
-> On 13/11/2023 13:27, Catalin Marinas wrote:
-> > If these patches are needed for Ard's series (I think they do), they
-> > could be posted together. But first we need to split Ard's series into
-> > at least two: reworking the memory map together with moving (some of)
-> > the init code to C and the actual LPA2 stage 1 support. We might even
-> > through LPA2 stage 2 on top if we feel brave ;). We can queue them all
-> > together but having separate series gives us an option to drop bits if
-> > needed.
-> 
-> Sorry I'm not completely sure what you are suggesting I do here. In the context
-> of the lpa2/kvm series, Marc previously said he would merge it for v6.8 if I
-> posted against v6.7-rc1 (which is what I'm gearing up for now).
+For unclear reasons our handling of SVE and SME when setting the default
+value of CPTR_EL2 for VHE mode is inconsistent. For normal VHE we
+unconditionally set CPTR_EL2.ZEN to 0b01 but only set the equivalent
+field CPTR_EL2.SMEN to 0b01 if SME is present, for hVHE we will always
+set the field 0b11 if SVE is not supported. Given the similarities
+between the two extensions it would generally be expected that the code
+handling SVE and SME would be very similar.
 
-If we merge your series independently of Ard's, that's fine, these three
-patches can go together as a prefix.
+Since CPTR_ELx.ZEN is RES0 when SVE is not implemented it is probably not
+harmful to try to set the bits but it is better practice to not set
+unimplemented bits so resolve the inconsistency in favour of checking if
+SVE is present too.
 
-> My series and Ard's are independent except that they both depend on the 3
-> patches in this RFC. Ard has just suggested he would prefix his series with
-> these 3 patches and I would continue to do the same, then they can be handled as
-> 2 independent series (or more if Ard is splitting his) - the first 3 patches
-> will just desolve to nothing for the series that goes in second.
-> 
-> Does that work for you, are are you suggesting I should re-post this as an
-> independent series?
+FPSIMD is also in theory optional though there's probably much more work to
+handle the case where it is not implemented properly and that is not
+something we see in practical systems.
 
-No need to. Just post your LPA2 patches with these three as a prefix.
-Ard can include them as well and if it gets to merging both, we'll sort
-out a small stable branch for these three patches.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v2:
+- Rebase onto v6.7-rc1.
+- Link to v1: https://lore.kernel.org/r/20230913-kvm-arm64-fp-init-v1-1-8ce9ba1cc4c4@kernel.org
+---
+ arch/arm64/include/asm/kvm_emulate.h | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 78a550537b67..b6f1ddff796c 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -583,15 +583,17 @@ static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
+ 	u64 val;
+ 
+ 	if (has_vhe()) {
+-		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
+-		       CPACR_EL1_ZEN_EL1EN);
++		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN);
++		if (cpus_have_final_cap(ARM64_SVE))
++			val |= CPACR_EL1_ZEN_EL1EN;
+ 		if (cpus_have_final_cap(ARM64_SME))
+ 			val |= CPACR_EL1_SMEN_EL1EN;
+ 	} else if (has_hvhe()) {
+ 		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN);
+ 
+-		if (!vcpu_has_sve(vcpu) ||
+-		    (vcpu->arch.fp_state != FP_STATE_GUEST_OWNED))
++		if (cpus_have_final_cap(ARM64_SVE) &&
++		    (!vcpu_has_sve(vcpu) ||
++		     (vcpu->arch.fp_state != FP_STATE_GUEST_OWNED)))
+ 			val |= CPACR_EL1_ZEN_EL1EN | CPACR_EL1_ZEN_EL0EN;
+ 		if (cpus_have_final_cap(ARM64_SME))
+ 			val |= CPACR_EL1_SMEN_EL1EN | CPACR_EL1_SMEN_EL0EN;
+
+---
+base-commit: b85ea95d086471afb4ad062012a4d73cd328fa86
+change-id: 20230908-kvm-arm64-fp-init-8948a8d55e44
+
+Best regards,
 -- 
-Catalin
+Mark Brown <broonie@kernel.org>
+
