@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B989922EFC
-	for <kvmarm@lists.linux.dev>; Mon, 13 Nov 2023 17:43:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1683622EE4
+	for <kvmarm@lists.linux.dev>; Mon, 13 Nov 2023 17:43:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SXyEW/bF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92D58C433CD;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sUYdit1b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1B74C433C7;
 	Mon, 13 Nov 2023 17:43:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1699897425;
-	bh=MtPSu5LUzrRw8/ng+e1jkKKFUThsGpUNJoMyASnhWfA=;
+	bh=iYlqs1RSget5iyc3jLMZO8ZKcFfCoTNJB6oiIZEmnlk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SXyEW/bF2OqunvYtWjlnOoR6s9h+kG37I1JUPKYWU7NkLWlI41efy9eCs9hkZNAjx
-	 XP6CtFf96laIT6U1xN5y2KsaFDzcOiA9LYerkYTMjVgbZImSW9YAS+dWyKQ1lA8ao/
-	 eOZgmmNyR4NwligNEiNIWQxTTSXVV/gj5X0MftO9v8RFkbxQGnzhbomNIRQ+O+vr/e
-	 /PmysSJaTJINXC7bX9qE3eHb+Kg4m7WKzQVvj3wTTp+eQYkrCtVxM7EPpTwW2nSOy7
-	 M02PZuq1nhXtl/9SlbPmiN1uEQsqthoMzY7RNOgIS+NTKT2nQ5XY0QthhMnhwepEvm
-	 pmj5jpngHEsQw==
+	b=sUYdit1b4tpTDNnPVOi4P7SB5TkMxqhC3p4iCoEeJ7W3CYufhLU5PqpaKKj/mCJCX
+	 XJ8F766xc/w72AJLh16CHjRzA3TCF3hEhgDCeU88/muLlQegOCBmwDyT02P9ocDwTe
+	 3Bjhk3jugVM0CM6c37U0JMHFMrrgDSV9K//9h1ZZ68k5qj6N+5ez/q8KA8K//OWf62
+	 h52Y7pe72gqZGMmA0sfem26teO/biGQEYUsNvTwM2GnWwyM22zgOXhSjKZY6RmD22w
+	 k8nAvVxgf0lSqyADZ8vDhiVN6LOecaapP5ZoxthrbJYpEmRxg2ORpay4LV6t4W5xjy
+	 aYZKMCUXYbXbQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1r2ayN-00CkQ4-NR;
-	Mon, 13 Nov 2023 17:43:43 +0000
+	id 1r2ayN-00CkQ4-Ue;
+	Mon, 13 Nov 2023 17:43:44 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -33,9 +33,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 10/12] arm64: Add MIDR-based overrides for ID_AA64MMFR4_EL1.E2H0
-Date: Mon, 13 Nov 2023 17:42:42 +0000
-Message-Id: <20231113174244.3026520-11-maz@kernel.org>
+Subject: [PATCH 11/12] KVM: arm64: Expose ID_AA64MMFR4_EL1 to guests
+Date: Mon, 13 Nov 2023 17:42:43 +0000
+Message-Id: <20231113174244.3026520-12-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231113174244.3026520-1-maz@kernel.org>
 References: <20231113174244.3026520-1-maz@kernel.org>
@@ -51,66 +51,44 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-None the Apple M1/M2 CPUs effectively implement E2H=0, and M2
-doesn't correctly implement NV1=1 (the EL2 S1 PTW seems to barf
-on the nVHE format).
-
-Override ID_AA64MMFR4_EL1.E2H0 for these CPUs to reflect what they
-actually support.
+We can now expose ID_AA64MMFR4_EL1 to guests, and let NV guests
+understand that they cannot really switch HCR_EL2.E2H to 0 on
+some platforms.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kernel/idreg-override.c | 36 ++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ arch/arm64/kvm/nested.c   | 4 ++++
+ arch/arm64/kvm/sys_regs.c | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-index 57c145bf50b7..f7be459e5ff3 100644
---- a/arch/arm64/kernel/idreg-override.c
-+++ b/arch/arm64/kernel/idreg-override.c
-@@ -326,7 +326,43 @@ struct midr_override_data {
- 	const struct midr_range	ranges[];
- };
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 042695a210ce..3885f1c93979 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -137,6 +137,10 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+ 		val |= FIELD_PREP(NV_FTR(MMFR2, TTL), 0b0001);
+ 		break;
  
-+static const struct midr_override_data e2h0_ni __initconst = {
-+	/*
-+	 * These CPUs predate FEAT_E2H0, but have HCR_EL2.E2H RES1
-+	 * anyway.
-+	 */
-+	.feature	= "id_aa64mmfr4.e2h0=0xf",
-+	.ranges	= {
-+		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM),
-+		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM),
-+		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_PRO),
-+		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_PRO),
-+		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_MAX),
-+		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_MAX),
-+		{}
-+	},
-+};
++	case SYS_ID_AA64MMFR4_EL1:
++		val &= NV_FTR(MMFR4, E2H0);
++		break;
 +
-+static const struct midr_override_data e2h0_nv1_ni __initconst = {
-+	/*
-+	 * These CPUs predate FEAT_E2H0, but have both HCR_EL2.E2H
-+	 * RES1 and a non-functional HCR_EL2.NV1.
-+	 */
-+	.feature	= "id_aa64mmfr4.e2h0=0xe",
-+	.ranges	= {
-+		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD),
-+		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE),
-+		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_PRO),
-+		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_PRO),
-+		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_MAX),
-+		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_MAX),
-+		{}
-+	},
-+};
-+
- static const struct midr_override_data * const midr_ovr_data[] __initconst = {
-+	&e2h0_ni,
-+	&e2h0_nv1_ni,
- };
- 
- static void __init apply_midr_overrides(void)
+ 	case SYS_ID_AA64DFR0_EL1:
+ 		/* Only limited support for PMU, Debug, BPs and WPs */
+ 		val &= (NV_FTR(DFR0, PMUVer)	|
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 4735e1b37fb3..4461eafca16c 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2196,7 +2196,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 					ID_AA64MMFR2_EL1_NV |
+ 					ID_AA64MMFR2_EL1_CCIDX)),
+ 	ID_SANITISED(ID_AA64MMFR3_EL1),
+-	ID_UNALLOCATED(7,4),
++	ID_SANITISED(ID_AA64MMFR4_EL1),
+ 	ID_UNALLOCATED(7,5),
+ 	ID_UNALLOCATED(7,6),
+ 	ID_UNALLOCATED(7,7),
 -- 
 2.39.2
 
