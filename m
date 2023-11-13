@@ -1,55 +1,38 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FABE3D82
-	for <kvmarm@lists.linux.dev>; Mon, 13 Nov 2023 00:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5196D8BE1
+	for <kvmarm@lists.linux.dev>; Mon, 13 Nov 2023 03:37:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F2nQ34+L"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699837137;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cDT/Yw6MepTUY5berRyzp+iGTh5/71yTqnFQ/kYgufg=;
-	b=F2nQ34+LtuVNAzyHYMhY7XKF8bKgDNlg2lTV3kPzOyfNVqMTnoyZycOp3/kc191s/cPkOT
-	X9y36lz/hegBsN5yN0+KnUJa1Wh3z27wNu1V7y1dhKJHdpVpaZ/Uzz59iae17ivmd+/piC
-	IaPEuDzPSDJOa3dvZmFTGJa+XSk1Ruo=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-345-_qGKwHiuPW-m2OogBi8UNA-1; Sun, 12 Nov 2023 19:58:55 -0500
-X-MC-Unique: _qGKwHiuPW-m2OogBi8UNA-1
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1cc40eb7d54so37692305ad.2
-        for <kvmarm@lists.linux.dev>; Sun, 12 Nov 2023 16:58:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699837135; x=1700441935;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cDT/Yw6MepTUY5berRyzp+iGTh5/71yTqnFQ/kYgufg=;
-        b=Fc4HBfZhPGE3Qwh383YpcbyO2p9Wk5UZhDGK1a2khtZS3Wc3bgpgzfhDek5g1VItIO
-         pCWnOLRDI0NZkD/XMxpi0ztnTUXm/qiJSgLjz64HFEvjosaAK3JE+h/qILK6go/A3U7W
-         kvSYTXybPky55uCgebKkRJg2WihNPgNXeATQAkeRyA2t1KEV6Hd+3KkYN4WRf6rHEHvx
-         LNZrEv8l5haw+SP+FkYENjYT6N4P3Od5hGMxLqHrSlLXxxH6cHBaF0NLZVHGA8urddQD
-         rSQRKpz+f2uyjj/4A6OBYUYt2UpMP6kxmWrHgowQHWX1DwRKpAfVnxaIet6qkXAIbHpw
-         a4/g==
-X-Gm-Message-State: AOJu0YzJlK7nDF2v+ODptXMJvyH2LYUVBIctAJ5zoHIjLfN6Qo2McyUz
-	D1/V3z0nVzi8bv8gfwjvZ58FlTmMNFGBHm47fSJWzkozPCIhq2DxciBMDUAsC7Ofw8zNY/3TaSA
-	nFoYRFBxi6G8zHrmW
-X-Received: by 2002:a17:903:18a:b0:1c5:d063:b70e with SMTP id z10-20020a170903018a00b001c5d063b70emr3527477plg.53.1699837134998;
-        Sun, 12 Nov 2023 16:58:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEYIxs5W0nH5PRlEPeC7HszJcExOhwxIk5eQviHGK0uTrxM/8D+SW3tGS+WkqqASqjIUf7rPA==
-X-Received: by 2002:a17:903:18a:b0:1c5:d063:b70e with SMTP id z10-20020a170903018a00b001c5d063b70emr3527451plg.53.1699837134747;
-        Sun, 12 Nov 2023 16:58:54 -0800 (PST)
-Received: from ?IPV6:2001:8003:e5b0:9f00:b890:3e54:96bb:2a15? ([2001:8003:e5b0:9f00:b890:3e54:96bb:2a15])
-        by smtp.gmail.com with ESMTPSA id 13-20020a170902c24d00b001c5fc291ef9sm3053276plg.209.2023.11.12.16.58.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 12 Nov 2023 16:58:54 -0800 (PST)
-Message-ID: <095c2d24-735b-4ce2-ba2e-9ec2164f2237@redhat.com>
-Date: Mon, 13 Nov 2023 10:58:46 +1000
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dGiuOSz+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699846643; x=1731382643;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Y+d5ffj+cXty8WEYU0vUgR9r7fyajtAWyyGi3xYe0Go=;
+  b=dGiuOSz+4dX4YBW0Q5ZQm0Ji60iKqTbBARBxvM+xrCiflUM+4Jt9gVM2
+   9M8C9pk/mpooO+C9hCGDx0MDZUgDkx7E4dEt05KZwuIlM+rlSatoh1kwo
+   NsOYIUssM/s9Y3ELb/5bjhve1eCtrv2ohrv8K5OccuID2hSzryLnc/qu3
+   dB4EvCb1vJzKtHabWm+gdfzHMKqQUsKFt7va4JG+e8jVwvkQfRqXCz7yf
+   iZR6NSqy0Vy05UGHlwSIgY7QgKnB2jPH/uOyZXz5rK6VKWE4LxTRtsmgu
+   U95xkFmqYttbWq8B4p0fzW4rzAOSnKZU1LU28CNx4MIx+tbkKwYXJi/4U
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10892"; a="421469893"
+X-IronPort-AV: E=Sophos;i="6.03,298,1694761200"; 
+   d="scan'208";a="421469893"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2023 19:37:22 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10892"; a="764228152"
+X-IronPort-AV: E=Sophos;i="6.03,298,1694761200"; 
+   d="scan'208";a="764228152"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.6.77]) ([10.93.6.77])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2023 19:37:09 -0800
+Message-ID: <b897d2ac-8a07-40a7-af59-dd746c56081e@intel.com>
+Date: Mon, 13 Nov 2023 11:37:05 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,55 +40,140 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 10/22] drivers: base: Move cpu_dev_init() after
- node_dev_init()
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev, x86@kernel.org,
- linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org
-Cc: Salil Mehta <salil.mehta@huawei.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com,
- justin.he@arm.com, James Morse <james.morse@arm.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>
-References: <ZUoRY33AAHMc5ThW@shell.armlinux.org.uk>
- <E1r0JLV-00CTxS-QB@rmk-PC.armlinux.org.uk>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <E1r0JLV-00CTxS-QB@rmk-PC.armlinux.org.uk>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+Subject: Re: [PATCH 15/34] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, Xu Yilun <yilun.xu@intel.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>,
+ David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
+ =?UTF-8?Q?n?= <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>,
+ Vishal Annapurve <vannapurve@google.com>,
+ Ackerley Tng <ackerleytng@google.com>,
+ Maciej Szmigiero <mail@maciej.szmigiero.name>,
+ David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
+ Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+ Liam Merwick <liam.merwick@oracle.com>,
+ Isaku Yamahata <isaku.yamahata@gmail.com>,
+ "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20231105163040.14904-1-pbonzini@redhat.com>
+ <20231105163040.14904-16-pbonzini@redhat.com>
+ <956d8ee3-8b63-4a2d-b0c4-c0d3d74a0f6f@intel.com>
+ <ZU51A3U6E3aZXayC@google.com>
 Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <ZU51A3U6E3aZXayC@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
+On 11/11/2023 2:22 AM, Sean Christopherson wrote:
+> On Fri, Nov 10, 2023, Xiaoyao Li wrote:
+>> On 11/6/2023 12:30 AM, Paolo Bonzini wrote:
+>>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+>>> index 68a144cb7dbc..a6de526c0426 100644
+>>> --- a/include/linux/kvm_host.h
+>>> +++ b/include/linux/kvm_host.h
+>>> @@ -589,8 +589,20 @@ struct kvm_memory_slot {
+>>>    	u32 flags;
+>>>    	short id;
+>>>    	u16 as_id;
+>>> +
+>>> +#ifdef CONFIG_KVM_PRIVATE_MEM
+>>> +	struct {
+>>> +		struct file __rcu *file;
+>>> +		pgoff_t pgoff;
+>>> +	} gmem;
+>>> +#endif
+>>>    };
+>>> +static inline bool kvm_slot_can_be_private(const struct kvm_memory_slot *slot)
+>>> +{
+>>> +	return slot && (slot->flags & KVM_MEM_GUEST_MEMFD);
+>>> +}
+>>> +
+>>
+>> maybe we can move this block and ...
+>>
+>> <snip>
+>>
+>>> @@ -2355,6 +2379,30 @@ bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
+>>>    					struct kvm_gfn_range *range);
+>>>    bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+>>>    					 struct kvm_gfn_range *range);
+>>> +
+>>> +static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+>>> +{
+>>> +	return IS_ENABLED(CONFIG_KVM_PRIVATE_MEM) &&
+>>> +	       kvm_get_memory_attributes(kvm, gfn) & KVM_MEMORY_ATTRIBUTE_PRIVATE;
+>>> +}
+>>> +#else
+>>> +static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
+>>> +{
+>>> +	return false;
+>>> +}
+>>>    #endif /* CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES */
+>>
+>> this block to Patch 18?
+> 
+> It would work, but my vote is to keep them here to minimize the changes to common
+> KVM code in the x86 enabling.  It's not a strong preference though.  Of course,
+> at this point, fiddling with this sort of thing is probably a bad idea in terms
+> of landing guest_memfd.
 
+Indeed. It's OK then.
 
-On 11/7/23 20:30, Russell King (Oracle) wrote:
-> From: James Morse <james.morse@arm.com>
+>>> @@ -4844,6 +4875,10 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+>>>    #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+>>>    	case KVM_CAP_MEMORY_ATTRIBUTES:
+>>>    		return kvm_supported_mem_attributes(kvm);
+>>> +#endif
+>>> +#ifdef CONFIG_KVM_PRIVATE_MEM
+>>> +	case KVM_CAP_GUEST_MEMFD:
+>>> +		return !kvm || kvm_arch_has_private_mem(kvm);
+>>>    #endif
+>>>    	default:
+>>>    		break;
+>>> @@ -5277,6 +5312,18 @@ static long kvm_vm_ioctl(struct file *filp,
+>>>    	case KVM_GET_STATS_FD:
+>>>    		r = kvm_vm_ioctl_get_stats_fd(kvm);
+>>>    		break;
+>>> +#ifdef CONFIG_KVM_PRIVATE_MEM
+>>> +	case KVM_CREATE_GUEST_MEMFD: {
+>>> +		struct kvm_create_guest_memfd guest_memfd;
+>>
+>> Do we need a guard of below?
+>>
+>> 		r = -EINVAL;
+>> 		if (!kvm_arch_has_private_mem(kvm))
+>> 			goto out;
 > 
-> NUMA systems require the node descriptions to be ready before CPUs are
-> registered. This is so that the node symlinks can be created in sysfs.
+> Argh, yeah, that's weird since KVM_CAP_GUEST_MEMFD says "not supported" if the
+> VM doesn't support private memory.
 > 
-> Currently no NUMA platform uses GENERIC_CPU_DEVICES, meaning that CPUs
-> are registered by arch code, instead of cpu_dev_init().
+> Enforcing that would break guest_memfd_test.c though.  And having to create a
+> "special" VM just to test basic guest_memfd functionality would be quite
+> annoying.
 > 
-> Move cpu_dev_init() after node_dev_init() so that NUMA architectures
-> can use GENERIC_CPU_DEVICES.
+> So my vote is to do:
 > 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
-> Note: Jonathan's comment still needs addressing - see
->    https://lore.kernel.org/r/20230914121612.00006ac7@Huawei.com
-> ---
->   drivers/base/init.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
+> 	case KVM_CAP_GUEST_MEMFD:
+> 		return IS_ENABLED(CONFIG_KVM_PRIVATE_MEM);
 
-With Jonathan's comments addressed:
+I'm fine with it.
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+> There's no harm to KVM if userspace creates a file it can't use, and at some
+> point KVM will hopefully support guest_memfd irrespective of private memory.
 
