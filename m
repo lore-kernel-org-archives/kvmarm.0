@@ -1,213 +1,73 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA5918620
-	for <kvmarm@lists.linux.dev>; Tue, 14 Nov 2023 10:04:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="w4XFJJSu"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=MliSkT+C97r/xoKb00has1+pOVRxGmmTM9aHZqmFb/M=; b=w4XFJJSuIadpNAeBv0oFJvheSh
-	XwUK9PQmPMEhgdmwSDbAapoeDa9K9HWgMz38zdIGLe/sPLp7TUYkOcvYDg3LX9m6snr5MAMtXZp1G
-	vIR6D8/EEfGWaAmd1K5HqJ20zzwHZj47NTHQMs5MZLrvpche7UN5fFTZUSmZeSZsKEMQLad0LQu28
-	zunJCFl41N8ZLAphzoOqhGQGVtYmuTDPoGwmCXhpcmyCL6DPgOGWWOwereFReVboNc6aRwnyTdllh
-	LRSDUTGxHde7yh8aZ/Yc3qmiS/Sv9HtEFiSqz9Vn7XPbLYjDyO5VYNCX+0/pgAR76YDhy0QX4GYMr
-	Kd1NjHnw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44278)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r2qHP-0007em-2q;
-	Tue, 14 Nov 2023 10:04:23 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r2qHO-0005UR-In; Tue, 14 Nov 2023 10:04:22 +0000
-Date: Tue, 14 Nov 2023 10:04:22 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
-	x86@kernel.org, Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	jianyong.wu@arm.com, justin.he@arm.com, gregkh@linuxfoundation.org
-Subject: Re: [RFC PATCH v2 11/35] arch_topology: Make
- register_cpu_capacity_sysctl() tolerant to late CPUs
-Message-ID: <ZVNGJuUEkwei+CwY@shell.armlinux.org.uk>
-References: <20230913163823.7880-1-james.morse@arm.com>
- <20230913163823.7880-12-james.morse@arm.com>
- <20230914130126.000069db@Huawei.com>
- <ZTKEQz0DJuv/tqNH@shell.armlinux.org.uk>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D57CC22EFE
+	for <kvmarm@lists.linux.dev>; Tue, 14 Nov 2023 11:25:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F1129C15;
+	Tue, 14 Nov 2023 03:26:10 -0800 (PST)
+Received: from [10.1.27.144] (XHFQ2J9959.cambridge.arm.com [10.1.27.144])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BFB0B3F641;
+	Tue, 14 Nov 2023 03:25:23 -0800 (PST)
+Message-ID: <250a02ea-c350-4752-89b2-aa75e5232c32@arm.com>
+Date: Tue, 14 Nov 2023 11:25:22 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZTKEQz0DJuv/tqNH@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 0/3] Update tlb invalidation routines for FEAT_LPA2
+Content-Language: en-GB
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Ard Biesheuvel <ardb@google.com>, Ard Biesheuvel <ardb@kernel.org>,
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Mark Rutland <mark.rutland@arm.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>,
+ Kees Cook <keescook@chromium.org>, Joey Gouly <joey.gouly@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, James Morse
+ <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+References: <20231027115634.1432154-1-ryan.roberts@arm.com>
+ <3800df70-73f2-44b7-a6ed-15ec0bd63f5f@arm.com> <ZVIkPm4uxbCNsOgh@arm.com>
+ <1bdcdd85-9470-408c-aaac-fa4548bb2385@arm.com> <ZVJhxF4y2Tds2dRn@arm.com>
+From: Ryan Roberts <ryan.roberts@arm.com>
+In-Reply-To: <ZVJhxF4y2Tds2dRn@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Okay, after 25 days, I'm now changing James' comment to:
+On 13/11/2023 17:49, Catalin Marinas wrote:
+> On Mon, Nov 13, 2023 at 04:44:58PM +0000, Ryan Roberts wrote:
+>> On 13/11/2023 13:27, Catalin Marinas wrote:
+>>> If these patches are needed for Ard's series (I think they do), they
+>>> could be posted together. But first we need to split Ard's series into
+>>> at least two: reworking the memory map together with moving (some of)
+>>> the init code to C and the actual LPA2 stage 1 support. We might even
+>>> through LPA2 stage 2 on top if we feel brave ;). We can queue them all
+>>> together but having separate series gives us an option to drop bits if
+>>> needed.
+>>
+>> Sorry I'm not completely sure what you are suggesting I do here. In the context
+>> of the lpa2/kvm series, Marc previously said he would merge it for v6.8 if I
+>> posted against v6.7-rc1 (which is what I'm gearing up for now).
+> 
+> If we merge your series independently of Ard's, that's fine, these three
+> patches can go together as a prefix.
+> 
+>> My series and Ard's are independent except that they both depend on the 3
+>> patches in this RFC. Ard has just suggested he would prefix his series with
+>> these 3 patches and I would continue to do the same, then they can be handled as
+>> 2 independent series (or more if Ard is splitting his) - the first 3 patches
+>> will just desolve to nothing for the series that goes in second.
+>>
+>> Does that work for you, are are you suggesting I should re-post this as an
+>> independent series?
+> 
+> No need to. Just post your LPA2 patches with these three as a prefix.
+> Ard can include them as well and if it gets to merging both, we'll sort
+> out a small stable branch for these three patches.
+> 
 
-    If the offline CPUs thing is a problem for the tools that consume
-    this value, we'd need to move cpu_capacity to be part of cpu.c's
-    common_cpu_attr_groups. However, attempts to discuss this just end
-    up in a black hole, so this is a non-starter. Thus, if this needs
-    to be done, it can be done as a separate patch.
-
-and thus I'm going to consider this patch acceptable to everyone.
-
-On Fri, Oct 20, 2023 at 02:44:35PM +0100, Russell King (Oracle) wrote:
-> On Thu, Sep 14, 2023 at 01:01:26PM +0100, Jonathan Cameron wrote:
-> > On Wed, 13 Sep 2023 16:37:59 +0000
-> > James Morse <james.morse@arm.com> wrote:
-> > 
-> > > register_cpu_capacity_sysctl() adds a property to sysfs that describes
-> > > the CPUs capacity. This is done from a subsys_initcall() that assumes
-> > > all possible CPUs are registered.
-> > > 
-> > > With CPU hotplug, possible CPUs aren't registered until they become
-> > > present, (or for arm64 enabled). This leads to messages during boot:
-> > > | register_cpu_capacity_sysctl: too early to get CPU1 device!
-> > > and once these CPUs are added to the system, the file is missing.
-> > > 
-> > > Move this to a cpuhp callback, so that the file is created once
-> > > CPUs are brought online. This covers CPUs that are added late by
-> > > mechanisms like hotplug.
-> > > One observable difference is the file is now missing for offline CPUs.
-> > > 
-> > > Signed-off-by: James Morse <james.morse@arm.com>
-> > > ---
-> > > If the offline CPUs thing is a problem for the tools that consume
-> > > this value, we'd need to move cpu_capacity to be part of cpu.c's
-> > > common_cpu_attr_groups.
-> > 
-> > I think we should do that anyway and then use an is_visible() if we want to
-> > change whether it is visible in offline cpus.
-> > 
-> > Dynamic sysfs file creation is horrible - particularly when done
-> > from an totally different file from where the rest of the attributes
-> > are registered.  I'm curious what the history behind that is.
-> > 
-> > Whilst here, why is there a common_cpu_attr_groups which is
-> > identical to the hotpluggable_cpu_attr_groups in base/cpu.c?
-> 
-> Looking into doing this, the easy bit is adding the attribute group
-> with an appropriate .is_visible dependent on cpu_present(), but we
-> need to be able to call sysfs_update_groups() when the state of the
-> .is_visible() changes.
-> 
-> Given the comment in sysfs_update_groups() about "if an error occurs",
-> rather than making this part of common_cpu_attr_groups, would it be
-> better that it's part of its own set of groups, thus limiting the
-> damage from a possible error? I suspect, however, that any error at
-> that point means that the system is rather fatally wounded.
-> 
-> This is what I have so far to implement your idea, less the necessary
-> sysfs_update_groups() call when we need to change the visibility of
-> the attributes.
-> 
-> diff --git a/drivers/base/arch_topology.c b/drivers/base/arch_topology.c
-> index 9ccb7daee78e..06c9fc6620d2 100644
-> --- a/drivers/base/arch_topology.c
-> +++ b/drivers/base/arch_topology.c
-> @@ -215,43 +215,24 @@ static ssize_t cpu_capacity_show(struct device *dev,
->  	return sysfs_emit(buf, "%lu\n", topology_get_cpu_scale(cpu->dev.id));
->  }
->  
-> -static void update_topology_flags_workfn(struct work_struct *work);
-> -static DECLARE_WORK(update_topology_flags_work, update_topology_flags_workfn);
-> -
->  static DEVICE_ATTR_RO(cpu_capacity);
->  
-> -static int cpu_capacity_sysctl_add(unsigned int cpu)
-> -{
-> -	struct device *cpu_dev = get_cpu_device(cpu);
-> -
-> -	if (!cpu_dev)
-> -		return -ENOENT;
-> -
-> -	device_create_file(cpu_dev, &dev_attr_cpu_capacity);
-> -
-> -	return 0;
-> -}
-> -
-> -static int cpu_capacity_sysctl_remove(unsigned int cpu)
-> +static umode_t cpu_present_attrs_visible(struct kobject *kobi,
-> +					 struct attribute *attr, int index)
->  {
-> -	struct device *cpu_dev = get_cpu_device(cpu);
-> -
-> -	if (!cpu_dev)
-> -		return -ENOENT;
-> -
-> -	device_remove_file(cpu_dev, &dev_attr_cpu_capacity);
-> +	struct device *dev = kobj_to_dev(kobj);
-> +	struct cpu *cpu = container_of(dev, struct cpu, dev);
->  
-> -	return 0;
-> +	return cpu_present(cpu->dev.id) ? attr->mode : 0;
->  }
->  
-> -static int register_cpu_capacity_sysctl(void)
-> -{
-> -	cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "topology/cpu-capacity",
-> -			  cpu_capacity_sysctl_add, cpu_capacity_sysctl_remove);
-> +const struct attribute_group cpu_capacity_attr_group = {
-> +	.is_visible = cpu_present_attrs_visible,
-> +	.attrs = cpu_capacity_attrs
-> +};
->  
-> -	return 0;
-> -}
-> -subsys_initcall(register_cpu_capacity_sysctl);
-> +static void update_topology_flags_workfn(struct work_struct *work);
-> +static DECLARE_WORK(update_topology_flags_work, update_topology_flags_workfn);
->  
->  static int update_topology;
->  
-> diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
-> index a19a8be93102..954b045705c2 100644
-> --- a/drivers/base/cpu.c
-> +++ b/drivers/base/cpu.c
-> @@ -192,6 +192,9 @@ static const struct attribute_group crash_note_cpu_attr_group = {
->  static const struct attribute_group *common_cpu_attr_groups[] = {
->  #ifdef CONFIG_KEXEC
->  	&crash_note_cpu_attr_group,
-> +#endif
-> +#ifdef CONFIG_GENERIC_ARCH_TOPOLOGY
-> +	&cpu_capacity_attr_group,
->  #endif
->  	NULL
->  };
-> diff --git a/include/linux/cpu.h b/include/linux/cpu.h
-> index e117c06e0c6b..745ad21e3dc8 100644
-> --- a/include/linux/cpu.h
-> +++ b/include/linux/cpu.h
-> @@ -30,6 +30,8 @@ struct cpu {
->  	struct device dev;
->  };
->  
-> +extern const struct attribute_group cpu_capacity_attr_group;
-> +
->  extern void boot_cpu_init(void);
->  extern void boot_cpu_hotplug_init(void);
->  extern void cpu_init(void);
-> 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Great - thanks for the clarification!
