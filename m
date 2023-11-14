@@ -1,177 +1,226 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B1E8BF9
-	for <kvmarm@lists.linux.dev>; Tue, 14 Nov 2023 03:09:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IJ9s3Ici"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699931348;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Hp9NampF300W3gHTU5Rkf8ZhuXrSkcBWcS+u5FtpskU=;
-	b=IJ9s3Icimr2iwMwjAiAqvIvXIt/iM21b2zS1BpdEwia4KqxW54y30loCNsb6LrjHezp3Rc
-	plVGSIW1YYp6sUNBsdyU0DZUPqPr6MQPLzL5vVuE/2Y18y2y999pIV0DJxzbf3bLoMpfle
-	4RHqnbLB/99+dJgGfCS5Q7HcAbVhj6A=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-632-NfPKyFGmP4GImmJ2STLDgg-1; Mon, 13 Nov 2023 22:09:07 -0500
-X-MC-Unique: NfPKyFGmP4GImmJ2STLDgg-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2800be2d781so1075115a91.1
-        for <kvmarm@lists.linux.dev>; Mon, 13 Nov 2023 19:09:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699931346; x=1700536146;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hp9NampF300W3gHTU5Rkf8ZhuXrSkcBWcS+u5FtpskU=;
-        b=dYikPGNs9Vih8tm0mbwD9T9wwYATp8GXxCxW8dyg4+tLr34J+V0S/wCY3OL3+YCD7f
-         j/gHR4v81Dx3Y7sx5VIV7MwlDuBnbyjZMXhPH7+MLfAfABoW+Yli51R5vCtf841wqe6P
-         e31Wv05TCHx4dL2VAqvfupaewmjN7j7jzN7Y834M4t2o+PLGYo3MQCUCPUtFJeQEvNEM
-         snaJjQGOs5p+DaYe9f6S7ren1/HVPEXFYYYik0RzdjQJq1uboivHtbZnj3oBY+q4OY75
-         00aSy2JA7NHH/+HJrqLtIK5qMqqFmqCQFD16L7mnppQFUu3ZPBEJRZyDVLCPIuFB6rYp
-         8WuA==
-X-Gm-Message-State: AOJu0Yx+XgN5hQINQ0nkW3/csT3GpljI6qWt7ycSmD++6A3+noFtu9VE
-	PV90bU6RWUv+CutLfIem1WaC6rlNzBPHIwgl6w7hZl3SrYnKXEdpngy7/zTXSxvP8Q/q/gGVfeH
-	9v2xAuzCFtXbl7M6o
-X-Received: by 2002:a17:902:d2c9:b0:1cc:2bc4:5157 with SMTP id n9-20020a170902d2c900b001cc2bc45157mr1308378plc.1.1699931346039;
-        Mon, 13 Nov 2023 19:09:06 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGjhLJ78Ag8ckdH6Gu8vstIBdIUeQdCT8yovhIJcWQSkQvlL97nftM1exog97M5/7oEVtIkJw==
-X-Received: by 2002:a17:902:d2c9:b0:1cc:2bc4:5157 with SMTP id n9-20020a170902d2c900b001cc2bc45157mr1308358plc.1.1699931345660;
-        Mon, 13 Nov 2023 19:09:05 -0800 (PST)
-Received: from [10.66.60.14] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id f4-20020a170902e98400b001b9c5e07bc3sm4746920plb.238.2023.11.13.19.09.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Nov 2023 19:09:05 -0800 (PST)
-Message-ID: <a82f0e42-9d47-fa3b-302d-2a30c38198b2@redhat.com>
-Date: Tue, 14 Nov 2023 11:09:01 +0800
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8284BE76
+	for <kvmarm@lists.linux.dev>; Tue, 14 Nov 2023 05:13:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 613901007;
+	Mon, 13 Nov 2023 21:14:43 -0800 (PST)
+Received: from a077893.blr.arm.com (a077893.blr.arm.com [10.162.41.8])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id DD5EF3F7B4;
+	Mon, 13 Nov 2023 21:13:51 -0800 (PST)
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	mark.rutland@arm.com
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	James Clark <james.clark@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Suzuki Poulose <suzuki.poulose@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	linux-perf-users@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	kvmarm@lists.linux.dev
+Subject: [V14 2/8] KVM: arm64: Prevent guest accesses into BRBE system registers/instructions
+Date: Tue, 14 Nov 2023 10:43:23 +0530
+Message-Id: <20231114051329.327572-3-anshuman.khandual@arm.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20231114051329.327572-1-anshuman.khandual@arm.com>
+References: <20231114051329.327572-1-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [kvm-unit-tests PATCH v2 2/2] arm: pmu-overflow-interrupt:
- Increase count values
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev,
- maz@kernel.org, oliver.upton@linux.dev, alexandru.elisei@arm.com
-Cc: jarichte@redhat.com
-References: <20231113174316.341630-1-eric.auger@redhat.com>
- <20231113174316.341630-3-eric.auger@redhat.com>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20231113174316.341630-3-eric.auger@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Currently BRBE feature is not supported in a guest environment. This hides
+BRBE feature availability via masking ID_AA64DFR0_EL1.BRBE field. This also
+blocks guest accesses into BRBE system registers and instructions as if the
+underlying hardware never implemented FEAT_BRBE feature.
 
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+---
+Changes in V14:
 
-On 11/14/23 01:42, Eric Auger wrote:
-> On some hardware, some pmu-overflow-interrupt failures can be observed.
-> Although the even counter overflows, the interrupt is not seen as
-> expected. This happens in the subtest after "promote to 64-b" comment.
-> After analysis, the PMU overflow interrupt actually hits, ie.
-> kvm_pmu_perf_overflow() gets called and KVM_REQ_IRQ_PENDING is set,
-> as expected. However the PMCR.E is reset by the handle_exit path, at
-> kvm_pmu_handle_pmcr() before the next guest entry and
-> kvm_pmu_flush_hwstate/kvm_pmu_update_state subsequent call.
-> There, since the enable bit has been reset, kvm_pmu_update_state() does
-> not inject the interrupt into the guest.
-> 
-> This does not seem to be a KVM bug but rather an unfortunate
-> scenario where the test disables the PMCR.E too closely to the
-> advent of the overflow interrupt.
-> 
-> Since it looks like a benign and inlikely case, let's resize the number
-> of iterations to prevent the PMCR enable bit from being resetted
-> immediately at the same time as the actual overflow event.
-> 
-> COUNT_INT is introduced, arbitrarily set to 1000 iterations and is
-> used in this test.
-> 
-> An alternative would be to let the PMU enabled and wait for the
-> interrupt but those extra executions might disturb the counting.
-> 
-> Reported-by: Jan Richter <jarichte@redhat.com>
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> 
-> ---
-> 
-> v1 -> v2:
-> - Only increase mem_access_loop iterations
-> ---
->   arm/pmu.c | 11 ++++++-----
->   1 file changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index 86199577..4b388899 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -66,6 +66,7 @@
->   #define PRE_OVERFLOW_64		0xFFFFFFFFFFFFFFF0ULL
->   #define COUNT 250
->   #define MARGIN 100
-> +#define COUNT_INT 1000
->   /*
->    * PRE_OVERFLOW2 is set so that 1st @COUNT iterations do not
->    * produce 32b overflow and 2nd @COUNT iterations do. To accommodate
-> @@ -978,7 +979,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->   
->   	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
->   
-> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->   	report(expect_interrupts(0), "no overflow interrupt after preset");
->   
->   	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> @@ -1002,7 +1003,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->   	write_sysreg(ALL_SET_32, pmintenset_el1);
->   	isb();
->   
-> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->   
->   	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->   	isb();
-> @@ -1010,7 +1011,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->   	for (i = 0; i < 100; i++)
->   		write_sysreg(0x3, pmswinc_el0);
->   
-> -	mem_access_loop(addr, 200, pmu.pmcr_ro);
-> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro);
->   	report_info("overflow=0x%lx", read_sysreg(pmovsclr_el0));
->   	report(expect_interrupts(0x3),
->   		"overflow interrupts expected on #0 and #1");
-> @@ -1029,7 +1030,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->   	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
->   	write_regn_el0(pmevcntr, 0, pre_overflow);
->   	isb();
-> -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->   	report(expect_interrupts(0x1), "expect overflow interrupt");
->   
->   	/* overflow on odd counter */
-> @@ -1037,7 +1038,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->   	write_regn_el0(pmevcntr, 0, pre_overflow);
->   	write_regn_el0(pmevcntr, 1, all_set);
->   	isb();
-> -	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> +	mem_access_loop(addr, COUNT_INT, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->   	if (overflow_at_64bits) {
->   		report(expect_interrupts(0x1),
->   		       "expect overflow interrupt on even counter");
+- This is a new patch in the series
 
+ arch/arm64/kvm/sys_regs.c | 130 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 130 insertions(+)
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 4735e1b37fb3..42701065b3cd 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1583,6 +1583,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 	/* Hide SPE from guests */
+ 	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
+ 
++	/* Hide BRBE from guests */
++	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
++
+ 	return val;
+ }
+ 
+@@ -2042,6 +2045,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
+ 	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
+ 	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
++	{ SYS_DESC(OP_BRB_IALL), undef_access },
++	{ SYS_DESC(OP_BRB_INJ), undef_access },
+ 
+ 	DBG_BCR_BVR_WCR_WVR_EL1(0),
+ 	DBG_BCR_BVR_WCR_WVR_EL1(1),
+@@ -2072,6 +2077,131 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
+ 	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
+ 
++	/*
++	 * BRBE branch record sysreg address space is interleaved between
++	 * corresponding BRBINF<N>_EL1, BRBSRC<N>_EL1, and BRBTGT<N>_EL1.
++	 */
++	{ SYS_DESC(SYS_BRBINF0_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC0_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT0_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF16_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC16_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT16_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF1_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC1_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT1_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF17_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC17_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT17_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF2_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC2_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT2_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF18_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC18_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT18_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF3_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC3_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT3_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF19_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC19_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT19_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF4_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC4_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT4_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF20_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC20_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT20_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF5_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC5_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT5_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF21_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC21_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT21_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF6_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC6_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT6_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF22_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC22_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT22_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF7_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC7_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT7_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF23_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC23_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT23_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF8_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC8_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT8_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF24_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC24_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT24_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF9_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC9_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT9_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF25_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC25_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT25_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF10_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC10_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT10_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF26_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC26_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT26_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF11_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC11_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT11_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF27_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC27_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT27_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF12_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC12_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT12_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF28_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC28_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT28_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF13_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC13_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT13_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF29_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC29_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT29_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF14_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC14_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT14_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF30_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC30_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT30_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF15_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC15_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT15_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF31_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC31_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT31_EL1), undef_access },
++
++	/* Remaining BRBE sysreg addresses space */
++	{ SYS_DESC(SYS_BRBCR_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBFCR_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTS_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINFINJ_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRCINJ_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGTINJ_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBIDR0_EL1), undef_access },
++
+ 	{ SYS_DESC(SYS_MDCCSR_EL0), trap_raz_wi },
+ 	{ SYS_DESC(SYS_DBGDTR_EL0), trap_raz_wi },
+ 	// DBGDTR[TR]X_EL0 share the same encoding
 -- 
-Shaoqin
+2.25.1
 
