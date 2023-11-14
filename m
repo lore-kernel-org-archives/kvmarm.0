@@ -1,195 +1,213 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EFF515AF8
-	for <kvmarm@lists.linux.dev>; Tue, 14 Nov 2023 09:16:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A65F2C15;
-	Tue, 14 Nov 2023 01:17:03 -0800 (PST)
-Received: from [192.168.1.100] (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 03C563F641;
-	Tue, 14 Nov 2023 01:16:14 -0800 (PST)
-Message-ID: <f2661879-636c-1865-0e1c-60d8e11f80f0@arm.com>
-Date: Tue, 14 Nov 2023 09:16:06 +0000
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA5918620
+	for <kvmarm@lists.linux.dev>; Tue, 14 Nov 2023 10:04:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="w4XFJJSu"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=MliSkT+C97r/xoKb00has1+pOVRxGmmTM9aHZqmFb/M=; b=w4XFJJSuIadpNAeBv0oFJvheSh
+	XwUK9PQmPMEhgdmwSDbAapoeDa9K9HWgMz38zdIGLe/sPLp7TUYkOcvYDg3LX9m6snr5MAMtXZp1G
+	vIR6D8/EEfGWaAmd1K5HqJ20zzwHZj47NTHQMs5MZLrvpche7UN5fFTZUSmZeSZsKEMQLad0LQu28
+	zunJCFl41N8ZLAphzoOqhGQGVtYmuTDPoGwmCXhpcmyCL6DPgOGWWOwereFReVboNc6aRwnyTdllh
+	LRSDUTGxHde7yh8aZ/Yc3qmiS/Sv9HtEFiSqz9Vn7XPbLYjDyO5VYNCX+0/pgAR76YDhy0QX4GYMr
+	Kd1NjHnw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44278)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r2qHP-0007em-2q;
+	Tue, 14 Nov 2023 10:04:23 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r2qHO-0005UR-In; Tue, 14 Nov 2023 10:04:22 +0000
+Date: Tue, 14 Nov 2023 10:04:22 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
+	loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com, gregkh@linuxfoundation.org
+Subject: Re: [RFC PATCH v2 11/35] arch_topology: Make
+ register_cpu_capacity_sysctl() tolerant to late CPUs
+Message-ID: <ZVNGJuUEkwei+CwY@shell.armlinux.org.uk>
+References: <20230913163823.7880-1-james.morse@arm.com>
+ <20230913163823.7880-12-james.morse@arm.com>
+ <20230914130126.000069db@Huawei.com>
+ <ZTKEQz0DJuv/tqNH@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [V14 5/8] KVM: arm64: nvhe: Disable branch generation in nVHE
- guests
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: Mark Brown <broonie@kernel.org>, Rob Herring <robh@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Suzuki Poulose <suzuki.poulose@arm.com>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- linux-perf-users@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com
-References: <20231114051329.327572-1-anshuman.khandual@arm.com>
- <20231114051329.327572-6-anshuman.khandual@arm.com>
-Content-Language: en-US
-From: James Clark <james.clark@arm.com>
-In-Reply-To: <20231114051329.327572-6-anshuman.khandual@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZTKEQz0DJuv/tqNH@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+Okay, after 25 days, I'm now changing James' comment to:
 
+    If the offline CPUs thing is a problem for the tools that consume
+    this value, we'd need to move cpu_capacity to be part of cpu.c's
+    common_cpu_attr_groups. However, attempts to discuss this just end
+    up in a black hole, so this is a non-starter. Thus, if this needs
+    to be done, it can be done as a separate patch.
 
-On 14/11/2023 05:13, Anshuman Khandual wrote:
-> Disable the BRBE before we enter the guest, saving the status and enable it
-> back once we get out of the guest. This is just to avoid capturing records
-> in the guest kernel/userspace, which would be confusing the samples.
+and thus I'm going to consider this patch acceptable to everyone.
+
+On Fri, Oct 20, 2023 at 02:44:35PM +0100, Russell King (Oracle) wrote:
+> On Thu, Sep 14, 2023 at 01:01:26PM +0100, Jonathan Cameron wrote:
+> > On Wed, 13 Sep 2023 16:37:59 +0000
+> > James Morse <james.morse@arm.com> wrote:
+> > 
+> > > register_cpu_capacity_sysctl() adds a property to sysfs that describes
+> > > the CPUs capacity. This is done from a subsys_initcall() that assumes
+> > > all possible CPUs are registered.
+> > > 
+> > > With CPU hotplug, possible CPUs aren't registered until they become
+> > > present, (or for arm64 enabled). This leads to messages during boot:
+> > > | register_cpu_capacity_sysctl: too early to get CPU1 device!
+> > > and once these CPUs are added to the system, the file is missing.
+> > > 
+> > > Move this to a cpuhp callback, so that the file is created once
+> > > CPUs are brought online. This covers CPUs that are added late by
+> > > mechanisms like hotplug.
+> > > One observable difference is the file is now missing for offline CPUs.
+> > > 
+> > > Signed-off-by: James Morse <james.morse@arm.com>
+> > > ---
+> > > If the offline CPUs thing is a problem for the tools that consume
+> > > this value, we'd need to move cpu_capacity to be part of cpu.c's
+> > > common_cpu_attr_groups.
+> > 
+> > I think we should do that anyway and then use an is_visible() if we want to
+> > change whether it is visible in offline cpus.
+> > 
+> > Dynamic sysfs file creation is horrible - particularly when done
+> > from an totally different file from where the rest of the attributes
+> > are registered.  I'm curious what the history behind that is.
+> > 
+> > Whilst here, why is there a common_cpu_attr_groups which is
+> > identical to the hotpluggable_cpu_attr_groups in base/cpu.c?
 > 
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: kvmarm@lists.linux.dev
-> Cc: linux-arm-kernel@lists.infradead.org
-> CC: linux-kernel@vger.kernel.org
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> ---
-> Changes in V14:
+> Looking into doing this, the easy bit is adding the attribute group
+> with an appropriate .is_visible dependent on cpu_present(), but we
+> need to be able to call sysfs_update_groups() when the state of the
+> .is_visible() changes.
 > 
-> - This is a new patch in the series
+> Given the comment in sysfs_update_groups() about "if an error occurs",
+> rather than making this part of common_cpu_attr_groups, would it be
+> better that it's part of its own set of groups, thus limiting the
+> damage from a possible error? I suspect, however, that any error at
+> that point means that the system is rather fatally wounded.
 > 
->  arch/arm64/include/asm/kvm_host.h  |  4 ++++
->  arch/arm64/kvm/debug.c             |  6 +++++
->  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 38 ++++++++++++++++++++++++++++++
->  3 files changed, 48 insertions(+)
+> This is what I have so far to implement your idea, less the necessary
+> sysfs_update_groups() call when we need to change the visibility of
+> the attributes.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 68421c74283a..1faa0430d8dd 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -449,6 +449,8 @@ enum vcpu_sysreg {
->  	CNTHV_CVAL_EL2,
->  	PMSCR_EL1,	/* Statistical profiling extension */
->  	TRFCR_EL1,	/* Self-hosted trace filters */
-> +	BRBCR_EL1,	/* Branch Record Buffer Control Register */
-> +	BRBFCR_EL1,	/* Branch Record Buffer Function Control Register */
->  
->  	NR_SYS_REGS	/* Nothing after this line! */
->  };
-> @@ -753,6 +755,8 @@ struct kvm_vcpu_arch {
->  #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
->  /* Save trace filter controls */
->  #define DEBUG_STATE_SAVE_TRFCR	__vcpu_single_flag(iflags, BIT(8))
-> +/* Save BRBE context if active  */
-> +#define DEBUG_STATE_SAVE_BRBE	__vcpu_single_flag(iflags, BIT(9))
->  
->  /* SVE enabled for host EL0 */
->  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index 2ab41b954512..4055783c3d34 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -354,6 +354,11 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
->  		    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
->  			vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
->  	}
-> +
-> +	/* Check if we have BRBE implemented and available at the host */
-> +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRBE_SHIFT) &&
-> +	    (read_sysreg_s(SYS_BRBCR_EL1) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
-> +		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
-
-Isn't this supposed to just be the feature check? Whether BRBE is
-enabled or not is checked later in __debug_save_brbe() anyway.
-
-It seems like it's possible to become enabled after this flag load part.
-
+> diff --git a/drivers/base/arch_topology.c b/drivers/base/arch_topology.c
+> index 9ccb7daee78e..06c9fc6620d2 100644
+> --- a/drivers/base/arch_topology.c
+> +++ b/drivers/base/arch_topology.c
+> @@ -215,43 +215,24 @@ static ssize_t cpu_capacity_show(struct device *dev,
+>  	return sysfs_emit(buf, "%lu\n", topology_get_cpu_scale(cpu->dev.id));
 >  }
 >  
->  void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
-> @@ -361,6 +366,7 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
->  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
->  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
->  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
-> +	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
->  }
+> -static void update_topology_flags_workfn(struct work_struct *work);
+> -static DECLARE_WORK(update_topology_flags_work, update_topology_flags_workfn);
+> -
+>  static DEVICE_ATTR_RO(cpu_capacity);
 >  
->  void kvm_etm_set_guest_trfcr(u64 trfcr_guest)
-> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> index 6174f710948e..e44a1f71a0f8 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> @@ -93,6 +93,38 @@ static void __debug_restore_trace(struct kvm_cpu_context *host_ctxt,
->  		write_sysreg_s(ctxt_sys_reg(host_ctxt, TRFCR_EL1), SYS_TRFCR_EL1);
->  }
->  
-> +static void __debug_save_brbe(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	ctxt_sys_reg(host_ctxt, BRBCR_EL1) = 0;
-> +	ctxt_sys_reg(host_ctxt, BRBFCR_EL1) = 0;
-> +
-> +	/* Check if the BRBE is enabled */
-> +	if (!(ctxt_sys_reg(host_ctxt, BRBCR_EL1) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
-> +		return;
-
-Doesn't this always fail, the host BRBCR_EL1 value was just cleared on
-the line above.
-
-Also, you need to read the register to determine if it was enabled or
-not, so you might as well always store the real value, rather than 0 in
-the not enabled case.
-
-> +
-> +	/*
-> +	 * Prohibit branch record generation while we are in guest.
-> +	 * Since access to BRBCR_EL1 and BRBFCR_EL1 is trapped, the
-> +	 * guest can't modify the filtering set by the host.
-> +	 */
-> +	ctxt_sys_reg(host_ctxt, BRBCR_EL1) = read_sysreg_s(SYS_BRBCR_EL1);
-> +	ctxt_sys_reg(host_ctxt, BRBFCR_EL1) = read_sysreg_s(SYS_BRBFCR_EL1)
-> +	write_sysreg_s(0, SYS_BRBCR_EL1);
-> +	write_sysreg_s(0, SYS_BRBFCR_EL1);
-
-Why does SYS_BRBFCR_EL1 need to be saved and restored? Only
-BRBCR_ELx_E0BRE and BRBCR_ELx_ExBRE need to be cleared to disable BRBE.
-
-> +	isb();
-> +}
-> +
-> +static void __debug_restore_brbe(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	if (!ctxt_sys_reg(host_ctxt, BRBCR_EL1) || !ctxt_sys_reg(host_ctxt, BRBFCR_EL1))
-> +		return;
-> +
-> +	/* Restore BRBE controls */
-> +	write_sysreg_s(ctxt_sys_reg(host_ctxt, BRBCR_EL1), SYS_BRBCR_EL1);
-> +	write_sysreg_s(ctxt_sys_reg(host_ctxt, BRBFCR_EL1), SYS_BRBFCR_EL1);
-> +	isb();
-> +}
-> +
->  void __debug_save_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
->  				    struct kvm_cpu_context *guest_ctxt)
+> -static int cpu_capacity_sysctl_add(unsigned int cpu)
+> -{
+> -	struct device *cpu_dev = get_cpu_device(cpu);
+> -
+> -	if (!cpu_dev)
+> -		return -ENOENT;
+> -
+> -	device_create_file(cpu_dev, &dev_attr_cpu_capacity);
+> -
+> -	return 0;
+> -}
+> -
+> -static int cpu_capacity_sysctl_remove(unsigned int cpu)
+> +static umode_t cpu_present_attrs_visible(struct kobject *kobi,
+> +					 struct attribute *attr, int index)
 >  {
-> @@ -102,6 +134,10 @@ void __debug_save_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
+> -	struct device *cpu_dev = get_cpu_device(cpu);
+> -
+> -	if (!cpu_dev)
+> -		return -ENOENT;
+> -
+> -	device_remove_file(cpu_dev, &dev_attr_cpu_capacity);
+> +	struct device *dev = kobj_to_dev(kobj);
+> +	struct cpu *cpu = container_of(dev, struct cpu, dev);
 >  
->  	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_TRFCR))
->  		__debug_save_trace(host_ctxt, guest_ctxt);
+> -	return 0;
+> +	return cpu_present(cpu->dev.id) ? attr->mode : 0;
+>  }
+>  
+> -static int register_cpu_capacity_sysctl(void)
+> -{
+> -	cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "topology/cpu-capacity",
+> -			  cpu_capacity_sysctl_add, cpu_capacity_sysctl_remove);
+> +const struct attribute_group cpu_capacity_attr_group = {
+> +	.is_visible = cpu_present_attrs_visible,
+> +	.attrs = cpu_capacity_attrs
+> +};
+>  
+> -	return 0;
+> -}
+> -subsys_initcall(register_cpu_capacity_sysctl);
+> +static void update_topology_flags_workfn(struct work_struct *work);
+> +static DECLARE_WORK(update_topology_flags_work, update_topology_flags_workfn);
+>  
+>  static int update_topology;
+>  
+> diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
+> index a19a8be93102..954b045705c2 100644
+> --- a/drivers/base/cpu.c
+> +++ b/drivers/base/cpu.c
+> @@ -192,6 +192,9 @@ static const struct attribute_group crash_note_cpu_attr_group = {
+>  static const struct attribute_group *common_cpu_attr_groups[] = {
+>  #ifdef CONFIG_KEXEC
+>  	&crash_note_cpu_attr_group,
+> +#endif
+> +#ifdef CONFIG_GENERIC_ARCH_TOPOLOGY
+> +	&cpu_capacity_attr_group,
+>  #endif
+>  	NULL
+>  };
+> diff --git a/include/linux/cpu.h b/include/linux/cpu.h
+> index e117c06e0c6b..745ad21e3dc8 100644
+> --- a/include/linux/cpu.h
+> +++ b/include/linux/cpu.h
+> @@ -30,6 +30,8 @@ struct cpu {
+>  	struct device dev;
+>  };
+>  
+> +extern const struct attribute_group cpu_capacity_attr_group;
 > +
-> +	/* Disable BRBE branch records */
-> +	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_BRBE))
-> +		__debug_save_brbe(host_ctxt);
->  }
->  
->  void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
-> @@ -116,6 +152,8 @@ void __debug_restore_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
->  		__debug_restore_spe(host_ctxt);
->  	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_TRFCR))
->  		__debug_restore_trace(host_ctxt, guest_ctxt);
-> +	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_BRBE))
-> +		__debug_restore_brbe(host_ctxt);
->  }
->  
->  void __debug_switch_to_host(struct kvm_vcpu *vcpu)
+>  extern void boot_cpu_init(void);
+>  extern void boot_cpu_hotplug_init(void);
+>  extern void cpu_init(void);
+> 
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
