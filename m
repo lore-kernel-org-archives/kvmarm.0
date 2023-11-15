@@ -1,247 +1,160 @@
-Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7734728370
-	for <kvmarm@lists.linux.dev>; Wed, 15 Nov 2023 17:17:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CE5041212;
+	Wed, 15 Nov 2023 21:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VyrgFHq9"
-Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-9e644d94d85so141382066b.0
-        for <kvmarm@lists.linux.dev>; Wed, 15 Nov 2023 09:17:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700068637; x=1700673437; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MrwZCdoLZEaizVhQil7JgumATiKs+C+flcugI0w/XAk=;
-        b=VyrgFHq9eDg5TY8F/p2y7CPnpHWZgP+qfx8LsgYWBSxzeA0F1bLZJc4F1So6HyGrt2
-         TF3JHQtz9HX1Slt6AIsm+7w3CyKw6StDDZUwXva4IQOouOdjmhIG//qEnrPZ6aeykBXI
-         EAp36ZI70wath9YlZAjtvxosVg49a97l55fZgJuWCvCz4NsU5OXWmebWOLGwvb8oPM85
-         rmaJU4CWF3V11EZM8osizeV4PtfOxLnTDhP3XwkiBdOJpY6bWpZWcrBwNSD8Z/1QpD5t
-         6PtoZNVi+GYeksnHwUzw7v4tHrKlkqTSLltHEo+xdwokoM9tgZwgKK+dTowMvE9tstVA
-         IRvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700068637; x=1700673437;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MrwZCdoLZEaizVhQil7JgumATiKs+C+flcugI0w/XAk=;
-        b=SziJl04MYC/3J8NM3J48Y2SAS3yxsnB0goQDrUyVIE+icB25TGh29Jj91pYkZza47K
-         3a8TwHhD3xZ5jCUaL6Wy5+xoA8B4SziUFLHMjhM1BrzJ15/gG4AZVq39rvMf+dC56xxY
-         j3CmatZX/xxT1inP16c+0JeYVZmw3gzSG+7Rj86Q0dW6Dl/1yM8lKNyMISH0JbaZETk5
-         N/70BzrEZ4skuOQqokYeGQHYlb1hBHHm+ntZ8fkSp9F2D28xvbf3q4Xh/MeM5aZawO6L
-         Q5tVaUzyKNOsRRCnwAlpgfH1GsTXOpdrPwlPgO4am9+/MJvU1i+4SiMHLGiJb4ikceTk
-         crLw==
-X-Gm-Message-State: AOJu0Yy3ZDsRhHB4RLRbBiBGLaPYKLKKHBYAvnMcvS7+L8u7mvgJrXSV
-	fwgp2D1tzSY/kBcN33Dto2JQ6CaLIXP3WRofXAs=
-X-Google-Smtp-Source: AGHT+IEfryolzdoKiOEYL1phXIKFgud/D2FyZuB7+BdH9E+NUl2GoRL9m1zLD32m+IOZddXrx7GWlUokfDnIsB2IKDc=
-X-Received: from sebkvm.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:cd5])
- (user=sebastianene job=sendgmr) by 2002:a17:906:a00f:b0:9f3:6556:bc79 with
- SMTP id p15-20020a170906a00f00b009f36556bc79mr19663ejy.0.1700068637537; Wed,
- 15 Nov 2023 09:17:17 -0800 (PST)
-Date: Wed, 15 Nov 2023 17:16:40 +0000
-In-Reply-To: <20231115171639.2852644-2-sebastianene@google.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EKeQeT3p"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700085509; x=1731621509;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=3taof8CoXDBT/pWXFj3jBJpymKDLX1dvSz+gdf7t378=;
+  b=EKeQeT3pu3ba12fQbxwfmQwF9YIAyRvNw1JUn5HJ8gogPHQG9//BVC/r
+   AtPMvVpbdxx2DZjP0ZQPVgr7ONzLaPeC9+iOewKxjXlAD2dKVf91tbB3/
+   EFsqveh5EnI9o7ZIy5uZ1KEWHaQ4Ln3kiuBD8aWx5LSn/I23+nPPsVPZI
+   dkbW0kJZ9n2dYMKWff2oPKCwJPlpQP2sGic86NdEo5m9Ji2kcHclC4S/F
+   Gkmi5vC7fmHtxP1DrE1KMWaDUUBulx8fOeq2XXTaVFDFGClJTkgl+Mh1v
+   4f0s/v2Dtc+WN+zpiLg9AR0HsqcMVOJI2LwlmLn26BuoYPNFlDXwwFhbB
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="390756846"
+X-IronPort-AV: E=Sophos;i="6.03,306,1694761200"; 
+   d="scan'208";a="390756846"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 13:58:28 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="882525590"
+X-IronPort-AV: E=Sophos;i="6.03,306,1694761200"; 
+   d="scan'208";a="882525590"
+Received: from lkp-server02.sh.intel.com (HELO b8de5498638e) ([10.239.97.151])
+  by fmsmga002.fm.intel.com with ESMTP; 15 Nov 2023 13:58:24 -0800
+Received: from kbuild by b8de5498638e with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1r3Ntu-0000t8-1U;
+	Wed, 15 Nov 2023 21:58:22 +0000
+Date: Thu, 16 Nov 2023 05:57:51 +0800
+From: kernel test robot <lkp@intel.com>
+To: Sebastian Ene <sebastianene@google.com>, will@kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, catalin.marinas@arm.com,
+	mark.rutland@arm.com, akpm@linux-foundation.org, maz@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kernel-team@android.com, vdonnefort@google.com, qperret@google.com,
+	smostafa@google.com, Sebastian Ene <sebastianene@google.com>
+Subject: Re: [PATCH v3 07/10] arm64: ptdump: Parse the host stage-2
+ page-tables from the snapshot
+Message-ID: <202311160522.Nr71iglr-lkp@intel.com>
+References: <20231115171639.2852644-9-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20231115171639.2852644-2-sebastianene@google.com>
-X-Mailer: git-send-email 2.43.0.rc0.421.g78406f8d94-goog
-Message-ID: <20231115171639.2852644-12-sebastianene@google.com>
-Subject: [PATCH v3 10/10] arm64: ptdump: Add support for guest stage-2
- pagetables dumping
-From: Sebastian Ene <sebastianene@google.com>
-To: will@kernel.org, Oliver Upton <oliver.upton@linux.dev>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, catalin.marinas@arm.com, mark.rutland@arm.com, 
-	akpm@linux-foundation.org, maz@kernel.org
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kernel-team@android.com, vdonnefort@google.com, 
-	qperret@google.com, smostafa@google.com, 
-	Sebastian Ene <sebastianene@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231115171639.2852644-9-sebastianene@google.com>
 
-Register a debugfs file on guest creation to be able to view their
-second translation tables with ptdump. This assumes that the host is in
-control of the guest stage-2 and has direct access to the pagetables.
+Hi Sebastian,
 
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
----
- arch/arm64/include/asm/ptdump.h |  7 ++++
- arch/arm64/kvm/debug.c          |  6 +++
- arch/arm64/kvm/mmu.c            |  2 +
- arch/arm64/mm/ptdump.c          | 68 +++++++++++++++++++++++++++++++++
- 4 files changed, 83 insertions(+)
+kernel test robot noticed the following build warnings:
 
-diff --git a/arch/arm64/include/asm/ptdump.h b/arch/arm64/include/asm/ptdump.h
-index de5a5a0c0ecf..21b281715d27 100644
---- a/arch/arm64/include/asm/ptdump.h
-+++ b/arch/arm64/include/asm/ptdump.h
-@@ -5,6 +5,8 @@
- #ifndef __ASM_PTDUMP_H
- #define __ASM_PTDUMP_H
- 
-+#include <asm/kvm_pgtable.h>
-+
- #ifdef CONFIG_PTDUMP_CORE
- 
- #include <linux/mm_types.h>
-@@ -23,6 +25,7 @@ struct ptdump_info {
- 	int (*ptdump_prepare_walk)(void *file_priv);
- 	void (*ptdump_end_walk)(void *file_priv);
- 	size_t				mc_len;
-+	void				*priv;
- };
- 
- void ptdump_walk(struct seq_file *s, struct ptdump_info *info);
-@@ -48,8 +51,12 @@ void ptdump_check_wx(void);
- 
- #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
- void ptdump_register_host_stage2(void);
-+int ptdump_register_guest_stage2(struct kvm *kvm);
-+void ptdump_unregister_guest_stage2(struct kvm_pgtable *pgt);
- #else
- static inline void ptdump_register_host_stage2(void) { }
-+static inline int ptdump_register_guest_stage2(struct kvm *kvm) { return 0; }
-+static inline void ptdump_unregister_guest_stage2(struct kvm_pgtable *pgt) { }
- #endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
- 
- #ifdef CONFIG_DEBUG_WX
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index 8725291cb00a..555d022f8ad9 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -13,6 +13,7 @@
- #include <asm/kvm_asm.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_emulate.h>
-+#include <asm/ptdump.h>
- 
- #include "trace.h"
- 
-@@ -342,3 +343,8 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
- 	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
- 	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
- }
-+
-+int kvm_arch_create_vm_debugfs(struct kvm *kvm)
-+{
-+	return ptdump_register_guest_stage2(kvm);
-+}
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index d87c8fcc4c24..da45050596e6 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -11,6 +11,7 @@
- #include <linux/sched/signal.h>
- #include <trace/events/kvm.h>
- #include <asm/pgalloc.h>
-+#include <asm/ptdump.h>
- #include <asm/cacheflush.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_mmu.h>
-@@ -1021,6 +1022,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
- 	write_unlock(&kvm->mmu_lock);
- 
- 	if (pgt) {
-+		ptdump_unregister_guest_stage2(pgt);
- 		kvm_pgtable_stage2_destroy(pgt);
- 		kfree(pgt);
- 	}
-diff --git a/arch/arm64/mm/ptdump.c b/arch/arm64/mm/ptdump.c
-index ffb87237078b..741764cff105 100644
---- a/arch/arm64/mm/ptdump.c
-+++ b/arch/arm64/mm/ptdump.c
-@@ -27,6 +27,7 @@
- #include <asm/kvm_pkvm.h>
- #include <asm/kvm_pgtable.h>
- #include <asm/kvm_host.h>
-+#include <asm/kvm_mmu.h>
- 
- 
- enum address_markers_idx {
-@@ -519,6 +520,16 @@ void ptdump_check_wx(void)
- #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
- static struct ptdump_info stage2_kernel_ptdump_info;
- 
-+struct ptdump_registered_guest {
-+	struct list_head		reg_list;
-+	struct ptdump_info		info;
-+	struct kvm_pgtable_snapshot	snapshot;
-+	rwlock_t			*lock;
-+};
-+
-+static LIST_HEAD(ptdump_guest_list);
-+static DEFINE_MUTEX(ptdump_list_lock);
-+
- static phys_addr_t ptdump_host_pa(void *addr)
- {
- 	return __pa(addr);
-@@ -757,6 +768,63 @@ static void stage2_ptdump_walk(struct seq_file *s, struct ptdump_info *info)
- 	kvm_pgtable_walk(pgtable, start_ipa, end_ipa, &walker);
- }
- 
-+static void guest_stage2_ptdump_walk(struct seq_file *s,
-+				     struct ptdump_info *info)
-+{
-+	struct ptdump_info_file_priv *f_priv =
-+		container_of(info, struct ptdump_info_file_priv, info);
-+	struct ptdump_registered_guest *guest = info->priv;
-+
-+	f_priv->file_priv = &guest->snapshot;
-+
-+	read_lock(guest->lock);
-+	stage2_ptdump_walk(s, info);
-+	read_unlock(guest->lock);
-+}
-+
-+int ptdump_register_guest_stage2(struct kvm *kvm)
-+{
-+	struct ptdump_registered_guest *guest;
-+	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
-+	struct kvm_pgtable *pgt = mmu->pgt;
-+
-+	guest = kzalloc(sizeof(struct ptdump_registered_guest), GFP_KERNEL);
-+	if (!guest)
-+		return -ENOMEM;
-+
-+	memcpy(&guest->snapshot.pgtable, pgt, sizeof(struct kvm_pgtable));
-+	guest->info = (struct ptdump_info) {
-+		.ptdump_walk		= guest_stage2_ptdump_walk,
-+	};
-+
-+	guest->info.priv = guest;
-+	guest->lock = &kvm->mmu_lock;
-+	mutex_lock(&ptdump_list_lock);
-+
-+	ptdump_debugfs_kvm_register(&guest->info, "stage2_page_tables",
-+				    kvm->debugfs_dentry);
-+
-+	list_add(&guest->reg_list, &ptdump_guest_list);
-+	mutex_unlock(&ptdump_list_lock);
-+
-+	return 0;
-+}
-+
-+void ptdump_unregister_guest_stage2(struct kvm_pgtable *pgt)
-+{
-+	struct ptdump_registered_guest *guest;
-+
-+	mutex_lock(&ptdump_list_lock);
-+	list_for_each_entry(guest, &ptdump_guest_list, reg_list) {
-+		if (guest->snapshot.pgtable.pgd == pgt->pgd) {
-+			list_del(&guest->reg_list);
-+			kfree(guest);
-+			break;
-+		}
-+	}
-+	mutex_unlock(&ptdump_list_lock);
-+}
-+
- void ptdump_register_host_stage2(void)
- {
- 	if (!is_protected_kvm_enabled())
+[auto build test WARNING on arm64/for-next/core]
+[also build test WARNING on kvmarm/next linus/master v6.7-rc1 next-20231115]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Sebastian-Ene/KVM-arm64-Add-snap-shooting-the-host-stage-2-pagetables/20231116-012017
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/core
+patch link:    https://lore.kernel.org/r/20231115171639.2852644-9-sebastianene%40google.com
+patch subject: [PATCH v3 07/10] arm64: ptdump: Parse the host stage-2 page-tables from the snapshot
+config: arm64-randconfig-001-20231116 (https://download.01.org/0day-ci/archive/20231116/202311160522.Nr71iglr-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231116/202311160522.Nr71iglr-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311160522.Nr71iglr-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> arch/arm64/mm/ptdump.c:178:31: warning: 'stage2_pte_bits' defined but not used [-Wunused-const-variable=]
+     178 | static const struct prot_bits stage2_pte_bits[] = {
+         |                               ^~~~~~~~~~~~~~~
+
+
+vim +/stage2_pte_bits +178 arch/arm64/mm/ptdump.c
+
+   177	
+ > 178	static const struct prot_bits stage2_pte_bits[] = {
+   179		{
+   180			.mask	= PTE_VALID,
+   181			.val	= PTE_VALID,
+   182			.set	= " ",
+   183			.clear	= "F",
+   184		}, {
+   185			.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
+   186			.val	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
+   187			.set	= "XN",
+   188			.clear	= "  ",
+   189		}, {
+   190			.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R,
+   191			.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R,
+   192			.set	= "R",
+   193			.clear	= " ",
+   194		}, {
+   195			.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
+   196			.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
+   197			.set	= "W",
+   198			.clear	= " ",
+   199		}, {
+   200			.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF,
+   201			.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF,
+   202			.set	= "AF",
+   203			.clear	= "  ",
+   204		}, {
+   205			.mask	= PTE_NG,
+   206			.val	= PTE_NG,
+   207			.set	= "FnXS",
+   208			.clear	= "  ",
+   209		}, {
+   210			.mask	= PTE_CONT,
+   211			.val	= PTE_CONT,
+   212			.set	= "CON",
+   213			.clear	= "   ",
+   214		}, {
+   215			.mask	= PTE_TABLE_BIT,
+   216			.val	= PTE_TABLE_BIT,
+   217			.set	= "   ",
+   218			.clear	= "BLK",
+   219		}, {
+   220			.mask	= KVM_PGTABLE_PROT_SW0,
+   221			.val	= KVM_PGTABLE_PROT_SW0,
+   222			.set	= "SW0", /* PKVM_PAGE_SHARED_OWNED */
+   223		}, {
+   224			.mask   = KVM_PGTABLE_PROT_SW1,
+   225			.val	= KVM_PGTABLE_PROT_SW1,
+   226			.set	= "SW1", /* PKVM_PAGE_SHARED_BORROWED */
+   227		}, {
+   228			.mask	= KVM_PGTABLE_PROT_SW2,
+   229			.val	= KVM_PGTABLE_PROT_SW2,
+   230			.set	= "SW2",
+   231		}, {
+   232			.mask   = KVM_PGTABLE_PROT_SW3,
+   233			.val	= KVM_PGTABLE_PROT_SW3,
+   234			.set	= "SW3",
+   235		},
+   236	};
+   237	
+
 -- 
-2.43.0.rc0.421.g78406f8d94-goog
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
