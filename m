@@ -1,94 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F67B41236;
-	Tue, 14 Nov 2023 14:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C508ACA74
+	for <kvmarm@lists.linux.dev>; Wed, 15 Nov 2023 10:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NJ9jhbCZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31FD3C116B8;
-	Tue, 14 Nov 2023 14:36:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699972592;
-	bh=uwufjRPZpufB4WAKz4BvxO1YI+sO9dPrjMMi385iZbk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=NJ9jhbCZtT33Qvof3TlCzkkFhz5s+fq7thPKABIDhzv7DUXN8pq3oHHiIRGSktlnL
-	 72ejabE3GFSkmCUq/2YFLnc+cZDPYbw0e/kjIyvkxRWtZbyYGa4IiJQfayH/fIfkqf
-	 92R+7hAZa7klpM9Fb0GqNK+XEUE7cWnUj4IcowB8lyqnbVzb1oLcEUMcgl1XsDtcnV
-	 300Bv9ThGLCHhms8Hq8sl+5ZoO8zlP7QoqX9W/DysaVyRU0errvieR7fHGoiZpOZST
-	 U0uJMg3MijVfNMRWpz05QcirghdcvKuGLyvSxIm27WI84zoGz+Ce42un29uyb65Mlm
-	 XCncXueZaM1RQ==
-From: Mark Brown <broonie@kernel.org>
-Date: Tue, 14 Nov 2023 14:35:06 +0000
-Subject: [PATCH v2 21/21] KVM: arm64: selftests: Teach get-reg-list about
- FPMR
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WMk7AaLV"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=J+m5Wux4gCeZ5VbKE22zSD3h2vqCToIPoOglMpcMB98=; b=WMk7AaLVtN5GRy7VHSplvABKOr
+	OXRc47CE5LjYfVL1I4G9BmL9nkSst8Vh0ERKHmS8MJxRSPLKDFvaYbEeA1sMiDIYtcRhNQa/pnlI8
+	PkqOB9knMX2YL+uvuraKATTscnDpMYKl3cLLR36pzK4yKmNHGHEjAw7PZ395B53vvUhyuWvtelDyB
+	r5XhCGNIJB9iBgYQiuOIDQBOPCIGnr+az2tu1OpmA6+1stGbOEb7mZfrcCgopQw9ZYDmB/DHKIyAH
+	MGihds8I0ekCwC2YQuqoXNHvkOJ31Wt+yTJ713pnOPmQLGMyMGfLqHWpB6tvMEThA4WWseIPd1uBc
+	ry+LnBrA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56952)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r3Crx-0000WK-1q;
+	Wed, 15 Nov 2023 10:11:37 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r3Crw-0006Uz-QI; Wed, 15 Nov 2023 10:11:36 +0000
+Date: Wed, 15 Nov 2023 10:11:36 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Gavin Shan <gshan@redhat.com>
+Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, linux-csky@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-ia64@vger.kernel.org,
+	linux-parisc@vger.kernel.org, Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com,
+	James Morse <james.morse@arm.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>
+Subject: Re: [PATCH RFC 11/22] drivers: base: remove unnecessary call to
+ register_cpu_under_node()
+Message-ID: <ZVSZWK+OmZWEce33@shell.armlinux.org.uk>
+References: <ZUoRY33AAHMc5ThW@shell.armlinux.org.uk>
+ <E1r0JLa-00CTxY-Uv@rmk-PC.armlinux.org.uk>
+ <955f2b95-76e4-4e68-830b-e6dd9f122dc1@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231114-arm64-2023-dpisa-v2-21-47251894f6a8@kernel.org>
-References: <20231114-arm64-2023-dpisa-v2-0-47251894f6a8@kernel.org>
-In-Reply-To: <20231114-arm64-2023-dpisa-v2-0-47251894f6a8@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <shuah@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- kvmarm@lists.linux.dev, linux-doc@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.13-dev-0438c
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1321; i=broonie@kernel.org;
- h=from:subject:message-id; bh=uwufjRPZpufB4WAKz4BvxO1YI+sO9dPrjMMi385iZbk=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBlU4WljyZx9r11YL8tcSv5B8kuEfjpvUQEKebxv1Zj
- Tas9auiJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZVOFpQAKCRAk1otyXVSH0BRGB/
- 0eKQ35FdG4nEY5EMIhWlYN7NyAik/Z8VmcnuImgEnedGuih5QNXSXGmyTcg+eoM3Ug+sF+9HdXnYs6
- r7BGS+4K0FAIhZ8EemtAZnN7MHTkCtiaWndEdzRG4u9ekRHwvcfslpdgQoETJVHO6h0n2/gRIpZGlI
- 90D1oWpNyYWZjFpTh61erW89DUsGuj0ljQU26xo5eMnef9S3riMClGoK/1AqLOtlu/98ZZ4ebfvCI6
- gh0C7bmQdtzP2sd32hYuAJk6OUQ8etGAoh9fxNtgUKKSZLRhfTCIkBjGkrhMKR6W9/MheCeCvIADvH
- bKXZvUhzzWTmEAEKQBIeFt8R0l5BPO
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <955f2b95-76e4-4e68-830b-e6dd9f122dc1@redhat.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-FEAT_FPMR defines a new register FMPR which is available at all ELs and is
-discovered via ID_AA64PFR2_EL1.FPMR, add this to the set of registers that
-get-reg-list knows to check for with the required identification register
-depdendency.
+On Mon, Nov 13, 2023 at 02:04:32PM +1000, Gavin Shan wrote:
+> On 11/7/23 20:30, Russell King (Oracle) wrote:
+> > Since "drivers: base: Move cpu_dev_init() after node_dev_init()", we
+> > can remove some redundant code.
+> > 
+> > node_dev_init() will walk through the nodes calling register_one_node()
+> > on each. This will trickle down to __register_one_node() which walks
+> > all present CPUs, calling register_cpu_under_node() on each.
+> > 
+> > register_cpu_under_node() will call get_cpu_device(cpu) for each, which
+> > will return NULL until the CPU is registered using register_cpu(). This
+> > now happens _after_ node_dev_init().
+> > 
+> > Therefore, calling register_cpu_under_node() from __register_one_node()
+> > becomes a no-op, and can be removed.
+> > 
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > ---
+> >   drivers/base/node.c | 7 -------
+> >   1 file changed, 7 deletions(-)
+> > 
+> 
+> __register_one_node() can be called in memory hot add path either. In that path,
+> a new NUMA node can be presented and becomes online. Does this become a problem
+> after the logic of associating CPU with newly added NUMA node?
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/aarch64/get-reg-list.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+I guess this is where ordering matters.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index 71ea6ecec7ce..1e43511d1440 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -40,6 +40,12 @@ static struct feature_id_reg feat_id_regs[] = {
- 		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
- 		4,
- 		1
-+	},
-+	{
-+		ARM64_SYS_REG(3, 3, 4, 4, 2),	/* FPMR */
-+		ARM64_SYS_REG(3, 0, 0, 4, 2),	/* ID_AA64PFR2_EL1 */
-+		32,
-+		1
- 	}
- };
- 
-@@ -481,6 +487,7 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 3, 14, 2, 1),	/* CNTP_CTL_EL0 */
- 	ARM64_SYS_REG(3, 3, 14, 2, 2),	/* CNTP_CVAL_EL0 */
- 	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
-+	ARM64_SYS_REG(3, 3, 4, 4, 2),	/* FPMR */
- 	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
- 	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
- };
+As mentioned in the commit message, register_cpu_under_node() does
+this:
+
+        if (!node_online(nid))
+                return 0;
+
+        obj = get_cpu_device(cpu);
+        if (!obj)
+                return 0;
+
+get_cpu_device() will return NULL if the CPU is not possible or is out
+of range, or register_cpu() has not yet been called for this CPU, and
+register_cpu() will call register_cpu_under_node().
+
+I guess it is possible for a CPU it be present, but the node its
+associated with would not be online, which means we end up with
+register_cpu_under_node() returning on !node_online(nid) but we've
+populated the CPU devices (thus get_cpu_device(cpu) would return
+non-NULL).
+
+Then when the numa node comes online, we do still need to call this
+path, so this change is incorrect.
+
+It came about trying to address Jonathan's comment for this patch:
+
+https://lore.kernel.org/r/20230913163823.7880-7-james.morse@arm.com
+
+I think my response to Jonathan is still correct - but didn't need
+a code change. I'm dropping this patch.
 
 -- 
-2.30.2
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
