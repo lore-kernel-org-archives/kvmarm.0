@@ -1,123 +1,126 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C508ACA74
-	for <kvmarm@lists.linux.dev>; Wed, 15 Nov 2023 10:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD98125D5
+	for <kvmarm@lists.linux.dev>; Wed, 15 Nov 2023 10:48:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WMk7AaLV"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=J+m5Wux4gCeZ5VbKE22zSD3h2vqCToIPoOglMpcMB98=; b=WMk7AaLVtN5GRy7VHSplvABKOr
-	OXRc47CE5LjYfVL1I4G9BmL9nkSst8Vh0ERKHmS8MJxRSPLKDFvaYbEeA1sMiDIYtcRhNQa/pnlI8
-	PkqOB9knMX2YL+uvuraKATTscnDpMYKl3cLLR36pzK4yKmNHGHEjAw7PZ395B53vvUhyuWvtelDyB
-	r5XhCGNIJB9iBgYQiuOIDQBOPCIGnr+az2tu1OpmA6+1stGbOEb7mZfrcCgopQw9ZYDmB/DHKIyAH
-	MGihds8I0ekCwC2YQuqoXNHvkOJ31Wt+yTJ713pnOPmQLGMyMGfLqHWpB6tvMEThA4WWseIPd1uBc
-	ry+LnBrA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56952)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r3Crx-0000WK-1q;
-	Wed, 15 Nov 2023 10:11:37 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r3Crw-0006Uz-QI; Wed, 15 Nov 2023 10:11:36 +0000
-Date: Wed, 15 Nov 2023 10:11:36 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Gavin Shan <gshan@redhat.com>
-Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
-	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
-	x86@kernel.org, linux-csky@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-ia64@vger.kernel.org,
-	linux-parisc@vger.kernel.org, Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	jianyong.wu@arm.com, justin.he@arm.com,
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U3/PGuqx"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700045288;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=sY+7WKoyMMy/V4oZ7M1gjiU0erpOSU8OhEEVrkBYQUU=;
+	b=U3/PGuqx++vENabfdWmk/hixMXFnEP7WCJdJistG0PuHxJ4r1WVzNvY1Emvz5Mh/0NagnN
+	WGQfmG0O1NB+JUeKZWMl2/SzGcHiVKQNeom4kYgLNwGC8wnXuZPcrwF17CHaB6GzLn45X1
+	RJxwsq4aijlid6GyKgDUeIEDlf/HAVk=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-261-a2i6MBMUOI-iZjeE1juWsg-1; Wed,
+ 15 Nov 2023 05:48:06 -0500
+X-MC-Unique: a2i6MBMUOI-iZjeE1juWsg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B4C7229ABA09;
+	Wed, 15 Nov 2023 10:48:05 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4637F40C6EB9;
+	Wed, 15 Nov 2023 10:48:05 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>
-Subject: Re: [PATCH RFC 11/22] drivers: base: remove unnecessary call to
- register_cpu_under_node()
-Message-ID: <ZVSZWK+OmZWEce33@shell.armlinux.org.uk>
-References: <ZUoRY33AAHMc5ThW@shell.armlinux.org.uk>
- <E1r0JLa-00CTxY-Uv@rmk-PC.armlinux.org.uk>
- <955f2b95-76e4-4e68-830b-e6dd9f122dc1@redhat.com>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: arm64: selftests: Clean up the GIC[D,R]_BASE_GPA
+Date: Wed, 15 Nov 2023 05:47:57 -0500
+Message-Id: <20231115104757.15710-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <955f2b95-76e4-4e68-830b-e6dd9f122dc1@redhat.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-On Mon, Nov 13, 2023 at 02:04:32PM +1000, Gavin Shan wrote:
-> On 11/7/23 20:30, Russell King (Oracle) wrote:
-> > Since "drivers: base: Move cpu_dev_init() after node_dev_init()", we
-> > can remove some redundant code.
-> > 
-> > node_dev_init() will walk through the nodes calling register_one_node()
-> > on each. This will trickle down to __register_one_node() which walks
-> > all present CPUs, calling register_cpu_under_node() on each.
-> > 
-> > register_cpu_under_node() will call get_cpu_device(cpu) for each, which
-> > will return NULL until the CPU is registered using register_cpu(). This
-> > now happens _after_ node_dev_init().
-> > 
-> > Therefore, calling register_cpu_under_node() from __register_one_node()
-> > becomes a no-op, and can be removed.
-> > 
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > ---
-> >   drivers/base/node.c | 7 -------
-> >   1 file changed, 7 deletions(-)
-> > 
-> 
-> __register_one_node() can be called in memory hot add path either. In that path,
-> a new NUMA node can be presented and becomes online. Does this become a problem
-> after the logic of associating CPU with newly added NUMA node?
+The GIC[D,R]_BASE_GPA has been defined in multiple files with the same
+value, define it in one place to make the code clean.
 
-I guess this is where ordering matters.
+Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+---
+ tools/testing/selftests/kvm/aarch64/arch_timer.c   | 3 ---
+ tools/testing/selftests/kvm/aarch64/vgic_irq.c     | 3 ---
+ tools/testing/selftests/kvm/dirty_log_perf_test.c  | 3 ---
+ tools/testing/selftests/kvm/include/aarch64/vgic.h | 3 +++
+ 4 files changed, 3 insertions(+), 9 deletions(-)
 
-As mentioned in the commit message, register_cpu_under_node() does
-this:
-
-        if (!node_online(nid))
-                return 0;
-
-        obj = get_cpu_device(cpu);
-        if (!obj)
-                return 0;
-
-get_cpu_device() will return NULL if the CPU is not possible or is out
-of range, or register_cpu() has not yet been called for this CPU, and
-register_cpu() will call register_cpu_under_node().
-
-I guess it is possible for a CPU it be present, but the node its
-associated with would not be online, which means we end up with
-register_cpu_under_node() returning on !node_online(nid) but we've
-populated the CPU devices (thus get_cpu_device(cpu) would return
-non-NULL).
-
-Then when the numa node comes online, we do still need to call this
-path, so this change is incorrect.
-
-It came about trying to address Jonathan's comment for this patch:
-
-https://lore.kernel.org/r/20230913163823.7880-7-james.morse@arm.com
-
-I think my response to Jonathan is still correct - but didn't need
-a code change. I'm dropping this patch.
-
+diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+index 274b8465b42a..818854007bfd 100644
+--- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
++++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+@@ -59,9 +59,6 @@ static struct test_args test_args = {
+ 
+ #define msecs_to_usecs(msec)		((msec) * 1000LL)
+ 
+-#define GICD_BASE_GPA			0x8000000ULL
+-#define GICR_BASE_GPA			0x80A0000ULL
+-
+ enum guest_stage {
+ 	GUEST_STAGE_VTIMER_CVAL = 1,
+ 	GUEST_STAGE_VTIMER_TVAL,
+diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+index 2e64b4856e38..a48aff110fb6 100644
+--- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
++++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+@@ -19,9 +19,6 @@
+ #include "gic_v3.h"
+ #include "vgic.h"
+ 
+-#define GICD_BASE_GPA		0x08000000ULL
+-#define GICR_BASE_GPA		0x080A0000ULL
+-
+ /*
+  * Stores the user specified args; it's passed to the guest and to every test
+  * function.
+diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+index d374dbcf9a53..4971e8f77a0a 100644
+--- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+@@ -22,9 +22,6 @@
+ #ifdef __aarch64__
+ #include "aarch64/vgic.h"
+ 
+-#define GICD_BASE_GPA			0x8000000ULL
+-#define GICR_BASE_GPA			0x80A0000ULL
+-
+ static int gic_fd;
+ 
+ static void arch_setup_vm(struct kvm_vm *vm, unsigned int nr_vcpus)
+diff --git a/tools/testing/selftests/kvm/include/aarch64/vgic.h b/tools/testing/selftests/kvm/include/aarch64/vgic.h
+index 0ac6f05c63f9..9dbb342fd808 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/vgic.h
++++ b/tools/testing/selftests/kvm/include/aarch64/vgic.h
+@@ -33,4 +33,7 @@ void kvm_irq_write_isactiver(int gic_fd, uint32_t intid, struct kvm_vcpu *vcpu);
+ 
+ #define KVM_IRQCHIP_NUM_PINS	(1020 - 32)
+ 
++#define GICD_BASE_GPA		0x08000000ULL
++#define GICR_BASE_GPA		0x080A0000ULL
++
+ #endif // SELFTEST_KVM_VGIC_H
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.40.1
+
