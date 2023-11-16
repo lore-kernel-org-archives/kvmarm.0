@@ -1,216 +1,124 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71A5434578
-	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 19:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CAA221595;
-	Thu, 16 Nov 2023 11:38:15 -0800 (PST)
-Received: from [10.57.84.40] (unknown [10.57.84.40])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C60303F6C4;
-	Thu, 16 Nov 2023 11:37:26 -0800 (PST)
-Message-ID: <c2552b30-92ee-435b-a50c-9c34c25bc421@arm.com>
-Date: Thu, 16 Nov 2023 19:37:25 +0000
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA96E48796
+	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 21:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vEbuygiY"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-da0737dcb26so1735806276.3
+        for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 13:00:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1700168424; x=1700773224; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=pcg1jHOi88FLN7hCqkcZwcR8zkGGhGMDTBufXRqyOok=;
+        b=vEbuygiYrc9xFnNCy/Xp3lYKMJ5/z1yHoPng1uF2OmkSBMR5mpwj1jLjxg7sEPVfEN
+         kN6EtZ5BuA7iRar51pCmk11Y1aRh85Fc6trYhHNp1pVCMwWgRJOHga819M/F6W04WEbY
+         H0Kr6/YMvEsHhnlV/w7wLZX763GITvbOqwdwm+nlE1kRQsyo4/piUXRkn62AoogZAp+9
+         0IIzyJxYW2NAOvS9k37IepcvXJSDk0rKxvKf2s49I8413eurMj1AIKa9m+3UIBbhvhgv
+         cEQOINl9XfTtE1MDGaZ8m6I5DakKyrGaQ6KGif7K9sC5Bki0bXavrjMZg3gNRGnT/O4Z
+         WqeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700168424; x=1700773224;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pcg1jHOi88FLN7hCqkcZwcR8zkGGhGMDTBufXRqyOok=;
+        b=BahQxvLrfgRZPz23jD0Kwj2wEdBTNKaksGIx8NX+VwrOkPfBY95TfRzBIASIIlY93p
+         6e93/SID86HfyoXKwtS4CtlM42gVm8EuBoRE7wj/kmiM/+hSKWw2qLu3dTFG3ixNX9SM
+         oQA1VhEldUY8NGVv/p7kEEU9dC5GXB1Gs2oZgLdUhkkpfJPc2ahZ0ZgkkytkejmwfLCj
+         vVO999LrB6ERmbi+znbHF4fp/yPragCZib4b0q2NUKgq3cb9T8q7hMxmwDNmL6fdXgc2
+         ocXXV8oGbaMp65rNyf+yn5JngFdOCX5+iQDcvg7oTOgT41mO7OJJym0zA3BE05KZ6BMn
+         07kQ==
+X-Gm-Message-State: AOJu0YxQbLvHN05pvKwK67uw2RAbrfOayp6GeyrSdhqL06yqxDLcmUz1
+	f/qYRlSFkUprLaWNdHLnuyyzc2TUVXT/mfJafA==
+X-Google-Smtp-Source: AGHT+IERExc4D+qrt27go/xYBPrtoAORZdvfQFtSO07pMqMqSuTLQB8wBOPMZT1riqPUGW5/Jxx9EA2kvlBTv30QyA==
+X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
+ (user=ackerleytng job=sendgmr) by 2002:a25:7644:0:b0:da3:a4ae:1525 with SMTP
+ id r65-20020a257644000000b00da3a4ae1525mr393167ybc.5.1700168424573; Thu, 16
+ Nov 2023 13:00:24 -0800 (PST)
+Date: Thu, 16 Nov 2023 21:00:22 +0000
+In-Reply-To: <20231105163040.14904-33-pbonzini@redhat.com> (message from Paolo
+ Bonzini on Sun,  5 Nov 2023 17:30:35 +0100)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 6/6] coresight: Pass guest TRFCR value to KVM
-Content-Language: en-GB
-To: James Clark <james.clark@arm.com>, coresight@lists.linaro.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, maz@kernel.org
-Cc: broonie@kernel.org, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mike Leach <mike.leach@linaro.org>, Leo Yan <leo.yan@linaro.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
- <robh@kernel.org>, Jintack Lim <jintack.lim@linaro.org>,
- Fuad Tabba <tabba@google.com>,
- Kristina Martsenko <kristina.martsenko@arm.com>,
- Akihiko Odaki <akihiko.odaki@daynix.com>, Joey Gouly <joey.gouly@arm.com>,
- linux-kernel@vger.kernel.org
-References: <20231019165510.1966367-1-james.clark@arm.com>
- <20231019165510.1966367-7-james.clark@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20231019165510.1966367-7-james.clark@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Message-ID: <diqzfs15o1ll.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [PATCH 32/34] KVM: selftests: Add basic selftest for guest_memfd()
+From: Ackerley Tng <ackerleytng@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org, 
+	willy@infradead.org, akpm@linux-foundation.org, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, tabba@google.com, jarkko@kernel.org, 
+	amoorthy@google.com, dmatlack@google.com, yu.c.zhang@linux.intel.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
+	qperret@google.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 19/10/2023 17:55, James Clark wrote:
-> Currently the userspace and kernel filters for guests are never set, so
-> no trace will be generated for them. Add support for tracing guests by
-> passing the desired TRFCR value to KVM so it can be applied to the
-> guest.
-> 
-> By writing either E1TRE or E0TRE, filtering on either guest kernel or
-> guest userspace is also supported. And if both E1TRE and E0TRE are
-> cleared when exclude_guest is set, that option is supported too. This
-> change also brings exclude_host support which is difficult to add as a
-> separate commit without excess churn and resulting in no trace at all.
-> 
-> Testing
-> =======
-> 
-> The addresses were counted with the following:
-> 
->    $ perf report -D | grep -Eo 'EL2|EL1|EL0' | sort | uniq -c
-> 
-> Guest kernel only:
-> 
->    $ perf record -e cs_etm//Gk -a -- true
->      535 EL1
->        1 EL2
-> 
-> Guest user only (only 5 addresses because the guest runs slowly in the
-> model):
-> 
->    $ perf record -e cs_etm//Gu -a -- true
->      5 EL0
-> 
-> Host kernel only:
-> 
->    $  perf record -e cs_etm//Hk -a -- true
->     3501 EL2
-> 
-> Host userspace only:
-> 
->    $  perf record -e cs_etm//Hu -a -- true
->      408 EL0
->        1 EL2
-> 
-> Signed-off-by: James Clark <james.clark@arm.com>
-> ---
->   .../coresight/coresight-etm4x-core.c          | 42 ++++++++++++++++---
->   drivers/hwtracing/coresight/coresight-etm4x.h |  2 +-
->   drivers/hwtracing/coresight/coresight-priv.h  |  3 ++
->   3 files changed, 40 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/hwtracing/coresight/coresight-etm4x-core.c b/drivers/hwtracing/coresight/coresight-etm4x-core.c
-> index 77b0271ce6eb..292f9da6aeaf 100644
-> --- a/drivers/hwtracing/coresight/coresight-etm4x-core.c
-> +++ b/drivers/hwtracing/coresight/coresight-etm4x-core.c
-> @@ -6,6 +6,7 @@
->   #include <linux/acpi.h>
->   #include <linux/bitops.h>
->   #include <linux/kernel.h>
-> +#include <linux/kvm_host.h>
->   #include <linux/moduleparam.h>
->   #include <linux/init.h>
->   #include <linux/types.h>
-> @@ -271,9 +272,22 @@ static void etm4x_prohibit_trace(struct etmv4_drvdata *drvdata)
->   	/* If the CPU doesn't support FEAT_TRF, nothing to do */
->   	if (!drvdata->trfcr)
->   		return;
-> +	kvm_etm_set_guest_trfcr(0);
->   	cpu_prohibit_trace();
->   }
->   
-> +static u64 etm4x_get_kern_user_filter(struct etmv4_drvdata *drvdata)
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> <snip>
+>
+> +static void test_create_guest_memfd_invalid(struct kvm_vm *vm)
 > +{
-> +	u64 trfcr = drvdata->trfcr;
+> +	size_t page_size = getpagesize();
+> +	uint64_t flag;
+> +	size_t size;
+> +	int fd;
 > +
-> +	if (drvdata->config.mode & ETM_MODE_EXCL_KERN)
-> +		trfcr &= ~TRFCR_ELx_ExTRE;
-> +	if (drvdata->config.mode & ETM_MODE_EXCL_USER)
-> +		trfcr &= ~TRFCR_ELx_E0TRE;
+> +	for (size = 1; size < page_size; size++) {
+> +		fd = __vm_create_guest_memfd(vm, size, 0);
+> +		TEST_ASSERT(fd == -1 && errno == EINVAL,
+> +			    "guest_memfd() with non-page-aligned page size '0x%lx' should fail with EINVAL",
+> +			    size);
+> +	}
 > +
-> +	return trfcr;
+> +	for (flag = 1; flag; flag <<= 1) {
+
+Since transparent hugepage support is no longer officially part of this
+series, 
+
+> +		uint64_t bit;
+
+this declaration of bit can be removed.
+
+> +
+> +		fd = __vm_create_guest_memfd(vm, page_size, flag);
+> +		TEST_ASSERT(fd == -1 && errno == EINVAL,
+> +			    "guest_memfd() with flag '0x%lx' should fail with EINVAL",
+> +			    flag);
+> +
+
+This loop can also be removed,
+
+> +		for_each_set_bit(bit, &valid_flags, 64) {
+> +			fd = __vm_create_guest_memfd(vm, page_size, flag | BIT_ULL(bit));
+> +			TEST_ASSERT(fd == -1 && errno == EINVAL,
+> +				    "guest_memfd() with flags '0x%llx' should fail with EINVAL",
+> +				    flag | BIT_ULL(bit));
+> +		}
+
+otherwise this won't compile because valid_flags is not declared.
+
+These lines will have to be added back when adding transparent hugepage
+support.
+
+> +	}
 > +}
-> +
->   /*
->    * etm4x_allow_trace - Allow CPU tracing in the respective ELs,
->    * as configured by the drvdata->config.mode for the current
-> @@ -286,18 +300,28 @@ static void etm4x_prohibit_trace(struct etmv4_drvdata *drvdata)
->    */
->   static void etm4x_allow_trace(struct etmv4_drvdata *drvdata)
->   {
-> -	u64 trfcr = drvdata->trfcr;
-> +	u64 trfcr;
->   
->   	/* If the CPU doesn't support FEAT_TRF, nothing to do */
-> -	if (!trfcr)
-> +	if (!drvdata->trfcr)
->   		return;
->   
-> -	if (drvdata->config.mode & ETM_MODE_EXCL_KERN)
-> -		trfcr &= ~TRFCR_ELx_ExTRE;
-> -	if (drvdata->config.mode & ETM_MODE_EXCL_USER)
-> -		trfcr &= ~TRFCR_ELx_E0TRE;
-> +	if (drvdata->config.mode & ETM_MODE_EXCL_HOST)
-> +		trfcr = drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
-> +	else
-> +		trfcr = etm4x_get_kern_user_filter(drvdata);
->   
->   	write_trfcr(trfcr);
-> +
-> +	/* Set filters for guests and pass to KVM */
-> +	if (drvdata->config.mode & ETM_MODE_EXCL_GUEST)
-> +		trfcr = drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
-> +	else
-> +		trfcr = etm4x_get_kern_user_filter(drvdata);
-> +
-> +	/* TRFCR_EL1 doesn't have CX so mask it out. */
-> +	trfcr &= ~TRFCR_EL2_CX;
 
-Here we are using the Guest "Virtual time" for the trace, which could be 
-different from that of the "host" (if the trace covers both). Thus 
-correlating the trace could be difficult if someone wants to do that.
-
-We could switch to using Physical time, for the guest trace always,
-matching the host time for correlating the events. (Assuming we are not
-a Guest Hypervisor).
-
-Rest looks fine to me.
-
-> +	kvm_etm_set_guest_trfcr(trfcr);
->   }
->   
->   #ifdef CONFIG_ETM4X_IMPDEF_FEATURE
-> @@ -655,6 +679,12 @@ static int etm4_parse_event_config(struct coresight_device *csdev,
->   	if (attr->exclude_user)
->   		config->mode = ETM_MODE_EXCL_USER;
->   
-> +	if (attr->exclude_host)
-> +		config->mode |= ETM_MODE_EXCL_HOST;
-> +
-> +	if (attr->exclude_guest)
-> +		config->mode |= ETM_MODE_EXCL_GUEST;
-> +
->   	/* Always start from the default config */
->   	etm4_set_default_config(config);
->   
-> diff --git a/drivers/hwtracing/coresight/coresight-etm4x.h b/drivers/hwtracing/coresight/coresight-etm4x.h
-> index 20e2e4cb7614..3f170599822f 100644
-> --- a/drivers/hwtracing/coresight/coresight-etm4x.h
-> +++ b/drivers/hwtracing/coresight/coresight-etm4x.h
-> @@ -841,7 +841,7 @@ enum etm_impdef_type {
->    * @s_ex_level: Secure ELs where tracing is supported.
->    */
->   struct etmv4_config {
-> -	u32				mode;
-> +	u64				mode;
->   	u32				pe_sel;
->   	u32				cfg;
->   	u32				eventctrl0;
-> diff --git a/drivers/hwtracing/coresight/coresight-priv.h b/drivers/hwtracing/coresight/coresight-priv.h
-> index 767076e07970..727dd27ba800 100644
-> --- a/drivers/hwtracing/coresight/coresight-priv.h
-> +++ b/drivers/hwtracing/coresight/coresight-priv.h
-> @@ -39,6 +39,9 @@
->   
->   #define ETM_MODE_EXCL_KERN	BIT(30)
->   #define ETM_MODE_EXCL_USER	BIT(31)
-> +#define ETM_MODE_EXCL_HOST	BIT(32)
-> +#define ETM_MODE_EXCL_GUEST	BIT(33)
-> +
-
-nit: Some day, we should move to using the "event->attrs" directly, than 
-translating them to these values.
-
-Suzuki
-
+Tested-by: Ackerley Tng <ackerleytng@google.com>
