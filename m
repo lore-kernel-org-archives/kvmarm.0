@@ -1,124 +1,76 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA96E48796
-	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 21:00:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89CE82FE26
+	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 23:22:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vEbuygiY"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-da0737dcb26so1735806276.3
-        for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 13:00:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700168424; x=1700773224; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=pcg1jHOi88FLN7hCqkcZwcR8zkGGhGMDTBufXRqyOok=;
-        b=vEbuygiYrc9xFnNCy/Xp3lYKMJ5/z1yHoPng1uF2OmkSBMR5mpwj1jLjxg7sEPVfEN
-         kN6EtZ5BuA7iRar51pCmk11Y1aRh85Fc6trYhHNp1pVCMwWgRJOHga819M/F6W04WEbY
-         H0Kr6/YMvEsHhnlV/w7wLZX763GITvbOqwdwm+nlE1kRQsyo4/piUXRkn62AoogZAp+9
-         0IIzyJxYW2NAOvS9k37IepcvXJSDk0rKxvKf2s49I8413eurMj1AIKa9m+3UIBbhvhgv
-         cEQOINl9XfTtE1MDGaZ8m6I5DakKyrGaQ6KGif7K9sC5Bki0bXavrjMZg3gNRGnT/O4Z
-         WqeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700168424; x=1700773224;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pcg1jHOi88FLN7hCqkcZwcR8zkGGhGMDTBufXRqyOok=;
-        b=BahQxvLrfgRZPz23jD0Kwj2wEdBTNKaksGIx8NX+VwrOkPfBY95TfRzBIASIIlY93p
-         6e93/SID86HfyoXKwtS4CtlM42gVm8EuBoRE7wj/kmiM/+hSKWw2qLu3dTFG3ixNX9SM
-         oQA1VhEldUY8NGVv/p7kEEU9dC5GXB1Gs2oZgLdUhkkpfJPc2ahZ0ZgkkytkejmwfLCj
-         vVO999LrB6ERmbi+znbHF4fp/yPragCZib4b0q2NUKgq3cb9T8q7hMxmwDNmL6fdXgc2
-         ocXXV8oGbaMp65rNyf+yn5JngFdOCX5+iQDcvg7oTOgT41mO7OJJym0zA3BE05KZ6BMn
-         07kQ==
-X-Gm-Message-State: AOJu0YxQbLvHN05pvKwK67uw2RAbrfOayp6GeyrSdhqL06yqxDLcmUz1
-	f/qYRlSFkUprLaWNdHLnuyyzc2TUVXT/mfJafA==
-X-Google-Smtp-Source: AGHT+IERExc4D+qrt27go/xYBPrtoAORZdvfQFtSO07pMqMqSuTLQB8wBOPMZT1riqPUGW5/Jxx9EA2kvlBTv30QyA==
-X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
- (user=ackerleytng job=sendgmr) by 2002:a25:7644:0:b0:da3:a4ae:1525 with SMTP
- id r65-20020a257644000000b00da3a4ae1525mr393167ybc.5.1700168424573; Thu, 16
- Nov 2023 13:00:24 -0800 (PST)
-Date: Thu, 16 Nov 2023 21:00:22 +0000
-In-Reply-To: <20231105163040.14904-33-pbonzini@redhat.com> (message from Paolo
- Bonzini on Sun,  5 Nov 2023 17:30:35 +0100)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="R8N+dwXM"
+Date: Thu, 16 Nov 2023 15:22:10 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1700176949;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ql19/OGj64AFFaCoG3rNb0IvzQY8kBjJxvcnLCSOPkE=;
+	b=R8N+dwXMjjEbQXwnXgnMViFOkdYDxySMg7onZbQpLj/tOmnHLechypeTzAq+V0LetrVLWJ
+	WA5CT9AJKg+AwMhnccXO7mdC0rgkOjk+G+5eyWGxMT2HDH7UMds2PWp178gFqUDSq6S4z2
+	pFHr6VXLWTQNKBE3e33gvmO+YXukj8g=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Jianyong Wu <jianyong.wu@arm.com>, maz@kernel.org, james.morse@arm.com,
+	will@kernel.org, salil.mehta@huawei.com, suzuki.poulose@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, justin.he@arm.com
+Subject: Re: [PATCH] arm64/kvm: Introduce feature extension for SMCCC filter
+Message-ID: <ZVakIv5mw6YUlHms@thinky-boi>
+References: <20231116114152.912344-1-jianyong.wu@arm.com>
+ <ZVZoKlWrjV1L3CBo@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <diqzfs15o1ll.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH 32/34] KVM: selftests: Add basic selftest for guest_memfd()
-From: Ackerley Tng <ackerleytng@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org, 
-	willy@infradead.org, akpm@linux-foundation.org, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, tabba@google.com, jarkko@kernel.org, 
-	amoorthy@google.com, dmatlack@google.com, yu.c.zhang@linux.intel.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	vannapurve@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
-	qperret@google.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZVZoKlWrjV1L3CBo@shell.armlinux.org.uk>
+X-Migadu-Flow: FLOW_OUT
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On Thu, Nov 16, 2023 at 07:06:18PM +0000, Russell King (Oracle) wrote:
+> On Thu, Nov 16, 2023 at 11:41:52AM +0000, Jianyong Wu wrote:
+> > 821d935c87b introduces support for userspace SMCCC filtering, but lack
+> > of a way to tell userspace if we have this feature. Add a corresponding
+> > feature extension can resolve this issue.
+> > 
+> > For example, the incoming feature Vcpu Hotplug needs the SMCCC filter.
+> > As there is no way to check this feature, VMM will run into error when
+> > it calls this feature on an old kernel. It's bad for backward compatible.
+> 
+> Can't you just attempt to use the SMCCC filtering, and if it errors out
+> with the appropriate error code, decide that SMCCC filtering is not
+> available?
 
-> <snip>
->
-> +static void test_create_guest_memfd_invalid(struct kvm_vm *vm)
-> +{
-> +	size_t page_size = getpagesize();
-> +	uint64_t flag;
-> +	size_t size;
-> +	int fd;
-> +
-> +	for (size = 1; size < page_size; size++) {
-> +		fd = __vm_create_guest_memfd(vm, size, 0);
-> +		TEST_ASSERT(fd == -1 && errno == EINVAL,
-> +			    "guest_memfd() with non-page-aligned page size '0x%lx' should fail with EINVAL",
-> +			    size);
-> +	}
-> +
-> +	for (flag = 1; flag; flag <<= 1) {
+That would also work, as we return ENXIO for the unsupported ioctl.
 
-Since transparent hugepage support is no longer officially part of this
-series, 
+> That's how most things like kernel syscalls work - if they're not
+> implemented they return -ENOSYS. glibc can detect that and use a
+> fallback.
 
-> +		uint64_t bit;
+I generally agree, but KVM has gone in the other direction of providing
+auxiliary interfaces for discovering new UAPI. ENXIO has been slightly
+overloaded to imply that a given ioctl is non-existent or otherwise
+unsupported due to some dynamic configuration.
 
-this declaration of bit can be removed.
+Is it ideal? Of course not. With that said userspace may as well use the
+preferred / documented discoverability mechanism. And in Jianyong's case
+the KVM documentation is rather unambiguous (for once) about how you
+discover device attributes.
 
-> +
-> +		fd = __vm_create_guest_memfd(vm, page_size, flag);
-> +		TEST_ASSERT(fd == -1 && errno == EINVAL,
-> +			    "guest_memfd() with flag '0x%lx' should fail with EINVAL",
-> +			    flag);
-> +
+https://docs.kernel.org/virt/kvm/api.html#kvm-has-device-attr
 
-This loop can also be removed,
-
-> +		for_each_set_bit(bit, &valid_flags, 64) {
-> +			fd = __vm_create_guest_memfd(vm, page_size, flag | BIT_ULL(bit));
-> +			TEST_ASSERT(fd == -1 && errno == EINVAL,
-> +				    "guest_memfd() with flags '0x%llx' should fail with EINVAL",
-> +				    flag | BIT_ULL(bit));
-> +		}
-
-otherwise this won't compile because valid_flags is not declared.
-
-These lines will have to be added back when adding transparent hugepage
-support.
-
-> +	}
-> +}
-
-Tested-by: Ackerley Tng <ackerleytng@google.com>
+-- 
+Thanks,
+Oliver
