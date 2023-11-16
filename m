@@ -1,15 +1,15 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80D5E30F91
-	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 14:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5A9730FB0
+	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 14:29:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8AB011595;
-	Thu, 16 Nov 2023 06:30:30 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4C7261650;
+	Thu, 16 Nov 2023 06:30:32 -0800 (PST)
 Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.26])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E1C623F73F;
-	Thu, 16 Nov 2023 06:29:42 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A55BA3F73F;
+	Thu, 16 Nov 2023 06:29:44 -0800 (PST)
 From: Ryan Roberts <ryan.roberts@arm.com>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
@@ -23,10 +23,12 @@ To: Catalin Marinas <catalin.marinas@arm.com>,
 Cc: Ryan Roberts <ryan.roberts@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: [PATCH v5 00/12] KVM: arm64: Support FEAT_LPA2 at hyp s1 and vm s2
-Date: Thu, 16 Nov 2023 14:29:19 +0000
-Message-Id: <20231116142931.1675485-1-ryan.roberts@arm.com>
+Subject: [PATCH v5 01/12] arm64/mm: Modify range-based tlbi to decrement scale
+Date: Thu, 16 Nov 2023 14:29:20 +0000
+Message-Id: <20231116142931.1675485-2-ryan.roberts@arm.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20231116142931.1675485-1-ryan.roberts@arm.com>
+References: <20231116142931.1675485-1-ryan.roberts@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,160 +37,101 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi All,
+In preparation for adding support for LPA2 to the tlb invalidation
+routines, modify the algorithm used by range-based tlbi to start at the
+highest 'scale' and decrement instead of starting at the lowest 'scale'
+and incrementing. This new approach makes it possible to maintain 64K
+alignment as we work through the range, until the last op (at scale=0).
+This is required when LPA2 is enabled. (This part will be added in a
+subsequent commit).
 
-This adds support for FEAT_LPA2 to KVM for both hypervisor stage 1 (for the
-nvhe/protected modes) and the vm stage 2 translation tables (for all modes).
-FEAT_LPA2 enables 52 bit PAs and VAs for 4KB and 16KB granules (note this is
-already supported for 64KB granules via the FEAT_LPA and FEAT_LVA extensions).
-The series does not include support for FEAT_LPA2 in the kernel stage 1. This
-support is provided separately by Ard Biesheuvel's series at [5]. The two series
-are independent.
+This change is separated into its own patch because it will also impact
+non-LPA2 systems, and I want to make it easy to bisect in case it leads
+to performance regression (see below for benchmarks that suggest this
+should not be a problem).
 
-This latest revision incorporates Marc's feedback and rebases the series onto
-v6.7-rc1.
+The original commit (d1d3aa98 "arm64: tlb: Use the TLBI RANGE feature in
+arm64") stated this as the reason for _incrementing_ scale:
 
-NOTE: The first 3 patches rework the tlbi routines to work for LPA2. These
-patches are required by both my series and Ard's series; Ard is prefixing his
-series with these same patches.
+  However, in most scenarios, the pages = 1 when flush_tlb_range() is
+  called. Start from scale = 3 or other proper value (such as scale
+  =ilog2(pages)), will incur extra overhead. So increase 'scale' from 0
+  to maximum.
 
-Marc previously suggested he would be willing to merge this for v6.8-rc1 if
-things continue to look ok. If that's still a possibility, I'd be happy to get
-this off my desk! :)
+But pages=1 is already special cased by the non-range invalidation path,
+which will take care of it the first time through the loop (both in the
+original commit and in my change), so I don't think switching to
+decrement scale should have any extra performance impact after all.
 
-Testing
-=======
+Indeed benchmarking kernel compilation, a TLBI-heavy workload, suggests
+that this new approach actually _improves_ performance slightly (using a
+virtual machine on Apple M2):
 
-Testing has been done exclusively on the FVP and covers my boot matrix tests
-and kvm selftests.
+Table shows time to execute kernel compilation workload with 8 jobs,
+relative to baseline without this patch (more negative number is
+bigger speedup). Repeated 9 times across 3 system reboots:
 
-I've expanded the boot matrix tests to include coverage of hvhe mode. This
-brings the number of configs to 300, 20 of which fail due to Ard's series not
-being present (which is expected).
+| counter   |       mean |     stdev |
+|:----------|-----------:|----------:|
+| real-time |      -0.6% |      0.0% |
+| kern-time |      -1.6% |      0.5% |
+| user-time |      -0.4% |      0.1% |
 
-KVM selftests have been enhanced to support P52V48 4K and 16K guest modes, and
-all tests have been run against a P48V48_4K host and a P52V52_4K host (a run
-takes about 10 hours on FVP, sigh, but I can test a few more host configs if
-useful). All tests pass except "memslot_perf_test", which fails due to a timeout
-while syncing. This test fails in the same way for plain v6.6-rc1, so I'm
-confident this is not a regression caused by this series. (the issue is that
-alarm(2) is issued and the signal is received before alarm(0) is issued. I
-expect this is an FVP-time related problem, although I'm not sure how to fix
-robustly for the FVP without potentially hanging real systems for long periods
-of time).
+Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
+---
+ arch/arm64/include/asm/tlbflush.h | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-Additionally, when running page_fault_test, when run on FVP against v6.7-rc1 and
-newer, I'm seeing RCU stalls. I'm confident that this is not an issue introduced
-by this series because it reproduces without my patches.
-
-
-Changes since v4 [4]
-====================
-
-Various tidy-ups based on Marc's feedback:
-
- - rebased onto v6.7-rc1.
- - Changed cpus_have_const_cap() to cpus_have_final_cap().
- - Reworked the tlbi patches to change the scale direction as first patch, then
-   introduce LPA2 support in separate patch.
- - Added clarifying comments to tlbi routines.
- - Removed inline and simplified ifdefery for HAP_LPA2 capability.
- - Reverted kvm_get_mode() != KVM_MODE_NONE for HAS_LPA2 capability since the
-   key is only used by KVM anyway - kernel can't use this because its too late
-   in boot process.
- - Fixed some nits.
-
-
-Changes since v3 [3]
-====================
-
- - rebased onto v6.6-rc5.
- - has_lpa2() only requires consistency between s1 and s2 when
-   kvm_get_mode() != KVM_MODE_NONE.
- - squashed 2 patches that enabled hyp s1 and vm s2 to use LPA2 pgtable format
-   respectively, into 1 patch. There were shared accessors so the intermediate
-   state was invalid.
- - use FIELD_PREP() to insert PS into TCR_EL2 instead of raw shift.
-
-
-Changes since v2 [2]
-====================
-
- - rebased onto v6.6-rc1
- - removed small amount of dead code eroneously introduced by previous rebase
- - reworked range-based tlbi to work with LPA2 (KVM has started using
-   range-based tlbi as of v6.6-rc1)
-
-
-Changes since v1 [1]
-====================
-
- - Create CPU feature for LPA2 (enabled if both S1 and S2 report LPA2 support).
- - Use the CPU feature (and therefore code patching) to globally decide whether
-   or not to use LPA2 PTE format; no more per-pgtable flag to pass around.
- - Removed the range-based TLBI changes, which are not required by KVM; leaves
-   only minor changes to the non-range-based invalidation code.
- - Removed patch to encode/decode VTCR_EL2.SL2, and replaced with a comment
-   describing why we never need to touch SL2 (stage 2 always uses concatenated
-   first level lookup).
- - Added support for LPA2 guests in KVM selftests (VM_MODE_P52V48_4K enabled and
-   new VM_MODE_P52V48_16K added).
- - Rebased onto 6.3-rc1.
-
-
-[1] https://lore.kernel.org/kvmarm/20221206135930.3277585-1-ryan.roberts@arm.com/
-[2] https://lore.kernel.org/kvmarm/20230306195438.1557851-1-ryan.roberts@arm.com/
-[3] https://lore.kernel.org/kvmarm/20230918065740.3670662-1-ryan.roberts@arm.com/
-[4] https://lore.kernel.org/kvmarm/20231009185008.3803879-1-ryan.roberts@arm.com/
-[5] https://lore.kernel.org/linux-arm-kernel/20230912141549.278777-63-ardb@google.com/
-
-
-Thanks,
-Ryan
-
-Anshuman Khandual (1):
-  arm64/mm: Add FEAT_LPA2 specific ID_AA64MMFR0.TGRAN[2]
-
-Ryan Roberts (11):
-  arm64/mm: Modify range-based tlbi to decrement scale
-  arm64/mm: Add lpa2_is_enabled() kvm_lpa2_is_enabled() stubs
-  arm64/mm: Update tlb invalidation routines for FEAT_LPA2
-  arm64: Add ARM64_HAS_LPA2 CPU capability
-  KVM: arm64: Add new (V)TCR_EL2 field definitions for FEAT_LPA2
-  KVM: arm64: Use LPA2 page-tables for stage2 and hyp stage1
-  KVM: arm64: Convert translation level parameter to s8
-  KVM: arm64: Support up to 5 levels of translation in kvm_pgtable
-  KVM: arm64: Allow guests with >48-bit IPA size on FEAT_LPA2 systems
-  KVM: selftests: arm64: Determine max ipa size per-page size
-  KVM: selftests: arm64: Support P52V48 4K and 16K guest_modes
-
- arch/arm64/include/asm/cpufeature.h           |   5 +
- arch/arm64/include/asm/kvm_arm.h              |   2 +
- arch/arm64/include/asm/kvm_emulate.h          |  12 ++-
- arch/arm64/include/asm/kvm_mmu.h              |   3 +
- arch/arm64/include/asm/kvm_pgtable.h          |  78 +++++++++-----
- arch/arm64/include/asm/kvm_pkvm.h             |   5 +-
- arch/arm64/include/asm/pgtable-prot.h         |   2 +
- arch/arm64/include/asm/sysreg.h               |   5 +
- arch/arm64/include/asm/tlb.h                  |  15 ++-
- arch/arm64/include/asm/tlbflush.h             | 100 +++++++++++-------
- arch/arm64/kernel/cpufeature.c                |  39 +++++++
- arch/arm64/kvm/arm.c                          |   5 +
- arch/arm64/kvm/hyp/nvhe/hyp-init.S            |   4 -
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         |   6 +-
- arch/arm64/kvm/hyp/nvhe/mm.c                  |   4 +-
- arch/arm64/kvm/hyp/nvhe/setup.c               |   2 +-
- arch/arm64/kvm/hyp/pgtable.c                  |  90 ++++++++++------
- arch/arm64/kvm/mmu.c                          |  16 +--
- arch/arm64/kvm/reset.c                        |   9 +-
- arch/arm64/tools/cpucaps                      |   1 +
- .../selftests/kvm/include/aarch64/processor.h |   4 +-
- .../selftests/kvm/include/kvm_util_base.h     |   1 +
- .../selftests/kvm/lib/aarch64/processor.c     |  66 +++++++++---
- tools/testing/selftests/kvm/lib/guest_modes.c |  42 ++++----
- tools/testing/selftests/kvm/lib/kvm_util.c    |   3 +
- 25 files changed, 354 insertions(+), 165 deletions(-)
-
---
+diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
+index bb2c2833a987..36acdb3d16a5 100644
+--- a/arch/arm64/include/asm/tlbflush.h
++++ b/arch/arm64/include/asm/tlbflush.h
+@@ -350,14 +350,14 @@ static inline void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
+  * entries one by one at the granularity of 'stride'. If the TLB
+  * range ops are supported, then:
+  *
+- * 1. If 'pages' is odd, flush the first page through non-range
+- *    operations;
++ * 1. The minimum range granularity is decided by 'scale', so multiple range
++ *    TLBI operations may be required. Start from scale = 3, flush the largest
++ *    possible number of pages ((num+1)*2^(5*scale+1)) that fit into the
++ *    requested range, then decrement scale and continue until one or zero pages
++ *    are left.
+  *
+- * 2. For remaining pages: the minimum range granularity is decided
+- *    by 'scale', so multiple range TLBI operations may be required.
+- *    Start from scale = 0, flush the corresponding number of pages
+- *    ((num+1)*2^(5*scale+1) starting from 'addr'), then increase it
+- *    until no pages left.
++ * 2. If there is 1 page remaining, flush it through non-range operations. Range
++ *    operations can only span an even number of pages.
+  *
+  * Note that certain ranges can be represented by either num = 31 and
+  * scale or num = 0 and scale + 1. The loop below favours the latter
+@@ -367,12 +367,12 @@ static inline void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
+ 				asid, tlb_level, tlbi_user)		\
+ do {									\
+ 	int num = 0;							\
+-	int scale = 0;							\
++	int scale = 3;							\
+ 	unsigned long addr;						\
+ 									\
+ 	while (pages > 0) {						\
+ 		if (!system_supports_tlb_range() ||			\
+-		    pages % 2 == 1) {					\
++		    pages == 1) {					\
+ 			addr = __TLBI_VADDR(start, asid);		\
+ 			__tlbi_level(op, addr, tlb_level);		\
+ 			if (tlbi_user)					\
+@@ -392,7 +392,7 @@ do {									\
+ 			start += __TLBI_RANGE_PAGES(num, scale) << PAGE_SHIFT; \
+ 			pages -= __TLBI_RANGE_PAGES(num, scale);	\
+ 		}							\
+-		scale++;						\
++		scale--;						\
+ 	}								\
+ } while (0)
+ 
+-- 
 2.25.1
 
