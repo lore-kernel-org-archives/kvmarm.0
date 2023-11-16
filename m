@@ -1,46 +1,32 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8334728E05
-	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 09:35:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jPCFJs0o"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700127345;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=s14OcYbNsy58OOft6vgyTif8IMy6gRwapu3+F+eWkNg=;
-	b=jPCFJs0oiUFlbh/GAHj8VmubhR8Lwc86m6XTkoVPHYtltn28xhirucfrypb5xtM0a2mu57
-	HA5kfoa3DBKYWSe7OTZ/beN5OSXvmTOqrxKmYZ12PKsdDhAig5MP7hu9SkdKDqEkbERnhu
-	KyHrEcOAN9AfhKpJ2kGqkeE6lgua4SQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-271-_SrAnAy-M1iDTKAzeIVejQ-1; Thu, 16 Nov 2023 04:35:40 -0500
-X-MC-Unique: _SrAnAy-M1iDTKAzeIVejQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3EAF7185A780;
-	Thu, 16 Nov 2023 09:35:40 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 34BF5492BFD;
-	Thu, 16 Nov 2023 09:35:40 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v1] KVM: selftests: Initalize sem_vcpu_[cont|stop] before each test in dirty_log_test
-Date: Thu, 16 Nov 2023 04:35:36 -0500
-Message-Id: <20231116093536.22256-1-shahuang@redhat.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707B42EAF5
+	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 11:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B8F1E1595;
+	Thu, 16 Nov 2023 03:45:30 -0800 (PST)
+Received: from entos-thunderx2-desktop.shanghai.arm.com (entos-thunderx2-desktop.shanghai.arm.com [10.169.214.134])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 2E26B3F6C4;
+	Thu, 16 Nov 2023 03:44:39 -0800 (PST)
+From: Jianyong Wu <jianyong.wu@arm.com>
+To: maz@kernel.org,
+	james.morse@arm.com,
+	will@kernel.org
+Cc: rmk@armlinux.org.uk,
+	salil.mehta@huawei.com,
+	suzuki.poulose@arm.com,
+	oliver.upton@linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	justin.he@arm.com,
+	jianyong.wu@arm.com
+Subject: [PATCH] arm64/kvm: Introduce feature extension for SMCCC filter
+Date: Thu, 16 Nov 2023 11:41:52 +0000
+Message-Id: <20231116114152.912344-1-jianyong.wu@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,86 +34,60 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-When execute the dirty_log_test on some aarch64 machine, it sometimes
-trigger the ASSERT:
+821d935c87b introduces support for userspace SMCCC filtering, but lack
+of a way to tell userspace if we have this feature. Add a corresponding
+feature extension can resolve this issue.
 
-==== Test Assertion Failure ====
-  dirty_log_test.c:384: dirty_ring_vcpu_ring_full
-  pid=14854 tid=14854 errno=22 - Invalid argument
-     1  0x00000000004033eb: dirty_ring_collect_dirty_pages at dirty_log_test.c:384
-     2  0x0000000000402d27: log_mode_collect_dirty_pages at dirty_log_test.c:505
-     3   (inlined by) run_test at dirty_log_test.c:802
-     4  0x0000000000403dc7: for_each_guest_mode at guest_modes.c:100
-     5  0x0000000000401dff: main at dirty_log_test.c:941 (discriminator 3)
-     6  0x0000ffff9be173c7: ?? ??:0
-     7  0x0000ffff9be1749f: ?? ??:0
-     8  0x000000000040206f: _start at ??:?
-  Didn't continue vcpu even without ring full
+For example, the incoming feature Vcpu Hotplug needs the SMCCC filter.
+As there is no way to check this feature, VMM will run into error when
+it calls this feature on an old kernel. It's bad for backward compatible.
 
-The dirty_log_test fails when execute the dirty-ring test, this is
-because the sem_vcpu_cont and the sem_vcpu_stop is non-zero value when
-execute the dirty_ring_collect_dirty_pages() function. When those two
-sem_t variables are non-zero, the dirty_ring_wait_vcpu() at the
-beginning of the dirty_ring_collect_dirty_pages() will not wait for the
-vcpu to stop, but continue to execute the following code. In this case,
-before vcpu stop, if the dirty_ring_vcpu_ring_full is true, and the
-dirty_ring_collect_dirty_pages() has passed the check for the
-dirty_ring_vcpu_ring_full but hasn't execute the check for the
-continued_vcpu, the vcpu stop, and set the dirty_ring_vcpu_ring_full to
-false. Then dirty_ring_collect_dirty_pages() will trigger the ASSERT.
-
-Why sem_vcpu_cont and sem_vcpu_stop can be non-zero value? It's because
-the dirty_ring_before_vcpu_join() execute the sem_post(&sem_vcpu_cont)
-at the end of each dirty-ring test. It can cause two cases:
-
-1. sem_vcpu_cont be non-zero. When we set the host_quit to be true,
-   the vcpu_worker directly see the host_quit to be true, it quit. So
-   the log_mode_before_vcpu_join() function will set the sem_vcpu_cont
-   to 1, since the vcpu_worker has quit, it won't consume it.
-2. sem_vcpu_stop be non-zero. When we set the host_quit to be true,
-   the vcpu_worker has entered the guest state, the next time it exit
-   from guest state, it will set the sem_vcpu_stop to 1, and then see
-   the host_quit, no one will consume the sem_vcpu_stop.
-
-When execute more and more dirty-ring tests, the sem_vcpu_cont and
-sem_vcpu_stop can be larger and larger, which makes many code paths
-don't wait for the sem_t. Thus finally cause the problem.
-
-Fix this problem is easy, simply initialize the sem_t before every test.
-Thus whatever the state previous test left, it won't interfere the next
-test.
-
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
 ---
- tools/testing/selftests/kvm/dirty_log_test.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ Documentation/virt/kvm/api.rst | 3 ++-
+ arch/arm64/kvm/arm.c           | 1 +
+ include/uapi/linux/kvm.h       | 1 +
+ 3 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index 936f3a8d1b83..23b179534c0b 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -726,6 +726,9 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 		return;
- 	}
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 7025b3751027..559c6c531bfd 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6395,7 +6395,8 @@ For arm64:
+ ----------
  
-+	sem_init(&sem_vcpu_stop, 0, 0);
-+	sem_init(&sem_vcpu_cont, 0, 0);
-+
- 	/*
- 	 * We reserve page table for 2 times of extra dirty mem which
- 	 * will definitely cover the original (1G+) test range.  Here
-@@ -871,9 +874,6 @@ int main(int argc, char *argv[])
- 	int opt, i;
- 	sigset_t sigset;
+ SMCCC exits can be enabled depending on the configuration of the SMCCC
+-filter. See the Documentation/virt/kvm/devices/vm.rst
++filter. This feature can be only available if KVM_CAP_ARM_VM_SMCCC is
++upported. See the Documentation/virt/kvm/devices/vm.rst
+ ``KVM_ARM_SMCCC_FILTER`` for more details.
  
--	sem_init(&sem_vcpu_stop, 0, 0);
--	sem_init(&sem_vcpu_cont, 0, 0);
--
- 	guest_modes_append_default();
+ ``nr`` contains the function ID of the guest's SMCCC call. Userspace is
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index e5f75f1f1085..44583da440ae 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -241,6 +241,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
+ 	case KVM_CAP_IRQFD_RESAMPLE:
+ 	case KVM_CAP_COUNTER_OFFSET:
++	case KVM_CAP_ARM_VM_SMCCC:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 211b86de35ac..e67fb1df508d 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1201,6 +1201,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
+ #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
+ #define KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES 230
++#define KVM_CAP_ARM_VM_SMCCC 231
  
- 	while ((opt = getopt(argc, argv, "c:hi:I:p:m:M:")) != -1) {
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
 -- 
-2.40.1
+2.34.1
 
