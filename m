@@ -1,32 +1,30 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707B42EAF5
-	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 11:44:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE3B10951
+	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 12:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B8F1E1595;
-	Thu, 16 Nov 2023 03:45:30 -0800 (PST)
-Received: from entos-thunderx2-desktop.shanghai.arm.com (entos-thunderx2-desktop.shanghai.arm.com [10.169.214.134])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 2E26B3F6C4;
-	Thu, 16 Nov 2023 03:44:39 -0800 (PST)
-From: Jianyong Wu <jianyong.wu@arm.com>
-To: maz@kernel.org,
-	james.morse@arm.com,
-	will@kernel.org
-Cc: rmk@armlinux.org.uk,
-	salil.mehta@huawei.com,
-	suzuki.poulose@arm.com,
-	oliver.upton@linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	justin.he@arm.com,
-	jianyong.wu@arm.com
-Subject: [PATCH] arm64/kvm: Introduce feature extension for SMCCC filter
-Date: Thu, 16 Nov 2023 11:41:52 +0000
-Message-Id: <20231116114152.912344-1-jianyong.wu@arm.com>
-X-Mailer: git-send-email 2.34.1
+Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.54])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SWKkc0HrMzvQWh;
+	Thu, 16 Nov 2023 20:55:04 +0800 (CST)
+Received: from DESKTOP-6NKE0BC.china.huawei.com (10.174.185.210) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Thu, 16 Nov 2023 20:55:20 +0800
+From: Kunkun Jiang <jiangkunkun@huawei.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jean-Philippe Brucker
+	<jean-philippe@linaro.org>, <eric.auger@redhat.com>
+CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<wanghaibin.wang@huawei.com>, Kunkun Jiang <jiangkunkun@huawei.com>
+Subject: [PATCH] KVM: arm/arm64: GICv4: Do not perform an map to a mapped vLPI
+Date: Thu, 16 Nov 2023 20:52:15 +0800
+Message-ID: <20231116125215.1812-1-jiangkunkun@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -34,60 +32,37 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.185.210]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
+X-CFilter-Loop: Reflected
 
-821d935c87b introduces support for userspace SMCCC filtering, but lack
-of a way to tell userspace if we have this feature. Add a corresponding
-feature extension can resolve this issue.
+Before performing an unmap, let's check whether the vLPI has been
+mapped. This corresponds to checking whether a vLPI is valid before
+unmap it.
 
-For example, the incoming feature Vcpu Hotplug needs the SMCCC filter.
-As there is no way to check this feature, VMM will run into error when
-it calls this feature on an old kernel. It's bad for backward compatible.
-
-Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
 ---
- Documentation/virt/kvm/api.rst | 3 ++-
- arch/arm64/kvm/arm.c           | 1 +
- include/uapi/linux/kvm.h       | 1 +
- 3 files changed, 4 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/vgic/vgic-v4.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 7025b3751027..559c6c531bfd 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6395,7 +6395,8 @@ For arm64:
- ----------
+diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+index 339a55194b2c..824f4baf50ee 100644
+--- a/arch/arm64/kvm/vgic/vgic-v4.c
++++ b/arch/arm64/kvm/vgic/vgic-v4.c
+@@ -436,6 +436,11 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+ 	if (ret)
+ 		goto out;
  
- SMCCC exits can be enabled depending on the configuration of the SMCCC
--filter. See the Documentation/virt/kvm/devices/vm.rst
-+filter. This feature can be only available if KVM_CAP_ARM_VM_SMCCC is
-+upported. See the Documentation/virt/kvm/devices/vm.rst
- ``KVM_ARM_SMCCC_FILTER`` for more details.
- 
- ``nr`` contains the function ID of the guest's SMCCC call. Userspace is
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index e5f75f1f1085..44583da440ae 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -241,6 +241,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
- 	case KVM_CAP_IRQFD_RESAMPLE:
- 	case KVM_CAP_COUNTER_OFFSET:
-+	case KVM_CAP_ARM_VM_SMCCC:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 211b86de35ac..e67fb1df508d 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1201,6 +1201,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
- #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
- #define KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES 230
-+#define KVM_CAP_ARM_VM_SMCCC 231
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
++	if (irq->hw) {
++		ret = -EBUSY;
++		goto out;
++	}
++
+ 	/*
+ 	 * Emit the mapping request. If it fails, the ITS probably
+ 	 * isn't v4 compatible, so let's silently bail out. Holding
 -- 
-2.34.1
+2.33.0
 
