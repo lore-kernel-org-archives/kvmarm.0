@@ -1,89 +1,194 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52752CA4A
-	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 14:25:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80D5E30F91
+	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 14:29:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from lhrpeml500003.china.huawei.com (unknown [172.18.147.200])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4SWMC54dvMz6GDCc;
-	Thu, 16 Nov 2023 22:01:21 +0800 (CST)
-Received: from lhrpeml500001.china.huawei.com (7.191.163.213) by
- lhrpeml500003.china.huawei.com (7.191.162.67) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 16 Nov 2023 14:06:03 +0000
-Received: from lhrpeml500001.china.huawei.com ([7.191.163.213]) by
- lhrpeml500001.china.huawei.com ([7.191.163.213]) with mapi id 15.01.2507.031;
- Thu, 16 Nov 2023 14:06:03 +0000
-From: Salil Mehta <salil.mehta@huawei.com>
-To: Cornelia Huck <cohuck@redhat.com>, Jianyong Wu <jianyong.wu@arm.com>,
-	"maz@kernel.org" <maz@kernel.org>, "james.morse@arm.com"
-	<james.morse@arm.com>, "will@kernel.org" <will@kernel.org>
-CC: "rmk@armlinux.org.uk" <rmk@armlinux.org.uk>, "suzuki.poulose@arm.com"
-	<suzuki.poulose@arm.com>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "justin.he@arm.com" <justin.he@arm.com>,
-	"jianyong.wu@arm.com" <jianyong.wu@arm.com>
-Subject: RE: [PATCH] arm64/kvm: Introduce feature extension for SMCCC filter
-Thread-Topic: [PATCH] arm64/kvm: Introduce feature extension for SMCCC filter
-Thread-Index: AQHaGIJSPxqmEiVqkkOrXIqhoEeoZ7B86xkAgAAOImA=
-Date: Thu, 16 Nov 2023 14:06:03 +0000
-Message-ID: <2ea495b04a7d484aa570059298e20862@huawei.com>
-References: <20231116114152.912344-1-jianyong.wu@arm.com>
- <877cmhq1zp.fsf@redhat.com>
-In-Reply-To: <877cmhq1zp.fsf@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [10.48.150.188]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8AB011595;
+	Thu, 16 Nov 2023 06:30:30 -0800 (PST)
+Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.26])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E1C623F73F;
+	Thu, 16 Nov 2023 06:29:42 -0800 (PST)
+From: Ryan Roberts <ryan.roberts@arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: Ryan Roberts <ryan.roberts@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: [PATCH v5 00/12] KVM: arm64: Support FEAT_LPA2 at hyp s1 and vm s2
+Date: Thu, 16 Nov 2023 14:29:19 +0000
+Message-Id: <20231116142931.1675485-1-ryan.roberts@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 
-> From: Cornelia Huck <cohuck@redhat.com>
-> Sent: Thursday, November 16, 2023 1:09 PM
-> To: Jianyong Wu <jianyong.wu@arm.com>; maz@kernel.org; james.morse@arm.co=
-m;
-> will@kernel.org
->=20
-> On Thu, Nov 16 2023, Jianyong Wu <jianyong.wu@arm.com> wrote:
->=20
-> > 821d935c87b introduces support for userspace SMCCC filtering, but lack
-> > of a way to tell userspace if we have this feature. Add a corresponding
-> > feature extension can resolve this issue.
-> >
-> > For example, the incoming feature Vcpu Hotplug needs the SMCCC filter.
-> > As there is no way to check this feature, VMM will run into error when
-> > it calls this feature on an old kernel. It's bad for backward compatibl=
-e.
->=20
-> Can't you simply query via KVM_HAS_DEVICE_ATTR whether the SMCCC
-> filtering controls exist?
+Hi All,
+
+This adds support for FEAT_LPA2 to KVM for both hypervisor stage 1 (for the
+nvhe/protected modes) and the vm stage 2 translation tables (for all modes).
+FEAT_LPA2 enables 52 bit PAs and VAs for 4KB and 16KB granules (note this is
+already supported for 64KB granules via the FEAT_LPA and FEAT_LVA extensions).
+The series does not include support for FEAT_LPA2 in the kernel stage 1. This
+support is provided separately by Ard Biesheuvel's series at [5]. The two series
+are independent.
+
+This latest revision incorporates Marc's feedback and rebases the series onto
+v6.7-rc1.
+
+NOTE: The first 3 patches rework the tlbi routines to work for LPA2. These
+patches are required by both my series and Ard's series; Ard is prefixing his
+series with these same patches.
+
+Marc previously suggested he would be willing to merge this for v6.8-rc1 if
+things continue to look ok. If that's still a possibility, I'd be happy to get
+this off my desk! :)
+
+Testing
+=======
+
+Testing has been done exclusively on the FVP and covers my boot matrix tests
+and kvm selftests.
+
+I've expanded the boot matrix tests to include coverage of hvhe mode. This
+brings the number of configs to 300, 20 of which fail due to Ard's series not
+being present (which is expected).
+
+KVM selftests have been enhanced to support P52V48 4K and 16K guest modes, and
+all tests have been run against a P48V48_4K host and a P52V52_4K host (a run
+takes about 10 hours on FVP, sigh, but I can test a few more host configs if
+useful). All tests pass except "memslot_perf_test", which fails due to a timeout
+while syncing. This test fails in the same way for plain v6.6-rc1, so I'm
+confident this is not a regression caused by this series. (the issue is that
+alarm(2) is issued and the signal is received before alarm(0) is issued. I
+expect this is an FVP-time related problem, although I'm not sure how to fix
+robustly for the FVP without potentially hanging real systems for long periods
+of time).
+
+Additionally, when running page_fault_test, when run on FVP against v6.7-rc1 and
+newer, I'm seeing RCU stalls. I'm confident that this is not an issue introduced
+by this series because it reproduces without my patches.
 
 
-Agreed. In fact, this is what I had earlier intended to do but deferred thi=
-s
-change. As of now, RFC V2 of vCPU Hotplug series does not have this check y=
-et
-while installing the SMCCC filters in KVM Host.
+Changes since v4 [4]
+====================
 
-Thanks
+Various tidy-ups based on Marc's feedback:
 
-> > Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst | 3 ++-
-> >  arch/arm64/kvm/arm.c           | 1 +
-> >  include/uapi/linux/kvm.h       | 1 +
-> >  3 files changed, 4 insertions(+), 1 deletion(-)
-> >
+ - rebased onto v6.7-rc1.
+ - Changed cpus_have_const_cap() to cpus_have_final_cap().
+ - Reworked the tlbi patches to change the scale direction as first patch, then
+   introduce LPA2 support in separate patch.
+ - Added clarifying comments to tlbi routines.
+ - Removed inline and simplified ifdefery for HAP_LPA2 capability.
+ - Reverted kvm_get_mode() != KVM_MODE_NONE for HAS_LPA2 capability since the
+   key is only used by KVM anyway - kernel can't use this because its too late
+   in boot process.
+ - Fixed some nits.
+
+
+Changes since v3 [3]
+====================
+
+ - rebased onto v6.6-rc5.
+ - has_lpa2() only requires consistency between s1 and s2 when
+   kvm_get_mode() != KVM_MODE_NONE.
+ - squashed 2 patches that enabled hyp s1 and vm s2 to use LPA2 pgtable format
+   respectively, into 1 patch. There were shared accessors so the intermediate
+   state was invalid.
+ - use FIELD_PREP() to insert PS into TCR_EL2 instead of raw shift.
+
+
+Changes since v2 [2]
+====================
+
+ - rebased onto v6.6-rc1
+ - removed small amount of dead code eroneously introduced by previous rebase
+ - reworked range-based tlbi to work with LPA2 (KVM has started using
+   range-based tlbi as of v6.6-rc1)
+
+
+Changes since v1 [1]
+====================
+
+ - Create CPU feature for LPA2 (enabled if both S1 and S2 report LPA2 support).
+ - Use the CPU feature (and therefore code patching) to globally decide whether
+   or not to use LPA2 PTE format; no more per-pgtable flag to pass around.
+ - Removed the range-based TLBI changes, which are not required by KVM; leaves
+   only minor changes to the non-range-based invalidation code.
+ - Removed patch to encode/decode VTCR_EL2.SL2, and replaced with a comment
+   describing why we never need to touch SL2 (stage 2 always uses concatenated
+   first level lookup).
+ - Added support for LPA2 guests in KVM selftests (VM_MODE_P52V48_4K enabled and
+   new VM_MODE_P52V48_16K added).
+ - Rebased onto 6.3-rc1.
+
+
+[1] https://lore.kernel.org/kvmarm/20221206135930.3277585-1-ryan.roberts@arm.com/
+[2] https://lore.kernel.org/kvmarm/20230306195438.1557851-1-ryan.roberts@arm.com/
+[3] https://lore.kernel.org/kvmarm/20230918065740.3670662-1-ryan.roberts@arm.com/
+[4] https://lore.kernel.org/kvmarm/20231009185008.3803879-1-ryan.roberts@arm.com/
+[5] https://lore.kernel.org/linux-arm-kernel/20230912141549.278777-63-ardb@google.com/
+
+
+Thanks,
+Ryan
+
+Anshuman Khandual (1):
+  arm64/mm: Add FEAT_LPA2 specific ID_AA64MMFR0.TGRAN[2]
+
+Ryan Roberts (11):
+  arm64/mm: Modify range-based tlbi to decrement scale
+  arm64/mm: Add lpa2_is_enabled() kvm_lpa2_is_enabled() stubs
+  arm64/mm: Update tlb invalidation routines for FEAT_LPA2
+  arm64: Add ARM64_HAS_LPA2 CPU capability
+  KVM: arm64: Add new (V)TCR_EL2 field definitions for FEAT_LPA2
+  KVM: arm64: Use LPA2 page-tables for stage2 and hyp stage1
+  KVM: arm64: Convert translation level parameter to s8
+  KVM: arm64: Support up to 5 levels of translation in kvm_pgtable
+  KVM: arm64: Allow guests with >48-bit IPA size on FEAT_LPA2 systems
+  KVM: selftests: arm64: Determine max ipa size per-page size
+  KVM: selftests: arm64: Support P52V48 4K and 16K guest_modes
+
+ arch/arm64/include/asm/cpufeature.h           |   5 +
+ arch/arm64/include/asm/kvm_arm.h              |   2 +
+ arch/arm64/include/asm/kvm_emulate.h          |  12 ++-
+ arch/arm64/include/asm/kvm_mmu.h              |   3 +
+ arch/arm64/include/asm/kvm_pgtable.h          |  78 +++++++++-----
+ arch/arm64/include/asm/kvm_pkvm.h             |   5 +-
+ arch/arm64/include/asm/pgtable-prot.h         |   2 +
+ arch/arm64/include/asm/sysreg.h               |   5 +
+ arch/arm64/include/asm/tlb.h                  |  15 ++-
+ arch/arm64/include/asm/tlbflush.h             | 100 +++++++++++-------
+ arch/arm64/kernel/cpufeature.c                |  39 +++++++
+ arch/arm64/kvm/arm.c                          |   5 +
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S            |   4 -
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         |   6 +-
+ arch/arm64/kvm/hyp/nvhe/mm.c                  |   4 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c               |   2 +-
+ arch/arm64/kvm/hyp/pgtable.c                  |  90 ++++++++++------
+ arch/arm64/kvm/mmu.c                          |  16 +--
+ arch/arm64/kvm/reset.c                        |   9 +-
+ arch/arm64/tools/cpucaps                      |   1 +
+ .../selftests/kvm/include/aarch64/processor.h |   4 +-
+ .../selftests/kvm/include/kvm_util_base.h     |   1 +
+ .../selftests/kvm/lib/aarch64/processor.c     |  66 +++++++++---
+ tools/testing/selftests/kvm/lib/guest_modes.c |  42 ++++----
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   3 +
+ 25 files changed, 354 insertions(+), 165 deletions(-)
+
+--
+2.25.1
 
