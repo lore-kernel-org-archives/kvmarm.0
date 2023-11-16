@@ -1,68 +1,82 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE3B10951
-	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 12:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.54])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SWKkc0HrMzvQWh;
-	Thu, 16 Nov 2023 20:55:04 +0800 (CST)
-Received: from DESKTOP-6NKE0BC.china.huawei.com (10.174.185.210) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 16 Nov 2023 20:55:20 +0800
-From: Kunkun Jiang <jiangkunkun@huawei.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jean-Philippe Brucker
-	<jean-philippe@linaro.org>, <eric.auger@redhat.com>
-CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<wanghaibin.wang@huawei.com>, Kunkun Jiang <jiangkunkun@huawei.com>
-Subject: [PATCH] KVM: arm/arm64: GICv4: Do not perform an map to a mapped vLPI
-Date: Thu, 16 Nov 2023 20:52:15 +0800
-Message-ID: <20231116125215.1812-1-jiangkunkun@huawei.com>
-X-Mailer: git-send-email 2.26.2.windows.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C2930643
+	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 13:09:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ESX4fbpJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700140144;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MonhjC3WXqcY3h7WdCFO745+80UlcrRmMeuYZtAtOeE=;
+	b=ESX4fbpJVptFZrDqzB4c4rfCiRXQtxye2o7hRIGuqyWYMFKJLbRBbznClE5zzzXFyyB/7H
+	f0krI2vK35XQu3FqQ6ELEq52NugAqcaPAlEHJIiWr0eZDixE8U9mltwCxxlxi7DuQvWfSh
+	j5gd3eQxtp011sYWERC+6OxKGG7vgWI=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-139-Xo8IBKGHMtuhjaOTJw4t7w-1; Thu,
+ 16 Nov 2023 08:09:01 -0500
+X-MC-Unique: Xo8IBKGHMtuhjaOTJw4t7w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D054F3C11A0C;
+	Thu, 16 Nov 2023 13:09:00 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.127])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2758640C6EB9;
+	Thu, 16 Nov 2023 13:08:59 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Jianyong Wu <jianyong.wu@arm.com>, maz@kernel.org, james.morse@arm.com,
+ will@kernel.org
+Cc: rmk@armlinux.org.uk, salil.mehta@huawei.com, suzuki.poulose@arm.com,
+ oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, justin.he@arm.com,
+ jianyong.wu@arm.com
+Subject: Re: [PATCH] arm64/kvm: Introduce feature extension for SMCCC filter
+In-Reply-To: <20231116114152.912344-1-jianyong.wu@arm.com>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <20231116114152.912344-1-jianyong.wu@arm.com>
+User-Agent: Notmuch/0.37 (https://notmuchmail.org)
+Date: Thu, 16 Nov 2023 14:08:58 +0100
+Message-ID: <877cmhq1zp.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [10.174.185.210]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm000007.china.huawei.com (7.193.23.189)
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-Before performing an unmap, let's check whether the vLPI has been
-mapped. This corresponds to checking whether a vLPI is valid before
-unmap it.
+On Thu, Nov 16 2023, Jianyong Wu <jianyong.wu@arm.com> wrote:
 
-Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
----
- arch/arm64/kvm/vgic/vgic-v4.c | 5 +++++
- 1 file changed, 5 insertions(+)
+> 821d935c87b introduces support for userspace SMCCC filtering, but lack
+> of a way to tell userspace if we have this feature. Add a corresponding
+> feature extension can resolve this issue.
+>
+> For example, the incoming feature Vcpu Hotplug needs the SMCCC filter.
+> As there is no way to check this feature, VMM will run into error when
+> it calls this feature on an old kernel. It's bad for backward compatible.
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index 339a55194b2c..824f4baf50ee 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -436,6 +436,11 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
- 	if (ret)
- 		goto out;
- 
-+	if (irq->hw) {
-+		ret = -EBUSY;
-+		goto out;
-+	}
-+
- 	/*
- 	 * Emit the mapping request. If it fails, the ITS probably
- 	 * isn't v4 compatible, so let's silently bail out. Holding
--- 
-2.33.0
+Can't you simply query via KVM_HAS_DEVICE_ATTR whether the SMCCC
+filtering controls exist?
+
+>
+> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+> ---
+>  Documentation/virt/kvm/api.rst | 3 ++-
+>  arch/arm64/kvm/arm.c           | 1 +
+>  include/uapi/linux/kvm.h       | 1 +
+>  3 files changed, 4 insertions(+), 1 deletion(-)
+>
 
