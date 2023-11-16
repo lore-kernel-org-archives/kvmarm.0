@@ -1,75 +1,148 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A056A3158A
-	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 19:06:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lRkle9xw"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=uryGSx2r+KBBKtYnZwparRWHnho2ggpLtpZaQHsRXRw=; b=lRkle9xweJK7FFbW1FFvqC/n43
-	7bis5aAZ9xrI18O/ptwXmM155hy8w6KCcZlmPl2xwbuccPv5/IvODiAKZYv5Gcgiy/8r/+RZ1uqEr
-	N0FSM9XGAlwCoi/qZDSpYUexsnBNCCvp0S0/Bq1iQvgjs3zeiTx2ffzNhelowyjCE5bEN4t0+9uum
-	mm7li3txI51DvM5jF2I6L1DCPFqTCp7XceR4ua/NuYMhLH8ntDv5WsrX1oveXvEW/2sT/2IOlnYiU
-	DaEX8CIQmzIgmnBc0/yBqILrTutofk5t/PfD3YbD/NVaZCrC4LWrj8FwQBxz6TgMSoQmHAyVOb/Yr
-	uQE3YJHQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39226)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r3hgx-0002Bb-1i;
-	Thu, 16 Nov 2023 19:06:19 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r3hgx-0007nw-0G; Thu, 16 Nov 2023 19:06:19 +0000
-Date: Thu, 16 Nov 2023 19:06:18 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jianyong Wu <jianyong.wu@arm.com>
-Cc: maz@kernel.org, james.morse@arm.com, will@kernel.org,
-	salil.mehta@huawei.com, suzuki.poulose@arm.com,
-	oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-	justin.he@arm.com
-Subject: Re: [PATCH] arm64/kvm: Introduce feature extension for SMCCC filter
-Message-ID: <ZVZoKlWrjV1L3CBo@shell.armlinux.org.uk>
-References: <20231116114152.912344-1-jianyong.wu@arm.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71154EAEA
+	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 19:26:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9A7F61595;
+	Thu, 16 Nov 2023 11:27:32 -0800 (PST)
+Received: from [10.57.84.40] (unknown [10.57.84.40])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9A0753F6C4;
+	Thu, 16 Nov 2023 11:26:43 -0800 (PST)
+Message-ID: <0ebe2a54-8111-4e8e-8afe-3e17ce85fcb9@arm.com>
+Date: Thu, 16 Nov 2023 19:26:42 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231116114152.912344-1-jianyong.wu@arm.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 4/6] arm64: KVM: Add interface to set guest value for
+ TRFCR register
+Content-Language: en-GB
+To: James Clark <james.clark@arm.com>, coresight@lists.linaro.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, maz@kernel.org
+Cc: broonie@kernel.org, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mike Leach <mike.leach@linaro.org>, Leo Yan <leo.yan@linaro.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
+ <robh@kernel.org>, Jintack Lim <jintack.lim@linaro.org>,
+ Kristina Martsenko <kristina.martsenko@arm.com>,
+ Fuad Tabba <tabba@google.com>, Akihiko Odaki <akihiko.odaki@daynix.com>,
+ Joey Gouly <joey.gouly@arm.com>, linux-kernel@vger.kernel.org
+References: <20231019165510.1966367-1-james.clark@arm.com>
+ <20231019165510.1966367-5-james.clark@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20231019165510.1966367-5-james.clark@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 16, 2023 at 11:41:52AM +0000, Jianyong Wu wrote:
-> 821d935c87b introduces support for userspace SMCCC filtering, but lack
-> of a way to tell userspace if we have this feature. Add a corresponding
-> feature extension can resolve this issue.
+On 19/10/2023 17:55, James Clark wrote:
+> Add an interface for the Coresight driver to use to set the value of the
+> TRFCR register for the guest. This register controls the exclude
+> settings for trace at different exception levels, and is used to honor
+> the exclude_host and exclude_guest parameters from the Perf session.
+> This will be used to later write TRFCR_EL1 on nVHE at guest switch. For
+> VHE, the host trace is controlled by TRFCR_EL2 and thus we can write to
+> the TRFCR_EL1 immediately. Because guest writes to the register are
+> trapped, the value will persist and can't be modified.
+
+This could also be added below to make it easier for the code reader.
+
 > 
-> For example, the incoming feature Vcpu Hotplug needs the SMCCC filter.
-> As there is no way to check this feature, VMM will run into error when
-> it calls this feature on an old kernel. It's bad for backward compatible.
+> The settings must be copied to the vCPU before each run in the same
+> way that PMU events are, because the per-cpu struct isn't accessible in
+> protected mode.
+> 
+> Signed-off-by: James Clark <james.clark@arm.com>
+> ---
+>   arch/arm64/include/asm/kvm_host.h |  3 +++
+>   arch/arm64/kvm/arm.c              |  1 +
+>   arch/arm64/kvm/debug.c            | 26 ++++++++++++++++++++++++++
+>   3 files changed, 30 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 0f0bf8e641bd..e1852102550d 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1125,6 +1125,8 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu);
+>   void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
+>   void kvm_clr_pmu_events(u32 clr);
+>   bool kvm_set_pmuserenr(u64 val);
+> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest);
+> +void kvm_etm_update_vcpu_events(struct kvm_vcpu *vcpu);
+>   #else
+>   static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
+>   static inline void kvm_clr_pmu_events(u32 clr) {}
+> @@ -1132,6 +1134,7 @@ static inline bool kvm_set_pmuserenr(u64 val)
+>   {
+>   	return false;
+>   }
+> +static inline void kvm_etm_set_guest_trfcr(u64 trfcr_guest) {}
+>   #endif
+>   
+>   void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 0f717b6a9151..e4d846f2f665 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1015,6 +1015,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>   		kvm_vgic_flush_hwstate(vcpu);
+>   
+>   		kvm_pmu_update_vcpu_events(vcpu);
+> +		kvm_etm_update_vcpu_events(vcpu);
+>   
+>   		/*
+>   		 * Ensure we set mode to IN_GUEST_MODE after we disable
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index 20cdd40b3c42..2ab41b954512 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -23,6 +23,12 @@
+>   
+>   static DEFINE_PER_CPU(u64, mdcr_el2);
+>   
+> +/*
+> + * Per CPU value for TRFCR that should be applied to any guest vcpu that may
+> + * run on that core in the future.
+> + */
+> +static DEFINE_PER_CPU(u64, guest_trfcr);
+> +
+>   /**
+>    * save/restore_guest_debug_regs
+>    *
+> @@ -356,3 +362,23 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+>   	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+>   	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
+>   }
+> +
 
-Can't you just attempt to use the SMCCC filtering, and if it errors out
-with the appropriate error code, decide that SMCCC filtering is not
-available?
+The comment in the description could be helpful here.
 
-That's how most things like kernel syscalls work - if they're not
-implemented they return -ENOSYS. glibc can detect that and use a
-fallback.
+> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest)
+> +{
+> +	if (has_vhe())
+> +		write_sysreg_s(trfcr_guest, SYS_TRFCR_EL12);
+> +	else
+> +		*this_cpu_ptr(&guest_trfcr) = trfcr_guest;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_etm_set_guest_trfcr);
+> +
+> +/*
+> + * Updates the vcpu's view of the etm events for this cpu. Must be
+> + * called before every vcpu run after disabling interrupts, to ensure
+> + * that an interrupt cannot fire and update the structure.
+> + */
+> +void kvm_etm_update_vcpu_events(struct kvm_vcpu *vcpu)
+> +{
+> +	if (!has_vhe() && vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRFCR))
+> +		ctxt_sys_reg(&vcpu->arch.ctxt, TRFCR_EL1) = *this_cpu_ptr(&guest_trfcr);
+> +}
 
-Imagine what it would be like if the kernel provided userspace with
-a large bitmap of what syscalls were implemented...
+Either way,
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
