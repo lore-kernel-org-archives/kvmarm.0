@@ -1,208 +1,75 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0360F31A95
-	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 14:30:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C19771691;
-	Thu, 16 Nov 2023 06:30:51 -0800 (PST)
-Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.26])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2628B3F73F;
-	Thu, 16 Nov 2023 06:30:04 -0800 (PST)
-From: Ryan Roberts <ryan.roberts@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: Ryan Roberts <ryan.roberts@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: [PATCH v5 12/12] KVM: selftests: arm64: Support P52V48 4K and 16K guest_modes
-Date: Thu, 16 Nov 2023 14:29:31 +0000
-Message-Id: <20231116142931.1675485-13-ryan.roberts@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231116142931.1675485-1-ryan.roberts@arm.com>
-References: <20231116142931.1675485-1-ryan.roberts@arm.com>
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A056A3158A
+	for <kvmarm@lists.linux.dev>; Thu, 16 Nov 2023 19:06:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lRkle9xw"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=uryGSx2r+KBBKtYnZwparRWHnho2ggpLtpZaQHsRXRw=; b=lRkle9xweJK7FFbW1FFvqC/n43
+	7bis5aAZ9xrI18O/ptwXmM155hy8w6KCcZlmPl2xwbuccPv5/IvODiAKZYv5Gcgiy/8r/+RZ1uqEr
+	N0FSM9XGAlwCoi/qZDSpYUexsnBNCCvp0S0/Bq1iQvgjs3zeiTx2ffzNhelowyjCE5bEN4t0+9uum
+	mm7li3txI51DvM5jF2I6L1DCPFqTCp7XceR4ua/NuYMhLH8ntDv5WsrX1oveXvEW/2sT/2IOlnYiU
+	DaEX8CIQmzIgmnBc0/yBqILrTutofk5t/PfD3YbD/NVaZCrC4LWrj8FwQBxz6TgMSoQmHAyVOb/Yr
+	uQE3YJHQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39226)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r3hgx-0002Bb-1i;
+	Thu, 16 Nov 2023 19:06:19 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r3hgx-0007nw-0G; Thu, 16 Nov 2023 19:06:19 +0000
+Date: Thu, 16 Nov 2023 19:06:18 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jianyong Wu <jianyong.wu@arm.com>
+Cc: maz@kernel.org, james.morse@arm.com, will@kernel.org,
+	salil.mehta@huawei.com, suzuki.poulose@arm.com,
+	oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+	justin.he@arm.com
+Subject: Re: [PATCH] arm64/kvm: Introduce feature extension for SMCCC filter
+Message-ID: <ZVZoKlWrjV1L3CBo@shell.armlinux.org.uk>
+References: <20231116114152.912344-1-jianyong.wu@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231116114152.912344-1-jianyong.wu@arm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Add support for VM_MODE_P52V48_4K and VM_MODE_P52V48_16K guest modes by
-using the FEAT_LPA2 pte format for stage1, when FEAT_LPA2 is available.
+On Thu, Nov 16, 2023 at 11:41:52AM +0000, Jianyong Wu wrote:
+> 821d935c87b introduces support for userspace SMCCC filtering, but lack
+> of a way to tell userspace if we have this feature. Add a corresponding
+> feature extension can resolve this issue.
+> 
+> For example, the incoming feature Vcpu Hotplug needs the SMCCC filter.
+> As there is no way to check this feature, VMM will run into error when
+> it calls this feature on an old kernel. It's bad for backward compatible.
 
-Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
----
- .../selftests/kvm/include/kvm_util_base.h     |  1 +
- .../selftests/kvm/lib/aarch64/processor.c     | 39 ++++++++++++++-----
- tools/testing/selftests/kvm/lib/guest_modes.c |  2 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |  3 ++
- 4 files changed, 36 insertions(+), 9 deletions(-)
+Can't you just attempt to use the SMCCC filtering, and if it errors out
+with the appropriate error code, decide that SMCCC filtering is not
+available?
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index a18db6a7b3cf..406500fb6e28 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -171,6 +171,7 @@ static inline struct userspace_mem_region *vm_get_mem_region(struct kvm_vm *vm,
- 
- enum vm_guest_mode {
- 	VM_MODE_P52V48_4K,
-+	VM_MODE_P52V48_16K,
- 	VM_MODE_P52V48_64K,
- 	VM_MODE_P48V48_4K,
- 	VM_MODE_P48V48_16K,
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 917cfeddb6b4..77dc83d83de3 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -12,6 +12,7 @@
- #include "kvm_util.h"
- #include "processor.h"
- #include <linux/bitfield.h>
-+#include <linux/sizes.h>
- 
- #define DEFAULT_ARM64_GUEST_STACK_VADDR_MIN	0xac0000
- 
-@@ -58,13 +59,25 @@ static uint64_t pte_index(struct kvm_vm *vm, vm_vaddr_t gva)
- 	return (gva >> vm->page_shift) & mask;
- }
- 
-+static inline bool use_lpa2_pte_format(struct kvm_vm *vm)
-+{
-+	return (vm->page_size == SZ_4K || vm->page_size == SZ_16K) &&
-+	    (vm->pa_bits > 48 || vm->va_bits > 48);
-+}
-+
- static uint64_t addr_pte(struct kvm_vm *vm, uint64_t pa, uint64_t attrs)
- {
- 	uint64_t pte;
- 
--	pte = pa & GENMASK(47, vm->page_shift);
--	if (vm->page_shift == 16)
--		pte |= FIELD_GET(GENMASK(51, 48), pa) << 12;
-+	if (use_lpa2_pte_format(vm)) {
-+		pte = pa & GENMASK(49, vm->page_shift);
-+		pte |= FIELD_GET(GENMASK(51, 50), pa) << 8;
-+		attrs &= ~GENMASK(9, 8);
-+	} else {
-+		pte = pa & GENMASK(47, vm->page_shift);
-+		if (vm->page_shift == 16)
-+			pte |= FIELD_GET(GENMASK(51, 48), pa) << 12;
-+	}
- 	pte |= attrs;
- 
- 	return pte;
-@@ -74,9 +87,14 @@ static uint64_t pte_addr(struct kvm_vm *vm, uint64_t pte)
- {
- 	uint64_t pa;
- 
--	pa = pte & GENMASK(47, vm->page_shift);
--	if (vm->page_shift == 16)
--		pa |= FIELD_GET(GENMASK(15, 12), pte) << 48;
-+	if (use_lpa2_pte_format(vm)) {
-+		pa = pte & GENMASK(49, vm->page_shift);
-+		pa |= FIELD_GET(GENMASK(9, 8), pte) << 50;
-+	} else {
-+		pa = pte & GENMASK(47, vm->page_shift);
-+		if (vm->page_shift == 16)
-+			pa |= FIELD_GET(GENMASK(15, 12), pte) << 48;
-+	}
- 
- 	return pa;
- }
-@@ -266,9 +284,6 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
- 
- 	/* Configure base granule size */
- 	switch (vm->mode) {
--	case VM_MODE_P52V48_4K:
--		TEST_FAIL("AArch64 does not support 4K sized pages "
--			  "with 52-bit physical address ranges");
- 	case VM_MODE_PXXV48_4K:
- 		TEST_FAIL("AArch64 does not support 4K sized pages "
- 			  "with ANY-bit physical address ranges");
-@@ -278,12 +293,14 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
- 	case VM_MODE_P36V48_64K:
- 		tcr_el1 |= 1ul << 14; /* TG0 = 64KB */
- 		break;
-+	case VM_MODE_P52V48_16K:
- 	case VM_MODE_P48V48_16K:
- 	case VM_MODE_P40V48_16K:
- 	case VM_MODE_P36V48_16K:
- 	case VM_MODE_P36V47_16K:
- 		tcr_el1 |= 2ul << 14; /* TG0 = 16KB */
- 		break;
-+	case VM_MODE_P52V48_4K:
- 	case VM_MODE_P48V48_4K:
- 	case VM_MODE_P40V48_4K:
- 	case VM_MODE_P36V48_4K:
-@@ -297,6 +314,8 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
- 
- 	/* Configure output size */
- 	switch (vm->mode) {
-+	case VM_MODE_P52V48_4K:
-+	case VM_MODE_P52V48_16K:
- 	case VM_MODE_P52V48_64K:
- 		tcr_el1 |= 6ul << 32; /* IPS = 52 bits */
- 		ttbr0_el1 |= FIELD_GET(GENMASK(51, 48), vm->pgd) << 2;
-@@ -325,6 +344,8 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
- 	/* TCR_EL1 |= IRGN0:WBWA | ORGN0:WBWA | SH0:Inner-Shareable */;
- 	tcr_el1 |= (1 << 8) | (1 << 10) | (3 << 12);
- 	tcr_el1 |= (64 - vm->va_bits) /* T0SZ */;
-+	if (use_lpa2_pte_format(vm))
-+		tcr_el1 |= (1ul << 59) /* DS */;
- 
- 	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL1), sctlr_el1);
- 	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL1), tcr_el1);
-diff --git a/tools/testing/selftests/kvm/lib/guest_modes.c b/tools/testing/selftests/kvm/lib/guest_modes.c
-index c64c5cf49942..6634afc22137 100644
---- a/tools/testing/selftests/kvm/lib/guest_modes.c
-+++ b/tools/testing/selftests/kvm/lib/guest_modes.c
-@@ -23,6 +23,8 @@ void guest_modes_append_default(void)
- 
- 		aarch64_get_supported_page_sizes(limit, &ipa4k, &ipa16k, &ipa64k);
- 
-+		guest_mode_append(VM_MODE_P52V48_4K, ipa4k >= 52, ipa4k >= 52);
-+		guest_mode_append(VM_MODE_P52V48_16K, ipa16k >= 52, ipa16k >= 52);
- 		guest_mode_append(VM_MODE_P52V48_64K, ipa64k >= 52, ipa64k >= 52);
- 
- 		guest_mode_append(VM_MODE_P48V48_4K, ipa4k >= 48, ipa4k >= 48);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 7a8af1821f5d..aeba7a23105c 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -148,6 +148,7 @@ const char *vm_guest_mode_string(uint32_t i)
- {
- 	static const char * const strings[] = {
- 		[VM_MODE_P52V48_4K]	= "PA-bits:52,  VA-bits:48,  4K pages",
-+		[VM_MODE_P52V48_16K]	= "PA-bits:52,  VA-bits:48, 16K pages",
- 		[VM_MODE_P52V48_64K]	= "PA-bits:52,  VA-bits:48, 64K pages",
- 		[VM_MODE_P48V48_4K]	= "PA-bits:48,  VA-bits:48,  4K pages",
- 		[VM_MODE_P48V48_16K]	= "PA-bits:48,  VA-bits:48, 16K pages",
-@@ -173,6 +174,7 @@ const char *vm_guest_mode_string(uint32_t i)
- 
- const struct vm_guest_mode_params vm_guest_mode_params[] = {
- 	[VM_MODE_P52V48_4K]	= { 52, 48,  0x1000, 12 },
-+	[VM_MODE_P52V48_16K]	= { 52, 48,  0x4000, 14 },
- 	[VM_MODE_P52V48_64K]	= { 52, 48, 0x10000, 16 },
- 	[VM_MODE_P48V48_4K]	= { 48, 48,  0x1000, 12 },
- 	[VM_MODE_P48V48_16K]	= { 48, 48,  0x4000, 14 },
-@@ -251,6 +253,7 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode)
- 	case VM_MODE_P36V48_64K:
- 		vm->pgtable_levels = 3;
- 		break;
-+	case VM_MODE_P52V48_16K:
- 	case VM_MODE_P48V48_16K:
- 	case VM_MODE_P40V48_16K:
- 	case VM_MODE_P36V48_16K:
+That's how most things like kernel syscalls work - if they're not
+implemented they return -ENOSYS. glibc can detect that and use a
+fallback.
+
+Imagine what it would be like if the kernel provided userspace with
+a large bitmap of what syscalls were implemented...
+
 -- 
-2.25.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
