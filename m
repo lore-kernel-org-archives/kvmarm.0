@@ -1,32 +1,36 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68423190
-	for <kvmarm@lists.linux.dev>; Fri, 17 Nov 2023 00:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533DF62D
+	for <kvmarm@lists.linux.dev>; Fri, 17 Nov 2023 00:23:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tl0+r6AG"
-Date: Thu, 16 Nov 2023 16:18:36 -0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CisYhOic"
+Date: Thu, 16 Nov 2023 16:23:13 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1700180332;
+	t=1700180608;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QD9j/IPLCC8903UMjVBCJa3RC+ypRWcjx7JiuDPe2Ls=;
-	b=tl0+r6AGUUEJc6BOYRFE9I+D/a/vSp3pXhOwpx0ZY3NnJJONDKOyPyKqWvuzYpkKM2a3oU
-	sf6a/H5bxRSm2Oqna0oR6uiBHC6/IZCAHnBohKwYaTrJiSHvWG3bPfEM5/X8ulBtWDAnPJ
-	hTJAvSCqcoZDwF3KOg+YvGCP9fBEspI=
+	bh=crtmuj7vo4FEzbjLhHi4cvhG3nsSCjx2s+yv7BGTVKw=;
+	b=CisYhOicipF4342Tk/P8oJCS4xtz0PskvT20IcTGexGI7eR9UYcJyhHBwJM8xnoT6a8fEQ
+	mzZoAZM+5chYTxTjfnFT1EqION/RlaKI2Wd1AzJafJM9BSw3lQndLam52wJ+Ozymg/1HIC
+	nuYqzzZdxUCmZdL+KS0LzIsgPBj+j98=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Shaoqin Huang <shahuang@redhat.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] KVM: selftests: Initalize sem_vcpu_[cont|stop] before
- each test in dirty_log_test
-Message-ID: <ZVaxXJ4xUW1eyQEL@thinky-boi>
-References: <20231116093536.22256-1-shahuang@redhat.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 07/12] arm64: Treat HCR_EL2.E2H as RES1 when
+ ID_AA64MMFR4_EL1.E2H0 is non-zero
+Message-ID: <ZVaycYt51sUWS0h+@thinky-boi>
+References: <20231113174244.3026520-1-maz@kernel.org>
+ <20231113174244.3026520-8-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,66 +39,56 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231116093536.22256-1-shahuang@redhat.com>
+In-Reply-To: <20231113174244.3026520-8-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-Hi Shaoqin,
+Hey Marc,
 
-On Thu, Nov 16, 2023 at 04:35:36AM -0500, Shaoqin Huang wrote:
-> When execute the dirty_log_test on some aarch64 machine, it sometimes
-> trigger the ASSERT:
+On Mon, Nov 13, 2023 at 05:42:39PM +0000, Marc Zyngier wrote:
+> For CPUs that have ID_AA64MMFR4_EL1.E2H0 as non-zero, it is important
+> to avoid the boot path that sets HCR_EL2.E2H=0. Fortunately, we
+> already have this path to cope with fruity CPUs.
 > 
-> ==== Test Assertion Failure ====
->   dirty_log_test.c:384: dirty_ring_vcpu_ring_full
->   pid=14854 tid=14854 errno=22 - Invalid argument
->      1  0x00000000004033eb: dirty_ring_collect_dirty_pages at dirty_log_test.c:384
->      2  0x0000000000402d27: log_mode_collect_dirty_pages at dirty_log_test.c:505
->      3   (inlined by) run_test at dirty_log_test.c:802
->      4  0x0000000000403dc7: for_each_guest_mode at guest_modes.c:100
->      5  0x0000000000401dff: main at dirty_log_test.c:941 (discriminator 3)
->      6  0x0000ffff9be173c7: ?? ??:0
->      7  0x0000ffff9be1749f: ?? ??:0
->      8  0x000000000040206f: _start at ??:?
->   Didn't continue vcpu even without ring full
+> Tweak init_el2 to look at ID_AA64MMFR4_EL1.E2H0 first.
 > 
-> The dirty_log_test fails when execute the dirty-ring test, this is
-> because the sem_vcpu_cont and the sem_vcpu_stop is non-zero value when
-> execute the dirty_ring_collect_dirty_pages() function. When those two
-> sem_t variables are non-zero, the dirty_ring_wait_vcpu() at the
-> beginning of the dirty_ring_collect_dirty_pages() will not wait for the
-> vcpu to stop, but continue to execute the following code. In this case,
-> before vcpu stop, if the dirty_ring_vcpu_ring_full is true, and the
-> dirty_ring_collect_dirty_pages() has passed the check for the
-> dirty_ring_vcpu_ring_full but hasn't execute the check for the
-> continued_vcpu, the vcpu stop, and set the dirty_ring_vcpu_ring_full to
-> false. Then dirty_ring_collect_dirty_pages() will trigger the ASSERT.
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kernel/head.S | 25 +++++++++++++++++--------
+>  1 file changed, 17 insertions(+), 8 deletions(-)
 > 
-> Why sem_vcpu_cont and sem_vcpu_stop can be non-zero value? It's because
-> the dirty_ring_before_vcpu_join() execute the sem_post(&sem_vcpu_cont)
-> at the end of each dirty-ring test. It can cause two cases:
-> 
-> 1. sem_vcpu_cont be non-zero. When we set the host_quit to be true,
->    the vcpu_worker directly see the host_quit to be true, it quit. So
->    the log_mode_before_vcpu_join() function will set the sem_vcpu_cont
->    to 1, since the vcpu_worker has quit, it won't consume it.
-> 2. sem_vcpu_stop be non-zero. When we set the host_quit to be true,
->    the vcpu_worker has entered the guest state, the next time it exit
->    from guest state, it will set the sem_vcpu_stop to 1, and then see
->    the host_quit, no one will consume the sem_vcpu_stop.
-> 
-> When execute more and more dirty-ring tests, the sem_vcpu_cont and
-> sem_vcpu_stop can be larger and larger, which makes many code paths
-> don't wait for the sem_t. Thus finally cause the problem.
-> 
-> Fix this problem is easy, simply initialize the sem_t before every test.
-> Thus whatever the state previous test left, it won't interfere the next
-> test.
+> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+> index 7b236994f0e1..5853540f7809 100644
+> --- a/arch/arm64/kernel/head.S
+> +++ b/arch/arm64/kernel/head.S
+> @@ -584,25 +584,34 @@ SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
+>  	mov_q	x1, INIT_SCTLR_EL1_MMU_OFF
+>  
+>  	/*
+> -	 * Fruity CPUs seem to have HCR_EL2.E2H set to RES1,
+> -	 * making it impossible to start in nVHE mode. Is that
+> -	 * compliant with the architecture? Absolutely not!
+> +	 * Compliant CPUs advertise their VHE-onlyness with
+> +	 * ID_AA64MMFR4_EL1.E2H0=0b111x. HCR_EL2.E2H can be
+> +	 * RES1 in that case.
+> +	 *
+> +	 * Fruity CPUs seem to have HCR_EL2.E2H set to RES1, but
+> +	 * don't advertise it (they predate this relaxation).
+>  	 */
+> +	mrs_s	x0, SYS_ID_AA64MMFR4_EL1
+> +	ubfx	x0, x0, #ID_AA64MMFR4_EL1_E2H0_SHIFT, #ID_AA64MMFR4_EL1_E2H0_WIDTH
+> +	and	x0, x0, #0b1110
+> +	cmp	x0, #0b1110
+> +	b.eq	1f
 
-In your changelog you describe what sounds like a semaphore imbalance at
-the time of test completion, yet your proposed fix is to just clobber
-the error and start fresh.
+Wouldn't it be more consistent with the architectural definition of
+signed feature fields to just test the sign bit in this case?
 
-Why not nip it at the bud and fix the logic bug instead?
+Maybe like:
+
+	ubfx	x0, x0, #ID_AA64MMFR4_EL1_E2H0_SHIFT, #ID_AA64MMFR4_EL1_E2H0_WIDTH
+	tbnz	x0, #3, 1f
+
+You'll also save 8 measly bytes of text while you're at it :)
 
 -- 
 Thanks,
