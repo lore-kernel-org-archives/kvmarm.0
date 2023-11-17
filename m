@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE2130341
-	for <kvmarm@lists.linux.dev>; Fri, 17 Nov 2023 12:17:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BEB1A5A8
+	for <kvmarm@lists.linux.dev>; Fri, 17 Nov 2023 12:21:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i/MZ0VJb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25798C433C8;
-	Fri, 17 Nov 2023 12:17:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RCLrFHBR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 751EBC433C8;
+	Fri, 17 Nov 2023 12:21:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700223448;
-	bh=uGv/0N97MfyoKdE5xzFfvYb927nxLnO9KiqDOTyPe9A=;
+	s=k20201202; t=1700223693;
+	bh=vdKAQdF37yxRhL8faPUHglEp2Q5802XUFyQK39UMUBo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=i/MZ0VJb7AORj51kkZswENnpOlrphEWbqcFSYujFWQvQ33OafxZ/sBW92T9Evlr3g
-	 TDuKBwxxIKwEH8se0Hsv2zLtFVA52Jjsqg6cK9IQr3yEA2XNX4YOIlRwlwUvCt5bQ1
-	 +yl17iaONBLngms0Jmz9pbY8mXcnSKhV9y1u+CQOKh7/QJztLJJYhmx1IzFGJQcW7A
-	 Uy7rIoaGMjh+f4IErinAmKDFnAaMbH+8a9ufwJgWuSXbSRxWeSvTAIYu3H2mi22Xgb
-	 gsvqy5AxTkDqM9eCCnmzbhsmzoVTAcMXlbWX+bTYTTk5d1QoJ4M03+X09OYFJ+RJ6T
-	 je46QQd4cLVgQ==
+	b=RCLrFHBRu0yk80FkGmanwZXv+N151ua+8RfPwi1Dr/a+lR4ZSqTysS5C3cJmBD2so
+	 FvT4rkGoC8tuJgBngDguYl7jG/Ia0ORtM9eXNFFj26Z492JvILAASTK/c6Pq/YjQgJ
+	 sD3OVlpZXKZLpQudBLOrK2F4B5ebiOBrF0JLFjnxccHm3uC7oXmKY8jsNZgj0FibBS
+	 QUd09lgiUBr6d/+ch32I/Ormp7bnhDPK2opWrtOM2nmLEU7+c91cJ3/aabqat4BKfP
+	 LMqJiSSr2AcjNeH6tql5Z/Lz1eTkhXrU6CZrzWKJvnQJlrlW87AVo+Azun6mKZdjUl
+	 ZiRyJ99aIvDfw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1r3xmn-00DyDc-Ix;
-	Fri, 17 Nov 2023 12:17:25 +0000
-Date: Fri, 17 Nov 2023 12:17:25 +0000
-Message-ID: <86wmugzi96.wl-maz@kernel.org>
+	id 1r3xqk-00DyIE-S9;
+	Fri, 17 Nov 2023 12:21:30 +0000
+Date: Fri, 17 Nov 2023 12:21:30 +0000
+Message-ID: <86v8a0zi2d.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -35,11 +35,11 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 07/12] arm64: Treat HCR_EL2.E2H as RES1 when ID_AA64MMFR4_EL1.E2H0 is non-zero
-In-Reply-To: <ZVaycYt51sUWS0h+@thinky-boi>
+Subject: Re: [PATCH 05/12] arm64: cpufeature: Detect E2H0 not being implemented
+In-Reply-To: <ZVa6RIOT8Eixqy6l@thinky-boi>
 References: <20231113174244.3026520-1-maz@kernel.org>
-	<20231113174244.3026520-8-maz@kernel.org>
-	<ZVaycYt51sUWS0h+@thinky-boi>
+	<20231113174244.3026520-6-maz@kernel.org>
+	<ZVa6RIOT8Eixqy6l@thinky-boi>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,62 +55,46 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 17 Nov 2023 00:23:13 +0000,
+On Fri, 17 Nov 2023 00:56:36 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Hey Marc,
-> 
-> On Mon, Nov 13, 2023 at 05:42:39PM +0000, Marc Zyngier wrote:
-> > For CPUs that have ID_AA64MMFR4_EL1.E2H0 as non-zero, it is important
-> > to avoid the boot path that sets HCR_EL2.E2H=0. Fortunately, we
-> > already have this path to cope with fruity CPUs.
+> On Mon, Nov 13, 2023 at 05:42:37PM +0000, Marc Zyngier wrote:
+> > FEAT_E2H0 is a new feature that indicates whether or not HCR_EL2.E2H
+> > can be set to 0. Amusingly, this feature is set to 0 when implemented,
+> > and otherwise negative.
 > > 
-> > Tweak init_el2 to look at ID_AA64MMFR4_EL1.E2H0 first.
+> > Add a new capability and detection infrastructure to detect the
+> > absence of FEAT_E2H0.
 > > 
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> 
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+> 
 > > ---
-> >  arch/arm64/kernel/head.S | 25 +++++++++++++++++--------
-> >  1 file changed, 17 insertions(+), 8 deletions(-)
+> >  arch/arm64/kernel/cpufeature.c | 7 +++++++
+> >  arch/arm64/tools/cpucaps       | 1 +
+> >  2 files changed, 8 insertions(+)
 > > 
-> > diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-> > index 7b236994f0e1..5853540f7809 100644
-> > --- a/arch/arm64/kernel/head.S
-> > +++ b/arch/arm64/kernel/head.S
-> > @@ -584,25 +584,34 @@ SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
-> >  	mov_q	x1, INIT_SCTLR_EL1_MMU_OFF
-> >  
-> >  	/*
-> > -	 * Fruity CPUs seem to have HCR_EL2.E2H set to RES1,
-> > -	 * making it impossible to start in nVHE mode. Is that
-> > -	 * compliant with the architecture? Absolutely not!
-> > +	 * Compliant CPUs advertise their VHE-onlyness with
-> > +	 * ID_AA64MMFR4_EL1.E2H0=0b111x. HCR_EL2.E2H can be
-> > +	 * RES1 in that case.
-> > +	 *
-> > +	 * Fruity CPUs seem to have HCR_EL2.E2H set to RES1, but
-> > +	 * don't advertise it (they predate this relaxation).
-> >  	 */
-> > +	mrs_s	x0, SYS_ID_AA64MMFR4_EL1
-> > +	ubfx	x0, x0, #ID_AA64MMFR4_EL1_E2H0_SHIFT, #ID_AA64MMFR4_EL1_E2H0_WIDTH
-> > +	and	x0, x0, #0b1110
-> > +	cmp	x0, #0b1110
-> > +	b.eq	1f
+> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> > index 41db7f993eef..e0d64e8b4851 100644
+> > --- a/arch/arm64/kernel/cpufeature.c
+> > +++ b/arch/arm64/kernel/cpufeature.c
+> > @@ -2787,6 +2787,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+> >  		.matches = has_cpuid_feature,
+> >  		ARM64_CPUID_FIELDS(ID_AA64MMFR2_EL1, EVT, IMP)
+> >  	},
+> > +	{
+> > +		.desc = "FEAT_E2H0 not implemented",
+> > +		.capability = ARM64_HCR_E2H_RES1,
 > 
-> Wouldn't it be more consistent with the architectural definition of
-> signed feature fields to just test the sign bit in this case?
-> 
-> Maybe like:
-> 
-> 	ubfx	x0, x0, #ID_AA64MMFR4_EL1_E2H0_SHIFT, #ID_AA64MMFR4_EL1_E2H0_WIDTH
-> 	tbnz	x0, #3, 1f
-> 
-> You'll also save 8 measly bytes of text while you're at it :)
+> I did read this a couple times before the neurons that interpret "0 not
+> implemented" and "RES1" fired together, heh.
 
-At this stage, why not try this:
+Yeah, the whole thing is upside down, in order to preserve backward
+compatibility. I guess that as the architecture deprecates old cruft,
+we may see more of this sort of constructs.
 
-tbnz x0, #(ID_AA64MMFR4_EL1_E2H0_SHIFT + ID_AA64MMFR4_EL1_E2H0_WIDTH - 1), 1f
-
-and we save a total of 12 bytes!
+Thanks,
 
 	M.
 
