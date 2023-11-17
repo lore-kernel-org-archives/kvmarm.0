@@ -1,164 +1,109 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C25AD274
-	for <kvmarm@lists.linux.dev>; Fri, 17 Nov 2023 05:22:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VJ9C6VTx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700198548;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=GP1qDRaGGYNkvm0KV8/GWSP2DF/3SQkemClyjrO5cH0=;
-	b=VJ9C6VTxZtuIN2u35KhtaSm0XDZmBU3XmqDs4Gfo5X7XswzvRi++pVkChzB262eB4cB5Z8
-	RmBbmbCeXatN5jqhT+fGXTOdf2aIxDhjLHhoO6W/T3pUaZl7gIzCmMZJeSL/3OwX1oGwOU
-	l69RI3SjIDLmOEnxVV7pUm/YDmZjK/E=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-385-FAvH0CbkOg-51Q-zciuaDQ-1; Fri, 17 Nov 2023 00:22:26 -0500
-X-MC-Unique: FAvH0CbkOg-51Q-zciuaDQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 173C6101A529;
-	Fri, 17 Nov 2023 05:22:26 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 064E5C15881;
-	Fri, 17 Nov 2023 05:22:26 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] KVM: selftests: Fix the dirty_log_test semaphore imbalance
-Date: Fri, 17 Nov 2023 00:22:09 -0500
-Message-Id: <20231117052210.26396-1-shahuang@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9B2FBEE
+	for <kvmarm@lists.linux.dev>; Fri, 17 Nov 2023 10:10:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.54])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4SWsc43wF2z1P8S2;
+	Fri, 17 Nov 2023 17:51:16 +0800 (CST)
+Received: from [10.174.185.210] (10.174.185.210) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Fri, 17 Nov 2023 17:54:37 +0800
+Subject: Re: [PATCH] KVM: arm/arm64: GICv4: Do not perform an map to a mapped
+ vLPI
+To: Marc Zyngier <maz@kernel.org>
+CC: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, <eric.auger@redhat.com>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
+References: <20231116125215.1812-1-jiangkunkun@huawei.com>
+ <864jhl23hp.wl-maz@kernel.org>
+From: Kunkun Jiang <jiangkunkun@huawei.com>
+Message-ID: <967d81f7-74ae-da34-33b1-00e0b5cd1f22@huawei.com>
+Date: Fri, 17 Nov 2023 17:54:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+In-Reply-To: <864jhl23hp.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+Content-Language: en-US
+X-Originating-IP: [10.174.185.210]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
+X-CFilter-Loop: Reflected
 
-When execute the dirty_log_test on some aarch64 machine, it sometimes
-trigger the ASSERT:
+Hi Marc，
 
-==== Test Assertion Failure ====
-  dirty_log_test.c:384: dirty_ring_vcpu_ring_full
-  pid=14854 tid=14854 errno=22 - Invalid argument
-     1  0x00000000004033eb: dirty_ring_collect_dirty_pages at dirty_log_test.c:384
-     2  0x0000000000402d27: log_mode_collect_dirty_pages at dirty_log_test.c:505
-     3   (inlined by) run_test at dirty_log_test.c:802
-     4  0x0000000000403dc7: for_each_guest_mode at guest_modes.c:100
-     5  0x0000000000401dff: main at dirty_log_test.c:941 (discriminator 3)
-     6  0x0000ffff9be173c7: ?? ??:0
-     7  0x0000ffff9be1749f: ?? ??:0
-     8  0x000000000040206f: _start at ??:?
-  Didn't continue vcpu even without ring full
+On 2023/11/16 22:10, Marc Zyngier wrote:
+> On Thu, 16 Nov 2023 12:52:15 +0000,
+> Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+>> Before performing an unmap, let's check whether the vLPI has been
+s/unmap/map
+>> mapped. This corresponds to checking whether a vLPI is valid before
+>> unmap it.
+>>
+>> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+>> ---
+>>   arch/arm64/kvm/vgic/vgic-v4.c | 5 +++++
+>>   1 file changed, 5 insertions(+)
+>>
+>> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+>> index 339a55194b2c..824f4baf50ee 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-v4.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
+>> @@ -436,6 +436,11 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+>>   	if (ret)
+>>   		goto out;
+>>   
+>> +	if (irq->hw) {
+>> +		ret = -EBUSY;
+>> +		goto out;
+>> +	}
+>> +
+> So this code affects the mapping side, not the unmapping. Even more
+> confusingly, the subject of the patch doesn't match the commit
+> message.
+>
+> Furthermore, I'm not sure we want to return an error here. Userspace
+> has no knowledge of GICv4, and there are numerous other cases where we
+> don't return any error. This is certainly a userspace visible change.
+Yes, Userspace has no knowledge of GICv4. In the current implementation,
+this error will not be presented to userspace. Only a log will be printed
+in kvm_irqfd_assign().
+ > #ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
+ >         if (kvm_arch_has_irq_bypass()) {
+ >                 irqfd->consumer.token = (void *)irqfd->eventfd;
+ >                 irqfd->consumer.add_producer = 
+kvm_arch_irq_bypass_add_producer;
+ >                 irqfd->consumer.del_producer = 
+kvm_arch_irq_bypass_del_producer;
+ >                 irqfd->consumer.stop = kvm_arch_irq_bypass_stop;
+ >                 irqfd->consumer.start = kvm_arch_irq_bypass_start;
+ >                 ret = irq_bypass_register_consumer(&irqfd->consumer);
+ >                 if (ret)
+ >                         pr_info("irq bypass consumer (token %p) 
+registration fails: %d\n",
+ >                                 irqfd->consumer.token, ret);
+ >         }
+ > #endif
 
-The dirty_log_test fails when execute the dirty-ring test, this is
-because the sem_vcpu_cont and the sem_vcpu_stop is non-zero value when
-execute the dirty_ring_collect_dirty_pages() function. When those two
-sem_t variables are non-zero, the dirty_ring_wait_vcpu() at the
-beginning of the dirty_ring_collect_dirty_pages() will not wait for the
-vcpu to stop, but continue to execute the following code. In this case,
-before vcpu stop, if the dirty_ring_vcpu_ring_full is true, and the
-dirty_ring_collect_dirty_pages() has passed the check for the
-dirty_ring_vcpu_ring_full but hasn't execute the check for the
-continued_vcpu, the vcpu stop, and set the dirty_ring_vcpu_ring_full to
-false. Then dirty_ring_collect_dirty_pages() will trigger the ASSERT.
+If you think it is better not to return an error, I will modify it in
+the next version.
 
-Why sem_vcpu_cont and sem_vcpu_stop can be non-zero value? It's because
-the dirty_ring_before_vcpu_join() execute the sem_post(&sem_vcpu_cont)
-at the end of each dirty-ring test. It can cause two cases:
+Looking forwarding to your reply.
 
-1. sem_vcpu_cont be non-zero. When we set the host_quit to be true,
-   the vcpu_worker directly see the host_quit to be true, it quit. So
-   the log_mode_before_vcpu_join() function will set the sem_vcpu_cont
-   to 1, since the vcpu_worker has quit, it won't consume it.
-2. sem_vcpu_stop be non-zero. When we set the host_quit to be true,
-   the vcpu_worker has entered the guest state, the next time it exit
-   from guest state, it will set the sem_vcpu_stop to 1, and then see
-   the host_quit, no one will consume the sem_vcpu_stop.
-
-When execute more and more dirty-ring tests, the sem_vcpu_cont and
-sem_vcpu_stop can be larger and larger, which makes many code paths
-don't wait for the sem_t. Thus finally cause the problem.
-
-To fix this problem, we can wait a while before set the host_quit to
-true, which gives the vcpu time to enter the guest state, so it will
-exit again. Then we can wait the vcpu to exit, and let it continue
-again, then the vcpu will see the host_quit. Thus the sem_vcpu_cont and
-sem_vcpu_stop will be both zero when test finished.
-
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
-v1->v2:
-  - Fix the real logic bug, not just fresh the context.
-
-v1: https://lore.kernel.org/all/20231116093536.22256-1-shahuang@redhat.com/
----
- tools/testing/selftests/kvm/dirty_log_test.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index 936f3a8d1b83..a6e0ff46a07c 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -417,7 +417,8 @@ static void dirty_ring_after_vcpu_run(struct kvm_vcpu *vcpu, int ret, int err)
- 
- static void dirty_ring_before_vcpu_join(void)
- {
--	/* Kick another round of vcpu just to make sure it will quit */
-+	/* Wait vcpu exit, and let it continue to see the host_quit. */
-+	dirty_ring_wait_vcpu();
- 	sem_post(&sem_vcpu_cont);
- }
- 
-@@ -719,6 +720,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	struct kvm_vm *vm;
- 	unsigned long *bmap;
- 	uint32_t ring_buf_idx = 0;
-+	int sem_val;
- 
- 	if (!log_mode_supported()) {
- 		print_skip("Log mode '%s' not supported",
-@@ -726,6 +728,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 		return;
- 	}
- 
-+	sem_getvalue(&sem_vcpu_stop, &sem_val);
-+	assert(sem_val == 0);
-+	sem_getvalue(&sem_vcpu_cont, &sem_val);
-+	assert(sem_val == 0);
-+
- 	/*
- 	 * We reserve page table for 2 times of extra dirty mem which
- 	 * will definitely cover the original (1G+) test range.  Here
-@@ -825,6 +832,13 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 		sync_global_to_guest(vm, iteration);
- 	}
- 
-+	/*
-+	 *
-+	 * Before we set the host_quit, let the vcpu has time to run, to make
-+	 * sure we consume the sem_vcpu_stop and the vcpu consume the
-+	 * sem_vcpu_cont, to keep the semaphore balance.
-+	 */
-+	usleep(p->interval * 1000);
- 	/* Tell the vcpu thread to quit */
- 	host_quit = true;
- 	log_mode_before_vcpu_join();
--- 
-2.40.1
+Thanks,
+Kunkun Jiang
 
