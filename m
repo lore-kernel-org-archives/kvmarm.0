@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2334F1CFBA;
-	Mon, 20 Nov 2023 13:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 386E21D52C;
+	Mon, 20 Nov 2023 13:10:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jlk+OL2+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 978ACC433CC;
-	Mon, 20 Nov 2023 13:10:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rWZMU5VE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A6A6C433C9;
+	Mon, 20 Nov 2023 13:10:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700485855;
-	bh=4jHfJFGdzbX/utUiRTq3GLogSkKx2H0T7/PU9jDIn8c=;
+	s=k20201202; t=1700485856;
+	bh=+pWt5eQcDILKS8KD5mpwiv/R4YCG6k9a5S3OuCbehVA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jlk+OL2+Lc6yRPhfmAYzwGfsDkUZHeicZagvJyjanoShxm2d+zsP0uUc60xdEt8tM
-	 XR4ywzxEKpA6gCP2iz6GNdxnsMwP+zVS831CweZ16sGLiqZ+0waIiz62DD3sLTKgrp
-	 OgAfIiqFhTEGMtFM5iJTGFk9M9S17AhUdpNFd3Ve1xVSCmRQX4mI1B8uDy/YXhPWJd
-	 HaAvcnYnoC2rBxm6FQKAjKoZFcsJcIpcpwpilJcna4QCM1TgcHk2hoBX1O8mTzyDnm
-	 wmHez+3KD1HZ9C2vJ6lW0Zxv6cNJNmbnEli9fvhs4ayrxdj1XXo4T8HFTs7J22pNVw
-	 TXGpawTPnv4BA==
+	b=rWZMU5VErPyyAhOsc0PdBsZOgkWV3rcXAKIUKUbye0BO0p3xD9iYN9cEFkRoEVueL
+	 5Pi+CCrKk4U+WiiUMTAZ3RZXBjR8WkNeQvYzQsF54c5eMzPHxd2vpWWmOYrdDZUXvp
+	 as0+W3DrachfgCypB5QqV8c1kJKszSkb6+ItHPjJrqdvYdD7RqB6qHP5eJ5bbtsgJJ
+	 iMfOgKGM+iKxIpxjGwk6SJACnSUE6IbT77qobyue76EzTz12MRrWXIHFdFInLMh/TT
+	 o1MwgMAgnAxV9Ao3OrfGlVebLd86iKD/dLET7EymRDme95nZCxRqCu/9UEO1rdVfTh
+	 /1YcVCtELW8hg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1r543B-00EjnU-KV;
-	Mon, 20 Nov 2023 13:10:53 +0000
+	id 1r543C-00EjnU-6l;
+	Mon, 20 Nov 2023 13:10:54 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v11 18/43] KVM: arm64: nv: Implement nested Stage-2 page table walk logic
-Date: Mon, 20 Nov 2023 13:10:02 +0000
-Message-Id: <20231120131027.854038-19-maz@kernel.org>
+Subject: [PATCH v11 20/43] KVM: arm64: nv: Restrict S2 RD/WR permissions to match the guest's
+Date: Mon, 20 Nov 2023 13:10:04 +0000
+Message-Id: <20231120131027.854038-21-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231120131027.854038-1-maz@kernel.org>
 References: <20231120131027.854038-1-maz@kernel.org>
@@ -58,349 +58,89 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+When mapping a page in a shadow stage-2, special care must be
+taken not to be more permissive than the guest is (writable or
+readable page when the guest hasn't set that permission).
 
-Based on the pseudo-code in the ARM ARM, implement a stage 2 software
-page table walker.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-[maz: heavily reworked for future ARMv8.4-TTL support]
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/esr.h        |   1 +
- arch/arm64/include/asm/kvm_arm.h    |   2 +
- arch/arm64/include/asm/kvm_nested.h |  13 ++
- arch/arm64/kvm/nested.c             | 267 ++++++++++++++++++++++++++++
- 4 files changed, 283 insertions(+)
+ arch/arm64/include/asm/kvm_nested.h | 15 +++++++++++++++
+ arch/arm64/kvm/mmu.c                | 14 +++++++++++++-
+ arch/arm64/kvm/nested.c             |  2 +-
+ 3 files changed, 29 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index ae35939f395b..7dd4a176d5eb 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -158,6 +158,7 @@
- #define ESR_ELx_Xs_MASK		(GENMASK_ULL(4, 0))
- 
- /* ISS field definitions for exceptions taken in to Hyp */
-+#define ESR_ELx_FSC_ADDRSZ	(0x00)
- #define ESR_ELx_CV		(UL(1) << 24)
- #define ESR_ELx_COND_SHIFT	(20)
- #define ESR_ELx_COND_MASK	(UL(0xF) << ESR_ELx_COND_SHIFT)
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index b85f46a73e21..9c10c88d2fc2 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -286,6 +286,8 @@
- #define VTTBR_VMID_SHIFT  (UL(48))
- #define VTTBR_VMID_MASK(size) (_AT(u64, (1 << size) - 1) << VTTBR_VMID_SHIFT)
- 
-+#define SCTLR_EE	(UL(1) << 25)
-+
- /* Hyp System Trap Register */
- #define HSTR_EL2_T(x)	(1 << x)
- 
 diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index f421ad294e68..a2e719d1cd53 100644
+index a9aec29bf7a1..cbcddc2e8379 100644
 --- a/arch/arm64/include/asm/kvm_nested.h
 +++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -67,6 +67,19 @@ extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu);
- extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
- extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
- 
-+struct kvm_s2_trans {
-+	phys_addr_t output;
-+	unsigned long block_size;
-+	bool writable;
-+	bool readable;
-+	int level;
-+	u32 esr;
-+	u64 upper_attr;
-+};
-+
-+extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
-+			      struct kvm_s2_trans *result);
-+
- extern bool forward_smc_trap(struct kvm_vcpu *vcpu);
- extern bool __check_nv_sr_forward(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index c5752ab8c3fe..cd74d8ee93cb 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -75,6 +75,273 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
- 	return ret;
+@@ -92,6 +92,21 @@ static inline u32 kvm_s2_trans_esr(struct kvm_s2_trans *trans)
+ 	return trans->esr;
  }
  
-+struct s2_walk_info {
-+	int	     (*read_desc)(phys_addr_t pa, u64 *desc, void *data);
-+	void	     *data;
-+	u64	     baddr;
-+	unsigned int max_pa_bits;
-+	unsigned int max_ipa_bits;
-+	unsigned int pgshift;
-+	unsigned int pgsize;
-+	unsigned int ps;
-+	unsigned int sl;
-+	unsigned int t0sz;
-+	bool	     be;
-+};
-+
-+static unsigned int ps_to_output_size(unsigned int ps)
++static inline bool kvm_s2_trans_readable(struct kvm_s2_trans *trans)
 +{
-+	switch (ps) {
-+	case 0: return 32;
-+	case 1: return 36;
-+	case 2: return 40;
-+	case 3: return 42;
-+	case 4: return 44;
-+	case 5:
-+	default:
-+		return 48;
-+	}
++	return trans->readable;
 +}
 +
-+static u32 compute_fsc(int level, u32 fsc)
++static inline bool kvm_s2_trans_writable(struct kvm_s2_trans *trans)
 +{
-+	return fsc | (level & 0x3);
++	return trans->writable;
 +}
 +
-+static int check_base_s2_limits(struct s2_walk_info *wi,
-+				int level, int input_size, int stride)
++static inline bool kvm_s2_trans_executable(struct kvm_s2_trans *trans)
 +{
-+	int start_size;
-+
-+	/* Check translation limits */
-+	switch (wi->pgsize) {
-+	case SZ_64K:
-+		if (level == 0 || (level == 1 && wi->max_ipa_bits <= 42))
-+			return -EFAULT;
-+		break;
-+	case SZ_16K:
-+		if (level == 0 || (level == 1 && wi->max_ipa_bits <= 40))
-+			return -EFAULT;
-+		break;
-+	case SZ_4K:
-+		if (level < 0 || (level == 0 && wi->max_ipa_bits <= 42))
-+			return -EFAULT;
-+		break;
-+	}
-+
-+	/* Check input size limits */
-+	if (input_size > wi->max_ipa_bits)
-+		return -EFAULT;
-+
-+	/* Check number of entries in starting level table */
-+	start_size = input_size - ((3 - level) * stride + wi->pgshift);
-+	if (start_size < 1 || start_size > stride + 4)
-+		return -EFAULT;
-+
-+	return 0;
++	return !(trans->upper_attr & BIT(54));
 +}
 +
-+/* Check if output is within boundaries */
-+static int check_output_size(struct s2_walk_info *wi, phys_addr_t output)
-+{
-+	unsigned int output_size = ps_to_output_size(wi->ps);
-+
-+	if (output_size > wi->max_pa_bits)
-+		output_size = wi->max_pa_bits;
-+
-+	if (output_size != 48 && (output & GENMASK_ULL(47, output_size)))
-+		return -1;
-+
-+	return 0;
-+}
-+
-+/*
-+ * This is essentially a C-version of the pseudo code from the ARM ARM
-+ * AArch64.TranslationTableWalk  function.  I strongly recommend looking at
-+ * that pseudocode in trying to understand this.
-+ *
-+ * Must be called with the kvm->srcu read lock held
-+ */
-+static int walk_nested_s2_pgd(phys_addr_t ipa,
-+			      struct s2_walk_info *wi, struct kvm_s2_trans *out)
-+{
-+	int first_block_level, level, stride, input_size, base_lower_bound;
-+	phys_addr_t base_addr;
-+	unsigned int addr_top, addr_bottom;
-+	u64 desc;  /* page table entry */
-+	int ret;
-+	phys_addr_t paddr;
-+
-+	switch (wi->pgsize) {
-+	case SZ_64K:
-+	case SZ_16K:
-+		level = 3 - wi->sl;
-+		first_block_level = 2;
-+		break;
-+	case SZ_4K:
-+		level = 2 - wi->sl;
-+		first_block_level = 1;
-+		break;
-+	default:
-+		/* GCC is braindead */
-+		unreachable();
-+	}
-+
-+	stride = wi->pgshift - 3;
-+	input_size = 64 - wi->t0sz;
-+	if (input_size > 48 || input_size < 25)
-+		return -EFAULT;
-+
-+	ret = check_base_s2_limits(wi, level, input_size, stride);
-+	if (WARN_ON(ret))
-+		return ret;
-+
-+	base_lower_bound = 3 + input_size - ((3 - level) * stride +
-+			   wi->pgshift);
-+	base_addr = wi->baddr & GENMASK_ULL(47, base_lower_bound);
-+
-+	if (check_output_size(wi, base_addr)) {
-+		out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
-+		return 1;
-+	}
-+
-+	addr_top = input_size - 1;
-+
-+	while (1) {
-+		phys_addr_t index;
-+
-+		addr_bottom = (3 - level) * stride + wi->pgshift;
-+		index = (ipa & GENMASK_ULL(addr_top, addr_bottom))
-+			>> (addr_bottom - 3);
-+
-+		paddr = base_addr | index;
-+		ret = wi->read_desc(paddr, &desc, wi->data);
-+		if (ret < 0)
-+			return ret;
-+
-+		/*
-+		 * Handle reversedescriptors if endianness differs between the
-+		 * host and the guest hypervisor.
-+		 */
-+		if (wi->be)
-+			desc = be64_to_cpu(desc);
-+		else
-+			desc = le64_to_cpu(desc);
-+
-+		/* Check for valid descriptor at this point */
-+		if (!(desc & 1) || ((desc & 3) == 1 && level == 3)) {
-+			out->esr = compute_fsc(level, ESR_ELx_FSC_FAULT);
-+			out->upper_attr = desc;
-+			return 1;
-+		}
-+
-+		/* We're at the final level or block translation level */
-+		if ((desc & 3) == 1 || level == 3)
-+			break;
-+
-+		if (check_output_size(wi, desc)) {
-+			out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
-+			out->upper_attr = desc;
-+			return 1;
-+		}
-+
-+		base_addr = desc & GENMASK_ULL(47, wi->pgshift);
-+
-+		level += 1;
-+		addr_top = addr_bottom - 1;
-+	}
-+
-+	if (level < first_block_level) {
-+		out->esr = compute_fsc(level, ESR_ELx_FSC_FAULT);
-+		out->upper_attr = desc;
-+		return 1;
-+	}
-+
+ extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ 			      struct kvm_s2_trans *result);
+ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 41de7616b735..b885a02200a1 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1586,6 +1586,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (exec_fault && device)
+ 		return -ENOEXEC;
+ 
 +	/*
-+	 * We don't use the contiguous bit in the stage-2 ptes, so skip check
-+	 * for misprogramming of the contiguous bit.
++	 * Potentially reduce shadow S2 permissions to match the guest's own
++	 * S2. For exec faults, we'd only reach this point if the guest
++	 * actually allowed it (see kvm_s2_handle_perm_fault).
 +	 */
-+
-+	if (check_output_size(wi, desc)) {
-+		out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
-+		out->upper_attr = desc;
-+		return 1;
++	if (nested) {
++		writable &= kvm_s2_trans_writable(nested);
++		if (!kvm_s2_trans_readable(nested))
++			prot &= ~KVM_PGTABLE_PROT_R;
 +	}
 +
-+	if (!(desc & BIT(10))) {
-+		out->esr = compute_fsc(level, ESR_ELx_FSC_ACCESS);
-+		out->upper_attr = desc;
-+		return 1;
-+	}
-+
-+	/* Calculate and return the result */
-+	paddr = (desc & GENMASK_ULL(47, addr_bottom)) |
-+		(ipa & GENMASK_ULL(addr_bottom - 1, 0));
-+	out->output = paddr;
-+	out->block_size = 1UL << ((3 - level) * stride + wi->pgshift);
-+	out->readable = desc & (0b01 << 6);
-+	out->writable = desc & (0b10 << 6);
-+	out->level = level;
-+	out->upper_attr = desc & GENMASK_ULL(63, 52);
-+	return 0;
-+}
-+
-+static int read_guest_s2_desc(phys_addr_t pa, u64 *desc, void *data)
-+{
-+	struct kvm_vcpu *vcpu = data;
-+
-+	return kvm_read_guest(vcpu->kvm, pa, desc, sizeof(*desc));
-+}
-+
-+static void vtcr_to_walk_info(u64 vtcr, struct s2_walk_info *wi)
-+{
-+	wi->t0sz = vtcr & TCR_EL2_T0SZ_MASK;
-+
-+	switch (vtcr & VTCR_EL2_TG0_MASK) {
-+	case VTCR_EL2_TG0_4K:
-+		wi->pgshift = 12;	 break;
-+	case VTCR_EL2_TG0_16K:
-+		wi->pgshift = 14;	 break;
-+	case VTCR_EL2_TG0_64K:
-+	default:
-+		wi->pgshift = 16;	 break;
-+	}
-+
-+	wi->pgsize = BIT(wi->pgshift);
-+	wi->ps = FIELD_GET(VTCR_EL2_PS_MASK, vtcr);
-+	wi->sl = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
-+	wi->max_ipa_bits = VTCR_EL2_IPA(vtcr);
-+	/* Global limit for now, should eventually be per-VM */
-+	wi->max_pa_bits = get_kvm_ipa_limit();
-+}
-+
-+int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
-+		       struct kvm_s2_trans *result)
-+{
-+	u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
-+	struct s2_walk_info wi;
-+	int ret;
-+
-+	result->esr = 0;
-+
-+	if (!vcpu_has_nv(vcpu))
-+		return 0;
-+
-+	wi.read_desc = read_guest_s2_desc;
-+	wi.data = vcpu;
-+	wi.baddr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-+
-+	vtcr_to_walk_info(vtcr, &wi);
-+
-+	wi.be = vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_EE;
-+
-+	ret = walk_nested_s2_pgd(gipa, &wi, result);
-+	if (ret)
-+		result->esr |= (kvm_vcpu_get_esr(vcpu) & ~ESR_ELx_FSC);
-+
-+	return ret;
-+}
-+
- /* Must be called with kvm->mmu_lock held */
- struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu)
- {
+ 	read_lock(&kvm->mmu_lock);
+ 	pgt = vcpu->arch.hw_mmu->pgt;
+ 	if (mmu_invalidate_retry(kvm, mmu_seq))
+@@ -1628,7 +1639,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 
+ 	if (device)
+ 		prot |= KVM_PGTABLE_PROT_DEVICE;
+-	else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
++	else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC) &&
++		 (!nested || kvm_s2_trans_executable(nested)))
+ 		prot |= KVM_PGTABLE_PROT_X;
+ 
+ 	/*
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index f4014ae0f901..e4203d106b71 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -496,7 +496,7 @@ int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, struct kvm_s2_trans *trans)
+ 		return 0;
+ 
+ 	if (kvm_vcpu_trap_is_iabt(vcpu)) {
+-		forward_fault = (trans->upper_attr & BIT(54));
++		forward_fault = !kvm_s2_trans_executable(trans);
+ 	} else {
+ 		bool write_fault = kvm_is_write_fault(vcpu);
+ 
 -- 
 2.39.2
 
