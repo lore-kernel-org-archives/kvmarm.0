@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1737C1B27C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2972C1B270
 	for <kvmarm@lists.linux.dev>; Mon, 20 Nov 2023 12:37:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mgw5POOK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D57A7C433B9;
-	Mon, 20 Nov 2023 12:37:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FxgOtxzg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01306C433BA;
+	Mon, 20 Nov 2023 12:37:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700483866;
-	bh=xyv7IeaSGe8th527glL17xgGvdT9ZXoUm+tJwOJ5XoU=;
+	s=k20201202; t=1700483867;
+	bh=lynjrJEz/BHjtI6s1T8jQIpyNGuzaukrA+2hTJuP2Mg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mgw5POOKQS0XnPo+vsBu5USAoDMJiJRWAqS//ZF8dR/YHJYtprpUgrJ2BYofnK0Gy
-	 PJQuzwsUYHKlQyJinzD7Aog8TrD/s/Y3oxZCnatbPbJI4dlEcOEM+SkqB6H83PkxNA
-	 Xk76Dtvn66kiSi2sYhW/XFe5JFYrpWg2Nj+ddgn2kh2U6NHRBrVA7sH1YItXoCWllE
-	 6AN+hq1KCPbpcyz9ra5t6UQdR1pOUcKTEjhX41ZuVA2tR4F6ant93WA8YenjsEfQZT
-	 7wDgz94rt4fzqZFtlIj/TeoFD98O4l4pN9z/WaE2uiHq7q03y0T7ntaG4+vmcYbIMd
-	 YhlbZ/n5C/Afg==
+	b=FxgOtxzgBfL3MrT+WDvbYYZ+8lmrpyKaunIiejSDZ+81ZgUXpmxcIvpCsWFwGPP1o
+	 ZqF3C0z1pnUJqAGcg+1ttwo5jVsjAegnmkTL/hYiVD6LepakHsreVwYiz7XH2RFq5G
+	 LjQDBwUDEvqcxWU+JE4VlZrh9N1H54HVjsP9LWGQ9mcYmcmJLUJTp73Kbffecln3dG
+	 GwGjq2yTzLkBdBJ9V/rUMxKTKAEBU2YNcBXYVymjHSOr4/8cPUF6MpcYft2A/piMtp
+	 gkTrVD4KjmKandlBdCsT4M0m9yizUDLBmiznb2wyjB/P2JDfOkGGX2DREw0wzNLIfE
+	 tb5xEMYmKG/nQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1r53X6-00EjJv-O9;
-	Mon, 20 Nov 2023 12:37:44 +0000
+	id 1r53X6-00EjJv-UR;
+	Mon, 20 Nov 2023 12:37:45 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -34,9 +34,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 05/13] arm64: cpufeature: Add ID_AA64MMFR4_EL1 handling
-Date: Mon, 20 Nov 2023 12:37:13 +0000
-Message-Id: <20231120123721.851738-6-maz@kernel.org>
+Subject: [PATCH v2 06/13] arm64: cpufeature: Detect E2H0 not being implemented
+Date: Mon, 20 Nov 2023 12:37:14 +0000
+Message-Id: <20231120123721.851738-7-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231120123721.851738-1-maz@kernel.org>
 References: <20231120123721.851738-1-maz@kernel.org>
@@ -52,73 +52,49 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add ID_AA64MMFR4_EL1 to the list of idregs the kernel knows about,
-and describe the E2H0 field.
+FEAT_E2H0 is a new feature that indicates whether or not HCR_EL2.E2H
+can be set to 0. Amusingly, this feature is set to 0 when implemented,
+and otherwise negative.
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+Add a new capability and detection infrastructure to detect the
+absence of FEAT_E2H0.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/cpu.h   | 1 +
  arch/arm64/kernel/cpufeature.c | 7 +++++++
- arch/arm64/kernel/cpuinfo.c    | 1 +
- 3 files changed, 9 insertions(+)
+ arch/arm64/tools/cpucaps       | 1 +
+ 2 files changed, 8 insertions(+)
 
-diff --git a/arch/arm64/include/asm/cpu.h b/arch/arm64/include/asm/cpu.h
-index f3034099fd95..d5ba6ec9f711 100644
---- a/arch/arm64/include/asm/cpu.h
-+++ b/arch/arm64/include/asm/cpu.h
-@@ -57,6 +57,7 @@ struct cpuinfo_arm64 {
- 	u64		reg_id_aa64mmfr1;
- 	u64		reg_id_aa64mmfr2;
- 	u64		reg_id_aa64mmfr3;
-+	u64		reg_id_aa64mmfr4;
- 	u64		reg_id_aa64pfr0;
- 	u64		reg_id_aa64pfr1;
- 	u64		reg_id_aa64zfr0;
 diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 767a6f288755..41db7f993eef 100644
+index 41db7f993eef..e0d64e8b4851 100644
 --- a/arch/arm64/kernel/cpufeature.c
 +++ b/arch/arm64/kernel/cpufeature.c
-@@ -438,6 +438,11 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr3[] = {
- 	ARM64_FTR_END,
+@@ -2787,6 +2787,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = has_cpuid_feature,
+ 		ARM64_CPUID_FIELDS(ID_AA64MMFR2_EL1, EVT, IMP)
+ 	},
++	{
++		.desc = "FEAT_E2H0 not implemented",
++		.capability = ARM64_HCR_E2H_RES1,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.matches = has_cpuid_feature,
++		ARM64_CPUID_FIELDS_NEG(ID_AA64MMFR4_EL1, E2H0, NI)
++	},
+ 	{},
  };
  
-+static const struct arm64_ftr_bits ftr_id_aa64mmfr4[] = {
-+	S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR4_EL1_E2H0_SHIFT, 4, 0),
-+	ARM64_FTR_END,
-+};
-+
- static const struct arm64_ftr_bits ftr_ctr[] = {
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, 31, 1, 1), /* RES1 */
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_EL0_DIC_SHIFT, 1, 1),
-@@ -755,6 +760,7 @@ static const struct __ftr_reg_entry {
- 			       &id_aa64mmfr1_override),
- 	ARM64_FTR_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2),
- 	ARM64_FTR_REG(SYS_ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3),
-+	ARM64_FTR_REG(SYS_ID_AA64MMFR4_EL1, ftr_id_aa64mmfr4),
- 
- 	/* Op1 = 1, CRn = 0, CRm = 0 */
- 	ARM64_FTR_REG(SYS_GMID_EL1, ftr_gmid),
-@@ -1079,6 +1085,7 @@ void __init init_cpu_features(struct cpuinfo_arm64 *info)
- 	init_cpu_ftr_reg(SYS_ID_AA64MMFR1_EL1, info->reg_id_aa64mmfr1);
- 	init_cpu_ftr_reg(SYS_ID_AA64MMFR2_EL1, info->reg_id_aa64mmfr2);
- 	init_cpu_ftr_reg(SYS_ID_AA64MMFR3_EL1, info->reg_id_aa64mmfr3);
-+	init_cpu_ftr_reg(SYS_ID_AA64MMFR4_EL1, info->reg_id_aa64mmfr4);
- 	init_cpu_ftr_reg(SYS_ID_AA64PFR0_EL1, info->reg_id_aa64pfr0);
- 	init_cpu_ftr_reg(SYS_ID_AA64PFR1_EL1, info->reg_id_aa64pfr1);
- 	init_cpu_ftr_reg(SYS_ID_AA64ZFR0_EL1, info->reg_id_aa64zfr0);
-diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
-index a257da7b56fe..a4205effca46 100644
---- a/arch/arm64/kernel/cpuinfo.c
-+++ b/arch/arm64/kernel/cpuinfo.c
-@@ -452,6 +452,7 @@ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *info)
- 	info->reg_id_aa64mmfr1 = read_cpuid(ID_AA64MMFR1_EL1);
- 	info->reg_id_aa64mmfr2 = read_cpuid(ID_AA64MMFR2_EL1);
- 	info->reg_id_aa64mmfr3 = read_cpuid(ID_AA64MMFR3_EL1);
-+	info->reg_id_aa64mmfr4 = read_cpuid(ID_AA64MMFR4_EL1);
- 	info->reg_id_aa64pfr0 = read_cpuid(ID_AA64PFR0_EL1);
- 	info->reg_id_aa64pfr1 = read_cpuid(ID_AA64PFR1_EL1);
- 	info->reg_id_aa64zfr0 = read_cpuid(ID_AA64ZFR0_EL1);
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index b98c38288a9d..8866ea9bf995 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -52,6 +52,7 @@ HAS_TIDCP1
+ HAS_TLB_RANGE
+ HAS_VIRT_HOST_EXTN
+ HAS_WFXT
++HCR_E2H_RES1
+ HW_DBM
+ KVM_HVHE
+ KVM_PROTECTED_MODE
 -- 
 2.39.2
 
