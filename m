@@ -1,70 +1,63 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B2C210F0
-	for <kvmarm@lists.linux.dev>; Mon, 20 Nov 2023 17:28:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EBF661042;
-	Mon, 20 Nov 2023 09:29:08 -0800 (PST)
-Received: from arm.com (e121798.cambridge.arm.com [10.1.197.44])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8A0073F7A6;
-	Mon, 20 Nov 2023 09:28:21 -0800 (PST)
-Date: Mon, 20 Nov 2023 17:28:19 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	andrew.jones@linux.dev, maz@kernel.org, oliver.upton@linux.dev,
-	jarichte@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 1/2] arm: pmu: Declare pmu_stats as
- volatile
-Message-ID: <ZVuXM98kh2r0AmEj@arm.com>
-References: <20231113174316.341630-1-eric.auger@redhat.com>
- <20231113174316.341630-2-eric.auger@redhat.com>
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AADD34567
+	for <kvmarm@lists.linux.dev>; Mon, 20 Nov 2023 19:21:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sZ143lJR"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1700508111;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3vzrrZq9ytY8Rewnx1/LbL/B9hFkRInU9eyjNfEWPyo=;
+	b=sZ143lJRzKcxT6rLMjlWyn69+lZKEE8DYBNp02X15reLSa3m7sZ2zQtN7hGdTfBm6T3Lv9
+	vhIqVDuPJw5wYFGFV66EiPBEKjzF7WVJr5wE3MNhmgOFfu53vCwWkgpDiThEVlrBtnvthS
+	XzJ0N7fbElBYcLeA/L7TSdaaYjynt+Y=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Kunkun Jiang <jiangkunkun@huawei.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	eric.auger@redhat.com,
+	Catalin Marinas <catalin.marinas@arm.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	wanghaibin.wang@huawei.com
+Subject: Re: [PATCH v3] KVM: arm64: GICv4: Do not perform a map to a mapped vLPI
+Date: Mon, 20 Nov 2023 19:21:34 +0000
+Message-ID: <170050808707.568776.18148802695411382186.b4-ty@linux.dev>
+In-Reply-To: <20231120131210.2039-1-jiangkunkun@huawei.com>
+References: <20231120131210.2039-1-jiangkunkun@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231113174316.341630-2-eric.auger@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi,
-
-On Mon, Nov 13, 2023 at 06:42:40PM +0100, Eric Auger wrote:
-> Declare pmu_stats as volatile in order to prevent the compiler
-> from caching previously read values. This actually fixes
-> pmu-overflow-interrupt failures on some HW.
-
-Looks good to me:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-Alex
-
+On Mon, 20 Nov 2023 21:12:10 +0800, Kunkun Jiang wrote:
+> Before performing a map, let's check whether the vLPI has been
+> mapped.
 > 
-> Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  arm/pmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index a91a7b1f..86199577 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -328,7 +328,7 @@ asm volatile(
->  	: "x9", "x10", "cc");
->  }
->  
-> -static struct pmu_stats pmu_stats;
-> +static volatile struct pmu_stats pmu_stats;
->  
->  static void irq_handler(struct pt_regs *regs)
->  {
-> -- 
-> 2.41.0
-> 
+
+Applied to kvmarm/fixes, thanks!
+
+[1/1] KVM: arm64: GICv4: Do not perform a map to a mapped vLPI
+      https://git.kernel.org/kvmarm/kvmarm/c/8e4ece6889a5
+
+--
+Best,
+Oliver
