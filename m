@@ -1,27 +1,27 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F27691B27E
-	for <kvmarm@lists.linux.dev>; Mon, 20 Nov 2023 12:37:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1737C1B27C
+	for <kvmarm@lists.linux.dev>; Mon, 20 Nov 2023 12:37:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dRNxqfbh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76E25C433A9;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mgw5POOK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D57A7C433B9;
 	Mon, 20 Nov 2023 12:37:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1700483866;
-	bh=vtc/5i6kKGwwu5BufGLykkpy1F0YD84NHR2T4NoIoUU=;
+	bh=xyv7IeaSGe8th527glL17xgGvdT9ZXoUm+tJwOJ5XoU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dRNxqfbh1jzkFJf77g7zg7wNraBJPkF5RGRNx3zpH8aUKLRNoDC8rWq8qHAatPA2R
-	 vgO0aouZ8392ckzEzJuUb1usSOWfOQ8YjS+u/WQoOVWaExddZ2sIVwqi+yf7kL06Do
-	 PmgntSz+icctQMp5+LukVrZyrSYFIW/J7HJxCryYHbbBJqBUZ0bil3vdokk/472KXE
-	 6QfdzPRCodMoQmfBODS+n+qyF2039WRSt9NMa48GcLMRROJ9vPHSJlUtQwVT2qo4sz
-	 OCWf7WRlRfdhv/yzFk8ELTyQui6mwSVF2DmLNGIOlK1vIaolHwpySkUc9pcqp+fm4I
-	 IkCh0VMQR79rQ==
+	b=mgw5POOKQS0XnPo+vsBu5USAoDMJiJRWAqS//ZF8dR/YHJYtprpUgrJ2BYofnK0Gy
+	 PJQuzwsUYHKlQyJinzD7Aog8TrD/s/Y3oxZCnatbPbJI4dlEcOEM+SkqB6H83PkxNA
+	 Xk76Dtvn66kiSi2sYhW/XFe5JFYrpWg2Nj+ddgn2kh2U6NHRBrVA7sH1YItXoCWllE
+	 6AN+hq1KCPbpcyz9ra5t6UQdR1pOUcKTEjhX41ZuVA2tR4F6ant93WA8YenjsEfQZT
+	 7wDgz94rt4fzqZFtlIj/TeoFD98O4l4pN9z/WaE2uiHq7q03y0T7ntaG4+vmcYbIMd
+	 YhlbZ/n5C/Afg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1r53X6-00EjJv-CI;
+	id 1r53X6-00EjJv-O9;
 	Mon, 20 Nov 2023 12:37:44 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
@@ -34,9 +34,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 03/13] arm64: cpufeature: Correctly display signed override values
-Date: Mon, 20 Nov 2023 12:37:11 +0000
-Message-Id: <20231120123721.851738-4-maz@kernel.org>
+Subject: [PATCH v2 05/13] arm64: cpufeature: Add ID_AA64MMFR4_EL1 handling
+Date: Mon, 20 Nov 2023 12:37:13 +0000
+Message-Id: <20231120123721.851738-6-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231120123721.851738-1-maz@kernel.org>
 References: <20231120123721.851738-1-maz@kernel.org>
@@ -52,32 +52,73 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When a field gets overriden, the kernel indicates the result of
-the override in dmesg. This works well with unsigned fields, but
-results in a pretty ugly output when the field is signed.
-
-Truncate the field to its width before displaying it.
+Add ID_AA64MMFR4_EL1 to the list of idregs the kernel knows about,
+and describe the E2H0 field.
 
 Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kernel/cpufeature.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/cpu.h   | 1 +
+ arch/arm64/kernel/cpufeature.c | 7 +++++++
+ arch/arm64/kernel/cpuinfo.c    | 1 +
+ 3 files changed, 9 insertions(+)
 
+diff --git a/arch/arm64/include/asm/cpu.h b/arch/arm64/include/asm/cpu.h
+index f3034099fd95..d5ba6ec9f711 100644
+--- a/arch/arm64/include/asm/cpu.h
++++ b/arch/arm64/include/asm/cpu.h
+@@ -57,6 +57,7 @@ struct cpuinfo_arm64 {
+ 	u64		reg_id_aa64mmfr1;
+ 	u64		reg_id_aa64mmfr2;
+ 	u64		reg_id_aa64mmfr3;
++	u64		reg_id_aa64mmfr4;
+ 	u64		reg_id_aa64pfr0;
+ 	u64		reg_id_aa64pfr1;
+ 	u64		reg_id_aa64zfr0;
 diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index e52d2c2b757f..767a6f288755 100644
+index 767a6f288755..41db7f993eef 100644
 --- a/arch/arm64/kernel/cpufeature.c
 +++ b/arch/arm64/kernel/cpufeature.c
-@@ -950,7 +950,8 @@ static void init_cpu_ftr_reg(u32 sys_reg, u64 new)
- 				pr_warn("%s[%d:%d]: %s to %llx\n",
- 					reg->name,
- 					ftrp->shift + ftrp->width - 1,
--					ftrp->shift, str, tmp);
-+					ftrp->shift, str,
-+					tmp & (BIT(ftrp->width) - 1));
- 		} else if ((ftr_mask & reg->override->val) == ftr_mask) {
- 			reg->override->val &= ~ftr_mask;
- 			pr_warn("%s[%d:%d]: impossible override, ignored\n",
+@@ -438,6 +438,11 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr3[] = {
+ 	ARM64_FTR_END,
+ };
+ 
++static const struct arm64_ftr_bits ftr_id_aa64mmfr4[] = {
++	S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR4_EL1_E2H0_SHIFT, 4, 0),
++	ARM64_FTR_END,
++};
++
+ static const struct arm64_ftr_bits ftr_ctr[] = {
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, 31, 1, 1), /* RES1 */
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_EL0_DIC_SHIFT, 1, 1),
+@@ -755,6 +760,7 @@ static const struct __ftr_reg_entry {
+ 			       &id_aa64mmfr1_override),
+ 	ARM64_FTR_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2),
+ 	ARM64_FTR_REG(SYS_ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3),
++	ARM64_FTR_REG(SYS_ID_AA64MMFR4_EL1, ftr_id_aa64mmfr4),
+ 
+ 	/* Op1 = 1, CRn = 0, CRm = 0 */
+ 	ARM64_FTR_REG(SYS_GMID_EL1, ftr_gmid),
+@@ -1079,6 +1085,7 @@ void __init init_cpu_features(struct cpuinfo_arm64 *info)
+ 	init_cpu_ftr_reg(SYS_ID_AA64MMFR1_EL1, info->reg_id_aa64mmfr1);
+ 	init_cpu_ftr_reg(SYS_ID_AA64MMFR2_EL1, info->reg_id_aa64mmfr2);
+ 	init_cpu_ftr_reg(SYS_ID_AA64MMFR3_EL1, info->reg_id_aa64mmfr3);
++	init_cpu_ftr_reg(SYS_ID_AA64MMFR4_EL1, info->reg_id_aa64mmfr4);
+ 	init_cpu_ftr_reg(SYS_ID_AA64PFR0_EL1, info->reg_id_aa64pfr0);
+ 	init_cpu_ftr_reg(SYS_ID_AA64PFR1_EL1, info->reg_id_aa64pfr1);
+ 	init_cpu_ftr_reg(SYS_ID_AA64ZFR0_EL1, info->reg_id_aa64zfr0);
+diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
+index a257da7b56fe..a4205effca46 100644
+--- a/arch/arm64/kernel/cpuinfo.c
++++ b/arch/arm64/kernel/cpuinfo.c
+@@ -452,6 +452,7 @@ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *info)
+ 	info->reg_id_aa64mmfr1 = read_cpuid(ID_AA64MMFR1_EL1);
+ 	info->reg_id_aa64mmfr2 = read_cpuid(ID_AA64MMFR2_EL1);
+ 	info->reg_id_aa64mmfr3 = read_cpuid(ID_AA64MMFR3_EL1);
++	info->reg_id_aa64mmfr4 = read_cpuid(ID_AA64MMFR4_EL1);
+ 	info->reg_id_aa64pfr0 = read_cpuid(ID_AA64PFR0_EL1);
+ 	info->reg_id_aa64pfr1 = read_cpuid(ID_AA64PFR1_EL1);
+ 	info->reg_id_aa64zfr0 = read_cpuid(ID_AA64ZFR0_EL1);
 -- 
 2.39.2
 
