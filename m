@@ -1,181 +1,114 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15098125A5
-	for <kvmarm@lists.linux.dev>; Mon, 20 Nov 2023 09:58:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B381B268
+	for <kvmarm@lists.linux.dev>; Mon, 20 Nov 2023 12:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="eAF0KRxg"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=RRH8ihRwgqqNWiOQXVgz2lSe5cF5QqM2TrvGcFPpVxQ=; b=eAF0KRxgbthRFbPQ6izZC3J3oy
-	NoICC18OIT3Qs7cMSCHEyKdPJVEqlqYYz46JeVVogCAoBWUhXiyxhy9SzyCivvREMDfvxXZSrMpqk
-	BHZ3abqeLK7FySm29lIYiV3szbHsZGZ0MEwL9YBdWcQ/tt0m9Epi+ARclf048DAo9sTRBExtXyU2Y
-	OWqc0bZ0sBPg5y7tECdJwrgrcIV0utpcws+XvnYsepZe+SO7zSvE1M0Dc3TnoMMhyx+qLFfvV/gAy
-	zBVN1YBhtJaSqBUjieLhtAr5Xh4FKBvt+x6MQT63nLwsYbtpT2WmNNA7nk4PLOb78D4oGUQs88/cg
-	AGe8pcpA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43368)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r512Z-0005Gn-2Y;
-	Mon, 20 Nov 2023 09:58:05 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r512Z-00034w-8Z; Mon, 20 Nov 2023 09:58:03 +0000
-Date: Mon, 20 Nov 2023 09:58:03 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jianyong Wu <Jianyong.Wu@arm.com>
-Cc: "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
-	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
-	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"x86@kernel.org" <x86@kernel.org>,
-	"linux-csky@vger.kernel.org" <linux-csky@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>,
-	"linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Justin He <Justin.He@arm.com>, James Morse <James.Morse@arm.com>,
-	Catalin Marinas <Catalin.Marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <Mark.Rutland@arm.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>
-Subject: Re: [PATCH 34/39] arm64: psci: Ignore DENIED CPUs
-Message-ID: <ZVstq+vhQSP73Nua@shell.armlinux.org.uk>
-References: <ZTffkAdOqL2pI2la@shell.armlinux.org.uk>
- <E1qvJBQ-00AqS8-8B@rmk-PC.armlinux.org.uk>
- <DB9PR08MB7511B178CA811C412766FDBAF4B0A@DB9PR08MB7511.eurprd08.prod.outlook.com>
- <ZVsl1ZQ9JRXPf4qH@shell.armlinux.org.uk>
- <DB9PR08MB7511C8825028074748FBB967F4B4A@DB9PR08MB7511.eurprd08.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hywe6rTc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3352DC433CA;
+	Mon, 20 Nov 2023 12:37:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700483866;
+	bh=o1Af8RlLYq5KNrqzHXwdQGYNbC5eu5P1hNsEZPEoKPc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Hywe6rTcw3kW8tKCaZ6sonscW528Sy6sme58bbKzxNI6c9EFSM6lI+bKGunEunOxW
+	 is/pSMzEtC4tfXxK8nyQT8biFIAFRoPVZcDl8Ujt3CzU71uAca1sTgj9HHdh9mgkA7
+	 devS5Mjlk9huqZgIxfJ1nikspvrsGST8+dRReyJQl4wQZIzlZq21h+TWLvFZKccvs1
+	 Ub2aVVjx0MFtA+Lc1HwSFouSfujczSac3qXFjj59xvo+cMydc5Pj2k+SnFOUYwMZq7
+	 nAECsnzOO3qH8pKXN8i5CpiES4GuFoNV9dbmKqDwrboU6RGmqLG0X6MRl/fPGfJ2BI
+	 GuwjH9e3bCFNA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1r53X5-00EjJv-EB;
+	Mon, 20 Nov 2023 12:37:43 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v2 00/13] arm64: Add support for FEAT_E2H0, or lack thereof
+Date: Mon, 20 Nov 2023 12:37:08 +0000
+Message-Id: <20231120123721.851738-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <DB9PR08MB7511C8825028074748FBB967F4B4A@DB9PR08MB7511.eurprd08.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, ardb@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Nov 20, 2023 at 09:36:05AM +0000, Jianyong Wu wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Russell King <linux@armlinux.org.uk>
-> > Sent: 2023年11月20日 17:25
-> > To: Jianyong Wu <Jianyong.Wu@arm.com>
-> > Cc: linux-pm@vger.kernel.org; loongarch@lists.linux.dev;
-> > linux-acpi@vger.kernel.org; linux-arch@vger.kernel.org;
-> > linux-kernel@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
-> > linux-riscv@lists.infradead.org; kvmarm@lists.linux.dev; x86@kernel.org;
-> > linux-csky@vger.kernel.org; linux-doc@vger.kernel.org;
-> > linux-ia64@vger.kernel.org; linux-parisc@vger.kernel.org; Salil Mehta
-> > <salil.mehta@huawei.com>; Jean-Philippe Brucker <jean-philippe@linaro.org>;
-> > Justin He <Justin.He@arm.com>; James Morse <James.Morse@arm.com>;
-> > Catalin Marinas <Catalin.Marinas@arm.com>; Will Deacon <will@kernel.org>;
-> > Mark Rutland <Mark.Rutland@arm.com>; Lorenzo Pieralisi
-> > <lpieralisi@kernel.org>
-> > Subject: Re: [PATCH 34/39] arm64: psci: Ignore DENIED CPUs
-> > 
-> > On Thu, Nov 16, 2023 at 07:45:51AM +0000, Jianyong Wu wrote:
-> > > Hi Russell,
-> > >
-> > > One inline comment.
-> > ...
-> > > > Changes since RFC v2
-> > > >  * Add specification reference
-> > > >  * Use EPERM rather than EPROBE_DEFER
-> > ...
-> > > > @@ -40,7 +40,7 @@ static int cpu_psci_cpu_boot(unsigned int cpu)  {
-> > > >  	phys_addr_t pa_secondary_entry = __pa_symbol(secondary_entry);
-> > > >  	int err = psci_ops.cpu_on(cpu_logical_map(cpu), pa_secondary_entry);
-> > > > -	if (err)
-> > > > +	if (err && err != -EPROBE_DEFER)
-> > >
-> > > Should this be EPERM? As the following psci cpu_on op will return it.
-> > > I think you miss to change this when apply Jean-Philippe's patch.
-> > 
-> > It looks like James didn't properly update all places. Also,
-> > 
-> > > > diff --git a/drivers/firmware/psci/psci.c
-> > > > b/drivers/firmware/psci/psci.c index d9629ff87861..ee82e7880d8c
-> > > > 100644
-> > > > --- a/drivers/firmware/psci/psci.c
-> > > > +++ b/drivers/firmware/psci/psci.c
-> > > > @@ -218,6 +218,8 @@ static int __psci_cpu_on(u32 fn, unsigned long
-> > > > cpuid, unsigned long entry_point)
-> > > >  	int err;
-> > > >
-> > > >  	err = invoke_psci_fn(fn, cpuid, entry_point, 0);
-> > > > +	if (err == PSCI_RET_DENIED)
-> > > > +		return -EPERM;
-> > > >  	return psci_to_linux_errno(err);
-> > 
-> > This change is unnecessary - probably comes from when -EPROBE_DEFER was
-> > being used. psci_to_linux_errno() already does:
-> 
-> But may print lots of noise like:
-> 
-> [    0.008955] smp: Bringing up secondary CPUs ...
-> [    0.009661] psci: failed to boot CPU1 (-1)
-> [    0.010360] psci: failed to boot CPU2 (-1)
-> [    0.011164] psci: failed to boot CPU3 (-1)
-> [    0.011946] psci: failed to boot CPU4 (-1)
-> [    0.012764] psci: failed to boot CPU5 (-1)
-> [    0.013534] psci: failed to boot CPU6 (-1)
-> [    0.014349] psci: failed to boot CPU7 (-1)
-> [    0.014820] smp: Brought up 1 node, 1 CPU
-> 
-> Is this expected?
+Since ARMv8.1, the architecture has grown the VHE feature, which makes
+EL2 a superset of EL1. With ARMv9.5 (and retroactively allowed from
+ARMv8.1), the architecture allows implementations to have VHE as the
+*only* implemented behaviour, meaning that HCR_EL2.E2H can be
+implemented as RES1. As a follow-up, HCR_EL2.NV1 can also be
+implemented as RES0, making the VHE-ness of the architecture
+recursive.
 
-Please read my email again, and take note of the _context_ above the
-places that I've commented. Context matters.
+This has a number of consequences, both at boot time and for KVM,
+though the changes at that level are pretty minor.
 
-What I'm saying is that this change:
+The real meat of this series is on the cpufeature front, as FEAT_E2H0
+is a *negative* feature, where 0b1111 (-1) represents E2H being RES1
+and 0b1110 (-2) additionally indicates that NV1 is RES0. Fun, isn't
+it?
 
- 	err = invoke_psci_fn(fn, cpuid, entry_point, 0);
-+	if (err == PSCI_RET_DENIED)
-+		return -EPERM;
- 	return psci_to_linux_errno(err);
+As a bonus, a popular crop of non-compliant HW gets promoted as the
+first batch of non-zero E2H0 users, making things easy for KVM.
 
-Is unnecessary when psci_to_linux_errno() already does:
+This series is a prefix for the next drop of NV support.
 
-static __always_inline int psci_to_linux_errno(int errno)
-{
-	switch (errno) {
-	...
-	case PSCI_RET_DENIED:
-		return -EPERM;
+* From v1:
+  - Added a SYS_FIELD_VALUE() helper to handle the concatenation
+    of various fields
+  - Only test for the top bit of ID_AA64MMFR4_EL1.E2H0 to decide
+    whether HCR_EL2.E2H is RES1.
+  - Picked RBs from Oliver (thanks!)
+  - Rebased on 6.7-rc2
 
-So, a return of PSCI_RET_DENIED from invoke_psci_fn() above will
-_already_ be translated to -EPERM (which is -1) by
-psci_to_linux_errno(). There is no need to add that extra if()
-statement in __psci_cpu_on().
+Marc Zyngier (13):
+  arm64: Add macro to compose a sysreg field value
+  arm64: cpufeatures: Correctly handle signed values
+  arm64: cpufeature: Correctly display signed override values
+  arm64: sysreg: Add layout for ID_AA64MMFR4_EL1
+  arm64: cpufeature: Add ID_AA64MMFR4_EL1 handling
+  arm64: cpufeature: Detect E2H0 not being implemented
+  arm64: cpufeature: Detect HCR_EL2.NV1 being RES0
+  arm64: Treat HCR_EL2.E2H as RES1 when ID_AA64MMFR4_EL1.E2H0 is
+    negative
+  arm64: Add override for ID_AA64MMFR4_EL1.E2H0
+  arm64: Add MIDR-based override infrastructure
+  arm64: Add MIDR-based overrides for ID_AA64MMFR4_EL1.E2H0
+  KVM: arm64: Expose ID_AA64MMFR4_EL1 to guests
+  KVM: arm64: Force guest's HCR_EL2.E2H RES1 when NV1 is not implemented
 
-I was _not_ saying that the entire patch was unnecessary.
-
-Context matters. That's why we include context in replies.
-
-Standard email etiquette (before Microsoft messed it up) is to quote the
-email that is being replied to, trimming hard irrelevant content, and to
-place the reply comments immediately below the original content to which
-the comments relate, to give the reply comments the context necessary
-for correct interpretation.
-
-Thanks.
+ arch/arm64/include/asm/cpu.h         |  1 +
+ arch/arm64/include/asm/cpufeature.h  |  2 +
+ arch/arm64/include/asm/kvm_emulate.h |  3 +-
+ arch/arm64/include/asm/sysreg.h      |  7 ++-
+ arch/arm64/kernel/cpufeature.c       | 91 +++++++++++++++++++++++++---
+ arch/arm64/kernel/cpuinfo.c          |  1 +
+ arch/arm64/kernel/head.S             | 23 ++++---
+ arch/arm64/kernel/idreg-override.c   | 65 ++++++++++++++++++++
+ arch/arm64/kvm/nested.c              |  4 ++
+ arch/arm64/kvm/sys_regs.c            | 17 +++++-
+ arch/arm64/tools/cpucaps             |  2 +
+ arch/arm64/tools/sysreg              | 37 +++++++++++
+ 12 files changed, 229 insertions(+), 24 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.39.2
+
