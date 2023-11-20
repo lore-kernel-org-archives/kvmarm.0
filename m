@@ -1,27 +1,27 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8FC81A723
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F901A5BC
 	for <kvmarm@lists.linux.dev>; Mon, 20 Nov 2023 12:37:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IFBv3IxK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86377C433BF;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j6ZWZmvr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CE4FC433C9;
 	Mon, 20 Nov 2023 12:37:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1700483867;
-	bh=9EORvHTRj5Hyk03GKOs6Xv6B5LFUITT1V1qzyzuUTPY=;
+	bh=drqdatwZNNrfZOfvVDcMLo2myB2+/5lGPticb1sXcDE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IFBv3IxKFOGv3uLv70IFty9MIvKnBJU0J8GhZF5C4uiSHYubN/ZQEpv3DDTicoYet
-	 9I5mIRVuthWTA9DcxHNt6ef55CPPl2Y9K7VEVyLLkn3s6oRufgeIXBsM1RbmaA6Z9E
-	 dD+SPGppzrZhB3xMVQaSmxYJvIf+hkGZpDpp1XCO4NQBP4fhyvIBouybH7MK4mNkP8
-	 dsWamIOS1LpKmIB2jvkUy0M8qQlFWfhLwdn31xPBQzYNugHhvTanIVXPc+a2z/e4n0
-	 i/ZyvS26ELOI+TtdQoWHed5cUinYKqr1YB92gOPD3aKs05MxXfWbSWEUVp92I6v2rl
-	 yZSQlg3VyNlcg==
+	b=j6ZWZmvr+CYaXXzHHi4WlFCbdE+q5lKQTt1zGJCErNst6AaHMvL4ZBQQosiA8OSDR
+	 ilgyIvC8GPFcBLHE8m0dOFLHYyjg4b1an4B7b35werZykpALW69tu8dddyHxUA39x1
+	 NqCRMjCRwDgKPT0+Fj6x39i0TjREeRqkCCmhRXD8PPAlZa0P85ABzATlXxD2jK2Th1
+	 LJTMCxLRRbML24xkYPvblxybqIUczltHdp9Nwq6pE9YD2gCgZow+3cvcwIalkC3zP1
+	 q+5hjl6eqKDr9QiIp9uIJsOh29GjhKtzEyTkkdDsvzmTSeuU99QtlhQkLBTllQC5SR
+	 qenVY3xh/eewQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1r53X7-00EjJv-K1;
+	id 1r53X7-00EjJv-Cd;
 	Mon, 20 Nov 2023 12:37:45 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
@@ -34,9 +34,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 09/13] arm64: Add override for ID_AA64MMFR4_EL1.E2H0
-Date: Mon, 20 Nov 2023 12:37:17 +0000
-Message-Id: <20231120123721.851738-10-maz@kernel.org>
+Subject: [PATCH v2 08/13] arm64: Treat HCR_EL2.E2H as RES1 when ID_AA64MMFR4_EL1.E2H0 is negative
+Date: Mon, 20 Nov 2023 12:37:16 +0000
+Message-Id: <20231120123721.851738-9-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231120123721.851738-1-maz@kernel.org>
 References: <20231120123721.851738-1-maz@kernel.org>
@@ -52,78 +52,93 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Allow ID_AA64MMFR4_EL1.E2H0 to be overriden from the command-line.
-This will subsequently be of use for non-compliant CPUs.
+For CPUs that have ID_AA64MMFR4_EL1.E2H0 as negative, it is important
+to avoid the boot path that sets HCR_EL2.E2H=0. Fortunately, we
+already have this path to cope with fruity CPUs.
+
+Tweak init_el2 to look at ID_AA64MMFR4_EL1.E2H0 first.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/cpufeature.h |  1 +
- arch/arm64/kernel/cpufeature.c      |  4 +++-
- arch/arm64/kernel/idreg-override.c  | 10 ++++++++++
- 3 files changed, 14 insertions(+), 1 deletion(-)
+ arch/arm64/kernel/cpufeature.c |  5 ++---
+ arch/arm64/kernel/head.S       | 23 +++++++++++++++--------
+ 2 files changed, 17 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 5f3f62efebd5..d465db251939 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -901,6 +901,7 @@ s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new, s64 cur);
- struct arm64_ftr_reg *get_arm64_ftr_reg(u32 sys_id);
- 
- extern struct arm64_ftr_override id_aa64mmfr1_override;
-+extern struct arm64_ftr_override id_aa64mmfr4_override;
- extern struct arm64_ftr_override id_aa64pfr0_override;
- extern struct arm64_ftr_override id_aa64pfr1_override;
- extern struct arm64_ftr_override id_aa64zfr0_override;
 diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 64a026cc5cec..7dcda39537f8 100644
+index a733c9a83f83..64a026cc5cec 100644
 --- a/arch/arm64/kernel/cpufeature.c
 +++ b/arch/arm64/kernel/cpufeature.c
-@@ -691,6 +691,7 @@ static const struct arm64_ftr_bits ftr_raz[] = {
- 	__ARM64_FTR_REG_OVERRIDE(#id, id, table, &no_override)
+@@ -140,7 +140,6 @@ void dump_cpu_features(void)
+ 	pr_emerg("0x%*pb\n", ARM64_NCAPS, &system_cpucaps);
+ }
  
- struct arm64_ftr_override __ro_after_init id_aa64mmfr1_override;
-+struct arm64_ftr_override __ro_after_init id_aa64mmfr4_override;
- struct arm64_ftr_override __ro_after_init id_aa64pfr0_override;
- struct arm64_ftr_override __ro_after_init id_aa64pfr1_override;
- struct arm64_ftr_override __ro_after_init id_aa64zfr0_override;
-@@ -759,7 +760,8 @@ static const struct __ftr_reg_entry {
- 			       &id_aa64mmfr1_override),
- 	ARM64_FTR_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2),
- 	ARM64_FTR_REG(SYS_ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3),
--	ARM64_FTR_REG(SYS_ID_AA64MMFR4_EL1, ftr_id_aa64mmfr4),
-+	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR4_EL1, ftr_id_aa64mmfr4,
-+			       &id_aa64mmfr4_override),
+-#define __ARM64_EXPAND_RFV(reg, field, val)	reg##_##field##_##val
+ #define __ARM64_MAX_POSITIVE(reg, field)				\
+ 		((reg##_##field##_SIGNED ?				\
+ 		  BIT(reg##_##field##_WIDTH - 1) :			\
+@@ -165,7 +164,7 @@ void dump_cpu_features(void)
+  */
+ #define ARM64_CPUID_FIELDS(reg, field, min_value)			\
+ 	__ARM64_CPUID_FIELDS(reg, field,				\
+-			     __ARM64_EXPAND_RFV(reg, field, min_value),	\
++			     SYS_FIELD_VALUE(reg, field, min_value),	\
+ 			     __ARM64_MAX_POSITIVE(reg, field))
  
- 	/* Op1 = 1, CRn = 0, CRm = 0 */
- 	ARM64_FTR_REG(SYS_GMID_EL1, ftr_gmid),
-diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-index 3addc09f8746..7b5b9dc20e6b 100644
---- a/arch/arm64/kernel/idreg-override.c
-+++ b/arch/arm64/kernel/idreg-override.c
-@@ -55,6 +55,15 @@ static const struct ftr_set_desc mmfr1 __initconst = {
- 	},
- };
+ /*
+@@ -176,7 +175,7 @@ void dump_cpu_features(void)
+ #define ARM64_CPUID_FIELDS_NEG(reg, field, max_value)			\
+ 	__ARM64_CPUID_FIELDS(reg, field,				\
+ 			     __ARM64_MIN_NEGATIVE(reg, field),		\
+-			     __ARM64_EXPAND_RFV(reg, field, max_value))
++			     SYS_FIELD_VALUE(reg, field, max_value))
  
-+static const struct ftr_set_desc mmfr4 __initconst = {
-+	.name		= "id_aa64mmfr4",
-+	.override	= &id_aa64mmfr4_override,
-+	.fields		= {
-+		FIELD("e2h0", ID_AA64MMFR4_EL1_E2H0_SHIFT, NULL ),
-+		{}
-+	},
-+};
-+
- static bool __init pfr0_sve_filter(u64 val)
- {
+ #define __ARM64_FTR_BITS(SIGNED, VISIBLE, STRICT, TYPE, SHIFT, WIDTH, SAFE_VAL) \
+ 	{						\
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index 7b236994f0e1..57e39bc3b2b5 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -584,25 +584,32 @@ SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
+ 	mov_q	x1, INIT_SCTLR_EL1_MMU_OFF
+ 
  	/*
-@@ -161,6 +170,7 @@ static const struct ftr_set_desc sw_features __initconst = {
+-	 * Fruity CPUs seem to have HCR_EL2.E2H set to RES1,
+-	 * making it impossible to start in nVHE mode. Is that
+-	 * compliant with the architecture? Absolutely not!
++	 * Compliant CPUs advertise their VHE-onlyness with
++	 * ID_AA64MMFR4_EL1.E2H0 < 0. HCR_EL2.E2H can be
++	 * RES1 in that case.
++	 *
++	 * Fruity CPUs seem to have HCR_EL2.E2H set to RES1, but
++	 * don't advertise it (they predate this relaxation).
+ 	 */
++	mrs_s	x0, SYS_ID_AA64MMFR4_EL1
++	ubfx	x0, x0, #ID_AA64MMFR4_EL1_E2H0_SHIFT, #ID_AA64MMFR4_EL1_E2H0_WIDTH
++	tbnz	x0, #(ID_AA64MMFR4_EL1_E2H0_SHIFT + ID_AA64MMFR4_EL1_E2H0_WIDTH - 1), 1f
++
+ 	mrs	x0, hcr_el2
+ 	and	x0, x0, #HCR_E2H
+-	cbz	x0, 1f
+-
++	cbz	x0, 2f
++1:
+ 	/* Set a sane SCTLR_EL1, the VHE way */
+ 	pre_disable_mmu_workaround
+ 	msr_s	SYS_SCTLR_EL12, x1
+ 	mov	x2, #BOOT_CPU_FLAG_E2H
+-	b	2f
++	b	3f
  
- static const struct ftr_set_desc * const regs[] __initconst = {
- 	&mmfr1,
-+	&mmfr4,
- 	&pfr0,
- 	&pfr1,
- 	&isar1,
+-1:
++2:
+ 	pre_disable_mmu_workaround
+ 	msr	sctlr_el1, x1
+ 	mov	x2, xzr
+-2:
++3:
+ 	__init_el2_nvhe_prepare_eret
+ 
+ 	mov	w0, #BOOT_CPU_MODE_EL2
 -- 
 2.39.2
 
