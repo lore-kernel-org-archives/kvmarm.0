@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B45200A4;
-	Mon, 20 Nov 2023 13:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2835520310;
+	Mon, 20 Nov 2023 13:11:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pFY3dWZG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66318C43215;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="leRIynKs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F4047C433C8;
 	Mon, 20 Nov 2023 13:10:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700485859;
-	bh=oDj0YVrni5wEXdq+N3+sIfHK9iK03efJtiKGC9hTCyI=;
+	s=k20201202; t=1700485860;
+	bh=f2wnhl3iS5UjWwLnmUkNaAlpevGDuNY/t92e4wzTMrU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pFY3dWZGpmTKAdzCb8gF5HFyMMl9Ols5UlObYfxbsussEbB4/0ioQJ3NOf2YvBW4q
-	 9Dk07yqG51LrASj86lMQ1AUeOKpXENHDJJ21kmLwpkqy2Z4VjhNt2Hjhbwe3IWqfHb
-	 sNBQUSZYzdb3uGOGuVZ2xmf+3V1kDzwX5zPzY1XJCCwQmDOpS3TEiDF7R1LSUnHEpS
-	 hkGEKciUDnAzJw8I9lp5BEv7MZ+HzH8RRumNUKLCkI/fulCmW2vWY3tixC7dtnpOnC
-	 xaRKf6cqEzwNLpynPawZZnqniBDDuaCMiLtlak6KQwTTJ6ESPvVlPGKmsDGTyXOSVZ
-	 aM5fSZ98joTMQ==
+	b=leRIynKs02vga32hLrfxV9KFM13y2IcEoDDpVZz7JBAejU4j/2rvFcgA3puYdwioY
+	 nYAxr59mXRyiVXzxaNYYR9fsf5GERxVzHlXvEgS8B3fpJ+noG3R1Gn8XOhwOGYWfsJ
+	 pH8HYr+lrX2qVUEH+grFYMBldLT/js+RSh4MjoSYPPNeUQIzbtEF712pu74bDTG1H3
+	 eoPxLHGC/Hsp+Z5TbAQxmB+7krVIus6LHfZChvDtnUBhUBUefvJQJuRRPNlrMsFVHT
+	 HPIGjR0xYLUafnIzCUtXKZ6QRVWAk1t+sDZwDZ39iF1uap/QCJHpLjENSyYVGwkgRN
+	 gsPYjj7tYD43A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1r543F-00EjnU-Jm;
-	Mon, 20 Nov 2023 13:10:57 +0000
+	id 1r543G-00EjnU-45;
+	Mon, 20 Nov 2023 13:10:58 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v11 33/43] KVM: arm64: nv: Fold GICv3 host trapping requirements into guest setup
-Date: Mon, 20 Nov 2023 13:10:17 +0000
-Message-Id: <20231120131027.854038-34-maz@kernel.org>
+Subject: [PATCH v11 35/43] KVM: arm64: nv: Add handling of FEAT_TTL TLB invalidation
+Date: Mon, 20 Nov 2023 13:10:19 +0000
+Message-Id: <20231120131027.854038-36-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231120131027.854038-1-maz@kernel.org>
 References: <20231120131027.854038-1-maz@kernel.org>
@@ -58,76 +58,172 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Popular HW that is able to use NV also has a broken vgic implementation
-that requires trapping.
-
-On such HW, propagate the host trap bits into the guest's shadow
-ICH_HCR_EL2 register, making sure we don't allow an L2 guest to bring
-the system down.
-
-This involves a bit of tweaking so that the emulation code correctly
-poicks up the shadow state as needed, and to only partially sync
-ICH_HCR_EL2 back with the guest state to capture EOIcount.
+Support guest-provided information information to find out about
+the range of required invalidation.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v3-nested.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_nested.h |  2 +
+ arch/arm64/kvm/nested.c             | 90 +++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c           | 26 +--------
+ 3 files changed, 93 insertions(+), 25 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-index e4919cc82daf..b8f4dd39676c 100644
---- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -168,9 +168,19 @@ void vgic_v3_create_shadow_state(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_v3_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
- 	struct vgic_v3_cpu_if *host_if = &vcpu->arch.vgic_cpu.vgic_v3;
-+	u64 val = 0;
- 	int i;
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 4f94aef8a750..b878577bc2ce 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -128,6 +128,8 @@ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+ extern bool forward_smc_trap(struct kvm_vcpu *vcpu);
+ extern bool __check_nv_sr_forward(struct kvm_vcpu *vcpu);
  
--	s_cpu_if->vgic_hcr = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
-+	/*
-+	 * If we're on a system with a broken vgic that requires
-+	 * trapping, propagate the trapping requirements.
-+	 *
-+	 * Ah, the smell of rotten fruits...
-+	 */
-+	if (static_branch_unlikely(&vgic_v3_cpuif_trap))
-+		val = host_if->vgic_hcr & (ICH_HCR_TALL0 | ICH_HCR_TALL1 |
-+					   ICH_HCR_TC | ICH_HCR_TDIR);
-+	s_cpu_if->vgic_hcr = __vcpu_sys_reg(vcpu, ICH_HCR_EL2) | val;
- 	s_cpu_if->vgic_vmcr = __vcpu_sys_reg(vcpu, ICH_VMCR_EL2);
- 	s_cpu_if->vgic_sre = host_if->vgic_sre;
++unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val);
++
+ int kvm_init_nv_sysregs(struct kvm *kvm);
  
-@@ -203,6 +213,7 @@ void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
- void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_v3_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
-+	u64 val;
- 	int i;
+ #endif /* __ARM64_KVM_NESTED_H */
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index ad1df851997d..6f574602b7df 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -351,6 +351,96 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ 	return ret;
+ }
  
- 	__vgic_v3_save_state(s_cpu_if);
-@@ -211,7 +222,10 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
- 	 * Translate the shadow state HW fields back to the virtual ones
- 	 * before copying the shadow struct back to the nested one.
++static unsigned int ttl_to_size(u8 ttl)
++{
++	int level = ttl & 3;
++	int gran = (ttl >> 2) & 3;
++	unsigned int max_size = 0;
++
++	switch (gran) {
++	case TLBI_TTL_TG_4K:
++		switch (level) {
++		case 0:
++			break;
++		case 1:
++			max_size = SZ_1G;
++			break;
++		case 2:
++			max_size = SZ_2M;
++			break;
++		case 3:
++			max_size = SZ_4K;
++			break;
++		}
++		break;
++	case TLBI_TTL_TG_16K:
++		switch (level) {
++		case 0:
++		case 1:
++			break;
++		case 2:
++			max_size = SZ_32M;
++			break;
++		case 3:
++			max_size = SZ_16K;
++			break;
++		}
++		break;
++	case TLBI_TTL_TG_64K:
++		switch (level) {
++		case 0:
++		case 1:
++			/* No 52bit IPA support */
++			break;
++		case 2:
++			max_size = SZ_512M;
++			break;
++		case 3:
++			max_size = SZ_64K;
++			break;
++		}
++		break;
++	default:			/* No size information */
++		break;
++	}
++
++	return max_size;
++}
++
++unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
++{
++	unsigned long max_size;
++	u8 ttl;
++
++	ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
++
++	max_size = ttl_to_size(ttl);
++
++	if (!max_size) {
++		/* Compute the maximum extent of the invalidation */
++		switch (mmu->tlb_vtcr & VTCR_EL2_TG0_MASK) {
++		case VTCR_EL2_TG0_4K:
++			max_size = SZ_1G;
++			break;
++		case VTCR_EL2_TG0_16K:
++			max_size = SZ_32M;
++			break;
++		case VTCR_EL2_TG0_64K:
++			/*
++			 * No, we do not support 52bit IPA in nested yet. Once
++			 * we do, this should be 4TB.
++			 */
++			max_size = SZ_512M;
++			break;
++		default:
++			BUG();
++		}
++	}
++
++	WARN_ON(!max_size);
++	return max_size;
++}
++
+ /*
+  * We can have multiple *different* MMU contexts with the same VMID:
+  *
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c9e55c7697d5..9a82f42b45ed 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3229,36 +3229,12 @@ static void s2_mmu_unmap_stage2_ipa(struct kvm_s2_mmu *mmu,
+ 	 *
+ 	 * - NS bit: we're non-secure only.
+ 	 *
+-	 * - TTL field: We already have the granule size from the
+-	 *   VTCR_EL2.TG0 field, and the level is only relevant to the
+-	 *   guest's S2PT.
+-	 *
+ 	 * - IPA[51:48]: We don't support 52bit IPA just yet...
+ 	 *
+ 	 * And of course, adjust the IPA to be on an actual address.
  	 */
--	__vcpu_sys_reg(vcpu, ICH_HCR_EL2) = s_cpu_if->vgic_hcr;
-+	val = __vcpu_sys_reg(vcpu, ICH_HCR_EL2);
-+	val &= ~ICH_HCR_EOIcount_MASK;
-+	val |= (s_cpu_if->vgic_hcr & ICH_HCR_EOIcount_MASK);
-+	__vcpu_sys_reg(vcpu, ICH_HCR_EL2) = val;
- 	__vcpu_sys_reg(vcpu, ICH_VMCR_EL2) = s_cpu_if->vgic_vmcr;
+ 	base_addr = (info->ipa.addr & GENMASK_ULL(35, 0)) << 12;
+-
+-	/* Compute the maximum extent of the invalidation */
+-	switch (mmu->tlb_vtcr & VTCR_EL2_TG0_MASK) {
+-	case VTCR_EL2_TG0_4K:
+-		max_size = SZ_1G;
+-		break;
+-	case VTCR_EL2_TG0_16K:
+-		max_size = SZ_32M;
+-		break;
+-	case VTCR_EL2_TG0_64K:
+-		/*
+-		 * No, we do not support 52bit IPA in nested yet. Once
+-		 * we do, this should be 4TB.
+-		 */
+-		/* FIXME: remove the 52bit PA support from the IDregs */
+-		max_size = SZ_512M;
+-		break;
+-	default:
+-		BUG();
+-	}
+-
++	max_size = compute_tlb_inval_range(mmu, info->ipa.addr);
+ 	base_addr &= ~(max_size - 1);
  
- 	for (i = 0; i < 4; i++) {
-@@ -220,7 +234,7 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
- 	}
- 
- 	for (i = 0; i < s_cpu_if->used_lrs; i++) {
--		u64 val = __vcpu_sys_reg(vcpu, ICH_LRN(i));
-+		val = __vcpu_sys_reg(vcpu, ICH_LRN(i));
- 
- 		val &= ~ICH_LR_STATE;
- 		val |= s_cpu_if->vgic_lr[i] & ICH_LR_STATE;
+ 	kvm_unmap_stage2_range(mmu, base_addr, max_size);
 -- 
 2.39.2
 
