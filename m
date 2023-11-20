@@ -1,27 +1,27 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F27AA1B280
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F27691B27E
 	for <kvmarm@lists.linux.dev>; Mon, 20 Nov 2023 12:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="APrL7bq+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A030AC433AB;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dRNxqfbh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76E25C433A9;
 	Mon, 20 Nov 2023 12:37:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1700483866;
-	bh=A5I5Ank97gMJHjlMkiOS6x44usmfYJbXquzi5rguQ0s=;
+	bh=vtc/5i6kKGwwu5BufGLykkpy1F0YD84NHR2T4NoIoUU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=APrL7bq+srqyXeaR3vd/7GDSTCg+tLtoLMfEMCm0DXHLcMWb+LShKjiw4cUmeWgHE
-	 07dfbVrG6ppZyHGWfeNoSZ/t3Jr1x4pcxzc14xOmnxeqx0JoYTYlU4Vk8r8XOngn8Q
-	 ltgJ+/WafbiqtUMn2AcRLTWqpNRzQKx5mSrYIEAsQRHqCEg9+pBsq3a1iLcFRotF2W
-	 xt3tdpT4C8RoketuzCtOLCTBAfm5yMupFSEqSoUyofDVqZjIF8NitJB2NdydRYx9NG
-	 2crYd5KDssIrFCtMmfPzaKnPtPxLnwksTgNRjK2HvJ69P/kJeRcze6xVEuIEwEcY3Z
-	 uPWsDbt7X+dmQ==
+	b=dRNxqfbh1jzkFJf77g7zg7wNraBJPkF5RGRNx3zpH8aUKLRNoDC8rWq8qHAatPA2R
+	 vgO0aouZ8392ckzEzJuUb1usSOWfOQ8YjS+u/WQoOVWaExddZ2sIVwqi+yf7kL06Do
+	 PmgntSz+icctQMp5+LukVrZyrSYFIW/J7HJxCryYHbbBJqBUZ0bil3vdokk/472KXE
+	 6QfdzPRCodMoQmfBODS+n+qyF2039WRSt9NMa48GcLMRROJ9vPHSJlUtQwVT2qo4sz
+	 OCWf7WRlRfdhv/yzFk8ELTyQui6mwSVF2DmLNGIOlK1vIaolHwpySkUc9pcqp+fm4I
+	 IkCh0VMQR79rQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1r53X6-00EjJv-ID;
+	id 1r53X6-00EjJv-CI;
 	Mon, 20 Nov 2023 12:37:44 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
@@ -34,9 +34,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 04/13] arm64: sysreg: Add layout for ID_AA64MMFR4_EL1
-Date: Mon, 20 Nov 2023 12:37:12 +0000
-Message-Id: <20231120123721.851738-5-maz@kernel.org>
+Subject: [PATCH v2 03/13] arm64: cpufeature: Correctly display signed override values
+Date: Mon, 20 Nov 2023 12:37:11 +0000
+Message-Id: <20231120123721.851738-4-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231120123721.851738-1-maz@kernel.org>
 References: <20231120123721.851738-1-maz@kernel.org>
@@ -52,65 +52,32 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-ARMv9.5 has infroduced ID_AA64MMFR4_EL1 with a bunch of new features.
-Add the corresponding layout.
+When a field gets overriden, the kernel indicates the result of
+the override in dmesg. This works well with unsigned fields, but
+results in a pretty ugly output when the field is signed.
 
-This is extracted from the public ARM SysReg_xml_A_profile-2023-09
-delivery, timestamped d55f5af8e09052abe92a02adf820deea2eaed717.
+Truncate the field to its width before displaying it.
 
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/tools/sysreg | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ arch/arm64/kernel/cpufeature.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 96cbeeab4eec..7fb3a4928256 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -1675,6 +1675,43 @@ UnsignedEnum	3:0	TCRX
- EndEnum
- EndSysreg
- 
-+Sysreg	ID_AA64MMFR4_EL1	3	0	0	7	4
-+Res0	63:40
-+UnsignedEnum	39:36	E3DSE
-+	0b0000	NI
-+	0b0001	IMP
-+EndEnum
-+Res0	35:28
-+SignedEnum	27:24	E2H0
-+	0b0000	IMP
-+	0b1110	NI_NV1
-+	0b1111	NI
-+EndEnum
-+UnsignedEnum	23:20	NV_frac
-+	0b0000	NV_NV2
-+	0b0001	NV2_ONLY
-+EndEnum
-+UnsignedEnum	19:16	FGWTE3
-+	0b0000	NI
-+	0b0001	IMP
-+EndEnum
-+UnsignedEnum	15:12	HACDBS
-+	0b0000	NI
-+	0b0001	IMP
-+EndEnum
-+UnsignedEnum	11:8	ASID2
-+	0b0000	NI
-+	0b0001	IMP
-+EndEnum
-+SignedEnum	7:4	EIESB
-+	0b0000	NI
-+	0b0001	ToEL3
-+	0b0010	ToELx
-+	0b1111	ANY
-+EndEnum
-+Res0	3:0
-+EndSysreg
-+
- Sysreg	SCTLR_EL1	3	0	1	0	0
- Field	63	TIDCP
- Field	62	SPINTMASK
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index e52d2c2b757f..767a6f288755 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -950,7 +950,8 @@ static void init_cpu_ftr_reg(u32 sys_reg, u64 new)
+ 				pr_warn("%s[%d:%d]: %s to %llx\n",
+ 					reg->name,
+ 					ftrp->shift + ftrp->width - 1,
+-					ftrp->shift, str, tmp);
++					ftrp->shift, str,
++					tmp & (BIT(ftrp->width) - 1));
+ 		} else if ((ftr_mask & reg->override->val) == ftr_mask) {
+ 			reg->override->val &= ~ftr_mask;
+ 			pr_warn("%s[%d:%d]: impossible override, ignored\n",
 -- 
 2.39.2
 
