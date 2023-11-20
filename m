@@ -1,114 +1,54 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DEF1C280;
-	Mon, 20 Nov 2023 14:09:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r45lYZBB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A142C433C9;
-	Mon, 20 Nov 2023 14:09:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700489371;
-	bh=hoIhA8+0yRB+8xKNhUqRCTi4Cj0Q9PRSELx11+Gdf9k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=r45lYZBBqyt2qIC3VTWvXeFOLpp7CslcoudAqZHo3c3ToiD3advJLwF+LCeQTSM4V
-	 ian9GJtKKF/6WQNbnSlPU6HPsyneu0ZkHaso51fhQyb5HfooUycrugoOjqW3AvaFvH
-	 JbSyG7Q6aiUwYwnG9OQSQDRK4H2FDhgaP+yGZfOW9mvm9hc6UiF2csU75mRMpuJsB/
-	 u1dCYBO9SVZu1FuLumVUvtcx32ALSNqXSMdsp9G0IufrXorcmRf7kCkpyLAOe7IGza
-	 CZVtn9hq2ML7D6TA2ZoEM+IA98iwR0d/sA7ltvFzg0zveh92v1bjHGQjv6XIUZ6hjb
-	 x08JifS0gmx4Q==
-Date: Mon, 20 Nov 2023 14:09:17 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Sean Christopherson <seanjc@google.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
-	David Matlack <dmatlack@google.com>,
-	Yu Zhang <yu.c.zhang@linux.intel.com>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Maciej Szmigiero <mail@maciej.szmigiero.name>,
-	David Hildenbrand <david@redhat.com>,
-	Quentin Perret <qperret@google.com>,
-	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
-	Liam Merwick <liam.merwick@oracle.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH 34/34] KVM: selftests: Add a memory region subtest to
- validate invalid flags
-Message-ID: <13677ced-e464-4cdb-82ae-4236536e169c@sirena.org.uk>
-References: <20231105163040.14904-1-pbonzini@redhat.com>
- <20231105163040.14904-35-pbonzini@redhat.com>
- <CAF7b7mpmuYLTY6OQfRRoOryfO-2e1ZumQ6SCQDHHPD5XFyhFTQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CCF1CAA1
+	for <kvmarm@lists.linux.dev>; Mon, 20 Nov 2023 14:30:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.55])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4SYqZb6Lx1z1P7T0;
+	Mon, 20 Nov 2023 22:26:47 +0800 (CST)
+Received: from [10.174.185.179] (10.174.185.179) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 20 Nov 2023 22:30:13 +0800
+Subject: Re: [PATCH v3] KVM: arm64: GICv4: Do not perform a map to a mapped
+ vLPI
+To: Kunkun Jiang <jiangkunkun@huawei.com>
+CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, <eric.auger@redhat.com>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<wanghaibin.wang@huawei.com>
+References: <20231120131210.2039-1-jiangkunkun@huawei.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <8e92fc63-1399-eaa0-ba05-63f292efc8d3@huawei.com>
+Date: Mon, 20 Nov 2023 22:30:07 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="61dY8WQ8Ox8wOW0h"
-Content-Disposition: inline
-In-Reply-To: <CAF7b7mpmuYLTY6OQfRRoOryfO-2e1ZumQ6SCQDHHPD5XFyhFTQ@mail.gmail.com>
-X-Cookie: Happiness is twin floppies.
+In-Reply-To: <20231120131210.2039-1-jiangkunkun@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.185.179]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
+X-CFilter-Loop: Reflected
 
+On 2023/11/20 21:12, Kunkun Jiang wrote:
+> Before performing a map, let's check whether the vLPI has been
+> mapped.
+> 
+> Fixes: 196b136498b3 ("KVM: arm/arm64: GICv4: Wire mapping/unmapping of VLPIs in VFIO irq bypass")
+> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+> Acked-by: Marc Zyngier <maz@kernel.org>
 
---61dY8WQ8Ox8wOW0h
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Nov 08, 2023 at 05:08:01PM -0800, Anish Moorthy wrote:
-> Applying [1] and [2] reveals that this also breaks non-x86 builds- the
-> MEM_REGION_GPA/SLOT definitions are guarded behind an #ifdef
-> __x86_64__, while the usages introduced here aren't.
->=20
-> Should
->=20
-> On Sun, Nov 5, 2023 at 8:35=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.com=
-> wrote:
-> >
-> > +       test_invalid_memory_region_flags();
->=20
-> be #ifdef'd, perhaps? I'm not quite sure what the intent is.
-
-This has been broken in -next for a week now, do we have any progress
-on a fix or should we just revert the patch?
-
---61dY8WQ8Ox8wOW0h
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmVbaI0ACgkQJNaLcl1U
-h9Aj2Qf9EbUUwOLmAwUa3Jl4QMfiLrKntsPjxIsD9MYRWpqfdGr2gZb7wNXozUgD
-A1SOrSPxLG5lvE3dOdXD1O/mzrxVwLcfAssVQ6KjXu13pJtZDIQHAUpYQBJL28QR
-KIeV8OVDMKeFryWnyt+y92xYK+7d4TocCuAq2Ph3jQj/OIXp4bI5quuTV58jmIG4
-1QuJFi73b7JIL4Ksmg32pp3aWaoP7BqMqnDxx92GwdngF0Jrg1NBhgHoMkh/J28y
-zT6Vui1HZF2pSrrxexqXFLJKhveYmLyg3kaoEyvYeRwj/WjZSB3U/9LJrhBDctTJ
-2Y23Hu9kFWuPdJxy0l8BV7AiIxSr4Q==
-=GWvB
------END PGP SIGNATURE-----
-
---61dY8WQ8Ox8wOW0h--
+Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
