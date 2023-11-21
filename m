@@ -1,36 +1,36 @@
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ADDE51C5B
-	for <kvmarm@lists.linux.dev>; Tue, 21 Nov 2023 13:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1A251C54
+	for <kvmarm@lists.linux.dev>; Tue, 21 Nov 2023 13:44:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jrLhUefG"
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zkO7jfZE"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
 	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=IPSQ290E8DPF5FLSe+aRGb8AySZwOAxe+Qbv5W0+qQc=; b=jrLhUefGLk5f1PUHRc9HCT+s/S
-	+wW1S09TAissMwnXitFWK/CuI7r5adngvPI/jZLJVr+4kfplr3BNwLqaiOwHJ27LuuDqEl9cCbJl4
-	mmotbGrSMp2dHExGSotlIWKkebYzsDYEG3l5LuqzwnxOOMwKx8rB8o2/6eWTA7o95LcLX97EE0LoP
-	uel1PYd3KgBKpEcSMguCb+XzuWlfP09P7s9JVpJzj+3CY7ePOnozJpoiq3iNTla0bakA7IsSp+HUH
-	i7rz61w+2GP8377PwsePQpuoxd16ji8a7AGAuf5GdiOqMph9l7NkqpextIvhoU2GqGqMw0m8KYBsw
-	4jd+0f9g==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:51922 helo=rmk-PC.armlinux.org.uk)
+	bh=y2GSERp7E9J02eV4/73W4D/y9Cm9/C+9FDNmyXz1gOw=; b=zkO7jfZEfLxwUIwcxcxgCctqge
+	gsCUuvtBM/tJAHJ27IgaaCi8HN9gl7QLAjHk6ia2PBLRAzaVeR6hqXYKId/3f53qKiiQMSxON6lg7
+	D3GRSmVOE0+u3793UxyQpV2OyL/LvpLX3sxVXVdk7PZJcurtXlD6fydzaEDzRVN2JrSF6yLZW17Kp
+	oGRzLbHDz0QBQbNlUqTthNkGcTlWZaW7LegROueOjw5aRZ5i2z8zLxcCH1evUoFlcTdNuHMIFECr8
+	enrvM8qIqZAEZz4TIUiEhuNi/fxevxfvkbHSNugiIFqxJv8P6ySN393zrEliM/3zD+t+rywlDxL4+
+	zGr9/3OQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:33890 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1r5R2k-00076J-0R;
-	Tue, 21 Nov 2023 13:43:58 +0000
+	id 1r5R2y-00076j-0i;
+	Tue, 21 Nov 2023 13:44:12 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1r5R2m-00Csyb-2S; Tue, 21 Nov 2023 13:44:00 +0000
+	id 1r5R2w-00Csyn-E2; Tue, 21 Nov 2023 13:44:10 +0000
 In-Reply-To: <ZVyz/Ve5pPu8AWoA@shell.armlinux.org.uk>
 References: <ZVyz/Ve5pPu8AWoA@shell.armlinux.org.uk>
-From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 To: linux-pm@vger.kernel.org,
 	 loongarch@lists.linux.dev,
 	 linux-acpi@vger.kernel.org,
@@ -49,12 +49,9 @@ Cc: Salil Mehta <salil.mehta@huawei.com>,
 	 jianyong.wu@arm.com,
 	 justin.he@arm.com,
 	 James Morse <james.morse@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH 02/21] x86: intel_epb: Don't rely on link order
+	Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>
+Subject: [PATCH 04/21] Loongarch: remove arch_*register_cpu() exports
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -64,44 +61,42 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1r5R2m-00Csyb-2S@rmk-PC.armlinux.org.uk>
+Message-Id: <E1r5R2w-00Csyn-E2@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 21 Nov 2023 13:44:00 +0000
+Date: Tue, 21 Nov 2023 13:44:10 +0000
 
-From: James Morse <james.morse@arm.com>
+arch_register_cpu() and arch_unregister_cpu() are not used by anything
+that can be a module - they are used by drivers/base/cpu.c and
+drivers/acpi/acpi_processor.c, neither of which can be a module.
 
-intel_epb_init() is called as a subsys_initcall() to register cpuhp
-callbacks. The callbacks make use of get_cpu_device() which will return
-NULL unless register_cpu() has been called. register_cpu() is called
-from topology_init(), which is also a subsys_initcall().
+Remove the exports.
 
-This is fragile. Moving the register_cpu() to a different
-subsys_initcall()  leads to a NULL dereference during boot.
-
-Make intel_epb_init() a late_initcall(), user-space can't provide a
-policy before this point anyway.
-
-Signed-off-by: James Morse <james.morse@arm.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
-subsys_initcall_sync() would be an option, but moving the register_cpu()
-calls into ACPI also means adding a safety net for CPUs that are online
-but not described properly by firmware. This lives in subsys_initcall_sync().
----
- arch/x86/kernel/cpu/intel_epb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/loongarch/kernel/topology.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/arch/x86/kernel/cpu/intel_epb.c b/arch/x86/kernel/cpu/intel_epb.c
-index e4c3ba91321c..f18d35fe27a9 100644
---- a/arch/x86/kernel/cpu/intel_epb.c
-+++ b/arch/x86/kernel/cpu/intel_epb.c
-@@ -237,4 +237,4 @@ static __init int intel_epb_init(void)
- 	cpuhp_remove_state(CPUHP_AP_X86_INTEL_EPB_ONLINE);
+diff --git a/arch/loongarch/kernel/topology.c b/arch/loongarch/kernel/topology.c
+index 3fd166006698..ae860fe81536 100644
+--- a/arch/loongarch/kernel/topology.c
++++ b/arch/loongarch/kernel/topology.c
+@@ -25,7 +25,6 @@ int arch_register_cpu(int cpu)
+ 
  	return ret;
  }
--subsys_initcall(intel_epb_init);
-+late_initcall(intel_epb_init);
+-EXPORT_SYMBOL(arch_register_cpu);
+ 
+ void arch_unregister_cpu(int cpu)
+ {
+@@ -34,7 +33,6 @@ void arch_unregister_cpu(int cpu)
+ 	c->hotpluggable = 0;
+ 	unregister_cpu(c);
+ }
+-EXPORT_SYMBOL(arch_unregister_cpu);
+ #endif
+ 
+ static int __init topology_init(void)
 -- 
 2.30.2
 
