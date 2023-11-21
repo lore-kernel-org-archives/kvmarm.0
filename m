@@ -1,410 +1,141 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9650168AF
-	for <kvmarm@lists.linux.dev>; Tue, 21 Nov 2023 17:13:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D971433B6;
+	Tue, 21 Nov 2023 19:02:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g6WHGyHC"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5094cb3a036so8348990e87.2
-        for <kvmarm@lists.linux.dev>; Tue, 21 Nov 2023 09:13:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700586826; x=1701191626; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=h9Zte1PSyG5JQ/yqTG+rMKotUvIuZFBZn/4aVJFcYrU=;
-        b=g6WHGyHCtG6UnyThAhnoAVyf7NYhwaARmTDNR9ZHkmhcYKNhWb8MjpIJb8AT1UALvm
-         Ft2L2qiiGPz6SzY1PQZTK2FwggFOZCWcit2WLCxAdYU7PK/YFFPFJ/vpCLLsIIS3uMzg
-         5fOO4N3VqS7vgcVnJXRvG5cykCKxuXHl97Ip2tHFab7EXMPwz9wm4oGBEUTgMoyCBiJa
-         h7yIQcagHplq3FwSaEwd3Rx6Yc/NbYhnE5oQHYd8N+IipmCYReeWEiBNnxY+HgW889to
-         9A6KYqfiKIhJBWOl0cndrTB8sxiGW0zdbNXs/8EPNj7ucbZIX3PbN5Kp63adgbW/z280
-         8GXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700586826; x=1701191626;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h9Zte1PSyG5JQ/yqTG+rMKotUvIuZFBZn/4aVJFcYrU=;
-        b=Xk1CS1cslJ3Ahlmlg+B11gQZfs45LUxuOc8TQ4h52FbBO0VKTreflYNojt2kqmjqds
-         9XgsnpluHLUBBTORVuT3FNVrYfUlNuUsIcVtMnL3AOmg/uhIZ12E8Z5V4iyB/9zoIIf5
-         YFFL62yxuXpweRb5UkXReocEXrsWIHNeGhCU1+Lj61iMxRZ7PUpSl/UbJanP31X02+vp
-         H79tdW08bMjUOrpx957iVoxsC3/oEuhRpN3l4Xjw16/uDOCwz1qbYQoOArNkDa164fTN
-         DGXCjmHhr4F+DSffPfAG+vGtwYYPWxrPzRdPMuRDnaBkTlJkWrQxHAJw0KB4b1ayhmyl
-         Nh8A==
-X-Gm-Message-State: AOJu0YxWgfJCCRv/nEPAJ3fh6ejEaG+QgUw8TGfLqOw68i5Qs3ui3V6A
-	8yAbedZn1IO3rq0Q7ZNab8hx+A==
-X-Google-Smtp-Source: AGHT+IGFKydbrvT5Is4XwGHfbMSrdXj+3xmghvPz+/4kcGNLnjaNOQOqQTZDO5BOjTMX2YrFeykXDg==
-X-Received: by 2002:ac2:5445:0:b0:507:b074:ecd4 with SMTP id d5-20020ac25445000000b00507b074ecd4mr7727535lfn.7.1700586826290;
-        Tue, 21 Nov 2023 09:13:46 -0800 (PST)
-Received: from google.com (109.36.187.35.bc.googleusercontent.com. [35.187.36.109])
-        by smtp.gmail.com with ESMTPSA id f11-20020a05600c4e8b00b0040535648639sm18153249wmq.36.2023.11.21.09.13.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Nov 2023 09:13:45 -0800 (PST)
-Date: Tue, 21 Nov 2023 17:13:41 +0000
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: will@kernel.org, Oliver Upton <oliver.upton@linux.dev>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MnCEW1N0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08C6CC433C7;
+	Tue, 21 Nov 2023 19:02:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700593369;
+	bh=gMXUYkt8knGRYiC1FvMF8r845HfVg7cwv39TXqrEy5I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MnCEW1N0LxDfOPc09T2ReT0kfnJ2b9YtIoC10Ee7i8zy+5bV/OvRCMkczMJkdRwhQ
+	 ZVH+iU0Ylz5TJgbLT15b+Yk762OByJD2kPfxNFykkc7tLDdtq6iUll9wiJzXU9kubY
+	 W9ViqImF93XBS3v3pcfplew6gsKg3ieF8rLH2C4Nas0NgDvFOYErD6DUB50TKdrv+6
+	 VZRH2VVM3bW3Mi1aG3ac/Ecearg+mFd6BhqXfpSyFqPxFenPMwuJSOrovkgEbFGow7
+	 g5wejdrrHQZlvrVXA/vNQkZBg5sL1UNzWTDoLXUYZeoey3UzlOUgqCtEjRqawduRxg
+	 gCPX+MfsKrDSA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1r5W1G-00FCTS-8w;
+	Tue, 21 Nov 2023 19:02:46 +0000
+Date: Tue, 21 Nov 2023 19:02:45 +0000
+Message-ID: <86msv7ylnu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Miguel Luis <miguel.luis@oracle.com>
+Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	Alexandru Elisei
+	<alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase
+ Conklin <chase.conklin@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Darren Hart
+	<darren@os.amperecomputing.com>,
+	Jintack Lim <jintack@cs.columbia.edu>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, catalin.marinas@arm.com,
-	mark.rutland@arm.com, akpm@linux-foundation.org, maz@kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com,
-	qperret@google.com, smostafa@google.com
-Subject: Re: [PATCH v3 06/10] arm64: ptdump: Register a debugfs entry for the
- host stage-2 tables
-Message-ID: <ZVzlRY8Dm9FjGo8i@google.com>
-References: <20231115171639.2852644-2-sebastianene@google.com>
- <20231115171639.2852644-8-sebastianene@google.com>
+	Oliver Upton
+	<oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support (FEAT_NV2 only)
+In-Reply-To: <DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
+References: <20231120131027.854038-1-maz@kernel.org>
+	<DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231115171639.2852644-8-sebastianene@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Nov 15, 2023 at 05:16:36PM +0000, Sebastian Ene wrote:
-> Initialize a structures used to keep the state of the host stage-2 ptdump
-> walker when pKVM is enabled. Create a new debugfs entry for the host
-> stage-2 pagetables and hook the callbacks invoked when the entry is
-> accessed. When the debugfs file is opened, allocate memory resources which
-> will be shared with the hypervisor for saving the pagetable snapshot.
-> On close release the associated memory and we unshare it from the
-> hypervisor.
+On Tue, 21 Nov 2023 16:49:52 +0000,
+Miguel Luis <miguel.luis@oracle.com> wrote:
 > 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> ---
->  arch/arm64/include/asm/ptdump.h |  12 +++
->  arch/arm64/kvm/Kconfig          |  13 +++
->  arch/arm64/kvm/arm.c            |   2 +
->  arch/arm64/mm/ptdump.c          | 168 ++++++++++++++++++++++++++++++++
->  arch/arm64/mm/ptdump_debugfs.c  |   8 +-
->  5 files changed, 202 insertions(+), 1 deletion(-)
+> Hi Marc,
 > 
-> diff --git a/arch/arm64/include/asm/ptdump.h b/arch/arm64/include/asm/ptdump.h
-> index 9b2bebfcefbe..de5a5a0c0ecf 100644
-> --- a/arch/arm64/include/asm/ptdump.h
-> +++ b/arch/arm64/include/asm/ptdump.h
-> @@ -22,6 +22,7 @@ struct ptdump_info {
->  	void (*ptdump_walk)(struct seq_file *s, struct ptdump_info *info);
->  	int (*ptdump_prepare_walk)(void *file_priv);
->  	void (*ptdump_end_walk)(void *file_priv);
-> +	size_t				mc_len;
->  };
->  
->  void ptdump_walk(struct seq_file *s, struct ptdump_info *info);
-> @@ -33,13 +34,24 @@ struct ptdump_info_file_priv {
->  #ifdef CONFIG_PTDUMP_DEBUGFS
->  #define EFI_RUNTIME_MAP_END	DEFAULT_MAP_WINDOW_64
->  void __init ptdump_debugfs_register(struct ptdump_info *info, const char *name);
-> +void ptdump_debugfs_kvm_register(struct ptdump_info *info, const char *name,
-> +				 struct dentry *d_entry);
->  #else
->  static inline void ptdump_debugfs_register(struct ptdump_info *info,
->  					   const char *name) { }
-> +static inline void ptdump_debugfs_kvm_register(struct ptdump_info *info,
-> +					       const char *name,
-> +					       struct dentry *d_entry) { }
->  #endif
->  void ptdump_check_wx(void);
->  #endif /* CONFIG_PTDUMP_CORE */
->  
-> +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
-> +void ptdump_register_host_stage2(void);
-> +#else
-> +static inline void ptdump_register_host_stage2(void) { }
-> +#endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
-> +
->  #ifdef CONFIG_DEBUG_WX
->  #define debug_checkwx()	ptdump_check_wx()
->  #else
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 83c1e09be42e..cf5b7f06b152 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -71,4 +71,17 @@ config PROTECTED_NVHE_STACKTRACE
->  
->  	  If unsure, or not using protected nVHE (pKVM), say N.
->  
-> +config PTDUMP_STAGE2_DEBUGFS
-> +	bool "Present the stage-2 pagetables to debugfs"
-> +	depends on NVHE_EL2_DEBUG && PTDUMP_DEBUGFS && KVM
-> +	default n
-> +	help
-> +	  Say Y here if you want to show the stage-2 kernel pagetables
-> +	  layout in a debugfs file. This information is only useful for kernel developers
-> +	  who are working in architecture specific areas of the kernel.
-> +	  It is probably not a good idea to enable this feature in a production
-> +	  kernel.
-> +
-> +	  If in doubt, say N.
-> +
->  endif # VIRTUALIZATION
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index e5f75f1f1085..987683650576 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -28,6 +28,7 @@
->  
->  #include <linux/uaccess.h>
->  #include <asm/ptrace.h>
-> +#include <asm/ptdump.h>
->  #include <asm/mman.h>
->  #include <asm/tlbflush.h>
->  #include <asm/cacheflush.h>
-> @@ -2592,6 +2593,7 @@ static __init int kvm_arm_init(void)
->  	if (err)
->  		goto out_subs;
->  
-> +	ptdump_register_host_stage2();
->  	kvm_arm_initialised = true;
->  
->  	return 0;
-> diff --git a/arch/arm64/mm/ptdump.c b/arch/arm64/mm/ptdump.c
-> index d531e24ea0b2..0b4cb54e43ff 100644
-> --- a/arch/arm64/mm/ptdump.c
-> +++ b/arch/arm64/mm/ptdump.c
-> @@ -24,6 +24,9 @@
->  #include <asm/memory.h>
->  #include <asm/pgtable-hwdef.h>
->  #include <asm/ptdump.h>
-> +#include <asm/kvm_pkvm.h>
-> +#include <asm/kvm_pgtable.h>
-> +#include <asm/kvm_host.h>
->  
->  
->  enum address_markers_idx {
-> @@ -378,6 +381,170 @@ void ptdump_check_wx(void)
->  		pr_info("Checked W+X mappings: passed, no W+X pages found\n");
->  }
->  
-> +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
-> +static struct ptdump_info stage2_kernel_ptdump_info;
-> +
-> +static phys_addr_t ptdump_host_pa(void *addr)
-> +{
-> +	return __pa(addr);
-> +}
-> +
-> +static void *ptdump_host_va(phys_addr_t phys)
-> +{
-> +	return __va(phys);
-> +}
-> +
-> +static size_t stage2_get_pgd_len(void)
-> +{
-> +	u64 mmfr0, mmfr1, vtcr;
-> +	u32 phys_shift = get_kvm_ipa_limit();
-> +
-> +	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
-> +	mmfr1 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> +	vtcr = kvm_get_vtcr(mmfr0, mmfr1, phys_shift);
-> +
-> +	return kvm_pgtable_stage2_pgd_size(vtcr);
-
-That's a lot of conversions to go from the kvm_ipa_limit to VTCR and
-VTCR back to ia_bits and the start level, but that would mean rewrite pieces of
-pgtable.c there. :-\
-
-> +}
-> +
-> +static int stage2_ptdump_prepare_walk(void *file_priv)
-> +{
-> +	struct ptdump_info_file_priv *f_priv = file_priv;
-> +	struct ptdump_info *info = &f_priv->info;
-> +	struct kvm_pgtable_snapshot *snapshot;
-> +	int ret, pgd_index, mc_index, pgd_pages_sz;
-> +	void *page_hva;
-> +	phys_addr_t pgd;
-> +
-> +	snapshot = alloc_pages_exact(PAGE_SIZE, GFP_KERNEL_ACCOUNT);
-> +	if (!snapshot)
-> +		return -ENOMEM;
-
-For a single page, __get_free_page is enough.
-
-> +
-> +	memset(snapshot, 0, PAGE_SIZE);
-> +	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, virt_to_pfn(snapshot));
-> +	if (ret)
-> +		goto free_snapshot;
-
-It'd probably be better to not share anything here, and let the hypervisor do
-host_donate_hyp() and hyp_donate_host() before returning back from the HVC. This
-way the hypervisor will protect itself.
-
-> +
-> +	snapshot->pgd_len = stage2_get_pgd_len();
-> +	pgd_pages_sz = snapshot->pgd_len / PAGE_SIZE;
-> +	snapshot->pgd_hva = alloc_pages_exact(snapshot->pgd_len,
-> +					      GFP_KERNEL_ACCOUNT);
-> +	if (!snapshot->pgd_hva) {
-> +		ret = -ENOMEM;
-> +		goto unshare_snapshot;
-> +	}
-> +
-> +	for (pgd_index = 0; pgd_index < pgd_pages_sz; pgd_index++) {
-> +		page_hva = snapshot->pgd_hva + pgd_index * PAGE_SIZE;
-> +		ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp,
-> +					virt_to_pfn(page_hva));
-> +		if (ret)
-> +			goto unshare_pgd_pages;
-> +	}
-> +
-> +	for (mc_index = 0; mc_index < info->mc_len; mc_index++) {
-> +		page_hva = alloc_pages_exact(PAGE_SIZE, GFP_KERNEL_ACCOUNT);
-
-ditto.
-
-> +		if (!page_hva) {
-> +			ret = -ENOMEM;
-> +			goto free_memcache_pages;
-> +		}
-> +
-> +		push_hyp_memcache(&snapshot->mc, page_hva, ptdump_host_pa);
-> +		ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp,
-> +					virt_to_pfn(page_hva));
-> +		if (ret) {
-> +			pop_hyp_memcache(&snapshot->mc, ptdump_host_va);
-> +			free_pages_exact(page_hva, PAGE_SIZE);
-> +			goto free_memcache_pages;
-> +		}
-
-Maybe for the page-table pages, it'd be better to let the hyp does the
-host_donate_hyp() / hyp_donate_host()? It might be easier than sharing + pin.
-
-> +	}
-> +
-> +	ret = kvm_call_hyp_nvhe(__pkvm_copy_host_stage2, snapshot);
-> +	if (ret)
-> +		goto free_memcache_pages;
-> +
-> +	pgd = (phys_addr_t)snapshot->pgtable.pgd;
-> +	snapshot->pgtable.pgd = phys_to_virt(pgd);
-> +	f_priv->file_priv = snapshot;
-> +	return 0;
-> +
-> +free_memcache_pages:
-> +	page_hva = pop_hyp_memcache(&snapshot->mc, ptdump_host_va);
-> +	while (page_hva) {
-> +		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
-> +					virt_to_pfn(page_hva));
-> +		WARN_ON(ret);
-> +		free_pages_exact(page_hva, PAGE_SIZE);
-> +		page_hva = pop_hyp_memcache(&snapshot->mc, ptdump_host_va);
-> +	}
-> +unshare_pgd_pages:
-> +	pgd_index = pgd_index - 1;
-> +	for (; pgd_index >= 0; pgd_index--) {
-> +		page_hva = snapshot->pgd_hva + pgd_index * PAGE_SIZE;
-> +		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
-> +					virt_to_pfn(page_hva));
-> +		WARN_ON(ret);
-> +	}
-> +	free_pages_exact(snapshot->pgd_hva, snapshot->pgd_len);
-> +unshare_snapshot:
-> +	WARN_ON(kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
-> +				  virt_to_pfn(snapshot)));
-> +free_snapshot:
-> +	free_pages_exact(snapshot, PAGE_SIZE);
-> +	f_priv->file_priv = NULL;
-> +	return ret;
-
-Couldn't this path be merged with stage2_ptdump_end_walk()?
-
-> +}
-> +
-> +static void stage2_ptdump_end_walk(void *file_priv)
-> +{
-> +	struct ptdump_info_file_priv *f_priv = file_priv;
-> +	struct kvm_pgtable_snapshot *snapshot = f_priv->file_priv;
-> +	void *page_hva;
-> +	int pgd_index, ret, pgd_pages_sz;
-> +
-> +	if (!snapshot)
-> +		return;
-> +
-> +	page_hva = pop_hyp_memcache(&snapshot->mc, ptdump_host_va);
-> +	while (page_hva) {
-> +		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
-> +					virt_to_pfn(page_hva));
-> +		WARN_ON(ret);
-> +		free_pages_exact(page_hva, PAGE_SIZE);
-> +		page_hva = pop_hyp_memcache(&snapshot->mc, ptdump_host_va);
-> +	}
-> +
-> +	pgd_pages_sz = snapshot->pgd_len / PAGE_SIZE;
-> +	for (pgd_index = 0; pgd_index < pgd_pages_sz; pgd_index++) {
-> +		page_hva = snapshot->pgd_hva + pgd_index * PAGE_SIZE;
-> +		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
-> +					virt_to_pfn(page_hva));
-> +		WARN_ON(ret);
-> +	}
-> +
-> +	free_pages_exact(snapshot->pgd_hva, snapshot->pgd_len);
-> +	WARN_ON(kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
-> +				  virt_to_pfn(snapshot)));
-> +	free_pages_exact(snapshot, PAGE_SIZE);
-> +	f_priv->file_priv = NULL;
-> +}
-> +
-> +void ptdump_register_host_stage2(void)
-> +{
-> +	if (!is_protected_kvm_enabled())
-> +		return;
-> +
-> +	stage2_kernel_ptdump_info = (struct ptdump_info) {
-> +		.mc_len			= host_s2_pgtable_pages(),
-> +		.ptdump_prepare_walk	= stage2_ptdump_prepare_walk,
-> +		.ptdump_end_walk	= stage2_ptdump_end_walk,
-> +	};
-> +
-> +	ptdump_debugfs_kvm_register(&stage2_kernel_ptdump_info,
-> +				    "host_stage2_page_tables",
-> +				    kvm_debugfs_dir);
-> +}
-> +#endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
-> +
->  static int __init ptdump_init(void)
->  {
->  	address_markers[PAGE_END_NR].start_address = PAGE_END;
-> @@ -386,6 +553,7 @@ static int __init ptdump_init(void)
->  #endif
->  	ptdump_initialize();
->  	ptdump_debugfs_register(&kernel_ptdump_info, "kernel_page_tables");
-> +
-
-Not needed.
-
->  	return 0;
->  }
->  device_initcall(ptdump_init);
-> diff --git a/arch/arm64/mm/ptdump_debugfs.c b/arch/arm64/mm/ptdump_debugfs.c
-> index 3bf5de51e8c3..4821dbef784c 100644
-> --- a/arch/arm64/mm/ptdump_debugfs.c
-> +++ b/arch/arm64/mm/ptdump_debugfs.c
-> @@ -68,5 +68,11 @@ static const struct file_operations ptdump_fops = {
->  
->  void __init ptdump_debugfs_register(struct ptdump_info *info, const char *name)
->  {
-> -	debugfs_create_file(name, 0400, NULL, info, &ptdump_fops);
-> +	ptdump_debugfs_kvm_register(info, name, NULL);
-
-Not really related to kvm, the only difference is passing or not a dentry.
-
-How about a single (non __init) function?
-
-> +}
-> +
-> +void ptdump_debugfs_kvm_register(struct ptdump_info *info, const char *name,
-> +				 struct dentry *d_entry)
-> +{
-> +	debugfs_create_file(name, 0400, d_entry, info, &ptdump_fops);
->  }
-> -- 
-> 2.43.0.rc0.421.g78406f8d94-goog
+> > On 20 Nov 2023, at 12:09, Marc Zyngier <maz@kernel.org> wrote:
+> > 
+> > This is the 5th drop of NV support on arm64 for this year, and most
+> > probably the last one for this side of Christmas.
+> > 
+> > For the previous episodes, see [1].
+> > 
+> > What's changed:
+> > 
+> > - Drop support for the original FEAT_NV. No existing hardware supports
+> >  it without FEAT_NV2, and the architecture is deprecating the former
+> >  entirely. This results in fewer patches, and a slightly simpler
+> >  model overall.
+> > 
+> > - Reorganise the series to make it a bit more logical now that FEAT_NV
+> >  is gone.
+> > 
+> > - Apply the NV idreg restrictions on VM first run rather than on each
+> >  access.
+> > 
+> > - Make the nested vgic shadow CPU interface a per-CPU structure rather
+> >  than per-vcpu.
+> > 
+> > - Fix the EL0 timer fastpath
+> > 
+> > - Work around the architecture deficiencies when trapping WFI from a
+> >  L2 guest.
+> > 
+> > - Fix sampling of nested vgic state (MISR, ELRSR, EISR)
+> > 
+> > - Drop the patches that have already been merged (NV trap forwarding,
+> >  per-MMU VTCR)
+> > 
+> > - Rebased on top of 6.7-rc2 + the FEAT_E2H0 support [2].
+> > 
+> > The branch containing these patches (and more) is at [3]. As for the
+> > previous rounds, my intention is to take a prefix of this series into
+> > 6.8, provided that it gets enough reviewing.
+> > 
+> > [1] https://lore.kernel.org/r/20230515173103.1017669-1-maz@kernel.org
+> > [2] https://lore.kernel.org/r/20231120123721.851738-1-maz@kernel.org
+> > [3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-6.8-nv2-only
+> > 
 > 
+> While I was testing this with kvmtool for 5.16 I noted the following on dmesg:
+> 
+> [  803.014258] kvm [19040]: Unsupported guest sys_reg access at: 8129fa50 [600003c9]
+>                 { Op0( 3), Op1( 5), CRn( 1), CRm( 0), Op2( 2), func_read },
+> 
+> This is CPACR_EL12.
+
+CPACR_EL12 is redirected to VNCR[0x100]. It really shouldn't trap...
+
+> Still need yet to debug.
+
+Can you disassemble the guest around the offending PC?
+
+> As for QEMU, it is having issues enabling _EL2 feature although EL2
+> is supported by checking KVM_CAP_ARM_EL2; need yet to debug this.
+
+The capability number changes at each release. Make sure you resync
+your includes.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
