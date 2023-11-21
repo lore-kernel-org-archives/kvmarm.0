@@ -1,22 +1,22 @@
-Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1BD5465F
-	for <kvmarm@lists.linux.dev>; Tue, 21 Nov 2023 20:34:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891CE55787
+	for <kvmarm@lists.linux.dev>; Tue, 21 Nov 2023 23:28:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="V6Pualdy"
-Date: Tue, 21 Nov 2023 20:34:50 +0000
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QNToNuD3"
+Date: Tue, 21 Nov 2023 23:27:57 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1700598894;
+	t=1700609282;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Hx4oGQNL7fwNExc08Z0zPeck5aP2ZQUtzfNB00RvLKk=;
-	b=V6Pualdy2yp5gnsVPQHz5Gg38Sd/Sqjzzb/aCIUGWk2vNl9RN5MvCGh0YEElap89P8tKrS
-	8VllHxl4G61HUX+e6QiTXsTTq11qPJpUYRonaZGL+gV4LSOjCCF57QgHG9iYg5qm0UWr42
-	mlCgJitICz8+iINA4E+YgCbCrl6bGO8=
+	bh=2q8dv0rjx9h4tXKNgzb9NkEHz5STcz1Q2TUBr0ldfo4=;
+	b=QNToNuD3IJTeznaC1U1UP7DbremOVuzOPkTGwIxq0AZdTlFw7LwG5SnJ0M5sR1RLjwMunW
+	O9OBsByGxaevknXCrP+K9B699B12hJl02KZesXFexMMe+SaQkkN+M9MDwzCXPsi1rLakFG
+	AYFMXf19GhkuwnqMLwaCzJJjGvD7zC0=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Ryan Roberts <ryan.roberts@arm.com>
@@ -27,11 +27,11 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>, Ard Biesheuvel <ardb@kernel.org>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v5 07/12] KVM: arm64: Use LPA2 page-tables for stage2 and
- hyp stage1
-Message-ID: <ZV0Uaoi-qBjX3j5i@linux.dev>
+Subject: Re: [PATCH v5 11/12] KVM: selftests: arm64: Determine max ipa size
+ per-page size
+Message-ID: <ZV08_eU9vV1SUmmd@linux.dev>
 References: <20231116142931.1675485-1-ryan.roberts@arm.com>
- <20231116142931.1675485-8-ryan.roberts@arm.com>
+ <20231116142931.1675485-12-ryan.roberts@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -40,62 +40,106 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231116142931.1675485-8-ryan.roberts@arm.com>
+In-Reply-To: <20231116142931.1675485-12-ryan.roberts@arm.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, Nov 16, 2023 at 02:29:26PM +0000, Ryan Roberts wrote:
-> Implement a simple policy whereby if the HW supports FEAT_LPA2 for the
-> page size we are using, always use LPA2-style page-tables for stage 2
-> and hyp stage 1 (assuming an nvhe hyp), regardless of the VMM-requested
-> IPA size or HW-implemented PA size. When in use we can now support up to
-> 52-bit IPA and PA sizes.
-> 
-> We use the previously created cpu feature to track whether LPA2 is
-> supported for deciding whether to use the LPA2 or classic pte format.
-> 
-> Note that FEAT_LPA2 brings support for bigger block mappings (512GB with
-> 4KB, 64GB with 16KB). We explicitly don't enable these in the library
-> because stage2_apply_range() works on batch sizes of the largest used
-> block mapping, and increasing the size of the batch would lead to soft
-> lockups. See commit 5994bc9e05c2 ("KVM: arm64: Limit
-> stage2_apply_range() batch size to largest block").
-> 
-> With the addition of LPA2 support in the hypervisor, the PA size
-> supported by the HW must be capped with a runtime decision, rather than
-> simply using a compile-time decision based on PA_BITS. For example, on a
-> system that advertises 52 bit PA but does not support FEAT_LPA2, A 4KB
-> or 16KB kernel compiled with LPA2 support must still limit the PA size
-> to 48 bits.
-> 
-> Therefore, move the insertion of the PS field into TCR_EL2 out of
-> __kvm_hyp_init assembly code and instead do it in cpu_prepare_hyp_mode()
-> where the rest of TCR_EL2 is prepared. This allows us to figure out PS
-> with kvm_get_parange(), which has the appropriate logic to ensure the
-> above requirement. (and the PS field of VTCR_EL2 is already populated
-> this way).
+On Thu, Nov 16, 2023 at 02:29:30PM +0000, Ryan Roberts wrote:
+> We are about to add 52 bit PA guest modes for 4K and 16K pages when the
+> system supports LPA2. In preparation beef up the logic that parses mmfr0
+> to also tell us what the maximum supported PA size is for each page
+> size. Max PA size = 0 implies the page size is not supported at all.
 > 
 > Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
 > ---
->  arch/arm64/include/asm/kvm_mmu.h     |  2 +-
->  arch/arm64/include/asm/kvm_pgtable.h | 47 +++++++++++++++++++++-------
->  arch/arm64/kvm/arm.c                 |  5 +++
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S   |  4 ---
->  arch/arm64/kvm/hyp/pgtable.c         | 15 +++++++--
->  5 files changed, 54 insertions(+), 19 deletions(-)
+>  .../selftests/kvm/include/aarch64/processor.h |  4 +-
+>  .../selftests/kvm/lib/aarch64/processor.c     | 27 ++++++++++---
+>  tools/testing/selftests/kvm/lib/guest_modes.c | 40 ++++++++-----------
+>  3 files changed, 41 insertions(+), 30 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 31e8d7faed65..f4e4fcb35afc 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -340,7 +340,7 @@ static inline struct kvm *kvm_s2_mmu_to_kvm(struct kvm_s2_mmu *mmu)
->  	return container_of(mmu->arch, struct kvm, arch);
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> index c42d683102c7..cf20e44e86f2 100644
+> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> @@ -119,8 +119,8 @@ enum {
+>  /* Access flag update enable/disable */
+>  #define TCR_EL1_HA		(1ULL << 39)
+>  
+> -void aarch64_get_supported_page_sizes(uint32_t ipa,
+> -				      bool *ps4k, bool *ps16k, bool *ps64k);
+> +void aarch64_get_supported_page_sizes(uint32_t ipa, uint32_t *ipa4k,
+> +					uint32_t *ipa16k, uint32_t *ipa64k);
+>  
+>  void vm_init_descriptor_tables(struct kvm_vm *vm);
+>  void vcpu_init_descriptor_tables(struct kvm_vcpu *vcpu);
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> index 6fe12e985ba5..917cfeddb6b4 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> @@ -492,12 +492,24 @@ uint32_t guest_get_vcpuid(void)
+>  	return read_sysreg(tpidr_el1);
 >  }
 >  
-> -#define kvm_lpa2_is_enabled()		false
-> +#define kvm_lpa2_is_enabled()		system_supports_lpa2()
+> -void aarch64_get_supported_page_sizes(uint32_t ipa,
+> -				      bool *ps4k, bool *ps16k, bool *ps64k)
+> +static uint32_t max_ipa_for_page_size(uint32_t vm_ipa, uint32_t gran,
+> +				uint32_t not_sup_val, uint32_t ipa52_min_val)
+> +{
+> +	if (gran == not_sup_val)
+> +		return 0;
+> +	else if (gran >= ipa52_min_val && vm_ipa >= 52)
+> +		return 52;
+> +	else
+> +		return min(vm_ipa, 48U);
+> +}
+> +
+> +void aarch64_get_supported_page_sizes(uint32_t ipa, uint32_t *ipa4k,
+> +					uint32_t *ipa16k, uint32_t *ipa64k)
+>  {
+>  	struct kvm_vcpu_init preferred_init;
+>  	int kvm_fd, vm_fd, vcpu_fd, err;
+>  	uint64_t val;
+> +	uint32_t gran;
+>  	struct kvm_one_reg reg = {
+>  		.id	= KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR0_EL1),
+>  		.addr	= (uint64_t)&val,
+> @@ -518,9 +530,14 @@ void aarch64_get_supported_page_sizes(uint32_t ipa,
+>  	err = ioctl(vcpu_fd, KVM_GET_ONE_REG, &reg);
+>  	TEST_ASSERT(err == 0, KVM_IOCTL_ERROR(KVM_GET_ONE_REG, vcpu_fd));
+>  
+> -	*ps4k = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN4), val) != 0xf;
+> -	*ps64k = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN64), val) == 0;
+> -	*ps16k = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN16), val) != 0;
+> +	gran = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN4), val);
+> +	*ipa4k = max_ipa_for_page_size(ipa, gran, 0xf, 1);
+> +
+> +	gran = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN64), val);
+> +	*ipa64k = max_ipa_for_page_size(ipa, gran, 0xf, 0);
+> +
+> +	gran = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN16), val);
+> +	*ipa16k = max_ipa_for_page_size(ipa, gran, 0, 2);
+>  
+>  	close(vcpu_fd);
+>  	close(vm_fd);
+> diff --git a/tools/testing/selftests/kvm/lib/guest_modes.c b/tools/testing/selftests/kvm/lib/guest_modes.c
+> index 1df3ce4b16fd..c64c5cf49942 100644
+> --- a/tools/testing/selftests/kvm/lib/guest_modes.c
+> +++ b/tools/testing/selftests/kvm/lib/guest_modes.c
+> @@ -18,33 +18,27 @@ void guest_modes_append_default(void)
+>  #else
+>  	{
+>  		unsigned int limit = kvm_check_cap(KVM_CAP_ARM_VM_IPA_SIZE);
+> -		bool ps4k, ps16k, ps64k;
+> +		uint32_t ipa4k, ipa16k, ipa64k;
+>  		int i;
+>  
+> -		aarch64_get_supported_page_sizes(limit, &ps4k, &ps16k, &ps64k);
+> +		aarch64_get_supported_page_sizes(limit, &ipa4k, &ipa16k, &ipa64k);
+>  
+> -		vm_mode_default = NUM_VM_MODES;
+> +		guest_mode_append(VM_MODE_P52V48_64K, ipa64k >= 52, ipa64k >= 52);
 
-Can we use this predicate consistently throughout the KVM code? Looks
-like the rest of this diff is using system_supports_lpa2() directly.
+Can we just change guest_mode_append() to take a single bool argument and
+initialize both ::supported and ::enabled to its value?
 
 -- 
 Thanks,
