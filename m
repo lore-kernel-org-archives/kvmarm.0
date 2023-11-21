@@ -1,108 +1,218 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B602D603
-	for <kvmarm@lists.linux.dev>; Tue, 21 Nov 2023 10:57:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBCD93C6B1
+	for <kvmarm@lists.linux.dev>; Tue, 21 Nov 2023 11:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from lhrpeml100001.china.huawei.com (unknown [172.18.147.207])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4SZLmv0DcRz6J9yP;
-	Tue, 21 Nov 2023 18:52:31 +0800 (CST)
-Received: from lhrpeml500001.china.huawei.com (7.191.163.213) by
- lhrpeml100001.china.huawei.com (7.191.160.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 21 Nov 2023 10:57:27 +0000
-Received: from lhrpeml500001.china.huawei.com ([7.191.163.213]) by
- lhrpeml500001.china.huawei.com ([7.191.163.213]) with mapi id 15.01.2507.035;
- Tue, 21 Nov 2023 10:57:27 +0000
-From: Salil Mehta <salil.mehta@huawei.com>
-To: Oliver Upton <oliver.upton@linux.dev>, "Russell King (Oracle)"
-	<linux@armlinux.org.uk>
-CC: Jianyong Wu <jianyong.wu@arm.com>, "maz@kernel.org" <maz@kernel.org>,
-	"james.morse@arm.com" <james.morse@arm.com>, "will@kernel.org"
-	<will@kernel.org>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "justin.he@arm.com" <justin.he@arm.com>
-Subject: RE: [PATCH] arm64/kvm: Introduce feature extension for SMCCC filter
-Thread-Topic: [PATCH] arm64/kvm: Introduce feature extension for SMCCC filter
-Thread-Index: AQHaGIJSPxqmEiVqkkOrXIqhoEeoZ7B9TvAAgABHfQCABwlmkA==
-Date: Tue, 21 Nov 2023 10:57:27 +0000
-Message-ID: <9367235ee3b34a30af43a5689173f61e@huawei.com>
-References: <20231116114152.912344-1-jianyong.wu@arm.com>
- <ZVZoKlWrjV1L3CBo@shell.armlinux.org.uk> <ZVakIv5mw6YUlHms@thinky-boi>
-In-Reply-To: <ZVakIv5mw6YUlHms@thinky-boi>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [10.195.245.211]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 77650FEC;
+	Tue, 21 Nov 2023 03:13:13 -0800 (PST)
+Received: from [10.163.36.237] (unknown [10.163.36.237])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6F0063F7A6;
+	Tue, 21 Nov 2023 03:12:21 -0800 (PST)
+Message-ID: <20858eb9-a4d0-41be-ad1d-2a5f2d2fa0de@arm.com>
+Date: Tue, 21 Nov 2023 16:42:18 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-
-> From: Oliver Upton <oliver.upton@linux.dev>
-> Sent: Thursday, November 16, 2023 11:22 PM
-> To: Russell King (Oracle) <linux@armlinux.org.uk>
->=20
-> On Thu, Nov 16, 2023 at 07:06:18PM +0000, Russell King (Oracle) wrote:
-> > On Thu, Nov 16, 2023 at 11:41:52AM +0000, Jianyong Wu wrote:
-> > > 821d935c87b introduces support for userspace SMCCC filtering, but lac=
-k
-> > > of a way to tell userspace if we have this feature. Add a correspondi=
-ng
-> > > feature extension can resolve this issue.
-> > >
-> > > For example, the incoming feature Vcpu Hotplug needs the SMCCC filter=
-.
-> > > As there is no way to check this feature, VMM will run into error whe=
-n
-> > > it calls this feature on an old kernel. It's bad for backward compati=
-ble.
-> >
-> > Can't you just attempt to use the SMCCC filtering, and if it errors out
-> > with the appropriate error code, decide that SMCCC filtering is not
-> > available?
->=20
-> That would also work, as we return ENXIO for the unsupported ioctl.
->=20
-> > That's how most things like kernel syscalls work - if they're not
-> > implemented they return -ENOSYS. glibc can detect that and use a
-> > fallback.
->=20
-> I generally agree, but KVM has gone in the other direction of providing
-> auxiliary interfaces for discovering new UAPI. ENXIO has been slightly
-> overloaded to imply that a given ioctl is non-existent or otherwise
-> unsupported due to some dynamic configuration.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [V14 5/8] KVM: arm64: nvhe: Disable branch generation in nVHE
+ guests
+Content-Language: en-US
+To: James Clark <james.clark@arm.com>
+Cc: Mark Brown <broonie@kernel.org>, Rob Herring <robh@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Suzuki Poulose <suzuki.poulose@arm.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ linux-perf-users@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com
+References: <20231114051329.327572-1-anshuman.khandual@arm.com>
+ <20231114051329.327572-6-anshuman.khandual@arm.com>
+ <f2661879-636c-1865-0e1c-60d8e11f80f0@arm.com>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <f2661879-636c-1865-0e1c-60d8e11f80f0@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
-Agreed. We require this check for vCPU Hotplug series as well exactly
-for the reason you stated above i.e. to clearly distinguish the case
-when KVM host does not support SMCCC filter and when it does but an
-error is purged out during configuration of this filter. In the later
-we would like to abort the VM initialization (as being done in RFC V2)
-but in former we would just continue without supporting vCPU Hotplug
-feature. Handling is different in each.
 
-Thanks
-Salil.
+On 11/14/23 14:46, James Clark wrote:
+> 
+> 
+> On 14/11/2023 05:13, Anshuman Khandual wrote:
+>> Disable the BRBE before we enter the guest, saving the status and enable it
+>> back once we get out of the guest. This is just to avoid capturing records
+>> in the guest kernel/userspace, which would be confusing the samples.
+>>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: Oliver Upton <oliver.upton@linux.dev>
+>> Cc: James Morse <james.morse@arm.com>
+>> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: kvmarm@lists.linux.dev
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> CC: linux-kernel@vger.kernel.org
+>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>> ---
+>> Changes in V14:
+>>
+>> - This is a new patch in the series
+>>
+>>  arch/arm64/include/asm/kvm_host.h  |  4 ++++
+>>  arch/arm64/kvm/debug.c             |  6 +++++
+>>  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 38 ++++++++++++++++++++++++++++++
+>>  3 files changed, 48 insertions(+)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 68421c74283a..1faa0430d8dd 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -449,6 +449,8 @@ enum vcpu_sysreg {
+>>  	CNTHV_CVAL_EL2,
+>>  	PMSCR_EL1,	/* Statistical profiling extension */
+>>  	TRFCR_EL1,	/* Self-hosted trace filters */
+>> +	BRBCR_EL1,	/* Branch Record Buffer Control Register */
+>> +	BRBFCR_EL1,	/* Branch Record Buffer Function Control Register */
+>>  
+>>  	NR_SYS_REGS	/* Nothing after this line! */
+>>  };
+>> @@ -753,6 +755,8 @@ struct kvm_vcpu_arch {
+>>  #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
+>>  /* Save trace filter controls */
+>>  #define DEBUG_STATE_SAVE_TRFCR	__vcpu_single_flag(iflags, BIT(8))
+>> +/* Save BRBE context if active  */
+>> +#define DEBUG_STATE_SAVE_BRBE	__vcpu_single_flag(iflags, BIT(9))
+>>  
+>>  /* SVE enabled for host EL0 */
+>>  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+>> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+>> index 2ab41b954512..4055783c3d34 100644
+>> --- a/arch/arm64/kvm/debug.c
+>> +++ b/arch/arm64/kvm/debug.c
+>> @@ -354,6 +354,11 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
+>>  		    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
+>>  			vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+>>  	}
+>> +
+>> +	/* Check if we have BRBE implemented and available at the host */
+>> +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRBE_SHIFT) &&
+>> +	    (read_sysreg_s(SYS_BRBCR_EL1) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
+>> +		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
+> 
+> Isn't this supposed to just be the feature check? Whether BRBE is
+> enabled or not is checked later in __debug_save_brbe() anyway.
 
->=20
-> Is it ideal? Of course not. With that said userspace may as well use the
-> preferred / documented discoverability mechanism. And in Jianyong's case
-> the KVM documentation is rather unambiguous (for once) about how you
-> discover device attributes.
->=20
-> https://docs.kernel.org/virt/kvm/api.html#kvm-has-device-attr
->=20
-> --
-> Thanks,
-> Oliver
+Okay, will make it just a feature check via ID_AA64DFR0_EL1_BRBE_SHIFT.
+
+> 
+> It seems like it's possible to become enabled after this flag load part.
+
+Agreed.
+
+> 
+>>  }
+>>  
+>>  void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+>> @@ -361,6 +366,7 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+>>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+>>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+>>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
+>> +	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
+>>  }
+>>  
+>>  void kvm_etm_set_guest_trfcr(u64 trfcr_guest)
+>> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+>> index 6174f710948e..e44a1f71a0f8 100644
+>> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+>> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+>> @@ -93,6 +93,38 @@ static void __debug_restore_trace(struct kvm_cpu_context *host_ctxt,
+>>  		write_sysreg_s(ctxt_sys_reg(host_ctxt, TRFCR_EL1), SYS_TRFCR_EL1);
+>>  }
+>>  
+>> +static void __debug_save_brbe(struct kvm_cpu_context *host_ctxt)
+>> +{
+>> +	ctxt_sys_reg(host_ctxt, BRBCR_EL1) = 0;
+>> +	ctxt_sys_reg(host_ctxt, BRBFCR_EL1) = 0;
+>> +
+>> +	/* Check if the BRBE is enabled */
+>> +	if (!(ctxt_sys_reg(host_ctxt, BRBCR_EL1) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
+>> +		return;
+> 
+> Doesn't this always fail, the host BRBCR_EL1 value was just cleared on
+> the line above.
+
+Agreed, this error might have slipped in while converting to ctxt_sys_reg().
+
+> 
+> Also, you need to read the register to determine if it was enabled or
+
+Right
+
+> not, so you might as well always store the real value, rather than 0 in
+> the not enabled case.
+
+But if it is not enabled - why store the real value ?
+
+> 
+>> +
+>> +	/*
+>> +	 * Prohibit branch record generation while we are in guest.
+>> +	 * Since access to BRBCR_EL1 and BRBFCR_EL1 is trapped, the
+>> +	 * guest can't modify the filtering set by the host.
+>> +	 */
+>> +	ctxt_sys_reg(host_ctxt, BRBCR_EL1) = read_sysreg_s(SYS_BRBCR_EL1);
+>> +	ctxt_sys_reg(host_ctxt, BRBFCR_EL1) = read_sysreg_s(SYS_BRBFCR_EL1)
+>> +	write_sysreg_s(0, SYS_BRBCR_EL1);
+>> +	write_sysreg_s(0, SYS_BRBFCR_EL1);
+> 
+> Why does SYS_BRBFCR_EL1 need to be saved and restored? Only
+> BRBCR_ELx_E0BRE and BRBCR_ELx_ExBRE need to be cleared to disable BRBE.
+
+Right, just thought both brbcr, and brbfcr system registers represent
+current BRBE state (besides branch records), in a more comprehensive
+manner, although none would be changed from inside the guest.
+
+> 
+>> +	isb();
+>> +}
+>> +
+>> +static void __debug_restore_brbe(struct kvm_cpu_context *host_ctxt)
+>> +{
+>> +	if (!ctxt_sys_reg(host_ctxt, BRBCR_EL1) || !ctxt_sys_reg(host_ctxt, BRBFCR_EL1))
+>> +		return;
+>> +
+>> +	/* Restore BRBE controls */
+>> +	write_sysreg_s(ctxt_sys_reg(host_ctxt, BRBCR_EL1), SYS_BRBCR_EL1);
+>> +	write_sysreg_s(ctxt_sys_reg(host_ctxt, BRBFCR_EL1), SYS_BRBFCR_EL1);
+>> +	isb();
+>> +}
+>> +
+>>  void __debug_save_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
+>>  				    struct kvm_cpu_context *guest_ctxt)
+>>  {
+>> @@ -102,6 +134,10 @@ void __debug_save_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
+>>  
+>>  	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_TRFCR))
+>>  		__debug_save_trace(host_ctxt, guest_ctxt);
+>> +
+>> +	/* Disable BRBE branch records */
+>> +	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_BRBE))
+>> +		__debug_save_brbe(host_ctxt);
+>>  }
+>>  
+>>  void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+>> @@ -116,6 +152,8 @@ void __debug_restore_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
+>>  		__debug_restore_spe(host_ctxt);
+>>  	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_TRFCR))
+>>  		__debug_restore_trace(host_ctxt, guest_ctxt);
+>> +	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_BRBE))
+>> +		__debug_restore_brbe(host_ctxt);
+>>  }
+>>  
+>>  void __debug_switch_to_host(struct kvm_vcpu *vcpu)
