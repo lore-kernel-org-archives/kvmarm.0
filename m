@@ -1,427 +1,358 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4829C54F9B
-	for <kvmarm@lists.linux.dev>; Tue, 21 Nov 2023 14:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6146F1101
+	for <kvmarm@lists.linux.dev>; Tue, 21 Nov 2023 16:50:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AfdO3JZ0"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2c50305c5c4so75414981fa.1
-        for <kvmarm@lists.linux.dev>; Tue, 21 Nov 2023 06:12:58 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="f87u6UhT";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="FHY0j8QS"
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ALFoFal026806;
+	Tue, 21 Nov 2023 16:49:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version; s=corp-2023-11-20;
+ bh=CZf7+0Gf51poGhudlRXJSz9/vIritvaoAA/B0ggXZ9U=;
+ b=f87u6UhTvM0NyRwb2vvjazoLc/s3bG4IIOgHPR+PgbhFydxoqYFTpnpYuyOcX4dC6FUa
+ +Nmeynbc3cZd1kSQJfPiZGOLxNdE1UD4vLM3AzOP8JcHcNIkJhtQKWLHVfHVFIpeQQ0K
+ 0K1kaxiwhTIEYMgMfdX0Yzgk/gucq73jI/l1eGalPiQD7IBN4rRmalK4yjKWMZIFaEE2
+ 41KNnnl9RzwhPrjA1JBnJeHkAjC8ca5HR6Ehs+yIiBaYGawq+9y5jzTJ98qIBvDpbZbH
+ HzzGyMPRXOCQSneQ/6dlIBFnVP83gvYajfHkNiitZcIumQfqvj1+LBCPSGnhI8OMSuwK CQ== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3uekv2wjnr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Nov 2023 16:49:56 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3ALFosmC023639;
+	Tue, 21 Nov 2023 16:49:54 GMT
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2168.outbound.protection.outlook.com [104.47.58.168])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3uekq7ab1a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Nov 2023 16:49:54 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oYBpOAOl/C14YApOh4VpZFz5iLdE3FgvisvKfzMtsdhZVDqAL7pZkdwunoVM2hdv0FO1JsRxxTUoYTF89BpyDR71IXyF1uUcV5ezLZI6xtwaycjqzMs/LplVWd9V+Xt8zFPCsqyG0wEgytD79q0A5HI05ZPArL1fALZSP7/+BiDfgMc86XWLcWv2j/aq5VnaNDPXFgFFswgP7akgSVppBcLgynHgBu9wkOEpMzj+fEjy8AdIvc46vTgJpFcHKZR+LnRDzrSc3KIEBZrA796WezmO9tVLzcjhJCJjGhEwR24/D0ab4w4LovAFuf7auxuqBD99ZpMbydvh+xA4f+QBgA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CZf7+0Gf51poGhudlRXJSz9/vIritvaoAA/B0ggXZ9U=;
+ b=NeXwU/6LbYuny2f1l0Bswow87yS2zdakKaIbIRrpqXP+k1sx51U/FhWhZToERgvpdON1e53PZoh1yfiROmXxqeyonY7RA6GyjhSXjauC54U2hCnJBeZqk+yuI7vJH9fRwchrm0a9OCQBmT+bkliWQ8H67fDib239zuk5uPBfRkNBHvkU+18xAGMPQrvQQdzZwKPsduSHACn7y8n4Nq14/J990GrvVmEPAoxSE27Q07bFcnxQ5KCVlkMqHhhCGIhDpda9BEvVJZNR482Nn4lSLRynkJbV2cORuSlQiFpEpLugm5QYgZBLoikW681MWKn0oXHyREQ0ACHe709F785gRw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700575977; x=1701180777; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dHZlJnR2F0+kbBXUJA/BBV3JLpteKy8OuOSHxj5KI5E=;
-        b=AfdO3JZ0zM16fjxP9LRgFTHy7hJDM6HdR/42exZOlUdMXym9FeHIkV317SzbokgC6p
-         HtYqJjFvSge6H9my6n3CrMl0isOmf7iASeTt2nP660Dc2qU2O2C60xcgwAcEOsucRTeL
-         OHv5Vfp2Mn8LsSKV0U6VQg7offlSHiIiF7Xq1X5b1v83Zr/e2Re/HwEeMDcpRZsryA8K
-         cpxXRkYcfH50eiazDnrMH9zvrW+SWYe9xSKQvGGEn/FIxfxxtEMSSg1lZtwJokZ4lfNG
-         +u+pOlh7U4dnUqiswf//ZmAihM0OOhNyg1kOZuzkiQhlV86ztnr1SMKcgOPgZejXA5oh
-         00rA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700575977; x=1701180777;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dHZlJnR2F0+kbBXUJA/BBV3JLpteKy8OuOSHxj5KI5E=;
-        b=oodo4azgGutAZsBGU6Tf73kSSPovpmk9go5xYj6GMGrHl+VBjX1dIZPR102urVJ84Q
-         ersmWstwN44s95MmaCjx2FxweSuW6BMy5KCk6gUKNB87gL1AXiZSuN32qrrOF/HNf44e
-         Avw8R7HqNhp6lwuWPJ41HmreZ17yg4kpUjY15M3wgOKbrG4ttRsf/vSI5BBJ6X/kr3XY
-         M7FcKWZGtxtwAecM1T2zbu8PFnfS+3eHXt8+SC4Xv/9Tkb4kVFIXKFWF8TtRC+G+Kym9
-         4HtnYEcb/IJcOKR1ucXLt9pteIYaOUM5cOvoEnRon3hu2DRrkyRukl39sUoeJftRgKV9
-         karg==
-X-Gm-Message-State: AOJu0YyUZk0YE87NKZos8iLU5jtthrcSOCNe6/5aDZgl7hQTp9lLIIe3
-	GGcXxcXJFZpAKcDWPpGBD7q+vA==
-X-Google-Smtp-Source: AGHT+IGL75TNKNlK3xK8N0MVZKH6ry+2ulpJqeCInxN3WKW1NEHFlC5VZx3WcKTitRzIRAsDLXvxHA==
-X-Received: by 2002:a2e:9296:0:b0:2c5:31de:6c02 with SMTP id d22-20020a2e9296000000b002c531de6c02mr7305774ljh.15.1700575976818;
-        Tue, 21 Nov 2023 06:12:56 -0800 (PST)
-Received: from google.com (109.36.187.35.bc.googleusercontent.com. [35.187.36.109])
-        by smtp.gmail.com with ESMTPSA id bg6-20020a05600c3c8600b004090ca6d785sm17472366wmb.2.2023.11.21.06.12.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Nov 2023 06:12:56 -0800 (PST)
-Date: Tue, 21 Nov 2023 14:12:50 +0000
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: will@kernel.org, Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, catalin.marinas@arm.com,
-	mark.rutland@arm.com, akpm@linux-foundation.org, maz@kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com,
-	qperret@google.com, smostafa@google.com
-Subject: Re: [PATCH v3 01/10] KVM: arm64: Add snap shooting the host stage-2
- pagetables
-Message-ID: <ZVy64ha-IaX_c0pl@google.com>
-References: <20231115171639.2852644-2-sebastianene@google.com>
- <20231115171639.2852644-3-sebastianene@google.com>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CZf7+0Gf51poGhudlRXJSz9/vIritvaoAA/B0ggXZ9U=;
+ b=FHY0j8QSR2IaURkMV8TrwDwDMb98AQyFABCjf7kEXIeUuBwHyULlRUO8EiVvFgColgPGLGrM1fUy7UPjwTW+rx2eb7FLF6TvGERjD2bMBwhQUnQVm3nQ4QKr5BVSxaWpPEO3d+vNAAd51svCVL4fzr9jlbr58w883p/+VcFhlZw=
+Received: from PH0PR10MB5433.namprd10.prod.outlook.com (2603:10b6:510:e0::9)
+ by DS7PR10MB7279.namprd10.prod.outlook.com (2603:10b6:8:e2::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.28; Tue, 21 Nov
+ 2023 16:49:52 +0000
+Received: from PH0PR10MB5433.namprd10.prod.outlook.com
+ ([fe80::cef0:d8a0:3eb1:66b2]) by PH0PR10MB5433.namprd10.prod.outlook.com
+ ([fe80::cef0:d8a0:3eb1:66b2%4]) with mapi id 15.20.7002.028; Tue, 21 Nov 2023
+ 16:49:52 +0000
+From: Miguel Luis <miguel.luis@oracle.com>
+To: Marc Zyngier <maz@kernel.org>
+CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+        Alexandru Elisei
+	<alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase
+ Conklin <chase.conklin@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart
+	<darren@os.amperecomputing.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton
+	<oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support
+ (FEAT_NV2 only)
+Thread-Topic: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support
+ (FEAT_NV2 only)
+Thread-Index: AQHaG7L/0SySzEvvDUqvWro5gTy1j7CE/goA
+Date: Tue, 21 Nov 2023 16:49:52 +0000
+Message-ID: <DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
+References: <20231120131027.854038-1-maz@kernel.org>
+In-Reply-To: <20231120131027.854038-1-maz@kernel.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR10MB5433:EE_|DS7PR10MB7279:EE_
+x-ms-office365-filtering-correlation-id: a75d8379-dc31-44cc-3fb7-08dbeab1e1c3
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ yOPxb6/xTOnkEzR00AecFNMA2fM6OYUKJ+Ib1dB7KrrAb9pdNaMXtL+2PhvkcFBjzytLBO1sEYUZvLkgqFgHfl24jHIjWcMiQDsQHNiXoO7+G8M/7P42KzwiL4o7y4nS9mrTCAux/LTFoyab0fi5o7fGLOJpse6KxifRHC3l7zFnInm7aqu1vsyvumyeng91hjBqe7Sw1CI4wJ2uNn6Ck5P5Ruj6AkX/aQhdIMwpe/R9h9DYGHmxV5zX39OxbK1q3yzs3EGIt0Hp3M+8dtFOVWXh6XqZodEXRRbU/CduOjm7QTuz2Kud6HOddmUahz0McoY8agrU1e3rSjU+5FyMl1bYYKVznOiKTui0x5QbFw4CJMJXlrD2sWc2dmAFdxtnMgsY9uQj+uC7/enB7eecTinpuED1HKRa2LcHMaLuDsQjhCWYOpqZOrJlj7XwRW4ZYjVQOQY1N2zmlOL6Xxxj81QrFstXm0M7t1AxXKcl5ghDz4jnoeUcT1jPZrbKHU97AC7vHvMqXyat60+0nQZPqWYGs2M3f5hgYw64hjc8pwAN4Hlu5ITR+xHD4XOkyTogDzT3pIB9LPayawFMZbn9/xSvt6+ECCYYbMkER4b8mkwR8FLyoKTcls/OecmJ16RQtFR1D1BYJnA4xyWOlDQox5NFAMDHaAFtsoX/wsTOvLp7+/kd6/hrcv0m76x7Y+jK
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB5433.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(396003)(366004)(136003)(39860400002)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(66899024)(316002)(6916009)(91956017)(54906003)(66476007)(66946007)(66556008)(64756008)(76116006)(66446008)(53546011)(6512007)(6506007)(2616005)(38070700009)(966005)(6486002)(478600001)(71200400001)(38100700002)(122000001)(83380400001)(33656002)(86362001)(36756003)(44832011)(2906002)(7416002)(5660300002)(8936002)(8676002)(4326008)(41300700001)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?TywOnujG/pQg+q+oaJR3itJu8XkqrPnTMlb90zOA7I1wksZ0zWdf1BqWjcg8?=
+ =?us-ascii?Q?+n1qAaIwIfhvtROYdt7UrgMPPPDenZ5OBoIyvF9+8I3EFUZ3VTg4wlpa8ytn?=
+ =?us-ascii?Q?iS+gY4WnHTjsxgbloX36+3P0iKstpX921SKpKFKsnOd+7xbZKDqIrBLdG0q5?=
+ =?us-ascii?Q?Mr1aM2j6TDF50WCtaCo9Iaa02jv1R90AkS+9zxlPszgMhJfDEOl2d+j1MjEe?=
+ =?us-ascii?Q?kG8OES2WmybO9x209I4KdgBRoF3w5EizrVPtM++JVzu3LXfjq2jEY9fgUGhW?=
+ =?us-ascii?Q?fKT6xUMwiSKK4icnzAwoilYOBcL9N7FgNzLH5Vt3r2OaPg6tPgbriXWXTInb?=
+ =?us-ascii?Q?EXqLk/YrHQlW137z416USFtxAGkf+8081yMlDr9oJ6ApmV0gCUfCidz7s3I1?=
+ =?us-ascii?Q?oO59VFJSH7vGHpkBqoEUqjdcVE6ux2oW+Q0DrGpK9/PCH9be1t7mAsbj/rnX?=
+ =?us-ascii?Q?NpxbCzkFNMNTxWiYfXXtbtJxgljKycnOHl5Hnf+xeBg+T/mp//Z2ZNj5KCL1?=
+ =?us-ascii?Q?bquQnjcYjJTsP1dH6rMhyfIzjhjDyKlZgVWni/VZZh0Mr3m7CVQfMJ55Z9g6?=
+ =?us-ascii?Q?K3frXMzs+PtwTSId55JoK0KK1wEySL3rkImxOO7CcIvqNyUo5paypGrk/iZK?=
+ =?us-ascii?Q?Dkr5eybMoD6eYA4j90hPMvsKC5ceXJFHLQjehRI+cdVudffuhRKOuCVhiTs0?=
+ =?us-ascii?Q?PU9JM6D42SbHFlWnQfZIdx5DJ9YoNM87qGmcPK+8TIW6HFRgzXgwKJ/PPxYx?=
+ =?us-ascii?Q?8b7aCVXuknRklaIHrUrOuB9hdzc7hf50YsHJXVtI9g+x4iEUGTJbXpwH6nqg?=
+ =?us-ascii?Q?wTzCuhdaEyerRjpMRTpY/SW0WN6+G0IbAfU2+DkCOlv05F9AKBGw71tPjjvr?=
+ =?us-ascii?Q?JALysPFKWsFMOc9m5UzKj0fw+aMFcAzCME98vZe/zZqSPVDGy7YM64DpWi8c?=
+ =?us-ascii?Q?xNPGXOOShCqhyWDDfEI8v+lmMMxET1aRqG2K6cYqYXDmUuwuFeL/wrbinVEh?=
+ =?us-ascii?Q?qffmO4yf9AoWi717jxx2wEUxSjyA0lk+rWGew9SR/PrsFp06VyQYZNKK81r4?=
+ =?us-ascii?Q?TEapseUOAc0xGQB3NNIzqRicUNCbca3XzNU+2imm0blDP1M3lBrba/jOk330?=
+ =?us-ascii?Q?aMC04ZH6fIJxxeP7APy750xUiwO8DFMY/cuKiTcSwPffU+zA78i1tJh9fbFx?=
+ =?us-ascii?Q?RiTX+MmMNPoRc4js0zWbIW3D+DK8nb+Mc7+NJGF8/RupTHAdmHs0hqgVLmJv?=
+ =?us-ascii?Q?K/rYeMqZWwLcG5VTEvk3n1i+zMcWSH3QYpe0U8VsvWUSE1Ws6xX2uG5bE6UL?=
+ =?us-ascii?Q?aegmNY0AcE/8TPQzHPVFJm/qIZvAGUW7kvT3lxDVDVCKahjwB9ZEVbVBiglf?=
+ =?us-ascii?Q?XAS8Yiep2+/zUadHgFoX8Nh2el3WQm+EiZaEXvZ67zGGLmY9YMlWlY2Y3aYH?=
+ =?us-ascii?Q?lwWBfm9y5d7+mXPOKK3vXsMazwlHqLt/38ixUBKqkvrZqEV2pjCHQIjO1jxS?=
+ =?us-ascii?Q?foFbwYctWt5yQdxnPD0ftOCU13fp3DZfrTNPP7v7tNJzfTA6BKv/0kkyc6Zs?=
+ =?us-ascii?Q?6GdOIKVyO7XRxnBYqlO2m3tLVN2ggzMu/w79X+Dj+mwzfTJVAyRz/81xFbgN?=
+ =?us-ascii?Q?0kkO57VRpQ+WUiobscqAoE0=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <DC9DBA823B3B7549B4AAE50799791A90@namprd10.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231115171639.2852644-3-sebastianene@google.com>
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	=?us-ascii?Q?CQu6fk7BdFfCV6Gcl3D3r+l4lR5SnlCIBJ7SavetaPCA6Qh29UvouM2CMSXM?=
+ =?us-ascii?Q?Vzx0PNWzzmTwjLx0ZiB8hnDDJuagH/EV60WDYmJbL8xFjlDq7M8TAYriVSFD?=
+ =?us-ascii?Q?1h+eXQd9S1lnEDiJUQhf0G7w3qSVFByd4nyXWqGB9mT/nmct4HBK98rMxTK2?=
+ =?us-ascii?Q?YvtaFVqPHdsmpMJbxFCNZPnLj6NiNnqCQUOHaPo/q1G1IwAMi549Wb5MjTr+?=
+ =?us-ascii?Q?rgoMFkBv6idjvye7OL7z4B6bMZSkj9iYVo8tHtvjXADsJj7jpCHawb9Zzl3P?=
+ =?us-ascii?Q?YTnFJaINmfkLA1Hp5Wsb3jlWKjcECmNdxvNOXbnqxoCDL58p66SHwq7Jtwf8?=
+ =?us-ascii?Q?N97oYAiU0W9bcjY1Gyx+X6nLZkIGWyNCSDkt9t7Fg1ldkD6UdkyA0KsFDwz9?=
+ =?us-ascii?Q?TW1dUvfZ/3su5+mDWM2Pi4rqRJRSvPgjS0YFsXQPe+vkoubM7ZyAP7kKOF7G?=
+ =?us-ascii?Q?nsR3XwO5gQ+vP+OVcI+Q4Oh4E1u/caihSNUdl4fmp1r7dtTpzGwIcKP60QO7?=
+ =?us-ascii?Q?ufDC/7Yl6w1nCUbBYS1f3uSgqJ0AFaOgX585DsOfvtEu+Q5YiHGPrY3MxBeJ?=
+ =?us-ascii?Q?noHN4N/3MGYndjQyiaOkr7KUhkgKZXpNViOiDW3m2hvENmvxsW+MFYg7NtX4?=
+ =?us-ascii?Q?c+aYmGQ69boulMNWz+FeSnhUIuaZxiKMnK7YAgF1lSJ37wgTnpwFkMLqMwOi?=
+ =?us-ascii?Q?SB60WQ/hD9aSa5yc4Tt2qQGEkxMbeDYmeOTGNH0PfzGrg/fLr1KEgT5lmDAr?=
+ =?us-ascii?Q?RWyscH6kCm041XFr/3I28ExobXUGPv8eeBDJZbjDn1uxvFWl5PRNA3BXlfeu?=
+ =?us-ascii?Q?kH/gdYLvloZLu2z2X6jFLBZ67jGOxInCX3LD3wObbGtMHtrS6y6XIj+oymJq?=
+ =?us-ascii?Q?QGvIjRDbWGUtEd4pqHwLDFqkiTwVTtkOfGJY+oc/uxHUsyexX9DI4RJiee9l?=
+ =?us-ascii?Q?Tn/3OSq4sY5+Y7QPC3FIWJaiITQQHx1xfnowplqnB+gjcsO2i434lmCk2Kk/?=
+ =?us-ascii?Q?m+VY4/mI1yn7mKtcsRgHIs75iAlHZPOBHugwikeEyeMWiINPxnZJsodKUAq1?=
+ =?us-ascii?Q?RRKtiHnowN/yqgd79Wn44yOWoXjPWuU83lhvX4SZDzAYhdjlQ/k=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB5433.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a75d8379-dc31-44cc-3fb7-08dbeab1e1c3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Nov 2023 16:49:52.0305
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: PIhdg3+g56Z499v+ai2YCug6n2BVQMI88YYjuUjdOfsNewiNTD9rSqqthqjVV/0Cv0QEfYGZr3vlDwH2c5TEhg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB7279
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-21_10,2023-11-21_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 mlxscore=0
+ mlxlogscore=999 phishscore=0 malwarescore=0 suspectscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
+ definitions=main-2311210132
+X-Proofpoint-GUID: KGslg5qCGVvc8TB_Z0l82LDS6eTBFDwH
+X-Proofpoint-ORIG-GUID: KGslg5qCGVvc8TB_Z0l82LDS6eTBFDwH
 
-On Wed, Nov 15, 2023 at 05:16:31PM +0000, Sebastian Ene wrote:
-> Introduce a new HVC that allows the caller to snap shoot the stage-2
+Hi Marc,
 
-"snapshot" same in the title of this patch.
+> On 20 Nov 2023, at 12:09, Marc Zyngier <maz@kernel.org> wrote:
+>=20
+> This is the 5th drop of NV support on arm64 for this year, and most
+> probably the last one for this side of Christmas.
+>=20
+> For the previous episodes, see [1].
+>=20
+> What's changed:
+>=20
+> - Drop support for the original FEAT_NV. No existing hardware supports
+>  it without FEAT_NV2, and the architecture is deprecating the former
+>  entirely. This results in fewer patches, and a slightly simpler
+>  model overall.
+>=20
+> - Reorganise the series to make it a bit more logical now that FEAT_NV
+>  is gone.
+>=20
+> - Apply the NV idreg restrictions on VM first run rather than on each
+>  access.
+>=20
+> - Make the nested vgic shadow CPU interface a per-CPU structure rather
+>  than per-vcpu.
+>=20
+> - Fix the EL0 timer fastpath
+>=20
+> - Work around the architecture deficiencies when trapping WFI from a
+>  L2 guest.
+>=20
+> - Fix sampling of nested vgic state (MISR, ELRSR, EISR)
+>=20
+> - Drop the patches that have already been merged (NV trap forwarding,
+>  per-MMU VTCR)
+>=20
+> - Rebased on top of 6.7-rc2 + the FEAT_E2H0 support [2].
+>=20
+> The branch containing these patches (and more) is at [3]. As for the
+> previous rounds, my intention is to take a prefix of this series into
+> 6.8, provided that it gets enough reviewing.
+>=20
+> [1] https://lore.kernel.org/r/20230515173103.1017669-1-maz@kernel.org
+> [2] https://lore.kernel.org/r/20231120123721.851738-1-maz@kernel.org
+> [3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git=
+/log/?h=3Dkvm-arm64/nv-6.8-nv2-only
+>=20
 
-> pagetables under NVHE debug configuration. The caller specifies the
-> location where the pagetables are copied and must ensure that the memory
-> is accessible by the hypervisor. The memory where the pagetables are
-> copied has to be allocated by the caller and shared with the hypervisor.
-> 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> ---
->  arch/arm64/include/asm/kvm_asm.h              |   1 +
->  arch/arm64/include/asm/kvm_pgtable.h          |  36 +++++++
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   1 +
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  20 ++++
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 102 ++++++++++++++++++
->  arch/arm64/kvm/hyp/pgtable.c                  |  56 ++++++++++
->  6 files changed, 216 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 24b5e6b23417..99145a24c0f6 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -81,6 +81,7 @@ enum __kvm_host_smccc_func {
->  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_teardown_vm,
-> +	__KVM_HOST_SMCCC_FUNC___pkvm_copy_host_stage2,
->  };
->  
->  #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index d3e354bb8351..be615700f8ac 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -10,6 +10,7 @@
->  #include <linux/bits.h>
->  #include <linux/kvm_host.h>
->  #include <linux/types.h>
-> +#include <asm/kvm_host.h>
->  
->  #define KVM_PGTABLE_MAX_LEVELS		4U
->  
-> @@ -351,6 +352,21 @@ struct kvm_pgtable {
->  	kvm_pgtable_force_pte_cb_t		force_pte_cb;
->  };
->  
-> +/**
-> + * struct kvm_pgtable_snapshot - Snapshot page-table wrapper.
-> + * @pgtable:		The page-table configuration.
-> + * @mc:			Memcache used for pagetable pages allocation.
-> + * @pgd_hva:		Host virtual address of a physically contiguous buffer
-> + *			used for storing the PGD.
-> + * @pgd_len:		The size of the phyisically contiguous buffer in bytes.
-> + */
-> +struct kvm_pgtable_snapshot {
-> +	struct kvm_pgtable			pgtable;
-> +	struct kvm_hyp_memcache			mc;
-> +	void					*pgd_hva;
-> +	size_t					pgd_len;
-> +};
-> +
->  /**
->   * kvm_pgtable_hyp_init() - Initialise a hypervisor stage-1 page-table.
->   * @pgt:	Uninitialised page-table structure to initialise.
-> @@ -756,4 +772,24 @@ enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
->   */
->  void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
->  				phys_addr_t addr, size_t size);
-> +
-> +#ifdef CONFIG_NVHE_EL2_DEBUG
-> +/**
-> + * kvm_pgtable_stage2_copy() - Snapshot the pagetable
-> + *
-> + * @to_pgt:	Destination pagetable
-> + * @from_pgt:	Source pagetable. The caller must lock the pagetables first
-> + * @mc:		The memcache where we allocate the destination pagetables from
-> + */
-> +int kvm_pgtable_stage2_copy(struct kvm_pgtable *to_pgt,
-> +			    const struct kvm_pgtable *from_pgt,
-> +			    void *mc);
-> +#else
-> +static inline int kvm_pgtable_stage2_copy(struct kvm_pgtable *to_pgt,
-> +					  const struct kvm_pgtable *from_pgt,
-> +					  void *mc)
-> +{
-> +	return -EPERM;
-> +}
-> +#endif	/* CONFIG_NVHE_EL2_DEBUG */
->  #endif	/* __ARM64_KVM_PGTABLE_H__ */
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> index 0972faccc2af..9cfb35d68850 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> @@ -69,6 +69,7 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
->  int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
->  int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
->  int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
-> +int __pkvm_host_stage2_prepare_copy(struct kvm_pgtable_snapshot *snapshot);
+While I was testing this with kvmtool for 5.16 I noted the following on dme=
+sg:
 
-nit: the struct being a snapshot and that function doing the actual snapshot,
-maybe __pkvm_host_stage2_snapshot() would be a better name?
+[  803.014258] kvm [19040]: Unsupported guest sys_reg access at: 8129fa50 [=
+600003c9]
+                { Op0( 3), Op1( 5), CRn( 1), CRm( 0), Op2( 2), func_read },
 
->  
->  bool addr_is_memory(phys_addr_t phys);
->  int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 2385fd03ed87..98646cc67497 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -314,6 +314,25 @@ static void handle___pkvm_teardown_vm(struct kvm_cpu_context *host_ctxt)
->  	cpu_reg(host_ctxt, 1) = __pkvm_teardown_vm(handle);
->  }
->  
-> +static void handle___pkvm_copy_host_stage2(struct kvm_cpu_context *host_ctxt)
-> +{
-> +#ifdef CONFIG_NVHE_EL2_DEBUG
-> +	int ret = -EPERM;
-> +	DECLARE_REG(struct kvm_pgtable_snapshot *, snapshot, host_ctxt, 1);
-> +	kvm_pteref_t pgd;
-> +
-> +	snapshot = kern_hyp_va(snapshot);
-> +	ret = __pkvm_host_stage2_prepare_copy(snapshot);
-> +	if (!ret) {
-> +		pgd = snapshot->pgtable.pgd;
-> +		snapshot->pgtable.pgd = (kvm_pteref_t)__hyp_pa(pgd);
-> +	}
-> +	cpu_reg(host_ctxt, 1) = ret;
-> +#else
-> +	cpu_reg(host_ctxt, 0) = SMCCC_RET_NOT_SUPPORTED;
-> +#endif
-> +}
-> +
->  typedef void (*hcall_t)(struct kvm_cpu_context *);
->  
->  #define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = (hcall_t)handle_##x
-> @@ -348,6 +367,7 @@ static const hcall_t host_hcall[] = {
->  	HANDLE_FUNC(__pkvm_init_vm),
->  	HANDLE_FUNC(__pkvm_init_vcpu),
->  	HANDLE_FUNC(__pkvm_teardown_vm),
-> +	HANDLE_FUNC(__pkvm_copy_host_stage2),
->  };
->  
->  static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 8d0a5834e883..1c3ab5ac9110 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -266,6 +266,108 @@ int kvm_guest_prepare_stage2(struct pkvm_hyp_vm *vm, void *pgd)
->  	return 0;
->  }
->  
-> +#ifdef CONFIG_NVHE_EL2_DEBUG
-> +static struct hyp_pool snapshot_pool = {0};
-> +static DEFINE_HYP_SPINLOCK(snapshot_pool_lock);
-> +
-> +static void *snapshot_zalloc_pages_exact(size_t size)
-> +{
-> +	void *addr = hyp_alloc_pages(&snapshot_pool, get_order(size));
-> +
-> +	hyp_split_page(hyp_virt_to_page(addr));
-> +
-> +	/*
-> +	 * The size of concatenated PGDs is always a power of two of PAGE_SIZE,
-> +	 * so there should be no need to free any of the tail pages to make the
-> +	 * allocation exact.
-> +	 */
-> +	WARN_ON(size != (PAGE_SIZE << get_order(size)));
-> +
-> +	return addr;
-> +}
-> +
-> +static void snapshot_get_page(void *addr)
-> +{
-> +	hyp_get_page(&snapshot_pool, addr);
-> +}
-> +
-> +static void *snapshot_zalloc_page(void *mc)
-> +{
-> +	struct hyp_page *p;
-> +	void *addr;
-> +
-> +	addr = hyp_alloc_pages(&snapshot_pool, 0);
-> +	if (addr)
-> +		return addr;
-> +
-> +	addr = pop_hyp_memcache(mc, hyp_phys_to_virt);
-> +	if (!addr)
-> +		return addr;
-> +
-> +	memset(addr, 0, PAGE_SIZE);
-> +	p = hyp_virt_to_page(addr);
-> +	memset(p, 0, sizeof(*p));
+This is CPACR_EL12.
 
-Why do you need to rease this entry of the vmemmap? That sounds odd.
+Still need yet to debug.
 
-> +	p->refcount = 1;
-> +
-> +	return addr;
-> +}
-> +
-> +static void snapshot_s2_free_pages_exact(void *addr, unsigned long size)
-> +{
-> +	u8 order = get_order(size);
-> +	unsigned int i;
-> +	struct hyp_page *p;
-> +
-> +	for (i = 0; i < (1 << order); i++) {
-> +		p = hyp_virt_to_page(addr + (i * PAGE_SIZE));
-> +		hyp_page_ref_dec_and_test(p);
+As for QEMU, it is having issues enabling _EL2 feature although EL2 is supp=
+orted by
+checking KVM_CAP_ARM_EL2; need yet to debug this.
 
-hyp_page_ref_dec() would be enough here.
+Thanks
 
-> +	}
-> +}
-> +
-> +int __pkvm_host_stage2_prepare_copy(struct kvm_pgtable_snapshot *snapshot)
-> +{
-> +	size_t required_pgd_len;
-> +	struct kvm_pgtable_mm_ops mm_ops = {0};
-> +	struct kvm_s2_mmu *mmu = &host_mmu.arch.mmu;
-> +	struct kvm_pgtable *to_pgt, *from_pgt = &host_mmu.pgt;
-> +	struct kvm_hyp_memcache *memcache = &snapshot->mc;
-> +	int ret;
-> +	void *pgd;
+Miguel
 
-The shared memory between host and hyp should probably be pinned here even if it
-is behind a DEBUG option. That would also ensure that the memory has actually
-been shared beforehand and we'll not crash while running that. 
+> Andre Przywara (1):
+>  KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
+>=20
+> Christoffer Dall (2):
+>  KVM: arm64: nv: Implement nested Stage-2 page table walk logic
+>  KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
+>=20
+> Jintack Lim (3):
+>  KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
+>  KVM: arm64: nv: Respect virtual CPTR_EL2.{TFP,FPEN} settings
+>  KVM: arm64: nv: Trap and emulate TLBI instructions from virtual EL2
+>=20
+> Marc Zyngier (37):
+>  arm64: cpufeatures: Restrict NV support to FEAT_NV2
+>  KVM: arm64: nv: Hoist vcpu_has_nv() into is_hyp_ctxt()
+>  KVM: arm64: nv: Compute NV view of idregs as a one-off
+>  KVM: arm64: nv: Drop EL12 register traps that are redirected to VNCR
+>  KVM: arm64: nv: Add non-VHE-EL2->EL1 translation helpers
+>  KVM: arm64: nv: Add include containing the VNCR_EL2 offsets
+>  KVM: arm64: Introduce a bad_trap() primitive for unexpected trap
+>    handling
+>  KVM: arm64: nv: Add EL2_REG_VNCR()/EL2_REG_REDIR() sysreg helpers
+>  KVM: arm64: nv: Map VNCR-capable registers to a separate page
+>  KVM: arm64: nv: Handle virtual EL2 registers in
+>    vcpu_read/write_sys_reg()
+>  KVM: arm64: nv: Handle HCR_EL2.E2H specially
+>  KVM: arm64: nv: Handle CNTHCTL_EL2 specially
+>  KVM: arm64: nv: Save/Restore vEL2 sysregs
+>  KVM: arm64: nv: Configure HCR_EL2 for FEAT_NV2
+>  KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+>  KVM: arm64: nv: Handle shadow stage 2 page faults
+>  KVM: arm64: nv: Restrict S2 RD/WR permissions to match the guest's
+>  KVM: arm64: nv: Set a handler for the system instruction traps
+>  KVM: arm64: nv: Trap and emulate AT instructions from virtual EL2
+>  KVM: arm64: nv: Hide RAS from nested guests
+>  KVM: arm64: nv: Add handling of EL2-specific timer registers
+>  KVM: arm64: nv: Sync nested timer state with FEAT_NV2
+>  KVM: arm64: nv: Publish emulated timer interrupt state in the
+>    in-memory state
+>  KVM: arm64: nv: Load timer before the GIC
+>  KVM: arm64: nv: Nested GICv3 Support
+>  KVM: arm64: nv: Don't block in WFI from nested state
+>  KVM: arm64: nv: Fold GICv3 host trapping requirements into guest setup
+>  KVM: arm64: nv: Deal with broken VGIC on maintenance interrupt
+>    delivery
+>  KVM: arm64: nv: Add handling of FEAT_TTL TLB invalidation
+>  KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like
+>    information
+>  KVM: arm64: nv: Tag shadow S2 entries with nested level
+>  KVM: arm64: nv: Allocate VNCR page when required
+>  KVM: arm64: nv: Fast-track 'InHost' exception returns
+>  KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
+>  KVM: arm64: nv: Use FEAT_ECV to trap access to EL0 timers
+>  KVM: arm64: nv: Accelerate EL0 timer read accesses when FEAT_ECV is on
+>  KVM: arm64: nv: Allow userspace to request KVM_ARM_VCPU_NESTED_VIRT
+>=20
+> .../virt/kvm/devices/arm-vgic-v3.rst          |  12 +-
+> arch/arm64/include/asm/esr.h                  |   1 +
+> arch/arm64/include/asm/kvm_arm.h              |   3 +
+> arch/arm64/include/asm/kvm_asm.h              |   4 +
+> arch/arm64/include/asm/kvm_emulate.h          |  53 +-
+> arch/arm64/include/asm/kvm_host.h             | 223 +++-
+> arch/arm64/include/asm/kvm_hyp.h              |   2 +
+> arch/arm64/include/asm/kvm_mmu.h              |  12 +
+> arch/arm64/include/asm/kvm_nested.h           | 130 ++-
+> arch/arm64/include/asm/sysreg.h               |   7 +
+> arch/arm64/include/asm/vncr_mapping.h         | 102 ++
+> arch/arm64/include/uapi/asm/kvm.h             |   1 +
+> arch/arm64/kernel/cpufeature.c                |  22 +-
+> arch/arm64/kvm/Makefile                       |   4 +-
+> arch/arm64/kvm/arch_timer.c                   | 115 +-
+> arch/arm64/kvm/arm.c                          |  46 +-
+> arch/arm64/kvm/at.c                           | 219 ++++
+> arch/arm64/kvm/emulate-nested.c               |  48 +-
+> arch/arm64/kvm/handle_exit.c                  |  29 +-
+> arch/arm64/kvm/hyp/include/hyp/switch.h       |   8 +-
+> arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h    |   5 +-
+> arch/arm64/kvm/hyp/nvhe/switch.c              |   2 +-
+> arch/arm64/kvm/hyp/nvhe/sysreg-sr.c           |   2 +-
+> arch/arm64/kvm/hyp/vgic-v3-sr.c               |   6 +-
+> arch/arm64/kvm/hyp/vhe/switch.c               | 211 +++-
+> arch/arm64/kvm/hyp/vhe/sysreg-sr.c            | 133 ++-
+> arch/arm64/kvm/hyp/vhe/tlb.c                  |  83 ++
+> arch/arm64/kvm/mmu.c                          | 248 ++++-
+> arch/arm64/kvm/nested.c                       | 813 ++++++++++++++-
+> arch/arm64/kvm/reset.c                        |   7 +
+> arch/arm64/kvm/sys_regs.c                     | 978 ++++++++++++++++--
+> arch/arm64/kvm/vgic/vgic-init.c               |  35 +
+> arch/arm64/kvm/vgic/vgic-kvm-device.c         |  29 +-
+> arch/arm64/kvm/vgic/vgic-v3-nested.c          | 270 +++++
+> arch/arm64/kvm/vgic/vgic-v3.c                 |  35 +-
+> arch/arm64/kvm/vgic/vgic.c                    |  29 +
+> arch/arm64/kvm/vgic/vgic.h                    |  10 +
+> arch/arm64/tools/cpucaps                      |   2 +
+> include/clocksource/arm_arch_timer.h          |   4 +
+> include/kvm/arm_arch_timer.h                  |  19 +
+> include/kvm/arm_vgic.h                        |  16 +
+> include/uapi/linux/kvm.h                      |   1 +
+> tools/arch/arm/include/uapi/asm/kvm.h         |   1 +
+> 43 files changed, 3725 insertions(+), 255 deletions(-)
+> create mode 100644 arch/arm64/include/asm/vncr_mapping.h
+> create mode 100644 arch/arm64/kvm/at.c
+> create mode 100644 arch/arm64/kvm/vgic/vgic-v3-nested.c
+>=20
+> --=20
+> 2.39.2
+>=20
 
-Pinning that memory would also make sure that the right amount has been shared
-for the pgd and we'll not overflow.
-
-> +
-> +	required_pgd_len = kvm_pgtable_stage2_pgd_size(mmu->vtcr);
-> +	if (snapshot->pgd_len < required_pgd_len)
-> +		return -ENOMEM;
-> +
-> +	to_pgt = &snapshot->pgtable;
-> +	pgd = kern_hyp_va(snapshot->pgd_hva);
-> +
-> +	hyp_spin_lock(&snapshot_pool_lock);
-> +	hyp_pool_init(&snapshot_pool, hyp_virt_to_pfn(pgd),
-> +		      required_pgd_len / PAGE_SIZE, 0);
-> +
-> +	mm_ops.zalloc_pages_exact	= snapshot_zalloc_pages_exact;
-> +	mm_ops.zalloc_page		= snapshot_zalloc_page;
-> +	mm_ops.free_pages_exact		= snapshot_s2_free_pages_exact;
-> +	mm_ops.get_page			= snapshot_get_page;
-> +	mm_ops.phys_to_virt		= hyp_phys_to_virt;
-> +	mm_ops.virt_to_phys		= hyp_virt_to_phys;
-> +	mm_ops.page_count		= hyp_page_count;
-
-It looks a bit odd to me to have to handle refcount while the lifespan of that
-newly create page-table only the lifespace of that function, where everything is
-behind a lock.
-
-Is the need for the pool to handle the physically contiguous mem for the PGD? If
-that is the case, maybe you could avoid the pool by just passing as a separated
-argument the memory for the PGD and in another one the memcache for the other
-levels?
-
-Especially IIUC, the pool would be used here only for the PGD allocation, as you
-add only the size of the PGD to the pool?
-
->+
-> +	to_pgt->ia_bits		= from_pgt->ia_bits;
-> +	to_pgt->start_level	= from_pgt->start_level;
-> +	to_pgt->flags		= from_pgt->flags;
-> +	to_pgt->mm_ops		= &mm_ops;
-> +
-> +	host_lock_component();
-> +	ret = kvm_pgtable_stage2_copy(to_pgt, from_pgt, memcache);
-> +	host_unlock_component();
-> +
-> +	hyp_spin_unlock(&snapshot_pool_lock);
-> +
-> +	return ret;
-> +}
-> +#endif /* CONFIG_NVHE_EL2_DEBUG */
-> +
->  void reclaim_guest_pages(struct pkvm_hyp_vm *vm, struct kvm_hyp_memcache *mc)
->  {
->  	void *addr;
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 1966fdee740e..46b15d74118f 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1598,3 +1598,59 @@ void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *p
->  	WARN_ON(mm_ops->page_count(pgtable) != 1);
->  	mm_ops->put_page(pgtable);
->  }
-> +
-> +#ifdef CONFIG_NVHE_EL2_DEBUG
-> +static int stage2_copy_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> +			      enum kvm_pgtable_walk_flags visit)
-> +{
-> +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-> +	void *copy_table, *original_addr;
-> +	kvm_pte_t new = ctx->old;
-> +
-> +	if (!stage2_pte_is_counted(ctx->old))
-> +		return 0;
-> +
-> +	if (kvm_pte_table(ctx->old, ctx->level)) {
-> +		copy_table = mm_ops->zalloc_page(ctx->arg);
-> +		if (!copy_table)
-> +			return -ENOMEM;
-> +
-> +		original_addr = kvm_pte_follow(ctx->old, mm_ops);
-> +
-> +		memcpy(copy_table, original_addr, PAGE_SIZE);
-> +		new = kvm_init_table_pte(copy_table, mm_ops);
-> +	}
-> +
-> +	*ctx->ptep = new;
-> +
-> +	return 0;
-> +}
-> +
-> +int kvm_pgtable_stage2_copy(struct kvm_pgtable *to_pgt,
-> +			    const struct kvm_pgtable *from_pgt,
-> +			    void *mc)
-> +{
-> +	int ret;
-> +	size_t pgd_sz;
-> +	struct kvm_pgtable_mm_ops *mm_ops = to_pgt->mm_ops;
-> +	struct kvm_pgtable_walker walker = {
-> +		.cb	= stage2_copy_walker,
-> +		.flags	= KVM_PGTABLE_WALK_LEAF |
-> +			  KVM_PGTABLE_WALK_TABLE_PRE,
-
-Do you need the WALK_LEAF? Entire tables are copied and you don't need to change
-anything at the leaf level. Actually, stage2_copy_walker() writes new =
-ctx->old in that case, doesn't it?
-
-> +		.arg = mc
-> +	};
-> +
-> +	pgd_sz = kvm_pgd_pages(to_pgt->ia_bits, to_pgt->start_level) *
-> +		PAGE_SIZE;
-> +	to_pgt->pgd = (kvm_pteref_t)mm_ops->zalloc_pages_exact(pgd_sz);
-> +	if (!to_pgt->pgd)
-> +		return -ENOMEM;
-> +
-> +	memcpy(to_pgt->pgd, from_pgt->pgd, pgd_sz);
-> +
-> +	ret = kvm_pgtable_walk(to_pgt, 0, BIT(to_pgt->ia_bits), &walker);
-> +	mm_ops->free_pages_exact(to_pgt->pgd, pgd_sz);
-
-> +
-> +	return ret;
-> +}
-> +#endif /* CONFIG_NVHE_EL2_DEBUG */
-> -- 
-> 2.43.0.rc0.421.g78406f8d94-goog
-> 
