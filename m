@@ -1,141 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D971433B6;
-	Tue, 21 Nov 2023 19:02:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC305B1F3
+	for <kvmarm@lists.linux.dev>; Tue, 21 Nov 2023 19:30:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MnCEW1N0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08C6CC433C7;
-	Tue, 21 Nov 2023 19:02:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700593369;
-	bh=gMXUYkt8knGRYiC1FvMF8r845HfVg7cwv39TXqrEy5I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MnCEW1N0LxDfOPc09T2ReT0kfnJ2b9YtIoC10Ee7i8zy+5bV/OvRCMkczMJkdRwhQ
-	 ZVH+iU0Ylz5TJgbLT15b+Yk762OByJD2kPfxNFykkc7tLDdtq6iUll9wiJzXU9kubY
-	 W9ViqImF93XBS3v3pcfplew6gsKg3ieF8rLH2C4Nas0NgDvFOYErD6DUB50TKdrv+6
-	 VZRH2VVM3bW3Mi1aG3ac/Ecearg+mFd6BhqXfpSyFqPxFenPMwuJSOrovkgEbFGow7
-	 g5wejdrrHQZlvrVXA/vNQkZBg5sL1UNzWTDoLXUYZeoey3UzlOUgqCtEjRqawduRxg
-	 gCPX+MfsKrDSA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1r5W1G-00FCTS-8w;
-	Tue, 21 Nov 2023 19:02:46 +0000
-Date: Tue, 21 Nov 2023 19:02:45 +0000
-Message-ID: <86msv7ylnu.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Miguel Luis <miguel.luis@oracle.com>
-Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	Alexandru Elisei
-	<alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase
- Conklin <chase.conklin@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Darren Hart
-	<darren@os.amperecomputing.com>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton
-	<oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support (FEAT_NV2 only)
-In-Reply-To: <DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
-References: <20231120131027.854038-1-maz@kernel.org>
-	<DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="paU2zdqh"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1700595018;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kj9amk3sZHEhxmsx3Fn9wTkkDjnzbMy4CyCqBJxEZpc=;
+	b=paU2zdqhbVaPHBdil4bk5Lo91CEa3CeRvhpHOgoX6WESS3FOVxUemJd4Xck//2nYj2Tlzt
+	pTasWAA+ZG5w8LUmZeBGKBPlFZyNVMFK2aQ0zEpVJkULWOds2mY9pt7JuAZcbGkr9Nv4DI
+	NKRy+zNVugBX0uU46kGEQ/ZOcKQtwbU=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: linux-perf-users@vger.kernel.org
+Cc: kvmarm@lists.linux.dev,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH 1/2] tools perf: Add arm64 sysreg files to MANIFEST
+Date: Tue, 21 Nov 2023 19:29:55 +0000
+Message-ID: <20231121192956.919380-2-oliver.upton@linux.dev>
+In-Reply-To: <20231121192956.919380-1-oliver.upton@linux.dev>
+References: <20231121192956.919380-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 21 Nov 2023 16:49:52 +0000,
-Miguel Luis <miguel.luis@oracle.com> wrote:
-> 
-> Hi Marc,
-> 
-> > On 20 Nov 2023, at 12:09, Marc Zyngier <maz@kernel.org> wrote:
-> > 
-> > This is the 5th drop of NV support on arm64 for this year, and most
-> > probably the last one for this side of Christmas.
-> > 
-> > For the previous episodes, see [1].
-> > 
-> > What's changed:
-> > 
-> > - Drop support for the original FEAT_NV. No existing hardware supports
-> >  it without FEAT_NV2, and the architecture is deprecating the former
-> >  entirely. This results in fewer patches, and a slightly simpler
-> >  model overall.
-> > 
-> > - Reorganise the series to make it a bit more logical now that FEAT_NV
-> >  is gone.
-> > 
-> > - Apply the NV idreg restrictions on VM first run rather than on each
-> >  access.
-> > 
-> > - Make the nested vgic shadow CPU interface a per-CPU structure rather
-> >  than per-vcpu.
-> > 
-> > - Fix the EL0 timer fastpath
-> > 
-> > - Work around the architecture deficiencies when trapping WFI from a
-> >  L2 guest.
-> > 
-> > - Fix sampling of nested vgic state (MISR, ELRSR, EISR)
-> > 
-> > - Drop the patches that have already been merged (NV trap forwarding,
-> >  per-MMU VTCR)
-> > 
-> > - Rebased on top of 6.7-rc2 + the FEAT_E2H0 support [2].
-> > 
-> > The branch containing these patches (and more) is at [3]. As for the
-> > previous rounds, my intention is to take a prefix of this series into
-> > 6.8, provided that it gets enough reviewing.
-> > 
-> > [1] https://lore.kernel.org/r/20230515173103.1017669-1-maz@kernel.org
-> > [2] https://lore.kernel.org/r/20231120123721.851738-1-maz@kernel.org
-> > [3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-6.8-nv2-only
-> > 
-> 
-> While I was testing this with kvmtool for 5.16 I noted the following on dmesg:
-> 
-> [  803.014258] kvm [19040]: Unsupported guest sys_reg access at: 8129fa50 [600003c9]
->                 { Op0( 3), Op1( 5), CRn( 1), CRm( 0), Op2( 2), func_read },
-> 
-> This is CPACR_EL12.
+Ian pointed out that source tarballs are incomplete as of commit
+e2bdd172e665 ("perf build: Generate arm64's sysreg-defs.h and add to
+include path"), since the source files needed from the kernel tree do
+not appear in the manifest. Add them.
 
-CPACR_EL12 is redirected to VNCR[0x100]. It really shouldn't trap...
+Reported-by: Ian Rogers <irogers@google.com>
+Fixes: e2bdd172e665 ("perf build: Generate arm64's sysreg-defs.h and add to include path")
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ tools/perf/MANIFEST | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> Still need yet to debug.
-
-Can you disassemble the guest around the offending PC?
-
-> As for QEMU, it is having issues enabling _EL2 feature although EL2
-> is supported by checking KVM_CAP_ARM_EL2; need yet to debug this.
-
-The capability number changes at each release. Make sure you resync
-your includes.
-
-	M.
-
+diff --git a/tools/perf/MANIFEST b/tools/perf/MANIFEST
+index 1da7f4b91b4f..dc42de1785ce 100644
+--- a/tools/perf/MANIFEST
++++ b/tools/perf/MANIFEST
+@@ -1,3 +1,5 @@
++arch/arm64/tools/gen-sysreg.awk
++arch/arm64/tools/sysreg
+ tools/perf
+ tools/arch
+ tools/scripts
 -- 
-Without deviation from the norm, progress is not possible.
+2.43.0.rc1.413.gea7ed67945-goog
+
