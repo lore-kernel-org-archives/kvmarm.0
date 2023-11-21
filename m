@@ -1,33 +1,33 @@
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D0451C50
-	for <kvmarm@lists.linux.dev>; Tue, 21 Nov 2023 13:45:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBDD3537E5
+	for <kvmarm@lists.linux.dev>; Tue, 21 Nov 2023 13:45:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zuBcYUCQ"
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="yzid5gv5"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
 	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=l0bVO3Ofxt9I6VpXHzidso1VbLhWBJYttUHQB+3pVpM=; b=zuBcYUCQiAG0NR88MSgxbqDO6V
-	Xrx1OtZxl7qgEAcM4dhRnGuG4j4UAfNVoteCbEsmDpsS18qgO1t6X4tE6HheDuU+sGcwB61GFsXY3
-	oAsHidn5Amx9CErfoca+RAWdG+p+9hdYGw7FtnYFnqcQWpdrXDSiZC1x26zWOaaMM/IMc+HaJSod/
-	L3yyVf812AHdqwjcVS07SJ4E3oY48l13IDkcNT+YfqUNMWwEQGWxajN9gNGiZWPDyO4oHavpx0HSR
-	R0OqxZdTKTKtchrXvERekFPPpwVEabOxvXL9IQPbrSo6u8W/MzMCqUOPPtmMok8Gwh4a4LeqjOWnq
-	2zkVvF6g==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:43168 helo=rmk-PC.armlinux.org.uk)
+	bh=MybTCs6tsYZDrwJz/++A+jmJRhrdL7CvULTcPkTUtec=; b=yzid5gv5SI5zY82Hlc1Gt6Bd9y
+	m9LlGnvDe1oaHlCUMboOtTQz5h6uH+Ke+69oLozVrDB6dLaORXxXl/DbU6QPKyWF5l0zxta33zkKG
+	cWFLEBGo7dus40E3F+EA+glDPsU7Vj5WNTCB11yCB3RakaNWaCQ9L64M0i8WZpwaP074iuyAl44tP
+	H0ieRtkQOt4gZijRMlEVjeHmr9p3sPOD7shJvXB8jyy5p7eF/kJ/7LFE2eGUed00r5eWDSYwl//fN
+	t5iFOFTK0Ng7gnrCXr4WCSAoouBK3GUsmLGOi9NXTSNb73eKSfyYpuzymHp4J4xHG88yq9zmZ0R59
+	/VUfegHQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:32994 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1r5R44-0007B5-1i;
-	Tue, 21 Nov 2023 13:45:20 +0000
+	id 1r5R4E-0007Bi-2f;
+	Tue, 21 Nov 2023 13:45:30 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1r5R46-00Ct0A-GJ; Tue, 21 Nov 2023 13:45:22 +0000
+	id 1r5R4G-00Ct0M-PS; Tue, 21 Nov 2023 13:45:32 +0000
 In-Reply-To: <ZVyz/Ve5pPu8AWoA@shell.armlinux.org.uk>
 References: <ZVyz/Ve5pPu8AWoA@shell.armlinux.org.uk>
 From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
@@ -49,10 +49,10 @@ Cc: Salil Mehta <salil.mehta@huawei.com>,
 	 jianyong.wu@arm.com,
 	 justin.he@arm.com,
 	 James Morse <james.morse@arm.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>
-Subject: [PATCH 18/21] LoongArch: Use the __weak version of
- arch_unregister_cpu()
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>
+Subject: [PATCH 20/21] riscv: Switch over to GENERIC_CPU_DEVICES
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -62,50 +62,89 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1r5R46-00Ct0A-GJ@rmk-PC.armlinux.org.uk>
+Message-Id: <E1r5R4G-00Ct0M-PS@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 21 Nov 2023 13:45:22 +0000
+Date: Tue, 21 Nov 2023 13:45:32 +0000
 
 From: James Morse <james.morse@arm.com>
 
-LoongArch provides its own arch_unregister_cpu(). This clears the
-hotpluggable flag, then unregisters the CPU.
+Now that GENERIC_CPU_DEVICES calls arch_register_cpu(), which can be
+overridden by the arch code, switch over to this to allow common code
+to choose when the register_cpu() call is made.
 
-It isn't necessary to clear the hotpluggable flag when unregistering
-a cpu. unregister_cpu() writes NULL to the percpu cpu_sys_devices
-pointer, meaning cpu_is_hotpluggable() will return false, as
-get_cpu_device() has returned NULL.
+This allows topology_init() to be removed.
 
-Remove arch_unregister_cpu() and use the __weak version.
+This is an intermediate step to the logic being moved to drivers/acpi,
+where GENERIC_CPU_DEVICES will do the work when booting with acpi=off.
+
+This patch also has the effect of moving the registration of CPUs from
+subsys to driver core initialisation, prior to any initcalls running.
 
 Signed-off-by: James Morse <james.morse@arm.com>
 Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
-Changes since RFC v3:
- * Adapt for removal of EXPORT_SYMBOL()s
+Changes since RFC v2:
+ * Add note about initialisation order change.
 ---
- arch/loongarch/kernel/topology.c | 8 --------
- 1 file changed, 8 deletions(-)
+ arch/riscv/Kconfig        |  1 +
+ arch/riscv/kernel/setup.c | 19 ++++---------------
+ 2 files changed, 5 insertions(+), 15 deletions(-)
 
-diff --git a/arch/loongarch/kernel/topology.c b/arch/loongarch/kernel/topology.c
-index 7dfb46c68f58..866c2c9ef6ab 100644
---- a/arch/loongarch/kernel/topology.c
-+++ b/arch/loongarch/kernel/topology.c
-@@ -18,12 +18,4 @@ int arch_register_cpu(int cpu)
- 	c->hotpluggable = !io_master(cpu);
- 	return register_cpu(c, cpu);
- }
--
--void arch_unregister_cpu(int cpu)
--{
--	struct cpu *c = &per_cpu(cpu_devices, cpu);
--
--	c->hotpluggable = 0;
--	unregister_cpu(c);
--}
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index 95a2a06acc6a..162425cb9739 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -71,6 +71,7 @@ config RISCV
+ 	select GENERIC_ARCH_TOPOLOGY
+ 	select GENERIC_ATOMIC64 if !64BIT
+ 	select GENERIC_CLOCKEVENTS_BROADCAST if SMP
++	select GENERIC_CPU_DEVICES
+ 	select GENERIC_EARLY_IOREMAP
+ 	select GENERIC_ENTRY
+ 	select GENERIC_GETTIMEOFDAY if HAVE_GENERIC_VDSO
+diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
+index 535a837de55d..b3a0aa2b78d5 100644
+--- a/arch/riscv/kernel/setup.c
++++ b/arch/riscv/kernel/setup.c
+@@ -51,7 +51,6 @@ atomic_t hart_lottery __section(".sdata")
  #endif
+ ;
+ unsigned long boot_cpu_hartid;
+-static DEFINE_PER_CPU(struct cpu, cpu_devices);
+ 
+ /*
+  * Place kernel memory regions on the resource tree so that
+@@ -299,23 +298,13 @@ void __init setup_arch(char **cmdline_p)
+ 	riscv_user_isa_enable();
+ }
+ 
+-static int __init topology_init(void)
++int arch_register_cpu(int cpu)
+ {
+-	int i, ret;
++	struct cpu *c = &per_cpu(cpu_devices, cpu);
+ 
+-	for_each_possible_cpu(i) {
+-		struct cpu *cpu = &per_cpu(cpu_devices, i);
+-
+-		cpu->hotpluggable = cpu_has_hotplug(i);
+-		ret = register_cpu(cpu, i);
+-		if (unlikely(ret))
+-			pr_warn("Warning: %s: register_cpu %d failed (%d)\n",
+-			       __func__, i, ret);
+-	}
+-
+-	return 0;
++	c->hotpluggable = cpu_has_hotplug(cpu);
++	return register_cpu(c, cpu);
+ }
+-subsys_initcall(topology_init);
+ 
+ void free_initmem(void)
+ {
 -- 
 2.30.2
 
