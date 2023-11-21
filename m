@@ -1,63 +1,127 @@
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A7E4316F
-	for <kvmarm@lists.linux.dev>; Tue, 21 Nov 2023 11:48:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="D6ZlfF2f"
-Date: Tue, 21 Nov 2023 12:48:34 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1700567319;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MJvc/u+y8ffXcjbVywGlGI+oKyv//SVH2yBvytutDBI=;
-	b=D6ZlfF2fZwYPxQ9RnNZD7hAazWaP070kho89l5ICYnQb0eOsipL+mdcoVJg5hy5kcPh5UM
-	5MU/JKuXbQXsald1+UNRbxYNpG4rvfs29YDj7ldNFkLW11nS3mjIrRelWEaKNwzDllQXfO
-	EzMGiopli+tbuZawgG3ifNac9esKyAA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Matthias Rosenfelder <matthias.rosenfelder@nio.io>
-Cc: Andrew Jones <ajones@ventanamicro.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Eric Auger <eric.auger@redhat.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-Subject: Re: [kvm-unit-tests PATCH] arm: pmu: Fix overflow test condition
-Message-ID: <20231121-52d66740214725baf6775f54@orel>
-References: <FRYP281MB31463EC1486883DDA477393DF2C0A@FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM>
- <20231024-9418f5e7b9e014986bdd4b58@orel>
- <FRYP281MB3146C5D86DCCBBB6CA37D3ACF2DDA@FRYP281MB3146.DEUP281.PROD.OUTLOOK.COM>
- <20231026-82e0400727da79cc04a637a4@orel>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED8B730D1E
+	for <kvmarm@lists.linux.dev>; Tue, 21 Nov 2023 11:54:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BBD48FEC;
+	Tue, 21 Nov 2023 03:55:29 -0800 (PST)
+Received: from arm.com (e121798.cambridge.arm.com [10.1.197.44])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DD1103F7A6;
+	Tue, 21 Nov 2023 03:54:38 -0800 (PST)
+Date: Tue, 21 Nov 2023 11:54:36 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Peter Collingbourne <pcc@google.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
+	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
+	rppt@kernel.org, hughd@google.com, steven.price@arm.com,
+	anshuman.khandual@arm.com, vincenzo.frascino@arm.com,
+	david@redhat.com, eugenis@google.com, kcc@google.com,
+	hyesoo.yu@samsung.com, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC 20/37] mm: compaction: Reserve metadata storage in
+ compaction_alloc()
+Message-ID: <ZVyafCOxqfa7T130@arm.com>
+References: <20230823131350.114942-1-alexandru.elisei@arm.com>
+ <20230823131350.114942-21-alexandru.elisei@arm.com>
+ <CAMn1gO67Lz_Xw5SCrq3fF4rOCSw3sXYK8qC77TTGnJeWd0b0Sg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231026-82e0400727da79cc04a637a4@orel>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMn1gO67Lz_Xw5SCrq3fF4rOCSw3sXYK8qC77TTGnJeWd0b0Sg@mail.gmail.com>
 
-On Thu, Oct 26, 2023 at 04:31:51PM +0200, Andrew Jones wrote:
-> On Thu, Oct 26, 2023 at 02:24:07PM +0000, Matthias Rosenfelder wrote:
-> > Hi drew,
-> > 
-> > thanks for coming back to me. I tried using "git-send-email" but was struggling with the SMTP configuration of my company (Microsoft Outlook online account...). So far I've not found a way to authenticate with SMTP, so I was unfortunately unable to send the patch (with improved rationale, as requested).
-> > 
-> > Since giving back to the open source community is more of a personal wish and is not required by management (but also not forbidden), it has low priority and I already spent some time on this. I will send patches in the future from my personal email account.
-> > 
-> > I am totally fine with someone else submitting the patch.
-> > If it's not too inconvenient, could you please add a "reported-by" to the patch? (No problem if not)
-> > Thank you.
-> 
-> You have the authorship
-> 
-> https://gitlab.com/jones-drew/kvm-unit-tests/-/commit/52d963e95aa2fa3ce4faa9557cb99c002b177ec7
->
+Hi Peter,
 
-Merged into https://gitlab.com/kvm-unit-tests/kvm-unit-tests master
+On Mon, Nov 20, 2023 at 08:49:32PM -0800, Peter Collingbourne wrote:
+> Hi Alexandru,
+> 
+> On Wed, Aug 23, 2023 at 6:16 AM Alexandru Elisei
+> <alexandru.elisei@arm.com> wrote:
+> >
+> > If the source page being migrated has metadata associated with it, make
+> > sure to reserve the metadata storage when choosing a suitable destination
+> > page from the free list.
+> >
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> >  mm/compaction.c | 9 +++++++++
+> >  mm/internal.h   | 1 +
+> >  2 files changed, 10 insertions(+)
+> >
+> > diff --git a/mm/compaction.c b/mm/compaction.c
+> > index cc0139fa0cb0..af2ee3085623 100644
+> > --- a/mm/compaction.c
+> > +++ b/mm/compaction.c
+> > @@ -570,6 +570,7 @@ static unsigned long isolate_freepages_block(struct compact_control *cc,
+> >         bool locked = false;
+> >         unsigned long blockpfn = *start_pfn;
+> >         unsigned int order;
+> > +       int ret;
+> >
+> >         /* Strict mode is for isolation, speed is secondary */
+> >         if (strict)
+> > @@ -626,6 +627,11 @@ static unsigned long isolate_freepages_block(struct compact_control *cc,
+> >
+> >                 /* Found a free page, will break it into order-0 pages */
+> >                 order = buddy_order(page);
+> > +               if (metadata_storage_enabled() && cc->reserve_metadata) {
+> > +                       ret = reserve_metadata_storage(page, order, cc->gfp_mask);
+> 
+> At this point the zone lock is held and preemption is disabled, which
+> makes it invalid to call reserve_metadata_storage.
+
+You are correct, I missed that. I dropped reserving tag storage during
+compaction in the next iteration, so fortunately I unintentionally fixed
+it.
 
 Thanks,
-drew
+Alex
+
+> 
+> Peter
+> 
+> > +                       if (ret)
+> > +                               goto isolate_fail;
+> > +               }
+> >                 isolated = __isolate_free_page(page, order);
+> >                 if (!isolated)
+> >                         break;
+> > @@ -1757,6 +1763,9 @@ static struct folio *compaction_alloc(struct folio *src, unsigned long data)
+> >         struct compact_control *cc = (struct compact_control *)data;
+> >         struct folio *dst;
+> >
+> > +       if (metadata_storage_enabled())
+> > +               cc->reserve_metadata = folio_has_metadata(src);
+> > +
+> >         if (list_empty(&cc->freepages)) {
+> >                 isolate_freepages(cc);
+> >
+> > diff --git a/mm/internal.h b/mm/internal.h
+> > index d28ac0085f61..046cc264bfbe 100644
+> > --- a/mm/internal.h
+> > +++ b/mm/internal.h
+> > @@ -492,6 +492,7 @@ struct compact_control {
+> >                                          */
+> >         bool alloc_contig;              /* alloc_contig_range allocation */
+> >         bool source_has_metadata;       /* source pages have associated metadata */
+> > +       bool reserve_metadata;
+> >  };
+> >
+> >  /*
+> > --
+> > 2.41.0
+> >
