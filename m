@@ -1,147 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B79C168C1;
-	Tue, 21 Nov 2023 09:41:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F0U3uXef"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC07CC433C8;
-	Tue, 21 Nov 2023 09:41:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700559677;
-	bh=379g4h+2GfMItulHPNl9leppzk/chVF5EpjsGaRxLKg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=F0U3uXefqiqfv6gEP6kKbCrQTl6bhCTRTjA6Tzfos2Gwwt86zW5CCJKAtCH3cUCoR
-	 hq2W/LfLiS8OyQt5pjq5YEXyXS4y5VD6wisLD2zF6fEAnK052HgG8J9raPalW3K6wQ
-	 FjZ+Iel9iS1Prpdptx8JSCt4wwM14La7c0lsAr5hvqRhhk/8fBNVFEJSrg2grESpBE
-	 +j8f00oSY/JScZ4vVdzxtsA7hrfqLcyzKomOz8Xyz1xvbNN7DnwjEmGJaHft2KAD84
-	 ygMQztfR3xJzA9D3/6eKINM5hulYJ3bl8aVhI3f45VoOymwEVK80s7Wg15MhLvVM6O
-	 lpYHo+oS3Bajg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1r5NFq-00F1Iv-Go;
-	Tue, 21 Nov 2023 09:41:14 +0000
-Date: Tue, 21 Nov 2023 09:41:13 +0000
-Message-ID: <86r0kjzbnq.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Miguel Luis <miguel.luis@oracle.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support (FEAT_NV2 only)
-In-Reply-To: <67082409-f432-44b6-bf40-1af9b4b7b569@os.amperecomputing.com>
-References: <20231120131027.854038-1-maz@kernel.org>
-	<a44660c4-e43a-4663-94c0-9b290ea755e3@os.amperecomputing.com>
-	<86ttpfzd5k.wl-maz@kernel.org>
-	<67082409-f432-44b6-bf40-1af9b4b7b569@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B602D603
+	for <kvmarm@lists.linux.dev>; Tue, 21 Nov 2023 10:57:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from lhrpeml100001.china.huawei.com (unknown [172.18.147.207])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4SZLmv0DcRz6J9yP;
+	Tue, 21 Nov 2023 18:52:31 +0800 (CST)
+Received: from lhrpeml500001.china.huawei.com (7.191.163.213) by
+ lhrpeml100001.china.huawei.com (7.191.160.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 21 Nov 2023 10:57:27 +0000
+Received: from lhrpeml500001.china.huawei.com ([7.191.163.213]) by
+ lhrpeml500001.china.huawei.com ([7.191.163.213]) with mapi id 15.01.2507.035;
+ Tue, 21 Nov 2023 10:57:27 +0000
+From: Salil Mehta <salil.mehta@huawei.com>
+To: Oliver Upton <oliver.upton@linux.dev>, "Russell King (Oracle)"
+	<linux@armlinux.org.uk>
+CC: Jianyong Wu <jianyong.wu@arm.com>, "maz@kernel.org" <maz@kernel.org>,
+	"james.morse@arm.com" <james.morse@arm.com>, "will@kernel.org"
+	<will@kernel.org>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "justin.he@arm.com" <justin.he@arm.com>
+Subject: RE: [PATCH] arm64/kvm: Introduce feature extension for SMCCC filter
+Thread-Topic: [PATCH] arm64/kvm: Introduce feature extension for SMCCC filter
+Thread-Index: AQHaGIJSPxqmEiVqkkOrXIqhoEeoZ7B9TvAAgABHfQCABwlmkA==
+Date: Tue, 21 Nov 2023 10:57:27 +0000
+Message-ID: <9367235ee3b34a30af43a5689173f61e@huawei.com>
+References: <20231116114152.912344-1-jianyong.wu@arm.com>
+ <ZVZoKlWrjV1L3CBo@shell.armlinux.org.uk> <ZVakIv5mw6YUlHms@thinky-boi>
+In-Reply-To: <ZVakIv5mw6YUlHms@thinky-boi>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [10.195.245.211]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 
-On Tue, 21 Nov 2023 09:26:22 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> 
-> 
-> 
-> On 21-11-2023 02:38 pm, Marc Zyngier wrote:
-> > On Tue, 21 Nov 2023 08:51:35 +0000,
-> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> >> 
-> >> 
-> >> Hi Marc,
-> >> 
-> >> On 20-11-2023 06:39 pm, Marc Zyngier wrote:
-> >>> This is the 5th drop of NV support on arm64 for this year, and most
-> >>> probably the last one for this side of Christmas.
-> >>> 
-> >>> For the previous episodes, see [1].
-> >>> 
-> >>> What's changed:
-> >>> 
-> >>> - Drop support for the original FEAT_NV. No existing hardware supports
-> >>>     it without FEAT_NV2, and the architecture is deprecating the former
-> >>>     entirely. This results in fewer patches, and a slightly simpler
-> >>>     model overall.
-> >>> 
-> >>> - Reorganise the series to make it a bit more logical now that FEAT_NV
-> >>>     is gone.
-> >>> 
-> >>> - Apply the NV idreg restrictions on VM first run rather than on each
-> >>>     access.
-> >>> 
-> >>> - Make the nested vgic shadow CPU interface a per-CPU structure rather
-> >>>     than per-vcpu.
-> >>> 
-> >>> - Fix the EL0 timer fastpath
-> >>> 
-> >>> - Work around the architecture deficiencies when trapping WFI from a
-> >>>     L2 guest.
-> >>> 
-> >>> - Fix sampling of nested vgic state (MISR, ELRSR, EISR)
-> >>> 
-> >>> - Drop the patches that have already been merged (NV trap forwarding,
-> >>>     per-MMU VTCR)
-> >>> 
-> >>> - Rebased on top of 6.7-rc2 + the FEAT_E2H0 support [2].
-> >>> 
-> >>> The branch containing these patches (and more) is at [3]. As for the
-> >>> previous rounds, my intention is to take a prefix of this series into
-> >>> 6.8, provided that it gets enough reviewing.
-> >>> 
-> >>> [1] https://lore.kernel.org/r/20230515173103.1017669-1-maz@kernel.org
-> >>> [2] https://lore.kernel.org/r/20231120123721.851738-1-maz@kernel.org
-> >>> [3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-6.8-nv2-only
-> >>> 
-> >> 
-> >> V11 series is not booting on Ampere platform (I am yet to debug).
-> >> With lkvm, it is stuck at the very early stage itself and no early
-> >> boot prints/logs.
-> >> 
-> >> Are there any changes needed in kvmtool for V11?
-> > 
-> > Not really, I'm still using the version I had built for 6.5. Is the
-> > problem with L1 or L2?
-> 
-> Stuck in the L1 itself.
-> 
-> I am using kvmtool from
-> https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvmtool.git/log/?h=arm64/nv-5.16
+> From: Oliver Upton <oliver.upton@linux.dev>
+> Sent: Thursday, November 16, 2023 11:22 PM
+> To: Russell King (Oracle) <linux@armlinux.org.uk>
+>=20
+> On Thu, Nov 16, 2023 at 07:06:18PM +0000, Russell King (Oracle) wrote:
+> > On Thu, Nov 16, 2023 at 11:41:52AM +0000, Jianyong Wu wrote:
+> > > 821d935c87b introduces support for userspace SMCCC filtering, but lac=
+k
+> > > of a way to tell userspace if we have this feature. Add a correspondi=
+ng
+> > > feature extension can resolve this issue.
+> > >
+> > > For example, the incoming feature Vcpu Hotplug needs the SMCCC filter=
+.
+> > > As there is no way to check this feature, VMM will run into error whe=
+n
+> > > it calls this feature on an old kernel. It's bad for backward compati=
+ble.
+> >
+> > Can't you just attempt to use the SMCCC filtering, and if it errors out
+> > with the appropriate error code, decide that SMCCC filtering is not
+> > available?
+>=20
+> That would also work, as we return ENXIO for the unsupported ioctl.
+>=20
+> > That's how most things like kernel syscalls work - if they're not
+> > implemented they return -ENOSYS. glibc can detect that and use a
+> > fallback.
+>=20
+> I generally agree, but KVM has gone in the other direction of providing
+> auxiliary interfaces for discovering new UAPI. ENXIO has been slightly
+> overloaded to imply that a given ioctl is non-existent or otherwise
+> unsupported due to some dynamic configuration.
 
-Huh. That's positively ancient. Yet, you shouldn't get into a
-situation where the L1 guest locks up.
 
-I have pushed out my kvmtool branch[1]. Please give it a go.
+Agreed. We require this check for vCPU Hotplug series as well exactly
+for the reason you stated above i.e. to clearly distinguish the case
+when KVM host does not support SMCCC filter and when it does but an
+error is purged out during configuration of this filter. In the later
+we would like to abort the VM initialization (as being done in RFC V2)
+but in former we would just continue without supporting vCPU Hotplug
+feature. Handling is different in each.
 
-Thanks,
+Thanks
+Salil.
 
-	M.
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvmtool.git/log/?h=arm64/nv-6.5
-
--- 
-Without deviation from the norm, progress is not possible.
+>=20
+> Is it ideal? Of course not. With that said userspace may as well use the
+> preferred / documented discoverability mechanism. And in Jianyong's case
+> the KVM documentation is rather unambiguous (for once) about how you
+> discover device attributes.
+>=20
+> https://docs.kernel.org/virt/kvm/api.html#kvm-has-device-attr
+>=20
+> --
+> Thanks,
+> Oliver
