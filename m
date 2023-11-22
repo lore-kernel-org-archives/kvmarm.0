@@ -1,115 +1,127 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F7F1DA53;
-	Wed, 22 Nov 2023 09:46:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73ECA56470
+	for <kvmarm@lists.linux.dev>; Wed, 22 Nov 2023 09:46:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fUa44Bi6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A99AC43391;
-	Wed, 22 Nov 2023 09:46:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AqWdvnoT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F4B4C433D9;
+	Wed, 22 Nov 2023 09:46:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700646391;
-	bh=I+uVw8aipGa+8Ns9k+b3dq26kNHNXYgyRv4lZpoE8Nc=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=fUa44Bi64x8jXoE/MvI8BIoiZzNypKXZeeiprmYPWGJR3lX5FGydI1vtuAYWadks7
-	 UasgH5m/KtJQsDRJFu9SVTzRRZ09vZBslyb0Ho2ASTSMbx7DP6p+CS8+ianT5KLmas
-	 tJXDc07OIjutHkKJCdOQ9rbHFcS+M1Xk9x0/2ZDaXRW8l9gWOsMXGxNr64kYyyP2wN
-	 wkARHPE4CLrm5Ok5GqnIBpxAl47axEAxsh9fxCbSQqsYrNum0vfC6FHddFrleyQ0jj
-	 1fispSHLot6aPOIBz5WXtqFTgm3jtICwL5ybtt6OQ3R735RlkVitJiiQ8Rd9rwhnj7
-	 yf08/Sy6l7Hug==
-From: Mark Brown <broonie@kernel.org>
-Date: Wed, 22 Nov 2023 09:42:38 +0000
-Subject: [PATCH v7 28/39] kselftest/arm64: Verify the GCS hwcap
+	s=k20201202; t=1700646393;
+	bh=MCMS5v3jzmf+7lLA9wZaAGLJaz2gnrfEQNsqbXtQ994=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AqWdvnoT8BIgq72frVFNmSUx/EW9dfbieQNsKYmdNtFO+U6sj62DDF4YIafvbDiAF
+	 wVaLTXVUQApQ4uQPHDpWwDXNr3IFP9G/r+gm+RB5qakC1OWK8yK+g95ab6St8GaPE6
+	 q1s+kFLGNK8LNYEO9HmKP6gMm1sUAP0uX/pFUjj4i5C1UsrUDdYa7dGNbHpCioK8tY
+	 4XPDutRiM9Pc+8RZ9VMNmbAImvkc1DFlvwStS4MKRkRWpEXFva0jJdb3ECTt/AI/P8
+	 l761J/TlUwCfdk74ux4Hg2bEBOU4obmgMi0BqRmcrHnGueAfLF1YPTNnJmBVOUT1es
+	 Yi1o/GsTAnxyw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1r5joU-00FN8b-AW;
+	Wed, 22 Nov 2023 09:46:30 +0000
+Date: Wed, 22 Nov 2023 09:46:28 +0000
+Message-ID: <86leaqyvbf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 02/13] arm64: cpufeatures: Correctly handle signed values
+In-Reply-To: <2fb7398f-b865-44a7-8ee0-4a32ae40afa8@arm.com>
+References: <20231120123721.851738-1-maz@kernel.org>
+	<20231120123721.851738-3-maz@kernel.org>
+	<2fb7398f-b865-44a7-8ee0-4a32ae40afa8@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231122-arm64-gcs-v7-28-201c483bd775@kernel.org>
-References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
-In-Reply-To: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Andrew Morton <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, 
- Oleg Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, 
- Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, 
- "Rick P. Edgecombe" <rick.p.edgecombe@intel.com>, 
- Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, 
- Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Cc: "H.J. Lu" <hjl.tools@gmail.com>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- Florian Weimer <fweimer@redhat.com>, Christian Brauner <brauner@kernel.org>, 
- Thiago Jung Bauermann <thiago.bauermann@linaro.org>, 
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
- kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
- linux-arch@vger.kernel.org, linux-mm@kvack.org, 
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-riscv@lists.infradead.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.13-dev-0438c
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1190; i=broonie@kernel.org;
- h=from:subject:message-id; bh=I+uVw8aipGa+8Ns9k+b3dq26kNHNXYgyRv4lZpoE8Nc=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBlXc0MyzVIJO4Kid9gCsCQr45ifThlTEHkARV/j
- UTsXVxwqbuJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZV3NDAAKCRAk1otyXVSH
- 0PTmCACERewHlO0lUDAx7VBob22qNqbBIi4nI0finRcfRAMHGdVUVIxWAqs+6UQtEQWTanwoxxh
- RHNYkE5AnkhBIVqgo9rPkkciwxmqsPMafm9s1H0t/nysi4FdiMxIMpg6pQt0D3ydQ1Psg/yCml7
- nbLsDLWDnrT2PZBbwMSZdbxpf6TLjfDdFnf2PqTp7lJXdovzdfaZM83h4amYvIT+snl3MZDg+DE
- yO8Tc24qt+aAP5Fbjm4kLsSFx2poUdmSadKGczZTZxfOnsCSNiQjkj2FshEGptZPCYDyN1vmU0z
- I1pxYkitO980tsJqitFcBPPgoo+CvzMYooor7SZAL9CXXBHj
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, ardb@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add coverage of the GCS hwcap to the hwcap selftest, using a read of
-GCSPR_EL0 to generate SIGILL without having to worry about enabling GCS.
+On Wed, 22 Nov 2023 09:29:50 +0000,
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+> 
+> On 20/11/2023 12:37, Marc Zyngier wrote:
+> > Although we've had signed values for some features such as PMUv3
+> > and FP, the code that handles the comparaison with some limit
+> > has a couple of annoying issues:
+> > 
+> > - the min_field_value is always unsigned, meaning that we cannot
+> >    easily compare it with a negative value
+> > 
+> > - it is not possible to have a range of values, let alone a range
+> >    of negative values
+> > 
+> > Fix this by:
+> > 
+> > - adding an upper limit to the comparison, defaulting to all bits
+> >    being set to the maximum positive value
+> > 
+> > - ensuring that the signess of the min and max values are taken into
+> >    account
+> > 
+> > A ARM64_CPUID_FIELDS_NEG() macro is provided for signed features, but
+> > nothing is using it yet.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >   arch/arm64/include/asm/cpufeature.h |  1 +
+> >   arch/arm64/kernel/cpufeature.c      | 66 +++++++++++++++++++++++++----
+> >   2 files changed, 58 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> > index f6d416fe49b0..5f3f62efebd5 100644
+> > --- a/arch/arm64/include/asm/cpufeature.h
+> > +++ b/arch/arm64/include/asm/cpufeature.h
+> > @@ -363,6 +363,7 @@ struct arm64_cpu_capabilities {
+> >   			u8 field_pos;
+> >   			u8 field_width;
+> >   			u8 min_field_value;
+> > +			u8 max_field_value;
+> >   			u8 hwcap_type;
+> >   			bool sign;
+> >   			unsigned long hwcap;
+> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> > index 646591c67e7a..e52d2c2b757f 100644
+> > --- a/arch/arm64/kernel/cpufeature.c
+> > +++ b/arch/arm64/kernel/cpufeature.c
+> > @@ -140,12 +140,43 @@ void dump_cpu_features(void)
+> >   	pr_emerg("0x%*pb\n", ARM64_NCAPS, &system_cpucaps);
+> >   }
+> >   +#define __ARM64_EXPAND_RFV(reg, field, val)
+> > reg##_##field##_##val
+> 
+> We have defined SYS_FIELD_VALUE to be the exact same thing in Patch 1
+> and we later remove this and switch to using the same in Patch 8.
+> Could we not do this straight away here ? i.e. use the SYS_FIELD_VALUE
+> instead of adding this ?
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/arm64/abi/hwcap.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+Because I'm a moron and updated everything *except* my own patches.
+Apologies for the noise, I'll fix that shortly.
 
-diff --git a/tools/testing/selftests/arm64/abi/hwcap.c b/tools/testing/selftests/arm64/abi/hwcap.c
-index 1189e77c8152..bc9e3250a9df 100644
---- a/tools/testing/selftests/arm64/abi/hwcap.c
-+++ b/tools/testing/selftests/arm64/abi/hwcap.c
-@@ -63,6 +63,17 @@ static void fp_sigill(void)
- 	asm volatile("fmov s0, #1");
- }
- 
-+static void gcs_sigill(void)
-+{
-+	unsigned long *gcspr;
-+
-+	asm volatile(
-+		"mrs	%0, S3_3_C2_C5_1"
-+	: "=r" (gcspr)
-+	:
-+	: "cc");
-+}
-+
- static void ilrcpc_sigill(void)
- {
- 	/* LDAPUR W0, [SP, #8] */
-@@ -360,6 +371,14 @@ static const struct hwcap_data {
- 		.cpuinfo = "fp",
- 		.sigill_fn = fp_sigill,
- 	},
-+	{
-+		.name = "GCS",
-+		.at_hwcap = AT_HWCAP2,
-+		.hwcap_bit = HWCAP2_GCS,
-+		.cpuinfo = "gcs",
-+		.sigill_fn = gcs_sigill,
-+		.sigill_reliable = true,
-+	},
- 	{
- 		.name = "JSCVT",
- 		.at_hwcap = AT_HWCAP,
+> Rest looks good to me.
+
+Thanks!
+
+	M.
 
 -- 
-2.39.2
-
+Without deviation from the norm, progress is not possible.
