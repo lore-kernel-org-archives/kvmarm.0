@@ -1,128 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B3056476;
-	Wed, 22 Nov 2023 09:48:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uZVDPcKF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB795C433C9;
-	Wed, 22 Nov 2023 09:48:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700646492;
-	bh=+DcIGbRVvw60QaNepPSRFBnETXstp9aOb5bVveLOaFg=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=uZVDPcKFka+wlMJXjfzajobqpM6EaIscRoqp8YtTGuiZLIBclLh/18h+beyzfCCak
-	 O611N3cFEGc9ooTue7jvmAjHduLzlohXVD9CMIjCWn79H/TlnFbuXsNc8sX94PgzpD
-	 CziDJmtJS4Lxr7Q90BN45O6K7RZDp60OhWbeVYOizHCAv+pOxqIKTxJVflyNZ+J6XH
-	 /WFEwQWOydbHD+eyzieR8s/u37khmup0ORNwiLjGPrd5KdyWHwd+12K9tNSjVXsVMU
-	 h4yc9Yk3hd0sUoKwmILtXr0+4rKmOlfPSNZJELuR9deSXlQR1au1DbSTFSMH3s0Dw3
-	 UjGBYMzpNCEaQ==
-From: Mark Brown <broonie@kernel.org>
-Date: Wed, 22 Nov 2023 09:42:49 +0000
-Subject: [PATCH v7 39/39] kselftest/clone3: Enable GCS in the clone3
- selftests
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7776584F5
+	for <kvmarm@lists.linux.dev>; Wed, 22 Nov 2023 09:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B93E01595;
+	Wed, 22 Nov 2023 01:55:35 -0800 (PST)
+Received: from [10.57.42.32] (unknown [10.57.42.32])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 882473F6C4;
+	Wed, 22 Nov 2023 01:54:47 -0800 (PST)
+Message-ID: <a3f567a6-8fa5-4021-9ed1-9f2afa191045@arm.com>
+Date: Wed, 22 Nov 2023 09:54:46 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 05/13] arm64: cpufeature: Add ID_AA64MMFR4_EL1 handling
+Content-Language: en-GB
+To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>
+References: <20231120123721.851738-1-maz@kernel.org>
+ <20231120123721.851738-6-maz@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20231120123721.851738-6-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231122-arm64-gcs-v7-39-201c483bd775@kernel.org>
-References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
-In-Reply-To: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Andrew Morton <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, 
- Oleg Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, 
- Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, 
- "Rick P. Edgecombe" <rick.p.edgecombe@intel.com>, 
- Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, 
- Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Cc: "H.J. Lu" <hjl.tools@gmail.com>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- Florian Weimer <fweimer@redhat.com>, Christian Brauner <brauner@kernel.org>, 
- Thiago Jung Bauermann <thiago.bauermann@linaro.org>, 
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
- kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
- linux-arch@vger.kernel.org, linux-mm@kvack.org, 
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-riscv@lists.infradead.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.13-dev-0438c
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2416; i=broonie@kernel.org;
- h=from:subject:message-id; bh=+DcIGbRVvw60QaNepPSRFBnETXstp9aOb5bVveLOaFg=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBlXc0Uf5JbJdKOG4lKmXzlRMK5DRWagk6L/dGG+
- 23SAtCf39uJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZV3NFAAKCRAk1otyXVSH
- 0HKwB/44qmjC2meQurJ74cEJ5LyDpr1HY6Y1uWSWnrnkSyRi8ifcJAyyiipIeWWT2m2p19Mpf+V
- 5qrOSTOZdbGPeoAgIKaULvFGqHP/ksUE8h92lW7xsOkWWWvpcMBPOCkmhlsIYyaWpVOSMobVII8
- PBDQf7mV3cJuvY8YfCMIkBz3Ul6mwtxdu9vNby4YUtXDRU9U3cGAcL6XtW3KntS2xI0+aDTcs7i
- YX48MJ+hv3H+CYavScUNHVuNSx8y1Q3eta1i1xV3wGLOaAAxBPAvtoCuwkfsLCOAy6jNqbmbBPU
- 2P7pVrY78UsvDTA8mvMcJrJSnASVS4HY2NdgEMkZbCxKMCbn
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-In order to allow testing without full userspace support for shadow stacks
-the clone3() selftests open code enabling them at runtime, hook up arm64
-support.
+On 20/11/2023 12:37, Marc Zyngier wrote:
+> Add ID_AA64MMFR4_EL1 to the list of idregs the kernel knows about,
+> and describe the E2H0 field.
+> 
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>   arch/arm64/include/asm/cpu.h   | 1 +
+>   arch/arm64/kernel/cpufeature.c | 7 +++++++
+>   arch/arm64/kernel/cpuinfo.c    | 1 +
+>   3 files changed, 9 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/cpu.h b/arch/arm64/include/asm/cpu.h
+> index f3034099fd95..d5ba6ec9f711 100644
+> --- a/arch/arm64/include/asm/cpu.h
+> +++ b/arch/arm64/include/asm/cpu.h
+> @@ -57,6 +57,7 @@ struct cpuinfo_arm64 {
+>   	u64		reg_id_aa64mmfr1;
+>   	u64		reg_id_aa64mmfr2;
+>   	u64		reg_id_aa64mmfr3;
+> +	u64		reg_id_aa64mmfr4;
+>   	u64		reg_id_aa64pfr0;
+>   	u64		reg_id_aa64pfr1;
+>   	u64		reg_id_aa64zfr0;
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 767a6f288755..41db7f993eef 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -438,6 +438,11 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr3[] = {
+>   	ARM64_FTR_END,
+>   };
+>   
+> +static const struct arm64_ftr_bits ftr_id_aa64mmfr4[] = {
+> +	S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64MMFR4_EL1_E2H0_SHIFT, 4, 0),
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/clone3/clone3.c | 37 +++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+It does sound a bit confusing, but FTR_LOWER_SAFE is the correct choice 
+for the feature.
 
-diff --git a/tools/testing/selftests/clone3/clone3.c b/tools/testing/selftests/clone3/clone3.c
-index dbe52582573c..6114a33d6ec2 100644
---- a/tools/testing/selftests/clone3/clone3.c
-+++ b/tools/testing/selftests/clone3/clone3.c
-@@ -432,6 +432,43 @@ static inline void enable_shadow_stack(void)
- 
- #endif
- 
-+#ifdef __aarc64__
-+#define PR_SET_SHADOW_STACK_STATUS      72
-+# define PR_SHADOW_STACK_ENABLE         (1UL << 0)
-+
-+#define my_syscall2(num, arg1, arg2)                                          \
-+({                                                                            \
-+	register long _num  __asm__ ("x8") = (num);                           \
-+	register long _arg1 __asm__ ("x0") = (long)(arg1);                    \
-+	register long _arg2 __asm__ ("x1") = (long)(arg2);                    \
-+	register long _arg3 __asm__ ("x2") = 0;                               \
-+	register long _arg4 __asm__ ("x3") = 0;                               \
-+	register long _arg5 __asm__ ("x4") = 0;                               \
-+	                                                                      \
-+	__asm__  volatile (                                                   \
-+		"svc #0\n"                                                    \
-+		: "=r"(_arg1)                                                 \
-+		: "r"(_arg1), "r"(_arg2),                                     \
-+		  "r"(_arg3), "r"(_arg4),                                     \
-+		  "r"(_arg5), "r"(_num)					      \
-+		: "memory", "cc"                                              \
-+	);                                                                    \
-+	_arg1;                                                                \
-+})
-+
-+#define ENABLE_SHADOW_STACK
-+static inline void enable_shadow_stack(void)
-+{
-+	int ret;
-+
-+	ret = my_syscall2(__NR_prctl, PR_SET_SHADOW_STACK_STATUS,
-+			  PR_SHADOW_STACK_ENABLE);
-+	if (ret == 0)
-+		shadow_stack_enabled = true;
-+}
-+
-+#endif
-+
- #ifndef ENABLE_SHADOW_STACK
- static void enable_shadow_stack(void)
- {
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
--- 
-2.39.2
+
+> +	ARM64_FTR_END,
+> +};
+> +
+>   static const struct arm64_ftr_bits ftr_ctr[] = {
+>   	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_EXACT, 31, 1, 1), /* RES1 */
+>   	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, CTR_EL0_DIC_SHIFT, 1, 1),
+> @@ -755,6 +760,7 @@ static const struct __ftr_reg_entry {
+>   			       &id_aa64mmfr1_override),
+>   	ARM64_FTR_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2),
+>   	ARM64_FTR_REG(SYS_ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3),
+> +	ARM64_FTR_REG(SYS_ID_AA64MMFR4_EL1, ftr_id_aa64mmfr4),
+>   
+>   	/* Op1 = 1, CRn = 0, CRm = 0 */
+>   	ARM64_FTR_REG(SYS_GMID_EL1, ftr_gmid),
+> @@ -1079,6 +1085,7 @@ void __init init_cpu_features(struct cpuinfo_arm64 *info)
+>   	init_cpu_ftr_reg(SYS_ID_AA64MMFR1_EL1, info->reg_id_aa64mmfr1);
+>   	init_cpu_ftr_reg(SYS_ID_AA64MMFR2_EL1, info->reg_id_aa64mmfr2);
+>   	init_cpu_ftr_reg(SYS_ID_AA64MMFR3_EL1, info->reg_id_aa64mmfr3);
+> +	init_cpu_ftr_reg(SYS_ID_AA64MMFR4_EL1, info->reg_id_aa64mmfr4);
+>   	init_cpu_ftr_reg(SYS_ID_AA64PFR0_EL1, info->reg_id_aa64pfr0);
+>   	init_cpu_ftr_reg(SYS_ID_AA64PFR1_EL1, info->reg_id_aa64pfr1);
+>   	init_cpu_ftr_reg(SYS_ID_AA64ZFR0_EL1, info->reg_id_aa64zfr0);
+> diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
+> index a257da7b56fe..a4205effca46 100644
+> --- a/arch/arm64/kernel/cpuinfo.c
+> +++ b/arch/arm64/kernel/cpuinfo.c
+> @@ -452,6 +452,7 @@ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *info)
+>   	info->reg_id_aa64mmfr1 = read_cpuid(ID_AA64MMFR1_EL1);
+>   	info->reg_id_aa64mmfr2 = read_cpuid(ID_AA64MMFR2_EL1);
+>   	info->reg_id_aa64mmfr3 = read_cpuid(ID_AA64MMFR3_EL1);
+> +	info->reg_id_aa64mmfr4 = read_cpuid(ID_AA64MMFR4_EL1);
+>   	info->reg_id_aa64pfr0 = read_cpuid(ID_AA64PFR0_EL1);
+>   	info->reg_id_aa64pfr1 = read_cpuid(ID_AA64PFR1_EL1);
+>   	info->reg_id_aa64zfr0 = read_cpuid(ID_AA64ZFR0_EL1);
 
