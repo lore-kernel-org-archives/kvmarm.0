@@ -1,49 +1,49 @@
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C5A58AD0
-	for <kvmarm@lists.linux.dev>; Wed, 22 Nov 2023 20:05:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30705D8E8
+	for <kvmarm@lists.linux.dev>; Wed, 22 Nov 2023 20:08:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="PJl1GI33"
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-35ba5e00dc5so581435ab.1
-        for <kvmarm@lists.linux.dev>; Wed, 22 Nov 2023 12:05:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="HcHaiTeW"
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-35930447ae9so484535ab.2
+        for <kvmarm@lists.linux.dev>; Wed, 22 Nov 2023 12:08:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1700683548; x=1701288348; darn=lists.linux.dev;
+        d=sifive.com; s=google; t=1700683725; x=1701288525; darn=lists.linux.dev;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=jrlbMrkwsXYB4FXj2gcBQ1hP13CJwFlH1qETDwr8Bbw=;
-        b=PJl1GI33AfVR7kRI6Ha7C9DZWsm3KEChwoXPZpIvQDytR95k+AMvzs7lssqkgWX5DV
-         UV1O4aMUWL8Onc33/JdGnNoCULFHVlGlg2kS8TprGqlBxYNYIEmqfvb0AvBlN5hIZenQ
-         L8QmTZOpxZTXhqgVUzbPZyo73r3UGBLEOQyjg36xf+rKpMC3yoaJHK4IQs2/T6/Mbqzo
-         JhYjqcsrOI5nRimaBLMcgPTmzF1/qUnSduQhch/+Z8RL79GYl3tujo7RMJHi3xlMUO1o
-         D4q6VMACJxNNZAvd8gatvgWZZ/oyAtB4uok/pY4Btxuod1mdCONRPz30ohz3CL9L4uQI
-         PemA==
+        bh=Vwn5XjAFVwzSFE87KSWGBC++RkG6QZotk9BZhXt0jBU=;
+        b=HcHaiTeW6AGtvStumchh5Ayf++vOIxKv5jcmy0l+y64ZRwShiVUjvLbQH0biZyrx8F
+         07AMpw05yIpofYNUnp+C7lNOx0e0IhkGujP8Mnsk+UHUYRkCk77KjUs6wSDMU5YmgZqi
+         Cp/ENMPg/upBJNRJAwM+qrhgZVZMCQ6q41NKB9/TXBUKeX81EZ94KquPN4ptmbHdRZpr
+         MZ3PCBolx+HjJKmygdJQgRw1p+E9bqYJOdmNNf+ZoIpzidDduaRALQ4HtxOoWsyXb7n/
+         F66XV460WaUTLptcH3HcZakTwbol0989MuQo+mGRzS4wGoWCtIWYACveoEeUlm5hgyHz
+         O42Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700683548; x=1701288348;
+        d=1e100.net; s=20230601; t=1700683725; x=1701288525;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jrlbMrkwsXYB4FXj2gcBQ1hP13CJwFlH1qETDwr8Bbw=;
-        b=t+p+KR5jk3PNatC5U3f69RV93JF/ynL71cBNrvldAcKpp3Pc4/i6X3tyVRXuEDu0EP
-         qE3uYXjOLVgDB+bGwiByBfnpsScZKkRmsdRZ0AhbcA8HhUMwbD9zrFywZIT/0vYvJ8QY
-         wm0Iz/ucWlp7901lbWnzJkvvWfaxQAs6ogRk1889fZ7cf8kk7GbjvXkJHXIFZqwAPtEh
-         8UCo8yo99Oz0Pzsl0hl0HFAyfAGKJ7ERxFTAWBlSBgOWwNuxwRxxpe+YpH/GiuZLvQ/H
-         lwYdKgU94Oz4KrKkWBKFmeu3zO3xxC5+iky+7/ChcY52dmoRayYfrHwntI10rLE0JOUX
-         TCSA==
-X-Gm-Message-State: AOJu0YxpSrkksjXP843Puc4BmoKxbyEuGikGc7bA1pa/GS+VFkXDoY3F
-	moNy8gE87k2XGwL/prG/3s9GYA==
-X-Google-Smtp-Source: AGHT+IHnt1n8lKdOoy/IQ7zxz3tfAa5Q5pJfyX8St73RZdlSFGXq1ufTDSL1DA4xJt2sjOxhqX4opA==
-X-Received: by 2002:a05:6e02:11a1:b0:35a:ff35:b471 with SMTP id 1-20020a056e0211a100b0035aff35b471mr2869112ilj.14.1700683547904;
-        Wed, 22 Nov 2023 12:05:47 -0800 (PST)
+        bh=Vwn5XjAFVwzSFE87KSWGBC++RkG6QZotk9BZhXt0jBU=;
+        b=TcMG3XjT32Eo/r/8bJKaut6dkzO4OjJI7C1F5SjbCdtHuKVmHKs+gQjn2m4GM+DoMt
+         g045YxuNRS8z1jZBYaLO1ru0gDk7Y0f8Hmd+4Iu1K55zBUldS2Emvaw0nJHciAtEONd1
+         l0vbU3L3hxNYBiuwD6NZWzDJHBx7oc/EU2kKs0atkq/WHWkWUoDt+3HdWUqCuM7nW+0K
+         tFxIaR0XVBIi5ICVu20G3OzO8Bbfd0pCqeYR3YN1o6iRSK5+qM3QR7KKtTdnAdFs0LwK
+         ygXa5B10ZaqHG1OflI+i4j5ZGEXnKzSmy/9wV/mGBgRYRRPW7bUp0HbjXmgAMvSxesmn
+         6eAg==
+X-Gm-Message-State: AOJu0YxNn3RX9EWsrE44sdEffxelHFXjJCr+h7j+AW3w2jZvyeQrgyib
+	IhtF6SKuGS1cinsKikD3oYE9vA==
+X-Google-Smtp-Source: AGHT+IF2qTlIhwVKEGQ0JFu0xT0lbRPaHgpkk1nP2LZCxYCZLDSL39dT1xuRlbmj8kzVW+/OEqRihw==
+X-Received: by 2002:a05:6e02:1345:b0:359:8ddf:5319 with SMTP id k5-20020a056e02134500b003598ddf5319mr3302057ilr.26.1700683725117;
+        Wed, 22 Nov 2023 12:08:45 -0800 (PST)
 Received: from ?IPV6:2605:a601:adae:4500:3d43:c8e2:1496:e620? ([2605:a601:adae:4500:3d43:c8e2:1496:e620])
-        by smtp.gmail.com with ESMTPSA id f14-20020a02cace000000b004665ce094c4sm31227jap.161.2023.11.22.12.05.46
+        by smtp.gmail.com with ESMTPSA id e7-20020a926907000000b0035acf801fe5sm100939ilc.64.2023.11.22.12.08.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Nov 2023 12:05:47 -0800 (PST)
-Message-ID: <a46a6eaa-a11e-4b78-80be-23ff90349dd7@sifive.com>
-Date: Wed, 22 Nov 2023 14:05:45 -0600
+        Wed, 22 Nov 2023 12:08:44 -0800 (PST)
+Message-ID: <11b0d7cf-b136-454b-a624-d9247bcd2e31@sifive.com>
+Date: Wed, 22 Nov 2023 14:08:43 -0600
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -51,7 +51,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 20/21] riscv: Switch over to GENERIC_CPU_DEVICES
+Subject: Re: [PATCH 21/21] riscv: convert to use arch_cpu_is_hotpluggable()
 Content-Language: en-US
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 Cc: Salil Mehta <salil.mehta@huawei.com>,
@@ -66,40 +66,23 @@ Cc: Salil Mehta <salil.mehta@huawei.com>,
  linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
  linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org
 References: <ZVyz/Ve5pPu8AWoA@shell.armlinux.org.uk>
- <E1r5R4G-00Ct0M-PS@rmk-PC.armlinux.org.uk>
+ <E1r5R4L-00Ct0d-To@rmk-PC.armlinux.org.uk>
 From: Samuel Holland <samuel.holland@sifive.com>
-In-Reply-To: <E1r5R4G-00Ct0M-PS@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1r5R4L-00Ct0d-To@rmk-PC.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 2023-11-21 7:45 AM, Russell King (Oracle) wrote:
-> From: James Morse <james.morse@arm.com>
+> Convert riscv to use the arch_cpu_is_hotpluggable() helper rather than
+> arch_register_cpu().
 > 
-> Now that GENERIC_CPU_DEVICES calls arch_register_cpu(), which can be
-> overridden by the arch code, switch over to this to allow common code
-> to choose when the register_cpu() call is made.
-> 
-> This allows topology_init() to be removed.
-> 
-> This is an intermediate step to the logic being moved to drivers/acpi,
-> where GENERIC_CPU_DEVICES will do the work when booting with acpi=off.
-> 
-> This patch also has the effect of moving the registration of CPUs from
-> subsys to driver core initialisation, prior to any initcalls running.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 > Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
 > Reviewed-by: Gavin Shan <gshan@redhat.com>
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 > ---
-> Changes since RFC v2:
->  * Add note about initialisation order change.
-> ---
->  arch/riscv/Kconfig        |  1 +
->  arch/riscv/kernel/setup.c | 19 ++++---------------
->  2 files changed, 5 insertions(+), 15 deletions(-)
+>  arch/riscv/kernel/setup.c | 7 ++-----
+>  1 file changed, 2 insertions(+), 5 deletions(-)
 
 Reviewed-by: Samuel Holland <samuel.holland@sifive.com>
-Tested-by: Samuel Holland <samuel.holland@sifive.com>
+Tested-by: Samuel Holland <samuel.holland@sifive.com> # On HiFive Unmatched
 
