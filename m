@@ -1,17 +1,49 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5D6458AB5
-	for <kvmarm@lists.linux.dev>; Wed, 22 Nov 2023 18:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B9F491042;
-	Wed, 22 Nov 2023 10:10:53 -0800 (PST)
-Received: from [10.57.42.32] (unknown [10.57.42.32])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1D0B83F73F;
-	Wed, 22 Nov 2023 10:10:03 -0800 (PST)
-Message-ID: <02692fd9-d184-4b33-9f45-dd62593064e5@arm.com>
-Date: Wed, 22 Nov 2023 18:10:02 +0000
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C5A58AD0
+	for <kvmarm@lists.linux.dev>; Wed, 22 Nov 2023 20:05:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="PJl1GI33"
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-35ba5e00dc5so581435ab.1
+        for <kvmarm@lists.linux.dev>; Wed, 22 Nov 2023 12:05:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1700683548; x=1701288348; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jrlbMrkwsXYB4FXj2gcBQ1hP13CJwFlH1qETDwr8Bbw=;
+        b=PJl1GI33AfVR7kRI6Ha7C9DZWsm3KEChwoXPZpIvQDytR95k+AMvzs7lssqkgWX5DV
+         UV1O4aMUWL8Onc33/JdGnNoCULFHVlGlg2kS8TprGqlBxYNYIEmqfvb0AvBlN5hIZenQ
+         L8QmTZOpxZTXhqgVUzbPZyo73r3UGBLEOQyjg36xf+rKpMC3yoaJHK4IQs2/T6/Mbqzo
+         JhYjqcsrOI5nRimaBLMcgPTmzF1/qUnSduQhch/+Z8RL79GYl3tujo7RMJHi3xlMUO1o
+         D4q6VMACJxNNZAvd8gatvgWZZ/oyAtB4uok/pY4Btxuod1mdCONRPz30ohz3CL9L4uQI
+         PemA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700683548; x=1701288348;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jrlbMrkwsXYB4FXj2gcBQ1hP13CJwFlH1qETDwr8Bbw=;
+        b=t+p+KR5jk3PNatC5U3f69RV93JF/ynL71cBNrvldAcKpp3Pc4/i6X3tyVRXuEDu0EP
+         qE3uYXjOLVgDB+bGwiByBfnpsScZKkRmsdRZ0AhbcA8HhUMwbD9zrFywZIT/0vYvJ8QY
+         wm0Iz/ucWlp7901lbWnzJkvvWfaxQAs6ogRk1889fZ7cf8kk7GbjvXkJHXIFZqwAPtEh
+         8UCo8yo99Oz0Pzsl0hl0HFAyfAGKJ7ERxFTAWBlSBgOWwNuxwRxxpe+YpH/GiuZLvQ/H
+         lwYdKgU94Oz4KrKkWBKFmeu3zO3xxC5+iky+7/ChcY52dmoRayYfrHwntI10rLE0JOUX
+         TCSA==
+X-Gm-Message-State: AOJu0YxpSrkksjXP843Puc4BmoKxbyEuGikGc7bA1pa/GS+VFkXDoY3F
+	moNy8gE87k2XGwL/prG/3s9GYA==
+X-Google-Smtp-Source: AGHT+IHnt1n8lKdOoy/IQ7zxz3tfAa5Q5pJfyX8St73RZdlSFGXq1ufTDSL1DA4xJt2sjOxhqX4opA==
+X-Received: by 2002:a05:6e02:11a1:b0:35a:ff35:b471 with SMTP id 1-20020a056e0211a100b0035aff35b471mr2869112ilj.14.1700683547904;
+        Wed, 22 Nov 2023 12:05:47 -0800 (PST)
+Received: from ?IPV6:2605:a601:adae:4500:3d43:c8e2:1496:e620? ([2605:a601:adae:4500:3d43:c8e2:1496:e620])
+        by smtp.gmail.com with ESMTPSA id f14-20020a02cace000000b004665ce094c4sm31227jap.161.2023.11.22.12.05.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Nov 2023 12:05:47 -0800 (PST)
+Message-ID: <a46a6eaa-a11e-4b78-80be-23ff90349dd7@sifive.com>
+Date: Wed, 22 Nov 2023 14:05:45 -0600
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -19,145 +51,55 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/6] arm64: KVM: Add interface to set guest value for
- TRFCR register
-Content-Language: en-GB
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: James Clark <james.clark@arm.com>, coresight@lists.linaro.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, maz@kernel.org
-Cc: broonie@kernel.org, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mike Leach <mike.leach@linaro.org>, Leo Yan <leo.yan@linaro.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
- <robh@kernel.org>, Jintack Lim <jintack.lim@linaro.org>,
- Kristina Martsenko <kristina.martsenko@arm.com>,
- Fuad Tabba <tabba@google.com>, Akihiko Odaki <akihiko.odaki@daynix.com>,
- Joey Gouly <joey.gouly@arm.com>, linux-kernel@vger.kernel.org
-References: <20231019165510.1966367-1-james.clark@arm.com>
- <20231019165510.1966367-5-james.clark@arm.com>
- <0ebe2a54-8111-4e8e-8afe-3e17ce85fcb9@arm.com>
-In-Reply-To: <0ebe2a54-8111-4e8e-8afe-3e17ce85fcb9@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 20/21] riscv: Switch over to GENERIC_CPU_DEVICES
+Content-Language: en-US
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Salil Mehta <salil.mehta@huawei.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com,
+ justin.he@arm.com, James Morse <james.morse@arm.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev, x86@kernel.org,
+ linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org
+References: <ZVyz/Ve5pPu8AWoA@shell.armlinux.org.uk>
+ <E1r5R4G-00Ct0M-PS@rmk-PC.armlinux.org.uk>
+From: Samuel Holland <samuel.holland@sifive.com>
+In-Reply-To: <E1r5R4G-00Ct0M-PS@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 16/11/2023 19:26, Suzuki K Poulose wrote:
-> On 19/10/2023 17:55, James Clark wrote:
->> Add an interface for the Coresight driver to use to set the value of the
->> TRFCR register for the guest. This register controls the exclude
->> settings for trace at different exception levels, and is used to honor
->> the exclude_host and exclude_guest parameters from the Perf session.
->> This will be used to later write TRFCR_EL1 on nVHE at guest switch. For
->> VHE, the host trace is controlled by TRFCR_EL2 and thus we can write to
->> the TRFCR_EL1 immediately. Because guest writes to the register are
->> trapped, the value will persist and can't be modified.
+On 2023-11-21 7:45 AM, Russell King (Oracle) wrote:
+> From: James Morse <james.morse@arm.com>
 > 
-> This could also be added below to make it easier for the code reader.
+> Now that GENERIC_CPU_DEVICES calls arch_register_cpu(), which can be
+> overridden by the arch code, switch over to this to allow common code
+> to choose when the register_cpu() call is made.
 > 
->>
->> The settings must be copied to the vCPU before each run in the same
->> way that PMU events are, because the per-cpu struct isn't accessible in
->> protected mode.
->>
->> Signed-off-by: James Clark <james.clark@arm.com>
->> ---
->>   arch/arm64/include/asm/kvm_host.h |  3 +++
->>   arch/arm64/kvm/arm.c              |  1 +
->>   arch/arm64/kvm/debug.c            | 26 ++++++++++++++++++++++++++
->>   3 files changed, 30 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/kvm_host.h 
->> b/arch/arm64/include/asm/kvm_host.h
->> index 0f0bf8e641bd..e1852102550d 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -1125,6 +1125,8 @@ void kvm_arch_vcpu_put_debug_state_flags(struct 
->> kvm_vcpu *vcpu);
->>   void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
->>   void kvm_clr_pmu_events(u32 clr);
->>   bool kvm_set_pmuserenr(u64 val);
->> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest);
->> +void kvm_etm_update_vcpu_events(struct kvm_vcpu *vcpu);
->>   #else
->>   static inline void kvm_set_pmu_events(u32 set, struct 
->> perf_event_attr *attr) {}
->>   static inline void kvm_clr_pmu_events(u32 clr) {}
->> @@ -1132,6 +1134,7 @@ static inline bool kvm_set_pmuserenr(u64 val)
->>   {
->>       return false;
->>   }
->> +static inline void kvm_etm_set_guest_trfcr(u64 trfcr_guest) {}
->>   #endif
->>   void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu);
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 0f717b6a9151..e4d846f2f665 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -1015,6 +1015,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->>           kvm_vgic_flush_hwstate(vcpu);
->>           kvm_pmu_update_vcpu_events(vcpu);
->> +        kvm_etm_update_vcpu_events(vcpu);
->>           /*
->>            * Ensure we set mode to IN_GUEST_MODE after we disable
->> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
->> index 20cdd40b3c42..2ab41b954512 100644
->> --- a/arch/arm64/kvm/debug.c
->> +++ b/arch/arm64/kvm/debug.c
->> @@ -23,6 +23,12 @@
->>   static DEFINE_PER_CPU(u64, mdcr_el2);
->> +/*
->> + * Per CPU value for TRFCR that should be applied to any guest vcpu 
->> that may
->> + * run on that core in the future.
->> + */
->> +static DEFINE_PER_CPU(u64, guest_trfcr);
->> +
->>   /**
->>    * save/restore_guest_debug_regs
->>    *
->> @@ -356,3 +362,23 @@ void kvm_arch_vcpu_put_debug_state_flags(struct 
->> kvm_vcpu *vcpu)
->>       vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
->>       vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
->>   }
->> +
+> This allows topology_init() to be removed.
 > 
-> The comment in the description could be helpful here.
+> This is an intermediate step to the logic being moved to drivers/acpi,
+> where GENERIC_CPU_DEVICES will do the work when booting with acpi=off.
 > 
->> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest)
->> +{
->> +    if (has_vhe())
+> This patch also has the effect of moving the registration of CPUs from
+> subsys to driver core initialisation, prior to any initcalls running.
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+> Changes since RFC v2:
+>  * Add note about initialisation order change.
+> ---
+>  arch/riscv/Kconfig        |  1 +
+>  arch/riscv/kernel/setup.c | 19 ++++---------------
+>  2 files changed, 5 insertions(+), 15 deletions(-)
 
-I am wondering if "kvm" should do the extra safety check of
-making sure that the FEAT_TRF is available on the CPU, before
-actually writing to the register ? coresight calls this only
-when the FEAT_TRF is implemented. But given this is an exported
-function, may be we should be extra careful ?
-
-Suzuki
-
-
-
->> +        write_sysreg_s(trfcr_guest, SYS_TRFCR_EL12);
->> +    else
->> +        *this_cpu_ptr(&guest_trfcr) = trfcr_guest;
->> +}
->> +EXPORT_SYMBOL_GPL(kvm_etm_set_guest_trfcr);
->> +
->> +/*
->> + * Updates the vcpu's view of the etm events for this cpu. Must be
->> + * called before every vcpu run after disabling interrupts, to ensure
->> + * that an interrupt cannot fire and update the structure.
->> + */
->> +void kvm_etm_update_vcpu_events(struct kvm_vcpu *vcpu)
->> +{
->> +    if (!has_vhe() && vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRFCR))
->> +        ctxt_sys_reg(&vcpu->arch.ctxt, TRFCR_EL1) = 
->> *this_cpu_ptr(&guest_trfcr);
->> +}
-> 
-> Either way,
-> 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Reviewed-by: Samuel Holland <samuel.holland@sifive.com>
+Tested-by: Samuel Holland <samuel.holland@sifive.com>
 
