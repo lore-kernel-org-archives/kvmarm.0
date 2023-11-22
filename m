@@ -1,69 +1,260 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5BB72136A
-	for <kvmarm@lists.linux.dev>; Wed, 22 Nov 2023 09:16:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DBC51CAA8
+	for <kvmarm@lists.linux.dev>; Wed, 22 Nov 2023 09:22:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1F90F1595;
-	Wed, 22 Nov 2023 01:17:33 -0800 (PST)
-Received: from [10.57.42.32] (unknown [10.57.42.32])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E498B3F73F;
-	Wed, 22 Nov 2023 01:16:44 -0800 (PST)
-Message-ID: <8a173f26-9c88-4619-9d71-0c7625bc2129@arm.com>
-Date: Wed, 22 Nov 2023 09:16:44 +0000
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 42BE01595;
+	Wed, 22 Nov 2023 01:23:32 -0800 (PST)
+Received: from arm.com (e121798.cambridge.arm.com [10.1.197.44])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3C2073F73F;
+	Wed, 22 Nov 2023 01:22:41 -0800 (PST)
+Date: Wed, 22 Nov 2023 09:22:38 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Peter Collingbourne <pcc@google.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
+	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
+	rppt@kernel.org, hughd@google.com, steven.price@arm.com,
+	anshuman.khandual@arm.com, vincenzo.frascino@arm.com,
+	david@redhat.com, eugenis@google.com, kcc@google.com,
+	hyesoo.yu@samsung.com, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC v2 20/27] mm: hugepage: Handle huge page fault on
+ access
+Message-ID: <ZV3IXlxKcyOphMgb@arm.com>
+References: <20231119165721.9849-1-alexandru.elisei@arm.com>
+ <20231119165721.9849-21-alexandru.elisei@arm.com>
+ <CAMn1gO7_UG-T9Vf_7oVOhLD1DFVPc1ceSxdJFsFqkem_vCopog@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 03/13] arm64: cpufeature: Correctly display signed
- override values
-Content-Language: en-GB
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>
-References: <20231120123721.851738-1-maz@kernel.org>
- <20231120123721.851738-4-maz@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20231120123721.851738-4-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMn1gO7_UG-T9Vf_7oVOhLD1DFVPc1ceSxdJFsFqkem_vCopog@mail.gmail.com>
 
-On 20/11/2023 12:37, Marc Zyngier wrote:
-> When a field gets overriden, the kernel indicates the result of
-> the override in dmesg. This works well with unsigned fields, but
-> results in a pretty ugly output when the field is signed.
+Hi Peter,
+
+On Tue, Nov 21, 2023 at 05:28:49PM -0800, Peter Collingbourne wrote:
+> On Sun, Nov 19, 2023 at 8:59 AM Alexandru Elisei
+> <alexandru.elisei@arm.com> wrote:
+> >
+> > Handle PAGE_FAULT_ON_ACCESS faults for huge pages in a similar way to
+> > regular pages.
+> >
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> >  arch/arm64/include/asm/mte_tag_storage.h |  1 +
+> >  arch/arm64/include/asm/pgtable.h         |  7 ++
+> >  arch/arm64/mm/fault.c                    | 81 ++++++++++++++++++++++++
+> >  include/linux/huge_mm.h                  |  2 +
+> >  include/linux/pgtable.h                  |  5 ++
+> >  mm/huge_memory.c                         |  4 +-
+> >  mm/memory.c                              |  3 +
+> >  7 files changed, 101 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/mte_tag_storage.h b/arch/arm64/include/asm/mte_tag_storage.h
+> > index c70ced60a0cd..b97406d369ce 100644
+> > --- a/arch/arm64/include/asm/mte_tag_storage.h
+> > +++ b/arch/arm64/include/asm/mte_tag_storage.h
+> > @@ -35,6 +35,7 @@ void free_tag_storage(struct page *page, int order);
+> >  bool page_tag_storage_reserved(struct page *page);
+> >
+> >  vm_fault_t handle_page_missing_tag_storage(struct vm_fault *vmf);
+> > +vm_fault_t handle_huge_page_missing_tag_storage(struct vm_fault *vmf);
+> >  #else
+> >  static inline bool tag_storage_enabled(void)
+> >  {
+> > diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+> > index 8cc135f1c112..1704411c096d 100644
+> > --- a/arch/arm64/include/asm/pgtable.h
+> > +++ b/arch/arm64/include/asm/pgtable.h
+> > @@ -477,6 +477,13 @@ static inline vm_fault_t arch_do_page_fault_on_access(struct vm_fault *vmf)
+> >                 return handle_page_missing_tag_storage(vmf);
+> >         return VM_FAULT_SIGBUS;
+> >  }
+> > +
+> > +static inline vm_fault_t arch_do_huge_page_fault_on_access(struct vm_fault *vmf)
+> > +{
+> > +       if (tag_storage_enabled())
+> > +               return handle_huge_page_missing_tag_storage(vmf);
+> > +       return VM_FAULT_SIGBUS;
+> > +}
+> >  #endif /* CONFIG_ARCH_HAS_FAULT_ON_ACCESS */
+> >
+> >  #define pmd_present_invalid(pmd)     (!!(pmd_val(pmd) & PMD_PRESENT_INVALID))
+> > diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+> > index f5fa583acf18..6730a0812a24 100644
+> > --- a/arch/arm64/mm/fault.c
+> > +++ b/arch/arm64/mm/fault.c
+> > @@ -1041,6 +1041,87 @@ vm_fault_t handle_page_missing_tag_storage(struct vm_fault *vmf)
+> >
+> >         return 0;
+> >
+> > +out_retry:
+> > +       put_page(page);
+> > +       if (vmf->flags & FAULT_FLAG_VMA_LOCK)
+> > +               vma_end_read(vma);
+> > +       if (fault_flag_allow_retry_first(vmf->flags)) {
+> > +               err = VM_FAULT_RETRY;
+> > +       } else {
+> > +               /* Replay the fault. */
+> > +               err = 0;
+> > +       }
+> > +       return err;
+> > +}
+> > +
+> > +vm_fault_t handle_huge_page_missing_tag_storage(struct vm_fault *vmf)
+> > +{
+> > +       unsigned long haddr = vmf->address & HPAGE_PMD_MASK;
+> > +       struct vm_area_struct *vma = vmf->vma;
+> > +       pmd_t old_pmd, new_pmd;
+> > +       bool writable = false;
+> > +       struct page *page;
+> > +       vm_fault_t err;
+> > +       int ret;
+> > +
+> > +       vmf->ptl = pmd_lock(vma->vm_mm, vmf->pmd);
+> > +       if (unlikely(!pmd_same(vmf->orig_pmd, *vmf->pmd))) {
+> > +               spin_unlock(vmf->ptl);
+> > +               return 0;
+> > +       }
+> > +
+> > +       old_pmd = vmf->orig_pmd;
+> > +       new_pmd = pmd_modify(old_pmd, vma->vm_page_prot);
+> > +
+> > +       /*
+> > +        * Detect now whether the PMD could be writable; this information
+> > +        * is only valid while holding the PT lock.
+> > +        */
+> > +       writable = pmd_write(new_pmd);
+> > +       if (!writable && vma_wants_manual_pte_write_upgrade(vma) &&
+> > +           can_change_pmd_writable(vma, vmf->address, new_pmd))
+> > +               writable = true;
+> > +
+> > +       page = vm_normal_page_pmd(vma, haddr, new_pmd);
+> > +       if (!page)
+> > +               goto out_map;
+> > +
+> > +       if (!(vma->vm_flags & VM_MTE))
+> > +               goto out_map;
+> > +
+> > +       get_page(page);
+> > +       vma_set_access_pid_bit(vma);
+> > +
+> > +       spin_unlock(vmf->ptl);
+> > +       writable = false;
+> > +
+> > +       if (unlikely(is_migrate_isolate_page(page)))
+> > +               goto out_retry;
+> > +
+> > +       ret = reserve_tag_storage(page, HPAGE_PMD_ORDER, GFP_HIGHUSER_MOVABLE);
+> > +       if (ret)
+> > +               goto out_retry;
+> > +
+> > +       put_page(page);
+> > +
+> > +       vmf->ptl = pmd_lock(vma->vm_mm, vmf->pmd);
+> > +       if (unlikely(!pmd_same(old_pmd, *vmf->pmd))) {
+> > +               spin_unlock(vmf->ptl);
+> > +               return 0;
+> > +       }
+> > +
+> > +out_map:
+> > +       /* Restore the PMD */
+> > +       new_pmd = pmd_modify(old_pmd, vma->vm_page_prot);
+> > +       new_pmd = pmd_mkyoung(new_pmd);
+> > +       if (writable)
+> > +               new_pmd = pmd_mkwrite(new_pmd, vma);
+> > +       set_pmd_at(vma->vm_mm, haddr, vmf->pmd, new_pmd);
+> > +       update_mmu_cache_pmd(vma, vmf->address, vmf->pmd);
+> > +       spin_unlock(vmf->ptl);
+> > +
+> > +       return 0;
+> > +
+> >  out_retry:
+> >         put_page(page);
+> >         if (vmf->flags & FAULT_FLAG_VMA_LOCK)
+> > diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
+> > index fa0350b0812a..bb84291f9231 100644
+> > --- a/include/linux/huge_mm.h
+> > +++ b/include/linux/huge_mm.h
+> > @@ -36,6 +36,8 @@ bool move_huge_pmd(struct vm_area_struct *vma, unsigned long old_addr,
+> >  int change_huge_pmd(struct mmu_gather *tlb, struct vm_area_struct *vma,
+> >                     pmd_t *pmd, unsigned long addr, pgprot_t newprot,
+> >                     unsigned long cp_flags);
+> > +bool can_change_pmd_writable(struct vm_area_struct *vma, unsigned long addr,
+> > +                            pmd_t pmd);
+> >
+> >  vm_fault_t vmf_insert_pfn_pmd(struct vm_fault *vmf, pfn_t pfn, bool write);
+> >  vm_fault_t vmf_insert_pfn_pud(struct vm_fault *vmf, pfn_t pfn, bool write);
+> > diff --git a/include/linux/pgtable.h b/include/linux/pgtable.h
+> > index e2c761dd6c41..de45f475bf8d 100644
+> > --- a/include/linux/pgtable.h
+> > +++ b/include/linux/pgtable.h
+> > @@ -1473,6 +1473,11 @@ static inline vm_fault_t arch_do_page_fault_on_access(struct vm_fault *vmf)
+> >  {
+> >         return VM_FAULT_SIGBUS;
+> >  }
+> > +
+> > +static inline vm_fault_t arch_do_huge_page_fault_on_access(struct vm_fault *vmf)
+> > +{
+> > +       return VM_FAULT_SIGBUS;
+> > +}
+> >  #endif
+> >
+> >  #endif /* CONFIG_MMU */
+> > diff --git a/mm/huge_memory.c b/mm/huge_memory.c
+> > index 9beead961a65..d1402b43ea39 100644
+> > --- a/mm/huge_memory.c
+> > +++ b/mm/huge_memory.c
+> > @@ -1406,8 +1406,8 @@ vm_fault_t do_huge_pmd_wp_page(struct vm_fault *vmf)
+> >         return VM_FAULT_FALLBACK;
+> >  }
+> >
+> > -static inline bool can_change_pmd_writable(struct vm_area_struct *vma,
+> > -                                          unsigned long addr, pmd_t pmd)
+> > +inline bool can_change_pmd_writable(struct vm_area_struct *vma,
 > 
-> Truncate the field to its width before displaying it.
+> Remove inline keyword here.
+
+Indeed, as it does nothing now that the function is not static.
+
+Thanks,
+Alex
+
 > 
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-
-
-> ---
->   arch/arm64/kernel/cpufeature.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+> Peter
 > 
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index e52d2c2b757f..767a6f288755 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -950,7 +950,8 @@ static void init_cpu_ftr_reg(u32 sys_reg, u64 new)
->   				pr_warn("%s[%d:%d]: %s to %llx\n",
->   					reg->name,
->   					ftrp->shift + ftrp->width - 1,
-> -					ftrp->shift, str, tmp);
-> +					ftrp->shift, str,
-> +					tmp & (BIT(ftrp->width) - 1));
->   		} else if ((ftr_mask & reg->override->val) == ftr_mask) {
->   			reg->override->val &= ~ftr_mask;
->   			pr_warn("%s[%d:%d]: impossible override, ignored\n",
-
+> > +                                   unsigned long addr, pmd_t pmd)
+> >  {
+> >         struct page *page;
+> >
+> > diff --git a/mm/memory.c b/mm/memory.c
+> > index a04a971200b9..46b926625503 100644
+> > --- a/mm/memory.c
+> > +++ b/mm/memory.c
+> > @@ -5168,6 +5168,9 @@ static vm_fault_t __handle_mm_fault(struct vm_area_struct *vma,
+> >                         return 0;
+> >                 }
+> >                 if (pmd_trans_huge(vmf.orig_pmd) || pmd_devmap(vmf.orig_pmd)) {
+> > +                       if (fault_on_access_pmd(vmf.orig_pmd) && vma_is_accessible(vma))
+> > +                               return arch_do_huge_page_fault_on_access(&vmf);
+> > +
+> >                         if (pmd_protnone(vmf.orig_pmd) && vma_is_accessible(vma))
+> >                                 return do_huge_pmd_numa_page(&vmf);
+> >
+> > --
+> > 2.42.1
+> >
