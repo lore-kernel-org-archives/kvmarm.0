@@ -1,43 +1,44 @@
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E1C5C8EA;
-	Wed, 22 Nov 2023 20:12:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45C25D909;
+	Wed, 22 Nov 2023 20:16:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-1d542f05b9aso30639fac.1;
-        Wed, 22 Nov 2023 12:12:16 -0800 (PST)
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-1f92cc9b2c5so18715fac.1;
+        Wed, 22 Nov 2023 12:16:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700683935; x=1701288735;
+        d=1e100.net; s=20230601; t=1700684210; x=1701289010;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hRAUhzzHnP+XZxzQEXs8TfAKCs5HsmLQBIFGrTTFm+M=;
-        b=v9gH9a4Pld9Ol6weZlhy/NKLHMlc1l6jpYO3QxI5EQqVZbhmFWSUEV77LmUznaGZlO
-         6fxsCGO8ma4GZCrtudwPlWfG8ZCOFcWqlGcjgGVrMDfr0akiWkFOF566SAjS7xyPXU5v
-         kqo2wIEGWFYYPHZdAPWui/DBvHZP7AxkpUtIUDaon2pyn0PAfJufHDBbjHci4iefKsRR
-         tQIaPTpryfxGLiwbTvjGoI5/TIdqNXrtpPMxnKbf/x2p8hxqRPxsclgMUd7zTgdeLnZl
-         Jgym6tv1RiCZ8snEXVsjuv30k0kpaBAAWl9jrnzfXsnBXc4ZU4tynGPYqgR/sJtuqWoG
-         zV1A==
-X-Gm-Message-State: AOJu0YzIZr3UmlHeVW5VyBoJjmOIHF9kJmGyodY0tqIe5u8td8OSS2iI
-	EvecdIsqTpjMwPvqgyWwWSeRyEt3bNcTzPlZLzg=
-X-Google-Smtp-Source: AGHT+IH/N9ldr6Rfz2HMts22gtDdEZrdomZQ3Wqdv4io0UUWkzkPpVzYdpFHz7cSkxilm43rTrV9+lWFNT1vpjiJ/R4=
-X-Received: by 2002:a05:6871:a58b:b0:1ea:1510:d8df with SMTP id
- wd11-20020a056871a58b00b001ea1510d8dfmr3742289oab.4.1700683935194; Wed, 22
- Nov 2023 12:12:15 -0800 (PST)
+        bh=U+AKNbPfGcSitF9DQBk43/GENfS9BTVC5pjwY2CWch8=;
+        b=CRNNv3f7PlKFeB3P+OzEl9XwsWQ+cKwI0aU8pleNsxGMtentUlWvGMM/WuGg6pvV/Y
+         MZxrlHGtezv06SD6xVE49mXIOVBeM2XXNFdJGgdE+CaOZddk/PQJwmSVJPSwZbvTP0Qv
+         CeDHdZNeP/WIE3ClIDlXk3ENZf+VcP5vQo1YzcYWbho7mcxHulUKFOz2gkGUgtzv4puV
+         pYu7FbqgqbJEoS6p2QT4kVymN7XHGUXpk5WMLI4GePtW6oIynoAgoHQ43/BGuNbMNdfj
+         6JIp6d4RmzgceKXXGmqjnZtbikPhCip6Benl4v0ZPHkG9KVyHwJip5c7+M59Dkqz0lU4
+         A4cw==
+X-Gm-Message-State: AOJu0Yw0jUTtwx6kVSRq7v5br4cbBi6LHmrVMRwnrGnPLsHiy5+Q2Lhk
+	2iRllM/YlxGARXPuw6JIDkEmF9V7l4oUFLyGj9U=
+X-Google-Smtp-Source: AGHT+IEZOuwWL+O8Ns2NywQDonavCXvBHcgdxxi2QZSHFBHwzFPNR8Ac+xre6B7/Fz+/eqIGB2UbpAfb/c6ikknz6l8=
+X-Received: by 2002:a05:6871:7a0:b0:1e9:8a7e:5893 with SMTP id
+ o32-20020a05687107a000b001e98a7e5893mr4323044oap.5.1700684209905; Wed, 22 Nov
+ 2023 12:16:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <ZVyz/Ve5pPu8AWoA@shell.armlinux.org.uk> <E1r5R2m-00Csyb-2S@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1r5R2m-00Csyb-2S@rmk-PC.armlinux.org.uk>
+References: <ZVyz/Ve5pPu8AWoA@shell.armlinux.org.uk> <E1r5R31-00Csyt-Jq@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1r5R31-00Csyt-Jq@rmk-PC.armlinux.org.uk>
 From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Wed, 22 Nov 2023 21:12:04 +0100
-Message-ID: <CAJZ5v0jbjykNooJ_PvkOjpE6hA0QFJUw+kpwYfNY7jOtkcPA0Q@mail.gmail.com>
-Subject: Re: [PATCH 02/21] x86: intel_epb: Don't rely on link order
+Date: Wed, 22 Nov 2023 21:16:39 +0100
+Message-ID: <CAJZ5v0iYRXh369M3XTM0V8Q9mWkAT2y+9pJMD7HMaGjgpvFEMw@mail.gmail.com>
+Subject: Re: [PATCH 05/21] ACPI: Move ACPI_HOTPLUG_CPU to be disabled on arm64
+ and riscv
 To: Russell King <rmk+kernel@armlinux.org.uk>
 Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev, 
 	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, 
@@ -47,8 +48,12 @@ Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
 	linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org, 
 	Salil Mehta <salil.mehta@huawei.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com, 
 	justin.he@arm.com, James Morse <james.morse@arm.com>, 
+	Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, 
 	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -57,46 +62,119 @@ rg.uk> wrote:
 >
 > From: James Morse <james.morse@arm.com>
 >
-> intel_epb_init() is called as a subsys_initcall() to register cpuhp
-> callbacks. The callbacks make use of get_cpu_device() which will return
-> NULL unless register_cpu() has been called. register_cpu() is called
-> from topology_init(), which is also a subsys_initcall().
+> Neither arm64 nor riscv support physical hotadd of CPUs that were not
+> present at boot. For arm64 much of the platform description is in static
+> tables which do not have update methods. arm64 does support HOTPLUG_CPU,
+> which is backed by a firmware interface to turn CPUs on and off.
 >
-> This is fragile. Moving the register_cpu() to a different
-> subsys_initcall()  leads to a NULL dereference during boot.
+> acpi_processor_hotadd_init() and acpi_processor_remove() are for adding
+> and removing CPUs that were not present at boot. arm64 systems that do th=
+is
+> are not supported as there is currently insufficient information in the
+> platform description. (e.g. did the GICR get removed too?)
 >
-> Make intel_epb_init() a late_initcall(), user-space can't provide a
-> policy before this point anyway.
+> arm64 currently relies on the MADT enabled flag check in map_gicc_mpidr()
+> to prevent CPUs that were not described as present at boot from being
+> added to the system. Similarly, riscv relies on the same check in
+> map_rintc_hartid(). Both architectures also rely on the weak 'always fail=
+s'
+> definitions of acpi_map_cpu() and arch_register_cpu().
+>
+> Subsequent changes will redefine ACPI_HOTPLUG_CPU as making possible
+> CPUs present. Neither arm64 nor riscv support this.
+>
+> Disable ACPI_HOTPLUG_CPU for arm64 and riscv by removing 'default y' and
+> selecting it on the other three ACPI architectures. This allows the weak
+> definitions of some symbols to be removed.
 >
 > Signed-off-by: James Morse <james.morse@arm.com>
+> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 > Reviewed-by: Gavin Shan <gshan@redhat.com>
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-
-and I'd suggest sending this separately to the x86 list.
+I can apply this if it gets ACKs from the maintainers of the affected
+architectures.
 
 > ---
-> subsys_initcall_sync() would be an option, but moving the register_cpu()
-> calls into ACPI also means adding a safety net for CPUs that are online
-> but not described properly by firmware. This lives in subsys_initcall_syn=
-c().
+> Changes since RFC:
+>  * Expanded conditions to avoid ACPI_HOTPLUG_CPU being enabled when
+>    HOTPLUG_CPU isn't.
+> Changes since RFC v3:
+>  * Dropped ia64 changes
 > ---
->  arch/x86/kernel/cpu/intel_epb.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/loongarch/Kconfig        |  1 +
+>  arch/x86/Kconfig              |  1 +
+>  drivers/acpi/Kconfig          |  1 -
+>  drivers/acpi/acpi_processor.c | 18 ------------------
+>  4 files changed, 2 insertions(+), 19 deletions(-)
 >
-> diff --git a/arch/x86/kernel/cpu/intel_epb.c b/arch/x86/kernel/cpu/intel_=
-epb.c
-> index e4c3ba91321c..f18d35fe27a9 100644
-> --- a/arch/x86/kernel/cpu/intel_epb.c
-> +++ b/arch/x86/kernel/cpu/intel_epb.c
-> @@ -237,4 +237,4 @@ static __init int intel_epb_init(void)
->         cpuhp_remove_state(CPUHP_AP_X86_INTEL_EPB_ONLINE);
->         return ret;
->  }
-> -subsys_initcall(intel_epb_init);
-> +late_initcall(intel_epb_init);
+> diff --git a/arch/loongarch/Kconfig b/arch/loongarch/Kconfig
+> index ee123820a476..331becb2cb4f 100644
+> --- a/arch/loongarch/Kconfig
+> +++ b/arch/loongarch/Kconfig
+> @@ -5,6 +5,7 @@ config LOONGARCH
+>         select ACPI
+>         select ACPI_GENERIC_GSI if ACPI
+>         select ACPI_MCFG if ACPI
+> +       select ACPI_HOTPLUG_CPU if ACPI_PROCESSOR && HOTPLUG_CPU
+>         select ACPI_PPTT if ACPI
+>         select ACPI_SYSTEM_POWER_STATES_SUPPORT if ACPI
+>         select ARCH_BINFMT_ELF_STATE
+> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> index 3762f41bb092..dbdcfc708369 100644
+> --- a/arch/x86/Kconfig
+> +++ b/arch/x86/Kconfig
+> @@ -59,6 +59,7 @@ config X86
+>         #
+>         select ACPI_LEGACY_TABLES_LOOKUP        if ACPI
+>         select ACPI_SYSTEM_POWER_STATES_SUPPORT if ACPI
+> +       select ACPI_HOTPLUG_CPU                 if ACPI_PROCESSOR && HOTP=
+LUG_CPU
+>         select ARCH_32BIT_OFF_T                 if X86_32
+>         select ARCH_CLOCKSOURCE_INIT
+>         select ARCH_CORRECT_STACKTRACE_ON_KRETPROBE
+> diff --git a/drivers/acpi/Kconfig b/drivers/acpi/Kconfig
+> index f819e760ff19..a3acfc750fce 100644
+> --- a/drivers/acpi/Kconfig
+> +++ b/drivers/acpi/Kconfig
+> @@ -310,7 +310,6 @@ config ACPI_HOTPLUG_CPU
+>         bool
+>         depends on ACPI_PROCESSOR && HOTPLUG_CPU
+>         select ACPI_CONTAINER
+> -       default y
+>
+>  config ACPI_PROCESSOR_AGGREGATOR
+>         tristate "Processor Aggregator"
+> diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.=
+c
+> index 0f5218e361df..4fe2ef54088c 100644
+> --- a/drivers/acpi/acpi_processor.c
+> +++ b/drivers/acpi/acpi_processor.c
+> @@ -184,24 +184,6 @@ static void __init acpi_pcc_cpufreq_init(void) {}
+>
+>  /* Initialization */
+>  #ifdef CONFIG_ACPI_HOTPLUG_CPU
+> -int __weak acpi_map_cpu(acpi_handle handle,
+> -               phys_cpuid_t physid, u32 acpi_id, int *pcpu)
+> -{
+> -       return -ENODEV;
+> -}
+> -
+> -int __weak acpi_unmap_cpu(int cpu)
+> -{
+> -       return -ENODEV;
+> -}
+> -
+> -int __weak arch_register_cpu(int cpu)
+> -{
+> -       return -ENODEV;
+> -}
+> -
+> -void __weak arch_unregister_cpu(int cpu) {}
+> -
+>  static int acpi_processor_hotadd_init(struct acpi_processor *pr)
+>  {
+>         unsigned long long sta;
 > --
 > 2.30.2
->
 >
