@@ -1,47 +1,47 @@
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2352136F
-	for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 09:49:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E81E22087
+	for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 10:58:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dMc5Ar87"
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-548c6efc020so9547a12.0
-        for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 01:49:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X9rAMMRS"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-40b367a0a12so29855e9.1
+        for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 02:58:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700732962; x=1701337762; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1700737102; x=1701341902; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=53mgz2I67bBPUMmao+k8i5+WtnPQJvvF0nHCuvFZ/vw=;
-        b=dMc5Ar87+j4RtgKfyCa0nXco097hKIr15c2hEA+i3fCPGcTDMfPYVKGwtVn1GHTSVr
-         zekmva/vL3Lbqk/mKlRM5oJylDpl/MoK7HjHDCfsxQpe7tyNFaVDX2TWlM2TI/juxZkL
-         Zwt1juxt8co8R0HciBgaGloKNvmZgCuZi56ajba99YEBjCqO9GKIuu7D0csVG1jxe6Tb
-         2H1sLohAgLYWUpOnxtZZC4PCmFCupzxGfsDcdhdiBrzQbhOe6Uuyir7bushgjnOaxog/
-         50gMJ1ZRGjFztt3/7U/OG+DDQK2cS1e9Hm7PL5sOrJJ8lTbwwWuix2+zf/6pW+JDM720
-         LSOw==
+        bh=tbD+CZLI2OJnj2XtkqlWGnXInTbmUcqYNyaWG++MW1o=;
+        b=X9rAMMRSsTcHi/FQDJIBvGMJUusfw2LRdtmNsteSHmyMaMXFYg0k26ouZ2qHz2H/S4
+         klPsvSGLe7GRro+tItN/nMcDlQOw6ligvzdgmF5O1uYz/YFK0KqA/e/TRPlZg/bjp92c
+         z9m+HJuHJ3OUJl/cnLWM0ZnbyI5I8R7USluc2Zso0/LODc+i8DWtKydckYahXHoDhfht
+         EsfCy8KlaviKBxW3KWMuNOpaH6ypqsoPdnJE60KrQhopnO9dwZkYLncge+wRguoxSXJ/
+         vxCNb/kqgoSOG6K7cLl/b8/OGBvC2sFvrYRKKOxi88kstdFyrZL7UHO64dwHV1Hb7Ldf
+         2+rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700732962; x=1701337762;
+        d=1e100.net; s=20230601; t=1700737102; x=1701341902;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=53mgz2I67bBPUMmao+k8i5+WtnPQJvvF0nHCuvFZ/vw=;
-        b=AzLrCrH/YGLTUCPfK7fywz8LPz+eW6FDqat4TfxCUAGMx8g0gPpPPJKCY+fYYDxOHr
-         GxPP1i/UOitsd9ZYxpkfc303Gmt+PjOE4/tzFAaO+nwMwCPoKGfXdsI040DerJY71Zxv
-         qeV9RmluNEczsaaI35fI2EsziYLMVSxOmxkouGGERTpyUemxqPSWEeupZnlEe9IWBMoN
-         y0D+UjWrpZKT0ZSz45Gwg15WRxQfyJOCACB0GzZAT1BJzaOquXO9j5NCfVhURAz/yzed
-         2h5RfhGuOAGPoSZu+ihS34q3GblwS4nkpgdqC2Um4B5PiGkMshX1Oblude3hlQcLXT88
-         OB9Q==
-X-Gm-Message-State: AOJu0YyoiTxUYMBCqWVkLFsH33r6Nn+zxaMIHAPk8LPVaARKpYvgaaAy
-	pTOvHFYXvvtbDG7J0JrNpet6lw==
-X-Google-Smtp-Source: AGHT+IGcKXGwNmDsBQqKA/iG8b0gT6CgYkVFrfoOHPHcaUQILJhKYcBEUn/xAg67qiro7eA/qQPVkA==
-X-Received: by 2002:a05:6402:3815:b0:544:466b:3b20 with SMTP id es21-20020a056402381500b00544466b3b20mr242943edb.5.1700732961713;
-        Thu, 23 Nov 2023 01:49:21 -0800 (PST)
+        bh=tbD+CZLI2OJnj2XtkqlWGnXInTbmUcqYNyaWG++MW1o=;
+        b=diRgGOAdaLDJu351h/CAZbFTTKmfO8oVVX3mjvp2viWvYcLsrtU6orQNbMNlOZszfs
+         NwnD+gs88a9W9r6pSEox6OmdRsBK8qiXTWrz9alGjTlbhJnB5dPXpyszC2Dcg7hxkNHn
+         JV7AM8yFw4EC0xsO0ueh42lFVfRmrwNHm2HmWQhqpiR4Gcg5daPhbbbqHFWB7XRWtFd6
+         DPBiDBxYYc1eSAmJTutXCVaV5OVld1VqArawAm7jEQm89tOELj96+LEcJxXPMfMmGV1a
+         LSXroZTWvjwN4rCxIkp31E4v5dRIpBJBuEgmTRXN9P0BEtPuDziE32HEhsiIYQaTwqcg
+         FqRQ==
+X-Gm-Message-State: AOJu0YzpzvghkJLj0SpVzy/DCBDILHVYnNJc2FtGjuYRuGfHxWFyzOtZ
+	DmOq4GUv29H77PV24BpnxPyEmA==
+X-Google-Smtp-Source: AGHT+IECpNi7V/qSvW7pVQ/CJFY4C0ksNj+vFUmeqFagu+qFkUWQoOPShJMnthXGa96ey5y1uPJSiw==
+X-Received: by 2002:a05:600c:3b13:b0:40a:483f:f828 with SMTP id m19-20020a05600c3b1300b0040a483ff828mr251605wms.4.1700737102403;
+        Thu, 23 Nov 2023 02:58:22 -0800 (PST)
 Received: from google.com (110.121.148.146.bc.googleusercontent.com. [146.148.121.110])
-        by smtp.gmail.com with ESMTPSA id k24-20020a5d5258000000b00332c0aace23sm1162986wrc.105.2023.11.23.01.49.20
+        by smtp.gmail.com with ESMTPSA id k11-20020adfe3cb000000b00332d3c78e11sm1305204wrm.85.2023.11.23.02.58.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 01:49:20 -0800 (PST)
-Date: Thu, 23 Nov 2023 09:49:17 +0000
+        Thu, 23 Nov 2023 02:58:21 -0800 (PST)
+Date: Thu, 23 Nov 2023 10:58:20 +0000
 From: Sebastian Ene <sebastianene@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: will@kernel.org, James Morse <james.morse@arm.com>,
@@ -51,10 +51,12 @@ Cc: will@kernel.org, James Morse <james.morse@arm.com>,
 	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, kernel-team@android.com,
 	vdonnefort@google.com, qperret@google.com, smostafa@google.com
-Subject: Re: [PATCH v3 00/10] arm64: ptdump: View the second stage page-tables
-Message-ID: <ZV8gHfnrFzhdjjw5@google.com>
+Subject: Re: [PATCH v3 10/10] arm64: ptdump: Add support for guest stage-2
+ pagetables dumping
+Message-ID: <ZV8wTMtuztSdzPaI@google.com>
 References: <20231115171639.2852644-2-sebastianene@google.com>
- <ZV6MVYI8J6NFS9Wl@linux.dev>
+ <20231115171639.2852644-12-sebastianene@google.com>
+ <ZV6QXSV_SrYjjoE_@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -63,69 +65,90 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZV6MVYI8J6NFS9Wl@linux.dev>
+In-Reply-To: <ZV6QXSV_SrYjjoE_@linux.dev>
 
-On Wed, Nov 22, 2023 at 11:18:45PM +0000, Oliver Upton wrote:
+On Wed, Nov 22, 2023 at 11:35:57PM +0000, Oliver Upton wrote:
+> On Wed, Nov 15, 2023 at 05:16:40PM +0000, Sebastian Ene wrote:
+> > +struct ptdump_registered_guest {
+> > +	struct list_head		reg_list;
+> > +	struct ptdump_info		info;
+> > +	struct kvm_pgtable_snapshot	snapshot;
+> > +	rwlock_t			*lock;
+> > +};
+> 
+> Why can't we just store a pointer directly to struct kvm in ::private?
 
-Hi Oliver,
+I don't think it will work unless we expect a struct kvm_pgtable
+in stage2_ptdump_walk file_priv field. I think it is a good ideea and will
+simplify things a little bit dropping kvm_pgtable_snapshot from here.
 
-> Hi Seb,
+The current code has some fileds that are reduntant (the priv pointers)
+because I also made this to work with protected guests where we can't
+access their pagetables directly.
+
+> Also, shouldn't you take a reference on struct kvm when the file is
+> opened to protect against VM teardown?
+>
+
+I am not sure about the need could you please elaborate a bit ? On VM
+teardown we expect ptdump_unregister_guest_stage2 to be invoked.
+
+> > +static LIST_HEAD(ptdump_guest_list);
+> > +static DEFINE_MUTEX(ptdump_list_lock);
 > 
-> On Wed, Nov 15, 2023 at 05:16:30PM +0000, Sebastian Ene wrote:
-> > Hi,
-> > 
-> > This can be used as a debugging tool for dumping the second stage
-> > page-tables.
-> > 
-> > When CONFIG_PTDUMP_STAGE2_DEBUGFS is enabled, ptdump registers 
-> > '/sys/debug/kvm/<guest_id>/stage2_page_tables' entry with debugfs
-> > upon guest creation. This allows userspace tools (eg. cat) to dump the
-> > stage-2 pagetables by reading the registered file.
-> > 
-> > Reading the debugfs file shows stage-2 memory ranges in following format:
-> > <IPA range> <size> <descriptor type> <access permissions> <mem_attributes>
-> > 
-> > Under pKVM configuration(kvm-arm.mode=protected) ptdump registers an entry
-> > for the host stage-2 pagetables in the following path:
-> > /sys/debug/kvm/host_stage2_page_tables/
-> > 
-> > The tool interprets the pKVM ownership annotation stored in the invalid
-> > entries and dumps to the console the ownership information. To be able
-> > to access the host stage-2 page-tables from the kernel, a new hypervisor
-> > call was introduced which allows us to snapshot the page-tables in a host
-> > provided buffer. The hypervisor call is hidden behind CONFIG_NVHE_EL2_DEBUG
-> > as this should be used under debugging environment.
-> 
-> While I think the value of the feature you're proposing is great, I'm
-> not a fan of the current shape of this series.
-> 
-> Reusing note_page() for the stage-2 dump is somewhat convenient, but the
-> series pulls a **massive** amount of KVM details outside of KVM:
-> 
->  - Open-coding the whole snapshotting interface with EL2 outside of KVM.
->    This is a complete non-starter for me; the kernel<->EL2 interface
->    needs to be owned by the EL1 portions of KVM.
-> 
->  - Building page-table walkers using the KVM pgtable library outside of
->    KVM.
-> 
->  - Copying (rather than directly calling) the logic responsible for
->    things like FWB and PGD concatenation.
-> 
->  - Hoisting the definition of _software bits_ outside of KVM. I'm less
->    concerned about hardware bits since they have an unambiguous meaning.
-> 
-> I think exporting the necessary stuff from ptdump into KVM will lead to
-> a much cleaner implementation.
+> What is the list for?
 > 
 
-Right, I had to import a lot of definitions from KVM, especially for the
-prot_bits array and for the IPA size retrieval. I think it would be less
-intrusive the other way around, to pull some ptdump hooks into kvm.
+I am keeping a list of registered guests with ptdump and the lock should
+protect the list against concurent VM teardowns.
+
+> >  static phys_addr_t ptdump_host_pa(void *addr)
+> >  {
+> >  	return __pa(addr);
+> > @@ -757,6 +768,63 @@ static void stage2_ptdump_walk(struct seq_file *s, struct ptdump_info *info)
+> >  	kvm_pgtable_walk(pgtable, start_ipa, end_ipa, &walker);
+> >  }
+> >  
+> > +static void guest_stage2_ptdump_walk(struct seq_file *s,
+> > +				     struct ptdump_info *info)
+> > +{
+> > +	struct ptdump_info_file_priv *f_priv =
+> > +		container_of(info, struct ptdump_info_file_priv, info);
+> > +	struct ptdump_registered_guest *guest = info->priv;
+> > +
+> > +	f_priv->file_priv = &guest->snapshot;
+> > +
+> > +	read_lock(guest->lock);
+> > +	stage2_ptdump_walk(s, info);
+> > +	read_unlock(guest->lock);
+> 
+> Taking the mmu lock for read allows other table walkers to add new
+> mappings and adjust the granularity of existing ones. Should this
+> instead take the mmu lock for write?
+>
+
+Thanks for pointing our, this is exactly what I was trying to avoid,
+so yes I should use the write mmu lock in this case.
+
+> > +}
+> > +
+> > +int ptdump_register_guest_stage2(struct kvm *kvm)
+> > +{
+> > +	struct ptdump_registered_guest *guest;
+> > +	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
+> > +	struct kvm_pgtable *pgt = mmu->pgt;
+> > +
+> > +	guest = kzalloc(sizeof(struct ptdump_registered_guest), GFP_KERNEL);
+> 
+> You want GFP_KERNEL_ACCOUNT here.
+> 
+
+Right, thanks this is because it is an untrusted allocation triggered from
+userspace.
 
 > -- 
 > Thanks,
 > Oliver
 
-Thanks,
+Thank you,
 Seb
