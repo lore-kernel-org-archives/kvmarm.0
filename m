@@ -1,440 +1,313 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB092575A
-	for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 14:48:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E9EF35EF4
+	for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 16:22:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oVAGiDBX"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40b35199f94so68835e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 06:48:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="aXanxBMN";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="vo7tHg1z"
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ANFrvTF002470;
+	Thu, 23 Nov 2023 16:21:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-11-20;
+ bh=3uPng5VJLLghWoGP9dOMb4fXlSeVDRMrdTQl016Qycg=;
+ b=aXanxBMNCdQ3k/CpB1GUwu6xGqbtuA9CrjPlSjv6Sqbbp+ggqcraPI5VVe3HzMJr/J7l
+ R2nsWMIWevgTuTEGXAJBmmgDTqMzGejx3WdGRe1f9BsflaH6mWYDZlKvHdX+ifiGZHck
+ nKqgpi0X3O5wvhj9YaHBAcDR0tbO+SFL69l+T1RnY7KQcD2+Hykll+bB9JPWQceu7bJN
+ dtiheBt63UMStVA547rdb+dzP59C1eVbqx/sqkIpzxMo5jS/ddwkpGBPck+/PnWFrBAR
+ CdQ79PWsBPkXsnwRceI7UQv1L871P8gMKRgSYaQq+RAvsWNDGveyRWL4TmFhbFuUsg0V DQ== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3uenadt3md-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 23 Nov 2023 16:21:58 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3ANEqKoi007333;
+	Thu, 23 Nov 2023 16:21:58 GMT
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2168.outbound.protection.outlook.com [104.47.55.168])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3uekqagpsy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 23 Nov 2023 16:21:58 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HHq4XtKsAH9oytxq798LNshJN+XTZIY13ROZpj/m4B5lXJ2gdET9wv5At5f8F0/mLEzahyJ8oFUfl2uYn6uwGxnk9lldHNIFbvpV7Rx47BLt38GpNr/WICRI0Z5PQ3EjZH3QgjmJUbkZUSXGVc25tnRAPv/JykRNf0akxApkk+fFg2GVJWhJJk+5cPPCU+SyoYM/kZqnWV9ZoPtaCxCfkw5v2BPPq/3HA/LpOJS6F6ev+BVWGpxT7mn+PUuBcJoDyIWT5Nh/NphsetRLtxun05jSFWGPYnz1zQc7n8SfzERVqtuPggh9WgYtkruhnaYFeufJN2daMzjaTIR2BC1MmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3uPng5VJLLghWoGP9dOMb4fXlSeVDRMrdTQl016Qycg=;
+ b=OC/Gxq01080tKGlF3qj9UsGbvGBol+075c+7Zj/5D3DRvyKCiXZ5dJ4d0qHPHZ9d+lBKXy0Xa0XoHumfqgLFzT5V18Onsc1KLbxHBHOHLz2THyKvymz36Oj3KC2UIaD1hUSBWbEdcs7R9lxZnwVWQj+7Nr8Sx14IRipfPRov0Zns4ZVGwtdBYBGpJGF+Rela7InHMidmTgoYVvx6hfdphXKgF4gXlv+J8oqkD6QhO4oGKOxSBZ8DJbA3/79qRqtLgEDnK531QqPLfrZeP31dcIZWFuyZ+xTQ/r7U0lSKsQ5hTHnh7bHjZ8D3X/5sL2diLI+TxFDwkpKfevLfOqUmlg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700750931; x=1701355731; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Id8FFmZPqAcjX9nM2kv7yhFZ7V91eseH8kTxLchD3kM=;
-        b=oVAGiDBXe+tHH5ml8JdAYbjDdfEh4/iB15A/ldMq9zQtznJuoXGT5q79dF0snEjSPR
-         luHg61ChWCC8jZKAgwcZZLEW95u/MSPEHIKtWP4afZH+U/LbjV+kpmuq/Yw7oWWO9hSQ
-         duTSA7qvx1EC6rdEDTREPxp9YdlIb653/2mBECsXAC0hSzlzTLyF5LKywujAJIOLj1r3
-         pGe4cHb3Q3dPqhQ2YxYGf8zj7b1w8TM6PnfjSN6/L71jqNZDbW6Y7zI6a76bvJpqQ72f
-         DmokcKiuPM8Ot1RT3HhonzbR3mnZhdwov13O6WS9x05A+AO2lY0bYRsvUWbQI2NIuC5Q
-         JSKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700750931; x=1701355731;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Id8FFmZPqAcjX9nM2kv7yhFZ7V91eseH8kTxLchD3kM=;
-        b=vvbAQzwmVf8ev+3RNIng5qycs81g+BYJcwB6wVZa6hy6PjkzFfTzI0GRtFiFl8sp5m
-         6j21QLDYcwOZ2Gaox3rAKrD+4haPVDgk2LkmhlE6InISrkoHda9uOrCqcyI6G/ezaNzY
-         C3De/O1sQwgjrIbQCPFOozfmWyEpnu2aIJROeiOLHIvm8YMGuPpo9ocg8qyHqfL34Etb
-         V/4OGng+KknslfbabLtL/uaTvt995LunCptUOXAZGe9tp49w/P9tP7tMfrZERvR4x+9B
-         cjxDvttdiUDa9OUXELr2pcB6YeNbTTvDHsSu3FiMyKeU2i7ibfODp87ZmglL+n7i4F2U
-         OSiw==
-X-Gm-Message-State: AOJu0YyfaC+czkfffFjatTal2agsmmj2Xt1v8kW0+7NJh/ea+5xKBVhg
-	SAoYrhnhFQuAycJl209vXsYwcA==
-X-Google-Smtp-Source: AGHT+IFCh5xgc0nF4xb2cR9PLPVK5PT5r87gQj8D+vxwP8OMDt4I+IMAbggtwK74+wGLTcgejKtYDg==
-X-Received: by 2002:a05:600c:b4f:b0:404:7462:1f87 with SMTP id k15-20020a05600c0b4f00b0040474621f87mr287391wmr.6.1700750931337;
-        Thu, 23 Nov 2023 06:48:51 -0800 (PST)
-Received: from google.com (110.121.148.146.bc.googleusercontent.com. [146.148.121.110])
-        by smtp.gmail.com with ESMTPSA id t4-20020a0560001a4400b003316eb9db40sm1859750wry.51.2023.11.23.06.48.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 06:48:50 -0800 (PST)
-Date: Thu, 23 Nov 2023 14:48:49 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: will@kernel.org, Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, catalin.marinas@arm.com,
-	mark.rutland@arm.com, akpm@linux-foundation.org, maz@kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com,
-	qperret@google.com, smostafa@google.com
-Subject: Re: [PATCH v3 06/10] arm64: ptdump: Register a debugfs entry for the
- host stage-2 tables
-Message-ID: <ZV9mUbWXr2hlKJI6@google.com>
-References: <20231115171639.2852644-2-sebastianene@google.com>
- <20231115171639.2852644-8-sebastianene@google.com>
- <ZVzlRY8Dm9FjGo8i@google.com>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3uPng5VJLLghWoGP9dOMb4fXlSeVDRMrdTQl016Qycg=;
+ b=vo7tHg1z4yJk8TgGXsASd+h6IrhH+2PCu6POzCbi7/Wh7ZPYRZPnjLX0WdWE6upB+qHQ/XwuLQllOHlqRBWYRPKmpjWKtwZAijh89+BNv3QZFAD8ypV94L4yro/1lvyKHpb8x2jc+JeuUcLVG/XxRgWL3ekR4zqYNBoZIBXgabg=
+Received: from PH0PR10MB5433.namprd10.prod.outlook.com (2603:10b6:510:e0::9)
+ by DS0PR10MB7456.namprd10.prod.outlook.com (2603:10b6:8:160::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.20; Thu, 23 Nov
+ 2023 16:21:56 +0000
+Received: from PH0PR10MB5433.namprd10.prod.outlook.com
+ ([fe80::cef0:d8a0:3eb1:66b2]) by PH0PR10MB5433.namprd10.prod.outlook.com
+ ([fe80::cef0:d8a0:3eb1:66b2%4]) with mapi id 15.20.7025.020; Thu, 23 Nov 2023
+ 16:21:55 +0000
+Message-ID: <05733774-4210-4097-9912-fb3aa8542fdd@oracle.com>
+Date: Thu, 23 Nov 2023 15:21:48 -0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support
+ (FEAT_NV2 only)
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        James Morse
+ <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+References: <20231120131027.854038-1-maz@kernel.org>
+ <DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
+ <86msv7ylnu.wl-maz@kernel.org>
+From: Miguel Luis <miguel.luis@oracle.com>
+In-Reply-To: <86msv7ylnu.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: LO4P265CA0228.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:315::16) To PH0PR10MB5433.namprd10.prod.outlook.com
+ (2603:10b6:510:e0::9)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZVzlRY8Dm9FjGo8i@google.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR10MB5433:EE_|DS0PR10MB7456:EE_
+X-MS-Office365-Filtering-Correlation-Id: 77993954-e915-422c-2ea9-08dbec404f08
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 
+	khTpEITJmxBVK64zRjRTNA7Qz2Mdv6dgXl4ltItn6dAAVK89I0ZL/90twRSv6DnkruVTEXYwF4sQ+9ZYmZgDTSabwgTVzEgmB3w3JH/d6u801p487QHhgZlOLI9ODNbaT5B9bssMU380TuzI67B2HdRrY8QJ2QqV2bIjiJ5ql2jdTwm/U0SCM9dwtDUkewEOQ1+8s45jGjCCaTrx0bv9X3HAvJCmKTieSkkWWN3e8zPx3CqAYUXnQHCtDg1GHMt98XixfPjNUGh16sjm6eU17sbJ81Fn/MgUNoodF091hlRuLRGmJzyN7gAB9toxscCFax/R/NHbfOLIePPoXEPKZ2lwFPBEe67CJ5DkCc8qOzEgCwsgBSgXZd3bdfJ4VPlmWfrYS7PXyz1+JpBAh73/GrrZP9VEeiV8bByYqFEDCIQd4MglEtuq0akOHf35dreRYvZloxq68a+u0qMo8Bp8jy4vuxcucDDxWKctiL58aPfDt/I3PwtfmmzvEPa4geFYgE27ChW0Y7zE+tIX7CyxRCdD6/iZervVuYb8s1CCZGQ17ojkHaPEm3sB/zlBMsdTIY6fcw6sASxWjm0A22EfkTVaa74L5acpMP7gSpj5jdEAY0Vdm4LTzkkDDvVfCjx3eX2DXuY6/yMhMspSy0nfHmuYFOFcPuOkMhhfR3XG287ixifFSxojIdpFJFM/kfZA
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB5433.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(396003)(39860400002)(346002)(376002)(230922051799003)(1800799012)(64100799003)(186009)(451199024)(5660300002)(7416002)(2906002)(66946007)(8676002)(8936002)(54906003)(6916009)(66476007)(66556008)(316002)(4326008)(41300700001)(6666004)(6486002)(6506007)(478600001)(966005)(53546011)(31686004)(44832011)(26005)(2616005)(6512007)(38100700002)(83380400001)(86362001)(36756003)(31696002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?utf-8?B?TmpDOHN4Um1hNWlnbVUyNm42TEZiR2Znb0tXYkdFK1h5ajJ1b3gxbW5jTnRu?=
+ =?utf-8?B?dzdDMDVOcUdwQit2WEZKdGxpRCtXd1p5UUZrK2FGNzI4MHJNeE02M0hHVUcw?=
+ =?utf-8?B?Wmw0WlpVZjExc3hHU3RUK05jeHMwQVN0b3g1NnFZVk1PRUZvZGV2am9tNXJk?=
+ =?utf-8?B?eDR0TWV6K0tGTk5oZFZhQ0RoTTJHdTdoeFZoZThrdDNqYkxvQ3ZtS09wWkll?=
+ =?utf-8?B?RnVpY21uLy8yUGU2R2tRRVlaaDBVRHJRMHNObWVSNjFSL3hTVXNjSVVwWXMy?=
+ =?utf-8?B?aDRrNVgrZkgwc3g5TGR5eEEzVlMzcGdsU3ZQZ2ZtM1JId1NkTXVCZzNOdWs0?=
+ =?utf-8?B?MHlGSDBoSHkwMW83NnRvSzNjdDlkUS9RN1NBZy94RGVqTDlOcHltbUd5dE1P?=
+ =?utf-8?B?T3YzczVIVGhZSWJXTVB6MGxWTHhVZmRTRVNuY1ZBblExKzExZDJUZFdFUDdh?=
+ =?utf-8?B?Tm1HV1ZZYXIwdks0ZWR5a0U0TFhXUERnTlQ5c0hzWm01bE94ZjhCcVZVeGwv?=
+ =?utf-8?B?dzRsQTdrc2x3bHp1bklPWmdPK21EbThqKzlkVWY5eFhQUDcvZ09pcmVFR28y?=
+ =?utf-8?B?YVdXamRwZFFCeVoyNkhWYUtxUDE3dTVqeWEzWnFUemdlRTBBbW55ZGd4V3li?=
+ =?utf-8?B?bEsyNm83NTQyQkkvem9idmVXQjlrMFl0Ym9ZTWEzS28vSzRHcTRGUVNmb1Ni?=
+ =?utf-8?B?N2xBdVhEWTNPcWdMTk03azZ3WkxhWnZ5Z21sV1VaK1lmN2V4aXVGQU5sb2Qz?=
+ =?utf-8?B?cVhKd3Q5SDM3cW5rWWlkQ0o1Q2RkZ3g1YkZUNlF3RnZYQkJWUlBESUFlWFkw?=
+ =?utf-8?B?ZWR1bE0xVVU1Z1p4ZW9IT1BCNmNveGFOVTYraWVyVXBWMW9yY1Brc2RZbWw2?=
+ =?utf-8?B?OFN0ZzNub2haNUdkNlJQc1RwYmV6dWxBWmVEcm0zNnhLZGxLNWNLZ08zUU85?=
+ =?utf-8?B?LzdtYzB3b2F2MjVPSjh2WXcvVmVuN0g0aTJWN05ENlNVQU1UMFZSaGtFVjVZ?=
+ =?utf-8?B?eHVkL3phTy9VZ01YY2hCR3F2WDdMT1VsT3hwK0Q4RHRLY3JLSUhRTjl4ZHY4?=
+ =?utf-8?B?dFRERTZmb09KTThndlZ0MU82dTlpWG5wbSt1UWlJOWRscEFEblN2R2ltNVpX?=
+ =?utf-8?B?dEY0YkNZNkcwd2Qwa2NrT1JQbi9pbzBMeTR1Vy9BT0RTRld3d0w1c1Brb1Vz?=
+ =?utf-8?B?NS84OU9xanpmWHdaTzBvL1hibFdvYi9PT3UyTHMxZnBBazJQL0ZQTjNPai80?=
+ =?utf-8?B?TDZPaWx2TU1GSXFKY2cxcVhUVWVwd01BTDNDYjVGOFA2amJSaVpiUHZNV3Zh?=
+ =?utf-8?B?eURGblFaVVkrRnF6MmVRbmNNSjFQeHJRcWZ6S0ZvQm9sR09hTEVVdDZ2SjdR?=
+ =?utf-8?B?QktiendQTHRFdE5SZFR2UE40Z0ZST3RibUZ5ZVlFQTh6eHhKWER1SDZGMDVp?=
+ =?utf-8?B?ekVlRmdwQXpySzFsMjVwVEN4by9XaGVnZWs1d2RTNk52enZiSEIzQTZheFUr?=
+ =?utf-8?B?dlE1RDVtaFpwZ0c3K2VBUFdiQ0pOUHNrV3YzN3UydHdLdE84eWV1RVhSQzZi?=
+ =?utf-8?B?Wmd4SjkzdWhseGtXL2FyMDBDQU9PN3ZEZ0x0eTI1UEFpcEl5V2NlN1ZoTnVQ?=
+ =?utf-8?B?NlIzci9IZU9nZ2tSUFIwZ3NBQ3VnUDFORS9LMlZSYlY0V1FFTXFpeXdxOFUr?=
+ =?utf-8?B?YVNkbTBCRU4wUG50ZjkxQVpQRWI2b3FzbjVVdWY2U3NPZ09GZ1R0NnE4eFgr?=
+ =?utf-8?B?bG5YNFZaUysyOUgrMldRaVhhRm9ROWRBUlBXbU1QVVExc3kxemJFNUVDUWNG?=
+ =?utf-8?B?SXFXUDQyZ0pIOTZoOVIwNnRmeGtxVUxyVVZJTnVvMHhyQ05VSm1xcDRxRFVT?=
+ =?utf-8?B?dlZTNzM3Z2RBM0d5bVBnQU9kZ3FHQkczamRaM1g4dmdtVEdhaWhJTTdDWFBK?=
+ =?utf-8?B?MmdWdG1PaU5hK3VRNE43VnVHb2ZvMUphaTY5cFZWcWY2b0dNRVlKcGhwbXVN?=
+ =?utf-8?B?NnZ1MlVFd2tvWHRkcmJiTnVtZ1RKR05uNXoyQlU1S011TWwxSHZ5RHFPUlRL?=
+ =?utf-8?B?VnNBWk9QV3BLVVN2N2hFd1FOZ2U4Z3RhYko0ZGlkNXpFVkJnRmRXZGlNNXRm?=
+ =?utf-8?Q?iXtVokBpAWA0LL7pU2OHn1ppf?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	=?utf-8?B?eFlieVpVd2FPcjlsNmhRUXFZanU3UlEyaDBWODVXSXBNaGdGek01VWJsSHdw?=
+ =?utf-8?B?QWh1RDlsc0ZPb0xVZ3pGWlBsMWpQb0MwZnd2bElNcG1VdFYyRVBhZ25kSEY3?=
+ =?utf-8?B?OTVLaXM1dEpFTEpuWmwyVWFVd01HUFBBYTNMb2c4Q3oyUnNMQTlydTRRcnZp?=
+ =?utf-8?B?ZGlDdGVLOVJ6cDk5aEhTRElOVHA1UWR0K3RKend3RWQxMVFteENHbVUwT0V2?=
+ =?utf-8?B?c0VHYVJ4SG9WZlQ0QWJNTDlSNkM0RTJkY0Z1SEVTVUlDYnV6OEIvcjE3bXRR?=
+ =?utf-8?B?VmJuWVpFV29LdTVRZWptVURDZHFYZXltdUdLLzFOUW51QU1yYnZXWDVFNmRt?=
+ =?utf-8?B?am13ZWttbk9pNk5teXpwMEhPV0o1S3ZBdlpMQ1lXZE4zdU9kSE4rU2lTR2hR?=
+ =?utf-8?B?MTJ3dHNzTlVWRytmTVpKN1pmZXpEd0tZZmcwcFRSNFJRWHp2dkNRZGx2VjJq?=
+ =?utf-8?B?R2Y4ZWlJYmNCUWJGb1U1RytWV21PbldMMWlBd1R5SDhwQ08zTVhuaW1rSE5k?=
+ =?utf-8?B?WTVGSVdaUGlNcUppZXFQNys5eEd3QWQ5YlJ5SFN4a3VlMnh3a2hqN0ZNMjY5?=
+ =?utf-8?B?dzk4ZFRKc0FTMWF3WGVORTFJWUljUEMrblZoRzRDbGtjUEFCQ1Q0VmtmNFg0?=
+ =?utf-8?B?aS9xaFF3M2R2TmdQL1BadU9kQWV5OVVuUnhlbko0ZDZBa2NDbis4TUJldGJl?=
+ =?utf-8?B?d2h2WERtRjNYN0dNcEplRlhuaml5VHJUTGxUeTFKK2ZCdW9TYkZZQ3pQWEFh?=
+ =?utf-8?B?UTVVdWFiRE5kRVFHMkMzdzg5SzFvd3lDMUpDc1R1VXZVWnNBQWlxOWxqckk1?=
+ =?utf-8?B?enh1L1BkZDJMMG8zcHpBSG0wbkZUaWdqRVYxRHdlaGhsV1I0cjRTMk45T3V4?=
+ =?utf-8?B?c0txWDJLUlRrQkw1MUY2bmlSeGNYMUlJdk5iMHdVU3hFYnhvUjJVMnI1T3FR?=
+ =?utf-8?B?RW9QdVdOTVRiaThQQzJOWGhnNzdEckc1ank0UkEweFRjY3VZZWwzeGgwRmEv?=
+ =?utf-8?B?OVNTWjA3cU1IdURRb2IvbjhxVFI4OXRxTEg0d3dpWWpOUHdKTkRPUnA4VEVr?=
+ =?utf-8?B?d1FwcGQyMThCa0crbWI1Yk5mV2xxeWJKR1R5enkzeVJpSWlyVXlxNXhzdjlk?=
+ =?utf-8?B?UUxwZng5ZHVRMnh0VVJnT0psNE1xVWRZRmVWNDM3NmlnOENxTHp6YjE4YVYw?=
+ =?utf-8?B?WEFjNEpXQ1pFandLVkNQMlJ4RVBhUElzcndFcTFuV2pxTXo1Z2hWOVBIOXQ1?=
+ =?utf-8?B?ZVVuSUNyTFFDTXZzM0I5REZMT1VaN0xUSXc5aTFwVCs0T1BBYXdRYlpnZ0g3?=
+ =?utf-8?B?UFBNbDBUWi9nN2NlN0xYN3kvQ2ZZY3ZaSENHOU5OZTlITEJUdXRDNWgvY2Q1?=
+ =?utf-8?B?ejZhaGsrcko5blNWeko0ZFgyYTRSeklzckpXejFBelQ1L29aOG4yYUJJTjZy?=
+ =?utf-8?B?MjNySDcvcFo1QVk2WWd6SFI5Y1hyN2lucldXT2FwNXRQZWpDclNNN3VyTzRY?=
+ =?utf-8?Q?nPCZyI=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 77993954-e915-422c-2ea9-08dbec404f08
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB5433.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Nov 2023 16:21:55.3867
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YWUfqAlGvCg/QbmoFJIsBh/TtUtid1QzWf9gLp0CKZJU4kXsw41WKQiBTFVMs/yUb+9WakqK5cCoa1AJa0/Uqg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB7456
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-23_12,2023-11-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 adultscore=0 malwarescore=0
+ spamscore=0 bulkscore=0 phishscore=0 mlxlogscore=999 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
+ definitions=main-2311230119
+X-Proofpoint-GUID: nYVUrRyqa61QGBEJE1GMPnFFkTxJXtj5
+X-Proofpoint-ORIG-GUID: nYVUrRyqa61QGBEJE1GMPnFFkTxJXtj5
 
-On Tue, Nov 21, 2023 at 05:13:41PM +0000, Vincent Donnefort wrote:
-> On Wed, Nov 15, 2023 at 05:16:36PM +0000, Sebastian Ene wrote:
+Hi Marc,
 
-Hi,
+On 21/11/2023 18:02, Marc Zyngier wrote:
+> On Tue, 21 Nov 2023 16:49:52 +0000,
+> Miguel Luis <miguel.luis@oracle.com> wrote:
+>> Hi Marc,
+>>
+>>> On 20 Nov 2023, at 12:09, Marc Zyngier <maz@kernel.org> wrote:
+>>>
+>>> This is the 5th drop of NV support on arm64 for this year, and most
+>>> probably the last one for this side of Christmas.
+>>>
+>>> For the previous episodes, see [1].
+>>>
+>>> What's changed:
+>>>
+>>> - Drop support for the original FEAT_NV. No existing hardware supports
+>>>  it without FEAT_NV2, and the architecture is deprecating the former
+>>>  entirely. This results in fewer patches, and a slightly simpler
+>>>  model overall.
+>>>
+>>> - Reorganise the series to make it a bit more logical now that FEAT_NV
+>>>  is gone.
+>>>
+>>> - Apply the NV idreg restrictions on VM first run rather than on each
+>>>  access.
+>>>
+>>> - Make the nested vgic shadow CPU interface a per-CPU structure rather
+>>>  than per-vcpu.
+>>>
+>>> - Fix the EL0 timer fastpath
+>>>
+>>> - Work around the architecture deficiencies when trapping WFI from a
+>>>  L2 guest.
+>>>
+>>> - Fix sampling of nested vgic state (MISR, ELRSR, EISR)
+>>>
+>>> - Drop the patches that have already been merged (NV trap forwarding,
+>>>  per-MMU VTCR)
+>>>
+>>> - Rebased on top of 6.7-rc2 + the FEAT_E2H0 support [2].
+>>>
+>>> The branch containing these patches (and more) is at [3]. As for the
+>>> previous rounds, my intention is to take a prefix of this series into
+>>> 6.8, provided that it gets enough reviewing.
+>>>
+>>> [1] https://lore.kernel.org/r/20230515173103.1017669-1-maz@kernel.org
+>>> [2] https://lore.kernel.org/r/20231120123721.851738-1-maz@kernel.org
+>>> [3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-6.8-nv2-only
+>>>
+>> While I was testing this with kvmtool for 5.16 I noted the following on dmesg:
+>>
+>> [  803.014258] kvm [19040]: Unsupported guest sys_reg access at: 8129fa50 [600003c9]
+>>                 { Op0( 3), Op1( 5), CRn( 1), CRm( 0), Op2( 2), func_read },
+>>
+>> This is CPACR_EL12.
+> CPACR_EL12 is redirected to VNCR[0x100]. It really shouldn't trap...
+>
+>> Still need yet to debug.
+> Can you disassemble the guest around the offending PC?
 
-> > Initialize a structures used to keep the state of the host stage-2 ptdump
-> > walker when pKVM is enabled. Create a new debugfs entry for the host
-> > stage-2 pagetables and hook the callbacks invoked when the entry is
-> > accessed. When the debugfs file is opened, allocate memory resources which
-> > will be shared with the hypervisor for saving the pagetable snapshot.
-> > On close release the associated memory and we unshare it from the
-> > hypervisor.
-> > 
-> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > ---
-> >  arch/arm64/include/asm/ptdump.h |  12 +++
-> >  arch/arm64/kvm/Kconfig          |  13 +++
-> >  arch/arm64/kvm/arm.c            |   2 +
-> >  arch/arm64/mm/ptdump.c          | 168 ++++++++++++++++++++++++++++++++
-> >  arch/arm64/mm/ptdump_debugfs.c  |   8 +-
-> >  5 files changed, 202 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/ptdump.h b/arch/arm64/include/asm/ptdump.h
-> > index 9b2bebfcefbe..de5a5a0c0ecf 100644
-> > --- a/arch/arm64/include/asm/ptdump.h
-> > +++ b/arch/arm64/include/asm/ptdump.h
-> > @@ -22,6 +22,7 @@ struct ptdump_info {
-> >  	void (*ptdump_walk)(struct seq_file *s, struct ptdump_info *info);
-> >  	int (*ptdump_prepare_walk)(void *file_priv);
-> >  	void (*ptdump_end_walk)(void *file_priv);
-> > +	size_t				mc_len;
-> >  };
-> >  
-> >  void ptdump_walk(struct seq_file *s, struct ptdump_info *info);
-> > @@ -33,13 +34,24 @@ struct ptdump_info_file_priv {
-> >  #ifdef CONFIG_PTDUMP_DEBUGFS
-> >  #define EFI_RUNTIME_MAP_END	DEFAULT_MAP_WINDOW_64
-> >  void __init ptdump_debugfs_register(struct ptdump_info *info, const char *name);
-> > +void ptdump_debugfs_kvm_register(struct ptdump_info *info, const char *name,
-> > +				 struct dentry *d_entry);
-> >  #else
-> >  static inline void ptdump_debugfs_register(struct ptdump_info *info,
-> >  					   const char *name) { }
-> > +static inline void ptdump_debugfs_kvm_register(struct ptdump_info *info,
-> > +					       const char *name,
-> > +					       struct dentry *d_entry) { }
-> >  #endif
-> >  void ptdump_check_wx(void);
-> >  #endif /* CONFIG_PTDUMP_CORE */
-> >  
-> > +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
-> > +void ptdump_register_host_stage2(void);
-> > +#else
-> > +static inline void ptdump_register_host_stage2(void) { }
-> > +#endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
-> > +
-> >  #ifdef CONFIG_DEBUG_WX
-> >  #define debug_checkwx()	ptdump_check_wx()
-> >  #else
-> > diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> > index 83c1e09be42e..cf5b7f06b152 100644
-> > --- a/arch/arm64/kvm/Kconfig
-> > +++ b/arch/arm64/kvm/Kconfig
-> > @@ -71,4 +71,17 @@ config PROTECTED_NVHE_STACKTRACE
-> >  
-> >  	  If unsure, or not using protected nVHE (pKVM), say N.
-> >  
-> > +config PTDUMP_STAGE2_DEBUGFS
-> > +	bool "Present the stage-2 pagetables to debugfs"
-> > +	depends on NVHE_EL2_DEBUG && PTDUMP_DEBUGFS && KVM
-> > +	default n
-> > +	help
-> > +	  Say Y here if you want to show the stage-2 kernel pagetables
-> > +	  layout in a debugfs file. This information is only useful for kernel developers
-> > +	  who are working in architecture specific areas of the kernel.
-> > +	  It is probably not a good idea to enable this feature in a production
-> > +	  kernel.
-> > +
-> > +	  If in doubt, say N.
-> > +
-> >  endif # VIRTUALIZATION
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index e5f75f1f1085..987683650576 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -28,6 +28,7 @@
-> >  
-> >  #include <linux/uaccess.h>
-> >  #include <asm/ptrace.h>
-> > +#include <asm/ptdump.h>
-> >  #include <asm/mman.h>
-> >  #include <asm/tlbflush.h>
-> >  #include <asm/cacheflush.h>
-> > @@ -2592,6 +2593,7 @@ static __init int kvm_arm_init(void)
-> >  	if (err)
-> >  		goto out_subs;
-> >  
-> > +	ptdump_register_host_stage2();
-> >  	kvm_arm_initialised = true;
-> >  
-> >  	return 0;
-> > diff --git a/arch/arm64/mm/ptdump.c b/arch/arm64/mm/ptdump.c
-> > index d531e24ea0b2..0b4cb54e43ff 100644
-> > --- a/arch/arm64/mm/ptdump.c
-> > +++ b/arch/arm64/mm/ptdump.c
-> > @@ -24,6 +24,9 @@
-> >  #include <asm/memory.h>
-> >  #include <asm/pgtable-hwdef.h>
-> >  #include <asm/ptdump.h>
-> > +#include <asm/kvm_pkvm.h>
-> > +#include <asm/kvm_pgtable.h>
-> > +#include <asm/kvm_host.h>
-> >  
-> >  
-> >  enum address_markers_idx {
-> > @@ -378,6 +381,170 @@ void ptdump_check_wx(void)
-> >  		pr_info("Checked W+X mappings: passed, no W+X pages found\n");
-> >  }
-> >  
-> > +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
-> > +static struct ptdump_info stage2_kernel_ptdump_info;
-> > +
-> > +static phys_addr_t ptdump_host_pa(void *addr)
-> > +{
-> > +	return __pa(addr);
-> > +}
-> > +
-> > +static void *ptdump_host_va(phys_addr_t phys)
-> > +{
-> > +	return __va(phys);
-> > +}
-> > +
-> > +static size_t stage2_get_pgd_len(void)
-> > +{
-> > +	u64 mmfr0, mmfr1, vtcr;
-> > +	u32 phys_shift = get_kvm_ipa_limit();
-> > +
-> > +	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
-> > +	mmfr1 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> > +	vtcr = kvm_get_vtcr(mmfr0, mmfr1, phys_shift);
-> > +
-> > +	return kvm_pgtable_stage2_pgd_size(vtcr);
-> 
-> That's a lot of conversions to go from the kvm_ipa_limit to VTCR and
-> VTCR back to ia_bits and the start level, but that would mean rewrite pieces of
-> pgtable.c there. :-\
-> 
+[ 1248.686350] kvm [7013]: Unsupported guest sys_reg access at: 812baa50 [600003c9]
+                { Op0( 3), Op1( 5), CRn( 1), CRm( 0), Op2( 2), func_read },
 
-Right, I think with Oliver's suggestion we will no longer have to move
-these bits around and the code will be self contained under /kvm.
+ 12baa00:    14000008     b    0x12baa20
+ 12baa04:    d000d501     adrp    x1, 0x2d5c000
+ 12baa08:    91154021     add    x1, x1, #0x550
+ 12baa0c:    f9400022     ldr    x2, [x1]
+ 12baa10:    f9400421     ldr    x1, [x1, #8]
+ 12baa14:    8a010042     and    x2, x2, x1
+ 12baa18:    d3441c42     ubfx    x2, x2, #4, #4
+ 12baa1c:    b4000082     cbz    x2, 0x12baa2c
+ 12baa20:    d2a175a0     mov    x0, #0xbad0000                 // #195887104
+ 12baa24:    f2994220     movk    x0, #0xca11
+ 12baa28:    d69f03e0     eret
+ 12baa2c:    d2c00080     mov    x0, #0x400000000               // #17179869184
+ 12baa30:    f2b10000     movk    x0, #0x8800, lsl #16
+ 12baa34:    f2800000     movk    x0, #0x0
+ 12baa38:    d51c1100     msr    hcr_el2, x0
+ 12baa3c:    d5033fdf     isb
+ 12baa40:    d53c4100     mrs    x0, sp_el1
+ 12baa44:    9100001f     mov    sp, x0
+ 12baa48:    d538d080     mrs    x0, tpidr_el1
+ 12baa4c:    d51cd040     msr    tpidr_el2, x0
+ 12baa50:    d53d1040     mrs    x0, cpacr_el12
+ 12baa54:    d5181040     msr    cpacr_el1, x0
+ 12baa58:    d53dc000     mrs    x0, vbar_el12
+ 12baa5c:    d518c000     msr    vbar_el1, x0
+ 12baa60:    d53c1120     mrs    x0, mdcr_el2
+ 12baa64:    9272f400     and    x0, x0, #0xffffffffffffcfff
+ 12baa68:    9266f400     and    x0, x0, #0xfffffffffcffffff
+ 12baa6c:    d51c1120     msr    mdcr_el2, x0
+ 12baa70:    d53d2040     mrs    x0, tcr_el12
+ 12baa74:    d5182040     msr    tcr_el1, x0
+ 12baa78:    d53d2000     mrs    x0, ttbr0_el12
+ 12baa7c:    d5182000     msr    ttbr0_el1, x0
+ 12baa80:    d53d2020     mrs    x0, ttbr1_el12
+ 12baa84:    d5182020     msr    ttbr1_el1, x0
+ 12baa88:    d53da200     mrs    x0, mair_el12
+ 12baa8c:    d518a200     msr    mair_el1, x0
+ 12baa90:    d5380761     mrs    x1, s3_0_c0_c7_3
+ 12baa94:    d3400c21     ubfx    x1, x1, #0, #4
+ 12baa98:    b4000141     cbz    x1, 0x12baac0
+ 12baa9c:    d53d2060     mrs    x0, s3_5_c2_c0_3
 
-> > +}
-> > +
-> > +static int stage2_ptdump_prepare_walk(void *file_priv)
-> > +{
-> > +	struct ptdump_info_file_priv *f_priv = file_priv;
-> > +	struct ptdump_info *info = &f_priv->info;
-> > +	struct kvm_pgtable_snapshot *snapshot;
-> > +	int ret, pgd_index, mc_index, pgd_pages_sz;
-> > +	void *page_hva;
-> > +	phys_addr_t pgd;
-> > +
-> > +	snapshot = alloc_pages_exact(PAGE_SIZE, GFP_KERNEL_ACCOUNT);
-> > +	if (!snapshot)
-> > +		return -ENOMEM;
-> 
-> For a single page, __get_free_page is enough.
-> 
 
-I can use this, thanks.
+>> As for QEMU, it is having issues enabling _EL2 feature although EL2
+>> is supported by checking KVM_CAP_ARM_EL2; need yet to debug this.
+> The capability number changes at each release. Make sure you resync
+> your includes.
 
-> > +
-> > +	memset(snapshot, 0, PAGE_SIZE);
-> > +	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, virt_to_pfn(snapshot));
-> > +	if (ret)
-> > +		goto free_snapshot;
-> 
-> It'd probably be better to not share anything here, and let the hypervisor do
-> host_donate_hyp() and hyp_donate_host() before returning back from the HVC. This
-> way the hypervisor will protect itself.
-> 
+Been there but it seems a different problem this time.
 
-Right, as we took this discussion offline, I will update this and use
-the *donate* API.
+Thank you
 
-> > +
-> > +	snapshot->pgd_len = stage2_get_pgd_len();
-> > +	pgd_pages_sz = snapshot->pgd_len / PAGE_SIZE;
-> > +	snapshot->pgd_hva = alloc_pages_exact(snapshot->pgd_len,
-> > +					      GFP_KERNEL_ACCOUNT);
-> > +	if (!snapshot->pgd_hva) {
-> > +		ret = -ENOMEM;
-> > +		goto unshare_snapshot;
-> > +	}
-> > +
-> > +	for (pgd_index = 0; pgd_index < pgd_pages_sz; pgd_index++) {
-> > +		page_hva = snapshot->pgd_hva + pgd_index * PAGE_SIZE;
-> > +		ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp,
-> > +					virt_to_pfn(page_hva));
-> > +		if (ret)
-> > +			goto unshare_pgd_pages;
-> > +	}
-> > +
-> > +	for (mc_index = 0; mc_index < info->mc_len; mc_index++) {
-> > +		page_hva = alloc_pages_exact(PAGE_SIZE, GFP_KERNEL_ACCOUNT);
-> 
-> ditto.
-> 
+Miguel
 
-Ack.
-
-> > +		if (!page_hva) {
-> > +			ret = -ENOMEM;
-> > +			goto free_memcache_pages;
-> > +		}
-> > +
-> > +		push_hyp_memcache(&snapshot->mc, page_hva, ptdump_host_pa);
-> > +		ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp,
-> > +					virt_to_pfn(page_hva));
-> > +		if (ret) {
-> > +			pop_hyp_memcache(&snapshot->mc, ptdump_host_va);
-> > +			free_pages_exact(page_hva, PAGE_SIZE);
-> > +			goto free_memcache_pages;
-> > +		}
-> 
-> Maybe for the page-table pages, it'd be better to let the hyp does the
-> host_donate_hyp() / hyp_donate_host()? It might be easier than sharing + pin.
-> 
-> > +	}
-> > +
-> > +	ret = kvm_call_hyp_nvhe(__pkvm_copy_host_stage2, snapshot);
-> > +	if (ret)
-> > +		goto free_memcache_pages;
-> > +
-> > +	pgd = (phys_addr_t)snapshot->pgtable.pgd;
-> > +	snapshot->pgtable.pgd = phys_to_virt(pgd);
-> > +	f_priv->file_priv = snapshot;
-> > +	return 0;
-> > +
-> > +free_memcache_pages:
-> > +	page_hva = pop_hyp_memcache(&snapshot->mc, ptdump_host_va);
-> > +	while (page_hva) {
-> > +		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
-> > +					virt_to_pfn(page_hva));
-> > +		WARN_ON(ret);
-> > +		free_pages_exact(page_hva, PAGE_SIZE);
-> > +		page_hva = pop_hyp_memcache(&snapshot->mc, ptdump_host_va);
-> > +	}
-> > +unshare_pgd_pages:
-> > +	pgd_index = pgd_index - 1;
-> > +	for (; pgd_index >= 0; pgd_index--) {
-> > +		page_hva = snapshot->pgd_hva + pgd_index * PAGE_SIZE;
-> > +		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
-> > +					virt_to_pfn(page_hva));
-> > +		WARN_ON(ret);
-> > +	}
-> > +	free_pages_exact(snapshot->pgd_hva, snapshot->pgd_len);
-> > +unshare_snapshot:
-> > +	WARN_ON(kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
-> > +				  virt_to_pfn(snapshot)));
-> > +free_snapshot:
-> > +	free_pages_exact(snapshot, PAGE_SIZE);
-> > +	f_priv->file_priv = NULL;
-> > +	return ret;
-> 
-> Couldn't this path be merged with stage2_ptdump_end_walk()?
-> 
-
-I think it should be doable.
-
-> > +}
-> > +
-> > +static void stage2_ptdump_end_walk(void *file_priv)
-> > +{
-> > +	struct ptdump_info_file_priv *f_priv = file_priv;
-> > +	struct kvm_pgtable_snapshot *snapshot = f_priv->file_priv;
-> > +	void *page_hva;
-> > +	int pgd_index, ret, pgd_pages_sz;
-> > +
-> > +	if (!snapshot)
-> > +		return;
-> > +
-> > +	page_hva = pop_hyp_memcache(&snapshot->mc, ptdump_host_va);
-> > +	while (page_hva) {
-> > +		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
-> > +					virt_to_pfn(page_hva));
-> > +		WARN_ON(ret);
-> > +		free_pages_exact(page_hva, PAGE_SIZE);
-> > +		page_hva = pop_hyp_memcache(&snapshot->mc, ptdump_host_va);
-> > +	}
-> > +
-> > +	pgd_pages_sz = snapshot->pgd_len / PAGE_SIZE;
-> > +	for (pgd_index = 0; pgd_index < pgd_pages_sz; pgd_index++) {
-> > +		page_hva = snapshot->pgd_hva + pgd_index * PAGE_SIZE;
-> > +		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
-> > +					virt_to_pfn(page_hva));
-> > +		WARN_ON(ret);
-> > +	}
-> > +
-> > +	free_pages_exact(snapshot->pgd_hva, snapshot->pgd_len);
-> > +	WARN_ON(kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
-> > +				  virt_to_pfn(snapshot)));
-> > +	free_pages_exact(snapshot, PAGE_SIZE);
-> > +	f_priv->file_priv = NULL;
-> > +}
-> > +
-> > +void ptdump_register_host_stage2(void)
-> > +{
-> > +	if (!is_protected_kvm_enabled())
-> > +		return;
-> > +
-> > +	stage2_kernel_ptdump_info = (struct ptdump_info) {
-> > +		.mc_len			= host_s2_pgtable_pages(),
-> > +		.ptdump_prepare_walk	= stage2_ptdump_prepare_walk,
-> > +		.ptdump_end_walk	= stage2_ptdump_end_walk,
-> > +	};
-> > +
-> > +	ptdump_debugfs_kvm_register(&stage2_kernel_ptdump_info,
-> > +				    "host_stage2_page_tables",
-> > +				    kvm_debugfs_dir);
-> > +}
-> > +#endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
-> > +
-> >  static int __init ptdump_init(void)
-> >  {
-> >  	address_markers[PAGE_END_NR].start_address = PAGE_END;
-> > @@ -386,6 +553,7 @@ static int __init ptdump_init(void)
-> >  #endif
-> >  	ptdump_initialize();
-> >  	ptdump_debugfs_register(&kernel_ptdump_info, "kernel_page_tables");
-> > +
-> 
-> Not needed.
-> 
-
-Will remove this, checkpatch didn't seem to complain about it.
-
-> >  	return 0;
-> >  }
-> >  device_initcall(ptdump_init);
-> > diff --git a/arch/arm64/mm/ptdump_debugfs.c b/arch/arm64/mm/ptdump_debugfs.c
-> > index 3bf5de51e8c3..4821dbef784c 100644
-> > --- a/arch/arm64/mm/ptdump_debugfs.c
-> > +++ b/arch/arm64/mm/ptdump_debugfs.c
-> > @@ -68,5 +68,11 @@ static const struct file_operations ptdump_fops = {
-> >  
-> >  void __init ptdump_debugfs_register(struct ptdump_info *info, const char *name)
-> >  {
-> > -	debugfs_create_file(name, 0400, NULL, info, &ptdump_fops);
-> > +	ptdump_debugfs_kvm_register(info, name, NULL);
-> 
-> Not really related to kvm, the only difference is passing or not a dentry.
-> 
-> How about a single (non __init) function?
-> 
-
-I don't think it works because you have to keep the signature of the
-original function. This 'ptdump_debugfs_register' is also called from the
-non-arch drivers code.
-
-> > +}
-> > +
-> > +void ptdump_debugfs_kvm_register(struct ptdump_info *info, const char *name,
-> > +				 struct dentry *d_entry)
-> > +{
-> > +	debugfs_create_file(name, 0400, d_entry, info, &ptdump_fops);
-> >  }
-> > -- 
-> > 2.43.0.rc0.421.g78406f8d94-goog
-> > 
+> 	M.
+>
