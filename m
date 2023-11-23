@@ -1,47 +1,47 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46D8833088
-	for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 14:40:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB092575A
+	for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 14:48:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aTl/tBKI"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40b367a0a12so41935e9.1
-        for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 06:40:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oVAGiDBX"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40b35199f94so68835e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 06:48:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700750456; x=1701355256; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1700750931; x=1701355731; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T42uP4RrwsWg1KmS69kyy9Ib3LBREEVHqIXQ7y4MVfY=;
-        b=aTl/tBKIwr++4TOTirUUFpLXv2q7JEXzQ1JMq+9Dg+2OKbHKflwSuHthZWa17eoc77
-         X/e4AUQlum2UiWtvU6nja83YI1I40u+aiPdVMivVvjmvXaUzonMjn6st4U79rvnWyPYU
-         WVkf6TcIi+bslO2Usmh9QzwN+zd5MCqbGXxOARaE7qNFzggST46ooHH2+G0hniXEBkdL
-         qB7gsfqJTsL2fmAC3f6ILMETFj9O8HJgn04MRoyH86a1moFVv4C7cQ6b7dZKvOJ0HL8M
-         nvGAXGx5bpRFD4kJ5yYbKv+RRk3lKXx2/wFr0Fi4T5U3DA7/tHNFZo3TopVnSmJeB0oQ
-         YI2Q==
+        bh=Id8FFmZPqAcjX9nM2kv7yhFZ7V91eseH8kTxLchD3kM=;
+        b=oVAGiDBXe+tHH5ml8JdAYbjDdfEh4/iB15A/ldMq9zQtznJuoXGT5q79dF0snEjSPR
+         luHg61ChWCC8jZKAgwcZZLEW95u/MSPEHIKtWP4afZH+U/LbjV+kpmuq/Yw7oWWO9hSQ
+         duTSA7qvx1EC6rdEDTREPxp9YdlIb653/2mBECsXAC0hSzlzTLyF5LKywujAJIOLj1r3
+         pGe4cHb3Q3dPqhQ2YxYGf8zj7b1w8TM6PnfjSN6/L71jqNZDbW6Y7zI6a76bvJpqQ72f
+         DmokcKiuPM8Ot1RT3HhonzbR3mnZhdwov13O6WS9x05A+AO2lY0bYRsvUWbQI2NIuC5Q
+         JSKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700750456; x=1701355256;
+        d=1e100.net; s=20230601; t=1700750931; x=1701355731;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=T42uP4RrwsWg1KmS69kyy9Ib3LBREEVHqIXQ7y4MVfY=;
-        b=Rvw37py/v5OeksVepHzo1Nh5fpxnthhGUSdyXyzHV3/jbbigktv9DXyAXLSIn83Lbp
-         wTTSm8QUiz0oNFv6DdDHpY1yZPci4CjCZjQo5BCBO7T83btF0GrQohOsgGflzx/W3dOo
-         ClU9eTGX7YTT/lqBA1xUO+6r2VZbAlCeBkXtHCDxDk4yQ4InmLjOU6KJH+s/QMqaL3ed
-         CTJL9cizrQCaQsvetWil6EfviH45jkz/54jRxpDYR5Pt+j0cG66EFVNxHpUo3q6zJWEm
-         JkNNS3/hPOoCg8g76cgIIxopoIElTmpTuoPRcTWzNT+Scr0/NOLEoFBJtrnA7JpnDuEy
-         tkTg==
-X-Gm-Message-State: AOJu0YzG+z1QmVC4rqXczjXJrgo8+EuAXHmLNwm33/gGuy9xoZRFvkUy
-	3FZoJA/pjs7+ONn+PxQsmSCgobO6YivSbxDJZaW8zqak80Q=
-X-Google-Smtp-Source: AGHT+IHMgA4b++qsBDOOnD56+tFpdmp4qO8iPd0q+vAQuh4AMwnkRHN4NaFjfob5bz9hL70Z6XsISg==
-X-Received: by 2002:a05:600c:4e0a:b0:40a:4c7d:f300 with SMTP id b10-20020a05600c4e0a00b0040a4c7df300mr279760wmq.6.1700750456054;
-        Thu, 23 Nov 2023 06:40:56 -0800 (PST)
+        bh=Id8FFmZPqAcjX9nM2kv7yhFZ7V91eseH8kTxLchD3kM=;
+        b=vvbAQzwmVf8ev+3RNIng5qycs81g+BYJcwB6wVZa6hy6PjkzFfTzI0GRtFiFl8sp5m
+         6j21QLDYcwOZ2Gaox3rAKrD+4haPVDgk2LkmhlE6InISrkoHda9uOrCqcyI6G/ezaNzY
+         C3De/O1sQwgjrIbQCPFOozfmWyEpnu2aIJROeiOLHIvm8YMGuPpo9ocg8qyHqfL34Etb
+         V/4OGng+KknslfbabLtL/uaTvt995LunCptUOXAZGe9tp49w/P9tP7tMfrZERvR4x+9B
+         cjxDvttdiUDa9OUXELr2pcB6YeNbTTvDHsSu3FiMyKeU2i7ibfODp87ZmglL+n7i4F2U
+         OSiw==
+X-Gm-Message-State: AOJu0YyfaC+czkfffFjatTal2agsmmj2Xt1v8kW0+7NJh/ea+5xKBVhg
+	SAoYrhnhFQuAycJl209vXsYwcA==
+X-Google-Smtp-Source: AGHT+IFCh5xgc0nF4xb2cR9PLPVK5PT5r87gQj8D+vxwP8OMDt4I+IMAbggtwK74+wGLTcgejKtYDg==
+X-Received: by 2002:a05:600c:b4f:b0:404:7462:1f87 with SMTP id k15-20020a05600c0b4f00b0040474621f87mr287391wmr.6.1700750931337;
+        Thu, 23 Nov 2023 06:48:51 -0800 (PST)
 Received: from google.com (110.121.148.146.bc.googleusercontent.com. [146.148.121.110])
-        by smtp.gmail.com with ESMTPSA id fj13-20020a05600c0c8d00b00407b93d8085sm2917406wmb.27.2023.11.23.06.40.55
+        by smtp.gmail.com with ESMTPSA id t4-20020a0560001a4400b003316eb9db40sm1859750wry.51.2023.11.23.06.48.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 06:40:55 -0800 (PST)
-Date: Thu, 23 Nov 2023 14:40:53 +0000
+        Thu, 23 Nov 2023 06:48:50 -0800 (PST)
+Date: Thu, 23 Nov 2023 14:48:49 +0000
 From: Sebastian Ene <sebastianene@google.com>
 To: Vincent Donnefort <vdonnefort@google.com>
 Cc: will@kernel.org, Oliver Upton <oliver.upton@linux.dev>,
@@ -52,12 +52,12 @@ Cc: will@kernel.org, Oliver Upton <oliver.upton@linux.dev>,
 	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, kernel-team@android.com,
 	qperret@google.com, smostafa@google.com
-Subject: Re: [PATCH v3 01/10] KVM: arm64: Add snap shooting the host stage-2
- pagetables
-Message-ID: <ZV9kdaSE3b8CON4B@google.com>
+Subject: Re: [PATCH v3 06/10] arm64: ptdump: Register a debugfs entry for the
+ host stage-2 tables
+Message-ID: <ZV9mUbWXr2hlKJI6@google.com>
 References: <20231115171639.2852644-2-sebastianene@google.com>
- <20231115171639.2852644-3-sebastianene@google.com>
- <ZVy64ha-IaX_c0pl@google.com>
+ <20231115171639.2852644-8-sebastianene@google.com>
+ <ZVzlRY8Dm9FjGo8i@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -66,402 +66,375 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZVy64ha-IaX_c0pl@google.com>
+In-Reply-To: <ZVzlRY8Dm9FjGo8i@google.com>
 
-On Tue, Nov 21, 2023 at 02:12:50PM +0000, Vincent Donnefort wrote:
+On Tue, Nov 21, 2023 at 05:13:41PM +0000, Vincent Donnefort wrote:
+> On Wed, Nov 15, 2023 at 05:16:36PM +0000, Sebastian Ene wrote:
 
 Hi,
 
-> On Wed, Nov 15, 2023 at 05:16:31PM +0000, Sebastian Ene wrote:
-> > Introduce a new HVC that allows the caller to snap shoot the stage-2
-> 
-> "snapshot" same in the title of this patch.
-> 
-
-I will update the name, thanks.
-
-> > pagetables under NVHE debug configuration. The caller specifies the
-> > location where the pagetables are copied and must ensure that the memory
-> > is accessible by the hypervisor. The memory where the pagetables are
-> > copied has to be allocated by the caller and shared with the hypervisor.
+> > Initialize a structures used to keep the state of the host stage-2 ptdump
+> > walker when pKVM is enabled. Create a new debugfs entry for the host
+> > stage-2 pagetables and hook the callbacks invoked when the entry is
+> > accessed. When the debugfs file is opened, allocate memory resources which
+> > will be shared with the hypervisor for saving the pagetable snapshot.
+> > On close release the associated memory and we unshare it from the
+> > hypervisor.
 > > 
 > > Signed-off-by: Sebastian Ene <sebastianene@google.com>
 > > ---
-> >  arch/arm64/include/asm/kvm_asm.h              |   1 +
-> >  arch/arm64/include/asm/kvm_pgtable.h          |  36 +++++++
-> >  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   1 +
-> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  20 ++++
-> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 102 ++++++++++++++++++
-> >  arch/arm64/kvm/hyp/pgtable.c                  |  56 ++++++++++
-> >  6 files changed, 216 insertions(+)
+> >  arch/arm64/include/asm/ptdump.h |  12 +++
+> >  arch/arm64/kvm/Kconfig          |  13 +++
+> >  arch/arm64/kvm/arm.c            |   2 +
+> >  arch/arm64/mm/ptdump.c          | 168 ++++++++++++++++++++++++++++++++
+> >  arch/arm64/mm/ptdump_debugfs.c  |   8 +-
+> >  5 files changed, 202 insertions(+), 1 deletion(-)
 > > 
-> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> > index 24b5e6b23417..99145a24c0f6 100644
-> > --- a/arch/arm64/include/asm/kvm_asm.h
-> > +++ b/arch/arm64/include/asm/kvm_asm.h
-> > @@ -81,6 +81,7 @@ enum __kvm_host_smccc_func {
-> >  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
-> >  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
-> >  	__KVM_HOST_SMCCC_FUNC___pkvm_teardown_vm,
-> > +	__KVM_HOST_SMCCC_FUNC___pkvm_copy_host_stage2,
+> > diff --git a/arch/arm64/include/asm/ptdump.h b/arch/arm64/include/asm/ptdump.h
+> > index 9b2bebfcefbe..de5a5a0c0ecf 100644
+> > --- a/arch/arm64/include/asm/ptdump.h
+> > +++ b/arch/arm64/include/asm/ptdump.h
+> > @@ -22,6 +22,7 @@ struct ptdump_info {
+> >  	void (*ptdump_walk)(struct seq_file *s, struct ptdump_info *info);
+> >  	int (*ptdump_prepare_walk)(void *file_priv);
+> >  	void (*ptdump_end_walk)(void *file_priv);
+> > +	size_t				mc_len;
 > >  };
 > >  
-> >  #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index d3e354bb8351..be615700f8ac 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -10,6 +10,7 @@
-> >  #include <linux/bits.h>
-> >  #include <linux/kvm_host.h>
-> >  #include <linux/types.h>
+> >  void ptdump_walk(struct seq_file *s, struct ptdump_info *info);
+> > @@ -33,13 +34,24 @@ struct ptdump_info_file_priv {
+> >  #ifdef CONFIG_PTDUMP_DEBUGFS
+> >  #define EFI_RUNTIME_MAP_END	DEFAULT_MAP_WINDOW_64
+> >  void __init ptdump_debugfs_register(struct ptdump_info *info, const char *name);
+> > +void ptdump_debugfs_kvm_register(struct ptdump_info *info, const char *name,
+> > +				 struct dentry *d_entry);
+> >  #else
+> >  static inline void ptdump_debugfs_register(struct ptdump_info *info,
+> >  					   const char *name) { }
+> > +static inline void ptdump_debugfs_kvm_register(struct ptdump_info *info,
+> > +					       const char *name,
+> > +					       struct dentry *d_entry) { }
+> >  #endif
+> >  void ptdump_check_wx(void);
+> >  #endif /* CONFIG_PTDUMP_CORE */
+> >  
+> > +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
+> > +void ptdump_register_host_stage2(void);
+> > +#else
+> > +static inline void ptdump_register_host_stage2(void) { }
+> > +#endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
+> > +
+> >  #ifdef CONFIG_DEBUG_WX
+> >  #define debug_checkwx()	ptdump_check_wx()
+> >  #else
+> > diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> > index 83c1e09be42e..cf5b7f06b152 100644
+> > --- a/arch/arm64/kvm/Kconfig
+> > +++ b/arch/arm64/kvm/Kconfig
+> > @@ -71,4 +71,17 @@ config PROTECTED_NVHE_STACKTRACE
+> >  
+> >  	  If unsure, or not using protected nVHE (pKVM), say N.
+> >  
+> > +config PTDUMP_STAGE2_DEBUGFS
+> > +	bool "Present the stage-2 pagetables to debugfs"
+> > +	depends on NVHE_EL2_DEBUG && PTDUMP_DEBUGFS && KVM
+> > +	default n
+> > +	help
+> > +	  Say Y here if you want to show the stage-2 kernel pagetables
+> > +	  layout in a debugfs file. This information is only useful for kernel developers
+> > +	  who are working in architecture specific areas of the kernel.
+> > +	  It is probably not a good idea to enable this feature in a production
+> > +	  kernel.
+> > +
+> > +	  If in doubt, say N.
+> > +
+> >  endif # VIRTUALIZATION
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index e5f75f1f1085..987683650576 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -28,6 +28,7 @@
+> >  
+> >  #include <linux/uaccess.h>
+> >  #include <asm/ptrace.h>
+> > +#include <asm/ptdump.h>
+> >  #include <asm/mman.h>
+> >  #include <asm/tlbflush.h>
+> >  #include <asm/cacheflush.h>
+> > @@ -2592,6 +2593,7 @@ static __init int kvm_arm_init(void)
+> >  	if (err)
+> >  		goto out_subs;
+> >  
+> > +	ptdump_register_host_stage2();
+> >  	kvm_arm_initialised = true;
+> >  
+> >  	return 0;
+> > diff --git a/arch/arm64/mm/ptdump.c b/arch/arm64/mm/ptdump.c
+> > index d531e24ea0b2..0b4cb54e43ff 100644
+> > --- a/arch/arm64/mm/ptdump.c
+> > +++ b/arch/arm64/mm/ptdump.c
+> > @@ -24,6 +24,9 @@
+> >  #include <asm/memory.h>
+> >  #include <asm/pgtable-hwdef.h>
+> >  #include <asm/ptdump.h>
+> > +#include <asm/kvm_pkvm.h>
+> > +#include <asm/kvm_pgtable.h>
 > > +#include <asm/kvm_host.h>
 > >  
-> >  #define KVM_PGTABLE_MAX_LEVELS		4U
 > >  
-> > @@ -351,6 +352,21 @@ struct kvm_pgtable {
-> >  	kvm_pgtable_force_pte_cb_t		force_pte_cb;
-> >  };
-> >  
-> > +/**
-> > + * struct kvm_pgtable_snapshot - Snapshot page-table wrapper.
-> > + * @pgtable:		The page-table configuration.
-> > + * @mc:			Memcache used for pagetable pages allocation.
-> > + * @pgd_hva:		Host virtual address of a physically contiguous buffer
-> > + *			used for storing the PGD.
-> > + * @pgd_len:		The size of the phyisically contiguous buffer in bytes.
-> > + */
-> > +struct kvm_pgtable_snapshot {
-> > +	struct kvm_pgtable			pgtable;
-> > +	struct kvm_hyp_memcache			mc;
-> > +	void					*pgd_hva;
-> > +	size_t					pgd_len;
-> > +};
-> > +
-> >  /**
-> >   * kvm_pgtable_hyp_init() - Initialise a hypervisor stage-1 page-table.
-> >   * @pgt:	Uninitialised page-table structure to initialise.
-> > @@ -756,4 +772,24 @@ enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
-> >   */
-> >  void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
-> >  				phys_addr_t addr, size_t size);
-> > +
-> > +#ifdef CONFIG_NVHE_EL2_DEBUG
-> > +/**
-> > + * kvm_pgtable_stage2_copy() - Snapshot the pagetable
-> > + *
-> > + * @to_pgt:	Destination pagetable
-> > + * @from_pgt:	Source pagetable. The caller must lock the pagetables first
-> > + * @mc:		The memcache where we allocate the destination pagetables from
-> > + */
-> > +int kvm_pgtable_stage2_copy(struct kvm_pgtable *to_pgt,
-> > +			    const struct kvm_pgtable *from_pgt,
-> > +			    void *mc);
-> > +#else
-> > +static inline int kvm_pgtable_stage2_copy(struct kvm_pgtable *to_pgt,
-> > +					  const struct kvm_pgtable *from_pgt,
-> > +					  void *mc)
-> > +{
-> > +	return -EPERM;
-> > +}
-> > +#endif	/* CONFIG_NVHE_EL2_DEBUG */
-> >  #endif	/* __ARM64_KVM_PGTABLE_H__ */
-> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > index 0972faccc2af..9cfb35d68850 100644
-> > --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > @@ -69,6 +69,7 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
-> >  int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
-> >  int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
-> >  int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
-> > +int __pkvm_host_stage2_prepare_copy(struct kvm_pgtable_snapshot *snapshot);
-> 
-> nit: the struct being a snapshot and that function doing the actual snapshot,
-> maybe __pkvm_host_stage2_snapshot() would be a better name?
-> 
-
-Sure, we can use __pkvm_host_stage2_snapshot.
-
-> >  
-> >  bool addr_is_memory(phys_addr_t phys);
-> >  int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > index 2385fd03ed87..98646cc67497 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > @@ -314,6 +314,25 @@ static void handle___pkvm_teardown_vm(struct kvm_cpu_context *host_ctxt)
-> >  	cpu_reg(host_ctxt, 1) = __pkvm_teardown_vm(handle);
+> >  enum address_markers_idx {
+> > @@ -378,6 +381,170 @@ void ptdump_check_wx(void)
+> >  		pr_info("Checked W+X mappings: passed, no W+X pages found\n");
 > >  }
 > >  
-> > +static void handle___pkvm_copy_host_stage2(struct kvm_cpu_context *host_ctxt)
-> > +{
-> > +#ifdef CONFIG_NVHE_EL2_DEBUG
-> > +	int ret = -EPERM;
-> > +	DECLARE_REG(struct kvm_pgtable_snapshot *, snapshot, host_ctxt, 1);
-> > +	kvm_pteref_t pgd;
+> > +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
+> > +static struct ptdump_info stage2_kernel_ptdump_info;
 > > +
-> > +	snapshot = kern_hyp_va(snapshot);
-> > +	ret = __pkvm_host_stage2_prepare_copy(snapshot);
-> > +	if (!ret) {
-> > +		pgd = snapshot->pgtable.pgd;
-> > +		snapshot->pgtable.pgd = (kvm_pteref_t)__hyp_pa(pgd);
-> > +	}
-> > +	cpu_reg(host_ctxt, 1) = ret;
-> > +#else
-> > +	cpu_reg(host_ctxt, 0) = SMCCC_RET_NOT_SUPPORTED;
-> > +#endif
+> > +static phys_addr_t ptdump_host_pa(void *addr)
+> > +{
+> > +	return __pa(addr);
 > > +}
 > > +
-> >  typedef void (*hcall_t)(struct kvm_cpu_context *);
-> >  
-> >  #define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = (hcall_t)handle_##x
-> > @@ -348,6 +367,7 @@ static const hcall_t host_hcall[] = {
-> >  	HANDLE_FUNC(__pkvm_init_vm),
-> >  	HANDLE_FUNC(__pkvm_init_vcpu),
-> >  	HANDLE_FUNC(__pkvm_teardown_vm),
-> > +	HANDLE_FUNC(__pkvm_copy_host_stage2),
-> >  };
-> >  
-> >  static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > index 8d0a5834e883..1c3ab5ac9110 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > @@ -266,6 +266,108 @@ int kvm_guest_prepare_stage2(struct pkvm_hyp_vm *vm, void *pgd)
-> >  	return 0;
-> >  }
-> >  
-> > +#ifdef CONFIG_NVHE_EL2_DEBUG
-> > +static struct hyp_pool snapshot_pool = {0};
-> > +static DEFINE_HYP_SPINLOCK(snapshot_pool_lock);
-> > +
-> > +static void *snapshot_zalloc_pages_exact(size_t size)
+> > +static void *ptdump_host_va(phys_addr_t phys)
 > > +{
-> > +	void *addr = hyp_alloc_pages(&snapshot_pool, get_order(size));
-> > +
-> > +	hyp_split_page(hyp_virt_to_page(addr));
-> > +
-> > +	/*
-> > +	 * The size of concatenated PGDs is always a power of two of PAGE_SIZE,
-> > +	 * so there should be no need to free any of the tail pages to make the
-> > +	 * allocation exact.
-> > +	 */
-> > +	WARN_ON(size != (PAGE_SIZE << get_order(size)));
-> > +
-> > +	return addr;
+> > +	return __va(phys);
 > > +}
 > > +
-> > +static void snapshot_get_page(void *addr)
+> > +static size_t stage2_get_pgd_len(void)
 > > +{
-> > +	hyp_get_page(&snapshot_pool, addr);
+> > +	u64 mmfr0, mmfr1, vtcr;
+> > +	u32 phys_shift = get_kvm_ipa_limit();
+> > +
+> > +	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+> > +	mmfr1 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+> > +	vtcr = kvm_get_vtcr(mmfr0, mmfr1, phys_shift);
+> > +
+> > +	return kvm_pgtable_stage2_pgd_size(vtcr);
+> 
+> That's a lot of conversions to go from the kvm_ipa_limit to VTCR and
+> VTCR back to ia_bits and the start level, but that would mean rewrite pieces of
+> pgtable.c there. :-\
+> 
+
+Right, I think with Oliver's suggestion we will no longer have to move
+these bits around and the code will be self contained under /kvm.
+
 > > +}
 > > +
-> > +static void *snapshot_zalloc_page(void *mc)
+> > +static int stage2_ptdump_prepare_walk(void *file_priv)
 > > +{
-> > +	struct hyp_page *p;
-> > +	void *addr;
+> > +	struct ptdump_info_file_priv *f_priv = file_priv;
+> > +	struct ptdump_info *info = &f_priv->info;
+> > +	struct kvm_pgtable_snapshot *snapshot;
+> > +	int ret, pgd_index, mc_index, pgd_pages_sz;
+> > +	void *page_hva;
+> > +	phys_addr_t pgd;
 > > +
-> > +	addr = hyp_alloc_pages(&snapshot_pool, 0);
-> > +	if (addr)
-> > +		return addr;
-> > +
-> > +	addr = pop_hyp_memcache(mc, hyp_phys_to_virt);
-> > +	if (!addr)
-> > +		return addr;
-> > +
-> > +	memset(addr, 0, PAGE_SIZE);
-> > +	p = hyp_virt_to_page(addr);
-> > +	memset(p, 0, sizeof(*p));
-> 
-> Why do you need to rease this entry of the vmemmap? That sounds odd.
-> 
-
-I guess I did in the same way as the guest does for
-`guest_s2_zalloc_page`. Do you see any issues with this ?
-
-> > +	p->refcount = 1;
-> > +
-> > +	return addr;
-> > +}
-> > +
-> > +static void snapshot_s2_free_pages_exact(void *addr, unsigned long size)
-> > +{
-> > +	u8 order = get_order(size);
-> > +	unsigned int i;
-> > +	struct hyp_page *p;
-> > +
-> > +	for (i = 0; i < (1 << order); i++) {
-> > +		p = hyp_virt_to_page(addr + (i * PAGE_SIZE));
-> > +		hyp_page_ref_dec_and_test(p);
-> 
-> hyp_page_ref_dec() would be enough here.
-> 
-
-Yes, we can use hyp_page_ref_dec here, thanks.
-
-> > +	}
-> > +}
-> > +
-> > +int __pkvm_host_stage2_prepare_copy(struct kvm_pgtable_snapshot *snapshot)
-> > +{
-> > +	size_t required_pgd_len;
-> > +	struct kvm_pgtable_mm_ops mm_ops = {0};
-> > +	struct kvm_s2_mmu *mmu = &host_mmu.arch.mmu;
-> > +	struct kvm_pgtable *to_pgt, *from_pgt = &host_mmu.pgt;
-> > +	struct kvm_hyp_memcache *memcache = &snapshot->mc;
-> > +	int ret;
-> > +	void *pgd;
-> 
-> The shared memory between host and hyp should probably be pinned here even if it
-> is behind a DEBUG option. That would also ensure that the memory has actually
-> been shared beforehand and we'll not crash while running that. 
-> 
-> Pinning that memory would also make sure that the right amount has been shared
-> for the pgd and we'll not overflow.
-> 
-
-After having the discussion offline I think it's better to change this
-to the donation API from host -> hypervisor as the host doesn't need
-share access while the snapshot is beeing done. 
-
-> > +
-> > +	required_pgd_len = kvm_pgtable_stage2_pgd_size(mmu->vtcr);
-> > +	if (snapshot->pgd_len < required_pgd_len)
+> > +	snapshot = alloc_pages_exact(PAGE_SIZE, GFP_KERNEL_ACCOUNT);
+> > +	if (!snapshot)
 > > +		return -ENOMEM;
-> > +
-> > +	to_pgt = &snapshot->pgtable;
-> > +	pgd = kern_hyp_va(snapshot->pgd_hva);
-> > +
-> > +	hyp_spin_lock(&snapshot_pool_lock);
-> > +	hyp_pool_init(&snapshot_pool, hyp_virt_to_pfn(pgd),
-> > +		      required_pgd_len / PAGE_SIZE, 0);
-> > +
-> > +	mm_ops.zalloc_pages_exact	= snapshot_zalloc_pages_exact;
-> > +	mm_ops.zalloc_page		= snapshot_zalloc_page;
-> > +	mm_ops.free_pages_exact		= snapshot_s2_free_pages_exact;
-> > +	mm_ops.get_page			= snapshot_get_page;
-> > +	mm_ops.phys_to_virt		= hyp_phys_to_virt;
-> > +	mm_ops.virt_to_phys		= hyp_virt_to_phys;
-> > +	mm_ops.page_count		= hyp_page_count;
 > 
-> It looks a bit odd to me to have to handle refcount while the lifespan of that
-> newly create page-table only the lifespace of that function, where everything is
-> behind a lock.
+> For a single page, __get_free_page is enough.
 > 
 
-I doubled checked on this and I don't think we need it so it can be
-dropped, thanks.
+I can use this, thanks.
 
-> Is the need for the pool to handle the physically contiguous mem for the PGD? If
-> that is the case, maybe you could avoid the pool by just passing as a separated
-> argument the memory for the PGD and in another one the memcache for the other
-> levels?
+> > +
+> > +	memset(snapshot, 0, PAGE_SIZE);
+> > +	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, virt_to_pfn(snapshot));
+> > +	if (ret)
+> > +		goto free_snapshot;
+> 
+> It'd probably be better to not share anything here, and let the hypervisor do
+> host_donate_hyp() and hyp_donate_host() before returning back from the HVC. This
+> way the hypervisor will protect itself.
 > 
 
-I found it convinient to reuse it as we are doing the same thing when we
-build the host stage-2.
+Right, as we took this discussion offline, I will update this and use
+the *donate* API.
 
-> Especially IIUC, the pool would be used here only for the PGD allocation, as you
-> add only the size of the PGD to the pool?
->
-
-Yes, we only populate the pool with memory for the PGD. Actually I
-wonder if we can just allocate everything from the pool and drop the
-memcache.
-
-> >+
-> > +	to_pgt->ia_bits		= from_pgt->ia_bits;
-> > +	to_pgt->start_level	= from_pgt->start_level;
-> > +	to_pgt->flags		= from_pgt->flags;
-> > +	to_pgt->mm_ops		= &mm_ops;
 > > +
-> > +	host_lock_component();
-> > +	ret = kvm_pgtable_stage2_copy(to_pgt, from_pgt, memcache);
-> > +	host_unlock_component();
-> > +
-> > +	hyp_spin_unlock(&snapshot_pool_lock);
-> > +
-> > +	return ret;
-> > +}
-> > +#endif /* CONFIG_NVHE_EL2_DEBUG */
-> > +
-> >  void reclaim_guest_pages(struct pkvm_hyp_vm *vm, struct kvm_hyp_memcache *mc)
-> >  {
-> >  	void *addr;
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 1966fdee740e..46b15d74118f 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -1598,3 +1598,59 @@ void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *p
-> >  	WARN_ON(mm_ops->page_count(pgtable) != 1);
-> >  	mm_ops->put_page(pgtable);
-> >  }
-> > +
-> > +#ifdef CONFIG_NVHE_EL2_DEBUG
-> > +static int stage2_copy_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> > +			      enum kvm_pgtable_walk_flags visit)
-> > +{
-> > +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-> > +	void *copy_table, *original_addr;
-> > +	kvm_pte_t new = ctx->old;
-> > +
-> > +	if (!stage2_pte_is_counted(ctx->old))
-> > +		return 0;
-> > +
-> > +	if (kvm_pte_table(ctx->old, ctx->level)) {
-> > +		copy_table = mm_ops->zalloc_page(ctx->arg);
-> > +		if (!copy_table)
-> > +			return -ENOMEM;
-> > +
-> > +		original_addr = kvm_pte_follow(ctx->old, mm_ops);
-> > +
-> > +		memcpy(copy_table, original_addr, PAGE_SIZE);
-> > +		new = kvm_init_table_pte(copy_table, mm_ops);
+> > +	snapshot->pgd_len = stage2_get_pgd_len();
+> > +	pgd_pages_sz = snapshot->pgd_len / PAGE_SIZE;
+> > +	snapshot->pgd_hva = alloc_pages_exact(snapshot->pgd_len,
+> > +					      GFP_KERNEL_ACCOUNT);
+> > +	if (!snapshot->pgd_hva) {
+> > +		ret = -ENOMEM;
+> > +		goto unshare_snapshot;
 > > +	}
 > > +
-> > +	*ctx->ptep = new;
+> > +	for (pgd_index = 0; pgd_index < pgd_pages_sz; pgd_index++) {
+> > +		page_hva = snapshot->pgd_hva + pgd_index * PAGE_SIZE;
+> > +		ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp,
+> > +					virt_to_pfn(page_hva));
+> > +		if (ret)
+> > +			goto unshare_pgd_pages;
+> > +	}
 > > +
+> > +	for (mc_index = 0; mc_index < info->mc_len; mc_index++) {
+> > +		page_hva = alloc_pages_exact(PAGE_SIZE, GFP_KERNEL_ACCOUNT);
+> 
+> ditto.
+> 
+
+Ack.
+
+> > +		if (!page_hva) {
+> > +			ret = -ENOMEM;
+> > +			goto free_memcache_pages;
+> > +		}
+> > +
+> > +		push_hyp_memcache(&snapshot->mc, page_hva, ptdump_host_pa);
+> > +		ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp,
+> > +					virt_to_pfn(page_hva));
+> > +		if (ret) {
+> > +			pop_hyp_memcache(&snapshot->mc, ptdump_host_va);
+> > +			free_pages_exact(page_hva, PAGE_SIZE);
+> > +			goto free_memcache_pages;
+> > +		}
+> 
+> Maybe for the page-table pages, it'd be better to let the hyp does the
+> host_donate_hyp() / hyp_donate_host()? It might be easier than sharing + pin.
+> 
+> > +	}
+> > +
+> > +	ret = kvm_call_hyp_nvhe(__pkvm_copy_host_stage2, snapshot);
+> > +	if (ret)
+> > +		goto free_memcache_pages;
+> > +
+> > +	pgd = (phys_addr_t)snapshot->pgtable.pgd;
+> > +	snapshot->pgtable.pgd = phys_to_virt(pgd);
+> > +	f_priv->file_priv = snapshot;
 > > +	return 0;
+> > +
+> > +free_memcache_pages:
+> > +	page_hva = pop_hyp_memcache(&snapshot->mc, ptdump_host_va);
+> > +	while (page_hva) {
+> > +		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
+> > +					virt_to_pfn(page_hva));
+> > +		WARN_ON(ret);
+> > +		free_pages_exact(page_hva, PAGE_SIZE);
+> > +		page_hva = pop_hyp_memcache(&snapshot->mc, ptdump_host_va);
+> > +	}
+> > +unshare_pgd_pages:
+> > +	pgd_index = pgd_index - 1;
+> > +	for (; pgd_index >= 0; pgd_index--) {
+> > +		page_hva = snapshot->pgd_hva + pgd_index * PAGE_SIZE;
+> > +		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
+> > +					virt_to_pfn(page_hva));
+> > +		WARN_ON(ret);
+> > +	}
+> > +	free_pages_exact(snapshot->pgd_hva, snapshot->pgd_len);
+> > +unshare_snapshot:
+> > +	WARN_ON(kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
+> > +				  virt_to_pfn(snapshot)));
+> > +free_snapshot:
+> > +	free_pages_exact(snapshot, PAGE_SIZE);
+> > +	f_priv->file_priv = NULL;
+> > +	return ret;
+> 
+> Couldn't this path be merged with stage2_ptdump_end_walk()?
+> 
+
+I think it should be doable.
+
 > > +}
 > > +
-> > +int kvm_pgtable_stage2_copy(struct kvm_pgtable *to_pgt,
-> > +			    const struct kvm_pgtable *from_pgt,
-> > +			    void *mc)
+> > +static void stage2_ptdump_end_walk(void *file_priv)
 > > +{
-> > +	int ret;
-> > +	size_t pgd_sz;
-> > +	struct kvm_pgtable_mm_ops *mm_ops = to_pgt->mm_ops;
-> > +	struct kvm_pgtable_walker walker = {
-> > +		.cb	= stage2_copy_walker,
-> > +		.flags	= KVM_PGTABLE_WALK_LEAF |
-> > +			  KVM_PGTABLE_WALK_TABLE_PRE,
-> 
-> Do you need the WALK_LEAF? Entire tables are copied and you don't need to change
-> anything at the leaf level. Actually, stage2_copy_walker() writes new =
-> ctx->old in that case, doesn't it?
->
-
-We need it because we invoke the callback on the _PRE flag if it is a
-table and we invoke it on the _LEAF if it is a block mapping.
-
-> > +		.arg = mc
+> > +	struct ptdump_info_file_priv *f_priv = file_priv;
+> > +	struct kvm_pgtable_snapshot *snapshot = f_priv->file_priv;
+> > +	void *page_hva;
+> > +	int pgd_index, ret, pgd_pages_sz;
+> > +
+> > +	if (!snapshot)
+> > +		return;
+> > +
+> > +	page_hva = pop_hyp_memcache(&snapshot->mc, ptdump_host_va);
+> > +	while (page_hva) {
+> > +		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
+> > +					virt_to_pfn(page_hva));
+> > +		WARN_ON(ret);
+> > +		free_pages_exact(page_hva, PAGE_SIZE);
+> > +		page_hva = pop_hyp_memcache(&snapshot->mc, ptdump_host_va);
+> > +	}
+> > +
+> > +	pgd_pages_sz = snapshot->pgd_len / PAGE_SIZE;
+> > +	for (pgd_index = 0; pgd_index < pgd_pages_sz; pgd_index++) {
+> > +		page_hva = snapshot->pgd_hva + pgd_index * PAGE_SIZE;
+> > +		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
+> > +					virt_to_pfn(page_hva));
+> > +		WARN_ON(ret);
+> > +	}
+> > +
+> > +	free_pages_exact(snapshot->pgd_hva, snapshot->pgd_len);
+> > +	WARN_ON(kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp,
+> > +				  virt_to_pfn(snapshot)));
+> > +	free_pages_exact(snapshot, PAGE_SIZE);
+> > +	f_priv->file_priv = NULL;
+> > +}
+> > +
+> > +void ptdump_register_host_stage2(void)
+> > +{
+> > +	if (!is_protected_kvm_enabled())
+> > +		return;
+> > +
+> > +	stage2_kernel_ptdump_info = (struct ptdump_info) {
+> > +		.mc_len			= host_s2_pgtable_pages(),
+> > +		.ptdump_prepare_walk	= stage2_ptdump_prepare_walk,
+> > +		.ptdump_end_walk	= stage2_ptdump_end_walk,
 > > +	};
 > > +
-> > +	pgd_sz = kvm_pgd_pages(to_pgt->ia_bits, to_pgt->start_level) *
-> > +		PAGE_SIZE;
-> > +	to_pgt->pgd = (kvm_pteref_t)mm_ops->zalloc_pages_exact(pgd_sz);
-> > +	if (!to_pgt->pgd)
-> > +		return -ENOMEM;
-> > +
-> > +	memcpy(to_pgt->pgd, from_pgt->pgd, pgd_sz);
-> > +
-> > +	ret = kvm_pgtable_walk(to_pgt, 0, BIT(to_pgt->ia_bits), &walker);
-> > +	mm_ops->free_pages_exact(to_pgt->pgd, pgd_sz);
-> 
-> > +
-> > +	return ret;
+> > +	ptdump_debugfs_kvm_register(&stage2_kernel_ptdump_info,
+> > +				    "host_stage2_page_tables",
+> > +				    kvm_debugfs_dir);
 > > +}
-> > +#endif /* CONFIG_NVHE_EL2_DEBUG */
+> > +#endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
+> > +
+> >  static int __init ptdump_init(void)
+> >  {
+> >  	address_markers[PAGE_END_NR].start_address = PAGE_END;
+> > @@ -386,6 +553,7 @@ static int __init ptdump_init(void)
+> >  #endif
+> >  	ptdump_initialize();
+> >  	ptdump_debugfs_register(&kernel_ptdump_info, "kernel_page_tables");
+> > +
+> 
+> Not needed.
+> 
+
+Will remove this, checkpatch didn't seem to complain about it.
+
+> >  	return 0;
+> >  }
+> >  device_initcall(ptdump_init);
+> > diff --git a/arch/arm64/mm/ptdump_debugfs.c b/arch/arm64/mm/ptdump_debugfs.c
+> > index 3bf5de51e8c3..4821dbef784c 100644
+> > --- a/arch/arm64/mm/ptdump_debugfs.c
+> > +++ b/arch/arm64/mm/ptdump_debugfs.c
+> > @@ -68,5 +68,11 @@ static const struct file_operations ptdump_fops = {
+> >  
+> >  void __init ptdump_debugfs_register(struct ptdump_info *info, const char *name)
+> >  {
+> > -	debugfs_create_file(name, 0400, NULL, info, &ptdump_fops);
+> > +	ptdump_debugfs_kvm_register(info, name, NULL);
+> 
+> Not really related to kvm, the only difference is passing or not a dentry.
+> 
+> How about a single (non __init) function?
+> 
+
+I don't think it works because you have to keep the signature of the
+original function. This 'ptdump_debugfs_register' is also called from the
+non-arch drivers code.
+
+> > +}
+> > +
+> > +void ptdump_debugfs_kvm_register(struct ptdump_info *info, const char *name,
+> > +				 struct dentry *d_entry)
+> > +{
+> > +	debugfs_create_file(name, 0400, d_entry, info, &ptdump_fops);
+> >  }
 > > -- 
 > > 2.43.0.rc0.421.g78406f8d94-goog
 > > 
