@@ -1,154 +1,244 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E81E22087
-	for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 10:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X9rAMMRS"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-40b367a0a12so29855e9.1
-        for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 02:58:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700737102; x=1701341902; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tbD+CZLI2OJnj2XtkqlWGnXInTbmUcqYNyaWG++MW1o=;
-        b=X9rAMMRSsTcHi/FQDJIBvGMJUusfw2LRdtmNsteSHmyMaMXFYg0k26ouZ2qHz2H/S4
-         klPsvSGLe7GRro+tItN/nMcDlQOw6ligvzdgmF5O1uYz/YFK0KqA/e/TRPlZg/bjp92c
-         z9m+HJuHJ3OUJl/cnLWM0ZnbyI5I8R7USluc2Zso0/LODc+i8DWtKydckYahXHoDhfht
-         EsfCy8KlaviKBxW3KWMuNOpaH6ypqsoPdnJE60KrQhopnO9dwZkYLncge+wRguoxSXJ/
-         vxCNb/kqgoSOG6K7cLl/b8/OGBvC2sFvrYRKKOxi88kstdFyrZL7UHO64dwHV1Hb7Ldf
-         2+rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700737102; x=1701341902;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tbD+CZLI2OJnj2XtkqlWGnXInTbmUcqYNyaWG++MW1o=;
-        b=diRgGOAdaLDJu351h/CAZbFTTKmfO8oVVX3mjvp2viWvYcLsrtU6orQNbMNlOZszfs
-         NwnD+gs88a9W9r6pSEox6OmdRsBK8qiXTWrz9alGjTlbhJnB5dPXpyszC2Dcg7hxkNHn
-         JV7AM8yFw4EC0xsO0ueh42lFVfRmrwNHm2HmWQhqpiR4Gcg5daPhbbbqHFWB7XRWtFd6
-         DPBiDBxYYc1eSAmJTutXCVaV5OVld1VqArawAm7jEQm89tOELj96+LEcJxXPMfMmGV1a
-         LSXroZTWvjwN4rCxIkp31E4v5dRIpBJBuEgmTRXN9P0BEtPuDziE32HEhsiIYQaTwqcg
-         FqRQ==
-X-Gm-Message-State: AOJu0YzpzvghkJLj0SpVzy/DCBDILHVYnNJc2FtGjuYRuGfHxWFyzOtZ
-	DmOq4GUv29H77PV24BpnxPyEmA==
-X-Google-Smtp-Source: AGHT+IECpNi7V/qSvW7pVQ/CJFY4C0ksNj+vFUmeqFagu+qFkUWQoOPShJMnthXGa96ey5y1uPJSiw==
-X-Received: by 2002:a05:600c:3b13:b0:40a:483f:f828 with SMTP id m19-20020a05600c3b1300b0040a483ff828mr251605wms.4.1700737102403;
-        Thu, 23 Nov 2023 02:58:22 -0800 (PST)
-Received: from google.com (110.121.148.146.bc.googleusercontent.com. [146.148.121.110])
-        by smtp.gmail.com with ESMTPSA id k11-20020adfe3cb000000b00332d3c78e11sm1305204wrm.85.2023.11.23.02.58.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Nov 2023 02:58:21 -0800 (PST)
-Date: Thu, 23 Nov 2023 10:58:20 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: will@kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, catalin.marinas@arm.com,
-	mark.rutland@arm.com, akpm@linux-foundation.org, maz@kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com,
-	vdonnefort@google.com, qperret@google.com, smostafa@google.com
-Subject: Re: [PATCH v3 10/10] arm64: ptdump: Add support for guest stage-2
- pagetables dumping
-Message-ID: <ZV8wTMtuztSdzPaI@google.com>
-References: <20231115171639.2852644-2-sebastianene@google.com>
- <20231115171639.2852644-12-sebastianene@google.com>
- <ZV6QXSV_SrYjjoE_@linux.dev>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1BD824B5C
+	for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 13:55:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 273271063;
+	Thu, 23 Nov 2023 05:55:51 -0800 (PST)
+Received: from [10.57.3.62] (unknown [10.57.3.62])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 547B23F6C4;
+	Thu, 23 Nov 2023 05:54:57 -0800 (PST)
+Message-ID: <1a94cccd-d871-1824-9fad-a8f7b99bb02a@arm.com>
+Date: Thu, 23 Nov 2023 13:54:55 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZV6QXSV_SrYjjoE_@linux.dev>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [V14 5/8] KVM: arm64: nvhe: Disable branch generation in nVHE
+ guests
+Content-Language: en-US
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: Mark Brown <broonie@kernel.org>, Rob Herring <robh@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Suzuki Poulose <suzuki.poulose@arm.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ linux-perf-users@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com
+References: <20231114051329.327572-1-anshuman.khandual@arm.com>
+ <20231114051329.327572-6-anshuman.khandual@arm.com>
+ <f2661879-636c-1865-0e1c-60d8e11f80f0@arm.com>
+ <20858eb9-a4d0-41be-ad1d-2a5f2d2fa0de@arm.com>
+From: James Clark <james.clark@arm.com>
+In-Reply-To: <20858eb9-a4d0-41be-ad1d-2a5f2d2fa0de@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 22, 2023 at 11:35:57PM +0000, Oliver Upton wrote:
-> On Wed, Nov 15, 2023 at 05:16:40PM +0000, Sebastian Ene wrote:
-> > +struct ptdump_registered_guest {
-> > +	struct list_head		reg_list;
-> > +	struct ptdump_info		info;
-> > +	struct kvm_pgtable_snapshot	snapshot;
-> > +	rwlock_t			*lock;
-> > +};
+
+
+On 21/11/2023 11:12, Anshuman Khandual wrote:
 > 
-> Why can't we just store a pointer directly to struct kvm in ::private?
-
-I don't think it will work unless we expect a struct kvm_pgtable
-in stage2_ptdump_walk file_priv field. I think it is a good ideea and will
-simplify things a little bit dropping kvm_pgtable_snapshot from here.
-
-The current code has some fileds that are reduntant (the priv pointers)
-because I also made this to work with protected guests where we can't
-access their pagetables directly.
-
-> Also, shouldn't you take a reference on struct kvm when the file is
-> opened to protect against VM teardown?
->
-
-I am not sure about the need could you please elaborate a bit ? On VM
-teardown we expect ptdump_unregister_guest_stage2 to be invoked.
-
-> > +static LIST_HEAD(ptdump_guest_list);
-> > +static DEFINE_MUTEX(ptdump_list_lock);
 > 
-> What is the list for?
+> On 11/14/23 14:46, James Clark wrote:
+>>
+>>
+>> On 14/11/2023 05:13, Anshuman Khandual wrote:
+>>> Disable the BRBE before we enter the guest, saving the status and enable it
+>>> back once we get out of the guest. This is just to avoid capturing records
+>>> in the guest kernel/userspace, which would be confusing the samples.
+>>>
+>>> Cc: Marc Zyngier <maz@kernel.org>
+>>> Cc: Oliver Upton <oliver.upton@linux.dev>
+>>> Cc: James Morse <james.morse@arm.com>
+>>> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>>> Cc: Will Deacon <will@kernel.org>
+>>> Cc: kvmarm@lists.linux.dev
+>>> Cc: linux-arm-kernel@lists.infradead.org
+>>> CC: linux-kernel@vger.kernel.org
+>>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>>> ---
+>>> Changes in V14:
+>>>
+>>> - This is a new patch in the series
+>>>
+>>>  arch/arm64/include/asm/kvm_host.h  |  4 ++++
+>>>  arch/arm64/kvm/debug.c             |  6 +++++
+>>>  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 38 ++++++++++++++++++++++++++++++
+>>>  3 files changed, 48 insertions(+)
+>>>
+>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>> index 68421c74283a..1faa0430d8dd 100644
+>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>> @@ -449,6 +449,8 @@ enum vcpu_sysreg {
+>>>  	CNTHV_CVAL_EL2,
+>>>  	PMSCR_EL1,	/* Statistical profiling extension */
+>>>  	TRFCR_EL1,	/* Self-hosted trace filters */
+>>> +	BRBCR_EL1,	/* Branch Record Buffer Control Register */
+>>> +	BRBFCR_EL1,	/* Branch Record Buffer Function Control Register */
+>>>  
+>>>  	NR_SYS_REGS	/* Nothing after this line! */
+>>>  };
+>>> @@ -753,6 +755,8 @@ struct kvm_vcpu_arch {
+>>>  #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
+>>>  /* Save trace filter controls */
+>>>  #define DEBUG_STATE_SAVE_TRFCR	__vcpu_single_flag(iflags, BIT(8))
+>>> +/* Save BRBE context if active  */
+>>> +#define DEBUG_STATE_SAVE_BRBE	__vcpu_single_flag(iflags, BIT(9))
+>>>  
+>>>  /* SVE enabled for host EL0 */
+>>>  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+>>> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+>>> index 2ab41b954512..4055783c3d34 100644
+>>> --- a/arch/arm64/kvm/debug.c
+>>> +++ b/arch/arm64/kvm/debug.c
+>>> @@ -354,6 +354,11 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
+>>>  		    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
+>>>  			vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+>>>  	}
+>>> +
+>>> +	/* Check if we have BRBE implemented and available at the host */
+>>> +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRBE_SHIFT) &&
+>>> +	    (read_sysreg_s(SYS_BRBCR_EL1) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
+>>> +		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
+>>
+>> Isn't this supposed to just be the feature check? Whether BRBE is
+>> enabled or not is checked later in __debug_save_brbe() anyway.
+> 
+> Okay, will make it just a feature check via ID_AA64DFR0_EL1_BRBE_SHIFT.
+> 
+>>
+>> It seems like it's possible to become enabled after this flag load part.
+> 
+> Agreed.
+> 
+>>
+>>>  }
+>>>  
+>>>  void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+>>> @@ -361,6 +366,7 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+>>>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+>>>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+>>>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
+>>> +	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
+>>>  }
+>>>  
+>>>  void kvm_etm_set_guest_trfcr(u64 trfcr_guest)
+>>> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+>>> index 6174f710948e..e44a1f71a0f8 100644
+>>> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+>>> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+>>> @@ -93,6 +93,38 @@ static void __debug_restore_trace(struct kvm_cpu_context *host_ctxt,
+>>>  		write_sysreg_s(ctxt_sys_reg(host_ctxt, TRFCR_EL1), SYS_TRFCR_EL1);
+>>>  }
+>>>  
+>>> +static void __debug_save_brbe(struct kvm_cpu_context *host_ctxt)
+>>> +{
+>>> +	ctxt_sys_reg(host_ctxt, BRBCR_EL1) = 0;
+>>> +	ctxt_sys_reg(host_ctxt, BRBFCR_EL1) = 0;
+>>> +
+>>> +	/* Check if the BRBE is enabled */
+>>> +	if (!(ctxt_sys_reg(host_ctxt, BRBCR_EL1) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
+>>> +		return;
+>>
+>> Doesn't this always fail, the host BRBCR_EL1 value was just cleared on
+>> the line above.
+> 
+> Agreed, this error might have slipped in while converting to ctxt_sys_reg().
+> 
+>>
+>> Also, you need to read the register to determine if it was enabled or
+> 
+> Right
+> 
+>> not, so you might as well always store the real value, rather than 0 in
+>> the not enabled case.
+> 
+> But if it is not enabled - why store the real value ?
 > 
 
-I am keeping a list of registered guests with ptdump and the lock should
-protect the list against concurent VM teardowns.
+It's fewer lines of code and it's less likely to catch someone out if
+it's always set to whatever the host value was. Using 0 as a special
+value could also be an issue because it's indistinguishable from if the
+register was actually set to 0. It's just more to reason about when you
+could reduce it to a single assignment.
 
-> >  static phys_addr_t ptdump_host_pa(void *addr)
-> >  {
-> >  	return __pa(addr);
-> > @@ -757,6 +768,63 @@ static void stage2_ptdump_walk(struct seq_file *s, struct ptdump_info *info)
-> >  	kvm_pgtable_walk(pgtable, start_ipa, end_ipa, &walker);
-> >  }
-> >  
-> > +static void guest_stage2_ptdump_walk(struct seq_file *s,
-> > +				     struct ptdump_info *info)
-> > +{
-> > +	struct ptdump_info_file_priv *f_priv =
-> > +		container_of(info, struct ptdump_info_file_priv, info);
-> > +	struct ptdump_registered_guest *guest = info->priv;
-> > +
-> > +	f_priv->file_priv = &guest->snapshot;
-> > +
-> > +	read_lock(guest->lock);
-> > +	stage2_ptdump_walk(s, info);
-> > +	read_unlock(guest->lock);
+Also it probably would have avoided the current mistake if it was always
+assigned to the host value as well.
+
+>>
+>>> +
+>>> +	/*
+>>> +	 * Prohibit branch record generation while we are in guest.
+>>> +	 * Since access to BRBCR_EL1 and BRBFCR_EL1 is trapped, the
+>>> +	 * guest can't modify the filtering set by the host.
+>>> +	 */
+>>> +	ctxt_sys_reg(host_ctxt, BRBCR_EL1) = read_sysreg_s(SYS_BRBCR_EL1);
+>>> +	ctxt_sys_reg(host_ctxt, BRBFCR_EL1) = read_sysreg_s(SYS_BRBFCR_EL1)
+>>> +	write_sysreg_s(0, SYS_BRBCR_EL1);
+>>> +	write_sysreg_s(0, SYS_BRBFCR_EL1);
+>>
+>> Why does SYS_BRBFCR_EL1 need to be saved and restored? Only
+>> BRBCR_ELx_E0BRE and BRBCR_ELx_ExBRE need to be cleared to disable BRBE.
 > 
-> Taking the mmu lock for read allows other table walkers to add new
-> mappings and adjust the granularity of existing ones. Should this
-> instead take the mmu lock for write?
->
-
-Thanks for pointing our, this is exactly what I was trying to avoid,
-so yes I should use the write mmu lock in this case.
-
-> > +}
-> > +
-> > +int ptdump_register_guest_stage2(struct kvm *kvm)
-> > +{
-> > +	struct ptdump_registered_guest *guest;
-> > +	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
-> > +	struct kvm_pgtable *pgt = mmu->pgt;
-> > +
-> > +	guest = kzalloc(sizeof(struct ptdump_registered_guest), GFP_KERNEL);
-> 
-> You want GFP_KERNEL_ACCOUNT here.
+> Right, just thought both brbcr, and brbfcr system registers represent
+> current BRBE state (besides branch records), in a more comprehensive
+> manner, although none would be changed from inside the guest.
 > 
 
-Right, thanks this is because it is an untrusted allocation triggered from
-userspace.
+The comment above doesn't match up with this explanation.
 
-> -- 
-> Thanks,
-> Oliver
+Having it in the code implies that it's needed. And as you say the
+branch records are missing anyway, so you can't even infer that it's
+only done to be comprehensive.
 
-Thank you,
-Seb
+It would be better to not make anyone reading it wonder why it's done
+and just not do it. It's only 8 bytes but it's also a waste of space.
+
+>>
+>>> +	isb();
+>>> +}
+>>> +
+>>> +static void __debug_restore_brbe(struct kvm_cpu_context *host_ctxt)
+>>> +{
+>>> +	if (!ctxt_sys_reg(host_ctxt, BRBCR_EL1) || !ctxt_sys_reg(host_ctxt, BRBFCR_EL1))
+>>> +		return;
+>>> +
+>>> +	/* Restore BRBE controls */
+>>> +	write_sysreg_s(ctxt_sys_reg(host_ctxt, BRBCR_EL1), SYS_BRBCR_EL1);
+>>> +	write_sysreg_s(ctxt_sys_reg(host_ctxt, BRBFCR_EL1), SYS_BRBFCR_EL1);
+>>> +	isb();
+>>> +}
+>>> +
+>>>  void __debug_save_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
+>>>  				    struct kvm_cpu_context *guest_ctxt)
+>>>  {
+>>> @@ -102,6 +134,10 @@ void __debug_save_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
+>>>  
+>>>  	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_TRFCR))
+>>>  		__debug_save_trace(host_ctxt, guest_ctxt);
+>>> +
+>>> +	/* Disable BRBE branch records */
+>>> +	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_BRBE))
+>>> +		__debug_save_brbe(host_ctxt);
+>>>  }
+>>>  
+>>>  void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+>>> @@ -116,6 +152,8 @@ void __debug_restore_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
+>>>  		__debug_restore_spe(host_ctxt);
+>>>  	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_TRFCR))
+>>>  		__debug_restore_trace(host_ctxt, guest_ctxt);
+>>> +	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_BRBE))
+>>> +		__debug_restore_brbe(host_ctxt);
+>>>  }
+>>>  
+>>>  void __debug_switch_to_host(struct kvm_vcpu *vcpu)
+> 
