@@ -1,133 +1,131 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897CB125AB
-	for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 06:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2352136F
+	for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 09:49:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BC3KbxyY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700721802;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0Y6v5Xhwln7tu/9zxftOsUtL05MptTTj1UHVhZFfC54=;
-	b=BC3KbxyY1cqWZHExLgz5VzrUmHGWFze0yQzZNNjt96zxXpMgdGteh1fzFufC++tZZI2v7d
-	MZI2Zr8baoMJcwtrvTWetFhx8RZ37zeV84zS+IbUn1mlzHwNM9DS4iSkd1SGutJmJDl0hM
-	vYy1yOpDvSJyvYFeUQ5aYBA5HINYyOY=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-417-Ebdj9aHrNuaT6-aVSVHBaA-1; Thu, 23 Nov 2023 01:43:20 -0500
-X-MC-Unique: Ebdj9aHrNuaT6-aVSVHBaA-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-28554978db1so166978a91.1
-        for <kvmarm@lists.linux.dev>; Wed, 22 Nov 2023 22:43:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dMc5Ar87"
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-548c6efc020so9547a12.0
+        for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 01:49:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1700732962; x=1701337762; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=53mgz2I67bBPUMmao+k8i5+WtnPQJvvF0nHCuvFZ/vw=;
+        b=dMc5Ar87+j4RtgKfyCa0nXco097hKIr15c2hEA+i3fCPGcTDMfPYVKGwtVn1GHTSVr
+         zekmva/vL3Lbqk/mKlRM5oJylDpl/MoK7HjHDCfsxQpe7tyNFaVDX2TWlM2TI/juxZkL
+         Zwt1juxt8co8R0HciBgaGloKNvmZgCuZi56ajba99YEBjCqO9GKIuu7D0csVG1jxe6Tb
+         2H1sLohAgLYWUpOnxtZZC4PCmFCupzxGfsDcdhdiBrzQbhOe6Uuyir7bushgjnOaxog/
+         50gMJ1ZRGjFztt3/7U/OG+DDQK2cS1e9Hm7PL5sOrJJ8lTbwwWuix2+zf/6pW+JDM720
+         LSOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700721799; x=1701326599;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0Y6v5Xhwln7tu/9zxftOsUtL05MptTTj1UHVhZFfC54=;
-        b=Bqfa87Gyk5U6OVB7wczvON+X6/8jRx4rnmHJ10PKya0fE5GLbjbuRXgWqvLFnQOeS9
-         /sC6aGverdjZQQBuFLhMXKLh9eu16cN2xM37K7foPvPh7hBZ98XcG5J4UWmef1XvMDCX
-         ht9chRFqXLZeOLag34X3fftQ33H6aktKSMTW48MlPEhup8g6IOAhTkEf9tp6PhaK4sDW
-         dqbw4al2tF+2pO0WIMmHYrd+BgT+zZOEYZ5P/E1Ia6IEBB99W0FMOaeO8nqv1bSnHvJg
-         X+P4H3Htsn0qzw8FAzxfhTOkV/bPcydDetwRO7MMhkPhOcWpgWmKDQRt60JQB0cb+ea2
-         fV1w==
-X-Gm-Message-State: AOJu0Yz6KGg5sr72NBRNMNH/qHl/XeoPa/3IuIxA3sjZIixF1nTl4MoQ
-	FIuBg+A2axQQwAoVu2scJ7OZYAJlNhySQW+F4AhwQXqe0vH1KNDirLKAmPqcB0iK78KpKvHSOTe
-	8z59A1zxS+7cXBWy/
-X-Received: by 2002:a17:902:d486:b0:1cc:3c2c:fa1a with SMTP id c6-20020a170902d48600b001cc3c2cfa1amr5191040plg.4.1700721799479;
-        Wed, 22 Nov 2023 22:43:19 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGqJ7t5K0G/lG65L6yMQON3n741jzN2NtB/hlBiB4j/kh7OASHj0JQgIsOvheK+O1VEnunV1Q==
-X-Received: by 2002:a17:902:d486:b0:1cc:3c2c:fa1a with SMTP id c6-20020a170902d48600b001cc3c2cfa1amr5191028plg.4.1700721799075;
-        Wed, 22 Nov 2023 22:43:19 -0800 (PST)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id a4-20020a1709027d8400b001c9d968563csm538754plm.79.2023.11.22.22.43.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Nov 2023 22:43:18 -0800 (PST)
-Message-ID: <d5cc3cf1-7b39-9ca3-adf2-224007c751fe@redhat.com>
-Date: Thu, 23 Nov 2023 14:43:15 +0800
+        d=1e100.net; s=20230601; t=1700732962; x=1701337762;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=53mgz2I67bBPUMmao+k8i5+WtnPQJvvF0nHCuvFZ/vw=;
+        b=AzLrCrH/YGLTUCPfK7fywz8LPz+eW6FDqat4TfxCUAGMx8g0gPpPPJKCY+fYYDxOHr
+         GxPP1i/UOitsd9ZYxpkfc303Gmt+PjOE4/tzFAaO+nwMwCPoKGfXdsI040DerJY71Zxv
+         qeV9RmluNEczsaaI35fI2EsziYLMVSxOmxkouGGERTpyUemxqPSWEeupZnlEe9IWBMoN
+         y0D+UjWrpZKT0ZSz45Gwg15WRxQfyJOCACB0GzZAT1BJzaOquXO9j5NCfVhURAz/yzed
+         2h5RfhGuOAGPoSZu+ihS34q3GblwS4nkpgdqC2Um4B5PiGkMshX1Oblude3hlQcLXT88
+         OB9Q==
+X-Gm-Message-State: AOJu0YyoiTxUYMBCqWVkLFsH33r6Nn+zxaMIHAPk8LPVaARKpYvgaaAy
+	pTOvHFYXvvtbDG7J0JrNpet6lw==
+X-Google-Smtp-Source: AGHT+IGcKXGwNmDsBQqKA/iG8b0gT6CgYkVFrfoOHPHcaUQILJhKYcBEUn/xAg67qiro7eA/qQPVkA==
+X-Received: by 2002:a05:6402:3815:b0:544:466b:3b20 with SMTP id es21-20020a056402381500b00544466b3b20mr242943edb.5.1700732961713;
+        Thu, 23 Nov 2023 01:49:21 -0800 (PST)
+Received: from google.com (110.121.148.146.bc.googleusercontent.com. [146.148.121.110])
+        by smtp.gmail.com with ESMTPSA id k24-20020a5d5258000000b00332c0aace23sm1162986wrc.105.2023.11.23.01.49.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Nov 2023 01:49:20 -0800 (PST)
+Date: Thu, 23 Nov 2023 09:49:17 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: will@kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, catalin.marinas@arm.com,
+	mark.rutland@arm.com, akpm@linux-foundation.org, maz@kernel.org,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kernel-team@android.com,
+	vdonnefort@google.com, qperret@google.com, smostafa@google.com
+Subject: Re: [PATCH v3 00/10] arm64: ptdump: View the second stage page-tables
+Message-ID: <ZV8gHfnrFzhdjjw5@google.com>
+References: <20231115171639.2852644-2-sebastianene@google.com>
+ <ZV6MVYI8J6NFS9Wl@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH] KVM: selftests: aarch64: Remove unused functions from
- vpmu test
-To: Raghavendra Rao Ananta <rananta@google.com>,
- Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20231122221526.2750966-1-rananta@google.com>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20231122221526.2750966-1-rananta@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZV6MVYI8J6NFS9Wl@linux.dev>
 
-Hi Raghavendra,
+On Wed, Nov 22, 2023 at 11:18:45PM +0000, Oliver Upton wrote:
 
-Those functions might be useful for other pmu tests. Recently I just 
-wrote a pmu_event_filter_test[1] and use the enable_counter().
+Hi Oliver,
 
-There may have more pmu tests which can use the helper functions, so I 
-think we can keep it now. And in my series[1], I have moved them into 
-the lib/ as the helper function.
+> Hi Seb,
+> 
+> On Wed, Nov 15, 2023 at 05:16:30PM +0000, Sebastian Ene wrote:
+> > Hi,
+> > 
+> > This can be used as a debugging tool for dumping the second stage
+> > page-tables.
+> > 
+> > When CONFIG_PTDUMP_STAGE2_DEBUGFS is enabled, ptdump registers 
+> > '/sys/debug/kvm/<guest_id>/stage2_page_tables' entry with debugfs
+> > upon guest creation. This allows userspace tools (eg. cat) to dump the
+> > stage-2 pagetables by reading the registered file.
+> > 
+> > Reading the debugfs file shows stage-2 memory ranges in following format:
+> > <IPA range> <size> <descriptor type> <access permissions> <mem_attributes>
+> > 
+> > Under pKVM configuration(kvm-arm.mode=protected) ptdump registers an entry
+> > for the host stage-2 pagetables in the following path:
+> > /sys/debug/kvm/host_stage2_page_tables/
+> > 
+> > The tool interprets the pKVM ownership annotation stored in the invalid
+> > entries and dumps to the console the ownership information. To be able
+> > to access the host stage-2 page-tables from the kernel, a new hypervisor
+> > call was introduced which allows us to snapshot the page-tables in a host
+> > provided buffer. The hypervisor call is hidden behind CONFIG_NVHE_EL2_DEBUG
+> > as this should be used under debugging environment.
+> 
+> While I think the value of the feature you're proposing is great, I'm
+> not a fan of the current shape of this series.
+> 
+> Reusing note_page() for the stage-2 dump is somewhat convenient, but the
+> series pulls a **massive** amount of KVM details outside of KVM:
+> 
+>  - Open-coding the whole snapshotting interface with EL2 outside of KVM.
+>    This is a complete non-starter for me; the kernel<->EL2 interface
+>    needs to be owned by the EL1 portions of KVM.
+> 
+>  - Building page-table walkers using the KVM pgtable library outside of
+>    KVM.
+> 
+>  - Copying (rather than directly calling) the logic responsible for
+>    things like FWB and PGD concatenation.
+> 
+>  - Hoisting the definition of _software bits_ outside of KVM. I'm less
+>    concerned about hardware bits since they have an unambiguous meaning.
+> 
+> I think exporting the necessary stuff from ptdump into KVM will lead to
+> a much cleaner implementation.
+> 
 
-[1]https://lore.kernel.org/all/20231123063750.2176250-1-shahuang@redhat.com/
+Right, I had to import a lot of definitions from KVM, especially for the
+prot_bits array and for the IPA size retrieval. I think it would be less
+intrusive the other way around, to pull some ptdump hooks into kvm.
+
+> -- 
+> Thanks,
+> Oliver
 
 Thanks,
-Shaoqin
-
-On 11/23/23 06:15, Raghavendra Rao Ananta wrote:
-> vpmu_counter_access's disable_counter() carries a bug that disables
-> all the counters that are enabled, instead of just the requested one.
-> Fortunately, it's not an issue as there are no callers of it. Hence,
-> instead of fixing it, remove the definition entirely.
-> 
-> Remove enable_counter() as it's unused as well.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> ---
->   .../selftests/kvm/aarch64/vpmu_counter_access.c  | 16 ----------------
->   1 file changed, 16 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> index 5ea78986e665f..e2f0b720cbfcf 100644
-> --- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> +++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> @@ -94,22 +94,6 @@ static inline void write_sel_evtyper(int sel, unsigned long val)
->   	isb();
->   }
->   
-> -static inline void enable_counter(int idx)
-> -{
-> -	uint64_t v = read_sysreg(pmcntenset_el0);
-> -
-> -	write_sysreg(BIT(idx) | v, pmcntenset_el0);
-> -	isb();
-> -}
-> -
-> -static inline void disable_counter(int idx)
-> -{
-> -	uint64_t v = read_sysreg(pmcntenset_el0);
-> -
-> -	write_sysreg(BIT(idx) | v, pmcntenclr_el0);
-> -	isb();
-> -}
-> -
->   static void pmu_disable_reset(void)
->   {
->   	uint64_t pmcr = read_sysreg(pmcr_el0);
-
+Seb
