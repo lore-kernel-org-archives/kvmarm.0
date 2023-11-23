@@ -1,54 +1,84 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB9635669
-	for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 02:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.55])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SbMzt3FHhzWhbc;
-	Thu, 23 Nov 2023 10:50:34 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 23 Nov 2023 10:51:08 +0800
-Subject: Re: [PATCH] KVM: selftests: aarch64: Remove unused functions from
- vpmu test
-To: Raghavendra Rao Ananta <rananta@google.com>
-CC: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shaoqin Huang <shahuang@redhat.com>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
-References: <20231122221526.2750966-1-rananta@google.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <bf4128c9-ce13-dba1-1ea3-825279e3dd76@huawei.com>
-Date: Thu, 23 Nov 2023 10:51:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4163A11738
+	for <kvmarm@lists.linux.dev>; Thu, 23 Nov 2023 06:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c0CxIWJ3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700721491;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=nWktWqMM4G/wXCLhrelXgnsFw3mwZMTHYGnEyrCPhDA=;
+	b=c0CxIWJ3ZCV3HGXXTGLc/IFrLh8fqhw63Dr/XUsd5K1NDJ0pjYpVr0QAtY6YbQSwkWmWWV
+	tbSVZzql33+wWXMQcdCQO0q8ETNjnLarf7M3eq7Es3YUYAXisAbjK5BrgcDBmLe1kJeWIr
+	WVso71Pa+h3XhROSWabxp5EdSX/Kzno=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-358-AC3FAiN5OAO27fE9bMEl8A-1; Thu, 23 Nov 2023 01:38:06 -0500
+X-MC-Unique: AC3FAiN5OAO27fE9bMEl8A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3B813899EC2;
+	Thu, 23 Nov 2023 06:38:06 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id F04E21C060AE;
+	Thu, 23 Nov 2023 06:38:05 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v1 0/3] KVM: selftests: aarch64: Introduce pmu_event_filter_test
+Date: Thu, 23 Nov 2023 01:37:42 -0500
+Message-Id: <20231123063750.2176250-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20231122221526.2750966-1-rananta@google.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm000007.china.huawei.com (7.193.23.189)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-On 2023/11/23 6:15, Raghavendra Rao Ananta wrote:
-> vpmu_counter_access's disable_counter() carries a bug that disables
-> all the counters that are enabled, instead of just the requested one.
-> Fortunately, it's not an issue as there are no callers of it. Hence,
-> instead of fixing it, remove the definition entirely.
-> 
-> Remove enable_counter() as it's unused as well.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+The test is inspired by the pmu_event_filter_test which implemented by x86. On
+the arm64 platform, there is the same ability to set the pmu_event_filter
+through the KVM_ARM_VCPU_PMU_V3_FILTER attribute. So add the test for arm64.
 
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+The series first move some pmu common code from vpmu_counter_access to lib/
+which can be used by pmu_event_filter_test. Then implements the test itself.
+
+Shaoqin Huang (3):
+  KVM: selftests: aarch64: Make the [create|destroy]_vpmu_vm() can be
+    reused
+  KVM: selftests: aarch64: Move the pmu helper function into lib/
+  KVM: selftests: aarch64: Introduce pmu_event_filter_test
+
+ tools/testing/selftests/kvm/Makefile          |   2 +
+ .../kvm/aarch64/pmu_event_filter_test.c       | 227 ++++++++++++++++++
+ .../kvm/aarch64/vpmu_counter_access.c         | 218 ++---------------
+ .../selftests/kvm/include/aarch64/vpmu.h      | 139 +++++++++++
+ .../testing/selftests/kvm/lib/aarch64/vpmu.c  |  74 ++++++
+ 5 files changed, 466 insertions(+), 194 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/vpmu.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vpmu.c
+
+-- 
+2.40.1
+
