@@ -1,15 +1,15 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBD87364A1
-	for <kvmarm@lists.linux.dev>; Fri, 24 Nov 2023 16:35:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194AE364AC
+	for <kvmarm@lists.linux.dev>; Fri, 24 Nov 2023 16:35:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5D8C81BD0;
-	Fri, 24 Nov 2023 08:36:21 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3D9A31063;
+	Fri, 24 Nov 2023 08:36:26 -0800 (PST)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AE04C3F73F;
-	Fri, 24 Nov 2023 08:35:32 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8CF433F7F5;
+	Fri, 24 Nov 2023 08:35:37 -0800 (PST)
 From: Joey Gouly <joey.gouly@arm.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: akpm@linux-foundation.org,
@@ -29,9 +29,9 @@ Cc: akpm@linux-foundation.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 05/25] arm64: context switch POR_EL0 register
-Date: Fri, 24 Nov 2023 16:34:50 +0000
-Message-Id: <20231124163510.1835740-6-joey.gouly@arm.com>
+Subject: [PATCH v3 07/25] arm64: enable the Permission Overlay Extension for EL0
+Date: Fri, 24 Nov 2023 16:34:52 +0000
+Message-Id: <20231124163510.1835740-8-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231124163510.1835740-1-joey.gouly@arm.com>
 References: <20231124163510.1835740-1-joey.gouly@arm.com>
@@ -43,122 +43,115 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-POR_EL0 is a register that can be modified by userspace directly,
-so it must be context switched.
+Expose a HWCAP and ID_AA64MMFR3_EL1_S1POE to userspace, so they can be used to
+check if the CPU supports the feature.
 
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/cpufeature.h |  6 ++++++
- arch/arm64/include/asm/processor.h  |  1 +
- arch/arm64/include/asm/sysreg.h     |  3 +++
- arch/arm64/kernel/process.c         | 22 ++++++++++++++++++++++
- 4 files changed, 32 insertions(+)
+ Documentation/arch/arm64/elf_hwcaps.rst |  3 +++
+ arch/arm64/include/asm/hwcap.h          |  1 +
+ arch/arm64/include/uapi/asm/hwcap.h     |  1 +
+ arch/arm64/kernel/cpufeature.c          | 14 ++++++++++++++
+ arch/arm64/kernel/cpuinfo.c             |  1 +
+ 5 files changed, 20 insertions(+)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index f6d416fe49b0..6870e4d46334 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -819,6 +819,12 @@ static inline bool system_supports_tlb_range(void)
- 	return alternative_has_cap_unlikely(ARM64_HAS_TLB_RANGE);
- }
+diff --git a/Documentation/arch/arm64/elf_hwcaps.rst b/Documentation/arch/arm64/elf_hwcaps.rst
+index ced7b335e2e0..fe7350a66cea 100644
+--- a/Documentation/arch/arm64/elf_hwcaps.rst
++++ b/Documentation/arch/arm64/elf_hwcaps.rst
+@@ -317,6 +317,9 @@ HWCAP2_LRCPC3
+ HWCAP2_LSE128
+     Functionality implied by ID_AA64ISAR0_EL1.Atomic == 0b0011.
  
-+static inline bool system_supports_poe(void)
-+{
-+	return IS_ENABLED(CONFIG_ARM64_POE) &&
-+		alternative_has_cap_unlikely(ARM64_HAS_S1POE);
-+}
++HWCAP2_POE
++    Functionality implied by ID_AA64MMFR3_EL1.S1POE == 0b0001.
 +
- int do_emulate_mrs(struct pt_regs *regs, u32 sys_reg, u32 rt);
- bool try_emulate_mrs(struct pt_regs *regs, u32 isn);
+ 4. Unused AT_HWCAP bits
+ -----------------------
  
-diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
-index e5bc54522e71..b3ad719c2d0c 100644
---- a/arch/arm64/include/asm/processor.h
-+++ b/arch/arm64/include/asm/processor.h
-@@ -179,6 +179,7 @@ struct thread_struct {
- 	u64			sctlr_user;
- 	u64			svcr;
- 	u64			tpidr2_el0;
-+	u64			por_el0;
+diff --git a/arch/arm64/include/asm/hwcap.h b/arch/arm64/include/asm/hwcap.h
+index cd71e09ea14d..9a1aa1e5e25c 100644
+--- a/arch/arm64/include/asm/hwcap.h
++++ b/arch/arm64/include/asm/hwcap.h
+@@ -142,6 +142,7 @@
+ #define KERNEL_HWCAP_SVE_B16B16		__khwcap2_feature(SVE_B16B16)
+ #define KERNEL_HWCAP_LRCPC3		__khwcap2_feature(LRCPC3)
+ #define KERNEL_HWCAP_LSE128		__khwcap2_feature(LSE128)
++#define KERNEL_HWCAP_POE		__khwcap2_feature(POE)
+ 
+ /*
+  * This yields a mask that user programs can use to figure out what
+diff --git a/arch/arm64/include/uapi/asm/hwcap.h b/arch/arm64/include/uapi/asm/hwcap.h
+index 5023599fa278..69f09521b553 100644
+--- a/arch/arm64/include/uapi/asm/hwcap.h
++++ b/arch/arm64/include/uapi/asm/hwcap.h
+@@ -107,5 +107,6 @@
+ #define HWCAP2_SVE_B16B16	(1UL << 45)
+ #define HWCAP2_LRCPC3		(1UL << 46)
+ #define HWCAP2_LSE128		(1UL << 47)
++#define HWCAP2_POE		(1UL << 48)
+ 
+ #endif /* _UAPI__ASM_HWCAP_H */
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 00b6d516ed3f..02169cb3b84b 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -402,6 +402,8 @@ static const struct arm64_ftr_bits ftr_id_aa64mmfr2[] = {
  };
  
- static inline unsigned int thread_get_vl(struct thread_struct *thread,
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 9c2caf0efdc7..77a4797d0d54 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -1052,6 +1052,9 @@
- #define POE_RXW		UL(0x7)
- #define POE_MASK	UL(0xf)
- 
-+/* Initial value for Permission Overlay Extension for EL0 */
-+#define POR_EL0_INIT	POE_RXW
-+
- #define ARM64_FEATURE_FIELD_BITS	4
- 
- /* Defined for compatibility only, do not add new users. */
-diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
-index 7387b68c745b..fc899c12d759 100644
---- a/arch/arm64/kernel/process.c
-+++ b/arch/arm64/kernel/process.c
-@@ -271,12 +271,19 @@ static void flush_tagged_addr_state(void)
- 		clear_thread_flag(TIF_TAGGED_ADDR);
+ static const struct arm64_ftr_bits ftr_id_aa64mmfr3[] = {
++	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_POE),
++		       FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64MMFR3_EL1_S1POE_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64MMFR3_EL1_S1PIE_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64MMFR3_EL1_TCRX_SHIFT, 4, 0),
+ 	ARM64_FTR_END,
+@@ -2242,6 +2244,14 @@ static void cpu_enable_mops(const struct arm64_cpu_capabilities *__unused)
+ 	sysreg_clear_set(sctlr_el1, 0, SCTLR_EL1_MSCEn);
  }
  
-+static void flush_poe(void)
++#ifdef CONFIG_ARM64_POE
++static void cpu_enable_poe(const struct arm64_cpu_capabilities *__unused)
 +{
-+	if (system_supports_poe())
-+		write_sysreg_s(POR_EL0_INIT, SYS_POR_EL0);
++	sysreg_clear_set(REG_TCR2_EL1, 0, TCR2_EL1x_E0POE);
++	sysreg_clear_set(CPACR_EL1, 0, CPACR_ELx_E0POE);
 +}
++#endif
 +
- void flush_thread(void)
- {
- 	fpsimd_flush_thread();
- 	tls_thread_flush();
- 	flush_ptrace_hw_breakpoint(current);
- 	flush_tagged_addr_state();
-+	flush_poe();
- }
+ /* Internal helper functions to match cpu capability type */
+ static bool
+ cpucap_late_cpu_optional(const struct arm64_cpu_capabilities *cap)
+@@ -2737,6 +2747,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.capability = ARM64_HAS_S1POE,
+ 		.type = ARM64_CPUCAP_BOOT_CPU_FEATURE,
+ 		.matches = has_cpuid_feature,
++		.cpu_enable = cpu_enable_poe,
+ 		ARM64_CPUID_FIELDS(ID_AA64MMFR3_EL1, S1POE, IMP)
+ 	},
+ #endif
+@@ -2889,6 +2900,9 @@ static const struct arm64_cpu_capabilities arm64_elf_hwcaps[] = {
+ 	HWCAP_CAP(ID_AA64SMFR0_EL1, BI32I32, IMP, CAP_HWCAP, KERNEL_HWCAP_SME_BI32I32),
+ 	HWCAP_CAP(ID_AA64SMFR0_EL1, F32F32, IMP, CAP_HWCAP, KERNEL_HWCAP_SME_F32F32),
+ #endif /* CONFIG_ARM64_SME */
++#ifdef CONFIG_ARM64_POE
++	HWCAP_CAP(ID_AA64MMFR3_EL1, S1POE, IMP, CAP_HWCAP, KERNEL_HWCAP_POE),
++#endif
+ 	{},
+ };
  
- void arch_release_task_struct(struct task_struct *tsk)
-@@ -374,6 +381,9 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
- 		if (system_supports_tpidr2())
- 			p->thread.tpidr2_el0 = read_sysreg_s(SYS_TPIDR2_EL0);
+diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
+index a257da7b56fe..5515c50f5219 100644
+--- a/arch/arm64/kernel/cpuinfo.c
++++ b/arch/arm64/kernel/cpuinfo.c
+@@ -130,6 +130,7 @@ static const char *const hwcap_str[] = {
+ 	[KERNEL_HWCAP_SVE_B16B16]	= "sveb16b16",
+ 	[KERNEL_HWCAP_LRCPC3]		= "lrcpc3",
+ 	[KERNEL_HWCAP_LSE128]		= "lse128",
++	[KERNEL_HWCAP_POE]		= "poe",
+ };
  
-+		if (system_supports_poe())
-+			p->thread.por_el0 = read_sysreg_s(SYS_POR_EL0);
-+
- 		if (stack_start) {
- 			if (is_compat_thread(task_thread_info(p)))
- 				childregs->compat_sp = stack_start;
-@@ -498,6 +508,17 @@ static void erratum_1418040_new_exec(void)
- 	preempt_enable();
- }
- 
-+static void permission_overlay_switch(struct task_struct *next)
-+{
-+	if (system_supports_poe()) {
-+		current->thread.por_el0 = read_sysreg_s(SYS_POR_EL0);
-+		if (current->thread.por_el0 != next->thread.por_el0) {
-+			write_sysreg_s(next->thread.por_el0, SYS_POR_EL0);
-+			isb();
-+		}
-+	}
-+}
-+
- /*
-  * __switch_to() checks current->thread.sctlr_user as an optimisation. Therefore
-  * this function must be called with preemption disabled and the update to
-@@ -533,6 +554,7 @@ struct task_struct *__switch_to(struct task_struct *prev,
- 	ssbs_thread_switch(next);
- 	erratum_1418040_thread_switch(next);
- 	ptrauth_thread_switch_user(next);
-+	permission_overlay_switch(next);
- 
- 	/*
- 	 * Complete any pending TLB or cache maintenance on this CPU in case
+ #ifdef CONFIG_COMPAT
 -- 
 2.25.1
 
