@@ -1,15 +1,15 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3470364C1
-	for <kvmarm@lists.linux.dev>; Fri, 24 Nov 2023 16:35:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AAE5364BD
+	for <kvmarm@lists.linux.dev>; Fri, 24 Nov 2023 16:35:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C80DD1BA8;
-	Fri, 24 Nov 2023 08:36:28 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1DE561BC0;
+	Fri, 24 Nov 2023 08:36:31 -0800 (PST)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 236AC3F73F;
-	Fri, 24 Nov 2023 08:35:35 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6E5A13F73F;
+	Fri, 24 Nov 2023 08:35:42 -0800 (PST)
 From: Joey Gouly <joey.gouly@arm.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: akpm@linux-foundation.org,
@@ -29,9 +29,9 @@ Cc: akpm@linux-foundation.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 06/25] KVM: arm64: Save/restore POE registers
-Date: Fri, 24 Nov 2023 16:34:51 +0000
-Message-Id: <20231124163510.1835740-7-joey.gouly@arm.com>
+Subject: [PATCH v3 09/25] arm64: define VM_PKEY_BIT* for arm64
+Date: Fri, 24 Nov 2023 16:34:54 +0000
+Message-Id: <20231124163510.1835740-10-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231124163510.1835740-1-joey.gouly@arm.com>
 References: <20231124163510.1835740-1-joey.gouly@arm.com>
@@ -43,118 +43,171 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Define the new system registers that POE introduces and context switch them.
+Define the VM_PKEY_BIT* values for arm64, and convert them into the arm64
+specific pgprot values.
+
+Move the current values for x86 and PPC into arch/*.
 
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_arm.h           |  4 ++--
- arch/arm64/include/asm/kvm_host.h          |  4 ++++
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 10 ++++++++++
- arch/arm64/kvm/sys_regs.c                  |  2 ++
- 4 files changed, 18 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/mman.h   |  8 +++++++-
+ arch/arm64/include/asm/page.h   | 10 ++++++++++
+ arch/arm64/mm/mmap.c            |  9 +++++++++
+ arch/powerpc/include/asm/page.h | 11 +++++++++++
+ arch/x86/include/asm/page.h     | 10 ++++++++++
+ fs/proc/task_mmu.c              |  2 ++
+ include/linux/mm.h              | 13 -------------
+ 7 files changed, 49 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index b85f46a73e21..597470e0b87b 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -346,14 +346,14 @@
-  */
- #define __HFGRTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51))
- #define __HFGRTR_EL2_MASK	GENMASK(49, 0)
--#define __HFGRTR_EL2_nMASK	(GENMASK(58, 57) | GENMASK(55, 54) | BIT(50))
-+#define __HFGRTR_EL2_nMASK	(GENMASK(60, 57) | GENMASK(55, 54) | BIT(50))
+diff --git a/arch/arm64/include/asm/mman.h b/arch/arm64/include/asm/mman.h
+index 5966ee4a6154..ecb2d18dc4d7 100644
+--- a/arch/arm64/include/asm/mman.h
++++ b/arch/arm64/include/asm/mman.h
+@@ -7,7 +7,7 @@
+ #include <uapi/asm/mman.h>
  
- #define __HFGWTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51) |	\
- 				 BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
- 				 GENMASK(26, 25) | BIT(21) | BIT(18) |	\
- 				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
- #define __HFGWTR_EL2_MASK	GENMASK(49, 0)
--#define __HFGWTR_EL2_nMASK	(GENMASK(58, 57) | GENMASK(55, 54) | BIT(50))
-+#define __HFGWTR_EL2_nMASK	(GENMASK(60, 57) | GENMASK(55, 54) | BIT(50))
- 
- #define __HFGITR_EL2_RES0	GENMASK(63, 57)
- #define __HFGITR_EL2_MASK	GENMASK(54, 0)
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 824f29f04916..fa9ebd8fce40 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -401,6 +401,10 @@ enum vcpu_sysreg {
- 	PIR_EL1,       /* Permission Indirection Register 1 (EL1) */
- 	PIRE0_EL1,     /*  Permission Indirection Register 0 (EL1) */
- 
-+	/* Permission Overlay Extension registers */
-+	POR_EL1,	/* Permission Overlay Register 1 (EL1) */
-+	POR_EL0,	/* Permission Overlay Register 0 (EL0) */
-+
- 	/* 32bit specific registers. */
- 	DACR32_EL2,	/* Domain Access Control Register */
- 	IFSR32_EL2,	/* Instruction Fault Status Register */
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index bb6b571ec627..22f07ee43e7e 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -19,6 +19,9 @@
- static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+ static inline unsigned long arch_calc_vm_prot_bits(unsigned long prot,
+-	unsigned long pkey __always_unused)
++	unsigned long pkey)
  {
- 	ctxt_sys_reg(ctxt, MDSCR_EL1)	= read_sysreg(mdscr_el1);
+ 	unsigned long ret = 0;
+ 
+@@ -17,6 +17,12 @@ static inline unsigned long arch_calc_vm_prot_bits(unsigned long prot,
+ 	if (system_supports_mte() && (prot & PROT_MTE))
+ 		ret |= VM_MTE;
+ 
++#if defined(CONFIG_ARCH_HAS_PKEYS)
++	ret |= pkey & 0x1 ? VM_PKEY_BIT0 : 0;
++	ret |= pkey & 0x2 ? VM_PKEY_BIT1 : 0;
++	ret |= pkey & 0x4 ? VM_PKEY_BIT2 : 0;
++#endif
 +
-+	if (system_supports_poe())
-+		ctxt_sys_reg(ctxt, POR_EL0)	= read_sysreg_s(SYS_POR_EL0);
+ 	return ret;
+ }
+ #define arch_calc_vm_prot_bits(prot, pkey) arch_calc_vm_prot_bits(prot, pkey)
+diff --git a/arch/arm64/include/asm/page.h b/arch/arm64/include/asm/page.h
+index 2312e6ee595f..aabfda2516d2 100644
+--- a/arch/arm64/include/asm/page.h
++++ b/arch/arm64/include/asm/page.h
+@@ -49,6 +49,16 @@ int pfn_is_map_memory(unsigned long pfn);
+ 
+ #define VM_DATA_DEFAULT_FLAGS	(VM_DATA_FLAGS_TSK_EXEC | VM_MTE_ALLOWED)
+ 
++#if defined(CONFIG_ARCH_HAS_PKEYS)
++/* A protection key is a 3-bit value */
++# define VM_PKEY_SHIFT	VM_HIGH_ARCH_BIT_2
++# define VM_PKEY_BIT0	VM_HIGH_ARCH_2
++# define VM_PKEY_BIT1	VM_HIGH_ARCH_3
++# define VM_PKEY_BIT2	VM_HIGH_ARCH_4
++# define VM_PKEY_BIT3	0
++# define VM_PKEY_BIT4	0
++#endif
++
+ #include <asm-generic/getorder.h>
+ 
+ #endif
+diff --git a/arch/arm64/mm/mmap.c b/arch/arm64/mm/mmap.c
+index 645fe60d000f..2e2a5a9bcfa1 100644
+--- a/arch/arm64/mm/mmap.c
++++ b/arch/arm64/mm/mmap.c
+@@ -98,6 +98,15 @@ pgprot_t vm_get_page_prot(unsigned long vm_flags)
+ 	if (vm_flags & VM_MTE)
+ 		prot |= PTE_ATTRINDX(MT_NORMAL_TAGGED);
+ 
++#ifdef CONFIG_ARCH_HAS_PKEYS
++	if (vm_flags & VM_PKEY_BIT0)
++		prot |= PTE_PO_IDX_0;
++	if (vm_flags & VM_PKEY_BIT1)
++		prot |= PTE_PO_IDX_1;
++	if (vm_flags & VM_PKEY_BIT2)
++		prot |= PTE_PO_IDX_2;
++#endif
++
+ 	return __pgprot(prot);
+ }
+ EXPORT_SYMBOL(vm_get_page_prot);
+diff --git a/arch/powerpc/include/asm/page.h b/arch/powerpc/include/asm/page.h
+index e5fcc79b5bfb..a5e75ec333ad 100644
+--- a/arch/powerpc/include/asm/page.h
++++ b/arch/powerpc/include/asm/page.h
+@@ -330,6 +330,17 @@ static inline unsigned long kaslr_offset(void)
  }
  
- static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
-@@ -59,6 +62,8 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- 		ctxt_sys_reg(ctxt, PIR_EL1)	= read_sysreg_el1(SYS_PIR);
- 		ctxt_sys_reg(ctxt, PIRE0_EL1)	= read_sysreg_el1(SYS_PIRE0);
- 	}
-+	if (system_supports_poe())
-+		ctxt_sys_reg(ctxt, POR_EL1)	= read_sysreg_el1(SYS_POR);
- 	ctxt_sys_reg(ctxt, PAR_EL1)	= read_sysreg_par();
- 	ctxt_sys_reg(ctxt, TPIDR_EL1)	= read_sysreg(tpidr_el1);
- 
-@@ -89,6 +94,9 @@ static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
- static inline void __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
- {
- 	write_sysreg(ctxt_sys_reg(ctxt, MDSCR_EL1),  mdscr_el1);
+ #include <asm-generic/memory_model.h>
 +
-+	if (system_supports_poe())
-+		write_sysreg_s(ctxt_sys_reg(ctxt, POR_EL0),	SYS_POR_EL0);
- }
++#if defined(CONFIG_ARCH_HAS_PKEYS)
++# define VM_PKEY_SHIFT	VM_HIGH_ARCH_BIT_0
++/* A protection key is a 5-bit value */
++# define VM_PKEY_BIT0	VM_HIGH_ARCH_0
++# define VM_PKEY_BIT1	VM_HIGH_ARCH_1
++# define VM_PKEY_BIT2	VM_HIGH_ARCH_2
++# define VM_PKEY_BIT3	VM_HIGH_ARCH_3
++# define VM_PKEY_BIT4	VM_HIGH_ARCH_4
++#endif /* CONFIG_ARCH_HAS_PKEYS */
++
+ #endif /* __ASSEMBLY__ */
  
- static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
-@@ -135,6 +143,8 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- 		write_sysreg_el1(ctxt_sys_reg(ctxt, PIR_EL1),	SYS_PIR);
- 		write_sysreg_el1(ctxt_sys_reg(ctxt, PIRE0_EL1),	SYS_PIRE0);
- 	}
-+	if (system_supports_poe())
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, POR_EL1),	SYS_POR);
- 	write_sysreg(ctxt_sys_reg(ctxt, PAR_EL1),	par_el1);
- 	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL1),	tpidr_el1);
+ #endif /* _ASM_POWERPC_PAGE_H */
+diff --git a/arch/x86/include/asm/page.h b/arch/x86/include/asm/page.h
+index d18e5c332cb9..b770db1a21e7 100644
+--- a/arch/x86/include/asm/page.h
++++ b/arch/x86/include/asm/page.h
+@@ -87,5 +87,15 @@ static __always_inline u64 __is_canonical_address(u64 vaddr, u8 vaddr_bits)
  
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 4735e1b37fb3..a54e5eadbf29 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2269,6 +2269,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
- 	{ SYS_DESC(SYS_PIRE0_EL1), NULL, reset_unknown, PIRE0_EL1 },
- 	{ SYS_DESC(SYS_PIR_EL1), NULL, reset_unknown, PIR_EL1 },
-+	{ SYS_DESC(SYS_POR_EL1), NULL, reset_unknown, POR_EL1 },
- 	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
+ #define HAVE_ARCH_HUGETLB_UNMAPPED_AREA
  
- 	{ SYS_DESC(SYS_LORSA_EL1), trap_loregion },
-@@ -2352,6 +2353,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  .access = access_pmovs, .reg = PMOVSSET_EL0,
- 	  .get_user = get_pmreg, .set_user = set_pmreg },
++#if defined(CONFIG_ARCH_HAS_PKEYS)
++# define VM_PKEY_SHIFT	VM_HIGH_ARCH_BIT_0
++/* A protection key is a 4-bit value */
++# define VM_PKEY_BIT0	VM_HIGH_ARCH_0
++# define VM_PKEY_BIT1	VM_HIGH_ARCH_1
++# define VM_PKEY_BIT2	VM_HIGH_ARCH_2
++# define VM_PKEY_BIT3	VM_HIGH_ARCH_3
++# define VM_PKEY_BIT4	0
++#endif /* CONFIG_ARCH_HAS_PKEYS */
++
+ #endif	/* __KERNEL__ */
+ #endif /* _ASM_X86_PAGE_H */
+diff --git a/fs/proc/task_mmu.c b/fs/proc/task_mmu.c
+index ef2eb12906da..8c2790abeffb 100644
+--- a/fs/proc/task_mmu.c
++++ b/fs/proc/task_mmu.c
+@@ -691,7 +691,9 @@ static void show_smap_vma_flags(struct seq_file *m, struct vm_area_struct *vma)
+ 		[ilog2(VM_PKEY_BIT0)]	= "",
+ 		[ilog2(VM_PKEY_BIT1)]	= "",
+ 		[ilog2(VM_PKEY_BIT2)]	= "",
++#if VM_PKEY_BIT3
+ 		[ilog2(VM_PKEY_BIT3)]	= "",
++#endif
+ #if VM_PKEY_BIT4
+ 		[ilog2(VM_PKEY_BIT4)]	= "",
+ #endif
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 418d26608ece..47f42d9893fe 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -328,19 +328,6 @@ extern unsigned int kobjsize(const void *objp);
+ #define VM_HIGH_ARCH_5	BIT(VM_HIGH_ARCH_BIT_5)
+ #endif /* CONFIG_ARCH_USES_HIGH_VMA_FLAGS */
  
-+	{ SYS_DESC(SYS_POR_EL0), NULL, reset_unknown, POR_EL0 },
- 	{ SYS_DESC(SYS_TPIDR_EL0), NULL, reset_unknown, TPIDR_EL0 },
- 	{ SYS_DESC(SYS_TPIDRRO_EL0), NULL, reset_unknown, TPIDRRO_EL0 },
- 	{ SYS_DESC(SYS_TPIDR2_EL0), undef_access },
+-#ifdef CONFIG_ARCH_HAS_PKEYS
+-# define VM_PKEY_SHIFT	VM_HIGH_ARCH_BIT_0
+-# define VM_PKEY_BIT0	VM_HIGH_ARCH_0	/* A protection key is a 4-bit value */
+-# define VM_PKEY_BIT1	VM_HIGH_ARCH_1	/* on x86 and 5-bit value on ppc64   */
+-# define VM_PKEY_BIT2	VM_HIGH_ARCH_2
+-# define VM_PKEY_BIT3	VM_HIGH_ARCH_3
+-#ifdef CONFIG_PPC
+-# define VM_PKEY_BIT4  VM_HIGH_ARCH_4
+-#else
+-# define VM_PKEY_BIT4  0
+-#endif
+-#endif /* CONFIG_ARCH_HAS_PKEYS */
+-
+ #ifdef CONFIG_X86_USER_SHADOW_STACK
+ /*
+  * VM_SHADOW_STACK should not be set with VM_SHARED because of lack of
 -- 
 2.25.1
 
