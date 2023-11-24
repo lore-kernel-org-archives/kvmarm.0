@@ -1,248 +1,122 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E0DA1A712
-	for <kvmarm@lists.linux.dev>; Fri, 24 Nov 2023 11:24:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C53A1EB5C
+	for <kvmarm@lists.linux.dev>; Fri, 24 Nov 2023 11:50:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0C9FD1063;
-	Fri, 24 Nov 2023 03:25:33 -0800 (PST)
-Received: from [10.57.5.4] (unknown [10.57.5.4])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C05CE3F7A6;
-	Fri, 24 Nov 2023 03:24:43 -0800 (PST)
-Message-ID: <905087cc-9c79-0c9f-ad2a-8472bdf3ac79@arm.com>
-Date: Fri, 24 Nov 2023 11:24:42 +0000
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DEF1F1063;
+	Fri, 24 Nov 2023 03:50:46 -0800 (PST)
+Received: from [10.57.73.191] (unknown [10.57.73.191])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EE5093F7A6;
+	Fri, 24 Nov 2023 03:49:58 -0800 (PST)
+Message-ID: <1ead7fa6-7085-4b95-a568-ece094721d34@arm.com>
+Date: Fri, 24 Nov 2023 11:49:57 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v3 6/6] coresight: Pass guest TRFCR value to KVM
-Content-Language: en-US
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: broonie@kernel.org, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 07/12] KVM: arm64: Use LPA2 page-tables for stage2 and
+ hyp stage1
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
  Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mike Leach <mike.leach@linaro.org>, Leo Yan <leo.yan@linaro.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
- <robh@kernel.org>, Jintack Lim <jintack.lim@linaro.org>,
- Fuad Tabba <tabba@google.com>,
- Kristina Martsenko <kristina.martsenko@arm.com>,
- Akihiko Odaki <akihiko.odaki@daynix.com>, Joey Gouly <joey.gouly@arm.com>,
- linux-kernel@vger.kernel.org, coresight@lists.linaro.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, maz@kernel.org
-References: <20231019165510.1966367-1-james.clark@arm.com>
- <20231019165510.1966367-7-james.clark@arm.com>
- <c2552b30-92ee-435b-a50c-9c34c25bc421@arm.com>
-From: James Clark <james.clark@arm.com>
-In-Reply-To: <c2552b30-92ee-435b-a50c-9c34c25bc421@arm.com>
+ Suzuki K Poulose <suzuki.poulose@arm.com>, James Morse
+ <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Ard Biesheuvel <ardb@kernel.org>,
+ Anshuman Khandual <anshuman.khandual@arm.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+References: <20231116142931.1675485-1-ryan.roberts@arm.com>
+ <20231116142931.1675485-8-ryan.roberts@arm.com> <ZV0Uaoi-qBjX3j5i@linux.dev>
+ <c89e4132-fedd-440d-8971-5e42969fc1e9@arm.com> <86fs0xzue7.wl-maz@kernel.org>
+Content-Language: en-GB
+From: Ryan Roberts <ryan.roberts@arm.com>
+In-Reply-To: <86fs0xzue7.wl-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-
-
-On 16/11/2023 19:37, Suzuki K Poulose wrote:
-> On 19/10/2023 17:55, James Clark wrote:
->> Currently the userspace and kernel filters for guests are never set, so
->> no trace will be generated for them. Add support for tracing guests by
->> passing the desired TRFCR value to KVM so it can be applied to the
->> guest.
+On 22/11/2023 15:21, Marc Zyngier wrote:
+> On Wed, 22 Nov 2023 13:41:33 +0000,
+> Ryan Roberts <ryan.roberts@arm.com> wrote:
 >>
->> By writing either E1TRE or E0TRE, filtering on either guest kernel or
->> guest userspace is also supported. And if both E1TRE and E0TRE are
->> cleared when exclude_guest is set, that option is supported too. This
->> change also brings exclude_host support which is difficult to add as a
->> separate commit without excess churn and resulting in no trace at all.
+>> On 21/11/2023 20:34, Oliver Upton wrote:
+>>> On Thu, Nov 16, 2023 at 02:29:26PM +0000, Ryan Roberts wrote:
+>>>> Implement a simple policy whereby if the HW supports FEAT_LPA2 for the
+>>>> page size we are using, always use LPA2-style page-tables for stage 2
+>>>> and hyp stage 1 (assuming an nvhe hyp), regardless of the VMM-requested
+>>>> IPA size or HW-implemented PA size. When in use we can now support up to
+>>>> 52-bit IPA and PA sizes.
+>>>>
+>>>> We use the previously created cpu feature to track whether LPA2 is
+>>>> supported for deciding whether to use the LPA2 or classic pte format.
+>>>>
+>>>> Note that FEAT_LPA2 brings support for bigger block mappings (512GB with
+>>>> 4KB, 64GB with 16KB). We explicitly don't enable these in the library
+>>>> because stage2_apply_range() works on batch sizes of the largest used
+>>>> block mapping, and increasing the size of the batch would lead to soft
+>>>> lockups. See commit 5994bc9e05c2 ("KVM: arm64: Limit
+>>>> stage2_apply_range() batch size to largest block").
+>>>>
+>>>> With the addition of LPA2 support in the hypervisor, the PA size
+>>>> supported by the HW must be capped with a runtime decision, rather than
+>>>> simply using a compile-time decision based on PA_BITS. For example, on a
+>>>> system that advertises 52 bit PA but does not support FEAT_LPA2, A 4KB
+>>>> or 16KB kernel compiled with LPA2 support must still limit the PA size
+>>>> to 48 bits.
+>>>>
+>>>> Therefore, move the insertion of the PS field into TCR_EL2 out of
+>>>> __kvm_hyp_init assembly code and instead do it in cpu_prepare_hyp_mode()
+>>>> where the rest of TCR_EL2 is prepared. This allows us to figure out PS
+>>>> with kvm_get_parange(), which has the appropriate logic to ensure the
+>>>> above requirement. (and the PS field of VTCR_EL2 is already populated
+>>>> this way).
+>>>>
+>>>> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
+>>>> ---
+>>>>  arch/arm64/include/asm/kvm_mmu.h     |  2 +-
+>>>>  arch/arm64/include/asm/kvm_pgtable.h | 47 +++++++++++++++++++++-------
+>>>>  arch/arm64/kvm/arm.c                 |  5 +++
+>>>>  arch/arm64/kvm/hyp/nvhe/hyp-init.S   |  4 ---
+>>>>  arch/arm64/kvm/hyp/pgtable.c         | 15 +++++++--
+>>>>  5 files changed, 54 insertions(+), 19 deletions(-)
+>>>>
+>>>> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+>>>> index 31e8d7faed65..f4e4fcb35afc 100644
+>>>> --- a/arch/arm64/include/asm/kvm_mmu.h
+>>>> +++ b/arch/arm64/include/asm/kvm_mmu.h
+>>>> @@ -340,7 +340,7 @@ static inline struct kvm *kvm_s2_mmu_to_kvm(struct kvm_s2_mmu *mmu)
+>>>>  	return container_of(mmu->arch, struct kvm, arch);
+>>>>  }
+>>>>  
+>>>> -#define kvm_lpa2_is_enabled()		false
+>>>> +#define kvm_lpa2_is_enabled()		system_supports_lpa2()
+>>>
+>>> Can we use this predicate consistently throughout the KVM code? Looks
+>>> like the rest of this diff is using system_supports_lpa2() directly.
 >>
->> Testing
->> =======
+>> My thinking was that system_supports_lpa2() is an input to KVM's policy to
+>> decide if it is going to use LPA2 (currently that policy is very simple - if the
+>> system supports it, then KVM uses it - but it doesn't have to be that way), and
+>> kvm_lpa2_is_enabled() is how KVM exports its policy decision, so one is an input
+>> and the other is an output.
 >>
->> The addresses were counted with the following:
->>
->>    $ perf report -D | grep -Eo 'EL2|EL1|EL0' | sort | uniq -c
->>
->> Guest kernel only:
->>
->>    $ perf record -e cs_etm//Gk -a -- true
->>      535 EL1
->>        1 EL2
->>
->> Guest user only (only 5 addresses because the guest runs slowly in the
->> model):
->>
->>    $ perf record -e cs_etm//Gu -a -- true
->>      5 EL0
->>
->> Host kernel only:
->>
->>    $  perf record -e cs_etm//Hk -a -- true
->>     3501 EL2
->>
->> Host userspace only:
->>
->>    $  perf record -e cs_etm//Hu -a -- true
->>      408 EL0
->>        1 EL2
->>
->> Signed-off-by: James Clark <james.clark@arm.com>
->> ---
->>   .../coresight/coresight-etm4x-core.c          | 42 ++++++++++++++++---
->>   drivers/hwtracing/coresight/coresight-etm4x.h |  2 +-
->>   drivers/hwtracing/coresight/coresight-priv.h  |  3 ++
->>   3 files changed, 40 insertions(+), 7 deletions(-)
->>
->> diff --git a/drivers/hwtracing/coresight/coresight-etm4x-core.c
->> b/drivers/hwtracing/coresight/coresight-etm4x-core.c
->> index 77b0271ce6eb..292f9da6aeaf 100644
->> --- a/drivers/hwtracing/coresight/coresight-etm4x-core.c
->> +++ b/drivers/hwtracing/coresight/coresight-etm4x-core.c
->> @@ -6,6 +6,7 @@
->>   #include <linux/acpi.h>
->>   #include <linux/bitops.h>
->>   #include <linux/kernel.h>
->> +#include <linux/kvm_host.h>
->>   #include <linux/moduleparam.h>
->>   #include <linux/init.h>
->>   #include <linux/types.h>
->> @@ -271,9 +272,22 @@ static void etm4x_prohibit_trace(struct
->> etmv4_drvdata *drvdata)
->>       /* If the CPU doesn't support FEAT_TRF, nothing to do */
->>       if (!drvdata->trfcr)
->>           return;
->> +    kvm_etm_set_guest_trfcr(0);
->>       cpu_prohibit_trace();
->>   }
->>   +static u64 etm4x_get_kern_user_filter(struct etmv4_drvdata *drvdata)
->> +{
->> +    u64 trfcr = drvdata->trfcr;
->> +
->> +    if (drvdata->config.mode & ETM_MODE_EXCL_KERN)
->> +        trfcr &= ~TRFCR_ELx_ExTRE;
->> +    if (drvdata->config.mode & ETM_MODE_EXCL_USER)
->> +        trfcr &= ~TRFCR_ELx_E0TRE;
->> +
->> +    return trfcr;
->> +}
->> +
->>   /*
->>    * etm4x_allow_trace - Allow CPU tracing in the respective ELs,
->>    * as configured by the drvdata->config.mode for the current
->> @@ -286,18 +300,28 @@ static void etm4x_prohibit_trace(struct
->> etmv4_drvdata *drvdata)
->>    */
->>   static void etm4x_allow_trace(struct etmv4_drvdata *drvdata)
->>   {
->> -    u64 trfcr = drvdata->trfcr;
->> +    u64 trfcr;
->>         /* If the CPU doesn't support FEAT_TRF, nothing to do */
->> -    if (!trfcr)
->> +    if (!drvdata->trfcr)
->>           return;
->>   -    if (drvdata->config.mode & ETM_MODE_EXCL_KERN)
->> -        trfcr &= ~TRFCR_ELx_ExTRE;
->> -    if (drvdata->config.mode & ETM_MODE_EXCL_USER)
->> -        trfcr &= ~TRFCR_ELx_E0TRE;
->> +    if (drvdata->config.mode & ETM_MODE_EXCL_HOST)
->> +        trfcr = drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
->> +    else
->> +        trfcr = etm4x_get_kern_user_filter(drvdata);
->>         write_trfcr(trfcr);
->> +
->> +    /* Set filters for guests and pass to KVM */
->> +    if (drvdata->config.mode & ETM_MODE_EXCL_GUEST)
->> +        trfcr = drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
->> +    else
->> +        trfcr = etm4x_get_kern_user_filter(drvdata);
->> +
->> +    /* TRFCR_EL1 doesn't have CX so mask it out. */
->> +    trfcr &= ~TRFCR_EL2_CX;
+>> It's a lightly held opinion though - I'll make the change if you insist? :)
 > 
-> Here we are using the Guest "Virtual time" for the trace, which could be
-> different from that of the "host" (if the trace covers both). Thus
-> correlating the trace could be difficult if someone wants to do that.
+> <bikeshed>
+> I personally don't find this dichotomy very useful. It could make
+> sense if we used the page table walker for S1 outside of KVM, but
+> that's not the case at the moment.
+> 
+> If there is no plan for such a use case, I'd rather see a single
+> predicate, making the code a bit more readable.
+> </bikeshed>
+
+OK fair enough. I've made this change for the next rev.
+
+> 
+> 	M.
 > 
 
-I don't think it would be difficult, you need to have a perf recording
-from inside the guest anyway to capture the DSO mappings and switch
-events. So that recording would have the guest's time conversion event
-in it.
-
-It might require a perf change to handle two different time conversion
-packets, or you'd probably just want to use the guest one anyway which
-might already work. I haven't really tested it in that much detail.
-
-> We could switch to using Physical time, for the guest trace always,
-> matching the host time for correlating the events. (Assuming we are not
-> a Guest Hypervisor).
-> 
-
-I think Physical time would be less useful, because eventually we want
-to be able to handle things like overlapping mmaps around execs etc so
-we need the virtual time.
-
-Physical time is only good for ordering events, and the virtual time can
-do that too.
-
-One thing that we might want to do is make TRFCR_ELx_TS_VIRTUAL
-configurable via a config option if you want to be able to correlate
-host and guest trace together with physical time. But I think that would
-be an extra change because it's already hard coded to on, and you can
-already trace nVHE guests. We should probably keep this change just
-about the filtering only.
-
-> Rest looks fine to me.
-> 
->> +    kvm_etm_set_guest_trfcr(trfcr);
->>   }
->>     #ifdef CONFIG_ETM4X_IMPDEF_FEATURE
->> @@ -655,6 +679,12 @@ static int etm4_parse_event_config(struct
->> coresight_device *csdev,
->>       if (attr->exclude_user)
->>           config->mode = ETM_MODE_EXCL_USER;
->>   +    if (attr->exclude_host)
->> +        config->mode |= ETM_MODE_EXCL_HOST;
->> +
->> +    if (attr->exclude_guest)
->> +        config->mode |= ETM_MODE_EXCL_GUEST;
->> +
->>       /* Always start from the default config */
->>       etm4_set_default_config(config);
->>   diff --git a/drivers/hwtracing/coresight/coresight-etm4x.h
->> b/drivers/hwtracing/coresight/coresight-etm4x.h
->> index 20e2e4cb7614..3f170599822f 100644
->> --- a/drivers/hwtracing/coresight/coresight-etm4x.h
->> +++ b/drivers/hwtracing/coresight/coresight-etm4x.h
->> @@ -841,7 +841,7 @@ enum etm_impdef_type {
->>    * @s_ex_level: Secure ELs where tracing is supported.
->>    */
->>   struct etmv4_config {
->> -    u32                mode;
->> +    u64                mode;
->>       u32                pe_sel;
->>       u32                cfg;
->>       u32                eventctrl0;
->> diff --git a/drivers/hwtracing/coresight/coresight-priv.h
->> b/drivers/hwtracing/coresight/coresight-priv.h
->> index 767076e07970..727dd27ba800 100644
->> --- a/drivers/hwtracing/coresight/coresight-priv.h
->> +++ b/drivers/hwtracing/coresight/coresight-priv.h
->> @@ -39,6 +39,9 @@
->>     #define ETM_MODE_EXCL_KERN    BIT(30)
->>   #define ETM_MODE_EXCL_USER    BIT(31)
->> +#define ETM_MODE_EXCL_HOST    BIT(32)
->> +#define ETM_MODE_EXCL_GUEST    BIT(33)
->> +
-> 
-> nit: Some day, we should move to using the "event->attrs" directly, than
-> translating them to these values.
-> 
-
-Yeah we could do that, that would be a good cleanup.
-
-> Suzuki
-> 
-> 
