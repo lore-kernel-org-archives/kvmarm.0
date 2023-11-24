@@ -1,55 +1,56 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFF9139FE1
-	for <kvmarm@lists.linux.dev>; Fri, 24 Nov 2023 18:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A498938DE8
+	for <kvmarm@lists.linux.dev>; Fri, 24 Nov 2023 19:35:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QQBbodFD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i15yLu+s"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700849690;
+	s=mimecast20190719; t=1700854554;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Zm7npic6hpdnvYBc9CxZ2JM6kBkxKJfDj7QUHeYYNcE=;
-	b=QQBbodFDJZmL+jEa6RWdJHlcrMj96sKcP3aNfpqup+uuIkRgic7vMUcsgj/0CV4YE09KkI
-	IgXUlSoV6J45Vi/8SIzGKHAJ9aEEDIn/fRXJQSRjXc9Hv7mu41KpaNq8JhVhztlHqK4lsA
-	0qxMgReHe1YaorNaiVPd/eby4aSHpCw=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=WpgGA1S9tEUCceeDcgeme0U/Hx75ujMCHkDsInmVnz8=;
+	b=i15yLu+sDocTRdMoyLvFd33i8tAJvhtb4/yAOKzxgFUgll3YPZfq2q5C3JW4V6qJ8QYLOO
+	3wkZvDZQ2QZke//PmHfPQOyE7y6XWwILXVnuZ/sRMc0wmk4KRSKD+FDJm1v8fw9mTVy5Ca
+	6gkmK+RypQ/Y9jvXYZpOLURe9gkMRu0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-170-Y_1inLoYMAeX_kyAAbQcTA-1; Fri, 24 Nov 2023 13:14:49 -0500
-X-MC-Unique: Y_1inLoYMAeX_kyAAbQcTA-1
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3b83ced372aso1963354b6e.2
-        for <kvmarm@lists.linux.dev>; Fri, 24 Nov 2023 10:14:48 -0800 (PST)
+ us-mta-168-7xnfzr7xOh6Yu-HrTn5T7A-1; Fri, 24 Nov 2023 14:35:51 -0500
+X-MC-Unique: 7xnfzr7xOh6Yu-HrTn5T7A-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-32f8371247fso1216931f8f.2
+        for <kvmarm@lists.linux.dev>; Fri, 24 Nov 2023 11:35:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700849688; x=1701454488;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zm7npic6hpdnvYBc9CxZ2JM6kBkxKJfDj7QUHeYYNcE=;
-        b=fDFO6Bn9QEZawojOHehKGK7lRF6ffww7+IAqQ/5Se+2xhdkirKWOWhQ/qZt02m+tPK
-         VUjUM1P+9D1gMggVjOA+k2KGRzllCckEqd4Hy0WtpCunIoMikES9/gpR+uM4dWOhOWew
-         iiA7uRIS2hmdHpDZgVoTRRQiyumjlrTZKhtlAGeEUbokxUYh9p3K3cwqMZJRBq3LDD+G
-         0y5gw7lrnPgZo19neV58DK5UsiYrLM3AhF8biECB/dyS/h5UHwnhn5riAhHOX4ohGlXG
-         EOdyXwrPh5Hg9DcEHHh5OnD7G+DxMHIZg8whilB4a+18y+BRakvkxJCWrAJfKLuK9dLF
-         Y8Yw==
-X-Gm-Message-State: AOJu0YzvLjMNDFLlEorl7hBcBkM5+5tb603XbsWdngSz2JngZM2qGvwF
-	fcuErJY0bf/BIiVtlcf35rIAHCl2WZjBkV8aaWpg9cDE8n6BSo5krmb4vw9tdWXQgTodB9ZIzTg
-	89SZReVVbILGQ2YA9
-X-Received: by 2002:a05:6808:1798:b0:3b8:44dc:7ce0 with SMTP id bg24-20020a056808179800b003b844dc7ce0mr4687194oib.2.1700849688351;
-        Fri, 24 Nov 2023 10:14:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEtGmM2eM47HzlOguDVKmn1lCm5hyLxe/kX5JAo4GtREYdwQJDRCUdA9WBI3RJNGHQMpo+kSQ==
-X-Received: by 2002:a05:6808:1798:b0:3b8:44dc:7ce0 with SMTP id bg24-20020a056808179800b003b844dc7ce0mr4687174oib.2.1700849688025;
-        Fri, 24 Nov 2023 10:14:48 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id cz9-20020a056214088900b0067a225ab63esm141629qvb.84.2023.11.24.10.14.44
+        d=1e100.net; s=20230601; t=1700854550; x=1701459350;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WpgGA1S9tEUCceeDcgeme0U/Hx75ujMCHkDsInmVnz8=;
+        b=iNCQHuDsHyoXbHKi+NCyvnXHY8rbQkIZYUyhwHL6WJ1Op0nJd9BqJ+qEpC7oM2VrZ/
+         ZI6WVg3R3s+v0g8simkGHNQL/jxaPk6RYNRyHktpi0gkz06+CWPRdwUrX7qaYBA0OPzE
+         yuBX5uLp6Zf+F6XtkueADIgOk5+zDaBca/vlR8quLa4lGOGIZTa19qjb2zc3yGs5UrcA
+         GNJoPF771O5hibwKcaMegdjHmHh/vYdUMKo09kUOS5KySb1o9muvfS2j0dP4n6JPW3S6
+         c/RMkscu+BSzEf27ISFqAuBUAiZp4LMc59vSunmACPcSomze+35kLmcljtAEI9BOhykV
+         hkbw==
+X-Gm-Message-State: AOJu0YyrJeaolPeSnRtpogSIOOP4lVhKHkf871Fy/wiX5EiRRhJGZVXd
+	wWge5gIWfL4a4rbGJwjzCZghdY5GZVSfT5yJ7OcD59i4jq3ixYVEJJkyijlOM+Ln5NpdAE4BThf
+	mazd+spVAhKOSyRp1
+X-Received: by 2002:a5d:484b:0:b0:331:82c4:929f with SMTP id n11-20020a5d484b000000b0033182c4929fmr2558502wrs.27.1700854550037;
+        Fri, 24 Nov 2023 11:35:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGgpR5xD7cIvx/57aWOuiJdZd42w0gDGPcl6JL7MayZiXmJSxWmriDosq0n4Yf76TvU+Hgk/Q==
+X-Received: by 2002:a5d:484b:0:b0:331:82c4:929f with SMTP id n11-20020a5d484b000000b0033182c4929fmr2558467wrs.27.1700854549666;
+        Fri, 24 Nov 2023 11:35:49 -0800 (PST)
+Received: from ?IPV6:2003:cb:c721:a000:7426:f6b4:82a3:c6ab? (p200300cbc721a0007426f6b482a3c6ab.dip0.t-ipconnect.de. [2003:cb:c721:a000:7426:f6b4:82a3:c6ab])
+        by smtp.gmail.com with ESMTPSA id r5-20020a5d4985000000b00332d3b89561sm1764366wrq.97.2023.11.24.11.35.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Nov 2023 10:14:46 -0800 (PST)
-Message-ID: <63c97950-2c12-4ee1-b8d1-0794e7603b25@redhat.com>
-Date: Fri, 24 Nov 2023 19:14:43 +0100
+        Fri, 24 Nov 2023 11:35:49 -0800 (PST)
+Message-ID: <dadc9d17-f311-47f1-a264-28b42bed0ab0@redhat.com>
+Date: Fri, 24 Nov 2023 20:35:47 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,347 +58,91 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/3] KVM: selftests: aarch64: Make the
- [create|destroy]_vpmu_vm() can be reused
-To: Shaoqin Huang <shahuang@redhat.com>, Oliver Upton
- <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
- kvmarm@lists.linux.dev
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <20231123063750.2176250-1-shahuang@redhat.com>
- <20231123063750.2176250-2-shahuang@redhat.com>
-From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <20231123063750.2176250-2-shahuang@redhat.com>
+Subject: Re: [PATCH RFC v2 05/27] mm: page_alloc: Add an arch hook to allow
+ prep_new_page() to fail
+To: Alexandru Elisei <alexandru.elisei@arm.com>, catalin.marinas@arm.com,
+ will@kernel.org, oliver.upton@linux.dev, maz@kernel.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ arnd@arndb.de, akpm@linux-foundation.org, mingo@redhat.com,
+ peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+ mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com,
+ mhiramat@kernel.org, rppt@kernel.org, hughd@google.com
+Cc: pcc@google.com, steven.price@arm.com, anshuman.khandual@arm.com,
+ vincenzo.frascino@arm.com, eugenis@google.com, kcc@google.com,
+ hyesoo.yu@samsung.com, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
+References: <20231119165721.9849-1-alexandru.elisei@arm.com>
+ <20231119165721.9849-6-alexandru.elisei@arm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20231119165721.9849-6-alexandru.elisei@arm.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Shaoqin,
+On 19.11.23 17:56, Alexandru Elisei wrote:
+> Introduce arch_prep_new_page(), which will be used by arm64 to reserve tag
+> storage for an allocated page. Reserving tag storage can fail, for example,
+> if the tag storage page has a short pin on it, so allow prep_new_page() ->
+> arch_prep_new_page() to similarly fail.
 
-On 11/23/23 07:37, Shaoqin Huang wrote:
-> Move the [create|destroy]_vpmu_vm() into the lib/, which makes those
-some wording suggestions below:
+But what are the side-effects of this? How does the calling code recover?
 
-Move the implementation of .. into lib/aarch64/pmu.c and export their
-declaration in a header so that they can be reused by other tests. Also
-the title may be renamed: Make [create|destroy]_vpmu_vm() public
-> function can be used by other tests. Install the handler is specific to
-the sync exception handler install is test specific so we move it out of
-the helper function.
-> the vpmu_counter_access test, so create a wrapper function for it, and
-> only move the common part.
-> 
-> No functional change.
-intended ;-)
-> 
-> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
-> ---
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../kvm/aarch64/vpmu_counter_access.c         | 100 +++++-------------
->  .../selftests/kvm/include/aarch64/vpmu.h      |  16 +++
->  .../testing/selftests/kvm/lib/aarch64/vpmu.c  |  64 +++++++++++
->  4 files changed, 105 insertions(+), 76 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/include/aarch64/vpmu.h
->  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vpmu.c
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index a5963ab9215b..b60852c222ac 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -57,6 +57,7 @@ LIBKVM_aarch64 += lib/aarch64/processor.c
->  LIBKVM_aarch64 += lib/aarch64/spinlock.c
->  LIBKVM_aarch64 += lib/aarch64/ucall.c
->  LIBKVM_aarch64 += lib/aarch64/vgic.c
-> +LIBKVM_aarch64 += lib/aarch64/vpmu.c
->  
->  LIBKVM_s390x += lib/s390x/diag318_test_handler.c
->  LIBKVM_s390x += lib/s390x/processor.c
-> diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> index 5ea78986e665..17305408a334 100644
-> --- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> +++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> @@ -16,6 +16,7 @@
->  #include <processor.h>
->  #include <test_util.h>
->  #include <vgic.h>
-> +#include <vpmu.h>
->  #include <perf/arm_pmuv3.h>
->  #include <linux/bitfield.h>
->  
-> @@ -25,13 +26,7 @@
->  /* The cycle counter bit position that's common among the PMU registers */
->  #define ARMV8_PMU_CYCLE_IDX		31
->  
-> -struct vpmu_vm {
-> -	struct kvm_vm *vm;
-> -	struct kvm_vcpu *vcpu;
-> -	int gic_fd;
-> -};
-> -
-> -static struct vpmu_vm vpmu_vm;
-> +static struct vpmu_vm *vpmu_vm;
->  
->  struct pmreg_sets {
->  	uint64_t set_reg_id;
-> @@ -421,64 +416,6 @@ static void guest_code(uint64_t expected_pmcr_n)
->  	GUEST_DONE();
->  }
->  
-> -#define GICD_BASE_GPA	0x8000000ULL
-> -#define GICR_BASE_GPA	0x80A0000ULL
-> -
-> -/* Create a VM that has one vCPU with PMUv3 configured. */
-> -static void create_vpmu_vm(void *guest_code)
-> -{
-> -	struct kvm_vcpu_init init;
-> -	uint8_t pmuver, ec;
-> -	uint64_t dfr0, irq = 23;
-> -	struct kvm_device_attr irq_attr = {
-> -		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-> -		.attr = KVM_ARM_VCPU_PMU_V3_IRQ,
-> -		.addr = (uint64_t)&irq,
-> -	};
-> -	struct kvm_device_attr init_attr = {
-> -		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-> -		.attr = KVM_ARM_VCPU_PMU_V3_INIT,
-> -	};
-> -
-> -	/* The test creates the vpmu_vm multiple times. Ensure a clean state */
-> -	memset(&vpmu_vm, 0, sizeof(vpmu_vm));
-> -
-> -	vpmu_vm.vm = vm_create(1);
-> -	vm_init_descriptor_tables(vpmu_vm.vm);
-> -	for (ec = 0; ec < ESR_EC_NUM; ec++) {
-> -		vm_install_sync_handler(vpmu_vm.vm, VECTOR_SYNC_CURRENT, ec,
-> -					guest_sync_handler);
-> -	}
-> -
-> -	/* Create vCPU with PMUv3 */
-> -	vm_ioctl(vpmu_vm.vm, KVM_ARM_PREFERRED_TARGET, &init);
-> -	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
-> -	vpmu_vm.vcpu = aarch64_vcpu_add(vpmu_vm.vm, 0, &init, guest_code);
-> -	vcpu_init_descriptor_tables(vpmu_vm.vcpu);
-> -	vpmu_vm.gic_fd = vgic_v3_setup(vpmu_vm.vm, 1, 64,
-> -					GICD_BASE_GPA, GICR_BASE_GPA);
-> -	__TEST_REQUIRE(vpmu_vm.gic_fd >= 0,
-> -		       "Failed to create vgic-v3, skipping");
-> -
-> -	/* Make sure that PMUv3 support is indicated in the ID register */
-> -	vcpu_get_reg(vpmu_vm.vcpu,
-> -		     KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &dfr0);
-> -	pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), dfr0);
-> -	TEST_ASSERT(pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF &&
-> -		    pmuver >= ID_AA64DFR0_EL1_PMUVer_IMP,
-> -		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
-> -
-> -	/* Initialize vPMU */
-> -	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
-> -	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
-> -}
-> -
-> -static void destroy_vpmu_vm(void)
-> -{
-> -	close(vpmu_vm.gic_fd);
-> -	kvm_vm_free(vpmu_vm.vm);
-> -}
-> -
->  static void run_vcpu(struct kvm_vcpu *vcpu, uint64_t pmcr_n)
->  {
->  	struct ucall uc;
-> @@ -497,13 +434,24 @@ static void run_vcpu(struct kvm_vcpu *vcpu, uint64_t pmcr_n)
->  	}
->  }
->  
-> +static void create_vpmu_vm_with_handler(void *guest_code)
-> +{
-> +	uint8_t ec;
-> +	vpmu_vm = create_vpmu_vm(guest_code);
-> +
-> +	for (ec = 0; ec < ESR_EC_NUM; ec++) {
-> +		vm_install_sync_handler(vpmu_vm->vm, VECTOR_SYNC_CURRENT, ec,
-> +					guest_sync_handler);
-> +	}
-> +}
-> +
->  static void test_create_vpmu_vm_with_pmcr_n(uint64_t pmcr_n, bool expect_fail)
->  {
->  	struct kvm_vcpu *vcpu;
->  	uint64_t pmcr, pmcr_orig;
->  
-> -	create_vpmu_vm(guest_code);
-> -	vcpu = vpmu_vm.vcpu;
-> +	create_vpmu_vm_with_handler(guest_code);
-> +	vcpu = vpmu_vm->vcpu;
->  
->  	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr_orig);
->  	pmcr = pmcr_orig;
-> @@ -539,7 +487,7 @@ static void run_access_test(uint64_t pmcr_n)
->  	pr_debug("Test with pmcr_n %lu\n", pmcr_n);
->  
->  	test_create_vpmu_vm_with_pmcr_n(pmcr_n, false);
-> -	vcpu = vpmu_vm.vcpu;
-> +	vcpu = vpmu_vm->vcpu;
->  
->  	/* Save the initial sp to restore them later to run the guest again */
->  	vcpu_get_reg(vcpu, ARM64_CORE_REG(sp_el1), &sp);
-> @@ -550,7 +498,7 @@ static void run_access_test(uint64_t pmcr_n)
->  	 * Reset and re-initialize the vCPU, and run the guest code again to
->  	 * check if PMCR_EL0.N is preserved.
->  	 */
-> -	vm_ioctl(vpmu_vm.vm, KVM_ARM_PREFERRED_TARGET, &init);
-> +	vm_ioctl(vpmu_vm->vm, KVM_ARM_PREFERRED_TARGET, &init);
->  	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
->  	aarch64_vcpu_setup(vcpu, &init);
->  	vcpu_init_descriptor_tables(vcpu);
-> @@ -559,7 +507,7 @@ static void run_access_test(uint64_t pmcr_n)
->  
->  	run_vcpu(vcpu, pmcr_n);
->  
-> -	destroy_vpmu_vm();
-> +	destroy_vpmu_vm(vpmu_vm);
->  }
->  
->  static struct pmreg_sets validity_check_reg_sets[] = {
-> @@ -580,7 +528,7 @@ static void run_pmregs_validity_test(uint64_t pmcr_n)
->  	uint64_t valid_counters_mask, max_counters_mask;
->  
->  	test_create_vpmu_vm_with_pmcr_n(pmcr_n, false);
-> -	vcpu = vpmu_vm.vcpu;
-> +	vcpu = vpmu_vm->vcpu;
->  
->  	valid_counters_mask = get_counters_mask(pmcr_n);
->  	max_counters_mask = get_counters_mask(ARMV8_PMU_MAX_COUNTERS);
-> @@ -621,7 +569,7 @@ static void run_pmregs_validity_test(uint64_t pmcr_n)
->  			    KVM_ARM64_SYS_REG(clr_reg_id), reg_val);
->  	}
->  
-> -	destroy_vpmu_vm();
-> +	destroy_vpmu_vm(vpmu_vm);
->  }
->  
->  /*
-> @@ -634,7 +582,7 @@ static void run_error_test(uint64_t pmcr_n)
->  	pr_debug("Error test with pmcr_n %lu (larger than the host)\n", pmcr_n);
->  
->  	test_create_vpmu_vm_with_pmcr_n(pmcr_n, true);
-> -	destroy_vpmu_vm();
-> +	destroy_vpmu_vm(vpmu_vm);
->  }
->  
->  /*
-> @@ -645,9 +593,9 @@ static uint64_t get_pmcr_n_limit(void)
->  {
->  	uint64_t pmcr;
->  
-> -	create_vpmu_vm(guest_code);
-> -	vcpu_get_reg(vpmu_vm.vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr);
-> -	destroy_vpmu_vm();
-> +	create_vpmu_vm_with_handler(guest_code);
-> +	vcpu_get_reg(vpmu_vm->vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr);
-> +	destroy_vpmu_vm(vpmu_vm);
->  	return get_pmcr_n(pmcr);
->  }
->  
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/vpmu.h b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
-> new file mode 100644
-> index 000000000000..0a56183644ee
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
-> @@ -0,0 +1,16 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +
-> +#include <kvm_util.h>
-> +
-> +#define GICD_BASE_GPA	0x8000000ULL
-> +#define GICR_BASE_GPA	0x80A0000ULL
-> +
-> +struct vpmu_vm {
-> +	struct kvm_vm *vm;
-> +	struct kvm_vcpu *vcpu;
-> +	int gic_fd;
-> +};
-> +
-> +struct vpmu_vm *create_vpmu_vm(void *guest_code);
-> +
-> +void destroy_vpmu_vm(struct vpmu_vm *vpmu_vm);
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/vpmu.c b/tools/testing/selftests/kvm/lib/aarch64/vpmu.c
-> new file mode 100644
-> index 000000000000..b3de8fdc555e
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/vpmu.c
-> @@ -0,0 +1,64 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +#include <kvm_util.h>
-> +#include <processor.h>
-> +#include <test_util.h>
-> +#include <vgic.h>
-> +#include <vpmu.h>
-> +#include <perf/arm_pmuv3.h>
-> +
-> +/* Create a VM that has one vCPU with PMUv3 configured. */
-> +struct vpmu_vm *create_vpmu_vm(void *guest_code)
-> +{
-> +	struct kvm_vcpu_init init;
-> +	uint8_t pmuver;
-> +	uint64_t dfr0, irq = 23;
-> +	struct kvm_device_attr irq_attr = {
-> +		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-> +		.attr = KVM_ARM_VCPU_PMU_V3_IRQ,
-> +		.addr = (uint64_t)&irq,
-> +	};
-> +	struct kvm_device_attr init_attr = {
-> +		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-> +		.attr = KVM_ARM_VCPU_PMU_V3_INIT,
-> +	};
-> +	struct vpmu_vm *vpmu_vm;
-> +
-> +	vpmu_vm = calloc(1, sizeof(*vpmu_vm));
-> +	TEST_ASSERT(vpmu_vm != NULL, "Insufficient Memory");
-> +	memset(vpmu_vm, 0, sizeof(vpmu_vm));
-> +
-> +	vpmu_vm->vm = vm_create(1);
-> +	vm_init_descriptor_tables(vpmu_vm->vm);
-> +
-> +	/* Create vCPU with PMUv3 */
-> +	vm_ioctl(vpmu_vm->vm, KVM_ARM_PREFERRED_TARGET, &init);
-> +	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
-> +	vpmu_vm->vcpu = aarch64_vcpu_add(vpmu_vm->vm, 0, &init, guest_code);
-> +	vcpu_init_descriptor_tables(vpmu_vm->vcpu);
-> +	vpmu_vm->gic_fd = vgic_v3_setup(vpmu_vm->vm, 1, 64,
-> +					GICD_BASE_GPA, GICR_BASE_GPA);
-> +	__TEST_REQUIRE(vpmu_vm->gic_fd >= 0,
-> +		       "Failed to create vgic-v3, skipping");
-> +
-> +	/* Make sure that PMUv3 support is indicated in the ID register */
-> +	vcpu_get_reg(vpmu_vm->vcpu,
-> +		     KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &dfr0);
-> +	pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), dfr0);
-> +	TEST_ASSERT(pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF &&
-> +		    pmuver >= ID_AA64DFR0_EL1_PMUVer_IMP,
-> +		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
-> +
-> +	/* Initialize vPMU */
-> +	vcpu_ioctl(vpmu_vm->vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
-> +	vcpu_ioctl(vpmu_vm->vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
-> +
-> +	return vpmu_vm;
-> +}
-> +
-> +void destroy_vpmu_vm(struct vpmu_vm *vpmu_vm)
-> +{
-> +	close(vpmu_vm->gic_fd);
-> +	kvm_vm_free(vpmu_vm->vm);
-> +	free(vpmu_vm);
-> +}
-Besides looks good to me
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+E.g., what if we need to populate a page into user space, but that 
+particular page we allocated fails to be prepared? So we inject a signal 
+into that poor process?
 
-Eric
+-- 
+Cheers,
 
+David / dhildenb
 
