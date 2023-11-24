@@ -1,56 +1,56 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A498938DE8
-	for <kvmarm@lists.linux.dev>; Fri, 24 Nov 2023 19:35:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520AA381A2
+	for <kvmarm@lists.linux.dev>; Fri, 24 Nov 2023 19:37:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i15yLu+s"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G1pDCi1l"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700854554;
+	s=mimecast20190719; t=1700854619;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=WpgGA1S9tEUCceeDcgeme0U/Hx75ujMCHkDsInmVnz8=;
-	b=i15yLu+sDocTRdMoyLvFd33i8tAJvhtb4/yAOKzxgFUgll3YPZfq2q5C3JW4V6qJ8QYLOO
-	3wkZvDZQ2QZke//PmHfPQOyE7y6XWwILXVnuZ/sRMc0wmk4KRSKD+FDJm1v8fw9mTVy5Ca
-	6gkmK+RypQ/Y9jvXYZpOLURe9gkMRu0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=yhz7X34rtir/QI6I24qRvGRWw3KId1ROlCi2joxVTvo=;
+	b=G1pDCi1lEcU2REqnCTnE7SsJK/FesiR5rqBcz6SChxJncp/Z1tEn4Ft3qx0h16dqdXEUb4
+	Mkjl1SE18ZzLZvt1L7asXOLaVXVbnFjFq4xUjauWvJabQqWNmTFS0Fd9tXQA37hsjQwcst
+	qwr3hiVol5E+mBlGUWaVDQy86QY9mxY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-168-7xnfzr7xOh6Yu-HrTn5T7A-1; Fri, 24 Nov 2023 14:35:51 -0500
-X-MC-Unique: 7xnfzr7xOh6Yu-HrTn5T7A-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-32f8371247fso1216931f8f.2
-        for <kvmarm@lists.linux.dev>; Fri, 24 Nov 2023 11:35:51 -0800 (PST)
+ us-mta-364-uC_PfP6CNQiRnrN0xvUbxQ-1; Fri, 24 Nov 2023 14:36:55 -0500
+X-MC-Unique: uC_PfP6CNQiRnrN0xvUbxQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-332e344cb3bso1097276f8f.3
+        for <kvmarm@lists.linux.dev>; Fri, 24 Nov 2023 11:36:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700854550; x=1701459350;
+        d=1e100.net; s=20230601; t=1700854614; x=1701459414;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :references:cc:to:content-language:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WpgGA1S9tEUCceeDcgeme0U/Hx75ujMCHkDsInmVnz8=;
-        b=iNCQHuDsHyoXbHKi+NCyvnXHY8rbQkIZYUyhwHL6WJ1Op0nJd9BqJ+qEpC7oM2VrZ/
-         ZI6WVg3R3s+v0g8simkGHNQL/jxaPk6RYNRyHktpi0gkz06+CWPRdwUrX7qaYBA0OPzE
-         yuBX5uLp6Zf+F6XtkueADIgOk5+zDaBca/vlR8quLa4lGOGIZTa19qjb2zc3yGs5UrcA
-         GNJoPF771O5hibwKcaMegdjHmHh/vYdUMKo09kUOS5KySb1o9muvfS2j0dP4n6JPW3S6
-         c/RMkscu+BSzEf27ISFqAuBUAiZp4LMc59vSunmACPcSomze+35kLmcljtAEI9BOhykV
-         hkbw==
-X-Gm-Message-State: AOJu0YyrJeaolPeSnRtpogSIOOP4lVhKHkf871Fy/wiX5EiRRhJGZVXd
-	wWge5gIWfL4a4rbGJwjzCZghdY5GZVSfT5yJ7OcD59i4jq3ixYVEJJkyijlOM+Ln5NpdAE4BThf
-	mazd+spVAhKOSyRp1
-X-Received: by 2002:a5d:484b:0:b0:331:82c4:929f with SMTP id n11-20020a5d484b000000b0033182c4929fmr2558502wrs.27.1700854550037;
-        Fri, 24 Nov 2023 11:35:50 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGgpR5xD7cIvx/57aWOuiJdZd42w0gDGPcl6JL7MayZiXmJSxWmriDosq0n4Yf76TvU+Hgk/Q==
-X-Received: by 2002:a5d:484b:0:b0:331:82c4:929f with SMTP id n11-20020a5d484b000000b0033182c4929fmr2558467wrs.27.1700854549666;
-        Fri, 24 Nov 2023 11:35:49 -0800 (PST)
+        bh=yhz7X34rtir/QI6I24qRvGRWw3KId1ROlCi2joxVTvo=;
+        b=IP7eCuAq37aWd7m4uPXQlMh/OXfN3yuSZ3SAzSkkR2frJyI8Vb/TG2uHpQ/60yiWRc
+         euyAoCVv6V4srmAEK+0hUTy8e7kS5jn32H/naDYREQPw47LCUaGVicThnT5hTJkHiQlx
+         w5TjOyeTMBSz//wtjGGO1kS+bTib8sSDHT60Ud8u+VkPYcnWVywq7Ighdulibo49DGTw
+         vgbI6C4kZnbmGS6AZ17n5nTLgnr+OD58+UCQG23+gG+ZRPo5ZaVZgnRdTpLypnCfz/QZ
+         ov2+kQg3Wo2/E+N7fxwqtSSbxQorqnaWw5RUK6wjQjhDgCsmPYtWymrdFQo7YZqIYv5d
+         a5wQ==
+X-Gm-Message-State: AOJu0YygmrhZUBurvx+R4DhrrYn2SoGIokx+Fs1ffJyrVCFwEQFmyx2D
+	9fULjThlZHMgHQoA9QBFZszl1jqGoZiXVpgGn3eSBoCUI1IxtNQ4W9ffrH+2xM1hW0SH49TDu3+
+	KjpUolzc/1Cfj4UbR
+X-Received: by 2002:a05:6000:b8b:b0:332:c699:f7b0 with SMTP id dl11-20020a0560000b8b00b00332c699f7b0mr3529184wrb.31.1700854614558;
+        Fri, 24 Nov 2023 11:36:54 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEtWiibCD3+vrVp4mDgf1cyQncOLRSHqFl89/CuHG7jW1X5In5uJNqN36gsj25aPlrpopXgNQ==
+X-Received: by 2002:a05:6000:b8b:b0:332:c699:f7b0 with SMTP id dl11-20020a0560000b8b00b00332c699f7b0mr3529146wrb.31.1700854614204;
+        Fri, 24 Nov 2023 11:36:54 -0800 (PST)
 Received: from ?IPV6:2003:cb:c721:a000:7426:f6b4:82a3:c6ab? (p200300cbc721a0007426f6b482a3c6ab.dip0.t-ipconnect.de. [2003:cb:c721:a000:7426:f6b4:82a3:c6ab])
-        by smtp.gmail.com with ESMTPSA id r5-20020a5d4985000000b00332d3b89561sm1764366wrq.97.2023.11.24.11.35.47
+        by smtp.gmail.com with ESMTPSA id r5-20020a5d4985000000b00332d3b89561sm1764366wrq.97.2023.11.24.11.36.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Nov 2023 11:35:49 -0800 (PST)
-Message-ID: <dadc9d17-f311-47f1-a264-28b42bed0ab0@redhat.com>
-Date: Fri, 24 Nov 2023 20:35:47 +0100
+        Fri, 24 Nov 2023 11:36:53 -0800 (PST)
+Message-ID: <45466b05-d620-41e5-8a2b-05c420b8fa7b@redhat.com>
+Date: Fri, 24 Nov 2023 20:36:52 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,8 +58,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2 05/27] mm: page_alloc: Add an arch hook to allow
- prep_new_page() to fail
+Subject: Re: [PATCH RFC v2 06/27] mm: page_alloc: Allow an arch to hook early
+ into free_pages_prepare()
 To: Alexandru Elisei <alexandru.elisei@arm.com>, catalin.marinas@arm.com,
  will@kernel.org, oliver.upton@linux.dev, maz@kernel.org,
  james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
@@ -75,7 +75,7 @@ Cc: pcc@google.com, steven.price@arm.com, anshuman.khandual@arm.com,
  linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
  linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
 References: <20231119165721.9849-1-alexandru.elisei@arm.com>
- <20231119165721.9849-6-alexandru.elisei@arm.com>
+ <20231119165721.9849-7-alexandru.elisei@arm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -122,24 +122,20 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20231119165721.9849-6-alexandru.elisei@arm.com>
+In-Reply-To: <20231119165721.9849-7-alexandru.elisei@arm.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 19.11.23 17:56, Alexandru Elisei wrote:
-> Introduce arch_prep_new_page(), which will be used by arm64 to reserve tag
-> storage for an allocated page. Reserving tag storage can fail, for example,
-> if the tag storage page has a short pin on it, so allow prep_new_page() ->
-> arch_prep_new_page() to similarly fail.
+On 19.11.23 17:57, Alexandru Elisei wrote:
+> Add arch_free_pages_prepare() hook that is called before that page flags
+> are cleared. This will be used by arm64 when explicit management of tag
+> storage pages is enabled.
 
-But what are the side-effects of this? How does the calling code recover?
-
-E.g., what if we need to populate a page into user space, but that 
-particular page we allocated fails to be prepared? So we inject a signal 
-into that poor process?
+Can you elaborate a bit what exactly will be done by that code with that 
+information?
 
 -- 
 Cheers,
