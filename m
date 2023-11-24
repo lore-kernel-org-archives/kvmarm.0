@@ -1,159 +1,65 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F8932D7B5
-	for <kvmarm@lists.linux.dev>; Fri, 24 Nov 2023 15:05:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6D67D1063;
-	Fri, 24 Nov 2023 07:05:47 -0800 (PST)
-Received: from [10.57.5.4] (unknown [10.57.5.4])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AB33C3F73F;
-	Fri, 24 Nov 2023 07:04:57 -0800 (PST)
-Message-ID: <ca193620-43a4-80ae-1125-b3d6c27cba22@arm.com>
-Date: Fri, 24 Nov 2023 15:04:56 +0000
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B483733082;
+	Fri, 24 Nov 2023 16:00:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="OHBEux1o"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC6B7C433CA;
+	Fri, 24 Nov 2023 16:00:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1700841615;
+	bh=x4/TLLmjsrOuHHCNtA+3OOqTerComhNMyZEiZV7mtis=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OHBEux1o1xTQtDic6Xsepye/fbD416/qXbpaILLpW4ggSsLinGpmMEL+9bkik3GiB
+	 shSD9tC1YA/2mQ8O3Edw2yROM7xRv+/X0T/9o9PS76jrvIHskGqEUP6N2e0Ik1WKVr
+	 3mIwQzmHbJwraA/7gFQJYsrdlXasqv9eRPOYLXJ4=
+Date: Fri, 24 Nov 2023 16:00:12 +0000
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Kunkun Jiang <jiangkunkun@huawei.com>
+Cc: Sasha Levin <sashal@kernel.org>, stable@vger.kernel.org,
+	Dongli Zhang <dongli.zhang@oracle.com>, kvmarm@lists.linux.dev,
+	wanghaibin.wang@huawei.com, yuzenghui@huawei.com
+Subject: Re: [stable-4.19 PATCH] scsi: virtio_scsi: limit number of hw queues
+ by nr_cpu_ids
+Message-ID: <2023112405-factual-uncut-ba77@gregkh>
+References: <20231109142328.1460-1-jiangkunkun@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v3 4/6] arm64: KVM: Add interface to set guest value for
- TRFCR register
-Content-Language: en-US
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: broonie@kernel.org, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mike Leach <mike.leach@linaro.org>, Leo Yan <leo.yan@linaro.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
- <robh@kernel.org>, Jintack Lim <jintack.lim@linaro.org>,
- Kristina Martsenko <kristina.martsenko@arm.com>,
- Fuad Tabba <tabba@google.com>, Akihiko Odaki <akihiko.odaki@daynix.com>,
- Joey Gouly <joey.gouly@arm.com>, linux-kernel@vger.kernel.org,
- coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, maz@kernel.org
-References: <20231019165510.1966367-1-james.clark@arm.com>
- <20231019165510.1966367-5-james.clark@arm.com>
- <0ebe2a54-8111-4e8e-8afe-3e17ce85fcb9@arm.com>
-From: James Clark <james.clark@arm.com>
-In-Reply-To: <0ebe2a54-8111-4e8e-8afe-3e17ce85fcb9@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231109142328.1460-1-jiangkunkun@huawei.com>
 
+On Thu, Nov 09, 2023 at 10:23:28PM +0800, Kunkun Jiang wrote:
+> From: Dongli Zhang <dongli.zhang@oracle.com>
+> 
+> [ Upstream commit 1978f30a87732d4d9072a20abeded9fe17884f1b ]
+> 
+> When tag_set->nr_maps is 1, the block layer limits the number of hw queues
+> by nr_cpu_ids. No matter how many hw queues are used by virtio-scsi, as it
+> has (tag_set->nr_maps == 1), it can use at most nr_cpu_ids hw queues.
+> 
+> In addition, specifically for pci scenario, when the 'num_queues' specified
+> by qemu is more than maxcpus, virtio-scsi would not be able to allocate
+> more than maxcpus vectors in order to have a vector for each queue. As a
+> result, it falls back into MSI-X with one vector for config and one shared
+> for queues.
+> 
+> Considering above reasons, this patch limits the number of hw queues used
+> by virtio-scsi by nr_cpu_ids.
+> 
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+> ---
+>  drivers/scsi/virtio_scsi.c | 1 +
+>  1 file changed, 1 insertion(+)
 
+Both now queued up, thanks.
 
-On 16/11/2023 19:26, Suzuki K Poulose wrote:
-> On 19/10/2023 17:55, James Clark wrote:
->> Add an interface for the Coresight driver to use to set the value of the
->> TRFCR register for the guest. This register controls the exclude
->> settings for trace at different exception levels, and is used to honor
->> the exclude_host and exclude_guest parameters from the Perf session.
->> This will be used to later write TRFCR_EL1 on nVHE at guest switch. For
->> VHE, the host trace is controlled by TRFCR_EL2 and thus we can write to
->> the TRFCR_EL1 immediately. Because guest writes to the register are
->> trapped, the value will persist and can't be modified.
-> 
-> This could also be added below to make it easier for the code reader.
-> 
->>
->> The settings must be copied to the vCPU before each run in the same
->> way that PMU events are, because the per-cpu struct isn't accessible in
->> protected mode.
->>
->> Signed-off-by: James Clark <james.clark@arm.com>
->> ---
->>   arch/arm64/include/asm/kvm_host.h |  3 +++
->>   arch/arm64/kvm/arm.c              |  1 +
->>   arch/arm64/kvm/debug.c            | 26 ++++++++++++++++++++++++++
->>   3 files changed, 30 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/kvm_host.h
->> b/arch/arm64/include/asm/kvm_host.h
->> index 0f0bf8e641bd..e1852102550d 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -1125,6 +1125,8 @@ void kvm_arch_vcpu_put_debug_state_flags(struct
->> kvm_vcpu *vcpu);
->>   void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
->>   void kvm_clr_pmu_events(u32 clr);
->>   bool kvm_set_pmuserenr(u64 val);
->> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest);
->> +void kvm_etm_update_vcpu_events(struct kvm_vcpu *vcpu);
->>   #else
->>   static inline void kvm_set_pmu_events(u32 set, struct
->> perf_event_attr *attr) {}
->>   static inline void kvm_clr_pmu_events(u32 clr) {}
->> @@ -1132,6 +1134,7 @@ static inline bool kvm_set_pmuserenr(u64 val)
->>   {
->>       return false;
->>   }
->> +static inline void kvm_etm_set_guest_trfcr(u64 trfcr_guest) {}
->>   #endif
->>     void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu);
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 0f717b6a9151..e4d846f2f665 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -1015,6 +1015,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->>           kvm_vgic_flush_hwstate(vcpu);
->>             kvm_pmu_update_vcpu_events(vcpu);
->> +        kvm_etm_update_vcpu_events(vcpu);
->>             /*
->>            * Ensure we set mode to IN_GUEST_MODE after we disable
->> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
->> index 20cdd40b3c42..2ab41b954512 100644
->> --- a/arch/arm64/kvm/debug.c
->> +++ b/arch/arm64/kvm/debug.c
->> @@ -23,6 +23,12 @@
->>     static DEFINE_PER_CPU(u64, mdcr_el2);
->>   +/*
->> + * Per CPU value for TRFCR that should be applied to any guest vcpu
->> that may
->> + * run on that core in the future.
->> + */
->> +static DEFINE_PER_CPU(u64, guest_trfcr);
->> +
->>   /**
->>    * save/restore_guest_debug_regs
->>    *
->> @@ -356,3 +362,23 @@ void kvm_arch_vcpu_put_debug_state_flags(struct
->> kvm_vcpu *vcpu)
->>       vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
->>       vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
->>   }
->> +
-> 
-> The comment in the description could be helpful here.
-> 
-
-Yep I agree, I'll add it.
-
->> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest)
->> +{
->> +    if (has_vhe())
->> +        write_sysreg_s(trfcr_guest, SYS_TRFCR_EL12);
->> +    else
->> +        *this_cpu_ptr(&guest_trfcr) = trfcr_guest;
->> +}
->> +EXPORT_SYMBOL_GPL(kvm_etm_set_guest_trfcr);
->> +
->> +/*
->> + * Updates the vcpu's view of the etm events for this cpu. Must be
->> + * called before every vcpu run after disabling interrupts, to ensure
->> + * that an interrupt cannot fire and update the structure.
->> + */
->> +void kvm_etm_update_vcpu_events(struct kvm_vcpu *vcpu)
->> +{
->> +    if (!has_vhe() && vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRFCR))
->> +        ctxt_sys_reg(&vcpu->arch.ctxt, TRFCR_EL1) =
->> *this_cpu_ptr(&guest_trfcr);
->> +}
-> 
-> Either way,
-> 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
+greg k-h
