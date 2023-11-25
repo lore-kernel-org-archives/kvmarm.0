@@ -1,112 +1,94 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C944CCA4A;
-	Sat, 25 Nov 2023 10:03:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1611D539F;
+	Sat, 25 Nov 2023 12:02:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jJr6hJe4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51C7FC433C7;
-	Sat, 25 Nov 2023 10:03:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="diLxf7zo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDF71C433C7;
+	Sat, 25 Nov 2023 12:02:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700906622;
-	bh=p2Y9N2XAI98q4rgvMYuaA64L0HRfC61PSCaNKkKNa08=;
+	s=k20201202; t=1700913772;
+	bh=tuP3mnsyjalSFkRoYilZotwb2CTmKBTRrdYxee7FyEU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jJr6hJe4kA/IFAUVu+a8cU5PwRzwHnpFw+BVZV7Eazw1jADD5q48cknChA+YK0kN8
-	 75wfNkXi0+hrIRRHvA55kPjFOdCjMIbK/Nkk6J8qugNc4KU2N3JpsizBoq9axvSDaa
-	 Ama3nZ62v0b1HOPzmQ34RJS4uA7Q85Cej3G/DZRQQRdtHL0nUXTyRy8I5kixlxPqkN
-	 A3S/bhP9BjywvJGFlYqE0IPpGyVfH/D+4vbA24fxy8h6mvVAKXzhtia7+p/TWtN8Xd
-	 nbnTiXnGyzJuCC696fLSjtzVxsHlbJEVUtDxOz+tdxa2r8pLb7IFNRXfBAm33IfoOR
-	 j2kX5KdSQknKw==
-Date: Sat, 25 Nov 2023 12:03:22 +0200
-From: Mike Rapoport <rppt@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
-	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
-	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
-	hughd@google.com, pcc@google.com, steven.price@arm.com,
-	anshuman.khandual@arm.com, vincenzo.frascino@arm.com,
-	david@redhat.com, eugenis@google.com, kcc@google.com,
-	hyesoo.yu@samsung.com, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC v2 04/27] mm: migrate/mempolicy: Add hook to modify
- migration target gfp
-Message-ID: <20231125100322.GH636165@kernel.org>
-References: <20231119165721.9849-1-alexandru.elisei@arm.com>
- <20231119165721.9849-5-alexandru.elisei@arm.com>
+	b=diLxf7zoZzu/TtTiAEGeGm69Lqim48csQd7BtltmOaYD2RG8p+qiG5DOP5EEitwMZ
+	 4IOBNKkcnNTeg9qr/Weow3vmUlYvtkYy1eFNkWzLnPE7/f7E15JVWJzZOmZpOOCP3l
+	 VYDc8ri5hrWYdfpeQLLTWdJR/4NO4Az3CEaPJnGAU6gK6MAo4Gogk42UooIz8GuA8w
+	 WBXPVwIBcoO4EJcTokwYORM3Wd7E3CsV3uS8wfLicwSx222uEVefKFvlYlUFVmbcIb
+	 +i6ZeuqTRu5KKdT5R14SjAa8nznIMB2NoKcXmuzfK/xmNpnGFGTfOg2CigmxQxPEtq
+	 JSO854vAMR2FQ==
+Date: Sat, 25 Nov 2023 12:02:49 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@linux.ibm.com, catalin.marinas@arm.com,
+	dave.hansen@linux.intel.com, maz@kernel.org, oliver.upton@linux.dev,
+	shuah@kernel.org, will@kernel.org, kvmarm@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v3 05/25] arm64: context switch POR_EL0 register
+Message-ID: <ZWHiaTO6VUzHmbDB@finisterre.sirena.org.uk>
+References: <20231124163510.1835740-1-joey.gouly@arm.com>
+ <20231124163510.1835740-6-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ow+J4bMvxCVXQcLF"
+Content-Disposition: inline
+In-Reply-To: <20231124163510.1835740-6-joey.gouly@arm.com>
+X-Cookie: Slow day.  Practice crawling.
+
+
+--ow+J4bMvxCVXQcLF
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231119165721.9849-5-alexandru.elisei@arm.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Nov 19, 2023 at 04:56:58PM +0000, Alexandru Elisei wrote:
-> It might be desirable for an architecture to modify the gfp flags used to
-> allocate the destination page for migration based on the page that it is
-> being replaced. For example, if an architectures has metadata associated
-> with a page (like arm64, when the memory tagging extension is implemented),
-> it can request that the destination page similarly has storage for tags
-> already allocated.
-> 
-> No functional change.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  include/linux/migrate.h | 4 ++++
->  mm/mempolicy.c          | 2 ++
->  mm/migrate.c            | 3 +++
->  3 files changed, 9 insertions(+)
-> 
-> diff --git a/include/linux/migrate.h b/include/linux/migrate.h
-> index 2ce13e8a309b..0acef592043c 100644
-> --- a/include/linux/migrate.h
-> +++ b/include/linux/migrate.h
-> @@ -60,6 +60,10 @@ struct movable_operations {
->  /* Defined in mm/debug.c: */
->  extern const char *migrate_reason_names[MR_TYPES];
->  
-> +#ifndef arch_migration_target_gfp
-> +#define arch_migration_target_gfp(src, gfp) 0
-> +#endif
-> +
->  #ifdef CONFIG_MIGRATION
->  
->  void putback_movable_pages(struct list_head *l);
-> diff --git a/mm/mempolicy.c b/mm/mempolicy.c
-> index 10a590ee1c89..50bc43ab50d6 100644
-> --- a/mm/mempolicy.c
-> +++ b/mm/mempolicy.c
-> @@ -1182,6 +1182,7 @@ static struct folio *alloc_migration_target_by_mpol(struct folio *src,
->  
->  		h = folio_hstate(src);
->  		gfp = htlb_alloc_mask(h);
-> +		gfp |= arch_migration_target_gfp(src, gfp);
+On Fri, Nov 24, 2023 at 04:34:50PM +0000, Joey Gouly wrote:
 
-I think it'll be more robust to have arch_migration_target_gfp() to modify
-the flags and return the new mask with added (or potentially removed)
-flags.
+> +static void flush_poe(void)
+> +{
+> +	if (system_supports_poe())
+> +		write_sysreg_s(POR_EL0_INIT, SYS_POR_EL0);
+> +}
 
->  		nodemask = policy_nodemask(gfp, pol, ilx, &nid);
->  		return alloc_hugetlb_folio_nodemask(h, nid, nodemask, gfp);
->  	}
-> @@ -1190,6 +1191,7 @@ static struct folio *alloc_migration_target_by_mpol(struct folio *src,
->  		gfp = GFP_TRANSHUGE;
->  	else
->  		gfp = GFP_HIGHUSER_MOVABLE | __GFP_RETRY_MAYFAIL | __GFP_COMP;
-> +	gfp |= arch_migration_target_gfp(src, gfp);
->  
->  	page = alloc_pages_mpol(gfp, order, pol, ilx, nid);
->  	return page_rmappable_folio(page);
+Here we have no isb()...
 
--- 
-Sincerely yours,
-Mike.
+> +static void permission_overlay_switch(struct task_struct *next)
+> +{
+> +	if (system_supports_poe()) {
+> +		current->thread.por_el0 =3D read_sysreg_s(SYS_POR_EL0);
+> +		if (current->thread.por_el0 !=3D next->thread.por_el0) {
+> +			write_sysreg_s(next->thread.por_el0, SYS_POR_EL0);
+> +			isb();
+> +		}
+> +	}
+> +}
+
+=2E..but here we do, I'd expect them to be consistent. =20
+
+If the barrier is needed it'd probably be helpful to have a comment
+explaining why we need it before the ERET.
+
+--ow+J4bMvxCVXQcLF
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmVh4mYACgkQJNaLcl1U
+h9BPiwf7BZimFuxNSYhP3hqXG6y4xu3e8rftssQCYtcNtXnIVlsn/6C7YMdoBuw2
+TV0LvyB1ZLjJRA8D9lBOsGm/MyW/yw15yHRHUYs+F+2+1mr8juEVIt+311HWRl9b
+JgBFfc+5fmzNpHr7xLAkgLY49z+cm0YXSx8NbyAO71UZj/hOyGsTuzVEoflXWKmG
+bmTAK2h5QqW3gRwf/Ty/BE9bCDGp7xLKTZXSdRCZxS+321SCBqIZbalqJ53oePCT
+YqYDr7McCoyhEv9QYhg3hh1+Yeg5ieFylfAQJmMzd8r2MU/zdYAbS8zFmPNPMBKP
+XhIttzUePYRY9o9GJyOLYSjqKkZ9Yg==
+=iEOq
+-----END PGP SIGNATURE-----
+
+--ow+J4bMvxCVXQcLF--
