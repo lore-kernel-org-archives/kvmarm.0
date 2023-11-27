@@ -1,15 +1,15 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8528F19463
-	for <kvmarm@lists.linux.dev>; Mon, 27 Nov 2023 11:18:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5737419454
+	for <kvmarm@lists.linux.dev>; Mon, 27 Nov 2023 11:18:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C567C2F4;
-	Mon, 27 Nov 2023 03:18:59 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8841AC15;
+	Mon, 27 Nov 2023 03:19:01 -0800 (PST)
 Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.26])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AC2A63F73F;
-	Mon, 27 Nov 2023 03:18:10 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6E9543F73F;
+	Mon, 27 Nov 2023 03:18:12 -0800 (PST)
 From: Ryan Roberts <ryan.roberts@arm.com>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
@@ -23,9 +23,9 @@ To: Catalin Marinas <catalin.marinas@arm.com>,
 Cc: Ryan Roberts <ryan.roberts@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: [PATCH v6 11/12] KVM: selftests: arm64: Determine max ipa size per-page size
-Date: Mon, 27 Nov 2023 11:17:36 +0000
-Message-Id: <20231127111737.1897081-12-ryan.roberts@arm.com>
+Subject: [PATCH v6 12/12] KVM: selftests: arm64: Support P52V48 4K and 16K guest_modes
+Date: Mon, 27 Nov 2023 11:17:37 +0000
+Message-Id: <20231127111737.1897081-13-ryan.roberts@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231127111737.1897081-1-ryan.roberts@arm.com>
 References: <20231127111737.1897081-1-ryan.roberts@arm.com>
@@ -37,183 +37,173 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We are about to add 52 bit PA guest modes for 4K and 16K pages when the
-system supports LPA2. In preparation beef up the logic that parses mmfr0
-to also tell us what the maximum supported PA size is for each page
-size. Max PA size = 0 implies the page size is not supported at all.
+Add support for VM_MODE_P52V48_4K and VM_MODE_P52V48_16K guest modes by
+using the FEAT_LPA2 pte format for stage1, when FEAT_LPA2 is available.
 
 Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
 ---
- .../selftests/kvm/include/aarch64/processor.h |  4 +-
- .../selftests/kvm/include/guest_modes.h       |  4 +-
- .../selftests/kvm/lib/aarch64/processor.c     | 30 ++++++++++--
- tools/testing/selftests/kvm/lib/guest_modes.c | 48 ++++++++-----------
- 4 files changed, 50 insertions(+), 36 deletions(-)
+ .../selftests/kvm/include/kvm_util_base.h     |  1 +
+ .../selftests/kvm/lib/aarch64/processor.c     | 39 ++++++++++++++-----
+ tools/testing/selftests/kvm/lib/guest_modes.c |  2 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  3 ++
+ 4 files changed, 36 insertions(+), 9 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index c42d683102c7..cf20e44e86f2 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -119,8 +119,8 @@ enum {
- /* Access flag update enable/disable */
- #define TCR_EL1_HA		(1ULL << 39)
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index a18db6a7b3cf..406500fb6e28 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -171,6 +171,7 @@ static inline struct userspace_mem_region *vm_get_mem_region(struct kvm_vm *vm,
  
--void aarch64_get_supported_page_sizes(uint32_t ipa,
--				      bool *ps4k, bool *ps16k, bool *ps64k);
-+void aarch64_get_supported_page_sizes(uint32_t ipa, uint32_t *ipa4k,
-+					uint32_t *ipa16k, uint32_t *ipa64k);
- 
- void vm_init_descriptor_tables(struct kvm_vm *vm);
- void vcpu_init_descriptor_tables(struct kvm_vcpu *vcpu);
-diff --git a/tools/testing/selftests/kvm/include/guest_modes.h b/tools/testing/selftests/kvm/include/guest_modes.h
-index b691df33e64e..63f5167397cc 100644
---- a/tools/testing/selftests/kvm/include/guest_modes.h
-+++ b/tools/testing/selftests/kvm/include/guest_modes.h
-@@ -11,8 +11,8 @@ struct guest_mode {
- 
- extern struct guest_mode guest_modes[NUM_VM_MODES];
- 
--#define guest_mode_append(mode, supported, enabled) ({ \
--	guest_modes[mode] = (struct guest_mode){ supported, enabled }; \
-+#define guest_mode_append(mode, enabled) ({ \
-+	guest_modes[mode] = (struct guest_mode){ (enabled), (enabled) }; \
- })
- 
- void guest_modes_append_default(void);
+ enum vm_guest_mode {
+ 	VM_MODE_P52V48_4K,
++	VM_MODE_P52V48_16K,
+ 	VM_MODE_P52V48_64K,
+ 	VM_MODE_P48V48_4K,
+ 	VM_MODE_P48V48_16K,
 diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 6fe12e985ba5..e6ffd9037c37 100644
+index e6ffd9037c37..41c776b642c0 100644
 --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
 +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -492,12 +492,24 @@ uint32_t guest_get_vcpuid(void)
- 	return read_sysreg(tpidr_el1);
+@@ -12,6 +12,7 @@
+ #include "kvm_util.h"
+ #include "processor.h"
+ #include <linux/bitfield.h>
++#include <linux/sizes.h>
+ 
+ #define DEFAULT_ARM64_GUEST_STACK_VADDR_MIN	0xac0000
+ 
+@@ -58,13 +59,25 @@ static uint64_t pte_index(struct kvm_vm *vm, vm_vaddr_t gva)
+ 	return (gva >> vm->page_shift) & mask;
  }
  
--void aarch64_get_supported_page_sizes(uint32_t ipa,
--				      bool *ps4k, bool *ps16k, bool *ps64k)
-+static uint32_t max_ipa_for_page_size(uint32_t vm_ipa, uint32_t gran,
-+				uint32_t not_sup_val, uint32_t ipa52_min_val)
++static inline bool use_lpa2_pte_format(struct kvm_vm *vm)
 +{
-+	if (gran == not_sup_val)
-+		return 0;
-+	else if (gran >= ipa52_min_val && vm_ipa >= 52)
-+		return 52;
-+	else
-+		return min(vm_ipa, 48U);
++	return (vm->page_size == SZ_4K || vm->page_size == SZ_16K) &&
++	    (vm->pa_bits > 48 || vm->va_bits > 48);
 +}
 +
-+void aarch64_get_supported_page_sizes(uint32_t ipa, uint32_t *ipa4k,
-+					uint32_t *ipa16k, uint32_t *ipa64k)
+ static uint64_t addr_pte(struct kvm_vm *vm, uint64_t pa, uint64_t attrs)
  {
- 	struct kvm_vcpu_init preferred_init;
- 	int kvm_fd, vm_fd, vcpu_fd, err;
- 	uint64_t val;
-+	uint32_t gran;
- 	struct kvm_one_reg reg = {
- 		.id	= KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR0_EL1),
- 		.addr	= (uint64_t)&val,
-@@ -518,9 +530,17 @@ void aarch64_get_supported_page_sizes(uint32_t ipa,
- 	err = ioctl(vcpu_fd, KVM_GET_ONE_REG, &reg);
- 	TEST_ASSERT(err == 0, KVM_IOCTL_ERROR(KVM_GET_ONE_REG, vcpu_fd));
+ 	uint64_t pte;
  
--	*ps4k = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN4), val) != 0xf;
--	*ps64k = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN64), val) == 0;
--	*ps16k = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN16), val) != 0;
-+	gran = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN4), val);
-+	*ipa4k = max_ipa_for_page_size(ipa, gran, ID_AA64MMFR0_EL1_TGRAN4_NI,
-+					ID_AA64MMFR0_EL1_TGRAN4_52_BIT);
-+
-+	gran = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN64), val);
-+	*ipa64k = max_ipa_for_page_size(ipa, gran, ID_AA64MMFR0_EL1_TGRAN64_NI,
-+					ID_AA64MMFR0_EL1_TGRAN64_IMP);
-+
-+	gran = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_EL1_TGRAN16), val);
-+	*ipa16k = max_ipa_for_page_size(ipa, gran, ID_AA64MMFR0_EL1_TGRAN16_NI,
-+					ID_AA64MMFR0_EL1_TGRAN16_52_BIT);
+-	pte = pa & GENMASK(47, vm->page_shift);
+-	if (vm->page_shift == 16)
+-		pte |= FIELD_GET(GENMASK(51, 48), pa) << 12;
++	if (use_lpa2_pte_format(vm)) {
++		pte = pa & GENMASK(49, vm->page_shift);
++		pte |= FIELD_GET(GENMASK(51, 50), pa) << 8;
++		attrs &= ~GENMASK(9, 8);
++	} else {
++		pte = pa & GENMASK(47, vm->page_shift);
++		if (vm->page_shift == 16)
++			pte |= FIELD_GET(GENMASK(51, 48), pa) << 12;
++	}
+ 	pte |= attrs;
  
- 	close(vcpu_fd);
- 	close(vm_fd);
+ 	return pte;
+@@ -74,9 +87,14 @@ static uint64_t pte_addr(struct kvm_vm *vm, uint64_t pte)
+ {
+ 	uint64_t pa;
+ 
+-	pa = pte & GENMASK(47, vm->page_shift);
+-	if (vm->page_shift == 16)
+-		pa |= FIELD_GET(GENMASK(15, 12), pte) << 48;
++	if (use_lpa2_pte_format(vm)) {
++		pa = pte & GENMASK(49, vm->page_shift);
++		pa |= FIELD_GET(GENMASK(9, 8), pte) << 50;
++	} else {
++		pa = pte & GENMASK(47, vm->page_shift);
++		if (vm->page_shift == 16)
++			pa |= FIELD_GET(GENMASK(15, 12), pte) << 48;
++	}
+ 
+ 	return pa;
+ }
+@@ -266,9 +284,6 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
+ 
+ 	/* Configure base granule size */
+ 	switch (vm->mode) {
+-	case VM_MODE_P52V48_4K:
+-		TEST_FAIL("AArch64 does not support 4K sized pages "
+-			  "with 52-bit physical address ranges");
+ 	case VM_MODE_PXXV48_4K:
+ 		TEST_FAIL("AArch64 does not support 4K sized pages "
+ 			  "with ANY-bit physical address ranges");
+@@ -278,12 +293,14 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
+ 	case VM_MODE_P36V48_64K:
+ 		tcr_el1 |= 1ul << 14; /* TG0 = 64KB */
+ 		break;
++	case VM_MODE_P52V48_16K:
+ 	case VM_MODE_P48V48_16K:
+ 	case VM_MODE_P40V48_16K:
+ 	case VM_MODE_P36V48_16K:
+ 	case VM_MODE_P36V47_16K:
+ 		tcr_el1 |= 2ul << 14; /* TG0 = 16KB */
+ 		break;
++	case VM_MODE_P52V48_4K:
+ 	case VM_MODE_P48V48_4K:
+ 	case VM_MODE_P40V48_4K:
+ 	case VM_MODE_P36V48_4K:
+@@ -297,6 +314,8 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
+ 
+ 	/* Configure output size */
+ 	switch (vm->mode) {
++	case VM_MODE_P52V48_4K:
++	case VM_MODE_P52V48_16K:
+ 	case VM_MODE_P52V48_64K:
+ 		tcr_el1 |= 6ul << 32; /* IPS = 52 bits */
+ 		ttbr0_el1 |= FIELD_GET(GENMASK(51, 48), vm->pgd) << 2;
+@@ -325,6 +344,8 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
+ 	/* TCR_EL1 |= IRGN0:WBWA | ORGN0:WBWA | SH0:Inner-Shareable */;
+ 	tcr_el1 |= (1 << 8) | (1 << 10) | (3 << 12);
+ 	tcr_el1 |= (64 - vm->va_bits) /* T0SZ */;
++	if (use_lpa2_pte_format(vm))
++		tcr_el1 |= (1ul << 59) /* DS */;
+ 
+ 	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL1), sctlr_el1);
+ 	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL1), tcr_el1);
 diff --git a/tools/testing/selftests/kvm/lib/guest_modes.c b/tools/testing/selftests/kvm/lib/guest_modes.c
-index 1df3ce4b16fd..772a7dd15db4 100644
+index 772a7dd15db4..b04901e55138 100644
 --- a/tools/testing/selftests/kvm/lib/guest_modes.c
 +++ b/tools/testing/selftests/kvm/lib/guest_modes.c
-@@ -14,37 +14,31 @@ struct guest_mode guest_modes[NUM_VM_MODES];
- void guest_modes_append_default(void)
+@@ -23,6 +23,8 @@ void guest_modes_append_default(void)
+ 
+ 		aarch64_get_supported_page_sizes(limit, &ipa4k, &ipa16k, &ipa64k);
+ 
++		guest_mode_append(VM_MODE_P52V48_4K, ipa4k >= 52);
++		guest_mode_append(VM_MODE_P52V48_16K, ipa16k >= 52);
+ 		guest_mode_append(VM_MODE_P52V48_64K, ipa64k >= 52);
+ 
+ 		guest_mode_append(VM_MODE_P48V48_4K, ipa4k >= 48);
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 7a8af1821f5d..aeba7a23105c 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -148,6 +148,7 @@ const char *vm_guest_mode_string(uint32_t i)
  {
- #ifndef __aarch64__
--	guest_mode_append(VM_MODE_DEFAULT, true, true);
-+	guest_mode_append(VM_MODE_DEFAULT, true);
- #else
- 	{
- 		unsigned int limit = kvm_check_cap(KVM_CAP_ARM_VM_IPA_SIZE);
--		bool ps4k, ps16k, ps64k;
-+		uint32_t ipa4k, ipa16k, ipa64k;
- 		int i;
+ 	static const char * const strings[] = {
+ 		[VM_MODE_P52V48_4K]	= "PA-bits:52,  VA-bits:48,  4K pages",
++		[VM_MODE_P52V48_16K]	= "PA-bits:52,  VA-bits:48, 16K pages",
+ 		[VM_MODE_P52V48_64K]	= "PA-bits:52,  VA-bits:48, 64K pages",
+ 		[VM_MODE_P48V48_4K]	= "PA-bits:48,  VA-bits:48,  4K pages",
+ 		[VM_MODE_P48V48_16K]	= "PA-bits:48,  VA-bits:48, 16K pages",
+@@ -173,6 +174,7 @@ const char *vm_guest_mode_string(uint32_t i)
  
--		aarch64_get_supported_page_sizes(limit, &ps4k, &ps16k, &ps64k);
-+		aarch64_get_supported_page_sizes(limit, &ipa4k, &ipa16k, &ipa64k);
- 
--		vm_mode_default = NUM_VM_MODES;
-+		guest_mode_append(VM_MODE_P52V48_64K, ipa64k >= 52);
- 
--		if (limit >= 52)
--			guest_mode_append(VM_MODE_P52V48_64K, ps64k, ps64k);
--		if (limit >= 48) {
--			guest_mode_append(VM_MODE_P48V48_4K, ps4k, ps4k);
--			guest_mode_append(VM_MODE_P48V48_16K, ps16k, ps16k);
--			guest_mode_append(VM_MODE_P48V48_64K, ps64k, ps64k);
--		}
--		if (limit >= 40) {
--			guest_mode_append(VM_MODE_P40V48_4K, ps4k, ps4k);
--			guest_mode_append(VM_MODE_P40V48_16K, ps16k, ps16k);
--			guest_mode_append(VM_MODE_P40V48_64K, ps64k, ps64k);
--			if (ps4k)
--				vm_mode_default = VM_MODE_P40V48_4K;
--		}
--		if (limit >= 36) {
--			guest_mode_append(VM_MODE_P36V48_4K, ps4k, ps4k);
--			guest_mode_append(VM_MODE_P36V48_16K, ps16k, ps16k);
--			guest_mode_append(VM_MODE_P36V48_64K, ps64k, ps64k);
--			guest_mode_append(VM_MODE_P36V47_16K, ps16k, ps16k);
--		}
-+		guest_mode_append(VM_MODE_P48V48_4K, ipa4k >= 48);
-+		guest_mode_append(VM_MODE_P48V48_16K, ipa16k >= 48);
-+		guest_mode_append(VM_MODE_P48V48_64K, ipa64k >= 48);
-+
-+		guest_mode_append(VM_MODE_P40V48_4K, ipa4k >= 40);
-+		guest_mode_append(VM_MODE_P40V48_16K, ipa16k >= 40);
-+		guest_mode_append(VM_MODE_P40V48_64K, ipa64k >= 40);
-+
-+		guest_mode_append(VM_MODE_P36V48_4K, ipa4k >= 36);
-+		guest_mode_append(VM_MODE_P36V48_16K, ipa16k >= 36);
-+		guest_mode_append(VM_MODE_P36V48_64K, ipa64k >= 36);
-+		guest_mode_append(VM_MODE_P36V47_16K, ipa16k >= 36);
-+
-+		vm_mode_default = ipa4k >= 40 ? VM_MODE_P40V48_4K : NUM_VM_MODES;
- 
- 		/*
- 		 * Pick the first supported IPA size if the default
-@@ -72,7 +66,7 @@ void guest_modes_append_default(void)
- 		close(kvm_fd);
- 		/* Starting with z13 we have 47bits of physical address */
- 		if (info.ibc >= 0x30)
--			guest_mode_append(VM_MODE_P47V64_4K, true, true);
-+			guest_mode_append(VM_MODE_P47V64_4K, true);
- 	}
- #endif
- #ifdef __riscv
-@@ -80,9 +74,9 @@ void guest_modes_append_default(void)
- 		unsigned int sz = kvm_check_cap(KVM_CAP_VM_GPA_BITS);
- 
- 		if (sz >= 52)
--			guest_mode_append(VM_MODE_P52V48_4K, true, true);
-+			guest_mode_append(VM_MODE_P52V48_4K, true);
- 		if (sz >= 48)
--			guest_mode_append(VM_MODE_P48V48_4K, true, true);
-+			guest_mode_append(VM_MODE_P48V48_4K, true);
- 	}
- #endif
- }
+ const struct vm_guest_mode_params vm_guest_mode_params[] = {
+ 	[VM_MODE_P52V48_4K]	= { 52, 48,  0x1000, 12 },
++	[VM_MODE_P52V48_16K]	= { 52, 48,  0x4000, 14 },
+ 	[VM_MODE_P52V48_64K]	= { 52, 48, 0x10000, 16 },
+ 	[VM_MODE_P48V48_4K]	= { 48, 48,  0x1000, 12 },
+ 	[VM_MODE_P48V48_16K]	= { 48, 48,  0x4000, 14 },
+@@ -251,6 +253,7 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode)
+ 	case VM_MODE_P36V48_64K:
+ 		vm->pgtable_levels = 3;
+ 		break;
++	case VM_MODE_P52V48_16K:
+ 	case VM_MODE_P48V48_16K:
+ 	case VM_MODE_P40V48_16K:
+ 	case VM_MODE_P36V48_16K:
 -- 
 2.25.1
 
