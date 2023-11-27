@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F033B101F2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D241A730
 	for <kvmarm@lists.linux.dev>; Mon, 27 Nov 2023 11:46:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IPCRnm7T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C503DC433C9;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CNIbEe26"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8491AC433C7;
 	Mon, 27 Nov 2023 11:46:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1701085569;
-	bh=TsGkexKp8HUOn/B8FDEVImO0nATvBu12UOy6vG/PoGw=;
+	bh=RYnRjoeKOsmLznGa7HZFefYf/HrFe4O9I7VJ66wu7yM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IPCRnm7T9hDe7nKklC3BHITnCk/ndpMFE+k4m1nJPrQ9xW5IWsCORrWHhgxwRStwM
-	 dDAeKpRu9cpVbeOA808dQ6qJgKkzhmf7ORBXL73sAX0o2GEHS4+mnhGl+e5RlMHAQY
-	 I1RB4L8OQMvJuLu2x3P59dbejayfl0+N4X/myMjxZt4wxiNyTUtPZBAiOijuVbcb8P
-	 jAm/mA9VyI2oQNJQnql5Zotq+Nr82VpA6qPICgnlR8+F/mlk8pTTL6OrWh8fAktn76
-	 Fg2fl4IjvP4VIX+Q6y9vKigUFjzqhXfE4tuVe1fh0JJGfOECOEFXIoT7VeGsZPoN+K
-	 QZp/ALMQXI7jg==
+	b=CNIbEe26PWyMwb7I8KmHnduZmNhP11Twb4Bp71ZqUd6GeGX9DvSY3gw1qmVI0r1sl
+	 6kGOdaAeS8xisU9kGpzBZHIheWIW26Vnbzqdj5x/UjoTv07z6jn5qiZVfFodiFdtx7
+	 cKaqKzqN4IWhIw7PwTyTQAzlpfUQ+gz/yy5wUba9Fltme2EpAI3Bv6CHwsHdnvqw8H
+	 JewXryzlhy9ag49kqVStB0pe8PSzvp5nbhe1MYKU1a/jMyOcWWP6+Ot9cVt9siJMQQ
+	 pfR8N/qF7SOchFsKnPNgJmz4opWe3xLFDvMRxhwTvqeyW1PmIQLg6MBShaRGMXREzU
+	 iP447vGcMXe7Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1r7a3z-00GleL-Uj;
-	Mon, 27 Nov 2023 11:46:08 +0000
+	id 1r7a3z-00GleL-Kh;
+	Mon, 27 Nov 2023 11:46:07 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -34,9 +34,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 13/13] KVM: arm64: Force guest's HCR_EL2.E2H RES1 when NV1 is not implemented
-Date: Mon, 27 Nov 2023 11:45:59 +0000
-Message-Id: <20231127114559.990314-14-maz@kernel.org>
+Subject: [PATCH v3 12/13] KVM: arm64: Expose ID_AA64MMFR4_EL1 to guests
+Date: Mon, 27 Nov 2023 11:45:58 +0000
+Message-Id: <20231127114559.990314-13-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231127114559.990314-1-maz@kernel.org>
 References: <20231127114559.990314-1-maz@kernel.org>
@@ -52,61 +52,45 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-If NV1 isn't supported on a system, make sure we always evaluate
-the guest's HCR_EL2.E2H as RES1, irrespective of what the guest
-may have written there.
+We can now expose ID_AA64MMFR4_EL1 to guests, and let NV guests
+understand that they cannot really switch HCR_EL2.E2H to 0 on
+some platforms.
 
 Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h |  3 ++-
- arch/arm64/kvm/sys_regs.c            | 12 +++++++++++-
- 2 files changed, 13 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/nested.c   | 4 ++++
+ arch/arm64/kvm/sys_regs.c | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 78a550537b67..7b10a44189d0 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -213,7 +213,8 @@ static inline bool vcpu_is_el2(const struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 042695a210ce..3885f1c93979 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -137,6 +137,10 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+ 		val |= FIELD_PREP(NV_FTR(MMFR2, TTL), 0b0001);
+ 		break;
  
- static inline bool __vcpu_el2_e2h_is_set(const struct kvm_cpu_context *ctxt)
- {
--	return ctxt_sys_reg(ctxt, HCR_EL2) & HCR_E2H;
-+	return (cpus_have_final_cap(ARM64_HCR_NV1_RES0) ||
-+		(ctxt_sys_reg(ctxt, HCR_EL2) & HCR_E2H));
- }
- 
- static inline bool vcpu_el2_e2h_is_set(const struct kvm_vcpu *vcpu)
++	case SYS_ID_AA64MMFR4_EL1:
++		val &= NV_FTR(MMFR4, E2H0);
++		break;
++
+ 	case SYS_ID_AA64DFR0_EL1:
+ 		/* Only limited support for PMU, Debug, BPs and WPs */
+ 		val &= (NV_FTR(DFR0, PMUVer)	|
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index ff2e66f0bda1..9e1e3da2ed4a 100644
+index 9f76f24b96f8..ff2e66f0bda1 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2022,6 +2022,16 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
- 	return true;
- }
- 
-+static u64 reset_hcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-+{
-+	u64 val = r->val;
-+
-+	if (cpus_have_final_cap(ARM64_HCR_NV1_RES0))
-+		val |= HCR_E2H;
-+
-+	return __vcpu_sys_reg(vcpu, r->reg) = val;
-+}
-+
- /*
-  * Architected system registers.
-  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-@@ -2513,7 +2523,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(VMPIDR_EL2, access_rw, reset_unknown, 0),
- 	EL2_REG(SCTLR_EL2, access_rw, reset_val, SCTLR_EL2_RES1),
- 	EL2_REG(ACTLR_EL2, access_rw, reset_val, 0),
--	EL2_REG(HCR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(HCR_EL2, access_rw, reset_hcr, 0),
- 	EL2_REG(MDCR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(CPTR_EL2, access_rw, reset_val, CPTR_NVHE_EL2_RES1),
- 	EL2_REG(HSTR_EL2, access_rw, reset_val, 0),
+@@ -2197,7 +2197,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 					ID_AA64MMFR2_EL1_NV |
+ 					ID_AA64MMFR2_EL1_CCIDX)),
+ 	ID_SANITISED(ID_AA64MMFR3_EL1),
+-	ID_UNALLOCATED(7,4),
++	ID_SANITISED(ID_AA64MMFR4_EL1),
+ 	ID_UNALLOCATED(7,5),
+ 	ID_UNALLOCATED(7,6),
+ 	ID_UNALLOCATED(7,7),
 -- 
 2.39.2
 
