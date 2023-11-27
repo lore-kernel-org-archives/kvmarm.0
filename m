@@ -1,210 +1,134 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE2F3BB36;
-	Mon, 27 Nov 2023 18:01:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59DB446524
+	for <kvmarm@lists.linux.dev>; Mon, 27 Nov 2023 21:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ul4K9Hg/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDF0DC433C7;
-	Mon, 27 Nov 2023 18:01:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701108083;
-	bh=Ctz2/d8fKRCj3eHDttwdg2nfR3buzb2KJwcp2lA0lBU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ul4K9Hg/bVzcrzbZ2AsrPwCEGW8K6+dumYyBXoP4AvyoIZwc3cLerYqpaR8F1FbXz
-	 tumsWkfgwMVR+9dX31+U5LckZTLkhGbMLRKsEAA6zIOMJfs3+2U9x29oHEl+CUUtCL
-	 +kTSPuih54Nl8IBrNoNmgOYL0TASzMSZx/55I6idiLeV3BMiguZnutSRrGLRUC8Rw1
-	 KaUANBSZAb8QM0/rOGoq3jXutCrMxGndXtubHs6JoOFoYVlaZnLxoBML5/gGjlIVp8
-	 KBTbYz+C6znLEW9fWgHP4bPWl7K53NFHLzcGOmAlgvCHT9dZdKnhmVfLJnWW3BGasa
-	 gxs48H8FgkjIA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1r7fv7-00GsvN-5x;
-	Mon, 27 Nov 2023 18:01:21 +0000
-Date: Mon, 27 Nov 2023 18:01:18 +0000
-Message-ID: <86bkbfcbyp.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	akpm@linux-foundation.org,
-	aneesh.kumar@linux.ibm.com,
-	broonie@kernel.org,
-	catalin.marinas@arm.com,
-	dave.hansen@linux.intel.com,
-	oliver.upton@linux.dev,
-	shuah@kernel.org,
-	will@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 06/25] KVM: arm64: Save/restore POE registers
-In-Reply-To: <20231124163510.1835740-7-joey.gouly@arm.com>
-References: <20231124163510.1835740-1-joey.gouly@arm.com>
-	<20231124163510.1835740-7-joey.gouly@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2qOLQpkG"
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-35c6cefa872so3095ab.0
+        for <kvmarm@lists.linux.dev>; Mon, 27 Nov 2023 13:41:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701121301; x=1701726101; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lIiUOLs4B5FYCz4BIBDodRBLizz4WQxtB5imEZ+H1Ys=;
+        b=2qOLQpkGy9gsghfGAF5xVRAu8Z4IJWSfdoVEAkJL91ab1ITBXdZkYwlBCrAZsnuTcX
+         BFJXD6xlxnT0KBzkmDyJ+CZa3rA8yw9XdnVXnVgVkx+u6xyp0Klm4cYG3JYGK7H5pDIl
+         lYyYiT9Fm83dz5aSw1RMPqXqQo0WXs04tKNIVpBrYVmGdDK/Z9U+Ln4FvqWbAZg31aZ5
+         lc6el9UPfInnbq+ekGLvwWyySR36PqwKH50n0117PeUPorxPENJFePewDxThuPC/H+4d
+         0KL1CTqAKwUALHF3metiSkzaQXjCLf0RS+k/52VFzaYdczY5sDGNvkB06sAzgS6RcPoy
+         C/Dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701121301; x=1701726101;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lIiUOLs4B5FYCz4BIBDodRBLizz4WQxtB5imEZ+H1Ys=;
+        b=XPwTc7xvbrakVQVxTs4asCNwrwGe75SzfEc9qAaf+x5oG7bI//sfnWkA5dYqPtossm
+         ufOfrw4wYnjvIE5GO6bPF3zzcmgX/wJH/rhom4FhJWth94sQ04Q1bZGFn3R1MYOQ7SUF
+         lC7gD322OVo6/RZrHcDbu2xgl8AB6pzKzqB1rYfFPD5E7/PrnWa/cqgYVXxji7ScDqTF
+         07aAWBjhPYwgfmzttPItswz+dn2ryut6fryyTnV4DiN24JfD6H492giABMzJDaV8EGzW
+         onT/JsKDgP03p/Lw0H6cW7kUMEXuqB2i4HxcjYK5/SmUMXyDXHC0YbrPZG61nv+FVfNy
+         F2dA==
+X-Gm-Message-State: AOJu0YwUFjnOh/t9DAIbb0QsoyuOSegmSslRBNY0nXMkWWb+/rGVDpCd
+	GHBQYZYXpGDja8WkzNBTRCJrOLH2mkruuFItx0HFfQ==
+X-Google-Smtp-Source: AGHT+IGbIr/R+htW7xaVZXcb1VijRsa9rXR3s4S6dUyOEpmr2hZBOp1GOfigsseF1e08qY1EZCsyy9k88qjMupsCCfE=
+X-Received: by 2002:a92:da04:0:b0:35c:e49d:3e65 with SMTP id
+ z4-20020a92da04000000b0035ce49d3e65mr211441ilm.11.1701121301101; Mon, 27 Nov
+ 2023 13:41:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org, aneesh.kumar@linux.ibm.com, broonie@kernel.org, catalin.marinas@arm.com, dave.hansen@linux.intel.com, oliver.upton@linux.dev, shuah@kernel.org, will@kernel.org, kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-kselftest@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20231122221526.2750966-1-rananta@google.com> <d5cc3cf1-7b39-9ca3-adf2-224007c751fe@redhat.com>
+In-Reply-To: <d5cc3cf1-7b39-9ca3-adf2-224007c751fe@redhat.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Mon, 27 Nov 2023 13:41:29 -0800
+Message-ID: <CAJHc60zinMfkjFF=QS5R6YO0B8_Anmyw2cZ2f0QEnW0i=hWHcQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: selftests: aarch64: Remove unused functions from
+ vpmu test
+To: Shaoqin Huang <shahuang@redhat.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 24 Nov 2023 16:34:51 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> Define the new system registers that POE introduces and context switch them.
+Hi Shaoqin,
 
-I would really like to see a discussion on the respective lifetimes of
-these two registers (see below).
-
+On Wed, Nov 22, 2023 at 10:43=E2=80=AFPM Shaoqin Huang <shahuang@redhat.com=
+> wrote:
 >
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_arm.h           |  4 ++--
->  arch/arm64/include/asm/kvm_host.h          |  4 ++++
->  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 10 ++++++++++
->  arch/arm64/kvm/sys_regs.c                  |  2 ++
->  4 files changed, 18 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index b85f46a73e21..597470e0b87b 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -346,14 +346,14 @@
->   */
->  #define __HFGRTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51))
->  #define __HFGRTR_EL2_MASK	GENMASK(49, 0)
-> -#define __HFGRTR_EL2_nMASK	(GENMASK(58, 57) | GENMASK(55, 54) | BIT(50))
-> +#define __HFGRTR_EL2_nMASK	(GENMASK(60, 57) | GENMASK(55, 54) | BIT(50))
->  
->  #define __HFGWTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51) |	\
->  				 BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
->  				 GENMASK(26, 25) | BIT(21) | BIT(18) |	\
->  				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
->  #define __HFGWTR_EL2_MASK	GENMASK(49, 0)
-> -#define __HFGWTR_EL2_nMASK	(GENMASK(58, 57) | GENMASK(55, 54) | BIT(50))
-> +#define __HFGWTR_EL2_nMASK	(GENMASK(60, 57) | GENMASK(55, 54) | BIT(50))
->  
->  #define __HFGITR_EL2_RES0	GENMASK(63, 57)
->  #define __HFGITR_EL2_MASK	GENMASK(54, 0)
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 824f29f04916..fa9ebd8fce40 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -401,6 +401,10 @@ enum vcpu_sysreg {
->  	PIR_EL1,       /* Permission Indirection Register 1 (EL1) */
->  	PIRE0_EL1,     /*  Permission Indirection Register 0 (EL1) */
->  
-> +	/* Permission Overlay Extension registers */
-> +	POR_EL1,	/* Permission Overlay Register 1 (EL1) */
-> +	POR_EL0,	/* Permission Overlay Register 0 (EL0) */
-> +
->  	/* 32bit specific registers. */
->  	DACR32_EL2,	/* Domain Access Control Register */
->  	IFSR32_EL2,	/* Instruction Fault Status Register */
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> index bb6b571ec627..22f07ee43e7e 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> @@ -19,6 +19,9 @@
->  static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
->  {
->  	ctxt_sys_reg(ctxt, MDSCR_EL1)	= read_sysreg(mdscr_el1);
-> +
-> +	if (system_supports_poe())
-> +		ctxt_sys_reg(ctxt, POR_EL0)	= read_sysreg_s(SYS_POR_EL0);
+> Hi Raghavendra,
+>
+> Those functions might be useful for other pmu tests. Recently I just
+> wrote a pmu_event_filter_test[1] and use the enable_counter().
+>
+> There may have more pmu tests which can use the helper functions, so I
+> think we can keep it now. And in my series[1], I have moved them into
+> the lib/ as the helper function.
+>
+> [1]https://lore.kernel.org/all/20231123063750.2176250-1-shahuang@redhat.c=
+om/
+>
+Thanks for the pointer. If you are planning to use it, then we can
+abandon this patch. However, disable_counter() may need fixing. I'll
+comment directly on your patch.
 
-So this is saved as eagerly as it gets. Why? If it only affects EL0,
-it can be saved/restored in a much lazier way.
+Thank you.
+Raghavendra
 
->  }
->  
->  static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
-> @@ -59,6 +62,8 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
->  		ctxt_sys_reg(ctxt, PIR_EL1)	= read_sysreg_el1(SYS_PIR);
->  		ctxt_sys_reg(ctxt, PIRE0_EL1)	= read_sysreg_el1(SYS_PIRE0);
-
-And the fact that you only touch PIRE0_EL1 here seems to be a good
-indication that the above can be relaxed.
-
->  	}
-> +	if (system_supports_poe())
-
-nit: missing new line before the if().
-
-> +		ctxt_sys_reg(ctxt, POR_EL1)	= read_sysreg_el1(SYS_POR);
->  	ctxt_sys_reg(ctxt, PAR_EL1)	= read_sysreg_par();
->  	ctxt_sys_reg(ctxt, TPIDR_EL1)	= read_sysreg(tpidr_el1);
->  
-> @@ -89,6 +94,9 @@ static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
->  static inline void __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
->  {
->  	write_sysreg(ctxt_sys_reg(ctxt, MDSCR_EL1),  mdscr_el1);
-> +
-> +	if (system_supports_poe())
-> +		write_sysreg_s(ctxt_sys_reg(ctxt, POR_EL0),	SYS_POR_EL0);
-
-Same thing here about the eager restore.
-
->  }
->  
->  static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
-> @@ -135,6 +143,8 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
->  		write_sysreg_el1(ctxt_sys_reg(ctxt, PIR_EL1),	SYS_PIR);
->  		write_sysreg_el1(ctxt_sys_reg(ctxt, PIRE0_EL1),	SYS_PIRE0);
->  	}
-> +	if (system_supports_poe())
-
-new line.
-
-> +		write_sysreg_el1(ctxt_sys_reg(ctxt, POR_EL1),	SYS_POR);
->  	write_sysreg(ctxt_sys_reg(ctxt, PAR_EL1),	par_el1);
->  	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL1),	tpidr_el1);
->  
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 4735e1b37fb3..a54e5eadbf29 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2269,6 +2269,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
->  	{ SYS_DESC(SYS_PIRE0_EL1), NULL, reset_unknown, PIRE0_EL1 },
->  	{ SYS_DESC(SYS_PIR_EL1), NULL, reset_unknown, PIR_EL1 },
-> +	{ SYS_DESC(SYS_POR_EL1), NULL, reset_unknown, POR_EL1 },
->  	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
->  
->  	{ SYS_DESC(SYS_LORSA_EL1), trap_loregion },
-> @@ -2352,6 +2353,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	  .access = access_pmovs, .reg = PMOVSSET_EL0,
->  	  .get_user = get_pmreg, .set_user = set_pmreg },
->  
-> +	{ SYS_DESC(SYS_POR_EL0), NULL, reset_unknown, POR_EL0 },
->  	{ SYS_DESC(SYS_TPIDR_EL0), NULL, reset_unknown, TPIDR_EL0 },
->  	{ SYS_DESC(SYS_TPIDRRO_EL0), NULL, reset_unknown, TPIDRRO_EL0 },
->  	{ SYS_DESC(SYS_TPIDR2_EL0), undef_access },
-
-Another thing that is missing is the trap routing for NV in
-emulated-nested.c. Please fill in the various tables there.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> Thanks,
+> Shaoqin
+>
+> On 11/23/23 06:15, Raghavendra Rao Ananta wrote:
+> > vpmu_counter_access's disable_counter() carries a bug that disables
+> > all the counters that are enabled, instead of just the requested one.
+> > Fortunately, it's not an issue as there are no callers of it. Hence,
+> > instead of fixing it, remove the definition entirely.
+> >
+> > Remove enable_counter() as it's unused as well.
+> >
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >   .../selftests/kvm/aarch64/vpmu_counter_access.c  | 16 ---------------=
+-
+> >   1 file changed, 16 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c =
+b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+> > index 5ea78986e665f..e2f0b720cbfcf 100644
+> > --- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+> > +++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+> > @@ -94,22 +94,6 @@ static inline void write_sel_evtyper(int sel, unsign=
+ed long val)
+> >       isb();
+> >   }
+> >
+> > -static inline void enable_counter(int idx)
+> > -{
+> > -     uint64_t v =3D read_sysreg(pmcntenset_el0);
+> > -
+> > -     write_sysreg(BIT(idx) | v, pmcntenset_el0);
+> > -     isb();
+> > -}
+> > -
+> > -static inline void disable_counter(int idx)
+> > -{
+> > -     uint64_t v =3D read_sysreg(pmcntenset_el0);
+> > -
+> > -     write_sysreg(BIT(idx) | v, pmcntenclr_el0);
+> > -     isb();
+> > -}
+> > -
+> >   static void pmu_disable_reset(void)
+> >   {
+> >       uint64_t pmcr =3D read_sysreg(pmcr_el0);
+>
