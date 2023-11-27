@@ -1,27 +1,27 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93F471A710
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93F171A70F
 	for <kvmarm@lists.linux.dev>; Mon, 27 Nov 2023 11:46:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="noNwu23k"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66A11C433CC;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qy2lV7Pu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62617C433C8;
 	Mon, 27 Nov 2023 11:46:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1701085567;
-	bh=HhSotA3vRVZkMJz+bs52JYjxX6yqRZHYA/aP1DuwyDQ=;
+	bh=gXBlI6B4/3G10kv7Eb7/IvZIvhp2mtpjQbuFuey1erg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=noNwu23km4xQTwlg47RqkRE1ZFxitipsNyb6nZM6f8w8EXFSRqZD0AcpBIWkxVI0J
-	 asoI3Hr3SuBgmYRHpSit1rdqvI2APUnFpVnmpvkf5B4E5or2cSnQnHuDLNt6Gbp94Q
-	 ub9SBpw8ZpGddO6kiB2bYRCGrT32gZe/J2IFfKtBiQnZF0YtpHgNnHME9TxJxZbKMq
-	 THYrsf66ggF/Pxr2Ja01qORegji8mPllBHh5yWC3VRUB4ITUzS6g2AuDN4ZrPyVJ1Z
-	 O5izk6IIRPpTMtEzuETWeyiZGANt9X0FSK762qRpIHYY1CFB/wLtf08jfOfoXJU3Mj
-	 vbEquAL0fllvw==
+	b=qy2lV7Pul/UvkphxKazxDBuYljooBIXRKzeCiZqXIqYEpRbBzqoMmKhNIN+ADDuTO
+	 35+I5EiQy4mJlu0HfjFOrbFWedALQvGLv0gp/OC6IFHJLnpofobgXojYWuvpdUl6XN
+	 19Fm44B1KO3RxikvkX8GAgzRK+2pggIjmd6UnEt55vdO8U1H65D875K9rLYgTJBRiS
+	 2Rwg+3o454zNC36z4pIWshsnEM00S14GUUlbbwDkBfa2JFL3r2vbDB9L+ObkwDRIHa
+	 dBH0fU6IYakyDWJLBNgQ08S8NkBoRE5WVFBqOjk5zNty0dX69H9n6umMrZ7plxSf2t
+	 0b1ZmQqKzEXuA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1r7a3x-00GleL-CR;
+	id 1r7a3x-00GleL-6L;
 	Mon, 27 Nov 2023 11:46:05 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
@@ -34,9 +34,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 07/13] arm64: cpufeature: Detect HCR_EL2.NV1 being RES0
-Date: Mon, 27 Nov 2023 11:45:53 +0000
-Message-Id: <20231127114559.990314-8-maz@kernel.org>
+Subject: [PATCH v3 06/13] arm64: cpufeature: Detect E2H0 not being implemented
+Date: Mon, 27 Nov 2023 11:45:52 +0000
+Message-Id: <20231127114559.990314-7-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231127114559.990314-1-maz@kernel.org>
 References: <20231127114559.990314-1-maz@kernel.org>
@@ -52,13 +52,13 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-A variant of FEAT_E2H0 not being implemented exists in the form of
-HCR_EL2.E2H being RES1 *and* HCR_EL2.NV1 being RES0 (indicating that
-only VHE is supported on the host and nested guests).
+FEAT_E2H0 is a new feature that indicates whether or not HCR_EL2.E2H
+can be set to 0. Amusingly, this feature is set to 0 when implemented,
+and otherwise negative.
 
-Add the necessary infrastructure for this new CPU capability.
+Add a new capability and detection infrastructure to detect the
+absence of FEAT_E2H0.
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
  arch/arm64/kernel/cpufeature.c | 7 +++++++
@@ -66,32 +66,32 @@ Signed-off-by: Marc Zyngier <maz@kernel.org>
  2 files changed, 8 insertions(+)
 
 diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 6ef9811f7bb7..64a026cc5cec 100644
+index 4a72fb26daec..6ef9811f7bb7 100644
 --- a/arch/arm64/kernel/cpufeature.c
 +++ b/arch/arm64/kernel/cpufeature.c
-@@ -2793,6 +2793,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+@@ -2786,6 +2786,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
  		.matches = has_cpuid_feature,
- 		ARM64_CPUID_FIELDS_NEG(ID_AA64MMFR4_EL1, E2H0, NI)
+ 		ARM64_CPUID_FIELDS(ID_AA64MMFR2_EL1, EVT, IMP)
  	},
 +	{
-+		.desc = "FEAT_E2H0 not implemented (NV1 RES0)",
-+		.capability = ARM64_HCR_NV1_RES0,
++		.desc = "FEAT_E2H0 not implemented",
++		.capability = ARM64_HCR_E2H_RES1,
 +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
 +		.matches = has_cpuid_feature,
-+		ARM64_CPUID_FIELDS_NEG(ID_AA64MMFR4_EL1, E2H0, NI_NV1)
++		ARM64_CPUID_FIELDS_NEG(ID_AA64MMFR4_EL1, E2H0, NI)
 +	},
  	{},
  };
  
 diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 8866ea9bf995..fea24bcd6252 100644
+index b98c38288a9d..8866ea9bf995 100644
 --- a/arch/arm64/tools/cpucaps
 +++ b/arch/arm64/tools/cpucaps
-@@ -53,6 +53,7 @@ HAS_TLB_RANGE
+@@ -52,6 +52,7 @@ HAS_TIDCP1
+ HAS_TLB_RANGE
  HAS_VIRT_HOST_EXTN
  HAS_WFXT
- HCR_E2H_RES1
-+HCR_NV1_RES0
++HCR_E2H_RES1
  HW_DBM
  KVM_HVHE
  KVM_PROTECTED_MODE
