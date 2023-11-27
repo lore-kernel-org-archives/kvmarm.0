@@ -1,15 +1,15 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7992D19464
-	for <kvmarm@lists.linux.dev>; Mon, 27 Nov 2023 11:17:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9FE19445
+	for <kvmarm@lists.linux.dev>; Mon, 27 Nov 2023 11:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 33FDCC15;
-	Mon, 27 Nov 2023 03:18:42 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EAA1F165C;
+	Mon, 27 Nov 2023 03:18:43 -0800 (PST)
 Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.26])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1A71D3F73F;
-	Mon, 27 Nov 2023 03:17:52 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D12A93F73F;
+	Mon, 27 Nov 2023 03:17:54 -0800 (PST)
 From: Ryan Roberts <ryan.roberts@arm.com>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
@@ -23,9 +23,9 @@ To: Catalin Marinas <catalin.marinas@arm.com>,
 Cc: Ryan Roberts <ryan.roberts@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: [PATCH v6 01/12] arm64/mm: Modify range-based tlbi to decrement scale
-Date: Mon, 27 Nov 2023 11:17:26 +0000
-Message-Id: <20231127111737.1897081-2-ryan.roberts@arm.com>
+Subject: [PATCH v6 02/12] arm64/mm: Add lpa2_is_enabled() kvm_lpa2_is_enabled() stubs
+Date: Mon, 27 Nov 2023 11:17:27 +0000
+Message-Id: <20231127111737.1897081-3-ryan.roberts@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231127111737.1897081-1-ryan.roberts@arm.com>
 References: <20231127111737.1897081-1-ryan.roberts@arm.com>
@@ -37,102 +37,55 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In preparation for adding support for LPA2 to the tlb invalidation
-routines, modify the algorithm used by range-based tlbi to start at the
-highest 'scale' and decrement instead of starting at the lowest 'scale'
-and incrementing. This new approach makes it possible to maintain 64K
-alignment as we work through the range, until the last op (at scale=0).
-This is required when LPA2 is enabled. (This part will be added in a
-subsequent commit).
+Add stub functions which is initially always return false. These provide
+the hooks that we need to update the range-based TLBI routines, whose
+operands are encoded differently depending on whether lpa2 is enabled or
+not.
 
-This change is separated into its own patch because it will also impact
-non-LPA2 systems, and I want to make it easy to bisect in case it leads
-to performance regression (see below for benchmarks that suggest this
-should not be a problem).
+The kernel and kvm will enable the use of lpa2 asynchronously in future,
+and part of that enablement will involve fleshing out their respective
+hook to advertise when it is using lpa2.
 
-The original commit (d1d3aa98 "arm64: tlb: Use the TLBI RANGE feature in
-arm64") stated this as the reason for _incrementing_ scale:
-
-  However, in most scenarios, the pages = 1 when flush_tlb_range() is
-  called. Start from scale = 3 or other proper value (such as scale
-  =ilog2(pages)), will incur extra overhead. So increase 'scale' from 0
-  to maximum.
-
-But pages=1 is already special cased by the non-range invalidation path,
-which will take care of it the first time through the loop (both in the
-original commit and in my change), so I don't think switching to
-decrement scale should have any extra performance impact after all.
-
-Indeed benchmarking kernel compilation, a TLBI-heavy workload, suggests
-that this new approach actually _improves_ performance slightly (using a
-virtual machine on Apple M2):
-
-Table shows time to execute kernel compilation workload with 8 jobs,
-relative to baseline without this patch (more negative number is
-bigger speedup). Repeated 9 times across 3 system reboots:
-
-| counter   |       mean |     stdev |
-|:----------|-----------:|----------:|
-| real-time |      -0.6% |      0.0% |
-| kern-time |      -1.6% |      0.5% |
-| user-time |      -0.4% |      0.1% |
+Since the kernel's decision to use lpa2 relies on more than just whether
+the HW supports the feature, it can't just use the same static key as
+kvm. This is another reason to use separate functions. lpa2_is_enabled()
+is already implemented as part of Ard's kernel lpa2 series. Since kvm
+will make its decision solely based on HW support, kvm_lpa2_is_enabled()
+will be defined as system_supports_lpa2() once kvm starts using lpa2.
 
 Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
 ---
- arch/arm64/include/asm/tlbflush.h | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ arch/arm64/include/asm/kvm_pgtable.h  | 2 ++
+ arch/arm64/include/asm/pgtable-prot.h | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
-index bb2c2833a987..36acdb3d16a5 100644
---- a/arch/arm64/include/asm/tlbflush.h
-+++ b/arch/arm64/include/asm/tlbflush.h
-@@ -350,14 +350,14 @@ static inline void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
-  * entries one by one at the granularity of 'stride'. If the TLB
-  * range ops are supported, then:
-  *
-- * 1. If 'pages' is odd, flush the first page through non-range
-- *    operations;
-+ * 1. The minimum range granularity is decided by 'scale', so multiple range
-+ *    TLBI operations may be required. Start from scale = 3, flush the largest
-+ *    possible number of pages ((num+1)*2^(5*scale+1)) that fit into the
-+ *    requested range, then decrement scale and continue until one or zero pages
-+ *    are left.
-  *
-- * 2. For remaining pages: the minimum range granularity is decided
-- *    by 'scale', so multiple range TLBI operations may be required.
-- *    Start from scale = 0, flush the corresponding number of pages
-- *    ((num+1)*2^(5*scale+1) starting from 'addr'), then increase it
-- *    until no pages left.
-+ * 2. If there is 1 page remaining, flush it through non-range operations. Range
-+ *    operations can only span an even number of pages.
-  *
-  * Note that certain ranges can be represented by either num = 31 and
-  * scale or num = 0 and scale + 1. The loop below favours the latter
-@@ -367,12 +367,12 @@ static inline void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
- 				asid, tlb_level, tlbi_user)		\
- do {									\
- 	int num = 0;							\
--	int scale = 0;							\
-+	int scale = 3;							\
- 	unsigned long addr;						\
- 									\
- 	while (pages > 0) {						\
- 		if (!system_supports_tlb_range() ||			\
--		    pages % 2 == 1) {					\
-+		    pages == 1) {					\
- 			addr = __TLBI_VADDR(start, asid);		\
- 			__tlbi_level(op, addr, tlb_level);		\
- 			if (tlbi_user)					\
-@@ -392,7 +392,7 @@ do {									\
- 			start += __TLBI_RANGE_PAGES(num, scale) << PAGE_SHIFT; \
- 			pages -= __TLBI_RANGE_PAGES(num, scale);	\
- 		}							\
--		scale++;						\
-+		scale--;						\
- 	}								\
- } while (0)
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index d3e354bb8351..10068500d601 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -25,6 +25,8 @@
+ #define KVM_PGTABLE_MIN_BLOCK_LEVEL	2U
+ #endif
  
++#define kvm_lpa2_is_enabled()		false
++
+ static inline u64 kvm_get_parange(u64 mmfr0)
+ {
+ 	u64 parange = cpuid_feature_extract_unsigned_field(mmfr0,
+diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
+index e9624f6326dd..483dbfa39c4c 100644
+--- a/arch/arm64/include/asm/pgtable-prot.h
++++ b/arch/arm64/include/asm/pgtable-prot.h
+@@ -71,6 +71,8 @@ extern bool arm64_use_ng_mappings;
+ #define PTE_MAYBE_NG		(arm64_use_ng_mappings ? PTE_NG : 0)
+ #define PMD_MAYBE_NG		(arm64_use_ng_mappings ? PMD_SECT_NG : 0)
+ 
++#define lpa2_is_enabled()	false
++
+ /*
+  * If we have userspace only BTI we don't want to mark kernel pages
+  * guarded even if the system does support BTI.
 -- 
 2.25.1
 
