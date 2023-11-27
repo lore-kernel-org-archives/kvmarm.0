@@ -1,209 +1,155 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5737419454
-	for <kvmarm@lists.linux.dev>; Mon, 27 Nov 2023 11:18:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8841AC15;
-	Mon, 27 Nov 2023 03:19:01 -0800 (PST)
-Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.26])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6E9543F73F;
-	Mon, 27 Nov 2023 03:18:12 -0800 (PST)
-From: Ryan Roberts <ryan.roberts@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE29101F2;
+	Mon, 27 Nov 2023 11:45:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TBT467Qj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20791C433C7;
+	Mon, 27 Nov 2023 11:45:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701085544;
+	bh=fR7axwwaqdOnZ7+hJpsO31cSOdlPA/4ws0EQLkXICwM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TBT467QjtZ/emVrJAaWgmbMkUb/5qwCubJokavxLNgqIOwvX6HCGspUnvcE+UYSi5
+	 Jj9fQ/Z4YVPrLjA52L3vtlR5/dh48Zv+ULQhcVKM3mI8VSqzsYTYbqwUrIDq6z7Fsl
+	 1XSj1FG5pUbKIWOAXQowWwSxL1mrF2QbSKrs93G2W6Fn9Khpf9VV+59tWMUROL3ZJ/
+	 LHzkhv+e+7126p+R5R+Vpr8QHz5TuyzyjJZIFi/6kne2+84vqWboQWHtFAbpNFGNkT
+	 hB8o1kmA9ILWUTE+DFBD4jd22+Sd4SU4593if0YuuIg05yJR3xzlIYXQ+FqHnDzlwp
+	 f34yubxBLkg+Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1r7a3Z-00Gldl-Ck;
+	Mon, 27 Nov 2023 11:45:41 +0000
+Date: Mon, 27 Nov 2023 11:45:40 +0000
+Message-ID: <86fs0rctcr.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: Miguel Luis <miguel.luis@oracle.com>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Darren Hart <darren@os.amperecomputing.com>,
+	Jintack Lim <jintack@cs.columbia.edu>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	James Morse
+ <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: Ryan Roberts <ryan.roberts@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: [PATCH v6 12/12] KVM: selftests: arm64: Support P52V48 4K and 16K guest_modes
-Date: Mon, 27 Nov 2023 11:17:37 +0000
-Message-Id: <20231127111737.1897081-13-ryan.roberts@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231127111737.1897081-1-ryan.roberts@arm.com>
-References: <20231127111737.1897081-1-ryan.roberts@arm.com>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support (FEAT_NV2 only)
+In-Reply-To: <1fe79744-f8a4-466f-8f1a-32e6fab78be9@os.amperecomputing.com>
+References: <20231120131027.854038-1-maz@kernel.org>
+	<DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
+	<86msv7ylnu.wl-maz@kernel.org>
+	<05733774-4210-4097-9912-fb3aa8542fdd@oracle.com>
+	<86a5r4zafh.wl-maz@kernel.org>
+	<134912e4-beed-4ab6-8ce1-33e69ec382b3@os.amperecomputing.com>
+	<868r6nzc5y.wl-maz@kernel.org>
+	<65dc2a93-0a17-4433-b3a5-430bf516ffe9@os.amperecomputing.com>
+	<86o7fjco13.wl-maz@kernel.org>
+	<e18700d4-061d-4489-8d8d-87c11b70eedb@os.amperecomputing.com>
+	<86leancjcr.wl-maz@kernel.org>
+	<9f8656c7-8036-4bd6-a0f5-4fa531f95b2f@os.amperecomputing.com>
+	<86jzq3d007.wl-maz@kernel.org>
+	<1fe79744-f8a4-466f-8f1a-32e6fab78be9@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add support for VM_MODE_P52V48_4K and VM_MODE_P52V48_16K guest modes by
-using the FEAT_LPA2 pte format for stage1, when FEAT_LPA2 is available.
+On Mon, 27 Nov 2023 10:59:36 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> 
+> 
+> 
+> On 27-11-2023 02:52 pm, Marc Zyngier wrote:
+> > On Mon, 27 Nov 2023 07:26:58 +0000,
+> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >> 
+> >> 
+> >> 
+> >> On 24-11-2023 08:02 pm, Marc Zyngier wrote:
+> >>> On Fri, 24 Nov 2023 13:22:22 +0000,
+> >>> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >>>> 
+> >>>>> How is this value possible if the write to HCR_EL2 has taken place?
+> >>>>> When do you sample this?
+> >>>> 
+> >>>> I am not sure how and where it got set. I think, whatever it is set,
+> >>>> it is due to false return of vcpu_el2_e2h_is_set(). Need to
+> >>>> understand/debug.
+> >>>> The vhcr_el2 value I have shared is traced along with hcr in function
+> >>>> __activate_traps/__compute_hcr.
+> >>> 
+> >>> Here's my hunch:
+> >>> 
+> >>> The guest boots with E2H=0, because we don't advertise anything else
+> >>> on your HW. So we run with NV1=1 until we try to *upgrade* to VHE. NV2
+> >>> means that HCR_EL2 is writable (to memory) without a trap. But we're
+> >>> still running with NV1=1.
+> >>> 
+> >>> Subsequently, we access a sysreg that should never trap for a VHE
+> >>> guest, but we're with the wrong config. Bad things happen.
+> >>> 
+> >>> Unfortunately, NV2 is pretty much incompatible with E2H being updated,
+> >>> because it cannot perform the changes that this would result into at
+> >>> the point where they should happen. We can try and do a best effort
+> >>> handling, but you can always trick it.
+> >>> 
+> >>> Anyway, can you see if the hack below helps? I'm not keen on it at
+> >>> all, but this would be a good data point.
+> >> 
+> >> Thanks Marc, this diff fixes the issue.
+> >> Just wondering what is changed w.r.t to L1 handling from V10 to V11
+> >> that it requires this trick?
+> > 
+> > Not completely sure. Before v11, anything that would trap would be
+> > silently handled by the FEAT_NV code. Now, a trap for something that
+> > is supposed to be redirected to VNCR results in an UNDEF exception.
+> > 
+> > I suspect that the exception is handled again as a call to
+> > __finalise_el2(), probably because the write to VBAR_EL1 didn't do
+> > what it was supposed to do.
+> > 
+> >> Also why this was not seen on your platform, is it E2H0 enabled?
+> > 
+> > It doesn't have FEAT_E2H0, and that's the whole point. No E2H0, no
+> > problems, as the guest cannot trick the host into losing track of the
+> > state (which I'm pretty sure can happen even with this ugly hack).
+> > 
+> > I will probably completely disable NV1 support in the next drop, and
+> > make NV support only VHE guests. Which is the only mode that makes any
+> > sense anyway.
+> > 
+> 
+> Thanks, absolutely makes sense to have *VHE-only* L1, looking forward
+> to a next drop.
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
----
- .../selftests/kvm/include/kvm_util_base.h     |  1 +
- .../selftests/kvm/lib/aarch64/processor.c     | 39 ++++++++++++++-----
- tools/testing/selftests/kvm/lib/guest_modes.c |  2 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |  3 ++
- 4 files changed, 36 insertions(+), 9 deletions(-)
+Note that this won't be restricted to L1, but will affect *everything.
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index a18db6a7b3cf..406500fb6e28 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -171,6 +171,7 @@ static inline struct userspace_mem_region *vm_get_mem_region(struct kvm_vm *vm,
- 
- enum vm_guest_mode {
- 	VM_MODE_P52V48_4K,
-+	VM_MODE_P52V48_16K,
- 	VM_MODE_P52V48_64K,
- 	VM_MODE_P48V48_4K,
- 	VM_MODE_P48V48_16K,
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index e6ffd9037c37..41c776b642c0 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -12,6 +12,7 @@
- #include "kvm_util.h"
- #include "processor.h"
- #include <linux/bitfield.h>
-+#include <linux/sizes.h>
- 
- #define DEFAULT_ARM64_GUEST_STACK_VADDR_MIN	0xac0000
- 
-@@ -58,13 +59,25 @@ static uint64_t pte_index(struct kvm_vm *vm, vm_vaddr_t gva)
- 	return (gva >> vm->page_shift) & mask;
- }
- 
-+static inline bool use_lpa2_pte_format(struct kvm_vm *vm)
-+{
-+	return (vm->page_size == SZ_4K || vm->page_size == SZ_16K) &&
-+	    (vm->pa_bits > 48 || vm->va_bits > 48);
-+}
-+
- static uint64_t addr_pte(struct kvm_vm *vm, uint64_t pa, uint64_t attrs)
- {
- 	uint64_t pte;
- 
--	pte = pa & GENMASK(47, vm->page_shift);
--	if (vm->page_shift == 16)
--		pte |= FIELD_GET(GENMASK(51, 48), pa) << 12;
-+	if (use_lpa2_pte_format(vm)) {
-+		pte = pa & GENMASK(49, vm->page_shift);
-+		pte |= FIELD_GET(GENMASK(51, 50), pa) << 8;
-+		attrs &= ~GENMASK(9, 8);
-+	} else {
-+		pte = pa & GENMASK(47, vm->page_shift);
-+		if (vm->page_shift == 16)
-+			pte |= FIELD_GET(GENMASK(51, 48), pa) << 12;
-+	}
- 	pte |= attrs;
- 
- 	return pte;
-@@ -74,9 +87,14 @@ static uint64_t pte_addr(struct kvm_vm *vm, uint64_t pte)
- {
- 	uint64_t pa;
- 
--	pa = pte & GENMASK(47, vm->page_shift);
--	if (vm->page_shift == 16)
--		pa |= FIELD_GET(GENMASK(15, 12), pte) << 48;
-+	if (use_lpa2_pte_format(vm)) {
-+		pa = pte & GENMASK(49, vm->page_shift);
-+		pa |= FIELD_GET(GENMASK(9, 8), pte) << 50;
-+	} else {
-+		pa = pte & GENMASK(47, vm->page_shift);
-+		if (vm->page_shift == 16)
-+			pa |= FIELD_GET(GENMASK(15, 12), pte) << 48;
-+	}
- 
- 	return pa;
- }
-@@ -266,9 +284,6 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
- 
- 	/* Configure base granule size */
- 	switch (vm->mode) {
--	case VM_MODE_P52V48_4K:
--		TEST_FAIL("AArch64 does not support 4K sized pages "
--			  "with 52-bit physical address ranges");
- 	case VM_MODE_PXXV48_4K:
- 		TEST_FAIL("AArch64 does not support 4K sized pages "
- 			  "with ANY-bit physical address ranges");
-@@ -278,12 +293,14 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
- 	case VM_MODE_P36V48_64K:
- 		tcr_el1 |= 1ul << 14; /* TG0 = 64KB */
- 		break;
-+	case VM_MODE_P52V48_16K:
- 	case VM_MODE_P48V48_16K:
- 	case VM_MODE_P40V48_16K:
- 	case VM_MODE_P36V48_16K:
- 	case VM_MODE_P36V47_16K:
- 		tcr_el1 |= 2ul << 14; /* TG0 = 16KB */
- 		break;
-+	case VM_MODE_P52V48_4K:
- 	case VM_MODE_P48V48_4K:
- 	case VM_MODE_P40V48_4K:
- 	case VM_MODE_P36V48_4K:
-@@ -297,6 +314,8 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
- 
- 	/* Configure output size */
- 	switch (vm->mode) {
-+	case VM_MODE_P52V48_4K:
-+	case VM_MODE_P52V48_16K:
- 	case VM_MODE_P52V48_64K:
- 		tcr_el1 |= 6ul << 32; /* IPS = 52 bits */
- 		ttbr0_el1 |= FIELD_GET(GENMASK(51, 48), vm->pgd) << 2;
-@@ -325,6 +344,8 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
- 	/* TCR_EL1 |= IRGN0:WBWA | ORGN0:WBWA | SH0:Inner-Shareable */;
- 	tcr_el1 |= (1 << 8) | (1 << 10) | (3 << 12);
- 	tcr_el1 |= (64 - vm->va_bits) /* T0SZ */;
-+	if (use_lpa2_pte_format(vm))
-+		tcr_el1 |= (1ul << 59) /* DS */;
- 
- 	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SCTLR_EL1), sctlr_el1);
- 	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TCR_EL1), tcr_el1);
-diff --git a/tools/testing/selftests/kvm/lib/guest_modes.c b/tools/testing/selftests/kvm/lib/guest_modes.c
-index 772a7dd15db4..b04901e55138 100644
---- a/tools/testing/selftests/kvm/lib/guest_modes.c
-+++ b/tools/testing/selftests/kvm/lib/guest_modes.c
-@@ -23,6 +23,8 @@ void guest_modes_append_default(void)
- 
- 		aarch64_get_supported_page_sizes(limit, &ipa4k, &ipa16k, &ipa64k);
- 
-+		guest_mode_append(VM_MODE_P52V48_4K, ipa4k >= 52);
-+		guest_mode_append(VM_MODE_P52V48_16K, ipa16k >= 52);
- 		guest_mode_append(VM_MODE_P52V48_64K, ipa64k >= 52);
- 
- 		guest_mode_append(VM_MODE_P48V48_4K, ipa4k >= 48);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 7a8af1821f5d..aeba7a23105c 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -148,6 +148,7 @@ const char *vm_guest_mode_string(uint32_t i)
- {
- 	static const char * const strings[] = {
- 		[VM_MODE_P52V48_4K]	= "PA-bits:52,  VA-bits:48,  4K pages",
-+		[VM_MODE_P52V48_16K]	= "PA-bits:52,  VA-bits:48, 16K pages",
- 		[VM_MODE_P52V48_64K]	= "PA-bits:52,  VA-bits:48, 64K pages",
- 		[VM_MODE_P48V48_4K]	= "PA-bits:48,  VA-bits:48,  4K pages",
- 		[VM_MODE_P48V48_16K]	= "PA-bits:48,  VA-bits:48, 16K pages",
-@@ -173,6 +174,7 @@ const char *vm_guest_mode_string(uint32_t i)
- 
- const struct vm_guest_mode_params vm_guest_mode_params[] = {
- 	[VM_MODE_P52V48_4K]	= { 52, 48,  0x1000, 12 },
-+	[VM_MODE_P52V48_16K]	= { 52, 48,  0x4000, 14 },
- 	[VM_MODE_P52V48_64K]	= { 52, 48, 0x10000, 16 },
- 	[VM_MODE_P48V48_4K]	= { 48, 48,  0x1000, 12 },
- 	[VM_MODE_P48V48_16K]	= { 48, 48,  0x4000, 14 },
-@@ -251,6 +253,7 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode)
- 	case VM_MODE_P36V48_64K:
- 		vm->pgtable_levels = 3;
- 		break;
-+	case VM_MODE_P52V48_16K:
- 	case VM_MODE_P48V48_16K:
- 	case VM_MODE_P40V48_16K:
- 	case VM_MODE_P36V48_16K:
+No non-VHE guest will be supported at any level whatsoever, and NV
+will always expose ID_AA64MMFR4_EL1.E2H0=0b1110, indicating that
+HCR_EL2.NV1 is RES0, on top of ID_AA64MMFR4_EL1.NV_frac=1 (NV2 only).
+
+	M.
+
 -- 
-2.25.1
-
+Without deviation from the norm, progress is not possible.
