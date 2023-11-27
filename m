@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06C81A70F
-	for <kvmarm@lists.linux.dev>; Mon, 27 Nov 2023 11:46:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7781D101F2
+	for <kvmarm@lists.linux.dev>; Mon, 27 Nov 2023 11:46:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ixNwChtA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A657CC43397;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K16ofiBr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC538C433C8;
 	Mon, 27 Nov 2023 11:46:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1701085567;
-	bh=cHcIEvwJnfbxO3mM5IzqDX9TDoySi9hJJrcEVWKZ/jI=;
+	bh=JfhVXgGa+qpN3Vol8ICPhIgPDpPhDkgYUrHK4QQN2mU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ixNwChtAwL9zoIx0DQ3g8DL6RCOsnVYWy7PCgFycmx4au9CKPgVocgBuUCcmnOdzg
-	 7zowsOZPkiuG4giY2QLY+IKebpdex3btJ1viUpZsJkhVpzXNdaI4FC1d6E3g0EkxUO
-	 5adpFUQ1VC4kXsgA4R6fupbNThBgqkU7sakArHxT+9KQNcLEe53GGz943tPl9//h5U
-	 yefv7eP03dZFrG+HYzci7poBX9abenb/e1FWlLIphOty+HbICPrL21aP9fxZJVgyDF
-	 gn0IyV/1R8i9AFnw29LH7ZH6BVz+iG2BrsKn8ZHKU/yE0dvdmSPtSxiXL/J6d3Tdlu
-	 RH9ReSDmjU7EA==
+	b=K16ofiBrL0ODYGo66FMYBQnbNNFkUQeZrzMFTZkdO33r3kEX/hsrWxHMKaMS+G0jK
+	 LYH2URduq4G5pV9Bm9quYnQro7+OKaOR9AjDdSczqG8dwJ81A1+NH7h/EJ5xVR/CQq
+	 KYCk7DTwcbaGpIF+12NZqL2uCHs6gQXX23+JVExoYMES/3O6zkV2Zl+/O+iWtjajJs
+	 tnQtGq9LcolBqI7NJnTr/O5eHprkpBhqJGHz4O6pFSc8fG+VcZnQ+XNcP3KVGrSb11
+	 xjiP18uaxKWLvYRUpFC2vMCmJ368XBs6yD8DY/IzDC8CjnRyBvoxZ1yNiebH4VH7jL
+	 fxkxiqJclEOAQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1r7a3x-00GleL-QL;
-	Mon, 27 Nov 2023 11:46:05 +0000
+	id 1r7a3y-00GleL-0T;
+	Mon, 27 Nov 2023 11:46:06 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -34,9 +34,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 09/13] arm64: Add override for ID_AA64MMFR4_EL1.E2H0
-Date: Mon, 27 Nov 2023 11:45:55 +0000
-Message-Id: <20231127114559.990314-10-maz@kernel.org>
+Subject: [PATCH v3 10/13] arm64: Add MIDR-based override infrastructure
+Date: Mon, 27 Nov 2023 11:45:56 +0000
+Message-Id: <20231127114559.990314-11-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231127114559.990314-1-maz@kernel.org>
 References: <20231127114559.990314-1-maz@kernel.org>
@@ -52,79 +52,54 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Allow ID_AA64MMFR4_EL1.E2H0 to be overriden from the command-line.
-This will subsequently be of use for non-compliant CPUs.
+In order to be able to use the override infrastructure to "fix"
+CPUs that have deviated from the architecture spec, add a new
+pile of hacks on top of the existing one, allowing a feature
+to be overriden based on matching a MIDR list.
 
 Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/cpufeature.h |  1 +
- arch/arm64/kernel/cpufeature.c      |  4 +++-
- arch/arm64/kernel/idreg-override.c  | 10 ++++++++++
- 3 files changed, 14 insertions(+), 1 deletion(-)
+ arch/arm64/kernel/idreg-override.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 5f3f62efebd5..d465db251939 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -901,6 +901,7 @@ s64 arm64_ftr_safe_value(const struct arm64_ftr_bits *ftrp, s64 new, s64 cur);
- struct arm64_ftr_reg *get_arm64_ftr_reg(u32 sys_id);
- 
- extern struct arm64_ftr_override id_aa64mmfr1_override;
-+extern struct arm64_ftr_override id_aa64mmfr4_override;
- extern struct arm64_ftr_override id_aa64pfr0_override;
- extern struct arm64_ftr_override id_aa64pfr1_override;
- extern struct arm64_ftr_override id_aa64zfr0_override;
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 64a026cc5cec..7dcda39537f8 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -691,6 +691,7 @@ static const struct arm64_ftr_bits ftr_raz[] = {
- 	__ARM64_FTR_REG_OVERRIDE(#id, id, table, &no_override)
- 
- struct arm64_ftr_override __ro_after_init id_aa64mmfr1_override;
-+struct arm64_ftr_override __ro_after_init id_aa64mmfr4_override;
- struct arm64_ftr_override __ro_after_init id_aa64pfr0_override;
- struct arm64_ftr_override __ro_after_init id_aa64pfr1_override;
- struct arm64_ftr_override __ro_after_init id_aa64zfr0_override;
-@@ -759,7 +760,8 @@ static const struct __ftr_reg_entry {
- 			       &id_aa64mmfr1_override),
- 	ARM64_FTR_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2),
- 	ARM64_FTR_REG(SYS_ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3),
--	ARM64_FTR_REG(SYS_ID_AA64MMFR4_EL1, ftr_id_aa64mmfr4),
-+	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR4_EL1, ftr_id_aa64mmfr4,
-+			       &id_aa64mmfr4_override),
- 
- 	/* Op1 = 1, CRn = 0, CRm = 0 */
- 	ARM64_FTR_REG(SYS_GMID_EL1, ftr_gmid),
 diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-index 3addc09f8746..7b5b9dc20e6b 100644
+index 7b5b9dc20e6b..57c145bf50b7 100644
 --- a/arch/arm64/kernel/idreg-override.c
 +++ b/arch/arm64/kernel/idreg-override.c
-@@ -55,6 +55,15 @@ static const struct ftr_set_desc mmfr1 __initconst = {
- 	},
- };
+@@ -321,6 +321,23 @@ static __init void parse_cmdline(void)
+ 		__parse_cmdline(prop, true);
+ }
  
-+static const struct ftr_set_desc mmfr4 __initconst = {
-+	.name		= "id_aa64mmfr4",
-+	.override	= &id_aa64mmfr4_override,
-+	.fields		= {
-+		FIELD("e2h0", ID_AA64MMFR4_EL1_E2H0_SHIFT, NULL ),
-+		{}
-+	},
++struct midr_override_data {
++	const char		feature[FTR_ALIAS_OPTION_LEN];
++	const struct midr_range	ranges[];
 +};
 +
- static bool __init pfr0_sve_filter(u64 val)
- {
- 	/*
-@@ -161,6 +170,7 @@ static const struct ftr_set_desc sw_features __initconst = {
++static const struct midr_override_data * const midr_ovr_data[] __initconst = {
++};
++
++static void __init apply_midr_overrides(void)
++{
++	const u64 midr = read_cpuid_id();
++
++	for (int i = 0; i < ARRAY_SIZE(midr_ovr_data); i++)
++		if (is_midr_in_range_list(midr, midr_ovr_data[i]->ranges))
++			__parse_cmdline(midr_ovr_data[i]->feature, false);
++}
++
+ /* Keep checkers quiet */
+ void init_feature_override(u64 boot_status);
  
- static const struct ftr_set_desc * const regs[] __initconst = {
- 	&mmfr1,
-+	&mmfr4,
- 	&pfr0,
- 	&pfr1,
- 	&isar1,
+@@ -337,6 +354,8 @@ asmlinkage void __init init_feature_override(u64 boot_status)
+ 
+ 	__boot_status = boot_status;
+ 
++	apply_midr_overrides();
++
+ 	parse_cmdline();
+ 
+ 	for (i = 0; i < ARRAY_SIZE(regs); i++) {
 -- 
 2.39.2
 
