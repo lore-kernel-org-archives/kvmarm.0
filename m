@@ -1,63 +1,51 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 102BEDDA6;
-	Mon, 27 Nov 2023 09:22:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816AB63CC
+	for <kvmarm@lists.linux.dev>; Mon, 27 Nov 2023 09:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OkT50YF3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8843AC433C8;
-	Mon, 27 Nov 2023 09:22:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d8KwpnbC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0300AC433C8;
+	Mon, 27 Nov 2023 09:32:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701076923;
-	bh=BOixlSNocNhyGWuF5ccWPK61QKCpJuHHl7gm2DfKVQ0=;
+	s=k20201202; t=1701077544;
+	bh=Hn/csHwbV9uZsVauhUhxu2nzrEufwWs5EXvSgVoaRb0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OkT50YF326qn4QfUxo1EAy8lrIdwkp6UZ4JN85QzYZoXpPuivM1BAyRzZXeNHT3Ds
-	 KTh17jZ8DhEIoS7Ee6rgpT+GKrxjbRs6Jc2YbHWEmE4VWNwlahpIveDDR8oDhO0J2E
-	 4DdT4lkpa+LAqurxKMJNwXK4dV8PERZZOHyFj96i9KOfKKpfdndRtQTEyOqbFLE50l
-	 sJSE9KtfeQYWktD+vT41bMa/FkdzbHwHpz7g9VHvjeJQTW9gEc7HSeaeEDUKK+TBDd
-	 oIsPYJgJHHiQzE0C/3HxojJLGELew8sTjhZDFVqIc46r1En0tpi6oVZZ1XIqpV9/Z4
-	 09H26visiFYoQ==
+	b=d8KwpnbCdX/Tn61Xyakmm4kUtOzJVTT8tJlKym73fgOJrnKUCKu/4+q59+ohQ8tAv
+	 M8tcy0W1hPPlu2G0MdHnomoZUF1k8VVyC8BalTT0umGevrNMZP0i0dcx7NGV1iHqlS
+	 p5olKRwdKXcUre59OGrIVH4SBSXFpYPlY5ZLj2lSWQSrkFq2/NvVckfEpv47sVJ8BE
+	 dGFp3KfvXLgyRr3rXRsRU22u0six7l0Z/Qx4cRimky31mQzoHyc2c9C1opYO3UntMv
+	 1KsNN+/idFCdu41HZNm+wED5Ozk4G0o4pqoKOLnZpHvRJCHvurMbk5243+8Z8XU5wS
+	 o4w26zQpqIOng==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1r7XoW-00Gj5n-TY;
-	Mon, 27 Nov 2023 09:22:01 +0000
-Date: Mon, 27 Nov 2023 09:22:00 +0000
-Message-ID: <86jzq3d007.wl-maz@kernel.org>
+	id 1r7XyX-00GjFX-JA;
+	Mon, 27 Nov 2023 09:32:21 +0000
+Date: Mon, 27 Nov 2023 09:32:21 +0000
+Message-ID: <86il5ncziy.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: Miguel Luis <miguel.luis@oracle.com>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
+To: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	James Morse
  <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v11 00/43] KVM: arm64: Nested Virtualization support (FEAT_NV2 only)
-In-Reply-To: <9f8656c7-8036-4bd6-a0f5-4fa531f95b2f@os.amperecomputing.com>
-References: <20231120131027.854038-1-maz@kernel.org>
-	<DB1E4B70-0FA0-4FA4-85AE-23B034459675@oracle.com>
-	<86msv7ylnu.wl-maz@kernel.org>
-	<05733774-4210-4097-9912-fb3aa8542fdd@oracle.com>
-	<86a5r4zafh.wl-maz@kernel.org>
-	<134912e4-beed-4ab6-8ce1-33e69ec382b3@os.amperecomputing.com>
-	<868r6nzc5y.wl-maz@kernel.org>
-	<65dc2a93-0a17-4433-b3a5-430bf516ffe9@os.amperecomputing.com>
-	<86o7fjco13.wl-maz@kernel.org>
-	<e18700d4-061d-4489-8d8d-87c11b70eedb@os.amperecomputing.com>
-	<86leancjcr.wl-maz@kernel.org>
-	<9f8656c7-8036-4bd6-a0f5-4fa531f95b2f@os.amperecomputing.com>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v5 07/12] KVM: arm64: Use LPA2 page-tables for stage2 and hyp stage1
+In-Reply-To: <1ead7fa6-7085-4b95-a568-ece094721d34@arm.com>
+References: <20231116142931.1675485-1-ryan.roberts@arm.com>
+	<20231116142931.1675485-8-ryan.roberts@arm.com>
+	<ZV0Uaoi-qBjX3j5i@linux.dev>
+	<c89e4132-fedd-440d-8971-5e42969fc1e9@arm.com>
+	<86fs0xzue7.wl-maz@kernel.org>
+	<1ead7fa6-7085-4b95-a568-ece094721d34@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -69,67 +57,17 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, suzuki.poulose@arm.com, james.morse@arm.com, yuzenghui@huawei.com, ardb@kernel.org, anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 27 Nov 2023 07:26:58 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+On Fri, 24 Nov 2023 11:49:57 +0000,
+Ryan Roberts <ryan.roberts@arm.com> wrote:
 > 
-> 
-> 
-> On 24-11-2023 08:02 pm, Marc Zyngier wrote:
-> > On Fri, 24 Nov 2023 13:22:22 +0000,
-> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> >> 
-> >>> How is this value possible if the write to HCR_EL2 has taken place?
-> >>> When do you sample this?
-> >> 
-> >> I am not sure how and where it got set. I think, whatever it is set,
-> >> it is due to false return of vcpu_el2_e2h_is_set(). Need to
-> >> understand/debug.
-> >> The vhcr_el2 value I have shared is traced along with hcr in function
-> >> __activate_traps/__compute_hcr.
-> > 
-> > Here's my hunch:
-> > 
-> > The guest boots with E2H=0, because we don't advertise anything else
-> > on your HW. So we run with NV1=1 until we try to *upgrade* to VHE. NV2
-> > means that HCR_EL2 is writable (to memory) without a trap. But we're
-> > still running with NV1=1.
-> > 
-> > Subsequently, we access a sysreg that should never trap for a VHE
-> > guest, but we're with the wrong config. Bad things happen.
-> > 
-> > Unfortunately, NV2 is pretty much incompatible with E2H being updated,
-> > because it cannot perform the changes that this would result into at
-> > the point where they should happen. We can try and do a best effort
-> > handling, but you can always trick it.
-> > 
-> > Anyway, can you see if the hack below helps? I'm not keen on it at
-> > all, but this would be a good data point.
-> 
-> Thanks Marc, this diff fixes the issue.
-> Just wondering what is changed w.r.t to L1 handling from V10 to V11
-> that it requires this trick?
+> OK fair enough. I've made this change for the next rev.
 
-Not completely sure. Before v11, anything that would trap would be
-silently handled by the FEAT_NV code. Now, a trap for something that
-is supposed to be redirected to VNCR results in an UNDEF exception.
-
-I suspect that the exception is handled again as a call to
-__finalise_el2(), probably because the write to VBAR_EL1 didn't do
-what it was supposed to do.
-
-> Also why this was not seen on your platform, is it E2H0 enabled?
-
-It doesn't have FEAT_E2H0, and that's the whole point. No E2H0, no
-problems, as the guest cannot trick the host into losing track of the
-state (which I'm pretty sure can happen even with this ugly hack).
-
-I will probably completely disable NV1 support in the next drop, and
-make NV support only VHE guests. Which is the only mode that makes any
-sense anyway.
+Any chance you could post this new revision shortly? It looks ready to
+me, and I would really like this to simmer in -next for a while.
 
 Thanks,
 
