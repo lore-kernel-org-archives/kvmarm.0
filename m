@@ -1,56 +1,56 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9E941C93
-	for <kvmarm@lists.linux.dev>; Tue, 28 Nov 2023 17:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9500441C69
+	for <kvmarm@lists.linux.dev>; Tue, 28 Nov 2023 17:56:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NIybnI0X"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VnfFcmdp"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701194125;
+	s=mimecast20190719; t=1701194199;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=6IpfI+5hX9oWAaqFKgR7pMHL53l1oeTSERZKZMVDwEk=;
-	b=NIybnI0XHi8b6h0H2OE7QaEIEDQJNJpdPj5aPLM8RMOuPJ1rbPHPyS47P7HkAUQpH+ynYN
-	808KDRDd68mM2/9el+wwTjjwixBMSah0v4uM5vfEp/7fHjpaGRqVs9/29MWIJH0/sBjeKb
-	Xgr+VZ0KKyJZOhU0z3VSdD7FRoa8khI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=mb/SELaNzaD9twNmu/FD3NMqayq4NlkgR97UOh62crI=;
+	b=VnfFcmdpkSV1rvb7MrA82y3pM4jUPyZXxCdhmZ5M0WmIApQQNkth6tBB5aXntOi6czhmbn
+	CmqPjfg4A09bFjweeRI7FuWC9rRHd6ZNRfUv0NaB/x4/4pcLh1Fwhi+Ubp6fn9ghSwg6vb
+	LXmb9I9lfkDyZhPxcbIFzP7zNqdRdAc=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-67-Yd4IGitmODinzEh6Ikb1qw-1; Tue, 28 Nov 2023 12:55:21 -0500
-X-MC-Unique: Yd4IGitmODinzEh6Ikb1qw-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33309619b52so6762f8f.1
-        for <kvmarm@lists.linux.dev>; Tue, 28 Nov 2023 09:55:21 -0800 (PST)
+ us-mta-638-IuzsKbDCMTqhbIXg0tRtMQ-1; Tue, 28 Nov 2023 12:56:37 -0500
+X-MC-Unique: IuzsKbDCMTqhbIXg0tRtMQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-332f5ff511aso2676411f8f.2
+        for <kvmarm@lists.linux.dev>; Tue, 28 Nov 2023 09:56:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701194121; x=1701798921;
+        d=1e100.net; s=20230601; t=1701194196; x=1701798996;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :references:cc:to:content-language:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6IpfI+5hX9oWAaqFKgR7pMHL53l1oeTSERZKZMVDwEk=;
-        b=Uq5Ym9QCTLlaXcmpdj37EelzSFzwuyse/Amjq4sV3z5org4ti5Utb0hCIavBJmvC4w
-         QqSuKOk+HTclQ1MkRELRPYpiSCgfd5XNgBsE1zJRjG0XNXOHno/31lkzGmYSo1pCCrvX
-         cjyhT1WG46ozu8W6IwkIXP7Ejdh7w7MuXP4XUVJYpayZEHe+T+mwoCCK//oHcL6x4FJw
-         UsNX4zKId0s601MBsmwT3w1f0/arC71rdwQeV2S7A+P8z6C36HnzF6IIYWix/7IdW8F6
-         ukJbYlUY0kc1Rs24k0SaQLz7eQJiTkt8tEyuYQBktWoMkcNZ9JtyEMYx33pkpr1sRWig
-         oTYQ==
-X-Gm-Message-State: AOJu0Yz2i53eKdaI4lmKWjsIo1LD/qaUoi0HzzzlPZVvlDrUILlxKA8P
-	MrZazY08clzB0CSBrxlycLmhAgdbA/B5CvEjLSkbs64xcHS+/UT+bqm3Ph5Ynco9KzGy3QzPOVP
-	w1+9Jm43+eNJ33nFh
-X-Received: by 2002:adf:e9c6:0:b0:332:ff64:ff50 with SMTP id l6-20020adfe9c6000000b00332ff64ff50mr6720277wrn.3.1701194120763;
-        Tue, 28 Nov 2023 09:55:20 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFxtIUmo/xgDPU+4SynBCZAKg3hJMQbTbqo7KrIGmu/9sGiONimAtj8MpqI83o1bVOsygmqVw==
-X-Received: by 2002:adf:e9c6:0:b0:332:ff64:ff50 with SMTP id l6-20020adfe9c6000000b00332ff64ff50mr6720265wrn.3.1701194120413;
-        Tue, 28 Nov 2023 09:55:20 -0800 (PST)
+        bh=mb/SELaNzaD9twNmu/FD3NMqayq4NlkgR97UOh62crI=;
+        b=mCCuKp4lD023TTkE6vqirIxaPQPlZ4OLdEAFlR+BOdojnlxSU5mKFQ4Y0+ipUYeURT
+         hMnI+I/6aO5njjKobciUhD/t7CUu9AQjo1R7jx3UuCfeHllhzQ+H8Rpdlf4GbEbB5zol
+         0aVa1NdLs6f23BYdpzWz7o8KIP7ceIIEmlSXIlZSAU68n5sFVi6djhmSuaPf47EzT7QK
+         LaFvhVD/o7A9lDYsyJo1qp2ScjwHVTGrGNqrqXivmmgtyyyWuIDnWYkngMnMN48E/aPP
+         +EvRu4TDPvJWWydSmxBJH4QY8pcO84yGAuuYzj++0szGuldO+yLY/R5GfbRL4cDs9gCs
+         hb6w==
+X-Gm-Message-State: AOJu0YxQhWZSDslkCa4t++O2LA2SrFIPSwQFIytFVkFzlobPlrw/MjnW
+	OWDdREM8Dxi2Zb/FkpTe+wY3Qjf+3DRKad9UFfg9UHwZtgZNdRuIOgOzhNm6F0eychx60pUYQGm
+	Ot+TvuricUlDE0eBJ
+X-Received: by 2002:a5d:4947:0:b0:332:fe86:7f64 with SMTP id r7-20020a5d4947000000b00332fe867f64mr5843139wrs.43.1701194196613;
+        Tue, 28 Nov 2023 09:56:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGj+3zYY7VsSNyNUu8sA5/8Eh+WYvSczsybLrcFtvaAm0lZ2m/9N/KercXdu/KmAUvDHpd7Iw==
+X-Received: by 2002:a5d:4947:0:b0:332:fe86:7f64 with SMTP id r7-20020a5d4947000000b00332fe867f64mr5843119wrs.43.1701194196186;
+        Tue, 28 Nov 2023 09:56:36 -0800 (PST)
 Received: from ?IPV6:2003:cb:c708:1d00:99ec:9656:7475:678d? (p200300cbc7081d0099ec96567475678d.dip0.t-ipconnect.de. [2003:cb:c708:1d00:99ec:9656:7475:678d])
-        by smtp.gmail.com with ESMTPSA id x1-20020adfec01000000b00332cfd83b8dsm15601843wrn.96.2023.11.28.09.55.18
+        by smtp.gmail.com with ESMTPSA id x1-20020adfec01000000b00332cfd83b8dsm15601843wrn.96.2023.11.28.09.56.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Nov 2023 09:55:20 -0800 (PST)
-Message-ID: <1c79ad05-cb52-4820-b2aa-bbe07ff82b19@redhat.com>
-Date: Tue, 28 Nov 2023 18:55:18 +0100
+        Tue, 28 Nov 2023 09:56:35 -0800 (PST)
+Message-ID: <2cb6090d-b71f-472f-ab89-715b75dba067@redhat.com>
+Date: Tue, 28 Nov 2023 18:56:34 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,8 +58,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2 19/27] mm: mprotect: Introduce PAGE_FAULT_ON_ACCESS
- for mprotect(PROT_MTE)
+Subject: Re: [PATCH RFC v2 20/27] mm: hugepage: Handle huge page fault on
+ access
 To: Alexandru Elisei <alexandru.elisei@arm.com>, catalin.marinas@arm.com,
  will@kernel.org, oliver.upton@linux.dev, maz@kernel.org,
  james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
@@ -75,7 +75,7 @@ Cc: pcc@google.com, steven.price@arm.com, anshuman.khandual@arm.com,
  linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
  linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
 References: <20231119165721.9849-1-alexandru.elisei@arm.com>
- <20231119165721.9849-20-alexandru.elisei@arm.com>
+ <20231119165721.9849-21-alexandru.elisei@arm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -122,7 +122,7 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20231119165721.9849-20-alexandru.elisei@arm.com>
+In-Reply-To: <20231119165721.9849-21-alexandru.elisei@arm.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -130,30 +130,13 @@ Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 19.11.23 17:57, Alexandru Elisei wrote:
-> To enable tagging on a memory range, userspace can use mprotect() with the
-> PROT_MTE access flag. Pages already mapped in the VMA don't have the
-> associated tag storage block reserved, so mark the PTEs as
-> PAGE_FAULT_ON_ACCESS to trigger a fault next time they are accessed, and
-> reserve the tag storage on the fault path.
+> Handle PAGE_FAULT_ON_ACCESS faults for huge pages in a similar way to
+> regular pages.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
 
-That sounds alot like fake PROT_NONE. Would there be a way to unify hat 
-handling and simply reuse pte_protnone()? For example, could we special 
-case on VMA flags?
-
-Like, don't do NUMA hinting in these special VMAs. Then, have something 
-like:
-
-if (pte_protnone(vmf->orig_pte))
-	return handle_pte_protnone(vmf);
-
-In there, special case on the VMA flags.
-
-I *suspect* that handle_page_missing_tag_storage() stole (sorry :P) some 
-code from the prot_none handling path. At least the recovery path and 
-writability handling looks like it better be located shared in 
-handle_pte_protnone() as well.
-
-That might take some magic out of this patch.
+Same comments :)
 
 -- 
 Cheers,
