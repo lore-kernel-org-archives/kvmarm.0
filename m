@@ -1,157 +1,102 @@
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCD5199B2
-	for <kvmarm@lists.linux.dev>; Tue, 28 Nov 2023 13:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755A0199B2;
+	Tue, 28 Nov 2023 13:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from kwepemd500005.china.huawei.com (unknown [172.30.72.57])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4SfkNz5c5Vz1P8ql;
-	Tue, 28 Nov 2023 21:50:27 +0800 (CST)
-Received: from huawei.com (10.174.186.3) by kwepemd500005.china.huawei.com
- (7.221.188.140) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1258.28; Tue, 28 Nov
- 2023 21:54:03 +0800
-From: l00313349 <liting8@huawei.com>
-To: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>
-CC: <maz@kernel.org>, <oliver.upton@linux.dev>, <james.morse@arm.com>,
-	<suzuki.poulose@arm.com>, <yuzenghui@huawei.com>, <catalin.marinas@arm.com>,
-	<will@kernel.org>, <zhengchuan@huawei.com>, <xiexiangyou@huawei.com>
-Subject: [PATCH] KVM: arm64: fix MPIDR to vcpu index cache to support vcpu change at runtime
-Date: Tue, 28 Nov 2023 21:54:02 +0800
-Message-ID: <20231128135402.1943-1-liting8@huawei.com>
-X-Mailer: git-send-email 2.24.1.windows.2
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4SfkVd4WZ8z6JB96;
+	Tue, 28 Nov 2023 21:55:21 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 774E61400C9;
+	Tue, 28 Nov 2023 21:55:38 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 28 Nov
+ 2023 13:55:37 +0000
+Date: Tue, 28 Nov 2023 13:55:36 +0000
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+CC: Gavin Shan <gshan@redhat.com>, <linux-pm@vger.kernel.org>,
+	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <x86@kernel.org>, <linux-csky@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-ia64@vger.kernel.org>,
+	<linux-parisc@vger.kernel.org>, Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, <jianyong.wu@arm.com>,
+	<justin.he@arm.com>, James Morse <james.morse@arm.com>, Greg Kroah-Hartman
+	<gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>
+Subject: Re: [PATCH RFC 10/22] drivers: base: Move cpu_dev_init() after
+ node_dev_init()
+Message-ID: <20231128135536.00002ab9@Huawei.com>
+In-Reply-To: <ZVywLPwhILp083Jk@shell.armlinux.org.uk>
+References: <ZUoRY33AAHMc5ThW@shell.armlinux.org.uk>
+	<E1r0JLV-00CTxS-QB@rmk-PC.armlinux.org.uk>
+	<095c2d24-735b-4ce2-ba2e-9ec2164f2237@redhat.com>
+	<ZVHXk9JG7gUjtERt@shell.armlinux.org.uk>
+	<ZVywLPwhILp083Jk@shell.armlinux.org.uk>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemd500005.china.huawei.com (7.221.188.140)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-From: Ting Li <liting8@huawei.com>
+On Tue, 21 Nov 2023 13:27:08 +0000
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 
-Consider vcpu change at runtime, for example online_vcpus is 8,
-but only start 2 vcpu threads, MPIDR to vcpu index 0 may be overwrited
-and vm hangs. When start other vcpu threads, cache will be outdated
-and always get mismatch.
-To solve this problem, codes update as followed:
-1.First time only vcpu 0 can init MPIDR data, and use flags to avoid
-index overwrite.
-2.When MPIDR cache mismatch, fallback to old iterative method, and reinit
-MPIDR to vcpu index cache data.
+> On Mon, Nov 13, 2023 at 08:00:19AM +0000, Russell King (Oracle) wrote:
+> > On Mon, Nov 13, 2023 at 10:58:46AM +1000, Gavin Shan wrote:  
+> > > 
+> > > 
+> > > On 11/7/23 20:30, Russell King (Oracle) wrote:  
+> > > > From: James Morse <james.morse@arm.com>
+> > > > 
+> > > > NUMA systems require the node descriptions to be ready before CPUs are
+> > > > registered. This is so that the node symlinks can be created in sysfs.
+> > > > 
+> > > > Currently no NUMA platform uses GENERIC_CPU_DEVICES, meaning that CPUs
+> > > > are registered by arch code, instead of cpu_dev_init().
+> > > > 
+> > > > Move cpu_dev_init() after node_dev_init() so that NUMA architectures
+> > > > can use GENERIC_CPU_DEVICES.
+> > > > 
+> > > > Signed-off-by: James Morse <james.morse@arm.com>
+> > > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > > > ---
+> > > > Note: Jonathan's comment still needs addressing - see
+> > > >    https://lore.kernel.org/r/20230914121612.00006ac7@Huawei.com
+> > > > ---
+> > > >   drivers/base/init.c | 2 +-
+> > > >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > > >   
+> > > 
+> > > With Jonathan's comments addressed:  
+> > 
+> > That needs James' input, which is why I made the note on the patch.  
+> 
+> I'm going to be posting the series without RFC soon, and it will be
+> with Jonathan's comment unaddressed - because as I've said several
+> times it needs James' input and we have sadly not yet received that.
+> 
+> Short of waiting until James can respond, I don't think there are
+> any other alternatives.
 
-Signed-off-by: Ting Li <liting8@huawei.com>
----
- arch/arm64/kvm/arm.c | 49 ++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 41 insertions(+), 8 deletions(-)
+In the interests of expediency I'm fine with that.  (To be honest I'd
+forgotten I even made that comment ;)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index e5f75f1f1085..a3c038ad2f41 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -584,14 +584,16 @@ static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
- static void kvm_init_mpidr_data(struct kvm *kvm)
- {
- 	struct kvm_mpidr_data *data = NULL;
-+	bool *index_inited_flags = NULL;
-+	struct kvm_mpidr_data *data_to_del = NULL;
- 	unsigned long c, mask, nr_entries;
- 	u64 aff_set = 0, aff_clr = ~0UL;
- 	struct kvm_vcpu *vcpu;
+Jonathan
 
--	mutex_lock(&kvm->arch.config_lock);
-+	if (atomic_read(&kvm->online_vcpus) == 1)
-+		return;
-
--	if (kvm->arch.mpidr_data || atomic_read(&kvm->online_vcpus) == 1)
--		goto out;
-+	mutex_lock(&kvm->arch.config_lock);
-
- 	kvm_for_each_vcpu(c, vcpu, kvm) {
- 		u64 aff = kvm_vcpu_get_mpidr_aff(vcpu);
-@@ -618,16 +620,37 @@ static void kvm_init_mpidr_data(struct kvm *kvm)
- 	if (!data)
- 		goto out;
-
-+	/*
-+	 * Use index inited flags to avoid index overwrite.
-+	 */
-+	index_inited_flags = kcalloc(nr_entries, sizeof(bool), GFP_KERNEL);
-+	if (!index_inited_flags) {
-+		kfree(data);
-+		goto out;
-+	}
-+
- 	data->mpidr_mask = mask;
-
- 	kvm_for_each_vcpu(c, vcpu, kvm) {
- 		u64 aff = kvm_vcpu_get_mpidr_aff(vcpu);
- 		u16 index = kvm_mpidr_index(data, aff);
-
-+		/*
-+		 * When index has inited, ignore set conflict index.
-+		 */
-+		if (index_inited_flags[index])
-+			continue;
- 		data->cmpidr_to_idx[index] = c;
-+		index_inited_flags[index] = true;
- 	}
--
-+	/*
-+	 * When mpidr_data exist, change to new data then free old data.
-+	 */
-+	if (kvm->arch.mpidr_data)
-+		data_to_del = kvm->arch.mpidr_data;
- 	kvm->arch.mpidr_data = data;
-+	kfree(data_to_del);
-+	kfree(index_inited_flags);
- out:
- 	mutex_unlock(&kvm->arch.config_lock);
- }
-@@ -655,7 +678,8 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- 	if (likely(vcpu_has_run_once(vcpu)))
- 		return 0;
-
--	kvm_init_mpidr_data(kvm);
-+	if (vcpu->vcpu_id == 0)
-+		kvm_init_mpidr_data(kvm);
-
- 	kvm_arm_vcpu_init_debug(vcpu);
-
-@@ -2459,15 +2483,24 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr)
-
- 		vcpu = kvm_get_vcpu(kvm,
- 				    kvm->arch.mpidr_data->cmpidr_to_idx[idx]);
-+		/*
-+		 * When mpidr mismatch, fallback to old iterative method.
-+		 */
- 		if (mpidr != kvm_vcpu_get_mpidr_aff(vcpu))
- 			vcpu = NULL;
--
--		return vcpu;
-+		else
-+			return vcpu;
- 	}
-
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
--		if (mpidr == kvm_vcpu_get_mpidr_aff(vcpu))
-+		if (mpidr == kvm_vcpu_get_mpidr_aff(vcpu)) {
-+			/*
-+			 * Reinit MPIDR to vcpu index cache.
-+			 */
-+			if (kvm->arch.mpidr_data)
-+				kvm_init_mpidr_data(kvm);
- 			return vcpu;
-+		}
- 	}
- 	return NULL;
- }
---
-2.33.0
+> 
+> I do hope we can get this queued up for v6.8 though.
+> 
 
