@@ -1,18 +1,18 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1BD91E49F
-	for <kvmarm@lists.linux.dev>; Tue, 28 Nov 2023 17:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FF065B5B3
+	for <kvmarm@lists.linux.dev>; Tue, 28 Nov 2023 17:21:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9871BC15;
-	Tue, 28 Nov 2023 09:18:54 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 388A1C15;
+	Tue, 28 Nov 2023 09:22:26 -0800 (PST)
 Received: from raptor (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4C82A3F6C4;
-	Tue, 28 Nov 2023 09:18:02 -0800 (PST)
-Date: Tue, 28 Nov 2023 17:17:59 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D45D33F6C4;
+	Tue, 28 Nov 2023 09:21:33 -0800 (PST)
+Date: Tue, 28 Nov 2023 17:21:31 +0000
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: David Hildenbrand <david@redhat.com>
+To: Mike Rapoport <rppt@kernel.org>
 Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
 	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
 	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
@@ -20,21 +20,21 @@ Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
 	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
 	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
 	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
-	rppt@kernel.org, hughd@google.com, pcc@google.com,
-	steven.price@arm.com, anshuman.khandual@arm.com,
-	vincenzo.frascino@arm.com, eugenis@google.com, kcc@google.com,
+	hughd@google.com, pcc@google.com, steven.price@arm.com,
+	anshuman.khandual@arm.com, vincenzo.frascino@arm.com,
+	david@redhat.com, eugenis@google.com, kcc@google.com,
 	hyesoo.yu@samsung.com, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
 	linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
 	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC v2 06/27] mm: page_alloc: Allow an arch to hook early
- into free_pages_prepare()
-Message-ID: <ZWYgx28LB28x5Pkb@raptor>
+Subject: Re: [PATCH RFC v2 04/27] mm: migrate/mempolicy: Add hook to modify
+ migration target gfp
+Message-ID: <ZWYhm34kA95ntoaq@raptor>
 References: <20231119165721.9849-1-alexandru.elisei@arm.com>
- <20231119165721.9849-7-alexandru.elisei@arm.com>
- <45466b05-d620-41e5-8a2b-05c420b8fa7b@redhat.com>
- <ZWSTiCghf8nMFy4G@raptor>
- <2e2d3f51-34e3-4982-b982-ab7b555cba21@redhat.com>
+ <20231119165721.9849-5-alexandru.elisei@arm.com>
+ <20231125100322.GH636165@kernel.org>
+ <ZWSDGGJDWDtY0G35@raptor>
+ <20231128064957.GI636165@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -43,52 +43,97 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2e2d3f51-34e3-4982-b982-ab7b555cba21@redhat.com>
+In-Reply-To: <20231128064957.GI636165@kernel.org>
 
 Hi,
 
-On Tue, Nov 28, 2023 at 05:58:55PM +0100, David Hildenbrand wrote:
-> On 27.11.23 14:03, Alexandru Elisei wrote:
-> > Hi,
+On Tue, Nov 28, 2023 at 08:49:57AM +0200, Mike Rapoport wrote:
+> On Mon, Nov 27, 2023 at 11:52:56AM +0000, Alexandru Elisei wrote:
+> > Hi Mike,
 > > 
-> > On Fri, Nov 24, 2023 at 08:36:52PM +0100, David Hildenbrand wrote:
-> > > On 19.11.23 17:57, Alexandru Elisei wrote:
-> > > > Add arch_free_pages_prepare() hook that is called before that page flags
-> > > > are cleared. This will be used by arm64 when explicit management of tag
-> > > > storage pages is enabled.
+> > I really appreciate you having a look!
+> > 
+> > On Sat, Nov 25, 2023 at 12:03:22PM +0200, Mike Rapoport wrote:
+> > > On Sun, Nov 19, 2023 at 04:56:58PM +0000, Alexandru Elisei wrote:
+> > > > It might be desirable for an architecture to modify the gfp flags used to
+> > > > allocate the destination page for migration based on the page that it is
+> > > > being replaced. For example, if an architectures has metadata associated
+> > > > with a page (like arm64, when the memory tagging extension is implemented),
+> > > > it can request that the destination page similarly has storage for tags
+> > > > already allocated.
+> > > > 
+> > > > No functional change.
+> > > > 
+> > > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > > ---
+> > > >  include/linux/migrate.h | 4 ++++
+> > > >  mm/mempolicy.c          | 2 ++
+> > > >  mm/migrate.c            | 3 +++
+> > > >  3 files changed, 9 insertions(+)
+> > > > 
+> > > > diff --git a/include/linux/migrate.h b/include/linux/migrate.h
+> > > > index 2ce13e8a309b..0acef592043c 100644
+> > > > --- a/include/linux/migrate.h
+> > > > +++ b/include/linux/migrate.h
+> > > > @@ -60,6 +60,10 @@ struct movable_operations {
+> > > >  /* Defined in mm/debug.c: */
+> > > >  extern const char *migrate_reason_names[MR_TYPES];
+> > > >  
+> > > > +#ifndef arch_migration_target_gfp
+> > > > +#define arch_migration_target_gfp(src, gfp) 0
+> > > > +#endif
+> > > > +
+> > > >  #ifdef CONFIG_MIGRATION
+> > > >  
+> > > >  void putback_movable_pages(struct list_head *l);
+> > > > diff --git a/mm/mempolicy.c b/mm/mempolicy.c
+> > > > index 10a590ee1c89..50bc43ab50d6 100644
+> > > > --- a/mm/mempolicy.c
+> > > > +++ b/mm/mempolicy.c
+> > > > @@ -1182,6 +1182,7 @@ static struct folio *alloc_migration_target_by_mpol(struct folio *src,
+> > > >  
+> > > >  		h = folio_hstate(src);
+> > > >  		gfp = htlb_alloc_mask(h);
+> > > > +		gfp |= arch_migration_target_gfp(src, gfp);
 > > > 
-> > > Can you elaborate a bit what exactly will be done by that code with that
-> > > information?
+> > > I think it'll be more robust to have arch_migration_target_gfp() to modify
+> > > the flags and return the new mask with added (or potentially removed)
+> > > flags.
 > > 
-> > Of course.
-> > 
-> > The MTE code that is in the kernel today uses the PG_arch_2 page flag, which it
-> > renames to PG_mte_tagged, to track if a page has been mapped with tagging
-> > enabled. That flag is cleared by free_pages_prepare() when it does:
-> > 
-> > 	page->flags &= ~PAGE_FLAGS_CHECK_AT_PREP;
-> > 
-> > When tag storage management is enabled, tag storage is reserved for a page if
-> > and only if the page is mapped as tagged. When a page is freed, the code looks
-> > at the PG_mte_tagged flag to determine if the page was mapped as tagged, and
-> > therefore has tag storage reserved, to determine if the corresponding tag
-> > storage should also be freed.
-> > 
-> > I have considered using arch_free_page(), but free_pages_prepare() calls the
-> > function after the flags are cleared.
-> > 
-> > Does that answer your question?
+> > I did it this way so an arch won't be able to remove flags set by the MM code.
+> > There's a similar pattern in do_mmap() -> calc_vm_flag_bits() ->
+> > arch_calc_vm_flag_bits().
 > 
-> Yes, please add some of that to the patch description!
+> Ok, just add a sentence about it to the commit message.
 
-Will do!
+Great, will do that!
 
 Thanks,
 Alex
 
+>  
+> > Thanks,
+> > Alex
+> > 
+> > > 
+> > > >  		nodemask = policy_nodemask(gfp, pol, ilx, &nid);
+> > > >  		return alloc_hugetlb_folio_nodemask(h, nid, nodemask, gfp);
+> > > >  	}
+> > > > @@ -1190,6 +1191,7 @@ static struct folio *alloc_migration_target_by_mpol(struct folio *src,
+> > > >  		gfp = GFP_TRANSHUGE;
+> > > >  	else
+> > > >  		gfp = GFP_HIGHUSER_MOVABLE | __GFP_RETRY_MAYFAIL | __GFP_COMP;
+> > > > +	gfp |= arch_migration_target_gfp(src, gfp);
+> > > >  
+> > > >  	page = alloc_pages_mpol(gfp, order, pol, ilx, nid);
+> > > >  	return page_rmappable_folio(page);
+> > > 
+> > > -- 
+> > > Sincerely yours,
+> > > Mike.
+> > > 
 > 
 > -- 
-> Cheers,
-> 
-> David / dhildenb
+> Sincerely yours,
+> Mike.
 > 
