@@ -1,56 +1,56 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CCD64412
-	for <kvmarm@lists.linux.dev>; Tue, 28 Nov 2023 17:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D004412
+	for <kvmarm@lists.linux.dev>; Tue, 28 Nov 2023 17:06:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DfWHA2zX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ND+Dy7hR"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701191146;
+	s=mimecast20190719; t=1701191219;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=YDT3LlbuA9xwOvVqmRhwhuZAJICAn/GwCufxWqEJUZE=;
-	b=DfWHA2zX5VRr39gPT3byu0XZIT93Y+alNmGqieovtQv/D9GLZsYCa7xIYrjRkfkcWyMK90
-	wr29IjnKWhRGLGCxoaEekqgRZJzjXLwvssApmnpUU9C6tA/lHUcvrjNj0+ZsUruuuLyWPF
-	XPlXUgD6HYL3ZfxGlHZeMw1Hu7H9CQQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=bTg/MUWbdr+UHRMBQa8a3bGoqb55birifOZplhEgkIQ=;
+	b=ND+Dy7hRS9NrEfpp9e1meXED6GCPHFtW5vlm+1MEF/tTueIktdmHNiX17hsiUMpsbRd95P
+	Pp95Ci2KrprvzZjjY/oaI+yXHJ+zve+GVJA5j7MUFWMiMs7JW8y6pCh+meVGmBfVyl7HFI
+	khM7b0lQCtocAkH2CbauyykJ+kNl0q8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-613-fRPOyn_aNfulnzrMOT9EHg-1; Tue, 28 Nov 2023 12:05:44 -0500
-X-MC-Unique: fRPOyn_aNfulnzrMOT9EHg-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-332dfb08436so3836476f8f.2
-        for <kvmarm@lists.linux.dev>; Tue, 28 Nov 2023 09:05:44 -0800 (PST)
+ us-mta-310-gMdNjC-OPgqXZtfjOn-M9w-1; Tue, 28 Nov 2023 12:06:57 -0500
+X-MC-Unique: gMdNjC-OPgqXZtfjOn-M9w-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-332e11a22a0so3772372f8f.2
+        for <kvmarm@lists.linux.dev>; Tue, 28 Nov 2023 09:06:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701191143; x=1701795943;
+        d=1e100.net; s=20230601; t=1701191216; x=1701796016;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :references:cc:to:content-language:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YDT3LlbuA9xwOvVqmRhwhuZAJICAn/GwCufxWqEJUZE=;
-        b=nZzeD5H5RntzChCYaLkfer5kwn8C39nHqtdfoYNRdZqJspFv9G+05VT3DjNg3d+kjd
-         GFGFWSFR8MBECufurCnOgLlUQijuv7YGIPOBTQmPXI3qW/x9IHfT+2kAn6BPoTnDc3UN
-         HK3WVjMfGJ+VTWmI2/8zuLluUifBZIAHyLd8Ch1U6cd7OixB+W+k9ymckMZhCrAKF4SF
-         lW6i03pZ8A+hDAgkaoRAxiTXCx/1W6DV+KHcIOtm+KavO2QGrFwgz47IJXO92/BV4Cvx
-         xqWAhAB9aCyYM8i6ZYYYRuGfN23DOkiRy4lkk7K57omxLHCIn2FE4WLjmaMwbeELsKQJ
-         7HmA==
-X-Gm-Message-State: AOJu0Yygdv+TEnfyf5nzzSc6VLI8ayvr98QTPu8Ywbga203gsAUL93of
-	Nj2hC3lI4i2obedlL/hE14zhcTmzgy0eBv0RvawmWQFtoFLlk3whswCI6dFLbAUOWoGm6WW5AVa
-	VBlbNwz5RghPkIpVK
-X-Received: by 2002:a5d:67c8:0:b0:332:d296:38e4 with SMTP id n8-20020a5d67c8000000b00332d29638e4mr11746511wrw.3.1701191143346;
-        Tue, 28 Nov 2023 09:05:43 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE9Eaiu9gI/+d6uSueiInI5bht2b/mC7sqil/E3ZdKQiWeH5452MX2pBYH3QiRGem8/2yMuzg==
-X-Received: by 2002:a5d:67c8:0:b0:332:d296:38e4 with SMTP id n8-20020a5d67c8000000b00332d29638e4mr11746454wrw.3.1701191142991;
-        Tue, 28 Nov 2023 09:05:42 -0800 (PST)
+        bh=bTg/MUWbdr+UHRMBQa8a3bGoqb55birifOZplhEgkIQ=;
+        b=bJ8VDG4i18GYW1P9G1AfCig/xNMDhEITxWIVcxB6Qh9+lhPQWbT5Q6vfM22iAhowI+
+         g8PNzdpy9PgBceGaHTIT208j/RGzbUZEWkUQbhtKFG59vzGCl98UA/iE+cuSZYZcF3Jo
+         6cnGshxWDIKHG4+Vg34jzRosbBYm8OnsKjPVCKY7/7l8py37iBAsZ25Sj6L8jXJAkr+A
+         p373dMSunLYLoki4gYg18CzMRqme6TZrajipNA3VN5jCLBSNi1jaL69IyKIWcqBrqIpR
+         ogLMqFoRw0JlmmHcNwFlDQl5roDi2gi650soFsfhN1BRgvwevJfEAaMwBQ6GKCXwdSTr
+         LTPA==
+X-Gm-Message-State: AOJu0Yzo0QxkGonnNP+HBroPnaayCfrjNgtEZEAhkSNJi1PgHpFoEesJ
+	P7+wVycpm5JU5DiUerWmDVcTHWHO1anwhteF68rmtz2pcDHjaAq/+bSIzcnl3ecqVJePLecY7RD
+	HOewNm1AomXmzblhK
+X-Received: by 2002:a5d:5987:0:b0:333:145c:ac01 with SMTP id n7-20020a5d5987000000b00333145cac01mr201020wri.44.1701191216271;
+        Tue, 28 Nov 2023 09:06:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHP0EVLHlR4Omthjz3Kgmd88UlLwBpQZ2wOHVbOylrwHqO2+Wj/fkCUGupPZSfHdcrqTWgBkg==
+X-Received: by 2002:a5d:5987:0:b0:333:145c:ac01 with SMTP id n7-20020a5d5987000000b00333145cac01mr200974wri.44.1701191215864;
+        Tue, 28 Nov 2023 09:06:55 -0800 (PST)
 Received: from ?IPV6:2003:cb:c708:1d00:99ec:9656:7475:678d? (p200300cbc7081d0099ec96567475678d.dip0.t-ipconnect.de. [2003:cb:c708:1d00:99ec:9656:7475:678d])
-        by smtp.gmail.com with ESMTPSA id d21-20020adf9b95000000b003316ad360c1sm15738401wrc.24.2023.11.28.09.05.41
+        by smtp.gmail.com with ESMTPSA id d21-20020adf9b95000000b003316ad360c1sm15738401wrc.24.2023.11.28.09.06.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Nov 2023 09:05:42 -0800 (PST)
-Message-ID: <dd2dfeb0-aa7b-43e4-ae9f-e2a22b3dac30@redhat.com>
-Date: Tue, 28 Nov 2023 18:05:41 +0100
+        Tue, 28 Nov 2023 09:06:55 -0800 (PST)
+Message-ID: <c027ea00-a955-4c3c-b1ea-2c3f6906790d@redhat.com>
+Date: Tue, 28 Nov 2023 18:06:54 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,25 +58,24 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2 14/27] arm64: mte: Disable dynamic tag storage
- management if HW KASAN is enabled
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
- maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
- mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
- vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org,
- bsegall@google.com, mgorman@suse.de, bristot@redhat.com,
- vschneid@redhat.com, mhiramat@kernel.org, rppt@kernel.org, hughd@google.com,
- pcc@google.com, steven.price@arm.com, anshuman.khandual@arm.com,
+Subject: Re: [PATCH RFC v2 18/27] arm64: mte: Reserve tag block for the zero
+ page
+To: Alexandru Elisei <alexandru.elisei@arm.com>, catalin.marinas@arm.com,
+ will@kernel.org, oliver.upton@linux.dev, maz@kernel.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ arnd@arndb.de, akpm@linux-foundation.org, mingo@redhat.com,
+ peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+ mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com,
+ mhiramat@kernel.org, rppt@kernel.org, hughd@google.com
+Cc: pcc@google.com, steven.price@arm.com, anshuman.khandual@arm.com,
  vincenzo.frascino@arm.com, eugenis@google.com, kcc@google.com,
  hyesoo.yu@samsung.com, linux-arm-kernel@lists.infradead.org,
  linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
  linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
  linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
 References: <20231119165721.9849-1-alexandru.elisei@arm.com>
- <20231119165721.9849-15-alexandru.elisei@arm.com>
- <e8f7d855-e5e7-48dd-adce-7c641a561e2b@redhat.com> <ZWSwrKS6EtJMEu1p@raptor>
+ <20231119165721.9849-19-alexandru.elisei@arm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -123,33 +122,21 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <ZWSwrKS6EtJMEu1p@raptor>
+In-Reply-To: <20231119165721.9849-19-alexandru.elisei@arm.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 27.11.23 16:07, Alexandru Elisei wrote:
-> Hi,
-> 
-> On Fri, Nov 24, 2023 at 08:54:12PM +0100, David Hildenbrand wrote:
->> On 19.11.23 17:57, Alexandru Elisei wrote:
->>> To be able to reserve the tag storage associated with a page requires that
->>> the tag storage page can be migrated.
->>>
->>> When HW KASAN is enabled, the kernel allocates pages, which are now tagged,
->>> in non-preemptible contexts, which can make reserving the associate tag
->>> storage impossible.
->>
->> I assume that it's the only in-kernel user that actually requires tagged
->> memory (besides for user space), correct?
-> 
-> Indeed, this is the case. I'll expand the commit message to be more clear about
-> it.
-> 
+On 19.11.23 17:57, Alexandru Elisei wrote:
+> On arm64, the zero page receives special treatment by having the tagged
+> flag set on MTE initialization, not when the page is mapped in a process
+> address space. Reserve the corresponding tag block when tag storage
+> management is being activated.
 
-Great, thanks!
+Out of curiosity: why does the shared zeropage require tagged storage? 
+What about the huge zeropage?
 
 -- 
 Cheers,
