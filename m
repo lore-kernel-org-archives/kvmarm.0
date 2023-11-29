@@ -1,33 +1,34 @@
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92C412E4A
-	for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 09:11:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F7213AFF
+	for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 09:17:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qwB/BR8z"
-Date: Wed, 29 Nov 2023 10:11:34 +0100
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="u5dysyFJ"
+Date: Wed, 29 Nov 2023 10:16:57 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1701249098;
+	t=1701249419;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JRJxZnwGjhIymnyBBk6Y0CVmxFGG/QUTFScRcfcAsVk=;
-	b=qwB/BR8zmhZ0jMeS+cVo8foAK3xEFLSq4YUnhHe9e/mPCH2FOuPJVAHqc8d+syKwescfaO
-	XD7HBc9RfGv8wjaC+RbtOXUOnzIcQjTDZm4ZJa5Cz6lgbRU/E5II0VOKInSCbDvN38nfQc
-	9cAGSDxCDEE5dnpF7SGvGL61941Hhv4=
+	bh=rgppvU2L/GoQQxYuYgM7B71jluFuq5FiCBFxjb4sYXE=;
+	b=u5dysyFJOWsjf7BeYTH2YqD2T9XmFQoY9s15Ege6aXiDrQKb5PmyUqy8H9adiPczkZIAtG
+	IYhhUBZkf9n/fDxZssQ+7R3JxKxD2HN1OfF7YOdbERuT3z41zYtT6pt+y405abje7GfcZg
+	dgC1Ug3SZjAY19sJz31jr1hS1DEId0I=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
 To: Shaoqin Huang <shahuang@redhat.com>
 Cc: kvmarm@lists.linux.dev, Thomas Huth <thuth@redhat.com>, 
 	Nico Boehr <nrb@linux.ibm.com>, Ricardo Koller <ricarkol@google.com>, 
-	Colton Lewis <coltonlewis@google.com>, Nina Schoetterl-Glausch <nsg@linux.ibm.com>, 
-	Sean Christopherson <seanjc@google.com>, Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v1 1/3] runtime: Fix the missing last_line
-Message-ID: <20231129-54301cf86283b3d5a5a249ea@orel>
+	Nina Schoetterl-Glausch <nsg@linux.ibm.com>, Nikos Nikoleris <nikos.nikoleris@arm.com>, 
+	Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v1 2/3] runtime: arm64: Skip the migration
+ tests when run on EFI
+Message-ID: <20231129-bb64bea98b2259adec0636f2@orel>
 References: <20231129032123.2658343-1-shahuang@redhat.com>
- <20231129032123.2658343-2-shahuang@redhat.com>
+ <20231129032123.2658343-3-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -36,41 +37,57 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231129032123.2658343-2-shahuang@redhat.com>
+In-Reply-To: <20231129032123.2658343-3-shahuang@redhat.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, Nov 28, 2023 at 10:21:21PM -0500, Shaoqin Huang wrote:
-> The last_line is deleted by the 2607d2d6 ("arm64: Add an efi/run script").
-> This lead to when SKIP test, the reason is missing. Fix the problem by
-> adding last_line back.
+On Tue, Nov 28, 2023 at 10:21:22PM -0500, Shaoqin Huang wrote:
+> When running the migration tests on EFI, the migration will always fail
+> since the efi/run use the vvfat format to run test, but the vvfat format
+> does not support live migration. So those migration tests will always
+> fail.
+> 
+> Instead of waiting for fail everytime when run migration tests on EFI,
+> skip those tests if running on EFI.
 > 
 > Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
-
-Fixes: 2607d2d6 ("arm64: Add an efi/run script")
-
 > ---
->  scripts/runtime.bash | 2 ++
->  1 file changed, 2 insertions(+)
+>  scripts/runtime.bash | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
 > diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index fc156f2f..d7054b80 100644
+> index d7054b80..b7105c19 100644
 > --- a/scripts/runtime.bash
 > +++ b/scripts/runtime.bash
-> @@ -148,6 +148,8 @@ function run()
->              fi
+> @@ -156,6 +156,11 @@ function run()
 >          fi
+>      }
 >  
-> +	last_line=$(tail -1 <<<"$log")
+> +    if [ "${CONFIG_EFI}" == "y" ] && find_word "migration" "$groups"; then
+> +        print_result "SKIP" $testname "" "migration test is not support in efi"
+
+migration tests are not supported with efi
+
+> +        return 2
+> +    fi
 > +
->          if [ ${skip} == true ]; then
->              print_result "SKIP" $testname "" "$last_line"
+>      cmdline=$(get_cmdline $kernel)
+>      if find_word "migration" "$groups"; then
+>          cmdline="MIGRATION=yes $cmdline"
 
-We can just change this one use of $last_line to $(tail -1 <<<"$log")
 
->              return 77
+We don't need to do the find_word twice,
+
+      cmdline=$(get_cmdline $kernel)
+      if find_word "migration" "$groups"; then
+          if [ "${CONFIG_EFI}" == "y" ]; then
+	      print_result "SKIP" $testname "" "migration tests are not supported with efi"
+	      return 2
+	  fi
+          cmdline="MIGRATION=yes $cmdline"
+
 > -- 
 > 2.40.1
->
+> 
 
 Thanks,
 drew
