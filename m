@@ -1,38 +1,35 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D2E312B72
-	for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 11:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4AEB72F4;
-	Wed, 29 Nov 2023 03:31:15 -0800 (PST)
-Received: from raptor (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C0D8A3F5A1;
-	Wed, 29 Nov 2023 03:30:22 -0800 (PST)
-Date: Wed, 29 Nov 2023 11:30:20 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
-	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
-	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
-	rppt@kernel.org, hughd@google.com, pcc@google.com,
-	steven.price@arm.com, anshuman.khandual@arm.com,
-	vincenzo.frascino@arm.com, eugenis@google.com, kcc@google.com,
-	hyesoo.yu@samsung.com, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC v2 18/27] arm64: mte: Reserve tag block for the zero
- page
-Message-ID: <ZWcgzPcld1YksCtZ@raptor>
-References: <20231119165721.9849-1-alexandru.elisei@arm.com>
- <20231119165721.9849-19-alexandru.elisei@arm.com>
- <c027ea00-a955-4c3c-b1ea-2c3f6906790d@redhat.com>
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AD2319471
+	for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 11:43:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NQ1N21nR"
+Date: Wed, 29 Nov 2023 12:43:08 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1701258191;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/IzVIw7aBdORt2nhoQvNCcoKG9vU5ChFOcZ/M34Q/rE=;
+	b=NQ1N21nRz8qNBjw/V7KCi1HWbNY49kLfKoljR3O3c5hBNnR2TMLjcVOCLN6m0O+3d724u4
+	NxcFdAlsJ3QYaMubhUIQ3ekeVWkPXSwwbL3aqD4R4ErQ5uDpiwOhLArxiNhIgmpcYBg1UW
+	Pvz2di2u8tYGFtgCqiEm6ZT8kDry33M=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Shaoqin Huang <shahuang@redhat.com>
+Cc: kvmarm@lists.linux.dev, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Eric Auger <eric.auger@redhat.com>, Nikos Nikoleris <nikos.nikoleris@arm.com>, 
+	Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v1 3/3] arm64: efi: Make running tests on
+ EFI can be parallel
+Message-ID: <20231129-cbddf8063ae5af7a37aa2e4a@orel>
+References: <20231129032123.2658343-1-shahuang@redhat.com>
+ <20231129032123.2658343-4-shahuang@redhat.com>
+ <20231129-7fbc43944dc62a55cffe131c@orel>
+ <a574e4b6-4c1b-d939-e61c-6a97a245341e@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,68 +38,88 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c027ea00-a955-4c3c-b1ea-2c3f6906790d@redhat.com>
+In-Reply-To: <a574e4b6-4c1b-d939-e61c-6a97a245341e@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Nov 28, 2023 at 06:06:54PM +0100, David Hildenbrand wrote:
-> On 19.11.23 17:57, Alexandru Elisei wrote:
-> > On arm64, the zero page receives special treatment by having the tagged
-> > flag set on MTE initialization, not when the page is mapped in a process
-> > address space. Reserve the corresponding tag block when tag storage
-> > management is being activated.
+On Wed, Nov 29, 2023 at 06:14:20PM +0800, Shaoqin Huang wrote:
+> Hi drew,
 > 
-> Out of curiosity: why does the shared zeropage require tagged storage? What
-> about the huge zeropage?
+> On 11/29/23 17:27, Andrew Jones wrote:
+> > On Tue, Nov 28, 2023 at 10:21:23PM -0500, Shaoqin Huang wrote:
+> > > Currently running tests on EFI in parallel can cause part of tests to
+> > > fail, this is because arm/efi/run script use the EFI_CASE to create the
+> > > subdir under the efi-tests, and the EFI_CASE is the filename of the
+> > > test, when running tests in parallel, the multiple tests exist in the
+> > > same filename will execute at the same time, which will use the same
+> > > directory and write the test specific things into it, this cause
+> > > chaotic and make some tests fail.
+> > 
+> > How do they fail? iiuc, we're switching from having one of each unique
+> > binary on the efi partition to multiple redundant binaries, since we
+> > copy the binary for each test, even when it's the same as for other
+> > tests. It seems like we should be able to keep single unique binaries
+> > and resolve the parallel execution failure by just checking for existence
+> > of the binaries or only creating test-specific data directories or
+> > something.
+> > 
+> 
+> The problem comes from the arm/efi/run script, as you can see. If we
+> parallel running multiple tests on efi, for example, running the pmu-sw-incr
+> and pmu-chained-counters and other pmu tests at the same time, the EFI_CASE
+> will be pmu. So they will write their $cmd_args to the
+> $EFI/TEST/pmu/startup.nsh at the same time, which will corrupt the
+> startup.nsh file.
+> 
+> cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
+> echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
+> ...
+> echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_TEST/$EFI_CASE/startup.nsh"
+> 
+> And I can get the log which outputs:
+> 
+> * pmu-sw-incr.log:
+>   - ABORT: pmu: Unknown sub-test 'pmu-mem-acce'
+> * pmu-chained-counters.log
+>   - ABORT: pmu: Unknown sub-test 'pmu-mem-access-reliab'
+> 
+> And the efi-tests/pmu/startup.nsh:
+> 
+> @echo -off
+> setvar fdtfile -guid 97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823 -rt =L"dtb"
+> pmu.efi pmu-mem-access-reliability
+> setvar fdtfile -guid 97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823 -rt =L"dtb"
+> pmu.efi pmu-chained-sw-incr
+> 
+> 
+> Thus when running parallel, some of them will fail. So I create different
+> sub-dir in the efi-tests for each small test.
 
-There are two different tags that are used for tag checking: the logical
-tag, the tag embedded in bits 59:56 of an address, and the physical tag
-corresponding to the address. This tag is stored in a separate memory
-location, called tag storage. When an access is performed, hardware
-compares the logical tag (from the address) with the physical tag (from the
-tag storage). If they match, the access is permitted.
+Ok, I was guessing it was something like that. Maybe we should create a
+"bin" type of named directory for all the binaries and then create a
+separate subdir for each test and its startup.nsh, rather than copying
+the binaries multiple times.
 
-The physical tag is set with special instructions.
+> > >   : "${EFI_CASE:=$(basename $1 .efi)}"
+> > >   : "${EFI_VAR_GUID:=97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823}"
+> > > @@ -56,20 +58,20 @@ if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
+> > >   	EFI_CASE=dummy
+> > >   fi
+> > > -: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_CASE"}"
+> > > +: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_TESTNAME"}"
+> > >   mkdir -p "$EFI_CASE_DIR"
+> > > -cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
+> > > -echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
+> > > +cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_CASE_DIR/"
+> > > +echo "@echo -off" > "$EFI_CASE_DIR/startup.nsh"
+> > 
+> > Unrelated change, should be a separate patch.
+> > 
+> 
+> Ok, Will separate it.
 
-Userspace pointers have bits 59:56 zero. If the pointer is in a VMA with
-MTE enabled, then for userspace to be able to access this address, the
-physical tag must also be 0b0000.
-
-To make it easier on userspace, when a page is first mapped as tagged, its
-tags are cleared by the kernel; this way, userspace can access the address
-immediately, without clearing the physical tags beforehand. Another reason
-for clearing the physical tags when a page is mapped as tagged would be to
-avoid leaking uninitialized tags to userspace.
-
-The zero page is special, because the physical tags are not zeroed every
-time the page is mapped in a process; instead, the zero page is marked as
-tagged (by setting a page flag) and the physical tags are zeroed only once,
-when MTE is enabled at boot.
-
-All of this means that when tag storage is enabled, which happens after MTE
-is enabled, the tag storage corresponding to the zero page is already in
-use and must be rezerved, and it can never be used for data allocations.
-
-I hope all of the above makes sense. I can also put it in the commit
-message :)
-
-As for the zero huge page, the MTE code in the kernel treats it like a
-regular page, and it zeroes the tags when it is mapped as tagged in a
-process. I agree that this might not be the best solution from a
-performance perspective, but it has worked so far.
-
-With tag storage management enabled, set_pte_at()->mte_sync_tags() will
-discover that the huge zero page doesn't have tag storage reserved, the
-table entry will be mapped as invalid to use the page fault-on-access
-mechanism that I introduce later in the series [1] to reserve tag storage,
-and after that set_pte_at() will zero the physical tags.
-
-[1] https://lore.kernel.org/all/20231119165721.9849-20-alexandru.elisei@arm.com/
+Actually, disregard my comment. I was too hasty here and thought the
+'@echo -off' was getting added, but now I see only the path was getting
+updated. It's correct to make this change here in this patch.
 
 Thanks,
-Alex
-
-> 
-> -- 
-> Cheers,
-> 
-> David / dhildenb
-> 
+drew
