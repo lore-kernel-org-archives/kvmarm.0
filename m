@@ -1,207 +1,139 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35EAB1DFCE;
-	Wed, 29 Nov 2023 19:47:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C4161673
+	for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 21:45:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="syQ2+UVh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 894CCC433C9;
-	Wed, 29 Nov 2023 19:47:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701287274;
-	bh=YG8IdGIKyEPPRl3BRdJ7ECZAIkh6utCR8Z3bE/lJTKg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=syQ2+UVhgwDKeVwkvcw3WWJMrIMwVFdqOaBnQdnY0Rlt9K0r4cb1XvV4Wn5nXHhiV
-	 gvTopNRfVdRFpnAxCIj73GZetoCy3oRvVWaF9UN49jRb7Z9PaP9OSK8xd3kbYWQPAf
-	 1DVl4x39hf55wBk5hq0wuuTKmwCIa53KirnCxp64qhjbH1nsW/rX0ljX0eKOsDQczo
-	 5NnQ+5y5F2fyYIQD1SrPwraAux7InBikg0rKMW1QXBI4LRkHIbJph2j7VkE0B5XT6p
-	 6lO6X2oBE1/m0yp44YgdR/5dTD+ohUFD0wP52uflq/4L+T9N3OYm8sxTaYYY5dT5A+
-	 NahbHETz7zMtA==
-Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1r8QXH-0001z1-Ua;
-	Wed, 29 Nov 2023 19:47:52 +0000
-Date: Wed, 29 Nov 2023 19:47:50 +0000
-Message-ID: <87h6l48hp5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	akpm@linux-foundation.org,
-	aneesh.kumar@linux.ibm.com,
-	broonie@kernel.org,
-	catalin.marinas@arm.com,
-	dave.hansen@linux.intel.com,
-	oliver.upton@linux.dev,
-	shuah@kernel.org,
-	will@kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 06/25] KVM: arm64: Save/restore POE registers
-In-Reply-To: <20231129151123.GA2423241@e124191.cambridge.arm.com>
-References: <20231124163510.1835740-1-joey.gouly@arm.com>
-	<20231124163510.1835740-7-joey.gouly@arm.com>
-	<86bkbfcbyp.wl-maz@kernel.org>
-	<20231129151123.GA2423241@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="advf6d5S"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701294337;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s3xWVWUZPbk5MGMDQz7HZH6VD2zILEgQvXP9r7AbwIo=;
+	b=advf6d5SvMQTxKgLR94MJFrWxVMxBSHl6Q6566Imrfkl17ydS1gPDufdTDkFKk1PkhSMCV
+	7+yvri+ti+zYdSdhh8FYFwkORgHG2Zly5cvgFn0NfnnGqMbqWAEpjFSuDzuav/KmzRPhoB
+	yQR3cVtzwKk7c8Dhyt5xrF2f0qwCo2I=
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
+ [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-656-ukA7yHOqN7C9OLxoqQroyQ-1; Wed, 29 Nov 2023 16:45:33 -0500
+X-MC-Unique: ukA7yHOqN7C9OLxoqQroyQ-1
+Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-58d11a85f90so301609eaf.3
+        for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 13:45:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701294333; x=1701899133;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=s3xWVWUZPbk5MGMDQz7HZH6VD2zILEgQvXP9r7AbwIo=;
+        b=uZIXCvkPj5sReyGKiHCCjDXzQRVrQ7KYRYgLb2n0TCD1sI5VM7MMNZcn2gTR4gWVDR
+         wOPE23s7wYvxrOMUXKpdKZJuNdpWMfgmI3XCxhAq0or3VSqOORcbJYUoM2Ctp7Y/zqA/
+         2jNNfxFIuEUgCXAE3lzKxau4YED6enxrloV78PCqspKYPhWU2cs/Tb9fEZ4rJyYaF5OJ
+         xWlOefcqSXTNQWPKa6M7GQcfK2OHNtP2OksRtsLR1g0rpB7Oxj0cE5YbuGxoXS8Qi0l8
+         d8mK7Y/Ftz7U4zIZEu58L8j3e7lTEm9V9w1wz9YvVaTQvEgeOFRjqs86sZj2vFzIYvJd
+         NpIw==
+X-Gm-Message-State: AOJu0Yxrzlb/YyyAxbO4Clreqf5qLuZcv8U595fZ6Oo98laKy9KTkY4u
+	+P/7MUWyu21OHY/LGvFiYPp0G9G0MB14rpJkev9m84cQKIY579ukAcJsjnnaGZ3P2OlYix3T8xX
+	RKGAYw7+fNdldTKBk
+X-Received: by 2002:a05:6820:513:b0:58d:6217:795e with SMTP id m19-20020a056820051300b0058d6217795emr19629091ooj.8.1701294332978;
+        Wed, 29 Nov 2023 13:45:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFiX/Tvc+toAwd/tY9Rv762mlPV5wQvlo/Dm5/DrBUxi70aCrX/U4468O+1d5CLlBkm80dRJw==
+X-Received: by 2002:a05:6820:513:b0:58d:6217:795e with SMTP id m19-20020a056820051300b0058d6217795emr19629065ooj.8.1701294332763;
+        Wed, 29 Nov 2023 13:45:32 -0800 (PST)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id u38-20020a4a8c29000000b0057bb326cad4sm2486047ooj.33.2023.11.29.13.45.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Nov 2023 13:45:32 -0800 (PST)
+Date: Wed, 29 Nov 2023 14:45:30 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Michael Ellerman <mpe@ellerman.id.au>,
+ Paolo Bonzini <pbonzini@redhat.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Borislav Petkov <bp@alien8.de>, Catalin
+ Marinas <catalin.marinas@arm.com>, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Dave Hansen <dave.hansen@linux.intel.com>,
+ David Hildenbrand <david@redhat.com>, Janosch Frank
+ <frankja@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens
+ <hca@linux.ibm.com>, "H. Peter Anvin" <hpa@zytor.com>, Claudio Imbrenda
+ <imbrenda@linux.ibm.com>, James Morse <james.morse@arm.com>,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, Marc Zyngier <maz@kernel.org>, Ingo Molnar
+ <mingo@redhat.com>, Nicholas Piggin <npiggin@gmail.com>, Oliver Upton
+ <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, Sven
+ Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Will
+ Deacon <will@kernel.org>, x86@kernel.org, Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: Ping? Re: [PATCH rc] kvm: Prevent compiling virt/kvm/vfio.c
+ unless VFIO is selected
+Message-ID: <20231129144530.16c18552.alex.williamson@redhat.com>
+In-Reply-To: <ZWeDZ76VkRMbHEGl@google.com>
+References: <0-v1-08396538817d+13c5-vfio_kvm_kconfig_jgg@nvidia.com>
+	<87edgy87ig.fsf@mail.lhotse>
+	<ZWagNsu1XQIqk5z9@google.com>
+	<20231129124821.GU436702@nvidia.com>
+	<ZWeDZ76VkRMbHEGl@google.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org, aneesh.kumar@linux.ibm.com, broonie@kernel.org, catalin.marinas@arm.com, dave.hansen@linux.intel.com, oliver.upton@linux.dev, shuah@kernel.org, will@kernel.org, kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-kselftest@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 7bit
 
-On Wed, 29 Nov 2023 15:11:23 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> Hi Marc,
-> 
-> Thanks for taking a look.
-> 
-> On Mon, Nov 27, 2023 at 06:01:18PM +0000, Marc Zyngier wrote:
-> > On Fri, 24 Nov 2023 16:34:51 +0000,
-> > Joey Gouly <joey.gouly@arm.com> wrote:
-> > > 
-> > > Define the new system registers that POE introduces and context switch them.
-> > 
-> > I would really like to see a discussion on the respective lifetimes of
-> > these two registers (see below).
-> > 
-> > >
-> > > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > > Cc: Marc Zyngier <maz@kernel.org>
-> > > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > > Cc: Will Deacon <will@kernel.org>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_arm.h           |  4 ++--
-> > >  arch/arm64/include/asm/kvm_host.h          |  4 ++++
-> > >  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 10 ++++++++++
-> > >  arch/arm64/kvm/sys_regs.c                  |  2 ++
-> > >  4 files changed, 18 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> > > index b85f46a73e21..597470e0b87b 100644
-> > > --- a/arch/arm64/include/asm/kvm_arm.h
-> > > +++ b/arch/arm64/include/asm/kvm_arm.h
-> > > @@ -346,14 +346,14 @@
+On Wed, 29 Nov 2023 10:31:03 -0800
+Sean Christopherson <seanjc@google.com> wrote:
+
+> On Wed, Nov 29, 2023, Jason Gunthorpe wrote:
+> > On Tue, Nov 28, 2023 at 06:21:42PM -0800, Sean Christopherson wrote:  
+> > > diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> > > index 454e9295970c..a65b2513f8cd 100644
+> > > --- a/include/linux/vfio.h
+> > > +++ b/include/linux/vfio.h
+> > > @@ -289,16 +289,12 @@ void vfio_combine_iova_ranges(struct rb_root_cached *root, u32 cur_nodes,
+> > >  /*
+> > >   * External user API
 > > >   */
-> > >  #define __HFGRTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51))
-> > >  #define __HFGRTR_EL2_MASK	GENMASK(49, 0)
-> > > -#define __HFGRTR_EL2_nMASK	(GENMASK(58, 57) | GENMASK(55, 54) | BIT(50))
-> > > +#define __HFGRTR_EL2_nMASK	(GENMASK(60, 57) | GENMASK(55, 54) | BIT(50))
-> > >  
-> > >  #define __HFGWTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51) |	\
-> > >  				 BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
-> > >  				 GENMASK(26, 25) | BIT(21) | BIT(18) |	\
-> > >  				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
-> > >  #define __HFGWTR_EL2_MASK	GENMASK(49, 0)
-> > > -#define __HFGWTR_EL2_nMASK	(GENMASK(58, 57) | GENMASK(55, 54) | BIT(50))
-> > > +#define __HFGWTR_EL2_nMASK	(GENMASK(60, 57) | GENMASK(55, 54) | BIT(50))
-> > >  
-> > >  #define __HFGITR_EL2_RES0	GENMASK(63, 57)
-> > >  #define __HFGITR_EL2_MASK	GENMASK(54, 0)
-> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > index 824f29f04916..fa9ebd8fce40 100644
-> > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > @@ -401,6 +401,10 @@ enum vcpu_sysreg {
-> > >  	PIR_EL1,       /* Permission Indirection Register 1 (EL1) */
-> > >  	PIRE0_EL1,     /*  Permission Indirection Register 0 (EL1) */
-> > >  
-> > > +	/* Permission Overlay Extension registers */
-> > > +	POR_EL1,	/* Permission Overlay Register 1 (EL1) */
-> > > +	POR_EL0,	/* Permission Overlay Register 0 (EL0) */
+> > > -#if IS_ENABLED(CONFIG_VFIO_GROUP)
+> > >  struct iommu_group *vfio_file_iommu_group(struct file *file);
 > > > +
-> > >  	/* 32bit specific registers. */
-> > >  	DACR32_EL2,	/* Domain Access Control Register */
-> > >  	IFSR32_EL2,	/* Instruction Fault Status Register */
-> > > diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > > index bb6b571ec627..22f07ee43e7e 100644
-> > > --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > > +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > > @@ -19,6 +19,9 @@
-> > >  static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+> > > +#if IS_ENABLED(CONFIG_VFIO_GROUP)
+> > >  bool vfio_file_is_group(struct file *file);
+> > >  bool vfio_file_has_dev(struct file *file, struct vfio_device *device);
+> > >  #else
+> > > -static inline struct iommu_group *vfio_file_iommu_group(struct file *file)
+> > > -{
+> > > -       return NULL;
+> > > -}
+> > > -
+> > >  static inline bool vfio_file_is_group(struct file *file)
 > > >  {
-> > >  	ctxt_sys_reg(ctxt, MDSCR_EL1)	= read_sysreg(mdscr_el1);
-> > > +
-> > > +	if (system_supports_poe())
-> > > +		ctxt_sys_reg(ctxt, POR_EL0)	= read_sysreg_s(SYS_POR_EL0);
+> > >         return false;
+> > >   
 > > 
-> > So this is saved as eagerly as it gets. Why? If it only affects EL0,
-> > it can be saved/restored in a much lazier way.
+> > So you symbol get on a symbol that can never be defined? Still says to
+> > me the kconfig needs fixing :|  
 > 
-> Just to confirm I understand what you mean, the current code looks like:
+> Yeah, I completely agree, and if KVM didn't already rely on this horrific
+> behavior and there wasn't a more complete overhaul in-flight, I wouldn't suggest
+> this.
 > 
-> 	vcpu_load()                // Lazy save
+> I'll send the KVM Kconfig/Makefile cleanups from my "Hide KVM internals from others"
+> series separately (which is still the bulk of the series) so as to prioritize
+> getting the cleanups landed.
 > 
-> 	while (ret > 0)
-> 		check_vcpu_requests()
-> 		kvm_arm_vcpu_enter_exit()  // Eager save/restore
-> 		ret = handle_exit()
-> 
-> 	vcpu_put()                // Lazy restore
 
-Yes, with the additional caveat that VHE and nVHE/hVHE have different
-views of what can be lazy or not.
+Seems we have agreement and confirmation of the fix above as an
+interim, do you want to post it formally and I can pick it up for
+v6.7-rc?  Thanks,
 
->
-> POR_EL0 does affect EL2, if it does some form of {get,put}_user.
-> This happens in vgic_its_process_commands (as part of handle_exit), also the
-> stolen time code (in check_vcpu_requests) and could possibly happen if perf
-> tries to walk the user stack.
->
-> So I think that it does need to happen eagerly, such that the host-userspace's
-> POR_EL0 is used to access the VM's memory, not the guest-userspace's POR_EL0.
+Alex
 
-OK, I didn't quite see that initially, thanks for the explanation.
-I find it rather ugly that userspace can directly affect these
-functionalities, but hey, why not.
-
-> Does that make sense? It will need a comment, I agree.
-
-Yes, that'd be good indeed.
-
-> 
-> > 
-> > >  }
-> > >  
-> > >  static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
-> > > @@ -59,6 +62,8 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
-> > >  		ctxt_sys_reg(ctxt, PIR_EL1)	= read_sysreg_el1(SYS_PIR);
-> > >  		ctxt_sys_reg(ctxt, PIRE0_EL1)	= read_sysreg_el1(SYS_PIRE0);
-> > 
-> > And the fact that you only touch PIRE0_EL1 here seems to be a good
-> > indication that the above can be relaxed.
-> 
-> PIREO_EL1 is not directly accessible from EL0. I'll have a think
-> about this a bit more, and if there is a potential similar issue
-> here.
-
-Ah, re-reading the spec, I see that there is a PIRE0_EL2 that is in
-use for VHE, meaning that in that case restoring POR_EL0 is enough to
-get the correct permissions. For nVHE/hVHE, this function is part of
-the 'eager' lot, so it doesn't matter.
-
-So this code is correct in the end, and all that's missing is some
-comments and the NV stuff.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
