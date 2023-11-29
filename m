@@ -1,139 +1,175 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C4161673
-	for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 21:45:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E05147A51
+	for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 22:40:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="advf6d5S"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701294337;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=s3xWVWUZPbk5MGMDQz7HZH6VD2zILEgQvXP9r7AbwIo=;
-	b=advf6d5SvMQTxKgLR94MJFrWxVMxBSHl6Q6566Imrfkl17ydS1gPDufdTDkFKk1PkhSMCV
-	7+yvri+ti+zYdSdhh8FYFwkORgHG2Zly5cvgFn0NfnnGqMbqWAEpjFSuDzuav/KmzRPhoB
-	yQR3cVtzwKk7c8Dhyt5xrF2f0qwCo2I=
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
- [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-656-ukA7yHOqN7C9OLxoqQroyQ-1; Wed, 29 Nov 2023 16:45:33 -0500
-X-MC-Unique: ukA7yHOqN7C9OLxoqQroyQ-1
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-58d11a85f90so301609eaf.3
-        for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 13:45:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Nc3DItpT"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5ca61d84dc3so6117647b3.0
+        for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 14:40:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701297621; x=1701902421; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LDVeTl61QPCCxPz+sfODK89nbVJMVG6TQMGABDOMFAw=;
+        b=Nc3DItpThdoM/yKlsiXHwN2jxCBxtFbSJs59ZwY5xnKJmyzaDoghWr/XNDeR4OzxU0
+         1xw/Z0nxhxam4eGDyqIEE6CO8NQMjbqFt0I9IatfCcXDxHVuK7XTXyy5Tmtu+TRa+sq+
+         bA18Tb15DrcIjxDyQOhJSsEEppaSRtDSSv9qo94S0xgDhbJDT4V4WJ1fTTrBUMuGTxAu
+         2QavdpZ/Jmt8VDYfIwZbErh1UQlzBSQMfXdXZ5WtWUHCHBly90isUhe7fPa+RQD+CYCb
+         IK1kvW23gnso4oTi5gEYZJOPh8WdBdTaB9kNeHstxWqAsMRjx0t3CUefDTDCvjtqoKAQ
+         niPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701294333; x=1701899133;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s3xWVWUZPbk5MGMDQz7HZH6VD2zILEgQvXP9r7AbwIo=;
-        b=uZIXCvkPj5sReyGKiHCCjDXzQRVrQ7KYRYgLb2n0TCD1sI5VM7MMNZcn2gTR4gWVDR
-         wOPE23s7wYvxrOMUXKpdKZJuNdpWMfgmI3XCxhAq0or3VSqOORcbJYUoM2Ctp7Y/zqA/
-         2jNNfxFIuEUgCXAE3lzKxau4YED6enxrloV78PCqspKYPhWU2cs/Tb9fEZ4rJyYaF5OJ
-         xWlOefcqSXTNQWPKa6M7GQcfK2OHNtP2OksRtsLR1g0rpB7Oxj0cE5YbuGxoXS8Qi0l8
-         d8mK7Y/Ftz7U4zIZEu58L8j3e7lTEm9V9w1wz9YvVaTQvEgeOFRjqs86sZj2vFzIYvJd
-         NpIw==
-X-Gm-Message-State: AOJu0Yxrzlb/YyyAxbO4Clreqf5qLuZcv8U595fZ6Oo98laKy9KTkY4u
-	+P/7MUWyu21OHY/LGvFiYPp0G9G0MB14rpJkev9m84cQKIY579ukAcJsjnnaGZ3P2OlYix3T8xX
-	RKGAYw7+fNdldTKBk
-X-Received: by 2002:a05:6820:513:b0:58d:6217:795e with SMTP id m19-20020a056820051300b0058d6217795emr19629091ooj.8.1701294332978;
-        Wed, 29 Nov 2023 13:45:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFiX/Tvc+toAwd/tY9Rv762mlPV5wQvlo/Dm5/DrBUxi70aCrX/U4468O+1d5CLlBkm80dRJw==
-X-Received: by 2002:a05:6820:513:b0:58d:6217:795e with SMTP id m19-20020a056820051300b0058d6217795emr19629065ooj.8.1701294332763;
-        Wed, 29 Nov 2023 13:45:32 -0800 (PST)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id u38-20020a4a8c29000000b0057bb326cad4sm2486047ooj.33.2023.11.29.13.45.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Nov 2023 13:45:32 -0800 (PST)
-Date: Wed, 29 Nov 2023 14:45:30 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Michael Ellerman <mpe@ellerman.id.au>,
- Paolo Bonzini <pbonzini@redhat.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger
- <borntraeger@linux.ibm.com>, Borislav Petkov <bp@alien8.de>, Catalin
- Marinas <catalin.marinas@arm.com>, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Dave Hansen <dave.hansen@linux.intel.com>,
- David Hildenbrand <david@redhat.com>, Janosch Frank
- <frankja@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens
- <hca@linux.ibm.com>, "H. Peter Anvin" <hpa@zytor.com>, Claudio Imbrenda
- <imbrenda@linux.ibm.com>, James Morse <james.morse@arm.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, Marc Zyngier <maz@kernel.org>, Ingo Molnar
- <mingo@redhat.com>, Nicholas Piggin <npiggin@gmail.com>, Oliver Upton
- <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, Sven
- Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Will
- Deacon <will@kernel.org>, x86@kernel.org, Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: Ping? Re: [PATCH rc] kvm: Prevent compiling virt/kvm/vfio.c
- unless VFIO is selected
-Message-ID: <20231129144530.16c18552.alex.williamson@redhat.com>
-In-Reply-To: <ZWeDZ76VkRMbHEGl@google.com>
-References: <0-v1-08396538817d+13c5-vfio_kvm_kconfig_jgg@nvidia.com>
-	<87edgy87ig.fsf@mail.lhotse>
-	<ZWagNsu1XQIqk5z9@google.com>
-	<20231129124821.GU436702@nvidia.com>
-	<ZWeDZ76VkRMbHEGl@google.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1701297621; x=1701902421;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LDVeTl61QPCCxPz+sfODK89nbVJMVG6TQMGABDOMFAw=;
+        b=onwCIru/iROy/KAeZ8/9/Fs+Iwt6p4MkUcgSvESEW2cnBUQhXA7GbeTXR8iuDwfq+M
+         sDQchbholLQ+4us2Ucaj75UCRvHmWXIKWG5kFmzpprQGW8oCQR0qFgXQn0xsoROQt3YS
+         0EPDpVm2pnvS3Vm305KUsMAw/4nDfbRuF57kf5TiystZdtnMHZsVbtvLjVSJ6K/nHx9m
+         ceWjRcjyMzXoTFl3l2id5VIrP2cPdxRZQAY7B+ofnwbBw+LGT5YSXv2vVIrB3i3bZD10
+         PbdXjXP1Y3l7vnaRPu3BHf/lETupiVQYbROWwmxuj0ewhddxDKZnKus+YesnXCyZwqwg
+         4A0Q==
+X-Gm-Message-State: AOJu0YwHEepmKCLUmv2uXU47LxRe5nkFS6mE3+qrSv6rTi550b1FCvlE
+	0RELSK+iKcAr3oyMecEYSRiFabx42oY=
+X-Google-Smtp-Source: AGHT+IH9RxzmajTLifcNJivXHXF15GYt6RNI6hyz68HWdvvEFKxSVfujRMym9vZDynLvRqNw698SRRht3dY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:842:b0:5cc:cd5e:8f0e with SMTP id
+ bz2-20020a05690c084200b005cccd5e8f0emr592433ywb.0.1701297621195; Wed, 29 Nov
+ 2023 14:40:21 -0800 (PST)
+Date: Wed, 29 Nov 2023 14:40:19 -0800
+In-Reply-To: <81628606-ca9b-866f-5e71-91001e856871@suse.cz>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <92ba7ddd-2bc8-4a8d-bd67-d6614b21914f@intel.com>
+ <ZUJVfCkIYYFp5VwG@google.com> <CABgObfaw4Byuzj5J3k48jdwT0HCKXLJNiuaA9H8Dtg+GOq==Sw@mail.gmail.com>
+ <ZUJ-cJfofk2d_I0B@google.com> <4ca2253d-276f-43c5-8e9f-0ded5d5b2779@redhat.com>
+ <ZULSkilO-tdgDGyT@google.com> <CABgObfbq_Hg0B=jvsSDqYH3CSpX+RsxfwB-Tc-eYF4uq2Qw9cg@mail.gmail.com>
+ <ZUPCWfO1iO77-KDA@google.com> <CABgObfa=DH7FySBviF63OS9sVog_wt-AqYgtUAGKqnY5Bizivw@mail.gmail.com>
+ <81628606-ca9b-866f-5e71-91001e856871@suse.cz>
+Message-ID: <ZWe90784ek9VvHa5@google.com>
+Subject: Re: [PATCH v13 17/35] KVM: Add transparent hugepage support for
+ dedicated guest memory
+From: Sean Christopherson <seanjc@google.com>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xu Yilun <yilun.xu@intel.com>, 
+	Chao Peng <chao.p.peng@linux.intel.com>, Fuad Tabba <tabba@google.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Anish Moorthy <amoorthy@google.com>, 
+	David Matlack <dmatlack@google.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Maciej Szmigiero <mail@maciej.szmigiero.name>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
+	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 29 Nov 2023 10:31:03 -0800
-Sean Christopherson <seanjc@google.com> wrote:
+On Mon, Nov 27, 2023, Vlastimil Babka wrote:
+> On 11/2/23 16:46, Paolo Bonzini wrote:
+> > On Thu, Nov 2, 2023 at 4:38=E2=80=AFPM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> >> Actually, looking that this again, there's not actually a hard depende=
+ncy on THP.
+> >> A THP-enabled kernel _probably_  gives a higher probability of using h=
+ugepages,
+> >> but mostly because THP selects COMPACTION, and I suppose because using=
+ THP for
+> >> other allocations reduces overall fragmentation.
+> >=20
+> > Yes, that's why I didn't even bother enabling it unless THP is
+> > enabled, but it makes even more sense to just try.
+> >=20
+> >> So rather than honor KVM_GUEST_MEMFD_ALLOW_HUGEPAGE iff THP is enabled=
+, I think
+> >> we should do the below (I verified KVM can create hugepages with THP=
+=3Dn).  We'll
+> >> need another capability, but (a) we probably should have that anyways =
+and (b) it
+> >> provides a cleaner path to adding PUD-sized hugepage support in the fu=
+ture.
+> >=20
+> > I wonder if we need KVM_CAP_GUEST_MEMFD_HUGEPAGE_PMD_SIZE though. This
+> > should be a generic kernel API and in fact the sizes are available in
+> > a not-so-friendly format in /sys/kernel/mm/hugepages.
+> >=20
+> > We should just add /sys/kernel/mm/hugepages/sizes that contains
+> > "2097152 1073741824" on x86 (only the former if 1G pages are not
+> > supported).
+> >=20
+> > Plus: is this the best API if we need something else for 1G pages?
+> >=20
+> > Let's drop *this* patch and proceed incrementally. (Again, this is
+> > what I want to do with this final review: identify places that are
+> > stil sticky, and don't let them block the rest).
+> >=20
+> > Coincidentially we have an open spot next week at plumbers. Let's
+> > extend Fuad's section to cover more guestmem work.
+>=20
+> Hi,
+>=20
+> was there any outcome wrt this one?
 
-> On Wed, Nov 29, 2023, Jason Gunthorpe wrote:
-> > On Tue, Nov 28, 2023 at 06:21:42PM -0800, Sean Christopherson wrote:  
-> > > diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> > > index 454e9295970c..a65b2513f8cd 100644
-> > > --- a/include/linux/vfio.h
-> > > +++ b/include/linux/vfio.h
-> > > @@ -289,16 +289,12 @@ void vfio_combine_iova_ranges(struct rb_root_cached *root, u32 cur_nodes,
-> > >  /*
-> > >   * External user API
-> > >   */
-> > > -#if IS_ENABLED(CONFIG_VFIO_GROUP)
-> > >  struct iommu_group *vfio_file_iommu_group(struct file *file);
-> > > +
-> > > +#if IS_ENABLED(CONFIG_VFIO_GROUP)
-> > >  bool vfio_file_is_group(struct file *file);
-> > >  bool vfio_file_has_dev(struct file *file, struct vfio_device *device);
-> > >  #else
-> > > -static inline struct iommu_group *vfio_file_iommu_group(struct file *file)
-> > > -{
-> > > -       return NULL;
-> > > -}
-> > > -
-> > >  static inline bool vfio_file_is_group(struct file *file)
-> > >  {
-> > >         return false;
-> > >   
-> > 
-> > So you symbol get on a symbol that can never be defined? Still says to
-> > me the kconfig needs fixing :|  
-> 
-> Yeah, I completely agree, and if KVM didn't already rely on this horrific
-> behavior and there wasn't a more complete overhaul in-flight, I wouldn't suggest
-> this.
-> 
-> I'll send the KVM Kconfig/Makefile cleanups from my "Hide KVM internals from others"
-> series separately (which is still the bulk of the series) so as to prioritize
-> getting the cleanups landed.
-> 
+No, we punted on hugepage support for the initial guest_memfd merge.  We de=
+finitely
+plan on adding hugeapge support sooner than later, but we haven't yet agree=
+d on
+exactly what that will look like.
 
-Seems we have agreement and confirmation of the fix above as an
-interim, do you want to post it formally and I can pick it up for
-v6.7-rc?  Thanks,
+> Based on my experience with THP's it would be best if userspace didn't ha=
+ve
+> to opt-in, nor care about the supported size. If the given size is unalig=
+ned,
+> provide a mix of large pages up to an aligned size, and for the rest fall=
+back
+> to base pages, which should be better than -EINVAL on creation (is it
+> possible with the current implementation? I'd hope so so?).
 
-Alex
+guest_memfd serves a different use case than THP.  For modern VMs, and espe=
+cially
+for slice-of-hardware VMs that are one of the main targets for guest_memfd,=
+ if not
+_the_ main target, guest memory should _always_ be backed by hugepages in t=
+he
+physical domain.  The actual guest mappings might not be huge, e.g. x86 nee=
+ds to
+do partial mappings to skip over (legacy) memory holes, but KVM already gra=
+cefully
+handles that.
 
+In other words, for most guest_memfd use cases, if userspace wants hugepage=
+s but
+KVM can't provide hugepages, then it is much more desirable to return an er=
+ror
+than to silently fall back to small pages.
+
+I 100% agree that having to opt-in is suboptimal, but IMO providing "error =
+on an
+incompatible configuration" semantics without requiring userspace to opt-in=
+ is an
+even worse experience for userspace.
+
+> A way to opt-out from huge pages could be useful although there's always =
+the
+> risk of some initial troubles resulting in various online sources cargo-c=
+ult
+> recommending to opt-out forever.
