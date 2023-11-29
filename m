@@ -1,155 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176B53AC19;
-	Wed, 29 Nov 2023 16:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51705DF06
+	for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 18:31:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="acJpDzkv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9248DC433C8;
-	Wed, 29 Nov 2023 16:27:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701275227;
-	bh=GwC4XY5uvJk/yRp22B+OakqJ33CPv5WWStiKtTgdZ1o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=acJpDzkvFaC19Wixe4FsPIxaEbIQ/rGiElA1YztWdmEvhOA2ka9rKnCZu+rlzKh+R
-	 JAXiIlVjd6f4Z4FR5+Exz2sdIQHl+AL8xEf9XHwnCWamnUT6LbJbmyNV1R1rwmU0gB
-	 //CqOlc7T8G65thnCQIp2WWMnD3+tOh1eMtnFLRYi+YZoh9H0w78ypEWPsnzT9XRhH
-	 E1q/YHbHckcwGFB2FBvff4KIDW5AFdsh23S3Cc3gTCy31Rj4pPiNmGDVAiZJ0Pn1ht
-	 D14SePrMXtxnZAYx98l8eb7QlDMCzeHMEMqRVeqjRGgTI9Kyfy2EIO71baTC/Jzgit
-	 5d2SL5x2C98Qw==
-Date: Wed, 29 Nov 2023 16:27:01 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
-	Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 2/2] perf build: Ensure sysreg-defs Makefile respects
- output dir
-Message-ID: <c701bf6b-0ff0-44a0-9d1d-84e8515d077c@sirena.org.uk>
-References: <20231121192956.919380-1-oliver.upton@linux.dev>
- <20231121192956.919380-3-oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tYSsNZZD"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5d10f5bf5d9so901637b3.3
+        for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 10:31:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701282665; x=1701887465; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=c1rLIdwfJP37garEzWHrWFHBXDQvp3tQ1Ff7Pa+0bvQ=;
+        b=tYSsNZZD7T6HWCYsi/FX162jsCnCsdwF+4JGzm2gnngBsvx4NHHtk2L4VKddkSQlIf
+         InKWh453eDX3JBVrTHyTMnZ7zzUN8FroqDxXWOOQJ5h+6pBARAuUsPkQPIb8zKGN+w0Y
+         P66Uq3M4kl40ZP0BesiFEcCexxKj4fMVfCl+TMiKFAkLlij+dvhqW2QqqJCHlLijYdKN
+         N6T/4SXSrXrFjXX8LX9iw0GMzZBbjgqcEjrCfEJ2C2pyyYjEPXHx3FOpSo68DSZ6k3aI
+         fEjuLaR85E3i2frMTgXnr7f691DIlcgs2K5NVdz4TbYs2ZAMFJKoz5AQKqJ/PyLF44jt
+         88+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701282665; x=1701887465;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=c1rLIdwfJP37garEzWHrWFHBXDQvp3tQ1Ff7Pa+0bvQ=;
+        b=BEYv+4mQ3ICeWQKJAUa++x7m/nzFPlUd9A3Aw6lpPQRk2F5RKsd+crRs7oyozD6LLA
+         KW7TVZ7bhCO2F5NwZL2Lw8klhgW8YmffIVci96VU7kU2T7ci2WcYSLHSNc5cYDylLRF/
+         IC/fQMBoeL6X4VDaDxI8bvQclrTbN6XlvrgnjKdbtcaj13Slp7c+uPis7GzXhTb+8AuC
+         IiwjXWPd7Ab/UlGbAELkhMawrNHlcickpQ0MiAW6lum2BQjXuurAYhVZcdlG7BzAvARS
+         OQdvnutqZnf9pN8To+VLh+pUodsuOsigIR5/aLOWXd5rztT+IeEFN4+n6TtIOgTUa/31
+         hyCA==
+X-Gm-Message-State: AOJu0YzYjaH5nT1L7I83GE99kHt3BZnZnIxC5L2IfsUbhkHjCOsh1ago
+	Bsx2IRfS8M8CcHI/JbjCED7aZ9KmZ1s=
+X-Google-Smtp-Source: AGHT+IHxpKv+Onni3jsljSwKzH8uXIhuxnoTBESUxuFhb+PRCSSwYQqIrFh/Htrp8TEW9pXbXT6mJDicqaY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:480d:b0:5ce:a88:8436 with SMTP id
+ hc13-20020a05690c480d00b005ce0a888436mr522497ywb.10.1701282664859; Wed, 29
+ Nov 2023 10:31:04 -0800 (PST)
+Date: Wed, 29 Nov 2023 10:31:03 -0800
+In-Reply-To: <20231129124821.GU436702@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="mCUpdAwQuB6wbXWa"
-Content-Disposition: inline
-In-Reply-To: <20231121192956.919380-3-oliver.upton@linux.dev>
-X-Cookie: Jesus is my POSTMASTER GENERAL ...
+Mime-Version: 1.0
+References: <0-v1-08396538817d+13c5-vfio_kvm_kconfig_jgg@nvidia.com>
+ <87edgy87ig.fsf@mail.lhotse> <ZWagNsu1XQIqk5z9@google.com> <20231129124821.GU436702@nvidia.com>
+Message-ID: <ZWeDZ76VkRMbHEGl@google.com>
+Subject: Re: Ping? Re: [PATCH rc] kvm: Prevent compiling virt/kvm/vfio.c
+ unless VFIO is selected
+From: Sean Christopherson <seanjc@google.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Michael Ellerman <mpe@ellerman.id.au>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Borislav Petkov <bp@alien8.de>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	David Hildenbrand <david@redhat.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, James Morse <james.morse@arm.com>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-s390@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	Marc Zyngier <maz@kernel.org>, Ingo Molnar <mingo@redhat.com>, Nicholas Piggin <npiggin@gmail.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, 
+	x86@kernel.org, Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="us-ascii"
 
+On Wed, Nov 29, 2023, Jason Gunthorpe wrote:
+> On Tue, Nov 28, 2023 at 06:21:42PM -0800, Sean Christopherson wrote:
+> > diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> > index 454e9295970c..a65b2513f8cd 100644
+> > --- a/include/linux/vfio.h
+> > +++ b/include/linux/vfio.h
+> > @@ -289,16 +289,12 @@ void vfio_combine_iova_ranges(struct rb_root_cached *root, u32 cur_nodes,
+> >  /*
+> >   * External user API
+> >   */
+> > -#if IS_ENABLED(CONFIG_VFIO_GROUP)
+> >  struct iommu_group *vfio_file_iommu_group(struct file *file);
+> > +
+> > +#if IS_ENABLED(CONFIG_VFIO_GROUP)
+> >  bool vfio_file_is_group(struct file *file);
+> >  bool vfio_file_has_dev(struct file *file, struct vfio_device *device);
+> >  #else
+> > -static inline struct iommu_group *vfio_file_iommu_group(struct file *file)
+> > -{
+> > -       return NULL;
+> > -}
+> > -
+> >  static inline bool vfio_file_is_group(struct file *file)
+> >  {
+> >         return false;
+> > 
+> 
+> So you symbol get on a symbol that can never be defined? Still says to
+> me the kconfig needs fixing :|
 
---mCUpdAwQuB6wbXWa
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yeah, I completely agree, and if KVM didn't already rely on this horrific
+behavior and there wasn't a more complete overhaul in-flight, I wouldn't suggest
+this.
 
-On Tue, Nov 21, 2023 at 07:29:56PM +0000, Oliver Upton wrote:
-
-> Currently the sysreg-defs are written out to the source tree
-> unconditionally, ignoring the specified output directory. Correct the
-> build rule to emit the header to the output directory. Opportunistically
-> reorganize the rules to avoid interleaving with the set of beauty make
-> rules.
-
-This breaks some build configurations:
-
-Running:
-
-make --silent --keep-going --jobs=3D56 O=3D/home/broonie/.cache/tuxmake/bui=
-lds/16/build ARCH=3Darm64 CROSS_COMPILE=3Daarch64-linux-gnu- LLVM=3D1 defco=
-nfig
-make --silent --keep-going --jobs=3D56 O=3D/home/broonie/.cache/tuxmake/bui=
-lds/16/bu
-ild INSTALL_PATH=3D/home/broonie/.cache/tuxmake/builds/16/build/kselftest_i=
-nstall=20
-ARCH=3Darm64 CROSS_COMPILE=3Daarch64-linux-gnu- LLVM=3D1 kselftest-install
-
-gives:
-
-make[4]: Leaving directory '/home/broonie/git/bisect/tools/testing/selftest=
-s/kex
-ec'
-make[4]: Entering directory '/home/broonie/git/bisect/tools/testing/selftes=
-ts/kvm'
-Makefile:270: warning: overriding recipe for target '/home/broonie/.cache/t=
-uxmake/builds/16/build/kselftest/kvm/get-reg-list'
-Makefile:265: warning: ignoring old recipe for target '/home/broonie/.cache=
-/tuxmake/builds/16/build/kselftest/kvm/get-reg-list'
-make -C ../../../../tools/arch/arm64/tools/ O=3D../../../../tools
-make[5]: Entering directory '/home/broonie/git/bisect/tools/arch/arm64/tool=
-s'
-/home/broonie/git/bisect/tools/scripts/Makefile.include:4: *** O=3D../../..=
-/../tools does not exist.  Stop.
-
-I'm using tuxmake with:
-
-    tuxmake -a arm64 -k defconfig -r docker -t llvm-17 kselftest
-
-to invoke the build.
-
-Bisection log identifying the commit that failed:
-
-git bisect start
-# bad: [1f5c003694fab4b1ba6cbdcc417488b975c088d0] Add linux-next specific f=
-iles for 20231129
-git bisect bad 1f5c003694fab4b1ba6cbdcc417488b975c088d0
-# bad: [1618cb8f574175a196b0e8926c62efc45760e856] Merge branch 'for-linux-n=
-ext-fixes' of git://anongit.freedesktop.org/drm/drm-misc
-git bisect bad 1618cb8f574175a196b0e8926c62efc45760e856
-# good: [18d46e76d7c2eedd8577fae67e3f1d4db25018b0] Merge tag 'for-6.7-rc3-t=
-ag' of git://git.kernel.org/pub/scm/linux/kernel/git/kdave/linux
-git bisect good 18d46e76d7c2eedd8577fae67e3f1d4db25018b0
-# good: [c33497720d50d39a9f3918975ee691ad570b77a6] Merge branch 'for-linus'=
- of git://git.kernel.org/pub/scm/linux/kernel/git/broonie/sound.git
-git bisect good c33497720d50d39a9f3918975ee691ad570b77a6
-# good: [35fb33a953396cae852e18a316173f5a2887bb0a] Merge branch 'fixes' of =
-git://git.kernel.org/pub/scm/linux/kernel/git/pdx86/platform-drivers-x86.git
-git bisect good 35fb33a953396cae852e18a316173f5a2887bb0a
-# good: [09a2ad2501da54228679dd21aaef72e783034a4e] Merge branch 'kunit-fixe=
-s' of git://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest.g=
-it
-git bisect good 09a2ad2501da54228679dd21aaef72e783034a4e
-# bad: [a29ee6aea7030786a63fde0d6d83a8f477b060fb] perf build: Ensure sysreg=
--defs Makefile respects output dir
-git bisect bad a29ee6aea7030786a63fde0d6d83a8f477b060fb
-# good: [fd2ddee727d1ae9296b3875087410cc3698885f0] tools headers: Update to=
-ols's copy of socket.h header
-git bisect good fd2ddee727d1ae9296b3875087410cc3698885f0
-# good: [b3b11aed147af8f7c3d79c5b0b7474505d1dde7b] tools/perf: Update tools=
-'s copy of x86 syscall table
-git bisect good b3b11aed147af8f7c3d79c5b0b7474505d1dde7b
-# good: [d3968c974a2453de9289bdb9d34130b2ce323628] tools/perf: Update tools=
-'s copy of s390 syscall table
-git bisect good d3968c974a2453de9289bdb9d34130b2ce323628
-# good: [ef5c958090a909c9f2ab717ba6abb86869e42da7] tools perf: Add arm64 sy=
-sreg files to MANIFEST
-git bisect good ef5c958090a909c9f2ab717ba6abb86869e42da7
-# first bad commit: [a29ee6aea7030786a63fde0d6d83a8f477b060fb] perf build: =
-Ensure sysreg-defs Makefile respects output dir
-
---mCUpdAwQuB6wbXWa
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmVnZlQACgkQJNaLcl1U
-h9CyQAf+O203S5VakDekJEwudWmw65mzZ6ucKwQ0lZmDZRJXrSXdhI4cYCa6mKcy
-YIVfj1IpfhjYA1WQ8noc7+gnCNglSXkr1h9tGvQMRTyI9F5af2ShDLSAp5S5iCAA
-STjTL5KArB6Y86qJYIpfgu7g7rYiWYKhH0v7hSrojlUGxONnDAbUvFncXsa21o9h
-CJLdkko4ZD75fm813Qow1dSQkoUlKrkQjWxkW8VQ1S0boV3u/atduQngBxvpv8iu
-9kqSPCMBEh2H5+dS302xwJR8LYWTTtVTRUYgIPJIlE5u1QmHrArV7bsT2evrYLLA
-l8RJr+j+ZEl92E24gVIWZWtcE8cMdw==
-=G/h/
------END PGP SIGNATURE-----
-
---mCUpdAwQuB6wbXWa--
+I'll send the KVM Kconfig/Makefile cleanups from my "Hide KVM internals from others"
+series separately (which is still the bulk of the series) so as to prioritize
+getting the cleanups landed.
