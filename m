@@ -1,55 +1,55 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81EF919444
-	for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 10:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24F41A282
+	for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 10:15:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WPdQb+Sj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A/u1NyJ+"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701252867;
+	s=mimecast20190719; t=1701252917;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7zsg/RI6TTCXC9r+9JvBhKGQYtqp3P81us7lifIiZaY=;
-	b=WPdQb+Sj6Z6OWu/aYrQ9L5slb8z2tdR/z3J0GYDvv6O+XwDbTJRLFfYOpwzRgX82CX85iU
-	zPN1XarQX4dj7gEApc9Z5wazHutawyX7NdNTUDAhaPUuqfTkX2LK94PPu/Yg8b6IOPOi5m
-	60YE599KENJsaVhisoRfGu8MEmlqkfk=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Lw81hUSol2mnRdZFW1ktXcFKebpoP3acx2OX3rITVMY=;
+	b=A/u1NyJ+oyFjbq67ju3jZjdLrL4vNHv3kVI9OmmxpubfSsjxfBkWpQkOWjQYKi0W/MqssH
+	0wB+6QtJR5SzTNzbNIgaB1BhJEYLTH1C2D0NJVJOpM5Q3lRmOfvSqPTHhory6k5O05l8wd
+	0EQGOGidMOqleJmfMkirzMOZTYIoZIY=
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-482-YYM6QQbiObasYswk9yFxrQ-1; Wed, 29 Nov 2023 05:14:25 -0500
-X-MC-Unique: YYM6QQbiObasYswk9yFxrQ-1
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-6cdd63867a5so60782b3a.1
-        for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 02:14:25 -0800 (PST)
+ us-mta-251-g5rtfxcANniRyujZo95kdA-1; Wed, 29 Nov 2023 05:15:11 -0500
+X-MC-Unique: g5rtfxcANniRyujZo95kdA-1
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-6cdc01c02a4so224843b3a.0
+        for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 02:15:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701252865; x=1701857665;
+        d=1e100.net; s=20230601; t=1701252910; x=1701857710;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7zsg/RI6TTCXC9r+9JvBhKGQYtqp3P81us7lifIiZaY=;
-        b=p/lVmSX7/uc1zUH62dmuY726R47FtJKEuWbPSHocpLhJ2KcHW0UdSOOeDSeb7L2+7W
-         Y3gXBb0UlN3HRHtYe3d7unJXlTNvw05aFW3KBkMy3wETY+yLY8V3Ea5gC/D69gBlIlN5
-         eez1LBYMskz9QgfUKrfzXxQAgD5aLIzD2ME3NQzOMUYKOUh1hE2qwGshlktIlgMMOsXp
-         8cOxp1ED9ZWfyw+M2ivysFQwsHck8IOY1SqHWzNOfvvJVV4Jdo17MLznlWWj1eTR2XiG
-         Smz6w04+9NK7S/LV3/Gzt9OMNrzVG4+wx5z7NtZlkuYttYp3XZ+DKeYE4Jfb/CdXU3aD
-         Zx5g==
-X-Gm-Message-State: AOJu0YzVOy5gYH9iipHZMTT0Jy1nvVy8L/56m9dSKS+qrQiJ1nH3InkJ
-	6ZffvYXQxbRWbqjrmQJ4VH60NSZRU5UcnTZvwPwOaUVEQdI6OhMkHAyAD8XW/kZSmzFqSjhao30
-	VcFJd1h9hs/G2MHqG
-X-Received: by 2002:a05:6a00:9390:b0:6bf:1621:ccad with SMTP id ka16-20020a056a00939000b006bf1621ccadmr21822305pfb.0.1701252864766;
-        Wed, 29 Nov 2023 02:14:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHPEveFUFjif03Zl8nGajMV3+o7G3pWbTGRE4N87OLSfTPpYTZcxH9Fz8K6h0d7YeBVLvaBDw==
-X-Received: by 2002:a05:6a00:9390:b0:6bf:1621:ccad with SMTP id ka16-20020a056a00939000b006bf1621ccadmr21822280pfb.0.1701252864339;
-        Wed, 29 Nov 2023 02:14:24 -0800 (PST)
+        bh=Lw81hUSol2mnRdZFW1ktXcFKebpoP3acx2OX3rITVMY=;
+        b=MilyCwoGxehjH2cJPvfYx3uWGiAcEWqXluU5ZGuV02zJf74AlHDDmx4wwZtA5Sy9LL
+         UN4AQauSj7FY7nnBa943P2bvjsHmyJ4/5dFzM5wU03a19Fzr/L9y/YxkHibTbu2v678E
+         TWsFmFZGc98VlFSPpzxKnKwaErIQGrlT769FB/Zt55H9sWxHY2OMi5GhpcFq3JUrORua
+         AgB/eRayGAkbDo41zmI+PTeBY8W/X+O5hYJjpkzQ8vpIJHlLm53qU7cFB8CEBps5Rd6G
+         GRGAmxOLGKV7hRGkuWBwV5m32alVbT8kqsi7D+l7CdSWcEbK4VyHKxhIxCG6V5jOexK4
+         TK5Q==
+X-Gm-Message-State: AOJu0YxI8ApIF5V5ODqyQ5gHaPwLAwElHjg9dyY99mg3+d9AF+x9tEaJ
+	Oq86xCKbQS+LH55AnwvbYtchTjRgBS8Wb3dY4y+SFdbY/TfupYvtZWi2KnBIP7+XxQluyHJUDhX
+	HKYEdFC3TFW4Q5dDP
+X-Received: by 2002:a05:6a21:a598:b0:18b:d26a:375c with SMTP id gd24-20020a056a21a59800b0018bd26a375cmr24956377pzc.1.1701252910308;
+        Wed, 29 Nov 2023 02:15:10 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEyzhTLYvGONc6oDui6z5dfWFKSQScpc0Ja4inxUPFDmsrawMYPVPrzhuQh+FmrKCMQPVEA7Q==
+X-Received: by 2002:a05:6a21:a598:b0:18b:d26a:375c with SMTP id gd24-20020a056a21a59800b0018bd26a375cmr24956366pzc.1.1701252909984;
+        Wed, 29 Nov 2023 02:15:09 -0800 (PST)
 Received: from [10.72.112.34] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id c21-20020aa78815000000b006cdc05b1a84sm1231123pfo.74.2023.11.29.02.14.22
+        by smtp.gmail.com with ESMTPSA id v1-20020a63d541000000b005b18c53d73csm10273696pgi.16.2023.11.29.02.15.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Nov 2023 02:14:23 -0800 (PST)
-Message-ID: <a574e4b6-4c1b-d939-e61c-6a97a245341e@redhat.com>
-Date: Wed, 29 Nov 2023 18:14:20 +0800
+        Wed, 29 Nov 2023 02:15:09 -0800 (PST)
+Message-ID: <261cdc3d-9882-a81d-57ff-6c88a2b0695a@redhat.com>
+Date: Wed, 29 Nov 2023 18:15:06 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,18 +58,19 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.1
-Subject: Re: [kvm-unit-tests PATCH v1 3/3] arm64: efi: Make running tests on
- EFI can be parallel
+Subject: Re: [kvm-unit-tests PATCH v1 1/3] runtime: Fix the missing last_line
 To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvmarm@lists.linux.dev, Alexandru Elisei <alexandru.elisei@arm.com>,
- Eric Auger <eric.auger@redhat.com>, Nikos Nikoleris
- <nikos.nikoleris@arm.com>, Ricardo Koller <ricarkol@google.com>,
- kvm@vger.kernel.org
+Cc: kvmarm@lists.linux.dev, Thomas Huth <thuth@redhat.com>,
+ Nico Boehr <nrb@linux.ibm.com>, Ricardo Koller <ricarkol@google.com>,
+ Colton Lewis <coltonlewis@google.com>,
+ Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+ Sean Christopherson <seanjc@google.com>,
+ Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org
 References: <20231129032123.2658343-1-shahuang@redhat.com>
- <20231129032123.2658343-4-shahuang@redhat.com>
- <20231129-7fbc43944dc62a55cffe131c@orel>
+ <20231129032123.2658343-2-shahuang@redhat.com>
+ <20231129-54301cf86283b3d5a5a249ea@orel>
 From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20231129-7fbc43944dc62a55cffe131c@orel>
+In-Reply-To: <20231129-54301cf86283b3d5a5a249ea@orel>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -78,122 +79,45 @@ Content-Transfer-Encoding: 7bit
 
 Hi drew,
 
-On 11/29/23 17:27, Andrew Jones wrote:
-> On Tue, Nov 28, 2023 at 10:21:23PM -0500, Shaoqin Huang wrote:
->> Currently running tests on EFI in parallel can cause part of tests to
->> fail, this is because arm/efi/run script use the EFI_CASE to create the
->> subdir under the efi-tests, and the EFI_CASE is the filename of the
->> test, when running tests in parallel, the multiple tests exist in the
->> same filename will execute at the same time, which will use the same
->> directory and write the test specific things into it, this cause
->> chaotic and make some tests fail.
+On 11/29/23 17:11, Andrew Jones wrote:
+> On Tue, Nov 28, 2023 at 10:21:21PM -0500, Shaoqin Huang wrote:
+>> The last_line is deleted by the 2607d2d6 ("arm64: Add an efi/run script").
+>> This lead to when SKIP test, the reason is missing. Fix the problem by
+>> adding last_line back.
+>>
+>> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 > 
-> How do they fail? iiuc, we're switching from having one of each unique
-> binary on the efi partition to multiple redundant binaries, since we
-> copy the binary for each test, even when it's the same as for other
-> tests. It seems like we should be able to keep single unique binaries
-> and resolve the parallel execution failure by just checking for existence
-> of the binaries or only creating test-specific data directories or
-> something.
+> Fixes: 2607d2d6 ("arm64: Add an efi/run script")
 > 
 
-The problem comes from the arm/efi/run script, as you can see. If we 
-parallel running multiple tests on efi, for example, running the 
-pmu-sw-incr and pmu-chained-counters and other pmu tests at the same 
-time, the EFI_CASE will be pmu. So they will write their $cmd_args to 
-the $EFI/TEST/pmu/startup.nsh at the same time, which will corrupt the 
-startup.nsh file.
+Will add it.
 
-cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
-echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
-...
-echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_TEST/$EFI_CASE/startup.nsh"
+>> ---
+>>   scripts/runtime.bash | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+>> index fc156f2f..d7054b80 100644
+>> --- a/scripts/runtime.bash
+>> +++ b/scripts/runtime.bash
+>> @@ -148,6 +148,8 @@ function run()
+>>               fi
+>>           fi
+>>   
+>> +	last_line=$(tail -1 <<<"$log")
+>> +
+>>           if [ ${skip} == true ]; then
+>>               print_result "SKIP" $testname "" "$last_line"
+> 
+> We can just change this one use of $last_line to $(tail -1 <<<"$log")
+> 
 
-And I can get the log which outputs:
-
-* pmu-sw-incr.log:
-   - ABORT: pmu: Unknown sub-test 'pmu-mem-acce'
-* pmu-chained-counters.log
-   - ABORT: pmu: Unknown sub-test 'pmu-mem-access-reliab'
-
-And the efi-tests/pmu/startup.nsh:
-
-@echo -off
-setvar fdtfile -guid 97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823 -rt =L"dtb"
-pmu.efi pmu-mem-access-reliability
-setvar fdtfile -guid 97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823 -rt =L"dtb"
-pmu.efi pmu-chained-sw-incr
-
-
-Thus when running parallel, some of them will fail. So I create 
-different sub-dir in the efi-tests for each small test.
+Got it. Looks good.
 
 Thanks,
 Shaoqin
 
->>
->> To Fix this things, use the testname instead of the filename to create
->> the subdir under the efi-tests. We use the EFI_TESTNAME to replace the
->> EFI_CASE in script. Since every testname is specific, now the tests
->> can be run parallel. It also considers when user directly use the
->> arm/efi/run to run test, in this case, still use the filename.
->>
->> Besides, replace multiple $EFI_TEST/$EFI_CASE to the $EFI_CASE_DIR, this
->> makes the script looks more clean and we don'e need to replace many
->> EFI_CASE to EFI_TESTNAME.
->>
->> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
->> ---
->>   arm/efi/run | 16 +++++++++-------
->>   1 file changed, 9 insertions(+), 7 deletions(-)
->>
->> diff --git a/arm/efi/run b/arm/efi/run
->> index 6872c337..03bfbef4 100755
->> --- a/arm/efi/run
->> +++ b/arm/efi/run
->> @@ -24,6 +24,8 @@ fi
->>   : "${EFI_SRC:=$TEST_DIR}"
->>   : "${EFI_UEFI:=$DEFAULT_UEFI}"
->>   : "${EFI_TEST:=efi-tests}"
->> +: "${EFI_TESTNAME:=$TESTNAME}"
->> +: "${EFI_TESTNAME:=$(basename $1 .efi)}"
->>   : "${EFI_CASE:=$(basename $1 .efi)}"
->>   : "${EFI_VAR_GUID:=97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823}"
->>   
->> @@ -56,20 +58,20 @@ if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
->>   	EFI_CASE=dummy
->>   fi
->>   
->> -: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_CASE"}"
->> +: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_TESTNAME"}"
->>   mkdir -p "$EFI_CASE_DIR"
->>   
->> -cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
->> -echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
->> +cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_CASE_DIR/"
->> +echo "@echo -off" > "$EFI_CASE_DIR/startup.nsh"
-> 
-> Unrelated change, should be a separate patch.
-> 
-
-Ok, Will separate it.
-
->>   if [ "$EFI_USE_DTB" = "y" ]; then
->>   	qemu_args+=(-machine acpi=off)
->>   	FDT_BASENAME="dtb"
->> -	$(EFI_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_TEST/$EFI_CASE/$FDT_BASENAME" "${qemu_args[@]}")
->> -	echo "setvar fdtfile -guid $EFI_VAR_GUID -rt =L\"$FDT_BASENAME\""  >> "$EFI_TEST/$EFI_CASE/startup.nsh"
->> +	$(EFI_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_CASE_DIR/$FDT_BASENAME" "${qemu_args[@]}")
->> +	echo "setvar fdtfile -guid $EFI_VAR_GUID -rt =L\"$FDT_BASENAME\""  >> "$EFI_CASE_DIR/startup.nsh"
->>   fi
->> -echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_TEST/$EFI_CASE/startup.nsh"
->> +echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_CASE_DIR/startup.nsh"
->>   
->>   EFI_RUN=y $TEST_DIR/run \
->>          -bios "$EFI_UEFI" \
->> -       -drive file.dir="$EFI_TEST/$EFI_CASE/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
->> +       -drive file.dir="$EFI_CASE_DIR/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
->>          "${qemu_args[@]}"
+>>               return 77
 >> -- 
 >> 2.40.1
 >>
