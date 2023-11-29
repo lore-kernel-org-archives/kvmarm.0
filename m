@@ -1,40 +1,32 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71656208B7
-	for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 13:41:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D2D374DC
+	for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 15:11:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8EDEE2F4;
-	Wed, 29 Nov 2023 05:42:27 -0800 (PST)
-Received: from raptor (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3CA6E3F5A1;
-	Wed, 29 Nov 2023 05:41:35 -0800 (PST)
-Date: Wed, 29 Nov 2023 13:41:32 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
-	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
-	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
-	rppt@kernel.org, hughd@google.com, pcc@google.com,
-	steven.price@arm.com, anshuman.khandual@arm.com,
-	vincenzo.frascino@arm.com, eugenis@google.com, kcc@google.com,
-	hyesoo.yu@samsung.com, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC v2 18/27] arm64: mte: Reserve tag block for the zero
- page
-Message-ID: <ZWc_jCy7B6jdc5rP@raptor>
-References: <20231119165721.9849-1-alexandru.elisei@arm.com>
- <20231119165721.9849-19-alexandru.elisei@arm.com>
- <c027ea00-a955-4c3c-b1ea-2c3f6906790d@redhat.com>
- <ZWcgzPcld1YksCtZ@raptor>
- <930b6fba-43bf-4784-9bc9-1c83c1adc30c@redhat.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8BCDA2F4;
+	Wed, 29 Nov 2023 07:12:18 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 56CC33F73F;
+	Wed, 29 Nov 2023 07:11:29 -0800 (PST)
+Date: Wed, 29 Nov 2023 15:11:23 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@linux.ibm.com, broonie@kernel.org,
+	catalin.marinas@arm.com, dave.hansen@linux.intel.com,
+	oliver.upton@linux.dev, shuah@kernel.org, will@kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v3 06/25] KVM: arm64: Save/restore POE registers
+Message-ID: <20231129151123.GA2423241@e124191.cambridge.arm.com>
+References: <20231124163510.1835740-1-joey.gouly@arm.com>
+ <20231124163510.1835740-7-joey.gouly@arm.com>
+ <86bkbfcbyp.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -43,97 +35,186 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <930b6fba-43bf-4784-9bc9-1c83c1adc30c@redhat.com>
+In-Reply-To: <86bkbfcbyp.wl-maz@kernel.org>
 
-Hi,
+Hi Marc,
 
-On Wed, Nov 29, 2023 at 02:13:50PM +0100, David Hildenbrand wrote:
-> On 29.11.23 12:30, Alexandru Elisei wrote:
-> > On Tue, Nov 28, 2023 at 06:06:54PM +0100, David Hildenbrand wrote:
-> > > On 19.11.23 17:57, Alexandru Elisei wrote:
-> > > > On arm64, the zero page receives special treatment by having the tagged
-> > > > flag set on MTE initialization, not when the page is mapped in a process
-> > > > address space. Reserve the corresponding tag block when tag storage
-> > > > management is being activated.
-> > > 
-> > > Out of curiosity: why does the shared zeropage require tagged storage? What
-> > > about the huge zeropage?
-> > 
-> > There are two different tags that are used for tag checking: the logical
-> > tag, the tag embedded in bits 59:56 of an address, and the physical tag
-> > corresponding to the address. This tag is stored in a separate memory
-> > location, called tag storage. When an access is performed, hardware
-> > compares the logical tag (from the address) with the physical tag (from the
-> > tag storage). If they match, the access is permitted.
-> 
-> Ack, matches my understanding.
-> 
-> > 
-> > The physical tag is set with special instructions.
-> > 
-> > Userspace pointers have bits 59:56 zero. If the pointer is in a VMA with
-> > MTE enabled, then for userspace to be able to access this address, the
-> > physical tag must also be 0b0000.
-> > 
-> > To make it easier on userspace, when a page is first mapped as tagged, its
-> > tags are cleared by the kernel; this way, userspace can access the address
-> > immediately, without clearing the physical tags beforehand. Another reason
-> > for clearing the physical tags when a page is mapped as tagged would be to
-> > avoid leaking uninitialized tags to userspace.
-> 
-> Make sense. Zero it just like we zero page content.
-> 
-> > 
-> > The zero page is special, because the physical tags are not zeroed every
-> > time the page is mapped in a process; instead, the zero page is marked as
-> > tagged (by setting a page flag) and the physical tags are zeroed only once,
-> > when MTE is enabled at boot.
-> 
-> Makes sense.
-> 
-> > 
-> > All of this means that when tag storage is enabled, which happens after MTE
-> > is enabled, the tag storage corresponding to the zero page is already in
-> > use and must be rezerved, and it can never be used for data allocations.
-> > 
-> > I hope all of the above makes sense. I can also put it in the commit
-> > message :)
-> 
-> Yes, makes sense!
-> 
-> > 
-> > As for the zero huge page, the MTE code in the kernel treats it like a
-> > regular page, and it zeroes the tags when it is mapped as tagged in a
-> > process. I agree that this might not be the best solution from a
-> > performance perspective, but it has worked so far.
-> 
-> What if user space were to change the tag of that shared resource?
-> 
-> Having a tag != 0 doesn't make sense for such a shared resource, so I
-> suspect modifying the tag is like a write event: trigger write-fault -> COW.
+Thanks for taking a look.
 
-Yes, modifying the tag is a write event.
-
-> 
+On Mon, Nov 27, 2023 at 06:01:18PM +0000, Marc Zyngier wrote:
+> On Fri, 24 Nov 2023 16:34:51 +0000,
+> Joey Gouly <joey.gouly@arm.com> wrote:
 > > 
-> > With tag storage management enabled, set_pte_at()->mte_sync_tags() will
-> > discover that the huge zero page doesn't have tag storage reserved, the
-> > table entry will be mapped as invalid to use the page fault-on-access
-> > mechanism that I introduce later in the series [1] to reserve tag storage,
+> > Define the new system registers that POE introduces and context switch them.
 > 
-> I assume (without looking at the code) that you took proper care of possible
-> races.
+> I would really like to see a discussion on the respective lifetimes of
+> these two registers (see below).
 > 
-> Thanks for goind into detail!
+> >
+> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> > Cc: Marc Zyngier <maz@kernel.org>
+> > Cc: Oliver Upton <oliver.upton@linux.dev>
+> > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > Cc: Will Deacon <will@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_arm.h           |  4 ++--
+> >  arch/arm64/include/asm/kvm_host.h          |  4 ++++
+> >  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 10 ++++++++++
+> >  arch/arm64/kvm/sys_regs.c                  |  2 ++
+> >  4 files changed, 18 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > index b85f46a73e21..597470e0b87b 100644
+> > --- a/arch/arm64/include/asm/kvm_arm.h
+> > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > @@ -346,14 +346,14 @@
+> >   */
+> >  #define __HFGRTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51))
+> >  #define __HFGRTR_EL2_MASK	GENMASK(49, 0)
+> > -#define __HFGRTR_EL2_nMASK	(GENMASK(58, 57) | GENMASK(55, 54) | BIT(50))
+> > +#define __HFGRTR_EL2_nMASK	(GENMASK(60, 57) | GENMASK(55, 54) | BIT(50))
+> >  
+> >  #define __HFGWTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51) |	\
+> >  				 BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
+> >  				 GENMASK(26, 25) | BIT(21) | BIT(18) |	\
+> >  				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
+> >  #define __HFGWTR_EL2_MASK	GENMASK(49, 0)
+> > -#define __HFGWTR_EL2_nMASK	(GENMASK(58, 57) | GENMASK(55, 54) | BIT(50))
+> > +#define __HFGWTR_EL2_nMASK	(GENMASK(60, 57) | GENMASK(55, 54) | BIT(50))
+> >  
+> >  #define __HFGITR_EL2_RES0	GENMASK(63, 57)
+> >  #define __HFGITR_EL2_MASK	GENMASK(54, 0)
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 824f29f04916..fa9ebd8fce40 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -401,6 +401,10 @@ enum vcpu_sysreg {
+> >  	PIR_EL1,       /* Permission Indirection Register 1 (EL1) */
+> >  	PIRE0_EL1,     /*  Permission Indirection Register 0 (EL1) */
+> >  
+> > +	/* Permission Overlay Extension registers */
+> > +	POR_EL1,	/* Permission Overlay Register 1 (EL1) */
+> > +	POR_EL0,	/* Permission Overlay Register 0 (EL0) */
+> > +
+> >  	/* 32bit specific registers. */
+> >  	DACR32_EL2,	/* Domain Access Control Register */
+> >  	IFSR32_EL2,	/* Instruction Fault Status Register */
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> > index bb6b571ec627..22f07ee43e7e 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> > @@ -19,6 +19,9 @@
+> >  static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+> >  {
+> >  	ctxt_sys_reg(ctxt, MDSCR_EL1)	= read_sysreg(mdscr_el1);
+> > +
+> > +	if (system_supports_poe())
+> > +		ctxt_sys_reg(ctxt, POR_EL0)	= read_sysreg_s(SYS_POR_EL0);
+> 
+> So this is saved as eagerly as it gets. Why? If it only affects EL0,
+> it can be saved/restored in a much lazier way.
 
-No problem.
+Just to confirm I understand what you mean, the current code looks like:
 
-Alex
+	vcpu_load()                // Lazy save
+
+	while (ret > 0)
+		check_vcpu_requests()
+		kvm_arm_vcpu_enter_exit()  // Eager save/restore
+		ret = handle_exit()
+
+	vcpu_put()                // Lazy restore
+
+POR_EL0 does affect EL2, if it does some form of {get,put}_user.
+This happens in vgic_its_process_commands (as part of handle_exit), also the
+stolen time code (in check_vcpu_requests) and could possibly happen if perf
+tries to walk the user stack.
+
+So I think that it does need to happen eagerly, such that the host-userspace's
+POR_EL0 is used to access the VM's memory, not the guest-userspace's POR_EL0.
+
+Does that make sense? It will need a comment, I agree.
 
 > 
+> >  }
+> >  
+> >  static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
+> > @@ -59,6 +62,8 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+> >  		ctxt_sys_reg(ctxt, PIR_EL1)	= read_sysreg_el1(SYS_PIR);
+> >  		ctxt_sys_reg(ctxt, PIRE0_EL1)	= read_sysreg_el1(SYS_PIRE0);
+> 
+> And the fact that you only touch PIRE0_EL1 here seems to be a good
+> indication that the above can be relaxed.
+
+PIREO_EL1 is not directly accessible from EL0. I'll have a think about this a
+bit more, and if there is a potential similar issue here.
+
+> 
+> >  	}
+> > +	if (system_supports_poe())
+> 
+> nit: missing new line before the if().
+> 
+> > +		ctxt_sys_reg(ctxt, POR_EL1)	= read_sysreg_el1(SYS_POR);
+> >  	ctxt_sys_reg(ctxt, PAR_EL1)	= read_sysreg_par();
+> >  	ctxt_sys_reg(ctxt, TPIDR_EL1)	= read_sysreg(tpidr_el1);
+> >  
+> > @@ -89,6 +94,9 @@ static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
+> >  static inline void __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
+> >  {
+> >  	write_sysreg(ctxt_sys_reg(ctxt, MDSCR_EL1),  mdscr_el1);
+> > +
+> > +	if (system_supports_poe())
+> > +		write_sysreg_s(ctxt_sys_reg(ctxt, POR_EL0),	SYS_POR_EL0);
+> 
+> Same thing here about the eager restore.
+> 
+> >  }
+> >  
+> >  static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
+> > @@ -135,6 +143,8 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+> >  		write_sysreg_el1(ctxt_sys_reg(ctxt, PIR_EL1),	SYS_PIR);
+> >  		write_sysreg_el1(ctxt_sys_reg(ctxt, PIRE0_EL1),	SYS_PIRE0);
+> >  	}
+> > +	if (system_supports_poe())
+> 
+> new line.
+> 
+> > +		write_sysreg_el1(ctxt_sys_reg(ctxt, POR_EL1),	SYS_POR);
+> >  	write_sysreg(ctxt_sys_reg(ctxt, PAR_EL1),	par_el1);
+> >  	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL1),	tpidr_el1);
+> >  
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 4735e1b37fb3..a54e5eadbf29 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -2269,6 +2269,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> >  	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
+> >  	{ SYS_DESC(SYS_PIRE0_EL1), NULL, reset_unknown, PIRE0_EL1 },
+> >  	{ SYS_DESC(SYS_PIR_EL1), NULL, reset_unknown, PIR_EL1 },
+> > +	{ SYS_DESC(SYS_POR_EL1), NULL, reset_unknown, POR_EL1 },
+> >  	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
+> >  
+> >  	{ SYS_DESC(SYS_LORSA_EL1), trap_loregion },
+> > @@ -2352,6 +2353,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> >  	  .access = access_pmovs, .reg = PMOVSSET_EL0,
+> >  	  .get_user = get_pmreg, .set_user = set_pmreg },
+> >  
+> > +	{ SYS_DESC(SYS_POR_EL0), NULL, reset_unknown, POR_EL0 },
+> >  	{ SYS_DESC(SYS_TPIDR_EL0), NULL, reset_unknown, TPIDR_EL0 },
+> >  	{ SYS_DESC(SYS_TPIDRRO_EL0), NULL, reset_unknown, TPIDRRO_EL0 },
+> >  	{ SYS_DESC(SYS_TPIDR2_EL0), undef_access },
+> 
+> Another thing that is missing is the trap routing for NV in
+> emulated-nested.c. Please fill in the various tables there.
+> 
+> Thanks,
+> 
+> 	M.
 > 
 > -- 
-> Cheers,
-> 
-> David / dhildenb
-> 
+> Without deviation from the norm, progress is not possible.
+
+
+Thanks,
+Joey
