@@ -1,220 +1,155 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D2D374DC
-	for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 15:11:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8BCDA2F4;
-	Wed, 29 Nov 2023 07:12:18 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 56CC33F73F;
-	Wed, 29 Nov 2023 07:11:29 -0800 (PST)
-Date: Wed, 29 Nov 2023 15:11:23 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
-	aneesh.kumar@linux.ibm.com, broonie@kernel.org,
-	catalin.marinas@arm.com, dave.hansen@linux.intel.com,
-	oliver.upton@linux.dev, shuah@kernel.org, will@kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 06/25] KVM: arm64: Save/restore POE registers
-Message-ID: <20231129151123.GA2423241@e124191.cambridge.arm.com>
-References: <20231124163510.1835740-1-joey.gouly@arm.com>
- <20231124163510.1835740-7-joey.gouly@arm.com>
- <86bkbfcbyp.wl-maz@kernel.org>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176B53AC19;
+	Wed, 29 Nov 2023 16:27:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="acJpDzkv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9248DC433C8;
+	Wed, 29 Nov 2023 16:27:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701275227;
+	bh=GwC4XY5uvJk/yRp22B+OakqJ33CPv5WWStiKtTgdZ1o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=acJpDzkvFaC19Wixe4FsPIxaEbIQ/rGiElA1YztWdmEvhOA2ka9rKnCZu+rlzKh+R
+	 JAXiIlVjd6f4Z4FR5+Exz2sdIQHl+AL8xEf9XHwnCWamnUT6LbJbmyNV1R1rwmU0gB
+	 //CqOlc7T8G65thnCQIp2WWMnD3+tOh1eMtnFLRYi+YZoh9H0w78ypEWPsnzT9XRhH
+	 E1q/YHbHckcwGFB2FBvff4KIDW5AFdsh23S3Cc3gTCy31Rj4pPiNmGDVAiZJ0Pn1ht
+	 D14SePrMXtxnZAYx98l8eb7QlDMCzeHMEMqRVeqjRGgTI9Kyfy2EIO71baTC/Jzgit
+	 5d2SL5x2C98Qw==
+Date: Wed, 29 Nov 2023 16:27:01 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
+	Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 2/2] perf build: Ensure sysreg-defs Makefile respects
+ output dir
+Message-ID: <c701bf6b-0ff0-44a0-9d1d-84e8515d077c@sirena.org.uk>
+References: <20231121192956.919380-1-oliver.upton@linux.dev>
+ <20231121192956.919380-3-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="mCUpdAwQuB6wbXWa"
+Content-Disposition: inline
+In-Reply-To: <20231121192956.919380-3-oliver.upton@linux.dev>
+X-Cookie: Jesus is my POSTMASTER GENERAL ...
+
+
+--mCUpdAwQuB6wbXWa
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86bkbfcbyp.wl-maz@kernel.org>
+Content-Transfer-Encoding: quoted-printable
 
-Hi Marc,
+On Tue, Nov 21, 2023 at 07:29:56PM +0000, Oliver Upton wrote:
 
-Thanks for taking a look.
+> Currently the sysreg-defs are written out to the source tree
+> unconditionally, ignoring the specified output directory. Correct the
+> build rule to emit the header to the output directory. Opportunistically
+> reorganize the rules to avoid interleaving with the set of beauty make
+> rules.
 
-On Mon, Nov 27, 2023 at 06:01:18PM +0000, Marc Zyngier wrote:
-> On Fri, 24 Nov 2023 16:34:51 +0000,
-> Joey Gouly <joey.gouly@arm.com> wrote:
-> > 
-> > Define the new system registers that POE introduces and context switch them.
-> 
-> I would really like to see a discussion on the respective lifetimes of
-> these two registers (see below).
-> 
-> >
-> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > Cc: Marc Zyngier <maz@kernel.org>
-> > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > Cc: Will Deacon <will@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_arm.h           |  4 ++--
-> >  arch/arm64/include/asm/kvm_host.h          |  4 ++++
-> >  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 10 ++++++++++
-> >  arch/arm64/kvm/sys_regs.c                  |  2 ++
-> >  4 files changed, 18 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> > index b85f46a73e21..597470e0b87b 100644
-> > --- a/arch/arm64/include/asm/kvm_arm.h
-> > +++ b/arch/arm64/include/asm/kvm_arm.h
-> > @@ -346,14 +346,14 @@
-> >   */
-> >  #define __HFGRTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51))
-> >  #define __HFGRTR_EL2_MASK	GENMASK(49, 0)
-> > -#define __HFGRTR_EL2_nMASK	(GENMASK(58, 57) | GENMASK(55, 54) | BIT(50))
-> > +#define __HFGRTR_EL2_nMASK	(GENMASK(60, 57) | GENMASK(55, 54) | BIT(50))
-> >  
-> >  #define __HFGWTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51) |	\
-> >  				 BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
-> >  				 GENMASK(26, 25) | BIT(21) | BIT(18) |	\
-> >  				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
-> >  #define __HFGWTR_EL2_MASK	GENMASK(49, 0)
-> > -#define __HFGWTR_EL2_nMASK	(GENMASK(58, 57) | GENMASK(55, 54) | BIT(50))
-> > +#define __HFGWTR_EL2_nMASK	(GENMASK(60, 57) | GENMASK(55, 54) | BIT(50))
-> >  
-> >  #define __HFGITR_EL2_RES0	GENMASK(63, 57)
-> >  #define __HFGITR_EL2_MASK	GENMASK(54, 0)
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 824f29f04916..fa9ebd8fce40 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -401,6 +401,10 @@ enum vcpu_sysreg {
-> >  	PIR_EL1,       /* Permission Indirection Register 1 (EL1) */
-> >  	PIRE0_EL1,     /*  Permission Indirection Register 0 (EL1) */
-> >  
-> > +	/* Permission Overlay Extension registers */
-> > +	POR_EL1,	/* Permission Overlay Register 1 (EL1) */
-> > +	POR_EL0,	/* Permission Overlay Register 0 (EL0) */
-> > +
-> >  	/* 32bit specific registers. */
-> >  	DACR32_EL2,	/* Domain Access Control Register */
-> >  	IFSR32_EL2,	/* Instruction Fault Status Register */
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > index bb6b571ec627..22f07ee43e7e 100644
-> > --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > @@ -19,6 +19,9 @@
-> >  static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
-> >  {
-> >  	ctxt_sys_reg(ctxt, MDSCR_EL1)	= read_sysreg(mdscr_el1);
-> > +
-> > +	if (system_supports_poe())
-> > +		ctxt_sys_reg(ctxt, POR_EL0)	= read_sysreg_s(SYS_POR_EL0);
-> 
-> So this is saved as eagerly as it gets. Why? If it only affects EL0,
-> it can be saved/restored in a much lazier way.
+This breaks some build configurations:
 
-Just to confirm I understand what you mean, the current code looks like:
+Running:
 
-	vcpu_load()                // Lazy save
+make --silent --keep-going --jobs=3D56 O=3D/home/broonie/.cache/tuxmake/bui=
+lds/16/build ARCH=3Darm64 CROSS_COMPILE=3Daarch64-linux-gnu- LLVM=3D1 defco=
+nfig
+make --silent --keep-going --jobs=3D56 O=3D/home/broonie/.cache/tuxmake/bui=
+lds/16/bu
+ild INSTALL_PATH=3D/home/broonie/.cache/tuxmake/builds/16/build/kselftest_i=
+nstall=20
+ARCH=3Darm64 CROSS_COMPILE=3Daarch64-linux-gnu- LLVM=3D1 kselftest-install
 
-	while (ret > 0)
-		check_vcpu_requests()
-		kvm_arm_vcpu_enter_exit()  // Eager save/restore
-		ret = handle_exit()
+gives:
 
-	vcpu_put()                // Lazy restore
+make[4]: Leaving directory '/home/broonie/git/bisect/tools/testing/selftest=
+s/kex
+ec'
+make[4]: Entering directory '/home/broonie/git/bisect/tools/testing/selftes=
+ts/kvm'
+Makefile:270: warning: overriding recipe for target '/home/broonie/.cache/t=
+uxmake/builds/16/build/kselftest/kvm/get-reg-list'
+Makefile:265: warning: ignoring old recipe for target '/home/broonie/.cache=
+/tuxmake/builds/16/build/kselftest/kvm/get-reg-list'
+make -C ../../../../tools/arch/arm64/tools/ O=3D../../../../tools
+make[5]: Entering directory '/home/broonie/git/bisect/tools/arch/arm64/tool=
+s'
+/home/broonie/git/bisect/tools/scripts/Makefile.include:4: *** O=3D../../..=
+/../tools does not exist.  Stop.
 
-POR_EL0 does affect EL2, if it does some form of {get,put}_user.
-This happens in vgic_its_process_commands (as part of handle_exit), also the
-stolen time code (in check_vcpu_requests) and could possibly happen if perf
-tries to walk the user stack.
+I'm using tuxmake with:
 
-So I think that it does need to happen eagerly, such that the host-userspace's
-POR_EL0 is used to access the VM's memory, not the guest-userspace's POR_EL0.
+    tuxmake -a arm64 -k defconfig -r docker -t llvm-17 kselftest
 
-Does that make sense? It will need a comment, I agree.
+to invoke the build.
 
-> 
-> >  }
-> >  
-> >  static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
-> > @@ -59,6 +62,8 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
-> >  		ctxt_sys_reg(ctxt, PIR_EL1)	= read_sysreg_el1(SYS_PIR);
-> >  		ctxt_sys_reg(ctxt, PIRE0_EL1)	= read_sysreg_el1(SYS_PIRE0);
-> 
-> And the fact that you only touch PIRE0_EL1 here seems to be a good
-> indication that the above can be relaxed.
+Bisection log identifying the commit that failed:
 
-PIREO_EL1 is not directly accessible from EL0. I'll have a think about this a
-bit more, and if there is a potential similar issue here.
+git bisect start
+# bad: [1f5c003694fab4b1ba6cbdcc417488b975c088d0] Add linux-next specific f=
+iles for 20231129
+git bisect bad 1f5c003694fab4b1ba6cbdcc417488b975c088d0
+# bad: [1618cb8f574175a196b0e8926c62efc45760e856] Merge branch 'for-linux-n=
+ext-fixes' of git://anongit.freedesktop.org/drm/drm-misc
+git bisect bad 1618cb8f574175a196b0e8926c62efc45760e856
+# good: [18d46e76d7c2eedd8577fae67e3f1d4db25018b0] Merge tag 'for-6.7-rc3-t=
+ag' of git://git.kernel.org/pub/scm/linux/kernel/git/kdave/linux
+git bisect good 18d46e76d7c2eedd8577fae67e3f1d4db25018b0
+# good: [c33497720d50d39a9f3918975ee691ad570b77a6] Merge branch 'for-linus'=
+ of git://git.kernel.org/pub/scm/linux/kernel/git/broonie/sound.git
+git bisect good c33497720d50d39a9f3918975ee691ad570b77a6
+# good: [35fb33a953396cae852e18a316173f5a2887bb0a] Merge branch 'fixes' of =
+git://git.kernel.org/pub/scm/linux/kernel/git/pdx86/platform-drivers-x86.git
+git bisect good 35fb33a953396cae852e18a316173f5a2887bb0a
+# good: [09a2ad2501da54228679dd21aaef72e783034a4e] Merge branch 'kunit-fixe=
+s' of git://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest.g=
+it
+git bisect good 09a2ad2501da54228679dd21aaef72e783034a4e
+# bad: [a29ee6aea7030786a63fde0d6d83a8f477b060fb] perf build: Ensure sysreg=
+-defs Makefile respects output dir
+git bisect bad a29ee6aea7030786a63fde0d6d83a8f477b060fb
+# good: [fd2ddee727d1ae9296b3875087410cc3698885f0] tools headers: Update to=
+ols's copy of socket.h header
+git bisect good fd2ddee727d1ae9296b3875087410cc3698885f0
+# good: [b3b11aed147af8f7c3d79c5b0b7474505d1dde7b] tools/perf: Update tools=
+'s copy of x86 syscall table
+git bisect good b3b11aed147af8f7c3d79c5b0b7474505d1dde7b
+# good: [d3968c974a2453de9289bdb9d34130b2ce323628] tools/perf: Update tools=
+'s copy of s390 syscall table
+git bisect good d3968c974a2453de9289bdb9d34130b2ce323628
+# good: [ef5c958090a909c9f2ab717ba6abb86869e42da7] tools perf: Add arm64 sy=
+sreg files to MANIFEST
+git bisect good ef5c958090a909c9f2ab717ba6abb86869e42da7
+# first bad commit: [a29ee6aea7030786a63fde0d6d83a8f477b060fb] perf build: =
+Ensure sysreg-defs Makefile respects output dir
 
-> 
-> >  	}
-> > +	if (system_supports_poe())
-> 
-> nit: missing new line before the if().
-> 
-> > +		ctxt_sys_reg(ctxt, POR_EL1)	= read_sysreg_el1(SYS_POR);
-> >  	ctxt_sys_reg(ctxt, PAR_EL1)	= read_sysreg_par();
-> >  	ctxt_sys_reg(ctxt, TPIDR_EL1)	= read_sysreg(tpidr_el1);
-> >  
-> > @@ -89,6 +94,9 @@ static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
-> >  static inline void __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
-> >  {
-> >  	write_sysreg(ctxt_sys_reg(ctxt, MDSCR_EL1),  mdscr_el1);
-> > +
-> > +	if (system_supports_poe())
-> > +		write_sysreg_s(ctxt_sys_reg(ctxt, POR_EL0),	SYS_POR_EL0);
-> 
-> Same thing here about the eager restore.
-> 
-> >  }
-> >  
-> >  static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
-> > @@ -135,6 +143,8 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
-> >  		write_sysreg_el1(ctxt_sys_reg(ctxt, PIR_EL1),	SYS_PIR);
-> >  		write_sysreg_el1(ctxt_sys_reg(ctxt, PIRE0_EL1),	SYS_PIRE0);
-> >  	}
-> > +	if (system_supports_poe())
-> 
-> new line.
-> 
-> > +		write_sysreg_el1(ctxt_sys_reg(ctxt, POR_EL1),	SYS_POR);
-> >  	write_sysreg(ctxt_sys_reg(ctxt, PAR_EL1),	par_el1);
-> >  	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL1),	tpidr_el1);
-> >  
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 4735e1b37fb3..a54e5eadbf29 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -2269,6 +2269,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
-> >  	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
-> >  	{ SYS_DESC(SYS_PIRE0_EL1), NULL, reset_unknown, PIRE0_EL1 },
-> >  	{ SYS_DESC(SYS_PIR_EL1), NULL, reset_unknown, PIR_EL1 },
-> > +	{ SYS_DESC(SYS_POR_EL1), NULL, reset_unknown, POR_EL1 },
-> >  	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
-> >  
-> >  	{ SYS_DESC(SYS_LORSA_EL1), trap_loregion },
-> > @@ -2352,6 +2353,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
-> >  	  .access = access_pmovs, .reg = PMOVSSET_EL0,
-> >  	  .get_user = get_pmreg, .set_user = set_pmreg },
-> >  
-> > +	{ SYS_DESC(SYS_POR_EL0), NULL, reset_unknown, POR_EL0 },
-> >  	{ SYS_DESC(SYS_TPIDR_EL0), NULL, reset_unknown, TPIDR_EL0 },
-> >  	{ SYS_DESC(SYS_TPIDRRO_EL0), NULL, reset_unknown, TPIDRRO_EL0 },
-> >  	{ SYS_DESC(SYS_TPIDR2_EL0), undef_access },
-> 
-> Another thing that is missing is the trap routing for NV in
-> emulated-nested.c. Please fill in the various tables there.
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+--mCUpdAwQuB6wbXWa
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
-Thanks,
-Joey
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmVnZlQACgkQJNaLcl1U
+h9CyQAf+O203S5VakDekJEwudWmw65mzZ6ucKwQ0lZmDZRJXrSXdhI4cYCa6mKcy
+YIVfj1IpfhjYA1WQ8noc7+gnCNglSXkr1h9tGvQMRTyI9F5af2ShDLSAp5S5iCAA
+STjTL5KArB6Y86qJYIpfgu7g7rYiWYKhH0v7hSrojlUGxONnDAbUvFncXsa21o9h
+CJLdkko4ZD75fm813Qow1dSQkoUlKrkQjWxkW8VQ1S0boV3u/atduQngBxvpv8iu
+9kqSPCMBEh2H5+dS302xwJR8LYWTTtVTRUYgIPJIlE5u1QmHrArV7bsT2evrYLLA
+l8RJr+j+ZEl92E24gVIWZWtcE8cMdw==
+=G/h/
+-----END PGP SIGNATURE-----
+
+--mCUpdAwQuB6wbXWa--
