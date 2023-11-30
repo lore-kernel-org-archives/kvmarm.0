@@ -1,53 +1,44 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3037E3529C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303BE35895
 	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 09:08:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NSOgs5ns"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OWAa6eKi"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	s=mimecast20190719; t=1701335280;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=b2BrihdLe4pGZEbs5jmiizmBAK+7Wuy8kKIYMt7+5/c=;
-	b=NSOgs5nsNVTtbl8OfmmjY7JUS7YlHJm2AI6jK3NqPGrZa/WUxO2O/EVue0p3M9MAGT8d5E
-	89fnlEDL/lEmKWrGqzudJLuPE/eSycgA7AH/djMkjNKqUS3XPMGWUhNfgTDI/Jr+L6mbha
-	/iuuyfjyEL5/JCTM5I5VFYLaVxxMxZ0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-615--bdy0aOIPie9UH3lJtZuIg-1; Thu, 30 Nov 2023 04:07:56 -0500
-X-MC-Unique: -bdy0aOIPie9UH3lJtZuIg-1
+	bh=bvgu88wHNRNmzXXlloHzld1OKbfvO68yNFuJTGWQaN8=;
+	b=OWAa6eKiQqub/tGbwyR2F1GFHPW/2IdrjEyuMUMDeVnmGu88Waj214nMLS+pZETXOBUldj
+	haG17Uau00RATVl9vKGcjnNYhk1Oa/HS2Z5kPQPL2z3F4XQ7ZXepkQYyccUBgrRXpJfPEj
+	OH3sFZ274NhHMXAmTP1wbbz+ds2EOi4=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-607-_e_OvAAUO0qcHfnUhkCOaw-1; Thu,
+ 30 Nov 2023 04:07:56 -0500
+X-MC-Unique: _e_OvAAUO0qcHfnUhkCOaw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C7DA084ACA0;
-	Thu, 30 Nov 2023 09:07:55 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 559943C1ACD7;
+	Thu, 30 Nov 2023 09:07:56 +0000 (UTC)
 Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B6BE61C060AE;
-	Thu, 30 Nov 2023 09:07:55 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4E7131C060AE;
+	Thu, 30 Nov 2023 09:07:56 +0000 (UTC)
 From: Shaoqin Huang <shahuang@redhat.com>
 To: Andrew Jones <andrew.jones@linux.dev>,
 	kvmarm@lists.linux.dev
 Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
-	Nikos Nikoleris <nikos.nikoleris@arm.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Laurent Vivier <lvivier@redhat.com>,
-	Thomas Huth <thuth@redhat.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Nadav Amit <namit@vmware.com>,
-	kvm@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org
-Subject: [kvm-unit-tests PATCH v1 01/18] Makefile: Define __ASSEMBLY__ for assembly files
-Date: Thu, 30 Nov 2023 04:07:03 -0500
-Message-Id: <20231130090722.2897974-2-shahuang@redhat.com>
+	kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v1 05/18] lib/alloc_phys: Remove locking
+Date: Thu, 30 Nov 2023 04:07:07 -0500
+Message-Id: <20231130090722.2897974-6-shahuang@redhat.com>
 In-Reply-To: <20231130090722.2897974-1-shahuang@redhat.com>
 References: <20231130090722.2897974-1-shahuang@redhat.com>
 Precedence: bulk
@@ -61,86 +52,105 @@ X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-There are 25 header files today (found with grep -r "#ifndef __ASSEMBLY__)
-with functionality relies on the __ASSEMBLY__ prepocessor constant being
-correctly defined to work correctly. So far, kvm-unit-tests has relied on
-the assembly files to define the constant before including any header
-files which depend on it.
+powerpc and s390 do not use the physical allocator.
 
-Let's make sure that nobody gets this wrong and define it as a compiler
-constant when compiling assembly files. __ASSEMBLY__ is now defined for all
-.S files, even those that didn't set it explicitely before.
+arm and arm64 initialize the physical allocator in the setup code, only to
+drain it immediately afterwards to initialize the page allocator.
 
-Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+x86 calls setup_vm() before any test that allocates memory, which similarly
+drains the physical allocator to initialize the page allocator.
+
+The setup code runs on a single core, which means that there is no need to
+protect the internal data structures of the physical allocator against
+concurrent accesses. Simplify the allocator by removing the locking.
+
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 ---
- Makefile           | 5 ++++-
- arm/cstart.S       | 1 -
- arm/cstart64.S     | 1 -
- powerpc/cstart64.S | 1 -
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ lib/alloc_phys.c | 14 --------------
+ 1 file changed, 14 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 602910dd..27ed14e6 100644
---- a/Makefile
-+++ b/Makefile
-@@ -92,6 +92,9 @@ CFLAGS += -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
+diff --git a/lib/alloc_phys.c b/lib/alloc_phys.c
+index 65c860cb..064077f7 100644
+--- a/lib/alloc_phys.c
++++ b/lib/alloc_phys.c
+@@ -21,7 +21,6 @@ struct phys_alloc_region {
+ static struct phys_alloc_region regions[PHYS_ALLOC_NR_REGIONS];
+ static int nr_regions;
  
- autodepend-flags = -MMD -MP -MF $(dir $*).$(notdir $*).d
+-static struct spinlock lock;
+ static phys_addr_t base, top;
  
-+AFLAGS  = $(CFLAGS)
-+AFLAGS += -D__ASSEMBLY__
-+
- LDFLAGS += -nostdlib $(no_pie) -z noexecstack
+ #define DEFAULT_MINIMUM_ALIGNMENT	32
+@@ -37,7 +36,6 @@ void phys_alloc_show(void)
+ {
+ 	int i;
  
- $(libcflat): $(cflatobjs)
-@@ -113,7 +116,7 @@ directories:
- 	@mkdir -p $(OBJDIRS)
+-	spin_lock(&lock);
+ 	printf("phys_alloc minimum alignment: %#" PRIx64 "\n", (u64)align_min);
+ 	for (i = 0; i < nr_regions; ++i)
+ 		printf("%016" PRIx64 "-%016" PRIx64 " [%s]\n",
+@@ -46,24 +44,19 @@ void phys_alloc_show(void)
+ 			"USED");
+ 	printf("%016" PRIx64 "-%016" PRIx64 " [%s]\n",
+ 		(u64)base, (u64)(top - 1), "FREE");
+-	spin_unlock(&lock);
+ }
  
- %.o: %.S
--	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
-+	$(CC) $(AFLAGS) -c -nostdlib -o $@ $<
+ void phys_alloc_init(phys_addr_t base_addr, phys_addr_t size)
+ {
+-	spin_lock(&lock);
+ 	base = base_addr;
+ 	top = base + size;
+ 	nr_regions = 0;
+-	spin_unlock(&lock);
+ }
  
- -include */.*.d */*/.*.d
+ void phys_alloc_set_minimum_alignment(phys_addr_t align)
+ {
+ 	assert(align && !(align & (align - 1)));
+-	spin_lock(&lock);
+ 	align_min = align;
+-	spin_unlock(&lock);
+ }
  
-diff --git a/arm/cstart.S b/arm/cstart.S
-index 3dd71ed9..b24ecabc 100644
---- a/arm/cstart.S
-+++ b/arm/cstart.S
-@@ -5,7 +5,6 @@
-  *
-  * This work is licensed under the terms of the GNU LGPL, version 2.
-  */
--#define __ASSEMBLY__
- #include <auxinfo.h>
- #include <asm/assembler.h>
- #include <asm/thread_info.h>
-diff --git a/arm/cstart64.S b/arm/cstart64.S
-index bc2be45a..a8ad6dc8 100644
---- a/arm/cstart64.S
-+++ b/arm/cstart64.S
-@@ -5,7 +5,6 @@
-  *
-  * This work is licensed under the terms of the GNU GPL, version 2.
-  */
--#define __ASSEMBLY__
- #include <auxinfo.h>
- #include <asm/asm-offsets.h>
- #include <asm/assembler.h>
-diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
-index 34e39341..fa32ef24 100644
---- a/powerpc/cstart64.S
-+++ b/powerpc/cstart64.S
-@@ -5,7 +5,6 @@
-  *
-  * This work is licensed under the terms of the GNU LGPL, version 2.
-  */
--#define __ASSEMBLY__
- #include <asm/hcall.h>
- #include <asm/ppc_asm.h>
- #include <asm/rtas.h>
+ static void *memalign_early(size_t alignment, size_t sz)
+@@ -76,8 +69,6 @@ static void *memalign_early(size_t alignment, size_t sz)
+ 
+ 	assert(align && !(align & (align - 1)));
+ 
+-	spin_lock(&lock);
+-
+ 	top_safe = top;
+ 
+ 	if (sizeof(long) == 4)
+@@ -97,7 +88,6 @@ static void *memalign_early(size_t alignment, size_t sz)
+ 		       "top=%#" PRIx64 ", top_safe=%#" PRIx64 "\n",
+ 		       (u64)size_orig, (u64)align, (u64)size,
+ 		       (u64)(top_safe - base), (u64)top, (u64)top_safe);
+-		spin_unlock(&lock);
+ 		return NULL;
+ 	}
+ 
+@@ -113,8 +103,6 @@ static void *memalign_early(size_t alignment, size_t sz)
+ 		warned = true;
+ 	}
+ 
+-	spin_unlock(&lock);
+-
+ 	return phys_to_virt(addr);
+ }
+ 
+@@ -124,10 +112,8 @@ void phys_alloc_get_unused(phys_addr_t *p_base, phys_addr_t *p_top)
+ 	*p_top = top;
+ 	if (base == top)
+ 		return;
+-	spin_lock(&lock);
+ 	regions[nr_regions].base = base;
+ 	regions[nr_regions].size = top - base;
+ 	++nr_regions;
+ 	base = top;
+-	spin_unlock(&lock);
+ }
 -- 
 2.40.1
 
