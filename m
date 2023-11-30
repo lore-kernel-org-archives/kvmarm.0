@@ -1,484 +1,149 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C235364B5
-	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 12:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CCA7F1042;
-	Thu, 30 Nov 2023 04:07:16 -0800 (PST)
-Received: from raptor (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5B8243F5A1;
-	Thu, 30 Nov 2023 04:06:25 -0800 (PST)
-Date: Thu, 30 Nov 2023 12:06:22 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Hyesoo Yu <hyesoo.yu@samsung.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
-	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
-	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
-	rppt@kernel.org, hughd@google.com, pcc@google.com,
-	steven.price@arm.com, anshuman.khandual@arm.com,
-	vincenzo.frascino@arm.com, david@redhat.com, eugenis@google.com,
-	kcc@google.com, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC v2 19/27] mm: mprotect: Introduce
- PAGE_FAULT_ON_ACCESS for mprotect(PROT_MTE)
-Message-ID: <ZWh6vl8DfXQbKo9O@raptor>
-References: <20231119165721.9849-1-alexandru.elisei@arm.com>
- <CGME20231119165921epcas2p3dce0532847d59a9c3973b4e41102e27d@epcas2p3.samsung.com>
- <20231119165721.9849-20-alexandru.elisei@arm.com>
- <20231129092725.GD2988384@tiffany>
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2068.outbound.protection.outlook.com [40.107.243.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC8D364B5
+	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 12:07:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tkK3iflv"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=H0ierRWbva/yzhJKTbXUcqPPrcbU5R5lqSgDF2Mg6pI5keTqdQcV5UazIPBAB5VVd9lWR/rSky3rCrvherxRcuTpWgC7ra811Yby8peB977coaVExRnjcggTG5QTrUulgCrkox7I8/+Vow8Tp0/kPA+Ec8Ar2IOYf2rwyWo0QYv0JBRp/Fs3KdxqOGOY+4zQMqwN1aqRzsZHiqy1kM35KcrRBHWviMTsatKJ9qbXhx0N4hLGRg3kJ8YP41tcSnIUS8TNWHtY+c8Kdqttb3LcBMIENl9O9BModoTZ8W3YdKGQW2eiWKqPV94eQNTUS715QFSDbDIyhtXG5TbED2qwrw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/bf+Eog8H80/LYq0vgSrbt5YRK9tITMPAvNJQ+r7N8s=;
+ b=WzKYwgV0ZuHhVwTUjf4rP1gpCczVOF3XBgDoFbCeAcPYgOkl2MLEhbXj15DOrTbWGP0lz7fbyLOjMEcLQ2v564x9XR6L94wRdNJpLpGV/dE4QKb4cv4eSDqAyfbYk3OQ+P+xK5UpcAwYzSg1iAQO1d4/qdxV99QZN+IhINQ7dPf4FDG66zCgrdS8A3haErD38jsjeXYg7rMehJ2hzP0i+wT9KE+s1VVltHc02mPR+4kWEzN8+/YlmF7vF7aKtfbnM9fnMxMhvXZJX5tavSJZ934q+5b0xZgSwAwZfnaZzTVsK2uMyVI8BPdLDu2ON6+TNTo5YWnJXTgmC2dDlRAYqw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/bf+Eog8H80/LYq0vgSrbt5YRK9tITMPAvNJQ+r7N8s=;
+ b=tkK3iflvhmd4W0N5upR95GRWyEeukoKi4ZKpIAEeD6CVdI3bKl0q9XAU/uxv3mwi9+GrQr0ZPt3bTjviWp1YqzSL+xrJWXl8AT94IGTpljuQn5kAfxWf90+WSVOvDXPesXRe9+Q31m/SFWWppH16nYTsqR2tPtp7pJIS8fcJhe6Nsge6x/z1q9dQBc0sr22mELndUDhSqjpfSx2yqVY2xrAKwgzJqgT8UaNVD+6erlKWz7j9V5jquEkICteNiCNwiM7G+CuC4oDEE4mB9clbW0MECsDiw0rU2CGyZ2eJxFSHJ1HT35t2SwITetkt+n1rcJmiF6iQGmxx/11vCGw6Ag==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DS0PR12MB8413.namprd12.prod.outlook.com (2603:10b6:8:f9::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7046.24; Thu, 30 Nov 2023 12:07:45 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7046.015; Thu, 30 Nov 2023
+ 12:07:44 +0000
+Date: Thu, 30 Nov 2023 08:07:43 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Michael Ellerman <mpe@ellerman.id.au>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	David Hildenbrand <david@redhat.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	James Morse <james.morse@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-s390@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	Marc Zyngier <maz@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+	x86@kernel.org, Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: Ping? Re: [PATCH rc] kvm: Prevent compiling virt/kvm/vfio.c
+ unless VFIO is selected
+Message-ID: <20231130120743.GF1389974@nvidia.com>
+References: <0-v1-08396538817d+13c5-vfio_kvm_kconfig_jgg@nvidia.com>
+ <87edgy87ig.fsf@mail.lhotse>
+ <ZWagNsu1XQIqk5z9@google.com>
+ <875y1k3nm9.fsf@mail.lhotse>
+ <ZWfgYdSoJAZqL2Gx@google.com>
+ <20231130011650.GD1389974@nvidia.com>
+ <ZWftIIEpbLP2xF5H@google.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZWftIIEpbLP2xF5H@google.com>
+X-ClientProxiedBy: SA0PR13CA0023.namprd13.prod.outlook.com
+ (2603:10b6:806:130::28) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231129092725.GD2988384@tiffany>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS0PR12MB8413:EE_
+X-MS-Office365-Filtering-Correlation-Id: b2b859a9-1fbc-4b8c-842f-08dbf19cf613
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	SdZP8p2k8IxR1wCTPNTV01yFiZNR9CKGkVWtvnUpLdFwzd8KSypB83JEcAyoLgvnLlUuet5zj4R+K9ar7QrHRXecoq/BHKyFrSdyqNBbKXWSAT5xfB39qqCyZOF9hndEGw8dxM59QuuJUc2uLyMErKw9PfbO/+qDf4ip8T2z+rAZZm3Gut3URzwD0lFmMjDOEGsM/FmN5d6LNx8FhOuF1xTgqAgr7G7rSOYUhpZBGNXIn5icn2kzN2fMbngLiafXNp60Mp6+vsb/D/5uVJhDYGvZkCCop4JP/cQ1uFZtf97jvyUc45T72tJPpkNkQNIFpvmpFwIzEehbrpiZBBGYQYWkAozg339NGPwrG49fgOO1lVLihbVEpoVt7UOjX+7xiltA8VAq8HcqoKhjT/jLMiKw37xBF7uZ/ZKI6Wk/LUzp5CQ8U/FmhVGP5qVXsWX079+1XQJ9uqhZnTggkqcP5vSZ6c1RWqz4u7usNgznQkyA5Q11kIcJ0Muc2Og43sDt6ISQxeGDbxqW4DECvCVGi3TQuYKtVgoQ6ajFsCPNHdFvoeyQNYSyVRCk8TcthHh4WJAU6s82UUUVvKK9ECL7kE5hhiHkN/1QD7z2T/wG3OZYpGT1XOTz9Tg7fo7rmaVq89zTXXMjYxyyJlzlysvC1V3QX0r6s9Ev1yfGNNMLJxI=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(136003)(346002)(376002)(396003)(230273577357003)(230922051799003)(230173577357003)(1800799012)(186009)(64100799003)(451199024)(1076003)(26005)(6506007)(83380400001)(2616005)(6512007)(6486002)(7406005)(5660300002)(4326008)(8676002)(8936002)(41300700001)(4744005)(7416002)(2906002)(478600001)(316002)(6916009)(54906003)(66476007)(66556008)(66946007)(202311291699003)(86362001)(33656002)(36756003)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?j1DuB+h7uY/Ghdp9YIiRQs8QKO5GQjBXN0LGO7WQaLVm+NdJzl22btnkhyvg?=
+ =?us-ascii?Q?ygJnG+q2WBq1Y9tNoZPRERVrFeC1uBBnSP3ORasb/mg/B+Y23dw1DH8G+pJQ?=
+ =?us-ascii?Q?7Lp1XAMtPfFUuOsC+/FaA+ojnUbb5jrYaQ3nbFN9+kSbCl/4TiLgKfQ6XVlA?=
+ =?us-ascii?Q?lQoUYCzyApBz227BS+hLMgrh199BRdzqMTxHURd5TARYBDxQuSUZ3CZ5hcTX?=
+ =?us-ascii?Q?zbl093zqyrXUGYdstUvwT2Ez0cdaEgUmCsUGblettnLREDypxbrnRGnpBuva?=
+ =?us-ascii?Q?qAxuxY2LE01hl5atmJ3Twktp+5sNMqBNiQEqOnyRJv5NIDL6mFxbPRrRltDi?=
+ =?us-ascii?Q?xm5wjLdvz8zpsEoQl9Ml/zpSYtMvYu2MU2RGbAHmocLq9Z+afyQzB91uCvcL?=
+ =?us-ascii?Q?MUtEaILJd3wAxNTz7BgxHugU04rZykp0A0srfFda0ZNsM1gf0y8Hol99VKNk?=
+ =?us-ascii?Q?82MAS6CGWhyoqUiShDtKibUmVOvPk5Nyo1zKueqQQg4VXJUFCpmTHoXRy+Xe?=
+ =?us-ascii?Q?Y6jriHuEt2dumScKiBt6rWpW86o1IaeJ5TlFnZzBpi2NAe9niiNFkc8RC9rk?=
+ =?us-ascii?Q?Yd7EwDeQfpBIRLxBbegIhfy4XG5iBvRTwXzdfb0G3P+QIfpr+QLX2Vj2SBNY?=
+ =?us-ascii?Q?K9Orud9xElSgCbQ5ECIYx26/B1jkphxeoHje3hk5MWstXfrb1s9pNtVqTSE3?=
+ =?us-ascii?Q?En25V2nWD5U/A0tRLoQkazKU/W701pWzTTpPXwP2NIIhIk/VCzrMnyk691V1?=
+ =?us-ascii?Q?/nSMof+9M4YM9Ey393wVvmjG8BEuK5fwfw4TGNVhzmTFQIA+jkb4hDp69RLn?=
+ =?us-ascii?Q?OLWwrRl/oBxCm9rz4OcY9szyCxesdFe2dI4xhXCy4J3XyIpyLQdychb13ArI?=
+ =?us-ascii?Q?xZ7vbX87y0V1D2/88rWo4pWrGdBfHWojzk82BO2dRMu5Zrs88xPRoLXzDY+l?=
+ =?us-ascii?Q?owA5tAlIsQ1nXgq/S2NPVelpvHzfJbIoBkOm9IyB3+3OnE3X4TCxhYEUyV+w?=
+ =?us-ascii?Q?NBKHVHpGQsjP4xq0pwvTqJnv1/HNwle653GsGBSR51j/qbqxsW+mrGAKNgJZ?=
+ =?us-ascii?Q?W+CNRKStAe3B1ZdNhDYZVITK6W95RAMnnrv2Gr658nb2uEU6HlQTldvRURoc?=
+ =?us-ascii?Q?HwWIk8mjH7wSFJqhPeB6YEFc6zD+G5krkLhUlORMxHibL2T7SHv37qHcZw+Z?=
+ =?us-ascii?Q?ZIG3jQEPWESu7P8eJfRBnSaLgDATB96MnLo9DNeC8RXV9XICNvhnCrpHx10g?=
+ =?us-ascii?Q?W6JvqauW0QWUPooN7YVkuRQvOJW0K5ktjM+oHNTqXrxNlRERygFovs85wo4S?=
+ =?us-ascii?Q?n+i5L/9sKv1pDHOuEuY/pf7EKVQcTEE4M0Gys4hIE8GwaK0CH4pCgf4pWRkl?=
+ =?us-ascii?Q?F/hng9j3mJ6AxEL6f7WWflQx/Kqw1LlzS3gwFHqlK+3rqGbGFSSEr7AxO0DR?=
+ =?us-ascii?Q?ME0Vm+5kZTCGqSS1KF2nfqlQQKn307HeoAAdyn7rBYfyRN8DAbDvsWc3ihZN?=
+ =?us-ascii?Q?FPkxZiB39vWFzlT67VpkN0MpCztdC45n0l6bc/l72s3zxXrp+I6hkcmonIKJ?=
+ =?us-ascii?Q?vK1FJ46+2rlLPq4gjC2OsJB3dXlv+KISvFbFpUuZ?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b2b859a9-1fbc-4b8c-842f-08dbf19cf613
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2023 12:07:44.9575
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: E1qqUaKUshzXuz+Ed62sZnrDyvhVpLdaXEknGQG3/tGqYPAM1+ZIMT0aMl+yve1/
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8413
 
-Hi,
+On Wed, Nov 29, 2023 at 06:02:08PM -0800, Sean Christopherson wrote:
 
-On Wed, Nov 29, 2023 at 06:27:25PM +0900, Hyesoo Yu wrote:
-> On Sun, Nov 19, 2023 at 04:57:13PM +0000, Alexandru Elisei wrote:
-> > To enable tagging on a memory range, userspace can use mprotect() with the
-> > PROT_MTE access flag. Pages already mapped in the VMA don't have the
-> > associated tag storage block reserved, so mark the PTEs as
-> > PAGE_FAULT_ON_ACCESS to trigger a fault next time they are accessed, and
-> > reserve the tag storage on the fault path.
+> > > Ah, it's the same warning, I just missed the CONFIG_MODULES=n requirement.
 > > 
-> > This has several benefits over reserving the tag storage as part of the
-> > mprotect() call handling:
-> > 
-> > - Tag storage is reserved only for those pages in the VMA that are
-> >   accessed, instead of for all the pages already mapped in the VMA.
-> > - Reduces the latency of the mprotect() call.
-> > - Eliminates races with page migration.
-> > 
-> > But all of this is at the expense of an extra page fault per page until the
-> > pages being accessed all have their corresponding tag storage reserved.
-> > 
-> > For arm64, the PAGE_FAULT_ON_ACCESS protection is created by defining a new
-> > page table entry software bit, PTE_TAG_STORAGE_NONE. Linux doesn't set any
-> > of the PBHA bits in entries from the last level of the translation table
-> > and it doesn't use the TCR_ELx.HWUxx bits; also, the first PBHA bit, bit
-> > 59, is already being used as a software bit for PMD_PRESENT_INVALID.
-> > 
-> > This is only implemented for PTE mappings; PMD mappings will follow.
-> > 
-> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > ---
-> >  arch/arm64/Kconfig                       |   1 +
-> >  arch/arm64/include/asm/mte.h             |   4 +-
-> >  arch/arm64/include/asm/mte_tag_storage.h |   2 +
-> >  arch/arm64/include/asm/pgtable-prot.h    |   2 +
-> >  arch/arm64/include/asm/pgtable.h         |  40 ++++++---
-> >  arch/arm64/kernel/mte.c                  |  12 ++-
-> >  arch/arm64/mm/fault.c                    | 101 +++++++++++++++++++++++
-> >  include/linux/pgtable.h                  |  17 ++++
-> >  mm/Kconfig                               |   3 +
-> >  mm/memory.c                              |   3 +
-> >  10 files changed, 170 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> > index efa5b7958169..3b9c435eaafb 100644
-> > --- a/arch/arm64/Kconfig
-> > +++ b/arch/arm64/Kconfig
-> > @@ -2066,6 +2066,7 @@ if ARM64_MTE
-> >  config ARM64_MTE_TAG_STORAGE
-> >  	bool "Dynamic MTE tag storage management"
-> >  	depends on ARCH_KEEP_MEMBLOCK
-> > +	select ARCH_HAS_FAULT_ON_ACCESS
-> >  	select CONFIG_CMA
-> >  	help
-> >  	  Adds support for dynamic management of the memory used by the hardware
-> > diff --git a/arch/arm64/include/asm/mte.h b/arch/arm64/include/asm/mte.h
-> > index 6457b7899207..70dc2e409070 100644
-> > --- a/arch/arm64/include/asm/mte.h
-> > +++ b/arch/arm64/include/asm/mte.h
-> > @@ -107,7 +107,7 @@ static inline bool try_page_mte_tagging(struct page *page)
-> >  }
-> >  
-> >  void mte_zero_clear_page_tags(void *addr);
-> > -void mte_sync_tags(pte_t pte, unsigned int nr_pages);
-> > +void mte_sync_tags(pte_t *pteval, unsigned int nr_pages);
-> >  void mte_copy_page_tags(void *kto, const void *kfrom);
-> >  void mte_thread_init_user(void);
-> >  void mte_thread_switch(struct task_struct *next);
-> > @@ -139,7 +139,7 @@ static inline bool try_page_mte_tagging(struct page *page)
-> >  static inline void mte_zero_clear_page_tags(void *addr)
-> >  {
-> >  }
-> > -static inline void mte_sync_tags(pte_t pte, unsigned int nr_pages)
-> > +static inline void mte_sync_tags(pte_t *pteval, unsigned int nr_pages)
-> >  {
-> >  }
-> >  static inline void mte_copy_page_tags(void *kto, const void *kfrom)
-> > diff --git a/arch/arm64/include/asm/mte_tag_storage.h b/arch/arm64/include/asm/mte_tag_storage.h
-> > index 6e5d28e607bb..c70ced60a0cd 100644
-> > --- a/arch/arm64/include/asm/mte_tag_storage.h
-> > +++ b/arch/arm64/include/asm/mte_tag_storage.h
-> > @@ -33,6 +33,8 @@ int reserve_tag_storage(struct page *page, int order, gfp_t gfp);
-> >  void free_tag_storage(struct page *page, int order);
-> >  
-> >  bool page_tag_storage_reserved(struct page *page);
-> > +
-> > +vm_fault_t handle_page_missing_tag_storage(struct vm_fault *vmf);
-> >  #else
-> >  static inline bool tag_storage_enabled(void)
-> >  {
-> > diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
-> > index e9624f6326dd..85ebb3e352ad 100644
-> > --- a/arch/arm64/include/asm/pgtable-prot.h
-> > +++ b/arch/arm64/include/asm/pgtable-prot.h
-> > @@ -19,6 +19,7 @@
-> >  #define PTE_SPECIAL		(_AT(pteval_t, 1) << 56)
-> >  #define PTE_DEVMAP		(_AT(pteval_t, 1) << 57)
-> >  #define PTE_PROT_NONE		(_AT(pteval_t, 1) << 58) /* only when !PTE_VALID */
-> > +#define PTE_TAG_STORAGE_NONE	(_AT(pteval_t, 1) << 60) /* only when PTE_PROT_NONE */
-> >  
-> >  /*
-> >   * This bit indicates that the entry is present i.e. pmd_page()
-> > @@ -94,6 +95,7 @@ extern bool arm64_use_ng_mappings;
-> >  	 })
-> >  
-> >  #define PAGE_NONE		__pgprot(((_PAGE_DEFAULT) & ~PTE_VALID) | PTE_PROT_NONE | PTE_RDONLY | PTE_NG | PTE_PXN | PTE_UXN)
-> > +#define PAGE_FAULT_ON_ACCESS	__pgprot(((_PAGE_DEFAULT) & ~PTE_VALID) | PTE_PROT_NONE | PTE_TAG_STORAGE_NONE | PTE_RDONLY | PTE_NG | PTE_PXN | PTE_UXN)
-> >  /* shared+writable pages are clean by default, hence PTE_RDONLY|PTE_WRITE */
-> >  #define PAGE_SHARED		__pgprot(_PAGE_SHARED)
-> >  #define PAGE_SHARED_EXEC	__pgprot(_PAGE_SHARED_EXEC)
-> > diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-> > index 20e8de853f5d..8cc135f1c112 100644
-> > --- a/arch/arm64/include/asm/pgtable.h
-> > +++ b/arch/arm64/include/asm/pgtable.h
-> > @@ -326,10 +326,10 @@ static inline void __check_safe_pte_update(struct mm_struct *mm, pte_t *ptep,
-> >  		     __func__, pte_val(old_pte), pte_val(pte));
-> >  }
-> >  
-> > -static inline void __sync_cache_and_tags(pte_t pte, unsigned int nr_pages)
-> > +static inline void __sync_cache_and_tags(pte_t *pteval, unsigned int nr_pages)
-> >  {
-> > -	if (pte_present(pte) && pte_user_exec(pte) && !pte_special(pte))
-> > -		__sync_icache_dcache(pte);
-> > +	if (pte_present(*pteval) && pte_user_exec(*pteval) && !pte_special(*pteval))
-> > +		__sync_icache_dcache(*pteval);
-> >  
-> >  	/*
-> >  	 * If the PTE would provide user space access to the tags associated
-> > @@ -337,9 +337,9 @@ static inline void __sync_cache_and_tags(pte_t pte, unsigned int nr_pages)
-> >  	 * pte_access_permitted() returns false for exec only mappings, they
-> >  	 * don't expose tags (instruction fetches don't check tags).
-> >  	 */
-> > -	if (system_supports_mte() && pte_access_permitted(pte, false) &&
-> > -	    !pte_special(pte) && pte_tagged(pte))
-> > -		mte_sync_tags(pte, nr_pages);
-> > +	if (system_supports_mte() && pte_access_permitted(*pteval, false) &&
-> > +	    !pte_special(*pteval) && pte_tagged(*pteval))
-> > +		mte_sync_tags(pteval, nr_pages);
-> >  }
-> >  
-> >  static inline void set_ptes(struct mm_struct *mm,
-> > @@ -347,7 +347,7 @@ static inline void set_ptes(struct mm_struct *mm,
-> >  			    pte_t *ptep, pte_t pte, unsigned int nr)
-> >  {
-> >  	page_table_check_ptes_set(mm, ptep, pte, nr);
-> > -	__sync_cache_and_tags(pte, nr);
-> > +	__sync_cache_and_tags(&pte, nr);
-> >  
-> >  	for (;;) {
-> >  		__check_safe_pte_update(mm, ptep, pte);
-> > @@ -459,6 +459,26 @@ static inline int pmd_protnone(pmd_t pmd)
-> >  }
-> >  #endif
-> >  
-> > +#ifdef CONFIG_ARCH_HAS_FAULT_ON_ACCESS
-> > +static inline bool fault_on_access_pte(pte_t pte)
-> > +{
-> > +	return (pte_val(pte) & (PTE_PROT_NONE | PTE_TAG_STORAGE_NONE | PTE_VALID)) ==
-> > +		(PTE_PROT_NONE | PTE_TAG_STORAGE_NONE);
-> > +}
-> > +
-> > +static inline bool fault_on_access_pmd(pmd_t pmd)
-> > +{
-> > +	return fault_on_access_pte(pmd_pte(pmd));
-> > +}
-> > +
-> > +static inline vm_fault_t arch_do_page_fault_on_access(struct vm_fault *vmf)
-> > +{
-> > +	if (tag_storage_enabled())
-> > +		return handle_page_missing_tag_storage(vmf);
-> > +	return VM_FAULT_SIGBUS;
-> > +}
-> > +#endif /* CONFIG_ARCH_HAS_FAULT_ON_ACCESS */
-> > +
-> >  #define pmd_present_invalid(pmd)     (!!(pmd_val(pmd) & PMD_PRESENT_INVALID))
-> >  
-> >  static inline int pmd_present(pmd_t pmd)
-> > @@ -533,7 +553,7 @@ static inline void __set_pte_at(struct mm_struct *mm,
-> >  				unsigned long __always_unused addr,
-> >  				pte_t *ptep, pte_t pte, unsigned int nr)
-> >  {
-> > -	__sync_cache_and_tags(pte, nr);
-> > +	__sync_cache_and_tags(&pte, nr);
-> >  	__check_safe_pte_update(mm, ptep, pte);
-> >  	set_pte(ptep, pte);
-> >  }
-> > @@ -828,8 +848,8 @@ static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
-> >  	 * in MAIR_EL1. The mask below has to include PTE_ATTRINDX_MASK.
-> >  	 */
-> >  	const pteval_t mask = PTE_USER | PTE_PXN | PTE_UXN | PTE_RDONLY |
-> > -			      PTE_PROT_NONE | PTE_VALID | PTE_WRITE | PTE_GP |
-> > -			      PTE_ATTRINDX_MASK;
-> > +			      PTE_PROT_NONE | PTE_TAG_STORAGE_NONE | PTE_VALID |
-> > +			      PTE_WRITE | PTE_GP | PTE_ATTRINDX_MASK;
-> >  	/* preserve the hardware dirty information */
-> >  	if (pte_hw_dirty(pte))
-> >  		pte = set_pte_bit(pte, __pgprot(PTE_DIRTY));
-> > diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
-> > index a41ef3213e1e..5962bab1d549 100644
-> > --- a/arch/arm64/kernel/mte.c
-> > +++ b/arch/arm64/kernel/mte.c
-> > @@ -21,6 +21,7 @@
-> >  #include <asm/barrier.h>
-> >  #include <asm/cpufeature.h>
-> >  #include <asm/mte.h>
-> > +#include <asm/mte_tag_storage.h>
-> >  #include <asm/ptrace.h>
-> >  #include <asm/sysreg.h>
-> >  
-> > @@ -35,13 +36,18 @@ DEFINE_STATIC_KEY_FALSE(mte_async_or_asymm_mode);
-> >  EXPORT_SYMBOL_GPL(mte_async_or_asymm_mode);
-> >  #endif
-> >  
-> > -void mte_sync_tags(pte_t pte, unsigned int nr_pages)
-> > +void mte_sync_tags(pte_t *pteval, unsigned int nr_pages)
-> >  {
-> > -	struct page *page = pte_page(pte);
-> > +	struct page *page = pte_page(*pteval);
-> >  	unsigned int i;
-> >  
-> > -	/* if PG_mte_tagged is set, tags have already been initialised */
-> >  	for (i = 0; i < nr_pages; i++, page++) {
-> > +		if (tag_storage_enabled() && unlikely(!page_tag_storage_reserved(page))) {
-> > +			*pteval = pte_modify(*pteval, PAGE_FAULT_ON_ACCESS);
-> > +			continue;
-> > +		}
-> > +
-> > +		/* if PG_mte_tagged is set, tags have already been initialised */
-> >  		if (try_page_mte_tagging(page)) {
-> >  			mte_clear_page_tags(page_address(page));
-> >  			set_page_mte_tagged(page);
-> > diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-> > index acbc7530d2b2..f5fa583acf18 100644
-> > --- a/arch/arm64/mm/fault.c
-> > +++ b/arch/arm64/mm/fault.c
-> > @@ -19,6 +19,7 @@
-> >  #include <linux/kprobes.h>
-> >  #include <linux/uaccess.h>
-> >  #include <linux/page-flags.h>
-> > +#include <linux/page-isolation.h>
-> >  #include <linux/sched/signal.h>
-> >  #include <linux/sched/debug.h>
-> >  #include <linux/highmem.h>
-> > @@ -953,3 +954,103 @@ void tag_clear_highpage(struct page *page)
-> >  	mte_zero_clear_page_tags(page_address(page));
-> >  	set_page_mte_tagged(page);
-> >  }
-> > +
-> > +#ifdef CONFIG_ARM64_MTE_TAG_STORAGE
-> > +vm_fault_t handle_page_missing_tag_storage(struct vm_fault *vmf)
-> > +{
-> > +	struct vm_area_struct *vma = vmf->vma;
-> > +	struct page *page = NULL;
-> > +	pte_t new_pte, old_pte;
-> > +	bool writable = false;
-> > +	vm_fault_t err;
-> > +	int ret;
-> > +
-> > +	spin_lock(vmf->ptl);
-> > +	if (unlikely(!pte_same(*vmf->pte, vmf->orig_pte))) {
-> > +		pte_unmap_unlock(vmf->pte, vmf->ptl);
-> > +		return 0;
-> > +	}
-> > +
-> > +	/* Get the normal PTE  */
-> > +	old_pte = ptep_get(vmf->pte);
-> > +	new_pte = pte_modify(old_pte, vma->vm_page_prot);
-> > +
-> > +	/*
-> > +	 * Detect now whether the PTE could be writable; this information
-> > +	 * is only valid while holding the PT lock.
-> > +	 */
-> > +	writable = pte_write(new_pte);
-> > +	if (!writable && vma_wants_manual_pte_write_upgrade(vma) &&
-> > +	    can_change_pte_writable(vma, vmf->address, new_pte))
-> > +		writable = true;
-> > +
-> > +	page = vm_normal_page(vma, vmf->address, new_pte);
-> > +	if (!page || is_zone_device_page(page))
-> > +		goto out_map;
-> > +
-> > +	/*
-> > +	 * This should never happen, once a VMA has been marked as tagged, that
-> > +	 * cannot be changed.
-> > +	 */
-> > +	if (!(vma->vm_flags & VM_MTE))
-> > +		goto out_map;
-> > +
-> > +	/* Prevent the page from being unmapped from under us. */
-> > +	get_page(page);
-> > +	vma_set_access_pid_bit(vma);
-> > +
-> > +	/*
-> > +	 * Pairs with pte_offset_map_nolock(), which takes the RCU read lock,
-> > +	 * and spin_lock() above which takes the ptl lock. Both locks should be
-> > +	 * balanced after this point.
-> > +	 */
-> > +	pte_unmap_unlock(vmf->pte, vmf->ptl);
-> > +
-> > +	/*
-> > +	 * Probably the page is being isolated for migration, replay the fault
-> > +	 * to give time for the entry to be replaced by a migration pte.
-> > +	 */
-> > +	if (unlikely(is_migrate_isolate_page(page)))
-> > +		goto out_retry;
-> > +
-> > +	ret = reserve_tag_storage(page, 0, GFP_HIGHUSER_MOVABLE);
-> > +	if (ret)
-> > +		goto out_retry;
-> > +
-> > +	put_page(page);
-> > +
-> > +	vmf->pte = pte_offset_map_lock(vma->vm_mm, vmf->pmd, vmf->address, &vmf->ptl);
-> > +	if (unlikely(!pte_same(*vmf->pte, vmf->orig_pte))) {
-> > +		pte_unmap_unlock(vmf->pte, vmf->ptl);
-> > +		return 0;
-> > +	}
-> > +
-> > +out_map:
-> > +	/*
-> > +	 * Make it present again, depending on how arch implements
-> > +	 * non-accessible ptes, some can allow access by kernel mode.
-> > +	 */
-> > +	old_pte = ptep_modify_prot_start(vma, vmf->address, vmf->pte);
-> > +	new_pte = pte_modify(old_pte, vma->vm_page_prot);
-> > +	new_pte = pte_mkyoung(new_pte);
-> > +	if (writable)
-> > +		new_pte = pte_mkwrite(new_pte, vma);
-> > +	ptep_modify_prot_commit(vma, vmf->address, vmf->pte, old_pte, new_pte);
-> > +	update_mmu_cache(vma, vmf->address, vmf->pte);
-> > +	pte_unmap_unlock(vmf->pte, vmf->ptl);
-> > +
-> > +	return 0;
-> > +
-> > +out_retry:
-> > +	put_page(page);
-> > +	if (vmf->flags & FAULT_FLAG_VMA_LOCK)
-> > +		vma_end_read(vma);
-> > +	if (fault_flag_allow_retry_first(vmf->flags)) {
-> > +		err = VM_FAULT_RETRY;
-> > +	} else {
-> > +		/* Replay the fault. */
-> > +		err = 0;
+> > Oh, wait, doesn't that mean the approach won't work? IIRC doesn't
+> > symbol_get turn into just &fn when non-modular turning this into a
+> > link failure without the kconfig part?
 > 
-> Hello!
-> 
-> Unfortunately, if the page continues to be pinned, it seems like fault will continue to occur.
-> I guess it makes system stability issue. (but I'm not familiar with that, so please let me know if I'm mistaken!)
-> 
-> How about migrating the page when migration problem repeats.
+> Yes, but it doesn't cause linker errors.  IIUC, because the extern declaration
+> is tagged "weak", a dummy default is used.  E.g. on x86, this is what is generated
+> with VFIO=y
 
-Yes, I had the same though in the previous iteration of the series, the
-page was migrated out of the VMA if tag storage couldn't be reserved.
+Oh wow that is some pretty dark magic there :|
 
-Only short term pins are allowed on MIGRATE_CMA pages, so I expect that the
-pin will be released before the fault is replayed. Because of this, and
-because it makes the code simpler, I chose not to migrate the page if tag
-storage couldn't be reserved.
-
-I'd be happy to revisit this if it turns out that in the real world
-replaying the fault happens often enough that migrating the page is faster.
-
-In fact, statistics about how often the fault is replayed and how long that
-takes would be very helpful.
-
-Thanks,
-Alex
-
-> 
-> Thanks,
-> Regards.
-> 
-> > +	}
-> > +	return err;
-> > +}
-> > +#endif
-> > diff --git a/include/linux/pgtable.h b/include/linux/pgtable.h
-> > index ffdb9b6bed6c..e2c761dd6c41 100644
-> > --- a/include/linux/pgtable.h
-> > +++ b/include/linux/pgtable.h
-> > @@ -1458,6 +1458,23 @@ static inline int pmd_protnone(pmd_t pmd)
-> >  }
-> >  #endif /* CONFIG_NUMA_BALANCING */
-> >  
-> > +#ifndef CONFIG_ARCH_HAS_FAULT_ON_ACCESS
-> > +static inline bool fault_on_access_pte(pte_t pte)
-> > +{
-> > +	return false;
-> > +}
-> > +
-> > +static inline bool fault_on_access_pmd(pmd_t pmd)
-> > +{
-> > +	return false;
-> > +}
-> > +
-> > +static inline vm_fault_t arch_do_page_fault_on_access(struct vm_fault *vmf)
-> > +{
-> > +	return VM_FAULT_SIGBUS;
-> > +}
-> > +#endif
-> > +
-> >  #endif /* CONFIG_MMU */
-> >  
-> >  #ifdef CONFIG_HAVE_ARCH_HUGE_VMAP
-> > diff --git a/mm/Kconfig b/mm/Kconfig
-> > index 89971a894b60..a90eefc3ee80 100644
-> > --- a/mm/Kconfig
-> > +++ b/mm/Kconfig
-> > @@ -1019,6 +1019,9 @@ config IDLE_PAGE_TRACKING
-> >  config ARCH_HAS_CACHE_LINE_SIZE
-> >  	bool
-> >  
-> > +config ARCH_HAS_FAULT_ON_ACCESS
-> > +	bool
-> > +
-> >  config ARCH_HAS_CURRENT_STACK_POINTER
-> >  	bool
-> >  	help
-> > diff --git a/mm/memory.c b/mm/memory.c
-> > index e137f7673749..a04a971200b9 100644
-> > --- a/mm/memory.c
-> > +++ b/mm/memory.c
-> > @@ -5044,6 +5044,9 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
-> >  	if (!pte_present(vmf->orig_pte))
-> >  		return do_swap_page(vmf);
-> >  
-> > +	if (fault_on_access_pte(vmf->orig_pte) && vma_is_accessible(vmf->vma))
-> > +		return arch_do_page_fault_on_access(vmf);
-> > +
-> >  	if (pte_protnone(vmf->orig_pte) && vma_is_accessible(vmf->vma))
-> >  		return do_numa_page(vmf);
-> >  
-> > -- 
-> > 2.42.1
-> > 
-> > 
-
-
+Jason
