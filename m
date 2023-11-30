@@ -1,169 +1,76 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82ACB58104
-	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 17:43:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0867A1756;
-	Thu, 30 Nov 2023 09:43:56 -0800 (PST)
-Received: from raptor (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 526A93F6C4;
-	Thu, 30 Nov 2023 09:43:04 -0800 (PST)
-Date: Thu, 30 Nov 2023 17:43:01 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Peter Collingbourne <pcc@google.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
-	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
-	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
-	rppt@kernel.org, hughd@google.com, steven.price@arm.com,
-	anshuman.khandual@arm.com, vincenzo.frascino@arm.com,
-	david@redhat.com, eugenis@google.com, kcc@google.com,
-	hyesoo.yu@samsung.com, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC v2 21/27] mm: arm64: Handle tag storage pages mapped
- before mprotect(PROT_MTE)
-Message-ID: <ZWjJpaSahUUM3GKs@raptor>
-References: <20231119165721.9849-1-alexandru.elisei@arm.com>
- <20231119165721.9849-22-alexandru.elisei@arm.com>
- <CAMn1gO5WYC5Xx7LfBxN_j-xqkVT+tjXP5PqDfrvhgqPOa0ZCsA@mail.gmail.com>
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 150DF5FF12
+	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 19:16:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LhH9YYP0"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5ca2a6f07b6so22551147b3.2
+        for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 11:16:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701371790; x=1701976590; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=y5pHXwknceWGmaj8OtPnr1WYaFoTOExKtqzqtLwiZ8o=;
+        b=LhH9YYP0yh9dpN0htnTO62TybmDRNb05QHMVmrVsKoeq2L6LTelo5LeLhhvsf/77yG
+         dsVyDYy7HxbhIeXy5dv0LHhCMuC21cg32VXk3yVhBukHV5tXWuwI7w/+Z/uuglKhJBsX
+         Ws2VmdNPNdincaOtImjyIeKajFwbyQ3Tc+rQY1Xl4jhDAwqQ4f0dAs+RxqWp9LpK1+Wc
+         tZKrw8DoPVSiDPdbD+VqcqCb19bco+hilcHZHwi3Rv5DmyFhChtlNsiGnbuaHD90eD8d
+         btl0pK84SVY2cCIKcyN5PuYKnjifGtgANozTO1Q0bJON71osNggSUZiBLfrfMqKYIThE
+         U2dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701371790; x=1701976590;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=y5pHXwknceWGmaj8OtPnr1WYaFoTOExKtqzqtLwiZ8o=;
+        b=NftYiQjTHqOGqnfYp6at8WxpTODZSbZIpQJRj30NmzmeWZHwRLH6AriQ5d898j5JFX
+         KxpI3J9izUt4eoDYZJQFRVktw1oHkYXz6zwkAEHT7uiCfrE0c0lrdhM/fQdvCcV4nT5L
+         dU3gBJhda61GDa7FTfmKBuVWJfhBEhrSN+wcUl/WUeyfg2OjcqFR2/u14Yn0oxUH56c7
+         DDOEdKCQX2jDcaQrchuu9zi/7sQrT4Ocoy47FUBQNH8CLYDCl+BNJJVnu3ViKNsC4sho
+         peANSlARx+EMi0dgR864RGfljuHLH021aFIkbD5SBULKaLYa+5frhZ4kaJFgd0jGyCNH
+         4lxg==
+X-Gm-Message-State: AOJu0Yxe2XXJ/YrGBY2eX0xfRaK3Waf/hL9RfL50JVN8dcQY32Sk+ewo
+	nXAaWLWkFick3hEwxGP7mUr7zMPpz9I=
+X-Google-Smtp-Source: AGHT+IGVQZH2hOZFevHTov9IVKBE8YAxCPoqEmlg+QCfshG7BGBWF+3pFeFyRhsJII6JOxcwz7vPkyXZa3U=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:2e87:b0:5cc:3d0c:2b60 with SMTP id
+ eu7-20020a05690c2e8700b005cc3d0c2b60mr620993ywb.4.1701371789943; Thu, 30 Nov
+ 2023 11:16:29 -0800 (PST)
+Date: Thu, 30 Nov 2023 19:16:28 +0000
+In-Reply-To: <20231130182832.54603-2-ajones@ventanamicro.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMn1gO5WYC5Xx7LfBxN_j-xqkVT+tjXP5PqDfrvhgqPOa0ZCsA@mail.gmail.com>
+Mime-Version: 1.0
+References: <20231130182832.54603-2-ajones@ventanamicro.com>
+Message-ID: <ZWjfjAnZcomGa1Ey@google.com>
+Subject: Re: [PATCH] KVM: selftests: Drop newline from __TEST_REQUIRE
+From: Sean Christopherson <seanjc@google.com>
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	maz@kernel.org, oliver.upton@linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Peter,
-
-On Mon, Nov 27, 2023 at 09:39:17PM -0800, Peter Collingbourne wrote:
-> Hi Alexandru,
+On Thu, Nov 30, 2023, Andrew Jones wrote:
+> A few __TEST_REQUIRE callers are appending their own newline, resulting
+> in an extra one being output. Rather than remove the newlines from
+> those callers, remove it from __TEST_REQUIRE and add newlines to all
+> the other callers, as __TEST_REQUIRE was the only output function
+> appending newlines and consistency is a good thing.
 > 
-> On Sun, Nov 19, 2023 at 8:59 AM Alexandru Elisei
-> <alexandru.elisei@arm.com> wrote:
-> >
-> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > ---
-> >  arch/arm64/include/asm/mte_tag_storage.h |  1 +
-> >  arch/arm64/kernel/mte_tag_storage.c      | 15 +++++++
-> >  arch/arm64/mm/fault.c                    | 55 ++++++++++++++++++++++++
-> >  include/linux/migrate.h                  |  8 +++-
-> >  include/linux/migrate_mode.h             |  1 +
-> >  mm/internal.h                            |  6 ---
-> >  6 files changed, 78 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/mte_tag_storage.h b/arch/arm64/include/asm/mte_tag_storage.h
-> > index b97406d369ce..6a8b19a6a758 100644
-> > --- a/arch/arm64/include/asm/mte_tag_storage.h
-> > +++ b/arch/arm64/include/asm/mte_tag_storage.h
-> > @@ -33,6 +33,7 @@ int reserve_tag_storage(struct page *page, int order, gfp_t gfp);
-> >  void free_tag_storage(struct page *page, int order);
-> >
-> >  bool page_tag_storage_reserved(struct page *page);
-> > +bool page_is_tag_storage(struct page *page);
-> >
-> >  vm_fault_t handle_page_missing_tag_storage(struct vm_fault *vmf);
-> >  vm_fault_t handle_huge_page_missing_tag_storage(struct vm_fault *vmf);
-> > diff --git a/arch/arm64/kernel/mte_tag_storage.c b/arch/arm64/kernel/mte_tag_storage.c
-> > index a1cc239f7211..5096ce859136 100644
-> > --- a/arch/arm64/kernel/mte_tag_storage.c
-> > +++ b/arch/arm64/kernel/mte_tag_storage.c
-> > @@ -500,6 +500,21 @@ bool page_tag_storage_reserved(struct page *page)
-> >         return test_bit(PG_tag_storage_reserved, &page->flags);
-> >  }
-> >
-> > +bool page_is_tag_storage(struct page *page)
-> > +{
-> > +       unsigned long pfn = page_to_pfn(page);
-> > +       struct range *tag_range;
-> > +       int i;
-> > +
-> > +       for (i = 0; i < num_tag_regions; i++) {
-> > +               tag_range = &tag_regions[i].tag_range;
-> > +               if (tag_range->start <= pfn && pfn <= tag_range->end)
-> > +                       return true;
-> > +       }
-> > +
-> > +       return false;
-> > +}
-> > +
-> >  int reserve_tag_storage(struct page *page, int order, gfp_t gfp)
-> >  {
-> >         unsigned long start_block, end_block;
-> > diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-> > index 6730a0812a24..964c5ae161a3 100644
-> > --- a/arch/arm64/mm/fault.c
-> > +++ b/arch/arm64/mm/fault.c
-> > @@ -12,6 +12,7 @@
-> >  #include <linux/extable.h>
-> >  #include <linux/kfence.h>
-> >  #include <linux/signal.h>
-> > +#include <linux/migrate.h>
-> >  #include <linux/mm.h>
-> >  #include <linux/hardirq.h>
-> >  #include <linux/init.h>
-> > @@ -956,6 +957,50 @@ void tag_clear_highpage(struct page *page)
-> >  }
-> >
-> >  #ifdef CONFIG_ARM64_MTE_TAG_STORAGE
-> > +
-> > +#define MR_TAGGED_TAG_STORAGE  MR_ARCH_1
-> > +
-> > +extern bool isolate_lru_page(struct page *page);
-> > +extern void putback_movable_pages(struct list_head *l);
+> Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+> ---
 > 
-> Could we move these declarations to a non-mm-internal header and
-> #include it instead of manually declaring them here?
+> Applies to kvm-x86/selftests (I chose that branch to ensure I got the
+> MAGIC_TOKEN change)
 
-Yes, that's better than this hackish way of doing it.
+Heh, and then I went and created a conflict anyways :-)
 
-> 
-> > +
-> > +/* Returns with the page reference dropped. */
-> > +static void migrate_tag_storage_page(struct page *page)
-> > +{
-> > +       struct migration_target_control mtc = {
-> > +               .nid = NUMA_NO_NODE,
-> > +               .gfp_mask = GFP_HIGHUSER_MOVABLE | __GFP_TAGGED,
-> > +       };
-> > +       unsigned long i, nr_pages = compound_nr(page);
-> > +       LIST_HEAD(pagelist);
-> > +       int ret, tries;
-> > +
-> > +       lru_cache_disable();
-> > +
-> > +       for (i = 0; i < nr_pages; i++) {
-> > +               if (!isolate_lru_page(page + i)) {
-> > +                       ret = -EAGAIN;
-> > +                       goto out;
-> > +               }
-> > +               /* Isolate just grabbed another reference, drop ours. */
-> > +               put_page(page + i);
-> > +               list_add_tail(&(page + i)->lru, &pagelist);
-> > +       }
-> > +
-> > +       tries = 5;
-> > +       while (tries--) {
-> > +               ret = migrate_pages(&pagelist, alloc_migration_target, NULL, (unsigned long)&mtc,
-> > +                                   MIGRATE_SYNC, MR_TAGGED_TAG_STORAGE, NULL);
-> > +               if (ret == 0 || ret != -EBUSY)
-> 
-> This could be simplified to:
-> 
-> if (ret != -EBUSY)
+https://lore.kernel.org/all/20231129224042.530798-1-seanjc@google.com
 
-Indeed! I can do the same thing in reserve_tag_storage(), in the loop where I
-call alloc_contig_range().
-
-Thanks,
-Alex
+If there are no objections, I'll grab this in kvm-x86/selftests and sort out the
+MAGIC_TOKEN conflict.
