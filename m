@@ -1,44 +1,45 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D924F364B5
-	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 09:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87BB4134C3
+	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 09:08:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U8M3KMky"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RzRja0BK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701335280;
+	s=mimecast20190719; t=1701335281;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QmLj4WrHra8uSCB8KBDHTivbNsWG14RE7daMxr/+zf0=;
-	b=U8M3KMky7SqgXRJMvXgenKuwW33m5sI13uu/81zfOX9TkaPWwpm6gNXduIBf6tarDzvS27
-	ONW8QohLYrDD5WgSsGPaqHiNvXY608RggK8BnItErY1twGZF0EirDJdGB6LMKx655oi5qw
-	4bCU1S0Aw4P8DLHwcM0JEDDfCk7M6A0=
+	bh=Gr/7wVzkmltnw1sRFdNXHtv+81MR3WwvKLkyr4K5qvo=;
+	b=RzRja0BKxy15ByQJFe+LUIwskQM2Xxz+3nuZHX9PkzjZInggNMs1c0bEQTfvLPCb6z3sQd
+	Ukk+UPYawMvBSiBvgYLATeYTdS3zSLtAJj8YRIVyHbuLdSSjmO34+0mpD4xaRTb4L5pm84
+	GmazjSpzo8rz1oG3PqwuL+/PuZXvD60=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-252-TgODM4--P3mZ2i7TtC5QMA-1; Thu, 30 Nov 2023 04:07:56 -0500
-X-MC-Unique: TgODM4--P3mZ2i7TtC5QMA-1
+ us-mta-358-WyDj6E47NqSZKMlXa4T8fg-1; Thu, 30 Nov 2023 04:07:58 -0500
+X-MC-Unique: WyDj6E47NqSZKMlXa4T8fg-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3631984ACA1;
-	Thu, 30 Nov 2023 09:07:56 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A26FD84ACAF;
+	Thu, 30 Nov 2023 09:07:57 +0000 (UTC)
 Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2ED111C060AE;
-	Thu, 30 Nov 2023 09:07:56 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9341B1C060AE;
+	Thu, 30 Nov 2023 09:07:57 +0000 (UTC)
 From: Shaoqin Huang <shahuang@redhat.com>
 To: Andrew Jones <andrew.jones@linux.dev>,
 	kvmarm@lists.linux.dev
 Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
 	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v1 04/18] lib/alloc_phys: Consolidate allocate functions into memalign_early()
-Date: Thu, 30 Nov 2023 04:07:06 -0500
-Message-Id: <20231130090722.2897974-5-shahuang@redhat.com>
+Subject: [kvm-unit-tests PATCH v1 13/18] arm/arm64: Configure secondaries' stack before enabling the MMU
+Date: Thu, 30 Nov 2023 04:07:15 -0500
+Message-Id: <20231130090722.2897974-14-shahuang@redhat.com>
 In-Reply-To: <20231130090722.2897974-1-shahuang@redhat.com>
 References: <20231130090722.2897974-1-shahuang@redhat.com>
 Precedence: bulk
@@ -52,109 +53,119 @@ X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-phys_alloc_aligned_safe() is called only by early_memalign() and the safe
-parameter is always true. In the spirit of simplifying the code, merge the
-two functions together. Rename it to memalign_early(), to match the naming
-scheme used by the page allocator.
+Now that the secondaries' stack is linearly mapped, we can set it before
+turning the MMU on. This makes the entry code for the secondaries
+consistent with the entry code for the boot CPU.
 
-Change the type of top_safe to phys_addr_t, to match the type of the top
-and base variables describing the available physical memory; this is a
-cosmetic change only, since libcflat.h defines phys_addr_t as an alias
-for u64.
+secondary_data is written by the CPU that brings the secondary online with
+the MMU enabled in the common case (that is, unless the user specifically
+compiled the tests to run with the MMU disabled), and now it is read by the
+secondary with the MMU disabled. Data is fetched from PoC by the secondary
+when the MMU is disabled, clean struct secondary_data to PoC to handle
+this.
 
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- lib/alloc_phys.c | 40 +++++++++++++++-------------------------
- 1 file changed, 15 insertions(+), 25 deletions(-)
+ arm/cstart.S   | 20 ++++++++++----------
+ arm/cstart64.S | 16 ++++++++--------
+ lib/arm/smp.c  |  5 +++++
+ 3 files changed, 23 insertions(+), 18 deletions(-)
 
-diff --git a/lib/alloc_phys.c b/lib/alloc_phys.c
-index 3a78d0ac..65c860cb 100644
---- a/lib/alloc_phys.c
-+++ b/lib/alloc_phys.c
-@@ -27,9 +27,9 @@ static phys_addr_t base, top;
- #define DEFAULT_MINIMUM_ALIGNMENT	32
- static size_t align_min = DEFAULT_MINIMUM_ALIGNMENT;
+diff --git a/arm/cstart.S b/arm/cstart.S
+index 98d61230..090cf38d 100644
+--- a/arm/cstart.S
++++ b/arm/cstart.S
+@@ -134,16 +134,6 @@ get_mmu_off:
  
--static void *early_memalign(size_t alignment, size_t size);
-+static void *memalign_early(size_t alignment, size_t sz);
- static struct alloc_ops early_alloc_ops = {
--	.memalign = early_memalign,
-+	.memalign = memalign_early,
- };
- struct alloc_ops *alloc_ops = &early_alloc_ops;
+ .global secondary_entry
+ secondary_entry:
+-	/* enable the MMU unless requested off */
+-	bl	get_mmu_off
+-	cmp	r0, #0
+-	bne	1f
+-	mov	r1, #0
+-	ldr	r0, =mmu_idmap
+-	ldr	r0, [r0]
+-	bl	asm_mmu_enable
+-
+-1:
+ 	/*
+ 	 * Set the stack, and set up vector table
+ 	 * and exception stacks. Exception stacks
+@@ -161,6 +151,16 @@ secondary_entry:
+ 	bl	exceptions_init
+ 	bl	enable_vfp
  
-@@ -66,21 +66,24 @@ void phys_alloc_set_minimum_alignment(phys_addr_t align)
- 	spin_unlock(&lock);
- }
- 
--static phys_addr_t phys_alloc_aligned_safe(phys_addr_t size,
--					   phys_addr_t align, bool safe)
-+static void *memalign_early(size_t alignment, size_t sz)
- {
- 	static bool warned = false;
--	phys_addr_t addr, size_orig = size;
--	u64 top_safe;
-+	phys_addr_t align = (phys_addr_t)alignment;
-+	phys_addr_t size = (phys_addr_t)sz;
-+	phys_addr_t size_orig = size;
-+	phys_addr_t addr, top_safe;
++	/* enable the MMU unless requested off */
++	bl	get_mmu_off
++	cmp	r0, #0
++	bne	1f
++	mov	r1, #0
++	ldr	r0, =mmu_idmap
++	ldr	r0, [r0]
++	bl	asm_mmu_enable
 +
-+	assert(align && !(align & (align - 1)));
++1:
+ 	/* finish init in C code */
+ 	bl	secondary_cinit
  
- 	spin_lock(&lock);
+diff --git a/arm/cstart64.S b/arm/cstart64.S
+index 7fb44f42..b9784d82 100644
+--- a/arm/cstart64.S
++++ b/arm/cstart64.S
+@@ -144,6 +144,14 @@ get_mmu_off:
  
- 	top_safe = top;
- 
--	if (safe && sizeof(long) == 4)
-+	if (sizeof(long) == 4)
- 		top_safe = MIN(top_safe, 1ULL << 32);
--
- 	assert(base < top_safe);
+ .globl secondary_entry
+ secondary_entry:
++	/* set the stack */
++	adrp	x0, secondary_data
++	ldr	x0, [x0, :lo12:secondary_data]
++	and	x1, x0, #THREAD_MASK
++	add	x2, x1, #THREAD_SIZE
++	zero_range x1, x2
++	mov	sp, x0
 +
- 	if (align < align_min)
- 		align = align_min;
+ 	/* Enable FP/ASIMD */
+ 	mov	x0, #(3 << 20)
+ 	msr	cpacr_el1, x0
+@@ -159,14 +167,6 @@ secondary_entry:
+ 	bl	asm_mmu_enable
  
-@@ -92,10 +95,10 @@ static phys_addr_t phys_alloc_aligned_safe(phys_addr_t size,
- 		       " (align=%#" PRIx64 "), "
- 		       "need=%#" PRIx64 ", but free=%#" PRIx64 ". "
- 		       "top=%#" PRIx64 ", top_safe=%#" PRIx64 "\n",
--		       (u64)size_orig, (u64)align, (u64)size, top_safe - base,
--		       (u64)top, top_safe);
-+		       (u64)size_orig, (u64)align, (u64)size,
-+		       (u64)(top_safe - base), (u64)top, (u64)top_safe);
- 		spin_unlock(&lock);
--		return INVALID_PHYS_ADDR;
-+		return NULL;
- 	}
- 
- 	base += size;
-@@ -112,7 +115,7 @@ static phys_addr_t phys_alloc_aligned_safe(phys_addr_t size,
- 
- 	spin_unlock(&lock);
- 
--	return addr;
-+	return phys_to_virt(addr);
- }
- 
- void phys_alloc_get_unused(phys_addr_t *p_base, phys_addr_t *p_top)
-@@ -128,16 +131,3 @@ void phys_alloc_get_unused(phys_addr_t *p_base, phys_addr_t *p_top)
- 	base = top;
- 	spin_unlock(&lock);
- }
+ 1:
+-	/* set the stack */
+-	adrp	x0, secondary_data
+-	ldr	x0, [x0, :lo12:secondary_data]
+-	and	x1, x0, #THREAD_MASK
+-	add	x2, x1, #THREAD_SIZE
+-	zero_range x1, x2
+-	mov	sp, x0
 -
--static void *early_memalign(size_t alignment, size_t size)
--{
--	phys_addr_t addr;
--
--	assert(alignment && !(alignment & (alignment - 1)));
--
--	addr = phys_alloc_aligned_safe(size, alignment, true);
--	if (addr == INVALID_PHYS_ADDR)
--		return NULL;
--
--	return phys_to_virt(addr);
--}
+ 	/* finish init in C code */
+ 	bl	secondary_cinit
+ 
+diff --git a/lib/arm/smp.c b/lib/arm/smp.c
+index 1d470d1a..c9b247a8 100644
+--- a/lib/arm/smp.c
++++ b/lib/arm/smp.c
+@@ -7,6 +7,8 @@
+  */
+ #include <libcflat.h>
+ #include <auxinfo.h>
++
++#include <asm/cacheflush.h>
+ #include <asm/thread_info.h>
+ #include <asm/spinlock.h>
+ #include <asm/cpumask.h>
+@@ -60,6 +62,9 @@ static void __smp_boot_secondary(int cpu, secondary_entry_fn entry)
+ 
+ 	secondary_data.stack = thread_stack_alloc();
+ 	secondary_data.entry = entry;
++	dcache_clean_poc((unsigned long)&secondary_data,
++			 (unsigned long)&secondary_data + sizeof(secondary_data));
++
+ 	mmu_mark_disabled(cpu);
+ 	ret = cpu_psci_cpu_boot(cpu);
+ 	assert(ret == 0);
 -- 
 2.40.1
 
