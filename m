@@ -1,146 +1,115 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC21511C9B
-	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 03:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B474E171A0
+	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 04:17:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oa8yOne0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HQrNILGP"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701315012;
+	s=mimecast20190719; t=1701317838;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=WVR5GsqS24d6WcH08WD57szVg2J4c5+AD/A7s0nVVgU=;
-	b=Oa8yOne08A80de96OqWVI+6aaWX03WiDXpqTwhc3JGOc4a/14PiraXJ1Aonr3rUr2Zt2lY
-	rcmVJAPadD+WbwnPmWW7PZvWNoBLEF7FaWeFROAv139KZbuiiIJRM2ABgKg59PyBHJd8u7
-	2qZCMuCYWfY2l+oGWUtqAnzDEBDNHo4=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-252-X35s0X4DPPaEUbYhyDvOvw-1; Wed,
- 29 Nov 2023 22:30:06 -0500
-X-MC-Unique: X35s0X4DPPaEUbYhyDvOvw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D361E3814945;
-	Thu, 30 Nov 2023 03:30:05 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C5FBD112130C;
-	Thu, 30 Nov 2023 03:30:05 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: Andrew Jones <andrew.jones@linux.dev>,
-	kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Nikos Nikoleris <nikos.nikoleris@arm.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v2 3/3] arm64: efi: Make running tests on EFI can be parallel
-Date: Wed, 29 Nov 2023 22:29:40 -0500
-Message-Id: <20231130032940.2729006-4-shahuang@redhat.com>
-In-Reply-To: <20231130032940.2729006-1-shahuang@redhat.com>
-References: <20231130032940.2729006-1-shahuang@redhat.com>
+	bh=o1gushqAiHQ23GEZEOV13TzTKkCoZS1NFR10zi092Pg=;
+	b=HQrNILGPB6YpSwawfGQx7+M8wnGm7voNK17SsFghGJ6WR8v5T3YdxBkS4ETYBtBVcB2H0z
+	M+1KFBOLU4XAnxFsfoV6YAvWF+KHIs5UJsLpG0fL1JG+mHAVeD9cVrmPmQZKa8sRfs+vrP
+	UnUYpGKsBSb+vGY2OF4BBVOKHhfimkA=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-443-LtYctMrQMHCbZIREno-LLg-1; Wed, 29 Nov 2023 23:17:16 -0500
+X-MC-Unique: LtYctMrQMHCbZIREno-LLg-1
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3b894358aa6so133898b6e.0
+        for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 20:17:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701317836; x=1701922636;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=o1gushqAiHQ23GEZEOV13TzTKkCoZS1NFR10zi092Pg=;
+        b=UGwJh+ulRVbitpzdir63KBdflsiH/VGXaOR9vluOILly7VwFrPFT9LAu3CeR7F9KCR
+         rG31p+5MBSa3bs99b6mAldaRtnzq6VbBXcEYwo8uXB59qoAaMFnuffY5llC2Wn8Vnclf
+         cr8heYA6xV1GPku+XasX2wOngHjW3tWeNWcQGEBLQzWDLovcFOl1tNfoD6SFhacedM4W
+         uT0JKMHBQJ0xlGjz8szewcBH47OgnSnAonbvlBnuooMCypykBG/3928OVRTDSCQGaHAD
+         0Dapula1uzq5R00s0t7DQXjCE692ex+47UjBdC4v2GfnH5Ww+G2tkqfzYL97xvNoeXzE
+         xL4g==
+X-Gm-Message-State: AOJu0YynOLa8X/mLLuUXcNWllLw2Y7oYoGvSAc0M+T1DyIOPwPYDNTtH
+	ICA3Vv5zJE6T30ijkMH0NKwuv9wedrxr+j3elPKXYHYg5uFhMwzTxWd3Co+qLMMDXzsQrArr7rq
+	UmmGoFZOHcYjURtUN
+X-Received: by 2002:a05:6808:2121:b0:3b8:5fb1:3574 with SMTP id r33-20020a056808212100b003b85fb13574mr19231984oiw.0.1701317836044;
+        Wed, 29 Nov 2023 20:17:16 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFF/I4dHP0NTHDLJ07kE1nSAYz/sN38Hqo2/+sQEmk3lhRLo6bjADuJwRleLPyVTHCunNfFzg==
+X-Received: by 2002:a05:6808:2121:b0:3b8:5fb1:3574 with SMTP id r33-20020a056808212100b003b85fb13574mr19231964oiw.0.1701317835768;
+        Wed, 29 Nov 2023 20:17:15 -0800 (PST)
+Received: from [10.66.61.39] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id e8-20020aa798c8000000b006cd7d189aa9sm204205pfm.131.2023.11.29.20.17.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Nov 2023 20:17:15 -0800 (PST)
+Message-ID: <926b91b3-4355-ac68-36f3-6352b1ac7285@redhat.com>
+Date: Thu, 30 Nov 2023 12:17:12 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [kvm-unit-tests PATCH v2 2/3] runtime: arm64: Skip the migration
+ tests when run on EFI
+To: Andrew Jones <andrew.jones@linux.dev>, kvmarm@lists.linux.dev
+Cc: Thomas Huth <thuth@redhat.com>, Nico Boehr <nrb@linux.ibm.com>,
+ Colton Lewis <coltonlewis@google.com>,
+ Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+ Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org
+References: <20231130032940.2729006-1-shahuang@redhat.com>
+ <20231130032940.2729006-3-shahuang@redhat.com>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20231130032940.2729006-3-shahuang@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Currently running tests on EFI in parallel can cause part of tests to
-fail, this is because arm/efi/run script use the EFI_CASE to create the
-subdir under the efi-tests, and the EFI_CASE is the filename of the
-test, when running tests in parallel, the multiple tests exist in the
-same filename will execute at the same time, which will use the same
-directory and write the test specific things into it, this cause
-chaotic and make some tests fail.
 
-For example, if we running the pmu-sw-incr and pmu-chained-counters
-and other pmu tests on EFI at the same time, the EFI_CASE will be pmu.
-So they will write their $cmd_args to the $EFI/TEST/pmu/startup.nsh
-at the same time, which will corrupt the startup.nsh file.
 
-And we can get the log which outputs:
+On 11/30/23 11:29, Shaoqin Huang wrote:
+> When running the migration tests on EFI, the migration will always fail
+> since the efi/run use the vvfat format to run test, but the vvfat format
+> does not support live migration. So those migration tests will always
+> fail.
+> 
+> Instead of waiting for fail everytime when run migration tests on EFI,
+> skip those tests if running on EFI.
+> 
+> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+>   scripts/runtime.bash | 4 ++++
+>   1 file changed, 4 insertions(+)
+> 
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index c73fb024..64d223e8 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -156,6 +156,10 @@ function run()
+>   
+>       cmdline=$(get_cmdline $kernel)
+>       if find_word "migration" "$groups"; then
+> +        if [ "{CONFIG_EFI}" == "y" ]; then
 
-* pmu-sw-incr.log:
-  - ABORT: pmu: Unknown sub-test 'pmu-mem-acce'
-* pmu-chained-counters.log
-  - ABORT: pmu: Unknown sub-test 'pmu-mem-access-reliab'
+I'm stupid. Should be ${CONFIG_EFI} here.
 
-And the efi-tests/pmu/startup.nsh:
+> +            print_result "SKIP" $testname "" "migration tests are not supported with efi"
+> +            return 2
+> +        fi
+>           cmdline="MIGRATION=yes $cmdline"
+>       fi
+>       if find_word "panic" "$groups"; then
 
-@echo -off
-setvar fdtfile -guid 97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823 -rt =L"dtb"
-pmu.efi pmu-mem-access-reliability
-setvar fdtfile -guid 97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823 -rt =L"dtb"
-pmu.efi pmu-chained-sw-incr
-
-As you can see, when multiple tests write to the same startup.nsh file,
-it causes the issue.
-
-To Fix this issue, use the testname instead of the filename to create
-the subdir under the efi-tests. We use the EFI_TESTNAME to replace the
-EFI_CASE in script. Since every testname is specific, now the tests
-can be run parallel. It also considers when user directly use the
-arm/efi/run to run test, in this case, still use the filename.
-
-Besides, replace multiple $EFI_TEST/$EFI_CASE to the $EFI_CASE_DIR, this
-makes the script looks more clean and we don'e need to replace many
-EFI_CASE to EFI_TESTNAME.
-
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
- arm/efi/run | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
-
-diff --git a/arm/efi/run b/arm/efi/run
-index 6872c337..03bfbef4 100755
---- a/arm/efi/run
-+++ b/arm/efi/run
-@@ -24,6 +24,8 @@ fi
- : "${EFI_SRC:=$TEST_DIR}"
- : "${EFI_UEFI:=$DEFAULT_UEFI}"
- : "${EFI_TEST:=efi-tests}"
-+: "${EFI_TESTNAME:=$TESTNAME}"
-+: "${EFI_TESTNAME:=$(basename $1 .efi)}"
- : "${EFI_CASE:=$(basename $1 .efi)}"
- : "${EFI_VAR_GUID:=97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823}"
- 
-@@ -56,20 +58,20 @@ if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
- 	EFI_CASE=dummy
- fi
- 
--: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_CASE"}"
-+: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_TESTNAME"}"
- mkdir -p "$EFI_CASE_DIR"
- 
--cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
--echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
-+cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_CASE_DIR/"
-+echo "@echo -off" > "$EFI_CASE_DIR/startup.nsh"
- if [ "$EFI_USE_DTB" = "y" ]; then
- 	qemu_args+=(-machine acpi=off)
- 	FDT_BASENAME="dtb"
--	$(EFI_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_TEST/$EFI_CASE/$FDT_BASENAME" "${qemu_args[@]}")
--	echo "setvar fdtfile -guid $EFI_VAR_GUID -rt =L\"$FDT_BASENAME\""  >> "$EFI_TEST/$EFI_CASE/startup.nsh"
-+	$(EFI_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_CASE_DIR/$FDT_BASENAME" "${qemu_args[@]}")
-+	echo "setvar fdtfile -guid $EFI_VAR_GUID -rt =L\"$FDT_BASENAME\""  >> "$EFI_CASE_DIR/startup.nsh"
- fi
--echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_TEST/$EFI_CASE/startup.nsh"
-+echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_CASE_DIR/startup.nsh"
- 
- EFI_RUN=y $TEST_DIR/run \
-        -bios "$EFI_UEFI" \
--       -drive file.dir="$EFI_TEST/$EFI_CASE/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
-+       -drive file.dir="$EFI_CASE_DIR/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
-        "${qemu_args[@]}"
 -- 
-2.40.1
+Shaoqin
 
