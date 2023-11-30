@@ -1,45 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7F236B1D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA303716B
 	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 09:08:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i6D0O3Rv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CG4oVeEp"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701335282;
+	s=mimecast20190719; t=1701335283;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6oJ2WRGg6a4FrOXCy7k3lvqpweTX6omo+sELBwPPyOE=;
-	b=i6D0O3Rvg7Hd4xpsGoBhS1L3eC6SiEPGxgxSxxeHMULe/FhEK9M7Fdyfq76cILwW6qI11g
-	PrAbEepHdshiVY3QHI0Zy90iUo5eR5s2CDTXYqfqlqJ4blxdh8V42CRIHH+qtM/cBmg66f
-	31npB4PsKRVDMQqNIedA+kDGcRL8gvk=
+	bh=T6J7bOOJIC05jXn22tMXTnBYzc47O0oKVIyQdp1yMck=;
+	b=CG4oVeEpn3OX8jB1rnCeQer+UPdwm4JkqoSiwBVZH3hqZmnGRCjSPbu1UDHtav3FklMk+N
+	cPYOqoQ7cgoGnYGyLZaPHniPTB/VTTEAA0B1+Rvip06sDPdd5fv7zUEXR8SZ002VZod5G6
+	XC8U1gkpHa9IDZXgZ6ZoaHRcuRw540w=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-324-EchLaSp1NiKqTgIJ2oC2VQ-1; Thu, 30 Nov 2023 04:07:58 -0500
-X-MC-Unique: EchLaSp1NiKqTgIJ2oC2VQ-1
+ us-mta-639-Ih6SkI_kMnCC2nG1jrks1g-1; Thu, 30 Nov 2023 04:07:57 -0500
+X-MC-Unique: Ih6SkI_kMnCC2nG1jrks1g-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8CA8B811E86;
-	Thu, 30 Nov 2023 09:07:58 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7F96E84ACA8;
+	Thu, 30 Nov 2023 09:07:57 +0000 (UTC)
 Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 801191C060AE;
-	Thu, 30 Nov 2023 09:07:58 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6FAFF1C060AE;
+	Thu, 30 Nov 2023 09:07:57 +0000 (UTC)
 From: Shaoqin Huang <shahuang@redhat.com>
 To: Andrew Jones <andrew.jones@linux.dev>,
 	kvmarm@lists.linux.dev
 Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
 	Eric Auger <eric.auger@redhat.com>,
+	Nikos Nikoleris <nikos.nikoleris@arm.com>,
 	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v1 18/18] arm/arm64: Rework the cache maintenance in asm_mmu_disable
-Date: Thu, 30 Nov 2023 04:07:20 -0500
-Message-Id: <20231130090722.2897974-19-shahuang@redhat.com>
+Subject: [kvm-unit-tests PATCH v1 12/18] arm/arm64: Add C functions for doing cache maintenance
+Date: Thu, 30 Nov 2023 04:07:14 -0500
+Message-Id: <20231130090722.2897974-13-shahuang@redhat.com>
 In-Reply-To: <20231130090722.2897974-1-shahuang@redhat.com>
 References: <20231130090722.2897974-1-shahuang@redhat.com>
 Precedence: bulk
@@ -53,139 +55,371 @@ X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-asm_mmu_disable is overly ambitious and provably incorrect:
-
-1. It tries to clean and invalidate the data caches for the **entire**
-memory, which is highly unnecessary, as it's very unlikely that a test
-will write to the entire memory, and even more unlikely that a test will
-modify the text section of the test image.
-
-2. There is no corresponding dcache invalidate command for the entire
-memory in asm_mmu_enable, leaving it up to the test that disabled the
-MMU to do the cache maintenance in an asymmetrical fashion: only for
-re-enabling the MMU, but not for disabling it.
-
-3. It's missing the DMB SY memory barrier to ensure that the dcache
-maintenance is performed after the last store executed in program order
-before calling asm_mmu_disable.
-
-Fix all of the issues in one go, by doing the cache maintenance only for
-the stack, as that is out of the control of the C code, and add the missing
-memory barrier. A test that disables the MMU is now expected to do whatever
-cache maintenance is necessary to execute correctly after the MMU is
-disabled.
-
-The code used to test that mmu_disable works correctly is similar to the
-code used to test commit 410b3bf09e76 ("arm/arm64: Perform dcache clean
-+ invalidate after turning MMU off"), with extra cache maintenance
-added:
-
-+#include <alloc_page.h>
-+#include <asm/cacheflush.h>
-+#include <asm/mmu.h>
- int main(int argc, char **argv)
- {
-+       int *x = alloc_page();
-+       bool pass = true;
-+       int i;
-+
-+       for  (i = 0; i < 1000000; i++) {
-+               *x = 0x42;
-+               dcache_clean_addr_poc((unsigned long)x);
-+               mmu_disable();
-+               if (*x != 0x42) {
-+                       mmu_enable(current_thread_info()->pgtable);
-+                       pass = false;
-+                       break;
-+               }
-+               *x = 0x50;
-+               /* Needed for the invalidation only. */
-+               dcache_clean_inval_addr_poc((unsigned long)x);
-+               mmu_enable(current_thread_info()->pgtable);
-+               if (*x != 0x50) {
-+                       pass = false;
-+                       break;
-+               }
-+       }
-+       report(pass, "MMU disable cache maintenance");
+Add C functions for doing cache maintenance, which will be used for
+implementing the necessary maintenance when kvm-unit-tests boots.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 ---
- arm/cstart.S   | 19 +++++++++++++------
- arm/cstart64.S | 19 ++++++++++++-------
- 2 files changed, 25 insertions(+), 13 deletions(-)
+ arm/Makefile.arm           |  4 +-
+ arm/Makefile.arm64         |  4 +-
+ arm/Makefile.common        |  6 +--
+ lib/arm/asm/assembler.h    |  4 +-
+ lib/arm/asm/cacheflush.h   |  1 +
+ lib/arm/asm/mmu.h          |  6 ---
+ lib/arm/cache.S            | 89 ++++++++++++++++++++++++++++++++++++++
+ lib/arm64/asm/cacheflush.h | 37 ++++++++++++++++
+ lib/arm64/asm/mmu.h        |  5 ---
+ lib/arm64/cache.S          | 85 ++++++++++++++++++++++++++++++++++++
+ 10 files changed, 224 insertions(+), 17 deletions(-)
+ create mode 100644 lib/arm/asm/cacheflush.h
+ create mode 100644 lib/arm/cache.S
+ create mode 100644 lib/arm64/asm/cacheflush.h
+ create mode 100644 lib/arm64/cache.S
 
-diff --git a/arm/cstart.S b/arm/cstart.S
-index 48dc87f5..3950e45e 100644
---- a/arm/cstart.S
-+++ b/arm/cstart.S
-@@ -240,18 +240,25 @@ asm_mmu_enable:
+diff --git a/arm/Makefile.arm b/arm/Makefile.arm
+index 7fd39f3a..0489aa92 100644
+--- a/arm/Makefile.arm
++++ b/arm/Makefile.arm
+@@ -26,7 +26,9 @@ endif
+ define arch_elf_check =
+ endef
  
- .globl asm_mmu_disable
- asm_mmu_disable:
-+	/*
-+	 * A test can change the memory attributes for a memory location to
-+	 * Device or Inner Non-cacheable, which makes the barrier required to
-+	 * avoid reordering of previous memory accesses with respect to the
-+	 * cache maintenance.
-+	 */
+-cstart.o = $(TEST_DIR)/cstart.o
++asmobjs  = $(TEST_DIR)/cstart.o
++asmobjs += lib/arm/cache.o
++
+ cflatobjs += lib/arm/spinlock.o
+ cflatobjs += lib/arm/processor.o
+ cflatobjs += lib/arm/stack.o
+diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+index 960880f1..10561f34 100644
+--- a/arm/Makefile.arm64
++++ b/arm/Makefile.arm64
+@@ -21,8 +21,10 @@ define arch_elf_check =
+ 		$(error $(1) has unsupported reloc types))
+ endef
+ 
+-cstart.o = $(TEST_DIR)/cstart64.o
++asmobjs  = $(TEST_DIR)/cstart64.o
++asmobjs += lib/arm64/cache.o
+ cflatobjs += lib/arm64/stack.o
++
+ cflatobjs += lib/arm64/processor.o
+ cflatobjs += lib/arm64/spinlock.o
+ cflatobjs += lib/arm64/gic-v3-its.o lib/arm64/gic-v3-its-cmd.o
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index 5214c8ac..10aa13f4 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -71,7 +71,7 @@ FLATLIBS = $(libcflat) $(LIBFDT_archive) $(libeabi)
+ 
+ ifeq ($(CONFIG_EFI),y)
+ %.so: EFI_LDFLAGS += -defsym=EFI_SUBSYSTEM=0xa --no-undefined
+-%.so: %.o $(FLATLIBS) $(SRCDIR)/arm/efi/elf_aarch64_efi.lds $(cstart.o)
++%.so: %.o $(FLATLIBS) $(SRCDIR)/arm/efi/elf_aarch64_efi.lds $(asmobjs)
+ 	$(CC) $(CFLAGS) -c -o $(@:.so=.aux.o) $(SRCDIR)/lib/auxinfo.c \
+ 		-DPROGNAME=\"$(@:.so=.efi)\" -DAUXFLAGS=$(AUXFLAGS)
+ 	$(LD) $(EFI_LDFLAGS) -o $@ -T $(SRCDIR)/arm/efi/elf_aarch64_efi.lds \
+@@ -91,7 +91,7 @@ ifeq ($(CONFIG_EFI),y)
+ 		-O binary $^ $@
+ else
+ %.elf: LDFLAGS += $(arch_LDFLAGS)
+-%.elf: %.o $(FLATLIBS) $(SRCDIR)/arm/flat.lds $(cstart.o)
++%.elf: %.o $(FLATLIBS) $(SRCDIR)/arm/flat.lds $(asmobjs)
+ 	$(CC) $(CFLAGS) -c -o $(@:.elf=.aux.o) $(SRCDIR)/lib/auxinfo.c \
+ 		-DPROGNAME=\"$(@:.elf=.flat)\" -DAUXFLAGS=$(AUXFLAGS)
+ 	$(LD) $(LDFLAGS) -o $@ -T $(SRCDIR)/arm/flat.lds \
+@@ -113,4 +113,4 @@ arm_clean: asm_offsets_clean
+ 	      $(TEST_DIR)/.*.d $(TEST_DIR)/efi/.*.d lib/arm/.*.d
+ 
+ generated-files = $(asm-offsets)
+-$(tests-all:.$(exe)=.o) $(cstart.o) $(cflatobjs): $(generated-files)
++$(tests-all:.$(exe)=.o) $(asmobjs) $(cflatobjs): $(generated-files)
+diff --git a/lib/arm/asm/assembler.h b/lib/arm/asm/assembler.h
+index db5f0f55..e728bb21 100644
+--- a/lib/arm/asm/assembler.h
++++ b/lib/arm/asm/assembler.h
+@@ -41,7 +41,9 @@
+ 	.ifc	\op, dccimvac
+ 	mcr	p15, 0, \addr, c7, c14, 1
+ 	.else
+-	.err
++	.ifc	\op, dccmvac
++	mcr	p15, 0, \addr, c7, c10, 1
++	.endif
+ 	.endif
+ 	add	\addr, \addr, \tmp1
+ 	cmp	\addr, \end
+diff --git a/lib/arm/asm/cacheflush.h b/lib/arm/asm/cacheflush.h
+new file mode 100644
+index 00000000..42dc88a4
+--- /dev/null
++++ b/lib/arm/asm/cacheflush.h
+@@ -0,0 +1 @@
++#include "../../arm64/asm/cacheflush.h"
+diff --git a/lib/arm/asm/mmu.h b/lib/arm/asm/mmu.h
+index b24b97e5..6359ba64 100644
+--- a/lib/arm/asm/mmu.h
++++ b/lib/arm/asm/mmu.h
+@@ -45,12 +45,6 @@ static inline void flush_tlb_page(unsigned long vaddr)
+ 	isb();
+ }
+ 
+-static inline void flush_dcache_addr(unsigned long vaddr)
+-{
+-	/* DCCIMVAC */
+-	asm volatile("mcr p15, 0, %0, c7, c14, 1" :: "r" (vaddr));
+-}
+-
+ #include <asm/mmu-api.h>
+ 
+ #endif /* _ASMARM_MMU_H_ */
+diff --git a/lib/arm/cache.S b/lib/arm/cache.S
+new file mode 100644
+index 00000000..cdb6c168
+--- /dev/null
++++ b/lib/arm/cache.S
+@@ -0,0 +1,89 @@
++/*
++ * Based on arch/arm64/mm/cache.S
++ *
++ * Copyright (C) 2001 Deep Blue Solutions Ltd.
++ * Copyright (C) 2012, 2022 ARM Ltd.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.
++ */
++
++#include <asm/assembler.h>
++
++/*
++ *      dcache_inval_poc(start, end)
++ *
++ *      Ensure that any D-cache lines for the interval [start, end) are
++ *      invalidated. Any partial lines at the ends of the interval are cleaned
++ *      and invalidated to PoC instead to prevent data loss.
++ *
++ *      - start   - start address of region
++ *      - end     - end address of region
++ */
++.global dcache_inval_poc
++dcache_inval_poc:
 +	dmb	sy
-+	mov	r0, sp
-+	lsr	r0, #THREAD_SHIFT
-+	lsl	r0, #THREAD_SHIFT
-+	add	r1, r0, #THREAD_SIZE
++	dcache_line_size r2, r3
++	sub 	r3, r2, #1
++	tst	r1, r3			// end cache line aligned?
++	bic	r1, r1, r3
++	beq 	1f
++	// DCCIMVAC
++	mcr	p15, 0, r1, c7, c14, 1	// clean + invalidate end cache line
++1:	tst	r0, r3			// start cache line aligned?
++	bic	r0, r0, r3
++	beq	2f
++	mcr	p15, 0, r0, c7, c14, 1	// clean + invalidate start cache line
++	b	3f
++	// DCIMVAC
++2:	mcr	p15, 0, r0, c7, c6, 1	// invalidate current cache line
++3:	add	r0, r0, r2
++	cmp	r0, r1
++	blo	2b
++	dsb	sy
++	mov	pc, lr
++
++/*
++ *      dcache_clean_poc(start, end)
++ *
++ *      Ensure that any D-cache lines for the interval [start, end)
++ *      are cleaned to the PoC.
++ *
++ *      - start   - start address of region
++ *      - end     - end address of region
++ */
++.global dcache_clean_poc
++dcache_clean_poc:
++	dmb	sy
 +	dcache_by_line_op dccmvac, sy, r0, r1, r2, r3
++	mov	pc, lr
 +
- 	/* SCTLR */
- 	mrc	p15, 0, r0, c1, c0, 0
- 	bic	r0, #CR_M
- 	mcr	p15, 0, r0, c1, c0, 0
- 	isb
- 
--	ldr	r0, =__phys_offset
--	ldr	r0, [r0]
--	ldr	r1, =__phys_end
--	ldr	r1, [r1]
--	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
--
- 	mov     pc, lr
- 
- /*
-diff --git a/arm/cstart64.S b/arm/cstart64.S
-index d8200ea2..af56186c 100644
---- a/arm/cstart64.S
-+++ b/arm/cstart64.S
-@@ -288,18 +288,23 @@ asm_mmu_enable:
- 
- .globl asm_mmu_disable
- asm_mmu_disable:
-+	/*
-+	 * A test can change the memory attributes for a memory location to
-+	 * Device or Inner Non-cacheable, which makes the barrier required to
-+	 * avoid reordering of previous memory accesses with respect to the
-+	 * cache maintenance.
-+	 */
++/*
++ *      dcache_clean_addr_poc(addr)
++ *
++ *      Ensure that the D-cache line for address addr is cleaned to the PoC.
++ *
++ *      - addr    - the address
++ */
++.global dcache_clean_addr_poc
++dcache_clean_addr_poc:
 +	dmb	sy
-+	mov	x9, sp
-+	and	x9, x9, #THREAD_MASK
-+	add	x10, x9, #THREAD_SIZE
-+	dcache_by_line_op cvac, sy, x9, x10, x11, x12
++	// DCCMVAC
++	mcr 	p15, 0, r0, c7, c10, 1
++	dsb	sy
++	mov	pc, lr
 +
- 	mrs	x0, sctlr_el1
- 	bic	x0, x0, SCTLR_EL1_M
- 	msr	sctlr_el1, x0
- 	isb
++/*
++ *      dcache_clean_inval_addr_poc(addr)
++ *
++ *      Ensure that the D-cache line for address addr is cleaned and invalidated
++ *      to the PoC.
++ *
++ *      - addr    - the address
++ */
++.global dcache_clean_inval_addr_poc
++dcache_clean_inval_addr_poc:
++	dmb	sy
++	// DCCIMVAC
++	mcr 	p15, 0, r0, c7, c14, 1
++	dsb	sy
++	mov	pc, lr
+diff --git a/lib/arm64/asm/cacheflush.h b/lib/arm64/asm/cacheflush.h
+new file mode 100644
+index 00000000..53a57820
+--- /dev/null
++++ b/lib/arm64/asm/cacheflush.h
+@@ -0,0 +1,37 @@
++#ifndef _ASMARM64_CACHEFLUSH_H_
++#define _ASMARM64_CACHEFLUSH_H_
++/*
++ * Based on arch/arm64/asm/include/cacheflush.h
++ *
++ * Copyright (C) 1999-2002 Russell King.
++ * Copyright (C) 2012,2022 ARM Ltd.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.
++ */
++
++#include <asm/page.h>
++
++extern void dcache_clean_addr_poc(unsigned long addr);
++/*
++ * Invalidating a specific address is dangerous, because it means invalidating
++ * everything that shares the same cache line. Do clean and invalidate instead,
++ * as the clean is harmless.
++ */
++extern void dcache_clean_inval_addr_poc(unsigned long addr);
++
++extern void dcache_inval_poc(unsigned long start, unsigned long end);
++extern void dcache_clean_poc(unsigned long start, unsigned long end);
++
++static inline void dcache_inval_page_poc(unsigned long page_addr)
++{
++	assert(PAGE_ALIGN(page_addr) == page_addr);
++	dcache_inval_poc(page_addr, page_addr + PAGE_SIZE);
++}
++
++static inline void dcache_clean_page_poc(unsigned long page_addr)
++{
++	assert(PAGE_ALIGN(page_addr) == page_addr);
++	dcache_clean_poc(page_addr, page_addr + PAGE_SIZE);
++}
++
++#endif /* _ASMARM64_CACHEFLUSH_H_ */
+diff --git a/lib/arm64/asm/mmu.h b/lib/arm64/asm/mmu.h
+index 5c27edb2..2ebbe925 100644
+--- a/lib/arm64/asm/mmu.h
++++ b/lib/arm64/asm/mmu.h
+@@ -28,11 +28,6 @@ static inline void flush_tlb_page(unsigned long vaddr)
+ 	isb();
+ }
  
--	/* Clean + invalidate the entire memory */
--	adrp	x0, __phys_offset
--	ldr	x0, [x0, :lo12:__phys_offset]
--	adrp	x1, __phys_end
--	ldr	x1, [x1, :lo12:__phys_end]
--	dcache_by_line_op civac, sy, x0, x1, x2, x3
+-static inline void flush_dcache_addr(unsigned long vaddr)
+-{
+-	asm volatile("dc civac, %0" :: "r" (vaddr));
+-}
 -
- 	ret
+ #include <asm/mmu-api.h>
  
- /*
+ #endif /* _ASMARM64_MMU_H_ */
+diff --git a/lib/arm64/cache.S b/lib/arm64/cache.S
+new file mode 100644
+index 00000000..595b6d9a
+--- /dev/null
++++ b/lib/arm64/cache.S
+@@ -0,0 +1,85 @@
++/*
++ * Based on arch/arm64/mm/cache.S
++ *
++ * Copyright (C) 2001 Deep Blue Solutions Ltd.
++ * Copyright (C) 2012, 2022 ARM Ltd.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.
++ */
++
++#include <asm/assembler.h>
++
++/*
++ *      dcache_inval_poc(start, end)
++ *
++ *      Ensure that any D-cache lines for the interval [start, end) are
++ *      invalidated. Any partial lines at the ends of the interval are cleaned
++ *      and invalidated to PoC instead to prevent data loss.
++ *
++ *      - start   - start address of region
++ *      - end     - end address of region
++ */
++.global dcache_inval_poc
++dcache_inval_poc:
++	dmb	sy
++	raw_dcache_line_size x2, x3
++	sub 	x3, x2, #1
++	tst	x1, x3			// end cache line aligned?
++	bic	x1, x1, x3
++	b.eq 	1f
++	dc	civac, x1		// clean + invalidate end cache line
++1:	tst	x0, x3			// start cache line aligned?
++	bic	x0, x0, x3
++	b.eq	2f
++	dc 	civac, x0		// clean + invalidate start cache line
++	b	3f
++2:	dc	ivac, x0		// invalidate current cache line
++3:	add	x0, x0, x2
++	cmp	x0, x1
++	b.lo	2b
++	dsb	sy
++	ret
++
++/*
++ *      dcache_clean_poc(start, end)
++ *
++ *      Ensure that any D-cache lines for the interval [start, end)
++ *      are cleaned to the PoC.
++ *
++ *      - start   - start address of region
++ *      - end     - end address of region
++ */
++.global dcache_clean_poc
++dcache_clean_poc:
++	dmb	sy
++	dcache_by_line_op cvac, sy, x0, x1, x2, x3
++	ret
++
++/*
++ *      dcache_clean_addr_poc(addr)
++ *
++ *      Ensure that the D-cache line for address addr is cleaned to the PoC.
++ *
++ *      - addr    - the address
++ */
++.global dcache_clean_addr_poc
++dcache_clean_addr_poc:
++	dmb	sy
++	dc	cvac, x0
++	dsb	sy
++	ret
++
++/*
++ *      dcache_clean_inval_addr_poc(addr)
++ *
++ *      Ensure that the D-cache line for address addr is cleaned and invalidated
++ *      to the PoC.
++ *
++ *      - addr    - the address
++ */
++.global dcache_clean_inval_addr_poc
++dcache_clean_inval_addr_poc:
++	dmb	sy
++	dc	civac, x0
++	dsb	sy
++	ret
 -- 
 2.40.1
 
