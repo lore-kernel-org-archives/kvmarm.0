@@ -1,131 +1,145 @@
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67556FC9
-	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 06:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77662134C3
+	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 09:07:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="rOr5qxeA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1701326330;
-	bh=scy1etpzFyR1jZIjJ7/tF1TmQ4Wr4ZPAn1YidjcB+F0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=rOr5qxeAp7+hwSCT9su1OJ57aJsQ7ggH9hU8d+p4CPkIHvFtYa8VDMQB3aJSsQb9x
-	 7KnwcbuuavH9TzQFqPQ8saFsfUnd/CUwi1aH82O7OZCKp9c2bNDVx1/Ej+L1puiA9T
-	 giyTyN5MW7HA52VJWCV0K0RgS6V9liqDJhHujqnVprWA5JMydiETZgA0m/mzz+BFZZ
-	 f0N5fEszptc/Dt1zIijywxUjRhlR4ocAB6HhjB/7jY9SUx2tXcLAHOwcfZoSLu6dhy
-	 vq6qJFI38c7f1IYdQT8Zh8HrWTsEQ/gdV9KMGmEyoAaS9NkZGtkUNvNtJJH5nFk/Rk
-	 PqeKz/k0JOiew==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JQraYjs+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701335278;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VCYXs7UB826Rm6Vi+S+LrP8zq1r68p6FkKq2ErN2au4=;
+	b=JQraYjs+1YN0E6r6MzGHm1IVQf8YHo1MLdCmPPwHPy2FPEWsuKyx9wWb9lLh6PWE1YpPkx
+	rFl6AhBQbJD/53aAo0fbOhbApPOLWrlEiUxve9AuhWJ6owx1fGDJ48nJrRdgncRFGzcv1t
+	7pi/DWqa64n5dw+ptSh+q+7z6aCIkzY=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-101-1X-oQLimP5qYoreV94DJ6g-1; Thu,
+ 30 Nov 2023 04:07:56 -0500
+X-MC-Unique: 1X-oQLimP5qYoreV94DJ6g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Sgmjz2zZwz4xWj;
-	Thu, 30 Nov 2023 17:38:47 +1100 (AEDT)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Sean Christopherson <seanjc@google.com>, Jason Gunthorpe <jgg@nvidia.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger
- <borntraeger@linux.ibm.com>, Borislav Petkov <bp@alien8.de>, Catalin
- Marinas <catalin.marinas@arm.com>, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Dave Hansen <dave.hansen@linux.intel.com>,
- David Hildenbrand <david@redhat.com>, Janosch Frank
- <frankja@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens
- <hca@linux.ibm.com>, "H. Peter Anvin" <hpa@zytor.com>, Claudio Imbrenda
- <imbrenda@linux.ibm.com>, James Morse <james.morse@arm.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, Marc Zyngier <maz@kernel.org>, Ingo Molnar
- <mingo@redhat.com>, Nicholas Piggin <npiggin@gmail.com>, Oliver Upton
- <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, Sven
- Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Will
- Deacon <will@kernel.org>, x86@kernel.org, Zenghui Yu
- <yuzenghui@huawei.com>
-Subject: Re: Ping? Re: [PATCH rc] kvm: Prevent compiling virt/kvm/vfio.c
- unless VFIO is selected
-In-Reply-To: <ZWftIIEpbLP2xF5H@google.com>
-References: <0-v1-08396538817d+13c5-vfio_kvm_kconfig_jgg@nvidia.com>
- <87edgy87ig.fsf@mail.lhotse> <ZWagNsu1XQIqk5z9@google.com>
- <875y1k3nm9.fsf@mail.lhotse> <ZWfgYdSoJAZqL2Gx@google.com>
- <20231130011650.GD1389974@nvidia.com> <ZWftIIEpbLP2xF5H@google.com>
-Date: Thu, 30 Nov 2023 17:38:43 +1100
-Message-ID: <87y1ef21ak.fsf@mail.lhotse>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E4DC51C382AF;
+	Thu, 30 Nov 2023 09:07:55 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id DB5DB1C060AE;
+	Thu, 30 Nov 2023 09:07:55 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Andrew Jones <andrew.jones@linux.dev>,
+	kvmarm@lists.linux.dev
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
+	Laurent Vivier <lvivier@redhat.com>,
+	Thomas Huth <thuth@redhat.com>,
+	kvm-ppc@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v1 02/18] powerpc: Replace the physical allocator with the page allocator
+Date: Thu, 30 Nov 2023 04:07:04 -0500
+Message-Id: <20231130090722.2897974-3-shahuang@redhat.com>
+In-Reply-To: <20231130090722.2897974-1-shahuang@redhat.com>
+References: <20231130090722.2897974-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-Sean Christopherson <seanjc@google.com> writes:
-> On Wed, Nov 29, 2023, Jason Gunthorpe wrote:
->> On Wed, Nov 29, 2023 at 05:07:45PM -0800, Sean Christopherson wrote:
->> > On Wed, Nov 29, 2023, Michael Ellerman wrote:
->> > > Sean Christopherson <seanjc@google.com> writes:
->> > > > On Fri, Nov 10, 2023, Michael Ellerman wrote:
->> > > >> Jason Gunthorpe <jgg@nvidia.com> writes:
->> > > >> > There are a bunch of reported randconfig failures now because of this,
->> > > >> > something like:
->> > > >> >
->> > > >> >>> arch/powerpc/kvm/../../../virt/kvm/vfio.c:89:7: warning: attribute declaration must precede definition [-Wignored-attributes]
->> > > >> >            fn = symbol_get(vfio_file_iommu_group);
->> > > >> >                 ^
->> > > >> >    include/linux/module.h:805:60: note: expanded from macro 'symbol_get'
->> > > >> >    #define symbol_get(x) ({ extern typeof(x) x __attribute__((weak,visibility("hidden"))); &(x); })
->> > > >> >
->> > > >> > It happens because the arch forces KVM_VFIO without knowing if VFIO is
->> > > >> > even enabled.
->> > > >> 
->> > > >> This is still breaking some builds. Can we get this fix in please?
->> > > >> 
->> > > >> cheers
->> > > >> 
->> > > >> > Split the kconfig so the arch selects the usual HAVE_KVM_ARCH_VFIO and
->> > > >> > then KVM_VFIO is only enabled if the arch wants it and VFIO is turned on.
->> > > >
->> > > > Heh, so I was trying to figure out why things like vfio_file_set_kvm() aren't
->> > > > problematic, i.e. why the existing mess didn't cause failures.  I can't repro the
->> > > > warning (requires clang-16?), but IIUC the reason only the group code is problematic
->> > > > is that vfio.h creates a stub for vfio_file_iommu_group() and thus there's no symbol,
->> > > > whereas vfio.h declares vfio_file_set_kvm() unconditionally.
->> > > 
->> > > That warning I'm unsure about.
->> > 
->> > Ah, it's the same warning, I just missed the CONFIG_MODULES=n requirement.
->> 
->> Oh, wait, doesn't that mean the approach won't work? IIRC doesn't
->> symbol_get turn into just &fn when non-modular turning this into a
->> link failure without the kconfig part?
+From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-It does build.
+The spapr_hcall test makes two page sized allocations using the physical
+allocator. Replace the physical allocator with the page allocator, which
+has has more features (like support for freeing allocations), and would
+allow for further simplification of the physical allocator.
 
-I haven't boot tested it, but TBH I don't really care as long as the
-build is green, I don't think anyone's actually using this weird
-combination of config options.
+CC: Laurent Vivier <lvivier@redhat.com>
+CC: Thomas Huth <thuth@redhat.com>
+CC: kvm-ppc@vger.kernel.org
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+ lib/powerpc/setup.c     | 9 ++++++---
+ powerpc/Makefile.common | 1 +
+ powerpc/spapr_hcall.c   | 5 +++--
+ 3 files changed, 10 insertions(+), 5 deletions(-)
 
-> Yes, but it doesn't cause linker errors.  IIUC, because the extern declaration
-> is tagged "weak", a dummy default is used.  E.g. on x86, this is what is generated
-> with VFIO=y
->
->                 fn = symbol_get(vfio_file_is_valid);
->                 if (!fn)
->    0xffffffff810396c5 <+5>:	mov    $0xffffffff81829230,%rax
->    0xffffffff810396cc <+12>:	test   %rax,%rax
->
-> whereas VFIO=n gets
->
->                 fn = symbol_get(vfio_file_is_valid);
->                 if (!fn)
->    0xffffffff810396c5 <+5>:	mov    $0x0,%rax
->    0xffffffff810396cc <+12>:	test   %rax,%rax
->
-> I have no idea if the fact that symbol_get() generates '0', i.e. the !NULL checks
-> work as expected, is intentional or if KVM works by sheer dumb luck.
+diff --git a/lib/powerpc/setup.c b/lib/powerpc/setup.c
+index 1be4c030..80fd38ae 100644
+--- a/lib/powerpc/setup.c
++++ b/lib/powerpc/setup.c
+@@ -15,6 +15,7 @@
+ #include <devicetree.h>
+ #include <alloc.h>
+ #include <alloc_phys.h>
++#include <alloc_page.h>
+ #include <argv.h>
+ #include <asm/setup.h>
+ #include <asm/page.h>
+@@ -111,6 +112,7 @@ static void mem_init(phys_addr_t freemem_start)
+ 	struct mem_region primary, mem = {
+ 		.start = (phys_addr_t)-1,
+ 	};
++	phys_addr_t base, top;
+ 	int nr_regs, i;
+ 
+ 	nr_regs = dt_get_memory_params(regs, NR_MEM_REGIONS);
+@@ -146,9 +148,10 @@ static void mem_init(phys_addr_t freemem_start)
+ 	__physical_start = mem.start;	/* PHYSICAL_START */
+ 	__physical_end = mem.end;	/* PHYSICAL_END */
+ 
+-	phys_alloc_init(freemem_start, primary.end - freemem_start);
+-	phys_alloc_set_minimum_alignment(__icache_bytes > __dcache_bytes
+-					 ? __icache_bytes : __dcache_bytes);
++	base = PAGE_ALIGN(freemem_start) >> PAGE_SHIFT;
++	top = primary.end >> PAGE_SHIFT;
++	page_alloc_init_area(0, base, top);
++	page_alloc_ops_enable();
+ }
+ 
+ void setup(const void *fdt)
+diff --git a/powerpc/Makefile.common b/powerpc/Makefile.common
+index f8f47490..ae70443a 100644
+--- a/powerpc/Makefile.common
++++ b/powerpc/Makefile.common
+@@ -34,6 +34,7 @@ include $(SRCDIR)/scripts/asm-offsets.mak
+ cflatobjs += lib/util.o
+ cflatobjs += lib/getchar.o
+ cflatobjs += lib/alloc_phys.o
++cflatobjs += lib/alloc_page.o
+ cflatobjs += lib/alloc.o
+ cflatobjs += lib/devicetree.o
+ cflatobjs += lib/migrate.o
+diff --git a/powerpc/spapr_hcall.c b/powerpc/spapr_hcall.c
+index e9b5300a..77ab4187 100644
+--- a/powerpc/spapr_hcall.c
++++ b/powerpc/spapr_hcall.c
+@@ -8,6 +8,7 @@
+ #include <libcflat.h>
+ #include <util.h>
+ #include <alloc.h>
++#include <alloc_page.h>
+ #include <asm/hcall.h>
+ #include <asm/processor.h>
+ 
+@@ -58,8 +59,8 @@ static void test_h_page_init(int argc, char **argv)
+ 	if (argc > 1)
+ 		report_abort("Unsupported argument: '%s'", argv[1]);
+ 
+-	dst = memalign(PAGE_SIZE, PAGE_SIZE);
+-	src = memalign(PAGE_SIZE, PAGE_SIZE);
++	dst = alloc_page();
++	src = alloc_page();
+ 	if (!dst || !src)
+ 		report_abort("Failed to alloc memory");
+ 
+-- 
+2.40.1
 
-I think it's intentional:
-
-  https://lore.kernel.org/all/20030117045054.9A2F72C073@lists.samba.org/
-
-cheers
