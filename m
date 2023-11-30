@@ -1,46 +1,45 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2366636B0F
-	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 09:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7F236B1D
+	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 09:08:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wn9OFz6r"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i6D0O3Rv"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	s=mimecast20190719; t=1701335282;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2c7018BXqcGEjZjD4X/x+XHma+yk1idz2obOd3uUdWs=;
-	b=Wn9OFz6rHD+m11CYIqKlpKZSsyQpuW91N21gg5Ikl9tZoZRCd5Fs3aceNXHGMQ3r2JXSt2
-	u9wW5Q4ibPltVfsU/VbMxkbjqMIMiW8oLWtILwiJd5nGdk3lRBVQ8LD58xZ1jO2bS9VfFT
-	mDiUqG+ZuhoLGxoebEwMerR69C/h6nU=
+	bh=6oJ2WRGg6a4FrOXCy7k3lvqpweTX6omo+sELBwPPyOE=;
+	b=i6D0O3Rvg7Hd4xpsGoBhS1L3eC6SiEPGxgxSxxeHMULe/FhEK9M7Fdyfq76cILwW6qI11g
+	PrAbEepHdshiVY3QHI0Zy90iUo5eR5s2CDTXYqfqlqJ4blxdh8V42CRIHH+qtM/cBmg66f
+	31npB4PsKRVDMQqNIedA+kDGcRL8gvk=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-392-yN7fN3VxPumRB8VPBn4tMw-1; Thu, 30 Nov 2023 04:07:58 -0500
-X-MC-Unique: yN7fN3VxPumRB8VPBn4tMw-1
+ us-mta-324-EchLaSp1NiKqTgIJ2oC2VQ-1; Thu, 30 Nov 2023 04:07:58 -0500
+X-MC-Unique: EchLaSp1NiKqTgIJ2oC2VQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 10C37811E91;
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8CA8B811E86;
 	Thu, 30 Nov 2023 09:07:58 +0000 (UTC)
 Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 034331C060AE;
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 801191C060AE;
 	Thu, 30 Nov 2023 09:07:58 +0000 (UTC)
 From: Shaoqin Huang <shahuang@redhat.com>
 To: Andrew Jones <andrew.jones@linux.dev>,
 	kvmarm@lists.linux.dev
 Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
 	Eric Auger <eric.auger@redhat.com>,
 	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v1 15/18] arm/arm64: Enable the MMU early
-Date: Thu, 30 Nov 2023 04:07:17 -0500
-Message-Id: <20231130090722.2897974-16-shahuang@redhat.com>
+Subject: [kvm-unit-tests PATCH v1 18/18] arm/arm64: Rework the cache maintenance in asm_mmu_disable
+Date: Thu, 30 Nov 2023 04:07:20 -0500
+Message-Id: <20231130090722.2897974-19-shahuang@redhat.com>
 In-Reply-To: <20231130090722.2897974-1-shahuang@redhat.com>
 References: <20231130090722.2897974-1-shahuang@redhat.com>
 Precedence: bulk
@@ -54,273 +53,139 @@ X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-Enable the MMU immediately after the physical allocator is initialized,
-to make reasoning about what cache maintenance operations are needed a
-lot easier.
+asm_mmu_disable is overly ambitious and provably incorrect:
 
-The translation tables are created with the MMU disabled. Use memalign(),
-which resolves to memalign_early(), for creating them, because the physical
-allocator has everything in place to perform dcache maintenance on the data
-structures it maintains.
+1. It tries to clean and invalidate the data caches for the **entire**
+memory, which is highly unnecessary, as it's very unlikely that a test
+will write to the entire memory, and even more unlikely that a test will
+modify the text section of the test image.
+
+2. There is no corresponding dcache invalidate command for the entire
+memory in asm_mmu_enable, leaving it up to the test that disabled the
+MMU to do the cache maintenance in an asymmetrical fashion: only for
+re-enabling the MMU, but not for disabling it.
+
+3. It's missing the DMB SY memory barrier to ensure that the dcache
+maintenance is performed after the last store executed in program order
+before calling asm_mmu_disable.
+
+Fix all of the issues in one go, by doing the cache maintenance only for
+the stack, as that is out of the control of the C code, and add the missing
+memory barrier. A test that disables the MMU is now expected to do whatever
+cache maintenance is necessary to execute correctly after the MMU is
+disabled.
+
+The code used to test that mmu_disable works correctly is similar to the
+code used to test commit 410b3bf09e76 ("arm/arm64: Perform dcache clean
++ invalidate after turning MMU off"), with extra cache maintenance
+added:
+
++#include <alloc_page.h>
++#include <asm/cacheflush.h>
++#include <asm/mmu.h>
+ int main(int argc, char **argv)
+ {
++       int *x = alloc_page();
++       bool pass = true;
++       int i;
++
++       for  (i = 0; i < 1000000; i++) {
++               *x = 0x42;
++               dcache_clean_addr_poc((unsigned long)x);
++               mmu_disable();
++               if (*x != 0x42) {
++                       mmu_enable(current_thread_info()->pgtable);
++                       pass = false;
++                       break;
++               }
++               *x = 0x50;
++               /* Needed for the invalidation only. */
++               dcache_clean_inval_addr_poc((unsigned long)x);
++               mmu_enable(current_thread_info()->pgtable);
++               if (*x != 0x50) {
++                       pass = false;
++                       break;
++               }
++       }
++       report(pass, "MMU disable cache maintenance");
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 ---
- lib/arm/asm/mmu-api.h   |  1 +
- lib/arm/asm/pgtable.h   | 25 ++++++++++++++++++++++---
- lib/arm/mmu.c           | 28 ++++++++++++++++++++--------
- lib/arm/setup.c         |  7 +++++++
- lib/arm64/asm/pgtable.h | 32 ++++++++++++++++++++++++++++----
- 5 files changed, 78 insertions(+), 15 deletions(-)
+ arm/cstart.S   | 19 +++++++++++++------
+ arm/cstart64.S | 19 ++++++++++++-------
+ 2 files changed, 25 insertions(+), 13 deletions(-)
 
-diff --git a/lib/arm/asm/mmu-api.h b/lib/arm/asm/mmu-api.h
-index 6c1136d9..4cb03fcb 100644
---- a/lib/arm/asm/mmu-api.h
-+++ b/lib/arm/asm/mmu-api.h
-@@ -10,6 +10,7 @@ extern void mmu_mark_enabled(int cpu);
- extern void mmu_mark_disabled(int cpu);
- extern void mmu_enable(pgd_t *pgtable);
- extern void mmu_disable(void);
-+extern void mmu_setup_early(phys_addr_t phys_end);
+diff --git a/arm/cstart.S b/arm/cstart.S
+index 48dc87f5..3950e45e 100644
+--- a/arm/cstart.S
++++ b/arm/cstart.S
+@@ -240,18 +240,25 @@ asm_mmu_enable:
  
- extern void mmu_set_range_sect(pgd_t *pgtable, uintptr_t virt_offset,
- 			       phys_addr_t phys_start, phys_addr_t phys_end,
-diff --git a/lib/arm/asm/pgtable.h b/lib/arm/asm/pgtable.h
-index a35f4296..49c74e19 100644
---- a/lib/arm/asm/pgtable.h
-+++ b/lib/arm/asm/pgtable.h
-@@ -41,10 +41,16 @@
- #define pgd_offset(pgtable, addr) ((pgtable) + pgd_index(addr))
- 
- #define pgd_free(pgd) free(pgd)
-+static inline pgd_t *pgd_alloc_early(void)
-+{
-+	pgd_t *pgd = memalign(PAGE_SIZE, PAGE_SIZE);
-+	memset(pgd, 0, PAGE_SIZE);
-+	return pgd;
-+}
- static inline pgd_t *pgd_alloc(void)
- {
- 	assert(PTRS_PER_PGD * sizeof(pgd_t) <= PAGE_SIZE);
--	pgd_t *pgd = alloc_page();
-+	pgd_t *pgd = page_alloc_initialized() ? alloc_page() : pgd_alloc_early();
- 	return pgd;
- }
- 
-@@ -65,10 +71,16 @@ static inline pmd_t *pgd_page_vaddr(pgd_t pgd)
- 	(pgd_page_vaddr(*(pgd)) + pmd_index(addr))
- 
- #define pmd_free(pmd) free_page(pmd)
-+static inline pmd_t *pmd_alloc_one_early(void)
-+{
-+	pmd_t *pmd = memalign(PAGE_SIZE, PAGE_SIZE);
-+	memset(pmd, 0, PAGE_SIZE);
-+	return pmd;
-+}
- static inline pmd_t *pmd_alloc_one(void)
- {
- 	assert(PTRS_PER_PMD * sizeof(pmd_t) == PAGE_SIZE);
--	pmd_t *pmd = alloc_page();
-+	pmd_t *pmd = page_alloc_initialized() ? alloc_page() : pmd_alloc_one_early();
- 	return pmd;
- }
- static inline pmd_t *pmd_alloc(pgd_t *pgd, unsigned long addr)
-@@ -92,10 +104,16 @@ static inline pte_t *pmd_page_vaddr(pmd_t pmd)
- 	(pmd_page_vaddr(*(pmd)) + pte_index(addr))
- 
- #define pte_free(pte) free_page(pte)
-+static inline pte_t *pte_alloc_one_early(void)
-+{
-+	pte_t *pte = memalign(PAGE_SIZE, PAGE_SIZE);
-+	memset(pte, 0, PAGE_SIZE);
-+	return pte;
-+}
- static inline pte_t *pte_alloc_one(void)
- {
- 	assert(PTRS_PER_PTE * sizeof(pte_t) == PAGE_SIZE);
--	pte_t *pte = alloc_page();
-+	pte_t *pte = page_alloc_initialized() ? alloc_page() : pte_alloc_one_early();
- 	return pte;
- }
- static inline pte_t *pte_alloc(pmd_t *pmd, unsigned long addr)
-@@ -104,6 +122,7 @@ static inline pte_t *pte_alloc(pmd_t *pmd, unsigned long addr)
- 		pmd_t entry;
- 		pmd_val(entry) = pgtable_pa(pte_alloc_one()) | PMD_TYPE_TABLE;
- 		WRITE_ONCE(*pmd, entry);
-+
- 	}
- 	return pte_offset(pmd, addr);
- }
-diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
-index 70c5333c..d23a12e8 100644
---- a/lib/arm/mmu.c
-+++ b/lib/arm/mmu.c
-@@ -12,11 +12,10 @@
- #include <asm/setup.h>
- #include <asm/page.h>
- #include <asm/io.h>
-+#include <asm/pgtable.h>
-+#include <asm/pgtable-hwdef.h>
- 
--#include "alloc_page.h"
- #include "vmalloc.h"
--#include <asm/pgtable-hwdef.h>
--#include <asm/pgtable.h>
- 
- #include <linux/compiler.h>
- 
-@@ -201,7 +200,7 @@ void mmu_set_range_sect(pgd_t *pgtable, uintptr_t virt_offset,
- 	}
- }
- 
--void *setup_mmu(phys_addr_t phys_end, void *unused)
-+void mmu_setup_early(phys_addr_t phys_end)
- {
- 	struct mem_region *r;
- 
-@@ -216,9 +215,7 @@ void *setup_mmu(phys_addr_t phys_end, void *unused)
- 			"Unsupported translation granule %ld\n", PAGE_SIZE);
- #endif
- 
--	if (!mmu_idmap)
--		mmu_idmap = pgd_alloc();
--
-+	mmu_idmap = pgd_alloc();
- 	for (r = mem_regions; r->end; ++r) {
- 		if (r->flags & MR_F_IO) {
- 			continue;
-@@ -236,7 +233,22 @@ void *setup_mmu(phys_addr_t phys_end, void *unused)
- 		}
- 	}
- 
--	mmu_enable(mmu_idmap);
+ .globl asm_mmu_disable
+ asm_mmu_disable:
 +	/*
-+	 * Open-code part of mmu_enabled(), because at this point thread_info
-+	 * hasn't been initialized. mmu_mark_enabled() cannot be called here
-+	 * because the cpumask operations can only be called later, after
-+	 * nr_cpus is initialized in cpu_init().
++	 * A test can change the memory attributes for a memory location to
++	 * Device or Inner Non-cacheable, which makes the barrier required to
++	 * avoid reordering of previous memory accesses with respect to the
++	 * cache maintenance.
 +	 */
-+	asm_mmu_enable((phys_addr_t)(unsigned long)mmu_idmap);
-+	current_thread_info()->pgtable = mmu_idmap;
-+}
++	dmb	sy
++	mov	r0, sp
++	lsr	r0, #THREAD_SHIFT
++	lsl	r0, #THREAD_SHIFT
++	add	r1, r0, #THREAD_SIZE
++	dcache_by_line_op dccmvac, sy, r0, r1, r2, r3
 +
-+void *setup_mmu(phys_addr_t phys_end, void *unused1)
-+{
-+	assert(mmu_idmap);
+ 	/* SCTLR */
+ 	mrc	p15, 0, r0, c1, c0, 0
+ 	bic	r0, #CR_M
+ 	mcr	p15, 0, r0, c1, c0, 0
+ 	isb
+ 
+-	ldr	r0, =__phys_offset
+-	ldr	r0, [r0]
+-	ldr	r1, =__phys_end
+-	ldr	r1, [r1]
+-	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
+-
+ 	mov     pc, lr
+ 
+ /*
+diff --git a/arm/cstart64.S b/arm/cstart64.S
+index d8200ea2..af56186c 100644
+--- a/arm/cstart64.S
++++ b/arm/cstart64.S
+@@ -288,18 +288,23 @@ asm_mmu_enable:
+ 
+ .globl asm_mmu_disable
+ asm_mmu_disable:
++	/*
++	 * A test can change the memory attributes for a memory location to
++	 * Device or Inner Non-cacheable, which makes the barrier required to
++	 * avoid reordering of previous memory accesses with respect to the
++	 * cache maintenance.
++	 */
++	dmb	sy
++	mov	x9, sp
++	and	x9, x9, #THREAD_MASK
++	add	x10, x9, #THREAD_SIZE
++	dcache_by_line_op cvac, sy, x9, x10, x11, x12
 +
-+	mmu_mark_enabled(0);
-+
- 	return mmu_idmap;
- }
+ 	mrs	x0, sctlr_el1
+ 	bic	x0, x0, SCTLR_EL1_M
+ 	msr	sctlr_el1, x0
+ 	isb
  
-diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index b6fc453e..4b9423e5 100644
---- a/lib/arm/setup.c
-+++ b/lib/arm/setup.c
-@@ -26,6 +26,7 @@
- #include <asm/smp.h>
- #include <asm/timer.h>
- #include <asm/psci.h>
-+#include <asm/mmu.h>
+-	/* Clean + invalidate the entire memory */
+-	adrp	x0, __phys_offset
+-	ldr	x0, [x0, :lo12:__phys_offset]
+-	adrp	x1, __phys_end
+-	ldr	x1, [x1, :lo12:__phys_end]
+-	dcache_by_line_op civac, sy, x0, x1, x2, x3
+-
+ 	ret
  
- #include "io.h"
- 
-@@ -226,6 +227,9 @@ static void mem_init(phys_addr_t freemem_start)
- 	phys_alloc_init(freemem_start, freemem->end - freemem_start);
- 	phys_alloc_set_minimum_alignment(SMP_CACHE_BYTES);
- 
-+	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
-+		mmu_setup_early(freemem->end);
-+
- 	phys_alloc_get_unused(&base, &top);
- 	base = PAGE_ALIGN(base);
- 	top = top & PAGE_MASK;
-@@ -417,6 +421,9 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
- 	phys_alloc_init(free_mem_start, free_mem_pages << EFI_PAGE_SHIFT);
- 	phys_alloc_set_minimum_alignment(SMP_CACHE_BYTES);
- 
-+	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
-+		mmu_setup_early(free_mem_start + (free_mem_pages << EFI_PAGE_SHIFT));
-+
- 	phys_alloc_get_unused(&base, &top);
- 	base = PAGE_ALIGN(base);
- 	top = top & PAGE_MASK;
-diff --git a/lib/arm64/asm/pgtable.h b/lib/arm64/asm/pgtable.h
-index 06357920..cc6a1bb5 100644
---- a/lib/arm64/asm/pgtable.h
-+++ b/lib/arm64/asm/pgtable.h
-@@ -47,10 +47,16 @@
- #define pgd_offset(pgtable, addr) ((pgtable) + pgd_index(addr))
- 
- #define pgd_free(pgd) free(pgd)
-+static inline pgd_t *pgd_alloc_early(void)
-+{
-+	pgd_t *pgd = memalign(PAGE_SIZE, PAGE_SIZE);
-+	memset(pgd, 0, PAGE_SIZE);
-+	return pgd;
-+}
- static inline pgd_t *pgd_alloc(void)
- {
- 	assert(PTRS_PER_PGD * sizeof(pgd_t) <= PAGE_SIZE);
--	pgd_t *pgd = alloc_page();
-+	pgd_t *pgd = page_alloc_initialized() ? alloc_page() : pgd_alloc_early();
- 	return pgd;
- }
- 
-@@ -75,10 +81,16 @@ static inline pte_t *pmd_page_vaddr(pmd_t pmd)
- #define pmd_offset(pud, addr)						\
- 	(pud_page_vaddr(*(pud)) + pmd_index(addr))
- #define pmd_free(pmd)	free_page(pmd)
-+static inline pmd_t *pmd_alloc_one_early(void)
-+{
-+	pmd_t *pmd = memalign(PAGE_SIZE, PAGE_SIZE);
-+	memset(pmd, 0, PAGE_SIZE);
-+	return pmd;
-+}
- static inline pmd_t *pmd_alloc_one(void)
- {
- 	assert(PTRS_PER_PMD * sizeof(pmd_t) == PAGE_SIZE);
--	pmd_t *pmd = alloc_page();
-+	pmd_t *pmd = page_alloc_initialized() ? alloc_page() : pmd_alloc_one_early();
- 	return pmd;
- }
- static inline pmd_t *pmd_alloc(pud_t *pud, unsigned long addr)
-@@ -102,10 +114,16 @@ static inline pmd_t *pmd_alloc(pud_t *pud, unsigned long addr)
- #define pud_offset(pgd, addr)                           \
- 	(pgd_page_vaddr(*(pgd)) + pud_index(addr))
- #define pud_free(pud) free_page(pud)
-+static inline pud_t *pud_alloc_one_early(void)
-+{
-+	pud_t *pud = memalign(PAGE_SIZE, PAGE_SIZE);
-+	memset(pud, 0, PAGE_SIZE);
-+	return pud;
-+}
- static inline pud_t *pud_alloc_one(void)
- {
- 	assert(PTRS_PER_PUD * sizeof(pud_t) == PAGE_SIZE);
--	pud_t *pud = alloc_page();
-+	pud_t *pud = page_alloc_initialized() ? alloc_page() : pud_alloc_one_early();
- 	return pud;
- }
- static inline pud_t *pud_alloc(pgd_t *pgd, unsigned long addr)
-@@ -129,10 +147,16 @@ static inline pud_t *pud_alloc(pgd_t *pgd, unsigned long addr)
- 	(pmd_page_vaddr(*(pmd)) + pte_index(addr))
- 
- #define pte_free(pte) free_page(pte)
-+static inline pte_t *pte_alloc_one_early(void)
-+{
-+	pte_t *pte = memalign(PAGE_SIZE, PAGE_SIZE);
-+	memset(pte, 0, PAGE_SIZE);
-+	return pte;
-+}
- static inline pte_t *pte_alloc_one(void)
- {
- 	assert(PTRS_PER_PTE * sizeof(pte_t) == PAGE_SIZE);
--	pte_t *pte = alloc_page();
-+	pte_t *pte = page_alloc_initialized() ? alloc_page() : pte_alloc_one_early();
- 	return pte;
- }
- static inline pte_t *pte_alloc(pmd_t *pmd, unsigned long addr)
+ /*
 -- 
 2.40.1
 
