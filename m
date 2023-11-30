@@ -1,42 +1,32 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA30747782
-	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 13:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CA30DC15;
-	Thu, 30 Nov 2023 05:33:10 -0800 (PST)
-Received: from raptor (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 415D63F5A1;
-	Thu, 30 Nov 2023 05:32:19 -0800 (PST)
-Date: Thu, 30 Nov 2023 13:32:16 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: Hyesoo Yu <hyesoo.yu@samsung.com>, catalin.marinas@arm.com,
-	will@kernel.org, oliver.upton@linux.dev, maz@kernel.org,
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	arnd@arndb.de, akpm@linux-foundation.org, mingo@redhat.com,
-	peterz@infradead.org, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
-	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
-	rppt@kernel.org, hughd@google.com, pcc@google.com,
-	steven.price@arm.com, anshuman.khandual@arm.com,
-	vincenzo.frascino@arm.com, eugenis@google.com, kcc@google.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC v2 19/27] mm: mprotect: Introduce
- PAGE_FAULT_ON_ACCESS for mprotect(PROT_MTE)
-Message-ID: <ZWiO4PWfK2gKDLGr@raptor>
-References: <20231119165721.9849-1-alexandru.elisei@arm.com>
- <CGME20231119165921epcas2p3dce0532847d59a9c3973b4e41102e27d@epcas2p3.samsung.com>
- <20231119165721.9849-20-alexandru.elisei@arm.com>
- <20231129092725.GD2988384@tiffany>
- <ZWh6vl8DfXQbKo9O@raptor>
- <4e7a4054-092c-4e34-ae00-0105d7c9343c@redhat.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C2138DE3;
+	Thu, 30 Nov 2023 13:40:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="jRtFzb4m"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 110A4C433C8;
+	Thu, 30 Nov 2023 13:40:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1701351656;
+	bh=q45DORMSkGk8UwLHb+YCIhPn1+smyNc93IxGO9o+84Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jRtFzb4mYg3flz8+fcSPOVf1RaGlngQN/gqXAUyHL3PNxAcpe2+tpVAc7NH5XCEhN
+	 S/jY2ECVCd6hm/mq/i1F2xWDCC6191FImA7PVrUdbu1XohoTCjltNHOOaV5Rappfue
+	 OvBDmpfc/QTXeybm7f2sxNlw+wIVaIIUJVAxJj0E=
+Date: Thu, 30 Nov 2023 13:40:53 +0000
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Cc: stable@vger.kernel.org, sashal@kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	andrew.murray@arm.com, mark.rutland@arm.com, suzuki.poulose@arm.com,
+	wanghaibin.wang@huawei.com, will@kernel.org
+Subject: Re: [for-4.19 0/2] backport "KVM: arm64: limit PMU version to PMUv3
+ for ARMv8.1"
+Message-ID: <2023113045-headlock-improvise-cf6b@gregkh>
+References: <20231128074633.646-1-yuzenghui@huawei.com>
+ <2023112831-preachy-unshaved-790d@gregkh>
+ <350d1f6f-953b-eac4-4e1b-9e59060c99bc@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,56 +35,25 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4e7a4054-092c-4e34-ae00-0105d7c9343c@redhat.com>
+In-Reply-To: <350d1f6f-953b-eac4-4e1b-9e59060c99bc@huawei.com>
 
-Hi,
-
-On Thu, Nov 30, 2023 at 01:49:34PM +0100, David Hildenbrand wrote:
-> > > > +
-> > > > +out_retry:
-> > > > +	put_page(page);
-> > > > +	if (vmf->flags & FAULT_FLAG_VMA_LOCK)
-> > > > +		vma_end_read(vma);
-> > > > +	if (fault_flag_allow_retry_first(vmf->flags)) {
-> > > > +		err = VM_FAULT_RETRY;
-> > > > +	} else {
-> > > > +		/* Replay the fault. */
-> > > > +		err = 0;
+On Tue, Nov 28, 2023 at 08:00:08PM +0800, Zenghui Yu wrote:
+> On 2023/11/28 16:12, Greg KH wrote:
+> > On Tue, Nov 28, 2023 at 03:46:31PM +0800, Zenghui Yu wrote:
+> > > We need to backport patch #1 as well because it introduced a helper used
+> > > by patch #2.
 > > > 
-> > > Hello!
-> > > 
-> > > Unfortunately, if the page continues to be pinned, it seems like fault will continue to occur.
-> > > I guess it makes system stability issue. (but I'm not familiar with that, so please let me know if I'm mistaken!)
-> > > 
-> > > How about migrating the page when migration problem repeats.
+> > > Andrew Murray (2):
+> > >   arm64: cpufeature: Extract capped perfmon fields
+> > >   KVM: arm64: limit PMU version to PMUv3 for ARMv8.1
 > > 
-> > Yes, I had the same though in the previous iteration of the series, the
-> > page was migrated out of the VMA if tag storage couldn't be reserved.
-> > 
-> > Only short term pins are allowed on MIGRATE_CMA pages, so I expect that the
-> > pin will be released before the fault is replayed. Because of this, and
-> > because it makes the code simpler, I chose not to migrate the page if tag
-> > storage couldn't be reserved.
+> > We can not just take these in an old stable tree and not newer ones as
+> > that would mean you could upgrade and have a regression.  Please provide
+> > backports for all applicable stable trees and we will be glad to take
+> > them.
 > 
-> There are still some cases that are theoretically problematic: vmsplice()
-> can pin pages forever and doesn't use FOLL_LONGTERM yet.
-> 
-> All these things also affect other users that rely on movability (e.g., CMA,
-> memory hotunplug).
+> Thanks for the heads up! "for-5.4" patches sent now.
 
-I wasn't aware of that, thank you for the information. Then to ensure that the
-process doesn't hang by replying the loop indefinitely, I'll migrate the page if
-tag storage cannot be reserved. Looking over the code again, I think I can reuse
-the same function that migrates tag storage pages out of the MTE VMA (added in
-patch #21), so no major changes needed.
+Great, all now queued up, thanks.
 
-Thanks,
-Alex
-
-> 
-> -- 
-> Cheers,
-> 
-> David / dhildenb
-> 
-> 
+greg k-h
