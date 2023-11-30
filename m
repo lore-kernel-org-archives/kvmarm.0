@@ -1,115 +1,131 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B474E171A0
-	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 04:17:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67556FC9
+	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 06:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HQrNILGP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701317838;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o1gushqAiHQ23GEZEOV13TzTKkCoZS1NFR10zi092Pg=;
-	b=HQrNILGPB6YpSwawfGQx7+M8wnGm7voNK17SsFghGJ6WR8v5T3YdxBkS4ETYBtBVcB2H0z
-	M+1KFBOLU4XAnxFsfoV6YAvWF+KHIs5UJsLpG0fL1JG+mHAVeD9cVrmPmQZKa8sRfs+vrP
-	UnUYpGKsBSb+vGY2OF4BBVOKHhfimkA=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-443-LtYctMrQMHCbZIREno-LLg-1; Wed, 29 Nov 2023 23:17:16 -0500
-X-MC-Unique: LtYctMrQMHCbZIREno-LLg-1
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3b894358aa6so133898b6e.0
-        for <kvmarm@lists.linux.dev>; Wed, 29 Nov 2023 20:17:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701317836; x=1701922636;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o1gushqAiHQ23GEZEOV13TzTKkCoZS1NFR10zi092Pg=;
-        b=UGwJh+ulRVbitpzdir63KBdflsiH/VGXaOR9vluOILly7VwFrPFT9LAu3CeR7F9KCR
-         rG31p+5MBSa3bs99b6mAldaRtnzq6VbBXcEYwo8uXB59qoAaMFnuffY5llC2Wn8Vnclf
-         cr8heYA6xV1GPku+XasX2wOngHjW3tWeNWcQGEBLQzWDLovcFOl1tNfoD6SFhacedM4W
-         uT0JKMHBQJ0xlGjz8szewcBH47OgnSnAonbvlBnuooMCypykBG/3928OVRTDSCQGaHAD
-         0Dapula1uzq5R00s0t7DQXjCE692ex+47UjBdC4v2GfnH5Ww+G2tkqfzYL97xvNoeXzE
-         xL4g==
-X-Gm-Message-State: AOJu0YynOLa8X/mLLuUXcNWllLw2Y7oYoGvSAc0M+T1DyIOPwPYDNTtH
-	ICA3Vv5zJE6T30ijkMH0NKwuv9wedrxr+j3elPKXYHYg5uFhMwzTxWd3Co+qLMMDXzsQrArr7rq
-	UmmGoFZOHcYjURtUN
-X-Received: by 2002:a05:6808:2121:b0:3b8:5fb1:3574 with SMTP id r33-20020a056808212100b003b85fb13574mr19231984oiw.0.1701317836044;
-        Wed, 29 Nov 2023 20:17:16 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFF/I4dHP0NTHDLJ07kE1nSAYz/sN38Hqo2/+sQEmk3lhRLo6bjADuJwRleLPyVTHCunNfFzg==
-X-Received: by 2002:a05:6808:2121:b0:3b8:5fb1:3574 with SMTP id r33-20020a056808212100b003b85fb13574mr19231964oiw.0.1701317835768;
-        Wed, 29 Nov 2023 20:17:15 -0800 (PST)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id e8-20020aa798c8000000b006cd7d189aa9sm204205pfm.131.2023.11.29.20.17.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Nov 2023 20:17:15 -0800 (PST)
-Message-ID: <926b91b3-4355-ac68-36f3-6352b1ac7285@redhat.com>
-Date: Thu, 30 Nov 2023 12:17:12 +0800
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="rOr5qxeA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1701326330;
+	bh=scy1etpzFyR1jZIjJ7/tF1TmQ4Wr4ZPAn1YidjcB+F0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=rOr5qxeAp7+hwSCT9su1OJ57aJsQ7ggH9hU8d+p4CPkIHvFtYa8VDMQB3aJSsQb9x
+	 7KnwcbuuavH9TzQFqPQ8saFsfUnd/CUwi1aH82O7OZCKp9c2bNDVx1/Ej+L1puiA9T
+	 giyTyN5MW7HA52VJWCV0K0RgS6V9liqDJhHujqnVprWA5JMydiETZgA0m/mzz+BFZZ
+	 f0N5fEszptc/Dt1zIijywxUjRhlR4ocAB6HhjB/7jY9SUx2tXcLAHOwcfZoSLu6dhy
+	 vq6qJFI38c7f1IYdQT8Zh8HrWTsEQ/gdV9KMGmEyoAaS9NkZGtkUNvNtJJH5nFk/Rk
+	 PqeKz/k0JOiew==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Sgmjz2zZwz4xWj;
+	Thu, 30 Nov 2023 17:38:47 +1100 (AEDT)
+From: Michael Ellerman <mpe@ellerman.id.au>
+To: Sean Christopherson <seanjc@google.com>, Jason Gunthorpe <jgg@nvidia.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Borislav Petkov <bp@alien8.de>, Catalin
+ Marinas <catalin.marinas@arm.com>, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Dave Hansen <dave.hansen@linux.intel.com>,
+ David Hildenbrand <david@redhat.com>, Janosch Frank
+ <frankja@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens
+ <hca@linux.ibm.com>, "H. Peter Anvin" <hpa@zytor.com>, Claudio Imbrenda
+ <imbrenda@linux.ibm.com>, James Morse <james.morse@arm.com>,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, Marc Zyngier <maz@kernel.org>, Ingo Molnar
+ <mingo@redhat.com>, Nicholas Piggin <npiggin@gmail.com>, Oliver Upton
+ <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, Sven
+ Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Will
+ Deacon <will@kernel.org>, x86@kernel.org, Zenghui Yu
+ <yuzenghui@huawei.com>
+Subject: Re: Ping? Re: [PATCH rc] kvm: Prevent compiling virt/kvm/vfio.c
+ unless VFIO is selected
+In-Reply-To: <ZWftIIEpbLP2xF5H@google.com>
+References: <0-v1-08396538817d+13c5-vfio_kvm_kconfig_jgg@nvidia.com>
+ <87edgy87ig.fsf@mail.lhotse> <ZWagNsu1XQIqk5z9@google.com>
+ <875y1k3nm9.fsf@mail.lhotse> <ZWfgYdSoJAZqL2Gx@google.com>
+ <20231130011650.GD1389974@nvidia.com> <ZWftIIEpbLP2xF5H@google.com>
+Date: Thu, 30 Nov 2023 17:38:43 +1100
+Message-ID: <87y1ef21ak.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [kvm-unit-tests PATCH v2 2/3] runtime: arm64: Skip the migration
- tests when run on EFI
-To: Andrew Jones <andrew.jones@linux.dev>, kvmarm@lists.linux.dev
-Cc: Thomas Huth <thuth@redhat.com>, Nico Boehr <nrb@linux.ibm.com>,
- Colton Lewis <coltonlewis@google.com>,
- Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
- Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org
-References: <20231130032940.2729006-1-shahuang@redhat.com>
- <20231130032940.2729006-3-shahuang@redhat.com>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20231130032940.2729006-3-shahuang@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
+Sean Christopherson <seanjc@google.com> writes:
+> On Wed, Nov 29, 2023, Jason Gunthorpe wrote:
+>> On Wed, Nov 29, 2023 at 05:07:45PM -0800, Sean Christopherson wrote:
+>> > On Wed, Nov 29, 2023, Michael Ellerman wrote:
+>> > > Sean Christopherson <seanjc@google.com> writes:
+>> > > > On Fri, Nov 10, 2023, Michael Ellerman wrote:
+>> > > >> Jason Gunthorpe <jgg@nvidia.com> writes:
+>> > > >> > There are a bunch of reported randconfig failures now because of this,
+>> > > >> > something like:
+>> > > >> >
+>> > > >> >>> arch/powerpc/kvm/../../../virt/kvm/vfio.c:89:7: warning: attribute declaration must precede definition [-Wignored-attributes]
+>> > > >> >            fn = symbol_get(vfio_file_iommu_group);
+>> > > >> >                 ^
+>> > > >> >    include/linux/module.h:805:60: note: expanded from macro 'symbol_get'
+>> > > >> >    #define symbol_get(x) ({ extern typeof(x) x __attribute__((weak,visibility("hidden"))); &(x); })
+>> > > >> >
+>> > > >> > It happens because the arch forces KVM_VFIO without knowing if VFIO is
+>> > > >> > even enabled.
+>> > > >> 
+>> > > >> This is still breaking some builds. Can we get this fix in please?
+>> > > >> 
+>> > > >> cheers
+>> > > >> 
+>> > > >> > Split the kconfig so the arch selects the usual HAVE_KVM_ARCH_VFIO and
+>> > > >> > then KVM_VFIO is only enabled if the arch wants it and VFIO is turned on.
+>> > > >
+>> > > > Heh, so I was trying to figure out why things like vfio_file_set_kvm() aren't
+>> > > > problematic, i.e. why the existing mess didn't cause failures.  I can't repro the
+>> > > > warning (requires clang-16?), but IIUC the reason only the group code is problematic
+>> > > > is that vfio.h creates a stub for vfio_file_iommu_group() and thus there's no symbol,
+>> > > > whereas vfio.h declares vfio_file_set_kvm() unconditionally.
+>> > > 
+>> > > That warning I'm unsure about.
+>> > 
+>> > Ah, it's the same warning, I just missed the CONFIG_MODULES=n requirement.
+>> 
+>> Oh, wait, doesn't that mean the approach won't work? IIRC doesn't
+>> symbol_get turn into just &fn when non-modular turning this into a
+>> link failure without the kconfig part?
 
+It does build.
 
-On 11/30/23 11:29, Shaoqin Huang wrote:
-> When running the migration tests on EFI, the migration will always fail
-> since the efi/run use the vvfat format to run test, but the vvfat format
-> does not support live migration. So those migration tests will always
-> fail.
-> 
-> Instead of waiting for fail everytime when run migration tests on EFI,
-> skip those tests if running on EFI.
-> 
-> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
-> ---
->   scripts/runtime.bash | 4 ++++
->   1 file changed, 4 insertions(+)
-> 
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index c73fb024..64d223e8 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -156,6 +156,10 @@ function run()
->   
->       cmdline=$(get_cmdline $kernel)
->       if find_word "migration" "$groups"; then
-> +        if [ "{CONFIG_EFI}" == "y" ]; then
+I haven't boot tested it, but TBH I don't really care as long as the
+build is green, I don't think anyone's actually using this weird
+combination of config options.
 
-I'm stupid. Should be ${CONFIG_EFI} here.
+> Yes, but it doesn't cause linker errors.  IIUC, because the extern declaration
+> is tagged "weak", a dummy default is used.  E.g. on x86, this is what is generated
+> with VFIO=y
+>
+>                 fn = symbol_get(vfio_file_is_valid);
+>                 if (!fn)
+>    0xffffffff810396c5 <+5>:	mov    $0xffffffff81829230,%rax
+>    0xffffffff810396cc <+12>:	test   %rax,%rax
+>
+> whereas VFIO=n gets
+>
+>                 fn = symbol_get(vfio_file_is_valid);
+>                 if (!fn)
+>    0xffffffff810396c5 <+5>:	mov    $0x0,%rax
+>    0xffffffff810396cc <+12>:	test   %rax,%rax
+>
+> I have no idea if the fact that symbol_get() generates '0', i.e. the !NULL checks
+> work as expected, is intentional or if KVM works by sheer dumb luck.
 
-> +            print_result "SKIP" $testname "" "migration tests are not supported with efi"
-> +            return 2
-> +        fi
->           cmdline="MIGRATION=yes $cmdline"
->       fi
->       if find_word "panic" "$groups"; then
+I think it's intentional:
 
--- 
-Shaoqin
+  https://lore.kernel.org/all/20030117045054.9A2F72C073@lists.samba.org/
 
+cheers
