@@ -1,48 +1,44 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77662134C3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C144A321B8
 	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 09:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JQraYjs+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V/vFOP4E"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	s=mimecast20190719; t=1701335278;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VCYXs7UB826Rm6Vi+S+LrP8zq1r68p6FkKq2ErN2au4=;
-	b=JQraYjs+1YN0E6r6MzGHm1IVQf8YHo1MLdCmPPwHPy2FPEWsuKyx9wWb9lLh6PWE1YpPkx
-	rFl6AhBQbJD/53aAo0fbOhbApPOLWrlEiUxve9AuhWJ6owx1fGDJ48nJrRdgncRFGzcv1t
-	7pi/DWqa64n5dw+ptSh+q+7z6aCIkzY=
+	bh=3GRpZVrUQ48jcY3nyA21eJ+CgW6QlT8/+5EjDT8mBVQ=;
+	b=V/vFOP4EWsuKMSPBZHeROfBtnicxNcW8uaUgoa0iLBXccFOkzBFXXKYSPrEbMWNznO3wi9
+	RjzTJ6HdYM7Cw5BhqpRYEOg/GD9/1Unkx/DpQZjrwzqhGHv3A2CTOEsJlOdUXg1eyJh/ot
+	WtfpdQWmVG689C4Sz77peLcH7zrIo0s=
 Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-101-1X-oQLimP5qYoreV94DJ6g-1; Thu,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-607-E2_7YMpgOXygR6voiEq6ZQ-1; Thu,
  30 Nov 2023 04:07:56 -0500
-X-MC-Unique: 1X-oQLimP5qYoreV94DJ6g-1
+X-MC-Unique: E2_7YMpgOXygR6voiEq6ZQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E4DC51C382AF;
-	Thu, 30 Nov 2023 09:07:55 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 799D1299E75C;
+	Thu, 30 Nov 2023 09:07:56 +0000 (UTC)
 Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id DB5DB1C060AE;
-	Thu, 30 Nov 2023 09:07:55 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 72BD01C060AE;
+	Thu, 30 Nov 2023 09:07:56 +0000 (UTC)
 From: Shaoqin Huang <shahuang@redhat.com>
 To: Andrew Jones <andrew.jones@linux.dev>,
 	kvmarm@lists.linux.dev
 Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
-	Laurent Vivier <lvivier@redhat.com>,
-	Thomas Huth <thuth@redhat.com>,
-	kvm-ppc@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
 	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v1 02/18] powerpc: Replace the physical allocator with the page allocator
-Date: Thu, 30 Nov 2023 04:07:04 -0500
-Message-Id: <20231130090722.2897974-3-shahuang@redhat.com>
+Subject: [kvm-unit-tests PATCH v1 06/18] lib/alloc_phys: Remove allocation accounting
+Date: Thu, 30 Nov 2023 04:07:08 -0500
+Message-Id: <20231130090722.2897974-7-shahuang@redhat.com>
 In-Reply-To: <20231130090722.2897974-1-shahuang@redhat.com>
 References: <20231130090722.2897974-1-shahuang@redhat.com>
 Precedence: bulk
@@ -56,89 +52,170 @@ X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-The spapr_hcall test makes two page sized allocations using the physical
-allocator. Replace the physical allocator with the page allocator, which
-has has more features (like support for freeing allocations), and would
-allow for further simplification of the physical allocator.
+The page allocator has better allocation tracking and is used by all
+architectures, while the physical allocator is never used for allocating
+memory.
 
-CC: Laurent Vivier <lvivier@redhat.com>
-CC: Thomas Huth <thuth@redhat.com>
-CC: kvm-ppc@vger.kernel.org
+Simplify the physical allocator by removing allocation accounting. This
+accomplishes two things:
+
+1. It makes the allocator more useful, as the warning that was displayed
+for each allocation after the 256th is removed. That can become an issue
+if the allocator is used for creating the translation tables, for example.
+
+2. It becomes trivial to add cache maintenance for the internal structures
+that the physical allocator maintains, which are now only four static
+variables.
+
+phys_alloc_show() has received a slight change in the way it displays the
+use and free regions: the end of the region is now non-inclusive, to allow
+phys_alloc_show() to express that no memory has been used, or no memory is
+free: in both cases, the start and the end adresses are equal.
+
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- lib/powerpc/setup.c     | 9 ++++++---
- powerpc/Makefile.common | 1 +
- powerpc/spapr_hcall.c   | 5 +++--
- 3 files changed, 10 insertions(+), 5 deletions(-)
+ lib/alloc_phys.c | 63 +++++++++++++-----------------------------------
+ lib/alloc_phys.h |  5 ++--
+ 2 files changed, 20 insertions(+), 48 deletions(-)
 
-diff --git a/lib/powerpc/setup.c b/lib/powerpc/setup.c
-index 1be4c030..80fd38ae 100644
---- a/lib/powerpc/setup.c
-+++ b/lib/powerpc/setup.c
-@@ -15,6 +15,7 @@
- #include <devicetree.h>
- #include <alloc.h>
- #include <alloc_phys.h>
-+#include <alloc_page.h>
- #include <argv.h>
- #include <asm/setup.h>
- #include <asm/page.h>
-@@ -111,6 +112,7 @@ static void mem_init(phys_addr_t freemem_start)
- 	struct mem_region primary, mem = {
- 		.start = (phys_addr_t)-1,
- 	};
-+	phys_addr_t base, top;
- 	int nr_regs, i;
+diff --git a/lib/alloc_phys.c b/lib/alloc_phys.c
+index 064077f7..c96bcb48 100644
+--- a/lib/alloc_phys.c
++++ b/lib/alloc_phys.c
+@@ -11,17 +11,11 @@
+ #include "asm/io.h"
+ #include "alloc_phys.h"
  
- 	nr_regs = dt_get_memory_params(regs, NR_MEM_REGIONS);
-@@ -146,9 +148,10 @@ static void mem_init(phys_addr_t freemem_start)
- 	__physical_start = mem.start;	/* PHYSICAL_START */
- 	__physical_end = mem.end;	/* PHYSICAL_END */
+-#define PHYS_ALLOC_NR_REGIONS	256
+-
+-struct phys_alloc_region {
+-	phys_addr_t base;
+-	phys_addr_t size;
+-};
+-
+-static struct phys_alloc_region regions[PHYS_ALLOC_NR_REGIONS];
+-static int nr_regions;
+-
+-static phys_addr_t base, top;
++/*
++ * used is the end address of the currently allocated memory, non-inclusive.
++ * used equals top means that all memory has been allocated.
++ */
++static phys_addr_t base, used, top;
  
--	phys_alloc_init(freemem_start, primary.end - freemem_start);
--	phys_alloc_set_minimum_alignment(__icache_bytes > __dcache_bytes
--					 ? __icache_bytes : __dcache_bytes);
-+	base = PAGE_ALIGN(freemem_start) >> PAGE_SHIFT;
-+	top = primary.end >> PAGE_SHIFT;
-+	page_alloc_init_area(0, base, top);
-+	page_alloc_ops_enable();
+ #define DEFAULT_MINIMUM_ALIGNMENT	32
+ static size_t align_min = DEFAULT_MINIMUM_ALIGNMENT;
+@@ -34,23 +28,15 @@ struct alloc_ops *alloc_ops = &early_alloc_ops;
+ 
+ void phys_alloc_show(void)
+ {
+-	int i;
+-
+ 	printf("phys_alloc minimum alignment: %#" PRIx64 "\n", (u64)align_min);
+-	for (i = 0; i < nr_regions; ++i)
+-		printf("%016" PRIx64 "-%016" PRIx64 " [%s]\n",
+-			(u64)regions[i].base,
+-			(u64)(regions[i].base + regions[i].size - 1),
+-			"USED");
+-	printf("%016" PRIx64 "-%016" PRIx64 " [%s]\n",
+-		(u64)base, (u64)(top - 1), "FREE");
++	printf("%016" PRIx64 "-%016" PRIx64 " [USED]\n", (u64)base, (u64)used);
++	printf("%016" PRIx64 "-%016" PRIx64 " [FREE]\n", (u64)used, (u64)top);
  }
  
- void setup(const void *fdt)
-diff --git a/powerpc/Makefile.common b/powerpc/Makefile.common
-index f8f47490..ae70443a 100644
---- a/powerpc/Makefile.common
-+++ b/powerpc/Makefile.common
-@@ -34,6 +34,7 @@ include $(SRCDIR)/scripts/asm-offsets.mak
- cflatobjs += lib/util.o
- cflatobjs += lib/getchar.o
- cflatobjs += lib/alloc_phys.o
-+cflatobjs += lib/alloc_page.o
- cflatobjs += lib/alloc.o
- cflatobjs += lib/devicetree.o
- cflatobjs += lib/migrate.o
-diff --git a/powerpc/spapr_hcall.c b/powerpc/spapr_hcall.c
-index e9b5300a..77ab4187 100644
---- a/powerpc/spapr_hcall.c
-+++ b/powerpc/spapr_hcall.c
-@@ -8,6 +8,7 @@
- #include <libcflat.h>
- #include <util.h>
- #include <alloc.h>
-+#include <alloc_page.h>
- #include <asm/hcall.h>
- #include <asm/processor.h>
+ void phys_alloc_init(phys_addr_t base_addr, phys_addr_t size)
+ {
+-	base = base_addr;
++	used = base = base_addr;
+ 	top = base + size;
+-	nr_regions = 0;
+ }
  
-@@ -58,8 +59,8 @@ static void test_h_page_init(int argc, char **argv)
- 	if (argc > 1)
- 		report_abort("Unsupported argument: '%s'", argv[1]);
+ void phys_alloc_set_minimum_alignment(phys_addr_t align)
+@@ -61,7 +47,6 @@ void phys_alloc_set_minimum_alignment(phys_addr_t align)
  
--	dst = memalign(PAGE_SIZE, PAGE_SIZE);
--	src = memalign(PAGE_SIZE, PAGE_SIZE);
-+	dst = alloc_page();
-+	src = alloc_page();
- 	if (!dst || !src)
- 		report_abort("Failed to alloc memory");
+ static void *memalign_early(size_t alignment, size_t sz)
+ {
+-	static bool warned = false;
+ 	phys_addr_t align = (phys_addr_t)alignment;
+ 	phys_addr_t size = (phys_addr_t)sz;
+ 	phys_addr_t size_orig = size;
+@@ -70,7 +55,6 @@ static void *memalign_early(size_t alignment, size_t sz)
+ 	assert(align && !(align & (align - 1)));
+ 
+ 	top_safe = top;
+-
+ 	if (sizeof(long) == 4)
+ 		top_safe = MIN(top_safe, 1ULL << 32);
+ 	assert(base < top_safe);
+@@ -78,42 +62,29 @@ static void *memalign_early(size_t alignment, size_t sz)
+ 	if (align < align_min)
+ 		align = align_min;
+ 
+-	addr = ALIGN(base, align);
+-	size += addr - base;
++	addr = ALIGN(used, align);
++	size += addr - used;
+ 
+-	if ((top_safe - base) < size) {
++	if (size > top_safe - used) {
+ 		printf("phys_alloc: requested=%#" PRIx64
+ 		       " (align=%#" PRIx64 "), "
+ 		       "need=%#" PRIx64 ", but free=%#" PRIx64 ". "
+ 		       "top=%#" PRIx64 ", top_safe=%#" PRIx64 "\n",
+ 		       (u64)size_orig, (u64)align, (u64)size,
+-		       (u64)(top_safe - base), (u64)top, (u64)top_safe);
++		       (u64)(top_safe - used), (u64)top, (u64)top_safe);
+ 		return NULL;
+ 	}
+ 
+-	base += size;
+-
+-	if (nr_regions < PHYS_ALLOC_NR_REGIONS) {
+-		regions[nr_regions].base = addr;
+-		regions[nr_regions].size = size_orig;
+-		++nr_regions;
+-	} else if (!warned) {
+-		printf("WARNING: phys_alloc: No free log entries, "
+-		       "can no longer log allocations...\n");
+-		warned = true;
+-	}
++	used += size;
+ 
+ 	return phys_to_virt(addr);
+ }
+ 
+ void phys_alloc_get_unused(phys_addr_t *p_base, phys_addr_t *p_top)
+ {
+-	*p_base = base;
++	*p_base = used;
+ 	*p_top = top;
+-	if (base == top)
+-		return;
+-	regions[nr_regions].base = base;
+-	regions[nr_regions].size = top - base;
+-	++nr_regions;
+-	base = top;
++
++	/* Empty allocator. */
++	used = top;
+ }
+diff --git a/lib/alloc_phys.h b/lib/alloc_phys.h
+index 8049c340..4d350f01 100644
+--- a/lib/alloc_phys.h
++++ b/lib/alloc_phys.h
+@@ -29,8 +29,9 @@ extern void phys_alloc_set_minimum_alignment(phys_addr_t align);
+ 
+ /*
+  * phys_alloc_show outputs all currently allocated regions with the
+- * following format
+- *   <start_addr>-<end_addr> [<USED|FREE>]
++ * following format, where <end_addr> is non-inclusive:
++ *
++ * <start_addr>-<end_addr> [<USED|FREE>]
+  */
+ extern void phys_alloc_show(void);
  
 -- 
 2.40.1
