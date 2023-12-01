@@ -1,86 +1,109 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E802135C;
-	Fri,  1 Dec 2023 11:25:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C95722EE3
+	for <kvmarm@lists.linux.dev>; Fri,  1 Dec 2023 12:16:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0+ilR1tN";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="EXq/pPMb"
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1701429955;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kTlhtH9a0LDiJlYkT6vgajK3kHtKUEVv+qg/KTKk4HU=;
-	b=0+ilR1tNhs5VaMIv76WOvkPT0qv5Fi2xLMjWOd8iwpKFF2e1rQLr8de2mbc/bHnkaNjaQe
-	LbiC5q4mkGd+Sj/kPhd1ERxWAS9+FoWokpwkA65PKVnzoPGIz6d5oLfQpSLkrkRNE3pzdQ
-	//bcpn1X9PhQ9O1fXMhZdr1auoP18Z7eHjeOjyN9GFUebTn83i1KnnfcKG5x+dss03Xtki
-	ttU09OzufBNos8ljNL69jCpLD5yOQ+wCs/EozGUtX5kcJ5FgGKvheIIRatcpoYJRoVyDnr
-	D0DygGmWcdNwEcac6KOaBeh495U3limq2zXQEY3QChB6Uu522eK6w17xZwQlAQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1701429955;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kTlhtH9a0LDiJlYkT6vgajK3kHtKUEVv+qg/KTKk4HU=;
-	b=EXq/pPMbI6sA6TcIEmqxncJn2e32OeM2qAllVTE4SFvTjeMaTIOAzfm4oL3PcYAI5mDcr2
-	IYeKQ7k9Tpe0HrBQ==
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev, x86@kernel.org,
- linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org
-Cc: Albert Ou <aou@eecs.berkeley.edu>, Borislav Petkov <bp@alien8.de>,
- Catalin Marinas <catalin.marinas@arm.com>, Dave Hansen
- <dave.hansen@linux.intel.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Guo Ren <guoren@kernel.org>, "H. Peter
- Anvin" <hpa@zytor.com>, Huacai Chen <chenhuacai@kernel.org>, Ingo Molnar
- <mingo@redhat.com>, James Morse <james.morse@arm.com>, Jean-Philippe
- Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com,
- justin.he@arm.com, Len Brown <lenb@kernel.org>, Palmer Dabbelt
- <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>, Peter
- Zijlstra <peterz@infradead.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
- Salil Mehta <salil.mehta@huawei.com>, Sudeep Holla <sudeep.holla@arm.com>,
- WANG Xuerui <kernel@xen0n.name>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 00/21] Initial cleanups for vCPU hotplug
-In-Reply-To: <ZVyz/Ve5pPu8AWoA@shell.armlinux.org.uk>
-References: <ZVyz/Ve5pPu8AWoA@shell.armlinux.org.uk>
-Date: Fri, 01 Dec 2023 12:25:54 +0100
-Message-ID: <87plzqxiyl.ffs@tglx>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kl7MSOXp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0463C433CA;
+	Fri,  1 Dec 2023 12:16:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701432960;
+	bh=TtoSxyQtOJ6tC1yKOx3Q1L5BgRytk+gwlOHXcbivH5U=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kl7MSOXpddo+13XbEopQh8ZVsn7KhLh4ke5ecAWJsezrPEZe2y/ONWv9mRUqtT8vV
+	 KF5O5KNGZBvzcIzuyRO/L6PqMI4cA3eScwUjg3tHmjZanx9bXzBx+4RklFgp4aSeVO
+	 BC5E7SWko3txI8LQLWzNMqtmS/B++fA9fDD6+FZmelhEYiHDchytm77jxhqDFrm2si
+	 kb+LgkZs+KenMdVOTqCzWrZJap7xNu3kne4GIT7VISUK+/6bbmk+7CRUFKnIEP5CXU
+	 ZrUTuNQCeC4Q0rNpF827P/VrExZWkjqHvueLUyvg6bCFiUVkUaSNRfoQrIGavLnZWT
+	 jk4jBVSgVt45g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1r92R4-000Y7D-5x;
+	Fri, 01 Dec 2023 12:15:58 +0000
+Date: Fri, 01 Dec 2023 12:15:56 +0000
+Message-ID: <86y1eeazk3.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "liting (Q)" <liting8@huawei.com>
+Cc: <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<oliver.upton@linux.dev>,
+	<james.morse@arm.com>,
+	<suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>,
+	<catalin.marinas@arm.com>,
+	<will@kernel.org>,
+	<zhengchuan@huawei.com>,
+	<xiexiangyou@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: fix MPIDR to vcpu index cache to support vcpu change at runtime
+In-Reply-To: <b6c14068-6ae2-4c25-8308-6ad506e51f74@huawei.com>
+References: <20231128135402.1943-1-liting8@huawei.com>
+	<87il5k8j1p.wl-maz@kernel.org>
+	<b6c14068-6ae2-4c25-8308-6ad506e51f74@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: liting8@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, zhengchuan@huawei.com, xiexiangyou@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Russell!
+Hi Ting,
 
-On Tue, Nov 21 2023 at 13:43, Russell King wrote:
-> This series aims to switch most architectures over to using generic CPU
-> devices rather than arch specific implementations, which I think is
-> worthwhile doing even if the vCPU hotplug series needs further work.
+On Fri, 01 Dec 2023 10:48:54 +0000,
+"liting (Q)" <liting8@huawei.com> wrote:
+> 
+> On 2023/11/30 3:18, Marc Zyngier wrote:
+> > On Tue, 28 Nov 2023 13:54:02 +0000,
+> > l00313349 <liting8@huawei.com> wrote:
+> >> From: Ting Li <liting8@huawei.com>
+> >> 
+> >> Consider vcpu change at runtime, for example online_vcpus is 8,
+> >> but only start 2 vcpu threads, MPIDR to vcpu index 0 may be overwrited
+> >> and vm hangs. When start other vcpu threads, cache will be outdated
+> >> and always get mismatch.
+> > If userspace creates two vcpus with the same vcpu_id, and therefore
+> > the same MPIDR value, that's userspace's problem. Don't do that.
+> > 
+> > Why should we do anything else?
+> > 
+> > 	M.
+> Hi Marc,
+> Thanks for your reply. Maybe you have misunderstanding about it.
+> The problem is not two vcpus with the same vcpu_id, but different vcpu_id
+> have the same MPIDR value in some situation such as vcpu hotplug.
 
-I went through the whole series and I can't find anything
-objectionable.
+But that's *wrong*. The whole point of MPIDR is that it distinguishes
+between CPUs. By definition, MPIDR *must* be unique in the system, and
+if you have two vcpus with the same MPIDR, you have a broken VM.
 
-Vs. merging: It does not make sense to split this up and route
-individual patches.
+> In my case, total vcpu count is 8 but only start 2 vcpu at the beginning,
+> then vcpu_id 2-7 will get the same MPIDR value 0 with vcpu_id 0, so
+> index 0 will be overwrited to vcpu_id 7.
 
-So I can pick the whole pile up and route it through tip smp/core unless
-Rafael or Greg prefer to take it through one of their trees. For the
-latter case:
+And that's wrong as per the letter of the architecture. Here's what it
+says: "In an implementation containing multiple PEs, each PE is
+identified by a unique affinity value reported by MPIDR_EL1{Aff3,
+Aff2, Aff1, Aff0}" (D12.4 Attributability).
 
-       Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+You don't have a case here. You are creating a VM that is in complete
+violation of the architecture. It is your choice to do so, but don't
+expect things to work.
 
-Greg, Rafael?
+> Please check, thanks.
 
-Thanks,
+I did.
 
-        tglx
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
