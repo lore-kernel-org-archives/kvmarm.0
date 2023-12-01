@@ -1,271 +1,111 @@
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E88352F66
-	for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 19:35:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA393468F
+	for <kvmarm@lists.linux.dev>; Fri,  1 Dec 2023 03:47:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="XwaG/cbL"
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a184d717de1so176773066b.1
-        for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 11:35:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1701372946; x=1701977746; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qu/G57LnazjPF+hhit8sVOHNi2qaherFjM1RsRjPAGA=;
-        b=XwaG/cbLcYu6A/BSli57FJTc0gWCEaofSiDFCInwkB6bUdxZj/SE9jk93CqwlMEfXZ
-         vRuOpZJZD+c96GtFrwT25v4Vga+G94aIcYucibM9nL9Tpm6csuCWyHWFMzPVFMqoq2bB
-         sG0umz2SpveGBY40Zb3qqW6Gj11B8c1xHHMCSDECIxlAQpM/NmO1SJYmZ6FNReSKsK/t
-         8IkBbdZ++tLpN1q3OKCBfHqwOtCf5oggZtTCbQtG5WIP407z806afcDh2xn/6Cxrqe9o
-         FnVxojxYeiXkodXHedilUOswforJzznkk22kbQRsv0H6Fhiq+ImlbNwzY/m/3OfcSo/V
-         QEnA==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e/qax+t2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701402445;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+Q5xYcnLhhl5wab+9SUNf2YG1+1AQAaLiKPAT2IR83M=;
+	b=e/qax+t2P5YvcINFgcPlspj/rVKk3yt5bTDqqYwM4Jw8ozUxOHjEfPtyKWDqbZC1JBuCWv
+	zZeRxDUPid4Em5hTOgYnkj5Ys6ISxi1ti7R4zMdY0hKnGe/zpPsos4H+K4QCDqMQIY8sIT
+	G1sxsfAFm+DLvLaPacI+eLdV8jdzYYs=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-427-_ham_seZPsany5DMvGk55A-1; Thu, 30 Nov 2023 22:47:23 -0500
+X-MC-Unique: _ham_seZPsany5DMvGk55A-1
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1cfb2811203so1337065ad.1
+        for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 19:47:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701372946; x=1701977746;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Qu/G57LnazjPF+hhit8sVOHNi2qaherFjM1RsRjPAGA=;
-        b=oL1OZ8+IHpSdAMYGJAIBzPrvGldqdMI+InqoKYI+/2YqRxvkEvcHQkotGf7fFW6PtG
-         FysZxtkeMAcRJpk2pQYwL5Xdwvyvd9Li9EzXd5y3LPNIt5tEiD8V4Ctk/p7Y5f2dDoI0
-         T1dpwdPI/MzmsWwmVDVKOPWyNpnO1270yszZAue+yN2oSa08YB8Fr0/N73qnBMYmrYPv
-         f+YuexgBdB6rKshWkM82jIja/ASxhGTAGMeuhwXuMtW37tdlFcoDgUOWpJavAjsauc3b
-         S0lXDZDXqY48AVyebtnM4ho6OIg7Dio7P7eLzpamPsj6NBDj8G+F1wvwXcAMYR+ika+1
-         Za0Q==
-X-Gm-Message-State: AOJu0YwkJ8SJhSLgY+3IdICrxwPc3z9F60nOwdqNsjOgZYeC4oyONHYL
-	LNwHxEn/HTM1Etq1fukdPsWzQyQZHUDNG/cDJms=
-X-Google-Smtp-Source: AGHT+IHa+HTBgwPhkJZoBMr5lzGTwWzN2zRvlyUhmTbPbO/HwbuZuUp4S65V/IpvSmICdp3auWh37g==
-X-Received: by 2002:a17:906:1091:b0:a19:a19b:422a with SMTP id u17-20020a170906109100b00a19a19b422amr4455eju.149.1701368913770;
-        Thu, 30 Nov 2023 10:28:33 -0800 (PST)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id jz22-20020a17090775f600b009fdcc65d720sm954665ejc.72.2023.11.30.10.28.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Nov 2023 10:28:33 -0800 (PST)
-From: Andrew Jones <ajones@ventanamicro.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: seanjc@google.com,
-	pbonzini@redhat.com,
-	maz@kernel.org,
-	oliver.upton@linux.dev
-Subject: [PATCH] KVM: selftests: Drop newline from __TEST_REQUIRE
-Date: Thu, 30 Nov 2023 19:28:33 +0100
-Message-ID: <20231130182832.54603-2-ajones@ventanamicro.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1701402442; x=1702007242;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+Q5xYcnLhhl5wab+9SUNf2YG1+1AQAaLiKPAT2IR83M=;
+        b=U/SDmZvRIYO+44JrPpEkMe6bXUS0tK9NrplVSQAW4viId1eF2znyn1mZQHJtZA4zX7
+         pavRCZPu10bkRhda17OwLgtWZ2Y3eW1cqDCHahySGUbFPMWzEwtDpuxubWuD5gB950xA
+         GtgUlsW+EDRVd7ob2RsJE9/hRDauKa39U/o3sla5aI0lXARRpyQYhB1/dFrJd/6AHqJR
+         LpAlaVg4XBnuktZzfEX6bI3I5RSeTEsZZaFwk3cnygYnXZjG9HgMdMixyhqZ2H899ii6
+         XoOkCH/kElyWfI82tAYTRmPIi5jpSNeVNUYMFdw9Y7D7nqieULadkP8Hm3AchXOS67n/
+         xgew==
+X-Gm-Message-State: AOJu0YyD3NLcqRItmIdjV+IcFWTdWpgxZ69A7llD32BoViFYzur9RbVS
+	qCovIpx8PW177HFy6plkJoI/x1/0rzF3dR4H/aYG1BP/TFsEFr3xGhID17rjjgHGnxUMMUhR0xL
+	dJFRuMxlPTZ7oxprs
+X-Received: by 2002:a17:902:d2cb:b0:1cf:de3e:e4c9 with SMTP id n11-20020a170902d2cb00b001cfde3ee4c9mr23769888plc.29.1701402442608;
+        Thu, 30 Nov 2023 19:47:22 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFFc/FRI9UHJwfBJxYeFRAhPaME7NIPXUpzMmMZaQsrSUZaHXjj5IgT1PfH3h0ARxutVZDmxg==
+X-Received: by 2002:a17:902:d2cb:b0:1cf:de3e:e4c9 with SMTP id n11-20020a170902d2cb00b001cfde3ee4c9mr23769867plc.29.1701402442296;
+        Thu, 30 Nov 2023 19:47:22 -0800 (PST)
+Received: from [192.168.68.51] ([43.252.115.3])
+        by smtp.gmail.com with ESMTPSA id p5-20020a170902e74500b001cfc1a593f7sm2185691plf.217.2023.11.30.19.47.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Nov 2023 19:47:21 -0800 (PST)
+Message-ID: <8c3ca6c7-fa5f-4f45-b36d-1c7d9d94c918@redhat.com>
+Date: Fri, 1 Dec 2023 14:47:11 +1100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 08/21] drivers: base: Implement weak arch_unregister_cpu()
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev, x86@kernel.org,
+ linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org
+Cc: Salil Mehta <salil.mehta@huawei.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com,
+ justin.he@arm.com, James Morse <james.morse@arm.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>
+References: <ZVyz/Ve5pPu8AWoA@shell.armlinux.org.uk>
+ <E1r5R3H-00CszC-2n@rmk-PC.armlinux.org.uk>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <E1r5R3H-00CszC-2n@rmk-PC.armlinux.org.uk>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-A few __TEST_REQUIRE callers are appending their own newline, resulting
-in an extra one being output. Rather than remove the newlines from
-those callers, remove it from __TEST_REQUIRE and add newlines to all
-the other callers, as __TEST_REQUIRE was the only output function
-appending newlines and consistency is a good thing.
+On 11/22/23 00:44, Russell King (Oracle) wrote:
+> From: James Morse <james.morse@arm.com>
+> 
+> Add arch_unregister_cpu() to allow the ACPI machinery to call
+> unregister_cpu(). This is enough for arm64, riscv and loongarch, but
+> needs to be overridden by x86 and ia64 who need to do more work.
+> 
+> CC: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+> An open question remains from the RFC v2 posting: should we provide a
+> __weak stub for !HOTPLUG_CPU as well, since in later patches ACPI may
+> reference this if the compiler doesn't optimise as we expect?
+> 
+> Changes since v1:
+>   * Added CONFIG_HOTPLUG_CPU ifdeffery around unregister_cpu
+> Changes since RFC v2:
+>   * Move earlier in the series
+> ---
+>   drivers/base/cpu.c | 9 ++++++++-
+>   1 file changed, 8 insertions(+), 1 deletion(-)
+> 
 
-Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
----
-
-Applies to kvm-x86/selftests (I chose that branch to ensure I got the
-MAGIC_TOKEN change)
-
- tools/testing/selftests/kvm/aarch64/arch_timer.c          | 4 ++--
- tools/testing/selftests/kvm/aarch64/debug-exceptions.c    | 4 ++--
- tools/testing/selftests/kvm/aarch64/vgic_irq.c            | 2 +-
- tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c | 2 +-
- tools/testing/selftests/kvm/access_tracking_perf_test.c   | 4 ++--
- tools/testing/selftests/kvm/include/test_util.h           | 4 ++--
- tools/testing/selftests/kvm/lib/kvm_util.c                | 2 +-
- tools/testing/selftests/kvm/lib/x86_64/processor.c        | 4 ++--
- tools/testing/selftests/kvm/rseq_test.c                   | 2 +-
- tools/testing/selftests/kvm/system_counter_offset_test.c  | 2 +-
- tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c   | 2 +-
- 11 files changed, 16 insertions(+), 16 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index 274b8465b42a..89b93e342654 100644
---- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -392,7 +392,7 @@ static struct kvm_vm *test_vm_create(void)
- 
- 	test_init_timer_irq(vm);
- 	gic_fd = vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
--	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3");
-+	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3\n");
- 
- 	/* Make all the test's cmdline args visible to the guest */
- 	sync_global_to_guest(vm, test_args);
-@@ -470,7 +470,7 @@ int main(int argc, char *argv[])
- 		exit(KSFT_SKIP);
- 
- 	__TEST_REQUIRE(!test_args.migration_freq_ms || get_nprocs() >= 2,
--		       "At least two physical CPUs needed for vCPU migration");
-+		       "At least two physical CPUs needed for vCPU migration\n");
- 
- 	vm = test_vm_create();
- 	test_run(vm);
-diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-index 866002917441..19088a971b1f 100644
---- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-+++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-@@ -540,7 +540,7 @@ void test_guest_debug_exceptions_all(uint64_t aa64dfr0)
- 
- 	/* Number of breakpoints */
- 	brp_num = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_BRPs), aa64dfr0) + 1;
--	__TEST_REQUIRE(brp_num >= 2, "At least two breakpoints are required");
-+	__TEST_REQUIRE(brp_num >= 2, "At least two breakpoints are required\n");
- 
- 	/* Number of watchpoints */
- 	wrp_num = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_WRPs), aa64dfr0) + 1;
-@@ -585,7 +585,7 @@ int main(int argc, char *argv[])
- 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
- 	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &aa64dfr0);
- 	__TEST_REQUIRE(debug_version(aa64dfr0) >= 6,
--		       "Armv8 debug architecture not supported.");
-+		       "Armv8 debug architecture not supported.\n");
- 	kvm_vm_free(vm);
- 
- 	while ((opt = getopt(argc, argv, "i:")) != -1) {
-diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-index 2e64b4856e38..e4452c4b60c2 100644
---- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-+++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-@@ -766,7 +766,7 @@ static void test_vgic(uint32_t nr_irqs, bool level_sensitive, bool eoi_split)
- 
- 	gic_fd = vgic_v3_setup(vm, 1, nr_irqs,
- 			GICD_BASE_GPA, GICR_BASE_GPA);
--	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3, skipping");
-+	__TEST_REQUIRE(gic_fd >= 0, "Failed to create vgic-v3, skipping\n");
- 
- 	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT,
- 		guest_irq_handlers[args.eoi_split][args.level_sensitive]);
-diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-index 5ea78986e665..3c5b83e0e776 100644
---- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-+++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-@@ -458,7 +458,7 @@ static void create_vpmu_vm(void *guest_code)
- 	vpmu_vm.gic_fd = vgic_v3_setup(vpmu_vm.vm, 1, 64,
- 					GICD_BASE_GPA, GICR_BASE_GPA);
- 	__TEST_REQUIRE(vpmu_vm.gic_fd >= 0,
--		       "Failed to create vgic-v3, skipping");
-+		       "Failed to create vgic-v3, skipping\n");
- 
- 	/* Make sure that PMUv3 support is indicated in the ID register */
- 	vcpu_get_reg(vpmu_vm.vcpu,
-diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-index 3c7defd34f56..65efec6f4f90 100644
---- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-+++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-@@ -103,7 +103,7 @@ static uint64_t lookup_pfn(int pagemap_fd, struct kvm_vm *vm, uint64_t gva)
- 		return 0;
- 
- 	pfn = entry & PAGEMAP_PFN_MASK;
--	__TEST_REQUIRE(pfn, "Looking up PFNs requires CAP_SYS_ADMIN");
-+	__TEST_REQUIRE(pfn, "Looking up PFNs requires CAP_SYS_ADMIN\n");
- 
- 	return pfn;
- }
-@@ -385,7 +385,7 @@ int main(int argc, char *argv[])
- 
- 	page_idle_fd = open("/sys/kernel/mm/page_idle/bitmap", O_RDWR);
- 	__TEST_REQUIRE(page_idle_fd >= 0,
--		       "CONFIG_IDLE_PAGE_TRACKING is not enabled");
-+		       "CONFIG_IDLE_PAGE_TRACKING is not enabled\n");
- 	close(page_idle_fd);
- 
- 	for_each_guest_mode(run_test, &params);
-diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-index a0c7dd3a5b30..88763f0e1b78 100644
---- a/tools/testing/selftests/kvm/include/test_util.h
-+++ b/tools/testing/selftests/kvm/include/test_util.h
-@@ -37,10 +37,10 @@ void __printf(1, 2) print_skip(const char *fmt, ...);
- #define __TEST_REQUIRE(f, fmt, ...)				\
- do {								\
- 	if (!(f))						\
--		ksft_exit_skip("- " fmt "\n", ##__VA_ARGS__);	\
-+		ksft_exit_skip("- " fmt, ##__VA_ARGS__);	\
- } while (0)
- 
--#define TEST_REQUIRE(f) __TEST_REQUIRE(f, "Requirement not met: %s", #f)
-+#define TEST_REQUIRE(f) __TEST_REQUIRE(f, "Requirement not met: %s\n", #f)
- 
- ssize_t test_write(int fd, const void *buf, size_t count);
- ssize_t test_read(int fd, void *buf, size_t count);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 17a978b8a2c4..7b40990d9b08 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -27,7 +27,7 @@ int open_path_or_exit(const char *path, int flags)
- 	int fd;
- 
- 	fd = open(path, flags);
--	__TEST_REQUIRE(fd >= 0, "%s not available (errno: %d)", path, errno);
-+	__TEST_REQUIRE(fd >= 0, "%s not available (errno: %d)\n", path, errno);
- 
- 	return fd;
- }
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index d8288374078e..abd19059b236 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -719,12 +719,12 @@ void __vm_xsave_require_permission(uint64_t xfeature, const char *name)
- 	close(kvm_fd);
- 
- 	if (rc == -1 && (errno == ENXIO || errno == EINVAL))
--		__TEST_REQUIRE(0, "KVM_X86_XCOMP_GUEST_SUPP not supported");
-+		__TEST_REQUIRE(0, "KVM_X86_XCOMP_GUEST_SUPP not supported\n");
- 
- 	TEST_ASSERT(rc == 0, "KVM_GET_DEVICE_ATTR(0, KVM_X86_XCOMP_GUEST_SUPP) error: %ld", rc);
- 
- 	__TEST_REQUIRE(bitmask & xfeature,
--		       "Required XSAVE feature '%s' not supported", name);
-+		       "Required XSAVE feature '%s' not supported\n", name);
- 
- 	TEST_REQUIRE(!syscall(SYS_arch_prctl, ARCH_REQ_XCOMP_GUEST_PERM, ilog2(xfeature)));
- 
-diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
-index f74e76d03b7e..e825fe6807fa 100644
---- a/tools/testing/selftests/kvm/rseq_test.c
-+++ b/tools/testing/selftests/kvm/rseq_test.c
-@@ -183,7 +183,7 @@ static void calc_min_max_cpu(void)
- 	}
- 
- 	__TEST_REQUIRE(cnt >= 2,
--		       "Only one usable CPU, task migration not possible");
-+		       "Only one usable CPU, task migration not possible\n");
- }
- 
- int main(int argc, char *argv[])
-diff --git a/tools/testing/selftests/kvm/system_counter_offset_test.c b/tools/testing/selftests/kvm/system_counter_offset_test.c
-index 7f5b330b6a1b..46e4ca694e6d 100644
---- a/tools/testing/selftests/kvm/system_counter_offset_test.c
-+++ b/tools/testing/selftests/kvm/system_counter_offset_test.c
-@@ -30,7 +30,7 @@ static void check_preconditions(struct kvm_vcpu *vcpu)
- {
- 	__TEST_REQUIRE(!__vcpu_has_device_attr(vcpu, KVM_VCPU_TSC_CTRL,
- 					       KVM_VCPU_TSC_OFFSET),
--		       "KVM_VCPU_TSC_OFFSET not supported; skipping test");
-+		       "KVM_VCPU_TSC_OFFSET not supported; skipping test\n");
- }
- 
- static void setup_system_counter(struct kvm_vcpu *vcpu, struct test_case *test)
-diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-index 83e25bccc139..a3f4edbd9add 100644
---- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-@@ -259,7 +259,7 @@ int main(int argc, char **argv)
- 	__TEST_REQUIRE(token == MAGIC_TOKEN,
- 		       "This test must be run with the magic token %d.\n"
- 		       "This is done by nx_huge_pages_test.sh, which\n"
--		       "also handles environment setup for the test.", MAGIC_TOKEN);
-+		       "also handles environment setup for the test.\n", MAGIC_TOKEN);
- 
- 	run_test(reclaim_period_ms, false, reboot_permissions);
- 	run_test(reclaim_period_ms, true, reboot_permissions);
--- 
-2.43.0
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 
