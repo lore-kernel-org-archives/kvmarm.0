@@ -1,82 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DF0724B58;
-	Fri,  1 Dec 2023 12:29:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BA75C8EA
+	for <kvmarm@lists.linux.dev>; Fri,  1 Dec 2023 16:08:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="dJ8jDacF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41FD1C433C9;
-	Fri,  1 Dec 2023 12:29:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1701433742;
-	bh=2msErawXU1FtCRCS5sg1Q8l3QB+7X8g5Q4ahABRE7v8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dJ8jDacFlSnfz6vHti2Hqo/yYnjTmAowPHXSHHs/ZVAyHKK3vqYmj15fWpmlFSwyK
-	 oDGOQXI0cD4TOPugWR4XLWNsKEWov5ibPPHMGBZmtzjTJjHNBvU0cN9CgmbjjZoerF
-	 FiLiZFU4qf9MaXbefoLTcFW9iipaY39QNIHlh/Ag=
-Date: Fri, 1 Dec 2023 12:28:59 +0000
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
-	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
-	x86@kernel.org, linux-csky@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-ia64@vger.kernel.org,
-	linux-parisc@vger.kernel.org, Albert Ou <aou@eecs.berkeley.edu>,
-	Borislav Petkov <bp@alien8.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Guo Ren <guoren@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-	Huacai Chen <chenhuacai@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	jianyong.wu@arm.com, justin.he@arm.com, Len Brown <lenb@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	WANG Xuerui <kernel@xen0n.name>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 00/21] Initial cleanups for vCPU hotplug
-Message-ID: <2023120131-leotard-deprecate-4e27@gregkh>
-References: <ZVyz/Ve5pPu8AWoA@shell.armlinux.org.uk>
- <87plzqxiyl.ffs@tglx>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0Eo9OJav"
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6c7c69e4367so2901548b3a.0
+        for <kvmarm@lists.linux.dev>; Fri, 01 Dec 2023 08:08:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701446913; x=1702051713; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SUzSIwk7HT8dyZz+ygqaaq2fkvYNgaSclIN2mCrDJ6o=;
+        b=0Eo9OJavoKe+Co3da2wScvnEPRq65JGS++W0WSCQsod+PDAQDIBsDoWxqI/qeeII+6
+         1yFTVNQtTsZX+PG+JTIA1ta6OlwF81uQf8UgvrDGb+D7IrHjTHAFOX51FV6QS1brEW5i
+         KC5EEIxEurwwuUvvdOn5DdwJCmEWsBwB0wTr8bONmj8dycHLg3KlIRgiefYGtatKsAGl
+         8QtfbZE9xj0zX21y883kyUrERsTlIpvvtWN/YQy/K/0cFnHSYPITq1QL9UlHluTCy3Fg
+         d3W/2l/im7m7RiKNhPESt+SBC0/Fj1A67wwsiLITaF/pS2hIrY5FQGfhr47NluYPXQRP
+         mowQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701446913; x=1702051713;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SUzSIwk7HT8dyZz+ygqaaq2fkvYNgaSclIN2mCrDJ6o=;
+        b=b+7et8BxjAQi/yGlDYz7d0zZ6ofjCxFkApmBdj0at/NpGkdW5t4dRAKr9+HbP40J9H
+         Dj15bTXdiL0Y/VyV6EAV6ztigijniei08TebLMpFeVKEesYeOZi5sK+2ww0ruI+K8i2A
+         D11wyIFDT/pPWziWGNBmL1FglcPc/+OfWEZPgon1SJkCKdXuEUj8caTB7stQTuvOgQdc
+         HWjppShdZzaq6bikx3AhKGs96yOUKjE2VhYcv1mPZjeTnFRi9yGoXiSoZEtF5mRjVoh5
+         gqdzTmweVW4Sv/NO9eUhfJwf4KobC1uNS/v1N5+Of6kwL1gPEYtPl4yykhIrESnyUKQq
+         ZiyA==
+X-Gm-Message-State: AOJu0Yw4HbJMfCcbYN4PhVsjFxQ+4sDyTWvL05Korj2rU7bcxglGjoqz
+	1iQq+N3i5wxnRyh46sdah9zj0uqD6YM=
+X-Google-Smtp-Source: AGHT+IEAgiPoi8owubrQZyENMwuhRbFd2eI1EsNr015bLVPqPEqSXeSZt+Sd/CSW+w3SJFOBSyfHE1Otll0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:885:b0:6cd:d8c6:5f36 with SMTP id
+ q5-20020a056a00088500b006cdd8c65f36mr1468980pfj.3.1701446912742; Fri, 01 Dec
+ 2023 08:08:32 -0800 (PST)
+Date: Fri, 1 Dec 2023 08:08:31 -0800
+In-Reply-To: <ZWjfjAnZcomGa1Ey@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87plzqxiyl.ffs@tglx>
+Mime-Version: 1.0
+References: <20231130182832.54603-2-ajones@ventanamicro.com> <ZWjfjAnZcomGa1Ey@google.com>
+Message-ID: <ZWoE_55_6q7lqJvo@google.com>
+Subject: Re: [PATCH] KVM: selftests: Drop newline from __TEST_REQUIRE
+From: Sean Christopherson <seanjc@google.com>
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	maz@kernel.org, oliver.upton@linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Dec 01, 2023 at 12:25:54PM +0100, Thomas Gleixner wrote:
-> Russell!
+On Thu, Nov 30, 2023, Sean Christopherson wrote:
+> On Thu, Nov 30, 2023, Andrew Jones wrote:
+> > A few __TEST_REQUIRE callers are appending their own newline, resulting
+> > in an extra one being output. Rather than remove the newlines from
+> > those callers, remove it from __TEST_REQUIRE and add newlines to all
+> > the other callers, as __TEST_REQUIRE was the only output function
+> > appending newlines and consistency is a good thing.
+> > 
+> > Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+> > ---
+> > 
+> > Applies to kvm-x86/selftests (I chose that branch to ensure I got the
+> > MAGIC_TOKEN change)
 > 
-> On Tue, Nov 21 2023 at 13:43, Russell King wrote:
-> > This series aims to switch most architectures over to using generic CPU
-> > devices rather than arch specific implementations, which I think is
-> > worthwhile doing even if the vCPU hotplug series needs further work.
+> Heh, and then I went and created a conflict anyways :-)
 > 
-> I went through the whole series and I can't find anything
-> objectionable.
+> https://lore.kernel.org/all/20231129224042.530798-1-seanjc@google.com
 > 
-> Vs. merging: It does not make sense to split this up and route
-> individual patches.
-> 
-> So I can pick the whole pile up and route it through tip smp/core unless
-> Rafael or Greg prefer to take it through one of their trees. For the
-> latter case:
-> 
->        Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
-> 
-> Greg, Rafael?
+> If there are no objections, I'll grab this in kvm-x86/selftests and sort out the
+> MAGIC_TOKEN conflict.
 
-I can take them, will do so this weekend when I catch up on patches on a
-14+ hour flight...
-
-greg k-h
+Actually, I misread the patch.  I thought you were removing newlines, not adding
+them.  My thinking for TEST_REQUIRE() is that it should look and behave like
+TEST_ASSERT(), not like a raw printf().  I.e. the caller provides the raw message,
+and the framework handles formatting the final output.
