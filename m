@@ -1,65 +1,76 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 831B3171C2
-	for <kvmarm@lists.linux.dev>; Fri,  1 Dec 2023 10:49:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from kwepemd500005.china.huawei.com (unknown [172.30.72.54])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4ShV7863zjzSgt8;
-	Fri,  1 Dec 2023 18:44:36 +0800 (CST)
-Received: from [10.174.186.3] (10.174.186.3) by kwepemd500005.china.huawei.com
- (7.221.188.140) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1258.28; Fri, 1 Dec
- 2023 18:48:55 +0800
-Message-ID: <b6c14068-6ae2-4c25-8308-6ad506e51f74@huawei.com>
-Date: Fri, 1 Dec 2023 18:48:54 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50CE0210E0;
+	Fri,  1 Dec 2023 11:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="gVfDLjU5";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="supcOG+E"
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1701428792;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HEhlj+ipjqr4tEgJOcMvjQsGJg7PSMW3Lo0ITUjqyJ8=;
+	b=gVfDLjU5umc+p3JXfSXFKIMVGVVvh/YAfNpBHT1q4t9H27RaW8vqhGxIzPvK5LwXvQwvdF
+	/JYPTDKNgMJUwy1VQmekKDtiuw9J5MRT8kLobRdLxKlvOUfGx43e57Db2Cd7dAx9syetOZ
+	BU7cmbjv5BmHUc0EAy6VO+z0aR26jT/u8M8FH2BQ6+zo9e37Okp4KeSLznfNh/tj+3D+nn
+	JUnzrC6xa7Oy2ZtOmEpsPXJWO6wneo3/X5sumqAOekkfTiY5vVbLzAykjFEs+lfH/gjvHp
+	2hQwTTxf7jJz2QGhGaXroHm9dcH/i6GePiLaIo9jyy0ijxHr/8RoxXDlbrf0jw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1701428792;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HEhlj+ipjqr4tEgJOcMvjQsGJg7PSMW3Lo0ITUjqyJ8=;
+	b=supcOG+ERH+rcQKMhNStZbjQi0qWHuaxf3SWtVLs0rM9jaVZ7Iy5x6/vAzCqSSHennIM26
+	dvRnrytMPd0gRKCA==
+To: Russell King <rmk+kernel@armlinux.org.uk>, linux-pm@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org,
+ kvmarm@lists.linux.dev, x86@kernel.org, linux-csky@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-ia64@vger.kernel.org,
+ linux-parisc@vger.kernel.org
+Cc: Salil Mehta <salil.mehta@huawei.com>, Jean-Philippe Brucker
+ <jean-philippe@linaro.org>, jianyong.wu@arm.com, justin.he@arm.com, James
+ Morse <james.morse@arm.com>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>
+Subject: Re: [PATCH 08/21] drivers: base: Implement weak arch_unregister_cpu()
+In-Reply-To: <E1r5R3H-00CszC-2n@rmk-PC.armlinux.org.uk>
+References: <ZVyz/Ve5pPu8AWoA@shell.armlinux.org.uk>
+ <E1r5R3H-00CszC-2n@rmk-PC.armlinux.org.uk>
+Date: Fri, 01 Dec 2023 12:06:31 +0100
+Message-ID: <87sf4mxjuw.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: arm64: fix MPIDR to vcpu index cache to support vcpu
- change at runtime
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<oliver.upton@linux.dev>, <james.morse@arm.com>, <suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
-	<zhengchuan@huawei.com>, <xiexiangyou@huawei.com>, <liting8@huawei.com>
-References: <20231128135402.1943-1-liting8@huawei.com>
- <87il5k8j1p.wl-maz@kernel.org>
-From: "liting (Q)" <liting8@huawei.com>
-In-Reply-To: <87il5k8j1p.wl-maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemd500005.china.huawei.com (7.221.188.140)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
 
-On 2023/11/30 3:18, Marc Zyngier wrote:
-> On Tue, 28 Nov 2023 13:54:02 +0000,
-> l00313349 <liting8@huawei.com> wrote:
->> From: Ting Li <liting8@huawei.com>
->>
->> Consider vcpu change at runtime, for example online_vcpus is 8,
->> but only start 2 vcpu threads, MPIDR to vcpu index 0 may be overwrited
->> and vm hangs. When start other vcpu threads, cache will be outdated
->> and always get mismatch.
-> If userspace creates two vcpus with the same vcpu_id, and therefore
-> the same MPIDR value, that's userspace's problem. Don't do that.
->
-> Why should we do anything else?
->
-> 	M.
-Hi Marc,
-Thanks for your reply. Maybe you have misunderstanding about it.
-The problem is not two vcpus with the same vcpu_id, but different vcpu_id
-have the same MPIDR value in some situation such as vcpu hotplug.
-In my case, total vcpu count is 8 but only start 2 vcpu at the beginning,
-then vcpu_id 2-7 will get the same MPIDR value 0 with vcpu_id 0, so
-index 0 will be overwrited to vcpu_id 7.
-Please check, thanks.
-Ting Li
+On Tue, Nov 21 2023 at 13:44, Russell King wrote:
+> ---
+> An open question remains from the RFC v2 posting: should we provide a
+> __weak stub for !HOTPLUG_CPU as well, since in later patches ACPI may
+> reference this if the compiler doesn't optimise as we expect?
+
+You mean:
+
+extern void foo(void);
+
+    if (!IS_ENABLED(CONFIG_FOO))
+    	foo();
+
+The kernel uses this pattern for years and if someday a compiler starts
+to fail to eliminate the call to 'foo()' for CONFIG_FOO=n then you
+already get hundreds linkage fails today.
+
+So adding one more in later patches won't matter much :)
+
