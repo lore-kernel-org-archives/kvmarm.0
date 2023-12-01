@@ -1,112 +1,221 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A72F6AA2
-	for <kvmarm@lists.linux.dev>; Fri,  1 Dec 2023 03:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WGu4YqHA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701402555;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IO8CL2qjeIUr0LsYwreVkjK8516DQtyOeewHK7H786o=;
-	b=WGu4YqHA2ly7lIBRb5cmtWLi5WqsiTeGBSOgibj+nx4++AXyK7ZsEtv2GYNHC2kyyWjipB
-	yfENv9zdCkglh41tmGkeQTVkU716gjXy1Imt0DaVvIn14xh4uR/2vgPO83XBmn2z/DmeoP
-	bx0ooj+aQf6f1CAztnw2y3tD3Gym1HY=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-526-F7ltkXXHPhKG9D1HKqoKpA-1; Thu, 30 Nov 2023 22:49:13 -0500
-X-MC-Unique: F7ltkXXHPhKG9D1HKqoKpA-1
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1cfcf1e9442so1556225ad.3
-        for <kvmarm@lists.linux.dev>; Thu, 30 Nov 2023 19:49:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701402552; x=1702007352;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IO8CL2qjeIUr0LsYwreVkjK8516DQtyOeewHK7H786o=;
-        b=sofWibhEDuVjCT/gSMEQURoRUgb3CYsyvzoWuZuPU2iU4UpI6Oqn1tKWkBODxvgNly
-         sYqzamSqR8Wlcr0wBWfkD1Fgqu8jxdmLcxiH5fQikJ/rZLbLbGW1U0q1IZt5lLBSgNoM
-         YMclTq9lG+Y6rpUI5pM6CyGWjYEolzsmbrGibBLyIejo7O0zG4azbyN3j//vWVruEVXE
-         vabUaKZQ+EyB7BG0P3VyvYXq0gpULnjjbKy8SuJ0ngpH8n511SbJnY2xp1dSU0T2ORDN
-         ud6Wa8KKWFc97uYxiFJ6X1QppkdtlYpSr+A37wBdNlOH4bmG2kTHKpVrlS/pEcL1IbxX
-         cX+Q==
-X-Gm-Message-State: AOJu0YyXagTZjb5wsQAZHVVwF9MbSV3tlsgBV6gIWTNrk0Bojjm3QuTe
-	els12NUTU/lUbPobEVGYzza7qHPKeTieFptdHGTRcUr3Lacurqj4ZxZkf+x3ycTSXEp7tUwtXY8
-	awSDlkfzzQYHAb52T
-X-Received: by 2002:a17:902:e80e:b0:1cf:daca:2b5e with SMTP id u14-20020a170902e80e00b001cfdaca2b5emr17322866plg.38.1701402552349;
-        Thu, 30 Nov 2023 19:49:12 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHVVbr2zUe8qqYTBkmHgB1fO8oP/OS0GFEHLzxacC4remFDnJNuIkfv1IWdcQ4cpeu8xrZWrg==
-X-Received: by 2002:a17:902:e80e:b0:1cf:daca:2b5e with SMTP id u14-20020a170902e80e00b001cfdaca2b5emr17322834plg.38.1701402551963;
-        Thu, 30 Nov 2023 19:49:11 -0800 (PST)
-Received: from [192.168.68.51] ([43.252.115.3])
-        by smtp.gmail.com with ESMTPSA id p5-20020a170902e74500b001cfc1a593f7sm2185691plf.217.2023.11.30.19.49.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Nov 2023 19:49:11 -0800 (PST)
-Message-ID: <e0b38120-8b09-4695-974c-f3c3ef226f22@redhat.com>
-Date: Fri, 1 Dec 2023 14:49:03 +1100
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AD038826
+	for <kvmarm@lists.linux.dev>; Fri,  1 Dec 2023 05:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AB95C1042;
+	Thu, 30 Nov 2023 21:40:20 -0800 (PST)
+Received: from a077893.blr.arm.com (a077893.blr.arm.com [10.162.41.8])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 4E6F93F73F;
+	Thu, 30 Nov 2023 21:39:28 -0800 (PST)
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	mark.rutland@arm.com
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	James Clark <james.clark@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Suzuki Poulose <suzuki.poulose@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	linux-perf-users@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	kvmarm@lists.linux.dev
+Subject: [PATCH V15 2/8] KVM: arm64: Prevent guest accesses into BRBE system registers/instructions
+Date: Fri,  1 Dec 2023 11:09:00 +0530
+Message-Id: <20231201053906.1261704-3-anshuman.khandual@arm.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20231201053906.1261704-1-anshuman.khandual@arm.com>
+References: <20231201053906.1261704-1-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 11/21] drivers: base: Print a warning instead of panic()
- when register_cpu() fails
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev, x86@kernel.org,
- linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org
-Cc: Salil Mehta <salil.mehta@huawei.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com,
- justin.he@arm.com, James Morse <james.morse@arm.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>
-References: <ZVyz/Ve5pPu8AWoA@shell.armlinux.org.uk>
- <E1r5R3W-00CszU-GM@rmk-PC.armlinux.org.uk>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <E1r5R3W-00CszU-GM@rmk-PC.armlinux.org.uk>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Currently BRBE feature is not supported in a guest environment. This hides
+BRBE feature availability via masking ID_AA64DFR0_EL1.BRBE field. This also
+blocks guest accesses into BRBE system registers and instructions as if the
+underlying hardware never implemented FEAT_BRBE feature.
 
-On 11/22/23 00:44, Russell King (Oracle) wrote:
-> From: James Morse <james.morse@arm.com>
-> 
-> loongarch, mips, parisc, riscv and sh all print a warning if
-> register_cpu() returns an error. Architectures that use
-> GENERIC_CPU_DEVICES call panic() instead.
-> 
-> Errors in this path indicate something is wrong with the firmware
-> description of the platform, but the kernel is able to keep running.
-> 
-> Downgrade this to a warning to make it easier to debug this issue.
-> 
-> This will allow architectures that switching over to GENERIC_CPU_DEVICES
-> to drop their warning, but keep the existing behaviour.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->   drivers/base/cpu.c | 7 ++++---
->   1 file changed, 4 insertions(+), 3 deletions(-)
-> 
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+---
+ arch/arm64/kvm/sys_regs.c | 130 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 130 insertions(+)
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 4735e1b37fb3..42701065b3cd 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1583,6 +1583,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 	/* Hide SPE from guests */
+ 	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
+ 
++	/* Hide BRBE from guests */
++	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
++
+ 	return val;
+ }
+ 
+@@ -2042,6 +2045,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
+ 	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
+ 	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
++	{ SYS_DESC(OP_BRB_IALL), undef_access },
++	{ SYS_DESC(OP_BRB_INJ), undef_access },
+ 
+ 	DBG_BCR_BVR_WCR_WVR_EL1(0),
+ 	DBG_BCR_BVR_WCR_WVR_EL1(1),
+@@ -2072,6 +2077,131 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
+ 	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
+ 
++	/*
++	 * BRBE branch record sysreg address space is interleaved between
++	 * corresponding BRBINF<N>_EL1, BRBSRC<N>_EL1, and BRBTGT<N>_EL1.
++	 */
++	{ SYS_DESC(SYS_BRBINF0_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC0_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT0_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF16_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC16_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT16_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF1_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC1_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT1_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF17_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC17_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT17_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF2_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC2_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT2_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF18_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC18_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT18_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF3_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC3_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT3_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF19_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC19_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT19_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF4_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC4_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT4_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF20_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC20_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT20_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF5_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC5_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT5_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF21_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC21_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT21_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF6_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC6_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT6_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF22_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC22_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT22_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF7_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC7_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT7_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF23_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC23_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT23_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF8_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC8_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT8_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF24_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC24_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT24_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF9_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC9_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT9_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF25_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC25_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT25_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF10_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC10_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT10_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF26_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC26_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT26_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF11_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC11_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT11_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF27_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC27_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT27_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF12_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC12_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT12_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF28_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC28_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT28_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF13_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC13_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT13_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF29_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC29_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT29_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF14_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC14_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT14_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF30_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC30_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT30_EL1), undef_access },
++
++	{ SYS_DESC(SYS_BRBINF15_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC15_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT15_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINF31_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRC31_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGT31_EL1), undef_access },
++
++	/* Remaining BRBE sysreg addresses space */
++	{ SYS_DESC(SYS_BRBCR_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBFCR_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTS_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINFINJ_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRCINJ_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGTINJ_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBIDR0_EL1), undef_access },
++
+ 	{ SYS_DESC(SYS_MDCCSR_EL0), trap_raz_wi },
+ 	{ SYS_DESC(SYS_DBGDTR_EL0), trap_raz_wi },
+ 	// DBGDTR[TR]X_EL0 share the same encoding
+-- 
+2.25.1
 
