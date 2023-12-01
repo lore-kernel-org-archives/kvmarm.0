@@ -1,14 +1,14 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AD038826
-	for <kvmarm@lists.linux.dev>; Fri,  1 Dec 2023 05:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19C16FC4
+	for <kvmarm@lists.linux.dev>; Fri,  1 Dec 2023 05:39:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AB95C1042;
-	Thu, 30 Nov 2023 21:40:20 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 792131042;
+	Thu, 30 Nov 2023 21:40:37 -0800 (PST)
 Received: from a077893.blr.arm.com (a077893.blr.arm.com [10.162.41.8])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 4E6F93F73F;
-	Thu, 30 Nov 2023 21:39:28 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 67C4B3F73F;
+	Thu, 30 Nov 2023 21:39:45 -0800 (PST)
 From: Anshuman Khandual <anshuman.khandual@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
@@ -28,9 +28,9 @@ Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	kvmarm@lists.linux.dev
-Subject: [PATCH V15 2/8] KVM: arm64: Prevent guest accesses into BRBE system registers/instructions
-Date: Fri,  1 Dec 2023 11:09:00 +0530
-Message-Id: <20231201053906.1261704-3-anshuman.khandual@arm.com>
+Subject: [PATCH V15 5/8] KVM: arm64: nvhe: Disable branch generation in nVHE guests
+Date: Fri,  1 Dec 2023 11:09:03 +0530
+Message-Id: <20231201053906.1261704-6-anshuman.khandual@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231201053906.1261704-1-anshuman.khandual@arm.com>
 References: <20231201053906.1261704-1-anshuman.khandual@arm.com>
@@ -42,10 +42,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently BRBE feature is not supported in a guest environment. This hides
-BRBE feature availability via masking ID_AA64DFR0_EL1.BRBE field. This also
-blocks guest accesses into BRBE system registers and instructions as if the
-underlying hardware never implemented FEAT_BRBE feature.
+Disable the BRBE before we enter the guest, saving the status and enable it
+back once we get out of the guest. This is just to avoid capturing records
+in the guest kernel/userspace, which would be confusing the samples.
 
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Oliver Upton <oliver.upton@linux.dev>
@@ -55,167 +54,124 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>
 Cc: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org
+CC: linux-kernel@vger.kernel.org
 Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 ---
- arch/arm64/kvm/sys_regs.c | 130 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 130 insertions(+)
+Changes in V15:
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 4735e1b37fb3..42701065b3cd 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1583,6 +1583,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
- 	/* Hide SPE from guests */
- 	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
+- Dropped runtime BRBE enable for setting DEBUG_STATE_SAVE_BRBE
+- Dropped BRBFCR_EL1 from __debug_save_brbe()/__debug_restore_brbe()
+- Always save the live SYS_BRBCR_EL1 in host context and then check if
+  BRBE was enabled before resetting SYS_BRBCR_EL1 for the host
+
+ arch/arm64/include/asm/kvm_host.h  |  4 ++++
+ arch/arm64/kvm/debug.c             |  5 +++++
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c | 33 ++++++++++++++++++++++++++++++
+ 3 files changed, 42 insertions(+)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 68421c74283a..1faa0430d8dd 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -449,6 +449,8 @@ enum vcpu_sysreg {
+ 	CNTHV_CVAL_EL2,
+ 	PMSCR_EL1,	/* Statistical profiling extension */
+ 	TRFCR_EL1,	/* Self-hosted trace filters */
++	BRBCR_EL1,	/* Branch Record Buffer Control Register */
++	BRBFCR_EL1,	/* Branch Record Buffer Function Control Register */
  
-+	/* Hide BRBE from guests */
-+	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
+ 	NR_SYS_REGS	/* Nothing after this line! */
+ };
+@@ -753,6 +755,8 @@ struct kvm_vcpu_arch {
+ #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
+ /* Save trace filter controls */
+ #define DEBUG_STATE_SAVE_TRFCR	__vcpu_single_flag(iflags, BIT(8))
++/* Save BRBE context if active  */
++#define DEBUG_STATE_SAVE_BRBE	__vcpu_single_flag(iflags, BIT(9))
+ 
+ /* SVE enabled for host EL0 */
+ #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+index 2ab41b954512..fa46a70a9503 100644
+--- a/arch/arm64/kvm/debug.c
++++ b/arch/arm64/kvm/debug.c
+@@ -354,6 +354,10 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
+ 		    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
+ 			vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+ 	}
 +
- 	return val;
++	/* Check if we have BRBE implemented and available at the host */
++	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRBE_SHIFT))
++		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
  }
  
-@@ -2042,6 +2045,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
- 	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
- 	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
-+	{ SYS_DESC(OP_BRB_IALL), undef_access },
-+	{ SYS_DESC(OP_BRB_INJ), undef_access },
+ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+@@ -361,6 +365,7 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+ 	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+ 	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+ 	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
++	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
+ }
  
- 	DBG_BCR_BVR_WCR_WVR_EL1(0),
- 	DBG_BCR_BVR_WCR_WVR_EL1(1),
-@@ -2072,6 +2077,131 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
- 	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
+ void kvm_etm_set_guest_trfcr(u64 trfcr_guest)
+diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+index 6174f710948e..1994fc48b57c 100644
+--- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
++++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+@@ -93,6 +93,33 @@ static void __debug_restore_trace(struct kvm_cpu_context *host_ctxt,
+ 		write_sysreg_s(ctxt_sys_reg(host_ctxt, TRFCR_EL1), SYS_TRFCR_EL1);
+ }
  
++static void __debug_save_brbe(struct kvm_cpu_context *host_ctxt)
++{
++	ctxt_sys_reg(host_ctxt, BRBCR_EL1) = read_sysreg_s(SYS_BRBCR_EL1);
++
++	/* Check if the BRBE is enabled */
++	if (!(ctxt_sys_reg(host_ctxt, BRBCR_EL1) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
++		return;
++
 +	/*
-+	 * BRBE branch record sysreg address space is interleaved between
-+	 * corresponding BRBINF<N>_EL1, BRBSRC<N>_EL1, and BRBTGT<N>_EL1.
++	 * Prohibit branch record generation while we are in guest.
++	 * Since access to BRBCR_EL1 is trapped, the guest can't
++	 * modify the filtering set by the host.
 +	 */
-+	{ SYS_DESC(SYS_BRBINF0_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC0_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT0_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBINF16_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC16_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT16_EL1), undef_access },
++	write_sysreg_s(0, SYS_BRBCR_EL1);
++	isb();
++}
 +
-+	{ SYS_DESC(SYS_BRBINF1_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC1_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT1_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBINF17_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC17_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT17_EL1), undef_access },
++static void __debug_restore_brbe(struct kvm_cpu_context *host_ctxt)
++{
++	if (!ctxt_sys_reg(host_ctxt, BRBCR_EL1))
++		return;
 +
-+	{ SYS_DESC(SYS_BRBINF2_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC2_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT2_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBINF18_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC18_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT18_EL1), undef_access },
++	/* Restore BRBE controls */
++	write_sysreg_s(ctxt_sys_reg(host_ctxt, BRBCR_EL1), SYS_BRBCR_EL1);
++	isb();
++}
 +
-+	{ SYS_DESC(SYS_BRBINF3_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC3_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT3_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBINF19_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC19_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT19_EL1), undef_access },
+ void __debug_save_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
+ 				    struct kvm_cpu_context *guest_ctxt)
+ {
+@@ -102,6 +129,10 @@ void __debug_save_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
+ 
+ 	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_TRFCR))
+ 		__debug_save_trace(host_ctxt, guest_ctxt);
 +
-+	{ SYS_DESC(SYS_BRBINF4_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC4_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT4_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBINF20_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC20_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT20_EL1), undef_access },
-+
-+	{ SYS_DESC(SYS_BRBINF5_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC5_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT5_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBINF21_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC21_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT21_EL1), undef_access },
-+
-+	{ SYS_DESC(SYS_BRBINF6_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC6_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT6_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBINF22_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC22_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT22_EL1), undef_access },
-+
-+	{ SYS_DESC(SYS_BRBINF7_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC7_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT7_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBINF23_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC23_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT23_EL1), undef_access },
-+
-+	{ SYS_DESC(SYS_BRBINF8_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC8_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT8_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBINF24_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC24_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT24_EL1), undef_access },
-+
-+	{ SYS_DESC(SYS_BRBINF9_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC9_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT9_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBINF25_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC25_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT25_EL1), undef_access },
-+
-+	{ SYS_DESC(SYS_BRBINF10_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC10_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT10_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBINF26_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC26_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT26_EL1), undef_access },
-+
-+	{ SYS_DESC(SYS_BRBINF11_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC11_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT11_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBINF27_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC27_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT27_EL1), undef_access },
-+
-+	{ SYS_DESC(SYS_BRBINF12_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC12_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT12_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBINF28_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC28_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT28_EL1), undef_access },
-+
-+	{ SYS_DESC(SYS_BRBINF13_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC13_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT13_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBINF29_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC29_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT29_EL1), undef_access },
-+
-+	{ SYS_DESC(SYS_BRBINF14_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC14_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT14_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBINF30_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC30_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT30_EL1), undef_access },
-+
-+	{ SYS_DESC(SYS_BRBINF15_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC15_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT15_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBINF31_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRC31_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGT31_EL1), undef_access },
-+
-+	/* Remaining BRBE sysreg addresses space */
-+	{ SYS_DESC(SYS_BRBCR_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBFCR_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTS_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBINFINJ_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBSRCINJ_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBTGTINJ_EL1), undef_access },
-+	{ SYS_DESC(SYS_BRBIDR0_EL1), undef_access },
-+
- 	{ SYS_DESC(SYS_MDCCSR_EL0), trap_raz_wi },
- 	{ SYS_DESC(SYS_DBGDTR_EL0), trap_raz_wi },
- 	// DBGDTR[TR]X_EL0 share the same encoding
++	/* Disable BRBE branch records */
++	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_BRBE))
++		__debug_save_brbe(host_ctxt);
+ }
+ 
+ void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+@@ -116,6 +147,8 @@ void __debug_restore_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
+ 		__debug_restore_spe(host_ctxt);
+ 	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_TRFCR))
+ 		__debug_restore_trace(host_ctxt, guest_ctxt);
++	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_BRBE))
++		__debug_restore_brbe(host_ctxt);
+ }
+ 
+ void __debug_switch_to_host(struct kvm_vcpu *vcpu)
 -- 
 2.25.1
 
