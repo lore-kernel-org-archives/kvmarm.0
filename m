@@ -1,66 +1,65 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C641CAB9;
-	Fri,  1 Dec 2023 10:45:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="T3NEQtyO";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="5ivKSLWo"
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1701427507;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qEECtfSCuNJnYbbSSxaa7Yhx563AZhnbYIPY9oqxOFE=;
-	b=T3NEQtyO3UjVNcOPdRfDLPqBbceTA/S3RG5pLrN/U1R54Q2+LC7E1qyZMq6Qdr2Lwq04Q7
-	o3RbMWPKuiDtnTWhcOihAwr10MgQL4MPJzwPuXjSE8T6gp+VGjfk6u/Ymyla3VOKfAsmmc
-	Ccc1ZPp7aRV0WvqXtoVD6atSILRTlOYC+gmZcP1quvkiE5ooEnP1dGy3CQhMQmnhHkyoNi
-	fjrSBFLZgwtCeutL0TuwQN8B6ZHMA2t6ITEqL89vyADio0MnrI5DVfPUnv3HUa3tTRDL7e
-	+EhhGYzs843vvIZov1ZEMz4EArysm5xib9rklBXUl6z6IburTOa1nE4pPpkQBA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1701427507;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qEECtfSCuNJnYbbSSxaa7Yhx563AZhnbYIPY9oqxOFE=;
-	b=5ivKSLWokv5u4EWLeFetTD8/zTFsnE28leOpFAM1uIFAuW0E1rMX60gedKhj/gj0RQebhI
-	nzpCyFo1nVj5NNDA==
-To: Russell King <rmk+kernel@armlinux.org.uk>, linux-pm@vger.kernel.org,
- loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org,
- kvmarm@lists.linux.dev, x86@kernel.org, linux-csky@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-ia64@vger.kernel.org,
- linux-parisc@vger.kernel.org
-Cc: Salil Mehta <salil.mehta@huawei.com>, Jean-Philippe Brucker
- <jean-philippe@linaro.org>, jianyong.wu@arm.com, justin.he@arm.com, James
- Morse <james.morse@arm.com>, Sudeep Holla <sudeep.holla@arm.com>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>
-Subject: Re: [PATCH 01/21] arch_topology: Make
- register_cpu_capacity_sysctl() tolerant to late CPUs
-In-Reply-To: <E1r5R2g-00CsyV-Ss@rmk-PC.armlinux.org.uk>
-References: <ZVyz/Ve5pPu8AWoA@shell.armlinux.org.uk>
- <E1r5R2g-00CsyV-Ss@rmk-PC.armlinux.org.uk>
-Date: Fri, 01 Dec 2023 11:45:06 +0100
-Message-ID: <87v89ixkul.ffs@tglx>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 831B3171C2
+	for <kvmarm@lists.linux.dev>; Fri,  1 Dec 2023 10:49:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from kwepemd500005.china.huawei.com (unknown [172.30.72.54])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4ShV7863zjzSgt8;
+	Fri,  1 Dec 2023 18:44:36 +0800 (CST)
+Received: from [10.174.186.3] (10.174.186.3) by kwepemd500005.china.huawei.com
+ (7.221.188.140) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1258.28; Fri, 1 Dec
+ 2023 18:48:55 +0800
+Message-ID: <b6c14068-6ae2-4c25-8308-6ad506e51f74@huawei.com>
+Date: Fri, 1 Dec 2023 18:48:54 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: arm64: fix MPIDR to vcpu index cache to support vcpu
+ change at runtime
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<oliver.upton@linux.dev>, <james.morse@arm.com>, <suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<zhengchuan@huawei.com>, <xiexiangyou@huawei.com>, <liting8@huawei.com>
+References: <20231128135402.1943-1-liting8@huawei.com>
+ <87il5k8j1p.wl-maz@kernel.org>
+From: "liting (Q)" <liting8@huawei.com>
+In-Reply-To: <87il5k8j1p.wl-maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemd500005.china.huawei.com (7.221.188.140)
+X-CFilter-Loop: Reflected
 
-On Tue, Nov 21 2023 at 13:43, Russell King wrote:
-> ---
-> If the offline CPUs thing is a problem for the tools that consume
-> this value, we'd need to move cpu_capacity to be part of cpu.c's
-> common_cpu_attr_groups. However, attempts to discuss this just end
-> up in a black hole, so this is a non-starter. Thus, if this needs
-> to be done, it can be done as a separate patch.
-
-Offline CPUs have 0 capacity by definition....
+On 2023/11/30 3:18, Marc Zyngier wrote:
+> On Tue, 28 Nov 2023 13:54:02 +0000,
+> l00313349 <liting8@huawei.com> wrote:
+>> From: Ting Li <liting8@huawei.com>
+>>
+>> Consider vcpu change at runtime, for example online_vcpus is 8,
+>> but only start 2 vcpu threads, MPIDR to vcpu index 0 may be overwrited
+>> and vm hangs. When start other vcpu threads, cache will be outdated
+>> and always get mismatch.
+> If userspace creates two vcpus with the same vcpu_id, and therefore
+> the same MPIDR value, that's userspace's problem. Don't do that.
+>
+> Why should we do anything else?
+>
+> 	M.
+Hi Marc,
+Thanks for your reply. Maybe you have misunderstanding about it.
+The problem is not two vcpus with the same vcpu_id, but different vcpu_id
+have the same MPIDR value in some situation such as vcpu hotplug.
+In my case, total vcpu count is 8 but only start 2 vcpu at the beginning,
+then vcpu_id 2-7 will get the same MPIDR value 0 with vcpu_id 0, so
+index 0 will be overwrited to vcpu_id 7.
+Please check, thanks.
+Ting Li
