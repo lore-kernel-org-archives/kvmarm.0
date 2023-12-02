@@ -1,98 +1,148 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3675A619B7
-	for <kvmarm@lists.linux.dev>; Sat,  2 Dec 2023 08:12:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5A5619DB
+	for <kvmarm@lists.linux.dev>; Sat,  2 Dec 2023 12:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="aUzPAb33"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-40b552deba0so30382585e9.1
-        for <kvmarm@lists.linux.dev>; Sat, 02 Dec 2023 00:12:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1701504756; x=1702109556; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CVX2kpuxMR/gQOGxwhkAyQ2ljhTWu/mzS3efRZJyhSQ=;
-        b=aUzPAb33AMwDqVkV7CdVAxHEOYCfFmk/eEsngrep82QmNU0GRoSzwiyTj625DVANAQ
-         uLnATI3l6PqCgKXdn9hlknA6Kcj3ilmkHS9WcA+4BhwOavav0Op4ZR/prnyBsblfg75r
-         k3T/G+6FzW+DNqpg0QDBt4FaHzMLgZBEvUAnJL3bqlGAEq246AH+XYgy89Fp0BKqGaef
-         GVifd3MlKnuZ7/RErj5Q+UegfwD/IoBs5o4UCCdlEFadDPsGVsp7DJyLaWUFnHq66bzw
-         QOlQ9XOlbQMIeCS95/bjDaFh+wxRsCZcoljeb/7Qwe0+2Z4bGhW4J53QTJvOy3MnKH6w
-         c29g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701504756; x=1702109556;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CVX2kpuxMR/gQOGxwhkAyQ2ljhTWu/mzS3efRZJyhSQ=;
-        b=qA7XMd+ckWJhfmX1LgOl/Hzl0sTt+dtXl/af3nL3yuprBAwSEi+xfoTu840+6RJstX
-         n7oyBEdhe4ufSLEpHbKk26wEk1MNk6BNB6yKk45kE3nG4x3vX5hIkLoTiZmZS6mipcpM
-         jSjQ5YR7JoJVgu8ZisE7BkGY9QIHB0XPwf0jifxG3Ht1LthDorUW1VOQbBKc9jtpOSsI
-         9pgx3od21DuicA44AitmCUogOI2LUfRq8mOsKzWnbpzVeuDnwNyEMoisOgMj1tKaI6KR
-         PNCV0SxoYw3Gib5/BSFPHsIaWWuSdaAi/wauCb9ev9U5BHVNDhfyy4zze4MFyyPvfJMl
-         Ar6Q==
-X-Gm-Message-State: AOJu0YydLDMi2/Cavg8jMw8ERD23fD0LgXFBmELxczkRsds/opHmUydo
-	G/ivgUSHcnRU721Q8fJ3P8OuqA==
-X-Google-Smtp-Source: AGHT+IEUK+ue+JgPyJTnysv1yet0GgFn+9iBizzS8rLx+WfhJQ9tDiQnhK4ki/wLaMJ6+T1dIvWEwg==
-X-Received: by 2002:a05:600c:21d0:b0:40b:5e59:cca3 with SMTP id x16-20020a05600c21d000b0040b5e59cca3mr835423wmj.132.1701504756302;
-        Sat, 02 Dec 2023 00:12:36 -0800 (PST)
-Received: from localhost ([2001:9e8:8c06:1:fc31:ac12:b4b1:32fe])
-        by smtp.gmail.com with ESMTPSA id t20-20020a05600c451400b004094e565e71sm7852194wmo.23.2023.12.02.00.12.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Dec 2023 00:12:35 -0800 (PST)
-Date: Sat, 2 Dec 2023 09:12:34 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
-	maz@kernel.org, oliver.upton@linux.dev
-Subject: Re: [PATCH] KVM: selftests: Drop newline from __TEST_REQUIRE
-Message-ID: <20231202-95468f21e7d2d4c90f475079@orel>
-References: <20231130182832.54603-2-ajones@ventanamicro.com>
- <ZWjfjAnZcomGa1Ey@google.com>
- <ZWoE_55_6q7lqJvo@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PvfwcIfW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E7EAC433C7;
+	Sat,  2 Dec 2023 12:20:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701519634;
+	bh=ejaFDXno/ycGNYAzsMsIvPwtjPT2anJN2aFKbFwFV04=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PvfwcIfWLh/wjDpU29WREENELuCw5zM+gDaYXkHN1dTQAhMOVMLcKZx0qF+XtbDww
+	 Cp8cd0bGhix99JP0W3laRsC/uu0mW48n0dssmWtApkTuYAK+QRQqGRTEDM1Tj7nq3r
+	 DfFE8WCm4e9My7K4ry5kpd+J4TThkfjNRic1IjDpX9BZv3TYIgAnHPOagQROkylFKY
+	 5CFgXaV5HBHRcNzJxPImcQlZ6BOZyrC8D0rgwpxvA5733vzb24/gDQwiSJc3V3YH5z
+	 1HzD2DElwwq/vVfI1K8HndQt7lDMscl/WRpH88NW+QoGuwn8AExtxvvT1rAjw09rBI
+	 sO/nNsSPAusbQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1r9Oz2-000oDc-6w;
+	Sat, 02 Dec 2023 12:20:32 +0000
+Date: Sat, 02 Dec 2023 12:20:31 +0000
+Message-ID: <87fs0k94og.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kunkun Jiang <jiangkunkun@huawei.com>
+Cc: <dongli.zhang@oracle.com>,
+	<cohuck@redhat.com>,
+	<jasowang@redhat.com>,
+	<stefanha@redhat.com>,
+	<mst@redhat.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Gavin Shan <gshan@redhat.com>,
+	Jean-Philippe Brucker
+	<jean-philippe@linaro.org>,
+	"open list:IRQCHIP DRIVERS"
+	<linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<wanghaibin.wang@huawei.com>
+Subject: Re: [RFC PATCH] KVM: arm/arm64: GICv4: Support shared VLPI
+In-Reply-To: <952bd5dc-dd20-acc3-d77e-c9b14e5728d3@huawei.com>
+References: <20231102143507.840-1-jiangkunkun@huawei.com>
+	<87msvt6cc7.wl-maz@kernel.org>
+	<1fb8353e-e9c4-2570-c2ca-ec537c18ac4d@huawei.com>
+	<86edh228xx.wl-maz@kernel.org>
+	<952bd5dc-dd20-acc3-d77e-c9b14e5728d3@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZWoE_55_6q7lqJvo@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, dongli.zhang@oracle.com, cohuck@redhat.com, jasowang@redhat.com, stefanha@redhat.com, mst@redhat.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, gshan@redhat.com, jean-philippe@linaro.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Dec 01, 2023 at 08:08:31AM -0800, Sean Christopherson wrote:
-> On Thu, Nov 30, 2023, Sean Christopherson wrote:
-> > On Thu, Nov 30, 2023, Andrew Jones wrote:
-> > > A few __TEST_REQUIRE callers are appending their own newline, resulting
-> > > in an extra one being output. Rather than remove the newlines from
-> > > those callers, remove it from __TEST_REQUIRE and add newlines to all
-> > > the other callers, as __TEST_REQUIRE was the only output function
-> > > appending newlines and consistency is a good thing.
-> > > 
-> > > Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
-> > > ---
-> > > 
-> > > Applies to kvm-x86/selftests (I chose that branch to ensure I got the
-> > > MAGIC_TOKEN change)
-> > 
-> > Heh, and then I went and created a conflict anyways :-)
-> > 
-> > https://lore.kernel.org/all/20231129224042.530798-1-seanjc@google.com
-> > 
-> > If there are no objections, I'll grab this in kvm-x86/selftests and sort out the
-> > MAGIC_TOKEN conflict.
+Hi Kunkun,
+
+On Wed, 08 Nov 2023 09:45:51 +0000,
+Kunkun Jiang <jiangkunkun@huawei.com> wrote:
 > 
-> Actually, I misread the patch.  I thought you were removing newlines, not adding
-> them.  My thinking for TEST_REQUIRE() is that it should look and behave like
-> TEST_ASSERT(), not like a raw printf().  I.e. the caller provides the raw message,
-> and the framework handles formatting the final output.
+> Hi Marc,
+> 
+> On 2023/11/6 23:33, Marc Zyngier wrote:
+> > On Mon, 06 Nov 2023 14:59:01 +0000,
+> > Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+> >> The virtio-pci driver write entry1-6
+> >> massage.data in the msix-table and trap to QEMU for processing. The
+> >> massage.data is as follow:
+> >>> entry-0 0
+> >>> entry-1 1
+> >>> entry-2 1
+> >>> entry-3 1
+> >>> entry-4 1
+> >>> entry-5 1
+> >>> entry-6 1
+> > Urgh... is vp_modern_queue_vector() used in your configuration? This
+> > is ... terrible.
+> I encountered this problem using the 4.19 version kernel, but not the
+> 5.10 version. This vp_modern_queue_vector() function does not exist
+> in 4.19, but it uses 'vp_iowrite16(msix_vec, &cfg->queue_msix_vector)',
+> the same as vp_modern_queue_vector().
+> 
+> In the past two days, I learned about the virtio driver and made some
+> new discoveries. When 'num_queues' is greater than maxcpus, it will
+> fall back into MSI-X with one shared for queues. The two patches[1],
+> submitted by Dongli, limits the number of hw queues used by
+> virtio-blk/virtio-scsi by 'nr_cpu_ids'. The two patches were merged
+> in 5.1-rc2. And the patch related virtio-blk was merged into the 4.19
+> stable branch.The patch related virtio-scsi was not merged.
+> [1]
+> https://lore.kernel.org/all/1553682995-5682-1-git-send-email-dongli.zhang@oracle.com/
+> 
+> This is the earliest discussion.
+> https://lore.kernel.org/all/e4afe4c5-0262-4500-aeec-60f30734b4fc@default/
+> 
+> I don't know if there are other circumstances that would cause it to
+> fall back into MSI-X with one shared for queues. At least the hack
+> method is possible.
+> > I wonder if PCIe actually allows this sort of thing.
+> Do you think the virtio driver should be modified?
 
-Darn. I'm not sure how I forgot about the other TEST_* functions. We
-indeed want them to be consistent. I'll reverse the patch. Also, it
-looks like when errno == EACCES, test_assert() will be missing a newline.
-I'll do a quick audit of TEST_* functions and their callers this time
-around.
+I think the virtio driver should stop messing with the MSI-X
+configuration behind the kernel's back. For example, what happens if
+the kernel needs to do a disable_irq() on the "shared" interrupt? It
+will mask the interrupt in *one* of the vectors, and the interrupt
+will still be screaming.
 
-Thanks,
-drew
+This is terribly broken, even on x86.
+
+> > In any case, this sort of behaviour breaks so many thing in KVM's
+> > implementation that I'd recommend you disable GICv4 until we have a
+> > good solution for that.
+> There seems to be no restriction in the GIC specification that multiple
+> host irqs cannot be mapped to the same vlpi. Or maybe I didn't notice.
+> Do you think there are any risks?
+
+Please see 5.2.10 ("Restrictions for INTID mapping rules"), which
+clearly forbids the case we have here: "Maps multiple EventID-DeviceID
+combinations to the same virtual LPI INTID-vPEID.".
+
+> GICv3 does not have this issue, but is this configuration legal?
+
+With GICv3, the ITS doesn't see multiple mappings to the same
+LPI. Each DeviceID/EventID pair has its own LPI, and KVM will just see
+the injection callback from VFIO.
+
+Honestly, the virtio driver is broken (irrespective of the
+architecture), and incompatible with the GIC architecture.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
