@@ -1,228 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1214EEAD8;
-	Mon,  4 Dec 2023 08:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91398C8F9
+	for <kvmarm@lists.linux.dev>; Mon,  4 Dec 2023 08:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J0JS+DS0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75A2BC433C8;
-	Mon,  4 Dec 2023 08:42:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701679370;
-	bh=2hI21E5d7yISQiEU7qyNrku3/qKcokHOmhNwgh0+Zzk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=J0JS+DS0T/xYERSJvf7SVSu3t8FBddNgtC8ZdvbhLYQGdcePXwU5pma2oVAZQuGNN
-	 YB0JTppJ0yo50otMkg0tCS+dofexu50Gu4WLrsnNhvRgxDNCFztSRrG3IrU4me8GPb
-	 EWRKQR9pukbBtu1lwKtj/u0i1vxVjMgf6QDqwXK8w0xxFhhixUmNHUZ4gnLkznt1ny
-	 R8xed3hXpLbYtFXyh95K7BEefzRIeheVXR/3Y24tPLoc44+ODZSFQ84Y1f4Py3rpb3
-	 x/EGmonseney/DAi0d4AN1VZhJLSeyM01YksyRDpYa0bHpvY4VPc3P/ZlGCdInfC/c
-	 U5urf+24tTnzQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rA4XP-001962-VH;
-	Mon, 04 Dec 2023 08:42:48 +0000
-Date: Mon, 04 Dec 2023 08:42:47 +0000
-Message-ID: <86ttoybbp4.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	mark.rutland@arm.com,
-	Mark Brown <broonie@kernel.org>,
-	James Clark <james.clark@arm.com>,
-	Rob Herring <robh@kernel.org>,
-	Suzuki Poulose <suzuki.poulose@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	linux-perf-users@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH V15 5/8] KVM: arm64: nvhe: Disable branch generation in nVHE guests
-In-Reply-To: <20231201053906.1261704-6-anshuman.khandual@arm.com>
-References: <20231201053906.1261704-1-anshuman.khandual@arm.com>
-	<20231201053906.1261704-6-anshuman.khandual@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S2SvPfDu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701679684;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1O1GHkZ2Qe7CcODotGlaFEj1pA1PKM1puCHikGn9aeQ=;
+	b=S2SvPfDuELzRzONtyUTByXhBQgumhnCzcKZPkn+brvRTulegrbRXsBazaf7e/p5mQNPuag
+	YiPtKPPXmiZ7ANnhClO/Z6l3a9GQ0cEztDzBKQurulZR8VXocl7oUqnGTbcxANN+3hO6Zw
+	l5nMYxKUh0zZuYOWPeMEccbHY+Pa7aQ=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-437-rDbHhTYFOkO8Tt_XYVe8iQ-1; Mon, 04 Dec 2023 03:48:03 -0500
+X-MC-Unique: rDbHhTYFOkO8Tt_XYVe8iQ-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-50bf00775ecso1043628e87.0
+        for <kvmarm@lists.linux.dev>; Mon, 04 Dec 2023 00:48:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701679681; x=1702284481;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1O1GHkZ2Qe7CcODotGlaFEj1pA1PKM1puCHikGn9aeQ=;
+        b=bntd97copX5tSq+ajpYovWNQ6REkueS6vp32Om8WTg/TmlrVbkBXn0VI2sGBP8dodG
+         +ok+NYXnKDdwh+q6qtvWKpuCKwkxY2sFuMdv6Ktm0+UazhnIEDlAttZYr2zYCtF9ucVI
+         99lx8b4BYo8WSxeLiwGchck5WFawmn9b4iaUU90J/3taXkhK9L/GfYbMilE4+yTM6jqV
+         8shoDyqXoNaolcNcqXQDs7NumTlYcW5gK+PS3HGrm9Ez+KTDUVxJhJH1AWQ15XacONeS
+         5HF92lGEpisGrpJ7RcpGK5kZK5U+3svAe+7T5/68cpKNh6OiYtMFqSqN6eT8VSeBD156
+         cZwA==
+X-Gm-Message-State: AOJu0YxMDwAlLZQWBJl9z/d3Te4wyV8Hlkxz6OGQMveqcAJysZZYcOEY
+	87Fc7NLB0U8QutC24i64SIyacFzVJL4KK1k65RNDPz5G9DbKj1oDbBMVjCMxTYbJk1c9aQhozyJ
+	KIkRBOg0iXzOaKZavNGPkIjVOedjRRUEt
+X-Received: by 2002:a05:6512:31c4:b0:50b:d764:9682 with SMTP id j4-20020a05651231c400b0050bd7649682mr3453488lfe.102.1701679681543;
+        Mon, 04 Dec 2023 00:48:01 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFNpyZl3CwMVFLh53IQjaLkzKjbxZ1SQYuv9EPSLS5561Kpl2BVkIh6xEnVf/SBfcuxpc2n7FrGmD2cINj4zVM=
+X-Received: by 2002:a05:6512:31c4:b0:50b:d764:9682 with SMTP id
+ j4-20020a05651231c400b0050bd7649682mr3453465lfe.102.1701679681197; Mon, 04
+ Dec 2023 00:48:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, broonie@kernel.org, james.clark@arm.com, robh@kernel.org, suzuki.poulose@arm.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, linux-perf-users@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20231102143507.840-1-jiangkunkun@huawei.com> <87msvt6cc7.wl-maz@kernel.org>
+ <1fb8353e-e9c4-2570-c2ca-ec537c18ac4d@huawei.com> <86edh228xx.wl-maz@kernel.org>
+ <952bd5dc-dd20-acc3-d77e-c9b14e5728d3@huawei.com> <87fs0k94og.wl-maz@kernel.org>
+ <CACGkMEt5sapZjpyBSM5oX_=k1AcefEe5D4wtX=HqtHy4AD3j_g@mail.gmail.com>
+In-Reply-To: <CACGkMEt5sapZjpyBSM5oX_=k1AcefEe5D4wtX=HqtHy4AD3j_g@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 4 Dec 2023 16:47:49 +0800
+Message-ID: <CACGkMEub4f0FWsrJzSK4e+9cC6LUNFm3vAcfSkpsp6pD=WM5qA@mail.gmail.com>
+Subject: Re: [RFC PATCH] KVM: arm/arm64: GICv4: Support shared VLPI
+To: Marc Zyngier <maz@kernel.org>
+Cc: Kunkun Jiang <jiangkunkun@huawei.com>, dongli.zhang@oracle.com, cohuck@redhat.com, 
+	stefanha@redhat.com, mst@redhat.com, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>, 
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+	"open list:IRQCHIP DRIVERS" <linux-kernel@vger.kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 01 Dec 2023 05:39:03 +0000,
-Anshuman Khandual <anshuman.khandual@arm.com> wrote:
-> 
-> Disable the BRBE before we enter the guest, saving the status and enable it
-> back once we get out of the guest. This is just to avoid capturing records
-> in the guest kernel/userspace, which would be confusing the samples.
-
-Why does it have to be limited to non-VHE? What protects host EL0
-records from guest's EL0 execution when the host is VHE?
-
-> 
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: kvmarm@lists.linux.dev
-> Cc: linux-arm-kernel@lists.infradead.org
-> CC: linux-kernel@vger.kernel.org
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> ---
-> Changes in V15:
-> 
-> - Dropped runtime BRBE enable for setting DEBUG_STATE_SAVE_BRBE
-> - Dropped BRBFCR_EL1 from __debug_save_brbe()/__debug_restore_brbe()
-> - Always save the live SYS_BRBCR_EL1 in host context and then check if
->   BRBE was enabled before resetting SYS_BRBCR_EL1 for the host
-> 
->  arch/arm64/include/asm/kvm_host.h  |  4 ++++
->  arch/arm64/kvm/debug.c             |  5 +++++
->  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 33 ++++++++++++++++++++++++++++++
->  3 files changed, 42 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 68421c74283a..1faa0430d8dd 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -449,6 +449,8 @@ enum vcpu_sysreg {
->  	CNTHV_CVAL_EL2,
->  	PMSCR_EL1,	/* Statistical profiling extension */
->  	TRFCR_EL1,	/* Self-hosted trace filters */
-> +	BRBCR_EL1,	/* Branch Record Buffer Control Register */
-> +	BRBFCR_EL1,	/* Branch Record Buffer Function Control Register */
-
-Whose state is this? If this is limited to the host, it has no purpose
-in this enum. Once you add guest support, then it will make sense.
-
+On Mon, Dec 4, 2023 at 4:39=E2=80=AFPM Jason Wang <jasowang@redhat.com> wro=
+te:
 >
->  	NR_SYS_REGS	/* Nothing after this line! */
->  };
-> @@ -753,6 +755,8 @@ struct kvm_vcpu_arch {
->  #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
->  /* Save trace filter controls */
->  #define DEBUG_STATE_SAVE_TRFCR	__vcpu_single_flag(iflags, BIT(8))
-> +/* Save BRBE context if active  */
-> +#define DEBUG_STATE_SAVE_BRBE	__vcpu_single_flag(iflags, BIT(9))
->  
->  /* SVE enabled for host EL0 */
->  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index 2ab41b954512..fa46a70a9503 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -354,6 +354,10 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
->  		    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
->  			vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
->  	}
-> +
-> +	/* Check if we have BRBE implemented and available at the host */
-> +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRBE_SHIFT))
-> +		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
->  }
->  
->  void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
-> @@ -361,6 +365,7 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
->  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
->  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
->  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
-> +	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
->  }
->  
->  void kvm_etm_set_guest_trfcr(u64 trfcr_guest)
-> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> index 6174f710948e..1994fc48b57c 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> @@ -93,6 +93,33 @@ static void __debug_restore_trace(struct kvm_cpu_context *host_ctxt,
->  		write_sysreg_s(ctxt_sys_reg(host_ctxt, TRFCR_EL1), SYS_TRFCR_EL1);
->  }
->  
-> +static void __debug_save_brbe(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	ctxt_sys_reg(host_ctxt, BRBCR_EL1) = read_sysreg_s(SYS_BRBCR_EL1);
-> +
-> +	/* Check if the BRBE is enabled */
-> +	if (!(ctxt_sys_reg(host_ctxt, BRBCR_EL1) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
-> +		return;
+> On Sat, Dec 2, 2023 at 8:20=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrot=
+e:
+> >
+> > Hi Kunkun,
+> >
+> > On Wed, 08 Nov 2023 09:45:51 +0000,
+> > Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+> > >
+> > > Hi Marc,
+> > >
+> > > On 2023/11/6 23:33, Marc Zyngier wrote:
+> > > > On Mon, 06 Nov 2023 14:59:01 +0000,
+> > > > Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+> > > >> The virtio-pci driver write entry1-6
+> > > >> massage.data in the msix-table and trap to QEMU for processing. Th=
+e
+> > > >> massage.data is as follow:
+> > > >>> entry-0 0
+> > > >>> entry-1 1
+> > > >>> entry-2 1
+> > > >>> entry-3 1
+> > > >>> entry-4 1
+> > > >>> entry-5 1
+> > > >>> entry-6 1
+>
+> It looks like a bug from the driver. It should only use vector 0 and 1
+> in this case.
+>
+> Could you please check the queue_msix_vector for each queue in this case?
 
-Why save BRBCR_EL1 if there is nothing enabled? It isn't like it can
-change behind your back, can it?
+Or did you actually mean queue_msix_vector here? I'm not familiar with
+ARM but 0 doesn't seem to be a good message.data anyhow.
 
-> +
-> +	/*
-> +	 * Prohibit branch record generation while we are in guest.
-> +	 * Since access to BRBCR_EL1 is trapped, the guest can't
-> +	 * modify the filtering set by the host.
-> +	 */
-> +	write_sysreg_s(0, SYS_BRBCR_EL1);
-> +	isb();
+Thanks
 
-What is the point of this ISB? We're at EL2, and this only affects
-EL1.
-
-> +}
-> +
-> +static void __debug_restore_brbe(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	if (!ctxt_sys_reg(host_ctxt, BRBCR_EL1))
-> +		return;
-
-So on one side you're using a flag, and on the other you're using the
-*value*. You need some consistency.
-
-> +
-> +	/* Restore BRBE controls */
-> +	write_sysreg_s(ctxt_sys_reg(host_ctxt, BRBCR_EL1), SYS_BRBCR_EL1);
-> +	isb();
-
-Same question.
-
-> +}
-> +
->  void __debug_save_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
->  				    struct kvm_cpu_context *guest_ctxt)
->  {
-> @@ -102,6 +129,10 @@ void __debug_save_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
->  
->  	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_TRFCR))
->  		__debug_save_trace(host_ctxt, guest_ctxt);
-> +
-> +	/* Disable BRBE branch records */
-> +	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_BRBE))
-> +		__debug_save_brbe(host_ctxt);
->  }
->  
->  void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
-> @@ -116,6 +147,8 @@ void __debug_restore_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
->  		__debug_restore_spe(host_ctxt);
->  	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_TRFCR))
->  		__debug_restore_trace(host_ctxt, guest_ctxt);
-> +	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_BRBE))
-> +		__debug_restore_brbe(host_ctxt);
->  }
->  
->  void __debug_switch_to_host(struct kvm_vcpu *vcpu)
-
-The lifetime of this flag seems bogus, specially when there is nothing
-to do, which will always be the arch-majority of the executions.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
