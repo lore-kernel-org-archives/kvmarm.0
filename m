@@ -1,144 +1,351 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09A9241E9
-	for <kvmarm@lists.linux.dev>; Mon,  4 Dec 2023 18:23:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7312EAFD;
+	Mon,  4 Dec 2023 18:26:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="yocSKJDC"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=OVfC8HmVSUtxQSExvUxbBU1pNZlzr2LJhw+rAKbX5PE=; b=yocSKJDCG9Uq3lu3L6Vrl+Aa1r
-	hRWP9mRlH8sq12iLzchSEn00N5gmtrXOrFxLBNbR5mZygwpfm35B6cyE+GVr+/PzVFYlmkHqrAwvr
-	iIE5YHq2YvOTv8yWAuDG1g2luAQ9ig0vVnSn7XLSMu+D7/SPDmP2V78Fe3cj5XQug/dcyZ2X+MlNr
-	pLAJlYa5DIv3yhIoRvY18doA0PBzavkAmkkl8VLUKq+nG7ker/GZ8/nnZqdFecoAx0X10dVEH0AW0
-	6cGst5/hVpu9tiNV+37ht5O02SqHfmN5alCAKSWBmod/hT3V7vYe9wq3qzhqKiISEDdpBQBQZbYTI
-	w96wF+BQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49384)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rADay-0005sX-2j;
-	Mon, 04 Dec 2023 18:23:06 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rADaw-0000tZ-LP; Mon, 04 Dec 2023 18:23:02 +0000
-Date: Mon, 4 Dec 2023 18:23:02 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
-	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
-	x86@kernel.org, acpica-devel@lists.linuxfoundation.org,
-	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	jianyong.wu@arm.com, justin.he@arm.com,
-	James Morse <james.morse@arm.com>
-Subject: Re: [RFC PATCH v3 00/39] ACPI/arm64: add support for virtual
- cpuhotplug
-Message-ID: <ZW4ZBkj2oCmxv55T@shell.armlinux.org.uk>
-References: <ZTffkAdOqL2pI2la@shell.armlinux.org.uk>
- <CAJZ5v0j-73_+9U3ngDAf9w1ADDhBTKctJdWboqUk-okH2TQGyg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OQqUHh2n"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2B9DC433C9;
+	Mon,  4 Dec 2023 18:26:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701714389;
+	bh=g91sT1EKPZFvuDzybGs4cyiAl3wctSKiKYLzajVksjQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OQqUHh2n1TiH2JRoOdv/a4dq9eMKmzdI/c83HEqn8BxOlPTpnLzFCgqLAihK0RGhg
+	 E33oB53SGKXmVUH0VaVLrMQQrVa/IjSclNmNuShdT1O3+nx/52/WK6bQH99EKSCZz8
+	 h0OCBKyklznHNM9v+Pvep/M2/ebHU7KnCSF6MBWQowUl9awpVlViAZojwcSeu2w8rb
+	 3Ry/u9opfKKNtZJ1Ru2+7oSysPMPSrXJdFaOaxN/vseF1oriI7wnIsFwsaZtSGheda
+	 nH5HIZL+C5eQfEgaU5J0tPT2n1Ij66C+vn0xVa18Xlp9bes9LHEgknYduZ6g3e/Vbx
+	 0HAA4EJqUAKnw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rADeE-001Jz6-EW;
+	Mon, 04 Dec 2023 18:26:26 +0000
+Date: Mon, 04 Dec 2023 18:26:25 +0000
+Message-ID: <86h6kxbz8u.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v3 0/3] arm64: Drop support for VPIPT i-cache policy
+In-Reply-To: <ZW3l6Bq7ortEGB8I@FVFF77S0Q05N>
+References: <20231204143606.1806432-1-maz@kernel.org>
+	<ZW3l6Bq7ortEGB8I@FVFF77S0Q05N>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJZ5v0j-73_+9U3ngDAf9w1ADDhBTKctJdWboqUk-okH2TQGyg@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: mark.rutland@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will@kernel.org, catalin.marinas@arm.com, ardb@kernel.org, anshuman.khandual@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Oct 24, 2023 at 08:26:58PM +0200, Rafael J. Wysocki wrote:
-> On Tue, Oct 24, 2023 at 5:15 PM Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
-> >
-> > Hi,
-> >
-> > I'm posting James' patch set updated with most of the review comments
-> > from his RFC v2 series back in September. Individual patches have a
-> > changelog attached at the bottom of the commit message. Those which
-> > I have finished updating have my S-o-b on them, those which still have
-> > outstanding review comments from RFC v2 do not. In some of these cases
-> > I've asked questions and am waiting for responses.
-> >
-> > I'm posting this as RFC v3 because there's still some unaddressed
-> > comments and it's clearly not ready for merging. Even if it was ready
-> > to be merged, it is too late in this development cycle to be taking
-> > this change in, so there would be little point posting it non-RFC.
-> > Also James stated that he's waiting for confirmation from the
-> > Kubernetes/Kata folk - I have no idea what the status is there.
-> >
-> > I will be sending each patch individually to a wider audience
-> > appropriate for that patch - apologies to those missing out on this
-> > cover message. I have added more mailing lists to the series with the
-> > exception of the acpica list in a hope of this cover message also
-> > reaching those folk.
-> >
-> > The changes that aren't included are:
-> >
-> > 1. Updates for my patch that was merged via Thomas (thanks!):
-> >    c4dd854f740c cpu-hotplug: Provide prototypes for arch CPU registration
-> >    rather than having this change spread through James' patches.
-> >
-> > 2. New patch - simplification of PA-RISC's smp_prepare_boot_cpu()
-> >
-> > 3. Moved "ACPI: Use the acpi_device_is_present() helper in more places"
-> >    and "ACPI: Rename acpi_scan_device_not_present() to be about
-> >    enumeration" to the beginning of the series - these two patches are
-> >    already queued up for merging into 6.7.
-> >
-> > 4. Moved "arm64, irqchip/gic-v3, ACPI: Move MADT GICC enabled check into
-> >    a helper" to the beginning of the series, which has been submitted,
-> >    but as yet the fate of that posting isn't known.
-> >
-> > The first four patches in this series are provided for completness only.
-> >
-> > There is an additional patch in James' git tree that isn't in the set
-> > of patches that James posted: "ACPI: processor: Only call
-> > arch_unregister_cpu() if HOTPLUG_CPU is selected" which looks to me to
-> > be a workaround for arch_unregister_cpu() being under the ifdef. I've
-> > commented on this on the RFC v2 posting making a suggestion, but as yet
-> > haven't had any response.
-> >
-> > I've included almost all of James' original covering body below the
-> > diffstat.
-> >
-> > The reason that I'm doing this is to help move this code forward so
-> > hopefully it can be merged - which is why I have been keen to dig out
-> > from James' patches anything that can be merged and submit it
-> > separately, since this is a feature for which some users have a
-> > definite need for.
-> 
-> I've gone through the series and there is at least one thing in it
-> that concerns me a lot and some others that at least appear to be
-> really questionable.
-> 
-> I need more time to send comments which I'm not going to do before the
-> 6.7 merge window (sorry), but from what I can say right now, this is
-> not looking good.
-
-Hi Rafael,
-
-Will you be able to send your comments, so that we can find out what
-your other concerns are please? I'm getting questions from interested
-parties who want to know what your concerns are.
-
-Nothing much has changed to the ACPI changes, so I think it's still
-valid to have the comments back for this.
+On Mon, 04 Dec 2023 14:44:56 +0000,
+Mark Rutland <mark.rutland@arm.com> wrote:
+>=20
+> On Mon, Dec 04, 2023 at 02:36:03PM +0000, Marc Zyngier wrote:
+> > ARMv8.2 introduced support for VPIPT i-caches, the V standing for
+> > VMID-tagged. Although this looked like a reasonable idea, no
+> > implementation has ever made it into the wild.
+> >=20
+> > Linux has supported this for over 6 years (amusingly, just as the
+> > architecture was dropping support for AIVIVT i-caches), but we had no
+> > way to even test it, and it is likely that this code was just
+> > bit-rotting.
+> >=20
+> > However, in a recent breakthrough (XML drop 2023-09, tagged as
+> > d55f5af8e09052abe92a02adf820deea2eaed717), the architecture has
+> > finally been purged of this option, making VIPT and PIPT the only two
+> > valid options.
+> >=20
+> > This really means this code is just dead code. Nobody will ever come
+> > up with such an implementation, and we can just get rid of it.
+> >=20
+> > Most of the impact is on KVM, where we drop a few large comment blocks
+> > (and a bit of code), while the core arch code loses the detection code
+> > itself.
+> >=20
+> > * From v2:
+> >   - Fix reserved naming for RESERVED_AIVIVT
+> >   - Collected RBs from Anshuman an Zenghui
+> >=20
+> > Marc Zyngier (3):
+> >   KVM: arm64: Remove VPIPT I-cache handling
+> >   arm64: Kill detection of VPIPT i-cache policy
+> >   arm64: Rename reserved values for CTR_EL0.L1Ip
+>=20
+> For the series:
+>=20
+> Acked-by: Mark Rutland <mark.rutland@arm.com>
 
 Thanks.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> Looking forward, we can/should probably replace __icache_flags with a sin=
+gle
+> ICACHE_NOALIASING or ICACHE_PIPT cpucap, which'd get rid of a bunch of
+> duplicated logic and make that more sound in the case of races around cpu
+> onlining.
+
+As long as we refuse VIPT CPUs coming up late (i.e. after we have
+patched the kernel to set ICACHE_PIPT), it should be doable. I guess
+we already have this restriction as userspace is able to probe the
+I-cache policy anyway.
+
+How about the patch below (tested in a guest with a bunch of hacks to
+expose different L1Ip values)?
+
+Thanks,
+
+	M.
+
+=46rom 8f88afb0b317213dcbf18ea460a508bfccc18568 Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Mon, 4 Dec 2023 18:09:40 +0000
+Subject: [PATCH] arm64: Make icache detection a cpu capability
+
+Now that we only have two icache policies, we are in a good position
+to make the whole detection business more robust.
+
+Let's replace __icache_flags by a single capability (ICACHE_PIPT),
+and use this if all CPUs are indeed PIPT. It means we can rely on
+existing logic to mandate that a VIPT CPU coming up late will be
+denied booting, which is the safe thing to do.
+
+This also leads to some nice cleanups in pKVM, and KVM as a whole
+can use ARM64_ICACHE_PIPT as a final cap.
+
+Suggested-by: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/cache.h   |  9 ++-------
+ arch/arm64/include/asm/kvm_hyp.h |  1 -
+ arch/arm64/include/asm/kvm_mmu.h |  2 +-
+ arch/arm64/kernel/cpufeature.c   |  7 +++++++
+ arch/arm64/kernel/cpuinfo.c      | 34 --------------------------------
+ arch/arm64/kvm/arm.c             |  1 -
+ arch/arm64/kvm/hyp/nvhe/pkvm.c   |  3 ---
+ arch/arm64/tools/cpucaps         |  1 +
+ arch/arm64/tools/sysreg          |  2 +-
+ 9 files changed, 12 insertions(+), 48 deletions(-)
+
+diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
+index 06a4670bdb0b..8ef9522a6151 100644
+--- a/arch/arm64/include/asm/cache.h
++++ b/arch/arm64/include/asm/cache.h
+@@ -37,9 +37,9 @@
+=20
+ #ifndef __ASSEMBLY__
+=20
+-#include <linux/bitops.h>
+ #include <linux/kasan-enabled.h>
+=20
++#include <asm/cpufeature.h>
+ #include <asm/cputype.h>
+ #include <asm/mte-def.h>
+ #include <asm/sysreg.h>
+@@ -55,18 +55,13 @@ static inline unsigned int arch_slab_minalign(void)
+ #define arch_slab_minalign() arch_slab_minalign()
+ #endif
+=20
+-#define CTR_L1IP(ctr)		SYS_FIELD_GET(CTR_EL0, L1Ip, ctr)
+-
+-#define ICACHEF_ALIASING	0
+-extern unsigned long __icache_flags;
+-
+ /*
+  * Whilst the D-side always behaves as PIPT on AArch64, aliasing is
+  * permitted in the I-cache.
+  */
+ static inline int icache_is_aliasing(void)
+ {
+-	return test_bit(ICACHEF_ALIASING, &__icache_flags);
++	return !cpus_have_cap(ARM64_ICACHE_PIPT);
+ }
+=20
+ static inline u32 cache_type_cwg(void)
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_=
+hyp.h
+index 145ce73fc16c..7ad70f9865fd 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -140,7 +140,6 @@ extern u64 kvm_nvhe_sym(id_aa64mmfr1_el1_sys_val);
+ extern u64 kvm_nvhe_sym(id_aa64mmfr2_el1_sys_val);
+ extern u64 kvm_nvhe_sym(id_aa64smfr0_el1_sys_val);
+=20
+-extern unsigned long kvm_nvhe_sym(__icache_flags);
+ extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
+=20
+ #endif /* __ARM64_KVM_HYP_H__ */
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_=
+mmu.h
+index e3e793d0ec30..ab86c2f025cf 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -248,7 +248,7 @@ static inline void __invalidate_icache_guest_page(void =
+*va, size_t size)
+ 	 * invalidation range exceeds our arbitrary limit on invadations by
+ 	 * cache line.
+ 	 */
+-	if (icache_is_aliasing() || size > __invalidate_icache_max_range())
++	if (!cpus_have_final_cap(ARM64_ICACHE_PIPT) || size > __invalidate_icache=
+_max_range())
+ 		icache_inval_all_pou();
+ 	else
+ 		icache_inval_pou((unsigned long)va, (unsigned long)va + size);
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 646591c67e7a..73a37176676e 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2272,6 +2272,13 @@ static const struct arm64_cpu_capabilities arm64_fea=
+tures[] =3D {
+ 		.type =3D ARM64_CPUCAP_SYSTEM_FEATURE,
+ 		.matches =3D has_always,
+ 	},
++	{
++		.desc =3D "PIPT I-cache policy",
++		.capability =3D ARM64_ICACHE_PIPT,
++		.type =3D ARM64_CPUCAP_SYSTEM_FEATURE,
++		.matches =3D has_cpuid_feature,
++		ARM64_CPUID_FIELDS(CTR_EL0, L1Ip, PIPT)
++	},
+ 	{
+ 		.desc =3D "GIC system register CPU interface",
+ 		.capability =3D ARM64_HAS_GIC_CPUIF_SYSREGS,
+diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
+index 47043c0d95ec..a4ea331fb6d4 100644
+--- a/arch/arm64/kernel/cpuinfo.c
++++ b/arch/arm64/kernel/cpuinfo.c
+@@ -33,20 +33,6 @@
+ DEFINE_PER_CPU(struct cpuinfo_arm64, cpu_data);
+ static struct cpuinfo_arm64 boot_cpu_data;
+=20
+-static inline const char *icache_policy_str(int l1ip)
+-{
+-	switch (l1ip) {
+-	case CTR_EL0_L1Ip_VIPT:
+-		return "VIPT";
+-	case CTR_EL0_L1Ip_PIPT:
+-		return "PIPT";
+-	default:
+-		return "RESERVED/UNKNOWN";
+-	}
+-}
+-
+-unsigned long __icache_flags;
+-
+ static const char *const hwcap_str[] =3D {
+ 	[KERNEL_HWCAP_FP]		=3D "fp",
+ 	[KERNEL_HWCAP_ASIMD]		=3D "asimd",
+@@ -378,24 +364,6 @@ static int __init cpuinfo_regs_init(void)
+ }
+ device_initcall(cpuinfo_regs_init);
+=20
+-static void cpuinfo_detect_icache_policy(struct cpuinfo_arm64 *info)
+-{
+-	unsigned int cpu =3D smp_processor_id();
+-	u32 l1ip =3D CTR_L1IP(info->reg_ctr);
+-
+-	switch (l1ip) {
+-	case CTR_EL0_L1Ip_PIPT:
+-		break;
+-	case CTR_EL0_L1Ip_VIPT:
+-	default:
+-		/* Assume aliasing */
+-		set_bit(ICACHEF_ALIASING, &__icache_flags);
+-		break;
+-	}
+-
+-	pr_info("Detected %s I-cache on CPU%d\n", icache_policy_str(l1ip), cpu);
+-}
+-
+ static void __cpuinfo_store_cpu_32bit(struct cpuinfo_32bit *info)
+ {
+ 	info->reg_id_dfr0 =3D read_cpuid(ID_DFR0_EL1);
+@@ -457,8 +425,6 @@ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *i=
+nfo)
+=20
+ 	if (id_aa64pfr0_32bit_el0(info->reg_id_aa64pfr0))
+ 		__cpuinfo_store_cpu_32bit(&info->aarch32);
+-
+-	cpuinfo_detect_icache_policy(info);
+ }
+=20
+ void cpuinfo_store_cpu(void)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index e5f75f1f1085..a5f71165cd5c 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2242,7 +2242,6 @@ static void kvm_hyp_init_symbols(void)
+ 	kvm_nvhe_sym(id_aa64mmfr1_el1_sys_val) =3D read_sanitised_ftr_reg(SYS_ID_=
+AA64MMFR1_EL1);
+ 	kvm_nvhe_sym(id_aa64mmfr2_el1_sys_val) =3D read_sanitised_ftr_reg(SYS_ID_=
+AA64MMFR2_EL1);
+ 	kvm_nvhe_sym(id_aa64smfr0_el1_sys_val) =3D read_sanitised_ftr_reg(SYS_ID_=
+AA64SMFR0_EL1);
+-	kvm_nvhe_sym(__icache_flags) =3D __icache_flags;
+ 	kvm_nvhe_sym(kvm_arm_vmid_bits) =3D kvm_arm_vmid_bits;
+ }
+=20
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index b29f15418c0a..187ce5720697 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -12,9 +12,6 @@
+ #include <nvhe/pkvm.h>
+ #include <nvhe/trap_handler.h>
+=20
+-/* Used by icache_is_aliasing(). */
+-unsigned long __icache_flags;
+-
+ /* Used by kvm_get_vttbr(). */
+ unsigned int kvm_arm_vmid_bits;
+=20
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index b98c38288a9d..9c6313cd6f5e 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -53,6 +53,7 @@ HAS_TLB_RANGE
+ HAS_VIRT_HOST_EXTN
+ HAS_WFXT
+ HW_DBM
++ICACHE_PIPT
+ KVM_HVHE
+ KVM_PROTECTED_MODE
+ MISMATCHED_CACHE_TYPE
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index c5af75b23187..db8c96841138 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -2003,7 +2003,7 @@ Field	28	IDC
+ Field	27:24	CWG
+ Field	23:20	ERG
+ Field	19:16	DminLine
+-Enum	15:14	L1Ip
++UnsignedEnum	15:14	L1Ip
+ 	# This was named as VPIPT in the ARM but now documented as reserved
+ 	0b00	RESERVED_VPIPT
+ 	# This is named as AIVIVT in the ARM but documented as reserved
+--=20
+2.39.2
+
+
+--=20
+Without deviation from the norm, progress is not possible.
