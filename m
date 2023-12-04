@@ -1,114 +1,134 @@
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA728A41
-	for <kvmarm@lists.linux.dev>; Mon,  4 Dec 2023 03:01:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33DCCC8E7;
+	Mon,  4 Dec 2023 08:22:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ma291zuT"
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6ce32821a53so269126b3a.0
-        for <kvmarm@lists.linux.dev>; Sun, 03 Dec 2023 19:01:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1701658912; x=1702263712; darn=lists.linux.dev;
-        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=CQYiiiRLontcDI44whmeD/LoEJVxuqfkBiryqv/zBTg=;
-        b=Ma291zuT9Zhjq5f5nlMg2UIpKvkZ/+51ExY58xLrtul/qQ1zxB6pMVmLzmadFlgs2H
-         R/DmlgiJ5Urc82X5tL/k+Runu6vUzAyv+AYtCrQAiejk+QpaE8mP4rWL8Kq3WuDA1oy1
-         q3AK9ELV/QQGwYkpy9UiHECZPx0rBi1Y68d7MPouLj0jncrPi7rLIIPA/ulNO7+Eiiv4
-         CWsxsw4UNepKjaO04zTVjgKht9hFx8s7SMiIv200mselBpotoAeZyuP+t/2g6nAfIe3J
-         8H4kVueLvbiV7tTOTxdOxLWbSTgc3kQ+7ZIfLnlLWhZ5G02V4GUJNd8MmRRVXBAQ55wO
-         vV4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701658912; x=1702263712;
-        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CQYiiiRLontcDI44whmeD/LoEJVxuqfkBiryqv/zBTg=;
-        b=fnAUUwSoDmBPGxZbrEXdGwFk12kGYgJyw3oahPrSn4r/Dr2KgXZ+/KtiZ7Cmn3wCaS
-         w3MLK0186CjSv7m4OgcB8u10Ba1nuRUCBUb3gOSlz/Epj2Ko2z1lL/k7NAMjgkYF20Do
-         4vIYrhRQRxpjyrCqhxJ35Lno9PATx6vk3eWiIoftQ7lCn0CqdkXqNRvo7aOhbgpWk+jv
-         i6fc6AfYCxDCbDoZHj9tVd7i5ZfLpki6S3yg1Cqsvr9s08hQCX1ehzMFENEXTkC5QS0q
-         v9qf7YBXQuKuylysrAAp0fV+HWX2ikEhfKivtFtCXI+V5Lmdt6Slnb7k4rb93EddGxWj
-         TrIQ==
-X-Gm-Message-State: AOJu0Yy86uGRPAWCz8n4oCMHim7LWTVTdQnuL/z/VOYx2s5j8hSJhCBF
-	n13Mo305Trqn1OKpagu57WDDUw==
-X-Google-Smtp-Source: AGHT+IHFLJUBmtnWAvysao8TWHQlyk2Cfpox9jD8bkyNgUP4wKyxIxGZHkfjhvm//XUEUavLfPd53A==
-X-Received: by 2002:a05:6a20:748f:b0:18c:8fef:22cc with SMTP id p15-20020a056a20748f00b0018c8fef22ccmr1035248pzd.24.1701658911982;
-        Sun, 03 Dec 2023 19:01:51 -0800 (PST)
-Received: from localhost ([2804:14d:7e39:8470:979a:226c:de55:73de])
-        by smtp.gmail.com with ESMTPSA id c24-20020aa78818000000b006cd88728572sm6562301pfo.211.2023.12.03.19.01.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Dec 2023 19:01:51 -0800 (PST)
-References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
- <20231122-arm64-gcs-v7-13-201c483bd775@kernel.org>
-User-agent: mu4e 1.10.8; emacs 29.1
-From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
- <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Morton
- <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
- <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, Oleg
- Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, Kees
- Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, "Rick P.
- Edgecombe" <rick.p.edgecombe@intel.com>, Deepak Gupta
- <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, Szabolcs Nagy
- <Szabolcs.Nagy@arm.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
- <aou@eecs.berkeley.edu>, Florian Weimer <fweimer@redhat.com>, Christian
- Brauner <brauner@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v7 13/39] arm64/mm: Map pages for guarded control stack
-In-reply-to: <20231122-arm64-gcs-v7-13-201c483bd775@kernel.org>
-Date: Mon, 04 Dec 2023 00:01:49 -0300
-Message-ID: <87a5qqisbm.fsf@linaro.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gLvzMSTe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A425BC433C7;
+	Mon,  4 Dec 2023 08:22:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701678148;
+	bh=d5xd1DNNe8JHTchZ1N0VUvsvu4Wgsp0ilZmuF8NZBgQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gLvzMSTejitY38rVbVjqGTXEH+MOT+PcFUG93c0YgGr336/kcmHuZtMyWAJUur9dj
+	 ylPSMIrRC6wrFF6JH8llfP4lnxofw9JWIRKnnRbtGCKoUGUmv+BvE3zqzIXchLcyIJ
+	 mN17ecVhBQKZ+dWBJT03lM6eIzrvq3+6DCrCLjqF0YaafhQ/cwUi5brHnGaFs86F8I
+	 4b4iOCkO3HIr/O4KlY6DcVzLuCyIZfchlvHG3+jOPQHbJfDpNjrPmWxRBahk/mvnEW
+	 MFOGWM7jIeEf4pzDdJPtfQVNnDvtINBdxCPnCpYJn/bidcPDKIQxzXDyMbQL9ojseN
+	 70ErEzj5WRZbw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rA4Di-0018lj-9m;
+	Mon, 04 Dec 2023 08:22:26 +0000
+Date: Mon, 04 Dec 2023 08:22:25 +0000
+Message-ID: <86v89ebcn2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	mark.rutland@arm.com,
+	Mark Brown <broonie@kernel.org>,
+	James Clark <james.clark@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	Suzuki Poulose <suzuki.poulose@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	linux-perf-users@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH V15 2/8] KVM: arm64: Prevent guest accesses into BRBE system registers/instructions
+In-Reply-To: <20231201053906.1261704-3-anshuman.khandual@arm.com>
+References: <20231201053906.1261704-1-anshuman.khandual@arm.com>
+	<20231201053906.1261704-3-anshuman.khandual@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, broonie@kernel.org, james.clark@arm.com, robh@kernel.org, suzuki.poulose@arm.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, linux-perf-users@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-
-Hello,
-
-Mark Brown <broonie@kernel.org> writes:
-
-> diff --git a/arch/arm64/mm/mmap.c b/arch/arm64/mm/mmap.c
-> index 645fe60d000f..605d4e6edc1d 100644
-> --- a/arch/arm64/mm/mmap.c
-> +++ b/arch/arm64/mm/mmap.c
-> @@ -79,9 +79,20 @@ arch_initcall(adjust_protection_map);
+On Fri, 01 Dec 2023 05:39:00 +0000,
+Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+> 
+> Currently BRBE feature is not supported in a guest environment. This hides
+> BRBE feature availability via masking ID_AA64DFR0_EL1.BRBE field. This also
+> blocks guest accesses into BRBE system registers and instructions as if the
+> underlying hardware never implemented FEAT_BRBE feature.
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: kvmarm@lists.linux.dev
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 130 ++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 130 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 4735e1b37fb3..42701065b3cd 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1583,6 +1583,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+>  	/* Hide SPE from guests */
+>  	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
 >  
->  pgprot_t vm_get_page_prot(unsigned long vm_flags)
->  {
-> -	pteval_t prot = pgprot_val(protection_map[vm_flags &
-> +	pteval_t prot;
+> +	/* Hide BRBE from guests */
+> +	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
 > +
-> +	/* If this is a GCS then only interpret VM_WRITE. */
-> +	if (system_supports_gcs() && (vm_flags & VM_SHADOW_STACK)) {
-> +		if (vm_flags & VM_WRITE)
-> +			prot = _PAGE_GCS;
-> +		else
-> +			prot = _PAGE_GCS_RO;
-> +	} else {
-> +		prot = pgprot_val(protection_map[vm_flags &
->  				   (VM_READ|VM_WRITE|VM_EXEC|VM_SHARED)]);
-> +	}
+>  	return val;
+>  }
 >  
-> +	/* VM_ARM64_BTI on a GCS is rejected in arch_valdiate_flags() */
+> @@ -2042,6 +2045,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
+>  	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
+>  	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
+> +	{ SYS_DESC(OP_BRB_IALL), undef_access },
+> +	{ SYS_DESC(OP_BRB_INJ), undef_access },
+>  
+>  	DBG_BCR_BVR_WCR_WVR_EL1(0),
+>  	DBG_BCR_BVR_WCR_WVR_EL1(1),
+> @@ -2072,6 +2077,131 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
+>  	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
+>  
+> +	/*
+> +	 * BRBE branch record sysreg address space is interleaved between
+> +	 * corresponding BRBINF<N>_EL1, BRBSRC<N>_EL1, and BRBTGT<N>_EL1.
+> +	 */
+> +	{ SYS_DESC(SYS_BRBINF0_EL1), undef_access },
+> +	{ SYS_DESC(SYS_BRBSRC0_EL1), undef_access },
+> +	{ SYS_DESC(SYS_BRBTGT0_EL1), undef_access },
+> +	{ SYS_DESC(SYS_BRBINF16_EL1), undef_access },
+> +	{ SYS_DESC(SYS_BRBSRC16_EL1), undef_access },
+> +	{ SYS_DESC(SYS_BRBTGT16_EL1), undef_access },
 
-s/valdiate/validate/
+Surely we can do better than this wall of text. Please look at what we
+do for the debug registers, and adopt a similar pattern. This should
+result in one line per group of 3 registers.
 
->  	if (vm_flags & VM_ARM64_BTI)
->  		prot |= PTE_GP;
+What is the plan for KVM support beyond this?
 
+	M.
 
 -- 
-Thiago
+Without deviation from the norm, progress is not possible.
