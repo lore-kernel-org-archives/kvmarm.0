@@ -1,92 +1,87 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E6A22D62D
-	for <kvmarm@lists.linux.dev>; Mon,  4 Dec 2023 14:45:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A54A15395
+	for <kvmarm@lists.linux.dev>; Mon,  4 Dec 2023 16:17:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 35010152B;
-	Mon,  4 Dec 2023 06:45:48 -0800 (PST)
-Received: from FVFF77S0Q05N (unknown [10.57.44.129])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 00DFF3F5A1;
-	Mon,  4 Dec 2023 06:44:58 -0800 (PST)
-Date: Mon, 4 Dec 2023 14:44:56 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 0/3] arm64: Drop support for VPIPT i-cache policy
-Message-ID: <ZW3l6Bq7ortEGB8I@FVFF77S0Q05N>
-References: <20231204143606.1806432-1-maz@kernel.org>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D9AB8152B;
+	Mon,  4 Dec 2023 08:18:32 -0800 (PST)
+Received: from [192.168.1.3] (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0F3C73F6C4;
+	Mon,  4 Dec 2023 08:17:42 -0800 (PST)
+Message-ID: <1aca6009-9943-d0ee-0fa9-b88b33fd0540@arm.com>
+Date: Mon, 4 Dec 2023 16:17:43 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231204143606.1806432-1-maz@kernel.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v3 2/6] arm64: KVM: Move SPE and trace registers to the
+ sysreg array
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+Cc: coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, suzuki.poulose@arm.com, broonie@kernel.org,
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mike Leach <mike.leach@linaro.org>, Leo Yan <leo.yan@linaro.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
+ <robh@kernel.org>, Jintack Lim <jintack.lim@linaro.org>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>, Fuad Tabba <tabba@google.com>,
+ Joey Gouly <joey.gouly@arm.com>, linux-kernel@vger.kernel.org
+References: <20231019165510.1966367-1-james.clark@arm.com>
+ <20231019165510.1966367-3-james.clark@arm.com> <86plzmb9jj.wl-maz@kernel.org>
+From: James Clark <james.clark@arm.com>
+In-Reply-To: <86plzmb9jj.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 04, 2023 at 02:36:03PM +0000, Marc Zyngier wrote:
-> ARMv8.2 introduced support for VPIPT i-caches, the V standing for
-> VMID-tagged. Although this looked like a reasonable idea, no
-> implementation has ever made it into the wild.
-> 
-> Linux has supported this for over 6 years (amusingly, just as the
-> architecture was dropping support for AIVIVT i-caches), but we had no
-> way to even test it, and it is likely that this code was just
-> bit-rotting.
-> 
-> However, in a recent breakthrough (XML drop 2023-09, tagged as
-> d55f5af8e09052abe92a02adf820deea2eaed717), the architecture has
-> finally been purged of this option, making VIPT and PIPT the only two
-> valid options.
-> 
-> This really means this code is just dead code. Nobody will ever come
-> up with such an implementation, and we can just get rid of it.
-> 
-> Most of the impact is on KVM, where we drop a few large comment blocks
-> (and a bit of code), while the core arch code loses the detection code
-> itself.
-> 
-> * From v2:
->   - Fix reserved naming for RESERVED_AIVIVT
->   - Collected RBs from Anshuman an Zenghui
-> 
-> Marc Zyngier (3):
->   KVM: arm64: Remove VPIPT I-cache handling
->   arm64: Kill detection of VPIPT i-cache policy
->   arm64: Rename reserved values for CTR_EL0.L1Ip
 
-For the series:
 
-Acked-by: Mark Rutland <mark.rutland@arm.com>
+On 04/12/2023 09:29, Marc Zyngier wrote:
+> On Thu, 19 Oct 2023 17:55:00 +0100,
+> James Clark <james.clark@arm.com> wrote:
+>>
+>> pmscr_el1 and trfcr_el1 are currently special cased in the
+>> host_debug_state struct, but they're just registers after all so give
+>> them entries in the sysreg array and refer to them through the host
+>> context.
+>>
+>> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: James Clark <james.clark@arm.com>
+>> ---
+>>  arch/arm64/include/asm/kvm_host.h  |  6 ++--
+>>  arch/arm64/include/asm/kvm_hyp.h   |  4 +--
+>>  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 44 +++++++++++++++---------------
+>>  arch/arm64/kvm/hyp/nvhe/switch.c   |  4 +--
+>>  4 files changed, 28 insertions(+), 30 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 4a966c0d7373..7c82927ddaf2 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -437,6 +437,8 @@ enum vcpu_sysreg {
+>>  	CNTHP_CVAL_EL2,
+>>  	CNTHV_CTL_EL2,
+>>  	CNTHV_CVAL_EL2,
+>> +	PMSCR_EL1,	/* Statistical profiling extension */
+>> +	TRFCR_EL1,	/* Self-hosted trace filters */
+> 
+> Why this move? Are you also adding guest support for SPE?
+> 
+> Until you do, I don't see the need to pollute the guest's sysreg
+> namespace.
+> 
+> 	M.
+> 
 
-Looking forward, we can/should probably replace __icache_flags with a single
-ICACHE_NOALIASING or ICACHE_PIPT cpucap, which'd get rid of a bunch of
-duplicated logic and make that more sound in the case of races around cpu
-onlining.
+Ah ok yes, I think I misunderstood your previous review comment. You're
+right I don't touch SPE and it's only ever for the host so I can leave
+it where it was in struct host_debug_state.
 
-Mark.
-
-> 
->  arch/arm64/include/asm/cache.h   |  6 ----
->  arch/arm64/include/asm/kvm_mmu.h |  7 ----
->  arch/arm64/kernel/cpuinfo.c      |  5 ---
->  arch/arm64/kvm/hyp/nvhe/pkvm.c   |  2 +-
->  arch/arm64/kvm/hyp/nvhe/tlb.c    | 61 --------------------------------
->  arch/arm64/kvm/hyp/vhe/tlb.c     | 13 -------
->  arch/arm64/tools/sysreg          |  5 +--
->  7 files changed, 4 insertions(+), 95 deletions(-)
-> 
-> -- 
-> 2.39.2
-> 
-> 
+James
