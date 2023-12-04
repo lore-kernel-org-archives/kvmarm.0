@@ -1,134 +1,175 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33DCCC8E7;
-	Mon,  4 Dec 2023 08:22:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234D52F47
+	for <kvmarm@lists.linux.dev>; Mon,  4 Dec 2023 08:39:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gLvzMSTe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A425BC433C7;
-	Mon,  4 Dec 2023 08:22:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701678148;
-	bh=d5xd1DNNe8JHTchZ1N0VUvsvu4Wgsp0ilZmuF8NZBgQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gLvzMSTejitY38rVbVjqGTXEH+MOT+PcFUG93c0YgGr336/kcmHuZtMyWAJUur9dj
-	 ylPSMIrRC6wrFF6JH8llfP4lnxofw9JWIRKnnRbtGCKoUGUmv+BvE3zqzIXchLcyIJ
-	 mN17ecVhBQKZ+dWBJT03lM6eIzrvq3+6DCrCLjqF0YaafhQ/cwUi5brHnGaFs86F8I
-	 4b4iOCkO3HIr/O4KlY6DcVzLuCyIZfchlvHG3+jOPQHbJfDpNjrPmWxRBahk/mvnEW
-	 MFOGWM7jIeEf4pzDdJPtfQVNnDvtINBdxCPnCpYJn/bidcPDKIQxzXDyMbQL9ojseN
-	 70ErEzj5WRZbw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rA4Di-0018lj-9m;
-	Mon, 04 Dec 2023 08:22:26 +0000
-Date: Mon, 04 Dec 2023 08:22:25 +0000
-Message-ID: <86v89ebcn2.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	mark.rutland@arm.com,
-	Mark Brown <broonie@kernel.org>,
-	James Clark <james.clark@arm.com>,
-	Rob Herring <robh@kernel.org>,
-	Suzuki Poulose <suzuki.poulose@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	linux-perf-users@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH V15 2/8] KVM: arm64: Prevent guest accesses into BRBE system registers/instructions
-In-Reply-To: <20231201053906.1261704-3-anshuman.khandual@arm.com>
-References: <20231201053906.1261704-1-anshuman.khandual@arm.com>
-	<20231201053906.1261704-3-anshuman.khandual@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RjOICxCw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701679155;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lscDHZ3yIZ/I6JT9P4DnclNKVqFrNnL7Ykz8yhYHIkY=;
+	b=RjOICxCwtgtiz6D0EzSF8c8o0L4EgBQ3hEXS9kNITikruPcnefLbmQ5OPKpwGw7QI/v2K5
+	Y19ssLpzZeNzgmFcuQJeDH+bbv2X+g1fGiSXeTjPirmSG3FmgLZxIiWwk+5ylGl7a++mES
+	x6UDLJQZVAxWUlAqhDwPPMhE0Q4UnzI=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-531-mqovX0fUONuWvoeKX-N8MA-1; Mon, 04 Dec 2023 03:39:13 -0500
+X-MC-Unique: mqovX0fUONuWvoeKX-N8MA-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-50bfbba86e0so304107e87.2
+        for <kvmarm@lists.linux.dev>; Mon, 04 Dec 2023 00:39:12 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701679152; x=1702283952;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lscDHZ3yIZ/I6JT9P4DnclNKVqFrNnL7Ykz8yhYHIkY=;
+        b=PuKLptXFprSMjRf9dL4xAo5cIeQUZT6yNfGjg1Y78RbWETbQFAiw+8SyTmAV/x0DDo
+         fXMgFMXq0+ChpMCr1DMvZ1387+stB+cY5WeiJOrWYQmhxTMY429lrx4bP1OY1k/DAs3F
+         4heZkyieh92dRSe1WoEZ4Il1QoP94l9HzOpiSJCcz5NRZKZaqBFzVBHw6iAEt/C3lwUn
+         BvhqHRjrh4G/hojxhy9nM1cK81B+G7RBw1jPwK4t9Q3NOty+HnGIx0M+nuIWWar+YYwK
+         yv86KBWJoiYNmVVmaHZOjglShsJkczDBlE2PZT3+26yVl5rsTXlbF5zixCNWTqOnCQNG
+         mWhA==
+X-Gm-Message-State: AOJu0Yzafp2ZU+B+lyGsBXbn5FquHTtlkCaOe2glHiSd1Xw1G1DaJvBP
+	Ymu/kucESngYFnaiUXBcAc8xwWkYGp2ewg5ogJZYHiuzdbEMa+yikH+Med6ezFtyxc0HxPsPxSa
+	lw3yoH4tViFaih8JSJXFFtbMaQuBOaGa5
+X-Received: by 2002:a19:c516:0:b0:50b:d764:8807 with SMTP id w22-20020a19c516000000b0050bd7648807mr2128154lfe.83.1701679151737;
+        Mon, 04 Dec 2023 00:39:11 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGnL4fXkMjcRU8JcX5iOM2K50RXffBA5cF0/9EhGkq9ffq7aFG4xQmmO0uFOQqbnohhHm7yM+U7oYAHpRgFKkE=
+X-Received: by 2002:a19:c516:0:b0:50b:d764:8807 with SMTP id
+ w22-20020a19c516000000b0050bd7648807mr2128133lfe.83.1701679151331; Mon, 04
+ Dec 2023 00:39:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, broonie@kernel.org, james.clark@arm.com, robh@kernel.org, suzuki.poulose@arm.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, linux-perf-users@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20231102143507.840-1-jiangkunkun@huawei.com> <87msvt6cc7.wl-maz@kernel.org>
+ <1fb8353e-e9c4-2570-c2ca-ec537c18ac4d@huawei.com> <86edh228xx.wl-maz@kernel.org>
+ <952bd5dc-dd20-acc3-d77e-c9b14e5728d3@huawei.com> <87fs0k94og.wl-maz@kernel.org>
+In-Reply-To: <87fs0k94og.wl-maz@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 4 Dec 2023 16:39:00 +0800
+Message-ID: <CACGkMEt5sapZjpyBSM5oX_=k1AcefEe5D4wtX=HqtHy4AD3j_g@mail.gmail.com>
+Subject: Re: [RFC PATCH] KVM: arm/arm64: GICv4: Support shared VLPI
+To: Marc Zyngier <maz@kernel.org>
+Cc: Kunkun Jiang <jiangkunkun@huawei.com>, dongli.zhang@oracle.com, cohuck@redhat.com, 
+	stefanha@redhat.com, mst@redhat.com, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>, 
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+	"open list:IRQCHIP DRIVERS" <linux-kernel@vger.kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 01 Dec 2023 05:39:00 +0000,
-Anshuman Khandual <anshuman.khandual@arm.com> wrote:
-> 
-> Currently BRBE feature is not supported in a guest environment. This hides
-> BRBE feature availability via masking ID_AA64DFR0_EL1.BRBE field. This also
-> blocks guest accesses into BRBE system registers and instructions as if the
-> underlying hardware never implemented FEAT_BRBE feature.
-> 
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: kvmarm@lists.linux.dev
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 130 ++++++++++++++++++++++++++++++++++++++
->  1 file changed, 130 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 4735e1b37fb3..42701065b3cd 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1583,6 +1583,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->  	/* Hide SPE from guests */
->  	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
->  
-> +	/* Hide BRBE from guests */
-> +	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
-> +
->  	return val;
->  }
->  
-> @@ -2042,6 +2045,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
->  	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
->  	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
-> +	{ SYS_DESC(OP_BRB_IALL), undef_access },
-> +	{ SYS_DESC(OP_BRB_INJ), undef_access },
->  
->  	DBG_BCR_BVR_WCR_WVR_EL1(0),
->  	DBG_BCR_BVR_WCR_WVR_EL1(1),
-> @@ -2072,6 +2077,131 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
->  	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
->  
-> +	/*
-> +	 * BRBE branch record sysreg address space is interleaved between
-> +	 * corresponding BRBINF<N>_EL1, BRBSRC<N>_EL1, and BRBTGT<N>_EL1.
-> +	 */
-> +	{ SYS_DESC(SYS_BRBINF0_EL1), undef_access },
-> +	{ SYS_DESC(SYS_BRBSRC0_EL1), undef_access },
-> +	{ SYS_DESC(SYS_BRBTGT0_EL1), undef_access },
-> +	{ SYS_DESC(SYS_BRBINF16_EL1), undef_access },
-> +	{ SYS_DESC(SYS_BRBSRC16_EL1), undef_access },
-> +	{ SYS_DESC(SYS_BRBTGT16_EL1), undef_access },
+On Sat, Dec 2, 2023 at 8:20=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Hi Kunkun,
+>
+> On Wed, 08 Nov 2023 09:45:51 +0000,
+> Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+> >
+> > Hi Marc,
+> >
+> > On 2023/11/6 23:33, Marc Zyngier wrote:
+> > > On Mon, 06 Nov 2023 14:59:01 +0000,
+> > > Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+> > >> The virtio-pci driver write entry1-6
+> > >> massage.data in the msix-table and trap to QEMU for processing. The
+> > >> massage.data is as follow:
+> > >>> entry-0 0
+> > >>> entry-1 1
+> > >>> entry-2 1
+> > >>> entry-3 1
+> > >>> entry-4 1
+> > >>> entry-5 1
+> > >>> entry-6 1
 
-Surely we can do better than this wall of text. Please look at what we
-do for the debug registers, and adopt a similar pattern. This should
-result in one line per group of 3 registers.
+It looks like a bug from the driver. It should only use vector 0 and 1
+in this case.
 
-What is the plan for KVM support beyond this?
+Could you please check the queue_msix_vector for each queue in this case?
 
-	M.
+> > > Urgh... is vp_modern_queue_vector() used in your configuration? This
+> > > is ... terrible.
+> > I encountered this problem using the 4.19 version kernel, but not the
+> > 5.10 version. This vp_modern_queue_vector() function does not exist
+> > in 4.19, but it uses 'vp_iowrite16(msix_vec, &cfg->queue_msix_vector)',
+> > the same as vp_modern_queue_vector().
+> >
+> > In the past two days, I learned about the virtio driver and made some
+> > new discoveries. When 'num_queues' is greater than maxcpus, it will
+> > fall back into MSI-X with one shared for queues. The two patches[1],
+> > submitted by Dongli, limits the number of hw queues used by
+> > virtio-blk/virtio-scsi by 'nr_cpu_ids'. The two patches were merged
+> > in 5.1-rc2. And the patch related virtio-blk was merged into the 4.19
+> > stable branch.The patch related virtio-scsi was not merged.
+> > [1]
+> > https://lore.kernel.org/all/1553682995-5682-1-git-send-email-dongli.zha=
+ng@oracle.com/
+> >
+> > This is the earliest discussion.
+> > https://lore.kernel.org/all/e4afe4c5-0262-4500-aeec-60f30734b4fc@defaul=
+t/
+> >
+> > I don't know if there are other circumstances that would cause it to
+> > fall back into MSI-X with one shared for queues. At least the hack
+> > method is possible.
+> > > I wonder if PCIe actually allows this sort of thing.
+> > Do you think the virtio driver should be modified?
+>
+> I think the virtio driver should stop messing with the MSI-X
+> configuration behind the kernel's back. For example, what happens if
+> the kernel needs to do a disable_irq() on the "shared" interrupt? It
+> will mask the interrupt in *one* of the vectors, and the interrupt
+> will still be screaming.
+>
+> This is terribly broken, even on x86.
 
--- 
-Without deviation from the norm, progress is not possible.
+Let's try to see the queue_msix_vector. A correct implemented device
+should not try to use a vector more than 1.
+
+>
+> > > In any case, this sort of behaviour breaks so many thing in KVM's
+> > > implementation that I'd recommend you disable GICv4 until we have a
+> > > good solution for that.
+> > There seems to be no restriction in the GIC specification that multiple
+> > host irqs cannot be mapped to the same vlpi. Or maybe I didn't notice.
+> > Do you think there are any risks?
+>
+> Please see 5.2.10 ("Restrictions for INTID mapping rules"), which
+> clearly forbids the case we have here: "Maps multiple EventID-DeviceID
+> combinations to the same virtual LPI INTID-vPEID.".
+>
+> > GICv3 does not have this issue, but is this configuration legal?
+>
+> With GICv3, the ITS doesn't see multiple mappings to the same
+> LPI. Each DeviceID/EventID pair has its own LPI, and KVM will just see
+> the injection callback from VFIO.
+>
+> Honestly, the virtio driver is broken (irrespective of the
+> architecture), and incompatible with the GIC architecture.
+
+No matter how the driver is written, the host/KVM should be able to
+survive from that.
+
+Thanks
+
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
+>
+
