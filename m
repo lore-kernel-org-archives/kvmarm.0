@@ -1,222 +1,146 @@
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2061.outbound.protection.outlook.com [40.107.237.61])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01F95C8ED
-	for <kvmarm@lists.linux.dev>; Tue,  5 Dec 2023 16:43:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709FC4174B;
+	Tue,  5 Dec 2023 16:51:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JmAtBPbp"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b90PWXvvjjy8972AC8GRECffrwcPtEei04JESS7EhSXuFZ+TNdVOhaVsPszrTc/jCHQBHUT7HvSrs7swStO6DyFCDfmLqGSopv43etyP2V9sGDUnIvyu/mAymx1auq1kzAH4DA//b3MTgFn2ayHlYBy6CCBR0lmhkmhnlO+DVmxZEYOt/l2Spd0G6CeJE0a21EfXy5NHv94PGybVgfTabYkMd+VVNhZCCvrQrzGVHDDrwQABLjWO8B2xpW+XzUowCI2+MZzDvzzT2z4vzIxReci8tM60jX6sRbsuaqNDOUux4dRkxUuJR/WQSMoEJCuWmImaSe1m42iXtsdCBcxGfw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sQmwIwVYkauMGtvx1jGrLwI/4G4nT7X0iDtOCpiEUN8=;
- b=fSBMgCrnzd9O6H71ySZtHBh3WXjzd4Xla/X+9CBcoEu+UqLA1qAT4obI/0cOkSAgK+BJQrpzxZib6nsMetkq+2Y8jbqJzk1zSZbnKv6RlDP1W7Dpe/gb/hXXyocfJLvoce0tF50vW+JNh0PIvNiZrY5oc60rG/Qx9oa7JQp5eqo9D4Kg2LR1zciYYasSXk01/QxbmDVBIiDSiRtgmf1qiqQNDnnquRxsSXVS5pMMn0ELjAgDgVn8oXhaKf9TWV38pOpHnUSGlmHDbsfx4R9ZWktPcl6lUYCrxwzX9aPX8uqM7LWwix7ykGZ7dHr8eXVKjzYRM/is0436gjbr1vNr/g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sQmwIwVYkauMGtvx1jGrLwI/4G4nT7X0iDtOCpiEUN8=;
- b=JmAtBPbpCBRDizDdY8uxV1z17TgyXogGUvuv37VmA0TI6/Om4huTborvfanHo5sLRr3DixUznDIHJr56oyKRI5iENN5MH/I0bjqW50bIAht57i3DWTx3KDSGSopIS7MH3vEUMeQcP6MJa44UP08cQd6Qr1/sebBtXLvgN84BcbCvqQ4s/YUTxs5MqL9pi5Lz82T8H3G3N8y/SMVG5zlYFnIps3ZxlJI/aAP29rv72u3J1qWvsFnsOzFglCLCGdHFpLHAyGKSeO7mKY+8RBCh6ZK53VBWpjscKWGmH/0kV1YV11WhvuQQmL1uEe8yMX0m201ULyys67MtywLpjRwf4w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH3PR12MB7764.namprd12.prod.outlook.com (2603:10b6:610:14e::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Tue, 5 Dec
- 2023 16:43:19 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7046.034; Tue, 5 Dec 2023
- 16:43:19 +0000
-Date: Tue, 5 Dec 2023 12:43:18 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, ankita@nvidia.com,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	oliver.upton@linux.dev, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, will@kernel.org, ardb@kernel.org,
-	akpm@linux-foundation.org, gshan@redhat.com, aniketa@nvidia.com,
-	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
-	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
-	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, lpieralisi@kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 1/1] KVM: arm64: allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
-Message-ID: <20231205164318.GG2692119@nvidia.com>
-References: <20231205033015.10044-1-ankita@nvidia.com>
- <86fs0hatt3.wl-maz@kernel.org>
- <ZW8MP2tDt4_9ROBz@arm.com>
- <20231205130517.GD2692119@nvidia.com>
- <ZW9OSe8Z9gAmM7My@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZW9OSe8Z9gAmM7My@arm.com>
-X-ClientProxiedBy: BL0PR03CA0017.namprd03.prod.outlook.com
- (2603:10b6:208:2d::30) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cA2ltJ3C"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 910E0C433C8;
+	Tue,  5 Dec 2023 16:51:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701795069;
+	bh=ld1xDDBIxU0aMjeZJcBk8TzmodfOXcQzxXPrqLOm3Wc=;
+	h=From:Subject:Date:To:Cc:From;
+	b=cA2ltJ3Ciu6iOJdi4d9B/ltq2K0G8sHqPxOAvifGX4gGCgc8VemqNpQJTyQayOS0p
+	 N1/5z6HA7O21Gy0CuqHBd7MD93z1Fo+yFkhRXrmCNC/lvKfoODEHIqVUwvhFE69Dgb
+	 tG9vV1X8YnX4m0mmtEQxHMKnxLhUJsE+pcjSsDohcOakIGGAVKM6QJS7Z2SILPGR3G
+	 JvlcRZgctPb3u0CJQhcSm65XFRDhZt8TMfDdTZLN/7ldJR6xQDH14qO/uP70rXh9w9
+	 4dE9Tc0pcvrI2L1UYABYYQPEEaRPYxENcSXqlL1aapvQI9x0D19LRIXkWNdhIy7gnM
+	 VqgDaVl/NnV0Q==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v3 00/21] arm64: Support for 2023 DPISA extensions
+Date: Tue, 05 Dec 2023 16:47:58 +0000
+Message-Id: <20231205-arm64-2023-dpisa-v3-0-dbcbcd867a7f@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH3PR12MB7764:EE_
-X-MS-Office365-Filtering-Correlation-Id: b858a273-057a-4eb0-9869-08dbf5b1493c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	AFSbd5BvOwEA5LJLP7M0qa6FsN4m+jFsXh66gDbpnRsNY6c27/kM16Ix61Iwp+ShCcagycsz3eT63jRQ8ZDJ2XpgqTGyDPVAiH5FfVBukmCWR3yxbR0HCR1bXK7ojrOcTvb2L1jLJ7x9Gewf/Y04cn1OmjpYb1JRP6l74IKIS9WAvbtYVg79ljSs7PT84V9FFW3b0IfFpGv1xaWUflHJfaAW3G7NcgPyQcKIB8ewt/++txClIM465+IiLX6Fe3BtUVI2JUHYmU2lIjWC2yAaOaLavOGSvN1+HQMUotawj+XDvfcPTYPrhT6A05irpHUmFB5aieQ1BP77GMFPc/cSrgADxpyj9V32Pso/jGprDrt4KKYXjvlYA+WM04akpodxR3J7+N84jneDBI8PJpXND4diGS2+u9cBLS2WYcJecEecI20QLtt7hwtXyOyu2A1tqHUrcKwljEELUVkKWs8datvg+Uom6RhFGTexiVsDwDFw2s701RdUmjpFsbmhUkTU8Hiu9PblZs+8hqBxUmUf+scIMUvMNwG86zfOq7iVGFXRK69uQ/Jc8QPm5uRc8eF1
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(376002)(39860400002)(396003)(346002)(230922051799003)(186009)(451199024)(64100799003)(1800799012)(54906003)(6916009)(66946007)(66556008)(316002)(66476007)(6486002)(478600001)(7416002)(5660300002)(41300700001)(36756003)(33656002)(2906002)(4326008)(8676002)(8936002)(83380400001)(86362001)(2616005)(26005)(1076003)(6506007)(38100700002)(6512007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?3VtKCITSQ1dFSVI/uuxAWlKZsmibVzIWRM4D8ml7r9UL1BIxGUotHUNV7eFh?=
- =?us-ascii?Q?LuhkUoFBSU1s+lrbsIt6PHsbl8nmhQEMZefl4rFQx4RH1jnyjW9Rp2JbWfrN?=
- =?us-ascii?Q?HFoo4/L8wxnmU/etfKahwcwbKvdCVZwvzyvROwPLSsLjYdrsTZSu1ppL5bxt?=
- =?us-ascii?Q?XJll5E0WmJAgm0yRLp1BqrsllztnPgzYxhm9cg6lKOP1+kEaAXE9Zp77I79m?=
- =?us-ascii?Q?VOTjs1pb5Tn/1iGR6Xb23wdS1PVOa0oxSZGy9AeMgPA0bG1vyBVBLHQpnnkU?=
- =?us-ascii?Q?IwyMtVWRNhMm2qb5DAPtubRKuV6KFcvvEJlWpDikeSWInxOVA8eN77vk5wi0?=
- =?us-ascii?Q?aPP55/fCd7mFkrMT/T3FrXlxMyCs/nR456CACEdyJ5aBPuf0V6CrQfpJgBlQ?=
- =?us-ascii?Q?zhYgLAVWVfI8P7z3aevVefmmDbNu1Wgltcq1fVztDlPV8kBXRTgtdWsKy+6l?=
- =?us-ascii?Q?ZIt7+evopfFh7rPWjRYEdyOy1Y1xewNEaV3cfoIGhdV5US8TMAhDC51sLDlK?=
- =?us-ascii?Q?TAiOKzEXvFZrJuAn9YIkHJ4UWHngEHq60sJOXXGH3iIybOyJxCxgRVKMPo+v?=
- =?us-ascii?Q?kJU0Ja/5lx7ouc82ozEetls9djsfrdD8aZJinHaCijithYEqKcst0OvosiO8?=
- =?us-ascii?Q?BO7T/YjpwrEQ32BLRnIAssjyPdWQZ/41oyaWsoa78WXVmNVyP5QxJKo5dwsV?=
- =?us-ascii?Q?8yddmyiri7QcETtySxH4jSW6hEio9pBPG5MkKSZgkXc/INpLkSqqwJkcyGIl?=
- =?us-ascii?Q?2hN47gbSjaxvktxiOK3cRhDckGZY6Uc5sxypk3U+A5luH6uNZEL/9Fxx2X/b?=
- =?us-ascii?Q?HdnWDXhxqWyHlyTIHsJOk2z5bOeQsGn523qQGJeoqF52X05EIE4oZVmEgeu8?=
- =?us-ascii?Q?8fbDkZ/Kdq2zWKxPpXc4nfpP4RbcNuuLHExH0ISkcfSIglc+tFEezfiRRSxn?=
- =?us-ascii?Q?HHpzLaGPdZmGUjyDp22I+anV9eS3eE6hl/Xlr2juVqhXb1gDNCiULN7z0wzE?=
- =?us-ascii?Q?3tob7IiBinAlcdVGuBpYVXFIhdJFHNZkD9m+Pp2WVZ6i+AoDCoGi3u18Edqr?=
- =?us-ascii?Q?q1q7e63NHrI8wg+Cg/obmp0ykmNKSAl0+qQP1ADJFvKyfwSqoJKIyYhWKGes?=
- =?us-ascii?Q?nqYJs+Zb1r5Mw9M8vgXfcpHPIXBSjYtxTsM+kNVX4Qzh8aFvXymr/+ZXE9p/?=
- =?us-ascii?Q?4ulGZ5RltW+RA3m2trgM9dS6PHM9pm7N+QPap5pzmxbO5jtBi54930BM88dV?=
- =?us-ascii?Q?Q8XeboSAMLl0JiRvT4/pyPJ3sA6paIQMub6QmljEnf7sT/iymbe0UIIYGlFt?=
- =?us-ascii?Q?NwHU3pkoLtKFyFi1U/9ln02/2+h7Fyic0dsVSdVGHVTtgsebrnsnXDBQkWhK?=
- =?us-ascii?Q?Z8EOFmNGFD+k9kMTlIBh5cvHvBG0gxWpxf6a/oKg+/KzHsD8QcRg1Vbaq355?=
- =?us-ascii?Q?NI1ZEMoUno1sBz7RTvWV1gccm3NWmEx0Z83MtR0BfXXZj+Q0CWGoLPvTrLmI?=
- =?us-ascii?Q?An6mQGQdbgeqXA7EI/+kBQoZnS4EqzdtemxobxbOKnvT1PYwttNK3AJNcoCV?=
- =?us-ascii?Q?gLFOakAp3pupuLZy2EPVYhTozdT5V3mLNoCYVKd/?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b858a273-057a-4eb0-9869-08dbf5b1493c
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2023 16:43:19.2296
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DBkwKONxfo+tkoiwvyosd2V48YfjvPEGw933wLah4ia70uyuZJ9hLQWF2KapwYr4
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7764
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAD9Ub2UC/23N0QrCIBTG8VcZXmfo8UzdrnqP6MKl26TahoYUY
+ ++eG0FEXf4/OL8zk+iCd5HUxUyCSz76ccghdgU592boHPU2NwEGgjMmqAk3iXRNaicfDYVWWCg
+ VSlRI8tkUXOsfG3k85e59vI/huX1IfF3fGMhfLHHKqEbFrK101TRwuLgwuOt+DB1ZtQQfgXP8I
+ 0AWUEHJdYWtNPpLWJblBSYrTd/zAAAA
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Jonathan Corbet <corbet@lwn.net>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ kvmarm@lists.linux.dev, linux-doc@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.13-dev-5c066
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4657; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=ld1xDDBIxU0aMjeZJcBk8TzmodfOXcQzxXPrqLOm3Wc=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBlb1ToWY21TL2lSFiNFFmpncXHZ+8uv3xdv0x92cWg
+ Iu7GAfWJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZW9U6AAKCRAk1otyXVSH0CTCB/
+ 9LsWRTj/wZmAWjeHxaGBiu4BElH0V6M0Tohiptgba/9qZblZAxTt7uVj1YC/BTGqiGuGajmHYUQhJ8
+ X2Bnb/Ttzt20+XlZnVYvaQ547tIUGHQ09wyXuPMfjoacAl/SfDZeP/NQzOBs+mNY2li70oPfvmhTO0
+ 2AmNK9Cq2jKWi/V8mqRw+tyKLV2lmvFGUrpahC8WEV7FgmGWsuH4q8ZeW2jLYA9DGW1WOk0W9W/TtF
+ X05gevBgezfm+zlyxAS6q98+WbF+vcdXfWuKOkWuk0cKnUaViQZDE3EmuVQNJmJ8BiejhePxk5mCxX
+ oXk5q8/Wx4ITOnEhKnMGqweRvTAHc0
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Tue, Dec 05, 2023 at 04:22:33PM +0000, Catalin Marinas wrote:
-> Yeah, I made this argument in the past. But it's a fair question to ask
-> since the Arm world is different from x86. Just reusing an existing
-> driver in a different context may break its expectations. Does Normal NC
-> access complete by the time a TLBI (for Stage 2) and DSB (DVMsync) is
-> completed? It does reach some point of serialisation with subsequent
-> accesses to the same address but not sure how it is ordered with an
-> access to a different location like the config space used for reset.
-> Maybe it's not a problem at all or it is safe only for PCIe but it would
-> be good to get to the bottom of this.
+This series enables support for the data processing extensions in the
+newly released 2023 architecture, this is mainly support for 8 bit
+floating point formats.  Most of the extensions only introduce new
+instructions and therefore only require hwcaps but there is a new EL0
+visible control register FPMR used to control the 8 bit floating point
+formats, we need to manage traps for this and context switch it.
 
-IMHO, the answer is you can't know architecturally. The specific
-vfio-platform driver must do an analysis of it's specific SOC and
-determine what exactly is required to order the reset. The primary
-purpose of the vfio-platform drivers is to provide this reset!
+The sharing of floating point save code between the host and guest
+kernels slightly complicates the introduction of KVM support, we first
+introduce host support with some placeholders for KVM then replace those
+with the actual KVM support.
 
-In most cases I would expect some reads from the device to be required
-before the reset.
+I've not added test coverage for ptrace, I've got a not quite finished
+test program which exercises all the FP ptrace interfaces and their
+interactions together, my plan is to cover it there rather than add
+another tiny test program that duplicates the boilerplace for tracing a
+target and doesn't actually run the traced program.
 
-> > Remember, the feedback we got from the CPU architects was that even
-> > DEVICE_* will experience an uncontained failure if the device tiggers
-> > an error response in shipping ARM IP.
-> > 
-> > The reason PCIe is safe is because the PCI bridge does not generate
-> > errors in the first place!
-> 
-> That's an argument to restrict this feature to PCIe. It's really about
-> fewer arguments on the behaviour of other devices. Marc did raise
-> another issue with the GIC VCPU interface (does this even have a vma in
-> the host VMM?). That's a class of devices where the mapping is
-> context-switched, so the TLBI+DSB rules don't help.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v3:
+- Rebase onto v6.7-rc3.
+- Hook up traps for FPMR in emulate-nested.c.
+- Link to v2: https://lore.kernel.org/r/20231114-arm64-2023-dpisa-v2-0-47251894f6a8@kernel.org
 
-I don't know anything about the GIC VCPU interface, to give any
-comment unfortunately. Since it seems there is something to fix here I
-would appreciate some background..
- 
-When you say it is context switched do you mean kvm does a register
-write on every vm entry to set the proper HW context for the vCPU?
+Changes in v2:
+- Rebase onto v6.7-rc1.
+- Link to v1: https://lore.kernel.org/r/20231026-arm64-2023-dpisa-v1-0-8470dd989bb2@kernel.org
 
-We are worrying that register write will possibly not order after
-NORMAL_NC?
+---
+Mark Brown (21):
+      arm64/sysreg: Add definition for ID_AA64PFR2_EL1
+      arm64/sysreg: Update ID_AA64ISAR2_EL1 defintion for DDI0601 2023-09
+      arm64/sysreg: Add definition for ID_AA64ISAR3_EL1
+      arm64/sysreg: Add definition for ID_AA64FPFR0_EL1
+      arm64/sysreg: Update ID_AA64SMFR0_EL1 definition for DDI0601 2023-09
+      arm64/sysreg: Update SCTLR_EL1 for DDI0601 2023-09
+      arm64/sysreg: Update HCRX_EL2 definition for DDI0601 2023-09
+      arm64/sysreg: Add definition for FPMR
+      arm64/cpufeature: Hook new identification registers up to cpufeature
+      arm64/fpsimd: Enable host kernel access to FPMR
+      arm64/fpsimd: Support FEAT_FPMR
+      arm64/signal: Add FPMR signal handling
+      arm64/ptrace: Expose FPMR via ptrace
+      KVM: arm64: Add newly allocated ID registers to register descriptions
+      KVM: arm64: Support FEAT_FPMR for guests
+      arm64/hwcap: Define hwcaps for 2023 DPISA features
+      kselftest/arm64: Handle FPMR context in generic signal frame parser
+      kselftest/arm64: Add basic FPMR test
+      kselftest/arm64: Add 2023 DPISA hwcap test coverage
+      KVM: arm64: selftests: Document feature registers added in 2023 extensions
+      KVM: arm64: selftests: Teach get-reg-list about FPMR
 
-> > Thus, the way a platform device can actually be safe is if it too
-> > never generates errors in the first place! Obviously this approach
-> > works just as well with NORMAL_NC.
-> > 
-> > If a platform device does generate errors then we shouldn't expect
-> > containment at all, and the memory type has no bearing on the
-> > safety. The correct answer is to block these platform devices from
-> > VFIO/KVM/etc because they can trigger uncontained failures.
-> 
-> Assuming the error containment is sorted, there are two other issues
-> with other types of devices:
-> 
-> 1. Ordering guarantees on reclaim or context switch
+ Documentation/arch/arm64/elf_hwcaps.rst            |  49 +++++
+ arch/arm64/include/asm/cpu.h                       |   3 +
+ arch/arm64/include/asm/cpufeature.h                |   5 +
+ arch/arm64/include/asm/fpsimd.h                    |   2 +
+ arch/arm64/include/asm/hwcap.h                     |  15 ++
+ arch/arm64/include/asm/kvm_arm.h                   |   4 +-
+ arch/arm64/include/asm/kvm_host.h                  |   3 +
+ arch/arm64/include/asm/processor.h                 |   2 +
+ arch/arm64/include/uapi/asm/hwcap.h                |  15 ++
+ arch/arm64/include/uapi/asm/sigcontext.h           |   8 +
+ arch/arm64/kernel/cpufeature.c                     |  72 +++++++
+ arch/arm64/kernel/cpuinfo.c                        |  18 ++
+ arch/arm64/kernel/fpsimd.c                         |  13 ++
+ arch/arm64/kernel/ptrace.c                         |  42 ++++
+ arch/arm64/kernel/signal.c                         |  59 ++++++
+ arch/arm64/kvm/emulate-nested.c                    |   9 +
+ arch/arm64/kvm/fpsimd.c                            |  19 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h            |   7 +-
+ arch/arm64/kvm/sys_regs.c                          |  17 +-
+ arch/arm64/tools/cpucaps                           |   1 +
+ arch/arm64/tools/sysreg                            | 153 ++++++++++++++-
+ include/uapi/linux/elf.h                           |   1 +
+ tools/testing/selftests/arm64/abi/hwcap.c          | 217 +++++++++++++++++++++
+ tools/testing/selftests/arm64/signal/.gitignore    |   1 +
+ .../arm64/signal/testcases/fpmr_siginfo.c          |  82 ++++++++
+ .../selftests/arm64/signal/testcases/testcases.c   |   8 +
+ .../selftests/arm64/signal/testcases/testcases.h   |   1 +
+ tools/testing/selftests/kvm/aarch64/get-reg-list.c |  11 +-
+ 28 files changed, 819 insertions(+), 18 deletions(-)
+---
+base-commit: 2cc14f52aeb78ce3f29677c2de1f06c0e91471ab
+change-id: 20231003-arm64-2023-dpisa-2f3d25746474
 
-Solved in VFIO
- 
-> 2. Unaligned accesses
-> 
-> On (2), I think PCIe is fairly clear on how the TLPs are generated, so I
-> wouldn't expect additional errors here. But I have no idea what AMBA/AXI
-> does here in general. Perhaps it's fine, I don't think we looked into it
-> as the focus was mostly on PCIe.
+Best regards,
+-- 
+Mark Brown <broonie@kernel.org>
 
-I would expect AXI devices to throw errors in all sorts of odd
-cases. eg I would not be surprised at all to see carelessly built AXI
-devices error if ST64B is pointed at them. At least when I was
-building AXI logic years ago I was so lazy :P
-
-This is mostly my point - if the devices under vfio-platform were not
-designed to have contained errors then, IMHO, it is hard to believe
-that DEVICE_X/NORMAL_NC is the only issue in that HW.
-
-> So, I think it would be easier to get this patch upstream if we limit
-> the change to PCIe devices for now. We may relax this further in the
-> future. Do you actually have a need for non-PCIe devices to support WC
-> in the guest or it's more about the complexity of the logic to detect
-> whether it's actually a PCIe BAR we are mapping into the guest? (I can
-> see some Arm GPU folk asking for this but those devices are not easily
-> virtualisable).
-
-The complexity is my concern, and the disruption to the ecosystem with
-some of the ideas given.
-
-If there was a trivial way to convey in the VMA that it is safe then
-sure, no objection from me.
-
-My worry is this has turned from fixing a real problem we have today
-into a debate about theoretical issues that nobody may care about that
-are very disruptive to solve.
-
-I would turn it around and ask we find a way to restrict platform
-devices when someone comes with a platform device that wants to use
-secure kvm and has a single well defined HW problem that is solved by
-this work.
-
-What if we change vfio-pci to use pgprot_device() like it already
-really should and say the pgprot_noncached() is enforced as
-DEVICE_nGnRnE and pgprot_device() may be DEVICE_nGnRE or NORMAL_NC?
-Would that be acceptable?
-
-Jason
