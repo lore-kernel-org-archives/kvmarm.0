@@ -1,77 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF5C67E92;
-	Tue,  5 Dec 2023 15:17:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mTwZiRm8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 878D2C433CB;
-	Tue,  5 Dec 2023 15:16:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701789422;
-	bh=ythRDbHamCF1V960slPinsGfd+YNI6SDqBoOYO7K2x8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mTwZiRm8s2c6snTdYDkQtv/CeJA2v5zipvPAIN1D7nX8GBiqG75MVpxvTuBrI986p
-	 949AhbN+0FBFYQQhybk2cuB7vaxL82NbdfeJDYQHQyVa2uJBLZwz0VQhMUbc/WVPTO
-	 YBzmognQorgb7BCEvR/a40RtvNB3/nQ4I3f3So14aLBOTVVh15iSAF79cr0Vgsz6ZA
-	 6k62i6q6dKjGgKBCfmrNHhrL97+V3YGWxRBVsq1CrU3gSOUw+Kc/KiadzQUceu9Kdd
-	 wScFcOHxai1PgA/H/KIHxWQvr/iILmb6c/vrKn4MGPBL/T1Ikf0p0iGlRLBABjBZOW
-	 fAZq82SmP7KDQ==
-From: Will Deacon <will@kernel.org>
-To: Marc Zyngier <maz@kernel.org>,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: catalin.marinas@arm.com,
-	kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D24A54FB3
+	for <kvmarm@lists.linux.dev>; Tue,  5 Dec 2023 15:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ADFB6139F;
+	Tue,  5 Dec 2023 07:42:11 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1501B3F6C4;
+	Tue,  5 Dec 2023 07:41:22 -0800 (PST)
+Date: Tue, 5 Dec 2023 15:41:16 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@linux.ibm.com, broonie@kernel.org,
+	catalin.marinas@arm.com, dave.hansen@linux.intel.com,
+	oliver.upton@linux.dev, shuah@kernel.org, will@kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v3 0/3] arm64: Drop support for VPIPT i-cache policy
-Date: Tue,  5 Dec 2023 15:16:34 +0000
-Message-Id: <170177628445.1801906.11394045917050132780.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20231204143606.1806432-1-maz@kernel.org>
-References: <20231204143606.1806432-1-maz@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v3 00/25] Permission Overlay Extension
+Message-ID: <20231205154116.GA3613610@e124191.cambridge.arm.com>
+References: <20231124163510.1835740-1-joey.gouly@arm.com>
+ <86jzpub56r.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86jzpub56r.wl-maz@kernel.org>
 
-On Mon, 4 Dec 2023 14:36:03 +0000, Marc Zyngier wrote:
-> ARMv8.2 introduced support for VPIPT i-caches, the V standing for
-> VMID-tagged. Although this looked like a reasonable idea, no
-> implementation has ever made it into the wild.
+Hi Marc,
+
+On Mon, Dec 04, 2023 at 11:03:24AM +0000, Marc Zyngier wrote:
+> Hi Joey,
 > 
-> Linux has supported this for over 6 years (amusingly, just as the
-> architecture was dropping support for AIVIVT i-caches), but we had no
-> way to even test it, and it is likely that this code was just
-> bit-rotting.
+> On Fri, 24 Nov 2023 16:34:45 +0000,
+> Joey Gouly <joey.gouly@arm.com> wrote:
+> > 
+> > Hello everyone,
+> > 
+> > This series implements the Permission Overlay Extension introduced in 2022
+> > VMSA enhancements [1]. It is based on v6.7-rc2.
+> > 
+> > Changes since v2[2]:
+> > 	# Added ptrace support and selftest
+> > 	# Add missing POR_EL0 initialisation in fork/clone
+> > 	# Rebase onto v6.7-rc2
+> > 	# Add r-bs
+> > 
+> > The Permission Overlay Extension allows to constrain permissions on memory
+> > regions. This can be used from userspace (EL0) without a system call or TLB
+> > invalidation.
 > 
-> [...]
+> I have given this series a few more thoughts, and came to the
+> conclusion that is it still incomplete on the KVM front:
+> 
+> * FEAT_S1POE often comes together with FEAT_S2POE. For obvious
+>   reasons, we cannot afford to let the guest play with S2POR_EL1, nor
+>   do we want to advertise FEAT_S2POE to the guest.
+> 
+>   You will need to add some additional FGT for this, and mask out
+>   FEAT_S2POE from the guest's view of the ID registers.
 
-Applied to arm64 (for-next/rip-vpipt), thanks!
+I found out last week that I had misunderstood S2POR_EL1, so yes looks like
+we need to trap that. I will add that in.
 
-[1/3] KVM: arm64: Remove VPIPT I-cache handling
-      https://git.kernel.org/arm64/c/ced242ba9d7c
-[2/3] arm64: Kill detection of VPIPT i-cache policy
-      https://git.kernel.org/arm64/c/d8e12a0d3715
-[3/3] arm64: Rename reserved values for CTR_EL0.L1Ip
-      https://git.kernel.org/arm64/c/f35c32ca6839
+> 
+> * letting the guest play with POE comes with some interesting strings
+>   attached: a guest that has started on a POE-enabled host cannot be
+>   migrated to one that doesn't have POE. which means that the POE
+>   registers should only be visible to the host userspace if enabled in
+>   the guest's ID registers, and thus only context-switched in these
+>   conditions. They should otherwise UNDEF.
 
-Cheers,
--- 
-Will
+Can you give me some clarification here?
+	
+	- By visible to the host userspace do you mean via the GET_ONE_REG API?
+	- Currently the ID register (ID_AA64MMFR3_EL1) is not ID_WRITABLE,
+	  should this series or another make it so? Currently if the host had
+	  POE it's enabled in the guest, so I believe migration to a non-POE
+	  host will fail?
+	- For the context switch, do you mean something like:
 
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
+		if (system_supports_poe() && ID_REG(MMFR3_EL1) & S1POE)
+			ctxt_sys_reg(ctxt, POR_EL0)     = read_sysreg_s(SYS_POR_EL0);
+
+	  That would need some refactoring, since I don't see how to access
+	  id_regs from struct kvm_cpu_context.
+
+Thanks,
+Joey
