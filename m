@@ -1,94 +1,118 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B554C5F1E7;
-	Tue,  5 Dec 2023 16:52:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5FED63DF8;
+	Tue,  5 Dec 2023 17:01:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oJH6nUjJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 627CDC433C7;
-	Tue,  5 Dec 2023 16:52:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jNfhj6Sj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 255D0C433C8;
+	Tue,  5 Dec 2023 17:01:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701795142;
-	bh=uwufjRPZpufB4WAKz4BvxO1YI+sO9dPrjMMi385iZbk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=oJH6nUjJn+pyp8n8QaDhYp6O6TcSF9HaFifSF/X8m4+yK2Pwp31ReTfIX4tZWn/Cz
-	 86lXE9v7PZRc+2Cxb3IxSdF5UhFqACIGOtfmUB6u31A1yaUg2mteWy6Gi3vfyqjrqV
-	 WhknUSSiQJWuYzSSaQcjs17iKEVob+7hwlxId8i/yrI1yZqqPjHgeo/Uhqz5ErV+Fm
-	 GANr1ePi3zIO3dmEFhEZEMQuByFj1pU2UyShP0ql85o+6wWlej0p3w/+yk1LjFaIAb
-	 0Dzlv02i4V9ZBU0GzUFinZ4csSrcSjK9dXHCmjljO6kIXLM4hrj6nuvIFLKYWqKSfG
-	 33DIepcLWSMXQ==
-From: Mark Brown <broonie@kernel.org>
-Date: Tue, 05 Dec 2023 16:48:19 +0000
-Subject: [PATCH v3 21/21] KVM: arm64: selftests: Teach get-reg-list about
- FPMR
+	s=k20201202; t=1701795692;
+	bh=z7FNqyYbh++wU3ICRqjtT3LehPLX7SHlP2b7stErCRE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jNfhj6SjwbBQ6eNpCPhHomoxo+IV3cTvgkZeChvxF+fSfQ4y2bTEz6rcobZzE4s2P
+	 LNSbjPhlEsapTZ/7mWVrlynpEnYugwIYVaJibd4dmdLPOASWHtLeFovj11gCtct4hZ
+	 nAgj8g1idOGRt0n9d1mUI5OoqICgtQ9JzzdjPGiXCp07wAZwhNC60VQQHj1YdQv05e
+	 bLYWpmdZamoNsHnRMF7mETbH9Hce5K1sA4TNXvbTn7kuMfG9vkIXMohwOCCpzpsoeH
+	 h4SXpq9EALrkjxtjwSEAhwccECgNc4meNWltzxjMXKtRti9QXrOtwilyldBPOSigjk
+	 VbZyHfbzj8TPg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rAYnZ-001dRU-Dm;
+	Tue, 05 Dec 2023 17:01:29 +0000
+Date: Tue, 05 Dec 2023 17:01:28 +0000
+Message-ID: <86bkb4bn2v.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	ankita@nvidia.com,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	oliver.upton@linux.dev,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	will@kernel.org,
+	ardb@kernel.org,
+	akpm@linux-foundation.org,
+	gshan@redhat.com,
+	aniketa@nvidia.com,
+	cjia@nvidia.com,
+	kwankhede@nvidia.com,
+	targupta@nvidia.com,
+	vsethi@nvidia.com,
+	acurrid@nvidia.com,
+	apopple@nvidia.com,
+	jhubbard@nvidia.com,
+	danw@nvidia.com,
+	mochs@nvidia.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	lpieralisi@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 1/1] KVM: arm64: allow the VM to select DEVICE_* and NORMAL_NC for IO memory
+In-Reply-To: <20231205164318.GG2692119@nvidia.com>
+References: <20231205033015.10044-1-ankita@nvidia.com>
+	<86fs0hatt3.wl-maz@kernel.org>
+	<ZW8MP2tDt4_9ROBz@arm.com>
+	<20231205130517.GD2692119@nvidia.com>
+	<ZW9OSe8Z9gAmM7My@arm.com>
+	<20231205164318.GG2692119@nvidia.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231205-arm64-2023-dpisa-v3-21-dbcbcd867a7f@kernel.org>
-References: <20231205-arm64-2023-dpisa-v3-0-dbcbcd867a7f@kernel.org>
-In-Reply-To: <20231205-arm64-2023-dpisa-v3-0-dbcbcd867a7f@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <shuah@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- kvmarm@lists.linux.dev, linux-doc@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.13-dev-5c066
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1321; i=broonie@kernel.org;
- h=from:subject:message-id; bh=uwufjRPZpufB4WAKz4BvxO1YI+sO9dPrjMMi385iZbk=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBlb1T5Ms1LUZ7iykmEHQxr5Fc4YCOF2pq4fe2+9KtB
- TDNYZouJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZW9U+QAKCRAk1otyXVSH0LS6B/
- 9m9yzXT/1mV+qdIYO/iuTT5Lxlk2I9E71H/ZXhNX+z9TkxFh9/bVj7czqQM1kKuWwSY4I/FMi+GpXj
- OTN+KJliG6qr+1JrGSyNMdZcEXdR+7TmQF/zu5t0O215vAYHI4xGJxVqHuG0HTK7+UyN4sCb4q69U5
- aC178H0cE0U/XI4Cb4UnUb+XTLo2IJLxcn8pT5g/5qQVe5Ot1jZgGLWjxbKT0p1h8H/L/vKyFbEGG2
- 1ghWpPyxtGpWFnF3ckyM0qg/5sjW2HEbWxTDG6fYtSOqjm5/YEhd+jLdvMoTLzyXGrQh0SogO60n7k
- EfGfxPn+wsNRM7rgF8MP7C4bVua5pZ
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jgg@nvidia.com, catalin.marinas@arm.com, ankita@nvidia.com, shameerali.kolothum.thodi@huawei.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, ardb@kernel.org, akpm@linux-foundation.org, gshan@redhat.com, aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, lpieralisi@kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-FEAT_FPMR defines a new register FMPR which is available at all ELs and is
-discovered via ID_AA64PFR2_EL1.FPMR, add this to the set of registers that
-get-reg-list knows to check for with the required identification register
-depdendency.
+On Tue, 05 Dec 2023 16:43:18 +0000,
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+> 
+> On Tue, Dec 05, 2023 at 04:22:33PM +0000, Catalin Marinas wrote:
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/aarch64/get-reg-list.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+> > That's an argument to restrict this feature to PCIe. It's really about
+> > fewer arguments on the behaviour of other devices. Marc did raise
+> > another issue with the GIC VCPU interface (does this even have a vma in
+> > the host VMM?). That's a class of devices where the mapping is
+> > context-switched, so the TLBI+DSB rules don't help.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index 71ea6ecec7ce..1e43511d1440 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -40,6 +40,12 @@ static struct feature_id_reg feat_id_regs[] = {
- 		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
- 		4,
- 		1
-+	},
-+	{
-+		ARM64_SYS_REG(3, 3, 4, 4, 2),	/* FPMR */
-+		ARM64_SYS_REG(3, 0, 0, 4, 2),	/* ID_AA64PFR2_EL1 */
-+		32,
-+		1
- 	}
- };
- 
-@@ -481,6 +487,7 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 3, 14, 2, 1),	/* CNTP_CTL_EL0 */
- 	ARM64_SYS_REG(3, 3, 14, 2, 2),	/* CNTP_CVAL_EL0 */
- 	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
-+	ARM64_SYS_REG(3, 3, 4, 4, 2),	/* FPMR */
- 	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
- 	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
- };
+There is no vma. The CPU interface is entirely under control of KVM.
+Userspace only provides the IPA for the mapping.
+
+> 
+> I don't know anything about the GIC VCPU interface, to give any
+> comment unfortunately. Since it seems there is something to fix here I
+> would appreciate some background..
+>  
+> When you say it is context switched do you mean kvm does a register
+> write on every vm entry to set the proper HW context for the vCPU?
+
+The CPU interface is mapped in every guest S2 page tables as a per-CPU
+device, and under complete control of the guest. There is no KVM
+register write to that frame (unless we're proxying it, but that's for
+another day).
+
+> 
+> We are worrying that register write will possibly not order after
+> NORMAL_NC?
+
+Guest maps the device as Normal-NC (because it now can), which means
+that there is no control over the alignment or anything like that. The
+accesses could also be reordered, and/or hit after a context switch to
+another guest. Which is why KVM has so far used nGnRE as the mapping
+type.
+
+	M.
 
 -- 
-2.30.2
-
+Without deviation from the norm, progress is not possible.
