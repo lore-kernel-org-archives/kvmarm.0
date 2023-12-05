@@ -1,151 +1,98 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1366B3FB13
-	for <kvmarm@lists.linux.dev>; Tue,  5 Dec 2023 10:05:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A33B8FEC;
-	Tue,  5 Dec 2023 02:06:06 -0800 (PST)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 34E323F5A1;
-	Tue,  5 Dec 2023 02:05:17 -0800 (PST)
-Message-ID: <6576da2f-4427-43ab-91e5-40508bf1e128@arm.com>
-Date: Tue, 5 Dec 2023 10:05:15 +0000
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839EE3C490
+	for <kvmarm@lists.linux.dev>; Tue,  5 Dec 2023 10:22:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X5+1efbR"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-332e11a22a0so4862549f8f.2
+        for <kvmarm@lists.linux.dev>; Tue, 05 Dec 2023 02:22:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701771771; x=1702376571; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=9t18tGFYr+sidi4j7S8LuvInz9BurB3PbtEfB1rEvz4=;
+        b=X5+1efbR0AhvyGMvCglpHf8hbpOFQoawCCXez5aI/OrRs0uxKOHWWpxbCyyE4KhVMn
+         1NpQrqpHy9oTHeca508I3fim494fIURDgfFxGdWqgE0MP9judRchXt2C/dh1WdlKXqhw
+         oBGR7nbjByAkRlUEWS40qtWhUII6DYChhMFZtGjoZ2Xgv0U7dGhLPOiVHa4heu76eTSs
+         AosLRqVz2TMordFseyp0m8+yhWkKCZepKfPn7G9OuhrBAJAiWvav6Ng1APulpzVjG6Oj
+         QmbvRPwDuo6416zcKYQGIxsGTPNppB6cx1HgU/oF2hdq0F3f5IEw7/OjJLBb6tEdtu3u
+         BDnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701771771; x=1702376571;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9t18tGFYr+sidi4j7S8LuvInz9BurB3PbtEfB1rEvz4=;
+        b=cg8e2BR9PEOD8SPNy1OLSvyKc/hhxaXHVPPjPB/z3JcrH5N4eaoe0M/I+r56hFmChO
+         BNRmcH3f6YBqZqA2qGQ+iFADA4EK+beF1sPepsS2IUW5mkBcnqD3oHuhb4l4MovNrx/P
+         Sssa/a5x0Hh4J/gGqqYC0ZBiZMIvdEO2WEFawM2PF6bTygyk4kSKWkURRzSpbZ4qcvUR
+         PYCqJOZL11ZwAKBOg5i5IjGxWhyZ6f74mPz+23rWGFE68KaC+mBhwxm0Rxhy2bti2Mnh
+         /6WquU4g5Rl/0RcH+bInHud9gxvGZ/2BBX1EjiSQXLzJsYEQhIyvfaXiRi9koniJGoQM
+         j0yA==
+X-Gm-Message-State: AOJu0Yz9ZvYkPOqhW2Wpcr9SA1PczrAEa/rWHE8svzWrEZ7hfqEbMmeM
+	l2q4kFkcJOim4f3jg/G4hbg9K/gWYZv/SSsXOlny+zG1e7mcY6VkiSJp6T99nZngnE95Xl1wgvI
+	inlZJ0VANfqruJeegMxPuXcZ7NTnxiddshoF83n3uoXB5CceDoTvjP1b4NDk=
+X-Google-Smtp-Source: AGHT+IHBNt8mVY9BRjxlPkPSAlByF0bIpNxxBtLE8A9fq7bJa4dCdkcUDDFks8BIN3A4T8cIC2aHLMudew==
+X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
+ (user=tabba job=sendgmr) by 2002:a5d:4d04:0:b0:333:3175:5afa with SMTP id
+ z4-20020a5d4d04000000b0033331755afamr134491wrt.14.1701771770646; Tue, 05 Dec
+ 2023 02:22:50 -0800 (PST)
+Date: Tue,  5 Dec 2023 10:22:42 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 3/6] arm64: KVM: Add iflag for FEAT_TRF
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>, James Clark <james.clark@arm.com>
-Cc: coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, broonie@kernel.org,
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mike Leach <mike.leach@linaro.org>, Leo Yan <leo.yan@linaro.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
- <robh@kernel.org>, Jintack Lim <jintack.lim@linaro.org>,
- Fuad Tabba <tabba@google.com>,
- Kristina Martsenko <kristina.martsenko@arm.com>,
- Akihiko Odaki <akihiko.odaki@daynix.com>, Joey Gouly <joey.gouly@arm.com>,
- linux-kernel@vger.kernel.org
-References: <20231019165510.1966367-1-james.clark@arm.com>
- <20231019165510.1966367-4-james.clark@arm.com> <86o7f6b8n8.wl-maz@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <86o7f6b8n8.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.rc2.451.g8631bc7472-goog
+Message-ID: <20231205102248.1915895-1-tabba@google.com>
+Subject: [PATCH v1 0/6] KVM: arm64: Fixes to fine grain traps and pKVM traps
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev
+Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, eric.auger@redhat.com, jingzhangos@google.com, 
+	joey.gouly@arm.com, tabba@google.com, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 04/12/2023 09:48, Marc Zyngier wrote:
-> On Thu, 19 Oct 2023 17:55:01 +0100,
-> James Clark <james.clark@arm.com> wrote:
->>
->> Add an extra iflag to signify if the TRFCR register is accessible.
->> Because TRBE requires FEAT_TRF, DEBUG_STATE_SAVE_TRBE still has the same
->> behavior even though it's only set when FEAT_TRF is present.
->>
->> The following holes are left in struct kvm_vcpu_arch, but there aren't
->> enough other 8 bit fields to rearrange it to leave any hole smaller than
->> 7 bytes:
->>
->>    u8                         cflags;               /*  2292     1 */
->>    /* XXX 1 byte hole, try to pack */
->>    u16                        iflags;               /*  2294     2 */
->>    u8                         sflags;               /*  2296     1 */
->>    bool                       pause;                /*  2297     1 */
->>    /* XXX 6 bytes hole, try to pack */
->>
->> Signed-off-by: James Clark <james.clark@arm.com>
->> ---
->>   arch/arm64/include/asm/kvm_host.h |  4 +++-
->>   arch/arm64/kvm/debug.c            | 22 ++++++++++++++++++----
->>   2 files changed, 21 insertions(+), 5 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 7c82927ddaf2..0f0bf8e641bd 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -535,7 +535,7 @@ struct kvm_vcpu_arch {
->>   	u8 cflags;
->>   
->>   	/* Input flags to the hypervisor code, potentially cleared after use */
->> -	u8 iflags;
->> +	u16 iflags;
->>   
->>   	/* State flags for kernel bookkeeping, unused by the hypervisor code */
->>   	u8 sflags;
->> @@ -741,6 +741,8 @@ struct kvm_vcpu_arch {
->>   #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
->>   /* vcpu running in HYP context */
->>   #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
->> +/* Save trace filter controls */
->> +#define DEBUG_STATE_SAVE_TRFCR	__vcpu_single_flag(iflags, BIT(8))
->>   
->>   /* SVE enabled for host EL0 */
->>   #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
->> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
->> index 8725291cb00a..20cdd40b3c42 100644
->> --- a/arch/arm64/kvm/debug.c
->> +++ b/arch/arm64/kvm/debug.c
->> @@ -331,14 +331,28 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
->>   	    !(read_sysreg_s(SYS_PMBIDR_EL1) & BIT(PMBIDR_EL1_P_SHIFT)))
->>   		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_SPE);
->>   
->> -	/* Check if we have TRBE implemented and available at the host */
->> -	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
->> -	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
->> -		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
->> +	/*
->> +	 * Save TRFCR on nVHE if FEAT_TRF (TraceFilt) exists. This will be
->> +	 * done in cases where use of TRBE doesn't completely disable trace and
->> +	 * handles the exclude_host/exclude_guest rules of the trace session.
-> 
-> This comment provides zero information. What will be done? Under which
-> conditions? What are the rules?
-> 
->> +	 */
->> +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceFilt_SHIFT)) {
->> +		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
->> +		/*
->> +		 * Check if we have TRBE implemented and available at the host. If it's
->> +		 * in use at the time of guest switch it will need to be disabled and
->> +		 * then restored. The architecture mandates FEAT_TRF with TRBE, so we
->> +		 * only need to check for TRBE after TRF.
->> +		 */
->> +		if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
->> +		    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
->> +			vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
->> +	}
-> 
-> Multiple questions:
-> 
-> - Why is it safe to trust the local CPU's capability rather than the
->    consolidated view from the cpufeature infrastructure?
+This patch series has fixes, updates, and code for validating
+fine grain trap register masks, as well as some fixes to feature
+trapping in pKVM.
 
-The coresight driver is capable of handling heterogeneous systems. i.e., 
-some CPUs may not have FEAT_TRF or FEAT_TRBE. This could be for various
-reasons (e.g., CPU Erratum disabling TRBE, though not used now). It 
-already needs to treat each CPU differently (due to the capabilities
-of the ETM).
+New fine grain trap (FGT) bits have been defined in the latest
+Arm Architecture System Registers xml specification (2023-09)
+[*], so the code is updated to reflect them. Moreover, some of
+the already-defined masks overlap with res0, which this series
+fixes. It also adds FGT register masks that weren't defined
+earlier, as well as build time validation that the bits of the
+various masks are all accounted for and without overlap.
 
-That said, we could reject events with exclude_guest/exclude_host flags
-on CPUs that do not support FEAT_TRF. But that doesn't solve checking
-the local capability.
+Based on 6.7-rc4.
 
-Suzuki
+Cheers,
+/fuad
+
+[*] https://developer.arm.com/downloads/-/exploration-tools
+
+Fuad Tabba (6):
+  KVM: arm64: Update and fix FGT register masks
+  KVM: arm64: Add bit masks for HAFGRTR_EL2
+  KVM: arm64: Add build validation for trap mask values
+  KVM: arm64: Calculate FGT RES0 Bits
+  KVM: arm64: Trap external trace for protected VMs
+  KVM: arm64: Mark features as supported for protected VMs
+
+ arch/arm64/include/asm/kvm_arm.h              | 56 +++++++++++--------
+ arch/arm64/kvm/hyp/include/hyp/switch.h       | 16 ++++++
+ .../arm64/kvm/hyp/include/nvhe/fixed_config.h |  4 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                |  4 ++
+ arch/arm64/tools/sysreg                       |  5 +-
+ 5 files changed, 59 insertions(+), 26 deletions(-)
 
 
-> 
-> - Why defer the saving of the registers if there are no changes made
->    to them in the interval?
-> 
-> Thanks,
-> 
-> 	M.
-> 
+base-commit: 33cc938e65a98f1d29d0a18403dbbee050dcad9a
+-- 
+2.43.0.rc2.451.g8631bc7472-goog
 
