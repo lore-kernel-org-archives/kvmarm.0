@@ -1,148 +1,204 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1413CD302;
-	Tue,  5 Dec 2023 11:49:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6136C433C7;
-	Tue,  5 Dec 2023 11:48:59 +0000 (UTC)
-Date: Tue, 5 Dec 2023 11:48:57 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: ankita@nvidia.com
-Cc: jgg@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org,
-	ardb@kernel.org, akpm@linux-foundation.org, gshan@redhat.com,
-	aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
-	targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
-	apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
-	mochs@nvidia.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 1/1] KVM: arm64: allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
-Message-ID: <ZW8OKZHpXeVjoNo6@arm.com>
-References: <20231205033015.10044-1-ankita@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA9E59B5F
+	for <kvmarm@lists.linux.dev>; Tue,  5 Dec 2023 11:49:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QWv2Bl+k"
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-d9caf5cc948so3834398276.0
+        for <kvmarm@lists.linux.dev>; Tue, 05 Dec 2023 03:49:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1701776953; x=1702381753; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9RIXOTY8N1Sf+XTL65qiqMC1xJCtrrgjQeLQxSj1Ur8=;
+        b=QWv2Bl+k1HFAaPPburlnieVILIEBu6w1Zs2BOwXiHHjXg/Dk9NQBzcmaD9rwzE03/s
+         sv3Rh4LpwlTp4cO/OEsskKIE+nLCRrfayRlvyjW+UrXWwIog5/rwpyw6ZlqyfVJ7q9un
+         mXJ0nf1OAlOhXRYlIR4HkWJk07K/RDjCw/Z4XG35S4YR0yrwtivgA/3qm5WjFnvdGJpN
+         zn+AbviG6UqTr6VAWY5n7NlGo3t1ZOhMXo6MJObbOsngwxLRp8kfDQIFVyGKDzDpgI9v
+         ySz2YUGzXVY85Jgj8Xav3+6NjkvHYj8OzoX7XU5KuAcRoDh0Pd2/sq9UPrGrxAfcG6Jj
+         sRMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701776953; x=1702381753;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9RIXOTY8N1Sf+XTL65qiqMC1xJCtrrgjQeLQxSj1Ur8=;
+        b=TtATx4zyeLakNIH7ckfKk35uq82wMvrs7rommr7czBx0NbUuq30+ETF7/McwhTqsu0
+         242i7XCk6pzwH7ISonXnCBPhKk3NSgRfaU6Q69f3PddOf4CANlxjLjZYo/3dy5D6wvNU
+         eyEnJSyeH/cBHRPPfkb3abQXYBr0p9PkZMiaq93C9oqcXTHRwiATsOYWy26L0AzSSjOo
+         OP3M6FDMsqPZhxMbCUk4YjqU5j6n+tkwDn1zaXltbrFytuEdFmFMeTTDWkRu8P4wtQ00
+         2kBnbGA+shmQyj/9z7k2YNuXMt4FEFy5MdzR6OCad5FC/Hn5sc95cYe2GpMU+lOeIMJG
+         gQ6Q==
+X-Gm-Message-State: AOJu0YwSvRLaZkXlmDRjENTqzHTi4T+B3YhLMMEsvHUEXnYYV0q0T00E
+	ymK6rCtX2+q++V0WWma6I/8GPk91OpIUNIApFHXW3Q==
+X-Google-Smtp-Source: AGHT+IHyAAfa5sVL3van3e3XPeN7/D5V8TQXYHwAqYxm7mt/gTCU60QNTsETWXFScWVvFbJ3k/MIEIO2IpntOOS53mE=
+X-Received: by 2002:a05:6902:30b:b0:db9:82b6:5c39 with SMTP id
+ b11-20020a056902030b00b00db982b65c39mr1113710ybs.45.1701776952601; Tue, 05
+ Dec 2023 03:49:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231205033015.10044-1-ankita@nvidia.com>
+References: <20231205102248.1915895-1-tabba@google.com> <20231205102248.1915895-2-tabba@google.com>
+ <86edg0c2w1.wl-maz@kernel.org>
+In-Reply-To: <86edg0c2w1.wl-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 5 Dec 2023 11:48:35 +0000
+Message-ID: <CA+EHjTwEkmRCRJsBkwv9nYzcfBPdAApXoFQBVViM3uF2FbsEig@mail.gmail.com>
+Subject: Re: [PATCH v1 1/6] KVM: arm64: Update and fix FGT register masks
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, oliver.upton@linux.dev, james.morse@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, eric.auger@redhat.com, jingzhangos@google.com, 
+	joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 05, 2023 at 09:00:15AM +0530, ankita@nvidia.com wrote:
-> From: Ankit Agrawal <ankita@nvidia.com>
-> 
-> Currently, KVM for ARM64 maps at stage 2 memory that is considered device
-> (i.e. it is not RAM) with DEVICE_nGnRE memory attributes; this setting
-> overrides (as per the ARM architecture [1]) any device MMIO mapping
-> present at stage 1, resulting in a set-up whereby a guest operating
-> system cannot determine device MMIO mapping memory attributes on its
-> own but it is always overridden by the KVM stage 2 default.
-> 
-> This set-up does not allow guest operating systems to select device
-> memory attributes independently from KVM stage-2 mappings
-> (refer to [1], "Combining stage 1 and stage 2 memory type attributes"),
-> which turns out to be an issue in that guest operating systems
-> (e.g. Linux) may request to map devices MMIO regions with memory
-> attributes that guarantee better performance (e.g. gathering
-> attribute - that for some devices can generate larger PCIe memory
-> writes TLPs) and specific operations (e.g. unaligned transactions)
-> such as the NormalNC memory type.
-> 
-> The default device stage 2 mapping was chosen in KVM for ARM64 since
-> it was considered safer (i.e. it would not allow guests to trigger
-> uncontained failures ultimately crashing the machine) but this
-> turned out to be asynchronous (SError) defeating the purpose.
-> 
-> Failures containability is a property of the platform and is independent
-> from the memory type used for MMIO device memory mappings.
-> 
-> Actually, DEVICE_nGnRE memory type is even more problematic than
-> Normal-NC memory type in terms of faults containability in that e.g.
-> aborts triggered on DEVICE_nGnRE loads cannot be made, architecturally,
-> synchronous (i.e. that would imply that the processor should issue at
-> most 1 load transaction at a time - it cannot pipeline them - otherwise
-> the synchronous abort semantics would break the no-speculation attribute
-> attached to DEVICE_XXX memory).
-> 
-> This means that regardless of the combined stage1+stage2 mappings a
-> platform is safe if and only if device transactions cannot trigger
-> uncontained failures and that in turn relies on platform capabilities
-> and the device type being assigned (i.e. PCIe AER/DPC error containment
-> and RAS architecture[3]); therefore the default KVM device stage 2
-> memory attributes play no role in making device assignment safer
-> for a given platform (if the platform design adheres to design
-> guidelines outlined in [3]) and therefore can be relaxed.
-> 
-> For all these reasons, relax the KVM stage 2 device memory attributes
-> from DEVICE_nGnRE to Normal-NC. Add a new kvm_pgtable_prot flag for
-> Normal-NC.
-> 
-> The Normal-NC was chosen over a different Normal memory type default
-> at stage-2 (e.g. Normal Write-through) to avoid cache allocation/snooping.
-> 
-> Relaxing S2 KVM device MMIO mappings to Normal-NC is not expected to
-> trigger any issue on guest device reclaim use cases either (i.e. device
-> MMIO unmap followed by a device reset) at least for PCIe devices, in that
-> in PCIe a device reset is architected and carried out through PCI config
-> space transactions that are naturally ordered with respect to MMIO
-> transactions according to the PCI ordering rules.
-> 
-> Having Normal-NC S2 default puts guests in control (thanks to
-> stage1+stage2 combined memory attributes rules [1]) of device MMIO
-> regions memory mappings, according to the rules described in [1]
-> and summarized here ([(S1) - stage1], [(S2) - stage 2]):
-> 
-> S1           |  S2           | Result
-> NORMAL-WB    |  NORMAL-NC    | NORMAL-NC
-> NORMAL-WT    |  NORMAL-NC    | NORMAL-NC
-> NORMAL-NC    |  NORMAL-NC    | NORMAL-NC
-> DEVICE<attr> |  NORMAL-NC    | DEVICE<attr>
-> 
-> It is worth noting that currently, to map devices MMIO space to user
-> space in a device pass-through use case the VFIO framework applies memory
-> attributes derived from pgprot_noncached() settings applied to VMAs, which
-> result in device-nGnRnE memory attributes for the stage-1 VMM mappings.
-> 
-> This means that a userspace mapping for device MMIO space carried
-> out with the current VFIO framework and a guest OS mapping for the same
-> MMIO space may result in a mismatched alias as described in [2].
-> 
-> Defaulting KVM device stage-2 mappings to Normal-NC attributes does not
-> change anything in this respect, in that the mismatched aliases would
-> only affect (refer to [2] for a detailed explanation) ordering between
-> the userspace and GuestOS mappings resulting stream of transactions
-> (i.e. it does not cause loss of property for either stream of
-> transactions on its own), which is harmless given that the userspace
-> and GuestOS access to the device is carried out through independent
-> transactions streams.
-> 
-> [1] section D8.5 - DDI0487_I_a_a-profile_architecture_reference_manual.pdf
-> [2] section B2.8 - DDI0487_I_a_a-profile_architecture_reference_manual.pdf
-> [3] sections 1.7.7.3/1.8.5.2/appendix C - DEN0029H_SBSA_7.1.pdf
-> 
-> Applied over next-20231201
-> 
-> History
-> =======
-> v1 -> v2
-> - Updated commit log to the one posted by
->   Lorenzo Pieralisi <lpieralisi@kernel.org> (Thanks!)
-> - Added new flag to represent the NORMAL_NC setting. Updated
->   stage2_set_prot_attr() to handle new flag.
-> 
-> v1 Link:
-> https://lore.kernel.org/all/20230907181459.18145-3-ankita@nvidia.com/
-> 
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
-> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Hi Marc,
 
-In the light of having to keep this relaxation only for PCIe devices, I
-will withdraw my Ack until we come to a conclusion.
+On Tue, Dec 5, 2023 at 11:20=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Tue, 05 Dec 2023 10:22:43 +0000,
+> Fuad Tabba <tabba@google.com> wrote:
+> >
+> > New trap bits have been defined in the latest Arm Architecture
+> > System Registers xml specification [*]. Moreover, the existing
+> > definitions of some of the mask and the res0 bits overlap, which
+>
+> nit: s/res0/RES0/
 
-Thanks.
+Ack
 
--- 
-Catalin
+> > could be wrong, confusing, or potentially both.
+> >
+> > Update the bits to represent the latest spec (as of this patch),
+> > and ensure that the existing bits are consistent.
+> >
+> > [*] https://developer.arm.com/downloads/-/exploration-tools
+>
+> Please indicate which version of the XML you are referring to (it
+> changes on average every 3 months).
+
+Ack
+
+> >
+> > Fixes: 0fd76865006d ("KVM: arm64: Add nPIR{E0}_EL1 to HFG traps")
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_arm.h | 39 ++++++++++++++++++++------------
+> >  1 file changed, 24 insertions(+), 15 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/=
+kvm_arm.h
+> > index b85f46a73e21..b1061647e837 100644
+> > --- a/arch/arm64/include/asm/kvm_arm.h
+> > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > @@ -344,36 +344,45 @@
+> >   * Once we get to a point where the two describe the same thing, we'll
+> >   * merge the definitions. One day.
+> >   */
+> > -#define __HFGRTR_EL2_RES0    (GENMASK(63, 56) | GENMASK(53, 51))
+> > +#define __HFGRTR_EL2_RES0    BIT(51)
+>
+> If we are now using the current architectural definition for RES0, can
+> we please move over to the generated values, as indicated in the above
+> comment?
+
+I'd missed the generated definitions. I thought that the comment was
+referring to the read and write version of the registers. Will fix
+that.
+
+> >  #define __HFGRTR_EL2_MASK    GENMASK(49, 0)
+> > -#define __HFGRTR_EL2_nMASK   (GENMASK(58, 57) | GENMASK(55, 54) | BIT(=
+50))
+> > +#define __HFGRTR_EL2_nMASK   (GENMASK(63, 52) | BIT(50))
+> >
+> > -#define __HFGWTR_EL2_RES0    (GENMASK(63, 56) | GENMASK(53, 51) |    \
+> > -                              BIT(46) | BIT(42) | BIT(40) | BIT(28) | =
+\
+> > -                              GENMASK(26, 25) | BIT(21) | BIT(18) |  \
+> > +#define __HFGWTR_EL2_RES0    (BIT(51) | BIT(46) | BIT(42) | BIT(40) | =
+\
+> > +                              BIT(28) | GENMASK(26, 25) | BIT(21) | BI=
+T(18) | \
+> >                                GENMASK(15, 14) | GENMASK(10, 9) | BIT(2=
+))
+> > -#define __HFGWTR_EL2_MASK    GENMASK(49, 0)
+> > -#define __HFGWTR_EL2_nMASK   (GENMASK(58, 57) | GENMASK(55, 54) | BIT(=
+50))
+> > +#define __HFGWTR_EL2_MASK    (GENMASK(49, 47) | GENMASK(45, 43) | \
+> > +                              BIT(41) | GENMASK(39, 29) | BIT(27) | \
+> > +                              GENMASK(24, 22) | GENMASK(20, 19) | \
+> > +                              GENMASK(17, 16) | GENMASK(13, 11) | \
+> > +                              GENMASK(8, 3) | GENMASK(1, 0))
+> > +#define __HFGWTR_EL2_nMASK   (GENMASK(63, 52) | BIT(50))
+> >
+> > -#define __HFGITR_EL2_RES0    GENMASK(63, 57)
+> > -#define __HFGITR_EL2_MASK    GENMASK(54, 0)
+> > -#define __HFGITR_EL2_nMASK   GENMASK(56, 55)
+> > +#define __HFGITR_EL2_RES0    (BIT(63) | BIT(61))
+> > +#define __HFGITR_EL2_MASK    (BIT(62) | BIT(60) | GENMASK(54, 0))
+> > +#define __HFGITR_EL2_nMASK   GENMASK(59, 55)
+> >
+> >  #define __HDFGRTR_EL2_RES0   (BIT(49) | BIT(42) | GENMASK(39, 38) |  \
+> >                                GENMASK(21, 20) | BIT(8))
+> > -#define __HDFGRTR_EL2_MASK   ~__HDFGRTR_EL2_nMASK
+> > +#define __HDFGRTR_EL2_MASK   (BIT(63) | GENMASK(58, 50) | GENMASK(48, =
+43) | \
+> > +                              GENMASK(41, 40) | GENMASK(37, 22) | \
+> > +                              GENMASK(19, 9) | GENMASK(7, 0))
+> >  #define __HDFGRTR_EL2_nMASK  GENMASK(62, 59)
+> >
+> >  #define __HDFGWTR_EL2_RES0   (BIT(63) | GENMASK(59, 58) | BIT(51) | BI=
+T(47) | \
+> >                                BIT(43) | GENMASK(40, 38) | BIT(34) | BI=
+T(30) | \
+> >                                BIT(22) | BIT(9) | BIT(6))
+> > -#define __HDFGWTR_EL2_MASK   ~__HDFGWTR_EL2_nMASK
+> > +#define __HDFGWTR_EL2_MASK   (GENMASK(57, 52) | GENMASK(50, 48) | \
+> > +                              GENMASK(46, 44) | GENMASK(42, 41) | \
+> > +                              GENMASK(37, 35) | GENMASK(33, 31) | \
+> > +                              GENMASK(29, 23) | GENMASK(21, 10) | \
+> > +                              GENMASK(8, 7) | GENMASK(5, 0))
+> >  #define __HDFGWTR_EL2_nMASK  GENMASK(62, 60)
+> >
+> >  /* Similar definitions for HCRX_EL2 */
+> > -#define __HCRX_EL2_RES0              (GENMASK(63, 16) | GENMASK(13, 12=
+))
+> > -#define __HCRX_EL2_MASK              (0)
+> > -#define __HCRX_EL2_nMASK     (GENMASK(15, 14) | GENMASK(4, 0))
+> > +#define __HCRX_EL2_RES0         (GENMASK(63, 25) | GENMASK(13, 12))
+> > +#define __HCRX_EL2_MASK              (BIT(6))
+> > +#define __HCRX_EL2_nMASK     (GENMASK(24, 14) | GENMASK(11, 7) | GENMA=
+SK(5, 0))
+> >
+> >  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+> >  #define HPFAR_MASK   (~UL(0xf))
+>
+> The main driver for not following the latest and greatest version
+> published in the architecture (including the FGT2 stuff) was to limit
+> the amount of work we need to do in NV.
+>
+> Can you please update the FGT tables in emulated-nested.c so that we
+> have a matching description of the added bits? This also overlaps with
+> the work Joey is doing on POE, so there is scope for collaboration
+> between you two here.
+
+Will do.
+
+Cheers,
+/fuad
+
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
