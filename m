@@ -1,30 +1,28 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3163F3FE41
-	for <kvmarm@lists.linux.dev>; Tue,  5 Dec 2023 09:55:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1366B3FB13
+	for <kvmarm@lists.linux.dev>; Tue,  5 Dec 2023 10:05:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E4077FEC;
-	Tue,  5 Dec 2023 01:55:47 -0800 (PST)
-Received: from [192.168.1.3] (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BD9BA3F5A1;
-	Tue,  5 Dec 2023 01:54:58 -0800 (PST)
-Message-ID: <ce9caa4a-273f-4272-9c58-81b3e4d535de@arm.com>
-Date: Tue, 5 Dec 2023 09:54:58 +0000
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A33B8FEC;
+	Tue,  5 Dec 2023 02:06:06 -0800 (PST)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 34E323F5A1;
+	Tue,  5 Dec 2023 02:05:17 -0800 (PST)
+Message-ID: <6576da2f-4427-43ab-91e5-40508bf1e128@arm.com>
+Date: Tue, 5 Dec 2023 10:05:15 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v3 4/6] arm64: KVM: Add interface to set guest value for
- TRFCR register
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 3/6] arm64: KVM: Add iflag for FEAT_TRF
 Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
+To: Marc Zyngier <maz@kernel.org>, James Clark <james.clark@arm.com>
 Cc: coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, suzuki.poulose@arm.com, broonie@kernel.org,
+ kvmarm@lists.linux.dev, broonie@kernel.org,
  Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
  Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
  <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
@@ -32,158 +30,122 @@ Cc: coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
  Alexander Shishkin <alexander.shishkin@linux.intel.com>,
  Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
  <robh@kernel.org>, Jintack Lim <jintack.lim@linaro.org>,
+ Fuad Tabba <tabba@google.com>,
  Kristina Martsenko <kristina.martsenko@arm.com>,
- Fuad Tabba <tabba@google.com>, Akihiko Odaki <akihiko.odaki@daynix.com>,
- Joey Gouly <joey.gouly@arm.com>, linux-kernel@vger.kernel.org
+ Akihiko Odaki <akihiko.odaki@daynix.com>, Joey Gouly <joey.gouly@arm.com>,
+ linux-kernel@vger.kernel.org
 References: <20231019165510.1966367-1-james.clark@arm.com>
- <20231019165510.1966367-5-james.clark@arm.com> <86msuqb84g.wl-maz@kernel.org>
-From: James Clark <james.clark@arm.com>
-In-Reply-To: <86msuqb84g.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+ <20231019165510.1966367-4-james.clark@arm.com> <86o7f6b8n8.wl-maz@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <86o7f6b8n8.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-
-
-On 04/12/2023 09:59, Marc Zyngier wrote:
-> On Thu, 19 Oct 2023 17:55:02 +0100,
+On 04/12/2023 09:48, Marc Zyngier wrote:
+> On Thu, 19 Oct 2023 17:55:01 +0100,
 > James Clark <james.clark@arm.com> wrote:
 >>
->> Add an interface for the Coresight driver to use to set the value of the
->> TRFCR register for the guest. This register controls the exclude
->> settings for trace at different exception levels, and is used to honor
->> the exclude_host and exclude_guest parameters from the Perf session.
->> This will be used to later write TRFCR_EL1 on nVHE at guest switch. For
->> VHE, the host trace is controlled by TRFCR_EL2 and thus we can write to
->> the TRFCR_EL1 immediately. Because guest writes to the register are
->> trapped, the value will persist and can't be modified.
+>> Add an extra iflag to signify if the TRFCR register is accessible.
+>> Because TRBE requires FEAT_TRF, DEBUG_STATE_SAVE_TRBE still has the same
+>> behavior even though it's only set when FEAT_TRF is present.
 >>
->> The settings must be copied to the vCPU before each run in the same
->> way that PMU events are, because the per-cpu struct isn't accessible in
->> protected mode.
-> 
-> Then maybe we should look at a better way of sharing global data
-> between EL1 and EL2 instead of copying stuff ad-nauseam?
-> 
-
-That probably makes sense, I can have a look into that.
-
+>> The following holes are left in struct kvm_vcpu_arch, but there aren't
+>> enough other 8 bit fields to rearrange it to leave any hole smaller than
+>> 7 bytes:
+>>
+>>    u8                         cflags;               /*  2292     1 */
+>>    /* XXX 1 byte hole, try to pack */
+>>    u16                        iflags;               /*  2294     2 */
+>>    u8                         sflags;               /*  2296     1 */
+>>    bool                       pause;                /*  2297     1 */
+>>    /* XXX 6 bytes hole, try to pack */
 >>
 >> Signed-off-by: James Clark <james.clark@arm.com>
 >> ---
->>  arch/arm64/include/asm/kvm_host.h |  3 +++
->>  arch/arm64/kvm/arm.c              |  1 +
->>  arch/arm64/kvm/debug.c            | 26 ++++++++++++++++++++++++++
->>  3 files changed, 30 insertions(+)
+>>   arch/arm64/include/asm/kvm_host.h |  4 +++-
+>>   arch/arm64/kvm/debug.c            | 22 ++++++++++++++++++----
+>>   2 files changed, 21 insertions(+), 5 deletions(-)
 >>
 >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 0f0bf8e641bd..e1852102550d 100644
+>> index 7c82927ddaf2..0f0bf8e641bd 100644
 >> --- a/arch/arm64/include/asm/kvm_host.h
 >> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -1125,6 +1125,8 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu);
->>  void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
->>  void kvm_clr_pmu_events(u32 clr);
->>  bool kvm_set_pmuserenr(u64 val);
->> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest);
->> +void kvm_etm_update_vcpu_events(struct kvm_vcpu *vcpu);
->>  #else
->>  static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
->>  static inline void kvm_clr_pmu_events(u32 clr) {}
->> @@ -1132,6 +1134,7 @@ static inline bool kvm_set_pmuserenr(u64 val)
->>  {
->>  	return false;
->>  }
->> +static inline void kvm_etm_set_guest_trfcr(u64 trfcr_guest) {}
->>  #endif
->>  
->>  void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu);
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 0f717b6a9151..e4d846f2f665 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -1015,6 +1015,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->>  		kvm_vgic_flush_hwstate(vcpu);
->>  
->>  		kvm_pmu_update_vcpu_events(vcpu);
->> +		kvm_etm_update_vcpu_events(vcpu);
->>  
->>  		/*
->>  		 * Ensure we set mode to IN_GUEST_MODE after we disable
+>> @@ -535,7 +535,7 @@ struct kvm_vcpu_arch {
+>>   	u8 cflags;
+>>   
+>>   	/* Input flags to the hypervisor code, potentially cleared after use */
+>> -	u8 iflags;
+>> +	u16 iflags;
+>>   
+>>   	/* State flags for kernel bookkeeping, unused by the hypervisor code */
+>>   	u8 sflags;
+>> @@ -741,6 +741,8 @@ struct kvm_vcpu_arch {
+>>   #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
+>>   /* vcpu running in HYP context */
+>>   #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
+>> +/* Save trace filter controls */
+>> +#define DEBUG_STATE_SAVE_TRFCR	__vcpu_single_flag(iflags, BIT(8))
+>>   
+>>   /* SVE enabled for host EL0 */
+>>   #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
 >> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
->> index 20cdd40b3c42..2ab41b954512 100644
+>> index 8725291cb00a..20cdd40b3c42 100644
 >> --- a/arch/arm64/kvm/debug.c
 >> +++ b/arch/arm64/kvm/debug.c
->> @@ -23,6 +23,12 @@
->>  
->>  static DEFINE_PER_CPU(u64, mdcr_el2);
->>  
->> +/*
->> + * Per CPU value for TRFCR that should be applied to any guest vcpu that may
->> + * run on that core in the future.
->> + */
->> +static DEFINE_PER_CPU(u64, guest_trfcr);
->> +
->>  /**
->>   * save/restore_guest_debug_regs
->>   *
->> @@ -356,3 +362,23 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
->>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
->>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
->>  }
->> +
->> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest)
->> +{
->> +	if (has_vhe())
->> +		write_sysreg_s(trfcr_guest, SYS_TRFCR_EL12);
->> +	else
->> +		*this_cpu_ptr(&guest_trfcr) = trfcr_guest;
->> +}
->> +EXPORT_SYMBOL_GPL(kvm_etm_set_guest_trfcr);
+>> @@ -331,14 +331,28 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
+>>   	    !(read_sysreg_s(SYS_PMBIDR_EL1) & BIT(PMBIDR_EL1_P_SHIFT)))
+>>   		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+>>   
+>> -	/* Check if we have TRBE implemented and available at the host */
+>> -	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
+>> -	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
+>> -		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+>> +	/*
+>> +	 * Save TRFCR on nVHE if FEAT_TRF (TraceFilt) exists. This will be
+>> +	 * done in cases where use of TRBE doesn't completely disable trace and
+>> +	 * handles the exclude_host/exclude_guest rules of the trace session.
 > 
-> How does the ETM code know what guests it impacts? Don't you have some
-> per-process context already?
+> This comment provides zero information. What will be done? Under which
+> conditions? What are the rules?
 > 
-
-It doesn't know what guests it impacts, it just does it blindly based on
-host CPU and whatever guest might run on the CPU in the future. PMU
-events are the same.
-
-We do have per-process context for per-process sessions, so if that was
-the VM process we might have been able to do something with that info.
-But we also have per-cpu sessions that would trace anything that runs on
-that CPU, so to be able to support that mode I think it has to be done
-without knowing about any guest.
-
->> +
->> +/*
->> + * Updates the vcpu's view of the etm events for this cpu. Must be
->> + * called before every vcpu run after disabling interrupts, to ensure
->> + * that an interrupt cannot fire and update the structure.
->> + */
->> +void kvm_etm_update_vcpu_events(struct kvm_vcpu *vcpu)
->> +{
->> +	if (!has_vhe() && vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRFCR))
->> +		ctxt_sys_reg(&vcpu->arch.ctxt, TRFCR_EL1) = *this_cpu_ptr(&guest_trfcr);
->> +}
+>> +	 */
+>> +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceFilt_SHIFT)) {
+>> +		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
+>> +		/*
+>> +		 * Check if we have TRBE implemented and available at the host. If it's
+>> +		 * in use at the time of guest switch it will need to be disabled and
+>> +		 * then restored. The architecture mandates FEAT_TRF with TRBE, so we
+>> +		 * only need to check for TRBE after TRF.
+>> +		 */
+>> +		if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
+>> +		    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
+>> +			vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+>> +	}
 > 
-> Why this requirement of updating it at all times? Why can't this be
-> done in a more lazy way, using the flags to instruct the hypervisor
-> what and when to load it?
+> Multiple questions:
+> 
+> - Why is it safe to trust the local CPU's capability rather than the
+>    consolidated view from the cpufeature infrastructure?
+
+The coresight driver is capable of handling heterogeneous systems. i.e., 
+some CPUs may not have FEAT_TRF or FEAT_TRBE. This could be for various
+reasons (e.g., CPU Erratum disabling TRBE, though not used now). It 
+already needs to treat each CPU differently (due to the capabilities
+of the ETM).
+
+That said, we could reject events with exclude_guest/exclude_host flags
+on CPUs that do not support FEAT_TRF. But that doesn't solve checking
+the local capability.
+
+Suzuki
+
+
+> 
+> - Why defer the saving of the registers if there are no changes made
+>    to them in the interval?
+> 
+> Thanks,
 > 
 > 	M.
 > 
 
-I could probably add a flag that gets set if the guest value should be
-different to the host value. I was just trying to keep it simple and in
-terms of just what the registers should be.
-
-The PMU one has something similar where it doesn't write anything if
-kvm_pmu_switch_needed() is false, but that's only on the path where the
-host sets the events, it still always does the copy in
-kvm_pmu_update_vcpu_events() before the guest switch.
-
-I suppose if I make the change to have the shared global data then the
-copy isn't needed and this function and kvm_pmu_update_vcpu_events()
-will just get deleted.
-
-Thanks
-James
