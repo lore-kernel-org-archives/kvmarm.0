@@ -1,30 +1,30 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D24A54FB3
-	for <kvmarm@lists.linux.dev>; Tue,  5 Dec 2023 15:41:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ADFB6139F;
-	Tue,  5 Dec 2023 07:42:11 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1501B3F6C4;
-	Tue,  5 Dec 2023 07:41:22 -0800 (PST)
-Date: Tue, 5 Dec 2023 15:41:16 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
-	aneesh.kumar@linux.ibm.com, broonie@kernel.org,
-	catalin.marinas@arm.com, dave.hansen@linux.intel.com,
-	oliver.upton@linux.dev, shuah@kernel.org, will@kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 00/25] Permission Overlay Extension
-Message-ID: <20231205154116.GA3613610@e124191.cambridge.arm.com>
-References: <20231124163510.1835740-1-joey.gouly@arm.com>
- <86jzpub56r.wl-maz@kernel.org>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2082963DFF;
+	Tue,  5 Dec 2023 16:22:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D9E8C433C7;
+	Tue,  5 Dec 2023 16:22:35 +0000 (UTC)
+Date: Tue, 5 Dec 2023 16:22:33 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Marc Zyngier <maz@kernel.org>, ankita@nvidia.com,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	oliver.upton@linux.dev, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, will@kernel.org, ardb@kernel.org,
+	akpm@linux-foundation.org, gshan@redhat.com, aniketa@nvidia.com,
+	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
+	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
+	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, lpieralisi@kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 1/1] KVM: arm64: allow the VM to select DEVICE_* and
+ NORMAL_NC for IO memory
+Message-ID: <ZW9OSe8Z9gAmM7My@arm.com>
+References: <20231205033015.10044-1-ankita@nvidia.com>
+ <86fs0hatt3.wl-maz@kernel.org>
+ <ZW8MP2tDt4_9ROBz@arm.com>
+ <20231205130517.GD2692119@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -33,66 +33,87 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86jzpub56r.wl-maz@kernel.org>
+In-Reply-To: <20231205130517.GD2692119@nvidia.com>
 
-Hi Marc,
-
-On Mon, Dec 04, 2023 at 11:03:24AM +0000, Marc Zyngier wrote:
-> Hi Joey,
-> 
-> On Fri, 24 Nov 2023 16:34:45 +0000,
-> Joey Gouly <joey.gouly@arm.com> wrote:
+On Tue, Dec 05, 2023 at 09:05:17AM -0400, Jason Gunthorpe wrote:
+> On Tue, Dec 05, 2023 at 11:40:47AM +0000, Catalin Marinas wrote:
+> > > - Will had unanswered questions in another part of the thread:
+> > > 
+> > >   https://lore.kernel.org/all/20231013092954.GB13524@willie-the-truck/
+> > > 
+> > >   Can someone please help concluding it?
 > > 
-> > Hello everyone,
-> > 
-> > This series implements the Permission Overlay Extension introduced in 2022
-> > VMSA enhancements [1]. It is based on v6.7-rc2.
-> > 
-> > Changes since v2[2]:
-> > 	# Added ptrace support and selftest
-> > 	# Add missing POR_EL0 initialisation in fork/clone
-> > 	# Rebase onto v6.7-rc2
-> > 	# Add r-bs
-> > 
-> > The Permission Overlay Extension allows to constrain permissions on memory
-> > regions. This can be used from userspace (EL0) without a system call or TLB
-> > invalidation.
+> > Is this about reclaiming the device? I think we concluded that we can't
+> > generalise this beyond PCIe, though not sure there was any formal
+> > statement to that thread. The other point Will had was around stating
+> > in the commit message why we only relax this to Normal NC. I haven't
+> > checked the commit message yet, it needs careful reading ;).
 > 
-> I have given this series a few more thoughts, and came to the
-> conclusion that is it still incomplete on the KVM front:
+> Not quite, we said reclaiming is VFIO's problem and if VFIO can't
+> reliably reclaim a device it shouldn't create it in the first place.
 > 
-> * FEAT_S1POE often comes together with FEAT_S2POE. For obvious
->   reasons, we cannot afford to let the guest play with S2POR_EL1, nor
->   do we want to advertise FEAT_S2POE to the guest.
+> Again, I think alot of this is trying to take VFIO problems into KVM.
 > 
->   You will need to add some additional FGT for this, and mask out
->   FEAT_S2POE from the guest's view of the ID registers.
+> VFIO devices should not exist if they pose a harm to the system. If
+> VFIO decided to create the devices anyhow (eg admin override or
+> something) then it is not KVM's job to do any further enforcement.
 
-I found out last week that I had misunderstood S2POR_EL1, so yes looks like
-we need to trap that. I will add that in.
+Yeah, I made this argument in the past. But it's a fair question to ask
+since the Arm world is different from x86. Just reusing an existing
+driver in a different context may break its expectations. Does Normal NC
+access complete by the time a TLBI (for Stage 2) and DSB (DVMsync) is
+completed? It does reach some point of serialisation with subsequent
+accesses to the same address but not sure how it is ordered with an
+access to a different location like the config space used for reset.
+Maybe it's not a problem at all or it is safe only for PCIe but it would
+be good to get to the bottom of this.
 
+Device-nGnRnE has some stronger rules around end-point completion and
+that's what the vfio-pci uses. KVM, however, went for the slightly more
+relaxed nGnRE variant which, at least per the Arm ARM, doesn't have
+these guarantees.
+
+> Remember, the feedback we got from the CPU architects was that even
+> DEVICE_* will experience an uncontained failure if the device tiggers
+> an error response in shipping ARM IP.
 > 
-> * letting the guest play with POE comes with some interesting strings
->   attached: a guest that has started on a POE-enabled host cannot be
->   migrated to one that doesn't have POE. which means that the POE
->   registers should only be visible to the host userspace if enabled in
->   the guest's ID registers, and thus only context-switched in these
->   conditions. They should otherwise UNDEF.
+> The reason PCIe is safe is because the PCI bridge does not generate
+> errors in the first place!
 
-Can you give me some clarification here?
-	
-	- By visible to the host userspace do you mean via the GET_ONE_REG API?
-	- Currently the ID register (ID_AA64MMFR3_EL1) is not ID_WRITABLE,
-	  should this series or another make it so? Currently if the host had
-	  POE it's enabled in the guest, so I believe migration to a non-POE
-	  host will fail?
-	- For the context switch, do you mean something like:
+That's an argument to restrict this feature to PCIe. It's really about
+fewer arguments on the behaviour of other devices. Marc did raise
+another issue with the GIC VCPU interface (does this even have a vma in
+the host VMM?). That's a class of devices where the mapping is
+context-switched, so the TLBI+DSB rules don't help.
 
-		if (system_supports_poe() && ID_REG(MMFR3_EL1) & S1POE)
-			ctxt_sys_reg(ctxt, POR_EL0)     = read_sysreg_s(SYS_POR_EL0);
+> Thus, the way a platform device can actually be safe is if it too
+> never generates errors in the first place! Obviously this approach
+> works just as well with NORMAL_NC.
+> 
+> If a platform device does generate errors then we shouldn't expect
+> containment at all, and the memory type has no bearing on the
+> safety. The correct answer is to block these platform devices from
+> VFIO/KVM/etc because they can trigger uncontained failures.
 
-	  That would need some refactoring, since I don't see how to access
-	  id_regs from struct kvm_cpu_context.
+Assuming the error containment is sorted, there are two other issues
+with other types of devices:
 
-Thanks,
-Joey
+1. Ordering guarantees on reclaim or context switch
+
+2. Unaligned accesses
+
+On (2), I think PCIe is fairly clear on how the TLPs are generated, so I
+wouldn't expect additional errors here. But I have no idea what AMBA/AXI
+does here in general. Perhaps it's fine, I don't think we looked into it
+as the focus was mostly on PCIe.
+
+So, I think it would be easier to get this patch upstream if we limit
+the change to PCIe devices for now. We may relax this further in the
+future. Do you actually have a need for non-PCIe devices to support WC
+in the guest or it's more about the complexity of the logic to detect
+whether it's actually a PCIe BAR we are mapping into the guest? (I can
+see some Arm GPU folk asking for this but those devices are not easily
+virtualisable).
+
+-- 
+Catalin
