@@ -1,93 +1,190 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E5B4E63D
-	for <kvmarm@lists.linux.dev>; Tue,  5 Dec 2023 10:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ROpaDOMV"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5d351694be7so83408397b3.3
-        for <kvmarm@lists.linux.dev>; Tue, 05 Dec 2023 02:23:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701771784; x=1702376584; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=33fHTG4hd84nJo+G3RKw/og5Lg2h+7y1b4GD/jJpS2Q=;
-        b=ROpaDOMVsveWhzgwOWqDNWQzZt5x6DdzFpEELC0eDlFFopP8JEMEwl6/+ZhpTWa2Z7
-         dRQIqhhWsgVY9qrbtJoWLzaSW3A9X+30gdG8tOXc+apXq/qWqRyXOwjK6hvj/ZghKMYW
-         x8sSIljDGdliPnopaY3qsBJWBQtGQr6vDafULpOnunJ4YOBOZdQ4B2B3udiNEpPWspew
-         iNo/j9GcPyDtRn9/ZJ5JuqvlSEXgvf4eGuZjzb/b9UExSPdpm7jhX6zEsqyLagzmpwLN
-         WTsJVtA+LWxCadXhR1iNAWtVO1P69x8qIF34hOCbHcaSwFVKOSQmD1fhN3Wh7T3G0l/L
-         0ySQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701771784; x=1702376584;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=33fHTG4hd84nJo+G3RKw/og5Lg2h+7y1b4GD/jJpS2Q=;
-        b=rYYXFT2IvFEAmWWCBjrOKewSExSBTe+9trmb9vvy6XplJyARehAYU4tSH1XxpPl861
-         hONriuC22T7wQC/A6HXBLQ8KBWld+zLVzfbHeydsFlm5S/DO94ux5y3bD0Aud2oksY7t
-         qd96Nz42SoSOscnFqDwRWkt+vEdZL6IkCrNpQaMDGTfFfCm2FrFXU7USGqksXt/1Pt7X
-         FQdxm25P12xkhZGp/D7A/7v8D8x2V9mnrbxOwqCAxDhoBhfWISbfgM2CMfTAu9cwIoXC
-         npOum9tak4qEyUofXQJC2Q0UZzGd4HbiAJKHpexlaaZTXnC52/3lJ8GGkOT6mTr1wq4A
-         HHYg==
-X-Gm-Message-State: AOJu0YySlCBj5tn4L2gnoJGVn4zUj9EYZDz47LvrsZd0kO//0lUTWdY1
-	HD5t5EcpSNJXWSf+IUzPZfMHp2SDk4hIxl9PxCl3ii3N0TjHvcKnzQkjcfwDAYF1aY4gCvzcukX
-	CARSsDqfuH7/4gv9lCMAKStOHQp1Qlj7jCadEE49IzdxhmN0muJ998NaBM+M=
-X-Google-Smtp-Source: AGHT+IFuVZnqls8s50nh20mAzd33XQDay5LYgo/RvYkGwRdnhQgJYLOnpmgqp7qPnVY6WXLk7qGbMS3YbQ==
-X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a81:f00a:0:b0:5d7:7d30:595c with SMTP id
- p10-20020a81f00a000000b005d77d30595cmr184549ywm.9.1701771784487; Tue, 05 Dec
- 2023 02:23:04 -0800 (PST)
-Date: Tue,  5 Dec 2023 10:22:48 +0000
-In-Reply-To: <20231205102248.1915895-1-tabba@google.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C5610940
+	for <kvmarm@lists.linux.dev>; Tue,  5 Dec 2023 11:03:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E040F139F;
+	Tue,  5 Dec 2023 03:04:18 -0800 (PST)
+Received: from FVFF77S0Q05N (unknown [10.57.42.51])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6C7E03F5A1;
+	Tue,  5 Dec 2023 03:03:30 -0800 (PST)
+Date: Tue, 5 Dec 2023 11:03:16 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v3 0/3] arm64: Drop support for VPIPT i-cache policy
+Message-ID: <ZW8DXGQCSWO1wB2m@FVFF77S0Q05N>
+References: <20231204143606.1806432-1-maz@kernel.org>
+ <ZW3l6Bq7ortEGB8I@FVFF77S0Q05N>
+ <86h6kxbz8u.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20231205102248.1915895-1-tabba@google.com>
-X-Mailer: git-send-email 2.43.0.rc2.451.g8631bc7472-goog
-Message-ID: <20231205102248.1915895-7-tabba@google.com>
-Subject: [PATCH v1 6/6] KVM: arm64: Mark features as supported for protected VMs
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev
-Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org, eric.auger@redhat.com, jingzhangos@google.com, 
-	joey.gouly@arm.com, tabba@google.com, linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86h6kxbz8u.wl-maz@kernel.org>
 
-Add features supported for protected VMs to the allow list.
+On Mon, Dec 04, 2023 at 06:26:25PM +0000, Marc Zyngier wrote:
+> On Mon, 04 Dec 2023 14:44:56 +0000,
+> Mark Rutland <mark.rutland@arm.com> wrote:
+> > 
+> > On Mon, Dec 04, 2023 at 02:36:03PM +0000, Marc Zyngier wrote:
+> > > ARMv8.2 introduced support for VPIPT i-caches, the V standing for
+> > > VMID-tagged. Although this looked like a reasonable idea, no
+> > > implementation has ever made it into the wild.
+> > > 
+> > > Linux has supported this for over 6 years (amusingly, just as the
+> > > architecture was dropping support for AIVIVT i-caches), but we had no
+> > > way to even test it, and it is likely that this code was just
+> > > bit-rotting.
+> > > 
+> > > However, in a recent breakthrough (XML drop 2023-09, tagged as
+> > > d55f5af8e09052abe92a02adf820deea2eaed717), the architecture has
+> > > finally been purged of this option, making VIPT and PIPT the only two
+> > > valid options.
+> > > 
+> > > This really means this code is just dead code. Nobody will ever come
+> > > up with such an implementation, and we can just get rid of it.
+> > > 
+> > > Most of the impact is on KVM, where we drop a few large comment blocks
+> > > (and a bit of code), while the core arch code loses the detection code
+> > > itself.
+> > > 
+> > > * From v2:
+> > >   - Fix reserved naming for RESERVED_AIVIVT
+> > >   - Collected RBs from Anshuman an Zenghui
+> > > 
+> > > Marc Zyngier (3):
+> > >   KVM: arm64: Remove VPIPT I-cache handling
+> > >   arm64: Kill detection of VPIPT i-cache policy
+> > >   arm64: Rename reserved values for CTR_EL0.L1Ip
+> > 
+> > For the series:
+> > 
+> > Acked-by: Mark Rutland <mark.rutland@arm.com>
+> 
+> Thanks.
+> 
+> > Looking forward, we can/should probably replace __icache_flags with a single
+> > ICACHE_NOALIASING or ICACHE_PIPT cpucap, which'd get rid of a bunch of
+> > duplicated logic and make that more sound in the case of races around cpu
+> > onlining.
+> 
+> As long as we refuse VIPT CPUs coming up late (i.e. after we have
+> patched the kernel to set ICACHE_PIPT), it should be doable. I guess
+> we already have this restriction as userspace is able to probe the
+> I-cache policy anyway.
+> 
+> How about the patch below (tested in a guest with a bunch of hacks to
+> expose different L1Ip values)?
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/hyp/include/nvhe/fixed_config.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+That's roughly what I was thinking; the diff looks good, minor comments below.
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
-index e91922daa8ca..e628541585fc 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
-@@ -101,6 +101,7 @@
-  * - Privileged Access Never
-  * - SError interrupt exceptions from speculative reads
-  * - Enhanced Translation Synchronization
-+ * - Control for cache maintenance permission
-  */
- #define PVM_ID_AA64MMFR1_ALLOW (\
- 	ARM64_FEATURE_MASK(ID_AA64MMFR1_EL1_HAFDBS) | \
-@@ -108,7 +109,8 @@
- 	ARM64_FEATURE_MASK(ID_AA64MMFR1_EL1_HPDS) | \
- 	ARM64_FEATURE_MASK(ID_AA64MMFR1_EL1_PAN) | \
- 	ARM64_FEATURE_MASK(ID_AA64MMFR1_EL1_SpecSEI) | \
--	ARM64_FEATURE_MASK(ID_AA64MMFR1_EL1_ETS) \
-+	ARM64_FEATURE_MASK(ID_AA64MMFR1_EL1_ETS) | \
-+	ARM64_FEATURE_MASK(ID_AA64MMFR1_EL1_CMOW) \
- 	)
- 
- /*
--- 
-2.43.0.rc2.451.g8631bc7472-goog
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> From 8f88afb0b317213dcbf18ea460a508bfccc18568 Mon Sep 17 00:00:00 2001
+> From: Marc Zyngier <maz@kernel.org>
+> Date: Mon, 4 Dec 2023 18:09:40 +0000
+> Subject: [PATCH] arm64: Make icache detection a cpu capability
+> 
+> Now that we only have two icache policies, we are in a good position
+> to make the whole detection business more robust.
+> 
+> Let's replace __icache_flags by a single capability (ICACHE_PIPT),
+> and use this if all CPUs are indeed PIPT. It means we can rely on
+> existing logic to mandate that a VIPT CPU coming up late will be
+> denied booting, which is the safe thing to do.
+> 
+> This also leads to some nice cleanups in pKVM, and KVM as a whole
+> can use ARM64_ICACHE_PIPT as a final cap.
+> 
+> Suggested-by: Mark Rutland <mark.rutland@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/cache.h   |  9 ++-------
+>  arch/arm64/include/asm/kvm_hyp.h |  1 -
+>  arch/arm64/include/asm/kvm_mmu.h |  2 +-
+>  arch/arm64/kernel/cpufeature.c   |  7 +++++++
+>  arch/arm64/kernel/cpuinfo.c      | 34 --------------------------------
+>  arch/arm64/kvm/arm.c             |  1 -
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c   |  3 ---
+>  arch/arm64/tools/cpucaps         |  1 +
+>  arch/arm64/tools/sysreg          |  2 +-
+>  9 files changed, 12 insertions(+), 48 deletions(-)
 
+Nice diffstat!
+
+[...]
+
+>  /*
+>   * Whilst the D-side always behaves as PIPT on AArch64, aliasing is
+>   * permitted in the I-cache.
+>   */
+>  static inline int icache_is_aliasing(void)
+>  {
+> -	return test_bit(ICACHEF_ALIASING, &__icache_flags);
+> +	return !cpus_have_cap(ARM64_ICACHE_PIPT);
+>  }
+
+It might be nicer to use alternative_has_cap_{likely,unlikely}(...) for
+consistency with other cap checks, though that won't matter for hyp code and I
+don't think the likely/unlikely part particularly matters either.
+
+[...]
+
+> -static void cpuinfo_detect_icache_policy(struct cpuinfo_arm64 *info)
+> -{
+> -	unsigned int cpu = smp_processor_id();
+> -	u32 l1ip = CTR_L1IP(info->reg_ctr);
+> -
+> -	switch (l1ip) {
+> -	case CTR_EL0_L1Ip_PIPT:
+> -		break;
+> -	case CTR_EL0_L1Ip_VIPT:
+> -	default:
+> -		/* Assume aliasing */
+> -		set_bit(ICACHEF_ALIASING, &__icache_flags);
+> -		break;
+> -	}
+> -
+> -	pr_info("Detected %s I-cache on CPU%d\n", icache_policy_str(l1ip), cpu);
+> -}
+
+Not printing this for each CPU is a nice bonus!
+
+[...]
+
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index c5af75b23187..db8c96841138 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -2003,7 +2003,7 @@ Field	28	IDC
+>  Field	27:24	CWG
+>  Field	23:20	ERG
+>  Field	19:16	DminLine
+> -Enum	15:14	L1Ip
+> +UnsignedEnum	15:14	L1Ip
+>  	# This was named as VPIPT in the ARM but now documented as reserved
+>  	0b00	RESERVED_VPIPT
+>  	# This is named as AIVIVT in the ARM but documented as reserved
+
+I was initially surprised by the use of UnsignedEnum, but given PIPT is 0b11, I
+can see that works. Otherwise, we can keep this as an enum and use a helper
+that checks for an exact match.
+
+Mark.
