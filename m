@@ -1,81 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C2C5241FC;
-	Mon,  4 Dec 2023 18:46:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3EBAC433C8;
-	Mon,  4 Dec 2023 18:46:42 +0000 (UTC)
-Date: Mon, 4 Dec 2023 18:46:40 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
-	aneesh.kumar@linux.ibm.com, broonie@kernel.org,
-	dave.hansen@linux.intel.com, maz@kernel.org, oliver.upton@linux.dev,
-	shuah@kernel.org, will@kernel.org, kvmarm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 03/25] arm64: cpufeature: add Permission Overlay
- Extension cpucap
-Message-ID: <ZW4ekJ8pxwWTmVFC@arm.com>
-References: <20231124163510.1835740-1-joey.gouly@arm.com>
- <20231124163510.1835740-4-joey.gouly@arm.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC6654689
+	for <kvmarm@lists.linux.dev>; Tue,  5 Dec 2023 02:04:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 87EDA1474;
+	Mon,  4 Dec 2023 18:05:22 -0800 (PST)
+Received: from [10.163.35.139] (unknown [10.163.35.139])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 155843F5A1;
+	Mon,  4 Dec 2023 18:04:31 -0800 (PST)
+Message-ID: <2dfb07f4-39c3-4cfe-81ba-416c18f99b10@arm.com>
+Date: Tue, 5 Dec 2023 07:34:28 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231124163510.1835740-4-joey.gouly@arm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 3/3] arm64: Rename reserved values for CTR_EL0.L1Ip
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Mark Rutland <mark.rutland@arm.com>, Ard Biesheuvel <ardb@kernel.org>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>
+References: <20231204143606.1806432-1-maz@kernel.org>
+ <20231204143606.1806432-4-maz@kernel.org>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <20231204143606.1806432-4-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 24, 2023 at 04:34:48PM +0000, Joey Gouly wrote:
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -2078,6 +2078,22 @@ config ARM64_EPAN
->  	  if the cpu does not implement the feature.
->  endmenu # "ARMv8.7 architectural features"
->  
-> +menu "ARMv8.9 architectural features"
-> +config ARM64_POE
-> +	prompt "Permission Overlay Extension"
-> +	def_bool y
-> +	help
-> +	  The Permission Overlay Extension is used to implement Memory
-> +	  Protection Keys. Memory Protection Keys provides a mechanism for
-> +	  enforcing page-based protections, but without requiring modification
-> +	  of the page tables when an application changes protection domains.
-> +
-> +	  For details, see Documentation/core-api/protection-keys.rst
-> +
-> +	  If unsure, say y.
-> +
-> +endmenu # "ARMv8.9 architectural features"
 
-I agree with Mark, we typically leave the Kconfig option towards the end
-of the series.
 
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 646591c67e7a..00b6d516ed3f 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -2731,6 +2731,15 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->  		.matches = has_cpuid_feature,
->  		ARM64_CPUID_FIELDS(ID_AA64MMFR2_EL1, EVT, IMP)
->  	},
-> +#ifdef CONFIG_ARM64_POE
-> +	{
-> +		.desc = "Stage-1 Permission Overlay Extension (S1POE)",
-> +		.capability = ARM64_HAS_S1POE,
-> +		.type = ARM64_CPUCAP_BOOT_CPU_FEATURE,
-> +		.matches = has_cpuid_feature,
-> +		ARM64_CPUID_FIELDS(ID_AA64MMFR3_EL1, S1POE, IMP)
-> +	},
-> +#endif
+On 12/4/23 20:06, Marc Zyngier wrote:
+> We now have *two* values for CTR_EL0.L1Ip that are reserved.
+> Which makes things a bit awkward. In order to lift the ambiguity,
+> rename RESERVED (0b01) to RESERVED_AIVIVT, and VPIPT (0b00) to
+> RESERVED_VPIPT.
+> 
+> This makes it clear which of these meant what, and I'm sure
+> archeologists will find it useful...
+> 
+> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-Keeping the #ifdef here is ok, it won't be defined at this point.
+Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
 
--- 
-Catalin
+> ---
+>  arch/arm64/tools/sysreg | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 96cbeeab4eec..c5af75b23187 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -2004,9 +2004,10 @@ Field	27:24	CWG
+>  Field	23:20	ERG
+>  Field	19:16	DminLine
+>  Enum	15:14	L1Ip
+> -	0b00	VPIPT
+> +	# This was named as VPIPT in the ARM but now documented as reserved
+> +	0b00	RESERVED_VPIPT
+>  	# This is named as AIVIVT in the ARM but documented as reserved
+> -	0b01	RESERVED
+> +	0b01	RESERVED_AIVIVT
+>  	0b10	VIPT
+>  	0b11	PIPT
+>  EndEnum
