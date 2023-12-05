@@ -1,45 +1,45 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9114D58F
-	for <kvmarm@lists.linux.dev>; Tue,  5 Dec 2023 10:23:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5B44D58F
+	for <kvmarm@lists.linux.dev>; Tue,  5 Dec 2023 10:23:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zP+6Ggbl"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-db584b8fb9cso4556453276.2
-        for <kvmarm@lists.linux.dev>; Tue, 05 Dec 2023 02:23:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zF2EuABB"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-332e11a22a0so4862637f8f.2
+        for <kvmarm@lists.linux.dev>; Tue, 05 Dec 2023 02:23:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701771780; x=1702376580; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1701771782; x=1702376582; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KNy4G0m5CsZO0PVE02L10AoMnonCl62//5sk2193kL4=;
-        b=zP+6GgblaPkKiqGMlWbK+3EvkbBbLWfu9TTrIXqPQ1kgYSDrgLAQTrG34syzoLovUb
-         DepCd/m6Z/qORaj/S3ZJ3gUr/fYEwtkJoVVQVW8ACZrxxyBnAvx/C/f9flMoQ23Z8sNW
-         cKMIRf4ZuZWvWTYyyBrmsdlhDKIAMyJRBycOjOIlBCG/BxMjlv/nGYFmCQiMl3+LC24s
-         si+OQqdAeYGQNBfRkPy08VdDrzh7CBU/WCPKNY/qNp4b4iW8a332an4MenhwpMMtim9V
-         4Ef2QS/MC36RSZMHIjV1KdfFGo4iPDf0sIDUW9O8BXnF9LIpKULifflckVnmEpqkFqpO
-         OXlQ==
+        bh=Nsl2YYWjzyWfpOqWiIYZWMEIY6Tqfa70sHcibcvmU8U=;
+        b=zF2EuABBZNRKJy6QtrUBKc56cSFd03lLzlZBsO7lC2u+BbyRG8Li+lUNs87foEVdgu
+         66LUG2W9wEqWwIGGEAl0iQvMjro0DwacBkJ3SE/n+9cu0YOMipih2rB7nbLz6BCTC+Kf
+         0oo5M86u4QacKxkvO8S55MWTLrPped8aY6w2FNE09lKcncMfLlj33vTZhQnIGKF2zV3E
+         X78kiycMc2OESINdhG6rL/gFoKNZj+W8Ou6KeRS5bTal1KHUzRdKyvzmS/u6IjZ4/QtL
+         f9g2hb8jXeCOtq516cuJlRlUnjM0RnhP+2N2UnGBWY5YRe4IAPbmjBcreIO56H3SEkDu
+         w6Sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701771780; x=1702376580;
+        d=1e100.net; s=20230601; t=1701771782; x=1702376582;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KNy4G0m5CsZO0PVE02L10AoMnonCl62//5sk2193kL4=;
-        b=Yw0KScLQ0V6wE+7o8j67A35fhIuQtl+QcyGRo/XPafE5ANlUB+1kYjhpfqRLec8UnH
-         Iw6nJVBJDeH56TN9uHOvij90w7Ks1JM0p6KJojTuCSNd5VnWIG3LMZ+6QXI80vbzqpz+
-         vAYN4wp7pwnwhH12iipF3MQ9BemW6QhwaFrSEeAsk86Ow+gtyd8N5vkKt0Eb1PyGRwUL
-         LE+8Qmdd7+RRTzQRmpwYW25HxSGGG/Frqj924oAFatNkBQpwezlGDU2nnBBs2frQ7PjM
-         T9oTvRyLDE44+Ozicyu1/HD3aAENU/uqhpwcxSxj3B6MD0UEAOSNDDCvudGlxVtUl0rY
-         o/dQ==
-X-Gm-Message-State: AOJu0YyulIkUBLWgqBcrTOxLJ54cEmCt4UD8w8HZBWuXiI0JqniYx+8s
-	PYEQz8N1OaXaPfabXcQzh2z56BUaw40Ehyl7fECyvS2jJietvC52eSj+UMsfi2BpAc744r9GirJ
-	B2+XxyXof6HuXBZmoDdWzm7Am3f8pbgM1jDw1XAlZlBQMJ0nm12BNFG3SSQ8=
-X-Google-Smtp-Source: AGHT+IGA84W6+BmctaSHyOtZJKJ7ioMvvJ9dEcQAhOvOmohHsmNGlJO/KQGc97vOKqUco8GspSKDwhovZQ==
+        bh=Nsl2YYWjzyWfpOqWiIYZWMEIY6Tqfa70sHcibcvmU8U=;
+        b=nRWoDHmHuD3gcgob6UM0lUqD5H6zx28LUSCyNrMpYTndRdAokkcJKZhnRrdCzIgfRK
+         +hHOaqqAqFHa5IWc43wFZ8hcdD9N86HvB+fAHb+SU1ZILIX5tM68L50ixtXV3eo40kNg
+         MxParw3dW3nvNIZXXJN/TpyEdJMQrFGimorFsy1XO7yOZVZeK2IsHpY0/2Xz3EE51NNp
+         Pn4GBrtI4LWaiYS2zI/d340nijJPkcSuQECUU53tcEGYlxYNup1I9XL2IzwUtzepTGZX
+         vgWUEpVvm8kb2Mc+iYsg/puMauXGxebWrfwETKF7EcEOlZleVh8HYRVpPHfNdM1zqRA0
+         B3Kw==
+X-Gm-Message-State: AOJu0Yz/ZyjW1Y0WRCKb4kAe+A+rQ4zcxUrLRMGMWIn2V4fo+2iYWFQ3
+	WjYGE1q/HiE4mw+WO25MmRLvCS6wGhi7VhEyURbsFbiWLboE6Ny5z8JxHsJXoLpw9j52tMFqf6f
+	MUuj3Z01X6XM6vKpdcUvcv9ME0x03FzPWdgVAtpMja4rWHcxKgA0v0HinogM=
+X-Google-Smtp-Source: AGHT+IGc3JXd4AZGnIIfddtzEYdRl3d3707t9Y6hVwx3FZAfMEmHj/ndlXJo0QeFYZ+zl2D7AFOfbmNFow==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a25:d6d1:0:b0:db7:dce9:76d3 with SMTP id
- n200-20020a25d6d1000000b00db7dce976d3mr190013ybg.9.1701771780150; Tue, 05 Dec
- 2023 02:23:00 -0800 (PST)
-Date: Tue,  5 Dec 2023 10:22:46 +0000
+ (user=tabba job=sendgmr) by 2002:adf:fd90:0:b0:333:32d8:40a5 with SMTP id
+ d16-20020adffd90000000b0033332d840a5mr116120wrr.7.1701771782375; Tue, 05 Dec
+ 2023 02:23:02 -0800 (PST)
+Date: Tue,  5 Dec 2023 10:22:47 +0000
 In-Reply-To: <20231205102248.1915895-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -49,8 +49,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20231205102248.1915895-1-tabba@google.com>
 X-Mailer: git-send-email 2.43.0.rc2.451.g8631bc7472-goog
-Message-ID: <20231205102248.1915895-5-tabba@google.com>
-Subject: [PATCH v1 4/6] KVM: arm64: Calculate FGT RES0 Bits
+Message-ID: <20231205102248.1915895-6-tabba@google.com>
+Subject: [PATCH v1 5/6] KVM: arm64: Trap external trace for protected VMs
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
@@ -59,93 +59,45 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com,
 	joey.gouly@arm.com, tabba@google.com, linux-arm-kernel@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 
-All FGT reserved bits are res0, and they are the ones remaining
-after accounting for all defined trap bits. Now that we have full
-coverage of the trap bits, calculate the res0 bits based on the
-other bits.
-
-No functional change intended.
+pKVM does not support external trace for protected VMs.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_arm.h        | 19 +++++++------------
- arch/arm64/kvm/hyp/include/hyp/switch.h |  2 --
- 2 files changed, 7 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/pkvm.c | 4 ++++
+ arch/arm64/tools/sysreg        | 5 ++++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index b0dc3249d5cd..44bbbb4110d3 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -344,49 +344,44 @@
-  * Once we get to a point where the two describe the same thing, we'll
-  * merge the definitions. One day.
-  */
--#define __HFGRTR_EL2_RES0	BIT(51)
- #define __HFGRTR_EL2_MASK	GENMASK(49, 0)
- #define __HFGRTR_EL2_nMASK	(GENMASK(63, 52) | BIT(50))
-+#define __HFGRTR_EL2_RES0	~(__HFGRTR_EL2_MASK | __HFGRTR_EL2_nMASK)
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index 9d23a51d7f75..84b5c3f387d8 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -136,6 +136,10 @@ static void pvm_init_traps_aa64dfr0(struct kvm_vcpu *vcpu)
+ 			cptr_set |= CPTR_EL2_TTA;
+ 	}
  
--#define __HFGWTR_EL2_RES0	(BIT(51) | BIT(46) | BIT(42) | BIT(40) | \
--				 BIT(28) | GENMASK(26, 25) | BIT(21) | BIT(18) | \
--				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
- #define __HFGWTR_EL2_MASK	(GENMASK(49, 47) | GENMASK(45, 43) | \
- 				 BIT(41) | GENMASK(39, 29) | BIT(27) | \
- 				 GENMASK(24, 22) | GENMASK(20, 19) | \
- 				 GENMASK(17, 16) | GENMASK(13, 11) | \
- 				 GENMASK(8, 3) | GENMASK(1, 0))
- #define __HFGWTR_EL2_nMASK	(GENMASK(63, 52) | BIT(50))
-+#define __HFGWTR_EL2_RES0	~(__HFGWTR_EL2_MASK | __HFGWTR_EL2_nMASK)
- 
--#define __HFGITR_EL2_RES0	(BIT(63) | BIT(61))
- #define __HFGITR_EL2_MASK	(BIT(62) | BIT(60) | GENMASK(54, 0))
- #define __HFGITR_EL2_nMASK	GENMASK(59, 55)
-+#define __HFGITR_EL2_RES0	~(__HFGITR_EL2_MASK | __HFGITR_EL2_nMASK)
- 
--#define __HDFGRTR_EL2_RES0	(BIT(49) | BIT(42) | GENMASK(39, 38) |	\
--				 GENMASK(21, 20) | BIT(8))
- #define __HDFGRTR_EL2_MASK	(BIT(63) | GENMASK(58, 50) | GENMASK(48, 43) | \
- 				 GENMASK(41, 40) | GENMASK(37, 22) | \
- 				 GENMASK(19, 9) | GENMASK(7, 0))
- #define __HDFGRTR_EL2_nMASK	GENMASK(62, 59)
-+#define __HDFGRTR_EL2_RES0	~(__HDFGRTR_EL2_MASK | __HDFGRTR_EL2_nMASK)
- 
--#define __HDFGWTR_EL2_RES0	(BIT(63) | GENMASK(59, 58) | BIT(51) | BIT(47) | \
--				 BIT(43) | GENMASK(40, 38) | BIT(34) | BIT(30) | \
--				 BIT(22) | BIT(9) | BIT(6))
- #define __HDFGWTR_EL2_MASK	(GENMASK(57, 52) | GENMASK(50, 48) | \
- 				 GENMASK(46, 44) | GENMASK(42, 41) | \
- 				 GENMASK(37, 35) | GENMASK(33, 31) | \
- 				 GENMASK(29, 23) | GENMASK(21, 10) | \
- 				 GENMASK(8, 7) | GENMASK(5, 0))
- #define __HDFGWTR_EL2_nMASK	GENMASK(62, 60)
-+#define __HDFGWTR_EL2_RES0	~(__HDFGWTR_EL2_MASK | __HDFGWTR_EL2_nMASK)
- 
--#define __HAFGRTR_EL2_RES0	(GENMASK(63, 50) | GENMASK(16, 5))
- #define __HAFGRTR_EL2_MASK	(GENMASK(49, 17) | GENMASK(4, 0))
- #define __HAFGRTR_EL2_nMASK	0UL
-+#define __HAFGRTR_EL2_RES0	~(__HAFGRTR_EL2_MASK | __HAFGRTR_EL2_nMASK)
- 
- /* Similar definitions for HCRX_EL2 */
--#define __HCRX_EL2_RES0         (GENMASK(63, 25) | GENMASK(13, 12))
- #define __HCRX_EL2_MASK		(BIT(6))
- #define __HCRX_EL2_nMASK	(GENMASK(24, 14) | GENMASK(11, 7) | GENMASK(5, 0))
-+#define __HCRX_EL2_RES0         ~(__HCRX_EL2_MASK | __HCRX_EL2_nMASK)
- 
- /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
- #define HPFAR_MASK	(~UL(0xf))
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 2c6e8cbbd081..bf045dc32996 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -86,8 +86,6 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
- #define CHECK_FGT_MASKS(reg)							\
- 	do {									\
- 		BUILD_BUG_ON((__ ## reg ## _MASK) & (__ ## reg ## _nMASK));	\
--		BUILD_BUG_ON(~((__ ## reg ## _RES0) ^ (__ ## reg ## _MASK) ^	\
--			       (__ ## reg ## _nMASK)));				\
- 	} while(0)
- 
- static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
++	/* Trap External Trace */
++	if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_ExtTrcBuff), feature_ids))
++		mdcr_clear |= MDCR_EL2_E2TB_MASK << MDCR_EL2_E2TB_SHIFT;
++
+ 	vcpu->arch.mdcr_el2 |= mdcr_set;
+ 	vcpu->arch.mdcr_el2 &= ~mdcr_clear;
+ 	vcpu->arch.cptr_el2 |= cptr_set;
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 96cbeeab4eec..02e1a4290fa5 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -1115,7 +1115,10 @@ Enum	63:60	HPMN0
+ 	0b0000	UNPREDICTABLE
+ 	0b0001	DEF
+ EndEnum
+-Res0	59:56
++UnsignedEnum	59:56	ExtTrcBuff
++	0b0000	NI
++	0b0001	IMP
++EndEnum
+ UnsignedEnum	55:52	BRBE
+ 	0b0000	NI
+ 	0b0001	IMP
 -- 
 2.43.0.rc2.451.g8631bc7472-goog
 
