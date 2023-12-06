@@ -1,54 +1,56 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3D615AC1
-	for <kvmarm@lists.linux.dev>; Wed,  6 Dec 2023 10:05:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990E91A725
+	for <kvmarm@lists.linux.dev>; Wed,  6 Dec 2023 10:05:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XlCwRun5"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5d340a9cf07so101772957b3.3
-        for <kvmarm@lists.linux.dev>; Wed, 06 Dec 2023 02:05:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QF9iBH6N"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3334b472196so510400f8f.1
+        for <kvmarm@lists.linux.dev>; Wed, 06 Dec 2023 02:05:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701857105; x=1702461905; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=hKt4wnxhbWMieJh8Fo1EeTPFkyfgQ6Kk+mcH0bY82so=;
-        b=XlCwRun5/jC/T544F+a4EjEyNxHBLa6m6XaDrY5jVnJRNrNcWTMuNDmbIl4MgmIYrj
-         +0aaWiPGenpWp41QuHXku1Y89261jbmWdZE14A2rv5+IkMChmwjnFW//2VWttb+cdxgZ
-         1AqHFDudeas236GWVauypyLV0RI7y3pWpfR2qlmUfAQ7xaOLEwkmLiXDJy25bNPCl+LH
-         EF9WUvCBGpPaUKEU836dU4QG5S/ZybqwlL/ogI4Tuzzl27KfbN1LietB6JCuuFuFaw9L
-         PFigZj7YSd4M+y6QIcov2lvIkjnDOxcPNXJ5WsDlU5p2F4ayV5eewiv7J2B8MErSpQNT
-         4ggQ==
+        d=google.com; s=20230601; t=1701857108; x=1702461908; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+hb6XkMaA8wq8n6byWbZcgbzRuAU/Da9bRJr34V2lOA=;
+        b=QF9iBH6NZZ5AyFhm/PJLCnMkhNp+ev0f/umcdgBRiibn5ZzQNIZbazggjKkx6BKmR7
+         IicYd1/5tE2ozYNyKkzt+W6bQp9ws8zeF9Equ4baCaxn8vdnv+CvrAw15PIayIzQM39C
+         Kwf6qMvZBxCssDcV3lHSqqeqBXI4/LGbQesAjXRln3jxMpeK9amBX7h16d65c3PsS5bm
+         eGsQNm6fyeK79GFjLArxz1ZJbiCzSERqXcBngnSM/oH+uBDA9zyxKAoCl/YswSKF+cSF
+         dLxI4pY37pSiP2n89t9+6rcuqiIDfoCttQqrHZRaQHzHDlYu2Ti/PVVsKuCPLk5xM1E0
+         pIMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701857105; x=1702461905;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hKt4wnxhbWMieJh8Fo1EeTPFkyfgQ6Kk+mcH0bY82so=;
-        b=axcUP/93L1qQPtDfZ1o4z0SeKwkXhyO3uCR4IizLQhicucqH8CvaA5YQU29LscD2CU
-         ExEA0vPH0HovlVMYVBTB6sabdeP+fJuVDKTHBLQcCgUIwuqrAGxDHGtAI9UMrLSsdlWm
-         RBR6fGYjMHxFunmdEsmYmrd8oH8ibtrUeQbRPLwe09ZlZHEq68hPPbd+4BBvSHujF650
-         +deosJf7bH4heSZnmMF7V20X6L3m1n0PhZU4ZGLvfny4bhoFy/MEtEKybBYikc/slg9Q
-         ckn6fXQgiFrmznXwxZN/rnYIfdzOAvx8x/8p9Eq0wLfttCwHMxH8Vvr8WG7tVXvxnnkd
-         szGg==
-X-Gm-Message-State: AOJu0YyxCb+MK1273hWeDar1AemU/xOENPT6EjE/pqqefidYI/14Bd3b
-	6ER3KVLcwrXdfbS30LgyZJ9lyNkOhRoL1YIBJw6/PgjpF8kqBIlHt8wbQPKbP3DIk9yFdCSG7Gk
-	qvS2oBVGec1k2q3wlGmH5gaGPlX4TbRh8qjkvGhLy2n4hIv/7ss3TWUqWFrw=
-X-Google-Smtp-Source: AGHT+IE0PJsBsYo7iM8Ik4Zx22L0blbH5vZfupSNvop9lHF+Jf6kBA570/+wuauYae2DfKLmqYI0SGe29w==
+        d=1e100.net; s=20230601; t=1701857108; x=1702461908;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+hb6XkMaA8wq8n6byWbZcgbzRuAU/Da9bRJr34V2lOA=;
+        b=XgaG0GWxlOETc4H1Sc8VpNEx86nrFE8cnDU6Wul2535Y4xL9LxgIe434Bnq9e31l8q
+         TKpuRQuZAGuqZcIabFgolOMq/PQAZEDuksz7GfX8VxnzxQdciJKBSLZ2b+jo8KuNm8Vc
+         7Z/lRmYBnMtNg1KZqYpWeNKn4XGUTk1zLycfzz/9YFbpPXkmoS0STpM7TNDcF0lP0TjM
+         XRXMiF1fkShtp7CfZYqS2u/3aN5DGtViv2VuwdljDnhuJuVkhk59jQY7Y3p52cSx/dC3
+         xMMkAUkn+8FwC4ALboH3GFN1CpQLXoKyOxXXBng/tLwUbEvWKWVwcUzTKN1cznvDBDOm
+         OlmA==
+X-Gm-Message-State: AOJu0Yy7M+RCNKkZuwjmLc6R0H3X6gAC6BK+JP4dMvKrU0y6MR9p/jio
+	+/DWXPXqYwXE2rPrW05qfEO9gTAPa+OiHe7cGauApSdWeBpQhb8aqYKBlYpg2gq33071cp6mUx8
+	lhlPzOVu1d5wk5/GCEovUJ4hQgXIMJNdiNwZGtb+OuPs3ASr8qTIBzGxqXkk=
+X-Google-Smtp-Source: AGHT+IFSPIaZXt3uxp4qWQADPeVuALXIH470f8vIbOpzJeFZxkCVe1ayPA4dezVGvXu7nvOTxIzYki2wiQ==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a81:99d0:0:b0:5d4:3013:25d4 with SMTP id
- q199-20020a8199d0000000b005d4301325d4mr6275ywg.5.1701857105270; Wed, 06 Dec
- 2023 02:05:05 -0800 (PST)
-Date: Wed,  6 Dec 2023 10:04:50 +0000
+ (user=tabba job=sendgmr) by 2002:adf:f1c4:0:b0:333:347a:581c with SMTP id
+ z4-20020adff1c4000000b00333347a581cmr2799wro.9.1701857107866; Wed, 06 Dec
+ 2023 02:05:07 -0800 (PST)
+Date: Wed,  6 Dec 2023 10:04:51 +0000
+In-Reply-To: <20231206100503.564090-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20231206100503.564090-1-tabba@google.com>
 X-Mailer: git-send-email 2.43.0.rc2.451.g8631bc7472-goog
-Message-ID: <20231206100503.564090-1-tabba@google.com>
-Subject: [PATCH v2 00/12] KVM: arm64: Fixes to fine grain traps and pKVM traps
+Message-ID: <20231206100503.564090-2-tabba@google.com>
+Subject: [PATCH v2 01/12] KVM: Add missing HCRX_EL2 field definitions
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
@@ -57,61 +59,34 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com,
 	joey.gouly@arm.com, tabba@google.com, linux-arm-kernel@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 
-Changes from v1:
-- Handle HAFGRTR_EL2 in nested virt
-- Update the nested virt FGT tables with the added trap bits (Marc)
-- Use the generated value for RES0 (Marc)
-- Calculate the value of NMASK based on RES0 and MASK
+Add the latest field definitions to HCRX_EL2 from the 2023-09 Arm
+Architecture System Registers xml specification [*].
 
-This patch series has fixes, updates, and code for validating
-fine grain trap register masks, as well as some fixes to feature
-trapping in pKVM.
+These fields aren't used yet. This is done mainly to get the
+correct generated value for the register's RES0 mask.
 
-New fine grain trap (FGT) bits have been defined in the latest
-Arm Architecture System Registers xml specification (2023-09)
-[*], so the code is updated to reflect them. Moreover, some of
-the already-defined masks overlap with RES0, which this series
-fixes.
+[*] https://developer.arm.com/documentation/ddi0601/2023-09/AArch64-Registers/HCRX-EL2--Extended-Hypervisor-Configuration-Register
 
-It also adds FGT register masks that weren't defined earlier,
-handling of HAFGRTR_EL2 in nested virt, as well as build time
-validation that the bits of the various masks are all accounted
-for and without overlap.
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ arch/arm64/tools/sysreg | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Based on 6.7-rc4.
-
-Cheers,
-/fuad
-
-[*] https://developer.arm.com/downloads/-/exploration-tools
-
-Fuad Tabba (12):
-  KVM: Add missing HCRX_EL2 field definitions
-  KVM: arm64: Add latest HFGxTR_EL2 FGT entries to nested virt
-  KVM: arm64: Add latest HFGITR_EL2 FGT entries to nested virt
-  KVM: arm64: Add bit masks for HAFGRTR_EL2
-  KVM: arm64: Handle HAFGRTR_EL2 trapping in nested virt
-  KVM: arm64: Update and fix FGT register masks
-  KVM: arm64: Add build validation for FGT trap mask values
-  KVM: arm64: Use generated FGT RES0 bits instead of specifying them
-  KVM: arm64: Generate the HFGWTR-only RES0 bits
-  KVM: arm64: Define FGT NMASK bits relative to other fields
-  KVM: arm64: Trap external trace for protected VMs
-  KVM: arm64: Mark CMOW as allowed for protected VMs
-
- arch/arm64/include/asm/kvm_arm.h              | 58 +++++++------
- arch/arm64/include/asm/kvm_host.h             |  1 +
- arch/arm64/include/asm/sysreg.h               | 20 +++++
- arch/arm64/kvm/emulate-nested.c               | 63 ++++++++++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h       | 29 +++++++
- .../arm64/kvm/hyp/include/nvhe/fixed_config.h |  4 +-
- arch/arm64/kvm/hyp/nvhe/pkvm.c                |  4 +
- arch/arm64/kvm/sys_regs.c                     |  1 +
- arch/arm64/tools/sysreg                       | 82 ++++++++++++++++++-
- 9 files changed, 231 insertions(+), 31 deletions(-)
-
-
-base-commit: 33cc938e65a98f1d29d0a18403dbbee050dcad9a
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 96cbeeab4eec..c6cc8f2396e6 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -2300,7 +2300,9 @@ Fields	ZCR_ELx
+ EndSysreg
+ 
+ Sysreg	HCRX_EL2	3	4	1	2	2
+-Res0	63:23
++Res0	63:25
++Field	24	PACMEn
++Field	23	EnFPM
+ Field	22	GCSEn
+ Field	21	EnIDCP128
+ Field	20	EnSDERR
 -- 
 2.43.0.rc2.451.g8631bc7472-goog
 
