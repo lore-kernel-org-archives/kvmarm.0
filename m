@@ -1,46 +1,47 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05644597B
-	for <kvmarm@lists.linux.dev>; Wed,  6 Dec 2023 17:02:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B88C49F74
+	for <kvmarm@lists.linux.dev>; Wed,  6 Dec 2023 17:02:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="nYM7LMkh"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-50c0f6b1015so1949333e87.3
-        for <kvmarm@lists.linux.dev>; Wed, 06 Dec 2023 09:02:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="JXUb8V/K"
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a1cdeab6b53so5076166b.1
+        for <kvmarm@lists.linux.dev>; Wed, 06 Dec 2023 09:02:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1701882163; x=1702486963; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Me0qqRrskpa11GvKdt5GrXiD/qCgAfM3AQizYA0X8fg=;
-        b=nYM7LMkhp5g9UoHltJHilpBg21YvvEgbBM80/2V1YwICDaI6bCSc9nbgJnA/f6J0cF
-         GUxCLgdlgO5QgUQr2uZR7Kp5DOCty7KjYLzPrbgMDp09LMf0eOcFaQKqkF2ImzUvd0rU
-         cznz7zVwHg5BcDjgM993iIjKZ9KdvRYpdHAqhh155bFkyMfarFdQOZ8xkCxg5aNkaJgt
-         USwC06yTyPmyk3Lbrf/jxcGtaIPzO3Jm+ZAhWUx1NK7ap1eBtAUuTpFoqnG39vfuAdsN
-         4xtecenODl0l3i2N8GRCyMaAD9HjHJkZ4t2PlMuu0xUfvsZ7p4AefUC8UKdh6iRD99oK
-         MTHw==
+        d=ventanamicro.com; s=google; t=1701882164; x=1702486964; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PCSKjpuLf9v8hvcS+DwLGbNivYzM6Js8UWdBsTK/9Gk=;
+        b=JXUb8V/KUU34Hx5MYJWeECiSV6Osn5mIntNEcg/c5UFvEXCXyWN0XYX+SsujTzBkd4
+         CVlUVvxy/1ooYjIWAJZ/nDWS2yvgHLNq//aaQ7nz82/hGYAKjXs884slNVAa9gnnAO8d
+         pfvvN9yKoxJ5tOM58ZrDg9KdbrhNk8QABvXCxcVyQSvEfOpjcwJO1hnpdq/Tf4w1vK/f
+         tLm+VzPYvvk/BWy62oLDeOKSy5peAJXIqLN6ve75dElPLOfsuLB/4w8XK0BeWXApbuKg
+         ERb04JsH89RCFmh8cng8plIagS+l/zKxBWshV1B7ckRJ65mP8ZdBqlb9uODU9HMPg3uA
+         WYdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701882163; x=1702486963;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Me0qqRrskpa11GvKdt5GrXiD/qCgAfM3AQizYA0X8fg=;
-        b=vbNGdrnP2ZKWz1gFp2novGnBQMccfvsSWCdPvJxNJ3SVSLn1beVJ5UlZPmWveG+95V
-         n7mWxzpnG0OC63Km2RDxnpw+44jcdm3KeFzFDst/r25JvnS7VWnx78mdeBTfu0Ejc1k8
-         WhvKSdJt4tcsNuGm2AsBwlrlIkmRPa3ChhZYpJXgT0jYC/6S4V1ccYAvPkdkLjljMEz8
-         K0G9xuw4naj9NmOpJ9fgc38QPUQQWZai35WnCE79slxHKabg/yhXmMcpG5d5lh/Oh/Zu
-         hf8lneVtkFvekwnZvxjBj7VQgiavk/Z9gIlHauRGY3bLKxchE665dWTyaM1zTDnlwyCu
-         eF8A==
-X-Gm-Message-State: AOJu0YySVO9L4PFLlTZB5wec/u6XGGiYTSUFoZf1OPCt/wDO53fVmTq6
-	iUHSrumh72JIE1tkD5JW+lJiPw==
-X-Google-Smtp-Source: AGHT+IECVyI5nSuArrzUeLvq2gF2I0dRUO6u4KVRrS6V9wDhUNsXaChckaX+LSPb1AXIsiukHIvlxQ==
-X-Received: by 2002:a05:6512:549:b0:50b:d3cf:1e8c with SMTP id h9-20020a056512054900b0050bd3cf1e8cmr612707lfl.43.1701882162556;
-        Wed, 06 Dec 2023 09:02:42 -0800 (PST)
+        d=1e100.net; s=20230601; t=1701882164; x=1702486964;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PCSKjpuLf9v8hvcS+DwLGbNivYzM6Js8UWdBsTK/9Gk=;
+        b=aOXLVQgrjaJszcBT8gMDsz3uXRD18BYYD0Nq/+qsH0bNh9s9KQzQmrzAaHSNraCDHU
+         uIfm6AZWZP2LR3oOHa0Jl4JtMiDqSLpM3fu9SfhIhZ1QPWU7rkHd93vclu5txJkep/EH
+         DTmagmFB33rLnKoKu3bfdE9l2nRXisSGfjaIxbDGHT6KiaywzVC+yhk7iuzIMOwgvvx7
+         YzMaOUMhZHvwVnqlJ5wUtcM+NDEWimM13kSB4GW7caSK8ylgfb3NwJDlaIFdggDgjFwa
+         agDeGSbuC1/M++I8A685t9ZLRU6Klimg9KeLiNpE+KQMCvD0POz40q0wetBwxHAj1x0c
+         uI+w==
+X-Gm-Message-State: AOJu0YzqDr1X5m0jJdjrKh5997uyKcQtFOmAs0bG54c9M8PTmr9tf+Nd
+	gOQtOZaxAdpt6nfuJA4oL2O6iQ==
+X-Google-Smtp-Source: AGHT+IHnLu38hdj/87sI44BfU9qMOOxUjzsxAq4dc0zgDAovyCZoEnr9Vr8OHwTvE+rl1zyjuc81Eg==
+X-Received: by 2002:a17:906:a851:b0:a1d:c376:216b with SMTP id dx17-20020a170906a85100b00a1dc376216bmr1039271ejb.45.1701882164241;
+        Wed, 06 Dec 2023 09:02:44 -0800 (PST)
 Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id l4-20020a056402344400b0054cc474b25fsm189776edc.40.2023.12.06.09.02.41
+        by smtp.gmail.com with ESMTPSA id d10-20020a170906040a00b00a1b65249053sm167372eja.128.2023.12.06.09.02.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 09:02:42 -0800 (PST)
+        Wed, 06 Dec 2023 09:02:43 -0800 (PST)
 From: Andrew Jones <ajones@ventanamicro.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
@@ -53,10 +54,12 @@ Cc: seanjc@google.com,
 	borntraeger@linux.ibm.com,
 	frankja@linux.ibm.com,
 	imbrenda@linux.ibm.com
-Subject: [PATCH 0/5] KVM: selftests: Remove redundant newlines
-Date: Wed,  6 Dec 2023 18:02:42 +0100
-Message-ID: <20231206170241.82801-7-ajones@ventanamicro.com>
+Subject: [PATCH 1/5] KVM: selftests: Remove redundant newlines
+Date: Wed,  6 Dec 2023 18:02:43 +0100
+Message-ID: <20231206170241.82801-8-ajones@ventanamicro.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20231206170241.82801-7-ajones@ventanamicro.com>
+References: <20231206170241.82801-7-ajones@ventanamicro.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -66,85 +69,411 @@ MIME-Version: 1.0
 Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 
-This series has a lot of churn for dubious value, but I'm posting it
-anyway since I've already done the work. Each patch in the series is
-simply removing trailing newlines from format strings in TEST_* function
-callsites, since TEST_* functions append their own. The first patch
-addresses common lib and test code, the rest of the changes are split
-by arch in the remaining patches.
+TEST_* functions append their own newline. Remove newlines from
+TEST_* callsites to avoid extra newlines in output.
 
-Figuring out which newlines to delete was done with a long, ugly
-grep regular expression[*] and then highlighting '\n' in the output
-and manually skimming to find, and then manually fix, each instance.
-I'm sure there's some AI tool that would have done everything for me,
-but this was my chance to prove I'm still as capable as AI (well,
-unless I missed some...)
+Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+---
+ tools/testing/selftests/kvm/demand_paging_test.c |  4 ++--
+ .../testing/selftests/kvm/dirty_log_perf_test.c  |  4 ++--
+ tools/testing/selftests/kvm/dirty_log_test.c     |  4 ++--
+ tools/testing/selftests/kvm/get-reg-list.c       |  2 +-
+ tools/testing/selftests/kvm/guest_print_test.c   |  8 ++++----
+ .../selftests/kvm/hardware_disable_test.c        |  6 +++---
+ .../testing/selftests/kvm/kvm_create_max_vcpus.c |  2 +-
+ .../testing/selftests/kvm/kvm_page_table_test.c  |  4 ++--
+ tools/testing/selftests/kvm/lib/elf.c            |  2 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c       | 16 ++++++++--------
+ tools/testing/selftests/kvm/lib/memstress.c      |  2 +-
+ .../testing/selftests/kvm/lib/userfaultfd_util.c |  2 +-
+ .../kvm/memslot_modification_stress_test.c       |  2 +-
+ tools/testing/selftests/kvm/memslot_perf_test.c  |  6 +++---
+ tools/testing/selftests/kvm/rseq_test.c          |  4 ++--
+ .../selftests/kvm/set_memory_region_test.c       |  6 +++---
+ .../selftests/kvm/system_counter_offset_test.c   |  2 +-
+ 17 files changed, 38 insertions(+), 38 deletions(-)
 
-[*] grep -rn . tools/testing/selftests/kvm |
-    grep -Pzo '(?s)\n[^\n]*TEST_(ASSERT|REQUIRE|FAIL)\(.*?\)\s*;' |
-    tr '\0' '\n'
-
-
-Andrew Jones (5):
-  KVM: selftests: Remove redundant newlines
-  KVM: selftests: aarch64: Remove redundant newlines
-  KVM: selftests: riscv: Remove redundant newlines
-  KVM: selftests: s390x: Remove redundant newlines
-  KVM: selftests: x86_64: Remove redundant newlines
-
- .../selftests/kvm/aarch64/arch_timer.c        | 12 ++++----
- .../selftests/kvm/aarch64/hypercalls.c        | 16 +++++------
- .../selftests/kvm/aarch64/page_fault_test.c   |  6 ++--
- .../selftests/kvm/aarch64/smccc_filter.c      |  2 +-
- .../kvm/aarch64/vpmu_counter_access.c         | 12 ++++----
- .../selftests/kvm/demand_paging_test.c        |  4 +--
- .../selftests/kvm/dirty_log_perf_test.c       |  4 +--
- tools/testing/selftests/kvm/dirty_log_test.c  |  4 +--
- tools/testing/selftests/kvm/get-reg-list.c    |  2 +-
- .../testing/selftests/kvm/guest_print_test.c  |  8 +++---
- .../selftests/kvm/hardware_disable_test.c     |  6 ++--
- .../selftests/kvm/kvm_create_max_vcpus.c      |  2 +-
- .../selftests/kvm/kvm_page_table_test.c       |  4 +--
- .../selftests/kvm/lib/aarch64/processor.c     |  2 +-
- .../testing/selftests/kvm/lib/aarch64/vgic.c  |  4 +--
- tools/testing/selftests/kvm/lib/elf.c         |  2 +-
- tools/testing/selftests/kvm/lib/kvm_util.c    | 16 +++++------
- tools/testing/selftests/kvm/lib/memstress.c   |  2 +-
- .../selftests/kvm/lib/riscv/processor.c       |  2 +-
- .../selftests/kvm/lib/s390x/processor.c       |  2 +-
- .../selftests/kvm/lib/userfaultfd_util.c      |  2 +-
- .../selftests/kvm/lib/x86_64/processor.c      | 10 +++----
- tools/testing/selftests/kvm/lib/x86_64/vmx.c  |  6 ++--
- .../kvm/memslot_modification_stress_test.c    |  2 +-
- .../testing/selftests/kvm/memslot_perf_test.c |  6 ++--
- .../selftests/kvm/riscv/get-reg-list.c        |  2 +-
- tools/testing/selftests/kvm/rseq_test.c       |  4 +--
- tools/testing/selftests/kvm/s390x/resets.c    |  4 +--
- .../selftests/kvm/s390x/sync_regs_test.c      | 20 ++++++-------
- .../selftests/kvm/set_memory_region_test.c    |  6 ++--
- .../kvm/system_counter_offset_test.c          |  2 +-
- tools/testing/selftests/kvm/x86_64/amx_test.c |  2 +-
- .../testing/selftests/kvm/x86_64/cpuid_test.c |  4 +--
- .../selftests/kvm/x86_64/flds_emulation.h     |  2 +-
- .../selftests/kvm/x86_64/hyperv_clock.c       |  4 +--
- .../testing/selftests/kvm/x86_64/hyperv_ipi.c |  2 +-
- .../selftests/kvm/x86_64/hyperv_tlb_flush.c   |  2 +-
- .../selftests/kvm/x86_64/kvm_clock_test.c     |  8 +++---
- .../selftests/kvm/x86_64/platform_info_test.c |  2 +-
- .../kvm/x86_64/pmu_event_filter_test.c        |  2 +-
- .../selftests/kvm/x86_64/sev_migrate_tests.c  | 28 +++++++++----------
- .../smaller_maxphyaddr_emulation_test.c       |  4 +--
- .../selftests/kvm/x86_64/sync_regs_test.c     | 10 +++----
- .../kvm/x86_64/ucna_injection_test.c          |  8 +++---
- .../selftests/kvm/x86_64/userspace_io_test.c  |  2 +-
- .../kvm/x86_64/vmx_apic_access_test.c         |  2 +-
- .../selftests/kvm/x86_64/vmx_dirty_log_test.c | 16 +++++------
- .../vmx_exception_with_invalid_guest_state.c  |  2 +-
- .../selftests/kvm/x86_64/xapic_ipi_test.c     |  8 +++---
- .../selftests/kvm/x86_64/xcr0_cpuid_test.c    |  2 +-
- .../selftests/kvm/x86_64/xss_msr_test.c       |  2 +-
- 51 files changed, 144 insertions(+), 144 deletions(-)
-
+diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+index 09c116a82a84..bf3609f71854 100644
+--- a/tools/testing/selftests/kvm/demand_paging_test.c
++++ b/tools/testing/selftests/kvm/demand_paging_test.c
+@@ -45,10 +45,10 @@ static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
+ 
+ 	/* Let the guest access its memory */
+ 	ret = _vcpu_run(vcpu);
+-	TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
++	TEST_ASSERT(ret == 0, "vcpu_run failed: %d", ret);
+ 	if (get_ucall(vcpu, NULL) != UCALL_SYNC) {
+ 		TEST_ASSERT(false,
+-			    "Invalid guest sync status: exit_reason=%s\n",
++			    "Invalid guest sync status: exit_reason=%s",
+ 			    exit_reason_str(run->exit_reason));
+ 	}
+ 
+diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+index d374dbcf9a53..504f6fe980e8 100644
+--- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+@@ -88,9 +88,9 @@ static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
+ 		ret = _vcpu_run(vcpu);
+ 		ts_diff = timespec_elapsed(start);
+ 
+-		TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
++		TEST_ASSERT(ret == 0, "vcpu_run failed: %d", ret);
+ 		TEST_ASSERT(get_ucall(vcpu, NULL) == UCALL_SYNC,
+-			    "Invalid guest sync status: exit_reason=%s\n",
++			    "Invalid guest sync status: exit_reason=%s",
+ 			    exit_reason_str(run->exit_reason));
+ 
+ 		pr_debug("Got sync event from vCPU %d\n", vcpu_idx);
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index 6cbecf499767..babea97b31a4 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -262,7 +262,7 @@ static void default_after_vcpu_run(struct kvm_vcpu *vcpu, int ret, int err)
+ 		    "vcpu run failed: errno=%d", err);
+ 
+ 	TEST_ASSERT(get_ucall(vcpu, NULL) == UCALL_SYNC,
+-		    "Invalid guest sync status: exit_reason=%s\n",
++		    "Invalid guest sync status: exit_reason=%s",
+ 		    exit_reason_str(run->exit_reason));
+ 
+ 	vcpu_handle_sync_stop();
+@@ -410,7 +410,7 @@ static void dirty_ring_after_vcpu_run(struct kvm_vcpu *vcpu, int ret, int err)
+ 		pr_info("vcpu continues now.\n");
+ 	} else {
+ 		TEST_ASSERT(false, "Invalid guest sync status: "
+-			    "exit_reason=%s\n",
++			    "exit_reason=%s",
+ 			    exit_reason_str(run->exit_reason));
+ 	}
+ }
+diff --git a/tools/testing/selftests/kvm/get-reg-list.c b/tools/testing/selftests/kvm/get-reg-list.c
+index be7bf5224434..5b37b7785086 100644
+--- a/tools/testing/selftests/kvm/get-reg-list.c
++++ b/tools/testing/selftests/kvm/get-reg-list.c
+@@ -151,7 +151,7 @@ static void check_supported(struct vcpu_reg_list *c)
+ 			continue;
+ 
+ 		__TEST_REQUIRE(kvm_has_cap(s->capability),
+-			       "%s: %s not available, skipping tests\n",
++			       "%s: %s not available, skipping tests",
+ 			       config_name(c), s->name);
+ 	}
+ }
+diff --git a/tools/testing/selftests/kvm/guest_print_test.c b/tools/testing/selftests/kvm/guest_print_test.c
+index 41230b746190..3502caa3590c 100644
+--- a/tools/testing/selftests/kvm/guest_print_test.c
++++ b/tools/testing/selftests/kvm/guest_print_test.c
+@@ -98,7 +98,7 @@ static void ucall_abort(const char *assert_msg, const char *expected_assert_msg)
+ 	int offset = len_str - len_substr;
+ 
+ 	TEST_ASSERT(len_substr <= len_str,
+-		    "Expected '%s' to be a substring of '%s'\n",
++		    "Expected '%s' to be a substring of '%s'",
+ 		    assert_msg, expected_assert_msg);
+ 
+ 	TEST_ASSERT(strcmp(&assert_msg[offset], expected_assert_msg) == 0,
+@@ -116,7 +116,7 @@ static void run_test(struct kvm_vcpu *vcpu, const char *expected_printf,
+ 		vcpu_run(vcpu);
+ 
+ 		TEST_ASSERT(run->exit_reason == UCALL_EXIT_REASON,
+-			    "Unexpected exit reason: %u (%s),\n",
++			    "Unexpected exit reason: %u (%s),",
+ 			    run->exit_reason, exit_reason_str(run->exit_reason));
+ 
+ 		switch (get_ucall(vcpu, &uc)) {
+@@ -161,11 +161,11 @@ static void test_limits(void)
+ 	vcpu_run(vcpu);
+ 
+ 	TEST_ASSERT(run->exit_reason == UCALL_EXIT_REASON,
+-		    "Unexpected exit reason: %u (%s),\n",
++		    "Unexpected exit reason: %u (%s),",
+ 		    run->exit_reason, exit_reason_str(run->exit_reason));
+ 
+ 	TEST_ASSERT(get_ucall(vcpu, &uc) == UCALL_ABORT,
+-		    "Unexpected ucall command: %lu,  Expected: %u (UCALL_ABORT)\n",
++		    "Unexpected ucall command: %lu,  Expected: %u (UCALL_ABORT)",
+ 		    uc.cmd, UCALL_ABORT);
+ 
+ 	kvm_vm_free(vm);
+diff --git a/tools/testing/selftests/kvm/hardware_disable_test.c b/tools/testing/selftests/kvm/hardware_disable_test.c
+index f5d59b9934f1..decc521fc760 100644
+--- a/tools/testing/selftests/kvm/hardware_disable_test.c
++++ b/tools/testing/selftests/kvm/hardware_disable_test.c
+@@ -41,7 +41,7 @@ static void *run_vcpu(void *arg)
+ 
+ 	vcpu_run(vcpu);
+ 
+-	TEST_ASSERT(false, "%s: exited with reason %d: %s\n",
++	TEST_ASSERT(false, "%s: exited with reason %d: %s",
+ 		    __func__, run->exit_reason,
+ 		    exit_reason_str(run->exit_reason));
+ 	pthread_exit(NULL);
+@@ -55,7 +55,7 @@ static void *sleeping_thread(void *arg)
+ 		fd = open("/dev/null", O_RDWR);
+ 		close(fd);
+ 	}
+-	TEST_ASSERT(false, "%s: exited\n", __func__);
++	TEST_ASSERT(false, "%s: exited", __func__);
+ 	pthread_exit(NULL);
+ }
+ 
+@@ -118,7 +118,7 @@ static void run_test(uint32_t run)
+ 	for (i = 0; i < VCPU_NUM; ++i)
+ 		check_join(threads[i], &b);
+ 	/* Should not be reached */
+-	TEST_ASSERT(false, "%s: [%d] child escaped the ninja\n", __func__, run);
++	TEST_ASSERT(false, "%s: [%d] child escaped the ninja", __func__, run);
+ }
+ 
+ void wait_for_child_setup(pid_t pid)
+diff --git a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
+index 31b3cb24b9a7..b9e23265e4b3 100644
+--- a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
++++ b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
+@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
+ 
+ 			int r = setrlimit(RLIMIT_NOFILE, &rl);
+ 			__TEST_REQUIRE(r >= 0,
+-				       "RLIMIT_NOFILE hard limit is too low (%d, wanted %d)\n",
++				       "RLIMIT_NOFILE hard limit is too low (%d, wanted %d)",
+ 				       old_rlim_max, nr_fds_wanted);
+ 		} else {
+ 			TEST_ASSERT(!setrlimit(RLIMIT_NOFILE, &rl), "setrlimit() failed!");
+diff --git a/tools/testing/selftests/kvm/kvm_page_table_test.c b/tools/testing/selftests/kvm/kvm_page_table_test.c
+index e37dc9c21888..e0ba97ac1c56 100644
+--- a/tools/testing/selftests/kvm/kvm_page_table_test.c
++++ b/tools/testing/selftests/kvm/kvm_page_table_test.c
+@@ -204,9 +204,9 @@ static void *vcpu_worker(void *data)
+ 		ret = _vcpu_run(vcpu);
+ 		ts_diff = timespec_elapsed(start);
+ 
+-		TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
++		TEST_ASSERT(ret == 0, "vcpu_run failed: %d", ret);
+ 		TEST_ASSERT(get_ucall(vcpu, NULL) == UCALL_SYNC,
+-			    "Invalid guest sync status: exit_reason=%s\n",
++			    "Invalid guest sync status: exit_reason=%s",
+ 			    exit_reason_str(vcpu->run->exit_reason));
+ 
+ 		pr_debug("Got sync event from vCPU %d\n", vcpu->id);
+diff --git a/tools/testing/selftests/kvm/lib/elf.c b/tools/testing/selftests/kvm/lib/elf.c
+index 266f3876e10a..f34d926d9735 100644
+--- a/tools/testing/selftests/kvm/lib/elf.c
++++ b/tools/testing/selftests/kvm/lib/elf.c
+@@ -184,7 +184,7 @@ void kvm_vm_elf_load(struct kvm_vm *vm, const char *filename)
+ 				"Seek to program segment offset failed,\n"
+ 				"  program header idx: %u errno: %i\n"
+ 				"  offset_rv: 0x%jx\n"
+-				"  expected: 0x%jx\n",
++				"  expected: 0x%jx",
+ 				n1, errno, (intmax_t) offset_rv,
+ 				(intmax_t) phdr.p_offset);
+ 			test_read(fd, addr_gva2hva(vm, phdr.p_vaddr),
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 17a978b8a2c4..8c4a3425ebf7 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -317,7 +317,7 @@ static uint64_t vm_nr_pages_required(enum vm_guest_mode mode,
+ 	uint64_t nr_pages;
+ 
+ 	TEST_ASSERT(nr_runnable_vcpus,
+-		    "Use vm_create_barebones() for VMs that _never_ have vCPUs\n");
++		    "Use vm_create_barebones() for VMs that _never_ have vCPUs");
+ 
+ 	TEST_ASSERT(nr_runnable_vcpus <= kvm_check_cap(KVM_CAP_MAX_VCPUS),
+ 		    "nr_vcpus = %d too large for host, max-vcpus = %d",
+@@ -488,7 +488,7 @@ void kvm_pin_this_task_to_pcpu(uint32_t pcpu)
+ 	CPU_ZERO(&mask);
+ 	CPU_SET(pcpu, &mask);
+ 	r = sched_setaffinity(0, sizeof(mask), &mask);
+-	TEST_ASSERT(!r, "sched_setaffinity() failed for pCPU '%u'.\n", pcpu);
++	TEST_ASSERT(!r, "sched_setaffinity() failed for pCPU '%u'.", pcpu);
+ }
+ 
+ static uint32_t parse_pcpu(const char *cpu_str, const cpu_set_t *allowed_mask)
+@@ -496,7 +496,7 @@ static uint32_t parse_pcpu(const char *cpu_str, const cpu_set_t *allowed_mask)
+ 	uint32_t pcpu = atoi_non_negative("CPU number", cpu_str);
+ 
+ 	TEST_ASSERT(CPU_ISSET(pcpu, allowed_mask),
+-		    "Not allowed to run on pCPU '%d', check cgroups?\n", pcpu);
++		    "Not allowed to run on pCPU '%d', check cgroups?", pcpu);
+ 	return pcpu;
+ }
+ 
+@@ -526,7 +526,7 @@ void kvm_parse_vcpu_pinning(const char *pcpus_string, uint32_t vcpu_to_pcpu[],
+ 	int i, r;
+ 
+ 	cpu_list = strdup(pcpus_string);
+-	TEST_ASSERT(cpu_list, "strdup() allocation failed.\n");
++	TEST_ASSERT(cpu_list, "strdup() allocation failed.");
+ 
+ 	r = sched_getaffinity(0, sizeof(allowed_mask), &allowed_mask);
+ 	TEST_ASSERT(!r, "sched_getaffinity() failed");
+@@ -535,7 +535,7 @@ void kvm_parse_vcpu_pinning(const char *pcpus_string, uint32_t vcpu_to_pcpu[],
+ 
+ 	/* 1. Get all pcpus for vcpus. */
+ 	for (i = 0; i < nr_vcpus; i++) {
+-		TEST_ASSERT(cpu, "pCPU not provided for vCPU '%d'\n", i);
++		TEST_ASSERT(cpu, "pCPU not provided for vCPU '%d'", i);
+ 		vcpu_to_pcpu[i] = parse_pcpu(cpu, &allowed_mask);
+ 		cpu = strtok(NULL, delim);
+ 	}
+@@ -1054,7 +1054,7 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
+ 	TEST_ASSERT(ret == 0, "KVM_SET_USER_MEMORY_REGION2 IOCTL failed,\n"
+ 		"  rc: %i errno: %i\n"
+ 		"  slot: %u flags: 0x%x\n"
+-		"  guest_phys_addr: 0x%lx size: 0x%lx guest_memfd: %d\n",
++		"  guest_phys_addr: 0x%lx size: 0x%lx guest_memfd: %d",
+ 		ret, errno, slot, flags,
+ 		guest_paddr, (uint64_t) region->region.memory_size,
+ 		region->region.guest_memfd);
+@@ -1219,7 +1219,7 @@ void vm_guest_mem_fallocate(struct kvm_vm *vm, uint64_t base, uint64_t size,
+ 		len = min_t(uint64_t, end - gpa, region->region.memory_size - offset);
+ 
+ 		ret = fallocate(region->region.guest_memfd, mode, fd_offset, len);
+-		TEST_ASSERT(!ret, "fallocate() failed to %s at %lx (len = %lu), fd = %d, mode = %x, offset = %lx\n",
++		TEST_ASSERT(!ret, "fallocate() failed to %s at %lx (len = %lu), fd = %d, mode = %x, offset = %lx",
+ 			    punch_hole ? "punch hole" : "allocate", gpa, len,
+ 			    region->region.guest_memfd, mode, fd_offset);
+ 	}
+@@ -1262,7 +1262,7 @@ struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
+ 	struct kvm_vcpu *vcpu;
+ 
+ 	/* Confirm a vcpu with the specified id doesn't already exist. */
+-	TEST_ASSERT(!vcpu_exists(vm, vcpu_id), "vCPU%d already exists\n", vcpu_id);
++	TEST_ASSERT(!vcpu_exists(vm, vcpu_id), "vCPU%d already exists", vcpu_id);
+ 
+ 	/* Allocate and initialize new vcpu structure. */
+ 	vcpu = calloc(1, sizeof(*vcpu));
+diff --git a/tools/testing/selftests/kvm/lib/memstress.c b/tools/testing/selftests/kvm/lib/memstress.c
+index d05487e5a371..cf2c73971308 100644
+--- a/tools/testing/selftests/kvm/lib/memstress.c
++++ b/tools/testing/selftests/kvm/lib/memstress.c
+@@ -192,7 +192,7 @@ struct kvm_vm *memstress_create_vm(enum vm_guest_mode mode, int nr_vcpus,
+ 	TEST_ASSERT(guest_num_pages < region_end_gfn,
+ 		    "Requested more guest memory than address space allows.\n"
+ 		    "    guest pages: %" PRIx64 " max gfn: %" PRIx64
+-		    " nr_vcpus: %d wss: %" PRIx64 "]\n",
++		    " nr_vcpus: %d wss: %" PRIx64 "]",
+ 		    guest_num_pages, region_end_gfn - 1, nr_vcpus, vcpu_memory_bytes);
+ 
+ 	args->gpa = (region_end_gfn - guest_num_pages - 1) * args->guest_page_size;
+diff --git a/tools/testing/selftests/kvm/lib/userfaultfd_util.c b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
+index 271f63891581..f4eef6eb2dc2 100644
+--- a/tools/testing/selftests/kvm/lib/userfaultfd_util.c
++++ b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
+@@ -69,7 +69,7 @@ static void *uffd_handler_thread_fn(void *arg)
+ 		if (pollfd[1].revents & POLLIN) {
+ 			r = read(pollfd[1].fd, &tmp_chr, 1);
+ 			TEST_ASSERT(r == 1,
+-				    "Error reading pipefd in UFFD thread\n");
++				    "Error reading pipefd in UFFD thread");
+ 			break;
+ 		}
+ 
+diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+index 9855c41ca811..156361966612 100644
+--- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
++++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+@@ -45,7 +45,7 @@ static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
+ 	/* Let the guest access its memory until a stop signal is received */
+ 	while (!READ_ONCE(memstress_args.stop_vcpus)) {
+ 		ret = _vcpu_run(vcpu);
+-		TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
++		TEST_ASSERT(ret == 0, "vcpu_run failed: %d", ret);
+ 
+ 		if (get_ucall(vcpu, NULL) == UCALL_SYNC)
+ 			continue;
+diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
+index 8698d1ab60d0..579a64f97333 100644
+--- a/tools/testing/selftests/kvm/memslot_perf_test.c
++++ b/tools/testing/selftests/kvm/memslot_perf_test.c
+@@ -175,11 +175,11 @@ static void wait_for_vcpu(void)
+ 	struct timespec ts;
+ 
+ 	TEST_ASSERT(!clock_gettime(CLOCK_REALTIME, &ts),
+-		    "clock_gettime() failed: %d\n", errno);
++		    "clock_gettime() failed: %d", errno);
+ 
+ 	ts.tv_sec += 2;
+ 	TEST_ASSERT(!sem_timedwait(&vcpu_ready, &ts),
+-		    "sem_timedwait() failed: %d\n", errno);
++		    "sem_timedwait() failed: %d", errno);
+ }
+ 
+ static void *vm_gpa2hva(struct vm_data *data, uint64_t gpa, uint64_t *rempages)
+@@ -336,7 +336,7 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
+ 
+ 		gpa = vm_phy_pages_alloc(data->vm, npages, guest_addr, slot);
+ 		TEST_ASSERT(gpa == guest_addr,
+-			    "vm_phy_pages_alloc() failed\n");
++			    "vm_phy_pages_alloc() failed");
+ 
+ 		data->hva_slots[slot - 1] = addr_gpa2hva(data->vm, guest_addr);
+ 		memset(data->hva_slots[slot - 1], 0, npages * guest_page_size);
+diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
+index f74e76d03b7e..28f97fb52044 100644
+--- a/tools/testing/selftests/kvm/rseq_test.c
++++ b/tools/testing/selftests/kvm/rseq_test.c
+@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
+ 		} while (snapshot != atomic_read(&seq_cnt));
+ 
+ 		TEST_ASSERT(rseq_cpu == cpu,
+-			    "rseq CPU = %d, sched CPU = %d\n", rseq_cpu, cpu);
++			    "rseq CPU = %d, sched CPU = %d", rseq_cpu, cpu);
+ 	}
+ 
+ 	/*
+@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
+ 	 * migrations given the 1us+ delay in the migration task.
+ 	 */
+ 	TEST_ASSERT(i > (NR_TASK_MIGRATIONS / 2),
+-		    "Only performed %d KVM_RUNs, task stalled too much?\n", i);
++		    "Only performed %d KVM_RUNs, task stalled too much?", i);
+ 
+ 	pthread_join(migration_thread, NULL);
+ 
+diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+index 03ec7efd19aa..1280ecac05a7 100644
+--- a/tools/testing/selftests/kvm/set_memory_region_test.c
++++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+@@ -98,11 +98,11 @@ static void wait_for_vcpu(void)
+ 	struct timespec ts;
+ 
+ 	TEST_ASSERT(!clock_gettime(CLOCK_REALTIME, &ts),
+-		    "clock_gettime() failed: %d\n", errno);
++		    "clock_gettime() failed: %d", errno);
+ 
+ 	ts.tv_sec += 2;
+ 	TEST_ASSERT(!sem_timedwait(&vcpu_ready, &ts),
+-		    "sem_timedwait() failed: %d\n", errno);
++		    "sem_timedwait() failed: %d", errno);
+ 
+ 	/* Wait for the vCPU thread to reenter the guest. */
+ 	usleep(100000);
+@@ -302,7 +302,7 @@ static void test_delete_memory_region(void)
+ 	if (run->exit_reason == KVM_EXIT_INTERNAL_ERROR)
+ 		TEST_ASSERT(regs.rip >= final_rip_start &&
+ 			    regs.rip < final_rip_end,
+-			    "Bad rip, expected 0x%lx - 0x%lx, got 0x%llx\n",
++			    "Bad rip, expected 0x%lx - 0x%lx, got 0x%llx",
+ 			    final_rip_start, final_rip_end, regs.rip);
+ 
+ 	kvm_vm_free(vm);
+diff --git a/tools/testing/selftests/kvm/system_counter_offset_test.c b/tools/testing/selftests/kvm/system_counter_offset_test.c
+index 7f5b330b6a1b..513d421a9bff 100644
+--- a/tools/testing/selftests/kvm/system_counter_offset_test.c
++++ b/tools/testing/selftests/kvm/system_counter_offset_test.c
+@@ -108,7 +108,7 @@ static void enter_guest(struct kvm_vcpu *vcpu)
+ 			handle_abort(&uc);
+ 			return;
+ 		default:
+-			TEST_ASSERT(0, "unhandled ucall %ld\n",
++			TEST_ASSERT(0, "unhandled ucall %ld",
+ 				    get_ucall(vcpu, &uc));
+ 		}
+ 	}
 -- 
 2.43.0
 
