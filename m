@@ -1,89 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79CF23BB3D;
-	Wed,  6 Dec 2023 19:07:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A909AC433C9;
-	Wed,  6 Dec 2023 19:07:00 +0000 (UTC)
-Date: Wed, 6 Dec 2023 19:06:58 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Marc Zyngier <maz@kernel.org>, ankita@nvidia.com,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	oliver.upton@linux.dev, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, will@kernel.org, ardb@kernel.org,
-	akpm@linux-foundation.org, gshan@redhat.com, aniketa@nvidia.com,
-	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
-	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
-	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, lpieralisi@kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 1/1] KVM: arm64: allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
-Message-ID: <ZXDGUskp1s4Bwbtr@arm.com>
-References: <ZW9ezSGSDIvv5MsQ@arm.com>
- <86a5qobkt8.wl-maz@kernel.org>
- <ZW9uqu7yOtyZfmvC@arm.com>
- <868r67blwo.wl-maz@kernel.org>
- <ZXBlmt88dKmZLCU9@arm.com>
- <20231206151603.GR2692119@nvidia.com>
- <ZXCh9N2xp0efHcpE@arm.com>
- <20231206172035.GU2692119@nvidia.com>
- <ZXDEZO6sS1dE_to9@arm.com>
- <20231206190356.GD2692119@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE0F3EA8C
+	for <kvmarm@lists.linux.dev>; Wed,  6 Dec 2023 20:22:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UDamrFEl"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1d0538d9bbcso1349165ad.3
+        for <kvmarm@lists.linux.dev>; Wed, 06 Dec 2023 12:22:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1701894172; x=1702498972; darn=lists.linux.dev;
+        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=wEKgHh9Vd3x1VnCH3fKyTqAO4yCFQDcZVScsz606mCI=;
+        b=UDamrFElWNIFPenywxsq9ZUu9NrBMkqbN4uFybyCjdYClAmFPYIV2OLhqjj+VPuIrS
+         pVkEBa/aM83dOZMgKM6JzmZxB9J4leYscpQZkfRit9L4YkD4UEU3vgKkL+pqjnElr7f9
+         J4v2RsLXMjGu64+7LvpNMGb8HiVzsmN2WuQ4sc4mrVfoyFhO350HqWT50JbKi/GnIKO8
+         uCT6rF8PDwJcDRo7iPtE21mM3kB4rCzO09rkG0HiGe6UA+b4KoRTDR27NZLYVAhRsV6x
+         s56mpQOB5Z4BIQrHqCl4uvJP9x3Q+MYIRATpmMq1Mx1j4w10edZmvvPwvaDZo9d0838M
+         nNuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701894172; x=1702498972;
+        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wEKgHh9Vd3x1VnCH3fKyTqAO4yCFQDcZVScsz606mCI=;
+        b=tvf8hhFeCxV/HLPn+3LAphFItfJqqTh4k7eNuYiFH6jV/uE2gOG3Bo9XUyUv8tV/Gq
+         1l/ee08lOcVeff4TCrIbtAUA63XZnO8pfhuQuzrtmA0zNRHiACVNJFm603m3tyoP06LV
+         RKmFZuXpbERtum+g54NvnO0Bg6BcuedKr78PZqmU8zPemDGfK7xO3/HLkWqUTJ/9/qEM
+         /3Xe9OReDQZM5VS6xbC2HgHdlHPKGgrMMhNmx+EViVR0nXVN009UHS+BOvTMyAtr6qrS
+         JKhbjhhuaQU8LBPY1TNc2nYFPjNq1oX3f7a1gFHguCHpamZbierwZqbI9cANMDYbKyxc
+         Vp/w==
+X-Gm-Message-State: AOJu0YxWlLYYGaBV3+J7sYgmuOsuvYBvMJmtHlCNU5m5zp/dK1osMWtN
+	7FM8m133hT99ufPI40PAXIveKg==
+X-Google-Smtp-Source: AGHT+IG+PGi/Ruq72+ftbttXAOwy9ae3wKn38k1eINbZqpLAyVIquTjmRIENSAWXjKXoIaCS0/BIwA==
+X-Received: by 2002:a17:902:d502:b0:1d0:92a0:492b with SMTP id b2-20020a170902d50200b001d092a0492bmr1505448plg.84.1701894171625;
+        Wed, 06 Dec 2023 12:22:51 -0800 (PST)
+Received: from localhost ([2804:14d:7e22:803e:f0e2:3ff1:8acc:a2d5])
+        by smtp.gmail.com with ESMTPSA id z2-20020a170902ee0200b001d071a305ecsm217078plb.245.2023.12.06.12.22.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 12:22:51 -0800 (PST)
+References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
+ <20231122-arm64-gcs-v7-21-201c483bd775@kernel.org>
+User-agent: mu4e 1.10.8; emacs 29.1
+From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
+ <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Morton
+ <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
+ <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
+ Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, Oleg
+ Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, Kees
+ Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, "Rick P.
+ Edgecombe" <rick.p.edgecombe@intel.com>, Deepak Gupta
+ <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, Szabolcs Nagy
+ <Szabolcs.Nagy@arm.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
+ <aou@eecs.berkeley.edu>, Florian Weimer <fweimer@redhat.com>, Christian
+ Brauner <brauner@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v7 21/39] arm64/gcs: Allocate a new GCS for threads with
+ GCS enabled
+In-reply-to: <20231122-arm64-gcs-v7-21-201c483bd775@kernel.org>
+Date: Wed, 06 Dec 2023 17:22:49 -0300
+Message-ID: <87il5bhyhy.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231206190356.GD2692119@nvidia.com>
+Content-Type: text/plain
 
-On Wed, Dec 06, 2023 at 03:03:56PM -0400, Jason Gunthorpe wrote:
-> On Wed, Dec 06, 2023 at 06:58:44PM +0000, Catalin Marinas wrote:
-> > -------------8<----------------------------
-> > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> > index 1929103ee59a..b89d2dfcd534 100644
-> > --- a/drivers/vfio/pci/vfio_pci_core.c
-> > +++ b/drivers/vfio/pci/vfio_pci_core.c
-> > @@ -1863,7 +1863,7 @@ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma
-> >  	 * See remap_pfn_range(), called from vfio_pci_fault() but we can't
-> >  	 * change vm_flags within the fault handler.  Set them now.
-> >  	 */
-> > -	vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
-> > +	vm_flags_set(vma, VM_VFIO | VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
-> >  	vma->vm_ops = &vfio_pci_mmap_ops;
-> > 
-> >  	return 0;
-> > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > index 418d26608ece..6df46fd7836a 100644
-> > --- a/include/linux/mm.h
-> > +++ b/include/linux/mm.h
-> > @@ -391,6 +391,13 @@ extern unsigned int kobjsize(const void *objp);
-> >  # define VM_UFFD_MINOR		VM_NONE
-> >  #endif /* CONFIG_HAVE_ARCH_USERFAULTFD_MINOR */
-> > 
-> > +#ifdef CONFIG_64BIT
-> > +#define VM_VFIO_BIT		39
-> > +#define VM_VFIO			BIT(VM_VFIO_BIT)
-> > +#else
-> > +#define VM_VFIO			VM_NONE
-> > +#endif
-> > +
-> >  /* Bits set in the VMA until the stack is in its final location */
-> >  #define VM_STACK_INCOMPLETE_SETUP (VM_RAND_READ | VM_SEQ_READ | VM_STACK_EARLY)
-> > -------------8<----------------------------
-> > 
-> > In KVM, Akita's patch would take this into account, not just rely on
-> > "device==true".
-> 
-> Yes, Ankit let's try this please. I would not call it VM_VFIO though
-> 
-> VM_VFIO_ALLOW_WC ?
 
-Yeah. I don't really care about the name.
+Mark Brown <broonie@kernel.org> writes:
+
+> When a new thread is created by a thread with GCS enabled the GCS needs
+> to be specified along with the regular stack.  clone3() has been
+> extended to support this case, allowing userspace to explicitly request
+> the size for the GCS to be created, but plain clone() is not extensible
+> and existing clone3() users will not specify a size.
+>
+> For compatibility with these cases and also x86 (which did not initially
+> implement clone3() support for shadow stacks) if no GCS is specified we
+> will allocate one thread so when a thread is created which has GCS
+                    ~~~~~~
+
+This "thread" seems extraneous in the sentence. Remove it?
+
+> enabled allocate one for it.  We follow the extensively discussed x86
+> implementation and allocate min(RLIMIT_STACK, 4G).  Since the GCS only
+
+Isn't it min(RLIMIT_STACK/2, 2G)?
+
+> stores the call stack and not any variables this should be more than
+> sufficient for most applications.
+>
+> GCSs allocated via this mechanism then it will be freed when the thread
+> exits.
+
+I'm not sure I parsed this sentence correctly. Is it missing an "If" at
+the beginning?
 
 -- 
-Catalin
+Thiago
