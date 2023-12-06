@@ -1,95 +1,97 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8DF54597B
-	for <kvmarm@lists.linux.dev>; Wed,  6 Dec 2023 17:07:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1787547778
+	for <kvmarm@lists.linux.dev>; Wed,  6 Dec 2023 17:10:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="hrx5SD/W"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2c9f85eff28so65008831fa.3
-        for <kvmarm@lists.linux.dev>; Wed, 06 Dec 2023 09:07:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1701882459; x=1702487259; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YVDl0W64scqWE1Z8AX7nRmNMJAFAUWb+DRtdm5KXlE4=;
-        b=hrx5SD/WQ2/6aqUYe7CqQm7DFpYEwJg+99QJSAF2QNCa6IInugNPo3fmzrUBgpTRGM
-         hDYQqF/zgeOAl1QjeChnk7fnnU//qLAwAIn4ANK9avfUf9T3G3oOFZW6PpYSdIBqPmsZ
-         nI1zF1Z7KmkLleQuUXleFuzDr4QzXQpGBuK9YfkUwTA7mBpuAgcZm7zcioRTryLdJOhd
-         +xrTnPdVLgRvkdQt0I8NyvqQY8yMn01xIHpi4n6kBDOU1nCU1C0CXBA52hdan5MX8PzM
-         iQR1cQHAESxsDAbL1kym2BQA8E1A5XSTkSo9f0vuxrrWGZx/byl88SiPDWdHQsYkGLbD
-         6yDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701882459; x=1702487259;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YVDl0W64scqWE1Z8AX7nRmNMJAFAUWb+DRtdm5KXlE4=;
-        b=rgyzJxeO5hUd/ZEfCgD2JYOCSt3eqJcNdTb/00Mk9uZu8l5LXm7g6PIcshmHsoTEw3
-         0xHQXYVGF5dKLspDn5QZdQO9TX9if0dBSv3F0o0Vd910uyLgD4gunV83ol5oupEdOi9O
-         3zSByBbI90N4Xlv4nlnZ0MAyeIdNEmU72eaELihLKjsf6M50GrLVv8fT/VmUiVYn2tyD
-         287ylHzc4YqIJK+LDdQx67AOhaM8wVBHYTwEgknG14TZCALQ2V/AcI5jvJ00RU2A9o7z
-         ZzpXKNPokZ33PzRmYOENCjXzqHiiqojqDwXWS70MX0pvyo8ZfY+hVMzywd/cmBILalHz
-         hNJw==
-X-Gm-Message-State: AOJu0YwW+oCAvk6gY7h2rOdBWgtTiipdScGIKVljp2zsZaVyCy+huQ/i
-	pwdS+VxMkKINk+/AMLnXh3GQmw==
-X-Google-Smtp-Source: AGHT+IGeQ+chN8itji8iVK88ohy3+dv9u0czbDONNHlaOKS0xWPMsN/mkH2BtWaLEtpakXlc6flIbA==
-X-Received: by 2002:a05:6512:507:b0:50c:c7d:9ef5 with SMTP id o7-20020a056512050700b0050c0c7d9ef5mr827625lfb.10.1701882458751;
-        Wed, 06 Dec 2023 09:07:38 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id fx14-20020a170906b74e00b00a1cc1be1158sm171675ejb.165.2023.12.06.09.07.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Dec 2023 09:07:38 -0800 (PST)
-Date: Wed, 6 Dec 2023 18:07:37 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org
-Cc: seanjc@google.com, pbonzini@redhat.com, maz@kernel.org, 
-	oliver.upton@linux.dev, anup@brainfault.org, borntraeger@linux.ibm.com, 
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com
-Subject: Re: [PATCH 0/5] KVM: selftests: Remove redundant newlines
-Message-ID: <20231206-6c869e5bc8ddf3b93e5b6fd6@orel>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NLCGxKZu"
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B6GrTY9020141;
+	Wed, 6 Dec 2023 17:09:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=WrVWeOs1SDLSlPg+mXu3GOG4ERP2Y2Qw3pmaeifr4BE=;
+ b=NLCGxKZuJ6rhJjs19SUksfLJKd7mCo5ZbuPopCG3wuUc5tEib5aZt4IJp1SE2OlxHbKd
+ GVLcwk92/hIpHGchWGP5M/weE1jcXYvpPbF4zIzYJm3/skcuJ9UDHBZ8buwbZP4700Ur
+ tdjELrMLAsEB6C4ctIv7vvJzK6PInG0N4pgNk83wLb6sQJCZuFYwEEIC8/0+ZvI43hPf
+ mXlSIOdRa53B6428gjeAzIC/IpczJZgs8vrnzn9qrYb4EYUFe+Npenw/vbGaMmKztmh9
+ uzweOZYCsNSAvFQf7CD9SpqbXcaz3F2X4Kc/6LOjSc7HpzgUXwDQMM1NOVHHiZN06m0q XQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3utvv9gn9n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 06 Dec 2023 17:09:48 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B6H8ZK6027218;
+	Wed, 6 Dec 2023 17:09:47 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3utvv9gn8n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 06 Dec 2023 17:09:47 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B6G899X004735;
+	Wed, 6 Dec 2023 17:09:46 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3utav4dt61-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 06 Dec 2023 17:09:46 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B6H9gE913763138
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 6 Dec 2023 17:09:42 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id ADD8220040;
+	Wed,  6 Dec 2023 17:09:42 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 691E42004F;
+	Wed,  6 Dec 2023 17:09:42 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  6 Dec 2023 17:09:42 +0000 (GMT)
+Date: Wed, 6 Dec 2023 18:09:41 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org,
+        seanjc@google.com, pbonzini@redhat.com, maz@kernel.org,
+        oliver.upton@linux.dev, anup@brainfault.org, borntraeger@linux.ibm.com,
+        frankja@linux.ibm.com
+Subject: Re: [PATCH 4/5] KVM: selftests: s390x: Remove redundant newlines
+Message-ID: <20231206180941.54a8bbb0@p-imbrenda>
+In-Reply-To: <20231206170241.82801-11-ajones@ventanamicro.com>
 References: <20231206170241.82801-7-ajones@ventanamicro.com>
+	<20231206170241.82801-11-ajones@ventanamicro.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231206170241.82801-7-ajones@ventanamicro.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 3oRjVqV5xror_yWEbiUxzWGarB_48dzc
+X-Proofpoint-GUID: BdFVxEdgmJrMOXRBiNWjx2nx55KINKxp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-06_15,2023-12-06_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ clxscore=1011 mlxlogscore=495 adultscore=0 spamscore=0 malwarescore=0
+ lowpriorityscore=0 impostorscore=0 bulkscore=0 mlxscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2312060140
 
-On Wed, Dec 06, 2023 at 06:02:42PM +0100, Andrew Jones wrote:
-> This series has a lot of churn for dubious value, but I'm posting it
-> anyway since I've already done the work. Each patch in the series is
-> simply removing trailing newlines from format strings in TEST_* function
-> callsites, since TEST_* functions append their own. The first patch
-> addresses common lib and test code, the rest of the changes are split
-> by arch in the remaining patches.
-> 
-> Figuring out which newlines to delete was done with a long, ugly
-> grep regular expression[*] and then highlighting '\n' in the output
-> and manually skimming to find, and then manually fix, each instance.
-> I'm sure there's some AI tool that would have done everything for me,
-> but this was my chance to prove I'm still as capable as AI (well,
-> unless I missed some...)
-> 
-> [*] grep -rn . tools/testing/selftests/kvm |
->     grep -Pzo '(?s)\n[^\n]*TEST_(ASSERT|REQUIRE|FAIL)\(.*?\)\s*;' |
->     tr '\0' '\n'
-> 
-> 
-> Andrew Jones (5):
->   KVM: selftests: Remove redundant newlines
->   KVM: selftests: aarch64: Remove redundant newlines
->   KVM: selftests: riscv: Remove redundant newlines
->   KVM: selftests: s390x: Remove redundant newlines
->   KVM: selftests: x86_64: Remove redundant newlines
->
+On Wed,  6 Dec 2023 18:02:46 +0100
+Andrew Jones <ajones@ventanamicro.com> wrote:
 
-I forgot to mention that this series is based on kvm-x86/selftests.
+> TEST_* functions append their own newline. Remove newlines from
+> TEST_* callsites to avoid extra newlines in output.
+> 
+> Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
 
-Thanks,
-drew
+Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+[...]
