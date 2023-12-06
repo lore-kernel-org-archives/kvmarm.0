@@ -1,107 +1,100 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DBF3456A;
-	Wed,  6 Dec 2023 12:14:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D996C433C7;
-	Wed,  6 Dec 2023 12:14:20 +0000 (UTC)
-Date: Wed, 6 Dec 2023 12:14:18 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, ankita@nvidia.com,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	oliver.upton@linux.dev, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, will@kernel.org, ardb@kernel.org,
-	akpm@linux-foundation.org, gshan@redhat.com, aniketa@nvidia.com,
-	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
-	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
-	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, lpieralisi@kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 1/1] KVM: arm64: allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
-Message-ID: <ZXBlmt88dKmZLCU9@arm.com>
-References: <86fs0hatt3.wl-maz@kernel.org>
- <ZW8MP2tDt4_9ROBz@arm.com>
- <20231205130517.GD2692119@nvidia.com>
- <ZW9OSe8Z9gAmM7My@arm.com>
- <20231205164318.GG2692119@nvidia.com>
- <86bkb4bn2v.wl-maz@kernel.org>
- <ZW9ezSGSDIvv5MsQ@arm.com>
- <86a5qobkt8.wl-maz@kernel.org>
- <ZW9uqu7yOtyZfmvC@arm.com>
- <868r67blwo.wl-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7923FF5;
+	Wed,  6 Dec 2023 13:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QycYwDeE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A860DC433C8;
+	Wed,  6 Dec 2023 13:45:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701870356;
+	bh=o60Oft731GDlPA7XOV56bwxMYcQyff+R3jG4W2ccIdM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QycYwDeEO+hyNopx5ULqCTQl1DrbXyObDcvORW+tf+GnRwDgMe0uMPuk1bgtSfJAa
+	 KxyVa98cBOMUtJo+LdzjqImkqyOiVUOxY3K8OQYoHk8Eoj/crA7I4vOdV6lWKxaips
+	 9sN4WP54z+bpD/88mOt5haSwnqf7VsHF85u11S31GqC5o2EvpaSYvMnjOT+G2Ypwte
+	 5D83QarI1hYxpD8xJ6GDfLPRM/6f5XFUPj8DR+X3IyhzibA/snYPr6JhLyipqVYg6y
+	 TM8Z13piESaIerJGyU88Id5IUGirzWE8GO5yNMTJmBimqB8YJyHh590R7rk6PPY5eI
+	 FYF73kOXcu9vA==
+Date: Wed, 6 Dec 2023 13:45:49 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
+	Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Marc Zyngier <maz@kernel.org>, torvalds@linux-foundation.org
+Subject: Re: [PATCH 2/2] perf build: Ensure sysreg-defs Makefile respects
+ output dir
+Message-ID: <80ff02a5-8355-437d-b844-3de9fe182518@sirena.org.uk>
+References: <20231121192956.919380-1-oliver.upton@linux.dev>
+ <20231121192956.919380-3-oliver.upton@linux.dev>
+ <c701bf6b-0ff0-44a0-9d1d-84e8515d077c@sirena.org.uk>
+ <ZWui3KxloT5tcIsJ@thinky-boi>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="/TeW1QSbBaDFi117"
+Content-Disposition: inline
+In-Reply-To: <ZWui3KxloT5tcIsJ@thinky-boi>
+X-Cookie: From concentrate.
+
+
+--/TeW1QSbBaDFi117
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <868r67blwo.wl-maz@kernel.org>
 
-On Wed, Dec 06, 2023 at 11:39:03AM +0000, Marc Zyngier wrote:
-> On Tue, 05 Dec 2023 18:40:42 +0000,
-> Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > On Tue, Dec 05, 2023 at 05:50:27PM +0000, Marc Zyngier wrote:
-> > > On Tue, 05 Dec 2023 17:33:01 +0000,
-> > > Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > > > Ideally we should do this for vfio only but we don't have an easy
-> > > > way to convey this to KVM.
-> > > 
-> > > But if we want to limit this to PCIe, we'll have to find out. The
-> > > initial proposal (a long while ago) had a flag conveying some
-> > > information, and I'd definitely feel more confident having something
-> > > like that.
-> > 
-> > We can add a VM_PCI_IO in the high vma flags to be set by
-> > vfio_pci_core_mmap(), though it limits it to 64-bit architectures. KVM
-> > knows this is PCI and relaxes things a bit. It's not generic though if
-> > we need this later for something else.
-> 
-> Either that, or something actually describing the attributes that VFIO
-> wants.
-> 
-> And I very much want it to be a buy-in behaviour, not something that
-> automagically happens and changes the default behaviour for everyone
-> based on some hand-wavy assertions.
-> 
-> If that means a userspace change, fine by me. The VMM better know what
-> is happening.
+On Sat, Dec 02, 2023 at 01:34:20PM -0800, Oliver Upton wrote:
+> Thanks for the bug report. Apologies for the latency on my end, I've had
+> a mountain of non-upstream stuff to wade through.
 
-Driving the attributes from a single point like the VFIO driver is
-indeed better. The problem is that write-combining on Arm doesn't come
-without speculative loads, otherwise we would have solved it by now. I
-also recall the VFIO maintainer pushing back on relaxing the
-pgprot_noncached() for the user mapping but I don't remember the
-reasons.
+> On Wed, Nov 29, 2023 at 04:27:01PM +0000, Mark Brown wrote:
+> > On Tue, Nov 21, 2023 at 07:29:56PM +0000, Oliver Upton wrote:
 
-We could do with a pgprot_maybewritecombine() or
-pgprot_writecombinenospec() (similar to Jason's idea but without
-changing the semantics of pgprot_device()). For the user mapping on
-arm64 this would be Device (even _GRE) since it can't disable
-speculation but stage 2 would leave the decision to the guest since the
-speculative loads aren't much different from committed loads done
-wrongly.
+> > > Currently the sysreg-defs are written out to the source tree
+> > > unconditionally, ignoring the specified output directory. Correct the
+> > > build rule to emit the header to the output directory. Opportunistically
+> > > reorganize the rules to avoid interleaving with the set of beauty make
+> > > rules.
 
-If we want the VMM to drive this entirely, we could add a new mmap()
-flag like MAP_WRITECOMBINE or PROT_WRITECOMBINE. They do feel a bit
-weird but there is precedent with PROT_MTE to describe a memory type.
-One question is whether the VFIO driver still needs to have the
-knowledge and sanitise the requests from the VMM within a single BAR. If
-there are no security implications to such mappings, the VMM can map
-parts of the BAR as pgprot_noncached(), other parts as
-pgprot_writecombine() and KVM just follows them (similarly if we need a
-cacheable mapping).
+> > This breaks some build configurations:
 
-The latter has some benefits for DPDK but it's a lot more involved with
-having to add device-specific knowledge into the VMM. The VMM would also
-have to present the whole BAR contiguously to the guest even if there
-are different mapping attributes within the range. So a lot of MAP_FIXED
-uses. I'd rather leaving this decision with the guest than the VMM, it
-looks like more hassle to create those mappings. The VMM or the VFIO
-could only state write-combine and speculation allowed.
+> > make[4]: Entering directory '/home/broonie/git/bisect/tools/testing/selftests/kvm'
+> > Makefile:270: warning: overriding recipe for target '/home/broonie/.cache/tuxmake/builds/16/build/kselftest/kvm/get-reg-list'
+> > Makefile:265: warning: ignoring old recipe for target '/home/broonie/.cache/tuxmake/builds/16/build/kselftest/kvm/get-reg-list'
+> > make -C ../../../../tools/arch/arm64/tools/ O=../../../../tools
+> > make[5]: Entering directory '/home/broonie/git/bisect/tools/arch/arm64/tools'
+> > /home/broonie/git/bisect/tools/scripts/Makefile.include:4: *** O=../../../../tools does not exist.  Stop.
 
--- 
-Catalin
+> Looks like its because $(PWD) is tools/testing/selftests/ when building
+> from the top level makefile. I'll get a fix out in the next couple days
+> after I find my Make dunce cap :)
+
+This issue is now in Linus' tree.
+
+--/TeW1QSbBaDFi117
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmVwew0ACgkQJNaLcl1U
+h9BwZQf+MW73pdSRu957upgido7PqkFuckEEkq3GeUe10nElFaTybG6lb9NpMfPP
+T9d0yc1idw3fiEf/IIYVcImkZ+MXFJlSIYlhG2zXl45px2VH1LZL6/Nyek38erXe
+iLFi10eNreV3v86sUP4jd0lrbojzFbJp6gnm1vMb/D60bUiaZTa8lT2Y1fZjtvS2
+IYQbnTBgmBwS8DdJYfMz2HRswL0DIQAkHWY/6Ke5bhmlgyhwGQ02SAhe+oY6LxrZ
+29oRVWGxtdSyclwtyJPRYBP0094/0g9lKGg/mRot5gVula4tBgoELStW6l9GyUkl
+kAYbW2ef0u0tGWdTU14Bs7TWgiFjgw==
+=yyfo
+-----END PGP SIGNATURE-----
+
+--/TeW1QSbBaDFi117--
