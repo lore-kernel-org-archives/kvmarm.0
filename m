@@ -1,159 +1,114 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A5E28DA2
-	for <kvmarm@lists.linux.dev>; Wed,  6 Dec 2023 10:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C636A315AF;
+	Wed,  6 Dec 2023 11:39:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LxAAneHn"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-67aa00ea853so34294616d6.2
-        for <kvmarm@lists.linux.dev>; Wed, 06 Dec 2023 02:19:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1701857998; x=1702462798; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SZTcpMnu2J2zl6SHOGrYYwBFiibLNla9ee76Z+T+gvs=;
-        b=LxAAneHnD0x0kgTTlujEAhOkBGQKgMfzrUH7WDpu7yDMg/Ao5leY/sH7qs1z8OPp8M
-         AcKIpMp/W6np6ONXSGIWhArUJHcdxywsYe3jWTxEGcRIIohjnwS3jBFd3XlHmWITk4uF
-         HAjs04l9wCWO4FFxShSxgiQ9+mEytfx3utwdAhqC9wf6qmrmtRUhBTtX7F1OkHBcA7x1
-         9Xmu0UT7ms6hHvkOoao7Rck0LGXweyfqXEW0F8m+eqpAviDa9Zp7vfFnVky73ji7sdO/
-         j8nkdDT4ibwVWZz8c4UOUtSBEHRj/RrvSaEG7zvVvbDVu1LYt6GFNugwM/KAdRm49F7o
-         wPgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701857998; x=1702462798;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SZTcpMnu2J2zl6SHOGrYYwBFiibLNla9ee76Z+T+gvs=;
-        b=P464n46QjKlLg1/IBXu2JdOl+aTuZhhQap+H+EYS47EnklKJO+qDKGqf+BvgY6T+FO
-         l92sBhszKm7xBoFFJlT15DF55QtxI8RHivTs2h3xzscg2Q8tD58lsy+tG+irqVaSJxJJ
-         kX2JbVdOuKnTL0duxETnniHjP1bv3JPjT6Q6gEFbGtDrOXuKwfro8pVzxOpmgqW8dxC6
-         Gmlz2Ai2WDPvxWMf4xSPbvxYojo+cdUucFdcEEx6gdPatYrqePZtSVMAGhnxIdVpSvEG
-         2PQi244dx7OusLMnzJZIc3ilgm2Smw7AEX4iEBDsiSFquMeG8JgjtN7VnhdEKNZ+vQ3j
-         dk/g==
-X-Gm-Message-State: AOJu0YzgqA7t++uiNHKy+r3OaV8zXZzrLvX3kgJIu8tAGp/tyPueyDtJ
-	iMEGXuUHJ1fbDoby9QkTzYIoVhprjOddrMIAibWEoWFp2YX2V3jAqjBro353
-X-Google-Smtp-Source: AGHT+IHxpetyH0eWuOfUs6BiZKWZ4hjI33ynop2x837Ce7vdQRCmgxCgMD2ckuDD7B67Wmy7Y62dDiawGB+5wjVVi8A=
-X-Received: by 2002:ad4:4f86:0:b0:67a:b7b8:b139 with SMTP id
- em6-20020ad44f86000000b0067ab7b8b139mr571346qvb.111.1701857997797; Wed, 06
- Dec 2023 02:19:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JG5xMnLV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41B43C433C9;
+	Wed,  6 Dec 2023 11:39:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701862746;
+	bh=VACpM7Rme6S0irInDKWgO8xLCrPsqk274n5MkiWmcsw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JG5xMnLV5Sd+LjMbCFz5yXzqsLubGU2gW7YaIunlRH/fySYpyxfDxa4lZpjMcjveL
+	 lZ6d4XPF4vvtPie7R0QCZlbF5t7ZQslO2toupZKR4nEwTzwEb79AR+eInyZiUh/hKu
+	 66NFewRMMsnzSXyIZYomW2tGpjJsuP4V4k3QyoHFSw2gkX9szLSP26C+qZ2t6XX+5t
+	 ALJMhmdcZLXgeNSn/snBfLrt1Ni3K3qJXpRyK44cXrI67dE8bkwv8PkEUD552kUDUt
+	 yw7rc7ZIr4DmbDAeXtQ+2hzYvgJ3uh9VrSgy80P39hgCEcY11xUJ1uTWgU2r/2I4Br
+	 vBqudpbAgwXTw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rAqF5-001rsK-Ld;
+	Wed, 06 Dec 2023 11:39:03 +0000
+Date: Wed, 06 Dec 2023 11:39:03 +0000
+Message-ID: <868r67blwo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	ankita@nvidia.com,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	oliver.upton@linux.dev,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	will@kernel.org,
+	ardb@kernel.org,
+	akpm@linux-foundation.org,
+	gshan@redhat.com,
+	aniketa@nvidia.com,
+	cjia@nvidia.com,
+	kwankhede@nvidia.com,
+	targupta@nvidia.com,
+	vsethi@nvidia.com,
+	acurrid@nvidia.com,
+	apopple@nvidia.com,
+	jhubbard@nvidia.com,
+	danw@nvidia.com,
+	mochs@nvidia.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	lpieralisi@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 1/1] KVM: arm64: allow the VM to select DEVICE_* and NORMAL_NC for IO memory
+In-Reply-To: <ZW9uqu7yOtyZfmvC@arm.com>
+References: <20231205033015.10044-1-ankita@nvidia.com>
+	<86fs0hatt3.wl-maz@kernel.org>
+	<ZW8MP2tDt4_9ROBz@arm.com>
+	<20231205130517.GD2692119@nvidia.com>
+	<ZW9OSe8Z9gAmM7My@arm.com>
+	<20231205164318.GG2692119@nvidia.com>
+	<86bkb4bn2v.wl-maz@kernel.org>
+	<ZW9ezSGSDIvv5MsQ@arm.com>
+	<86a5qobkt8.wl-maz@kernel.org>
+	<ZW9uqu7yOtyZfmvC@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20231206100503.564090-1-tabba@google.com> <20231206100503.564090-10-tabba@google.com>
-In-Reply-To: <20231206100503.564090-10-tabba@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 6 Dec 2023 10:19:21 +0000
-Message-ID: <CA+EHjTyBXnS-EUpEeYWg9L3jRDLsHY9vxPVm7yMZYKe-hs3DeQ@mail.gmail.com>
-Subject: Re: [PATCH v2 09/12] KVM: arm64: Generate the HFGWTR-only RES0 bits
-To: kvmarm@lists.linux.dev
-Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org, eric.auger@redhat.com, jingzhangos@google.com, 
-	joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, jgg@nvidia.com, ankita@nvidia.com, shameerali.kolothum.thodi@huawei.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, ardb@kernel.org, akpm@linux-foundation.org, gshan@redhat.com, aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, lpieralisi@kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi,
+On Tue, 05 Dec 2023 18:40:42 +0000,
+Catalin Marinas <catalin.marinas@arm.com> wrote:
+> 
+> On Tue, Dec 05, 2023 at 05:50:27PM +0000, Marc Zyngier wrote:
+> > On Tue, 05 Dec 2023 17:33:01 +0000,
+> > Catalin Marinas <catalin.marinas@arm.com> wrote:
+> > > Ideally we should do this for vfio only but we don't have an easy
+> > > way to convey this to KVM.
+> > 
+> > But if we want to limit this to PCIe, we'll have to find out. The
+> > initial proposal (a long while ago) had a flag conveying some
+> > information, and I'd definitely feel more confident having something
+> > like that.
+> 
+> We can add a VM_PCI_IO in the high vma flags to be set by
+> vfio_pci_core_mmap(), though it limits it to 64-bit architectures. KVM
+> knows this is PCI and relaxes things a bit. It's not generic though if
+> we need this later for something else.
 
-On Wed, Dec 6, 2023 at 10:05=E2=80=AFAM Fuad Tabba <tabba@google.com> wrote=
-:
->
-> Generate the HFGWTR-only RES0 bits in sysreg. This is done to
-> consolidate all the bit definitions in one place.
+Either that, or something actually describing the attributes that VFIO
+wants.
 
-I should have marked this as an RFC. I'm not sure if this approach is
-better than the previous patch, or if I should just bite the bullet
-and fully define HFGWTR's fields.
+And I very much want it to be a buy-in behaviour, not something that
+automagically happens and changes the default behaviour for everyone
+based on some hand-wavy assertions.
 
-Cheers,
-/fuad
+If that means a userspace change, fine by me. The VMM better know what
+is happening.
 
->
-> No functional change intended.
->
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/include/asm/kvm_arm.h | 13 +++----------
->  arch/arm64/tools/sysreg          | 26 ++++++++++++++++++++++++++
->  2 files changed, 29 insertions(+), 10 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kv=
-m_arm.h
-> index 5b634e909d1c..02442bc90717 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -348,16 +348,9 @@
->  #define __HFGRTR_EL2_MASK      GENMASK(49, 0)
->  #define __HFGRTR_EL2_nMASK     (GENMASK(63, 52) | BIT(50))
->
-> -/*
-> - * The HFGWTR bits are a subset of HFGRTR bits. To ensure we don't miss =
-any
-> - * future additions, define __HFGWTR* macros relative to __HFGRTR* ones.
-> - */
-> -#define __HFGxTR_READ_ONLY_MASK        (BIT(46) | BIT(42) | BIT(40) | BI=
-T(28) | \
-> -                                GENMASK(26, 25) | BIT(21) | BIT(18) | \
-> -                                GENMASK(15, 14) | GENMASK(10, 9) | BIT(2=
-))
-> -#define __HFGWTR_EL2_RES0      (__HFGRTR_EL2_RES0 | __HFGxTR_READ_ONLY_M=
-ASK)
-> -#define __HFGWTR_EL2_MASK      (__HFGRTR_EL2_MASK & ~__HFGxTR_READ_ONLY_=
-MASK)
-> -#define __HFGWTR_EL2_nMASK     (__HFGRTR_EL2_nMASK & ~__HFGxTR_READ_ONLY=
-_MASK)
-> +#define __HFGWTR_EL2_RES0      (__HFGRTR_EL2_RES0 | HFGWTR_ONLY_EL2_RES0=
-)
-> +#define __HFGWTR_EL2_MASK      (__HFGRTR_EL2_MASK & ~HFGWTR_ONLY_EL2_RES=
-0)
-> +#define __HFGWTR_EL2_nMASK     (__HFGRTR_EL2_nMASK & ~HFGWTR_ONLY_EL2_RE=
-S0)
->
->  #define __HFGITR_EL2_RES0      HFGITR_EL2_RES0
->  #define __HFGITR_EL2_MASK      (BIT(62) | BIT(60) | GENMASK(54, 0))
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index e5631f4e62f4..85f8b385fed2 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -2093,6 +2093,32 @@ Field    1       AFSR1_EL1
->  Field  0       AFSR0_EL1
->  EndSysregFields
->
-> +# HFGWTR_EL2 bits are a subset of those for HFGRTR_EL2.
-> +# Define RES0 only present in HFGWTR_EL2.
-> +SysregFields   HFGWTR_ONLY_EL2
-> +Unkn   63:47
-> +Res0   46
-> +Unkn   45:43
-> +Res0   42
-> +Unkn   41
-> +Res0   40
-> +Unkn   39:29
-> +Res0   28
-> +Unkn   27
-> +Res0   26:25
-> +Unkn   24:22
-> +Res0   21
-> +Unkn   20:19
-> +Res0   18
-> +Unkn   17:16
-> +Res0   15:14
-> +Unkn   13:11
-> +Res0   10:9
-> +Unkn   8:3
-> +Res0   2
-> +Unkn   1:0
-> +EndSysregFields
-> +
->  Sysreg HFGRTR_EL2      3       4       1       1       4
->  Fields HFGxTR_EL2
->  EndSysreg
-> --
-> 2.43.0.rc2.451.g8631bc7472-goog
->
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
