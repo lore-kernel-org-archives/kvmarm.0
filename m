@@ -1,160 +1,150 @@
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2069.outbound.protection.outlook.com [40.107.212.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378A847778
-	for <kvmarm@lists.linux.dev>; Wed,  6 Dec 2023 16:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05644597B
+	for <kvmarm@lists.linux.dev>; Wed,  6 Dec 2023 17:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GpTJ9gaB"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QWfoXd5+TAIII3Lz8U2uyDbCohWMjh0TLLWSCrv2YSkjDqIQPoDaLwDTnYlk+dsZ0icDho7zcuUehxmXOA8YHVxneR3v0i9exv40iiHWGGRnlHSYts061GqKSFJ01GXJ+WT48GdyqEmDMVzT41LjlGDsHCmbd0PoqbBrdVJ55+FWctYq1QfP9k/GGGe17HZFnlmEGhIGnrndomUoNhjft5Q5l1xKHA4k6KEC8o/BJAEJzgueGqmCMv45IaNDfkba6dCSWECfKVxaPoW9QywpHGVfsxYAUKohgFx6erNB0cJkd0vmTcZgOa8OyF//JEEEg0bdcqF1FjR7HCXGOmYInQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cPXFmOM2k3qyPi62hYgnnEkkF8MPM3VteBX9M4Q4HIg=;
- b=NQzORgGEqFYxfe0hHA3rtS8OEcS8aa8MyhoUhKb3EJT9YF+EymmuUJfqW0CBAle4S7Ah6sntpQlS7QGcNQZRGATOS4wzyZ+GQ0V+FdY9Z7SDnGnTusLy+wyruf9n6Q0+Oea5A8Jhsw79KQ8tKJT244K0PlzCKiAJAKCdQLE89bexUSYWJ2kBK3xp/JgW05HnKUuqEjJyHIVI1JBs6RReV4HwMf5jcXspqafvKkKEfkHNxdtIEGaMkd/Ms/nB0HxG4C3DEqbBIQe7Zki7HaU1P1pxntr3kgMqi2xyixIWFtLgAA5c5UKxKIkYzhCYll5dGMjmvhPP6NKRQwT6z6yC+Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cPXFmOM2k3qyPi62hYgnnEkkF8MPM3VteBX9M4Q4HIg=;
- b=GpTJ9gaBZfwQNlpAYwlX4p+zuyaBkWYgHZsBMCtMwkhpsjRA6SGZZGswKKMR6MxkipqMlQZFmRug6/lWhlZClXkt5b9jdt0PSMF7NwkE9sOJtbXge59mAifo+v616oIaHenbkK+QRWqTGOT7AkeTWObXOyVrsilkCRf0ggjgJrLC3gSD4axKv4aXi/cWzytefBRQf1YiC2oWghIVOw5LqrV9suSgYnwyv2iysdElzn9qWfxnPWvyvIDKiIk5AbOsdF3sdJmnRkTGbfGhg+ca1wzlHZYaYk3Cf/8gj9c4nNjhX1rUhBHE6ZCifnl456TRSHnTt9gTXf//2Va1UYPQVw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SJ1PR12MB6171.namprd12.prod.outlook.com (2603:10b6:a03:45a::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.27; Wed, 6 Dec
- 2023 16:48:03 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7046.034; Wed, 6 Dec 2023
- 16:48:03 +0000
-Date: Wed, 6 Dec 2023 12:48:02 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Marc Zyngier <maz@kernel.org>, ankita@nvidia.com,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	oliver.upton@linux.dev, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, will@kernel.org, ardb@kernel.org,
-	akpm@linux-foundation.org, gshan@redhat.com, aniketa@nvidia.com,
-	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
-	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
-	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 1/1] KVM: arm64: allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
-Message-ID: <20231206164802.GT2692119@nvidia.com>
-References: <20231205130517.GD2692119@nvidia.com>
- <ZW9OSe8Z9gAmM7My@arm.com>
- <20231205164318.GG2692119@nvidia.com>
- <ZW949Tl3VmQfPk0L@arm.com>
- <20231205194822.GL2692119@nvidia.com>
- <ZXCJ3pVbKuHJ3LTz@arm.com>
- <20231206150556.GQ2692119@nvidia.com>
- <ZXCQrTbf6q0BIhSw@lpieralisi>
- <20231206153809.GS2692119@nvidia.com>
- <ZXCf_e-ACqrj6VrV@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZXCf_e-ACqrj6VrV@arm.com>
-X-ClientProxiedBy: MN2PR15CA0063.namprd15.prod.outlook.com
- (2603:10b6:208:237::32) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="nYM7LMkh"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-50c0f6b1015so1949333e87.3
+        for <kvmarm@lists.linux.dev>; Wed, 06 Dec 2023 09:02:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1701882163; x=1702486963; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Me0qqRrskpa11GvKdt5GrXiD/qCgAfM3AQizYA0X8fg=;
+        b=nYM7LMkhp5g9UoHltJHilpBg21YvvEgbBM80/2V1YwICDaI6bCSc9nbgJnA/f6J0cF
+         GUxCLgdlgO5QgUQr2uZR7Kp5DOCty7KjYLzPrbgMDp09LMf0eOcFaQKqkF2ImzUvd0rU
+         cznz7zVwHg5BcDjgM993iIjKZ9KdvRYpdHAqhh155bFkyMfarFdQOZ8xkCxg5aNkaJgt
+         USwC06yTyPmyk3Lbrf/jxcGtaIPzO3Jm+ZAhWUx1NK7ap1eBtAUuTpFoqnG39vfuAdsN
+         4xtecenODl0l3i2N8GRCyMaAD9HjHJkZ4t2PlMuu0xUfvsZ7p4AefUC8UKdh6iRD99oK
+         MTHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701882163; x=1702486963;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Me0qqRrskpa11GvKdt5GrXiD/qCgAfM3AQizYA0X8fg=;
+        b=vbNGdrnP2ZKWz1gFp2novGnBQMccfvsSWCdPvJxNJ3SVSLn1beVJ5UlZPmWveG+95V
+         n7mWxzpnG0OC63Km2RDxnpw+44jcdm3KeFzFDst/r25JvnS7VWnx78mdeBTfu0Ejc1k8
+         WhvKSdJt4tcsNuGm2AsBwlrlIkmRPa3ChhZYpJXgT0jYC/6S4V1ccYAvPkdkLjljMEz8
+         K0G9xuw4naj9NmOpJ9fgc38QPUQQWZai35WnCE79slxHKabg/yhXmMcpG5d5lh/Oh/Zu
+         hf8lneVtkFvekwnZvxjBj7VQgiavk/Z9gIlHauRGY3bLKxchE665dWTyaM1zTDnlwyCu
+         eF8A==
+X-Gm-Message-State: AOJu0YySVO9L4PFLlTZB5wec/u6XGGiYTSUFoZf1OPCt/wDO53fVmTq6
+	iUHSrumh72JIE1tkD5JW+lJiPw==
+X-Google-Smtp-Source: AGHT+IECVyI5nSuArrzUeLvq2gF2I0dRUO6u4KVRrS6V9wDhUNsXaChckaX+LSPb1AXIsiukHIvlxQ==
+X-Received: by 2002:a05:6512:549:b0:50b:d3cf:1e8c with SMTP id h9-20020a056512054900b0050bd3cf1e8cmr612707lfl.43.1701882162556;
+        Wed, 06 Dec 2023 09:02:42 -0800 (PST)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id l4-20020a056402344400b0054cc474b25fsm189776edc.40.2023.12.06.09.02.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Dec 2023 09:02:42 -0800 (PST)
+From: Andrew Jones <ajones@ventanamicro.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org
+Cc: seanjc@google.com,
+	pbonzini@redhat.com,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	anup@brainfault.org,
+	borntraeger@linux.ibm.com,
+	frankja@linux.ibm.com,
+	imbrenda@linux.ibm.com
+Subject: [PATCH 0/5] KVM: selftests: Remove redundant newlines
+Date: Wed,  6 Dec 2023 18:02:42 +0100
+Message-ID: <20231206170241.82801-7-ajones@ventanamicro.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ1PR12MB6171:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3866fe20-9d9b-4d36-a84b-08dbf67b1d01
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	xy55FX6KsUfxybQC1kYqU37S1uHzQxNYSF+dCQ/ule99YsUs+B+bKs5KA3ADzVoVXjEXD5zPUkbQRkax6Cxg+RBoqrczc0GaV4UYN0RypLCy9GYtJp4nVBQd/prTbxUv2MFPc0ccCFrTq1dwDhvgeVdbjzIOpXh1Wh2OE67c1mG9ohpSA2FzvA/OetbSxgyQNn9tThJ19Wx4OtuT3MlePGYcKRViJUXtFzOsYP8gvQLkM0Xey3zbWejaNFlJAETuZnGMmK0EwvZrnxbOsFKCow7yJurZ5L1PG6tNkcT4yV0MjH2ZLWK6dvkTkaR3Bhu/CbrgvET/UAGzAUrj6aYJTvMtYdvx2GI8HuPivwFvF1nxzAC4ewiWEFX/q7tbewITm1QCKIXPlT2YMIsjjy1OnUvWj6xOGDlQX1NapQKvnoknsvwyoUIkrhLAJdxFL8RqpN/Zlg/pdFPb52YweMx4/SpKGUDhrEZyGPLreSqQ4T5gzFYoruq/KdeBC/fET+LfSYN8zvxsxbytBW16EupK+XzlD8EphKx3bN9JxsoVStuxAQWKqSCKV8njReoH0DOm
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(376002)(39860400002)(396003)(346002)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(6916009)(38100700002)(86362001)(6506007)(5660300002)(8676002)(4326008)(66476007)(54906003)(7416002)(66946007)(478600001)(316002)(41300700001)(6512007)(33656002)(2906002)(36756003)(8936002)(26005)(66556008)(1076003)(6486002)(2616005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?vgXhN8xZjUaXP/Jkn9+XSSJYKDQAFzhMBnBi9G6IWC5NbmgalQB0qi0Pl+fh?=
- =?us-ascii?Q?sPtKfcSaY5+6v8faQ/AjmA6Q5Ll5Jjei4uy4jljyJOztwPSS841ZGKC+c7IF?=
- =?us-ascii?Q?4GaPd4QTEV/rfwfGefYzjfq/n6+z7qKMikiF/Uj7zofkItqarD/yYp3oXKCi?=
- =?us-ascii?Q?xeC8lJ9kfqE1kKIkmgh6yspm3I7f5jCcJLty3MQCLVwfTu+T8umI6QAo81eG?=
- =?us-ascii?Q?W5dC44SEnuyj0WT3K3b7k4DafT54sS6luWWI/JdJ0rHPKzKmc/8h7TRcJys6?=
- =?us-ascii?Q?Zk7Ta5EzSbMSmzhqeG7gcufymiBXBdU90GiceTvZsCgUTGC0AlWlM8mvANeF?=
- =?us-ascii?Q?tMgFztutzr7smddQRjJqRPMvniBVJdAb1yd714V7HkeIwQFzRsSS4mubECu4?=
- =?us-ascii?Q?6obYHSg3gxy3bPwF9Ic0uzKDMi7ZQ1A/tmOwJCHKEBdt4pSmxZL6NSDamWQp?=
- =?us-ascii?Q?GPk3AlK6vSeNNN1srxgTELIgh/t7hA6PdFH5Hm3o2Lw69t3VQYzvP+cdhXCw?=
- =?us-ascii?Q?TbJrt+3lLqfCD/dWaMR8GmVxxElc5v8NCpNJeUtiqUUnLtAv6Y/n6LDedNmo?=
- =?us-ascii?Q?+R1c5ZueFU9PHfelIaFJ8dQUhOWGi31u2CHiiziyx7hWHx1Umxp8ydjXowei?=
- =?us-ascii?Q?UlbBK/UubxdIJ0BaXEa6usOSTKqClM2Y2+Nnqxzs/7DUxxEEtVkLXl8Tk2W1?=
- =?us-ascii?Q?np1ZVmGMgIMJoB/bJu8K6TF6FzcJOyaitZlI8sPnbzoyFvSUM55At3AQvPv7?=
- =?us-ascii?Q?xNpkO1RFDfe3CuBw7SOw0Pa00L+jrnULLtq6nP3tb9AEoIJOBZ82fC4C/1bU?=
- =?us-ascii?Q?SIgukHP9HJ3xpjN52g0HEIYCYlO1TArUfhLk09uCYETg9gFUxfwTX6qPhu39?=
- =?us-ascii?Q?0q1wIqidLBGp+mVEtmlW5v3O7WOQuKPJ4QHjgtZ+Ude6VReDQsPjiCq0cB4+?=
- =?us-ascii?Q?zmyRab23UZtUnb8E2kNgOnDcZ7EZn+/Yao/Us1lEfVDDfRDhyjkGDXgD3xSx?=
- =?us-ascii?Q?YzzRDURZuiVwpdB5oFhVhAru6/8H/Rc4QsWBIs27lMbcjwaDw5ab8UegPsgn?=
- =?us-ascii?Q?rdsOIyNSqxGXe4Z5JlC1aq20gBLAhEiftpk7nzjRl0LpDe0a/sKm32Q3htcG?=
- =?us-ascii?Q?Mi2q+kuqavA2QtiHXYuHeXQhqD2LRfkydw3fO+sTd0smo9JURentJmj6n48H?=
- =?us-ascii?Q?aS3+eVPkQt1Q0T4nqmEma2ixNDXEaelVp1/xDuWLFKldLC66FW7RAllVJU9q?=
- =?us-ascii?Q?dx3u9QiDOcd0wQ6K+xesYbmKWNJCqPD9UAug+4DzJ895WAy0SHNoIffogq4Z?=
- =?us-ascii?Q?Yl2ToX3XgXzfIPR92Ij0wTdlCuFN8Oi6NpidAuwEK7BdSyF4Oyey6Wkot9Kb?=
- =?us-ascii?Q?/P/RGo4d/OJIqlxff/UKSQRqSJnPeiDQdrGNo2oQHO685g4e+2xetIfCGfgT?=
- =?us-ascii?Q?AFc9Iz7VokhAo47ZqAYduktFOrrjngL61a7WHtQIpGKc8zC7PRnaG7TfbFD6?=
- =?us-ascii?Q?Jw7ksQYeY8sRaK0dP7aessAMYl3awZsUPt6TrZdks3xUiEKZP0+MYD22xgNU?=
- =?us-ascii?Q?TY3DR24Cns9LNjmWQtJ4Us0B0mrNgabKuVW5Fc0J?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3866fe20-9d9b-4d36-a84b-08dbf67b1d01
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2023 16:48:03.3145
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gwBaVBxLkcJYB8Vl88lNk0uBtFZaU+27YDo7zSdcKDI0f/b1zDhTZhSTYhHYlVnX
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6171
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 06, 2023 at 04:23:25PM +0000, Catalin Marinas wrote:
-> On Wed, Dec 06, 2023 at 11:38:09AM -0400, Jason Gunthorpe wrote:
-> > On Wed, Dec 06, 2023 at 04:18:05PM +0100, Lorenzo Pieralisi wrote:
-> > > On Wed, Dec 06, 2023 at 11:05:56AM -0400, Jason Gunthorpe wrote:
-> > > > On Wed, Dec 06, 2023 at 02:49:02PM +0000, Catalin Marinas wrote:
-> > > > > BTW, on those Mellanox devices that require different attributes within
-> > > > > a BAR, do they have a problem with speculative reads causing
-> > > > > side-effects? 
-> > > > 
-> > > > Yes. We definitely have had that problem in the past on older
-> > > > devices. VFIO must map the BAR using pgprot_device/noncached() into
-> > > > the VMM, no other choice is functionally OK.
-> > > 
-> > > Were those BARs tagged as prefetchable or non-prefetchable ? I assume the
-> > > latter but please let me know if I am guessing wrong.
-> > 
-> > I don't know it was quite old HW. Probably.
-> > 
-> > Just because a BAR is not marked as prefetchable doesn't mean that the
-> > device can't use NORMAL_NC on subsets of it.
-> 
-> What about the other way around - would we have a prefetchable BAR that
-> has portions which are unprefetchable?
+This series has a lot of churn for dubious value, but I'm posting it
+anyway since I've already done the work. Each patch in the series is
+simply removing trailing newlines from format strings in TEST_* function
+callsites, since TEST_* functions append their own. The first patch
+addresses common lib and test code, the rest of the changes are split
+by arch in the remaining patches.
 
-I would say possibly.
+Figuring out which newlines to delete was done with a long, ugly
+grep regular expression[*] and then highlighting '\n' in the output
+and manually skimming to find, and then manually fix, each instance.
+I'm sure there's some AI tool that would have done everything for me,
+but this was my chance to prove I'm still as capable as AI (well,
+unless I missed some...)
 
-Prefetch is a dead concept in PCIe, it was obsoleted in PCI-X about 20
-years ago. No PCIe system has ever done prefetch.
+[*] grep -rn . tools/testing/selftests/kvm |
+    grep -Pzo '(?s)\n[^\n]*TEST_(ASSERT|REQUIRE|FAIL)\(.*?\)\s*;' |
+    tr '\0' '\n'
 
-There is a strong incentive to mark BAR's as prefetchable because it
-allows 64 bit addressing in configurations with bridges.
 
-So.. I would expect people have done interesting things here.
+Andrew Jones (5):
+  KVM: selftests: Remove redundant newlines
+  KVM: selftests: aarch64: Remove redundant newlines
+  KVM: selftests: riscv: Remove redundant newlines
+  KVM: selftests: s390x: Remove redundant newlines
+  KVM: selftests: x86_64: Remove redundant newlines
 
-Jason
+ .../selftests/kvm/aarch64/arch_timer.c        | 12 ++++----
+ .../selftests/kvm/aarch64/hypercalls.c        | 16 +++++------
+ .../selftests/kvm/aarch64/page_fault_test.c   |  6 ++--
+ .../selftests/kvm/aarch64/smccc_filter.c      |  2 +-
+ .../kvm/aarch64/vpmu_counter_access.c         | 12 ++++----
+ .../selftests/kvm/demand_paging_test.c        |  4 +--
+ .../selftests/kvm/dirty_log_perf_test.c       |  4 +--
+ tools/testing/selftests/kvm/dirty_log_test.c  |  4 +--
+ tools/testing/selftests/kvm/get-reg-list.c    |  2 +-
+ .../testing/selftests/kvm/guest_print_test.c  |  8 +++---
+ .../selftests/kvm/hardware_disable_test.c     |  6 ++--
+ .../selftests/kvm/kvm_create_max_vcpus.c      |  2 +-
+ .../selftests/kvm/kvm_page_table_test.c       |  4 +--
+ .../selftests/kvm/lib/aarch64/processor.c     |  2 +-
+ .../testing/selftests/kvm/lib/aarch64/vgic.c  |  4 +--
+ tools/testing/selftests/kvm/lib/elf.c         |  2 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 16 +++++------
+ tools/testing/selftests/kvm/lib/memstress.c   |  2 +-
+ .../selftests/kvm/lib/riscv/processor.c       |  2 +-
+ .../selftests/kvm/lib/s390x/processor.c       |  2 +-
+ .../selftests/kvm/lib/userfaultfd_util.c      |  2 +-
+ .../selftests/kvm/lib/x86_64/processor.c      | 10 +++----
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c  |  6 ++--
+ .../kvm/memslot_modification_stress_test.c    |  2 +-
+ .../testing/selftests/kvm/memslot_perf_test.c |  6 ++--
+ .../selftests/kvm/riscv/get-reg-list.c        |  2 +-
+ tools/testing/selftests/kvm/rseq_test.c       |  4 +--
+ tools/testing/selftests/kvm/s390x/resets.c    |  4 +--
+ .../selftests/kvm/s390x/sync_regs_test.c      | 20 ++++++-------
+ .../selftests/kvm/set_memory_region_test.c    |  6 ++--
+ .../kvm/system_counter_offset_test.c          |  2 +-
+ tools/testing/selftests/kvm/x86_64/amx_test.c |  2 +-
+ .../testing/selftests/kvm/x86_64/cpuid_test.c |  4 +--
+ .../selftests/kvm/x86_64/flds_emulation.h     |  2 +-
+ .../selftests/kvm/x86_64/hyperv_clock.c       |  4 +--
+ .../testing/selftests/kvm/x86_64/hyperv_ipi.c |  2 +-
+ .../selftests/kvm/x86_64/hyperv_tlb_flush.c   |  2 +-
+ .../selftests/kvm/x86_64/kvm_clock_test.c     |  8 +++---
+ .../selftests/kvm/x86_64/platform_info_test.c |  2 +-
+ .../kvm/x86_64/pmu_event_filter_test.c        |  2 +-
+ .../selftests/kvm/x86_64/sev_migrate_tests.c  | 28 +++++++++----------
+ .../smaller_maxphyaddr_emulation_test.c       |  4 +--
+ .../selftests/kvm/x86_64/sync_regs_test.c     | 10 +++----
+ .../kvm/x86_64/ucna_injection_test.c          |  8 +++---
+ .../selftests/kvm/x86_64/userspace_io_test.c  |  2 +-
+ .../kvm/x86_64/vmx_apic_access_test.c         |  2 +-
+ .../selftests/kvm/x86_64/vmx_dirty_log_test.c | 16 +++++------
+ .../vmx_exception_with_invalid_guest_state.c  |  2 +-
+ .../selftests/kvm/x86_64/xapic_ipi_test.c     |  8 +++---
+ .../selftests/kvm/x86_64/xcr0_cpuid_test.c    |  2 +-
+ .../selftests/kvm/x86_64/xss_msr_test.c       |  2 +-
+ 51 files changed, 144 insertions(+), 144 deletions(-)
+
+-- 
+2.43.0
+
