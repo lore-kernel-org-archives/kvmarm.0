@@ -1,137 +1,200 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2072.outbound.protection.outlook.com [40.107.244.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6991A48798
-	for <kvmarm@lists.linux.dev>; Wed,  6 Dec 2023 17:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D3D60BBA
+	for <kvmarm@lists.linux.dev>; Wed,  6 Dec 2023 17:20:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="c0fIEMg8"
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3B6H75P6014781;
-	Wed, 6 Dec 2023 17:18:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=iLAZtBgfavIW2C/yCiLsLl0/0C/qHx0UAu0Tli0IL34=;
- b=c0fIEMg8AbD3L87lbvVuocEwAob4ifzRolzpWrdtOmceYFnAN6ISjsVvoaKcYK9ku6xL
- yABR6W1fhwSasph0TbEH7nFrNgBbnWT/iJchSEv7qJOWkI3L6g7+tcbhEVmZUd069sNw
- xqGhd/lJdE35VbsBNW8d5H3K3Os1CGFXKntrk2BNQnqmtHVRhN7CJMhbxFdvUOUNqvaa
- 4+44L4zb1+/e9sfVXswj8EsFuy9ttiUTlRK6NSduOINkP6VnsnMKThGw7MP1Be9DEXg1
- 7idfP5o3FOk7ECvy0K46IDsvu3bs8GpR26+E0sLA9KNmGrXllkkXqzxaVq6Psu/X7kIn RQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3utw2t8b3e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 06 Dec 2023 17:18:27 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3B6H7ujh019086;
-	Wed, 6 Dec 2023 17:18:27 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3utw2t8b31-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 06 Dec 2023 17:18:26 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3B6GD7I9027003;
-	Wed, 6 Dec 2023 17:18:26 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3utav2wu5a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 06 Dec 2023 17:18:26 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3B6HIN5Y43582182
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 6 Dec 2023 17:18:23 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0912020043;
-	Wed,  6 Dec 2023 17:18:23 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8DB0720040;
-	Wed,  6 Dec 2023 17:18:22 +0000 (GMT)
-Received: from [9.179.6.71] (unknown [9.179.6.71])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  6 Dec 2023 17:18:22 +0000 (GMT)
-Message-ID: <387136aa-dfc7-4a1b-a7a6-31c7ecad1013@linux.ibm.com>
-Date: Wed, 6 Dec 2023 18:18:22 +0100
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SHmA1xuR"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ihelwTm6uZRY/glxuvHh6aVPpBj9YeN/d13A94TA/CNoxfek3ZeC0fUaF7Moz3NwHlkHVg/0urMW+iGIUx7MmxtfOMnMY+OVzoDkwfY5S7q4DmtGsNwWPZs4Xsc0cxMt0x62W8VKfPaDUJcfjHW4V9/DswF9rQWturYGxnHwmmEq16skxBsXyycDXtiGOU3b+eaZ4Y10tfM0tLDDOlCmRdxDKOk82if4fZeZ8I1sjCivk3bnwJovTVCsNfJTKmlgdO9LwVHLHofThDBpsBOYtlgO+mtfRWrgZIeofmOUpxZ3NRpt695DTbgYPSmM79ajpqRUs8Una5SC968F8w7+Sw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vVUE0rOnDjben9YuQw5c2i8NkkAISTFLCehfbKPtf9E=;
+ b=kPDbHSm4KbYCTERVOavrY3DKEqbo/wyeAqt53ejGD9Se2e17y5PGCM+33vMRExsTxOB6ZHyU20XkS7locfPZ/fUTxQE+CLaQDbwSlq82Th+pyuVogR1wG1/lDYal7f1qQZFa6t4PpGjP5KJRpN3dseLdRAWhHK+fAq+Iuf2VoxuASLcd/o4UD73fNUlLSobAwhNR2xudlFisAtvRn6lvAu0qv10WZnOlV97M/03hThWRMoVyoKKfucf1K4Ym7BBzc8ktLBH0CwZMyiIHjh69cKaaRmtUYgwGZ1UwXvzI3U336L+nYsI67yP1G4BAdiXvWGE4eSLg3nVNQFDN+QlpVw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vVUE0rOnDjben9YuQw5c2i8NkkAISTFLCehfbKPtf9E=;
+ b=SHmA1xuRZmyhT6JWsScdIgDODdM25YLAWciAsgwByPSThCkBm5ycX6XyIfx3cbnJ1OlEE2x89Dk7A6KfN8teBtW3u30wNqKoRlPhAgUQFINgmr+g8Cqchc+3tZvddU8HvEqWkHdiv+fxAYzJxNtPS4GLfTgGuI8+H+wogqjZfycCov725Le7jxRQ39BQBE/HqdlKa6lMxYgDxe9tqhtJNFHUjhRpHIlqrIX2pq9BGF2vUIZcRGMFp2qz/vy/+YIJiQS5Krx1EYCD0eXTAgqvI2D6RY5eelMdEzfnrmFcuzcrzWWFzdI8Vrvl3qjuiSvHlQXBdhu4cG13Sq8Bge0q/w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DM6PR12MB4057.namprd12.prod.outlook.com (2603:10b6:5:213::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.34; Wed, 6 Dec
+ 2023 17:20:37 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7046.034; Wed, 6 Dec 2023
+ 17:20:37 +0000
+Date: Wed, 6 Dec 2023 13:20:35 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, ankita@nvidia.com,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	oliver.upton@linux.dev, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, will@kernel.org, ardb@kernel.org,
+	akpm@linux-foundation.org, gshan@redhat.com, aniketa@nvidia.com,
+	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
+	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
+	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, lpieralisi@kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 1/1] KVM: arm64: allow the VM to select DEVICE_* and
+ NORMAL_NC for IO memory
+Message-ID: <20231206172035.GU2692119@nvidia.com>
+References: <ZW9OSe8Z9gAmM7My@arm.com>
+ <20231205164318.GG2692119@nvidia.com>
+ <86bkb4bn2v.wl-maz@kernel.org>
+ <ZW9ezSGSDIvv5MsQ@arm.com>
+ <86a5qobkt8.wl-maz@kernel.org>
+ <ZW9uqu7yOtyZfmvC@arm.com>
+ <868r67blwo.wl-maz@kernel.org>
+ <ZXBlmt88dKmZLCU9@arm.com>
+ <20231206151603.GR2692119@nvidia.com>
+ <ZXCh9N2xp0efHcpE@arm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZXCh9N2xp0efHcpE@arm.com>
+X-ClientProxiedBy: BL1PR13CA0109.namprd13.prod.outlook.com
+ (2603:10b6:208:2b9::24) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/5] KVM: selftests: s390x: Remove redundant newlines
-Content-Language: en-US
-To: Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-Cc: seanjc@google.com, pbonzini@redhat.com, maz@kernel.org,
-        oliver.upton@linux.dev, anup@brainfault.org, borntraeger@linux.ibm.com,
-        imbrenda@linux.ibm.com
-References: <20231206170241.82801-7-ajones@ventanamicro.com>
- <20231206170241.82801-11-ajones@ventanamicro.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20231206170241.82801-11-ajones@ventanamicro.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: xzV3MHUDjJdbVfr7x-9rZ1jhYyXvY1qd
-X-Proofpoint-ORIG-GUID: Y_r8UmplnxgKD645XqSGjFYdOcTqSmrx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-06_15,2023-12-06_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- bulkscore=0 mlxlogscore=449 lowpriorityscore=0 spamscore=0 mlxscore=0
- suspectscore=0 clxscore=1011 impostorscore=0 adultscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2312060140
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM6PR12MB4057:EE_
+X-MS-Office365-Filtering-Correlation-Id: 085ca220-403a-46e2-6cb2-08dbf67fa9a4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	+EbR6enDrIhiuG4mxoYJMPudX42UP1jRXkAhPX60Ec7FWTX0hnn/QuYUzeX5hXM97rzZWWG3K5bW33jBbO5AuDNgxrWgUQYsjjtDyq9Eht1cE+msy2LrchLkjjfEjgnx3jEAuz9NAW1wP4ExD/0N3sIBt9/RXmjgSr54Xpm9rC5nwQeXp1mdwvyOqchMwgDkMYrKP3oxAUDqwNr7GAzV4Q6qrpgIpsMpT4/KS08aElt+7t791bqvn3HcqpuaptQWVmplmvTDWj2+jXtDgho6i8NJ2GmGXvCrZ1bU7WwX7pqQXK7GErAhHejrY04X8TV1BBAVHjiMQAI8NWCiPx4NJSXAn0phkTbRgfjabiw849DgA2OcyErYHOZHiiLdadOUIZr6D3eLN3OtW7BcPAvOQfuMBUkL9zoYTqbGSnNhJdSgZv27kZIGxwu5qyoUKBJW9qJ7jtyWsHBt7TNtUje0gnv9f9W0wAL42I88OLLo9gg1sN9/F+V9eVFOs98jNxw/49S1wk0Ixi3bW7baazC/tRK7MvAvYN162PjC+6y39129sXg8QumBFrdyTAzkHdMx
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(346002)(136003)(376002)(366004)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(38100700002)(6512007)(6506007)(6486002)(478600001)(54906003)(66946007)(66556008)(66476007)(316002)(26005)(2616005)(1076003)(4326008)(8676002)(8936002)(6916009)(5660300002)(2906002)(7416002)(33656002)(41300700001)(86362001)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?kBVnosITWAeDzgtSXO9TxTToBRB30CpIaElW/4IeCcn18Pex0eicT+qF3hqG?=
+ =?us-ascii?Q?B0MCnJK88LZXw62bWoq7dRzzQT5liNnBpyO7oeMNiJnpeQO37r7mKHTYBBt+?=
+ =?us-ascii?Q?MwgvTRT4ZcBnYI+K/sXUAA1nfj4BjVgU2WO3FRk7IEW6Xg1Qr2OffwvSSUu3?=
+ =?us-ascii?Q?Tn8A7z2A/C+YDsxqPp6vinSzn9gSbijxvQrgcNSQjy9Tlw2G/pEupwnQ6qCC?=
+ =?us-ascii?Q?7Pfxc1lYEKEXQL7lJF3eDcC9REYNKfL8RNb1fvw2378Yj7h/jrehyw7mKRWQ?=
+ =?us-ascii?Q?YmrM8UHTF3hjg5r1Bkig0/Sdi17O91vUGB8NJyyYoD+hEkUBil8rRfvVEM4x?=
+ =?us-ascii?Q?LmCjMfOfPSWiEopdbfoQ12ny+d1PSmT/MaB42G1+DdoxhqJrp8o++AFXGFHJ?=
+ =?us-ascii?Q?jX8mNkTLlKXy+w2T3A72W7oe5vENdEz4t6tMb2NuW9icJFTFPNO9f6gbnJVt?=
+ =?us-ascii?Q?y+EAVAke5Oz/aQVb5gxcYyLaY23D13iAbBlgs8mzwsj+vj/S3rqyaicCqV34?=
+ =?us-ascii?Q?fiPqTsDbO5/sAGnv0z7CSKBPeKS2UPtlCEhflR6zIrqNN0sBskvLvCwI2Duv?=
+ =?us-ascii?Q?P3fonk0QzwD/Ha0VnAWaccosswnB5FvIOZLLrddSIn2lLOu1J6kzuaR6Gqvl?=
+ =?us-ascii?Q?OsYPqW6ogNOW1GZBYi/pk4GSh+WIBKVJd8Xwe0PSEaBf5LNokr/J7qmjbCpn?=
+ =?us-ascii?Q?LkqrHI6+R/6aQlc7UWiTMwSMlVLGCwlQpL2iXBBufpaEucft853AmZz09CzE?=
+ =?us-ascii?Q?u629WKTHdlK3ZgaHzNrev9P74r9AQuJVMlU4AbhSXn+i2bzNOGZ2Wv7BN6vM?=
+ =?us-ascii?Q?hnjR4zsnTC26yIecBJG9NO3M+PGw+Q/PBZqj9ydGpZxbWBk1SxjbUkTWh1fK?=
+ =?us-ascii?Q?bgs2sZwvnZk1PA8D5WzHm890meBYs4MmD0PT7RlXqHvMwXR/W/dHmjSVP5NR?=
+ =?us-ascii?Q?EY2Fip+M8rNEpMbiso81s5udxlsp4pqVJny7EpwFON05603V63ljP1kAHkZ7?=
+ =?us-ascii?Q?lanIoi2vhXm44e88Hl3S1U4E/J9elhyMRs+NJOFqUKCuWbYot3oRPvyIg1KA?=
+ =?us-ascii?Q?Hu9fdlz8vbVDTT5Svp5OQqlgyUl9zpP9KhHUGbyDqvUBsmTeKJsjQcySmaPs?=
+ =?us-ascii?Q?D5dygoyVdk/f8mv0OQzZhsD8a5vP5bG9ZaqtyQsFX3qKuSDCFFAy+lkdc1br?=
+ =?us-ascii?Q?7xHrlBbLqNPct3k54xaCvAzpN/3x50DIA4/avfsESxF41wMkhfFm5Peq6LNb?=
+ =?us-ascii?Q?EQaoFlCPp4mtTEgCgF5JcOj78mxnyV26DRwx4X1OsySceixGY61XIFJwU9so?=
+ =?us-ascii?Q?sRmvSTX1zJvfTDsUe7agpy8iM5K6o1ji20RWXB1Qc+kHO/1vpaun6kmq4zJQ?=
+ =?us-ascii?Q?1KFG+wzrk2ApBF9JhdgQ7fGjRuAiPJQIavaCCP16U6gjcGxfvhhbMBAHCkNP?=
+ =?us-ascii?Q?vwjndTQOCRreL+RvRf+MSHI0wotNA25lHSKdW0929tqisTj6PZA3+zYNSGGt?=
+ =?us-ascii?Q?g1OIR28G5vp0BsvPbitBIzbBX/tStzjmVSANVOLRwx5ry2zcDYZJy6cuWdue?=
+ =?us-ascii?Q?iCnyt8PvIlrUvI6EA1BgFnBFvTJpbr5rACiBd5YU?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 085ca220-403a-46e2-6cb2-08dbf67fa9a4
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2023 17:20:37.2119
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zDs2OKmci2tMSCfZ8bA5Lyc4+ta19BSfiU3OF/OMxVJf8FpcQ+W1n/b3fXod96Rp
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4057
 
-On 12/6/23 18:02, Andrew Jones wrote:
-> TEST_* functions append their own newline. Remove newlines from
-> TEST_* callsites to avoid extra newlines in output.
+On Wed, Dec 06, 2023 at 04:31:48PM +0000, Catalin Marinas wrote:
+
+> > This would be fine, as would a VMA flag. Please pick one :)
+> > 
+> > I think a VMA flag is simpler than messing with pgprot.
 > 
-> Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+> I guess one could write a patch and see how it goes ;).
 
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
+A lot of patches have been sent on this already :(
 
-[...]
+> > > If we want the VMM to drive this entirely, we could add a new mmap()
+> > > flag like MAP_WRITECOMBINE or PROT_WRITECOMBINE. They do feel a bit
+> > 
+> > As in the other thread, we cannot unconditionally map NORMAL_NC into
+> > the VMM.
+> 
+> I'm not suggesting this but rather the VMM map portions of the BAR with
+> either Device or Normal-NC, concatenate them (MAP_FIXED) and pass this
+> range as a memory slot (or multiple if a slot doesn't allow multiple
+> vmas).
+
+The VMM can't know what to do. We already talked about this. The VMM
+cannot be involved in the decision to make pages NORMAL_NC or
+not. That idea ignores how actual devices work.
+
+Either the VM decides directly as this patch proposes or the VM does
+some new generic trap/hypercall to ask the VMM to change it on its
+behalf. The VMM cannot do it independently.
+
+AFAIK nobody wants to see a trap/hypercall solution.
+
+That is why we have been exclusively focused on this approach.
+
+> > > The latter has some benefits for DPDK but it's a lot more involved
+> > > with
+> > 
+> > DPDK WC support will be solved with some VFIO-only change if anyone
+> > ever cares to make it, if that is what you mean.
+> 
+> Yeah. Some arguments I've heard in private and public discussions is
+> that the KVM device pass-through shouldn't be different from the DPDK
+> case. 
+
+I strongly disagree with this.
+
+The KVM case should be solved without the VMM being aware of what
+mappings the VM is doing.
+
+DPDK is in control and can directly ask VFIO to make the correct
+pgprot with an ioctl.
+
+You can hear Alex also articulate this position in that video.
+
+> There was some statement in there that for x86, the guests are
+> allowed to do WC without other KVM restrictions (not sure whether
+> that's the case, not familiar with it).
+
+x86 has a similar issue (Sean was talking about this and how he wants
+to fix it) where the VMM can restrict things and on x86 there are
+configurations where WC does and doesn't work in VM's too. Depends on
+who made the hypervisor. :(
+
+Nobody has pushed hard enough to see it resolved in upstream, but I
+understand some of the cloud operator set have their own solutions.
+
+> > We talked about this already, the guest must decide, the VMM doesn't
+> > have the information to pre-predict which pages the guest will want to
+> > use WC on.
+> 
+> Are the Device/Normal offsets within a BAR fixed, documented in e.g. the
+> spec or this is something configurable via some MMIO that the guest
+> does.
+
+No, it is fully dynamic on demand with firmware RPCs.
+
+Jason
