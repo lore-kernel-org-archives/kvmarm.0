@@ -1,40 +1,147 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0204439A;
-	Thu,  7 Dec 2023 15:12:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6023C433C8;
-	Thu,  7 Dec 2023 15:11:57 +0000 (UTC)
-Date: Thu, 7 Dec 2023 15:11:55 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
-	aneesh.kumar@linux.ibm.com, broonie@kernel.org,
-	dave.hansen@linux.intel.com, maz@kernel.org, oliver.upton@linux.dev,
-	shuah@kernel.org, will@kernel.org, kvmarm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, James Morse <james.morse@arm.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DCA125C5;
+	Thu,  7 Dec 2023 15:12:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hAphyFtZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB0A1C433C8;
+	Thu,  7 Dec 2023 15:12:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701961935;
+	bh=bjw4PEa9SjpvxQmxru54wXvwdGXfNeLhwFsEcpsXAT8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=hAphyFtZfO1h8SVG0nkPBfxunKZZHNRrYx9jUY5GVgEZCC/PWS4frBkwVvhKTaZW6
+	 u761SZ3lpAqh/aDUKLKe1444yi2HdqD1WgzQqBjhpPwEOOj/m87Y3061vY0cTIq+cQ
+	 IzhOr09EvZm2pGlGlg2S9q8q+KccZsOuFAx86WuRXeTCPVSWdcRrgQlLHLbXUAPGwb
+	 ZZA78tzNLtFK1v2Uz0mUds4c7EYi3Q1vdMaZF9jYvd15wz8noaM00LHxe69PcjsZST
+	 XDzVtD5K7QjJQciJ5VOiyzRFyWbeOqeZTbxpVyhGmglGvaOsJ2v2fAlsrPNkFZvEkA
+	 BVscdhDS0AFMw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rBG2v-002FcG-Ev;
+	Thu, 07 Dec 2023 15:12:13 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 10/25] arm64: mask out POIndex when modifying a PTE
-Message-ID: <ZXHgu0rJb5u9sz3T@arm.com>
-References: <20231124163510.1835740-1-joey.gouly@arm.com>
- <20231124163510.1835740-11-joey.gouly@arm.com>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	vdonnefort@google.com,
+	stable@vger.kernel.org
+Subject: [PATCH 1/5] KVM: arm64: vgic: Simplify kvm_vgic_destroy()
+Date: Thu,  7 Dec 2023 15:11:57 +0000
+Message-Id: <20231207151201.3028710-2-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20231207151201.3028710-1-maz@kernel.org>
+References: <20231207151201.3028710-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231124163510.1835740-11-joey.gouly@arm.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, vdonnefort@google.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Nov 24, 2023 at 04:34:55PM +0000, Joey Gouly wrote:
-> When a PTE is modified, the POIndex must be masked off so that it can be modified.
-> 
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
+When destroying a vgic, we have rather cumbersome rules about
+when slots_lock and config_lock are held, resulting in fun
+buglets.
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+The first port of call is to simplify kvm_vgic_map_resources()
+so that there is only one call to kvm_vgic_destroy() instead of
+two, with the second only holding half of the locks.
+
+For that, we kill the non-locking primitive and move the call
+outside of the locking altogether. This doesn't change anything
+(we re-acquire the locks and teardown the whole vgic), and
+simplifies the code significantly.
+
+Cc: stable@vger.kernel.org
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/vgic/vgic-init.c | 29 ++++++++++++++---------------
+ 1 file changed, 14 insertions(+), 15 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index c8c3cb812783..ad7e86879eb9 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -382,26 +382,24 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 	vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
+ }
+ 
+-static void __kvm_vgic_destroy(struct kvm *kvm)
++void kvm_vgic_destroy(struct kvm *kvm)
+ {
+ 	struct kvm_vcpu *vcpu;
+ 	unsigned long i;
+ 
+-	lockdep_assert_held(&kvm->arch.config_lock);
++	mutex_lock(&kvm->slots_lock);
+ 
+ 	vgic_debug_destroy(kvm);
+ 
+ 	kvm_for_each_vcpu(i, vcpu, kvm)
+ 		kvm_vgic_vcpu_destroy(vcpu);
+ 
++	mutex_lock(&kvm->arch.config_lock);
++
+ 	kvm_vgic_dist_destroy(kvm);
+-}
+ 
+-void kvm_vgic_destroy(struct kvm *kvm)
+-{
+-	mutex_lock(&kvm->arch.config_lock);
+-	__kvm_vgic_destroy(kvm);
+ 	mutex_unlock(&kvm->arch.config_lock);
++	mutex_unlock(&kvm->slots_lock);
+ }
+ 
+ /**
+@@ -469,25 +467,26 @@ int kvm_vgic_map_resources(struct kvm *kvm)
+ 		type = VGIC_V3;
+ 	}
+ 
+-	if (ret) {
+-		__kvm_vgic_destroy(kvm);
++	if (ret)
+ 		goto out;
+-	}
++
+ 	dist->ready = true;
+ 	dist_base = dist->vgic_dist_base;
+ 	mutex_unlock(&kvm->arch.config_lock);
+ 
+ 	ret = vgic_register_dist_iodev(kvm, dist_base, type);
+-	if (ret) {
++	if (ret)
+ 		kvm_err("Unable to register VGIC dist MMIO regions\n");
+-		kvm_vgic_destroy(kvm);
+-	}
+-	mutex_unlock(&kvm->slots_lock);
+-	return ret;
+ 
++	goto out_slots;
+ out:
+ 	mutex_unlock(&kvm->arch.config_lock);
++out_slots:
+ 	mutex_unlock(&kvm->slots_lock);
++
++	if (ret)
++		kvm_vgic_destroy(kvm);
++
+ 	return ret;
+ }
+ 
+-- 
+2.39.2
+
