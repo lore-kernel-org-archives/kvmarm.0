@@ -1,117 +1,231 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1383D37B
-	for <kvmarm@lists.linux.dev>; Thu,  7 Dec 2023 03:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2452328C8;
+	Thu,  7 Dec 2023 08:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="vqn9GCMy"
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-286e57fde73so444372a91.1
-        for <kvmarm@lists.linux.dev>; Wed, 06 Dec 2023 19:36:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1701920191; x=1702524991; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qpmyb8tDOuDjxZZHw+pAqD3DpIEuP7kLjd1VsjqScDM=;
-        b=vqn9GCMytOsPwgwjyAspoGK/db7pRZLzElAdCbgebZ0o0O99j06WJcBUnyyYf+WmCv
-         yLDuH9y5tQ2YpTB60sIxMFXlfjTh1DU7PHZVp3fLO/Xno11Z+U43YX2afRzzWhM/DuF3
-         tEB++SyKjcwCZIUjtAQLeBWqgQEKcXdpGNBVrUMBFy/stxuvj1mtUG/mT3rrRSI65/HK
-         rxcYtik7jTbvORVAlrpjZ8Z9XHy5TwP4I+FF0NXuWlJpol2NU02wpYMTrE/lwksWo9ch
-         63GwE4Wd8IwnzdiIei0QRjfYX1o1fgNCBJB0vTd78bCJ4tf/ICM0hddXNB8+IwdpSsBh
-         bKQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701920191; x=1702524991;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qpmyb8tDOuDjxZZHw+pAqD3DpIEuP7kLjd1VsjqScDM=;
-        b=Qy3gTHVjgl2Yvi9vVHmfN6Hh2C8c0iBZueBEUt5lWGN2IoNa2UYpdd0ZenIvJy9xWN
-         BwwnbcMdLewbyQCL7ey1dfWAfXe2loUkVX8VyctHVFAXVekzdE+u0saP65vg0o/OHSol
-         cDYTiv+Dkj5Ht7pdSHHoWtsgbufqVHRCJQm4FdsBzKkBCkm4pK4NIJrSakr4yBkvqImW
-         v6TpmG7NNDBWUCIx8TpkdviQTqFxi+B2a5rgrt3ufdCR0WqLrO+Yz62+ufZMO366s8Ou
-         9FVkR3EbdtX5iXvqFL7f+36lIEFo3h+zRpdWPHb55Z5Ww76kgI5V4/XYAyytDZ+FdWYR
-         Dv/A==
-X-Gm-Message-State: AOJu0YyryGvCvlMcfHZHofp5TZKkIdaxNx9SArMa4giewkINgH6Q4h5I
-	g8UofC6KSqR1tbdW7L4Dxjs6qsSQJB5mtEyOafutaA==
-X-Google-Smtp-Source: AGHT+IEM4PIqu4evLMzttRYz5xZTrBv9JHEOwZBZ3TDAZtsFijg+WwQhl3hMrZaWSpNq3AZG1PYrXsmc8rNBgQGb8ck=
-X-Received: by 2002:a17:90b:4a11:b0:286:6cc0:b90b with SMTP id
- kk17-20020a17090b4a1100b002866cc0b90bmr1378337pjb.66.1701920191109; Wed, 06
- Dec 2023 19:36:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="esa/Qkqg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 420C2C433C7;
+	Thu,  7 Dec 2023 08:40:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701938404;
+	bh=aERKSRSkgUM4DekqTDBhu4Ocyd2adYz1QF9/iT1ti/o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=esa/QkqgYlHsn6hwR7x1wBb4dhnQrP/9kPdP8POQbBVMV7yp1HdqBgJ2p5X0vNfiH
+	 460P9x4aip/x1L2+SzI0XGFamUl9rUZbin82hE+MTadrDh2iEcr9PYUb794tKHoeqY
+	 lFCsUZOeqtB672dsUwXecZUXkOTt7Eh+XwoSAMtStv+ol7OIpWHITeVhHIw3SU2Pcs
+	 624V31oVMWUHTIH8XMVAiAwHS4RTJHa3/m1lPbzC5heIHLn7zXp+1wxlb6NqtrPTiI
+	 BM2XKMlRf5sMR3ptIT11+3IhfgDprU7UvavyZWH/BOFrS9ixaEGN5jrHK3YyVFHy//
+	 B7vzOgstBmKgQ==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rB9vN-0029MR-84;
+	Thu, 07 Dec 2023 08:40:01 +0000
+Date: Thu, 07 Dec 2023 08:39:46 +0000
+Message-ID: <87cyvi8kz1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v3 15/21] KVM: arm64: Support FEAT_FPMR for guests
+In-Reply-To: <20231205-arm64-2023-dpisa-v3-15-dbcbcd867a7f@kernel.org>
+References: <20231205-arm64-2023-dpisa-v3-0-dbcbcd867a7f@kernel.org>
+	<20231205-arm64-2023-dpisa-v3-15-dbcbcd867a7f@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20231206170241.82801-7-ajones@ventanamicro.com> <20231206170241.82801-10-ajones@ventanamicro.com>
-In-Reply-To: <20231206170241.82801-10-ajones@ventanamicro.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Thu, 7 Dec 2023 09:06:19 +0530
-Message-ID: <CAAhSdy1b8z2Vo8fig3O-kHHY0R+D=Y8g0WBDF4uagkQ7meak+Q@mail.gmail.com>
-Subject: Re: [PATCH 3/5] KVM: selftests: riscv: Remove redundant newlines
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	seanjc@google.com, pbonzini@redhat.com, maz@kernel.org, 
-	oliver.upton@linux.dev, borntraeger@linux.ibm.com, frankja@linux.ibm.com, 
-	imbrenda@linux.ibm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, corbet@lwn.net, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Dec 6, 2023 at 10:32=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
-om> wrote:
->
-> TEST_* functions append their own newline. Remove newlines from
-> TEST_* callsites to avoid extra newlines in output.
->
-> Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
-
-For KVM RISC-V:
-Acked-by: Anup Patel <anup@brainfault.org>
-
-Regards,
-Anup
-
+On Tue, 05 Dec 2023 16:48:13 +0000,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> FEAT_FPMR introduces a new system register FPMR which allows configuration
+> of floating point behaviour, currently for FP8 specific features. Allow use
+> of this in guests, disabling the trap while guests are running and saving
+> and restoring the value along with the rest of the floating point state.
+> Since FPMR is stored immediately after the main floating point state we
+> share it with the hypervisor by adjusting the size of the shared region.
+> 
+> Access to FPMR is covered by both a register specific trap HCRX_EL2.EnFPM
+> and the overall floating point access trap so we just unconditionally
+> enable the FPMR specific trap and rely on the floating point access trap to
+> detect guest floating point usage.
+> 
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->  tools/testing/selftests/kvm/lib/riscv/processor.c | 2 +-
->  tools/testing/selftests/kvm/riscv/get-reg-list.c  | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/te=
-sting/selftests/kvm/lib/riscv/processor.c
-> index d146ca71e0c0..b3082da05c76 100644
-> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> @@ -327,7 +327,7 @@ void vcpu_args_set(struct kvm_vcpu *vcpu, unsigned in=
-t num, ...)
->         int i;
->
->         TEST_ASSERT(num >=3D 1 && num <=3D 8, "Unsupported number of args=
-,\n"
-> -                   "  num: %u\n", num);
-> +                   "  num: %u", num);
->
->         va_start(ap, num);
->
-> diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/tes=
-ting/selftests/kvm/riscv/get-reg-list.c
-> index 6bedaea95395..4355e33c0cec 100644
-> --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> @@ -112,7 +112,7 @@ void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu=
-_reg_list *c)
->
->                 /* Double check whether the desired extension was enabled=
- */
->                 __TEST_REQUIRE(vcpu_has_ext(vcpu, s->feature),
-> -                              "%s not available, skipping tests\n", s->n=
-ame);
-> +                              "%s not available, skipping tests", s->nam=
-e);
->         }
+>  arch/arm64/include/asm/kvm_arm.h        |  2 +-
+>  arch/arm64/include/asm/kvm_host.h       |  4 +++-
+>  arch/arm64/kvm/emulate-nested.c         |  9 +++++++++
+>  arch/arm64/kvm/fpsimd.c                 | 20 +++++++++++++++++---
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  7 ++++++-
+>  arch/arm64/kvm/sys_regs.c               | 11 +++++++++++
+>  6 files changed, 47 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 9f9239d86900..95f3b44e7c3a 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -103,7 +103,7 @@
+>  #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
+>  
+>  #define HCRX_GUEST_FLAGS \
+> -	(HCRX_EL2_SMPME | HCRX_EL2_TCR2En | \
+> +	(HCRX_EL2_SMPME | HCRX_EL2_TCR2En | HCRX_EL2_EnFPM | \
+
+We really should start making all of these things conditional. See
+below.
+
+>  	 (cpus_have_final_cap(ARM64_HAS_MOPS) ? (HCRX_EL2_MSCEn | HCRX_EL2_MCE2) : 0))
+>  #define HCRX_HOST_FLAGS (HCRX_EL2_MSCEn | HCRX_EL2_TCR2En | HCRX_EL2_EnFPM)
+>  
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index f8d98985a39c..9885adff06fa 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -391,6 +391,8 @@ enum vcpu_sysreg {
+>  	CNTP_CVAL_EL0,
+>  	CNTP_CTL_EL0,
+>  
+> +	FPMR,
+> +
+>  	/* Memory Tagging Extension registers */
+>  	RGSR_EL1,	/* Random Allocation Tag Seed Register */
+>  	GCR_EL1,	/* Tag Control Register */
+> @@ -517,7 +519,6 @@ struct kvm_vcpu_arch {
+>  	enum fp_type fp_type;
+>  	unsigned int sve_max_vl;
+>  	u64 svcr;
+> -	u64 fpmr;
+
+Why do this change here? Why isn't done like that the first place?
+
+>  
+>  	/* Stage 2 paging state used by the hardware on next switch */
+>  	struct kvm_s2_mmu *hw_mmu;
+> @@ -576,6 +577,7 @@ struct kvm_vcpu_arch {
+>  	struct kvm_guest_debug_arch external_debug_state;
+>  
+>  	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
+> +	u64 *host_fpmr;					/* hyp VA */
+>  	struct task_struct *parent_task;
+>  
+>  	struct {
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 06185216a297..802e5cde696f 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -67,6 +67,8 @@ enum cgt_group_id {
+>  	CGT_HCR_TTLBIS,
+>  	CGT_HCR_TTLBOS,
+>  
+> +	CGT_HCRX_EnFPM,
+> +
+>  	CGT_MDCR_TPMCR,
+>  	CGT_MDCR_TPM,
+>  	CGT_MDCR_TDE,
+> @@ -279,6 +281,12 @@ static const struct trap_bits coarse_trap_bits[] = {
+>  		.mask		= HCR_TTLBOS,
+>  		.behaviour	= BEHAVE_FORWARD_ANY,
+>  	},
+> +	[CGT_HCRX_EnFPM] = {
+> +		.index		= HCRX_EL2,
+> +		.value		= HCRX_EL2_EnFPM,
+> +		.mask		= HCRX_EL2_EnFPM,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+
+This looks wrong. HCRX_EL2.EnFPM is an enable bit.
+
+> +	},
+>  	[CGT_MDCR_TPMCR] = {
+>  		.index		= MDCR_EL2,
+>  		.value		= MDCR_EL2_TPMCR,
+> @@ -478,6 +486,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+>  	SR_TRAP(SYS_AIDR_EL1,		CGT_HCR_TID1),
+>  	SR_TRAP(SYS_SMIDR_EL1,		CGT_HCR_TID1),
+>  	SR_TRAP(SYS_CTR_EL0,		CGT_HCR_TID2),
+> +	SR_TRAP(SYS_FPMR,		CGT_HCRX_EnFPM),
+>  	SR_TRAP(SYS_CCSIDR_EL1,		CGT_HCR_TID2_TID4),
+>  	SR_TRAP(SYS_CCSIDR2_EL1,	CGT_HCR_TID2_TID4),
+>  	SR_TRAP(SYS_CLIDR_EL1,		CGT_HCR_TID2_TID4),
+> diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+> index e3e611e30e91..dee078625d0d 100644
+> --- a/arch/arm64/kvm/fpsimd.c
+> +++ b/arch/arm64/kvm/fpsimd.c
+> @@ -14,6 +14,16 @@
+>  #include <asm/kvm_mmu.h>
+>  #include <asm/sysreg.h>
+>  
+> +static void *fpsimd_share_end(struct user_fpsimd_state *fpsimd)
+> +{
+> +	void *share_end = fpsimd + 1;
+> +
+> +	if (cpus_have_final_cap(ARM64_HAS_FPMR))
+> +		share_end += sizeof(u64);
+> +
+> +	return share_end;
+> +}
+
+This is horrible. Why can't you just have a new structure wrapping
+both user_fpsimd_state and fpmr? This is going to break in subtle
+ways, just like the SVE/SME stuff.
+
+> +
+>  void kvm_vcpu_unshare_task_fp(struct kvm_vcpu *vcpu)
+>  {
+>  	struct task_struct *p = vcpu->arch.parent_task;
+> @@ -23,7 +33,7 @@ void kvm_vcpu_unshare_task_fp(struct kvm_vcpu *vcpu)
+>  		return;
+>  
+>  	fpsimd = &p->thread.uw.fpsimd_state;
+> -	kvm_unshare_hyp(fpsimd, fpsimd + 1);
+> +	kvm_unshare_hyp(fpsimd, fpsimd_share_end(fpsimd));
+>  	put_task_struct(p);
 >  }
->
-> --
-> 2.43.0
->
+>  
+> @@ -45,11 +55,15 @@ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
+>  	kvm_vcpu_unshare_task_fp(vcpu);
+>  
+>  	/* Make sure the host task fpsimd state is visible to hyp: */
+> -	ret = kvm_share_hyp(fpsimd, fpsimd + 1);
+> +	ret = kvm_share_hyp(fpsimd, fpsimd_share_end(fpsimd));
+>  	if (ret)
+>  		return ret;
+>  
+>  	vcpu->arch.host_fpsimd_state = kern_hyp_va(fpsimd);
+> +	if (cpus_have_final_cap(ARM64_HAS_FPMR)) {
+> +		WARN_ON_ONCE(&current->thread.fpmr + 1 != fpsimd_share_end(fpsimd));
+
+How can this happen?
+
+> +		vcpu->arch.host_fpmr = kern_hyp_va(&current->thread.fpmr);
+> +	}
+
+We really need to stop piling the save/restore of stuff that isn't
+advertised to the guest.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
