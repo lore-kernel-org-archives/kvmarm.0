@@ -1,91 +1,101 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C96C40BE4;
-	Thu,  7 Dec 2023 14:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A134185B;
+	Thu,  7 Dec 2023 14:50:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KNjNn79q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B982C433CA;
-	Thu,  7 Dec 2023 14:12:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bqx8dsk+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE229C433C7;
+	Thu,  7 Dec 2023 14:50:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701958349;
-	bh=47UZfvnQWDEJSOeupCYwAYrzuYtNC/T8g7iT65OoBZU=;
+	s=k20201202; t=1701960618;
+	bh=ROv4DFKKEEpLSUSHwElpbfywORQ7vxKS7FhooWQWgrQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KNjNn79q5qw9TWzhiTTP83A72DjqspeTkbwfxzoFnhtiod+ean4s/g2ZihwzwXDAU
-	 Am57C5Ozpebi7RrIDin2lfTxnQxnd/g1SJoTl2stCv7gjEib8S29onQm4DWkSwfzAZ
-	 zQi1z8Fa3bGDCUGc8ZtXlmlIVQ6Xi6yNJgaAYtgdyVUXKyIp8aiTF0U1YOWvQahFHS
-	 ovxFQg0P0owLouv5ZAp97Cl/VvE9siUPJngtZBoqORuYrfG2l/L7z/ZrGnG0gD2Q4f
-	 uSh67mCPQywqM40/rxG+J9b+1jRbCMjSIyBubfR+IcM6KHPn1/BRu4XSAbS+A0laFC
-	 Gp0YR7Yh9D9NQ==
-Date: Thu, 7 Dec 2023 14:12:23 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Joey Gouly <joey.gouly@arm.com>, linux-arm-kernel@lists.infradead.org,
-	akpm@linux-foundation.org, aneesh.kumar@linux.ibm.com,
-	dave.hansen@linux.intel.com, maz@kernel.org, oliver.upton@linux.dev,
-	shuah@kernel.org, will@kernel.org, kvmarm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 05/25] arm64: context switch POR_EL0 register
-Message-ID: <6ff480e3-e2d4-472a-ba6f-4037e438f69b@sirena.org.uk>
-References: <20231124163510.1835740-1-joey.gouly@arm.com>
- <20231124163510.1835740-6-joey.gouly@arm.com>
- <ZWHiaTO6VUzHmbDB@finisterre.sirena.org.uk>
- <ZXHO0_ypVTUb392K@arm.com>
+	b=bqx8dsk+Za2R5f1hFZYmCEE/Sr6KkS6eFsETYaOgAs8HGf8d4qq0Db067rEyGEyhs
+	 oBhIWAEOUkPpkMYxba0uDwXDsBqalS3CV0N0bMyvX+9yLhvnmeqlbrj8HK7AK00xjU
+	 J06J/tliIegHCiPwoyM/37M/haAxsZg5BfKgfpJkLku6PDZOcSIeVs2yMGerEpGy2D
+	 Afyghp+yZNbYb1q/itNfMTs13tWtBoFyYOeVHYpWe34GFO4w+ChTNfpEHeDcqgf5mG
+	 qCTiHuyaQbJEtAhT2mD0YT5DtG/hKn56Nt7WlSXRter5DFhQEhUE8sp5Svvkj81rcT
+	 9vsdOFnxtKoDw==
+Date: Thu, 7 Dec 2023 15:50:09 +0100
+From: Lorenzo Pieralisi <lpieralisi@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, ankita@nvidia.com,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	oliver.upton@linux.dev, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, will@kernel.org, ardb@kernel.org,
+	akpm@linux-foundation.org, gshan@redhat.com, aniketa@nvidia.com,
+	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
+	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
+	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 1/1] KVM: arm64: allow the VM to select DEVICE_* and
+ NORMAL_NC for IO memory
+Message-ID: <ZXHbocMSiAtrFdyr@lpieralisi>
+References: <ZW949Tl3VmQfPk0L@arm.com>
+ <20231205194822.GL2692119@nvidia.com>
+ <ZXCJ3pVbKuHJ3LTz@arm.com>
+ <20231206150556.GQ2692119@nvidia.com>
+ <ZXCQrTbf6q0BIhSw@lpieralisi>
+ <20231206153809.GS2692119@nvidia.com>
+ <ZXCf_e-ACqrj6VrV@arm.com>
+ <20231206164802.GT2692119@nvidia.com>
+ <ZXGa4A6rfxLtkTB2@lpieralisi>
+ <20231207133825.GI2692119@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="tFLJkYHdpJA4U9vc"
-Content-Disposition: inline
-In-Reply-To: <ZXHO0_ypVTUb392K@arm.com>
-X-Cookie: Two is company, three is an orgy.
-
-
---tFLJkYHdpJA4U9vc
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20231207133825.GI2692119@nvidia.com>
 
-On Thu, Dec 07, 2023 at 01:55:31PM +0000, Catalin Marinas wrote:
-> On Sat, Nov 25, 2023 at 12:02:49PM +0000, Mark Brown wrote:
-> > On Fri, Nov 24, 2023 at 04:34:50PM +0000, Joey Gouly wrote:
+On Thu, Dec 07, 2023 at 09:38:25AM -0400, Jason Gunthorpe wrote:
+> On Thu, Dec 07, 2023 at 11:13:52AM +0100, Lorenzo Pieralisi wrote:
+> > > > What about the other way around - would we have a prefetchable BAR that
+> > > > has portions which are unprefetchable?
+> > > 
+> > > I would say possibly.
+> > > 
+> > > Prefetch is a dead concept in PCIe, it was obsoleted in PCI-X about 20
+> > > years ago. No PCIe system has ever done prefetch.
+> > > 
+> > > There is a strong incentive to mark BAR's as prefetchable because it
+> > > allows 64 bit addressing in configurations with bridges.
+> > 
+> > If by strong incentive you mean the "Additional guidance on the
+> > Prefetchable Bit in Memory Space BARs" in the PCI express specifications,
+> > I think it has been removed from the spec and the criteria that had to be
+> > met to implement it were basically impossible to fulfill on ARM systems,
+> > it did not make any sense in the first place.
+> 
+> No, I mean many systems don't have room to accommodate large 32 bit
+> BARs and the only real way to make stuff work is to have a 64 bit BAR
+> by setting prefetchable.
 
-> > > +static void flush_poe(void)
-> > > +{
-> > > +	if (system_supports_poe())
-> > > +		write_sysreg_s(POR_EL0_INIT, SYS_POR_EL0);
-> > > +}
+That's what the implementation note I mentioned referred to ;)
 
-> > Here we have no isb()...
+> Given mis-marking a read-side-effect region as prefetchable has no
+> actual consequence on PCI-E I would not be surprised to learn people
+> have done this.
 
-> My immediate thought was that we'd not care about the ISB here since
-> we'll have an ERET before getting to EL0. However, we may have some
-> LDTR/STTR populating the new process args page on exec which may, in
-> theory, pick up a stale POR_EL0.
+PCIe specs 6.1, 7.5.1.2.1 "Base Address Registers"
 
-Yeah, it was a combination of the inconsistency and the lack of clarity
-over there being a path which could potentially use POR_EL0 before ERET.
-We at least probably need some comments with regard to the requirements
-here.
+"A function is permitted to mark a range as prefetchable if there are
+no side effects on reads..."
 
---tFLJkYHdpJA4U9vc
-Content-Type: application/pgp-signature; name="signature.asc"
+I don't think that an OS should use the prefetchable flag to infer
+anything (even though we do at the moment -> sysfs mappings, I know that
+the prefetchable concept is being scrapped from the PCI specs altogether
+for a reason), I don't see though how we can say that's a SW bug at
+present given what I quoted above.
 
------BEGIN PGP SIGNATURE-----
+I'd agree that it is best not to use that flag for new code we are adding
+(because it will be deprecated soon).
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmVx0sYACgkQJNaLcl1U
-h9AZCgf/X0uy8/6EiE75lAKZoYXgFKyGs21xpo+KNf8OlxnW1Cmwd9pWCniE0DGV
-/4Knlc88paXTUnUA8ufobkjiQdj+R2nYJUnW62qD/SfOULo8As//rlpui0NgjfYO
-2e2UKWEJ0cHFdSGifE0R4DF3qmQFo5K73m7ywedSo1IMrbM6EIR6qBTOe3mnOIcu
-ofI81TpLR6gKiz0hA2uWNITQQK8VNG0Czuvi6QaIVOKnADLbPFP5orAZDEdt4t06
-Qa13Ok13tFqqUSxGnsHFnCLRvRILPy2L6ecupywOUsgtMIj3kkfTi4uMRs4EPcMx
-6eViRFXbIAXNsGbjwlE1t4vNBPLbBQ==
-=nEdy
------END PGP SIGNATURE-----
-
---tFLJkYHdpJA4U9vc--
+Thanks,
+Lorenzo
