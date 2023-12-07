@@ -1,49 +1,25 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A134185B;
-	Thu,  7 Dec 2023 14:50:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bqx8dsk+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE229C433C7;
-	Thu,  7 Dec 2023 14:50:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701960618;
-	bh=ROv4DFKKEEpLSUSHwElpbfywORQ7vxKS7FhooWQWgrQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bqx8dsk+Za2R5f1hFZYmCEE/Sr6KkS6eFsETYaOgAs8HGf8d4qq0Db067rEyGEyhs
-	 oBhIWAEOUkPpkMYxba0uDwXDsBqalS3CV0N0bMyvX+9yLhvnmeqlbrj8HK7AK00xjU
-	 J06J/tliIegHCiPwoyM/37M/haAxsZg5BfKgfpJkLku6PDZOcSIeVs2yMGerEpGy2D
-	 Afyghp+yZNbYb1q/itNfMTs13tWtBoFyYOeVHYpWe34GFO4w+ChTNfpEHeDcqgf5mG
-	 qCTiHuyaQbJEtAhT2mD0YT5DtG/hKn56Nt7WlSXRter5DFhQEhUE8sp5Svvkj81rcT
-	 9vsdOFnxtKoDw==
-Date: Thu, 7 Dec 2023 15:50:09 +0100
-From: Lorenzo Pieralisi <lpieralisi@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, ankita@nvidia.com,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	oliver.upton@linux.dev, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, will@kernel.org, ardb@kernel.org,
-	akpm@linux-foundation.org, gshan@redhat.com, aniketa@nvidia.com,
-	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
-	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
-	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 1/1] KVM: arm64: allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
-Message-ID: <ZXHbocMSiAtrFdyr@lpieralisi>
-References: <ZW949Tl3VmQfPk0L@arm.com>
- <20231205194822.GL2692119@nvidia.com>
- <ZXCJ3pVbKuHJ3LTz@arm.com>
- <20231206150556.GQ2692119@nvidia.com>
- <ZXCQrTbf6q0BIhSw@lpieralisi>
- <20231206153809.GS2692119@nvidia.com>
- <ZXCf_e-ACqrj6VrV@arm.com>
- <20231206164802.GT2692119@nvidia.com>
- <ZXGa4A6rfxLtkTB2@lpieralisi>
- <20231207133825.GI2692119@nvidia.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7FBA125C5
+	for <kvmarm@lists.linux.dev>; Thu,  7 Dec 2023 15:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B630B2F4;
+	Thu,  7 Dec 2023 07:00:56 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3925E3F762;
+	Thu,  7 Dec 2023 07:00:09 -0800 (PST)
+Date: Thu, 7 Dec 2023 15:00:01 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev,
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, eric.auger@redhat.com,
+	jingzhangos@google.com, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 06/12] KVM: arm64: Update and fix FGT register masks
+Message-ID: <20231207150001.GA29745@e124191.cambridge.arm.com>
+References: <20231206100503.564090-1-tabba@google.com>
+ <20231206100503.564090-7-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,50 +28,136 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231207133825.GI2692119@nvidia.com>
+In-Reply-To: <20231206100503.564090-7-tabba@google.com>
 
-On Thu, Dec 07, 2023 at 09:38:25AM -0400, Jason Gunthorpe wrote:
-> On Thu, Dec 07, 2023 at 11:13:52AM +0100, Lorenzo Pieralisi wrote:
-> > > > What about the other way around - would we have a prefetchable BAR that
-> > > > has portions which are unprefetchable?
-> > > 
-> > > I would say possibly.
-> > > 
-> > > Prefetch is a dead concept in PCIe, it was obsoleted in PCI-X about 20
-> > > years ago. No PCIe system has ever done prefetch.
-> > > 
-> > > There is a strong incentive to mark BAR's as prefetchable because it
-> > > allows 64 bit addressing in configurations with bridges.
-> > 
-> > If by strong incentive you mean the "Additional guidance on the
-> > Prefetchable Bit in Memory Space BARs" in the PCI express specifications,
-> > I think it has been removed from the spec and the criteria that had to be
-> > met to implement it were basically impossible to fulfill on ARM systems,
-> > it did not make any sense in the first place.
+Hello Fuad,
+
+On Wed, Dec 06, 2023 at 10:04:56AM +0000, Fuad Tabba wrote:
+> New trap bits have been defined in the 2023-09 Arm Architecture
+> System Registers xml specification [*]. Moreover, the existing
+> definitions of some of the mask and the RES0 bits overlap, which
+> could be wrong, confusing, or both.
 > 
-> No, I mean many systems don't have room to accommodate large 32 bit
-> BARs and the only real way to make stuff work is to have a 64 bit BAR
-> by setting prefetchable.
+> Update the bits to represent the latest spec (as of this patch,
+> 2023-09), and ensure that the existing bits are consistent.
+> 
+> Subsequent patches will use the generated RES0 fields instead of
+> specifying them manually. This patch keeps the manual encoding of
+> the bits to make it easier to review the series.
+> 
+> [*] https://developer.arm.com/downloads/-/exploration-tools
+> 
+> Fixes: 0fd76865006d ("KVM: arm64: Add nPIR{E0}_EL1 to HFG traps")
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h | 39 ++++++++++++++++++++------------
+>  1 file changed, 24 insertions(+), 15 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 7de0a7062625..b0dc3249d5cd 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -344,30 +344,39 @@
+>   * Once we get to a point where the two describe the same thing, we'll
+>   * merge the definitions. One day.
+>   */
+> -#define __HFGRTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51))
+> +#define __HFGRTR_EL2_RES0	BIT(51)
+>  #define __HFGRTR_EL2_MASK	GENMASK(49, 0)
+> -#define __HFGRTR_EL2_nMASK	(GENMASK(58, 57) | GENMASK(55, 54) | BIT(50))
+> +#define __HFGRTR_EL2_nMASK	(GENMASK(63, 52) | BIT(50))
+>  
+> -#define __HFGWTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51) |	\
+> -				 BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
+> -				 GENMASK(26, 25) | BIT(21) | BIT(18) |	\
+> +#define __HFGWTR_EL2_RES0	(BIT(51) | BIT(46) | BIT(42) | BIT(40) | \
+> +				 BIT(28) | GENMASK(26, 25) | BIT(21) | BIT(18) | \
+>  				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
+> -#define __HFGWTR_EL2_MASK	GENMASK(49, 0)
+> -#define __HFGWTR_EL2_nMASK	(GENMASK(58, 57) | GENMASK(55, 54) | BIT(50))
+> +#define __HFGWTR_EL2_MASK	(GENMASK(49, 47) | GENMASK(45, 43) | \
+> +				 BIT(41) | GENMASK(39, 29) | BIT(27) | \
+> +				 GENMASK(24, 22) | GENMASK(20, 19) | \
+> +				 GENMASK(17, 16) | GENMASK(13, 11) | \
+> +				 GENMASK(8, 3) | GENMASK(1, 0))
+> +#define __HFGWTR_EL2_nMASK	(GENMASK(63, 52) | BIT(50))
 
-That's what the implementation note I mentioned referred to ;)
+By adding all these bits to *_nMASK, we're allowing a guest to access registers
+which KVM doesn't (currently) deal with.  For example if I apply this patch
+series, a guest can access S2POR_EL1, previously it would print something like:
 
-> Given mis-marking a read-side-effect region as prefetchable has no
-> actual consequence on PCI-E I would not be surprised to learn people
-> have done this.
+	kvm [80]: Unsupported guest sys_reg access at: ffffc42969c1f270 [600000c5]                                                                      
+	 { Op0( 3), Op1( 0), CRn(10), CRm( 2), Op2( 5), func_read }, 
 
-PCIe specs 6.1, 7.5.1.2.1 "Base Address Registers"
+After applying this patch series, the guest can read S2POR_EL1.
 
-"A function is permitted to mark a range as prefetchable if there are
-no side effects on reads..."
+We don't expose S2POE to the guest through ID_AA64MMFR3_EL1, so a well behaved
+guest shouldn't access it, but there's nothing stopping it.
 
-I don't think that an OS should use the prefetchable flag to infer
-anything (even though we do at the moment -> sysfs mappings, I know that
-the prefetchable concept is being scrapped from the PCI specs altogether
-for a reason), I don't see though how we can say that's a SW bug at
-present given what I quoted above.
+My question is, is this intended? Or do we need to update the following code
+(and comment!) to trap all the stuff we don't currently handle (along with
+ACCDATA_EL1):
 
-I'd agree that it is best not to use that flag for new code we are adding
-(because it will be deprecated soon).
+	static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+	{
+
+		..
+
+	        /* The default is not to trap anything but ACCDATA_EL1 */
+        	r_val = __HFGRTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
+	        r_val |= r_set;
+        	r_val &= ~r_clr;
+
 
 Thanks,
-Lorenzo
+Joey
+
+>  
+> -#define __HFGITR_EL2_RES0	GENMASK(63, 57)
+> -#define __HFGITR_EL2_MASK	GENMASK(54, 0)
+> -#define __HFGITR_EL2_nMASK	GENMASK(56, 55)
+> +#define __HFGITR_EL2_RES0	(BIT(63) | BIT(61))
+> +#define __HFGITR_EL2_MASK	(BIT(62) | BIT(60) | GENMASK(54, 0))
+> +#define __HFGITR_EL2_nMASK	GENMASK(59, 55)
+>  
+>  #define __HDFGRTR_EL2_RES0	(BIT(49) | BIT(42) | GENMASK(39, 38) |	\
+>  				 GENMASK(21, 20) | BIT(8))
+> -#define __HDFGRTR_EL2_MASK	~__HDFGRTR_EL2_nMASK
+> +#define __HDFGRTR_EL2_MASK	(BIT(63) | GENMASK(58, 50) | GENMASK(48, 43) | \
+> +				 GENMASK(41, 40) | GENMASK(37, 22) | \
+> +				 GENMASK(19, 9) | GENMASK(7, 0))
+>  #define __HDFGRTR_EL2_nMASK	GENMASK(62, 59)
+>  
+>  #define __HDFGWTR_EL2_RES0	(BIT(63) | GENMASK(59, 58) | BIT(51) | BIT(47) | \
+>  				 BIT(43) | GENMASK(40, 38) | BIT(34) | BIT(30) | \
+>  				 BIT(22) | BIT(9) | BIT(6))
+> -#define __HDFGWTR_EL2_MASK	~__HDFGWTR_EL2_nMASK
+> +#define __HDFGWTR_EL2_MASK	(GENMASK(57, 52) | GENMASK(50, 48) | \
+> +				 GENMASK(46, 44) | GENMASK(42, 41) | \
+> +				 GENMASK(37, 35) | GENMASK(33, 31) | \
+> +				 GENMASK(29, 23) | GENMASK(21, 10) | \
+> +				 GENMASK(8, 7) | GENMASK(5, 0))
+>  #define __HDFGWTR_EL2_nMASK	GENMASK(62, 60)
+>  
+>  #define __HAFGRTR_EL2_RES0	(GENMASK(63, 50) | GENMASK(16, 5))
+> @@ -375,9 +384,9 @@
+>  #define __HAFGRTR_EL2_nMASK	0UL
+>  
+>  /* Similar definitions for HCRX_EL2 */
+> -#define __HCRX_EL2_RES0		(GENMASK(63, 16) | GENMASK(13, 12))
+> -#define __HCRX_EL2_MASK		(0)
+> -#define __HCRX_EL2_nMASK	(GENMASK(15, 14) | GENMASK(4, 0))
+> +#define __HCRX_EL2_RES0         (GENMASK(63, 25) | GENMASK(13, 12))
+> +#define __HCRX_EL2_MASK		(BIT(6))
+> +#define __HCRX_EL2_nMASK	(GENMASK(24, 14) | GENMASK(11, 7) | GENMASK(5, 0))
+>  
+>  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+>  #define HPFAR_MASK	(~UL(0xf))
+> -- 
+> 2.43.0.rc2.451.g8631bc7472-goog
+> 
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
