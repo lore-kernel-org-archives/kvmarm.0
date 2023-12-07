@@ -1,14 +1,14 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 610B84437C
-	for <kvmarm@lists.linux.dev>; Thu,  7 Dec 2023 15:08:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E05E74437C
+	for <kvmarm@lists.linux.dev>; Thu,  7 Dec 2023 15:08:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 554ED139F;
-	Thu,  7 Dec 2023 07:09:01 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 12D851570;
+	Thu,  7 Dec 2023 07:09:08 -0800 (PST)
 Received: from eglon.cambridge.arm.com (eglon.cambridge.arm.com [10.1.197.60])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 680573F762;
-	Thu,  7 Dec 2023 07:08:14 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 26F1E3F762;
+	Thu,  7 Dec 2023 07:08:21 -0800 (PST)
 From: James Morse <james.morse@arm.com>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org
@@ -17,10 +17,12 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	James Morse <james.morse@arm.com>
-Subject: [PATCH v2 0/4] KVM: arm64: Hide unsupported MPAM from the guest
-Date: Thu,  7 Dec 2023 15:08:00 +0000
-Message-Id: <20231207150804.3425468-1-james.morse@arm.com>
+Subject: [PATCH v2 1/4] arm64: head.S: Initialise MPAM EL2 registers and disable traps
+Date: Thu,  7 Dec 2023 15:08:01 +0000
+Message-Id: <20231207150804.3425468-2-james.morse@arm.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20231207150804.3425468-1-james.morse@arm.com>
+References: <20231207150804.3425468-1-james.morse@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -29,69 +31,58 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-'lo
+Add code to head.S's el2_setup to detect MPAM and disable any EL2 traps.
+This register resets to an unknown value, setting it to the default
+parititons/pmg before we enable the MMU is the best thing to do.
 
-This series fixes up a long standing bug where MPAM was accidentally exposed
-to a guest, but the feature was not otherwise trapped or context switched.
-This could result in KVM warning about unexpected traps, and injecting an
-undef into the guest contradicting the ID registers.
-This would prevent an MPAM aware kernel from booting - fortunately, there
-aren't any of those.
+Kexec/kdump will depend on this if the previous kernel left the CPU
+configured with a restrictive configuration.
 
-Ideally, we'd take the MPAM feature away from the ID registers, but that
-would leave existing guests unable to migrate to a newer kernel. Instead,
-use the writable ID registers to allow MPAM to be re-enabled - but emulate
-it as RAZ/WI for the system registers that are trapped.
-This means KVM emulates a machine with 0 PARTID and 0 PMG, so the MPAMx_ELy
-registers don't need to be preserved by KVM. This has the added advantage
-that MPAMx_ELy's 'MPAMEN' bit will be read as zero, telling guests that
-this feature is disabled.
+If linux is booted at the highest implemented exception level el2_setup
+will clear the enable bit, disabling MPAM.
 
-Guests have never been able to make use of MPAM as these system registers
-are only for configuring the CPU, to see any change in behaviour you need
-to configure the Memory System Components (MSC) which are MMIO gadgets that
-belong to the host.
+This code can't be enabled until a subsequent patch adds the Kconfig
+and cpufeature boiler plate.
 
-This series includes the head.S and KVM changes to enable/disable traps. If
-MPAM is neither enabled nor emulated by EL3 firmware, these system register
-accesses will trap to EL3.
-If your kernel doesn't boot, and the problem bisects here - please update
-your firmware. MPAM has been supported by trusted firmware since v1.6 in
-2018. (also noted on patch 2).
+Signed-off-by: James Morse <james.morse@arm.com>
+---
+ arch/arm64/include/asm/el2_setup.h | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-This series is based on v6.7-rc4 and can be retrieved from:
-https://git.kernel.org/pub/scm/linux/kernel/git/morse/linux.git/log/?h=mpam/kvm_mpam_fix/v2
-
-
-Thanks,
-
-James Morse (4):
-  arm64: head.S: Initialise MPAM EL2 registers and disable traps
-  arm64: cpufeature: discover CPU support for MPAM
-  KVM: arm64: Fix missing traps of guest accesses to the MPAM registers
-  KVM: arm64: Disable MPAM visibility by default, and handle traps
-
- .../arch/arm64/cpu-feature-registers.rst      |  2 +
- arch/arm64/Kconfig                            | 19 ++++-
- arch/arm64/include/asm/cpu.h                  |  1 +
- arch/arm64/include/asm/cpufeature.h           | 13 ++++
- arch/arm64/include/asm/el2_setup.h            | 16 ++++
- arch/arm64/include/asm/kvm_arm.h              |  1 +
- arch/arm64/include/asm/mpam.h                 | 75 +++++++++++++++++++
- arch/arm64/include/asm/sysreg.h               |  8 ++
- arch/arm64/kernel/Makefile                    |  1 +
- arch/arm64/kernel/cpufeature.c                | 67 +++++++++++++++++
- arch/arm64/kernel/cpuinfo.c                   |  4 +
- arch/arm64/kernel/image-vars.h                |  5 ++
- arch/arm64/kernel/mpam.c                      |  8 ++
- arch/arm64/kvm/hyp/include/hyp/switch.h       | 32 ++++++++
- arch/arm64/kvm/sys_regs.c                     | 71 +++++++++++++++++-
- arch/arm64/tools/cpucaps                      |  1 +
- arch/arm64/tools/sysreg                       | 32 ++++++++
- 17 files changed, 352 insertions(+), 4 deletions(-)
- create mode 100644 arch/arm64/include/asm/mpam.h
- create mode 100644 arch/arm64/kernel/mpam.c
-
+diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+index b7afaa026842..fb4ea2a94e10 100644
+--- a/arch/arm64/include/asm/el2_setup.h
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -208,6 +208,21 @@
+ 	msr	spsr_el2, x0
+ .endm
+ 
++.macro __init_el2_mpam
++#ifdef CONFIG_ARM64_MPAM
++	/* Memory Partitioning And Monitoring: disable EL2 traps */
++	mrs	x1, id_aa64pfr0_el1
++	ubfx	x0, x1, #ID_AA64PFR0_EL1_MPAM_SHIFT, #4
++	cbz	x0, .Lskip_mpam_\@		// skip if no MPAM
++	msr_s	SYS_MPAM2_EL2, xzr		// use the default partition
++						// and disable lower traps
++	mrs_s	x0, SYS_MPAMIDR_EL1
++	tbz	x0, #17, .Lskip_mpam_\@		// skip if no MPAMHCR reg
++	msr_s	SYS_MPAMHCR_EL2, xzr		// clear TRAP_MPAMIDR_EL1 -> EL2
++.Lskip_mpam_\@:
++#endif /* CONFIG_ARM64_MPAM */
++.endm
++
+ /**
+  * Initialize EL2 registers to sane values. This should be called early on all
+  * cores that were booted in EL2. Note that everything gets initialised as
+@@ -225,6 +240,7 @@
+ 	__init_el2_stage2
+ 	__init_el2_gicv3
+ 	__init_el2_hstr
++	__init_el2_mpam
+ 	__init_el2_nvhe_idregs
+ 	__init_el2_cptr
+ 	__init_el2_fgt
 -- 
 2.39.2
 
