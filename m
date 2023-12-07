@@ -1,204 +1,139 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DACDB4437C
-	for <kvmarm@lists.linux.dev>; Thu,  7 Dec 2023 15:08:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 017DD139F;
-	Thu,  7 Dec 2023 07:09:15 -0800 (PST)
-Received: from eglon.cambridge.arm.com (eglon.cambridge.arm.com [10.1.197.60])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 15A7E3F762;
-	Thu,  7 Dec 2023 07:08:27 -0800 (PST)
-From: James Morse <james.morse@arm.com>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF110125C5;
+	Thu,  7 Dec 2023 15:11:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AAFCC433C7;
+	Thu,  7 Dec 2023 15:11:01 +0000 (UTC)
+Date: Thu, 7 Dec 2023 15:10:58 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
+	aneesh.kumar@linux.ibm.com, broonie@kernel.org,
+	dave.hansen@linux.intel.com, maz@kernel.org, oliver.upton@linux.dev,
+	shuah@kernel.org, will@kernel.org, kvmarm@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	James Morse <james.morse@arm.com>
-Subject: [PATCH v2 4/4] KVM: arm64: Disable MPAM visibility by default, and handle traps
-Date: Thu,  7 Dec 2023 15:08:04 +0000
-Message-Id: <20231207150804.3425468-5-james.morse@arm.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231207150804.3425468-1-james.morse@arm.com>
-References: <20231207150804.3425468-1-james.morse@arm.com>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v3 09/25] arm64: define VM_PKEY_BIT* for arm64
+Message-ID: <ZXHggjY32Ypr5euK@arm.com>
+References: <20231124163510.1835740-1-joey.gouly@arm.com>
+ <20231124163510.1835740-10-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231124163510.1835740-10-joey.gouly@arm.com>
 
-Currently KVM only allows certain writeable ID registers to be
-downgraded from their reset value.
+On Fri, Nov 24, 2023 at 04:34:54PM +0000, Joey Gouly wrote:
+>  arch/arm64/include/asm/mman.h   |  8 +++++++-
+>  arch/arm64/include/asm/page.h   | 10 ++++++++++
+>  arch/arm64/mm/mmap.c            |  9 +++++++++
+>  arch/powerpc/include/asm/page.h | 11 +++++++++++
+>  arch/x86/include/asm/page.h     | 10 ++++++++++
+>  fs/proc/task_mmu.c              |  2 ++
+>  include/linux/mm.h              | 13 -------------
+>  7 files changed, 49 insertions(+), 14 deletions(-)
 
-commit 011e5f5bf529f ("arm64/cpufeature: Add remaining feature bits in
-ID_AA64PFR0 register") exposed the MPAM field of AA64PFR0_EL1 to guests,
-but didn't add trap handling. A previous patch supplied the missing trap
-handling.
+It might be worth splitting out the powerpc/x86/generic parts into a
+separate patch.
 
-Existing VMs that have the MPAM field of AA64PFR0_EL1 need to be
-migratable, but there is little point enabling the MPAM CPU interface
-on new VMs until there is something a guest can do with it.
+> diff --git a/arch/arm64/include/asm/mman.h b/arch/arm64/include/asm/mman.h
+> index 5966ee4a6154..ecb2d18dc4d7 100644
+> --- a/arch/arm64/include/asm/mman.h
+> +++ b/arch/arm64/include/asm/mman.h
+> @@ -7,7 +7,7 @@
+>  #include <uapi/asm/mman.h>
+>  
+>  static inline unsigned long arch_calc_vm_prot_bits(unsigned long prot,
+> -	unsigned long pkey __always_unused)
+> +	unsigned long pkey)
+>  {
+>  	unsigned long ret = 0;
+>  
+> @@ -17,6 +17,12 @@ static inline unsigned long arch_calc_vm_prot_bits(unsigned long prot,
+>  	if (system_supports_mte() && (prot & PROT_MTE))
+>  		ret |= VM_MTE;
+>  
+> +#if defined(CONFIG_ARCH_HAS_PKEYS)
+> +	ret |= pkey & 0x1 ? VM_PKEY_BIT0 : 0;
+> +	ret |= pkey & 0x2 ? VM_PKEY_BIT1 : 0;
+> +	ret |= pkey & 0x4 ? VM_PKEY_BIT2 : 0;
+> +#endif
 
-Clear the MPAM field from the guest's AA64PFR0_EL1 by default, but
-allow user-space to set it again if the host supports MPAM. Add a
-helper to return the maximum permitted value for an ID register.
-For most this is the reset value. To allow the MPAM field to be
-written as supported, check if the host sanitised value is '1'
-and allow an upgrade from the reset value.
+Is there anywhere that rejects pkey & 8 on arm64? Because with 128-bit
+PTEs, if we ever support them, we can have 4-bit pkeys.
 
-Finally, change the trap handling to inject an undef if MPAM was
-not advertised to the guest.
+>  #define arch_calc_vm_prot_bits(prot, pkey) arch_calc_vm_prot_bits(prot, pkey)
+> diff --git a/arch/arm64/include/asm/page.h b/arch/arm64/include/asm/page.h
+> index 2312e6ee595f..aabfda2516d2 100644
+> --- a/arch/arm64/include/asm/page.h
+> +++ b/arch/arm64/include/asm/page.h
+> @@ -49,6 +49,16 @@ int pfn_is_map_memory(unsigned long pfn);
+>  
+>  #define VM_DATA_DEFAULT_FLAGS	(VM_DATA_FLAGS_TSK_EXEC | VM_MTE_ALLOWED)
+>  
+> +#if defined(CONFIG_ARCH_HAS_PKEYS)
+> +/* A protection key is a 3-bit value */
+> +# define VM_PKEY_SHIFT	VM_HIGH_ARCH_BIT_2
+> +# define VM_PKEY_BIT0	VM_HIGH_ARCH_2
+> +# define VM_PKEY_BIT1	VM_HIGH_ARCH_3
+> +# define VM_PKEY_BIT2	VM_HIGH_ARCH_4
+> +# define VM_PKEY_BIT3	0
+> +# define VM_PKEY_BIT4	0
+> +#endif
 
-Full support will depend on an psuedo-device being created that
-describes the virt->phys PARTID mapping the VMM expects. Migration
-would be expected to fail if this psuedo-device can't be created
-on the remote end. This ID bit isn't needed to block migration.
+I think we should start from VM_HIGH_ARCH_BIT_0 and just move the
+VM_MTE, VM_MTE_ALLOWED to VM_HIGH_ARCH_BIT_{4,5}.
 
-Signed-off-by: James Morse <james.morse@arm.com>
----
- arch/arm64/kvm/sys_regs.c | 75 +++++++++++++++++++++++++++++++--------
- 1 file changed, 60 insertions(+), 15 deletions(-)
+> diff --git a/arch/powerpc/include/asm/page.h b/arch/powerpc/include/asm/page.h
+> index e5fcc79b5bfb..a5e75ec333ad 100644
+> --- a/arch/powerpc/include/asm/page.h
+> +++ b/arch/powerpc/include/asm/page.h
+> @@ -330,6 +330,17 @@ static inline unsigned long kaslr_offset(void)
+>  }
+>  
+>  #include <asm-generic/memory_model.h>
+> +
+> +#if defined(CONFIG_ARCH_HAS_PKEYS)
+> +# define VM_PKEY_SHIFT	VM_HIGH_ARCH_BIT_0
+> +/* A protection key is a 5-bit value */
+> +# define VM_PKEY_BIT0	VM_HIGH_ARCH_0
+> +# define VM_PKEY_BIT1	VM_HIGH_ARCH_1
+> +# define VM_PKEY_BIT2	VM_HIGH_ARCH_2
+> +# define VM_PKEY_BIT3	VM_HIGH_ARCH_3
+> +# define VM_PKEY_BIT4	VM_HIGH_ARCH_4
+> +#endif /* CONFIG_ARCH_HAS_PKEYS */
+> +
+>  #endif /* __ASSEMBLY__ */
+>  
+>  #endif /* _ASM_POWERPC_PAGE_H */
+> diff --git a/arch/x86/include/asm/page.h b/arch/x86/include/asm/page.h
+> index d18e5c332cb9..b770db1a21e7 100644
+> --- a/arch/x86/include/asm/page.h
+> +++ b/arch/x86/include/asm/page.h
+> @@ -87,5 +87,15 @@ static __always_inline u64 __is_canonical_address(u64 vaddr, u8 vaddr_bits)
+>  
+>  #define HAVE_ARCH_HUGETLB_UNMAPPED_AREA
+>  
+> +#if defined(CONFIG_ARCH_HAS_PKEYS)
+> +# define VM_PKEY_SHIFT	VM_HIGH_ARCH_BIT_0
+> +/* A protection key is a 4-bit value */
+> +# define VM_PKEY_BIT0	VM_HIGH_ARCH_0
+> +# define VM_PKEY_BIT1	VM_HIGH_ARCH_1
+> +# define VM_PKEY_BIT2	VM_HIGH_ARCH_2
+> +# define VM_PKEY_BIT3	VM_HIGH_ARCH_3
+> +# define VM_PKEY_BIT4	0
+> +#endif /* CONFIG_ARCH_HAS_PKEYS */
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 15fb9f54e308..055a72643aed 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -411,21 +411,29 @@ static bool trap_oslar_el1(struct kvm_vcpu *vcpu,
- 	return true;
- }
- 
--static bool workaround_bad_mpam_abi(struct kvm_vcpu *vcpu,
--				    struct sys_reg_params *p,
--				    const struct sys_reg_desc *r)
-+static bool trap_mpam(struct kvm_vcpu *vcpu,
-+		      struct sys_reg_params *p,
-+		      const struct sys_reg_desc *r)
- {
-+	u64 aa64pfr0_el1 = IDREG(vcpu->kvm, SYS_ID_AA64PFR0_EL1);
-+
- 	/*
--	 * The ID register can't be removed without breaking migration,
--	 * but MPAMIDR_EL1 can advertise all-zeroes, indicating there are zero
--	 * PARTID/PMG supported by the CPU, allowing the other two trapped
--	 * registers (MPAM1_EL1 and MPAM0_EL1) to be treated as RAZ/WI.
-+	 * What did we expose to the guest?
-+	 * Earlier guests may have seen the ID bits, which can't be removed
-+	 * without breaking migration, but MPAMIDR_EL1 can advertise all-zeroes,
-+	 * indicating there are zero PARTID/PMG supported by the CPU, allowing
-+	 * the other two trapped registers (MPAM1_EL1 and MPAM0_EL1) to be
-+	 * treated as RAZ/WI.
- 	 * Emulating MPAM1_EL1 as RAZ/WI means the guest sees the MPAMEN bit
- 	 * as clear, and realises MPAM isn't usable on this CPU.
- 	 */
--	p->regval = 0;
-+	if (FIELD_GET(ID_AA64PFR0_EL1_MPAM_MASK, aa64pfr0_el1)) {
-+		p->regval = 0;
-+		return true;
-+	}
- 
--	return true;
-+	kvm_inject_undefined(vcpu);
-+	return false;
- }
- 
- static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
-@@ -1326,6 +1334,36 @@ static s64 kvm_arm64_ftr_safe_value(u32 id, const struct arm64_ftr_bits *ftrp,
- 	return arm64_ftr_safe_value(&kvm_ftr, new, cur);
- }
- 
-+static u64 kvm_arm64_ftr_max(struct kvm_vcpu *vcpu,
-+			     const struct sys_reg_desc *rd)
-+{
-+	u64 pfr0, val = rd->reset(vcpu, rd);
-+	u32 field, id = reg_to_encoding(rd);
-+
-+	/*
-+	 * Some values may reset to a lower value than can be supported,
-+	 * get the maximum feature value.
-+	 */
-+	switch (id) {
-+	case SYS_ID_AA64PFR0_EL1:
-+		pfr0 = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-+
-+		/*
-+		 * MPAM resets to 0, but migration of MPAM=1 guests is needed.
-+		 * See trap_mpam() for more.
-+		 */
-+		field = cpuid_feature_extract_unsigned_field(pfr0, ID_AA64PFR0_EL1_MPAM_SHIFT);
-+		if (field == ID_AA64PFR0_EL1_MPAM_1) {
-+			val &= ~ID_AA64PFR0_EL1_MPAM_MASK;
-+			val |= FIELD_PREP(ID_AA64PFR0_EL1_MPAM_MASK, ID_AA64PFR0_EL1_MPAM_1);
-+		}
-+
-+		break;
-+	}
-+
-+	return val;
-+}
-+
- /*
-  * arm64_check_features() - Check if a feature register value constitutes
-  * a subset of features indicated by the idreg's KVM sanitised limit.
-@@ -1346,8 +1384,7 @@ static int arm64_check_features(struct kvm_vcpu *vcpu,
- 	const struct arm64_ftr_bits *ftrp = NULL;
- 	u32 id = reg_to_encoding(rd);
- 	u64 writable_mask = rd->val;
--	u64 limit = rd->reset(vcpu, rd);
--	u64 mask = 0;
-+	u64 limit, mask = 0;
- 
- 	/*
- 	 * Hidden and unallocated ID registers may not have a corresponding
-@@ -1361,6 +1398,7 @@ static int arm64_check_features(struct kvm_vcpu *vcpu,
- 	if (!ftr_reg)
- 		return -EINVAL;
- 
-+	limit = kvm_arm64_ftr_max(vcpu, rd);
- 	ftrp = ftr_reg->ftr_bits;
- 
- 	for (; ftrp && ftrp->width; ftrp++) {
-@@ -1570,6 +1608,14 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 
- 	val &= ~ID_AA64PFR0_EL1_AMU_MASK;
- 
-+	/*
-+	 * MPAM is disabled by default as KVM also needs a set of PARTID to
-+	 * program the MPAMVPMx_EL2 PARTID remapping registers with. But some
-+	 * older kernels let the guest see the ID bit. Turning it on causes
-+	 * the registers to be emulated as RAZ/WI. See trap_mpam() for more.
-+	 */
-+	val &= ~ID_AA64PFR0_EL1_MPAM_MASK;
-+
- 	return val;
- }
- 
-@@ -2149,7 +2195,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  .set_user = set_id_reg,
- 	  .reset = read_sanitised_id_aa64pfr0_el1,
- 	  .val = ~(ID_AA64PFR0_EL1_AMU |
--		   ID_AA64PFR0_EL1_MPAM |
- 		   ID_AA64PFR0_EL1_SVE |
- 		   ID_AA64PFR0_EL1_RAS |
- 		   ID_AA64PFR0_EL1_GIC |
-@@ -2292,11 +2337,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_LOREA_EL1), trap_loregion },
- 	{ SYS_DESC(SYS_LORN_EL1), trap_loregion },
- 	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
--	{ SYS_DESC(SYS_MPAMIDR_EL1), workaround_bad_mpam_abi },
-+	{ SYS_DESC(SYS_MPAMIDR_EL1), trap_mpam },
- 	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
- 
--	{ SYS_DESC(SYS_MPAM1_EL1), workaround_bad_mpam_abi },
--	{ SYS_DESC(SYS_MPAM0_EL1), workaround_bad_mpam_abi },
-+	{ SYS_DESC(SYS_MPAM1_EL1), trap_mpam },
-+	{ SYS_DESC(SYS_MPAM0_EL1), trap_mpam },
- 	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
- 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
- 
+Rather than moving these to arch code, we could instead keep the generic
+definitions with some additional CONFIG_ARCH_HAS_PKEYS_{3,4,5}BIT
+selected from the arch code.
+
 -- 
-2.39.2
-
+Catalin
