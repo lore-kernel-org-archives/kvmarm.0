@@ -1,57 +1,58 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92FD810A22
-	for <kvmarm@lists.linux.dev>; Fri,  8 Dec 2023 08:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEBB310969
+	for <kvmarm@lists.linux.dev>; Fri,  8 Dec 2023 08:20:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a7OVbmXu"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-67abd020f40so23088096d6.0
-        for <kvmarm@lists.linux.dev>; Fri, 08 Dec 2023 00:18:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YfjZILr0"
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-db8892a5f96so1942027276.2
+        for <kvmarm@lists.linux.dev>; Fri, 08 Dec 2023 00:20:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702023501; x=1702628301; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1702023620; x=1702628420; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=G34T/Gw6tDgRRxUpSxJ+EoHMEAfP6qfhrdkltLDdE0E=;
-        b=a7OVbmXuhUITfNJWytXZWEtKSvRy4LUfxkPTPdQBAsxlz0HPkF5qqKppGdJ9Qn0c0s
-         7unkPG6UPOQH8angWykVJwPCKToU3YZK2jklcGtmQeWMDWv+RqFSO3RPt5YrxpJiKvPG
-         NHRprBnMpaC4Sp0w6H7qH9rIhMaEYeFsuV1IMSYtjRCijtFSfQs8G0bBeXdOYc4t4HzY
-         RYaZdeUCe4hoKOAX3xPQCRDjt6aZ5AqGQfN5JFvfFl/MvJS/T4oye8uWYoC7pgQsB6vR
-         KlyOcNUebkxoJpK/CkMIVM9zRz14s1vPLFs5B8TcK+f2zrEs7+vyyE6eQkxDhWufMndx
-         DTwQ==
+        bh=6IVq5r+vNWXjvmE2KybM8jf/JrsATUf4eFpxstMy5F0=;
+        b=YfjZILr0gE9zvXWCTmtxnh3drXGtYVQ5RbO01KHw06CKQipIyXQEpRLKxLNFLMQ2gt
+         Q/qz14oSwkzZ+QqbsPC0wSAN7kA/4bfS7sEjEWUfmuRwz4Wr111uQMrEJE8/Yb53ZpUL
+         GXrvNwwBE/T+wn+UtE1zA8exfpYAcse3YWOTkRiyE9o+zD2vAbJqCVdVNfhCxsplUjoS
+         tKx7psTL1cPfNmNkas9eYVKpQIhTh13gKFsm8WC24GyZekwxGEhWLD6WhPaM83WP8/RN
+         DWx/E5m9u/dhf/2nqyPhFeCJk/F+X/Y9wiWr85uUrJboBzECEKhKZMrzctyoZXqm8lDP
+         n44Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702023501; x=1702628301;
+        d=1e100.net; s=20230601; t=1702023620; x=1702628420;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=G34T/Gw6tDgRRxUpSxJ+EoHMEAfP6qfhrdkltLDdE0E=;
-        b=c426oshRkxSGiRtYtwYjvqSMo5AVr0Hr4A9+syzDz4EiiVG0qQnu6NGD+7ypy5OaJV
-         JNMJUQnBltDb9uDtP+dY6eVI9hP1fq2NCAj9yLqji7/Volm9+raqFn4E7ySdfLgn64OU
-         0Vp554RkizL6EFnQY3NLaSIfla1ZMZITlaSS72dmqhkPGSHHMfFW1EH8mGnKUD4ZpVWc
-         Kqh3q5W+fH3LyjUN8QO3dG1fNLKIIU/orC0AA8OxfHfYuOzLB4+CE2K9iL4OVjkW307k
-         Vin7uSGuPKJorWay0X5YUFAsb65VLENFnTWunjZbUPT201H7mdMSAtYE7brD4bElEdWO
-         +qZw==
-X-Gm-Message-State: AOJu0Yw9EkjOSDMbUu0XP/y+xtoihSwHH9qH4KJ+rc0Haq8qzsHVUgAL
-	SpLVl1yfzzGxj7XN2REUg5RiMj3K0dW558X/hZ0B3g==
-X-Google-Smtp-Source: AGHT+IHoNv9J2q+enrFqBN1ho5Sa4DdPErX11SvuSSYguqJhOSIKIqYmCQIQKBJrsbBzX6Yt8o+Xh8gXgYYLP4Wkph0=
-X-Received: by 2002:a05:6214:5ec1:b0:67a:a721:7210 with SMTP id
- mn1-20020a0562145ec100b0067aa7217210mr689517qvb.45.1702023501286; Fri, 08 Dec
- 2023 00:18:21 -0800 (PST)
+        bh=6IVq5r+vNWXjvmE2KybM8jf/JrsATUf4eFpxstMy5F0=;
+        b=qhOdGBOyVrgPuzMKtrLg1Br9w9AvNVfLKmIvwVMLW7aSFrPHo1xwgger8BW4bcFMdT
+         +zl25R86IfjkNkWO0EDKVOf111ew31idBTnEpxdBStJQif7yRd9Jxu6oUs+fhHLFwto/
+         HGKSf7f4gMbI+znkyHLnO9iT5GCefVxl4oooHBh93Q/yqTnurkkG0B50gJ7Et6f9XiUM
+         poT3JM2lQkrZ6Y2XptuFbG88tjNAB+5c3QIQrPQOjJMfh6b+BRR0vMl+uif2jXzBAc5r
+         Fw1HZ9464Y+e5Ed3Xekd9F4HaqmL/b+ic5vM8Q/PpkObZzntbpSOq2vzICTaXFc9d2od
+         RwpA==
+X-Gm-Message-State: AOJu0YxNqsaffnPJ3ieuO3d34ouScdhcC8XKl+ZLFkS9Y/cv8ofcckr6
+	h/8YHRLq27URWJpM48Mn5cEYJMT/rbgDvkdaN5RQQw==
+X-Google-Smtp-Source: AGHT+IEAwXDfKI/rs/cVUYkNV8sjU8Z2rEH20XgkyYUOQxP3fMyLJX0wNSpi9gm8rcePGpmsRevDz17oAAzV7DKBgzI=
+X-Received: by 2002:a25:6853:0:b0:db7:dacf:621a with SMTP id
+ d80-20020a256853000000b00db7dacf621amr3645297ybc.108.1702023620460; Fri, 08
+ Dec 2023 00:20:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20231206100503.564090-1-tabba@google.com> <20231206100503.564090-5-tabba@google.com>
- <268ebe97-1f79-416e-805e-9a67144f6a99@sirena.org.uk>
-In-Reply-To: <268ebe97-1f79-416e-805e-9a67144f6a99@sirena.org.uk>
+References: <20231206100503.564090-1-tabba@google.com> <20231206100503.564090-6-tabba@google.com>
+ <006ec2b0-6263-4e86-8641-d81c01a91c8e@sirena.org.uk>
+In-Reply-To: <006ec2b0-6263-4e86-8641-d81c01a91c8e@sirena.org.uk>
 From: Fuad Tabba <tabba@google.com>
-Date: Fri, 8 Dec 2023 08:17:44 +0000
-Message-ID: <CA+EHjTy53FTm6QtwhDhRNQrz-7CNnQro4VS67eWq+_z5KBofmA@mail.gmail.com>
-Subject: Re: [PATCH v2 04/12] KVM: arm64: Add bit masks for HAFGRTR_EL2
+Date: Fri, 8 Dec 2023 08:19:43 +0000
+Message-ID: <CA+EHjTx42qgepOaFMt1wLSQ6uPUv8wQTa2z-Z_PEiVPUwYAL8A@mail.gmail.com>
+Subject: Re: [PATCH v2 05/12] KVM: arm64: Handle HAFGRTR_EL2 trapping in
+ nested virt
 To: Mark Brown <broonie@kernel.org>
 Cc: kvmarm@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev, 
 	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
@@ -63,31 +64,82 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-On Thu, Dec 7, 2023 at 5:19=E2=80=AFPM Mark Brown <broonie@kernel.org> wrot=
+On Thu, Dec 7, 2023 at 5:28=E2=80=AFPM Mark Brown <broonie@kernel.org> wrot=
 e:
 >
-> On Wed, Dec 06, 2023 at 10:04:54AM +0000, Fuad Tabba wrote:
-> > To support HAFGRTR_EL2 supported in nested virt in the following
-> > patch, first add its bitmask definitions based on the 2023-09
-> > Arm Architecture System Registers xml specification [*].
-> >
+> On Wed, Dec 06, 2023 at 10:04:55AM +0000, Fuad Tabba wrote:
+>
+> > Add the encodings to fine grain trapping fields for HAFGRTR_EL2
+> > and add the associated handling code in nested virt. Based on
+> > the 2023-09 Arm Architecture System Registers xml
+> > specification [*]. Add the missing field definitions as well,
+> > both to generate the correct RES0 mask and to be able to toggle
+> > their FGT bits.
+>
+> > Also add the code for handling FGT trapping, reading of the
+> > register, to nested virt.
+>
 > > [*] https://developer.arm.com/downloads/-/exploration-tools
 >
-> DDI0601 is a more stable name, and I'd have expected an "arm64/sysreg"
-> subject.
+> DDI0601.
 
-Got it.
+Yup! :)
 
-Cheers,
-/fuad
-
->
-> > +#define __HAFGRTR_EL2_RES0   (GENMASK(63, 50) | GENMASK(16, 5))
-> > +#define __HAFGRTR_EL2_MASK   (GENMASK(49, 17) | GENMASK(4, 0))
-> > +#define __HAFGRTR_EL2_nMASK  0UL
+> > +Sysreg HAFGRTR_EL2   3       4       3       1       6
+> > +Res0 63:50
+> > +Field        49      AMEVTYPER115_EL0
+> > +Field        48      AMEVCNTR115_EL0
+> > +Field        47      AMEVTYPER114_EL0
+> > +Field        46      AMEVCNTR114_EL0
+> > +Field        45      AMEVTYPER113_EL0
+> > +Field        44      AMEVCNTR113_EL0
+> > +Field        43      AMEVTYPER112_EL0
+> > +Field        42      AMEVCNTR112_EL0
+> > +Field        41      AMEVTYPER111_EL0
+> > +Field        40      AMEVCNTR111_EL0
+> > +Field        39      AMEVTYPER110_EL0
+> > +Field        38      AMEVCNTR110_EL0
+> > +Field        37      AMEVTYPER19_EL0
+> > +Field        36      AMEVCNTR19_EL0
+> > +Field        35      AMEVTYPER18_EL0
+> > +Field        34      AMEVCNTR18_EL0
+> > +Field        33      AMEVTYPER17_EL0
+> > +Field        32      AMEVCNTR17_EL0
+> > +Field        31      AMEVTYPER16_EL0
+> > +Field        30      AMEVCNTR16_EL0
+> > +Field        29      AMEVTYPER15_EL0
+> > +Field        28      AMEVCNTR15_EL0
+> > +Field        27      AMEVTYPER14_EL0
+> > +Field        26      AMEVCNTR14_EL0
+> > +Field        25      AMEVTYPER13_EL0
+> > +Field        24      AMEVCNTR13_EL0
+> > +Field        23      AMEVTYPER12_EL0
+> > +Field        22      AMEVCNTR12_EL0
+> > +Field        21      AMEVTYPER11_EL0
+> > +Field        20      AMEVCNTR11_EL0
+> > +Field        19      AMEVTYPER10_EL0
+> > +Field        18      AMEVCNTR10_EL0
+> > +Field        17      AMCNTEN1
+> > +Res0 16:5
+> > +Field        4       AMEVCNTR03_EL0
+> > +Field        3       AMEVCNTR02_EL0
+> > +Field        2       AMEVCNTR01_EL0
+> > +Field        1       AMEVCNTR00_EL0
+> > +Field        0       AMCNTEN0
+> > +EndSysreg
 > > +
 >
-> This one is an example of something where some manual encoding does make
-> sense given all the AMCNTEN<x> and so on fields so:
->
+> Oh, we actually have the register fully encoded since we needed the
+> fields.  Given this why did we need the manual encoding in the previous
+> patch?  In any case this looks good according to DDI0601 2023-09:
+
+We need both because we need to know the polarity. RES0 and the valid
+bits are generated. In later patches in this series I move completely
+to using the generated RES0, and to calculating nMASK based on the
+other fields. But we still need the definitions in kvm_arm.h for the
+polarity.
+
 > Reviewed-by: Mark Brown <broonie@kernel.org>
+
+Thanks!
+/fuad
