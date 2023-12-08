@@ -1,294 +1,84 @@
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C5C79FC
-	for <kvmarm@lists.linux.dev>; Fri,  8 Dec 2023 08:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA11A1C68F
+	for <kvmarm@lists.linux.dev>; Fri,  8 Dec 2023 13:43:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Mmas9y/t"
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-db547d3631fso2166552276.1
-        for <kvmarm@lists.linux.dev>; Fri, 08 Dec 2023 00:23:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702023823; x=1702628623; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iezF7LvvtFZph3ar5jkUi4VXBbzJv953B+IYNvhBxzc=;
-        b=Mmas9y/tZ8qP2PbxPsuAaPN+eTmTXJQfUhyQnuIZhzRVO/YghiWg7U/uY+x7eQFxW6
-         V/Gfx8uWwIn1KtNS8osi9G7yN6LO/uO8vCSGrcdApbkgD5UUNAVD5SlxLM4aHQlKMC+6
-         +VJk9Qpwz0nwn9Gzr/hH4iNoD/K2xxsfU1QXFRyFZY5y4kkwPH6V7gsv8/QaBozX3vfw
-         Q2Qwg+qE56sihEWuIbWItHuUovBrLVkEn1R+jMOCyqDSUKoD6ZUAbXyfvselAbEU4y5j
-         oL/+JygCjZAGVfMblIsZBZchDwDJoTHPZukGv0g4++QiMYGNzfdXpV3a70wkhPeEQPsc
-         9eFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702023823; x=1702628623;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iezF7LvvtFZph3ar5jkUi4VXBbzJv953B+IYNvhBxzc=;
-        b=UTqXvPUqrkH6BILU8+r3gQAYlIFBlwnwd/sEqcDbW9yb5umZfXf0+8tHUIGLiB0oY0
-         JGm1BpX7tg7S+jKxSJihbU4ddI0aoz2NY0qnKdvSE7HXPD0xLIgtjSkFmogtuNV98ef9
-         e6TnPz0R7Jsj5maXARoaUUQ2VPcLTls5GAsRGFyw4W8Hm0B0hOEvdZyQrC5oUyacj6Q7
-         2RT0mu2oQxK9L/gEk6qzc6c8RJQjN3lbPXkDWw1fNsTg6hX2fRYj4Tn7r5VtjBMWlqeP
-         BSNGkYzIenAwFLWy8t0Us21pbpCKNLbEltHaZQqY+A9LmzGIJ8RkXpUWRME1OMe7wSoi
-         z+hw==
-X-Gm-Message-State: AOJu0Yzd4ZUx5jgEm58LAIN6CyjnrZ44V9t6bcjUzUaSS6mJjpN353d3
-	vc6iUG/5+huaHhAYCHfVVvEw+VX+sBbnrcYMf/zxlg==
-X-Google-Smtp-Source: AGHT+IEdGll9KKqDqBhIRk0DNP0abxzIing8NLJwva3juwlX6EhXhgJAcPi2nNlkNwAFNy1AOxwkK1CYrtd3X05LqKI=
-X-Received: by 2002:a25:820d:0:b0:db5:45d7:48a0 with SMTP id
- q13-20020a25820d000000b00db545d748a0mr3602621ybk.16.1702023822606; Fri, 08
- Dec 2023 00:23:42 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ecWcsIQz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97EF7C433C7;
+	Fri,  8 Dec 2023 13:43:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702042995;
+	bh=NIaopYdM2dcbSTLvNOf5TaMdJYI+SlfvYNK2Nc//1iM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ecWcsIQzokRORkTk2si2o+3xKZi3O8jZNZEeTQa9nOgNuR9v/Tqw0sQxjX9ToUiJy
+	 aZ4wo/h6Ia8IxpslKFYVeJEaBhpgbmLrAWoYylnVndtlYR3FTlRB1CbsMxUelkdDrc
+	 OtiFut4SwJQAGObYqp43weVKzxijedIXScsAISxDmk+vEAEV2GRXtfinpGm6IRK9O7
+	 6RShr0b/eNsml/kM6tNUdv123TWP2f3d15iywmKb9Eeq+F7ETkjYCcpq8R94igCD9y
+	 4C28DLPMmSVi5t9ETMcS/xwnTVm6vXWE5woyJoxz59kJorLLlzA9AvHLd8av296OHd
+	 VG00orUmcB1ng==
+Date: Fri, 8 Dec 2023 13:43:06 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev,
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, eric.auger@redhat.com,
+	jingzhangos@google.com, joey.gouly@arm.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 01/12] KVM: Add missing HCRX_EL2 field definitions
+Message-ID: <ZXMdasQNGNPFPP3E@finisterre.sirena.org.uk>
+References: <20231206100503.564090-1-tabba@google.com>
+ <20231206100503.564090-2-tabba@google.com>
+ <7c85421b-5dfd-4931-bb14-aa2416e54b58@sirena.org.uk>
+ <CA+EHjTx7LJJzOHbO=ubWtuwhbVXd3FyX99Y6LxkT6u9vSx8qxA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20231206100503.564090-1-tabba@google.com> <20231206100503.564090-7-tabba@google.com>
- <20231207150001.GA29745@e124191.cambridge.arm.com> <CA+EHjTwC+66GyPma00XQ6VRzktYzxB7XXr+7zSKFrG6U-+EeEQ@mail.gmail.com>
- <20231207171237.GA87398@e124191.cambridge.arm.com>
-In-Reply-To: <20231207171237.GA87398@e124191.cambridge.arm.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 8 Dec 2023 08:23:05 +0000
-Message-ID: <CA+EHjTy7R6SmXwk5wGLuSpW1_Y5_VRA2==r0ix0g_Yr2rJXbbw@mail.gmail.com>
-Subject: Re: [PATCH v2 06/12] KVM: arm64: Update and fix FGT register masks
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev, 
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, eric.auger@redhat.com, 
-	jingzhangos@google.com, linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="P8UFquSP/kpFpiGD"
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTx7LJJzOHbO=ubWtuwhbVXd3FyX99Y6LxkT6u9vSx8qxA@mail.gmail.com>
+X-Cookie: Slow day.  Practice crawling.
+
+
+--P8UFquSP/kpFpiGD
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Hi Joey,
+On Fri, Dec 08, 2023 at 08:14:58AM +0000, Fuad Tabba wrote:
+> On Thu, Dec 7, 2023 at 4:57=E2=80=AFPM Mark Brown <broonie@kernel.org> wr=
+ote:
 
-On Thu, Dec 7, 2023 at 5:12=E2=80=AFPM Joey Gouly <joey.gouly@arm.com> wrot=
-e:
->
-> On Thu, Dec 07, 2023 at 03:06:44PM +0000, Fuad Tabba wrote:
-> > Hi Joey,
-> >
-> > On Thu, Dec 7, 2023 at 3:00=E2=80=AFPM Joey Gouly <joey.gouly@arm.com> =
-wrote:
-> > >
-> > > Hello Fuad,
-> > >
-> > > On Wed, Dec 06, 2023 at 10:04:56AM +0000, Fuad Tabba wrote:
-> > > > New trap bits have been defined in the 2023-09 Arm Architecture
-> > > > System Registers xml specification [*]. Moreover, the existing
-> > > > definitions of some of the mask and the RES0 bits overlap, which
-> > > > could be wrong, confusing, or both.
-> > > >
-> > > > Update the bits to represent the latest spec (as of this patch,
-> > > > 2023-09), and ensure that the existing bits are consistent.
-> > > >
-> > > > Subsequent patches will use the generated RES0 fields instead of
-> > > > specifying them manually. This patch keeps the manual encoding of
-> > > > the bits to make it easier to review the series.
-> > > >
-> > > > [*] https://developer.arm.com/downloads/-/exploration-tools
-> > > >
-> > > > Fixes: 0fd76865006d ("KVM: arm64: Add nPIR{E0}_EL1 to HFG traps")
-> > > > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > > > ---
-> > > >  arch/arm64/include/asm/kvm_arm.h | 39 ++++++++++++++++++++--------=
-----
-> > > >  1 file changed, 24 insertions(+), 15 deletions(-)
-> > > >
-> > > > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/=
-asm/kvm_arm.h
-> > > > index 7de0a7062625..b0dc3249d5cd 100644
-> > > > --- a/arch/arm64/include/asm/kvm_arm.h
-> > > > +++ b/arch/arm64/include/asm/kvm_arm.h
-> > > > @@ -344,30 +344,39 @@
-> > > >   * Once we get to a point where the two describe the same thing, w=
-e'll
-> > > >   * merge the definitions. One day.
-> > > >   */
-> > > > -#define __HFGRTR_EL2_RES0    (GENMASK(63, 56) | GENMASK(53, 51))
-> > > > +#define __HFGRTR_EL2_RES0    BIT(51)
-> > > >  #define __HFGRTR_EL2_MASK    GENMASK(49, 0)
-> > > > -#define __HFGRTR_EL2_nMASK   (GENMASK(58, 57) | GENMASK(55, 54) | =
-BIT(50))
-> > > > +#define __HFGRTR_EL2_nMASK   (GENMASK(63, 52) | BIT(50))
-> > > >
-> > > > -#define __HFGWTR_EL2_RES0    (GENMASK(63, 56) | GENMASK(53, 51) | =
-   \
-> > > > -                              BIT(46) | BIT(42) | BIT(40) | BIT(28=
-) | \
-> > > > -                              GENMASK(26, 25) | BIT(21) | BIT(18) =
-|  \
-> > > > +#define __HFGWTR_EL2_RES0    (BIT(51) | BIT(46) | BIT(42) | BIT(40=
-) | \
-> > > > +                              BIT(28) | GENMASK(26, 25) | BIT(21) =
-| BIT(18) | \
-> > > >                                GENMASK(15, 14) | GENMASK(10, 9) | B=
-IT(2))
-> > > > -#define __HFGWTR_EL2_MASK    GENMASK(49, 0)
-> > > > -#define __HFGWTR_EL2_nMASK   (GENMASK(58, 57) | GENMASK(55, 54) | =
-BIT(50))
-> > > > +#define __HFGWTR_EL2_MASK    (GENMASK(49, 47) | GENMASK(45, 43) | =
-\
-> > > > +                              BIT(41) | GENMASK(39, 29) | BIT(27) =
-| \
-> > > > +                              GENMASK(24, 22) | GENMASK(20, 19) | =
-\
-> > > > +                              GENMASK(17, 16) | GENMASK(13, 11) | =
-\
-> > > > +                              GENMASK(8, 3) | GENMASK(1, 0))
-> > > > +#define __HFGWTR_EL2_nMASK   (GENMASK(63, 52) | BIT(50))
-> > >
-> > > By adding all these bits to *_nMASK, we're allowing a guest to access=
- registers
-> > > which KVM doesn't (currently) deal with.  For example if I apply this=
- patch
-> > > series, a guest can access S2POR_EL1, previously it would print somet=
-hing like:
-> > >
-> > >         kvm [80]: Unsupported guest sys_reg access at: ffffc42969c1f2=
-70 [600000c5]
-> > >          { Op0( 3), Op1( 0), CRn(10), CRm( 2), Op2( 5), func_read },
-> > >
-> > > After applying this patch series, the guest can read S2POR_EL1.
-> > >
-> > > We don't expose S2POE to the guest through ID_AA64MMFR3_EL1, so a wel=
-l behaved
-> > > guest shouldn't access it, but there's nothing stopping it.
-> > >
-> > > My question is, is this intended? Or do we need to update the followi=
-ng code
-> > > (and comment!) to trap all the stuff we don't currently handle (along=
- with
-> > > ACCDATA_EL1):
-> >
-> > Thanks for pointing this out, and no, it's not intended. For
-> > consistency, I think it might be good to update the code, as you
-> > suggest, to prevent these accesses. If you and the other reviewers are
-> > happy with that solution I can respin with your suggested fix. I have
-> > a couple of other minor fixes as well for the series.
-> >
->
-> Thanks for clarifying that.
->
-> To me it seems weird to use the generated bits directly, and I think that=
-'s why
-> the code seems confusing?
->
-> I think we should stop using __HFGRTR_EL2_nMASK directly in that function=
-, and
-> build it up from '0'. This also matches, I think, with Marc Z wanting to =
-move
-> towards setting these things based on features [1], so maybe something li=
-ke:
->
->         u64 r_val =3D 0;
->
->         if (cpus_have_final_cap(ARM64_HAS_S1PIE))
->                 r_set |=3D HFGxTR_EL2_nPIR_EL1 | HFGxTR_EL2_nPIREO_EL1;
->
->         r_val |=3D r_set;
->         r_val &=3D ~r_clr;
->
->         write_sysreg_s(r_val, SYS_HFGRTR_EL2);
->
-> That way we just explicitly set which bits we don't want to trap on. We h=
-ave
-> some weird behaviour right now were we set nSMPRI_EL1 to 1, unless you ha=
-ve
-> FEAT_SME where we set it to 0.. but if you don't have FEAT_SME it's RES0
-> anyway? The above approach would fix that.
+> > (that series does make use of EnFPM).  Given the likelyhood of overlaps
+> > like this I really think we should be merging these sysreg updates even
+> > if the serieses that depend on them are still in flight, it doesn't make
+> > sense for multiple people to end up doing the typing.
 
-I don't have a strong opinion about that, but I am inclined to agree
-with you. Let's also hear what Marc Zygier (since he's the author of
-that part) opinion is, and I'm happy either way.
+> Makes sense. We'll ask one of the maintainers to pick up your updates.
 
-Cheers,
-/fuad
+Thanks.  I'm in the middle of pulling a series together which gathers
+all the sysreg additions I'm aware of together which are ready
+(including yours from this series) - should be out later today unless
+something unexpected happens in my CI, hopefully one way or another
+everything will get pulled in.  I'll Cc you when I post.
 
-> Thanks,
-> Joey
->
-> [1] https://lore.kernel.org/linux-arm-kernel/87bkb285ud.wl-maz@kernel.org=
-/ (last paragraph)
->
-> >
-> > Cheers,
-> > /fuad
-> >
-> >
-> > >
-> > >         static inline void __activate_traps_hfgxtr(struct kvm_vcpu *v=
-cpu)
-> > >         {
-> > >
-> > >                 ..
-> > >
-> > >                 /* The default is not to trap anything but ACCDATA_EL=
-1 */
-> > >                 r_val =3D __HFGRTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_E=
-L1;
-> > >                 r_val |=3D r_set;
-> > >                 r_val &=3D ~r_clr;
-> > >
-> > >
-> > > Thanks,
-> > > Joey
-> > >
-> > > >
-> > > > -#define __HFGITR_EL2_RES0    GENMASK(63, 57)
-> > > > -#define __HFGITR_EL2_MASK    GENMASK(54, 0)
-> > > > -#define __HFGITR_EL2_nMASK   GENMASK(56, 55)
-> > > > +#define __HFGITR_EL2_RES0    (BIT(63) | BIT(61))
-> > > > +#define __HFGITR_EL2_MASK    (BIT(62) | BIT(60) | GENMASK(54, 0))
-> > > > +#define __HFGITR_EL2_nMASK   GENMASK(59, 55)
-> > > >
-> > > >  #define __HDFGRTR_EL2_RES0   (BIT(49) | BIT(42) | GENMASK(39, 38) =
-|  \
-> > > >                                GENMASK(21, 20) | BIT(8))
-> > > > -#define __HDFGRTR_EL2_MASK   ~__HDFGRTR_EL2_nMASK
-> > > > +#define __HDFGRTR_EL2_MASK   (BIT(63) | GENMASK(58, 50) | GENMASK(=
-48, 43) | \
-> > > > +                              GENMASK(41, 40) | GENMASK(37, 22) | =
-\
-> > > > +                              GENMASK(19, 9) | GENMASK(7, 0))
-> > > >  #define __HDFGRTR_EL2_nMASK  GENMASK(62, 59)
-> > > >
-> > > >  #define __HDFGWTR_EL2_RES0   (BIT(63) | GENMASK(59, 58) | BIT(51) =
-| BIT(47) | \
-> > > >                                BIT(43) | GENMASK(40, 38) | BIT(34) =
-| BIT(30) | \
-> > > >                                BIT(22) | BIT(9) | BIT(6))
-> > > > -#define __HDFGWTR_EL2_MASK   ~__HDFGWTR_EL2_nMASK
-> > > > +#define __HDFGWTR_EL2_MASK   (GENMASK(57, 52) | GENMASK(50, 48) | =
-\
-> > > > +                              GENMASK(46, 44) | GENMASK(42, 41) | =
-\
-> > > > +                              GENMASK(37, 35) | GENMASK(33, 31) | =
-\
-> > > > +                              GENMASK(29, 23) | GENMASK(21, 10) | =
-\
-> > > > +                              GENMASK(8, 7) | GENMASK(5, 0))
-> > > >  #define __HDFGWTR_EL2_nMASK  GENMASK(62, 60)
-> > > >
-> > > >  #define __HAFGRTR_EL2_RES0   (GENMASK(63, 50) | GENMASK(16, 5))
-> > > > @@ -375,9 +384,9 @@
-> > > >  #define __HAFGRTR_EL2_nMASK  0UL
-> > > >
-> > > >  /* Similar definitions for HCRX_EL2 */
-> > > > -#define __HCRX_EL2_RES0              (GENMASK(63, 16) | GENMASK(13=
-, 12))
-> > > > -#define __HCRX_EL2_MASK              (0)
-> > > > -#define __HCRX_EL2_nMASK     (GENMASK(15, 14) | GENMASK(4, 0))
-> > > > +#define __HCRX_EL2_RES0         (GENMASK(63, 25) | GENMASK(13, 12)=
-)
-> > > > +#define __HCRX_EL2_MASK              (BIT(6))
-> > > > +#define __HCRX_EL2_nMASK     (GENMASK(24, 14) | GENMASK(11, 7) | G=
-ENMASK(5, 0))
-> > > >
-> > > >  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
-> > > >  #define HPFAR_MASK   (~UL(0xf))
-> > > > --
-> > > > 2.43.0.rc2.451.g8631bc7472-goog
-> > > >
-> > > >
+--P8UFquSP/kpFpiGD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmVzHWkACgkQJNaLcl1U
+h9BGtQf+NM9tYc+9+rWjKm73CKYuewaN1IoSTN2pe8uD4f5xMHsHfpHyhsouSSzk
+46X9BiWJtjtB2fvCHzHLbMZ5T+Euf5gpMonn5QS9DXkJfqz6P8x93xEFn2FYmfIb
+z5mwz5SyZ2pZ11k4hJ5aUfBHY7Xyvum8N1v4xNgYs90+bZwNaTJY12U/w2gUOi46
+HlG8mPXrXrVtan7iyreL4E3v5WbPIuHlXgFvlPgTqoemPrFq1cdmlt+BL9MtfeDW
+pFUC+JI7T+FoiaKtuFzVV9kyNSdhbWMMDyBg6WDOT35U7bMuIGBn7cGEkGzqjzss
+IHjZhgcnUJqCN03K3SNezKI+40Ni7Q==
+=yrCp
+-----END PGP SIGNATURE-----
+
+--P8UFquSP/kpFpiGD--
