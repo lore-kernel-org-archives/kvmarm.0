@@ -1,115 +1,116 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3FA71F61F
-	for <kvmarm@lists.linux.dev>; Fri,  8 Dec 2023 18:12:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10D2D37D3E
+	for <kvmarm@lists.linux.dev>; Fri,  8 Dec 2023 21:01:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fFvNqzqc"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702059140;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/TkwU2denrfJVnTiAIr/mTvHxt1y7el//yhAIkwpoKI=;
-	b=fFvNqzqcsyyjKH4iPJvkc881fjGtkS+GhKaGqzVgvofYH/nCIT1IAJGFiKYt1PSVId8uJk
-	WQvbdK7kR1872zcyBiTPfKVJbFE1af2VsGUYd/TgYLpsbkr/JcaQmHFzSQBp2AQ3qjAj0Y
-	KCCgkxiYdhJP5WSIvzEYtDA+p1iJTgw=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-93-qjIsQmxmOPuvvnWNxjrPiw-1; Fri, 08 Dec 2023 13:12:19 -0500
-X-MC-Unique: qjIsQmxmOPuvvnWNxjrPiw-1
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-6d8647941eeso3174091a34.3
-        for <kvmarm@lists.linux.dev>; Fri, 08 Dec 2023 10:12:19 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T+to0IRk"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-daf702bde7eso2738155276.3
+        for <kvmarm@lists.linux.dev>; Fri, 08 Dec 2023 13:01:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702069292; x=1702674092; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=cPvsp4vtrotIomPKqq2ImuA44XLC/C4iYoGwJqvn3h8=;
+        b=T+to0IRkohELp9qoh0Xq8M8IV3eFow0hADROFccT6RCX7bzhCd6HVbWUa2b8PeGpbP
+         c1w0O4g/aYn5qWCp61ChECYq77XkCL3Shh3nCtO3zJoWA3ZNokt2iU2Mx3Zc7ekR3EFM
+         4+ejOUb/U39sBK6Oc2OcyLAgKtcs7CukLHfkrysQqWxYR1NTc6YXNj4+PjI4m3rQceLB
+         729N0x8tFAARIemwLcSnIXVQN+zcx6b7e3bVN0PChOLnEQ2KlfBWXd+LuQNEbUQak5cV
+         YLdbkmxHzcOtoW+gLZDyjSRLeAR3VqE9N2N9j+LV9b1uxoGDdEjBBrPPjBg5MrXlMQvf
+         ptQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702059138; x=1702663938;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/TkwU2denrfJVnTiAIr/mTvHxt1y7el//yhAIkwpoKI=;
-        b=ATYfA4+y04dSa9AFVM5DRHPWmCSWsfBcjJ0kEXrNSU7h7v1RYDhXsM5z/6/j4xKQTU
-         4RFobvjOPL1QyjqPETrNufRlS5Ds7//iI0qRdu15hffVmmx7UOSMEAMEj1dfaHO99wyn
-         qW2/Y1ooOf90CoRdkEfWTu9eYPLLovXFjI6BPK9ZoZAmpdulLoChVAC/DHpVDmadzUYI
-         uRcR/FSf6pwCbL0x+yT+spUqAszTVjvmfhcr6wFNnHeT5UMCZ/7/p1SGUwwsCJ4HayJ1
-         h3bw0naoLu166n4pP36lXNqWuTcdTVmEN3IgZdmh6uDKRMK4fy1Gz2g85v3aYtJosdtF
-         nuWg==
-X-Gm-Message-State: AOJu0YxXM5X6sodmTUh5qk+JwuOpd5uNFWtgn/xhoaEIzGU1YXQuoHAQ
-	fFpH+WZHLonyBl/eUb7huJA9CRu7AJUiiXmLF2UeOxWyVgF/fU9QlsZXCYoT8rspTCyHpzH95D1
-	M6AqMljvJCIyKSygkGyZl0wEoRFwUjv0s
-X-Received: by 2002:a05:6870:4728:b0:1fb:75a:de78 with SMTP id b40-20020a056870472800b001fb075ade78mr583896oaq.102.1702059138560;
-        Fri, 08 Dec 2023 10:12:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG1dBdgMfiuSi5uz+rVRXvKDkpoT9HYByD4Nc2YMvjQiYfF5kVpiZ92tDqJoUOJ4qc/qdT3rZOFMba0vNgZ4z4=
-X-Received: by 2002:a05:6870:4728:b0:1fb:75a:de78 with SMTP id
- b40-20020a056870472800b001fb075ade78mr583887oaq.102.1702059138295; Fri, 08
- Dec 2023 10:12:18 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702069292; x=1702674092;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cPvsp4vtrotIomPKqq2ImuA44XLC/C4iYoGwJqvn3h8=;
+        b=LDlB4QO0T1GG0Hxsi8uijDnSvh67XULT8pmHYQUv11yog08dze4sSUIRfzV1wLovUf
+         D7rPwi1P/FWfYBUySOJDskZ8K8jTfplRM5pzqq51TfxiIUQeDhaDFfkeJp/gGKtS0nrr
+         iE2xVTXLBeMF1OE34UfZ4yWj/B7h8zUOva/H/Sd4nHOne18VPn9ERFyGWQCwGBgx/Oyb
+         z7gy7hmPGxtIZwgrnQ3mQBitVqhWbEuVKhwbZv471wry/3ISgv3rzb4gb8Bi+/Pb+dyp
+         lT1MeKofMG+z+q8KxaxWfeXYIdbA8KD7qcFbAnGRzhPQnBdvI+DjRcByJpA9I6vsLyJz
+         A0ig==
+X-Gm-Message-State: AOJu0YyuBtljRg0vfKGPuK9wgux+6mydQ95DdZ7UsmZp/yXQpRojV6lR
+	eBt/aBpX5lZR6vGZsYzWhsVmLo37VVrSvqYvSA==
+X-Google-Smtp-Source: AGHT+IE2+v2iURbPda/UkDDifecJeozbvSa31F1K3eqBpsYJtjPo/blaA3H9UAXge83pUxWRcqNIFPEBrorUs01B8g==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a25:b94e:0:b0:db4:4df:8c0d with SMTP
+ id s14-20020a25b94e000000b00db404df8c0dmr4660ybm.11.1702069291893; Fri, 08
+ Dec 2023 13:01:31 -0800 (PST)
+Date: Fri, 08 Dec 2023 21:01:30 +0000
+In-Reply-To: <ZV4924juGGCk2cjf@linux.dev> (message from Oliver Upton on Wed,
+ 22 Nov 2023 17:43:55 +0000)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <ZWufQneeJiBJLnPb@thinky-boi>
-In-Reply-To: <ZWufQneeJiBJLnPb@thinky-boi>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 8 Dec 2023 19:12:05 +0100
-Message-ID: <CABgObfbCy-9VpN+tOvXtS3RcA-M67Vwm7GmoBGmaG+0wrs1Eeg@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.7, take #1
+Mime-Version: 1.0
+Message-ID: <gsnt7clov26t.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v3 1/3] KVM: arm64: selftests: Standardize GIC base addresses
+From: Colton Lewis <coltonlewis@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Kunkun Jiang <jiangkunkun@huawei.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc: kvm@vger.kernel.org, maz@kernel.org, james.morse@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, ricarkol@google.com, 
+	kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On Sat, Dec 2, 2023 at 10:19=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> Hi Paolo,
->
-> Here's the first set of fixes for 6.7. There hasn't been very many
-> interesting issues that have come up this cycle, so it is only a single
-> patch this time around.
->
-> Please pull :)
+Oliver Upton <oliver.upton@linux.dev> writes:
 
-Pulled, thanks.
+> On Fri, Nov 03, 2023 at 07:29:13PM +0000, Colton Lewis wrote:
+>> Use default values during GIC initialization and setup to avoid
+>> multiple tests needing to decide and declare base addresses for GICD
+>> and GICR. Remove the repeated definitions of these addresses across
+>> tests.
 
-Paolo
+>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
 
-> --
-> Thanks,
-> Oliver
->
-> The following changes since commit b85ea95d086471afb4ad062012a4d73cd328fa=
-86:
->
->   Linux 6.7-rc1 (2023-11-12 16:19:07 -0800)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kv=
-marm-fixes-6.7-1
->
-> for you to fetch changes up to 8e4ece6889a5b1836b6a135827ac831a5350602a:
->
->   KVM: arm64: GICv4: Do not perform a map to a mapped vLPI (2023-11-20 19=
-:13:32 +0000)
->
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 6.7, take #1
->
->  - Avoid mapping vLPIs that have already been mapped
->
-> ----------------------------------------------------------------
-> Kunkun Jiang (1):
->       KVM: arm64: GICv4: Do not perform a map to a mapped vLPI
->
->  arch/arm64/kvm/vgic/vgic-v4.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
+> <snip>
 
+>> -void gic_init(enum gic_type type, unsigned int nr_cpus,
+>> +void _gic_init(enum gic_type type, unsigned int nr_cpus,
+>>   		void *dist_base, void *redist_base)
+>>   {
+>>   	uint32_t cpu = guest_get_vcpuid();
+>> @@ -63,6 +63,11 @@ void gic_init(enum gic_type type, unsigned int  
+>> nr_cpus,
+>>   	gic_cpu_init(cpu, redist_base);
+>>   }
+
+>> +void gic_init(enum gic_type type, unsigned int nr_cpus)
+>> +{
+>> +	_gic_init(type, nr_cpus, (void *)GICD_BASE_GPA, (void *)GICR_BASE_GPA);
+>> +}
+>> +
+
+> </snip>
+
+>> -int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t  
+>> nr_irqs,
+>> +int _vgic_v3_setup(struct kvm_vm *vm, uint32_t nr_vcpus, uint32_t  
+>> nr_irqs,
+>>   		uint64_t gicd_base_gpa, uint64_t gicr_base_gpa)
+>>   {
+>>   	int gic_fd;
+>> @@ -79,6 +79,11 @@ int vgic_v3_setup(struct kvm_vm *vm, unsigned int  
+>> nr_vcpus, uint32_t nr_irqs,
+>>   	return gic_fd;
+>>   }
+
+>> +int vgic_v3_setup(struct kvm_vm *vm, uint32_t nr_vcpus, uint32_t  
+>> nr_irqs)
+>> +{
+>> +	return _vgic_v3_setup(vm, nr_vcpus, nr_irqs, GICD_BASE_GPA,  
+>> GICR_BASE_GPA);
+>> +}
+>> +
+
+> What's the point of having the internal implementations of these
+> functions that still take addresses? If we're standardizing GIC
+> placement then there's no need for allowing the caller to provide
+> different addresses.
+
+I wasn't sure if there might be a reason for that allowance I was
+unaware of since that's what the original interface was so I erred on
+the side of flexibility. I'll delete it.
