@@ -1,145 +1,294 @@
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEBB310969
-	for <kvmarm@lists.linux.dev>; Fri,  8 Dec 2023 08:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C5C79FC
+	for <kvmarm@lists.linux.dev>; Fri,  8 Dec 2023 08:23:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YfjZILr0"
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-db8892a5f96so1942027276.2
-        for <kvmarm@lists.linux.dev>; Fri, 08 Dec 2023 00:20:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Mmas9y/t"
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-db547d3631fso2166552276.1
+        for <kvmarm@lists.linux.dev>; Fri, 08 Dec 2023 00:23:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702023620; x=1702628420; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1702023823; x=1702628623; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6IVq5r+vNWXjvmE2KybM8jf/JrsATUf4eFpxstMy5F0=;
-        b=YfjZILr0gE9zvXWCTmtxnh3drXGtYVQ5RbO01KHw06CKQipIyXQEpRLKxLNFLMQ2gt
-         Q/qz14oSwkzZ+QqbsPC0wSAN7kA/4bfS7sEjEWUfmuRwz4Wr111uQMrEJE8/Yb53ZpUL
-         GXrvNwwBE/T+wn+UtE1zA8exfpYAcse3YWOTkRiyE9o+zD2vAbJqCVdVNfhCxsplUjoS
-         tKx7psTL1cPfNmNkas9eYVKpQIhTh13gKFsm8WC24GyZekwxGEhWLD6WhPaM83WP8/RN
-         DWx/E5m9u/dhf/2nqyPhFeCJk/F+X/Y9wiWr85uUrJboBzECEKhKZMrzctyoZXqm8lDP
-         n44Q==
+        bh=iezF7LvvtFZph3ar5jkUi4VXBbzJv953B+IYNvhBxzc=;
+        b=Mmas9y/tZ8qP2PbxPsuAaPN+eTmTXJQfUhyQnuIZhzRVO/YghiWg7U/uY+x7eQFxW6
+         V/Gfx8uWwIn1KtNS8osi9G7yN6LO/uO8vCSGrcdApbkgD5UUNAVD5SlxLM4aHQlKMC+6
+         +VJk9Qpwz0nwn9Gzr/hH4iNoD/K2xxsfU1QXFRyFZY5y4kkwPH6V7gsv8/QaBozX3vfw
+         Q2Qwg+qE56sihEWuIbWItHuUovBrLVkEn1R+jMOCyqDSUKoD6ZUAbXyfvselAbEU4y5j
+         oL/+JygCjZAGVfMblIsZBZchDwDJoTHPZukGv0g4++QiMYGNzfdXpV3a70wkhPeEQPsc
+         9eFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702023620; x=1702628420;
+        d=1e100.net; s=20230601; t=1702023823; x=1702628623;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6IVq5r+vNWXjvmE2KybM8jf/JrsATUf4eFpxstMy5F0=;
-        b=qhOdGBOyVrgPuzMKtrLg1Br9w9AvNVfLKmIvwVMLW7aSFrPHo1xwgger8BW4bcFMdT
-         +zl25R86IfjkNkWO0EDKVOf111ew31idBTnEpxdBStJQif7yRd9Jxu6oUs+fhHLFwto/
-         HGKSf7f4gMbI+znkyHLnO9iT5GCefVxl4oooHBh93Q/yqTnurkkG0B50gJ7Et6f9XiUM
-         poT3JM2lQkrZ6Y2XptuFbG88tjNAB+5c3QIQrPQOjJMfh6b+BRR0vMl+uif2jXzBAc5r
-         Fw1HZ9464Y+e5Ed3Xekd9F4HaqmL/b+ic5vM8Q/PpkObZzntbpSOq2vzICTaXFc9d2od
-         RwpA==
-X-Gm-Message-State: AOJu0YxNqsaffnPJ3ieuO3d34ouScdhcC8XKl+ZLFkS9Y/cv8ofcckr6
-	h/8YHRLq27URWJpM48Mn5cEYJMT/rbgDvkdaN5RQQw==
-X-Google-Smtp-Source: AGHT+IEAwXDfKI/rs/cVUYkNV8sjU8Z2rEH20XgkyYUOQxP3fMyLJX0wNSpi9gm8rcePGpmsRevDz17oAAzV7DKBgzI=
-X-Received: by 2002:a25:6853:0:b0:db7:dacf:621a with SMTP id
- d80-20020a256853000000b00db7dacf621amr3645297ybc.108.1702023620460; Fri, 08
- Dec 2023 00:20:20 -0800 (PST)
+        bh=iezF7LvvtFZph3ar5jkUi4VXBbzJv953B+IYNvhBxzc=;
+        b=UTqXvPUqrkH6BILU8+r3gQAYlIFBlwnwd/sEqcDbW9yb5umZfXf0+8tHUIGLiB0oY0
+         JGm1BpX7tg7S+jKxSJihbU4ddI0aoz2NY0qnKdvSE7HXPD0xLIgtjSkFmogtuNV98ef9
+         e6TnPz0R7Jsj5maXARoaUUQ2VPcLTls5GAsRGFyw4W8Hm0B0hOEvdZyQrC5oUyacj6Q7
+         2RT0mu2oQxK9L/gEk6qzc6c8RJQjN3lbPXkDWw1fNsTg6hX2fRYj4Tn7r5VtjBMWlqeP
+         BSNGkYzIenAwFLWy8t0Us21pbpCKNLbEltHaZQqY+A9LmzGIJ8RkXpUWRME1OMe7wSoi
+         z+hw==
+X-Gm-Message-State: AOJu0Yzd4ZUx5jgEm58LAIN6CyjnrZ44V9t6bcjUzUaSS6mJjpN353d3
+	vc6iUG/5+huaHhAYCHfVVvEw+VX+sBbnrcYMf/zxlg==
+X-Google-Smtp-Source: AGHT+IEdGll9KKqDqBhIRk0DNP0abxzIing8NLJwva3juwlX6EhXhgJAcPi2nNlkNwAFNy1AOxwkK1CYrtd3X05LqKI=
+X-Received: by 2002:a25:820d:0:b0:db5:45d7:48a0 with SMTP id
+ q13-20020a25820d000000b00db545d748a0mr3602621ybk.16.1702023822606; Fri, 08
+ Dec 2023 00:23:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20231206100503.564090-1-tabba@google.com> <20231206100503.564090-6-tabba@google.com>
- <006ec2b0-6263-4e86-8641-d81c01a91c8e@sirena.org.uk>
-In-Reply-To: <006ec2b0-6263-4e86-8641-d81c01a91c8e@sirena.org.uk>
+References: <20231206100503.564090-1-tabba@google.com> <20231206100503.564090-7-tabba@google.com>
+ <20231207150001.GA29745@e124191.cambridge.arm.com> <CA+EHjTwC+66GyPma00XQ6VRzktYzxB7XXr+7zSKFrG6U-+EeEQ@mail.gmail.com>
+ <20231207171237.GA87398@e124191.cambridge.arm.com>
+In-Reply-To: <20231207171237.GA87398@e124191.cambridge.arm.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Fri, 8 Dec 2023 08:19:43 +0000
-Message-ID: <CA+EHjTx42qgepOaFMt1wLSQ6uPUv8wQTa2z-Z_PEiVPUwYAL8A@mail.gmail.com>
-Subject: Re: [PATCH v2 05/12] KVM: arm64: Handle HAFGRTR_EL2 trapping in
- nested virt
-To: Mark Brown <broonie@kernel.org>
+Date: Fri, 8 Dec 2023 08:23:05 +0000
+Message-ID: <CA+EHjTy7R6SmXwk5wGLuSpW1_Y5_VRA2==r0ix0g_Yr2rJXbbw@mail.gmail.com>
+Subject: Re: [PATCH v2 06/12] KVM: arm64: Update and fix FGT register masks
+To: Joey Gouly <joey.gouly@arm.com>
 Cc: kvmarm@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev, 
 	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
 	catalin.marinas@arm.com, will@kernel.org, eric.auger@redhat.com, 
-	jingzhangos@google.com, joey.gouly@arm.com, 
-	linux-arm-kernel@lists.infradead.org
+	jingzhangos@google.com, linux-arm-kernel@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Joey,
 
-On Thu, Dec 7, 2023 at 5:28=E2=80=AFPM Mark Brown <broonie@kernel.org> wrot=
+On Thu, Dec 7, 2023 at 5:12=E2=80=AFPM Joey Gouly <joey.gouly@arm.com> wrot=
 e:
 >
-> On Wed, Dec 06, 2023 at 10:04:55AM +0000, Fuad Tabba wrote:
+> On Thu, Dec 07, 2023 at 03:06:44PM +0000, Fuad Tabba wrote:
+> > Hi Joey,
+> >
+> > On Thu, Dec 7, 2023 at 3:00=E2=80=AFPM Joey Gouly <joey.gouly@arm.com> =
+wrote:
+> > >
+> > > Hello Fuad,
+> > >
+> > > On Wed, Dec 06, 2023 at 10:04:56AM +0000, Fuad Tabba wrote:
+> > > > New trap bits have been defined in the 2023-09 Arm Architecture
+> > > > System Registers xml specification [*]. Moreover, the existing
+> > > > definitions of some of the mask and the RES0 bits overlap, which
+> > > > could be wrong, confusing, or both.
+> > > >
+> > > > Update the bits to represent the latest spec (as of this patch,
+> > > > 2023-09), and ensure that the existing bits are consistent.
+> > > >
+> > > > Subsequent patches will use the generated RES0 fields instead of
+> > > > specifying them manually. This patch keeps the manual encoding of
+> > > > the bits to make it easier to review the series.
+> > > >
+> > > > [*] https://developer.arm.com/downloads/-/exploration-tools
+> > > >
+> > > > Fixes: 0fd76865006d ("KVM: arm64: Add nPIR{E0}_EL1 to HFG traps")
+> > > > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > > > ---
+> > > >  arch/arm64/include/asm/kvm_arm.h | 39 ++++++++++++++++++++--------=
+----
+> > > >  1 file changed, 24 insertions(+), 15 deletions(-)
+> > > >
+> > > > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/=
+asm/kvm_arm.h
+> > > > index 7de0a7062625..b0dc3249d5cd 100644
+> > > > --- a/arch/arm64/include/asm/kvm_arm.h
+> > > > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > > > @@ -344,30 +344,39 @@
+> > > >   * Once we get to a point where the two describe the same thing, w=
+e'll
+> > > >   * merge the definitions. One day.
+> > > >   */
+> > > > -#define __HFGRTR_EL2_RES0    (GENMASK(63, 56) | GENMASK(53, 51))
+> > > > +#define __HFGRTR_EL2_RES0    BIT(51)
+> > > >  #define __HFGRTR_EL2_MASK    GENMASK(49, 0)
+> > > > -#define __HFGRTR_EL2_nMASK   (GENMASK(58, 57) | GENMASK(55, 54) | =
+BIT(50))
+> > > > +#define __HFGRTR_EL2_nMASK   (GENMASK(63, 52) | BIT(50))
+> > > >
+> > > > -#define __HFGWTR_EL2_RES0    (GENMASK(63, 56) | GENMASK(53, 51) | =
+   \
+> > > > -                              BIT(46) | BIT(42) | BIT(40) | BIT(28=
+) | \
+> > > > -                              GENMASK(26, 25) | BIT(21) | BIT(18) =
+|  \
+> > > > +#define __HFGWTR_EL2_RES0    (BIT(51) | BIT(46) | BIT(42) | BIT(40=
+) | \
+> > > > +                              BIT(28) | GENMASK(26, 25) | BIT(21) =
+| BIT(18) | \
+> > > >                                GENMASK(15, 14) | GENMASK(10, 9) | B=
+IT(2))
+> > > > -#define __HFGWTR_EL2_MASK    GENMASK(49, 0)
+> > > > -#define __HFGWTR_EL2_nMASK   (GENMASK(58, 57) | GENMASK(55, 54) | =
+BIT(50))
+> > > > +#define __HFGWTR_EL2_MASK    (GENMASK(49, 47) | GENMASK(45, 43) | =
+\
+> > > > +                              BIT(41) | GENMASK(39, 29) | BIT(27) =
+| \
+> > > > +                              GENMASK(24, 22) | GENMASK(20, 19) | =
+\
+> > > > +                              GENMASK(17, 16) | GENMASK(13, 11) | =
+\
+> > > > +                              GENMASK(8, 3) | GENMASK(1, 0))
+> > > > +#define __HFGWTR_EL2_nMASK   (GENMASK(63, 52) | BIT(50))
+> > >
+> > > By adding all these bits to *_nMASK, we're allowing a guest to access=
+ registers
+> > > which KVM doesn't (currently) deal with.  For example if I apply this=
+ patch
+> > > series, a guest can access S2POR_EL1, previously it would print somet=
+hing like:
+> > >
+> > >         kvm [80]: Unsupported guest sys_reg access at: ffffc42969c1f2=
+70 [600000c5]
+> > >          { Op0( 3), Op1( 0), CRn(10), CRm( 2), Op2( 5), func_read },
+> > >
+> > > After applying this patch series, the guest can read S2POR_EL1.
+> > >
+> > > We don't expose S2POE to the guest through ID_AA64MMFR3_EL1, so a wel=
+l behaved
+> > > guest shouldn't access it, but there's nothing stopping it.
+> > >
+> > > My question is, is this intended? Or do we need to update the followi=
+ng code
+> > > (and comment!) to trap all the stuff we don't currently handle (along=
+ with
+> > > ACCDATA_EL1):
+> >
+> > Thanks for pointing this out, and no, it's not intended. For
+> > consistency, I think it might be good to update the code, as you
+> > suggest, to prevent these accesses. If you and the other reviewers are
+> > happy with that solution I can respin with your suggested fix. I have
+> > a couple of other minor fixes as well for the series.
+> >
 >
-> > Add the encodings to fine grain trapping fields for HAFGRTR_EL2
-> > and add the associated handling code in nested virt. Based on
-> > the 2023-09 Arm Architecture System Registers xml
-> > specification [*]. Add the missing field definitions as well,
-> > both to generate the correct RES0 mask and to be able to toggle
-> > their FGT bits.
+> Thanks for clarifying that.
 >
-> > Also add the code for handling FGT trapping, reading of the
-> > register, to nested virt.
+> To me it seems weird to use the generated bits directly, and I think that=
+'s why
+> the code seems confusing?
 >
-> > [*] https://developer.arm.com/downloads/-/exploration-tools
+> I think we should stop using __HFGRTR_EL2_nMASK directly in that function=
+, and
+> build it up from '0'. This also matches, I think, with Marc Z wanting to =
+move
+> towards setting these things based on features [1], so maybe something li=
+ke:
 >
-> DDI0601.
-
-Yup! :)
-
-> > +Sysreg HAFGRTR_EL2   3       4       3       1       6
-> > +Res0 63:50
-> > +Field        49      AMEVTYPER115_EL0
-> > +Field        48      AMEVCNTR115_EL0
-> > +Field        47      AMEVTYPER114_EL0
-> > +Field        46      AMEVCNTR114_EL0
-> > +Field        45      AMEVTYPER113_EL0
-> > +Field        44      AMEVCNTR113_EL0
-> > +Field        43      AMEVTYPER112_EL0
-> > +Field        42      AMEVCNTR112_EL0
-> > +Field        41      AMEVTYPER111_EL0
-> > +Field        40      AMEVCNTR111_EL0
-> > +Field        39      AMEVTYPER110_EL0
-> > +Field        38      AMEVCNTR110_EL0
-> > +Field        37      AMEVTYPER19_EL0
-> > +Field        36      AMEVCNTR19_EL0
-> > +Field        35      AMEVTYPER18_EL0
-> > +Field        34      AMEVCNTR18_EL0
-> > +Field        33      AMEVTYPER17_EL0
-> > +Field        32      AMEVCNTR17_EL0
-> > +Field        31      AMEVTYPER16_EL0
-> > +Field        30      AMEVCNTR16_EL0
-> > +Field        29      AMEVTYPER15_EL0
-> > +Field        28      AMEVCNTR15_EL0
-> > +Field        27      AMEVTYPER14_EL0
-> > +Field        26      AMEVCNTR14_EL0
-> > +Field        25      AMEVTYPER13_EL0
-> > +Field        24      AMEVCNTR13_EL0
-> > +Field        23      AMEVTYPER12_EL0
-> > +Field        22      AMEVCNTR12_EL0
-> > +Field        21      AMEVTYPER11_EL0
-> > +Field        20      AMEVCNTR11_EL0
-> > +Field        19      AMEVTYPER10_EL0
-> > +Field        18      AMEVCNTR10_EL0
-> > +Field        17      AMCNTEN1
-> > +Res0 16:5
-> > +Field        4       AMEVCNTR03_EL0
-> > +Field        3       AMEVCNTR02_EL0
-> > +Field        2       AMEVCNTR01_EL0
-> > +Field        1       AMEVCNTR00_EL0
-> > +Field        0       AMCNTEN0
-> > +EndSysreg
-> > +
+>         u64 r_val =3D 0;
 >
-> Oh, we actually have the register fully encoded since we needed the
-> fields.  Given this why did we need the manual encoding in the previous
-> patch?  In any case this looks good according to DDI0601 2023-09:
+>         if (cpus_have_final_cap(ARM64_HAS_S1PIE))
+>                 r_set |=3D HFGxTR_EL2_nPIR_EL1 | HFGxTR_EL2_nPIREO_EL1;
+>
+>         r_val |=3D r_set;
+>         r_val &=3D ~r_clr;
+>
+>         write_sysreg_s(r_val, SYS_HFGRTR_EL2);
+>
+> That way we just explicitly set which bits we don't want to trap on. We h=
+ave
+> some weird behaviour right now were we set nSMPRI_EL1 to 1, unless you ha=
+ve
+> FEAT_SME where we set it to 0.. but if you don't have FEAT_SME it's RES0
+> anyway? The above approach would fix that.
 
-We need both because we need to know the polarity. RES0 and the valid
-bits are generated. In later patches in this series I move completely
-to using the generated RES0, and to calculating nMASK based on the
-other fields. But we still need the definitions in kvm_arm.h for the
-polarity.
+I don't have a strong opinion about that, but I am inclined to agree
+with you. Let's also hear what Marc Zygier (since he's the author of
+that part) opinion is, and I'm happy either way.
 
-> Reviewed-by: Mark Brown <broonie@kernel.org>
-
-Thanks!
+Cheers,
 /fuad
+
+> Thanks,
+> Joey
+>
+> [1] https://lore.kernel.org/linux-arm-kernel/87bkb285ud.wl-maz@kernel.org=
+/ (last paragraph)
+>
+> >
+> > Cheers,
+> > /fuad
+> >
+> >
+> > >
+> > >         static inline void __activate_traps_hfgxtr(struct kvm_vcpu *v=
+cpu)
+> > >         {
+> > >
+> > >                 ..
+> > >
+> > >                 /* The default is not to trap anything but ACCDATA_EL=
+1 */
+> > >                 r_val =3D __HFGRTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_E=
+L1;
+> > >                 r_val |=3D r_set;
+> > >                 r_val &=3D ~r_clr;
+> > >
+> > >
+> > > Thanks,
+> > > Joey
+> > >
+> > > >
+> > > > -#define __HFGITR_EL2_RES0    GENMASK(63, 57)
+> > > > -#define __HFGITR_EL2_MASK    GENMASK(54, 0)
+> > > > -#define __HFGITR_EL2_nMASK   GENMASK(56, 55)
+> > > > +#define __HFGITR_EL2_RES0    (BIT(63) | BIT(61))
+> > > > +#define __HFGITR_EL2_MASK    (BIT(62) | BIT(60) | GENMASK(54, 0))
+> > > > +#define __HFGITR_EL2_nMASK   GENMASK(59, 55)
+> > > >
+> > > >  #define __HDFGRTR_EL2_RES0   (BIT(49) | BIT(42) | GENMASK(39, 38) =
+|  \
+> > > >                                GENMASK(21, 20) | BIT(8))
+> > > > -#define __HDFGRTR_EL2_MASK   ~__HDFGRTR_EL2_nMASK
+> > > > +#define __HDFGRTR_EL2_MASK   (BIT(63) | GENMASK(58, 50) | GENMASK(=
+48, 43) | \
+> > > > +                              GENMASK(41, 40) | GENMASK(37, 22) | =
+\
+> > > > +                              GENMASK(19, 9) | GENMASK(7, 0))
+> > > >  #define __HDFGRTR_EL2_nMASK  GENMASK(62, 59)
+> > > >
+> > > >  #define __HDFGWTR_EL2_RES0   (BIT(63) | GENMASK(59, 58) | BIT(51) =
+| BIT(47) | \
+> > > >                                BIT(43) | GENMASK(40, 38) | BIT(34) =
+| BIT(30) | \
+> > > >                                BIT(22) | BIT(9) | BIT(6))
+> > > > -#define __HDFGWTR_EL2_MASK   ~__HDFGWTR_EL2_nMASK
+> > > > +#define __HDFGWTR_EL2_MASK   (GENMASK(57, 52) | GENMASK(50, 48) | =
+\
+> > > > +                              GENMASK(46, 44) | GENMASK(42, 41) | =
+\
+> > > > +                              GENMASK(37, 35) | GENMASK(33, 31) | =
+\
+> > > > +                              GENMASK(29, 23) | GENMASK(21, 10) | =
+\
+> > > > +                              GENMASK(8, 7) | GENMASK(5, 0))
+> > > >  #define __HDFGWTR_EL2_nMASK  GENMASK(62, 60)
+> > > >
+> > > >  #define __HAFGRTR_EL2_RES0   (GENMASK(63, 50) | GENMASK(16, 5))
+> > > > @@ -375,9 +384,9 @@
+> > > >  #define __HAFGRTR_EL2_nMASK  0UL
+> > > >
+> > > >  /* Similar definitions for HCRX_EL2 */
+> > > > -#define __HCRX_EL2_RES0              (GENMASK(63, 16) | GENMASK(13=
+, 12))
+> > > > -#define __HCRX_EL2_MASK              (0)
+> > > > -#define __HCRX_EL2_nMASK     (GENMASK(15, 14) | GENMASK(4, 0))
+> > > > +#define __HCRX_EL2_RES0         (GENMASK(63, 25) | GENMASK(13, 12)=
+)
+> > > > +#define __HCRX_EL2_MASK              (BIT(6))
+> > > > +#define __HCRX_EL2_nMASK     (GENMASK(24, 14) | GENMASK(11, 7) | G=
+ENMASK(5, 0))
+> > > >
+> > > >  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+> > > >  #define HPFAR_MASK   (~UL(0xf))
+> > > > --
+> > > > 2.43.0.rc2.451.g8631bc7472-goog
+> > > >
+> > > >
