@@ -1,131 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A838495EC
-	for <kvmarm@lists.linux.dev>; Thu,  7 Dec 2023 17:28:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59614566E
+	for <kvmarm@lists.linux.dev>; Fri,  8 Dec 2023 05:07:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u3eRBKYV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0931DC433C7;
-	Thu,  7 Dec 2023 17:28:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701970104;
-	bh=jkgPZVbGYpUROvGphge7PukRKwsZcxGxGuI1xL4jMrI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=u3eRBKYVZUjqR0ZnfHj7EhL5GbFKxK/jDFukbI5+mW7PudU4e8sTO16fVGlPkAAjc
-	 7ytUCwpT6ZNIGpPW560h7970lMT491a6VMK8VnRjSn4cRdLeClv6uPhkHKMVqEhwhG
-	 NrdX8QiB8qA0fwlCgiU3B0c31/ijUpeiav/EXIALi14JYEfIRMhMmQeKxZaoFv3VNP
-	 xI1iCOxtEAUEh7H9wjSxad2UMzjMo2wcydmKjlPcA4P9ln3Z7KY8SXqStIHBjiRv5D
-	 StjIZVX2u2sAorreSsYfsu0mX74fPYThXustTvWrMXN86Wqi2JmwDw21iCFq6RYTSL
-	 7PmNa+arcawNA==
-Date: Thu, 7 Dec 2023 17:28:18 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev,
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, eric.auger@redhat.com,
-	jingzhangos@google.com, joey.gouly@arm.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 05/12] KVM: arm64: Handle HAFGRTR_EL2 trapping in
- nested virt
-Message-ID: <006ec2b0-6263-4e86-8641-d81c01a91c8e@sirena.org.uk>
-References: <20231206100503.564090-1-tabba@google.com>
- <20231206100503.564090-6-tabba@google.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bivf7zGL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702012051;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7DjOW++h2qpYv/KAC35xyOMKgc1I7IXf0474RhNm4+E=;
+	b=Bivf7zGLH6HHkHSxL/SFmWnzO27NVKMaAAdNF/pIYkcZDows70grjSBIwfpobLjH1aN4kR
+	lu8vpX9o7HajVZaHsZWSIYUR4Dix1ghR7C951ILEgOxhid+maEk5Ei81u5yph+J/Db0Gr0
+	AUCrxYruIdjlEmgKCay+tL7h3nW/+O0=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-126-mCgnlZ4DOuyY9jhOTobHLA-1; Fri, 08 Dec 2023 00:07:29 -0500
+X-MC-Unique: mCgnlZ4DOuyY9jhOTobHLA-1
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1d053953954so11808995ad.2
+        for <kvmarm@lists.linux.dev>; Thu, 07 Dec 2023 21:07:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702012048; x=1702616848;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7DjOW++h2qpYv/KAC35xyOMKgc1I7IXf0474RhNm4+E=;
+        b=Tooz6Cv2aZfD38virIMxp5Zu6HdWCsDx7Gj7rSNs1SCWeXiUdPsXEV3EVXRsUPjG6W
+         or6mQRfl1O8cSGPW+kK3h5oJHgV8IW+boY3ew4U5RVaWRD1VuoNJSb1j3rD4aG7vKLsE
+         F7nJtt0zpW8VkKgNnQZMHrN37jGMAkoapJi13i1HSOkU3MjhfX2tdLDLsImu7/0kxhEf
+         MDUUPni9k3M5096GaYkBrwV7kH69cKgsHyjebflhmsPn/R+4Rm8nhvJM4NH1b9SVRzfC
+         g4Hysu//MWzeyo3THU4+IveY57BpTihBxhKA822IZLoPUxMhlSJx2n0YJRgv1jc3xzWy
+         DPLg==
+X-Gm-Message-State: AOJu0YwVtnX54m8iTmYsE1uCJ6o7gV7z9EWBVp2QYR5InBZ1Ewmuxnrj
+	yKyHp0cZeluXRZSz2DhAuI+bHQAsEmkodq6wlTl86t+pjmhc+vetSBHkoXV/3nS21qA6jR5MgPA
+	epes1HASkhXYEYXUx
+X-Received: by 2002:a17:903:228b:b0:1d0:b16a:b26a with SMTP id b11-20020a170903228b00b001d0b16ab26amr3435392plh.4.1702012048294;
+        Thu, 07 Dec 2023 21:07:28 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG6LlOSfQMdwKQHpCvinXE+YTOV9LAn4L/4e5piuadXfTGPzQr096NtqUuMnxxErVNRlrsErQ==
+X-Received: by 2002:a17:903:228b:b0:1d0:b16a:b26a with SMTP id b11-20020a170903228b00b001d0b16ab26amr3435375plh.4.1702012047799;
+        Thu, 07 Dec 2023 21:07:27 -0800 (PST)
+Received: from [192.168.68.51] ([43.252.115.3])
+        by smtp.gmail.com with ESMTPSA id g24-20020a170902869800b001cf9ddd3552sm701722plo.85.2023.12.07.21.07.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Dec 2023 21:07:27 -0800 (PST)
+Message-ID: <c8e1594e-1379-4fb3-904f-fba2cd194cdc@redhat.com>
+Date: Fri, 8 Dec 2023 15:07:22 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="AMd9aHGiv/jzGOb9"
-Content-Disposition: inline
-In-Reply-To: <20231206100503.564090-6-tabba@google.com>
-X-Cookie: No purchase necessary.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] KVM: selftests: Fix Assertion on non-x86_64 platforms
+To: Shaoqin Huang <shahuang@redhat.com>, kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Sean Christopherson <seanjc@google.com>, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+References: <20231208033505.2930064-1-shahuang@redhat.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20231208033505.2930064-1-shahuang@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 12/8/23 13:35, Shaoqin Huang wrote:
+> When running the set_memory_region_test on arm64 platform, it causes the
+> below assert:
+> 
+> ==== Test Assertion Failure ====
+>    set_memory_region_test.c:355: r && errno == EINVAL
+>    pid=40695 tid=40695 errno=0 - Success
+>       1	0x0000000000401baf: test_invalid_memory_region_flags at set_memory_region_test.c:355
+>       2	 (inlined by) main at set_memory_region_test.c:541
+>       3	0x0000ffff951c879b: ?? ??:0
+>       4	0x0000ffff951c886b: ?? ??:0
+>       5	0x0000000000401caf: _start at ??:?
+>    KVM_SET_USER_MEMORY_REGION should have failed on v2 only flag 0x2
+> 
+> This is because the arm64 platform also support the KVM_MEM_READONLY flag, but
+> the current implementation add it into the supportd_flags only on x86_64
+> platform, so this causes assert on other platform which also support the
+> KVM_MEM_READONLY flag.
+> 
+> Fix it by using the __KVM_HAVE_READONLY_MEM macro to detect if the
+> current platform support the KVM_MEM_READONLY, thus fix this problem on
+> all other platform which support KVM_MEM_READONLY.
+> 
+> Fixes: 5d74316466f4 ("KVM: selftests: Add a memory region subtest to validate invalid flags")
+> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+> This patch is based on the latest kvm-next[1] branch.
+> 
+> [1] https://git.kernel.org/pub/scm/virt/kvm/kvm.git/log/?h=next
+> ---
+>   tools/testing/selftests/kvm/set_memory_region_test.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
 
---AMd9aHGiv/jzGOb9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 
-On Wed, Dec 06, 2023 at 10:04:55AM +0000, Fuad Tabba wrote:
-
-> Add the encodings to fine grain trapping fields for HAFGRTR_EL2
-> and add the associated handling code in nested virt. Based on
-> the 2023-09 Arm Architecture System Registers xml
-> specification [*]. Add the missing field definitions as well,
-> both to generate the correct RES0 mask and to be able to toggle
-> their FGT bits.
-
-> Also add the code for handling FGT trapping, reading of the
-> register, to nested virt.
-
-> [*] https://developer.arm.com/downloads/-/exploration-tools
-
-DDI0601.
-
-> +Sysreg HAFGRTR_EL2	3	4	3	1	6
-> +Res0	63:50
-> +Field	49	AMEVTYPER115_EL0
-> +Field	48	AMEVCNTR115_EL0
-> +Field	47	AMEVTYPER114_EL0
-> +Field	46	AMEVCNTR114_EL0
-> +Field	45	AMEVTYPER113_EL0
-> +Field	44	AMEVCNTR113_EL0
-> +Field	43	AMEVTYPER112_EL0
-> +Field	42	AMEVCNTR112_EL0
-> +Field	41	AMEVTYPER111_EL0
-> +Field	40	AMEVCNTR111_EL0
-> +Field	39	AMEVTYPER110_EL0
-> +Field	38	AMEVCNTR110_EL0
-> +Field	37	AMEVTYPER19_EL0
-> +Field	36	AMEVCNTR19_EL0
-> +Field	35	AMEVTYPER18_EL0
-> +Field	34	AMEVCNTR18_EL0
-> +Field	33	AMEVTYPER17_EL0
-> +Field	32	AMEVCNTR17_EL0
-> +Field	31	AMEVTYPER16_EL0
-> +Field	30	AMEVCNTR16_EL0
-> +Field	29	AMEVTYPER15_EL0
-> +Field	28	AMEVCNTR15_EL0
-> +Field	27	AMEVTYPER14_EL0
-> +Field	26	AMEVCNTR14_EL0
-> +Field	25	AMEVTYPER13_EL0
-> +Field	24	AMEVCNTR13_EL0
-> +Field	23	AMEVTYPER12_EL0
-> +Field	22	AMEVCNTR12_EL0
-> +Field	21	AMEVTYPER11_EL0
-> +Field	20	AMEVCNTR11_EL0
-> +Field	19	AMEVTYPER10_EL0
-> +Field	18	AMEVCNTR10_EL0
-> +Field	17	AMCNTEN1
-> +Res0	16:5
-> +Field	4	AMEVCNTR03_EL0
-> +Field	3	AMEVCNTR02_EL0
-> +Field	2	AMEVCNTR01_EL0
-> +Field	1	AMEVCNTR00_EL0
-> +Field	0	AMCNTEN0
-> +EndSysreg
-> +
-
-Oh, we actually have the register fully encoded since we needed the
-fields.  Given this why did we need the manual encoding in the previous
-patch?  In any case this looks good according to DDI0601 2023-09:
-
-Reviewed-by: Mark Brown <broonie@kernel.org>
-
---AMd9aHGiv/jzGOb9
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmVyALIACgkQJNaLcl1U
-h9ADPAf9FeuqXUliARdZHy1V31rfSH9oIfYDVBtlx/XTcrcdKsHKFm35SRy/2nDW
-3Ct6VBgVyzziVWfROvP67bsOtpHsVPVKLKRVs3wXn/+do8eSFe03XWyqjAT0fTxF
-UZVwrkFyihnj4rqXEvITcWBz5nS62PMwMaUVU9MSps2Btr05kiHYrs6GZpByq08o
-mfk7Zuj6n0rFqkOBpZ0Bl4g41I+HI6GlQJEorch8cqs31XPnzpzLTP/GYyydqG4U
-77PrRdMj6TGyyMYuuEP3xKTh9BEgR76yNYXqCl/VL+9uGCEDrQTJYmysKwtxwAMt
-zz6AW2hZBDhq3h3oJfI44f0bzlvASg==
-=cuKo
------END PGP SIGNATURE-----
-
---AMd9aHGiv/jzGOb9--
