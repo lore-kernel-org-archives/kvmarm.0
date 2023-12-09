@@ -1,48 +1,48 @@
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 062A4156DB
-	for <kvmarm@lists.linux.dev>; Sat,  9 Dec 2023 22:28:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF3B19471
+	for <kvmarm@lists.linux.dev>; Sat,  9 Dec 2023 23:49:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wGgwNhiP"
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-3b9e7f4a0d7so1557538b6e.1
-        for <kvmarm@lists.linux.dev>; Sat, 09 Dec 2023 14:28:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zT3unBuB"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d0ccda19eeso22430345ad.1
+        for <kvmarm@lists.linux.dev>; Sat, 09 Dec 2023 15:49:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702160904; x=1702765704; darn=lists.linux.dev;
+        d=linaro.org; s=google; t=1702165745; x=1702770545; darn=lists.linux.dev;
         h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
          :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=GIZ+mcVI5qd9xzhqd2Lq/djPmsscI/1vsqmZHAfk8NA=;
-        b=wGgwNhiPoV4/q80dwUk3l4dMWkY1IxSUgifaUta1u7q6Hb4b2P3609kEWSOpysFsaH
-         7z3Oc2pMMh/GRhVQ4/RG7FQuRiD5MIZjydhvB5hUJHUuDjuMLMGjReFaIx3UHHJBzSq0
-         SuLvUEhEe5o4U8AdS7gyMRsOAWR9znuINKnSGNGyac6AD3lRuJWYiQB5PzfuR4JxZ/mY
-         U8Ue51dly79cgjqyJXTmMk+DUYGPSTVEv/XlhDai056GI0fNxeXeHos23PhahRrrcppY
-         q7LnCl/vyIbzR+1aLq/ss8EwfVLOE6Uo3rkIRfSKXf86ImvdH5BxKLv0aO1RBhsswYOA
-         +nTA==
+        bh=OPCNY52nyiQdIzlwx6EU4oIvd2oaUqsRoubFMnhv/R4=;
+        b=zT3unBuBiVy3i9AH7tFCIEHEHmihCLghnnJrvzulnUk3mCGsxB2jlWkQ4OELiHXo6B
+         F8AgazUt+Fo8sGJ8WgJvPSrDgZgDBVrT/ywG6fCz9Llqcm+CN0yyMd+SxXNWxMXr8ZUd
+         6Xggwp3KjBIKfge6q3MR0QiGK7VDttBpzn+45gTufIUfTdXbwljCwlZxhjS59QaqIDt6
+         EtTgp0Mb/ypQwhYPuNIX8WEnaan+Sz4f6XNPekNzXJqZLyQ1wzUDuuH+/lXme3lAMUh0
+         P6Qlob9g8ChwaW+CqZT4AY5zyUjO5afUC1uGyPRacQqG5/UtmrPT+hrduil89fqeEFVe
+         /W1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702160904; x=1702765704;
+        d=1e100.net; s=20230601; t=1702165745; x=1702770545;
         h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
          :user-agent:references:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GIZ+mcVI5qd9xzhqd2Lq/djPmsscI/1vsqmZHAfk8NA=;
-        b=jjg9HxuVONBo7YLYm1lu586tyStko+Zcalv0Yw8HyEwyFmQ/UZ3K1zc3EZTnxP5r7/
-         63IFE3UoSubRv8rr2ecteoQQtM4hV+CkjfD0f7k3Jtinjd52gvWadGTmmbjDibFhTDqW
-         Z2yTlMxfkppGLH/zEQcj0stDWQNIaxwbS1i9XTQkN01IkLZb63V9kI1ZhtNtE49ZBxtl
-         fT6oHq8+RFrcCc5rEDpM970tdTSvu1UFNZG1F/Jr/bG+7UIsXXll3OKyKPvZpJjEb6m2
-         qRVODxYghb2Y75M0bPWx33FGi4/WR8fVzhHTOZmq28PgZ9DcXhZ8MfLPdINwKhILtLVM
-         RjQQ==
-X-Gm-Message-State: AOJu0Yw7Fcz0RMCe3Nbtn9hF3yGky//XlyTJ+DM4fO6c+NeFNIMpZTMg
-	xPR5xKr3lfuV6wI1oh40ZzU/sg==
-X-Google-Smtp-Source: AGHT+IHe/3Q7T7mqAS39AMZy9ESnpkNFM6q37u24Z3u046keYsm8BlHmxnJkG9/CppRHC9PxpHjPRw==
-X-Received: by 2002:a05:6808:21a6:b0:3b9:e87b:d963 with SMTP id be38-20020a05680821a600b003b9e87bd963mr2922446oib.85.1702160903962;
-        Sat, 09 Dec 2023 14:28:23 -0800 (PST)
+        bh=OPCNY52nyiQdIzlwx6EU4oIvd2oaUqsRoubFMnhv/R4=;
+        b=kxzMT8pNekRpsMRpW7fX4j/LgFIq3Jg4t5msaspu1yttQTPVb6O4c3WFIe4egSietx
+         Oinpg9HAEnrjLrIbnx4P4PAH52jQ571oBa+6uSR2Wv8qBR2yGS36U2EeMa9/lwdhoAVt
+         jbRtAcDOGjVAKYhoD5uTnF29cVS0+StL5jinz42SMMCb0AqTrz9s2KFnfIOo1HQa++yc
+         Z8k9i5NUSaa/WIEp0n9xDD8KMfNacnhcuMcKQIzVamTNOFncNnEDMAQridudIkEPcCgu
+         RPTnQq70H+PDiuPK5MA9IkrhOA5ZtORUeRIfIHx10rj/HeQh/D4P+PSpM9TWjue03dED
+         n+aw==
+X-Gm-Message-State: AOJu0Yw4DH1Us7FS0tNcfJgcqnumgnwIoPQMGOZ53IUXKf90J5P57t/F
+	Kd8vXy96N9MfPvZIUifgHEILpg==
+X-Google-Smtp-Source: AGHT+IEJJXjirbJfGvEGv9wlC7QhPL3oJqPTSZjXXGeMs1qcfj17IHUevHGTEfzPXl+gH/HmXyzIBw==
+X-Received: by 2002:a17:902:c64a:b0:1d0:c41b:1d1e with SMTP id s10-20020a170902c64a00b001d0c41b1d1emr919404pls.73.1702165744705;
+        Sat, 09 Dec 2023 15:49:04 -0800 (PST)
 Received: from localhost ([2804:14d:7e39:8470:ded6:9593:9f4f:5c29])
-        by smtp.gmail.com with ESMTPSA id h17-20020aa786d1000000b006ce7ed5ba42sm3794269pfo.171.2023.12.09.14.28.22
+        by smtp.gmail.com with ESMTPSA id n2-20020a170902d2c200b001cfcf3dd317sm3918148plc.61.2023.12.09.15.49.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Dec 2023 14:28:23 -0800 (PST)
+        Sat, 09 Dec 2023 15:49:04 -0800 (PST)
 References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
- <20231122-arm64-gcs-v7-25-201c483bd775@kernel.org>
+ <20231122-arm64-gcs-v7-26-201c483bd775@kernel.org>
 User-agent: mu4e 1.10.8; emacs 29.1
 From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
 To: Mark Brown <broonie@kernel.org>
@@ -63,10 +63,11 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
  linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
  linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v7 25/39] arm64/signal: Expose GCS state in signal frames
-In-reply-to: <20231122-arm64-gcs-v7-25-201c483bd775@kernel.org>
-Date: Sat, 09 Dec 2023 19:28:21 -0300
-Message-ID: <87sf4bf1tm.fsf@linaro.org>
+Subject: Re: [PATCH v7 26/39] arm64/ptrace: Expose GCS via ptrace and core
+ files
+In-reply-to: <20231122-arm64-gcs-v7-26-201c483bd775@kernel.org>
+Date: Sat, 09 Dec 2023 20:49:02 -0300
+Message-ID: <877clney35.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -78,35 +79,114 @@ Content-Type: text/plain
 
 Mark Brown <broonie@kernel.org> writes:
 
-> +static int preserve_gcs_context(struct gcs_context __user *ctx)
+> Provide a new register type NT_ARM_GCS reporting the current GCS mode
+> and pointer for EL0.  Due to the interactions with allocation and
+> deallocation of Guarded Control Stacks we do not permit any changes to
+> the GCS mode via ptrace, only GCSPR_EL0 may be changed.
+
+The code allows disabling GCS. Is that unintended?
+
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/uapi/asm/ptrace.h |  8 +++++
+>  arch/arm64/kernel/ptrace.c           | 59 ++++++++++++++++++++++++++++++++++++
+>  include/uapi/linux/elf.h             |  1 +
+>  3 files changed, 68 insertions(+)
+>
+> diff --git a/arch/arm64/include/uapi/asm/ptrace.h b/arch/arm64/include/uapi/asm/ptrace.h
+> index 7fa2f7036aa7..0f39ba4f3efd 100644
+> --- a/arch/arm64/include/uapi/asm/ptrace.h
+> +++ b/arch/arm64/include/uapi/asm/ptrace.h
+> @@ -324,6 +324,14 @@ struct user_za_header {
+>  #define ZA_PT_SIZE(vq)						\
+>  	(ZA_PT_ZA_OFFSET + ZA_PT_ZA_SIZE(vq))
+>  
+> +/* GCS state (NT_ARM_GCS) */
+> +
+> +struct user_gcs {
+> +	__u64 features_enabled;
+> +	__u64 features_locked;
+> +	__u64 gcspr_el0;
+> +};
+
+If there's a reserved field in sigframe's gcs_context, isn't it worth it
+to have a reserved field here as well?
+
+> +
+>  #endif /* __ASSEMBLY__ */
+>  
+>  #endif /* _UAPI__ASM_PTRACE_H */
+> diff --git a/arch/arm64/kernel/ptrace.c b/arch/arm64/kernel/ptrace.c
+> index 20d7ef82de90..f15b8e33561e 100644
+> --- a/arch/arm64/kernel/ptrace.c
+> +++ b/arch/arm64/kernel/ptrace.c
+> @@ -33,6 +33,7 @@
+>  #include <asm/cpufeature.h>
+>  #include <asm/debug-monitors.h>
+>  #include <asm/fpsimd.h>
+> +#include <asm/gcs.h>
+>  #include <asm/mte.h>
+>  #include <asm/pointer_auth.h>
+>  #include <asm/stacktrace.h>
+> @@ -1409,6 +1410,51 @@ static int tagged_addr_ctrl_set(struct task_struct *target, const struct
+>  }
+>  #endif
+>  
+> +#ifdef CONFIG_ARM64_GCS
+> +static int gcs_get(struct task_struct *target,
+> +		   const struct user_regset *regset,
+> +		   struct membuf to)
 > +{
-> +	int err = 0;
-> +	u64 gcspr;
+> +	struct user_gcs user_gcs;
 > +
-> +	/*
-> +	 * We will add a cap token to the frame, include it in the
-> +	 * GCSPR_EL0 we report to support stack switching via
-> +	 * sigreturn.
-> +	 */
-> +	gcs_preserve_current_state();
-> +	gcspr = current->thread.gcspr_el0;
-> +	if (task_gcs_el0_enabled(current))
-> +		gcspr -= 8;
+> +	if (target == current)
+> +		gcs_preserve_current_state();
 > +
-> +	__put_user_error(GCS_MAGIC, &ctx->head.magic, err);
-> +	__put_user_error(sizeof(*ctx), &ctx->head.size, err);
-> +	__put_user_error(gcspr, &ctx->gcspr, err);
-> +	__put_user_error(current->thread.gcs_el0_mode,
-> +			 &ctx->features_enabled, err);
-
-Other preserve_<foo>_context() functions zero the reserved fields in
-ctx. I suggest doing the same here. It helps with backward
-compatibility.
-
+> +	user_gcs.features_enabled = target->thread.gcs_el0_mode;
+> +	user_gcs.features_locked = target->thread.gcs_el0_locked;
+> +	user_gcs.gcspr_el0 = target->thread.gcspr_el0;
 > +
-> +	return err;
+> +	return membuf_write(&to, &user_gcs, sizeof(user_gcs));
 > +}
+> +
+> +static int gcs_set(struct task_struct *target, const struct
+> +		   user_regset *regset, unsigned int pos,
+> +		   unsigned int count, const void *kbuf, const
+> +		   void __user *ubuf)
+> +{
+> +	int ret;
+> +	struct user_gcs user_gcs;
+> +
+> +	ret = user_regset_copyin(&pos, &count, &kbuf, &ubuf, &user_gcs, 0, -1);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (user_gcs.features_enabled & ~PR_SHADOW_STACK_SUPPORTED_STATUS_MASK)
+> +		return -EINVAL;
+> +
+> +	/* Do not allow enable via ptrace */
+> +	if ((user_gcs.features_enabled & PR_SHADOW_STACK_ENABLE) &&
+> +	    !!(target->thread.gcs_el0_mode & PR_SHADOW_STACK_ENABLE))
 
+There should be only one '!' above.
+
+Though contrary to the patch description, this code allows disabling
+GCS. Shouldn't we require that
+
+  (user_gcs.features_enabled & PR_SHADOW_STACK_ENABLE) ==
+    (target->thread.gcs_el0_mode & PR_SHADOW_STACK_ENABLE)
+
+? That would ensure that the GCS mode can't be changed.
+
+> +		return -EBUSY;
+> +
+> +	target->thread.gcs_el0_mode = user_gcs.features_enabled;
+> +	target->thread.gcs_el0_locked = user_gcs.features_locked;
+> +	target->thread.gcspr_el0 = user_gcs.gcspr_el0;
+> +
+> +	return 0;
+> +}
+> +#endif
 
 -- 
 Thiago
