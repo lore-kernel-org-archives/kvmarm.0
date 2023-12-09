@@ -1,109 +1,107 @@
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEBF515AB
-	for <kvmarm@lists.linux.dev>; Sat,  9 Dec 2023 07:26:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DCA313AE3;
+	Sat,  9 Dec 2023 13:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="PIQSUBrt"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1702106811; x=1733642811;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=4okwfpjiOL9ZonK2dWGC50lt5XsgIOEt8Jz9Lhvjzo4=;
-  b=PIQSUBrti7XNdxosdmG+XzBhb0pfM+sUYWjKMzM5Ly2fg1oN3WgMtKYS
-   ykv+mcF3w3FD4LSA2mRkAwKA7bzyX/9YX6aPjLlYXJC/v9QsUFOxB8zIy
-   bA+Ul9y2JzV0nA+6cH2DrSzLH0sOAWdBHg4CTdr6X3W/zqHgncdwMI2MI
-   I=;
-X-IronPort-AV: E=Sophos;i="6.04,262,1695686400"; 
-   d="scan'208";a="258537457"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-d8e96288.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2023 07:26:47 +0000
-Received: from smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
-	by email-inbound-relay-iad-1d-m6i4x-d8e96288.us-east-1.amazon.com (Postfix) with ESMTPS id C784184A4F;
-	Sat,  9 Dec 2023 07:26:41 +0000 (UTC)
-Received: from EX19MTAEUA002.ant.amazon.com [10.0.17.79:62225]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.20.114:2525] with esmtp (Farcaster)
- id 6f872b6f-41b3-41a6-ab54-db2adfc2df23; Sat, 9 Dec 2023 07:26:40 +0000 (UTC)
-X-Farcaster-Flow-ID: 6f872b6f-41b3-41a6-ab54-db2adfc2df23
-Received: from EX19D012EUC004.ant.amazon.com (10.252.51.220) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Sat, 9 Dec 2023 07:26:37 +0000
-Received: from EX19D014EUC004.ant.amazon.com (10.252.51.182) by
- EX19D012EUC004.ant.amazon.com (10.252.51.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Sat, 9 Dec 2023 07:26:37 +0000
-Received: from EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41]) by
- EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41%3]) with mapi id
- 15.02.1118.040; Sat, 9 Dec 2023 07:26:37 +0000
-From: "Gowans, James" <jgowans@amazon.com>
-To: "pbonzini@redhat.com" <pbonzini@redhat.com>, "Graf (AWS), Alexander"
-	<graf@amazon.de>, "seanjc@google.com" <seanjc@google.com>,
-	=?utf-8?B?U2Now7ZuaGVyciwgSmFuIEgu?= <jschoenh@amazon.de>,
-	"ebiederm@xmission.com" <ebiederm@xmission.com>
-CC: "yuzenghui@huawei.com" <yuzenghui@huawei.com>, "atishp@atishpatra.org"
-	<atishp@atishpatra.org>, "kvm-riscv@lists.infradead.org"
-	<kvm-riscv@lists.infradead.org>, "james.morse@arm.com" <james.morse@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "maz@kernel.org"
-	<maz@kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
-	"anup@brainfault.org" <anup@brainfault.org>, "kexec@lists.infradead.org"
-	<kexec@lists.infradead.org>
-Subject: Re: [PATCH v2 1/2] KVM: Use syscore_ops instead of reboot_notifier to
- hook restart/shutdown
-Thread-Topic: [PATCH v2 1/2] KVM: Use syscore_ops instead of reboot_notifier
- to hook restart/shutdown
-Thread-Index: AQHaKm9F6TfLvhzSVEeLxKjiUjwNTrCgjTCA
-Date: Sat, 9 Dec 2023 07:26:36 +0000
-Message-ID: <cfed942fc767fa7b2fabc68a3357a7b95bd6a589.camel@amazon.com>
-References: <20230512233127.804012-1-seanjc@google.com>
-	 <20230512233127.804012-2-seanjc@google.com>
-In-Reply-To: <20230512233127.804012-2-seanjc@google.com>
-Accept-Language: en-ZA, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A719B06918EA30498C61BE1015DC918C@amazon.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S6jE7XNT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 783C1C433C8;
+	Sat,  9 Dec 2023 13:09:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702127389;
+	bh=BXmvRrbuQ7Zo9bps7+7CLsTiu05XaN6dU9PEwdxs+ro=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=S6jE7XNTUdBp/jI1nNZw36YjJLxRXIwjeEtof8D9IiRzLKGfNItYmAr+VT2iAQ38c
+	 38YNmmUUIYntBWbwZ9cGSSxaGQim7h9NbXYE8xNDouYR8+TMgLcesHT+cipBw2tgX/
+	 4lThPROQalN7MagIZParOBO4e1O2Pg4g6V0ixyjV2R33hTQ+sgi2mNYzJWJbwJzmJw
+	 rUnZe+RUTAfAHW4aOwHkof8lj7+6t1uk4lf7Y6WTHOwc+fOGo2/av3fMhf6zCZfn9v
+	 KMPF5McGv4f6VX8d9RocfRsJKSW7FslB0ZP2s+OE7BGvUVe1zwkJUq28+7u8No8Z/8
+	 zs4EO1JDtaj9w==
+Date: Sat, 9 Dec 2023 13:09:45 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v7 24/39] arm64/signal: Set up and restore the GCS
+ context for signal handlers
+Message-ID: <ZXRnGbYI+uq7m9sA@finisterre.sirena.org.uk>
+References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
+ <20231122-arm64-gcs-v7-24-201c483bd775@kernel.org>
+ <8734wcgj79.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="37w+xraunaVzWRvI"
+Content-Disposition: inline
+In-Reply-To: <8734wcgj79.fsf@linaro.org>
+X-Cookie: You might have mail.
 
-SGkgU2VhbiwNCg0KQmxhc3QgZnJvbSB0aGUgcGFzdCBidXQgSSd2ZSBqdXN0IGJlZW4gYml0dGVu
-IGJ5IHRoaXMgcGF0Y2ggd2hlbg0KcmViYXNpbmcgYWNyb3NzIHY2LjQuDQoNCk9uIEZyaSwgMjAy
-My0wNS0xMiBhdCAxNjozMSAtMDcwMCwgU2VhbiBDaHJpc3RvcGhlcnNvbiB3cm90ZToNCj4gVXNl
-IHN5c2NvcmVfb3BzLnNodXRkb3duIHRvIGRpc2FibGUgaGFyZHdhcmUgdmlydHVhbGl6YXRpb24g
-ZHVyaW5nIGENCj4gcmVib290IGluc3RlYWQgb2YgdXNpbmcgdGhlIGRlZGljYXRlZCByZWJvb3Rf
-bm90aWZpZXIgc28gdGhhdCBLVk0gZGlzYWJsZXMNCj4gdmlydHVhbGl6YXRpb24gX2FmdGVyXyBz
-eXN0ZW1fc3RhdGUgaGFzIGJlZW4gdXBkYXRlZC7CoCBUaGlzIHdpbGwgYWxsb3cNCj4gZml4aW5n
-IGEgcmFjZSBpbiBLVk0ncyBoYW5kbGluZyBvZiBhIGZvcmNlZCByZWJvb3Qgd2hlcmUgS1ZNIGNh
-biBlbmQgdXANCj4gZW5hYmxpbmcgaGFyZHdhcmUgdmlydHVhbGl6YXRpb24gYmV0d2VlbiBrZXJu
-ZWxfcmVzdGFydF9wcmVwYXJlKCkgYW5kDQo+IG1hY2hpbmVfcmVzdGFydCgpLg0KDQpUaGUgaXNz
-dWUgaXMgdGhhdCwgQUZBSUNULCB0aGUgc3lzY29yZV9vcHMuc2h1dGRvd24gYXJlIG5vdCBjYWxs
-ZWQgd2hlbg0KZG9pbmcgYSBrZXhlYy4gUmVib290IG5vdGlmaWVycyBhcmUgY2FsbGVkIGFjcm9z
-cyBrZXhlYyB2aWE6DQoNCmtlcm5lbF9rZXhlYw0KICBrZXJuZWxfcmVzdGFydF9wcmVwYXJlDQog
-ICAgYmxvY2tpbmdfbm90aWZpZXJfY2FsbF9jaGFpbg0KICAgICAga3ZtX3JlYm9vdA0KDQpTbyBh
-ZnRlciB0aGlzIHBhdGNoLCBLVk0gaXMgbm90IHNodXRkb3duIGR1cmluZyBrZXhlYzsgaWYgaGFy
-ZHdhcmUgdmlydA0KbW9kZSBpcyBlbmFibGVkIHRoZW4gdGhlIGtleGVjIGhhbmdzIGluIGV4YWN0
-bHkgdGhlIHNhbWUgbWFubmVyIGFzIHlvdQ0KZGVzY3JpYmUgd2l0aCB0aGUgcmVib290Lg0KDQpT
-b21lIHNwZWNpZmljIHNodXRkb3duIGNhbGxiYWNrcywgZm9yIGV4YW1wbGUgSU9NTVUsIEhQRVQs
-IElSUSwgZXRjIGFyZQ0KY2FsbGVkIGluIG5hdGl2ZV9tYWNoaW5lX3NodXRkb3duLCBidXQgS1ZN
-IGlzIG5vdCBvbmUgb2YgdGhlc2UuDQoNClRob3VnaHRzIG9uIHBvc3NpYmxlIHdheXMgdG8gZml4
-IHRoaXM6DQphKSBnbyBiYWNrIHRvIHJlYm9vdCBub3RpZmllcnMNCmIpIGdldCBrZXhlYyB0byBj
-YWxsIHN5c2NvcmVfc2h1dGRvd24oKSB0byBpbnZva2UgYWxsIG9mIHRoZXNlIGNhbGxiYWNrcw0K
-YykgQWRkIGEgS1ZNLXNwZWNpZmljIGNhbGxiYWNrIHRvIG5hdGl2ZV9tYWNoaW5lX3NodXRkb3du
-KCk7IHdlIG9ubHkNCm5lZWQgdGhpcyBmb3IgSW50ZWwgeDg2LCByaWdodD8NCg0KTXkgc2xpZ2h0
-IHByZWZlcmVuY2UgaXMgdG93YXJkcyBhZGRpbmcgc3lzY29yZV9zaHV0ZG93bigpIHRvIGtleGVj
-LCBidXQNCkknbSBub3Qgc3VyZSB0aGF0J3MgZmVhc2libGUuIEFkZGluZyBrZXhlYyBtYWludGFp
-bmVycyBmb3IgaW5wdXQuDQoNCkpHDQo=
+
+--37w+xraunaVzWRvI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Sat, Dec 09, 2023 at 12:15:22AM -0300, Thiago Jung Bauermann wrote:
+> Mark Brown <broonie@kernel.org> writes:
+
+> > +	/* The cap must have the low bits set to a token value */
+> > +	if (GCS_CAP_TOKEN(val) != 0)
+> > +		return false;
+
+> I found the comment above a little confusing, since the if condition
+> actually checks that low bits aren't set at all. Perhaps reword to
+> something like "The token value of a signal cap must be 0"?
+
+Right, that's bitrot from the previous token format.
+
+> I'm still not proficient enough in GCS to know how exactly this could be
+> abused (e.g., somehow writing the desired return location right above
+> one of these inactive caps and arranging for GCSPR to point to the cap
+> before returning from a signal) but to be safe or paranoid, perhaps zero
+> the location of the cap before returning?
+
+Right, ideally we'd be doing a compare and exchange here to substitute
+in a zero.
+
+--37w+xraunaVzWRvI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmV0ZxYACgkQJNaLcl1U
+h9AoDgf/VkzebhdvDSlUlS84JXdoOeqvCdQEoqmGKLcuFu0afYS5oNsgjYoWfoXD
+aoXaZBnOjvf3Wmp5hO2MtDSGOlnNYMS9btFUd+2docNaeKRynVrPd2hEwST4I/yq
+ZeT2mGf5o2wyv6qxW6RsXkgz4UUscznq2pitjl0x4ca+pOIeX+qxPQjayUJhPGtL
+Us1MullRxipMfAZE5H9eGQ5UrEO940lmaqa3GOexHuqAmzs/znZexqoZYXOStiBS
+DTmANL89uVAgAarTtMNsXKkO8mOZ8D9pNtu+zPEO0JNSrVzQgDD363lTYbIjKz5P
+QroAHMW7izjjkY7CBtP6RwOmok0Uvw==
+=u7l1
+-----END PGP SIGNATURE-----
+
+--37w+xraunaVzWRvI--
