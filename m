@@ -1,337 +1,292 @@
-Received: from mail-oi1-f201.google.com (mail-oi1-f201.google.com [209.85.167.201])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F763BB55
-	for <kvmarm@lists.linux.dev>; Fri,  8 Dec 2023 21:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7947F
+	for <kvmarm@lists.linux.dev>; Sat,  9 Dec 2023 03:15:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Jkdzf1Tq"
-Received: by mail-oi1-f201.google.com with SMTP id 5614622812f47-3b8b66d49easo3674141b6e.1
-        for <kvmarm@lists.linux.dev>; Fri, 08 Dec 2023 13:01:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tGqII11+"
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-53fbf2c42bfso2237119a12.3
+        for <kvmarm@lists.linux.dev>; Fri, 08 Dec 2023 19:15:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702069308; x=1702674108; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ohHL4NM1dI6UZbQFn0jebt7/vn+02U2BOD5/z3Rzxz0=;
-        b=Jkdzf1TqyaYn7l5BGaIyMhkezukhmUBBh2M2Y7b0QAF6GXEDG7x4uY32o9irAol03Y
-         /nY0iXWyqnobCMvY1P0ARWjkVPAFTcUnUzH0Wi2tWEGDtiTlCHbG0pqMxUcneaZYa3Mc
-         TfRg79MbFh03oaapRegXWtvEzekSRPS/Lf8ONyljwqID2SiLdrbeC8Y/N2RGB+SKEBsD
-         HIpdkOneYFdes8LMCym5qFWThUztiYk7YwfLZKdn2yFIX9optVD6hB58Klda+8NFldEH
-         O0tG5Wt7n1F8gooec9e56I3X9JmdPVGFG4I/YPT8aR++YRmDTPZQglq9ZXsk7yzpb0Ob
-         mSCw==
+        d=linaro.org; s=google; t=1702091726; x=1702696526; darn=lists.linux.dev;
+        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=2b+6n+ULng3a579Szt1kcCIxHSrZ+D7LmH/Z+vqyyTE=;
+        b=tGqII11+lviRDmAwLWR7PMOj01fTP+/Ca/OgRe6XtZHE3NRVQeIbcSzhX8TMO7l8L1
+         wKe4e2R5Vld5aGuvWIwLdrDqq13dtPc9qAsDsh5J56xee6RF7meVrbCwjArTJ2SXYkwE
+         twAsDJ39G1NOWHsDLF1mnIWZ37sALmtdNo0KM2cxXDS/A+Bg71LLmJz2hiDJNJ/1Zz7u
+         HI8zR1h8wtLaJdkgyI3xTgBiaFwNX9CVUPkioy36ABD36Aa0dqpxrNM07/pDEM7q0e1L
+         GcXWwj+W19XfJnD2loVXaLoJM9zCWHUmgTCqjHYw/pLiGvg7wOmWOHawxGj+NkExRhrL
+         /tkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702069308; x=1702674108;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ohHL4NM1dI6UZbQFn0jebt7/vn+02U2BOD5/z3Rzxz0=;
-        b=f7rBHLRM6gNVw+CFOPbV0zD42vTv4jd8rKxb7yCvLS0T8jBttNFpvJIRWqmULeJp+W
-         4AG5E1pF8o0w5jja2gGudccrAQGMqvGQJmiLz5t8bxaMFmTpifs8DEzcIk0JSOYnOCQm
-         VcaRn5FGGQcK7KbIamm5vO4SbXKgT5gdLUuVdC03YzfKT5xnwL6ya75B/Lwzg7EgU1Hi
-         Ug0Oihv8004lRsgZ61VfPOrLqtSnJyRk9rjNVwV6OJEnDFg8WafzUTEdrKyeo88a6M2X
-         0zK5iLiU2uwKcJqbKSAbc5wCoHg4oaoruBsuYFC1P2Jn6jT2hbhOjcws2E+m3uvxblim
-         GvyQ==
-X-Gm-Message-State: AOJu0Yy9PZG6VF/w6/CHahHJZOWUcvXic8k3L1k6+BUPX+usuqZXiiG3
-	y0LUVIpcqBYozX//UqIfPl4gJRq0b0IjpLJ4ZA==
-X-Google-Smtp-Source: AGHT+IELZjT2Wb1/8dctSZAreeasawPBnDaNpQW+qkpJUycV+LVE0RilDB7Q/Mb5eCw0jV27bIHw5D3hDJBu8OFFng==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6808:17a6:b0:3b9:bcdd:c192 with
- SMTP id bg38-20020a05680817a600b003b9bcddc192mr594339oib.6.1702069307938;
- Fri, 08 Dec 2023 13:01:47 -0800 (PST)
-Date: Fri, 08 Dec 2023 21:01:47 +0000
-In-Reply-To: <ZV5j5By1o6aFnrbV@linux.dev> (message from Oliver Upton on Wed,
- 22 Nov 2023 20:26:12 +0000)
+        d=1e100.net; s=20230601; t=1702091726; x=1702696526;
+        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2b+6n+ULng3a579Szt1kcCIxHSrZ+D7LmH/Z+vqyyTE=;
+        b=vaEdxcjaXKbRahaoStkD1tuuMg5UwKde68tw0LL4XTEK0yKDURbmHk0VRj2zLt29vy
+         D4d8rGvKEchkeEC6AzZRbM+X/rNL42ef06zOBWXal5/TRbicZSa13PRV4QbRKlDZI9O3
+         Aj8xh2EFmD34Jt/jbpTQ+FNaJO6Ik2faEWQYTG83rogFHhPfsckJkzMr9/i7WyiPWyQi
+         jDWkefal9EXJaUyzXY+9Euq8ubIw6z/shIz61Gf6wM4VUDT+P2W5oudyYCl1I09Na7MU
+         /2gtcAp8m/3zdCwcKgTbP5guoG5/Dnq+nO5lKR2Xd1cpHMTzY8Xys1MGTqDzyznA+Hs+
+         AXQQ==
+X-Gm-Message-State: AOJu0YznzST3BkbI5ZxMkHPH78DIh4xTAEo7GAR90MLi5CSY+Wdi3Pyk
+	Dx6aMZHPGJ1oQbbjIxiW2zjLuQ==
+X-Google-Smtp-Source: AGHT+IEaUnkmb6VMOC1ZmV7RhknH3M28z+3B6TqVq+yqgnnJz1v02mq63uTBtrSHn4oV4teABtH6uA==
+X-Received: by 2002:a05:6a20:f390:b0:190:6920:e14b with SMTP id qr16-20020a056a20f39000b001906920e14bmr1018200pzb.122.1702091725612;
+        Fri, 08 Dec 2023 19:15:25 -0800 (PST)
+Received: from localhost ([2804:14d:7e39:8470:4c58:a216:27d2:2ff])
+        by smtp.gmail.com with ESMTPSA id x22-20020a056a00271600b006be5af77f06sm2330693pfv.2.2023.12.08.19.15.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Dec 2023 19:15:25 -0800 (PST)
+References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
+ <20231122-arm64-gcs-v7-24-201c483bd775@kernel.org>
+User-agent: mu4e 1.10.8; emacs 29.1
+From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
+ <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Morton
+ <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
+ <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
+ Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, Oleg
+ Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, Kees
+ Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, "Rick P.
+ Edgecombe" <rick.p.edgecombe@intel.com>, Deepak Gupta
+ <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, Szabolcs Nagy
+ <Szabolcs.Nagy@arm.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
+ <aou@eecs.berkeley.edu>, Florian Weimer <fweimer@redhat.com>, Christian
+ Brauner <brauner@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v7 24/39] arm64/signal: Set up and restore the GCS
+ context for signal handlers
+In-reply-to: <20231122-arm64-gcs-v7-24-201c483bd775@kernel.org>
+Date: Sat, 09 Dec 2023 00:15:22 -0300
+Message-ID: <8734wcgj79.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsnt5y18v26c.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v3 3/3] KVM: arm64: selftests: Add arch_timer_edge_cases selftest
-From: Colton Lewis <coltonlewis@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, maz@kernel.org, james.morse@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, ricarkol@google.com, 
-	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain
 
-Oliver Upton <oliver.upton@linux.dev> writes:
 
-> On Fri, Nov 03, 2023 at 07:29:15PM +0000, Colton Lewis wrote:
->> +enum sync_cmd {
->> +	SET_REG_KVM_REG_ARM_TIMER_CNT = 100001,
+Mark Brown <broonie@kernel.org> writes:
 
-> nit: Why not call it SET_COUNTER_VALUE? Also, what's the reason for the
-> magic starting value here?
+> +static bool gcs_signal_cap_valid(u64 addr, u64 val)
+> +{
+> +	/*
+> +	 * The top bit should be set, this is an invalid address for
+> +	 * EL0 and will only be set for caps created by signals.
+> +	 */
+> +	if (!(val & GCS_SIGNAL_CAP_FLAG))
+> +		return false;
+> +
+> +	/* The rest should be a standard architectural cap token. */
+> +	val &= ~GCS_SIGNAL_CAP_FLAG;
+> +
+> +	/* The cap must have the low bits set to a token value */
+> +	if (GCS_CAP_TOKEN(val) != 0)
+> +		return false;
 
-No reason I'm aware of other than it was that way before I took over.
+I found the comment above a little confusing, since the if condition
+actually checks that low bits aren't set at all. Perhaps reword to
+something like "The token value of a signal cap must be 0"?
 
->> +#define for_each_wfi_method(i)							\
->> +	for ((i) = 0; (i) < ARRAY_SIZE(wfi_method); (i)++)
->> +
->> +#define for_each_sleep_method(i)						\
->> +	for ((i) = 0; (i) < ARRAY_SIZE(sleep_method); (i)++)
+> +
+> +	/* The cap must store the VA the cap was stored at */
+> +	if (GCS_CAP_ADDR(addr) != GCS_CAP_ADDR(val))
+> +		return false;
+> +
+> +	return true;
+> +}
+> +#endif
+> +
+>  /*
+>   * Do a signal return; undo the signal stack. These are aligned to 128-bit.
+>   */
+> @@ -815,6 +847,45 @@ static int restore_sigframe(struct pt_regs *regs,
+>  	return err;
+>  }
+>  
+> +#ifdef CONFIG_ARM64_GCS
+> +static int gcs_restore_signal(void)
+> +{
+> +	u64 gcspr_el0, cap;
+> +	int ret;
+> +
+> +	if (!system_supports_gcs())
+> +		return 0;
+> +
+> +	if (!(current->thread.gcs_el0_mode & PR_SHADOW_STACK_ENABLE))
+> +		return 0;
+> +
+> +	gcspr_el0 = read_sysreg_s(SYS_GCSPR_EL0);
+> +
+> +	/*
+> +	 * GCSPR_EL0 should be pointing at a capped GCS, read the cap...
+> +	 */
+> +	gcsb_dsync();
+> +	ret = copy_from_user(&cap, (__user void*)gcspr_el0, sizeof(cap));
+> +	if (ret)
+> +		return -EFAULT;
+> +
+> +	/*
+> +	 * ...then check that the cap is the actual GCS before
+> +	 * restoring it.
+> +	 */
+> +	if (!gcs_signal_cap_valid(gcspr_el0, cap))
+> +		return -EINVAL;
+> +
+> +	current->thread.gcspr_el0 = gcspr_el0 + sizeof(cap);
+> +	write_sysreg_s(current->thread.gcspr_el0, SYS_GCSPR_EL0);
 
-> I don't see a tremendous amount of value in using iterators for these
-> arrays, especially since the caller is still directly referencing the
-> underlying arrays to get at the element anyway.
+At this point, there's an inactive but valid cap just below the GCS.
+Over time, as different signals are received when the GCSPR is pointing
+at different locations of the stack, there could be a number of valid
+inactive caps available for misuse.
 
-Easy enough to change.
+I'm still not proficient enough in GCS to know how exactly this could be
+abused (e.g., somehow writing the desired return location right above
+one of these inactive caps and arranging for GCSPR to point to the cap
+before returning from a signal) but to be safe or paranoid, perhaps zero
+the location of the cap before returning?
 
->> +enum timer_view {
->> +	TIMER_CVAL = 1,
+> +
+> +	return 0;
+> +}
+> +
+> +#else
+> +static int gcs_restore_signal(void) { return 0; }
+> +#endif
+> +
+>  SYSCALL_DEFINE0(rt_sigreturn)
+>  {
+>  	struct pt_regs *regs = current_pt_regs();
+> @@ -841,6 +912,9 @@ SYSCALL_DEFINE0(rt_sigreturn)
+>  	if (restore_altstack(&frame->uc.uc_stack))
+>  		goto badframe;
+>  
+> +	if (gcs_restore_signal())
+> +		goto badframe;
+> +
+>  	return regs->regs[0];
+>  
+>  badframe:
+> @@ -1071,7 +1145,50 @@ static int get_sigframe(struct rt_sigframe_user_layout *user,
+>  	return 0;
+>  }
+>  
+> -static void setup_return(struct pt_regs *regs, struct k_sigaction *ka,
+> +#ifdef CONFIG_ARM64_GCS
+> +
+> +static int gcs_signal_entry(__sigrestore_t sigtramp, struct ksignal *ksig)
 
-> Again, when I read an enumeration with an explicit starting value, I
-> assume that there is a functional reason for it.
+The ksig argument is unused, so it can be removed.
 
-Not this time. I'll change it.
+> +{
+> +	unsigned long __user *gcspr_el0;
+> +	int ret = 0;
+> +
+> +	if (!system_supports_gcs())
+> +		return 0;
+> +
+> +	if (!task_gcs_el0_enabled(current))
+> +		return 0;
+> +
+> +	/*
+> +	 * We are entering a signal handler, current register state is
+> +	 * active.
+> +	 */
+> +	gcspr_el0 = (unsigned long __user *)read_sysreg_s(SYS_GCSPR_EL0);
+> +
+> +	/*
+> +	 * Push a cap and the GCS entry for the trampoline onto the GCS.
+> +	 */
+> +	put_user_gcs((unsigned long)sigtramp, gcspr_el0 - 2, &ret);
+> +	put_user_gcs(GCS_SIGNAL_CAP(gcspr_el0 - 1), gcspr_el0 - 1, &ret);
+> +	if (ret != 0)
+> +		return ret;
+> +
+> +	gcsb_dsync();
+> +
+> +	gcspr_el0 -= 2;
+> +	write_sysreg_s((unsigned long)gcspr_el0, SYS_GCSPR_EL0);
+> +
+> +	return 0;
+> +}
+> +#else
+> +
+> +static int gcs_signal_entry(__sigrestore_t sigtramp, struct ksignal *ksig)
+> +{
+> +	return 0;
+> +}
+> +
+> +#endif
+> +
+> +static int setup_return(struct pt_regs *regs, struct ksignal *ksig,
+>  			 struct rt_sigframe_user_layout *user, int usig)
 
->> +#define IAR_SPURIOUS		1023
->> +
+Since the ksig argument isn't used by gcs_signal_entry(), setup_return()
+can keep the ka argument and the changes below from ka to ksic->ka are
+unnecessary.
 
-> Isn't this already defined in gic.h?
+>  {
+>  	__sigrestore_t sigtramp;
+> @@ -1079,7 +1196,7 @@ static void setup_return(struct pt_regs *regs, struct k_sigaction *ka,
+>  	regs->regs[0] = usig;
+>  	regs->sp = (unsigned long)user->sigframe;
+>  	regs->regs[29] = (unsigned long)&user->next_frame->fp;
+> -	regs->pc = (unsigned long)ka->sa.sa_handler;
+> +	regs->pc = (unsigned long)ksig->ka.sa.sa_handler;
+>  
+>  	/*
+>  	 * Signal delivery is a (wacky) indirect function call in
+> @@ -1119,12 +1236,14 @@ static void setup_return(struct pt_regs *regs, struct k_sigaction *ka,
+>  		sme_smstop();
+>  	}
+>  
+> -	if (ka->sa.sa_flags & SA_RESTORER)
+> -		sigtramp = ka->sa.sa_restorer;
+> +	if (ksig->ka.sa.sa_flags & SA_RESTORER)
+> +		sigtramp = ksig->ka.sa.sa_restorer;
+>  	else
+>  		sigtramp = VDSO_SYMBOL(current->mm->context.vdso, sigtramp);
+>  
+>  	regs->regs[30] = (unsigned long)sigtramp;
+> +
+> +	return gcs_signal_entry(sigtramp, ksig);
+>  }
+>  
+>  static int setup_rt_frame(int usig, struct ksignal *ksig, sigset_t *set,
+> @@ -1147,7 +1266,7 @@ static int setup_rt_frame(int usig, struct ksignal *ksig, sigset_t *set,
+>  	err |= __save_altstack(&frame->uc.uc_stack, regs->sp);
+>  	err |= setup_sigframe(&user, regs, set);
+>  	if (err == 0) {
+> -		setup_return(regs, &ksig->ka, &user, usig);
+> +		err = setup_return(regs, ksig, &user, usig);
+>  		if (ksig->ka.sa.sa_flags & SA_SIGINFO) {
+>  			err |= copy_siginfo_to_user(&frame->info, &ksig->info);
+>  			regs->regs[1] = (unsigned long)&frame->info;
+> diff --git a/arch/arm64/mm/gcs.c b/arch/arm64/mm/gcs.c
+> index 02f8f6046c10..6f51429c5a46 100644
+> --- a/arch/arm64/mm/gcs.c
+> +++ b/arch/arm64/mm/gcs.c
+> @@ -6,6 +6,7 @@
+>  #include <linux/types.h>
+>  
+>  #include <asm/cpufeature.h>
+> +#include <asm/gcs.h>
+>  #include <asm/page.h>
 
-It is.
+This is #include isn't needed by this patch. Probably better as part of
+another one.
 
->> +static void set_counter(enum arch_timer timer, uint64_t counter)
->> +{
->> +	GUEST_SYNC_ARGS(SET_REG_KVM_REG_ARM_TIMER_CNT, counter, timer, 0, 0);
->> +}
-
-> Why do some of the ucall helpers use macros and this one is done as a
-> function? You should avoid using macros unless you're actually doing
-> something valuable with the preprocessor.
-
-I agree that's an inconsistency and it would be better to make them all
-functions.
-
->> +static uint32_t next_pcpu(void)
->> +{
->> +	uint32_t max = get_nprocs();
->> +	uint32_t cur = sched_getcpu();
->> +	uint32_t next = cur;
->> +	cpu_set_t cpuset;
->> +
->> +	TEST_ASSERT(max > 1, "Need at least two physical cpus");
->> +
->> +	sched_getaffinity(getpid(), sizeof(cpuset), &cpuset);
-
-> Can you just pass 0 here for the pid? Forgive me if I'm getting my wires
-> crossed, but isn't this going to return the last cpuset you've written in
-> migrate_self()? In that case it would seem you'll always select the same
-> CPU.
-
-I checked and I can pass 0. You are right that it will select the last
-cpuset written in migrate_self, but that is not always the
-same. next_pcpu() uses the current cpuset to calculate the next cpu to
-migrate to (current scheme just rotates through all cpus in ascending
-order). To migrate, the test calls migrate_self(next_pcpu()), so it
-should advance the cpuset to the next cpu every time migrate_self is
-called.
-
-> Also, it would seem that the test isn't pinning to a particular CPU in
-> the beginning. In that case CPU migrations can happen _at any time_ and
-> are not being precisely controlled by the test. Is this intentional?
-
-This appears to be an oversight on my part. I did have a pin at the
-beginning before but it must have been deleted when I shuffled some code
-around.
-
->> +		gic_wfi();
->> +		local_irq_enable();
->> +		isb();
->> +		/* handle IRQ */
->> +		local_irq_disable();
-
-> Same nitpick about comment placement here. The isb *is* the context
-> synchronization event that precipitates the imaginary window where
-> pending interrupts are taken.
-
-Strictly speaking by ARM ref manual (DDI 0487J.a D1.3.6 table entry for
-R_RBZYL), "interrupt is taken before the first instruction **after**
-context synchronization event".
-
-But I don't mind just putting the comment to the right of the isb.
-
->> + * Wait for an non-spurious IRQ by polling in the guest (userspace=0)  
->> or in
->> + * userspace (e.g., userspace=1 and  
->> userspace_cmd=USERSPACE_SCHED_YIELD).
-> 		       ^~~~~~~~~~~
-
-> More magic values. What is this?
-
-In this case it's 1 and 0 representing true and false. Seems like a
-standard Cism to me but I can make it more clear.
-
->> +	local_irq_enable();
->> +	while (h == atomic_read(&shared_data.handled)) {
->> +		if (userspace_cmd == NO_USERSPACE_CMD)
->> +			cpu_relax();
->> +		else
->> +			USERSPACE_CMD(userspace_cmd);
->> +	}
->> +	local_irq_disable();
-
-> cpu_relax(), or rather the yield instruction, is not a context
-> synchronization event.
-
-I agree it's not, but I don't think it matters. We are just waiting for
-an interrupt. Context will catch up eventually.
-
->> +/* Test masking/unmasking a timer using the timer mask (not the IRQ  
->> mask). */
->> +static void test_timer_control_mask_then_unmask(enum arch_timer timer)
->> +{
->> +	reset_timer_state(timer, DEF_CNT);
->> +	set_tval_irq(timer, -1, CTL_ENABLE | CTL_IMASK);
->> +
->> +	/* No IRQs because the timer is still masked. */
->> +	ASSERT_IRQS_HANDLED(0);
-
-> This seems to assume both the timer hardware and GIC are capable of
-> getting the interrupt to the CPU in just a few cycles.
-
-> Oh wait, that's exactly what test_timer_control_masks() is doing...
-> What's the point of this then?
-
-I agree the point of this test is something else so the
-ASSERT_IRQS_HANDLED(0) is duplicating test_timer_control_masks
-
->> +static void test_fire_a_timer_multiple_times(enum arch_timer timer,
->> +					     wfi_method_t wm, int num)
->> +{
->> +	int i;
->> +
->> +	local_irq_disable();
->> +	reset_timer_state(timer, DEF_CNT);
->> +
->> +	set_tval_irq(timer, 0, CTL_ENABLE);
->> +
->> +	for (i = 1; i <= num; i++) {
->> +		wm();
-
-> wfi_method_t is such a misnomer. Critically, it masks/unmasks IRQs which
-> is rather hard to remember once you're this deep into the test code. At
-> least having some comments on what wfi_method_t is expected to do would
-> help a bit.
-
-I agree a better name is called for there. How about irq_wait_method_t?
-That better hints what it is doing with irqs.
-
->> +/*
->> + * Set a timer for tval=d_1_ms then reprogram it to tval=d_2_ms. Check  
->> that we
->> + * get the timer fired. There is no timeout for the wait: we use the wfi
->> + * instruction.
->> + */
->> +static void test_reprogramming_timer(enum arch_timer timer,  
->> wfi_method_t wm,
->> +				     int32_t d_1_ms, int32_t d_2_ms)
->> +{
->> +	local_irq_disable();
->> +	reset_timer_state(timer, DEF_CNT);
->> +
->> +	/* Program the timer to DEF_CNT + d_1_ms. */
->> +	set_tval_irq(timer, msec_to_cycles(d_1_ms), CTL_ENABLE);
-
-> This assumes that the program doesn't get preempted for @d_1_ms here,
-> right?
-
-No? Where are you getting that?
-
->> +	guest_sleep(timer, msecs_to_usecs(d_2_ms) + TEST_MARGIN_US);
-
-> Even more magic values. What is the difference between TEST_MARGIN_US
-> and TIMEOUT_NO_IRQ_US?
-
-Seems like they serve the same purpose and should be unified.
-
->> +static void test_reprogram_timers(enum arch_timer timer)
->> +{
->> +	int i;
->> +	uint64_t base_wait = test_args.wait_ms;
->> +
->> +	for_each_wfi_method(i) {
->> +		test_reprogramming_timer(timer, wfi_method[i], 2 * base_wait,
->> +					 base_wait);
->> +		test_reprogramming_timer(timer, wfi_method[i], base_wait,
->> +					 2 * base_wait);
-
-> What is the value of changing around the two timer deltas? It is
-> entirely unclear from reading this what potential edge case it is
-> detecting.
-
-It's ensuring the timer is reprogrammed correctly whether going from a
-longer to a shorter delta or shorter to longer. I can comment on that.
-
->> +/*
->> + * This test checks basic timer behavior without actually firing  
->> timers, things
->> + * like: the relationship between cval and tval, tval down-counting.
->> + */
->> +static void timers_sanity_checks(enum arch_timer timer, bool use_sched)
->> +{
->> +	reset_timer_state(timer, DEF_CNT);
->> +
->> +	local_irq_disable();
->> +
->> +	/* cval in the past */
->> +	timer_set_cval(timer,
->> +		       timer_get_cntct(timer) -
->> +		       msec_to_cycles(test_args.wait_ms));
->> +	if (use_sched)
->> +		USERSPACE_MIGRATE_VCPU();
->> +	GUEST_ASSERT(timer_get_tval(timer) < 0);
->> +
->> +	/* tval in the past */
->> +	timer_set_tval(timer, -1);
->> +	if (use_sched)
->> +		USERSPACE_MIGRATE_VCPU();
->> +	GUEST_ASSERT(timer_get_cval(timer) < timer_get_cntct(timer));
->> +
->> +	/* tval larger than TVAL_MAX. */
-
-> Isn't this programming CVAL with a delta larger than what can be
-> expressed in TVAL?
-
-Yes. If the value is not expressible by TVAL (greater than INT_MAX),
-then it won't work with the timer_set_tval function and has to be
-programmed with timer_set_cval.
-
->> +	/*
->> +	 * tval larger than 2 * TVAL_MAX.
->> +	 * Twice the TVAL_MAX completely loops around the TVAL.
->> +	 */
-
-> Same here. The comment calls it TVAL, but the test is programming CVAL.
-
-Same response.
-
->> +	/* negative tval that rollovers from 0. */
->> +	set_counter(timer, msec_to_cycles(1));
->> +	timer_set_tval(timer, -1 * msec_to_cycles(test_args.wait_ms));
->> +	if (use_sched)
->> +		USERSPACE_MIGRATE_VCPU();
->> +	GUEST_ASSERT(timer_get_cval(timer) >= (CVAL_MAX - msec_to_cycles(9)));
-> 					      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-> I'm lost. What is the significance of this expression?
-
-Good question. I'll have to think about that one some more.
-
-> I'm pretty sure the architecture allows implementers to size the CVAL
-> register according to the number of implemented bits in the counter. I
-> don't see how the case of hardware truncating the MSBs of the register
-> is handled here.
-
-I'm pretty sure the CVAL register is always 64 bits regardless of the
-number of implemented counter bits.
-
-> Looks like there's quite a lot more of this code I haven't gotten to,
-> but I've reached a stopping point and need to work on some other things.
-
-Thanks. I can see you put a lot of time and effort into a thoughtful
-critique and I realize there are some frustrating aspects of this code I
-have not fully removed yet.
+-- 
+Thiago
