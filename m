@@ -1,42 +1,38 @@
-Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2181.outbound.protection.outlook.com [40.92.62.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8CB76FAD
-	for <kvmarm@lists.linux.dev>; Sun, 10 Dec 2023 08:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66DB9290C;
+	Sun, 10 Dec 2023 12:16:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="czuqyxI+"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Mj7clTcRpmfwzuRoAM2B6W3luIjSu7oVWJ08o0LokHbqJWcbKerHEzHo2+uduiaaHohLMg/FFiUoq7u+k1dCAvXFCuaBRJRtlAkEYe2PJpBgA6VVPWK6ilkRk6cIp6pK9b7H02u4WVNQ/UUQo1b1ULotD03+qqRh5NLpTqqr0LdcOvApLk3aMfpzbKeB4nTWmwUDdw9t4400LuygtROOH/tgHCG1zwPCUp7HHW6HKEBnCXe4YaKgEkiUvcd1DI6WecfNZC1Qg7z5+KKsFcFjlOtCq/wYUD9s9ZVzvk0RfH/wKxr1AjD0CV25h3wbnyOpUEUmaZHWGhjkih0/3ghaMQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Mhds1yoBbjrhkjhv8XPbO4OPO72aaoNMvMxayRbgsR4=;
- b=MRClbKtrKhZpjDdAAOpgwOjwoU8o3wE5WJveyCYqWIpUX1rONUmCyFPvbRTg48/ilYO73ZYqZn1iqLO6+NK57/cEc6HdgHjOBM2im2TVUnuQBW0m5ewtGGkUBURMTNpZKU2xWpEdELGo7sQY4cJyw6JF/DG1I/AkF+2y3Dumg0ihmAH58amWObIYMvSfC1JQeUB6gWBZKLnZJPA66WSwvtLdLT0mSHFE2KuI8fWFq2hNJx6E3adFZdW1WDRFbx001y9LlrYg3iZAqbsysMYOXMwEd2rDI1pLcBm96sbeZeJhyV7/bfe1B8vbhXl8uu2hJ3aZF6o6+7VKINSzRJZZpg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mhds1yoBbjrhkjhv8XPbO4OPO72aaoNMvMxayRbgsR4=;
- b=czuqyxI+/jLrCtACYpUdol1ZJojbdl0voVkq3eixcteJ/IE90MsP6luwZCfzcMzdvTlKYVTLbi5tJb+h9aNfrVOFxJnH69DNtENmv6KffJaUTdtGodx0F49pTD4Dzcip3O1KqcGcKmlT5mycXGQMnohF+kTO1Qf1L+EnrwUNk0sh62pgFgjjjSbLWXJ+lr7Nl+J/gy5BSRK7yEOzl9t52m+9lBpceHVArMqZjv1Ic68R2Y+A7mmvQvwd3fS/tnoSjD4f8Fga9Lom5WRg9u8wILwMvi8lg4WBYpPrXsbKSCYTtSAwfKqIF61Rtvi0pE1LjckqfSW8kxu8aSHGSAefmw==
-Received: from SYBPR01MB6870.ausprd01.prod.outlook.com (2603:10c6:10:13d::10)
- by MEYPR01MB7339.ausprd01.prod.outlook.com (2603:10c6:220:15f::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.31; Sun, 10 Dec
- 2023 08:16:38 +0000
-Received: from SYBPR01MB6870.ausprd01.prod.outlook.com
- ([fe80::be5a:160f:5418:9deb]) by SYBPR01MB6870.ausprd01.prod.outlook.com
- ([fe80::be5a:160f:5418:9deb%5]) with mapi id 15.20.7068.030; Sun, 10 Dec 2023
- 08:16:38 +0000
-From: Tianyi Liu <i.pear@outlook.com>
-To: seanjc@google.com,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XNGPxpqM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF365C433C9;
+	Sun, 10 Dec 2023 12:16:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702210596;
+	bh=zI/jeFRyjHplsqmull7ZiNDfoFDcHnPQwoXdDnLIe58=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XNGPxpqMpKbxiZDIIwqaAP4vnfVrNqeUImkpUgaTvVibWyF+2Td6NYdBTgGCG8ACy
+	 eXA05rq0mJvnlQ7bT6gFshJKSrDZ4rRxoaTWphSdn0dyipzHpkw3agwiO4oRHtBnD7
+	 XdrNR6lyCoQZdaOWT6KN330vSSuhzLMDIw7VHQVZNG1PW9RPfHNniNnkap6e+aI6M5
+	 sUdbMPxuS88tY+Ql086/6F63E7KcTUMRyDs0Kxi7qFZyt46iJ4X5z5zftq1SAiXQyX
+	 CwA9Nh7Xs5MLIRJvzRv+zGsx2zYl5k+gNoRbrnoZgDDskHAaZyCWViXyAjstMkwJJ4
+	 2EEHczNzYYg+g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rCIja-002tai-3P;
+	Sun, 10 Dec 2023 12:16:34 +0000
+Date: Sun, 10 Dec 2023 12:16:32 +0000
+Message-ID: <865y16b6cf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Tianyi Liu <i.pear@outlook.com>
+Cc: seanjc@google.com,
 	pbonzini@redhat.com,
 	peterz@infradead.org,
 	mingo@redhat.com,
-	acme@kernel.org
-Cc: linux-arm-kernel@lists.infradead.org,
+	acme@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	linux-perf-users@vger.kernel.org,
@@ -44,143 +40,129 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	x86@kernel.org,
 	mark.rutland@arm.com,
 	mlevitsk@redhat.com,
-	maz@kernel.org,
 	alexander.shishkin@linux.intel.com,
 	jolsa@kernel.org,
 	namhyung@kernel.org,
 	irogers@google.com,
-	adrian.hunter@intel.com,
-	Tianyi Liu <i.pear@outlook.com>
-Subject: [PATCH v3 5/5] perf tools: Support PERF_CONTEXT_GUEST_* flags
-Date: Sun, 10 Dec 2023 16:16:14 +0800
-Message-ID:
- <SYBPR01MB68703FCDA8424EC486BB208E9D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <SYBPR01MB687069BFC9744585B4EEF8C49D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
+	adrian.hunter@intel.com
+Subject: Re: [PATCH v3 1/5] KVM: Add arch specific interfaces for sampling guest callchains
+In-Reply-To: <SYBPR01MB6870FDFBB88F879C735198F39D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
 References: <SYBPR01MB687069BFC9744585B4EEF8C49D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [8UVhiSmk+ilYe9quhayyz4kLLAPhV41H68ne61CRE+RkAwuHwNnW+A==]
-X-ClientProxiedBy: SG2P153CA0040.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c6::9)
- To SYBPR01MB6870.ausprd01.prod.outlook.com (2603:10c6:10:13d::10)
-X-Microsoft-Original-Message-ID: <20231210081614.2435-1-i.pear@outlook.com>
+	<SYBPR01MB6870FDFBB88F879C735198F39D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SYBPR01MB6870:EE_|MEYPR01MB7339:EE_
-X-MS-Office365-Filtering-Correlation-Id: ea4a1d05-76d7-4776-7e34-08dbf958554b
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	8KlL61KGK3844bxqcw2mjgws6tBrdbjGDYJLTUij/sCbrkbRQ9yEaxqamA5ScAvluCCmn5N/sVhI7etP8Grtx20mq9nYuREuuIRcf7sQoX35ZkFcaWWTmEmAolzKfhhy9YTa3GIow3x1DrR26RpnEDOhFOMuNMT9ndbUXrdTO1tijtCixldnQ+sEU1TotpzLEfbkByd1J5N5n4yiWMs+LTR0D6uwehA8ypOw9t3SYl8abVWwTxPQkS4YrvIIATv+9isVIdC8MNnxmTY2280yuRPce74WnF9T1W6rPo8+yS5+vNHkEhbetC/Lt8RDf4siTWmeqNdKmPSYoaeuVUIW2x5S4MlENHlbHaRHC6tOLHLGst5kQ86nkYnRruEa/IxMhtVNxPEog3mqZCQWl9afEWTHWlYUXVaDiIJvvTo5SDyIJMmEdHSrMpw9R9ZA+PGiPQVN+gxvxTXjbLm6VZHR++BtBLVp07kbNUeRS1ars6DErcgqyl2y/9SaBJSa3VmT14knUt5Inqj5VSzg5BafYp52mJMIA9vQOCFZAj8EnIbdDW1QwkW5Y2NZ3L/XYz4hUGYPnkkZA7vcVqOWF4SDWoTJShlOFbq/upMwa0P1dF5kFlTg6UvWHSspWoE7MIEv
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?KfEbjl6a6Sqms5Et/MeX36Qw/8VPmzfQ/l24QGo9AzUEAYvEhe/XKQFi0HiU?=
- =?us-ascii?Q?uLdJtjjeWxkV9CbU16DjwhY4NJvTyKQ2Q1IwcOMgnwl9RxhfJfrfe7QBHfqz?=
- =?us-ascii?Q?r7CzFR4yPNskOZkcdiwmG7e4eFPyLAZQFBRWDS9B4O92p1u0Lz/x41uUsEce?=
- =?us-ascii?Q?qM+qua2lkIaDuTqiDmFtNn4yIrAN3XOvALwlL7eZcKmnpduQ6N3iicyojbSR?=
- =?us-ascii?Q?dnxTdRAxhSwEzHsBwY5G0xAdiO0shG8zlBhWlGORZ7BkJ+iBjGdW0A5Oa9TR?=
- =?us-ascii?Q?cAgFNYbLtvxoQrqUW2AtuMHoQPLGGMGzp3jWBIBJyA5JFzuSeAEXiEdXAM03?=
- =?us-ascii?Q?n4/OsGGprziqjLFX1Q0Gkj8eunkfQ0AdJn/QhlxpSffJby2verSBwD0bLXtr?=
- =?us-ascii?Q?43ResD7TrvF58c7FFkKeNVyK6zrzy8dxkvRdXLmkqvCtB48FRDLolEXpz5p4?=
- =?us-ascii?Q?NZXBTzxFn8uTmZHDVwQgmY1hL+4lQLazqQar11Uyuhg1GsCg4tXL1bo4w2jb?=
- =?us-ascii?Q?jkLnOV/s4KGbOkBjAo3/UBnNAbrlJBHFjkaaPd/7M5rOsaIfvZtWuclQ7LYq?=
- =?us-ascii?Q?kGw/mWXNsWCRKc4Q7pArjkJPiI9Y1TP5bzOJLpzjbafdFLBs7K7TPYyJ7gId?=
- =?us-ascii?Q?/OJuFp63Ps3K6FZ+AZIsNh1LB5QC+/nbX6nB80qtK2YKdW2l3cNPaVNJ07ay?=
- =?us-ascii?Q?ApbjN69a/hI5LsVWo40l7CMyKLaJ3bUTPmwZC0Z4TwurZrrYqUWWA5RuIFac?=
- =?us-ascii?Q?IglBm0TTopp8zQ4eRlBTKjPAFg07ryA9EOPLOmFiqRUQWbksE6/8Z5XmceA5?=
- =?us-ascii?Q?mvCuW5ITzyP5KTUtRUjUizWqgIa7N5T+fujzcTkannuCKNZ61Bqa7DpewIz4?=
- =?us-ascii?Q?xWCjTelW71QJre1aWOtoDSygZAKj5iwZoB5aPnVkoT5eDojCyC+rNQ6XZT5U?=
- =?us-ascii?Q?5alCoAl/5P+XrA8PSUUeeLVaU4BxPXkeCNFcTUc26/yZ2APDg/QfP8romr/l?=
- =?us-ascii?Q?onN/Zoy1faXmhBL7iD8qSQQDMfBQ4ndz7h1VibyWE6zn+CYsdBv4uyAibKxr?=
- =?us-ascii?Q?/HszVvkGTJc5Zu6eaS8XFojieu6AzEuzDMV6pEyhq3m0zQ9wdPmBRuQGm6QW?=
- =?us-ascii?Q?PTSzhpeIloU0y1PvZhjJJgnOhrLPJN6ldj5cEBxiRkc7HmKWmPnZoQAHa6Lq?=
- =?us-ascii?Q?hotUe9DY2aYNWhHlxUjKUz7vDGFn/3Wl25fqPQiWOUZndr1zJsdvrZZY0uAS?=
- =?us-ascii?Q?9VZqthVg+h498A6Ddnq7?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea4a1d05-76d7-4776-7e34-08dbf958554b
-X-MS-Exchange-CrossTenant-AuthSource: SYBPR01MB6870.ausprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2023 08:16:38.9013
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MEYPR01MB7339
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: i.pear@outlook.com, seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, mark.rutland@arm.com, mlevitsk@redhat.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org, namhyung@kernel.org, irogers@google.com, adrian.hunter@intel.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The `perf` util currently has an incomplete implementation for the
-following event flags. Events with these flags will be dropped
-or be identified as unknown types:
+On Sun, 10 Dec 2023 08:12:18 +0000,
+Tianyi Liu <i.pear@outlook.com> wrote:
+> 
+> This patch adds two architecture specific interfaces used by `perf kvm`:
+> 
+> - kvm_arch_vcpu_get_unwind_info: Return required data for unwinding
+>   at once; including ip address, frame pointer, whether the guest vCPU
+>   is running in 32 or 64 bits, and possibly the base addresses of
+>   the segments.
+> 
+> - kvm_arch_vcpu_read_virt: Read data from a virtual address of the
+>   guest vm.
+> 
+> `perf_kvm.h` has been added to the `include/linux/` directory to store
+> the interface structures between the perf events subsystem and the KVM
+> subsystem.
+> 
+> Since arm64 hasn't provided some foundational infrastructure, stub the
+> arm64 implementation for now because it's a bit complex.
 
-`PERF_CONTEXT_GUEST_KERNEL`
-`PERF_CONTEXT_GUEST_USER`
+It's not complex. It is *unsafe*. Do you see the difference?
 
-This patch makes `perf script`, `perf timechart` and `perf data` to
-correctly identify these flags.
+> 
+> The above interfaces require architecture support for
+> `CONFIG_GUEST_PERF_EVENTS`, which is only implemented by x86 and arm64
+> currently. For more architectures, they need to implement these interfaces
+> when enabling `CONFIG_GUEST_PERF_EVENTS`.
+> 
+> In terms of safety, guests are designed to be read-only in this feature,
+> and we will never inject page faults into the guests, ensuring that the
+> guests are not interfered by profiling. In extremely rare cases, if the
+> guest is modifying the page table, there is a possibility of reading
+> incorrect data. Additionally, if certain programs running in the guest OS
+> do not support frame pointers, it may also result in some erroneous data.
+> These erroneous data will eventually appear as `[unknown]` entries in the
+> report. It is sufficient as long as most of the records are correct for
+> profiling.
+> 
+> Signed-off-by: Tianyi Liu <i.pear@outlook.com>
+> ---
+>  MAINTAINERS              |  1 +
+>  arch/arm64/kvm/arm.c     | 12 ++++++++++++
+>  arch/x86/kvm/x86.c       | 24 ++++++++++++++++++++++++
+>  include/linux/kvm_host.h |  5 +++++
+>  include/linux/perf_kvm.h | 18 ++++++++++++++++++
+>  5 files changed, 60 insertions(+)
+>  create mode 100644 include/linux/perf_kvm.h
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 788be9ab5b73..5ee36b4a9701 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -16976,6 +16976,7 @@ F:	arch/*/kernel/*/perf_event*.c
+>  F:	arch/*/kernel/perf_callchain.c
+>  F:	arch/*/kernel/perf_event*.c
+>  F:	include/linux/perf_event.h
+> +F:	include/linux/perf_kvm.h
+>  F:	include/uapi/linux/perf_event.h
+>  F:	kernel/events/*
+>  F:	tools/lib/perf/
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index e5f75f1f1085..5ae74b5c263a 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -574,6 +574,18 @@ unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu)
+>  {
+>  	return *vcpu_pc(vcpu);
+>  }
+> +
+> +bool kvm_arch_vcpu_get_unwind_info(struct kvm_vcpu *vcpu, struct perf_kvm_guest_unwind_info *info)
+> +{
+> +	/* TODO: implement */
+> +	return false;
+> +}
+> +
+> +bool kvm_arch_vcpu_read_virt(struct kvm_vcpu *vcpu, gva_t addr, void *dest, unsigned int length)
+> +{
+> +	/* TODO: implement */
+> +	return false;
+> +}
 
-Signed-off-by: Tianyi Liu <i.pear@outlook.com>
----
- tools/perf/builtin-timechart.c      | 6 ++++++
- tools/perf/util/data-convert-json.c | 6 ++++++
- tools/perf/util/machine.c           | 6 ++++++
- 3 files changed, 18 insertions(+)
+I don't do it very often, but the only thing I can say about this is
+*NAK*.
 
-diff --git a/tools/perf/builtin-timechart.c b/tools/perf/builtin-timechart.c
-index 19d4542ea18a..6a368b6a323e 100644
---- a/tools/perf/builtin-timechart.c
-+++ b/tools/perf/builtin-timechart.c
-@@ -536,6 +536,12 @@ static const char *cat_backtrace(union perf_event *event,
- 			case PERF_CONTEXT_USER:
- 				cpumode = PERF_RECORD_MISC_USER;
- 				break;
-+			case PERF_CONTEXT_GUEST_KERNEL:
-+				cpumode = PERF_RECORD_MISC_GUEST_KERNEL;
-+				break;
-+			case PERF_CONTEXT_GUEST_USER:
-+				cpumode = PERF_RECORD_MISC_GUEST_USER;
-+				break;
- 			default:
- 				pr_debug("invalid callchain context: "
- 					 "%"PRId64"\n", (s64) ip);
-diff --git a/tools/perf/util/data-convert-json.c b/tools/perf/util/data-convert-json.c
-index 5bb3c2ba95ca..62686f78d973 100644
---- a/tools/perf/util/data-convert-json.c
-+++ b/tools/perf/util/data-convert-json.c
-@@ -205,6 +205,12 @@ static int process_sample_event(struct perf_tool *tool,
- 				case PERF_CONTEXT_USER:
- 					cpumode = PERF_RECORD_MISC_USER;
- 					break;
-+				case PERF_CONTEXT_GUEST_KERNEL:
-+					cpumode = PERF_RECORD_MISC_GUEST_KERNEL;
-+					break;
-+				case PERF_CONTEXT_GUEST_USER:
-+					cpumode = PERF_RECORD_MISC_GUEST_USER;
-+					break;
- 				default:
- 					pr_debug("invalid callchain context: %"
- 							PRId64 "\n", (s64) ip);
-diff --git a/tools/perf/util/machine.c b/tools/perf/util/machine.c
-index 90c750150b19..28eac11d0f61 100644
---- a/tools/perf/util/machine.c
-+++ b/tools/perf/util/machine.c
-@@ -2343,6 +2343,12 @@ static int add_callchain_ip(struct thread *thread,
- 			case PERF_CONTEXT_USER:
- 				*cpumode = PERF_RECORD_MISC_USER;
- 				break;
-+			case PERF_CONTEXT_GUEST_KERNEL:
-+				*cpumode = PERF_RECORD_MISC_GUEST_KERNEL;
-+				break;
-+			case PERF_CONTEXT_GUEST_USER:
-+				*cpumode = PERF_RECORD_MISC_GUEST_USER;
-+				break;
- 			default:
- 				pr_debug("invalid callchain context: "
- 					 "%"PRId64"\n", (s64) ip);
+You have decided to ignore the previous review comments, which is your
+prerogative. However, I absolutely refuse to add half baked and
+*dangerous* stuff to the arm64's version of KVM.
+
+If you can convince the x86 folks that they absolutely want this, fine
+by me. But this need to be a buy-in interface, not something that is
+required for each and every architecture to have stubs, wrongly
+suggesting that extra work is needed.
+
+For arm64, the way to go is to have this in userspace. Which is both
+easy to implement and safe. And until we have such a userspace
+implementation as a baseline, I will not consider a kernel
+version.
+
+	M.
+
 -- 
-2.34.1
-
+Without deviation from the norm, progress is not possible.
