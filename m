@@ -1,168 +1,102 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66DB9290C;
-	Sun, 10 Dec 2023 12:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99267125DE;
+	Sun, 10 Dec 2023 14:22:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XNGPxpqM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF365C433C9;
-	Sun, 10 Dec 2023 12:16:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z46OPbu3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9FFDC433C7;
+	Sun, 10 Dec 2023 14:22:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702210596;
-	bh=zI/jeFRyjHplsqmull7ZiNDfoFDcHnPQwoXdDnLIe58=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XNGPxpqMpKbxiZDIIwqaAP4vnfVrNqeUImkpUgaTvVibWyF+2Td6NYdBTgGCG8ACy
-	 eXA05rq0mJvnlQ7bT6gFshJKSrDZ4rRxoaTWphSdn0dyipzHpkw3agwiO4oRHtBnD7
-	 XdrNR6lyCoQZdaOWT6KN330vSSuhzLMDIw7VHQVZNG1PW9RPfHNniNnkap6e+aI6M5
-	 sUdbMPxuS88tY+Ql086/6F63E7KcTUMRyDs0Kxi7qFZyt46iJ4X5z5zftq1SAiXQyX
-	 CwA9Nh7Xs5MLIRJvzRv+zGsx2zYl5k+gNoRbrnoZgDDskHAaZyCWViXyAjstMkwJJ4
-	 2EEHczNzYYg+g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rCIja-002tai-3P;
-	Sun, 10 Dec 2023 12:16:34 +0000
-Date: Sun, 10 Dec 2023 12:16:32 +0000
-Message-ID: <865y16b6cf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Tianyi Liu <i.pear@outlook.com>
-Cc: seanjc@google.com,
-	pbonzini@redhat.com,
-	peterz@infradead.org,
-	mingo@redhat.com,
-	acme@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org,
-	kvm@vger.kernel.org,
-	x86@kernel.org,
-	mark.rutland@arm.com,
-	mlevitsk@redhat.com,
-	alexander.shishkin@linux.intel.com,
-	jolsa@kernel.org,
-	namhyung@kernel.org,
-	irogers@google.com,
-	adrian.hunter@intel.com
-Subject: Re: [PATCH v3 1/5] KVM: Add arch specific interfaces for sampling guest callchains
-In-Reply-To: <SYBPR01MB6870FDFBB88F879C735198F39D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
-References: <SYBPR01MB687069BFC9744585B4EEF8C49D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
-	<SYBPR01MB6870FDFBB88F879C735198F39D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1702218179;
+	bh=8tne0aaAREf7h+qiY6KAldko6jyI6LRXnoNCM9fma6Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Z46OPbu3lxs+nSXwJj7g5+uM236T8qcWVMENzV16W8PRn+wPA90J2c/MU1TR09r9G
+	 V7uktPMYA+kX07nhFqGBeWzVnfPGq1sWi8TmA2O/Ypbc+HHzOKCOCc6aUZpI1E2ux5
+	 i7a4xJ46nLuCB9P/YSDucazqkfc40Pwk2ruWwXth0yedV7jS/lBPvlu9h8D8FqQQ5E
+	 7NrgTVM832Ck4BiiNruf7natGB4ETT1vuYgIR5796kVSPSFEDz9SqMvV2j2pOXJx2O
+	 kYv2KFYNFZhj2cny4Ad3h63HQeFh23ezu4307DrPbna88E2yARpEbrhoRhlGsNFA2m
+	 xH4AUl7qyB+aQ==
+Date: Sun, 10 Dec 2023 14:22:56 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v7 26/39] arm64/ptrace: Expose GCS via ptrace and core
+ files
+Message-ID: <ZXXJwNdKC/y6bRYn@finisterre.sirena.org.uk>
+References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
+ <20231122-arm64-gcs-v7-26-201c483bd775@kernel.org>
+ <877clney35.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: i.pear@outlook.com, seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, mark.rutland@arm.com, mlevitsk@redhat.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org, namhyung@kernel.org, irogers@google.com, adrian.hunter@intel.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="+xOPyWhFp+ttqF+R"
+Content-Disposition: inline
+In-Reply-To: <877clney35.fsf@linaro.org>
+X-Cookie: You might have mail.
 
-On Sun, 10 Dec 2023 08:12:18 +0000,
-Tianyi Liu <i.pear@outlook.com> wrote:
-> 
-> This patch adds two architecture specific interfaces used by `perf kvm`:
-> 
-> - kvm_arch_vcpu_get_unwind_info: Return required data for unwinding
->   at once; including ip address, frame pointer, whether the guest vCPU
->   is running in 32 or 64 bits, and possibly the base addresses of
->   the segments.
-> 
-> - kvm_arch_vcpu_read_virt: Read data from a virtual address of the
->   guest vm.
-> 
-> `perf_kvm.h` has been added to the `include/linux/` directory to store
-> the interface structures between the perf events subsystem and the KVM
-> subsystem.
-> 
-> Since arm64 hasn't provided some foundational infrastructure, stub the
-> arm64 implementation for now because it's a bit complex.
 
-It's not complex. It is *unsafe*. Do you see the difference?
+--+xOPyWhFp+ttqF+R
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> 
-> The above interfaces require architecture support for
-> `CONFIG_GUEST_PERF_EVENTS`, which is only implemented by x86 and arm64
-> currently. For more architectures, they need to implement these interfaces
-> when enabling `CONFIG_GUEST_PERF_EVENTS`.
-> 
-> In terms of safety, guests are designed to be read-only in this feature,
-> and we will never inject page faults into the guests, ensuring that the
-> guests are not interfered by profiling. In extremely rare cases, if the
-> guest is modifying the page table, there is a possibility of reading
-> incorrect data. Additionally, if certain programs running in the guest OS
-> do not support frame pointers, it may also result in some erroneous data.
-> These erroneous data will eventually appear as `[unknown]` entries in the
-> report. It is sufficient as long as most of the records are correct for
-> profiling.
-> 
-> Signed-off-by: Tianyi Liu <i.pear@outlook.com>
-> ---
->  MAINTAINERS              |  1 +
->  arch/arm64/kvm/arm.c     | 12 ++++++++++++
->  arch/x86/kvm/x86.c       | 24 ++++++++++++++++++++++++
->  include/linux/kvm_host.h |  5 +++++
->  include/linux/perf_kvm.h | 18 ++++++++++++++++++
->  5 files changed, 60 insertions(+)
->  create mode 100644 include/linux/perf_kvm.h
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 788be9ab5b73..5ee36b4a9701 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -16976,6 +16976,7 @@ F:	arch/*/kernel/*/perf_event*.c
->  F:	arch/*/kernel/perf_callchain.c
->  F:	arch/*/kernel/perf_event*.c
->  F:	include/linux/perf_event.h
-> +F:	include/linux/perf_kvm.h
->  F:	include/uapi/linux/perf_event.h
->  F:	kernel/events/*
->  F:	tools/lib/perf/
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index e5f75f1f1085..5ae74b5c263a 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -574,6 +574,18 @@ unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu)
->  {
->  	return *vcpu_pc(vcpu);
->  }
-> +
-> +bool kvm_arch_vcpu_get_unwind_info(struct kvm_vcpu *vcpu, struct perf_kvm_guest_unwind_info *info)
-> +{
-> +	/* TODO: implement */
-> +	return false;
-> +}
-> +
-> +bool kvm_arch_vcpu_read_virt(struct kvm_vcpu *vcpu, gva_t addr, void *dest, unsigned int length)
-> +{
-> +	/* TODO: implement */
-> +	return false;
-> +}
+On Sat, Dec 09, 2023 at 08:49:02PM -0300, Thiago Jung Bauermann wrote:
+> Mark Brown <broonie@kernel.org> writes:
 
-I don't do it very often, but the only thing I can say about this is
-*NAK*.
+> > Provide a new register type NT_ARM_GCS reporting the current GCS mode
+> > and pointer for EL0.  Due to the interactions with allocation and
+> > deallocation of Guarded Control Stacks we do not permit any changes to
+> > the GCS mode via ptrace, only GCSPR_EL0 may be changed.
 
-You have decided to ignore the previous review comments, which is your
-prerogative. However, I absolutely refuse to add half baked and
-*dangerous* stuff to the arm64's version of KVM.
+> The code allows disabling GCS. Is that unintended?
 
-If you can convince the x86 folks that they absolutely want this, fine
-by me. But this need to be a buy-in interface, not something that is
-required for each and every architecture to have stubs, wrongly
-suggesting that extra work is needed.
+No, it's intentional - ptrace has a lot of control over the process,
+there's not a huge point trying to protect against it doing a disable.
+The reason we prevent enabling is the allocation of a GCS along with
+enable, the complexity of doing that on a remote process seemed
+unjustified.  If clone3() ends up allowing manual allocation and
+placement that'll likely be revised.
 
-For arm64, the way to go is to have this in userspace. Which is both
-easy to implement and safe. And until we have such a userspace
-implementation as a baseline, I will not consider a kernel
-version.
+--+xOPyWhFp+ttqF+R
+Content-Type: application/pgp-signature; name="signature.asc"
 
-	M.
+-----BEGIN PGP SIGNATURE-----
 
--- 
-Without deviation from the norm, progress is not possible.
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmV1yb8ACgkQJNaLcl1U
+h9BWYwf/Tu6vlQCwGJ174Zum1yyKhNrP0gXrNj0hXhil/y9CwTApo4pvBUMmBwQz
+JO0qoPePZDOSlxns1bELpj5O5sFq0c8qB1e29Y1nFzNClHf+uyVDswS2nZDBU6Rk
+QyW/T7yJerJVj/Lw5Mh1iJMbf8+iOPyRCJ8iMOnYiCbPpOmz7FuarOxPowUXUTqe
+e/bnana1ic+ctkWCw67wxEB6SJsOSaN2uW7mCj2ftjf9Cq9GmxzYnn8WuOvPHLxQ
+1id5Q0hqIWUqpgKGWDeIng5VHThiIuZDUa4EWQga6fnVZnApv4pRNJY7ttyNS6SS
+VfquKJpzBaa9lItRtIz5Dxs2gX1jyg==
+=9ttk
+-----END PGP SIGNATURE-----
+
+--+xOPyWhFp+ttqF+R--
