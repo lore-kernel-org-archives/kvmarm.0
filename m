@@ -1,192 +1,138 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out03.mta.xmission.com (out03.mta.xmission.com [166.70.13.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF3B19471
-	for <kvmarm@lists.linux.dev>; Sat,  9 Dec 2023 23:49:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zT3unBuB"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d0ccda19eeso22430345ad.1
-        for <kvmarm@lists.linux.dev>; Sat, 09 Dec 2023 15:49:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702165745; x=1702770545; darn=lists.linux.dev;
-        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=OPCNY52nyiQdIzlwx6EU4oIvd2oaUqsRoubFMnhv/R4=;
-        b=zT3unBuBiVy3i9AH7tFCIEHEHmihCLghnnJrvzulnUk3mCGsxB2jlWkQ4OELiHXo6B
-         F8AgazUt+Fo8sGJ8WgJvPSrDgZgDBVrT/ywG6fCz9Llqcm+CN0yyMd+SxXNWxMXr8ZUd
-         6Xggwp3KjBIKfge6q3MR0QiGK7VDttBpzn+45gTufIUfTdXbwljCwlZxhjS59QaqIDt6
-         EtTgp0Mb/ypQwhYPuNIX8WEnaan+Sz4f6XNPekNzXJqZLyQ1wzUDuuH+/lXme3lAMUh0
-         P6Qlob9g8ChwaW+CqZT4AY5zyUjO5afUC1uGyPRacQqG5/UtmrPT+hrduil89fqeEFVe
-         /W1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702165745; x=1702770545;
-        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OPCNY52nyiQdIzlwx6EU4oIvd2oaUqsRoubFMnhv/R4=;
-        b=kxzMT8pNekRpsMRpW7fX4j/LgFIq3Jg4t5msaspu1yttQTPVb6O4c3WFIe4egSietx
-         Oinpg9HAEnrjLrIbnx4P4PAH52jQ571oBa+6uSR2Wv8qBR2yGS36U2EeMa9/lwdhoAVt
-         jbRtAcDOGjVAKYhoD5uTnF29cVS0+StL5jinz42SMMCb0AqTrz9s2KFnfIOo1HQa++yc
-         Z8k9i5NUSaa/WIEp0n9xDD8KMfNacnhcuMcKQIzVamTNOFncNnEDMAQridudIkEPcCgu
-         RPTnQq70H+PDiuPK5MA9IkrhOA5ZtORUeRIfIHx10rj/HeQh/D4P+PSpM9TWjue03dED
-         n+aw==
-X-Gm-Message-State: AOJu0Yw4DH1Us7FS0tNcfJgcqnumgnwIoPQMGOZ53IUXKf90J5P57t/F
-	Kd8vXy96N9MfPvZIUifgHEILpg==
-X-Google-Smtp-Source: AGHT+IEJJXjirbJfGvEGv9wlC7QhPL3oJqPTSZjXXGeMs1qcfj17IHUevHGTEfzPXl+gH/HmXyzIBw==
-X-Received: by 2002:a17:902:c64a:b0:1d0:c41b:1d1e with SMTP id s10-20020a170902c64a00b001d0c41b1d1emr919404pls.73.1702165744705;
-        Sat, 09 Dec 2023 15:49:04 -0800 (PST)
-Received: from localhost ([2804:14d:7e39:8470:ded6:9593:9f4f:5c29])
-        by smtp.gmail.com with ESMTPSA id n2-20020a170902d2c200b001cfcf3dd317sm3918148plc.61.2023.12.09.15.49.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Dec 2023 15:49:04 -0800 (PST)
-References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
- <20231122-arm64-gcs-v7-26-201c483bd775@kernel.org>
-User-agent: mu4e 1.10.8; emacs 29.1
-From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
- <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Morton
- <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
- <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, Oleg
- Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, Kees
- Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, "Rick P.
- Edgecombe" <rick.p.edgecombe@intel.com>, Deepak Gupta
- <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, Szabolcs Nagy
- <Szabolcs.Nagy@arm.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
- <aou@eecs.berkeley.edu>, Florian Weimer <fweimer@redhat.com>, Christian
- Brauner <brauner@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v7 26/39] arm64/ptrace: Expose GCS via ptrace and core
- files
-In-reply-to: <20231122-arm64-gcs-v7-26-201c483bd775@kernel.org>
-Date: Sat, 09 Dec 2023 20:49:02 -0300
-Message-ID: <877clney35.fsf@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28835A42
+	for <kvmarm@lists.linux.dev>; Sun, 10 Dec 2023 05:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xmission.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xmission.com
+Received: from in02.mta.xmission.com ([166.70.13.52]:33540)
+	by out03.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.93)
+	(envelope-from <ebiederm@xmission.com>)
+	id 1rCBpP-00B9T9-5N; Sat, 09 Dec 2023 21:54:07 -0700
+Received: from ip68-227-168-167.om.om.cox.net ([68.227.168.167]:35840 helo=email.froward.int.ebiederm.org.xmission.com)
+	by in02.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.93)
+	(envelope-from <ebiederm@xmission.com>)
+	id 1rCBpN-00BEzy-T4; Sat, 09 Dec 2023 21:54:06 -0700
+From: "Eric W. Biederman" <ebiederm@xmission.com>
+To: "Gowans, James" <jgowans@amazon.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,  "Graf (AWS), Alexander"
+ <graf@amazon.de>,  "seanjc@google.com" <seanjc@google.com>,  =?utf-8?Q?Sc?=
+ =?utf-8?Q?h=C3=B6nherr=2C_Jan_H=2E?= <jschoenh@amazon.de>,
+  "yuzenghui@huawei.com"
+ <yuzenghui@huawei.com>,  "atishp@atishpatra.org" <atishp@atishpatra.org>,
+  "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+  "james.morse@arm.com" <james.morse@arm.com>,  "suzuki.poulose@arm.com"
+ <suzuki.poulose@arm.com>,  "oliver.upton@linux.dev"
+ <oliver.upton@linux.dev>,  "chenhuacai@kernel.org"
+ <chenhuacai@kernel.org>,  "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>,  "kvmarm@lists.linux.dev"
+ <kvmarm@lists.linux.dev>,  "maz@kernel.org" <maz@kernel.org>,
+  "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+  "aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
+  "anup@brainfault.org" <anup@brainfault.org>,  "kexec@lists.infradead.org"
+ <kexec@lists.infradead.org>
+References: <20230512233127.804012-1-seanjc@google.com>
+	<20230512233127.804012-2-seanjc@google.com>
+	<cfed942fc767fa7b2fabc68a3357a7b95bd6a589.camel@amazon.com>
+Date: Sat, 09 Dec 2023 22:53:30 -0600
+In-Reply-To: <cfed942fc767fa7b2fabc68a3357a7b95bd6a589.camel@amazon.com>
+	(James Gowans's message of "Sat, 9 Dec 2023 07:26:36 +0000")
+Message-ID: <871qbud5f9.fsf@email.froward.int.ebiederm.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-XM-SPF: eid=1rCBpN-00BEzy-T4;;;mid=<871qbud5f9.fsf@email.froward.int.ebiederm.org>;;;hst=in02.mta.xmission.com;;;ip=68.227.168.167;;;frm=ebiederm@xmission.com;;;spf=pass
+X-XM-AID: U2FsdGVkX1+JmH+hfPfL+HY3DU2+KTDcxM737ZP9cTs=
+X-SA-Exim-Connect-IP: 68.227.168.167
+X-SA-Exim-Mail-From: ebiederm@xmission.com
+X-Spam-Level: *
+X-Spam-Report: 
+	* -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
+	*  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+	*      [score: 0.5000]
+	*  0.7 XMSubLong Long Subject
+	*  1.0 XM_ULScore_01 UL-obfuscated credit score reference
+	*  0.0 XM_B_Unicode BODY: Testing for specific types of unicode
+	*  0.0 T_TM2_M_HEADER_IN_MSG BODY: No description available.
+	* -0.0 DCC_CHECK_NEGATIVE Not listed in DCC
+	*      [sa06 1397; Body=1 Fuz1=1 Fuz2=1]
+	* -0.0 T_SCC_BODY_TEXT_LINE No description available.
+	*  0.0 T_TooManySym_01 4+ unique symbols in subject
+X-Spam-DCC: XMission; sa06 1397; Body=1 Fuz1=1 Fuz2=1 
+X-Spam-Combo: *;"Gowans, James" <jgowans@amazon.com>
+X-Spam-Relay-Country: 
+X-Spam-Timing: total 676 ms - load_scoreonly_sql: 0.04 (0.0%),
+	signal_user_changed: 12 (1.8%), b_tie_ro: 11 (1.6%), parse: 1.39
+	(0.2%), extract_message_metadata: 4.0 (0.6%), get_uri_detail_list:
+	1.64 (0.2%), tests_pri_-2000: 3.1 (0.5%), tests_pri_-1000: 3.5 (0.5%),
+	tests_pri_-950: 1.20 (0.2%), tests_pri_-900: 1.03 (0.2%),
+	tests_pri_-90: 332 (49.0%), check_bayes: 330 (48.8%), b_tokenize: 8
+	(1.2%), b_tok_get_all: 9 (1.4%), b_comp_prob: 2.4 (0.4%),
+	b_tok_touch_all: 306 (45.3%), b_finish: 0.89 (0.1%), tests_pri_0: 295
+	(43.7%), check_dkim_signature: 0.54 (0.1%), check_dkim_adsp: 3.4
+	(0.5%), poll_dns_idle: 1.54 (0.2%), tests_pri_10: 3.2 (0.5%),
+	tests_pri_500: 10 (1.5%), rewrite_mail: 0.00 (0.0%)
+Subject: Re: [PATCH v2 1/2] KVM: Use syscore_ops instead of reboot_notifier
+ to hook restart/shutdown
+X-SA-Exim-Version: 4.2.1 (built Sat, 08 Feb 2020 21:53:50 +0000)
+X-SA-Exim-Scanned: Yes (on in02.mta.xmission.com)
 
+"Gowans, James" <jgowans@amazon.com> writes:
 
-Mark Brown <broonie@kernel.org> writes:
-
-> Provide a new register type NT_ARM_GCS reporting the current GCS mode
-> and pointer for EL0.  Due to the interactions with allocation and
-> deallocation of Guarded Control Stacks we do not permit any changes to
-> the GCS mode via ptrace, only GCSPR_EL0 may be changed.
-
-The code allows disabling GCS. Is that unintended?
-
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/include/uapi/asm/ptrace.h |  8 +++++
->  arch/arm64/kernel/ptrace.c           | 59 ++++++++++++++++++++++++++++++++++++
->  include/uapi/linux/elf.h             |  1 +
->  3 files changed, 68 insertions(+)
+> Hi Sean,
 >
-> diff --git a/arch/arm64/include/uapi/asm/ptrace.h b/arch/arm64/include/uapi/asm/ptrace.h
-> index 7fa2f7036aa7..0f39ba4f3efd 100644
-> --- a/arch/arm64/include/uapi/asm/ptrace.h
-> +++ b/arch/arm64/include/uapi/asm/ptrace.h
-> @@ -324,6 +324,14 @@ struct user_za_header {
->  #define ZA_PT_SIZE(vq)						\
->  	(ZA_PT_ZA_OFFSET + ZA_PT_ZA_SIZE(vq))
->  
-> +/* GCS state (NT_ARM_GCS) */
-> +
-> +struct user_gcs {
-> +	__u64 features_enabled;
-> +	__u64 features_locked;
-> +	__u64 gcspr_el0;
-> +};
+> Blast from the past but I've just been bitten by this patch when
+> rebasing across v6.4.
+>
+> On Fri, 2023-05-12 at 16:31 -0700, Sean Christopherson wrote:
+>> Use syscore_ops.shutdown to disable hardware virtualization during a
+>> reboot instead of using the dedicated reboot_notifier so that KVM disabl=
+es
+>> virtualization _after_ system_state has been updated.=C2=A0 This will al=
+low
+>> fixing a race in KVM's handling of a forced reboot where KVM can end up
+>> enabling hardware virtualization between kernel_restart_prepare() and
+>> machine_restart().
+>
+> The issue is that, AFAICT, the syscore_ops.shutdown are not called when
+> doing a kexec. Reboot notifiers are called across kexec via:
+>
+> kernel_kexec
+>   kernel_restart_prepare
+>     blocking_notifier_call_chain
+>       kvm_reboot
+>
+> So after this patch, KVM is not shutdown during kexec; if hardware virt
+> mode is enabled then the kexec hangs in exactly the same manner as you
+> describe with the reboot.
 
-If there's a reserved field in sigframe's gcs_context, isn't it worth it
-to have a reserved field here as well?
+kernel_restart_prepare calls device_shutdown.  Which should call all
+of the shutdown operations.  This has been the way the code has been
+structured since December 2005.
 
-> +
->  #endif /* __ASSEMBLY__ */
->  
->  #endif /* _UAPI__ASM_PTRACE_H */
-> diff --git a/arch/arm64/kernel/ptrace.c b/arch/arm64/kernel/ptrace.c
-> index 20d7ef82de90..f15b8e33561e 100644
-> --- a/arch/arm64/kernel/ptrace.c
-> +++ b/arch/arm64/kernel/ptrace.c
-> @@ -33,6 +33,7 @@
->  #include <asm/cpufeature.h>
->  #include <asm/debug-monitors.h>
->  #include <asm/fpsimd.h>
-> +#include <asm/gcs.h>
->  #include <asm/mte.h>
->  #include <asm/pointer_auth.h>
->  #include <asm/stacktrace.h>
-> @@ -1409,6 +1410,51 @@ static int tagged_addr_ctrl_set(struct task_struct *target, const struct
->  }
->  #endif
->  
-> +#ifdef CONFIG_ARM64_GCS
-> +static int gcs_get(struct task_struct *target,
-> +		   const struct user_regset *regset,
-> +		   struct membuf to)
-> +{
-> +	struct user_gcs user_gcs;
-> +
-> +	if (target == current)
-> +		gcs_preserve_current_state();
-> +
-> +	user_gcs.features_enabled = target->thread.gcs_el0_mode;
-> +	user_gcs.features_locked = target->thread.gcs_el0_locked;
-> +	user_gcs.gcspr_el0 = target->thread.gcspr_el0;
-> +
-> +	return membuf_write(&to, &user_gcs, sizeof(user_gcs));
-> +}
-> +
-> +static int gcs_set(struct task_struct *target, const struct
-> +		   user_regset *regset, unsigned int pos,
-> +		   unsigned int count, const void *kbuf, const
-> +		   void __user *ubuf)
-> +{
-> +	int ret;
-> +	struct user_gcs user_gcs;
-> +
-> +	ret = user_regset_copyin(&pos, &count, &kbuf, &ubuf, &user_gcs, 0, -1);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (user_gcs.features_enabled & ~PR_SHADOW_STACK_SUPPORTED_STATUS_MASK)
-> +		return -EINVAL;
-> +
-> +	/* Do not allow enable via ptrace */
-> +	if ((user_gcs.features_enabled & PR_SHADOW_STACK_ENABLE) &&
-> +	    !!(target->thread.gcs_el0_mode & PR_SHADOW_STACK_ENABLE))
+> Some specific shutdown callbacks, for example IOMMU, HPET, IRQ, etc are
+> called in native_machine_shutdown, but KVM is not one of these.
+>
+> Thoughts on possible ways to fix this:
+> a) go back to reboot notifiers
+> b) get kexec to call syscore_shutdown() to invoke all of these callbacks
+> c) Add a KVM-specific callback to native_machine_shutdown(); we only
+> need this for Intel x86, right?
+>
+> My slight preference is towards adding syscore_shutdown() to kexec, but
+> I'm not sure that's feasible. Adding kexec maintainers for input.
 
-There should be only one '!' above.
+Why isn't device_suthdown calling syscore_shutdown?
 
-Though contrary to the patch description, this code allows disabling
-GCS. Shouldn't we require that
+What problem are you running into with your rebase that worked with
+reboot notifiers that is not working with syscore_shutdown?
 
-  (user_gcs.features_enabled & PR_SHADOW_STACK_ENABLE) ==
-    (target->thread.gcs_el0_mode & PR_SHADOW_STACK_ENABLE)
-
-? That would ensure that the GCS mode can't be changed.
-
-> +		return -EBUSY;
-> +
-> +	target->thread.gcs_el0_mode = user_gcs.features_enabled;
-> +	target->thread.gcs_el0_locked = user_gcs.features_locked;
-> +	target->thread.gcspr_el0 = user_gcs.gcspr_el0;
-> +
-> +	return 0;
-> +}
-> +#endif
-
--- 
-Thiago
+Eric
