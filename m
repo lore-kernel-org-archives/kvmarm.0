@@ -1,138 +1,211 @@
-Received: from out03.mta.xmission.com (out03.mta.xmission.com [166.70.13.233])
+Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2188.outbound.protection.outlook.com [40.92.62.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28835A42
-	for <kvmarm@lists.linux.dev>; Sun, 10 Dec 2023 05:16:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xmission.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xmission.com
-Received: from in02.mta.xmission.com ([166.70.13.52]:33540)
-	by out03.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.93)
-	(envelope-from <ebiederm@xmission.com>)
-	id 1rCBpP-00B9T9-5N; Sat, 09 Dec 2023 21:54:07 -0700
-Received: from ip68-227-168-167.om.om.cox.net ([68.227.168.167]:35840 helo=email.froward.int.ebiederm.org.xmission.com)
-	by in02.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.93)
-	(envelope-from <ebiederm@xmission.com>)
-	id 1rCBpN-00BEzy-T4; Sat, 09 Dec 2023 21:54:06 -0700
-From: "Eric W. Biederman" <ebiederm@xmission.com>
-To: "Gowans, James" <jgowans@amazon.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,  "Graf (AWS), Alexander"
- <graf@amazon.de>,  "seanjc@google.com" <seanjc@google.com>,  =?utf-8?Q?Sc?=
- =?utf-8?Q?h=C3=B6nherr=2C_Jan_H=2E?= <jschoenh@amazon.de>,
-  "yuzenghui@huawei.com"
- <yuzenghui@huawei.com>,  "atishp@atishpatra.org" <atishp@atishpatra.org>,
-  "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
-  "james.morse@arm.com" <james.morse@arm.com>,  "suzuki.poulose@arm.com"
- <suzuki.poulose@arm.com>,  "oliver.upton@linux.dev"
- <oliver.upton@linux.dev>,  "chenhuacai@kernel.org"
- <chenhuacai@kernel.org>,  "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>,  "kvmarm@lists.linux.dev"
- <kvmarm@lists.linux.dev>,  "maz@kernel.org" <maz@kernel.org>,
-  "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-  "aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
-  "anup@brainfault.org" <anup@brainfault.org>,  "kexec@lists.infradead.org"
- <kexec@lists.infradead.org>
-References: <20230512233127.804012-1-seanjc@google.com>
-	<20230512233127.804012-2-seanjc@google.com>
-	<cfed942fc767fa7b2fabc68a3357a7b95bd6a589.camel@amazon.com>
-Date: Sat, 09 Dec 2023 22:53:30 -0600
-In-Reply-To: <cfed942fc767fa7b2fabc68a3357a7b95bd6a589.camel@amazon.com>
-	(James Gowans's message of "Sat, 9 Dec 2023 07:26:36 +0000")
-Message-ID: <871qbud5f9.fsf@email.froward.int.ebiederm.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 594BF4426
+	for <kvmarm@lists.linux.dev>; Sun, 10 Dec 2023 08:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="OZ8aMSRP"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ivq+NRXjxGDwnKnLRZGXu/whyyqDohuGgc9DHRz/N+8kdS2qwgRx6tXeYiUZsCP4CspfnSLaytb2crBkUMURY84KRfHktzBUlyKtRp2axx7moGbpr/I2+AYNceeMpEw17O7qzSkn+JETGbJHVCcs+Hg6OfAnUIMGYAyYQ09zpQeJtigxpjf/Rc/Fuxxbg90ckylqyMxUsdotknmvOsFJBhH0MdLj/dFlfj8r/fqv8gjqf92aL3GBh7IQgYA3rRa4PW7Gf+BGQdhBFYUoZmzgQahTeN0+Pc10IDGKCikp/uiYsfO735bN0MhhsuJHv4XB5WjQPpUIJBI7GFdAtIKxBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fzAcBBC3/Qh5JHV4M83f1kBaLFDSVNfSmRZxxUCxyog=;
+ b=efli0bupdNhVgqjnwi18WmWOk8a5DPWcd1w1edMLvYh0Ujm2yxD5juHOK30nk0OJRRMvxmNPtfxXggYFbV0r6QrhsD6vMHO0wQs58Us8EE+K2t41B1LPBQxr9ok6T1QRYtbs3wzsJoNDjQde4QgA2xnm5HY6yMwaHDYGf9KGqQJfF/B64TQ0m8St6VA+lFToi3KwhJNiyZfzqwARMC3uMq1TXi9t7FIkXNKEjOHRpKQa5sym1blKtFciyHO7TXhwD4YsEDAiYegaM5eZWXOyRoqvrYX1Qc/YwajyuDUafv/NTWjc0xX+UBYmDC3ONBU4AdmHoqEV3ZDeZHJO0L2btw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fzAcBBC3/Qh5JHV4M83f1kBaLFDSVNfSmRZxxUCxyog=;
+ b=OZ8aMSRPVUpn99S1lKPRGQWg7meUP76wavfBqFXDlh381lzEeFAA4hgb1JlOj46LcyizVdNsJp7o1qz+BECP7P7qMFPWNhD+/S3OMTAw8R8ff+PNIf1NsawHs5/22gssjQ5JB21vvdnsgTxXPSwS/N5oqNd4mBprA5hxDLZKgMoi1WVDPrlqxMJmw78mUyMzl7gRJB+cHpk+hz9DGWsQDxLF3dr4fPOHbQzeuMO/4zt8T+SJVXjuCrbPfjaM8rRTePfYfd5A56Js8mb3qwknKxT9x08We0j/R1xMpgKRHKKU1NUKLAEWBFOFHjTMwiJs/1z9jm77b4q+e4wF8Igw5g==
+Received: from SYBPR01MB6870.ausprd01.prod.outlook.com (2603:10c6:10:13d::10)
+ by MEYPR01MB7339.ausprd01.prod.outlook.com (2603:10c6:220:15f::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.31; Sun, 10 Dec
+ 2023 08:08:49 +0000
+Received: from SYBPR01MB6870.ausprd01.prod.outlook.com
+ ([fe80::be5a:160f:5418:9deb]) by SYBPR01MB6870.ausprd01.prod.outlook.com
+ ([fe80::be5a:160f:5418:9deb%5]) with mapi id 15.20.7068.030; Sun, 10 Dec 2023
+ 08:08:49 +0000
+From: Tianyi Liu <i.pear@outlook.com>
+To: seanjc@google.com,
+	pbonzini@redhat.com,
+	peterz@infradead.org,
+	mingo@redhat.com,
+	acme@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	kvm@vger.kernel.org,
+	x86@kernel.org,
+	mark.rutland@arm.com,
+	mlevitsk@redhat.com,
+	maz@kernel.org,
+	alexander.shishkin@linux.intel.com,
+	jolsa@kernel.org,
+	namhyung@kernel.org,
+	irogers@google.com,
+	adrian.hunter@intel.com,
+	Tianyi Liu <i.pear@outlook.com>
+Subject: [PATCH v3 0/5] perf: KVM: Enable callchains for guests
+Date: Sun, 10 Dec 2023 16:07:42 +0800
+Message-ID:
+ <SYBPR01MB687069BFC9744585B4EEF8C49D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [5hP5SFsKOSJHZzIDoL6ixfHLgGiQ2S0WroETPYou9oYzvUMOQ2+dyQ==]
+X-ClientProxiedBy: SG2PR01CA0189.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:189::15) To SYBPR01MB6870.ausprd01.prod.outlook.com
+ (2603:10c6:10:13d::10)
+X-Microsoft-Original-Message-ID: <20231210080742.2135-1-i.pear@outlook.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-XM-SPF: eid=1rCBpN-00BEzy-T4;;;mid=<871qbud5f9.fsf@email.froward.int.ebiederm.org>;;;hst=in02.mta.xmission.com;;;ip=68.227.168.167;;;frm=ebiederm@xmission.com;;;spf=pass
-X-XM-AID: U2FsdGVkX1+JmH+hfPfL+HY3DU2+KTDcxM737ZP9cTs=
-X-SA-Exim-Connect-IP: 68.227.168.167
-X-SA-Exim-Mail-From: ebiederm@xmission.com
-X-Spam-Level: *
-X-Spam-Report: 
-	* -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
-	*  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-	*      [score: 0.5000]
-	*  0.7 XMSubLong Long Subject
-	*  1.0 XM_ULScore_01 UL-obfuscated credit score reference
-	*  0.0 XM_B_Unicode BODY: Testing for specific types of unicode
-	*  0.0 T_TM2_M_HEADER_IN_MSG BODY: No description available.
-	* -0.0 DCC_CHECK_NEGATIVE Not listed in DCC
-	*      [sa06 1397; Body=1 Fuz1=1 Fuz2=1]
-	* -0.0 T_SCC_BODY_TEXT_LINE No description available.
-	*  0.0 T_TooManySym_01 4+ unique symbols in subject
-X-Spam-DCC: XMission; sa06 1397; Body=1 Fuz1=1 Fuz2=1 
-X-Spam-Combo: *;"Gowans, James" <jgowans@amazon.com>
-X-Spam-Relay-Country: 
-X-Spam-Timing: total 676 ms - load_scoreonly_sql: 0.04 (0.0%),
-	signal_user_changed: 12 (1.8%), b_tie_ro: 11 (1.6%), parse: 1.39
-	(0.2%), extract_message_metadata: 4.0 (0.6%), get_uri_detail_list:
-	1.64 (0.2%), tests_pri_-2000: 3.1 (0.5%), tests_pri_-1000: 3.5 (0.5%),
-	tests_pri_-950: 1.20 (0.2%), tests_pri_-900: 1.03 (0.2%),
-	tests_pri_-90: 332 (49.0%), check_bayes: 330 (48.8%), b_tokenize: 8
-	(1.2%), b_tok_get_all: 9 (1.4%), b_comp_prob: 2.4 (0.4%),
-	b_tok_touch_all: 306 (45.3%), b_finish: 0.89 (0.1%), tests_pri_0: 295
-	(43.7%), check_dkim_signature: 0.54 (0.1%), check_dkim_adsp: 3.4
-	(0.5%), poll_dns_idle: 1.54 (0.2%), tests_pri_10: 3.2 (0.5%),
-	tests_pri_500: 10 (1.5%), rewrite_mail: 0.00 (0.0%)
-Subject: Re: [PATCH v2 1/2] KVM: Use syscore_ops instead of reboot_notifier
- to hook restart/shutdown
-X-SA-Exim-Version: 4.2.1 (built Sat, 08 Feb 2020 21:53:50 +0000)
-X-SA-Exim-Scanned: Yes (on in02.mta.xmission.com)
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SYBPR01MB6870:EE_|MEYPR01MB7339:EE_
+X-MS-Office365-Filtering-Correlation-Id: bfc982f2-5ffa-4a9b-075e-08dbf9573bf5
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Z1xFtd/ebhKIquqP+AniVhqEOR5bQv6zvqqrZrQEiWkLDkudW76b3dS0SsnxRSN4Hd8/rd9kqY3hrraBts6vKj04KqNo1hYV8pt49wRx9UJ2Yyxd0xnh+PZP/VSwsJvaPxcUt9UcmNssbrvBX8VfNAqu3LuV1udXL0lel3fYGlYedfgqj8GCUZE8haVvHkUPyY/h4By/Mxyy49T4TH5tscrKw6IH5tryo+aO+ebXHm3Dd4oU6//THlfmYcKbDdvnizO4YspBPoDff2v1X5X0sR8yDay3cIRpBHv+u2ULBpCHc9iCd0IXGF1F8mK8fd9HB7f7/P25onZ6kRybCEogoJE5NeEkkZUEqeNqW9jUIltjaAQomi7ajZxBSM6jg5knxDvLny2g74B/27EtP8cFV1l3s6pPv726B7K8qGeRPxh9sGYX+EJJSKw495/jFBvR3mXBQCA37E+OCcWJs/nAyXyigOtBUjuHPl0iBNxXrVAKb3qKMqu/31aoEu+qK+v1yV57RwdyHkWA1BSDKknRdU778lKQcKE1ji+G9XWB7wvXlZyo9wpd9Onobeq+7qefUHSd/NnU2vFdw/bOpQSAV5xzO609drhfzhpPXuXI69Y2poSVMwjYAG9UPwbHB7LqhM71CxsjCQ0W8DHiswNFHWL9Em+N/nsAdOA95dg0aa8=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?qtlAwsuqlHla7xOFiLSX6LBYfVNyLYKnfieGED40ASZkLRpm48NqaEvy1Gzn?=
+ =?us-ascii?Q?KEYDZIxEIp6aLSVglZEZSz/9ABY5AvYy8ymwGnVX48RFAROpPf7skfDBLEk9?=
+ =?us-ascii?Q?pAnd4hUs2StSdZT5oBFEygDXOiZJrDNFsB2h6jfbxGBPbi92RPz41gtAGP2R?=
+ =?us-ascii?Q?tuu/NSkGEEeHnIFHUNvs8YLZdPgJyCAbFwGWT+7oNinI2i9Q7p29jJ9q7WHA?=
+ =?us-ascii?Q?D99DqUzTPsuyK93ZQpFjjE9m8UAng/aiZkaBf8E+KRnH8oMrsUc4j2iWDzYA?=
+ =?us-ascii?Q?hxSk7E7ktnEBhuM6ZGZpa7J7xgkEgCK+TdCxSEpMW0KjEfk+ZBW8Ji2/yDu9?=
+ =?us-ascii?Q?uv8xLMDzXhQkk3EFeuksT9H5jdKzaAtwzsiFSSLDxfEj/7nqVsLauRdF4mK7?=
+ =?us-ascii?Q?HOqNwrh0Z95Lz3FQlqnU42Jq4HU1hmA7HFJnzQK8yFyV/1dYAx/HZNPFEjCp?=
+ =?us-ascii?Q?wkX/cgIzfDqbaNeLAOqIJb/jluldTsi3kdc7TZ+zpPpZhuMU2tUhv2kkKS3w?=
+ =?us-ascii?Q?mPROzsOv1YMFmtHXThsJESAI7RY8L3PRooXB8Ou0t57OSN3NVmqT2Hnfog8e?=
+ =?us-ascii?Q?Zbo/vivWQci28E0XrdgkN08wE1iG6eoXw5P5aCtR/fZ6QK6JUdGtr855GTJl?=
+ =?us-ascii?Q?ypoE4E/rzeL3S3hqfYZUIor72gka/MZX7ZXIgQCO/XsrFsiH45iuhUNblnVP?=
+ =?us-ascii?Q?ynTxRipAPY24Gd3p4oVy7TXWU3dsjF+hJfcGHRzeYlvz8YrpKTn03ckQj5T0?=
+ =?us-ascii?Q?ZING7SVnvvLLps0Ev2mF26fbjggEN77COpzpJUF8NYwmu/TDvh8/qDBFfw+o?=
+ =?us-ascii?Q?yIklzw48/pcz8vhdxOrAKvNsqf6U+5uDwhHv4f3YsUCBFDoIoovB3AhQpbrT?=
+ =?us-ascii?Q?HQQ2bbpKV2mNIrPlokdenJY2owPzxSObNz+xR1vgPuKeeHI0ErQgQR0fPt5p?=
+ =?us-ascii?Q?NB3AbBVkWk7IaplOlTy1/XOLJ1pPRiyLJ5MQBHtIfop/TvoXlB90FYKzjgDL?=
+ =?us-ascii?Q?QpM3ebECAkJZuXPzCGMzGdrTDoCk4JEY30IqZqwyozUtp41+tyMyWLrcM0SK?=
+ =?us-ascii?Q?+ZNIqdWfIsPtK1fQV0LU9MwG5YjaMWGgPrzm8tzCLx9VWXs+a2f5sewXGKsl?=
+ =?us-ascii?Q?qVtlsRsTsIo09W2kRsYSz2sBsfwfQ0xd7JV+q+oo8guvIW4P32EoXpV3w8WY?=
+ =?us-ascii?Q?FyLx7qZK9JDMdPO52Rpy6s+dCbwH7mA29J+IbV/T8+Ew4Hidw2jvPCBLIICB?=
+ =?us-ascii?Q?7/gIWUfqxvcum83cbRLz?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bfc982f2-5ffa-4a9b-075e-08dbf9573bf5
+X-MS-Exchange-CrossTenant-AuthSource: SYBPR01MB6870.ausprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2023 08:08:48.8734
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MEYPR01MB7339
 
-"Gowans, James" <jgowans@amazon.com> writes:
+This series of patches enables callchains for guests (used by `perf kvm`),
+which holds the top spot on the perf wiki TODO list [1]. This allows users
+to perform guest OS callchain or performance analysis from external
+using PMU events. This is also useful for guests like unikernels that
+lack performance event subsystems.
 
-> Hi Sean,
->
-> Blast from the past but I've just been bitten by this patch when
-> rebasing across v6.4.
->
-> On Fri, 2023-05-12 at 16:31 -0700, Sean Christopherson wrote:
->> Use syscore_ops.shutdown to disable hardware virtualization during a
->> reboot instead of using the dedicated reboot_notifier so that KVM disabl=
-es
->> virtualization _after_ system_state has been updated.=C2=A0 This will al=
-low
->> fixing a race in KVM's handling of a forced reboot where KVM can end up
->> enabling hardware virtualization between kernel_restart_prepare() and
->> machine_restart().
->
-> The issue is that, AFAICT, the syscore_ops.shutdown are not called when
-> doing a kexec. Reboot notifiers are called across kexec via:
->
-> kernel_kexec
->   kernel_restart_prepare
->     blocking_notifier_call_chain
->       kvm_reboot
->
-> So after this patch, KVM is not shutdown during kexec; if hardware virt
-> mode is enabled then the kexec hangs in exactly the same manner as you
-> describe with the reboot.
+The event processing flow is as follows (shown as backtrace):
+@0 kvm_arch_vcpu_get_unwind_info / kvm_arch_vcpu_read_virt (per arch impl)
+@1 kvm_guest_get_unwind_info / kvm_guest_read_virt
+   <callback function pointers in `struct perf_guest_info_callbacks`>
+@2 perf_guest_get_unwind_info / perf_guest_read_virt
+@3 perf_callchain_guest
+@4 get_perf_callchain
+@5 perf_callchain
 
-kernel_restart_prepare calls device_shutdown.  Which should call all
-of the shutdown operations.  This has been the way the code has been
-structured since December 2005.
+Between @0 and @1 is the interface between KVM and the arch-specific
+impl, while between @1 and @2 is the interface between Perf and KVM.
+The 1st patch implements @0. The 2nd patch extends interfaces between @1
+and @2, while the 3rd patch implements @1. The 4th patch implements @3
+and modifies @4 @5. The last patch is for userspace tools.
 
-> Some specific shutdown callbacks, for example IOMMU, HPET, IRQ, etc are
-> called in native_machine_shutdown, but KVM is not one of these.
->
-> Thoughts on possible ways to fix this:
-> a) go back to reboot notifiers
-> b) get kexec to call syscore_shutdown() to invoke all of these callbacks
-> c) Add a KVM-specific callback to native_machine_shutdown(); we only
-> need this for Intel x86, right?
->
-> My slight preference is towards adding syscore_shutdown() to kexec, but
-> I'm not sure that's feasible. Adding kexec maintainers for input.
+Since arm64 hasn't provided some foundational infrastructure (interface
+for reading from a virtual address of guest), the arm64 implementation
+is stubbed for now because it's a bit complex, and will be implemented
+later.
 
-Why isn't device_suthdown calling syscore_shutdown?
+For safety, guests are designed to be read-only in this feature,
+and we will never inject page faults into the guests, ensuring that the
+guests are not interfered by profiling. In extremely rare cases, if the
+guest is modifying the page table, there is a possibility of reading
+incorrect data. Additionally, if certain programs running in the guest OS
+do not support frame pointers, it may also result in some erroneous data.
+These erroneous data will eventually appear as `[unknown]` entries in the
+report. It is sufficient as long as most of the records are correct for
+profiling.
 
-What problem are you running into with your rebase that worked with
-reboot notifiers that is not working with syscore_shutdown?
+Regarding the necessity of implementing in the kernel:
+Indeed, we could implement this in userspace and access the guest vm
+through the KVM APIs, to interrupt the guest and perform unwinding.
+However, this approach will introduce higher latency, and the overhead of
+syscalls could limit the sampling frequency. Moreover, it appears that
+user space can only interrupt the VCPU at a certain frequency, without
+fully leveraging the richness of the PMU's performance events. On the
+other hand, if we incorporate the logic into kernel, `perf kvm` can bind
+to various PMU events and achieve faster performance in PMU interrupts.
 
-Eric
+Tested with both Linux and unikernels as guests, the `perf script` command
+could correctly show the callchains.
+FlameGraphs could also be generated with this series of patches and [2].
+
+[1] https://perf.wiki.kernel.org/index.php/Todo
+[2] https://github.com/brendangregg/FlameGraph
+
+v1:
+https://lore.kernel.org/kvm/SYYP282MB108686A73C0F896D90D246569DE5A@SYYP282MB1086.AUSP282.PROD.OUTLOOK.COM/
+
+Changes since v1:
+Post the complete implementation, also updated some code based on
+Sean's feedback.
+
+v2:
+https://lore.kernel.org/kvm/SY4P282MB1084ECBCC1B176153B9E2A009DCFA@SY4P282MB1084.AUSP282.PROD.OUTLOOK.COM/
+
+Changes since v2:
+Refactored interface, packaged the info required by unwinding into
+a struct; Resolved some type mismatches; Provided more explanations
+based on the feedback from v2; more tests were performed.
+
+Tianyi Liu (5):
+  KVM: Add arch specific interfaces for sampling guest callchains
+  perf kvm: Introduce guest interfaces for sampling callchains
+  KVM: implement new perf callback interfaces
+  perf kvm: Support sampling guest callchains
+  perf tools: Support PERF_CONTEXT_GUEST_* flags
+
+ MAINTAINERS                         |  1 +
+ arch/arm64/kvm/arm.c                | 12 ++++++
+ arch/x86/events/core.c              | 63 ++++++++++++++++++++++++-----
+ arch/x86/kvm/x86.c                  | 24 +++++++++++
+ include/linux/kvm_host.h            |  5 +++
+ include/linux/perf_event.h          | 20 ++++++++-
+ include/linux/perf_kvm.h            | 18 +++++++++
+ kernel/bpf/stackmap.c               |  8 ++--
+ kernel/events/callchain.c           | 27 ++++++++++++-
+ kernel/events/core.c                | 17 +++++++-
+ tools/perf/builtin-timechart.c      |  6 +++
+ tools/perf/util/data-convert-json.c |  6 +++
+ tools/perf/util/machine.c           |  6 +++
+ virt/kvm/kvm_main.c                 | 22 ++++++++++
+ 14 files changed, 218 insertions(+), 17 deletions(-)
+ create mode 100644 include/linux/perf_kvm.h
+
+
+base-commit: 33cc938e65a98f1d29d0a18403dbbee050dcad9a
+-- 
+2.34.1
+
