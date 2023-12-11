@@ -1,452 +1,177 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E91284C3DD
-	for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 17:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1310B4C3DD
+	for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 17:34:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LIhraVqy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDFB3C4339A
-	for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 17:29:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702315795;
-	bh=VP6rxIE0YrbcOG/9wnq9cB6kaypzUe7LOgu57Kw03yM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=LIhraVqyQdSfQe228mHwkdXxGCCkLJRry0OfP50RDcmYcgm8HYl+sN3lFgIsGHDkK
-	 qFO1jpKRk+4TV2pPCWzuXXcpy1Dk746QciwjtOX8bcBqP8nO8fuWCbncIY5C/+NF+v
-	 cPzN+QScdCx4rbHwHJM108XK0PEj0HkcGBUCffokZCX7WvCk8kP7BT59+On5Hj1Cs0
-	 Cc9NwAaOcBbcPNEJjn1lNYgvYedpyeWHkuK3FGA02cVw5xOGAItnRvZJVw9oT4a2pL
-	 GnRi3dIGBh7BQ9YkMKVpbbCkn0ysVsBEklPtgsOXrkpxfjYzztn9cXcSNZ7aGNhQge
-	 25LiqNlUEnFvA==
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-50c0f6b1015so5547921e87.3
-        for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 09:29:55 -0800 (PST)
-X-Gm-Message-State: AOJu0YyyO10WORuHzpjqcTziNYHRi32CogGzQLCVt85iHfpXQ4DDkNOU
-	+9S1MevahdDn+8zjpq1Pym2vpQ50V3OhfHPMKw==
-X-Google-Smtp-Source: AGHT+IGf9GxCgHbSaCR9ChlHwIzcYeJN/o9beG+fFS/Wj2+MXjJAqODSxU5em7xHCQ26rKUjit1wlHMa263dNGOiUjs=
-X-Received: by 2002:ac2:42c3:0:b0:50b:efd4:1475 with SMTP id
- n3-20020ac242c3000000b0050befd41475mr1861829lfl.9.1702315793752; Mon, 11 Dec
- 2023 09:29:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s0MpUEVb"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1d08383e566so41791435ad.2
+        for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 09:34:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702316066; x=1702920866; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4dy1GZPt4ahloA1lKMAAh2vw8dnz9eCUNT+pZwXAOsM=;
+        b=s0MpUEVb046+KNL4h/0vAppsiF5pGsxCZ2PfNTrfufD16pbccn2jJquw0ZmYtkwLoU
+         GYjHed+TjewpkuLSz0Y0PNf6zzV9te/D4kUwW2f5ELyId8TmPwYEsXYDcixNKcdoObZS
+         ukAhRpG+Vryjh6eJU/FgJMRK4KroYjdV3Rp8M0XNXWXxQfrSoHSNcrVku+8Jb90dGjbb
+         f1vjiqr7jKuQ3j967cwlg8dcYPWHcPJUvXt56r0AXrbQ2rWAlR2rBnvWAAyZ9bbf8pP6
+         hw+2iOmZ9kS6GL7YlE48IJGhPowpsNDjSrFKyQX0PPLPytCUEuBybIT2M3s1az6WAZEg
+         3h8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702316066; x=1702920866;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4dy1GZPt4ahloA1lKMAAh2vw8dnz9eCUNT+pZwXAOsM=;
+        b=TlhjjBf2K0wz0T7b1fcDwl8W36zLdN9c3zOv+CESarkG89lMWRuvsB78Fz+ZdpcqLl
+         TgerBeavaepFegaZ/3H2zquXNOQkXhvhUnvYDzTiO0ui4sHiJg+SKDF2fby7b1V2q/Rc
+         hic/2EkBo6rYMXoqy7I4T7gygxdWa/1vcW01tG1nGAXJT/SoJvM7LNorQJwGWpYH+2gw
+         AWW9XPa0Dg6BUar2GNtwAW/7z02fAT5IxsAVonltgHBgSyg9Za2I1AWyLxCflhV7/T/h
+         nzsKy+j0kMNkzT7MPeLmIKPW0jlkGMWGGRK0UWbkMswdFTy8lBtygRB5Vt5/KB/LJkyQ
+         2nsg==
+X-Gm-Message-State: AOJu0YygLEG6jkFeMJBxKzntfP2iJfJY+AjCnfnuxFV/10zKitrvI4ZR
+	y4cI1+K/j/ZqXr5pny0n+TJtnN0abpc=
+X-Google-Smtp-Source: AGHT+IHqkXvBHkzpZr4xBbgwsL3PvOCK8qSlSmIRPscVFj5vuMB/n5MJcuPBtGQA7MQkmEwS8R6UC/HFYLE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:41cf:b0:1d0:80cd:4c44 with SMTP id
+ u15-20020a17090341cf00b001d080cd4c44mr36557ple.10.1702316066276; Mon, 11 Dec
+ 2023 09:34:26 -0800 (PST)
+Date: Mon, 11 Dec 2023 09:34:24 -0800
+In-Reply-To: <cfed942fc767fa7b2fabc68a3357a7b95bd6a589.camel@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20231119165721.9849-1-alexandru.elisei@arm.com> <20231119165721.9849-12-alexandru.elisei@arm.com>
-In-Reply-To: <20231119165721.9849-12-alexandru.elisei@arm.com>
-From: Rob Herring <robh@kernel.org>
-Date: Mon, 11 Dec 2023 11:29:40 -0600
-X-Gmail-Original-Message-ID: <CAL_Jsq+k5BeM9+u12AQvWQ0b4Uv5Cy0vPOpK_uLcYtRnunq4iQ@mail.gmail.com>
-Message-ID: <CAL_Jsq+k5BeM9+u12AQvWQ0b4Uv5Cy0vPOpK_uLcYtRnunq4iQ@mail.gmail.com>
-Subject: Re: [PATCH RFC v2 11/27] arm64: mte: Reserve tag storage memory
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, 
-	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org, 
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, 
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org, 
-	bsegall@google.com, mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com, 
-	mhiramat@kernel.org, rppt@kernel.org, hughd@google.com, pcc@google.com, 
-	steven.price@arm.com, anshuman.khandual@arm.com, vincenzo.frascino@arm.com, 
-	david@redhat.com, eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-mm@kvack.org, 
-	linux-trace-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20230512233127.804012-1-seanjc@google.com> <20230512233127.804012-2-seanjc@google.com>
+ <cfed942fc767fa7b2fabc68a3357a7b95bd6a589.camel@amazon.com>
+Message-ID: <ZXdIIBUXcCIK28ys@google.com>
+Subject: Re: [PATCH v2 1/2] KVM: Use syscore_ops instead of reboot_notifier to
+ hook restart/shutdown
+From: Sean Christopherson <seanjc@google.com>
+To: James Gowans <jgowans@amazon.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, Alexander Graf <graf@amazon.de>, 
+	"Jan =?utf-8?Q?Sch=C3=B6nherr?=" <jschoenh@amazon.de>, "ebiederm@xmission.com" <ebiederm@xmission.com>, 
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "atishp@atishpatra.org" <atishp@atishpatra.org>, 
+	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>, "james.morse@arm.com" <james.morse@arm.com>, 
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
+	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "maz@kernel.org" <maz@kernel.org>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>, 
+	"anup@brainfault.org" <anup@brainfault.org>, 
+	"kexec@lists.infradead.org" <kexec@lists.infradead.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Nov 19, 2023 at 10:59=E2=80=AFAM Alexandru Elisei
-<alexandru.elisei@arm.com> wrote:
->
-> Allow the kernel to get the size and location of the MTE tag storage
-> regions from the DTB. This memory is marked as reserved for now.
->
-> The DTB node for the tag storage region is defined as:
->
->         tags0: tag-storage@8f8000000 {
->                 compatible =3D "arm,mte-tag-storage";
->                 reg =3D <0x08 0xf8000000 0x00 0x4000000>;
->                 block-size =3D <0x1000>;
->                 memory =3D <&memory0>;    // Associated tagged memory nod=
-e
->         };
+On Sat, Dec 09, 2023, James Gowans wrote:
+> Hi Sean,
+>=20
+> Blast from the past but I've just been bitten by this patch when
+> rebasing across v6.4.
+>=20
+> On Fri, 2023-05-12 at 16:31 -0700, Sean Christopherson wrote:
+> > Use syscore_ops.shutdown to disable hardware virtualization during a
+> > reboot instead of using the dedicated reboot_notifier so that KVM disab=
+les
+> > virtualization _after_ system_state has been updated.=C2=A0 This will a=
+llow
+> > fixing a race in KVM's handling of a forced reboot where KVM can end up
+> > enabling hardware virtualization between kernel_restart_prepare() and
+> > machine_restart().
+>=20
+> The issue is that, AFAICT, the syscore_ops.shutdown are not called when
+> doing a kexec. Reboot notifiers are called across kexec via:
+>=20
+> kernel_kexec
+>   kernel_restart_prepare
+>     blocking_notifier_call_chain
+>       kvm_reboot
+>=20
+> So after this patch, KVM is not shutdown during kexec; if hardware virt
+> mode is enabled then the kexec hangs in exactly the same manner as you
+> describe with the reboot.
+>=20
+> Some specific shutdown callbacks, for example IOMMU, HPET, IRQ, etc are
+> called in native_machine_shutdown, but KVM is not one of these.
+>=20
+> Thoughts on possible ways to fix this:
+> a) go back to reboot notifiers
+> b) get kexec to call syscore_shutdown() to invoke all of these callbacks
+> c) Add a KVM-specific callback to native_machine_shutdown(); we only
+> need this for Intel x86, right?
 
-I skimmed thru the discussion some. If this memory range is within
-main RAM, then it definitely belongs in /reserved-memory.
+I don't like (c).  VMX is the most sensitive/problematic, e.g. the whole bl=
+ocking
+of INIT thing, but SVM can also run afoul of EFER.SVME being cleared, and K=
+VM really=20
+should leave virtualization enabled across kexec(), even if leaving virtual=
+ization
+enabled is relatively benign on other architectures.
 
-You need a binding for this too.
+One more option would be:
 
-> The tag storage region represents the largest contiguous memory region th=
-at
-> holds all the tags for the associated contiguous memory region which can =
-be
-> tagged. For example, for a 32GB contiguous tagged memory the correspondin=
-g
-> tag storage region is 1GB of contiguous memory, not two adjacent 512M of
-> tag storage memory.
->
-> "block-size" represents the minimum multiple of 4K of tag storage where a=
-ll
-> the tags stored in the block correspond to a contiguous memory region. Th=
-is
-> is needed for platforms where the memory controller interleaves tag write=
-s
-> to memory. For example, if the memory controller interleaves tag writes f=
-or
-> 256KB of contiguous memory across 8K of tag storage (2-way interleave),
-> then the correct value for "block-size" is 0x2000. This value is a hardwa=
-re
-> property, independent of the selected kernel page size.
->
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arch/arm64/Kconfig                       |  12 ++
->  arch/arm64/include/asm/mte_tag_storage.h |  15 ++
->  arch/arm64/kernel/Makefile               |   1 +
->  arch/arm64/kernel/mte_tag_storage.c      | 256 +++++++++++++++++++++++
->  arch/arm64/kernel/setup.c                |   7 +
->  5 files changed, 291 insertions(+)
->  create mode 100644 arch/arm64/include/asm/mte_tag_storage.h
->  create mode 100644 arch/arm64/kernel/mte_tag_storage.c
->
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index 7b071a00425d..fe8276fdc7a8 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -2062,6 +2062,18 @@ config ARM64_MTE
->
->           Documentation/arch/arm64/memory-tagging-extension.rst.
->
-> +if ARM64_MTE
-> +config ARM64_MTE_TAG_STORAGE
-> +       bool "Dynamic MTE tag storage management"
-> +       help
-> +         Adds support for dynamic management of the memory used by the h=
-ardware
-> +         for storing MTE tags. This memory, unlike normal memory, cannot=
- be
-> +         tagged. When it is used to store tags for another memory locati=
-on it
-> +         cannot be used for any type of allocation.
-> +
-> +         If unsure, say N
-> +endif # ARM64_MTE
-> +
->  endmenu # "ARMv8.5 architectural features"
->
->  menu "ARMv8.7 architectural features"
-> diff --git a/arch/arm64/include/asm/mte_tag_storage.h b/arch/arm64/includ=
-e/asm/mte_tag_storage.h
-> new file mode 100644
-> index 000000000000..8f86c4f9a7c3
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/mte_tag_storage.h
-> @@ -0,0 +1,15 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +#ifndef __ASM_MTE_TAG_STORAGE_H
-> +#define __ASM_MTE_TAG_STORAGE_H
-> +
-> +#ifdef CONFIG_ARM64_MTE_TAG_STORAGE
-> +void mte_tag_storage_init(void);
-> +#else
-> +static inline void mte_tag_storage_init(void)
-> +{
-> +}
-> +#endif /* CONFIG_ARM64_MTE_TAG_STORAGE */
-> +#endif /* __ASM_MTE_TAG_STORAGE_H  */
-> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
-> index d95b3d6b471a..5f031bf9f8f1 100644
-> --- a/arch/arm64/kernel/Makefile
-> +++ b/arch/arm64/kernel/Makefile
-> @@ -70,6 +70,7 @@ obj-$(CONFIG_CRASH_CORE)              +=3D crash_core.o
->  obj-$(CONFIG_ARM_SDE_INTERFACE)                +=3D sdei.o
->  obj-$(CONFIG_ARM64_PTR_AUTH)           +=3D pointer_auth.o
->  obj-$(CONFIG_ARM64_MTE)                        +=3D mte.o
-> +obj-$(CONFIG_ARM64_MTE_TAG_STORAGE)    +=3D mte_tag_storage.o
->  obj-y                                  +=3D vdso-wrap.o
->  obj-$(CONFIG_COMPAT_VDSO)              +=3D vdso32-wrap.o
->  obj-$(CONFIG_UNWIND_PATCH_PAC_INTO_SCS)        +=3D patch-scs.o
-> diff --git a/arch/arm64/kernel/mte_tag_storage.c b/arch/arm64/kernel/mte_=
-tag_storage.c
-> new file mode 100644
-> index 000000000000..fa6267ef8392
-> --- /dev/null
-> +++ b/arch/arm64/kernel/mte_tag_storage.c
-> @@ -0,0 +1,256 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Support for dynamic tag storage.
-> + *
-> + * Copyright (C) 2023 ARM Ltd.
-> + */
-> +
-> +#include <linux/memblock.h>
-> +#include <linux/mm.h>
-> +#include <linux/of_device.h>
+ d) Add another sycore hook, e.g. syscore_kexec() specifically for this pat=
+h.
 
-You probably don't need this header. If you depend on what it
-implicitly includes, then that will now break in linux-next.
+> My slight preference is towards adding syscore_shutdown() to kexec, but
+> I'm not sure that's feasible. Adding kexec maintainers for input.
 
-> +#include <linux/of_fdt.h>
-> +#include <linux/range.h>
-> +#include <linux/string.h>
-> +#include <linux/xarray.h>
-> +
-> +#include <asm/mte_tag_storage.h>
-> +
-> +struct tag_region {
-> +       struct range mem_range; /* Memory associated with the tag storage=
-, in PFNs. */
-> +       struct range tag_range; /* Tag storage memory, in PFNs. */
-> +       u32 block_size;         /* Tag block size, in pages. */
-> +};
-> +
-> +#define MAX_TAG_REGIONS        32
-> +
-> +static struct tag_region tag_regions[MAX_TAG_REGIONS];
-> +static int num_tag_regions;
-> +
-> +static int __init tag_storage_of_flat_get_range(unsigned long node, cons=
-t __be32 *reg,
-> +                                               int reg_len, struct range=
- *range)
-> +{
-> +       int addr_cells =3D dt_root_addr_cells;
-> +       int size_cells =3D dt_root_size_cells;
-> +       u64 size;
-> +
-> +       if (reg_len / 4 > addr_cells + size_cells)
-> +               return -EINVAL;
-> +
-> +       range->start =3D PHYS_PFN(of_read_number(reg, addr_cells));
-> +       size =3D PHYS_PFN(of_read_number(reg + addr_cells, size_cells));
-> +       if (size =3D=3D 0) {
-> +               pr_err("Invalid node");
-> +               return -EINVAL;
-> +       }
-> +       range->end =3D range->start + size - 1;
+In a vacuum, that'd be my preference too.  It's the obvious choice IMO, e.g=
+. the
+kexec_image->preserve_context path does syscore_suspend() (and then resume(=
+), so
+it's not completely uncharted territory.
 
-We have a function to read (and translate which you forgot) addresses.
-Add what's missing rather than open code your own.
+However, there's a rather big wrinkle in that not all of the existing .shut=
+down()
+implementations are obviously ok to call during kexec.  Luckily, AFAICT the=
+re are
+very few users of the syscore .shutdown hook, so it's at least feasible to =
+go that
+route.
 
-> +
-> +       return 0;
-> +}
-> +
-> +static int __init tag_storage_of_flat_get_tag_range(unsigned long node,
-> +                                                   struct range *tag_ran=
-ge)
-> +{
-> +       const __be32 *reg;
-> +       int reg_len;
-> +
-> +       reg =3D of_get_flat_dt_prop(node, "reg", &reg_len);
-> +       if (reg =3D=3D NULL) {
-> +               pr_err("Invalid metadata node");
-> +               return -EINVAL;
-> +       }
-> +
-> +       return tag_storage_of_flat_get_range(node, reg, reg_len, tag_rang=
-e);
-> +}
-> +
-> +static int __init tag_storage_of_flat_get_memory_range(unsigned long nod=
-e, struct range *mem)
-> +{
-> +       const __be32 *reg;
-> +       int reg_len;
-> +
-> +       reg =3D of_get_flat_dt_prop(node, "linux,usable-memory", &reg_len=
-);
-> +       if (reg =3D=3D NULL)
-> +               reg =3D of_get_flat_dt_prop(node, "reg", &reg_len);
-> +
-> +       if (reg =3D=3D NULL) {
-> +               pr_err("Invalid memory node");
-> +               return -EINVAL;
-> +       }
-> +
-> +       return tag_storage_of_flat_get_range(node, reg, reg_len, mem);
-> +}
-> +
-> +struct find_memory_node_arg {
-> +       unsigned long node;
-> +       u32 phandle;
-> +};
-> +
-> +static int __init fdt_find_memory_node(unsigned long node, const char *u=
-name,
-> +                                      int depth, void *data)
-> +{
-> +       const char *type =3D of_get_flat_dt_prop(node, "device_type", NUL=
-L);
-> +       struct find_memory_node_arg *arg =3D data;
-> +
-> +       if (depth !=3D 1 || !type || strcmp(type, "memory") !=3D 0)
-> +               return 0;
-> +
-> +       if (of_get_flat_dt_phandle(node) =3D=3D arg->phandle) {
-> +               arg->node =3D node;
-> +               return 1;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +static int __init tag_storage_get_memory_node(unsigned long tag_node, un=
-signed long *mem_node)
-> +{
-> +       struct find_memory_node_arg arg =3D { 0 };
-> +       const __be32 *memory_prop;
-> +       u32 mem_phandle;
-> +       int ret, reg_len;
-> +
-> +       memory_prop =3D of_get_flat_dt_prop(tag_node, "memory", &reg_len)=
-;
-> +       if (!memory_prop) {
-> +               pr_err("Missing 'memory' property in the tag storage node=
-");
-> +               return -EINVAL;
-> +       }
-> +
-> +       mem_phandle =3D be32_to_cpup(memory_prop);
-> +       arg.phandle =3D mem_phandle;
-> +
-> +       ret =3D of_scan_flat_dt(fdt_find_memory_node, &arg);
+x86's mce_syscore_shutdown() should be ok, and arguably is correct, e.g. I =
+don't
+see how leaving #MC reporting enabled across kexec can work.
 
-Do not use of_scan_flat_dt. It is a relic predating libfdt which can
-get a node by phandle directly.
+ledtrig_cpu_syscore_shutdown() is also likely ok and arguably correct.
 
-> +       if (ret !=3D 1) {
-> +               pr_err("Associated memory node not found");
-> +               return -EINVAL;
-> +       }
-> +
-> +       *mem_node =3D arg.node;
-> +
-> +       return 0;
-> +}
-> +
-> +static int __init tag_storage_of_flat_read_u32(unsigned long node, const=
- char *propname,
-> +                                              u32 *retval)
+The interrupt controllers though?  x86 disables IRQs at the very beginning =
+of
+machine_kexec(), so it's likely fine.  But every other architecture?  No cl=
+ue.
+E.g. PPC's default_machine_kexec() sends IPIs to shutdown other CPUs, thoug=
+h I
+have no idea if that can run afoul of any of the paths below.
 
-If you are going to make a generic function, make it for everyone.
+        arch/powerpc/platforms/cell/spu_base.c  .shutdown =3D spu_shutdown,
+        arch/x86/kernel/cpu/mce/core.c	        .shutdown =3D mce_syscore_sh=
+utdown,
+        arch/x86/kernel/i8259.c                 .shutdown =3D i8259A_shutdo=
+wn,
+        drivers/irqchip/irq-i8259.c	        .shutdown =3D i8259A_shutdown,
+        drivers/irqchip/irq-sun6i-r.c	        .shutdown =3D sun6i_r_intc_sh=
+utdown,
+        drivers/leds/trigger/ledtrig-cpu.c	.shutdown =3D ledtrig_cpu_syscor=
+e_shutdown,
+        drivers/power/reset/sc27xx-poweroff.c	.shutdown =3D sc27xx_poweroff=
+_shutdown,
+        kernel/irq/generic-chip.c	        .shutdown =3D irq_gc_shutdown,
+        virt/kvm/kvm_main.c	                .shutdown =3D kvm_shutdown,
 
-> +{
-> +       const __be32 *reg;
-> +
-> +       reg =3D of_get_flat_dt_prop(node, propname, NULL);
-> +       if (!reg)
-> +               return -EINVAL;
-> +
-> +       *retval =3D be32_to_cpup(reg);
-> +       return 0;
-> +}
-> +
-> +static u32 __init get_block_size_pages(u32 block_size_bytes)
-> +{
-> +       u32 a =3D PAGE_SIZE;
-> +       u32 b =3D block_size_bytes;
-> +       u32 r;
-> +
-> +       /* Find greatest common divisor using the Euclidian algorithm. */
-> +       do {
-> +               r =3D a % b;
-> +               a =3D b;
-> +               b =3D r;
-> +       } while (b !=3D 0);
-> +
-> +       return PHYS_PFN(PAGE_SIZE * block_size_bytes / a);
-> +}
-> +
-> +static int __init fdt_init_tag_storage(unsigned long node, const char *u=
-name,
-> +                                      int depth, void *data)
-> +{
-> +       struct tag_region *region;
-> +       unsigned long mem_node;
-> +       struct range *mem_range;
-> +       struct range *tag_range;
-> +       u32 block_size_bytes;
-> +       u32 nid =3D 0;
-> +       int ret;
-> +
-> +       if (depth !=3D 1 || !strstr(uname, "tag-storage"))
-> +               return 0;
-> +
-> +       if (!of_flat_dt_is_compatible(node, "arm,mte-tag-storage"))
-> +               return 0;
-> +
-> +       if (num_tag_regions =3D=3D MAX_TAG_REGIONS) {
-> +               pr_err("Maximum number of tag storage regions exceeded");
-> +               return -EINVAL;
-> +       }
-> +
-> +       region =3D &tag_regions[num_tag_regions];
-> +       mem_range =3D &region->mem_range;
-> +       tag_range =3D &region->tag_range;
-> +
-> +       ret =3D tag_storage_of_flat_get_tag_range(node, tag_range);
-> +       if (ret) {
-> +               pr_err("Invalid tag storage node");
-> +               return ret;
-> +       }
-> +
-> +       ret =3D tag_storage_get_memory_node(node, &mem_node);
-> +       if (ret)
-> +               return ret;
-> +
-> +       ret =3D tag_storage_of_flat_get_memory_range(mem_node, mem_range)=
-;
-> +       if (ret) {
-> +               pr_err("Invalid address for associated data memory node")=
-;
-> +               return ret;
-> +       }
-> +
-> +       /* The tag region must exactly match the corresponding memory. */
-> +       if (range_len(tag_range) * 32 !=3D range_len(mem_range)) {
-> +               pr_err("Tag storage region 0x%llx-0x%llx does not cover t=
-he memory region 0x%llx-0x%llx",
-> +                      PFN_PHYS(tag_range->start), PFN_PHYS(tag_range->en=
-d),
-> +                      PFN_PHYS(mem_range->start), PFN_PHYS(mem_range->en=
-d));
-> +               return -EINVAL;
-> +       }
-> +
-> +       ret =3D tag_storage_of_flat_read_u32(node, "block-size", &block_s=
-ize_bytes);
-> +       if (ret || block_size_bytes =3D=3D 0) {
-> +               pr_err("Invalid or missing 'block-size' property");
-> +               return -EINVAL;
-> +       }
-> +       region->block_size =3D get_block_size_pages(block_size_bytes);
-> +       if (range_len(tag_range) % region->block_size !=3D 0) {
-> +               pr_err("Tag storage region size 0x%llx is not a multiple =
-of block size %u",
-> +                      PFN_PHYS(range_len(tag_range)), region->block_size=
-);
-> +               return -EINVAL;
-> +       }
-> +
-> +       ret =3D tag_storage_of_flat_read_u32(mem_node, "numa-node-id", &n=
-id);
+The whole thing is a bit of a mess.  E.g. x86 treats machine_shutdown() fro=
+m
+kexec pretty much the same as shutdown for reboot, but other architectures =
+have
+what appear to be unique paths for handling kexec.
 
-I was going to say we already have a way to associate memory nodes
-other nodes using "numa-node-id", so the "memory" phandle property is
-somewhat redundant. Maybe the tag node should have a numa-node-id.
-With that, it looks like you don't even need to access the /memory
-node. Avoiding that would be good for 2 reasons. It avoids parsing
-memory nodes twice and it's not the kernel's job to validate the DT.
-Really, if you want memory info, you should use memblock to get it
-because all the special cases of memory layout are handled. For
-example you can have memory nodes with multiple 'reg' entries or
-multiple memory nodes or both, and then some of those could be
-contiguous.
-
-Rob
+FWIW, if we want to go with option (b), syscore_shutdown() hooks could use
+kexec_in_progress to differentiate between "regular" shutdown/reboot and ke=
+xec.
