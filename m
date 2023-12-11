@@ -1,363 +1,167 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF333208DF
-	for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 14:45:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E3714C3DB
+	for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 16:13:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D0141FEC;
-	Mon, 11 Dec 2023 06:45:54 -0800 (PST)
-Received: from raptor (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AD8A03F738;
-	Mon, 11 Dec 2023 06:45:02 -0800 (PST)
-Date: Mon, 11 Dec 2023 14:45:00 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Hyesoo Yu <hyesoo.yu@samsung.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
-	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
-	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
-	rppt@kernel.org, hughd@google.com, pcc@google.com,
-	steven.price@arm.com, anshuman.khandual@arm.com,
-	vincenzo.frascino@arm.com, david@redhat.com, eugenis@google.com,
-	kcc@google.com, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC v2 11/27] arm64: mte: Reserve tag storage memory
-Message-ID: <ZXcgbJsFRotjOgUw@raptor>
-References: <20231119165721.9849-1-alexandru.elisei@arm.com>
- <CGME20231119165840epcas2p2c99f1dd358f716c103c16f47cc23bf2a@epcas2p2.samsung.com>
- <20231119165721.9849-12-alexandru.elisei@arm.com>
- <20231129084424.GA2988384@tiffany>
- <ZWxxJipc2STxHHKn@raptor>
- <20231208050340.GA1359878@tiffany>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 782621007;
+	Mon, 11 Dec 2023 08:14:39 -0800 (PST)
+Received: from e127643.broadband (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 053963F738;
+	Mon, 11 Dec 2023 08:13:48 -0800 (PST)
+From: James Clark <james.clark@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	linux-perf-users@vger.kernel.org,
+	suzuki.poulose@arm.com,
+	will@kernel.org,
+	mark.rutland@arm.com,
+	anshuman.khandual@arm.com
+Cc: namhyung@gmail.com,
+	James Clark <james.clark@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Zaid Al-Bassam <zalbassam@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH v7 00/11] arm64: perf: Add support for event counting threshold
+Date: Mon, 11 Dec 2023 16:13:12 +0000
+Message-Id: <20231211161331.1277825-1-james.clark@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231208050340.GA1359878@tiffany>
+Content-Transfer-Encoding: 8bit
 
-Hi,
+Changes since v6:
 
-On Fri, Dec 08, 2023 at 02:03:44PM +0900, Hyesoo Yu wrote:
-> Hi, 
-> 
-> I'm sorry for the late response, I was on vacation.
-> 
-> On Sun, Dec 03, 2023 at 12:14:30PM +0000, Alexandru Elisei wrote:
-> > Hi,
-> > 
-> > On Wed, Nov 29, 2023 at 05:44:24PM +0900, Hyesoo Yu wrote:
-> > > Hello.
-> > > 
-> > > On Sun, Nov 19, 2023 at 04:57:05PM +0000, Alexandru Elisei wrote:
-> > > > Allow the kernel to get the size and location of the MTE tag storage
-> > > > regions from the DTB. This memory is marked as reserved for now.
-> > > > 
-> > > > The DTB node for the tag storage region is defined as:
-> > > > 
-> > > >         tags0: tag-storage@8f8000000 {
-> > > >                 compatible = "arm,mte-tag-storage";
-> > > >                 reg = <0x08 0xf8000000 0x00 0x4000000>;
-> > > >                 block-size = <0x1000>;
-> > > >                 memory = <&memory0>;	// Associated tagged memory node
-> > > >         };
-> > > >
-> > > 
-> > > How about using compatible = "shared-dma-pool" like below ?
-> > > 
-> > > &reserved_memory {
-> > > 	tags0: tag0@8f8000000 {
-> > > 		compatible = "arm,mte-tag-storage";
-> > >         	reg = <0x08 0xf8000000 0x00 0x4000000>;
-> > > 	};
-> > > }
-> > > 
-> > > tag-storage {
-> > >         compatible = "arm,mte-tag-storage";
-> > > 	memory-region = <&tag>;
-> > >         memory = <&memory0>;
-> > > 	block-size = <0x1000>;
-> > > }
-> > > 
-> > > And then, the activation of CMA would be performed in the CMA code.
-> > > We just can get the region information from memory-region and allocate it directly
-> > > like alloc_contig_range, take_page_off_buddy. It seems like we can remove a lots of code.
-> >
-> 
-> Sorry, that example was my mistake. Actually I wanted to write like this. 
-> 
-> &reserved_memory {
-> 	tags0: tag0@8f8000000 {
-> 		compatible = "shared-dma-pool";
->         	reg = <0x08 0xf8000000 0x00 0x4000000>;
-> 		reusable;
-> 	};
-> }
-> 
-> tag-storage {
->         compatible = "arm,mte-tag-storage";
->  	memory-region = <&tag>;
->         memory = <&memory0>;
-> 	block-size = <0x1000>;
-> }
+  * Remove inlines from arm_pmuv3.c
+  * Use format attribute mechanism from SPE
+  * Re-arrange attributes so that threshold comes last and can
+    potentially be extended
+  * Emit an error if the max threshold is exceeded rather than clamping
+  * Convert all register fields to GENMASK
 
-I prototyped your suggestion with this change to the device tree:
+Changes since v5:
+  * Restructure the docs and add some more explanations
+  * PMMIR.WIDTH -> PMMIR.THWIDTH in one comment
+  * Don't write EVTYPER.TC if TH is 0. Doesn't have any functional
+    effect but it might be a bit easier to understand the code.
+  * Expand the format field #define names
 
-            reserved-memory {
-                    #address-cells = <0x02>;
-                    #size-cells = <0x02>;
-                    ranges;
+Changes since v4:
 
-                    tags0: tag-storage@8f8000000 {
-                            compatible = "arm,mte-tag-storage";
-                            reg = <0x08 0xf8000000 0x00 0x4000000>;
-                            block-size = <0x1000>;
-                            memory = <&memory0>;
-                            reusable;
-                    };
-            };
+  * Rebase onto v6.7-rc1, it no longer depends on kvmarm/next
+  * Remove change that moved ARMV8_PMU_EVTYPE_MASK to the asm files.
+    This actually depended on those files being included in a certain
+    order with arm_pmuv3.h to avoid circular includes. Now the
+    definition is done programmatically in arm_pmuv3.c instead.
 
-Would you mind explaining what we are gaining by using reserved mem?
+Changes since v3:
 
-Struct reserved_mem only has the base and size of the tag storage region,
-and initialization for reserved mem happens before the DTB is unflattened.
-When I prototyped using reserved mem, I still had to write the code to
-parse the memory node address and size. This code was the same as the code
-needed to parse the tag storage region address and size, so having that
-information in struct reserved_mem does not reduce the size of the code by
-a meaningful amount.
+  * Drop #include changes to KVM source files because since
+    commit bc512d6a9b92 ("KVM: arm64: Make PMEVTYPER<n>_EL0.NSH RES0 if
+    EL2 isn't advertised"), KVM doesn't use ARMV8_PMU_EVTYPE_MASK
+    anymore
 
-> 
-> 
-> > Played with reserved_mem a bit. I don't think that's the correct path
-> > forward.
-> > 
-> > The location of the tag storage is a hardware property, independent of how
-> > Linux is configured.
-> > 
-> > early_init_fdt_scan_reserved_mem() is called from arm64_memblock_init(),
-> > **after** the kernel enforces an upper address for various reasons. One of
-> > the reasons can be that it's been compiled with 39 bits VA.
-> > 
-> 
-> I'm not sure about this part. What is the upper address enforced by the kernel ?
-> Where can I check the code ? Do you means that memblock_end_of_DRAM() ?  
+Changes since v2:
 
-I am referring to arch/arm64/mm/init.c:: arm64_memblock_init(). The
-function initializes reserved mem (in early_init_fdt_scan_reserved_mem())
-**after**removing memory from memblock that the kernel cannot address.
+  * Split threshold_control attribute into two, threshold_compare and
+    threshold_count so that it's easier to use
+  * Add some notes to the first commit message and the cover letter
+    about the behavior in KVM
+  * Update the docs commit with regards to the split attribute
+ 
+Changes since v1:
 
-> 
-> > After early_init_fdt_scan_reserved_mem() returns, the kernel sets the
-> > maximum address, stored in the variable "high_memory".
-> >
-> > What can happen is that tag storage is present at an address above the
-> > maximum addressable by the kernel, and the CMA code will trigger an
-> > unrecovrable page fault.
-> > 
-> > I was able to trigger this with the dts change:
-> > 
-> > diff --git a/arch/arm64/boot/dts/arm/fvp-base-revc.dts b/arch/arm64/boot/dts/arm/fvp-base-revc.dts
-> > index 60472d65a355..201359d014e4 100644
-> > --- a/arch/arm64/boot/dts/arm/fvp-base-revc.dts
-> > +++ b/arch/arm64/boot/dts/arm/fvp-base-revc.dts
-> > @@ -183,6 +183,13 @@ vram: vram@18000000 {
-> >                         reg = <0x00000000 0x18000000 0 0x00800000>;
-> >                         no-map;
-> >                 };
-> > +
-> > +
-> > +               linux,cma {
-> > +                       compatible = "shared-dma-pool";
-> > +                       reg = <0x100 0x0 0x00 0x4000000>;
-> > +                       reusable;
-> > +               };
-> >         };
-> > 
-> >         gic: interrupt-controller@2f000000 {
-> > 
-> > And the error I got:
-> > 
-> > [    0.000000] Reserved memory: created CMA memory pool at 0x0000010000000000, size 64 MiB
-> > [    0.000000] OF: reserved mem: initialized node linux,cma, compatible id shared-dma-pool
-> > [    0.000000] OF: reserved mem: 0x0000010000000000..0x0000010003ffffff (65536 KiB) map reusable linux,cma
-> > [..]
-> > [    0.793193] WARNING: CPU: 0 PID: 1 at mm/cma.c:111 cma_init_reserved_areas+0xa8/0x378
-> > [..]
-> > [    0.806945] Unable to handle kernel paging request at virtual address 00000001fe000000
-> > [    0.807277] Mem abort info:
-> > [    0.807277]   ESR = 0x0000000096000005
-> > [    0.807693]   EC = 0x25: DABT (current EL), IL = 32 bits
-> > [    0.808110]   SET = 0, FnV = 0
-> > [    0.808443]   EA = 0, S1PTW = 0
-> > [    0.808526]   FSC = 0x05: level 1 translation fault
-> > [    0.808943] Data abort info:
-> > [    0.808943]   ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
-> > [    0.809360]   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
-> > [    0.809776]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-> > [    0.810221] [00000001fe000000] user address but active_mm is swapper
-> > [..]
-> > [    0.820887] Call trace:
-> > [    0.821027]  cma_init_reserved_areas+0xc4/0x378
-> > [    0.821443]  do_one_initcall+0x7c/0x1c0
-> > [    0.821860]  kernel_init_freeable+0x1bc/0x284
-> > [    0.822277]  kernel_init+0x24/0x1dc
-> > [    0.822693]  ret_from_fork+0x10/0x20
-> > [    0.823554] Code: 9127a29a cb813321 d37ae421 8b030020 (f8636822)
-> > [    0.823554] ---[ end trace 0000000000000000 ]---
-> > [    0.824360] Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
-> > [    0.824443] SMP: stopping secondary CPUs
-> > [    0.825193] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b ]---
-> > 
-> > Should reserved mem check if the reserved memory is actually addressable by
-> > the kernel if it's not "no-map"? Should cma fail gracefully if
-> > !pfn_valid(base_pfn)? Shold early_init_fdt_scan_reserved_mem() be moved
-> > because arm64_bootmem_init()? I don't have the answer to any of those. And
-> > I got a kernel panic because the kernel cannot address that memory (39 bits
-> > VA). I don't know what would happen if the upper limit is reduced for
-> > another reason.
-> > 
-> 
-> My answer may not be accurate because I don't understand what this upper limit is.
-> Is this a problem caused by the tag storage area not being included in the memory node ?
+  * Fix build on aarch32 by disabling FEAT_PMUv3_TH and splitting event
+    type mask between the platforms
+  * Change armv8pmu_write_evtype() to take unsigned long instead of u64
+    so it isn't unnecessarily wide on aarch32
+  * Add UL suffix to aarch64 event type mask definition
 
-This problem is caused by the kernel cannot using virtual addresses in the
-linear map (where VA == PA) to access the tag storage region.
+----
 
-> 
-> The reason for not including it in the memory node is to enable static mte when dmte
-> initilization fails, right ? I think I missed that. I thought the tag storage is included
-> in the memory node and registered as cma.
-> 
-> > What I think should happen:
-> > 
-> > 1. Add the tag storage memory before any limits are enforced by
-> > arm64_bootmem_init().
-> >
-> > 2. Call cma_declare_contiguous_nid() after arm64_bootmem_init(), because
-> > the function will check the memory limit.
-> > 
-> > 3. Have an arch initcall that checks that the CMA regions corresponding to
-> > the tag storage have been activated successfully (cma_init_reserved_areas()
-> > is a core initcall). If not, then don't enable tag storage.
-> > 
-> > How does that sound to you?
-> > 
-> > Thanks,
-> > Alex
-> > 
-> 
-> I think this is a good way to utilize the cma code !
+FEAT_PMUv3_TH (Armv8.8) is a new feature that allows conditional
+counting of PMU events depending on how much the event increments on
+a single cycle. Two new config fields for perf_event_open have been
+added, and a PMU cap file for reading the max_threshold. See the second
+commit message and the docs in the last commit for more details.
 
-Cool, thanks!
+The feature is not currently supported on KVM guests, and PMMIR is set
+to read as zero, so it's not advertised as available. But it can be
+added at a later time. Writes to PMEVTYPER.TC and TH from guests are
+already RES0.
 
-Alex
+The change has been validated on the Arm FVP model:
 
-> 
-> Thanks,
-> Regards.
-> 
-> > > > +	ret = tag_storage_of_flat_read_u32(node, "block-size", &block_size_bytes);
-> > > > +	if (ret || block_size_bytes == 0) {
-> > > > +		pr_err("Invalid or missing 'block-size' property");
-> > > > +		return -EINVAL;
-> > > > +	}
-> > > > +	region->block_size = get_block_size_pages(block_size_bytes);
-> > > > +	if (range_len(tag_range) % region->block_size != 0) {
-> > > > +		pr_err("Tag storage region size 0x%llx is not a multiple of block size %u",
-> > > > +		       PFN_PHYS(range_len(tag_range)), region->block_size);
-> > > > +		return -EINVAL;
-> > > > +	}
-> > > > +
-> > > 
-> > > I was confused about the variable "block_size", The block size declared in the device tree is
-> > > in bytes, but the actual block size used is in pages. I think the term "block_size" can cause
-> > > confusion as it might be interpreted as bytes. If possible, I suggest changing the term "block_size"
-> > > to something more readable, such as "block_nr_pages" (This is just a example!)
-> > > 
-> > > Thanks,
-> > > Regards.
-> >>
-> 
-> What do you think about this ?
-> 
-> Thanks,
-> Regards.
-> 
-> > > > +	ret = tag_storage_of_flat_read_u32(mem_node, "numa-node-id", &nid);
-> > > > +	if (ret)
-> > > > +		nid = numa_node_id();
-> > > > +
-> > > > +	ret = memblock_add_node(PFN_PHYS(tag_range->start), PFN_PHYS(range_len(tag_range)),
-> > > > +				nid, MEMBLOCK_NONE);
-> > > > +	if (ret) {
-> > > > +		pr_err("Error adding tag memblock (%d)", ret);
-> > > > +		return ret;
-> > > > +	}
-> > > > +	memblock_reserve(PFN_PHYS(tag_range->start), PFN_PHYS(range_len(tag_range)));
-> > > > +
-> > > > +	pr_info("Found tag storage region 0x%llx-0x%llx, block size %u pages",
-> > > > +		PFN_PHYS(tag_range->start), PFN_PHYS(tag_range->end), region->block_size);
-> > > > +
-> > > > +	num_tag_regions++;
-> > > > +
-> > > > +	return 0;
-> > > > +}
-> > > > +
-> > > > +void __init mte_tag_storage_init(void)
-> > > > +{
-> > > > +	struct range *tag_range;
-> > > > +	int i, ret;
-> > > > +
-> > > > +	ret = of_scan_flat_dt(fdt_init_tag_storage, NULL);
-> > > > +	if (ret) {
-> > > > +		for (i = 0; i < num_tag_regions; i++) {
-> > > > +			tag_range = &tag_regions[i].tag_range;
-> > > > +			memblock_remove(PFN_PHYS(tag_range->start), PFN_PHYS(range_len(tag_range)));
-> > > > +		}
-> > > > +		num_tag_regions = 0;
-> > > > +		pr_info("MTE tag storage region management disabled");
-> > > > +	}
-> > > > +}
-> > > > diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-> > > > index 417a8a86b2db..1b77138c1aa5 100644
-> > > > --- a/arch/arm64/kernel/setup.c
-> > > > +++ b/arch/arm64/kernel/setup.c
-> > > > @@ -42,6 +42,7 @@
-> > > >  #include <asm/cpufeature.h>
-> > > >  #include <asm/cpu_ops.h>
-> > > >  #include <asm/kasan.h>
-> > > > +#include <asm/mte_tag_storage.h>
-> > > >  #include <asm/numa.h>
-> > > >  #include <asm/scs.h>
-> > > >  #include <asm/sections.h>
-> > > > @@ -342,6 +343,12 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
-> > > >  			   FW_BUG "Booted with MMU enabled!");
-> > > >  	}
-> > > >  
-> > > > +	/*
-> > > > +	 * Must be called before memory limits are enforced by
-> > > > +	 * arm64_memblock_init().
-> > > > +	 */
-> > > > +	mte_tag_storage_init();
-> > > > +
-> > > >  	arm64_memblock_init();
-> > > >  
-> > > >  	paging_init();
-> > > > -- 
-> > > > 2.42.1
-> > > > 
-> > > > 
-> > 
-> > 
-> > 
+  # Zero values, works as expected (as before).
+  $ perf stat -e dtlb_walk/threshold=0,threshold_compare=0/ -- true
 
+    5962      dtlb_walk/threshold=0,threshold_compare=0/
+
+  # Threshold >= 255 causes count to be 0 because dtlb_walk doesn't
+  # increase by more than 1 per cycle.
+  $ perf stat -e dtlb_walk/threshold=255,threshold_compare=2/ -- true
+
+    0      dtlb_walk/threshold=255,threshold_compare=2/
+  
+  # Keeping comparison as >= but lowering the threshold to 1 makes the
+  # count return.
+  $ perf stat -e dtlb_walk/threshold=1,threshold_compare=2/ -- true
+
+    6329      dtlb_walk/threshold=1,threshold_compare=2/
+
+James Clark (11):
+  arm: perf: Remove inlines from arm_pmuv3.c
+  arm: perf/kvm: Use GENMASK for ARMV8_PMU_PMCR_N
+  arm: perf: Use GENMASK for PMMIR fields
+  arm: perf: Convert remaining fields to use GENMASK
+  arm64: perf: Include threshold control fields in PMEVTYPER mask
+  arm: pmu: Share user ABI format mechanism with SPE
+  perf/arm_dmc620: Remove duplicate format attribute #defines
+  KVM: selftests: aarch64: Update tools copy of arm_pmuv3.h
+  arm: pmu: Move error message and -EOPNOTSUPP to individual PMUs
+  arm64: perf: Add support for event counting threshold
+  Documentation: arm64: Document the PMU event counting threshold
+    feature
+
+ Documentation/arch/arm64/perf.rst             |  72 +++++++
+ arch/arm/kernel/perf_event_v7.c               |   6 +-
+ arch/arm64/kvm/pmu-emul.c                     |   8 +-
+ arch/arm64/kvm/sys_regs.c                     |   4 +-
+ drivers/perf/apple_m1_cpu_pmu.c               |   6 +-
+ drivers/perf/arm_dmc620_pmu.c                 |  22 +--
+ drivers/perf/arm_pmu.c                        |  11 +-
+ drivers/perf/arm_pmuv3.c                      | 175 ++++++++++++++----
+ drivers/perf/arm_spe_pmu.c                    |  22 ---
+ include/linux/perf/arm_pmu.h                  |  22 +++
+ include/linux/perf/arm_pmuv3.h                |  34 ++--
+ tools/include/perf/arm_pmuv3.h                |  43 +++--
+ .../kvm/aarch64/vpmu_counter_access.c         |   5 +-
+ 13 files changed, 296 insertions(+), 134 deletions(-)
+
+-- 
+2.34.1
 
