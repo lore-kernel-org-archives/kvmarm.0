@@ -1,86 +1,96 @@
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFAD155C02
-	for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 22:48:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5906e03a7a4so2701605eaf.1
-        for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 14:48:00 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9240153E13
+	for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 22:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Cwi9buOC"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5de8c2081d1so42034207b3.1
+        for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 14:57:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1702335422; x=1702940222; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XLiTtRRqM+qNBV6tYcuiNPBMTUo4FdzTRXinHk4XXSY=;
+        b=Cwi9buOCGKlpuG1lHoACs47f26uonCRt8VjufKI2DI8HsOdcx3VkjmGszbKcwTUdbQ
+         jb7lNDb+SZPhrWrX1LJKJq1F/fIS5ES86A6NnpWmDdCOxgMCCYgVjr5f278G82IM/PPI
+         CUsV1ajOR6wvVDcB2K0Lrxu6+sotdlTcC4bp/uh5Z94jF9H70gF5yhOXkWfVYzZ/E7nV
+         fIqFOLTFI30YsV1G93mNMj9RYQPHtiK3tFa7TvGDY3/gkul35wbkRlP3S9Zu7ImDB6jY
+         uq7WepA+SNGczm57YfdQl1AOVSngKt3DkCCxwq+C4nc+sx/V5JtLz4YpuulCwyCs6+jO
+         mylw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702334880; x=1702939680;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=k4H6aTdYE8tqOr/rhjfIkIGsF0cSzu4dWTqXBe8lHAQ=;
-        b=pNXPSYFKtV+HDhQJxdsV5fFz5UPgLujWV9ArfnPfqve5eTn7O1z8XYEB5K9X4Y+CoH
-         Z7Sz+Nw3BhuVZbA56VDoD0Tj5PTkMkzHO/0C2I8OeDWBj+qFGsTFmmFIBvp8jE5sVo10
-         1fyKEKD11X+VAMvjHLjUJgvlDAvTYhGXQCTkya0pJmZYSPSekKsrOxz0oFVE0URoABa5
-         4lZkRbDr0PccPiKhXGQiVkX+zheKuH8CV2nAiPkPqk3P4v8dDruHofe2FA/+HJTlnyom
-         3on7H2Me8mvmCSuPgDaeqpQt2QpjAHUnmHAiG+GcD5yexdALzDS1wZLYj+DoFMUbzYSu
-         eVFQ==
-X-Gm-Message-State: AOJu0Yzde2zUs/4QC6e3mXIv+AWiztF4r8rJ4yOzYx8mpFmZjXsFM5BR
-	zEXBBNygDaL6953W3EemxkbZgPx1W8kxI27YRt8=
-X-Google-Smtp-Source: AGHT+IF31Mg+zAriK3Z8TrEy05W4kntJoJ4yBtpYQzWGNS2VD5tmT/nhYRq+mn0O9RBa0jUyCvS3Hi31NDsPEFoKSeU=
-X-Received: by 2002:a05:6359:4114:b0:170:bfb9:fb41 with SMTP id
- kh20-20020a056359411400b00170bfb9fb41mr2885853rwc.28.1702334879711; Mon, 11
- Dec 2023 14:47:59 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702335422; x=1702940222;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XLiTtRRqM+qNBV6tYcuiNPBMTUo4FdzTRXinHk4XXSY=;
+        b=NLCORjxjTFeyejmqIQZr67u7ra8Bm8TI0k/VHTQ/KV5/1M1HQVAzKxRYqmIqc8wrbj
+         DowTMA/fllVnbRZ2oPT1epzhWN22QqI1qomB14q7EMmM5/cdQGdeM8vHE6duBro6acMf
+         LNDKqA9kqY5dVu6YiOzXWQ2yQDSEpIQyN3KuRrqN9dDYuLRhZEy37BDYzRNsEtTHp7sL
+         lhyHI3IL+l8r1nVYcrgwPys1i1IuLCzj+naczCxajs5kOuld/kXndVpqsB+pPiAI/obZ
+         YkkxOqMaL7qfB0LDhsJ52tGOVz/n+6LYla22G8xlEkPnk8hSufPFibgYC5qgVltVgidT
+         9YIw==
+X-Gm-Message-State: AOJu0YxyWg1lRLFZO/PsNL8fXSFebeNfxxu4XqdeYo6WPdo4WxEJKHlz
+	f0lPlOWHyX5wICmOVCBCpdqWFt4kjnk=
+X-Google-Smtp-Source: AGHT+IEhhypj7D/PwqeFaL95W7v5NUceMg/HzzkyowCvBZn3QIeqdswnpmg0GcBg4W9bI7RZryt2AT+W5iM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:c01:b0:5d1:104a:acb5 with SMTP id
+ cl1-20020a05690c0c0100b005d1104aacb5mr53522ywb.2.1702335422457; Mon, 11 Dec
+ 2023 14:57:02 -0800 (PST)
+Date: Mon, 11 Dec 2023 14:57:00 -0800
+In-Reply-To: <865y16b6cf.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20231121192956.919380-1-oliver.upton@linux.dev>
- <20231121192956.919380-3-oliver.upton@linux.dev> <c701bf6b-0ff0-44a0-9d1d-84e8515d077c@sirena.org.uk>
- <ZWui3KxloT5tcIsJ@thinky-boi> <80ff02a5-8355-437d-b844-3de9fe182518@sirena.org.uk>
- <bec12895-38d0-46d3-8031-53c55f88f3a7@sirena.org.uk>
-In-Reply-To: <bec12895-38d0-46d3-8031-53c55f88f3a7@sirena.org.uk>
-From: Namhyung Kim <namhyung@kernel.org>
-Date: Mon, 11 Dec 2023 14:47:48 -0800
-Message-ID: <CAM9d7cirVU1sGPKT9SfmjPpFKJ2PiZ-Md52bWB=Ormbkiwvgkw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] perf build: Ensure sysreg-defs Makefile respects
- output dir
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Mark Brown <broonie@kernel.org>, linux-perf-users@vger.kernel.org, 
-	kvmarm@lists.linux.dev, Peter Zijlstra <peterz@infradead.org>, 
-	Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Marc Zyngier <maz@kernel.org>, torvalds@linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <SYBPR01MB687069BFC9744585B4EEF8C49D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
+ <SYBPR01MB6870FDFBB88F879C735198F39D88A@SYBPR01MB6870.ausprd01.prod.outlook.com>
+ <865y16b6cf.wl-maz@kernel.org>
+Message-ID: <ZXeTvCLURmwzpDkP@google.com>
+Subject: Re: [PATCH v3 1/5] KVM: Add arch specific interfaces for sampling
+ guest callchains
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Tianyi Liu <i.pear@outlook.com>, pbonzini@redhat.com, peterz@infradead.org, 
+	mingo@redhat.com, acme@kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, 
+	mark.rutland@arm.com, mlevitsk@redhat.com, alexander.shishkin@linux.intel.com, 
+	jolsa@kernel.org, namhyung@kernel.org, irogers@google.com, 
+	adrian.hunter@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-Hello Oliver,
+On Sun, Dec 10, 2023, Marc Zyngier wrote:
+> On Sun, 10 Dec 2023 08:12:18 +0000, Tianyi Liu <i.pear@outlook.com> wrote:
+> > +bool kvm_arch_vcpu_read_virt(struct kvm_vcpu *vcpu, gva_t addr, void *dest, unsigned int length)
+> > +{
+> > +	/* TODO: implement */
+> > +	return false;
+> > +}
+> 
+> I don't do it very often, but the only thing I can say about this is
+> *NAK*.
+> 
+> You have decided to ignore the previous review comments, which is your
+> prerogative. However, I absolutely refuse to add half baked and
+> *dangerous* stuff to the arm64's version of KVM.
+> 
+> If you can convince the x86 folks that they absolutely want this, fine
+> by me. But this need to be a buy-in interface, not something that is
+> required for each and every architecture to have stubs, wrongly
+> suggesting that extra work is needed.
+> 
+> For arm64, the way to go is to have this in userspace. Which is both
+> easy to implement and safe. And until we have such a userspace
+> implementation as a baseline, I will not consider a kernel
+> version.
 
-On Mon, Dec 11, 2023 at 5:19=E2=80=AFAM Mark Brown <broonie@kernel.org> wro=
-te:
->
-> On Wed, Dec 06, 2023 at 01:45:56PM +0000, Mark Brown wrote:
-> > On Sat, Dec 02, 2023 at 01:34:20PM -0800, Oliver Upton wrote:
-> > > Thanks for the bug report. Apologies for the latency on my end, I've =
-had
-> > > a mountain of non-upstream stuff to wade through.
-> > > On Wed, Nov 29, 2023 at 04:27:01PM +0000, Mark Brown wrote:
->
-> > > > This breaks some build configurations:
->
-> > > > make[5]: Entering directory '/home/broonie/git/bisect/tools/arch/ar=
-m64/tools'
-> > > > /home/broonie/git/bisect/tools/scripts/Makefile.include:4: *** O=3D=
-../../../../tools does not exist.  Stop.
->
-> > > Looks like its because $(PWD) is tools/testing/selftests/ when buildi=
-ng
-> > > from the top level makefile. I'll get a fix out in the next couple da=
-ys
-> > > after I find my Make dunce cap :)
->
-> > This issue is now in Linus' tree.
->
-> Any news on this, the problem remains in -rc5?
+I too want more justification of why this needs to be handled in the kernel[*].
+The usefulness of this is dubious for many modern setups/workloads, and outright
+undesirable for some, e.g. many (most?) cloud providers want to make it all but
+impossible to access customer data.
 
-Have you found some time to work on it?
-
-Thanks,
-Namhyung
+[*] https://lore.kernel.org/all/ZSlNsn-f1j2bB8pW@FVFF77S0Q05N.cambridge.arm.com
