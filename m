@@ -1,121 +1,136 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D77501BDD6
-	for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 06:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 67E501007;
-	Sun, 10 Dec 2023 22:35:00 -0800 (PST)
-Received: from [10.162.41.8] (a077893.blr.arm.com [10.162.41.8])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D977F3F762;
-	Sun, 10 Dec 2023 22:34:08 -0800 (PST)
-Message-ID: <3ba53c71-114a-4ac9-b590-7332e97b6fc4@arm.com>
-Date: Mon, 11 Dec 2023 12:04:05 +0530
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F1B5208A2
+	for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 07:54:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LVpNoLrV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1702281296; x=1733817296;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-id:content-transfer-encoding:mime-version:subject;
+  bh=r73lI5nXluUvYNLiP+U10mmGdgAqNSuQ7rSnDd3RcJk=;
+  b=LVpNoLrVG+1GqbNFrh483O9bMSJInVxUEym7p7vFjr87wUfCZzRL4fUR
+   RI+sfU7s8vC56Ddr0THo7AXp24HxpbVH7rFU1CBQNNfjy3byOwOvT6V/V
+   emAJTuN4Id622TkFtFjZmfqIG/UrsSjOZRjuVy06nZ6eC0a4tS4YvIELK
+   A=;
+X-IronPort-AV: E=Sophos;i="6.04,267,1695686400"; 
+   d="scan'208";a="624436526"
+Subject: Re: [PATCH v2 1/2] KVM: Use syscore_ops instead of reboot_notifier to hook
+ restart/shutdown
+Thread-Topic: [PATCH v2 1/2] KVM: Use syscore_ops instead of reboot_notifier to hook
+ restart/shutdown
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2023 07:54:54 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
+	by email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com (Postfix) with ESMTPS id 10901AAAFC;
+	Mon, 11 Dec 2023 07:54:49 +0000 (UTC)
+Received: from EX19MTAEUA002.ant.amazon.com [10.0.10.100:25155]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.40.11:2525] with esmtp (Farcaster)
+ id 93b94b21-a815-4010-9fac-0e3e3813c799; Mon, 11 Dec 2023 07:54:47 +0000 (UTC)
+X-Farcaster-Flow-ID: 93b94b21-a815-4010-9fac-0e3e3813c799
+Received: from EX19D012EUC004.ant.amazon.com (10.252.51.220) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 11 Dec 2023 07:54:43 +0000
+Received: from EX19D014EUC004.ant.amazon.com (10.252.51.182) by
+ EX19D012EUC004.ant.amazon.com (10.252.51.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 11 Dec 2023 07:54:42 +0000
+Received: from EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41]) by
+ EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41%3]) with mapi id
+ 15.02.1118.040; Mon, 11 Dec 2023 07:54:42 +0000
+From: "Gowans, James" <jgowans@amazon.com>
+To: "Graf (AWS), Alexander" <graf@amazon.de>, "seanjc@google.com"
+	<seanjc@google.com>, "ebiederm@xmission.com" <ebiederm@xmission.com>,
+	=?utf-8?B?U2Now7ZuaGVyciwgSmFuIEgu?= <jschoenh@amazon.de>
+CC: "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+	"kexec@lists.infradead.org" <kexec@lists.infradead.org>,
+	"james.morse@arm.com" <james.morse@arm.com>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, "atishp@atishpatra.org"
+	<atishp@atishpatra.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "maz@kernel.org" <maz@kernel.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"anup@brainfault.org" <anup@brainfault.org>,
+	"aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>
+Thread-Index: AQHaKm9F6TfLvhzSVEeLxKjiUjwNTrCgjTCAgAFn6T+AAcSbgA==
+Date: Mon, 11 Dec 2023 07:54:42 +0000
+Message-ID: <a02b40d3d9ae5b3037b9a9d5921cfb0144ab5610.camel@amazon.com>
+References: <20230512233127.804012-1-seanjc@google.com>
+	 <20230512233127.804012-2-seanjc@google.com>
+	 <cfed942fc767fa7b2fabc68a3357a7b95bd6a589.camel@amazon.com>
+	 <871qbud5f9.fsf@email.froward.int.ebiederm.org>
+In-Reply-To: <871qbud5f9.fsf@email.froward.int.ebiederm.org>
+Accept-Language: en-ZA, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F320358D0A3B8147A9D633C6C3B3AEF4@amazon.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V15 2/8] KVM: arm64: Prevent guest accesses into BRBE
- system registers/instructions
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com,
- Mark Brown <broonie@kernel.org>, James Clark <james.clark@arm.com>,
- Rob Herring <robh@kernel.org>, Suzuki Poulose <suzuki.poulose@arm.com>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- linux-perf-users@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev
-References: <20231201053906.1261704-1-anshuman.khandual@arm.com>
- <20231201053906.1261704-3-anshuman.khandual@arm.com>
- <86v89ebcn2.wl-maz@kernel.org>
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <86v89ebcn2.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-
-
-On 12/4/23 13:52, Marc Zyngier wrote:
-> On Fri, 01 Dec 2023 05:39:00 +0000,
-> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
->> Currently BRBE feature is not supported in a guest environment. This hides
->> BRBE feature availability via masking ID_AA64DFR0_EL1.BRBE field. This also
->> blocks guest accesses into BRBE system registers and instructions as if the
->> underlying hardware never implemented FEAT_BRBE feature.
->>
->> Cc: Marc Zyngier <maz@kernel.org>
->> Cc: Oliver Upton <oliver.upton@linux.dev>
->> Cc: James Morse <james.morse@arm.com>
->> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will@kernel.org>
->> Cc: kvmarm@lists.linux.dev
->> Cc: linux-arm-kernel@lists.infradead.org
->> Cc: linux-kernel@vger.kernel.org
->> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
->> ---
->>  arch/arm64/kvm/sys_regs.c | 130 ++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 130 insertions(+)
->>
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 4735e1b37fb3..42701065b3cd 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -1583,6 +1583,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->>  	/* Hide SPE from guests */
->>  	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
->>  
->> +	/* Hide BRBE from guests */
->> +	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
->> +
->>  	return val;
->>  }
->>  
->> @@ -2042,6 +2045,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->>  	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
->>  	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
->>  	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
->> +	{ SYS_DESC(OP_BRB_IALL), undef_access },
->> +	{ SYS_DESC(OP_BRB_INJ), undef_access },
->>  
->>  	DBG_BCR_BVR_WCR_WVR_EL1(0),
->>  	DBG_BCR_BVR_WCR_WVR_EL1(1),
->> @@ -2072,6 +2077,131 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->>  	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
->>  	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
->>  
->> +	/*
->> +	 * BRBE branch record sysreg address space is interleaved between
->> +	 * corresponding BRBINF<N>_EL1, BRBSRC<N>_EL1, and BRBTGT<N>_EL1.
->> +	 */
->> +	{ SYS_DESC(SYS_BRBINF0_EL1), undef_access },
->> +	{ SYS_DESC(SYS_BRBSRC0_EL1), undef_access },
->> +	{ SYS_DESC(SYS_BRBTGT0_EL1), undef_access },
->> +	{ SYS_DESC(SYS_BRBINF16_EL1), undef_access },
->> +	{ SYS_DESC(SYS_BRBSRC16_EL1), undef_access },
->> +	{ SYS_DESC(SYS_BRBTGT16_EL1), undef_access },
-> Surely we can do better than this wall of text. Please look at what we
-> do for the debug registers, and adopt a similar pattern. This should
-> result in one line per group of 3 registers.
-
-Sure, will these replace via the following macro.
-
-+#define BRB_INF_SRC_TGT_EL1(n)                                 \
-+       { SYS_DESC(SYS_BRBINF##n##_EL1), undef_access },        \
-+       { SYS_DESC(SYS_BRBSRC##n##_EL1), undef_access },        \
-+       { SYS_DESC(SYS_BRBTGT##n##_EL1), undef_access }         \
-....
-+       BRB_INF_SRC_TGT_EL1(0),
-+       BRB_INF_SRC_TGT_EL1(16),
-+       BRB_INF_SRC_TGT_EL1(1),
-+       BRB_INF_SRC_TGT_EL1(17),
-+       BRB_INF_SRC_TGT_EL1(2),
-+       BRB_INF_SRC_TGT_EL1(18),
-+       BRB_INF_SRC_TGT_EL1(3),
-+       BRB_INF_SRC_TGT_EL1(19),
-....
+T24gU2F0LCAyMDIzLTEyLTA5IGF0IDIyOjUzIC0wNjAwLCBFcmljIFcuIEJpZWRlcm1hbiB3cm90
+ZToNCj4gPiBPbiBGcmksIDIwMjMtMDUtMTIgYXQgMTY6MzEgLTA3MDAsIFNlYW4gQ2hyaXN0b3Bo
+ZXJzb24gd3JvdGU6DQo+ID4gPiBVc2Ugc3lzY29yZV9vcHMuc2h1dGRvd24gdG8gZGlzYWJsZSBo
+YXJkd2FyZSB2aXJ0dWFsaXphdGlvbiBkdXJpbmcgYQ0KPiA+ID4gcmVib290IGluc3RlYWQgb2Yg
+dXNpbmcgdGhlIGRlZGljYXRlZCByZWJvb3Rfbm90aWZpZXIgc28gdGhhdCBLVk0gZGlzYWJsZXMN
+Cj4gPiA+IHZpcnR1YWxpemF0aW9uIF9hZnRlcl8gc3lzdGVtX3N0YXRlIGhhcyBiZWVuIHVwZGF0
+ZWQuwqAgVGhpcyB3aWxsIGFsbG93DQo+ID4gPiBmaXhpbmcgYSByYWNlIGluIEtWTSdzIGhhbmRs
+aW5nIG9mIGEgZm9yY2VkIHJlYm9vdCB3aGVyZSBLVk0gY2FuIGVuZCB1cA0KPiA+ID4gZW5hYmxp
+bmcgaGFyZHdhcmUgdmlydHVhbGl6YXRpb24gYmV0d2VlbiBrZXJuZWxfcmVzdGFydF9wcmVwYXJl
+KCkgYW5kDQo+ID4gPiBtYWNoaW5lX3Jlc3RhcnQoKS4NCj4gPiANCj4gPiBUaGUgaXNzdWUgaXMg
+dGhhdCwgQUZBSUNULCB0aGUgc3lzY29yZV9vcHMuc2h1dGRvd24gYXJlIG5vdCBjYWxsZWQgd2hl
+bg0KPiA+IGRvaW5nIGEga2V4ZWMuIFJlYm9vdCBub3RpZmllcnMgYXJlIGNhbGxlZCBhY3Jvc3Mg
+a2V4ZWMgdmlhOg0KPiA+IA0KPiA+IGtlcm5lbF9rZXhlYw0KPiA+IMKgwqAga2VybmVsX3Jlc3Rh
+cnRfcHJlcGFyZQ0KPiA+IMKgwqDCoMKgIGJsb2NraW5nX25vdGlmaWVyX2NhbGxfY2hhaW4NCj4g
+PiDCoMKgwqDCoMKgwqAga3ZtX3JlYm9vdA0KPiA+IA0KPiA+IFNvIGFmdGVyIHRoaXMgcGF0Y2gs
+IEtWTSBpcyBub3Qgc2h1dGRvd24gZHVyaW5nIGtleGVjOyBpZiBoYXJkd2FyZSB2aXJ0DQo+ID4g
+bW9kZSBpcyBlbmFibGVkIHRoZW4gdGhlIGtleGVjIGhhbmdzIGluIGV4YWN0bHkgdGhlIHNhbWUg
+bWFubmVyIGFzIHlvdQ0KPiA+IGRlc2NyaWJlIHdpdGggdGhlIHJlYm9vdC4NCj4gDQo+IGtlcm5l
+bF9yZXN0YXJ0X3ByZXBhcmUgY2FsbHMgZGV2aWNlX3NodXRkb3duLsKgIFdoaWNoIHNob3VsZCBj
+YWxsIGFsbA0KPiBvZiB0aGUgc2h1dGRvd24gb3BlcmF0aW9ucy7CoCBUaGlzIGhhcyBiZWVuIHRo
+ZSB3YXkgdGhlIGNvZGUgaGFzIGJlZW4NCj4gc3RydWN0dXJlZCBzaW5jZSBEZWNlbWJlciAyMDA1
+Lg0KDQpZZXMsIGtlcm5lbF9yZXNldF9wcmVwYXJlIGNhbGxzIGRldmljZV9zaHV0ZG93biB3aGlj
+aCBjYWxscw0KZGV2LT5kcml2ZXItPnNodXRkb3duIGZvciBlYWNoIGRldiB3aGljaCBoYXMgYSBk
+cml2ZXIuIEtWTSwgaG93ZXZlciwgaXMNCm5vdCBhIGRldiB3aXRoIGEgZHJpdmVyLCBoZW5jZSBk
+b2Vzbid0IGhhdmUgYSBkZXYtPmRyaXZlci0+c2h1dGRvd24NCmNhbGxiYWNrLiBTbyBLVk0gaXMg
+bm8tb3AnZWQgaW4gZGV2aWNlX3NodXRkb3duLg0KDQpLVk0gYWRkcyBpdHMgc2h1dGRvd24gY2Fs
+bGJhY2sgdG8gc3lzY29yZV9vcHMgYW5kIGV4cGVjdHMgdG8gYmUgc2h1dA0KZG93biB0aGF0IHdh
+eS4NCg0KPiANCj4gPiBTb21lIHNwZWNpZmljIHNodXRkb3duIGNhbGxiYWNrcywgZm9yIGV4YW1w
+bGUgSU9NTVUsIEhQRVQsIElSUSwgZXRjIGFyZQ0KPiA+IGNhbGxlZCBpbiBuYXRpdmVfbWFjaGlu
+ZV9zaHV0ZG93biwgYnV0IEtWTSBpcyBub3Qgb25lIG9mIHRoZXNlLg0KPiA+IA0KPiA+IFRob3Vn
+aHRzIG9uIHBvc3NpYmxlIHdheXMgdG8gZml4IHRoaXM6DQo+ID4gYSkgZ28gYmFjayB0byByZWJv
+b3Qgbm90aWZpZXJzDQo+ID4gYikgZ2V0IGtleGVjIHRvIGNhbGwgc3lzY29yZV9zaHV0ZG93bigp
+IHRvIGludm9rZSBhbGwgb2YgdGhlc2UgY2FsbGJhY2tzDQo+ID4gYykgQWRkIGEgS1ZNLXNwZWNp
+ZmljIGNhbGxiYWNrIHRvIG5hdGl2ZV9tYWNoaW5lX3NodXRkb3duKCk7IHdlIG9ubHkNCj4gPiBu
+ZWVkIHRoaXMgZm9yIEludGVsIHg4NiwgcmlnaHQ/DQo+ID4gDQo+ID4gTXkgc2xpZ2h0IHByZWZl
+cmVuY2UgaXMgdG93YXJkcyBhZGRpbmcgc3lzY29yZV9zaHV0ZG93bigpIHRvIGtleGVjLCBidXQN
+Cj4gPiBJJ20gbm90IHN1cmUgdGhhdCdzIGZlYXNpYmxlLiBBZGRpbmcga2V4ZWMgbWFpbnRhaW5l
+cnMgZm9yIGlucHV0Lg0KPiANCj4gV2h5IGlzbid0IGRldmljZV9zdXRoZG93biBjYWxsaW5nIHN5
+c2NvcmVfc2h1dGRvd24/DQoNCkknbSBub3Qgc3VyZSAtIHRoYXQgd291bGQgaW5kZWVkIGJlIG9u
+ZSB3YXkgdG8gZml4OyBhZGRpbmcgYSBjYWxsIHRvDQpzeXNjb3JlX3NodXRkb3duKCkgaW5zaWRl
+IGRldmljZV9zaHV0ZG93bi4gV2UgbWF5IG5lZWQgdG8gY2xlYW4gdXAgb3RoZXINCmNhbGxlcnMg
+dG8gbm90IGRvIHRoZWlyIG93biBzeXNjb3JlX3NodXRkb3duIGFuZCByYXRoZXIgZGVwZW5kIG9u
+DQpkZXZpY2Vfc2h1dGRvd24gdG8gZG8gaXQgYWxsLg0KDQpXb3VsZCB5b3Ugc3VwcG9ydCBhZGRp
+bmcgc3lzY29yZV9zaHV0ZG93bigpIHRvIGRldmljZV9zaHV0ZG93bigpPw0KDQo+IA0KPiBXaGF0
+IHByb2JsZW0gYXJlIHlvdSBydW5uaW5nIGludG8gd2l0aCB5b3VyIHJlYmFzZSB0aGF0IHdvcmtl
+ZCB3aXRoDQo+IHJlYm9vdCBub3RpZmllcnMgdGhhdCBpcyBub3Qgd29ya2luZyB3aXRoIHN5c2Nv
+cmVfc2h1dGRvd24/DQoNClByaW9yIHRvIHRoaXMgY29tbWl0IFsxXSB3aGljaCBjaGFuZ2VkIEtW
+TSBmcm9tIHJlYm9vdCBub3RpZmllcnMgdG8NCnN5c2NvcmVfb3BzLCBLVk0ncyByZWJvb3Qgbm90
+aWZpZXIgc2h1dGRvd24gY2FsbGJhY2sgd2FzIGludm9rZWQgb24NCmtleGVjIHZpYSBrZXJuZWxf
+cmVzdGFydF9wcmVwYXJlLg0KDQpBZnRlciB0aGlzIGNvbW1pdCwgS1ZNIGlzIG5vdCBiZWluZyBz
+aHV0IGRvd24gYmVjYXVzZSBjdXJyZW50bHkgdGhlDQprZXhlYyBmbG93IGRvZXMgbm90IGNhbGwg
+c3lzY29yZV9zaHV0ZG93bi4NCg0KSkcNCg0KDQpbMV0gaHR0cHM6Ly9naXRodWIuY29tL3RvcnZh
+bGRzL2xpbnV4L2NvbW1pdC82NzM1MTUwYjY5OTcNCg==
