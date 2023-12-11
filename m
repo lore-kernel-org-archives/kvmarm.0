@@ -1,14 +1,14 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA91B4C60B
-	for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 16:15:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23BD34C60B
+	for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 16:15:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C926D16F3;
-	Mon, 11 Dec 2023 08:15:53 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5844316F2;
+	Mon, 11 Dec 2023 08:16:06 -0800 (PST)
 Received: from e127643.broadband (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 526BF3F766;
-	Mon, 11 Dec 2023 08:15:03 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id D8BD53F738;
+	Mon, 11 Dec 2023 08:15:15 -0800 (PST)
 From: James Clark <james.clark@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	linux-perf-users@vger.kernel.org,
@@ -42,9 +42,9 @@ Cc: namhyung@gmail.com,
 	kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH v7 06/11] arm: pmu: Share user ABI format mechanism with SPE
-Date: Mon, 11 Dec 2023 16:13:18 +0000
-Message-Id: <20231211161331.1277825-7-james.clark@arm.com>
+Subject: [PATCH v7 07/11] perf/arm_dmc620: Remove duplicate format attribute #defines
+Date: Mon, 11 Dec 2023 16:13:19 +0000
+Message-Id: <20231211161331.1277825-8-james.clark@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231211161331.1277825-1-james.clark@arm.com>
 References: <20231211161331.1277825-1-james.clark@arm.com>
@@ -56,125 +56,54 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This mechanism makes it much easier to define and read new attributes
-so move it to the arm_pmu.h header so that it can be shared. At the same
-time update the existing format attributes to use it.
-
-GENMASK has to be changed to GENMASK_ULL because the config fields are
-64 bits even on arm32 where this will also be used now.
+These were copied from the SPE driver, but now they're in the arm_pmu.h
+header so delete them and use the header instead.
 
 Signed-off-by: James Clark <james.clark@arm.com>
 ---
- drivers/perf/arm_pmuv3.c     | 21 ++++++++++++++++-----
- drivers/perf/arm_spe_pmu.c   | 22 ----------------------
- include/linux/perf/arm_pmu.h | 22 ++++++++++++++++++++++
- 3 files changed, 38 insertions(+), 27 deletions(-)
+ drivers/perf/arm_dmc620_pmu.c | 22 +---------------------
+ 1 file changed, 1 insertion(+), 21 deletions(-)
 
-diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
-index 16ef8448afc0..84b15c0892d9 100644
---- a/drivers/perf/arm_pmuv3.c
-+++ b/drivers/perf/arm_pmuv3.c
-@@ -295,20 +295,31 @@ static const struct attribute_group armv8_pmuv3_events_attr_group = {
- 	.is_visible = armv8pmu_event_attr_is_visible,
- };
+diff --git a/drivers/perf/arm_dmc620_pmu.c b/drivers/perf/arm_dmc620_pmu.c
+index 30cea6859574..9de9dc8db8db 100644
+--- a/drivers/perf/arm_dmc620_pmu.c
++++ b/drivers/perf/arm_dmc620_pmu.c
+@@ -23,6 +23,7 @@
+ #include <linux/module.h>
+ #include <linux/mutex.h>
+ #include <linux/perf_event.h>
++#include <linux/perf/arm_pmu.h>
+ #include <linux/platform_device.h>
+ #include <linux/printk.h>
+ #include <linux/rculist.h>
+@@ -189,27 +190,6 @@ static const struct attribute_group dmc620_pmu_events_attr_group = {
+ #define ATTR_CFG_FLD_clkdiv2_LO		9
+ #define ATTR_CFG_FLD_clkdiv2_HI		9
  
--PMU_FORMAT_ATTR(event, "config:0-15");
--PMU_FORMAT_ATTR(long, "config1:0");
--PMU_FORMAT_ATTR(rdpmc, "config1:1");
-+/* User ABI */
-+#define ATTR_CFG_FLD_event_CFG		config
-+#define ATTR_CFG_FLD_event_LO		0
-+#define ATTR_CFG_FLD_event_HI		15
-+#define ATTR_CFG_FLD_long_CFG		config1
-+#define ATTR_CFG_FLD_long_LO		0
-+#define ATTR_CFG_FLD_long_HI		0
-+#define ATTR_CFG_FLD_rdpmc_CFG		config1
-+#define ATTR_CFG_FLD_rdpmc_LO		1
-+#define ATTR_CFG_FLD_rdpmc_HI		1
-+
-+GEN_PMU_FORMAT_ATTR(event);
-+GEN_PMU_FORMAT_ATTR(long);
-+GEN_PMU_FORMAT_ATTR(rdpmc);
- 
- static int sysctl_perf_user_access __read_mostly;
- 
- static bool armv8pmu_event_is_64bit(struct perf_event *event)
- {
--	return event->attr.config1 & 0x1;
-+	return ATTR_CFG_GET_FLD(&event->attr, long);
- }
- 
- static bool armv8pmu_event_want_user_access(struct perf_event *event)
- {
--	return event->attr.config1 & 0x2;
-+	return ATTR_CFG_GET_FLD(&event->attr, rdpmc);
- }
- 
- static struct attribute *armv8_pmuv3_format_attrs[] = {
-diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-index d2b0cbf0e0c4..b622d75d8c9e 100644
---- a/drivers/perf/arm_spe_pmu.c
-+++ b/drivers/perf/arm_spe_pmu.c
-@@ -206,28 +206,6 @@ static const struct attribute_group arm_spe_pmu_cap_group = {
- #define ATTR_CFG_FLD_inv_event_filter_LO	0
- #define ATTR_CFG_FLD_inv_event_filter_HI	63
- 
--/* Why does everything I do descend into this? */
--#define __GEN_PMU_FORMAT_ATTR(cfg, lo, hi)				\
+-#define __GEN_PMU_FORMAT_ATTR(cfg, lo, hi)			\
 -	(lo) == (hi) ? #cfg ":" #lo "\n" : #cfg ":" #lo "-" #hi
 -
--#define _GEN_PMU_FORMAT_ATTR(cfg, lo, hi)				\
+-#define _GEN_PMU_FORMAT_ATTR(cfg, lo, hi)			\
 -	__GEN_PMU_FORMAT_ATTR(cfg, lo, hi)
 -
--#define GEN_PMU_FORMAT_ATTR(name)					\
--	PMU_FORMAT_ATTR(name,						\
--	_GEN_PMU_FORMAT_ATTR(ATTR_CFG_FLD_##name##_CFG,			\
--			     ATTR_CFG_FLD_##name##_LO,			\
+-#define GEN_PMU_FORMAT_ATTR(name)				\
+-	PMU_FORMAT_ATTR(name,					\
+-	_GEN_PMU_FORMAT_ATTR(ATTR_CFG_FLD_##name##_CFG,		\
+-			     ATTR_CFG_FLD_##name##_LO,		\
 -			     ATTR_CFG_FLD_##name##_HI))
 -
--#define _ATTR_CFG_GET_FLD(attr, cfg, lo, hi)				\
--	((((attr)->cfg) >> lo) & GENMASK(hi - lo, 0))
+-#define _ATTR_CFG_GET_FLD(attr, cfg, lo, hi)			\
+-	((((attr)->cfg) >> lo) & GENMASK_ULL(hi - lo, 0))
 -
--#define ATTR_CFG_GET_FLD(attr, name)					\
--	_ATTR_CFG_GET_FLD(attr,						\
--			  ATTR_CFG_FLD_##name##_CFG,			\
--			  ATTR_CFG_FLD_##name##_LO,			\
+-#define ATTR_CFG_GET_FLD(attr, name)				\
+-	_ATTR_CFG_GET_FLD(attr,					\
+-			  ATTR_CFG_FLD_##name##_CFG,		\
+-			  ATTR_CFG_FLD_##name##_LO,		\
 -			  ATTR_CFG_FLD_##name##_HI)
 -
- GEN_PMU_FORMAT_ATTR(ts_enable);
- GEN_PMU_FORMAT_ATTR(pa_enable);
- GEN_PMU_FORMAT_ATTR(pct_enable);
-diff --git a/include/linux/perf/arm_pmu.h b/include/linux/perf/arm_pmu.h
-index 143fbc10ecfe..337f01674b38 100644
---- a/include/linux/perf/arm_pmu.h
-+++ b/include/linux/perf/arm_pmu.h
-@@ -189,4 +189,26 @@ void armpmu_free_irq(int irq, int cpu);
- #define ARMV8_SPE_PDEV_NAME "arm,spe-v1"
- #define ARMV8_TRBE_PDEV_NAME "arm,trbe"
- 
-+/* Why does everything I do descend into this? */
-+#define __GEN_PMU_FORMAT_ATTR(cfg, lo, hi)				\
-+	(lo) == (hi) ? #cfg ":" #lo "\n" : #cfg ":" #lo "-" #hi
-+
-+#define _GEN_PMU_FORMAT_ATTR(cfg, lo, hi)				\
-+	__GEN_PMU_FORMAT_ATTR(cfg, lo, hi)
-+
-+#define GEN_PMU_FORMAT_ATTR(name)					\
-+	PMU_FORMAT_ATTR(name,						\
-+	_GEN_PMU_FORMAT_ATTR(ATTR_CFG_FLD_##name##_CFG,			\
-+			     ATTR_CFG_FLD_##name##_LO,			\
-+			     ATTR_CFG_FLD_##name##_HI))
-+
-+#define _ATTR_CFG_GET_FLD(attr, cfg, lo, hi)				\
-+	((((attr)->cfg) >> lo) & GENMASK_ULL(hi - lo, 0))
-+
-+#define ATTR_CFG_GET_FLD(attr, name)					\
-+	_ATTR_CFG_GET_FLD(attr,						\
-+			  ATTR_CFG_FLD_##name##_CFG,			\
-+			  ATTR_CFG_FLD_##name##_LO,			\
-+			  ATTR_CFG_FLD_##name##_HI)
-+
- #endif /* __ARM_PMU_H__ */
+ GEN_PMU_FORMAT_ATTR(mask);
+ GEN_PMU_FORMAT_ATTR(match);
+ GEN_PMU_FORMAT_ATTR(invert);
 -- 
 2.34.1
 
