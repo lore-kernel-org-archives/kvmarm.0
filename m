@@ -1,152 +1,452 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C69B4C61D
-	for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 16:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 877CE16F2;
-	Mon, 11 Dec 2023 08:16:55 -0800 (PST)
-Received: from e127643.broadband (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1313D3F738;
-	Mon, 11 Dec 2023 08:16:04 -0800 (PST)
-From: James Clark <james.clark@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	linux-perf-users@vger.kernel.org,
-	suzuki.poulose@arm.com,
-	will@kernel.org,
-	mark.rutland@arm.com,
-	anshuman.khandual@arm.com
-Cc: namhyung@gmail.com,
-	James Clark <james.clark@arm.com>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Zaid Al-Bassam <zalbassam@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH v7 11/11] Documentation: arm64: Document the PMU event counting threshold feature
-Date: Mon, 11 Dec 2023 16:13:23 +0000
-Message-Id: <20231211161331.1277825-12-james.clark@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231211161331.1277825-1-james.clark@arm.com>
-References: <20231211161331.1277825-1-james.clark@arm.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E91284C3DD
+	for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 17:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LIhraVqy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDFB3C4339A
+	for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 17:29:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702315795;
+	bh=VP6rxIE0YrbcOG/9wnq9cB6kaypzUe7LOgu57Kw03yM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=LIhraVqyQdSfQe228mHwkdXxGCCkLJRry0OfP50RDcmYcgm8HYl+sN3lFgIsGHDkK
+	 qFO1jpKRk+4TV2pPCWzuXXcpy1Dk746QciwjtOX8bcBqP8nO8fuWCbncIY5C/+NF+v
+	 cPzN+QScdCx4rbHwHJM108XK0PEj0HkcGBUCffokZCX7WvCk8kP7BT59+On5Hj1Cs0
+	 Cc9NwAaOcBbcPNEJjn1lNYgvYedpyeWHkuK3FGA02cVw5xOGAItnRvZJVw9oT4a2pL
+	 GnRi3dIGBh7BQ9YkMKVpbbCkn0ysVsBEklPtgsOXrkpxfjYzztn9cXcSNZ7aGNhQge
+	 25LiqNlUEnFvA==
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-50c0f6b1015so5547921e87.3
+        for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 09:29:55 -0800 (PST)
+X-Gm-Message-State: AOJu0YyyO10WORuHzpjqcTziNYHRi32CogGzQLCVt85iHfpXQ4DDkNOU
+	+9S1MevahdDn+8zjpq1Pym2vpQ50V3OhfHPMKw==
+X-Google-Smtp-Source: AGHT+IGf9GxCgHbSaCR9ChlHwIzcYeJN/o9beG+fFS/Wj2+MXjJAqODSxU5em7xHCQ26rKUjit1wlHMa263dNGOiUjs=
+X-Received: by 2002:ac2:42c3:0:b0:50b:efd4:1475 with SMTP id
+ n3-20020ac242c3000000b0050befd41475mr1861829lfl.9.1702315793752; Mon, 11 Dec
+ 2023 09:29:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231119165721.9849-1-alexandru.elisei@arm.com> <20231119165721.9849-12-alexandru.elisei@arm.com>
+In-Reply-To: <20231119165721.9849-12-alexandru.elisei@arm.com>
+From: Rob Herring <robh@kernel.org>
+Date: Mon, 11 Dec 2023 11:29:40 -0600
+X-Gmail-Original-Message-ID: <CAL_Jsq+k5BeM9+u12AQvWQ0b4Uv5Cy0vPOpK_uLcYtRnunq4iQ@mail.gmail.com>
+Message-ID: <CAL_Jsq+k5BeM9+u12AQvWQ0b4Uv5Cy0vPOpK_uLcYtRnunq4iQ@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 11/27] arm64: mte: Reserve tag storage memory
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, 
+	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org, 
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, 
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org, 
+	bsegall@google.com, mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com, 
+	mhiramat@kernel.org, rppt@kernel.org, hughd@google.com, pcc@google.com, 
+	steven.price@arm.com, anshuman.khandual@arm.com, vincenzo.frascino@arm.com, 
+	david@redhat.com, eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-mm@kvack.org, 
+	linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add documentation for the new Perf event open parameters and
-the threshold_max capability file.
+On Sun, Nov 19, 2023 at 10:59=E2=80=AFAM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> Allow the kernel to get the size and location of the MTE tag storage
+> regions from the DTB. This memory is marked as reserved for now.
+>
+> The DTB node for the tag storage region is defined as:
+>
+>         tags0: tag-storage@8f8000000 {
+>                 compatible =3D "arm,mte-tag-storage";
+>                 reg =3D <0x08 0xf8000000 0x00 0x4000000>;
+>                 block-size =3D <0x1000>;
+>                 memory =3D <&memory0>;    // Associated tagged memory nod=
+e
+>         };
 
-Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Acked-by: Namhyung Kim <namhyung@kernel.org>
-Signed-off-by: James Clark <james.clark@arm.com>
----
- Documentation/arch/arm64/perf.rst | 72 +++++++++++++++++++++++++++++++
- 1 file changed, 72 insertions(+)
+I skimmed thru the discussion some. If this memory range is within
+main RAM, then it definitely belongs in /reserved-memory.
 
-diff --git a/Documentation/arch/arm64/perf.rst b/Documentation/arch/arm64/perf.rst
-index 1f87b57c2332..997fd716b82f 100644
---- a/Documentation/arch/arm64/perf.rst
-+++ b/Documentation/arch/arm64/perf.rst
-@@ -164,3 +164,75 @@ and should be used to mask the upper bits as needed.
-    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/perf/arch/arm64/tests/user-events.c
- .. _tools/lib/perf/tests/test-evsel.c:
-    https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/lib/perf/tests/test-evsel.c
-+
-+Event Counting Threshold
-+==========================================
-+
-+Overview
-+--------
-+
-+FEAT_PMUv3_TH (Armv8.8) permits a PMU counter to increment only on
-+events whose count meets a specified threshold condition. For example if
-+threshold_compare is set to 2 ('Greater than or equal'), and the
-+threshold is set to 2, then the PMU counter will now only increment by
-+when an event would have previously incremented the PMU counter by 2 or
-+more on a single processor cycle.
-+
-+To increment by 1 after passing the threshold condition instead of the
-+number of events on that cycle, add the 'threshold_count' option to the
-+commandline.
-+
-+How-to
-+------
-+
-+These are the parameters for controlling the feature:
-+
-+.. list-table::
-+   :header-rows: 1
-+
-+   * - Parameter
-+     - Description
-+   * - threshold
-+     - Value to threshold the event by. A value of 0 means that
-+       thresholding is disabled and the other parameters have no effect.
-+   * - threshold_compare
-+     - | Comparison function to use, with the following values supported:
-+       |
-+       | 0: Not-equal
-+       | 1: Equals
-+       | 2: Greater-than-or-equal
-+       | 3: Less-than
-+   * - threshold_count
-+     - If this is set, count by 1 after passing the threshold condition
-+       instead of the value of the event on this cycle.
-+
-+The threshold, threshold_compare and threshold_count values can be
-+provided per event, for example:
-+
-+.. code-block:: sh
-+
-+  perf stat -e stall_slot/threshold=2,threshold_compare=2/ \
-+            -e dtlb_walk/threshold=10,threshold_compare=3,threshold_count/
-+
-+In this example the stall_slot event will count by 2 or more on every
-+cycle where 2 or more stalls happen. And dtlb_walk will count by 1 on
-+every cycle where the number of dtlb walks were less than 10.
-+
-+The maximum supported threshold value can be read from the caps of each
-+PMU, for example:
-+
-+.. code-block:: sh
-+
-+  cat /sys/bus/event_source/devices/armv8_pmuv3/caps/threshold_max
-+
-+  0x000000ff
-+
-+If a value higher than this is given, then opening the event will result
-+in an error. The highest possible maximum is 4095, as the config field
-+for threshold is limited to 12 bits, and the Perf tool will refuse to
-+parse higher values.
-+
-+If the PMU doesn't support FEAT_PMUv3_TH, then threshold_max will read
-+0, and attempting to set a threshold value will also result in an error.
-+threshold_max will also read as 0 on aarch32 guests, even if the host
-+is running on hardware with the feature.
--- 
-2.34.1
+You need a binding for this too.
 
+> The tag storage region represents the largest contiguous memory region th=
+at
+> holds all the tags for the associated contiguous memory region which can =
+be
+> tagged. For example, for a 32GB contiguous tagged memory the correspondin=
+g
+> tag storage region is 1GB of contiguous memory, not two adjacent 512M of
+> tag storage memory.
+>
+> "block-size" represents the minimum multiple of 4K of tag storage where a=
+ll
+> the tags stored in the block correspond to a contiguous memory region. Th=
+is
+> is needed for platforms where the memory controller interleaves tag write=
+s
+> to memory. For example, if the memory controller interleaves tag writes f=
+or
+> 256KB of contiguous memory across 8K of tag storage (2-way interleave),
+> then the correct value for "block-size" is 0x2000. This value is a hardwa=
+re
+> property, independent of the selected kernel page size.
+>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  arch/arm64/Kconfig                       |  12 ++
+>  arch/arm64/include/asm/mte_tag_storage.h |  15 ++
+>  arch/arm64/kernel/Makefile               |   1 +
+>  arch/arm64/kernel/mte_tag_storage.c      | 256 +++++++++++++++++++++++
+>  arch/arm64/kernel/setup.c                |   7 +
+>  5 files changed, 291 insertions(+)
+>  create mode 100644 arch/arm64/include/asm/mte_tag_storage.h
+>  create mode 100644 arch/arm64/kernel/mte_tag_storage.c
+>
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index 7b071a00425d..fe8276fdc7a8 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -2062,6 +2062,18 @@ config ARM64_MTE
+>
+>           Documentation/arch/arm64/memory-tagging-extension.rst.
+>
+> +if ARM64_MTE
+> +config ARM64_MTE_TAG_STORAGE
+> +       bool "Dynamic MTE tag storage management"
+> +       help
+> +         Adds support for dynamic management of the memory used by the h=
+ardware
+> +         for storing MTE tags. This memory, unlike normal memory, cannot=
+ be
+> +         tagged. When it is used to store tags for another memory locati=
+on it
+> +         cannot be used for any type of allocation.
+> +
+> +         If unsure, say N
+> +endif # ARM64_MTE
+> +
+>  endmenu # "ARMv8.5 architectural features"
+>
+>  menu "ARMv8.7 architectural features"
+> diff --git a/arch/arm64/include/asm/mte_tag_storage.h b/arch/arm64/includ=
+e/asm/mte_tag_storage.h
+> new file mode 100644
+> index 000000000000..8f86c4f9a7c3
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/mte_tag_storage.h
+> @@ -0,0 +1,15 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2023 ARM Ltd.
+> + */
+> +#ifndef __ASM_MTE_TAG_STORAGE_H
+> +#define __ASM_MTE_TAG_STORAGE_H
+> +
+> +#ifdef CONFIG_ARM64_MTE_TAG_STORAGE
+> +void mte_tag_storage_init(void);
+> +#else
+> +static inline void mte_tag_storage_init(void)
+> +{
+> +}
+> +#endif /* CONFIG_ARM64_MTE_TAG_STORAGE */
+> +#endif /* __ASM_MTE_TAG_STORAGE_H  */
+> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
+> index d95b3d6b471a..5f031bf9f8f1 100644
+> --- a/arch/arm64/kernel/Makefile
+> +++ b/arch/arm64/kernel/Makefile
+> @@ -70,6 +70,7 @@ obj-$(CONFIG_CRASH_CORE)              +=3D crash_core.o
+>  obj-$(CONFIG_ARM_SDE_INTERFACE)                +=3D sdei.o
+>  obj-$(CONFIG_ARM64_PTR_AUTH)           +=3D pointer_auth.o
+>  obj-$(CONFIG_ARM64_MTE)                        +=3D mte.o
+> +obj-$(CONFIG_ARM64_MTE_TAG_STORAGE)    +=3D mte_tag_storage.o
+>  obj-y                                  +=3D vdso-wrap.o
+>  obj-$(CONFIG_COMPAT_VDSO)              +=3D vdso32-wrap.o
+>  obj-$(CONFIG_UNWIND_PATCH_PAC_INTO_SCS)        +=3D patch-scs.o
+> diff --git a/arch/arm64/kernel/mte_tag_storage.c b/arch/arm64/kernel/mte_=
+tag_storage.c
+> new file mode 100644
+> index 000000000000..fa6267ef8392
+> --- /dev/null
+> +++ b/arch/arm64/kernel/mte_tag_storage.c
+> @@ -0,0 +1,256 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Support for dynamic tag storage.
+> + *
+> + * Copyright (C) 2023 ARM Ltd.
+> + */
+> +
+> +#include <linux/memblock.h>
+> +#include <linux/mm.h>
+> +#include <linux/of_device.h>
+
+You probably don't need this header. If you depend on what it
+implicitly includes, then that will now break in linux-next.
+
+> +#include <linux/of_fdt.h>
+> +#include <linux/range.h>
+> +#include <linux/string.h>
+> +#include <linux/xarray.h>
+> +
+> +#include <asm/mte_tag_storage.h>
+> +
+> +struct tag_region {
+> +       struct range mem_range; /* Memory associated with the tag storage=
+, in PFNs. */
+> +       struct range tag_range; /* Tag storage memory, in PFNs. */
+> +       u32 block_size;         /* Tag block size, in pages. */
+> +};
+> +
+> +#define MAX_TAG_REGIONS        32
+> +
+> +static struct tag_region tag_regions[MAX_TAG_REGIONS];
+> +static int num_tag_regions;
+> +
+> +static int __init tag_storage_of_flat_get_range(unsigned long node, cons=
+t __be32 *reg,
+> +                                               int reg_len, struct range=
+ *range)
+> +{
+> +       int addr_cells =3D dt_root_addr_cells;
+> +       int size_cells =3D dt_root_size_cells;
+> +       u64 size;
+> +
+> +       if (reg_len / 4 > addr_cells + size_cells)
+> +               return -EINVAL;
+> +
+> +       range->start =3D PHYS_PFN(of_read_number(reg, addr_cells));
+> +       size =3D PHYS_PFN(of_read_number(reg + addr_cells, size_cells));
+> +       if (size =3D=3D 0) {
+> +               pr_err("Invalid node");
+> +               return -EINVAL;
+> +       }
+> +       range->end =3D range->start + size - 1;
+
+We have a function to read (and translate which you forgot) addresses.
+Add what's missing rather than open code your own.
+
+> +
+> +       return 0;
+> +}
+> +
+> +static int __init tag_storage_of_flat_get_tag_range(unsigned long node,
+> +                                                   struct range *tag_ran=
+ge)
+> +{
+> +       const __be32 *reg;
+> +       int reg_len;
+> +
+> +       reg =3D of_get_flat_dt_prop(node, "reg", &reg_len);
+> +       if (reg =3D=3D NULL) {
+> +               pr_err("Invalid metadata node");
+> +               return -EINVAL;
+> +       }
+> +
+> +       return tag_storage_of_flat_get_range(node, reg, reg_len, tag_rang=
+e);
+> +}
+> +
+> +static int __init tag_storage_of_flat_get_memory_range(unsigned long nod=
+e, struct range *mem)
+> +{
+> +       const __be32 *reg;
+> +       int reg_len;
+> +
+> +       reg =3D of_get_flat_dt_prop(node, "linux,usable-memory", &reg_len=
+);
+> +       if (reg =3D=3D NULL)
+> +               reg =3D of_get_flat_dt_prop(node, "reg", &reg_len);
+> +
+> +       if (reg =3D=3D NULL) {
+> +               pr_err("Invalid memory node");
+> +               return -EINVAL;
+> +       }
+> +
+> +       return tag_storage_of_flat_get_range(node, reg, reg_len, mem);
+> +}
+> +
+> +struct find_memory_node_arg {
+> +       unsigned long node;
+> +       u32 phandle;
+> +};
+> +
+> +static int __init fdt_find_memory_node(unsigned long node, const char *u=
+name,
+> +                                      int depth, void *data)
+> +{
+> +       const char *type =3D of_get_flat_dt_prop(node, "device_type", NUL=
+L);
+> +       struct find_memory_node_arg *arg =3D data;
+> +
+> +       if (depth !=3D 1 || !type || strcmp(type, "memory") !=3D 0)
+> +               return 0;
+> +
+> +       if (of_get_flat_dt_phandle(node) =3D=3D arg->phandle) {
+> +               arg->node =3D node;
+> +               return 1;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static int __init tag_storage_get_memory_node(unsigned long tag_node, un=
+signed long *mem_node)
+> +{
+> +       struct find_memory_node_arg arg =3D { 0 };
+> +       const __be32 *memory_prop;
+> +       u32 mem_phandle;
+> +       int ret, reg_len;
+> +
+> +       memory_prop =3D of_get_flat_dt_prop(tag_node, "memory", &reg_len)=
+;
+> +       if (!memory_prop) {
+> +               pr_err("Missing 'memory' property in the tag storage node=
+");
+> +               return -EINVAL;
+> +       }
+> +
+> +       mem_phandle =3D be32_to_cpup(memory_prop);
+> +       arg.phandle =3D mem_phandle;
+> +
+> +       ret =3D of_scan_flat_dt(fdt_find_memory_node, &arg);
+
+Do not use of_scan_flat_dt. It is a relic predating libfdt which can
+get a node by phandle directly.
+
+> +       if (ret !=3D 1) {
+> +               pr_err("Associated memory node not found");
+> +               return -EINVAL;
+> +       }
+> +
+> +       *mem_node =3D arg.node;
+> +
+> +       return 0;
+> +}
+> +
+> +static int __init tag_storage_of_flat_read_u32(unsigned long node, const=
+ char *propname,
+> +                                              u32 *retval)
+
+If you are going to make a generic function, make it for everyone.
+
+> +{
+> +       const __be32 *reg;
+> +
+> +       reg =3D of_get_flat_dt_prop(node, propname, NULL);
+> +       if (!reg)
+> +               return -EINVAL;
+> +
+> +       *retval =3D be32_to_cpup(reg);
+> +       return 0;
+> +}
+> +
+> +static u32 __init get_block_size_pages(u32 block_size_bytes)
+> +{
+> +       u32 a =3D PAGE_SIZE;
+> +       u32 b =3D block_size_bytes;
+> +       u32 r;
+> +
+> +       /* Find greatest common divisor using the Euclidian algorithm. */
+> +       do {
+> +               r =3D a % b;
+> +               a =3D b;
+> +               b =3D r;
+> +       } while (b !=3D 0);
+> +
+> +       return PHYS_PFN(PAGE_SIZE * block_size_bytes / a);
+> +}
+> +
+> +static int __init fdt_init_tag_storage(unsigned long node, const char *u=
+name,
+> +                                      int depth, void *data)
+> +{
+> +       struct tag_region *region;
+> +       unsigned long mem_node;
+> +       struct range *mem_range;
+> +       struct range *tag_range;
+> +       u32 block_size_bytes;
+> +       u32 nid =3D 0;
+> +       int ret;
+> +
+> +       if (depth !=3D 1 || !strstr(uname, "tag-storage"))
+> +               return 0;
+> +
+> +       if (!of_flat_dt_is_compatible(node, "arm,mte-tag-storage"))
+> +               return 0;
+> +
+> +       if (num_tag_regions =3D=3D MAX_TAG_REGIONS) {
+> +               pr_err("Maximum number of tag storage regions exceeded");
+> +               return -EINVAL;
+> +       }
+> +
+> +       region =3D &tag_regions[num_tag_regions];
+> +       mem_range =3D &region->mem_range;
+> +       tag_range =3D &region->tag_range;
+> +
+> +       ret =3D tag_storage_of_flat_get_tag_range(node, tag_range);
+> +       if (ret) {
+> +               pr_err("Invalid tag storage node");
+> +               return ret;
+> +       }
+> +
+> +       ret =3D tag_storage_get_memory_node(node, &mem_node);
+> +       if (ret)
+> +               return ret;
+> +
+> +       ret =3D tag_storage_of_flat_get_memory_range(mem_node, mem_range)=
+;
+> +       if (ret) {
+> +               pr_err("Invalid address for associated data memory node")=
+;
+> +               return ret;
+> +       }
+> +
+> +       /* The tag region must exactly match the corresponding memory. */
+> +       if (range_len(tag_range) * 32 !=3D range_len(mem_range)) {
+> +               pr_err("Tag storage region 0x%llx-0x%llx does not cover t=
+he memory region 0x%llx-0x%llx",
+> +                      PFN_PHYS(tag_range->start), PFN_PHYS(tag_range->en=
+d),
+> +                      PFN_PHYS(mem_range->start), PFN_PHYS(mem_range->en=
+d));
+> +               return -EINVAL;
+> +       }
+> +
+> +       ret =3D tag_storage_of_flat_read_u32(node, "block-size", &block_s=
+ize_bytes);
+> +       if (ret || block_size_bytes =3D=3D 0) {
+> +               pr_err("Invalid or missing 'block-size' property");
+> +               return -EINVAL;
+> +       }
+> +       region->block_size =3D get_block_size_pages(block_size_bytes);
+> +       if (range_len(tag_range) % region->block_size !=3D 0) {
+> +               pr_err("Tag storage region size 0x%llx is not a multiple =
+of block size %u",
+> +                      PFN_PHYS(range_len(tag_range)), region->block_size=
+);
+> +               return -EINVAL;
+> +       }
+> +
+> +       ret =3D tag_storage_of_flat_read_u32(mem_node, "numa-node-id", &n=
+id);
+
+I was going to say we already have a way to associate memory nodes
+other nodes using "numa-node-id", so the "memory" phandle property is
+somewhat redundant. Maybe the tag node should have a numa-node-id.
+With that, it looks like you don't even need to access the /memory
+node. Avoiding that would be good for 2 reasons. It avoids parsing
+memory nodes twice and it's not the kernel's job to validate the DT.
+Really, if you want memory info, you should use memblock to get it
+because all the special cases of memory layout are handled. For
+example you can have memory nodes with multiple 'reg' entries or
+multiple memory nodes or both, and then some of those could be
+contiguous.
+
+Rob
