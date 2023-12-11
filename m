@@ -1,102 +1,248 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99267125DE;
-	Sun, 10 Dec 2023 14:22:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z46OPbu3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9FFDC433C7;
-	Sun, 10 Dec 2023 14:22:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702218179;
-	bh=8tne0aaAREf7h+qiY6KAldko6jyI6LRXnoNCM9fma6Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z46OPbu3lxs+nSXwJj7g5+uM236T8qcWVMENzV16W8PRn+wPA90J2c/MU1TR09r9G
-	 V7uktPMYA+kX07nhFqGBeWzVnfPGq1sWi8TmA2O/Ypbc+HHzOKCOCc6aUZpI1E2ux5
-	 i7a4xJ46nLuCB9P/YSDucazqkfc40Pwk2ruWwXth0yedV7jS/lBPvlu9h8D8FqQQ5E
-	 7NrgTVM832Ck4BiiNruf7natGB4ETT1vuYgIR5796kVSPSFEDz9SqMvV2j2pOXJx2O
-	 kYv2KFYNFZhj2cny4Ad3h63HQeFh23ezu4307DrPbna88E2yARpEbrhoRhlGsNFA2m
-	 xH4AUl7qyB+aQ==
-Date: Sun, 10 Dec 2023 14:22:56 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v7 26/39] arm64/ptrace: Expose GCS via ptrace and core
- files
-Message-ID: <ZXXJwNdKC/y6bRYn@finisterre.sirena.org.uk>
-References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
- <20231122-arm64-gcs-v7-26-201c483bd775@kernel.org>
- <877clney35.fsf@linaro.org>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9A11EB46
+	for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 06:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4C4131007;
+	Sun, 10 Dec 2023 22:01:02 -0800 (PST)
+Received: from [10.162.41.8] (a077893.blr.arm.com [10.162.41.8])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3799C3F762;
+	Sun, 10 Dec 2023 22:00:10 -0800 (PST)
+Message-ID: <e48f5cdc-2711-4a03-a074-da87d84b3caf@arm.com>
+Date: Mon, 11 Dec 2023 11:30:08 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="+xOPyWhFp+ttqF+R"
-Content-Disposition: inline
-In-Reply-To: <877clney35.fsf@linaro.org>
-X-Cookie: You might have mail.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V15 5/8] KVM: arm64: nvhe: Disable branch generation in
+ nVHE guests
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com,
+ Mark Brown <broonie@kernel.org>, James Clark <james.clark@arm.com>,
+ Rob Herring <robh@kernel.org>, Suzuki Poulose <suzuki.poulose@arm.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ linux-perf-users@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev
+References: <20231201053906.1261704-1-anshuman.khandual@arm.com>
+ <20231201053906.1261704-6-anshuman.khandual@arm.com>
+ <86ttoybbp4.wl-maz@kernel.org>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <86ttoybbp4.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 12/4/23 14:12, Marc Zyngier wrote:
+> On Fri, 01 Dec 2023 05:39:03 +0000,
+> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+>>
+>> Disable the BRBE before we enter the guest, saving the status and enable it
+>> back once we get out of the guest. This is just to avoid capturing records
+>> in the guest kernel/userspace, which would be confusing the samples.
+> 
+> Why does it have to be limited to non-VHE? What protects host EL0
+> records from guest's EL0 execution when the host is VHE?
 
---+xOPyWhFp+ttqF+R
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In a scenario when running the host in VHE mode
+ 
+- The host might have enabled branch records for host EL0 through BRBCR_EL2.E0HBRE
+  indirectly via accessing BRBCR_EL1.E0BRE
 
-On Sat, Dec 09, 2023 at 08:49:02PM -0300, Thiago Jung Bauermann wrote:
-> Mark Brown <broonie@kernel.org> writes:
+- But after the guest switches in on the cpu - BRBCR_EL2.E0HBRE will still remain
+  set and enable branch records in guest EL0 as well because BRBCR_EL1.E0BRE will
+  not have any effect when EL2 is implemented and HCR_EL2.TGE == 1. The guest EL0
+  execution branch records will find their way into branch records being captured
+  for host EL0
 
-> > Provide a new register type NT_ARM_GCS reporting the current GCS mode
-> > and pointer for EL0.  Due to the interactions with allocation and
-> > deallocation of Guarded Control Stacks we do not permit any changes to
-> > the GCS mode via ptrace, only GCSPR_EL0 may be changed.
+You are right. The host EL0 branch records too need to be protected from guest EL0
+execution. A similar BRBCR_EL1 save/restore mechanism is needed for VHE as well ?
 
-> The code allows disabling GCS. Is that unintended?
+> 
+>>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: Oliver Upton <oliver.upton@linux.dev>
+>> Cc: James Morse <james.morse@arm.com>
+>> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: kvmarm@lists.linux.dev
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> CC: linux-kernel@vger.kernel.org
+>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>> ---
+>> Changes in V15:
+>>
+>> - Dropped runtime BRBE enable for setting DEBUG_STATE_SAVE_BRBE
+>> - Dropped BRBFCR_EL1 from __debug_save_brbe()/__debug_restore_brbe()
+>> - Always save the live SYS_BRBCR_EL1 in host context and then check if
+>>   BRBE was enabled before resetting SYS_BRBCR_EL1 for the host
+>>
+>>  arch/arm64/include/asm/kvm_host.h  |  4 ++++
+>>  arch/arm64/kvm/debug.c             |  5 +++++
+>>  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 33 ++++++++++++++++++++++++++++++
+>>  3 files changed, 42 insertions(+)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 68421c74283a..1faa0430d8dd 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -449,6 +449,8 @@ enum vcpu_sysreg {
+>>  	CNTHV_CVAL_EL2,
+>>  	PMSCR_EL1,	/* Statistical profiling extension */
+>>  	TRFCR_EL1,	/* Self-hosted trace filters */
+>> +	BRBCR_EL1,	/* Branch Record Buffer Control Register */
+>> +	BRBFCR_EL1,	/* Branch Record Buffer Function Control Register */
+> 
+> Whose state is this? If this is limited to the host, it has no purpose
+> in this enum. Once you add guest support, then it will make sense.
 
-No, it's intentional - ptrace has a lot of control over the process,
-there's not a huge point trying to protect against it doing a disable.
-The reason we prevent enabling is the allocation of a GCS along with
-enable, the complexity of doing that on a remote process seemed
-unjustified.  If clone3() ends up allowing manual allocation and
-placement that'll likely be revised.
+yes, this is limited to host but if not here, where this register (BRBCR_EL1)
+should be stored during guest context switch ? This place holder is used for
+that purpose via ctxt_sys_reg(host_ctxt, BRBCR_EL1).
 
---+xOPyWhFp+ttqF+R
-Content-Type: application/pgp-signature; name="signature.asc"
+> 
+>>
+>>  	NR_SYS_REGS	/* Nothing after this line! */
+>>  };
+>> @@ -753,6 +755,8 @@ struct kvm_vcpu_arch {
+>>  #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
+>>  /* Save trace filter controls */
+>>  #define DEBUG_STATE_SAVE_TRFCR	__vcpu_single_flag(iflags, BIT(8))
+>> +/* Save BRBE context if active  */
+>> +#define DEBUG_STATE_SAVE_BRBE	__vcpu_single_flag(iflags, BIT(9))
+>>  
+>>  /* SVE enabled for host EL0 */
+>>  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+>> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+>> index 2ab41b954512..fa46a70a9503 100644
+>> --- a/arch/arm64/kvm/debug.c
+>> +++ b/arch/arm64/kvm/debug.c
+>> @@ -354,6 +354,10 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
+>>  		    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
+>>  			vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+>>  	}
+>> +
+>> +	/* Check if we have BRBE implemented and available at the host */
+>> +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRBE_SHIFT))
+>> +		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
+>>  }
+>>  
+>>  void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+>> @@ -361,6 +365,7 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+>>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+>>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+>>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
+>> +	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
+>>  }
+>>  
+>>  void kvm_etm_set_guest_trfcr(u64 trfcr_guest)
+>> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+>> index 6174f710948e..1994fc48b57c 100644
+>> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+>> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+>> @@ -93,6 +93,33 @@ static void __debug_restore_trace(struct kvm_cpu_context *host_ctxt,
+>>  		write_sysreg_s(ctxt_sys_reg(host_ctxt, TRFCR_EL1), SYS_TRFCR_EL1);
+>>  }
+>>  
+>> +static void __debug_save_brbe(struct kvm_cpu_context *host_ctxt)
+>> +{
+>> +	ctxt_sys_reg(host_ctxt, BRBCR_EL1) = read_sysreg_s(SYS_BRBCR_EL1);
+>> +
+>> +	/* Check if the BRBE is enabled */
+>> +	if (!(ctxt_sys_reg(host_ctxt, BRBCR_EL1) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
+>> +		return;
+> 
+> Why save BRBCR_EL1 if there is nothing enabled? It isn't like it can
+> change behind your back, can it?
 
------BEGIN PGP SIGNATURE-----
+James mentioned that always setting the host value with real BRBCR_EL1 is preferred.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmV1yb8ACgkQJNaLcl1U
-h9BWYwf/Tu6vlQCwGJ174Zum1yyKhNrP0gXrNj0hXhil/y9CwTApo4pvBUMmBwQz
-JO0qoPePZDOSlxns1bELpj5O5sFq0c8qB1e29Y1nFzNClHf+uyVDswS2nZDBU6Rk
-QyW/T7yJerJVj/Lw5Mh1iJMbf8+iOPyRCJ8iMOnYiCbPpOmz7FuarOxPowUXUTqe
-e/bnana1ic+ctkWCw67wxEB6SJsOSaN2uW7mCj2ftjf9Cq9GmxzYnn8WuOvPHLxQ
-1id5Q0hqIWUqpgKGWDeIng5VHThiIuZDUa4EWQga6fnVZnApv4pRNJY7ttyNS6SS
-VfquKJpzBaa9lItRtIz5Dxs2gX1jyg==
-=9ttk
------END PGP SIGNATURE-----
+https://lore.kernel.org/linux-arm-kernel/1a94cccd-d871-1824-9fad-a8f7b99bb02a@arm.com/
+ 
+> 
+>> +
+>> +	/*
+>> +	 * Prohibit branch record generation while we are in guest.
+>> +	 * Since access to BRBCR_EL1 is trapped, the guest can't
+>> +	 * modify the filtering set by the host.
+>> +	 */
+>> +	write_sysreg_s(0, SYS_BRBCR_EL1);
+>> +	isb();
+> 
+> What is the point of this ISB? We're at EL2, and this only affects
+> EL1.
 
---+xOPyWhFp+ttqF+R--
+Makes sense, will drop this isb().
+
+> 
+>> +}
+>> +
+>> +static void __debug_restore_brbe(struct kvm_cpu_context *host_ctxt)
+>> +{
+>> +	if (!ctxt_sys_reg(host_ctxt, BRBCR_EL1))
+>> +		return;
+> 
+> So on one side you're using a flag, and on the other you're using the
+> *value*. You need some consistency.
+
+Both DEBUG_STATE_SAVE_BRBE flag and BRBCR_EL1 value is checked on both save
+and restore side.
+
+__debug_save_host_buffers_nvhe()
+	vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_BRBE)
+		__debug_save_brbe(host_ctxt)
+			Save BRBE but reset if BRBE is running
+
+__debug_restore_host_buffers_nvhe()
+	vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_BRBE)
+		__debug_restore_brbe(host_ctxt)
+			Restore when saved BRBCR_EL1 is positive
+
+> 
+>> +
+>> +	/* Restore BRBE controls */
+>> +	write_sysreg_s(ctxt_sys_reg(host_ctxt, BRBCR_EL1), SYS_BRBCR_EL1);
+>> +	isb();
+> 
+> Same question.
+> 
+>> +}
+>> +
+>>  void __debug_save_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
+>>  				    struct kvm_cpu_context *guest_ctxt)
+>>  {
+>> @@ -102,6 +129,10 @@ void __debug_save_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
+>>  
+>>  	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_TRFCR))
+>>  		__debug_save_trace(host_ctxt, guest_ctxt);
+>> +
+>> +	/* Disable BRBE branch records */
+>> +	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_BRBE))
+>> +		__debug_save_brbe(host_ctxt);
+>>  }
+>>  
+>>  void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+>> @@ -116,6 +147,8 @@ void __debug_restore_host_buffers_nvhe(struct kvm_cpu_context *host_ctxt,
+>>  		__debug_restore_spe(host_ctxt);
+>>  	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_TRFCR))
+>>  		__debug_restore_trace(host_ctxt, guest_ctxt);
+>> +	if (vcpu_get_flag(host_ctxt->__hyp_running_vcpu, DEBUG_STATE_SAVE_BRBE))
+>> +		__debug_restore_brbe(host_ctxt);
+>>  }
+>>  
+>>  void __debug_switch_to_host(struct kvm_vcpu *vcpu)
+> 
+> The lifetime of this flag seems bogus, specially when there is nothing
+> to do, which will always be the arch-majority of the executions.
+
+Not sure if I follow your point, could you please be more specific here ?
+
+DEBUG_STATE_SAVE_BRBE follows all existing register state context save/restore
+mechanism such as DEBUG_STATE_SAVE_SPE and DEBUG_STATE_SAVE_TRFCR. How is this
+any different or problematic ?
