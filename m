@@ -1,139 +1,74 @@
-Received: from out03.mta.xmission.com (out03.mta.xmission.com [166.70.13.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE6E18E01
-	for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 23:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xmission.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xmission.com
-Received: from in02.mta.xmission.com ([166.70.13.52]:37898)
-	by out03.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.93)
-	(envelope-from <ebiederm@xmission.com>)
-	id 1rCq36-00EVyC-FL; Mon, 11 Dec 2023 16:50:56 -0700
-Received: from ip68-227-168-167.om.om.cox.net ([68.227.168.167]:49742 helo=email.froward.int.ebiederm.org.xmission.com)
-	by in02.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.93)
-	(envelope-from <ebiederm@xmission.com>)
-	id 1rCq35-00F4Dc-Cg; Mon, 11 Dec 2023 16:50:56 -0700
-From: "Eric W. Biederman" <ebiederm@xmission.com>
-To: "Gowans, James" <jgowans@amazon.com>
-Cc: "Graf (AWS), Alexander" <graf@amazon.de>,  "seanjc@google.com"
- <seanjc@google.com>,  =?utf-8?Q?Sch=C3=B6nherr=2C_Jan_H=2E?=
- <jschoenh@amazon.de>,
-  "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-  "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
-  "kexec@lists.infradead.org" <kexec@lists.infradead.org>,
-  "james.morse@arm.com" <james.morse@arm.com>,  "oliver.upton@linux.dev"
- <oliver.upton@linux.dev>,  "suzuki.poulose@arm.com"
- <suzuki.poulose@arm.com>,  "chenhuacai@kernel.org"
- <chenhuacai@kernel.org>,  "atishp@atishpatra.org" <atishp@atishpatra.org>,
-  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-  "maz@kernel.org" <maz@kernel.org>,  "pbonzini@redhat.com"
- <pbonzini@redhat.com>,  "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-  "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,  "anup@brainfault.org"
- <anup@brainfault.org>,  "aleksandar.qemu.devel@gmail.com"
- <aleksandar.qemu.devel@gmail.com>
-References: <20230512233127.804012-1-seanjc@google.com>
-	<20230512233127.804012-2-seanjc@google.com>
-	<cfed942fc767fa7b2fabc68a3357a7b95bd6a589.camel@amazon.com>
-	<871qbud5f9.fsf@email.froward.int.ebiederm.org>
-	<a02b40d3d9ae5b3037b9a9d5921cfb0144ab5610.camel@amazon.com>
-	<7e30cfc2359dfef39d038e3734f7e5e3d9e82d68.camel@amazon.com>
-Date: Mon, 11 Dec 2023 17:50:33 -0600
-In-Reply-To: <7e30cfc2359dfef39d038e3734f7e5e3d9e82d68.camel@amazon.com>
-	(James Gowans's message of "Mon, 11 Dec 2023 10:27:15 +0000")
-Message-ID: <87wmtk9u46.fsf@email.froward.int.ebiederm.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C011181A
+	for <kvmarm@lists.linux.dev>; Tue, 12 Dec 2023 01:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="TN/LWXBi"
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-50bfd8d5c77so5925762e87.1
+        for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 17:59:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1702346377; x=1702951177; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uQ89ZIrgto37G/xlhKf3Jw+2Aq+MN68zNYm03Mdawcg=;
+        b=TN/LWXBiwBjdFitAhqbCKBV6PEu5gYT31rf1YFjIHt4L0N4EXShSUEFC2WJzlo5NCe
+         MNQhE5MY7s3KlfJZIqNUkytWOyoQBARZbzJ6dd/iiE/c5VNoOvtcRK2xuKdSjyLOz/Ml
+         6kJEOPl4lvoNv25akRZXW2B5mxPNtCalND0Bg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702346377; x=1702951177;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uQ89ZIrgto37G/xlhKf3Jw+2Aq+MN68zNYm03Mdawcg=;
+        b=mIdlGNGy0iACUlz+AaMPJqInFVkA+Tj/vZMkcLEGXDfk+cqpFaLSs25Ufy3ceIusMO
+         zKXBfFCKzIiwg308EjH1DuGwXp9bMU41vvnyPIITm8i8e+TlnqrwwuEJpD6TxdOFV6rY
+         dYpLgccVasKf1suZrIsyLPUeQvwJGBH3218GDttQp8ZQVB6Pz/UBivoNc9iSRrSXhM74
+         RFCgOCtxgikMkfwYGDIfPb/167xVmQVx2izAH3I7uodZTG641TyIab4Jd0O7dKfw2hNV
+         To7NOMUhVat3xaWseEJkapiVHVrVx684CD74fjanOWWGvXYEv2uyp7nduScPYa2rJ7+e
+         i9OA==
+X-Gm-Message-State: AOJu0Yw9v01+YSj3JRUBc18E37atUBEMinsnzmdlHqlxuzwn3BEd2um9
+	tg8jIgO4UdprXBmshMwEzsbJQcmSzkWyeO18YIxX4A==
+X-Google-Smtp-Source: AGHT+IFPkMwM+ODEL8jAac04JHQ1iWXAbY+dSF92QrVLp74yCwtnOhjG/2NaE3hAxNkItRtrSNp0Jef+ghFheIRqHhQ=
+X-Received: by 2002:a05:6512:23a7:b0:50d:1a10:d27f with SMTP id
+ c39-20020a05651223a700b0050d1a10d27fmr1444302lfv.201.1702346376180; Mon, 11
+ Dec 2023 17:59:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-XM-SPF: eid=1rCq35-00F4Dc-Cg;;;mid=<87wmtk9u46.fsf@email.froward.int.ebiederm.org>;;;hst=in02.mta.xmission.com;;;ip=68.227.168.167;;;frm=ebiederm@xmission.com;;;spf=pass
-X-XM-AID: U2FsdGVkX183erp/ctJyjnDuDEXnwg8YrcYEg8oGrjc=
-X-SA-Exim-Connect-IP: 68.227.168.167
-X-SA-Exim-Mail-From: ebiederm@xmission.com
-X-Spam-Level: *
-X-Spam-Report: 
-	* -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
-	*  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-	*      [score: 0.4999]
-	*  0.7 XMSubLong Long Subject
-	*  1.0 XM_ULScore_01 UL-obfuscated credit score reference
-	*  0.0 T_TM2_M_HEADER_IN_MSG BODY: No description available.
-	* -0.0 DCC_CHECK_NEGATIVE Not listed in DCC
-	*      [sa06 1397; Body=1 Fuz1=1 Fuz2=1]
-	* -0.0 T_SCC_BODY_TEXT_LINE No description available.
-	*  0.0 T_TooManySym_01 4+ unique symbols in subject
-X-Spam-DCC: XMission; sa06 1397; Body=1 Fuz1=1 Fuz2=1 
-X-Spam-Combo: *;"Gowans, James" <jgowans@amazon.com>
-X-Spam-Relay-Country: 
-X-Spam-Timing: total 473 ms - load_scoreonly_sql: 0.04 (0.0%),
-	signal_user_changed: 11 (2.3%), b_tie_ro: 9 (2.0%), parse: 0.99 (0.2%),
-	 extract_message_metadata: 3.6 (0.8%), get_uri_detail_list: 1.61
-	(0.3%), tests_pri_-2000: 3.4 (0.7%), tests_pri_-1000: 3.6 (0.8%),
-	tests_pri_-950: 1.23 (0.3%), tests_pri_-900: 1.01 (0.2%),
-	tests_pri_-90: 93 (19.6%), check_bayes: 91 (19.2%), b_tokenize: 9
-	(1.9%), b_tok_get_all: 9 (1.8%), b_comp_prob: 2.6 (0.5%),
-	b_tok_touch_all: 67 (14.1%), b_finish: 1.02 (0.2%), tests_pri_0: 329
-	(69.5%), check_dkim_signature: 0.53 (0.1%), check_dkim_adsp: 2.9
-	(0.6%), poll_dns_idle: 1.15 (0.2%), tests_pri_10: 3.3 (0.7%),
-	tests_pri_500: 15 (3.1%), rewrite_mail: 0.00 (0.0%)
-Subject: Re: [PATCH v2 1/2] KVM: Use syscore_ops instead of reboot_notifier
- to hook restart/shutdown
-X-SA-Exim-Version: 4.2.1 (built Sat, 08 Feb 2020 21:53:50 +0000)
-X-SA-Exim-Scanned: Yes (on in02.mta.xmission.com)
+References: <20230911021637.1941096-1-stevensd@google.com> <CAD=HUj5733eL9momi=V53njm85BQv_QkVrX92xReiq0_9JhqxQ@mail.gmail.com>
+ <ZUEPn_nIoE-gLspp@google.com>
+In-Reply-To: <ZUEPn_nIoE-gLspp@google.com>
+From: David Stevens <stevensd@chromium.org>
+Date: Tue, 12 Dec 2023 10:59:25 +0900
+Message-ID: <CAD=HUj5g9BoziHT5SbbZ1oFKv75UuXoo32x8DC3TYgLGZ6G_Bw@mail.gmail.com>
+Subject: Re: [PATCH v9 0/6] KVM: allow mapping non-refcounted pages
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-"Gowans, James" <jgowans@amazon.com> writes:
-
-> On Mon, 2023-12-11 at 09:54 +0200, James Gowans wrote:
->> > 
->> > What problem are you running into with your rebase that worked with
->> > reboot notifiers that is not working with syscore_shutdown?
->> 
->> Prior to this commit [1] which changed KVM from reboot notifiers to
->> syscore_ops, KVM's reboot notifier shutdown callback was invoked on
->> kexec via kernel_restart_prepare.
->> 
->> After this commit, KVM is not being shut down because currently the
->> kexec flow does not call syscore_shutdown.
+On Tue, Oct 31, 2023 at 11:30=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
 >
-> I think I missed what you're asking here; you're asking for a reproducer
-> for the specific failure? 
+> On Tue, Oct 31, 2023, David Stevens wrote:
+> > Sean, have you been waiting for a new patch series with responses to
+> > Maxim's comments? I'm not really familiar with kernel contribution
+> > etiquette, but I was hoping to get your feedback before spending the
+> > time to put together another patch series.
 >
-> 1. Launch a QEMU VM with -enable-kvm flag
->
-> 2. Do an immediate (-f flag) kexec:
-> kexec -f --reuse-cmdline ./bzImage 
->
-> Somewhere after doing the RET to new kernel in the relocate_kernel asm
-> function the new kernel starts triple faulting; I can't exactly figure
-> out where but I think it has to do with the new kernel trying to modify
-> CR3 while the VMXE bit is still set in CR4 causing the triple fault.
->
-> If KVM has been shut down via the shutdown callback, or alternatively if
-> the QEMU process has actually been killed first (by not doing a -f exec)
-> then the VMXE bit is clear and the kexec goes smoothly.
->
-> So, TL;DR: kexec -f use to work with a KVM VM active, now it goes into a
-> triple fault crash.
+> No, I'm working my way back toward it.  The guest_memfd series took prece=
+dence
+> over everything that I wasn't confident would land in 6.7, i.e. larger se=
+ries
+> effectively got put on the back burner.  Sorry :-(
 
-You mentioned I rebase so I thought your were backporting kernel patches.
-By rebase do you mean you porting your userspace to a newer kernel?
+Is this series something that may be able to make it into 6.8 or 6.9?
 
-
-In any event I believe the bug with respect to kexec was introduced in
-commit 6f389a8f1dd2 ("PM / reboot: call syscore_shutdown() after
-disable_nonboot_cpus()").  That is where syscore_shutdown was removed
-from kernel_restart_prepare().
-
-At this point it looks like someone just needs to add the missing
-syscore_shutdown call into kernel_kexec() right after
-migrate_to_reboot_cpu() is called.
-
-That said I am not seeing the reboot notifiers being called on the kexec
-path either so your issue with kvm might be deeper.
-
-Eric
+-David
