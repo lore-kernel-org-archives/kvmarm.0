@@ -1,151 +1,456 @@
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2052.outbound.protection.outlook.com [40.107.244.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92CF77D8AD
-	for <kvmarm@lists.linux.dev>; Tue, 12 Dec 2023 18:12:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF6A5FF17
+	for <kvmarm@lists.linux.dev>; Tue, 12 Dec 2023 18:44:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LBgE9ACw"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UUYbpxYBd182wJsYYoMkJ2vMykUdKWf05P7ZkbqD8VE8QcGP8x/oIVf/zeCFTgXYVNtUXK5LTDgMOAivEYrWdF50W9h2NtT41uqcfExbQRxrsJLaUOtpp/mwon7AFkwPo4YDeU8e54tqaeQ7eK3nf3T+WvAjP3685wAa9LA2T3KPTIu16b/8zRmimHxuFBKI7srQ/Ayv0hiYGuFNbw8Tnp6868c06h2ZkiraJCl3jf4VZFsvfSnl2lNtDfHUhDQfy/xhP377VevjnODtX19tm+CzuUvWf4u5uiS+C/E4QQIbflD8T/fDzGuY4FsdFzPnGtmnh4IG62XVljmB2FwzPg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DsdEjdFGro1jUaUTRB3jpRmIpqJfTbR955de68Nrfyc=;
- b=LrC92Vkp1Wo3FeDLsTQhq/8CiziE1U7+LgF2rOgogxWtseyluizkmdf+M0fgMdRNmJ/0HreVt0eXgU/F47tAStPrSUyo/k+ZHltsv2reFCYQ7PrpmIUfXu1y5FU+FMc33h5vhK4h4aJ52M+2y7cZLJMP9MkVGzejNkm5jP/d21u7HQ1FTZwcHvpNTy0AmreP/xEmhb94rufFqbnqdTvha2N5Qm3xAlpinPxFNIogosFkVR8jUY2kzHZaTH22VpzBee8z09Ez7PTJ3K/Y86x6GuB4S12b2BYBSnowqoX2VXxi+0bdmDroEuelS7w0+kau/sFAfSI+hvlaLg+THSVUeA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DsdEjdFGro1jUaUTRB3jpRmIpqJfTbR955de68Nrfyc=;
- b=LBgE9ACwCj2vsqSMjtpj26FkBaPSGUd8vOo2f97yhvp7zp8cEBBuim1iF+ui4QS9TeL2S5N+k6ve1+4stUktgVal/UO0d/DNOGUl6P8M3oTM03n3KUC7XZT0cURnqNU0AkcxkKoURxOTE6Y6ry+lpSk/zJcCfRXQiWEAIwOTeGbqr6K1/4Y+ZxgOXrDW4Eh0s9GlJZw/mfNeTUgCd+Mt2Z8qxXl39KuBHLXGF/DQVvBKFGSbNpDnDdp2rQWJf4nTm1Z/00wY9lTkk5QUpef1gHFTgU/zIn+SXNfqu+nXDQQtXc6NeRDcDLsleWhc53vkCnKDT5kmKok86y4ATRvpNg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH7PR12MB8428.namprd12.prod.outlook.com (2603:10b6:510:243::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7068.32; Tue, 12 Dec
- 2023 18:11:57 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7091.022; Tue, 12 Dec 2023
- 18:11:57 +0000
-Date: Tue, 12 Dec 2023 14:11:56 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: ankita@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org,
-	alex.williamson@redhat.com, kevin.tian@intel.com,
-	yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org,
-	gshan@redhat.com, linux-mm@kvack.org, lpieralisi@kernel.org,
-	aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
-	targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
-	apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
-	mochs@nvidia.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 2/2] kvm: arm64: set io memory s2 pte as normalnc for
- vfio pci devices
-Message-ID: <20231212181156.GO3014157@nvidia.com>
-References: <20231208164709.23101-1-ankita@nvidia.com>
- <20231208164709.23101-3-ankita@nvidia.com>
- <ZXicemDzXm8NShs1@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZXicemDzXm8NShs1@arm.com>
-X-ClientProxiedBy: MN2PR02CA0023.namprd02.prod.outlook.com
- (2603:10b6:208:fc::36) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="me/Oic6E"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D968C433AD
+	for <kvmarm@lists.linux.dev>; Tue, 12 Dec 2023 18:44:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702406660;
+	bh=Ndlxqd4u6aMS443058k3vlVCLDjDnnTD4QJ/AJDqfqQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=me/Oic6E5S36+0+KPeuDh5hN7xQGlGEuOwP67iTj2zaMaiJh24sXX72dh6tTZMctf
+	 BBzodUtVdxXCA17RqJzfWyR9OScR80gDAThwZOl3hVz8hxWkZMxdyHSKAAUtShXG5s
+	 DGjXjbQ8mwp4hAkEGqw2Z/ReoWN0Vq0Up5Mxyzi3xjdD38l3We5YLerF0FloWtsynJ
+	 gyCvu41jJPYobdfjTxQquDZwHFF3sL4YiTLjbEONZzIdF7gaDq31Uyyi7YLXse9n5A
+	 aNT18t81E6OwTL9gCU/ShbR2w+L8naDn2g3ws5lj20ZI+cajIBPhAqDXXVhw1KcgSJ
+	 4I8I0cczxeieg==
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-50bf4f97752so7766846e87.1
+        for <kvmarm@lists.linux.dev>; Tue, 12 Dec 2023 10:44:20 -0800 (PST)
+X-Gm-Message-State: AOJu0YzVz6Bo7qyLOmHkRJFzw44zRAHeUxrq5qSpdVRjTRkuCHQWwYDn
+	5uZchXWAOeS3P7un1NpLGK5QJyd7zxfp8NFuCQ==
+X-Google-Smtp-Source: AGHT+IEPoRgBjiZrbpoAHo1Ne4VjjPt6sdxouTWRS3lY1hTs5kRvH0vkBFz5RqHyYOYM8izzmPvxPRFcqNOG0jrXezs=
+X-Received: by 2002:a05:6512:3581:b0:50d:1733:cebc with SMTP id
+ m1-20020a056512358100b0050d1733cebcmr2791750lfr.54.1702406658381; Tue, 12 Dec
+ 2023 10:44:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB8428:EE_
-X-MS-Office365-Filtering-Correlation-Id: d3fafca0-d646-4b38-167e-08dbfb3dd430
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	hPLN4IERp5q2wZAX2wdRWqMVf+Fk7/Bvtm/y9UODYAPpvHtxcbLM4NZW5aXVCOV/cb4r/6/218onG4WhZxBak8hkX17GXSipbpKXE64hsmWs1BTUB+qg4S3t9+5aL0SDqrVdYJsiaJWgDnNmHSGtD5omH0Zc9dQsIMrwsTDWgK2ePjQ8rnY5xwu158nU59bv4B4ch5AxzwzLm2oNEeyrkToXmZyCdkEgnibFdGnmbAeWlQ5/r/CJLMFDsW47uhZPsH0WHEKKev7cVnuhNBdrp69yQiR09HCGmdqmc+ynCVXfRyn6q+PavV3L5JtSEh6xOt9BS8JaHK4dPt15fx7/4Oe+gJXc5K6V7T9OvrgEr1jx02ijeThl9K2BIrWNJR81ObkplKR6ixrLAtDbyPqg+TIJZXUQ3xtkpkhvLgy48yRvhTIWidqAODC9dqc0hQmbDdq3zPRNNPQnC24hDMtgbARP3OkQbZ/gkXLt38TDfWOd1LzuGcU2gYzPjjcVVTB949cGp1P6ZAnidBt2SJL5GoUD2Bs05juxdbJOrYcInHcKVO6UznX8hQqQHpD32KnG
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(376002)(39860400002)(396003)(366004)(230922051799003)(186009)(451199024)(1800799012)(64100799003)(41300700001)(2616005)(1076003)(26005)(83380400001)(33656002)(36756003)(38100700002)(5660300002)(8676002)(316002)(8936002)(4326008)(2906002)(7416002)(86362001)(6512007)(6506007)(66476007)(6916009)(66556008)(66946007)(478600001)(6486002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?lY+ljsP3PhtpT/EpVX1ZKQab0bzV4kfOgaErxMjpaqM+y+mB//tsww8slkYC?=
- =?us-ascii?Q?/YryN+gOdI4qJ7siLtRknWGYLBba8O5EfmSW+zEXd0Qc1L3keG3JiJXFmSfK?=
- =?us-ascii?Q?xxeOSIfR0bEGZJfFF8TCdlG4vYPMFgBBLSBcGGlSSOPI11P0mqc6VS0kPDdv?=
- =?us-ascii?Q?U3TPQQG0YO0xmbT+tHUlS3cg2VgMgWASkF0ksdJ/7At4Mffx6/hHsU74bFs2?=
- =?us-ascii?Q?d0tT+59qQOLLGYiGU5w8JwGOiTpRRUPAFsVqKoPNCDIOkYSJWyhjdwqTKeiT?=
- =?us-ascii?Q?t20eIVYfJQbAnKrfkjb8XLw4mi1kS6JDg8JmdPkZ4y1OyAlmPAYRHH9kHJ6b?=
- =?us-ascii?Q?NRkKy2A1gBhd1oY8JjB+MU7m7HQ7ywH5l5BGozVGWMsDiZH0IJmo+Sk6igMD?=
- =?us-ascii?Q?sQPkubIT8ENgDK8sJJ9fM8N4h9/QYVA2WyVy5KfmAFbqlz8+/uEtvYHYydzp?=
- =?us-ascii?Q?/nM1n4zeNw+0hy0X6cEITbgA5hZzVjlhbM4kzSrHdu5mejTjWdGp9Osy5X0L?=
- =?us-ascii?Q?HfB9mWoWd+RDxLQQdIWM4SvQyjO9GlBBga1lNADdN+U/XWgx6gAwc+6ezZdF?=
- =?us-ascii?Q?pSsTovZF5KlmVicqmG5EYlKT8XE76cWjJFxTBXMcFlnZm05UP+CzOavFs3KW?=
- =?us-ascii?Q?2gOwFlunuzn5gZk4/7ejOEEOzkTsfHLH4AEiYLARwyotXNVXh2GKkPdOxKSL?=
- =?us-ascii?Q?g1cCKurXjfYly46m8V4HXFmErGes6EclMCHuiC8CyxiYyronW0Ok+GJngJoC?=
- =?us-ascii?Q?XyYPjiMlL+Ys1x38QDGDlyOoI2v12Im7AoMqv366aIULCZQYvJsz/qsS+k54?=
- =?us-ascii?Q?1HYvhcL37vCFWAsSJRQqtPSbJ3TW+f/sp0ZbB7IUOYmyFDnEQxkarl1tDf7S?=
- =?us-ascii?Q?bvauImFSOpA6sQ+vEVr4ZkIDrGYNb+SALYylcSnXdcSb5QVi9jI4p+h7EyZt?=
- =?us-ascii?Q?DU1X1WKLj61Z8U+AkL12v9/tmC9smeXWdCJr01Lkwzhxqa228AM9v/9nlqbg?=
- =?us-ascii?Q?i1ZdcoS7JRygPZ922SAEvLnflK2/jAO32oI8ECd08hxJIzdRYLhCGkKqOSXC?=
- =?us-ascii?Q?bCN/iFqBAXIeuQE6fo1yPX3xEI1BX9yfO5L/j+iR2XKTHOzb4XlgKsGZw8Gm?=
- =?us-ascii?Q?UGFwH8Ndx7y20DtPvXKYvKEHz2pZxQQSi+kkbpTDN43BDgqtkAU+3Kp/nrhW?=
- =?us-ascii?Q?p7X6JePiqJkhw06Szr76Cgjjvn7i7Sx5pXAFMohSMRWjHFQAtGVYsOVqrkdK?=
- =?us-ascii?Q?eIFMrofFXPFyT95w0ZN0wLUKHn1VDKd5UK82Gr5Piv47IrHggJuYWiEx4f/w?=
- =?us-ascii?Q?Z7fhfcde/+9hJgT533DEjyxDH1kN+3hcT1RhAAsvpvaslcoIT5ki6BMyKWmS?=
- =?us-ascii?Q?CAZP8V+RAKcQQItELXI36j3lWYb5XF426amMOZ2OJIZ/zxIrRUQb9apAbwEU?=
- =?us-ascii?Q?d5fY19ZfMD4kCRTPZMNnSlRGijD8nt5GJAGahG8H3fshgkXA2zyCWMfc+aGB?=
- =?us-ascii?Q?pATNqK3BS8EkrtBXeNxRwqCbXhrv/mcNlgGGLsCTQz0esE738B1MiVdfO0Z/?=
- =?us-ascii?Q?ZcRZC0gT/laouWX/surdnG5ECZRLdH9/o8EOvSsM?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d3fafca0-d646-4b38-167e-08dbfb3dd430
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2023 18:11:57.5689
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9bXSN1XWQUcSUdDFg3DI3BMjBwwQ9lTSMbnpSNQJbgBDOo8vCF3oA2FmClbwkLnJ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8428
+References: <20231119165721.9849-1-alexandru.elisei@arm.com>
+ <20231119165721.9849-12-alexandru.elisei@arm.com> <CAL_Jsq+k5BeM9+u12AQvWQ0b4Uv5Cy0vPOpK_uLcYtRnunq4iQ@mail.gmail.com>
+ <ZXiMiLz9ZyUdxUP8@raptor>
+In-Reply-To: <ZXiMiLz9ZyUdxUP8@raptor>
+From: Rob Herring <robh@kernel.org>
+Date: Tue, 12 Dec 2023 12:44:06 -0600
+X-Gmail-Original-Message-ID: <CAL_Jsq+U_GR=mOK3-phnd4jeJKf79aOmhPwDOSj+f=s-7fZZWQ@mail.gmail.com>
+Message-ID: <CAL_Jsq+U_GR=mOK3-phnd4jeJKf79aOmhPwDOSj+f=s-7fZZWQ@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 11/27] arm64: mte: Reserve tag storage memory
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, 
+	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org, 
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, 
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org, 
+	bsegall@google.com, mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com, 
+	mhiramat@kernel.org, rppt@kernel.org, hughd@google.com, pcc@google.com, 
+	steven.price@arm.com, anshuman.khandual@arm.com, vincenzo.frascino@arm.com, 
+	david@redhat.com, eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-mm@kvack.org, 
+	linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 12, 2023 at 05:46:34PM +0000, Catalin Marinas wrote:
-> > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > index a422cc123a2d..8d3c4820c492 100644
-> > --- a/include/linux/mm.h
-> > +++ b/include/linux/mm.h
-> > @@ -391,6 +391,13 @@ extern unsigned int kobjsize(const void *objp);
-> >  # define VM_UFFD_MINOR		VM_NONE
-> >  #endif /* CONFIG_HAVE_ARCH_USERFAULTFD_MINOR */
-> >  
-> > +#ifdef CONFIG_64BIT
-> > +#define VM_VFIO_ALLOW_WC_BIT	39	/* Convey KVM to map S2 NORMAL_NC */
-> 
-> This comment shouldn't be in the core header file. It knows nothing
-> about S2 and Normal-NC, that's arm64 terminology. You can mention
-> something like VFIO can use this flag hint that write-combining is
-> allowed.
+On Tue, Dec 12, 2023 at 10:38=E2=80=AFAM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> Hi Rob,
+>
+> Thank you so much for the feedback, I'm not very familiar with device tre=
+e,
+> and any comments are very useful.
+>
+> On Mon, Dec 11, 2023 at 11:29:40AM -0600, Rob Herring wrote:
+> > On Sun, Nov 19, 2023 at 10:59=E2=80=AFAM Alexandru Elisei
+> > <alexandru.elisei@arm.com> wrote:
+> > >
+> > > Allow the kernel to get the size and location of the MTE tag storage
+> > > regions from the DTB. This memory is marked as reserved for now.
+> > >
+> > > The DTB node for the tag storage region is defined as:
+> > >
+> > >         tags0: tag-storage@8f8000000 {
+> > >                 compatible =3D "arm,mte-tag-storage";
+> > >                 reg =3D <0x08 0xf8000000 0x00 0x4000000>;
+> > >                 block-size =3D <0x1000>;
+> > >                 memory =3D <&memory0>;    // Associated tagged memory=
+ node
+> > >         };
+> >
+> > I skimmed thru the discussion some. If this memory range is within
+> > main RAM, then it definitely belongs in /reserved-memory.
+>
+> Ok, will do that.
+>
+> If you don't mind, why do you say that it definitely belongs in
+> reserved-memory? I'm not trying to argue otherwise, I'm curious about the
+> motivation.
 
-Let's write a comment down here to address both remarks:
+Simply so that /memory nodes describe all possible memory and
+/reserved-memory is just adding restrictions. It's also because
+/reserved-memory is what gets handled early, and we don't need
+multiple things to handle early.
 
- This flag is used to connect VFIO to arch specific KVM code. It
- indicates that the memory under this VMA is safe for use with any
- non-cachable memory type inside KVM. Some VFIO devices, on some
- platforms, are thought to be unsafe and can cause machine crashes if
- KVM does not lock down the memory type.
+> Tag storage is not DMA and can live anywhere in memory.
 
-> should know the implications. There's also an expectation that the
-> actual driver (KVM guests) or maybe later DPDK can choose the safe
-> non-cacheable or write-combine (Linux terminology) attributes for the
-> BAR.
+Then why put it in DT at all? The only reason CMA is there is to set
+the size. It's not even clear to me we need CMA in DT either. The
+reasoning long ago was the kernel didn't do a good job of moving and
+reclaiming contiguous space, but that's supposed to be better now (and
+most h/w figured out they need IOMMUs).
 
-DPDK won't rely on this interface
+But for tag storage you know the size as it is a function of the
+memory size, right? After all, you are validating the size is correct.
+I guess there is still the aspect of whether you want enable MTE or
+not which could be done in a variety of ways.
 
-Thanks,
-Jason
+> In
+> arm64_memblock_init(), the kernel first removes the memory that it cannot
+> address from memblock. For example, because it has been compiled with
+> CONFIG_ARM64_VA_BITS_39=3Dy. And then calls
+> early_init_fdt_scan_reserved_mem().
+>
+> What happens if reserved memory is above what the kernel can address?
+
+I would hope the kernel handles it. That's the kernel's problem unless
+there's some h/w limitation to access some region. The DT can't have
+things dependent on the kernel config.
+
+> From my testing, when the kernel is compiled with 39 bit VA, if I use
+> reserved memory to discover tag storage the lives above the virtua addres=
+s
+> limit and then I try to use CMA to manage the tag storage memory, I get a
+> kernel panic:
+
+Looks like we should handle that better...
+
+>> [    0.000000] Reserved memory: created CMA memory pool at 0x00000100000=
+00000, size 64 MiB
+> [    0.000000] OF: reserved mem: initialized node linux,cma, compatible i=
+d shared-dma-pool
+> [    0.000000] OF: reserved mem: 0x0000010000000000..0x0000010003ffffff (=
+65536 KiB) map reusable linux,cma
+> [..]
+> [    0.806945] Unable to handle kernel paging request at virtual address =
+00000001fe000000
+> [    0.807277] Mem abort info:
+> [    0.807277]   ESR =3D 0x0000000096000005
+> [    0.807693]   EC =3D 0x25: DABT (current EL), IL =3D 32 bits
+> [    0.808110]   SET =3D 0, FnV =3D 0
+> [    0.808443]   EA =3D 0, S1PTW =3D 0
+> [    0.808526]   FSC =3D 0x05: level 1 translation fault
+> [    0.808943] Data abort info:
+> [    0.808943]   ISV =3D 0, ISS =3D 0x00000005, ISS2 =3D 0x00000000
+> [    0.809360]   CM =3D 0, WnR =3D 0, TnD =3D 0, TagAccess =3D 0
+> [    0.809776]   GCS =3D 0, Overlay =3D 0, DirtyBit =3D 0, Xs =3D 0
+> [    0.810221] [00000001fe000000] user address but active_mm is swapper
+> [..]
+> [    0.820887] Call trace:
+> [    0.821027]  cma_init_reserved_areas+0xc4/0x378
+>
+> >
+> > You need a binding for this too.
+>
+> By binding you mean having an yaml file in dt-schem [1] describing the ta=
+g
+> storage node, right?
+
+Yes, but in the kernel tree is fine.
+
+[...]
+
+> > > +static int __init tag_storage_of_flat_get_range(unsigned long node, =
+const __be32 *reg,
+> > > +                                               int reg_len, struct r=
+ange *range)
+> > > +{
+> > > +       int addr_cells =3D dt_root_addr_cells;
+> > > +       int size_cells =3D dt_root_size_cells;
+> > > +       u64 size;
+> > > +
+> > > +       if (reg_len / 4 > addr_cells + size_cells)
+> > > +               return -EINVAL;
+> > > +
+> > > +       range->start =3D PHYS_PFN(of_read_number(reg, addr_cells));
+> > > +       size =3D PHYS_PFN(of_read_number(reg + addr_cells, size_cells=
+));
+> > > +       if (size =3D=3D 0) {
+> > > +               pr_err("Invalid node");
+> > > +               return -EINVAL;
+> > > +       }
+> > > +       range->end =3D range->start + size - 1;
+> >
+> > We have a function to read (and translate which you forgot) addresses.
+> > Add what's missing rather than open code your own.
+>
+> I must have missed that there's already a function to read addresses. Wou=
+ld
+> you mind pointing me in the right direction?
+
+drivers/of/fdt_address.c
+
+Though it doesn't provide getting the size, so that will have to be added.
+
+
+> > > +
+> > > +       return 0;
+> > > +}
+> > > +
+> > > +static int __init tag_storage_of_flat_get_tag_range(unsigned long no=
+de,
+> > > +                                                   struct range *tag=
+_range)
+> > > +{
+> > > +       const __be32 *reg;
+> > > +       int reg_len;
+> > > +
+> > > +       reg =3D of_get_flat_dt_prop(node, "reg", &reg_len);
+> > > +       if (reg =3D=3D NULL) {
+> > > +               pr_err("Invalid metadata node");
+> > > +               return -EINVAL;
+> > > +       }
+> > > +
+> > > +       return tag_storage_of_flat_get_range(node, reg, reg_len, tag_=
+range);
+> > > +}
+> > > +
+> > > +static int __init tag_storage_of_flat_get_memory_range(unsigned long=
+ node, struct range *mem)
+> > > +{
+> > > +       const __be32 *reg;
+> > > +       int reg_len;
+> > > +
+> > > +       reg =3D of_get_flat_dt_prop(node, "linux,usable-memory", &reg=
+_len);
+> > > +       if (reg =3D=3D NULL)
+> > > +               reg =3D of_get_flat_dt_prop(node, "reg", &reg_len);
+> > > +
+> > > +       if (reg =3D=3D NULL) {
+> > > +               pr_err("Invalid memory node");
+> > > +               return -EINVAL;
+> > > +       }
+> > > +
+> > > +       return tag_storage_of_flat_get_range(node, reg, reg_len, mem)=
+;
+> > > +}
+> > > +
+> > > +struct find_memory_node_arg {
+> > > +       unsigned long node;
+> > > +       u32 phandle;
+> > > +};
+> > > +
+> > > +static int __init fdt_find_memory_node(unsigned long node, const cha=
+r *uname,
+> > > +                                      int depth, void *data)
+> > > +{
+> > > +       const char *type =3D of_get_flat_dt_prop(node, "device_type",=
+ NULL);
+> > > +       struct find_memory_node_arg *arg =3D data;
+> > > +
+> > > +       if (depth !=3D 1 || !type || strcmp(type, "memory") !=3D 0)
+> > > +               return 0;
+> > > +
+> > > +       if (of_get_flat_dt_phandle(node) =3D=3D arg->phandle) {
+> > > +               arg->node =3D node;
+> > > +               return 1;
+> > > +       }
+> > > +
+> > > +       return 0;
+> > > +}
+> > > +
+> > > +static int __init tag_storage_get_memory_node(unsigned long tag_node=
+, unsigned long *mem_node)
+> > > +{
+> > > +       struct find_memory_node_arg arg =3D { 0 };
+> > > +       const __be32 *memory_prop;
+> > > +       u32 mem_phandle;
+> > > +       int ret, reg_len;
+> > > +
+> > > +       memory_prop =3D of_get_flat_dt_prop(tag_node, "memory", &reg_=
+len);
+> > > +       if (!memory_prop) {
+> > > +               pr_err("Missing 'memory' property in the tag storage =
+node");
+> > > +               return -EINVAL;
+> > > +       }
+> > > +
+> > > +       mem_phandle =3D be32_to_cpup(memory_prop);
+> > > +       arg.phandle =3D mem_phandle;
+> > > +
+> > > +       ret =3D of_scan_flat_dt(fdt_find_memory_node, &arg);
+> >
+> > Do not use of_scan_flat_dt. It is a relic predating libfdt which can
+> > get a node by phandle directly.
+>
+> I used that because that's what drivers/of/fdt.c uses. With reserved memo=
+ry
+> I shouldn't need it, because struct reserved_mem already includes a
+> phandle.
+
+Check again. Only some arch/ code (mostly powerpc) uses it. I've
+killed off most of it.
+
+
+> > > +       if (ret !=3D 1) {
+> > > +               pr_err("Associated memory node not found");
+> > > +               return -EINVAL;
+> > > +       }
+> > > +
+> > > +       *mem_node =3D arg.node;
+> > > +
+> > > +       return 0;
+> > > +}
+> > > +
+> > > +static int __init tag_storage_of_flat_read_u32(unsigned long node, c=
+onst char *propname,
+> > > +                                              u32 *retval)
+> >
+> > If you are going to make a generic function, make it for everyone.
+>
+> Sure. If I still need it, should I put the function in
+> include/linux/of_fdt.h?
+
+Yes.
+
+> > > +{
+> > > +       const __be32 *reg;
+> > > +
+> > > +       reg =3D of_get_flat_dt_prop(node, propname, NULL);
+> > > +       if (!reg)
+> > > +               return -EINVAL;
+> > > +
+> > > +       *retval =3D be32_to_cpup(reg);
+> > > +       return 0;
+> > > +}
+> > > +
+> > > +static u32 __init get_block_size_pages(u32 block_size_bytes)
+> > > +{
+> > > +       u32 a =3D PAGE_SIZE;
+> > > +       u32 b =3D block_size_bytes;
+> > > +       u32 r;
+> > > +
+> > > +       /* Find greatest common divisor using the Euclidian algorithm=
+. */
+> > > +       do {
+> > > +               r =3D a % b;
+> > > +               a =3D b;
+> > > +               b =3D r;
+> > > +       } while (b !=3D 0);
+> > > +
+> > > +       return PHYS_PFN(PAGE_SIZE * block_size_bytes / a);
+> > > +}
+> > > +
+> > > +static int __init fdt_init_tag_storage(unsigned long node, const cha=
+r *uname,
+> > > +                                      int depth, void *data)
+> > > +{
+> > > +       struct tag_region *region;
+> > > +       unsigned long mem_node;
+> > > +       struct range *mem_range;
+> > > +       struct range *tag_range;
+> > > +       u32 block_size_bytes;
+> > > +       u32 nid =3D 0;
+> > > +       int ret;
+> > > +
+> > > +       if (depth !=3D 1 || !strstr(uname, "tag-storage"))
+> > > +               return 0;
+> > > +
+> > > +       if (!of_flat_dt_is_compatible(node, "arm,mte-tag-storage"))
+> > > +               return 0;
+> > > +
+> > > +       if (num_tag_regions =3D=3D MAX_TAG_REGIONS) {
+> > > +               pr_err("Maximum number of tag storage regions exceede=
+d");
+> > > +               return -EINVAL;
+> > > +       }
+> > > +
+> > > +       region =3D &tag_regions[num_tag_regions];
+> > > +       mem_range =3D &region->mem_range;
+> > > +       tag_range =3D &region->tag_range;
+> > > +
+> > > +       ret =3D tag_storage_of_flat_get_tag_range(node, tag_range);
+> > > +       if (ret) {
+> > > +               pr_err("Invalid tag storage node");
+> > > +               return ret;
+> > > +       }
+> > > +
+> > > +       ret =3D tag_storage_get_memory_node(node, &mem_node);
+> > > +       if (ret)
+> > > +               return ret;
+> > > +
+> > > +       ret =3D tag_storage_of_flat_get_memory_range(mem_node, mem_ra=
+nge);
+> > > +       if (ret) {
+> > > +               pr_err("Invalid address for associated data memory no=
+de");
+> > > +               return ret;
+> > > +       }
+> > > +
+> > > +       /* The tag region must exactly match the corresponding memory=
+. */
+> > > +       if (range_len(tag_range) * 32 !=3D range_len(mem_range)) {
+> > > +               pr_err("Tag storage region 0x%llx-0x%llx does not cov=
+er the memory region 0x%llx-0x%llx",
+> > > +                      PFN_PHYS(tag_range->start), PFN_PHYS(tag_range=
+->end),
+> > > +                      PFN_PHYS(mem_range->start), PFN_PHYS(mem_range=
+->end));
+> > > +               return -EINVAL;
+> > > +       }
+> > > +
+> > > +       ret =3D tag_storage_of_flat_read_u32(node, "block-size", &blo=
+ck_size_bytes);
+> > > +       if (ret || block_size_bytes =3D=3D 0) {
+> > > +               pr_err("Invalid or missing 'block-size' property");
+> > > +               return -EINVAL;
+> > > +       }
+> > > +       region->block_size =3D get_block_size_pages(block_size_bytes)=
+;
+> > > +       if (range_len(tag_range) % region->block_size !=3D 0) {
+> > > +               pr_err("Tag storage region size 0x%llx is not a multi=
+ple of block size %u",
+> > > +                      PFN_PHYS(range_len(tag_range)), region->block_=
+size);
+> > > +               return -EINVAL;
+> > > +       }
+> > > +
+> > > +       ret =3D tag_storage_of_flat_read_u32(mem_node, "numa-node-id"=
+, &nid);
+> >
+> > I was going to say we already have a way to associate memory nodes
+> > other nodes using "numa-node-id", so the "memory" phandle property is
+> > somewhat redundant. Maybe the tag node should have a numa-node-id.
+> > With that, it looks like you don't even need to access the /memory
+> > node. Avoiding that would be good for 2 reasons. It avoids parsing
+> > memory nodes twice and it's not the kernel's job to validate the DT.
+> > Really, if you want memory info, you should use memblock to get it
+> > because all the special cases of memory layout are handled. For
+> > example you can have memory nodes with multiple 'reg' entries or
+> > multiple memory nodes or both, and then some of those could be
+> > contiguous.
+>
+> I need to have a memory node associated with the tag storage node because
+> there is a static relationship between a page from "normal" memory and it=
+s
+> associated tag storage. If the code doesn't know that the memory region
+> A..B has the corresponding tag storage in the region X..Y, then it doesn'=
+t
+> know which tag storage to reserve when a page is allocated as tagged.
+>
+> In the example above, assuming that page P is allocated as tagged, the
+> corresponding tag storage page that needs to be reserved is:
+>
+> tag_storage_pfn =3D (page_to_pfn(P) - PHYS_PFN(A)) / 32* + PHYS_PFN(X)
+>
+> numa-node-id is not enough for this, because as far I know you can have
+> multiple memory regions withing the same numa node.
+
+Okay.
+
+Rob
