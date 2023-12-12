@@ -1,74 +1,104 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C011181A
-	for <kvmarm@lists.linux.dev>; Tue, 12 Dec 2023 01:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46BCA15AF5
+	for <kvmarm@lists.linux.dev>; Tue, 12 Dec 2023 07:05:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="TN/LWXBi"
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-50bfd8d5c77so5925762e87.1
-        for <kvmarm@lists.linux.dev>; Mon, 11 Dec 2023 17:59:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1702346377; x=1702951177; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uQ89ZIrgto37G/xlhKf3Jw+2Aq+MN68zNYm03Mdawcg=;
-        b=TN/LWXBiwBjdFitAhqbCKBV6PEu5gYT31rf1YFjIHt4L0N4EXShSUEFC2WJzlo5NCe
-         MNQhE5MY7s3KlfJZIqNUkytWOyoQBARZbzJ6dd/iiE/c5VNoOvtcRK2xuKdSjyLOz/Ml
-         6kJEOPl4lvoNv25akRZXW2B5mxPNtCalND0Bg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702346377; x=1702951177;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uQ89ZIrgto37G/xlhKf3Jw+2Aq+MN68zNYm03Mdawcg=;
-        b=mIdlGNGy0iACUlz+AaMPJqInFVkA+Tj/vZMkcLEGXDfk+cqpFaLSs25Ufy3ceIusMO
-         zKXBfFCKzIiwg308EjH1DuGwXp9bMU41vvnyPIITm8i8e+TlnqrwwuEJpD6TxdOFV6rY
-         dYpLgccVasKf1suZrIsyLPUeQvwJGBH3218GDttQp8ZQVB6Pz/UBivoNc9iSRrSXhM74
-         RFCgOCtxgikMkfwYGDIfPb/167xVmQVx2izAH3I7uodZTG641TyIab4Jd0O7dKfw2hNV
-         To7NOMUhVat3xaWseEJkapiVHVrVx684CD74fjanOWWGvXYEv2uyp7nduScPYa2rJ7+e
-         i9OA==
-X-Gm-Message-State: AOJu0Yw9v01+YSj3JRUBc18E37atUBEMinsnzmdlHqlxuzwn3BEd2um9
-	tg8jIgO4UdprXBmshMwEzsbJQcmSzkWyeO18YIxX4A==
-X-Google-Smtp-Source: AGHT+IFPkMwM+ODEL8jAac04JHQ1iWXAbY+dSF92QrVLp74yCwtnOhjG/2NaE3hAxNkItRtrSNp0Jef+ghFheIRqHhQ=
-X-Received: by 2002:a05:6512:23a7:b0:50d:1a10:d27f with SMTP id
- c39-20020a05651223a700b0050d1a10d27fmr1444302lfv.201.1702346376180; Mon, 11
- Dec 2023 17:59:36 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Uhzgb9Js"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1702364746;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ohnF1W++KcAoa0lsuGqvKhsZ8LjbSkh3DKZwGQ3ANzo=;
+	b=Uhzgb9JsR6oug72Fv2zMFxTJ7ZFgHBsKUxvLPdIBwgg43aj11oiYPIvoVXqMFjdYnreA0c
+	l6Z7kSuNxvplQGWQ7b3GjD9qtLDySZFBscxF3y+hglMHqfUwIeqE92wq36tI+OvgfuHicc
+	OP4eSUxW0nWEGianxk5jAhH+wz/IRuk=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	broonie@kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH] KVM: selftests: Ensure sysreg-defs.h is generated at the expected path
+Date: Tue, 12 Dec 2023 07:04:32 +0000
+Message-ID: <20231212070431.145544-2-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230911021637.1941096-1-stevensd@google.com> <CAD=HUj5733eL9momi=V53njm85BQv_QkVrX92xReiq0_9JhqxQ@mail.gmail.com>
- <ZUEPn_nIoE-gLspp@google.com>
-In-Reply-To: <ZUEPn_nIoE-gLspp@google.com>
-From: David Stevens <stevensd@chromium.org>
-Date: Tue, 12 Dec 2023 10:59:25 +0900
-Message-ID: <CAD=HUj5g9BoziHT5SbbZ1oFKv75UuXoo32x8DC3TYgLGZ6G_Bw@mail.gmail.com>
-Subject: Re: [PATCH v9 0/6] KVM: allow mapping non-refcounted pages
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Oct 31, 2023 at 11:30=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Tue, Oct 31, 2023, David Stevens wrote:
-> > Sean, have you been waiting for a new patch series with responses to
-> > Maxim's comments? I'm not really familiar with kernel contribution
-> > etiquette, but I was hoping to get your feedback before spending the
-> > time to put together another patch series.
->
-> No, I'm working my way back toward it.  The guest_memfd series took prece=
-dence
-> over everything that I wasn't confident would land in 6.7, i.e. larger se=
-ries
-> effectively got put on the back burner.  Sorry :-(
+Building the KVM selftests from the main selftests Makefile (as opposed
+to the kvm subdirectory) doesn't work as OUTPUT is set, forcing the
+generated header to spill into the selftests directory. Additionally,
+relative paths do not work when building outside of the srctree, as the
+canonical selftests path is replaced with 'kselftest' in the output.
 
-Is this series something that may be able to make it into 6.8 or 6.9?
+Work around both of these issues by explicitly overriding OUTPUT on the
+submake cmdline. Move the whole fragment below the point lib.mk gets
+included such that $(abs_objdir) is available.
 
--David
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ tools/testing/selftests/kvm/Makefile | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 52c59bad7213..5f4f6be7a866 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -17,16 +17,6 @@ else
+ 	ARCH_DIR := $(ARCH)
+ endif
+ 
+-ifeq ($(ARCH),arm64)
+-tools_dir := $(top_srcdir)/tools
+-arm64_tools_dir := $(tools_dir)/arch/arm64/tools/
+-GEN_HDRS := $(top_srcdir)/tools/arch/arm64/include/generated/
+-CFLAGS += -I$(GEN_HDRS)
+-
+-$(GEN_HDRS): $(wildcard $(arm64_tools_dir)/*)
+-	$(MAKE) -C $(arm64_tools_dir) O=$(tools_dir)
+-endif
+-
+ LIBKVM += lib/assert.c
+ LIBKVM += lib/elf.c
+ LIBKVM += lib/guest_modes.c
+@@ -234,6 +224,22 @@ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
+ ifeq ($(ARCH),s390)
+ 	CFLAGS += -march=z10
+ endif
++ifeq ($(ARCH),arm64)
++tools_dir := $(top_srcdir)/tools
++arm64_tools_dir := $(tools_dir)/arch/arm64/tools/
++
++ifneq ($(abs_objdir),)
++arm64_hdr_outdir := $(abs_objdir)/tools/
++else
++arm64_hdr_outdir := $(tools_dir)/
++endif
++
++GEN_HDRS := $(arm64_hdr_outdir)arch/arm64/include/generated/
++CFLAGS += -I$(GEN_HDRS)
++
++$(GEN_HDRS): $(wildcard $(arm64_tools_dir)/*)
++	$(MAKE) -C $(arm64_tools_dir) OUTPUT=$(arm64_hdr_outdir)
++endif
+ 
+ no-pie-option := $(call try-run, echo 'int main(void) { return 0; }' | \
+         $(CC) -Werror $(CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
+
+base-commit: 33cc938e65a98f1d29d0a18403dbbee050dcad9a
+-- 
+2.43.0.472.g3155946c3a-goog
+
