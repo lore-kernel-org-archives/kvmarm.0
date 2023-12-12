@@ -1,114 +1,61 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DAF37B3D9;
-	Tue, 12 Dec 2023 17:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="quWq7NFA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 955A4C433C9;
-	Tue, 12 Dec 2023 17:21:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702401677;
-	bh=NjEv9qEr/oYVM+wHeeNDWCRv65KfnIhhpX8bgvPrnAA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=quWq7NFAtXTBXufHjGAQPZuAXrlWxIJ4Rn3ITaI13bZesQeatjNFR7raywE3BfBn7
-	 Pitan+DMqBcCL58QZwCgz3Lh/6jidDw46o+sSHdw2XNETPNFha4R9ntZwxgldpxfvd
-	 ThUunTfPwVTXTNhOAsJ9W9/N6z4PG1M3beyPew54n2U5AZrjlyDMmXs2L7Toa+G5kj
-	 jyTED6ks2sSuPvCG+6dEMiYHKakPG+EvMGSSnpSABMjq1R1ugTLDeB0n3JnFi9LuSS
-	 cUuBfE0LIKezRTEQ8AUTFsdnAhfeVJygPdgHWAaZ27aCb30nqIqsyQPesJMXA3vzFc
-	 vN+/g3oSMdIBg==
-From: Will Deacon <will@kernel.org>
-To: anshuman.khandual@arm.com,
-	mark.rutland@arm.com,
-	linux-arm-kernel@lists.infradead.org,
-	James Clark <james.clark@arm.com>,
-	suzuki.poulose@arm.com,
-	linux-perf-users@vger.kernel.org
-Cc: catalin.marinas@arm.com,
-	kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	Zaid Al-Bassam <zalbassam@google.com>,
-	linux-kselftest@vger.kernel.org,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	namhyung@gmail.com,
-	Jonathan Corbet <corbet@lwn.net>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Shuah Khan <shuah@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	kvmarm@lists.linux.dev,
-	linux-doc@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Ian Rogers <irogers@google.com>,
-	linux-kernel@vger.kernel.org,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	kvm@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>
-Subject: Re: [PATCH v7 00/11] arm64: perf: Add support for event counting threshold
-Date: Tue, 12 Dec 2023 17:20:53 +0000
-Message-Id: <170237438420.1648654.4727808470285684911.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20231211161331.1277825-1-james.clark@arm.com>
-References: <20231211161331.1277825-1-james.clark@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35D6E6FDC;
+	Tue, 12 Dec 2023 17:32:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95A85C433C7;
+	Tue, 12 Dec 2023 17:32:01 +0000 (UTC)
+Date: Tue, 12 Dec 2023 17:31:59 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: ankita@nvidia.com
+Cc: jgg@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org,
+	alex.williamson@redhat.com, kevin.tian@intel.com,
+	yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org,
+	gshan@redhat.com, linux-mm@kvack.org, lpieralisi@kernel.org,
+	aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
+	targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
+	apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
+	mochs@nvidia.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v3 1/2] kvm: arm64: introduce new flag for non-cacheable
+ IO memory
+Message-ID: <ZXiZDwaCtHpPGXh6@arm.com>
+References: <20231208164709.23101-1-ankita@nvidia.com>
+ <20231208164709.23101-2-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231208164709.23101-2-ankita@nvidia.com>
 
-On Mon, 11 Dec 2023 16:13:12 +0000, James Clark wrote:
-> Changes since v6:
-> 
->   * Remove inlines from arm_pmuv3.c
->   * Use format attribute mechanism from SPE
->   * Re-arrange attributes so that threshold comes last and can
->     potentially be extended
->   * Emit an error if the max threshold is exceeded rather than clamping
->   * Convert all register fields to GENMASK
-> 
-> [...]
+On Fri, Dec 08, 2023 at 10:17:08PM +0530, ankita@nvidia.com wrote:
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index c651df904fe3..d4835d553c61 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -718,10 +718,17 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
+>  				kvm_pte_t *ptep)
+>  {
+>  	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
+> -	kvm_pte_t attr = device ? KVM_S2_MEMATTR(pgt, DEVICE_nGnRE) :
+> -			    KVM_S2_MEMATTR(pgt, NORMAL);
+> +	bool normal_nc = prot & KVM_PGTABLE_PROT_NORMAL_NC;
+> +	kvm_pte_t attr;
+>  	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
+>  
+> +	if (device)
+> +		attr = KVM_S2_MEMATTR(pgt, DEVICE_nGnRE);
+> +	else if (normal_nc)
+> +		attr = KVM_S2_MEMATTR(pgt, NORMAL_NC);
+> +	else
+> +		attr = KVM_S2_MEMATTR(pgt, NORMAL);
 
-Thanks for respinning, James. This looks really good now.
+As Will said, maybe a WARN_ON_ONCE(device && normal_nc). It would fall
+back to device which I think is fine.
 
-Applied to will (for-next/perf), thanks!
-
-[01/11] arm: perf: Remove inlines from arm_pmuv3.c
-        https://git.kernel.org/will/c/9343c790e6de
-[02/11] arm: perf/kvm: Use GENMASK for ARMV8_PMU_PMCR_N
-        https://git.kernel.org/will/c/62e1f212e5fe
-[03/11] arm: perf: Use GENMASK for PMMIR fields
-        https://git.kernel.org/will/c/2f6a00f30600
-[04/11] arm: perf: Convert remaining fields to use GENMASK
-        https://git.kernel.org/will/c/d30f09b6d7de
-[05/11] arm64: perf: Include threshold control fields in PMEVTYPER mask
-        https://git.kernel.org/will/c/3115ee021bfb
-[06/11] arm: pmu: Share user ABI format mechanism with SPE
-        https://git.kernel.org/will/c/f6da86969a3c
-[07/11] perf/arm_dmc620: Remove duplicate format attribute #defines
-        https://git.kernel.org/will/c/a5f4ca68f348
-[08/11] KVM: selftests: aarch64: Update tools copy of arm_pmuv3.h
-        https://git.kernel.org/will/c/c7b98bf0fc79
-[09/11] arm: pmu: Move error message and -EOPNOTSUPP to individual PMUs
-        https://git.kernel.org/will/c/186c91aaf549
-[10/11] arm64: perf: Add support for event counting threshold
-        https://git.kernel.org/will/c/816c26754447
-[11/11] Documentation: arm64: Document the PMU event counting threshold feature
-        https://git.kernel.org/will/c/bd690638e2c2
-
-Cheers,
--- 
-Will
-
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
