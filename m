@@ -1,104 +1,88 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46BCA15AF5
-	for <kvmarm@lists.linux.dev>; Tue, 12 Dec 2023 07:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15BD115AF5
+	for <kvmarm@lists.linux.dev>; Tue, 12 Dec 2023 07:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Uhzgb9Js"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qJEWx6Sv"
+Date: Tue, 12 Dec 2023 07:07:03 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1702364746;
+	t=1702364828;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ohnF1W++KcAoa0lsuGqvKhsZ8LjbSkh3DKZwGQ3ANzo=;
-	b=Uhzgb9JsR6oug72Fv2zMFxTJ7ZFgHBsKUxvLPdIBwgg43aj11oiYPIvoVXqMFjdYnreA0c
-	l6Z7kSuNxvplQGWQ7b3GjD9qtLDySZFBscxF3y+hglMHqfUwIeqE92wq36tI+OvgfuHicc
-	OP4eSUxW0nWEGianxk5jAhH+wz/IRuk=
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q6Z44FDt8R0+dMpUCBszFPBqGtxSLmgo/e5SgiCoAWE=;
+	b=qJEWx6Svn1TLMl93UN8HpWOwT9dNiYGbVb7BmhNJaYDipXXc60AYPXwXpBqLOuEGLlbFh1
+	im9f3qo/p+rUM8wTyqZlxv5TA5hGU7h51Z2s8VZ1FkLE1ws0OjdVftzeDwNudlPWBVesQn
+	HrxgnU4zh0E9CZa4Tev41qS/g5oB9oI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	broonie@kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH] KVM: selftests: Ensure sysreg-defs.h is generated at the expected path
-Date: Tue, 12 Dec 2023 07:04:32 +0000
-Message-ID: <20231212070431.145544-2-oliver.upton@linux.dev>
+To: Namhyung Kim <namhyung@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>, linux-perf-users@vger.kernel.org,
+	kvmarm@lists.linux.dev, Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Marc Zyngier <maz@kernel.org>, torvalds@linux-foundation.org
+Subject: Re: [PATCH 2/2] perf build: Ensure sysreg-defs Makefile respects
+ output dir
+Message-ID: <ZXgGlxh1iNX52pLU@linux.dev>
+References: <20231121192956.919380-1-oliver.upton@linux.dev>
+ <20231121192956.919380-3-oliver.upton@linux.dev>
+ <c701bf6b-0ff0-44a0-9d1d-84e8515d077c@sirena.org.uk>
+ <ZWui3KxloT5tcIsJ@thinky-boi>
+ <80ff02a5-8355-437d-b844-3de9fe182518@sirena.org.uk>
+ <bec12895-38d0-46d3-8031-53c55f88f3a7@sirena.org.uk>
+ <CAM9d7cirVU1sGPKT9SfmjPpFKJ2PiZ-Md52bWB=Ormbkiwvgkw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM9d7cirVU1sGPKT9SfmjPpFKJ2PiZ-Md52bWB=Ormbkiwvgkw@mail.gmail.com>
 X-Migadu-Flow: FLOW_OUT
 
-Building the KVM selftests from the main selftests Makefile (as opposed
-to the kvm subdirectory) doesn't work as OUTPUT is set, forcing the
-generated header to spill into the selftests directory. Additionally,
-relative paths do not work when building outside of the srctree, as the
-canonical selftests path is replaced with 'kselftest' in the output.
+On Mon, Dec 11, 2023 at 02:47:48PM -0800, Namhyung Kim wrote:
+> Hello Oliver,
+> 
+> On Mon, Dec 11, 2023 at 5:19 AM Mark Brown <broonie@kernel.org> wrote:
+> >
+> > On Wed, Dec 06, 2023 at 01:45:56PM +0000, Mark Brown wrote:
+> > > On Sat, Dec 02, 2023 at 01:34:20PM -0800, Oliver Upton wrote:
+> > > > Thanks for the bug report. Apologies for the latency on my end, I've had
+> > > > a mountain of non-upstream stuff to wade through.
+> > > > On Wed, Nov 29, 2023 at 04:27:01PM +0000, Mark Brown wrote:
+> >
+> > > > > This breaks some build configurations:
+> >
+> > > > > make[5]: Entering directory '/home/broonie/git/bisect/tools/arch/arm64/tools'
+> > > > > /home/broonie/git/bisect/tools/scripts/Makefile.include:4: *** O=../../../../tools does not exist.  Stop.
+> >
+> > > > Looks like its because $(PWD) is tools/testing/selftests/ when building
+> > > > from the top level makefile. I'll get a fix out in the next couple days
+> > > > after I find my Make dunce cap :)
+> >
+> > > This issue is now in Linus' tree.
+> >
+> > Any news on this, the problem remains in -rc5?
+> 
+> Have you found some time to work on it?
 
-Work around both of these issues by explicitly overriding OUTPUT on the
-submake cmdline. Move the whole fragment below the point lib.mk gets
-included such that $(abs_objdir) is available.
+Thanks for the double-nudge, just sent the fix out. I'll take it
+through the kvmarm tree as it only affects KVM selftests at this point.
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- tools/testing/selftests/kvm/Makefile | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
+https://lore.kernel.org/kvmarm/20231212070431.145544-2-oliver.upton@linux.dev/
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 52c59bad7213..5f4f6be7a866 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -17,16 +17,6 @@ else
- 	ARCH_DIR := $(ARCH)
- endif
- 
--ifeq ($(ARCH),arm64)
--tools_dir := $(top_srcdir)/tools
--arm64_tools_dir := $(tools_dir)/arch/arm64/tools/
--GEN_HDRS := $(top_srcdir)/tools/arch/arm64/include/generated/
--CFLAGS += -I$(GEN_HDRS)
--
--$(GEN_HDRS): $(wildcard $(arm64_tools_dir)/*)
--	$(MAKE) -C $(arm64_tools_dir) O=$(tools_dir)
--endif
--
- LIBKVM += lib/assert.c
- LIBKVM += lib/elf.c
- LIBKVM += lib/guest_modes.c
-@@ -234,6 +224,22 @@ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
- ifeq ($(ARCH),s390)
- 	CFLAGS += -march=z10
- endif
-+ifeq ($(ARCH),arm64)
-+tools_dir := $(top_srcdir)/tools
-+arm64_tools_dir := $(tools_dir)/arch/arm64/tools/
-+
-+ifneq ($(abs_objdir),)
-+arm64_hdr_outdir := $(abs_objdir)/tools/
-+else
-+arm64_hdr_outdir := $(tools_dir)/
-+endif
-+
-+GEN_HDRS := $(arm64_hdr_outdir)arch/arm64/include/generated/
-+CFLAGS += -I$(GEN_HDRS)
-+
-+$(GEN_HDRS): $(wildcard $(arm64_tools_dir)/*)
-+	$(MAKE) -C $(arm64_tools_dir) OUTPUT=$(arm64_hdr_outdir)
-+endif
- 
- no-pie-option := $(call try-run, echo 'int main(void) { return 0; }' | \
-         $(CC) -Werror $(CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
-
-base-commit: 33cc938e65a98f1d29d0a18403dbbee050dcad9a
 -- 
-2.43.0.472.g3155946c3a-goog
-
+Thanks,
+Oliver
