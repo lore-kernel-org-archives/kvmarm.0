@@ -1,37 +1,62 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B51B47A221
-	for <kvmarm@lists.linux.dev>; Tue, 12 Dec 2023 17:05:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DAF37B3D9;
+	Tue, 12 Dec 2023 17:21:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wrADt0vC"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1702400735;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ul4QCMX3zRBmaeSj7e153y54BDj6LkmaO6zi6VJEA/Y=;
-	b=wrADt0vCWwcTpDluna3v9HiYIbV3KF9L5lBfyDpqZaNKbvuxsMPwGk2GQ+JttAvvY4Z6D1
-	S8TVJiZtIlvXp2keeHri4Jon4KZ9ZsAfo76GwI4ImjSLUHK/e0WaNYS4nV0yt2XClJuFaQ
-	lihnqacr/GFsrY8zYeb0MbWzOGJ0pao=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Oliver Upton <oliver.upton@linux.dev>,
-	kvmarm@lists.linux.dev
-Cc: broonie@kernel.org,
-	Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="quWq7NFA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 955A4C433C9;
+	Tue, 12 Dec 2023 17:21:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702401677;
+	bh=NjEv9qEr/oYVM+wHeeNDWCRv65KfnIhhpX8bgvPrnAA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=quWq7NFAtXTBXufHjGAQPZuAXrlWxIJ4Rn3ITaI13bZesQeatjNFR7raywE3BfBn7
+	 Pitan+DMqBcCL58QZwCgz3Lh/6jidDw46o+sSHdw2XNETPNFha4R9ntZwxgldpxfvd
+	 ThUunTfPwVTXTNhOAsJ9W9/N6z4PG1M3beyPew54n2U5AZrjlyDMmXs2L7Toa+G5kj
+	 jyTED6ks2sSuPvCG+6dEMiYHKakPG+EvMGSSnpSABMjq1R1ugTLDeB0n3JnFi9LuSS
+	 cUuBfE0LIKezRTEQ8AUTFsdnAhfeVJygPdgHWAaZ27aCb30nqIqsyQPesJMXA3vzFc
+	 vN+/g3oSMdIBg==
+From: Will Deacon <will@kernel.org>
+To: anshuman.khandual@arm.com,
+	mark.rutland@arm.com,
+	linux-arm-kernel@lists.infradead.org,
+	James Clark <james.clark@arm.com>,
+	suzuki.poulose@arm.com,
+	linux-perf-users@vger.kernel.org
+Cc: catalin.marinas@arm.com,
+	kernel-team@android.com,
+	Will Deacon <will@kernel.org>,
+	Zaid Al-Bassam <zalbassam@google.com>,
+	linux-kselftest@vger.kernel.org,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: Ensure sysreg-defs.h is generated at the expected path
-Date: Tue, 12 Dec 2023 17:05:02 +0000
-Message-ID: <170240034091.513070.15669155471561151239.b4-ty@linux.dev>
-In-Reply-To: <20231212070431.145544-2-oliver.upton@linux.dev>
-References: <20231212070431.145544-2-oliver.upton@linux.dev>
+	namhyung@gmail.com,
+	Jonathan Corbet <corbet@lwn.net>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Shuah Khan <shuah@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	kvmarm@lists.linux.dev,
+	linux-doc@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Ian Rogers <irogers@google.com>,
+	linux-kernel@vger.kernel.org,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	kvm@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>
+Subject: Re: [PATCH v7 00/11] arm64: perf: Add support for event counting threshold
+Date: Tue, 12 Dec 2023 17:20:53 +0000
+Message-Id: <170237438420.1648654.4727808470285684911.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20231211161331.1277825-1-james.clark@arm.com>
+References: <20231211161331.1277825-1-james.clark@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -40,27 +65,50 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-On Tue, 12 Dec 2023 07:04:32 +0000, Oliver Upton wrote:
-> Building the KVM selftests from the main selftests Makefile (as opposed
-> to the kvm subdirectory) doesn't work as OUTPUT is set, forcing the
-> generated header to spill into the selftests directory. Additionally,
-> relative paths do not work when building outside of the srctree, as the
-> canonical selftests path is replaced with 'kselftest' in the output.
+On Mon, 11 Dec 2023 16:13:12 +0000, James Clark wrote:
+> Changes since v6:
 > 
-> Work around both of these issues by explicitly overriding OUTPUT on the
-> submake cmdline. Move the whole fragment below the point lib.mk gets
-> included such that $(abs_objdir) is available.
+>   * Remove inlines from arm_pmuv3.c
+>   * Use format attribute mechanism from SPE
+>   * Re-arrange attributes so that threshold comes last and can
+>     potentially be extended
+>   * Emit an error if the max threshold is exceeded rather than clamping
+>   * Convert all register fields to GENMASK
 > 
 > [...]
 
-Thanks folks for the quick review / testing. I'll get this out ASAP, the
-VGIC RD changes from Marc need to go in for 6.7 anyway.
+Thanks for respinning, James. This looks really good now.
 
-[1/1] KVM: selftests: Ensure sysreg-defs.h is generated at the expected path
-      https://git.kernel.org/kvmarm/kvmarm/c/0c12e6c8267f
+Applied to will (for-next/perf), thanks!
 
---
-Best,
-Oliver
+[01/11] arm: perf: Remove inlines from arm_pmuv3.c
+        https://git.kernel.org/will/c/9343c790e6de
+[02/11] arm: perf/kvm: Use GENMASK for ARMV8_PMU_PMCR_N
+        https://git.kernel.org/will/c/62e1f212e5fe
+[03/11] arm: perf: Use GENMASK for PMMIR fields
+        https://git.kernel.org/will/c/2f6a00f30600
+[04/11] arm: perf: Convert remaining fields to use GENMASK
+        https://git.kernel.org/will/c/d30f09b6d7de
+[05/11] arm64: perf: Include threshold control fields in PMEVTYPER mask
+        https://git.kernel.org/will/c/3115ee021bfb
+[06/11] arm: pmu: Share user ABI format mechanism with SPE
+        https://git.kernel.org/will/c/f6da86969a3c
+[07/11] perf/arm_dmc620: Remove duplicate format attribute #defines
+        https://git.kernel.org/will/c/a5f4ca68f348
+[08/11] KVM: selftests: aarch64: Update tools copy of arm_pmuv3.h
+        https://git.kernel.org/will/c/c7b98bf0fc79
+[09/11] arm: pmu: Move error message and -EOPNOTSUPP to individual PMUs
+        https://git.kernel.org/will/c/186c91aaf549
+[10/11] arm64: perf: Add support for event counting threshold
+        https://git.kernel.org/will/c/816c26754447
+[11/11] Documentation: arm64: Document the PMU event counting threshold feature
+        https://git.kernel.org/will/c/bd690638e2c2
+
+Cheers,
+-- 
+Will
+
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
