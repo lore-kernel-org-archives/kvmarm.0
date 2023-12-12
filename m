@@ -1,150 +1,145 @@
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ABE917989
-	for <kvmarm@lists.linux.dev>; Tue, 12 Dec 2023 08:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FDBD54662
+	for <kvmarm@lists.linux.dev>; Tue, 12 Dec 2023 09:19:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ITCrqBsJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1702371056; x=1733907056;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:content-transfer-encoding:mime-version:subject;
-  bh=kbYhK6bcNLvWaLADIREECSkT5n5R6xh4aWNtaq66HUw=;
-  b=ITCrqBsJOIWxjJNAtFPASVzbKKGtGSU2r5O63HPJBsOcQq5Wov+VUdUi
-   kPzWkci2+HeV2lFojjMCq527I6ul226G4Upmx0OMBpt3ADt9Prj6MmC72
-   8sTbCPTXLN2rxaWvjzSbDWgyCAIHWur7n8larmFb4wxvorpTpmQHlzYMj
-   0=;
-X-IronPort-AV: E=Sophos;i="6.04,269,1695686400"; 
-   d="scan'208";a="258431658"
-Subject: Re: [PATCH v2 1/2] KVM: Use syscore_ops instead of reboot_notifier to hook
- restart/shutdown
-Thread-Topic: [PATCH v2 1/2] KVM: Use syscore_ops instead of reboot_notifier to hook
- restart/shutdown
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-96feee09.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 08:50:52 +0000
-Received: from smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-	by email-inbound-relay-iad-1a-m6i4x-96feee09.us-east-1.amazon.com (Postfix) with ESMTPS id 3BEDC497EE;
-	Tue, 12 Dec 2023 08:50:47 +0000 (UTC)
-Received: from EX19MTAEUA002.ant.amazon.com [10.0.10.100:27324]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.22.100:2525] with esmtp (Farcaster)
- id fe0bb469-decf-4e0f-878d-e52a4e884b55; Tue, 12 Dec 2023 08:50:46 +0000 (UTC)
-X-Farcaster-Flow-ID: fe0bb469-decf-4e0f-878d-e52a4e884b55
-Received: from EX19D012EUC003.ant.amazon.com (10.252.51.208) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 12 Dec 2023 08:50:40 +0000
-Received: from EX19D014EUC004.ant.amazon.com (10.252.51.182) by
- EX19D012EUC003.ant.amazon.com (10.252.51.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 12 Dec 2023 08:50:40 +0000
-Received: from EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41]) by
- EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41%3]) with mapi id
- 15.02.1118.040; Tue, 12 Dec 2023 08:50:40 +0000
-From: "Gowans, James" <jgowans@amazon.com>
-To: "Graf (AWS), Alexander" <graf@amazon.de>, "seanjc@google.com"
-	<seanjc@google.com>, "ebiederm@xmission.com" <ebiederm@xmission.com>,
-	=?utf-8?B?U2Now7ZuaGVyciwgSmFuIEgu?= <jschoenh@amazon.de>
-CC: "yuzenghui@huawei.com" <yuzenghui@huawei.com>, "kexec@lists.infradead.org"
-	<kexec@lists.infradead.org>, "kvm-riscv@lists.infradead.org"
-	<kvm-riscv@lists.infradead.org>, "james.morse@arm.com" <james.morse@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "suzuki.poulose@arm.com"
-	<suzuki.poulose@arm.com>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
-	"atishp@atishpatra.org" <atishp@atishpatra.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"maz@kernel.org" <maz@kernel.org>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
-	"anup@brainfault.org" <anup@brainfault.org>
-Thread-Index: AQHaKm9F6TfLvhzSVEeLxKjiUjwNTrCgjTCAgAFn6T+AAcSbgIAAKp8AgADgykyAAJaPgA==
-Date: Tue, 12 Dec 2023 08:50:40 +0000
-Message-ID: <cf9e15bf3da411ada1c5b2bbdbfdea836029a5e1.camel@amazon.com>
-References: <20230512233127.804012-1-seanjc@google.com>
-	 <20230512233127.804012-2-seanjc@google.com>
-	 <cfed942fc767fa7b2fabc68a3357a7b95bd6a589.camel@amazon.com>
-	 <871qbud5f9.fsf@email.froward.int.ebiederm.org>
-	 <a02b40d3d9ae5b3037b9a9d5921cfb0144ab5610.camel@amazon.com>
-	 <7e30cfc2359dfef39d038e3734f7e5e3d9e82d68.camel@amazon.com>
-	 <87wmtk9u46.fsf@email.froward.int.ebiederm.org>
-In-Reply-To: <87wmtk9u46.fsf@email.froward.int.ebiederm.org>
-Accept-Language: en-ZA, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <76D26AF16DA5D4499D562F4A2CD6FDBF@amazon.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Kq9A51q9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1702372750; x=1733908750;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=r1px4BsQs/X7Xgfx+BYJsYmJ0wM7HnTCh77HJxhuwZg=;
+  b=Kq9A51q9SyoffKynEIkyZdQK5BnPL/L/qaxH80gLkSO3Q5CcdT4PweX5
+   vmrs6uPxhvn0J7Lc/OiUbnyXpszN8nQsRCebgWZ3Vr/rLy2qCcHvwPJCo
+   1g0J0uycHJYOhZy6P3wyJooNJRQ5OQ7RIwK8x490PFJ28yxGjcuSWNgqJ
+   x2nw6KAPqt0kGCBQonM1wQVMTyGiS6inGxH9nIVwO4V/SfC35t/LVX7dQ
+   2DjibEZg90pnoKY4NVUO+sz6UrKSQOd8jCGaVz6nI2PAvDlA8pTK4DdYa
+   Ruzr8zgNrtujr5uswJPFzuxacSe8VYBWUbhB1FbJA+vDm9HJ101Jhawdm
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="480974129"
+X-IronPort-AV: E=Sophos;i="6.04,269,1695711600"; 
+   d="scan'208";a="480974129"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 01:19:08 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10921"; a="917212797"
+X-IronPort-AV: E=Sophos;i="6.04,269,1695711600"; 
+   d="scan'208";a="917212797"
+Received: from haibo-optiplex-7090.sh.intel.com ([10.239.159.132])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2023 01:19:00 -0800
+From: Haibo Xu <haibo1.xu@intel.com>
+To: 
+Cc: xiaobo55x@gmail.com,
+	haibo1.xu@intel.com,
+	ajones@ventanamicro.com,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Guo Ren <guoren@kernel.org>,
+	Mayuresh Chitale <mchitale@ventanamicro.com>,
+	wchen <waylingii@gmail.com>,
+	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Peter Xu <peterx@redhat.com>,
+	Like Xu <likexu@tencent.com>,
+	Vipin Sharma <vipinsh@google.com>,
+	Aaron Lewis <aaronlewis@google.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org
+Subject: [PATCH v4 00/11] RISCV: Add kvm Sstc timer selftests
+Date: Tue, 12 Dec 2023 17:31:09 +0800
+Message-Id: <cover.1702371136.git.haibo1.xu@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-T24gTW9uLCAyMDIzLTEyLTExIGF0IDE3OjUwIC0wNjAwLCBFcmljIFcuIEJpZWRlcm1hbiB3cm90
-ZToNCj4gIkdvd2FucywgSmFtZXMiIDxqZ293YW5zQGFtYXpvbi5jb20+IHdyaXRlczoNCj4gDQo+
-ID4gT24gTW9uLCAyMDIzLTEyLTExIGF0IDA5OjU0ICswMjAwLCBKYW1lcyBHb3dhbnMgd3JvdGU6
-DQo+ID4gPiA+IA0KPiA+ID4gPiBXaGF0IHByb2JsZW0gYXJlIHlvdSBydW5uaW5nIGludG8gd2l0
-aCB5b3VyIHJlYmFzZSB0aGF0IHdvcmtlZCB3aXRoDQo+ID4gPiA+IHJlYm9vdCBub3RpZmllcnMg
-dGhhdCBpcyBub3Qgd29ya2luZyB3aXRoIHN5c2NvcmVfc2h1dGRvd24/DQo+ID4gPiANCj4gPiA+
-IFByaW9yIHRvIHRoaXMgY29tbWl0IFsxXSB3aGljaCBjaGFuZ2VkIEtWTSBmcm9tIHJlYm9vdCBu
-b3RpZmllcnMgdG8NCj4gPiA+IHN5c2NvcmVfb3BzLCBLVk0ncyByZWJvb3Qgbm90aWZpZXIgc2h1
-dGRvd24gY2FsbGJhY2sgd2FzIGludm9rZWQgb24NCj4gPiA+IGtleGVjIHZpYSBrZXJuZWxfcmVz
-dGFydF9wcmVwYXJlLg0KPiA+ID4gDQo+ID4gPiBBZnRlciB0aGlzIGNvbW1pdCwgS1ZNIGlzIG5v
-dCBiZWluZyBzaHV0IGRvd24gYmVjYXVzZSBjdXJyZW50bHkgdGhlDQo+ID4gPiBrZXhlYyBmbG93
-IGRvZXMgbm90IGNhbGwgc3lzY29yZV9zaHV0ZG93bi4NCj4gPiANCj4gPiBJIHRoaW5rIEkgbWlz
-c2VkIHdoYXQgeW91J3JlIGFza2luZyBoZXJlOyB5b3UncmUgYXNraW5nIGZvciBhIHJlcHJvZHVj
-ZXINCj4gPiBmb3IgdGhlIHNwZWNpZmljIGZhaWx1cmU/DQo+ID4gDQo+ID4gMS4gTGF1bmNoIGEg
-UUVNVSBWTSB3aXRoIC1lbmFibGUta3ZtIGZsYWcNCj4gPiANCj4gPiAyLiBEbyBhbiBpbW1lZGlh
-dGUgKC1mIGZsYWcpIGtleGVjOg0KPiA+IGtleGVjIC1mIC0tcmV1c2UtY21kbGluZSAuL2J6SW1h
-Z2UNCj4gPiANCj4gPiBTb21ld2hlcmUgYWZ0ZXIgZG9pbmcgdGhlIFJFVCB0byBuZXcga2VybmVs
-IGluIHRoZSByZWxvY2F0ZV9rZXJuZWwgYXNtDQo+ID4gZnVuY3Rpb24gdGhlIG5ldyBrZXJuZWwg
-c3RhcnRzIHRyaXBsZSBmYXVsdGluZzsgSSBjYW4ndCBleGFjdGx5IGZpZ3VyZQ0KPiA+IG91dCB3
-aGVyZSBidXQgSSB0aGluayBpdCBoYXMgdG8gZG8gd2l0aCB0aGUgbmV3IGtlcm5lbCB0cnlpbmcg
-dG8gbW9kaWZ5DQo+ID4gQ1IzIHdoaWxlIHRoZSBWTVhFIGJpdCBpcyBzdGlsbCBzZXQgaW4gQ1I0
-IGNhdXNpbmcgdGhlIHRyaXBsZSBmYXVsdC4NCj4gPiANCj4gPiBJZiBLVk0gaGFzIGJlZW4gc2h1
-dCBkb3duIHZpYSB0aGUgc2h1dGRvd24gY2FsbGJhY2ssIG9yIGFsdGVybmF0aXZlbHkgaWYNCj4g
-PiB0aGUgUUVNVSBwcm9jZXNzIGhhcyBhY3R1YWxseSBiZWVuIGtpbGxlZCBmaXJzdCAoYnkgbm90
-IGRvaW5nIGEgLWYgZXhlYykNCj4gPiB0aGVuIHRoZSBWTVhFIGJpdCBpcyBjbGVhciBhbmQgdGhl
-IGtleGVjIGdvZXMgc21vb3RobHkuDQo+ID4gDQo+ID4gU28sIFRMO0RSOiBrZXhlYyAtZiB1c2Ug
-dG8gd29yayB3aXRoIGEgS1ZNIFZNIGFjdGl2ZSwgbm93IGl0IGdvZXMgaW50byBhDQo+ID4gdHJp
-cGxlIGZhdWx0IGNyYXNoLg0KPiANCj4gWW91IG1lbnRpb25lZCBJIHJlYmFzZSBzbyBJIHRob3Vn
-aHQgeW91ciB3ZXJlIGJhY2twb3J0aW5nIGtlcm5lbCBwYXRjaGVzLg0KPiBCeSByZWJhc2UgZG8g
-eW91IG1lYW4geW91IHBvcnRpbmcgeW91ciB1c2Vyc3BhY2UgdG8gYSBuZXdlciBrZXJuZWw/DQoN
-CkkndmUgYmVlbiB3b3JraW5nIG9uIHNvbWUgcGF0Y2hlcyBhbmQgd2hlbiBJIHJlYmFzZWQgbXkg
-d29yay1pbi1wcm9ncmVzcw0KcGF0Y2hlcyB0byBsYXRlc3QgbWFzdGVyIHRoZW4ga2V4ZWMgc3Rv
-cHBlZCB3b3JraW5nIHdoZW4gS1ZNIFZNcyBleGlzdC4NCk9yaWdpbmFsbHkgdGhlIFdJUCBwYXRj
-aGVzIHdlcmUgYmFzZWQgb24gYW4gb2xkZXIgc3RhYmxlIHZlcnNpb24uDQoNCj4gDQo+IEluIGFu
-eSBldmVudCBJIGJlbGlldmUgdGhlIGJ1ZyB3aXRoIHJlc3BlY3QgdG8ga2V4ZWMgd2FzIGludHJv
-ZHVjZWQgaW4NCj4gY29tbWl0IDZmMzg5YThmMWRkMiAoIlBNIC8gcmVib290OiBjYWxsIHN5c2Nv
-cmVfc2h1dGRvd24oKSBhZnRlcg0KPiBkaXNhYmxlX25vbmJvb3RfY3B1cygpIikuICBUaGF0IGlz
-IHdoZXJlIHN5c2NvcmVfc2h1dGRvd24gd2FzIHJlbW92ZWQNCj4gZnJvbSBrZXJuZWxfcmVzdGFy
-dF9wcmVwYXJlKCkuDQo+IA0KPiBBdCB0aGlzIHBvaW50IGl0IGxvb2tzIGxpa2Ugc29tZW9uZSBq
-dXN0IG5lZWRzIHRvIGFkZCB0aGUgbWlzc2luZw0KPiBzeXNjb3JlX3NodXRkb3duIGNhbGwgaW50
-byBrZXJuZWxfa2V4ZWMoKSByaWdodCBhZnRlcg0KPiBtaWdyYXRlX3RvX3JlYm9vdF9jcHUoKSBp
-cyBjYWxsZWQuDQoNClNlZW1zIGdvb2QgYW5kIEknbSBoYXBweSB0byBkbyB0aGF0OyBvbmUgdGhp
-bmcgd2UgbmVlZCB0byBjaGVjayBmaXJzdDoNCmFyZSBhbGwgQ1BVcyBvbmxpbmUgYXQgdGhhdCBw
-b2ludD8gVGhlIGNvbW1pdCBtZXNzYWdlIGZvcg0KNmYzODlhOGYxZGQyICgiUE0gLyByZWJvb3Q6
-IGNhbGwgc3lzY29yZV9zaHV0ZG93bigpIGFmdGVyIGRpc2FibGVfbm9uYm9vdF9jcHVzKCkiKQ0K
-c3BlYWtzIGFib3V0OiAib25lIENQVSBvbi1saW5lIGFuZCBpbnRlcnJ1cHRzIGRpc2FibGVkIiB3
-aGVuDQpzeXNjb3JlX3NodXRkb3duIGlzIGNhbGxlZC4gS1ZNJ3Mgc3lzY29yZSBzaHV0ZG93biBo
-b29rIGRvZXM6DQoNCm9uX2VhY2hfY3B1KGhhcmR3YXJlX2Rpc2FibGVfbm9sb2NrLCBOVUxMLCAx
-KTsNCg0KLi4uIHNvIHRoYXQgc21lbGxzIHRvIG1lIGxpa2UgaXQgd2FudHMgYWxsIHRoZSBDUFVz
-IHRvIGJlIG9ubGluZSBhdA0Ka3ZtX3NodXRkb3duIHBvaW50Lg0KDQpJdCdzIG5vdCBjbGVhciB0
-byBtZToNCg0KMS4gRG9lcyBoYXJkd2FyZV9kaXNhYmxlX25vbG9jayBhY3R1YWxseSBuZWVkIHRv
-IGJlIGRvbmUgb24gKmV2ZXJ5KiBDUFUNCm9yIHdvdWxkIHRoZSBvZmZsaW5lZCBvbmVzIGJlIGZp
-bmUgdG8gaWdub3JlIGJlY2F1c2UgdGhleSB3aWxsIGJlIHJlc2V0DQphbmQgdGhlIFZNWEUgYml0
-IHdpbGwgYmUgY2xlYXJlZCB0aGF0IHdheT8gV2l0aCBjb29wZXJhdGl2ZSBDUFUgaGFuZG92ZXIN
-CndlIHByb2JhYmx5IGRvIGluZGVlZCB3YW50IHRvIGRvIHRoaXMgb24gZXZlcnkgQ1BVIGFuZCBu
-b3QgZGVwZW5kIG9uDQpyZXNldHRpbmcuDQoNCjIuIEFyZSBDUFVzIGFjdHVhbGx5IG9mZmxpbmUg
-YXQgdGhpcyBwb2ludD8gV2hlbiB0aGF0IGNvbW1pdCB3YXMNCmF1dGhvcmVkIHRoZXJlIHVzZWQg
-dG8gYmUgYSBjYWxsIHRvIGhhcmR3YXJlX2Rpc2FibGVfbm9sb2NrKCkgYnV0IHRoYXQncw0Kbm90
-IHRoZXJlIGFueW1vcmUuDQoNCj4gDQo+IFRoYXQgc2FpZCBJIGFtIG5vdCBzZWVpbmcgdGhlIHJl
-Ym9vdCBub3RpZmllcnMgYmVpbmcgY2FsbGVkIG9uIHRoZSBrZXhlYw0KPiBwYXRoIGVpdGhlciBz
-byB5b3VyIGlzc3VlIHdpdGgga3ZtIG1pZ2h0IGJlIGRlZXBlci4NCg0KUHJldmlvdXNseSBpdCB3
-YXMgY2FsbGVkIHZpYToNCg0Ka2VybmVsX2tleGVjDQogIGtlcm5lbF9yZXN0YXJ0X3ByZXBhcmUN
-CiAgICBibG9ja2luZ19ub3RpZmllcl9jYWxsX2NoYWluKCZyZWJvb3Rfbm90aWZpZXJfbGlzdCwg
-U1lTX1JFU1RBUlQsIGNtZCk7DQogICAgICBrdm1fc2h1dGRvd24NCg0KSkcNCg==
+The RISC-V arch_timer selftests is used to validate Sstc timer
+functionality in a guest, which sets up periodic timer interrupts
+and check the basic interrupt status upon its receipt.
+
+This KVM selftests was ported from aarch64 arch_timer and tested
+with Linux v6.7-rc4 on a Qemu riscv64 virt machine.
+
+---
+Changed since v4:
+  * Rebased to Linux 6.7-rc4
+  * Included Paolo's patch(01/11) to fix issues with SPLIT_TESTS
+  * Droped the patch(KVM: selftests: Unify the makefile rule for split targets) 
+    since Paolo's patch had included the fix
+  * Added new patch(05/11) to include header file vdso/processor.h from linux
+    source tree to leverage the cpu_relax() definition - Conor/Andrew
+  * Added new patch(11/11) to enable user configuration of timer error margin
+    parameter which alleviate the intermitent failure in stress test - Andrew
+  * Other minor fixes per Andrew's comments
+
+Haibo Xu (10):
+  KVM: arm64: selftests: Split arch_timer test code
+  KVM: selftests: Add CONFIG_64BIT definition for the build
+  tools: riscv: Add header file csr.h
+  tools: riscv: Add header file vdso/processor.h
+  KVM: riscv: selftests: Switch to use macro from csr.h
+  KVM: riscv: selftests: Add exception handling support
+  KVM: riscv: selftests: Add guest helper to get vcpu id
+  KVM: riscv: selftests: Change vcpu_has_ext to a common function
+  KVM: riscv: selftests: Add sstc timer test
+  KVM: selftests: Enable tunning of err_margin_us in arch timer test
+
+Paolo Bonzini (1):
+  selftests/kvm: Fix issues with $(SPLIT_TESTS)
+
+ tools/arch/riscv/include/asm/csr.h            | 521 ++++++++++++++++++
+ tools/arch/riscv/include/asm/vdso/processor.h |  32 ++
+ tools/testing/selftests/kvm/Makefile          |  27 +-
+ .../selftests/kvm/aarch64/arch_timer.c        | 295 +---------
+ tools/testing/selftests/kvm/arch_timer.c      | 259 +++++++++
+ .../selftests/kvm/include/aarch64/processor.h |   4 -
+ .../selftests/kvm/include/kvm_util_base.h     |   9 +
+ .../selftests/kvm/include/riscv/arch_timer.h  |  71 +++
+ .../selftests/kvm/include/riscv/processor.h   |  65 ++-
+ .../testing/selftests/kvm/include/test_util.h |   2 +
+ .../selftests/kvm/include/timer_test.h        |  45 ++
+ .../selftests/kvm/lib/riscv/handlers.S        | 101 ++++
+ .../selftests/kvm/lib/riscv/processor.c       |  87 +++
+ .../testing/selftests/kvm/riscv/arch_timer.c  | 111 ++++
+ .../selftests/kvm/riscv/get-reg-list.c        |  11 +-
+ 15 files changed, 1333 insertions(+), 307 deletions(-)
+ create mode 100644 tools/arch/riscv/include/asm/csr.h
+ create mode 100644 tools/arch/riscv/include/asm/vdso/processor.h
+ create mode 100644 tools/testing/selftests/kvm/arch_timer.c
+ create mode 100644 tools/testing/selftests/kvm/include/riscv/arch_timer.h
+ create mode 100644 tools/testing/selftests/kvm/include/timer_test.h
+ create mode 100644 tools/testing/selftests/kvm/lib/riscv/handlers.S
+ create mode 100644 tools/testing/selftests/kvm/riscv/arch_timer.c
+
+-- 
+2.34.1
+
