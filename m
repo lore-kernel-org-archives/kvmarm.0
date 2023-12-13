@@ -1,108 +1,122 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 706BFECE
-	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 02:22:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 213271844
+	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 02:45:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="daZu9QmO"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2869cdac540so3623363a91.0
-        for <kvmarm@lists.linux.dev>; Tue, 12 Dec 2023 18:22:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ox/nAT5R"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6ce7c1b07e1so5511673b3a.2
+        for <kvmarm@lists.linux.dev>; Tue, 12 Dec 2023 18:45:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702434122; x=1703038922; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=H3dbLwG3pwrVNc+flPqWL0ROEahdeYkxOItBObS2igQ=;
-        b=daZu9QmOMzQBgTf9EodVE8CRM8x8TwlfhIgKVetVzpil60Mh/xpkwD8lnj33VdY+Up
-         TYG7Dlcc7q6zQg0L+xVZINSyGOBURwFgDEA27uoSSJ8Ob5a5M1kkRmECfIhwiyqmaJmo
-         QN2Fy2Q7N7Te5L3QsSX65sotDjA81wzkqvXsZKzr8OKmYuMYGFqI04knICk8MKcDvGCh
-         1vTjvG9PBBvuNGJ8rM5YElTmDCZxQHWnkfsMcaXp9AwGxszoNr7ZyHiNOrM8QwQA7SRv
-         V3tWOD3CY5DFW5DOJ+UYnPPJ+G3+v1o+IUtKYy4FKzEZcRBYg+/SlZn5sbdPQzJCq262
-         m/Yw==
+        d=linaro.org; s=google; t=1702435509; x=1703040309; darn=lists.linux.dev;
+        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=CJ7qwCmvq20mGgi3dRymJGPN14h9pbhwL4VM2txPZCM=;
+        b=Ox/nAT5RTU8A/059hdQrT7Xufblts7BBiAxuMHU2DBXuhWFSB9HiPzRXZ1xSXtGkso
+         iMaAKc7Y32spkfVgzNL9/X45Y/iT67R6IpzUqWz4kOA+o0H7K1wtE+1xIB4zuXod6bPV
+         3y6db1LQlMupaW7+7mDG5Y7VP9V+MK/bTU/lE0fja9ZF6W2Zwy259eYwY1bklLXfQt4C
+         xXMimqTPa2kfIUpzmXC+7OSfJ7U1fX5McZBHpDOZMTH06JZxvl6jxf0rQphaZ7es+Knw
+         2yn3R/dzrtIHyOm06KnIPf8IaNNgbnKRdB1cSEO0fCqQTqo1aezCBXudviNP0fA9TPxa
+         F8Pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702434122; x=1703038922;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H3dbLwG3pwrVNc+flPqWL0ROEahdeYkxOItBObS2igQ=;
-        b=cZKUgkpdogb2Emv/8/BSUZk8PtquJD81kfyC87kTCCTWrGg2nBLWA3F1Pr3srG4PQO
-         FJlFlx0bDpab/9X3cDzBK6dAvpfKR3LMKI7zCrpQrzDb7Smwo3N15DxQdqziiLkc3KoR
-         zjFNQ21UMU/xRxhbktNakBs3xgjFMf+GcsuiW0JMX3ZsXYS7WoUBehLzdtvv8fv4Jqta
-         51A3XrvXAEBlf9VHcGTNvgEaqNBZaBbSKuPLGK7wLWxzXFEfbgg+yOt6bjMDs4qyRJ6j
-         kYbUvDLj8JfOVOx/4Wvo05Y/4DbDilbemda2zBk5434O/+J9K3u9pvLyKuWEr7RKL+SK
-         vihQ==
-X-Gm-Message-State: AOJu0YwPSX0J3/997qd7SLIz6AOIYaRgHxZTEbnJhPb9KmVU5h//N8M9
-	XQ13Hwcou0PW+BqFhy3q5OnvgQaEI80=
-X-Google-Smtp-Source: AGHT+IEMdNbXZWy9ISUMeWXjYiRzXRSqXuBEtLtB2quA6rPLGk41btEuk2vriof3H/B+MEphfzV6B3hdgbQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:41c9:b0:1d0:cd87:64dd with SMTP id
- u9-20020a17090341c900b001d0cd8764ddmr52067ple.3.1702434121579; Tue, 12 Dec
- 2023 18:22:01 -0800 (PST)
-Date: Tue, 12 Dec 2023 18:22:00 -0800
-In-Reply-To: <20231203140756.GI1489931@ziepe.ca>
+        d=1e100.net; s=20230601; t=1702435509; x=1703040309;
+        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CJ7qwCmvq20mGgi3dRymJGPN14h9pbhwL4VM2txPZCM=;
+        b=IlsNyg/L3GFm/Q+yWRmV/71+i7LiindfqvGNR7vwXEhcaNCiQb3XQBtZydDMRgAo75
+         IbRUS5i4zfGXw0G1me63mcD7CZ0rNhfd2z3nktzBz2rKi0D0s2OFF8dBFnCE0u51qbs7
+         105gTMMboEsYZRMqQ6LnT/tIf0wofUdrpqbh+St2ctN8GCuGc8/EJxl+h92uYGRN2DMv
+         LbVlBwLXR/tVkoprnVMlmESaSazHQOVULT5l6NQgmIKorvce2GlKc4cub8AzcXX4BrvJ
+         YMg2KTsqaD8p4ItBtc9sxgVdgsW1ng8s5odjSUAAljR6dePxgLhX3MF+7TTYk8k9d6zI
+         Ce7Q==
+X-Gm-Message-State: AOJu0YxGpHl8QO57OiR/ItNEA6SILZ+qKeZbefozdbNQNwVImlIGqS/x
+	4E85BUgTvfaibp4UKMJbl7VoaQ==
+X-Google-Smtp-Source: AGHT+IGi//6HE3KINOZpirefGAX+e3jIHwZFWzUp/AR1xA1scaFysKSWvBw9/QjFkCNOqGCFGdEidA==
+X-Received: by 2002:a05:6a00:c81:b0:6cb:a2f4:8579 with SMTP id a1-20020a056a000c8100b006cba2f48579mr8585102pfv.15.1702435509333;
+        Tue, 12 Dec 2023 18:45:09 -0800 (PST)
+Received: from localhost ([2804:14d:7e39:8470:cddd:ffc9:f19e:a4dc])
+        by smtp.gmail.com with ESMTPSA id y72-20020a62ce4b000000b006cb7bdbc3besm9528817pfg.17.2023.12.12.18.45.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Dec 2023 18:45:08 -0800 (PST)
+References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
+ <20231122-arm64-gcs-v7-37-201c483bd775@kernel.org>
+User-agent: mu4e 1.10.8; emacs 29.1
+From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
+ <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Morton
+ <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
+ <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
+ Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, Oleg
+ Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, Kees
+ Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, "Rick P.
+ Edgecombe" <rick.p.edgecombe@intel.com>, Deepak Gupta
+ <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, Szabolcs Nagy
+ <Szabolcs.Nagy@arm.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
+ <aou@eecs.berkeley.edu>, Florian Weimer <fweimer@redhat.com>, Christian
+ Brauner <brauner@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v7 37/39] kselftest/arm64: Add a GCS stress test
+In-reply-to: <20231122-arm64-gcs-v7-37-201c483bd775@kernel.org>
+Date: Tue, 12 Dec 2023 23:45:06 -0300
+Message-ID: <87zfyex1l9.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230916003118.2540661-1-seanjc@google.com> <20230916003118.2540661-6-seanjc@google.com>
- <20230918152110.GI13795@ziepe.ca> <ZQhxpesyXeG+qbS6@google.com>
- <20230918160258.GL13795@ziepe.ca> <ZWp_q1w01NCZi8KX@google.com> <20231203140756.GI1489931@ziepe.ca>
-Message-ID: <ZXkVSKULLivrMkBl@google.com>
-Subject: Re: [PATCH 05/26] vfio: KVM: Pass get/put helpers from KVM to VFIO,
- don't do circular lookup
-From: Sean Christopherson <seanjc@google.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Tony Krowiak <akrowiak@linux.ibm.com>, 
-	Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>, 
-	Harald Freudenberger <freude@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	Andy Lutomirski <luto@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	Anish Ghulati <aghulati@google.com>, Venkatesh Srinivas <venkateshs@chromium.org>, 
-	Andrew Thornton <andrewth@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Sun, Dec 03, 2023, Jason Gunthorpe wrote:
-> On Fri, Dec 01, 2023 at 04:51:55PM -0800, Sean Christopherson wrote:
-> 
-> > There's one more wrinkle: this patch is buggy in that it doesn't ensure the liveliness
-> > of KVM-the-module, i.e. nothing prevents userspace from unloading kvm.ko while VFIO
-> > still holds a reference to a kvm structure, and so invoking ->put_kvm() could jump
-> > into freed code.  To fix that, KVM would also need to pass along a module pointer :-(
-> 
-> Maybe we should be refcounting the struct file not the struct kvm?
-> 
-> Then we don't need special helpers and it keeps the module alive correctly.
 
-Huh.  It took my brain a while to catch up, but this seems comically obvious in
-hindsight.  I *love* this approach, both conceptually and from a code perspective.
+I'm going a bit out-of-order to report a build failure in a test:
 
-Handing VFIO (and any other external entities) a file makes it so that KVM effectively
-interacts with users via files, regardless of whether the user lives in userspace
-or the kernel.  That makes it easier to reason about the safety of operations,
-e.g. in addition to ensuring KVM-the-module is pinned, having a file pointer allows
-KVM to verify that the incoming pointer does indeed represent a VM.  Which isn't
-necessary by any means, but it's a nice sanity check.
+Mark Brown <broonie@kernel.org> writes:
 
-From a code perspective, it's far cleaner than manually grabbing module references,
-and having only a file pointers makes it a wee bit harder for non-KVM code to
-poke into KVM, e.g. keeps us honest.
+> +// Recurse x20 times
+> +.macro recurse id
 
-Assuming nothing blows up in testing, I'll go this route for v2.
+I get an assembler error here:
 
-Thanks!
+gcc -nostdlib gcs-stress-thread.S -o /home/thiago.bauermann/src/linux/tools/testing/selftests/arm64/gcs/gcs-stress-thread
+gcs-stress-thread.S: Assembler messages:
+gcs-stress-thread.S:236: Error: unexpected end of file in macro `recurse' definition
+make[2]: *** [Makefile:24: /home/thiago.bauermann/src/linux/tools/testing/selftests/arm64/gcs/gcs-stress-thread] Error 1
+
+This is with gas from Ubuntu 22.04, which ships binutils 2.38.
+
+> +function recurse\id
+> +	stp	x29, x30, [sp, #-16]!
+> +	mov	x29, sp
+> +
+> +	cmp	x20, 0
+> +	beq	1f
+> +	sub	x20, x20, 1
+> +	bl	recurse\id
+> +
+> +1:
+> +	ldp	x29, x30, [sp], #16
+> +
+> +	// Do a syscall immediately prior to returning to try to provoke
+> +	// scheduling and migration at a point where coherency issues
+> +	// might trigger.
+> +	mov	x8, #__NR_getpid
+> +	svc	#0
+> +
+> +	ret
+> +endfunction
+> +.endmacro
+> +
+> +// Generate and use two copies so we're changing the GCS contents
+> +recurse 1
+> +recurse 2
+
+-- 
+Thiago
