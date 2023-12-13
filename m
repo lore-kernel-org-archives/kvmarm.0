@@ -1,16 +1,16 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF05F9471
-	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 03:56:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF72CBA28
+	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 04:56:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D25A6C15;
-	Tue, 12 Dec 2023 19:56:47 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F41A9C15;
+	Tue, 12 Dec 2023 20:57:11 -0800 (PST)
 Received: from [10.162.41.8] (a077893.blr.arm.com [10.162.41.8])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EEADB3F5A1;
-	Tue, 12 Dec 2023 19:55:55 -0800 (PST)
-Message-ID: <b319f8ed-5848-4663-bc1b-7afe160bbcd3@arm.com>
-Date: Wed, 13 Dec 2023 09:25:52 +0530
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 905483F5A1;
+	Tue, 12 Dec 2023 20:56:19 -0800 (PST)
+Message-ID: <26ab1190-f437-477b-b09c-6522a1d3fe1d@arm.com>
+Date: Wed, 13 Dec 2023 10:26:16 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -18,9 +18,10 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V15 2/8] KVM: arm64: Prevent guest accesses into BRBE
- system registers/instructions
+Subject: Re: [PATCH V15 5/8] KVM: arm64: nvhe: Disable branch generation in
+ nVHE guests
 Content-Language: en-US
+From: Anshuman Khandual <anshuman.khandual@arm.com>
 To: Marc Zyngier <maz@kernel.org>
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
  will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com,
@@ -31,79 +32,56 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
  linux-perf-users@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
  James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev
 References: <20231201053906.1261704-1-anshuman.khandual@arm.com>
- <20231201053906.1261704-3-anshuman.khandual@arm.com>
- <86v89ebcn2.wl-maz@kernel.org>
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <86v89ebcn2.wl-maz@kernel.org>
+ <20231201053906.1261704-6-anshuman.khandual@arm.com>
+ <86ttoybbp4.wl-maz@kernel.org> <e48f5cdc-2711-4a03-a074-da87d84b3caf@arm.com>
+In-Reply-To: <e48f5cdc-2711-4a03-a074-da87d84b3caf@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
-On 12/4/23 13:52, Marc Zyngier wrote:
-> On Fri, 01 Dec 2023 05:39:00 +0000,
-> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
->> Currently BRBE feature is not supported in a guest environment. This hides
->> BRBE feature availability via masking ID_AA64DFR0_EL1.BRBE field. This also
->> blocks guest accesses into BRBE system registers and instructions as if the
->> underlying hardware never implemented FEAT_BRBE feature.
->>
->> Cc: Marc Zyngier <maz@kernel.org>
->> Cc: Oliver Upton <oliver.upton@linux.dev>
->> Cc: James Morse <james.morse@arm.com>
->> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will@kernel.org>
->> Cc: kvmarm@lists.linux.dev
->> Cc: linux-arm-kernel@lists.infradead.org
->> Cc: linux-kernel@vger.kernel.org
->> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
->> ---
->>  arch/arm64/kvm/sys_regs.c | 130 ++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 130 insertions(+)
->>
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 4735e1b37fb3..42701065b3cd 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -1583,6 +1583,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->>  	/* Hide SPE from guests */
->>  	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
->>  
->> +	/* Hide BRBE from guests */
->> +	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
->> +
->>  	return val;
->>  }
->>  
->> @@ -2042,6 +2045,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->>  	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
->>  	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
->>  	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
->> +	{ SYS_DESC(OP_BRB_IALL), undef_access },
->> +	{ SYS_DESC(OP_BRB_INJ), undef_access },
->>  
->>  	DBG_BCR_BVR_WCR_WVR_EL1(0),
->>  	DBG_BCR_BVR_WCR_WVR_EL1(1),
->> @@ -2072,6 +2077,131 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->>  	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
->>  	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
->>  
->> +	/*
->> +	 * BRBE branch record sysreg address space is interleaved between
->> +	 * corresponding BRBINF<N>_EL1, BRBSRC<N>_EL1, and BRBTGT<N>_EL1.
->> +	 */
->> +	{ SYS_DESC(SYS_BRBINF0_EL1), undef_access },
->> +	{ SYS_DESC(SYS_BRBSRC0_EL1), undef_access },
->> +	{ SYS_DESC(SYS_BRBTGT0_EL1), undef_access },
->> +	{ SYS_DESC(SYS_BRBINF16_EL1), undef_access },
->> +	{ SYS_DESC(SYS_BRBSRC16_EL1), undef_access },
->> +	{ SYS_DESC(SYS_BRBTGT16_EL1), undef_access },
-> Surely we can do better than this wall of text. Please look at what we
-> do for the debug registers, and adopt a similar pattern. This should
-> result in one line per group of 3 registers.
+On 12/11/23 11:30, Anshuman Khandual wrote:
+> On 12/4/23 14:12, Marc Zyngier wrote:
+>> On Fri, 01 Dec 2023 05:39:03 +0000,
+>> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+>>> Disable the BRBE before we enter the guest, saving the status and enable it
+>>> back once we get out of the guest. This is just to avoid capturing records
+>>> in the guest kernel/userspace, which would be confusing the samples.
+>> Why does it have to be limited to non-VHE? What protects host EL0
+>> records from guest's EL0 execution when the host is VHE?
+> In a scenario when running the host in VHE mode
+>  
+> - The host might have enabled branch records for host EL0 through BRBCR_EL2.E0HBRE
+>   indirectly via accessing BRBCR_EL1.E0BRE
 > 
-> What is the plan for KVM support beyond this?
-We are planning to add support for simultaneous and independent branch record
-tracing via perf branch stack sampling inside the guest and the host. But will
-prevent tracing of the guest execution from the host.
+> - But after the guest switches in on the cpu - BRBCR_EL2.E0HBRE will still remain
+>   set and enable branch records in guest EL0 as well because BRBCR_EL1.E0BRE will
+>   not have any effect when EL2 is implemented and HCR_EL2.TGE == 1. The guest EL0
+>   execution branch records will find their way into branch records being captured
+>   for host EL0
+> 
+> You are right. The host EL0 branch records too need to be protected from guest EL0
+> execution. A similar BRBCR_EL1 save/restore mechanism is needed for VHE as well ?
+
+Looking at this again, seems like host EL0 records will be protected from
+guest EL0 execution as HCR_EL2.TGE toggles when th guest switches in thus
+enforcing BRBCR_EL1.E0BRE (which is clear) requirement for capturing guest
+EL0 branch records.
+
+arch/arm64/kvm/hyp/vhe/tlb.c
+
+__tlb_switch_to_guest() {
+	....
+	val = read_sysreg(hcr_el2);
+        val &= ~HCR_TGE;
+        write_sysreg(val, hcr_el2);
+	isb();
+}
+
+HCR_TGE comes back via HCR_HOST_VHE_FLAGS when the host switches back in.
+
+__tlb_switch_to_host() {
+	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
+        isb();
+	....
+}
