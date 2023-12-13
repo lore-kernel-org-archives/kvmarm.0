@@ -1,86 +1,205 @@
-Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1EF7E562
-	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 20:25:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D882837D
+	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 20:30:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="T6LceOf1"
-Date: Wed, 13 Dec 2023 20:24:59 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1702499103;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tNO556z6FFu06V81OQ+zyHsSpgoOG3daD8uh3SUI1ew=;
-	b=T6LceOf1lh7wrllqQaFpMBvKcbmWs5Pk1nsncOiFxJKxrkHkBzMfunILFugu3pMqCSi4l1
-	JxX1ftanMmMjMTsZ0G/v3WfDCy51zMJ78l7UAA9EsRVeCzyoMxsfin/ewGmRjUtgwUpLaX
-	59UfWFQsum6fJnvdJllp7g0LlINclcA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: James Morse <james.morse@arm.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 0/4] KVM: arm64: Hide unsupported MPAM from the guest
-Message-ID: <ZXoTG1Y4O16Cjq39@linux.dev>
-References: <20231207150804.3425468-1-james.morse@arm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pzY58e+S"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B807C43397
+	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 20:30:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702499457;
+	bh=2kSgrL3rqNhzbcloHGwmD+Op6eU1uTYkc8WV4RpWZEA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=pzY58e+SfqagqI/N/rg8JrJI6zrL3tQk8blJRpnIxpAdps98u0I/TDxE1gkEXX5Sc
+	 ITXcIp2mty+caRxzX5P05yWik3apA9iI3Aes3rDlY6ctkFQGR9s08UzwHDcIZ0Rl7g
+	 nvHErr4Dc7OyBWPauvakubCKIaxKlX8frlACfWZiqG/+w2pgre2V2rwjp3FKaKPPuI
+	 l7+LLtASLTW9e4MlduynIA9QEOVF+6ChQcgK/T3AUHIrspvL01y6q659ZCUiLzLk/j
+	 W7ejUw3/zAiXeAOOoqNtbIXpwa8ez8Kx1AOX4Z1MUcqSvehwcE1G/91bHkW52oE9Wh
+	 jZmoOertBiZhQ==
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-50c0f6b1015so8662372e87.3
+        for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 12:30:57 -0800 (PST)
+X-Gm-Message-State: AOJu0Yy851ArXuquOPoreA42p2UAv8waZ5vxMIDnKMsn57C2dMFQG+vZ
+	CYFdxUWJoFKVim09ZBsRYl8iFhiw9vSKC+ktjg==
+X-Google-Smtp-Source: AGHT+IFgd6YpFyJgZhLDy0EZGLGdXBWFqpNnZ7ro1f5adp2tWnNWL6zmYVImkR5sAkQh+ReR19JlxfWI4mQIp7D1Js8=
+X-Received: by 2002:ac2:4d15:0:b0:50d:2f88:e93e with SMTP id
+ r21-20020ac24d15000000b0050d2f88e93emr2997218lfi.66.1702499455211; Wed, 13
+ Dec 2023 12:30:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231207150804.3425468-1-james.morse@arm.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20231119165721.9849-1-alexandru.elisei@arm.com>
+ <20231119165721.9849-12-alexandru.elisei@arm.com> <CAL_Jsq+k5BeM9+u12AQvWQ0b4Uv5Cy0vPOpK_uLcYtRnunq4iQ@mail.gmail.com>
+ <ZXiMiLz9ZyUdxUP8@raptor> <CAL_Jsq+U_GR=mOK3-phnd4jeJKf79aOmhPwDOSj+f=s-7fZZWQ@mail.gmail.com>
+ <ZXmr-Kl9L2SO13--@raptor> <CAL_JsqL=P1Y6w38LD_xw+vK4CNqt22FW_FE9oi_XTLHVQEne7Q@mail.gmail.com>
+ <ZXnE3724jYYSg4o6@raptor> <CAL_JsqJgTnuQjo13cKo1Ebm5j9tCRT8GhNavdqu5vwp+fdnTLw@mail.gmail.com>
+ <ZXnthcg0BkEd-RgK@raptor>
+In-Reply-To: <ZXnthcg0BkEd-RgK@raptor>
+From: Rob Herring <robh@kernel.org>
+Date: Wed, 13 Dec 2023 14:30:42 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqLAW0--F8R0oTaajN3YpbK2KgE6Ypn8tk4_pf_s=xC+aw@mail.gmail.com>
+Message-ID: <CAL_JsqLAW0--F8R0oTaajN3YpbK2KgE6Ypn8tk4_pf_s=xC+aw@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 11/27] arm64: mte: Reserve tag storage memory
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, 
+	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org, 
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, 
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org, 
+	bsegall@google.com, mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com, 
+	mhiramat@kernel.org, rppt@kernel.org, hughd@google.com, pcc@google.com, 
+	steven.price@arm.com, anshuman.khandual@arm.com, vincenzo.frascino@arm.com, 
+	david@redhat.com, eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-mm@kvack.org, 
+	linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+On Wed, Dec 13, 2023 at 11:44=E2=80=AFAM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> On Wed, Dec 13, 2023 at 11:22:17AM -0600, Rob Herring wrote:
+> > On Wed, Dec 13, 2023 at 8:51=E2=80=AFAM Alexandru Elisei
+> > <alexandru.elisei@arm.com> wrote:
+> > >
+> > > Hi,
+> > >
+> > > On Wed, Dec 13, 2023 at 08:06:44AM -0600, Rob Herring wrote:
+> > > > On Wed, Dec 13, 2023 at 7:05=E2=80=AFAM Alexandru Elisei
+> > > > <alexandru.elisei@arm.com> wrote:
+> > > > >
+> > > > > Hi Rob,
+> > > > >
+> > > > > On Tue, Dec 12, 2023 at 12:44:06PM -0600, Rob Herring wrote:
+> > > > > > On Tue, Dec 12, 2023 at 10:38=E2=80=AFAM Alexandru Elisei
+> > > > > > <alexandru.elisei@arm.com> wrote:
+> > > > > > >
+> > > > > > > Hi Rob,
+> > > > > > >
+> > > > > > > Thank you so much for the feedback, I'm not very familiar wit=
+h device tree,
+> > > > > > > and any comments are very useful.
+> > > > > > >
+> > > > > > > On Mon, Dec 11, 2023 at 11:29:40AM -0600, Rob Herring wrote:
+> > > > > > > > On Sun, Nov 19, 2023 at 10:59=E2=80=AFAM Alexandru Elisei
+> > > > > > > > <alexandru.elisei@arm.com> wrote:
+> > > > > > > > >
+> > > > > > > > > Allow the kernel to get the size and location of the MTE =
+tag storage
+> > > > > > > > > regions from the DTB. This memory is marked as reserved f=
+or now.
+> > > > > > > > >
+> > > > > > > > > The DTB node for the tag storage region is defined as:
+> > > > > > > > >
+> > > > > > > > >         tags0: tag-storage@8f8000000 {
+> > > > > > > > >                 compatible =3D "arm,mte-tag-storage";
+> > > > > > > > >                 reg =3D <0x08 0xf8000000 0x00 0x4000000>;
+> > > > > > > > >                 block-size =3D <0x1000>;
+> > > > > > > > >                 memory =3D <&memory0>;    // Associated t=
+agged memory node
+> > > > > > > > >         };
+> > > > > > > >
+> > > > > > > > I skimmed thru the discussion some. If this memory range is=
+ within
+> > > > > > > > main RAM, then it definitely belongs in /reserved-memory.
+> > > > > > >
+> > > > > > > Ok, will do that.
+> > > > > > >
+> > > > > > > If you don't mind, why do you say that it definitely belongs =
+in
+> > > > > > > reserved-memory? I'm not trying to argue otherwise, I'm curio=
+us about the
+> > > > > > > motivation.
+> > > > > >
+> > > > > > Simply so that /memory nodes describe all possible memory and
+> > > > > > /reserved-memory is just adding restrictions. It's also because
+> > > > > > /reserved-memory is what gets handled early, and we don't need
+> > > > > > multiple things to handle early.
+> > > > > >
+> > > > > > > Tag storage is not DMA and can live anywhere in memory.
+> > > > > >
+> > > > > > Then why put it in DT at all? The only reason CMA is there is t=
+o set
+> > > > > > the size. It's not even clear to me we need CMA in DT either. T=
+he
+> > > > > > reasoning long ago was the kernel didn't do a good job of movin=
+g and
+> > > > > > reclaiming contiguous space, but that's supposed to be better n=
+ow (and
+> > > > > > most h/w figured out they need IOMMUs).
+> > > > > >
+> > > > > > But for tag storage you know the size as it is a function of th=
+e
+> > > > > > memory size, right? After all, you are validating the size is c=
+orrect.
+> > > > > > I guess there is still the aspect of whether you want enable MT=
+E or
+> > > > > > not which could be done in a variety of ways.
+> > > > >
+> > > > > Oh, sorry, my bad, I should have been clearer about this. I don't=
+ want to
+> > > > > put it in the DT as a "linux,cma" node. But I want it to be manag=
+ed by CMA.
+> > > >
+> > > > Yes, I understand, but my point remains. Why do you need this in DT=
+?
+> > > > If the location doesn't matter and you can calculate the size from =
+the
+> > > > memory size, what else is there to add to the DT?
+> > >
+> > > I am afraid there has been a misunderstanding. What do you mean by
+> > > "location doesn't matter"?
+> >
+> > You said:
+> > > Tag storage is not DMA and can live anywhere in memory.
+> >
+> > Which I took as the kernel can figure out where to put it. But maybe
+> > you meant the h/w platform can hard code it to be anywhere in memory?
+> > If so, then yes, DT is needed.
+>
+> Ah, I see, sorry for not being clear enough, you are correct: tag storage
+> is a hardware property, and software needs a mechanism (in this case, the
+> dt) to discover its properties.
+>
+> >
+> > > At the very least, Linux needs to know the address and size of a memo=
+ry
+> > > region to use it. The series is about using the tag storage memory fo=
+r
+> > > data. Tag storage cannot be described as a regular memory node becaus=
+e it
+> > > cannot be tagged (and normal memory can).
+> >
+> > If the tag storage lives in the middle of memory, then it would be
+> > described in the memory node, but removed by being in reserved-memory
+> > node.
+>
+> I don't follow. Would you mind going into more details?
 
-Thank you very much for posting these fixes.
+It goes back to what I said earlier about /memory nodes describing all
+the memory. There's no reason to reserve memory if you haven't
+described that range as memory to begin with. One could presumably
+just have a memory node for each contiguous chunk and not need
+/reserved-memory (ignoring the need to say what things are reserved
+for). That would become very difficult to adjust. Note that the kernel
+has a hardcoded limit of 64 reserved regions currently and that is not
+enough for some people. Seems like a lot, but I have no idea how they
+are (ab)using /reserved-memory.
 
-On Thu, Dec 07, 2023 at 03:08:00PM +0000, James Morse wrote:
-> 'lo
-> 
-> This series fixes up a long standing bug where MPAM was accidentally exposed
-> to a guest, but the feature was not otherwise trapped or context switched.
-> This could result in KVM warning about unexpected traps, and injecting an
-> undef into the guest contradicting the ID registers.
-> This would prevent an MPAM aware kernel from booting - fortunately, there
-> aren't any of those.
-> 
-> Ideally, we'd take the MPAM feature away from the ID registers, but that
-> would leave existing guests unable to migrate to a newer kernel. Instead,
-> use the writable ID registers to allow MPAM to be re-enabled - but emulate
-> it as RAZ/WI for the system registers that are trapped.
+Let me give an example. Presumably using MTE at all is configurable.
+If you boot a kernel with MTE disabled (or older and not supporting
+it), then I'd assume you'd want to use the tag storage for regular
+memory. Well, If tag storage is already part of /memory, then all you
+have to do is ignore the tag reserved-memory region. Tweaking the
+memory nodes would be more work.
 
-This is certainly a reasonable approach, but TBH I'm not too terribly
-concerned about the completeness of the workaround plumbing that we need
-here. Undoubtedly what you propose is the most complete solution to the
-problem, but it is somewhat involved.
 
-So long as we don't break migration at the userspace ioctl level I'm not
-too worried. Maybe something like:
+Also, I should point out that /memory and /reserved-memory nodes are
+not used for UEFI boot.
 
- - Ensure the reset value of ID_AA64PFR0_EL1.MPAM is 0
-
- - Allow userspace to write ID_AA64PFR0_EL1.MPAM as 1, *but*
-
- - KVM reinterprets this as '0' behind the scenes for the final register
-   value
-
- - Add the MPAM registers to the sysreg table with trap_raz_wi() as the
-   handler to avoid the unsupported sysreg printk, since it is possible
-   that older VMs may've already seen the MPAM feature.
-
-We've already done something similar to hide our mistakes with IMP DEF
-PMU versions in commit f90f9360c3d7 ("KVM: arm64: Rewrite IMPDEF PMU
-version as NI"), and I think MPAM may be a good candidate for something
-similar.
-
--- 
-Thanks,
-Oliver
+Rob
