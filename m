@@ -1,47 +1,47 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC472E65E
-	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 14:08:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B0D2E821
+	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 14:18:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="TlhNVbxt"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40c580ba223so13489795e9.3
-        for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 06:08:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="BgbgmGAI"
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3363aa1b7d2so587441f8f.0
+        for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 06:18:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1702476530; x=1703081330; darn=lists.linux.dev;
+        d=ventanamicro.com; s=google; t=1702477096; x=1703081896; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=w4lrG4sG6YQ4BIE8GkwyCjrSGGxi/UC5oCrLRkXbQKg=;
-        b=TlhNVbxtopTdBKzD5XRxJ5Y5Uay64UkNCJUo+VyjP8+ZLNWerATMEy2YiW7wXF8aXM
-         59JEdVRYzzZP11QVpAtinotWajNAFhbxsFLaR2OlgBsEtdo2WVrNQ0MsQao85DWINwcp
-         J/VGDMlUFHxKL/54z6Y9Wt+MT2PPnR6Tv+BA62zCDrVfWlqdKuo1/IN3sf0iQK2ztyi5
-         dtlfc/kCoM1iccdQLnNc6ko6sJjFLg4oiXSWigPyO+DroRIp1wO+mEYLrYtrWWR5Am9J
-         rH/LriKilK5WeK2E2Kf32ZUmpavzi8C1/0WC/skS8u0peJPsXeO/QZZCmn8oLDmOw9Eu
-         uM3Q==
+        bh=pMvhSkMSE/Am1VRqFroHUAOOjs4iyetVHF646YQvvOI=;
+        b=BgbgmGAI9OtKAuQ1tZUo/S5nLTM60e7AX3k21zAmgBfq//TaAfS6W0moGcqjHIk9E+
+         GnH2WitjMHnRgBZmFVNinOllFrj/smdoWI8ZWm9RzJ5xUphQE941SnvYKfcr29Rs9cQu
+         rglH75KXrk3+de/snthXztp7GO07C0Ys0IjUxhqI097OnoUBbkmCavloDTvm5None/SV
+         62pJkM5mMEvS83GZYTLOUvO+Cv5R97+IiPyTmLrpdA0sQw69U3Ae3KKOgX8a0FipRyMc
+         Y9NPUg/FzXEgh6vjy7F4qMe9QHpo1BywlsXuw1EPyJ3yNA4I30QsNg74yu0/VpgFuilT
+         OXBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702476530; x=1703081330;
+        d=1e100.net; s=20230601; t=1702477096; x=1703081896;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=w4lrG4sG6YQ4BIE8GkwyCjrSGGxi/UC5oCrLRkXbQKg=;
-        b=eC/JtEmcHiskOodx19qYQNDtRRc3MoKVTn5xBeQ4g5uyjLnGtVr7FvrmGmQ5Gdp1uS
-         lPho/6ms1+8W2FaWsWCw6L/bU+5AdooGGRdHBpegZJR+hCreksr0Bqh9/UrTPzzfZOBv
-         HgWmxES6B9y2Ek1MNXwj5zW9JxefwQ8LcFKt+747YtKfIS24DTsw9pdQmPgHn7J8b2RE
-         mej/5IEPZICCY0TQvRJltE2tH3EIp1klFOONaHCK43H4haXEVzKqNhqnQqXcLs+bXDFW
-         U6UoyFmBEGp56SmxR6q7Is0XSx3k127TnQtde9HM/RdF99R825uffEyzpuJVPIvlLhc7
-         Fd5g==
-X-Gm-Message-State: AOJu0YztEJOc55XgOHK4BpM8AbqKm53+htNxPTXX3RWQ3aoi2W89Urah
-	lE5QgjoSQsEPlkI99AesV6RsAA==
-X-Google-Smtp-Source: AGHT+IFgauWd5JriwtlECloTEhDNQTP3+kD2+Khl56+oF2aQ1LGAnudW9SV+lT5Ks1LMkyomAMD58w==
-X-Received: by 2002:a05:600c:1d19:b0:40b:5e1d:83a0 with SMTP id l25-20020a05600c1d1900b0040b5e1d83a0mr4191978wms.52.1702476529934;
-        Wed, 13 Dec 2023 06:08:49 -0800 (PST)
+        bh=pMvhSkMSE/Am1VRqFroHUAOOjs4iyetVHF646YQvvOI=;
+        b=LxI/WFYiYbS5xXB8YfLPzlfJ4gO1FpRav3+2QPjUScNTf3iox7M5shSxOnswLT7qBi
+         FzNnYvfLIPgD9klJaMFqXTJ30VdivkSB3/Spvn0XamBfOyShjoyoCAlABqSnkqbPcTLq
+         INJ46/rTurc9zFrP/ir/J4cyGnyKalrvM2ecs9tlIhdFBKRze9xADcs1xZx9JQ7FF11A
+         CT7xaP3CsQExe+MKpNT9H6is1gOYGfTkb+6hmoAa983Of+9pEaIqZwgBgHXrScBtVE4y
+         4wsVcb794+o1HXZHJi4zon5yqSGmKDWuwcQKFLEcWZ3bKpg0KIJtrfy6QVvuuZEDA40w
+         b4xA==
+X-Gm-Message-State: AOJu0Yz1VqCsWzXRVy3B3n8vN8QpIIbtE/JE6jap3ZukG01j2UiHeVlw
+	csrJFIXz64BHyYNnkAVeQJLeSA==
+X-Google-Smtp-Source: AGHT+IHHAN8IaZVRK1Ps8W71SJhwMq4xLyWFOqoAIKM4rFfgBhljotdkzECz0shi/fy3fHhekB11VQ==
+X-Received: by 2002:a5d:6242:0:b0:333:3c06:b433 with SMTP id m2-20020a5d6242000000b003333c06b433mr2848127wrv.0.1702477095654;
+        Wed, 13 Dec 2023 06:18:15 -0800 (PST)
 Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id v6-20020a05600c444600b0040c46ba7b66sm11736461wmn.48.2023.12.13.06.08.49
+        by smtp.gmail.com with ESMTPSA id v16-20020adfa1d0000000b003362e9b75c3sm4056912wrv.88.2023.12.13.06.18.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 06:08:49 -0800 (PST)
-Date: Wed, 13 Dec 2023 15:08:48 +0100
+        Wed, 13 Dec 2023 06:18:15 -0800 (PST)
+Date: Wed, 13 Dec 2023 15:18:14 +0100
 From: Andrew Jones <ajones@ventanamicro.com>
 To: Haibo Xu <haibo1.xu@intel.com>
 Cc: xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -50,20 +50,19 @@ Cc: xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>,
 	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
 	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
-	Conor Dooley <conor.dooley@microchip.com>, Mayuresh Chitale <mchitale@ventanamicro.com>, 
-	Greentime Hu <greentime.hu@sifive.com>, wchen <waylingii@gmail.com>, Jisheng Zhang <jszhang@kernel.org>, 
-	Minda Chen <minda.chen@starfivetech.com>, Samuel Holland <samuel@sholland.org>, 
-	Sean Christopherson <seanjc@google.com>, Like Xu <likexu@tencent.com>, Peter Xu <peterx@redhat.com>, 
-	Vipin Sharma <vipinsh@google.com>, Aaron Lewis <aaronlewis@google.com>, 
-	Thomas Huth <thuth@redhat.com>, Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, 
-	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 08/11] KVM: riscv: selftests: Add guest helper to get
- vcpu id
-Message-ID: <20231213-b02db86aaf7957be22b200f1@orel>
+	Mayuresh Chitale <mchitale@ventanamicro.com>, Greentime Hu <greentime.hu@sifive.com>, 
+	Daniel Henrique Barboza <dbarboza@ventanamicro.com>, Conor Dooley <conor.dooley@microchip.com>, 
+	Jisheng Zhang <jszhang@kernel.org>, Minda Chen <minda.chen@starfivetech.com>, 
+	Samuel Holland <samuel@sholland.org>, Sean Christopherson <seanjc@google.com>, 
+	Peter Xu <peterx@redhat.com>, Like Xu <likexu@tencent.com>, Vipin Sharma <vipinsh@google.com>, 
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v4 10/11] KVM: riscv: selftests: Add sstc timer test
+Message-ID: <20231213-4ba5fcc75b41cd19ec96f08e@orel>
 References: <cover.1702371136.git.haibo1.xu@intel.com>
- <02f6c9ccaaeb4ceb67137863e0317f62cef62496.1702371136.git.haibo1.xu@intel.com>
+ <3bb7d5ae5a1a016e970faa0759c47214c9391b19.1702371136.git.haibo1.xu@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -72,83 +71,24 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <02f6c9ccaaeb4ceb67137863e0317f62cef62496.1702371136.git.haibo1.xu@intel.com>
+In-Reply-To: <3bb7d5ae5a1a016e970faa0759c47214c9391b19.1702371136.git.haibo1.xu@intel.com>
 
-On Tue, Dec 12, 2023 at 05:31:17PM +0800, Haibo Xu wrote:
-> Add guest_get_vcpuid() helper to simplify accessing to per-cpu
-> private data. The sscratch CSR was used to store the vcpu id.
+On Tue, Dec 12, 2023 at 05:31:19PM +0800, Haibo Xu wrote:
+> Add a KVM selftests to validate the Sstc timer functionality.
+> The test was ported from arm64 arch timer test.
 > 
 > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 > ---
->  tools/testing/selftests/kvm/include/aarch64/processor.h | 4 ----
->  tools/testing/selftests/kvm/include/kvm_util_base.h     | 9 +++++++++
->  tools/testing/selftests/kvm/lib/riscv/processor.c       | 8 ++++++++
->  3 files changed, 17 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> index c42d683102c7..16ae0ac01879 100644
-> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> @@ -226,8 +226,4 @@ void smccc_smc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
->  	       uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5,
->  	       uint64_t arg6, struct arm_smccc_res *res);
->  
-> -
-> -
-> -uint32_t guest_get_vcpuid(void);
-> -
->  #endif /* SELFTEST_KVM_PROCESSOR_H */
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> index a18db6a7b3cf..666438113d22 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -932,4 +932,13 @@ void kvm_selftest_arch_init(void);
->  
->  void kvm_arch_vm_post_create(struct kvm_vm *vm);
->  
-> +void vm_init_vector_tables(struct kvm_vm *vm);
-> +void vcpu_init_vector_tables(struct kvm_vcpu *vcpu);
-> +
-> +struct ex_regs;
-> +typedef void(*exception_handler_fn)(struct ex_regs *);
-> +void vm_install_exception_handler(struct kvm_vm *vm, int vector, exception_handler_fn handler);
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../selftests/kvm/aarch64/arch_timer.c        |  12 +-
+>  tools/testing/selftests/kvm/arch_timer.c      |  10 +-
+>  .../selftests/kvm/include/riscv/arch_timer.h  |  71 ++++++++++++
+>  .../selftests/kvm/include/riscv/processor.h   |  10 ++
+>  .../selftests/kvm/include/timer_test.h        |   5 +-
+>  .../testing/selftests/kvm/riscv/arch_timer.c  | 107 ++++++++++++++++++
+>  7 files changed, 206 insertions(+), 10 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/include/riscv/arch_timer.h
+>  create mode 100644 tools/testing/selftests/kvm/riscv/arch_timer.c
+>
 
-I think something happend on rebase since the above should be in a
-different patch (and were for v3). I suggest checking your previous
-and current version branches with git-range-diff after rebasing in
-order to catch stuff like this.
-
-Thanks,
-drew
-
-> +
-> +uint32_t guest_get_vcpuid(void);
-> +
->  #endif /* SELFTEST_KVM_UTIL_BASE_H */
-> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> index efd9ac4b0198..39a1e9902dec 100644
-> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> @@ -316,6 +316,9 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
->  	vcpu_set_reg(vcpu, RISCV_CORE_REG(regs.sp), stack_vaddr + stack_size);
->  	vcpu_set_reg(vcpu, RISCV_CORE_REG(regs.pc), (unsigned long)guest_code);
->  
-> +	/* Setup sscratch for guest_get_vcpuid() */
-> +	vcpu_set_reg(vcpu, RISCV_CSR_REG(sscratch), vcpu_id);
-> +
->  	/* Setup default exception vector of guest */
->  	vcpu_set_reg(vcpu, RISCV_CSR_REG(stvec), (unsigned long)guest_unexp_trap);
->  
-> @@ -436,3 +439,8 @@ void vm_install_interrupt_handler(struct kvm_vm *vm, exception_handler_fn handle
->  
->  	handlers->exception_handlers[1][0] = handler;
->  }
-> +
-> +uint32_t guest_get_vcpuid(void)
-> +{
-> +	return csr_read(CSR_SSCRATCH);
-> +}
-> -- 
-> 2.34.1
-> 
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
