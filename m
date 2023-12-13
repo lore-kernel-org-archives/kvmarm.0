@@ -1,121 +1,170 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A24E72FC39
-	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 15:03:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 211E2C15;
-	Wed, 13 Dec 2023 07:03:53 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 06D6E3F738;
-	Wed, 13 Dec 2023 07:03:04 -0800 (PST)
-Date: Wed, 13 Dec 2023 15:02:59 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, akpm@linux-foundation.org,
-	aneesh.kumar@linux.ibm.com, broonie@kernel.org,
-	dave.hansen@linux.intel.com, maz@kernel.org, oliver.upton@linux.dev,
-	shuah@kernel.org, will@kernel.org, kvmarm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 12/25] arm64: handle PKEY/POE faults
-Message-ID: <20231213150259.GA1129554@e124191.cambridge.arm.com>
-References: <20231124163510.1835740-1-joey.gouly@arm.com>
- <20231124163510.1835740-13-joey.gouly@arm.com>
- <ZXdSaRIJGWrtXin-@arm.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1BA5645D
+	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 17:22:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nCjqTyEE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92376C433BA
+	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 17:22:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702488152;
+	bh=MdFfxmRqnU2pgiKIHVjpuT5qM/n8AmSOleAkAeYhZzY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=nCjqTyEEwYAqdW8/rlU/X2qNfvBr2d9kOIKAiAWZ9qncIg+m+22IilZcJEY8VRoTX
+	 7PgbJV6HZ5JLE3sDdfsX2UHiaQmp3mY3zRbfmkxhAQWJ83UeIlzK3XIiaKF4vV3C3f
+	 l9pxj+2hx8VjnlJ2uwTuDTSGTfuTbmQMk1sflXBlXe0SOkan+3n93ddJV7VKUEfu0Z
+	 MZFFlYrGAojnFk9Ri12mVxePt5n8d5wu+mgtpl3OjT9ECbV+/ED8mE03YSGnU9dACx
+	 ItkqIXFCrBxK8l26h8/TEEuSPhBnj4lDFVScIjFLiDXKOzURPiqtz1dSaT/lmYKVu+
+	 rig24IG2XtNVw==
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-50e0ba402b4so2786107e87.1
+        for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 09:22:32 -0800 (PST)
+X-Gm-Message-State: AOJu0YwHjym9aS0rAUi2ONJJHzruKhiHjdw96ibY7NU14DdbdGdprQwg
+	Q+GKL2R/4D7hWrHaHOJLVRZqw60Ty1MhznlhBg==
+X-Google-Smtp-Source: AGHT+IFqzlN5cXgUWTtVKqvQkSS2vQPSTV20xZkO0pzlfuqEtQX8svaifgRBAAqLPVw/kWvXPFUvtTzHkFE1kxDLXyI=
+X-Received: by 2002:ac2:5504:0:b0:50c:a39:ee37 with SMTP id
+ j4-20020ac25504000000b0050c0a39ee37mr4154700lfk.109.1702488150631; Wed, 13
+ Dec 2023 09:22:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZXdSaRIJGWrtXin-@arm.com>
+References: <20231119165721.9849-1-alexandru.elisei@arm.com>
+ <20231119165721.9849-12-alexandru.elisei@arm.com> <CAL_Jsq+k5BeM9+u12AQvWQ0b4Uv5Cy0vPOpK_uLcYtRnunq4iQ@mail.gmail.com>
+ <ZXiMiLz9ZyUdxUP8@raptor> <CAL_Jsq+U_GR=mOK3-phnd4jeJKf79aOmhPwDOSj+f=s-7fZZWQ@mail.gmail.com>
+ <ZXmr-Kl9L2SO13--@raptor> <CAL_JsqL=P1Y6w38LD_xw+vK4CNqt22FW_FE9oi_XTLHVQEne7Q@mail.gmail.com>
+ <ZXnE3724jYYSg4o6@raptor>
+In-Reply-To: <ZXnE3724jYYSg4o6@raptor>
+From: Rob Herring <robh@kernel.org>
+Date: Wed, 13 Dec 2023 11:22:17 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqJgTnuQjo13cKo1Ebm5j9tCRT8GhNavdqu5vwp+fdnTLw@mail.gmail.com>
+Message-ID: <CAL_JsqJgTnuQjo13cKo1Ebm5j9tCRT8GhNavdqu5vwp+fdnTLw@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 11/27] arm64: mte: Reserve tag storage memory
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, 
+	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org, 
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, 
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org, 
+	bsegall@google.com, mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com, 
+	mhiramat@kernel.org, rppt@kernel.org, hughd@google.com, pcc@google.com, 
+	steven.price@arm.com, anshuman.khandual@arm.com, vincenzo.frascino@arm.com, 
+	david@redhat.com, eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-mm@kvack.org, 
+	linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Wed, Dec 13, 2023 at 8:51=E2=80=AFAM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> Hi,
+>
+> On Wed, Dec 13, 2023 at 08:06:44AM -0600, Rob Herring wrote:
+> > On Wed, Dec 13, 2023 at 7:05=E2=80=AFAM Alexandru Elisei
+> > <alexandru.elisei@arm.com> wrote:
+> > >
+> > > Hi Rob,
+> > >
+> > > On Tue, Dec 12, 2023 at 12:44:06PM -0600, Rob Herring wrote:
+> > > > On Tue, Dec 12, 2023 at 10:38=E2=80=AFAM Alexandru Elisei
+> > > > <alexandru.elisei@arm.com> wrote:
+> > > > >
+> > > > > Hi Rob,
+> > > > >
+> > > > > Thank you so much for the feedback, I'm not very familiar with de=
+vice tree,
+> > > > > and any comments are very useful.
+> > > > >
+> > > > > On Mon, Dec 11, 2023 at 11:29:40AM -0600, Rob Herring wrote:
+> > > > > > On Sun, Nov 19, 2023 at 10:59=E2=80=AFAM Alexandru Elisei
+> > > > > > <alexandru.elisei@arm.com> wrote:
+> > > > > > >
+> > > > > > > Allow the kernel to get the size and location of the MTE tag =
+storage
+> > > > > > > regions from the DTB. This memory is marked as reserved for n=
+ow.
+> > > > > > >
+> > > > > > > The DTB node for the tag storage region is defined as:
+> > > > > > >
+> > > > > > >         tags0: tag-storage@8f8000000 {
+> > > > > > >                 compatible =3D "arm,mte-tag-storage";
+> > > > > > >                 reg =3D <0x08 0xf8000000 0x00 0x4000000>;
+> > > > > > >                 block-size =3D <0x1000>;
+> > > > > > >                 memory =3D <&memory0>;    // Associated tagge=
+d memory node
+> > > > > > >         };
+> > > > > >
+> > > > > > I skimmed thru the discussion some. If this memory range is wit=
+hin
+> > > > > > main RAM, then it definitely belongs in /reserved-memory.
+> > > > >
+> > > > > Ok, will do that.
+> > > > >
+> > > > > If you don't mind, why do you say that it definitely belongs in
+> > > > > reserved-memory? I'm not trying to argue otherwise, I'm curious a=
+bout the
+> > > > > motivation.
+> > > >
+> > > > Simply so that /memory nodes describe all possible memory and
+> > > > /reserved-memory is just adding restrictions. It's also because
+> > > > /reserved-memory is what gets handled early, and we don't need
+> > > > multiple things to handle early.
+> > > >
+> > > > > Tag storage is not DMA and can live anywhere in memory.
+> > > >
+> > > > Then why put it in DT at all? The only reason CMA is there is to se=
+t
+> > > > the size. It's not even clear to me we need CMA in DT either. The
+> > > > reasoning long ago was the kernel didn't do a good job of moving an=
+d
+> > > > reclaiming contiguous space, but that's supposed to be better now (=
+and
+> > > > most h/w figured out they need IOMMUs).
+> > > >
+> > > > But for tag storage you know the size as it is a function of the
+> > > > memory size, right? After all, you are validating the size is corre=
+ct.
+> > > > I guess there is still the aspect of whether you want enable MTE or
+> > > > not which could be done in a variety of ways.
+> > >
+> > > Oh, sorry, my bad, I should have been clearer about this. I don't wan=
+t to
+> > > put it in the DT as a "linux,cma" node. But I want it to be managed b=
+y CMA.
+> >
+> > Yes, I understand, but my point remains. Why do you need this in DT?
+> > If the location doesn't matter and you can calculate the size from the
+> > memory size, what else is there to add to the DT?
+>
+> I am afraid there has been a misunderstanding. What do you mean by
+> "location doesn't matter"?
 
-On Mon, Dec 11, 2023 at 06:18:17PM +0000, Catalin Marinas wrote:
-> On Fri, Nov 24, 2023 at 04:34:57PM +0000, Joey Gouly wrote:
-> > @@ -497,6 +498,23 @@ static void do_bad_area(unsigned long far, unsigned long esr,
-> >  #define VM_FAULT_BADMAP		((__force vm_fault_t)0x010000)
-> >  #define VM_FAULT_BADACCESS	((__force vm_fault_t)0x020000)
-> >  
-> > +static bool fault_from_pkey(unsigned long esr, struct vm_area_struct *vma,
-> > +			unsigned int mm_flags)
-> > +{
-> > +	unsigned long iss2 = ESR_ELx_ISS2(esr);
-> > +
-> > +	if (!arch_pkeys_enabled())
-> > +		return false;
-> > +
-> > +	if (iss2 & ESR_ELx_Overlay)
-> > +		return true;
-> > +
-> > +	return !arch_vma_access_permitted(vma,
-> > +			mm_flags & FAULT_FLAG_WRITE,
-> > +			mm_flags & FAULT_FLAG_INSTRUCTION,
-> > +			mm_flags & FAULT_FLAG_REMOTE);
-> > +}
-> 
-> Do we actually need this additional arch_vma_access_permitted() check?
-> The ESR should tell us if it was a POE fault. Permission overlay faults
-> have priority over the base permission faults, so we'd not need to fall
-> back to this additional checks. Well, see below, we could do something
-> slightly smarter here.
+You said:
+> Tag storage is not DMA and can live anywhere in memory.
 
-We want this here as it follows other arch's which will fail with a pkey fault
-even if the page isn't actually mapped. If the paged isn't mapped we'd get a
-translation fault, but since we know the type of access and have the pkey in
-the VMA we check it here.
+Which I took as the kernel can figure out where to put it. But maybe
+you meant the h/w platform can hard code it to be anywhere in memory?
+If so, then yes, DT is needed.
 
-> 
-> I can see x86 and powerpc have similar checks (though at a different
-> point under the mmap lock) but I'm not familiar with their exception
-> model, exception priorities.
-> 
-> > +
-> >  static vm_fault_t __do_page_fault(struct mm_struct *mm,
-> >  				  struct vm_area_struct *vma, unsigned long addr,
-> >  				  unsigned int mm_flags, unsigned long vm_flags,
-> > @@ -688,9 +706,29 @@ static int __kprobes do_page_fault(unsigned long far, unsigned long esr,
-> >  		 * Something tried to access memory that isn't in our memory
-> >  		 * map.
-> >  		 */
-> > -		arm64_force_sig_fault(SIGSEGV,
-> > -				      fault == VM_FAULT_BADACCESS ? SEGV_ACCERR : SEGV_MAPERR,
-> > -				      far, inf->name);
-> > +		int fault_kind;
-> > +		/*
-> > +		 * The pkey value that we return to userspace can be different
-> > +		 * from the pkey that caused the fault.
-> > +		 *
-> > +		 * 1. T1   : mprotect_key(foo, PAGE_SIZE, pkey=4);
-> > +		 * 2. T1   : set AMR to deny access to pkey=4, touches, page
-> > +		 * 3. T1   : faults...
-> > +		 * 4.    T2: mprotect_key(foo, PAGE_SIZE, pkey=5);
-> > +		 * 5. T1   : enters fault handler, takes mmap_lock, etc...
-> > +		 * 6. T1   : reaches here, sees vma_pkey(vma)=5, when we really
-> > +		 *	     faulted on a pte with its pkey=4.
-> > +		 */
-> > +		int pkey = vma_pkey(vma);
-> 
-> Other than the vma_pkey() race, I'm more worried about the vma
-> completely disappearing, e.g. munmap() in another thread. We end up
-> dereferencing a free pointer here. We need to do this under the mmap
-> lock.
-> 
-> Since we need to do this check under the mmap lock, we could add an
-> additional check to see if the pkey fault we got was a racy and just
-> restart the instruction if it no longer faults according to
-> por_el0_allows_pkey(). However, the code below is too late in the fault
-> handling to be able to do much other than SIGSEGV.
+> At the very least, Linux needs to know the address and size of a memory
+> region to use it. The series is about using the tag storage memory for
+> data. Tag storage cannot be described as a regular memory node because it
+> cannot be tagged (and normal memory can).
 
-After discussing in person, I agree with the assesment that this is the wrong
-place to do the check, and after looking at the x86 arch code, I see how
-they're doing it earlier.
+If the tag storage lives in the middle of memory, then it would be
+described in the memory node, but removed by being in reserved-memory
+node.
 
-Thanks,
-Joey
+> Then there's the matter of the tag storage block size (explained in this
+> commit message), and also knowing the memory range for which a tag storag=
+e
+> region stores the tags. This is explained in the cover letter.
+
+Honestly, I just forgot about that part.
+
+Rob
