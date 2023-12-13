@@ -1,42 +1,32 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E059B7E551
-	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 20:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1EF7E562
+	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 20:25:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jJcnDy5b"
-Date: Wed, 13 Dec 2023 20:05:29 +0000
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="T6LceOf1"
+Date: Wed, 13 Dec 2023 20:24:59 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1702497936;
+	t=1702499103;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=bs3RmWkkBEnHpfKuSLQmU1XdcllYwTl+oGw2E3qh8dc=;
-	b=jJcnDy5bHbUQZ++rOn61pjWjrjxub6x7tQGxN6Q/n2e8x8QqbvQBN0WMjqMDzS9KbV0iYs
-	wCgSpmwEUbVv6YEq3zCdtU1qGuTE6IwHyJzcoTRQw4SP/Qsfm9Sz/cIkb2d4mN4aAQUtts
-	tgUEit1z6/gIrWV69f2FgtcachFAZYI=
+	bh=tNO556z6FFu06V81OQ+zyHsSpgoOG3daD8uh3SUI1ew=;
+	b=T6LceOf1lh7wrllqQaFpMBvKcbmWs5Pk1nsncOiFxJKxrkHkBzMfunILFugu3pMqCSi4l1
+	JxX1ftanMmMjMTsZ0G/v3WfDCy51zMJ78l7UAA9EsRVeCzyoMxsfin/ewGmRjUtgwUpLaX
+	59UfWFQsum6fJnvdJllp7g0LlINclcA=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, ankita@nvidia.com,
-	maz@kernel.org, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	will@kernel.org, alex.williamson@redhat.com, kevin.tian@intel.com,
-	yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org,
-	gshan@redhat.com, linux-mm@kvack.org, lpieralisi@kernel.org,
-	aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
-	targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
-	apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
-	mochs@nvidia.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 2/2] kvm: arm64: set io memory s2 pte as normalnc for
- vfio pci devices
-Message-ID: <ZXoOieQN7rBiLL4A@linux.dev>
-References: <20231208164709.23101-1-ankita@nvidia.com>
- <20231208164709.23101-3-ankita@nvidia.com>
- <ZXicemDzXm8NShs1@arm.com>
- <20231212181156.GO3014157@nvidia.com>
+To: James Morse <james.morse@arm.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Marc Zyngier <maz@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 0/4] KVM: arm64: Hide unsupported MPAM from the guest
+Message-ID: <ZXoTG1Y4O16Cjq39@linux.dev>
+References: <20231207150804.3425468-1-james.morse@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,49 +35,51 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231212181156.GO3014157@nvidia.com>
+In-Reply-To: <20231207150804.3425468-1-james.morse@arm.com>
 X-Migadu-Flow: FLOW_OUT
 
-Hi,
+Hi James,
 
-Sorry, a bit late to the discussion :)
+Thank you very much for posting these fixes.
 
-On Tue, Dec 12, 2023 at 02:11:56PM -0400, Jason Gunthorpe wrote:
-> On Tue, Dec 12, 2023 at 05:46:34PM +0000, Catalin Marinas wrote:
-> > should know the implications. There's also an expectation that the
-> > actual driver (KVM guests) or maybe later DPDK can choose the safe
-> > non-cacheable or write-combine (Linux terminology) attributes for the
-> > BAR.
+On Thu, Dec 07, 2023 at 03:08:00PM +0000, James Morse wrote:
+> 'lo
 > 
-> DPDK won't rely on this interface
+> This series fixes up a long standing bug where MPAM was accidentally exposed
+> to a guest, but the feature was not otherwise trapped or context switched.
+> This could result in KVM warning about unexpected traps, and injecting an
+> undef into the guest contradicting the ID registers.
+> This would prevent an MPAM aware kernel from booting - fortunately, there
+> aren't any of those.
+> 
+> Ideally, we'd take the MPAM feature away from the ID registers, but that
+> would leave existing guests unable to migrate to a newer kernel. Instead,
+> use the writable ID registers to allow MPAM to be re-enabled - but emulate
+> it as RAZ/WI for the system registers that are trapped.
 
-Wait, so what's the expected interface for determining the memory
-attributes at stage-1? I'm somewhat concerned that we're conflating two
-things here:
+This is certainly a reasonable approach, but TBH I'm not too terribly
+concerned about the completeness of the workaround plumbing that we need
+here. Undoubtedly what you propose is the most complete solution to the
+problem, but it is somewhat involved.
 
- 1) KVM needs to know the memory attributes to use at stage-2, which
-    isn't fundamentally different from what's needed for userspace
-    stage-1 mappings.
+So long as we don't break migration at the userspace ioctl level I'm not
+too worried. Maybe something like:
 
- 2) KVM additionally needs a hint that the device / VFIO can handle
-    mismatched aliases w/o the machine exploding. This goes beyond
-    supporting Normal-NC mappings at stage-2 and is really a bug
-    with our current scheme (nGnRnE at stage-1, nGnRE at stage-2).
+ - Ensure the reset value of ID_AA64PFR0_EL1.MPAM is 0
 
-I was hoping that (1) could be some 'common' plumbing for both userspace
-and KVM mappings. And for (2), any case where a device is intolerant of
-mismatches && KVM cannot force the memory attributes should be rejected.
+ - Allow userspace to write ID_AA64PFR0_EL1.MPAM as 1, *but*
 
-AFAICT, the only reason PCI devices can get the blanket treatment of
-Normal-NC at stage-2 is because userspace has a Device-* mapping and can't
-speculatively load from the alias. This feels a bit hacky, and maybe we
-should prioritize an interface for mapping a device into a VM w/o a
-valid userspace mapping.
+ - KVM reinterprets this as '0' behind the scenes for the final register
+   value
 
-I very much understand that this has been going on for a while, and we
-need to do *something* to get passthrough working well for devices that
-like 'WC'. I just want to make sure we don't paint ourselves into a corner
-that's hard to get out of in the future.
+ - Add the MPAM registers to the sysreg table with trap_raz_wi() as the
+   handler to avoid the unsupported sysreg printk, since it is possible
+   that older VMs may've already seen the MPAM feature.
+
+We've already done something similar to hide our mistakes with IMP DEF
+PMU versions in commit f90f9360c3d7 ("KVM: arm64: Rewrite IMPDEF PMU
+version as NI"), and I think MPAM may be a good candidate for something
+similar.
 
 -- 
 Thanks,
