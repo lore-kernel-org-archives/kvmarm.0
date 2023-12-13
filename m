@@ -1,103 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDCC7D8B0;
-	Wed, 13 Dec 2023 20:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E059B7E551
+	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 20:05:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rw52Vfty"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C1AFC433C8;
-	Wed, 13 Dec 2023 20:02:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702497753;
-	bh=TWKx/EtzYbtKFgsobV53zPra9sAQTzvSeeX3jZwDlRo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Rw52VftygnvuTCgOrGI+gXe3TWpHtVdnfgBKILZHSSoQQfWcj4FiDZBF3q0xg/p1U
-	 yMyKDh7CfJhMPcfzgFLat+8qbBLeFz+kC6B1tBll2xoDe6ZR+lL4atc7TiTHTaVBXM
-	 KlV6aWd7XISTwMfEZMAy3uUu9bt6AO01rkUbbhpNndDZiRNqiRth1R5905LQyKnKba
-	 /Gu969kcPjCpd8VYSh4acTvsQvcFLrQg/odEGgysmo+09v0y9yHqoazxNAXt1jERrU
-	 3PEg1LuMx6NGBxtg6PTj1VO7B1PTnSanvAI6Vm8xADmZDlQepBudQj+aTfcAbjr2x0
-	 iLnlO4srSoqvg==
-Date: Wed, 13 Dec 2023 20:02:24 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Deepak Gupta <debug@rivosinc.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v7 20/39] arm64/gcs: Context switch GCS state for EL0
-Message-ID: <b2a717a7-e6d3-4fa9-921e-156c17ad5424@sirena.org.uk>
-References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
- <20231122-arm64-gcs-v7-20-201c483bd775@kernel.org>
- <CAKC1njQVB71A8fQBLmBnx++agM12XDLhS=7iL7-A4NTXSqUM+A@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jJcnDy5b"
+Date: Wed, 13 Dec 2023 20:05:29 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1702497936;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bs3RmWkkBEnHpfKuSLQmU1XdcllYwTl+oGw2E3qh8dc=;
+	b=jJcnDy5bHbUQZ++rOn61pjWjrjxub6x7tQGxN6Q/n2e8x8QqbvQBN0WMjqMDzS9KbV0iYs
+	wCgSpmwEUbVv6YEq3zCdtU1qGuTE6IwHyJzcoTRQw4SP/Qsfm9Sz/cIkb2d4mN4aAQUtts
+	tgUEit1z6/gIrWV69f2FgtcachFAZYI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, ankita@nvidia.com,
+	maz@kernel.org, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	will@kernel.org, alex.williamson@redhat.com, kevin.tian@intel.com,
+	yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org,
+	gshan@redhat.com, linux-mm@kvack.org, lpieralisi@kernel.org,
+	aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
+	targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
+	apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
+	mochs@nvidia.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v3 2/2] kvm: arm64: set io memory s2 pte as normalnc for
+ vfio pci devices
+Message-ID: <ZXoOieQN7rBiLL4A@linux.dev>
+References: <20231208164709.23101-1-ankita@nvidia.com>
+ <20231208164709.23101-3-ankita@nvidia.com>
+ <ZXicemDzXm8NShs1@arm.com>
+ <20231212181156.GO3014157@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="p5BMo6xEVagOzbFU"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAKC1njQVB71A8fQBLmBnx++agM12XDLhS=7iL7-A4NTXSqUM+A@mail.gmail.com>
-X-Cookie: One size fits all.
+In-Reply-To: <20231212181156.GO3014157@nvidia.com>
+X-Migadu-Flow: FLOW_OUT
 
+Hi,
 
---p5BMo6xEVagOzbFU
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Sorry, a bit late to the discussion :)
 
-On Wed, Dec 13, 2023 at 11:59:45AM -0800, Deepak Gupta wrote:
-> On Wed, Nov 22, 2023 at 1:45=E2=80=AFAM Mark Brown <broonie@kernel.org> w=
-rote:
+On Tue, Dec 12, 2023 at 02:11:56PM -0400, Jason Gunthorpe wrote:
+> On Tue, Dec 12, 2023 at 05:46:34PM +0000, Catalin Marinas wrote:
+> > should know the implications. There's also an expectation that the
+> > actual driver (KVM guests) or maybe later DPDK can choose the safe
+> > non-cacheable or write-combine (Linux terminology) attributes for the
+> > BAR.
+> 
+> DPDK won't rely on this interface
 
-> > +       if (task->thread.gcs_el0_mode & PR_SHADOW_STACK_ENABLE)
-> > +               gcscre0_el1 |=3D GCSCRE0_EL1_RVCHKEN | GCSCRE0_EL1_PCRS=
-EL;
+Wait, so what's the expected interface for determining the memory
+attributes at stage-1? I'm somewhat concerned that we're conflating two
+things here:
 
-> If the intent is to disable, is the GCS stack freed or kept around?
-> I expect if libc is taking the decision to disable, kernel should free it=
- up.
-> Is it freed in some other flow?
+ 1) KVM needs to know the memory attributes to use at stage-2, which
+    isn't fundamentally different from what's needed for userspace
+    stage-1 mappings.
 
-Kept around and freed on thread exit.  There is a potential race between
-for example disabling in a signal handler and something trying to walk
-the stack so we err on the side of caution.
+ 2) KVM additionally needs a hint that the device / VFIO can handle
+    mismatched aliases w/o the machine exploding. This goes beyond
+    supporting Normal-NC mappings at stage-2 and is really a bug
+    with our current scheme (nGnRnE at stage-1, nGnRE at stage-2).
 
---p5BMo6xEVagOzbFU
-Content-Type: application/pgp-signature; name="signature.asc"
+I was hoping that (1) could be some 'common' plumbing for both userspace
+and KVM mappings. And for (2), any case where a device is intolerant of
+mismatches && KVM cannot force the memory attributes should be rejected.
 
------BEGIN PGP SIGNATURE-----
+AFAICT, the only reason PCI devices can get the blanket treatment of
+Normal-NC at stage-2 is because userspace has a Device-* mapping and can't
+speculatively load from the alias. This feels a bit hacky, and maybe we
+should prioritize an interface for mapping a device into a VM w/o a
+valid userspace mapping.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmV6Dc8ACgkQJNaLcl1U
-h9D/UQf/drLKsAxcIavasAKyvNxy00BF9vIZyHv3vJ+sFZEMcKnnX/8KO6A54p3z
-Y5Oowl7starF/ef/S94c9GDD6e9ErIIZiUHOIWoegLpSIr9NL3p3q2pzJTSgEigR
-7gxmR840FSDV235o0T16ajXu4aj3hg3eSiDmycP9Wh2TY6lNU+Uab1nhCM6mIgzY
-Spu0s0+naKP+fYEkXZjhn15XHplZNEI2qLOIXhEpNJZHiEt1imkFwLa5GqHbaWUz
-wqtAF1RUqcDm5hATvxuPbnPA0WsnHFGCniy5C7vyRNlcPGx+FBg2pW0O9Y47ff2a
-Vt+12qPfZq/CDUunfX/IvKyQ3YO5+Q==
-=JGbe
------END PGP SIGNATURE-----
+I very much understand that this has been going on for a while, and we
+need to do *something* to get passthrough working well for devices that
+like 'WC'. I just want to make sure we don't paint ourselves into a corner
+that's hard to get out of in the future.
 
---p5BMo6xEVagOzbFU--
+-- 
+Thanks,
+Oliver
