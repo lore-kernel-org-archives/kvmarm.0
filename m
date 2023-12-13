@@ -1,160 +1,119 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F73639FEC
-	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 17:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4703EC15;
-	Wed, 13 Dec 2023 09:45:39 -0800 (PST)
-Received: from raptor (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 37DBF3F762;
-	Wed, 13 Dec 2023 09:44:48 -0800 (PST)
-Date: Wed, 13 Dec 2023 17:44:37 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Rob Herring <robh@kernel.org>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
-	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
-	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
-	rppt@kernel.org, hughd@google.com, pcc@google.com,
-	steven.price@arm.com, anshuman.khandual@arm.com,
-	vincenzo.frascino@arm.com, david@redhat.com, eugenis@google.com,
-	kcc@google.com, hyesoo.yu@samsung.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC v2 11/27] arm64: mte: Reserve tag storage memory
-Message-ID: <ZXnthcg0BkEd-RgK@raptor>
-References: <20231119165721.9849-1-alexandru.elisei@arm.com>
- <20231119165721.9849-12-alexandru.elisei@arm.com>
- <CAL_Jsq+k5BeM9+u12AQvWQ0b4Uv5Cy0vPOpK_uLcYtRnunq4iQ@mail.gmail.com>
- <ZXiMiLz9ZyUdxUP8@raptor>
- <CAL_Jsq+U_GR=mOK3-phnd4jeJKf79aOmhPwDOSj+f=s-7fZZWQ@mail.gmail.com>
- <ZXmr-Kl9L2SO13--@raptor>
- <CAL_JsqL=P1Y6w38LD_xw+vK4CNqt22FW_FE9oi_XTLHVQEne7Q@mail.gmail.com>
- <ZXnE3724jYYSg4o6@raptor>
- <CAL_JsqJgTnuQjo13cKo1Ebm5j9tCRT8GhNavdqu5vwp+fdnTLw@mail.gmail.com>
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470485955D
+	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 19:44:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="tV2YXWAk"
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-db537948ea0so7191978276.2
+        for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 11:44:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1702496641; x=1703101441; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7KwJmg/AmRci9oth6e0vim63G1m84y3oNQcN/OKV3e0=;
+        b=tV2YXWAkozgdec4hKEfes1ZMx2Iaap7i0yOUzgSTco2ThRe1bRGNobN6hnJ6nE9kh2
+         uH4GcRz/uYE6wTT1iSW07h+sIwpxC1/RV5Gc82V+Uw3/Gcl6x/dv0+SqD14RRRon6RZp
+         cjQ2lWcZ8i8buMp5/E/m2pZ4vG9ttekZcpfrdosUChMpJbMIYhHYtz3hHRXLG0WJSXlu
+         1mIpARy3A7VUQpDgpY/OmxT3lZE3bk2RoBTucofCiWoD5weTC/d13vj5nh6Rkb1q7CU1
+         xtzfPw7a/musFmGlFykW2Bziz9JC35yOODuyCMTqMBpJdXxNZ4G0TVax49xrs5fMfwZu
+         QY0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702496641; x=1703101441;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7KwJmg/AmRci9oth6e0vim63G1m84y3oNQcN/OKV3e0=;
+        b=tVT7ZYznZv4BTOFcEolxPtr/oYkWzTCbs9NZcFWFk0fvGUB0HL/9NpV2pjEdKPA3LK
+         iQ0iHzkALasNg7j4pkLFqVbpP3k7LOab4QVceCA09JzJIwyPNrYd40S+P2KdWv1cpxGM
+         8vb0AH246wb9pd4/X6z7btTnn9S5GhW8soBXVYo+esk5xo5j8E6aKLq8JJLzazsOv1h2
+         s5BVdaNTUFrJrax/8wV+bSvRnmTiyT2XfdkN8vP98aUPQZymwC9efdte1UZgzo4sfkBd
+         51XL5eE1vEPeC7FUWc6KOtoHVfSrmaJBRt+RH8tO8jMd+rJKpGtw7nMyl8nI8n8T89tZ
+         1R/g==
+X-Gm-Message-State: AOJu0YxfXy5lNU7l+uj//DZJWclhsXrp2r8X3bZ3i8dxn3ghjwsmaqc8
+	0bzB9kGVKRP1tmX7vY49FrQZ49pD0Sf/ITQiFOurKg==
+X-Google-Smtp-Source: AGHT+IFSmPxfZTBIe3gumpwK2nVwVDcDb9+yDl2yaVi4US6Ez2/rKUahNn9IJ0xE08iqlW2A2FfQ7xQQ2M/z/jnykQ4=
+X-Received: by 2002:a25:8c91:0:b0:db7:dacf:59de with SMTP id
+ m17-20020a258c91000000b00db7dacf59demr4990232ybl.82.1702496641231; Wed, 13
+ Dec 2023 11:44:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL_JsqJgTnuQjo13cKo1Ebm5j9tCRT8GhNavdqu5vwp+fdnTLw@mail.gmail.com>
+References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
+ <20231122-arm64-gcs-v7-2-201c483bd775@kernel.org> <CAKC1njSC5cC_fXnyNAPt=WU6cD-OjLKFxo90oVPmsLJbuWf4nw@mail.gmail.com>
+ <d708b493-267a-4418-be91-9bde6b2cf50c@sirena.org.uk> <CAKC1njSQPO8ja7AkTzQ724hhSsGjchH9dLbbH9LXP0ZiKj-zPQ@mail.gmail.com>
+ <0d0d8802-09e3-4ea5-a0b4-b3a08c8a282e@sirena.org.uk>
+In-Reply-To: <0d0d8802-09e3-4ea5-a0b4-b3a08c8a282e@sirena.org.uk>
+From: Deepak Gupta <debug@rivosinc.com>
+Date: Wed, 13 Dec 2023 11:43:49 -0800
+Message-ID: <CAKC1njRHs0R=VKfn4jBap9__oR0rBHmNy7_tqHR8=xEHdUE4+A@mail.gmail.com>
+Subject: Re: [PATCH v7 02/39] prctl: arch-agnostic prctl for shadow stack
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Andrew Morton <akpm@linux-foundation.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, 
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, 
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>, "H.J. Lu" <hjl.tools@gmail.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Florian Weimer <fweimer@redhat.com>, 
+	Christian Brauner <brauner@kernel.org>, Thiago Jung Bauermann <thiago.bauermann@linaro.org>, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 13, 2023 at 11:22:17AM -0600, Rob Herring wrote:
-> On Wed, Dec 13, 2023 at 8:51 AM Alexandru Elisei
-> <alexandru.elisei@arm.com> wrote:
-> >
-> > Hi,
-> >
-> > On Wed, Dec 13, 2023 at 08:06:44AM -0600, Rob Herring wrote:
-> > > On Wed, Dec 13, 2023 at 7:05 AM Alexandru Elisei
-> > > <alexandru.elisei@arm.com> wrote:
-> > > >
-> > > > Hi Rob,
-> > > >
-> > > > On Tue, Dec 12, 2023 at 12:44:06PM -0600, Rob Herring wrote:
-> > > > > On Tue, Dec 12, 2023 at 10:38 AM Alexandru Elisei
-> > > > > <alexandru.elisei@arm.com> wrote:
-> > > > > >
-> > > > > > Hi Rob,
-> > > > > >
-> > > > > > Thank you so much for the feedback, I'm not very familiar with device tree,
-> > > > > > and any comments are very useful.
-> > > > > >
-> > > > > > On Mon, Dec 11, 2023 at 11:29:40AM -0600, Rob Herring wrote:
-> > > > > > > On Sun, Nov 19, 2023 at 10:59 AM Alexandru Elisei
-> > > > > > > <alexandru.elisei@arm.com> wrote:
-> > > > > > > >
-> > > > > > > > Allow the kernel to get the size and location of the MTE tag storage
-> > > > > > > > regions from the DTB. This memory is marked as reserved for now.
-> > > > > > > >
-> > > > > > > > The DTB node for the tag storage region is defined as:
-> > > > > > > >
-> > > > > > > >         tags0: tag-storage@8f8000000 {
-> > > > > > > >                 compatible = "arm,mte-tag-storage";
-> > > > > > > >                 reg = <0x08 0xf8000000 0x00 0x4000000>;
-> > > > > > > >                 block-size = <0x1000>;
-> > > > > > > >                 memory = <&memory0>;    // Associated tagged memory node
-> > > > > > > >         };
-> > > > > > >
-> > > > > > > I skimmed thru the discussion some. If this memory range is within
-> > > > > > > main RAM, then it definitely belongs in /reserved-memory.
-> > > > > >
-> > > > > > Ok, will do that.
-> > > > > >
-> > > > > > If you don't mind, why do you say that it definitely belongs in
-> > > > > > reserved-memory? I'm not trying to argue otherwise, I'm curious about the
-> > > > > > motivation.
-> > > > >
-> > > > > Simply so that /memory nodes describe all possible memory and
-> > > > > /reserved-memory is just adding restrictions. It's also because
-> > > > > /reserved-memory is what gets handled early, and we don't need
-> > > > > multiple things to handle early.
-> > > > >
-> > > > > > Tag storage is not DMA and can live anywhere in memory.
-> > > > >
-> > > > > Then why put it in DT at all? The only reason CMA is there is to set
-> > > > > the size. It's not even clear to me we need CMA in DT either. The
-> > > > > reasoning long ago was the kernel didn't do a good job of moving and
-> > > > > reclaiming contiguous space, but that's supposed to be better now (and
-> > > > > most h/w figured out they need IOMMUs).
-> > > > >
-> > > > > But for tag storage you know the size as it is a function of the
-> > > > > memory size, right? After all, you are validating the size is correct.
-> > > > > I guess there is still the aspect of whether you want enable MTE or
-> > > > > not which could be done in a variety of ways.
-> > > >
-> > > > Oh, sorry, my bad, I should have been clearer about this. I don't want to
-> > > > put it in the DT as a "linux,cma" node. But I want it to be managed by CMA.
-> > >
-> > > Yes, I understand, but my point remains. Why do you need this in DT?
-> > > If the location doesn't matter and you can calculate the size from the
-> > > memory size, what else is there to add to the DT?
-> >
-> > I am afraid there has been a misunderstanding. What do you mean by
-> > "location doesn't matter"?
-> 
-> You said:
-> > Tag storage is not DMA and can live anywhere in memory.
-> 
-> Which I took as the kernel can figure out where to put it. But maybe
-> you meant the h/w platform can hard code it to be anywhere in memory?
-> If so, then yes, DT is needed.
+On Wed, Dec 13, 2023 at 5:37=E2=80=AFAM Mark Brown <broonie@kernel.org> wro=
+te:
+>
+> On Tue, Dec 12, 2023 at 04:50:38PM -0800, Deepak Gupta wrote:
+>
+> > A theoretical scenario (no current workloads should've this case
+> > because no shadow stack)
+>
+> > - User mode did _ENABLE on the main thread. Shadow stack was allocated
+> > for the current
+> >   thread.
+> > - User mode created a bunch worker threads to run untrusted contained
+> > code. They shadow
+> >   stack too.
+> > - main thread had to do dlopen and now need to disable shadow stack on
+> > itself due to
+> >   incompatibility of incoming object in address space.
+> > - main thread controls worker threads and knows they're contained and
+> > should still be running
+> >   with a shadow stack. Although once in a while the main thread needs
+> > to perform writes to a shadow
+> >   stack of worker threads for some fixup (in the same addr space).
+> > main thread doesn't want to delegate
+> >   this responsibility of ss writes to worker threads because they're un=
+trusted.
+>
+> > How will it do that (currently _ENABLE is married to _WRITE and _PUSH) =
+?
+>
+> That's feeling moderately firmly into "don't do that" territory to be
+> honest, the problems of trying to modify the stack of another running
+> thread while it's active just don't seem worth it - if you're
+> coordinating enough to do the modifications it's probably possible to
+> just ask the thread who's stack is being modified to do the modification
+> itself and having an unprotected thread writing into shadow stack memory
+> doesn't feel great.
+>
 
-Ah, I see, sorry for not being clear enough, you are correct: tag storage
-is a hardware property, and software needs a mechanism (in this case, the
-dt) to discover its properties.
-
-> 
-> > At the very least, Linux needs to know the address and size of a memory
-> > region to use it. The series is about using the tag storage memory for
-> > data. Tag storage cannot be described as a regular memory node because it
-> > cannot be tagged (and normal memory can).
-> 
-> If the tag storage lives in the middle of memory, then it would be
-> described in the memory node, but removed by being in reserved-memory
-> node.
-
-I don't follow. Would you mind going into more details?
-
-> 
-> > Then there's the matter of the tag storage block size (explained in this
-> > commit message), and also knowing the memory range for which a tag storage
-> > region stores the tags. This is explained in the cover letter.
-> 
-> Honestly, I just forgot about that part.
-
-I totally understand, there are a lot of things to consider at the same
-time.
-
-Thanks,
-Alex
+Yeah no leanings on my side. Just wanted to articulate this scenario.
+Since this is new ground,
+we can define what's appropriate. Let's keep it this way where a
+thread can write to shadow
+stack mappings only when it itself has shadow stack enabled.
