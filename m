@@ -1,122 +1,109 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 213271844
-	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 02:45:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ox/nAT5R"
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6ce7c1b07e1so5511673b3a.2
-        for <kvmarm@lists.linux.dev>; Tue, 12 Dec 2023 18:45:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702435509; x=1703040309; darn=lists.linux.dev;
-        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=CJ7qwCmvq20mGgi3dRymJGPN14h9pbhwL4VM2txPZCM=;
-        b=Ox/nAT5RTU8A/059hdQrT7Xufblts7BBiAxuMHU2DBXuhWFSB9HiPzRXZ1xSXtGkso
-         iMaAKc7Y32spkfVgzNL9/X45Y/iT67R6IpzUqWz4kOA+o0H7K1wtE+1xIB4zuXod6bPV
-         3y6db1LQlMupaW7+7mDG5Y7VP9V+MK/bTU/lE0fja9ZF6W2Zwy259eYwY1bklLXfQt4C
-         xXMimqTPa2kfIUpzmXC+7OSfJ7U1fX5McZBHpDOZMTH06JZxvl6jxf0rQphaZ7es+Knw
-         2yn3R/dzrtIHyOm06KnIPf8IaNNgbnKRdB1cSEO0fCqQTqo1aezCBXudviNP0fA9TPxa
-         F8Pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702435509; x=1703040309;
-        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CJ7qwCmvq20mGgi3dRymJGPN14h9pbhwL4VM2txPZCM=;
-        b=IlsNyg/L3GFm/Q+yWRmV/71+i7LiindfqvGNR7vwXEhcaNCiQb3XQBtZydDMRgAo75
-         IbRUS5i4zfGXw0G1me63mcD7CZ0rNhfd2z3nktzBz2rKi0D0s2OFF8dBFnCE0u51qbs7
-         105gTMMboEsYZRMqQ6LnT/tIf0wofUdrpqbh+St2ctN8GCuGc8/EJxl+h92uYGRN2DMv
-         LbVlBwLXR/tVkoprnVMlmESaSazHQOVULT5l6NQgmIKorvce2GlKc4cub8AzcXX4BrvJ
-         YMg2KTsqaD8p4ItBtc9sxgVdgsW1ng8s5odjSUAAljR6dePxgLhX3MF+7TTYk8k9d6zI
-         Ce7Q==
-X-Gm-Message-State: AOJu0YxGpHl8QO57OiR/ItNEA6SILZ+qKeZbefozdbNQNwVImlIGqS/x
-	4E85BUgTvfaibp4UKMJbl7VoaQ==
-X-Google-Smtp-Source: AGHT+IGi//6HE3KINOZpirefGAX+e3jIHwZFWzUp/AR1xA1scaFysKSWvBw9/QjFkCNOqGCFGdEidA==
-X-Received: by 2002:a05:6a00:c81:b0:6cb:a2f4:8579 with SMTP id a1-20020a056a000c8100b006cba2f48579mr8585102pfv.15.1702435509333;
-        Tue, 12 Dec 2023 18:45:09 -0800 (PST)
-Received: from localhost ([2804:14d:7e39:8470:cddd:ffc9:f19e:a4dc])
-        by smtp.gmail.com with ESMTPSA id y72-20020a62ce4b000000b006cb7bdbc3besm9528817pfg.17.2023.12.12.18.45.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Dec 2023 18:45:08 -0800 (PST)
-References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
- <20231122-arm64-gcs-v7-37-201c483bd775@kernel.org>
-User-agent: mu4e 1.10.8; emacs 29.1
-From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
- <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Morton
- <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
- <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, Oleg
- Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, Kees
- Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, "Rick P.
- Edgecombe" <rick.p.edgecombe@intel.com>, Deepak Gupta
- <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, Szabolcs Nagy
- <Szabolcs.Nagy@arm.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
- <aou@eecs.berkeley.edu>, Florian Weimer <fweimer@redhat.com>, Christian
- Brauner <brauner@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v7 37/39] kselftest/arm64: Add a GCS stress test
-In-reply-to: <20231122-arm64-gcs-v7-37-201c483bd775@kernel.org>
-Date: Tue, 12 Dec 2023 23:45:06 -0300
-Message-ID: <87zfyex1l9.fsf@linaro.org>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF05F9471
+	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 03:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D25A6C15;
+	Tue, 12 Dec 2023 19:56:47 -0800 (PST)
+Received: from [10.162.41.8] (a077893.blr.arm.com [10.162.41.8])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EEADB3F5A1;
+	Tue, 12 Dec 2023 19:55:55 -0800 (PST)
+Message-ID: <b319f8ed-5848-4663-bc1b-7afe160bbcd3@arm.com>
+Date: Wed, 13 Dec 2023 09:25:52 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V15 2/8] KVM: arm64: Prevent guest accesses into BRBE
+ system registers/instructions
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com,
+ Mark Brown <broonie@kernel.org>, James Clark <james.clark@arm.com>,
+ Rob Herring <robh@kernel.org>, Suzuki Poulose <suzuki.poulose@arm.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ linux-perf-users@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev
+References: <20231201053906.1261704-1-anshuman.khandual@arm.com>
+ <20231201053906.1261704-3-anshuman.khandual@arm.com>
+ <86v89ebcn2.wl-maz@kernel.org>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <86v89ebcn2.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
-I'm going a bit out-of-order to report a build failure in a test:
 
-Mark Brown <broonie@kernel.org> writes:
-
-> +// Recurse x20 times
-> +.macro recurse id
-
-I get an assembler error here:
-
-gcc -nostdlib gcs-stress-thread.S -o /home/thiago.bauermann/src/linux/tools/testing/selftests/arm64/gcs/gcs-stress-thread
-gcs-stress-thread.S: Assembler messages:
-gcs-stress-thread.S:236: Error: unexpected end of file in macro `recurse' definition
-make[2]: *** [Makefile:24: /home/thiago.bauermann/src/linux/tools/testing/selftests/arm64/gcs/gcs-stress-thread] Error 1
-
-This is with gas from Ubuntu 22.04, which ships binutils 2.38.
-
-> +function recurse\id
-> +	stp	x29, x30, [sp, #-16]!
-> +	mov	x29, sp
-> +
-> +	cmp	x20, 0
-> +	beq	1f
-> +	sub	x20, x20, 1
-> +	bl	recurse\id
-> +
-> +1:
-> +	ldp	x29, x30, [sp], #16
-> +
-> +	// Do a syscall immediately prior to returning to try to provoke
-> +	// scheduling and migration at a point where coherency issues
-> +	// might trigger.
-> +	mov	x8, #__NR_getpid
-> +	svc	#0
-> +
-> +	ret
-> +endfunction
-> +.endmacro
-> +
-> +// Generate and use two copies so we're changing the GCS contents
-> +recurse 1
-> +recurse 2
-
--- 
-Thiago
+On 12/4/23 13:52, Marc Zyngier wrote:
+> On Fri, 01 Dec 2023 05:39:00 +0000,
+> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+>> Currently BRBE feature is not supported in a guest environment. This hides
+>> BRBE feature availability via masking ID_AA64DFR0_EL1.BRBE field. This also
+>> blocks guest accesses into BRBE system registers and instructions as if the
+>> underlying hardware never implemented FEAT_BRBE feature.
+>>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: Oliver Upton <oliver.upton@linux.dev>
+>> Cc: James Morse <james.morse@arm.com>
+>> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: kvmarm@lists.linux.dev
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> Cc: linux-kernel@vger.kernel.org
+>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>> ---
+>>  arch/arm64/kvm/sys_regs.c | 130 ++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 130 insertions(+)
+>>
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index 4735e1b37fb3..42701065b3cd 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -1583,6 +1583,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+>>  	/* Hide SPE from guests */
+>>  	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
+>>  
+>> +	/* Hide BRBE from guests */
+>> +	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
+>> +
+>>  	return val;
+>>  }
+>>  
+>> @@ -2042,6 +2045,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>>  	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
+>>  	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
+>>  	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
+>> +	{ SYS_DESC(OP_BRB_IALL), undef_access },
+>> +	{ SYS_DESC(OP_BRB_INJ), undef_access },
+>>  
+>>  	DBG_BCR_BVR_WCR_WVR_EL1(0),
+>>  	DBG_BCR_BVR_WCR_WVR_EL1(1),
+>> @@ -2072,6 +2077,131 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>>  	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
+>>  	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
+>>  
+>> +	/*
+>> +	 * BRBE branch record sysreg address space is interleaved between
+>> +	 * corresponding BRBINF<N>_EL1, BRBSRC<N>_EL1, and BRBTGT<N>_EL1.
+>> +	 */
+>> +	{ SYS_DESC(SYS_BRBINF0_EL1), undef_access },
+>> +	{ SYS_DESC(SYS_BRBSRC0_EL1), undef_access },
+>> +	{ SYS_DESC(SYS_BRBTGT0_EL1), undef_access },
+>> +	{ SYS_DESC(SYS_BRBINF16_EL1), undef_access },
+>> +	{ SYS_DESC(SYS_BRBSRC16_EL1), undef_access },
+>> +	{ SYS_DESC(SYS_BRBTGT16_EL1), undef_access },
+> Surely we can do better than this wall of text. Please look at what we
+> do for the debug registers, and adopt a similar pattern. This should
+> result in one line per group of 3 registers.
+> 
+> What is the plan for KVM support beyond this?
+We are planning to add support for simultaneous and independent branch record
+tracing via perf branch stack sampling inside the guest and the host. But will
+prevent tracing of the guest execution from the host.
