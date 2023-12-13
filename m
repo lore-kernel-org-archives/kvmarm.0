@@ -1,128 +1,130 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94DBE2D03D
-	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 14:02:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9565B2E82B
+	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 14:06:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="BiZyNcOd"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-40c39e936b4so45667775e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 06:02:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1702476173; x=1703080973; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W8CNgTMGbobolB1r9w8VNb165BlBAplPuvdaxYrWog0=;
-        b=BiZyNcOdWm5GCZQdThwIvW6Ng+RTMmwQc3P+H0nCksYjm+yNZQA7RSra5vNIekxTo5
-         2Xysoz5Fx5dowIdxW7uCaFhuaAYrITXVqNNYvJJwX2tM7m7nSs9AZaebVnsPktjCmRYL
-         TxV44gkp2iFt3srKGjvTqMULS4L5lOeLSgkDIzSO3/VZ5KZMlKvt3lkosoZTo4syK9cq
-         GUEkjvMBleutXV8KpMZeTAL09tA7sjnqPxS7sBa5MFS/psykizX4yAaxSY63fWg7Sipu
-         1hhIU5T0NY8G69UJU0MPmpHDRHuj/zJbwJpGdUVFf61yZm2IjlgbqBbYyszIu0vbjGa5
-         Fqhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702476173; x=1703080973;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W8CNgTMGbobolB1r9w8VNb165BlBAplPuvdaxYrWog0=;
-        b=I3KJFAUYr35+MO/xGyZmfGmlqxgm+OD45jt6t7mFZHA5iBpqnrSkZ5yqV8zVxHh9ZI
-         iE627aWQ6wi+2GlpOPCvM6YOzEu0G65bQ0HO91BGm8UtJc7KhHc/VXNC8aPTnnnDqeyF
-         tvz9kjqf5/U2eDoR2+ow4hQFS0EPnOZG5WbGWLNGaITxt7kibKRhdCfdCz9itC6JzzOR
-         IqHv9rMRYZVwNQavopAB378wngtmZqaiqJyVFJ/UYFANShX2Un5hObsJOuzoFgHu/hBp
-         Orb3bXafw5zvZlEJSJVnnF18nhnMUnDnvoUsaYplCs+T8ABlrL5AkEjbJkiCougd+9TF
-         XBSg==
-X-Gm-Message-State: AOJu0Yx+ihuTsIGYrrSALBejjRBddwDWGvFqEoP3sTnXPAU78qI3gjoR
-	U4z8Gl5q/rYWBiP2/IRqihY2TA==
-X-Google-Smtp-Source: AGHT+IHHe1VYvYeZf/3ceduRCoWvVbIdH20JSg3fNMXtxhw7fHkTGIiZ2b27mL7MboW3CuD0I846lA==
-X-Received: by 2002:a05:600c:2483:b0:40c:3314:5be0 with SMTP id 3-20020a05600c248300b0040c33145be0mr1879277wms.295.1702476172702;
-        Wed, 13 Dec 2023 06:02:52 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id fm14-20020a05600c0c0e00b00407b93d8085sm22968185wmb.27.2023.12.13.06.02.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Dec 2023 06:02:52 -0800 (PST)
-Date: Wed, 13 Dec 2023 15:02:51 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Haibo Xu <haibo1.xu@intel.com>
-Cc: xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
-	Conor Dooley <conor.dooley@microchip.com>, Mayuresh Chitale <mchitale@ventanamicro.com>, 
-	Daniel Henrique Barboza <dbarboza@ventanamicro.com>, Jisheng Zhang <jszhang@kernel.org>, 
-	Samuel Holland <samuel@sholland.org>, Minda Chen <minda.chen@starfivetech.com>, 
-	Sean Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, Like Xu <likexu@tencent.com>, 
-	Vipin Sharma <vipinsh@google.com>, Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, 
-	Thomas Huth <thuth@redhat.com>, Aaron Lewis <aaronlewis@google.com>, 
-	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 05/11] tools: riscv: Add header file vdso/processor.h
-Message-ID: <20231213-9d5ad03bed3056007c6e714d@orel>
-References: <cover.1702371136.git.haibo1.xu@intel.com>
- <7b633cc441f5133608597463301fef122f5174d3.1702371136.git.haibo1.xu@intel.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c9zQEcvQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28832C433B6
+	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 14:06:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702476419;
+	bh=tm2PI5P6o9KPIR9RVFv5cihdxeSVXN3uEt/yiTzKpe0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=c9zQEcvQ/I/2TrO3daFju8Q2xvsVxymZ1J7YViFzMZ22+GvhKczCBu8rrJUDo+TO1
+	 Anc8NUN4dA8ow4LVobcs6qb1jWphf9bw+jELBUPJqudNn/xWmkIMxcrIKvu8XEBcOa
+	 WGHuZ4mBaB1rMvlvIqSSVkfP8pw0u8oJznFFXHh/0RHC1S6PyvN8OnGfzj5MLKjOEg
+	 HySg5HD2tSeAL5m4LdWat8MD42qViAcfpBu0xgVl4Hr5NLzfEv0Y0pYxVLkLYlhamB
+	 Yq4b1VHB5b6j9M45TKb0UiSQxQhkgwHVuLjWoh+MIYvXWbVA5RP95pk6+8WdFm9kYM
+	 Og9EiU/75zGdQ==
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-50c0f13ea11so7992933e87.3
+        for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 06:06:59 -0800 (PST)
+X-Gm-Message-State: AOJu0Yz8fymlxxn9BFwCS+MsywIfPzGeDE60RNyyZWAYIy55pK1upFuf
+	U48MkjhFDfjK93iQtVO7n7rsOIj0iUidphSCEA==
+X-Google-Smtp-Source: AGHT+IEHGprK2wtm9q9hd2ZZLdtHsMouVaTGmtumsX7/XD4d3zOhREC7oFbL/aoRWTZ5IHg9+YH7vjYm3B+d1JvtS+g=
+X-Received: by 2002:a19:8c5b:0:b0:50d:1733:ceba with SMTP id
+ i27-20020a198c5b000000b0050d1733cebamr3208254lfj.58.1702476417164; Wed, 13
+ Dec 2023 06:06:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7b633cc441f5133608597463301fef122f5174d3.1702371136.git.haibo1.xu@intel.com>
+References: <20231119165721.9849-1-alexandru.elisei@arm.com>
+ <20231119165721.9849-12-alexandru.elisei@arm.com> <CAL_Jsq+k5BeM9+u12AQvWQ0b4Uv5Cy0vPOpK_uLcYtRnunq4iQ@mail.gmail.com>
+ <ZXiMiLz9ZyUdxUP8@raptor> <CAL_Jsq+U_GR=mOK3-phnd4jeJKf79aOmhPwDOSj+f=s-7fZZWQ@mail.gmail.com>
+ <ZXmr-Kl9L2SO13--@raptor>
+In-Reply-To: <ZXmr-Kl9L2SO13--@raptor>
+From: Rob Herring <robh@kernel.org>
+Date: Wed, 13 Dec 2023 08:06:44 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqL=P1Y6w38LD_xw+vK4CNqt22FW_FE9oi_XTLHVQEne7Q@mail.gmail.com>
+Message-ID: <CAL_JsqL=P1Y6w38LD_xw+vK4CNqt22FW_FE9oi_XTLHVQEne7Q@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 11/27] arm64: mte: Reserve tag storage memory
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, 
+	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org, 
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, 
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org, 
+	bsegall@google.com, mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com, 
+	mhiramat@kernel.org, rppt@kernel.org, hughd@google.com, pcc@google.com, 
+	steven.price@arm.com, anshuman.khandual@arm.com, vincenzo.frascino@arm.com, 
+	david@redhat.com, eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-mm@kvack.org, 
+	linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 12, 2023 at 05:31:14PM +0800, Haibo Xu wrote:
-> Borrow the cpu_relax() definitions from kernel's
-> arch/riscv/include/asm/vdso/processor.h to tools/ for riscv.
-> 
-> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> ---
->  tools/arch/riscv/include/asm/vdso/processor.h | 32 +++++++++++++++++++
->  1 file changed, 32 insertions(+)
->  create mode 100644 tools/arch/riscv/include/asm/vdso/processor.h
-> 
-> diff --git a/tools/arch/riscv/include/asm/vdso/processor.h b/tools/arch/riscv/include/asm/vdso/processor.h
-> new file mode 100644
-> index 000000000000..662aca039848
-> --- /dev/null
-> +++ b/tools/arch/riscv/include/asm/vdso/processor.h
-> @@ -0,0 +1,32 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +#ifndef __ASM_VDSO_PROCESSOR_H
-> +#define __ASM_VDSO_PROCESSOR_H
-> +
-> +#ifndef __ASSEMBLY__
-> +
-> +#include <asm-generic/barrier.h>
-> +
-> +static inline void cpu_relax(void)
-> +{
-> +#ifdef __riscv_muldiv
-> +	int dummy;
-> +	/* In lieu of a halt instruction, induce a long-latency stall. */
-> +	__asm__ __volatile__ ("div %0, %0, zero" : "=r" (dummy));
-> +#endif
-> +
-> +#ifdef CONFIG_TOOLCHAIN_HAS_ZIHINTPAUSE
-> +	/*
-> +	 * Reduce instruction retirement.
-> +	 * This assumes the PC changes.
-> +	 */
-> +	__asm__ __volatile__ ("pause");
-> +#else
-> +	/* Encoding of the pause instruction */
-> +	__asm__ __volatile__ (".4byte 0x100000F");
-> +#endif
-> +	barrier();
-> +}
-> +
-> +#endif /* __ASSEMBLY__ */
-> +
-> +#endif /* __ASM_VDSO_PROCESSOR_H */
-> -- 
-> 2.34.1
+On Wed, Dec 13, 2023 at 7:05=E2=80=AFAM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
 >
+> Hi Rob,
+>
+> On Tue, Dec 12, 2023 at 12:44:06PM -0600, Rob Herring wrote:
+> > On Tue, Dec 12, 2023 at 10:38=E2=80=AFAM Alexandru Elisei
+> > <alexandru.elisei@arm.com> wrote:
+> > >
+> > > Hi Rob,
+> > >
+> > > Thank you so much for the feedback, I'm not very familiar with device=
+ tree,
+> > > and any comments are very useful.
+> > >
+> > > On Mon, Dec 11, 2023 at 11:29:40AM -0600, Rob Herring wrote:
+> > > > On Sun, Nov 19, 2023 at 10:59=E2=80=AFAM Alexandru Elisei
+> > > > <alexandru.elisei@arm.com> wrote:
+> > > > >
+> > > > > Allow the kernel to get the size and location of the MTE tag stor=
+age
+> > > > > regions from the DTB. This memory is marked as reserved for now.
+> > > > >
+> > > > > The DTB node for the tag storage region is defined as:
+> > > > >
+> > > > >         tags0: tag-storage@8f8000000 {
+> > > > >                 compatible =3D "arm,mte-tag-storage";
+> > > > >                 reg =3D <0x08 0xf8000000 0x00 0x4000000>;
+> > > > >                 block-size =3D <0x1000>;
+> > > > >                 memory =3D <&memory0>;    // Associated tagged me=
+mory node
+> > > > >         };
+> > > >
+> > > > I skimmed thru the discussion some. If this memory range is within
+> > > > main RAM, then it definitely belongs in /reserved-memory.
+> > >
+> > > Ok, will do that.
+> > >
+> > > If you don't mind, why do you say that it definitely belongs in
+> > > reserved-memory? I'm not trying to argue otherwise, I'm curious about=
+ the
+> > > motivation.
+> >
+> > Simply so that /memory nodes describe all possible memory and
+> > /reserved-memory is just adding restrictions. It's also because
+> > /reserved-memory is what gets handled early, and we don't need
+> > multiple things to handle early.
+> >
+> > > Tag storage is not DMA and can live anywhere in memory.
+> >
+> > Then why put it in DT at all? The only reason CMA is there is to set
+> > the size. It's not even clear to me we need CMA in DT either. The
+> > reasoning long ago was the kernel didn't do a good job of moving and
+> > reclaiming contiguous space, but that's supposed to be better now (and
+> > most h/w figured out they need IOMMUs).
+> >
+> > But for tag storage you know the size as it is a function of the
+> > memory size, right? After all, you are validating the size is correct.
+> > I guess there is still the aspect of whether you want enable MTE or
+> > not which could be done in a variety of ways.
+>
+> Oh, sorry, my bad, I should have been clearer about this. I don't want to
+> put it in the DT as a "linux,cma" node. But I want it to be managed by CM=
+A.
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+Yes, I understand, but my point remains. Why do you need this in DT?
+If the location doesn't matter and you can calculate the size from the
+memory size, what else is there to add to the DT?
+
+Rob
