@@ -1,130 +1,154 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9565B2E82B
-	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 14:06:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC472E65E
+	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 14:08:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c9zQEcvQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28832C433B6
-	for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 14:06:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702476419;
-	bh=tm2PI5P6o9KPIR9RVFv5cihdxeSVXN3uEt/yiTzKpe0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=c9zQEcvQ/I/2TrO3daFju8Q2xvsVxymZ1J7YViFzMZ22+GvhKczCBu8rrJUDo+TO1
-	 Anc8NUN4dA8ow4LVobcs6qb1jWphf9bw+jELBUPJqudNn/xWmkIMxcrIKvu8XEBcOa
-	 WGHuZ4mBaB1rMvlvIqSSVkfP8pw0u8oJznFFXHh/0RHC1S6PyvN8OnGfzj5MLKjOEg
-	 HySg5HD2tSeAL5m4LdWat8MD42qViAcfpBu0xgVl4Hr5NLzfEv0Y0pYxVLkLYlhamB
-	 Yq4b1VHB5b6j9M45TKb0UiSQxQhkgwHVuLjWoh+MIYvXWbVA5RP95pk6+8WdFm9kYM
-	 Og9EiU/75zGdQ==
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-50c0f13ea11so7992933e87.3
-        for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 06:06:59 -0800 (PST)
-X-Gm-Message-State: AOJu0Yz8fymlxxn9BFwCS+MsywIfPzGeDE60RNyyZWAYIy55pK1upFuf
-	U48MkjhFDfjK93iQtVO7n7rsOIj0iUidphSCEA==
-X-Google-Smtp-Source: AGHT+IEHGprK2wtm9q9hd2ZZLdtHsMouVaTGmtumsX7/XD4d3zOhREC7oFbL/aoRWTZ5IHg9+YH7vjYm3B+d1JvtS+g=
-X-Received: by 2002:a19:8c5b:0:b0:50d:1733:ceba with SMTP id
- i27-20020a198c5b000000b0050d1733cebamr3208254lfj.58.1702476417164; Wed, 13
- Dec 2023 06:06:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="TlhNVbxt"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40c580ba223so13489795e9.3
+        for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 06:08:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1702476530; x=1703081330; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=w4lrG4sG6YQ4BIE8GkwyCjrSGGxi/UC5oCrLRkXbQKg=;
+        b=TlhNVbxtopTdBKzD5XRxJ5Y5Uay64UkNCJUo+VyjP8+ZLNWerATMEy2YiW7wXF8aXM
+         59JEdVRYzzZP11QVpAtinotWajNAFhbxsFLaR2OlgBsEtdo2WVrNQ0MsQao85DWINwcp
+         J/VGDMlUFHxKL/54z6Y9Wt+MT2PPnR6Tv+BA62zCDrVfWlqdKuo1/IN3sf0iQK2ztyi5
+         dtlfc/kCoM1iccdQLnNc6ko6sJjFLg4oiXSWigPyO+DroRIp1wO+mEYLrYtrWWR5Am9J
+         rH/LriKilK5WeK2E2Kf32ZUmpavzi8C1/0WC/skS8u0peJPsXeO/QZZCmn8oLDmOw9Eu
+         uM3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1702476530; x=1703081330;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w4lrG4sG6YQ4BIE8GkwyCjrSGGxi/UC5oCrLRkXbQKg=;
+        b=eC/JtEmcHiskOodx19qYQNDtRRc3MoKVTn5xBeQ4g5uyjLnGtVr7FvrmGmQ5Gdp1uS
+         lPho/6ms1+8W2FaWsWCw6L/bU+5AdooGGRdHBpegZJR+hCreksr0Bqh9/UrTPzzfZOBv
+         HgWmxES6B9y2Ek1MNXwj5zW9JxefwQ8LcFKt+747YtKfIS24DTsw9pdQmPgHn7J8b2RE
+         mej/5IEPZICCY0TQvRJltE2tH3EIp1klFOONaHCK43H4haXEVzKqNhqnQqXcLs+bXDFW
+         U6UoyFmBEGp56SmxR6q7Is0XSx3k127TnQtde9HM/RdF99R825uffEyzpuJVPIvlLhc7
+         Fd5g==
+X-Gm-Message-State: AOJu0YztEJOc55XgOHK4BpM8AbqKm53+htNxPTXX3RWQ3aoi2W89Urah
+	lE5QgjoSQsEPlkI99AesV6RsAA==
+X-Google-Smtp-Source: AGHT+IFgauWd5JriwtlECloTEhDNQTP3+kD2+Khl56+oF2aQ1LGAnudW9SV+lT5Ks1LMkyomAMD58w==
+X-Received: by 2002:a05:600c:1d19:b0:40b:5e1d:83a0 with SMTP id l25-20020a05600c1d1900b0040b5e1d83a0mr4191978wms.52.1702476529934;
+        Wed, 13 Dec 2023 06:08:49 -0800 (PST)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id v6-20020a05600c444600b0040c46ba7b66sm11736461wmn.48.2023.12.13.06.08.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Dec 2023 06:08:49 -0800 (PST)
+Date: Wed, 13 Dec 2023 15:08:48 +0100
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Haibo Xu <haibo1.xu@intel.com>
+Cc: xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
+	Conor Dooley <conor.dooley@microchip.com>, Mayuresh Chitale <mchitale@ventanamicro.com>, 
+	Greentime Hu <greentime.hu@sifive.com>, wchen <waylingii@gmail.com>, Jisheng Zhang <jszhang@kernel.org>, 
+	Minda Chen <minda.chen@starfivetech.com>, Samuel Holland <samuel@sholland.org>, 
+	Sean Christopherson <seanjc@google.com>, Like Xu <likexu@tencent.com>, Peter Xu <peterx@redhat.com>, 
+	Vipin Sharma <vipinsh@google.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Thomas Huth <thuth@redhat.com>, Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, 
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v4 08/11] KVM: riscv: selftests: Add guest helper to get
+ vcpu id
+Message-ID: <20231213-b02db86aaf7957be22b200f1@orel>
+References: <cover.1702371136.git.haibo1.xu@intel.com>
+ <02f6c9ccaaeb4ceb67137863e0317f62cef62496.1702371136.git.haibo1.xu@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20231119165721.9849-1-alexandru.elisei@arm.com>
- <20231119165721.9849-12-alexandru.elisei@arm.com> <CAL_Jsq+k5BeM9+u12AQvWQ0b4Uv5Cy0vPOpK_uLcYtRnunq4iQ@mail.gmail.com>
- <ZXiMiLz9ZyUdxUP8@raptor> <CAL_Jsq+U_GR=mOK3-phnd4jeJKf79aOmhPwDOSj+f=s-7fZZWQ@mail.gmail.com>
- <ZXmr-Kl9L2SO13--@raptor>
-In-Reply-To: <ZXmr-Kl9L2SO13--@raptor>
-From: Rob Herring <robh@kernel.org>
-Date: Wed, 13 Dec 2023 08:06:44 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqL=P1Y6w38LD_xw+vK4CNqt22FW_FE9oi_XTLHVQEne7Q@mail.gmail.com>
-Message-ID: <CAL_JsqL=P1Y6w38LD_xw+vK4CNqt22FW_FE9oi_XTLHVQEne7Q@mail.gmail.com>
-Subject: Re: [PATCH RFC v2 11/27] arm64: mte: Reserve tag storage memory
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, 
-	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org, 
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, 
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org, 
-	bsegall@google.com, mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com, 
-	mhiramat@kernel.org, rppt@kernel.org, hughd@google.com, pcc@google.com, 
-	steven.price@arm.com, anshuman.khandual@arm.com, vincenzo.frascino@arm.com, 
-	david@redhat.com, eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-mm@kvack.org, 
-	linux-trace-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <02f6c9ccaaeb4ceb67137863e0317f62cef62496.1702371136.git.haibo1.xu@intel.com>
 
-On Wed, Dec 13, 2023 at 7:05=E2=80=AFAM Alexandru Elisei
-<alexandru.elisei@arm.com> wrote:
->
-> Hi Rob,
->
-> On Tue, Dec 12, 2023 at 12:44:06PM -0600, Rob Herring wrote:
-> > On Tue, Dec 12, 2023 at 10:38=E2=80=AFAM Alexandru Elisei
-> > <alexandru.elisei@arm.com> wrote:
-> > >
-> > > Hi Rob,
-> > >
-> > > Thank you so much for the feedback, I'm not very familiar with device=
- tree,
-> > > and any comments are very useful.
-> > >
-> > > On Mon, Dec 11, 2023 at 11:29:40AM -0600, Rob Herring wrote:
-> > > > On Sun, Nov 19, 2023 at 10:59=E2=80=AFAM Alexandru Elisei
-> > > > <alexandru.elisei@arm.com> wrote:
-> > > > >
-> > > > > Allow the kernel to get the size and location of the MTE tag stor=
-age
-> > > > > regions from the DTB. This memory is marked as reserved for now.
-> > > > >
-> > > > > The DTB node for the tag storage region is defined as:
-> > > > >
-> > > > >         tags0: tag-storage@8f8000000 {
-> > > > >                 compatible =3D "arm,mte-tag-storage";
-> > > > >                 reg =3D <0x08 0xf8000000 0x00 0x4000000>;
-> > > > >                 block-size =3D <0x1000>;
-> > > > >                 memory =3D <&memory0>;    // Associated tagged me=
-mory node
-> > > > >         };
-> > > >
-> > > > I skimmed thru the discussion some. If this memory range is within
-> > > > main RAM, then it definitely belongs in /reserved-memory.
-> > >
-> > > Ok, will do that.
-> > >
-> > > If you don't mind, why do you say that it definitely belongs in
-> > > reserved-memory? I'm not trying to argue otherwise, I'm curious about=
- the
-> > > motivation.
-> >
-> > Simply so that /memory nodes describe all possible memory and
-> > /reserved-memory is just adding restrictions. It's also because
-> > /reserved-memory is what gets handled early, and we don't need
-> > multiple things to handle early.
-> >
-> > > Tag storage is not DMA and can live anywhere in memory.
-> >
-> > Then why put it in DT at all? The only reason CMA is there is to set
-> > the size. It's not even clear to me we need CMA in DT either. The
-> > reasoning long ago was the kernel didn't do a good job of moving and
-> > reclaiming contiguous space, but that's supposed to be better now (and
-> > most h/w figured out they need IOMMUs).
-> >
-> > But for tag storage you know the size as it is a function of the
-> > memory size, right? After all, you are validating the size is correct.
-> > I guess there is still the aspect of whether you want enable MTE or
-> > not which could be done in a variety of ways.
->
-> Oh, sorry, my bad, I should have been clearer about this. I don't want to
-> put it in the DT as a "linux,cma" node. But I want it to be managed by CM=
-A.
+On Tue, Dec 12, 2023 at 05:31:17PM +0800, Haibo Xu wrote:
+> Add guest_get_vcpuid() helper to simplify accessing to per-cpu
+> private data. The sscratch CSR was used to store the vcpu id.
+> 
+> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> ---
+>  tools/testing/selftests/kvm/include/aarch64/processor.h | 4 ----
+>  tools/testing/selftests/kvm/include/kvm_util_base.h     | 9 +++++++++
+>  tools/testing/selftests/kvm/lib/riscv/processor.c       | 8 ++++++++
+>  3 files changed, 17 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> index c42d683102c7..16ae0ac01879 100644
+> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> @@ -226,8 +226,4 @@ void smccc_smc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
+>  	       uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5,
+>  	       uint64_t arg6, struct arm_smccc_res *res);
+>  
+> -
+> -
+> -uint32_t guest_get_vcpuid(void);
+> -
+>  #endif /* SELFTEST_KVM_PROCESSOR_H */
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index a18db6a7b3cf..666438113d22 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -932,4 +932,13 @@ void kvm_selftest_arch_init(void);
+>  
+>  void kvm_arch_vm_post_create(struct kvm_vm *vm);
+>  
+> +void vm_init_vector_tables(struct kvm_vm *vm);
+> +void vcpu_init_vector_tables(struct kvm_vcpu *vcpu);
+> +
+> +struct ex_regs;
+> +typedef void(*exception_handler_fn)(struct ex_regs *);
+> +void vm_install_exception_handler(struct kvm_vm *vm, int vector, exception_handler_fn handler);
 
-Yes, I understand, but my point remains. Why do you need this in DT?
-If the location doesn't matter and you can calculate the size from the
-memory size, what else is there to add to the DT?
+I think something happend on rebase since the above should be in a
+different patch (and were for v3). I suggest checking your previous
+and current version branches with git-range-diff after rebasing in
+order to catch stuff like this.
 
-Rob
+Thanks,
+drew
+
+> +
+> +uint32_t guest_get_vcpuid(void);
+> +
+>  #endif /* SELFTEST_KVM_UTIL_BASE_H */
+> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
+> index efd9ac4b0198..39a1e9902dec 100644
+> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
+> @@ -316,6 +316,9 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
+>  	vcpu_set_reg(vcpu, RISCV_CORE_REG(regs.sp), stack_vaddr + stack_size);
+>  	vcpu_set_reg(vcpu, RISCV_CORE_REG(regs.pc), (unsigned long)guest_code);
+>  
+> +	/* Setup sscratch for guest_get_vcpuid() */
+> +	vcpu_set_reg(vcpu, RISCV_CSR_REG(sscratch), vcpu_id);
+> +
+>  	/* Setup default exception vector of guest */
+>  	vcpu_set_reg(vcpu, RISCV_CSR_REG(stvec), (unsigned long)guest_unexp_trap);
+>  
+> @@ -436,3 +439,8 @@ void vm_install_interrupt_handler(struct kvm_vm *vm, exception_handler_fn handle
+>  
+>  	handlers->exception_handlers[1][0] = handler;
+>  }
+> +
+> +uint32_t guest_get_vcpuid(void)
+> +{
+> +	return csr_read(CSR_SSCRATCH);
+> +}
+> -- 
+> 2.34.1
+> 
