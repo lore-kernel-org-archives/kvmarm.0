@@ -1,215 +1,120 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FD475D8F8
-	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 15:45:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9BF2AC15;
-	Thu, 14 Dec 2023 07:46:22 -0800 (PST)
-Received: from raptor (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EA4D93F5A1;
-	Thu, 14 Dec 2023 07:45:31 -0800 (PST)
-Date: Thu, 14 Dec 2023 15:45:25 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Rob Herring <robh@kernel.org>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
-	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
-	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
-	rppt@kernel.org, hughd@google.com, pcc@google.com,
-	steven.price@arm.com, anshuman.khandual@arm.com,
-	vincenzo.frascino@arm.com, david@redhat.com, eugenis@google.com,
-	kcc@google.com, hyesoo.yu@samsung.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC v2 11/27] arm64: mte: Reserve tag storage memory
-Message-ID: <ZXsjFYKHkJM_JLCy@raptor>
-References: <20231119165721.9849-12-alexandru.elisei@arm.com>
- <CAL_Jsq+k5BeM9+u12AQvWQ0b4Uv5Cy0vPOpK_uLcYtRnunq4iQ@mail.gmail.com>
- <ZXiMiLz9ZyUdxUP8@raptor>
- <CAL_Jsq+U_GR=mOK3-phnd4jeJKf79aOmhPwDOSj+f=s-7fZZWQ@mail.gmail.com>
- <ZXmr-Kl9L2SO13--@raptor>
- <CAL_JsqL=P1Y6w38LD_xw+vK4CNqt22FW_FE9oi_XTLHVQEne7Q@mail.gmail.com>
- <ZXnE3724jYYSg4o6@raptor>
- <CAL_JsqJgTnuQjo13cKo1Ebm5j9tCRT8GhNavdqu5vwp+fdnTLw@mail.gmail.com>
- <ZXnthcg0BkEd-RgK@raptor>
- <CAL_JsqLAW0--F8R0oTaajN3YpbK2KgE6Ypn8tk4_pf_s=xC+aw@mail.gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B383C55784;
+	Thu, 14 Dec 2023 15:48:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YJqaV9dj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57E61C433C8;
+	Thu, 14 Dec 2023 15:48:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702568907;
+	bh=c5Hrhu9jv1aI02dxQqDlqaubcSiytClNWLM8d4C/kvI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YJqaV9djsO/05rDV52LNkS1/r3WX1iHi+z4LvSF0/Di2UKXcchnv6sNH/cOKDIuBx
+	 6MpAsvRG7pW6buIuMSK5/WrN8+vWJn03EpganGs7uk0UJSNmk2VfbrrARLeUyrYLqb
+	 DrjO+9QjEGyJkOWwoGkiMkxi93cpzZJOeLBi7crnAeQEDvyrV7Fqr9tTj4usU4fsz4
+	 p3KC5eQByNZx19W2DV9ABOEKUr2SF0bWlWuEEOK/zS5y0Dn+xhk7PZ7JYQ0r3ZrKAL
+	 FeGwO/Bi3QkCYVvPEXbACz4VsJMvz7XU3430O1c+P0LxSe2lJjXSwOo5SYUFY2MP/w
+	 pFc7cqInVHFIQ==
+Date: Thu, 14 Dec 2023 16:48:15 +0100
+From: Lorenzo Pieralisi <lpieralisi@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Catalin Marinas <catalin.marinas@arm.com>, ankita@nvidia.com,
+	maz@kernel.org, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	will@kernel.org, alex.williamson@redhat.com, kevin.tian@intel.com,
+	yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org,
+	gshan@redhat.com, linux-mm@kvack.org, aniketa@nvidia.com,
+	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
+	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
+	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	james.morse@arm.com
+Subject: Re: [PATCH v3 2/2] kvm: arm64: set io memory s2 pte as normalnc for
+ vfio pci devices
+Message-ID: <ZXsjv+svp44YjMmh@lpieralisi>
+References: <20231208164709.23101-1-ankita@nvidia.com>
+ <20231208164709.23101-3-ankita@nvidia.com>
+ <ZXicemDzXm8NShs1@arm.com>
+ <20231212181156.GO3014157@nvidia.com>
+ <ZXoOieQN7rBiLL4A@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL_JsqLAW0--F8R0oTaajN3YpbK2KgE6Ypn8tk4_pf_s=xC+aw@mail.gmail.com>
+In-Reply-To: <ZXoOieQN7rBiLL4A@linux.dev>
 
-Hi,
+[+James]
 
-On Wed, Dec 13, 2023 at 02:30:42PM -0600, Rob Herring wrote:
-> On Wed, Dec 13, 2023 at 11:44 AM Alexandru Elisei
-> <alexandru.elisei@arm.com> wrote:
-> >
-> > On Wed, Dec 13, 2023 at 11:22:17AM -0600, Rob Herring wrote:
-> > > On Wed, Dec 13, 2023 at 8:51 AM Alexandru Elisei
-> > > <alexandru.elisei@arm.com> wrote:
-> > > >
-> > > > Hi,
-> > > >
-> > > > On Wed, Dec 13, 2023 at 08:06:44AM -0600, Rob Herring wrote:
-> > > > > On Wed, Dec 13, 2023 at 7:05 AM Alexandru Elisei
-> > > > > <alexandru.elisei@arm.com> wrote:
-> > > > > >
-> > > > > > Hi Rob,
-> > > > > >
-> > > > > > On Tue, Dec 12, 2023 at 12:44:06PM -0600, Rob Herring wrote:
-> > > > > > > On Tue, Dec 12, 2023 at 10:38 AM Alexandru Elisei
-> > > > > > > <alexandru.elisei@arm.com> wrote:
-> > > > > > > >
-> > > > > > > > Hi Rob,
-> > > > > > > >
-> > > > > > > > Thank you so much for the feedback, I'm not very familiar with device tree,
-> > > > > > > > and any comments are very useful.
-> > > > > > > >
-> > > > > > > > On Mon, Dec 11, 2023 at 11:29:40AM -0600, Rob Herring wrote:
-> > > > > > > > > On Sun, Nov 19, 2023 at 10:59 AM Alexandru Elisei
-> > > > > > > > > <alexandru.elisei@arm.com> wrote:
-> > > > > > > > > >
-> > > > > > > > > > Allow the kernel to get the size and location of the MTE tag storage
-> > > > > > > > > > regions from the DTB. This memory is marked as reserved for now.
-> > > > > > > > > >
-> > > > > > > > > > The DTB node for the tag storage region is defined as:
-> > > > > > > > > >
-> > > > > > > > > >         tags0: tag-storage@8f8000000 {
-> > > > > > > > > >                 compatible = "arm,mte-tag-storage";
-> > > > > > > > > >                 reg = <0x08 0xf8000000 0x00 0x4000000>;
-> > > > > > > > > >                 block-size = <0x1000>;
-> > > > > > > > > >                 memory = <&memory0>;    // Associated tagged memory node
-> > > > > > > > > >         };
-> > > > > > > > >
-> > > > > > > > > I skimmed thru the discussion some. If this memory range is within
-> > > > > > > > > main RAM, then it definitely belongs in /reserved-memory.
-> > > > > > > >
-> > > > > > > > Ok, will do that.
-> > > > > > > >
-> > > > > > > > If you don't mind, why do you say that it definitely belongs in
-> > > > > > > > reserved-memory? I'm not trying to argue otherwise, I'm curious about the
-> > > > > > > > motivation.
-> > > > > > >
-> > > > > > > Simply so that /memory nodes describe all possible memory and
-> > > > > > > /reserved-memory is just adding restrictions. It's also because
-> > > > > > > /reserved-memory is what gets handled early, and we don't need
-> > > > > > > multiple things to handle early.
-> > > > > > >
-> > > > > > > > Tag storage is not DMA and can live anywhere in memory.
-> > > > > > >
-> > > > > > > Then why put it in DT at all? The only reason CMA is there is to set
-> > > > > > > the size. It's not even clear to me we need CMA in DT either. The
-> > > > > > > reasoning long ago was the kernel didn't do a good job of moving and
-> > > > > > > reclaiming contiguous space, but that's supposed to be better now (and
-> > > > > > > most h/w figured out they need IOMMUs).
-> > > > > > >
-> > > > > > > But for tag storage you know the size as it is a function of the
-> > > > > > > memory size, right? After all, you are validating the size is correct.
-> > > > > > > I guess there is still the aspect of whether you want enable MTE or
-> > > > > > > not which could be done in a variety of ways.
-> > > > > >
-> > > > > > Oh, sorry, my bad, I should have been clearer about this. I don't want to
-> > > > > > put it in the DT as a "linux,cma" node. But I want it to be managed by CMA.
-> > > > >
-> > > > > Yes, I understand, but my point remains. Why do you need this in DT?
-> > > > > If the location doesn't matter and you can calculate the size from the
-> > > > > memory size, what else is there to add to the DT?
-> > > >
-> > > > I am afraid there has been a misunderstanding. What do you mean by
-> > > > "location doesn't matter"?
-> > >
-> > > You said:
-> > > > Tag storage is not DMA and can live anywhere in memory.
-> > >
-> > > Which I took as the kernel can figure out where to put it. But maybe
-> > > you meant the h/w platform can hard code it to be anywhere in memory?
-> > > If so, then yes, DT is needed.
-> >
-> > Ah, I see, sorry for not being clear enough, you are correct: tag storage
-> > is a hardware property, and software needs a mechanism (in this case, the
-> > dt) to discover its properties.
-> >
-> > >
-> > > > At the very least, Linux needs to know the address and size of a memory
-> > > > region to use it. The series is about using the tag storage memory for
-> > > > data. Tag storage cannot be described as a regular memory node because it
-> > > > cannot be tagged (and normal memory can).
-> > >
-> > > If the tag storage lives in the middle of memory, then it would be
-> > > described in the memory node, but removed by being in reserved-memory
-> > > node.
-> >
-> > I don't follow. Would you mind going into more details?
+On Wed, Dec 13, 2023 at 08:05:29PM +0000, Oliver Upton wrote:
+> Hi,
 > 
-> It goes back to what I said earlier about /memory nodes describing all
-> the memory. There's no reason to reserve memory if you haven't
-> described that range as memory to begin with. One could presumably
-> just have a memory node for each contiguous chunk and not need
-> /reserved-memory (ignoring the need to say what things are reserved
-> for). That would become very difficult to adjust. Note that the kernel
-> has a hardcoded limit of 64 reserved regions currently and that is not
-> enough for some people. Seems like a lot, but I have no idea how they
-> are (ab)using /reserved-memory.
-
-Ah, I see what you mean, reserved memory is about marking existing memory
-(from a /memory node) as special, not about adding new memory.
-
-After the memblock allocator is initialized, the kernel can use it for its
-own allocations. Kernel allocations are not movable.
-
-When a page is allocated as tagged, the associated tag storage cannot be
-used for data, otherwise the tags would corrupt that data. To avoid this,
-the requirement is that tag storage pages are only used for movable
-allocations. When a page is allocated as tagged, the data in the associated
-tag storage is migrated and the tag storage is taken from the page
-allocator (via alloc_contig_range()).
-
-My understanding is that the memblock allocator can use all the memory from
-a /memory node. If the tags storage memory is declared in a /memory node,
-there exists the possibility that Linux will use tag storage memory for its
-own allocation, which would make that tags storage memory unmovable, and
-thus unusable for storing tags.
-
-Looking at early_init_dt_scan_memory(), even if a /memory node if marked at
-hotpluggable, memblock will still use it, unless "movable_node" is set on
-the kernel command line.
-
-That's the reason why I'm not describing tag storage in a /memory node.  Is
-there way to tell the memblock allocator not to use memory from a /memory
-node?
-
+> Sorry, a bit late to the discussion :)
 > 
-> Let me give an example. Presumably using MTE at all is configurable.
-> If you boot a kernel with MTE disabled (or older and not supporting
-> it), then I'd assume you'd want to use the tag storage for regular
-> memory. Well, If tag storage is already part of /memory, then all you
-> have to do is ignore the tag reserved-memory region. Tweaking the
-> memory nodes would be more work.
+> On Tue, Dec 12, 2023 at 02:11:56PM -0400, Jason Gunthorpe wrote:
+> > On Tue, Dec 12, 2023 at 05:46:34PM +0000, Catalin Marinas wrote:
+> > > should know the implications. There's also an expectation that the
+> > > actual driver (KVM guests) or maybe later DPDK can choose the safe
+> > > non-cacheable or write-combine (Linux terminology) attributes for the
+> > > BAR.
+> > 
+> > DPDK won't rely on this interface
+> 
+> Wait, so what's the expected interface for determining the memory
+> attributes at stage-1? I'm somewhat concerned that we're conflating two
+> things here:
+> 
+>  1) KVM needs to know the memory attributes to use at stage-2, which
+>     isn't fundamentally different from what's needed for userspace
+>     stage-1 mappings.
+> 
+>  2) KVM additionally needs a hint that the device / VFIO can handle
+>     mismatched aliases w/o the machine exploding. This goes beyond
+>     supporting Normal-NC mappings at stage-2 and is really a bug
+>     with our current scheme (nGnRnE at stage-1, nGnRE at stage-2).
+> 
+> I was hoping that (1) could be some 'common' plumbing for both userspace
+> and KVM mappings. And for (2), any case where a device is intolerant of
+> mismatches && KVM cannot force the memory attributes should be rejected.
+> 
+> AFAICT, the only reason PCI devices can get the blanket treatment of
+> Normal-NC at stage-2 is because userspace has a Device-* mapping and can't
+> speculatively load from the alias. This feels a bit hacky, and maybe we
+> should prioritize an interface for mapping a device into a VM w/o a
+> valid userspace mapping.
 
-Right now, memory is added via memblock_reserve(), and if MTE is disabled
-(for example, via the kernel command line), the code calls
-free_reserved_page() for each tag storage page. I find that straightfoward
-to implement.
+FWIW - I have tried to summarize the reasoning behind PCIe devices
+Normal-NC default stage-2 safety in a document that I have just realized
+now it has become this series cover letter, I don't think the PCI blanket
+treatment is related *only* to the current user space mappings (ie
+BTW, AFAICS it is also *possible* at present to map a prefetchable BAR through
+sysfs with Normal-NC memory attributes in the host at the same time a PCI
+device is passed-through to a guest with VFIO - and therefore we have a
+dev-nGnRnE stage-1 mapping for it. Don't think anyone does that - what for -
+but it is possible and KVM would not know about it).
+
+Again, FWIW, we were told (source Arm ARM) mismatched aliases concerning
+device-XXX vs Normal-NC are not problematic as long as the transactions
+issued for the related mappings are independent (and none of the
+mappings is cacheable).
+
+I appreciate this is not enough to give everyone full confidence on
+this solution robustness - that's why I wrote that up so that we know
+what we are up against and write KVM interfaces accordingly.
+
+> I very much understand that this has been going on for a while, and we
+> need to do *something* to get passthrough working well for devices that
+> like 'WC'. I just want to make sure we don't paint ourselves into a corner
+> that's hard to get out of in the future.
+
+That makes perfect sense, see above, if there is anything we can do
+to clarify we will, in whatever shape it is preferred.
 
 Thanks,
-Alex
-
-> 
-> 
-> Also, I should point out that /memory and /reserved-memory nodes are
-> not used for UEFI boot.
-> 
-> Rob
-> 
+Lorenzo
