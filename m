@@ -1,54 +1,57 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94FB2E64B
-	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 10:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 530B72E64B
+	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 10:02:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DhsBca11"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5e27479b6e2so25149147b3.0
-        for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 02:02:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ut3D9taJ"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-33331e69698so6595687f8f.1
+        for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 02:02:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702548120; x=1703152920; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jcmoOfTfuAZe0H48BAZSQKy3c0OXKN12bT3q7fYzvao=;
-        b=DhsBca110gSM009jzFNAsjdghty3Ipdr/HIPLdvCbTw7RFtCbhy9VI1dbPi0sVPV5k
-         5XsfgvZ8MLmiOm8peePlrfl1SpGHFLmk18GILaV6CXJAy6P2rN7gGruXPwE5d7La0XGA
-         g5VcJ7PHVHWnAdu6KSGSge5DLto7KV0HAkvCBP6fPE7V/IVg8eTP6SdNmh1z04fZ8bu/
-         YsapDdUgK2ZfI4RnfID8QQO5EeujlqIQO+sok7PbsQ7TWyc4t2vE/WgiHtYHGP+zuffK
-         qfXnuujAXtYHT0xxr5hfBdJN+VGKCAQzo+A/A9KhaSQeUnO4g2hDioDxMJPRoqaMm9AV
-         2d2A==
+        d=google.com; s=20230601; t=1702548122; x=1703152922; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lK/UD9rywANKR7blVX9d/xN+XkoswxGXvB4reNM2bgU=;
+        b=Ut3D9taJQMWkKHj/hAsXVi7wkAzTVYRsQoyWjJPa73oBOEQ6fX4s58p4XtE+b35fwR
+         RHw+B9FAT1EF3vPvEvCEG8VyNvYrd4bc2QWORi/n3AIlnqT09PnQIxmUg+yG+VoIeUDt
+         3zYTATIf/OnU/pNjUGS9R5ekjzmmgL1SomonQ1NeqcCduJhJC60KyN9IouMVAjk8AZT1
+         v+J+TgFxoffzxwB3hJGWZ14V/PdKuf1aA+b+BEv0qkgzFmDA1DrBPS36piqkOxH4svK1
+         X8ls+9loSqYaNGyadUB7jgv3WuTFNGk2Ej/vdClxlcthOUsUpyjkiAErvrX6hIFmXfh3
+         wgQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702548120; x=1703152920;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jcmoOfTfuAZe0H48BAZSQKy3c0OXKN12bT3q7fYzvao=;
-        b=F+hGapqXhsZaaON0fRJaIn3Lfszo9V8oXF/8jgnMabnNvEHl7dex/+/X770sq+RvcB
-         z7FxbYukQY1XKiMKaad4VA+e6ku2Y02beV03fAuD3CmRFOow4YWNq5Aenf1ZvAO50Rm6
-         S6iSoaMPyLVbhkoaundiAA/wsVMtTbLai6MSSTEZP90mS3gcXfJOCBP1HS9AeQS7kIOI
-         267RmUr/vRda1MgfQUW9pW8SlxTAn+l/t1sF7e5aZckXaeczSI936frs24/z0lSrBtqe
-         OXsNWZJ2IVYvz4EtuYH7wgGgg7xPS4TuUYeLAAKVODaxBR/5M305nbkWbz+lXjN9/+W1
-         JjvQ==
-X-Gm-Message-State: AOJu0YxL/6yepCaIDWYSCImEBH+uXBZ/T9N2ES9ifprEUGU17JTfVAVx
-	ZxmNxEPjEtBQmVsTiet4kQtFM9aADMR629XkOHtUtvqBrzHoDYWXEwK1l36hsEOS8vyI6MgZIMj
-	YcP/2FTuaeWeWYgmi07BomTEKHtu78VZCRbXkRgqCK/2lv3FtR8wGIP4BhNk=
-X-Google-Smtp-Source: AGHT+IHa7ZGIfNRAiqR5mQm9iMrynhdS+L689UnGmzl+oKTX6+S84bpG0jYLqqqsBtLwgJhUvmIEHp0/bQ==
+        d=1e100.net; s=20230601; t=1702548122; x=1703152922;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lK/UD9rywANKR7blVX9d/xN+XkoswxGXvB4reNM2bgU=;
+        b=TrOy523sJ0Fmg15RJMrtxUdvKfsEd6kZL9FQqFm9OLNUDGCyYCuInwsVDK9kZ7XVrk
+         0LQxnQj5zvbc9NuNiJ1ihgeNzSosJnUuyF0LiL/n0nTmWcvz2TzJN60H8I5OZek0ih75
+         IbQ1uuiOUb0bnYovRiMyuCHaxrzwqzRATuLrdNQMVwTAkXpf0qiq/IWeQDK5ftSYubcP
+         6vHxbXG4EETdl7OPu1C5tKFVB1EnL64V47o7VmlTGUqneFZqnwo8+ZhPuz7SmC75ZXVS
+         8mGALWFxLVTYJ/9/Sv5KOieH2AsYRGN3QsAmZrg74BaJJVtPiHRP0+BefhFzSzlNFIg3
+         /AdA==
+X-Gm-Message-State: AOJu0YzpTi9gq0N6pVewG3lFIAwmsp89fDJSihfPQ6yDciXPDaaTIbml
+	JoFIU7ILelURtKBKZc6VQMZUaX9GP3JJEAhKjkKGU4X6uuzVC7i2lVpMXTleemLatTSugP8JhKM
+	0UzSUtWf0KumsdcB1DZzCvA2gZuRDTv8Wu3god4hKk9ajZitXtYU2PEauQew=
+X-Google-Smtp-Source: AGHT+IGJJHIsD1xjhl63UW9V8Ndxpk7q0cp06ihFUj9uAXgwk16GOxymoaVfreWidlYvo/hi+CCyO8rG8A==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:534:b0:db5:41e9:aa1c with SMTP id
- y20-20020a056902053400b00db541e9aa1cmr74689ybs.11.1702548120127; Thu, 14 Dec
- 2023 02:02:00 -0800 (PST)
-Date: Thu, 14 Dec 2023 10:01:40 +0000
+ (user=tabba job=sendgmr) by 2002:adf:f2ca:0:b0:336:471e:ada7 with SMTP id
+ d10-20020adff2ca000000b00336471eada7mr4618wrp.0.1702548122478; Thu, 14 Dec
+ 2023 02:02:02 -0800 (PST)
+Date: Thu, 14 Dec 2023 10:01:41 +0000
+In-Reply-To: <20231214100158.2305400-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20231214100158.2305400-1-tabba@google.com>
 X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231214100158.2305400-1-tabba@google.com>
-Subject: [PATCH v3 00/17] KVM: arm64: Fixes to fine grain traps and pKVM traps
+Message-ID: <20231214100158.2305400-2-tabba@google.com>
+Subject: [PATCH v3 01/17] arm64/sysreg: Add missing Pauth_LR field definitions
+ to ID_AA64ISAR1_EL1
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, 
@@ -58,84 +61,37 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, broonie@kernel.org,
 	linux-arm-kernel@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 
-Changes from v2:
-- Rebased on arm64/for-next/sysregs, which includes new system
-  register definitions (Mark, Joey)
-- Explicitly trap unsupported HFGxTR_EL2 features rather than
-  relying on its nMASK (Joey)
-- Add new system registers to the auto-generated sysreg rather
-  than hardcoding them (Mark)
-- Drop patch that was meant as RFC
-- Added missing system registers, fields, and  system
-  instructions
-- Split patches that make system register changes
-- Fixes to patches defining allowed features for protected VMs
-- Other minor fixes and tidying up
+Add the Pauth_LR field definitions to ID_AA64ISAR1_EL1, based on
+DDI0601 2023-09.
 
-Changes from v1:
-- Handle HAFGRTR_EL2 in nested virt
-- Update the nested virt FGT tables with the added trap bits (Marc)
-- Use the generated value for RES0 (Marc)
-- Calculate the value of NMASK based on RES0 and MASK
+These fields aren't used yet. Adding them for completeness and
+consistency (definition already exists for ID_AA64ISAR2_EL1).
 
-This patch series has fixes, updates, and code for validating
-fine grain trap register masks, as well as some fixes to feature
-trapping in pKVM.
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ arch/arm64/tools/sysreg | 2 ++
+ 1 file changed, 2 insertions(+)
 
-New fine grain trap (FGT) bits have been defined in the latest
-Arm Architecture System Registers xml specification (DDI0601 and
-DDI0602 2023-09) [1], so the code is updated to reflect them.
-Moreover, some of the already-defined masks overlap with RES0,
-which this series fixes.
-
-It also adds FGT register masks that weren't defined earlier,
-handling of HAFGRTR_EL2 in nested virt, as well as build time
-validation that the bits of the various masks are all accounted
-for and without overlap.
-
-Based on arm64/for-next/sysregs (e94e06d8a796), which is composed
-of system register updates [2] and is based on Linux 6.7-rc3.
-
-Cheers,
-/fuad
-
-[1] https://developer.arm.com/downloads/-/exploration-tools
-[2] https://lore.kernel.org/all/20231209-b4-arm64-sysreg-additions-v1-0-45284e538474@kernel.org/
-
-Fuad Tabba (17):
-  arm64/sysreg: Add missing Pauth_LR field definitions to
-    ID_AA64ISAR1_EL1
-  arm64/sysreg: Add missing ExtTrcBuff field definition to
-    ID_AA64DFR0_EL1
-  arm64/sysreg: Add missing system register definitions for FGT
-  arm64/sysreg: Add missing system instruction definitions for FGT
-  KVM: arm64: Explicitly trap unsupported HFGxTR_EL2 features
-  KVM: arm64: Add missing HFGxTR_EL2 FGT entries to nested virt
-  KVM: arm64: Add missing HFGITR_EL2 FGT entries to nested virt
-  KVM: arm64: Add bit masks for HAFGRTR_EL2
-  KVM: arm64: Handle HAFGRTR_EL2 trapping in nested virt
-  KVM: arm64: Update and fix FGT register masks
-  KVM: arm64: Add build validation for FGT trap mask values
-  KVM: arm64: Use generated FGT RES0 bits instead of specifying them
-  KVM: arm64: Define FGT nMASK bits relative to other fields
-  KVM: arm64: Macros for setting/clearing FGT bits
-  KVM: arm64: Fix which features are marked as allowed for protected VMs
-  KVM: arm64: Mark PAuth as a restricted feature for protected VMs
-  KVM: arm64: Trap external trace for protected VMs
-
- arch/arm64/include/asm/kvm_arm.h              | 61 +++++++++------
- arch/arm64/include/asm/kvm_host.h             |  1 +
- arch/arm64/include/asm/sysreg.h               |  7 ++
- arch/arm64/kvm/emulate-nested.c               | 63 +++++++++++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h       | 77 +++++++++++--------
- .../arm64/kvm/hyp/include/nvhe/fixed_config.h | 22 +++++-
- arch/arm64/kvm/hyp/nvhe/pkvm.c                |  4 +
- arch/arm64/kvm/sys_regs.c                     |  1 +
- arch/arm64/tools/sysreg                       | 50 +++++++++++-
- 9 files changed, 225 insertions(+), 61 deletions(-)
-
-
-base-commit: e94e06d8a7960fd840ea92021ca1bf1362ea67f8
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 2c4b6665c5bf..d596be2599d1 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -1401,6 +1401,7 @@ UnsignedEnum	11:8	API
+ 	0b0011	PAuth2
+ 	0b0100	FPAC
+ 	0b0101	FPACCOMBINE
++	0b0110	PAuth_LR
+ EndEnum
+ UnsignedEnum	7:4	APA
+ 	0b0000	NI
+@@ -1409,6 +1410,7 @@ UnsignedEnum	7:4	APA
+ 	0b0011	PAuth2
+ 	0b0100	FPAC
+ 	0b0101	FPACCOMBINE
++	0b0110	PAuth_LR
+ EndEnum
+ UnsignedEnum	3:0	DPB
+ 	0b0000	NI
 -- 
 2.43.0.472.g3155946c3a-goog
 
