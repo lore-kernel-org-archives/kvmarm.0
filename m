@@ -1,72 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 678693C6BC
-	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 10:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e+d2Zn9x"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 184CDC433C8;
-	Thu, 14 Dec 2023 10:50:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702551030;
-	bh=WhVk6LdYTBcLUolzvQwZzTU0osUuadmW4+S3Xld0eN0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=e+d2Zn9x5QJyRYo15LjvCmCJPKt6hCIlfqkH6Vubiubw14MClDtGJuid0wq5MyPuj
-	 vlpdloZmXDCiEUgxnbGw+9lIHlptZDKDzGHBIgeL2Z+KcarbM7ydytJWqFHbDTSiHM
-	 QESMiPy0SSYsLrsz4SYfpVmmu0JjfInmnGdUHQ98GPfzj82yJAs+RtFoheFZMcNUJ6
-	 h+eiloAwsjsJPlIZp/B6dRwkJ8LlCkjM8SW2g+KV4JJuex8GEjnLdAgx3EURdCz0AJ
-	 8kLj2auLm/tCLdEOnpohE4y0dWyuaLdB2KlhmmdUBn8o9/9JV2UXyjMz6iuW+sQoP2
-	 SPg4mhnRK26UA==
-Date: Thu, 14 Dec 2023 10:50:25 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev,
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, eric.auger@redhat.com,
-	jingzhangos@google.com, joey.gouly@arm.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 03/17] arm64/sysreg: Add missing system register
- definitions for FGT
-Message-ID: <c9a947e9-7bf0-484d-970d-4094d19ed5d5@sirena.org.uk>
-References: <20231214100158.2305400-1-tabba@google.com>
- <20231214100158.2305400-4-tabba@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4188E4B5AA
+	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 12:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4SrWVm0htSzMnmP;
+	Thu, 14 Dec 2023 20:14:24 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
+	by mail.maildlp.com (Postfix) with ESMTPS id B818B1404D9;
+	Thu, 14 Dec 2023 20:14:32 +0800 (CST)
+Received: from [10.174.185.210] (10.174.185.210) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 14 Dec 2023 20:14:31 +0800
+From: Kunkun Jiang <jiangkunkun@huawei.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jean-Philippe Brucker
+	<jean-philippe@linaro.org>
+CC: "moderated list:ARM SMMU DRIVERS" <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, open list <linux-kernel@vger.kernel.org>,
+	"wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>
+Subject: [bug report] GICv4.1: vSGI remains pending across the guest reset
+Message-ID: <7e7f2c0c-448b-10a9-8929-4b8f4f6e2a32@huawei.com>
+Date: Thu, 14 Dec 2023 20:13:57 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="SJaJ5HEXpA+q0OZk"
-Content-Disposition: inline
-In-Reply-To: <20231214100158.2305400-4-tabba@google.com>
-X-Cookie: Preserve the old, but know the new.
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
 
+Hi list,
 
---SJaJ5HEXpA+q0OZk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+We have observed on GICv4.1 systems that, after a guest reset, the
+secondary VCPU would receive an IPI_CPU_STOP accidently and failed to
+come online eventually.
 
-On Thu, Dec 14, 2023 at 10:01:43AM +0000, Fuad Tabba wrote:
-> Add the definitions of missing system registers that are
-> trappable by fine grain traps. The definitions are based on
-> DDI0601 2023-09.
+| Guest User-space
+|
+| reset (with a vSGI pending in the
+| hardware) [0]
+|
+| disable the distributor (write 0
+| into GICD_CTLR) [1]
+|
+| clear pending status (write 0 into
+| GICR_ISPENDR0 for each RD) [2]
+|
+| disable the distributor (write 0
+| into GICD_CTLR) [3]
+|
+| enable the distributor with ARE,
+| Group1 and nASSGIreq [4]
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+The problem is that even if user-space tries to disable the distributor
+and clear pending bits for all SGIs, we don't actually propogate it into
+HW (we only record it via vgic_dist->{enabled, nassgireq} and
+vgic_irq->pending_latch) and the vSGI remains pending across the guest
+reset.
 
---SJaJ5HEXpA+q0OZk
-Content-Type: application/pgp-signature; name="signature.asc"
+And when we're at [4], all vSGI's vgic_irq->hw are *true* and
+vgic_v4_enable_vsgis() becomes a nop.. That's not good.
 
------BEGIN PGP SIGNATURE-----
+The following solution can solve the problem. Not sure if this is a good
+solution.Sent out early for suggestions or solutions.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmV63fAACgkQJNaLcl1U
-h9AnOgf+PVtAXSrnlzE9CDnbX0WKrvaXfoEJCi3KzYwJreZcxVLhpBDdsTq/jZ2Z
-E3xPbIxx8gQRlkQ8I0EJqgeUa16GnJk0tDCD+0BwfLX6NUsXCtMdLzbkAz35GSFZ
-bPPlk7iq9Pqpi6PVNnNBSsNymODVg3+0X+gDBjj75zWZMNa32EeoSpQwPGf8lOcm
-qOf0VBAEfVOP4ydYS41qboKlhKE88RDw1+xkb/ed0iK8cRIHwKdWgnxAwbUAarMs
-fJKxzo4W1oFAF+kXGp+Zdu8D16BKqwcZFupt2O2f2HGCIcn2fzB7/Tleq12wCGJW
-GzCzXEAvU4x86yAGpNxemfOse3LdOg==
-=B+LD
------END PGP SIGNATURE-----
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c 
+b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index 89117ba2528a..3678ab33f5b9 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -374,6 +374,10 @@ static int vgic_v3_uaccess_write_pending(struct 
+kvm_vcpu *vcpu,
+              irq->pending_latch = true;
+              vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+          } else {
++             if (irq->hw && vgic_irq_is_sgi(irq->intid))
++                 irq_set_irqchip_state(irq->host_irq,
++                              IRQCHIP_STATE_PENDING,
++                              false);
+              irq->pending_latch = false;
+              raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+          }
 
---SJaJ5HEXpA+q0OZk--
