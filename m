@@ -1,685 +1,831 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1616ABF
-	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 06:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDDD1FA6
+	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 06:42:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="IwHW1aYO"
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-28b06be7cf6so277509a91.2
-        for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 22:20:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="rOjlpC63"
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-6da330ff8fdso1463778a34.0
+        for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 22:42:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1702534812; x=1703139612; darn=lists.linux.dev;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1702536125; x=1703140925; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=usZae7pl3MvjhAJt7mCoCrwHfAUEYl7EAGJsUOY2M9Q=;
-        b=IwHW1aYOFDQIgXQODX9iNNstV4EUUIux4++YzDH8mul22uDL5jBERX5RO2TNsoEW7I
-         U4v//e42sUAoPr+7Uw1wWA40yhF5xTlf5VAya+k/jPaI8qxj5PAlIYCgMtZZpO2mwcBE
-         2uxN6gJmZ5do0Su5yc7KUp2E3INQLST2OVH6qXPWWcOLWCgPy8cIMuSpAS2IU8rqHoeM
-         6kXywaB57quHV+w5QJ4G8z+jamBfApvLzZ42ONaIRs4V0osD/2/WHDUfi8sYMeenKOor
-         pSJYUeqMkGtNbdIEXH1lprCvhfMgzvUHA/jDP1KTAPkCfutUwj5QkLR2Wqhvnlhy0yZd
-         6+ZA==
+        bh=13FmDcyhjs8ErKIoJ2M5PIcR4M2jPsANXaNJ5AXqq5M=;
+        b=rOjlpC63RhgbhWIwj24GwAA5yYiRZryDbJ5dB3QS62D/XcfgXWg0OCvkaMdygmZSR7
+         aub73sFre3E6CrXMza7gbtHw6V8P0aOYQHNo1Arp5YghqXk5NPVwO+lmYd6cl3dQ2rNj
+         JrKMM9/tO/DI1jZq5PkiA3bHOjpbITkqDGLB0nMWcIqqdSdaCSU0fAkD8jZtHnLmaR5/
+         2QyFp7UMf+TXjQGn8YTz7457RiHBonMQUPoXlJWd9PgZ3FvOU/MfTeHnpNoOSd95Uuf9
+         sYqgMYsNAlqt1+pviWJTQ0Kqdh8j7NAI3U8CciYP3yD131SCw7c3aEybvHrJA6lDVwvD
+         R0UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702534812; x=1703139612;
+        d=1e100.net; s=20230601; t=1702536125; x=1703140925;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=usZae7pl3MvjhAJt7mCoCrwHfAUEYl7EAGJsUOY2M9Q=;
-        b=Ks/r13RBECX3aSdDQFf5wsNdWfndQVtpN6P4G1kt8+VuIEuO6x++v1/R8Tbkkz+OD5
-         TT13vBSbicKfLl/VkxihGfb6YQUinygt+NXuZBSIkLSQ+GJli9U2dxnbZ368TizxJtO/
-         dnmIGz09geJ75wnMpdLzNjjjoGqD6LtlXJhbucrUKzk2tMBax4pODPG2IYBQp4IaTSED
-         PV9B1zVHUc7h6fGnYHrUYJzhIi8lqxeC+NtTQaJOq50vDFUBkO4WOn4/cQHZgWRV/HFt
-         T9U6MaTBLgM00qfvjGqFBRHZyVoOrqY31fsOBlHvdJbLetdqe4XfbhePeTTwZZoQad5U
-         93Cw==
-X-Gm-Message-State: AOJu0YynC+FN3EBXWzUzYb1QwtT8UdzfOppvIvPx4cH697Gpu3h/mzyj
-	sgUJK8zZUuixB09aCDyAf2PmMcDuyjx6CQWN01znrQ==
-X-Google-Smtp-Source: AGHT+IHoDEzaeNTBz3an7Avgk3ETv+Yw0lQ+h7PpO6QDmPdjjkoy+XCzIThEdNUah62czl7MeVMvKdc99zVQSiKEZvk=
-X-Received: by 2002:a17:90a:b012:b0:28a:e58d:fbd0 with SMTP id
- x18-20020a17090ab01200b0028ae58dfbd0mr864277pjq.72.1702534811859; Wed, 13 Dec
- 2023 22:20:11 -0800 (PST)
+        bh=13FmDcyhjs8ErKIoJ2M5PIcR4M2jPsANXaNJ5AXqq5M=;
+        b=O2IgwD7D05a8JKCiNJgxFa2bqzNJ7dRrR+XlBwVP4bvRhCgrLBr7rRqMaHi1V9/f1K
+         AqVtavl94ujpGfurZiAVOQOqb8TC6wfkOoHwVHySEZ2nM1akia6nNOJ7LL/kzsZ5fM1E
+         O9BECk+U2DIUNF5xCg4HJRRP/Hp9jrD9Mq1rR9Qy3VpSYBFNWuR3AZuU3KD+C/3zvQ0b
+         MNxEsdWsnulrocOb+we9xnk62zJFch5xSOLd9dXtce4WWXi9DvTNPn5yAhRIK9noRAXv
+         ujz/WmezdVXJA+y4u7lGIFmPeOsa1cn6ehBf01PX3dxcxmU7CpXkMEiw+Nrf6MuVewbL
+         0pSg==
+X-Gm-Message-State: AOJu0Yw6+Ro4FKHMJ8BFRGS2Mo0RCj4DNKyuwl+f0cL2BC9sO9nnE0JW
+	NTqUaxjnuJhEiqGjrW+VBdDiWiBl05dhvZFvjnDSEw==
+X-Google-Smtp-Source: AGHT+IEfDp47zSpKQdKI+0bZaATu9JMKD/6G8am64FM5JEj6y0PGHRStMTIbBSF49LOiFWpoZuIijoOssdjeHIMVFgM=
+X-Received: by 2002:a05:6358:4194:b0:170:ee27:bfa1 with SMTP id
+ w20-20020a056358419400b00170ee27bfa1mr5103478rwc.5.1702536124532; Wed, 13 Dec
+ 2023 22:42:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230916003118.2540661-1-seanjc@google.com> <20230916003118.2540661-27-seanjc@google.com>
-In-Reply-To: <20230916003118.2540661-27-seanjc@google.com>
+References: <cover.1702371136.git.haibo1.xu@intel.com> <636e8c3bf8b35be089182569621eaff331242d98.1702371136.git.haibo1.xu@intel.com>
+In-Reply-To: <636e8c3bf8b35be089182569621eaff331242d98.1702371136.git.haibo1.xu@intel.com>
 From: Anup Patel <anup@brainfault.org>
-Date: Thu, 14 Dec 2023 11:50:00 +0530
-Message-ID: <CAAhSdy1mxY23+AU99wSmbCcr6yGHrdRGDqAVehzuD-TEJuK_OQ@mail.gmail.com>
-Subject: Re: [PATCH 26/26] KVM: Hide KVM internal data structures and values
- from kernel at-large
-To: Sean Christopherson <seanjc@google.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+Date: Thu, 14 Dec 2023 12:11:53 +0530
+Message-ID: <CAAhSdy2=MbAS0evdVH0afB1OqNAH9e8_fLSyCmhAe-4_m4jo7w@mail.gmail.com>
+Subject: Re: [PATCH v4 02/11] KVM: arm64: selftests: Split arch_timer test code
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Cc: xiaobo55x@gmail.com, haibo1.xu@intel.com, ajones@ventanamicro.com, 
 	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Tony Krowiak <akrowiak@linux.ibm.com>, 
-	Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>, 
-	Harald Freudenberger <freude@linux.ibm.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	Andy Lutomirski <luto@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	Anish Ghulati <aghulati@google.com>, Venkatesh Srinivas <venkateshs@chromium.org>, 
-	Andrew Thornton <andrewth@google.com>
+	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
+	Conor Dooley <conor.dooley@microchip.com>, Mayuresh Chitale <mchitale@ventanamicro.com>, 
+	Greentime Hu <greentime.hu@sifive.com>, Heiko Stuebner <heiko@sntech.de>, 
+	Samuel Holland <samuel@sholland.org>, Minda Chen <minda.chen@starfivetech.com>, 
+	Jisheng Zhang <jszhang@kernel.org>, Sean Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, 
+	Like Xu <likexu@tencent.com>, Vipin Sharma <vipinsh@google.com>, 
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, Thomas Huth <thuth@redhat.com>, 
+	Aaron Lewis <aaronlewis@google.com>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Sep 16, 2023 at 6:02=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> Wrap all KVM internal APIs, data structures, values, etc. in public
-> headers with "#ifdef __KVM__" to effectively hide KVM's internal details
-> from other subsystems and the kernel at-large.  Hiding KVM details for
-> all architectures will, in the very distant future, allow loading a new
-> (or old) KVM module without needing to rebuild and reboot the entire
-> kernel, or to even allow loading and running multiple versions of KVM
-> simultaneously on a single host.
->
-> To allow different instances of KVM modules to freely modify KVM data
-> structures, enums, #defines, etc., e.g. the struct kvm_vcpu layout, there
-> must be exactly zero dereferences of KVM-defined structures/values in
-> non-KVM code (excepting code for architectures that don't support such
-> shenanigans).  Any such references could lead to latent bugs, e.g. as the
-> kernel would think a KVM structure has layout X, but in reality the
-> current incarnation of KVM uses layout Y.
->
-> In KVM x86, all remaining non-KVM references to KVM details have been now
-> eliminated.  To harden KVM against new references being introduced, hide
-> KVM's details to ensure that KVM doesn=E2=80=99t create a de facto ABI wi=
-th the
-> rest of the kernel.
->
-> Use #ifdeffery to hide KVM details as doing so requires, by far, the leas=
-t
-> amount of churn and impact on architectures that freely share select KVM
-> details with the rest of the kernel, e.g. s390, ARM64 and PPC, have
-> significant usage of KVM-defined APIs, structures, values, etc.  E.g.
-> attempting to extract the "private" chunks into dedicated KVM-internal
-> headers would require massive churn, even on x86, and it's not obvious th=
-e
-> end result would be a net positive (all attempts at moving code around
-> failed long before getting anywhere near compiling cleanly).
->
-> Another (bad) alternative that would be relative churn-free would be to
-> move the KVM headers to a dedicated KVM-specific path while maintaining
-> the generic layout, e.g. something like virt/kvm/include/linux.  That
-> would allow x86 to simply omit the KVM-specific include path.  But that
-> would require modifying the global include path, i.e. would make KVM a
-> really special snowflake and set the awful precedent that it's "ok" to
-> add subsystem specific directories to the global include path.
->
-> Grant exceptions to asm-offsets.c as needed, and to s390's VFIO AP driver=
-.
-> Creating a KVM-specific asm-offsets, as was done for x86, adds no value
-> (x86 did so to avoid exposing vendor specific headers) and doesn't create
-> much of a "slippery slope" risk.  s390's VFIO AP driver on the other hand
-> is simply too intertwined with KVM to realistically treat it as anything
-> other than KVM code, despite it living in crypto drivers, e.g. the driver
-> has some rather crazy lock ordering rules between the device and KVM.
->
-> Add a static assert that __KVM__ is defined in trace/events/kvm.h, as tha=
-t
-> is effectively a private KVM header that just happens to live in a public
-> path.
->
-> Shuffle a few PPC includes and an s390 declaration as needed, and
-> opportunistically include kvm_host.h in trace/events.kvm.h instead of
-> relying on the parent to provide the right includes.
->
-> Cc: Anish Ghulati <aghulati@google.com>
-> Cc: Venkatesh Srinivas <venkateshs@chromium.org>
-> Cc: Andrew Thornton <andrewth@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+Hi Marc, Hi Oliver,
 
-For KVM RISC-V:
-Anup Patel <anup@brainfault.org>
+On Tue, Dec 12, 2023 at 2:49=E2=80=AFPM Haibo Xu <haibo1.xu@intel.com> wrot=
+e:
+>
+> Split the arch-neutral test code out of aarch64/arch_timer.c
+> and put them into a common arch_timer.c. This is a preparation
+> to share timer test codes in riscv.
+>
+> Suggested-by: Andrew Jones <ajones@ventanamicro.com>
+> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+
+Can you please review this patch ?
+
+We want to take this entire series through KVM RISC-V tree.
 
 Regards,
 Anup
 
 > ---
->  arch/arm64/include/asm/kvm_emulate.h     | 3 +++
->  arch/arm64/include/asm/kvm_host.h        | 2 ++
->  arch/arm64/include/asm/kvm_mmu.h         | 4 ++++
->  arch/arm64/kernel/asm-offsets.c          | 2 ++
->  arch/arm64/kvm/hyp/Makefile              | 2 +-
->  arch/arm64/kvm/hyp/nvhe/Makefile         | 3 ++-
->  arch/arm64/kvm/hyp/vhe/Makefile          | 2 +-
->  arch/mips/include/asm/kvm_host.h         | 2 ++
->  arch/mips/kernel/asm-offsets.c           | 2 ++
->  arch/powerpc/include/asm/kvm_book3s.h    | 3 +++
->  arch/powerpc/include/asm/kvm_book3s_64.h | 2 ++
->  arch/powerpc/include/asm/kvm_booke.h     | 4 ++++
->  arch/powerpc/include/asm/kvm_host.h      | 7 ++++---
->  arch/powerpc/include/asm/kvm_ppc.h       | 2 ++
->  arch/powerpc/kernel/asm-offsets.c        | 1 +
->  arch/riscv/include/asm/kvm_host.h        | 3 +++
->  arch/riscv/kernel/asm-offsets.c          | 1 +
->  arch/s390/include/asm/kvm_host.h         | 7 +++++--
->  arch/s390/kernel/asm-offsets.c           | 1 +
->  arch/x86/include/asm/kvm_host.h          | 3 +++
->  drivers/s390/crypto/vfio_ap_drv.c        | 1 +
->  drivers/s390/crypto/vfio_ap_ops.c        | 2 ++
->  include/linux/kvm_host.h                 | 4 ++++
->  include/linux/kvm_types.h                | 3 +++
->  include/trace/events/kvm.h               | 5 +++++
->  virt/kvm/Makefile.kvm                    | 2 +-
->  26 files changed, 64 insertions(+), 9 deletions(-)
+>  tools/testing/selftests/kvm/Makefile          |   3 +-
+>  .../selftests/kvm/aarch64/arch_timer.c        | 275 +-----------------
+>  tools/testing/selftests/kvm/arch_timer.c      | 249 ++++++++++++++++
+>  .../testing/selftests/kvm/include/test_util.h |   2 +
+>  .../selftests/kvm/include/timer_test.h        |  43 +++
+>  5 files changed, 302 insertions(+), 270 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/arch_timer.c
+>  create mode 100644 tools/testing/selftests/kvm/include/timer_test.h
 >
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/as=
-m/kvm_emulate.h
-> index 3d6725ff0bf6..5861fa00763b 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -21,6 +21,8 @@
->  #include <asm/cputype.h>
->  #include <asm/virt.h>
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftes=
+ts/kvm/Makefile
+> index 2200f06b740b..4838ea899bbb 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -151,7 +151,6 @@ TEST_GEN_PROGS_x86_64 +=3D system_counter_offset_test
+>  TEST_GEN_PROGS_EXTENDED_x86_64 +=3D x86_64/nx_huge_pages_test
 >
-> +#ifdef __KVM__
-> +
->  #define CURRENT_EL_SP_EL0_VECTOR       0x0
->  #define CURRENT_EL_SP_ELx_VECTOR       0x200
->  #define LOWER_EL_AArch64_VECTOR                0x400
-> @@ -615,4 +617,5 @@ static __always_inline void kvm_reset_cptr_el2(struct=
- kvm_vcpu *vcpu)
+>  TEST_GEN_PROGS_aarch64 +=3D aarch64/aarch32_id_regs
+> -TEST_GEN_PROGS_aarch64 +=3D aarch64/arch_timer
+>  TEST_GEN_PROGS_aarch64 +=3D aarch64/debug-exceptions
+>  TEST_GEN_PROGS_aarch64 +=3D aarch64/hypercalls
+>  TEST_GEN_PROGS_aarch64 +=3D aarch64/page_fault_test
+> @@ -163,6 +162,7 @@ TEST_GEN_PROGS_aarch64 +=3D aarch64/vgic_init
+>  TEST_GEN_PROGS_aarch64 +=3D aarch64/vgic_irq
+>  TEST_GEN_PROGS_aarch64 +=3D aarch64/vpmu_counter_access
+>  TEST_GEN_PROGS_aarch64 +=3D access_tracking_perf_test
+> +TEST_GEN_PROGS_aarch64 +=3D arch_timer
+>  TEST_GEN_PROGS_aarch64 +=3D demand_paging_test
+>  TEST_GEN_PROGS_aarch64 +=3D dirty_log_test
+>  TEST_GEN_PROGS_aarch64 +=3D dirty_log_perf_test
+> @@ -201,6 +201,7 @@ TEST_GEN_PROGS_riscv +=3D kvm_page_table_test
+>  TEST_GEN_PROGS_riscv +=3D set_memory_region_test
+>  TEST_GEN_PROGS_riscv +=3D kvm_binary_stats_test
 >
->         kvm_write_cptr_el2(val);
->  }
-> +#endif /* __KVM__ */
->  #endif /* __ARM64_KVM_EMULATE_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/k=
-vm_host.h
-> index 89b40c34f0af..ba4065db5d5c 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -93,6 +93,7 @@ static inline bool kvm_pmu_counter_deferred(struct perf=
-_event_attr *attr)
->         return (!has_vhe() && attr->exclude_host);
->  }
+> +SPLIT_TESTS +=3D arch_timer
+>  SPLIT_TESTS +=3D get-reg-list
 >
-> +#ifdef __KVM__
->  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
->
->  extern unsigned int __ro_after_init kvm_sve_max_vl;
-> @@ -1149,4 +1150,5 @@ int kvm_trng_call(struct kvm_vcpu *vcpu);
->  void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
->  bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
->
-> +#endif /* __KVM__ */
->  #endif /* __ARM64_KVM_HOST_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kv=
-m_mmu.h
-> index 96a80e8f6226..9d8c92cda3b6 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -125,6 +125,8 @@ void kvm_update_va_mask(struct alt_instr *alt,
->  void kvm_compute_layout(void);
->  void kvm_apply_hyp_relocations(void);
->
-> +#ifdef __KVM__
-> +
->  #define __hyp_pa(x) (((phys_addr_t)(x)) + hyp_physvirt_offset)
->
->  static __always_inline unsigned long __kern_hyp_va(unsigned long v)
-> @@ -314,5 +316,7 @@ static inline struct kvm *kvm_s2_mmu_to_kvm(struct kv=
-m_s2_mmu *mmu)
->  {
->         return container_of(mmu->arch, struct kvm, arch);
->  }
-> +
-> +#endif /* __KVM__ */
->  #endif /* __ASSEMBLY__ */
->  #endif /* __ARM64_KVM_MMU_H__ */
-> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offs=
-ets.c
-> index 5ff1942b04fc..dc02ea9a002c 100644
-> --- a/arch/arm64/kernel/asm-offsets.c
-> +++ b/arch/arm64/kernel/asm-offsets.c
-> @@ -7,6 +7,8 @@
->   * Copyright (C) 2012 ARM Ltd.
->   */
->
-> +#define __KVM__
-> +
->  #include <linux/arm_sdei.h>
->  #include <linux/sched.h>
->  #include <linux/ftrace.h>
-> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-> index 4ce8c86967b5..99982b75671a 100644
-> --- a/arch/arm64/kvm/hyp/Makefile
-> +++ b/arch/arm64/kvm/hyp/Makefile
-> @@ -5,6 +5,6 @@
->
->  incdir :=3D $(srctree)/$(src)/include
->  subdir-asflags-y :=3D -I$(incdir) -I$(srctree)/arch/arm64/kvm
-> -subdir-ccflags-y :=3D -I$(incdir) -I$(srctree)/arch/arm64/kvm
-> +subdir-ccflags-y :=3D -I$(incdir) -I$(srctree)/arch/arm64/kvm -D__KVM__
->
->  obj-$(CONFIG_KVM) +=3D vhe/ nvhe/ pgtable.o
-> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/M=
-akefile
-> index 2250253a6429..b5f4750fa16e 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> @@ -9,7 +9,8 @@ asflags-y :=3D -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPO=
-RTS
->  # there is no way to execute them and any such MMIO access from nVHE KVM
->  # will explode instantly (Words of Marc Zyngier). So introduce a generic=
- flag
->  # __DISABLE_TRACE_MMIO__ to disable MMIO tracing for nVHE KVM.
-> -ccflags-y :=3D -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS -D__DISABLE=
-_TRACE_MMIO__
-> +ccflags-y :=3D -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS \
-> +            -D__DISABLE_TRACE_MMIO__  -D__KVM__
->  ccflags-y +=3D -fno-stack-protector      \
->              -DDISABLE_BRANCH_PROFILING \
->              $(DISABLE_STACKLEAK_PLUGIN)
-> diff --git a/arch/arm64/kvm/hyp/vhe/Makefile b/arch/arm64/kvm/hyp/vhe/Mak=
-efile
-> index 3b9e5464b5b3..54cd3c444102 100644
-> --- a/arch/arm64/kvm/hyp/vhe/Makefile
-> +++ b/arch/arm64/kvm/hyp/vhe/Makefile
-> @@ -4,7 +4,7 @@
->  #
->
->  asflags-y :=3D -D__KVM_VHE_HYPERVISOR__
-> -ccflags-y :=3D -D__KVM_VHE_HYPERVISOR__
-> +ccflags-y :=3D -D__KVM_VHE_HYPERVISOR__ -D__KVM__
->
->  obj-y :=3D timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o
->  obj-y +=3D ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entr=
-y.o \
-> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm=
-_host.h
-> index f8f63d0aa399..6fd7c998d7b9 100644
-> --- a/arch/mips/include/asm/kvm_host.h
-> +++ b/arch/mips/include/asm/kvm_host.h
-> @@ -25,6 +25,7 @@
->  #include <asm/inst.h>
->  #include <asm/mipsregs.h>
->
-> +#ifdef __KVM__
->  /* MIPS KVM register ids */
->  #define MIPS_CP0_32(_R, _S)                                    \
->         (KVM_REG_MIPS_CP0 | KVM_REG_SIZE_U32 | (8 * (_R) + (_S)))
-> @@ -897,4 +898,5 @@ static inline void kvm_arch_vcpu_unblocking(struct kv=
-m_vcpu *vcpu) {}
->
->  #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
->
-> +#endif /* __KVM__ */
->  #endif /* __MIPS_KVM_HOST_H__ */
-> diff --git a/arch/mips/kernel/asm-offsets.c b/arch/mips/kernel/asm-offset=
-s.c
-> index d1b11f66f748..8a233bddfea0 100644
-> --- a/arch/mips/kernel/asm-offsets.c
-> +++ b/arch/mips/kernel/asm-offsets.c
-> @@ -9,6 +9,8 @@
->   * Kevin Kissell, kevink@mips.com and Carsten Langgaard, carstenl@mips.c=
-om
->   * Copyright (C) 2000 MIPS Technologies, Inc.
->   */
-> +#define __KVM__
-> +
->  #include <linux/compat.h>
->  #include <linux/types.h>
->  #include <linux/sched.h>
-> diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include=
-/asm/kvm_book3s.h
-> index bbf5e2c5fe09..8880bc7c8a32 100644
-> --- a/arch/powerpc/include/asm/kvm_book3s.h
-> +++ b/arch/powerpc/include/asm/kvm_book3s.h
-> @@ -13,6 +13,8 @@
->  #include <linux/kvm_host.h>
->  #include <asm/kvm_book3s_asm.h>
->
-> +#ifdef __KVM__
-> +
->  struct kvmppc_bat {
->         u64 raw;
->         u32 bepi;
-> @@ -483,4 +485,5 @@ static inline u32 kvmppc_pack_vcpu_id(struct kvm *kvm=
-, u32 id)
->         return packed_id;
->  }
->
-> +#endif /* __KVM__ */
->  #endif /* __ASM_KVM_BOOK3S_H__ */
-> diff --git a/arch/powerpc/include/asm/kvm_book3s_64.h b/arch/powerpc/incl=
-ude/asm/kvm_book3s_64.h
-> index d49065af08e9..a807716ccae6 100644
-> --- a/arch/powerpc/include/asm/kvm_book3s_64.h
-> +++ b/arch/powerpc/include/asm/kvm_book3s_64.h
-> @@ -16,6 +16,7 @@
->  #include <asm/ppc-opcode.h>
->  #include <asm/pte-walk.h>
->
-> +#ifdef __KVM__
+>  TEST_PROGS +=3D $(TEST_PROGS_$(ARCH_DIR))
+> diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/tes=
+ting/selftests/kvm/aarch64/arch_timer.c
+> index 274b8465b42a..6fb47ba07e5b 100644
+> --- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> @@ -1,64 +1,19 @@
+>  // SPDX-License-Identifier: GPL-2.0-only
 >  /*
->   * Structure for a nested guest, that is, for a guest that is managed by
->   * one of our guests.
-> @@ -679,4 +680,5 @@ extern pte_t *find_kvm_nested_guest_pte(struct kvm *k=
-vm, unsigned long lpid,
+> - * arch_timer.c - Tests the aarch64 timer IRQ functionality
+> - *
+>   * The test validates both the virtual and physical timer IRQs using
+> - * CVAL and TVAL registers. This consitutes the four stages in the test.
+> - * The guest's main thread configures the timer interrupt for a stage
+> - * and waits for it to fire, with a timeout equal to the timer period.
+> - * It asserts that the timeout doesn't exceed the timer period.
+> - *
+> - * On the other hand, upon receipt of an interrupt, the guest's interrup=
+t
+> - * handler validates the interrupt by checking if the architectural stat=
+e
+> - * is in compliance with the specifications.
+> - *
+> - * The test provides command-line options to configure the timer's
+> - * period (-p), number of vCPUs (-n), and iterations per stage (-i).
+> - * To stress-test the timer stack even more, an option to migrate the
+> - * vCPUs across pCPUs (-m), at a particular rate, is also provided.
+> + * CVAL and TVAL registers.
+>   *
+>   * Copyright (c) 2021, Google LLC.
+>   */
+>  #define _GNU_SOURCE
 >
->  #endif /* CONFIG_KVM_BOOK3S_HV_POSSIBLE */
->
-> +#endif /* __KVM__ */
->  #endif /* __ASM_KVM_BOOK3S_64_H__ */
-> diff --git a/arch/powerpc/include/asm/kvm_booke.h b/arch/powerpc/include/=
-asm/kvm_booke.h
-> index 0c3401b2e19e..85ebc0314539 100644
-> --- a/arch/powerpc/include/asm/kvm_booke.h
-> +++ b/arch/powerpc/include/asm/kvm_booke.h
-> @@ -12,6 +12,8 @@
->  #include <linux/types.h>
->  #include <linux/kvm_host.h>
->
-> +#ifdef __KVM__
-> +
->  /*
->   * Number of available lpids. Only the low-order 6 bits of LPID rgister =
-are
->   * implemented on e500mc+ cores.
-> @@ -105,4 +107,6 @@ static inline bool kvmppc_supports_magic_page(struct =
-kvm_vcpu *vcpu)
->         return false;
->  #endif
->  }
-> +
-> +#endif /* __KVM__ */
->  #endif /* __ASM_KVM_BOOKE_H__ */
-> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/a=
-sm/kvm_host.h
-> index 14ee0dece853..1e7a008ce085 100644
-> --- a/arch/powerpc/include/asm/kvm_host.h
-> +++ b/arch/powerpc/include/asm/kvm_host.h
-> @@ -14,6 +14,7 @@
->  #include <linux/interrupt.h>
->  #include <linux/types.h>
->  #include <linux/kvm_types.h>
-> +#include <linux/mmu_notifier.h>
->  #include <linux/threads.h>
->  #include <linux/spinlock.h>
->  #include <linux/kvm_para.h>
-> @@ -25,13 +26,14 @@
->  #include <asm/cacheflush.h>
->  #include <asm/hvcall.h>
->  #include <asm/mce.h>
-> +#include <asm/cputhreads.h>
->
-> +#ifdef __KVM__
->  #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
->
->  #define KVM_MAX_VCPUS          NR_CPUS
->  #define KVM_MAX_VCORES         NR_CPUS
->
-> -#include <asm/cputhreads.h>
->
->  #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
->  #include <asm/kvm_book3s_asm.h>                /* for MAX_SMT_THREADS */
-> @@ -60,8 +62,6 @@
->  #define KVM_REQ_EPR_EXIT       KVM_ARCH_REQ(1)
->  #define KVM_REQ_PENDING_TIMER  KVM_ARCH_REQ(2)
->
-> -#include <linux/mmu_notifier.h>
+> -#include <stdlib.h>
+> -#include <pthread.h>
+> -#include <linux/kvm.h>
+> -#include <linux/sizes.h>
+> -#include <linux/bitmap.h>
+> -#include <sys/sysinfo.h>
 > -
->  #define KVM_ARCH_WANT_MMU_NOTIFIER
+> -#include "kvm_util.h"
+> -#include "processor.h"
+> -#include "delay.h"
+>  #include "arch_timer.h"
+> +#include "delay.h"
+>  #include "gic.h"
+> +#include "processor.h"
+> +#include "timer_test.h"
+>  #include "vgic.h"
 >
->  #define HPTEG_CACHE_NUM                        (1 << 15)
-> @@ -883,4 +883,5 @@ static inline void kvm_arch_sched_in(struct kvm_vcpu =
-*vcpu, int cpu) {}
->  static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
->  static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+> -#define NR_VCPUS_DEF                   4
+> -#define NR_TEST_ITERS_DEF              5
+> -#define TIMER_TEST_PERIOD_MS_DEF       10
+> -#define TIMER_TEST_ERR_MARGIN_US       100
+> -#define TIMER_TEST_MIGRATION_FREQ_MS   2
+> -
+> -struct test_args {
+> -       int nr_vcpus;
+> -       int nr_iter;
+> -       int timer_period_ms;
+> -       int migration_freq_ms;
+> -       struct kvm_arm_counter_offset offset;
+> -};
+> -
+> -static struct test_args test_args =3D {
+> -       .nr_vcpus =3D NR_VCPUS_DEF,
+> -       .nr_iter =3D NR_TEST_ITERS_DEF,
+> -       .timer_period_ms =3D TIMER_TEST_PERIOD_MS_DEF,
+> -       .migration_freq_ms =3D TIMER_TEST_MIGRATION_FREQ_MS,
+> -       .offset =3D { .reserved =3D 1 },
+> -};
+> -
+> -#define msecs_to_usecs(msec)           ((msec) * 1000LL)
+> -
+>  #define GICD_BASE_GPA                  0x8000000ULL
+>  #define GICR_BASE_GPA                  0x80A0000ULL
 >
-> +#endif /* __KVM__ */
->  #endif /* __POWERPC_KVM_HOST_H__ */
-> diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/as=
-m/kvm_ppc.h
-> index ead2ad892ebc..03d9998d0111 100644
-> --- a/arch/powerpc/include/asm/kvm_ppc.h
-> +++ b/arch/powerpc/include/asm/kvm_ppc.h
-> @@ -183,6 +183,7 @@ static inline void kvmppc_clear_host_ipi(int cpu)
->  static inline bool kvm_hv_mode_active(void)            { return false; }
->  #endif
->
-> +#ifdef __KVM__
->  /*
->   * KVMPPC_INST_SW_BREAKPOINT is debug Instruction
->   * for supporting software breakpoint.
-> @@ -1076,4 +1077,5 @@ static inline ulong kvmppc_get_ea_indexed(struct kv=
-m_vcpu *vcpu, int ra, int rb)
->         return ea;
->  }
->
-> +#endif /* __KVM__ */
->  #endif /* __POWERPC_KVM_PPC_H__ */
-> diff --git a/arch/powerpc/kernel/asm-offsets.c b/arch/powerpc/kernel/asm-=
-offsets.c
-> index 9f14d95b8b32..872d44971536 100644
-> --- a/arch/powerpc/kernel/asm-offsets.c
-> +++ b/arch/powerpc/kernel/asm-offsets.c
-> @@ -8,6 +8,7 @@
->   * compile this file to assembler, and then extract the
->   * #defines from the assembly-language output.
->   */
-> +#define __KVM__
->
->  #include <linux/compat.h>
->  #include <linux/signal.h>
-> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/k=
-vm_host.h
-> index 1ebf20dfbaa6..a81ae8c4b739 100644
-> --- a/arch/riscv/include/asm/kvm_host.h
-> +++ b/arch/riscv/include/asm/kvm_host.h
-> @@ -22,6 +22,8 @@
->  #include <asm/kvm_vcpu_timer.h>
->  #include <asm/kvm_vcpu_pmu.h>
->
-> +#ifdef __KVM__
-> +
->  #define KVM_MAX_VCPUS                  1024
->
->  #define KVM_HALT_POLL_NS_DEFAULT       500000
-> @@ -354,4 +356,5 @@ bool kvm_riscv_vcpu_has_interrupts(struct kvm_vcpu *v=
-cpu, u64 mask);
->  void kvm_riscv_vcpu_power_off(struct kvm_vcpu *vcpu);
->  void kvm_riscv_vcpu_power_on(struct kvm_vcpu *vcpu);
->
-> +#endif /* __KVM__ */
->  #endif /* __RISCV_KVM_HOST_H__ */
-> diff --git a/arch/riscv/kernel/asm-offsets.c b/arch/riscv/kernel/asm-offs=
-ets.c
-> index d6a75aac1d27..476263e78f39 100644
-> --- a/arch/riscv/kernel/asm-offsets.c
-> +++ b/arch/riscv/kernel/asm-offsets.c
-> @@ -5,6 +5,7 @@
->   */
->
->  #define GENERATING_ASM_OFFSETS
-> +#define __KVM__
->
->  #include <linux/kbuild.h>
->  #include <linux/mm.h>
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm=
-_host.h
-> index 427f9528a7b6..9153420bb5ac 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -380,6 +380,10 @@ struct sie_page {
->         __u8 reserved700[2304];         /* 0x0700 */
+> @@ -70,22 +25,8 @@ enum guest_stage {
+>         GUEST_STAGE_MAX,
 >  };
 >
-> +extern char sie_exit;
-> +
-> +#ifdef __KVM__
-> +
->  struct kvm_vcpu_stat {
->         struct kvm_vcpu_stat_generic generic;
->         u64 exit_userspace;
-> @@ -1028,8 +1032,6 @@ static inline int sie64a(struct kvm_s390_sie_block =
-*sie_block, u64 *rsa)
->         return __sie64a(virt_to_phys(sie_block), sie_block, rsa);
+> -/* Shared variables between host and guest */
+> -struct test_vcpu_shared_data {
+> -       int nr_iter;
+> -       enum guest_stage guest_stage;
+> -       uint64_t xcnt;
+> -};
+> -
+> -static struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
+> -static pthread_t pt_vcpu_run[KVM_MAX_VCPUS];
+> -static struct test_vcpu_shared_data vcpu_shared_data[KVM_MAX_VCPUS];
+> -
+>  static int vtimer_irq, ptimer_irq;
+>
+> -static unsigned long *vcpu_done_map;
+> -static pthread_mutex_t vcpu_done_map_lock;
+> -
+>  static void
+>  guest_configure_timer_action(struct test_vcpu_shared_data *shared_data)
+>  {
+> @@ -222,137 +163,6 @@ static void guest_code(void)
+>         GUEST_DONE();
 >  }
 >
-> -extern char sie_exit;
+> -static void *test_vcpu_run(void *arg)
+> -{
+> -       unsigned int vcpu_idx =3D (unsigned long)arg;
+> -       struct ucall uc;
+> -       struct kvm_vcpu *vcpu =3D vcpus[vcpu_idx];
+> -       struct kvm_vm *vm =3D vcpu->vm;
+> -       struct test_vcpu_shared_data *shared_data =3D &vcpu_shared_data[v=
+cpu_idx];
 > -
->  bool kvm_s390_pv_is_protected(struct kvm *kvm);
->  bool kvm_s390_pv_cpu_is_protected(struct kvm_vcpu *vcpu);
+> -       vcpu_run(vcpu);
+> -
+> -       /* Currently, any exit from guest is an indication of completion =
+*/
+> -       pthread_mutex_lock(&vcpu_done_map_lock);
+> -       __set_bit(vcpu_idx, vcpu_done_map);
+> -       pthread_mutex_unlock(&vcpu_done_map_lock);
+> -
+> -       switch (get_ucall(vcpu, &uc)) {
+> -       case UCALL_SYNC:
+> -       case UCALL_DONE:
+> -               break;
+> -       case UCALL_ABORT:
+> -               sync_global_from_guest(vm, *shared_data);
+> -               fprintf(stderr, "Guest assert failed,  vcpu %u; stage; %u=
+; iter: %u\n",
+> -                       vcpu_idx, shared_data->guest_stage, shared_data->=
+nr_iter);
+> -               REPORT_GUEST_ASSERT(uc);
+> -               break;
+> -       default:
+> -               TEST_FAIL("Unexpected guest exit\n");
+> -       }
+> -
+> -       return NULL;
+> -}
+> -
+> -static uint32_t test_get_pcpu(void)
+> -{
+> -       uint32_t pcpu;
+> -       unsigned int nproc_conf;
+> -       cpu_set_t online_cpuset;
+> -
+> -       nproc_conf =3D get_nprocs_conf();
+> -       sched_getaffinity(0, sizeof(cpu_set_t), &online_cpuset);
+> -
+> -       /* Randomly find an available pCPU to place a vCPU on */
+> -       do {
+> -               pcpu =3D rand() % nproc_conf;
+> -       } while (!CPU_ISSET(pcpu, &online_cpuset));
+> -
+> -       return pcpu;
+> -}
+> -
+> -static int test_migrate_vcpu(unsigned int vcpu_idx)
+> -{
+> -       int ret;
+> -       cpu_set_t cpuset;
+> -       uint32_t new_pcpu =3D test_get_pcpu();
+> -
+> -       CPU_ZERO(&cpuset);
+> -       CPU_SET(new_pcpu, &cpuset);
+> -
+> -       pr_debug("Migrating vCPU: %u to pCPU: %u\n", vcpu_idx, new_pcpu);
+> -
+> -       ret =3D pthread_setaffinity_np(pt_vcpu_run[vcpu_idx],
+> -                                    sizeof(cpuset), &cpuset);
+> -
+> -       /* Allow the error where the vCPU thread is already finished */
+> -       TEST_ASSERT(ret =3D=3D 0 || ret =3D=3D ESRCH,
+> -                   "Failed to migrate the vCPU:%u to pCPU: %u; ret: %d\n=
+",
+> -                   vcpu_idx, new_pcpu, ret);
+> -
+> -       return ret;
+> -}
+> -
+> -static void *test_vcpu_migration(void *arg)
+> -{
+> -       unsigned int i, n_done;
+> -       bool vcpu_done;
+> -
+> -       do {
+> -               usleep(msecs_to_usecs(test_args.migration_freq_ms));
+> -
+> -               for (n_done =3D 0, i =3D 0; i < test_args.nr_vcpus; i++) =
+{
+> -                       pthread_mutex_lock(&vcpu_done_map_lock);
+> -                       vcpu_done =3D test_bit(i, vcpu_done_map);
+> -                       pthread_mutex_unlock(&vcpu_done_map_lock);
+> -
+> -                       if (vcpu_done) {
+> -                               n_done++;
+> -                               continue;
+> -                       }
+> -
+> -                       test_migrate_vcpu(i);
+> -               }
+> -       } while (test_args.nr_vcpus !=3D n_done);
+> -
+> -       return NULL;
+> -}
+> -
+> -static void test_run(struct kvm_vm *vm)
+> -{
+> -       pthread_t pt_vcpu_migration;
+> -       unsigned int i;
+> -       int ret;
+> -
+> -       pthread_mutex_init(&vcpu_done_map_lock, NULL);
+> -       vcpu_done_map =3D bitmap_zalloc(test_args.nr_vcpus);
+> -       TEST_ASSERT(vcpu_done_map, "Failed to allocate vcpu done bitmap\n=
+");
+> -
+> -       for (i =3D 0; i < (unsigned long)test_args.nr_vcpus; i++) {
+> -               ret =3D pthread_create(&pt_vcpu_run[i], NULL, test_vcpu_r=
+un,
+> -                                    (void *)(unsigned long)i);
+> -               TEST_ASSERT(!ret, "Failed to create vCPU-%d pthread\n", i=
+);
+> -       }
+> -
+> -       /* Spawn a thread to control the vCPU migrations */
+> -       if (test_args.migration_freq_ms) {
+> -               srand(time(NULL));
+> -
+> -               ret =3D pthread_create(&pt_vcpu_migration, NULL,
+> -                                       test_vcpu_migration, NULL);
+> -               TEST_ASSERT(!ret, "Failed to create the migration pthread=
+\n");
+> -       }
+> -
+> -
+> -       for (i =3D 0; i < test_args.nr_vcpus; i++)
+> -               pthread_join(pt_vcpu_run[i], NULL);
+> -
+> -       if (test_args.migration_freq_ms)
+> -               pthread_join(pt_vcpu_migration, NULL);
+> -
+> -       bitmap_free(vcpu_done_map);
+> -}
+> -
+>  static void test_init_timer_irq(struct kvm_vm *vm)
+>  {
+>         /* Timer initid should be same for all the vCPUs, so query only v=
+CPU-0 */
+> @@ -369,7 +179,7 @@ static void test_init_timer_irq(struct kvm_vm *vm)
 >
-> @@ -1049,6 +1051,7 @@ static inline void kvm_arch_vcpu_unblocking(struct =
-kvm_vcpu *vcpu) {}
+>  static int gic_fd;
 >
->  #define __KVM_HAVE_ARCH_VM_FREE
->  void kvm_arch_free_vm(struct kvm *kvm);
-> +#endif /* __KVM__ */
+> -static struct kvm_vm *test_vm_create(void)
+> +struct kvm_vm *test_vm_create(void)
+>  {
+>         struct kvm_vm *vm;
+>         unsigned int i;
+> @@ -400,81 +210,8 @@ static struct kvm_vm *test_vm_create(void)
+>         return vm;
+>  }
 >
->  struct zpci_kvm_hook {
->         int (*kvm_register)(void *opaque, struct kvm *kvm);
-> diff --git a/arch/s390/kernel/asm-offsets.c b/arch/s390/kernel/asm-offset=
-s.c
-> index fa5f6885c74a..22ed673871ee 100644
-> --- a/arch/s390/kernel/asm-offsets.c
-> +++ b/arch/s390/kernel/asm-offsets.c
-> @@ -6,6 +6,7 @@
->   */
->
->  #define ASM_OFFSETS_C
-> +#define __KVM__
->
->  #include <linux/kbuild.h>
->  #include <linux/kvm_host.h>
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
-ost.h
-> index 29db870dbaae..eda45a937666 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -37,6 +37,8 @@
->  #include <asm/kvm_vcpu_regs.h>
->  #include <asm/hyperv-tlfs.h>
->
-> +#ifdef __KVM__
+> -static void test_vm_cleanup(struct kvm_vm *vm)
+> +void test_vm_cleanup(struct kvm_vm *vm)
+>  {
+>         close(gic_fd);
+>         kvm_vm_free(vm);
+>  }
+> -
+> -static void test_print_help(char *name)
+> -{
+> -       pr_info("Usage: %s [-h] [-n nr_vcpus] [-i iterations] [-p timer_p=
+eriod_ms]\n",
+> -               name);
+> -       pr_info("\t-n: Number of vCPUs to configure (default: %u; max: %u=
+)\n",
+> -               NR_VCPUS_DEF, KVM_MAX_VCPUS);
+> -       pr_info("\t-i: Number of iterations per stage (default: %u)\n",
+> -               NR_TEST_ITERS_DEF);
+> -       pr_info("\t-p: Periodicity (in ms) of the guest timer (default: %=
+u)\n",
+> -               TIMER_TEST_PERIOD_MS_DEF);
+> -       pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different=
+ pCPU. 0 to turn off (default: %u)\n",
+> -               TIMER_TEST_MIGRATION_FREQ_MS);
+> -       pr_info("\t-o: Counter offset (in counter cycles, default: 0)\n")=
+;
+> -       pr_info("\t-h: print this help screen\n");
+> -}
+> -
+> -static bool parse_args(int argc, char *argv[])
+> -{
+> -       int opt;
+> -
+> -       while ((opt =3D getopt(argc, argv, "hn:i:p:m:o:")) !=3D -1) {
+> -               switch (opt) {
+> -               case 'n':
+> -                       test_args.nr_vcpus =3D atoi_positive("Number of v=
+CPUs", optarg);
+> -                       if (test_args.nr_vcpus > KVM_MAX_VCPUS) {
+> -                               pr_info("Max allowed vCPUs: %u\n",
+> -                                       KVM_MAX_VCPUS);
+> -                               goto err;
+> -                       }
+> -                       break;
+> -               case 'i':
+> -                       test_args.nr_iter =3D atoi_positive("Number of it=
+erations", optarg);
+> -                       break;
+> -               case 'p':
+> -                       test_args.timer_period_ms =3D atoi_positive("Peri=
+odicity", optarg);
+> -                       break;
+> -               case 'm':
+> -                       test_args.migration_freq_ms =3D atoi_non_negative=
+("Frequency", optarg);
+> -                       break;
+> -               case 'o':
+> -                       test_args.offset.counter_offset =3D strtol(optarg=
+, NULL, 0);
+> -                       test_args.offset.reserved =3D 0;
+> -                       break;
+> -               case 'h':
+> -               default:
+> -                       goto err;
+> -               }
+> -       }
+> -
+> -       return true;
+> -
+> -err:
+> -       test_print_help(argv[0]);
+> -       return false;
+> -}
+> -
+> -int main(int argc, char *argv[])
+> -{
+> -       struct kvm_vm *vm;
+> -
+> -       if (!parse_args(argc, argv))
+> -               exit(KSFT_SKIP);
+> -
+> -       __TEST_REQUIRE(!test_args.migration_freq_ms || get_nprocs() >=3D =
+2,
+> -                      "At least two physical CPUs needed for vCPU migrat=
+ion");
+> -
+> -       vm =3D test_vm_create();
+> -       test_run(vm);
+> -       test_vm_cleanup(vm);
+> -
+> -       return 0;
+> -}
+> diff --git a/tools/testing/selftests/kvm/arch_timer.c b/tools/testing/sel=
+ftests/kvm/arch_timer.c
+> new file mode 100644
+> index 000000000000..6e442dbcfc8b
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/arch_timer.c
+> @@ -0,0 +1,249 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * arch_timer.c - Tests the arch timer IRQ functionality
+> + *
+> + * The guest's main thread configures the timer interrupt and waits
+> + * for it to fire, with a timeout equal to the timer period.
+> + * It asserts that the timeout doesn't exceed the timer period plus
+> + * an error margin of 100us.
+> + *
+> + * On the other hand, upon receipt of an interrupt, the guest's interrup=
+t
+> + * handler validates the interrupt by checking if the architectural stat=
+e
+> + * is in compliance with the specifications.
+> + *
+> + * The test provides command-line options to configure the timer's
+> + * period (-p), number of vCPUs (-n), and iterations per stage (-i).
+> + * To stress-test the timer stack even more, an option to migrate the
+> + * vCPUs across pCPUs (-m), at a particular rate, is also provided.
+> + *
+> + * Copyright (c) 2021, Google LLC.
+> + */
 > +
->  #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
->
->  #define KVM_MAX_VCPUS 1024
-> @@ -2229,4 +2231,5 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot=
-, unsigned long npages);
->   */
->  #define KVM_EXIT_HYPERCALL_MBZ         GENMASK_ULL(31, 1)
->
-> +#endif /* __KVM__ */
->  #endif /* _ASM_X86_KVM_HOST_H */
-> diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio=
-_ap_drv.c
-> index a5ab03e42ff1..55744f0f4758 100644
-> --- a/drivers/s390/crypto/vfio_ap_drv.c
-> +++ b/drivers/s390/crypto/vfio_ap_drv.c
-> @@ -7,6 +7,7 @@
->   * Author(s): Tony Krowiak <akrowiak@linux.ibm.com>
->   *           Pierre Morel <pmorel@linux.ibm.com>
->   */
-> +#define __KVM__
->
->  #include <linux/module.h>
->  #include <linux/mod_devicetable.h>
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio=
-_ap_ops.c
-> index 4db538a55192..0dd98f42e9d5 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -8,6 +8,8 @@
->   *           Halil Pasic <pasic@linux.ibm.com>
->   *           Pierre Morel <pmorel@linux.ibm.com>
->   */
-> +#define __KVM__
+> +#define _GNU_SOURCE
 > +
->  #include <linux/string.h>
->  #include <linux/vfio.h>
->  #include <linux/device.h>
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index d520d6801070..f0afe549c0d6 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -45,6 +45,8 @@
->  #include <asm/kvm_host.h>
->  #include <linux/kvm_dirty_ring.h>
->
-> +#ifdef __KVM__
+> +#include <stdlib.h>
+> +#include <pthread.h>
+> +#include <linux/sizes.h>
+> +#include <linux/bitmap.h>
+> +#include <sys/sysinfo.h>
 > +
->  #ifndef KVM_MAX_VCPU_IDS
->  #define KVM_MAX_VCPU_IDS KVM_MAX_VCPUS
->  #endif
-> @@ -2329,4 +2331,6 @@ static inline void kvm_account_pgtable_pages(void *=
-virt, int nr)
->  /* Max number of entries allowed for each kvm dirty ring */
->  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
->
-> +#endif /* __KVM__ */
+> +#include "timer_test.h"
 > +
->  #endif
-> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> index 6f4737d5046a..4804bce2a655 100644
-> --- a/include/linux/kvm_types.h
-> +++ b/include/linux/kvm_types.h
-> @@ -48,6 +48,8 @@ typedef u64            hfn_t;
->
->  typedef hfn_t kvm_pfn_t;
->
-> +#ifdef __KVM__
+> +struct test_args test_args =3D {
+> +       .nr_vcpus =3D NR_VCPUS_DEF,
+> +       .nr_iter =3D NR_TEST_ITERS_DEF,
+> +       .timer_period_ms =3D TIMER_TEST_PERIOD_MS_DEF,
+> +       .migration_freq_ms =3D TIMER_TEST_MIGRATION_FREQ_MS,
+> +       .offset =3D { .reserved =3D 1 },
+> +};
 > +
->  enum pfn_cache_usage {
->         KVM_GUEST_USES_PFN =3D BIT(0),
->         KVM_HOST_USES_PFN  =3D BIT(1),
-> @@ -123,4 +125,5 @@ struct kvm_vcpu_stat_generic {
->
->  #define KVM_STATS_NAME_SIZE    48
->
-> +#endif /* __KVM__ */
->  #endif /* __KVM_TYPES_H__ */
-> diff --git a/include/trace/events/kvm.h b/include/trace/events/kvm.h
-> index 3bd31ea23fee..aee85527bb74 100644
-> --- a/include/trace/events/kvm.h
-> +++ b/include/trace/events/kvm.h
-> @@ -2,8 +2,13 @@
->  #if !defined(_TRACE_KVM_MAIN_H) || defined(TRACE_HEADER_MULTI_READ)
->  #define _TRACE_KVM_MAIN_H
->
-> +#include <linux/kvm_host.h>
->  #include <linux/tracepoint.h>
->
-> +#ifndef __KVM__
-> +static_assert(0, "Do not include trace/events/kvm.h from non-KVM code");
-> +#endif
+> +struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
+> +struct test_vcpu_shared_data vcpu_shared_data[KVM_MAX_VCPUS];
 > +
->  #undef TRACE_SYSTEM
->  #define TRACE_SYSTEM kvm
+> +static pthread_t pt_vcpu_run[KVM_MAX_VCPUS];
+> +static unsigned long *vcpu_done_map;
+> +static pthread_mutex_t vcpu_done_map_lock;
+> +
+> +static void *test_vcpu_run(void *arg)
+> +{
+> +       unsigned int vcpu_idx =3D (unsigned long)arg;
+> +       struct ucall uc;
+> +       struct kvm_vcpu *vcpu =3D vcpus[vcpu_idx];
+> +       struct kvm_vm *vm =3D vcpu->vm;
+> +       struct test_vcpu_shared_data *shared_data =3D &vcpu_shared_data[v=
+cpu_idx];
+> +
+> +       vcpu_run(vcpu);
+> +
+> +       /* Currently, any exit from guest is an indication of completion =
+*/
+> +       pthread_mutex_lock(&vcpu_done_map_lock);
+> +       __set_bit(vcpu_idx, vcpu_done_map);
+> +       pthread_mutex_unlock(&vcpu_done_map_lock);
+> +
+> +       switch (get_ucall(vcpu, &uc)) {
+> +       case UCALL_SYNC:
+> +       case UCALL_DONE:
+> +               break;
+> +       case UCALL_ABORT:
+> +               sync_global_from_guest(vm, *shared_data);
+> +               fprintf(stderr, "Guest assert failed,  vcpu %u; stage; %u=
+; iter: %u\n",
+> +                       vcpu_idx, shared_data->guest_stage, shared_data->=
+nr_iter);
+> +               REPORT_GUEST_ASSERT(uc);
+> +               break;
+> +       default:
+> +               TEST_FAIL("Unexpected guest exit\n");
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+> +static uint32_t test_get_pcpu(void)
+> +{
+> +       uint32_t pcpu;
+> +       unsigned int nproc_conf;
+> +       cpu_set_t online_cpuset;
+> +
+> +       nproc_conf =3D get_nprocs_conf();
+> +       sched_getaffinity(0, sizeof(cpu_set_t), &online_cpuset);
+> +
+> +       /* Randomly find an available pCPU to place a vCPU on */
+> +       do {
+> +               pcpu =3D rand() % nproc_conf;
+> +       } while (!CPU_ISSET(pcpu, &online_cpuset));
+> +
+> +       return pcpu;
+> +}
+> +
+> +static int test_migrate_vcpu(unsigned int vcpu_idx)
+> +{
+> +       int ret;
+> +       cpu_set_t cpuset;
+> +       uint32_t new_pcpu =3D test_get_pcpu();
+> +
+> +       CPU_ZERO(&cpuset);
+> +       CPU_SET(new_pcpu, &cpuset);
+> +
+> +       pr_debug("Migrating vCPU: %u to pCPU: %u\n", vcpu_idx, new_pcpu);
+> +
+> +       ret =3D pthread_setaffinity_np(pt_vcpu_run[vcpu_idx],
+> +                                    sizeof(cpuset), &cpuset);
+> +
+> +       /* Allow the error where the vCPU thread is already finished */
+> +       TEST_ASSERT(ret =3D=3D 0 || ret =3D=3D ESRCH,
+> +                   "Failed to migrate the vCPU:%u to pCPU: %u; ret: %d\n=
+",
+> +                   vcpu_idx, new_pcpu, ret);
+> +
+> +       return ret;
+> +}
+> +
+> +static void *test_vcpu_migration(void *arg)
+> +{
+> +       unsigned int i, n_done;
+> +       bool vcpu_done;
+> +
+> +       do {
+> +               usleep(msecs_to_usecs(test_args.migration_freq_ms));
+> +
+> +               for (n_done =3D 0, i =3D 0; i < test_args.nr_vcpus; i++) =
+{
+> +                       pthread_mutex_lock(&vcpu_done_map_lock);
+> +                       vcpu_done =3D test_bit(i, vcpu_done_map);
+> +                       pthread_mutex_unlock(&vcpu_done_map_lock);
+> +
+> +                       if (vcpu_done) {
+> +                               n_done++;
+> +                               continue;
+> +                       }
+> +
+> +                       test_migrate_vcpu(i);
+> +               }
+> +       } while (test_args.nr_vcpus !=3D n_done);
+> +
+> +       return NULL;
+> +}
+> +
+> +static void test_run(struct kvm_vm *vm)
+> +{
+> +       pthread_t pt_vcpu_migration;
+> +       unsigned int i;
+> +       int ret;
+> +
+> +       pthread_mutex_init(&vcpu_done_map_lock, NULL);
+> +       vcpu_done_map =3D bitmap_zalloc(test_args.nr_vcpus);
+> +       TEST_ASSERT(vcpu_done_map, "Failed to allocate vcpu done bitmap\n=
+");
+> +
+> +       for (i =3D 0; i < (unsigned long)test_args.nr_vcpus; i++) {
+> +               ret =3D pthread_create(&pt_vcpu_run[i], NULL, test_vcpu_r=
+un,
+> +                                    (void *)(unsigned long)i);
+> +               TEST_ASSERT(!ret, "Failed to create vCPU-%d pthread\n", i=
+);
+> +       }
+> +
+> +       /* Spawn a thread to control the vCPU migrations */
+> +       if (test_args.migration_freq_ms) {
+> +               srand(time(NULL));
+> +
+> +               ret =3D pthread_create(&pt_vcpu_migration, NULL,
+> +                                       test_vcpu_migration, NULL);
+> +               TEST_ASSERT(!ret, "Failed to create the migration pthread=
+\n");
+> +       }
+> +
+> +
+> +       for (i =3D 0; i < test_args.nr_vcpus; i++)
+> +               pthread_join(pt_vcpu_run[i], NULL);
+> +
+> +       if (test_args.migration_freq_ms)
+> +               pthread_join(pt_vcpu_migration, NULL);
+> +
+> +       bitmap_free(vcpu_done_map);
+> +}
+> +
+> +static void test_print_help(char *name)
+> +{
+> +       pr_info("Usage: %s [-h] [-n nr_vcpus] [-i iterations] [-p timer_p=
+eriod_ms]\n",
+> +               name);
+> +       pr_info("\t-n: Number of vCPUs to configure (default: %u; max: %u=
+)\n",
+> +               NR_VCPUS_DEF, KVM_MAX_VCPUS);
+> +       pr_info("\t-i: Number of iterations per stage (default: %u)\n",
+> +               NR_TEST_ITERS_DEF);
+> +       pr_info("\t-p: Periodicity (in ms) of the guest timer (default: %=
+u)\n",
+> +               TIMER_TEST_PERIOD_MS_DEF);
+> +       pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different=
+ pCPU. 0 to turn off (default: %u)\n",
+> +               TIMER_TEST_MIGRATION_FREQ_MS);
+> +       pr_info("\t-o: Counter offset (in counter cycles, default: 0)\n")=
+;
+> +       pr_info("\t-h: print this help screen\n");
+> +}
+> +
+> +static bool parse_args(int argc, char *argv[])
+> +{
+> +       int opt;
+> +
+> +       while ((opt =3D getopt(argc, argv, "hn:i:p:m:o:")) !=3D -1) {
+> +               switch (opt) {
+> +               case 'n':
+> +                       test_args.nr_vcpus =3D atoi_positive("Number of v=
+CPUs", optarg);
+> +                       if (test_args.nr_vcpus > KVM_MAX_VCPUS) {
+> +                               pr_info("Max allowed vCPUs: %u\n",
+> +                                       KVM_MAX_VCPUS);
+> +                               goto err;
+> +                       }
+> +                       break;
+> +               case 'i':
+> +                       test_args.nr_iter =3D atoi_positive("Number of it=
+erations", optarg);
+> +                       break;
+> +               case 'p':
+> +                       test_args.timer_period_ms =3D atoi_positive("Peri=
+odicity", optarg);
+> +                       break;
+> +               case 'm':
+> +                       test_args.migration_freq_ms =3D atoi_non_negative=
+("Frequency", optarg);
+> +                       break;
+> +               case 'o':
+> +                       test_args.offset.counter_offset =3D strtol(optarg=
+, NULL, 0);
+> +                       test_args.offset.reserved =3D 0;
+> +                       break;
+> +               case 'h':
+> +               default:
+> +                       goto err;
+> +               }
+> +       }
+> +
+> +       return true;
+> +
+> +err:
+> +       test_print_help(argv[0]);
+> +       return false;
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +       struct kvm_vm *vm;
+> +
+> +       if (!parse_args(argc, argv))
+> +               exit(KSFT_SKIP);
+> +
+> +       __TEST_REQUIRE(!test_args.migration_freq_ms || get_nprocs() >=3D =
+2,
+> +                      "At least two physical CPUs needed for vCPU migrat=
+ion");
+> +
+> +       vm =3D test_vm_create();
+> +       test_run(vm);
+> +       test_vm_cleanup(vm);
+> +
+> +       return 0;
+> +}
+> diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/test=
+ing/selftests/kvm/include/test_util.h
+> index 8e5f413a593d..36387e7ee8b2 100644
+> --- a/tools/testing/selftests/kvm/include/test_util.h
+> +++ b/tools/testing/selftests/kvm/include/test_util.h
+> @@ -20,6 +20,8 @@
+>  #include <sys/mman.h>
+>  #include "kselftest.h"
 >
-> diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
-> index e85079ad245d..4de10d447ef3 100644
-> --- a/virt/kvm/Makefile.kvm
-> +++ b/virt/kvm/Makefile.kvm
-> @@ -3,7 +3,7 @@
->  # Makefile for Kernel-based Virtual Machine module
->  #
+> +#define msecs_to_usecs(msec)    ((msec) * 1000LL)
+> +
+>  static inline int _no_printf(const char *format, ...) { return 0; }
 >
-> -ccflags-y +=3D -I$(srctree)/$(src)
-> +ccflags-y +=3D -I$(srctree)/$(src) -D__KVM__
->
->  KVM ?=3D ../../../virt/kvm
->
+>  #ifdef DEBUG
+> diff --git a/tools/testing/selftests/kvm/include/timer_test.h b/tools/tes=
+ting/selftests/kvm/include/timer_test.h
+> new file mode 100644
+> index 000000000000..2234c513b510
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/include/timer_test.h
+> @@ -0,0 +1,43 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * timer test specific header
+> + *
+> + * Copyright (C) 2018, Google LLC
+> + */
+> +
+> +#ifndef SELFTEST_KVM_TIMER_TEST_H
+> +#define SELFTEST_KVM_TIMER_TEST_H
+> +
+> +#include "kvm_util.h"
+> +
+> +#define NR_VCPUS_DEF            4
+> +#define NR_TEST_ITERS_DEF       5
+> +#define TIMER_TEST_PERIOD_MS_DEF    10
+> +#define TIMER_TEST_ERR_MARGIN_US    100
+> +#define TIMER_TEST_MIGRATION_FREQ_MS    2
+> +
+> +/* Timer test cmdline parameters */
+> +struct test_args {
+> +       int nr_vcpus;
+> +       int nr_iter;
+> +       int timer_period_ms;
+> +       int migration_freq_ms;
+> +       /* TODO: Change arm specific type to a common one */
+> +       struct kvm_arm_counter_offset offset;
+> +};
+> +
+> +/* Shared variables between host and guest */
+> +struct test_vcpu_shared_data {
+> +       int nr_iter;
+> +       int guest_stage;
+> +       uint64_t xcnt;
+> +};
+> +
+> +extern struct test_args test_args;
+> +extern struct kvm_vcpu *vcpus[];
+> +extern struct test_vcpu_shared_data vcpu_shared_data[];
+> +
+> +struct kvm_vm *test_vm_create(void);
+> +void test_vm_cleanup(struct kvm_vm *vm);
+> +
+> +#endif /* SELFTEST_KVM_TIMER_TEST_H */
 > --
-> 2.42.0.459.ge4e396fd5e-goog
+> 2.34.1
 >
