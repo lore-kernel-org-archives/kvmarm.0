@@ -1,274 +1,141 @@
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF3363C1
-	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 06:44:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94FB2E64B
+	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 10:02:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="uito0+ot"
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3ba00fe4e98so3892846b6e.2
-        for <kvmarm@lists.linux.dev>; Wed, 13 Dec 2023 22:44:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DhsBca11"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5e27479b6e2so25149147b3.0
+        for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 02:02:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1702536274; x=1703141074; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gxtiy01D8WpTYbLcMD+XHOmT3EOIKEJTAtmXTdX58vM=;
-        b=uito0+otBDKPn5RezYQusVWxM1y7vQd8YFV11F1wgira+tVr7I8HXCKVrxluTPRmmC
-         sTo7d2VviSozk4sIuXnVyx61ZttdXFlNzIdU2Npr10l3zyAlJS6JPAvL2HL5apMqHCMZ
-         rOQNtxyMQ2M2FcyQiYtdSqe+IzQzISXF9nCNpIIoLNPfHZZYrWop4wmwtXePEGNu98Vo
-         amxYy9NDuOeqFfHOZHUCvehkFYriWcVPZ6n4gcvyGrJTnQqn9EWqpCkiUfHbnyoYGZ6B
-         K5eikpQOZCysxys8Glqb76O/ZRLBn5uk2VF/a/araQ9IXMwTt5UtrBfAFKxfpwEBXqqP
-         si9Q==
+        d=google.com; s=20230601; t=1702548120; x=1703152920; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jcmoOfTfuAZe0H48BAZSQKy3c0OXKN12bT3q7fYzvao=;
+        b=DhsBca110gSM009jzFNAsjdghty3Ipdr/HIPLdvCbTw7RFtCbhy9VI1dbPi0sVPV5k
+         5XsfgvZ8MLmiOm8peePlrfl1SpGHFLmk18GILaV6CXJAy6P2rN7gGruXPwE5d7La0XGA
+         g5VcJ7PHVHWnAdu6KSGSge5DLto7KV0HAkvCBP6fPE7V/IVg8eTP6SdNmh1z04fZ8bu/
+         YsapDdUgK2ZfI4RnfID8QQO5EeujlqIQO+sok7PbsQ7TWyc4t2vE/WgiHtYHGP+zuffK
+         qfXnuujAXtYHT0xxr5hfBdJN+VGKCAQzo+A/A9KhaSQeUnO4g2hDioDxMJPRoqaMm9AV
+         2d2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702536274; x=1703141074;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gxtiy01D8WpTYbLcMD+XHOmT3EOIKEJTAtmXTdX58vM=;
-        b=I7YjQPEifApdkxQe4rmboJ9lfxgzgeZRMLbasyf7CqY9KnQez3fyoh9drokS8/V7wT
-         v0IUsM25FuqK8p9PZg6WA9FIbeBsPc/YoJ+N+RY/3yTB8jwi9oFog/kwIxlWjwSCtcd9
-         bPBVhAzt+xH/vSJNE8KuKlSfbXV26ZW4/RLFsN8Evg7T5XJbxKOkCeEcrNJDq6QEXijE
-         AM7ZVkVSm4lZpqkGYqdA2EYaCc8EBg3bZ7Dncw4sh9c0gFHYyn1vFte0yEzSvA6PStwQ
-         pkSvBGDxwOTrjYguLRVJ9kobP9JagQiW91hKz6meFndR5WTHl/EyRI1Q6KIHE7mIjBrv
-         usYA==
-X-Gm-Message-State: AOJu0YwFokDIewLuZvZD2soAPw2Sl5EbfSTTysetXc7UnV5+d6FVHyB8
-	pdn7NksVQ35spgwG8379Wa8V5th1dcDet4XS4Mq9+g==
-X-Google-Smtp-Source: AGHT+IEPsCwgVMN/5iD2oOj8vwOEPOEacEvG4g4lr9eVc/vyryWU5/8R+8uC7/Gdwf/ytphMPl6gKCzWeBK6P1MjHrE=
-X-Received: by 2002:a05:6808:13c4:b0:3b9:dea6:f336 with SMTP id
- d4-20020a05680813c400b003b9dea6f336mr11212909oiw.50.1702536273720; Wed, 13
- Dec 2023 22:44:33 -0800 (PST)
+        d=1e100.net; s=20230601; t=1702548120; x=1703152920;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jcmoOfTfuAZe0H48BAZSQKy3c0OXKN12bT3q7fYzvao=;
+        b=F+hGapqXhsZaaON0fRJaIn3Lfszo9V8oXF/8jgnMabnNvEHl7dex/+/X770sq+RvcB
+         z7FxbYukQY1XKiMKaad4VA+e6ku2Y02beV03fAuD3CmRFOow4YWNq5Aenf1ZvAO50Rm6
+         S6iSoaMPyLVbhkoaundiAA/wsVMtTbLai6MSSTEZP90mS3gcXfJOCBP1HS9AeQS7kIOI
+         267RmUr/vRda1MgfQUW9pW8SlxTAn+l/t1sF7e5aZckXaeczSI936frs24/z0lSrBtqe
+         OXsNWZJ2IVYvz4EtuYH7wgGgg7xPS4TuUYeLAAKVODaxBR/5M305nbkWbz+lXjN9/+W1
+         JjvQ==
+X-Gm-Message-State: AOJu0YxL/6yepCaIDWYSCImEBH+uXBZ/T9N2ES9ifprEUGU17JTfVAVx
+	ZxmNxEPjEtBQmVsTiet4kQtFM9aADMR629XkOHtUtvqBrzHoDYWXEwK1l36hsEOS8vyI6MgZIMj
+	YcP/2FTuaeWeWYgmi07BomTEKHtu78VZCRbXkRgqCK/2lv3FtR8wGIP4BhNk=
+X-Google-Smtp-Source: AGHT+IHa7ZGIfNRAiqR5mQm9iMrynhdS+L689UnGmzl+oKTX6+S84bpG0jYLqqqsBtLwgJhUvmIEHp0/bQ==
+X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
+ (user=tabba job=sendgmr) by 2002:a05:6902:534:b0:db5:41e9:aa1c with SMTP id
+ y20-20020a056902053400b00db541e9aa1cmr74689ybs.11.1702548120127; Thu, 14 Dec
+ 2023 02:02:00 -0800 (PST)
+Date: Thu, 14 Dec 2023 10:01:40 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <cover.1702371136.git.haibo1.xu@intel.com> <0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
-In-Reply-To: <0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Thu, 14 Dec 2023 12:14:22 +0530
-Message-ID: <CAAhSdy3hXNvGiSL0VToDp2GbWcaPveg8SoMeGFeGL=MmuCpsCg@mail.gmail.com>
-Subject: Re: [PATCH v4 11/11] KVM: selftests: Enable tunning of err_margin_us
- in arch timer test
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Cc: xiaobo55x@gmail.com, haibo1.xu@intel.com, ajones@ventanamicro.com, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
-	Mayuresh Chitale <mchitale@ventanamicro.com>, Greentime Hu <greentime.hu@sifive.com>, 
-	wchen <waylingii@gmail.com>, Conor Dooley <conor.dooley@microchip.com>, 
-	Heiko Stuebner <heiko@sntech.de>, Minda Chen <minda.chen@starfivetech.com>, 
-	Samuel Holland <samuel@sholland.org>, Jisheng Zhang <jszhang@kernel.org>, 
-	Sean Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, Like Xu <likexu@tencent.com>, 
-	Vipin Sharma <vipinsh@google.com>, 
-	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, Aaron Lewis <aaronlewis@google.com>, 
-	Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Message-ID: <20231214100158.2305400-1-tabba@google.com>
+Subject: [PATCH v3 00/17] KVM: arm64: Fixes to fine grain traps and pKVM traps
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev
+Cc: maz@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, 
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, eric.auger@redhat.com, 
+	jingzhangos@google.com, joey.gouly@arm.com, tabba@google.com, 
+	linux-arm-kernel@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Marc, Hi Oliver,
+Changes from v2:
+- Rebased on arm64/for-next/sysregs, which includes new system
+  register definitions (Mark, Joey)
+- Explicitly trap unsupported HFGxTR_EL2 features rather than
+  relying on its nMASK (Joey)
+- Add new system registers to the auto-generated sysreg rather
+  than hardcoding them (Mark)
+- Drop patch that was meant as RFC
+- Added missing system registers, fields, and  system
+  instructions
+- Split patches that make system register changes
+- Fixes to patches defining allowed features for protected VMs
+- Other minor fixes and tidying up
 
-On Tue, Dec 12, 2023 at 2:52=E2=80=AFPM Haibo Xu <haibo1.xu@intel.com> wrot=
-e:
->
-> There are intermittent failures occured when stressing the
-> arch-timer test in a Qemu VM:
->
->  Guest assert failed,  vcpu 0; stage; 4; iter: 3
->  =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
->    aarch64/arch_timer.c:196: config_iter + 1 =3D=3D irq_iter
->    pid=3D4048 tid=3D4049 errno=3D4 - Interrupted system call
->       1  0x000000000040253b: test_vcpu_run at arch_timer.c:248
->       2  0x0000ffffb60dd5c7: ?? ??:0
->       3  0x0000ffffb6145d1b: ?? ??:0
->    0x3 !=3D 0x2 (config_iter + 1 !=3D irq_iter)e
->
-> Further test and debug show that the timeout for an interrupt
-> to arrive do have random high fluctuation, espectially when
-> testing in an virtual environment.
->
-> To alleviate this issue, just expose the timeout value as user
-> configurable and print some hint message to increase the value
-> when hitting the failure..
->
-> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+Changes from v1:
+- Handle HAFGRTR_EL2 in nested virt
+- Update the nested virt FGT tables with the added trap bits (Marc)
+- Use the generated value for RES0 (Marc)
+- Calculate the value of NMASK based on RES0 and MASK
 
-Can you please review this patch ?
+This patch series has fixes, updates, and code for validating
+fine grain trap register masks, as well as some fixes to feature
+trapping in pKVM.
 
-We want to take this entire series through the KVM RISC-V tree.
+New fine grain trap (FGT) bits have been defined in the latest
+Arm Architecture System Registers xml specification (DDI0601 and
+DDI0602 2023-09) [1], so the code is updated to reflect them.
+Moreover, some of the already-defined masks overlap with RES0,
+which this series fixes.
 
-Regards,
-Anup
+It also adds FGT register masks that weren't defined earlier,
+handling of HAFGRTR_EL2 in nested virt, as well as build time
+validation that the bits of the various masks are all accounted
+for and without overlap.
 
-> ---
->  .../selftests/kvm/aarch64/arch_timer.c        |  8 +++++--
->  tools/testing/selftests/kvm/arch_timer.c      | 22 +++++++++++++------
->  .../selftests/kvm/include/timer_test.h        |  1 +
->  .../testing/selftests/kvm/riscv/arch_timer.c  |  8 +++++--
->  4 files changed, 28 insertions(+), 11 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/tes=
-ting/selftests/kvm/aarch64/arch_timer.c
-> index 4b421d421c3f..139eecbf77e7 100644
-> --- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-> +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-> @@ -131,10 +131,14 @@ static void guest_run_stage(struct test_vcpu_shared=
-_data *shared_data,
->
->                 /* Setup a timeout for the interrupt to arrive */
->                 udelay(msecs_to_usecs(test_args.timer_period_ms) +
-> -                       TIMER_TEST_ERR_MARGIN_US);
-> +                       test_args.timer_err_margin_us);
->
->                 irq_iter =3D READ_ONCE(shared_data->nr_iter);
-> -               GUEST_ASSERT_EQ(config_iter + 1, irq_iter);
-> +               __GUEST_ASSERT(config_iter + 1 =3D=3D irq_iter,
-> +                       "config_iter + 1 =3D 0x%lx, irq_iter =3D 0x%lx.\n=
-"
-> +                       "  Guest timer interrupt was not trigged within t=
-he specified\n"
-> +                       "  interval, try to increase the error margin by =
-[-e] option.\n",
-> +                       config_iter + 1, irq_iter);
->         }
->  }
->
-> diff --git a/tools/testing/selftests/kvm/arch_timer.c b/tools/testing/sel=
-ftests/kvm/arch_timer.c
-> index 60963fce16f2..5050022fd345 100644
-> --- a/tools/testing/selftests/kvm/arch_timer.c
-> +++ b/tools/testing/selftests/kvm/arch_timer.c
-> @@ -5,16 +5,17 @@
->   * The guest's main thread configures the timer interrupt and waits
->   * for it to fire, with a timeout equal to the timer period.
->   * It asserts that the timeout doesn't exceed the timer period plus
-> - * an error margin of 100us.
-> + * an user configurable error margin(default to 100us).
->   *
->   * On the other hand, upon receipt of an interrupt, the guest's interrup=
-t
->   * handler validates the interrupt by checking if the architectural stat=
-e
->   * is in compliance with the specifications.
->   *
->   * The test provides command-line options to configure the timer's
-> - * period (-p), number of vCPUs (-n), and iterations per stage (-i).
-> - * To stress-test the timer stack even more, an option to migrate the
-> - * vCPUs across pCPUs (-m), at a particular rate, is also provided.
-> + * period (-p), number of vCPUs (-n), iterations per stage (-i), and tim=
-er
-> + * interrupt arrival error margin (-e). To stress-test the timer stack e=
-ven
-> + * more, an option to migrate the vCPUs across pCPUs (-m), at a particul=
-ar
-> + * rate, is also provided.
->   *
->   * Copyright (c) 2021, Google LLC.
->   */
-> @@ -34,6 +35,7 @@ struct test_args test_args =3D {
->         .nr_iter =3D NR_TEST_ITERS_DEF,
->         .timer_period_ms =3D TIMER_TEST_PERIOD_MS_DEF,
->         .migration_freq_ms =3D TIMER_TEST_MIGRATION_FREQ_MS,
-> +       .timer_err_margin_us =3D TIMER_TEST_ERR_MARGIN_US,
->         .reserved =3D 1,
->  };
->
-> @@ -179,8 +181,9 @@ static void test_run(struct kvm_vm *vm)
->
->  static void test_print_help(char *name)
->  {
-> -       pr_info("Usage: %s [-h] [-n nr_vcpus] [-i iterations] [-p timer_p=
-eriod_ms]\n",
-> -               name);
-> +       pr_info("Usage: %s [-h] [-n nr_vcpus] [-i iterations] [-p timer_p=
-eriod_ms]\n"
-> +               "\t\t    [-m migration_freq_ms] [-o counter_offset]\n"
-> +               "\t\t    [-e timer_err_margin_us]\n", name);
->         pr_info("\t-n: Number of vCPUs to configure (default: %u; max: %u=
-)\n",
->                 NR_VCPUS_DEF, KVM_MAX_VCPUS);
->         pr_info("\t-i: Number of iterations per stage (default: %u)\n",
-> @@ -190,6 +193,8 @@ static void test_print_help(char *name)
->         pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different=
- pCPU. 0 to turn off (default: %u)\n",
->                 TIMER_TEST_MIGRATION_FREQ_MS);
->         pr_info("\t-o: Counter offset (in counter cycles, default: 0) [aa=
-rch64-only]\n");
-> +       pr_info("\t-e: Interrupt arrival error margin(in us) of the guest=
- timer (default: %u)\n",
-> +               TIMER_TEST_ERR_MARGIN_US);
->         pr_info("\t-h: print this help screen\n");
->  }
->
-> @@ -197,7 +202,7 @@ static bool parse_args(int argc, char *argv[])
->  {
->         int opt;
->
-> -       while ((opt =3D getopt(argc, argv, "hn:i:p:m:o:")) !=3D -1) {
-> +       while ((opt =3D getopt(argc, argv, "hn:i:p:m:o:e:")) !=3D -1) {
->                 switch (opt) {
->                 case 'n':
->                         test_args.nr_vcpus =3D atoi_positive("Number of v=
-CPUs", optarg);
-> @@ -216,6 +221,9 @@ static bool parse_args(int argc, char *argv[])
->                 case 'm':
->                         test_args.migration_freq_ms =3D atoi_non_negative=
-("Frequency", optarg);
->                         break;
-> +               case 'e':
-> +                       test_args.timer_err_margin_us =3D atoi_non_negati=
-ve("Error Margin", optarg);
-> +                       break;
->                 case 'o':
->                         test_args.counter_offset =3D strtol(optarg, NULL,=
- 0);
->                         test_args.reserved =3D 0;
-> diff --git a/tools/testing/selftests/kvm/include/timer_test.h b/tools/tes=
-ting/selftests/kvm/include/timer_test.h
-> index 968257b893a7..b1d405e7157d 100644
-> --- a/tools/testing/selftests/kvm/include/timer_test.h
-> +++ b/tools/testing/selftests/kvm/include/timer_test.h
-> @@ -22,6 +22,7 @@ struct test_args {
->         int nr_iter;
->         int timer_period_ms;
->         int migration_freq_ms;
-> +       int timer_err_margin_us;
->         /* Members of struct kvm_arm_counter_offset */
->         uint64_t counter_offset;
->         uint64_t reserved;
-> diff --git a/tools/testing/selftests/kvm/riscv/arch_timer.c b/tools/testi=
-ng/selftests/kvm/riscv/arch_timer.c
-> index 13bf184d1ff5..45a139dc7ce3 100644
-> --- a/tools/testing/selftests/kvm/riscv/arch_timer.c
-> +++ b/tools/testing/selftests/kvm/riscv/arch_timer.c
-> @@ -55,10 +55,14 @@ static void guest_run(struct test_vcpu_shared_data *s=
-hared_data)
->
->                 /* Setup a timeout for the interrupt to arrive */
->                 udelay(msecs_to_usecs(test_args.timer_period_ms) +
-> -                       TIMER_TEST_ERR_MARGIN_US);
-> +                       test_args.timer_err_margin_us);
->
->                 irq_iter =3D READ_ONCE(shared_data->nr_iter);
-> -               GUEST_ASSERT_EQ(config_iter + 1, irq_iter);
-> +               __GUEST_ASSERT(config_iter + 1 =3D=3D irq_iter,
-> +                       "config_iter + 1 =3D 0x%lx, irq_iter =3D 0x%lx.\n=
-"
-> +                       "  Guest timer interrupt was not trigged within t=
-he specified\n"
-> +                       "  interval, try to increase the error margin by =
-[-e] option.\n",
-> +                       config_iter + 1, irq_iter);
->         }
->  }
->
-> --
-> 2.34.1
->
+Based on arm64/for-next/sysregs (e94e06d8a796), which is composed
+of system register updates [2] and is based on Linux 6.7-rc3.
+
+Cheers,
+/fuad
+
+[1] https://developer.arm.com/downloads/-/exploration-tools
+[2] https://lore.kernel.org/all/20231209-b4-arm64-sysreg-additions-v1-0-45284e538474@kernel.org/
+
+Fuad Tabba (17):
+  arm64/sysreg: Add missing Pauth_LR field definitions to
+    ID_AA64ISAR1_EL1
+  arm64/sysreg: Add missing ExtTrcBuff field definition to
+    ID_AA64DFR0_EL1
+  arm64/sysreg: Add missing system register definitions for FGT
+  arm64/sysreg: Add missing system instruction definitions for FGT
+  KVM: arm64: Explicitly trap unsupported HFGxTR_EL2 features
+  KVM: arm64: Add missing HFGxTR_EL2 FGT entries to nested virt
+  KVM: arm64: Add missing HFGITR_EL2 FGT entries to nested virt
+  KVM: arm64: Add bit masks for HAFGRTR_EL2
+  KVM: arm64: Handle HAFGRTR_EL2 trapping in nested virt
+  KVM: arm64: Update and fix FGT register masks
+  KVM: arm64: Add build validation for FGT trap mask values
+  KVM: arm64: Use generated FGT RES0 bits instead of specifying them
+  KVM: arm64: Define FGT nMASK bits relative to other fields
+  KVM: arm64: Macros for setting/clearing FGT bits
+  KVM: arm64: Fix which features are marked as allowed for protected VMs
+  KVM: arm64: Mark PAuth as a restricted feature for protected VMs
+  KVM: arm64: Trap external trace for protected VMs
+
+ arch/arm64/include/asm/kvm_arm.h              | 61 +++++++++------
+ arch/arm64/include/asm/kvm_host.h             |  1 +
+ arch/arm64/include/asm/sysreg.h               |  7 ++
+ arch/arm64/kvm/emulate-nested.c               | 63 +++++++++++++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h       | 77 +++++++++++--------
+ .../arm64/kvm/hyp/include/nvhe/fixed_config.h | 22 +++++-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                |  4 +
+ arch/arm64/kvm/sys_regs.c                     |  1 +
+ arch/arm64/tools/sysreg                       | 50 +++++++++++-
+ 9 files changed, 225 insertions(+), 61 deletions(-)
+
+
+base-commit: e94e06d8a7960fd840ea92021ca1bf1362ea67f8
+-- 
+2.43.0.472.g3155946c3a-goog
+
