@@ -1,45 +1,45 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 957712E64B
-	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 10:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53AD9381C1
+	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 10:02:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tU3oQrjS"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5e1b9b10dc0so38610087b3.2
-        for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 02:02:17 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qw57gSnR"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-33608b14b3cso5646479f8f.0
+        for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 02:02:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702548136; x=1703152936; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1702548138; x=1703152938; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Da8PEljTHFtyAdAg/eiKbw+wWBtYdo/VV9CYke8DnEQ=;
-        b=tU3oQrjSEWCrl+s3rTgGvnBlSBDt3IhokOnH3SWzQE0GMmJH/46a6hvpckmFXUs7le
-         W3p0VIfuDZQKcYWxdL0U3mo8fYJ4d+nLu7kj6sF0hUHsYKe3A5OiFm9io12pNpF6MUIk
-         0gtI6kqW5bfGCRzlKXPaCqdBWrXLrXM1gd/FA+wduiv//i0mDtYMNexhN2CeGkSviAkV
-         MKCdYU14P93MGqIzc0f7Wd5pcxzfniVXn1AnxFj3Ei2wHEummgt0rjeGl5u4erpZBZG9
-         jhXZvjYdL5SZaVB+Lf8NVqQduLdqOWWz3dZr063Q8ra9WfdaXSl2AgSQD5Mf0g01GUuo
-         BVSg==
+        bh=hWCr/u0/LEl0Qz/K61SKmSilcDBET0Mpt8ezhmPfdL0=;
+        b=qw57gSnRFeV5fwsq9T27XM8eCqzOoqg6ZosnQneoDJbWVczcYbuKu4h3iih4Ap2bmv
+         Ai6DsM1tzPVgjXP5lCmyQ+wXDsu8pz/oNKefA3+4qzAFB3qrYWf3Cld19SSkpVxhSVOO
+         u1adB+0mAHeYTA8IAECidxQ9+vPzEpAZUOWmSSdrq0uc+Jer8KJSITnuaXimYBCg4q3Z
+         RHUEjteLPZxKyztjxG3x0VT9yu4wBvSmbn5Ygj3V6radwAr3U25mToTsYKx6xz/njyiB
+         vlVFinVxPieE5iAOggXjkmKQHydt70ymB8IFEG/WEXM7LPaKs8XLM30TycsOp9Agkhwx
+         tKJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702548136; x=1703152936;
+        d=1e100.net; s=20230601; t=1702548138; x=1703152938;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Da8PEljTHFtyAdAg/eiKbw+wWBtYdo/VV9CYke8DnEQ=;
-        b=PwUpznsDRpmahnN4KcHnqhFm4ZLropghN3ALqdYmH1bxzr2EDgaE6n7HZIqjvhvhpI
-         KQab+pPLp7Ydn8uoWKJBFChh1EaZtAmz3g9jyRmGdoUFLuWWOiPa7cjspGnALVnmq7NF
-         9bn7ZHqzPNGU24lqitmGdXauJOqaGJUxIbDoXR38bdKU3H8WiutopytYIWS9YAeSbslZ
-         z/hCmkGIlswOwZSDJFbOYEfAGPsZXFhzyOKmqHvW2aQ4VA0VzNdCdVNrmg10geXCSxdv
-         93PBkn9VYnc/h5Mj1ZUE73sflTNRUTR60ys/ksLez8asjT+nhLKXO8TpAW9ZSOTchFxv
-         56ng==
-X-Gm-Message-State: AOJu0YxN42z/2VHxL0ru5HHdjTeN3EGYa2iF1vkWU2G0muuJ5nKejWON
-	pkyjt5fLJV+LoVUQ+j/FUcW0vyVllyahuzOPb4sN3Tlo8vJpIBqoQRThqGv6369nAqjx5pUgwX0
-	hx7/PvdjdvLTxfoEM4TalBycV+umY64NL6+Gpv3UtOkPpAcvHFPh+rm48Ip0=
-X-Google-Smtp-Source: AGHT+IEuw+3Pg+LXmSjMTI015X5o2FNJIMfMU9lFQxidELjvY70BfLIQKtuu/0eWkY2P/YRS+CobhfzYvw==
+        bh=hWCr/u0/LEl0Qz/K61SKmSilcDBET0Mpt8ezhmPfdL0=;
+        b=kRipEWRZl4DnjT5UdzLNFeMzbhVKLlPMWUtW9tWybryxe3INBFY6mP/jWEaIvs2S98
+         t3fuc2LY1KedxH6qpqOSO9izWmwLZvFThoM1IYnh+Ow0s+lklr9PDkIXBzoda4g8j9X1
+         Xo7E0dMNlLv2BiPJ3aQZ5DoRI1+Q5+ShPiEDv7pfVZgKcuBLqpLJTTUYbM5oUFGUZnD1
+         lGHsdacKkp9+bFzIR1UPDr029HV4QtU1tkt0Eg8mtZxlSBHjanAdofNZEv0ybbvkZl3V
+         ir9i5mX8em8bsiw0/ZKO+Zp+ta2Uq7ST3ctyLshQbAWSedBnytZegY9pCN0/iQQ+8R2v
+         77MQ==
+X-Gm-Message-State: AOJu0YwN3fCnu0X/q3prVsOXNqLwbGnapEn492WNteMhi66npkQBT4oO
+	A9rZXERIYBL3nMATefqMP6EzqgrvbuBX51AYr1u5CqgOSpCGJZFoylw3Ul1UdICaGMwiSxhqqq2
+	d939AeD6reD2HoNhcROz7J/b3hAJI1LgQzowIdJ3IuTnyB9dVTTQ5JL7px/8=
+X-Google-Smtp-Source: AGHT+IFL2ThU73Trz4Wy9pYB2yLh/2X8/PtTAtN1qdC64iHsHskqYdTX9A2+HSCsuauP2OUpLSO2Us+QPg==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:185:b0:dbc:c7f0:7c2e with SMTP id
- t5-20020a056902018500b00dbcc7f07c2emr50863ybh.2.1702548136159; Thu, 14 Dec
- 2023 02:02:16 -0800 (PST)
-Date: Thu, 14 Dec 2023 10:01:47 +0000
+ (user=tabba job=sendgmr) by 2002:a05:6000:4024:b0:333:43b5:ef39 with SMTP id
+ cp36-20020a056000402400b0033343b5ef39mr50416wrb.10.1702548138483; Thu, 14 Dec
+ 2023 02:02:18 -0800 (PST)
+Date: Thu, 14 Dec 2023 10:01:48 +0000
 In-Reply-To: <20231214100158.2305400-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -49,9 +49,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20231214100158.2305400-1-tabba@google.com>
 X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231214100158.2305400-8-tabba@google.com>
-Subject: [PATCH v3 07/17] KVM: arm64: Add missing HFGITR_EL2 FGT entries to
- nested virt
+Message-ID: <20231214100158.2305400-9-tabba@google.com>
+Subject: [PATCH v3 08/17] KVM: arm64: Add bit masks for HAFGRTR_EL2
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, 
@@ -61,30 +60,30 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, broonie@kernel.org,
 	linux-arm-kernel@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 
-Add the missing nested virt FGT table entries HFGITR_EL2. Based
-on DDI0601 and DDI0602 2023-09.
+To support HAFGRTR_EL2 supported in nested virt in the following
+patch, first add its bitmask definitions based on DDI0601 2023-09.
 
+Reviewed-by: Mark Brown <broonie@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/emulate-nested.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/arm64/include/asm/kvm_arm.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 8b473a1bbc11..89901550db34 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -1117,6 +1117,11 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
- 	SR_FGT(SYS_AFSR1_EL1, 		HFGxTR, AFSR1_EL1, 1),
- 	SR_FGT(SYS_AFSR0_EL1, 		HFGxTR, AFSR0_EL1, 1),
- 	/* HFGITR_EL2 */
-+	SR_FGT(OP_AT_S1E1A, 		HFGITR, ATS1E1A, 1),
-+	SR_FGT(OP_COSP_RCTX, 		HFGITR, COSPRCTX, 1),
-+	SR_FGT(OP_GCSPUSHX, 		HFGITR, nGCSEPP, 0),
-+	SR_FGT(OP_GCSPOPX, 		HFGITR, nGCSEPP, 0),
-+	SR_FGT(OP_GCSPUSHM, 		HFGITR, nGCSPUSHM_EL1, 0),
- 	SR_FGT(OP_BRB_IALL, 		HFGITR, nBRBIALL, 0),
- 	SR_FGT(OP_BRB_INJ, 		HFGITR, nBRBINJ, 0),
- 	SR_FGT(SYS_DC_CVAC, 		HFGITR, DCCVAC, 1),
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index b85f46a73e21..7de0a7062625 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -370,6 +370,10 @@
+ #define __HDFGWTR_EL2_MASK	~__HDFGWTR_EL2_nMASK
+ #define __HDFGWTR_EL2_nMASK	GENMASK(62, 60)
+ 
++#define __HAFGRTR_EL2_RES0	(GENMASK(63, 50) | GENMASK(16, 5))
++#define __HAFGRTR_EL2_MASK	(GENMASK(49, 17) | GENMASK(4, 0))
++#define __HAFGRTR_EL2_nMASK	0UL
++
+ /* Similar definitions for HCRX_EL2 */
+ #define __HCRX_EL2_RES0		(GENMASK(63, 16) | GENMASK(13, 12))
+ #define __HCRX_EL2_MASK		(0)
 -- 
 2.43.0.472.g3155946c3a-goog
 
