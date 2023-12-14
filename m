@@ -1,45 +1,45 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F205364DE
-	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 10:02:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1477A2E64B
+	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 10:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mPttejQB"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbcd721b366so346773276.0
-        for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 02:02:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1b/ms6TN"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3333aaf02b0so7127562f8f.1
+        for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 02:02:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702548154; x=1703152954; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1702548156; x=1703152956; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S1+IuL8DTNb6t5XDOnXjUzV0e48iypX1iDtmuw3RN+0=;
-        b=mPttejQBtt3jXrWEKQvhm6GCh2abNFFwl1lJEmmU2Y/UbTe+tccUTdx+GNFtKJIuwn
-         XiEpSyzRAETGEV9NgxhFXSpru/8R7zWmCgxRkZdR+G/qkobrh1M0k9xxzEXVoQr4mpUC
-         yBoVrTWYb78OG0VGqitCAjHcI2n4kLweQQ5IuhCQplgMyNQkrr7WRFmh2TwxICaGIGl5
-         LqvB1hoBAlePjKsZ8tIAVOgUf9En++Fh8bmqxmVkOfjTa5x6ID34iBYewo86Pfger7WE
-         V8RUAdA27l4IgvDEJ2tPcMD3xEdXuMvWWX7YnsOocLFKn1x/MkpOaMs431x1Pb4f3Xgn
-         54HA==
+        bh=DxM0XHeehpr+WPJP1Pzkg4drlsNFy3fN21V8Kb3LPPA=;
+        b=1b/ms6TNhKxgYd/8pjJuz/4bBvf0GTGK2akZpYqxdQlFqcDYFLEcAZQGlDs78pydzK
+         JwKOX4fO9QcwEY0xhBmWJFaETcp3HKS9KyVr0BY/ls4yrNVE0/01CHIH3cpV5uH6JPEu
+         55W+6V5LvoWNo+hx2/pU0GIPDN/dhI6oIfQJr8RSLJvYmEVNk3UycTeBybs3Avdo1qJk
+         CXp84gpuuaRx8smONj1MpcDxGcBaqGyMcubfnLd48L3DbIcEMnXl50aGZmLFTIG6LZeE
+         S3VBYL94AlASFXVqGKqQSNZ72QmwHFxNZuTNjErmGYQr1Dkc+rL0/ancayQfUBQDzY8p
+         jgFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702548154; x=1703152954;
+        d=1e100.net; s=20230601; t=1702548156; x=1703152956;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S1+IuL8DTNb6t5XDOnXjUzV0e48iypX1iDtmuw3RN+0=;
-        b=xJMUZdrrJbsyOmZpFupUMzBi/f/uBbJizp9lxLm/zqAdl1JIwH/8idYbXkRsvLxCSU
-         kFQqkFTd5z0aSwDTXVvPRPxDos3FQ8S8sdCsWGNFSH19merWyb7M/UQZpw2jFIwyAoGV
-         YHy4lGzJv+xRW2KyLxUq/F6pMNG0TNcIZnvDrol+/S8qJby5RSbA0fr0adt10xMwdIa6
-         4KvYGxFRQXBbJajmamdxWRcDmLmCx2vDsZgDqnhkCkVhiEvnTyw+YLg7o4biVHKJ/nKX
-         o6iHYmglGApjzXoXrg3zSWFlfN2sRQGr5eDWdwrNa+F7gUo6UzGNASebdyQejhk1lB3l
-         qbGg==
-X-Gm-Message-State: AOJu0Yy3/mSnsbqnGESJBBjbW1hUAgMwW7H3xptgctwVI/hJ+6Rtg1wc
-	n9VdBXyZw/6eL4Inph8KAn+bmpsHGzQh99LNtNCR6x1CRMTAZTkNGcl1wkEE7cx4aMPn5dos769
-	CvIvRero/kkQVXVViesiFeL3jsiKGyPiuiyXWkSSUxuYqO18s8hRixPWOa0M=
-X-Google-Smtp-Source: AGHT+IFYC31qCWJ06bIumj+WQ40j9UIE6wLj/c88RXH+XdggRYNwnvugeJ9GwrMi29Nj5+bhLHACVDAgRw==
+        bh=DxM0XHeehpr+WPJP1Pzkg4drlsNFy3fN21V8Kb3LPPA=;
+        b=F5e91sL2H3TxEijNUHvoeMimJc+9ycUdSHlSbkH7fJFBUgYIpjU/lS+V6X1ra88zIG
+         IPjQwn1mqa8Jn9F5bjHsjr71yIQTmVd8Unux7uzHk4QRIjIzccQ0bKfonAf2UwU8EhDn
+         YCzB4NfhvAQ/53DbOqwEIPMR1gPGQUU6qm/BkIxcYGuVk3sC+t0WlAyoXSwFgsRv4A8m
+         E97C5Ky5nsGEek/kgNeoLObnofhgDTtum96dCGTyi38tEP6xjP5Q8/8/m6EnhtcrO8XY
+         wosEybp2FCxAPpunLGnIZ3Qfj8j6NfUQd0JXGRCIGJe9m1x0HjZpRzUKJaMugBIRL21Z
+         fefQ==
+X-Gm-Message-State: AOJu0YyUN64MnxUJPdXdHgppXF5sNOm10T8KLpUdQg8mcjMnqbGrUmY4
+	gI56FfiIENYDhgz6g7Ps4NLC2H8WP67WqmLyZPlTk6QpW7MSdzfVsZrb3br8CPVHq511O3hOyiT
+	T4x216xIICpllG5kV9oRFZbvS4GfDbS3GbnlNDo7eYTQ3cixfAyBYvFMwU+g=
+X-Google-Smtp-Source: AGHT+IHRZfkX+kRwxAcAgeOYuqBVIq7qh6v7y8TD4vtcPCdnrGYYlwGO4zqQN1aoI/8Pp/ExfSE/vt6lxQ==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a25:1307:0:b0:db5:4a00:a153 with SMTP id
- 7-20020a251307000000b00db54a00a153mr159337ybt.4.1702548153946; Thu, 14 Dec
- 2023 02:02:33 -0800 (PST)
-Date: Thu, 14 Dec 2023 10:01:55 +0000
+ (user=tabba job=sendgmr) by 2002:a5d:4b06:0:b0:336:4a97:9f70 with SMTP id
+ v6-20020a5d4b06000000b003364a979f70mr1374wrq.5.1702548156209; Thu, 14 Dec
+ 2023 02:02:36 -0800 (PST)
+Date: Thu, 14 Dec 2023 10:01:56 +0000
 In-Reply-To: <20231214100158.2305400-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -49,9 +49,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20231214100158.2305400-1-tabba@google.com>
 X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231214100158.2305400-16-tabba@google.com>
-Subject: [PATCH v3 15/17] KVM: arm64: Fix which features are marked as allowed
- for protected VMs
+Message-ID: <20231214100158.2305400-17-tabba@google.com>
+Subject: [PATCH v3 16/17] KVM: arm64: Mark PAuth as a restricted feature for
+ protected VMs
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, 
@@ -61,57 +61,50 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, broonie@kernel.org,
 	linux-arm-kernel@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 
-Cache maintenance operations are not trapped for protected VMs,
-and shouldn't be. Mark them as allowed.
-
-Moreover, features advertised by ID_AA64PFR2 and ID_AA64MMFR3 are
-(already) not allowed, mark them as such.
+Protected VMs will only support basic PAuth (FEAT_PAuth). Mark it
+as restricted to ensure that later versions aren't supported for
+protected guests.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/include/nvhe/fixed_config.h | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/include/nvhe/fixed_config.h | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
-index e91922daa8ca..8d97dff4bb7b 100644
+index 8d97dff4bb7b..51f043649146 100644
 --- a/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
 +++ b/arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
-@@ -69,6 +69,8 @@
- 	ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SSBS) \
+@@ -184,10 +184,18 @@
+ 	ARM64_FEATURE_MASK(ID_AA64ISAR0_EL1_RNDR) \
  	)
  
-+#define PVM_ID_AA64PFR2_ALLOW 0ULL
++/* Restrict pointer authentication to the basic version. */
++#define PVM_ID_AA64ISAR1_RESTRICT_UNSIGNED (\
++	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_APA), ID_AA64ISAR1_EL1_APA_PAuth) | \
++	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_API), ID_AA64ISAR1_EL1_API_PAuth) \
++	)
 +
- /*
-  * Allow for protected VMs:
-  * - Mixed-endian
-@@ -101,6 +103,7 @@
-  * - Privileged Access Never
-  * - SError interrupt exceptions from speculative reads
-  * - Enhanced Translation Synchronization
-+ * - Control for cache maintenance permission
-  */
- #define PVM_ID_AA64MMFR1_ALLOW (\
- 	ARM64_FEATURE_MASK(ID_AA64MMFR1_EL1_HAFDBS) | \
-@@ -108,7 +111,8 @@
- 	ARM64_FEATURE_MASK(ID_AA64MMFR1_EL1_HPDS) | \
- 	ARM64_FEATURE_MASK(ID_AA64MMFR1_EL1_PAN) | \
- 	ARM64_FEATURE_MASK(ID_AA64MMFR1_EL1_SpecSEI) | \
--	ARM64_FEATURE_MASK(ID_AA64MMFR1_EL1_ETS) \
-+	ARM64_FEATURE_MASK(ID_AA64MMFR1_EL1_ETS) | \
-+	ARM64_FEATURE_MASK(ID_AA64MMFR1_EL1_CMOW) \
- 	)
- 
- /*
-@@ -133,6 +137,8 @@
- 	ARM64_FEATURE_MASK(ID_AA64MMFR2_EL1_E0PD) \
- 	)
- 
-+#define PVM_ID_AA64MMFR3_ALLOW (0ULL)
++#define PVM_ID_AA64ISAR2_RESTRICT_UNSIGNED (\
++	FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_APA3), ID_AA64ISAR2_EL1_APA3_PAuth) \
++	)
 +
- /*
-  * No support for Scalable Vectors for protected VMs:
-  *	Requires additional support from KVM, e.g., context-switching and
+ #define PVM_ID_AA64ISAR1_ALLOW (\
+ 	ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_DPB) | \
+-	ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_APA) | \
+-	ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_API) | \
+ 	ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_JSCVT) | \
+ 	ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_FCMA) | \
+ 	ARM64_FEATURE_MASK(ID_AA64ISAR1_EL1_LRCPC) | \
+@@ -202,8 +210,8 @@
+ 	)
+ 
+ #define PVM_ID_AA64ISAR2_ALLOW (\
++	ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_ATS1A)| \
+ 	ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_GPA3) | \
+-	ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_APA3) | \
+ 	ARM64_FEATURE_MASK(ID_AA64ISAR2_EL1_MOPS) \
+ 	)
+ 
 -- 
 2.43.0.472.g3155946c3a-goog
 
