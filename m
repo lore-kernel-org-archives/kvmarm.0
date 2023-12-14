@@ -1,101 +1,236 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D181524A11
-	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 16:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="E60cAGDA"
-Date: Thu, 14 Dec 2023 16:56:01 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1702572970;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4YNudICFnccOJwSRae1JA15vTriKkExaSPdeDL+9ouQ=;
-	b=E60cAGDAv7DLogGVzQ767p+8gD8T7Uf/QSXhFzabZSx5Z+LA7N2090ZifH+dopmn0oBAsB
-	+KpmKolLuvIonLpihx3t0oJrVTF3GH9zJjB/5JxvxCNTx7I2g62Wu9IjAETEpeCRAeBwJF
-	xmt2EieAYHyu3P78CbW8deoTVu4A78E=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Lorenzo Pieralisi <lpieralisi@kernel.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>,
-	Catalin Marinas <catalin.marinas@arm.com>, ankita@nvidia.com,
-	maz@kernel.org, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	will@kernel.org, alex.williamson@redhat.com, kevin.tian@intel.com,
-	yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org,
-	gshan@redhat.com, linux-mm@kvack.org, aniketa@nvidia.com,
-	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
-	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
-	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	james.morse@arm.com
-Subject: Re: [PATCH v3 2/2] kvm: arm64: set io memory s2 pte as normalnc for
- vfio pci devices
-Message-ID: <ZXszoQ48pZ7FnQNV@linux.dev>
-References: <20231208164709.23101-1-ankita@nvidia.com>
- <20231208164709.23101-3-ankita@nvidia.com>
- <ZXicemDzXm8NShs1@arm.com>
- <20231212181156.GO3014157@nvidia.com>
- <ZXoOieQN7rBiLL4A@linux.dev>
- <ZXsjv+svp44YjMmh@lpieralisi>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E912965ECF;
+	Thu, 14 Dec 2023 17:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4SrfWp0gHJz67mnJ;
+	Fri, 15 Dec 2023 01:30:46 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8C9211400CA;
+	Fri, 15 Dec 2023 01:32:43 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 14 Dec
+ 2023 17:32:42 +0000
+Date: Thu, 14 Dec 2023 17:32:41 +0000
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+CC: <linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
+	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-riscv@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<x86@kernel.org>, <acpica-devel@lists.linuxfoundation.org>,
+	<linux-csky@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-ia64@vger.kernel.org>, <linux-parisc@vger.kernel.org>, Salil Mehta
+	<salil.mehta@huawei.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	<jianyong.wu@arm.com>, <justin.he@arm.com>, James Morse <james.morse@arm.com>
+Subject: Re: [PATCH RFC v3 01/21] ACPI: Only enumerate enabled (or
+ functional) devices
+Message-ID: <20231214173241.0000260f@Huawei.com>
+In-Reply-To: <E1rDOfs-00DvjY-HQ@rmk-PC.armlinux.org.uk>
+References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk>
+	<E1rDOfs-00DvjY-HQ@rmk-PC.armlinux.org.uk>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZXsjv+svp44YjMmh@lpieralisi>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Thu, Dec 14, 2023 at 04:48:15PM +0100, Lorenzo Pieralisi wrote:
+On Wed, 13 Dec 2023 12:49:16 +0000
+Russell King (Oracle) <rmk+kernel@armlinux.org.uk> wrote:
 
-[...]
-
-> > AFAICT, the only reason PCI devices can get the blanket treatment of
-> > Normal-NC at stage-2 is because userspace has a Device-* mapping and can't
-> > speculatively load from the alias. This feels a bit hacky, and maybe we
-> > should prioritize an interface for mapping a device into a VM w/o a
-> > valid userspace mapping.
+> From: James Morse <james.morse@arm.com>
 > 
-> FWIW - I have tried to summarize the reasoning behind PCIe devices
-> Normal-NC default stage-2 safety in a document that I have just realized
-> now it has become this series cover letter, I don't think the PCI blanket
-> treatment is related *only* to the current user space mappings (ie
-> BTW, AFAICS it is also *possible* at present to map a prefetchable BAR through
-> sysfs with Normal-NC memory attributes in the host at the same time a PCI
-> device is passed-through to a guest with VFIO - and therefore we have a
-> dev-nGnRnE stage-1 mapping for it. Don't think anyone does that - what for -
-> but it is possible and KVM would not know about it).
+> Today the ACPI enumeration code 'visits' all devices that are present.
 > 
-> Again, FWIW, we were told (source Arm ARM) mismatched aliases concerning
-> device-XXX vs Normal-NC are not problematic as long as the transactions
-> issued for the related mappings are independent (and none of the
-> mappings is cacheable).
+> This is a problem for arm64, where CPUs are always present, but not
+> always enabled. When a device-check occurs because the firmware-policy
+> has changed and a CPU is now enabled, the following error occurs:
+> | acpi ACPI0007:48: Enumeration failure
 > 
-> I appreciate this is not enough to give everyone full confidence on
-> this solution robustness - that's why I wrote that up so that we know
-> what we are up against and write KVM interfaces accordingly.
+> This is ultimately because acpi_dev_ready_for_enumeration() returns
+> true for a device that is not enabled. The ACPI Processor driver
+> will not register such CPUs as they are not 'decoding their resources'.
+> 
+> Change acpi_dev_ready_for_enumeration() to also check the enabled bit.
+> ACPI allows a device to be functional instead of maintaining the
+> present and enabled bit. Make this behaviour an explicit check with
+> a reference to the spec, and then check the present and enabled bits.
+> This is needed to avoid enumerating present && functional devices that
+> are not enabled.
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Tested-by: Miguel Luis <miguel.luis@oracle.com>
+> Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
+> Tested-by: Jianyong Wu <jianyong.wu@arm.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+> If this change causes problems on deployed hardware, I suggest an
+> arch opt-in: ACPI_IGNORE_STA_ENABLED, that causes
+> acpi_dev_ready_for_enumeration() to only check the present bit.
 
-Apologies, I didn't mean to question what's going on here from the
-hardware POV. My concern was more from the kernel + user interfaces POV,
-this all seems to work (specifically for PCI) by maintaining an
-intentional mismatch between the VFIO stage-1 and KVM stage-2 mappings.
+My gut feeling (having made ACPI 'fixes' in the past that ran into
+horribly broken firmware and had to be reverted) is reduce the blast
+radius preemptively from the start. I'd love to live in a world were
+that wasn't necessary but I don't trust all the generators of ACPI tables.
+I'll leave it to Rafael and other ACPI experts suggest how narrow we should
+make it though - arch opt in might be narrow enough.
 
-If we add more behind-the-scenes tricks to get other MMIO mappings
-working in the future then this whole interaction will get even
-hairier. At least if we follow the stage-1 attributes (where possible)
-then we can document some sort of expected behavior in KVM. The VMM would
-need know if the device has read side-effects, as the only way to get a
-Normal-NC mapping in the guest would be to have one at stage-1.
+> 
+> Changes since RFC v2:
+>  * Incorporate comment suggestion by Gavin Shan.
+> Other review comments from Jonathan Cameron not yet addressed.
 
-Kinda stinks to make the VMM aware of the device, but IMO it is a
-fundamental limitation of the way we back memslots right now.
+Looking back, I think this was mainly a suggestion for a minor
+possible optimization by ignoring the case of !present && enabled
+when designing the logic because that's not allowed by the spec.
 
--- 
-Thanks,
-Oliver
+You made that change in v3.
+
+Otherwise, comments were trivial comment clarifications that I'm not
+that worried about.
+
+One comment typo inline.
+
+With assumption others will comment on when this change should be
+chicken bit'd out.
+
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+
+
+> ---
+>  drivers/acpi/device_pm.c    |  2 +-
+>  drivers/acpi/device_sysfs.c |  2 +-
+>  drivers/acpi/internal.h     |  1 -
+>  drivers/acpi/property.c     |  2 +-
+>  drivers/acpi/scan.c         | 24 ++++++++++++++----------
+>  5 files changed, 17 insertions(+), 14 deletions(-)
+> 
+> diff --git a/drivers/acpi/device_pm.c b/drivers/acpi/device_pm.c
+> index 3b4d048c4941..e3c80f3b3b57 100644
+> --- a/drivers/acpi/device_pm.c
+> +++ b/drivers/acpi/device_pm.c
+> @@ -313,7 +313,7 @@ int acpi_bus_init_power(struct acpi_device *device)
+>  		return -EINVAL;
+>  
+>  	device->power.state = ACPI_STATE_UNKNOWN;
+> -	if (!acpi_device_is_present(device)) {
+> +	if (!acpi_dev_ready_for_enumeration(device)) {
+>  		device->flags.initialized = false;
+>  		return -ENXIO;
+>  	}
+> diff --git a/drivers/acpi/device_sysfs.c b/drivers/acpi/device_sysfs.c
+> index 23373faa35ec..a0256d2493a7 100644
+> --- a/drivers/acpi/device_sysfs.c
+> +++ b/drivers/acpi/device_sysfs.c
+> @@ -141,7 +141,7 @@ static int create_pnp_modalias(const struct acpi_device *acpi_dev, char *modalia
+>  	struct acpi_hardware_id *id;
+>  
+>  	/* Avoid unnecessarily loading modules for non present devices. */
+> -	if (!acpi_device_is_present(acpi_dev))
+> +	if (!acpi_dev_ready_for_enumeration(acpi_dev))
+>  		return 0;
+>  
+>  	/*
+> diff --git a/drivers/acpi/internal.h b/drivers/acpi/internal.h
+> index 866c7c4ed233..a1b45e345bcc 100644
+> --- a/drivers/acpi/internal.h
+> +++ b/drivers/acpi/internal.h
+> @@ -107,7 +107,6 @@ int acpi_device_setup_files(struct acpi_device *dev);
+>  void acpi_device_remove_files(struct acpi_device *dev);
+>  void acpi_device_add_finalize(struct acpi_device *device);
+>  void acpi_free_pnp_ids(struct acpi_device_pnp *pnp);
+> -bool acpi_device_is_present(const struct acpi_device *adev);
+>  bool acpi_device_is_battery(struct acpi_device *adev);
+>  bool acpi_device_is_first_physical_node(struct acpi_device *adev,
+>  					const struct device *dev);
+> diff --git a/drivers/acpi/property.c b/drivers/acpi/property.c
+> index 6979a3f9f90a..14d6948fd88a 100644
+> --- a/drivers/acpi/property.c
+> +++ b/drivers/acpi/property.c
+> @@ -1420,7 +1420,7 @@ static bool acpi_fwnode_device_is_available(const struct fwnode_handle *fwnode)
+>  	if (!is_acpi_device_node(fwnode))
+>  		return false;
+>  
+> -	return acpi_device_is_present(to_acpi_device_node(fwnode));
+> +	return acpi_dev_ready_for_enumeration(to_acpi_device_node(fwnode));
+>  }
+>  
+>  static const void *
+> diff --git a/drivers/acpi/scan.c b/drivers/acpi/scan.c
+> index 02bb2cce423f..728649a2a251 100644
+> --- a/drivers/acpi/scan.c
+> +++ b/drivers/acpi/scan.c
+> @@ -304,7 +304,7 @@ static int acpi_scan_device_check(struct acpi_device *adev)
+>  	int error;
+>  
+>  	acpi_bus_get_status(adev);
+> -	if (acpi_device_is_present(adev)) {
+> +	if (acpi_dev_ready_for_enumeration(adev)) {
+>  		/*
+>  		 * This function is only called for device objects for which
+>  		 * matching scan handlers exist.  The only situation in which
+> @@ -338,7 +338,7 @@ static int acpi_scan_bus_check(struct acpi_device *adev, void *not_used)
+>  	int error;
+>  
+>  	acpi_bus_get_status(adev);
+> -	if (!acpi_device_is_present(adev)) {
+> +	if (!acpi_dev_ready_for_enumeration(adev)) {
+>  		acpi_scan_device_not_enumerated(adev);
+>  		return 0;
+>  	}
+> @@ -1913,11 +1913,6 @@ static bool acpi_device_should_be_hidden(acpi_handle handle)
+>  	return true;
+>  }
+>  
+> -bool acpi_device_is_present(const struct acpi_device *adev)
+> -{
+> -	return adev->status.present || adev->status.functional;
+> -}
+> -
+>  static bool acpi_scan_handler_matching(struct acpi_scan_handler *handler,
+>  				       const char *idstr,
+>  				       const struct acpi_device_id **matchid)
+> @@ -2381,16 +2376,25 @@ EXPORT_SYMBOL_GPL(acpi_dev_clear_dependencies);
+>   * acpi_dev_ready_for_enumeration - Check if the ACPI device is ready for enumeration
+>   * @device: Pointer to the &struct acpi_device to check
+>   *
+> - * Check if the device is present and has no unmet dependencies.
+> + * Check if the device is functional or enabled and has no unmet dependencies.
+>   *
+> - * Return true if the device is ready for enumeratino. Otherwise, return false.
+> + * Return true if the device is ready for enumeration. Otherwise, return false.
+>   */
+>  bool acpi_dev_ready_for_enumeration(const struct acpi_device *device)
+>  {
+>  	if (device->flags.honor_deps && device->dep_unmet)
+>  		return false;
+>  
+> -	return acpi_device_is_present(device);
+> +	/*
+> +	 * ACPI 6.5's 6.3.7 "_STA (Device Status)" allows firmware to return
+> +	 * (!present && functional) for certain types of devices that should be
+> +	 * enumerated. Note that the enabled bit can't be sert until the present
+
+set until
+
+> +	 * bit is set.
+> +	 */
+> +	if (device->status.present)
+> +		return device->status.enabled;
+> +	else
+> +		return device->status.functional;
+>  }
+>  EXPORT_SYMBOL_GPL(acpi_dev_ready_for_enumeration);
+>  
+
