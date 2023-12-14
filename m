@@ -1,45 +1,45 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6A2364DE
-	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 10:02:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21724364DE
+	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 10:02:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jKaGNBOp"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3335df64539so6584163f8f.3
-        for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 02:02:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g+s+iKBa"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbcc8f895daso2273139276.2
+        for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 02:02:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702548149; x=1703152949; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1702548152; x=1703152952; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xiH9cCOHpECfluleYwHnu/Lcc0lTQuy3GE63dgctBzU=;
-        b=jKaGNBOpz686pKKiULC+cL8rV3kObDFFiMMd4kcsdC5oSGaO20yylhUmjQiaPh5zZX
-         ya0cauWeFvR3MwOMeXQbYpGm9VFRd3Us9BYWHQvSjMQZTH5/C6PygzFgqRnH3lJaTnFl
-         Z1/HTH2nmtariGnYGna7kH8eNq1KaPVyL2meqhdjgFRNqCkUomOmaPMSg8hvR/ygbavy
-         p/lr5Tn9DYn+Ptyny/M+biHScm2AUDrj+B6xW0nAveo86ZpLklsIy4goL6NbdzMH1+ZL
-         1DAMuRCWgo3jr2EiXsdrzuVf/YPyu1meHFjU8vYRPMu5lUFcwrXpszPh8Tkmg93W0xsL
-         U8SQ==
+        bh=BZpm5g8sXqlgN71zqSoD3PYKLpgzzVAPPBQdv9SzS9U=;
+        b=g+s+iKBaTuZCwSeVMLVU2PF0h3ERvqW/5l2o1uY+mvWxvmXf2l789NO21dDNQWjy3B
+         /e+vC4scFF9LUd5Xh6k4AI1frp22hrml0p2ddJLoGKyqEAR7ptyh0mpF64b3WqgWilAe
+         rnITPz+/yAtFeqyor8NNcCkh9NpHjEqB2lulNxT4Kx2SLlAq2kZHji5hzkJY2qZ61C9l
+         usg8jd8ihLwwfFdraPYrXmLEtJrdugCjVoEczraKo8p5fRuZeZCU1YUfPP2/vYTk2iBT
+         BMM9wUSmaxykj1ee/L2oe6Mp7H4PRz/eQ7EkxQKJdFKjaRbL5YDAhdGjmBE25P4J9Qil
+         c5WA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702548149; x=1703152949;
+        d=1e100.net; s=20230601; t=1702548152; x=1703152952;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xiH9cCOHpECfluleYwHnu/Lcc0lTQuy3GE63dgctBzU=;
-        b=WHF7h3hg9RzfSdRk96ZvNMO/+y/qPvGSBvKsGHQTRzmB4i+ZyyL0JWFKyB9ampGG4F
-         UO2Mp9tWfoWXu92DvXgG4pL+f2N+mdq/SSowz4+dGWVnoz/suIG+5uae5TFAxzUYcOnh
-         GKq1Lr8DG5+bUPkBoV9Zl+dPfZBCm5RHgbTbQnz/IUbtjIweZ6WRwAI+I5UwLqmiz3YT
-         4y5atjXT19brInq3F6XNsguPmvh8jsW4WSm0iV6YDablLAr+oroPu3PHJOVRk1Wms0CX
-         KNYJis7/8Gy1yEVoXhFABpbPRr+fW99hu7oCu1HfRjbElBrEH625D7hhZ47t7mem/wNl
-         zT+Q==
-X-Gm-Message-State: AOJu0Yygzb/mWbVSyJIIPteiP9aHRuq/U8JmcABErKBl3PJWIwExD8qs
-	qT3RrxSg8fc/SusoqKehu06M1E4PX8YAVELiy5+3muccujruBONfAJXPUandFQitZAVILCSIDDY
-	Ecte1mRErck1cj0UOzmJ5I2cOBl5a3lmsFdwZSlimDFe8Ozjgld+gKBFTcWk=
-X-Google-Smtp-Source: AGHT+IHX75xTL+XE/RnHwJsq2XGhisxwaOMfWGYxWgvAlywICs0euh4HZY2sx82xHWV+xO1t1Aiaso36uw==
+        bh=BZpm5g8sXqlgN71zqSoD3PYKLpgzzVAPPBQdv9SzS9U=;
+        b=H6Ym4FVG9sYfpFU6rLjnULQdsdv0a+Q91SZn75kB09HAqqd+GgxiiCINZ+biYe90LC
+         7KvwHx1/WYKao5jhc0eWpZf1aCi85gr4nKEd0nravPVMWjULp6oYSIE79h1GfIScOpWa
+         NzOcXSnhzPsSlbEY4rKsXJC8hLE5MRPXoqik0ax4vx3IYtw+roIfzITiP1277/xYDLVQ
+         SFAm1CTqFHZfUSEkldn57A2eMN0DuclEZ35vOxj2ByWkPGmQ+r7jaeEze3EJMzIlurNJ
+         k4+w19BqegUnxK9w4b4j0sb8rzuXHJGjT0zWlt2I2JCuVrkxRQl03FZBp6rJivF2pvB3
+         EAVQ==
+X-Gm-Message-State: AOJu0YyGwoNKF4Q3+LgI86LwZMVb1vTKfxlHAxGg7Vv5yH7rUJIM5YIJ
+	10VYEjeQPFzJFHvZkT+Oz8s8kRRh/wrtRiujWcsu3y01iCf9y9AeQ87SGtG0LADJsTcTqGvyrjb
+	OEG1SS30j3cDPociU6MXTShUFQ9lAsydx5p/p+2HMa2bpOvTy8+3lbD5eJ/A=
+X-Google-Smtp-Source: AGHT+IF6Akn1Pi5DCUhyiJjAZLduSqaHqIoZSn6di1DIm8HQc07sCgOSlwvtGjmu28U/J1q4cm0p0M6luQ==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a5d:4246:0:b0:336:4ad5:60eb with SMTP id
- s6-20020a5d4246000000b003364ad560ebmr1093wrr.7.1702548149458; Thu, 14 Dec
- 2023 02:02:29 -0800 (PST)
-Date: Thu, 14 Dec 2023 10:01:53 +0000
+ (user=tabba job=sendgmr) by 2002:a05:6902:150:b0:da0:3da9:ce08 with SMTP id
+ p16-20020a056902015000b00da03da9ce08mr109580ybh.10.1702548151743; Thu, 14 Dec
+ 2023 02:02:31 -0800 (PST)
+Date: Thu, 14 Dec 2023 10:01:54 +0000
 In-Reply-To: <20231214100158.2305400-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -49,8 +49,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20231214100158.2305400-1-tabba@google.com>
 X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231214100158.2305400-14-tabba@google.com>
-Subject: [PATCH v3 13/17] KVM: arm64: Define FGT nMASK bits relative to other fields
+Message-ID: <20231214100158.2305400-15-tabba@google.com>
+Subject: [PATCH v3 14/17] KVM: arm64: Macros for setting/clearing FGT bits
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, 
@@ -60,70 +60,95 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, broonie@kernel.org,
 	linux-arm-kernel@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 
-Now that RES0 and MASK have full coverage, no speed to manually
-encode nMASK. Calculate it relative to the other fields.
+There's a lot of boilerplate code for setting and clearing FGT
+bits when activating guest traps. Refactor it into macros. These
+macros will also be used in future patch series.
 
 No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_arm.h | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 60 +++++++++----------------
+ 1 file changed, 21 insertions(+), 39 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index bd20d27f1b33..b7a9fe36bb59 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -346,7 +346,7 @@
-  */
- #define __HFGRTR_EL2_RES0	HFGxTR_EL2_RES0
- #define __HFGRTR_EL2_MASK	GENMASK(49, 0)
--#define __HFGRTR_EL2_nMASK	(GENMASK(63, 52) | BIT(50))
-+#define __HFGRTR_EL2_nMASK	~(__HFGRTR_EL2_RES0 | __HFGRTR_EL2_MASK)
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 17ce40f5b006..e223fc0d5193 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -79,6 +79,23 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+ 		clr |= ~hfg & __ ## reg ## _nMASK; 			\
+ 	} while(0)
  
++#define update_fgt_traps_cs(reg, clr, set)				\
++	do {								\
++		struct kvm_cpu_context *hctxt =				\
++			&this_cpu_ptr(&kvm_host_data)->host_ctxt;	\
++		u64 val, c = 0, s = 0;					\
++									\
++		ctxt_sys_reg(hctxt, reg) = read_sysreg_s(SYS_ ## reg);	\
++		compute_clr_set(vcpu, reg, c, s);			\
++		val = __ ## reg ## _nMASK;				\
++		val |= (s | set);					\
++		val &= ~(c | clr);					\
++		write_sysreg_s(val, SYS_ ## reg);			\
++	} while(0)
++
++#define update_fgt_traps(reg)						\
++	update_fgt_traps_cs(reg, 0, 0)
++
  /*
-  * The HFGWTR bits are a subset of HFGRTR bits. To ensure we don't miss any
-@@ -357,17 +357,17 @@
- 				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
- #define __HFGWTR_EL2_RES0	(__HFGRTR_EL2_RES0 | __HFGRTR_ONLY_MASK)
- #define __HFGWTR_EL2_MASK	(__HFGRTR_EL2_MASK & ~__HFGRTR_ONLY_MASK)
--#define __HFGWTR_EL2_nMASK	(__HFGRTR_EL2_nMASK & ~__HFGRTR_ONLY_MASK)
-+#define __HFGWTR_EL2_nMASK	~(__HFGWTR_EL2_RES0 | __HFGWTR_EL2_MASK)
+  * Validate the fine grain trap masks.
+  * Check that the masks do not overlap and that all bits are accounted for.
+@@ -146,45 +163,10 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+ 	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
+ 		return;
  
- #define __HFGITR_EL2_RES0	HFGITR_EL2_RES0
- #define __HFGITR_EL2_MASK	(BIT(62) | BIT(60) | GENMASK(54, 0))
--#define __HFGITR_EL2_nMASK	GENMASK(59, 55)
-+#define __HFGITR_EL2_nMASK	~(__HFGITR_EL2_RES0 | __HFGITR_EL2_MASK)
+-	ctxt_sys_reg(hctxt, HFGITR_EL2) = read_sysreg_s(SYS_HFGITR_EL2);
+-
+-	r_set = r_clr = 0;
+-	compute_clr_set(vcpu, HFGITR_EL2, r_clr, r_set);
+-	r_val = __HFGITR_EL2_nMASK;
+-	r_val |= r_set;
+-	r_val &= ~r_clr;
+-
+-	write_sysreg_s(r_val, SYS_HFGITR_EL2);
+-
+-	ctxt_sys_reg(hctxt, HDFGRTR_EL2) = read_sysreg_s(SYS_HDFGRTR_EL2);
+-	ctxt_sys_reg(hctxt, HDFGWTR_EL2) = read_sysreg_s(SYS_HDFGWTR_EL2);
+-
+-	r_clr = r_set = w_clr = w_set = 0;
+-
+-	compute_clr_set(vcpu, HDFGRTR_EL2, r_clr, r_set);
+-	compute_clr_set(vcpu, HDFGWTR_EL2, w_clr, w_set);
+-
+-	r_val = __HDFGRTR_EL2_nMASK;
+-	r_val |= r_set;
+-	r_val &= ~r_clr;
+-
+-	w_val = __HDFGWTR_EL2_nMASK;
+-	w_val |= w_set;
+-	w_val &= ~w_clr;
+-
+-	write_sysreg_s(r_val, SYS_HDFGRTR_EL2);
+-	write_sysreg_s(w_val, SYS_HDFGWTR_EL2);
+-
+-	ctxt_sys_reg(hctxt, HAFGRTR_EL2) = read_sysreg_s(SYS_HAFGRTR_EL2);
+-
+-	r_clr = r_set = 0;
+-	compute_clr_set(vcpu, HAFGRTR_EL2, r_clr, r_set);
+-
+-	r_val = __HAFGRTR_EL2_nMASK;
+-	r_val |= r_set;
+-	r_val &= ~r_clr;
+-
+-	write_sysreg_s(r_val, SYS_HAFGRTR_EL2);
++	update_fgt_traps(HFGITR_EL2);
++	update_fgt_traps(HDFGRTR_EL2);
++	update_fgt_traps(HDFGWTR_EL2);
++	update_fgt_traps(HAFGRTR_EL2);
+ }
  
- #define __HDFGRTR_EL2_RES0	HDFGRTR_EL2_RES0
- #define __HDFGRTR_EL2_MASK	(BIT(63) | GENMASK(58, 50) | GENMASK(48, 43) | \
- 				 GENMASK(41, 40) | GENMASK(37, 22) | \
- 				 GENMASK(19, 9) | GENMASK(7, 0))
--#define __HDFGRTR_EL2_nMASK	GENMASK(62, 59)
-+#define __HDFGRTR_EL2_nMASK	~(__HDFGRTR_EL2_RES0 | __HDFGRTR_EL2_MASK)
- 
- #define __HDFGWTR_EL2_RES0	HDFGWTR_EL2_RES0
- #define __HDFGWTR_EL2_MASK	(GENMASK(57, 52) | GENMASK(50, 48) | \
-@@ -375,16 +375,16 @@
- 				 GENMASK(37, 35) | GENMASK(33, 31) | \
- 				 GENMASK(29, 23) | GENMASK(21, 10) | \
- 				 GENMASK(8, 7) | GENMASK(5, 0))
--#define __HDFGWTR_EL2_nMASK	GENMASK(62, 60)
-+#define __HDFGWTR_EL2_nMASK	~(__HDFGWTR_EL2_RES0 | __HDFGWTR_EL2_MASK)
- 
- #define __HAFGRTR_EL2_RES0	HAFGRTR_EL2_RES0
- #define __HAFGRTR_EL2_MASK	(GENMASK(49, 17) | GENMASK(4, 0))
--#define __HAFGRTR_EL2_nMASK	0UL
-+#define __HAFGRTR_EL2_nMASK	~(__HAFGRTR_EL2_RES0 | __HAFGRTR_EL2_MASK)
- 
- /* Similar definitions for HCRX_EL2 */
- #define __HCRX_EL2_RES0         HCRX_EL2_RES0
- #define __HCRX_EL2_MASK		(BIT(6))
--#define __HCRX_EL2_nMASK	(GENMASK(24, 14) | GENMASK(11, 7) | GENMASK(5, 0))
-+#define __HCRX_EL2_nMASK	~(__HCRX_EL2_RES0 | __HCRX_EL2_MASK)
- 
- /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
- #define HPFAR_MASK	(~UL(0xf))
+ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
 -- 
 2.43.0.472.g3155946c3a-goog
 
