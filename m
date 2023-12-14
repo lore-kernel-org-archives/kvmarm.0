@@ -1,23 +1,23 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB13D610B
-	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 10:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE07F3C47E
+	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 10:49:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sAZibPng"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90F29C433C8;
-	Thu, 14 Dec 2023 10:46:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V0EK1eld"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92EC8C433C8;
+	Thu, 14 Dec 2023 10:49:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702550786;
-	bh=fvcIaz/o6l7V5+3cQCm6opb1Hs/eXB/QMXOH6MB9u9I=;
+	s=k20201202; t=1702550972;
+	bh=py4xQEfE2DeQPN5lAk3G1wfEvxip9OKJ62dYERpBsnI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sAZibPng/8VbgAjjrJNfyCdzveAhzskYgNyX72WVWbKG6anN9MyauNO8Ff7/9gCgf
-	 mgLtjUdN+4/yOvMF8YnxUNEEpAFjUFzU/0FHmC5XYySggjwKNDwSIrAeP9bt3VUqJC
-	 d0FSH3kaqOg8neglLyYaQ42y0i7X9S0Yxdv6BQhxN8RfeJrg2JLIPvOqEz9AWk0tyU
-	 BySP89XH1Q4WuF6VhY78v9D/Hhg2vt4r8Fcxxpx5kUg/5Op6PA8oVSo76XN8lMWpMM
-	 h3Zxq2cPbiw4+DueE+98hmow0JVzqpyCeABUKjFUdkqFlvHX5P+31vdzRPij55kfq2
-	 qMNI8ewAo4vvg==
-Date: Thu, 14 Dec 2023 10:46:20 +0000
+	b=V0EK1eldHuJhG7UanASa2j6NN1aTkmEXpixQMlsMxRURIqctMPn3SL6C6NjDyi/ri
+	 NqsjIlyW9Ah8ZhHrzP2NqjtDlsRJE1fQP8S/tHPPJyC4ve3O1WCbW7Ktuw+qfENazO
+	 MH5dKD1oxgLFWapOlWl0kCtLOWqGRFKzVV5eGEa6e82KzDHwxLxv6sgcZqKiIKtg+W
+	 ZE+9PzHjFQ5yb+SzQVxyD53xHseyUZAqRvrMu+jFq0mXozqCWn39dzd7FR7Y7Bkdvd
+	 S8mhq29qYRWH9SSgPaigVmjxC3nqPPR3kNwsFtote+tgEO94iXEpyNiEp81vfRsA85
+	 FfE8+cQR4m84g==
+Date: Thu, 14 Dec 2023 10:49:26 +0000
 From: Mark Brown <broonie@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev,
@@ -25,11 +25,12 @@ Cc: kvmarm@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev,
 	catalin.marinas@arm.com, will@kernel.org, eric.auger@redhat.com,
 	jingzhangos@google.com, joey.gouly@arm.com,
 	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 02/17] arm64/sysreg: Add missing ExtTrcBuff field
- definition to ID_AA64DFR0_EL1
-Message-ID: <bc735ea0-80ae-4c50-8cdb-98db1abd61d3@sirena.org.uk>
+Subject: Re: [PATCH v3 01/17] arm64/sysreg: Add missing Pauth_LR field
+ definitions to ID_AA64ISAR1_EL1
+Message-ID: <6e14b02c-93a7-482a-9377-3afaa57c2dd0@sirena.org.uk>
 References: <20231214100158.2305400-1-tabba@google.com>
- <20231214100158.2305400-3-tabba@google.com>
+ <20231214100158.2305400-2-tabba@google.com>
+ <719d323f-787d-40c3-8fbf-6496411ca6fd@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,42 +38,38 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="WQ1HdTszyCohK+oJ"
+	protocol="application/pgp-signature"; boundary="yph08nADB4JXeoLn"
 Content-Disposition: inline
-In-Reply-To: <20231214100158.2305400-3-tabba@google.com>
-X-Cookie: Preserve the old, but know the new.
+In-Reply-To: <719d323f-787d-40c3-8fbf-6496411ca6fd@sirena.org.uk>
+X-Cookie: He who laughs last didn't get the joke.
 
 
---WQ1HdTszyCohK+oJ
+--yph08nADB4JXeoLn
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 14, 2023 at 10:01:42AM +0000, Fuad Tabba wrote:
-> Add the ExtTrcBuff field definitions to ID_AA64DFR0_EL1 from
-> DDI0601 2023-09.
->=20
-> This field isn't used yet. Adding it for completeness and because
-> it will be used in future patches.
+On Thu, Dec 14, 2023 at 10:42:12AM +0000, Mark Brown wrote:
 
-There's also updates for PMSVer, PMUVer and DebugVer, and the addition
-of SEBEP and PSSS.  The changes here are fine though
+> This is fine in so far as it goes, though it does make life slightly
+> easier to do the whole register at once.  There's also a new 0b0010
+> value in SPECRES here, though not worth making it a blocker:
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+Sorry, was looking at a draft version there - this is fine as per the
+current docs (as is patch 2).
 
---WQ1HdTszyCohK+oJ
+--yph08nADB4JXeoLn
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmV63PsACgkQJNaLcl1U
-h9BFhQf+JihZwqpfvQHZbgR+QpWI152YieQlesG5ucqJiu3nvRZD2zMkdafHE8l1
-7JQHRRwlmc7PgRc6OWTwT+QQ5Xd7Nu+/hs2ZEueYrjqCAWnUB8ExHVOTePQ2Zkb4
-CuX/Nuuy9rpVQ5wz0OXTTGi00OSFpiSgnouNXtkt//WhgIZR6Box7IslqOYnCfpF
-9pU2x+5RMd6sQru0D0fFshTujYBf1w8aFxiYbtcnNWQKYRGwxJJCCtdswIzJp2Gy
-8A6aiamzJHzSgwM4A7HHxaiMiEGWWNvbyi4g6LADCeNnYQXVfpRRqsuaFWUlijOo
-4VPbuSAGn7jIvA6mkJt08yhMUfgWlA==
-=ApHS
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmV63bUACgkQJNaLcl1U
+h9DnwQf/UTu2xT1tT6jmUo0bHEwk4pyW0qy/uzk+o6n4BlY6C+xObAhS082wumdE
+c8bfhhRVQKwqyLJzwiIUcVCa7eTOc4B8tEjFtMkg5igabmAjFNzT3n97ATWvHhDO
+u6W+VM7C6wECmuySnlh1sIk4GLryyPoydaChkzJKcE/y5DhW8ckYNfIEfVCOwvGz
+ttIM6PZXO22WkLGGAGxDhohvmkVc5Mn64BQgaZU9AvNQwzPFDPi0gLcqTPX79ELU
+wJ7ihPR6ofCPuVlNxtabWa3iVMQa0OYYpqwal9DEydAaNWzgwmQjeZVx8hNs1JCM
+lwvd95Ly44iUrK4B8ewx96+QByohdA==
+=V22t
 -----END PGP SIGNATURE-----
 
---WQ1HdTszyCohK+oJ--
+--yph08nADB4JXeoLn--
