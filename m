@@ -1,45 +1,45 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F53B2E64B
-	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 10:02:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC5E364DE
+	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 10:02:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IXLqMGHK"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbce98f7d44so286416276.2
-        for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 02:02:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3FQc+245"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5e2eccf79f8so17297577b3.1
+        for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 02:02:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702548141; x=1703152941; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1702548143; x=1703152943; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LWwzLbvByHCmWMHsPOp6gqtuDic+laOykV5wdqH7WEA=;
-        b=IXLqMGHKv1szU43DRLW5/BgRaKB/7hY/jbARtACsgeXJMMs4WyTcKrizmT6Cdm8E8i
-         lZWewATOsM/mzn781/zpEgMIn/Z2AxhUURn4zK6RbhWghoRZnLzixgd4ZSUo4jjzbr8c
-         XPMy7EJPoHEiR/jJjZ6/oQzyQG7GCfTsuVpQ52OKQHnqDzSsSAyXm6xvp0gppKZ7JS5B
-         NTY8i3ZCKTdAuqGvzW8/hdtQBk/K96Bw8zMrfaRl72xPIrW5HvO6qa0vhJyxfkwkh8xZ
-         NifnoPPI2/U0iT9VH8dtQ/QMMw3Bl8p2ur4fWGRgzkISN7PrS1ziqfHZoBXO43Nx7HfO
-         aYnA==
+        bh=i5gQXx09qcREZzryPULHtbRcGtK2VgeJB/Kj9vzazEw=;
+        b=3FQc+245I8ISlivUGw6cqPqzfvuJS7jJu4P+eM0089byQnTFSGmAAVTnTcqf3g7W4l
+         7HPPl1YfcBfsJoH5Wa+YmdzmqWHeQ/C+p4tBqqPNGdUN/ouNzuG9Y7fsa9DQwX4TtYN4
+         WEbgku0Qir+ZDft8kJLU+wrKHIXvIWEkYIY3f1amORS5AwZk/dCeJdVxyGEhjrkvamBv
+         cNnUykseC/idmhJ9D+K7z/rewq0CjORtNr4r/3aZgMwYp7XJLPho1QsK9gKR4IrF+e+O
+         2es0CyFnEUsSpm8ibMZjp5FBhqVnUFaDXUuyKvN+Y382lCzVtUQOYblTbLLrm2owmwZ7
+         Ec1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702548141; x=1703152941;
+        d=1e100.net; s=20230601; t=1702548143; x=1703152943;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LWwzLbvByHCmWMHsPOp6gqtuDic+laOykV5wdqH7WEA=;
-        b=KgvziW69je+CPHNkIkROdbKQctzeemWYpwLxmSHMdDZkyuPeqwTsjqOVbfcIEUl7BV
-         PwdB4qJFBG1QnLs59bu3TcOT6DXlTuAyw2heQ28fg6VULw7io91d18JZ0LtVFXwcPS5O
-         IeMqNDvc24H6lS2P00goPIiIxDrzVr4kBE24tCjslT/J1OzNXS0gxeliaej2vvjnY/e9
-         eSQdeyEac+jl2kIg8cD9fyXmX7C+CJ4lOvIzEekUXPq0TGpgaHsIwkPCVQh/MSB/HO3W
-         vBDj9Yq7vPldmfOoDXkBmAE3rCawbqz+XyYEsYPQ5v823QluwvSF5z58RmPj4H8/rRU0
-         EpCA==
-X-Gm-Message-State: AOJu0Yzhb5IxAkVtsqDkJr+faxcC6eG4dISOEFZWY84KA6N2Q4zkSwhw
-	MgAUkD8kLpsXkyd9uUtIPCHaxMyUln4loQtnCgiWFA4FWJpnArehzNBqKmKe/oecYLvYpKvHtGd
-	qz4O2vS/DMjTYCDLthui9lC6PezHrWIycmLYOAGc2/YsuJ2sAND9/B/Hjz7Q=
-X-Google-Smtp-Source: AGHT+IEQz3VBSiDveYMYZZJRvCqTfLzVPzfPWPwNQqScEnd95XhL1OToVJz/PKu0HJcWp0GJCwuKytlQyA==
+        bh=i5gQXx09qcREZzryPULHtbRcGtK2VgeJB/Kj9vzazEw=;
+        b=lmRG+8I/cVe+PL8SKRaRyqKEDGUXNVsPe7tz51EX4cf4IHq9gHL1sgIVRgAXoaH37G
+         ZqpG5j8DmjRR7T7oEerTShXoZiOFL8I0UgcAC13xaLRWfyZlW3QJqZVUY0qpDu6OeL4Z
+         FHZcem+ggOQ+TAMLhFSONB12k1T4AGc7BjWYbakwkpost81bH5gT4t6C0g++a/Mwuvt1
+         HED3YLS/sPxE8guSn2b1d+KjaLGAQS24Y6n7ZwiepF8eBk6UNwn0TDBn6XMicrIxfd4+
+         Ivv9bUkPyTJg+MaJm4QPoUXMU/3NTEIWrYxgC5ae20oHYkBFHUZwnXKhiSH+3cuveyJh
+         UHWg==
+X-Gm-Message-State: AOJu0Ywmz9Kza/4Eo+bRgByCSWylbNimP51QARBM5s9HGJBMKw95G6xk
+	17YODWw4MHO4qYNSwXtQoKVDIHawDx604MwtorFXsDxTudTxYUZqsZ5liVHEWJbkcfLQ2amWT9l
+	j2PpZzS1dMqpCZbm+4C+ZFx66rqFQ6QofVGnGyAj9XwFfzpPFNguRnCg7Zgw=
+X-Google-Smtp-Source: AGHT+IGsVKQuOdWWEcKxeUozb/6rs0MXEj2XWfE6tghHpcrfAfgFpTD/eWCv6Y+3GCtQprtF3oD5mK159g==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:4e5:b0:dbc:cf1a:312c with SMTP id
- w5-20020a05690204e500b00dbccf1a312cmr36793ybs.4.1702548140735; Thu, 14 Dec
- 2023 02:02:20 -0800 (PST)
-Date: Thu, 14 Dec 2023 10:01:49 +0000
+ (user=tabba job=sendgmr) by 2002:a05:690c:3747:b0:5d5:5183:ebd7 with SMTP id
+ fw7-20020a05690c374700b005d55183ebd7mr104796ywb.7.1702548142956; Thu, 14 Dec
+ 2023 02:02:22 -0800 (PST)
+Date: Thu, 14 Dec 2023 10:01:50 +0000
 In-Reply-To: <20231214100158.2305400-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -49,8 +49,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20231214100158.2305400-1-tabba@google.com>
 X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231214100158.2305400-10-tabba@google.com>
-Subject: [PATCH v3 09/17] KVM: arm64: Handle HAFGRTR_EL2 trapping in nested virt
+Message-ID: <20231214100158.2305400-11-tabba@google.com>
+Subject: [PATCH v3 10/17] KVM: arm64: Update and fix FGT register masks
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, 
@@ -60,151 +60,93 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, broonie@kernel.org,
 	linux-arm-kernel@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 
-Add the encodings to fine grain trapping fields for HAFGRTR_EL2
-and add the associated handling code in nested virt. Based on
-DDI0601 2023-09. Add the missing field definitions as well,
-both to generate the correct RES0 mask and to be able to toggle
-their FGT bits.
+New trap bits have been defined since the latest update to this
+patch.  Moreover, the existing definitions of some of the mask
+and the RES0 bits overlap, which could be wrong, confusing, or
+both.
 
-Also add the code for handling FGT trapping, reading of the
-register, to nested virt.
+Update the bits based on DDI0601 2023-09, and ensure that the
+existing bits are consistent.
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+Subsequent patches will use the generated RES0 fields instead of
+specifying them manually. This patch keeps the manual encoding of
+the bits to make it easier to review the series.
+
+Fixes: 0fd76865006d ("KVM: arm64: Add nPIR{E0}_EL1 to HFG traps")
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h       |  1 +
- arch/arm64/kvm/emulate-nested.c         | 48 +++++++++++++++++++++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 12 +++++++
- arch/arm64/kvm/sys_regs.c               |  1 +
- 4 files changed, 62 insertions(+)
+ arch/arm64/include/asm/kvm_arm.h | 39 ++++++++++++++++++++------------
+ 1 file changed, 24 insertions(+), 15 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 824f29f04916..ba14648e2de2 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -443,6 +443,7 @@ enum vcpu_sysreg {
- 	HFGITR_EL2,
- 	HDFGRTR_EL2,
- 	HDFGWTR_EL2,
-+	HAFGRTR_EL2,
- 	CNTHP_CTL_EL2,
- 	CNTHP_CVAL_EL2,
- 	CNTHV_CTL_EL2,
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 89901550db34..431fd429932d 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -1012,6 +1012,7 @@ enum fgt_group_id {
- 	HDFGRTR_GROUP,
- 	HDFGWTR_GROUP,
- 	HFGITR_GROUP,
-+	HAFGRTR_GROUP,
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 7de0a7062625..b0dc3249d5cd 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -344,30 +344,39 @@
+  * Once we get to a point where the two describe the same thing, we'll
+  * merge the definitions. One day.
+  */
+-#define __HFGRTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51))
++#define __HFGRTR_EL2_RES0	BIT(51)
+ #define __HFGRTR_EL2_MASK	GENMASK(49, 0)
+-#define __HFGRTR_EL2_nMASK	(GENMASK(58, 57) | GENMASK(55, 54) | BIT(50))
++#define __HFGRTR_EL2_nMASK	(GENMASK(63, 52) | BIT(50))
  
- 	/* Must be last */
- 	__NR_FGT_GROUP_IDS__
-@@ -1689,6 +1690,49 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
- 	SR_FGT(SYS_PMCR_EL0,		HDFGWTR, PMCR_EL0, 1),
- 	SR_FGT(SYS_PMSWINC_EL0,		HDFGWTR, PMSWINC_EL0, 1),
- 	SR_FGT(SYS_OSLAR_EL1,		HDFGWTR, OSLAR_EL1, 1),
-+	/*
-+	 * HAFGRTR_EL2
-+	 */
-+	SR_FGT(SYS_AMEVTYPER1_EL0(15),	HAFGRTR, AMEVTYPER115_EL0, 1),
-+	SR_FGT(SYS_AMEVTYPER1_EL0(14),	HAFGRTR, AMEVTYPER114_EL0, 1),
-+	SR_FGT(SYS_AMEVTYPER1_EL0(13),	HAFGRTR, AMEVTYPER113_EL0, 1),
-+	SR_FGT(SYS_AMEVTYPER1_EL0(12),	HAFGRTR, AMEVTYPER112_EL0, 1),
-+	SR_FGT(SYS_AMEVTYPER1_EL0(11),	HAFGRTR, AMEVTYPER111_EL0, 1),
-+	SR_FGT(SYS_AMEVTYPER1_EL0(10),	HAFGRTR, AMEVTYPER110_EL0, 1),
-+	SR_FGT(SYS_AMEVTYPER1_EL0(9),	HAFGRTR, AMEVTYPER19_EL0, 1),
-+	SR_FGT(SYS_AMEVTYPER1_EL0(8),	HAFGRTR, AMEVTYPER18_EL0, 1),
-+	SR_FGT(SYS_AMEVTYPER1_EL0(7),	HAFGRTR, AMEVTYPER17_EL0, 1),
-+	SR_FGT(SYS_AMEVTYPER1_EL0(6),	HAFGRTR, AMEVTYPER16_EL0, 1),
-+	SR_FGT(SYS_AMEVTYPER1_EL0(5),	HAFGRTR, AMEVTYPER15_EL0, 1),
-+	SR_FGT(SYS_AMEVTYPER1_EL0(4),	HAFGRTR, AMEVTYPER14_EL0, 1),
-+	SR_FGT(SYS_AMEVTYPER1_EL0(3),	HAFGRTR, AMEVTYPER13_EL0, 1),
-+	SR_FGT(SYS_AMEVTYPER1_EL0(2),	HAFGRTR, AMEVTYPER12_EL0, 1),
-+	SR_FGT(SYS_AMEVTYPER1_EL0(1),	HAFGRTR, AMEVTYPER11_EL0, 1),
-+	SR_FGT(SYS_AMEVTYPER1_EL0(0),	HAFGRTR, AMEVTYPER10_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR1_EL0(15),	HAFGRTR, AMEVCNTR115_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR1_EL0(14),	HAFGRTR, AMEVCNTR114_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR1_EL0(13),	HAFGRTR, AMEVCNTR113_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR1_EL0(12),	HAFGRTR, AMEVCNTR112_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR1_EL0(11),	HAFGRTR, AMEVCNTR111_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR1_EL0(10),	HAFGRTR, AMEVCNTR110_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR1_EL0(9),	HAFGRTR, AMEVCNTR19_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR1_EL0(8),	HAFGRTR, AMEVCNTR18_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR1_EL0(7),	HAFGRTR, AMEVCNTR17_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR1_EL0(6),	HAFGRTR, AMEVCNTR16_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR1_EL0(5),	HAFGRTR, AMEVCNTR15_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR1_EL0(4),	HAFGRTR, AMEVCNTR14_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR1_EL0(3),	HAFGRTR, AMEVCNTR13_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR1_EL0(2),	HAFGRTR, AMEVCNTR12_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR1_EL0(1),	HAFGRTR, AMEVCNTR11_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR1_EL0(0),	HAFGRTR, AMEVCNTR10_EL0, 1),
-+	SR_FGT(SYS_AMCNTENCLR1_EL0,	HAFGRTR, AMCNTEN1, 1),
-+	SR_FGT(SYS_AMCNTENSET1_EL0,	HAFGRTR, AMCNTEN1, 1),
-+	SR_FGT(SYS_AMCNTENCLR0_EL0,	HAFGRTR, AMCNTEN0, 1),
-+	SR_FGT(SYS_AMCNTENSET0_EL0,	HAFGRTR, AMCNTEN0, 1),
-+	SR_FGT(SYS_AMEVCNTR0_EL0(3),	HAFGRTR, AMEVCNTR03_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR0_EL0(2),	HAFGRTR, AMEVCNTR02_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR0_EL0(1),	HAFGRTR, AMEVCNTR01_EL0, 1),
-+	SR_FGT(SYS_AMEVCNTR0_EL0(0),	HAFGRTR, AMEVCNTR00_EL0, 1),
- };
+-#define __HFGWTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51) |	\
+-				 BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
+-				 GENMASK(26, 25) | BIT(21) | BIT(18) |	\
++#define __HFGWTR_EL2_RES0	(BIT(51) | BIT(46) | BIT(42) | BIT(40) | \
++				 BIT(28) | GENMASK(26, 25) | BIT(21) | BIT(18) | \
+ 				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
+-#define __HFGWTR_EL2_MASK	GENMASK(49, 0)
+-#define __HFGWTR_EL2_nMASK	(GENMASK(58, 57) | GENMASK(55, 54) | BIT(50))
++#define __HFGWTR_EL2_MASK	(GENMASK(49, 47) | GENMASK(45, 43) | \
++				 BIT(41) | GENMASK(39, 29) | BIT(27) | \
++				 GENMASK(24, 22) | GENMASK(20, 19) | \
++				 GENMASK(17, 16) | GENMASK(13, 11) | \
++				 GENMASK(8, 3) | GENMASK(1, 0))
++#define __HFGWTR_EL2_nMASK	(GENMASK(63, 52) | BIT(50))
  
- static union trap_config get_trap_config(u32 sysreg)
-@@ -1909,6 +1953,10 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
- 			val = sanitised_sys_reg(vcpu, HDFGWTR_EL2);
- 		break;
+-#define __HFGITR_EL2_RES0	GENMASK(63, 57)
+-#define __HFGITR_EL2_MASK	GENMASK(54, 0)
+-#define __HFGITR_EL2_nMASK	GENMASK(56, 55)
++#define __HFGITR_EL2_RES0	(BIT(63) | BIT(61))
++#define __HFGITR_EL2_MASK	(BIT(62) | BIT(60) | GENMASK(54, 0))
++#define __HFGITR_EL2_nMASK	GENMASK(59, 55)
  
-+	case HAFGRTR_GROUP:
-+		val = sanitised_sys_reg(vcpu, HAFGRTR_EL2);
-+		break;
-+
- 	case HFGITR_GROUP:
- 		val = sanitised_sys_reg(vcpu, HFGITR_EL2);
- 		switch (tc.fgf) {
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 7b4909dfd1f5..22f3b916f60c 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -156,6 +156,17 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+ #define __HDFGRTR_EL2_RES0	(BIT(49) | BIT(42) | GENMASK(39, 38) |	\
+ 				 GENMASK(21, 20) | BIT(8))
+-#define __HDFGRTR_EL2_MASK	~__HDFGRTR_EL2_nMASK
++#define __HDFGRTR_EL2_MASK	(BIT(63) | GENMASK(58, 50) | GENMASK(48, 43) | \
++				 GENMASK(41, 40) | GENMASK(37, 22) | \
++				 GENMASK(19, 9) | GENMASK(7, 0))
+ #define __HDFGRTR_EL2_nMASK	GENMASK(62, 59)
  
- 	write_sysreg_s(r_val, SYS_HDFGRTR_EL2);
- 	write_sysreg_s(w_val, SYS_HDFGWTR_EL2);
-+
-+	ctxt_sys_reg(hctxt, HAFGRTR_EL2) = read_sysreg_s(SYS_HAFGRTR_EL2);
-+
-+	r_clr = r_set = 0;
-+	compute_clr_set(vcpu, HAFGRTR_EL2, r_clr, r_set);
-+
-+	r_val = __HAFGRTR_EL2_nMASK;
-+	r_val |= r_set;
-+	r_val &= ~r_clr;
-+
-+	write_sysreg_s(r_val, SYS_HAFGRTR_EL2);
- }
+ #define __HDFGWTR_EL2_RES0	(BIT(63) | GENMASK(59, 58) | BIT(51) | BIT(47) | \
+ 				 BIT(43) | GENMASK(40, 38) | BIT(34) | BIT(30) | \
+ 				 BIT(22) | BIT(9) | BIT(6))
+-#define __HDFGWTR_EL2_MASK	~__HDFGWTR_EL2_nMASK
++#define __HDFGWTR_EL2_MASK	(GENMASK(57, 52) | GENMASK(50, 48) | \
++				 GENMASK(46, 44) | GENMASK(42, 41) | \
++				 GENMASK(37, 35) | GENMASK(33, 31) | \
++				 GENMASK(29, 23) | GENMASK(21, 10) | \
++				 GENMASK(8, 7) | GENMASK(5, 0))
+ #define __HDFGWTR_EL2_nMASK	GENMASK(62, 60)
  
- static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
-@@ -174,6 +185,7 @@ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
- 	write_sysreg_s(ctxt_sys_reg(hctxt, HFGITR_EL2), SYS_HFGITR_EL2);
- 	write_sysreg_s(ctxt_sys_reg(hctxt, HDFGRTR_EL2), SYS_HDFGRTR_EL2);
- 	write_sysreg_s(ctxt_sys_reg(hctxt, HDFGWTR_EL2), SYS_HDFGWTR_EL2);
-+	write_sysreg_s(ctxt_sys_reg(hctxt, HAFGRTR_EL2), SYS_HAFGRTR_EL2);
- }
+ #define __HAFGRTR_EL2_RES0	(GENMASK(63, 50) | GENMASK(16, 5))
+@@ -375,9 +384,9 @@
+ #define __HAFGRTR_EL2_nMASK	0UL
  
- static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 4735e1b37fb3..8bb297a2df38 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2532,6 +2532,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_DACR32_EL2), trap_undef, reset_unknown, DACR32_EL2 },
- 	EL2_REG(HDFGRTR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(HDFGWTR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(HAFGRTR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(SPSR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(ELR_EL2, access_rw, reset_val, 0),
- 	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
+ /* Similar definitions for HCRX_EL2 */
+-#define __HCRX_EL2_RES0		(GENMASK(63, 16) | GENMASK(13, 12))
+-#define __HCRX_EL2_MASK		(0)
+-#define __HCRX_EL2_nMASK	(GENMASK(15, 14) | GENMASK(4, 0))
++#define __HCRX_EL2_RES0         (GENMASK(63, 25) | GENMASK(13, 12))
++#define __HCRX_EL2_MASK		(BIT(6))
++#define __HCRX_EL2_nMASK	(GENMASK(24, 14) | GENMASK(11, 7) | GENMASK(5, 0))
+ 
+ /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+ #define HPFAR_MASK	(~UL(0xf))
 -- 
 2.43.0.472.g3155946c3a-goog
 
