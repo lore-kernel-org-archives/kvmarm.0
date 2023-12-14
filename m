@@ -1,45 +1,45 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F332E64B
-	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 10:02:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D162E64B
+	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 10:02:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LCQZ7a2m"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-333501e22caso6168852f8f.2
-        for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 02:02:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TxWt3Hmi"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-db402e6f61dso8476178276.3
+        for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 02:02:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702548125; x=1703152925; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1702548128; x=1703152928; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TguY2CRPZsDbC7EwriWWWSxwKPNn+kyygMIufDgE984=;
-        b=LCQZ7a2mh9fg2oRM1vH3N7xLfYlPCNx2Gpmvi9jd+dDtpRpvmMgdBjWD8Aiy0A2LIY
-         P3OlEvgyOzu0lOY4eYLjtMz5JakmpIq55d57J3J7aOoszPswkkqH7SBmKgYb/4fRbrbB
-         fCx8oc6fOLN/dSpDAImdblTAc/5HphoWxLRt7xQe0InK2RFlZbTsmQWUwmh6FQPh56nx
-         EpVxkNMF3I5i5Kor01oZZiLl4qDGymB+XuqrmRsiIYtk7NN4nIrPr4frd2SP49PXbw4L
-         knhWLwo4y0XMO52le5vMHB1RwPYlu3MBE7kEJHKV87oX9Tc2wOy/90H+B4V+dIgyFoTs
-         RhGQ==
+        bh=cL1RM+olJsmQC3rlwUz51qwzObdNnMoFgRZbOyilRC8=;
+        b=TxWt3Hmi5jkoZf4AdWNKLAbz0tmtb32MQx78y8i+mDSWvNeJL/6fDBfsuCjLyHS2n4
+         p7XJSVSeFs9iTqDLwrm9OnFL7nqDr0gXbpjuaQSdrncE1m3TIK+VjcivIG9osGchb3F/
+         EDEjov/BKk79Ib/2u3E3lK862HqcEDPlnUwmPPlXHZbRy4ZL4RBuGj59vf9OhW5Qr0He
+         w9Yyw+/kzjHD5i6JK2904J6p0xoOHlDEhVOJwvaFHfcB2lexaAmn7nsnBGoml07uQd3d
+         gfzvTLr8IdXrzatdwz9ZGW3sg3ONDFX4qe1oNHh+98f025jb7RX3BT2jYoXqvNvie3xF
+         rPHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702548125; x=1703152925;
+        d=1e100.net; s=20230601; t=1702548128; x=1703152928;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TguY2CRPZsDbC7EwriWWWSxwKPNn+kyygMIufDgE984=;
-        b=PRfiwhn2/TWXagDevaO0i1Srq0LAmc7QTzWvLjvWt6lMZ0SXX2kbsByUl5/CS9v7uo
-         42w81lKa1GJkmiINwG+7NtxGXLWY348gn+gp5cTdBQEhu9z9R/EyMVyhl1nX+fd6du0c
-         Q2oAvd7Dp0gI4K2aeZZhIrd76vfv6BOWNV2MxFDReDy5nZzMWdo1cwfeU+ir8mezfx9g
-         metOO86tgYAmWDe8urG4VqoUL/voNKaO0XzcBj6pZcUcsoHb7iolWxWIVN99W8DUPXXT
-         4gRPBjFGv518fCNon8p1jtmngRi+WOWewpiynBsk60xaENyJQeoVDwYF2kEB38JkFDMW
-         WZVg==
-X-Gm-Message-State: AOJu0YwpE7PUCb2foP2ZbXeNBmF/077xfekWWuRBYG5iykHW1PVfdjGz
-	XwJJo7c7bedZQWTcz85oCTUZxsc5LVCntgks+MqTFLrty7G22LOZWBp2Nti84SYqir2amGK5+TO
-	J+RkOzXS53BALJmOoVagXt5nPVXBzWbqoMa5fNy5ZsA23Oco/GbGM3EFPbXc=
-X-Google-Smtp-Source: AGHT+IEzmFHlBxyZF8O+LbvH0QlS0e2LiJp8Xgrv+Xa+5a0SbCpGGf2FmJL17DH3UiYhv0VTN7gqNhALtw==
+        bh=cL1RM+olJsmQC3rlwUz51qwzObdNnMoFgRZbOyilRC8=;
+        b=xF9yWaOgqhjozA7CJ9V3D8WrtRyOiVgcNYlVoTgpVM84K5b3hB6xe5L7/WhZMR29KH
+         Q8IzC4uGZYmofDIoRHq3MqEDRTTadQo3Dezd6rSqN4kJt1mxquLZ3Dc9DCZ8fDZaEbII
+         O+Yn0YMBJH+vX9ITRnAKd+PgOhugEq7dR4bKzegrLTH0iNlJY13cxmXNO7rohEXTdPbV
+         gmP9G9u+VDGdYf2mGbLv7sE6grQL8om8TdJj35ZUUbtH8EspOYgPA02VFJxC0j2Me6rc
+         Var80f9mNBKeRisdGW+EdwpI0MVJ5A8eZqYkIBzCA6Pf+FItBA7fKl/HXir/BvRu4NOl
+         Qlfg==
+X-Gm-Message-State: AOJu0Yx1HpanToHj2Cuxwu/aZFCbnUwLljIAiPO6IHe0fo8plcAPkFAO
+	/ZPBaeL/Jaf6mTJLIVr47KTM5G9m3uo2lHtvMglGYmH5VONHxelwayJOiHw127Jn+x6OhuVOZzr
+	JTF03joQHy2EMHjMNldYkCiATaid/Xpm6QYGna4+3tLTj9/PlSL//5fO/1XY=
+X-Google-Smtp-Source: AGHT+IFdf/kGRovY/XOsMBonsCGOYiqd3rLc8nEiGw7C7DJypFe2aftCAYaDZMQMTm3AeDZLmHSSwTzk5Q==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a5d:6daf:0:b0:333:543a:9f9b with SMTP id
- u15-20020a5d6daf000000b00333543a9f9bmr52179wrs.11.1702548124858; Thu, 14 Dec
- 2023 02:02:04 -0800 (PST)
-Date: Thu, 14 Dec 2023 10:01:42 +0000
+ (user=tabba job=sendgmr) by 2002:a05:6902:345:b0:dbc:1b7a:e185 with SMTP id
+ e5-20020a056902034500b00dbc1b7ae185mr80924ybs.8.1702548127111; Thu, 14 Dec
+ 2023 02:02:07 -0800 (PST)
+Date: Thu, 14 Dec 2023 10:01:43 +0000
 In-Reply-To: <20231214100158.2305400-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -49,9 +49,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20231214100158.2305400-1-tabba@google.com>
 X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231214100158.2305400-3-tabba@google.com>
-Subject: [PATCH v3 02/17] arm64/sysreg: Add missing ExtTrcBuff field
- definition to ID_AA64DFR0_EL1
+Message-ID: <20231214100158.2305400-4-tabba@google.com>
+Subject: [PATCH v3 03/17] arm64/sysreg: Add missing system register
+ definitions for FGT
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, 
@@ -61,33 +61,87 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, broonie@kernel.org,
 	linux-arm-kernel@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 
-Add the ExtTrcBuff field definitions to ID_AA64DFR0_EL1 from
+Add the definitions of missing system registers that are
+trappable by fine grain traps. The definitions are based on
 DDI0601 2023-09.
-
-This field isn't used yet. Adding it for completeness and because
-it will be used in future patches.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/tools/sysreg | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ arch/arm64/tools/sysreg | 43 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
 diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index d596be2599d1..a8e36640c027 100644
+index a8e36640c027..5ceaa1d3630e 100644
 --- a/arch/arm64/tools/sysreg
 +++ b/arch/arm64/tools/sysreg
-@@ -1189,7 +1189,10 @@ Enum	63:60	HPMN0
- 	0b0000	UNPREDICTABLE
- 	0b0001	DEF
- EndEnum
--Res0	59:56
-+UnsignedEnum	59:56	ExtTrcBuff
-+	0b0000	NI
-+	0b0001	IMP
-+EndEnum
- UnsignedEnum	55:52	BRBE
- 	0b0000	NI
- 	0b0001	IMP
+@@ -2086,10 +2086,18 @@ Sysreg	CONTEXTIDR_EL1	3	0	13	0	1
+ Fields	CONTEXTIDR_ELx
+ EndSysreg
+ 
++Sysreg	RCWSMASK_EL1	3	0	13	0	3
++Field	63:0	RCWSMASK
++EndSysreg
++
+ Sysreg	TPIDR_EL1	3	0	13	0	4
+ Field	63:0	ThreadID
+ EndSysreg
+ 
++Sysreg	RCWMASK_EL1	3	0	13	0	6
++Field	63:0	RCWMASK
++EndSysreg
++
+ Sysreg	SCXTNUM_EL1	3	0	13	0	7
+ Field	63:0	SoftwareContextNumber
+ EndSysreg
+@@ -2714,6 +2722,33 @@ Field	1	PIE
+ Field	0	PnCH
+ EndSysreg
+ 
++SysregFields MAIR2_ELx
++Field	63:56	Attr7
++Field	55:48	Attr6
++Field	47:40	Attr5
++Field	39:32	Attr4
++Field	31:24	Attr3
++Field	23:16	Attr2
++Field	15:8	Attr1
++Field	7:0	Attr0
++EndSysregFields
++
++Sysreg	MAIR2_EL1	3	0	10	2	1
++Fields	MAIR2_ELx
++EndSysreg
++
++Sysreg	MAIR2_EL2	3	4	10	1	1
++Fields	MAIR2_ELx
++EndSysreg
++
++Sysreg	AMAIR2_EL1	3	0	10	3	1
++Field	63:0	ImpDef
++EndSysreg
++
++Sysreg	AMAIR2_EL2	3	4	10	3	1
++Field	63:0	ImpDef
++EndSysreg
++
+ SysregFields PIRx_ELx
+ Field	63:60	Perm15
+ Field	59:56	Perm14
+@@ -2765,6 +2800,14 @@ Sysreg	POR_EL12	3	5	10	2	4
+ Fields	PIRx_ELx
+ EndSysreg
+ 
++Sysreg	S2POR_EL1	3	0	10	2	5
++Fields	PIRx_ELx
++EndSysreg
++
++Sysreg	S2PIR_EL2	3	4	10	2	5
++Fields	PIRx_ELx
++EndSysreg
++
+ Sysreg	LORSA_EL1	3	0	10	4	0
+ Res0	63:52
+ Field	51:16	SA
 -- 
 2.43.0.472.g3155946c3a-goog
 
