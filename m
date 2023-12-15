@@ -1,222 +1,198 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF7AA3F
-	for <kvmarm@lists.linux.dev>; Fri, 15 Dec 2023 02:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BC0wgFYA"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6ce72faf1e8so77510b3a.0
-        for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 18:50:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702608614; x=1703213414; darn=lists.linux.dev;
-        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=oDvaa/loPXs8QqeKn/dbAir7W2iAEYYDHF7svcomArc=;
-        b=BC0wgFYAaca0MBtO3v0Ub3bHxXNOsU9v20IAgl/LlSCPesVrpFbg5UyrcWCjJ+vS7J
-         dm+WORxBUndDheC1YtXizPFMsAqa1q9xCyvbO7WN2yUaEDjy7Z0KQ+qP88L3/8gWjdzg
-         gpAWQabou0AQsGTR89CtTbhr6/BL6793je5E0QOVxCCDe0t9WonOOuSOxIgX6zi+aBXG
-         /rEvpA+x1Dmqw+jF3RmyH7WSYmbLnV48lVfSsvbxEZMoTLf2bsvQLohDjCyMdCYymOwb
-         dTAyw0wOdH265mTr7gKVCchlljzqOlqSe8Ig0MdDeUmMeYZrtPDY5imzpZeb0H5nK8sL
-         qckg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702608614; x=1703213414;
-        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oDvaa/loPXs8QqeKn/dbAir7W2iAEYYDHF7svcomArc=;
-        b=NBcLlZ3sB91VePQbojzAIu12mK8dGbA2aKGx8I5ot0IvIAKeevmjBemX0KiChKsK0x
-         boJY6Jy4ZRLf932isvQ3HavhvAaXYs8dhSYSWuob88VD3rpg11RD92xX2wpM+r+HNyzf
-         4skggKgmbLIpLE0/2CPkVGny6Si5ESCJ1rjm8M1HoD9Ls6x0yjUaxkJ4S8u0P15c3rIK
-         Z+OnrEp3aEdt/xMZGDkg7OacdwBOZnzkQEGh8BSNfr5h+BS0y0VFNRVEoY/Txk5Tdtm4
-         KfOyeHwcn9YVT7cDT30eFb3Mx6BdnFfVZnST7zpfEe18uKj2XwTzOuaypXxVgzYQkmS8
-         AeJg==
-X-Gm-Message-State: AOJu0YzxqEk0qVRFoGi8MegDFst2p3MvH8jqBJ3vOs3MPM/JSA5jiac1
-	6MrC4L8AXVMbjVoiONRH4Xku+g==
-X-Google-Smtp-Source: AGHT+IE99vQkPCzS0fUw2+RGCuARu2aeWphX23kJyqBn5JyJXY6hondFJhuQ9dhnml5rfwoe6hL5lw==
-X-Received: by 2002:a05:6a00:cd0:b0:6cd:e046:f3f0 with SMTP id b16-20020a056a000cd000b006cde046f3f0mr7542035pfv.13.1702608614486;
-        Thu, 14 Dec 2023 18:50:14 -0800 (PST)
-Received: from localhost ([2804:14d:7e39:8470:c901:5e00:3dbe:d1bd])
-        by smtp.gmail.com with ESMTPSA id r25-20020aa78b99000000b006d2738a2510sm384321pfd.146.2023.12.14.18.50.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Dec 2023 18:50:14 -0800 (PST)
-References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
- <20231122-arm64-gcs-v7-34-201c483bd775@kernel.org>
-User-agent: mu4e 1.10.8; emacs 29.1
-From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
- <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Morton
- <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
- <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, Oleg
- Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, Kees
- Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, "Rick P.
- Edgecombe" <rick.p.edgecombe@intel.com>, Deepak Gupta
- <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, Szabolcs Nagy
- <Szabolcs.Nagy@arm.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
- <aou@eecs.berkeley.edu>, Florian Weimer <fweimer@redhat.com>, Christian
- Brauner <brauner@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v7 34/39] kselftest/arm64: Add a GCS test program built
- with the system libc
-In-reply-to: <20231122-arm64-gcs-v7-34-201c483bd775@kernel.org>
-Date: Thu, 14 Dec 2023 23:50:11 -0300
-Message-ID: <875y1089i4.fsf@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7C719469
+	for <kvmarm@lists.linux.dev>; Fri, 15 Dec 2023 12:09:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1rE6zO-0001Th-VU; Fri, 15 Dec 2023 13:08:22 +0100
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1rE6zK-00G18H-0I; Fri, 15 Dec 2023 13:08:18 +0100
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1rE6zJ-003Wy8-ML; Fri, 15 Dec 2023 13:08:17 +0100
+Date: Fri, 15 Dec 2023 13:08:17 +0100
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To: James Clark <james.clark@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org,
+	suzuki.poulose@arm.com, will@kernel.org, mark.rutland@arm.com,
+	anshuman.khandual@arm.com, namhyung@gmail.com,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
+	Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Russell King <linux@armlinux.org.uk>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Zaid Al-Bassam <zalbassam@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v7 05/11] arm64: perf: Include threshold control fields
+ in PMEVTYPER mask
+Message-ID: <20231215120817.h2f3akgv72zhrtqo@pengutronix.de>
+References: <20231211161331.1277825-1-james.clark@arm.com>
+ <20231211161331.1277825-6-james.clark@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ngsobzumwfjdiywd"
+Content-Disposition: inline
+In-Reply-To: <20231211161331.1277825-6-james.clark@arm.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: kvmarm@lists.linux.dev
 
 
-Mark Brown <broonie@kernel.org> writes:
+--ngsobzumwfjdiywd
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> +	/* Same thing via process_vm_readv() */
-> +	local_iov.iov_base = &rval;
-> +	local_iov.iov_len = sizeof(rval);
-> +	remote_iov.iov_base = (void *)gcspr;
-> +	remote_iov.iov_len = sizeof(rval);
-> +	ret = process_vm_writev(child, &local_iov, 1, &remote_iov, 1, 0);
-> +	if (ret == -1)
-> +		ksft_print_msg("process_vm_readv() failed: %s (%d)\n",
-> +			       strerror(errno), errno);
+Hello,
 
-The comment and the error message say "process_vm_readv()", but the
-function actually called is process_vm_writev(). Is this intended?
+On Mon, Dec 11, 2023 at 04:13:17PM +0000, James Clark wrote:
+> FEAT_PMUv3_TH (Armv8.8) adds two new fields to PMEVTYPER, so include
+> them in the mask. These aren't writable on 32 bit kernels as they are in
+> the high part of the register, so only include them for arm64.
+>=20
+> It would be difficult to do this statically in the asm header files for
+> each platform without resulting in circular includes or #ifdefs inline
+> in the code. For that reason the ARMV8_PMU_EVTYPE_MASK definition has
+> been removed and the mask is constructed programmatically.
+>=20
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> Signed-off-by: James Clark <james.clark@arm.com>
 
-Also, process_vm_writev() is failing when I run on my Arm FVP:
+This change is in today's next as commit
+3115ee021bfb04efde2e96507bfcc1330261a6a1. this breaks allmodconfig
+building on ARCH=3Darm:
 
-# #  RUN           global.ptrace_read_write ...
-# # Child: 1150
-# # Child GCSPR 0xffffa210ffd8, flags 1, locked 0
-# # process_vm_readv() failed: Bad address (14)
-# # libc-gcs.c:271:ptrace_read_write:Expected ret (-1) == sizeof(rval) (8)
-# # libc-gcs.c:272:ptrace_read_write:Expected val (281473401005692) == rval (281473402849248)
-# # libc-gcs.c:293:ptrace_read_write:Expected val (281473401005692) == ptrace(PTRACE_PEEKDATA, child, (void *)gcspr, NULL) (0)
-# # ptrace_read_write: Test failed at step #1
-# #          FAIL  global.ptrace_read_write
-# not ok 4 global.ptrace_read_write
+	In file included from include/linux/ratelimit_types.h:5,
+			 from include/linux/printk.h:9,
+			 from include/asm-generic/bug.h:22,
+			 from arch/arm/include/asm/bug.h:60,
+			 from include/linux/bug.h:5,
+			 from include/linux/mmdebug.h:5,
+			 from include/linux/percpu.h:5,
+			 from include/asm-generic/irq_regs.h:11,
+			 from ./arch/arm/include/generated/asm/irq_regs.h:1,
+			 from drivers/perf/arm_pmuv3.c:11:
+	drivers/perf/arm_pmuv3.c: In function =E2=80=98armv8pmu_write_evtype=E2=80=
+=99:
+	include/linux/bits.h:34:29: error: left shift count >=3D width of type [-W=
+error=3Dshift-count-overflow]
+	   34 |         (((~UL(0)) - (UL(1) << (l)) + 1) & \
+	      |                             ^~
+	include/linux/bits.h:37:38: note: in expansion of macro =E2=80=98__GENMASK=
+=E2=80=99
+	   37 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+	      |                                      ^~~~~~~~~
+	include/linux/perf/arm_pmuv3.h:238:33: note: in expansion of macro =E2=80=
+=98GENMASK=E2=80=99
+	  238 | #define ARMV8_PMU_EVTYPE_TC     GENMASK(63, 61)
+	      |                                 ^~~~~~~
+	drivers/perf/arm_pmuv3.c:567:25: note: in expansion of macro =E2=80=98ARMV=
+8_PMU_EVTYPE_TC=E2=80=99
+	  567 |                 mask |=3D ARMV8_PMU_EVTYPE_TC | ARMV8_PMU_EVTYPE_T=
+H;
+	      |                         ^~~~~~~~~~~~~~~~~~~
+	include/linux/bits.h:35:18: error: right shift count is negative [-Werror=
+=3Dshift-count-negative]
+	   35 |          (~UL(0) >> (BITS_PER_LONG - 1 - (h))))
+	      |                  ^~
+	include/linux/bits.h:37:38: note: in expansion of macro =E2=80=98__GENMASK=
+=E2=80=99
+	   37 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+	      |                                      ^~~~~~~~~
+	include/linux/perf/arm_pmuv3.h:238:33: note: in expansion of macro =E2=80=
+=98GENMASK=E2=80=99
+	  238 | #define ARMV8_PMU_EVTYPE_TC     GENMASK(63, 61)
+	      |                                 ^~~~~~~
+	drivers/perf/arm_pmuv3.c:567:25: note: in expansion of macro =E2=80=98ARMV=
+8_PMU_EVTYPE_TC=E2=80=99
+	  567 |                 mask |=3D ARMV8_PMU_EVTYPE_TC | ARMV8_PMU_EVTYPE_T=
+H;
+	      |                         ^~~~~~~~~~~~~~~~~~~
+	include/linux/bits.h:34:29: error: left shift count >=3D width of type [-W=
+error=3Dshift-count-overflow]
+	   34 |         (((~UL(0)) - (UL(1) << (l)) + 1) & \
+	      |                             ^~
+	include/linux/bits.h:37:38: note: in expansion of macro =E2=80=98__GENMASK=
+=E2=80=99
+	   37 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+	      |                                      ^~~~~~~~~
+	include/linux/perf/arm_pmuv3.h:237:33: note: in expansion of macro =E2=80=
+=98GENMASK=E2=80=99
+	  237 | #define ARMV8_PMU_EVTYPE_TH     GENMASK(43, 32)
+	      |                                 ^~~~~~~
+	drivers/perf/arm_pmuv3.c:567:47: note: in expansion of macro =E2=80=98ARMV=
+8_PMU_EVTYPE_TH=E2=80=99
+	  567 |                 mask |=3D ARMV8_PMU_EVTYPE_TC | ARMV8_PMU_EVTYPE_T=
+H;
+	      |                                               ^~~~~~~~~~~~~~~~~~~
+	include/linux/bits.h:35:18: error: right shift count is negative [-Werror=
+=3Dshift-count-negative]
+	   35 |          (~UL(0) >> (BITS_PER_LONG - 1 - (h))))
+	      |                  ^~
+	include/linux/bits.h:37:38: note: in expansion of macro =E2=80=98__GENMASK=
+=E2=80=99
+	   37 |         (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+	      |                                      ^~~~~~~~~
+	include/linux/perf/arm_pmuv3.h:237:33: note: in expansion of macro =E2=80=
+=98GENMASK=E2=80=99
+	  237 | #define ARMV8_PMU_EVTYPE_TH     GENMASK(43, 32)
+	      |                                 ^~~~~~~
+	drivers/perf/arm_pmuv3.c:567:47: note: in expansion of macro =E2=80=98ARMV=
+8_PMU_EVTYPE_TH=E2=80=99
+	  567 |                 mask |=3D ARMV8_PMU_EVTYPE_TC | ARMV8_PMU_EVTYPE_T=
+H;
+	      |                                               ^~~~~~~~~~~~~~~~~~~
 
-If I swap process_vm_readv() and process_vm_writev(), then the read
-succeeds but the write fails:
+I guess that's easy to fix but I didn't look into that.
 
-#  RUN           global.ptrace_read_write ...
-# Child: 1996
-# Child GCSPR 0xffffa7fcffd8, flags 1, locked 0
-# process_vm_writev() failed: Bad address (14)
-# libc-gcs.c:291:ptrace_read_write:Expected ret (-1) == sizeof(rval) (8)
-# libc-gcs.c:293:ptrace_read_write:Expected val (281473500358268) == ptrace(PTRACE_PEEKDATA, child, (void *)gcspr, NULL) (0)
-# ptrace_read_write: Test failed at step #1
-#          FAIL  global.ptrace_read_write
-not ok 4 global.ptrace_read_write
+Best regards
+Uwe
 
-> +/* Put it all together, we can safely switch to and from the stack */
-> +TEST_F(map_gcs, stack_switch)
-> +{
-> +	size_t cap_index;
-> +	cap_index = (variant->stack_size / sizeof(unsigned long));
-> +	unsigned long *orig_gcspr_el0, *pivot_gcspr_el0;
-> +
-> +	/* Skip over the stack terminator and point at the cap */
-> + switch (variant->flags & (SHADOW_STACK_SET_MARKER | SHADOW_STACK_SET_TOKEN)) {
-> +	case SHADOW_STACK_SET_MARKER | SHADOW_STACK_SET_TOKEN:
-> +		cap_index -= 2;
-> +		break;
-> +	case SHADOW_STACK_SET_TOKEN:
-> +		cap_index -= 1;
-> +		break;
-> +	case SHADOW_STACK_SET_MARKER:
-> +	case 0:
-> +		/* No cap, no test */
-> +		return;
-> +	}
-> +	pivot_gcspr_el0 = &self->stack[cap_index];
-> +
-> +	/* Pivot to the new GCS */
-> +	ksft_print_msg("Pivoting to %p from %p, target has value 0x%lx\n",
-> +		       pivot_gcspr_el0, get_gcspr(),
-> +		       *pivot_gcspr_el0);
-> +	gcsss1(pivot_gcspr_el0);
-> +	orig_gcspr_el0 = gcsss2();
-> +	ksft_print_msg("Pivoted to %p from %p, target has value 0x%lx\n",
-> +		       pivot_gcspr_el0, get_gcspr(),
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=C3=B6nig         =
+   |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
 
-Not sure about the intent here, but perhaps "get_gcspr()" here should be
-"orig_gcspr_el0" instead? Ditto in the equivalent place at the
-map_gcs.stack_overflow test below.
+--ngsobzumwfjdiywd
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Also, it's strange that the tests defined after map_gcs.stack_overflow
-don't run when I execute this test program. I'm doing:
+-----BEGIN PGP SIGNATURE-----
 
-$ ./run_kselftest.sh -t arm64:libc-gcs
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmV8QbAACgkQj4D7WH0S
+/k7AiQf+P2oUWv7SoB0VqSdzaQDZiVP5cLTAQNAUd2/KvKLHcynNocmMBs36c3pg
+o+x8tw5H8hmrOREyHLMq2dFVFQOzDjUpzVl/UtvewEwJ/wer59fr31E2+O4d3RzB
+HbLD/OuVTL88TWye1hyv+43iSoG4gfff9n9SBsr/423tBmEqnCkIv/A7CMzawZMi
+Nr4oV5P03hNhNXEFy4OxIVfuLmAVxIlK4EtUtMErE/+UHeJL6gs+nhOW38UwNR+c
++9uau7zzuYGeBWLmiDYGPteZWs0/DB9/WO5xm+U4eA10oQSho6Tjd8DS4ls2katc
+cDqpu8z3U3vqJXktpE5/swkSxSAuWQ==
+=wXB9
+-----END PGP SIGNATURE-----
 
-I.e., these tests aren't being run in my FVP:
-
-> +FIXTURE_VARIANT_ADD(map_invalid_gcs, too_small)
-> +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_1)
-> +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_2)
-> +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_3)
-> +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_4)
-> +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_5)
-> +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_6)
-> +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_7)
-> +TEST_F(map_invalid_gcs, do_map)
-> +FIXTURE_VARIANT_ADD(invalid_mprotect, exec)
-> +FIXTURE_VARIANT_ADD(invalid_mprotect, bti)
-> +FIXTURE_VARIANT_ADD(invalid_mprotect, exec_bti)
-> +TEST_F(invalid_mprotect, do_map)
-> +TEST_F(invalid_mprotect, do_map_read)
-
-Finally, one last comment:
-
-> +int main(int argc, char **argv)
-> +{
-> +	unsigned long gcs_mode;
-> +	int ret;
-> +
-> +	if (!(getauxval(AT_HWCAP2) & HWCAP2_GCS))
-> +		ksft_exit_skip("SKIP GCS not supported\n");
-> +
-> +	/* 
-> +	 * Force shadow stacks on, our tests *should* be fine with or
-> +	 * without libc support and with or without this having ended
-> +	 * up tagged for GCS and enabled by the dynamic linker.  We
-> +	 * can't use the libc prctl() function since we can't return
-> +	 * from enabling the stack.  Also lock GCS if not already
-> +	 * locked so we can test behaviour when it's locked.
-
-This is probably a leftover from a previous version: the test doesn't
-lock any GCS flag.
-
-> +	 */
-> +	ret = my_syscall2(__NR_prctl, PR_GET_SHADOW_STACK_STATUS, &gcs_mode);
-> +	if (ret) {
-> +		ksft_print_msg("Failed to read GCS state: %d\n", ret);
-> +		return EXIT_FAILURE;
-> +	}
-> +	
-> +	if (!(gcs_mode & PR_SHADOW_STACK_ENABLE)) {
-> +		gcs_mode = PR_SHADOW_STACK_ENABLE;
-> +		ret = my_syscall2(__NR_prctl, PR_SET_SHADOW_STACK_STATUS,
-> +				  gcs_mode);
-> +		if (ret) {
-> +			ksft_print_msg("Failed to configure GCS: %d\n", ret);
-> +			return EXIT_FAILURE;
-> +		}
-> +	}
-> +
-> +	/* Avoid returning in case libc doesn't understand GCS */
-> +	exit(test_harness_run(argc, argv));
-> +}
-
-
--- 
-Thiago
+--ngsobzumwfjdiywd--
