@@ -1,205 +1,144 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B642E40A
-	for <kvmarm@lists.linux.dev>; Fri, 15 Dec 2023 13:46:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B6235884;
+	Fri, 15 Dec 2023 15:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ubWicI/0"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-77f3c721c38so47930485a.1
-        for <kvmarm@lists.linux.dev>; Fri, 15 Dec 2023 05:46:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702647991; x=1703252791; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Au5CVcebn6Vck8JCLxPLVdam9baahWxjR1JXzbH1ObI=;
-        b=ubWicI/0hbCW+cJ7jEMEijiL8h1gxs7JPp4GTHWJ072CCjHC9SfoNQw2R9mADQtT5g
-         JjjG5vu4guIMlvRdHjms5z7kbnpGMkenJc8jWqHLMo7pEJ47xI2qKMqI5GQEfYSnncGx
-         aar4UubCf8Op41Q0QE/hsDlGa/Q2EJTT8yUsYKMe7yLIWE6fdcl6AyI+dedhju10vP3l
-         6H/8cU66cu/uVs0OmBfio2C7Q7FJ0qOxGs+pdIn6+jfgLAuoLJuAlQzI8QRjfmHHKUbf
-         EshtI+0g4dctNrOnxby9ctMSMuog11opopbxZozQPZNWZ180nbc5qPtZ6ebReu62hiei
-         kiLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702647991; x=1703252791;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Au5CVcebn6Vck8JCLxPLVdam9baahWxjR1JXzbH1ObI=;
-        b=Mz+a4lo5mf769mR+3RhAA8hzJKyMybXhSIobR4MHIGMty4qwHkz5QQh+wmDZWd4E2w
-         BaV4lq1mAHlRfiRJW2R0lZKkoLk6UkE726gg0vSWQnnghiml7+7uT7sL+y5xYGmX8AS3
-         S2bl5WUEujvUP0Pa2irnQMESxu9FYRQFBbBMapJrbKQqwbwOxFs+nYqZtuSFlhqXL/yt
-         FuBNvZYwL5WZhMYcjesE4PdynoZLcAs8W46GBc+r9kpV78GdN3p11Lpe3aTPm7hL2xya
-         7fdmikAOu2LcSGM9CdUHZWQDA2BHWoQYUNrUG2k3W5VxsGkK5qF+Y2Y+7sJZP0al0e7b
-         Q8/A==
-X-Gm-Message-State: AOJu0YwvZIoHEeWrwK5/rBq0JMil5T36JlhoO9IHrRMlhiclexDemwEI
-	T3oAJNB63FOYY44uoiNC3V1uSsv9jO0NwYL50Y1oHV6FOXyjqTSMwWcPwGNH
-X-Google-Smtp-Source: AGHT+IHckMIooHkOETF5lF7Y0bNjW5UfPrSiTHk/PFAN/KgOn5XjCD7mnoVy4OhjHiU7akGBUvMp/xFGXczN5iFDV44=
-X-Received: by 2002:ad4:5ecb:0:b0:67f:b1a:64a with SMTP id jm11-20020ad45ecb000000b0067f0b1a064amr3757015qvb.54.1702647990801;
- Fri, 15 Dec 2023 05:46:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ThF3UUWw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8CD3C433C8;
+	Fri, 15 Dec 2023 14:59:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702652405;
+	bh=422PM3fDIpd8XBwXAF/Vr2Tijy2/V6yIm6WwhsorExQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ThF3UUWwGr5c0gG18awOx5DrQRxAPwOOshZh7SWrhMEjGtlJQKezv414UMUQWtogg
+	 HnsI2tu59s1B5g7ry0ZQTMiQwmrK95OYjW9JiQ6MubAahf8tnoIGHG4ZF1g5MM51Ho
+	 Fuyd5f95QOR67Xo2K1+5IQcrm/42yldE3jy4DNl4ppdU048EmnGGuL8meF1yRhb1Vb
+	 LrNl4xg5kA7VxTmTD6d5xMpK4G8SinhZgdQ+byz8MwpizJS6XNp+ezD/RlY5hnqPb5
+	 M/qJhGhNwfiuAs4wEKcr3OTh/1Lt7WuUVP/7vAsp3W1EZLiIXddMPg4h2ayPqcPZD9
+	 deK0um1LZe7kA==
+Date: Fri, 15 Dec 2023 14:59:51 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v7 34/39] kselftest/arm64: Add a GCS test program built
+ with the system libc
+Message-ID: <485b6454-135c-4dd4-b38e-8fb8a02779cd@sirena.org.uk>
+References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
+ <20231122-arm64-gcs-v7-34-201c483bd775@kernel.org>
+ <875y1089i4.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20231214100158.2305400-1-tabba@google.com> <20231214100158.2305400-15-tabba@google.com>
-In-Reply-To: <20231214100158.2305400-15-tabba@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 15 Dec 2023 13:45:53 +0000
-Message-ID: <CA+EHjTw_728zgVqF6_UraP0CwvmvFH0WiYCbyN-gvNMNk8QMBQ@mail.gmail.com>
-Subject: Re: [PATCH v3 14/17] KVM: arm64: Macros for setting/clearing FGT bits
-To: kvmarm@lists.linux.dev
-Cc: maz@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, 
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, eric.auger@redhat.com, 
-	jingzhangos@google.com, joey.gouly@arm.com, 
-	linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="M02qk/d68kwsaj1P"
+Content-Disposition: inline
+In-Reply-To: <875y1089i4.fsf@linaro.org>
+X-Cookie: PARDON me, am I speaking ENGLISH?
+
+
+--M02qk/d68kwsaj1P
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Thu, Dec 14, 2023 at 11:50:11PM -0300, Thiago Jung Bauermann wrote:
+> Mark Brown <broonie@kernel.org> writes:
 
-On Thu, Dec 14, 2023 at 10:02=E2=80=AFAM Fuad Tabba <tabba@google.com> wrot=
-e:
->
-> There's a lot of boilerplate code for setting and clearing FGT
-> bits when activating guest traps. Refactor it into macros. These
-> macros will also be used in future patch series.
->
-> No functional change intended.
->
-> Signed-off-by: Fuad Tabba <tabba@google.com>
+> > +	ret =3D process_vm_writev(child, &local_iov, 1, &remote_iov, 1, 0);
+> > +	if (ret =3D=3D -1)
+> > +		ksft_print_msg("process_vm_readv() failed: %s (%d)\n",
+> > +			       strerror(errno), errno);
 
-And in relation to my email in "PATCH v3 09/17" [*] on HAFGRTR_EL2
-being present only when FEAT_AMUv1 is implemented and FEAT_FGT:
+> The comment and the error message say "process_vm_readv()", but the
+> function actually called is process_vm_writev(). Is this intended?
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h
-b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 58e450180f68..071d6db299f5 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -174,7 +174,9 @@ static inline void __activate_traps_hfgxtr(struct
-kvm_vcpu *vcpu)
-        update_fgt_traps(HFGITR_EL2);
-        update_fgt_traps(HDFGRTR_EL2);
-        update_fgt_traps(HDFGWTR_EL2);
--       update_fgt_traps(HAFGRTR_EL2);
-+
-+       if (cpu_has_amu())
-+               update_fgt_traps(HAFGRTR_EL2);
- }
+No, that's a rebasing issue.
 
- static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+> If I swap process_vm_readv() and process_vm_writev(), then the read
+> succeeds but the write fails:
+>=20
+> #  RUN           global.ptrace_read_write ...
+> # Child: 1996
+> # Child GCSPR 0xffffa7fcffd8, flags 1, locked 0
+> # process_vm_writev() failed: Bad address (14)
+> # libc-gcs.c:291:ptrace_read_write:Expected ret (-1) =3D=3D sizeof(rval) =
+(8)
+> # libc-gcs.c:293:ptrace_read_write:Expected val (281473500358268) =3D=3D =
+ptrace(PTRACE_PEEKDATA, child, (void *)gcspr, NULL) (0)
+> # ptrace_read_write: Test failed at step #1
+> #          FAIL  global.ptrace_read_write
+> not ok 4 global.ptrace_read_write
 
-* https://lore.kernel.org/all/CA+EHjTwrcXjOdo7JG-6fr0YpDq2EtMoTQxngq5H-ELLd=
-jyQG=3DA@mail.gmail.com/
+Yeah, I did notice something had happened with the writes but didn't
+investigate yet.
 
-Cheers,
-/fuad
+> Also, it's strange that the tests defined after map_gcs.stack_overflow
+> don't run when I execute this test program. I'm doing:
 
+> $ ./run_kselftest.sh -t arm64:libc-gcs
 
+> I.e., these tests aren't being run in my FVP:
 
+> > +FIXTURE_VARIANT_ADD(map_invalid_gcs, too_small)
+> > +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_1)
+> > +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_2)
+> > +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_3)
+> > +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_4)
+> > +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_5)
+> > +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_6)
+> > +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_7)
+> > +TEST_F(map_invalid_gcs, do_map)
+> > +FIXTURE_VARIANT_ADD(invalid_mprotect, exec)
+> > +FIXTURE_VARIANT_ADD(invalid_mprotect, bti)
+> > +FIXTURE_VARIANT_ADD(invalid_mprotect, exec_bti)
+> > +TEST_F(invalid_mprotect, do_map)
+> > +TEST_F(invalid_mprotect, do_map_read)
 
+I'm seeing all of those appearing.  I'm not sure what to say there -
+that's all kselftest framework stuff, I'd expect the framework to say
+something about what it's doing if it decides to skip and I can't think
+why it would decide to skip.
 
-> ---
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 60 +++++++++----------------
->  1 file changed, 21 insertions(+), 39 deletions(-)
->
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp=
-/include/hyp/switch.h
-> index 17ce40f5b006..e223fc0d5193 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -79,6 +79,23 @@ static inline void __activate_traps_fpsimd32(struct kv=
-m_vcpu *vcpu)
->                 clr |=3D ~hfg & __ ## reg ## _nMASK;                     =
- \
->         } while(0)
->
-> +#define update_fgt_traps_cs(reg, clr, set)                             \
-> +       do {                                                            \
-> +               struct kvm_cpu_context *hctxt =3D                        =
- \
-> +                       &this_cpu_ptr(&kvm_host_data)->host_ctxt;       \
-> +               u64 val, c =3D 0, s =3D 0;                               =
-   \
-> +                                                                       \
-> +               ctxt_sys_reg(hctxt, reg) =3D read_sysreg_s(SYS_ ## reg); =
- \
-> +               compute_clr_set(vcpu, reg, c, s);                       \
-> +               val =3D __ ## reg ## _nMASK;                             =
- \
-> +               val |=3D (s | set);                                      =
- \
-> +               val &=3D ~(c | clr);                                     =
- \
-> +               write_sysreg_s(val, SYS_ ## reg);                       \
-> +       } while(0)
-> +
-> +#define update_fgt_traps(reg)                                          \
-> +       update_fgt_traps_cs(reg, 0, 0)
-> +
->  /*
->   * Validate the fine grain trap masks.
->   * Check that the masks do not overlap and that all bits are accounted f=
-or.
-> @@ -146,45 +163,10 @@ static inline void __activate_traps_hfgxtr(struct k=
-vm_vcpu *vcpu)
->         if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
->                 return;
->
-> -       ctxt_sys_reg(hctxt, HFGITR_EL2) =3D read_sysreg_s(SYS_HFGITR_EL2)=
-;
-> -
-> -       r_set =3D r_clr =3D 0;
-> -       compute_clr_set(vcpu, HFGITR_EL2, r_clr, r_set);
-> -       r_val =3D __HFGITR_EL2_nMASK;
-> -       r_val |=3D r_set;
-> -       r_val &=3D ~r_clr;
-> -
-> -       write_sysreg_s(r_val, SYS_HFGITR_EL2);
-> -
-> -       ctxt_sys_reg(hctxt, HDFGRTR_EL2) =3D read_sysreg_s(SYS_HDFGRTR_EL=
-2);
-> -       ctxt_sys_reg(hctxt, HDFGWTR_EL2) =3D read_sysreg_s(SYS_HDFGWTR_EL=
-2);
-> -
-> -       r_clr =3D r_set =3D w_clr =3D w_set =3D 0;
-> -
-> -       compute_clr_set(vcpu, HDFGRTR_EL2, r_clr, r_set);
-> -       compute_clr_set(vcpu, HDFGWTR_EL2, w_clr, w_set);
-> -
-> -       r_val =3D __HDFGRTR_EL2_nMASK;
-> -       r_val |=3D r_set;
-> -       r_val &=3D ~r_clr;
-> -
-> -       w_val =3D __HDFGWTR_EL2_nMASK;
-> -       w_val |=3D w_set;
-> -       w_val &=3D ~w_clr;
-> -
-> -       write_sysreg_s(r_val, SYS_HDFGRTR_EL2);
-> -       write_sysreg_s(w_val, SYS_HDFGWTR_EL2);
-> -
-> -       ctxt_sys_reg(hctxt, HAFGRTR_EL2) =3D read_sysreg_s(SYS_HAFGRTR_EL=
-2);
-> -
-> -       r_clr =3D r_set =3D 0;
-> -       compute_clr_set(vcpu, HAFGRTR_EL2, r_clr, r_set);
-> -
-> -       r_val =3D __HAFGRTR_EL2_nMASK;
-> -       r_val |=3D r_set;
-> -       r_val &=3D ~r_clr;
-> -
-> -       write_sysreg_s(r_val, SYS_HAFGRTR_EL2);
-> +       update_fgt_traps(HFGITR_EL2);
-> +       update_fgt_traps(HDFGRTR_EL2);
-> +       update_fgt_traps(HDFGWTR_EL2);
-> +       update_fgt_traps(HAFGRTR_EL2);
->  }
->
->  static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
-> --
-> 2.43.0.472.g3155946c3a-goog
->
+--M02qk/d68kwsaj1P
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmV8aecACgkQJNaLcl1U
+h9Cx7Qf+NstvmUJDmhKZCiSXybEblR3UfKc2ERXjiJRyMZJYWGE59Aqau43rUxYz
+4oELXv45Jxb9fBX19Ap6W19TxDrGHMHoCW6fuIiqeTu9L1798R0lJi1TuUxnoX2t
+t/s1MqP87pbwKNs60ne9ezvagfQhFFBAYyUepAxrvfPkeUakOwLgsHRwx2bEVsXv
+6SsJJ9hRz7N2FvlP487cWfC5VQkyYjefXQHi/1OrZw1hSkS9a5Hb/Y1vBzacFUbS
+YDYZszJexTXkcRjAngFzHsCBCakK3xpFB1uRPMhrAOj51UDJHHwE4+nX7DUWZaxT
+delEJTYjMd7cGaEpGyDdMnkhQVyM4g==
+=fKsW
+-----END PGP SIGNATURE-----
+
+--M02qk/d68kwsaj1P--
