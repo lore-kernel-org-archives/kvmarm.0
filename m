@@ -1,453 +1,222 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0363B69791
-	for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 19:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF7AA3F
+	for <kvmarm@lists.linux.dev>; Fri, 15 Dec 2023 02:50:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f9+zi497"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702582174;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xUk3eG+68EZSTIrjQkfVQpGuO5D5nt4u7CUzC6kn+ms=;
-	b=f9+zi497kqaCK6AR+NYF5YU+dCcJL4Uhcqg9ibZm/eLVcYXGnCNtK7+YJMe00ua92Ftzo4
-	gX25CO0wSjlo9vj0p2LeERh5g2FKgUo3o7Q8u3rPwjm7CMRL20C2LZdoGRcsuljc/4TUb1
-	Vh4ZXny5xaWXf12ygqpcgSrk1Wnq3HY=
-Received: from mail-vk1-f198.google.com (mail-vk1-f198.google.com
- [209.85.221.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-298-Um1OBJVCMByG_NN2tXPwVA-1; Thu, 14 Dec 2023 14:29:31 -0500
-X-MC-Unique: Um1OBJVCMByG_NN2tXPwVA-1
-Received: by mail-vk1-f198.google.com with SMTP id 71dfb90a1353d-4b309d9aad0so2279370e0c.1
-        for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 11:29:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BC0wgFYA"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6ce72faf1e8so77510b3a.0
+        for <kvmarm@lists.linux.dev>; Thu, 14 Dec 2023 18:50:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1702608614; x=1703213414; darn=lists.linux.dev;
+        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=oDvaa/loPXs8QqeKn/dbAir7W2iAEYYDHF7svcomArc=;
+        b=BC0wgFYAaca0MBtO3v0Ub3bHxXNOsU9v20IAgl/LlSCPesVrpFbg5UyrcWCjJ+vS7J
+         dm+WORxBUndDheC1YtXizPFMsAqa1q9xCyvbO7WN2yUaEDjy7Z0KQ+qP88L3/8gWjdzg
+         gpAWQabou0AQsGTR89CtTbhr6/BL6793je5E0QOVxCCDe0t9WonOOuSOxIgX6zi+aBXG
+         /rEvpA+x1Dmqw+jF3RmyH7WSYmbLnV48lVfSsvbxEZMoTLf2bsvQLohDjCyMdCYymOwb
+         dTAyw0wOdH265mTr7gKVCchlljzqOlqSe8Ig0MdDeUmMeYZrtPDY5imzpZeb0H5nK8sL
+         qckg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702582170; x=1703186970;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xUk3eG+68EZSTIrjQkfVQpGuO5D5nt4u7CUzC6kn+ms=;
-        b=m0Rt5A0WP01FwIeji2KRogyciXdkj4Rpi8GQzv1QeyPOXgp9NHo1qVUvSq9pMD/+SL
-         1R4e7toAl2h9mo6PxyUy0xJE2triFmrl7jSLwB5pJ0m2bEO9in0gtfRjQ4UBP+lNVnV8
-         TqDsFcAqBfu17bq9nUJ13MkwSvxB1+VkQ+d73ZwoeA7wpdj9ut9jtsIohUwL/D5AoRJ5
-         qbbzeV1j0PwRRTBh6FZ7bxDQD8mACehwlfBTEOV4hiLmwsrg1t6H6HvR2xtKVBqXaWoq
-         xjKS5hjbkCANl2yR5wAsR7El0RNb2rocXbeavb9oa5Seoh0FYCLDVp5IjXWoUypYtoDj
-         GZTw==
-X-Gm-Message-State: AOJu0Yykz6Wyc+HJ7EJ+gKtmfNmwjCeDd0c3dpULe6rCqb2i8qlfVCxP
-	nay0bUJZ9DIGdeEbKvk24K+StVtAYrFIoxF9doEg7U06SccB6+WdHlfAGRvvkfLtLySYnOcATNY
-	tZXRRBuci6FZsyr9y
-X-Received: by 2002:ac5:c38f:0:b0:4b2:956e:f651 with SMTP id s15-20020ac5c38f000000b004b2956ef651mr6137827vkk.0.1702582170618;
-        Thu, 14 Dec 2023 11:29:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE51zbBMPgEBfDxOsVJeFCrbH7TB4ZBojjQo3bgaphGVUfxRbU+URMAd9Lv4bepko/KkIfhQg==
-X-Received: by 2002:ac5:c38f:0:b0:4b2:956e:f651 with SMTP id s15-20020ac5c38f000000b004b2956ef651mr6137817vkk.0.1702582170275;
-        Thu, 14 Dec 2023 11:29:30 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id dv4-20020a05620a1b8400b0077da476d403sm5498175qkb.58.2023.12.14.11.29.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Dec 2023 11:29:29 -0800 (PST)
-Message-ID: <e14dcae7-db8c-4a82-a829-b783e754163b@redhat.com>
-Date: Thu, 14 Dec 2023 20:29:25 +0100
+        d=1e100.net; s=20230601; t=1702608614; x=1703213414;
+        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oDvaa/loPXs8QqeKn/dbAir7W2iAEYYDHF7svcomArc=;
+        b=NBcLlZ3sB91VePQbojzAIu12mK8dGbA2aKGx8I5ot0IvIAKeevmjBemX0KiChKsK0x
+         boJY6Jy4ZRLf932isvQ3HavhvAaXYs8dhSYSWuob88VD3rpg11RD92xX2wpM+r+HNyzf
+         4skggKgmbLIpLE0/2CPkVGny6Si5ESCJ1rjm8M1HoD9Ls6x0yjUaxkJ4S8u0P15c3rIK
+         Z+OnrEp3aEdt/xMZGDkg7OacdwBOZnzkQEGh8BSNfr5h+BS0y0VFNRVEoY/Txk5Tdtm4
+         KfOyeHwcn9YVT7cDT30eFb3Mx6BdnFfVZnST7zpfEe18uKj2XwTzOuaypXxVgzYQkmS8
+         AeJg==
+X-Gm-Message-State: AOJu0YzxqEk0qVRFoGi8MegDFst2p3MvH8jqBJ3vOs3MPM/JSA5jiac1
+	6MrC4L8AXVMbjVoiONRH4Xku+g==
+X-Google-Smtp-Source: AGHT+IE99vQkPCzS0fUw2+RGCuARu2aeWphX23kJyqBn5JyJXY6hondFJhuQ9dhnml5rfwoe6hL5lw==
+X-Received: by 2002:a05:6a00:cd0:b0:6cd:e046:f3f0 with SMTP id b16-20020a056a000cd000b006cde046f3f0mr7542035pfv.13.1702608614486;
+        Thu, 14 Dec 2023 18:50:14 -0800 (PST)
+Received: from localhost ([2804:14d:7e39:8470:c901:5e00:3dbe:d1bd])
+        by smtp.gmail.com with ESMTPSA id r25-20020aa78b99000000b006d2738a2510sm384321pfd.146.2023.12.14.18.50.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Dec 2023 18:50:14 -0800 (PST)
+References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
+ <20231122-arm64-gcs-v7-34-201c483bd775@kernel.org>
+User-agent: mu4e 1.10.8; emacs 29.1
+From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
+ <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Morton
+ <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
+ <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
+ Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, Oleg
+ Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, Kees
+ Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, "Rick P.
+ Edgecombe" <rick.p.edgecombe@intel.com>, Deepak Gupta
+ <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, Szabolcs Nagy
+ <Szabolcs.Nagy@arm.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
+ <aou@eecs.berkeley.edu>, Florian Weimer <fweimer@redhat.com>, Christian
+ Brauner <brauner@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v7 34/39] kselftest/arm64: Add a GCS test program built
+ with the system libc
+In-reply-to: <20231122-arm64-gcs-v7-34-201c483bd775@kernel.org>
+Date: Thu, 14 Dec 2023 23:50:11 -0300
+Message-ID: <875y1089i4.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/5] KVM: selftests: aarch64: Introduce
- pmu_event_filter_test
-From: Eric Auger <eauger@redhat.com>
-To: Shaoqin Huang <shahuang@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <20231129072712.2667337-1-shahuang@redhat.com>
- <20231129072712.2667337-5-shahuang@redhat.com>
- <72c68db7-3de0-4517-9410-fd19d4564fea@redhat.com>
-In-Reply-To: <72c68db7-3de0-4517-9410-fd19d4564fea@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-Hi Shaoqin,
 
-On 12/14/23 14:45, Eric Auger wrote:
-> Hi Shaoqin,
-> 
-> On 11/29/23 08:27, Shaoqin Huang wrote:
->> Introduce pmu_event_filter_test for arm64 platforms. The test configures
->> PMUv3 for a vCPU, and sets different pmu event filters for the vCPU, and
->> check if the guest can use those events which user allow and can't use
->> those events which use deny.
->>
->> This test refactor the create_vpmu_vm() and make it a wrapper for
->> __create_vpmu_vm(), which allows some extra init code before
->> KVM_ARM_VCPU_PMU_V3_INIT.
->>
->> And this test use the KVM_ARM_VCPU_PMU_V3_FILTER attribute to set the
->> pmu event filter in KVM. And choose to filter two common event
->> branches_retired and instructions_retired, and let guest use the two
->> events in pmu. And check if the result is expected.
->>
->> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
->> ---
->>  tools/testing/selftests/kvm/Makefile          |   1 +
->>  .../kvm/aarch64/pmu_event_filter_test.c       | 231 ++++++++++++++++++
->>  .../selftests/kvm/include/aarch64/vpmu.h      |   4 +
->>  .../testing/selftests/kvm/lib/aarch64/vpmu.c  |  14 +-
->>  4 files changed, 248 insertions(+), 2 deletions(-)
->>  create mode 100644 tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
->>
->> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
->> index b60852c222ac..5f126e1a1dbf 100644
->> --- a/tools/testing/selftests/kvm/Makefile
->> +++ b/tools/testing/selftests/kvm/Makefile
->> @@ -155,6 +155,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
->>  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
->>  TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
->>  TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
->> +TEST_GEN_PROGS_aarch64 += aarch64/pmu_event_filter_test
->>  TEST_GEN_PROGS_aarch64 += aarch64/psci_test
->>  TEST_GEN_PROGS_aarch64 += aarch64/set_id_regs
->>  TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
->> diff --git a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
->> new file mode 100644
->> index 000000000000..0e652fbdb37a
->> --- /dev/null
->> +++ b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
->> @@ -0,0 +1,231 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * pmu_event_filter_test - Test user limit pmu event for guest.
->> + *
->> + * Copyright (c) 2023 Red Hat, Inc.
->> + *
->> + * This test checks if the guest only see the limited pmu event that userspace
->> + * sets, if the guest can use those events which user allow, and if the guest
->> + * can't use those events which user deny.
->> + * This test runs only when KVM_CAP_ARM_PMU_V3, KVM_ARM_VCPU_PMU_V3_FILTER
->> + * is supported on the host.
->> + */
->> +#include <kvm_util.h>
->> +#include <processor.h>
->> +#include <vgic.h>
->> +#include <vpmu.h>
->> +#include <test_util.h>
->> +#include <perf/arm_pmuv3.h>
->> +
->> +struct {
->> +	uint64_t branches_retired;
->> +	uint64_t instructions_retired;
->> +} pmc_results;
->> +
->> +static struct vpmu_vm *vpmu_vm;
->> +static uint64_t pmceid0;
->> +
->> +#define FILTER_NR 10
->> +
->> +struct test_desc {
->> +	const char *name;
->> +	void (*check_result)(void);
->> +	struct kvm_pmu_event_filter filter[FILTER_NR];
->> +};
->> +> +#define __DEFINE_FILTER(base, num, act)		\
->> +	((struct kvm_pmu_event_filter) {	\
->> +		.base_event	= base,		\
->> +		.nevents	= num,		\
->> +		.action		= act,		\
->> +	})
->> +
->> +#define DEFINE_FILTER(base, act) __DEFINE_FILTER(base, 1, act)
->> +
->> +#define EMPTY_FILTER	{ 0 }
->> +
->> +#define SW_INCR		0x0
->> +#define INST_RETIRED	0x8
->> +#define BR_RETIRED	0x21
->> +
->> +#define NUM_BRANCHES	10
->> +
->> +static void run_and_measure_loop(void)
->> +{
->> +	asm volatile(
->> +		"	mov	x10, %[loop]\n"
->> +		"1:	sub	x10, x10, #1\n"
->> +		"	cmp	x10, #0x0\n"
->> +		"	b.gt	1b\n"
->> +		:
->> +		: [loop] "r" (NUM_BRANCHES)
->> +		: "x10", "cc");
->> +}
->> +
->> +static void guest_code(void)
->> +{
->> +	uint64_t pmcr = read_sysreg(pmcr_el0);
->> +
->> +	pmu_disable_reset();
->> +
->> +	write_pmevtypern(0, BR_RETIRED);
->> +	write_pmevtypern(1, INST_RETIRED);
->> +	enable_counter(0);
->> +	enable_counter(1);
->> +	write_sysreg(pmcr | ARMV8_PMU_PMCR_E, pmcr_el0);
->> +
->> +	run_and_measure_loop();
->> +
->> +	write_sysreg(pmcr, pmcr_el0);
->> +
->> +	pmc_results.branches_retired = read_sysreg(pmevcntr0_el0);
->> +	pmc_results.instructions_retired = read_sysreg(pmevcntr1_el0);
->> +
->> +	GUEST_DONE();
->> +}
->> +
->> +static void guest_get_pmceid0(void)
->> +{
->> +	uint64_t pmceid0 = read_sysreg(pmceid0_el0);
->> +
->> +	GUEST_PRINTF("%lx\n", pmceid0);
->> +
->> +	GUEST_DONE();
->> +}
->> +
->> +static void pmu_event_filter_init(struct vpmu_vm *vm, void *arg)
->> +{
->> +	struct kvm_device_attr attr = {
->> +		.group	= KVM_ARM_VCPU_PMU_V3_CTRL,
->> +		.attr	= KVM_ARM_VCPU_PMU_V3_FILTER,
->> +	};
->> +	struct kvm_pmu_event_filter *filter = (struct kvm_pmu_event_filter *)arg;
->> +
->> +	while (filter && filter->nevents != 0) {
->> +		attr.addr = (uint64_t)filter;
->> +		vcpu_ioctl(vm->vcpu, KVM_SET_DEVICE_ATTR, &attr);
->> +		filter++;
->> +	}
->> +}
->> +
->> +static void create_vpmu_vm_with_filter(void *guest_code,
->> +				       struct kvm_pmu_event_filter *filter)
->> +{
->> +	vpmu_vm = __create_vpmu_vm(guest_code, pmu_event_filter_init, filter);
->> +}
->> +
->> +static void run_vcpu(struct kvm_vcpu *vcpu)
->> +{
->> +	struct ucall uc;
->> +
->> +	while (1) {
->> +		vcpu_run(vcpu);
->> +		switch (get_ucall(vcpu, &uc)) {
->> +		case UCALL_DONE:
->> +			return;
->> +		case UCALL_PRINTF:
->> +			pmceid0 = strtoll(uc.buffer, NULL, 16);
->> +			break;
->> +		default:
->> +			TEST_FAIL("Unknown ucall %lu", uc.cmd);
->> +		}
->> +	}
->> +}
->> +
->> +static void check_pmc_counting(void)
->> +{
->> +	uint64_t br = pmc_results.branches_retired;
->> +	uint64_t ir = pmc_results.instructions_retired;
->> +
->> +	TEST_ASSERT(br && br == NUM_BRANCHES, "Branch instructions retired = "
->> +		    "%lu (expected %u)", br, NUM_BRANCHES);
-> have you tested on several machines? My experience with some events
-> (MEM_ACCESS for instance) is that you have variance (sometimes
-> significant) on some event count. I am a little bit scared that having
-> this br == NUM_BRANCHES check without taking into account some margin
-> will cause failures on some HW.
+Mark Brown <broonie@kernel.org> writes:
 
-I confirm the usual suspect, Amberwing, does not like this check ;-)
+> +	/* Same thing via process_vm_readv() */
+> +	local_iov.iov_base = &rval;
+> +	local_iov.iov_len = sizeof(rval);
+> +	remote_iov.iov_base = (void *)gcspr;
+> +	remote_iov.iov_len = sizeof(rval);
+> +	ret = process_vm_writev(child, &local_iov, 1, &remote_iov, 1, 0);
+> +	if (ret == -1)
+> +		ksft_print_msg("process_vm_readv() failed: %s (%d)\n",
+> +			       strerror(errno), errno);
 
-augere@qualcomm-amberwing-rep-06:~/UPSTREAM/linux/tools/testing/selftests/kvm/aarch64#
-./pmu_event_filter_test
-==== Test Assertion Failure ====
-  aarch64/pmu_event_filter_test.c:141: br && br == NUM_BRANCHES
-  pid=7750 tid=7750 errno=4 - Interrupted system call
-     1	0x0000000000401d6b: check_pmc_counting at pmu_event_filter_test.c:141
-     2	0x0000000000401967: run_test at pmu_event_filter_test.c:173
-     3	 (inlined by) for_each_test at pmu_event_filter_test.c:198
-     4	 (inlined by) main at pmu_event_filter_test.c:264
-     5	0x0000ffffaaa6c79b: ?? ??:0
-     6	0x0000ffffaaa6c86b: ?? ??:0
-     7	0x0000000000401aaf: _start at ??:?
-  Branch instructions retired = 15 (expected 10)
+The comment and the error message say "process_vm_readv()", but the
+function actually called is process_vm_writev(). Is this intended?
 
-Eric
+Also, process_vm_writev() is failing when I run on my Arm FVP:
 
-> 
-> in v1 I suggested to read to PMCEID* in a guest code to check if the
-> event is supported. This method would also have the benefice to allow
-> testing more complex filter range combinations.
->> +	TEST_ASSERT(ir, "Instructions retired = %lu (expected > 0)", ir);
->> +}
->> +
->> +static void check_pmc_not_counting(void)
->> +{
->> +	uint64_t br = pmc_results.branches_retired;
->> +	uint64_t ir = pmc_results.instructions_retired;
->> +
->> +	TEST_ASSERT(!br, "Branch instructions retired = %lu (expected 0)", br);
->> +	TEST_ASSERT(!ir, "Instructions retired = %lu (expected 0)", ir);
->> +}
->> +
->> +static void run_vcpu_and_sync_pmc_results(void)
->> +{
->> +	memset(&pmc_results, 0, sizeof(pmc_results));
->> +	sync_global_to_guest(vpmu_vm->vm, pmc_results);
->> +
->> +	run_vcpu(vpmu_vm->vcpu);
->> +
->> +	sync_global_from_guest(vpmu_vm->vm, pmc_results);
->> +}
->> +
->> +static void run_test(struct test_desc *t)
->> +{
->> +	pr_debug("Test: %s\n", t->name);
->> +
->> +	create_vpmu_vm_with_filter(guest_code, t->filter);
->> +
->> +	run_vcpu_and_sync_pmc_results();
->> +
->> +	t->check_result();
->> +
->> +	destroy_vpmu_vm(vpmu_vm);
->> +}
->> +
->> +static struct test_desc tests[] = {
->> +	{"without_filter", check_pmc_counting, { EMPTY_FILTER }},
->> +	{"member_allow_filter", check_pmc_counting,
->> +	 {DEFINE_FILTER(SW_INCR, 0), DEFINE_FILTER(INST_RETIRED, 0),
-> Note the doc says that Event 0 (SW_INCR) is never filtered, as it
-> doesn't count a hardware event
-> 
-> 
-> I would use the defines exposed in the uapi
->> +#define KVM_PMU_EVENT_ALLOW	0
->> +#define KVM_PMU_EVENT_DENY	1
->> +	  DEFINE_FILTER(BR_RETIRED, 0), EMPTY_FILTER}},
->> +	{"member_deny_filter", check_pmc_not_counting,
->> +	 {DEFINE_FILTER(SW_INCR, 1), DEFINE_FILTER(INST_RETIRED, 1),
-> what is the purpose of SW_INCR. YOu do not seem to test it anyway?
->> +	  DEFINE_FILTER(BR_RETIRED, 1), EMPTY_FILTER}},
->> +	{"not_member_deny_filter", check_pmc_counting,
->> +	 {DEFINE_FILTER(SW_INCR, 1), EMPTY_FILTER}},
->> +	{"not_member_allow_filter", check_pmc_not_counting,
->> +	 {DEFINE_FILTER(SW_INCR, 0), EMPTY_FILTER}},
->> +	{ 0 }
->> +};
->> +
->> +static void for_each_test(void)
->> +{
->> +	struct test_desc *t;
->> +
->> +	for (t = &tests[0]; t->name; t++)
->> +		run_test(t);
->> +}
->> +
->> +static bool kvm_supports_pmu_event_filter(void)
->> +{
->> +	int r;
->> +
->> +	vpmu_vm = create_vpmu_vm(guest_code);
->> +
->> +	r = __kvm_has_device_attr(vpmu_vm->vcpu->fd, KVM_ARM_VCPU_PMU_V3_CTRL,
->> +				  KVM_ARM_VCPU_PMU_V3_FILTER);
-> you can use __vcpu_has_device_attr directly
->> +
->> +	destroy_vpmu_vm(vpmu_vm);
->> +	return !r;
->> +}
->> +
->> +static bool host_pmu_supports_events(void)
->> +{
->> +	vpmu_vm = create_vpmu_vm(guest_get_pmceid0);
->> +
->> +	run_vcpu(vpmu_vm->vcpu);
->> +
->> +	destroy_vpmu_vm(vpmu_vm);
->> +
->> +	return pmceid0 & (BR_RETIRED | INST_RETIRED);
-> this will return true if either event is supported. I suspect this is
-> not what you want.
->> +}
->> +
->> +int main(void)
->> +{
->> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
->> +	TEST_REQUIRE(kvm_supports_pmu_event_filter());
->> +	TEST_REQUIRE(host_pmu_supports_events());
->> +
->> +	for_each_test();
->> +}
->> diff --git a/tools/testing/selftests/kvm/include/aarch64/vpmu.h b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
->> index 644dae3814b5..f103d0824f8a 100644
->> --- a/tools/testing/selftests/kvm/include/aarch64/vpmu.h
->> +++ b/tools/testing/selftests/kvm/include/aarch64/vpmu.h
->> @@ -18,6 +18,10 @@ struct vpmu_vm {
->>  	int gic_fd;
->>  };
->>  
->> +struct vpmu_vm *__create_vpmu_vm(void *guest_code,
->> +				 void (*init_pmu)(struct vpmu_vm *vm, void *arg),
->> +				 void *arg);
->> +
->>  struct vpmu_vm *create_vpmu_vm(void *guest_code);
->>  
->>  void destroy_vpmu_vm(struct vpmu_vm *vpmu_vm);
->> diff --git a/tools/testing/selftests/kvm/lib/aarch64/vpmu.c b/tools/testing/selftests/kvm/lib/aarch64/vpmu.c
->> index b3de8fdc555e..76ea03d607f1 100644
->> --- a/tools/testing/selftests/kvm/lib/aarch64/vpmu.c
->> +++ b/tools/testing/selftests/kvm/lib/aarch64/vpmu.c
->> @@ -7,8 +7,9 @@
->>  #include <vpmu.h>
->>  #include <perf/arm_pmuv3.h>
->>  
->> -/* Create a VM that has one vCPU with PMUv3 configured. */
->> -struct vpmu_vm *create_vpmu_vm(void *guest_code)
->> +struct vpmu_vm *__create_vpmu_vm(void *guest_code,
->> +				 void (*init_pmu)(struct vpmu_vm *vm, void *arg),
->> +				 void *arg)
->>  {
->>  	struct kvm_vcpu_init init;
->>  	uint8_t pmuver;
->> @@ -50,12 +51,21 @@ struct vpmu_vm *create_vpmu_vm(void *guest_code)
->>  		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
->>  
->>  	/* Initialize vPMU */
->> +	if (init_pmu)
->> +		init_pmu(vpmu_vm, arg);
->> +
->>  	vcpu_ioctl(vpmu_vm->vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
->>  	vcpu_ioctl(vpmu_vm->vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
->>  
->>  	return vpmu_vm;
->>  }
->>  
->> +/* Create a VM that has one vCPU with PMUv3 configured. */
->> +struct vpmu_vm *create_vpmu_vm(void *guest_code)
->> +{
->> +	return __create_vpmu_vm(guest_code, NULL, NULL);
->> +}
->> +
->>  void destroy_vpmu_vm(struct vpmu_vm *vpmu_vm)
->>  {
->>  	close(vpmu_vm->gic_fd);
-> 
-> Thanks
-> 
-> Eric
+# #  RUN           global.ptrace_read_write ...
+# # Child: 1150
+# # Child GCSPR 0xffffa210ffd8, flags 1, locked 0
+# # process_vm_readv() failed: Bad address (14)
+# # libc-gcs.c:271:ptrace_read_write:Expected ret (-1) == sizeof(rval) (8)
+# # libc-gcs.c:272:ptrace_read_write:Expected val (281473401005692) == rval (281473402849248)
+# # libc-gcs.c:293:ptrace_read_write:Expected val (281473401005692) == ptrace(PTRACE_PEEKDATA, child, (void *)gcspr, NULL) (0)
+# # ptrace_read_write: Test failed at step #1
+# #          FAIL  global.ptrace_read_write
+# not ok 4 global.ptrace_read_write
 
+If I swap process_vm_readv() and process_vm_writev(), then the read
+succeeds but the write fails:
+
+#  RUN           global.ptrace_read_write ...
+# Child: 1996
+# Child GCSPR 0xffffa7fcffd8, flags 1, locked 0
+# process_vm_writev() failed: Bad address (14)
+# libc-gcs.c:291:ptrace_read_write:Expected ret (-1) == sizeof(rval) (8)
+# libc-gcs.c:293:ptrace_read_write:Expected val (281473500358268) == ptrace(PTRACE_PEEKDATA, child, (void *)gcspr, NULL) (0)
+# ptrace_read_write: Test failed at step #1
+#          FAIL  global.ptrace_read_write
+not ok 4 global.ptrace_read_write
+
+> +/* Put it all together, we can safely switch to and from the stack */
+> +TEST_F(map_gcs, stack_switch)
+> +{
+> +	size_t cap_index;
+> +	cap_index = (variant->stack_size / sizeof(unsigned long));
+> +	unsigned long *orig_gcspr_el0, *pivot_gcspr_el0;
+> +
+> +	/* Skip over the stack terminator and point at the cap */
+> + switch (variant->flags & (SHADOW_STACK_SET_MARKER | SHADOW_STACK_SET_TOKEN)) {
+> +	case SHADOW_STACK_SET_MARKER | SHADOW_STACK_SET_TOKEN:
+> +		cap_index -= 2;
+> +		break;
+> +	case SHADOW_STACK_SET_TOKEN:
+> +		cap_index -= 1;
+> +		break;
+> +	case SHADOW_STACK_SET_MARKER:
+> +	case 0:
+> +		/* No cap, no test */
+> +		return;
+> +	}
+> +	pivot_gcspr_el0 = &self->stack[cap_index];
+> +
+> +	/* Pivot to the new GCS */
+> +	ksft_print_msg("Pivoting to %p from %p, target has value 0x%lx\n",
+> +		       pivot_gcspr_el0, get_gcspr(),
+> +		       *pivot_gcspr_el0);
+> +	gcsss1(pivot_gcspr_el0);
+> +	orig_gcspr_el0 = gcsss2();
+> +	ksft_print_msg("Pivoted to %p from %p, target has value 0x%lx\n",
+> +		       pivot_gcspr_el0, get_gcspr(),
+
+Not sure about the intent here, but perhaps "get_gcspr()" here should be
+"orig_gcspr_el0" instead? Ditto in the equivalent place at the
+map_gcs.stack_overflow test below.
+
+Also, it's strange that the tests defined after map_gcs.stack_overflow
+don't run when I execute this test program. I'm doing:
+
+$ ./run_kselftest.sh -t arm64:libc-gcs
+
+I.e., these tests aren't being run in my FVP:
+
+> +FIXTURE_VARIANT_ADD(map_invalid_gcs, too_small)
+> +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_1)
+> +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_2)
+> +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_3)
+> +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_4)
+> +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_5)
+> +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_6)
+> +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_7)
+> +TEST_F(map_invalid_gcs, do_map)
+> +FIXTURE_VARIANT_ADD(invalid_mprotect, exec)
+> +FIXTURE_VARIANT_ADD(invalid_mprotect, bti)
+> +FIXTURE_VARIANT_ADD(invalid_mprotect, exec_bti)
+> +TEST_F(invalid_mprotect, do_map)
+> +TEST_F(invalid_mprotect, do_map_read)
+
+Finally, one last comment:
+
+> +int main(int argc, char **argv)
+> +{
+> +	unsigned long gcs_mode;
+> +	int ret;
+> +
+> +	if (!(getauxval(AT_HWCAP2) & HWCAP2_GCS))
+> +		ksft_exit_skip("SKIP GCS not supported\n");
+> +
+> +	/* 
+> +	 * Force shadow stacks on, our tests *should* be fine with or
+> +	 * without libc support and with or without this having ended
+> +	 * up tagged for GCS and enabled by the dynamic linker.  We
+> +	 * can't use the libc prctl() function since we can't return
+> +	 * from enabling the stack.  Also lock GCS if not already
+> +	 * locked so we can test behaviour when it's locked.
+
+This is probably a leftover from a previous version: the test doesn't
+lock any GCS flag.
+
+> +	 */
+> +	ret = my_syscall2(__NR_prctl, PR_GET_SHADOW_STACK_STATUS, &gcs_mode);
+> +	if (ret) {
+> +		ksft_print_msg("Failed to read GCS state: %d\n", ret);
+> +		return EXIT_FAILURE;
+> +	}
+> +	
+> +	if (!(gcs_mode & PR_SHADOW_STACK_ENABLE)) {
+> +		gcs_mode = PR_SHADOW_STACK_ENABLE;
+> +		ret = my_syscall2(__NR_prctl, PR_SET_SHADOW_STACK_STATUS,
+> +				  gcs_mode);
+> +		if (ret) {
+> +			ksft_print_msg("Failed to configure GCS: %d\n", ret);
+> +			return EXIT_FAILURE;
+> +		}
+> +	}
+> +
+> +	/* Avoid returning in case libc doesn't understand GCS */
+> +	exit(test_harness_run(argc, argv));
+> +}
+
+
+-- 
+Thiago
