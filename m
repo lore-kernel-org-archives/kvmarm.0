@@ -1,85 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB89544C6A
-	for <kvmarm@lists.linux.dev>; Sun, 17 Dec 2023 13:41:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6BE846B81
+	for <kvmarm@lists.linux.dev>; Sun, 17 Dec 2023 17:33:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XahMe1+k"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D777C433C8;
-	Sun, 17 Dec 2023 13:41:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702820481;
-	bh=0lfQ3EiUeF6DD3d5AbtOSGJqbB3vB3wWpoUTvknzNLQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XahMe1+kjkFBeDhI5MBUrgJsncCvLX64JH4tABrA3okfF7Bff2KMzxbB8usmGpjNj
-	 ezlwVjJYnJRAK9UaW+eWuMPHqbD1GrSoqpZ0AxWaKXFkyEX4sqgtdjE3YwWiO9+zXV
-	 8kxCI7FIhHKQi/biuIKZbct3bu+afw7tm1hLLtvWQH7knGQr3bZjd16GSdoGQMA0CX
-	 pHChcHIQ5PxeRdTVIqkZoVZ3xEe2ZYdGDtpy7JMeKSMlZMr3kLHHOGPYu3QG8NSQSu
-	 pD7XrS+InS0JZF/QAntqofSa/Niu8rPcbg8u3p1GLJIigaO7GNU5ASMcxDok4Rutiu
-	 +O7Lkc54s0iAw==
-From: Will Deacon <will@kernel.org>
-To: kvmarm@lists.linux.dev,
-	Fuad Tabba <tabba@google.com>
-Cc: catalin.marinas@arm.com,
-	kernel-team@android.com,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LaqKKaN4"
+Date: Sun, 17 Dec 2023 17:33:10 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1702834395;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EC2ZiWMVE0bsblf0ibQ54FvtheWVnlzmW2NNfQKBpw8=;
+	b=LaqKKaN4EeFoK3k+Hr2niESb0jzOaUpU6BVyUO+geV3UBeR5UxBKxSEgAEihoTJyr76kza
+	nTodzcGM+A5rKHpVIzvjy1fWb/VuxAolzy3NqFAjsfXrHwf9l1QUnji2LNoANoT1fgQL3R
+	uGt0WWHNLmHluVe4HJ1RdJ3OPxtfNkc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Kunkun Jiang <jiangkunkun@huawei.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	james.morse@arm.com,
-	yuzenghui@huawei.com,
-	eric.auger@redhat.com,
-	linux-arm-kernel@lists.infradead.org,
-	joey.gouly@arm.com,
-	broonie@kernel.org,
-	oliver.upton@linux.dev,
-	suzuki.poulose@arm.com,
-	jingzhangos@google.com,
-	maz@kernel.org
-Subject: Re: [PATCH v3 00/17] KVM: arm64: Fixes to fine grain traps and pKVM traps
-Date: Sun, 17 Dec 2023 13:41:07 +0000
-Message-Id: <170281508473.360576.14128850250144458309.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20231214100158.2305400-1-tabba@google.com>
-References: <20231214100158.2305400-1-tabba@google.com>
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	"moderated list:ARM SMMU DRIVERS" <linux-arm-kernel@lists.infradead.org>,
+	kvmarm@lists.linux.dev, open list <linux-kernel@vger.kernel.org>,
+	"wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>
+Subject: Re: [bug report] GICv4.1: vSGI remains pending across the guest reset
+Message-ID: <ZX8w1vfQzeXP5klL@linux.dev>
+References: <7e7f2c0c-448b-10a9-8929-4b8f4f6e2a32@huawei.com>
+ <87a5q983zc.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a5q983zc.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 14 Dec 2023 10:01:40 +0000, Fuad Tabba wrote:
-> Changes from v2:
-> - Rebased on arm64/for-next/sysregs, which includes new system
->   register definitions (Mark, Joey)
-> - Explicitly trap unsupported HFGxTR_EL2 features rather than
->   relying on its nMASK (Joey)
-> - Add new system registers to the auto-generated sysreg rather
->   than hardcoding them (Mark)
-> - Drop patch that was meant as RFC
-> - Added missing system registers, fields, and  system
->   instructions
-> - Split patches that make system register changes
-> - Fixes to patches defining allowed features for protected VMs
-> - Other minor fixes and tidying up
+On Sun, Dec 17, 2023 at 11:26:15AM +0000, Marc Zyngier wrote:
+
+[...]
+
+> But this has *nothing* to do with the guest. This is the *host*
+> userspace performing a write to the redistributor view, which has
+> different semantics. Which is why your earlier description made no
+> sense to me.
 > 
-> [...]
+> I think the problem is slightly larger than what you describe. A write
+> to ISPENDR0 should be propagated to the ITS for any values of the
+> latch, just like this happens on enabling HW-backed SGIs.
+> 
+> Can you please give this a go?
 
-Applied the first four sysreg patches to arm64 (for-next/sysregs), thanks!
+What do you think about using this as an opportunity for a bit of
+cleanup? It'd be nice unify the various MMIO and uaccess handlers for
+SPENDING + CPENDING while being careful about the arch_timer interrupt.
 
-[01/17] arm64/sysreg: Add missing Pauth_LR field definitions to ID_AA64ISAR1_EL1
-        https://git.kernel.org/arm64/c/3b077ad8cb25
-[02/17] arm64/sysreg: Add missing ExtTrcBuff field definition to ID_AA64DFR0_EL1
-        https://git.kernel.org/arm64/c/4f101cdcb578
-[03/17] arm64/sysreg: Add missing system register definitions for FGT
-        https://git.kernel.org/arm64/c/885c6d8e2885
-[04/17] arm64/sysreg: Add missing system instruction definitions for FGT
-        https://git.kernel.org/arm64/c/4ebee8cebdf6
+	clear = ~val;
+	vgic_uaccess_write_spending(val);
+	vgic_uaccess_write_cpending(clear);
 
-Cheers,
+Happy to take your fix too, especially in case I missed something
+obvious :)
+
+[*] https://git.kernel.org/pub/scm/linux/kernel/git/oupton/linux.git/log/?h=kvm-arm64/vsgi-spending-fixes
+
 -- 
-Will
-
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
+Thanks,
+Oliver
