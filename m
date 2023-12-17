@@ -1,114 +1,232 @@
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D79EA9
-	for <kvmarm@lists.linux.dev>; Sun, 17 Dec 2023 02:18:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8331E3219A;
+	Sun, 17 Dec 2023 11:26:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l8IEuVEC"
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5906eac104bso1447377eaf.2
-        for <kvmarm@lists.linux.dev>; Sat, 16 Dec 2023 18:18:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1702779495; x=1703384295; darn=lists.linux.dev;
-        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=OFl8kjpw91XelbaLp/NqZrQDKjPZSUtARdmSUPQXSX8=;
-        b=l8IEuVECGqxIg8pNAX4Jm4JGOxPwKQmnK6USnESWLsbqQw7zBEMgsqwDrNbCnomETS
-         y6Tl5HAwPg00siXOAwxT7+zSw4S9IUl478Wuhx3DHrhPU+BgyEOS4k6I+ugaBM0Likx8
-         flkaS2yF5QB6oOTMIQD6Ul3ecFLjm1pbYrm7GaqqOKIOA4daOfjyejpDdSxfNDiY/tq4
-         9a7wtGUGn+6+Was9OhIEBX0W8C8Ai/HnBLswB0yQovjJxKXIzJHsJtMW6UwH7N1vy+bz
-         9sExolIRK2cgcYDuv8wNXDGz6m7IWWHTlAyguloHhU2062APCJBqMixLPqgYfDJx74ax
-         DcYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702779495; x=1703384295;
-        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OFl8kjpw91XelbaLp/NqZrQDKjPZSUtARdmSUPQXSX8=;
-        b=Rj+VlSHdfEsQSx7BZhaunmiomYO/XO3vlrMfgJHMcEa3n2+E9y23ouVNFQPiteklQp
-         hXTJhqc8AbyTARm7N+6ya9BH3kE1rM2sK+363Ayd78kU4UjG1Pv2AYrqP2WSkJssw/vG
-         +f3UayxSCCCrVJWBtcxF+TrSeT2i94QJshXlsAECfkz1PKZSeLcM44ZhhGEBI6VPkVXk
-         tw8UkFcS/+i9P3XdaJaGAw3m+qQYbngMmTyuG7SjssFAHww8e6T+GRzPuyHx9cfmB5Rg
-         7aAodD8RpKb91sfSyAg6USKgv/4RBzOlCIHxzSfSU6OFy7lLdAaEPWSp2rC5dApR58cv
-         G7eQ==
-X-Gm-Message-State: AOJu0YymPXAKqpgTNwJPcdOiZF3nN1pkfIOf9VT74f2Fr2TbboPylNO7
-	tra1jqILfLUjZSg+zgiYTPohxw==
-X-Google-Smtp-Source: AGHT+IF+rykhjl/vJMlMFtG1M64I68Xtmq2p6wjQt8Jp7El542Y7P1lc23SbwSwdEGVtxnixp9/AeQ==
-X-Received: by 2002:a05:6808:3a09:b0:3b9:e828:816 with SMTP id gr9-20020a0568083a0900b003b9e8280816mr20647236oib.48.1702779495498;
-        Sat, 16 Dec 2023 18:18:15 -0800 (PST)
-Received: from localhost ([2804:14d:7e39:8470:a30f:cc0e:7239:16c3])
-        by smtp.gmail.com with ESMTPSA id ja11-20020a170902efcb00b001d39f6edd54sm1453638plb.84.2023.12.16.18.18.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Dec 2023 18:18:14 -0800 (PST)
-References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
- <20231122-arm64-gcs-v7-34-201c483bd775@kernel.org>
- <875y1089i4.fsf@linaro.org>
- <485b6454-135c-4dd4-b38e-8fb8a02779cd@sirena.org.uk>
-User-agent: mu4e 1.10.8; emacs 29.1
-From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
- <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Morton
- <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
- <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, Oleg
- Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, Kees
- Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, "Rick P.
- Edgecombe" <rick.p.edgecombe@intel.com>, Deepak Gupta
- <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, Szabolcs Nagy
- <Szabolcs.Nagy@arm.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
- <aou@eecs.berkeley.edu>, Florian Weimer <fweimer@redhat.com>, Christian
- Brauner <brauner@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v7 34/39] kselftest/arm64: Add a GCS test program built
- with the system libc
-In-reply-to: <485b6454-135c-4dd4-b38e-8fb8a02779cd@sirena.org.uk>
-Date: Sat, 16 Dec 2023 23:18:13 -0300
-Message-ID: <871qbl7esa.fsf@linaro.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bwOg1YzV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76B49C433C7;
+	Sun, 17 Dec 2023 11:26:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702812383;
+	bh=RyZFvFJ+ALGNyHMWUvbkqjcQLUmcXZtzeRYDSGpYI3s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bwOg1YzVOP6Pmx60xNxvbqRoFse5NJmoPOsJTTUvgFezZ0LojWpbP0s3kfyrvXynj
+	 s0/BgpVDvE6TtgAA3EzHMl5clql2reSfvIvND08VQoBxvg/ahXxwcw0dN8Y1PPfFmf
+	 ZAZIqvT93tAh4Zuffz9pjsi4dmbDC3TKAHXeOrLLq9Vnc6iHFe5ORuLOQMEE6bHDhW
+	 qNeGn8YlOqjXb17UdrZCgDDTbJjrdCD1bty/U85jYwja0c0pcJq4ZljIv4snEPU6zm
+	 NkvDHUrlRG/F56ZbNLs88UzjBAozUSFeHSY1JDCXREl1XNanpuRLV1XS5Nw11oM5U2
+	 AvzAWCwPUj9Uw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rEpHo-004oS6-RN;
+	Sun, 17 Dec 2023 11:26:20 +0000
+Date: Sun, 17 Dec 2023 11:26:15 +0000
+Message-ID: <87a5q983zc.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kunkun Jiang <jiangkunkun@huawei.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Jean-Philippe Brucker
+	<jean-philippe@linaro.org>,
+	"moderated list:ARM SMMU DRIVERS" <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	open list <linux-kernel@vger.kernel.org>,
+	"wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>
+Subject: Re: [bug report] GICv4.1: vSGI remains pending across the guest reset
+In-Reply-To: <7e7f2c0c-448b-10a9-8929-4b8f4f6e2a32@huawei.com>
+References: <7e7f2c0c-448b-10a9-8929-4b8f4f6e2a32@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, jean-philippe@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, wanghaibin.wang@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Thu, 14 Dec 2023 12:13:57 +0000,
+Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+>=20
+> Hi list,
+>=20
+> We have observed on GICv4.1 systems that, after a guest reset, the
+> secondary VCPU would receive an IPI_CPU_STOP accidently and failed to
+> come online eventually.
+>=20
+> | Guest User-space
 
-Mark Brown <broonie@kernel.org> writes:
+Guest userspace????
 
->> Also, it's strange that the tests defined after map_gcs.stack_overflow
->> don't run when I execute this test program. I'm doing:
+> |
+> | reset (with a vSGI pending in the
+> | hardware) [0]
+> |
+> | disable the distributor (write 0
+> | into GICD_CTLR) [1]
+> |
+> | clear pending status (write 0 into
+> | GICR_ISPENDR0 for each RD) [2]
+
+This cannot clear the pending bits. Writing 0 to any of the
+ISPEND/ICPEND registers is effectively a NOP.
+
+If you want to remove the pending SGIs, you need to write a bunch of
+1s to ICPENDR0.
+
+> |
+> | disable the distributor (write 0
+> | into GICD_CTLR) [3]
+> |
+> | enable the distributor with ARE,
+> | Group1 and nASSGIreq [4]
+>=20
+> The problem is that even if user-space tries to disable the distributor
+
+I don't understand what userspace does here. Why is it significant
+that it is an EL0 access? I don't know of any SW doing that, but even
+if it existed, this should make no difference.
+
+> and clear pending bits for all SGIs, we don't actually propogate it into
+> HW (we only record it via vgic_dist->{enabled, nassgireq} and
+> vgic_irq->pending_latch) and the vSGI remains pending across the guest
+> reset.
 >
->> $ ./run_kselftest.sh -t arm64:libc-gcs
->
->> I.e., these tests aren't being run in my FVP:
->
->> > +FIXTURE_VARIANT_ADD(map_invalid_gcs, too_small)
->> > +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_1)
->> > +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_2)
->> > +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_3)
->> > +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_4)
->> > +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_5)
->> > +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_6)
->> > +FIXTURE_VARIANT_ADD(map_invalid_gcs, unligned_7)
->> > +TEST_F(map_invalid_gcs, do_map)
->> > +FIXTURE_VARIANT_ADD(invalid_mprotect, exec)
->> > +FIXTURE_VARIANT_ADD(invalid_mprotect, bti)
->> > +FIXTURE_VARIANT_ADD(invalid_mprotect, exec_bti)
->> > +TEST_F(invalid_mprotect, do_map)
->> > +TEST_F(invalid_mprotect, do_map_read)
->
-> I'm seeing all of those appearing.  I'm not sure what to say there -
-> that's all kselftest framework stuff, I'd expect the framework to say
-> something about what it's doing if it decides to skip and I can't think
-> why it would decide to skip.
+> And when we're at [4], all vSGI's vgic_irq->hw are *true* and
+> vgic_v4_enable_vsgis() becomes a nop.. That's not good.
+>=20
+> The following solution can solve the problem. Not sure if this is a good
+> solution.Sent out early for suggestions or solutions.
+>=20
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> index 89117ba2528a..3678ab33f5b9 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> @@ -374,6 +374,10 @@ static int vgic_v3_uaccess_write_pending(struct
+> kvm_vcpu *vcpu,
+> =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 irq->pendi=
+ng_latch =3D true;
+> =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 vgic_queue=
+_irq_unlock(vcpu->kvm, irq, flags);
+> =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 } else {
+> + =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (irq->hw &&=
+ vgic_irq_is_sgi(irq->intid))
+> + =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 irq_set_irqchip_state(irq->host_irq,
+> + =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0 IRQCH=
+IP_STATE_PENDING,
+> + =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=
+=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0 false=
+);
+> =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 irq->pendi=
+ng_latch =3D false;
+> =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 raw_spin_u=
+nlock_irqrestore(&irq->irq_lock, flags);
+> =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 }
+>=20
 
-Thanks. I'll poke some more to see if I can figure out what's going on.
+But this has *nothing* to do with the guest. This is the *host*
+userspace performing a write to the redistributor view, which has
+different semantics. Which is why your earlier description made no
+sense to me.
 
--- 
-Thiago
+I think the problem is slightly larger than what you describe. A write
+to ISPENDR0 should be propagated to the ITS for any values of the
+latch, just like this happens on enabling HW-backed SGIs.
+
+Can you please give this a go?
+
+Thanks,
+
+	M.
+
+=46rom 9932d74392d969057e84bc3c18bd15f1769b6211 Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Sun, 17 Dec 2023 11:15:09 +0000
+Subject: [PATCH] KVM: arm64: vgic-v4: Restore pending state on host userspa=
+ce
+ write
+
+When the VMM writes to ISPENDR0 to set the state pending state of
+an SGI, we fail to convey this to the HW if this SGI is already
+backed by a GICv4.1 vSGI.
+
+This is a bit of a corner case, as this would only occur if the
+vgic state is changed on an already running VM, but this can
+apparently happen across a guest reset driven by the VMM.
+
+Fix this by always writing out the pending_latch value to the
+HW, and reseting it to false.
+
+Reported-by: Kunkun Jiang <jiangkunkun@huawei.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/7e7f2c0c-448b-10a9-8929-4b8f4f6e2a32@huawei=
+.com
+---
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 27 +++++++++++++++++----------
+ 1 file changed, 17 insertions(+), 10 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-=
+mmio-v3.c
+index a764b0ab8bf9..2533f264b954 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -365,19 +365,26 @@ static int vgic_v3_uaccess_write_pending(struct kvm_v=
+cpu *vcpu,
+ 		struct vgic_irq *irq =3D vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+=20
+ 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+-		if (test_bit(i, &val)) {
+-			/*
+-			 * pending_latch is set irrespective of irq type
+-			 * (level or edge) to avoid dependency that VM should
+-			 * restore irq config before pending info.
+-			 */
+-			irq->pending_latch =3D true;
+-			vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+-		} else {
++
++		/*
++		 * pending_latch is set irrespective of irq type
++		 * (level or edge) to avoid dependency that VM should
++		 * restore irq config before pending info.
++		 */
++		irq->pending_latch =3D test_bit(i, &val);
++
++		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
++			irq_set_irqchip_state(irq->host_irq,
++					      IRQCHIP_STATE_PENDING,
++					      irq->pending_latch);
+ 			irq->pending_latch =3D false;
+-			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+ 		}
+=20
++		if (irq->pending_latch)
++			vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
++		else
++			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
++
+ 		vgic_put_irq(vcpu->kvm, irq);
+ 	}
+=20
+--=20
+2.39.2
+
+
+--=20
+Without deviation from the norm, progress is not possible.
