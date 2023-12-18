@@ -1,44 +1,44 @@
 Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B872A498A9
-	for <kvmarm@lists.linux.dev>; Mon, 18 Dec 2023 14:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8D84FF6A
+	for <kvmarm@lists.linux.dev>; Mon, 18 Dec 2023 14:00:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C3wUGAlD"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-3366bf4adbcso359898f8f.2
-        for <kvmarm@lists.linux.dev>; Mon, 18 Dec 2023 06:00:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ScoOryAC"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-33666ece1c6so824002f8f.2
+        for <kvmarm@lists.linux.dev>; Mon, 18 Dec 2023 06:00:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702908005; x=1703512805; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1702908007; x=1703512807; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/DzJPItky+7MIXN0FJdMX89fRzHYJTFATAafmjRyPww=;
-        b=C3wUGAlDh6B1C0LfS6cB5eR3xItbsYBwPq5QoJ2nxBmQlzMsNe6LrxHxqR1nogKrZ0
-         1qfYbKiWk/S7JZ/LdGW1GuGgCWwXlLGjL+QIbZNKWGQ2fGqWc3BjkxRKnyQZdFccyhnU
-         WGrxz8MMUQhFI8/FSz7cJzio63yi+Z4bcd/Qp7GvEoQyxx/H9cHReU/Qt+khCrWs4bLN
-         spqCHYT9voC25ZYeV8og5cOXfGgMTmScDdNB3Q9z6LL2BG8zHN4b9icc0mxEsvu8asVH
-         PRdhQqt2y2tybHomK7ragHaqmWIsFHu2DYNkzH8lFdmK5fYXm6u+ZaNFk38MOjgcCDPb
-         5vkg==
+        bh=RVeSPgnrVagCch9Gfw7vmBqjH7Htt5Ae7divhOxYmU8=;
+        b=ScoOryACTY1dEIFqZyDBzCpNFHeibpYvSdFQ+pgBEIHCnKIHOZuMuvJK7bGDvG2ziY
+         wKN8B/7q2IddfnoMxmxTjp22+zwgKwauUxMP7+tfXNOWKZ1tnCJUdtU2xXQpWYPmNTrW
+         VGef9t7VOuhHK0VwQKim4XdrVFKIA+V+0sWH8nIfwqPlAvxRxPTrIv7GHkUnqnei7Pt5
+         mbtQ7qK97ucEBWTJ45GZNWa/DfFR3wsfI5bqr2PgAB7cB2N6k4GoHZAUUxRXnRdvF+Ae
+         weImxdn+9Xl/xXTQrnrnaG6Qni/Mh2Brqb7TeFB7dl118SLYwf6RBDXFWw12/4NEYNBB
+         eOBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702908005; x=1703512805;
+        d=1e100.net; s=20230601; t=1702908007; x=1703512807;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/DzJPItky+7MIXN0FJdMX89fRzHYJTFATAafmjRyPww=;
-        b=HWt97s+XgxgeQB1//8Q7suYfbr3KB3Fyce6ps92BZRiEIXqMti9KzMAT2SyzWKxAW4
-         BTeuUBv74qJH6lrexDd3qIJf1+Q3QuYF3DJ29mQ2iNbtbQ0scxnZ8tAX+Yd6tM403C50
-         5mnNMzjftWCFGwcNHrfyL7SsnOILOXE8CjhPEU/HcR9YFDirTZMDKUGtPQOiHD9FlV+1
-         fbkYg9rriyNR3OxNwquv53wl+clnnzjZU2aWER6otImKTqnxe3JfOjfq4ZeQ9/WpgsNC
-         4ZT8AeWtngZXmslODr1oN4y6x28vArH5i6c/FinioEgdFxtFglgP9bUroXp9odp2L1E0
-         qR7w==
-X-Gm-Message-State: AOJu0YwRO1UROW/y0PtIaMv061Np/P8x86bJMZnk8p+DFzs7xiNBCnmy
-	iagkLMfHOUUyOL7gDEX71EOj8tZhvOWxurVi9v0=
-X-Google-Smtp-Source: AGHT+IFva+9bduuuV31oR8xkc8BswjCQxwwMXxhfSUj0PJxjfOR04yw1jMSSd5Mf5dzNJ/J+K9OLoYJn4glXAxT7l0Q=
+        bh=RVeSPgnrVagCch9Gfw7vmBqjH7Htt5Ae7divhOxYmU8=;
+        b=PMi9lwLNaxxrZClPQ4CTEE9OpuKf5CUmTGqmpYGGAT0DVR0ZqP85rjZ9fcq+oyp24C
+         fNgfpJLBlwWCh6dKMX4po7xIk2BVcmebeqJdbDZ7EOPFe89VGNPGhCsax2wKwcNV3euj
+         sGFsFmoWv/maGPWbzQ/f1ReSFA455Ug9o6BstP/xRoP3JIGOHmvHclFsZPOLIS8Nsh4n
+         azEGyoc8usGvdain12UVvLrTJW+36Z699UIoO+59lcTXP1fgk5ns3rPLM2mOs0w7vBks
+         cxu808Go4x99waOYZnn4Rh9BRuPHKoqjEfMnA+Qh3qJOIk45LfOskbyhS94B48/+Hfp+
+         oDkg==
+X-Gm-Message-State: AOJu0YxlGlIle39ZOIneSimYErnoFBRArf3AADdYGqr/JtpBCY5YMTf6
+	blQzRaf4uX/f/akRsMmY3rwU0RPh9VD0DHMiNvY=
+X-Google-Smtp-Source: AGHT+IEiB7+Bsh8hl0BeEi1gynzTqms9UzqwBVVufWuvsdpGz2NnU2Nuh5mMuTpa32OSR/46WklHFd6NPUWZmF2MJtg=
 X-Received: from sebkvm.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:cd5])
- (user=sebastianene job=sendgmr) by 2002:adf:d1cf:0:b0:333:5232:d7f5 with SMTP
- id b15-20020adfd1cf000000b003335232d7f5mr91065wrd.8.1702908005046; Mon, 18
- Dec 2023 06:00:05 -0800 (PST)
-Date: Mon, 18 Dec 2023 13:58:58 +0000
+ (user=sebastianene job=sendgmr) by 2002:a05:6000:400f:b0:336:6611:7936 with
+ SMTP id cp15-20020a056000400f00b0033666117936mr7753wrb.11.1702908007241; Mon,
+ 18 Dec 2023 06:00:07 -0800 (PST)
+Date: Mon, 18 Dec 2023 13:58:59 +0000
 In-Reply-To: <20231218135859.2513568-2-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -48,9 +48,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20231218135859.2513568-2-sebastianene@google.com>
 X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20231218135859.2513568-10-sebastianene@google.com>
-Subject: [PATCH v4 08/10] arm64: ptdump: Interpret memory attributes based on
- the runtime config
+Message-ID: <20231218135859.2513568-11-sebastianene@google.com>
+Subject: [PATCH v4 09/10] arm64: ptdump: Interpret pKVM ownership annotations
 From: Sebastian Ene <sebastianene@google.com>
 To: will@kernel.org, Oliver Upton <oliver.upton@linux.dev>, 
 	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
@@ -62,107 +61,183 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Sebastian Ene <sebastianene@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Introduce two callbacks that verify the current runtime configuration
-before parsing the attribute fields. This is used to check when FWB is
-enabled which changes the interpretation of the descriptor bits.
+When pKVM is enabled the software bits are used to keep track of the
+page sharing state. Interepret these fields when pKVM is enabled and
+print the sharing state. Move the definitions to common pagetable
+header.
 
 Signed-off-by: Sebastian Ene <sebastianene@google.com>
 ---
- arch/arm64/include/asm/ptdump.h |  7 +++++++
- arch/arm64/kvm/ptdump.c         | 32 ++++++++++++++++++++++++++++++++
- arch/arm64/mm/ptdump.c          |  6 ++++++
- 3 files changed, 45 insertions(+)
+ arch/arm64/include/asm/kvm_pgtable.h          | 26 ++++++++++
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 26 ----------
+ arch/arm64/kvm/ptdump.c                       | 47 +++++++++++++++++--
+ 3 files changed, 69 insertions(+), 30 deletions(-)
 
-diff --git a/arch/arm64/include/asm/ptdump.h b/arch/arm64/include/asm/ptdump.h
-index 4e728d2a1..e150fc21f 100644
---- a/arch/arm64/include/asm/ptdump.h
-+++ b/arch/arm64/include/asm/ptdump.h
-@@ -23,11 +23,18 @@ struct ptdump_info {
- 	unsigned long			base_addr;
- };
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 37f2a8532..7f654d4aa 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -87,6 +87,13 @@ typedef u64 kvm_pte_t;
+  */
+ #define KVM_INVALID_PTE_LOCKED		BIT(10)
  
-+/* Forward declaration */
-+struct pg_state;
++/* This corresponds to page-table locking order */
++enum pkvm_component_id {
++	PKVM_ID_HOST,
++	PKVM_ID_HYP,
++	PKVM_ID_FFA,
++};
 +
- struct prot_bits {
- 	u64		mask;
- 	u64		val;
- 	const char	*set;
- 	const char	*clear;
-+	/* bit ignored if the callback returns false */
-+	bool		(*feature_on)(const struct pg_state *ctxt);
-+	/* bit ignored if the callback returns true */
-+	bool		(*feature_off)(const struct pg_state *ctxt);
+ static inline bool kvm_pte_valid(kvm_pte_t pte)
+ {
+ 	return pte & KVM_PTE_VALID;
+@@ -230,6 +237,25 @@ enum kvm_pgtable_prot {
+ 	KVM_PGTABLE_PROT_SW3			= BIT(58),
  };
  
- struct pg_level {
++/*
++ * SW bits 0-1 are reserved to track the memory ownership state of each page:
++ *   00: The page is owned exclusively by the page-table owner.
++ *   01: The page is owned by the page-table owner, but is shared
++ *       with another entity.
++ *   10: The page is shared with, but not owned by the page-table owner.
++ *   11: Reserved for future use (lending).
++ */
++enum pkvm_page_state {
++	PKVM_PAGE_OWNED			= 0ULL,
++	PKVM_PAGE_SHARED_OWNED		= KVM_PGTABLE_PROT_SW0,
++	PKVM_PAGE_SHARED_BORROWED	= KVM_PGTABLE_PROT_SW1,
++	__PKVM_PAGE_RESERVED		= KVM_PGTABLE_PROT_SW0 |
++					  KVM_PGTABLE_PROT_SW1,
++
++	/* Meta-states which aren't encoded directly in the PTE's SW bits */
++	PKVM_NOPAGE,
++};
++
+ #define KVM_PGTABLE_PROT_RW	(KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_W)
+ #define KVM_PGTABLE_PROT_RWX	(KVM_PGTABLE_PROT_RW | KVM_PGTABLE_PROT_X)
+ 
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+index ca8f76915..677686b86 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+@@ -14,25 +14,6 @@
+ #include <nvhe/pkvm.h>
+ #include <nvhe/spinlock.h>
+ 
+-/*
+- * SW bits 0-1 are reserved to track the memory ownership state of each page:
+- *   00: The page is owned exclusively by the page-table owner.
+- *   01: The page is owned by the page-table owner, but is shared
+- *       with another entity.
+- *   10: The page is shared with, but not owned by the page-table owner.
+- *   11: Reserved for future use (lending).
+- */
+-enum pkvm_page_state {
+-	PKVM_PAGE_OWNED			= 0ULL,
+-	PKVM_PAGE_SHARED_OWNED		= KVM_PGTABLE_PROT_SW0,
+-	PKVM_PAGE_SHARED_BORROWED	= KVM_PGTABLE_PROT_SW1,
+-	__PKVM_PAGE_RESERVED		= KVM_PGTABLE_PROT_SW0 |
+-					  KVM_PGTABLE_PROT_SW1,
+-
+-	/* Meta-states which aren't encoded directly in the PTE's SW bits */
+-	PKVM_NOPAGE,
+-};
+-
+ #define PKVM_PAGE_STATE_PROT_MASK	(KVM_PGTABLE_PROT_SW0 | KVM_PGTABLE_PROT_SW1)
+ static inline enum kvm_pgtable_prot pkvm_mkstate(enum kvm_pgtable_prot prot,
+ 						 enum pkvm_page_state state)
+@@ -53,13 +34,6 @@ struct host_mmu {
+ };
+ extern struct host_mmu host_mmu;
+ 
+-/* This corresponds to page-table locking order */
+-enum pkvm_component_id {
+-	PKVM_ID_HOST,
+-	PKVM_ID_HYP,
+-	PKVM_ID_FFA,
+-};
+-
+ extern unsigned long hyp_nr_cpus;
+ 
+ int __pkvm_prot_finalize(void);
 diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-index 80c338e03..0ad7944e5 100644
+index 0ad7944e5..4296e739f 100644
 --- a/arch/arm64/kvm/ptdump.c
 +++ b/arch/arm64/kvm/ptdump.c
-@@ -40,6 +40,18 @@ static struct kvm_pgtable_mm_ops ptdump_host_mmops = {
- 	.virt_to_phys	= get_host_pa,
- };
+@@ -52,6 +52,11 @@ static bool is_fwb_enabled(const struct pg_state *m)
+ 	return fwb_enabled;
+ }
  
-+static bool is_fwb_enabled(const struct pg_state *m)
++static bool is_pkvm_enabled(const struct pg_state *m)
 +{
-+	struct kvm_pgtable_snapshot *snapshot = m->seq->private;
-+	struct kvm_pgtable *pgtable = &snapshot->pgtable;
-+	bool fwb_enabled = false;
-+
-+	if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
-+		fwb_enabled = !(pgtable->flags & KVM_PGTABLE_S2_NOFWB);
-+
-+	return fwb_enabled;
++	return is_protected_kvm_enabled();
 +}
 +
  static const struct prot_bits stage2_pte_bits[] = {
  	{
  		.mask	= PTE_VALID,
-@@ -81,6 +93,26 @@ static const struct prot_bits stage2_pte_bits[] = {
- 		.val	= PTE_TABLE_BIT,
- 		.set	= "   ",
- 		.clear	= "BLK",
+@@ -113,22 +118,56 @@ static const struct prot_bits stage2_pte_bits[] = {
+ 		.val	= PTE_S2_MEMATTR(MT_S2_FWB_NORMAL) | PTE_VALID,
+ 		.set	= "MEM/NORMAL FWB",
+ 		.feature_on	= is_fwb_enabled,
 +	}, {
-+		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR | PTE_VALID,
-+		.val	= PTE_S2_MEMATTR(MT_S2_DEVICE_nGnRE) | PTE_VALID,
-+		.set	= "DEVICE/nGnRE",
-+		.feature_off	= is_fwb_enabled,
++		.mask	= KVM_INVALID_PTE_OWNER_MASK | PTE_VALID,
++		.val	= FIELD_PREP_CONST(KVM_INVALID_PTE_OWNER_MASK,
++					   PKVM_ID_HYP),
++		.set	= "HYP",
 +	}, {
-+		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR | PTE_VALID,
-+		.val	= PTE_S2_MEMATTR(MT_S2_FWB_DEVICE_nGnRE) | PTE_VALID,
-+		.set	= "DEVICE/nGnRE FWB",
-+		.feature_on	= is_fwb_enabled,
++		.mask	= KVM_INVALID_PTE_OWNER_MASK | PTE_VALID,
++		.val	= FIELD_PREP_CONST(KVM_INVALID_PTE_OWNER_MASK,
++					   PKVM_ID_FFA),
++		.set	= "FF-A",
 +	}, {
-+		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR | PTE_VALID,
-+		.val	= PTE_S2_MEMATTR(MT_S2_NORMAL) | PTE_VALID,
-+		.set	= "MEM/NORMAL",
-+		.feature_off	= is_fwb_enabled,
++		.mask	= __PKVM_PAGE_RESERVED | PTE_VALID,
++		.val	= PKVM_PAGE_OWNED | PTE_VALID,
++		.set	= "PKVM_PAGE_OWNED",
++		.feature_on	= is_pkvm_enabled,
 +	}, {
-+		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR | PTE_VALID,
-+		.val	= PTE_S2_MEMATTR(MT_S2_FWB_NORMAL) | PTE_VALID,
-+		.set	= "MEM/NORMAL FWB",
-+		.feature_on	= is_fwb_enabled,
++		.mask   = __PKVM_PAGE_RESERVED | PTE_VALID,
++		.val	= PKVM_PAGE_SHARED_OWNED | PTE_VALID,
++		.set	= "PKVM_PAGE_SHARED_OWNED",
++		.feature_on     = is_pkvm_enabled,
++	}, {
++		.mask	= __PKVM_PAGE_RESERVED | PTE_VALID,
++		.val	= PKVM_PAGE_SHARED_BORROWED | PTE_VALID,
++		.set	= "PKVM_PAGE_SHARED_BORROWED",
++		.feature_on     = is_pkvm_enabled,
++	}, {
++		.mask	= PKVM_NOPAGE | PTE_VALID,
++		.val	= PKVM_NOPAGE,
++		.set	= "PKVM_NOPAGE",
++		.feature_on     = is_pkvm_enabled,
  	}, {
  		.mask	= KVM_PGTABLE_PROT_SW0,
  		.val	= KVM_PGTABLE_PROT_SW0,
-diff --git a/arch/arm64/mm/ptdump.c b/arch/arm64/mm/ptdump.c
-index 015ed65d3..6c7208f66 100644
---- a/arch/arm64/mm/ptdump.c
-+++ b/arch/arm64/mm/ptdump.c
-@@ -177,6 +177,12 @@ static void dump_prot(struct pg_state *st, const struct prot_bits *bits,
- 	for (i = 0; i < num; i++, bits++) {
- 		const char *s;
+-		.set	= "SW0", /* PKVM_PAGE_SHARED_OWNED */
++		.set    = "SW0",
++		.feature_off	= is_pkvm_enabled,
+ 	}, {
+-		.mask   = KVM_PGTABLE_PROT_SW1,
++		.mask	= KVM_PGTABLE_PROT_SW1,
+ 		.val	= KVM_PGTABLE_PROT_SW1,
+-		.set	= "SW1", /* PKVM_PAGE_SHARED_BORROWED */
++		.set	= "SW1",
++		.feature_off	= is_pkvm_enabled,
+ 	}, {
+-		.mask	= KVM_PGTABLE_PROT_SW2,
++		.mask   = KVM_PGTABLE_PROT_SW2,
+ 		.val	= KVM_PGTABLE_PROT_SW2,
+ 		.set	= "SW2",
++		.feature_off	= is_pkvm_enabled,
+ 	}, {
+ 		.mask   = KVM_PGTABLE_PROT_SW3,
+ 		.val	= KVM_PGTABLE_PROT_SW3,
+ 		.set	= "SW3",
++		.feature_off	= is_pkvm_enabled,
+ 	},
+ };
  
-+		if (bits->feature_on && !bits->feature_on(st))
-+			continue;
-+
-+		if (bits->feature_off && bits->feature_off(st))
-+			continue;
-+
- 		if ((st->current_prot & bits->mask) == bits->val)
- 			s = bits->set;
- 		else
 -- 
 2.43.0.472.g3155946c3a-goog
 
