@@ -1,43 +1,42 @@
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
+Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6AA4239A;
-	Mon, 18 Dec 2023 20:22:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2ED7206D;
+	Mon, 18 Dec 2023 20:31:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-6da682dcf66so513814a34.1;
-        Mon, 18 Dec 2023 12:22:15 -0800 (PST)
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-203aa9c19ceso242192fac.0;
+        Mon, 18 Dec 2023 12:31:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702930934; x=1703535734;
+        d=1e100.net; s=20230601; t=1702931461; x=1703536261;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fGmAXhjX5Y4s1RFRjJ9B0I+ERw19f5OL+MbL6CYALRM=;
-        b=qYZVXEI0pc1GJuF89BDCzGeOIM4vEt7LSOagxxh4RuQURAbpSN/2jehohAeCDgYrh9
-         5MNzqSo1VWaMnJSUCvo3a9xopiMlxarAGHvrF+L/QmA71/hzYmSPEwsdbht5ukfh0oX2
-         eUikqhcttW6+7IyhDrBhAb3yc1bS7iRPAck7a2nnzeF++k31WwfUJwyWkI1kAjS3s8tB
-         q0cFZg35W2yZxrfDz15z3ctuzLUAzHjEvEznhtiGb7RPwrUOma8zTCX6ELSThmHQcq2J
-         zv1RNLtkKlYmbT7oLYw7aPAu3O4FS50rYTdXtX+QwNqWtCdlh7GhLLcQac1Y0bVZKw6i
-         KgAg==
-X-Gm-Message-State: AOJu0YxFElQWSJUXvRoTH+UZlm2WKNT1YImK01ZJ11mdFTNJ7I9wt/pz
-	oIYL2J8hUYwMDvVAG4XTlyqw7PgxwmbwXzQYW4s=
-X-Google-Smtp-Source: AGHT+IFFmOzyX7COzVhRLC4hkeEXc2MIlTmVhC4D34QheVfbqsxG755bG+zIachM1eZIx9UOshFO0sQ+BYaFyFhhPA4=
-X-Received: by 2002:a4a:a581:0:b0:591:cdc0:f28d with SMTP id
- d1-20020a4aa581000000b00591cdc0f28dmr5277719oom.0.1702930934339; Mon, 18 Dec
- 2023 12:22:14 -0800 (PST)
+        bh=5tAlFGdRk7dsOpEqAvR+OuH9VoSVkSPM03m6WEM5ITU=;
+        b=YtDirdKH07qtoD6aB3Pvqh/kP1lnjlLlWDGo4NDVnWZBR9/GtxVpOOniCZCFZKUutg
+         r0AtmHdFI1c0hf7k87UdOYaT2TyD6y2my/Zdp7m4pRYv8Kwhrv2fb1WVYbl+1/j6Mpex
+         dXBjH1ignX0q753iVsoju7cWWagpunZeOqV7/rhVSJw/cWLfCxzoubO5Ghm42EgIelJ+
+         BGsG1HmI/V3aiG1umY2wLSlV9tJH0tcUqb6LUGQ2iNVtShWKZ/FqoMB+maf+G5M7AVWB
+         PzdXVRkOcBZLOiuObN1PLlG5z7SzbRuSGtM8F4IXxWSpYx/QaFirmeHkdwW7Wijo/fw+
+         ALBg==
+X-Gm-Message-State: AOJu0YxDr62nFdxF9Uvqqxp++SpoRBrDQQmRi8chx05BrlvFWydDInxr
+	eQA/PKoYnQXzkHc4YZO/WNh1TJQ0J4ah4dSXLtM=
+X-Google-Smtp-Source: AGHT+IH2/Xcl6oIvnSfLcxllKujvsfBDeafZqBXfGcoJ6ZYuhTDpjdkrOr2cBBTAZn748hcGAPQjloWIL3tDogLMDwE=
+X-Received: by 2002:a05:6870:420d:b0:1fb:5d05:685e with SMTP id
+ u13-20020a056870420d00b001fb5d05685emr31445963oac.2.1702931460922; Mon, 18
+ Dec 2023 12:31:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk> <E1rDOg2-00Dvjk-RI@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1rDOg2-00Dvjk-RI@rmk-PC.armlinux.org.uk>
+References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk> <E1rDOg7-00Dvjq-VZ@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1rDOg7-00Dvjq-VZ@rmk-PC.armlinux.org.uk>
 From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Mon, 18 Dec 2023 21:22:03 +0100
-Message-ID: <CAJZ5v0ju1JHgpjuFLHZVs4NZiARG6iBZN_wza6c2e0kDhZjK0w@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 03/21] ACPI: processor: Register CPUs that are
- online, but not described in the DSDT
+Date: Mon, 18 Dec 2023 21:30:50 +0100
+Message-ID: <CAJZ5v0je=-oVnSumZs=dzcyVuVUeVeTgO7yOnjGg1igyrS7EHQ@mail.gmail.com>
+Subject: Re: [PATCH RFC v3 04/21] ACPI: processor: Register all CPUs from acpi_processor_get_info()
 To: Russell King <rmk+kernel@armlinux.org.uk>
 Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev, 
 	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, 
@@ -56,74 +55,85 @@ rg.uk> wrote:
 >
 > From: James Morse <james.morse@arm.com>
 >
-> ACPI has two descriptions of CPUs, one in the MADT/APIC table, the other
-> in the DSDT. Both are required. (ACPI 6.5's 8.4 "Declaring Processors"
-> says "Each processor in the system must be declared in the ACPI
-> namespace"). Having two descriptions allows firmware authors to get
-> this wrong.
->
-> If CPUs are described in the MADT/APIC, they will be brought online
-> early during boot. Once the register_cpu() calls are moved to ACPI,
-> they will be based on the DSDT description of the CPUs. When CPUs are
-> missing from the DSDT description, they will end up online, but not
-> registered.
->
-> Add a helper that runs after acpi_init() has completed to register
-> CPUs that are online, but weren't found in the DSDT. Any CPU that
-> is registered by this code triggers a firmware-bug warning and kernel
-> taint.
->
-> Qemu TCG only describes the first CPU in the DSDT, unless cpu-hotplug
-> is configured.
+> To allow ACPI to skip the call to arch_register_cpu() when the _STA
+> value indicates the CPU can't be brought online right now, move the
+> arch_register_cpu() call into acpi_processor_get_info().
 
-So why is this a kernel problem?
+This kind of looks backwards to me and has a potential to become
+super-confusing.
+
+I would instead add a way for the generic code to ask the platform
+firmware whether or not the given CPU is enabled and so it can be
+registered.
+
+> Systems can still be booted with 'acpi=3Doff', or not include an
+> ACPI description at all. For these, the CPUs continue to be
+> registered by cpu_dev_register_generic().
+>
+> This moves the CPU register logic back to a subsys_initcall(),
+> while the memory nodes will have been registered earlier.
+
+Isn't this somewhat risky?
 
 > Signed-off-by: James Morse <james.morse@arm.com>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 > Reviewed-by: Gavin Shan <gshan@redhat.com>
 > Tested-by: Miguel Luis <miguel.luis@oracle.com>
 > Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
 > Tested-by: Jianyong Wu <jianyong.wu@arm.com>
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 > ---
->  drivers/acpi/acpi_processor.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
+> Changes since RFC v2:
+>  * Fixup comment in acpi_processor_get_info() (Gavin Shan)
+>  * Add comment in cpu_dev_register_generic() (Gavin Shan)
+> ---
+>  drivers/acpi/acpi_processor.c | 12 ++++++++++++
+>  drivers/base/cpu.c            |  6 +++++-
+>  2 files changed, 17 insertions(+), 1 deletion(-)
 >
 > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.=
 c
-> index 6a542e0ce396..0511f2bc10bc 100644
+> index 0511f2bc10bc..e7ed4730cbbe 100644
 > --- a/drivers/acpi/acpi_processor.c
 > +++ b/drivers/acpi/acpi_processor.c
-> @@ -791,6 +791,25 @@ void __init acpi_processor_init(void)
->         acpi_pcc_cpufreq_init();
->  }
+> @@ -314,6 +314,18 @@ static int acpi_processor_get_info(struct acpi_devic=
+e *device)
+>                         cpufreq_add_device("acpi-cpufreq");
+>         }
 >
-> +static int __init acpi_processor_register_missing_cpus(void)
-> +{
-> +       int cpu;
+> +       /*
+> +        * Register CPUs that are present. get_cpu_device() is used to sk=
+ip
+> +        * duplicate CPU descriptions from firmware.
+> +        */
+> +       if (!invalid_logical_cpuid(pr->id) && cpu_present(pr->id) &&
+> +           !get_cpu_device(pr->id)) {
+> +               int ret =3D arch_register_cpu(pr->id);
 > +
-> +       if (acpi_disabled)
-> +               return 0;
-> +
-> +       for_each_online_cpu(cpu) {
-> +               if (!get_cpu_device(cpu)) {
-> +                       pr_err_once(FW_BUG "CPU %u has no ACPI namespace =
-description!\n", cpu);
-> +                       add_taint(TAINT_FIRMWARE_WORKAROUND, LOCKDEP_STIL=
-L_OK);
-> +                       arch_register_cpu(cpu);
-
-Which part of this code is related to ACPI?
-
-> +               }
+> +               if (ret)
+> +                       return ret;
 > +       }
 > +
-> +       return 0;
-> +}
-> +subsys_initcall_sync(acpi_processor_register_missing_cpus);
-> +
->  #ifdef CONFIG_ACPI_PROCESSOR_CSTATE
->  /**
->   * acpi_processor_claim_cst_control - Request _CST control from the plat=
-form.
+>         /*
+>          *  Extra Processor objects may be enumerated on MP systems with
+>          *  less than the max # of CPUs. They should be ignored _iff
+> diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
+> index 47de0f140ba6..13d052bf13f4 100644
+> --- a/drivers/base/cpu.c
+> +++ b/drivers/base/cpu.c
+> @@ -553,7 +553,11 @@ static void __init cpu_dev_register_generic(void)
+>  {
+>         int i, ret;
+>
+> -       if (!IS_ENABLED(CONFIG_GENERIC_CPU_DEVICES))
+> +       /*
+> +        * When ACPI is enabled, CPUs are registered via
+> +        * acpi_processor_get_info().
+> +        */
+> +       if (!IS_ENABLED(CONFIG_GENERIC_CPU_DEVICES) || !acpi_disabled)
+>                 return;
+>
+>         for_each_present_cpu(i) {
 > --
+> 2.30.2
+>
+>
