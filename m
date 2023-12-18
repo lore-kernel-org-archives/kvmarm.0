@@ -1,152 +1,265 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E24D125A3
-	for <kvmarm@lists.linux.dev>; Mon, 18 Dec 2023 09:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u4n4BoKG"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-67f2fc389e6so9404296d6.2
-        for <kvmarm@lists.linux.dev>; Mon, 18 Dec 2023 01:57:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702893429; x=1703498229; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AWjfe7RH/mU7J9DoxKHehvCyBL+cySbjOgl2d3a9iCM=;
-        b=u4n4BoKGyQRFBwtaE9ZnVmvssr2PVpC8qKugbZaW9HDxn2Dbs9ppg+Vyt+ayv9dCxS
-         OmxLb+nF0iSSnT9QgfuVxbku5JDV/kXPR1UoJk2H9pRq+z501yFtL/QZOEb2Jawd9hHl
-         d0JJQ2kj55sLxPVOLWwmggWVTEkB4TDphBUotP1iYQ9rzbqHfShx8HAyID5eyPV5dRpH
-         d+OmoXFZiUKUMWHAt2lqAXO9979k1JwvdOmkpJmCrP7xQGEjM4Ui5Zg3ciPxqWb1iUko
-         4u8+BEM2MTZ2U1NavKbPCfMmSu01EavQGZJNVyzeM9WhDHaQDaZyhtAY7nGvSoV90lfu
-         aiYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702893429; x=1703498229;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AWjfe7RH/mU7J9DoxKHehvCyBL+cySbjOgl2d3a9iCM=;
-        b=AFTyIsy5KMtHkpsAUl0RJskv6zV0HR7A1fzY3JubK4J7pWJY9DvGljzwk/OfkXi+A7
-         i/HFeYnC3qzA/e5xLYAIeS53Zh5r7w5FsDDnL80OOmQchpQkIVrhKpuoc3Bjh9aIr7ad
-         QMpko4Z//xgLURfR74nq+1JGL7lKUZ9euTMttxB10KEY1jP/GwHNIdj7YK/QvUM0/UPn
-         ytYi7p87gqyNlJlqTGB+/xe6dtgNvgQhjQlBu7jGDU/9kiAsoGZXpCFBjCNtKGNwsg2h
-         FyDtZZnzXgmaKOvH+xAMkstBc7sVSuoVGDqOKjJH3M205+bUp4wW6wph7W7ApCGLzKVA
-         eYUg==
-X-Gm-Message-State: AOJu0YxfIx2Ao5LzaWm/olRH9PCcIMzATe8dIUL+kl2gSQsvQPhgXlga
-	eCQeOgBsxNsOAxOdZtTlIAgYXz4a42vNgmoOn01b6g==
-X-Google-Smtp-Source: AGHT+IGYbR6gUlllV6xfxcDnv7UT2h4I8qSrO6cOt0PscRTby6ssA1uQNs2QiJ45mLqo4adWkVKueNeQyMx/PORwcPM=
-X-Received: by 2002:a0c:c58d:0:b0:67a:8f89:a631 with SMTP id
- a13-20020a0cc58d000000b0067a8f89a631mr13157179qvj.23.1702893429206; Mon, 18
- Dec 2023 01:57:09 -0800 (PST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E933182D5
+	for <kvmarm@lists.linux.dev>; Mon, 18 Dec 2023 10:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F20AA1FB;
+	Mon, 18 Dec 2023 03:00:18 -0800 (PST)
+Received: from raptor (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 748C23F738;
+	Mon, 18 Dec 2023 02:59:29 -0800 (PST)
+Date: Mon, 18 Dec 2023 10:59:26 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Rob Herring <robh@kernel.org>
+Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
+	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
+	rppt@kernel.org, hughd@google.com, pcc@google.com,
+	steven.price@arm.com, anshuman.khandual@arm.com,
+	vincenzo.frascino@arm.com, david@redhat.com, eugenis@google.com,
+	kcc@google.com, hyesoo.yu@samsung.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC v2 11/27] arm64: mte: Reserve tag storage memory
+Message-ID: <ZYAmDkz5NplbVGyd@raptor>
+References: <ZXiMiLz9ZyUdxUP8@raptor>
+ <CAL_Jsq+U_GR=mOK3-phnd4jeJKf79aOmhPwDOSj+f=s-7fZZWQ@mail.gmail.com>
+ <ZXmr-Kl9L2SO13--@raptor>
+ <CAL_JsqL=P1Y6w38LD_xw+vK4CNqt22FW_FE9oi_XTLHVQEne7Q@mail.gmail.com>
+ <ZXnE3724jYYSg4o6@raptor>
+ <CAL_JsqJgTnuQjo13cKo1Ebm5j9tCRT8GhNavdqu5vwp+fdnTLw@mail.gmail.com>
+ <ZXnthcg0BkEd-RgK@raptor>
+ <CAL_JsqLAW0--F8R0oTaajN3YpbK2KgE6Ypn8tk4_pf_s=xC+aw@mail.gmail.com>
+ <ZXsjFYKHkJM_JLCy@raptor>
+ <CAL_JsqJF7Bs6nGt0hdP25YTMpzPK8V3h6C5Thkh=PnzPbwFEkQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20231214100158.2305400-1-tabba@google.com> <20231214100158.2305400-15-tabba@google.com>
- <86wmtbalx9.wl-maz@kernel.org>
-In-Reply-To: <86wmtbalx9.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 18 Dec 2023 09:56:32 +0000
-Message-ID: <CA+EHjTxZmc2bAaDbFLjWxx-LzCX7Jwy+EH60JgFBvWYh68U=xg@mail.gmail.com>
-Subject: Re: [PATCH v3 14/17] KVM: arm64: Macros for setting/clearing FGT bits
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, oliver.upton@linux.dev, broonie@kernel.org, 
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, eric.auger@redhat.com, 
-	jingzhangos@google.com, joey.gouly@arm.com, 
-	linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL_JsqJF7Bs6nGt0hdP25YTMpzPK8V3h6C5Thkh=PnzPbwFEkQ@mail.gmail.com>
 
-Hi Marc,
+Hi,
 
-On Mon, Dec 18, 2023 at 9:40=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> On Thu, 14 Dec 2023 10:01:54 +0000,
-> Fuad Tabba <tabba@google.com> wrote:
+On Thu, Dec 14, 2023 at 12:55:14PM -0600, Rob Herring wrote:
+> On Thu, Dec 14, 2023 at 9:45 AM Alexandru Elisei
+> <alexandru.elisei@arm.com> wrote:
 > >
-> > There's a lot of boilerplate code for setting and clearing FGT
-> > bits when activating guest traps. Refactor it into macros. These
-> > macros will also be used in future patch series.
+> > Hi,
 > >
-> > No functional change intended.
+> > On Wed, Dec 13, 2023 at 02:30:42PM -0600, Rob Herring wrote:
+> > > On Wed, Dec 13, 2023 at 11:44 AM Alexandru Elisei
+> > > <alexandru.elisei@arm.com> wrote:
+> > > >
+> > > > On Wed, Dec 13, 2023 at 11:22:17AM -0600, Rob Herring wrote:
+> > > > > On Wed, Dec 13, 2023 at 8:51 AM Alexandru Elisei
+> > > > > <alexandru.elisei@arm.com> wrote:
+> > > > > >
+> > > > > > Hi,
+> > > > > >
+> > > > > > On Wed, Dec 13, 2023 at 08:06:44AM -0600, Rob Herring wrote:
+> > > > > > > On Wed, Dec 13, 2023 at 7:05 AM Alexandru Elisei
+> > > > > > > <alexandru.elisei@arm.com> wrote:
+> > > > > > > >
+> > > > > > > > Hi Rob,
+> > > > > > > >
+> > > > > > > > On Tue, Dec 12, 2023 at 12:44:06PM -0600, Rob Herring wrote:
+> > > > > > > > > On Tue, Dec 12, 2023 at 10:38 AM Alexandru Elisei
+> > > > > > > > > <alexandru.elisei@arm.com> wrote:
+> > > > > > > > > >
+> > > > > > > > > > Hi Rob,
+> > > > > > > > > >
+> > > > > > > > > > Thank you so much for the feedback, I'm not very familiar with device tree,
+> > > > > > > > > > and any comments are very useful.
+> > > > > > > > > >
+> > > > > > > > > > On Mon, Dec 11, 2023 at 11:29:40AM -0600, Rob Herring wrote:
+> > > > > > > > > > > On Sun, Nov 19, 2023 at 10:59 AM Alexandru Elisei
+> > > > > > > > > > > <alexandru.elisei@arm.com> wrote:
+> > > > > > > > > > > >
+> > > > > > > > > > > > Allow the kernel to get the size and location of the MTE tag storage
+> > > > > > > > > > > > regions from the DTB. This memory is marked as reserved for now.
+> > > > > > > > > > > >
+> > > > > > > > > > > > The DTB node for the tag storage region is defined as:
+> > > > > > > > > > > >
+> > > > > > > > > > > >         tags0: tag-storage@8f8000000 {
+> > > > > > > > > > > >                 compatible = "arm,mte-tag-storage";
+> > > > > > > > > > > >                 reg = <0x08 0xf8000000 0x00 0x4000000>;
+> > > > > > > > > > > >                 block-size = <0x1000>;
+> > > > > > > > > > > >                 memory = <&memory0>;    // Associated tagged memory node
+> > > > > > > > > > > >         };
+> > > > > > > > > > >
+> > > > > > > > > > > I skimmed thru the discussion some. If this memory range is within
+> > > > > > > > > > > main RAM, then it definitely belongs in /reserved-memory.
+> > > > > > > > > >
+> > > > > > > > > > Ok, will do that.
+> > > > > > > > > >
+> > > > > > > > > > If you don't mind, why do you say that it definitely belongs in
+> > > > > > > > > > reserved-memory? I'm not trying to argue otherwise, I'm curious about the
+> > > > > > > > > > motivation.
+> > > > > > > > >
+> > > > > > > > > Simply so that /memory nodes describe all possible memory and
+> > > > > > > > > /reserved-memory is just adding restrictions. It's also because
+> > > > > > > > > /reserved-memory is what gets handled early, and we don't need
+> > > > > > > > > multiple things to handle early.
+> > > > > > > > >
+> > > > > > > > > > Tag storage is not DMA and can live anywhere in memory.
+> > > > > > > > >
+> > > > > > > > > Then why put it in DT at all? The only reason CMA is there is to set
+> > > > > > > > > the size. It's not even clear to me we need CMA in DT either. The
+> > > > > > > > > reasoning long ago was the kernel didn't do a good job of moving and
+> > > > > > > > > reclaiming contiguous space, but that's supposed to be better now (and
+> > > > > > > > > most h/w figured out they need IOMMUs).
+> > > > > > > > >
+> > > > > > > > > But for tag storage you know the size as it is a function of the
+> > > > > > > > > memory size, right? After all, you are validating the size is correct.
+> > > > > > > > > I guess there is still the aspect of whether you want enable MTE or
+> > > > > > > > > not which could be done in a variety of ways.
+> > > > > > > >
+> > > > > > > > Oh, sorry, my bad, I should have been clearer about this. I don't want to
+> > > > > > > > put it in the DT as a "linux,cma" node. But I want it to be managed by CMA.
+> > > > > > >
+> > > > > > > Yes, I understand, but my point remains. Why do you need this in DT?
+> > > > > > > If the location doesn't matter and you can calculate the size from the
+> > > > > > > memory size, what else is there to add to the DT?
+> > > > > >
+> > > > > > I am afraid there has been a misunderstanding. What do you mean by
+> > > > > > "location doesn't matter"?
+> > > > >
+> > > > > You said:
+> > > > > > Tag storage is not DMA and can live anywhere in memory.
+> > > > >
+> > > > > Which I took as the kernel can figure out where to put it. But maybe
+> > > > > you meant the h/w platform can hard code it to be anywhere in memory?
+> > > > > If so, then yes, DT is needed.
+> > > >
+> > > > Ah, I see, sorry for not being clear enough, you are correct: tag storage
+> > > > is a hardware property, and software needs a mechanism (in this case, the
+> > > > dt) to discover its properties.
+> > > >
+> > > > >
+> > > > > > At the very least, Linux needs to know the address and size of a memory
+> > > > > > region to use it. The series is about using the tag storage memory for
+> > > > > > data. Tag storage cannot be described as a regular memory node because it
+> > > > > > cannot be tagged (and normal memory can).
+> > > > >
+> > > > > If the tag storage lives in the middle of memory, then it would be
+> > > > > described in the memory node, but removed by being in reserved-memory
+> > > > > node.
+> > > >
+> > > > I don't follow. Would you mind going into more details?
+> > >
+> > > It goes back to what I said earlier about /memory nodes describing all
+> > > the memory. There's no reason to reserve memory if you haven't
+> > > described that range as memory to begin with. One could presumably
+> > > just have a memory node for each contiguous chunk and not need
+> > > /reserved-memory (ignoring the need to say what things are reserved
+> > > for). That would become very difficult to adjust. Note that the kernel
+> > > has a hardcoded limit of 64 reserved regions currently and that is not
+> > > enough for some people. Seems like a lot, but I have no idea how they
+> > > are (ab)using /reserved-memory.
 > >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 60 +++++++++----------------
-> >  1 file changed, 21 insertions(+), 39 deletions(-)
+> > Ah, I see what you mean, reserved memory is about marking existing memory
+> > (from a /memory node) as special, not about adding new memory.
 > >
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/h=
-yp/include/hyp/switch.h
-> > index 17ce40f5b006..e223fc0d5193 100644
-> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > @@ -79,6 +79,23 @@ static inline void __activate_traps_fpsimd32(struct =
-kvm_vcpu *vcpu)
-> >               clr |=3D ~hfg & __ ## reg ## _nMASK;                     =
- \
-> >       } while(0)
+> > After the memblock allocator is initialized, the kernel can use it for its
+> > own allocations. Kernel allocations are not movable.
 > >
-> > +#define update_fgt_traps_cs(reg, clr, set)                           \
-> > +     do {                                                            \
-> > +             struct kvm_cpu_context *hctxt =3D                        =
- \
-> > +                     &this_cpu_ptr(&kvm_host_data)->host_ctxt;       \
-> > +             u64 val, c =3D 0, s =3D 0;                               =
-   \
-> > +                                                                     \
-> > +             ctxt_sys_reg(hctxt, reg) =3D read_sysreg_s(SYS_ ## reg); =
- \
-> > +             compute_clr_set(vcpu, reg, c, s);                       \
->
-> You are referring to a variable name that is in the scope of the macro
-> user, and not the macro itself. It is so fragile it isn't funny.
->
-> Why don't you simply pass the vcpu as a parameter to the function?
->
-> Another thing is that this read/write can be expensive. How about not
-> doing anything when there is no change to the value of the sysreg?
+> > When a page is allocated as tagged, the associated tag storage cannot be
+> > used for data, otherwise the tags would corrupt that data. To avoid this,
+> > the requirement is that tag storage pages are only used for movable
+> > allocations. When a page is allocated as tagged, the data in the associated
+> > tag storage is migrated and the tag storage is taken from the page
+> > allocator (via alloc_contig_range()).
+> >
+> > My understanding is that the memblock allocator can use all the memory from
+> > a /memory node. If the tags storage memory is declared in a /memory node,
+> > there exists the possibility that Linux will use tag storage memory for its
+> > own allocation, which would make that tags storage memory unmovable, and
+> > thus unusable for storing tags.
+> 
+> No, because the tag storage would be reserved in /reserved-memory.
+> 
+> Of course, the arch code could do something between scanning /memory
+> nodes and /reserved-memory, but that would be broken arch code.
+> Ideally, there wouldn't be any arch code in between those 2 points,
+> but it's complicated. It used to mainly be powerpc, but we keep adding
+> to the complexity on arm64.
 
-What do you think of this (spacing will be fixed):
+Ah, yes, thats what I was referring to, the fact that the memory nodes are
+parsed in setup_arch -> setup_machine_fdt -> early_init_dt_scan, and the
+reserved memory is parsed later in setup_arch -> arm64_memblock_init.
 
-#define update_fgt_traps_cs(vcpu, reg, clr, set)                         \
-    do {
-                           \
-        struct kvm_cpu_context *hctxt =3D
-         \
-            &this_cpu_ptr(&kvm_host_data)->host_ctxt;                  \
-        u64 val, c =3D 0, s =3D 0;
-                  \
+If the rule is that no memblock allocations can take place between
+setup_machine_fdt() and arm64_memblock_init(), then putting tag storage in
+a /memory node will work, thank you for the clarification.
 
-                             \
-        ctxt_sys_reg(hctxt, reg) =3D read_sysreg_s(SYS_ ## reg);   \
-        compute_clr_set(vcpu, reg, c, s);
-          \
-        val =3D __ ## reg ## _nMASK;
-          \
-        val |=3D (s | set);
-                        \
-        val &=3D ~(c | clr);
-                       \
-        if (ctxt_sys_reg(hctxt, reg) !=3D val)
-              \
-            write_sysreg_s(val, SYS_ ## reg);
-           \
-    } while(0)
+> 
+> > Looking at early_init_dt_scan_memory(), even if a /memory node if marked at
+> > hotpluggable, memblock will still use it, unless "movable_node" is set on
+> > the kernel command line.
+> >
+> > That's the reason why I'm not describing tag storage in a /memory node.  Is
+> > there way to tell the memblock allocator not to use memory from a /memory
+> > node?
+> >
+> > >
+> > > Let me give an example. Presumably using MTE at all is configurable.
+> > > If you boot a kernel with MTE disabled (or older and not supporting
+> > > it), then I'd assume you'd want to use the tag storage for regular
+> > > memory. Well, If tag storage is already part of /memory, then all you
+> > > have to do is ignore the tag reserved-memory region. Tweaking the
+> > > memory nodes would be more work.
+> >
+> > Right now, memory is added via memblock_reserve(), and if MTE is disabled
+> > (for example, via the kernel command line), the code calls
+> > free_reserved_page() for each tag storage page. I find that straightfoward
+> > to implement.
+> 
+> But better to just not reserve the region in the first place. Also, it
+> needs to be simple enough to back port.
 
-If it looks good to you, I'll fix it on the respin.
+I don't think that works - reserved memory is parsed in setup_arch ->
+arm64_memblock_init, and the cpu capabilities are initialized later, in
+smp_prepare_boot_cpu.
+
+> 
+> Also, does free_reserved_page() work on ranges outside of memblock
+> range (e.g. beyond end_of_DRAM())? If the tag storage happened to live
+> at the end of DRAM and you shorten the /memory node size to remove tag
+> storage, is it still going to work?
+
+Tag storage memory is discovered in 2 staged: first it is added to memblock
+with memblock_add(), then reserved with memblock_reserve().  This is
+performed in setup_arch(), after setup_machine_fdt(), and before
+arm64_memblock_init(). The tag torage code keeps an array of the discovered
+tag regions. This is implemented in this patch.
+
+The next patch [1] adds an arch_initcall that checks if
+memblock_end_of_DRAM() is less than the upper address of a tag storage
+region. If that is the case, then tag storage memory is kept as reserved
+and remains unused by the kernel.
+
+The next check is for mte enabled: if it is disabled, then the pages are
+unreserved by doing free_reserved_page().
+
+And finally, if all the checks pass, the tag storage pages are put on the
+MIGRATE_CMA lists with init_cma_reserved_pageblock().
+
+[1] https://lore.kernel.org/all/20231119165721.9849-12-alexandru.elisei@arm.com/
 
 Thanks,
-/fuad
+Alex
 
->
-> I'll see if I can come up with something.
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+> 
+> Rob
