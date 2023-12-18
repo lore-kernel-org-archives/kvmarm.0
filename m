@@ -1,42 +1,42 @@
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2ED7206D;
-	Mon, 18 Dec 2023 20:31:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D921DA21;
+	Mon, 18 Dec 2023 20:35:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-203aa9c19ceso242192fac.0;
-        Mon, 18 Dec 2023 12:31:01 -0800 (PST)
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-1fae54afb66so108520fac.1;
+        Mon, 18 Dec 2023 12:35:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702931461; x=1703536261;
+        d=1e100.net; s=20230601; t=1702931727; x=1703536527;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5tAlFGdRk7dsOpEqAvR+OuH9VoSVkSPM03m6WEM5ITU=;
-        b=YtDirdKH07qtoD6aB3Pvqh/kP1lnjlLlWDGo4NDVnWZBR9/GtxVpOOniCZCFZKUutg
-         r0AtmHdFI1c0hf7k87UdOYaT2TyD6y2my/Zdp7m4pRYv8Kwhrv2fb1WVYbl+1/j6Mpex
-         dXBjH1ignX0q753iVsoju7cWWagpunZeOqV7/rhVSJw/cWLfCxzoubO5Ghm42EgIelJ+
-         BGsG1HmI/V3aiG1umY2wLSlV9tJH0tcUqb6LUGQ2iNVtShWKZ/FqoMB+maf+G5M7AVWB
-         PzdXVRkOcBZLOiuObN1PLlG5z7SzbRuSGtM8F4IXxWSpYx/QaFirmeHkdwW7Wijo/fw+
-         ALBg==
-X-Gm-Message-State: AOJu0YxDr62nFdxF9Uvqqxp++SpoRBrDQQmRi8chx05BrlvFWydDInxr
-	eQA/PKoYnQXzkHc4YZO/WNh1TJQ0J4ah4dSXLtM=
-X-Google-Smtp-Source: AGHT+IH2/Xcl6oIvnSfLcxllKujvsfBDeafZqBXfGcoJ6ZYuhTDpjdkrOr2cBBTAZn748hcGAPQjloWIL3tDogLMDwE=
-X-Received: by 2002:a05:6870:420d:b0:1fb:5d05:685e with SMTP id
- u13-20020a056870420d00b001fb5d05685emr31445963oac.2.1702931460922; Mon, 18
- Dec 2023 12:31:00 -0800 (PST)
+        bh=w5muLLdvnEWK5GQ123Z96eJyI+5glad1JcNNdF8H1Jg=;
+        b=LTP2lQDeFXEDUZVdCNQF8GdhHCbpicXo3ev5c7ZpIYyHj7UEVJqBggQUlfYjcV/Yy1
+         tBikJ7RIv3bdzIMTymwM6YbnoyDlUJ8+9LiGTlnSJ56crMJwWO3HUVAuLVinJZyFGYJB
+         nH6cUvJi/ppxi6hjtFj8n90KdcsAcjDx/9NP/4B8HI7NQ2GZIPeCDiDi/9y/JxA5fR2Y
+         wyu2R/H9GjZmUDHJCLUny8alPzDwIsc5jq1ONqo63mshxi4r2wVnrtHG6rIKxPlDMlfF
+         QjSvAEm7wnvH7VaNTK3A+PV7cX6rKu+hMSFDAEgzmYUoybiD2iuwffkmz1ZUkKzi3FZq
+         YTWw==
+X-Gm-Message-State: AOJu0YwQ9pfWrr2hIc6R04yV4yQp4DFRsipNkEtyA49k8ixElHQkft1I
+	2yrQDfyCJNe4GWTqCQA4eNHriEhXle8RYL4cvs4oTkLA
+X-Google-Smtp-Source: AGHT+IF1MjB6QbmwWfc3T+5pLabp0AF+8g7RLCoeqeEABS9CAvETyoAN6o6rB15S5OlZOByT2E647igWVuJN9yCJ/4I=
+X-Received: by 2002:a05:6870:71ca:b0:203:e75d:a2c2 with SMTP id
+ p10-20020a05687071ca00b00203e75da2c2mr729668oag.1.1702931727130; Mon, 18 Dec
+ 2023 12:35:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk> <E1rDOg7-00Dvjq-VZ@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1rDOg7-00Dvjq-VZ@rmk-PC.armlinux.org.uk>
+References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk> <E1rDOgD-00Dvk2-3h@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1rDOgD-00Dvk2-3h@rmk-PC.armlinux.org.uk>
 From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Mon, 18 Dec 2023 21:30:50 +0100
-Message-ID: <CAJZ5v0je=-oVnSumZs=dzcyVuVUeVeTgO7yOnjGg1igyrS7EHQ@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 04/21] ACPI: processor: Register all CPUs from acpi_processor_get_info()
+Date: Mon, 18 Dec 2023 21:35:16 +0100
+Message-ID: <CAJZ5v0g9nfLrEf9u4Ksw6BOWJQ9iv8Z-O8RsLU6jR5zk0ahxRw@mail.gmail.com>
+Subject: Re: [PATCH RFC v3 05/21] ACPI: Rename ACPI_HOTPLUG_CPU to include 'present'
 To: Russell King <rmk+kernel@armlinux.org.uk>
 Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev, 
 	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, 
@@ -55,85 +55,24 @@ rg.uk> wrote:
 >
 > From: James Morse <james.morse@arm.com>
 >
-> To allow ACPI to skip the call to arch_register_cpu() when the _STA
-> value indicates the CPU can't be brought online right now, move the
-> arch_register_cpu() call into acpi_processor_get_info().
+> The code behind ACPI_HOTPLUG_CPU allows a not-present CPU to become
+> present.
 
-This kind of looks backwards to me and has a potential to become
-super-confusing.
+Right.
 
-I would instead add a way for the generic code to ask the platform
-firmware whether or not the given CPU is enabled and so it can be
-registered.
+> This isn't the only use of HOTPLUG_CPU. On arm64 and riscv
+> CPUs can be taken offline as a power saving measure.
 
-> Systems can still be booted with 'acpi=3Doff', or not include an
-> ACPI description at all. For these, the CPUs continue to be
-> registered by cpu_dev_register_generic().
->
-> This moves the CPU register logic back to a subsys_initcall(),
-> while the memory nodes will have been registered earlier.
+But still there is the case in which a non-present CPU can become
+present, isn't it there?
 
-Isn't this somewhat risky?
+> On arm64 an offline CPU may be disabled by firmware, preventing it from
+> being brought back online, but it remains present throughout.
+>
+> Adding code to prevent user-space trying to online these disabled CPUs
+> needs some additional terminology.
+>
+> Rename the Kconfig symbol CONFIG_ACPI_HOTPLUG_PRESENT_CPU to reflect
+> that it makes possible CPUs present.
 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Tested-by: Miguel Luis <miguel.luis@oracle.com>
-> Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
-> Tested-by: Jianyong Wu <jianyong.wu@arm.com>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
-> Changes since RFC v2:
->  * Fixup comment in acpi_processor_get_info() (Gavin Shan)
->  * Add comment in cpu_dev_register_generic() (Gavin Shan)
-> ---
->  drivers/acpi/acpi_processor.c | 12 ++++++++++++
->  drivers/base/cpu.c            |  6 +++++-
->  2 files changed, 17 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.=
-c
-> index 0511f2bc10bc..e7ed4730cbbe 100644
-> --- a/drivers/acpi/acpi_processor.c
-> +++ b/drivers/acpi/acpi_processor.c
-> @@ -314,6 +314,18 @@ static int acpi_processor_get_info(struct acpi_devic=
-e *device)
->                         cpufreq_add_device("acpi-cpufreq");
->         }
->
-> +       /*
-> +        * Register CPUs that are present. get_cpu_device() is used to sk=
-ip
-> +        * duplicate CPU descriptions from firmware.
-> +        */
-> +       if (!invalid_logical_cpuid(pr->id) && cpu_present(pr->id) &&
-> +           !get_cpu_device(pr->id)) {
-> +               int ret =3D arch_register_cpu(pr->id);
-> +
-> +               if (ret)
-> +                       return ret;
-> +       }
-> +
->         /*
->          *  Extra Processor objects may be enumerated on MP systems with
->          *  less than the max # of CPUs. They should be ignored _iff
-> diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
-> index 47de0f140ba6..13d052bf13f4 100644
-> --- a/drivers/base/cpu.c
-> +++ b/drivers/base/cpu.c
-> @@ -553,7 +553,11 @@ static void __init cpu_dev_register_generic(void)
->  {
->         int i, ret;
->
-> -       if (!IS_ENABLED(CONFIG_GENERIC_CPU_DEVICES))
-> +       /*
-> +        * When ACPI is enabled, CPUs are registered via
-> +        * acpi_processor_get_info().
-> +        */
-> +       if (!IS_ENABLED(CONFIG_GENERIC_CPU_DEVICES) || !acpi_disabled)
->                 return;
->
->         for_each_present_cpu(i) {
-> --
-> 2.30.2
->
->
+Honestly, I don't think that this change is necessary or even useful.
