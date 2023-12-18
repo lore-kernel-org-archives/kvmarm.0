@@ -1,96 +1,96 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F7E4B5BE
-	for <kvmarm@lists.linux.dev>; Mon, 18 Dec 2023 12:14:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 831D942058
+	for <kvmarm@lists.linux.dev>; Mon, 18 Dec 2023 12:25:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="C2KaLUoh"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=08SzGJH5lXG9BtLXnSCiZJkgfUYvZPRLdF1MiDN6maA=; b=C2KaLUoh/n1BgxKSf6SrAbqvai
-	JKrWWotA8ePs91dXAVLuwjEpSY5ePbNax2YRNGRaUBgp7XlJSEVD5M4TKEtLw4VeIHgs2tqfFO7aM
-	dxhfjGyheynixij5MnQ9UsD+vCLAUH1h1KZirAZWC8js4LRKy1n3PwI3uBnUi1JZVY2U7Ihv5/Mor
-	rJp5cRqch1rnSU/tEZFmu+buYl/SCLuuuxAXtVHXXphaJjFugXWAG6myDphxhCF2EwzotxfXC/uJ4
-	u6LnZqqFeEf53FdSsSiRJvxxjxBXV5gsbJXRjyqKyBk1ikWGT5yxqUY1944KT5NF09+Aqz0ttUPbl
-	JFeOLJUA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54580)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rFCVj-0005GR-2l;
-	Mon, 18 Dec 2023 12:14:15 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rFCVi-0006hJ-Np; Mon, 18 Dec 2023 12:14:14 +0000
-Date: Mon, 18 Dec 2023 12:14:14 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
-	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
-	x86@kernel.org, acpica-devel@lists.linuxfoundation.org,
-	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	jianyong.wu@arm.com, justin.he@arm.com,
-	James Morse <james.morse@arm.com>
-Subject: Re: [PATCH RFC v3 21/21] cpumask: Add enabled cpumask for present
- CPUs that can be brought online
-Message-ID: <ZYA3lmPOwIOJq/iY@shell.armlinux.org.uk>
-References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk>
- <E1rDOhX-00Dvlg-Ci@rmk-PC.armlinux.org.uk>
- <20231215171831.00004a19@Huawei.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="is9QCy1K"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AA00C433C7;
+	Mon, 18 Dec 2023 12:25:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702902353;
+	bh=I+Ee4XNk8J4rYzmdxemVXEwThjz6c4BZEplm9T6nQkM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=is9QCy1K1Gk+mwJm/CMmBl9Y4LEhp7TAMi8rgjJd6l8xWu7j724EGjWUszANk7He5
+	 lZDJM4wUnO6ZcVC0MjBDmUrBgzck/NzFnr6XSLQGp1BGgFwKi9YeiBlTvvD4EHUNIG
+	 2IqKTnyj/HjqzAvimP3FQRKw3dzmA7x9je4CSoAibOXaoDVBne6Ifgjxa3xf1xL6gn
+	 o3eKyuXLHz+PDrZWbEPiUlg7/bCWh0T7oAcbAkD1dXU3E7Y2VS1r5AISdgXBAqp2yh
+	 wMPSS0FMdCICPd8RGB+MLsd68zGca76pqP1t2xhpSduTrLQQLhN/iirK9DiZI+8+1Z
+	 LGNTve+1+JQFA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rFCgw-0052LG-Ae;
+	Mon, 18 Dec 2023 12:25:50 +0000
+Date: Mon, 18 Dec 2023 12:25:49 +0000
+Message-ID: <86ttofae9e.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	oliver.upton@linux.dev,
+	broonie@kernel.org,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	eric.auger@redhat.com,
+	jingzhangos@google.com,
+	joey.gouly@arm.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v3 14/17] KVM: arm64: Macros for setting/clearing FGT bits
+In-Reply-To: <CA+EHjTyPS-3PX+JGV32oTTMYJPk3Dijbcj3oAENg3v7sAdw7wA@mail.gmail.com>
+References: <20231214100158.2305400-1-tabba@google.com>
+	<20231214100158.2305400-15-tabba@google.com>
+	<86wmtbalx9.wl-maz@kernel.org>
+	<CA+EHjTxZmc2bAaDbFLjWxx-LzCX7Jwy+EH60JgFBvWYh68U=xg@mail.gmail.com>
+	<86v88vahn8.wl-maz@kernel.org>
+	<CA+EHjTyPS-3PX+JGV32oTTMYJPk3Dijbcj3oAENg3v7sAdw7wA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231215171831.00004a19@Huawei.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, broonie@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, eric.auger@redhat.com, jingzhangos@google.com, joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Dec 15, 2023 at 05:18:31PM +0000, Jonathan Cameron wrote:
-> On Wed, 13 Dec 2023 12:50:59 +0000
-> Russell King (Oracle) <rmk+kernel@armlinux.org.uk> wrote:
-> 
-> > From: James Morse <james.morse@arm.com>
-> > 
-> > The 'offline' file in sysfs shows all offline CPUs, including those
-> > that aren't present. User-space is expected to remove not-present CPUs
-> > from this list to learn which CPUs could be brought online.
-> > 
-> > CPUs can be present but not-enabled. These CPUs can't be brought online
-> > until the firmware policy changes, which comes with an ACPI notification
-> > that will register the CPUs.
-> > 
-> > With only the offline and present files, user-space is unable to
-> > determine which CPUs it can try to bring online. Add a new CPU mask
-> > that shows this based on all the registered CPUs.
-> > 
-> > Signed-off-by: James Morse <james.morse@arm.com>
-> > Tested-by: Miguel Luis <miguel.luis@oracle.com>
-> > Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
-> > Tested-by: Jianyong Wu <jianyong.wu@arm.com>
-> > ---
-> 
-> Needs docs
-> Documentation/ABI/testing/sysfs-devices-system-cpu
-> seems to have the rest of the similar entries.
+On Mon, 18 Dec 2023 11:17:55 +0000,
+Fuad Tabba <tabba@google.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> On Mon, Dec 18, 2023 at 11:12=E2=80=AFAM Marc Zyngier <maz@kernel.org> wr=
+ote:
+> ...
+> >         if (cpu_has_amu())
+> >                 update_fgt_traps(vcpu, HAFGRTR_EL2);
+> >
+> > If that seems sensible to you, I'll fold it in, as I'd like to do
+> > without a respin if we can avoid it.
+>=20
+> Looks good to me. Thanks Marc!
 
-Any ideas what I put in there as "Date" ? It seems to me that we have
-little idea when this might be merged.. I could use the date of the
-commit (Nov 2022).
+Please have a look at [1] to see what I have done (AMU fixes and my
+suggestion for the FGT macros), and let me know if that's OK with you.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+I've given it a go on my M2 with NV (only a couple of minor conflicts)
+and nothing caught fire.
+
+Thanks,
+
+	M.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/l=
+og/?h=3Dkvm-arm64/fgt-rework
+
+--=20
+Without deviation from the norm, progress is not possible.
