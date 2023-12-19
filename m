@@ -1,206 +1,117 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEAE1182A0
-	for <kvmarm@lists.linux.dev>; Tue, 19 Dec 2023 11:52:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0576638DEB;
+	Tue, 19 Dec 2023 18:22:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kC4OooOH"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40d2f67b930so225e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 19 Dec 2023 03:52:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1702986745; x=1703591545; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6+saTyDFu3JKkTgh9+qAoCNDwyD6uD6EvbbNk9+tb9w=;
-        b=kC4OooOHZ68zlwgAO3Ws7Npf2qhxCqgwB8+AXj8475NK2oHXSqTngo8Ck1yDZc2Y0c
-         GR5FD2b0KOatEXynqPGbipO0n66+R2I3o+1mm07/PsQjvfKDBmzwoiYeP5FYWA1OoEYo
-         DTVR31JDHWgdEq9DgivRmHUIXaTZrvH7koipoeP8prMe69v4a35dt158qYJ/yvtTPsm5
-         pK5tHTgev0GOXK4SUwG9KCyIDQZTW57zbIUMdwJIWVxq292Kf4UF771E6PkkCiB16RLm
-         LXtHq8/O/Yp9rj6q/2S0GrzVuXbG4jo3+PcJMmiqCUPCAkQrlfcODR9eoF44/nG3IO6q
-         reQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702986745; x=1703591545;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6+saTyDFu3JKkTgh9+qAoCNDwyD6uD6EvbbNk9+tb9w=;
-        b=YTNPsrB2OFG1eDM+hd5aDbvBA8xQBTtZdskkzMuvhWBtJkMjeXrn04zlS4rKg7Frrz
-         bPuYsBKtl7vFyXl7Bax9I77oq2b9GpDsA6ZYcJQFXNLG3Ds4a1LDybC8pQlR+ffb8oJc
-         /rZ6Ggc0wp8Us3iTAhfF8m3zSMzbEI6Rhq1rQhmIedJ3Ef8Ma0eo/sIOOBvFZNkrNNSc
-         WQ80bHozQCZwkfpZhcI38q77hSunBTo+WZMF6ja61N9f5d+D5NxRCAbTZQabL1OFm9s3
-         9zbKr/LlReDulAEvyRj03lzfo8GN7X063/WqIv128rGHOrtaWPQuYTSWABydWhh59JKv
-         HmHg==
-X-Gm-Message-State: AOJu0YxVsGwrNuqrtWSJaj7L37paYrQTffA3yLOq5UVtIq3tjOKWmCSk
-	cOWGQX8eJSfvDbZRdbNY8OZUygS12OdJ
-X-Google-Smtp-Source: AGHT+IEfwvB6yLTkW6Xj0KhpdwlCUZwWV8uL2NQqpHJVv121xmqn1IfvV6Yhn2ElHeo9GVfaU0O9zw==
-X-Received: by 2002:a1c:4b14:0:b0:40d:27c5:9c16 with SMTP id y20-20020a1c4b14000000b0040d27c59c16mr65533wma.0.1702986745036;
-        Tue, 19 Dec 2023 03:52:25 -0800 (PST)
-Received: from google.com (185.83.140.34.bc.googleusercontent.com. [34.140.83.185])
-        by smtp.gmail.com with ESMTPSA id v14-20020a05600c444e00b0040c58e410a3sm2541375wmn.14.2023.12.19.03.52.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Dec 2023 03:52:24 -0800 (PST)
-Date: Tue, 19 Dec 2023 11:52:22 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: will@kernel.org, Oliver Upton <oliver.upton@linux.dev>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lJ7TR7dH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78AA1C433C7;
+	Tue, 19 Dec 2023 18:22:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703010168;
+	bh=DPuOkfzjPhady10Q5o+36I/qim38sfvyYNHfU9o8g4s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lJ7TR7dHiGeTaDrDcD0P3s9K3/Cy0c5R+1JMsyHoyWSfR09sTOekdWbvT6dGuVtMM
+	 +MApXmtcHV+t2luxAN1lSgKWm++Ahv8W3hdZa37W1zwijBzqvRKv3ogmQQ3lwJtsH8
+	 IeMlSpos+7YynBF91UFPlkwtiaeyVcQL5JGEx9DWDK6ncwFsjZ1IvVPSg9+4aNJNL3
+	 oE03fa8trLY7ghnI0z+tR3HRpqSs+MYJo2GIFMKbAAeJ7/LiCe9FcaRMq2mvI7QGCD
+	 qYfD7Zh7ZWB9MMFX6UtMTZ4bCCpZWw6dKP6hxxwd3z8WAxC1YbU/jqaRGJ5bHb6Ljm
+	 q2fleBZ31mTBg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rFejt-005SbH-35;
+	Tue, 19 Dec 2023 18:22:45 +0000
+Date: Tue, 19 Dec 2023 18:22:44 +0000
+Message-ID: <8734vy832j.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Haibo Xu <haibo1.xu@intel.com>
+Cc: xiaobo55x@gmail.com,
+	ajones@ventanamicro.com,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, catalin.marinas@arm.com,
-	mark.rutland@arm.com, akpm@linux-foundation.org, maz@kernel.org
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com,
-	vdonnefort@google.com, qperret@google.com, smostafa@google.com
-Subject: Re: [PATCH v4 10/10] arm64: ptdump: Add guest stage-2 pagetables
- dumping
-Message-ID: <ZYGD9qWqHgICBCp8@google.com>
-References: <20231218135859.2513568-2-sebastianene@google.com>
- <20231218135859.2513568-12-sebastianene@google.com>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Guo Ren <guoren@kernel.org>,
+	Mayuresh Chitale <mchitale@ventanamicro.com>,
+	Greentime Hu <greentime.hu@sifive.com>,
+	wchen <waylingii@gmail.com>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Peter Xu <peterx@redhat.com>,
+	Like Xu <likexu@tencent.com>,
+	Vipin Sharma <vipinsh@google.com>,
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>,
+	Aaron Lewis <aaronlewis@google.com>,
+	Thomas Huth <thuth@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v4 11/11] KVM: selftests: Enable tunning of err_margin_us in arch timer test
+In-Reply-To: <0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
+References: <cover.1702371136.git.haibo1.xu@intel.com>
+	<0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231218135859.2513568-12-sebastianene@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: haibo1.xu@intel.com, xiaobo55x@gmail.com, ajones@ventanamicro.com, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, pbonzini@redhat.com, shuah@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, guoren@kernel.org, mchitale@ventanamicro.com, greentime.hu@sifive.com, waylingii@gmail.com, conor.dooley@microchip.com, heiko@sntech.de, minda.chen@starfivetech.com, samuel@sholland.org, jszhang@kernel.org, seanjc@google.com, peterx@redhat.com, likexu@tencent.com, vipinsh@google.com, maciej.wieczor-retman@intel.com, aaronlewis@google.com, thuth@redhat.com, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Dec 18, 2023 at 01:59:00PM +0000, Sebastian Ene wrote:
-> Register a debugfs file on guest creation to be able to view their
-> second translation tables with ptdump. This assumes that the host is in
-> control of the guest stage-2 and has direct access to the pagetables.
-> 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> ---
->  arch/arm64/kvm/debug.c      |  6 ++++++
->  arch/arm64/kvm/kvm_ptdump.h |  3 +++
->  arch/arm64/kvm/ptdump.c     | 35 ++++++++++++++++++++++++++++++++---
->  3 files changed, 41 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index 8725291cb..7c4c2902d 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -13,6 +13,7 @@
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_arm.h>
->  #include <asm/kvm_emulate.h>
-> +#include <kvm_ptdump.h>
->  
->  #include "trace.h"
->  
-> @@ -342,3 +343,8 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
->  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
->  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
->  }
-> +
-> +int kvm_arch_create_vm_debugfs(struct kvm *kvm)
-> +{
-> +	return kvm_ptdump_register_guest(kvm);
-> +}
-> diff --git a/arch/arm64/kvm/kvm_ptdump.h b/arch/arm64/kvm/kvm_ptdump.h
-> index 98b595ce8..5f5a455d0 100644
-> --- a/arch/arm64/kvm/kvm_ptdump.h
-> +++ b/arch/arm64/kvm/kvm_ptdump.h
-> @@ -6,13 +6,16 @@
->  #ifndef __KVM_PTDUMP_H
->  #define __KVM_PTDUMP_H
->  
-> +#include <linux/kvm_host.h>
->  #include <asm/ptdump.h>
->  
->  
->  #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
->  void kvm_ptdump_register_host(void);
-> +int kvm_ptdump_register_guest(struct kvm *kvm);
->  #else
->  static inline void kvm_ptdump_register_host(void) { }
-> +static inline int kvm_ptdump_register_guest(struct kvm *kvm) { return -1; }
->  #endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
->  
->  #endif /* __KVM_PTDUMP_H */
-> diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> index 4296e739f..62a753d6b 100644
-> --- a/arch/arm64/kvm/ptdump.c
-> +++ b/arch/arm64/kvm/ptdump.c
-> @@ -181,6 +181,8 @@ static int kvm_ptdump_open(struct inode *inode, struct file *file)
->  		info = reg->get_ptdump_info(reg);
->  		if (!info)
->  			return -ENOMEM;
-> +	} else {
-> +		info = inode->i_private;
+On Tue, 12 Dec 2023 09:31:20 +0000,
+Haibo Xu <haibo1.xu@intel.com> wrote:
+> > @@ -216,6 +221,9 @@ static bool parse_args(int argc, char *argv[])
+>  		case 'm':
+>  			test_args.migration_freq_ms = atoi_non_negative("Frequency", optarg);
+>  			break;
+> +		case 'e':
+> +			test_args.timer_err_margin_us = atoi_non_negative("Error Margin", optarg);
+> +			break;
 
-FIXME: Don't call kvm_ptdump_release with this ^ argument.
+So your error margin is always unsigned...
 
->  	}
->  
->  	if (!reg->show_ptdump_info)
-> @@ -239,15 +241,14 @@ static int kvm_ptdump_visitor(const struct kvm_pgtable_visit_ctx *ctx,
->  	return 0;
->  }
->  
-> -static int kvm_ptdump_show(struct seq_file *m, void *)
-> +static int kvm_ptdump_show_common(struct seq_file *m,
-> +				  struct kvm_pgtable *pgtable)
->  {
->  	u64 ipa_size;
->  	char ipa_description[32];
->  	struct pg_state st;
->  	struct addr_marker ipa_addr_markers[3] = {0};
->  	struct pg_level pg_level_descr[KVM_PGTABLE_MAX_LEVELS] = {0};
-> -	struct kvm_pgtable_snapshot *snapshot = m->private;
-> -	struct kvm_pgtable *pgtable = &snapshot->pgtable;
->  	struct kvm_pgtable_walker walker = (struct kvm_pgtable_walker) {
->  		.cb	= kvm_ptdump_visitor,
->  		.arg	= &st,
-> @@ -282,6 +283,26 @@ static int kvm_ptdump_show(struct seq_file *m, void *)
->  	return kvm_pgtable_walk(pgtable, 0, ipa_size, &walker);
->  }
->  
-> +static int kvm_host_ptdump_show(struct seq_file *m, void *)
-> +{
-> +	struct kvm_pgtable_snapshot *snapshot = m->private;
-> +
-> +	return kvm_ptdump_show_common(m, &snapshot->pgtable);
-> +}
-> +
-> +static int kvm_ptdump_show(struct seq_file *m, void *)
-> +{
-> +	struct kvm *guest_kvm = m->private;
-> +	struct kvm_s2_mmu *mmu = &guest_kvm->arch.mmu;
-> +	int ret;
-> +
-> +	write_lock(&guest_kvm->mmu_lock);
-> +	ret = kvm_ptdump_show_common(m, mmu->pgt);
-> +	write_unlock(&guest_kvm->mmu_lock);
-> +
-> +	return ret;
-> +}
-> +
->  static void kvm_ptdump_debugfs_register(struct kvm_ptdump_register *reg,
->  					const char *name, struct dentry *parent)
->  {
-> @@ -393,11 +414,19 @@ void kvm_ptdump_register_host(void)
->  
->  	host_reg.get_ptdump_info = kvm_host_get_ptdump_info;
->  	host_reg.put_ptdump_info = kvm_host_put_ptdump_info;
-> +	host_reg.show_ptdump_info = kvm_host_ptdump_show;
->  
->  	kvm_ptdump_debugfs_register(&host_reg, "host_page_tables",
->  				    kvm_debugfs_dir);
->  }
->  
-> +int kvm_ptdump_register_guest(struct kvm *kvm)
-> +{
-> +	debugfs_create_file("stage2_page_tables", 0400, kvm->debugfs_dentry,
-> +			    kvm, &kvm_ptdump_fops);
-> +	return 0;
-> +}
-> +
->  static int __init kvm_host_ptdump_init(void)
->  {
->  	host_reg.priv = (void *)host_s2_pgtable_pages();
-> -- 
-> 2.43.0.472.g3155946c3a-goog
-> 
+>  		case 'o':
+>  			test_args.counter_offset = strtol(optarg, NULL, 0);
+>  			test_args.reserved = 0;
+> diff --git a/tools/testing/selftests/kvm/include/timer_test.h b/tools/testing/selftests/kvm/include/timer_test.h
+> index 968257b893a7..b1d405e7157d 100644
+> --- a/tools/testing/selftests/kvm/include/timer_test.h
+> +++ b/tools/testing/selftests/kvm/include/timer_test.h
+> @@ -22,6 +22,7 @@ struct test_args {
+>  	int nr_iter;
+>  	int timer_period_ms;
+>  	int migration_freq_ms;
+> +	int timer_err_margin_us;
+
+... except that you are storing it as a signed value. Some consistency
+wouldn't hurt, really, and would avoid issues when passing large
+values.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
