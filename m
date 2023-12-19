@@ -1,78 +1,170 @@
-Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D921DA21;
-	Mon, 18 Dec 2023 20:35:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49F21FB6
+	for <kvmarm@lists.linux.dev>; Tue, 19 Dec 2023 02:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-1fae54afb66so108520fac.1;
-        Mon, 18 Dec 2023 12:35:27 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dVutZg0b"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-50e3cdcf010so1787827e87.2
+        for <kvmarm@lists.linux.dev>; Mon, 18 Dec 2023 18:28:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1702952923; x=1703557723; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LybLCdgFs9gLLPX00YSt1nmK2aV7C82qKaPm0j5xx54=;
+        b=dVutZg0bkpHCvz4XaHOOXLYi6mVugpev1o6ri0656eqLQvURcQ1i14+jfLdo4nSaTd
+         mu1+x8dv1YHRDuqpwPP0itZSgIOv2IjtMB9MGMitsY0r25pLdxynX8BJIXGEYjvmyOtH
+         IswWIbDkNukVl8bOevn9avVJNnfIXzbPuoKAxMbf5NDDeiDpdKvOIaGng94D3KoroIOZ
+         G8sZBWwmYYx8WldlY80/B9qSExzoYEj5uHoSFU2OMlSJ6tcShUb3x6e/oQo51o5MW3/x
+         Lv3aR9RuyvHJe9CTpp3xCaoAY6z3Bko23L9Qa5V1UKoyBp6U3S+dWSlqALehmsIRNBFj
+         aAyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702931727; x=1703536527;
+        d=1e100.net; s=20230601; t=1702952923; x=1703557723;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=w5muLLdvnEWK5GQ123Z96eJyI+5glad1JcNNdF8H1Jg=;
-        b=LTP2lQDeFXEDUZVdCNQF8GdhHCbpicXo3ev5c7ZpIYyHj7UEVJqBggQUlfYjcV/Yy1
-         tBikJ7RIv3bdzIMTymwM6YbnoyDlUJ8+9LiGTlnSJ56crMJwWO3HUVAuLVinJZyFGYJB
-         nH6cUvJi/ppxi6hjtFj8n90KdcsAcjDx/9NP/4B8HI7NQ2GZIPeCDiDi/9y/JxA5fR2Y
-         wyu2R/H9GjZmUDHJCLUny8alPzDwIsc5jq1ONqo63mshxi4r2wVnrtHG6rIKxPlDMlfF
-         QjSvAEm7wnvH7VaNTK3A+PV7cX6rKu+hMSFDAEgzmYUoybiD2iuwffkmz1ZUkKzi3FZq
-         YTWw==
-X-Gm-Message-State: AOJu0YwQ9pfWrr2hIc6R04yV4yQp4DFRsipNkEtyA49k8ixElHQkft1I
-	2yrQDfyCJNe4GWTqCQA4eNHriEhXle8RYL4cvs4oTkLA
-X-Google-Smtp-Source: AGHT+IF1MjB6QbmwWfc3T+5pLabp0AF+8g7RLCoeqeEABS9CAvETyoAN6o6rB15S5OlZOByT2E647igWVuJN9yCJ/4I=
-X-Received: by 2002:a05:6870:71ca:b0:203:e75d:a2c2 with SMTP id
- p10-20020a05687071ca00b00203e75da2c2mr729668oag.1.1702931727130; Mon, 18 Dec
- 2023 12:35:27 -0800 (PST)
+        bh=LybLCdgFs9gLLPX00YSt1nmK2aV7C82qKaPm0j5xx54=;
+        b=w1UBZH8kbCAOYR6WXWh55fsc2EQPq3lvz7ngb2/EM8eezTihW6zoh/SCv030ZdlxRV
+         321PyNRU9bg6uM066cMizn58pQTZjKoUHzmhgcNo5vd0sgcklVPdAEANfGe6VTwh7Rzd
+         5/vsT74HOrHNTRQsa0bzLWYCg6KZWgPXwZkL5opGRpHMP2xhwNMRG7LwFUWWmgPaMU66
+         5rZAfR3+FvGI/rZz0kMHfEjDIZkX1KvdGBE/UGF4ubJA8e2dArCmuR4R/Lbf/4S/QIOF
+         h4th8cuSTnKYkdHFPfMI1KjBlrrT/KxZvV+rTGre1ZjvyCZTIXE59qlzis2a2jsidznX
+         DNzw==
+X-Gm-Message-State: AOJu0YxVib0rLoWFIqP84PW48zYP3/AOom3LFD7nOG+TKWjm+DamZFVz
+	8S4QWLNZcpbDYnMdkIPzpIqEnTz3OZDvL2ubxBI=
+X-Google-Smtp-Source: AGHT+IG6tljE07OMLVo3iJQf47agztV1nHz7B1i2JzU7TDEW4jew8QvJDd4tPS3eMEBquQ1JC0Eg0TLSm7SvcF9wtYg=
+X-Received: by 2002:a05:6512:b0b:b0:50b:eb40:441a with SMTP id
+ w11-20020a0565120b0b00b0050beb40441amr7027389lfu.127.1702952922543; Mon, 18
+ Dec 2023 18:28:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk> <E1rDOgD-00Dvk2-3h@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1rDOgD-00Dvk2-3h@rmk-PC.armlinux.org.uk>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Mon, 18 Dec 2023 21:35:16 +0100
-Message-ID: <CAJZ5v0g9nfLrEf9u4Ksw6BOWJQ9iv8Z-O8RsLU6jR5zk0ahxRw@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 05/21] ACPI: Rename ACPI_HOTPLUG_CPU to include 'present'
-To: Russell King <rmk+kernel@armlinux.org.uk>
-Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev, x86@kernel.org, 
-	acpica-devel@lists.linuxfoundation.org, linux-csky@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-ia64@vger.kernel.org, 
-	linux-parisc@vger.kernel.org, Salil Mehta <salil.mehta@huawei.com>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com, justin.he@arm.com, 
-	James Morse <james.morse@arm.com>
+References: <cover.1702371136.git.haibo1.xu@intel.com> <02f6c9ccaaeb4ceb67137863e0317f62cef62496.1702371136.git.haibo1.xu@intel.com>
+ <20231213-b02db86aaf7957be22b200f1@orel>
+In-Reply-To: <20231213-b02db86aaf7957be22b200f1@orel>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Tue, 19 Dec 2023 10:28:31 +0800
+Message-ID: <CAJve8okOO=e66Kko3LyDfsD+tRZvDGf_Zgmog-u5TUzk1JZ1RA@mail.gmail.com>
+Subject: Re: [PATCH v4 08/11] KVM: riscv: selftests: Add guest helper to get
+ vcpu id
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Haibo Xu <haibo1.xu@intel.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
+	Conor Dooley <conor.dooley@microchip.com>, Mayuresh Chitale <mchitale@ventanamicro.com>, 
+	Greentime Hu <greentime.hu@sifive.com>, wchen <waylingii@gmail.com>, 
+	Jisheng Zhang <jszhang@kernel.org>, Minda Chen <minda.chen@starfivetech.com>, 
+	Samuel Holland <samuel@sholland.org>, Sean Christopherson <seanjc@google.com>, Like Xu <likexu@tencent.com>, 
+	Peter Xu <peterx@redhat.com>, Vipin Sharma <vipinsh@google.com>, 
+	Aaron Lewis <aaronlewis@google.com>, Thomas Huth <thuth@redhat.com>, 
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 13, 2023 at 1:49=E2=80=AFPM Russell King <rmk+kernel@armlinux.o=
-rg.uk> wrote:
+On Wed, Dec 13, 2023 at 10:08=E2=80=AFPM Andrew Jones <ajones@ventanamicro.=
+com> wrote:
 >
-> From: James Morse <james.morse@arm.com>
+> On Tue, Dec 12, 2023 at 05:31:17PM +0800, Haibo Xu wrote:
+> > Add guest_get_vcpuid() helper to simplify accessing to per-cpu
+> > private data. The sscratch CSR was used to store the vcpu id.
+> >
+> > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> > ---
+> >  tools/testing/selftests/kvm/include/aarch64/processor.h | 4 ----
+> >  tools/testing/selftests/kvm/include/kvm_util_base.h     | 9 +++++++++
+> >  tools/testing/selftests/kvm/lib/riscv/processor.c       | 8 ++++++++
+> >  3 files changed, 17 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/=
+tools/testing/selftests/kvm/include/aarch64/processor.h
+> > index c42d683102c7..16ae0ac01879 100644
+> > --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > @@ -226,8 +226,4 @@ void smccc_smc(uint32_t function_id, uint64_t arg0,=
+ uint64_t arg1,
+> >              uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5=
+,
+> >              uint64_t arg6, struct arm_smccc_res *res);
+> >
+> > -
+> > -
+> > -uint32_t guest_get_vcpuid(void);
+> > -
+> >  #endif /* SELFTEST_KVM_PROCESSOR_H */
+> > diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tool=
+s/testing/selftests/kvm/include/kvm_util_base.h
+> > index a18db6a7b3cf..666438113d22 100644
+> > --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> > +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> > @@ -932,4 +932,13 @@ void kvm_selftest_arch_init(void);
+> >
+> >  void kvm_arch_vm_post_create(struct kvm_vm *vm);
+> >
+> > +void vm_init_vector_tables(struct kvm_vm *vm);
+> > +void vcpu_init_vector_tables(struct kvm_vcpu *vcpu);
+> > +
+> > +struct ex_regs;
+> > +typedef void(*exception_handler_fn)(struct ex_regs *);
+> > +void vm_install_exception_handler(struct kvm_vm *vm, int vector, excep=
+tion_handler_fn handler);
 >
-> The code behind ACPI_HOTPLUG_CPU allows a not-present CPU to become
-> present.
-
-Right.
-
-> This isn't the only use of HOTPLUG_CPU. On arm64 and riscv
-> CPUs can be taken offline as a power saving measure.
-
-But still there is the case in which a non-present CPU can become
-present, isn't it there?
-
-> On arm64 an offline CPU may be disabled by firmware, preventing it from
-> being brought back online, but it remains present throughout.
+> I think something happend on rebase since the above should be in a
+> different patch (and were for v3). I suggest checking your previous
+> and current version branches with git-range-diff after rebasing in
+> order to catch stuff like this.
 >
-> Adding code to prevent user-space trying to online these disabled CPUs
-> needs some additional terminology.
+> Thanks,
+> drew
 >
-> Rename the Kconfig symbol CONFIG_ACPI_HOTPLUG_PRESENT_CPU to reflect
-> that it makes possible CPUs present.
 
-Honestly, I don't think that this change is necessary or even useful.
+Thanks for pointing it out. Will fix it in v5.
+
+> > +
+> > +uint32_t guest_get_vcpuid(void);
+> > +
+> >  #endif /* SELFTEST_KVM_UTIL_BASE_H */
+> > diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/=
+testing/selftests/kvm/lib/riscv/processor.c
+> > index efd9ac4b0198..39a1e9902dec 100644
+> > --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
+> > +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
+> > @@ -316,6 +316,9 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm=
+, uint32_t vcpu_id,
+> >       vcpu_set_reg(vcpu, RISCV_CORE_REG(regs.sp), stack_vaddr + stack_s=
+ize);
+> >       vcpu_set_reg(vcpu, RISCV_CORE_REG(regs.pc), (unsigned long)guest_=
+code);
+> >
+> > +     /* Setup sscratch for guest_get_vcpuid() */
+> > +     vcpu_set_reg(vcpu, RISCV_CSR_REG(sscratch), vcpu_id);
+> > +
+> >       /* Setup default exception vector of guest */
+> >       vcpu_set_reg(vcpu, RISCV_CSR_REG(stvec), (unsigned long)guest_une=
+xp_trap);
+> >
+> > @@ -436,3 +439,8 @@ void vm_install_interrupt_handler(struct kvm_vm *vm=
+, exception_handler_fn handle
+> >
+> >       handlers->exception_handlers[1][0] =3D handler;
+> >  }
+> > +
+> > +uint32_t guest_get_vcpuid(void)
+> > +{
+> > +     return csr_read(CSR_SSCRATCH);
+> > +}
+> > --
+> > 2.34.1
+> >
