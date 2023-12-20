@@ -1,117 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0576638DEB;
-	Tue, 19 Dec 2023 18:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C955C79DF
+	for <kvmarm@lists.linux.dev>; Wed, 20 Dec 2023 01:37:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lJ7TR7dH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78AA1C433C7;
-	Tue, 19 Dec 2023 18:22:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703010168;
-	bh=DPuOkfzjPhady10Q5o+36I/qim38sfvyYNHfU9o8g4s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lJ7TR7dHiGeTaDrDcD0P3s9K3/Cy0c5R+1JMsyHoyWSfR09sTOekdWbvT6dGuVtMM
-	 +MApXmtcHV+t2luxAN1lSgKWm++Ahv8W3hdZa37W1zwijBzqvRKv3ogmQQ3lwJtsH8
-	 IeMlSpos+7YynBF91UFPlkwtiaeyVcQL5JGEx9DWDK6ncwFsjZ1IvVPSg9+4aNJNL3
-	 oE03fa8trLY7ghnI0z+tR3HRpqSs+MYJo2GIFMKbAAeJ7/LiCe9FcaRMq2mvI7QGCD
-	 qYfD7Zh7ZWB9MMFX6UtMTZ4bCCpZWw6dKP6hxxwd3z8WAxC1YbU/jqaRGJ5bHb6Ljm
-	 q2fleBZ31mTBg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rFejt-005SbH-35;
-	Tue, 19 Dec 2023 18:22:45 +0000
-Date: Tue, 19 Dec 2023 18:22:44 +0000
-Message-ID: <8734vy832j.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Haibo Xu <haibo1.xu@intel.com>
-Cc: xiaobo55x@gmail.com,
-	ajones@ventanamicro.com,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Guo Ren <guoren@kernel.org>,
-	Mayuresh Chitale <mchitale@ventanamicro.com>,
-	Greentime Hu <greentime.hu@sifive.com>,
-	wchen <waylingii@gmail.com>,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Minda Chen <minda.chen@starfivetech.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Jisheng Zhang <jszhang@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Peter Xu <peterx@redhat.com>,
-	Like Xu <likexu@tencent.com>,
-	Vipin Sharma <vipinsh@google.com>,
-	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>,
-	Aaron Lewis <aaronlewis@google.com>,
-	Thomas Huth <thuth@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 11/11] KVM: selftests: Enable tunning of err_margin_us in arch timer test
-In-Reply-To: <0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
-References: <cover.1702371136.git.haibo1.xu@intel.com>
-	<0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p9gMJt+c"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5e7547e98f1so3333787b3.1
+        for <kvmarm@lists.linux.dev>; Tue, 19 Dec 2023 17:37:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1703036224; x=1703641024; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZMpPDRTJH35hvvkbLxFhPjnJilPUQ+sVkxQSPUGNzAE=;
+        b=p9gMJt+cA6nrpLCIVcC034VgLFW7QjQhMjN9EbZ+1lYtGe6N4Bjy1XRND/dx7Fc8XD
+         kSF0Yxm4zwor07rv2xt6Ltz0DG5ruATlGw4A82Xq75zRr3WKKducq46UvSQpC9ng40dS
+         0ZvnYyugk1Qo3XRQYaLPRkDmKTj+Dm8DWxdCe4IzMi5yWbYTPyi3Se3/lzxjMnK/ZMao
+         0mA3xXCIci1Op6qSct58xUw4wlRhhAHW3deY8WYaolXaXQwQumYNHuvX6Y9FlIYS4Akb
+         iz0JrnXsPQcuqVWw0vfJVGv+T11tkA0x6CRSrZIJtDWjmKF5M7IoTUJWIqjchfGfObm+
+         AFQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703036224; x=1703641024;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ZMpPDRTJH35hvvkbLxFhPjnJilPUQ+sVkxQSPUGNzAE=;
+        b=dC37bbXNilsxtrSxPj4ylqKHa2tKlIckIhSlnYvVmCYD/yvy3p1qY9xM9r1X4qzRvZ
+         rXnsGv+5vWznyaFpgh8k0ReUNsNMjXhnmpbLThKXpafGkE0BXzH5ZfgBdXHQsBRg5oi5
+         dVWhUYlKJGE5fC/mpVJDyhGqq1ZvbbaFzOzA8iFRoUTBkzjEqbAhUlA2JKZ8dL+drXvG
+         /tq6shKxmG62sVN46jAU5qkGnm/qvqe52Dcz+1Ofva9HCnrHEnS/2mkVAZR6SSH7QBGr
+         6C7sLnDSU71inQZIrtSUm4+1hRYtOTD1IsM3NKUUmTPIsJT4GrzLnQxfnCzOaqVqAjdf
+         XP5Q==
+X-Gm-Message-State: AOJu0YxinhZhjBVunWe2sqgsc0Rs5EtlhRD9hzdpNLp0W/2Z8ag1U8pj
+	PYEFBiFWHdzXriBP+YDja/+oP6KjcKQnwK+n3A==
+X-Google-Smtp-Source: AGHT+IHkW3C5TUe1j64s0L+R/fMZTOwVtCHzR1lHKvZLh86Uotwca9XCKzPvHhUBb8usj/+FHyFqnAW4Z34=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:2913:b0:5e5:d445:d9a9 with SMTP id
+ eg19-20020a05690c291300b005e5d445d9a9mr688492ywb.3.1703036223803; Tue, 19 Dec
+ 2023 17:37:03 -0800 (PST)
+Date: Tue, 19 Dec 2023 17:37:02 -0800
+In-Reply-To: <CAD=HUj5g9BoziHT5SbbZ1oFKv75UuXoo32x8DC3TYgLGZ6G_Bw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: haibo1.xu@intel.com, xiaobo55x@gmail.com, ajones@ventanamicro.com, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, pbonzini@redhat.com, shuah@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, guoren@kernel.org, mchitale@ventanamicro.com, greentime.hu@sifive.com, waylingii@gmail.com, conor.dooley@microchip.com, heiko@sntech.de, minda.chen@starfivetech.com, samuel@sholland.org, jszhang@kernel.org, seanjc@google.com, peterx@redhat.com, likexu@tencent.com, vipinsh@google.com, maciej.wieczor-retman@intel.com, aaronlewis@google.com, thuth@redhat.com, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20230911021637.1941096-1-stevensd@google.com> <CAD=HUj5733eL9momi=V53njm85BQv_QkVrX92xReiq0_9JhqxQ@mail.gmail.com>
+ <ZUEPn_nIoE-gLspp@google.com> <CAD=HUj5g9BoziHT5SbbZ1oFKv75UuXoo32x8DC3TYgLGZ6G_Bw@mail.gmail.com>
+Message-ID: <ZYJFPoFYkp4xajRO@google.com>
+Subject: Re: [PATCH v9 0/6] KVM: allow mapping non-refcounted pages
+From: Sean Christopherson <seanjc@google.com>
+To: David Stevens <stevensd@chromium.org>
+Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 12 Dec 2023 09:31:20 +0000,
-Haibo Xu <haibo1.xu@intel.com> wrote:
-> > @@ -216,6 +221,9 @@ static bool parse_args(int argc, char *argv[])
->  		case 'm':
->  			test_args.migration_freq_ms = atoi_non_negative("Frequency", optarg);
->  			break;
-> +		case 'e':
-> +			test_args.timer_err_margin_us = atoi_non_negative("Error Margin", optarg);
-> +			break;
+On Tue, Dec 12, 2023, David Stevens wrote:
+> On Tue, Oct 31, 2023 at 11:30=E2=80=AFPM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> >
+> > On Tue, Oct 31, 2023, David Stevens wrote:
+> > > Sean, have you been waiting for a new patch series with responses to
+> > > Maxim's comments? I'm not really familiar with kernel contribution
+> > > etiquette, but I was hoping to get your feedback before spending the
+> > > time to put together another patch series.
+> >
+> > No, I'm working my way back toward it.  The guest_memfd series took pre=
+cedence
+> > over everything that I wasn't confident would land in 6.7, i.e. larger =
+series
+> > effectively got put on the back burner.  Sorry :-(
+>=20
+> Is this series something that may be able to make it into 6.8 or 6.9?
 
-So your error margin is always unsigned...
+6.8 isn't realistic.  Between LPC, vacation, and non-upstream stuff, I've d=
+one
+frustratingly little code review since early November.  Sorry :-(
 
->  		case 'o':
->  			test_args.counter_offset = strtol(optarg, NULL, 0);
->  			test_args.reserved = 0;
-> diff --git a/tools/testing/selftests/kvm/include/timer_test.h b/tools/testing/selftests/kvm/include/timer_test.h
-> index 968257b893a7..b1d405e7157d 100644
-> --- a/tools/testing/selftests/kvm/include/timer_test.h
-> +++ b/tools/testing/selftests/kvm/include/timer_test.h
-> @@ -22,6 +22,7 @@ struct test_args {
->  	int nr_iter;
->  	int timer_period_ms;
->  	int migration_freq_ms;
-> +	int timer_err_margin_us;
-
-... except that you are storing it as a signed value. Some consistency
-wouldn't hurt, really, and would avoid issues when passing large
-values.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+I haven't paged this series back into memory, so take this with a grain of =
+salt,
+but IIRC there was nothing that would block this from landing in 6.9.  Timi=
+ng will
+likely be tight though, especially for getting testing on all architectures=
+.
