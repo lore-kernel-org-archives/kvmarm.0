@@ -1,88 +1,125 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C955C79DF
-	for <kvmarm@lists.linux.dev>; Wed, 20 Dec 2023 01:37:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 316A0168C4
+	for <kvmarm@lists.linux.dev>; Wed, 20 Dec 2023 04:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p9gMJt+c"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5e7547e98f1so3333787b3.1
-        for <kvmarm@lists.linux.dev>; Tue, 19 Dec 2023 17:37:04 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JNFjFsE4"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d3e84fded7so5338845ad.1
+        for <kvmarm@lists.linux.dev>; Tue, 19 Dec 2023 20:13:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1703036224; x=1703641024; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZMpPDRTJH35hvvkbLxFhPjnJilPUQ+sVkxQSPUGNzAE=;
-        b=p9gMJt+cA6nrpLCIVcC034VgLFW7QjQhMjN9EbZ+1lYtGe6N4Bjy1XRND/dx7Fc8XD
-         kSF0Yxm4zwor07rv2xt6Ltz0DG5ruATlGw4A82Xq75zRr3WKKducq46UvSQpC9ng40dS
-         0ZvnYyugk1Qo3XRQYaLPRkDmKTj+Dm8DWxdCe4IzMi5yWbYTPyi3Se3/lzxjMnK/ZMao
-         0mA3xXCIci1Op6qSct58xUw4wlRhhAHW3deY8WYaolXaXQwQumYNHuvX6Y9FlIYS4Akb
-         iz0JrnXsPQcuqVWw0vfJVGv+T11tkA0x6CRSrZIJtDWjmKF5M7IoTUJWIqjchfGfObm+
-         AFQA==
+        d=linaro.org; s=google; t=1703045623; x=1703650423; darn=lists.linux.dev;
+        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=mNVWdMSAqfvpbN5g4IovRqwuhzgdiEbCZgrhc7x2wjc=;
+        b=JNFjFsE4vjuIf/xNckD3rdwduKDwdJfY7YRS/lh711Z8jQmLha6WLrt/cipSXubAxP
+         C1GoCf4NpWmyfSTSdMJqSkZVsvXVehlIm+w2NFYFT7IBHZ6jy1Mbz1d3fUqag3pUSIdi
+         e6ZT3KTh4ZYYtYSUwDXP9TUD6mSRKn/6hrdaYhR0Xt9WKgUO8nO+K0OsmTDqQIsbtkkU
+         InqonvoeHw8e1+9IBVbE6VxoW/L7WSlzC+z1GopWwCTsZ5xnRRHWaDVtGpP63/kytMCl
+         nIv2SgHThbj51ENt3vY69h0JuwQMRa06ZZLcfzFk7mLKRlGmOpJzByCEwfOUZO2EA6fO
+         OGoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703036224; x=1703641024;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ZMpPDRTJH35hvvkbLxFhPjnJilPUQ+sVkxQSPUGNzAE=;
-        b=dC37bbXNilsxtrSxPj4ylqKHa2tKlIckIhSlnYvVmCYD/yvy3p1qY9xM9r1X4qzRvZ
-         rXnsGv+5vWznyaFpgh8k0ReUNsNMjXhnmpbLThKXpafGkE0BXzH5ZfgBdXHQsBRg5oi5
-         dVWhUYlKJGE5fC/mpVJDyhGqq1ZvbbaFzOzA8iFRoUTBkzjEqbAhUlA2JKZ8dL+drXvG
-         /tq6shKxmG62sVN46jAU5qkGnm/qvqe52Dcz+1Ofva9HCnrHEnS/2mkVAZR6SSH7QBGr
-         6C7sLnDSU71inQZIrtSUm4+1hRYtOTD1IsM3NKUUmTPIsJT4GrzLnQxfnCzOaqVqAjdf
-         XP5Q==
-X-Gm-Message-State: AOJu0YxinhZhjBVunWe2sqgsc0Rs5EtlhRD9hzdpNLp0W/2Z8ag1U8pj
-	PYEFBiFWHdzXriBP+YDja/+oP6KjcKQnwK+n3A==
-X-Google-Smtp-Source: AGHT+IHkW3C5TUe1j64s0L+R/fMZTOwVtCHzR1lHKvZLh86Uotwca9XCKzPvHhUBb8usj/+FHyFqnAW4Z34=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:2913:b0:5e5:d445:d9a9 with SMTP id
- eg19-20020a05690c291300b005e5d445d9a9mr688492ywb.3.1703036223803; Tue, 19 Dec
- 2023 17:37:03 -0800 (PST)
-Date: Tue, 19 Dec 2023 17:37:02 -0800
-In-Reply-To: <CAD=HUj5g9BoziHT5SbbZ1oFKv75UuXoo32x8DC3TYgLGZ6G_Bw@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1703045623; x=1703650423;
+        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mNVWdMSAqfvpbN5g4IovRqwuhzgdiEbCZgrhc7x2wjc=;
+        b=RVfwtHA69h7Sjvl333Mt/bDA6vTMDQwomcAHhMC5EbsgHgy3mCD1ZWj06/z2IvY7ub
+         KffsJGorRyg+If6FTDCrO5R0Pvb/qjd4xp2uy3uTJ7rNllvHxHwPSp1KbK2+OPwwMgwR
+         p/YjLv3i2EBGK2pSl7mLM9l3GZskHfjsnFjrkLn8kAqGa4GVoynWkOvHmoPIBVKt8NK+
+         JXlzDgHqG6kVqVbCqExm0x/ZiGhF9Uuuf+VzyJ/nzHcFl4lrRnAM2LjFMT8Vqaq7r+uj
+         70EtKAmkUJUPVdMKYwKmH/SGfO7t6CBgoo/+JSI2Lcy2LxfRnjoFAaWdfWjQNT9jTFB2
+         8N5g==
+X-Gm-Message-State: AOJu0YxjD1RcfJrOvLpIvokvPPc9p0aa5jngDbHTA4IzHNpG8rguG/MF
+	LudUTVOqhNJrtXXgG2g2yCPpRg==
+X-Google-Smtp-Source: AGHT+IGTH7Uz/NcmceVfotUGElTRFy6BFXANyvxa2H36ukICplsk22hKc23OStWdWx3+9daWWuC7hQ==
+X-Received: by 2002:a17:903:22c1:b0:1d3:c025:c99e with SMTP id y1-20020a17090322c100b001d3c025c99emr2935918plg.63.1703045623531;
+        Tue, 19 Dec 2023 20:13:43 -0800 (PST)
+Received: from localhost ([2804:14d:7e39:8470:8f60:ee5a:d698:1116])
+        by smtp.gmail.com with ESMTPSA id q14-20020a170902dace00b001d08e08003esm21884208plx.174.2023.12.19.20.13.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Dec 2023 20:13:42 -0800 (PST)
+References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
+User-agent: mu4e 1.10.8; emacs 29.1
+From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
+ <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Morton
+ <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
+ <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
+ Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, Oleg
+ Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, Kees
+ Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, "Rick P.
+ Edgecombe" <rick.p.edgecombe@intel.com>, Deepak Gupta
+ <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, Szabolcs Nagy
+ <Szabolcs.Nagy@arm.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
+ <aou@eecs.berkeley.edu>, Florian Weimer <fweimer@redhat.com>, Christian
+ Brauner <brauner@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v7 00/39] arm64/gcs: Provide support for GCS in userspace
+In-reply-to: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
+Date: Wed, 20 Dec 2023 01:13:41 -0300
+Message-ID: <874jgdh5oq.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230911021637.1941096-1-stevensd@google.com> <CAD=HUj5733eL9momi=V53njm85BQv_QkVrX92xReiq0_9JhqxQ@mail.gmail.com>
- <ZUEPn_nIoE-gLspp@google.com> <CAD=HUj5g9BoziHT5SbbZ1oFKv75UuXoo32x8DC3TYgLGZ6G_Bw@mail.gmail.com>
-Message-ID: <ZYJFPoFYkp4xajRO@google.com>
-Subject: Re: [PATCH v9 0/6] KVM: allow mapping non-refcounted pages
-From: Sean Christopherson <seanjc@google.com>
-To: David Stevens <stevensd@chromium.org>
-Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Tue, Dec 12, 2023, David Stevens wrote:
-> On Tue, Oct 31, 2023 at 11:30=E2=80=AFPM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> >
-> > On Tue, Oct 31, 2023, David Stevens wrote:
-> > > Sean, have you been waiting for a new patch series with responses to
-> > > Maxim's comments? I'm not really familiar with kernel contribution
-> > > etiquette, but I was hoping to get your feedback before spending the
-> > > time to put together another patch series.
-> >
-> > No, I'm working my way back toward it.  The guest_memfd series took pre=
-cedence
-> > over everything that I wasn't confident would land in 6.7, i.e. larger =
-series
-> > effectively got put on the back burner.  Sorry :-(
->=20
-> Is this series something that may be able to make it into 6.8 or 6.9?
 
-6.8 isn't realistic.  Between LPC, vacation, and non-upstream stuff, I've d=
-one
-frustratingly little code review since early November.  Sorry :-(
+Mark Brown <broonie@kernel.org> writes:
 
-I haven't paged this series back into memory, so take this with a grain of =
-salt,
-but IIRC there was nothing that would block this from landing in 6.9.  Timi=
-ng will
-likely be tight though, especially for getting testing on all architectures=
-.
+>       arm64/mm: Restructure arch_validate_flags() for extensibility
+>       prctl: arch-agnostic prctl for shadow stack
+>       mman: Add map_shadow_stack() flags
+>       arm64: Document boot requirements for Guarded Control Stacks
+>       arm64/gcs: Document the ABI for Guarded Control Stacks
+>       arm64/sysreg: Add new system registers for GCS
+>       arm64/sysreg: Add definitions for architected GCS caps
+>       arm64/gcs: Add manual encodings of GCS instructions
+>       arm64/gcs: Provide put_user_gcs()
+>       arm64/cpufeature: Runtime detection of Guarded Control Stack (GCS)
+>       arm64/mm: Allocate PIE slots for EL0 guarded control stack
+>       mm: Define VM_SHADOW_STACK for arm64 when we support GCS
+>       arm64/mm: Map pages for guarded control stack
+>       KVM: arm64: Manage GCS registers for guests
+>       arm64/gcs: Allow GCS usage at EL0 and EL1
+>       arm64/idreg: Add overrride for GCS
+>       arm64/hwcap: Add hwcap for GCS
+>       arm64/traps: Handle GCS exceptions
+>       arm64/mm: Handle GCS data aborts
+>       arm64/gcs: Context switch GCS state for EL0
+>       arm64/gcs: Allocate a new GCS for threads with GCS enabled
+>       arm64/gcs: Implement shadow stack prctl() interface
+>       arm64/mm: Implement map_shadow_stack()
+>       arm64/signal: Set up and restore the GCS context for signal handlers
+>       arm64/signal: Expose GCS state in signal frames
+>       arm64/ptrace: Expose GCS via ptrace and core files
+>       arm64: Add Kconfig for Guarded Control Stack (GCS)
+>       kselftest/arm64: Verify the GCS hwcap
+>       kselftest/arm64: Add GCS as a detected feature in the signal tests
+>       kselftest/arm64: Add framework support for GCS to signal handling tests
+>       kselftest/arm64: Allow signals tests to specify an expected si_code
+>       kselftest/arm64: Always run signals tests with GCS enabled
+>       kselftest/arm64: Add very basic GCS test program
+>       kselftest/arm64: Add a GCS test program built with the system libc
+>       kselftest/arm64: Add test coverage for GCS mode locking
+>       selftests/arm64: Add GCS signal tests
+>       kselftest/arm64: Add a GCS stress test
+>       kselftest/arm64: Enable GCS for the FP stress tests
+>       kselftest/clone3: Enable GCS in the clone3 selftests
+
+Not sure if this is warranted, so sorry for the potential spam:
+
+I don't have any comments on the patches I haven't replied to.
+
+-- 
+Thiago
