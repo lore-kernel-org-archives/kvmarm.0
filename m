@@ -1,125 +1,136 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 316A0168C4
-	for <kvmarm@lists.linux.dev>; Wed, 20 Dec 2023 04:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294611549E
+	for <kvmarm@lists.linux.dev>; Wed, 20 Dec 2023 06:50:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JNFjFsE4"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d3e84fded7so5338845ad.1
-        for <kvmarm@lists.linux.dev>; Tue, 19 Dec 2023 20:13:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EczIQb/L"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2cc2238f597so60852921fa.3
+        for <kvmarm@lists.linux.dev>; Tue, 19 Dec 2023 22:50:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1703045623; x=1703650423; darn=lists.linux.dev;
-        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=mNVWdMSAqfvpbN5g4IovRqwuhzgdiEbCZgrhc7x2wjc=;
-        b=JNFjFsE4vjuIf/xNckD3rdwduKDwdJfY7YRS/lh711Z8jQmLha6WLrt/cipSXubAxP
-         C1GoCf4NpWmyfSTSdMJqSkZVsvXVehlIm+w2NFYFT7IBHZ6jy1Mbz1d3fUqag3pUSIdi
-         e6ZT3KTh4ZYYtYSUwDXP9TUD6mSRKn/6hrdaYhR0Xt9WKgUO8nO+K0OsmTDqQIsbtkkU
-         InqonvoeHw8e1+9IBVbE6VxoW/L7WSlzC+z1GopWwCTsZ5xnRRHWaDVtGpP63/kytMCl
-         nIv2SgHThbj51ENt3vY69h0JuwQMRa06ZZLcfzFk7mLKRlGmOpJzByCEwfOUZO2EA6fO
-         OGoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703045623; x=1703650423;
-        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1703055015; x=1703659815; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mNVWdMSAqfvpbN5g4IovRqwuhzgdiEbCZgrhc7x2wjc=;
-        b=RVfwtHA69h7Sjvl333Mt/bDA6vTMDQwomcAHhMC5EbsgHgy3mCD1ZWj06/z2IvY7ub
-         KffsJGorRyg+If6FTDCrO5R0Pvb/qjd4xp2uy3uTJ7rNllvHxHwPSp1KbK2+OPwwMgwR
-         p/YjLv3i2EBGK2pSl7mLM9l3GZskHfjsnFjrkLn8kAqGa4GVoynWkOvHmoPIBVKt8NK+
-         JXlzDgHqG6kVqVbCqExm0x/ZiGhF9Uuuf+VzyJ/nzHcFl4lrRnAM2LjFMT8Vqaq7r+uj
-         70EtKAmkUJUPVdMKYwKmH/SGfO7t6CBgoo/+JSI2Lcy2LxfRnjoFAaWdfWjQNT9jTFB2
-         8N5g==
-X-Gm-Message-State: AOJu0YxjD1RcfJrOvLpIvokvPPc9p0aa5jngDbHTA4IzHNpG8rguG/MF
-	LudUTVOqhNJrtXXgG2g2yCPpRg==
-X-Google-Smtp-Source: AGHT+IGTH7Uz/NcmceVfotUGElTRFy6BFXANyvxa2H36ukICplsk22hKc23OStWdWx3+9daWWuC7hQ==
-X-Received: by 2002:a17:903:22c1:b0:1d3:c025:c99e with SMTP id y1-20020a17090322c100b001d3c025c99emr2935918plg.63.1703045623531;
-        Tue, 19 Dec 2023 20:13:43 -0800 (PST)
-Received: from localhost ([2804:14d:7e39:8470:8f60:ee5a:d698:1116])
-        by smtp.gmail.com with ESMTPSA id q14-20020a170902dace00b001d08e08003esm21884208plx.174.2023.12.19.20.13.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Dec 2023 20:13:42 -0800 (PST)
-References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
-User-agent: mu4e 1.10.8; emacs 29.1
-From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
- <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Morton
- <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
- <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, Oleg
- Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, Kees
- Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, "Rick P.
- Edgecombe" <rick.p.edgecombe@intel.com>, Deepak Gupta
- <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, Szabolcs Nagy
- <Szabolcs.Nagy@arm.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
- <aou@eecs.berkeley.edu>, Florian Weimer <fweimer@redhat.com>, Christian
- Brauner <brauner@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v7 00/39] arm64/gcs: Provide support for GCS in userspace
-In-reply-to: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
-Date: Wed, 20 Dec 2023 01:13:41 -0300
-Message-ID: <874jgdh5oq.fsf@linaro.org>
+        bh=IloV9gHlRpc9SD2YCXR7E/7T42jMVfD74Pty8sLbHvY=;
+        b=EczIQb/LL6qNEs0cmixyqI6OI4EnGsomxWZDfZEGobOZrdhtfHjn1UtnnGxRcT0tJ9
+         JNzvC4zlCy19N5y3NvWcX2ikgjpuyKyEeWgWLwLM7TmSrDqO2tNzg8ijAUyBiLK8APDq
+         323TPXBUpObgERxvFo1gSp1JIAk8ZWZF7sM9TF/09jTGAxAVwUJrq/A+57ViI3S8Bb1j
+         c0Uk6e+KH0HGU3bwtce8aSRkHe3+qQidMEylxqmMMznOxstdmoZKXxXgzPxJRZ645eaZ
+         MWz3Zdrtoc+LtxD5CdWCe2SLBFM+CvMpLKpnqlFjJ95afr0s4UkkanU1rJB4OnBm6odP
+         h5HQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703055015; x=1703659815;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IloV9gHlRpc9SD2YCXR7E/7T42jMVfD74Pty8sLbHvY=;
+        b=pCwXNBj1JMzAyK7HoD2QvscVebOQShAYwXlpK28+dsis8YMfdYblOwRD2ihDoAoe1y
+         61diHfbMKUJpeYyiocTxYFVxaFyTjowIPOVHOPh0sX7eY3w2TZLJ00+1gqdaS9ZxkEMM
+         3lAqav4vAm2tjftOpFBhmAy1ooC3f/eklvv8OO+3IbjSIrC9LBN0PUyhqRj7NDLwLThe
+         pc8TEuRaglfXb+eU2a0CH7Lj+elHwa+s0xQ5kYrYvtoej16hFCCjtMYs6+TWFMoF5Bce
+         ZVAQddWH4u6iQ405DGSDEOSg/GM0p6G5WkbqlExQ18lDqm+aJfhtzSSRfFbIh4IdBhl+
+         K33g==
+X-Gm-Message-State: AOJu0Yy6iW55JvllzGzbzddXCkfpres2gSES+szXeJMPJvnwN2+VFFHQ
+	Hx3S6SRLngBdkX2396/z1wOp6FAn3+U6gJoF1O0=
+X-Google-Smtp-Source: AGHT+IGyXIZ1XsWlabej49gCsPyJXlY+x34WunG9S1gzJ848CgF23IrFQFyfhwjo//9JKJAadF2riryatJZtvHVMNgc=
+X-Received: by 2002:a2e:b0dc:0:b0:2cc:895c:5de3 with SMTP id
+ g28-20020a2eb0dc000000b002cc895c5de3mr338259ljl.207.1703055014949; Tue, 19
+ Dec 2023 22:50:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <cover.1702371136.git.haibo1.xu@intel.com> <0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
+ <8734vy832j.wl-maz@kernel.org>
+In-Reply-To: <8734vy832j.wl-maz@kernel.org>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Wed, 20 Dec 2023 14:50:03 +0800
+Message-ID: <CAJve8onc0WN5g98aOVBmJx15wFBAqfBKJ+ufoLY+oqYyVL+=3A@mail.gmail.com>
+Subject: Re: [PATCH v4 11/11] KVM: selftests: Enable tunning of err_margin_us
+ in arch timer test
+To: Marc Zyngier <maz@kernel.org>
+Cc: Haibo Xu <haibo1.xu@intel.com>, ajones@ventanamicro.com, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
+	Mayuresh Chitale <mchitale@ventanamicro.com>, Greentime Hu <greentime.hu@sifive.com>, 
+	wchen <waylingii@gmail.com>, Conor Dooley <conor.dooley@microchip.com>, 
+	Heiko Stuebner <heiko@sntech.de>, Minda Chen <minda.chen@starfivetech.com>, 
+	Samuel Holland <samuel@sholland.org>, Jisheng Zhang <jszhang@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, Like Xu <likexu@tencent.com>, 
+	Vipin Sharma <vipinsh@google.com>, 
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Dec 20, 2023 at 2:22=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Tue, 12 Dec 2023 09:31:20 +0000,
+> Haibo Xu <haibo1.xu@intel.com> wrote:
+> > > @@ -216,6 +221,9 @@ static bool parse_args(int argc, char *argv[])
+> >               case 'm':
+> >                       test_args.migration_freq_ms =3D atoi_non_negative=
+("Frequency", optarg);
+> >                       break;
+> > +             case 'e':
+> > +                     test_args.timer_err_margin_us =3D atoi_non_negati=
+ve("Error Margin", optarg);
+> > +                     break;
+>
+> So your error margin is always unsigned...
+>
 
-Mark Brown <broonie@kernel.org> writes:
+The error margin was supposed to be a non-negative [0, INT_MAX].
+(May be need to define a Max for the input, instead of INT_MAX)
 
->       arm64/mm: Restructure arch_validate_flags() for extensibility
->       prctl: arch-agnostic prctl for shadow stack
->       mman: Add map_shadow_stack() flags
->       arm64: Document boot requirements for Guarded Control Stacks
->       arm64/gcs: Document the ABI for Guarded Control Stacks
->       arm64/sysreg: Add new system registers for GCS
->       arm64/sysreg: Add definitions for architected GCS caps
->       arm64/gcs: Add manual encodings of GCS instructions
->       arm64/gcs: Provide put_user_gcs()
->       arm64/cpufeature: Runtime detection of Guarded Control Stack (GCS)
->       arm64/mm: Allocate PIE slots for EL0 guarded control stack
->       mm: Define VM_SHADOW_STACK for arm64 when we support GCS
->       arm64/mm: Map pages for guarded control stack
->       KVM: arm64: Manage GCS registers for guests
->       arm64/gcs: Allow GCS usage at EL0 and EL1
->       arm64/idreg: Add overrride for GCS
->       arm64/hwcap: Add hwcap for GCS
->       arm64/traps: Handle GCS exceptions
->       arm64/mm: Handle GCS data aborts
->       arm64/gcs: Context switch GCS state for EL0
->       arm64/gcs: Allocate a new GCS for threads with GCS enabled
->       arm64/gcs: Implement shadow stack prctl() interface
->       arm64/mm: Implement map_shadow_stack()
->       arm64/signal: Set up and restore the GCS context for signal handlers
->       arm64/signal: Expose GCS state in signal frames
->       arm64/ptrace: Expose GCS via ptrace and core files
->       arm64: Add Kconfig for Guarded Control Stack (GCS)
->       kselftest/arm64: Verify the GCS hwcap
->       kselftest/arm64: Add GCS as a detected feature in the signal tests
->       kselftest/arm64: Add framework support for GCS to signal handling tests
->       kselftest/arm64: Allow signals tests to specify an expected si_code
->       kselftest/arm64: Always run signals tests with GCS enabled
->       kselftest/arm64: Add very basic GCS test program
->       kselftest/arm64: Add a GCS test program built with the system libc
->       kselftest/arm64: Add test coverage for GCS mode locking
->       selftests/arm64: Add GCS signal tests
->       kselftest/arm64: Add a GCS stress test
->       kselftest/arm64: Enable GCS for the FP stress tests
->       kselftest/clone3: Enable GCS in the clone3 selftests
+> >               case 'o':
+> >                       test_args.counter_offset =3D strtol(optarg, NULL,=
+ 0);
+> >                       test_args.reserved =3D 0;
+> > diff --git a/tools/testing/selftests/kvm/include/timer_test.h b/tools/t=
+esting/selftests/kvm/include/timer_test.h
+> > index 968257b893a7..b1d405e7157d 100644
+> > --- a/tools/testing/selftests/kvm/include/timer_test.h
+> > +++ b/tools/testing/selftests/kvm/include/timer_test.h
+> > @@ -22,6 +22,7 @@ struct test_args {
+> >       int nr_iter;
+> >       int timer_period_ms;
+> >       int migration_freq_ms;
+> > +     int timer_err_margin_us;
+>
+> ... except that you are storing it as a signed value. Some consistency
+> wouldn't hurt, really, and would avoid issues when passing large
+> values.
+>
 
-Not sure if this is warranted, so sorry for the potential spam:
+Yes, it's more proper to use an unsigned int for the non-negative error mar=
+gin.
+Storing as signed here is just to keep the type consistent with that
+of timer_period_ms
+since there will be '+' operation in other places.
 
-I don't have any comments on the patches I haven't replied to.
+        tools/testing/selftests/kvm/aarch64/arch_timer.c
+        /* Setup a timeout for the interrupt to arrive */
+         udelay(msecs_to_usecs(test_args.timer_period_ms) +
+             test_args.timer_err_margin_us);
 
--- 
-Thiago
+Thanks,
+Haibo
+
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
