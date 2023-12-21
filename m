@@ -1,186 +1,149 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6254B5C9;
-	Thu, 21 Dec 2023 09:25:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e+a1SPK9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CC26C433C7;
-	Thu, 21 Dec 2023 09:25:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703150706;
-	bh=AYGf91U8T/JqQeT9S7bNrsfYGOsBnl13+m+5Z2NMRpE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=e+a1SPK9XQk98t/2P89QLYkpRHBpJS7KY21oexMqyE4ufnNnH1jA60n99byaXUQrG
-	 Whze4kMbMPwcMYcyZxxZthpvZeB86k4WI2aoo5qTNeHpb0hiPYhTvStJ316yvjfq6j
-	 dtlS3klVPy7VJSds3XBKmkSvuP/7RE7bHXFEPyxIYjUUoiWjQ+MzJJ2PQGgJxFGnDy
-	 JglUtTKXGsfwyIxsYSBqcJHYZBf1neH1h3xIwVrp65z5zJTs3+eRYQTEdLTc+zL4H0
-	 Oh8HDT/FEIfnZbhUeAp76Mhb5ygZSOHs3myvlqSoNxw9Mv3cIVXXSMpG/TFhnfbsqA
-	 MM/3QxvCERuTg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rGFIc-005wSL-VG;
-	Thu, 21 Dec 2023 09:25:03 +0000
-Date: Thu, 21 Dec 2023 09:25:02 +0000
-Message-ID: <86plyzaowh.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Haibo Xu <xiaobo55x@gmail.com>
-Cc: Haibo Xu <haibo1.xu@intel.com>,
-	ajones@ventanamicro.com,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Guo Ren <guoren@kernel.org>,
-	Mayuresh Chitale <mchitale@ventanamicro.com>,
-	Greentime Hu <greentime.hu@sifive.com>,
-	wchen <waylingii@gmail.com>,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Minda Chen <minda.chen@starfivetech.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Jisheng Zhang <jszhang@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Peter Xu <peterx@redhat.com>,
-	Like Xu <likexu@tencent.com>,
-	Vipin Sharma <vipinsh@google.com>,
-	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>,
-	Aaron Lewis <aaronlewis@google.com>,
-	Thomas Huth <thuth@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v4 11/11] KVM: selftests: Enable tunning of err_margin_us in arch timer test
-In-Reply-To: <CAJve8o=nTsAwwgSib4vOLXjOWSMV2+J+BFsUZ57OdAK7eW8q8A@mail.gmail.com>
-References: <cover.1702371136.git.haibo1.xu@intel.com>
-	<0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
-	<8734vy832j.wl-maz@kernel.org>
-	<CAJve8onc0WN5g98aOVBmJx15wFBAqfBKJ+ufoLY+oqYyVL+=3A@mail.gmail.com>
-	<f98879dc24f948f7a8a7b5374a32bc04@kernel.org>
-	<CAJve8ona7g=LxW1YeRB_FqGodF973H=A3b2m8054gmzK=Z7_ww@mail.gmail.com>
-	<87zfy5t1qt.wl-maz@kernel.org>
-	<CAJve8o=nTsAwwgSib4vOLXjOWSMV2+J+BFsUZ57OdAK7eW8q8A@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4327745CD;
+	Thu, 21 Dec 2023 13:19:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCA05C433C7;
+	Thu, 21 Dec 2023 13:19:20 +0000 (UTC)
+Date: Thu, 21 Dec 2023 13:19:18 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Jason Gunthorpe <jgg@nvidia.com>, ankita@nvidia.com, maz@kernel.org,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org,
+	alex.williamson@redhat.com, kevin.tian@intel.com,
+	yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org,
+	gshan@redhat.com, linux-mm@kvack.org, aniketa@nvidia.com,
+	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
+	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
+	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	james.morse@arm.com
+Subject: Re: [PATCH v3 2/2] kvm: arm64: set io memory s2 pte as normalnc for
+ vfio pci devices
+Message-ID: <ZYQ7VjApH1v1QwTW@arm.com>
+References: <20231208164709.23101-1-ankita@nvidia.com>
+ <20231208164709.23101-3-ankita@nvidia.com>
+ <ZXicemDzXm8NShs1@arm.com>
+ <20231212181156.GO3014157@nvidia.com>
+ <ZXoOieQN7rBiLL4A@linux.dev>
+ <ZXsjv+svp44YjMmh@lpieralisi>
+ <ZXszoQ48pZ7FnQNV@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: xiaobo55x@gmail.com, haibo1.xu@intel.com, ajones@ventanamicro.com, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, pbonzini@redhat.com, shuah@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, guoren@kernel.org, mchitale@ventanamicro.com, greentime.hu@sifive.com, waylingii@gmail.com, conor.dooley@microchip.com, heiko@sntech.de, minda.chen@starfivetech.com, samuel@sholland.org, jszhang@kernel.org, seanjc@google.com, peterx@redhat.com, likexu@tencent.com, vipinsh@google.com, maciej.wieczor-retman@intel.com, aaronlewis@google.com, thuth@redhat.com, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZXszoQ48pZ7FnQNV@linux.dev>
 
-On Thu, 21 Dec 2023 02:58:40 +0000,
-Haibo Xu <xiaobo55x@gmail.com> wrote:
->=20
-> On Wed, Dec 20, 2023 at 9:58=E2=80=AFPM Marc Zyngier <maz@kernel.org> wro=
-te:
-> >
-> > On Wed, 20 Dec 2023 13:51:24 +0000,
-> > Haibo Xu <xiaobo55x@gmail.com> wrote:
-> > >
-> > > On Wed, Dec 20, 2023 at 5:00=E2=80=AFPM Marc Zyngier <maz@kernel.org>=
- wrote:
-> > > >
-> > > > On 2023-12-20 06:50, Haibo Xu wrote:
-> > > > > On Wed, Dec 20, 2023 at 2:22=E2=80=AFAM Marc Zyngier <maz@kernel.=
-org> wrote:
-> > > > >>
-> > > > >> On Tue, 12 Dec 2023 09:31:20 +0000,
-> > > > >> Haibo Xu <haibo1.xu@intel.com> wrote:
-> > > > >> > diff --git a/tools/testing/selftests/kvm/include/timer_test.h =
-b/tools/testing/selftests/kvm/include/timer_test.h
-> > > > >> > index 968257b893a7..b1d405e7157d 100644
-> > > > >> > --- a/tools/testing/selftests/kvm/include/timer_test.h
-> > > > >> > +++ b/tools/testing/selftests/kvm/include/timer_test.h
-> > > > >> > @@ -22,6 +22,7 @@ struct test_args {
-> > > > >> >       int nr_iter;
-> > > > >> >       int timer_period_ms;
-> > > > >> >       int migration_freq_ms;
-> > > > >> > +     int timer_err_margin_us;
-> > > > >>
-> > > > >> ... except that you are storing it as a signed value. Some consi=
-stency
-> > > > >> wouldn't hurt, really, and would avoid issues when passing large
-> > > > >> values.
-> > > > >>
-> > > > >
-> > > > > Yes, it's more proper to use an unsigned int for the non-negative=
- error
-> > > > > margin.
-> > > > > Storing as signed here is just to keep the type consistent with t=
-hat
-> > > > > of timer_period_ms
-> > > > > since there will be '+' operation in other places.
-> > > > >
-> > > > >         tools/testing/selftests/kvm/aarch64/arch_timer.c
-> > > > >         /* Setup a timeout for the interrupt to arrive */
-> > > > >          udelay(msecs_to_usecs(test_args.timer_period_ms) +
-> > > > >              test_args.timer_err_margin_us);
-> > > >
-> > > > But that's exactly why using a signed quantity is wrong.
-> > > > What does it mean to have a huge *negative* margin?
-> > > >
-> > >
-> > > Hi Marc,
-> > >
-> > > I agree that negative values are meaningless for the margin.
-> > > If I understand correctly, the negative margin should be filtered by
-> > > assertion in atoi_non_negative().
-> >
-> > No. Please.
-> >
-> > atoi_non_negative() returns a uint32_t, which is what it should do.
-> > The bug is squarely in the use of an 'int' to store such value, and it
-> > is the *storage* that turns a positive value into a negative one.
-> >
->=20
-> Thanks for the detailed info!
->=20
-> May I understand that your concern is mainly for a platform with
-> 64bit int type, which may trigger the positive to negative convert?
+Catching up on emails before going on holiday (again).
 
-No. It specifically applies to architectures with a 32bit int type,
-which is... *EVERYTHING*. Here's a basic example:
+On Thu, Dec 14, 2023 at 04:56:01PM +0000, Oliver Upton wrote:
+> On Thu, Dec 14, 2023 at 04:48:15PM +0100, Lorenzo Pieralisi wrote:
+> > > AFAICT, the only reason PCI devices can get the blanket treatment of
+> > > Normal-NC at stage-2 is because userspace has a Device-* mapping and can't
+> > > speculatively load from the alias. This feels a bit hacky, and maybe we
+> > > should prioritize an interface for mapping a device into a VM w/o a
+> > > valid userspace mapping.
+> > 
+> > FWIW - I have tried to summarize the reasoning behind PCIe devices
+> > Normal-NC default stage-2 safety in a document that I have just realized
+> > now it has become this series cover letter, I don't think the PCI blanket
+> > treatment is related *only* to the current user space mappings (ie
+> > BTW, AFAICS it is also *possible* at present to map a prefetchable BAR through
+> > sysfs with Normal-NC memory attributes in the host at the same time a PCI
+> > device is passed-through to a guest with VFIO - and therefore we have a
+> > dev-nGnRnE stage-1 mapping for it. Don't think anyone does that - what for -
+> > but it is possible and KVM would not know about it).
+> > 
+> > Again, FWIW, we were told (source Arm ARM) mismatched aliases concerning
+> > device-XXX vs Normal-NC are not problematic as long as the transactions
+> > issued for the related mappings are independent (and none of the
+> > mappings is cacheable).
+> > 
+> > I appreciate this is not enough to give everyone full confidence on
+> > this solution robustness - that's why I wrote that up so that we know
+> > what we are up against and write KVM interfaces accordingly.
+> 
+> Apologies, I didn't mean to question what's going on here from the
+> hardware POV. My concern was more from the kernel + user interfaces POV,
+> this all seems to work (specifically for PCI) by maintaining an
+> intentional mismatch between the VFIO stage-1 and KVM stage-2 mappings.
 
-<quote>
-#include <stdio.h>
+If you stare at it long enough, the mismatch starts to look fine ;).
+Even if you have the VFIO stage 1 Normal NC, KVM stage 2 Normal NC, you
+can still have the guest setting stage 1 to Device and introduce an
+architectural mismatch. These aliases have some bad reputation but the
+behaviour is constrained architecturally.
 
-int main(int argc, char *argv[])
-{
-	int x =3D 1U << 31;
+IMHO we should move on from this attribute mismatch since we can't fully
+solve it anyway and focus instead on what the device, system can
+tolerate, who's responsible for deciding which MMIO ranges can be mapped
+as Normal NC. There are a few options here (talking in the PCIe context
+but it can be extended to other VFIO mappings):
 
-	printf("%d (%d)\n", x, sizeof(x));
-	return 0;
-}
-</quote>
+1. The VMM is responsible for intra-BAR relaxation of the KVM stage 2:
+   a) via the stage 1 VFIO mapping attributes - Device or Normal
+   b) via other means (e.g. ioctl(<range>)) while the stage 1 VFIO stays
+      Device
 
-which returns "-2147483648 (4)" on any platform.
+2. KVM decides the intra-BAR relaxation irrespective of the VFIO stage 1
+   attributes (VMM mapping)
 
-This really is basic C, and I am very worried that you don't see the
-issue. I strongly suggest that you go and read about the C type system
-before touching this code.
+3. KVM decides the full-BAR relaxation with the guest responsible for
+   the intra-BAR attributes. As with (2), that's irrespective of the
+   VFIO stage 1 host mapping
 
-	M.
+Whichever option we pick, it won't be the host forcing the Normal NC
+mapping, that's still a guest decision and the host only allowing it.
 
---=20
-Without deviation from the norm, progress is not possible.
+(1) needs specific device knowledge in the VMM or a VFIO-specific driver
+(or both if the VMM isn't fully trusted to request the right
+attributes). (2) moves the device-specific knowledge to KVM or a
+combination of KVM and VFIO-specific driver. Things can get a lot worse
+if the Device vs Normal ranges within a BAR are configurable and needs
+some paravirtualised interface for the guest to agree with the host.
+
+These patches aim for (3) but only if the host VFIO driver deems it safe
+(hence PCIe only for now). I find this an acceptable compromise.
+
+If we really want to avoid any aliases (though I think we are spending
+too many cycles on something that's not a real issue), the only way is
+to have fd-based mappings in KVM so that there's no VMM alias. After
+that we need to choose between (2) and (3) since the VMM may no longer
+be able to probe the device and figure out which ranges need what
+attributes.
+
+> If we add more behind-the-scenes tricks to get other MMIO mappings
+> working in the future then this whole interaction will get even
+> hairier. At least if we follow the stage-1 attributes (where possible)
+> then we can document some sort of expected behavior in KVM. The VMM would
+> need know if the device has read side-effects, as the only way to get a
+> Normal-NC mapping in the guest would be to have one at stage-1.
+
+I don't think KVM or the VMM should attempt to hand-hold the guest and
+ensure that it maps an MMIO with read side-effects appropriately. The
+guest driver can do this by itself or get incorrect hw behaviour. Such
+hand-holding is only needed if the speculative loads have wider system
+implications but we concluded that it's not the case for PCIe. Even with
+a Device mapping, the guest can always issue random reads from an
+assigned MMIO range and cause side-effects.
+
+> Kinda stinks to make the VMM aware of the device, but IMO it is a
+> fundamental limitation of the way we back memslots right now.
+
+As I mentioned above, the limitation may be more complex if the
+intra-BAR attributes are not something readily available in the device
+documentation. Maybe Jason or Ankit can shed some light here: are those
+intra-BAR ranges configurable by the (guest) driver or they are already
+pre-configured by firmware and the driver only needs to probe them?
+
+Anyway, about to go on the Christmas break, so most likely I'll follow
+up in January. Happy holidays!
+
+-- 
+Catalin
