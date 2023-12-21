@@ -1,198 +1,158 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F64238F82;
-	Wed, 20 Dec 2023 14:16:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5A74696
+	for <kvmarm@lists.linux.dev>; Thu, 21 Dec 2023 02:58:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B5e6AjFX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FBD3C433C8;
-	Wed, 20 Dec 2023 14:16:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703081803;
-	bh=ZI70D8QvLaWdXr+fAuK9V6XLldoFTfbDeU/tcqCx5Bs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=B5e6AjFXAbuWH87OJt2SncWeCUQNmySRUqIgLbrY1DD0aF0i3otiqnjjhkE24YOOH
-	 KirDF+QUDSsbn1/+/GFIHNzn7bpJchKI/Kjv80eqSoDfN73rVGUASKiJSXJssiJMaA
-	 U/Wjw7zQyNon/FCoPeBP+FTRhhQjRpbn3mgCKt7ZziecilMqhPBKxEhbBDc6PNMPkR
-	 VSbgVwz+AYuDi7upHfRIkKIY+pg/uFvVx+yBwynsT6sTmlY5m5VmKXmRdWrgVOtLZ5
-	 E3X8ParhMu06znMEq2MJhbZY4rsFAME5XHPfeFeguIQTrtXty5naajYcGAbA37405P
-	 xhtVYMji6aRwQ==
-Received: from [104.132.45.104] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rFxNJ-005hcv-4T;
-	Wed, 20 Dec 2023 14:16:41 +0000
-Date: Wed, 20 Dec 2023 14:16:40 +0000
-Message-ID: <87v88tt0vr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: <ankita@nvidia.com>
-Cc: <jgg@nvidia.com>,
-	<oliver.upton@linux.dev>,
-	<suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>,
-	<catalin.marinas@arm.com>,
-	<will@kernel.org>,
-	<alex.williamson@redhat.com>,
-	<kevin.tian@intel.com>,
-	<yi.l.liu@intel.com>,
-	<ardb@kernel.org>,
-	<akpm@linux-foundation.org>,
-	<gshan@redhat.com>,
-	<mochs@nvidia.com>,
-	<lpieralisi@kernel.org>,
-	<aniketa@nvidia.com>,
-	<cjia@nvidia.com>,
-	<kwankhede@nvidia.com>,
-	<targupta@nvidia.com>,
-	<vsethi@nvidia.com>,
-	<acurrid@nvidia.com>,
-	<apopple@nvidia.com>,
-	<jhubbard@nvidia.com>,
-	<danw@nvidia.com>,
-	<linux-mm@kvack.org>,
-	<kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v4 2/3] kvm: arm64: set io memory s2 pte as normalnc for vfio pci devices
-In-Reply-To: <20231218090719.22250-3-ankita@nvidia.com>
-References: <20231218090719.22250-1-ankita@nvidia.com>
-	<20231218090719.22250-3-ankita@nvidia.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cb9u+eG6"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2cc6d9b4c6aso2880811fa.3
+        for <kvmarm@lists.linux.dev>; Wed, 20 Dec 2023 18:58:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703127533; x=1703732333; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6bBzkO/x8C7pW+ybw+V7AQ5yP+2vx9qyk2y1ClRHSZw=;
+        b=Cb9u+eG65OluRUJaLlXL2sidFalyEAiJcz0hhtSbrECmK+S73DlzoO9c1rF4vm/vH+
+         tFLSwEWQByNZbf8V3XZGme3awnn4wEUOVKASIsKff9EuUQFB/6svItK4gn0cuIH9+we8
+         qc2cZUzEYNuBD00eXk9B/yK3OqeL+/ornelO2kg8f5Pq7nt7R/9n/nJwOJ1tJypCJQb8
+         wyULrSEk+FLh6x1LgBZYBK4igmuaz2BcYchzp4EkU2tfp8BJqVZPTYYTjyafm0a9olLV
+         bdfKJ0RyEvEWOvl+TY9CmoPt4oXRKmY7E5VURQjdhifjbJOYVRrfR6CC0eda0fp43LK5
+         3myg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703127533; x=1703732333;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6bBzkO/x8C7pW+ybw+V7AQ5yP+2vx9qyk2y1ClRHSZw=;
+        b=S4XkPVkAwojrIQlqq+R1JqEDBM9he5t1M5hmOK1zodYWSZEd2hNvOaPqpHpzoaAdrK
+         7nvFlAaQuilJitlq4w03zaeGnBi8bIzYWiDBmdzRr802KTHR0aYz6hQ7ng2k6PQQmk99
+         ormVZaYPcce5t7RR2q4w2lmGYrBYWWk/pLLSn7SN4H/+Vpi6+3S3N8F/W8CU3SrPd6+k
+         EoDyW9xvKTfWwUCUS7LQvKMbb4RstgG4/xv6ZANt94EApa1wbhLQXveP/QRU7/+QK4Hg
+         lCtRrFkAFC5POxx8HSzRPRYFq578Qw/uVp3z+Sq/79wRxH0lheg1pTJavoLFj+9edxre
+         gosQ==
+X-Gm-Message-State: AOJu0YxvnR2ND4iNoLQj3TD1VV/AOx/ee1TrwN9wc4mruxBKstELhXvz
+	wN5knJykBnutdFPjw6vpDqalAgkhRjIAuPaztDY=
+X-Google-Smtp-Source: AGHT+IGJHPrvnGt2Ru34bEuu9VEKW4Ddr4y1BwS+bbHJIUMRrvHhhF9Knr8M3TPrt5vBdMTPh9CciXS8rGxFOeFA2n4=
+X-Received: by 2002:a2e:95d2:0:b0:2cc:7c8c:574b with SMTP id
+ y18-20020a2e95d2000000b002cc7c8c574bmr1956176ljh.77.1703127532313; Wed, 20
+ Dec 2023 18:58:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 104.132.45.104
-X-SA-Exim-Rcpt-To: ankita@nvidia.com, jgg@nvidia.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, alex.williamson@redhat.com, kevin.tian@intel.com, yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org, gshan@redhat.com, mochs@nvidia.com, lpieralisi@kernel.org, aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com, linux-mm@kvack.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <cover.1702371136.git.haibo1.xu@intel.com> <0343a9e4bfa8011fbb6bca0286cee7eab1f17d5d.1702371136.git.haibo1.xu@intel.com>
+ <8734vy832j.wl-maz@kernel.org> <CAJve8onc0WN5g98aOVBmJx15wFBAqfBKJ+ufoLY+oqYyVL+=3A@mail.gmail.com>
+ <f98879dc24f948f7a8a7b5374a32bc04@kernel.org> <CAJve8ona7g=LxW1YeRB_FqGodF973H=A3b2m8054gmzK=Z7_ww@mail.gmail.com>
+ <87zfy5t1qt.wl-maz@kernel.org>
+In-Reply-To: <87zfy5t1qt.wl-maz@kernel.org>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Thu, 21 Dec 2023 10:58:40 +0800
+Message-ID: <CAJve8o=nTsAwwgSib4vOLXjOWSMV2+J+BFsUZ57OdAK7eW8q8A@mail.gmail.com>
+Subject: Re: [PATCH v4 11/11] KVM: selftests: Enable tunning of err_margin_us
+ in arch timer test
+To: Marc Zyngier <maz@kernel.org>
+Cc: Haibo Xu <haibo1.xu@intel.com>, ajones@ventanamicro.com, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
+	Mayuresh Chitale <mchitale@ventanamicro.com>, Greentime Hu <greentime.hu@sifive.com>, 
+	wchen <waylingii@gmail.com>, Conor Dooley <conor.dooley@microchip.com>, 
+	Heiko Stuebner <heiko@sntech.de>, Minda Chen <minda.chen@starfivetech.com>, 
+	Samuel Holland <samuel@sholland.org>, Jisheng Zhang <jszhang@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, Like Xu <likexu@tencent.com>, 
+	Vipin Sharma <vipinsh@google.com>, 
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Thomas Huth <thuth@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 18 Dec 2023 09:07:18 +0000,
-<ankita@nvidia.com> wrote:
-> 
-> From: Ankit Agrawal <ankita@nvidia.com>
-> 
-> To provide VM with the ability to get device IO memory with NormalNC
-> property, map device MMIO in KVM for ARM64 at stage2 as NormalNC.
-> Having NormalNC S2 default puts guests in control (based on [1],
-> "Combining stage 1 and stage 2 memory type attributes") of device
-> MMIO regions memory mappings. The rules are summarized below:
-> ([(S1) - stage1], [(S2) - stage 2])
-> 
-> S1           |  S2           | Result
-> NORMAL-WB    |  NORMAL-NC    | NORMAL-NC
-> NORMAL-WT    |  NORMAL-NC    | NORMAL-NC
-> NORMAL-NC    |  NORMAL-NC    | NORMAL-NC
-> DEVICE<attr> |  NORMAL-NC    | DEVICE<attr>
-> 
-> Generalizing this to non PCI devices may be problematic. E.g. GICv2
-> vCPU interface, which is effectively a shared peripheral, can allow
-> a guest to affect another guest's interrupt distribution. The issue
-> may be solved by limiting the relaxation to mappings that have a user
-> VMA. Still There is insufficient information and uncertainity in the
-> behavior of non PCI driver. Hence caution is maintained and the change
-> is restricted to the VFIO-PCI devices. PCIe on the other hand is safe
-> because the PCI bridge does not generate errors, and thus do not cause
-> uncontained failures.
-> 
-> A new flag VM_VFIO_ALLOW_WC to indicate KVM that the device is WC capable.
-> KVM use this flag to activate the code.
-> 
-> This could be extended to other devices in the future once that
-> is deemed safe.
-> 
-> [1] section D8.5.5 of DDI0487J_a_a-profile_architecture_reference_manual.pdf
-> 
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
-> Suggested-by: Catalin Marinas <catalin.marinas@arm.com>
-> Acked-by: Jason Gunthorpe <jgg@nvidia.com>
-> Tested-by: Ankit Agrawal <ankita@nvidia.com>
-> ---
->  arch/arm64/kvm/mmu.c | 18 ++++++++++++++----
->  include/linux/mm.h   | 13 +++++++++++++
->  2 files changed, 27 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index d14504821b79..e1e6847a793b 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1381,7 +1381,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	int ret = 0;
->  	bool write_fault, writable, force_pte = false;
->  	bool exec_fault, mte_allowed;
-> -	bool device = false;
-> +	bool device = false, vfio_allow_wc = false;
->  	unsigned long mmu_seq;
->  	struct kvm *kvm = vcpu->kvm;
->  	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
-> @@ -1472,6 +1472,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	gfn = fault_ipa >> PAGE_SHIFT;
->  	mte_allowed = kvm_vma_mte_allowed(vma);
->  
-> +	vfio_allow_wc = (vma->vm_flags & VM_VFIO_ALLOW_WC);
-> +
->  	/* Don't use the VMA after the unlock -- it may have vanished */
->  	vma = NULL;
->  
-> @@ -1557,10 +1559,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	if (exec_fault)
->  		prot |= KVM_PGTABLE_PROT_X;
->  
-> -	if (device)
-> -		prot |= KVM_PGTABLE_PROT_DEVICE;
-> -	else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
-> +	if (device) {
-> +		/*
-> +		 * To provide VM with the ability to get device IO memory
-> +		 * with NormalNC property, map device MMIO as NormalNC in S2.
-> +		 */
-> +		if (vfio_allow_wc)
-> +			prot |= KVM_PGTABLE_PROT_NORMAL_NC;
-> +		else
-> +			prot |= KVM_PGTABLE_PROT_DEVICE;
-> +	} else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC)) {
->  		prot |= KVM_PGTABLE_PROT_X;
-> +	}
->  
->  	/*
->  	 * Under the premise of getting a FSC_PERM fault, we just need to relax
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index 2bea89dc0bdf..d2f0f969875c 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -391,6 +391,19 @@ extern unsigned int kobjsize(const void *objp);
->  # define VM_UFFD_MINOR		VM_NONE
->  #endif /* CONFIG_HAVE_ARCH_USERFAULTFD_MINOR */
->  
-> +/* This flag is used to connect VFIO to arch specific KVM code. It
-> + * indicates that the memory under this VMA is safe for use with any
-> + * non-cachable memory type inside KVM. Some VFIO devices, on some
-> + * platforms, are thought to be unsafe and can cause machine crashes if
-> + * KVM does not lock down the memory type.
-> + */
+On Wed, Dec 20, 2023 at 9:58=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Wed, 20 Dec 2023 13:51:24 +0000,
+> Haibo Xu <xiaobo55x@gmail.com> wrote:
+> >
+> > On Wed, Dec 20, 2023 at 5:00=E2=80=AFPM Marc Zyngier <maz@kernel.org> w=
+rote:
+> > >
+> > > On 2023-12-20 06:50, Haibo Xu wrote:
+> > > > On Wed, Dec 20, 2023 at 2:22=E2=80=AFAM Marc Zyngier <maz@kernel.or=
+g> wrote:
+> > > >>
+> > > >> On Tue, 12 Dec 2023 09:31:20 +0000,
+> > > >> Haibo Xu <haibo1.xu@intel.com> wrote:
+> > > >> > diff --git a/tools/testing/selftests/kvm/include/timer_test.h b/=
+tools/testing/selftests/kvm/include/timer_test.h
+> > > >> > index 968257b893a7..b1d405e7157d 100644
+> > > >> > --- a/tools/testing/selftests/kvm/include/timer_test.h
+> > > >> > +++ b/tools/testing/selftests/kvm/include/timer_test.h
+> > > >> > @@ -22,6 +22,7 @@ struct test_args {
+> > > >> >       int nr_iter;
+> > > >> >       int timer_period_ms;
+> > > >> >       int migration_freq_ms;
+> > > >> > +     int timer_err_margin_us;
+> > > >>
+> > > >> ... except that you are storing it as a signed value. Some consist=
+ency
+> > > >> wouldn't hurt, really, and would avoid issues when passing large
+> > > >> values.
+> > > >>
+> > > >
+> > > > Yes, it's more proper to use an unsigned int for the non-negative e=
+rror
+> > > > margin.
+> > > > Storing as signed here is just to keep the type consistent with tha=
+t
+> > > > of timer_period_ms
+> > > > since there will be '+' operation in other places.
+> > > >
+> > > >         tools/testing/selftests/kvm/aarch64/arch_timer.c
+> > > >         /* Setup a timeout for the interrupt to arrive */
+> > > >          udelay(msecs_to_usecs(test_args.timer_period_ms) +
+> > > >              test_args.timer_err_margin_us);
+> > >
+> > > But that's exactly why using a signed quantity is wrong.
+> > > What does it mean to have a huge *negative* margin?
+> > >
+> >
+> > Hi Marc,
+> >
+> > I agree that negative values are meaningless for the margin.
+> > If I understand correctly, the negative margin should be filtered by
+> > assertion in atoi_non_negative().
+>
+> No. Please.
+>
+> atoi_non_negative() returns a uint32_t, which is what it should do.
+> The bug is squarely in the use of an 'int' to store such value, and it
+> is the *storage* that turns a positive value into a negative one.
+>
 
-Comment format.
+Thanks for the detailed info!
 
-> +#ifdef CONFIG_64BIT
-> +#define VM_VFIO_ALLOW_WC_BIT	39
-> +#define VM_VFIO_ALLOW_WC	BIT(VM_VFIO_ALLOW_WC_BIT)
-> +#else
-> +#define VM_VFIO_ALLOW_WC	VM_NONE
-> +#endif
-> +
->  /* Bits set in the VMA until the stack is in its final location */
->  #define VM_STACK_INCOMPLETE_SETUP (VM_RAND_READ | VM_SEQ_READ | VM_STACK_EARLY)
+May I understand that your concern is mainly for a platform with 64bit int =
+type,
+which may trigger the positive to negative convert?
 
-The mm.h change should be standalone, separate from the KVM stuff.
+If so, I think we may need to do a clean up for the test code since
+several other
+places have the same issue.
 
-	M.
+Regards,
+Haibo
 
--- 
-Without deviation from the norm, progress is not possible.
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
