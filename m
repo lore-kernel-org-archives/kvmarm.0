@@ -1,26 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA2376DA0;
-	Thu, 21 Dec 2023 21:21:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A8118C20;
+	Fri, 22 Dec 2023 13:03:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rPhO+IaY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E0C8C433C7;
-	Thu, 21 Dec 2023 21:21:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ozj8B26r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDC7AC433C7;
+	Fri, 22 Dec 2023 13:03:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703193709;
-	bh=NjNmw5Ek8zEJrqryDRYWuyDZvX8b0InAFEl21YGq4XY=;
-	h=From:Date:Subject:To:Cc:From;
-	b=rPhO+IaYCwg9QQGnJD2N6PkeHyXytY0LnsDPYiySppg75/ONxsv36JJk002c3xmLU
-	 lJJwVc/rBQxAZOnqGuUzeAc7kjYGOKvwKaINW8zDa8esQ8+VWZUM/wecGySitddfWe
-	 +lVBQk//OF5Fc2qTTmbdhcrcVHqAMGeB5Kif1iE6dpd40Goy4Hysmf/cDdsGZcCS3E
-	 aK65T5ue2fBAa6S16p2EqWziGt0VrthwTTBRre8wIvG8FcjdvXxKS4O728BjtkbIze
-	 Vdvvxcp3EI7+huATwpt5laNmfbqXKai7c/Ll/5n7dXQR7ha54qAYfVwrlH/4JenwjI
-	 Qg9OaBUmq33AA==
-From: Mark Brown <broonie@kernel.org>
-Date: Thu, 21 Dec 2023 21:21:09 +0000
-Subject: [PATCH] KVM: arm64: Document why we trap SVE access from the host
- in nVHE
+	s=k20201202; t=1703250203;
+	bh=LTeYnVWVO19688eGDeLJfIhPFSZW0RSk+4muNm4S6z0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ozj8B26rdYFle2xz2A07Vm+LrD/eysLy/AxC7tBNN8uYlSLHybIS3/VBkACeJDzCP
+	 oBjQMv/3QXVZlRdQ7Dsxed0NvP+UXa9tBTySYCYBmd78kIerYD7VaX0NoVOguW3CaP
+	 MQJkc4Tqci9Y7JqtLnMih7B7jPJasUqt5WYUGJGevjuG98kjl+Od/vtYKJqEAthUv+
+	 4NbeSNhCodbytHMo0vHAKhHrPQddWz2koXaDmdX64CRsgX6qtBrbOMz68IR1T2+lE0
+	 aU7od2hAa+zMloJ/nk0U/gTlRYA92Aj+JkxR4NzKbKS71DHD9iXbbet2JrtX5opyjC
+	 GBrsfar2Ejqaw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rGfBR-006JUN-6H;
+	Fri, 22 Dec 2023 13:03:21 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Kunkun Jiang <jiangkunkun@huawei.com>
+Subject: Re: [PATCH 0/3] KVM: arm64: Fix + cleanup for GICv3 ISPENDR
+Date: Fri, 22 Dec 2023 13:03:18 +0000
+Message-Id: <170325013513.3484045.6210383840599915735.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20231219065855.1019608-1-oliver.upton@linux.dev>
+References: <20231219065855.1019608-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -28,80 +44,39 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231221-kvm-arm64-nvhe-sve-trap-v1-1-332ecc56f694@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAESshGUC/x3MMQqAMAxA0atIZgO2ahGvIg7BRg1ilVSKIN7d4
- viG/x+IrMIR+uIB5SRRjpBhygKmlcLCKD4bbGVrY02HW9qRdHcNhrQyxsR4KZ04u5Zq7xtHjiD
- Xp/Is938exvf9APIfSIxpAAAA
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.13-dev-5c066
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2116; i=broonie@kernel.org;
- h=from:subject:message-id; bh=NjNmw5Ek8zEJrqryDRYWuyDZvX8b0InAFEl21YGq4XY=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBlhKxqtaVguLxVoy/xyh/2YDD7V5KEdHEKIQHe9SYb
- FOuLKVSJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZYSsagAKCRAk1otyXVSH0AeKB/
- 9VuQl3RXtHCh2SiKEoZkyn67P1sOJROEh15jp/tZ2/inqSslCn/TRleua50ZwSKbF8yqWt9UoglFyd
- G4d1I85RkBLHxq078eSfP/USN37aX0t5b+q4/UPjp0D9ogHDMKYq/qFumulnb3ZQC23L/Kctz8p9/4
- IJZrik7Hhy3rw7HLedJVmMH7H431RUDuPzBcoefxwl9sb8t7dU0TTPl4qxHGorCtdTzd86FpVMMYsu
- xWnwyrNDgzVidt0rruILNccgBnMY6vRu2og0L/WKl2Hfr/fV/OR/BAaNbC6CLY/pzKPTA5i9NZ2H4s
- JYgiwEkiYoFdk/bqU3dUOSuTi9pmFe
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oliver.upton@linux.dev, yuzenghui@huawei.com, suzuki.poulose@arm.com, kvm@vger.kernel.org, james.morse@arm.com, jiangkunkun@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When we exit from a SVE guest we leave the SVE configuration in EL2 as it
-was for the guest, only switching back to the host configuration on next
-use by the host. This is perhaps a little surprising when encountered in
-the code by itself, add comments explaining what is going on both in the
-trap handler and when we configure the traps.
+On Tue, 19 Dec 2023 06:58:52 +0000, Oliver Upton wrote:
+> Here's the alternative approach I had suggested in response to Kunkun's
+> bug report, building the GICv3 ISPENDR accessor on top of the existing
+> ISPENDR / ICPENDR accessors. With these changes userspace should
+> consistently read / configure the hardware pending state for GICv4.1
+> vSGIs.
+> 
+> Oliver Upton (3):
+>   KVM: arm64: vgic: Use common accessor for writes to ISPENDR
+>   KVM: arm64: vgic: Use common accessor for writes to ICPENDR
+>   KVM: arm64: vgic-v3: Reinterpret user ISPENDR writes as I{C,S}PENDR
+> 
+> [...]
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- arch/arm64/include/asm/kvm_emulate.h | 2 ++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c   | 1 +
- 2 files changed, 3 insertions(+)
+I have queued this for 6.8, together with my GICv4.1 fix.
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 78a550537b67..edd807a77e19 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -590,6 +590,7 @@ static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
- 	} else if (has_hvhe()) {
- 		val = (CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN);
- 
-+		/* Leave traps enabled, we will restore EL2 lazily */
- 		if (!vcpu_has_sve(vcpu) ||
- 		    (vcpu->arch.fp_state != FP_STATE_GUEST_OWNED))
- 			val |= CPACR_EL1_ZEN_EL1EN | CPACR_EL1_ZEN_EL0EN;
-@@ -598,6 +599,7 @@ static __always_inline u64 kvm_get_reset_cptr_el2(struct kvm_vcpu *vcpu)
- 	} else {
- 		val = CPTR_NVHE_EL2_RES1;
- 
-+		/* Leave traps enabled, we will restore EL2 lazily */
- 		if (vcpu_has_sve(vcpu) &&
- 		    (vcpu->arch.fp_state == FP_STATE_GUEST_OWNED))
- 			val |= CPTR_EL2_TZ;
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 2385fd03ed87..84deed83e580 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -420,6 +420,7 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
- 		handle_host_smc(host_ctxt);
- 		break;
- 	case ESR_ELx_EC_SVE:
-+		/* Handle lazy restore of the host VL */
- 		if (has_hvhe())
- 			sysreg_clear_set(cpacr_el1, 0, (CPACR_EL1_ZEN_EL1EN |
- 							CPACR_EL1_ZEN_EL0EN));
+[1/3] KVM: arm64: vgic: Use common accessor for writes to ISPENDR
+      commit: 13886f34444596e6eca124677cd8362a941b585b
+[2/3] KVM: arm64: vgic: Use common accessor for writes to ICPENDR
+      commit: 561851424d93e91083df4071781b68dc4ba1fc5a
+[3/3] KVM: arm64: vgic-v3: Reinterpret user ISPENDR writes as I{C,S}PENDR
+      commit: 39084ba8d0fceb477a264e2bb8dfd3553876b84c
 
----
-base-commit: 2cc14f52aeb78ce3f29677c2de1f06c0e91471ab
-change-id: 20231218-kvm-arm64-nvhe-sve-trap-f65a3dd46a6a
+Cheers,
 
-Best regards,
+	M.
 -- 
-Mark Brown <broonie@kernel.org>
+Without deviation from the norm, progress is not possible.
+
 
