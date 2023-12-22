@@ -1,85 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52530199A1;
-	Fri, 22 Dec 2023 13:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2EA1A5A3
+	for <kvmarm@lists.linux.dev>; Fri, 22 Dec 2023 13:51:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AkqCBW5j"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E251C433C7;
-	Fri, 22 Dec 2023 13:34:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703252052;
-	bh=GZRyFaBvIki9enXYb02TS6Skv6X1UKUdbbABm1/fk0g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AkqCBW5jHwKr0qg0d1HQtPBtyYpaHQ7dXBxzXkxSxct+ynJ66ix/LUUV5NdFVrBQu
-	 g9oKHJcwQ5ZE07DgFziLidBzPE/W1d5Z6CJIjnMQBfM0s2m3gWTuPVYBXqp45+30Wj
-	 CCX5Ew+ipsf8dERprkKM4YGWZhXS3ZNtFUfnNj3Rm/fGIhzEGik9gfr0Y5miJ35P4w
-	 RMgQrrGWb3MtxnFx1o86bdKKzr7OmuCvswr9OtTB/318Sy+AH6vqaGh4K+C9ZERk2h
-	 2JUzdRMtd2ekzTTh5dc0Y5zhv/cI/FfTl8Q/ibUtmLAlOfB6Ew4N1pEjV/E2QliFbD
-	 1/kYvaSLDGofw==
-Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rGffF-006Jtc-P6;
-	Fri, 22 Dec 2023 13:34:09 +0000
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O2SQ7JYe"
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-28bf1410e37so1344133a91.2
+        for <kvmarm@lists.linux.dev>; Fri, 22 Dec 2023 05:51:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703253065; x=1703857865; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5zqMKf7KXgOHRYALYfO/qvFwWZkjocCEqNPPk9MJnuw=;
+        b=O2SQ7JYe/TGziR8ZshyrPAvi0pdqxBlOT7aL6Txs4RcGB8UpZmXdM5nwNWOOGd9qZW
+         T45yR5QVpM/K8qZJSOWMgqMSIsXdrdHClV5qD0ULeiKj9e3uV9xbFTe0SWq7dpc8XMOd
+         /QuqLMuJtnIdBUXJLVEOBtU3oCiumbLyxNOVy9W3bqFV5FP2/LD2BdNwb/h3gVAoMUfo
+         /3NyVKXTBYQnqAi2oW8SXYTtCZU6EN24XiKTuwiUGQHjryI1ZNa0BAfllqKMgvk5FODT
+         cgVVl2I7cCHbSldb+eDMiId4TK3Zc08Jq/o4nfQKj/xmMUjU2FR+J3J+J8poL8VgTBJh
+         ScYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703253065; x=1703857865;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5zqMKf7KXgOHRYALYfO/qvFwWZkjocCEqNPPk9MJnuw=;
+        b=plVYdiPUrgu5nU/rqy2+jkKpYh1KZtyMSA4d+Ga39Vs/XAvI1do3JztdBdyJ3z16xS
+         o6HbcmwOJcZfK8n5SS3X2Iri1MBUbl1DaOX1gyytR1ug1t80ArOlcYTAJqCrsqc/5nLa
+         ZLmaYxzIEjSShJIAILsk/unFztTxv0Ar375ORZ1jiVVdoFZ5CtkzeD0FfbBM9Dl4B2if
+         zcQbITbtLzJQ2QMqI7MQsun1MOawvxhx8rgOeG+HKhAHg+B0xvuAAz+hZIjGzUzZ3CTU
+         7FglxJwWd9NS5JAiUDUjFweuarMRXIa3cwRgRoJKbE+mfHQosj8xpxPzgU2P4RBwMuFd
+         nZgw==
+X-Gm-Message-State: AOJu0Yzk20jwnUcAJzZXEsTvzv+zOn4clwGzVwJOtdyvJd/guNoyjzxj
+	ESQzrk4hGFDLKIrXdNsJb2s=
+X-Google-Smtp-Source: AGHT+IFTvL7baOi+WA9A1CiGd4kDHO1A0hMH2POOXsGm8LsAosUoUwCP2mO+R1FoLFAExQXoGS9h7A==
+X-Received: by 2002:a17:90a:ad84:b0:286:6cc1:3f03 with SMTP id s4-20020a17090aad8400b002866cc13f03mr1086130pjq.58.1703253065442;
+        Fri, 22 Dec 2023 05:51:05 -0800 (PST)
+Received: from wheely.local0.net ([203.220.145.68])
+        by smtp.gmail.com with ESMTPSA id n12-20020a17090ac68c00b0028ae54d988esm3629280pjt.48.2023.12.22.05.50.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Dec 2023 05:51:04 -0800 (PST)
+From: Nicholas Piggin <npiggin@gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>,
+	kvm@vger.kernel.org,
+	Laurent Vivier <lvivier@redhat.com>,
+	"Shaoqin Huang" <shahuang@redhat.com>,
+	Andrew Jones <andrew.jones@linux.dev>,
+	Nico Boehr <nrb@linux.ibm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-s390@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: [kvm-unit-tests PATCH 0/9] Multi-migration support
+Date: Fri, 22 Dec 2023 23:50:39 +1000
+Message-ID: <20231222135048.1924672-1-npiggin@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Date: Fri, 22 Dec 2023 13:34:09 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini
- <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.7, part #2
-In-Reply-To: <ffbca4ce-7386-469b-952c-f33e2ba42a51@sirena.org.uk>
-References: <ZYCaxOtefkuvBc3Z@thinky-boi>
- <784ab26d-8919-4f08-8440-f66432458492@sirena.org.uk>
- <69259c81441a57ceebcffb0e16895db1@kernel.org>
- <ffbca4ce-7386-469b-952c-f33e2ba42a51@sirena.org.uk>
-User-Agent: Roundcube Webmail/1.4.15
-Message-ID: <441ff2c753fbfd69a60e93031070b09e@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 217.182.43.188
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, pbonzini@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 8bit
 
-On 2023-12-22 13:26, Mark Brown wrote:
-> On Fri, Dec 22, 2023 at 01:16:41PM +0000, Marc Zyngier wrote:
-> 
->> > Oliver, should your tree be in -next?
-> 
->> No, we don't have the KVM/arm64 fixes in -next.
-> 
-> I see it's not, I'm asking if it should be - given the latencies
-> involved it seems like it'd be helpful for keeping -next working.
+Thomas suggested I should split this out of the powerpc series
+because it is applicable to other archs as well and it's easier
+for others to review like this.
 
-This is on purpose. We use -next for, well, the next release,
-and not as a band-aid for some other purpose. If you think things
-don't get merged quickly enough, please take it with the person
-processing the PRs (Paolo).
+Since the v5 series:
+- Split out from powerpc changes
+- Fixed another small race found when running migration tests
+  on aarch64 (wait for destination machine to have qmp socket
+  set up before issuing qmp commands to it).
+- Added a directory for common tests, added the migration
+  selftest to it, build it on arm and s390x as well.
+- Add "quiet" migration support, use it in migration selftest.
+- Cut down runtime for migration selftest so it is suitable for
+  unit tests. Add it to unit tests.
+- Fix a s390x make clean omission that bit me when testing
+  it. This does not depend on the other patches.
 
-> 
->> And we have another two weeks to release, so ample amount of
->> time until Paolo picks up the PR.
-> 
-> Sure, but we do also have the holidays and also the fact that it's a
-> build failure in a configuration used by some of the CIs means that
-> we've got a bunch of testing that simply hasn't been happening for a
-> couple of weeks now.
+Thanks,
+Nick
 
-Given that most of the KVM tests are usually more broken than
-the kernel itself, I'm not losing much sleep over it.
+Nicholas Piggin (9):
+  s390x: clean lib/auxinfo.o
+  arch-run: Clean up temporary files properly
+  arch-run: Clean up initrd cleanup
+  migration: use a more robust way to wait for background job
+  migration: Support multiple migrations
+  arch-run: rename migration variables
+  migration: Add quiet migration support
+  Add common/ directory for architecture-independent tests
+  migration: add a migration selftest
 
-         M.
+ arm/Makefile.common         |   1 +
+ arm/sieve.c                 |   2 +-
+ arm/unittests.cfg           |   6 ++
+ common/selftest-migration.c |  34 +++++++
+ common/sieve.c              |  51 ++++++++++
+ lib/migrate.c               |  20 +++-
+ lib/migrate.h               |   2 +
+ powerpc/Makefile.common     |   1 +
+ powerpc/unittests.cfg       |   4 +
+ s390x/Makefile              |   3 +-
+ s390x/sieve.c               |   2 +-
+ s390x/unittests.cfg         |   4 +
+ scripts/arch-run.bash       | 181 ++++++++++++++++++++++++++----------
+ x86/sieve.c                 |  52 +----------
+ 14 files changed, 258 insertions(+), 105 deletions(-)
+ create mode 100644 common/selftest-migration.c
+ create mode 100644 common/sieve.c
+ mode change 100644 => 120000 x86/sieve.c
+
 -- 
-Jazz is not dead. It just smells funny...
+2.42.0
+
