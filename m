@@ -1,46 +1,47 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2EA1A5A3
-	for <kvmarm@lists.linux.dev>; Fri, 22 Dec 2023 13:51:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B541A71D
+	for <kvmarm@lists.linux.dev>; Fri, 22 Dec 2023 13:51:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O2SQ7JYe"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-28bf1410e37so1344133a91.2
-        for <kvmarm@lists.linux.dev>; Fri, 22 Dec 2023 05:51:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L8nJsjou"
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-5cda3e35b26so769447a12.1
+        for <kvmarm@lists.linux.dev>; Fri, 22 Dec 2023 05:51:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703253065; x=1703857865; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5zqMKf7KXgOHRYALYfO/qvFwWZkjocCEqNPPk9MJnuw=;
-        b=O2SQ7JYe/TGziR8ZshyrPAvi0pdqxBlOT7aL6Txs4RcGB8UpZmXdM5nwNWOOGd9qZW
-         T45yR5QVpM/K8qZJSOWMgqMSIsXdrdHClV5qD0ULeiKj9e3uV9xbFTe0SWq7dpc8XMOd
-         /QuqLMuJtnIdBUXJLVEOBtU3oCiumbLyxNOVy9W3bqFV5FP2/LD2BdNwb/h3gVAoMUfo
-         /3NyVKXTBYQnqAi2oW8SXYTtCZU6EN24XiKTuwiUGQHjryI1ZNa0BAfllqKMgvk5FODT
-         cgVVl2I7cCHbSldb+eDMiId4TK3Zc08Jq/o4nfQKj/xmMUjU2FR+J3J+J8poL8VgTBJh
-         ScYg==
+        d=gmail.com; s=20230601; t=1703253072; x=1703857872; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7GbTP9pyEfLW8+fO86ti39WKj5aM3Ikce3+WhF/QSJE=;
+        b=L8nJsjouP48YULqqBG2u78CRNcRbI/Eo8OQdloh+pFNbY7HkMaGVYEUFbRUoEjArVj
+         7Ls90ZOBw0GG1Bt9e9N4ptB2DnjPgJzCEMl96PlH02YwvlqIuIl6DnBd+wSCtILD1Kq0
+         NTI3QtzXaLhhu8YGIGXcnlkpqftJEhPUjNSlZA7Nl70soMlpeQtNIFMINkj5bHjspxOD
+         qenL0hHGiOCnQpKmA2drtQTHUKHV4rQoSSN/7Gxav/lFXgGSMMf8SrgohrTlNRGXY+NL
+         4tgsUXWvuQSW7++M747560oxIGP81Cham7Zu2XolK7pMFafnt1ZVPvxl48xE8uU29miy
+         kdVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703253065; x=1703857865;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5zqMKf7KXgOHRYALYfO/qvFwWZkjocCEqNPPk9MJnuw=;
-        b=plVYdiPUrgu5nU/rqy2+jkKpYh1KZtyMSA4d+Ga39Vs/XAvI1do3JztdBdyJ3z16xS
-         o6HbcmwOJcZfK8n5SS3X2Iri1MBUbl1DaOX1gyytR1ug1t80ArOlcYTAJqCrsqc/5nLa
-         ZLmaYxzIEjSShJIAILsk/unFztTxv0Ar375ORZ1jiVVdoFZ5CtkzeD0FfbBM9Dl4B2if
-         zcQbITbtLzJQ2QMqI7MQsun1MOawvxhx8rgOeG+HKhAHg+B0xvuAAz+hZIjGzUzZ3CTU
-         7FglxJwWd9NS5JAiUDUjFweuarMRXIa3cwRgRoJKbE+mfHQosj8xpxPzgU2P4RBwMuFd
-         nZgw==
-X-Gm-Message-State: AOJu0Yzk20jwnUcAJzZXEsTvzv+zOn4clwGzVwJOtdyvJd/guNoyjzxj
-	ESQzrk4hGFDLKIrXdNsJb2s=
-X-Google-Smtp-Source: AGHT+IFTvL7baOi+WA9A1CiGd4kDHO1A0hMH2POOXsGm8LsAosUoUwCP2mO+R1FoLFAExQXoGS9h7A==
-X-Received: by 2002:a17:90a:ad84:b0:286:6cc1:3f03 with SMTP id s4-20020a17090aad8400b002866cc13f03mr1086130pjq.58.1703253065442;
-        Fri, 22 Dec 2023 05:51:05 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703253072; x=1703857872;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7GbTP9pyEfLW8+fO86ti39WKj5aM3Ikce3+WhF/QSJE=;
+        b=uZeIjSQwUC5aMP9azU+Q7lFsKCUI7KIJApf75CjzWjiami/YllTKMweyS5o3GoTHOx
+         WrFMzElpZhZyaiLmEbKcKIXN/hWFaPKf91yHiy1TylcewyoPM5JF9vey64p2AqVPf3LV
+         FPbfPfX8zjyUoIRHAV0pyTKuD9lnKm8AOetT3cRsDckRWgUzq9UTjfUJDCXOX27HMXZU
+         td40fLUpeMotC05EmjESzS6+0p43M8VfxCoFJOZbsGEj07SuaN8ENia+v3M9c2JJ3srL
+         8mIUKoA1K1z99dK+PdI+4BIrLb1GibawWCdo2d8c7R8tvUDoT3zhiFJCBhBevAxkfrQ/
+         udfA==
+X-Gm-Message-State: AOJu0YzcNQgaHyWtKPUuJ+BCQ91HMPOpr+Go5641hc4DsFE6sIalacom
+	4eZ2IuujL5x1q/hTLgW/s6M=
+X-Google-Smtp-Source: AGHT+IGJI92l6o3kvWR/9nnc+3uwUDhIQTyXexnYVp7D+d/n+yWUp/xYOOZ+9JgltI8VuCq6hAiw9g==
+X-Received: by 2002:a17:90b:e8b:b0:28c:27:dc87 with SMTP id fv11-20020a17090b0e8b00b0028c0027dc87mr840659pjb.49.1703253072589;
+        Fri, 22 Dec 2023 05:51:12 -0800 (PST)
 Received: from wheely.local0.net ([203.220.145.68])
-        by smtp.gmail.com with ESMTPSA id n12-20020a17090ac68c00b0028ae54d988esm3629280pjt.48.2023.12.22.05.50.58
+        by smtp.gmail.com with ESMTPSA id n12-20020a17090ac68c00b0028ae54d988esm3629280pjt.48.2023.12.22.05.51.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Dec 2023 05:51:04 -0800 (PST)
+        Fri, 22 Dec 2023 05:51:11 -0800 (PST)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -58,10 +59,12 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	linuxppc-dev@lists.ozlabs.org,
 	linux-s390@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: [kvm-unit-tests PATCH 0/9] Multi-migration support
-Date: Fri, 22 Dec 2023 23:50:39 +1000
-Message-ID: <20231222135048.1924672-1-npiggin@gmail.com>
+Subject: [kvm-unit-tests PATCH 1/9] s390x: clean lib/auxinfo.o
+Date: Fri, 22 Dec 2023 23:50:40 +1000
+Message-ID: <20231222135048.1924672-2-npiggin@gmail.com>
 X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231222135048.1924672-1-npiggin@gmail.com>
+References: <20231222135048.1924672-1-npiggin@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -70,56 +73,24 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Thomas suggested I should split this out of the powerpc series
-because it is applicable to other archs as well and it's easier
-for others to review like this.
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
+ s390x/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Since the v5 series:
-- Split out from powerpc changes
-- Fixed another small race found when running migration tests
-  on aarch64 (wait for destination machine to have qmp socket
-  set up before issuing qmp commands to it).
-- Added a directory for common tests, added the migration
-  selftest to it, build it on arm and s390x as well.
-- Add "quiet" migration support, use it in migration selftest.
-- Cut down runtime for migration selftest so it is suitable for
-  unit tests. Add it to unit tests.
-- Fix a s390x make clean omission that bit me when testing
-  it. This does not depend on the other patches.
-
-Thanks,
-Nick
-
-Nicholas Piggin (9):
-  s390x: clean lib/auxinfo.o
-  arch-run: Clean up temporary files properly
-  arch-run: Clean up initrd cleanup
-  migration: use a more robust way to wait for background job
-  migration: Support multiple migrations
-  arch-run: rename migration variables
-  migration: Add quiet migration support
-  Add common/ directory for architecture-independent tests
-  migration: add a migration selftest
-
- arm/Makefile.common         |   1 +
- arm/sieve.c                 |   2 +-
- arm/unittests.cfg           |   6 ++
- common/selftest-migration.c |  34 +++++++
- common/sieve.c              |  51 ++++++++++
- lib/migrate.c               |  20 +++-
- lib/migrate.h               |   2 +
- powerpc/Makefile.common     |   1 +
- powerpc/unittests.cfg       |   4 +
- s390x/Makefile              |   3 +-
- s390x/sieve.c               |   2 +-
- s390x/unittests.cfg         |   4 +
- scripts/arch-run.bash       | 181 ++++++++++++++++++++++++++----------
- x86/sieve.c                 |  52 +----------
- 14 files changed, 258 insertions(+), 105 deletions(-)
- create mode 100644 common/selftest-migration.c
- create mode 100644 common/sieve.c
- mode change 100644 => 120000 x86/sieve.c
-
+diff --git a/s390x/Makefile b/s390x/Makefile
+index f79fd009..95ef9533 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -227,7 +227,7 @@ $(snippet_asmlib): $$(patsubst %.o,%.S,$$@) $(asm-offsets)
+ 
+ 
+ arch_clean: asm_offsets_clean
+-	$(RM) $(TEST_DIR)/*.{o,elf,bin,lds} $(SNIPPET_DIR)/*/*.{o,elf,*bin,*obj,hdr,lds} $(SNIPPET_DIR)/asm/.*.d $(TEST_DIR)/.*.d lib/s390x/.*.d $(comm-key)
++	$(RM) $(TEST_DIR)/*.{o,elf,bin,lds} $(SNIPPET_DIR)/*/*.{o,elf,*bin,*obj,hdr,lds} $(SNIPPET_DIR)/asm/.*.d $(TEST_DIR)/.*.d lib/s390x/.*.d lib/auxinfo.o $(comm-key)
+ 
+ generated-files = $(asm-offsets)
+ $(tests:.elf=.o) $(asmlib) $(cflatobjs): $(generated-files)
 -- 
 2.42.0
 
