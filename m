@@ -1,104 +1,113 @@
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65FBD4A12
-	for <kvmarm@lists.linux.dev>; Sat, 23 Dec 2023 05:18:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF88E44396;
+	Wed, 27 Dec 2023 11:15:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LwAm0j3Z"
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-35fb96f3404so10391175ab.2
-        for <kvmarm@lists.linux.dev>; Fri, 22 Dec 2023 21:18:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703308735; x=1703913535; darn=lists.linux.dev;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XnwDpdbEms0r9ctWFykUHT4Fg9JnNMIjKFVXl1aMRgY=;
-        b=LwAm0j3Z1e22zCtj4JnTYG2TeI6m62WdILjRxbg+oc3PFsz8ggrlwux3abbx9vRKrO
-         jdtLGYjAkXRrF//YMJKruurBX7310JqUgDSc117Et1/kZ1ogMIE0GKdJzMFK2YOjDJag
-         krBzRyoZDz22PtqHPq5sGGQPGVIzNAq5XhHhQx9524AwZUUCmI+MJ5ciI4KuIG/DtxPC
-         A8Hpgdchoa3FSws8k6VMm29N6zS9QZ1ebYfzfQKXKWhTt/tsVHLsXOlROaE2H5X7tMJj
-         cpW8EIyvpEzPk1VSwAilVoBrzpeFlaLn2Q5/i4zTkFIoH3hiwyrhaYkZPCpDML72I43P
-         0CcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703308735; x=1703913535;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=XnwDpdbEms0r9ctWFykUHT4Fg9JnNMIjKFVXl1aMRgY=;
-        b=sKgWHS9wrzyKN4ZjIKMJ2gVQni8M1tfqJb8Mp64Bxcean/QMOa+occjQex15ZnGXdA
-         rlg4zD3wwTtdkpMu/x0Ji+1+HcgJAHwjYQ6JMD07hRWJxEI76Jb0W2jR55bN8wYhe+UI
-         /7vDsQqwWuldzm05udoBG9e3M3IlkjjLWHxT18j+G/phkAWo3SsNgu4wf7AHGps+WlN3
-         8STvJIasN36SBalZeWG9v4klWKJkOUG8cTrBxNsd8Jl3yjQkJpOptN53q6Pv4ryBR/g9
-         kcxUrRxEg6Jh8CH5hv2j8IkTa4Z5RB9PzDfvjuH8Dx/xQsfgCk+aw1YHR5lJ1q03Od+c
-         eLFA==
-X-Gm-Message-State: AOJu0YwvjU10RsFTb2Bxfg/Ef6TaDaXKa2Zj0kkckEEmKetnL+4YggSJ
-	iKl+tgPIXU3Lt11ZD6h61o0=
-X-Google-Smtp-Source: AGHT+IFaHzlucHRk+1cz9vp3pAi/3gV++IZOiVArAG66rH8YvEuO0wUOoZEKgYXgJDJX2cMfaNfq+A==
-X-Received: by 2002:a05:6e02:1707:b0:35f:e71f:4c60 with SMTP id u7-20020a056e02170700b0035fe71f4c60mr2472288ill.13.1703308735520;
-        Fri, 22 Dec 2023 21:18:55 -0800 (PST)
-Received: from localhost ([203.220.145.68])
-        by smtp.gmail.com with ESMTPSA id c6-20020a17090a020600b0028aed79c244sm3641553pjc.1.2023.12.22.21.18.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Dec 2023 21:18:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pP9RBZ+D"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 354F6C433C8;
+	Wed, 27 Dec 2023 11:15:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703675723;
+	bh=Gy+D+S27rQJBs12wlJEa+cumgsdCkF3P6tKjEyxVt5s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pP9RBZ+DfqI9ufbs6J2xz/FKM0nY4Pwf02G34GG/l91DTZu2tk+J7E60zTnEhjPL3
+	 qZpNUMit64mYzbAtmwb9KGD6zaz5A40god5gLykenVaCm2sXCYmzeuPBwh81SyO6PE
+	 Bmza1w3YIvrK9XpCQ1ll0SBpVNNIbPKuiFHL1di27kuvrOtBBRDVMYxJBl9aC9WXFF
+	 MVkAcY36NePVzE7QE5kh7q0qI8bFlVKwHv5Lb87s+QQdATKl+4EzU0nNeZCmAVTbhm
+	 BIC374HdlJLWXGEfqtrC7dzBPDecYaAPxTeXEnoldydMWpAyK6aa7O4FdWU6pXS3QV
+	 BU1AUG2sovIcQ==
+Date: Wed, 27 Dec 2023 12:15:14 +0100
+From: Lorenzo Pieralisi <lpieralisi@kernel.org>
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, acpica-devel@lists.linuxfoundation.org,
+	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com,
+	James Morse <james.morse@arm.com>
+Subject: Re: [PATCH RFC v3 13/21] ACPICA: Add new MADT GICC flags fields
+Message-ID: <ZYwHQgdGGGVkwmJ8@lpieralisi>
+References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk>
+ <E1rDOgs-00Dvko-6t@rmk-PC.armlinux.org.uk>
+ <20231215162322.00007391@Huawei.com>
+ <ZXyEiHLFBsoUkfNI@shell.armlinux.org.uk>
+ <ZYAPhlwPUT/7dN4n@lpieralisi>
+ <CAJZ5v0hyUqJspPbGTgTMSVHVBe=wHR6swPx-O3UcsH5dXDFpTA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Sat, 23 Dec 2023 15:18:45 +1000
-Message-Id: <CXVGJUAN6935.1L9WYI8NQ4R0O@wheely>
-Cc: "Thomas Huth" <thuth@redhat.com>, <kvm@vger.kernel.org>, "Laurent
- Vivier" <lvivier@redhat.com>, "Shaoqin Huang" <shahuang@redhat.com>,
- "Andrew Jones" <andrew.jones@linux.dev>, "Nico Boehr" <nrb@linux.ibm.com>,
- "Paolo Bonzini" <pbonzini@redhat.com>, "Alexandru Elisei"
- <alexandru.elisei@arm.com>, "Eric Auger" <eric.auger@redhat.com>, "Janosch
- Frank" <frankja@linux.ibm.com>, "David Hildenbrand" <david@redhat.com>,
- <linuxppc-dev@lists.ozlabs.org>, <linux-s390@vger.kernel.org>,
- <kvmarm@lists.linux.dev>
-Subject: Re: [kvm-unit-tests PATCH 1/9] s390x: clean lib/auxinfo.o
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Claudio Imbrenda" <imbrenda@linux.ibm.com>
-X-Mailer: aerc 0.15.2
-References: <20231222135048.1924672-1-npiggin@gmail.com>
- <20231222135048.1924672-2-npiggin@gmail.com>
- <20231222160414.5175ebba@p-imbrenda>
-In-Reply-To: <20231222160414.5175ebba@p-imbrenda>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJZ5v0hyUqJspPbGTgTMSVHVBe=wHR6swPx-O3UcsH5dXDFpTA@mail.gmail.com>
 
-On Sat Dec 23, 2023 at 1:04 AM AEST, Claudio Imbrenda wrote:
-> On Fri, 22 Dec 2023 23:50:40 +1000
-> Nicholas Piggin <npiggin@gmail.com> wrote:
->
-> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> > ---
-> >  s390x/Makefile | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/s390x/Makefile b/s390x/Makefile
-> > index f79fd009..95ef9533 100644
-> > --- a/s390x/Makefile
-> > +++ b/s390x/Makefile
-> > @@ -227,7 +227,7 @@ $(snippet_asmlib): $$(patsubst %.o,%.S,$$@) $(asm-o=
-ffsets)
-> > =20
-> > =20
-> >  arch_clean: asm_offsets_clean
-> > -	$(RM) $(TEST_DIR)/*.{o,elf,bin,lds} $(SNIPPET_DIR)/*/*.{o,elf,*bin,*o=
-bj,hdr,lds} $(SNIPPET_DIR)/asm/.*.d $(TEST_DIR)/.*.d lib/s390x/.*.d $(comm-=
-key)
-> > +	$(RM) $(TEST_DIR)/*.{o,elf,bin,lds} $(SNIPPET_DIR)/*/*.{o,elf,*bin,*o=
-bj,hdr,lds} $(SNIPPET_DIR)/asm/.*.d $(TEST_DIR)/.*.d lib/s390x/.*.d lib/aux=
-info.o $(comm-key)
->
-> it seems other architectures don't need to do the cleanp? what are we
-> doing wrong?
+On Mon, Dec 18, 2023 at 02:14:30PM +0100, Rafael J. Wysocki wrote:
+> On Mon, Dec 18, 2023 at 10:23 AM Lorenzo Pieralisi
+> <lpieralisi@kernel.org> wrote:
+> >
+> > On Fri, Dec 15, 2023 at 04:53:28PM +0000, Russell King (Oracle) wrote:
+> > > On Fri, Dec 15, 2023 at 04:23:22PM +0000, Jonathan Cameron wrote:
+> > > > On Wed, 13 Dec 2023 12:50:18 +0000
+> > > > Russell King (Oracle) <rmk+kernel@armlinux.org.uk> wrote:
+> > > >
+> > > > > From: James Morse <james.morse@arm.com>
+> > > > >
+> > > > > Add the new flag field to the MADT's GICC structure.
+> > > > >
+> > > > > 'Online Capable' indicates a disabled CPU can be enabled later. See
+> > > > > ACPI specification 6.5 Tabel 5.37: GICC CPU Interface Flags.
+> > > > >
+> > > > > Signed-off-by: James Morse <james.morse@arm.com>
+> > > > > Tested-by: Miguel Luis <miguel.luis@oracle.com>
+> > > > > Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
+> > > > > Tested-by: Jianyong Wu <jianyong.wu@arm.com>
+> > > > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > > >
+> > > > I see there is an acpica pull request including this bit but with a different name
+> > > > For reference.
+> > > > https://github.com/acpica/acpica/pull/914/commits/453a5f67567786522021d5f6913f561f8b3cabf6
+> > > >
+> > > > +CC Lorenzo who submitted that.
+> > >
+> > > > > +#define ACPI_MADT_GICC_CPU_CAPABLE      (1<<3)   /* 03: CPU is online capable */
+> > > >
+> > > > ACPI_MADT_GICC_ONLINE_CAPABLE
+> > >
+> > > It's somewhat disappointing, but no big deal. It's easy enough to change
+> > > "irqchip/gic-v3: Add support for ACPI's disabled but 'online capable' CPUs"
+> > > to use Lorenzo's name when that patch hits - and it becomes one less
+> > > patch in this patch set when Lorenzo's change eventually hits mainline.
+> > >
+> > > Does anyone know how long it may take for Lorenzo's change to get into
+> > > mainline? Would it be by the 6.8 merge window or the following one?
+> >
+> > I wish I knew. I submitted ACPICA changes for the online capable bit
+> > since I had to add additional flags on top (ie DMA coherent) and it
+> > would not make sense to submit the latter without the former.
+> >
+> > I'd be great if the ACPICA headers can make it into Linux for the upcoming
+> > merge window, not sure what I can do to fasttrack the process though
+> > (I shall ping the maintainers).
+> 
+> If your upstream pull request has been merged, I can pick up Linux
+> patches carrying Link: tags pointing to the upstream ACPICA commits in
+> that pull request.
 
-x86 does clean it via cflatobjs. arm and powerpc never build the .o
-AFAIKS.
+ACPICA PR was merged, sent the Linuxized version along with the GIC changes
+here:
+
+https://lore.kernel.org/lkml/20231227110038.55453-1-lpieralisi@kernel.org
 
 Thanks,
-Nick
+Lorenzo
