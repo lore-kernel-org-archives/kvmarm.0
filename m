@@ -1,78 +1,86 @@
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88DA928DD4
-	for <kvmarm@lists.linux.dev>; Thu,  4 Jan 2024 18:22:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309E92C691
+	for <kvmarm@lists.linux.dev>; Thu,  4 Jan 2024 18:32:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EgDKCdZE"
-Date: Thu, 4 Jan 2024 18:22:19 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1704392543;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=y6mU88UU7RwuIYuMbDb5yDn0rYv6PefHxXdYDrc9VLI=;
-	b=EgDKCdZE20v9OExzVNdXTQ+9FPo7gxMtUmhFXzPE09LkTPYSwarsZGWvGfDJmHvCqE1gt2
-	w6D7B8Mdkl0/RnB/gsmZxzxCVkPwwKpXTIpZVRRe0NDLTg5nBI0DndLsm+EQMChmijdnJE
-	fXbEFcwX4/qNEemgMFBwlT0kWk1nggs=
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="m313ILFG"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1704393163;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=wF+/ZNoe9kIdBZy1UZERjlDvp3hqlDkzbkeVD7gYeD8=;
+	b=m313ILFGfNYxEFN3P1U/59pz1b7XsdzcI+JEfbwRTb2x3w4aX/vuJlGfqrnbcNR0ROTlEA
+	GgeDM3Jmy29a9hvCwlESq+CLD6zQZu2efTlrTA/LCQVJUK/QZJPyuyxT92SHOn9YNfJdAn
+	s1TZBTkdK1w2REOX7g9o+ur9u7ZX1hc=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	maz@kernel.org, keirf@google.com,
-	Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH] KVM: arm64: Add missing memory barriers when switching
- to pKVM's hyp pgd
-Message-ID: <ZZb3W1N80q6pAib7@linux.dev>
-References: <20240104164220.7968-1-will@kernel.org>
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	stable@vger.kernel.org
+Subject: [PATCH] KVM: arm64: vgic-its: Avoid potential UAF in LPI translation cache
+Date: Thu,  4 Jan 2024 18:32:32 +0000
+Message-ID: <20240104183233.3560639-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240104164220.7968-1-will@kernel.org>
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jan 04, 2024 at 04:42:20PM +0000, Will Deacon wrote:
-> In commit f320bc742bc23 ("KVM: arm64: Prepare the creation of s1
-> mappings at EL2"), pKVM switches from a temporary host-provided
-> page-table to its own page-table at EL2. Since there is only a single
-> TTBR for the nVHE hypervisor, this involves disabling and re-enabling
-> the MMU in __pkvm_init_switch_pgd().
-> 
-> Unfortunately, the memory barriers here are not quite correct.
-> Specifically:
-> 
->   - A DSB is required to complete the TLB invalidation executed while
->     the MMU is disabled.
-> 
->   - An ISB is required to make the new TTBR value visible to the
->     page-table walker before the MMU is enabled in the SCTLR.
-> 
-> An earlier version of the patch actually got this correct:
-> 
->   https://lore.kernel.org/lkml/20210304184717.GB21795@willie-the-truck/
-> 
-> but thanks to some badly worded review comments from yours truly, these
-> were dropped for the version that was eventually merged.
-> 
-> Bring back the barriers and fix the potential issue (but note that this
-> was found by code inspection).
-> 
-> Cc: Quentin Perret <qperret@google.com>
-> Fixes: f320bc742bc23 ("KVM: arm64: Prepare the creation of s1 mappings at EL2")
-> Signed-off-by: Will Deacon <will@kernel.org>
+There is a potential UAF scenario in the case of an LPI translation
+cache hit racing with an operation that invalidates the cache, such
+as a DISCARD ITS command. The root of the problem is that
+vgic_its_check_cache() does not elevate the refcount on the vgic_irq
+before dropping the lock that serializes refcount changes.
 
-+1 to Marc's suggestion about folding the appropriate barriers into the
-macro, but fine with this as is:
+Have vgic_its_check_cache() raise the refcount on the returned vgic_irq
+and add the corresponding decrement after queueing the interrupt.
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+Cc: stable@vger.kernel.org
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/kvm/vgic/vgic-its.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 2dad2d095160..e2764d0ffa9f 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -590,7 +590,11 @@ static struct vgic_irq *vgic_its_check_cache(struct kvm *kvm, phys_addr_t db,
+ 	unsigned long flags;
+ 
+ 	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
++
+ 	irq = __vgic_its_check_cache(dist, db, devid, eventid);
++	if (irq)
++		vgic_get_irq_kref(irq);
++
+ 	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 
+ 	return irq;
+@@ -769,6 +773,7 @@ int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi)
+ 	raw_spin_lock_irqsave(&irq->irq_lock, flags);
+ 	irq->pending_latch = true;
+ 	vgic_queue_irq_unlock(kvm, irq, flags);
++	vgic_put_irq(kvm, irq);
+ 
+ 	return 0;
+ }
+
+base-commit: 33cc938e65a98f1d29d0a18403dbbee050dcad9a
 -- 
-Thanks,
-Oliver
+2.43.0.472.g3155946c3a-goog
+
