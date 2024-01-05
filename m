@@ -1,16 +1,16 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C891241F1
-	for <kvmarm@lists.linux.dev>; Fri,  5 Jan 2024 09:40:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47EE0249E9
+	for <kvmarm@lists.linux.dev>; Fri,  5 Jan 2024 09:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 35677C15;
-	Fri,  5 Jan 2024 01:41:22 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CFD8BFEC;
+	Fri,  5 Jan 2024 01:50:51 -0800 (PST)
 Received: from [10.57.44.155] (unknown [10.57.44.155])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 399B83F7A6;
-	Fri,  5 Jan 2024 01:40:32 -0800 (PST)
-Message-ID: <d8778412-99aa-4eb8-9c73-b60740a7b5cb@arm.com>
-Date: Fri, 5 Jan 2024 09:40:30 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B410B3F5A1;
+	Fri,  5 Jan 2024 01:50:01 -0800 (PST)
+Message-ID: <8ba4d3dd-6ab2-49e3-9d25-d742e4958afc@arm.com>
+Date: Fri, 5 Jan 2024 09:50:00 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -18,8 +18,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/7] arm64: KVM: Use shared area to pass PMU event
- state to hypervisor
+Subject: Re: [PATCH v4 6/7] arm64: KVM: Write TRFCR value on guest switch with
+ nVHE
 Content-Language: en-GB
 To: James Clark <james.clark@arm.com>, coresight@lists.linaro.org,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
@@ -32,236 +32,135 @@ Cc: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
  Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
  <robh@kernel.org>, Miguel Luis <miguel.luis@oracle.com>,
  Jintack Lim <jintack.lim@linaro.org>, Ard Biesheuvel <ardb@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Arnd Bergmann <arnd@arndb.de>,
- Vincent Donnefort <vdonnefort@google.com>,
- Kristina Martsenko <kristina.martsenko@arm.com>,
- Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
- Akihiko Odaki <akihiko.odaki@daynix.com>, Jing Zhang
- <jingzhangos@google.com>, linux-kernel@vger.kernel.org
+ Mark Rutland <mark.rutland@arm.com>, Helge Deller <deller@gmx.de>,
+ Arnd Bergmann <arnd@arndb.de>, Kalesh Singh <kaleshsingh@google.com>,
+ Quentin Perret <qperret@google.com>,
+ Vincent Donnefort <vdonnefort@google.com>, Fuad Tabba <tabba@google.com>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>, Joey Gouly <joey.gouly@arm.com>,
+ Jing Zhang <jingzhangos@google.com>, linux-kernel@vger.kernel.org
 References: <20240104162714.1062610-1-james.clark@arm.com>
- <20240104162714.1062610-3-james.clark@arm.com>
+ <20240104162714.1062610-7-james.clark@arm.com>
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240104162714.1062610-3-james.clark@arm.com>
+In-Reply-To: <20240104162714.1062610-7-james.clark@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 04/01/2024 16:27, James Clark wrote:
-> Currently the state of the PMU events is copied into the VCPU struct
-> before every VCPU run. This isn't scalable if more data for other
-> features needs to be added too. So make a writable area that's shared
-> between the host and the hypervisor to store this state.
+> The guest value for TRFCR requested by the Coresight driver is saved in
+> kvm_host_global_state. On guest switch this value needs to be written to
+> the register. Currently TRFCR is only modified when we want to disable
+> trace completely in guests due to an issue with TRBE. Expand the
+> __debug_save_trace() function to always write to the register if a
+> different value for guests is required, but also keep the existing TRBE
+> disable behavior if that's required.
 > 
-> Normal per-cpu constructs can't be used because although the framework
-> exists for the host to write to the hypervisor's per-cpu structs, this
-> only works until the protection is enabled. And for the other way
-> around, no framework exists for the hypervisor to access the host's size
-> and layout of per-cpu data. Instead of making a new framework for the
-> hypervisor to access the host's per-cpu data that would only be used
-> once, just define the new shared area as an array with NR_CPUS elements.
-> This also reduces the amount of sharing that needs to be done, because
-> unlike this array, the per-cpu data isn't contiguous.
+> The TRFCR restore function remains functionally the same, except a value
+> of 0 doesn't mean "don't restore" anymore. Now that we save both guest
+> and host values the register is restored any time the guest and host
+> values differ.
 > 
 > Signed-off-by: James Clark <james.clark@arm.com>
 > ---
->   arch/arm64/include/asm/kvm_host.h |  8 ++++++++
->   arch/arm64/kernel/image-vars.h    |  1 +
->   arch/arm64/kvm/arm.c              | 16 ++++++++++++++--
->   arch/arm64/kvm/hyp/nvhe/setup.c   | 11 +++++++++++
->   arch/arm64/kvm/hyp/nvhe/switch.c  |  9 +++++++--
->   arch/arm64/kvm/pmu.c              |  4 +---
->   include/kvm/arm_pmu.h             | 17 -----------------
->   7 files changed, 42 insertions(+), 24 deletions(-)
+>   arch/arm64/kvm/hyp/nvhe/debug-sr.c | 55 ++++++++++++++++++------------
+>   1 file changed, 34 insertions(+), 21 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 824f29f04916..93d38ad257ed 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -466,6 +466,14 @@ struct kvm_cpu_context {
->   	struct kvm_vcpu *__hyp_running_vcpu;
->   };
+> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> index 4558c02eb352..7fd876d4f034 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> @@ -51,32 +51,45 @@ static void __debug_restore_spe(u64 pmscr_el1)
+>   	write_sysreg_s(pmscr_el1, SYS_PMSCR_EL1);
+>   }
 >   
-> +struct kvm_host_global_state {
-> +	struct kvm_pmu_events {
-> +		u32 events_host;
-> +		u32 events_guest;
-> +	} pmu_events;
-> +} ____cacheline_aligned;
-> +extern struct kvm_host_global_state kvm_host_global_state[NR_CPUS];
-
-With this in place, we could also optimize the VCPU debug state flags
-(DEBUG_STATE_SAVE_{TRBE,SPE}). i.e., right now, we always check the for
-SPE and TRBE availability on the CPU, by reading the ID registers.
-This could hold the per-cpu flags for the Physical CPU and the VCPU
-could use this for making the decisions, rather than reading the two
-ID registers per feature everytime.
-
-This can come later though, in a separate series.
-
-Suzuki
-
-
-> +
->   struct kvm_host_data {
->   	struct kvm_cpu_context host_ctxt;
->   };
-> diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-> index 119ca121b5f8..1a9dbb02bb4a 100644
-> --- a/arch/arm64/kernel/image-vars.h
-> +++ b/arch/arm64/kernel/image-vars.h
-> @@ -59,6 +59,7 @@ KVM_NVHE_ALIAS(alt_cb_patch_nops);
->   
->   /* Global kernel state accessed by nVHE hyp code. */
->   KVM_NVHE_ALIAS(kvm_vgic_global_state);
-> +KVM_NVHE_ALIAS(kvm_host_global_state);
->   
->   /* Kernel symbols used to call panic() from nVHE hyp code (via ERET). */
->   KVM_NVHE_ALIAS(nvhe_hyp_panic_handler);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 4796104c4471..bd6b2eda5f4f 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -47,6 +47,20 @@
->   
->   static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
->   
+> -static void __debug_save_trace(u64 *trfcr_el1)
 > +/*
-> + * Host state that isn't associated with any VCPU, but will affect any VCPU
-> + * running on a host CPU in the future. This remains writable from the host and
-> + * readable in the hyp.
-> + *
-> + * PER_CPU constructs aren't compatible between the hypervisor and the host so
-> + * just define it as a NR_CPUS array. DECLARE_KVM_NVHE_PER_CPU works in both
-> + * places, but not after the hypervisor protection is initialised. After that,
-> + * kvm_arm_hyp_percpu_base isn't accessible from the host, so even if the
-> + * kvm_host_global_state struct was shared with the host, the per-cpu offset
-> + * can't be calculated without sharing even more data with the host.
+> + * Save TRFCR and disable trace completely if TRBE is being used, otherwise
+> + * apply required guest TRFCR value.
 > + */
-> +struct kvm_host_global_state kvm_host_global_state[NR_CPUS];
+> +static void __debug_save_trace(struct kvm_vcpu *vcpu)
+>   {
+> -	*trfcr_el1 = 0;
+> +	u64 host_trfcr_el1 = read_sysreg_s(SYS_TRFCR_EL1);
+> +	u64 guest_trfcr_el1;
 > +
->   DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+> +	vcpu->arch.host_debug_state.trfcr_el1 = host_trfcr_el1;
 >   
->   DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
-> @@ -1016,8 +1030,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->   
->   		kvm_vgic_flush_hwstate(vcpu);
->   
-> -		kvm_pmu_update_vcpu_events(vcpu);
-> -
->   		/*
->   		 * Ensure we set mode to IN_GUEST_MODE after we disable
->   		 * interrupts and before the final VCPU requests check.
-> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-> index b5452e58c49a..3e45cc10ba96 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-> @@ -159,6 +159,17 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
->   	if (ret)
->   		return ret;
->   
-> +	/*
-> +	 * Similar to kvm_vgic_global_state, but this one remains writable by
-> +	 * the host rather than read-only. Used to store per-cpu state about the
-> +	 * host that isn't associated with any particular VCPU.
-> +	 */
-> +	prot = pkvm_mkstate(KVM_PGTABLE_PROT_RW, PKVM_PAGE_SHARED_OWNED);
-> +	ret = pkvm_create_mappings(&kvm_host_global_state,
-> +				   &kvm_host_global_state + 1, prot);
-> +	if (ret)
-> +		return ret;
-> +
->   	ret = create_hyp_debug_uart_mapping();
->   	if (ret)
->   		return ret;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index c50f8459e4fc..89147a9dc38c 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -130,13 +130,18 @@ static void __hyp_vgic_restore_state(struct kvm_vcpu *vcpu)
->   	}
+>   	/* Check if the TRBE is enabled */
+> -	if (!(read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E))
+> -		return;
+> -	/*
+> -	 * Prohibit trace generation while we are in guest.
+> -	 * Since access to TRFCR_EL1 is trapped, the guest can't
+> -	 * modify the filtering set by the host.
+> -	 */
+> -	*trfcr_el1 = read_sysreg_s(SYS_TRFCR_EL1);
+> -	write_sysreg_s(0, SYS_TRFCR_EL1);
+> -	isb();
+> -	/* Drain the trace buffer to memory */
+> -	tsb_csync();
+> +	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE) &&
+> +	    (read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E)) {
+> +		/*
+> +		 * Prohibit trace generation while we are in guest. Since access
+> +		 * to TRFCR_EL1 is trapped, the guest can't modify the filtering
+> +		 * set by the host.
+> +		 */
+> +		write_sysreg_s(0, SYS_TRFCR_EL1);
+> +		isb();
+> +		/* Drain the trace buffer to memory */
+> +		tsb_csync();
+> +	} else {
+> +		/*
+> +		 * Not using TRBE, so guest trace works. Apply the guest filters
+> +		 * provided by the Coresight driver, if different.
+> +		 */
+> +		guest_trfcr_el1 = kvm_host_global_state[vcpu->cpu].guest_trfcr_el1;
+> +		if (host_trfcr_el1 != guest_trfcr_el1)
+> +			write_sysreg_s(guest_trfcr_el1, SYS_TRFCR_EL1);
+> +	}
 >   }
 >   
-> +static struct kvm_pmu_events *kvm_nvhe_get_pmu_events(struct kvm_vcpu *vcpu)
-> +{
-> +	return &kvm_host_global_state[vcpu->cpu].pmu_events;
-> +}
-> +
->   /*
->    * Disable host events, enable guest events
->    */
->   #ifdef CONFIG_HW_PERF_EVENTS
->   static bool __pmu_switch_to_guest(struct kvm_vcpu *vcpu)
+>   static void __debug_restore_trace(u64 trfcr_el1)
 >   {
-> -	struct kvm_pmu_events *pmu = &vcpu->arch.pmu.events;
-> +	struct kvm_pmu_events *pmu = kvm_nvhe_get_pmu_events(vcpu);
->   
->   	if (pmu->events_host)
->   		write_sysreg(pmu->events_host, pmcntenclr_el0);
-> @@ -152,7 +157,7 @@ static bool __pmu_switch_to_guest(struct kvm_vcpu *vcpu)
->    */
->   static void __pmu_switch_to_host(struct kvm_vcpu *vcpu)
->   {
-> -	struct kvm_pmu_events *pmu = &vcpu->arch.pmu.events;
-> +	struct kvm_pmu_events *pmu = kvm_nvhe_get_pmu_events(vcpu);
->   
->   	if (pmu->events_guest)
->   		write_sysreg(pmu->events_guest, pmcntenclr_el0);
-> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-> index a243934c5568..136d5c6c1916 100644
-> --- a/arch/arm64/kvm/pmu.c
-> +++ b/arch/arm64/kvm/pmu.c
-> @@ -6,8 +6,6 @@
->   #include <linux/kvm_host.h>
->   #include <linux/perf_event.h>
->   
-> -static DEFINE_PER_CPU(struct kvm_pmu_events, kvm_pmu_events);
+> -	if (!trfcr_el1)
+> -		return;
 > -
->   /*
->    * Given the perf event attributes and system type, determine
->    * if we are going to need to switch counters at guest entry/exit.
-> @@ -28,7 +26,7 @@ static bool kvm_pmu_switch_needed(struct perf_event_attr *attr)
->   
->   struct kvm_pmu_events *kvm_get_pmu_events(void)
->   {
-> -	return this_cpu_ptr(&kvm_pmu_events);
-> +	return &kvm_host_global_state[smp_processor_id()].pmu_events;
+>   	/* Restore trace filter controls */
+> -	write_sysreg_s(trfcr_el1, SYS_TRFCR_EL1);
+> +	if (trfcr_el1 != read_sysreg_s(SYS_TRFCR_EL1))
+> +		write_sysreg_s(trfcr_el1, SYS_TRFCR_EL1);
+
+Could we not write it unconditionally here ? In the saving step, we have
+to save the host setting. But while restoring, we could skip the check.
+A read and write is probably the same cost, as the value is implicitly
+synchronized by a later ISB.
+
+Eitherways,
+
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+
+
 >   }
 >   
->   /*
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 4b9d8fb393a8..71a835970ab5 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -18,14 +18,8 @@ struct kvm_pmc {
->   	struct perf_event *perf_event;
->   };
+>   void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+> @@ -85,8 +98,8 @@ void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+>   	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_SPE))
+>   		__debug_save_spe(&vcpu->arch.host_debug_state.pmscr_el1);
+>   	/* Disable and flush Self-Hosted Trace generation */
+> -	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
+> -		__debug_save_trace(&vcpu->arch.host_debug_state.trfcr_el1);
+> +	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRFCR))
+> +		__debug_save_trace(vcpu);
+>   }
 >   
-> -struct kvm_pmu_events {
-> -	u32 events_host;
-> -	u32 events_guest;
-> -};
-> -
->   struct kvm_pmu {
->   	struct irq_work overflow_work;
-> -	struct kvm_pmu_events events;
->   	struct kvm_pmc pmc[ARMV8_PMU_MAX_COUNTERS];
->   	int irq_num;
->   	bool created;
-> @@ -79,17 +73,6 @@ void kvm_vcpu_pmu_resync_el0(void);
->   #define kvm_vcpu_has_pmu(vcpu)					\
->   	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_PMU_V3))
+>   void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+> @@ -98,7 +111,7 @@ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+>   {
+>   	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_SPE))
+>   		__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
+> -	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
+> +	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRFCR))
+>   		__debug_restore_trace(vcpu->arch.host_debug_state.trfcr_el1);
+>   }
 >   
-> -/*
-> - * Updates the vcpu's view of the pmu events for this cpu.
-> - * Must be called before every vcpu run after disabling interrupts, to ensure
-> - * that an interrupt cannot fire and update the structure.
-> - */
-> -#define kvm_pmu_update_vcpu_events(vcpu)				\
-> -	do {								\
-> -		if (!has_vhe() && kvm_vcpu_has_pmu(vcpu))		\
-> -			vcpu->arch.pmu.events = *kvm_get_pmu_events();	\
-> -	} while (0)
-> -
->   /*
->    * Evaluates as true when emulating PMUv3p5, and false otherwise.
->    */
 
