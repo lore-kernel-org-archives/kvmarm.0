@@ -1,162 +1,262 @@
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2104.outbound.protection.outlook.com [40.107.243.104])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476DB35890
-	for <kvmarm@lists.linux.dev>; Fri,  5 Jan 2024 21:33:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDFE8364B8
+	for <kvmarm@lists.linux.dev>; Fri,  5 Jan 2024 23:53:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="VvkhSBoB"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=O0Uu4oRwQ+UqSvRmDzx/WkbNuB5jrFMKtg67XCpbnHFAkPM1l4Hmtlyr1UVguV1XXbaZkhysZq3+7XSmvsLSCWrKFM2Ww8BvC2IPPEoy1vE4llgLBRwDskv1oT6fpshvoSXRLFbEkqdzv9wedlXrXWiJlt37ttbZAXzO9aZ85DhCDb5OkCtl8WSARg1/71yHZCioeq6x7QGSo6ZVEiOGmATE8HhlQZJAYGBCK8pSYaleAK/9LeLc7bgTv7fFWYruCba6dHvVlE7r7hHkn5vUqerBIDsvInYJZ0J6ZN0nMcq1o41b/zjts2v+BrKvoXmBluLzco5TRMQCvMuD+EQbsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eZWEWWFKDh1CUtjz4V/c6SskXpSsThuamXXd88vx5Z8=;
- b=dBteTILC4RBYkOzy4+NBlC9XunhEspmEuz/Ec/oDPUdaCSvU+R4dZSm+S/bQXq2uFDKDGzoMt9DclRMv2PX2P0p7cZKqavplyO0KKTHdo8kt750wLX/b2+pWT9BeBQ9kSb9exiCdl+OW9b2tvvjVyAbZRfxy2cU+em+F5nVyn0mkgA2MFDT1OblFI1X2bOW35JgmfBGFiv2uY55MbW9t/ISppnDrfnfbFHkomp30cNpdi68zTbhmAQo0A2V/pq8f8FiSEBwpT1yyQHQpb2I2TWo6NCNqkkaIdRd3aXy8A7kW80CKsqubGKpIj5sX2ytL4JjVml+AspwX1YsrNkH2Cg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eZWEWWFKDh1CUtjz4V/c6SskXpSsThuamXXd88vx5Z8=;
- b=VvkhSBoB84n4A9Zraaj75gn6sE3uss25jLomlPuBeltNR3rh5DHrODre+Lf7smN58rR7Cb9vlb8GeCXZubYH5/4cyku8Fm5sK3dXE18pZ964hv9xyJbYExPLDY4ww6umVaA94rb9F6G6nke4oYJtLt3t8ulmt8xAIHNkTWLtnGY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from PH0PR01MB8166.prod.exchangelabs.com (2603:10b6:510:293::17) by
- CO1PR01MB6598.prod.exchangelabs.com (2603:10b6:303:f8::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7159.17; Fri, 5 Jan 2024 21:33:20 +0000
-Received: from PH0PR01MB8166.prod.exchangelabs.com
- ([fe80::5549:ab3d:70af:8693]) by PH0PR01MB8166.prod.exchangelabs.com
- ([fe80::5549:ab3d:70af:8693%7]) with mapi id 15.20.7135.023; Fri, 5 Jan 2024
- 21:33:20 +0000
-From: Ilkka Koskinen <ilkka@os.amperecomputing.com>
-To: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NtYdnV6s"
+Date: Fri, 5 Jan 2024 23:53:10 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1704498795;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lCwg2KhbBxczqWivmS+HLDaOklrbO1Me0OlTSs5JdVM=;
+	b=NtYdnV6sjgsbe1UXJefyHcbFa1lwJJL4d2o6kHmnw5N3UxwkTtKAY+8cQXjPmcI7Cd00d+
+	CZvi6peHaoJgx8x4a+/kT/VkhX6Ajj7tpbiJm89QYpKxGD7N0iEu/AVAwYMJ+nkm5/E8LH
+	7d8qZJg0YbXvmJPHbsOrIy82Nubj7yc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Ilkka Koskinen <ilkka@os.amperecomputing.com>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Gavin Shan <gshan@redhat.com>,
+	Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>,
 	Mark Rutland <mark.rutland@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>
-Cc: Ilkka Koskinen <ilkka@os.amperecomputing.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
 	D Scott Phillips <scott@os.amperecomputing.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH] KVM: arm64: Workaround for Ampere AC03_CPU_36 (exception taken to an incorrect EL)
-Date: Fri,  5 Jan 2024 13:32:51 -0800
-Message-ID: <20240105213251.4141-1-ilkka@os.amperecomputing.com>
-X-Mailer: git-send-email 2.43.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: CH0PR03CA0082.namprd03.prod.outlook.com
- (2603:10b6:610:cc::27) To PH0PR01MB8166.prod.exchangelabs.com
- (2603:10b6:510:293::17)
+Subject: Re: [RFC PATCH] KVM: arm64: Workaround for Ampere AC03_CPU_36
+ (exception taken to an incorrect EL)
+Message-ID: <ZZiWZkNP8Owytecw@linux.dev>
+References: <20240105213251.4141-1-ilkka@os.amperecomputing.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR01MB8166:EE_|CO1PR01MB6598:EE_
-X-MS-Office365-Filtering-Correlation-Id: a0108a2c-cfc2-4ad8-a3e9-08dc0e35f00d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	7OnFLaLk4d4jYXCFmiaN33mtkRqAdFPyKNULG0ABpZbI/PIxBKEQD7wunTJS6B0oMcmMuLYtmEp6EmHQB20a8p1VuVGSr9naLlxc+tRF8VP1Gf3/G26p6e2h+SbYaxlaHI6ZaOSNrUDFF0u2wrfAhO/I9YBOrRNvFayPtYji/RI/YGD/9A9hB5e6DavinBj05RIAbmX3K+RyCwe+AyL+W7aiUhsqRbI3U15sLEMErFHhip6kJFDTBka6FCl7MxAwBx1b7G9M2X41Z1A4Bi9u6UyNVsC73BiHo/B2cxio/FHzmSfYa4Mjdo0fHapoa743RyjoATb8o4kJ79uJJ3B7rpXCheoOxhV1g/WoMycZmRMP6zejZv4hoIKFFph2HT8djg1Q3Fz1EqC9D1klKAZL4KGRxcay4V2CAaKzTyItfTQWl4Nar+Be+NbFV95YdVxCxbtyOPoAiUyAwR/iJE39nEqdv/+Os/w6PzSzkvTKROrSrJLA+GfNliHG1FAB4+JN9MR7dc6iirOAWFPzIHrxW00iyNyrUyLXWV7eyZsqO4n6hlnybQQETkzmbb3Zkb9z/kusl/TgSZOAOB7SBmFLKf7/JNNfi1aDmulBFWv+n10d1J5aPINZGoSKeCzIxB4v+clsokGyD5IOCjpOS65R6g==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR01MB8166.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(136003)(366004)(39850400004)(376002)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(83380400001)(86362001)(52116002)(478600001)(6512007)(41300700001)(6506007)(6666004)(921011)(2616005)(110136005)(7416002)(54906003)(38350700005)(5660300002)(2906002)(6486002)(316002)(66946007)(66476007)(66556008)(8936002)(8676002)(4326008)(38100700002)(66899024)(26005)(1076003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?hUPPOu5X2U2ShhruUGmX54ZC2wu3J5wCIoOITnGlWcBHH6WdUl1opl7TScz/?=
- =?us-ascii?Q?2j7PM0SB3fFRvGxjtMdA2T6jZyoKcMl4v5EMofakGm4yOyJ2nkrYHo+nWThE?=
- =?us-ascii?Q?UAjXLsNd16QnR3uIeDRCOkvw/rQzs66u1W/UymIuOtb+pDLDCwvXbDugrVpD?=
- =?us-ascii?Q?sl9SQsnZKSvPdur1Oys9nTihwpXs8mCAF4WVn/Bp+YrORg5fOzhqEhrFHD55?=
- =?us-ascii?Q?U7XrvKtP5BYfl4mRXfVb08wLCLoqxFCfFqeFrXVGinY1M1lSdYuQ/MC+ysZF?=
- =?us-ascii?Q?Ycb6jDijoMHbTpMGyZ0oCDJD1q4LIEiuzez7i7tvOE/6FCVqOnYB7UX7Ea65?=
- =?us-ascii?Q?ug/FPsRT+cJD53FgGS940WmJZIomwSPZYsn1/j1T9tRxw+D7vTOMaqycszyw?=
- =?us-ascii?Q?vxKazXGGzL9aZsGWDwJTWPdBdX3uQ+EdiIfh6SAdip/BwOnlDh6mInSm8BOj?=
- =?us-ascii?Q?rw4Kl0sWquhKSXjQEfhen9GOlNJtsArjuAU4YDWUMBzAXtOdST8tbZOMa6q2?=
- =?us-ascii?Q?OuYxb96MMR9d0rqLGJ8BJvXMP47juxo53YRBDro/502icq5kN8rlYK3xtOn7?=
- =?us-ascii?Q?mSBfYXvxQ5qqo5I9r9hCHeCS3YhSHWxIZCO50H4+mEJun8VlKRLrU3FvPekT?=
- =?us-ascii?Q?XcgumkPVrVZdtEe7c6LV2wZuZJMYNKbSsJ68bePhYlGz0t9ep/53quwdgDWH?=
- =?us-ascii?Q?mKkS0ouvY2xQOLMPgi7yqPcNHoVMZTLVo2PAf5TfMe1lvNnKQWrrJmvuTp/m?=
- =?us-ascii?Q?c0+GNhRybPJJrfz+alhf1zp8XP226F/cyRLDaUJ5EwzXb7sz6pAyDg6WU2Uk?=
- =?us-ascii?Q?BTecrpzBvjBCvXT8rj0TPK40FoQr/N7AE134QS9/9ThWygQ7986Yfvhoeo+x?=
- =?us-ascii?Q?hOvr5J+FzgpQKqgPZFv7ZnCj59QVZ044BnrcGSWrD4Fu8poJQkILRbU67ql6?=
- =?us-ascii?Q?yUl9vq3U1W4FvjpnBMRqS+i8c22m7U9ojs1WTVMrq/naKX5OiNC7VkW+eQRU?=
- =?us-ascii?Q?EG5y5ReJbHheK5bTSCcEpRgAyYW4mgqHT9gPMvvEouL05Qu3fDWHPM0xSvAk?=
- =?us-ascii?Q?8kaswy1SG+LnQUJdazfclheXfvR2Ho4/b0LalQrwDAcPSfhy2LAaA8/37wXA?=
- =?us-ascii?Q?uPjJxuK3rg6ULdwzTMDmSrLMQrMktS5n8y/mglg7BC8dXsInCCyTpX4zh6pY?=
- =?us-ascii?Q?Z4AE2Bz02HDbN1xEMW4wA6ig6a970AV4srllOpP0cruBCvlJVJxGeUwQ2NDR?=
- =?us-ascii?Q?KZNV4MTKoOnsvgmLTVgOV70HvJ0LhvwttfULFfqHFnWlly6oFqBSm0jan0HE?=
- =?us-ascii?Q?udVFfet+rXzcL0XPxfzNUh1A0bDNA+l8IPm9leMFPH/BLEh9FSxwHKpGwfST?=
- =?us-ascii?Q?VqsnM/8Y33o7I1eSlXf5OvvkUgMaMSUhjaNRaexIvqTtzPoKy5BxUwvXWpVJ?=
- =?us-ascii?Q?C+pwhcowYmaYL5A5TY/qLfC4TmMw8MhZYiZ2ahOmoa5tsARqE7hNcnJTi06T?=
- =?us-ascii?Q?cxCqUYd562uWWRA7sBLG8tUElrPiJ1Nk50rddXBVrlJLtd4zY4EgnjjmewFD?=
- =?us-ascii?Q?eH0qReTvgk3PFWZjHgttTSESCjZfRaXuXB7gBVAjysShGXq9LjBhC2C74Gw8?=
- =?us-ascii?Q?ZGrGs6T7793BXK3NqK/J9hg=3D?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a0108a2c-cfc2-4ad8-a3e9-08dc0e35f00d
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR01MB8166.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2024 21:33:20.4869
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jhPfDlc4Wb7z3c7ye/49lhiSXNUYpUV1LfPAVQUVwfOp7vsn9BzyEPBi9p3wlrqLSQxfBtMfzJeR8STX0w4J5h1RMUAV66J49adFnG5lSGfAqhzX0TfpcyiBHSDXzUDr
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR01MB6598
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240105213251.4141-1-ilkka@os.amperecomputing.com>
+X-Migadu-Flow: FLOW_OUT
 
-Due to erratum AC03_CPU_36 on AmpereOne, if an Asynchronous Exception
-(interrupts or SErrors) occurs to EL2, while EL2 software is modifying
-system register bits that control EL2 exception behavior, the processor
-may take an exception to an incorrect Exception Level.
+Hi Ilkka,
 
-The affected system registers are HCR_EL2 and SCTLR_EL2, which contain
-control bits for routing and enabling of EL2 exceptions.
+On Fri, Jan 05, 2024 at 01:32:51PM -0800, Ilkka Koskinen wrote:
+> Due to erratum AC03_CPU_36 on AmpereOne, if an Asynchronous Exception
+> (interrupts or SErrors) occurs to EL2, while EL2 software is modifying
+> system register bits that control EL2 exception behavior, the processor
+> may take an exception to an incorrect Exception Level.
+> 
+> The affected system registers are HCR_EL2 and SCTLR_EL2, which contain
+> control bits for routing and enabling of EL2 exceptions.
+> 
+> The issue is triggered when HGE.TGE bit is cleared while having
+> AMO/IMO/FMO bits cleared too. To avoid the exception getting taken
+> at a wrong Exception Level, we set AMO/IMO/FMO.
 
-The issue is triggered when HGE.TGE bit is cleared while having
-AMO/IMO/FMO bits cleared too. To avoid the exception getting taken
-at a wrong Exception Level, we set AMO/IMO/FMO.
+We toggle HCR_EL2 for other things besides TLB invalidations, and the
+changelog does not describe why they're apparently unaffected.
 
-Suggested-by: D Scott Phillips <scott@os.amperecomputing.com>
-Signed-off-by: Ilkka Koskinen <ilkka@os.amperecomputing.com>
+> Suggested-by: D Scott Phillips <scott@os.amperecomputing.com>
+> Signed-off-by: Ilkka Koskinen <ilkka@os.amperecomputing.com>
+
+This isn't an acceptable way to go about errata mitigations. Besides
+extremely unusual circumstances, the pattern is to use a cpucap &&
+alternatives to only enable the workaround on affected designs. We then
+document the errata in the expected places (Kconfig and kernel
+documentation) such that the folks saddled with maintaining this stuff
+know how to handle it years down the line.
+
+> ---
+>  arch/arm64/kvm/hyp/vhe/tlb.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
+> index b32e2940df7d..c72fdd2e4549 100644
+> --- a/arch/arm64/kvm/hyp/vhe/tlb.c
+> +++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+> @@ -61,9 +61,15 @@ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
+>  	 * has an ISB in order to deal with this.
+>  	 */
+>  	__load_stage2(mmu, mmu->arch);
+> -	val = read_sysreg(hcr_el2);
+> -	val &= ~HCR_TGE;
+> -	write_sysreg(val, hcr_el2);
+> +
+> +	/*
+> +	 * With {E2H,TGE} == {1,0}, IMO == 1 is required so that IRQs are not
+> +	 * all masked.
+
+Huh? HCR_EL2.IMO affects the *routing* of IRQs at exception levels
+*lower than* EL2.
+
+> This also works around AmpereOne erratum AC03_CPU_36
+> +	 * which can incorrectly route an IRQ to EL1 when HCR_EL2.{E2H,TGE} is
+> +	 * written from {1,1} to {1,0} with interrupts unmasked.
+> +	 */
+> +	sysreg_clear_set(hcr_el2, HCR_TGE, HCR_AMO | HCR_IMO | HCR_FMO);
+> +
+
+Rather than further modifying the exception controls, why not mask DAIF
+like we do on guest entry/exit? AFAICT that is the only reason KVM_RUN
+is unaffected by this erratum.
+
+This is what I have been using on a few AmpereOne systems:
+
+From 265cb193190c13c651d8e008d34d1d18505d4804 Mon Sep 17 00:00:00 2001
+From: Oliver Upton <oliver.upton@linux.dev>
+Date: Fri, 5 Jan 2024 23:18:14 +0000
+Subject: [PATCH] KVM: arm64: Mitigate AmpereOne erratum AC03_CPU_36
+
+The AmpereOne design suffers from an erratum where if an asynchronous
+exception arrives while EL2 is modifying hypervisor exception controls
+(i.e. HCR_EL2, SCTLR_EL2) the PE may take an invalid exception to
+another EL.
+
+KVM's guest entry/exit path is unaffected because DAIF is already masked
+when modifying HCR_EL2. However, KVM only masks IRQs when switching to
+the guest MMU context for a TLB invalidation, meaning it is possible for
+an intervening exception to trigger the erratum. This becomes
+immediately obvious when profiling a KVM VM with pseudo-NMIs enabled,
+such as:
+
+  perf record ./dirty_log_perf_test -m 2 -s anonymous_thp -v 4 -b 4G
+
+Mitigate the erratum by masking DAIF completely before switching to the
+guest MMU context.
+
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/hyp/vhe/tlb.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ Documentation/arch/arm64/silicon-errata.rst |  2 ++
+ arch/arm64/Kconfig                          | 16 ++++++++++++++++
+ arch/arm64/kernel/cpu_errata.c              |  7 +++++++
+ arch/arm64/kvm/hyp/vhe/tlb.c                | 20 ++++++++++++++++++--
+ arch/arm64/tools/cpucaps                    |  1 +
+ 5 files changed, 44 insertions(+), 2 deletions(-)
 
+diff --git a/Documentation/arch/arm64/silicon-errata.rst b/Documentation/arch/arm64/silicon-errata.rst
+index f47f63bcf67c..aea7a75ae434 100644
+--- a/Documentation/arch/arm64/silicon-errata.rst
++++ b/Documentation/arch/arm64/silicon-errata.rst
+@@ -52,6 +52,8 @@ stable kernels.
+ | Allwinner      | A64/R18         | UNKNOWN1        | SUN50I_ERRATUM_UNKNOWN1     |
+ +----------------+-----------------+-----------------+-----------------------------+
+ +----------------+-----------------+-----------------+-----------------------------+
++| Ampere         | AmpereOne       | AC03_CPU_36     | AMPERE_ERRATUM_AC03_CPU_36  |
+++----------------+-----------------+-----------------+-----------------------------+
+ | Ampere         | AmpereOne       | AC03_CPU_38     | AMPERE_ERRATUM_AC03_CPU_38  |
+ +----------------+-----------------+-----------------+-----------------------------+
+ +----------------+-----------------+-----------------+-----------------------------+
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 7b071a00425d..9ba04b90e945 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -434,6 +434,22 @@ config AMPERE_ERRATUM_AC03_CPU_38
+ 
+ 	  If unsure, say Y.
+ 
++config AMPERE_ERRATUM_AC03_CPU_36
++	bool "AmpereOne: AC03_CPU_36: CPU takes invalid asynchronous exception while changing exception controls"
++	default y
++	help
++	  This option adds an alternative code sequence to work around Ampere
++	  erratum AC03_CPU_36 on AmpereOne parts.
++
++	  The affected designs can take an invalid exception to an incorrect
++	  exception level if an asynchronous exception arrives while software
++	  is changing the EL2 exception controls (i.e. HCR_EL2, SCTLR_EL2).
++
++	  The workaround forces KVM to mask all asynchronous exception sources
++	  when switching to the guest MMU context for TLB invalidations.
++
++	  If unsure, say Y.
++
+ config ARM64_WORKAROUND_CLEAN_CACHE
+ 	bool
+ 
+diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+index e29e0fea63fb..7e2856360f38 100644
+--- a/arch/arm64/kernel/cpu_errata.c
++++ b/arch/arm64/kernel/cpu_errata.c
+@@ -727,6 +727,13 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
+ 		.capability = ARM64_WORKAROUND_AMPERE_AC03_CPU_38,
+ 		ERRATA_MIDR_ALL_VERSIONS(MIDR_AMPERE1),
+ 	},
++#endif
++#ifdef CONFIG_AMPERE_ERRATUM_AC03_CPU_36
++	{
++		.desc = "AmpereOne erratum AC03_CPU_36",
++		.capability = ARM64_WORKAROUND_AMPERE_AC03_CPU_36,
++		ERRATA_MIDR_ALL_VERSIONS(MIDR_AMPERE1),
++	},
+ #endif
+ 	{
+ 	}
 diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index b32e2940df7d..c72fdd2e4549 100644
+index b636b4111dbf..cedfb0a32fa0 100644
 --- a/arch/arm64/kvm/hyp/vhe/tlb.c
 +++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -61,9 +61,15 @@ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
- 	 * has an ISB in order to deal with this.
- 	 */
- 	__load_stage2(mmu, mmu->arch);
--	val = read_sysreg(hcr_el2);
--	val &= ~HCR_TGE;
--	write_sysreg(val, hcr_el2);
+@@ -17,13 +17,29 @@ struct tlb_inv_context {
+ 	u64			sctlr;
+ };
+ 
++#define __tlb_daif_save(flags)						\
++({									\
++	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_36))	\
++		flags = local_daif_save();				\
++	else								\
++		local_irq_save(flags);					\
++})
 +
-+	/*
-+	 * With {E2H,TGE} == {1,0}, IMO == 1 is required so that IRQs are not
-+	 * all masked. This also works around AmpereOne erratum AC03_CPU_36
-+	 * which can incorrectly route an IRQ to EL1 when HCR_EL2.{E2H,TGE} is
-+	 * written from {1,1} to {1,0} with interrupts unmasked.
-+	 */
-+	sysreg_clear_set(hcr_el2, HCR_TGE, HCR_AMO | HCR_IMO | HCR_FMO);
++#define __tlb_daif_restore(flags)					\
++({									\
++	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_36))	\
++		local_daif_restore(flags);				\
++	else								\
++		local_irq_restore(flags);				\
++})
 +
- 	isb();
+ static void __tlb_switch_to_guest(struct kvm_s2_mmu *mmu,
+ 				  struct tlb_inv_context *cxt)
+ {
+ 	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+ 	u64 val;
+ 
+-	local_irq_save(cxt->flags);
++	__tlb_daif_save(cxt->flags);
+ 
+ 	if (vcpu && mmu != vcpu->arch.hw_mmu)
+ 		cxt->mmu = vcpu->arch.hw_mmu;
+@@ -86,7 +102,7 @@ static void __tlb_switch_to_host(struct tlb_inv_context *cxt)
+ 		write_sysreg_el1(cxt->sctlr, SYS_SCTLR);
+ 	}
+ 
+-	local_irq_restore(cxt->flags);
++	__tlb_daif_restore(cxt->flags);
  }
  
+ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index b98c38288a9d..cfaae3b4d2d0 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -85,6 +85,7 @@ WORKAROUND_2457168
+ WORKAROUND_2645198
+ WORKAROUND_2658417
+ WORKAROUND_2966298
++WORKAROUND_AMPERE_AC03_CPU_36
+ WORKAROUND_AMPERE_AC03_CPU_38
+ WORKAROUND_TRBE_OVERWRITE_FILL_MODE
+ WORKAROUND_TSB_FLUSH_FAILURE
 -- 
-2.43.0
+2.43.0.472.g3155946c3a-goog
 
+-- 
+Thanks,
+Oliver
