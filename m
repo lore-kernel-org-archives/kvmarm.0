@@ -1,82 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEA691401A;
-	Mon,  8 Jan 2024 11:04:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA6B7C433C7;
-	Mon,  8 Jan 2024 11:04:49 +0000 (UTC)
-Date: Mon, 8 Jan 2024 11:04:47 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Jason Gunthorpe <jgg@nvidia.com>, ankita@nvidia.com, maz@kernel.org,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org,
-	alex.williamson@redhat.com, kevin.tian@intel.com,
-	yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org,
-	gshan@redhat.com, linux-mm@kvack.org, aniketa@nvidia.com,
-	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
-	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
-	jhubbard@nvidia.com, danw@nvidia.com, mochs@nvidia.com,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	james.morse@arm.com
-Subject: Re: [PATCH v3 2/2] kvm: arm64: set io memory s2 pte as normalnc for
- vfio pci devices
-Message-ID: <ZZvWzyNb1V29-H85@arm.com>
-References: <20231208164709.23101-1-ankita@nvidia.com>
- <20231208164709.23101-3-ankita@nvidia.com>
- <ZXicemDzXm8NShs1@arm.com>
- <20231212181156.GO3014157@nvidia.com>
- <ZXoOieQN7rBiLL4A@linux.dev>
- <ZXsjv+svp44YjMmh@lpieralisi>
- <ZXszoQ48pZ7FnQNV@linux.dev>
- <ZYQ7VjApH1v1QwTW@arm.com>
- <ZZhpt8vdlnOP7i82@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 919A941208
+	for <kvmarm@lists.linux.dev>; Mon,  8 Jan 2024 12:53:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cX5bA1S2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704718438;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gvglX5vfzLPGQZ0Qz47T67FC34QNQiEWEPjU/z3PgsI=;
+	b=cX5bA1S2+G22uiUtvhH04zWp1cba4/7DjaaINIUDWoVikTalSMiMDLcv7Inot/6mkvpgah
+	ace+gg3C0aMtwjtMJt7EJO8KiB6026CYoiGgQpzjzBisYGpWQkoQnGlXhPlcrQ04845vFF
+	Ff0BlWT0/FP9ATBBAzgDom888E2QNLc=
+Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
+ [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-37-OZrrT9rDNwiF_SdB8zlQnA-1; Mon, 08 Jan 2024 07:53:52 -0500
+X-MC-Unique: OZrrT9rDNwiF_SdB8zlQnA-1
+Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-7cc3e45ef28so487909241.2
+        for <kvmarm@lists.linux.dev>; Mon, 08 Jan 2024 04:53:52 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704718432; x=1705323232;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gvglX5vfzLPGQZ0Qz47T67FC34QNQiEWEPjU/z3PgsI=;
+        b=cUwT4tK8IsyHWNS01Br86Tyv899kjTEe8B8RMY5R5ayZF2FNDnNvru4EManZROL3YV
+         31D64W9ex45Kv4PmJGUctocxJNeT0AnbRIycmKCIpIraOg3luOzkIzy4mxEBmTIxVm2L
+         2JK0Kak0nkzNxsx7tmytqgW1ruKsJvIULYgVjXaam9z0KNo45FINvNW4Ozjv/LVi3e6R
+         IHl/ZgkQkL0hjwyyQx1nZOgs8xTs+nvjqVlqLflaCnQQ5ifR22hoA7d5V9F5EtpTz0DK
+         +zlUIUszyHtnME/ybIe8Xuc/UVV+BUSXF5VJk36pB4Wk2kJaRWwwSsM3QO3nrSekhyF5
+         Fn1Q==
+X-Gm-Message-State: AOJu0YxtjPTnp+8i1uDBX3lybdU3NgXO2qV1+MhvOV0E4Ssz7ArOq6dt
+	pbmQ7qYHhf2WtERJZHok33oORUzt+xQeH2D4xdwSCAxtvfao+ECUpFU7rDkqRO1SeHb5eOaaJkz
+	EfjHt0N1iw0PFUb8PVr/d4tyHKZ4eRL4EXA4wz/uK
+X-Received: by 2002:a05:6102:f14:b0:467:d295:377b with SMTP id v20-20020a0561020f1400b00467d295377bmr696754vss.45.1704718431970;
+        Mon, 08 Jan 2024 04:53:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH4iZj6Z4CtUJTRdLavXSn1LD4TkVBf4/0EakNdwjXOF+p2sj0LPVYqkUxZ0kYYFZzYyEj/WY2OkrttCyG+zzY=
+X-Received: by 2002:a05:6102:f14:b0:467:d295:377b with SMTP id
+ v20-20020a0561020f1400b00467d295377bmr696748vss.45.1704718431762; Mon, 08 Jan
+ 2024 04:53:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZZhpt8vdlnOP7i82@linux.dev>
+References: <20240105111756.930029-1-maz@kernel.org>
+In-Reply-To: <20240105111756.930029-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 8 Jan 2024 13:53:39 +0100
+Message-ID: <CABgObfZFccM6vH4r7oVHgRc3fhgyd=Z5iGKbCar5EEywiFOcUQ@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 updates for 6.8
+To: Marc Zyngier <maz@kernel.org>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>, Andre Przywara <andre.przywara@arm.com>, 
+	Anshuman Khandual <anshuman.khandual@arm.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Fuad Tabba <tabba@google.com>, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Kunkun Jiang <jiangkunkun@huawei.com>, Mark Brown <broonie@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Quentin Perret <qperret@google.com>, Russell King <rmk+kernel@armlinux.org.uk>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Will Deacon <will@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 05, 2024 at 08:42:31PM +0000, Oliver Upton wrote:
-> On Thu, Dec 21, 2023 at 01:19:18PM +0000, Catalin Marinas wrote:
-> > > Apologies, I didn't mean to question what's going on here from the
-> > > hardware POV. My concern was more from the kernel + user interfaces POV,
-> > > this all seems to work (specifically for PCI) by maintaining an
-> > > intentional mismatch between the VFIO stage-1 and KVM stage-2 mappings.
-> > 
-> > If you stare at it long enough, the mismatch starts to look fine ;).
-> > Even if you have the VFIO stage 1 Normal NC, KVM stage 2 Normal NC, you
-> > can still have the guest setting stage 1 to Device and introduce an
-> > architectural mismatch. These aliases have some bad reputation but the
-> > behaviour is constrained architecturally.
-> > 
-> > IMHO we should move on from this attribute mismatch since we can't fully
-> > solve it anyway and focus instead on what the device, system can
-> > tolerate, who's responsible for deciding which MMIO ranges can be mapped
-> > as Normal NC.
-> 
-> Fair enough :) The other slightly unsavory part is that we're baking
-> the mapping policy into KVM. I'd prefer it if this policy were kept in
-> userspace somehow, but there's no actual usecase for userspace selecting
-> memory attributes at this point.
+On Fri, Jan 5, 2024 at 12:18=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> Hi Paolo,
+>
+> Here's the set of KVM/arm64 updates for 6.8. The highlight this time
+> around is the LPA2 work by Ryan, bringing 52bit IPA/PA support to 4k
+> and 16k page sizes. Also of note is an extensive FGT rework by Fuad
+> and another set of NV patches, mostly focusing on supporting NV2.
+>
+> The rest is a small set of fixes, mostly addressing vgic issues.
+>
+> Note that this PR contains a branch shared with the arm64 tree (sysreg
+> definition updates), and that the LPA2 series is also shared with
+> arm64 to resolve some conflicts.
+>
+> Please pull,
+>
+>         M.
 
-If by policy you mean who's deciding the write-combining relaxation,
-this series moved it to the vfio-pci host driver. KVM only picks the
-appropriate memory type for stage 2 based on the vma flags. That's
-Normal NC in the absence of anything better on arm64 and it does more
-than just write-combining but we can describe what this new VM_* flag
-allows.
+Pulled, thanks.
 
-If we want to keep this decision strictly in user space, we can do it
-with some ioctl(). The downside is that the host kernel now puts more
-trust in the user VMM, so my preference would be to keep this in the
-vfio driver. Or we can do both, vfio-pci allows the relaxation, the VMM
-tells KVM to go for a more relaxed stage 2 via an ioctl().
+Paolo
 
--- 
-Catalin
