@@ -1,87 +1,129 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27FF3A8C6
-	for <kvmarm@lists.linux.dev>; Tue,  9 Jan 2024 16:23:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A8F33A1D4
+	for <kvmarm@lists.linux.dev>; Tue,  9 Jan 2024 16:56:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x39xsYMK"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2cca5d81826so41703941fa.2
-        for <kvmarm@lists.linux.dev>; Tue, 09 Jan 2024 08:23:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qxOlbB33"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5f69158f32eso41933787b3.2
+        for <kvmarm@lists.linux.dev>; Tue, 09 Jan 2024 08:56:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704817419; x=1705422219; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wsg7zMm5Fdy1jA8s3lcgjoxedub8Q57T3G6fYjwRVq8=;
-        b=x39xsYMKAKM6M6ctNygCs1xsIHtso0sAHAIq05nokNjmRXLWBgfsv3+nFgk6o53AyT
-         RNMlWF/dUmyYBHtbE9ZYz+pYMgH2T0mlR5JSE8IQHbKlJM3UQsg9fcTDQpJ5hFVTCFiN
-         UiwCYtDjnT7rzZdlCY+0lANP0EpP+9vc6IeU18ewyct2zi9m3eRr6JFj0jP7pCdGp21Y
-         EHjZzjo3dy6OVWWVxu5ydJ78mMrlgb0DVWf264ZGi1u3YwRq5Hk6y2vmW6dk3coO2oZp
-         PxJQgRpYUymUCxMeJ9fuQ9bFLKVkJSOsmMHsqlExbbG/wln7g7R1kk2JH3oeILmx+9zI
-         qm5w==
+        d=google.com; s=20230601; t=1704819411; x=1705424211; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ynJWgyIQTp0mxF1GFOGb+73JwIM0WneWjD70p63cQEA=;
+        b=qxOlbB339GvNg2/7c+qCf7GlQRFutWv/MWjo3QNwERJg6LB+LyW+oCsvw27c7p7fK3
+         8Lgdavw+mv+KQiS76DG6DlD9HegFivkrYsKnQ/eCAXCaMO6x2r4eL6vNcIJmh88EJCCu
+         jtmkUT3ezQQ6ZtaKQ6JHQuS9df0AKSz2Y0PT/ku+WsbmFMAl3jNMTi9huCYPDsCITf/R
+         ZPTgSAuLZTDi++4RA1KrCMRD3kICRwLkXn6xcAjozza9uriHZUSvjjBKbUx7xZD6IVLV
+         szeHjI79IKmDUOl+YmF4ASl0ybiPwDnlUXefhu64x6grrd8gG3eNODFOX4nWJmdcwvqa
+         YkpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704817419; x=1705422219;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Wsg7zMm5Fdy1jA8s3lcgjoxedub8Q57T3G6fYjwRVq8=;
-        b=RYcIbjZ8vAJFrHLtuDoAgCKduttudeT+y9DBe9hKaNtCA3SLTnudm2Fe8gLtTgvb8O
-         MHtrXYBqdDDAv4LZKgnH/aXF23pt0O0c0Kd+G2oLq5JR7wXgW6/M4hugo1TjEb3x/Qyv
-         5860JWrXXZSWL/g35IRDa1RJlf+eU5jEUYR/NtpsNaf601zEN9UVwmo7VbyYLpFF9/iU
-         gC92gjbRqPPqCjDJRYimCX3Upn4UgC1gNDanucOli9S9rIjcK99d8VqgrUSg1wH5Nn6m
-         8nBmGvFYm9m2maxLXZOpGqtFh3rZM0f2bol83Fmz2cSDAOgbzLslLykaCcE/GU6VVSi7
-         SCCQ==
-X-Gm-Message-State: AOJu0YxcP91+ycPLdsH72mTUxRQb+qTmrdy7lHofpCjSHwQQbFjEK1NE
-	wkQJjCmwBz0so+YxzzY19SlUE0RZlIusmqwxqwmurreeRwRi
-X-Google-Smtp-Source: AGHT+IENINkHdScslGoH1+e94F8Ik5C9aYB8w1MwoOyMisInkBOG5KStveZ4xiPiBsZa81JjQmBLru7M1qN9QTUClhM=
-X-Received: by 2002:a2e:b712:0:b0:2cc:788a:3d4d with SMTP id
- j18-20020a2eb712000000b002cc788a3d4dmr2530358ljo.51.1704817418515; Tue, 09
- Jan 2024 08:23:38 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704819411; x=1705424211;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ynJWgyIQTp0mxF1GFOGb+73JwIM0WneWjD70p63cQEA=;
+        b=WVw+FIkxUkF2e2t7lNOEUtWzuugel2LyAr+yf/+o4flIFmrKuvKAC0uqV/ktoPswRS
+         RYlmqqCJ7FP97Xy4Qu17hbZd5x/5BuRYA5VCdmj39hZWit8vTQnJWaiKBuVu2QCzLX+q
+         su73hVMkip28rNfAHZ5sw166jpP5Me4RddrRVcCvdfdaNc88iWuCugRFT6h3aMwwuIhH
+         gO06ezl5j2vI7TLedp9XRhzGajGxvWUpiyqYHnUlvghOw/NPGiisdSVQbm3/+skXqLgW
+         IVb1ItjbJg0wwJaFf1r6xh2OHj1XgD9J23aTXct6pTYdaLMko1nNCUGcb2qqGof0FFl0
+         VJSA==
+X-Gm-Message-State: AOJu0YwDIyok5+tMRsxXndZ1g9oUPFxP8KdDho12UM1/3+C6HvMVJ2bx
+	0uO0J4sk3OdGhhTRXuN5K8UmuDZKRAVDJScTAr6mqaZx
+X-Google-Smtp-Source: AGHT+IFJYk3i2RC1bH88fwAuau9C4zuiOPot5e3J0BArmIefW2S8KwtUXxKUu+wt+MEHyKZAdOV1+wsmcKU76wbbYQ==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a05:6902:1369:b0:dbe:ab5b:c667 with
+ SMTP id bt9-20020a056902136900b00dbeab5bc667mr159057ybb.2.1704819411220; Tue,
+ 09 Jan 2024 08:56:51 -0800 (PST)
+Date: Tue,  9 Jan 2024 08:56:21 -0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20231011195740.3349631-1-oliver.upton@linux.dev>
- <20231011195740.3349631-6-oliver.upton@linux.dev> <e0facec9-8c50-10cb-fd02-1214f9a49571@redhat.com>
- <ab1337bc-d4a2-0afc-3e26-0d50dff4ea73@huawei.com> <ZZx5y_iy9kXg47SW@linux.dev>
- <CAAdAUtie4GFKAPhk4wDWnEmSOzWF+X-6eHwS79169JRv_=hKdg@mail.gmail.com> <c90a3fb4-62b7-5642-433a-b0cfb41d6992@linux.dev>
-In-Reply-To: <c90a3fb4-62b7-5642-433a-b0cfb41d6992@linux.dev>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
+Message-ID: <20240109165622.4104387-1-jingzhangos@google.com>
+Subject: [PATCH v1] KVM: arm64: selftests: Handle feature fields with nonzero
+ minimum value correctly
 From: Jing Zhang <jingzhangos@google.com>
-Date: Tue, 9 Jan 2024 08:23:26 -0800
-Message-ID: <CAAdAUthgbQ5i8gatF0daa6RPRUtQ79cU3renpBrjkHwroziA9w@mail.gmail.com>
-Subject: Re: [PATCH v3 5/5] KVM: arm64: selftests: Test for setting ID
- register from usersapce
-To: Zenghui Yu <zenghui.yu@linux.dev>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Eric Auger <eauger@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org, 
-	Mark Brown <broonie@kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	James Morse <james.morse@arm.com>, Marc Zyngier <maz@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>
+To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Itaru Kitayama <itaru.kitayama@linux.dev>, Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Thanks Zenghui.
+There are some feature fields with nonzero minimum valid value. Make
+sure get_safe_value() won't return invalid field values for them.
+Also fix a bug that wrongly uses the feature bits type as the feature
+bits sign causing all fields as signed in the get_safe_value() and
+get_invalid_value().
 
-On Tue, Jan 9, 2024 at 7:37=E2=80=AFAM Zenghui Yu <zenghui.yu@linux.dev> wr=
-ote:
->
-> On 2024/1/9 09:31, Jing Zhang wrote:
-> > Hi Zenghui,
-> >
-> > I don't have a Cortex A72 to fully verify the fix. Could you help
-> > verify the following change?
->
-> It works for me (after fixing a compilation error locally ;-) ), thanks!
->
-> Zenghui
+Fixes: 54a9ea73527d ("KVM: arm64: selftests: Test for setting ID register from usersapce")
+Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+Reported-by: Itaru Kitayama <itaru.kitayama@linux.dev>
+Signed-off-by: Jing Zhang <jingzhangos@google.com>
+---
+ .../selftests/kvm/aarch64/set_id_regs.c       | 20 +++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
 
-Jing
+diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+index bac05210b539..f17454dc6d9e 100644
+--- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
++++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+@@ -224,13 +224,20 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
+ {
+ 	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
+ 
+-	if (ftr_bits->type == FTR_UNSIGNED) {
++	if (ftr_bits->sign == FTR_UNSIGNED) {
+ 		switch (ftr_bits->type) {
+ 		case FTR_EXACT:
+ 			ftr = ftr_bits->safe_val;
+ 			break;
+ 		case FTR_LOWER_SAFE:
+-			if (ftr > 0)
++			uint64_t min_safe = 0;
++
++			if (!strcmp(ftr_bits->name, "ID_AA64DFR0_EL1_DebugVer"))
++				min_safe = ID_AA64DFR0_EL1_DebugVer_IMP;
++			else if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_CopDbg"))
++				min_safe = ID_DFR0_EL1_CopDbg_Armv8;
++
++			if (ftr > min_safe)
+ 				ftr--;
+ 			break;
+ 		case FTR_HIGHER_SAFE:
+@@ -252,7 +259,12 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
+ 			ftr = ftr_bits->safe_val;
+ 			break;
+ 		case FTR_LOWER_SAFE:
+-			if (ftr > 0)
++			uint64_t min_safe = 0;
++
++			if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_PerfMon"))
++				min_safe = ID_DFR0_EL1_PerfMon_PMUv3;
++
++			if (ftr > min_safe)
+ 				ftr--;
+ 			break;
+ 		case FTR_HIGHER_SAFE:
+@@ -276,7 +288,7 @@ uint64_t get_invalid_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
+ {
+ 	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
+ 
+-	if (ftr_bits->type == FTR_UNSIGNED) {
++	if (ftr_bits->sign == FTR_UNSIGNED) {
+ 		switch (ftr_bits->type) {
+ 		case FTR_EXACT:
+ 			ftr = max((uint64_t)ftr_bits->safe_val + 1, ftr + 1);
+
+base-commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a
+-- 
+2.43.0.472.g3155946c3a-goog
+
