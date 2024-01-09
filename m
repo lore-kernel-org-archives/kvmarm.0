@@ -1,145 +1,87 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D523A264
-	for <kvmarm@lists.linux.dev>; Tue,  9 Jan 2024 16:13:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27FF3A8C6
+	for <kvmarm@lists.linux.dev>; Tue,  9 Jan 2024 16:23:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="a1Ok5Tny"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=hjOpdiFLaU/rl9xnyUOLlrLmtfPs6+yF3otyUbGH/R4=; b=a1Ok5TnyDwwEPqkbOv/NhT9x7R
-	vsRGEpXQQuagE84o1GOKB+g5J/3SKZHiq7gO7CVhZ9MwbQLrdnXwckcxFgAGvnY9Nk4loJwUNfWTP
-	dmTT4AEb4pqk4eK2+PIhMHYIuLyFfMQgkCgMxXmxbzNgRuL29tI50v1rDgTaj2mHCxoPuAbNQPrUt
-	Km1OPWQBn9drrgdJHriccMuP6O1dmCKstC1QR2adWEFoMNzjxmXhZjSbPWilyBjDSoIpatoeKnAWZ
-	8VR9XluXAKu8zzZRWPmIvh+ZGCcd5RXc90I3qF8F9kbHPYQUINZIyz2P07nQPugKYvhC2BMDt30cD
-	fa7z7JPQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35300)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rNEj9-0004JK-0j;
-	Tue, 09 Jan 2024 16:13:19 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rNEjB-0004Pk-Ap; Tue, 09 Jan 2024 16:13:21 +0000
-Date: Tue, 9 Jan 2024 16:13:21 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
-	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
-	x86@kernel.org, acpica-devel@lists.linuxfoundation.org,
-	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	jianyong.wu@arm.com, justin.he@arm.com,
-	James Morse <james.morse@arm.com>
-Subject: Re: [PATCH RFC v3 02/21] ACPI: processor: Add support for processors
- described as container packages
-Message-ID: <ZZ1woQkpMMCWVnXc@shell.armlinux.org.uk>
-References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk>
- <E1rDOfx-00Dvje-MS@rmk-PC.armlinux.org.uk>
- <CAJZ5v0iB0bS6nmjQ++pV1zp5YSGuigbffK5VD3wsX+8bY9MA5w@mail.gmail.com>
- <ZZ1q+7GXqnMMwKNR@shell.armlinux.org.uk>
- <CAJZ5v0jvuTAMak-x=ekphwgNsUWABGRcDPb8D4QB=KhfyC76Sg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x39xsYMK"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2cca5d81826so41703941fa.2
+        for <kvmarm@lists.linux.dev>; Tue, 09 Jan 2024 08:23:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1704817419; x=1705422219; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wsg7zMm5Fdy1jA8s3lcgjoxedub8Q57T3G6fYjwRVq8=;
+        b=x39xsYMKAKM6M6ctNygCs1xsIHtso0sAHAIq05nokNjmRXLWBgfsv3+nFgk6o53AyT
+         RNMlWF/dUmyYBHtbE9ZYz+pYMgH2T0mlR5JSE8IQHbKlJM3UQsg9fcTDQpJ5hFVTCFiN
+         UiwCYtDjnT7rzZdlCY+0lANP0EpP+9vc6IeU18ewyct2zi9m3eRr6JFj0jP7pCdGp21Y
+         EHjZzjo3dy6OVWWVxu5ydJ78mMrlgb0DVWf264ZGi1u3YwRq5Hk6y2vmW6dk3coO2oZp
+         PxJQgRpYUymUCxMeJ9fuQ9bFLKVkJSOsmMHsqlExbbG/wln7g7R1kk2JH3oeILmx+9zI
+         qm5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704817419; x=1705422219;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Wsg7zMm5Fdy1jA8s3lcgjoxedub8Q57T3G6fYjwRVq8=;
+        b=RYcIbjZ8vAJFrHLtuDoAgCKduttudeT+y9DBe9hKaNtCA3SLTnudm2Fe8gLtTgvb8O
+         MHtrXYBqdDDAv4LZKgnH/aXF23pt0O0c0Kd+G2oLq5JR7wXgW6/M4hugo1TjEb3x/Qyv
+         5860JWrXXZSWL/g35IRDa1RJlf+eU5jEUYR/NtpsNaf601zEN9UVwmo7VbyYLpFF9/iU
+         gC92gjbRqPPqCjDJRYimCX3Upn4UgC1gNDanucOli9S9rIjcK99d8VqgrUSg1wH5Nn6m
+         8nBmGvFYm9m2maxLXZOpGqtFh3rZM0f2bol83Fmz2cSDAOgbzLslLykaCcE/GU6VVSi7
+         SCCQ==
+X-Gm-Message-State: AOJu0YxcP91+ycPLdsH72mTUxRQb+qTmrdy7lHofpCjSHwQQbFjEK1NE
+	wkQJjCmwBz0so+YxzzY19SlUE0RZlIusmqwxqwmurreeRwRi
+X-Google-Smtp-Source: AGHT+IENINkHdScslGoH1+e94F8Ik5C9aYB8w1MwoOyMisInkBOG5KStveZ4xiPiBsZa81JjQmBLru7M1qN9QTUClhM=
+X-Received: by 2002:a2e:b712:0:b0:2cc:788a:3d4d with SMTP id
+ j18-20020a2eb712000000b002cc788a3d4dmr2530358ljo.51.1704817418515; Tue, 09
+ Jan 2024 08:23:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJZ5v0jvuTAMak-x=ekphwgNsUWABGRcDPb8D4QB=KhfyC76Sg@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20231011195740.3349631-1-oliver.upton@linux.dev>
+ <20231011195740.3349631-6-oliver.upton@linux.dev> <e0facec9-8c50-10cb-fd02-1214f9a49571@redhat.com>
+ <ab1337bc-d4a2-0afc-3e26-0d50dff4ea73@huawei.com> <ZZx5y_iy9kXg47SW@linux.dev>
+ <CAAdAUtie4GFKAPhk4wDWnEmSOzWF+X-6eHwS79169JRv_=hKdg@mail.gmail.com> <c90a3fb4-62b7-5642-433a-b0cfb41d6992@linux.dev>
+In-Reply-To: <c90a3fb4-62b7-5642-433a-b0cfb41d6992@linux.dev>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Tue, 9 Jan 2024 08:23:26 -0800
+Message-ID: <CAAdAUthgbQ5i8gatF0daa6RPRUtQ79cU3renpBrjkHwroziA9w@mail.gmail.com>
+Subject: Re: [PATCH v3 5/5] KVM: arm64: selftests: Test for setting ID
+ register from usersapce
+To: Zenghui Yu <zenghui.yu@linux.dev>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Eric Auger <eauger@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org, 
+	Mark Brown <broonie@kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	James Morse <james.morse@arm.com>, Marc Zyngier <maz@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Mark Rutland <mark.rutland@arm.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 09, 2024 at 05:05:15PM +0100, Rafael J. Wysocki wrote:
-> On Tue, Jan 9, 2024 at 4:49 PM Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
+Thanks Zenghui.
+
+On Tue, Jan 9, 2024 at 7:37=E2=80=AFAM Zenghui Yu <zenghui.yu@linux.dev> wr=
+ote:
+>
+> On 2024/1/9 09:31, Jing Zhang wrote:
+> > Hi Zenghui,
 > >
-> > On Mon, Dec 18, 2023 at 09:17:34PM +0100, Rafael J. Wysocki wrote:
-> > > On Wed, Dec 13, 2023 at 1:49 PM Russell King <rmk+kernel@armlinux.org.uk> wrote:
-> > > >
-> > > > From: James Morse <james.morse@arm.com>
-> > > >
-> > > > ACPI has two ways of describing processors in the DSDT. From ACPI v6.5,
-> > > > 5.2.12:
-> > > >
-> > > > "Starting with ACPI Specification 6.3, the use of the Processor() object
-> > > > was deprecated. Only legacy systems should continue with this usage. On
-> > > > the Itanium architecture only, a _UID is provided for the Processor()
-> > > > that is a string object. This usage of _UID is also deprecated since it
-> > > > can preclude an OSPM from being able to match a processor to a
-> > > > non-enumerable device, such as those defined in the MADT. From ACPI
-> > > > Specification 6.3 onward, all processor objects for all architectures
-> > > > except Itanium must now use Device() objects with an _HID of ACPI0007,
-> > > > and use only integer _UID values."
-> > > >
-> > > > Also see https://uefi.org/specs/ACPI/6.5/08_Processor_Configuration_and_Control.html#declaring-processors
-> > > >
-> > > > Duplicate descriptions are not allowed, the ACPI processor driver already
-> > > > parses the UID from both devices and containers. acpi_processor_get_info()
-> > > > returns an error if the UID exists twice in the DSDT.
-> > >
-> > > I'm not really sure how the above is related to the actual patch.
-> > >
-> > > > The missing probe for CPUs described as packages
-> > >
-> > > It is unclear what exactly is meant by "CPUs described as packages".
-> > >
-> > > From the patch, it looks like those would be Processor() objects
-> > > defined under a processor container device.
-> > >
-> > > > creates a problem for
-> > > > moving the cpu_register() calls into the acpi_processor driver, as CPUs
-> > > > described like this don't get registered, leading to errors from other
-> > > > subsystems when they try to add new sysfs entries to the CPU node.
-> > > > (e.g. topology_sysfs_init()'s use of topology_add_dev() via cpuhp)
-> > > >
-> > > > To fix this, parse the processor container and call acpi_processor_add()
-> > > > for each processor that is discovered like this.
-> > >
-> > > Discovered like what?
-> > >
-> > > > The processor container
-> > > > handler is added with acpi_scan_add_handler(), so no detach call will
-> > > > arrive.
-> > >
-> > > The above requires clarification too.
-> >
-> > The above comments... yea. As I didn't write the commit description, but
-> > James did, and James has basically vanished, I don't think these can be
-> > answered, short of rewriting the entire commit message, with me spending
-> > a lot of time with the ACPI specification trying to get the terminology
-> > right - because at lot of the above on the face of it seems to be things
-> > to do with wrong terminology being used.
-> >
-> > I wasn't expecting this level of issues with this patch set, and I now
-> > feel completely out of my depth with this series. I'm wondering whether
-> > I should even continue with it, since I don't have the ACPI knowledge
-> > to address a lot of these comments.
-> 
-> Well, sorry about this.
-> 
-> I met James at the LPC last year, so he seems to be still around, in
-> some way at least..
+> > I don't have a Cortex A72 to fully verify the fix. Could you help
+> > verify the following change?
+>
+> It works for me (after fixing a compilation error locally ;-) ), thanks!
+>
+> Zenghui
 
-On the previous posting, I wanted James to comment on some of the
-feedback from Jonathan, and despite explicitly asking, there has been
-nothing but radio silence ever since James' last post of this series.
-
-So, I now deem this work to be completely dead in the water, and not
-going to happen - not unless others can input on your comments.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Jing
