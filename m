@@ -1,129 +1,159 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A8F33A1D4
-	for <kvmarm@lists.linux.dev>; Tue,  9 Jan 2024 16:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75ADE3D3B8
+	for <kvmarm@lists.linux.dev>; Tue,  9 Jan 2024 19:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qxOlbB33"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5f69158f32eso41933787b3.2
-        for <kvmarm@lists.linux.dev>; Tue, 09 Jan 2024 08:56:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704819411; x=1705424211; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ynJWgyIQTp0mxF1GFOGb+73JwIM0WneWjD70p63cQEA=;
-        b=qxOlbB339GvNg2/7c+qCf7GlQRFutWv/MWjo3QNwERJg6LB+LyW+oCsvw27c7p7fK3
-         8Lgdavw+mv+KQiS76DG6DlD9HegFivkrYsKnQ/eCAXCaMO6x2r4eL6vNcIJmh88EJCCu
-         jtmkUT3ezQQ6ZtaKQ6JHQuS9df0AKSz2Y0PT/ku+WsbmFMAl3jNMTi9huCYPDsCITf/R
-         ZPTgSAuLZTDi++4RA1KrCMRD3kICRwLkXn6xcAjozza9uriHZUSvjjBKbUx7xZD6IVLV
-         szeHjI79IKmDUOl+YmF4ASl0ybiPwDnlUXefhu64x6grrd8gG3eNODFOX4nWJmdcwvqa
-         YkpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704819411; x=1705424211;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ynJWgyIQTp0mxF1GFOGb+73JwIM0WneWjD70p63cQEA=;
-        b=WVw+FIkxUkF2e2t7lNOEUtWzuugel2LyAr+yf/+o4flIFmrKuvKAC0uqV/ktoPswRS
-         RYlmqqCJ7FP97Xy4Qu17hbZd5x/5BuRYA5VCdmj39hZWit8vTQnJWaiKBuVu2QCzLX+q
-         su73hVMkip28rNfAHZ5sw166jpP5Me4RddrRVcCvdfdaNc88iWuCugRFT6h3aMwwuIhH
-         gO06ezl5j2vI7TLedp9XRhzGajGxvWUpiyqYHnUlvghOw/NPGiisdSVQbm3/+skXqLgW
-         IVb1ItjbJg0wwJaFf1r6xh2OHj1XgD9J23aTXct6pTYdaLMko1nNCUGcb2qqGof0FFl0
-         VJSA==
-X-Gm-Message-State: AOJu0YwDIyok5+tMRsxXndZ1g9oUPFxP8KdDho12UM1/3+C6HvMVJ2bx
-	0uO0J4sk3OdGhhTRXuN5K8UmuDZKRAVDJScTAr6mqaZx
-X-Google-Smtp-Source: AGHT+IFJYk3i2RC1bH88fwAuau9C4zuiOPot5e3J0BArmIefW2S8KwtUXxKUu+wt+MEHyKZAdOV1+wsmcKU76wbbYQ==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a05:6902:1369:b0:dbe:ab5b:c667 with
- SMTP id bt9-20020a056902136900b00dbeab5bc667mr159057ybb.2.1704819411220; Tue,
- 09 Jan 2024 08:56:51 -0800 (PST)
-Date: Tue,  9 Jan 2024 08:56:21 -0800
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="MU44z6ma"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=L5q9G4EH+GvNtL+Wb8XKMCOl8tTep7D40VZuegMyoOA=; b=MU44z6maYlvs7GL6v/GT26fHEs
+	JywflQgaRGHzndkpt+lSurBg+ao2mQxU+/oGRSPRiPNkKcdcrWFvi+6rItnyaLc7f+FPAYo7I83W5
+	d2s5ZugUXxshlJZGVGdrzrlIPCvqO/paJ1S3aBQEm5m9WcY0LPaxU5tR2kGwmEZzaY4deEjqCqu4u
+	DArVZFITrAPbLhv9xLhr/UgPtS73DxSn0SkJEK4PDTSMy+YZBXGTEYK/DtGROgF9J5QMkTF/3HvTA
+	umaXB+rcdQQpV3GgnIh74H38yrte9HF9bmmSsTVhQfTau7kl/lzJA4JTLkbtSQEyuHbASkLLoClqJ
+	gOO/RXgQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56366)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rNHkv-0004Ud-0B;
+	Tue, 09 Jan 2024 19:27:21 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rNHku-0004Wn-DT; Tue, 09 Jan 2024 19:27:20 +0000
+Date: Tue, 9 Jan 2024 19:27:20 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, acpica-devel@lists.linuxfoundation.org,
+	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com,
+	James Morse <james.morse@arm.com>
+Subject: Re: [PATCH RFC v3 14/21] irqchip/gic-v3: Don't return errors from
+ gic_acpi_match_gicc()
+Message-ID: <ZZ2eGLwlkqZrh0In@shell.armlinux.org.uk>
+References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk>
+ <E1rDOgx-00Dvkv-Bb@rmk-PC.armlinux.org.uk>
+ <20231215163301.0000183a@Huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.472.g3155946c3a-goog
-Message-ID: <20240109165622.4104387-1-jingzhangos@google.com>
-Subject: [PATCH v1] KVM: arm64: selftests: Handle feature fields with nonzero
- minimum value correctly
-From: Jing Zhang <jingzhangos@google.com>
-To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Itaru Kitayama <itaru.kitayama@linux.dev>, Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231215163301.0000183a@Huawei.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-There are some feature fields with nonzero minimum valid value. Make
-sure get_safe_value() won't return invalid field values for them.
-Also fix a bug that wrongly uses the feature bits type as the feature
-bits sign causing all fields as signed in the get_safe_value() and
-get_invalid_value().
+On Fri, Dec 15, 2023 at 04:33:01PM +0000, Jonathan Cameron wrote:
+> On Wed, 13 Dec 2023 12:50:23 +0000
+> Russell King (Oracle) <rmk+kernel@armlinux.org.uk> wrote:
+> 
+> > From: James Morse <james.morse@arm.com>
+> > 
+> > gic_acpi_match_gicc() is only called via gic_acpi_count_gicr_regions().
+> > It should only count the number of enabled redistributors, but it
+> > also tries to sanity check the GICC entry, currently returning an
+> > error if the Enabled bit is set, but the gicr_base_address is zero.
+> > 
+> > Adding support for the online-capable bit to the sanity check
+> > complicates it, for no benefit. The existing check implicitly
+> > depends on gic_acpi_count_gicr_regions() previous failing to find
+> > any GICR regions (as it is valid to have gicr_base_address of zero if
+> > the redistributors are described via a GICR entry).
+> > 
+> > Instead of complicating the check, remove it. Failures that happen
+> > at this point cause the irqchip not to register, meaning no irqs
+> > can be requested. The kernel grinds to a panic() pretty quickly.
+> > 
+> > Without the check, MADT tables that exhibit this problem are still
+> > caught by gic_populate_rdist(), which helpfully also prints what
+> > went wrong:
+> > | CPU4: mpidr 100 has no re-distributor!
+> > 
+> > Signed-off-by: James Morse <james.morse@arm.com>
+> > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > Tested-by: Miguel Luis <miguel.luis@oracle.com>
+> > Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
+> > Tested-by: Jianyong Wu <jianyong.wu@arm.com>
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > ---
+> >  drivers/irqchip/irq-gic-v3.c | 18 ++++++------------
+> >  1 file changed, 6 insertions(+), 12 deletions(-)
+> > 
+> > diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+> > index 98b0329b7154..ebecd4546830 100644
+> > --- a/drivers/irqchip/irq-gic-v3.c
+> > +++ b/drivers/irqchip/irq-gic-v3.c
+> > @@ -2420,21 +2420,15 @@ static int __init gic_acpi_match_gicc(union acpi_subtable_headers *header,
+> >  
+> >  	/*
+> >  	 * If GICC is enabled and has valid gicr base address, then it means
+> > -	 * GICR base is presented via GICC
+> > +	 * GICR base is presented via GICC. The redistributor is only known to
+> > +	 * be accessible if the GICC is marked as enabled. If this bit is not
+> > +	 * set, we'd need to add the redistributor at runtime, which isn't
+> > +	 * supported.
+> >  	 */
+> > -	if (acpi_gicc_is_usable(gicc) && gicc->gicr_base_address) {
+> > +	if (gicc->flags & ACPI_MADT_ENABLED && gicc->gicr_base_address)
+> 
+> I was very vague in previous review.  I think the reasons you are switching
+> from acpi_gicc_is_useable(gicc) to the gicc->flags & ACPI_MADT_ENABLED
+> needs calling out as I'm fairly sure that this point in the series at least
+> acpi_gicc_is_usable is same as current upstream:
+> 
+> static inline bool acpi_gicc_is_usable(struct acpi_madt_generic_interrupt *gicc)
+> {
+> 	return gicc->flags & ACPI_MADT_ENABLED;
+> }
 
-Fixes: 54a9ea73527d ("KVM: arm64: selftests: Test for setting ID register from usersapce")
-Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-Reported-by: Itaru Kitayama <itaru.kitayama@linux.dev>
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
----
- .../selftests/kvm/aarch64/set_id_regs.c       | 20 +++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+In a previous patch adding acpi_gicc_is_usable() c54e52f84d7a ("arm64,
+irqchip/gic-v3, ACPI: Move MADT GICC enabled check into a helper") this
+was:
 
-diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-index bac05210b539..f17454dc6d9e 100644
---- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-@@ -224,13 +224,20 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
- {
- 	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
- 
--	if (ftr_bits->type == FTR_UNSIGNED) {
-+	if (ftr_bits->sign == FTR_UNSIGNED) {
- 		switch (ftr_bits->type) {
- 		case FTR_EXACT:
- 			ftr = ftr_bits->safe_val;
- 			break;
- 		case FTR_LOWER_SAFE:
--			if (ftr > 0)
-+			uint64_t min_safe = 0;
-+
-+			if (!strcmp(ftr_bits->name, "ID_AA64DFR0_EL1_DebugVer"))
-+				min_safe = ID_AA64DFR0_EL1_DebugVer_IMP;
-+			else if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_CopDbg"))
-+				min_safe = ID_DFR0_EL1_CopDbg_Armv8;
-+
-+			if (ftr > min_safe)
- 				ftr--;
- 			break;
- 		case FTR_HIGHER_SAFE:
-@@ -252,7 +259,12 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
- 			ftr = ftr_bits->safe_val;
- 			break;
- 		case FTR_LOWER_SAFE:
--			if (ftr > 0)
-+			uint64_t min_safe = 0;
-+
-+			if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_PerfMon"))
-+				min_safe = ID_DFR0_EL1_PerfMon_PMUv3;
-+
-+			if (ftr > min_safe)
- 				ftr--;
- 			break;
- 		case FTR_HIGHER_SAFE:
-@@ -276,7 +288,7 @@ uint64_t get_invalid_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
- {
- 	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
- 
--	if (ftr_bits->type == FTR_UNSIGNED) {
-+	if (ftr_bits->sign == FTR_UNSIGNED) {
- 		switch (ftr_bits->type) {
- 		case FTR_EXACT:
- 			ftr = max((uint64_t)ftr_bits->safe_val + 1, ftr + 1);
+-       if ((gicc->flags & ACPI_MADT_ENABLED) && gicc->gicr_base_address) {
++       if (acpi_gicc_is_usable(gicc) && gicc->gicr_base_address) {
 
-base-commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a
+so effectively this is undoing that particular change, which raises in
+my mind why the change was made in the first place if it's just going
+to be reverted in a later patch (because in a following patch,
+acpi_gicc_is_usable() has an additional condition added to it that
+isn't applicable here.) which effectively makes acpi_gicc_is_usable()
+return true if either ACPI_MADT_ENABLED _or_
+ACPI_MADT_GICC_ONLINE_CAPABLE (as it is now known) are set.
+
+However, if ACPI_MADT_GICC_ONLINE_CAPABLE is set, does that actually
+mean that the GICC is usable? I'm not sure it does. ACPI v6.5 says that
+this bit indicates that the system supports enabling this processor
+later. Is the GICC of a currently disabled processor "usable"...
+
+Clearly, the intention of this change is not to count this GICC entry
+if it is marked ACPI_MADT_GICC_ONLINE_CAPABLE, but I feel that isn't
+described in the commit message.
+
+Moreover, I am getting the feeling that there are _two_ changes going
+on here - there's the change that's talked about in the commit message
+(the complex validation that seems unnecessary) and then there's the
+preparation for the change to acpi_gicc_is_usable() - which maybe
+should be in the following patch where it would be less confusing.
+
+Would you agree?
+
 -- 
-2.43.0.472.g3155946c3a-goog
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
