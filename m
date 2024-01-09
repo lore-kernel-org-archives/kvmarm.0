@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0297436AEB
-	for <kvmarm@lists.linux.dev>; Tue,  9 Jan 2024 11:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17D3339FC1
+	for <kvmarm@lists.linux.dev>; Tue,  9 Jan 2024 15:16:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ha680r0r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D11CC433F1;
-	Tue,  9 Jan 2024 11:40:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ae3nJ9d2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86619C433C7;
+	Tue,  9 Jan 2024 15:16:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704800428;
-	bh=9v2sF+hZQgGLtSlalEb8xpEOtIYWC2+MtHxdv7xG+bU=;
+	s=k20201202; t=1704813376;
+	bh=u3VxjdwAl9+MAihzbY3LBWNdZrbXgO8eh6jTlVT3WgU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ha680r0rM5BJ2jvajxvVgLRnPLH2VjdFQaKzk0el+sFtl/BYV0OKJff8NK5cAHp7j
-	 mjgrsZWltrB11RVmeMCcZw6Go34MVE/NJC3gd7l/MX/0oC1K1Oy44vepHgTHFWkYb/
-	 S0rALmgs6QtiwbEFw9rVDCRW6pOtQKE9Q++ZqJQR5d/cmj2dkmtXbaiXn8tqTjOfVj
-	 HNh+/9laJU3brFmvHMYEIWOOr8FnUhOTfSmecoCFwQn/HEZPo3VhgrjIiQSNRl/Wdg
-	 rtYAxE5m4fLWbvEhn+WBpXX7Jnt3kuo4ApIQJKKqNntMH7ncifn+HsDk+p+0SO0Cxx
-	 bqMeYeHeX227w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	b=ae3nJ9d2+bxrz0vghfnVG3XlG8L32Jynf6KZOhZVGpuSiVkBxq0rwwW+ei5TtT7QP
+	 JDvyQg09nGZS9hmR/Iya/5psk52BmkykgKZ6uFwStLiy3AnKs3J1k1FUPktjLfCIwz
+	 2Fov79wuZr8XAup/rvGBqjDyWA0GPHPerzvCM1Oc0mJVNaXzu3dsEoIF+3eMj1vmEm
+	 ygAwuZz2m7QQGFapZotCxkMksXRrewyjgMO/onHG6PnhVTTQ/w66+ZPuPFnWAW2t/P
+	 RC12z7c6X7e+UaNbJH/FO+KatPRocsgZczvFG9K/UWGjbnDz2zvo4kSwsRSI2YAQgS
+	 zrnGtu5mzjC3w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rNAT3-00AACE-IH;
-	Tue, 09 Jan 2024 11:40:25 +0000
-Date: Tue, 09 Jan 2024 11:40:19 +0000
-Message-ID: <87plyau44c.wl-maz@kernel.org>
+	id 1rNDpt-00ADtY-Uv;
+	Tue, 09 Jan 2024 15:16:14 +0000
+Date: Tue, 09 Jan 2024 15:16:13 +0000
+Message-ID: <868r4ya66a.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Will Deacon <will@kernel.org>
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -36,15 +36,14 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 02/13] arm64: cpufeatures: Correctly handle signed values
-In-Reply-To: <86a5pfafbv.wl-maz@kernel.org>
+Subject: Re: [PATCH v3 06/13] arm64: cpufeature: Detect E2H0 not being implemented
+In-Reply-To: <20231211124238.GB25277@willie-the-truck>
 References: <20231127114559.990314-1-maz@kernel.org>
-	<20231127114559.990314-3-maz@kernel.org>
-	<20231211122416.GA25277@willie-the-truck>
-	<86a5pfafbv.wl-maz@kernel.org>
+	<20231127114559.990314-7-maz@kernel.org>
+	<20231211124238.GB25277@willie-the-truck>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,41 +56,59 @@ X-SA-Exim-Rcpt-To: will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 08 Jan 2024 17:46:12 +0000,
-Marc Zyngier <maz@kernel.org> wrote:
+On Mon, 11 Dec 2023 12:42:38 +0000,
+Will Deacon <will@kernel.org> wrote:
 > 
-> On Mon, 11 Dec 2023 12:24:16 +0000,
-> Will Deacon <will@kernel.org> wrote:
-
-[...]
-
-> > > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> > > index 646591c67e7a..bc8787f28ffd 100644
-> > > --- a/arch/arm64/kernel/cpufeature.c
-> > > +++ b/arch/arm64/kernel/cpufeature.c
-> > > @@ -140,12 +140,42 @@ void dump_cpu_features(void)
-> > >  	pr_emerg("0x%*pb\n", ARM64_NCAPS, &system_cpucaps);
-> > >  }
-> > >  
-> > > +#define __ARM64_MAX_POSITIVE(reg, field)				\
-> > > +		((reg##_##field##_SIGNED ?				\
-> > > +		  BIT(reg##_##field##_WIDTH - 1) :			\
-> > > +		  BIT(reg##_##field##_WIDTH)) - 1)
-> > > +
-> > > +#define __ARM64_MIN_NEGATIVE(reg, field)  BIT(reg##_##field##_WIDTH - 1)
+> On Mon, Nov 27, 2023 at 11:45:52AM +0000, Marc Zyngier wrote:
+> > FEAT_E2H0 is a new feature that indicates whether or not HCR_EL2.E2H
+> > can be set to 0. Amusingly, this feature is set to 0 when implemented,
+> > and otherwise negative.
 > > 
-> > I'm struggling to grok these two macros. For example, let's say I have a
-> > 4-bit signed field. In that case, the maximum positive value is 7 (0b0111)
-> > and the minimum negative value is -8 (0b1000), but the macros above appear
-> > to give 0b1000 for both.
+> > Add a new capability and detection infrastructure to detect the
+> > absence of FEAT_E2H0.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kernel/cpufeature.c | 7 +++++++
+> >  arch/arm64/tools/cpucaps       | 1 +
+> >  2 files changed, 8 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> > index 4a72fb26daec..6ef9811f7bb7 100644
+> > --- a/arch/arm64/kernel/cpufeature.c
+> > +++ b/arch/arm64/kernel/cpufeature.c
+> > @@ -2786,6 +2786,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+> >  		.matches = has_cpuid_feature,
+> >  		ARM64_CPUID_FIELDS(ID_AA64MMFR2_EL1, EVT, IMP)
+> >  	},
+> > +	{
+> > +		.desc = "FEAT_E2H0 not implemented",
+> > +		.capability = ARM64_HCR_E2H_RES1,
+> > +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
 > 
-> Crap. Well spotted. The signed maximum needs to be further adjusted
-> like this:
+> Is ARM64_CPUCAP_SYSTEM_FEATURE the right thing to use here? For example,
+> if the boot CPUs have this feature but a late CPU doesn't, then I think
+> we should be ok as long as we're using VHE, but I don't think the above
+> takes that into account.
+> 
+> Maybe we shouldn't be adding new capabilities for this at all, and instead
+> just look at the sanitised register value when we need to?
 
-Actually, scratch that. The original code is correct and does return
-0b0111 for the max of a signed 4 bit value, and 0b1000 for the min.
-The clue is in the bracketing (the '- 1' is applied to the result of
-the conditional expression in the max case).
+That's probably good enough for this particular use of E2H0, as this
+is not used on any fast path.
+
+However, when E2H0 is 0b1110 (NV1 being RES0, and thus the guest's own
+HCR_EL2.E2H being RES1), we need to sanitise the guest's HCR_EL2 no
+matter what the guest writes there.
+
+With that in mind, __vcpu_el2_e2h_is_set() using the sanitised value
+would result in a binary search on a lot of very hot paths, something
+that I'm keen to avoid.
+
+So while I'm happy to drop this particular cap, I'll keep the one
+introduced in patch #6.
+
+Thanks,
 
 	M.
 
