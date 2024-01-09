@@ -1,112 +1,99 @@
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19ABE250FA
-	for <kvmarm@lists.linux.dev>; Tue,  9 Jan 2024 07:50:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0297436AEB
+	for <kvmarm@lists.linux.dev>; Tue,  9 Jan 2024 11:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jwUqrDO8"
-Date: Tue, 9 Jan 2024 16:50:05 +0900
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1704786616;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jC0LcHQAj5sU6xwMTRYWTxbuyexf66+yJ6ABxO0uBs8=;
-	b=jwUqrDO82RRuyPdvS0rbiSFrAaCsnr36tatZfwTSAjpYXF/JsXX4ArfR4ppv7ySIAWpAWJ
-	FVLMSBY8knAInm+HUW82uHpkXvVGvy6W3kgyNYyeKGazDmf+7NKAuNLfaYPmxbfgwEKX5M
-	McDblqfMjuevQgCN5Hz1rstUOV5CBuk=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Itaru Kitayama <itaru.kitayama@linux.dev>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Zenghui Yu <yuzenghui@huawei.com>, Eric Auger <eauger@redhat.com>,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-perf-users@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-	Jing Zhang <jingzhangos@google.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>, Marc Zyngier <maz@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ha680r0r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D11CC433F1;
+	Tue,  9 Jan 2024 11:40:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704800428;
+	bh=9v2sF+hZQgGLtSlalEb8xpEOtIYWC2+MtHxdv7xG+bU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ha680r0rM5BJ2jvajxvVgLRnPLH2VjdFQaKzk0el+sFtl/BYV0OKJff8NK5cAHp7j
+	 mjgrsZWltrB11RVmeMCcZw6Go34MVE/NJC3gd7l/MX/0oC1K1Oy44vepHgTHFWkYb/
+	 S0rALmgs6QtiwbEFw9rVDCRW6pOtQKE9Q++ZqJQR5d/cmj2dkmtXbaiXn8tqTjOfVj
+	 HNh+/9laJU3brFmvHMYEIWOOr8FnUhOTfSmecoCFwQn/HEZPo3VhgrjIiQSNRl/Wdg
+	 rtYAxE5m4fLWbvEhn+WBpXX7Jnt3kuo4ApIQJKKqNntMH7ncifn+HsDk+p+0SO0Cxx
+	 bqMeYeHeX227w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rNAT3-00AACE-IH;
+	Tue, 09 Jan 2024 11:40:25 +0000
+Date: Tue, 09 Jan 2024 11:40:19 +0000
+Message-ID: <87plyau44c.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
 	Mark Rutland <mark.rutland@arm.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v3 5/5] KVM: arm64: selftests: Test for setting ID
- register from usersapce
-Message-ID: <ZZz6rfBKsN14GMaq@vm3>
-References: <20231011195740.3349631-1-oliver.upton@linux.dev>
- <20231011195740.3349631-6-oliver.upton@linux.dev>
- <e0facec9-8c50-10cb-fd02-1214f9a49571@redhat.com>
- <ab1337bc-d4a2-0afc-3e26-0d50dff4ea73@huawei.com>
- <ZZx5y_iy9kXg47SW@linux.dev>
+	Ard Biesheuvel <ardb@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v3 02/13] arm64: cpufeatures: Correctly handle signed values
+In-Reply-To: <86a5pfafbv.wl-maz@kernel.org>
+References: <20231127114559.990314-1-maz@kernel.org>
+	<20231127114559.990314-3-maz@kernel.org>
+	<20231211122416.GA25277@willie-the-truck>
+	<86a5pfafbv.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZZx5y_iy9kXg47SW@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, mark.rutland@arm.com, ardb@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Jan 08, 2024 at 10:40:11PM +0000, Oliver Upton wrote:
-> Hi Zenghui,
+On Mon, 08 Jan 2024 17:46:12 +0000,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> On Fri, Jan 05, 2024 at 05:07:08PM +0800, Zenghui Yu wrote:
-> > On 2023/10/19 16:38, Eric Auger wrote:
+> On Mon, 11 Dec 2023 12:24:16 +0000,
+> Will Deacon <will@kernel.org> wrote:
+
+[...]
+
+> > > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> > > index 646591c67e7a..bc8787f28ffd 100644
+> > > --- a/arch/arm64/kernel/cpufeature.c
+> > > +++ b/arch/arm64/kernel/cpufeature.c
+> > > @@ -140,12 +140,42 @@ void dump_cpu_features(void)
+> > >  	pr_emerg("0x%*pb\n", ARM64_NCAPS, &system_cpucaps);
+> > >  }
+> > >  
+> > > +#define __ARM64_MAX_POSITIVE(reg, field)				\
+> > > +		((reg##_##field##_SIGNED ?				\
+> > > +		  BIT(reg##_##field##_WIDTH - 1) :			\
+> > > +		  BIT(reg##_##field##_WIDTH)) - 1)
+> > > +
+> > > +#define __ARM64_MIN_NEGATIVE(reg, field)  BIT(reg##_##field##_WIDTH - 1)
 > > 
-> > > > +static const struct reg_ftr_bits ftr_id_aa64dfr0_el1[] = {
-> > > > +	S_REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, PMUVer, 0),
-> > >
-> > > Strictly speaking this is not always safe to have a lower value. For
-> > > instance: From Armv8.1, if FEAT_PMUv3 is implemented, the value 0b0001
-> > > is not permitted. But I guess this consistency is to be taken into
-> > > account by the user space. But may be wort a comment. Here and below
-> > > 
-> > > You may at least clarify what does mean 'safe'
-> > >
-> > > > +	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_EL1, DebugVer, 0),
-> > 
-> > I've seen the following failure on Cortex A72 where
-> > ID_AA64DFR0_EL1.DebugVer is 6.
+> > I'm struggling to grok these two macros. For example, let's say I have a
+> > 4-bit signed field. In that case, the maximum positive value is 7 (0b0111)
+> > and the minimum negative value is -8 (0b1000), but the macros above appear
+> > to give 0b1000 for both.
 > 
-> Ah, yes, the test is wrong. KVM enforces a minimum value of 0x6 on this
-> field, yet get_safe_value() returns 0x5 for the field.
+> Crap. Well spotted. The signed maximum needs to be further adjusted
+> like this:
 
-This is observed with the RevC AEM FVP as well.
+Actually, scratch that. The original code is correct and does return
+0b0111 for the max of a signed 4 bit value, and 0b1000 for the min.
+The clue is in the bracketing (the '- 1' is applied to the result of
+the conditional expression in the max case).
 
-Thanks,
-Itaru.
+	M.
 
-> 
-> Jing, do you have time to check this test for similar failures and send
-> out a fix for Zenghui's observations?
-> 
-> > # ./aarch64/set_id_regs
-> > TAP version 13
-> > 1..79
-> > ok 1 ID_AA64DFR0_EL1_PMUVer
-> > ==== Test Assertion Failure ====
-> >   include/kvm_util_base.h:553: !ret
-> >   pid=2288505 tid=2288505 errno=22 - Invalid argument
-> >      1	0x0000000000402787: vcpu_set_reg at kvm_util_base.h:553
-> > (discriminator 6)
-> >      2	 (inlined by) test_reg_set_success at set_id_regs.c:342
-> > (discriminator 6)
-> >      3	 (inlined by) test_user_set_reg at set_id_regs.c:413 (discriminator
-> > 6)
-> >      4	0x0000000000401943: main at set_id_regs.c:475
-> >      5	0x0000ffffbdd5d03b: ?? ??:0
-> >      6	0x0000ffffbdd5d113: ?? ??:0
-> >      7	0x0000000000401a2f: _start at ??:?
-> >   KVM_SET_ONE_REG failed, rc: -1 errno: 22 (Invalid argument)
-> 
-> -- 
-> Thanks,
-> Oliver
+-- 
+Without deviation from the norm, progress is not possible.
