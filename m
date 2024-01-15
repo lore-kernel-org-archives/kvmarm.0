@@ -1,155 +1,102 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04B626E2BB;
-	Fri, 12 Jan 2024 15:04:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B325666
+	for <kvmarm@lists.linux.dev>; Mon, 15 Jan 2024 07:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4TBPrs1VcSz6FGMn;
-	Fri, 12 Jan 2024 23:02:05 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 445D41400CB;
-	Fri, 12 Jan 2024 23:04:01 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 12 Jan
- 2024 15:04:00 +0000
-Date: Fri, 12 Jan 2024 15:03:59 +0000
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-CC: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	<linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-riscv@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<x86@kernel.org>, <acpica-devel@lists.linuxfoundation.org>,
-	<linux-csky@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-ia64@vger.kernel.org>, <linux-parisc@vger.kernel.org>, Salil Mehta
-	<salil.mehta@huawei.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	<jianyong.wu@arm.com>, <justin.he@arm.com>, James Morse <james.morse@arm.com>
-Subject: Re: [PATCH RFC v3 02/21] ACPI: processor: Add support for
- processors described as container packages
-Message-ID: <20240112150359.0000733f@Huawei.com>
-In-Reply-To: <CAJZ5v0g2CFPrSfNzHKBz_Spwt304QEQtR6w57VR11i5APPrD8Q@mail.gmail.com>
-References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk>
-	<E1rDOfx-00Dvje-MS@rmk-PC.armlinux.org.uk>
-	<CAJZ5v0iB0bS6nmjQ++pV1zp5YSGuigbffK5VD3wsX+8bY9MA5w@mail.gmail.com>
-	<20240111175908.00002f46@Huawei.com>
-	<ZaA3l4yjgCXxSiVg@shell.armlinux.org.uk>
-	<20240112092520.00001278@Huawei.com>
-	<CAJZ5v0g2CFPrSfNzHKBz_Spwt304QEQtR6w57VR11i5APPrD8Q@mail.gmail.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4TD3vd5TZLz1Q7tp;
+	Mon, 15 Jan 2024 15:40:13 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 71D8718006D;
+	Mon, 15 Jan 2024 15:41:04 +0800 (CST)
+Received: from [10.174.185.179] (10.174.185.179) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 15 Jan 2024 15:41:03 +0800
+Subject: Re: [PATCH v1] KVM: arm64: selftests: Handle feature fields with
+ nonzero minimum value correctly
+To: Jing Zhang <jingzhangos@google.com>
+CC: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, ARMLinux
+	<linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, Oliver
+ Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, James
+ Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Itaru
+ Kitayama <itaru.kitayama@linux.dev>
+References: <20240109165622.4104387-1-jingzhangos@google.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <05e504bb-9aec-6026-1ea8-bca59ad439bf@huawei.com>
+Date: Mon, 15 Jan 2024 15:41:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: lhrpeml500005.china.huawei.com (7.191.163.240) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+In-Reply-To: <20240109165622.4104387-1-jingzhangos@google.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Fri, 12 Jan 2024 16:01:40 +0100
-"Rafael J. Wysocki" <rafael@kernel.org> wrote:
+Hi Jing,
 
-> On Fri, Jan 12, 2024 at 10:25=E2=80=AFAM Jonathan Cameron
-> <Jonathan.Cameron@huawei.com> wrote:
-> >
-> > On Thu, 11 Jan 2024 18:46:47 +0000
-> > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-> > =20
-> > > On Thu, Jan 11, 2024 at 05:59:08PM +0000, Jonathan Cameron wrote: =20
-> > > > On Mon, 18 Dec 2023 21:17:34 +0100
-> > > > "Rafael J. Wysocki" <rafael@kernel.org> wrote:
-> > > > =20
-> > > > > On Wed, Dec 13, 2023 at 1:49=E2=80=AFPM Russell King <rmk+kernel@=
-armlinux.org.uk> wrote: =20
-> > > > > >
-> > > > > > From: James Morse <james.morse@arm.com> =20
-> > > >
-> > > > Done some digging + machine faking.  This is mid stage results at b=
-est.
-> > > >
-> > > > Summary: I don't think this patch is necessary.  If anyone happens =
-to be in
-> > > > the mood for testing on various platforms, can you drop this patch =
-and
-> > > > see if everything still works.
-> > > >
-> > > > With this patch in place, and a processor container containing
-> > > > Processor() objects acpi_process_add is called twice - once via
-> > > > the path added here and once via acpi_bus_attach etc.
-> > > >
-> > > > Maybe it's a left over from earlier approaches to some of this? =20
-> > >
-> > > From what you're saying, it seems that way. It would be really good to
-> > > get a reply from James to see whether he agrees - or at least get the
-> > > reason why this patch is in the series... but I suspect that will nev=
-er
-> > > come.
-> > > =20
-> > > > Both cases are covered by the existing handling without this.
-> > > >
-> > > > I'm far from clear on why we need this patch.  Presumably
-> > > > it's the reference in the description on it breaking for
-> > > > Processor Package containing Processor() objects that matters
-> > > > after a move... I'm struggling to find that move though! =20
-> > >
-> > > I do know that James did a lot of testing, so maybe he found some
-> > > corner case somewhere which made this necessary - but without input
-> > > from James, we can't know that.
-> > >
-> > > So, maybe the right way forward on this is to re-test the series
-> > > with this patch dropped, and see whether there's any ill effects.
-> > > It should be possible to resurect the patch if it does turn out to
-> > > be necessary.
-> > >
-> > > Does that sound like a good way forward?
-> > >
-> > > Thanks.
-> > > =20
-> >
-> > Yes that sounds like the best plan. Note this patch can only make a
-> > difference on non arm64 arches because it's a firmware bug to combine
-> > Processor() with a GICC entry in APIC/MADT.  To even test on ARM64
-> > you have to skip the bug check.
-> >
-> > https://elixir.bootlin.com/linux/latest/source/drivers/acpi/processor_c=
-ore.c#L101
-> >
-> >         /* device_declaration means Device object in DSDT, in the
-> >          * GIC interrupt model, logical processors are required to
-> >          * have a Processor Device object in the DSDT, so we should
-> >          * check device_declaration here
-> >          */
-> > //      if (device_declaration && (gicc->uid =3D=3D acpi_id)) {
-> >         if (gicc->uid =3D=3D acpi_id) {
-> >                 *mpidr =3D gicc->arm_mpidr;
-> >                 return 0;
-> >         }
-> >
-> > Only alternative is probably to go history diving and try and
-> > find another change that would have required this and is now gone.
-> >
-> > The ACPI scanning code has had a lot of changes whilst this work has
-> > been underway.  More than possible that this was papering over some
-> > issue that has long since been fixed. I can't find any deliberate
-> > functional changes, but there is some code generalization that 'might'
-> > have side effects in this area. Rafael, any expectation that anything
-> > changed in how scanning processor containers works? =20
->=20
-> There have been changes, but I can't recall when exactly without some
-> git history research.
->=20
-> In any case, it is always better to work on top of the current
-> mainline code IMO.
+On 2024/1/10 0:56, Jing Zhang wrote:
+> There are some feature fields with nonzero minimum valid value. Make
+> sure get_safe_value() won't return invalid field values for them.
+> Also fix a bug that wrongly uses the feature bits type as the feature
+> bits sign causing all fields as signed in the get_safe_value() and
+> get_invalid_value().
+> 
+> Fixes: 54a9ea73527d ("KVM: arm64: selftests: Test for setting ID register from usersapce")
+> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+> Reported-by: Itaru Kitayama <itaru.kitayama@linux.dev>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  .../selftests/kvm/aarch64/set_id_regs.c       | 20 +++++++++++++++----
+>  1 file changed, 16 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+> index bac05210b539..f17454dc6d9e 100644
+> --- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+> +++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
+> @@ -224,13 +224,20 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
+>  {
+>  	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
+>   
+> -	if (ftr_bits->type == FTR_UNSIGNED) {
+> +	if (ftr_bits->sign == FTR_UNSIGNED) {
+>  		switch (ftr_bits->type) {
+>  		case FTR_EXACT:
+>  			ftr = ftr_bits->safe_val;
+>  			break;
+>  		case FTR_LOWER_SAFE:
+> -			if (ftr > 0)
+> +			uint64_t min_safe = 0;
+> +
+> +			if (!strcmp(ftr_bits->name, "ID_AA64DFR0_EL1_DebugVer"))
+> +				min_safe = ID_AA64DFR0_EL1_DebugVer_IMP;
+> +			else if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_CopDbg"))
+> +				min_safe = ID_DFR0_EL1_CopDbg_Armv8;
+> +
+> +			if (ftr > min_safe)
 
-Absolutely - just in this case the series has been rebased for=20
-a few years because the standards discussions took far far too long!
+As I mentioned in my previous reply, there is a compilation error with
+gcc-10.3.1.
 
-Jonathan
+| aarch64/set_id_regs.c: In function 'get_safe_value':
+| aarch64/set_id_regs.c:233:4: error: a label can only be part of a 
+statement and a declaration is not a statement
+|   233 |    uint64_t min_safe = 0;
+|       |    ^~~~~~~~
+| aarch64/set_id_regs.c:262:4: error: a label can only be part of a 
+statement and a declaration is not a statement
+|   262 |    uint64_t min_safe = 0;
+|       |    ^~~~~~~~
 
+Please fix it.
 
+Zenghui
