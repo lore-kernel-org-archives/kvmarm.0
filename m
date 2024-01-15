@@ -1,35 +1,60 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEAEEEAF7
-	for <kvmarm@lists.linux.dev>; Mon, 15 Jan 2024 12:44:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 510E210796
+	for <kvmarm@lists.linux.dev>; Mon, 15 Jan 2024 14:33:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qkSTBs3V"
-Date: Mon, 15 Jan 2024 13:44:17 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1705322660;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MwtEWLAXam/IycH3fliQdB9hc+Fa+3tIJSxCSLpGklg=;
-	b=qkSTBs3VJnpyVeSfr53o+AUoEBfoa5dlIRd+6kIoAVDl8WIuSCQd77yD7dHnO6r3aksh+g
-	OtddvsEWRILNOTNVjzpmeGn50EtxIftBx+29mCVpTVmGAxMBvvQQJrm1s9MV2LwKdIhhk5
-	XxQ2ie+A3NvnwIF2Tfp5s7zyl1rQIV8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Shaoqin Huang <shahuang@redhat.com>
-Cc: kvmarm@lists.linux.dev, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Nikos Nikoleris <nikos.nikoleris@arm.com>, Eric Auger <eric.auger@redhat.com>, 
-	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Nico Boehr <nrb@linux.ibm.com>, 
-	David Woodhouse <dwmw@amazon.co.uk>, Nadav Amit <namit@vmware.com>, kvm@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org
-Subject: Re: [kvm-unit-tests PATCH v1 01/18] Makefile: Define __ASSEMBLY__
- for assembly files
-Message-ID: <20240115-0c41f7d4aa09b7b82613faa8@orel>
-References: <20231130090722.2897974-1-shahuang@redhat.com>
- <20231130090722.2897974-2-shahuang@redhat.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xcWZocRL"
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-50edf4f4aa4so4897e87.0
+        for <kvmarm@lists.linux.dev>; Mon, 15 Jan 2024 06:33:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1705329233; x=1705934033; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3074nJdUxwGh74if2bgwl0WhHx2TaEYyKeVYnV6RTR0=;
+        b=xcWZocRLI3k5HRa5K+3rEdQrq0+AayP1RsS2nS0DXHVP6zOFUdOf4aH8kPFrV3m/tj
+         vdJXXi3VdYiW3NvgnyTryd5M0YpKUMMsbzKg69fuhrLkwOI/32pIqI60oZun3Cx4zdHG
+         /RxMn+8EK7IewV6Qdk3TufKQsj45fZuN2XtNVhmxdTKAsz3LYwX+xuyWYpdCNCcUm79C
+         kZd55cg4okY7lTX4xv/m0SqAqt956dNJ7ID+D35mO4EAg58XEiO6Vx5y7yIQtIl59d9l
+         SkB7mOd5dw9JH7vnMOUL/z0/mtcTQg8GgdLVBaVK42k4tW2qOoIfuiUS0AoFXnCe+q2b
+         +FKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705329233; x=1705934033;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3074nJdUxwGh74if2bgwl0WhHx2TaEYyKeVYnV6RTR0=;
+        b=ohaUaesz6sOhYlIGWI1tStUomY2CyH/ISuILS1vw6U50bG6i22QAKjhrukHX/pZJOg
+         nwc0bOdltQ7tZWTBHUmhxst5iY65cxu5UdqYnDnnf5JhlRWFDDDoHYid/XhWtfOkOZEG
+         vXpsP4YM7l35eIahehn7tjl95niVYtyyeygZH6Zmp4F1lPX9FeITkdyD+7FGe3mpDhCP
+         7NICVai4YjF5qatygtoKcXX5i4w0j05iELz+Fs5hrqzbSUwECpKqNw79weuNuRUgRzDo
+         OFFS/43WpvlsmMVyJIHKhvKoaHoXmTQOHnM998VDUXrOZ1sMO+pf9CuwymyF0hWiV114
+         4JZA==
+X-Gm-Message-State: AOJu0YzxINtKc+ydKGEFastu19S+2Qf7eO261ZWF9ZL+cu6Cr1tzfs15
+	zYjA5YahjjWKe2OCv2sNuHxpKFTJu0OW
+X-Google-Smtp-Source: AGHT+IGLIGAhu4rPYAOpIuokHbTPnSZ1UJer5j1S0DwMiyemD4L6ZtwfZq6sG9jJNINcYk8Ix1hLhg==
+X-Received: by 2002:a05:6512:3b09:b0:50e:78fa:5193 with SMTP id f9-20020a0565123b0900b0050e78fa5193mr424562lfv.2.1705329233127;
+        Mon, 15 Jan 2024 06:33:53 -0800 (PST)
+Received: from google.com (185.83.140.34.bc.googleusercontent.com. [34.140.83.185])
+        by smtp.gmail.com with ESMTPSA id i6-20020adff306000000b003377e22ffdcsm12038621wro.85.2024.01.15.06.33.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jan 2024 06:33:52 -0800 (PST)
+Date: Mon, 15 Jan 2024 14:33:50 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
+	joro@8bytes.org, robin.murphy@arm.com, james.morse@arm.com,
+	suzuki.poulose@arm.com, oliver.upton@linux.dev,
+	yuzenghui@huawei.com, smostafa@google.com, dbrazdil@google.com,
+	ryan.roberts@arm.com, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev
+Subject: Re: [RFC PATCH 12/45] KVM: arm64: pkvm: Unify
+ pkvm_pkvm_teardown_donated_memory()
+Message-ID: <ZaVCTuM7KDSWqqaE@google.com>
+References: <20230201125328.2186498-1-jean-philippe@linaro.org>
+ <20230201125328.2186498-13-jean-philippe@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,99 +63,148 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231130090722.2897974-2-shahuang@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20230201125328.2186498-13-jean-philippe@linaro.org>
 
-On Thu, Nov 30, 2023 at 04:07:03AM -0500, Shaoqin Huang wrote:
-> From: Alexandru Elisei <alexandru.elisei@arm.com>
+On Wed, Feb 01, 2023 at 12:52:56PM +0000, Jean-Philippe Brucker wrote:
+
+Hi Jean,
+
+> Tearing down donated memory requires clearing the memory, pushing the
+> pages into the reclaim memcache, and moving the mapping into the host
+> stage-2. Keep these operations in a single function.
 > 
-> There are 25 header files today (found with grep -r "#ifndef __ASSEMBLY__)
-> with functionality relies on the __ASSEMBLY__ prepocessor constant being
-> correctly defined to work correctly. So far, kvm-unit-tests has relied on
-> the assembly files to define the constant before including any header
-> files which depend on it.
-> 
-> Let's make sure that nobody gets this wrong and define it as a compiler
-> constant when compiling assembly files. __ASSEMBLY__ is now defined for all
-> .S files, even those that didn't set it explicitely before.
-> 
-> Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 > ---
->  Makefile           | 5 ++++-
->  arm/cstart.S       | 1 -
->  arm/cstart64.S     | 1 -
->  powerpc/cstart64.S | 1 -
->  4 files changed, 4 insertions(+), 4 deletions(-)
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 +
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  3 +-
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c                | 50 +++++++------------
+>  3 files changed, 22 insertions(+), 33 deletions(-)
 > 
-> diff --git a/Makefile b/Makefile
-> index 602910dd..27ed14e6 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -92,6 +92,9 @@ CFLAGS += -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> index d4f4ffbb7dbb..021825aee854 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> @@ -86,6 +86,8 @@ void reclaim_guest_pages(struct pkvm_hyp_vm *vm, struct kvm_hyp_memcache *mc);
 >  
->  autodepend-flags = -MMD -MP -MF $(dir $*).$(notdir $*).d
+>  void *pkvm_map_donated_memory(unsigned long host_va, size_t size);
+>  void pkvm_unmap_donated_memory(void *va, size_t size);
+> +void pkvm_teardown_donated_memory(struct kvm_hyp_memcache *mc, void *addr,
+> +				  size_t dirty_size);
 >  
-> +AFLAGS  = $(CFLAGS)
-> +AFLAGS += -D__ASSEMBLY__
+>  static __always_inline void __load_host_stage2(void)
+>  {
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 410361f41e38..cad5736026d5 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -314,8 +314,7 @@ void reclaim_guest_pages(struct pkvm_hyp_vm *vm, struct kvm_hyp_memcache *mc)
+>  	addr = hyp_alloc_pages(&vm->pool, 0);
+>  	while (addr) {
+>  		memset(hyp_virt_to_page(addr), 0, sizeof(struct hyp_page));
+> -		push_hyp_memcache(mc, addr, hyp_virt_to_phys);
+> -		WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(addr), 1));
+> +		pkvm_teardown_donated_memory(mc, addr, 0);
+>  		addr = hyp_alloc_pages(&vm->pool, 0);
+>  	}
+>  }
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index a3711979bbd3..c51a8a592849 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -602,27 +602,28 @@ void *pkvm_map_donated_memory(unsigned long host_va, size_t size)
+>  	return va;
+>  }
+>  
+> -static void __unmap_donated_memory(void *va, size_t size)
+> +void pkvm_teardown_donated_memory(struct kvm_hyp_memcache *mc, void *va,
+> +				  size_t dirty_size)
+>  {
+> -	WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(va),
+> -				       PAGE_ALIGN(size) >> PAGE_SHIFT));
+> -}
+> +	size_t size = max(PAGE_ALIGN(dirty_size), PAGE_SIZE);
+>  
+> -void pkvm_unmap_donated_memory(void *va, size_t size)
+> -{
+>  	if (!va)
+>  		return;
+>  
+> -	memset(va, 0, size);
+> -	__unmap_donated_memory(va, size);
+> +	memset(va, 0, dirty_size);
 > +
->  LDFLAGS += -nostdlib $(no_pie) -z noexecstack
+> +	if (mc) {
+> +		for (void *start = va; start < va + size; start += PAGE_SIZE)
+> +			push_hyp_memcache(mc, start, hyp_virt_to_phys);
+> +	}
+> +
+> +	WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(va),
+> +				       size >> PAGE_SHIFT));
+>  }
 >  
->  $(libcflat): $(cflatobjs)
-> @@ -113,7 +116,7 @@ directories:
->  	@mkdir -p $(OBJDIRS)
+> -static void unmap_donated_memory_noclear(void *va, size_t size)
+> +void pkvm_unmap_donated_memory(void *va, size_t size)
+>  {
+> -	if (!va)
+> -		return;
+> -
+> -	__unmap_donated_memory(va, size);
+> +	pkvm_teardown_donated_memory(NULL, va, size);
+>  }
 >  
->  %.o: %.S
-> -	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
-> +	$(CC) $(AFLAGS) -c -nostdlib -o $@ $<
+>  /*
+> @@ -759,18 +760,6 @@ int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
+>  	return ret;
+>  }
+>  
+> -static void
+> -teardown_donated_memory(struct kvm_hyp_memcache *mc, void *addr, size_t size)
+> -{
+> -	size = PAGE_ALIGN(size);
+> -	memset(addr, 0, size);
+> -
+> -	for (void *start = addr; start < addr + size; start += PAGE_SIZE)
+> -		push_hyp_memcache(mc, start, hyp_virt_to_phys);
+> -
+> -	unmap_donated_memory_noclear(addr, size);
+> -}
+> -
+>  int __pkvm_teardown_vm(pkvm_handle_t handle)
+>  {
+>  	size_t vm_size, last_ran_size;
+> @@ -813,19 +802,18 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
+>  		vcpu_mc = &hyp_vcpu->vcpu.arch.pkvm_memcache;
+>  		while (vcpu_mc->nr_pages) {
+>  			addr = pop_hyp_memcache(vcpu_mc, hyp_phys_to_virt);
+> -			push_hyp_memcache(mc, addr, hyp_virt_to_phys);
+> -			unmap_donated_memory_noclear(addr, PAGE_SIZE);
+> +			pkvm_teardown_donated_memory(mc, addr, 0);
 
-I think we can drop the two hunks above from this patch and just rely on
-the compiler to add __ASSEMBLY__ for us when compiling assembly files.
+Here we probably need to pass PAGE_SIZE as an argument instead of "0"
+to make sure that we clear out the content of the page before tearing it
+down.
+
+>  		}
+>  
+> -		teardown_donated_memory(mc, hyp_vcpu, sizeof(*hyp_vcpu));
+> +		pkvm_teardown_donated_memory(mc, hyp_vcpu, sizeof(*hyp_vcpu));
+>  	}
+>  
+>  	last_ran_size = pkvm_get_last_ran_size();
+> -	teardown_donated_memory(mc, hyp_vm->kvm.arch.mmu.last_vcpu_ran,
+> -				last_ran_size);
+> +	pkvm_teardown_donated_memory(mc, hyp_vm->kvm.arch.mmu.last_vcpu_ran,
+> +				     last_ran_size);
+>  
+>  	vm_size = pkvm_get_hyp_vm_size(hyp_vm->kvm.created_vcpus);
+> -	teardown_donated_memory(mc, hyp_vm, vm_size);
+> +	pkvm_teardown_donated_memory(mc, hyp_vm, vm_size);
+>  	hyp_unpin_shared_mem(host_kvm, host_kvm + 1);
+>  	return 0;
+>  
+> -- 
+> 2.39.0
+>
 
 Thanks,
-drew
-
->  
->  -include */.*.d */*/.*.d
->  
-> diff --git a/arm/cstart.S b/arm/cstart.S
-> index 3dd71ed9..b24ecabc 100644
-> --- a/arm/cstart.S
-> +++ b/arm/cstart.S
-> @@ -5,7 +5,6 @@
->   *
->   * This work is licensed under the terms of the GNU LGPL, version 2.
->   */
-> -#define __ASSEMBLY__
->  #include <auxinfo.h>
->  #include <asm/assembler.h>
->  #include <asm/thread_info.h>
-> diff --git a/arm/cstart64.S b/arm/cstart64.S
-> index bc2be45a..a8ad6dc8 100644
-> --- a/arm/cstart64.S
-> +++ b/arm/cstart64.S
-> @@ -5,7 +5,6 @@
->   *
->   * This work is licensed under the terms of the GNU GPL, version 2.
->   */
-> -#define __ASSEMBLY__
->  #include <auxinfo.h>
->  #include <asm/asm-offsets.h>
->  #include <asm/assembler.h>
-> diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
-> index 34e39341..fa32ef24 100644
-> --- a/powerpc/cstart64.S
-> +++ b/powerpc/cstart64.S
-> @@ -5,7 +5,6 @@
->   *
->   * This work is licensed under the terms of the GNU LGPL, version 2.
->   */
-> -#define __ASSEMBLY__
->  #include <asm/hcall.h>
->  #include <asm/ppc_asm.h>
->  #include <asm/rtas.h>
-> -- 
-> 2.40.1
-> 
+Seb
