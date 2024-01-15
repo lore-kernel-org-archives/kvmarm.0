@@ -1,114 +1,86 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED04F4E4
-	for <kvmarm@lists.linux.dev>; Mon, 15 Jan 2024 09:34:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 316782F4;
-	Mon, 15 Jan 2024 01:35:14 -0800 (PST)
-Received: from [10.57.46.55] (unknown [10.57.46.55])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 58FCD3F6C4;
-	Mon, 15 Jan 2024 01:34:26 -0800 (PST)
-Message-ID: <4e3c051b-ccdb-47d4-9a29-5c92f5101a06@arm.com>
-Date: Mon, 15 Jan 2024 09:34:24 +0000
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A362BB08
+	for <kvmarm@lists.linux.dev>; Mon, 15 Jan 2024 10:47:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Sz3CtW8T"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=BZWJhywUMRRIXvtL5doMOpnSiLPQBWG9w9WPF2MUO4c=; b=Sz3CtW8TvMYVj95XL1EZCET2A+
+	QamuonxIFNT3zYkRLRtfqxw7SE6Ou+c1sDlHOm3gafCTRQqOLJZCqlQDm5FD6J4qrogV6aC9NBqKU
+	UvioOgQ7gVTi/liinVC4kVe/e4buW1OQKg1r4GMXP3iDla1Qt5/Ci+N1I7TqyALOM7ZH/njEyXM+O
+	kqJMAfgr9yHj6be0TqV5AqRnblBaGfn2ZJHMunrt6qJ0b7/ZJ87rjdKUjRsvXgIYphw4O44+TlX5o
+	PSgdX1SN3rxuaPmO/lCvJycV2gVlF4hse5S9MWc2dj0rsOcECr0O+epZD/m8Mped50SRNjDOgOXs2
+	5FXDnxHg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39864)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rPKUr-0002Ja-0t;
+	Mon, 15 Jan 2024 10:47:13 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rPKUm-0002tU-5o; Mon, 15 Jan 2024 10:47:08 +0000
+Date: Mon, 15 Jan 2024 10:47:08 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, acpica-devel@lists.linuxfoundation.org,
+	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com,
+	James Morse <james.morse@arm.com>
+Subject: Re: [PATCH RFC v3 02/21] ACPI: processor: Add support for processors
+ described as container packages
+Message-ID: <ZaUNLMvIYChv6qai@shell.armlinux.org.uk>
+References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk>
+ <E1rDOfx-00Dvje-MS@rmk-PC.armlinux.org.uk>
+ <CAJZ5v0iB0bS6nmjQ++pV1zp5YSGuigbffK5VD3wsX+8bY9MA5w@mail.gmail.com>
+ <20240111175908.00002f46@Huawei.com>
+ <ZaA3l4yjgCXxSiVg@shell.armlinux.org.uk>
+ <20240112092520.00001278@Huawei.com>
+ <CAJZ5v0g2CFPrSfNzHKBz_Spwt304QEQtR6w57VR11i5APPrD8Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] KVM: arm64: selftests: Handle feature fields with
- nonzero minimum value correctly
-Content-Language: en-GB
-To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
- KVMARM <kvmarm@lists.linux.dev>,
- ARMLinux <linux-arm-kernel@lists.infradead.org>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Itaru Kitayama <itaru.kitayama@linux.dev>
-References: <20240109165622.4104387-1-jingzhangos@google.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240109165622.4104387-1-jingzhangos@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJZ5v0g2CFPrSfNzHKBz_Spwt304QEQtR6w57VR11i5APPrD8Q@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 09/01/2024 16:56, Jing Zhang wrote:
-> There are some feature fields with nonzero minimum valid value. Make
-> sure get_safe_value() won't return invalid field values for them.
-> Also fix a bug that wrongly uses the feature bits type as the feature
-> bits sign causing all fields as signed in the get_safe_value() and
-> get_invalid_value().
-> 
-> Fixes: 54a9ea73527d ("KVM: arm64: selftests: Test for setting ID register from usersapce")
-> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-> Reported-by: Itaru Kitayama <itaru.kitayama@linux.dev>
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->   .../selftests/kvm/aarch64/set_id_regs.c       | 20 +++++++++++++++----
->   1 file changed, 16 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> index bac05210b539..f17454dc6d9e 100644
-> --- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> +++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> @@ -224,13 +224,20 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
->   {
->   	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
->   
-> -	if (ftr_bits->type == FTR_UNSIGNED) {
-> +	if (ftr_bits->sign == FTR_UNSIGNED) {
->   		switch (ftr_bits->type) {
->   		case FTR_EXACT:
->   			ftr = ftr_bits->safe_val;
->   			break;
->   		case FTR_LOWER_SAFE:
-> -			if (ftr > 0)
-> +			uint64_t min_safe = 0;
-> +
-> +			if (!strcmp(ftr_bits->name, "ID_AA64DFR0_EL1_DebugVer"))
-> +				min_safe = ID_AA64DFR0_EL1_DebugVer_IMP;
-> +			else if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_CopDbg"))
-> +				min_safe = ID_DFR0_EL1_CopDbg_Armv8;
+On Fri, Jan 12, 2024 at 04:01:40PM +0100, Rafael J. Wysocki wrote:
+> In any case, it is always better to work on top of the current
+> mainline code IMO.
 
-Instead of hardcoding the safe value here in the code, why not "fix" the 
-safe value in the ftr_id table and use ftr_bits->safe_val for both the
-above cases ?
+That's fine if one is starting to do some work now, but that is not the
+case with this. The first posting was almost a year ago:
 
-> +
-> +			if (ftr > min_safe)
->   				ftr--;
->   			break;
->   		case FTR_HIGHER_SAFE:
-> @@ -252,7 +259,12 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
->   			ftr = ftr_bits->safe_val;
->   			break;
->   		case FTR_LOWER_SAFE:
-> -			if (ftr > 0)
-> +			uint64_t min_safe = 0;
-> +
-> +			if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_PerfMon"))
-> +				min_safe = ID_DFR0_EL1_PerfMon_PMUv3;
-> +
-> +			if (ftr > min_safe)
->   				ftr--;
+	https://lwn.net/Articles/922127/
 
-Also, here, don't we need to type case both "ftr" and min_safe to 
-int64_t for signed features ?
+which likely means that it's been around for at 18 months or more, and
+we can also see that this patch was in that original patch set. What
+the history of this patch is before the first posting... only James
+would be able to answer that and I feel that we're highly unlikely to
+get any kind of response.
 
-Suzuki
+Anyway, consider this patch dropped from the series.
 
->   			break;
->   		case FTR_HIGHER_SAFE:
-> @@ -276,7 +288,7 @@ uint64_t get_invalid_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
->   {
->   	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
->   
-> -	if (ftr_bits->type == FTR_UNSIGNED) {
-> +	if (ftr_bits->sign == FTR_UNSIGNED) {
->   		switch (ftr_bits->type) {
->   		case FTR_EXACT:
->   			ftr = max((uint64_t)ftr_bits->safe_val + 1, ftr + 1);
-> 
-> base-commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
