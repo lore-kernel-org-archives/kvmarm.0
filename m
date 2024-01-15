@@ -1,50 +1,39 @@
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B325666
-	for <kvmarm@lists.linux.dev>; Mon, 15 Jan 2024 07:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4TD3vd5TZLz1Q7tp;
-	Mon, 15 Jan 2024 15:40:13 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 71D8718006D;
-	Mon, 15 Jan 2024 15:41:04 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 15 Jan 2024 15:41:03 +0800
-Subject: Re: [PATCH v1] KVM: arm64: selftests: Handle feature fields with
- nonzero minimum value correctly
-To: Jing Zhang <jingzhangos@google.com>
-CC: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, ARMLinux
-	<linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, Oliver
- Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, James
- Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Itaru
- Kitayama <itaru.kitayama@linux.dev>
-References: <20240109165622.4104387-1-jingzhangos@google.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <05e504bb-9aec-6026-1ea8-bca59ad439bf@huawei.com>
-Date: Mon, 15 Jan 2024 15:41:02 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED04F4E4
+	for <kvmarm@lists.linux.dev>; Mon, 15 Jan 2024 09:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 316782F4;
+	Mon, 15 Jan 2024 01:35:14 -0800 (PST)
+Received: from [10.57.46.55] (unknown [10.57.46.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 58FCD3F6C4;
+	Mon, 15 Jan 2024 01:34:26 -0800 (PST)
+Message-ID: <4e3c051b-ccdb-47d4-9a29-5c92f5101a06@arm.com>
+Date: Mon, 15 Jan 2024 09:34:24 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] KVM: arm64: selftests: Handle feature fields with
+ nonzero minimum value correctly
+Content-Language: en-GB
+To: Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+ KVMARM <kvmarm@lists.linux.dev>,
+ ARMLinux <linux-arm-kernel@lists.infradead.org>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, James Morse <james.morse@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, Itaru Kitayama <itaru.kitayama@linux.dev>
+References: <20240109165622.4104387-1-jingzhangos@google.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
 In-Reply-To: <20240109165622.4104387-1-jingzhangos@google.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600007.china.huawei.com (7.193.23.208)
 
-Hi Jing,
-
-On 2024/1/10 0:56, Jing Zhang wrote:
+On 09/01/2024 16:56, Jing Zhang wrote:
 > There are some feature fields with nonzero minimum valid value. Make
 > sure get_safe_value() won't return invalid field values for them.
 > Also fix a bug that wrongly uses the feature bits type as the feature
@@ -56,24 +45,24 @@ On 2024/1/10 0:56, Jing Zhang wrote:
 > Reported-by: Itaru Kitayama <itaru.kitayama@linux.dev>
 > Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
->  .../selftests/kvm/aarch64/set_id_regs.c       | 20 +++++++++++++++----
->  1 file changed, 16 insertions(+), 4 deletions(-)
+>   .../selftests/kvm/aarch64/set_id_regs.c       | 20 +++++++++++++++----
+>   1 file changed, 16 insertions(+), 4 deletions(-)
 > 
 > diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
 > index bac05210b539..f17454dc6d9e 100644
 > --- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
 > +++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
 > @@ -224,13 +224,20 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
->  {
->  	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
+>   {
+>   	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
 >   
 > -	if (ftr_bits->type == FTR_UNSIGNED) {
 > +	if (ftr_bits->sign == FTR_UNSIGNED) {
->  		switch (ftr_bits->type) {
->  		case FTR_EXACT:
->  			ftr = ftr_bits->safe_val;
->  			break;
->  		case FTR_LOWER_SAFE:
+>   		switch (ftr_bits->type) {
+>   		case FTR_EXACT:
+>   			ftr = ftr_bits->safe_val;
+>   			break;
+>   		case FTR_LOWER_SAFE:
 > -			if (ftr > 0)
 > +			uint64_t min_safe = 0;
 > +
@@ -81,22 +70,45 @@ On 2024/1/10 0:56, Jing Zhang wrote:
 > +				min_safe = ID_AA64DFR0_EL1_DebugVer_IMP;
 > +			else if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_CopDbg"))
 > +				min_safe = ID_DFR0_EL1_CopDbg_Armv8;
+
+Instead of hardcoding the safe value here in the code, why not "fix" the 
+safe value in the ftr_id table and use ftr_bits->safe_val for both the
+above cases ?
+
 > +
 > +			if (ftr > min_safe)
+>   				ftr--;
+>   			break;
+>   		case FTR_HIGHER_SAFE:
+> @@ -252,7 +259,12 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
+>   			ftr = ftr_bits->safe_val;
+>   			break;
+>   		case FTR_LOWER_SAFE:
+> -			if (ftr > 0)
+> +			uint64_t min_safe = 0;
+> +
+> +			if (!strcmp(ftr_bits->name, "ID_DFR0_EL1_PerfMon"))
+> +				min_safe = ID_DFR0_EL1_PerfMon_PMUv3;
+> +
+> +			if (ftr > min_safe)
+>   				ftr--;
 
-As I mentioned in my previous reply, there is a compilation error with
-gcc-10.3.1.
+Also, here, don't we need to type case both "ftr" and min_safe to 
+int64_t for signed features ?
 
-| aarch64/set_id_regs.c: In function 'get_safe_value':
-| aarch64/set_id_regs.c:233:4: error: a label can only be part of a 
-statement and a declaration is not a statement
-|   233 |    uint64_t min_safe = 0;
-|       |    ^~~~~~~~
-| aarch64/set_id_regs.c:262:4: error: a label can only be part of a 
-statement and a declaration is not a statement
-|   262 |    uint64_t min_safe = 0;
-|       |    ^~~~~~~~
+Suzuki
 
-Please fix it.
+>   			break;
+>   		case FTR_HIGHER_SAFE:
+> @@ -276,7 +288,7 @@ uint64_t get_invalid_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
+>   {
+>   	uint64_t ftr_max = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
+>   
+> -	if (ftr_bits->type == FTR_UNSIGNED) {
+> +	if (ftr_bits->sign == FTR_UNSIGNED) {
+>   		switch (ftr_bits->type) {
+>   		case FTR_EXACT:
+>   			ftr = max((uint64_t)ftr_bits->safe_val + 1, ftr + 1);
+> 
+> base-commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a
 
-Zenghui
