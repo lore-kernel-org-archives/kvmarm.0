@@ -1,192 +1,147 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D52A10A05
-	for <kvmarm@lists.linux.dev>; Tue, 16 Jan 2024 06:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1471B10A05
+	for <kvmarm@lists.linux.dev>; Tue, 16 Jan 2024 06:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VrUfDDIR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UESuWJ9r"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705387081;
+	s=mimecast20190719; t=1705388330;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Oie7qG3hD/4YNZrrfNMQFt0VD8dTSSeIYaAsFoCMhlU=;
-	b=VrUfDDIRvYH4/7x17gSdfHIU8RHaAG0ZcDXCNTaHjN8dmVRnQBr7XeIw6FcYjfm7UcEwDs
-	7b7rucbWmTYokbABiGuZsA9Rbr4wOPqfwPhe2HpXHXXnZjWDdgr0G7xc+Ou1Wd6hgNoISB
-	NT1gWDin754ABdtyRXFBLLA3ZbvhJAI=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-389-Wg2mCwPGM0qapWTSvD_spA-1; Tue, 16 Jan 2024 01:37:59 -0500
-X-MC-Unique: Wg2mCwPGM0qapWTSvD_spA-1
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-6d99a379dacso1536726b3a.1
-        for <kvmarm@lists.linux.dev>; Mon, 15 Jan 2024 22:37:59 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705387078; x=1705991878;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Oie7qG3hD/4YNZrrfNMQFt0VD8dTSSeIYaAsFoCMhlU=;
-        b=tDmlLPmThm0efVi7hAp5XEP81gtBk9lmZ6cDTMzQBU4eTTnkjgwjWJV4/eym27MiLh
-         CTk2v1TWXWu6GeOjVNuNBZ5Z4gxYizI4ijVZrttTcEvRCxPI+zMnyJNFaiM2Q6UHLqyr
-         q80jvpDHSYZlhSTGRO4NfCdoN9FvsivMOMAjQ0GZY07MbxO5vNtdqwpnwuogICN6hXDE
-         otBGSIkDNJhcJiY8dW2cxvyILN5Iji3ycmdXO7Y9uWoUZPI62ctWJCwxdUuZJr9qgQd7
-         td8spgDEWtizHncXHk4aYgCSdpzvxnUX75BoCYispj9+gZu4DmosxblciFRiReQZFBJ6
-         nTnQ==
-X-Gm-Message-State: AOJu0YwsKd7aECqti8Qgqq7sshym/VN3+N9VaEkAmmu6lMNS5jTyQh7t
-	3+syoOzp4vDPRHXz3L8IDH2bDrpkDhW2BnIJz17coA+It+R794IW2DW7oAvkwzcuD6A9Db1xF8G
-	5kGNBQNBvNfGdYXOE0baUV6qq
-X-Received: by 2002:a05:6a00:2e20:b0:6d9:6081:602d with SMTP id fc32-20020a056a002e2000b006d96081602dmr10766070pfb.3.1705387077483;
-        Mon, 15 Jan 2024 22:37:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGAOaeR+nDphUQp1lsgsm9WsHGd+j85kuwZ0giUcI57OxeUtDgrOf4Rx+WCGIeJ3ColfZE+JA==
-X-Received: by 2002:a05:6a00:2e20:b0:6d9:6081:602d with SMTP id fc32-20020a056a002e2000b006d96081602dmr10766056pfb.3.1705387077141;
-        Mon, 15 Jan 2024 22:37:57 -0800 (PST)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id lc26-20020a056a004f5a00b006d9330a934dsm8590269pfb.64.2024.01.15.22.37.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Jan 2024 22:37:56 -0800 (PST)
-Message-ID: <553b55a9-f6d1-4c37-99bf-ccdc16326196@redhat.com>
-Date: Tue, 16 Jan 2024 14:37:53 +0800
+	bh=1suPXz3mdXtEizWNvumgqR5PbxuamTx8eG/JhmK4lwo=;
+	b=UESuWJ9rfOiwVcZnUpYJrfH8cH5UVgJQ04Mxn4zPGzEJPmNSIr58ULP+l6MsO6L+G5oIHV
+	wOvhJoIciZYHevedBmM3phvg/Sv+Xw+/TnSxkRXBSU5AuBFQfqgVrdS0OCi4pUZk4yXFr+
+	dicBqG4NBn1zC+0sLdifavwGdCmonQY=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-467-tOW6xBHVP1i3VNj_4DXQGw-1; Tue,
+ 16 Jan 2024 01:58:49 -0500
+X-MC-Unique: tOW6xBHVP1i3VNj_4DXQGw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A2E5A280FECA;
+	Tue, 16 Jan 2024 06:58:48 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 929CA3C25;
+	Tue, 16 Jan 2024 06:58:48 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Andrew Jones <andrew.jones@linux.dev>,
+	kvmarm@lists.linux.dev
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Nikos Nikoleris <nikos.nikoleris@arm.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v3 3/3] arm64: efi: Make running tests on EFI can be parallel
+Date: Tue, 16 Jan 2024 01:58:46 -0500
+Message-Id: <20240116065847.71623-4-shahuang@redhat.com>
+In-Reply-To: <20240116065847.71623-1-shahuang@redhat.com>
+References: <20240116065847.71623-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2 3/3] arm64: efi: Make running tests on
- EFI can be parallel
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvmarm@lists.linux.dev, Alexandru Elisei <alexandru.elisei@arm.com>,
- Eric Auger <eric.auger@redhat.com>, Nikos Nikoleris
- <nikos.nikoleris@arm.com>, Ricardo Koller <ricarkol@google.com>,
- kvm@vger.kernel.org
-References: <20231130032940.2729006-1-shahuang@redhat.com>
- <20231130032940.2729006-4-shahuang@redhat.com>
- <20240115-df5b09a3501c04572a54416d@orel>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20240115-df5b09a3501c04572a54416d@orel>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
+Currently running tests on EFI in parallel can cause part of tests to
+fail, this is because arm/efi/run script use the EFI_CASE to create the
+subdir under the efi-tests, and the EFI_CASE is the filename of the
+test, when running tests in parallel, the multiple tests exist in the
+same filename will execute at the same time, which will use the same
+directory and write the test specific things into it, this cause
+chaotic and make some tests fail.
 
+For example, if we running the pmu-sw-incr and pmu-chained-counters
+and other pmu tests on EFI at the same time, the EFI_CASE will be pmu.
+So they will write their $cmd_args to the $EFI/TEST/pmu/startup.nsh
+at the same time, which will corrupt the startup.nsh file.
 
-On 1/15/24 20:23, Andrew Jones wrote:
-> On Wed, Nov 29, 2023 at 10:29:40PM -0500, Shaoqin Huang wrote:
->> Currently running tests on EFI in parallel can cause part of tests to
->> fail, this is because arm/efi/run script use the EFI_CASE to create the
->> subdir under the efi-tests, and the EFI_CASE is the filename of the
->> test, when running tests in parallel, the multiple tests exist in the
->> same filename will execute at the same time, which will use the same
->> directory and write the test specific things into it, this cause
->> chaotic and make some tests fail.
->>
->> For example, if we running the pmu-sw-incr and pmu-chained-counters
->> and other pmu tests on EFI at the same time, the EFI_CASE will be pmu.
->> So they will write their $cmd_args to the $EFI/TEST/pmu/startup.nsh
->> at the same time, which will corrupt the startup.nsh file.
->>
->> And we can get the log which outputs:
->>
->> * pmu-sw-incr.log:
->>    - ABORT: pmu: Unknown sub-test 'pmu-mem-acce'
->> * pmu-chained-counters.log
->>    - ABORT: pmu: Unknown sub-test 'pmu-mem-access-reliab'
->>
->> And the efi-tests/pmu/startup.nsh:
->>
->> @echo -off
->> setvar fdtfile -guid 97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823 -rt =L"dtb"
->> pmu.efi pmu-mem-access-reliability
->> setvar fdtfile -guid 97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823 -rt =L"dtb"
->> pmu.efi pmu-chained-sw-incr
->>
->> As you can see, when multiple tests write to the same startup.nsh file,
->> it causes the issue.
->>
->> To Fix this issue, use the testname instead of the filename to create
->> the subdir under the efi-tests. We use the EFI_TESTNAME to replace the
->> EFI_CASE in script. Since every testname is specific, now the tests
->> can be run parallel. It also considers when user directly use the
->> arm/efi/run to run test, in this case, still use the filename.
->>
->> Besides, replace multiple $EFI_TEST/$EFI_CASE to the $EFI_CASE_DIR, this
->> makes the script looks more clean and we don'e need to replace many
->> EFI_CASE to EFI_TESTNAME.
->>
->> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
->> ---
->>   arm/efi/run | 16 +++++++++-------
->>   1 file changed, 9 insertions(+), 7 deletions(-)
->>
->> diff --git a/arm/efi/run b/arm/efi/run
->> index 6872c337..03bfbef4 100755
->> --- a/arm/efi/run
->> +++ b/arm/efi/run
->> @@ -24,6 +24,8 @@ fi
->>   : "${EFI_SRC:=$TEST_DIR}"
->>   : "${EFI_UEFI:=$DEFAULT_UEFI}"
->>   : "${EFI_TEST:=efi-tests}"
->> +: "${EFI_TESTNAME:=$TESTNAME}"
->> +: "${EFI_TESTNAME:=$(basename $1 .efi)}"
->>   : "${EFI_CASE:=$(basename $1 .efi)}"
-> 
-> We can write it the above like the following to avoid duplicating the
-> basename call
-> 
-> : "${EFI_CASE:=$(basename $1 .efi)}"
-> : "${EFI_TESTNAME:=$TESTNAME}"
-> : "${EFI_TESTNAME:=$EFI_CASE}"
+And we can get the log which outputs:
 
-Yep. It actually looks good. I will use that format.
+* pmu-sw-incr.log:
+  - ABORT: pmu: Unknown sub-test 'pmu-mem-acce'
+* pmu-chained-counters.log
+  - ABORT: pmu: Unknown sub-test 'pmu-mem-access-reliab'
 
-> 
-> 
->>   : "${EFI_VAR_GUID:=97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823}"
->>   
->> @@ -56,20 +58,20 @@ if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
->>   	EFI_CASE=dummy
->>   fi
->>   
->> -: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_CASE"}"
->> +: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_TESTNAME"}"
->>   mkdir -p "$EFI_CASE_DIR"
->>   
->> -cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
->> -echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
->> +cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_CASE_DIR/"
->> +echo "@echo -off" > "$EFI_CASE_DIR/startup.nsh"
->>   if [ "$EFI_USE_DTB" = "y" ]; then
->>   	qemu_args+=(-machine acpi=off)
->>   	FDT_BASENAME="dtb"
->> -	$(EFI_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_TEST/$EFI_CASE/$FDT_BASENAME" "${qemu_args[@]}")
->> -	echo "setvar fdtfile -guid $EFI_VAR_GUID -rt =L\"$FDT_BASENAME\""  >> "$EFI_TEST/$EFI_CASE/startup.nsh"
->> +	$(EFI_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_CASE_DIR/$FDT_BASENAME" "${qemu_args[@]}")
->> +	echo "setvar fdtfile -guid $EFI_VAR_GUID -rt =L\"$FDT_BASENAME\""  >> "$EFI_CASE_DIR/startup.nsh"
->>   fi
->> -echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_TEST/$EFI_CASE/startup.nsh"
->> +echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_CASE_DIR/startup.nsh"
->>   
->>   EFI_RUN=y $TEST_DIR/run \
->>          -bios "$EFI_UEFI" \
->> -       -drive file.dir="$EFI_TEST/$EFI_CASE/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
->> +       -drive file.dir="$EFI_CASE_DIR/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
->>          "${qemu_args[@]}"
->> -- 
->> 2.40.1
->>
-> 
-> Otherwise
-> 
-> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
-> 
+And the efi-tests/pmu/startup.nsh:
 
+@echo -off
+setvar fdtfile -guid 97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823 -rt =L"dtb"
+pmu.efi pmu-mem-access-reliability
+setvar fdtfile -guid 97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823 -rt =L"dtb"
+pmu.efi pmu-chained-sw-incr
+
+As you can see, when multiple tests write to the same startup.nsh file,
+it causes the issue.
+
+To Fix this issue, use the testname instead of the filename to create
+the subdir under the efi-tests. We use the EFI_TESTNAME to replace the
+EFI_CASE in script. Since every testname is specific, now the tests
+can be run parallel. It also considers when user directly use the
+arm/efi/run to run test, in this case, still use the filename.
+
+Besides, replace multiple $EFI_TEST/$EFI_CASE to the $EFI_CASE_DIR, this
+makes the script looks more clean and we don'e need to replace many
+EFI_CASE to EFI_TESTNAME.
+
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+---
+ arm/efi/run | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/arm/efi/run b/arm/efi/run
+index 6872c337..2c34e3d6 100755
+--- a/arm/efi/run
++++ b/arm/efi/run
+@@ -25,6 +25,8 @@ fi
+ : "${EFI_UEFI:=$DEFAULT_UEFI}"
+ : "${EFI_TEST:=efi-tests}"
+ : "${EFI_CASE:=$(basename $1 .efi)}"
++: "${EFI_TESTNAME:=$TESTNAME}"
++: "${EFI_TESTNAME:=$EFI_CASE}"
+ : "${EFI_VAR_GUID:=97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823}"
+ 
+ [ "$EFI_USE_ACPI" = "y" ] || EFI_USE_DTB=y
+@@ -56,20 +58,20 @@ if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
+ 	EFI_CASE=dummy
+ fi
+ 
+-: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_CASE"}"
++: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_TESTNAME"}"
+ mkdir -p "$EFI_CASE_DIR"
+ 
+-cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
+-echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
++cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_CASE_DIR/"
++echo "@echo -off" > "$EFI_CASE_DIR/startup.nsh"
+ if [ "$EFI_USE_DTB" = "y" ]; then
+ 	qemu_args+=(-machine acpi=off)
+ 	FDT_BASENAME="dtb"
+-	$(EFI_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_TEST/$EFI_CASE/$FDT_BASENAME" "${qemu_args[@]}")
+-	echo "setvar fdtfile -guid $EFI_VAR_GUID -rt =L\"$FDT_BASENAME\""  >> "$EFI_TEST/$EFI_CASE/startup.nsh"
++	$(EFI_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_CASE_DIR/$FDT_BASENAME" "${qemu_args[@]}")
++	echo "setvar fdtfile -guid $EFI_VAR_GUID -rt =L\"$FDT_BASENAME\""  >> "$EFI_CASE_DIR/startup.nsh"
+ fi
+-echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_TEST/$EFI_CASE/startup.nsh"
++echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_CASE_DIR/startup.nsh"
+ 
+ EFI_RUN=y $TEST_DIR/run \
+        -bios "$EFI_UEFI" \
+-       -drive file.dir="$EFI_TEST/$EFI_CASE/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
++       -drive file.dir="$EFI_CASE_DIR/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
+        "${qemu_args[@]}"
 -- 
-Shaoqin
+2.40.1
 
