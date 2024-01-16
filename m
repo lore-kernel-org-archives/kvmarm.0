@@ -1,55 +1,55 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9EB610971
-	for <kvmarm@lists.linux.dev>; Tue, 16 Jan 2024 06:19:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D52A10A05
+	for <kvmarm@lists.linux.dev>; Tue, 16 Jan 2024 06:38:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DLno0I9d"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VrUfDDIR"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705385960;
+	s=mimecast20190719; t=1705387081;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=dv3YKC3c8DPTgoEFA32x0UGDsvE1JRMlM1qKabmoCgU=;
-	b=DLno0I9drdeMXOZOc06WfDGJ/LYtBZ6hwnZu1GLFY2t0F86bPo3zVqVo2S9xYbMFhATlIY
-	VjOj0l8NCFRC268W6AW4M6Qd1BjGtQgYcB+vPRxiJYCd95RR58I55TH3UtZ8eKVSe2Wpya
-	Jq9qUKdd1LIOysWMhA0rLV4ihyO8XdY=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Oie7qG3hD/4YNZrrfNMQFt0VD8dTSSeIYaAsFoCMhlU=;
+	b=VrUfDDIRvYH4/7x17gSdfHIU8RHaAG0ZcDXCNTaHjN8dmVRnQBr7XeIw6FcYjfm7UcEwDs
+	7b7rucbWmTYokbABiGuZsA9Rbr4wOPqfwPhe2HpXHXXnZjWDdgr0G7xc+Ou1Wd6hgNoISB
+	NT1gWDin754ABdtyRXFBLLA3ZbvhJAI=
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-48-LHOqHDfQOmGO_fSqfzEJLw-1; Tue, 16 Jan 2024 01:19:13 -0500
-X-MC-Unique: LHOqHDfQOmGO_fSqfzEJLw-1
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-35fbab97a5cso16016735ab.0
-        for <kvmarm@lists.linux.dev>; Mon, 15 Jan 2024 22:19:13 -0800 (PST)
+ us-mta-389-Wg2mCwPGM0qapWTSvD_spA-1; Tue, 16 Jan 2024 01:37:59 -0500
+X-MC-Unique: Wg2mCwPGM0qapWTSvD_spA-1
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-6d99a379dacso1536726b3a.1
+        for <kvmarm@lists.linux.dev>; Mon, 15 Jan 2024 22:37:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705385952; x=1705990752;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1705387078; x=1705991878;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dv3YKC3c8DPTgoEFA32x0UGDsvE1JRMlM1qKabmoCgU=;
-        b=JDkiz1qzAquqhOMdeVY6HIJbMhrDQOATSH+/qFv0jPd9EshOQPxaV46/Ox4q1DJMpt
-         6wjPp1OlDLu6/M7f862/+cQed3ppYY0q26XOaW1yJudGM3KWII0pED9RbbuQkyyOkvTY
-         shSgm5Kjra84lQkmM2aqWb7UnGSv+aNu9sp6RiymLlp11kxqXdfdKGGO+8ASfRPhrmvC
-         F3d5c2tsAYpz0xBi30EU+d6RkVYrJ2sjNs979N/OyNQkN48Co0/WNnzTxG1w2EKUVIRD
-         3NiYkoFl5m4kllAl0HQtCCk+4pYHCmXa4D2o498b0BZTwsjMftx+ZvhH89Bh+tEX7S53
-         DMsg==
-X-Gm-Message-State: AOJu0YxFvkFCf8Mlyk7fjmT8HEjRZMI3Qyc/CENZ5igGjkYAc0wWxIUK
-	WSMg81dNJEAwyGBrwCMLBTa3yfQfPsA5mQ1sG475D15GA8yzISloXJkzCaVBHczeL2P4ODZz4vX
-	X5FUxKzMBdtDlIWx9ggzqix6H
-X-Received: by 2002:a92:c561:0:b0:35f:fa79:644 with SMTP id b1-20020a92c561000000b0035ffa790644mr12233621ilj.3.1705385952616;
-        Mon, 15 Jan 2024 22:19:12 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHI3QmE1AD6Z+nAbVNM3OMCvfP7YDFhM98TU6JD0h2wwcYA9GNa4rUkzp3YjnsgmsSb1OQfOQ==
-X-Received: by 2002:a92:c561:0:b0:35f:fa79:644 with SMTP id b1-20020a92c561000000b0035ffa790644mr12233612ilj.3.1705385952371;
-        Mon, 15 Jan 2024 22:19:12 -0800 (PST)
+        bh=Oie7qG3hD/4YNZrrfNMQFt0VD8dTSSeIYaAsFoCMhlU=;
+        b=tDmlLPmThm0efVi7hAp5XEP81gtBk9lmZ6cDTMzQBU4eTTnkjgwjWJV4/eym27MiLh
+         CTk2v1TWXWu6GeOjVNuNBZ5Z4gxYizI4ijVZrttTcEvRCxPI+zMnyJNFaiM2Q6UHLqyr
+         q80jvpDHSYZlhSTGRO4NfCdoN9FvsivMOMAjQ0GZY07MbxO5vNtdqwpnwuogICN6hXDE
+         otBGSIkDNJhcJiY8dW2cxvyILN5Iji3ycmdXO7Y9uWoUZPI62ctWJCwxdUuZJr9qgQd7
+         td8spgDEWtizHncXHk4aYgCSdpzvxnUX75BoCYispj9+gZu4DmosxblciFRiReQZFBJ6
+         nTnQ==
+X-Gm-Message-State: AOJu0YwsKd7aECqti8Qgqq7sshym/VN3+N9VaEkAmmu6lMNS5jTyQh7t
+	3+syoOzp4vDPRHXz3L8IDH2bDrpkDhW2BnIJz17coA+It+R794IW2DW7oAvkwzcuD6A9Db1xF8G
+	5kGNBQNBvNfGdYXOE0baUV6qq
+X-Received: by 2002:a05:6a00:2e20:b0:6d9:6081:602d with SMTP id fc32-20020a056a002e2000b006d96081602dmr10766070pfb.3.1705387077483;
+        Mon, 15 Jan 2024 22:37:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGAOaeR+nDphUQp1lsgsm9WsHGd+j85kuwZ0giUcI57OxeUtDgrOf4Rx+WCGIeJ3ColfZE+JA==
+X-Received: by 2002:a05:6a00:2e20:b0:6d9:6081:602d with SMTP id fc32-20020a056a002e2000b006d96081602dmr10766056pfb.3.1705387077141;
+        Mon, 15 Jan 2024 22:37:57 -0800 (PST)
 Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id t1-20020a02b181000000b0046e759037f4sm1510591jah.33.2024.01.15.22.19.09
+        by smtp.gmail.com with ESMTPSA id lc26-20020a056a004f5a00b006d9330a934dsm8590269pfb.64.2024.01.15.22.37.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Jan 2024 22:19:11 -0800 (PST)
-Message-ID: <16c774cc-090e-4a81-8d49-1c2a369adb8c@redhat.com>
-Date: Tue, 16 Jan 2024 14:19:05 +0800
+        Mon, 15 Jan 2024 22:37:56 -0800 (PST)
+Message-ID: <553b55a9-f6d1-4c37-99bf-ccdc16326196@redhat.com>
+Date: Tue, 16 Jan 2024 14:37:53 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,18 +57,18 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2 2/3] runtime: arm64: Skip the migration
- tests when run on EFI
+Subject: Re: [kvm-unit-tests PATCH v2 3/3] arm64: efi: Make running tests on
+ EFI can be parallel
 To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvmarm@lists.linux.dev, Thomas Huth <thuth@redhat.com>,
- Nico Boehr <nrb@linux.ibm.com>, Colton Lewis <coltonlewis@google.com>,
- Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
- Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org
+Cc: kvmarm@lists.linux.dev, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Eric Auger <eric.auger@redhat.com>, Nikos Nikoleris
+ <nikos.nikoleris@arm.com>, Ricardo Koller <ricarkol@google.com>,
+ kvm@vger.kernel.org
 References: <20231130032940.2729006-1-shahuang@redhat.com>
- <20231130032940.2729006-3-shahuang@redhat.com>
- <20240115-92ecda86253ec8b52f348eda@orel>
+ <20231130032940.2729006-4-shahuang@redhat.com>
+ <20240115-df5b09a3501c04572a54416d@orel>
 From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20240115-92ecda86253ec8b52f348eda@orel>
+In-Reply-To: <20240115-df5b09a3501c04572a54416d@orel>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -77,48 +77,114 @@ Content-Transfer-Encoding: 7bit
 
 
 
-On 1/15/24 20:25, Andrew Jones wrote:
-> On Wed, Nov 29, 2023 at 10:29:39PM -0500, Shaoqin Huang wrote:
->> When running the migration tests on EFI, the migration will always fail
->> since the efi/run use the vvfat format to run test, but the vvfat format
->> does not support live migration. So those migration tests will always
->> fail.
+On 1/15/24 20:23, Andrew Jones wrote:
+> On Wed, Nov 29, 2023 at 10:29:40PM -0500, Shaoqin Huang wrote:
+>> Currently running tests on EFI in parallel can cause part of tests to
+>> fail, this is because arm/efi/run script use the EFI_CASE to create the
+>> subdir under the efi-tests, and the EFI_CASE is the filename of the
+>> test, when running tests in parallel, the multiple tests exist in the
+>> same filename will execute at the same time, which will use the same
+>> directory and write the test specific things into it, this cause
+>> chaotic and make some tests fail.
 >>
->> Instead of waiting for fail everytime when run migration tests on EFI,
->> skip those tests if running on EFI.
+>> For example, if we running the pmu-sw-incr and pmu-chained-counters
+>> and other pmu tests on EFI at the same time, the EFI_CASE will be pmu.
+>> So they will write their $cmd_args to the $EFI/TEST/pmu/startup.nsh
+>> at the same time, which will corrupt the startup.nsh file.
+>>
+>> And we can get the log which outputs:
+>>
+>> * pmu-sw-incr.log:
+>>    - ABORT: pmu: Unknown sub-test 'pmu-mem-acce'
+>> * pmu-chained-counters.log
+>>    - ABORT: pmu: Unknown sub-test 'pmu-mem-access-reliab'
+>>
+>> And the efi-tests/pmu/startup.nsh:
+>>
+>> @echo -off
+>> setvar fdtfile -guid 97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823 -rt =L"dtb"
+>> pmu.efi pmu-mem-access-reliability
+>> setvar fdtfile -guid 97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823 -rt =L"dtb"
+>> pmu.efi pmu-chained-sw-incr
+>>
+>> As you can see, when multiple tests write to the same startup.nsh file,
+>> it causes the issue.
+>>
+>> To Fix this issue, use the testname instead of the filename to create
+>> the subdir under the efi-tests. We use the EFI_TESTNAME to replace the
+>> EFI_CASE in script. Since every testname is specific, now the tests
+>> can be run parallel. It also considers when user directly use the
+>> arm/efi/run to run test, in this case, still use the filename.
+>>
+>> Besides, replace multiple $EFI_TEST/$EFI_CASE to the $EFI_CASE_DIR, this
+>> makes the script looks more clean and we don'e need to replace many
+>> EFI_CASE to EFI_TESTNAME.
 >>
 >> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 >> ---
->>   scripts/runtime.bash | 4 ++++
->>   1 file changed, 4 insertions(+)
+>>   arm/efi/run | 16 +++++++++-------
+>>   1 file changed, 9 insertions(+), 7 deletions(-)
 >>
->> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
->> index c73fb024..64d223e8 100644
->> --- a/scripts/runtime.bash
->> +++ b/scripts/runtime.bash
->> @@ -156,6 +156,10 @@ function run()
+>> diff --git a/arm/efi/run b/arm/efi/run
+>> index 6872c337..03bfbef4 100755
+>> --- a/arm/efi/run
+>> +++ b/arm/efi/run
+>> @@ -24,6 +24,8 @@ fi
+>>   : "${EFI_SRC:=$TEST_DIR}"
+>>   : "${EFI_UEFI:=$DEFAULT_UEFI}"
+>>   : "${EFI_TEST:=efi-tests}"
+>> +: "${EFI_TESTNAME:=$TESTNAME}"
+>> +: "${EFI_TESTNAME:=$(basename $1 .efi)}"
+>>   : "${EFI_CASE:=$(basename $1 .efi)}"
+> 
+> We can write it the above like the following to avoid duplicating the
+> basename call
+> 
+> : "${EFI_CASE:=$(basename $1 .efi)}"
+> : "${EFI_TESTNAME:=$TESTNAME}"
+> : "${EFI_TESTNAME:=$EFI_CASE}"
+
+Yep. It actually looks good. I will use that format.
+
+> 
+> 
+>>   : "${EFI_VAR_GUID:=97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823}"
 >>   
->>       cmdline=$(get_cmdline $kernel)
->>       if find_word "migration" "$groups"; then
->> +        if [ "{CONFIG_EFI}" == "y" ]; then
->> +            print_result "SKIP" $testname "" "migration tests are not supported with efi"
->> +            return 2
->> +        fi
->>           cmdline="MIGRATION=yes $cmdline"
->>       fi
->>       if find_word "panic" "$groups"; then
+>> @@ -56,20 +58,20 @@ if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
+>>   	EFI_CASE=dummy
+>>   fi
+>>   
+>> -: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_CASE"}"
+>> +: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_TESTNAME"}"
+>>   mkdir -p "$EFI_CASE_DIR"
+>>   
+>> -cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
+>> -echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
+>> +cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_CASE_DIR/"
+>> +echo "@echo -off" > "$EFI_CASE_DIR/startup.nsh"
+>>   if [ "$EFI_USE_DTB" = "y" ]; then
+>>   	qemu_args+=(-machine acpi=off)
+>>   	FDT_BASENAME="dtb"
+>> -	$(EFI_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_TEST/$EFI_CASE/$FDT_BASENAME" "${qemu_args[@]}")
+>> -	echo "setvar fdtfile -guid $EFI_VAR_GUID -rt =L\"$FDT_BASENAME\""  >> "$EFI_TEST/$EFI_CASE/startup.nsh"
+>> +	$(EFI_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_CASE_DIR/$FDT_BASENAME" "${qemu_args[@]}")
+>> +	echo "setvar fdtfile -guid $EFI_VAR_GUID -rt =L\"$FDT_BASENAME\""  >> "$EFI_CASE_DIR/startup.nsh"
+>>   fi
+>> -echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_TEST/$EFI_CASE/startup.nsh"
+>> +echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_CASE_DIR/startup.nsh"
+>>   
+>>   EFI_RUN=y $TEST_DIR/run \
+>>          -bios "$EFI_UEFI" \
+>> -       -drive file.dir="$EFI_TEST/$EFI_CASE/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
+>> +       -drive file.dir="$EFI_CASE_DIR/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
+>>          "${qemu_args[@]}"
 >> -- 
 >> 2.40.1
 >>
 > 
-> This isn't arm-specific, so we should drop the arm64 prefix from the patch
-> summary and get an ack from x86 people.
+> Otherwise
 > 
-
-Ok, I can fix it and respin.
-
-> Thanks,
-> drew
+> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 > 
 
 -- 
