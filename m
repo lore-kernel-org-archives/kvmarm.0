@@ -1,52 +1,53 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9690510A1D
-	for <kvmarm@lists.linux.dev>; Tue, 16 Jan 2024 06:58:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC3811184
+	for <kvmarm@lists.linux.dev>; Tue, 16 Jan 2024 06:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UW4I5w8Y"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b4HjneLK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705388332;
+	s=mimecast20190719; t=1705388334;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=MQ5GcXOhiGFSyn5vD4nd7pcGv9wo7rlPf51HBEjNCys=;
-	b=UW4I5w8YFTNeQZVgpKcToANPewy20DizCi+531lmD0vaB+6f/C6dYT4h4lj+T55+Sl9pVj
-	DlFRwEaqp0BY8EKVTQCq2baFJ+JdLRXEmWcYAsZaWyUb24NY8z4X5vjfiaprUuJ6wAHnol
-	ERkEhPESx0c12mgfvOFFIq7EA0OadvI=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-685-Kqpsa5f8POSfN7O59EGkcA-1; Tue,
- 16 Jan 2024 01:58:48 -0500
-X-MC-Unique: Kqpsa5f8POSfN7O59EGkcA-1
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tqq6wYIFEnT+LQV2qUAqyFES2NYVYOIc6yshT9Yaoeg=;
+	b=b4HjneLKVYcuwzh+HYM+FvitBaZZ9Wyzwczo0/R5pUYNdzQMKiMnJkOzeThjC8AQ2PdyKm
+	8tWjBGjT1Iqb3uoF4rRfPuU86glYJ+KOTDRIvNfiGMUb7jXy7/WhRsLCGU1Ze+k0zfhop/
+	XJkd4U/5pLKp8xT9mc0kVeLipwZIXig=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-286-_Kqv1i-AMLK86Exz2t7-UA-1; Tue, 16 Jan 2024 01:58:48 -0500
+X-MC-Unique: _Kqv1i-AMLK86Exz2t7-UA-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 33D171C05AC2;
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5A48D848942;
 	Tue, 16 Jan 2024 06:58:48 +0000 (UTC)
 Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 065693C25;
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4E48E3C25;
 	Tue, 16 Jan 2024 06:58:48 +0000 (UTC)
 From: Shaoqin Huang <shahuang@redhat.com>
 To: Andrew Jones <andrew.jones@linux.dev>,
 	kvmarm@lists.linux.dev
 Cc: Shaoqin Huang <shahuang@redhat.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	kvm@vger.kernel.org,
 	Nico Boehr <nrb@linux.ibm.com>,
-	Nikos Nikoleris <nikos.nikoleris@arm.com>,
-	Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-	Ricardo Koller <ricarkol@google.com>,
+	Thomas Huth <thuth@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
-	Thomas Huth <thuth@redhat.com>
-Subject: [kvm-unit-tests PATCH v3 0/3] arm64: runtime scripts improvements on efi
-Date: Tue, 16 Jan 2024 01:58:43 -0500
-Message-Id: <20240116065847.71623-1-shahuang@redhat.com>
+	Colton Lewis <coltonlewis@google.com>,
+	Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+	Nikos Nikoleris <nikos.nikoleris@arm.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v3 1/3] runtime: Fix the missing last_line
+Date: Tue, 16 Jan 2024 01:58:44 -0500
+Message-Id: <20240116065847.71623-2-shahuang@redhat.com>
+In-Reply-To: <20240116065847.71623-1-shahuang@redhat.com>
+References: <20240116065847.71623-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,42 +57,30 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-When I run the arm64 tests on efi, I found several runtime scripts issues. This
-patch series try to fix all the issues.
+The last_line is deleted by the 2607d2d6 ("arm64: Add an efi/run script").
+This lead to when SKIP test, the reason is missing. Fix the problem by
+adding last_line back.
 
-The first patch add a missing error reporting.
+Fixes: 2607d2d6 ("arm64: Add an efi/run script")
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+---
+ scripts/runtime.bash | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The second patch skip the migration tests when run on efi since it will always
-fail.
-
-The thrid patch fix the issue when parallel running tests on efi.
-
-Changelog:
-----------
-v2->v3:
-  - Collect the Reviewed-By.
-  - Drop the arm64 flag in patch summary of patch2.
-  - Small tweak to minimize the call to basename in patch3.
-
-v1->v2:
-  - Add the fixes tag in patch-1.
-  - Change the $last_line to embedeed format in patch-1.
-  - Move the check EFI into the check for migration, which decrease one check in
-  patch-2.
-  - Add more detailed comments about how tests fail in patch-3.
-
-v1: https://lore.kernel.org/all/20231129032123.2658343-1-shahuang@redhat.com/
-v2: https://lore.kernel.org/all/20231130032940.2729006-1-shahuang@redhat.com/
-
-Shaoqin Huang (3):
-  runtime: Fix the missing last_line
-  runtime: Skip the migration tests when run on EFI
-  arm64: efi: Make running tests on EFI can be parallel
-
- arm/efi/run          | 16 +++++++++-------
- scripts/runtime.bash |  6 +++++-
- 2 files changed, 14 insertions(+), 8 deletions(-)
-
+diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+index fc156f2f..c73fb024 100644
+--- a/scripts/runtime.bash
++++ b/scripts/runtime.bash
+@@ -149,7 +149,7 @@ function run()
+         fi
+ 
+         if [ ${skip} == true ]; then
+-            print_result "SKIP" $testname "" "$last_line"
++            print_result "SKIP" $testname "" "$(tail -1 <<<"$log")"
+             return 77
+         fi
+     }
 -- 
 2.40.1
 
