@@ -1,89 +1,136 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD4410A25
-	for <kvmarm@lists.linux.dev>; Tue, 16 Jan 2024 06:58:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 633CF12B61
+	for <kvmarm@lists.linux.dev>; Tue, 16 Jan 2024 08:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BkS3TyRQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705388333;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HlK+W/3Y6hR8zU8dV/B+PirvVRSMRiHzK52ecqQW9NI=;
-	b=BkS3TyRQZWM7DfgNa+8s2AAre/ex5T5+JdjFzXYpot4mRsEDq8foIF7Dul9FNG/pkWNQR2
-	gphWvm7p9BAC8Bx8Xkq3tJ9jWQRZONQEUJeOWP7+Q+pNo1cNJW9XIHDDQt4pGhRlHdw4C6
-	dmLlwMRu9S0MxYBkF1Mj1hiqWmMRgDc=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-26-1ekKJL4NPNGLoRnWJ1x7sA-1; Tue,
- 16 Jan 2024 01:58:49 -0500
-X-MC-Unique: 1ekKJL4NPNGLoRnWJ1x7sA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 798B63C025C1;
-	Tue, 16 Jan 2024 06:58:48 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6E3D13C25;
-	Tue, 16 Jan 2024 06:58:48 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: Andrew Jones <andrew.jones@linux.dev>,
-	kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
-	Nico Boehr <nrb@linux.ibm.com>,
-	Thomas Huth <thuth@redhat.com>,
-	Nikos Nikoleris <nikos.nikoleris@arm.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v3 2/3] runtime: Skip the migration tests when run on EFI
-Date: Tue, 16 Jan 2024 01:58:45 -0500
-Message-Id: <20240116065847.71623-3-shahuang@redhat.com>
-In-Reply-To: <20240116065847.71623-1-shahuang@redhat.com>
-References: <20240116065847.71623-1-shahuang@redhat.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f2lOTeVG"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-429d2ebdf05so663071cf.0
+        for <kvmarm@lists.linux.dev>; Tue, 16 Jan 2024 00:59:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1705395593; x=1706000393; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/igkgCyA152m1fzCehtUHeYlu0mhCasrXV541Dw4cvc=;
+        b=f2lOTeVGfd8anclzjN3wwHqZ1ohqed3/YEUZ/BE/JezKVinqA1vtrDLbsdx44NKvor
+         qhm2JfmGs2cer+zwkJky6a8e7xpSC4nNLmKhfXS3QZn/wlaSTKDqQoeAVJpPorECujk9
+         lyuXAyJqvGSXb7EqbavGDSkII1/HhhQ1gtx01PVBHypSicxAvldvJDY4uqcW/kiWi+Tp
+         itWbr8vy8jfVgh6uGTBsxQXTEE3crOgohVDKly7jZVC2+la4v2P5znv0ITrBxSgqnOuX
+         3HxfCcCyHRs/cP6FZwAVUJpO4//V7k73ZhOmCPdyN/T3d1eT8eezKl1qbEjEeywgqFit
+         TNOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705395593; x=1706000393;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/igkgCyA152m1fzCehtUHeYlu0mhCasrXV541Dw4cvc=;
+        b=PUB/cDbbR6FinZ6FZ1IyqycuK/c8fnZNN/3/zyIql0J1eseVF1ugoT8KyTAJ4UZPOk
+         9ywfDs25WXNMiekhz9sMCq2eoZBPyLko+KxMp4Qer4ifWrO7KMowToBCWZ1bglQNBv/m
+         Lz715V3zExrSTt52YLMqOhkyrsENzcxDILavqj5DcDcZhTtl3VkqG3Hb1d5eR7z3K8Ha
+         qf1NwHhueAJ5MULMZ0dQ6/8bWf6FFIEFg5v0V72bU/WbRaTMySd98biaBhRVojkLqrid
+         OpMioel/Z3PaBDRSVefUIqF0lOKJCGzC8OIi67Dmujbnnz5Pcp5llIpCxwR68IcMh8/h
+         FKZg==
+X-Gm-Message-State: AOJu0YyXAWaoGZadvv3mdiH4QtY7lQDGiDf/JHSju1v8TRLSrXSiMQ8Q
+	Nxqt7fRMCXo650Q1VgZFV0s6Yn46d3w3L3NWfYNimtVwiR2R
+X-Google-Smtp-Source: AGHT+IFqW6pcSkRl+kNnNA6UxnwDzJDioCsXMI2eqdzhDZzh6KY/0DXg2WWhBI5TtTkUDNvwGw5V/d5icdBQrzQcI5M=
+X-Received: by 2002:a05:622a:608e:b0:429:e35c:e3b7 with SMTP id
+ hf14-20020a05622a608e00b00429e35ce3b7mr294775qtb.18.1705395593175; Tue, 16
+ Jan 2024 00:59:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+References: <20230201125328.2186498-1-jean-philippe@linaro.org> <20230201125328.2186498-25-jean-philippe@linaro.org>
+In-Reply-To: <20230201125328.2186498-25-jean-philippe@linaro.org>
+From: Mostafa Saleh <smostafa@google.com>
+Date: Tue, 16 Jan 2024 08:59:41 +0000
+Message-ID: <CAFgf54qcTAru0Nvy1wH_tJMadOSW7Y3zEip5RTm+mtSa54Bymg@mail.gmail.com>
+Subject: Re: [RFC PATCH 24/45] KVM: arm64: smmu-v3: Setup stream table
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org, joro@8bytes.org, 
+	robin.murphy@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, 
+	oliver.upton@linux.dev, yuzenghui@huawei.com, dbrazdil@google.com, 
+	ryan.roberts@arm.com, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When running the migration tests on EFI, the migration will always fail
-since the efi/run use the vvfat format to run test, but the vvfat format
-does not support live migration. So those migration tests will always
-fail.
+Hi Jean,
 
-Instead of waiting for fail everytime when run migration tests on EFI,
-skip those tests if running on EFI.
+On Wed, Feb 1, 2023 at 12:59=E2=80=AFPM Jean-Philippe Brucker
+<jean-philippe@linaro.org> wrote:
+>
+> Map the stream table allocated by the host into the hypervisor address
+> space. When the host mappings are finalized, the table is unmapped from
+> the host. Depending on the host configuration, the stream table may have
+> one or two levels. Populate the level-2 stream table lazily.
+>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> ---
+>  include/kvm/arm_smmu_v3.h                   |   4 +
+>  arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c | 133 +++++++++++++++++++-
+>  2 files changed, 136 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/kvm/arm_smmu_v3.h b/include/kvm/arm_smmu_v3.h
+> index da36737bc1e0..fc67a3bf5709 100644
+> --- a/include/kvm/arm_smmu_v3.h
+> +++ b/include/kvm/arm_smmu_v3.h
+> @@ -24,6 +24,10 @@ struct hyp_arm_smmu_v3_device {
+>         u32                     cmdq_prod;
+>         u64                     *cmdq_base;
+>         size_t                  cmdq_log2size;
+> +       u64                     *strtab_base;
+> +       size_t                  strtab_num_entries;
+> +       size_t                  strtab_num_l1_entries;
+> +       u8                      strtab_split;
+>  };
+>
+>  extern size_t kvm_nvhe_sym(kvm_hyp_arm_smmu_v3_count);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c b/arch/arm64/kvm=
+/hyp/nvhe/iommu/arm-smmu-v3.c
+> index 36ee5724f36f..021bebebd40c 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
+> @@ -141,7 +141,6 @@ static int smmu_sync_cmd(struct hyp_arm_smmu_v3_devic=
+e *smmu)
+>         return smmu_wait_event(smmu, smmu_cmdq_empty(smmu));
+>  }
+>
+> -__maybe_unused
+>  static int smmu_send_cmd(struct hyp_arm_smmu_v3_device *smmu,
+>                          struct arm_smmu_cmdq_ent *cmd)
+>  {
+> @@ -153,6 +152,82 @@ static int smmu_send_cmd(struct hyp_arm_smmu_v3_devi=
+ce *smmu,
+>         return smmu_sync_cmd(smmu);
+>  }
+>
+> +__maybe_unused
+> +static int smmu_sync_ste(struct hyp_arm_smmu_v3_device *smmu, u32 sid)
+> +{
+> +       struct arm_smmu_cmdq_ent cmd =3D {
+> +               .opcode =3D CMDQ_OP_CFGI_STE,
+> +               .cfgi.sid =3D sid,
+> +               .cfgi.leaf =3D true,
+> +       };
+> +
+> +       return smmu_send_cmd(smmu, &cmd);
+> +}
+> +
+I see the page tables are properly configured for ARM_SMMU_FEAT_COHERENCY b=
+ut no
+handling for the STE or CMDQ, I believe here we should have something as:
+if (!(smmu->features & ARM_SMMU_FEAT_COHERENCY))
+        kvm_flush_dcache_to_poc(step, STRTAB_STE_DWORDS << 3);
 
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
- scripts/runtime.bash | 4 ++++
- 1 file changed, 4 insertions(+)
+Similarly in "smmu_add_cmd" for the command queue. Or use NC mapping
+(which doesn't exist
+upstream as far as I can see)
 
-diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index c73fb024..7deb047c 100644
---- a/scripts/runtime.bash
-+++ b/scripts/runtime.bash
-@@ -156,6 +156,10 @@ function run()
- 
-     cmdline=$(get_cmdline $kernel)
-     if find_word "migration" "$groups"; then
-+        if [ "${CONFIG_EFI}" == "y" ]; then
-+            print_result "SKIP" $testname "" "migration tests are not supported with efi"
-+            return 2
-+        fi
-         cmdline="MIGRATION=yes $cmdline"
-     fi
-     if find_word "panic" "$groups"; then
--- 
-2.40.1
-
+Thanks,
+Mostafa
