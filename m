@@ -1,89 +1,107 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15A46FBF
-	for <kvmarm@lists.linux.dev>; Tue, 16 Jan 2024 03:26:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4TDZCF1jR4zvTrP;
-	Tue, 16 Jan 2024 11:25:29 +0800 (CST)
-Received: from dggpeml500004.china.huawei.com (unknown [7.185.36.140])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8349614053B;
-	Tue, 16 Jan 2024 11:26:37 +0800 (CST)
-Received: from [10.174.186.25] (10.174.186.25) by
- dggpeml500004.china.huawei.com (7.185.36.140) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 16 Jan 2024 11:26:25 +0800
-Message-ID: <a481ef04-ddd2-dfc1-41b1-d2ec45c6a3b5@huawei.com>
-Date: Tue, 16 Jan 2024 11:26:08 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDAB8495
+	for <kvmarm@lists.linux.dev>; Tue, 16 Jan 2024 06:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LXnWBcz6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705384894;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=WlPhpBHgPBW4epHtfgvsYfoDGE7LvKbEMtJ+P0WHH8k=;
+	b=LXnWBcz6lP8a0EPjpjEYhlMmz9EQT0mWlI20wH9FEHLfpPYWEO2AT4B5mhjO2BXRUQYAEf
+	m2HM2CKyRpQ3x4XyxD66YThxEkHr2HGE5QFIG/yterhY7Pmv4E52s/IpbOUD+McgZwyxWT
+	8jjx48bGrzAsCRJsBCS3xl0IHras788=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-3-oJch4i_sP22KV71D6xItuA-1; Tue, 16 Jan 2024 01:01:31 -0500
+X-MC-Unique: oJch4i_sP22KV71D6xItuA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5DAFB839BB3;
+	Tue, 16 Jan 2024 06:01:31 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id EADEC2027042;
+	Tue, 16 Jan 2024 06:01:30 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev
+Cc: Eric Auger <eauger@redhat.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v3 0/5] KVM: selftests: aarch64: Introduce pmu_event_filter_test
+Date: Tue, 16 Jan 2024 01:01:18 -0500
+Message-Id: <20240116060129.55473-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Content-Language: en-US
-From: "sundongxu (A)" <sundongxu3@huawei.com>
-To: <maz@kernel.org>, <oliver.upton@linux.dev>, <yuzenghui@huawei.com>,
-	<james.morse@arm.com>, <suzuki.poulose@arm.com>, <will@kernel.org>,
-	<catalin.marinas@arm.com>
-CC: <wanghaibin.wang@huawei.com>, <kvmarm@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-Subject: [bug report] GICv4.1: VM performance degradation due to not trapping
- vCPU WFI
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500004.china.huawei.com (7.185.36.140)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-Hi Guys,
+The test is inspired by the pmu_event_filter_test which implemented by x86. On
+the arm64 platform, there is the same ability to set the pmu_event_filter
+through the KVM_ARM_VCPU_PMU_V3_FILTER attribute. So add the test for arm64.
 
-We found a problem about GICv4/4.1, for example:
-We use QEMU to start a VM (4 vCPUs and 8G memory), VM disk was
-configured with virtio, and the network is configured with vhost-net,
-the CPU affinity of the vCPU and emulator is as follows, in VM xml:
+The series first move some pmu common code from vpmu_counter_access to
+lib/aarch64/vpmu.c and include/aarch64/vpmu.h, which can be used by
+pmu_event_filter_test. Then fix a bug related to the [enable|disable]_counter,
+and at last, implement the test itself.
 
-  <cputune>
-    <vcpupin vcpu='0' cpuset='4'/>
-    <vcpupin vcpu='1' cpuset='5'/>
-    <vcpupin vcpu='2' cpuset='6'/>
-    <vcpupin vcpu='3' cpuset='7'/>
-    <emulatorpin cpuset='4,5,6,7'/>
-  </cputune>
+Changelog:
+----------
+v2->v3:
+  - Check the pmceid in guest code instead of pmu event count since different
+  hardware may have different event count result, check pmceid makes it stable
+  on different platform.                        [Eric]
+  - Some typo fixed and commit message improved.
 
-Running Mysql in the VM, and sysbench (Mysql benchmark) on the host,
-the performance index is tps, the higher the better.
-If the host only enabled GICv3, the tps will be around 1400.
-If the host enabled GICv4.1, other configurations remain unchanged, the
-tps will be around 40.
+v1->v2:
+  - Improve the commit message.                 [Eric]
+  - Fix the bug in [enable|disable]_counter.    [Raghavendra & Marc]
+  - Add the check if kvm has attr KVM_ARM_VCPU_PMU_V3_FILTER.
+  - Add if host pmu support the test event throught pmceid0.
+  - Split the test_invalid_filter() to another patch. [Eric]
 
-We found that when the host enabled GICv4.1, because vSGI is directly
-injected to VM, and most time vCPU exclusively occupy the pCPU, vCPU
-will not trap when executing the WFI instruction. Then from the host
-view, the CPU usage of vCPU0~vCPU3 is almost 100%. When running mysql
-service in VM, the vhost-net and qemu processes also need to obtain
-enough CPU time, but unfortunately these processes cannot get that much
-time (for example, only GICv3 enabled, the cpu usage of vhost-net is
-about 43%, but with GICv4.1 enabled, it becomes 0~2%). During the test,
-it was found that vhost-net sleeps and wakes up very frequently. When
-vhost-net wakes up, it often cannot obtain CPU in time (because of
-wake-up preemption check). After waking up, vhost-net will usually run
-for a short period of time before going to sleep again.
+v1: https://lore.kernel.org/all/20231123063750.2176250-1-shahuang@redhat.com/
+v2: https://lore.kernel.org/all/20231129072712.2667337-1-shahuang@redhat.com/
 
-If the host enabled GICv4.1, and force vCPU to trap when executing WFI,
-the tps will be around 1400.
+Shaoqin Huang (5):
+  KVM: selftests: aarch64: Make the [create|destroy]_vpmu_vm() public
+  KVM: selftests: aarch64: Move pmu helper functions into vpmu.h
+  KVM: selftests: aarch64: Fix the buggy [enable|disable]_counter
+  KVM: selftests: aarch64: Introduce pmu_event_filter_test
+  KVM: selftests: aarch64: Add invalid filter test in
+    pmu_event_filter_test
 
-On the other hand, when vCPU executes WFI instruction without trapping,
-the vcpu wake-up delay will be significantly improved. For example, the
-result of running cyclictest in VM:
-WFI trap           6us
-WFI no trap        2us
+ tools/testing/selftests/kvm/Makefile          |   2 +
+ .../kvm/aarch64/pmu_event_filter_test.c       | 255 ++++++++++++++++++
+ .../kvm/aarch64/vpmu_counter_access.c         | 218 ++-------------
+ .../selftests/kvm/include/aarch64/vpmu.h      | 135 ++++++++++
+ .../testing/selftests/kvm/lib/aarch64/vpmu.c  |  74 +++++
+ 5 files changed, 490 insertions(+), 194 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/vpmu.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vpmu.c
 
-Currently, I add a KVM module parameter to control whether the vCPU
-traps (by set or clear HCR_TWI) when executing the WFI instruction with
-host enabled GICv4/4.1, and by default, vCPU traps are set.
+-- 
+2.40.1
 
-Or, it there a better way?
