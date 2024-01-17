@@ -1,27 +1,45 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A24952134E
-	for <kvmarm@lists.linux.dev>; Wed, 17 Jan 2024 14:53:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C0D21A0A;
+	Wed, 17 Jan 2024 15:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705503213; cv=none; b=d5tQ/JMeRbH9XwIBD7WW1im6Dncx/qCbW2xYetXHNZl8lH75KJh1HwdlgjNEMi4cyvIeE/KiDd0RyxO1notId8/YPdJR1ADWKHeR/r5adVO4k0nMBNaGgXK+OnPFUsJIyz81HgEhFsVurYpUlly2Ip0D2tulCY4mCvVkDym7DIU=
+	t=1705506793; cv=none; b=dfm5/WTjgu4O0DmVbChLXRLDTMZG8aqfturozOA3b9dM2vqiQPIXz5CeYkuKLrZcGYMYL1nqvJFz+II5Zf0yvTIeWmnWZ0qPN2Gjii3D2YrpPpXnC39iUTKMlj9f+it22yYS3eO3Tqrho5BXpoL8hWTrqLYTmhnGEe8Hqn9pQds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705503213; c=relaxed/simple;
-	bh=UQZv9R5R44pjsYklVFLVGdfBf8OGFpGGbP7oXjVdzdg=;
-	h=Received:Received:Date:From:To:Cc:Subject:Message-ID:References:
-	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To; b=Kwon49zVdZN5vdyokkxmVjNjtcJKD/kR8pcCnNxP93yLyVxcQkvJlorTZVmYJAjsM5EzT0QWvjv6GN4VAX4WrQxZU0HSz6Gb6Kg8RCwVxTYnB6xMt5GMxp9GfOZHZpEP/5VG234MY+ZS2cgBBXdQYMfWdl5JQf0P1SJe2Nde7rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 586A111FB;
-	Wed, 17 Jan 2024 06:54:10 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 28EB93F5A1;
-	Wed, 17 Jan 2024 06:53:22 -0800 (PST)
-Date: Wed, 17 Jan 2024 14:53:16 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	s=arc-20240116; t=1705506793; c=relaxed/simple;
+	bh=m31gOYaX0qNd+PNRQKpGXkFbQk6HqDktKfiWaV/M0Zc=;
+	h=Received:DKIM-Signature:Received:Date:Message-ID:From:To:Cc:
+	 Subject:In-Reply-To:References:User-Agent:MIME-Version:
+	 Content-Type:X-SA-Exim-Connect-IP:X-SA-Exim-Rcpt-To:
+	 X-SA-Exim-Mail-From:X-SA-Exim-Scanned; b=Uf6GmUkz2NsXeKFIp43lBhrd4bdXFYnesQ8lupjpAgrFcHLd80sAW7gSIGxAFsV+p3i6Uoi863dgFPJNeQL+XH8itQZ1q6zn602UhJ1csQU5mVmHFdTV6essf7ODyr+Er08bqXftj4PItlGBA95ZK37ZsOdovCgexu/D0sZIQrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=No6p3VHr; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="No6p3VHr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B911CC433C7;
+	Wed, 17 Jan 2024 15:53:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705506792;
+	bh=m31gOYaX0qNd+PNRQKpGXkFbQk6HqDktKfiWaV/M0Zc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=No6p3VHrJk+lOK8M/OFXrG8QUoTSwAuYU3b+EX4/zB+0xCKfy/svvSfxZKF6XIOcA
+	 ySsp92UusHfM0DjpY9hiepe2oEN0aGiT1KGFk39XSnrfdO2ViBIGFr344KJ8OEhaf2
+	 YtJGO8udmg86KWyAdWQs7XO4a22zpAQ//P6d3WUgNlylrkcPNZqXUwlK7tK8t/CQ6B
+	 zYBA6rRqjGmADJFNEvndYoeOlMddNVXvOPf99BbjyVJe8Y0eT4feD9aAtfXnxZgSgm
+	 nqDw3/mayD61ZBKKxn9TwXlJWn0RC1wD3+CiZncVPclP8x7wxMriAFbdzVS+HSPFWJ
+	 H09XAeTbf0K2A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rQ8E1-00CTdb-FJ;
+	Wed, 17 Jan 2024 15:53:09 +0000
+Date: Wed, 17 Jan 2024 15:53:09 +0000
+Message-ID: <86ttnc7y8q.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Andre Przywara <andre.przywara@arm.com>,
@@ -36,118 +54,101 @@ Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v11 19/43] KVM: arm64: nv: Handle shadow stage 2 page
- faults
-Message-ID: <20240117145316.GA398843@e124191.cambridge.arm.com>
+Subject: Re: [PATCH v11 19/43] KVM: arm64: nv: Handle shadow stage 2 page faults
+In-Reply-To: <20240117145316.GA398843@e124191.cambridge.arm.com>
 References: <20231120131027.854038-1-maz@kernel.org>
- <20231120131027.854038-20-maz@kernel.org>
+	<20231120131027.854038-20-maz@kernel.org>
+	<20240117145316.GA398843@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231120131027.854038-20-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
-
-Drive by thing I spotted.
-
-On Mon, Nov 20, 2023 at 01:10:03PM +0000, Marc Zyngier wrote:
-> If we are faulting on a shadow stage 2 translation, we first walk the
-> guest hypervisor's stage 2 page table to see if it has a mapping. If
-> not, we inject a stage 2 page fault to the virtual EL2. Otherwise, we
-> create a mapping in the shadow stage 2 page table.
+On Wed, 17 Jan 2024 14:53:16 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> Note that we have to deal with two IPAs when we got a shadow stage 2
-> page fault. One is the address we faulted on, and is in the L2 guest
-> phys space. The other is from the guest stage-2 page table walk, and is
-> in the L1 guest phys space.  To differentiate them, we rename variables
-> so that fault_ipa is used for the former and ipa is used for the latter.
+> Hi Marc,
 > 
-> Co-developed-by: Christoffer Dall <christoffer.dall@linaro.org>
-> Co-developed-by: Jintack Lim <jintack.lim@linaro.org>
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> [maz: rewrote this multiple times...]
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h |  7 +++
->  arch/arm64/include/asm/kvm_nested.h  | 19 ++++++
->  arch/arm64/kvm/mmu.c                 | 89 ++++++++++++++++++++++++----
->  arch/arm64/kvm/nested.c              | 48 +++++++++++++++
->  4 files changed, 153 insertions(+), 10 deletions(-)
+> Drive by thing I spotted.
 > 
-[.. snip ..]
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 588ce46c0ad0..41de7616b735 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1412,14 +1412,16 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
->  }
->  
->  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> -			  struct kvm_memory_slot *memslot, unsigned long hva,
-> -			  unsigned long fault_status)
-> +			  struct kvm_s2_trans *nested,
-> +			  struct kvm_memory_slot *memslot,
-> +			  unsigned long hva, unsigned long fault_status)
->  {
->  	int ret = 0;
->  	bool write_fault, writable, force_pte = false;
->  	bool exec_fault, mte_allowed;
->  	bool device = false;
->  	unsigned long mmu_seq;
-> +	phys_addr_t ipa = fault_ipa;
->  	struct kvm *kvm = vcpu->kvm;
->  	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
->  	struct vm_area_struct *vma;
-> @@ -1504,10 +1506,38 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	}
->  
->  	vma_pagesize = 1UL << vma_shift;
-> +
-> +	if (nested) {
-> +		unsigned long max_map_size;
-> +
-> +		max_map_size = force_pte ? PUD_SIZE : PAGE_SIZE;
+> On Mon, Nov 20, 2023 at 01:10:03PM +0000, Marc Zyngier wrote:
+> > If we are faulting on a shadow stage 2 translation, we first walk the
+> > guest hypervisor's stage 2 page table to see if it has a mapping. If
+> > not, we inject a stage 2 page fault to the virtual EL2. Otherwise, we
+> > create a mapping in the shadow stage 2 page table.
+> > 
+> > Note that we have to deal with two IPAs when we got a shadow stage 2
+> > page fault. One is the address we faulted on, and is in the L2 guest
+> > phys space. The other is from the guest stage-2 page table walk, and is
+> > in the L1 guest phys space.  To differentiate them, we rename variables
+> > so that fault_ipa is used for the former and ipa is used for the latter.
+> > 
+> > Co-developed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > Co-developed-by: Jintack Lim <jintack.lim@linaro.org>
+> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> > [maz: rewrote this multiple times...]
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_emulate.h |  7 +++
+> >  arch/arm64/include/asm/kvm_nested.h  | 19 ++++++
+> >  arch/arm64/kvm/mmu.c                 | 89 ++++++++++++++++++++++++----
+> >  arch/arm64/kvm/nested.c              | 48 +++++++++++++++
+> >  4 files changed, 153 insertions(+), 10 deletions(-)
+> > 
+> [.. snip ..]
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 588ce46c0ad0..41de7616b735 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1412,14 +1412,16 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+> >  }
+> >  
+> >  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> > -			  struct kvm_memory_slot *memslot, unsigned long hva,
+> > -			  unsigned long fault_status)
+> > +			  struct kvm_s2_trans *nested,
+> > +			  struct kvm_memory_slot *memslot,
+> > +			  unsigned long hva, unsigned long fault_status)
+> >  {
+> >  	int ret = 0;
+> >  	bool write_fault, writable, force_pte = false;
+> >  	bool exec_fault, mte_allowed;
+> >  	bool device = false;
+> >  	unsigned long mmu_seq;
+> > +	phys_addr_t ipa = fault_ipa;
+> >  	struct kvm *kvm = vcpu->kvm;
+> >  	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
+> >  	struct vm_area_struct *vma;
+> > @@ -1504,10 +1506,38 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  	}
+> >  
+> >  	vma_pagesize = 1UL << vma_shift;
+> > +
+> > +	if (nested) {
+> > +		unsigned long max_map_size;
+> > +
+> > +		max_map_size = force_pte ? PUD_SIZE : PAGE_SIZE;
+> 
+> This seems like the wrong way around, presumably you want PAGE_SIZE for force_pte?
 
-This seems like the wrong way around, presumably you want PAGE_SIZE for force_pte?
+This is hilarious. I really shouldn't write code these days.
 
-> +
-> +		ipa = kvm_s2_trans_output(nested);
-> +
-> +		/*
-> +		 * If we're about to create a shadow stage 2 entry, then we
-> +		 * can only create a block mapping if the guest stage 2 page
-> +		 * table uses at least as big a mapping.
-> +		 */
-> +		max_map_size = min(kvm_s2_trans_size(nested), max_map_size);
-> +
-> +		/*
-> +		 * Be careful that if the mapping size falls between
-> +		 * two host sizes, take the smallest of the two.
-> +		 */
-> +		if (max_map_size >= PMD_SIZE && max_map_size < PUD_SIZE)
-> +			max_map_size = PMD_SIZE;
-> +		else if (max_map_size >= PAGE_SIZE && max_map_size < PMD_SIZE)
-> +			max_map_size = PAGE_SIZE;
-> +
-> +		force_pte = (max_map_size == PAGE_SIZE);
-> +		vma_pagesize = min(vma_pagesize, (long)max_map_size);
-> +	}
-> +
->  	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
->  		fault_ipa &= ~(vma_pagesize - 1);
->  
-> -	gfn = fault_ipa >> PAGE_SHIFT;
-> +	gfn = ipa >> PAGE_SHIFT;
->  	mte_allowed = kvm_vma_mte_allowed(vma);
->  
->  	/* Don't use the VMA after the unlock -- it may have vanished */
-[.. snip ..]
+Thanks a lot for spotting this one, I'll fix that right away!
 
-Thanks,
-Joey
+Cheers,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
