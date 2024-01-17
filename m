@@ -1,188 +1,153 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BDB3200D4
-	for <kvmarm@lists.linux.dev>; Wed, 17 Jan 2024 14:21:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A24952134E
+	for <kvmarm@lists.linux.dev>; Wed, 17 Jan 2024 14:53:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705501263; cv=none; b=k8rbJOIB2lG/EcqajiD2dIFBjzrs+ySqHqT8LC9MBv1CNMeTrtlvytDXx4B/riAfmwCwuEuK9yFeZ6KDp9KIRinLxcvrXIjl0ofCaX9RKxB4yuvI0g9iR+if70qierPEuK+pkMrCEdTYXibyWmMYYTafqWLUCePEcfvlmlqKI+c=
+	t=1705503213; cv=none; b=d5tQ/JMeRbH9XwIBD7WW1im6Dncx/qCbW2xYetXHNZl8lH75KJh1HwdlgjNEMi4cyvIeE/KiDd0RyxO1notId8/YPdJR1ADWKHeR/r5adVO4k0nMBNaGgXK+OnPFUsJIyz81HgEhFsVurYpUlly2Ip0D2tulCY4mCvVkDym7DIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705501263; c=relaxed/simple;
-	bh=QTt3NxgnO3h06z8kuyBtWXpxxpfLImOSJaHvIQ9Cp4g=;
-	h=Received:Received:Received:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:Content-Language:To:CC:References:From:
-	 In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 X-Originating-IP:X-ClientProxiedBy; b=IojSjxRDXORDiMfi3F95CriWvin/fLQBU4nQwnpjPFxj8dcWtIUvy6fT84VvqXOXhACfH074NCKEMR7JxxI3U+PsZuqEh277IrALp9gvLhtylw72BYsk9So5ogNpQYsnIsBgl6PH/B9K6ixNlqNAJ/Yl7ZKLJb5IMjma64IQsvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4TFSh410xQzsW0k;
-	Wed, 17 Jan 2024 22:20:04 +0800 (CST)
-Received: from dggpeml500004.china.huawei.com (unknown [7.185.36.140])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0DE1414053B;
-	Wed, 17 Jan 2024 22:20:43 +0800 (CST)
-Received: from [10.174.186.25] (10.174.186.25) by
- dggpeml500004.china.huawei.com (7.185.36.140) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 17 Jan 2024 22:20:38 +0800
-Message-ID: <89fe1503-6d62-90ca-5edb-e11c74846a00@huawei.com>
-Date: Wed, 17 Jan 2024 22:20:32 +0800
+	s=arc-20240116; t=1705503213; c=relaxed/simple;
+	bh=UQZv9R5R44pjsYklVFLVGdfBf8OGFpGGbP7oXjVdzdg=;
+	h=Received:Received:Date:From:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To; b=Kwon49zVdZN5vdyokkxmVjNjtcJKD/kR8pcCnNxP93yLyVxcQkvJlorTZVmYJAjsM5EzT0QWvjv6GN4VAX4WrQxZU0HSz6Gb6Kg8RCwVxTYnB6xMt5GMxp9GfOZHZpEP/5VG234MY+ZS2cgBBXdQYMfWdl5JQf0P1SJe2Nde7rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 586A111FB;
+	Wed, 17 Jan 2024 06:54:10 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 28EB93F5A1;
+	Wed, 17 Jan 2024 06:53:22 -0800 (PST)
+Date: Wed, 17 Jan 2024 14:53:16 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Darren Hart <darren@os.amperecomputing.com>,
+	Jintack Lim <jintack@cs.columbia.edu>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Miguel Luis <miguel.luis@oracle.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v11 19/43] KVM: arm64: nv: Handle shadow stage 2 page
+ faults
+Message-ID: <20240117145316.GA398843@e124191.cambridge.arm.com>
+References: <20231120131027.854038-1-maz@kernel.org>
+ <20231120131027.854038-20-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [bug report] GICv4.1: VM performance degradation due to not
- trapping vCPU WFI
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-CC: <oliver.upton@linux.dev>, <yuzenghui@huawei.com>, <james.morse@arm.com>,
-	<suzuki.poulose@arm.com>, <will@kernel.org>, <catalin.marinas@arm.com>,
-	<wanghaibin.wang@huawei.com>, <kvmarm@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<jiangkunkun@huawei.com>
-References: <a481ef04-ddd2-dfc1-41b1-d2ec45c6a3b5@huawei.com>
- <86v87t8ras.wl-maz@kernel.org>
-From: "sundongxu (A)" <sundongxu3@huawei.com>
-In-Reply-To: <86v87t8ras.wl-maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500004.china.huawei.com (7.185.36.140)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231120131027.854038-20-maz@kernel.org>
 
 Hi Marc,
 
-Thank you for your reply.
+Drive by thing I spotted.
 
-On 2024/1/16 19:13, Marc Zyngier wrote:
-> On Tue, 16 Jan 2024 03:26:08 +0000,
-> "sundongxu (A)" <sundongxu3@huawei.com> wrote:
->>
->> Hi Guys,
->>
->> We found a problem about GICv4/4.1, for example:
->> We use QEMU to start a VM (4 vCPUs and 8G memory), VM disk was
->> configured with virtio, and the network is configured with vhost-net,
->> the CPU affinity of the vCPU and emulator is as follows, in VM xml:
->>
->>   <cputune>
->>     <vcpupin vcpu='0' cpuset='4'/>
->>     <vcpupin vcpu='1' cpuset='5'/>
->>     <vcpupin vcpu='2' cpuset='6'/>
->>     <vcpupin vcpu='3' cpuset='7'/>
->>     <emulatorpin cpuset='4,5,6,7'/>
->>   </cputune>
->>
->> Running Mysql in the VM, and sysbench (Mysql benchmark) on the host,
->> the performance index is tps, the higher the better.
->> If the host only enabled GICv3, the tps will be around 1400.
->> If the host enabled GICv4.1, other configurations remain unchanged, the
->> tps will be around 40.
->>
->> We found that when the host enabled GICv4.1, because vSGI is directly
->> injected to VM, and most time vCPU exclusively occupy the pCPU, vCPU
->> will not trap when executing the WFI instruction. Then from the host
->> view, the CPU usage of vCPU0~vCPU3 is almost 100%. When running mysql
->> service in VM, the vhost-net and qemu processes also need to obtain
->> enough CPU time, but unfortunately these processes cannot get that much
->> time (for example, only GICv3 enabled, the cpu usage of vhost-net is
->> about 43%, but with GICv4.1 enabled, it becomes 0~2%). During the test,
->> it was found that vhost-net sleeps and wakes up very frequently. When
->> vhost-net wakes up, it often cannot obtain CPU in time (because of
->> wake-up preemption check). After waking up, vhost-net will usually run
->> for a short period of time before going to sleep again.
+On Mon, Nov 20, 2023 at 01:10:03PM +0000, Marc Zyngier wrote:
+> If we are faulting on a shadow stage 2 translation, we first walk the
+> guest hypervisor's stage 2 page table to see if it has a mapping. If
+> not, we inject a stage 2 page fault to the virtual EL2. Otherwise, we
+> create a mapping in the shadow stage 2 page table.
 > 
-> Can you elaborate on this preemption check issue?
-
-Well, I forgot to post the version of my kernel(5.10).
-I've noticed that the scheduler of mainline kernel is EEVDF, while my
-kernel's scheduler is still CFS. I feel sorry if my report misled you.
-
-With the CFS scheduler, if vhost-net thread wake-up, the scheduler
-need to check whether vhost-net could preempt vCPU
-(check_preempt_wakeup->wakeup_preempt_entity).
-From my understanding, if vhost-net want to run on CPU，the conditions
-need to meet：
-1. the difference between vhost-net's vruntime and current running
-thread's vruntime exceeds sched_wakeup_granularity_ns (in my host,
-it's 15ms, and the sched_latency_ns is 24ms).
-2. If condition 1 is not met, the CFS scheduler thinks vhost-net
-should not preempt current thread, the vhost-net will be enqueued and
-wait for the tick preempt check. In tick preempt check, the vhost-net
-could run when the growth of current thread vruntime is already higher
-than sched_min_granularity_ns (in my host, it's 10ms), since the last
-time current thread was preempted.
-So, if vhost-net wake-up preemption fails, it needs to wait for a
-while, but in the meantime, maybe vCPU is just running WFI.
-
-Frankly, the sched_wakeup_granularity_ns (default 4ms) and
-sched_wakeup_granularity_ns(default 3ms) are set too high, So I reset
-these parameters to default value and test again. Here is the result:
-If the host enabled GICv3, the tps will be around 1300.
-If the host enabled GICv4.1 with WFI no trapping, the tps will be
-around 235.
-
-I tested the kernel 6.5rc2 (git checkout 752182b24bf4), it has the
-same issue.
-
-And I also tested it in mainline kernel (6.7, with EEVDF), the result
-as below:
-If the host only enabled GICv3, the tps will be around 377.
-If the host enabled GICv4.1 with WFI no trapping, the tps will be
-around 323.
-If the host enabled GICv4.1 with WFI trapping, the tps will be around
-387.
-With host enabled GICv3 the tps is much lower than when the scheduler
-is CFS. Looks like there's a serious issue, but I haven't found it yet.
-
+> Note that we have to deal with two IPAs when we got a shadow stage 2
+> page fault. One is the address we faulted on, and is in the L2 guest
+> phys space. The other is from the guest stage-2 page table walk, and is
+> in the L1 guest phys space.  To differentiate them, we rename variables
+> so that fault_ipa is used for the former and ipa is used for the latter.
 > 
->>
->> If the host enabled GICv4.1, and force vCPU to trap when executing WFI,
->> the tps will be around 1400.
->>
->> On the other hand, when vCPU executes WFI instruction without trapping,
->> the vcpu wake-up delay will be significantly improved. For example, the
->> result of running cyclictest in VM:
->> WFI trap           6us
->> WFI no trap        2us
->>
->> Currently, I add a KVM module parameter to control whether the vCPU
->> traps (by set or clear HCR_TWI) when executing the WFI instruction with
->> host enabled GICv4/4.1, and by default, vCPU traps are set.
->>
->> Or, it there a better way?
+> Co-developed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Co-developed-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> [maz: rewrote this multiple times...]
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h |  7 +++
+>  arch/arm64/include/asm/kvm_nested.h  | 19 ++++++
+>  arch/arm64/kvm/mmu.c                 | 89 ++++++++++++++++++++++++----
+>  arch/arm64/kvm/nested.c              | 48 +++++++++++++++
+>  4 files changed, 153 insertions(+), 10 deletions(-)
 > 
-> As you foudn out, KVM has an adaptive way of dealing with HCR_TWI,
-> turning it off when the vcpu is alone in the run queue. Which means it
-> doesn't compete with any other thread. How comes the other threads
-> don't register as being runnable?
+[.. snip ..]
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 588ce46c0ad0..41de7616b735 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1412,14 +1412,16 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+>  }
+>  
+>  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> -			  struct kvm_memory_slot *memslot, unsigned long hva,
+> -			  unsigned long fault_status)
+> +			  struct kvm_s2_trans *nested,
+> +			  struct kvm_memory_slot *memslot,
+> +			  unsigned long hva, unsigned long fault_status)
+>  {
+>  	int ret = 0;
+>  	bool write_fault, writable, force_pte = false;
+>  	bool exec_fault, mte_allowed;
+>  	bool device = false;
+>  	unsigned long mmu_seq;
+> +	phys_addr_t ipa = fault_ipa;
+>  	struct kvm *kvm = vcpu->kvm;
+>  	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
+>  	struct vm_area_struct *vma;
+> @@ -1504,10 +1506,38 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	}
+>  
+>  	vma_pagesize = 1UL << vma_shift;
+> +
+> +	if (nested) {
+> +		unsigned long max_map_size;
+> +
+> +		max_map_size = force_pte ? PUD_SIZE : PAGE_SIZE;
 
-Actually，other threads is registered as runnable，but they may not get
-CPU immediately. 
+This seems like the wrong way around, presumably you want PAGE_SIZE for force_pte?
 
-> 
-> Effectively, we apply the same principle to vSGIs as to vLPIs, and it
-> was found that this heuristic was pretty beneficial to vLPIs. I'm a
-> bit surprised that vSGIs are so different in their usage pattern.
-
-IMO, the point is hypervisor not trapping vCPU WFI, rather than
-vSGI/vLPI usage pattern.
-
-> 
-> Does it help if you move your "emulatorpin" to some other physical
-> CPUs?
-
-Yes，it does, in kernel 5.10 or 6.5rc1.
+> +
+> +		ipa = kvm_s2_trans_output(nested);
+> +
+> +		/*
+> +		 * If we're about to create a shadow stage 2 entry, then we
+> +		 * can only create a block mapping if the guest stage 2 page
+> +		 * table uses at least as big a mapping.
+> +		 */
+> +		max_map_size = min(kvm_s2_trans_size(nested), max_map_size);
+> +
+> +		/*
+> +		 * Be careful that if the mapping size falls between
+> +		 * two host sizes, take the smallest of the two.
+> +		 */
+> +		if (max_map_size >= PMD_SIZE && max_map_size < PUD_SIZE)
+> +			max_map_size = PMD_SIZE;
+> +		else if (max_map_size >= PAGE_SIZE && max_map_size < PMD_SIZE)
+> +			max_map_size = PAGE_SIZE;
+> +
+> +		force_pte = (max_map_size == PAGE_SIZE);
+> +		vma_pagesize = min(vma_pagesize, (long)max_map_size);
+> +	}
+> +
+>  	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
+>  		fault_ipa &= ~(vma_pagesize - 1);
+>  
+> -	gfn = fault_ipa >> PAGE_SHIFT;
+> +	gfn = ipa >> PAGE_SHIFT;
+>  	mte_allowed = kvm_vma_mte_allowed(vma);
+>  
+>  	/* Don't use the VMA after the unlock -- it may have vanished */
+[.. snip ..]
 
 Thanks,
-	Dongxu
-> 
-> Thanks,
-> 
-> 	M.
-> 
-
+Joey
