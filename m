@@ -1,36 +1,36 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C20322EFE;
-	Wed, 17 Jan 2024 23:07:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF11022F17;
+	Wed, 17 Jan 2024 23:07:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705532841; cv=none; b=rdQIBAPwEBGdiL4gkbJWikBQYVSZPk7K2zih4tkqsR0OVN8euEwQ+53W0MTYKWj3zxX4twaUy6lgjLoXQHbaxMiTOH0ABt+3wJB0n3Ee57skMMnD5je2ItRN/8kE3Sr9bYMYhDyKWvUMRIZi6ITOcadef4Cvu+lHdRk7fXhNwWc=
+	t=1705532841; cv=none; b=S9kDCAWmz2Oc+2w7wFFPKNvoWlGySzjDUZliGQ6inWzRy/E+lpTXsx4NayTeYX2SO9+Zx6fljQ9sBDP76EgcPZ1S03yIhCpy02lwFdWLBkucoNdw4WaB0AV5JscZx+PmF8i9vJ5F6NCP3kfqk1vZQ2wigDoYRwQRVkY8MLILSGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1705532841; c=relaxed/simple;
-	bh=qe4FjNte+EfV+SxIMOllnF2vE+IqSHEb4QBYlyFCKsw=;
+	bh=n2BhsFjGcr7MuBGXteubepVgpYIPmnI7f0uYF07S+ws=;
 	h=DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding; b=QRQSm5IGhuuDI9iP5rFe1ldILdOXBdttVYNgysbjjwPpdWxCrMwhhQJ9IZrXc2j5e6h25ddkZgCgCX10ZXobR7smy2SRjZof5nKPEPGBh5oYSxcJ+tnqL74MFpPWW08stpZym6lwx1dQU6X20C9Jwr2fDgjuHi2RvsArc0mrKHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vukh56S4; arc=none smtp.client-ip=198.137.202.133
+	 Content-Transfer-Encoding; b=NFA+EJ3Edi6Qmw7suZWtP5DoJWFtJ60Alz1vlHuyIczkmW40iAGSJtiBHl8Sx3MIrrcXQSMHyTWV9gnWUfhj97v3el5VK5q1ukV4a9+rrgFrFWU4PCroeiMN5kb7spXpYGVL+vPxXRoif7lNq4CkCrf01tieBSzHw0Hy5iKnuDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Sqv8CQ31; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vukh56S4"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Sqv8CQ31"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=ypndJ3q6jZFQH0yBwkGZzBndYEsmF1d2BBCzWXEQX3w=; b=vukh56S447fwfDPuha9YigmbqP
-	xSj28FnXgN2ji/AhU5njJCQrHUZXD7c2czNhmxmWTBmgs0rUxN7j6I+8+weQYQHM8KloLlg1BRX/O
-	OE+lfxPBfWTWB6sPHlfx1tH9ABKq5PYWkCxxEmrHjpEojMumot9bai3FYKkW7Wg9ozrfFGI49tnn4
-	oyCbodzxiV6e66TB2CBkVYdEkkKFbReJavH3yrDrsS5Rwr/c5McMrwK+S/1JV0fPWSrIHt7ole8kV
-	bTFg7BrOWIMMAXJSBUVl1PHvUhhPmXmctYj7VeToE+r+OfF86H3AuAgdWDX8laDmcGlzQ6mg45Ll8
-	gLBz2VZA==;
+	bh=tL7JHTjwR33SLiqO2gdH0Yo2NTGGiSKZCN1Uyn0m5mI=; b=Sqv8CQ31VYBNhnIc0P7XixwtXT
+	UCNNXnytKrLzNfYcp6PVfgpzgkK1JnH1NAImPVR5rgreMrkMZihTo/UJwut9gap69NUCNqJgn68u9
+	pOydntKBU8khfOD2OebL/B6gKWtDotkgzZwysWHPecQfpJfnA/LvHZ6rKid/fqmO49qxIAAV2qa/2
+	dZb63Uzw1ZN4O78teO2NwvYEXgsprzKOxgKXYOaZNXcXslic31f4+nVBrriz20JX9h2exO0SXDbmh
+	VQjarR4Yhn/HYPHZ8koIbUdIbTW/qFemhve23Qgps8zpmwjUlafU0omnlDGq1/QuavHlpLs5FS62H
+	zIubOWZw==;
 Received: from [50.53.46.231] (helo=bombadil.infradead.org)
 	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1rQF0A-0011su-15;
-	Wed, 17 Jan 2024 23:07:18 +0000
+	id 1rQF0B-0011su-0O;
+	Wed, 17 Jan 2024 23:07:19 +0000
 From: Randy Dunlap <rdunlap@infradead.org>
 To: linux-kernel@vger.kernel.org
 Cc: Randy Dunlap <rdunlap@infradead.org>,
@@ -43,9 +43,9 @@ Cc: Randy Dunlap <rdunlap@infradead.org>,
 	kvmarm@lists.linux.dev,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
-Subject: [PATCH 02/10] KVM: arm64: guest: fix kernel-doc warnings
-Date: Wed, 17 Jan 2024 15:07:06 -0800
-Message-ID: <20240117230714.31025-3-rdunlap@infradead.org>
+Subject: [PATCH 04/10] KVM: arm64: vhe: fix a kernel-doc warning
+Date: Wed, 17 Jan 2024 15:07:08 -0800
+Message-ID: <20240117230714.31025-5-rdunlap@infradead.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240117230714.31025-1-rdunlap@infradead.org>
 References: <20240117230714.31025-1-rdunlap@infradead.org>
@@ -57,13 +57,10 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix multiple function parameter descriptions to prevent warnings:
+Use the correct function name in the kernel-doc comment to prevent
+a warning:
 
-guest.c:718: warning: Function parameter or struct member 'vcpu' not described in 'kvm_arm_num_regs'
-guest.c:736: warning: Function parameter or struct member 'vcpu' not described in 'kvm_arm_copy_reg_indices'
-guest.c:736: warning: Function parameter or struct member 'uindices' not described in 'kvm_arm_copy_reg_indices'
-arch/arm64/kvm/guest.c:915: warning: Excess function parameter 'kvm' description in 'kvm_arch_vcpu_ioctl_set_guest_debug'
-arch/arm64/kvm/guest.c:915: warning: Excess function parameter 'kvm_guest_debug' description in 'kvm_arch_vcpu_ioctl_set_guest_debug'
+arch/arm64/kvm/hyp/vhe/sysreg-sr.c:109: warning: expecting prototype for __vcpu_put_switch_syregs(). Prototype was for __vcpu_put_switch_sysregs() instead
 
 Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 Cc: Marc Zyngier <maz@kernel.org>
@@ -76,37 +73,18 @@ Cc: kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/guest.c |    7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff -- a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -711,6 +711,7 @@ static int copy_sve_reg_indices(const st
+diff -- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+--- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+@@ -95,7 +95,7 @@ void __vcpu_load_switch_sysregs(struct k
+ }
  
  /**
-  * kvm_arm_num_regs - how many registers do we present via KVM_GET_ONE_REG
-+ * @vcpu: the vCPU pointer
+- * __vcpu_put_switch_syregs - Restore host system registers to the physical CPU
++ * __vcpu_put_switch_sysregs - Restore host system registers to the physical CPU
   *
-  * This is for all registers.
-  */
-@@ -729,6 +730,8 @@ unsigned long kvm_arm_num_regs(struct kv
- 
- /**
-  * kvm_arm_copy_reg_indices - get indices of all registers.
-+ * @vcpu: the vCPU pointer
-+ * @uindices: register list to copy
+  * @vcpu: The VCPU pointer
   *
-  * We do core registers right here, then we append system regs.
-  */
-@@ -902,8 +905,8 @@ int kvm_arch_vcpu_ioctl_translate(struct
- 
- /**
-  * kvm_arch_vcpu_ioctl_set_guest_debug - set up guest debugging
-- * @kvm:	pointer to the KVM struct
-- * @kvm_guest_debug: the ioctl data buffer
-+ * @vcpu: the vCPU pointer
-+ * @dbg: the ioctl data buffer
-  *
-  * This sets up and enables the VM for guest debugging. Userspace
-  * passes in a control flag to enable different debug types and
