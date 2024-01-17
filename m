@@ -1,106 +1,105 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D696225D7
-	for <kvmarm@lists.linux.dev>; Wed, 17 Jan 2024 16:51:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9956224C2;
+	Wed, 17 Jan 2024 23:07:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705510266; cv=none; b=G0HcOeTqo0P383X+IbAowlytjfDNJBsFk7N4V/H4vU4++QrW6z+BK5AeAlALRqP1JSKRG4xwqPMqLnIAa5ZxRKtLBXLgB2bt70abY32lRNLYH5WR0t/LzP2KhdPCEu7IoThqnNmnrCxd95Cp8NuxB0DvYqu9B87kf9dD9iIUWEY=
+	t=1705532840; cv=none; b=NigVH1nI1ysDZI7njiK9OPhcQtNOuEAhZduqoOyXN0GfnB8pszjSLPOEnNU6bChIX4IoIMgPahRFwYEZMDUI9td+SpHw2jNU7LdxN3cUoF4R4YILTAcSoNUwSrugoJa1zbUQE1K8yrvT5+oGXo1Q3TWHKugf7s9goFKOiprTPmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705510266; c=relaxed/simple;
-	bh=faT2uRrQt3V7tKi/jCpPpD6mGOoqk18135qnLaMNQ6w=;
-	h=Date:DKIM-Signature:X-Report-Abuse:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To:X-Migadu-Flow; b=BCpQc7jnhw52gpz0VMclEX3bIjnAfW/fN6+qwMUFnbyR08WoADN4AdNMJm5n7Mu0GkFWX/ZYQ1mbsoPpTLG5GkBF8cVJ6uhjfc3oyji2jWXU5TExk2Cw2Hi9bIEgSYbl8a1eqdLZGkye4f06ks9BjYe9dQ/oV9qsCKuBxiVCRvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BspoeQJt; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1705532840; c=relaxed/simple;
+	bh=AxL2pBXazAzg//MRXlYnFJ53tGOVmTSBSNMjNVOlrTQ=;
+	h=DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding; b=GXdL1HAoH54cFJwrJgYU8758c+ExduJIiWjcjGQ6MWzB9KAlfsrUz1i7kAlEHSN0s2ndt0fZXa4S1j0Lpm5jlDnPlAfC4bxJECQ9PgBZZpALJ/lUiPlM/PjezMuvZiGeLKyypSDLf74D0e2/O7y90fq/DvkBI8Xm1aiErLSUGzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Cmnv6kko; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BspoeQJt"
-Date: Wed, 17 Jan 2024 17:50:28 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1705510261;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zsMBTqAbxvDSq34Y8PBcrq1QpEjPS4gVtR8AVs1aPo0=;
-	b=BspoeQJtQ3UPfpuJmKzVnJGZaqu6V2IgvIXmri1tYRZK2y0xcxPjnsCRf7Xs6Hj33dsr19
-	MNRPJ4vUXh4baAxJUXOshQkM6a9UfonXktAjkK426LQgS0DFmZbAQ1G6W9LQlRCO/cssRo
-	KcxndU/YA7T217PRGN6/swdvxkMLfmA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: "sundongxu (A)" <sundongxu3@huawei.com>
-Cc: Marc Zyngier <maz@kernel.org>, yuzenghui@huawei.com,
-	james.morse@arm.com, suzuki.poulose@arm.com, will@kernel.org,
-	catalin.marinas@arm.com, wanghaibin.wang@huawei.com,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, jiangkunkun@huawei.com
-Subject: Re: [bug report] GICv4.1: VM performance degradation due to not
- trapping vCPU WFI
-Message-ID: <ZagFVNsA1aLuxorp@linux.dev>
-References: <a481ef04-ddd2-dfc1-41b1-d2ec45c6a3b5@huawei.com>
- <86v87t8ras.wl-maz@kernel.org>
- <89fe1503-6d62-90ca-5edb-e11c74846a00@huawei.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Cmnv6kko"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=33pXiC615tAp01UX0oIvnU0m5UyE9DId90eSm2AOiDA=; b=Cmnv6kko4O6H4EJIhtFSqIpoQp
+	hhIHa5nLJ04S5KtXMPDlgR2LRpGkaqeRAtoN8iiTsqcAwuv6QsHOS9S3b19eZwO9bxF6Cuc5k4Z2z
+	eeDXeeoaZ5cOj+bJSk32R01arFIetSHojqNyIKi8YA7Q4MPEyGpT4PxiTKkY7WQNDUceL2D+vizAx
+	SYTAllYONNHpFNToNSpWPhDu3O7FX00ZwnA6UikLt66+Xes+jxooifGSV0lwvEHKbdlLMYx84oVbC
+	9w2UaJ+++NK0WrPCcAI6R5TuIcc/u2doq3w13LM4YR2tsx2PVpEnZIJFrAvq2zXDqSSrOaxXL1nUE
+	TWj7KjRw==;
+Received: from [50.53.46.231] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rQF09-0011su-32;
+	Wed, 17 Jan 2024 23:07:18 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: linux-kernel@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH 01/10] KVM: arm64: debug: fix kernel-doc warnings
+Date: Wed, 17 Jan 2024 15:07:05 -0800
+Message-ID: <20240117230714.31025-2-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240117230714.31025-1-rdunlap@infradead.org>
+References: <20240117230714.31025-1-rdunlap@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <89fe1503-6d62-90ca-5edb-e11c74846a00@huawei.com>
-X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jan 17, 2024 at 10:20:32PM +0800, sundongxu (A) wrote:
-> On 2024/1/16 19:13, Marc Zyngier wrote:
-> > On Tue, 16 Jan 2024 03:26:08 +0000, "sundongxu (A)" <sundongxu3@huawei.com> wrote:
-> >> We found a problem about GICv4/4.1, for example:
-> >> We use QEMU to start a VM (4 vCPUs and 8G memory), VM disk was
-> >> configured with virtio, and the network is configured with vhost-net,
-> >> the CPU affinity of the vCPU and emulator is as follows, in VM xml:
+Change one "/**" comment to a common "/*" comment since the comment
+is not in kernel-doc format.
+Add description for the @vcpu function parameter.
 
-<snip>
+These changes prevent warnings:
 
-> >>   <cputune>
-> >>     <vcpupin vcpu='0' cpuset='4'/>
-> >>     <vcpupin vcpu='1' cpuset='5'/>
-> >>     <vcpupin vcpu='2' cpuset='6'/>
-> >>     <vcpupin vcpu='3' cpuset='7'/>
-> >>     <emulatorpin cpuset='4,5,6,7'/>
-> >>   </cputune>
+debug.c:27: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+ * save/restore_guest_debug_regs
+debug.c:27: warning: missing initial short description on line:
+ * save/restore_guest_debug_regs
+debug.c:149: warning: Function parameter or struct member 'vcpu' not described in 'kvm_arm_reset_debug_ptr'
 
-</snip>
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Zenghui Yu <yuzenghui@huawei.com>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+---
+ arch/arm64/kvm/debug.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-> > Effectively, we apply the same principle to vSGIs as to vLPIs, and it
-> > was found that this heuristic was pretty beneficial to vLPIs. I'm a
-> > bit surprised that vSGIs are so different in their usage pattern.
-> 
-> IMO, the point is hypervisor not trapping vCPU WFI, rather than
-> vSGI/vLPI usage pattern.
-
-Sure, that's what's affecting your use case, but the logic in the kernel
-came about because improving virtual interrupt injection has been found
-to be generally useful.
-
-> > 
-> > Does it help if you move your "emulatorpin" to some other physical
-> > CPUs?
-> 
-> Yes，it does, in kernel 5.10 or 6.5rc1.
-
-Won't your VM have a poor experience in this configuration regardless of WFx
-traps? The value of vCPU pinning is to *isolate* the vCPU threads from
-noise/overheads of the host and scheduler latencies. Seems to me that
-VMM overhead threads are being forced to take time away from the guest.
-
-Nevertheless, disabling WFI traps isn't going to work well for
-overcommitted scenarios. The thought of tacking on more hacks in KVM has be
-a bit uneasy, perhaps instead we can give userspace an interface to explicitly
-enable/disable WFx traps and let it pick a suitable policy.
-
--- 
-Thanks,
-Oliver
+diff -- a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+--- a/arch/arm64/kvm/debug.c
++++ b/arch/arm64/kvm/debug.c
+@@ -23,7 +23,7 @@
+ 
+ static DEFINE_PER_CPU(u64, mdcr_el2);
+ 
+-/**
++/*
+  * save/restore_guest_debug_regs
+  *
+  * For some debug operations we need to tweak some guest registers. As
+@@ -143,6 +143,7 @@ void kvm_arm_vcpu_init_debug(struct kvm_
+ 
+ /**
+  * kvm_arm_reset_debug_ptr - reset the debug ptr to point to the vcpu state
++ * @vcpu:	the vcpu pointer
+  */
+ 
+ void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu)
