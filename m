@@ -1,36 +1,35 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9956224C2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E999E225A1;
 	Wed, 17 Jan 2024 23:07:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705532840; cv=none; b=NigVH1nI1ysDZI7njiK9OPhcQtNOuEAhZduqoOyXN0GfnB8pszjSLPOEnNU6bChIX4IoIMgPahRFwYEZMDUI9td+SpHw2jNU7LdxN3cUoF4R4YILTAcSoNUwSrugoJa1zbUQE1K8yrvT5+oGXo1Q3TWHKugf7s9goFKOiprTPmo=
+	t=1705532840; cv=none; b=kulIfYkXa96/olQEe5dOspHuDAPvywTB2wtBXxUCEytdB2LHlE28EfkcycRkS1XtUzeddE2ZWqELWKFaULSSXA3cRfAbel+c3lKqB7DscMBGteULo98tgBv76DZeypqU0W5uDyMXsvqswomZ4Z8byC5g4ginFHAO73Oj0A8SxFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1705532840; c=relaxed/simple;
-	bh=AxL2pBXazAzg//MRXlYnFJ53tGOVmTSBSNMjNVOlrTQ=;
+	bh=BdGkvKEcTMKO693GK951fQ0JtUasgLDl08bRJYLMwPs=;
 	h=DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding; b=GXdL1HAoH54cFJwrJgYU8758c+ExduJIiWjcjGQ6MWzB9KAlfsrUz1i7kAlEHSN0s2ndt0fZXa4S1j0Lpm5jlDnPlAfC4bxJECQ9PgBZZpALJ/lUiPlM/PjezMuvZiGeLKyypSDLf74D0e2/O7y90fq/DvkBI8Xm1aiErLSUGzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Cmnv6kko; arc=none smtp.client-ip=198.137.202.133
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding; b=qiDNta0fXtxxC4i8OEQQeURPU1Q33C3Leeov09w8aB8vD8vCWfiD/sn0O2t/A0fO381CJROP2j8g9XQkd31AUWXcRAo3ZzLBIYl1m+fDbRUJHw29IVpk4WyTp4c7XhYo3oTzELrouF5gcDjQBhjGUNteQLaYmRWy6h8KhHe+H9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gejYoZzV; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Cmnv6kko"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gejYoZzV"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=33pXiC615tAp01UX0oIvnU0m5UyE9DId90eSm2AOiDA=; b=Cmnv6kko4O6H4EJIhtFSqIpoQp
-	hhIHa5nLJ04S5KtXMPDlgR2LRpGkaqeRAtoN8iiTsqcAwuv6QsHOS9S3b19eZwO9bxF6Cuc5k4Z2z
-	eeDXeeoaZ5cOj+bJSk32R01arFIetSHojqNyIKi8YA7Q4MPEyGpT4PxiTKkY7WQNDUceL2D+vizAx
-	SYTAllYONNHpFNToNSpWPhDu3O7FX00ZwnA6UikLt66+Xes+jxooifGSV0lwvEHKbdlLMYx84oVbC
-	9w2UaJ+++NK0WrPCcAI6R5TuIcc/u2doq3w13LM4YR2tsx2PVpEnZIJFrAvq2zXDqSSrOaxXL1nUE
-	TWj7KjRw==;
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=BdGkvKEcTMKO693GK951fQ0JtUasgLDl08bRJYLMwPs=; b=gejYoZzVds4d2oITeV1/orc5p+
+	9hp+43fvaV+1x/dv4f75pWDR3w0LsiTu1x3duwVPg1IhgPbEj8i4Mo95nGluRrZmQgZsfqLYi3hZK
+	G4Y8acAUsNu4QmU23OlZZlzlEEjN2Qo1RlXBBjfzHCDMheb5AJzV3/zqWOyR0o3EsbIZu6BAWpyt7
+	C13vedEj99AkibGGd5hE7eVzL2HUX18FlQe6EUdhoMdMHAvZ+qQscWTrAJWGDF9xoRmibiW8+tiTp
+	Y74UV81diVObdGVxD5gVgo8wAV0SlgB95EY5z/A4KXQvelRIZDk1A5NQuyVEmqasbNZFLf96DEt0t
+	MIh1vuMQ==;
 Received: from [50.53.46.231] (helo=bombadil.infradead.org)
 	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1rQF09-0011su-32;
-	Wed, 17 Jan 2024 23:07:18 +0000
+	id 1rQF09-0011su-1r;
+	Wed, 17 Jan 2024 23:07:17 +0000
 From: Randy Dunlap <rdunlap@infradead.org>
 To: linux-kernel@vger.kernel.org
 Cc: Randy Dunlap <rdunlap@infradead.org>,
@@ -43,12 +42,10 @@ Cc: Randy Dunlap <rdunlap@infradead.org>,
 	kvmarm@lists.linux.dev,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
-Subject: [PATCH 01/10] KVM: arm64: debug: fix kernel-doc warnings
-Date: Wed, 17 Jan 2024 15:07:05 -0800
-Message-ID: <20240117230714.31025-2-rdunlap@infradead.org>
+Subject: [PATCH 00/10] KVM: arm64: fix many kernel-doc warnings
+Date: Wed, 17 Jan 2024 15:07:04 -0800
+Message-ID: <20240117230714.31025-1-rdunlap@infradead.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240117230714.31025-1-rdunlap@infradead.org>
-References: <20240117230714.31025-1-rdunlap@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,19 +54,19 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Change one "/**" comment to a common "/*" comment since the comment
-is not in kernel-doc format.
-Add description for the @vcpu function parameter.
+Fix a bunch of kernel-doc warnings in arch/arm64/kvm/.
 
-These changes prevent warnings:
+ [PATCH 01/10] KVM: arm64: debug: fix kernel-doc warnings
+ [PATCH 02/10] KVM: arm64: guest: fix kernel-doc warnings
+ [PATCH 03/10] KVM: arm64: hyp/aarch32: fix kernel-doc warnings
+ [PATCH 04/10] KVM: arm64: vhe: fix a kernel-doc warning
+ [PATCH 05/10] KVM: arm64: mmu: fix a kernel-doc warning
+ [PATCH 06/10] KVM: arm64: PMU: fix kernel-doc warnings
+ [PATCH 07/10] KVM: arm64: sys_regs: fix kernel-doc warnings
+ [PATCH 08/10] KVM: arm64: vgic-init: fix a kernel-doc warning
+ [PATCH 09/10] KVM: arm64: vgic-its: fix kernel-doc warnings
+ [PATCH 10/10] KVM: arm64: vgic: fix a kernel-doc warning
 
-debug.c:27: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
- * save/restore_guest_debug_regs
-debug.c:27: warning: missing initial short description on line:
- * save/restore_guest_debug_regs
-debug.c:149: warning: Function parameter or struct member 'vcpu' not described in 'kvm_arm_reset_debug_ptr'
-
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Oliver Upton <oliver.upton@linux.dev>
 Cc: James Morse <james.morse@arm.com>
@@ -79,27 +76,3 @@ Cc: linux-arm-kernel@lists.infradead.org
 Cc: kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>
----
- arch/arm64/kvm/debug.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff -- a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -23,7 +23,7 @@
- 
- static DEFINE_PER_CPU(u64, mdcr_el2);
- 
--/**
-+/*
-  * save/restore_guest_debug_regs
-  *
-  * For some debug operations we need to tweak some guest registers. As
-@@ -143,6 +143,7 @@ void kvm_arm_vcpu_init_debug(struct kvm_
- 
- /**
-  * kvm_arm_reset_debug_ptr - reset the debug ptr to point to the vcpu state
-+ * @vcpu:	the vcpu pointer
-  */
- 
- void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu)
