@@ -1,119 +1,106 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBFF125A7
-	for <kvmarm@lists.linux.dev>; Thu, 18 Jan 2024 07:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D89772E400;
+	Thu, 18 Jan 2024 19:58:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705564596; cv=none; b=qXQHHIIoh/h2HNBt57V5xZVDOaCOAzYwbmG9uO/J7h2UraXX/bN0RguUnQMd38sRcIepPdOws+Qc5q8fwnWHqYrM3FAsDc+UQJDjSoIKVBAx1XyERjQ0FArulbya12szNDn6Xd/HgRtMFzyS2r7Gc2CjlauNU8tcOFepZ26cjdU=
+	t=1705607922; cv=none; b=am45jjnvgUxY0IbhpoMTTS2lHa8F9DmTF8fL6IOLS5KIkuyMFqEyf/RqJ8YvfGzQ3sD+X7IcB8BSs4usaR4uSpUK771GHrUX/tZfBMv/abBRKGqTAVf0j51RcFu7LUv0yleDWHWD+2MxzC2CXImUA3yPlhc3qQArLKHGjFwyvOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705564596; c=relaxed/simple;
-	bh=2hcdQMhALmEHs/B/xSjTTqqDn29RnDN9oet6bHzzXrU=;
-	h=Received:Received:Received:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:To:CC:References:Content-Language:From:
-	 In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 X-Originating-IP:X-ClientProxiedBy; b=HxPlH35SBp2Y0lpedg89pMFtvrnxTLDhbWuDok8UotUJrTmTlwUSweH+9qLKazrPEzWCEqqG5uqgq57BICE/juUwR0KBB+fNQgVnTGMT3WsL/2MuFrcKj9Gukq4mUvncIOukKPH4a/tuJcuU0PAWJsTawrdM8Ett9Ho/yaDbM5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TFw5756ghz29kLB;
-	Thu, 18 Jan 2024 15:54:51 +0800 (CST)
-Received: from dggpeml500004.china.huawei.com (unknown [7.185.36.140])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9EE571A0172;
-	Thu, 18 Jan 2024 15:56:30 +0800 (CST)
-Received: from [10.174.186.25] (10.174.186.25) by
- dggpeml500004.china.huawei.com (7.185.36.140) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 18 Jan 2024 15:56:30 +0800
-Message-ID: <6572d6eb-a3f0-445b-8167-13d0600dd7e8@huawei.com>
-Date: Thu, 18 Jan 2024 15:56:27 +0800
+	s=arc-20240116; t=1705607922; c=relaxed/simple;
+	bh=dg8AYukbRIwcDM7XMhA2eAX0Vj/41D/3o41gR6bxNzE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u2EqRnVsmsXg0for47OZ0wRfNZtlvsuBIIAGRYJCMCmGzn+2RbynZ+BBhp5U11b/Q6eZwORLctC568VTYu4LCpjZPochdJbTh0Jii4b/qzVZ1OcMVCSx0FBqiXQ/nL6Q/G3SNu4GEJl0FKHt4Ecgho3DkCkJ/K5NTjQSq+64WYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kOcnPxyT; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kOcnPxyT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50BF7C433C7;
+	Thu, 18 Jan 2024 19:58:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705607921;
+	bh=dg8AYukbRIwcDM7XMhA2eAX0Vj/41D/3o41gR6bxNzE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kOcnPxyTNJLXDXVOtyj99VAsOk5s0Rmh83NR1a9NOgU/OF5FOi72j3zLwSt210Nus
+	 Dj4P0dm5hTDZcazYWhWxYczQmqtNTEG43VEDdUXGPSaqLmzmR97NTuw8YTekBMF+OI
+	 ldipeDxBaXKpzY0ZaRVwUQbY/pusnuaIPwFnT8vd0t+Q4pG8AH3CLYak4Z4vUn0Ub/
+	 MDDl+enUsNxWgtsRxya+NNhRr7KdNGzGlzh7twIgvuG8k/M7SgqKtOQoy/Bk96yx28
+	 VpimFp2KEjfb1RkRd3mdE37KHbO4bTVMjTmEalTGSdvHcEBV3FsSLG7BuKppdoTIIP
+	 riNFJwlivNLUg==
+Date: Thu, 18 Jan 2024 19:58:32 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v7 34/39] kselftest/arm64: Add a GCS test program built
+ with the system libc
+Message-ID: <d5c8b071-dd68-4e5c-b0ba-10c5fdc0c730@sirena.org.uk>
+References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
+ <20231122-arm64-gcs-v7-34-201c483bd775@kernel.org>
+ <875y1089i4.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [bug report] GICv4.1: VM performance degradation due to not
- trapping vCPU WFI
-To: Oliver Upton <oliver.upton@linux.dev>
-CC: Marc Zyngier <maz@kernel.org>, <yuzenghui@huawei.com>,
-	<james.morse@arm.com>, <suzuki.poulose@arm.com>, <will@kernel.org>,
-	<catalin.marinas@arm.com>, <wanghaibin.wang@huawei.com>,
-	<kvmarm@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <jiangkunkun@huawei.com>
-References: <a481ef04-ddd2-dfc1-41b1-d2ec45c6a3b5@huawei.com>
- <86v87t8ras.wl-maz@kernel.org>
- <89fe1503-6d62-90ca-5edb-e11c74846a00@huawei.com>
- <ZagFVNsA1aLuxorp@linux.dev>
-Content-Language: en-US
-From: "sundongxu (A)" <sundongxu3@huawei.com>
-In-Reply-To: <ZagFVNsA1aLuxorp@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500004.china.huawei.com (7.185.36.140)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="J0lYyRO8meje2xTl"
+Content-Disposition: inline
+In-Reply-To: <875y1089i4.fsf@linaro.org>
+X-Cookie: FEELINGS are cascading over me!!!
 
-On 2024/1/18 0:50, Oliver Upton wrote:
-> On Wed, Jan 17, 2024 at 10:20:32PM +0800, sundongxu (A) wrote:
->> On 2024/1/16 19:13, Marc Zyngier wrote:
->>> On Tue, 16 Jan 2024 03:26:08 +0000, "sundongxu (A)" <sundongxu3@huawei.com> wrote:
->>>> We found a problem about GICv4/4.1, for example:
->>>> We use QEMU to start a VM (4 vCPUs and 8G memory), VM disk was
->>>> configured with virtio, and the network is configured with vhost-net,
->>>> the CPU affinity of the vCPU and emulator is as follows, in VM xml:
-> 
-> <snip>
-> 
->>>>   <cputune>
->>>>     <vcpupin vcpu='0' cpuset='4'/>
->>>>     <vcpupin vcpu='1' cpuset='5'/>
->>>>     <vcpupin vcpu='2' cpuset='6'/>
->>>>     <vcpupin vcpu='3' cpuset='7'/>
->>>>     <emulatorpin cpuset='4,5,6,7'/>
->>>>   </cputune>
-> 
-> </snip>
-> 
->>> Effectively, we apply the same principle to vSGIs as to vLPIs, and it
->>> was found that this heuristic was pretty beneficial to vLPIs. I'm a
->>> bit surprised that vSGIs are so different in their usage pattern.
->>
->> IMO, the point is hypervisor not trapping vCPU WFI, rather than
->> vSGI/vLPI usage pattern.
-> 
-> Sure, that's what's affecting your use case, but the logic in the kernel
-> came about because improving virtual interrupt injection has been found
-> to be generally useful.
-> 
->>>
->>> Does it help if you move your "emulatorpin" to some other physical
->>> CPUs?
->>
->> Yes，it does, in kernel 5.10 or 6.5rc1.
-> 
-> Won't your VM have a poor experience in this configuration regardless of WFx
-> traps? The value of vCPU pinning is to *isolate* the vCPU threads from
-> noise/overheads of the host and scheduler latencies. Seems to me that
-> VMM overhead threads are being forced to take time away from the guest.
 
-When the emulators and vCPUs have affinity on same CPUs, the VM
-performance is worse than when emulators and vCPUs have affinity on
-different CPUs. Emulators will steal time from vCPU, since we need them
-to deal with some IO/net requests. If we allocate 4 pCPUs to one VM, we
-do not want it's emulators to run on other pCPU, which may interfere
-with other VMs. May be SPDK/DPDK will alleviate the issue.
+--J0lYyRO8meje2xTl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> 
-> Nevertheless, disabling WFI traps isn't going to work well for
-> overcommitted scenarios. The thought of tacking on more hacks in KVM has be
-> a bit uneasy, perhaps instead we can give userspace an interface to explicitly
-> enable/disable WFx traps and let it pick a suitable policy.
+On Thu, Dec 14, 2023 at 11:50:11PM -0300, Thiago Jung Bauermann wrote:
 
-Agreed, I added a KVM parameter to do that, and default trapping vCPU WFI.
+> If I swap process_vm_readv() and process_vm_writev(), then the read
+> succeeds but the write fails:
 
-Thanks,
-	Dongxu
+The writes are intended to fail, for security reasons we explicitly
+block this API for GCS pages.  Given that process_vm_writev() is only
+available with similar permissions to ptrace() which does not have these
+restrictions this on first consideration feels like something that we
+should allow but it feels out of scope for this already very large
+series to do so so I'll fix the test.
 
+--J0lYyRO8meje2xTl
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmWpgucACgkQJNaLcl1U
+h9CYvgf5AXvQCEOJft2rRvx77RKKR6OcqHq1nMW9gq0PedqzL0bOOJ8VUxLbblGi
+ODi9eMUiTzx/e+/d8/7JXSG4dg6mZmDLRZlgKYdl0wYK+D4AL1jb8Xm3KRcZPTYj
+9wXpkwLj3R/4slPoom0idK/+g7BmgwhhGKsmDPh279p1vXn4F3GdbFvta3KvvKB4
+f8jmwIVrllAaAXZsmg2eIvTd/lvna7Oa6C3UrHqN8QYaiokebhB+fvyY5LIRx6oW
+a0godJWG2XN83VL3A5Mgnk2v27ewHVAAQ5MeMKBJSYwLQYNyWlh1Y6J0s7jAYmhU
+pQqh3jZ7jg6I1WyqsYO12yX1KYXFTw==
+=FSEz
+-----END PGP SIGNATURE-----
+
+--J0lYyRO8meje2xTl--
