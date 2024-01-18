@@ -1,90 +1,119 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AF9B28DCA;
-	Wed, 17 Jan 2024 23:07:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBFF125A7
+	for <kvmarm@lists.linux.dev>; Thu, 18 Jan 2024 07:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705532843; cv=none; b=CzsVwGPVordeU3IoHehIzl/IxHlrK3qyKofuudYaHGLf6Sxa6b9tFW+gme4GFuqolS4Y4hz9x7YfVTlFO35icMGV7srT4M4eWTiZnmewjee+DLEYqlBvYLIw/jiXDJy2cpK2QJYhf5Db+eLWt5FqLG2TIpl63d8W0TYKHTaEmQA=
+	t=1705564596; cv=none; b=qXQHHIIoh/h2HNBt57V5xZVDOaCOAzYwbmG9uO/J7h2UraXX/bN0RguUnQMd38sRcIepPdOws+Qc5q8fwnWHqYrM3FAsDc+UQJDjSoIKVBAx1XyERjQ0FArulbya12szNDn6Xd/HgRtMFzyS2r7Gc2CjlauNU8tcOFepZ26cjdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705532843; c=relaxed/simple;
-	bh=RiiiCFCSg23bdODcmHVKYdCbg7Nx10zpVDFgao209n0=;
-	h=DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding; b=h4BxmEstxuH4CRy911oJawEPcPjXXuBPv0IZbUnUPWnlSJ1yB/o57GphPoVts9y7lxc8TcYvV+tPTv7VmzkofvW3jQFwMG6+AleVJa0tVaHY6zsLID1hhV3AMv42crIoddKVbqHFgSozdp0zb56AnnwGkYGD48fRY0v1vMPUxE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=q4imAu3N; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="q4imAu3N"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=4z//f4SWii73rhmNB7IdhlI7RbSfenJTKTaX55Qhiuk=; b=q4imAu3NSlhLHLEfxBINKlePAf
-	EoW2oKIsUWSxyc0WEiV3W9N9j7vE9sGxXbVt+0UL5AxkvQcn5xvJ1Sy2R+LmuMJPgtuRd2qHPQ8kM
-	p7/5G6sBOXCLfMXJdBQvKZCsjCm1RKQV5kmIm1TudfMVKpUFe41cBFQcIbxNJyu1ESZaxW/ojZ8cX
-	RWntzG7KluBxBZzo06l7bhopvQIupwjEnw9iJV5CwPXAhuBCX5SrvDNgS0+ysKZE1vWN9tKdrvMQQ
-	em/3TFg6TUbMnj6bxjvbKr5ezbAyzmOgO8X1/Q7nMLR5dTM5a0KD5uIWPMXqCkla/8NLDQjI9VUV4
-	rUXAR+FA==;
-Received: from [50.53.46.231] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1rQF0D-0011su-11;
-	Wed, 17 Jan 2024 23:07:21 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: linux-kernel@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: [PATCH 10/10] KVM: arm64: vgic: fix a kernel-doc warning
-Date: Wed, 17 Jan 2024 15:07:14 -0800
-Message-ID: <20240117230714.31025-11-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240117230714.31025-1-rdunlap@infradead.org>
-References: <20240117230714.31025-1-rdunlap@infradead.org>
+	s=arc-20240116; t=1705564596; c=relaxed/simple;
+	bh=2hcdQMhALmEHs/B/xSjTTqqDn29RnDN9oet6bHzzXrU=;
+	h=Received:Received:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:CC:References:Content-Language:From:
+	 In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 X-Originating-IP:X-ClientProxiedBy; b=HxPlH35SBp2Y0lpedg89pMFtvrnxTLDhbWuDok8UotUJrTmTlwUSweH+9qLKazrPEzWCEqqG5uqgq57BICE/juUwR0KBB+fNQgVnTGMT3WsL/2MuFrcKj9Gukq4mUvncIOukKPH4a/tuJcuU0PAWJsTawrdM8Ett9Ho/yaDbM5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TFw5756ghz29kLB;
+	Thu, 18 Jan 2024 15:54:51 +0800 (CST)
+Received: from dggpeml500004.china.huawei.com (unknown [7.185.36.140])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9EE571A0172;
+	Thu, 18 Jan 2024 15:56:30 +0800 (CST)
+Received: from [10.174.186.25] (10.174.186.25) by
+ dggpeml500004.china.huawei.com (7.185.36.140) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 18 Jan 2024 15:56:30 +0800
+Message-ID: <6572d6eb-a3f0-445b-8167-13d0600dd7e8@huawei.com>
+Date: Thu, 18 Jan 2024 15:56:27 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [bug report] GICv4.1: VM performance degradation due to not
+ trapping vCPU WFI
+To: Oliver Upton <oliver.upton@linux.dev>
+CC: Marc Zyngier <maz@kernel.org>, <yuzenghui@huawei.com>,
+	<james.morse@arm.com>, <suzuki.poulose@arm.com>, <will@kernel.org>,
+	<catalin.marinas@arm.com>, <wanghaibin.wang@huawei.com>,
+	<kvmarm@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <jiangkunkun@huawei.com>
+References: <a481ef04-ddd2-dfc1-41b1-d2ec45c6a3b5@huawei.com>
+ <86v87t8ras.wl-maz@kernel.org>
+ <89fe1503-6d62-90ca-5edb-e11c74846a00@huawei.com>
+ <ZagFVNsA1aLuxorp@linux.dev>
+Content-Language: en-US
+From: "sundongxu (A)" <sundongxu3@huawei.com>
+In-Reply-To: <ZagFVNsA1aLuxorp@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500004.china.huawei.com (7.185.36.140)
 
-Use the correct function name in a kernel-doc comment to prevent a
-warning:
+On 2024/1/18 0:50, Oliver Upton wrote:
+> On Wed, Jan 17, 2024 at 10:20:32PM +0800, sundongxu (A) wrote:
+>> On 2024/1/16 19:13, Marc Zyngier wrote:
+>>> On Tue, 16 Jan 2024 03:26:08 +0000, "sundongxu (A)" <sundongxu3@huawei.com> wrote:
+>>>> We found a problem about GICv4/4.1, for example:
+>>>> We use QEMU to start a VM (4 vCPUs and 8G memory), VM disk was
+>>>> configured with virtio, and the network is configured with vhost-net,
+>>>> the CPU affinity of the vCPU and emulator is as follows, in VM xml:
+> 
+> <snip>
+> 
+>>>>   <cputune>
+>>>>     <vcpupin vcpu='0' cpuset='4'/>
+>>>>     <vcpupin vcpu='1' cpuset='5'/>
+>>>>     <vcpupin vcpu='2' cpuset='6'/>
+>>>>     <vcpupin vcpu='3' cpuset='7'/>
+>>>>     <emulatorpin cpuset='4,5,6,7'/>
+>>>>   </cputune>
+> 
+> </snip>
+> 
+>>> Effectively, we apply the same principle to vSGIs as to vLPIs, and it
+>>> was found that this heuristic was pretty beneficial to vLPIs. I'm a
+>>> bit surprised that vSGIs are so different in their usage pattern.
+>>
+>> IMO, the point is hypervisor not trapping vCPU WFI, rather than
+>> vSGI/vLPI usage pattern.
+> 
+> Sure, that's what's affecting your use case, but the logic in the kernel
+> came about because improving virtual interrupt injection has been found
+> to be generally useful.
+> 
+>>>
+>>> Does it help if you move your "emulatorpin" to some other physical
+>>> CPUs?
+>>
+>> Yes，it does, in kernel 5.10 or 6.5rc1.
+> 
+> Won't your VM have a poor experience in this configuration regardless of WFx
+> traps? The value of vCPU pinning is to *isolate* the vCPU threads from
+> noise/overheads of the host and scheduler latencies. Seems to me that
+> VMM overhead threads are being forced to take time away from the guest.
 
-arch/arm64/kvm/vgic/vgic.c:217: warning: expecting prototype for kvm_vgic_target_oracle(). Prototype was for vgic_target_oracle() instead
+When the emulators and vCPUs have affinity on same CPUs, the VM
+performance is worse than when emulators and vCPUs have affinity on
+different CPUs. Emulators will steal time from vCPU, since we need them
+to deal with some IO/net requests. If we allocate 4 pCPUs to one VM, we
+do not want it's emulators to run on other pCPU, which may interfere
+with other VMs. May be SPDK/DPDK will alleviate the issue.
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: James Morse <james.morse@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Zenghui Yu <yuzenghui@huawei.com>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
----
- arch/arm64/kvm/vgic/vgic.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> Nevertheless, disabling WFI traps isn't going to work well for
+> overcommitted scenarios. The thought of tacking on more hacks in KVM has be
+> a bit uneasy, perhaps instead we can give userspace an interface to explicitly
+> enable/disable WFx traps and let it pick a suitable policy.
 
-diff -- a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -203,7 +203,7 @@ void vgic_irq_set_phys_active(struct vgi
- }
- 
- /**
-- * kvm_vgic_target_oracle - compute the target vcpu for an irq
-+ * vgic_target_oracle - compute the target vcpu for an irq
-  *
-  * @irq:	The irq to route. Must be already locked.
-  *
+Agreed, I added a KVM parameter to do that, and default trapping vCPU WFI.
+
+Thanks,
+	Dongxu
+
