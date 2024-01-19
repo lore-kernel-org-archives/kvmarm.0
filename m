@@ -1,157 +1,99 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3590EC7
-	for <kvmarm@lists.linux.dev>; Fri, 19 Jan 2024 01:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E385F55E7B
+	for <kvmarm@lists.linux.dev>; Fri, 19 Jan 2024 17:16:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705627638; cv=none; b=N/D6kmBlyDbagZvccQnNNT1Mty6t++II+FCjDn1YB60k2PuPID3K5N31nYoru4YKv1s1NNTg+kgO/zzE74khGBDkDMEcbrDcFNICFjuUXDcGJXLermt9Lj/2tJyTGsso9H8rNc/ZKiy1XzNahnhiM+VPbYYcFz9K4x74nXL+buE=
+	t=1705684567; cv=none; b=Zgdtj6BeWcr/wnypxp7kWCOQPLxYuWIwlAofDymvgeEROzHiOLELPeZYFI9YnDTRbUtKaCEkZ3GMUmrNdQVg/juzTpYHwsK5pDoQWBug7FziAh7DRdCLerLB+mnMDLselCqP4U0XcJ/qT4SUvgZOiRyMQMbxNMo4P/v2V0GX/84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705627638; c=relaxed/simple;
-	bh=oIs2VoyVo5eys3aTQpEMmJF1mdTuSPVW1ZHPdC2hqxg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o+p45JiE+M7R3bAKso+Nh5dpTKuQEUwwd2hKWAShD0vFTPXwS1zgO2x3QaZJKoD0gMrfwHuptPqQmK+A1VaVGgOJGV9/Y5cvy7qJEx2TyPtSrcbsaDviijQY9hTpF18YIOvm03sGJrFT8KlOBxGc8ey5CJnaST/d0X+VsHvZ4kM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aNjOWHXC; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aNjOWHXC"
-Date: Fri, 19 Jan 2024 10:26:59 +0900
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1705627634;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MEAAKdKI2s28mLXSjhbge/t2jcWXL1sSrlOeBNigut8=;
-	b=aNjOWHXCrX/lkwKeCe64ksjMWHQnYhafV7LjxiqaEbtC7Rtq2OswV7y4MAuWj8a0yQmjgh
-	LIHNxMfvUdAjeJ9hG0aTTuYW8VB0blGusdNjdMZYbXrerP2ioa++WAdfAkv3UDD8GsJBKI
-	b0XaHXSc78GqGkDtCfcwHTBTwGgeDlI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Itaru Kitayama <itaru.kitayama@linux.dev>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org,
-	maz@kernel.org, steven.price@arm.com, alexandru.elisei@arm.com,
-	joey.gouly@arm.com, james.morse@arm.com,
-	Jonathan.Cameron@huawei.com, dgilbert@redhat.com, jpb@kernel.org,
-	oliver.upton@linux.dev, zhi.wang.linux@gmail.com,
-	yuzenghui@huawei.com, salil.mehta@huawei.com,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Quentin Perret <qperret@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Thomas Huth <thuth@redhat.com>, Ryan Roberts <Ryan.Roberts@arm.com>,
-	Sami Mujawar <Sami.Mujawar@arm.com>
-Subject: Re: [RFC] Support for Arm CCA VMs on Linux
-Message-ID: <ZanP4+K/CEkhukkp@vm3>
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
- <20231002124311.204614-1-suzuki.poulose@arm.com>
- <ZZ4tsTQOKOamM+h/@vm3>
- <ec8ed5b0-5080-45e9-a4a6-e5dbe48e86d3@arm.com>
- <d47e8b8c-50e4-4ad3-8f00-cadaede1eca9@arm.com>
+	s=arc-20240116; t=1705684567; c=relaxed/simple;
+	bh=jt7dOvCPCY9r7Cu73aJ/UCynKwSwXvLRA3lixD/f1bg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=byjQqAjPlSVhgcdKazBcParwzjecoxZAIAXxEB+zOqfN7B1dBCXhh9uBdE+KoZyVSTZjgek2f9rAbinqq57edVynIEhE5pBuIuswWDSAv7Zaax7aSlR7t8hmJ/IoXl+OJqyTmnQYLS60xm5ZJFOWc25h/seeKItwib+84eRvwXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 755CE1042;
+	Fri, 19 Jan 2024 09:16:49 -0800 (PST)
+Received: from [10.1.197.60] (eglon.cambridge.arm.com [10.1.197.60])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 50A5A3F5A1;
+	Fri, 19 Jan 2024 09:16:01 -0800 (PST)
+Message-ID: <f06ed418-922d-54c5-22a0-bde127146b5a@arm.com>
+Date: Fri, 19 Jan 2024 17:15:59 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d47e8b8c-50e4-4ad3-8f00-cadaede1eca9@arm.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v2 0/4] KVM: arm64: Hide unsupported MPAM from the guest
+Content-Language: en-GB
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ Marc Zyngier <maz@kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>
+References: <20231207150804.3425468-1-james.morse@arm.com>
+ <ZXoTG1Y4O16Cjq39@linux.dev>
+From: James Morse <james.morse@arm.com>
+In-Reply-To: <ZXoTG1Y4O16Cjq39@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 10, 2024 at 01:44:45PM +0000, Suzuki K Poulose wrote:
-> On 10/01/2024 11:41, Suzuki K Poulose wrote:
-> > Hi Itaru,
-> > 
-> > On 10/01/2024 05:40, Itaru Kitayama wrote:
-> > > On Mon, Oct 02, 2023 at 01:43:11PM +0100, Suzuki K Poulose wrote:
-> > > > Hi,
-> > > > 
-> > > > 
-> 
-> ...
-> 
-> > > 
-> > > Suzuki,
-> > > Any update to the Arm CCA series (v3?) since last October?
-> > 
-> > Yes, we now have a version that supports the final RMM-v1.0
-> > specification (RMM-v1.0-EAC5). We also have the UEFI EDK2 firmware
-> > support for Guests in Realm world.
-> > 
-> > We are planning to post the changes for review in the v6.8-rc cycle. We
-> > are trying to integrate the guest_mem support (available in v6.8-rc1) as
-> > well as reusing some of the arm64 kvm generic interface for configuring
-> > the Realm parameters (e.g., PMU, SVE_VL etc).
-> > 
-> > Here is a version that is missing the items mentioned above, based
-> > on v6.7-rc4, if anyone would like to try.
-> > 
-> > Also, the easiest way to get the components built and model kick started
-> > is using the shrinkwrap [6] tool, using the cca-3world configuration.
-> > The tool pulls all the required software components, builds (including
-> > the buildroot for rootfs) and can run a model using these built
-> > components.
-> 
-> Also, please see 'arm/run-realm-tests.sh' in the kvm-unit-tests-cca
-> repository for sample command lines to invoke kvmtool to create Realm
-> VMs.
+Hi Oliver,
 
-Thank you, Suzuki. I have just run the script above, again in the
-framework of shrinkwrap on the RevC FVP and the jobs ran fine. I need to
-go look at the lots of logs.
+On 13/12/2023 20:24, Oliver Upton wrote:
+> On Thu, Dec 07, 2023 at 03:08:00PM +0000, James Morse wrote:
+>> This series fixes up a long standing bug where MPAM was accidentally exposed
+>> to a guest, but the feature was not otherwise trapped or context switched.
+>> This could result in KVM warning about unexpected traps, and injecting an
+>> undef into the guest contradicting the ID registers.
+>> This would prevent an MPAM aware kernel from booting - fortunately, there
+>> aren't any of those.
+>>
+>> Ideally, we'd take the MPAM feature away from the ID registers, but that
+>> would leave existing guests unable to migrate to a newer kernel. Instead,
+>> use the writable ID registers to allow MPAM to be re-enabled - but emulate
+>> it as RAZ/WI for the system registers that are trapped.
 
-Itaru.
+> This is certainly a reasonable approach, but TBH I'm not too terribly
+> concerned about the completeness of the workaround plumbing that we need
+> here. Undoubtedly what you propose is the most complete solution to the
+> problem, but it is somewhat involved.
 
+Yup, I figured having a new upper limit than the default for id registers would be needed
+at some point, but maybe not today.
+
+
+> So long as we don't break migration at the userspace ioctl level I'm not
+> too worried. Maybe something like:
 > 
+>  - Ensure the reset value of ID_AA64PFR0_EL1.MPAM is 0
 > 
-> > 
-> > 
-> > 
-> > [0] Linux Repo:
-> >        Where: git@git.gitlab.arm.com:linux-arm/linux-cca.git
-> >        KVM Support branch: cca-host/rmm-v1.0-eac5
-> >        Linux Guest branch: cca-guest/rmm-v1.0-eac5
-> >        Full stack branch:  cca-full/rmm-v1.0-eac5
-> > 
-> > [1] kvmtool Repo:
-> >        Where: git@git.gitlab.arm.com:linux-arm/kvmtool-cca.git
-> >        Branch: cca/rmm-v1.0-eac5
-> > 
-> > [2] kvm-unit-tests Repo:
-> >        Where: git@git.gitlab.arm.com:linux-arm/kvm-unit-tests-cca.git
-> >        Branch: cca/rmm-v1.0-eac5
-> > 
-> > [3] UEFI Guest firmware:
-> >        edk2:     https://git.gitlab.arm.com/linux-arm/edk2-cca.git
-> >        revision: 2802_arm_cca_rmm-v1.0-eac5
-> > 
-> >        edk2-platforms:
-> > https://git.gitlab.arm.com/linux-arm/edk2-platforms-cca.git
-> >        revision:       2802_arm_cca_rmm-v1.0-eac5
-> > 
-> > 
-> > [4] RMM Repo:
-> >        Where: https://git.trustedfirmware.org/TF-RMM/tf-rmm.git
-> >        tag : tf-rmm-v0.4.0
-> > 
-> > [5] TF-A repo:
-> >        Where: https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git
-> >        Tag: v2.10
-> > 
-> > 
-> > [6] https://shrinkwrap.docs.arm.com/en/latest/
-> >      config: cca-3world.yaml
-> > 
-> 
-> Suzuki
-> 
+>  - Allow userspace to write ID_AA64PFR0_EL1.MPAM as 1, *but*
+
+>  - KVM reinterprets this as '0' behind the scenes for the final register
+>    value
+
+>  - Add the MPAM registers to the sysreg table with trap_raz_wi() as the
+>    handler to avoid the unsupported sysreg printk, since it is possible
+>    that older VMs may've already seen the MPAM feature.
+
+> We've already done something similar to hide our mistakes with IMP DEF
+> PMU versions in commit f90f9360c3d7 ("KVM: arm64: Rewrite IMPDEF PMU
+> version as NI"), and I think MPAM may be a good candidate for something
+> similar.
+
+As there is precedent, I feel less dirty doing that!
+
+This also solves the problem of the VMM re-writing the broken value after the vCPU has
+started running, and getting a surprise error. A weird side effect of doing this would be
+you can write MPAM=1 on A53 and KVM will ignore it, I don't want user-space to start
+relying on that! I'll add a final-cap check so this can only be ignored on hardware that
+actually has MPAM, and could have been exposed to the bug.
+
+
+Thanks,
+
+James
