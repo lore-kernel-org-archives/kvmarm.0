@@ -1,131 +1,157 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5EE714270;
-	Thu, 18 Jan 2024 21:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3590EC7
+	for <kvmarm@lists.linux.dev>; Fri, 19 Jan 2024 01:27:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705612253; cv=none; b=BYnylEICddo/lcVSCyl8pw+jBpZfj0zMzvshEkwDrOUnoGsaL7lLNi+W3nkEPx7BaMUTSlZZkWCW1xVNR+G0KpTm8QHCNkQ5V1FBdq9irt29XzSma1W0PND5iKJGBAw6rX+df868bApXsEJ19eiHGK04USadwQDiye6HjcmO1Do=
+	t=1705627638; cv=none; b=N/D6kmBlyDbagZvccQnNNT1Mty6t++II+FCjDn1YB60k2PuPID3K5N31nYoru4YKv1s1NNTg+kgO/zzE74khGBDkDMEcbrDcFNICFjuUXDcGJXLermt9Lj/2tJyTGsso9H8rNc/ZKiy1XzNahnhiM+VPbYYcFz9K4x74nXL+buE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705612253; c=relaxed/simple;
-	bh=f4pgnl8yd020hjFNUjJcTz/Gx6KZT1fbOEGiRHoWS0I=;
+	s=arc-20240116; t=1705627638; c=relaxed/simple;
+	bh=oIs2VoyVo5eys3aTQpEMmJF1mdTuSPVW1ZHPdC2hqxg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YjM5n//9w76i08Kfxt3/jLRsNEb/uSucSNVE1aTWOB3WtVE4S/4EVNx8y6piYuyCMzLlTL8Lupb2DN5zc7C5u6KcGOSQ4i8MYkyvy49g2opjEh+iUVa3IzYEGWYZzdfnbk+dPAPz7nGWiOzbTHjj63R4ztVsO0irA81r5GB8emM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZOjcivrW; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=o+p45JiE+M7R3bAKso+Nh5dpTKuQEUwwd2hKWAShD0vFTPXwS1zgO2x3QaZJKoD0gMrfwHuptPqQmK+A1VaVGgOJGV9/Y5cvy7qJEx2TyPtSrcbsaDviijQY9hTpF18YIOvm03sGJrFT8KlOBxGc8ey5CJnaST/d0X+VsHvZ4kM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aNjOWHXC; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZOjcivrW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DF08C433C7;
-	Thu, 18 Jan 2024 21:10:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705612252;
-	bh=f4pgnl8yd020hjFNUjJcTz/Gx6KZT1fbOEGiRHoWS0I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZOjcivrWeVqiQ8DXbRajgXxCSi0AX3o34/4vHt4xY0ZnhzaET53Cz7aexMT8aHn4h
-	 M5ArFyBw3UfbVpaf4/Z9R5jHEzG3cMVLydldQ+Gz+dB6E/xbSzGvtvCAhWKP3jTkVs
-	 NeVoUXPOeaCC1aJFFLAMZi3JyZP5FBbanivHS3DIiDvoTRmSVlVFrh9gK+zgS4JuPx
-	 a2NLXYIWfKGkWvFn23pJBDYEqqiOLFyGNR2wEEAtGQdnKptgaikIvDuNwf3KNWUSCq
-	 wP+zvTqLzIH15uhXn7/NUWueHheuyrpj/mKTsg6rzfFSF0P0QejjHhX6c+rmg9EklJ
-	 5GQ+WBkWh5hgQ==
-Date: Thu, 18 Jan 2024 21:10:43 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v7 36/39] selftests/arm64: Add GCS signal tests
-Message-ID: <94263c5c-817f-4dcf-8418-6c7e3c058557@sirena.org.uk>
-References: <20231122-arm64-gcs-v7-0-201c483bd775@kernel.org>
- <20231122-arm64-gcs-v7-36-201c483bd775@kernel.org>
- <875y0x7f1m.fsf@linaro.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aNjOWHXC"
+Date: Fri, 19 Jan 2024 10:26:59 +0900
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1705627634;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MEAAKdKI2s28mLXSjhbge/t2jcWXL1sSrlOeBNigut8=;
+	b=aNjOWHXCrX/lkwKeCe64ksjMWHQnYhafV7LjxiqaEbtC7Rtq2OswV7y4MAuWj8a0yQmjgh
+	LIHNxMfvUdAjeJ9hG0aTTuYW8VB0blGusdNjdMZYbXrerP2ioa++WAdfAkv3UDD8GsJBKI
+	b0XaHXSc78GqGkDtCfcwHTBTwGgeDlI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Itaru Kitayama <itaru.kitayama@linux.dev>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org,
+	maz@kernel.org, steven.price@arm.com, alexandru.elisei@arm.com,
+	joey.gouly@arm.com, james.morse@arm.com,
+	Jonathan.Cameron@huawei.com, dgilbert@redhat.com, jpb@kernel.org,
+	oliver.upton@linux.dev, zhi.wang.linux@gmail.com,
+	yuzenghui@huawei.com, salil.mehta@huawei.com,
+	Andrew Jones <andrew.jones@linux.dev>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Quentin Perret <qperret@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Thomas Huth <thuth@redhat.com>, Ryan Roberts <Ryan.Roberts@arm.com>,
+	Sami Mujawar <Sami.Mujawar@arm.com>
+Subject: Re: [RFC] Support for Arm CCA VMs on Linux
+Message-ID: <ZanP4+K/CEkhukkp@vm3>
+References: <20230127112248.136810-1-suzuki.poulose@arm.com>
+ <20231002124311.204614-1-suzuki.poulose@arm.com>
+ <ZZ4tsTQOKOamM+h/@vm3>
+ <ec8ed5b0-5080-45e9-a4a6-e5dbe48e86d3@arm.com>
+ <d47e8b8c-50e4-4ad3-8f00-cadaede1eca9@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="doBW+2ZTusCkWc8M"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <875y0x7f1m.fsf@linaro.org>
-X-Cookie: FEELINGS are cascading over me!!!
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d47e8b8c-50e4-4ad3-8f00-cadaede1eca9@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
+On Wed, Jan 10, 2024 at 01:44:45PM +0000, Suzuki K Poulose wrote:
+> On 10/01/2024 11:41, Suzuki K Poulose wrote:
+> > Hi Itaru,
+> > 
+> > On 10/01/2024 05:40, Itaru Kitayama wrote:
+> > > On Mon, Oct 02, 2023 at 01:43:11PM +0100, Suzuki K Poulose wrote:
+> > > > Hi,
+> > > > 
+> > > > 
+> 
+> ...
+> 
+> > > 
+> > > Suzuki,
+> > > Any update to the Arm CCA series (v3?) since last October?
+> > 
+> > Yes, we now have a version that supports the final RMM-v1.0
+> > specification (RMM-v1.0-EAC5). We also have the UEFI EDK2 firmware
+> > support for Guests in Realm world.
+> > 
+> > We are planning to post the changes for review in the v6.8-rc cycle. We
+> > are trying to integrate the guest_mem support (available in v6.8-rc1) as
+> > well as reusing some of the arm64 kvm generic interface for configuring
+> > the Realm parameters (e.g., PMU, SVE_VL etc).
+> > 
+> > Here is a version that is missing the items mentioned above, based
+> > on v6.7-rc4, if anyone would like to try.
+> > 
+> > Also, the easiest way to get the components built and model kick started
+> > is using the shrinkwrap [6] tool, using the cca-3world configuration.
+> > The tool pulls all the required software components, builds (including
+> > the buildroot for rootfs) and can run a model using these built
+> > components.
+> 
+> Also, please see 'arm/run-realm-tests.sh' in the kvm-unit-tests-cca
+> repository for sample command lines to invoke kvmtool to create Realm
+> VMs.
 
---doBW+2ZTusCkWc8M
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Thank you, Suzuki. I have just run the script above, again in the
+framework of shrinkwrap on the RevC FVP and the jobs ran fine. I need to
+go look at the lots of logs.
 
-On Sat, Dec 16, 2023 at 11:12:37PM -0300, Thiago Jung Bauermann wrote:
-> Mark Brown <broonie@kernel.org> writes:
+Itaru.
 
-> > +/* This should be includable from some standard header, but which? */
-> > +#ifndef SEGV_CPERR
-> > +#define SEGV_CPERR 10
-> > +#endif
-
-> One suggestion is include/uapi/asm-generic/siginfo.h. It already has
-> SEGV_MTEAERR and SEGV_MTESERR, as well as si_codes specific to other
-> arches.
-
-Sadly the testsuite is being very clever with redefining siginfo_t which
-means it conflicts with that header.  I'll update the comment.
-
-> > +	if (!get_current_context(td, &context.uc, sizeof(context))) {
-> > +		fprintf(stderr, "Failed getting context\n");
-> > +		return 1;
-> > +	}
-
-> At this point, before any function call is made, can the test check that
-> *(gcspr + 8) == 0? This would detect the issue I mentioned in
-> patch 24 of gcs_restore_signal() not zeroing the location of the cap.
-
-Sure.
-
-> > +	if (gcs->gcspr != gcspr) {
-> > +		fprintf(stderr, "Got GCSPR %llx but expected %lx\n",
-> > +			gcs->gcspr, gcspr);
-> > +		return 1;
-> > +	}
-
-> I suggest adding a new check here to ensure that gcs->reserved == 0.
-
-This would mean that you couldn't use an old kselftest build to verify
-a new kernel that starts using the reserved bits.  It's niche but it
-does seem like something that should work.
-
---doBW+2ZTusCkWc8M
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmWpk9IACgkQJNaLcl1U
-h9D18Qf/dkanHMRcVOLBO0KY2XdPTIfY1GyOkjJY1kaVS8NrmmBXUrDbi21xRyjY
-hrG/NK4XolQfikIXkTHDmzK4oPapXDow6he4iR1c9zU0DnLSMp4VoXZ7ocIMAoBi
-tQ10946KiS7b3/zM+TNvOJeQcoToWb8HdVsvesPbs3kMHXTGFOCXIIGP+at5Xn+d
-jm35bqd8SAcCA57Xci4zNZm6G/40We/QeI3oAQjjrGQuCHeecQQAz1qMinbc5udk
-98yjraA9J1Q0v5JAuH1ssAczoXX2hM7H7ZJZFu2x/lXqoq2bvjEDsJUJHybrb4d+
-R77h7JGFnnC+PGVQbXKJpz1bueqP8w==
-=5ri/
------END PGP SIGNATURE-----
-
---doBW+2ZTusCkWc8M--
+> 
+> 
+> > 
+> > 
+> > 
+> > [0] Linux Repo:
+> >        Where: git@git.gitlab.arm.com:linux-arm/linux-cca.git
+> >        KVM Support branch: cca-host/rmm-v1.0-eac5
+> >        Linux Guest branch: cca-guest/rmm-v1.0-eac5
+> >        Full stack branch:  cca-full/rmm-v1.0-eac5
+> > 
+> > [1] kvmtool Repo:
+> >        Where: git@git.gitlab.arm.com:linux-arm/kvmtool-cca.git
+> >        Branch: cca/rmm-v1.0-eac5
+> > 
+> > [2] kvm-unit-tests Repo:
+> >        Where: git@git.gitlab.arm.com:linux-arm/kvm-unit-tests-cca.git
+> >        Branch: cca/rmm-v1.0-eac5
+> > 
+> > [3] UEFI Guest firmware:
+> >        edk2:     https://git.gitlab.arm.com/linux-arm/edk2-cca.git
+> >        revision: 2802_arm_cca_rmm-v1.0-eac5
+> > 
+> >        edk2-platforms:
+> > https://git.gitlab.arm.com/linux-arm/edk2-platforms-cca.git
+> >        revision:       2802_arm_cca_rmm-v1.0-eac5
+> > 
+> > 
+> > [4] RMM Repo:
+> >        Where: https://git.trustedfirmware.org/TF-RMM/tf-rmm.git
+> >        tag : tf-rmm-v0.4.0
+> > 
+> > [5] TF-A repo:
+> >        Where: https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git
+> >        Tag: v2.10
+> > 
+> > 
+> > [6] https://shrinkwrap.docs.arm.com/en/latest/
+> >      config: cca-3world.yaml
+> > 
+> 
+> Suzuki
+> 
