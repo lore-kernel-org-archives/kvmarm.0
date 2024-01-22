@@ -1,104 +1,139 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D8A55C1F;
-	Mon, 22 Jan 2024 16:29:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DB2651A1
+	for <kvmarm@lists.linux.dev>; Mon, 22 Jan 2024 17:28:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705940956; cv=none; b=qqajGBfcfBfHa93T4QSlsp2iE2lkSyjIhWp5Y/qQU1lpwj/bNSH1t5vegLzp3oHAqRMwnjdZZwZKrab1pnoYXYXf4c3gD64sjmwbrYuqPxe5I+EnnpJVIuQ7F2gXp44TY8/NDXFkBiI1pp2zwziGQ91leFIxG7H1qT1xLWpVtEg=
+	t=1705944484; cv=none; b=OyELwVpyxOXHzFmoj7ynw4Cr0rGZQx+TGsQXHr6/LqgnQaO0Icy/jL+7wSkxfdaosFzDMaydtRauD4LiSqm6/k8BqRY/HlISbe+14+qsfqGklWjRgBspoqTCC15Ptlrr9OaT8Uk031AmS5TlxwGVCxb3aWMOzn/321QSVXvGfik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705940956; c=relaxed/simple;
-	bh=uwufjRPZpufB4WAKz4BvxO1YI+sO9dPrjMMi385iZbk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=e240o9y0mb5vKUZWFIQ8NInJ23Os6GAKO/Ccp+8XTQY0aXEvylzqEVqGcvFtcUAHg60GXh6GlUC4m82Kgq5jYhJczy+saekMehic2mgvux6SwK5iiFu6nqol2AFGqEdXkZypWZH4yHiyiBh6+GcE/aDwXkwSEzbkPq42OWBWHRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uenH2NUr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1705944484; c=relaxed/simple;
+	bh=HxKy5Bibhf+2B00lsgPRKpJNJzyu7ueJfD16Tr2+GJg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tb+aiyPr8uC0/RHWYe6S3pd1eVvZGSBpl1evGrPNIURV5d5TFDnpzmVWNGQ1KWFARTga32ZYHQ0GkoWNdrFT0ZT/9/w8cVHorK9+cGL2nhR2BFIrTz5etQZXxNpMhda41JZssfse5lM2ashwTioaD92GjSfwGIQpmdvWKdvoCGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=k2RTabvp; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uenH2NUr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7E90C433C7;
-	Mon, 22 Jan 2024 16:29:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705940955;
-	bh=uwufjRPZpufB4WAKz4BvxO1YI+sO9dPrjMMi385iZbk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=uenH2NUrX3BKHUZTGYAKES6IUCVEd34fQcYHD/QnUk1hcVVtzw8IkjJAygPTxBvUV
-	 tLkmF17RwOKNQAvH5LjkOzMpL0aNyhV0o35SD1BLHNr948RqRN1zl9kG5sRSF703g2
-	 cGPTvtH9m6GrOm1ja5pzN8BsNPwRWktFhbpNkmbYSjSBSM/pcVITivuw5S1ejWN+hG
-	 TV0RjxjdH3wWxQvToX4Cq+xZmgPWrvwp5eJBN0t+6T2t4NE2sSey9xtVM0MZCsKJUP
-	 /T8YN2h6hgpeTeQeQdDR0xruIqNn4IfxlVcwpKxwjoYKiyBfMUJ01ipOAB5QmzXE2u
-	 pa2nuS9aj8BDA==
-From: Mark Brown <broonie@kernel.org>
-Date: Mon, 22 Jan 2024 16:28:17 +0000
-Subject: [PATCH v4 14/14] KVM: arm64: selftests: Teach get-reg-list about
- FPMR
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="k2RTabvp"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=4s5ASXue467nLReommt3Qb/xh4/CleRrf7HABCgDhAc=; b=k2RTabvplP91YS/X8q/zqV21/0
+	qq9DgaiMgmZJiqO3jB55Q9chgwQ35eB1+eA7x7jhEHzaKdet6hSaC52CWHQUgwvG7gkDXSgFaHYat
+	F0fK7xJGkii9k+DKttPiUF0xErSZBLXj7z3pTPWSb7ke6hMhA8Q1+WfuHcA4kdmfF4+MTDeWJqrHn
+	DKxdjxQtMmdbZ+GjpYGGO2++xFou5Tg1sahLJn3m0tXgnSlLLVFyRoEFSuaMmiAwqWqCQ62AkNjs/
+	r8m/fC/O5qBwbiu03pbM8QcCyTyuegbDsHWC+bqv2hZ/QYcKy7OJpQoabZft8xMDIEc6qarES6VyY
+	n51mtm7A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60388)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rRy5I-0001Gc-2T;
+	Mon, 22 Jan 2024 17:27:44 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rRy5D-0001Bz-Ok; Mon, 22 Jan 2024 17:27:39 +0000
+Date: Mon, 22 Jan 2024 17:27:39 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>, linux-pm@vger.kernel.org,
+	loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, acpica-devel@lists.linuxfoundation.org,
+	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com,
+	James Morse <james.morse@arm.com>
+Subject: Re: [PATCH RFC v3 03/21] ACPI: processor: Register CPUs that are
+ online, but not described in the DSDT
+Message-ID: <Za6li4NhfvL6x6Vl@shell.armlinux.org.uk>
+References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk>
+ <E1rDOg2-00Dvjk-RI@rmk-PC.armlinux.org.uk>
+ <CAJZ5v0ju1JHgpjuFLHZVs4NZiARG6iBZN_wza6c2e0kDhZjK0w@mail.gmail.com>
+ <ZaURtUvWQyjYfiiO@shell.armlinux.org.uk>
+ <20240122160227.00002d83@Huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240122-arm64-2023-dpisa-v4-14-776e094861df@kernel.org>
-References: <20240122-arm64-2023-dpisa-v4-0-776e094861df@kernel.org>
-In-Reply-To: <20240122-arm64-2023-dpisa-v4-0-776e094861df@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <shuah@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Dave Martin <dave.martin@arm.com>, kvmarm@lists.linux.dev, 
- linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.13-dev-5c066
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1321; i=broonie@kernel.org;
- h=from:subject:message-id; bh=uwufjRPZpufB4WAKz4BvxO1YI+sO9dPrjMMi385iZbk=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBlrpemmM3AK6+WPaoSdy7Qcch0oKIzrES77Fu5/jhd
- JEa4ODGJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZa6XpgAKCRAk1otyXVSH0L2FB/
- 9JtvyUkvEyYLF+wF35/AAh39vh4Uvxxsf8+qhD0Ff1cZCEm7UP72/BD/8DFiY44ZE9neyx6LzObJu4
- b7wIddfXclMlzgs+ZS3eB/OfjGEUcTbK9rVQQHvreEkW9S01Zct8IYaKbfTePsXLratgs+8stgWDry
- ubCvtehsccI4szJhv0p2hVbpt6MYWDU6vORq5ZC5cRJnD4klBcHi5kSYPFvy8qIYr+LF+L8d2XgEp5
- OFcGru+xBhviS/IlCoLWx/VV01mEOaPW9hDK6+udmSB/0BjI+E0t2XqmsCOHwuuFr7h8+SMlSQ8ACu
- rFY8oKoGPaCrZujLbSgguhkXRQIpJw
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240122160227.00002d83@Huawei.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-FEAT_FPMR defines a new register FMPR which is available at all ELs and is
-discovered via ID_AA64PFR2_EL1.FPMR, add this to the set of registers that
-get-reg-list knows to check for with the required identification register
-depdendency.
+On Mon, Jan 22, 2024 at 04:02:27PM +0000, Jonathan Cameron wrote:
+> On Mon, 15 Jan 2024 11:06:29 +0000
+> "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> 
+> > On Mon, Dec 18, 2023 at 09:22:03PM +0100, Rafael J. Wysocki wrote:
+> > > On Wed, Dec 13, 2023 at 1:49 PM Russell King <rmk+kernel@armlinux.org.uk> wrote:  
+> > > >
+> > > > From: James Morse <james.morse@arm.com>
+> > > >
+> > > > ACPI has two descriptions of CPUs, one in the MADT/APIC table, the other
+> > > > in the DSDT. Both are required. (ACPI 6.5's 8.4 "Declaring Processors"
+> > > > says "Each processor in the system must be declared in the ACPI
+> > > > namespace"). Having two descriptions allows firmware authors to get
+> > > > this wrong.
+> > > >
+> > > > If CPUs are described in the MADT/APIC, they will be brought online
+> > > > early during boot. Once the register_cpu() calls are moved to ACPI,
+> > > > they will be based on the DSDT description of the CPUs. When CPUs are
+> > > > missing from the DSDT description, they will end up online, but not
+> > > > registered.
+> > > >
+> > > > Add a helper that runs after acpi_init() has completed to register
+> > > > CPUs that are online, but weren't found in the DSDT. Any CPU that
+> > > > is registered by this code triggers a firmware-bug warning and kernel
+> > > > taint.
+> > > >
+> > > > Qemu TCG only describes the first CPU in the DSDT, unless cpu-hotplug
+> > > > is configured.  
+> > > 
+> > > So why is this a kernel problem?  
+> > 
+> > So what are you proposing should be the behaviour here? What this
+> > statement seems to be saying is that QEMU as it exists today only
+> > describes the first CPU in DSDT.
+> 
+> This confuses me somewhat, because I'm far from sure which machines this
+> is true for in QEMU.  I'm guessing it's a legacy thing with
+> some old distro version of QEMU - so we'll have to paper over it anyway
+> but for current QEMU I'm not sure it's true.
+> 
+> Helpfully there are a bunch of ACPI table tests so I've been checking
+> through all the multi CPU cases.
+> 
+> CPU hotplug not enabled.
+> pc/DSDT.dimmpxm  - 4x Processor entries.  -smp 4
+> pc/DSDT.acpihmat - 2x Processor entries.  -smp 2
+> q35/DSDT.acpihmat - 2x Processor entries. -smp 2
+> virt/DSDT.acpihmatvirt - 4x ACPI0007 entries -smp 4
+> q35/DSDT.acpihmat-noinitiator - 4 x Processor () entries -smp 4 
+> virt/DSDT.topology - 8x ACPI0007 entries
+> 
+> I've also looked at the code and we have various types of
+> CPU hotplug on x86 but they all build appropriate numbers of
+> Processor() entries in DSDT.
+> Arm likewise seems to build the right number of ACPI0007 entries
+> (and doesn't yet have CPU HP support).
+> 
+> If anyone can add a reference on why this is needed that would be very
+> helpful.
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/aarch64/get-reg-list.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index 71ea6ecec7ce..1e43511d1440 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -40,6 +40,12 @@ static struct feature_id_reg feat_id_regs[] = {
- 		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
- 		4,
- 		1
-+	},
-+	{
-+		ARM64_SYS_REG(3, 3, 4, 4, 2),	/* FPMR */
-+		ARM64_SYS_REG(3, 0, 0, 4, 2),	/* ID_AA64PFR2_EL1 */
-+		32,
-+		1
- 	}
- };
- 
-@@ -481,6 +487,7 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 3, 14, 2, 1),	/* CNTP_CTL_EL0 */
- 	ARM64_SYS_REG(3, 3, 14, 2, 2),	/* CNTP_CVAL_EL0 */
- 	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
-+	ARM64_SYS_REG(3, 3, 4, 4, 2),	/* FPMR */
- 	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
- 	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
- };
+Maybe Salil can shed some light on this?
 
 -- 
-2.30.2
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
