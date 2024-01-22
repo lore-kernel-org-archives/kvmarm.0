@@ -1,195 +1,112 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4EFC4122A
-	for <kvmarm@lists.linux.dev>; Mon, 22 Jan 2024 20:19:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1230148CE9
+	for <kvmarm@lists.linux.dev>; Mon, 22 Jan 2024 21:29:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705954742; cv=none; b=WrCojYMeAOXkVa6ioY5NETFCyDKLuQCwzpa/A81cKLv4SRPvLUzgr4/NlH94sI9bEzqVFzOGYX/SQKrKDEp3U/sYZmPpgI3/K/5NodCX8qQF1HBCuG/GNjnnzBq49jdJRDHzff0LU7TF9k3PtqSXDYjL7K7Wmui2lMdVjNHlLc4=
+	t=1705958982; cv=none; b=mXJTBvDXDG7jxknivpgipQsNIv5H5ClK3FePl7Q20RuUI2v43fqAbtpXvUmXv7u9AY5r2ieQfdnu/mR7ZZFKOkTFSJHlvHkvArCmr/yfiP3HPGuvw7x83aQuKYlQqaBn3/MLqnEMcsY+xfboz6XGont3eMDad4UOp58Ue2TZ4uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705954742; c=relaxed/simple;
-	bh=qY2D63nr7CXZXtPqpmI7dtxD0dAWJWy0xSTh5/zrD7s=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gUOFgBjW4ZNnRlezVd/N2xP6TC9CX9LQABTxzlNwfqneAXFCaqRjzRp2U3CsolEhQayzym58JTmTKT3vDoX6w/u6lOyGffSLM5V6fyhCuYo42zSlgyGSJn1p0qTi3EibjzwPHPd79hE3o/LPgCnErxeclLbSZ6oC7OxnuIAW5Ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SjM7a8GZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1705958982; c=relaxed/simple;
+	bh=WFleTVHI15wq54UDGMl0AQCcsbvuKvyQUVYiML8KPV0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qww28EBzc2rD8PGkFhxNa8VyJylWnv4eoUSf51HtVH8O58KpS9REtckB6XyhJS+TfS1Om7x6/ZmryXtH1HMWVnUGdKIHGZlwYjW/bQdJ4bbVQfuOktfuR4bK9wRPE8sccr6SAbqcndykl+epk4XtMeiGwCzvDpjOJ4xRDRejG0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L+eAgXUY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SjM7a8GZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D571C433A6;
-	Mon, 22 Jan 2024 20:19:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L+eAgXUY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73731C43390;
+	Mon, 22 Jan 2024 21:29:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705954742;
-	bh=qY2D63nr7CXZXtPqpmI7dtxD0dAWJWy0xSTh5/zrD7s=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SjM7a8GZWgNffa6vPtmh5KcZlWafesLra3V+pLzv6Uj51DJA/pr4XbvrwJH0bhbwK
-	 c49/g8f+9H3iaUcR+XbSRzuUToW4MBs7SGS40+D30G+8cJGTQC4KJpgZ2HHN7VBPIe
-	 La+HSRa/Vf1pfMWCuEEKxvcRK5//gnk8qOZkfDdqzuX5dOsQuvZrlXSMRS6t38gpce
-	 ricn7bgDfyp3+hgaF9YDusPlezRP8LLbIQWys98j4Zl9p/p75sSjQxBCZAWLrWnaDG
-	 jSiS2qXknnZfYh4pY3yFiGSqa+dkMuaD/J7o+RCpDu/4UmstXRINGFa03BliljLRYA
-	 XXIp5ozUZNgPw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rS0l2-00DjkQ-GI;
-	Mon, 22 Jan 2024 20:19:00 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: James Morse <james.morse@arm.com>,
+	s=k20201202; t=1705958981;
+	bh=WFleTVHI15wq54UDGMl0AQCcsbvuKvyQUVYiML8KPV0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=L+eAgXUYpO2fLug6kc/A5TKSyNlbcnTJkhbbxURzXez1GDPybopLkJ6Azo0Sl8UIM
+	 WOD4fSLSF18d1pVZkQtQkZR6zOT1kYlrDwgLJNORZV990yQRURK1jmJG9TbaUNCCEi
+	 GQpCjnJs6zVDPSftvv75ByOCL4d5bUBWl/p0BQDeMem3RipBkwEd+k3BJKlLmVVjS9
+	 fAiQU2S66i0LNtKdLsevwTk6iWdsCFXpa+qGViofdzfqlNLI8RQ26CQyRlGN46dB8K
+	 057uqml+PPyLzP9l/BmTQXV2H9ycPHZV3N+NgexU2YdqnL1w0MtEpu6rWqQeusK4/Y
+	 3CFqrYgOr0GZQ==
+Date: Mon, 22 Jan 2024 21:29:36 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: [PATCH 25/25] KVM: arm64: Add debugfs file for guest's ID registers
-Date: Mon, 22 Jan 2024 20:18:52 +0000
-Message-Id: <20240122201852.262057-26-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240122201852.262057-1-maz@kernel.org>
+	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 01/25] arm64: sysreg: Add missing ID_AA64ISAR[13]_EL1
+ fields and variants
+Message-ID: <0146c7fa-f7e6-45e8-8f02-bec677f84397@sirena.org.uk>
 References: <20240122201852.262057-1-maz@kernel.org>
+ <20240122201852.262057-2-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="hTPQOzYPOX8FaDXg"
+Content-Disposition: inline
+In-Reply-To: <20240122201852.262057-2-maz@kernel.org>
+X-Cookie: Nice guys don't finish nice.
 
-Debugging ID register setup can be a complicated affair. Give the
-kernel hacker a way to dump that state in an easy to parse way.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h |  3 ++
- arch/arm64/kvm/sys_regs.c         | 81 +++++++++++++++++++++++++++++++
- 2 files changed, 84 insertions(+)
+--hTPQOzYPOX8FaDXg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 22343354db3e..065e2deb3ea4 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -319,6 +319,9 @@ struct kvm_arch {
- 	/* PMCR_EL0.N value for the guest */
- 	u8 pmcr_n;
- 
-+	/* Iterator for idreg debugfs */
-+	u8	idreg_debugfs_iter;
-+
- 	/* Hypercall features firmware registers' descriptor */
- 	struct kvm_smccc_features smccc_feat;
- 	struct maple_tree smccc_filter;
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index b7977e08e4ef..3278ba0d0347 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -12,6 +12,7 @@
- #include <linux/bitfield.h>
- #include <linux/bsearch.h>
- #include <linux/cacheinfo.h>
-+#include <linux/debugfs.h>
- #include <linux/kvm_host.h>
- #include <linux/mm.h>
- #include <linux/printk.h>
-@@ -3423,6 +3424,81 @@ static bool emulate_sys_reg(struct kvm_vcpu *vcpu,
- 	return false;
- }
- 
-+static void *idregs_debug_start(struct seq_file *s, loff_t *pos)
-+{
-+	struct kvm *kvm = s->private;
-+	u8 *iter;
-+
-+	mutex_lock(&kvm->arch.config_lock);
-+
-+	iter = &kvm->arch.idreg_debugfs_iter;
-+	if (*iter == (u8)~0) {
-+		*iter = *pos;
-+		if (*iter >= KVM_ARM_ID_REG_NUM)
-+			iter = NULL;
-+	} else {
-+		iter = ERR_PTR(-EBUSY);
-+	}
-+
-+	mutex_unlock(&kvm->arch.config_lock);
-+
-+	return iter;
-+}
-+
-+static void *idregs_debug_next(struct seq_file *s, void *v, loff_t *pos)
-+{
-+	struct kvm *kvm = s->private;
-+
-+	(*pos)++;
-+
-+	if ((kvm->arch.idreg_debugfs_iter + 1) < KVM_ARM_ID_REG_NUM) {
-+		kvm->arch.idreg_debugfs_iter++;
-+
-+		return &kvm->arch.idreg_debugfs_iter;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void idregs_debug_stop(struct seq_file *s, void *v)
-+{
-+	struct kvm *kvm = s->private;
-+
-+	if (IS_ERR(v))
-+		return;
-+
-+	mutex_lock(&kvm->arch.config_lock);
-+
-+	kvm->arch.idreg_debugfs_iter = ~0;
-+
-+	mutex_unlock(&kvm->arch.config_lock);
-+}
-+
-+static int idregs_debug_show(struct seq_file *s, void *v)
-+{
-+	struct kvm *kvm = s->private;
-+	const struct sys_reg_desc *desc;
-+
-+	desc = first_idreg + kvm->arch.idreg_debugfs_iter;
-+
-+	if (!desc->name)
-+		return 0;
-+
-+	seq_printf(s, "%20s:\t%016llx\n",
-+		   desc->name, IDREG(kvm, IDX_IDREG(kvm->arch.idreg_debugfs_iter)));
-+
-+	return 0;
-+}
-+
-+static const struct seq_operations idregs_debug_sops = {
-+	.start	= idregs_debug_start,
-+	.next	= idregs_debug_next,
-+	.stop	= idregs_debug_stop,
-+	.show	= idregs_debug_show,
-+};
-+
-+DEFINE_SEQ_ATTRIBUTE(idregs_debug);
-+
- static void kvm_reset_id_regs(struct kvm_vcpu *vcpu)
- {
- 	const struct sys_reg_desc *idreg = first_idreg;
-@@ -3442,6 +3518,11 @@ static void kvm_reset_id_regs(struct kvm_vcpu *vcpu)
- 		id = reg_to_encoding(idreg);
- 	}
- 
-+	kvm->arch.idreg_debugfs_iter = ~0;
-+
-+	debugfs_create_file("idregs", 0444, kvm->debugfs_dentry, kvm,
-+			    &idregs_debug_fops);
-+
- 	set_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags);
- }
- 
--- 
-2.39.2
+On Mon, Jan 22, 2024 at 08:18:28PM +0000, Marc Zyngier wrote:
 
+> Despite having the control bits for FEAT_SPECRES and FEAT_PACM,
+> the ID registers fields are either incomplete or missing.
+
+In general the registers tend to get updated register by register so
+it's not 100% surprising to get partial definition of features, though
+more usually it's the ID register that's there.
+
+> Fix it.
+
+Checking against DDI0601 2023-12 the additions here look correct with
+the proviso below, I didn't audit for other missing defintions in the
+two affected registers (ID_AA64ISAR[13]_EL1).
+
+Reviewed-by: Mark Brown <broonie@kernel.org>
+
+> ---
+>  arch/arm64/tools/sysreg | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index fa3fe0856880..53daaaef46cb 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -1366,6 +1366,7 @@ EndEnum
+>  UnsignedEnum	43:40	SPECRES
+>  	0b0000	NI
+>  	0b0001	IMP
+> +	0b0010	COSP_RCTX
+
+This is OK in itself but there's also a copy of this in ID_ISAR6_EL1
+which needs updating too (and presumably ought to be considered by the
+hypervisor, I didn't look at anything else yet).
+
+--hTPQOzYPOX8FaDXg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmWu3j8ACgkQJNaLcl1U
+h9BkVAf/UuDuQ513O7Jd0sdc++i6nrlbAsPKy/PuC4O8+u9QSLKocEir/AzOrJj+
+cQzFbaujwW8xivWIvWN7g4sivgjoaPQb1LpJ54uoKM7sO0XUSQlkBhzFchzYyt2N
+jyC4kt5Kc6mR0eX/ZTXMmE9O4kdrqxBEEuTYlntKYVb09Hu4z5Z15o9x3puspOz6
+NNAlHQb0yvjCYjwCx+Q2UvGL+Lbv4sLDR8Owmwbg3rXd9howcOj7J6FJko15C3pc
+IGoNZnv/LSz7LhxjtI33GlV4TWK/ZAKWCHN4FdHKpzHt8Zh9TmMcf7VbgQDt2QYz
+t4W4In9pSeNZn+UZgBri6s5h9nbkyQ==
+=p08F
+-----END PGP SIGNATURE-----
+
+--hTPQOzYPOX8FaDXg--
