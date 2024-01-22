@@ -1,420 +1,137 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453CB39AF1
-	for <kvmarm@lists.linux.dev>; Mon, 22 Jan 2024 09:48:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B7E3B790
+	for <kvmarm@lists.linux.dev>; Mon, 22 Jan 2024 12:21:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705916910; cv=none; b=lnEqTd+KgAxdCRyh8HQqnezDOMtNJ4vkvIKLJtwFId4+H/1k3OakMTn/yU5XrhV7l8mqza4+ZsUshQQs+yViKsbg4u61VkcGFUkaSYYSiY5OzxgxKmo/H5V80r88+Ef7UADsmtXNwiSWidti23WwxF4Vt9Vi+frrCeTBJy4MGmQ=
+	t=1705926099; cv=none; b=lNFqrrjCKCo6t7nZa3otog2Kv7TWH3DPi4GHO/YUCegZj2iZpcX7VKF3xBj4arq+71lWd1Zeb9BPMiOQ723no9IuRZkQXlFqLBR+DMqgBOdFbfLH+Fn8mGeWSxwhgHXHy8DxCA2cANTuV4m+npXM6/0xcgfpLjV5FnSyCzGtazo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705916910; c=relaxed/simple;
-	bh=1XO9eEdspJUyiQNfOySiSxKbv3KYnLFim284FfulR8k=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=X8+E7ZoiQVE/Eep9teoGusHcI0llNDkRfxVGSDmNUXxHEffrbI7fywNkZxrZWvPsSliC8zbBIJeQjf4tTZZII2OVMeOi0SGk7q22HRSo+E3ZqVfYM7mJMOmzROJaHnSp+qNNSyKj60bBkKpFpGsdeGEE6les7z9GmS1V73aBBSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OZED7pmG; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1705926099; c=relaxed/simple;
+	bh=vNrKTN+Psy0M2VFW5VqZf+0AB0x8oBNn3f2wlhE/7W8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sXNpAXX+M9GoltYDvWF4sjQas5NDL4R9vqmFHZKesbFjz78FGDDfPJOHGZux5CT+c/aPx7t3zCyFIPUGWm/L8FbF5yCBf+AbkF3CqJujKYapd3MoP4bJJSMRhV5qxchd4VTqE8GKCPTERHoUQIxh0Ot3vrW51YZbgiMJ6lYmLhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=YcIxDZwR; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OZED7pmG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705916908; x=1737452908;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=1XO9eEdspJUyiQNfOySiSxKbv3KYnLFim284FfulR8k=;
-  b=OZED7pmG/WUAiFO1HN89M30DwhnnWtTEnSswkTLDHvUNvFObxbuqKr7w
-   9TxhY+P65qPc51HJSr8/H7t2IKa5Ax6N87tp/zHgTh84cvSXUymUbt2CI
-   Spzj3uPSSCTfMUGBOM3imDy4dqzMl+uzO91xdD5RRUeEu6m8PLMsZpeC4
-   3xt///Tk+etHJaKmxGtL5jfPExJ7Xjj6RJUxXkx2CTuDyyT5iNtzHMlnr
-   B/H7gNURJlVqUmUPVT1kd1AuwCBF91/HwBLC5zBRWy0SRZEbCu+DNV0PG
-   OTMIAmmqUwBVw+/i8cObkLWCM3DMtSaETHdX64tXam+2MnEZyHToRlIOx
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="22642104"
-X-IronPort-AV: E=Sophos;i="6.05,211,1701158400"; 
-   d="scan'208";a="22642104"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 01:48:27 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="778535602"
-X-IronPort-AV: E=Sophos;i="6.05,211,1701158400"; 
-   d="scan'208";a="778535602"
-Received: from haibo-optiplex-7090.sh.intel.com ([10.239.159.132])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 01:48:18 -0800
-From: Haibo Xu <haibo1.xu@intel.com>
-To: 
-Cc: xiaobo55x@gmail.com,
-	ajones@ventanamicro.com,
-	Haibo Xu <haibo1.xu@intel.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Guo Ren <guoren@kernel.org>,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Mayuresh Chitale <mchitale@ventanamicro.com>,
-	Greentime Hu <greentime.hu@sifive.com>,
-	Minda Chen <minda.chen@starfivetech.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Jisheng Zhang <jszhang@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Like Xu <likexu@tencent.com>,
-	Peter Xu <peterx@redhat.com>,
-	Vipin Sharma <vipinsh@google.com>,
-	Thomas Huth <thuth@redhat.com>,
-	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>,
-	Aaron Lewis <aaronlewis@google.com>,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm-riscv@lists.infradead.org
-Subject: [PATCH v5 12/12] KVM: riscv: selftests: Add sstc timer test
-Date: Mon, 22 Jan 2024 17:58:42 +0800
-Message-Id: <f20fbb9657f586f159c7b8171c9163226e2d52c1.1705916069.git.haibo1.xu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1705916069.git.haibo1.xu@intel.com>
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="YcIxDZwR"
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-337cf4ac600so2897083f8f.3
+        for <kvmarm@lists.linux.dev>; Mon, 22 Jan 2024 04:21:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1705926095; x=1706530895; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pNyn/qnqC01DO5aYO0gaP3LnuG+kGrelMJHPp637j+Q=;
+        b=YcIxDZwRhcgpTMrZl7gw79FIFMQe0ICMIKwda8a8+zuLqNkc8MSMs59ELx1zn9AduX
+         g6ilxMPPDUy4P+hHPuLUd83jwp3lvJ474h4f+joq5G4Y14/yKWD5Fhx5TIwY2IYR5nIS
+         cjUZILhrC3Eq+2b9VuQRw880BIZ4NuS6cBC2w8QhOn2zI3Wl68MwVyxyjzfJDAmZiP4v
+         ReuyCGwtIbP7kMzqc/MjOuqQ6usLrS7/+ccnTNRc65v4krnrWIiy00tpXoW49S50Pf8D
+         kX4mn5aPU1TSZKzLHmrDqfca5vZo5apisJYD2sDXb17tXtDG11qN/fcdxYY37oyGPOsY
+         VKRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705926095; x=1706530895;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pNyn/qnqC01DO5aYO0gaP3LnuG+kGrelMJHPp637j+Q=;
+        b=R8PdjI3rNRLN+hA7HKdhrOUQ1pF/CJHDWOBix9mhs9ljzTLAVHBK6IZWfopOadynfG
+         E3HffqpYABRZ03OayfiCblQkC8f4BQsLP4BcXtGCEkXaRDiiENWP6UAtWUpaGqXJaZuA
+         z7eWMna/XciEq4aoBnDFgoTjiCZOc6pbpqjSk/uacxe2MDAscOWp6QkvXxOJ27QkZv6P
+         PZ1ey2kIUtckt9YWI6qKxqoP6CHfrar8JhpS1qUNDGiaypsu3ATjCAiIU9hS/WuTFdEl
+         U3CC3RYBeXN872E5GMVWmGP3qHmGS7nCv5mgN0f4ZKTL2aYqqTby0iiO1phYypBrislQ
+         0icA==
+X-Gm-Message-State: AOJu0YypoSCSfzNWcXIhx5fP53GDI0S/Je2NGmjWQwB7sR+/5Gc/73we
+	g1+D0p/pCB17DS4P3J2yijPGHOyInz4pIeTI3W5UPzfKiBnThDMzyUMAsTn/NL0=
+X-Google-Smtp-Source: AGHT+IGjstD5P6UroceP4UshiLynFM2AqV73RXt9NzLqzEsWwmxRvB3J0Fsa/nFM64CECZlIeo29pg==
+X-Received: by 2002:a5d:44ce:0:b0:337:c538:6db with SMTP id z14-20020a5d44ce000000b00337c53806dbmr1979837wrr.2.1705926095352;
+        Mon, 22 Jan 2024 04:21:35 -0800 (PST)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id bw12-20020a0560001f8c00b00337cef427f8sm11306084wrb.70.2024.01.22.04.21.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jan 2024 04:21:34 -0800 (PST)
+Date: Mon, 22 Jan 2024 13:21:33 +0100
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Haibo Xu <haibo1.xu@intel.com>
+Cc: xiaobo55x@gmail.com, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
+	Conor Dooley <conor.dooley@microchip.com>, Mayuresh Chitale <mchitale@ventanamicro.com>, 
+	wchen <waylingii@gmail.com>, Daniel Henrique Barboza <dbarboza@ventanamicro.com>, 
+	Samuel Holland <samuel@sholland.org>, Jisheng Zhang <jszhang@kernel.org>, 
+	Minda Chen <minda.chen@starfivetech.com>, Sean Christopherson <seanjc@google.com>, 
+	Peter Xu <peterx@redhat.com>, Like Xu <likexu@tencent.com>, Vipin Sharma <vipinsh@google.com>, 
+	Aaron Lewis <aaronlewis@google.com>, Thomas Huth <thuth@redhat.com>, 
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v5 02/12] KVM: arm64: selftests: Data type cleanup for
+ arch_timer test
+Message-ID: <20240122-0ddedacdeb64808477a7911d@orel>
 References: <cover.1705916069.git.haibo1.xu@intel.com>
+ <173c9b64c4c43cd585f6b177a7d434dcedc905fa.1705916069.git.haibo1.xu@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <173c9b64c4c43cd585f6b177a7d434dcedc905fa.1705916069.git.haibo1.xu@intel.com>
 
-Add a KVM selftests to validate the Sstc timer functionality.
-The test was ported from arm64 arch timer test.
+On Mon, Jan 22, 2024 at 05:58:32PM +0800, Haibo Xu wrote:
+> Change signed type to unsigned in test_args struct which
+> only make sense for unsigned value.
+> 
+> Suggested-by: Andrew Jones <ajones@ventanamicro.com>
+> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> ---
+>  tools/testing/selftests/kvm/aarch64/arch_timer.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> index 274b8465b42a..3260fefcc1b3 100644
+> --- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> @@ -42,10 +42,10 @@
+>  #define TIMER_TEST_MIGRATION_FREQ_MS	2
+>  
+>  struct test_args {
+> -	int nr_vcpus;
+> -	int nr_iter;
+> -	int timer_period_ms;
+> -	int migration_freq_ms;
+> +	uint32_t nr_vcpus;
+> +	uint32_t nr_iter;
+> +	uint32_t timer_period_ms;
+> +	uint32_t migration_freq_ms;
+>  	struct kvm_arm_counter_offset offset;
+>  };
+>  
+> @@ -57,7 +57,7 @@ static struct test_args test_args = {
+>  	.offset = { .reserved = 1 },
+>  };
+>  
+> -#define msecs_to_usecs(msec)		((msec) * 1000LL)
+> +#define msecs_to_usecs(msec)		((msec) * 1000ULL)
+>  
+>  #define GICD_BASE_GPA			0x8000000ULL
+>  #define GICR_BASE_GPA			0x80A0000ULL
+> @@ -72,7 +72,7 @@ enum guest_stage {
+>  
+>  /* Shared variables between host and guest */
+>  struct test_vcpu_shared_data {
+> -	int nr_iter;
+> +	uint32_t nr_iter;
+>  	enum guest_stage guest_stage;
+>  	uint64_t xcnt;
+>  };
+> -- 
+> 2.34.1
+>
 
-Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
 Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/arch_timer.c        |  12 +-
- tools/testing/selftests/kvm/arch_timer.c      |  10 +-
- .../selftests/kvm/include/riscv/arch_timer.h  |  71 +++++++++++
- .../selftests/kvm/include/riscv/processor.h   |  10 ++
- .../selftests/kvm/include/timer_test.h        |   5 +-
- .../testing/selftests/kvm/riscv/arch_timer.c  | 111 ++++++++++++++++++
- 7 files changed, 210 insertions(+), 10 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/include/riscv/arch_timer.h
- create mode 100644 tools/testing/selftests/kvm/riscv/arch_timer.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index f514c81877ce..77004220763e 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -183,6 +183,7 @@ TEST_GEN_PROGS_s390x += rseq_test
- TEST_GEN_PROGS_s390x += set_memory_region_test
- TEST_GEN_PROGS_s390x += kvm_binary_stats_test
- 
-+TEST_GEN_PROGS_riscv += arch_timer
- TEST_GEN_PROGS_riscv += demand_paging_test
- TEST_GEN_PROGS_riscv += dirty_log_test
- TEST_GEN_PROGS_riscv += guest_print_test
-diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index a4732ec9f761..77393be9236d 100644
---- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -194,10 +194,14 @@ struct kvm_vm *test_vm_create(void)
- 	vm_init_descriptor_tables(vm);
- 	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT, guest_irq_handler);
- 
--	if (!test_args.offset.reserved) {
--		if (kvm_has_cap(KVM_CAP_COUNTER_OFFSET))
--			vm_ioctl(vm, KVM_ARM_SET_COUNTER_OFFSET, &test_args.offset);
--		else
-+	if (!test_args.reserved) {
-+		if (kvm_has_cap(KVM_CAP_COUNTER_OFFSET)) {
-+			struct kvm_arm_counter_offset offset = {
-+				.counter_offset = test_args.counter_offset,
-+				.reserved = 0,
-+			};
-+			vm_ioctl(vm, KVM_ARM_SET_COUNTER_OFFSET, &offset);
-+		} else
- 			TEST_FAIL("no support for global offset\n");
- 	}
- 
-diff --git a/tools/testing/selftests/kvm/arch_timer.c b/tools/testing/selftests/kvm/arch_timer.c
-index 113d40f7bb14..e4eb6cacc356 100644
---- a/tools/testing/selftests/kvm/arch_timer.c
-+++ b/tools/testing/selftests/kvm/arch_timer.c
-@@ -36,7 +36,7 @@ struct test_args test_args = {
- 	.timer_period_ms = TIMER_TEST_PERIOD_MS_DEF,
- 	.migration_freq_ms = TIMER_TEST_MIGRATION_FREQ_MS,
- 	.timer_err_margin_us = TIMER_TEST_ERR_MARGIN_US,
--	.offset = { .reserved = 1 },
-+	.reserved = 1,
- };
- 
- struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
-@@ -75,6 +75,8 @@ static void *test_vcpu_run(void *arg)
- 		TEST_FAIL("Unexpected guest exit\n");
- 	}
- 
-+	pr_info("PASS(vCPU-%d).\n", vcpu_idx);
-+
- 	return NULL;
- }
- 
-@@ -190,7 +192,7 @@ static void test_print_help(char *name)
- 		TIMER_TEST_PERIOD_MS_DEF);
- 	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. 0 to turn off (default: %u)\n",
- 		TIMER_TEST_MIGRATION_FREQ_MS);
--	pr_info("\t-o: Counter offset (in counter cycles, default: 0)\n");
-+	pr_info("\t-o: Counter offset (in counter cycles, default: 0) [aarch64-only]\n");
- 	pr_info("\t-e: Interrupt arrival error margin (in us) of the guest timer (default: %u)\n",
- 		TIMER_TEST_ERR_MARGIN_US);
- 	pr_info("\t-h: print this help screen\n");
-@@ -223,8 +225,8 @@ static bool parse_args(int argc, char *argv[])
- 			test_args.timer_err_margin_us = atoi_non_negative("Error Margin", optarg);
- 			break;
- 		case 'o':
--			test_args.offset.counter_offset = strtol(optarg, NULL, 0);
--			test_args.offset.reserved = 0;
-+			test_args.counter_offset = strtol(optarg, NULL, 0);
-+			test_args.reserved = 0;
- 			break;
- 		case 'h':
- 		default:
-diff --git a/tools/testing/selftests/kvm/include/riscv/arch_timer.h b/tools/testing/selftests/kvm/include/riscv/arch_timer.h
-new file mode 100644
-index 000000000000..225d81dad064
---- /dev/null
-+++ b/tools/testing/selftests/kvm/include/riscv/arch_timer.h
-@@ -0,0 +1,71 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * RISC-V Arch Timer(sstc) specific interface
-+ *
-+ * Copyright (c) 2024 Intel Corporation
-+ */
-+
-+#ifndef SELFTEST_KVM_ARCH_TIMER_H
-+#define SELFTEST_KVM_ARCH_TIMER_H
-+
-+#include <asm/csr.h>
-+#include <asm/vdso/processor.h>
-+
-+static unsigned long timer_freq;
-+
-+#define msec_to_cycles(msec)	\
-+	((timer_freq) * (uint64_t)(msec) / 1000)
-+
-+#define usec_to_cycles(usec)	\
-+	((timer_freq) * (uint64_t)(usec) / 1000000)
-+
-+#define cycles_to_usec(cycles) \
-+	((uint64_t)(cycles) * 1000000 / (timer_freq))
-+
-+static inline uint64_t timer_get_cycles(void)
-+{
-+	return csr_read(CSR_TIME);
-+}
-+
-+static inline void timer_set_cmp(uint64_t cval)
-+{
-+	csr_write(CSR_STIMECMP, cval);
-+}
-+
-+static inline uint64_t timer_get_cmp(void)
-+{
-+	return csr_read(CSR_STIMECMP);
-+}
-+
-+static inline void timer_irq_enable(void)
-+{
-+	csr_set(CSR_SIE, IE_TIE);
-+}
-+
-+static inline void timer_irq_disable(void)
-+{
-+	csr_clear(CSR_SIE, IE_TIE);
-+}
-+
-+static inline void timer_set_next_cmp_ms(uint32_t msec)
-+{
-+	uint64_t now_ct = timer_get_cycles();
-+	uint64_t next_ct = now_ct + msec_to_cycles(msec);
-+
-+	timer_set_cmp(next_ct);
-+}
-+
-+static inline void __delay(uint64_t cycles)
-+{
-+	uint64_t start = timer_get_cycles();
-+
-+	while ((timer_get_cycles() - start) < cycles)
-+		cpu_relax();
-+}
-+
-+static inline void udelay(unsigned long usec)
-+{
-+	__delay(usec_to_cycles(usec));
-+}
-+
-+#endif /* SELFTEST_KVM_ARCH_TIMER_H */
-diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/tools/testing/selftests/kvm/include/riscv/processor.h
-index bd27e1c67579..3e7f6b369a5e 100644
---- a/tools/testing/selftests/kvm/include/riscv/processor.h
-+++ b/tools/testing/selftests/kvm/include/riscv/processor.h
-@@ -158,4 +158,14 @@ struct sbiret sbi_ecall(int ext, int fid, unsigned long arg0,
- 			unsigned long arg3, unsigned long arg4,
- 			unsigned long arg5);
- 
-+static inline void local_irq_enable(void)
-+{
-+	csr_set(CSR_SSTATUS, SR_SIE);
-+}
-+
-+static inline void local_irq_disable(void)
-+{
-+	csr_clear(CSR_SSTATUS, SR_SIE);
-+}
-+
- #endif /* SELFTEST_KVM_PROCESSOR_H */
-diff --git a/tools/testing/selftests/kvm/include/timer_test.h b/tools/testing/selftests/kvm/include/timer_test.h
-index 256e2d2137cf..9b6edaafe6d4 100644
---- a/tools/testing/selftests/kvm/include/timer_test.h
-+++ b/tools/testing/selftests/kvm/include/timer_test.h
-@@ -23,8 +23,9 @@ struct test_args {
- 	uint32_t timer_period_ms;
- 	uint32_t migration_freq_ms;
- 	uint32_t timer_err_margin_us;
--	/* TODO: Change arm specific type to a common one */
--	struct kvm_arm_counter_offset offset;
-+	/* Members of struct kvm_arm_counter_offset */
-+	uint64_t counter_offset;
-+	uint64_t reserved;
- };
- 
- /* Shared variables between host and guest */
-diff --git a/tools/testing/selftests/kvm/riscv/arch_timer.c b/tools/testing/selftests/kvm/riscv/arch_timer.c
-new file mode 100644
-index 000000000000..1bbd0ce2923c
---- /dev/null
-+++ b/tools/testing/selftests/kvm/riscv/arch_timer.c
-@@ -0,0 +1,111 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * arch_timer.c - Tests the riscv64 sstc timer IRQ functionality
-+ *
-+ * The test validates the sstc timer IRQs using vstimecmp registers.
-+ * It's ported from the aarch64 arch_timer test.
-+ *
-+ * Copyright (c) 2024, Intel Corporation.
-+ */
-+
-+#define _GNU_SOURCE
-+
-+#include "arch_timer.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "timer_test.h"
-+
-+static int timer_irq = IRQ_S_TIMER;
-+
-+static void guest_irq_handler(struct ex_regs *regs)
-+{
-+	uint64_t xcnt, xcnt_diff_us, cmp;
-+	unsigned int intid = regs->cause & ~CAUSE_IRQ_FLAG;
-+	uint32_t cpu = guest_get_vcpuid();
-+	struct test_vcpu_shared_data *shared_data = &vcpu_shared_data[cpu];
-+
-+	timer_irq_disable();
-+
-+	xcnt = timer_get_cycles();
-+	cmp = timer_get_cmp();
-+	xcnt_diff_us = cycles_to_usec(xcnt - shared_data->xcnt);
-+
-+	/* Make sure we are dealing with the correct timer IRQ */
-+	GUEST_ASSERT_EQ(intid, timer_irq);
-+
-+	__GUEST_ASSERT(xcnt >= cmp,
-+			"xcnt = 0x%llx, cmp = 0x%llx, xcnt_diff_us = 0x%llx",
-+			xcnt, cmp, xcnt_diff_us);
-+
-+	WRITE_ONCE(shared_data->nr_iter, shared_data->nr_iter + 1);
-+}
-+
-+static void guest_run(struct test_vcpu_shared_data *shared_data)
-+{
-+	uint32_t irq_iter, config_iter;
-+
-+	shared_data->nr_iter = 0;
-+	shared_data->guest_stage = 0;
-+
-+	for (config_iter = 0; config_iter < test_args.nr_iter; config_iter++) {
-+		/* Setup the next interrupt */
-+		timer_set_next_cmp_ms(test_args.timer_period_ms);
-+		shared_data->xcnt = timer_get_cycles();
-+		timer_irq_enable();
-+
-+		/* Setup a timeout for the interrupt to arrive */
-+		udelay(msecs_to_usecs(test_args.timer_period_ms) +
-+			test_args.timer_err_margin_us);
-+
-+		irq_iter = READ_ONCE(shared_data->nr_iter);
-+		__GUEST_ASSERT(config_iter + 1 == irq_iter,
-+				"config_iter + 1 = 0x%lx, irq_iter = 0x%lx.\n"
-+				"  Guest timer interrupt was not trigged within the specified\n"
-+				"  interval, try to increase the error margin by [-e] option.\n",
-+				config_iter + 1, irq_iter);
-+	}
-+}
-+
-+static void guest_code(void)
-+{
-+	uint32_t cpu = guest_get_vcpuid();
-+	struct test_vcpu_shared_data *shared_data = &vcpu_shared_data[cpu];
-+
-+	timer_irq_disable();
-+	local_irq_enable();
-+
-+	guest_run(shared_data);
-+
-+	GUEST_DONE();
-+}
-+
-+struct kvm_vm *test_vm_create(void)
-+{
-+	struct kvm_vm *vm;
-+	int nr_vcpus = test_args.nr_vcpus;
-+
-+	vm = vm_create_with_vcpus(nr_vcpus, guest_code, vcpus);
-+	__TEST_REQUIRE(__vcpu_has_ext(vcpus[0], KVM_RISCV_ISA_EXT_SSTC),
-+				   "SSTC not available, skipping test\n");
-+
-+	vm_init_vector_tables(vm);
-+	vm_install_interrupt_handler(vm, guest_irq_handler);
-+
-+	for (int i = 0; i < nr_vcpus; i++)
-+		vcpu_init_vector_tables(vcpus[i]);
-+
-+	/* Initialize guest timer frequency. */
-+	vcpu_get_reg(vcpus[0], RISCV_TIMER_REG(frequency), &timer_freq);
-+	sync_global_to_guest(vm, timer_freq);
-+	pr_debug("timer_freq: %lu\n", timer_freq);
-+
-+	/* Make all the test's cmdline args visible to the guest */
-+	sync_global_to_guest(vm, test_args);
-+
-+	return vm;
-+}
-+
-+void test_vm_cleanup(struct kvm_vm *vm)
-+{
-+	kvm_vm_free(vm);
-+}
--- 
-2.34.1
-
