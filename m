@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3D963DB94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39553FE5F
 	for <kvmarm@lists.linux.dev>; Mon, 22 Jan 2024 18:14:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705947241; cv=none; b=pjwNpw484ds89qA8saYZHczbIchPwm6mIfZNGVYRvsylC6PNedrkaXTRtvtYUd/P/+4s0GxfeTpduHZm6Vgfrw5toVXt1jNzgE5UW1DVgvT9byxR5VFsE1y5rSku4g1OYwXjoreLRmXQdi5CsjQ9BgayoXFmRjlSe+f0Lg6JvBE=
+	t=1705947241; cv=none; b=dM9MikvP/cLrBw4QH4Dvoymiimx4OfpkFXUjHhG1ssX6wOmOMLXsw17uEC83ZSqWq2Dm01ER4PlDLFz4gFDQCMdQk+nKibrdDuklKjDamdXTygAQWPgyfzVb5l71W89kgG6qI0LECuszSsOhkKHT3mf0xwd5iyRhK6nPmq9ZsqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1705947241; c=relaxed/simple;
-	bh=vtwO7Y1pa9TBqUfZj+JwJZr2z9NDvi8DIG/VMxcL/3g=;
+	bh=P/4V+i/EtjGeVTyYKiWi07tTDVAjq/TyRbVJcMg9KFM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VCfs2rtGvVkYbL65cwiyG/+G2rV54EDfsJ+cZodBBewoK7F1coyeduKIl0OFL+VHZJlYAu89ESJ/7FxBGzHRj0qnSrwKx3FPApdfZyDG/qB2L4rD1HOJuE+X4g8Vhq4OEm/kNY1vbx9T3wO1d8ZlAutLhcoCDOeXGYMCDoP/vNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R4w7BD3W; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=fmQ2zjj7QChGeA0uuIq6hELNzhwscLMVruWlUGExQPUxP/AAF450XpcZXbWGnQFrEAvMcxxEHLuNX1ee1Iy4qiKQVSFTe7SN6ENJNG+2jSEt9w/K5vRIZDDlrayYi5ozpm/2bus3CwesheFWjizeJ2sDDUILK7zwuj5BzulYTzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z7A2J7qE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R4w7BD3W"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86388C4166D;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z7A2J7qE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EA80C43141;
 	Mon, 22 Jan 2024 18:14:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1705947241;
-	bh=vtwO7Y1pa9TBqUfZj+JwJZr2z9NDvi8DIG/VMxcL/3g=;
+	bh=P/4V+i/EtjGeVTyYKiWi07tTDVAjq/TyRbVJcMg9KFM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=R4w7BD3WhjLdLfpJHFzM33N9nGIa8VEfffn09mnabmCICWeg9V0oRv639k9PhvHcY
-	 pBGQC7CeHkwhICPNqonhlKfbRa+nY4jCGPK2EEhehhJ8FZEXYs2D2LsDZvwIPFrNjQ
-	 EYvv1qwbIHBN8ephOKfqAStMYVenOP1D+CY25Q61QACoSiIA5wLUjKxTGBdlcJUweH
-	 M73ThRSMCgpm2oHDi78an8Ekg4OkFRKdEY4cIgfZgPGl/J9E+I3iPA49BfK6gYzSPd
-	 sHlfX04gMNpKwGc17UipRF3lID2En7fw40kIwzOn/XeV29c38i+lByOlxOSr9Wfv4R
-	 fBktfios9iqqQ==
+	b=Z7A2J7qEYDxuhlAtlS4jECM1sl1nGH8z45z3vWu9WykBJH9pAkZiViYoM7SwoNXdX
+	 BKuGRkmuyg9rd6qSUgdWwychhpOpminQDEGiyDWlNyXPHot/Eil7lBI6UV9b7BZooP
+	 v4XRF2Fr01sfwcCr7PhF9/UbfSi9VYUFqn8U2uZuMb7DYN/UHvF6AZ/YytzF1pFbEF
+	 5AbBra8zB7dQT5XYu0joaA93nQcwaDG0Wtvr47QpdTZWJijRd2bsbVDQoHJCxl1T/H
+	 clN0asWoTevmOvfgWnSRbuGdLPjFsiFkTZbYBQAuflJR93vZC+iLELavriL5Q66V2n
+	 XWsxTiHlGvhqg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rRyo3-00Dh6E-L0;
+	id 1rRyo3-00Dh6E-6i;
 	Mon, 22 Jan 2024 18:13:59 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
@@ -43,9 +43,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v4 06/10] arm64: cpufeature: Detect HCR_EL2.NV1 being RES0
-Date: Mon, 22 Jan 2024 18:13:40 +0000
-Message-Id: <20240122181344.258974-7-maz@kernel.org>
+Subject: [PATCH v4 04/10] arm64: sysreg: Add layout for ID_AA64MMFR4_EL1
+Date: Mon, 22 Jan 2024 18:13:38 +0000
+Message-Id: <20240122181344.258974-5-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240122181344.258974-1-maz@kernel.org>
 References: <20240122181344.258974-1-maz@kernel.org>
@@ -61,61 +61,66 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-A variant of FEAT_E2H0 not being implemented exists in the form of
-HCR_EL2.E2H being RES1 *and* HCR_EL2.NV1 being RES0 (indicating that
-only VHE is supported on the host and nested guests).
+ARMv9.5 has infroduced ID_AA64MMFR4_EL1 with a bunch of new features.
+Add the corresponding layout.
 
-Add the necessary infrastructure for this new CPU capability.
+This is extracted from the public ARM SysReg_xml_A_profile-2023-09
+delivery, timestamped d55f5af8e09052abe92a02adf820deea2eaed717.
 
 Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kernel/cpufeature.c | 12 ++++++++++++
- arch/arm64/tools/cpucaps       |  1 +
- 2 files changed, 13 insertions(+)
+ arch/arm64/tools/sysreg | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index ad3753fbdcb1..91249d20883b 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -1794,6 +1794,11 @@ static bool unmap_kernel_at_el0(const struct arm64_cpu_capabilities *entry,
- 	return !meltdown_safe;
- }
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 4c9b67934367..fa3fe0856880 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -1791,6 +1791,43 @@ UnsignedEnum	3:0	TCRX
+ EndEnum
+ EndSysreg
  
-+static bool has_nv1(const struct arm64_cpu_capabilities *entry, int scope)
-+{
-+	return !has_cpuid_feature(entry, scope);
-+}
++Sysreg	ID_AA64MMFR4_EL1	3	0	0	7	4
++Res0	63:40
++UnsignedEnum	39:36	E3DSE
++	0b0000	NI
++	0b0001	IMP
++EndEnum
++Res0	35:28
++SignedEnum	27:24	E2H0
++	0b0000	IMP
++	0b1110	NI_NV1
++	0b1111	NI
++EndEnum
++UnsignedEnum	23:20	NV_frac
++	0b0000	NV_NV2
++	0b0001	NV2_ONLY
++EndEnum
++UnsignedEnum	19:16	FGWTE3
++	0b0000	NI
++	0b0001	IMP
++EndEnum
++UnsignedEnum	15:12	HACDBS
++	0b0000	NI
++	0b0001	IMP
++EndEnum
++UnsignedEnum	11:8	ASID2
++	0b0000	NI
++	0b0001	IMP
++EndEnum
++SignedEnum	7:4	EIESB
++	0b0000	NI
++	0b0001	ToEL3
++	0b0010	ToELx
++	0b1111	ANY
++EndEnum
++Res0	3:0
++EndSysreg
 +
- #if defined(ID_AA64MMFR0_EL1_TGRAN_LPA2) && defined(ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_LPA2)
- static bool has_lpa2_at_stage1(u64 mmfr0)
- {
-@@ -2794,6 +2799,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
- 		.matches = has_lpa2,
- 	},
-+	{
-+		.desc = "NV1",
-+		.capability = ARM64_HAS_HCR_NV1,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.matches = has_nv1,
-+		ARM64_CPUID_FIELDS_NEG(ID_AA64MMFR4_EL1, E2H0, NI_NV1)
-+	},
- 	{},
- };
- 
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index b912b1409fc0..65090dd34641 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -35,6 +35,7 @@ HAS_GENERIC_AUTH_IMP_DEF
- HAS_GIC_CPUIF_SYSREGS
- HAS_GIC_PRIO_MASKING
- HAS_GIC_PRIO_RELAXED_SYNC
-+HAS_HCR_NV1
- HAS_HCX
- HAS_LDAPR
- HAS_LPA2
+ Sysreg	SCTLR_EL1	3	0	1	0	0
+ Field	63	TIDCP
+ Field	62	SPINTMASK
 -- 
 2.39.2
 
