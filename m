@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A2758235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6BDF3E474
 	for <kvmarm@lists.linux.dev>; Mon, 22 Jan 2024 18:14:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705947242; cv=none; b=MUFBJ//plIkIcnahGSRGnJaxWCNPvUU3TBOvlJ3I3tRCSP6Kw6s09sQsfa4Gd5d/Tb1JxWh2lZZhtm+q7A/FpSTbR+bRezBikOM9AOwsodZisfZti6hwQAvlj784HJb6hvLGXvmKgkoTQSeXX9aJpyLR3WsXCf0+y151fv7rB1c=
+	t=1705947244; cv=none; b=SQ1WD+nKjhNIp/BKjxV58rUuF/pwLGOEfuA4Vg43XJrgnkFQQexpQGgqdX329ssdEMyxx2jCn2nmfw/onoEP5VmiO7oEp14sqFEDgUbxptzaV2fbi6/1msLTDn48o6Dl8tcmYkqSPFraFWEs1kYzGBE1CWb7fr4lqZUhhWzFNmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705947242; c=relaxed/simple;
-	bh=GGerkmtaNjy22Jb7TRkxak0xA1aU5iFzPnFQ3YcbEbw=;
+	s=arc-20240116; t=1705947244; c=relaxed/simple;
+	bh=Bh3vfMD6ju54Foxy9nsQsQaciPYfPW4GwDoMUkoGUDk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=DxwVaIgCMqwUE05r4Rf9+XTXm+aOukzUAP7InEHH5Xzo2MABYZKOuz/+b2zga5byuYabWv70m084YOj6H7b7RlA+NXEwb4iDGjuLfz1ZdRXslnxyMGyO1ySQ402Zv1k2xTVA8hy34mlttZo3QsOrzCRF1I8uCFP42uDPWndsPww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZBcFP7t6; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Gs7s2l+KQwOzfvi4aPl5M+5NAvLrk3JksK6N41i5SL9koHWL82iK0CpfWyvHXlD8feFZwE17Wmc/IEzmEf17encWd1eTqInhjSYnbj00UYr31nPuQc4Sab+MVBIrV00ONWulxa+btOUV5NcFgzNxeaFPhFEjyCaykO2VCuQkRyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PQR4QNKY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZBcFP7t6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 216E3C433F1;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PQR4QNKY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D4C1C32782;
 	Mon, 22 Jan 2024 18:14:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1705947242;
-	bh=GGerkmtaNjy22Jb7TRkxak0xA1aU5iFzPnFQ3YcbEbw=;
+	bh=Bh3vfMD6ju54Foxy9nsQsQaciPYfPW4GwDoMUkoGUDk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZBcFP7t6QT6a9a1hEXg9i6RQcW3s+KkaZTPSdvVkJvT5C/I+4I32XqXmI5Mczba10
-	 MrHBqKG7FTXDa8wInbEXQLofQ26dIdpskJjre8CQvAHAsPG2LL35JtqqH4UwBcpQro
-	 9SDnkjEcJaeRo4gbRbZZyTPB8ldbfV0TfnjN+SO/wKNn4ODzukLesIWXdLDDL3s7BJ
-	 vSf1EjGd5hxA1ilavlmr6rsZav4kD6hptJBvJviR47RmL3rTRc2ZesbZ2eL1G8EQ0c
-	 z+LVV4ObZpT6Zw64vVTRrd/6Orny1AbyuWcg6n7D4ABHUbYy+62kobCCh/Q4h1xO0G
-	 4lJlb6ofYLG+g==
+	b=PQR4QNKY2VYo5a2TVsy+3eUubdi/1SsZP6JY1a/GxU1CjNppsWYpVhG3gIkkC8Ti4
+	 UD8dvHZKPRUJUHI5rmIP1RVXSayyDYBVD8oX5ypeOJGKRxKOz/QAB5tzFw3PxqNzmC
+	 gbH6E/blEzgCoQpNV20TufmQ2F171FdtiyktNnHS98wi/pWgsfnnSWODgYnvPRK/aO
+	 YScUvJHpIy/L46hT4EYyDCvu51eJbCz1mzWnnvcPIUfAyt7wRFiKAv0CtWm9wfKlsm
+	 FPToIu9+q7mDCuZLLyIl7HA9u1ODoWQzjN3tDSC49Ibc5H9ojqnbBPv0ng2p38E2h/
+	 zHRdpcdA9AT9w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rRyo4-00Dh6E-8E;
+	id 1rRyo4-00Dh6E-Ea;
 	Mon, 22 Jan 2024 18:14:00 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
@@ -43,9 +43,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v4 09/10] KVM: arm64: Force guest's HCR_EL2.E2H RES1 when NV1 is not implemented
-Date: Mon, 22 Jan 2024 18:13:43 +0000
-Message-Id: <20240122181344.258974-10-maz@kernel.org>
+Subject: [PATCH v4 10/10] KVM: arm64: Handle Apple M2 as not having HCR_EL2.NV1 implemented
+Date: Mon, 22 Jan 2024 18:13:44 +0000
+Message-Id: <20240122181344.258974-11-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240122181344.258974-1-maz@kernel.org>
 References: <20240122181344.258974-1-maz@kernel.org>
@@ -61,61 +61,47 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-If NV1 isn't supported on a system, make sure we always evaluate
-the guest's HCR_EL2.E2H as RES1, irrespective of what the guest
-may have written there.
+Although the Apple M2 family of CPUs can have HCR_EL2.NV1 being
+set and clear, with the change in trap behaviour being OK, they
+explode spectacularily on an EL2 S1 page table using the nVHE
+format. This is no good.
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Let's pretend this HW doesn't have NV1, and move along.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h |  3 ++-
- arch/arm64/kvm/sys_regs.c            | 12 +++++++++++-
- 2 files changed, 13 insertions(+), 2 deletions(-)
+ arch/arm64/kernel/cpufeature.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index b804fe832184..debc3753d2ef 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -209,7 +209,8 @@ static inline bool vcpu_is_el2(const struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 91249d20883b..0f29ac43c7a2 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1796,7 +1796,23 @@ static bool unmap_kernel_at_el0(const struct arm64_cpu_capabilities *entry,
  
- static inline bool __vcpu_el2_e2h_is_set(const struct kvm_cpu_context *ctxt)
+ static bool has_nv1(const struct arm64_cpu_capabilities *entry, int scope)
  {
--	return ctxt_sys_reg(ctxt, HCR_EL2) & HCR_E2H;
-+	return (!cpus_have_final_cap(ARM64_HAS_HCR_NV1) ||
-+		(ctxt_sys_reg(ctxt, HCR_EL2) & HCR_E2H));
+-	return !has_cpuid_feature(entry, scope);
++	/*
++	 * Although the Apple M2 family appears to support NV1, the
++	 * PTW barfs on the nVHE EL2 S1 page table format. Pretend
++	 * that it doesn't support NV1 at all.
++	 */
++	static const struct midr_range nv1_ni_list[] = {
++		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD),
++		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE),
++		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_PRO),
++		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_PRO),
++		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_MAX),
++		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_MAX),
++		{}
++	};
++
++	return !(has_cpuid_feature(entry, scope) ||
++		 is_midr_in_range_list(read_cpuid_id(), nv1_ni_list));
  }
  
- static inline bool vcpu_el2_e2h_is_set(const struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 08a9571fa809..041b11825578 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2175,6 +2175,16 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
- 	return true;
- }
- 
-+static u64 reset_hcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-+{
-+	u64 val = r->val;
-+
-+	if (!cpus_have_final_cap(ARM64_HAS_HCR_NV1))
-+		val |= HCR_E2H;
-+
-+	return __vcpu_sys_reg(vcpu, r->reg) = val;
-+}
-+
- /*
-  * Architected system registers.
-  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-@@ -2666,7 +2676,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG_VNCR(VMPIDR_EL2, reset_unknown, 0),
- 	EL2_REG(SCTLR_EL2, access_rw, reset_val, SCTLR_EL2_RES1),
- 	EL2_REG(ACTLR_EL2, access_rw, reset_val, 0),
--	EL2_REG_VNCR(HCR_EL2, reset_val, 0),
-+	EL2_REG_VNCR(HCR_EL2, reset_hcr, 0),
- 	EL2_REG(MDCR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(CPTR_EL2, access_rw, reset_val, CPTR_NVHE_EL2_RES1),
- 	EL2_REG_VNCR(HSTR_EL2, reset_val, 0),
+ #if defined(ID_AA64MMFR0_EL1_TGRAN_LPA2) && defined(ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_LPA2)
 -- 
 2.39.2
 
