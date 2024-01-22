@@ -1,112 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1230148CE9
-	for <kvmarm@lists.linux.dev>; Mon, 22 Jan 2024 21:29:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 029B4487A2
+	for <kvmarm@lists.linux.dev>; Mon, 22 Jan 2024 21:56:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705958982; cv=none; b=mXJTBvDXDG7jxknivpgipQsNIv5H5ClK3FePl7Q20RuUI2v43fqAbtpXvUmXv7u9AY5r2ieQfdnu/mR7ZZFKOkTFSJHlvHkvArCmr/yfiP3HPGuvw7x83aQuKYlQqaBn3/MLqnEMcsY+xfboz6XGont3eMDad4UOp58Ue2TZ4uM=
+	t=1705960598; cv=none; b=O1anQj/z+95KagRTzS0NBXcYJC/AIJE5ZoRA/qfv8TpMce14yez3WuVUHbnfXwi3A0C6JBQ+pNsPnqKCMhKoVqBHxBgSdsHWT6sv58lZtX6A/gQRFOb+PdXAFyEtwk5Qwqx/OENp8DzgR0JILsB3TqeoM4/D7fVbAFHkencme70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705958982; c=relaxed/simple;
-	bh=WFleTVHI15wq54UDGMl0AQCcsbvuKvyQUVYiML8KPV0=;
+	s=arc-20240116; t=1705960598; c=relaxed/simple;
+	bh=J8tuHVuaRf99BTjAxEXGtJuL5FiKMuM5URapCqBOWYg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qww28EBzc2rD8PGkFhxNa8VyJylWnv4eoUSf51HtVH8O58KpS9REtckB6XyhJS+TfS1Om7x6/ZmryXtH1HMWVnUGdKIHGZlwYjW/bQdJ4bbVQfuOktfuR4bK9wRPE8sccr6SAbqcndykl+epk4XtMeiGwCzvDpjOJ4xRDRejG0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L+eAgXUY; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=HN19OL/2tTTz9aajeggVExNk+Bd6RnILd5w7RIlfuEEeaX80boaNFrOxeoctoFeur3a9kXfXRmZQHwEyb5Nk/+53Nz8eY5Ts3P7I7wppWkTB/PPnzQ3OsDPOeWGomRR76xV612s7f73+GGu5qA8kFlJ5c5EZjHhjHYzUHDxgQac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=XtyKsMO6; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L+eAgXUY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73731C43390;
-	Mon, 22 Jan 2024 21:29:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705958981;
-	bh=WFleTVHI15wq54UDGMl0AQCcsbvuKvyQUVYiML8KPV0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=L+eAgXUYpO2fLug6kc/A5TKSyNlbcnTJkhbbxURzXez1GDPybopLkJ6Azo0Sl8UIM
-	 WOD4fSLSF18d1pVZkQtQkZR6zOT1kYlrDwgLJNORZV990yQRURK1jmJG9TbaUNCCEi
-	 GQpCjnJs6zVDPSftvv75ByOCL4d5bUBWl/p0BQDeMem3RipBkwEd+k3BJKlLmVVjS9
-	 fAiQU2S66i0LNtKdLsevwTk6iWdsCFXpa+qGViofdzfqlNLI8RQ26CQyRlGN46dB8K
-	 057uqml+PPyLzP9l/BmTQXV2H9ycPHZV3N+NgexU2YdqnL1w0MtEpu6rWqQeusK4/Y
-	 3CFqrYgOr0GZQ==
-Date: Mon, 22 Jan 2024 21:29:36 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 01/25] arm64: sysreg: Add missing ID_AA64ISAR[13]_EL1
- fields and variants
-Message-ID: <0146c7fa-f7e6-45e8-8f02-bec677f84397@sirena.org.uk>
-References: <20240122201852.262057-1-maz@kernel.org>
- <20240122201852.262057-2-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XtyKsMO6"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=DlkxdPo00vFXMtifZbwmiD3pZWcfGIoDSDnanNUdXxo=; b=XtyKsMO6Yn2dYk1lNRNde3BiDP
+	un+RAJyMR6k8+9e/yJl2r+Ov0qOcDIbhiz/y/7GX3fw87B0GNJ/3HmCLVJiLb2Ks1V96LgACams6f
+	cX+obUMvFpeX/Pmcl6RnUH2y50c9vxvFy0DDxefuB+2qrsso/uyXuGtyvj3A9FRQHRH/QBhxa5OTm
+	Zz/RSWt46rOm+BHPj4216FX8QXMjUNV0DnJe0jlcqUzpr7YBglGllncVFHK+j40azOzpeA1xvOtkS
+	tXvN5txsFycplH3UgwgXX380INC6PxDJ2P3HQ+KLP+EUK49pbp89QiATkRHw/56ttdlNvv/I2Oqdt
+	A0vRazAA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50158)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rS2HI-0001cI-2Q;
+	Mon, 22 Jan 2024 21:56:24 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rS2HC-0001MW-T5; Mon, 22 Jan 2024 21:56:18 +0000
+Date: Mon, 22 Jan 2024 21:56:18 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, acpica-devel@lists.linuxfoundation.org,
+	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com,
+	James Morse <james.morse@arm.com>
+Subject: Re: [PATCH RFC v3 04/21] ACPI: processor: Register all CPUs from
+ acpi_processor_get_info()
+Message-ID: <Za7kglu6qO1n5ZCg@shell.armlinux.org.uk>
+References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk>
+ <E1rDOg7-00Dvjq-VZ@rmk-PC.armlinux.org.uk>
+ <CAJZ5v0je=-oVnSumZs=dzcyVuVUeVeTgO7yOnjGg1igyrS7EHQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="hTPQOzYPOX8FaDXg"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240122201852.262057-2-maz@kernel.org>
-X-Cookie: Nice guys don't finish nice.
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJZ5v0je=-oVnSumZs=dzcyVuVUeVeTgO7yOnjGg1igyrS7EHQ@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Mon, Dec 18, 2023 at 09:30:50PM +0100, Rafael J. Wysocki wrote:
+> On Wed, Dec 13, 2023 at 1:49 PM Russell King <rmk+kernel@armlinux.org.uk> wrote:
+> > Systems can still be booted with 'acpi=off', or not include an
+> > ACPI description at all. For these, the CPUs continue to be
+> > registered by cpu_dev_register_generic().
+> >
+> > This moves the CPU register logic back to a subsys_initcall(),
+> > while the memory nodes will have been registered earlier.
+> 
+> Isn't this somewhat risky?
 
---hTPQOzYPOX8FaDXg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Not really. The earlier full series moved the registration of CPUs
+from subsys (by the various architecture specific code) into the
+driver core - thus moving it much earlier. This patch merely
+restores it back to the subsys initialisation stage.
 
-On Mon, Jan 22, 2024 at 08:18:28PM +0000, Marc Zyngier wrote:
+There is a low chance that something _could_ have become reliant
+on that change - and the longer it takes for this change to be
+merged, the more risk there is that something could become reliant
+on CPUs being registered very early.
 
-> Despite having the control bits for FEAT_SPECRES and FEAT_PACM,
-> the ID registers fields are either incomplete or missing.
+Maybe this ought to be spelt out more explicitly that it's merely
+restoring the point at which CPUs are registered.
 
-In general the registers tend to get updated register by register so
-it's not 100% surprising to get partial definition of features, though
-more usually it's the ID register that's there.
-
-> Fix it.
-
-Checking against DDI0601 2023-12 the additions here look correct with
-the proviso below, I didn't audit for other missing defintions in the
-two affected registers (ID_AA64ISAR[13]_EL1).
-
-Reviewed-by: Mark Brown <broonie@kernel.org>
-
-> ---
->  arch/arm64/tools/sysreg | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->=20
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index fa3fe0856880..53daaaef46cb 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -1366,6 +1366,7 @@ EndEnum
->  UnsignedEnum	43:40	SPECRES
->  	0b0000	NI
->  	0b0001	IMP
-> +	0b0010	COSP_RCTX
-
-This is OK in itself but there's also a copy of this in ID_ISAR6_EL1
-which needs updating too (and presumably ought to be considered by the
-hypervisor, I didn't look at anything else yet).
-
---hTPQOzYPOX8FaDXg
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmWu3j8ACgkQJNaLcl1U
-h9BkVAf/UuDuQ513O7Jd0sdc++i6nrlbAsPKy/PuC4O8+u9QSLKocEir/AzOrJj+
-cQzFbaujwW8xivWIvWN7g4sivgjoaPQb1LpJ54uoKM7sO0XUSQlkBhzFchzYyt2N
-jyC4kt5Kc6mR0eX/ZTXMmE9O4kdrqxBEEuTYlntKYVb09Hu4z5Z15o9x3puspOz6
-NNAlHQb0yvjCYjwCx+Q2UvGL+Lbv4sLDR8Owmwbg3rXd9howcOj7J6FJko15C3pc
-IGoNZnv/LSz7LhxjtI33GlV4TWK/ZAKWCHN4FdHKpzHt8Zh9TmMcf7VbgQDt2QYz
-t4W4In9pSeNZn+UZgBri6s5h9nbkyQ==
-=p08F
------END PGP SIGNATURE-----
-
---hTPQOzYPOX8FaDXg--
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
