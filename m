@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3059840C01
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840D340BFC
 	for <kvmarm@lists.linux.dev>; Mon, 22 Jan 2024 20:18:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705954739; cv=none; b=DFJEK4yZeCLE/um5CI38FjMIC9DxRfggIi3lqSRdYY2/0p/1V4rb4WL5mKYDdV7ikD6htwUS2vx5d9SI+Xx/nLqzBoTrjJOQqFPcxhPz3XxRYIoNFjMd3GegXnQBnXT4SDQEXADFhelx6L474Nv6IAqH64bM/SEUgMX1mgiuU5U=
+	t=1705954739; cv=none; b=bZuc2tOFcCLLmDvWvmh76h9/kI3ZPg3EwPdqrlk2JJUSBxDbB4Te42809VzdDzMOTQBOI0+qk9zM+CBabiy2GB7a6kUvvzV8G51AwhzLJcg1fvSvmkCg0WvgJC4kiBiTUPBv2QwNbjy5TR83ishRzTqPh75Q+ElvOYb0IIf3yk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1705954739; c=relaxed/simple;
-	bh=zJzedstPNPXZDOod74i34EIzt6/XZqUrd8Ks1qqhZvo=;
+	bh=9hBAKOyTHCZPgqJHCSVdY4FgU2Ta6tAXYL5A56zPx+U=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qyKjyj6siYwpKI8fE73r7puPG8W5br3HpQHvc/GTWL21+/DQat+5IX69sbsd3KaquMNTkvjGPspg0MuCa+q1eaBQ+50lHe9BzKQnc5+te3sbybkCSylt3lTIDyjG66e+Pimt1n53lNsY4KIEzw9MwUiMpQXZ1TBsEHsk5NUdTRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lB1eAio4; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=h63dSbWKXh2ZXENCCChSYExkNPvdutRInv9YIkDTXhCYWJ1U0GQisHH9JScTCEQJxyGcBm8vRMnGwMdd+J7Fbycy1wnA4VL35XypkjaIh8wOT2J7Y6GusK7qydlgk7vS1lTzHj4Oq0Uc2ABaYvMFjSMMMbJmCjwnZTb8nR10GS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D6chHDD0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lB1eAio4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00961C43142;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D6chHDD0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5ABFDC433B2;
 	Mon, 22 Jan 2024 20:18:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1705954739;
-	bh=zJzedstPNPXZDOod74i34EIzt6/XZqUrd8Ks1qqhZvo=;
+	bh=9hBAKOyTHCZPgqJHCSVdY4FgU2Ta6tAXYL5A56zPx+U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lB1eAio4WfngrlOFBNYKkcWD7OBCwBORkR2//OU1GrpqH9Dk2SOqJJuf3VhFSOMQN
-	 sjo0uflyvaoLTQkYhkWvYyW7dvHkW73E67j0vqW/6RxSaulGdEr0/VERVro4O4HU3J
-	 JV0dlgyKVUh8s/a3gW9+q6vPouRZJ16ZX/nFUy2uZboyfQ+mB3E7Iid4sv8/TOr9Nq
-	 SCUUWjUyjCp8D6hz86zQNJxy8RkGDWLXDj9200AB0HPwooTNc4q5OAtQZWGt/xLaiK
-	 4ts72XpUmOctXKKjBKwcWm0BO0Y39LZnldYLx2bmT+m8osw5VZoTuuE8X5s/smZzI0
-	 npzdKjE5BdCPg==
+	b=D6chHDD0HHfPsADIMkrk+CFu0p85afbp8Zal0EjRSZJTVLHQcFlPELGx5TlXz2SHD
+	 4TnwRih4GlGXRp5T+SZ089c0A1/Gvzku69KXCE39mb23Sl7P+y1ZiDIhQhvQjcG7ia
+	 wwa/6bfkclic0fboyWiDFB8ZR7FZ8ua4K14rVTJhUSx/jA9wa9gBiqpRJqW7CwNGs2
+	 mzeqdxke4yHoiPdXfOvDrj0hb+26BS2YxsUoPKxfAKUsgYGWs4jb1jKWaIJaMWo1Wt
+	 2UU0PTQsgY4fU0rYmvG/6UPoxiYGjIJH45x4OC0UTvYssiDv/YOaCVe0CIfVg22NV5
+	 vGmrM88HX/nvA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rS0kz-00DjkQ-3x;
+	id 1rS0kz-00DjkQ-G6;
 	Mon, 22 Jan 2024 20:18:57 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH 08/25] KVM: arm64: Unify HDFG[WR]TR_GROUP FGT identifiers
-Date: Mon, 22 Jan 2024 20:18:35 +0000
-Message-Id: <20240122201852.262057-9-maz@kernel.org>
+Subject: [PATCH 10/25] KVM: arm64: nv: Turn encoding ranges into discrete XArray stores
+Date: Mon, 22 Jan 2024 20:18:37 +0000
+Message-Id: <20240122201852.262057-11-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240122201852.262057-1-maz@kernel.org>
 References: <20240122201852.262057-1-maz@kernel.org>
@@ -61,39 +61,67 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-There is no reason to have separate FGT group identifiers for
-the debug fine grain trapping. The sole requirement is to provide
-the *names* so that the SR_FGF() macro can do its magic of picking
-the correct bit definition.
+In order to be able to store different values for member of an
+encoding range, replace xa_store_range() calls with discrete
+xa_store() calls and an encoding iterator.
 
-So let's alias HDFGWTR_GROUP and HDFGRTR_GROUP.
+We end-up using a bit more memory, but we gain some flexibility
+that we will make use of shortly.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/emulate-nested.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ arch/arm64/kvm/emulate-nested.c | 31 ++++++++++++++++++++++++-------
+ 1 file changed, 24 insertions(+), 7 deletions(-)
 
 diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 7a4a886adb9d..8a1cfcf553a2 100644
+index ef46c2e45307..59622636b723 100644
 --- a/arch/arm64/kvm/emulate-nested.c
 +++ b/arch/arm64/kvm/emulate-nested.c
-@@ -1010,7 +1010,7 @@ enum fgt_group_id {
- 	__NO_FGT_GROUP__,
- 	HFGxTR_GROUP,
- 	HDFGRTR_GROUP,
--	HDFGWTR_GROUP,
-+	HDFGWTR_GROUP = HDFGRTR_GROUP,
- 	HFGITR_GROUP,
- 	HAFGRTR_GROUP,
+@@ -1757,6 +1757,28 @@ static __init void print_nv_trap_error(const struct encoding_to_trap_config *tc,
+ 		err);
+ }
  
-@@ -1938,7 +1938,6 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
- 		break;
++static u32 encoding_next(u32 encoding)
++{
++	u8 op0, op1, crn, crm, op2;
++
++	op0 = sys_reg_Op0(encoding);
++	op1 = sys_reg_Op1(encoding);
++	crn = sys_reg_CRn(encoding);
++	crm = sys_reg_CRm(encoding);
++	op2 = sys_reg_Op2(encoding);
++
++	if (op2 < Op2_mask)
++		return sys_reg(op0, op1, crn, crm, op2 + 1);
++	if (crm < CRm_mask)
++		return sys_reg(op0, op1, crn, crm + 1, 0);
++	if (crn < CRn_mask)
++		return sys_reg(op0, op1, crn + 1, 0, 0);
++	if (op1 < Op1_mask)
++		return sys_reg(op0, op1 + 1, 0, 0, 0);
++
++	return sys_reg(op0 + 1, 0, 0, 0, 0);
++}
++
+ int __init populate_nv_trap_config(void)
+ {
+ 	int ret = 0;
+@@ -1775,13 +1797,8 @@ int __init populate_nv_trap_config(void)
+ 			ret = -EINVAL;
+ 		}
  
- 	case HDFGRTR_GROUP:
--	case HDFGWTR_GROUP:
- 		if (is_read)
- 			val = __vcpu_sys_reg(vcpu, HDFGRTR_EL2);
- 		else
+-		if (cgt->encoding != cgt->end) {
+-			prev = xa_store_range(&sr_forward_xa,
+-					      cgt->encoding, cgt->end,
+-					      xa_mk_value(cgt->tc.val),
+-					      GFP_KERNEL);
+-		} else {
+-			prev = xa_store(&sr_forward_xa, cgt->encoding,
++		for (u32 enc = cgt->encoding; enc <= cgt->end; enc = encoding_next(enc)) {
++			prev = xa_store(&sr_forward_xa, enc,
+ 					xa_mk_value(cgt->tc.val), GFP_KERNEL);
+ 			if (prev && !xa_is_err(prev)) {
+ 				ret = -EINVAL;
 -- 
 2.39.2
 
