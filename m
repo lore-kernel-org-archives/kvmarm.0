@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3395358234
-	for <kvmarm@lists.linux.dev>; Mon, 22 Jan 2024 18:14:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6413A3DB94
+	for <kvmarm@lists.linux.dev>; Mon, 22 Jan 2024 18:14:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705947242; cv=none; b=YrPRJn+R8omatoOImH+ZHM9PFdndJgNTvwtQ5aLJ3x0Cg27MGpjpki1qKqntQDI/KCfOHL8oJp5lzoHoISOpnjAFpvcchBBBWf5pNuPZZqMzV8hQmS7Asf90rjDRDxX0B1AekA86nmm2oeqUPQk8wFWKrLLx0e1ycBFMgu7j4bc=
+	t=1705947242; cv=none; b=QHOSre8i8DIIq2QQlzjRFimFoTHMDyI1tvVXXrNmDItkLzcML9SSqdJLxS5VKpgrEKPgowpgfcDvJjxO7xS6kb9g57ttnnBxQDU0VVQdPapUWAlAVq47px4dlM0W8o+lwELLdaGyyjRlumXJs3oZ9WTZUR9lmRgfM6s56nHggs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1705947242; c=relaxed/simple;
-	bh=hd9KsuVWHQ3mf1EmYOOu8k1O2jo8O8ksqnfICiMkpEo=;
+	bh=uXZt+ggYQwr2UORMUCddxIJ24b9qDYjES/RyXmgrMy8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VnlsWemj4k5wBYdrlF3J3pw/qZH4A0K5xgVdnS+N8c3IqstT75ZPxQmLLSW4+RGJmI8+FbmNcuMtzcl2JyVr04re1uaT5PcyWlFc1acWQ+z3M4EwOGKzyL/mHjx8kA8I/6erIkpJfovQsj4xAc6ldR3qJdo4TWprTqUQ+sV0v4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jAPegHue; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=bApDGkKufX9Pe3vXBJwykviaQiyxrUVjaiVgTfR6loQFzhK7x1yCyXeDcu6ZTyp//NKLBmxIxJDJfUqW5nK4mZHf+eoq3SzQi7DBktxL4Qp3/Q8zu+qk2/VmLdqAtyvI27FStuuqbJ5dIadm8BEBRWlzf/3Qc7YD6rpuji8jfHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uOeTv9aX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jAPegHue"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B50EAC4167E;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uOeTv9aX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFEA1C3277D;
 	Mon, 22 Jan 2024 18:14:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1705947241;
-	bh=hd9KsuVWHQ3mf1EmYOOu8k1O2jo8O8ksqnfICiMkpEo=;
+	bh=uXZt+ggYQwr2UORMUCddxIJ24b9qDYjES/RyXmgrMy8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jAPegHue9IdG2sv7URbYyv4PgVSReqO5KrFcYrLUulAuaR/l+tBQXRYfnxjpXVKsz
-	 rPjK/1rIvBwcwk/PDz8qoxF7CQgQEBhoBPaOkjs9YB9uo7IqjR/fl9ydhXo8d5mLS0
-	 F0uMLrOSXUQu49xTxKKI2S1purYvcidMAsHPAN9nvHYtJ/h3UQTjDxrsQgNKmnkBJQ
-	 gqkuXzq2s/jL0b+FH95XPKlBuvf4RPQOGf9I1Z5pzjBpJhUA+m3aJcoXgRoN88cWaN
-	 lXGU8QIG6DvYUTuGqZoRdtj6L+gtzgNzlQ09azX1sKm7uVjBZmj8SheOHvfBLiDPb3
-	 7PXDQkNy+48Xw==
+	b=uOeTv9aXEVA3NqnYtgsdXBhgGG80y04r5rIKauRG/5qXr6qTMuyUjX6pAXo+Q3+n6
+	 wFxMjU9OASxTp5tueB2JnoeL6kaNe/uwKD2/lAaQSMQQl9JQvvzJK71t7Z2PzZqryW
+	 356YOvIFG7KEs+U9V3Wiap3288uViTZfkNCFsjdRgomO5WdIwENDBsjgt4SQ9Cjdfp
+	 PpqUXMgKnSo0MwLEtvr2aZbkYETHQz0CG08DbgVCGC395ovdyghH8kQlVu55dO5YqE
+	 jbFEOyLJgtn42WS3YnBc3MOmo1hS3Zpob3XkEpzZZHgac6BEi9e6CGM5XW4CRKlRjv
+	 94JOWCJ4FRaCQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rRyo3-00Dh6E-RA;
-	Mon, 22 Jan 2024 18:13:59 +0000
+	id 1rRyo4-00Dh6E-1m;
+	Mon, 22 Jan 2024 18:14:00 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -43,9 +43,9 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v4 07/10] arm64: Treat HCR_EL2.E2H as RES1 when ID_AA64MMFR4_EL1.E2H0 is negative
-Date: Mon, 22 Jan 2024 18:13:41 +0000
-Message-Id: <20240122181344.258974-8-maz@kernel.org>
+Subject: [PATCH v4 08/10] KVM: arm64: Expose ID_AA64MMFR4_EL1 to guests
+Date: Mon, 22 Jan 2024 18:13:42 +0000
+Message-Id: <20240122181344.258974-9-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240122181344.258974-1-maz@kernel.org>
 References: <20240122181344.258974-1-maz@kernel.org>
@@ -61,63 +61,48 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-For CPUs that have ID_AA64MMFR4_EL1.E2H0 as negative, it is important
-to avoid the boot path that sets HCR_EL2.E2H=0. Fortunately, we
-already have this path to cope with fruity CPUs.
-
-Tweak init_el2 to look at ID_AA64MMFR4_EL1.E2H0 first.
+We can now expose ID_AA64MMFR4_EL1 to guests, and let NV guests
+understand that they cannot really switch HCR_EL2.E2H to 0 on
+some platforms.
 
 Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kernel/head.S | 23 +++++++++++++++--------
- 1 file changed, 15 insertions(+), 8 deletions(-)
+ arch/arm64/kvm/nested.c   | 7 +++++++
+ arch/arm64/kvm/sys_regs.c | 2 +-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index cab7f91949d8..5bdafbcff009 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -584,25 +584,32 @@ SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
- 	mov_q	x1, INIT_SCTLR_EL1_MMU_OFF
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index ba95d044bc98..d55e809e26cb 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -133,6 +133,13 @@ static u64 limit_nv_id_reg(u32 id, u64 val)
+ 		val |= FIELD_PREP(NV_FTR(MMFR2, TTL), 0b0001);
+ 		break;
  
- 	/*
--	 * Fruity CPUs seem to have HCR_EL2.E2H set to RES1,
--	 * making it impossible to start in nVHE mode. Is that
--	 * compliant with the architecture? Absolutely not!
-+	 * Compliant CPUs advertise their VHE-onlyness with
-+	 * ID_AA64MMFR4_EL1.E2H0 < 0. HCR_EL2.E2H can be
-+	 * RES1 in that case.
-+	 *
-+	 * Fruity CPUs seem to have HCR_EL2.E2H set to RES1, but
-+	 * don't advertise it (they predate this relaxation).
- 	 */
-+	mrs_s	x0, SYS_ID_AA64MMFR4_EL1
-+	ubfx	x0, x0, #ID_AA64MMFR4_EL1_E2H0_SHIFT, #ID_AA64MMFR4_EL1_E2H0_WIDTH
-+	tbnz	x0, #(ID_AA64MMFR4_EL1_E2H0_SHIFT + ID_AA64MMFR4_EL1_E2H0_WIDTH - 1), 1f
++	case SYS_ID_AA64MMFR4_EL1:
++		val = 0;
++		if (!cpus_have_final_cap(ARM64_HAS_HCR_NV1))
++			val |= FIELD_PREP(NV_FTR(MMFR4, E2H0),
++					  ID_AA64MMFR4_EL1_E2H0_NI_NV1);
++		break;
 +
- 	mrs	x0, hcr_el2
- 	and	x0, x0, #HCR_E2H
--	cbz	x0, 1f
--
-+	cbz	x0, 2f
-+1:
- 	/* Set a sane SCTLR_EL1, the VHE way */
- 	pre_disable_mmu_workaround
- 	msr_s	SYS_SCTLR_EL12, x1
- 	mov	x2, #BOOT_CPU_FLAG_E2H
--	b	2f
-+	b	3f
- 
--1:
-+2:
- 	pre_disable_mmu_workaround
- 	msr	sctlr_el1, x1
- 	mov	x2, xzr
--2:
-+3:
- 	__init_el2_nvhe_prepare_eret
- 
- 	mov	w0, #BOOT_CPU_MODE_EL2
+ 	case SYS_ID_AA64DFR0_EL1:
+ 		/* Only limited support for PMU, Debug, BPs and WPs */
+ 		val &= (NV_FTR(DFR0, PMUVer)	|
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 88b8fbeafaa0..08a9571fa809 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2350,7 +2350,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 					ID_AA64MMFR2_EL1_NV |
+ 					ID_AA64MMFR2_EL1_CCIDX)),
+ 	ID_SANITISED(ID_AA64MMFR3_EL1),
+-	ID_UNALLOCATED(7,4),
++	ID_SANITISED(ID_AA64MMFR4_EL1),
+ 	ID_UNALLOCATED(7,5),
+ 	ID_UNALLOCATED(7,6),
+ 	ID_UNALLOCATED(7,7),
 -- 
 2.39.2
 
