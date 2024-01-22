@@ -1,45 +1,45 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A11E3A292
-	for <kvmarm@lists.linux.dev>; Mon, 22 Jan 2024 09:47:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48E673A8CD
+	for <kvmarm@lists.linux.dev>; Mon, 22 Jan 2024 09:47:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705916823; cv=none; b=brdYjUrH8Ajn48kujKyqfCJ2iVVjTGVXCVHcYnoKRK0cSBiqwEgiccedGLZw49uXqEuaDdKMo5gL9mcquUyVqGd/g6HGHnjke2MBfAPf+zDSpfE2M/2PmDat+dTq5kubyeCX6iimDTWdWaexJsUrlMLPmIalW6/njhcDuRiQWkQ=
+	t=1705916840; cv=none; b=DHTKV8ujRsTQ47BkowAHV09Uazb+tBMVFx2ixR9+G/M1eV37Kbfe2til7+OaHORtRGYRs8cJvokMbXM5pSlmxFTqzzX78oUwXmuZmYX1OD/A+089hPBsyREGZRsL6jdOjFFfy1QreMZUNiUgfABjiPYVRetHvRzuLZAvGHwefd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705916823; c=relaxed/simple;
-	bh=XjbRb6KLhs3MMD3Cdz5D4prMhpH/m5EAMfKa/Xyq4Ak=;
+	s=arc-20240116; t=1705916840; c=relaxed/simple;
+	bh=bCbMxYqsNc6ysevtODH1LdEzA9cmGSP1KVajSHQPjJU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Z70yQoQmq8/7ZKs0DfsHPG8gmPUrhAe2CuOmoD/HIekWTrs68v+DzN2WafY5i23rpYG56DVKhT/k90ULXMYst7tae242rnPx40mTgq3piio4li0B5eLaET4ou6NSqHWmOYrF7y5lwErj/J0pVLRpcWD4kG7F1Fe2A9c82gWoMn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fuWFVtWJ; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version; b=LHul7jb1m/u6v4OLLh/66WBKxlSfozEt2h2RTdbSOFP4TuDKJz/ykfuEdPK8cwKV8cMS8tm+2uvM7nqn/F5Syk/XzmKq42KoUaa396JQBdXO6ff16dUyu11BOlZILSR/3AOmCOn8JMLomRVLqxahK/CkrLQOKlDuPW9kkcQCwuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eALNTadK; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fuWFVtWJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eALNTadK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705916822; x=1737452822;
+  t=1705916839; x=1737452839;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=XjbRb6KLhs3MMD3Cdz5D4prMhpH/m5EAMfKa/Xyq4Ak=;
-  b=fuWFVtWJjp0hxeOF7qSKNxZysDfToApMIx+fEJ1283vIBi0xnqf4/Wfp
-   dIiTDTmys8IhILgmlfl6qBZyAYrt14R7vP4sK7f0CEcsFF1t69rF1LKQs
-   lehPR3bMmc5aEaCgTXwZ7X5J3eo5OvXFdSRh2WIFPJAjBgvMgYQQXDSbi
-   Hk9IxmmpGbV6aW4A0Q7EIRn+RJZFlLxGaaK3VY3HUet+2UX48L5LDZvxZ
-   f039jDtBpJT/O8I6pyZYIGjPJfh/rI1rEylPEV4vhFduEGgf800BfaDUt
-   NKPfKBYscioNOrgAlh0zIxuVPbljLre89+zYEuL8vq2NWB0qTk4LvHzO2
+  bh=bCbMxYqsNc6ysevtODH1LdEzA9cmGSP1KVajSHQPjJU=;
+  b=eALNTadKq+2FfZB9rbjp+Bb84KC61hanZSF78DEtBPwP1puyrgSoj6Yu
+   Q8KRQkrmv0XR3IoXmLFfK/8K8y9V2KnKBMmqIIEu3ha2someqt+fmXymM
+   Joxg4Je4Sjh44oDr8ongAh4XXYhYqRJ9163hAQNBf90dRWgQbp8yV3YBK
+   hjwI0UtNLE06MnrAmZEk2ozksi7fpajezhO2ZS2MmkCAvDIdsDxm3sNvw
+   wPvRNjSEJi8KI7HB3VGhrA8hqCIw3Ozzhx0i+xAGya6l1oaXzbK8Gljdt
+   HsVt+5Olh+vnz5mAMlJtkAorxHdMDEcLcQN+sQLWF6tzbcQElor3YCuca
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="22641864"
+X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="22641899"
 X-IronPort-AV: E=Sophos;i="6.05,211,1701158400"; 
-   d="scan'208";a="22641864"
+   d="scan'208";a="22641899"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 01:47:01 -0800
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 01:47:18 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="778535468"
+X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="778535499"
 X-IronPort-AV: E=Sophos;i="6.05,211,1701158400"; 
-   d="scan'208";a="778535468"
+   d="scan'208";a="778535499"
 Received: from haibo-optiplex-7090.sh.intel.com ([10.239.159.132])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 01:46:52 -0800
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 01:47:09 -0800
 From: Haibo Xu <haibo1.xu@intel.com>
 To: 
 Cc: xiaobo55x@gmail.com,
@@ -60,9 +60,10 @@ Cc: xiaobo55x@gmail.com,
 	Guo Ren <guoren@kernel.org>,
 	Mayuresh Chitale <mchitale@ventanamicro.com>,
 	Greentime Hu <greentime.hu@sifive.com>,
+	wchen <waylingii@gmail.com>,
 	Conor Dooley <conor.dooley@microchip.com>,
-	Minda Chen <minda.chen@starfivetech.com>,
 	Samuel Holland <samuel@sholland.org>,
+	Minda Chen <minda.chen@starfivetech.com>,
 	Jisheng Zhang <jszhang@kernel.org>,
 	Sean Christopherson <seanjc@google.com>,
 	Like Xu <likexu@tencent.com>,
@@ -78,9 +79,9 @@ Cc: xiaobo55x@gmail.com,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	kvm-riscv@lists.infradead.org
-Subject: [PATCH v5 07/12] tools: riscv: Add header file vdso/processor.h
-Date: Mon, 22 Jan 2024 17:58:37 +0800
-Message-Id: <212d0d848e54c887944ec38bd9f9729df8d1a27f.1705916069.git.haibo1.xu@intel.com>
+Subject: [PATCH v5 08/12] KVM: riscv: selftests: Switch to use macro from csr.h
+Date: Mon, 22 Jan 2024 17:58:38 +0800
+Message-Id: <4806503d3e8fe4b727eb6df72c8fdd087355495b.1705916069.git.haibo1.xu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1705916069.git.haibo1.xu@intel.com>
 References: <cover.1705916069.git.haibo1.xu@intel.com>
@@ -92,54 +93,41 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Borrow the cpu_relax() definitions from kernel's
-arch/riscv/include/asm/vdso/processor.h to tools/ for riscv.
-
 Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
 Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 ---
- tools/arch/riscv/include/asm/vdso/processor.h | 32 +++++++++++++++++++
- 1 file changed, 32 insertions(+)
- create mode 100644 tools/arch/riscv/include/asm/vdso/processor.h
+ tools/testing/selftests/kvm/include/riscv/processor.h | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/tools/arch/riscv/include/asm/vdso/processor.h b/tools/arch/riscv/include/asm/vdso/processor.h
-new file mode 100644
-index 000000000000..662aca039848
---- /dev/null
-+++ b/tools/arch/riscv/include/asm/vdso/processor.h
-@@ -0,0 +1,32 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef __ASM_VDSO_PROCESSOR_H
-+#define __ASM_VDSO_PROCESSOR_H
-+
-+#ifndef __ASSEMBLY__
-+
-+#include <asm-generic/barrier.h>
-+
-+static inline void cpu_relax(void)
-+{
-+#ifdef __riscv_muldiv
-+	int dummy;
-+	/* In lieu of a halt instruction, induce a long-latency stall. */
-+	__asm__ __volatile__ ("div %0, %0, zero" : "=r" (dummy));
-+#endif
-+
-+#ifdef CONFIG_TOOLCHAIN_HAS_ZIHINTPAUSE
-+	/*
-+	 * Reduce instruction retirement.
-+	 * This assumes the PC changes.
-+	 */
-+	__asm__ __volatile__ ("pause");
-+#else
-+	/* Encoding of the pause instruction */
-+	__asm__ __volatile__ (".4byte 0x100000F");
-+#endif
-+	barrier();
-+}
-+
-+#endif /* __ASSEMBLY__ */
-+
-+#endif /* __ASM_VDSO_PROCESSOR_H */
+diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/tools/testing/selftests/kvm/include/riscv/processor.h
+index 5b62a3d2aa9b..6f9e1e5e466d 100644
+--- a/tools/testing/selftests/kvm/include/riscv/processor.h
++++ b/tools/testing/selftests/kvm/include/riscv/processor.h
+@@ -7,8 +7,9 @@
+ #ifndef SELFTEST_KVM_PROCESSOR_H
+ #define SELFTEST_KVM_PROCESSOR_H
+ 
+-#include "kvm_util.h"
+ #include <linux/stringify.h>
++#include <asm/csr.h>
++#include "kvm_util.h"
+ 
+ static inline uint64_t __kvm_reg_id(uint64_t type, uint64_t idx,
+ 				    uint64_t  size)
+@@ -95,13 +96,6 @@ static inline uint64_t __kvm_reg_id(uint64_t type, uint64_t idx,
+ #define PGTBL_PAGE_SIZE				PGTBL_L0_BLOCK_SIZE
+ #define PGTBL_PAGE_SIZE_SHIFT			PGTBL_L0_BLOCK_SHIFT
+ 
+-#define SATP_PPN				_AC(0x00000FFFFFFFFFFF, UL)
+-#define SATP_MODE_39				_AC(0x8000000000000000, UL)
+-#define SATP_MODE_48				_AC(0x9000000000000000, UL)
+-#define SATP_ASID_BITS				16
+-#define SATP_ASID_SHIFT				44
+-#define SATP_ASID_MASK				_AC(0xFFFF, UL)
+-
+ #define SBI_EXT_EXPERIMENTAL_START		0x08000000
+ #define SBI_EXT_EXPERIMENTAL_END		0x08FFFFFF
+ 
 -- 
 2.34.1
 
