@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9CF5811F7
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jan 2024 17:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DB1080056
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jan 2024 17:51:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706031917; cv=none; b=NrI4IsqmcfOjS1RFctvhZtTHx/lvWilom6uIfFTB+zTP3DjH0spyVhYUCvTRmkQQf/eBWsYSQ9eCxaP1wSm1Bl9c9FpaxFAUBMKbxpFMkiCEYPIThi+Q+XRh2zetnbuKzwD7HT1ErkGevY6SFpoHffDq8w1vibUSGw+gvunLxzo=
+	t=1706032267; cv=none; b=J7k0DErKsib8Jgd5Ez0Ra687sWuYJRBYgIO6y7mzkf7zqmBQut3C+LyU8mnOYbo+1BVhlujK7ICPHPH7TjXL/9Pg2Ml11fMd8gE29mjGifjb4lmBcLbHik+gkgChATir6aTzNfJ8v5Kz7FAiPDQf/VM5ePwNcbG7s360Sl9WiJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706031917; c=relaxed/simple;
-	bh=9b0JptKYUL2tLymXQ28zb0b6p+7g/64y/aIArNTTNxk=;
+	s=arc-20240116; t=1706032267; c=relaxed/simple;
+	bh=ZA93uUf4beZQzrMSYOnNWGgILljsW3Qv9sFJiHqaGuM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gayuZWCF0ra4HbcHqtGeYIWZ3+MdqBpnQgXnLXXiJ10QGTqsaBzAY29hT6l2NHhkLpmX2x5OWY9EOb8USt0LZZfgkFGrO3z6aJTLbzup7vDSKpIq1oBEy04WfkxkiNUlK8tNw8aUeOqeBgx/eE841uUU4cx1yaEeMmuNX24sKCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CHztmlIW; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=ahhS/XjQ0m9KqaxxKH9AWJD4A+XBDblAZzsxuLnrJ/rzPzc9mOBua8SNMZgUiFsJssvR0RfrTrLYw/5E/ZgOx8cvKJsAJd9g1RufxVoxTyfZSWMLyoKUO3u8K2BTJdEST0RP11qyH9VxyCKNTZxo+6MCMiHFxtau6/3cs3yRj84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pc7XGE1/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CHztmlIW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16906C433C7;
-	Tue, 23 Jan 2024 17:45:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pc7XGE1/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B3A3C433C7;
+	Tue, 23 Jan 2024 17:51:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706031917;
-	bh=9b0JptKYUL2tLymXQ28zb0b6p+7g/64y/aIArNTTNxk=;
+	s=k20201202; t=1706032267;
+	bh=ZA93uUf4beZQzrMSYOnNWGgILljsW3Qv9sFJiHqaGuM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CHztmlIWrxS7UyxoTJi24dT1YM4EnUNdgR9wYVJQoPXDvbDie92hkI8RaW1+8Fda/
-	 Vx5ZuMUO9Lf05DIfFj0mjrvtLTupF6cCTrgfjRgNF5n5NyijpJ82opQR8SbXpuckEQ
-	 eHe853O8+9SP93aEDxpC7eDLlofxzIjPu6SlRUrss3iulNhIhoZnrIg5NK0gV6gWZE
-	 y68+HilHDPuG8Mcu3L2E5A8R1nlfrokEsiSU/Wl9KZYSTMWiQp/mUveEJuXWUaYXOq
-	 Nkry+wJT4RFhKbMNOpDzg5Xo4LFfKt+ppnI5gjahgvpAMRyftWHL6PHWQDBL+P9o8B
-	 Gw7nTkNQb8oOQ==
+	b=pc7XGE1/AY0odCr2LK4xfrel0A/aDUcsrzHbn6TXTvrpLP5v/iRE5m8qHc/rB4ObD
+	 ZiChQ0gVe22cVQxzGG6K9KRKvXjqF0/ZziKqrNcHSS5lpiHCjigbxF5E2hvPcrOs9T
+	 2sqAtY/GUmaYVqPUgzvQPBqzehHTBU2OUDA6niIGyX9wFhJVnGcfCTfls9Sc6Q96xK
+	 2wMtpYbtVV5696rryrmxePaALAonm6pzIyKbJHkPwkvKEm4EaxR+uMcKvL9cGsB+BO
+	 Z6jrSTC/D3FZdu5bDjolJVqUmufdqfLNFVrLPa6QI+FeWxFDg93o94v4Wj1AISdLIb
+	 A/rEnDnRN7c/A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rSKpm-00E4UN-M9;
-	Tue, 23 Jan 2024 17:45:14 +0000
-Date: Tue, 23 Jan 2024 17:45:14 +0000
-Message-ID: <86h6j47xlh.wl-maz@kernel.org>
+	id 1rSKvQ-00E4cu-Jl;
+	Tue, 23 Jan 2024 17:51:04 +0000
+Date: Tue, 23 Jan 2024 17:51:03 +0000
+Message-ID: <86fryo7xbs.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Joey Gouly <joey.gouly@arm.com>
 Cc: kvmarm@lists.linux.dev,
@@ -45,11 +45,11 @@ Cc: kvmarm@lists.linux.dev,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 10/25] KVM: arm64: nv: Turn encoding ranges into discrete XArray stores
-In-Reply-To: <20240123163725.GE1283334@e124191.cambridge.arm.com>
+Subject: Re: [PATCH 22/25] KVM: arm64: Make PIR{,E0}_EL1 UNDEF if S1PIE is not advertised to the guest
+In-Reply-To: <20240123114810.GA1283334@e124191.cambridge.arm.com>
 References: <20240122201852.262057-1-maz@kernel.org>
-	<20240122201852.262057-11-maz@kernel.org>
-	<20240123163725.GE1283334@e124191.cambridge.arm.com>
+	<20240122201852.262057-23-maz@kernel.org>
+	<20240123114810.GA1283334@e124191.cambridge.arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -65,156 +65,62 @@ X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 23 Jan 2024 16:37:25 +0000,
+On Tue, 23 Jan 2024 11:48:10 +0000,
 Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> On Mon, Jan 22, 2024 at 08:18:37PM +0000, Marc Zyngier wrote:
-> > In order to be able to store different values for member of an
-> > encoding range, replace xa_store_range() calls with discrete
-> > xa_store() calls and an encoding iterator.
-> > 
-> > We end-up using a bit more memory, but we gain some flexibility
-> > that we will make use of shortly.
+> Hello,
+> 
+> On Mon, Jan 22, 2024 at 08:18:49PM +0000, Marc Zyngier wrote:
+> > As part of the ongoing effort to honor the guest configuration,
+> > add the necessary checks to make PIR_EL1 and co UNDEF if not
+> > advertised to the guest, and avoid context switching them.
 > > 
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  arch/arm64/kvm/emulate-nested.c | 31 ++++++++++++++++++++++++-------
-> >  1 file changed, 24 insertions(+), 7 deletions(-)
+> >  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 15 ++++++++++++++-
+> >  arch/arm64/kvm/sys_regs.c                  |  4 ++++
+> >  2 files changed, 18 insertions(+), 1 deletion(-)
 > > 
-> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> > index ef46c2e45307..59622636b723 100644
-> > --- a/arch/arm64/kvm/emulate-nested.c
-> > +++ b/arch/arm64/kvm/emulate-nested.c
-> > @@ -1757,6 +1757,28 @@ static __init void print_nv_trap_error(const struct encoding_to_trap_config *tc,
-> >  		err);
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> > index bb6b571ec627..b34743292ca7 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> > @@ -37,6 +37,19 @@ static inline bool ctxt_has_mte(struct kvm_cpu_context *ctxt)
+> >  	return kvm_has_mte(kern_hyp_va(vcpu->kvm));
 > >  }
 > >  
-> > +static u32 encoding_next(u32 encoding)
+> > +static inline bool ctxt_has_s1pie(struct kvm_cpu_context *ctxt)
 > > +{
-> > +	u8 op0, op1, crn, crm, op2;
+> > +	struct kvm_vcpu *vcpu = ctxt->__hyp_running_vcpu;
 > > +
-> > +	op0 = sys_reg_Op0(encoding);
-> > +	op1 = sys_reg_Op1(encoding);
-> > +	crn = sys_reg_CRn(encoding);
-> > +	crm = sys_reg_CRm(encoding);
-> > +	op2 = sys_reg_Op2(encoding);
+> > +	if (!cpus_have_final_cap(ARM64_HAS_S1PIE))
+> > +		return false;
 > > +
-> > +	if (op2 < Op2_mask)
-> > +		return sys_reg(op0, op1, crn, crm, op2 + 1);
-> > +	if (crm < CRm_mask)
-> > +		return sys_reg(op0, op1, crn, crm + 1, 0);
-> > +	if (crn < CRn_mask)
-> > +		return sys_reg(op0, op1, crn + 1, 0, 0);
-> > +	if (op1 < Op1_mask)
-> > +		return sys_reg(op0, op1 + 1, 0, 0, 0);
+> > +	if (!vcpu)
+> > +		vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
 > > +
-> > +	return sys_reg(op0 + 1, 0, 0, 0, 0);
+> > +	return kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64MMFR3_EL1, S1PIE, IMP);
 > > +}
-> 
-> I like this function, aesthetically pleasing!
-
-Glad you like the colour! :D
-
-> 
 > > +
-> >  int __init populate_nv_trap_config(void)
+> >  static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
 > >  {
-> >  	int ret = 0;
-> > @@ -1775,13 +1797,8 @@ int __init populate_nv_trap_config(void)
-> >  			ret = -EINVAL;
-> >  		}
-> >  
-> > -		if (cgt->encoding != cgt->end) {
-> > -			prev = xa_store_range(&sr_forward_xa,
-> > -					      cgt->encoding, cgt->end,
-> > -					      xa_mk_value(cgt->tc.val),
-> > -					      GFP_KERNEL);
-> > -		} else {
-> > -			prev = xa_store(&sr_forward_xa, cgt->encoding,
-> > +		for (u32 enc = cgt->encoding; enc <= cgt->end; enc = encoding_next(enc)) {
-> > +			prev = xa_store(&sr_forward_xa, enc,
-> >  					xa_mk_value(cgt->tc.val), GFP_KERNEL);
-> >  			if (prev && !xa_is_err(prev)) {
-> >  				ret = -EINVAL;
+> >  	ctxt_sys_reg(ctxt, SCTLR_EL1)	= read_sysreg_el1(SYS_SCTLR);
+> > @@ -55,7 +68,7 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+> >  	ctxt_sys_reg(ctxt, CONTEXTIDR_EL1) = read_sysreg_el1(SYS_CONTEXTIDR);
+> >  	ctxt_sys_reg(ctxt, AMAIR_EL1)	= read_sysreg_el1(SYS_AMAIR);
+> >  	ctxt_sys_reg(ctxt, CNTKCTL_EL1)	= read_sysreg_el1(SYS_CNTKCTL);
+> > -	if (cpus_have_final_cap(ARM64_HAS_S1PIE)) {
+> > +	if (ctxt_has_s1pie(ctxt)) {
+> >  		ctxt_sys_reg(ctxt, PIR_EL1)	= read_sysreg_el1(SYS_PIR);
+> >  		ctxt_sys_reg(ctxt, PIRE0_EL1)	= read_sysreg_el1(SYS_PIRE0);
+> >  	}
 > 
-> The error handling looks a bit weird here, the full context:
-> 
->                 for (u32 enc = cgt->encoding; enc <= cgt->end; enc = encoding_next(enc)) {
->                         prev = xa_store(&sr_forward_xa, enc,
->                                         xa_mk_value(cgt->tc.val), GFP_KERNEL);
->                         if (prev && !xa_is_err(prev)) {
->                                 ret = -EINVAL;
->                                 print_nv_trap_error(cgt, "Duplicate CGT", ret);
->                         }
->                 }
->
->                 if (xa_is_err(prev)) {
->                         ret = xa_err(prev);
->                         print_nv_trap_error(cgt, "Failed CGT insertion", ret);
->                 }  
-> 
-> I would maybe expect some 'goto's after setting ret? It looks like the ret
-> would still be returned properly at the end of the function at least.  We also
-> don't check the return value of xa_store() in the encoding_to_fgt loop further
-> down, which seems worse as that could affect VMs if some encodings failed to be
-> stored for some reason.
+> Missing the corresponding change in __sysreg_restore_el1_state().
 
-The lack of goto is on purpose. Getting the tables right is tedious
-when you can't collect multiple errors at once and stop on the first
-one. Which is why I opted for this scheme where 'ret' only gets
-written on error.
+Gah. Thanks for spotting it. I'm pretty sure I had it at some point,
+and somehow lost it. Probably on another machine somewhere...
 
-However, the error handling is pretty lax indeed. I have this in
-store, on top of the current patch:
-
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 5c0f81b6e55c..f2cf0fbf27eb 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -1795,11 +1795,11 @@ int __init populate_nv_trap_config(void)
- 				ret = -EINVAL;
- 				print_nv_trap_error(cgt, "Duplicate CGT", ret);
- 			}
--		}
- 
--		if (xa_is_err(prev)) {
--			ret = xa_err(prev);
--			print_nv_trap_error(cgt, "Failed CGT insertion", ret);
-+			if (xa_is_err(prev)) {
-+				ret = xa_err(prev);
-+				print_nv_trap_error(cgt, "Failed CGT insertion", ret);
-+			}
- 		}
- 	}
- 
-@@ -1812,6 +1812,7 @@ int __init populate_nv_trap_config(void)
- 	for (int i = 0; i < ARRAY_SIZE(encoding_to_fgt); i++) {
- 		const struct encoding_to_trap_config *fgt = &encoding_to_fgt[i];
- 		union trap_config tc;
-+		void *prev;
- 
- 		if (fgt->tc.fgt >= __NR_FGT_GROUP_IDS__) {
- 			ret = -EINVAL;
-@@ -1826,8 +1827,13 @@ int __init populate_nv_trap_config(void)
- 		}
- 
- 		tc.val |= fgt->tc.val;
--		xa_store(&sr_forward_xa, fgt->encoding,
--			 xa_mk_value(tc.val), GFP_KERNEL);
-+		prev = xa_store(&sr_forward_xa, fgt->encoding,
-+				xa_mk_value(tc.val), GFP_KERNEL);
-+
-+		if (xa_is_err(prev)) {
-+			ret = xa_err(prev);
-+			print_nv_trap_error(cgt, "Failed FGT insertion", ret);
-+		}
- 	}
- 
- 	kvm_info("nv: %ld fine grained trap handlers\n",
-
-Completely untested, of course.
-
-Thanks,
+Cheers,
 
 	M.
 
