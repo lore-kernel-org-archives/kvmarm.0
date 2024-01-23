@@ -1,38 +1,64 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 118C95C908
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jan 2024 11:48:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B2862A0A
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jan 2024 13:11:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706010503; cv=none; b=FUPZVH/UJHeuddq+tbfiAGjjvrVwswj2SFqjlxg7wciZOr9NlYSfrXkgzY/dS+ON1OHyvBu4EANNR/rMIUNjLxiGSfdS1HzoKskXwXStxIy/hs1feUXwbpw6lhl/9aaj4NpHvYE+KB2PXhJd4etAC/HOWYW0a5l0VdP5QuPVd7E=
+	t=1706015467; cv=none; b=XKEaqc60f7CW2gex/9wcGYkG1LYNaiEcs7AhBhSZHEuwyKGiKIG3+uR8M4j7WNu2t6bl2cel0461Y61+Gws+EsWqOHpH7OgLU9IvTQtRvTfWyH00I5GnWm4zp2Yo4bCjypVtFWXOhNGYXEyjrV2r8+chXajjoslXzPA06UtqQ+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706010503; c=relaxed/simple;
-	bh=MyR0UWGrR9UUIcTGMYu/Cqde/QEggU6wiO+OSEyEu1A=;
+	s=arc-20240116; t=1706015467; c=relaxed/simple;
+	bh=5h4c0yLpAWhh9wDVnrtG83khZHw2xEkAxReFMbgcYiM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=abOBz1Gpu4XcfFWAdDoVCtElC47VbWXUQjBnTA4nkOEhQKxBY5+isuQsLGEmv06eop4U5NCt9/jw65isOHwgbY90zD6ZbGniDcTzIB6eDOk7Y/GaGY2lkjXDLNqQ3w9tvVpuTRo2GpwHY7nC9oW9QrQwo/w7a0oJxsxk1dTFxSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C36F51FB;
-	Tue, 23 Jan 2024 03:49:05 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1C91C3F762;
-	Tue, 23 Jan 2024 03:48:19 -0800 (PST)
-Date: Tue, 23 Jan 2024 11:48:10 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 22/25] KVM: arm64: Make PIR{,E0}_EL1 UNDEF if S1PIE is
- not advertised to the guest
-Message-ID: <20240123114810.GA1283334@e124191.cambridge.arm.com>
-References: <20240122201852.262057-1-maz@kernel.org>
- <20240122201852.262057-23-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=hm5E3GH3DfrS/SL6xOLR0oX9MwLiwYQ6av/Crkaxi+yGJx76XsuRGgWa6wRQOku3HCBB+UMiOJ9YY1+VeF4Cuh21yIUZHo1hfNXEw2wApMmfrgtvfgvAdDS+KQ6UVDCqzUR626GkZlUbaUHXmSDhfnAnKGfR5d39JSwvhkygIKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=fpto1vRE; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="fpto1vRE"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=fSr5mFfM4iUU6EsOYToTuq8gdRk30qQl8QQSg63i70E=; b=fpto1vRE8xiQfC1uHZjgB53IU1
+	JLS4uiEkPBr6x1Klv4TNndrOnG/ui4aqzwG/Y2eqKlYIDHpeJacttqDhXV2KGhFFEn9acxBpxIouu
+	tOH2aiHL34vwZDnDTt45uqhH4MS/X5syanHIDBqUfCGS4JuKsSQ/+MMkvnURyhmYGdLkZ9t3oZuqF
+	XWRtZTgH2zKCxX4SfzUOlORMQvFyeJrKaOho9uAsnq3WH6zRTINuWSRJ4XEYkmi4DaXRKgTQN+Kz8
+	8qrlri2JBWoJpsiLMJuWZcj5/RLx3sn8Pm1uwiDKuFDLblQQ1Lq/w4uAOvqo/kJ0weC6iYY1dCIMz
+	idqciouw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46192)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rSGYC-0002Qx-1y;
+	Tue, 23 Jan 2024 13:10:48 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rSGY8-0001yi-Ln; Tue, 23 Jan 2024 13:10:44 +0000
+Date: Tue, 23 Jan 2024 13:10:44 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, acpica-devel@lists.linuxfoundation.org,
+	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com,
+	James Morse <james.morse@arm.com>
+Subject: Re: [PATCH RFC v3 17/21] ACPI: add support to register CPUs based on
+ the _STA enabled bit
+Message-ID: <Za+61Jikkxh2BinY@shell.armlinux.org.uk>
+References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk>
+ <E1rDOhC-00DvlI-Pp@rmk-PC.armlinux.org.uk>
+ <ZYBDJG1g7SH7AiM1@shell.armlinux.org.uk>
+ <20240102145320.000062f9@Huawei.com>
+ <20240123102603.00004244@Huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,72 +67,110 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240122201852.262057-23-maz@kernel.org>
+In-Reply-To: <20240123102603.00004244@Huawei.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello,
-
-On Mon, Jan 22, 2024 at 08:18:49PM +0000, Marc Zyngier wrote:
-> As part of the ongoing effort to honor the guest configuration,
-> add the necessary checks to make PIR_EL1 and co UNDEF if not
-> advertised to the guest, and avoid context switching them.
+On Tue, Jan 23, 2024 at 10:26:03AM +0000, Jonathan Cameron wrote:
+> On Tue, 2 Jan 2024 14:53:20 +0000
+> Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 15 ++++++++++++++-
->  arch/arm64/kvm/sys_regs.c                  |  4 ++++
->  2 files changed, 18 insertions(+), 1 deletion(-)
+> > On Mon, 18 Dec 2023 13:03:32 +0000
+> > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> > 
+> > > On Wed, Dec 13, 2023 at 12:50:38PM +0000, Russell King wrote:  
+> > > > From: James Morse <james.morse@arm.com>
+> > > > 
+> > > > acpi_processor_get_info() registers all present CPUs. Registering a
+> > > > CPU is what creates the sysfs entries and triggers the udev
+> > > > notifications.
+> > > > 
+> > > > arm64 virtual machines that support 'virtual cpu hotplug' use the
+> > > > enabled bit to indicate whether the CPU can be brought online, as
+> > > > the existing ACPI tables require all hardware to be described and
+> > > > present.
+> > > > 
+> > > > If firmware describes a CPU as present, but disabled, skip the
+> > > > registration. Such CPUs are present, but can't be brought online for
+> > > > whatever reason. (e.g. firmware/hypervisor policy).
+> > > > 
+> > > > Once firmware sets the enabled bit, the CPU can be registered and
+> > > > brought online by user-space. Online CPUs, or CPUs that are missing
+> > > > an _STA method must always be registered.    
+> > > 
+> > > ...
+> > >   
+> > > > @@ -526,6 +552,9 @@ static void acpi_processor_post_eject(struct acpi_device *device)
+> > > >  		acpi_processor_make_not_present(device);
+> > > >  		return;
+> > > >  	}
+> > > > +
+> > > > +	if (cpu_present(pr->id) && !(sta & ACPI_STA_DEVICE_ENABLED))
+> > > > +		arch_unregister_cpu(pr->id);    
+> > > 
+> > > This change isn't described in the commit log, but seems to be the cause
+> > > of the build error identified by the kernel build bot that is fixed
+> > > later in this series. I'm wondering whether this should be in a
+> > > different patch, maybe "ACPI: Check _STA present bit before making CPUs
+> > > not present" ?  
+> > 
+> > Would seem a bit odd to call arch_unregister_cpu() way before the code
+> > is added to call the matching arch_registers_cpu()
+> > 
+> > Mind you this eject doesn't just apply to those CPUs that are registered
+> > later I think, but instead to all.  So we run into the spec hole that
+> > there is no way to identify initially 'enabled' CPUs that might be disabled
+> > later.
+> > 
+> > > 
+> > > Or maybe my brain isn't working properly (due to being Covid positive.)
+> > > Any thoughts, Jonathan?  
+> > 
+> > I'll go with a resounding 'not sure' on where this change belongs.
+> > I blame my non existent start of the year hangover.
+> > Hope you have recovered!
 > 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> index bb6b571ec627..b34743292ca7 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> @@ -37,6 +37,19 @@ static inline bool ctxt_has_mte(struct kvm_cpu_context *ctxt)
->  	return kvm_has_mte(kern_hyp_va(vcpu->kvm));
->  }
->  
-> +static inline bool ctxt_has_s1pie(struct kvm_cpu_context *ctxt)
-> +{
-> +	struct kvm_vcpu *vcpu = ctxt->__hyp_running_vcpu;
-> +
-> +	if (!cpus_have_final_cap(ARM64_HAS_S1PIE))
-> +		return false;
-> +
-> +	if (!vcpu)
-> +		vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
-> +
-> +	return kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64MMFR3_EL1, S1PIE, IMP);
-> +}
-> +
->  static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
->  {
->  	ctxt_sys_reg(ctxt, SCTLR_EL1)	= read_sysreg_el1(SYS_SCTLR);
-> @@ -55,7 +68,7 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
->  	ctxt_sys_reg(ctxt, CONTEXTIDR_EL1) = read_sysreg_el1(SYS_CONTEXTIDR);
->  	ctxt_sys_reg(ctxt, AMAIR_EL1)	= read_sysreg_el1(SYS_AMAIR);
->  	ctxt_sys_reg(ctxt, CNTKCTL_EL1)	= read_sysreg_el1(SYS_CNTKCTL);
-> -	if (cpus_have_final_cap(ARM64_HAS_S1PIE)) {
-> +	if (ctxt_has_s1pie(ctxt)) {
->  		ctxt_sys_reg(ctxt, PIR_EL1)	= read_sysreg_el1(SYS_PIR);
->  		ctxt_sys_reg(ctxt, PIRE0_EL1)	= read_sysreg_el1(SYS_PIRE0);
->  	}
+> Looking again, I think you were right, move it to that earlier patch.
 
-Missing the corresponding change in __sysreg_restore_el1_state().
+I'm having second thoughts - because this patch introduces the
+arch_register_cpu() into the acpi_processor_add() path (via
+acpi_processor_get_info() and acpi_processor_make_enabled(), so isn't
+it also correct to add arch_unregister_cpu() to the detach/post_eject
+path as well? If we add one without the other, doesn't stuff become
+a bit asymetric?
 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 3c939ea4a28f..bcde43b81755 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -3990,6 +3990,10 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
->  						HFGITR_EL2_TLBIRVAAE1OS	|
->  						HFGITR_EL2_TLBIRVAE1OS);
->  
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
-> +		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPIRE0_EL1 |
-> +						HFGxTR_EL2_nPIR_EL1);
-> +
->  	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
->  out:
->  	mutex_unlock(&kvm->arch.config_lock);
+Looking more deeply at these changes, I'm finding it isn't easy to
+keep track of everything that's going on here.
 
-Thanks,
-Joey
+We had attach()/detach() callbacks that were nice and symetrical.
+How we have this post_eject() callback that makes things asymetrical.
+
+We have the attach() method that registers the CPU, but no detach
+method, instead having the post_eject() method. On the face of it,
+arch_unregister_cpu() doesn't look symetric unless one goes digging
+more in the code - by that, I mean arch_register_cpu() only gets
+called of present=1 _and_ enabled=1. However, arch_unregister_cpu()
+gets called buried in acpi_processor_make_not_present(), called when
+present=0, and then we have this new one to handle the case where
+enabled=0. It is not obvious that arch_unregister_cpu() is the reverse
+of what happens with arch_register_cpu() here.
+
+Then we have the add() method allocating pr->throttling.shared_cpu_map,
+and acpi_processor_make_not_present() freeing it. From what I read in
+ACPI v6.5, enabled is not allowed to be set without present. So, if
+_STA reports that a CPU that had present=1 enabled=1, but then is
+later reported to be enabled=0 (which we handle by calling only
+arch_unregister_cpu()) then what happens when _STA changes to
+enabled=1 later? Does add() get called? If it does, this would cause
+a new acpi_processor structure to be allocated and the old one to be
+leaked... I hope I'm wrong about add() being called - but if it isn't,
+how does enabled going from 0->1 get handled... and if we are handling
+its 1->0 transition separately from present, then surely we should be
+handling that.
+
+Maybe I'm just getting confused, but I've spent much of this morning
+trying to unravel all this... and I'm of the opinion that this isn't a
+sign of a good approach.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
