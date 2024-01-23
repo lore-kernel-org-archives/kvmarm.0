@@ -1,195 +1,222 @@
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7065E7F7DC;
-	Tue, 23 Jan 2024 17:44:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9CF5811F7
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jan 2024 17:45:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706031853; cv=none; b=I/ckMRBjtB1ArUEVMrq8RDHLkpNQU2XKyfeMjFrT+FJhbIkebnkuLQR9Cmo7sC7tXIwnHOXl1iUJ6fjRVY9d9zq6y/Se+rZx0cGpGZDQLxPMFD/eIRPyjnqGxpoyvRT2D0u8dR1L0Zv/C90uBXT9jxKavxLhbApjmPqHBPGR3IY=
+	t=1706031917; cv=none; b=NrI4IsqmcfOjS1RFctvhZtTHx/lvWilom6uIfFTB+zTP3DjH0spyVhYUCvTRmkQQf/eBWsYSQ9eCxaP1wSm1Bl9c9FpaxFAUBMKbxpFMkiCEYPIThi+Q+XRh2zetnbuKzwD7HT1ErkGevY6SFpoHffDq8w1vibUSGw+gvunLxzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706031853; c=relaxed/simple;
-	bh=h/fOGX9r8KCQE5Xn93RskzadT8HYnWRtaC3RKieW7lg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O459PomfjLN5UzEK6eTelzHL4e4hwF0wHUKTliqh+CBgybtvL+8Vc82Qj0UZtH5FdAIR/T6bPIt1F8u3IlqAWVyCYjNqU9iizyP6WkkEyDRFRyaswdXfKW4f+6ZoKhDAUv3eKEmcz7HQRttbsCY7TVrnOs+JWItgVzW6RGASBqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-6dfd973f3fdso447556a34.1;
-        Tue, 23 Jan 2024 09:44:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706031851; x=1706636651;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kq6KcpPGxOZbbj6MD5pFvib4SOoS9hzSh6Dd/9DvrIs=;
-        b=VQFtyOCTxrCdx0h1zn/5RDtpkOMvPgb36ydQrcEMs2tomkaFOT0Eno0Sjzdp+/eDSw
-         D9CmJwFm2ZWmkzL4alDqJfIsevLq5buB/9aJGwNmrW/k+A7AOLuqaEeQ4gkZzAcaGIIM
-         YE2S6+W7kO6ChNaK7yoiEWOM/xCn2ig60KOC7GZDK0GLxVtjZ8pEh5Bpj/ux78mkP1ej
-         FxmjvIBKpOak/sf3Y295TnpfdfIlG2PZJhUrbMS1noJLxp8qmEdXGM+sx3ficNYzH6pr
-         J888M44FQB6Ww386s2Sv2TIzUDh64CEW0q9BOGk65AjANgIpgmW6zyO6Bh9DsLD2kOGL
-         3k9w==
-X-Gm-Message-State: AOJu0YyIhNiYnfbBHq7lu77Mz3reFE1MprOzcVya6tz3udn8ucLZ0yCx
-	nYW3OHVBYHCLwaNOeBPwW6QiocZw4jQHJvgPmtS5XUiA/PZci/FBvGlg2JYUgKT123A/Z/Id14s
-	/EaS+HjPj1/pQa2a02uX8HmWMFL8=
-X-Google-Smtp-Source: AGHT+IEpP44JkahyRRncDJZ6FDB633whaZG3UM7wkrdtm7F6Y1fagxGT/g8CFvifyPleyOU2/X9qkHN1NII1GS6acpg=
-X-Received: by 2002:a4a:d9c4:0:b0:599:6d16:353c with SMTP id
- l4-20020a4ad9c4000000b005996d16353cmr9505215oou.1.1706031851278; Tue, 23 Jan
- 2024 09:44:11 -0800 (PST)
+	s=arc-20240116; t=1706031917; c=relaxed/simple;
+	bh=9b0JptKYUL2tLymXQ28zb0b6p+7g/64y/aIArNTTNxk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gayuZWCF0ra4HbcHqtGeYIWZ3+MdqBpnQgXnLXXiJ10QGTqsaBzAY29hT6l2NHhkLpmX2x5OWY9EOb8USt0LZZfgkFGrO3z6aJTLbzup7vDSKpIq1oBEy04WfkxkiNUlK8tNw8aUeOqeBgx/eE841uUU4cx1yaEeMmuNX24sKCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CHztmlIW; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CHztmlIW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16906C433C7;
+	Tue, 23 Jan 2024 17:45:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706031917;
+	bh=9b0JptKYUL2tLymXQ28zb0b6p+7g/64y/aIArNTTNxk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CHztmlIWrxS7UyxoTJi24dT1YM4EnUNdgR9wYVJQoPXDvbDie92hkI8RaW1+8Fda/
+	 Vx5ZuMUO9Lf05DIfFj0mjrvtLTupF6cCTrgfjRgNF5n5NyijpJ82opQR8SbXpuckEQ
+	 eHe853O8+9SP93aEDxpC7eDLlofxzIjPu6SlRUrss3iulNhIhoZnrIg5NK0gV6gWZE
+	 y68+HilHDPuG8Mcu3L2E5A8R1nlfrokEsiSU/Wl9KZYSTMWiQp/mUveEJuXWUaYXOq
+	 Nkry+wJT4RFhKbMNOpDzg5Xo4LFfKt+ppnI5gjahgvpAMRyftWHL6PHWQDBL+P9o8B
+	 Gw7nTkNQb8oOQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rSKpm-00E4UN-M9;
+	Tue, 23 Jan 2024 17:45:14 +0000
+Date: Tue, 23 Jan 2024 17:45:14 +0000
+Message-ID: <86h6j47xlh.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 10/25] KVM: arm64: nv: Turn encoding ranges into discrete XArray stores
+In-Reply-To: <20240123163725.GE1283334@e124191.cambridge.arm.com>
+References: <20240122201852.262057-1-maz@kernel.org>
+	<20240122201852.262057-11-maz@kernel.org>
+	<20240123163725.GE1283334@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk> <E1rDOgD-00Dvk2-3h@rmk-PC.armlinux.org.uk>
- <CAJZ5v0g9nfLrEf9u4Ksw6BOWJQ9iv8Z-O8RsLU6jR5zk0ahxRw@mail.gmail.com>
- <20240122180013.000016d5@Huawei.com> <Za++/11n5KA1VS3p@shell.armlinux.org.uk>
- <CAJZ5v0h7wsLt8d3ZoLXsK1=crAx66T42WDKNoHcg8CiHpAjS8g@mail.gmail.com> <Za/q9jivG4OdZM0f@shell.armlinux.org.uk>
-In-Reply-To: <Za/q9jivG4OdZM0f@shell.armlinux.org.uk>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Tue, 23 Jan 2024 18:43:59 +0100
-Message-ID: <CAJZ5v0gwe02uzAQoX0QDHo35OTEozpbnqC6vukjM3aE6HMq9WQ@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 05/21] ACPI: Rename ACPI_HOTPLUG_CPU to include 'present'
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
-	linux-pm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev, x86@kernel.org, 
-	acpica-devel@lists.linuxfoundation.org, linux-csky@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-ia64@vger.kernel.org, 
-	linux-parisc@vger.kernel.org, Salil Mehta <salil.mehta@huawei.com>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com, justin.he@arm.com, 
-	James Morse <james.morse@arm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Jan 23, 2024 at 5:36=E2=80=AFPM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
->
-> On Tue, Jan 23, 2024 at 05:15:54PM +0100, Rafael J. Wysocki wrote:
-> > On Tue, Jan 23, 2024 at 2:28=E2=80=AFPM Russell King (Oracle)
-> > <linux@armlinux.org.uk> wrote:
-> > >
-> > > On Mon, Jan 22, 2024 at 06:00:13PM +0000, Jonathan Cameron wrote:
-> > > > On Mon, 18 Dec 2023 21:35:16 +0100
-> > > > "Rafael J. Wysocki" <rafael@kernel.org> wrote:
-> > > >
-> > > > > On Wed, Dec 13, 2023 at 1:49=E2=80=AFPM Russell King <rmk+kernel@=
-armlinux.org.uk> wrote:
-> > > > > >
-> > > > > > From: James Morse <james.morse@arm.com>
-> > > > > >
-> > > > > > The code behind ACPI_HOTPLUG_CPU allows a not-present CPU to be=
-come
-> > > > > > present.
-> > > > >
-> > > > > Right.
-> > > > >
-> > > > > > This isn't the only use of HOTPLUG_CPU. On arm64 and riscv
-> > > > > > CPUs can be taken offline as a power saving measure.
-> > > > >
-> > > > > But still there is the case in which a non-present CPU can become
-> > > > > present, isn't it there?
-> > > >
-> > > > Not yet defined by the architectures (and I'm assuming it probably =
-never will be).
-> > > >
-> > > > The original proposal we took to ARM was to do exactly that - they =
-pushed
-> > > > back hard on the basis there was no architecturally safe way to imp=
-lement it.
-> > > > Too much of the ARM arch has to exist from the start of time.
-> > > >
-> > > > https://lore.kernel.org/linux-arm-kernel/cbaa6d68-6143-e010-5f3c-ec=
-62f879ad95@arm.com/
-> > > > is one of the relevant threads of the kernel side of that discussio=
-n.
-> > > >
-> > > > Not to put specific words into the ARM architects mouths, but the
-> > > > short description is that there is currently no demand for working
-> > > > out how to make physical CPU hotplug possible, as such they will no=
-t
-> > > > provide an architecturally compliant way to do it for virtual CPU h=
-otplug and
-> > > > another means is needed (which is why this series doesn't use the p=
-resent bit
-> > > > for that purpose and we have the Online capable bit in MADT/GICC)
-> > > >
-> > > > It was a 'fun' dance of several years to get to that clarification.
-> > > > As another fun fact, the same is defined for x86, but I don't think
-> > > > anyone has used it yet (GICC for ARM has an online capable bit in t=
-he flags to
-> > > > enable this, which was remarkably similar to the online capable bit=
- in the
-> > > > flags of the Local APIC entries as added fairly recently).
-> > > >
-> > > > >
-> > > > > > On arm64 an offline CPU may be disabled by firmware, preventing=
- it from
-> > > > > > being brought back online, but it remains present throughout.
-> > > > > >
-> > > > > > Adding code to prevent user-space trying to online these disabl=
-ed CPUs
-> > > > > > needs some additional terminology.
-> > > > > >
-> > > > > > Rename the Kconfig symbol CONFIG_ACPI_HOTPLUG_PRESENT_CPU to re=
-flect
-> > > > > > that it makes possible CPUs present.
-> > > > >
-> > > > > Honestly, I don't think that this change is necessary or even use=
-ful.
-> > > >
-> > > > Whilst it's an attempt to avoid future confusion, the rename is
-> > > > not something I really care about so my advice to Russell is drop
-> > > > it unless you are attached to it!
-> > >
-> > > While I agree that it isn't a necessity, I don't fully agree that it
-> > > isn't useful.
-> > >
-> > > One of the issues will be that while Arm64 will support hotplug vCPU,
-> > > it won't be setting ACPI_HOTPLUG_CPU because it doesn't support
-> > > the present bit changing. So I can see why James decided to rename
-> > > it - because with Arm64's hotplug vCPU, the idea that ACPI_HOTPLUG_CP=
-U
-> > > somehow enables hotplug CPU support is now no longer true.
-> > >
-> > > Keeping it as ACPI_HOTPLUG_CPU makes the code less obvious, because i=
-t
-> > > leads one to assume that it ought to be enabled for Arm64's
-> > > implementatinon, and that could well cause issues in the future if
-> > > people make the assumption that "ACPI_HOTPLUG_CPU" means hotplug CPU
-> > > is supported in ACPI. It doesn't anymore.
-> >
-> > On x86 there is no confusion AFAICS.  It's always meant "as long as
-> > the platform supports it".
->
-> That's x86, which supports physical CPU hotplug. We're introducing
-> support for Arm64 here which doesn't support physical CPU hotplug.
->
->                                                 ACPI-based      Physical =
-       Virtual
-> Arch    HOTPLUG_CPU     ACPI_HOTPLUG_CPU        Hotplug         Hotplug  =
-       Hotplug
-> Arm64   Y               N                       Y               N        =
-       Y
-> x86     Y               Y                       Y               Y        =
-       Y
->
-> So ACPI_HOTPLUG_CPU becomes totally misnamed with the introduction
-> of hotplug on Arm64.
->
-> If we want to just look at stuff from an x86 perspective, then yes,
-> it remains correct to call it ACPI_HOTPLUG_CPU. It isn't correct as
-> soon as we add Arm64, as I already said.
+On Tue, 23 Jan 2024 16:37:25 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
+> 
+> On Mon, Jan 22, 2024 at 08:18:37PM +0000, Marc Zyngier wrote:
+> > In order to be able to store different values for member of an
+> > encoding range, replace xa_store_range() calls with discrete
+> > xa_store() calls and an encoding iterator.
+> > 
+> > We end-up using a bit more memory, but we gain some flexibility
+> > that we will make use of shortly.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/emulate-nested.c | 31 ++++++++++++++++++++++++-------
+> >  1 file changed, 24 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> > index ef46c2e45307..59622636b723 100644
+> > --- a/arch/arm64/kvm/emulate-nested.c
+> > +++ b/arch/arm64/kvm/emulate-nested.c
+> > @@ -1757,6 +1757,28 @@ static __init void print_nv_trap_error(const struct encoding_to_trap_config *tc,
+> >  		err);
+> >  }
+> >  
+> > +static u32 encoding_next(u32 encoding)
+> > +{
+> > +	u8 op0, op1, crn, crm, op2;
+> > +
+> > +	op0 = sys_reg_Op0(encoding);
+> > +	op1 = sys_reg_Op1(encoding);
+> > +	crn = sys_reg_CRn(encoding);
+> > +	crm = sys_reg_CRm(encoding);
+> > +	op2 = sys_reg_Op2(encoding);
+> > +
+> > +	if (op2 < Op2_mask)
+> > +		return sys_reg(op0, op1, crn, crm, op2 + 1);
+> > +	if (crm < CRm_mask)
+> > +		return sys_reg(op0, op1, crn, crm + 1, 0);
+> > +	if (crn < CRn_mask)
+> > +		return sys_reg(op0, op1, crn + 1, 0, 0);
+> > +	if (op1 < Op1_mask)
+> > +		return sys_reg(op0, op1 + 1, 0, 0, 0);
+> > +
+> > +	return sys_reg(op0 + 1, 0, 0, 0, 0);
+> > +}
+> 
+> I like this function, aesthetically pleasing!
 
-And if you rename it, it becomes less confusing for ARM64, but more
-confusing for x86, which basically is my point.
+Glad you like the colour! :D
 
-IMO "hotplug" covers both cases well enough and "hotplug present" is
-only accurate for one of them.
+> 
+> > +
+> >  int __init populate_nv_trap_config(void)
+> >  {
+> >  	int ret = 0;
+> > @@ -1775,13 +1797,8 @@ int __init populate_nv_trap_config(void)
+> >  			ret = -EINVAL;
+> >  		}
+> >  
+> > -		if (cgt->encoding != cgt->end) {
+> > -			prev = xa_store_range(&sr_forward_xa,
+> > -					      cgt->encoding, cgt->end,
+> > -					      xa_mk_value(cgt->tc.val),
+> > -					      GFP_KERNEL);
+> > -		} else {
+> > -			prev = xa_store(&sr_forward_xa, cgt->encoding,
+> > +		for (u32 enc = cgt->encoding; enc <= cgt->end; enc = encoding_next(enc)) {
+> > +			prev = xa_store(&sr_forward_xa, enc,
+> >  					xa_mk_value(cgt->tc.val), GFP_KERNEL);
+> >  			if (prev && !xa_is_err(prev)) {
+> >  				ret = -EINVAL;
+> 
+> The error handling looks a bit weird here, the full context:
+> 
+>                 for (u32 enc = cgt->encoding; enc <= cgt->end; enc = encoding_next(enc)) {
+>                         prev = xa_store(&sr_forward_xa, enc,
+>                                         xa_mk_value(cgt->tc.val), GFP_KERNEL);
+>                         if (prev && !xa_is_err(prev)) {
+>                                 ret = -EINVAL;
+>                                 print_nv_trap_error(cgt, "Duplicate CGT", ret);
+>                         }
+>                 }
+>
+>                 if (xa_is_err(prev)) {
+>                         ret = xa_err(prev);
+>                         print_nv_trap_error(cgt, "Failed CGT insertion", ret);
+>                 }  
+> 
+> I would maybe expect some 'goto's after setting ret? It looks like the ret
+> would still be returned properly at the end of the function at least.  We also
+> don't check the return value of xa_store() in the encoding_to_fgt loop further
+> down, which seems worse as that could affect VMs if some encodings failed to be
+> stored for some reason.
 
-> And honestly, a two line quip to my reasoned argument is not IMHO
-> an acceptable reply.
+The lack of goto is on purpose. Getting the tables right is tedious
+when you can't collect multiple errors at once and stop on the first
+one. Which is why I opted for this scheme where 'ret' only gets
+written on error.
 
-Well, I'm not even sure how to respond to this ...
+However, the error handling is pretty lax indeed. I have this in
+store, on top of the current patch:
+
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 5c0f81b6e55c..f2cf0fbf27eb 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -1795,11 +1795,11 @@ int __init populate_nv_trap_config(void)
+ 				ret = -EINVAL;
+ 				print_nv_trap_error(cgt, "Duplicate CGT", ret);
+ 			}
+-		}
+ 
+-		if (xa_is_err(prev)) {
+-			ret = xa_err(prev);
+-			print_nv_trap_error(cgt, "Failed CGT insertion", ret);
++			if (xa_is_err(prev)) {
++				ret = xa_err(prev);
++				print_nv_trap_error(cgt, "Failed CGT insertion", ret);
++			}
+ 		}
+ 	}
+ 
+@@ -1812,6 +1812,7 @@ int __init populate_nv_trap_config(void)
+ 	for (int i = 0; i < ARRAY_SIZE(encoding_to_fgt); i++) {
+ 		const struct encoding_to_trap_config *fgt = &encoding_to_fgt[i];
+ 		union trap_config tc;
++		void *prev;
+ 
+ 		if (fgt->tc.fgt >= __NR_FGT_GROUP_IDS__) {
+ 			ret = -EINVAL;
+@@ -1826,8 +1827,13 @@ int __init populate_nv_trap_config(void)
+ 		}
+ 
+ 		tc.val |= fgt->tc.val;
+-		xa_store(&sr_forward_xa, fgt->encoding,
+-			 xa_mk_value(tc.val), GFP_KERNEL);
++		prev = xa_store(&sr_forward_xa, fgt->encoding,
++				xa_mk_value(tc.val), GFP_KERNEL);
++
++		if (xa_is_err(prev)) {
++			ret = xa_err(prev);
++			print_nv_trap_error(cgt, "Failed FGT insertion", ret);
++		}
+ 	}
+ 
+ 	kvm_info("nv: %ld fine grained trap handlers\n",
+
+Completely untested, of course.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
