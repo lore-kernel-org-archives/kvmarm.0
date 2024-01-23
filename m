@@ -1,70 +1,70 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F6182D81
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jan 2024 19:49:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438C68003E
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jan 2024 19:50:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706039366; cv=none; b=a3Yk8TMT64cJCTyClvFH1yNbTif0DyXMrzDS0EtJY5Npqe3ZtjSniF7xo3ChthX9MXpZ0LObB6z6uKMjarmjSSm9NQqcTi7ojdgmW3Ayn2dvca5hpyfHqBXGYOEwGId6Up/NKXtb+E38jCvgWzCZI5V0mjeIxLTsuBWunFRnaJY=
+	t=1706039447; cv=none; b=VngivZJsqF9Z+SwOPzuF11yMAqmX9oijLAzdmpbJqCz5tvw7NbuGBTl0NHQS5dJt7bMxP5jZIFE0rc7jHOefmC9pQdGg2GMZ9KygE0JKP5BvJMCfamjEY+xpSPf7QmQm6StSFXExUgjlUzkAaadvyDinpewKKHlr1mRHd2o6XNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706039366; c=relaxed/simple;
-	bh=5a50XFyy6hbMzQLCzCl9kkt/qQbAxlHL862YhlOKj08=;
+	s=arc-20240116; t=1706039447; c=relaxed/simple;
+	bh=8dtODH7c4Z7+dVuF8YPbrq74mw76xQEbD5vF9cYfMUg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XaE2PdjSxPVmZRaBhFc3MsL65PXwksOhICSWI8EyI3n4hRVaGvtTpoZzzqnFKzEiAOWoMRfMq03LQHPXKxp2Yv+w9S7A5gF1wTxi6HH4SuqrZMyiJEoMxsNkwCRt+jK2evZFQniSF+jLSbdp03cApahhvK5FDBDuF2F43aGJ4fA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=OZjAbReJ; arc=none smtp.client-ip=209.85.221.47
+	 Content-Type:Content-Disposition:In-Reply-To; b=PdTDqn+0hn/kVFaQz/6H8a50IVcxB8niARGhubrOdGMynqNW2H9Ay67wskMv2KKb9dlxSf1CSV75WsrNG/W37gijX1LNAz5xf1MDk3kWWPneS4IsHKKtSvcuBn47z948taZ/QcKBIRoVdlKZ5CwNevtPKvbA6iqTsj8t9o18eog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=zGCq6NGQ; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OZjAbReJ"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-337cc8e72f5so4319841f8f.1
-        for <kvmarm@lists.linux.dev>; Tue, 23 Jan 2024 11:49:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zGCq6NGQ"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-337cc8e72f5so4321161f8f.1
+        for <kvmarm@lists.linux.dev>; Tue, 23 Jan 2024 11:50:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706039362; x=1706644162; darn=lists.linux.dev;
+        d=linaro.org; s=google; t=1706039444; x=1706644244; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4qE28dlWF6DGyTTPmng9ihaceKW+IRRh93UPoev7s84=;
-        b=OZjAbReJYEt7q9LAyn88qSuJvjoRNAUyU6ZFmwrrqQoY4zyitzj2w6JR1c01rpKftu
-         +vnYRdyi7r0QxnrYYofburgMP+UKiSKvmNoGfKNbA/ta5tdWXMx4NfKxda8o75ZpJjPN
-         IaquvCSlrjrHSGSguAqvJypV+g7mAZSTdoNfd/XsGtoau5tQNieCznP9BEI6FFTVvuEe
-         KTTBBH9KwvPNQbk0tuwbd0eo1p1EUWErIKmlO1cR8rS7hD2t8+EWvx5A6EUGNuQ5sDqx
-         pXuRQmLTdMcPnbjfliKY3cNEK6CO8ygTYeTgj+FfNBTXFMnMeHP6QSZ3MTc3OaPIKyaz
-         NFxA==
+        bh=symCKlu70t5c2pz5MpkVzEsXKmD/I2ycs0+d/rCZY9k=;
+        b=zGCq6NGQ5eYAw2g1gZV+iizw2L90t67OPZ4jKWPJQ6wOKaWevUkexjp3yQpqGIy/bN
+         3+QTLyTgLsr0K/DsESefl5cT8ZnEL83GazlqdqW2U9zMUPMW8YFEXHpFhQ4oOvimtd6x
+         TVmTglGXnw6Y2/BUVRG1g5FMRqTXpm9xjFWtOddQ8uRGNPlxFxTAsR+aS6vE3XXNFetM
+         PMuwXa7vY8H654+DyrLt4SkqhjmssxgLusoOzELsG2sqyGLXTMmiIQC/nIjf3iiwyCMR
+         b9TV5EG+3IDw6YVeqo8iLBW82frNrEfQlZalZNINQaaQzc3BUXJbL4wMOkoQwy+okjnW
+         7neQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706039362; x=1706644162;
+        d=1e100.net; s=20230601; t=1706039444; x=1706644244;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4qE28dlWF6DGyTTPmng9ihaceKW+IRRh93UPoev7s84=;
-        b=oaf750wCN+BuZgCVLlsPZsIjDKVz9z6ARz+K6itortuCqHklTd7ofOZgnCzJxCJNP2
-         uEb0mRQpI9cwqwRxWjo722wsik0V7WUJhKQsQvg4dgLioV09QQ+kxTvrUDxsoW+MoeHo
-         cydrl/dU8r3uSvFO0IhssKI7GIujiRWlt0gRL/GoaYC1S9U9xbakQnQtDtGt3ayaMtQJ
-         jxufzbNlsNBZhFwB2rwnoTFEl2/oFT59CzJV7i8LRMXAN3t2xby8lfEgBrhrRnuMXVQF
-         uRlEJDtVoWT26rOT87MQ++RBVET07pJGBRTRdcx52jLC6xoqLHuRyJFl+iMEF/eGaOpB
-         hkyw==
-X-Gm-Message-State: AOJu0Yw0JyhjS5bZ6Hfo6xh4DzGDtecGyUJhDC2rbbSB7lZYLsrvKU6R
-	gpA5x2LMzo/iJsLoh85aJ73zOmMC+tiqWumF4CpnSpJucZRQamg4NcnUukGawqc=
-X-Google-Smtp-Source: AGHT+IFumTc9KtJ/kCVLcF8NzAKi14YhOjo/H7kRpM6sr9VqFP25QaURtKyQ3GiPFue0ZdupifoJrg==
-X-Received: by 2002:adf:f70f:0:b0:337:c93d:fe44 with SMTP id r15-20020adff70f000000b00337c93dfe44mr2726111wrp.58.1706039362497;
-        Tue, 23 Jan 2024 11:49:22 -0800 (PST)
+        bh=symCKlu70t5c2pz5MpkVzEsXKmD/I2ycs0+d/rCZY9k=;
+        b=FtwcrcOHZBXJuGs1taPdf6ujAzqN29u8O/IcvX/OfYQia7LR9B1hZSaNlYmAgYWdFd
+         Hdt8kJ8sHIa8EJCmcjgXxlaWDYtnkDETxA/xXC6fT92jBFSXB1c1onTnUh9wtYdqZd+u
+         TcLKokwtyNyzm+lRzfFZ2PpN49TTHkY3rCjJ59MLbnA3KKB5tcNAdP4b0+TH0ZDIO47o
+         +YmS0y3PjOR3KxBKvCm78qotaxOQUska+yu8msu9EpqfTzAzSOF/UwsdsChOaYwAmBh5
+         4KrYeijYrJ6xLUYiiZwDhcblcVZdysX2qFHuYu0zgrBz/PV3+nOqjYoyqIcihSvNsrH7
+         0TSw==
+X-Gm-Message-State: AOJu0Yw68UvVwiQ8FSzVI9AuvNeV3egcqe6u2nELF0a1I+hHl9iWZkdR
+	ZcMar4qDiBsRH8Mco/8JEJJDXCKJBJhkBtv6ag3io1ZTOQcWxqtEsJhT9RjwjoU=
+X-Google-Smtp-Source: AGHT+IGvK2nRgJqfqxTiFf7eYxXF/FLO4QS4slRNBAch0gl6IUsYo+a3YBQ4+CQ61hhuq9QUr9aw8Q==
+X-Received: by 2002:a5d:628c:0:b0:339:3f40:ffcd with SMTP id k12-20020a5d628c000000b003393f40ffcdmr1573778wru.129.1706039444344;
+        Tue, 23 Jan 2024 11:50:44 -0800 (PST)
 Received: from myrica ([2.221.137.100])
-        by smtp.gmail.com with ESMTPSA id e30-20020a5d595e000000b00339237a2752sm10844430wri.33.2024.01.23.11.49.21
+        by smtp.gmail.com with ESMTPSA id x8-20020a5d54c8000000b00337d3465997sm14205211wrv.38.2024.01.23.11.50.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 11:49:22 -0800 (PST)
-Date: Tue, 23 Jan 2024 19:49:31 +0000
+        Tue, 23 Jan 2024 11:50:44 -0800 (PST)
+Date: Tue, 23 Jan 2024 19:50:53 +0000
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Sebastian Ene <sebastianene@google.com>
+To: Mostafa Saleh <smostafa@google.com>
 Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
 	joro@8bytes.org, robin.murphy@arm.com, james.morse@arm.com,
 	suzuki.poulose@arm.com, oliver.upton@linux.dev,
-	yuzenghui@huawei.com, smostafa@google.com, dbrazdil@google.com,
-	ryan.roberts@arm.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev
-Subject: Re: [RFC PATCH 12/45] KVM: arm64: pkvm: Unify
- pkvm_pkvm_teardown_donated_memory()
-Message-ID: <20240123194931.GB40099@myrica>
+	yuzenghui@huawei.com, dbrazdil@google.com, ryan.roberts@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	iommu@lists.linux.dev, Daniel Mentz <danielmentz@google.com>
+Subject: Re: [RFC PATCH 27/45] KVM: arm64: smmu-v3: Setup domains and page
+ table configuration
+Message-ID: <20240123195053.GC40099@myrica>
 References: <20230201125328.2186498-1-jean-philippe@linaro.org>
- <20230201125328.2186498-13-jean-philippe@linaro.org>
- <ZaVCTuM7KDSWqqaE@google.com>
+ <20230201125328.2186498-28-jean-philippe@linaro.org>
+ <CAFgf54pysSxKHcJVP6=dWPxmS3qi=eEMNQMF7SPiaiaeA-Kc_g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -73,55 +73,41 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZaVCTuM7KDSWqqaE@google.com>
+In-Reply-To: <CAFgf54pysSxKHcJVP6=dWPxmS3qi=eEMNQMF7SPiaiaeA-Kc_g@mail.gmail.com>
 
-Hi Seb,
-
-On Mon, Jan 15, 2024 at 02:33:50PM +0000, Sebastian Ene wrote:
-> >  int __pkvm_teardown_vm(pkvm_handle_t handle)
-> >  {
-> >  	size_t vm_size, last_ran_size;
-> > @@ -813,19 +802,18 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
-> >  		vcpu_mc = &hyp_vcpu->vcpu.arch.pkvm_memcache;
-> >  		while (vcpu_mc->nr_pages) {
-> >  			addr = pop_hyp_memcache(vcpu_mc, hyp_phys_to_virt);
-> > -			push_hyp_memcache(mc, addr, hyp_virt_to_phys);
-> > -			unmap_donated_memory_noclear(addr, PAGE_SIZE);
-> > +			pkvm_teardown_donated_memory(mc, addr, 0);
+On Mon, Jan 15, 2024 at 02:34:12PM +0000, Mostafa Saleh wrote:
+> > +static void smmu_tlb_inv_range(struct kvm_iommu_tlb_cookie *data,
+> > +                              unsigned long iova, size_t size, size_t granule,
+> > +                              bool leaf)
+> > +{
+> > +       struct hyp_arm_smmu_v3_device *smmu = to_smmu(data->iommu);
+> > +       unsigned long end = iova + size;
+> > +       struct arm_smmu_cmdq_ent cmd = {
+> > +               .opcode = CMDQ_OP_TLBI_S2_IPA,
+> > +               .tlbi.vmid = data->domain_id,
+> > +               .tlbi.leaf = leaf,
+> > +       };
+> > +
+> > +       /*
+> > +        * There are no mappings at high addresses since we don't use TTB1, so
+> > +        * no overflow possible.
+> > +        */
+> > +       BUG_ON(end < iova);
+> > +
+> > +       while (iova < end) {
+> > +               cmd.tlbi.addr = iova;
+> > +               WARN_ON(smmu_send_cmd(smmu, &cmd));
 > 
-> Here we probably need to pass PAGE_SIZE as an argument instead of "0"
-> to make sure that we clear out the content of the page before tearing it
-> down.
+> This would issue a sync command between each range, which is not needed,
+> maybe we can build the command first and then issue the sync, similar
+> to what the upstream driver does, what do you think?
 
-But since it's replacing unmap_donated_memory_noclear(), would that be a
-change of behavior?  That would be a separate patch because this one is
-just trying to refactor things.
+Yes, moving the sync out of the loop would be better. To keep things
+simple I'd just replace this with smmu_add_cmd() and add a smmu_sync_cmd()
+at the end, but maybe some implementations won't consume the TLBI itself
+fast enough, and we need to build a command list in software. Do you think
+smmu_add_cmd() is sufficient here?
 
 Thanks,
 Jean
 
-> 
-> >  		}
-> >  
-> > -		teardown_donated_memory(mc, hyp_vcpu, sizeof(*hyp_vcpu));
-> > +		pkvm_teardown_donated_memory(mc, hyp_vcpu, sizeof(*hyp_vcpu));
-> >  	}
-> >  
-> >  	last_ran_size = pkvm_get_last_ran_size();
-> > -	teardown_donated_memory(mc, hyp_vm->kvm.arch.mmu.last_vcpu_ran,
-> > -				last_ran_size);
-> > +	pkvm_teardown_donated_memory(mc, hyp_vm->kvm.arch.mmu.last_vcpu_ran,
-> > +				     last_ran_size);
-> >  
-> >  	vm_size = pkvm_get_hyp_vm_size(hyp_vm->kvm.created_vcpus);
-> > -	teardown_donated_memory(mc, hyp_vm, vm_size);
-> > +	pkvm_teardown_donated_memory(mc, hyp_vm, vm_size);
-> >  	hyp_unpin_shared_mem(host_kvm, host_kvm + 1);
-> >  	return 0;
-> >  
-> > -- 
-> > 2.39.0
-> >
-> 
-> Thanks,
-> Seb
