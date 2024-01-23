@@ -1,148 +1,225 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB9D604CF
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jan 2024 13:28:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7123E5EE92
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jan 2024 13:49:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706016523; cv=none; b=rx/4KR/sURrOFbe3XDcLvR0WJO70d9QUtcO4TDeLaSoQMkg2CnS/8CAEz0KbD9sKmbTgG5WRnQi12gIsQTHG5r6fco1PKTCRL1nmd/60UDKt++Rp5DpJNKr6uniS0Pxf/N+g8qem4XG48R/w2w/nVgCyHNuhj3+gVw/aWBdMRR8=
+	t=1706017743; cv=none; b=u7cpJJEnxFFEC5NlKxT3R8MyKBclnD5UvMDZVSayfGsm8K/cpxC1n7PWqjLPQO/SRpW8HlBSqpoNXgWv+LSXybB3f2twKZ+UhZSppoC3nrhWowPviPqOmcWca/BoCgIrw7PhXfV23Dk6sx3FFdHEnym8QaOCIwlhXIHn1lk2eCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706016523; c=relaxed/simple;
-	bh=NJc04YeV9kOqCLAh9fn3kVyDWlVh70iAMeCv/H6zMYQ=;
+	s=arc-20240116; t=1706017743; c=relaxed/simple;
+	bh=xsT0XNdnFm+n3ODYXR/JJOrdpKT7UtAhXIBcHk0UIvU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=evKs9OEFLaaHH1QkIWrgk6Jl68U5CNhJYfzdM2Ith4eY54uss1je6gw0guc530cRx6h9/lbKMkd3kHArzv447Ll19UjVxAmR/j8869EDrcAGcm6haWeYs9aWvfIV5fMAwCC1uqlY/IjDdnQzXpUqnf6osXpiDhftUL8m130T6NQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=IdnEp3jB; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="IdnEp3jB"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=bDhJF4aVPbj4qdYQrzDaOMUJoNeiDqHjPb9iFMH77ME=; b=IdnEp3jBKIndIWP5XIcwMJoMZK
-	VXAFBeu/Bv043OgntYF4+y/xj9qap4lxUJj/TR17iVnq4OTkxCGofK+sQd0TfJJd2l7haKwWUVxfU
-	ZJf9cDAC9ySAxC+NkZQn2KbyP01YUyuVx2Wd9QLC1WmInPbkvTtHosurY6tHla6fMQSlKB+iOcLw0
-	3z1303J4SsJlIPCGZI1Q5n/8BCxks6XJq2hl5U000/f/yLcwbfqMyQRfn7uwgnT5Eo4Oy/uzxSGIX
-	3OtPDik/U9GB1G5G40b6fP6tQ/K61kRvCxs7BJHtd+K/BfdeBoFp6jBvSaRd+AiGP0aW5GW3rJGXs
-	1F0TkSkg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42766)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rSGpM-0002S5-2a;
-	Tue, 23 Jan 2024 13:28:32 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rSGpL-0001z0-LP; Tue, 23 Jan 2024 13:28:31 +0000
-Date: Tue, 23 Jan 2024 13:28:31 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, linux-pm@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
-	x86@kernel.org, acpica-devel@lists.linuxfoundation.org,
-	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	jianyong.wu@arm.com, justin.he@arm.com,
-	James Morse <james.morse@arm.com>
-Subject: Re: [PATCH RFC v3 05/21] ACPI: Rename ACPI_HOTPLUG_CPU to include
- 'present'
-Message-ID: <Za++/11n5KA1VS3p@shell.armlinux.org.uk>
-References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk>
- <E1rDOgD-00Dvk2-3h@rmk-PC.armlinux.org.uk>
- <CAJZ5v0g9nfLrEf9u4Ksw6BOWJQ9iv8Z-O8RsLU6jR5zk0ahxRw@mail.gmail.com>
- <20240122180013.000016d5@Huawei.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ufeQXVQrc5h/8kMKEy0G9r6v9NYe72buhUUl7ebSJizh0RRoXdnLD5nWObUxA6Mm/LhncypiDRQwtgA299R5UUzepSyh374RNkoIRhiGUFGhFTiQVxe4aWg/uKyUhtN59wCOzUwZcFqLJN9MGB25TPKpa++qXO9GI+oFNskAN6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 19F701FB;
+	Tue, 23 Jan 2024 05:49:46 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6EA503F762;
+	Tue, 23 Jan 2024 05:48:59 -0800 (PST)
+Date: Tue, 23 Jan 2024 13:48:57 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 03/25] KVM: arm64: nv: Add sanitising to VNCR-backed
+ sysregs
+Message-ID: <20240123134857.GB1283334@e124191.cambridge.arm.com>
+References: <20240122201852.262057-1-maz@kernel.org>
+ <20240122201852.262057-4-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240122180013.000016d5@Huawei.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20240122201852.262057-4-maz@kernel.org>
 
-On Mon, Jan 22, 2024 at 06:00:13PM +0000, Jonathan Cameron wrote:
-> On Mon, 18 Dec 2023 21:35:16 +0100
-> "Rafael J. Wysocki" <rafael@kernel.org> wrote:
-> 
-> > On Wed, Dec 13, 2023 at 1:49 PM Russell King <rmk+kernel@armlinux.org.uk> wrote:
-> > >
-> > > From: James Morse <james.morse@arm.com>
-> > >
-> > > The code behind ACPI_HOTPLUG_CPU allows a not-present CPU to become
-> > > present.  
-> > 
-> > Right.
-> > 
-> > > This isn't the only use of HOTPLUG_CPU. On arm64 and riscv
-> > > CPUs can be taken offline as a power saving measure.  
-> > 
-> > But still there is the case in which a non-present CPU can become
-> > present, isn't it there?
-> 
-> Not yet defined by the architectures (and I'm assuming it probably never will be).
-> 
-> The original proposal we took to ARM was to do exactly that - they pushed
-> back hard on the basis there was no architecturally safe way to implement it.
-> Too much of the ARM arch has to exist from the start of time.
-> 
-> https://lore.kernel.org/linux-arm-kernel/cbaa6d68-6143-e010-5f3c-ec62f879ad95@arm.com/
-> is one of the relevant threads of the kernel side of that discussion.
-> 
-> Not to put specific words into the ARM architects mouths, but the
-> short description is that there is currently no demand for working
-> out how to make physical CPU hotplug possible, as such they will not
-> provide an architecturally compliant way to do it for virtual CPU hotplug and
-> another means is needed (which is why this series doesn't use the present bit
-> for that purpose and we have the Online capable bit in MADT/GICC)
-> 
-> It was a 'fun' dance of several years to get to that clarification.
-> As another fun fact, the same is defined for x86, but I don't think
-> anyone has used it yet (GICC for ARM has an online capable bit in the flags to
-> enable this, which was remarkably similar to the online capable bit in the
-> flags of the Local APIC entries as added fairly recently).
-> 
-> > 
-> > > On arm64 an offline CPU may be disabled by firmware, preventing it from
-> > > being brought back online, but it remains present throughout.
-> > >
-> > > Adding code to prevent user-space trying to online these disabled CPUs
-> > > needs some additional terminology.
-> > >
-> > > Rename the Kconfig symbol CONFIG_ACPI_HOTPLUG_PRESENT_CPU to reflect
-> > > that it makes possible CPUs present.  
-> > 
-> > Honestly, I don't think that this change is necessary or even useful.
-> 
-> Whilst it's an attempt to avoid future confusion, the rename is
-> not something I really care about so my advice to Russell is drop
-> it unless you are attached to it!
+Hi,
 
-While I agree that it isn't a necessity, I don't fully agree that it
-isn't useful.
+On Mon, Jan 22, 2024 at 08:18:30PM +0000, Marc Zyngier wrote:
+> VNCR-backed "registers" are actually only memory. Which means that
+> there is zero control over what the guest can write, and that it
+> is the hypervisor's job to actually sanitise the content of the
+> backing store. Yeah, this is fun.
+> 
+> In order to preserve some form of sanity, add a repainting mechanism
+> that makes use of a per-VM set of RES0/RES1 masks, one pair per VNCR
+> register. These masks get applied on access to the backing store via
+> __vcpu_sys_reg(), ensuring that the state that is consumed by KVM is
+> correct.
+> 
+> So far, nothing populates these masks, but stay tuned.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 25 +++++++++++++++++++
+>  arch/arm64/kvm/arm.c              |  1 +
+>  arch/arm64/kvm/nested.c           | 41 ++++++++++++++++++++++++++++++-
+>  3 files changed, 66 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index c0cf9c5f5e8d..fe35c59214ad 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -238,6 +238,8 @@ static inline u16 kvm_mpidr_index(struct kvm_mpidr_data *data, u64 mpidr)
+>  	return index;
+>  }
+>  
+> +struct kvm_sysreg_masks;
+> +
+>  struct kvm_arch {
+>  	struct kvm_s2_mmu mmu;
+>  
+> @@ -312,6 +314,9 @@ struct kvm_arch {
+>  #define KVM_ARM_ID_REG_NUM	(IDREG_IDX(sys_reg(3, 0, 0, 7, 7)) + 1)
+>  	u64 id_regs[KVM_ARM_ID_REG_NUM];
+>  
+> +	/* Masks for VNCR-baked sysregs */
+> +	struct kvm_sysreg_masks	*sysreg_masks;
+> +
+>  	/*
+>  	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
+>  	 * the associated pKVM instance in the hypervisor.
+> @@ -474,6 +479,13 @@ enum vcpu_sysreg {
+>  	NR_SYS_REGS	/* Nothing after this line! */
+>  };
+>  
+> +struct kvm_sysreg_masks {
+> +	struct {
+> +		u64	res0;
+> +		u64	res1;
+> +	} mask[NR_SYS_REGS - __VNCR_START__];
+> +};
+> +
+>  struct kvm_cpu_context {
+>  	struct user_pt_regs regs;	/* sp = sp_el0 */
+>  
+> @@ -868,7 +880,20 @@ static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
+>  
+>  #define ctxt_sys_reg(c,r)	(*__ctxt_sys_reg(c,r))
+>  
+> +#if defined (__KVM_NVHE_HYPERVISOR__)
+>  #define __vcpu_sys_reg(v,r)	(ctxt_sys_reg(&(v)->arch.ctxt, (r)))
+> +#else
+> +u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *, enum vcpu_sysreg);
+> +#define __vcpu_sys_reg(v,r)						\
+> +	(*({								\
+> +		const struct kvm_cpu_context *ctxt = &(v)->arch.ctxt;	\
+> +		u64 *__r = __ctxt_sys_reg(ctxt, (r));			\
+> +		if (unlikely(cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) && \
+> +			     r >= __VNCR_START__ && ctxt->vncr_array))	\
+> +			*__r = kvm_vcpu_sanitise_vncr_reg((v), (r));	\
+> +		__r;							\
+> +	}))
+> +#endif
 
-One of the issues will be that while Arm64 will support hotplug vCPU,
-it won't be setting ACPI_HOTPLUG_CPU because it doesn't support
-the present bit changing. So I can see why James decided to rename
-it - because with Arm64's hotplug vCPU, the idea that ACPI_HOTPLUG_CPU
-somehow enables hotplug CPU support is now no longer true.
+Can you not use vcpu_has_nv() here? I see that __ctxt_sys_reg() does a similar
+check, but vcpu_has_nv() covers !__KVM_NVHE_HYPERVISOR__, ARM64_HAS_NESTED_VIRT
+and KVM_ARM_VCPU_HAS_EL2 (which I guess is what the ctxt->vncr_array check is
+doing?) I can see it's defined in kvm_nested.h, which includes kvm_host.h, so
+maybe that's an issue.
 
-Keeping it as ACPI_HOTPLUG_CPU makes the code less obvious, because it
-leads one to assume that it ought to be enabled for Arm64's
-implementatinon, and that could well cause issues in the future if
-people make the assumption that "ACPI_HOTPLUG_CPU" means hotplug CPU
-is supported in ACPI. It doesn't anymore.
+#define __vcpu_sys_reg(v,r)						\
+	(*({								\
+		const struct kvm_cpu_context *ctxt = &(v)->arch.ctxt;	\
+		u64 *__r = __ctxt_sys_reg(ctxt, (r));			\
+		if (unlikely(vcpu_has_nv(v) && r >= __VNCR_START__))	\
+			*__r = kvm_vcpu_sanitise_vncr_reg((v), (r));	\
+		__r;							\
+	}))
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+And since vcpu_has_nv() already checks __KVM_NVHE_HYPERVISOR__, you don't need
+to define __vcpu_sys_reg() twice.
+
+Also maybe move that derefence into the macro, like: *__r;, instead of being
+after the first (.
+
+I'm not sure about the ctxt->vncr_array check, so maybe that's still important.
+
+>  
+>  u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg);
+>  void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg);
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index a25265aca432..c063e84fc72c 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -206,6 +206,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>  		pkvm_destroy_hyp_vm(kvm);
+>  
+>  	kfree(kvm->arch.mpidr_data);
+> +	kfree(kvm->arch.sysreg_masks);
+>  	kvm_destroy_vcpus(kvm);
+>  
+>  	kvm_unshare_hyp(kvm, kvm + 1);
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index d55e809e26cb..c976cd4b8379 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -163,15 +163,54 @@ static u64 limit_nv_id_reg(u32 id, u64 val)
+>  
+>  	return val;
+>  }
+> +
+> +u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg sr)
+> +{
+> +	u64 v = ctxt_sys_reg(&vcpu->arch.ctxt, sr);
+> +	struct kvm_sysreg_masks *masks;
+> +
+> +	masks = vcpu->kvm->arch.sysreg_masks;
+> +
+> +	if (masks) {
+> +		sr -= __VNCR_START__;
+> +
+> +		v &= ~masks->mask[sr].res0;
+> +		v |= masks->mask[sr].res1;
+> +	}
+> +
+> +	return v;
+> +}
+> +
+> +static void __maybe_unused set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u64 res1)
+> +{
+> +	int i = sr - __VNCR_START__;
+> +
+> +	kvm->arch.sysreg_masks->mask[i].res0 = res0;
+> +	kvm->arch.sysreg_masks->mask[i].res1 = res1;
+> +}
+> +
+>  int kvm_init_nv_sysregs(struct kvm *kvm)
+>  {
+> +	int ret = 0;
+> +
+>  	mutex_lock(&kvm->arch.config_lock);
+>  
+> +	if (kvm->arch.sysreg_masks)
+> +		goto out;
+> +
+> +	kvm->arch.sysreg_masks = kzalloc(sizeof(*(kvm->arch.sysreg_masks)),
+> +					 GFP_KERNEL);
+> +	if (!kvm->arch.sysreg_masks) {
+> +		ret = -ENOMEM;
+> +		goto out;
+> +	}
+> +
+>  	for (int i = 0; i < KVM_ARM_ID_REG_NUM; i++)
+>  		kvm->arch.id_regs[i] = limit_nv_id_reg(IDX_IDREG(i),
+>  						       kvm->arch.id_regs[i]);
+>  
+> +out:
+>  	mutex_unlock(&kvm->arch.config_lock);
+>  
+> -	return 0;
+> +	return ret;
+>  }
+
+Thanks,
+Joey
