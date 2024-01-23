@@ -1,202 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315527FBCE
-	for <kvmarm@lists.linux.dev>; Tue, 23 Jan 2024 17:33:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731BE7FBD7
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jan 2024 17:35:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706031221; cv=none; b=pui0CG9R1mPPmP3DB3ZJEnMEnyndHDmktoiH6g/RVFoK7ZLr6vsKlJV2vPK+rHajMrNu1Fz1e6lEo+3Wc44b8DZEV0ks+o7JWvmRCYn+TAugsKrAyPq5DoH1ooiENM+iA5bmmWtJwFKCm9r2C0wpHzL2p1abOlTmcQXiFNObqwk=
+	t=1706031336; cv=none; b=CoUqzJ2AhOZN1sGYT6qCEgY2HZk6Di+E65YuloQK3ugVuSMfA9GOBElf6su9KZBMB34Mph4+GrL4rtxeC3EXt42bGQPyOuXJi6/KL2bhCpdFozmH6FxlCVkenT/SQzCTVChZVH7ku2P76hM4rVjGf3vWHO+JO/MMyBhFhmc0PWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706031221; c=relaxed/simple;
-	bh=/lCLPXXPYb4ngKV2FWBipNfw3VKm7+Egk53vy0zy5bs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=s+b2UVTcrFRmxU6Df7Mk31dryFPRKZlKl5jlJcH5mu+lCvLfP+C+p7e08+vmUlYqi9NuB7VBlTltfO3aPhGEDTVQnNl1i9CknxnWyn/5i716/M/C9aE7Q4ZqhUuIsf2NW1aDKIg+w60jTshYTa3u36VFACCHKNjJK3B2CR5N1RA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dr2sAC1Q; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706031336; c=relaxed/simple;
+	bh=VQ9Gn56B0UNrOuJsLhXK6Sa7vlzzG5qg1k0KFEwnyoU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L+Z5+yUHBtGe4rjEjKusSVC6rnrl8u8PqxgT+uyfF7v7wYJYKCr3IaEOzWixCVrv60/kdyPPcLolqU3Lt/gt/IqOxRJDpVevg/GsHYN56NFioyWeEh4A3083sXjWsweMAeIgcHiTcM4pMqEjRsAf0sDH3CLOWyUggGHuzBt2Xfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=i7TJuyqG; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dr2sAC1Q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8208C433C7;
-	Tue, 23 Jan 2024 17:33:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706031220;
-	bh=/lCLPXXPYb4ngKV2FWBipNfw3VKm7+Egk53vy0zy5bs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dr2sAC1Q/cXrqtUnJ0EusnHqAYzONamk0A8xkatD87uhx5BIgRiLhIDC+orXn5FPC
-	 JpIFDefRYTYWv91WYbGv9FIsYJdJ8ERjglbQ7qPFmgYig/3YA/fju5SYQPxTsKlw3b
-	 T8AAmZuaBfRZiKSN7BapHumkqI7r7vbtBOGthDFws+5e08PAAKFMAoAzkzovW4eG+0
-	 zSEbPiic9qx8pL1tQcXLOzGqOHegDAJ9PjY8QWmB64sFOAYPfG9bzOQr+RUzUtMxez
-	 kSHRSs5ZvvHsA3KohnqPgfzf4JYwfCDaybHmyUI55mw5FktPHyFeuKQm5LkpoW5VoV
-	 w/2z/AybwxkAw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rSKeY-00E4H0-AF;
-	Tue, 23 Jan 2024 17:33:38 +0000
-Date: Tue, 23 Jan 2024 17:33:37 +0000
-Message-ID: <86il3k7y4u.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="i7TJuyqG"
+Date: Tue, 23 Jan 2024 17:35:26 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706031331;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UwviwEcY1cghsMNJvI1Ple+2zXBuNHw/5USyAIIn4xk=;
+	b=i7TJuyqGANrL1hkBQsvtx8m9oVlfgkFOaC8sBUxH59Fzw4I0A0HdausJEmDONdFGmQlTkA
+	WzWVwKUwWBamk2r8MUlCfOMXRIeGbbd6PX0cQ6Y9bMZreJBOCWH8PiiowscZXIVCxE32Ep
+	f66j0y5KfrkoWxyv8wPI9wrYQ1Co0PQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sebastian Ene <sebastianene@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 03/25] KVM: arm64: nv: Add sanitising to VNCR-backed sysregs
-In-Reply-To: <20240123134857.GB1283334@e124191.cambridge.arm.com>
-References: <20240122201852.262057-1-maz@kernel.org>
-	<20240122201852.262057-4-maz@kernel.org>
-	<20240123134857.GB1283334@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kernel-team@android.com, stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Fix circular locking dependency
+Message-ID: <Za_43qOnVsCPauEr@linux.dev>
+References: <20240123164818.1306122-2-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240123164818.1306122-2-sebastianene@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 23 Jan 2024 13:48:57 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> Hi,
-> 
-> On Mon, Jan 22, 2024 at 08:18:30PM +0000, Marc Zyngier wrote:
-> > VNCR-backed "registers" are actually only memory. Which means that
-> > there is zero control over what the guest can write, and that it
-> > is the hypervisor's job to actually sanitise the content of the
-> > backing store. Yeah, this is fun.
-> > 
-> > In order to preserve some form of sanity, add a repainting mechanism
-> > that makes use of a per-VM set of RES0/RES1 masks, one pair per VNCR
-> > register. These masks get applied on access to the backing store via
-> > __vcpu_sys_reg(), ensuring that the state that is consumed by KVM is
-> > correct.
-> > 
-> > So far, nothing populates these masks, but stay tuned.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h | 25 +++++++++++++++++++
-> >  arch/arm64/kvm/arm.c              |  1 +
-> >  arch/arm64/kvm/nested.c           | 41 ++++++++++++++++++++++++++++++-
-> >  3 files changed, 66 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index c0cf9c5f5e8d..fe35c59214ad 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -238,6 +238,8 @@ static inline u16 kvm_mpidr_index(struct kvm_mpidr_data *data, u64 mpidr)
-> >  	return index;
-> >  }
-> >  
-> > +struct kvm_sysreg_masks;
-> > +
-> >  struct kvm_arch {
-> >  	struct kvm_s2_mmu mmu;
-> >  
-> > @@ -312,6 +314,9 @@ struct kvm_arch {
-> >  #define KVM_ARM_ID_REG_NUM	(IDREG_IDX(sys_reg(3, 0, 0, 7, 7)) + 1)
-> >  	u64 id_regs[KVM_ARM_ID_REG_NUM];
-> >  
-> > +	/* Masks for VNCR-baked sysregs */
-> > +	struct kvm_sysreg_masks	*sysreg_masks;
-> > +
-> >  	/*
-> >  	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
-> >  	 * the associated pKVM instance in the hypervisor.
-> > @@ -474,6 +479,13 @@ enum vcpu_sysreg {
-> >  	NR_SYS_REGS	/* Nothing after this line! */
-> >  };
-> >  
-> > +struct kvm_sysreg_masks {
-> > +	struct {
-> > +		u64	res0;
-> > +		u64	res1;
-> > +	} mask[NR_SYS_REGS - __VNCR_START__];
-> > +};
-> > +
-> >  struct kvm_cpu_context {
-> >  	struct user_pt_regs regs;	/* sp = sp_el0 */
-> >  
-> > @@ -868,7 +880,20 @@ static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
-> >  
-> >  #define ctxt_sys_reg(c,r)	(*__ctxt_sys_reg(c,r))
-> >  
-> > +#if defined (__KVM_NVHE_HYPERVISOR__)
-> >  #define __vcpu_sys_reg(v,r)	(ctxt_sys_reg(&(v)->arch.ctxt, (r)))
-> > +#else
-> > +u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *, enum vcpu_sysreg);
-> > +#define __vcpu_sys_reg(v,r)						\
-> > +	(*({								\
-> > +		const struct kvm_cpu_context *ctxt = &(v)->arch.ctxt;	\
-> > +		u64 *__r = __ctxt_sys_reg(ctxt, (r));			\
-> > +		if (unlikely(cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) && \
-> > +			     r >= __VNCR_START__ && ctxt->vncr_array))	\
-> > +			*__r = kvm_vcpu_sanitise_vncr_reg((v), (r));	\
-> > +		__r;							\
-> > +	}))
-> > +#endif
-> 
-> Can you not use vcpu_has_nv() here? I see that __ctxt_sys_reg() does a similar
-> check, but vcpu_has_nv() covers !__KVM_NVHE_HYPERVISOR__, ARM64_HAS_NESTED_VIRT
-> and KVM_ARM_VCPU_HAS_EL2 (which I guess is what the ctxt->vncr_array check is
-> doing?) I can see it's defined in kvm_nested.h, which includes kvm_host.h, so
-> maybe that's an issue.
-> 
-> #define __vcpu_sys_reg(v,r)						\
-> 	(*({								\
-> 		const struct kvm_cpu_context *ctxt = &(v)->arch.ctxt;	\
-> 		u64 *__r = __ctxt_sys_reg(ctxt, (r));			\
-> 		if (unlikely(vcpu_has_nv(v) && r >= __VNCR_START__))	\
-> 			*__r = kvm_vcpu_sanitise_vncr_reg((v), (r));	\
-> 		__r;							\
-> 	}))
-> 
-> And since vcpu_has_nv() already checks __KVM_NVHE_HYPERVISOR__, you don't need
-> to define __vcpu_sys_reg() twice.
+On Tue, Jan 23, 2024 at 04:48:19PM +0000, Sebastian Ene wrote:
+> The rule inside kvm enforces that the vcpu->mutex is taken *inside*
+> kvm->lock. The rule is violated by the pkvm_create_hyp_vm which acquires
+                                         ^~~~~~~~~~~~~~~~~~
 
-All good points. Now that we only cater for NV2, vncr_array not being
-NULL is a given, although we still need it in __ctxt_sys_reg() as we
-don't have the full-fat vcpu at this stage (and thus cannot check for
-flags).
+nit: always suffix function names with '()'
 
->
-> Also maybe move that derefence into the macro, like: *__r;, instead of being
-> after the first (.
+> the kvm->lock while already holding the vcpu->mutex lock from
+> kvm_vcpu_ioctl. Follow the rule by taking the config lock while getting the
+> VM handle and make sure that this is cleaned on VM destroy under the
+> same lock.
 
-Surprisingly, this doesn't work:
+It is always better to describe a lock in terms of what data it
+protects, the critical section(s) are rather obvious here.
 
-<quote>
-./arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h:240:38: error: lvalue required as left operand of assignment
-240 |   __vcpu_sys_reg(vcpu, DBGVCR32_EL2) = read_sysreg(dbgvcr32_el2);
+  Avoid the circular locking dependency altogether by protecting the hyp
+  vm handle with the config_lock, much like we already do for other
+  forms of VM-scoped data.
 
-</quote>
+> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> Cc: stable@vger.kernel.org
 
-There are plenty more.
+nitpicks aside, this looks fine.
 
-> I'm not sure about the ctxt->vncr_array check, so maybe that's still
-> important.
-
-In the absence of the flag, it is. And I'm actually tempted to
-standardise on checking for vncr_array in vcpu_has_nv() as a
-substitute for the flag. It is likely to be a bit cheaper and for the
-value to be needed down the line.
-
-I'll rework this shortly.
-
-Thanks,
-
-	M.
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
