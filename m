@@ -1,146 +1,239 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F095F86F;
-	Tue, 23 Jan 2024 14:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7B25FBAE
+	for <kvmarm@lists.linux.dev>; Tue, 23 Jan 2024 14:59:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706019976; cv=none; b=BPeFnPD3puy94e91FEWSYymB50pWXoI25zsLpcHkCQFkNiQEdn6l6TO7ENdN3v9xpK1R+Js8KqhWBD8DJq3Pxam1y2G/8oQYFhshg3NaoKPjA3fc2j32a6XfHBCzBwIMGyc7YVnT5DQhrv9axkHi9t2eRfiGouiBJVfG4kA1TXU=
+	t=1706021998; cv=none; b=lOfIh+I63OEBLcHshPFdOIDR4w1r8i/H+1nU7OldM4fbRyTTd/0kr232UAIWU4eA5rHGUGyAhIzXgOZakorlQqIfyxGnLC0ED2N7LjGwg9Uuu/iKs639oFwzNHNFUFGn5jNvBSxfoXjbyMFfVgt/4u25kcO/z5ECR1iC7Z7WDbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706019976; c=relaxed/simple;
-	bh=XzMv801rPyyxdys6wgkOUwUyiZT+naegA+B9M/CmMKg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kbZqgPHgmDl+dQMgs5JbE3QS5o8+2dtCppfKmYJBUZetq/oSMnNDF/ClsKPnAUEQKjhHhQGlwGtviSrav9Ohd3FWwlgpK1FyKgayAegOO645ilmN8aZoZnW79sKM0CJRJP3bFsJEmceiFOFvLltkqDXpE9NEOC5GLrNmKslXYKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DGy1LPY9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706021998; c=relaxed/simple;
+	bh=S2nNMUs1kL5gBban5RvYepp4KkT73O4GwescFEHu7M0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=idJBvRj/LuwY0geTdifmP5lCRXxkoprKYAZG0dxhQrIe15JHgKJv/mFXl1+4dFWKNrb8siHDaj2yO8bM542k7CWUd13XkuyYbsN4b9BDv2oFi/+OLt0UN1CS8UjHe55hn65ZsAtKeTistTOV1jeI44jP39w95AejmzJP54Mbm8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0uRCA6f6; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DGy1LPY9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D75EAC433F1;
-	Tue, 23 Jan 2024 14:26:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706019975;
-	bh=XzMv801rPyyxdys6wgkOUwUyiZT+naegA+B9M/CmMKg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DGy1LPY9k13mP1CBLKtTrMt/cfZNH4AXqIXvvEu5epQU3KRr7r45Dy5tonG1MD7LE
-	 KmsuF9i8vQjheeQ0YsAJACawbJf61BExY0KBLgFQr0DRtjiAU4m61MSfzeajKDFaLG
-	 KJGxQa3POvZYqAnhwgjplaoXF56Cq+pCYkEFeexSJTLUuMd3nRinK9lFcmVExxZyfp
-	 K1sA/lq0RZicdXIyXdTBaGvs9NM0jsssopIErV7IsjCj8lvthPXQALNGNpj+nouaT6
-	 nfdIIKSfJ6pqnbgVpsHeyfrInV1P+xvi6wbUe6oKI7jjLfbf17la3H2w+mtsCJ/720
-	 mEYg58vROEMWw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rSHjB-00DzgN-Bw;
-	Tue, 23 Jan 2024 14:26:13 +0000
-Date: Tue, 23 Jan 2024 14:26:13 +0000
-Message-ID: <86le8g86t6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Miguel Luis <miguel.luis@oracle.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	D Scott Phillips <scott@os.amperecomputing.com>
-Subject: Re: [PATCH v11 17/43] KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
-In-Reply-To: <f0416fa9-b4f1-4bad-a73b-b1d7ecbffc62@os.amperecomputing.com>
-References: <20231120131027.854038-1-maz@kernel.org>
-	<20231120131027.854038-18-maz@kernel.org>
-	<f0416fa9-b4f1-4bad-a73b-b1d7ecbffc62@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0uRCA6f6"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Cy6lkn4Op/3yUQXZQHShopdoVhncUbCOYHYdLrbNsOk=; b=0uRCA6f6dyL9b5hwe2V9zfJMeC
+	Jrj+tRumFPBYLz1UF5/gC/e/t3ePZ1VL74pK/4pT95ZLAGfYVli1V7VVnEWsiGBtvvncqzWkPz/3o
+	KxaRfyM+0nn25IsDtmaZXcik41iSTz1H484y8kqEt2ghmIlYNAriohtH5SgKnjpcJkIpvgzZX6O3Y
+	Fh4Tt7TAOh4nmmFn/3OqiXf4uHg445sgqaq8xBzjFnfZ7jF7Kou4Z3vqbx4SnPx8A4k8BGTU1n24O
+	04xzQ9lkqRIRvkgjGE3YSgYq4HeyaFAdEFnBPK6L17VdAliAhie1HUhdhMKXdEOx0lji/Djjv/lT3
+	MbcFnuCA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37654)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rSIFb-0002bC-2T;
+	Tue, 23 Jan 2024 14:59:43 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rSIFX-00021n-7b; Tue, 23 Jan 2024 14:59:39 +0000
+Date: Tue, 23 Jan 2024 14:59:39 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, acpica-devel@lists.linuxfoundation.org,
+	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com,
+	James Morse <james.morse@arm.com>
+Subject: Re: [PATCH RFC v3 17/21] ACPI: add support to register CPUs based on
+ the _STA enabled bit
+Message-ID: <Za/UWxAEnS5O/oY3@shell.armlinux.org.uk>
+References: <Za+61Jikkxh2BinY@shell.armlinux.org.uk>
+ <20240123142218.00001a7b@Huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, scott@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240123142218.00001a7b@Huawei.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi Ganapatrao,
-
-On Tue, 23 Jan 2024 09:55:32 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+On Tue, Jan 23, 2024 at 02:22:18PM +0000, Jonathan Cameron wrote:
+> On Tue, 23 Jan 2024 13:10:44 +0000
+> "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 > 
-> Hi Marc,
+> > On Tue, Jan 23, 2024 at 10:26:03AM +0000, Jonathan Cameron wrote:
+> > > On Tue, 2 Jan 2024 14:53:20 +0000
+> > > Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
+> > >   
+> > > > On Mon, 18 Dec 2023 13:03:32 +0000
+> > > > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> > > >   
+> > > > > On Wed, Dec 13, 2023 at 12:50:38PM +0000, Russell King wrote:    
+> > > > > > From: James Morse <james.morse@arm.com>
+> > > > > > 
+> > > > > > acpi_processor_get_info() registers all present CPUs. Registering a
+> > > > > > CPU is what creates the sysfs entries and triggers the udev
+> > > > > > notifications.
+> > > > > > 
+> > > > > > arm64 virtual machines that support 'virtual cpu hotplug' use the
+> > > > > > enabled bit to indicate whether the CPU can be brought online, as
+> > > > > > the existing ACPI tables require all hardware to be described and
+> > > > > > present.
+> > > > > > 
+> > > > > > If firmware describes a CPU as present, but disabled, skip the
+> > > > > > registration. Such CPUs are present, but can't be brought online for
+> > > > > > whatever reason. (e.g. firmware/hypervisor policy).
+> > > > > > 
+> > > > > > Once firmware sets the enabled bit, the CPU can be registered and
+> > > > > > brought online by user-space. Online CPUs, or CPUs that are missing
+> > > > > > an _STA method must always be registered.      
+> > > > > 
+> > > > > ...
+> > > > >     
+> > > > > > @@ -526,6 +552,9 @@ static void acpi_processor_post_eject(struct acpi_device *device)
+> > > > > >  		acpi_processor_make_not_present(device);
+> > > > > >  		return;
+> > > > > >  	}
+> > > > > > +
+> > > > > > +	if (cpu_present(pr->id) && !(sta & ACPI_STA_DEVICE_ENABLED))
+> > > > > > +		arch_unregister_cpu(pr->id);      
+> > > > > 
+> > > > > This change isn't described in the commit log, but seems to be the cause
+> > > > > of the build error identified by the kernel build bot that is fixed
+> > > > > later in this series. I'm wondering whether this should be in a
+> > > > > different patch, maybe "ACPI: Check _STA present bit before making CPUs
+> > > > > not present" ?    
+> > > > 
+> > > > Would seem a bit odd to call arch_unregister_cpu() way before the code
+> > > > is added to call the matching arch_registers_cpu()
+> > > > 
+> > > > Mind you this eject doesn't just apply to those CPUs that are registered
+> > > > later I think, but instead to all.  So we run into the spec hole that
+> > > > there is no way to identify initially 'enabled' CPUs that might be disabled
+> > > > later.
+> > > >   
+> > > > > 
+> > > > > Or maybe my brain isn't working properly (due to being Covid positive.)
+> > > > > Any thoughts, Jonathan?    
+> > > > 
+> > > > I'll go with a resounding 'not sure' on where this change belongs.
+> > > > I blame my non existent start of the year hangover.
+> > > > Hope you have recovered!  
+> > > 
+> > > Looking again, I think you were right, move it to that earlier patch.  
+> > 
+> > I'm having second thoughts - because this patch introduces the
+> > arch_register_cpu() into the acpi_processor_add() path (via
+> > acpi_processor_get_info() and acpi_processor_make_enabled(), so isn't
+> > it also correct to add arch_unregister_cpu() to the detach/post_eject
+> > path as well? If we add one without the other, doesn't stuff become
+> > a bit asymetric?
+> > 
+> > Looking more deeply at these changes, I'm finding it isn't easy to
+> > keep track of everything that's going on here.
 > 
-> > +void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
-> > +{
-> > +	if (is_hyp_ctxt(vcpu)) {
-> > +		vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
-> > +	} else {
-> > +		write_lock(&vcpu->kvm->mmu_lock);
-> > +		vcpu->arch.hw_mmu = get_s2_mmu_nested(vcpu);
-> > +		write_unlock(&vcpu->kvm->mmu_lock);
-> > +	}
+> I can sympathize.
 > 
-> Due to race, there is a non-existing L2's mmu table is getting loaded
-> for some of vCPU while booting L1(noticed with L1 boot using large
-> number of vCPUs). This is happening since at the early stage the
-> e2h(hyp-context) is not set and trap to eret of L1 boot-strap code
-> resulting in context switch as if it is returning to L2(guest enter)
-> and loading not initialized mmu table on those vCPUs resulting in
-> unrecoverable traps and aborts.
-
-I'm not sure I understand the problem you're describing here.
-
-What is the race exactly? Why isn't the shadow S2 good enough? Not
-having HCR_EL2.VM set doesn't mean we can use the same S2, as the TLBs
-are tagged by a different VMID, so staying on the canonical S2 seems
-wrong.
-
-My expectations are that the L1 ERET from EL2 to EL1 is trapped, and
-that we pick an empty S2 and start populating it. What fails in this
-process?
-
-> Adding code to check (below diff fixes the issue) stage 2 is enabled
-> and avoid the false ERET and continue with L1's mmu context.
+> > 
+> > We had attach()/detach() callbacks that were nice and symetrical.
+> > How we have this post_eject() callback that makes things asymetrical.
+> > 
+> > We have the attach() method that registers the CPU, but no detach
+> > method, instead having the post_eject() method. On the face of it,
+> > arch_unregister_cpu() doesn't look symetric unless one goes digging
+> > more in the code - by that, I mean arch_register_cpu() only gets
+> > called of present=1 _and_ enabled=1. However, arch_unregister_cpu()
+> > gets called buried in acpi_processor_make_not_present(), called when
+> > present=0, and then we have this new one to handle the case where
+> > enabled=0. It is not obvious that arch_unregister_cpu() is the reverse
+> > of what happens with arch_register_cpu() here.
 > 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 340e2710cdda..1901dd19d770 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -759,7 +759,12 @@ void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
+> One option would be to pull the arch_unregister_cpu() out so it
+> happens in one place in both the present = 0 and enabled = 0 cases but
+> I'm not sure if it's safe to reorder the contents of 
+> acpi_processor_not_present() as it's followed by a bunch of things.
 > 
->  void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
->  {
-> -       if (is_hyp_ctxt(vcpu)) {
-> +       bool nested_stage2_enabled = vcpu_read_sys_reg(vcpu, HCR_EL2)
-> & HCR_VM;
-> +
-> +       /* Load L2 mmu only if nested_stage2_enabled, avoid mmu
-> +        * load due to false ERET trap.
-> +        */
-> +       if (is_hyp_ctxt(vcpu) || !nested_stage2_enabled) {
->                 vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
->         } else {
->                 write_lock(&vcpu->kvm->mmu_lock);
+> Would looks something like
+> 
+> if (cpu_present(pr->id)) {
+> 	if (!(sta & ACPI_STA_DEVICE_PRESENT)) {
+> 		acpi_processor_make_not_present(device); /* Remove arch_cpu_unregister() */
+> 	} else if (!(sta & ACPI_STA_DEVICE_ENABLED)) {
+> 		/* Nothing to do in this case */
+> 	} else {
+> 		return; /* Firmware did something silly - probably racing */
+> 	}
+> 	arch_unregister_cpu(pr->id);
+> 
+> 	return;
+> }
+> 
+> > 
+> > Then we have the add() method allocating pr->throttling.shared_cpu_map,
+> > and acpi_processor_make_not_present() freeing it. From what I read in
+> > ACPI v6.5, enabled is not allowed to be set without present. So, if
+> > _STA reports that a CPU that had present=1 enabled=1, but then is
+> > later reported to be enabled=0 (which we handle by calling only
+> > arch_unregister_cpu()) then what happens when _STA changes to
+> > enabled=1 later? Does add() get called? 
+> 
+> yes it does (I poked it to see) which indeed isn't good (unless I've
+> broken my setup in some obscure way).
 
-As I said above, this doesn't look right.
+Thanks for confirming - I haven't had a chance to do any testing (late
+lunch because of spending so long looking at this...)
 
-> Hoping we dont hit this when we move completely NV2 based
-> implementation and e2h is always set?
+> Seems we need a few more things than arch_unregister_cpu() pulled out
+> in the above code.
 
-No, the same constraints apply. I don't see why this would change.
+Yes, and I also wonder whether we should be doing any of that
+unconditionally...
 
-Thanks,
+> > If it does, this would cause
+> > a new acpi_processor structure to be allocated and the old one to be
+> > leaked... I hope I'm wrong about add() being called - but if it isn't,
+> > how does enabled going from 0->1 get handled... and if we are handling
+> > its 1->0 transition separately from present, then surely we should be
+> > handling that.
+> > 
+> > Maybe I'm just getting confused, but I've spent much of this morning
+> > trying to unravel all this... and I'm of the opinion that this isn't a
+> > sign of a good approach.
+> 
+> It's all annoyingly messy at the root of things, but indeed you've found
+> some issues in current implementation.  Feels like just ripping out
+> a bunch of stuff from acpi_processor_make_not_present() and calling it
+> for both paths will probably work, but I've not tested that yet.
 
-	M.
+... since surely if we've already got to the point of issuing a
+post_eject() callback, the device has already been ejected
+and thus has gone - and if it is ever "replaced" we will get an
+attach() callback.
+
+Moreover, looking at acpi_scan_hot_remove(), if we are the device
+being ejected, then after ej0 is evaluated, _STA is checked, and
+acpi_bus_post_eject() called only if enabled=0. (This will also
+end up calling post_eject() for any children as well which won't
+have their _STA evaluated.)
+
+So this has got me wondering whether acpi_processor_post_eject()
+should be doing all the cleanup in acpi_processor_make_not_present()
+except if we believe the call is in error (e.g.
+!ACPI_HOTPLUG_PRESENT_CPU and present=0) - thus preparing the way
+for a future attach() callback.
+
+Hmm. I wonder if Rafael has any input on this.
 
 -- 
-Without deviation from the norm, progress is not possible.
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
