@@ -1,121 +1,191 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9265A788;
-	Tue, 23 Jan 2024 10:29:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30ABE5C8ED;
+	Tue, 23 Jan 2024 10:49:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706005773; cv=none; b=bJZyrsVzihXpQoNdJIFSpF0eu23+g4zMTLLOVQcCsERxqrLSMvPlmb2ajqt3TraOgKLKL5omH44wG7UpZn9UR24SN9MSEJFwEiWpWjITaG4yOgjk3hg8pYTV1xC1Nibkle5rbVP+uUmfq8/UdhogPdb5jUAH7lJ1cQiPr2P2ndw=
+	t=1706006982; cv=none; b=nZAdFYUbRhhJV0eayiR15gouw9ZqBTIiNfo3A0ZruzqH3qpYDKOenMB4WuBGFKWbhPMvAC4uAwfo8o/0o5+Y1S6Wr25MEUxEeE0Sq17mkWyqmCAJBwbjPTJDlHomb6ACJuFZtiWA4W2iJxnITyQIQKSIeLhgMpXXl+HMtNUihk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706005773; c=relaxed/simple;
-	bh=1z304UMB9iwNDgxznbQ/na098G6JM2egcJawzjYAgFU=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l3oFqw/smrrV0JKx/HRqu1OJrgMrCDlY3qMZaWZNUozzaOixAXSv/eBRuYpxYFz2a8yCtn8moEd5Hkv4ciWcK3FHc+O70u1rqy6dtK4lqZbQ5JxsGlVJTJ3JAmOjJQYkK1lsitYpTW7YcBolaFeE1vbLLo1xaLaCpFsB+h6UXd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4TK3Ct523Lz6K91D;
-	Tue, 23 Jan 2024 18:26:34 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id B7F05140A90;
-	Tue, 23 Jan 2024 18:29:29 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 23 Jan
- 2024 10:29:29 +0000
-Date: Tue, 23 Jan 2024 10:29:28 +0000
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-CC: <linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-riscv@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<x86@kernel.org>, <acpica-devel@lists.linuxfoundation.org>,
-	<linux-csky@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-ia64@vger.kernel.org>, <linux-parisc@vger.kernel.org>, Salil Mehta
-	<salil.mehta@huawei.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	<jianyong.wu@arm.com>, <justin.he@arm.com>, James Morse <james.morse@arm.com>
-Subject: Re: [PATCH RFC v3 18/21] ACPI: processor: Only call
- arch_unregister_cpu() if HOTPLUG_CPU is selected
-Message-ID: <20240123102928.0000270c@Huawei.com>
-In-Reply-To: <ZYBB32fMWB6of7Jb@shell.armlinux.org.uk>
-References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk>
-	<E1rDOhH-00DvlO-UP@rmk-PC.armlinux.org.uk>
-	<20231215165009.000035f2@Huawei.com>
-	<ZYBB32fMWB6of7Jb@shell.armlinux.org.uk>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1706006982; c=relaxed/simple;
+	bh=gHsDyfesb/mmGoU8vrHS9IRNcLNE0C+m0hCx7hzoAdQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=egQgHP6yypiumoEJ4lVvWY5KwBFha6LRMl49QvBH+fci83xURu7VR4UHQvc5tDazEb/fcObVno8HpTeVzFN9vH+rTRSO6/zb5ZTX6PnNPUwgb+8ORJc6LR7adyAhYT9ULqA7pZFet6Q6d9cs7r6jtWm/MzYDCOWh1ir8qYX0vVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GdBE0Yme; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GdBE0Yme"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BA5AC433F1;
+	Tue, 23 Jan 2024 10:49:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706006981;
+	bh=gHsDyfesb/mmGoU8vrHS9IRNcLNE0C+m0hCx7hzoAdQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GdBE0YmeC5uAWTMFoCQ42sY/cye7y//Dnpf7rdVq4SvyjftkaLUOcNCG24K0gzTqA
+	 dFSGEvVyB2CRW293HZlNrP2XS9mb0CidVywNsPoJT+Nv0LlRsJGumd4HyqEzI/dQtC
+	 8cZZhQ8iYmFcmFDldNudf6GwUGERxsOqasJhzc2Jxuo+SMTJNy5VOU0cnM6d4aQvmO
+	 5VeqzCf31gC7IEg1x5zj45zAVrV5IbcjPxb0rENgCyuzdQi3e5q1BgqXI8C1GpfVSm
+	 0bpoCA9evozJgwCIHwkkZ6oy1u7sBKpsItgsjORTrYunPCbA6yYv8JWg616G6cR2A5
+	 voHUGbm3fS+VA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rSELb-00Dw18-4f;
+	Tue, 23 Jan 2024 10:49:39 +0000
+Date: Tue, 23 Jan 2024 10:49:38 +0000
+Message-ID: <86o7dc8gu5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: linux-hardening@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Reiji Watanabe <reijiw@google.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 24/82] KVM: arm64: vgic: Refactor intentional wrap-around calculation
+In-Reply-To: <20240123002814.1396804-24-keescook@chromium.org>
+References: <20240122235208.work.748-kees@kernel.org>
+	<20240123002814.1396804-24-keescook@chromium.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: keescook@chromium.org, linux-hardening@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, reijiw@google.com, eric.auger@redhat.com, ricarkol@google.com, rananta@google.com, qperret@google.com, jean-philippe@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, gustavoars@kernel.org, morbo@google.com, justinstitt@google.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 18 Dec 2023 12:58:07 +0000
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+On Tue, 23 Jan 2024 00:26:59 +0000,
+Kees Cook <keescook@chromium.org> wrote:
+> 
+> In an effort to separate intentional arithmetic wrap-around from
+> unexpected wrap-around, we need to refactor places that depend on this
+> kind of math. One of the most common code patterns of this is:
+> 
+> 	VAR + value < VAR
+> 
+> Notably, this is considered "undefined behavior" for signed and pointer
+> types, which the kernel works around by using the -fno-strict-overflow
+> option in the build[1] (which used to just be -fwrapv). Regardless, we
+> want to get the kernel source to the position where we can meaningfully
+> instrument arithmetic wrap-around conditions and catch them when they
+> are unexpected, regardless of whether they are signed[2], unsigned[3],
+> or pointer[4] types.
+> 
+> Refactor open-coded unsigned wrap-around addition test to use
+> check_add_overflow(), retaining the result for later usage (which removes
+> the redundant open-coded addition). This paves the way to enabling the
+> wrap-around sanitizers in the future.
+> 
+> Link: https://git.kernel.org/linus/68df3755e383e6fecf2354a67b08f92f18536594 [1]
+> Link: https://github.com/KSPP/linux/issues/26 [2]
+> Link: https://github.com/KSPP/linux/issues/27 [3]
+> Link: https://github.com/KSPP/linux/issues/344 [4]
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Zenghui Yu <yuzenghui@huawei.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Reiji Watanabe <reijiw@google.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Ricardo Koller <ricarkol@google.com>
+> Cc: Raghavendra Rao Ananta <rananta@google.com>
+> Cc: Quentin Perret <qperret@google.com>
+> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: kvmarm@lists.linux.dev
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>  arch/arm64/kvm/vgic/vgic-kvm-device.c |  6 ++++--
+>  arch/arm64/kvm/vgic/vgic-v2.c         | 10 ++++++----
+>  2 files changed, 10 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> index f48b8dab8b3d..0eec5344d203 100644
+> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> @@ -18,17 +18,19 @@ int vgic_check_iorange(struct kvm *kvm, phys_addr_t ioaddr,
+>  		       phys_addr_t addr, phys_addr_t alignment,
+>  		       phys_addr_t size)
+>  {
+> +	phys_addr_t sum;
+> +
+>  	if (!IS_VGIC_ADDR_UNDEF(ioaddr))
+>  		return -EEXIST;
+>  
+>  	if (!IS_ALIGNED(addr, alignment) || !IS_ALIGNED(size, alignment))
+>  		return -EINVAL;
+>  
+> -	if (addr + size < addr)
+> +	if (check_add_overflow(addr, size, &sum))
+>  		return -EINVAL;
+>  
+>  	if (addr & ~kvm_phys_mask(&kvm->arch.mmu) ||
+> -	    (addr + size) > kvm_phys_size(&kvm->arch.mmu))
+> +	    sum > kvm_phys_size(&kvm->arch.mmu))
 
-> On Fri, Dec 15, 2023 at 04:50:09PM +0000, Jonathan Cameron wrote:
-> > On Wed, 13 Dec 2023 12:50:43 +0000
-> > Russell King (Oracle) <rmk+kernel@armlinux.org.uk> wrote:
-> >   
-> > > From: James Morse <james.morse@arm.com>
-> > > 
-> > > The kbuild robot points out that configurations without HOTPLUG_CPU
-> > > selected can try to build acpi_processor_post_eject() without success
-> > > as arch_unregister_cpu() is not defined.
-> > > 
-> > > Check this explicitly. This will be merged into:
-> > > | ACPI: Add post_eject to struct acpi_scan_handler for cpu hotplug
-> > > for any subsequent posting.
-> > > 
-> > > Reported-by: kbuild test robot <lkp@intel.com>
-> > > Signed-off-by: James Morse <james.morse@arm.com>
-> > > Tested-by: Miguel Luis <miguel.luis@oracle.com>
-> > > Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
-> > > Tested-by: Jianyong Wu <jianyong.wu@arm.com>
-> > > ---
-> > > This should probably be squashed into an earlier patch.  
-> > 
-> > Agreed. If not
-> > Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>  
-> 
-> I'm not convinced that "ACPI: Add post_eject to struct acpi_scan_handler
-> for cpu hotplug" is the correct commit to squash this into.
-> 
-> As far as acpi_processor.c is concerned, This commit merely renames
-> acpi_processor_remove() to be acpi_processor_post_eject(). The function
-> references arch_unregister_cpu() before and after this change, and its
-> build is dependent on CONFIG_ACPI_HOTPLUG_PRESENT_CPU being defined.
-> 
-> Commit "ACPI: convert acpi_processor_post_eject() to use IS_ENABLED()"
-> removed the ifdef CONFIG_ACPI_HOTPLUG_PRESENT_CPU surrounding
-> acpi_processor_post_eject, and that symbol depends on
-> CONFIG_HOTPLUG_CPU, so I think this commit is also fine.
-> 
-> Commit "ACPI: Check _STA present bit before making CPUs not present"
-> rewrites the function - the original body gets called
-> acpi_processor_make_not_present() and a new acpi_processor_post_eject()
-> is created. At this point, it doesn't reference arch_unregister_cpu().
-> 
-> Commit "ACPI: add support to register CPUs based on the _STA enabled
-> bit" adds a reference to arch_unregister_cpu() in this new
-> acpi_processor_post_eject() - so I think this is the correct commit
-> this change should be merged into.
+nit: 'sum' doesn't mean much in this context. Something like 'end'
+would be much more descriptive.
 
-That or where that change ends up given your earlier suggestion to
-move that change as well.  I find it hard to care as long as
-the bisection issue is squashed by the change.  If we make the code
-drop out before the build issue is introduced that's fine because
-we are arguing we shouldn't be running it anyway so such protection
-is fine if not necessary for build fix purposes.
+>  		return -E2BIG;
+>  
+>  	return 0;
+> diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
+> index 7e9cdb78f7ce..c8d1e965d3b7 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v2.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v2.c
+> @@ -273,14 +273,16 @@ void vgic_v2_enable(struct kvm_vcpu *vcpu)
+>  /* check for overlapping regions and for regions crossing the end of memory */
+>  static bool vgic_v2_check_base(gpa_t dist_base, gpa_t cpu_base)
+>  {
+> -	if (dist_base + KVM_VGIC_V2_DIST_SIZE < dist_base)
+> +	gpa_t dist_sum, cpu_sum;
 
-J
+Same here: dist_end, cpu_end.
 
-> 
+> +
+> +	if (check_add_overflow(dist_base, KVM_VGIC_V2_DIST_SIZE, &dist_sum))
+>  		return false;
+> -	if (cpu_base + KVM_VGIC_V2_CPU_SIZE < cpu_base)
+> +	if (check_add_overflow(cpu_base, KVM_VGIC_V2_CPU_SIZE, &cpu_sum))
+>  		return false;
+>  
+> -	if (dist_base + KVM_VGIC_V2_DIST_SIZE <= cpu_base)
+> +	if (dist_sum <= cpu_base)
+>  		return true;
+> -	if (cpu_base + KVM_VGIC_V2_CPU_SIZE <= dist_base)
+> +	if (cpu_sum <= dist_base)
+>  		return true;
+>  
+>  	return false;
 
+With these nits addressed, and assuming you intend to merge the whole
+series yourself:
+
+Acked-by: Marc Zyngier <maz@kernel.org>
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
