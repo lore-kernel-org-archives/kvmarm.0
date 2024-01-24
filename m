@@ -1,64 +1,64 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B58317BDD
-	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 09:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59ED1799C
+	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 09:41:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706088820; cv=none; b=LIJbjDOqXayD9L5KjmAl1DocWWQhfmHMKiXUgho9QTuOrvX8hIZqdJBTF+AsqV1ws43Pm3ncMUixlsKaop04+BDLK+dAHXgxHhSzVKTmJpCnMEyPvhtEMEHTX5Cqt4z+2CILECkH/o1bf6nzfMRNfP+DCfn6HEF9g7L5ZxXZGow=
+	t=1706089277; cv=none; b=sDcIUDtnu+yNmiM3CvJZeNLfjhWMOk+/sPDiD1nOlPWdHW+wQ2SRdRngOf+W2ESzpoTAO4D+LccTFqG/EaufUF7LigypkyM+b/AGMe6Q1R8D7L9Hhoxm8zMRr/bZhqPwZ10tOIsYYgc0GoalzPwtNQ3fAuF4hibEbncrMuiFqVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706088820; c=relaxed/simple;
-	bh=Qnwrtb0fDatmqwT2W2BhqFAGuc28hH7YbJ11CtLFqEY=;
+	s=arc-20240116; t=1706089277; c=relaxed/simple;
+	bh=0EpT3CK+Limf2hGvFJ/GiDh1uJ1ffx0DanYWdJ0Uijs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Rokii1P7PoYxsHFU/iECdubcTsR49UIZzn1bqAYZuz0sWCuq1Anmq2xn6jWVgPryknD3iv1CvA0SglMd8dMyqMw3NaMdsK62jRrr1wO86cKoDIN2W9UMLi8pA5xgAs7gulzXPQC1b4RkHUalZDfbg1jFbd716r7tQCQCaxo8ih8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bdgo/Zsp; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=jMgE45Z2/lSOL/9IeZtupa0xfj35QFy8sHWZRWalg3C0/gYf2JOfXqORMrAesdeQCGODrJ6rhRubchkdWUHJECwFTpoGbrN+EWVKco9ARylnQr859PnL1GiybMSLHSUvPQiy8USQ5ITPSiGutfsGp4ZszYAdkbT0GXasf+hBzH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nu9plN7M; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bdgo/Zsp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nu9plN7M"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706088817;
+	s=mimecast20190719; t=1706089274;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=90uTwTzY8agF7ocmQ+dD+FDMx0poHKPSgJQURYtfO9I=;
-	b=bdgo/Zspv+AftiLpZmacueql6mP1k6nkPhFv/aDzIGMxgtS2t3AhrgLoDGVbaK0ZSbBrc1
-	Sot1QsgEA3LbDAU6FjV4ppUbQry38pqHXZj9X8SJbHaF/Io9XuZLdvh0THRabmKoJ+KWlo
-	viMcqen9OjZcFT+1S6ssb0ib3CgenfA=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=gx6UDE3WqgCxA+YsuAbtHMHWU0KJY6DuLd1G/I2mTs0=;
+	b=Nu9plN7MdpleM4O65I39+trZ+JSdluGLziMF7JKomfz29UnHuddkzxqvNL1VklL5hgq1cB
+	R3VopYXanF52chMnXMhms07gO4HI3NIvoy3Lm+Gng+x7WFQjgti50AQDPT1ZgvdFaEQtZ1
+	YSTf98dIAGYzS5C4D1J9H1ZSPog+s5g=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-189-IJD54jYOPkan_iqcYp1XIg-1; Wed, 24 Jan 2024 04:33:36 -0500
-X-MC-Unique: IJD54jYOPkan_iqcYp1XIg-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7816bea8d28so1159862285a.0
-        for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 01:33:36 -0800 (PST)
+ us-mta-313-H_Z9eHLPOsignR4ntsLuKg-1; Wed, 24 Jan 2024 04:41:11 -0500
+X-MC-Unique: H_Z9eHLPOsignR4ntsLuKg-1
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-42a34134f4cso61532901cf.2
+        for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 01:41:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706088816; x=1706693616;
+        d=1e100.net; s=20230601; t=1706089270; x=1706694070;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=90uTwTzY8agF7ocmQ+dD+FDMx0poHKPSgJQURYtfO9I=;
-        b=LnQxdDLRMFgWDkm9dyfOMa338apx3+xWHDLUIluDbA0KBwZPznTlsGS/xFGpcz6whs
-         wkDvBwvt1aLEs8PKBjpe2Ygjna+OSyhmoxgH129knNjZOp9OrAelVLZxeWo0gNfFYSr0
-         nLHVAGTdPvfiHTlZejN8recXp8WO35MKb7H9hv/QJ126k55FDKd62hM828XfXG5yoACk
-         4AJDI1oCX3mq93NM8bJuWejnRkAoGDtjuZ/gfmBoJORdG0XJjLBHRltHgbV8YouszsOJ
-         SPZ+sP/BMtt+cPSB+dcNGTugF+jA729EN4ZFfpIxGE0l4qQZlx1cXfaSTkW6C+p44HFt
-         8VGQ==
-X-Gm-Message-State: AOJu0YzE5CThKU1LAhxl4q+h6r47LUNszvlf3LqsrMOb8zOiFHyuy2tq
-	dSbZL40O6IdPJXrS77Fi+F2O1ZKA354nZIosI38bBQr0k0lWYvxc7r+ml7HjUjng2KAm1RTTh1Z
-	5i58hK6unky8nALhyb9em40q2lafjFoqntxVgvp1wMuU1JvC1ah9SPw==
-X-Received: by 2002:a05:620a:3950:b0:783:1b28:d9d5 with SMTP id qs16-20020a05620a395000b007831b28d9d5mr1607405qkn.73.1706088815906;
-        Wed, 24 Jan 2024 01:33:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFKUjlEgLJMjchSeGQ/sZ5XArTp937YINJB5P2/e3uGNpuvrJdmLpRMXW5sVYo3BKGixZl71g==
-X-Received: by 2002:a05:620a:3950:b0:783:1b28:d9d5 with SMTP id qs16-20020a05620a395000b007831b28d9d5mr1607389qkn.73.1706088815681;
-        Wed, 24 Jan 2024 01:33:35 -0800 (PST)
+        bh=gx6UDE3WqgCxA+YsuAbtHMHWU0KJY6DuLd1G/I2mTs0=;
+        b=CLgFsZroZ3R3yvs6ODHgnsy3GEG35mFyAjMlzz5vL+6OQlSOZD0Xx8QWQZeZaYbMMY
+         0aGMDsySPnQBwijpQtmAU8+xGMOx4OgP/QCHh2C34SJN19C+nyN2gQXx1kwWti84XGGu
+         W4+Kpuz4jt4Rr/Nml6T0oy3UepZV84LUBPsB+0EzuKgDUXowCZaZvvWB9z3l910DjwDG
+         CTJ3Txk7JBkd+Gic1sFDH+EixBl9+9vLhuFtK56G2FAa/WXwa5rnC48YcOasVImo0QVN
+         SIKRKnxGe+CX2S30wK1d/swZcDAJVv0IYMrXlvdnn+O7Z7RcLzoTLwcI6C2dtZKJ6+AG
+         WHEQ==
+X-Gm-Message-State: AOJu0YzATr9vPrvRYKLLgTMOxytY0zbMik/x52CRnhtDyc6DBsOHz/B6
+	Tc1xNRlKkCxQI5QekFtL0SxNJR2mzKafibJFeasT3NwGy+xMwkkeZlbgzSGOHSArHUufPmgpNVg
+	ftSJhs2gxsFiYelcvgefGRrPo+QSOVtTLWK+OTFUuLKfWO4KZGxV9jQ==
+X-Received: by 2002:a05:622a:1103:b0:42a:2ee1:74b3 with SMTP id e3-20020a05622a110300b0042a2ee174b3mr2650312qty.6.1706089270712;
+        Wed, 24 Jan 2024 01:41:10 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEDGRqsb/R8L8hbnk8L4IdXUS0xDsxstZqw9Z4Ey4fpOzEJvtifee7J8+h9k5v+cErpfz4kgw==
+X-Received: by 2002:a05:622a:1103:b0:42a:2ee1:74b3 with SMTP id e3-20020a05622a110300b0042a2ee174b3mr2650307qty.6.1706089270478;
+        Wed, 24 Jan 2024 01:41:10 -0800 (PST)
 Received: from [192.168.0.9] (ip-109-43-177-121.web.vodafone.de. [109.43.177.121])
-        by smtp.gmail.com with ESMTPSA id bn22-20020a05620a2ad600b007832b17f3eesm3897125qkb.41.2024.01.24.01.33.32
+        by smtp.gmail.com with ESMTPSA id m5-20020ac86885000000b0042a11ed1240sm4211877qtq.92.2024.01.24.01.41.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jan 2024 01:33:35 -0800 (PST)
-Message-ID: <206d5e08-b056-4baa-9e87-37812702ece6@redhat.com>
-Date: Wed, 24 Jan 2024 10:33:30 +0100
+        Wed, 24 Jan 2024 01:41:10 -0800 (PST)
+Message-ID: <44e2bf47-9948-42d6-aa6a-6a24e29d7ee1@redhat.com>
+Date: Wed, 24 Jan 2024 10:41:05 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -66,13 +66,13 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 01/24] configure: Add ARCH_LIBDIR
+Subject: Re: [kvm-unit-tests PATCH 21/24] lib: Add strcasecmp and strncasecmp
 To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
  kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev
 Cc: ajones@ventanamicro.com, anup@brainfault.org, atishp@atishpatra.org,
  pbonzini@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com
 References: <20240124071815.6898-26-andrew.jones@linux.dev>
- <20240124071815.6898-27-andrew.jones@linux.dev>
+ <20240124071815.6898-47-andrew.jones@linux.dev>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -116,7 +116,7 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240124071815.6898-27-andrew.jones@linux.dev>
+In-Reply-To: <20240124071815.6898-47-andrew.jones@linux.dev>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -124,15 +124,16 @@ Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 24/01/2024 08.18, Andrew Jones wrote:
-> Prepare for an architecture which will share the same lib/$ARCH
-> directory, but be configured with different arch names for different
-> bit widths, i.e. riscv32 -> lib/riscv and riscv64 -> lib/riscv.
+> We'll soon want a case insensitive string comparison. Add toupper()
+> and tolower() too (the latter gets used by the new string functions).
 > 
 > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 > ---
->   Makefile  | 2 +-
->   configure | 2 ++
->   2 files changed, 3 insertions(+), 1 deletion(-)
+>   lib/ctype.h  | 10 ++++++++++
+>   lib/string.c | 14 ++++++++++++++
+>   lib/string.h |  2 ++
+>   3 files changed, 26 insertions(+)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+
 
