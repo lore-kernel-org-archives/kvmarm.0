@@ -1,104 +1,107 @@
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D2D18E14
-	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 10:21:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E06E87764C
+	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 12:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706091714; cv=none; b=Xp+y90ufjpy7YsCY5F+KZuvjE0xnLju05d6jxw22lVqbGCOHm+aTtLVp/c+0zqXWUXfCVFZR9rDuiC8au+vpnSGHwQrqlpl5q4VL/ZYG64NKgtHcUiNtrVg0y+i+gxxzV9Uj3C9uchDE5aiBZrStOs9fdSSL6PFSiqRPVf+CKTk=
+	t=1706100233; cv=none; b=ZmQEhXfqQiKR4qFS7kBz3sDKp+6On6y7d+nIrBtlsS+QmYU6PNiZcmiw8LHnw5vwu1Yubbw/9oH8EBWJzwjaxPZmffjeaL+If9XWXW1fvNH+vjTlSrbuiAmDSmcJK+UvIC3XYpC1AjYBXacW8zDq3vwISCwdCA7v415leWOkdes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706091714; c=relaxed/simple;
-	bh=DW/Zid75nYtAKL864xbUfrtgy+MkZ3LvxRolt5C62pk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZQgSRUbf4YnsUKnKe9O4LIMU6xwliUiN+GZJUuD1x+q94OShaB4FiVTNxOeoDT2HbsHQReqKnvLKAq79wysH9fKcJj6EO/8wXCVgSJp8Xl515be31yqbpChgBzqsjGqzgf6xONGCoGKBnnEEDxQ6AL0p94yU84onWk0SsPAKp3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=q2M4WHig; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1706100233; c=relaxed/simple;
+	bh=u0vGJxROrhTS4kvxwqHLUVg+IUg+Xi7vcEAgXmfVwUE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RtpSoCtQ4ieqPaWsaFklfN1TAZrEEQ+wSFcAa/TQZJqVdBW3Cpv5yTE62VzTPvr6yGtEqVJNmNtzrgrffCQB3RgQVVmKOrNXohro4jqCfIHQXzTwaKQPA4lhc/6xywC5UqSbeGSNReXQKDW3gN4GKcutjcCx5xS871kIvv5kQxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iCObavxx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="q2M4WHig"
-Date: Wed, 24 Jan 2024 11:21:47 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706091710;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GM3MEUQ3Kcjrz3xfmFPpbVxXKjMf8RlianzQLfEQ6uM=;
-	b=q2M4WHigQ+FLzqB91oFm8be1nTm6wKGHOqfi+PSeFtHmMFGbHoNanUMG11IuBB/Ayo2qer
-	gpuikqTlSiaFs4wxy410Vfi6uhKv9cH0elo9iyL9Jifl7TgmOpd6TQ2fuk50aPiaMxn6Rl
-	JOduEAUF+J7TMkE5KqrlHvpigXognrk=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Thomas Huth <thuth@redhat.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	kvmarm@lists.linux.dev, ajones@ventanamicro.com, anup@brainfault.org, 
-	atishp@atishpatra.org, pbonzini@redhat.com, alexandru.elisei@arm.com, 
-	eric.auger@redhat.com
-Subject: Re: Re: [kvm-unit-tests PATCH 23/24] gitlab-ci: Add riscv64 tests
-Message-ID: <20240124-6b0edbeb8659415cd18d809d@orel>
-References: <20240124071815.6898-26-andrew.jones@linux.dev>
- <20240124071815.6898-49-andrew.jones@linux.dev>
- <283af7cb-33fa-4486-a038-0c5a2235ffd5@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iCObavxx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62F43C43394;
+	Wed, 24 Jan 2024 12:43:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706100232;
+	bh=u0vGJxROrhTS4kvxwqHLUVg+IUg+Xi7vcEAgXmfVwUE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=iCObavxxxmKdtvxEzY67nCBlj8UkQtjh4inrVSK2GeO6RQk7T89kc+N1bGiAk7VwJ
+	 MOvlm8LE2Jcl7wVnpnZwTLY70WqNrq5Sn1c3fIvBNLZ8TNzu8mliCmiTJX8G1VmFOb
+	 U7wKZBfTW18T0lI33y5yfiBqFnLet8sygmZPdbpPJdeNFXrnagsUA6VSaw0eEaBVR8
+	 2OOMv3YlAqJK7EMjgOxukA5thN03kM7Z/UpUtrI29t0f4KmliELDrJ/ll68zm0yQ3f
+	 0AY1IIo2IB1aH+SNxbGF3eoXtzrsfdkMpv0HrgVFMKehfYTs5hxGYXWHAsIqDbkv1A
+	 PpSuApSedpdTw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rScbc-00EKMi-TN;
+	Wed, 24 Jan 2024 12:43:50 +0000
+Date: Wed, 24 Jan 2024 12:43:48 +0000
+Message-ID: <86cytq9a0r.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kunkun Jiang <jiangkunkun@huawei.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	moderated for non-subscribers <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	"wanghaibin.wang@huawei.com"
+	<wanghaibin.wang@huawei.com>
+Subject: Re: [bug report] GICv4.1: doorbell interrupts will be lost in a corner case
+In-Reply-To: <4edc4d02-5c0b-a2e5-897a-7e60fbb0f3e3@huawei.com>
+References: <4edc4d02-5c0b-a2e5-897a-7e60fbb0f3e3@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <283af7cb-33fa-4486-a038-0c5a2235ffd5@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Jan 24, 2024 at 10:45:29AM +0100, Thomas Huth wrote:
-> On 24/01/2024 08.18, Andrew Jones wrote:
-> > Add build/run tests for riscv64. We would also add riscv32, but Fedora
-> > doesn't package what we need for that.
-> > 
-> > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-> > ---
-> >   .gitlab-ci.yml | 16 ++++++++++++++++
-> >   1 file changed, 16 insertions(+)
-> > 
-> > diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> > index 273ec9a7224b..f3ec551a50f2 100644
-> > --- a/.gitlab-ci.yml
-> > +++ b/.gitlab-ci.yml
-> > @@ -87,6 +87,22 @@ build-ppc64le:
-> >        | tee results.txt
-> >    - if grep -q FAIL results.txt ; then exit 1 ; fi
-> > +# build-riscv32:
-> > +# Fedora doesn't package a riscv32 compiler for QEMU. Oh, well.
-> > +
-> > +build-riscv64:
-> > + extends: .intree_template
-> > + script:
-> > + - dnf install -y qemu-system-riscv gcc-riscv64-linux-gnu
-> > + - ./configure --arch=riscv64 --cross-prefix=riscv64-linux-gnu-
-> > + - make -j2
-> > + - printf "FOO=foo\nBAR=bar\nBAZ=baz\nMVENDORID=0\n" >test-env
-> > + - ACCEL=tcg KVM_UNIT_TESTS_ENV=test-env ./run_tests.sh
-> > +      selftest
-> > +      sbi
-> > +      | tee results.txt
-> > + - if grep -q FAIL results.txt ; then exit 1 ; fi
-> 
-> IIRC it's better to make sure that at least one test passed:
-> 
->   - grep -q PASS results.txt && ! grep -q FAIL results.txt
-> 
-> Otherwise all tests could be SKIP which indicates that something went wrong,
-> too.
+On Wed, 24 Jan 2024 08:54:24 +0000,
+Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+>=20
+> Hi all=EF=BC=8C
+>=20
+> In chapter 8.5 ("Doorbells") of the GIC spec, the affinity of
+> doorbell interrupt is described like this:
+>=20
+> > Doorbell interrupts target the Redistributor the vPE is
+> > currently mapped to, based on the previous VMAPP or VMOVP
+> > command for the vPE.
+> The doorbell interrupt here should refer to all types of
+> doorbell interrupt, right?
 
-Yeah, for sure the basic selftests should pass.
+There is only one type of doorbell.
 
-> We're using the check for PASS for some tests in the gitlab-ci.yml file, but
-> not for all ... we should maybe update the remaining ones to use that,
-> too...
+>=20
+> When GICv4.1 is enabled, the doorbell interrupt will be
+> truned on only when kvm handles WFI exit. There is a
+> corner case where will lost doorbell interrupt:
+> 1. doorbell interrupt enabled
+> 2. the cpu which the vPE is mapped to is manually offline
+> =C2=A0 through 'echo 0 > /sys/device/system/cpu/cpuX/online'
+> 3. According to the description of chapter 8.5 ("Doorbells"),
+> =C2=A0 the doorbell interrupt coming at this time will still
+> =C2=A0 be sent to the offline cpu.Then the interrupt will be
+> =C2=A0 lost.
+>=20
+> Should we add a cpu offline callback to handle the
+> doorbell interrupt mapped to this cpu?
 
-Yup, almost all of them are the FAIL pattern which I copy+pasted. If
-I respin this series I'll change riscv now, but since I think we should
-change the other ones in a separate patch, then we could change riscv at
-the same time as the rest.
+That seems gross. The right way to do it is to track the affinity of
+the doorbell (which we already do), and let the core code move the
+interrupt somewhere else in this case (which is should already do).
 
-Thanks,
-drew
+Have you actually witnessed this issue? Or is that just idle
+conjecture?
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
