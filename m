@@ -1,32 +1,32 @@
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A55131E53
-	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 20:49:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 862771350ED
+	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 20:49:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706129384; cv=none; b=FlZqjTisfRK+FpqC+KB8w1XWRiz8xkThwAv79Xufid7GS0OuYaNmAUEmX9uOaMkQE/nwWjl+2VvkVq+FqIHdgN9S0/zsnNpP3lAgS1bFW7qaTOmjK7Kv/MF7VxN40M6rqiKzGX8toSVJYW2ywMdy1l+thigISIS8YgTEe3gBJzA=
+	t=1706129384; cv=none; b=T0kSagf46xcv5r5zya5bn3fbRGaVOHDbBC5YNZ5SDWp4pxq/K+ZWNoE44p3WzUh8Dg/p6qSw7UshxIa7hY4Qt0/jdwr6fNz2nzbdVXMzvyXd48ujn61BqQikM9Doi2J1rlHPaHivKaxGJTe3SgkwogAOmw+YLTBhiDKMeUkffpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706129384; c=relaxed/simple;
-	bh=zn+NEwCWV2J3fnlNAv5UMIsfb2daqDGOeyb3cOTr5Hs=;
+	bh=AaUwQqfc4Ku5CZrkEkRiMftjazrtuY7bOsUzVzb64Mc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eS8ldBIWMlVa0LwqHHQCsGU3EPnhhYMXfkRSVmuI/a2CvkssRPhj2ti7+NCYLY/9mTTPJ0LIG3pYo07p1Rqj4mHoMPNCL0cc+Uho5H+zItN6Mn24fRChtIXKgCsdnod/7LARoP9pssfTZ3rX9lcZI9fEsBYNrbKHgK1BisO90yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oOIhrA5D; arc=none smtp.client-ip=95.215.58.179
+	 MIME-Version; b=IwB5FQu7Xsz4XH7NCqs2L49Z0vYMLSAmlNkSnf7oMTwHPPX2EV2IRGTzyTLAAb68F/b8tHSnP4mh7go30tsqMP5ppfcpaVhL34o+GzcEGP3YTA0sklI0uvUURXuXrDDLuMnc1T2VURlR8nJ6KN2OsVEUyR4e6oV+iPUggR3i+1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cMlnq2Zn; arc=none smtp.client-ip=95.215.58.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oOIhrA5D"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cMlnq2Zn"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706129380;
+	t=1706129378;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JSRHFG0+mRsPGBx4WvzyykyzgB4/zirusbi7pLa/qNU=;
-	b=oOIhrA5D3lJg4GSUFQDL3QLVro9vo0pypba9bifO/3h2NcrwEERhgaf/6BMGpVfhsyoAK1
-	LTDWMeu5jXahn7CDfs2JTb8E1TK3eoWSN+PggYvbylA1EAMAXbErepMD7O34yeg4Nwezip
-	TViXME2XGctJrav32UkOpVt4lfq8wbk=
+	bh=LxxqEpTwO+zOxGEx/S+lcOqJ8/x3pVGgz89u4x3XNnQ=;
+	b=cMlnq2ZnRx9gK/QCKmQw4yHzghedLSRfeCu9QAVj+8ifMd90nhmuiaAnAb2IP73EGYHFqK
+	m3voIsdj+ElcUbBYHsyPeyOB/apHaOdUC4cJHM8Wt0FfXdiHBJCQ9zS/N6r2xB2Ih6AXEz
+	V32y2tpxGfvLw1/V0796ACB+1DxdDR4=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -37,9 +37,9 @@ Cc: kvm@vger.kernel.org,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	Jing Zhang <jingzhangos@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 10/15] KVM: arm64: vgic: Don't acquire the lpi_list_lock in vgic_put_irq()
-Date: Wed, 24 Jan 2024 20:49:04 +0000
-Message-ID: <20240124204909.105952-11-oliver.upton@linux.dev>
+Subject: [PATCH 09/15] KVM: arm64: vgic: Ensure the irq refcount is nonzero when taking a ref
+Date: Wed, 24 Jan 2024 20:49:03 +0000
+Message-ID: <20240124204909.105952-10-oliver.upton@linux.dev>
 In-Reply-To: <20240124204909.105952-1-oliver.upton@linux.dev>
 References: <20240124204909.105952-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -51,96 +51,79 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The LPI xarray's xa_lock is sufficient for synchronizing writers when
-freeing a given LPI. Furthermore, readers can only take a new reference
-on an IRQ if it was already nonzero.
-
-Stop taking the lpi_list_lock unnecessarily and get rid of
-__vgic_put_lpi_locked().
+It will soon be possible for get() and put() calls to happen in
+parallel, which means in most cases we must ensure the refcount is
+nonzero when taking a new reference. Switch to using
+vgic_try_get_irq_kref() where necessary, and document the few conditions
+where an IRQ's refcount is guaranteed to be nonzero.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/vgic/vgic-its.c |  4 ++--
- arch/arm64/kvm/vgic/vgic.c     | 21 ++++-----------------
- arch/arm64/kvm/vgic/vgic.h     |  1 -
- 3 files changed, 6 insertions(+), 20 deletions(-)
+ arch/arm64/kvm/vgic/vgic-its.c | 18 ++++++++----------
+ arch/arm64/kvm/vgic/vgic.c     |  3 ++-
+ 2 files changed, 10 insertions(+), 11 deletions(-)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 7219f4a0a93d..8c026a530018 100644
+index 1d912a595b71..7219f4a0a93d 100644
 --- a/arch/arm64/kvm/vgic/vgic-its.c
 +++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -645,7 +645,7 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
- 	 * was in the cache, and increment it on the new interrupt.
+@@ -75,18 +75,11 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 	 * check that we don't add a second list entry with the same LPI.
  	 */
- 	if (cte->irq)
--		__vgic_put_lpi_locked(kvm, cte->irq);
-+		vgic_put_irq(kvm, cte->irq);
+ 	oldirq = xa_load(&dist->lpi_xa, intid);
+-	if (oldirq) {
++	if (oldirq && vgic_try_get_irq_kref(oldirq)) {
+ 		/* Someone was faster with adding this LPI, lets use that. */
+ 		kfree(irq);
+ 		irq = oldirq;
  
- 	/*
- 	 * The irq refcount is guaranteed to be nonzero while holding the
-@@ -682,7 +682,7 @@ void vgic_its_invalidate_cache(struct kvm *kvm)
- 		if (!cte->irq)
- 			break;
- 
--		__vgic_put_lpi_locked(kvm, cte->irq);
-+		vgic_put_irq(kvm, cte->irq);
- 		cte->irq = NULL;
+-		/*
+-		 * This increases the refcount, the caller is expected to
+-		 * call vgic_put_irq() on the returned pointer once it's
+-		 * finished with the IRQ.
+-		 */
+-		vgic_get_irq_kref(irq);
+-
+ 		goto out_unlock;
  	}
  
+@@ -607,8 +600,8 @@ static struct vgic_irq *vgic_its_check_cache(struct kvm *kvm, phys_addr_t db,
+ 	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
+ 
+ 	irq = __vgic_its_check_cache(dist, db, devid, eventid);
+-	if (irq)
+-		vgic_get_irq_kref(irq);
++	if (irq && !vgic_try_get_irq_kref(irq))
++		irq = NULL;
+ 
+ 	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+ 
+@@ -654,6 +647,11 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+ 	if (cte->irq)
+ 		__vgic_put_lpi_locked(kvm, cte->irq);
+ 
++	/*
++	 * The irq refcount is guaranteed to be nonzero while holding the
++	 * its_lock, as the ITE (and the reference it holds) cannot be freed.
++	 */
++	lockdep_assert_held(&its->its_lock);
+ 	vgic_get_irq_kref(irq);
+ 
+ 	cte->db		= db;
 diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 7e0d84906a12..6b8f440ca0fd 100644
+index 949af87bb599..7e0d84906a12 100644
 --- a/arch/arm64/kvm/vgic/vgic.c
 +++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -110,13 +110,13 @@ static void vgic_irq_release(struct kref *ref)
- {
- }
+@@ -394,7 +394,8 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
  
--/*
-- * Drop the refcount on the LPI. Must be called with lpi_list_lock held.
-- */
--void __vgic_put_lpi_locked(struct kvm *kvm, struct vgic_irq *irq)
-+void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
- 
-+	if (irq->intid < VGIC_MIN_LPI)
-+		return;
-+
- 	if (!kref_put(&irq->refcount, vgic_irq_release))
- 		return;
- 
-@@ -126,19 +126,6 @@ void __vgic_put_lpi_locked(struct kvm *kvm, struct vgic_irq *irq)
- 	kfree_rcu(irq, rcu);
- }
- 
--void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
--{
--	struct vgic_dist *dist = &kvm->arch.vgic;
--	unsigned long flags;
--
--	if (irq->intid < VGIC_MIN_LPI)
--		return;
--
--	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
--	__vgic_put_lpi_locked(kvm, irq);
--	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
--}
--
- void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 20886f57416a..b0a2754eae93 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -180,7 +180,6 @@ vgic_get_mmio_region(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
- 		     gpa_t addr, int len);
- struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 			      u32 intid);
--void __vgic_put_lpi_locked(struct kvm *kvm, struct vgic_irq *irq);
- void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
- bool vgic_get_phys_line_level(struct vgic_irq *irq);
- void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending);
+ 	/*
+ 	 * Grab a reference to the irq to reflect the fact that it is
+-	 * now in the ap_list.
++	 * now in the ap_list. This is safe as the caller must already hold a
++	 * reference on the irq.
+ 	 */
+ 	vgic_get_irq_kref(irq);
+ 	list_add_tail(&irq->ap_list, &vcpu->arch.vgic_cpu.ap_list_head);
 -- 
 2.43.0.429.g432eaa2c6b-goog
 
