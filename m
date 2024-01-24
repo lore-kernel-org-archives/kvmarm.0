@@ -1,24 +1,24 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6524F7E78B
-	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 16:57:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18AD57A72F
+	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 17:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706115446; cv=none; b=uWRrqTElEZltaJ3j/R0yHUI6fwV+4uA2zqC5g31Fg4u/V9WsljO7qWvwKu2UrzhAvGoOvugx4QUvXpGyKjHHnSqNfjr/gB0DyDaQZoT1sbUrDb89VveKyS2VC1kf6ekp2NwSQrE7X8I3g7eyxOLsRgGP3rUXYOTaa7QbwgIAehw=
+	t=1706115742; cv=none; b=iuTTX8LVdSduLvUTktU8BhfnOLzXUqUkgYZQHa5VhtvaKVfnqPa98ynE81QXJsQ/TNPyzbYYJvHyKN2TKVDIPOhs5hwLOEGZQLd7Jiu74OrTbjDhVsC4MjPmw/10EhUKWVfwPdLfY+fDOrNWZayrhq44LA/BKaGVFrCynZPFdUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706115446; c=relaxed/simple;
-	bh=cgTur/W6o3cGZBW0U2qon29cLXjTRoze49kvEMNEfBg=;
+	s=arc-20240116; t=1706115742; c=relaxed/simple;
+	bh=jT0Iby/QM9XcbS0bln/hhCljkepZnYjuOK3coEAvMis=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q4C9+plSkKufRnbEOl0zmbqX6i27iIxnliKJSA7okKZdklhHKhBVPgUmFthzcIQnLXdqkpY8q9DobRU3yUNgqy9PdlXNB/sWeS89sJPZ8svi3xCLUJGE6Y0d705b5H/l1n8kbVhruwN4gGj1vn3at8Ym1nIFak6kTRxHrTysBdw=
+	 Content-Type:Content-Disposition:In-Reply-To; b=AAOqgep5ecJ6y2ki9iaSquy/setJUpIQDvnhvxqin+QEKCVL2ainitYzOpQd03+uYCyp7oYWb3zpjOLf0GhyT/CXw62jnMYTt1FAFLVdY5X475fgJLB3q6p19EGFA+3bmmwyUhfupFgTZrDNq/mf24G4vzGKcqP2BhjmEzaJ85Q=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 78BA81FB;
-	Wed, 24 Jan 2024 08:58:08 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4038D1FB;
+	Wed, 24 Jan 2024 09:03:04 -0800 (PST)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 63BD03F762;
-	Wed, 24 Jan 2024 08:57:22 -0800 (PST)
-Date: Wed, 24 Jan 2024 16:57:20 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 29AF53F762;
+	Wed, 24 Jan 2024 09:02:18 -0800 (PST)
+Date: Wed, 24 Jan 2024 17:02:11 +0000
 From: Joey Gouly <joey.gouly@arm.com>
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -28,11 +28,13 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 16/25] KVM: arm64: Rename __check_nv_sr_forward() to
- triage_sysreg_trap()
-Message-ID: <20240124165720.GL1283334@e124191.cambridge.arm.com>
+Subject: Re: [PATCH 14/25] KVM: arm64: Register AArch64 system register
+ entries with the sysreg xarray
+Message-ID: <20240124170211.GA1535978@e124191.cambridge.arm.com>
 References: <20240122201852.262057-1-maz@kernel.org>
- <20240122201852.262057-17-maz@kernel.org>
+ <20240122201852.262057-15-maz@kernel.org>
+ <20240124163425.GJ1283334@e124191.cambridge.arm.com>
+ <86a5ou8z7g.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,77 +43,144 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240122201852.262057-17-maz@kernel.org>
+In-Reply-To: <86a5ou8z7g.wl-maz@kernel.org>
 
-On Mon, Jan 22, 2024 at 08:18:43PM +0000, Marc Zyngier wrote:
-> __check_nv_sr_forward() is not specific to NV anymore, and does
-> a lot more. Rename it to triage_sysreg_trap(), making it plain
-> that its role is to handle where an exception is to be handled.
+On Wed, Jan 24, 2024 at 04:37:23PM +0000, Marc Zyngier wrote:
+> On Wed, 24 Jan 2024 16:34:25 +0000,
+> Joey Gouly <joey.gouly@arm.com> wrote:
+> > 
+> > On Mon, Jan 22, 2024 at 08:18:41PM +0000, Marc Zyngier wrote:
+> > > In order to reduce the number of lookups that we have to perform
+> > > when handling a sysreg, register each AArch64 sysreg descriptor
+> > > with the global xarray. The index of the descriptor is stored
+> > > as a 10 bit field in the data word.
+> > > 
+> > > Subsequent patches will retrieve and use the stored index.
+> > > 
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h |  3 +++
+> > >  arch/arm64/kvm/emulate-nested.c   | 39 +++++++++++++++++++++++++++++--
+> > >  arch/arm64/kvm/sys_regs.c         | 11 ++++++++-
+> > >  3 files changed, 50 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index fe35c59214ad..e7a6219f2929 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -1083,6 +1083,9 @@ int kvm_handle_cp10_id(struct kvm_vcpu *vcpu);
+> > >  void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
+> > >  
+> > >  int __init kvm_sys_reg_table_init(void);
+> > > +struct sys_reg_desc;
+> > > +int __init populate_sysreg_config(const struct sys_reg_desc *sr,
+> > > +				  unsigned int idx);
+> > >  int __init populate_nv_trap_config(void);
+> > >  
+> > >  bool lock_all_vcpus(struct kvm *kvm);
+> > > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> > > index 59622636b723..342d43b66fda 100644
+> > > --- a/arch/arm64/kvm/emulate-nested.c
+> > > +++ b/arch/arm64/kvm/emulate-nested.c
+> > > @@ -427,12 +427,14 @@ static const complex_condition_check ccc[] = {
+> > >   * [19:14]	bit number in the FGT register (6 bits)
+> > >   * [20]		trap polarity (1 bit)
+> > >   * [25:21]	FG filter (5 bits)
+> > > - * [62:26]	Unused (37 bits)
+> > > + * [35:26]	Main SysReg table index (10 bits)
+> > > + * [62:36]	Unused (27 bits)
+> > >   * [63]		RES0 - Must be zero, as lost on insertion in the xarray
+> > >   */
+> > >  #define TC_CGT_BITS	10
+> > >  #define TC_FGT_BITS	4
+> > >  #define TC_FGF_BITS	5
+> > > +#define TC_MSR_BITS	10
+> > >  
+> > >  union trap_config {
+> > >  	u64	val;
+> > > @@ -442,7 +444,8 @@ union trap_config {
+> > >  		unsigned long	bit:6;		 /* Bit number */
+> > >  		unsigned long	pol:1;		 /* Polarity */
+> > >  		unsigned long	fgf:TC_FGF_BITS; /* Fine Grained Filter */
+> > > -		unsigned long	unused:37;	 /* Unused, should be zero */
+> > > +		unsigned long	msr:TC_MSR_BITS; /* Main SysReg index */
+> > > +		unsigned long	unused:27;	 /* Unused, should be zero */
+> > >  		unsigned long	mbz:1;		 /* Must Be Zero */
+> > >  	};
+> > >  };
+> > > @@ -1862,6 +1865,38 @@ int __init populate_nv_trap_config(void)
+> > >  	return ret;
+> > >  }
+> > >  
+> > > +int __init populate_sysreg_config(const struct sys_reg_desc *sr,
+> > > +				  unsigned int idx)
+> > > +{
+> > > +	union trap_config tc;
+> > > +	u32 encoding;
+> > > +	void *ret;
+> > > +
+> > > +	/*
+> > > +	 * 0 is a valid value for the index, but not for the storage.
+> > > +	 * We'll store (idx+1), so check against an offset'd limit.
+> > > +	 */
+> > > +	if (idx >= (BIT(TC_MSR_BITS) - 1)) {
+> > > +		kvm_err("sysreg %s (%d) out of range\n", sr->name, idx);
+> > > +		return -EINVAL;
+> > > +	}
+> > > +
+> > > +	encoding = sys_reg(sr->Op0, sr->Op1, sr->CRn, sr->CRm, sr->Op2);
+> > > +	tc = get_trap_config(encoding);
+> > > +
+> > > +	if (tc.msr) {
+> > > +		kvm_err("sysreg %s (%d) duplicate entry (%d)\n",
+> > > +			sr->name, idx - 1, tc.msr);
+> > > +		return -EINVAL;
+> > > +	}
+> > > +
+> > > +	tc.msr = idx + 1;
+> > > +	ret = xa_store(&sr_forward_xa, encoding,
+> > > +		       xa_mk_value(tc.val), GFP_KERNEL);
+> > > +
+> > > +	return xa_err(ret);
+> > > +}
+> > > +
+> > >  static enum trap_behaviour get_behaviour(struct kvm_vcpu *vcpu,
+> > >  					 const struct trap_bits *tb)
+> > >  {
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index 77cd818c23b0..65319193e443 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -3974,6 +3974,7 @@ int __init kvm_sys_reg_table_init(void)
+> > >  	struct sys_reg_params params;
+> > >  	bool valid = true;
+> > >  	unsigned int i;
+> > > +	int ret = 0;
+> > >  
+> > >  	/* Make sure tables are unique and in order. */
+> > >  	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false);
+> > > @@ -3997,5 +3998,13 @@ int __init kvm_sys_reg_table_init(void)
+> > >  	if (!first_idreg)
+> > >  		return -EINVAL;
+> > >  
+> > > -	return populate_nv_trap_config();
+> > > +	ret = populate_nv_trap_config();
+> > > +
+> > > +	for (i = 0; !ret && i < ARRAY_SIZE(sys_reg_descs); i++)
+> > > +		ret = populate_sysreg_config(sys_reg_descs + i, i);
+> > > +
+> > > +	for (i = 0; !ret && i < ARRAY_SIZE(sys_insn_descs); i++)
+> > > +		ret = populate_sysreg_config(sys_insn_descs + i, i);
+> > > +
+> > > +	return ret;
+> > >  }
+> > 
+> > The choice of `msr` was a tiny bit confusing due to the conflict with the asm
+> > instruction `msr`, but not enough to warrant renaming.
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_nested.h | 1 -
->  arch/arm64/kvm/emulate-nested.c     | 2 +-
->  arch/arm64/kvm/sys_regs.c           | 2 +-
->  arch/arm64/kvm/sys_regs.h           | 2 ++
->  4 files changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index 68465f87d308..c77d795556e1 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -60,7 +60,6 @@ static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
->  	return ttbr0 & ~GENMASK_ULL(63, 48);
->  }
->  
-> -extern bool __check_nv_sr_forward(struct kvm_vcpu *vcpu, int *sr_idx);
->  
->  int kvm_init_nv_sysregs(struct kvm *kvm);
->  
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 54ab4d240fc6..b39ced4ea331 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -2001,7 +2001,7 @@ static bool check_fgt_bit(struct kvm *kvm, bool is_read,
->  	return !(kvm_get_sysreg_res0(kvm, sr) & BIT(tc.bit));
->  }
->  
-> -bool __check_nv_sr_forward(struct kvm_vcpu *vcpu, int *sr_index)
-> +bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
->  {
->  	union trap_config tc;
->  	enum trap_behaviour b;
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 794d1f8c9bfe..c48bc2577162 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -3484,7 +3484,7 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
->  
->  	trace_kvm_handle_sys_reg(esr);
->  
-> -	if (__check_nv_sr_forward(vcpu, &sr_idx))
-> +	if (triage_sysreg_trap(vcpu, &sr_idx))
->  		return 1;
->  
->  	params = esr_sys64_to_params(esr);
-> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> index c65c129b3500..997eea21ba2a 100644
-> --- a/arch/arm64/kvm/sys_regs.h
-> +++ b/arch/arm64/kvm/sys_regs.h
-> @@ -233,6 +233,8 @@ int kvm_sys_reg_get_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
->  int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
->  			 const struct sys_reg_desc table[], unsigned int num);
->  
-> +bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index);
-> +
->  #define AA32(_x)	.aarch32_map = AA32_##_x
->  #define Op0(_x) 	.Op0 = _x
->  #define Op1(_x) 	.Op1 = _x
+> No, that's actually a very good point. How about SRI (Sys Reg Index)?
 
-It's strange having triage_sysreg_trap() in emulate-nested.c, but moving that
-would be churn for little benefit. Maybe once NV is all in.
-
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+LGTM
 
 Thanks,
 Joey
