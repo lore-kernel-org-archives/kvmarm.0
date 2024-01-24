@@ -1,216 +1,235 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEC6741745
-	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 15:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B113F43154
+	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 15:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706109237; cv=none; b=QNoY0z4+NGESLSYcVQMAroNYfW7IWjvqF6IiC2mkc4apDE660PwKtTgDBsCazhJIiK/DgE6AzCnkj7ipP/xMkzKqSx/xn8ZCplq+IfKdsGszPxlE2wDGDYqBeyS6vgmeJTuL0cpgGhlLjeWESdyc0ugEY+gkXqfUNNrdpjZgtZ8=
+	t=1706111634; cv=none; b=FxCRLzZm2Lh6nPK9K+BdGtig2VNpx1tx2FCsxwtrx3X9cfzT9yU9lvgE6LU92s0RssM8EAhNt4yGZoZZX/rIx9euYjwbYWAORi/URObqFE/jQyeluS/Shnjb1tuS4Ez4cNOidTIOCQehVuK0F46kMm9p/EWZaB3pKnvKltUFd7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706109237; c=relaxed/simple;
-	bh=/nlV2b76Bb766HvGp0us13c0PkmPQgNRUTW9LQNcXTk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EGEzCbbmwCtD/uBo8v1aeAgR0FXY3jvRXFpDME/5GBb+/lZIoivKgiPr+CFQGn7gMWHHcudXBYd3MmwQay2tYKBiw3F8zmfMi+V/uHT5RqW4ZOQ/dh3gcSjTZ+qYc9jpvJMmpjzv+aaJVp0jr6SGTnB9tqU713vQIsNpIcyY7ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=beX/zhwz; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="beX/zhwz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706109235;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AmpPYmHl13Io6EkojaUZhZmn9ypUW1G8T5NB4u+9OLg=;
-	b=beX/zhwzjdHetkXSJy1kSSY+Etp934ta7hLyJASZOg9VaF0NhJI+ogoRd1DEv1VF2dzRkH
-	HZFZxCKKklDxTo+enmDQPy3BKJ4tPxRkbEqtrKjFpeOC9eqYeUlomomF5lXGXYzyjBuGoe
-	YoK7P+H2paXJHPjuOSLSkMMJLWJaZeY=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-617-xTmbagQlMD-9m17X8dgpcg-1; Wed, 24 Jan 2024 10:13:53 -0500
-X-MC-Unique: xTmbagQlMD-9m17X8dgpcg-1
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6869d6d83dfso25629316d6.1
-        for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 07:13:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706109233; x=1706714033;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AmpPYmHl13Io6EkojaUZhZmn9ypUW1G8T5NB4u+9OLg=;
-        b=NQCWaM89Lb/D1bH7EEHky2Sux1HLr7itwXN0odwmj3kH5hGURWcGn5vZ/WWhXWJ3Gt
-         NPAxeJpXQqwm/pk4dcc/2zzwQ9n2LXmbNdD6q/V2Qob4w1tILJXeu8OPKbHgrKDJxDlP
-         7Y1Y1W9YchmwJkrnst7/OgY8pcSXfi1nUQnQq7qiV5438vnfUzAtlVhNH490CiE6Pa6B
-         TkVwdDkM+S8FusX5TODyNKp7oinbf2cF2JNlvnZP4Il7F8Pl6tJE09rAC75LzAfjKh9q
-         OBT0i0TWLrEoc1j7l97pEJWYl06Q0qhFr2FQJdUTi16Rtc76mYYb6jkcVP/uBppIST9E
-         5+Pw==
-X-Gm-Message-State: AOJu0YzsEIUl3gDuh9mjBrw0HYkBqHCq9iPWfZXkvGti9onm/xwiItdH
-	yTsTXDzSnbTDtLNewZtiHXyEu3hJkkim+hheDGIAUvFr8cPHrfNnUyJxOZFUnsL0mFllYOzPEyM
-	wczpBXzs5rGRN8ivrlj+q7UQlJqkgVotNnim0roFTFBfBxMgeQ1y0Yg==
-X-Received: by 2002:ad4:5bcc:0:b0:681:99b:ea0 with SMTP id t12-20020ad45bcc000000b00681099b0ea0mr2636933qvt.54.1706109233167;
-        Wed, 24 Jan 2024 07:13:53 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHOrCqKRabSy51esnpYkStX9FYC3518F8eYJFX1zOlKRM3AgbDzTJsl87QnO68+09jDXkknnQ==
-X-Received: by 2002:ad4:5bcc:0:b0:681:99b:ea0 with SMTP id t12-20020ad45bcc000000b00681099b0ea0mr2636921qvt.54.1706109232837;
-        Wed, 24 Jan 2024 07:13:52 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id z15-20020a0cfc0f000000b0067f2559fd5esm4562012qvo.34.2024.01.24.07.13.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jan 2024 07:13:52 -0800 (PST)
-Message-ID: <86b9e255-9d19-44ee-b6c4-544507756183@redhat.com>
-Date: Wed, 24 Jan 2024 16:13:48 +0100
+	s=arc-20240116; t=1706111634; c=relaxed/simple;
+	bh=kXE5W+6Y3dlRfSgMon6lacOQeIjVu2mhg0cJ2n/s4XE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tbav0IGieE5DzFAWrIcw2CIcii51ej0cEgbWhzTHw1gPKzEz0o7srGKf7yBKMSrvkLpXMoj6P3ubBp8c397WYEicu63F/Cj+eoGUH3oUpUfnH+c+W7yHdaxNzmVCmUOEGtF1h2RhjRwa+QLs9ipPIca1q+F3Fyx+y/lkaouK3H8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 19C2C1FB;
+	Wed, 24 Jan 2024 07:54:37 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C69F53F762;
+	Wed, 24 Jan 2024 07:53:50 -0800 (PST)
+Date: Wed, 24 Jan 2024 15:53:48 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 18/25] KVM: arm64: Propagate and handle Fine-Grained
+ UNDEF bits
+Message-ID: <20240124155348.GF1283334@e124191.cambridge.arm.com>
+References: <20240122201852.262057-1-maz@kernel.org>
+ <20240122201852.262057-19-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH 24/82] KVM: arm64: vgic: Refactor intentional wrap-around
- calculation
-To: Marc Zyngier <maz@kernel.org>, Kees Cook <keescook@chromium.org>
-Cc: linux-hardening@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Reiji Watanabe <reijiw@google.com>, Ricardo Koller <ricarkol@google.com>,
- Raghavendra Rao Ananta <rananta@google.com>,
- Quentin Perret <qperret@google.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- linux-kernel@vger.kernel.org
-References: <20240122235208.work.748-kees@kernel.org>
- <20240123002814.1396804-24-keescook@chromium.org>
- <86o7dc8gu5.wl-maz@kernel.org>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <86o7dc8gu5.wl-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240122201852.262057-19-maz@kernel.org>
 
+Hello,
 
+On Mon, Jan 22, 2024 at 08:18:45PM +0000, Marc Zyngier wrote:
+> In order to correctly honor our FGU bits, they must be converted
+> into a set of FGT bits. They get merged as part of the existing
+> FGT setting.
+> 
+> Similarly, the UNDEF injection phase takes place when handling
+> the trap.
+> 
+> This results in a bit of rework in the FGT macros in order to
+> help with the code generation, as burying per-CPU accesses in
+> macros results in a lot of expansion, not to mention the vcpu->kvm
+> access on nvhe (kern_hyp_va() is not optimisation-friendly).
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-On 1/23/24 11:49, Marc Zyngier wrote:
-> On Tue, 23 Jan 2024 00:26:59 +0000,
-> Kees Cook <keescook@chromium.org> wrote:
->> In an effort to separate intentional arithmetic wrap-around from
->> unexpected wrap-around, we need to refactor places that depend on this
->> kind of math. One of the most common code patterns of this is:
->>
->> 	VAR + value < VAR
->>
->> Notably, this is considered "undefined behavior" for signed and pointer
->> types, which the kernel works around by using the -fno-strict-overflow
->> option in the build[1] (which used to just be -fwrapv). Regardless, we
->> want to get the kernel source to the position where we can meaningfully
->> instrument arithmetic wrap-around conditions and catch them when they
->> are unexpected, regardless of whether they are signed[2], unsigned[3],
->> or pointer[4] types.
->>
->> Refactor open-coded unsigned wrap-around addition test to use
->> check_add_overflow(), retaining the result for later usage (which removes
->> the redundant open-coded addition). This paves the way to enabling the
->> wrap-around sanitizers in the future.
->>
->> Link: https://git.kernel.org/linus/68df3755e383e6fecf2354a67b08f92f18536594 [1]
->> Link: https://github.com/KSPP/linux/issues/26 [2]
->> Link: https://github.com/KSPP/linux/issues/27 [3]
->> Link: https://github.com/KSPP/linux/issues/344 [4]
->> Cc: Marc Zyngier <maz@kernel.org>
->> Cc: Oliver Upton <oliver.upton@linux.dev>
->> Cc: James Morse <james.morse@arm.com>
->> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Cc: Zenghui Yu <yuzenghui@huawei.com>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will@kernel.org>
->> Cc: Reiji Watanabe <reijiw@google.com>
->> Cc: Eric Auger <eric.auger@redhat.com>
->> Cc: Ricardo Koller <ricarkol@google.com>
->> Cc: Raghavendra Rao Ananta <rananta@google.com>
->> Cc: Quentin Perret <qperret@google.com>
->> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
->> Cc: linux-arm-kernel@lists.infradead.org
->> Cc: kvmarm@lists.linux.dev
->> Signed-off-by: Kees Cook <keescook@chromium.org>
->> ---
->>  arch/arm64/kvm/vgic/vgic-kvm-device.c |  6 ++++--
->>  arch/arm64/kvm/vgic/vgic-v2.c         | 10 ++++++----
->>  2 files changed, 10 insertions(+), 6 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
->> index f48b8dab8b3d..0eec5344d203 100644
->> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
->> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
->> @@ -18,17 +18,19 @@ int vgic_check_iorange(struct kvm *kvm, phys_addr_t ioaddr,
->>  		       phys_addr_t addr, phys_addr_t alignment,
->>  		       phys_addr_t size)
->>  {
->> +	phys_addr_t sum;
->> +
->>  	if (!IS_VGIC_ADDR_UNDEF(ioaddr))
->>  		return -EEXIST;
->>  
->>  	if (!IS_ALIGNED(addr, alignment) || !IS_ALIGNED(size, alignment))
->>  		return -EINVAL;
->>  
->> -	if (addr + size < addr)
->> +	if (check_add_overflow(addr, size, &sum))
->>  		return -EINVAL;
->>  
->>  	if (addr & ~kvm_phys_mask(&kvm->arch.mmu) ||
->> -	    (addr + size) > kvm_phys_size(&kvm->arch.mmu))
->> +	    sum > kvm_phys_size(&kvm->arch.mmu))
-> nit: 'sum' doesn't mean much in this context. Something like 'end'
-> would be much more descriptive.
->
->>  		return -E2BIG;
->>  
->>  	return 0;
->> diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
->> index 7e9cdb78f7ce..c8d1e965d3b7 100644
->> --- a/arch/arm64/kvm/vgic/vgic-v2.c
->> +++ b/arch/arm64/kvm/vgic/vgic-v2.c
->> @@ -273,14 +273,16 @@ void vgic_v2_enable(struct kvm_vcpu *vcpu)
->>  /* check for overlapping regions and for regions crossing the end of memory */
->>  static bool vgic_v2_check_base(gpa_t dist_base, gpa_t cpu_base)
->>  {
->> -	if (dist_base + KVM_VGIC_V2_DIST_SIZE < dist_base)
->> +	gpa_t dist_sum, cpu_sum;
-> Same here: dist_end, cpu_end.
-I do agree.
->
->> +
->> +	if (check_add_overflow(dist_base, KVM_VGIC_V2_DIST_SIZE, &dist_sum))
->>  		return false;
->> -	if (cpu_base + KVM_VGIC_V2_CPU_SIZE < cpu_base)
->> +	if (check_add_overflow(cpu_base, KVM_VGIC_V2_CPU_SIZE, &cpu_sum))
->>  		return false;
->>  
->> -	if (dist_base + KVM_VGIC_V2_DIST_SIZE <= cpu_base)
->> +	if (dist_sum <= cpu_base)
->>  		return true;
->> -	if (cpu_base + KVM_VGIC_V2_CPU_SIZE <= dist_base)
->> +	if (cpu_sum <= dist_base)
->>  		return true;
->>  
->>  	return false;
-> With these nits addressed, and assuming you intend to merge the whole
-> series yourself:
->
-> Acked-by: Marc Zyngier <maz@kernel.org>
-assuming above suggested changes,
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Thanks,
+Joey
 
-Eric
->
-> 	M.
->
+> ---
+>  arch/arm64/kvm/emulate-nested.c         | 11 ++++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 81 +++++++++++++++++++------
+>  2 files changed, 72 insertions(+), 20 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 539b3913628d..f64d1809fe79 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -2011,6 +2011,17 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
+>  	if (!tc.val)
+>  		goto local;
+>  
+> +	/*
+> +	 * If a sysreg can be trapped using a FGT, first check whether we
+> +	 * trap for the purpose of forbidding the feature. In that case,
+> +	 * inject an UNDEF.
+> +	 */
+> +	if (tc.fgt != __NO_FGT_GROUP__ &&
+> +	    (vcpu->kvm->arch.fgu[tc.fgt] & BIT(tc.bit))) {
+> +		kvm_inject_undefined(vcpu);
+> +		return true;
+> +	}
+> +
+>  	/*
+>  	 * If we're not nesting, immediately return to the caller, with the
+>  	 * sysreg index, should we have it.
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index a038320cdb08..a09149fd91ed 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -79,14 +79,48 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+>  		clr |= ~hfg & __ ## reg ## _nMASK; 			\
+>  	} while(0)
+>  
+> -#define update_fgt_traps_cs(vcpu, reg, clr, set)			\
+> +#define reg_to_fgt_group_id(reg)					\
+> +	({								\
+> +		enum fgt_group_id id;					\
+> +		switch(reg) {						\
+> +		case HFGRTR_EL2:					\
+> +		case HFGWTR_EL2:					\
+> +			id = HFGxTR_GROUP;				\
+> +			break;						\
+> +		case HFGITR_EL2:					\
+> +			id = HFGITR_GROUP;				\
+> +			break;						\
+> +		case HDFGRTR_EL2:					\
+> +		case HDFGWTR_EL2:					\
+> +			id = HDFGRTR_GROUP;				\
+> +			break;						\
+> +		case HAFGRTR_EL2:					\
+> +			id = HAFGRTR_GROUP;				\
+> +			break;						\
+> +		default:						\
+> +			BUILD_BUG_ON(1);				\
+> +		}							\
+> +									\
+> +		id;							\
+> +	})
+> +
+> +#define compute_undef_clr_set(vcpu, kvm, reg, clr, set)			\
+> +	do {								\
+> +		u64 hfg = kvm->arch.fgu[reg_to_fgt_group_id(reg)];	\
+> +		set |= hfg & __ ## reg ## _MASK;			\
+> +		clr |= hfg & __ ## reg ## _nMASK; 			\
+> +	} while(0)
+> +
+> +#define update_fgt_traps_cs(hctxt, vcpu, kvm, reg, clr, set)		\
+>  	do {								\
+> -		struct kvm_cpu_context *hctxt =				\
+> -			&this_cpu_ptr(&kvm_host_data)->host_ctxt;	\
+>  		u64 c = 0, s = 0;					\
+>  									\
+>  		ctxt_sys_reg(hctxt, reg) = read_sysreg_s(SYS_ ## reg);	\
+> -		compute_clr_set(vcpu, reg, c, s);			\
+> +		if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu))		\
+> +			compute_clr_set(vcpu, reg, c, s);		\
+> +									\
+> +		compute_undef_clr_set(vcpu, kvm, reg, c, s);		\
+> +									\
+>  		s |= set;						\
+>  		c |= clr;						\
+>  		if (c || s) {						\
+> @@ -97,8 +131,8 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+>  		}							\
+>  	} while(0)
+>  
+> -#define update_fgt_traps(vcpu, reg)		\
+> -	update_fgt_traps_cs(vcpu, reg, 0, 0)
+> +#define update_fgt_traps(hctxt, vcpu, kvm, reg)		\
+> +	update_fgt_traps_cs(hctxt, vcpu, kvm, reg, 0, 0)
+>  
+>  /*
+>   * Validate the fine grain trap masks.
+> @@ -122,6 +156,7 @@ static inline bool cpu_has_amu(void)
+>  static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+>  	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0, tmp;
+>  	u64 r_val, w_val;
+>  
+> @@ -157,6 +192,9 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  		compute_clr_set(vcpu, HFGWTR_EL2, w_clr, w_set);
+>  	}
+>  
+> +	compute_undef_clr_set(vcpu, kvm, HFGRTR_EL2, r_clr, r_set);
+> +	compute_undef_clr_set(vcpu, kvm, HFGWTR_EL2, w_clr, w_set);
+> +
+>  	/* The default to trap everything not handled or supported in KVM. */
+>  	tmp = HFGxTR_EL2_nAMAIR2_EL1 | HFGxTR_EL2_nMAIR2_EL1 | HFGxTR_EL2_nS2POR_EL1 |
+>  	      HFGxTR_EL2_nPOR_EL1 | HFGxTR_EL2_nPOR_EL0 | HFGxTR_EL2_nACCDATA_EL1;
+> @@ -172,20 +210,26 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  	write_sysreg_s(r_val, SYS_HFGRTR_EL2);
+>  	write_sysreg_s(w_val, SYS_HFGWTR_EL2);
+>  
+> -	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
+> -		return;
+> -
+> -	update_fgt_traps(vcpu, HFGITR_EL2);
+> -	update_fgt_traps(vcpu, HDFGRTR_EL2);
+> -	update_fgt_traps(vcpu, HDFGWTR_EL2);
+> +	update_fgt_traps(hctxt, vcpu, kvm, HFGITR_EL2);
+> +	update_fgt_traps(hctxt, vcpu, kvm, HDFGRTR_EL2);
+> +	update_fgt_traps(hctxt, vcpu, kvm, HDFGWTR_EL2);
+>  
+>  	if (cpu_has_amu())
+> -		update_fgt_traps(vcpu, HAFGRTR_EL2);
+> +		update_fgt_traps(hctxt, vcpu, kvm, HAFGRTR_EL2);
+>  }
+>  
+> +#define __deactivate_fgt(htcxt, vcpu, kvm, reg)				\
+> +	do {								\
+> +		if ((vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) ||	\
+> +		    kvm->arch.fgu[reg_to_fgt_group_id(reg)])		\
+> +			write_sysreg_s(ctxt_sys_reg(hctxt, reg),	\
+> +				       SYS_ ## reg);			\
+> +	} while(0)
+> +
+>  static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+>  
+>  	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+>  		return;
+> @@ -193,15 +237,12 @@ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  	write_sysreg_s(ctxt_sys_reg(hctxt, HFGRTR_EL2), SYS_HFGRTR_EL2);
+>  	write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
+>  
+> -	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
+> -		return;
+> -
+> -	write_sysreg_s(ctxt_sys_reg(hctxt, HFGITR_EL2), SYS_HFGITR_EL2);
+> -	write_sysreg_s(ctxt_sys_reg(hctxt, HDFGRTR_EL2), SYS_HDFGRTR_EL2);
+> -	write_sysreg_s(ctxt_sys_reg(hctxt, HDFGWTR_EL2), SYS_HDFGWTR_EL2);
+> +	__deactivate_fgt(hctxt, vcpu, kvm, HFGITR_EL2);
+> +	__deactivate_fgt(hctxt, vcpu, kvm, HDFGRTR_EL2);
+> +	__deactivate_fgt(hctxt, vcpu, kvm, HDFGWTR_EL2);
+>  
+>  	if (cpu_has_amu())
+> -		write_sysreg_s(ctxt_sys_reg(hctxt, HAFGRTR_EL2), SYS_HAFGRTR_EL2);
+> +		__deactivate_fgt(hctxt, vcpu, kvm, HAFGRTR_EL2);
+>  }
+>  
+>  static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
 
