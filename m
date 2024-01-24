@@ -1,32 +1,32 @@
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59E71642B
-	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 07:18:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71722168DC
+	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 07:18:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706080728; cv=none; b=i/F9I5wCxkIYC9vUm9Wh0MerkIyzia047UbuUs4N52X9EjOkpSF43Q54lfgVJViAWqp8dZJ/HjfbGm2mJwWMkVovsb5LdhM+wfXljCM1PvlwL8N0nPsz/HcWp1V2C1il7HILta7tmerH6OUEfrIi/9H36lbFJlyb/NeCtHb7GCQ=
+	t=1706080732; cv=none; b=KDhv2wJvKl8MhSMRqllM8K7PRZFzqI1bubWPVG9/YSouqvDSnuV13Ic1SfXLX9wnzgTHWHMnXE1IT4sCX9E5QPq/WVe/FRkZhpv8WaDCjTBVmPU0LmaUlDQ9RoLl95IzmIaUQyW4kvpG+9RCC12TWwiqUPgLXq54sM8goMZ6fU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706080728; c=relaxed/simple;
-	bh=IN4KDvowCe3MO9rkYJNYvtUV5oiLR52aCvOB2p8kqH4=;
+	s=arc-20240116; t=1706080732; c=relaxed/simple;
+	bh=tClk/5R7ESut3VVlAY0rOaj0ZHY+922asJPxpR1EwCk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=mUI5OSsgYqZ+URz598+VHX7KBMQxn/PU1utOq1BtpydzcQtLHuKq5BzU7YrY+fqA2cqmt/nUtEtpS7C7p+8hGVe5SxbzJk5b/4imX6zmjktjmSUHVV1q2U0/zRTNSrF7B6v8iGZgBpQKr5JvNkeJwGWZREn4dDilmgRhbBEYRCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r3qCMNbe; arc=none smtp.client-ip=91.218.175.182
+	 MIME-Version:Content-type; b=XToqA24g5BortMjQyp93my6pyyamGthlOkJe2fgrjkZCXnj5jA/iNo+MNffkHAOsMAFfjKyIT8xbkl47BmrEnKaDP/enwdo6lboknW8resLWWaPcChDJKrV7V58GDy8pffk6h4B9W8g+r3bY6bQU7UIU97QkRcIqQkhzhf8b5cA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MxyvOxko; arc=none smtp.client-ip=95.215.58.186
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r3qCMNbe"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MxyvOxko"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706080725;
+	t=1706080728;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=r/ajjahsx2Nrd2/mL5O1tszPf4Vqor3QjjtEx7SCtlA=;
-	b=r3qCMNbeX8fIkl46iwk53h9zb/5qgrTc4mDj2YhDzj87QhRfn2oLGrWXS4mVDj2hWJ6R5P
-	i4ltH/23vENg9pkD25kcn707aVURKhvRJxxxyWyq8AyuuMGxz03pwd/AHPGh+UUvGkqJvH
-	jJGfUqU12wM4BFdtNGiQQCKbySXNLGU=
+	bh=1IZ39lZ6JzXUAble/1Vh2nVNaYk86ln+rCUbGyDaitw=;
+	b=MxyvOxkoAgFJMyn4GqE8qFI8vdslbKLi6z33vIfaulw8m6ZemnAs5dToO9K0hMVlXDmLDd
+	925+5gdYKDII61RQEEb662FUHRubCmupubajbrtCVHHuali5dZn2LVtbkw+rtPwc4dB551
+	RxxR/lg8DbiSnKi1ES1VtAIa2KeyoRU=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
@@ -38,9 +38,9 @@ Cc: ajones@ventanamicro.com,
 	thuth@redhat.com,
 	alexandru.elisei@arm.com,
 	eric.auger@redhat.com
-Subject: [kvm-unit-tests PATCH 10/24] riscv: Add backtrace support
-Date: Wed, 24 Jan 2024 08:18:26 +0100
-Message-ID: <20240124071815.6898-36-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH 11/24] arm/arm64: Generalize wfe/sev names in smp.c
+Date: Wed, 24 Jan 2024 08:18:27 +0100
+Message-ID: <20240124071815.6898-37-andrew.jones@linux.dev>
 In-Reply-To: <20240124071815.6898-26-andrew.jones@linux.dev>
 References: <20240124071815.6898-26-andrew.jones@linux.dev>
 Precedence: bulk
@@ -53,135 +53,109 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Enable stack unwinding, even when going through an exception, by
-implementing backtrace() and pushing a frame pointer on the stack
-in exception_vectors.
+Most of Arm's on_cpus() implementation can be shared by any
+architecture which has the possible, present, and idle cpumasks,
+like riscv does. Rename the exceptions (wfe/sve) to something
+more generic in order to prepare to share the functions.
 
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- lib/riscv/asm/stack.h |  3 +++
- lib/riscv/stack.c     | 32 ++++++++++++++++++++++++++++++++
- riscv/Makefile        |  1 +
- riscv/cstart.S        | 28 ++++++++++++++++++++++++++--
- 4 files changed, 62 insertions(+), 2 deletions(-)
- create mode 100644 lib/riscv/stack.c
+ lib/arm/asm/smp.h |  4 ++++
+ lib/arm/smp.c     | 16 ++++++++--------
+ 2 files changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/lib/riscv/asm/stack.h b/lib/riscv/asm/stack.h
-index d081d0716d7b..f003ca37c913 100644
---- a/lib/riscv/asm/stack.h
-+++ b/lib/riscv/asm/stack.h
-@@ -6,4 +6,7 @@
- #error Do not directly include <asm/stack.h>. Just use <stack.h>.
- #endif
+diff --git a/lib/arm/asm/smp.h b/lib/arm/asm/smp.h
+index b89a68dd344f..9f6d839ab568 100644
+--- a/lib/arm/asm/smp.h
++++ b/lib/arm/asm/smp.h
+@@ -6,6 +6,7 @@
+  * This work is licensed under the terms of the GNU LGPL, version 2.
+  */
+ #include <cpumask.h>
++#include <asm/barrier.h>
+ #include <asm/thread_info.h>
  
-+#define HAVE_ARCH_BACKTRACE_FRAME
-+#define HAVE_ARCH_BACKTRACE
-+
- #endif
-diff --git a/lib/riscv/stack.c b/lib/riscv/stack.c
-new file mode 100644
-index 000000000000..712a5478d547
---- /dev/null
-+++ b/lib/riscv/stack.c
-@@ -0,0 +1,32 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+#include <libcflat.h>
-+#include <stack.h>
-+
-+int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
-+{
-+	static bool walking;
-+	const unsigned long *fp = (unsigned long *)frame;
-+	int depth;
-+
-+	if (walking) {
-+		printf("RECURSIVE STACK WALK!!!\n");
-+		return 0;
-+	}
-+	walking = true;
-+
-+	for (depth = 0; fp && depth < max_depth; ++depth) {
-+		return_addrs[depth] = (void *)fp[-1];
-+		if (return_addrs[depth] == 0)
-+			break;
-+		fp = (unsigned long *)fp[-2];
-+	}
-+
-+	walking = false;
-+	return depth;
-+}
-+
-+int backtrace(const void **return_addrs, int max_depth)
-+{
-+	return backtrace_frame(__builtin_frame_address(0),
-+			       return_addrs, max_depth);
-+}
-diff --git a/riscv/Makefile b/riscv/Makefile
-index 1243be125c00..4a83f27f7df2 100644
---- a/riscv/Makefile
-+++ b/riscv/Makefile
-@@ -30,6 +30,7 @@ cflatobjs += lib/riscv/processor.o
- cflatobjs += lib/riscv/sbi.o
- cflatobjs += lib/riscv/setup.o
- cflatobjs += lib/riscv/smp.o
-+cflatobjs += lib/riscv/stack.o
- ifeq ($(ARCH),riscv32)
- cflatobjs += lib/ldiv32.o
- endif
-diff --git a/riscv/cstart.S b/riscv/cstart.S
-index ac7858ef398f..9bdf2e3b17dd 100644
---- a/riscv/cstart.S
-+++ b/riscv/cstart.S
-@@ -17,6 +17,22 @@
+ #define smp_processor_id()		(current_thread_info()->cpu)
+@@ -18,6 +19,9 @@ struct secondary_data {
+ };
+ extern struct secondary_data secondary_data;
  
- #define REG_L	__REG_SEL(ld, lw)
- #define REG_S	__REG_SEL(sd, sw)
-+#define SZREG	__REG_SEL(8, 4)
++#define smp_wait_for_event()	wfe()
++#define smp_send_event()	sev()
 +
-+#define FP_SIZE 16
-+
-+.macro push_fp, ra=ra
-+	addi	sp, sp, -FP_SIZE
-+	REG_S	\ra, (FP_SIZE - SZREG)(sp)
-+	REG_S	fp, (FP_SIZE - 2*SZREG)(sp)
-+	addi	fp, sp, FP_SIZE
-+.endm
-+
-+.macro pop_fp
-+	REG_L	ra, (FP_SIZE - SZREG)(sp)
-+	REG_L	fp, (FP_SIZE - 2*SZREG)(sp)
-+	addi	sp, sp, FP_SIZE
-+.endm
+ extern bool cpu0_calls_idle;
  
- .macro zero_range, tmp1, tmp2
- 9998:	beq	\tmp1, \tmp2, 9997f
-@@ -73,6 +89,7 @@ start:
- 	li	a1, -8192
- 	add	a1, sp, a1
- 	zero_range a1, sp
-+	mv	fp, zero			// Ensure fp starts out as zero
+ extern void halt(void);
+diff --git a/lib/arm/smp.c b/lib/arm/smp.c
+index 78fc1656cefa..c00fda2efb03 100644
+--- a/lib/arm/smp.c
++++ b/lib/arm/smp.c
+@@ -45,7 +45,7 @@ secondary_entry_fn secondary_cinit(void)
+ 	 */
+ 	entry = secondary_data.entry;
+ 	set_cpu_online(ti->cpu, true);
+-	sev();
++	smp_send_event();
  
- 	/* set up exception handling */
- 	la	a1, exception_vectors
-@@ -200,9 +217,16 @@ halt:
- .balign 4
- .global exception_vectors
- exception_vectors:
--	REG_S	a0, (-PT_SIZE + PT_ORIG_A0)(sp)
--	addi	a0, sp, -PT_SIZE
-+	REG_S	a0, (-PT_SIZE - FP_SIZE + PT_ORIG_A0)(sp)
-+	addi	a0, sp, -PT_SIZE - FP_SIZE
- 	save_context
-+	/*
-+	 * Set a frame pointer "ra" which points to the last instruction.
-+	 * Add 1 to it, because pretty_print_stacks.py subtracts 1.
-+	 */
-+	REG_L	a1, PT_EPC(a0)
-+	addi	a1, a1, 1
-+	push_fp	a1
- 	mv	sp, a0
- 	call	do_handle_exception
- 	restore_context
+ 	/*
+ 	 * Return to the assembly stub, allowing entry to be called
+@@ -65,7 +65,7 @@ static void __smp_boot_secondary(int cpu, secondary_entry_fn entry)
+ 	assert(ret == 0);
+ 
+ 	while (!cpu_online(cpu))
+-		wfe();
++		smp_wait_for_event();
+ }
+ 
+ void smp_boot_secondary(int cpu, secondary_entry_fn entry)
+@@ -122,7 +122,7 @@ static void cpu_wait(int cpu)
+ 	cpumask_set_cpu(me, &on_cpu_info[cpu].waiters);
+ 	deadlock_check(me, cpu);
+ 	while (!cpu_idle(cpu))
+-		wfe();
++		smp_wait_for_event();
+ 	cpumask_clear_cpu(me, &on_cpu_info[cpu].waiters);
+ }
+ 
+@@ -134,17 +134,17 @@ void do_idle(void)
+ 		cpu0_calls_idle = true;
+ 
+ 	set_cpu_idle(cpu, true);
+-	sev();
++	smp_send_event();
+ 
+ 	for (;;) {
+ 		while (cpu_idle(cpu))
+-			wfe();
++			smp_wait_for_event();
+ 		smp_rmb();
+ 		on_cpu_info[cpu].func(on_cpu_info[cpu].data);
+ 		on_cpu_info[cpu].func = NULL;
+ 		smp_wmb();
+ 		set_cpu_idle(cpu, true);
+-		sev();
++		smp_send_event();
+ 	}
+ }
+ 
+@@ -174,7 +174,7 @@ void on_cpu_async(int cpu, void (*func)(void *data), void *data)
+ 	on_cpu_info[cpu].data = data;
+ 	spin_unlock(&lock);
+ 	set_cpu_idle(cpu, false);
+-	sev();
++	smp_send_event();
+ }
+ 
+ void on_cpu(int cpu, void (*func)(void *data), void *data)
+@@ -201,7 +201,7 @@ void on_cpus(void (*func)(void *data), void *data)
+ 		deadlock_check(me, cpu);
+ 	}
+ 	while (cpumask_weight(&cpu_idle_mask) < nr_cpus - 1)
+-		wfe();
++		smp_wait_for_event();
+ 	for_each_present_cpu(cpu)
+ 		cpumask_clear_cpu(me, &on_cpu_info[cpu].waiters);
+ }
 -- 
 2.43.0
 
