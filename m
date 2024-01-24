@@ -1,184 +1,120 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DD9B7CF18
-	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 17:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B631350CA
+	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 20:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706116584; cv=none; b=ChZCDzKeKxm9+jrnemBjsV9ImcSVaj8XiQ7d9U9vrjjmvgoDqxi8zCydu2uUAfUyU7J3HMrEYg8zvppT7KRtshECDHOwD5PSXxXQFhGpoolWMNSCQew6E9Z0ojqsUYCED8CGOonkkf1vj0LRBTIiH4NP/Fyibt+uKOPrVralBrI=
+	t=1706129370; cv=none; b=P/qFhE121PFuxgQgoFSOYSryR/Sip8JVmtJa0VJEuWFdsmQaIoECZHNqPe1fELi+7pgZ99G0Q+bef4cSKn9izcQvFO41A/A+252o4yDGAoR/iNneuygAESlcxYQKIS78VNX9cDxE2pejhh7Y7mJo5JjzJ32fzr71pP4fEroHmBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706116584; c=relaxed/simple;
-	bh=rCzzbUU4xb5U9AQowstMR5B/WmYSvDbx2sV1q5EZVWw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OOKxT0nWWX1/UMGNwcPM7czdmtEyujwv1g4s/ZjtQh5Uu2Jcdl0M+aCmiaUZGKNLCfhuXx/3HDo20zbqFidkxUVd3gVfmPhbJK1/7q6i9oKKmegtA3Bdp3lqDM6vKY4Y653O+9OHuYPMtWPxnwg9/kSFsOE24TZtYnDzBxO4Je8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 071591FB;
-	Wed, 24 Jan 2024 09:17:07 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DC27D3F762;
-	Wed, 24 Jan 2024 09:16:20 -0800 (PST)
-Date: Wed, 24 Jan 2024 17:16:18 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	s=arc-20240116; t=1706129370; c=relaxed/simple;
+	bh=fYdb0s8j6INILPBCiFKkTHx4drOYk1lE6+c2s0Xm/l4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F+X0O+/LboWpsbkqiZ/kEO603F9O/j33AL52LEjqjKs3fHB2kurAcO4wnISrYuuZ+tMvASBe9T7vOpDqitoR973RLEtzECPnB5sYovvPZdbVQ4AGAQ0SJfytTGVaFVmG+1rRtxod7EJx6OrcHWjZEZH+6lTGy1sKUqMA4SR4UqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=u92Awrwj; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="u92Awrwj"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706129361;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ErrYvq4woSS9wtjygaOskYgEbsL06Iyne8J3rZQvpVo=;
+	b=u92AwrwjVte7I3SC/0wycLo4k7R16daGQf4o0Jm1dFAB9X+KUSR97XcVztqrg4CLnwP8j7
+	t5j3l2vqrt1KdVhdjrVn5e4jAZUD10dJqlzO45chsksJLnN0r492f1YyWepuJZpkmiExhH
+	SzOboi9eFyOAEE4R0gG17Awhw7GPVWg=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 19/25] KVM: arm64: Move existing feature disabling over
- to FGU infrastructure
-Message-ID: <20240124171618.GB1535978@e124191.cambridge.arm.com>
-References: <20240122201852.262057-1-maz@kernel.org>
- <20240122201852.262057-20-maz@kernel.org>
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH 00/15] KVM: arm64: Improvements to GICv3 LPI injection
+Date: Wed, 24 Jan 2024 20:48:54 +0000
+Message-ID: <20240124204909.105952-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240122201852.262057-20-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Greetings,
+The unfortunate reality is there are increasingly large systems that are
+shipping today without support for GICv4 vLPI injection. Serialization
+in KVM's LPI routing/injection code has been a significant bottleneck
+for VMs on these machines when under a high load of LPIs (e.g. a
+multi-queue NIC).
 
-On Mon, Jan 22, 2024 at 08:18:46PM +0000, Marc Zyngier wrote:
-> We already trap a bunch of existing features for the purpose of
-> disabling them (MAIR2, POR, ACCDATA, SME...).
-> 
-> Let's move them over to our brand new FGU infrastructure.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h       |  4 ++++
->  arch/arm64/kvm/arm.c                    |  6 ++++++
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 17 +++--------------
->  arch/arm64/kvm/sys_regs.c               | 23 +++++++++++++++++++++++
->  4 files changed, 36 insertions(+), 14 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 4e0ac507ca01..fe5ed4bcded0 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -297,6 +297,8 @@ struct kvm_arch {
->  #define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		6
->  	/* Initial ID reg values loaded */
->  #define KVM_ARCH_FLAG_ID_REGS_INITIALIZED		7
-> +	/* Fine-Grained UNDEF initialised */
-> +#define KVM_ARCH_FLAG_FGU_INITIALIZED			8
->  	unsigned long flags;
->  
->  	/* VM-wide vCPU feature set */
-> @@ -1112,6 +1114,8 @@ int __init populate_nv_trap_config(void);
->  bool lock_all_vcpus(struct kvm *kvm);
->  void unlock_all_vcpus(struct kvm *kvm);
->  
-> +void kvm_init_sysreg(struct kvm_vcpu *);
-> +
->  /* MMIO helpers */
->  void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
->  unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index c063e84fc72c..9f806c9b7d5d 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -675,6 +675,12 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
->  			return ret;
->  	}
->  
-> +	/*
-> +	 * This needs to happen after NV has imposed its own restrictions on
-> +	 * the feature set
-> +	 */
-> +	kvm_init_sysreg(vcpu);
-> +
->  	ret = kvm_timer_enable(vcpu);
->  	if (ret)
->  		return ret;
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index a09149fd91ed..245f9c1ca666 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -157,7 +157,7 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
->  	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-> -	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0, tmp;
-> +	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0;
->  	u64 r_val, w_val;
->  
->  	CHECK_FGT_MASKS(HFGRTR_EL2);
-> @@ -174,13 +174,6 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
->  	ctxt_sys_reg(hctxt, HFGRTR_EL2) = read_sysreg_s(SYS_HFGRTR_EL2);
->  	ctxt_sys_reg(hctxt, HFGWTR_EL2) = read_sysreg_s(SYS_HFGWTR_EL2);
->  
-> -	if (cpus_have_final_cap(ARM64_SME)) {
-> -		tmp = HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_EL0_MASK;
-> -
-> -		r_clr |= tmp;
-> -		w_clr |= tmp;
-> -	}
-> -
->  	/*
->  	 * Trap guest writes to TCR_EL1 to prevent it from enabling HA or HD.
->  	 */
-> @@ -195,15 +188,11 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
->  	compute_undef_clr_set(vcpu, kvm, HFGRTR_EL2, r_clr, r_set);
->  	compute_undef_clr_set(vcpu, kvm, HFGWTR_EL2, w_clr, w_set);
->  
-> -	/* The default to trap everything not handled or supported in KVM. */
-> -	tmp = HFGxTR_EL2_nAMAIR2_EL1 | HFGxTR_EL2_nMAIR2_EL1 | HFGxTR_EL2_nS2POR_EL1 |
-> -	      HFGxTR_EL2_nPOR_EL1 | HFGxTR_EL2_nPOR_EL0 | HFGxTR_EL2_nACCDATA_EL1;
-> -
-> -	r_val = __HFGRTR_EL2_nMASK & ~tmp;
-> +	r_val = __HFGRTR_EL2_nMASK;
->  	r_val |= r_set;
->  	r_val &= ~r_clr;
->  
-> -	w_val = __HFGWTR_EL2_nMASK & ~tmp;
-> +	w_val = __HFGWTR_EL2_nMASK;
->  	w_val |= w_set;
->  	w_val &= ~w_clr;
->  
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index c48bc2577162..a62efd8a2959 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -3943,6 +3943,29 @@ int kvm_vm_ioctl_get_reg_writable_masks(struct kvm *kvm, struct reg_mask_range *
->  	return 0;
->  }
->  
-> +void kvm_init_sysreg(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +
-> +	mutex_lock(&kvm->arch.config_lock);
-> +
-> +	if (test_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags))
-> +		goto out;
-> +
-> +	kvm->arch.fgu[HFGxTR_GROUP] = (HFGxTR_EL2_nAMAIR2_EL1		|
-> +				       HFGxTR_EL2_nMAIR2_EL1		|
-> +				       HFGxTR_EL2_nS2POR_EL1		|
-> +				       HFGxTR_EL2_nPOR_EL1		|
-> +				       HFGxTR_EL2_nPOR_EL0		|
-> +				       HFGxTR_EL2_nACCDATA_EL1		|
-> +				       HFGxTR_EL2_nSMPRI_EL1_MASK	|
-> +				       HFGxTR_EL2_nTPIDR2_EL0_MASK);
-> +
-> +	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
-> +out:
-> +	mutex_unlock(&kvm->arch.config_lock);
-> +}
-> +
->  int __init kvm_sys_reg_table_init(void)
->  {
->  	struct sys_reg_params params;
+Even though the long-term solution is quite clearly **direct
+injection**, we really ought to do something about the LPI scaling
+issues within KVM.
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+This series aims to improve the performance of LPI routing/injection in
+KVM by moving readers of LPI configuration data away from the
+lpi_list_lock in favor or using RCU.
 
-Thanks,
-Joey
+Patches 1-5 change out the representation of LPIs in KVM from a
+linked-list to an xarray. While not strictly necessary for making the
+locking improvements, this seems to be an opportune time to switch to a
+data structure that can actually be indexed.
+
+Patches 6-10 transition vgic_get_lpi() and vgic_put_lpi() away from
+taking the lpi_list_lock in favor of using RCU for protection. Note that
+this requires some rework to the way references are taken on LPIs and
+how reclaim works to be RCU safe.
+
+Lastly, patches 11-15 rework the LRU policy on the LPI translation cache
+to not require moving elements in the linked-list and take advantage of
+this to make it an rculist readable outside of the lpi_list_lock.
+
+All of this was tested on top of v6.8-rc1. Apologies if any of the
+changelogs are a bit too light, I'm happy to rework those further in
+subsequent revisions.
+
+I would've liked to have benchmark data showing the improvement on top
+of upstream with this series, but I'm currently having issues with our
+internal infrastructure and upstream kernels. However, this series has
+been found to have a near 2x performance improvement to redis-memtier [*]
+benchmarks on our kernel tree.
+
+[*] https://github.com/RedisLabs/memtier_benchmark
+
+Oliver Upton (15):
+  KVM: arm64: vgic: Store LPIs in an xarray
+  KVM: arm64: vgic: Use xarray to find LPI in vgic_get_lpi()
+  KVM: arm64: vgic-v3: Iterate the xarray to find pending LPIs
+  KVM: arm64: vgic-its: Walk the LPI xarray in vgic_copy_lpi_list()
+  KVM: arm64: vgic: Get rid of the LPI linked-list
+  KVM: arm64: vgic: Use atomics to count LPIs
+  KVM: arm64: vgic: Free LPI vgic_irq structs in an RCU-safe manner
+  KVM: arm64: vgic: Rely on RCU protection in vgic_get_lpi()
+  KVM: arm64: vgic: Ensure the irq refcount is nonzero when taking a ref
+  KVM: arm64: vgic: Don't acquire the lpi_list_lock in vgic_put_irq()
+  KVM: arm64: vgic-its: Lazily allocate LPI translation cache
+  KVM: arm64: vgic-its: Pick cache victim based on usage count
+  KVM: arm64: vgic-its: Protect cached vgic_irq pointers with RCU
+  KVM: arm64: vgic-its: Treat the LPI translation cache as an rculist
+  KVM: arm64: vgic-its: Rely on RCU to protect translation cache reads
+
+ arch/arm64/kvm/vgic/vgic-debug.c |   2 +-
+ arch/arm64/kvm/vgic/vgic-init.c  |   7 +-
+ arch/arm64/kvm/vgic/vgic-its.c   | 190 ++++++++++++++++++-------------
+ arch/arm64/kvm/vgic/vgic-v3.c    |   3 +-
+ arch/arm64/kvm/vgic/vgic.c       |  56 +++------
+ arch/arm64/kvm/vgic/vgic.h       |  12 +-
+ include/kvm/arm_vgic.h           |   9 +-
+ 7 files changed, 146 insertions(+), 133 deletions(-)
+
+
+base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
+-- 
+2.43.0.429.g432eaa2c6b-goog
+
