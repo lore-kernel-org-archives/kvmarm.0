@@ -1,146 +1,138 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 146E117BB5
-	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 09:10:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B58317BDD
+	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 09:33:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706087439; cv=none; b=dViKxJ/BakLmhnSzL4DK1P7h/K0AtorPcDZkn7F7YNAIawyUEZEliyUtob4PphTQ7KRr64P2QslCAhOD32FBsn2wZUyxAeluNxOxouUCewjqmbMWYSkTx6MUaAbmX5ji1vuOIWe+4dRtvn1HeNjlchPZuMckHTgh030HigTR5Bc=
+	t=1706088820; cv=none; b=LIJbjDOqXayD9L5KjmAl1DocWWQhfmHMKiXUgho9QTuOrvX8hIZqdJBTF+AsqV1ws43Pm3ncMUixlsKaop04+BDLK+dAHXgxHhSzVKTmJpCnMEyPvhtEMEHTX5Cqt4z+2CILECkH/o1bf6nzfMRNfP+DCfn6HEF9g7L5ZxXZGow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706087439; c=relaxed/simple;
-	bh=VbIlhMmrk27yNKtV56v+KJ/TtRK0LOiHjDYn+JraBwI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=DryksBd2EA9uGuXP3HwOkcv0Onne7Hqd0i5v3hfBLMBu79/9KmjdfJN0sCxSMX9nIPvYuFC61AgxttmzOqU6FQNtMgijZF+JinVWH84gKx59Bzar06dmy5Gbn6q7NkjlZdm5idAcPDfVPWfYcT7EzjUXH4hor3OjD3exjwAvI8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z6yojuwm; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
+	s=arc-20240116; t=1706088820; c=relaxed/simple;
+	bh=Qnwrtb0fDatmqwT2W2BhqFAGuc28hH7YbJ11CtLFqEY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Rokii1P7PoYxsHFU/iECdubcTsR49UIZzn1bqAYZuz0sWCuq1Anmq2xn6jWVgPryknD3iv1CvA0SglMd8dMyqMw3NaMdsK62jRrr1wO86cKoDIN2W9UMLi8pA5xgAs7gulzXPQC1b4RkHUalZDfbg1jFbd716r7tQCQCaxo8ih8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bdgo/Zsp; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z6yojuwm"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-40e8810b5f3so51281855e9.3
-        for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 01:10:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706087436; x=1706692236; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=azYCHPhWGygUAZtVjzOnMMNYpv2pTJPs25+3mFpcg14=;
-        b=z6yojuwmmSmJgBUFabA/tNCY+AZkRJ8PMZjEfWOXqUNRSjdISv4JwZOSu2d30Ef9IK
-         R8kzNozvcKFN/i/sZ7x2IQcr+8hkybGUDF9Ph8d0Ee9nCyavh566XRqoS0GEOAGmK829
-         0NsqLyGc7HyxYghk75rBv3FPscv1YaPQutNJwbxtr+bOw7/eGU2oYAWhdeimtTXCiti2
-         xJPG23fJkaxIEmzn1/qVTJqIBkD0GQSw0BNZEv0AkX+9zqK8m/wrSD7nne1TWiGTgB4Q
-         3XLYXPNfZCmg25e+ngKTdeeyOxa56j53YzqSA4o0maEWlPBwCcNldfgIMlDJNqUEjA5W
-         RWzA==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bdgo/Zsp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706088817;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=90uTwTzY8agF7ocmQ+dD+FDMx0poHKPSgJQURYtfO9I=;
+	b=bdgo/Zspv+AftiLpZmacueql6mP1k6nkPhFv/aDzIGMxgtS2t3AhrgLoDGVbaK0ZSbBrc1
+	Sot1QsgEA3LbDAU6FjV4ppUbQry38pqHXZj9X8SJbHaF/Io9XuZLdvh0THRabmKoJ+KWlo
+	viMcqen9OjZcFT+1S6ssb0ib3CgenfA=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-189-IJD54jYOPkan_iqcYp1XIg-1; Wed, 24 Jan 2024 04:33:36 -0500
+X-MC-Unique: IJD54jYOPkan_iqcYp1XIg-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7816bea8d28so1159862285a.0
+        for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 01:33:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706087436; x=1706692236;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=azYCHPhWGygUAZtVjzOnMMNYpv2pTJPs25+3mFpcg14=;
-        b=PArgp8cczQk6TkWT2VJTuLPVf7Iy1lNAUOkCybhOkggNgWaiZcR9/7qAygc//O2P3V
-         0g5mclayuyVeD2keNuArSQW6LWfOtgL8RtL8Yt7oPwtIycuIySAttEDRP7kiF8+cE0pZ
-         oWf3WkvAGhbOkAIpvh/7IliWIXJG5ifopAhIs/2JRPzhSvN2TtB8Db1p2P0NlLarCfl0
-         xjyUs9uBnoKOFwm4o0U8t/qy56QgMIbz0wC28ztku62/nuLjNq5JSoZ6i5YTrsMFXlU8
-         JB+b68Qxi4NkHfbid4n39TBmOYhbDQbPSuBDqquOUsaxagLQzR9bPDYq8Kx/+bJe0Fe9
-         RIEg==
-X-Gm-Message-State: AOJu0Ywd5r7BloXHf2gsOqofnJxEgEAzM0LErks/Jfjz4PAnU3coTgyc
-	QMeZq4ibZHF9UXorxs3Jl9wBwbsZ9cPAjQE4HHbM3zIaxUygTUcsDwCNDbZNN2J0HSFA8Tx/vcF
-	m0IgH9LOQ0p44YfaS4onU22u0Gg==
-X-Google-Smtp-Source: AGHT+IHQu8PSyX8X6hBs0OxdOvH6yTQqd8GMOA0f4B5GP1tHJaIbkkEvv2xekuxmDaroKhS0ZGfjPA1hyZX71dbNPJg=
-X-Received: from sebkvm.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:cd5])
- (user=sebastianene job=sendgmr) by 2002:a05:600c:518e:b0:40e:c602:e37d with
- SMTP id fa14-20020a05600c518e00b0040ec602e37dmr8947wmb.0.1706087436115; Wed,
- 24 Jan 2024 01:10:36 -0800 (PST)
-Date: Wed, 24 Jan 2024 09:10:28 +0000
+        d=1e100.net; s=20230601; t=1706088816; x=1706693616;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=90uTwTzY8agF7ocmQ+dD+FDMx0poHKPSgJQURYtfO9I=;
+        b=LnQxdDLRMFgWDkm9dyfOMa338apx3+xWHDLUIluDbA0KBwZPznTlsGS/xFGpcz6whs
+         wkDvBwvt1aLEs8PKBjpe2Ygjna+OSyhmoxgH129knNjZOp9OrAelVLZxeWo0gNfFYSr0
+         nLHVAGTdPvfiHTlZejN8recXp8WO35MKb7H9hv/QJ126k55FDKd62hM828XfXG5yoACk
+         4AJDI1oCX3mq93NM8bJuWejnRkAoGDtjuZ/gfmBoJORdG0XJjLBHRltHgbV8YouszsOJ
+         SPZ+sP/BMtt+cPSB+dcNGTugF+jA729EN4ZFfpIxGE0l4qQZlx1cXfaSTkW6C+p44HFt
+         8VGQ==
+X-Gm-Message-State: AOJu0YzE5CThKU1LAhxl4q+h6r47LUNszvlf3LqsrMOb8zOiFHyuy2tq
+	dSbZL40O6IdPJXrS77Fi+F2O1ZKA354nZIosI38bBQr0k0lWYvxc7r+ml7HjUjng2KAm1RTTh1Z
+	5i58hK6unky8nALhyb9em40q2lafjFoqntxVgvp1wMuU1JvC1ah9SPw==
+X-Received: by 2002:a05:620a:3950:b0:783:1b28:d9d5 with SMTP id qs16-20020a05620a395000b007831b28d9d5mr1607405qkn.73.1706088815906;
+        Wed, 24 Jan 2024 01:33:35 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFKUjlEgLJMjchSeGQ/sZ5XArTp937YINJB5P2/e3uGNpuvrJdmLpRMXW5sVYo3BKGixZl71g==
+X-Received: by 2002:a05:620a:3950:b0:783:1b28:d9d5 with SMTP id qs16-20020a05620a395000b007831b28d9d5mr1607389qkn.73.1706088815681;
+        Wed, 24 Jan 2024 01:33:35 -0800 (PST)
+Received: from [192.168.0.9] (ip-109-43-177-121.web.vodafone.de. [109.43.177.121])
+        by smtp.gmail.com with ESMTPSA id bn22-20020a05620a2ad600b007832b17f3eesm3897125qkb.41.2024.01.24.01.33.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Jan 2024 01:33:35 -0800 (PST)
+Message-ID: <206d5e08-b056-4baa-9e87-37812702ece6@redhat.com>
+Date: Wed, 24 Jan 2024 10:33:30 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-Message-ID: <20240124091027.1477174-2-sebastianene@google.com>
-Subject: [PATCH v2] KVM: arm64: Fix circular locking dependency
-From: Sebastian Ene <sebastianene@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kernel-team@android.com, 
-	Sebastian Ene <sebastianene@google.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH 01/24] configure: Add ARCH_LIBDIR
+To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev
+Cc: ajones@ventanamicro.com, anup@brainfault.org, atishp@atishpatra.org,
+ pbonzini@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com
+References: <20240124071815.6898-26-andrew.jones@linux.dev>
+ <20240124071815.6898-27-andrew.jones@linux.dev>
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20240124071815.6898-27-andrew.jones@linux.dev>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The rule inside kvm enforces that the vcpu->mutex is taken *inside*
-kvm->lock. The rule is violated by the pkvm_create_hyp_vm() which acquires
-the kvm->lock while already holding the vcpu->mutex lock from
-kvm_vcpu_ioctl(). Avoid the circular locking dependency altogether by
-protecting the hyp vm handle with the config_lock, much like we already
-do for other forms of VM-scoped data.
+On 24/01/2024 08.18, Andrew Jones wrote:
+> Prepare for an architecture which will share the same lib/$ARCH
+> directory, but be configured with different arch names for different
+> bit widths, i.e. riscv32 -> lib/riscv and riscv64 -> lib/riscv.
+> 
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> ---
+>   Makefile  | 2 +-
+>   configure | 2 ++
+>   2 files changed, 3 insertions(+), 1 deletion(-)
 
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
-Cc: stable@vger.kernel.org
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kvm/pkvm.c | 27 +++++++++++++++++----------
- 1 file changed, 17 insertions(+), 10 deletions(-)
-
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 8350fb8fee0b..b7be96a53597 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -101,6 +101,17 @@ void __init kvm_hyp_reserve(void)
- 		 hyp_mem_base);
- }
- 
-+static void __pkvm_destroy_hyp_vm(struct kvm *host_kvm)
-+{
-+	if (host_kvm->arch.pkvm.handle) {
-+		WARN_ON(kvm_call_hyp_nvhe(__pkvm_teardown_vm,
-+					  host_kvm->arch.pkvm.handle));
-+	}
-+
-+	host_kvm->arch.pkvm.handle = 0;
-+	free_hyp_memcache(&host_kvm->arch.pkvm.teardown_mc);
-+}
-+
- /*
-  * Allocates and donates memory for hypervisor VM structs at EL2.
-  *
-@@ -181,7 +192,7 @@ static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
- 	return 0;
- 
- destroy_vm:
--	pkvm_destroy_hyp_vm(host_kvm);
-+	__pkvm_destroy_hyp_vm(host_kvm);
- 	return ret;
- free_vm:
- 	free_pages_exact(hyp_vm, hyp_vm_sz);
-@@ -194,23 +205,19 @@ int pkvm_create_hyp_vm(struct kvm *host_kvm)
- {
- 	int ret = 0;
- 
--	mutex_lock(&host_kvm->lock);
-+	mutex_lock(&host_kvm->arch.config_lock);
- 	if (!host_kvm->arch.pkvm.handle)
- 		ret = __pkvm_create_hyp_vm(host_kvm);
--	mutex_unlock(&host_kvm->lock);
-+	mutex_unlock(&host_kvm->arch.config_lock);
- 
- 	return ret;
- }
- 
- void pkvm_destroy_hyp_vm(struct kvm *host_kvm)
- {
--	if (host_kvm->arch.pkvm.handle) {
--		WARN_ON(kvm_call_hyp_nvhe(__pkvm_teardown_vm,
--					  host_kvm->arch.pkvm.handle));
--	}
--
--	host_kvm->arch.pkvm.handle = 0;
--	free_hyp_memcache(&host_kvm->arch.pkvm.teardown_mc);
-+	mutex_lock(&host_kvm->arch.config_lock);
-+	__pkvm_destroy_hyp_vm(host_kvm);
-+	mutex_unlock(&host_kvm->arch.config_lock);
- }
- 
- int pkvm_init_host_vm(struct kvm *host_kvm)
--- 
-2.43.0.429.g432eaa2c6b-goog
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
