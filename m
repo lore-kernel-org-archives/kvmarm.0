@@ -1,85 +1,94 @@
-Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC83317C64
-	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 07:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 261EC179B7
+	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 08:45:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706080762; cv=none; b=TSnJIjkVOGUGsauFtDJ2eKQavCuEQ7btAb147yQ+vSghMqcyOm9l89nTbNx99KlArnHmEJ7KGUNepcsM3aRo8VK6hH1RN8Gl1MkQy+B0H3GxngQGLyV0fh8WuNlS5YzAEa4GdXwdXb3hNVV+V6FLk7E0JyzizDt8jKeIKXHG9JM=
+	t=1706085930; cv=none; b=uMMvc1jDV8uhlducCDkPRKx4dwQvytGLqupuh05OJIkgjX/ziE4rEwsgtQ7CeOfK7mQxB3frl2oDOzqkaUb8Z1wBFZsIeBfrrVLnApcfT+5fFzM0GZFokPRg7Y1NFnfvNISUfFMppBGGPVaqGx2DtRBdl7h/JMk77+f+tMnNsQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706080762; c=relaxed/simple;
-	bh=LTHRcOyFFc/POoPgDVsamww5oZXpgWr8D7yWNJAuL38=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=EQZo6t6yBDg7qvPUVnnFa+UqwJHsv3JxDbk+rWUcXGETid07mx2OdOCeW8yqU1Djaerj4luat5ZJUv1YNAbm5Ha68WNFhXIJtvXXsPymICJKH+bmqoshElijZHBGizmjKUoEOliTmtG4Bm5ru1zGLzLrXQtAAzrPYPA87SBEEpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fc3Dk11F; arc=none smtp.client-ip=91.218.175.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1706085930; c=relaxed/simple;
+	bh=/nsD3d+E0lLEEpr6zHa2aA4SWpngDZwV5I8Z0fUog+c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jHPXsYtq9LBNMmKrHmb1iRdMTho+K/k5Nqo1VGmOdtuGDXeH87otgbfXIN+XcWgShGk0DF/pzMkOCnpaAlq5VsPHmnKI1ooJ667OHuEqCxVj7687C9OS2r+nYeunWYAxcsm+NzjTrEAAvnC1RaR3BffA5y77e7eul87hYTgy69U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Nzo1kG4/; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fc3Dk11F"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706080759;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4NF/KYhfN5NlP2yR4ZiBemy8uaGL5WfIBOw+Or+8VUU=;
-	b=fc3Dk11FiAsQtBayb5XqPVAN46rzUUeFe7csAl0QgdFnEmobhWi+6d5bNOhjD/XH/NJuHJ
-	we+mrGLlK8mbmln1RmEpsUkbh/NWh5D/r3ax5KqRlHiNQKQ43MQKyH/u5FJR/XOi90L2H9
-	DZX3V7MQcvBU/UcqWY2hUEwikmu0Ejk=
-From: Andrew Jones <andrew.jones@linux.dev>
-To: kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: ajones@ventanamicro.com,
-	anup@brainfault.org,
-	atishp@atishpatra.org,
-	pbonzini@redhat.com,
-	thuth@redhat.com,
-	alexandru.elisei@arm.com,
-	eric.auger@redhat.com
-Subject: [kvm-unit-tests PATCH 24/24] MAINTAINERS: Add riscv
-Date: Wed, 24 Jan 2024 08:18:40 +0100
-Message-ID: <20240124071815.6898-50-andrew.jones@linux.dev>
-In-Reply-To: <20240124071815.6898-26-andrew.jones@linux.dev>
-References: <20240124071815.6898-26-andrew.jones@linux.dev>
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Nzo1kG4/"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=5lEen0G4yFCsLlAF+wT6cjA+TZeTYFwLA6f1OlJb35c=; b=Nzo1kG4/6uJi4JkVCN2GnsVPSP
+	MSCm4FbOrhPHehb1KUJVrH1BJ3z9cxxbnwCC0zxjG3bD8+skV/uIfdTD6Xjbum3MAfAlH46N/Wp+6
+	L7YV4CDoxK1vWQMcHAQgVJyJHoNDrjkuxOIry+Y5WoNfp7WvmbHn0uuneIMiaw3MbPLQllmBXaukX
+	TYMxIFTn6SoI9/QX7eY4T0qhBicf+VgU4zXx/IN3Fy2G80u7atBOa9GDJ5r57T/AsDstwl/th3j5P
+	hRfBkIRpb/e4q3+Na04s1TcgWKeqoYLVLCnejFkjHgtXQ41c1OGcmGHfEku7EHHcuxCj7+We0ZUXO
+	+zL7lf9w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41124)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rSYsi-0003f3-2f;
+	Wed, 24 Jan 2024 08:45:13 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rSYse-0002ld-Qu; Wed, 24 Jan 2024 08:45:08 +0000
+Date: Wed, 24 Jan 2024 08:45:08 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, acpica-devel@lists.linuxfoundation.org,
+	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com,
+	James Morse <james.morse@arm.com>
+Subject: Re: [PATCH RFC v3 05/21] ACPI: Rename ACPI_HOTPLUG_CPU to include
+ 'present'
+Message-ID: <ZbDOFJeRjdaXtVJu@shell.armlinux.org.uk>
+References: <CAJZ5v0gwe02uzAQoX0QDHo35OTEozpbnqC6vukjM3aE6HMq9WQ@mail.gmail.com>
+ <ZbADTBLDEFtdglho@shell.armlinux.org.uk>
+ <CAJZ5v0jh-EdrnjkJep++UDo+Uv4hmR7VV4KYVdF4CK2K+5XLtg@mail.gmail.com>
+ <ZbAMjZoybVfiAGcT@shell.armlinux.org.uk>
+ <CAJZ5v0gt=MR1JGsPZnZG_AqudA-KMmb4BOa_A6H9B6+Rhe_+JQ@mail.gmail.com>
+ <ZbAdAdqqfXRuY3Xj@shell.armlinux.org.uk>
+ <CAJZ5v0gsqbeJc4qX-AefOqu53=rDme2XzFXacWz_0zbVBoaXjw@mail.gmail.com>
+ <ZbAoJO8f66Dg0lGF@shell.armlinux.org.uk>
+ <ZbArzbC19L1YxLHi@shell.armlinux.org.uk>
+ <CAJZ5v0jvek=W-FNhiY_0DQha2wDCUv7YW_4jaHUeX0DbYJOX6Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJZ5v0jvek=W-FNhiY_0DQha2wDCUv7YW_4jaHUeX0DbYJOX6Q@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Most of the support for riscv is now in place. Let's make it official
-and start adding tests!
+On Tue, Jan 23, 2024 at 11:05:43PM +0100, Rafael J. Wysocki wrote:
+> > So why not state that you personally don't want it in the first
+> > place? Why this game of cat and mouse and the constantly changing
+> > arguments. I guess it's to waste developers time.
+> >
+> > Well, I'm calling you out for this, because I'm that pissed off
+> > at the amount of time you're causing to be wasted.
+> 
+> And I don't have to suffer this kind of abuse.  Sorry.
 
-Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
----
- MAINTAINERS | 8 ++++++++
- 1 file changed, 8 insertions(+)
+And I've had enough of this crap, so I'm not walking away. Good
+riddance.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 958735fbfd79..a2fa437da5c9 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -94,6 +94,14 @@ F: powerpc/
- F: lib/powerpc/
- F: lib/ppc64/
- 
-+RISCV
-+M: Andrew Jones <andrew.jones@linux.dev>
-+S: Supported
-+L: kvm-riscv@lists.infradead.org
-+F: riscv/
-+F: lib/riscv/
-+T: https://gitlab.com/jones-drew/kvm-unit-tests.git
-+
- S390X
- M: Janosch Frank <frankja@linux.ibm.com>
- M: Claudio Imbrenda <imbrenda@linux.ibm.com>
 -- 
-2.43.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
