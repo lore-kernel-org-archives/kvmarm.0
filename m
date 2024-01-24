@@ -1,209 +1,275 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B7777652
-	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 16:37:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792BD7E76E
+	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 16:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706114247; cv=none; b=o1OqLcBa9SUmbgTW7H2g/D4uvPygCYYjqN1RrraiQanxlktYqRDcso6T/ewkDbU3P6aZi/SCaJQqbyW8ky4jerbdQHuIYpLm02HZPNgl7ccPa1E8/iT5xp9+zUeFWNFgKO3ewrlRAIAhsBBlBwQNDaaQuS9hNPvwtHLmIQL6Cdg=
+	t=1706114897; cv=none; b=qtrxQNFmzUsvtvtjCScIn4JbTgeO7nLmaG/XMRDlG8iHk97MWiPyTKuvjLosu7g7NJqXOCsNXobg0foVEGOP2JL7eWOHbTHdEqAPGAqaNP5lMZEdr78LuNxcTKhfuOMyrLd264ho45mAego1k6Q+gyINjcvg5oa211gsOoiElyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706114247; c=relaxed/simple;
-	bh=EGze84r6gDmuMCfkhYzIK84AhSJ3vy8tSde0Y83n8zo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PsQw6rYfeSypPFvSolifC6+I3g7WY6BhhYAebYeNQPR6WzNi/ecZdOd3f6nPKQvSRdzXo9qJ22o8N1EP4So5Ii5e8LGVkOXfikI26P3LG9HpJ6kOWHIV9mC1d3GiIu9KOdxrIU3+yXIYPmnmPWr8oOj/9ne1J01uIqy+NSASX9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X9QotWp6; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X9QotWp6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB8E9C433C7;
-	Wed, 24 Jan 2024 16:37:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706114246;
-	bh=EGze84r6gDmuMCfkhYzIK84AhSJ3vy8tSde0Y83n8zo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=X9QotWp65ZyiIKNBqSd+y615MIL6iA8thmLEL6/lJM70JBjufhwyOJFP5JKApFwLW
-	 gMiifPLRx4OQdKKW6cHoSpxDVJweiw2l9Bm9GeVnuQXQpXdTTZXouBEzEExcf1e8o/
-	 Ag3FIiC78g+iOQCrtsK0WGabGBzDAVHg1gGJkFLYZzYYgTDAwH1ertQAJn+6k8MLxb
-	 pv1zy/ZtiL9HhlOSpcY2GEYHj/SjCOQf+c0kR0ASda3lzSP14btbtGCz9W0xP8B1s7
-	 KzU7J5k5dzFURw1DxzpeyRtUPXltM1W+5VevPkwl/Uu38tQsUPJBh8mh5Jx9iwFpvp
-	 msBfUlyktSpSQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rSgFg-00EO3o-6L;
-	Wed, 24 Jan 2024 16:37:24 +0000
-Date: Wed, 24 Jan 2024 16:37:23 +0000
-Message-ID: <86a5ou8z7g.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
+	s=arc-20240116; t=1706114897; c=relaxed/simple;
+	bh=cSJtwZOZ13W7i/rzqRV5EIL7GLTfm/3+dOu0Gg7NPkA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bedWk+tIm7ZmwiWun7A9BY9SMAPD272XrvEgAIa3HYH7QXP4WtYuOwMgNLWBiy/UmSHyriVvez2O8KsQ/tHrzaj1H1Bo8l01JN4IgRh250oSiejQkhvNLn7CzcTducBNuaj6ZuF/vT4g/FE+00dPyrZJ+HRiMKAOV2rs8Zj7uvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8F2541FB;
+	Wed, 24 Jan 2024 08:48:58 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 79DD73F762;
+	Wed, 24 Jan 2024 08:48:12 -0800 (PST)
+Date: Wed, 24 Jan 2024 16:48:10 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 14/25] KVM: arm64: Register AArch64 system register entries with the sysreg xarray
-In-Reply-To: <20240124163425.GJ1283334@e124191.cambridge.arm.com>
+	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 15/25] KVM: arm64: Use the xarray as the primary
+ sysreg/sysinsn walker
+Message-ID: <20240124164810.GK1283334@e124191.cambridge.arm.com>
 References: <20240122201852.262057-1-maz@kernel.org>
-	<20240122201852.262057-15-maz@kernel.org>
-	<20240124163425.GJ1283334@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240122201852.262057-16-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240122201852.262057-16-maz@kernel.org>
 
-On Wed, 24 Jan 2024 16:34:25 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
+On Mon, Jan 22, 2024 at 08:18:42PM +0000, Marc Zyngier wrote:
+> Since we always start sysreg/sysinsn handling by searching the
+> xarray, use it as the source of the index in the correct sys_reg_desc
+> array.
 > 
-> On Mon, Jan 22, 2024 at 08:18:41PM +0000, Marc Zyngier wrote:
-> > In order to reduce the number of lookups that we have to perform
-> > when handling a sysreg, register each AArch64 sysreg descriptor
-> > with the global xarray. The index of the descriptor is stored
-> > as a 10 bit field in the data word.
-> > 
-> > Subsequent patches will retrieve and use the stored index.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h |  3 +++
-> >  arch/arm64/kvm/emulate-nested.c   | 39 +++++++++++++++++++++++++++++--
-> >  arch/arm64/kvm/sys_regs.c         | 11 ++++++++-
-> >  3 files changed, 50 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index fe35c59214ad..e7a6219f2929 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -1083,6 +1083,9 @@ int kvm_handle_cp10_id(struct kvm_vcpu *vcpu);
-> >  void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
-> >  
-> >  int __init kvm_sys_reg_table_init(void);
-> > +struct sys_reg_desc;
-> > +int __init populate_sysreg_config(const struct sys_reg_desc *sr,
-> > +				  unsigned int idx);
-> >  int __init populate_nv_trap_config(void);
-> >  
-> >  bool lock_all_vcpus(struct kvm *kvm);
-> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> > index 59622636b723..342d43b66fda 100644
-> > --- a/arch/arm64/kvm/emulate-nested.c
-> > +++ b/arch/arm64/kvm/emulate-nested.c
-> > @@ -427,12 +427,14 @@ static const complex_condition_check ccc[] = {
-> >   * [19:14]	bit number in the FGT register (6 bits)
-> >   * [20]		trap polarity (1 bit)
-> >   * [25:21]	FG filter (5 bits)
-> > - * [62:26]	Unused (37 bits)
-> > + * [35:26]	Main SysReg table index (10 bits)
-> > + * [62:36]	Unused (27 bits)
-> >   * [63]		RES0 - Must be zero, as lost on insertion in the xarray
-> >   */
-> >  #define TC_CGT_BITS	10
-> >  #define TC_FGT_BITS	4
-> >  #define TC_FGF_BITS	5
-> > +#define TC_MSR_BITS	10
-> >  
-> >  union trap_config {
-> >  	u64	val;
-> > @@ -442,7 +444,8 @@ union trap_config {
-> >  		unsigned long	bit:6;		 /* Bit number */
-> >  		unsigned long	pol:1;		 /* Polarity */
-> >  		unsigned long	fgf:TC_FGF_BITS; /* Fine Grained Filter */
-> > -		unsigned long	unused:37;	 /* Unused, should be zero */
-> > +		unsigned long	msr:TC_MSR_BITS; /* Main SysReg index */
-> > +		unsigned long	unused:27;	 /* Unused, should be zero */
-> >  		unsigned long	mbz:1;		 /* Must Be Zero */
-> >  	};
-> >  };
-> > @@ -1862,6 +1865,38 @@ int __init populate_nv_trap_config(void)
-> >  	return ret;
-> >  }
-> >  
-> > +int __init populate_sysreg_config(const struct sys_reg_desc *sr,
-> > +				  unsigned int idx)
-> > +{
-> > +	union trap_config tc;
-> > +	u32 encoding;
-> > +	void *ret;
-> > +
-> > +	/*
-> > +	 * 0 is a valid value for the index, but not for the storage.
-> > +	 * We'll store (idx+1), so check against an offset'd limit.
-> > +	 */
-> > +	if (idx >= (BIT(TC_MSR_BITS) - 1)) {
-> > +		kvm_err("sysreg %s (%d) out of range\n", sr->name, idx);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	encoding = sys_reg(sr->Op0, sr->Op1, sr->CRn, sr->CRm, sr->Op2);
-> > +	tc = get_trap_config(encoding);
-> > +
-> > +	if (tc.msr) {
-> > +		kvm_err("sysreg %s (%d) duplicate entry (%d)\n",
-> > +			sr->name, idx - 1, tc.msr);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	tc.msr = idx + 1;
-> > +	ret = xa_store(&sr_forward_xa, encoding,
-> > +		       xa_mk_value(tc.val), GFP_KERNEL);
-> > +
-> > +	return xa_err(ret);
-> > +}
-> > +
-> >  static enum trap_behaviour get_behaviour(struct kvm_vcpu *vcpu,
-> >  					 const struct trap_bits *tb)
-> >  {
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 77cd818c23b0..65319193e443 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -3974,6 +3974,7 @@ int __init kvm_sys_reg_table_init(void)
-> >  	struct sys_reg_params params;
-> >  	bool valid = true;
-> >  	unsigned int i;
-> > +	int ret = 0;
-> >  
-> >  	/* Make sure tables are unique and in order. */
-> >  	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false);
-> > @@ -3997,5 +3998,13 @@ int __init kvm_sys_reg_table_init(void)
-> >  	if (!first_idreg)
-> >  		return -EINVAL;
-> >  
-> > -	return populate_nv_trap_config();
-> > +	ret = populate_nv_trap_config();
-> > +
-> > +	for (i = 0; !ret && i < ARRAY_SIZE(sys_reg_descs); i++)
-> > +		ret = populate_sysreg_config(sys_reg_descs + i, i);
-> > +
-> > +	for (i = 0; !ret && i < ARRAY_SIZE(sys_insn_descs); i++)
-> > +		ret = populate_sysreg_config(sys_insn_descs + i, i);
-> > +
-> > +	return ret;
-> >  }
+> This allows some cleanup, such as moving the handling of unknown
+> sysregs in a single location.
 > 
-> The choice of `msr` was a tiny bit confusing due to the conflict with the asm
-> instruction `msr`, but not enough to warrant renaming.
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_nested.h |  2 +-
+>  arch/arm64/kvm/emulate-nested.c     | 36 +++++++++++-----
+>  arch/arm64/kvm/sys_regs.c           | 64 +++++++++--------------------
+>  3 files changed, 46 insertions(+), 56 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 4882905357f4..68465f87d308 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -60,7 +60,7 @@ static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
+>  	return ttbr0 & ~GENMASK_ULL(63, 48);
+>  }
+>  
+> -extern bool __check_nv_sr_forward(struct kvm_vcpu *vcpu);
+> +extern bool __check_nv_sr_forward(struct kvm_vcpu *vcpu, int *sr_idx);
+>  
+>  int kvm_init_nv_sysregs(struct kvm *kvm);
+>  
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 342d43b66fda..54ab4d240fc6 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -2001,7 +2001,7 @@ static bool check_fgt_bit(struct kvm *kvm, bool is_read,
+>  	return !(kvm_get_sysreg_res0(kvm, sr) & BIT(tc.bit));
+>  }
+>  
+> -bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+> +bool __check_nv_sr_forward(struct kvm_vcpu *vcpu, int *sr_index)
+>  {
+>  	union trap_config tc;
+>  	enum trap_behaviour b;
+> @@ -2009,9 +2009,6 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+>  	u32 sysreg;
+>  	u64 esr, val;
+>  
+> -	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
+> -		return false;
+> -
+>  	esr = kvm_vcpu_get_esr(vcpu);
+>  	sysreg = esr_sys64_to_sysreg(esr);
+>  	is_read = (esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_READ;
+> @@ -2022,13 +2019,16 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+>  	 * A value of 0 for the whole entry means that we know nothing
+>  	 * for this sysreg, and that it cannot be re-injected into the
+>  	 * nested hypervisor. In this situation, let's cut it short.
+> -	 *
+> -	 * Note that ultimately, we could also make use of the xarray
+> -	 * to store the index of the sysreg in the local descriptor
+> -	 * array, avoiding another search... Hint, hint...
+>  	 */
+>  	if (!tc.val)
+> -		return false;
+> +		goto local;
+> +
+> +	/*
+> +	 * If we're not nesting, immediately return to the caller, with the
+> +	 * sysreg index, should we have it.
+> +	 */
+> +	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
+> +		goto local;
+>  
+>  	switch ((enum fgt_group_id)tc.fgt) {
+>  	case __NO_FGT_GROUP__:
+> @@ -2070,7 +2070,7 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+>  	case __NR_FGT_GROUP_IDS__:
+>  		/* Something is really wrong, bail out */
+>  		WARN_ONCE(1, "__NR_FGT_GROUP_IDS__");
+> -		return false;
+> +		goto local;
+>  	}
+>  
+>  	if (tc.fgt != __NO_FGT_GROUP__ && check_fgt_bit(vcpu->kvm, is_read,
+> @@ -2083,6 +2083,22 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+>  	    ((b & BEHAVE_FORWARD_WRITE) && !is_read))
+>  		goto inject;
+>  
+> +local:
+> +	if (!tc.msr) {
+> +		struct sys_reg_params params;
+> +
+> +		params = esr_sys64_to_params(esr);
+> +
+> +		// IMPDEF range. See ARM DDI 0487E.a, section D12.3.2
 
-No, that's actually a very good point. How about SRI (Sys Reg Index)?
+I know you're just moving this code, but can we update the reference? It's
+DDI0487 J.a, D18.3.2 Reserved encodings for IMPLEMENTATION DEFINED registers
+now. Feel free to drop the title of the section if it looks too long!
 
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+> +		if (!(params.Op0 == 3 && (params.CRn & 0b1011) == 0b1011))
+> +			print_sys_reg_msg(&params,
+> +					  "Unsupported guest access at: %lx\n",
+> +					  *vcpu_pc(vcpu));
+> +		kvm_inject_undefined(vcpu);
+> +		return true;
+> +	}
+> +
+> +	*sr_index = tc.msr - 1;
+>  	return false;
+>  
+>  inject:
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 65319193e443..794d1f8c9bfe 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -3397,12 +3397,6 @@ int kvm_handle_cp14_32(struct kvm_vcpu *vcpu)
+>  	return kvm_handle_cp_32(vcpu, &params, cp14_regs, ARRAY_SIZE(cp14_regs));
+>  }
+>  
+> -static bool is_imp_def_sys_reg(struct sys_reg_params *params)
+> -{
+> -	// See ARM DDI 0487E.a, section D12.3.2
+> -	return params->Op0 == 3 && (params->CRn & 0b1011) == 0b1011;
+> -}
+> -
+>  /**
+>   * emulate_sys_reg - Emulate a guest access to an AArch64 system register
+>   * @vcpu: The VCPU pointer
+> @@ -3411,44 +3405,22 @@ static bool is_imp_def_sys_reg(struct sys_reg_params *params)
+>   * Return: true if the system register access was successful, false otherwise.
+>   */
+>  static bool emulate_sys_reg(struct kvm_vcpu *vcpu,
+> -			   struct sys_reg_params *params)
+> +			    struct sys_reg_params *params)
+>  {
+>  	const struct sys_reg_desc *r;
+>  
+>  	r = find_reg(params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
+> -
+>  	if (likely(r)) {
+>  		perform_access(vcpu, params, r);
+>  		return true;
+>  	}
+>  
+> -	if (is_imp_def_sys_reg(params)) {
+> -		kvm_inject_undefined(vcpu);
+> -	} else {
+> -		print_sys_reg_msg(params,
+> -				  "Unsupported guest sys_reg access at: %lx [%08lx]\n",
+> -				  *vcpu_pc(vcpu), *vcpu_cpsr(vcpu));
+> -		kvm_inject_undefined(vcpu);
+> -	}
+> -	return false;
+> -}
+> -
+> -static int emulate_sys_instr(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
+> -{
+> -	const struct sys_reg_desc *r;
+> -
+> -	/* Search from the system instruction table. */
+> -	r = find_reg(p, sys_insn_descs, ARRAY_SIZE(sys_insn_descs));
+> +	print_sys_reg_msg(params,
+> +			  "Unsupported guest sys_reg access at: %lx [%08lx]\n",
+> +			  *vcpu_pc(vcpu), *vcpu_cpsr(vcpu));
+> +	kvm_inject_undefined(vcpu);
+>  
+> -	if (likely(r)) {
+> -		perform_access(vcpu, p, r);
+> -	} else {
+> -		kvm_err("Unsupported guest sys instruction at: %lx\n",
+> -			*vcpu_pc(vcpu));
+> -		print_sys_reg_instr(p);
+> -		kvm_inject_undefined(vcpu);
+> -	}
+> -	return 1;
+> +	return false;
+>  }
+>  
+>  static void kvm_reset_id_regs(struct kvm_vcpu *vcpu)
+> @@ -3504,31 +3476,33 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+>   */
+>  int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
+>  {
+> +	const struct sys_reg_desc *desc = NULL;
+>  	struct sys_reg_params params;
+>  	unsigned long esr = kvm_vcpu_get_esr(vcpu);
+>  	int Rt = kvm_vcpu_sys_get_rt(vcpu);
+> +	int sr_idx;
+>  
+>  	trace_kvm_handle_sys_reg(esr);
+>  
+> -	if (__check_nv_sr_forward(vcpu))
+> +	if (__check_nv_sr_forward(vcpu, &sr_idx))
+>  		return 1;
+>  
+>  	params = esr_sys64_to_params(esr);
+>  	params.regval = vcpu_get_reg(vcpu, Rt);
+>  
+> -	/* System register? */
+> -	if (params.Op0 == 2 || params.Op0 == 3) {
+> -		if (!emulate_sys_reg(vcpu, &params))
+> -			return 1;
+> +	if (params.Op0 == 2 || params.Op0 == 3)
+> +		desc = &sys_reg_descs[sr_idx];
+> +	else
+> +		desc = &sys_insn_descs[sr_idx];
+>  
+> -		if (!params.is_write)
+> -			vcpu_set_reg(vcpu, Rt, params.regval);
+> +	perform_access(vcpu, &params, desc);
+>  
+> -		return 1;
+> -	}
+> +	/* Read from system register? */
+> +	if (!params.is_write &&
+> +	    (params.Op0 == 2 || params.Op0 == 3))
+> +		vcpu_set_reg(vcpu, Rt, params.regval);
+>  
+> -	/* Hints, PSTATE (Op0 == 0) and System instructions (Op0 == 1) */
+> -	return emulate_sys_instr(vcpu, &params);
+> +	return 1;
+>  }
+>  
+>  /******************************************************************************
 
-Thanks!
+Other than the ref update:
 
-	M.
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Joey
