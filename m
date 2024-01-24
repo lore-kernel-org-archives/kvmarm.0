@@ -1,24 +1,24 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18AD57A72F
-	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 17:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DD9B7CF18
+	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 17:16:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706115742; cv=none; b=iuTTX8LVdSduLvUTktU8BhfnOLzXUqUkgYZQHa5VhtvaKVfnqPa98ynE81QXJsQ/TNPyzbYYJvHyKN2TKVDIPOhs5hwLOEGZQLd7Jiu74OrTbjDhVsC4MjPmw/10EhUKWVfwPdLfY+fDOrNWZayrhq44LA/BKaGVFrCynZPFdUw=
+	t=1706116584; cv=none; b=ChZCDzKeKxm9+jrnemBjsV9ImcSVaj8XiQ7d9U9vrjjmvgoDqxi8zCydu2uUAfUyU7J3HMrEYg8zvppT7KRtshECDHOwD5PSXxXQFhGpoolWMNSCQew6E9Z0ojqsUYCED8CGOonkkf1vj0LRBTIiH4NP/Fyibt+uKOPrVralBrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706115742; c=relaxed/simple;
-	bh=jT0Iby/QM9XcbS0bln/hhCljkepZnYjuOK3coEAvMis=;
+	s=arc-20240116; t=1706116584; c=relaxed/simple;
+	bh=rCzzbUU4xb5U9AQowstMR5B/WmYSvDbx2sV1q5EZVWw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AAOqgep5ecJ6y2ki9iaSquy/setJUpIQDvnhvxqin+QEKCVL2ainitYzOpQd03+uYCyp7oYWb3zpjOLf0GhyT/CXw62jnMYTt1FAFLVdY5X475fgJLB3q6p19EGFA+3bmmwyUhfupFgTZrDNq/mf24G4vzGKcqP2BhjmEzaJ85Q=
+	 Content-Type:Content-Disposition:In-Reply-To; b=OOKxT0nWWX1/UMGNwcPM7czdmtEyujwv1g4s/ZjtQh5Uu2Jcdl0M+aCmiaUZGKNLCfhuXx/3HDo20zbqFidkxUVd3gVfmPhbJK1/7q6i9oKKmegtA3Bdp3lqDM6vKY4Y653O+9OHuYPMtWPxnwg9/kSFsOE24TZtYnDzBxO4Je8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4038D1FB;
-	Wed, 24 Jan 2024 09:03:04 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 071591FB;
+	Wed, 24 Jan 2024 09:17:07 -0800 (PST)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 29AF53F762;
-	Wed, 24 Jan 2024 09:02:18 -0800 (PST)
-Date: Wed, 24 Jan 2024 17:02:11 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DC27D3F762;
+	Wed, 24 Jan 2024 09:16:20 -0800 (PST)
+Date: Wed, 24 Jan 2024 17:16:18 +0000
 From: Joey Gouly <joey.gouly@arm.com>
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -28,13 +28,11 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 14/25] KVM: arm64: Register AArch64 system register
- entries with the sysreg xarray
-Message-ID: <20240124170211.GA1535978@e124191.cambridge.arm.com>
+Subject: Re: [PATCH 19/25] KVM: arm64: Move existing feature disabling over
+ to FGU infrastructure
+Message-ID: <20240124171618.GB1535978@e124191.cambridge.arm.com>
 References: <20240122201852.262057-1-maz@kernel.org>
- <20240122201852.262057-15-maz@kernel.org>
- <20240124163425.GJ1283334@e124191.cambridge.arm.com>
- <86a5ou8z7g.wl-maz@kernel.org>
+ <20240122201852.262057-20-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -43,144 +41,144 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86a5ou8z7g.wl-maz@kernel.org>
+In-Reply-To: <20240122201852.262057-20-maz@kernel.org>
 
-On Wed, Jan 24, 2024 at 04:37:23PM +0000, Marc Zyngier wrote:
-> On Wed, 24 Jan 2024 16:34:25 +0000,
-> Joey Gouly <joey.gouly@arm.com> wrote:
-> > 
-> > On Mon, Jan 22, 2024 at 08:18:41PM +0000, Marc Zyngier wrote:
-> > > In order to reduce the number of lookups that we have to perform
-> > > when handling a sysreg, register each AArch64 sysreg descriptor
-> > > with the global xarray. The index of the descriptor is stored
-> > > as a 10 bit field in the data word.
-> > > 
-> > > Subsequent patches will retrieve and use the stored index.
-> > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_host.h |  3 +++
-> > >  arch/arm64/kvm/emulate-nested.c   | 39 +++++++++++++++++++++++++++++--
-> > >  arch/arm64/kvm/sys_regs.c         | 11 ++++++++-
-> > >  3 files changed, 50 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > index fe35c59214ad..e7a6219f2929 100644
-> > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > @@ -1083,6 +1083,9 @@ int kvm_handle_cp10_id(struct kvm_vcpu *vcpu);
-> > >  void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
-> > >  
-> > >  int __init kvm_sys_reg_table_init(void);
-> > > +struct sys_reg_desc;
-> > > +int __init populate_sysreg_config(const struct sys_reg_desc *sr,
-> > > +				  unsigned int idx);
-> > >  int __init populate_nv_trap_config(void);
-> > >  
-> > >  bool lock_all_vcpus(struct kvm *kvm);
-> > > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> > > index 59622636b723..342d43b66fda 100644
-> > > --- a/arch/arm64/kvm/emulate-nested.c
-> > > +++ b/arch/arm64/kvm/emulate-nested.c
-> > > @@ -427,12 +427,14 @@ static const complex_condition_check ccc[] = {
-> > >   * [19:14]	bit number in the FGT register (6 bits)
-> > >   * [20]		trap polarity (1 bit)
-> > >   * [25:21]	FG filter (5 bits)
-> > > - * [62:26]	Unused (37 bits)
-> > > + * [35:26]	Main SysReg table index (10 bits)
-> > > + * [62:36]	Unused (27 bits)
-> > >   * [63]		RES0 - Must be zero, as lost on insertion in the xarray
-> > >   */
-> > >  #define TC_CGT_BITS	10
-> > >  #define TC_FGT_BITS	4
-> > >  #define TC_FGF_BITS	5
-> > > +#define TC_MSR_BITS	10
-> > >  
-> > >  union trap_config {
-> > >  	u64	val;
-> > > @@ -442,7 +444,8 @@ union trap_config {
-> > >  		unsigned long	bit:6;		 /* Bit number */
-> > >  		unsigned long	pol:1;		 /* Polarity */
-> > >  		unsigned long	fgf:TC_FGF_BITS; /* Fine Grained Filter */
-> > > -		unsigned long	unused:37;	 /* Unused, should be zero */
-> > > +		unsigned long	msr:TC_MSR_BITS; /* Main SysReg index */
-> > > +		unsigned long	unused:27;	 /* Unused, should be zero */
-> > >  		unsigned long	mbz:1;		 /* Must Be Zero */
-> > >  	};
-> > >  };
-> > > @@ -1862,6 +1865,38 @@ int __init populate_nv_trap_config(void)
-> > >  	return ret;
-> > >  }
-> > >  
-> > > +int __init populate_sysreg_config(const struct sys_reg_desc *sr,
-> > > +				  unsigned int idx)
-> > > +{
-> > > +	union trap_config tc;
-> > > +	u32 encoding;
-> > > +	void *ret;
-> > > +
-> > > +	/*
-> > > +	 * 0 is a valid value for the index, but not for the storage.
-> > > +	 * We'll store (idx+1), so check against an offset'd limit.
-> > > +	 */
-> > > +	if (idx >= (BIT(TC_MSR_BITS) - 1)) {
-> > > +		kvm_err("sysreg %s (%d) out of range\n", sr->name, idx);
-> > > +		return -EINVAL;
-> > > +	}
-> > > +
-> > > +	encoding = sys_reg(sr->Op0, sr->Op1, sr->CRn, sr->CRm, sr->Op2);
-> > > +	tc = get_trap_config(encoding);
-> > > +
-> > > +	if (tc.msr) {
-> > > +		kvm_err("sysreg %s (%d) duplicate entry (%d)\n",
-> > > +			sr->name, idx - 1, tc.msr);
-> > > +		return -EINVAL;
-> > > +	}
-> > > +
-> > > +	tc.msr = idx + 1;
-> > > +	ret = xa_store(&sr_forward_xa, encoding,
-> > > +		       xa_mk_value(tc.val), GFP_KERNEL);
-> > > +
-> > > +	return xa_err(ret);
-> > > +}
-> > > +
-> > >  static enum trap_behaviour get_behaviour(struct kvm_vcpu *vcpu,
-> > >  					 const struct trap_bits *tb)
-> > >  {
-> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > > index 77cd818c23b0..65319193e443 100644
-> > > --- a/arch/arm64/kvm/sys_regs.c
-> > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > @@ -3974,6 +3974,7 @@ int __init kvm_sys_reg_table_init(void)
-> > >  	struct sys_reg_params params;
-> > >  	bool valid = true;
-> > >  	unsigned int i;
-> > > +	int ret = 0;
-> > >  
-> > >  	/* Make sure tables are unique and in order. */
-> > >  	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false);
-> > > @@ -3997,5 +3998,13 @@ int __init kvm_sys_reg_table_init(void)
-> > >  	if (!first_idreg)
-> > >  		return -EINVAL;
-> > >  
-> > > -	return populate_nv_trap_config();
-> > > +	ret = populate_nv_trap_config();
-> > > +
-> > > +	for (i = 0; !ret && i < ARRAY_SIZE(sys_reg_descs); i++)
-> > > +		ret = populate_sysreg_config(sys_reg_descs + i, i);
-> > > +
-> > > +	for (i = 0; !ret && i < ARRAY_SIZE(sys_insn_descs); i++)
-> > > +		ret = populate_sysreg_config(sys_insn_descs + i, i);
-> > > +
-> > > +	return ret;
-> > >  }
-> > 
-> > The choice of `msr` was a tiny bit confusing due to the conflict with the asm
-> > instruction `msr`, but not enough to warrant renaming.
+Greetings,
+
+On Mon, Jan 22, 2024 at 08:18:46PM +0000, Marc Zyngier wrote:
+> We already trap a bunch of existing features for the purpose of
+> disabling them (MAIR2, POR, ACCDATA, SME...).
 > 
-> No, that's actually a very good point. How about SRI (Sys Reg Index)?
+> Let's move them over to our brand new FGU infrastructure.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h       |  4 ++++
+>  arch/arm64/kvm/arm.c                    |  6 ++++++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 17 +++--------------
+>  arch/arm64/kvm/sys_regs.c               | 23 +++++++++++++++++++++++
+>  4 files changed, 36 insertions(+), 14 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 4e0ac507ca01..fe5ed4bcded0 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -297,6 +297,8 @@ struct kvm_arch {
+>  #define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		6
+>  	/* Initial ID reg values loaded */
+>  #define KVM_ARCH_FLAG_ID_REGS_INITIALIZED		7
+> +	/* Fine-Grained UNDEF initialised */
+> +#define KVM_ARCH_FLAG_FGU_INITIALIZED			8
+>  	unsigned long flags;
+>  
+>  	/* VM-wide vCPU feature set */
+> @@ -1112,6 +1114,8 @@ int __init populate_nv_trap_config(void);
+>  bool lock_all_vcpus(struct kvm *kvm);
+>  void unlock_all_vcpus(struct kvm *kvm);
+>  
+> +void kvm_init_sysreg(struct kvm_vcpu *);
+> +
+>  /* MMIO helpers */
+>  void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
+>  unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index c063e84fc72c..9f806c9b7d5d 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -675,6 +675,12 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+>  			return ret;
+>  	}
+>  
+> +	/*
+> +	 * This needs to happen after NV has imposed its own restrictions on
+> +	 * the feature set
+> +	 */
+> +	kvm_init_sysreg(vcpu);
+> +
+>  	ret = kvm_timer_enable(vcpu);
+>  	if (ret)
+>  		return ret;
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index a09149fd91ed..245f9c1ca666 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -157,7 +157,7 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+>  	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+> -	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0, tmp;
+> +	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0;
+>  	u64 r_val, w_val;
+>  
+>  	CHECK_FGT_MASKS(HFGRTR_EL2);
+> @@ -174,13 +174,6 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  	ctxt_sys_reg(hctxt, HFGRTR_EL2) = read_sysreg_s(SYS_HFGRTR_EL2);
+>  	ctxt_sys_reg(hctxt, HFGWTR_EL2) = read_sysreg_s(SYS_HFGWTR_EL2);
+>  
+> -	if (cpus_have_final_cap(ARM64_SME)) {
+> -		tmp = HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_EL0_MASK;
+> -
+> -		r_clr |= tmp;
+> -		w_clr |= tmp;
+> -	}
+> -
+>  	/*
+>  	 * Trap guest writes to TCR_EL1 to prevent it from enabling HA or HD.
+>  	 */
+> @@ -195,15 +188,11 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  	compute_undef_clr_set(vcpu, kvm, HFGRTR_EL2, r_clr, r_set);
+>  	compute_undef_clr_set(vcpu, kvm, HFGWTR_EL2, w_clr, w_set);
+>  
+> -	/* The default to trap everything not handled or supported in KVM. */
+> -	tmp = HFGxTR_EL2_nAMAIR2_EL1 | HFGxTR_EL2_nMAIR2_EL1 | HFGxTR_EL2_nS2POR_EL1 |
+> -	      HFGxTR_EL2_nPOR_EL1 | HFGxTR_EL2_nPOR_EL0 | HFGxTR_EL2_nACCDATA_EL1;
+> -
+> -	r_val = __HFGRTR_EL2_nMASK & ~tmp;
+> +	r_val = __HFGRTR_EL2_nMASK;
+>  	r_val |= r_set;
+>  	r_val &= ~r_clr;
+>  
+> -	w_val = __HFGWTR_EL2_nMASK & ~tmp;
+> +	w_val = __HFGWTR_EL2_nMASK;
+>  	w_val |= w_set;
+>  	w_val &= ~w_clr;
+>  
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index c48bc2577162..a62efd8a2959 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -3943,6 +3943,29 @@ int kvm_vm_ioctl_get_reg_writable_masks(struct kvm *kvm, struct reg_mask_range *
+>  	return 0;
+>  }
+>  
+> +void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +
+> +	mutex_lock(&kvm->arch.config_lock);
+> +
+> +	if (test_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags))
+> +		goto out;
+> +
+> +	kvm->arch.fgu[HFGxTR_GROUP] = (HFGxTR_EL2_nAMAIR2_EL1		|
+> +				       HFGxTR_EL2_nMAIR2_EL1		|
+> +				       HFGxTR_EL2_nS2POR_EL1		|
+> +				       HFGxTR_EL2_nPOR_EL1		|
+> +				       HFGxTR_EL2_nPOR_EL0		|
+> +				       HFGxTR_EL2_nACCDATA_EL1		|
+> +				       HFGxTR_EL2_nSMPRI_EL1_MASK	|
+> +				       HFGxTR_EL2_nTPIDR2_EL0_MASK);
+> +
+> +	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
+> +out:
+> +	mutex_unlock(&kvm->arch.config_lock);
+> +}
+> +
+>  int __init kvm_sys_reg_table_init(void)
+>  {
+>  	struct sys_reg_params params;
 
-LGTM
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
 Thanks,
 Joey
