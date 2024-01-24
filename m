@@ -1,32 +1,32 @@
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781F41353ED
-	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 20:49:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8662B1350C2
+	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 20:49:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706129374; cv=none; b=R08ONF/436DOGZdsgqJ3/+7q0eApikSK94DvyiGqrluenQ2tFh/cOZ9YJVms6KQyTtURxkHtQZ5UqBucvcKentVbCWSvzCqBIhzccBQ780BRUOkQmV+X5GoFqC+z5QmxUuKFRBFuYsrS6Gb3pw4zhxQexNw5oX2QMWThAX9KSeA=
+	t=1706129376; cv=none; b=I+j3R2YG4p5WGmkk7A/dhyr0apyHiz3Da3BKbbOgy/BqGa6qubzwkdLhhSyYVMQiLW8tVDJ3B/R8rPfsvDZJRa+QSvs1LYsUlAZeYz8cmkPNkNeogtP1jl4aPCe2oKamid+f2k5XllI+JtvxRSPzzeLYEWkTnKVytOaO3zYREm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706129374; c=relaxed/simple;
-	bh=OWQPlGbJfv74O6Ejj1hlEx603Lza1Ej43wwVmD20d6g=;
+	s=arc-20240116; t=1706129376; c=relaxed/simple;
+	bh=Yci9UjKWnyQCjg1gteyPivkD77+UxH3VnJgIayCPj4k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BpohHk7ktI7GiTcztjXHRvvYTsCwfKol8XSUfc6S+m8Cb4/NTCRbuZdvZCxGk5vksUi0IaEyTG9P+D78FxLYb/npbyZCrJMdszoWqB+T2ofbS7qsQVZtSCxes7wyhVoUvVNiY8rZAEm6Bn1yrEG0OHHCU+sAlwa8caFNUGJzLJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gFQ+wblN; arc=none smtp.client-ip=95.215.58.175
+	 MIME-Version; b=YiThIZcdyMPzC/aau0kyY07aXyDYOpS00wZwZuhrw+8WNKoMYVglErGMgMJH85Lrv6cocYg9CIJH14wWtUiNsVv7kFgh+qfX9yoYpFzB5vR6QPLGpe1ksQh3av0VY1Fo2tsaGg6Z2TFuwSel+eb6KFIunZ7gzYeN+fwBMbr3wH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XcVgE3Vg; arc=none smtp.client-ip=95.215.58.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gFQ+wblN"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XcVgE3Vg"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706129370;
+	t=1706129372;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=gMHb8qwOgYdG295rXfmcu6C9eixNCueL5GSPuTMDr/M=;
-	b=gFQ+wblN+DmTLfOxsU/cOMUDyxDFW0xoVLAf2Jm7QHEUY17RoeBiXHE9NhjmcsVxvLDzTU
-	AL8jxKTuIA8AMTw+YFAb2VHW6n4BAPi4BClJ/iVglMe0Cuz+/MYPiMMOioLpy4LXMBp0US
-	hbJHrg86q579EmLXYL6RG99jEhxkLN4=
+	bh=PrQ+PVEC9XhGPAIG43CquUH33xiU8286LZeimDf+tfE=;
+	b=XcVgE3VgULstQEd6lTi1Iv7You3egtz/rN9kfGrDlz3W7rAqPQKIIz1QetaUv4w8sd0kbc
+	0ZduumdAP8sR03fdgB7AYV9ov9ti8tKwOb3Nl+c0mSRQEhBT3byFUHK6SVt2Xnkl/Ti5jN
+	GwJ/1ZrumKK/p3h/6uLrK50NDKkNd0c=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -37,9 +37,9 @@ Cc: kvm@vger.kernel.org,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	Jing Zhang <jingzhangos@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 05/15] KVM: arm64: vgic: Get rid of the LPI linked-list
-Date: Wed, 24 Jan 2024 20:48:59 +0000
-Message-ID: <20240124204909.105952-6-oliver.upton@linux.dev>
+Subject: [PATCH 06/15] KVM: arm64: vgic: Use atomics to count LPIs
+Date: Wed, 24 Jan 2024 20:49:00 +0000
+Message-ID: <20240124204909.105952-7-oliver.upton@linux.dev>
 In-Reply-To: <20240124204909.105952-1-oliver.upton@linux.dev>
 References: <20240124204909.105952-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -51,78 +51,82 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-All readers of LPI configuration have been transitioned to use the LPI
-xarray. Get rid of the linked-list altogether.
+Switch to using atomics for LPI accounting, allowing vgic_irq references
+to be dropped in parallel.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/vgic/vgic-init.c | 1 -
- arch/arm64/kvm/vgic/vgic-its.c  | 7 ++-----
- arch/arm64/kvm/vgic/vgic.c      | 1 -
- include/kvm/arm_vgic.h          | 1 -
- 4 files changed, 2 insertions(+), 8 deletions(-)
+ arch/arm64/kvm/vgic/vgic-debug.c | 2 +-
+ arch/arm64/kvm/vgic/vgic-its.c   | 4 ++--
+ arch/arm64/kvm/vgic/vgic.c       | 2 +-
+ include/kvm/arm_vgic.h           | 4 ++--
+ 4 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 411719053107..e25672d6e846 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -53,7 +53,6 @@ void kvm_vgic_early_init(struct kvm *kvm)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
+diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
+index 85606a531dc3..389025ce7749 100644
+--- a/arch/arm64/kvm/vgic/vgic-debug.c
++++ b/arch/arm64/kvm/vgic/vgic-debug.c
+@@ -149,7 +149,7 @@ static void print_dist_state(struct seq_file *s, struct vgic_dist *dist)
+ 	seq_printf(s, "vgic_model:\t%s\n", v3 ? "GICv3" : "GICv2");
+ 	seq_printf(s, "nr_spis:\t%d\n", dist->nr_spis);
+ 	if (v3)
+-		seq_printf(s, "nr_lpis:\t%d\n", dist->lpi_list_count);
++		seq_printf(s, "nr_lpis:\t%d\n", atomic_read(&dist->lpi_count));
+ 	seq_printf(s, "enabled:\t%d\n", dist->enabled);
+ 	seq_printf(s, "\n");
  
--	INIT_LIST_HEAD(&dist->lpi_list_head);
- 	INIT_LIST_HEAD(&dist->lpi_translation_cache);
- 	raw_spin_lock_init(&dist->lpi_list_lock);
- 	xa_init_flags(&dist->lpi_xa, XA_FLAGS_LOCK_IRQ);
 diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index a2d95a279798..0486d3779d11 100644
+index 0486d3779d11..1d912a595b71 100644
 --- a/arch/arm64/kvm/vgic/vgic-its.c
 +++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -74,10 +74,8 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
- 	 * There could be a race with another vgic_add_lpi(), so we need to
- 	 * check that we don't add a second list entry with the same LPI.
- 	 */
--	list_for_each_entry(oldirq, &dist->lpi_list_head, lpi_list) {
--		if (oldirq->intid != intid)
--			continue;
--
-+	oldirq = xa_load(&dist->lpi_xa, intid);
-+	if (oldirq) {
- 		/* Someone was faster with adding this LPI, lets use that. */
- 		kfree(irq);
- 		irq = oldirq;
-@@ -99,7 +97,6 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+@@ -97,7 +97,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
  		return ERR_PTR(ret);
  	}
  
--	list_add_tail(&irq->lpi_list, &dist->lpi_list_head);
- 	dist->lpi_list_count++;
+-	dist->lpi_list_count++;
++	atomic_inc(&dist->lpi_count);
  
  out_unlock:
+ 	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+@@ -342,7 +342,7 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
+ 	 * command). If coming from another path (such as enabling LPIs),
+ 	 * we must be careful not to overrun the array.
+ 	 */
+-	irq_count = READ_ONCE(dist->lpi_list_count);
++	irq_count = atomic_read(&dist->lpi_count);
+ 	intids = kmalloc_array(irq_count, sizeof(intids[0]), GFP_KERNEL_ACCOUNT);
+ 	if (!intids)
+ 		return -ENOMEM;
 diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index d90c42ff051d..e58ce68e325c 100644
+index e58ce68e325c..5988d162b765 100644
 --- a/arch/arm64/kvm/vgic/vgic.c
 +++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -121,7 +121,6 @@ void __vgic_put_lpi_locked(struct kvm *kvm, struct vgic_irq *irq)
- 	if (!kref_put(&irq->refcount, vgic_irq_release))
+@@ -122,7 +122,7 @@ void __vgic_put_lpi_locked(struct kvm *kvm, struct vgic_irq *irq)
  		return;
  
--	list_del(&irq->lpi_list);
  	xa_erase(&dist->lpi_xa, irq->intid);
- 	dist->lpi_list_count--;
+-	dist->lpi_list_count--;
++	atomic_dec(&dist->lpi_count);
  
+ 	kfree(irq);
+ }
 diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 795b35656b54..39037db3fa90 100644
+index 39037db3fa90..e944536feee8 100644
 --- a/include/kvm/arm_vgic.h
 +++ b/include/kvm/arm_vgic.h
-@@ -277,7 +277,6 @@ struct vgic_dist {
- 	/* Protects the lpi_list and the count value below. */
+@@ -274,10 +274,10 @@ struct vgic_dist {
+ 	 */
+ 	u64			propbaser;
+ 
+-	/* Protects the lpi_list and the count value below. */
++	/* Protects the lpi_list. */
  	raw_spinlock_t		lpi_list_lock;
  	struct xarray		lpi_xa;
--	struct list_head	lpi_list_head;
- 	int			lpi_list_count;
+-	int			lpi_list_count;
++	atomic_t		lpi_count;
  
  	/* LPI translation cache */
+ 	struct list_head	lpi_translation_cache;
 -- 
 2.43.0.429.g432eaa2c6b-goog
 
