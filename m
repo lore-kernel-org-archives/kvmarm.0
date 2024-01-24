@@ -1,64 +1,64 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986BA18029
-	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 09:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52DB18E01
+	for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 09:52:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706089575; cv=none; b=ShxyeMZaXaCK0iMXGggGrcV0DiGcwKU0NBS+QKHd2a1FDU7npk80Wy0+zpCaV9iDSDHAStYvbVi7eIBf5osWScCGISGxY9plAO5OCpw+4FFWpkMJIjCaC7mE+w+e3c4JBK4faIKOhpea8PwLsFi75Yaotr6qWNywGSzBs1+WI2g=
+	t=1706089977; cv=none; b=Pc3G7ahxwichS+IlO7gTobAHgDYXRonhWE33lAXZy3vfCFP/Kma+m2a0SSb59M5UacRfnZib8e4umQoraF5yXac/WZgoQhSEeoGU2qd813xN5kQdsK7g4ZDp/xh+jrop5UR+Y9r/nK7iF1ogW7bBQKPmOUL6Eenm56WMAjsPdY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706089575; c=relaxed/simple;
-	bh=LX0wtveYeNNpy0IYLnI6Un6vYkcXYDvdsMhO5MfguRc=;
+	s=arc-20240116; t=1706089977; c=relaxed/simple;
+	bh=fL7xsFAPf6mLm5AqWXPAvpgnkwrwuTjyDCASZ1m7eZU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VrKucSrbEFQny2RfASWJlc0HtpP+4d8cZyUkyudB1SAW88VS7jPl11F58j7totM1CnsnBXYEMqfNLbaaMlAjhS8PAS0aqASXwwtObJkRzhIjL/Ag8GV+FbOnvhcrnZOAu7RXNfDz6tPW9iwBwnhEnZBARdEOvAaxZ/BGPSBx0QI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FprsDxqi; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=P81p1t/T6cWG6Mdn9jGxXYhSRpmjbPOzT1CmoCL+ggnZcXTEhvSg2kA515/kujbni4BnTnnGAy1uOpkt5A+cjliyH4zR13X+61rEUHrUVyMKkQIO+08TwtsNdfW4IKu9e8Z9sfSFS82RKSLPRYNpwBviC6vGUP0VeeBXNihe88E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QEsiX7nE; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FprsDxqi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QEsiX7nE"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706089572;
+	s=mimecast20190719; t=1706089974;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=pFN7ypEuub1SUNjprLw16LHSKAbY43NwwfYcGZ0HYJU=;
-	b=FprsDxqiffRKATSM/39T3+lFRcYWdqZXSM9JQFEhVZxOPnukpL80iSCpTdZQzHlhLfR55j
-	mrvXWQY/R50ku7i3Zog/iXsIPQjv4fHGZtioIQGJ/ExmyuZJsG/1ABJlIWI+V1gIuY3BBa
-	eMZ6pOIS1q8esYB/xUGycKXH3cgnm5c=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=3Em1vhfyXKT1LEE01SdpLdKpgsNPtBUovozPrXlkUAI=;
+	b=QEsiX7nErpf4FOz1viGuaSJKXB/nmn/n4/76iA2/o8IzxluYGY69Gmv/+dDnMOuaheGld8
+	yRP9QdfkeK36/1AqMF24NKAKtpLAefxGaccMlBB3i7Ad1O06sa6WtN8sSHMl/ehJYQjuQB
+	B4qeqmQNR5AukoygXcWRkMfd1XSwooI=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-186-P5_xXAGXOqOb4wmmqhVF8g-1; Wed, 24 Jan 2024 04:46:10 -0500
-X-MC-Unique: P5_xXAGXOqOb4wmmqhVF8g-1
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-68194fcd1f1so90956136d6.0
-        for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 01:46:10 -0800 (PST)
+ us-mta-244-DotJJ9boNCaEQUeGs_GFVw-1; Wed, 24 Jan 2024 04:52:53 -0500
+X-MC-Unique: DotJJ9boNCaEQUeGs_GFVw-1
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4297db4eba1so62935821cf.2
+        for <kvmarm@lists.linux.dev>; Wed, 24 Jan 2024 01:52:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706089570; x=1706694370;
+        d=1e100.net; s=20230601; t=1706089971; x=1706694771;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pFN7ypEuub1SUNjprLw16LHSKAbY43NwwfYcGZ0HYJU=;
-        b=gfF0pSDo64B02lJIbHOWua/71R6HCl9JxNrQhJXBX3C9hpn8JQDXdHm+7BFNUYRDmA
-         8UD3X+X/Cy36CoQdPtRA4bmMjU6yC4H9hyTAcv+fXmBUdhx3tYaVbCfCzXxaFu+0oYM1
-         buJnERQM2rrol/j2QdZOrL141DajTHXjUzl5djnKrn2yUC7iyqcEPBGHON70GfqYUt0P
-         SZVJOg+b7/fDakRKwoExO1BVBx7bziBJMuUDHIWIKe7fDmeY/Cu8KD6f28MIhYGspHhe
-         1FTCjK0lj9BIXYG9ej2EtTRWQb+ft5g+l+GPnte8llmY/O1LAChdgnjodR0z3em/pu8Q
-         6yEg==
-X-Gm-Message-State: AOJu0YxH0nStCh2VOIiFqeFSPAMTXtI9bpJ8zPEkpDcaUGzEam6P46bN
-	RuXtlX6gvc3osr8JO00m6QecZJk+n6TDPC4OAvmpF81Q/XTasx3cSHLOPkhK38Jg1qDBo72UlKO
-	s1HcU7f6MJrpkvRG4gpgGW6md4W1FKcDzVhWwrCeBcd+QIFDPRuPS8Q==
-X-Received: by 2002:ad4:5bc9:0:b0:686:ad62:807a with SMTP id t9-20020ad45bc9000000b00686ad62807amr1195916qvt.30.1706089570416;
-        Wed, 24 Jan 2024 01:46:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHjDgzjNdw0jWlTHxDlL6wZ74MNLP68V032ZI0/mgEhSfHsnSSYXBV3bRAWunzJA7DcAWO8Bg==
-X-Received: by 2002:ad4:5bc9:0:b0:686:ad62:807a with SMTP id t9-20020ad45bc9000000b00686ad62807amr1195904qvt.30.1706089570206;
-        Wed, 24 Jan 2024 01:46:10 -0800 (PST)
+        bh=3Em1vhfyXKT1LEE01SdpLdKpgsNPtBUovozPrXlkUAI=;
+        b=HcbvAQNQ+8vi7MBBNJ2TFr1qcYAKbfVogMscsk/03hRnGwG1SZh8MuEZiUzKMw7Biz
+         cPmmFztKkE3VlySQK6LjaNxu44Eut2p6jRXUIPyMoLEvdiBbJgo2XHV+zEE82ngsCWVC
+         U/0lCRQvO2bxaRTjl2l1TjQkr6wy8GRL+uI+IzYdPknYyY68/3GH/YWFiMnwNDinwlyJ
+         IrYe9By0JBGMHV4nFIt9Oq/KlP3zosJB6wpHI1BZGCosdNWUy8R0RrXr7ygQ13ismTMe
+         glx1mE8atA200jxDB7koBMcwJJRak0xSuI6gjNMFU11MIUVEVWaOnX4+BJiSBqt+HQMz
+         TLiQ==
+X-Gm-Message-State: AOJu0YxhKDti7X9i1jEmOm0Y+gd4qj9SUbmoJ4Ktdm0V+BuBVoGcFOj7
+	Sn0oy39K3l4E0DUZXAiR+JOassaSeU7PvYLjv0SIJ9plwTxbTl2nerCUQg8rA+EvjTU7D39nAoU
+	tpBiofmcC08oOfQBReh0GyZ/qUcwRu8QfURkrngEBNf962qJ4YtRnJg==
+X-Received: by 2002:a05:622a:288:b0:42a:5b85:32ca with SMTP id z8-20020a05622a028800b0042a5b8532camr862558qtw.11.1706089971533;
+        Wed, 24 Jan 2024 01:52:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGH/1IaQQCpdnGnKzLipGmiYfUhmKC7+77PPGsSQdq692kdDR2DfILIz56aG7RtlIcdHEFhOA==
+X-Received: by 2002:a05:622a:288:b0:42a:5b85:32ca with SMTP id z8-20020a05622a028800b0042a5b8532camr862549qtw.11.1706089971305;
+        Wed, 24 Jan 2024 01:52:51 -0800 (PST)
 Received: from [192.168.0.9] (ip-109-43-177-121.web.vodafone.de. [109.43.177.121])
-        by smtp.gmail.com with ESMTPSA id me17-20020a0562145d1100b00686ac6401fdsm664081qvb.13.2024.01.24.01.46.08
+        by smtp.gmail.com with ESMTPSA id x3-20020ac81203000000b00427e0e9c22dsm4222908qti.54.2024.01.24.01.52.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jan 2024 01:46:09 -0800 (PST)
-Message-ID: <e50d0124-230d-4720-bded-b2ae9eb2e128@redhat.com>
-Date: Wed, 24 Jan 2024 10:46:08 +0100
+        Wed, 24 Jan 2024 01:52:51 -0800 (PST)
+Message-ID: <1284c5bd-8c2d-4228-b2db-915548672eac@redhat.com>
+Date: Wed, 24 Jan 2024 10:52:47 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -66,13 +66,14 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 24/24] MAINTAINERS: Add riscv
+Subject: Re: [kvm-unit-tests PATCH 03/24] arm/arm64: Move cpumask.h to common
+ lib
 To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
  kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev
 Cc: ajones@ventanamicro.com, anup@brainfault.org, atishp@atishpatra.org,
  pbonzini@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com
 References: <20240124071815.6898-26-andrew.jones@linux.dev>
- <20240124071815.6898-50-andrew.jones@linux.dev>
+ <20240124071815.6898-29-andrew.jones@linux.dev>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -116,7 +117,7 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240124071815.6898-50-andrew.jones@linux.dev>
+In-Reply-To: <20240124071815.6898-29-andrew.jones@linux.dev>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -124,13 +125,23 @@ Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 24/01/2024 08.18, Andrew Jones wrote:
-> Most of the support for riscv is now in place. Let's make it official
-> and start adding tests!
+> RISC-V will also make use of cpumask.h, so move it to the arch-common
+> directory.
 > 
 > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 > ---
->   MAINTAINERS | 8 ++++++++
->   1 file changed, 8 insertions(+)
+>   lib/arm/asm/gic-v2.h        | 2 +-
+>   lib/arm/asm/gic-v3.h        | 2 +-
+>   lib/arm/asm/gic.h           | 2 +-
+>   lib/arm/asm/smp.h           | 2 +-
+>   lib/arm/mmu.c               | 2 +-
+>   lib/arm/smp.c               | 2 +-
+>   lib/arm64/asm/cpumask.h     | 1 -
+>   lib/{arm/asm => }/cpumask.h | 9 ++++-----
+>   8 files changed, 10 insertions(+), 12 deletions(-)
+>   delete mode 100644 lib/arm64/asm/cpumask.h
+>   rename lib/{arm/asm => }/cpumask.h (94%)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+
 
