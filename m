@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF0613666F
-	for <kvmarm@lists.linux.dev>; Thu, 25 Jan 2024 16:45:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D725136677
+	for <kvmarm@lists.linux.dev>; Thu, 25 Jan 2024 16:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706201142; cv=none; b=VTtqrTUp+mt8bpiA7qxp3w0C7ctAzdenqq9Mj53+w9Y2Rd9IbYAgx2mqTg9Cp9kcFXnQpbCq3Ko+oz+gVVS86ueL9E5LsM6Mnzaaz5nFqcz7S/KoLdWy4pf+NHcsXEGrkHBhlnCbP1UbcH4iousn5PGq5uEsiCRySmaEqpHziHE=
+	t=1706201149; cv=none; b=rdSx2OpTA1Ehvz16MDbYv+Ur28/Jb7lmMxng3+gP2S5McWEJ4pUXL7BxqTDy4aNhU0jgWdg+Wlpt7GXmqq9qX02GpNKBbLs10+hkLsfbnL6sFfMMzrpSmSROnE/ASzH+mwnms/rx1Kr9yORuDF3pu/o5E0/BpYj1ealWKNLL/nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706201142; c=relaxed/simple;
-	bh=g16m8hwe2c+Kqfp9b9jwBFM1C8lWUj9Vnff3BFnKf5E=;
+	s=arc-20240116; t=1706201149; c=relaxed/simple;
+	bh=MOpgrrJcQ/MuxDeBbUcSDCqPbGVfpCoyzo9ytzas7Ec=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=D58/8xObwcrTKsgkka4NAE/nhdp3i5WfNQMmtfQzWNUotdd5e/B865EKAgGmzc8+EvGlSYTYDG6t0skzR/+Wagv8p+lZap61DSInZP8oZ0bqatAn6nti1CTDNiM6faqqvYwIAcidJwcerJjev+gklKVubqoPtmrJsqfiTbWzLnQ=
+	 MIME-Version; b=VcgQ6TZg1P6a78UJlXr5h4b5iOqyP63cSzI+/G5gN7E+88cnC1iW2+pculSOgoOGq5WkQeu8ix6jXewzE5CzobkkISAgEokGmC5AH1oBhfNmXtjJb9lN5kOd3iKuVt9wo9w9iH44IvJRBi+Q4s4zyljp6gu5AF/CUQ0hoVviO6c=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 09C361713;
-	Thu, 25 Jan 2024 08:46:25 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8549C1756;
+	Thu, 25 Jan 2024 08:46:30 -0800 (PST)
 Received: from e121798.cable.virginm.net (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D3D8E3F5A1;
-	Thu, 25 Jan 2024 08:45:34 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 945353F8A4;
+	Thu, 25 Jan 2024 08:45:40 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: catalin.marinas@arm.com,
 	will@kernel.org,
@@ -56,9 +56,9 @@ Cc: pcc@google.com,
 	linux-arch@vger.kernel.org,
 	linux-mm@kvack.org,
 	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH RFC v3 30/35] arm64: mte: ptrace: Handle pages with missing tag storage
-Date: Thu, 25 Jan 2024 16:42:51 +0000
-Message-Id: <20240125164256.4147-31-alexandru.elisei@arm.com>
+Subject: [PATCH RFC v3 31/35] khugepaged: arm64: Don't collapse MTE enabled VMAs
+Date: Thu, 25 Jan 2024 16:42:52 +0000
+Message-Id: <20240125164256.4147-32-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240125164256.4147-1-alexandru.elisei@arm.com>
 References: <20240125164256.4147-1-alexandru.elisei@arm.com>
@@ -70,69 +70,90 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A page can end up mapped in a MTE enabled VMA without the corresponding tag
-storage block reserved. Tag accesses made by ptrace in this case can lead
-to the wrong tags being read or memory corruption for the process that is
-using the tag storage memory as data.
+copy_user_highpage() will do memory allocation if there are saved tags for
+the destination page, and the page is missing tag storage.
 
-Reserve tag storage by treating ptrace accesses like a fault.
+After commit a349d72fd9ef ("mm/pgtable: add rcu_read_lock() and
+rcu_read_unlock()s"), collapse_huge_page() calls
+__collapse_huge_page_copy() -> .. -> copy_user_highpage() with the RCU lock
+held, which means that copy_user_highpage() can only allocate memory using
+GFP_ATOMIC or equivalent.
+
+Get around this by refusing to collapse pages into a transparent huge page
+if the VMA is MTE-enabled.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
 
 Changes since rfc v2:
 
-* New patch, issue reported by Peter Collingbourne.
+* New patch. I think an agreement on whether copy*_user_highpage() should be
+always allowed to sleep, or should not be allowed, would be useful.
 
- arch/arm64/kernel/mte.c | 26 ++++++++++++++++++++++++--
- 1 file changed, 24 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/pgtable.h    | 3 +++
+ arch/arm64/kernel/mte_tag_storage.c | 5 +++++
+ include/linux/khugepaged.h          | 5 +++++
+ mm/khugepaged.c                     | 4 ++++
+ 4 files changed, 17 insertions(+)
 
-diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
-index faf09da3400a..b1fa02dad4fd 100644
---- a/arch/arm64/kernel/mte.c
-+++ b/arch/arm64/kernel/mte.c
-@@ -412,10 +412,13 @@ static int __access_remote_tags(struct mm_struct *mm, unsigned long addr,
- 	while (len) {
- 		struct vm_area_struct *vma;
- 		unsigned long tags, offset;
-+		unsigned int fault_flags;
-+		struct page *page;
-+		vm_fault_t ret;
- 		void *maddr;
--		struct page *page = get_user_page_vma_remote(mm, addr,
--							     gup_flags, &vma);
+diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+index 87ae59436162..d0473538c926 100644
+--- a/arch/arm64/include/asm/pgtable.h
++++ b/arch/arm64/include/asm/pgtable.h
+@@ -1120,6 +1120,9 @@ static inline bool arch_alloc_cma(gfp_t gfp_mask)
+ 	return true;
+ }
  
-+get_page:
-+		page = get_user_page_vma_remote(mm, addr, gup_flags, &vma);
- 		if (IS_ERR(page)) {
- 			err = PTR_ERR(page);
- 			break;
-@@ -433,6 +436,25 @@ static int __access_remote_tags(struct mm_struct *mm, unsigned long addr,
- 			put_page(page);
- 			break;
- 		}
++bool arch_hugepage_vma_revalidate(struct vm_area_struct *vma, unsigned long address);
++#define arch_hugepage_vma_revalidate arch_hugepage_vma_revalidate
 +
-+		if (tag_storage_enabled() && !page_tag_storage_reserved(page)) {
-+			fault_flags = FAULT_FLAG_DEFAULT | \
-+				      FAULT_FLAG_USER | \
-+				      FAULT_FLAG_REMOTE | \
-+				      FAULT_FLAG_ALLOW_RETRY | \
-+				      FAULT_FLAG_RETRY_NOWAIT;
-+			if (write)
-+				fault_flags |= FAULT_FLAG_WRITE;
-+
-+			put_page(page);
-+			ret = handle_mm_fault(vma, addr, fault_flags, NULL);
-+			if (ret & VM_FAULT_ERROR) {
-+				err = -EFAULT;
-+				break;
-+			}
-+			goto get_page;
-+		}
-+
- 		WARN_ON_ONCE(!page_mte_tagged(page));
+ #endif /* CONFIG_ARM64_MTE_TAG_STORAGE */
+ #endif /* CONFIG_ARM64_MTE */
  
- 		/* limit access to the end of the page */
+diff --git a/arch/arm64/kernel/mte_tag_storage.c b/arch/arm64/kernel/mte_tag_storage.c
+index ac7b9c9c585c..a99959b70573 100644
+--- a/arch/arm64/kernel/mte_tag_storage.c
++++ b/arch/arm64/kernel/mte_tag_storage.c
+@@ -636,3 +636,8 @@ void arch_alloc_page(struct page *page, int order, gfp_t gfp)
+ 	if (tag_storage_enabled() && alloc_requires_tag_storage(gfp))
+ 		reserve_tag_storage(page, order, gfp);
+ }
++
++bool arch_hugepage_vma_revalidate(struct vm_area_struct *vma, unsigned long address)
++{
++	return !(vma->vm_flags & VM_MTE);
++}
+diff --git a/include/linux/khugepaged.h b/include/linux/khugepaged.h
+index f68865e19b0b..461e4322dff2 100644
+--- a/include/linux/khugepaged.h
++++ b/include/linux/khugepaged.h
+@@ -38,6 +38,11 @@ static inline void khugepaged_exit(struct mm_struct *mm)
+ 	if (test_bit(MMF_VM_HUGEPAGE, &mm->flags))
+ 		__khugepaged_exit(mm);
+ }
++
++#ifndef arch_hugepage_vma_revalidate
++#define arch_hugepage_vma_revalidate(vma, address) 1
++#endif
++
+ #else /* CONFIG_TRANSPARENT_HUGEPAGE */
+ static inline void khugepaged_fork(struct mm_struct *mm, struct mm_struct *oldmm)
+ {
+diff --git a/mm/khugepaged.c b/mm/khugepaged.c
+index 2b219acb528e..cb9a9ddb4d86 100644
+--- a/mm/khugepaged.c
++++ b/mm/khugepaged.c
+@@ -935,6 +935,10 @@ static int hugepage_vma_revalidate(struct mm_struct *mm, unsigned long address,
+ 	 */
+ 	if (expect_anon && (!(*vmap)->anon_vma || !vma_is_anonymous(*vmap)))
+ 		return SCAN_PAGE_ANON;
++
++	if (!arch_hugepage_vma_revalidate(vma, address))
++		return SCAN_VMA_CHECK;
++
+ 	return SCAN_SUCCEED;
+ }
+ 
 -- 
 2.43.0
 
