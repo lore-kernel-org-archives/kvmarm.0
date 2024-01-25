@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5DF130E55
-	for <kvmarm@lists.linux.dev>; Thu, 25 Jan 2024 16:43:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 160C41386AC
+	for <kvmarm@lists.linux.dev>; Thu, 25 Jan 2024 16:43:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706201003; cv=none; b=Suboqkkfeezxp6j4MsTTab7//h5C4gMBXY9KkuN0S80XyqCndyLrRlpaf3tumJ0x50XWT3ehaJG5fptdv7ywQi00JCAc9SYFRh667ozIVad0hLrZdtytSLu56HhlVKMbCmTD0s4Y+Aeh1xwyOgoTJTZP57davu81M9UygcR4KOA=
+	t=1706201009; cv=none; b=uLnXXLTx7KYhbRLm2YDjCEofxCVg1xeEtRs81l6bqDFPC2WLFN5ellaQ0JPHPF2IQsquCXrBVM+grmMA3oYepvb3J45P4b3MtHp6OBaV20PBh+43RVY1DiDaNzhYbo5Zb6m9LIwhgeRux1IoTDB3398TKeVMJLcCgEVtUhcyBXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706201003; c=relaxed/simple;
-	bh=J+WIqQlbUY0+hWDvh2I19ubO5WQ0091CxZdX8YkH8bE=;
+	s=arc-20240116; t=1706201009; c=relaxed/simple;
+	bh=iJY2JnHpfOobyLxdsi5Dz0+NbwyQF3jtod656QDsJqQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OJZNv9B0rH1JRDHKZ+FQ1+E3jTvi1BsuwFVewpAYIs770VzLLVqH6/+jBjBLkmsJ+HzolaXGur+cV1QFLZmaaT8dIv5N2yk53Oym26Cr411JXEASAFdhqPf4jRNKrIy+ElpSbSxX4SMwtxwraprKDpd39+0FdKZsqL1SSsLtgZo=
+	 MIME-Version; b=uSXnRyjAcNRvWlXWIbfBcFcU1FZxXiiGrIG1HOCNVa0zZrOxN1i6h7DwPKxO8qptmRU0YCDi8lTeRPLCLKe1Qp8i9XgmH2TsDunaWAyFDCNYFoU8h0cah50wS9q0DXduIMsl48/VdhNnW4dmCZdgUrmX0k5Pjb+hQi2H3NYbOq8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2BBFC150C;
-	Thu, 25 Jan 2024 08:44:06 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E9A0F1515;
+	Thu, 25 Jan 2024 08:44:11 -0800 (PST)
 Received: from e121798.cable.virginm.net (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3BDCC3F5A1;
-	Thu, 25 Jan 2024 08:43:16 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 053093F5A1;
+	Thu, 25 Jan 2024 08:43:21 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: catalin.marinas@arm.com,
 	will@kernel.org,
@@ -56,9 +56,9 @@ Cc: pcc@google.com,
 	linux-arch@vger.kernel.org,
 	linux-mm@kvack.org,
 	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH RFC v3 06/35] mm: cma: Make CMA_ALLOC_SUCCESS/FAIL count the number of pages
-Date: Thu, 25 Jan 2024 16:42:27 +0000
-Message-Id: <20240125164256.4147-7-alexandru.elisei@arm.com>
+Subject: [PATCH RFC v3 07/35] mm: cma: Add CMA_RELEASE_{SUCCESS,FAIL} events
+Date: Thu, 25 Jan 2024 16:42:28 +0000
+Message-Id: <20240125164256.4147-8-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240125164256.4147-1-alexandru.elisei@arm.com>
 References: <20240125164256.4147-1-alexandru.elisei@arm.com>
@@ -70,49 +70,73 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The CMA_ALLOC_SUCCESS, respectively CMA_ALLOC_FAIL, are increased by one
-after each cma_alloc() function call. This is done even though cma_alloc()
-can allocate an arbitrary number of CMA pages. When looking at
-/proc/vmstat, the number of successful (or failed) cma_alloc() calls
-doesn't tell much with regards to how many CMA pages were allocated via
-cma_alloc() versus via the page allocator (regular allocation request or
-PCP lists refill).
-
-This can also be rather confusing to a user who isn't familiar with the
-code, since the unit of measurement for nr_free_cma is the number of pages,
-but cma_alloc_success and cma_alloc_fail count the number of cma_alloc()
-function calls.
-
-Let's make this consistent, and arguably more useful, by having
-CMA_ALLOC_SUCCESS count the number of successfully allocated CMA pages, and
-CMA_ALLOC_FAIL count the number of pages the cma_alloc() failed to
-allocate.
-
-For users that wish to track the number of cma_alloc() calls, there are
-tracepoints for that already implemented.
+Similar to the two events that relate to CMA allocations, add the
+CMA_RELEASE_SUCCESS and CMA_RELEASE_FAIL events that count when CMA pages
+are freed.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- mm/cma.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
+Changes since rfc v2:
+
+* New patch.
+
+ include/linux/vm_event_item.h | 2 ++
+ mm/cma.c                      | 6 +++++-
+ mm/vmstat.c                   | 2 ++
+ 3 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/vm_event_item.h b/include/linux/vm_event_item.h
+index 747943bc8cc2..aba5c5bf8127 100644
+--- a/include/linux/vm_event_item.h
++++ b/include/linux/vm_event_item.h
+@@ -83,6 +83,8 @@ enum vm_event_item { PGPGIN, PGPGOUT, PSWPIN, PSWPOUT,
+ #ifdef CONFIG_CMA
+ 		CMA_ALLOC_SUCCESS,
+ 		CMA_ALLOC_FAIL,
++		CMA_RELEASE_SUCCESS,
++		CMA_RELEASE_FAIL,
+ #endif
+ 		UNEVICTABLE_PGCULLED,	/* culled to noreclaim list */
+ 		UNEVICTABLE_PGSCANNED,	/* scanned for reclaimability */
 diff --git a/mm/cma.c b/mm/cma.c
-index f49c95f8ee37..dbf7fe8cb1bd 100644
+index dbf7fe8cb1bd..543bb6b3be8e 100644
 --- a/mm/cma.c
 +++ b/mm/cma.c
-@@ -517,10 +517,10 @@ struct page *cma_alloc(struct cma *cma, unsigned long count,
- 	pr_debug("%s(): returned %p\n", __func__, page);
- out:
- 	if (page) {
--		count_vm_event(CMA_ALLOC_SUCCESS);
-+		count_vm_events(CMA_ALLOC_SUCCESS, count);
- 		cma_sysfs_account_success_pages(cma, count);
- 	} else {
--		count_vm_event(CMA_ALLOC_FAIL);
-+		count_vm_events(CMA_ALLOC_FAIL, count);
- 		if (cma)
- 			cma_sysfs_account_fail_pages(cma, count);
- 	}
+@@ -562,8 +562,10 @@ bool cma_release(struct cma *cma, const struct page *pages,
+ {
+ 	unsigned long pfn;
+ 
+-	if (!cma_pages_valid(cma, pages, count))
++	if (!cma_pages_valid(cma, pages, count)) {
++		count_vm_events(CMA_RELEASE_FAIL, count);
+ 		return false;
++	}
+ 
+ 	pr_debug("%s(page %p, count %lu)\n", __func__, (void *)pages, count);
+ 
+@@ -575,6 +577,8 @@ bool cma_release(struct cma *cma, const struct page *pages,
+ 	cma_clear_bitmap(cma, pfn, count);
+ 	trace_cma_release(cma->name, pfn, pages, count);
+ 
++	count_vm_events(CMA_RELEASE_SUCCESS, count);
++
+ 	return true;
+ }
+ 
+diff --git a/mm/vmstat.c b/mm/vmstat.c
+index db79935e4a54..eebfd5c6c723 100644
+--- a/mm/vmstat.c
++++ b/mm/vmstat.c
+@@ -1340,6 +1340,8 @@ const char * const vmstat_text[] = {
+ #ifdef CONFIG_CMA
+ 	"cma_alloc_success",
+ 	"cma_alloc_fail",
++	"cma_release_success",
++	"cma_release_fail",
+ #endif
+ 	"unevictable_pgs_culled",
+ 	"unevictable_pgs_scanned",
 -- 
 2.43.0
 
