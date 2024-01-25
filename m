@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D82854BD1;
-	Thu, 25 Jan 2024 10:55:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F3D1C16;
+	Thu, 25 Jan 2024 11:02:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706180124; cv=none; b=jfFVL2ZQMfK4IRgeTIYnYzMtvQh5UCXOETXA2ByziS7MqKMo//dsT/+FvDr4b1qImQhRFZ+sjlfLWpEYGRdUIDLAznnuuMyHpmN5FN+rM18X7PmA2F5ZjE17AYCsLz6+We+1ZVRPDcjV1HT2BpAp7Alzlb0+JZaMm88q9t7pLsA=
+	t=1706180524; cv=none; b=QZ77GNqM3EDgLBqh/mA53uH87f5QOAl20LuIoQtk+eSU+iBBo3u4CPBZOWyrjQUrqFKoKq8+qhEv3iw0pvbhCSJ1NCxOcz9DjLAFeh3Zddewf64g5fY5HtjJFVfQBLvMkrrdIycn6PBCdBgJvmNFFATjyME7+3xZvjGa0KjFQBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706180124; c=relaxed/simple;
-	bh=lgWjkpPUrAxK+RKWlUCeLeY4GW8Rd9cDoAf7MGzIDYs=;
+	s=arc-20240116; t=1706180524; c=relaxed/simple;
+	bh=QoLtJhax5FRP1/wP5osvaDsb01kHkav7FL5tHy/UekQ=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hS34nFjRxidmB3dITtOAv5laQMRqWcJiXNmj3BYW7UjxqGuAs3YzS5SFuS8vXYCob8vBoi8tTUd8Udm6R69om7EUHITsVbYly7uFq6rzekKLZdZLyXHl+4HJhlJFxIRgvlObEUvSxHiWQEl8Naf+eRa/fZSfJfvYcRt1GfgPsPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l+IWZT5B; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=ed7OL78+krY58aSDD6uRIOMmEZYOvGMhuPdeV59kDrDW5A1ULkP4RUy62qL4tLx9yTj/0JX57LZW2f/A9TCbW5S2uSM7Mzc5O+AKuBTXbIMZehJfE6ibGbKSSSrck40K1Z0S3CpCnb2KfItim6/+cj7RL/oC+a7hwMFkhqLGNKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=enn/eet3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l+IWZT5B"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5BC9C433F1;
-	Thu, 25 Jan 2024 10:55:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="enn/eet3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FDADC433C7;
+	Thu, 25 Jan 2024 11:02:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706180122;
-	bh=lgWjkpPUrAxK+RKWlUCeLeY4GW8Rd9cDoAf7MGzIDYs=;
+	s=k20201202; t=1706180524;
+	bh=QoLtJhax5FRP1/wP5osvaDsb01kHkav7FL5tHy/UekQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=l+IWZT5B87Hbr5HlyVCzrJOK15e/ReRySXxTBQgUsrh4ZyQ/ijenK8AQpoO3OHhSL
-	 8WjF0Qo0JOrMMS6W/r8VxVOWczbYw8J6SFEK7NY1iDt+ZR9WGq4/cbQcWsMXeZULl1
-	 AsrzzBROPvvnCFDfNJTcHavh6LzWL97n2bQH+VCB8eKFq3EARpHTbbM/NZS4QMUZMl
-	 njs4/8psbBKK+yGRS6iIiuEuN1XH9HoO15+MJjRJmO31U3Ou62tqJ0Bq+Ns6amvYAs
-	 ot8nvyetSv1lW0LZxcEu7CHIJElehdpnrWt/xPtiLxjN2vnuchr1cdOLf+kIdxsdPi
-	 woho9LunxAwOw==
+	b=enn/eet3O116NLrhiq7jlG6ANuEaBW6zFAvQdy07perA1dTDRc9THMguITl/NOlPN
+	 AXDsffIfgCgsZByTce3FxALTs9aWIAaCry/LETWFiBKwesDBwOMFRqh3MGB3oLsToV
+	 xpD3286z1wfNpGlRs8HNIfg+mD5M79xcMgz0Ph2V1zUqajdCKfRIdhX9SraeypljnY
+	 LuL5xMSpQRCiXgQ3eGfcaVMiMwRG2ZF5Pk3DOWq2dE+EY2I4AnIs5YUSQG68oGWe6g
+	 4rde6c5igjr7+Dz2+vkUHM+yqF1H54V9Cs2cvvKs+iJ07kbhNmV9g/kbqzYuX97y8A
+	 XhOeNMydS7j8Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rSxOC-00Eh2I-9R;
-	Thu, 25 Jan 2024 10:55:20 +0000
-Date: Thu, 25 Jan 2024 10:55:19 +0000
-Message-ID: <861qa58yy0.wl-maz@kernel.org>
+	id 1rSxUf-00Eh8C-TE;
+	Thu, 25 Jan 2024 11:02:02 +0000
+Date: Thu, 25 Jan 2024 11:02:01 +0000
+Message-ID: <86zfwt7k2e.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -43,10 +43,9 @@ Cc: kvmarm@lists.linux.dev,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH 12/15] KVM: arm64: vgic-its: Pick cache victim based on usage count
-In-Reply-To: <20240124204909.105952-13-oliver.upton@linux.dev>
+Subject: Re: [PATCH 00/15] KVM: arm64: Improvements to GICv3 LPI injection
+In-Reply-To: <20240124204909.105952-1-oliver.upton@linux.dev>
 References: <20240124204909.105952-1-oliver.upton@linux.dev>
-	<20240124204909.105952-13-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -62,118 +61,56 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kern
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 24 Jan 2024 20:49:06 +0000,
+Hi Oliver,
+
+On Wed, 24 Jan 2024 20:48:54 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> To date the translation cache LRU policy relies on the ordering of the
-> linked-list to pick the victim, as entries are moved to the head of the
-> list on every cache hit. These sort of transformations are incompatible
-> with an rculist, necessitating a different strategy for recording usage
-> in-place.
+> The unfortunate reality is there are increasingly large systems that are
+> shipping today without support for GICv4 vLPI injection. Serialization
+> in KVM's LPI routing/injection code has been a significant bottleneck
+> for VMs on these machines when under a high load of LPIs (e.g. a
+> multi-queue NIC).
 > 
-> Count the number of cache hits since the last translation cache miss for
-> every entry. The preferences for selecting a victim are as follows:
+> Even though the long-term solution is quite clearly **direct
+> injection**, we really ought to do something about the LPI scaling
+> issues within KVM.
 > 
->  - Invalid entries over valid entries
+> This series aims to improve the performance of LPI routing/injection in
+> KVM by moving readers of LPI configuration data away from the
+> lpi_list_lock in favor or using RCU.
 > 
->  - Valid entry with the lowest usage count
+> Patches 1-5 change out the representation of LPIs in KVM from a
+> linked-list to an xarray. While not strictly necessary for making the
+> locking improvements, this seems to be an opportune time to switch to a
+> data structure that can actually be indexed.
 > 
->  - In the case of a tie, pick the entry closest to the tail (oldest)
+> Patches 6-10 transition vgic_get_lpi() and vgic_put_lpi() away from
+> taking the lpi_list_lock in favor of using RCU for protection. Note that
+> this requires some rework to the way references are taken on LPIs and
+> how reclaim works to be RCU safe.
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/vgic/vgic-its.c | 42 ++++++++++++++++++++++++++--------
->  1 file changed, 32 insertions(+), 10 deletions(-)
+> Lastly, patches 11-15 rework the LRU policy on the LPI translation cache
+> to not require moving elements in the linked-list and take advantage of
+> this to make it an rculist readable outside of the lpi_list_lock.
+
+I quite like the overall direction. I've left a few comments here and
+there, and will probably get back to it after I try to run some tests
+on a big-ish box.
+
+> All of this was tested on top of v6.8-rc1. Apologies if any of the
+> changelogs are a bit too light, I'm happy to rework those further in
+> subsequent revisions.
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index aec82d9a1b3c..ed0c6c333a6c 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -154,6 +154,7 @@ struct vgic_translation_cache_entry {
->  	u32			devid;
->  	u32			eventid;
->  	struct vgic_irq		*irq;
-> +	atomic64_t		usage_count;
->  };
->  
->  /**
-> @@ -577,13 +578,7 @@ static struct vgic_irq *__vgic_its_check_cache(struct vgic_dist *dist,
->  		    cte->eventid != eventid)
->  			continue;
->  
-> -		/*
-> -		 * Move this entry to the head, as it is the most
-> -		 * recently used.
-> -		 */
-> -		if (!list_is_first(&cte->entry, &dist->lpi_translation_cache))
-> -			list_move(&cte->entry, &dist->lpi_translation_cache);
-> -
-> +		atomic64_inc(&cte->usage_count);
->  		return cte->irq;
->  	}
->  
-> @@ -616,6 +611,30 @@ static unsigned int vgic_its_max_cache_size(struct kvm *kvm)
->  	return atomic_read(&kvm->online_vcpus) * LPI_DEFAULT_PCPU_CACHE_SIZE;
->  }
->  
-> +static struct vgic_translation_cache_entry *vgic_its_cache_victim(struct vgic_dist *dist)
-> +{
-> +	struct vgic_translation_cache_entry *cte, *victim = NULL;
-> +	u64 min, tmp;
-> +
-> +	/*
-> +	 * Find the least used cache entry since the last cache miss, preferring
-> +	 * older entries in the case of a tie. Note that usage accounting is
-> +	 * deliberately non-atomic, so this is all best-effort.
-> +	 */
-> +	list_for_each_entry(cte, &dist->lpi_translation_cache, entry) {
-> +		if (!cte->irq)
-> +			return cte;
-> +
-> +		tmp = atomic64_xchg_relaxed(&cte->usage_count, 0);
-> +		if (!victim || tmp <= min) {
+> I would've liked to have benchmark data showing the improvement on top
+> of upstream with this series, but I'm currently having issues with our
+> internal infrastructure and upstream kernels. However, this series has
+> been found to have a near 2x performance improvement to redis-memtier [*]
+> benchmarks on our kernel tree.
 
-min is not initialised until after the first round. Not great. How
-comes the compiler doesn't spot this?
-
-> +			victim = cte;
-> +			min = tmp;
-> +		}
-> +	}
-
-So this resets all the counters on each search for a new insertion?
-Seems expensive, specially on large VMs (512 * 16 = up to 8K SWP
-instructions in a tight loop, and I'm not even mentioning the fun
-without LSE). I can at least think of a box that will throw its
-interconnect out of the pram it tickled that way.
-
-I'd rather the new cache entry inherits the max of the current set,
-making it a lot cheaper. We can always detect the overflow and do a
-full invalidation in that case (worse case -- better options exist).
-
-> +
-> +	return victim;
-> +}
-> +
->  static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
->  				       u32 devid, u32 eventid,
->  				       struct vgic_irq *irq)
-> @@ -645,9 +664,12 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
->  		goto out;
->  
->  	if (dist->lpi_cache_count >= vgic_its_max_cache_size(kvm)) {
-> -		/* Always reuse the last entry (LRU policy) */
-> -		victim = list_last_entry(&dist->lpi_translation_cache,
-> -				      typeof(*cte), entry);
-> +		victim = vgic_its_cache_victim(dist);
-> +		if (WARN_ON_ONCE(!victim)) {
-> +			victim = new;
-> +			goto out;
-> +		}
-
-I don't understand how this could happen. It sort of explains the
-oddity I was mentioning earlier, but I don't think we need this
-complexity.
+It'd be really good to have upstream-based numbers, with details of
+the actual setup (device assignment? virtio?) so that we can compare
+things and even track regressions in the future.
 
 Thanks,
 
