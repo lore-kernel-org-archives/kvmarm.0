@@ -1,123 +1,74 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4CB717BA7;
-	Thu, 25 Jan 2024 09:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE6C1BF27
+	for <kvmarm@lists.linux.dev>; Thu, 25 Jan 2024 09:22:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706174133; cv=none; b=d+x3+pMyb2jZGaJE2sgWEPLDKbUsx81bh+IdO2wIuU8EsSd8dk/GRri8TKRM+AZG38a9tvRAhWWyL7RKTplg4jrA5B1TU2qwqqkx0JznlK2i+Mk3DhY1+ifZWwrGDnUL8mq/W06gdzWEnc9MQnKprxTMEl/iq2jsYXgGzM+X8oo=
+	t=1706174571; cv=none; b=i7diXBrMJjV1NaUxmrROZSMXvLHATy7L/qsbULyDbxZwmeMmqpaPdgeky6PeqrFmUfE/N4W5e4+8XC8vMQzeLZx6H7JNfbZo6PuQSAukR9oD/CB9xu3zeJiOA7ESA/uABFotzbsoTRckPSzjDcqTpJ9vl14PMYZU/q6V9VXgLAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706174133; c=relaxed/simple;
-	bh=K9lYZvrqdgnYP3UGmpgkuK/YqJ3JhSr/K1XaHoW8CxE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gvskvTaQYsKMrZFyxbuEbQ0M2RekiYJvNt5CMR+xK8gAJgOVvGGPRYVBDYhyfUtEhpo8CaSOiQd/AvxA4QPA2gTsMROU9r7/duzGRmbhfb4lH5FApuU/OurQL62gkP7EAJ01oj3NUQC+gNLd76e2spp9mRcpMyiltmliR1mQPcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H6xYevna; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706174571; c=relaxed/simple;
+	bh=K1O/I7raMmvS4c8ezYgM742lJbCbADgntjdDhnkbhk0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BW1O1SV5+9XQs4zM6STeXTnuV3pzHyofEtbR4iDCVor6XeW/fooq/WK8ssAxtf3LZIK7cqeNvXpcvkOgPaY6h+iPgW8nuaoLKX0o8PvIscIVjXXzQ+DZd5lY71A06ltu/XP3VC3R6belJHa1RfcEfflQYfLC138xqumdIIz4BD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GGCBO8gM; arc=none smtp.client-ip=91.218.175.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H6xYevna"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 173B7C433F1;
-	Thu, 25 Jan 2024 09:15:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706174133;
-	bh=K9lYZvrqdgnYP3UGmpgkuK/YqJ3JhSr/K1XaHoW8CxE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=H6xYevnalxh+Yn9zgKcLDclQWboRoKYZnaeI9f0xI0v5QeE9+nR6XqeEbJDS3elwZ
-	 1bbOvyg6ryhmWj3xrtkWS0ThR+2teDkJLKotLGjqGDhoE84/LuZINLgQeDBd9tlcOs
-	 HHVt82WzbIvBG4tcV/Jmdx9fagCK84ZwlHOm7c29IOIa3Kk7JVGrBdVjEDqt8NTVCx
-	 gbi+u6usmihayMcll8JN3NPoILuDuMZDvOoCQJVwyAla53tbhapcBB4E/VdZEnoIIx
-	 2ObNGH4/V4Pj+eeqkT7p8AuCTOub3r1jouC3c2SlWrPbyMZdXEZZUGKivgxm16xgBX
-	 rqzMg++Fl/d6Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rSvpa-00EfA8-RV;
-	Thu, 25 Jan 2024 09:15:30 +0000
-Date: Thu, 25 Jan 2024 09:15:30 +0000
-Message-ID: <867cjx93kd.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GGCBO8gM"
+Date: Thu, 25 Jan 2024 09:22:42 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706174567;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mexG939nLP9vqeQf3vOY4O6oQrMPR7Yk4TbAr6+G5jo=;
+	b=GGCBO8gMQJSYBjoLBrc/oGKQBDL06PJcXDERg5UDaLHXFLbJYwC87788jnPhCUdg4OH9cb
+	wQFTR8oCyDndad4FiF41cpSncaNuvbDmYOa3CqLUQNXHkaACSh4UWVQHf+kIakVXJBnn8N
+	QH9Xi0sonYviwcU5bNsfA2oVCgo4t0E=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH 04/15] KVM: arm64: vgic-its: Walk the LPI xarray in vgic_copy_lpi_list()
-In-Reply-To: <20240124204909.105952-5-oliver.upton@linux.dev>
+Subject: Re: [PATCH 12/15] KVM: arm64: vgic-its: Pick cache victim based on
+ usage count
+Message-ID: <ZbIoYm5GzMNZiZP5@linux.dev>
 References: <20240124204909.105952-1-oliver.upton@linux.dev>
-	<20240124204909.105952-5-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240124204909.105952-13-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, rananta@google.com, jingzhangos@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240124204909.105952-13-oliver.upton@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 24 Jan 2024 20:48:58 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> Start iterating the LPI xarray in anticipation of removing the LPI
-> linked-list.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/vgic/vgic-its.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index f152d670113f..a2d95a279798 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -332,6 +332,7 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
->  int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
->  {
->  	struct vgic_dist *dist = &kvm->arch.vgic;
-> +	XA_STATE(xas, &dist->lpi_xa, 0);
+On Wed, Jan 24, 2024 at 08:49:06PM +0000, Oliver Upton wrote:
 
-Why 0? LPIs start at 8192 (aka GIC_LPI_OFFSET), so it'd probably make
-sense to use that.
+[...]
 
->  	struct vgic_irq *irq;
->  	unsigned long flags;
->  	u32 *intids;
-> @@ -350,7 +351,9 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
->  		return -ENOMEM;
->  
->  	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
-> -	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
-> +	rcu_read_lock();
+> +static struct vgic_translation_cache_entry *vgic_its_cache_victim(struct vgic_dist *dist)
+> +{
+> +	struct vgic_translation_cache_entry *cte, *victim = NULL;
+> +	u64 min, tmp;
 > +
-> +	xas_for_each(&xas, irq, U32_MAX) {
+> +	/*
+> +	 * Find the least used cache entry since the last cache miss, preferring
+> +	 * older entries in the case of a tie. Note that usage accounting is
+> +	 * deliberately non-atomic, so this is all best-effort.
+> +	 */
 
-Similar thing: we advertise 16 bits of ID space (described as
-INTERRUPT_ID_BITS_ITS), so capping at that level would make it more
-understandable.
-
->  		if (i == irq_count)
->  			break;
->  		/* We don't need to "get" the IRQ, as we hold the list lock. */
-> @@ -358,6 +361,8 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
->  			continue;
->  		intids[i++] = irq->intid;
->  	}
-> +
-> +	rcu_read_unlock();
->  	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
->  
->  	*intid_ptr = intids;
-
-Thanks,
-
-	M.
+This comment is stale, and does not reflect the fact that I'm very
+obviously using atomics below.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
