@@ -1,120 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F3D1C16;
-	Thu, 25 Jan 2024 11:02:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 659DC3589C
+	for <kvmarm@lists.linux.dev>; Thu, 25 Jan 2024 11:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706180524; cv=none; b=QZ77GNqM3EDgLBqh/mA53uH87f5QOAl20LuIoQtk+eSU+iBBo3u4CPBZOWyrjQUrqFKoKq8+qhEv3iw0pvbhCSJ1NCxOcz9DjLAFeh3Zddewf64g5fY5HtjJFVfQBLvMkrrdIycn6PBCdBgJvmNFFATjyME7+3xZvjGa0KjFQBc=
+	t=1706182212; cv=none; b=OAF5xbx20AJ0mvn2rys74gnNNG06UNXysqvfkgsO/Ov9GsmPZCR/mjtBfZY8sOAhBaS9jZzNV4DImwQm85dsEVjD8Syy29iZa6KMp1owd3fKLWEIbfv5i8mkW+yEaWm6AO8CXa6Qcjcu9adbXMaX1jQtDXl4fBEa3o4wrNAlNr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706180524; c=relaxed/simple;
-	bh=QoLtJhax5FRP1/wP5osvaDsb01kHkav7FL5tHy/UekQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ed7OL78+krY58aSDD6uRIOMmEZYOvGMhuPdeV59kDrDW5A1ULkP4RUy62qL4tLx9yTj/0JX57LZW2f/A9TCbW5S2uSM7Mzc5O+AKuBTXbIMZehJfE6ibGbKSSSrck40K1Z0S3CpCnb2KfItim6/+cj7RL/oC+a7hwMFkhqLGNKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=enn/eet3; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="enn/eet3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FDADC433C7;
-	Thu, 25 Jan 2024 11:02:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706180524;
-	bh=QoLtJhax5FRP1/wP5osvaDsb01kHkav7FL5tHy/UekQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=enn/eet3O116NLrhiq7jlG6ANuEaBW6zFAvQdy07perA1dTDRc9THMguITl/NOlPN
-	 AXDsffIfgCgsZByTce3FxALTs9aWIAaCry/LETWFiBKwesDBwOMFRqh3MGB3oLsToV
-	 xpD3286z1wfNpGlRs8HNIfg+mD5M79xcMgz0Ph2V1zUqajdCKfRIdhX9SraeypljnY
-	 LuL5xMSpQRCiXgQ3eGfcaVMiMwRG2ZF5Pk3DOWq2dE+EY2I4AnIs5YUSQG68oGWe6g
-	 4rde6c5igjr7+Dz2+vkUHM+yqF1H54V9Cs2cvvKs+iJ07kbhNmV9g/kbqzYuX97y8A
-	 XhOeNMydS7j8Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rSxUf-00Eh8C-TE;
-	Thu, 25 Jan 2024 11:02:02 +0000
-Date: Thu, 25 Jan 2024 11:02:01 +0000
-Message-ID: <86zfwt7k2e.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
+	s=arc-20240116; t=1706182212; c=relaxed/simple;
+	bh=hudeKIsDVtkxrroz9a47kw4v+vx9N48mdAxmNXvHWVo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FWQ/1kJqDe65SzE6Dft235NPgAaJ61GFqdak3l6eOU1vvqu4tCLsCznkViI5Kk+zQRGHOHC/Mwvyo40B6CTeS5DQT5/3ZD9AKoJER/ATs786g128kMhbKP2BJTFdMa9jwPH3CFV3yPBDG6Z+SdvIXUhVS9U/w34PmmuC7ks7WYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1FFB01FB;
+	Thu, 25 Jan 2024 03:30:54 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 448133F73F;
+	Thu, 25 Jan 2024 03:30:08 -0800 (PST)
+Date: Thu, 25 Jan 2024 11:30:06 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH 00/15] KVM: arm64: Improvements to GICv3 LPI injection
-In-Reply-To: <20240124204909.105952-1-oliver.upton@linux.dev>
-References: <20240124204909.105952-1-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 20/25] KVM: arm64: Streamline save/restore of
+ HFG[RW]TR_EL2
+Message-ID: <20240125113006.GC1535978@e124191.cambridge.arm.com>
+References: <20240122201852.262057-1-maz@kernel.org>
+ <20240122201852.262057-21-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, rananta@google.com, jingzhangos@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240122201852.262057-21-maz@kernel.org>
 
-Hi Oliver,
+On Mon, Jan 22, 2024 at 08:18:47PM +0000, Marc Zyngier wrote:
+> The way we save/restore HFG[RW]TR_EL2 can now be simplified, and
+> the Ampere erratum hack is the only thing that still stands out.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 42 ++++++-------------------
+>  1 file changed, 9 insertions(+), 33 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 245f9c1ca666..2d5891518006 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -157,8 +157,6 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+>  	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+> -	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0;
+> -	u64 r_val, w_val;
+>  
+>  	CHECK_FGT_MASKS(HFGRTR_EL2);
+>  	CHECK_FGT_MASKS(HFGWTR_EL2);
+> @@ -171,34 +169,10 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+>  		return;
+>  
+> -	ctxt_sys_reg(hctxt, HFGRTR_EL2) = read_sysreg_s(SYS_HFGRTR_EL2);
+> -	ctxt_sys_reg(hctxt, HFGWTR_EL2) = read_sysreg_s(SYS_HFGWTR_EL2);
+> -
+> -	/*
+> -	 * Trap guest writes to TCR_EL1 to prevent it from enabling HA or HD.
+> -	 */
+> -	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+> -		w_set |= HFGxTR_EL2_TCR_EL1_MASK;
+> -
+> -	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
+> -		compute_clr_set(vcpu, HFGRTR_EL2, r_clr, r_set);
+> -		compute_clr_set(vcpu, HFGWTR_EL2, w_clr, w_set);
+> -	}
+> -
+> -	compute_undef_clr_set(vcpu, kvm, HFGRTR_EL2, r_clr, r_set);
+> -	compute_undef_clr_set(vcpu, kvm, HFGWTR_EL2, w_clr, w_set);
+> -
+> -	r_val = __HFGRTR_EL2_nMASK;
+> -	r_val |= r_set;
+> -	r_val &= ~r_clr;
+> -
+> -	w_val = __HFGWTR_EL2_nMASK;
+> -	w_val |= w_set;
+> -	w_val &= ~w_clr;
+> -
+> -	write_sysreg_s(r_val, SYS_HFGRTR_EL2);
+> -	write_sysreg_s(w_val, SYS_HFGWTR_EL2);
+> -
+> +	update_fgt_traps(hctxt, vcpu, kvm, HFGRTR_EL2);
+> +	update_fgt_traps_cs(hctxt, vcpu, kvm, HFGWTR_EL2, 0,
+> +			    cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38) ?
+> +			    HFGxTR_EL2_TCR_EL1_MASK : 0);
+>  	update_fgt_traps(hctxt, vcpu, kvm, HFGITR_EL2);
+>  	update_fgt_traps(hctxt, vcpu, kvm, HDFGRTR_EL2);
+>  	update_fgt_traps(hctxt, vcpu, kvm, HDFGWTR_EL2);
+> @@ -223,9 +197,11 @@ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+>  		return;
+>  
+> -	write_sysreg_s(ctxt_sys_reg(hctxt, HFGRTR_EL2), SYS_HFGRTR_EL2);
+> -	write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
+> -
+> +	__deactivate_fgt(hctxt, vcpu, kvm, HFGRTR_EL2);
+> +	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+> +		write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
+> +	else
+> +		__deactivate_fgt(hctxt, vcpu, kvm, HFGWTR_EL2);
+>  	__deactivate_fgt(hctxt, vcpu, kvm, HFGITR_EL2);
+>  	__deactivate_fgt(hctxt, vcpu, kvm, HDFGRTR_EL2);
+>  	__deactivate_fgt(hctxt, vcpu, kvm, HDFGWTR_EL2);
 
-On Wed, 24 Jan 2024 20:48:54 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> The unfortunate reality is there are increasingly large systems that are
-> shipping today without support for GICv4 vLPI injection. Serialization
-> in KVM's LPI routing/injection code has been a significant bottleneck
-> for VMs on these machines when under a high load of LPIs (e.g. a
-> multi-queue NIC).
-> 
-> Even though the long-term solution is quite clearly **direct
-> injection**, we really ought to do something about the LPI scaling
-> issues within KVM.
-> 
-> This series aims to improve the performance of LPI routing/injection in
-> KVM by moving readers of LPI configuration data away from the
-> lpi_list_lock in favor or using RCU.
-> 
-> Patches 1-5 change out the representation of LPIs in KVM from a
-> linked-list to an xarray. While not strictly necessary for making the
-> locking improvements, this seems to be an opportune time to switch to a
-> data structure that can actually be indexed.
-> 
-> Patches 6-10 transition vgic_get_lpi() and vgic_put_lpi() away from
-> taking the lpi_list_lock in favor of using RCU for protection. Note that
-> this requires some rework to the way references are taken on LPIs and
-> how reclaim works to be RCU safe.
-> 
-> Lastly, patches 11-15 rework the LRU policy on the LPI translation cache
-> to not require moving elements in the linked-list and take advantage of
-> this to make it an rculist readable outside of the lpi_list_lock.
-
-I quite like the overall direction. I've left a few comments here and
-there, and will probably get back to it after I try to run some tests
-on a big-ish box.
-
-> All of this was tested on top of v6.8-rc1. Apologies if any of the
-> changelogs are a bit too light, I'm happy to rework those further in
-> subsequent revisions.
-> 
-> I would've liked to have benchmark data showing the improvement on top
-> of upstream with this series, but I'm currently having issues with our
-> internal infrastructure and upstream kernels. However, this series has
-> been found to have a near 2x performance improvement to redis-memtier [*]
-> benchmarks on our kernel tree.
-
-It'd be really good to have upstream-based numbers, with details of
-the actual setup (device assignment? virtio?) so that we can compare
-things and even track regressions in the future.
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Joey
