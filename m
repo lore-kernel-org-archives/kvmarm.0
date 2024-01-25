@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C952C131721
-	for <kvmarm@lists.linux.dev>; Thu, 25 Jan 2024 16:46:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92BD1468E7
+	for <kvmarm@lists.linux.dev>; Thu, 25 Jan 2024 16:46:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706201165; cv=none; b=M4yA6hATO0b5Jn6txb+uxcU7KuU+tBwj5J//PVpQ/OMvpVBBmsS4DNq0dnXLIwrBOa5AzAOGLAKkWUHgiZEYQ7rowgGFn+rK/ff9q57GVVcLG4HMfumdwomkeP/6aX7khUcA4tUuAywPZtv8LWJQQIm5y6sIrJSuTKvz9AwMzMI=
+	t=1706201171; cv=none; b=qBhU4UL2HTa7oyYogYYrxjI005A/0FwnRelTbwhESQvctXl84gXtLI+jco3QLjZiQaK2eK+JOZZJX/gacG6nk/5S8dlXXDVYxNYDc1NnaQt6NtjyzRosApgUXFMShchTWoO0DL2K4KxKnHmv1rkxN4JuiXD2Rf2kXpwaiSHsfhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706201165; c=relaxed/simple;
-	bh=P+QbObnrP0WBontv6raHh6yNRs/wXfMjE3QjG7otGtY=;
+	s=arc-20240116; t=1706201171; c=relaxed/simple;
+	bh=RYSkqFOQ01hFCkK6kdRl4zoorgEFa1qy6JwzzkzXoKc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uZadWFMumpvL/Na8qI7SrvgkZqw+bvODOg31MAZiNFATloC2rDZrBdQ99NPg/VoLNERQU1UCEV2Cfb9C0Rpnn2NlVFJSoOozaiD1x8b0nz8VcvpOay3fVKo07uwi1mutygTSN7cczDjHqSXv5nx5nmwA2p1IBsprNzMtKbSHs08=
+	 MIME-Version; b=OJjmxybI1hql6mlmqZ9vubcCnUuFM/lw7XLXqbZEuqqTSqj3K2sP+Nfzf5Iqr3a0ohjbbnk2RzwUv5GXZr1PBbVUkts9dQxmIqFMejhkiTwudtuoBBirIAe/FSX5iyAjEfP24Uw0pgDjfbbpxbjSxtTtAukW7dk0rEvbgkeBa8A=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CBC93175A;
-	Thu, 25 Jan 2024 08:46:47 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 908D41762;
+	Thu, 25 Jan 2024 08:46:53 -0800 (PST)
 Received: from e121798.cable.virginm.net (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E1F9D3F5A1;
-	Thu, 25 Jan 2024 08:45:57 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A7DED3F5A1;
+	Thu, 25 Jan 2024 08:46:03 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: catalin.marinas@arm.com,
 	will@kernel.org,
@@ -56,9 +56,9 @@ Cc: pcc@google.com,
 	linux-arch@vger.kernel.org,
 	linux-mm@kvack.org,
 	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH RFC v3 34/35] arm64: mte: Enable dynamic tag storage management
-Date: Thu, 25 Jan 2024 16:42:55 +0000
-Message-Id: <20240125164256.4147-35-alexandru.elisei@arm.com>
+Subject: [PATCH RFC v3 35/35] HACK! arm64: dts: Add fake tag storage to fvp-base-revc.dts
+Date: Thu, 25 Jan 2024 16:42:56 +0000
+Message-Id: <20240125164256.4147-36-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240125164256.4147-1-alexandru.elisei@arm.com>
 References: <20240125164256.4147-1-alexandru.elisei@arm.com>
@@ -70,26 +70,79 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Everything is in place, enable tag storage management.
+Faking a tag storage region for FVP is useful for testing.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arch/arm64/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 088e30fc6d12..95c153705a2c 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -2084,7 +2084,7 @@ config ARM64_MTE
+Changes since rfc v2:
+
+* New patch, not intended to be merged.
+
+ arch/arm64/boot/dts/arm/fvp-base-revc.dts | 42 +++++++++++++++++++++--
+ 1 file changed, 39 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/arm/fvp-base-revc.dts b/arch/arm64/boot/dts/arm/fvp-base-revc.dts
+index 60472d65a355..e9f44420cb62 100644
+--- a/arch/arm64/boot/dts/arm/fvp-base-revc.dts
++++ b/arch/arm64/boot/dts/arm/fvp-base-revc.dts
+@@ -165,10 +165,30 @@ C1_L2: l2-cache1 {
+ 		};
+ 	};
  
- if ARM64_MTE
- config ARM64_MTE_TAG_STORAGE
--	bool
-+	bool "MTE tag storage management"
- 	select ARCH_HAS_FAULT_ON_ACCESS
- 	select CONFIG_CMA
- 	help
+-	memory@80000000 {
++	memory0: memory@80000000 {
+ 		device_type = "memory";
+-		reg = <0x00000000 0x80000000 0 0x80000000>,
+-		      <0x00000008 0x80000000 0 0x80000000>;
++		reg = <0x00 0x80000000 0x00 0x80000000>;
++		numa-node-id = <0x00>;
++	};
++
++	/* tags0 */
++	tags_memory0: memory@8f8000000 {
++		device_type = "memory";
++		reg = <0x08 0xf8000000 0x00 0x4000000>;
++		numa-node-id = <0x00>;
++	};
++
++	memory1: memory@880000000 {
++		device_type = "memory";
++		reg = <0x08 0x80000000 0x00 0x78000000>;
++		numa-node-id = <0x01>;
++	};
++
++	/* tags1 */
++	tags_memory1: memory@8fc00000 {
++		device_type = "memory";
++		reg = <0x08 0xfc000000 0x00 0x3c00000>;
++		numa-node-id = <0x01>;
+ 	};
+ 
+ 	reserved-memory {
+@@ -183,6 +203,22 @@ vram: vram@18000000 {
+ 			reg = <0x00000000 0x18000000 0 0x00800000>;
+ 			no-map;
+ 		};
++
++		tags0: tag-storage@8f8000000 {
++			compatible = "arm,mte-tag-storage";
++			reg = <0x08 0xf8000000 0x00 0x4000000>;
++			block-size = <0x1000>;
++			tagged-memory = <&memory0>;
++			reusable;
++		};
++
++		tags1: tag-storage@8fc00000 {
++			compatible = "arm,mte-tag-storage";
++			reg = <0x08 0xfc000000 0x00 0x3c00000>;
++			block-size = <0x1000>;
++			tagged-memory = <&memory1>;
++			reusable;
++		};
+ 	};
+ 
+ 	gic: interrupt-controller@2f000000 {
 -- 
 2.43.0
 
