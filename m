@@ -1,190 +1,99 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D5581BF2B
-	for <kvmarm@lists.linux.dev>; Thu, 25 Jan 2024 09:42:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A0BC1CA9C;
+	Thu, 25 Jan 2024 10:08:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706175726; cv=none; b=ub0zXaWOBpMUEMBVxdh408C2Bma3i3k7nOWjVlk7bbw1ehWRjkm60xujpLmsoE8lRsH4YlRUCaZ5IG+gUSKD3LubEiGubGECnlii2VPHPQZACwNfWWCGgKkLlQLU9Z7aevo5MvnKn0ZG0eKEvInTQjPh6mTQAyRdYOZqTkmpamE=
+	t=1706177311; cv=none; b=RHSlx+ETJIAWO18bhvaUPXBRCMa3GmZFuhITkwi4Q7ntLDgpCacw/5ksn4d+9vCPf1IccHwnXWYLX+/FU4q+xD4a1C5JpMlklkx5XwmNtOWOCgZXEgCjj6GlXBIqdCLAR4xTolXgzu/krT8vtY55CqBBgfb6ifZEPUKMshG4OAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706175726; c=relaxed/simple;
-	bh=kHyYYCdBgYQk24bzTT7RfjZBbzTiO+dJI+C6Eodq4+A=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EkCleBXYCyndxU3SiunTJ18IqmO0Moz2WX8utGuorcUwHindNwy9mOuFoE4G4vrMAtux+oQE0rkNqWLKuGM0IYogJbaLO7FU9ZyRVKbP/1PdPvUCm69Sk3ZAregYYvaG/bXJN/n6FOqn75CqOpUty+AqhabEISRqrzav8jpTfc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C2CC1515;
-	Thu, 25 Jan 2024 01:42:48 -0800 (PST)
-Received: from a077893.arm.com (unknown [10.163.40.116])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 9BFE23F73F;
-	Thu, 25 Jan 2024 01:41:58 -0800 (PST)
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	mark.rutland@arm.com
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	James Clark <james.clark@arm.com>,
-	Rob Herring <robh@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Suzuki Poulose <suzuki.poulose@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	linux-perf-users@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
+	s=arc-20240116; t=1706177311; c=relaxed/simple;
+	bh=+tITBzDqPrtOmavLo2l72bnF/pJ1I0RIn/MseVnx2A8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sjel1W8G6lAsjEic2WPDPrrDQrBFUwpYG9g6S4Rv9kc0221Hx8cTouQBIrW+x2cdTTUAAQeyYQtmLvkkpmYxxq3bW9gdAAK0cWFMauAKzVgqM6Q2QWCWJwJL/VT9vz2VVnFrnXG6W7VPbs3xm7F8Lupejy4qMn6rhbwqFNDKyiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WoMZKOtN; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WoMZKOtN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CB3DC43390;
+	Thu, 25 Jan 2024 10:08:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706177311;
+	bh=+tITBzDqPrtOmavLo2l72bnF/pJ1I0RIn/MseVnx2A8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WoMZKOtN4zYAxIAxA/4gMDOaXPKIi8pyRk4T/r+sZw+Zlqq9Qj+IoRA14dBwO8k/w
+	 a+lq0KT+o/VZRCl7u2jDHBnAhvoWLOCxivzFRinREjWZFBnyXi+syrrYkQOEyT48Gy
+	 XAGjPRoAGmUBq6ONJW+STPxcW5Zod5/m2FIAgMJihbHf81kzGa5k1iGiKuRNE05fh2
+	 NmKkpGxLtIjxD+WiaCklQ9VniK0gkIFct2GH1aSo9LCTyGZRL8Jz0baSDm4dbILAn4
+	 eOFVZz7aC6E8lOBQyB2/fuKEE3bjeXehEvm2Fr6W3d/qHf20R+pT1XU7hP/VtOF+t+
+	 1pZ8ORNUG5uQA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rSweq-00EgK8-QS;
+	Thu, 25 Jan 2024 10:08:28 +0000
+Date: Thu, 25 Jan 2024 10:08:28 +0000
+Message-ID: <864jf19143.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
 	James Morse <james.morse@arm.com>,
-	kvmarm@lists.linux.dev
-Subject: [PATCH V16 5/8] KVM: arm64: nvhe: Disable branch generation in nVHE guests
-Date: Thu, 25 Jan 2024 15:11:16 +0530
-Message-Id: <20240125094119.2542332-6-anshuman.khandual@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240125094119.2542332-1-anshuman.khandual@arm.com>
-References: <20240125094119.2542332-1-anshuman.khandual@arm.com>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH 09/15] KVM: arm64: vgic: Ensure the irq refcount is nonzero when taking a ref
+In-Reply-To: <20240124204909.105952-10-oliver.upton@linux.dev>
+References: <20240124204909.105952-1-oliver.upton@linux.dev>
+	<20240124204909.105952-10-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, rananta@google.com, jingzhangos@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Disable the BRBE before we enter the guest, saving the status and enable it
-back once we get out of the guest. This avoids capturing branch records in
-the guest kernel or userspace, which would be confusing the host samples.
+On Wed, 24 Jan 2024 20:49:03 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> It will soon be possible for get() and put() calls to happen in
+> parallel, which means in most cases we must ensure the refcount is
+> nonzero when taking a new reference. Switch to using
+> vgic_try_get_irq_kref() where necessary, and document the few conditions
+> where an IRQ's refcount is guaranteed to be nonzero.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/vgic/vgic-its.c | 18 ++++++++----------
+>  arch/arm64/kvm/vgic/vgic.c     |  3 ++-
+>  2 files changed, 10 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 1d912a595b71..7219f4a0a93d 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -75,18 +75,11 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+>  	 * check that we don't add a second list entry with the same LPI.
+>  	 */
+>  	oldirq = xa_load(&dist->lpi_xa, intid);
+> -	if (oldirq) {
+> +	if (oldirq && vgic_try_get_irq_kref(oldirq)) {
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: James Morse <james.morse@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev
-Cc: linux-arm-kernel@lists.infradead.org
-CC: linux-kernel@vger.kernel.org
-Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
----
-Changes in V16:
+nit: move the NULL-check inside the helper, since you always have to
+do it.
 
-- Dropped BRBCR_EL1 and BRBFCR_EL1 from enum vcpu_sysreg
-- Reverted back the KVM NVHE patch - used host_debug_state based 'brbcr_el1'
-  element, and dropped the previous dependency on Jame's coresight series
+Thanks,
 
- arch/arm64/include/asm/kvm_host.h  |  5 ++++-
- arch/arm64/kvm/debug.c             |  5 +++++
- arch/arm64/kvm/hyp/nvhe/debug-sr.c | 33 ++++++++++++++++++++++++++++++
- 3 files changed, 42 insertions(+), 1 deletion(-)
+	M.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 21c57b812569..bce8792092af 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -569,7 +569,7 @@ struct kvm_vcpu_arch {
- 	u8 cflags;
- 
- 	/* Input flags to the hypervisor code, potentially cleared after use */
--	u8 iflags;
-+	u16 iflags;
- 
- 	/* State flags for kernel bookkeeping, unused by the hypervisor code */
- 	u8 sflags;
-@@ -610,6 +610,7 @@ struct kvm_vcpu_arch {
- 		u64 pmscr_el1;
- 		/* Self-hosted trace */
- 		u64 trfcr_el1;
-+		u64 brbcr_el1;
- 	} host_debug_state;
- 
- 	/* VGIC state */
-@@ -779,6 +780,8 @@ struct kvm_vcpu_arch {
- #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
- /* vcpu running in HYP context */
- #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
-+/* Save BRBE context if active  */
-+#define DEBUG_STATE_SAVE_BRBE	__vcpu_single_flag(iflags, BIT(8))
- 
- /* SVE enabled for host EL0 */
- #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index 8725291cb00a..99f85d8acbf3 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -335,10 +335,15 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
- 	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
- 	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
- 		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
-+
-+	/* Check if we have BRBE implemented and available at the host */
-+	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRBE_SHIFT))
-+		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
- }
- 
- void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
- {
- 	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
- 	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
-+	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-index 4558c02eb352..79bcf0fb1326 100644
---- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-@@ -79,6 +79,34 @@ static void __debug_restore_trace(u64 trfcr_el1)
- 	write_sysreg_s(trfcr_el1, SYS_TRFCR_EL1);
- }
- 
-+static void __debug_save_brbe(u64 *brbcr_el1)
-+{
-+	*brbcr_el1 = 0;
-+
-+	/* Check if the BRBE is enabled */
-+	if (!(read_sysreg_s(SYS_BRBCR_EL1) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
-+		return;
-+
-+	/*
-+	 * Prohibit branch record generation while we are in guest.
-+	 * Since access to BRBCR_EL1 is trapped, the guest can't
-+	 * modify the filtering set by the host.
-+	 */
-+	*brbcr_el1 = read_sysreg_s(SYS_BRBCR_EL1);
-+	write_sysreg_s(0, SYS_BRBCR_EL1);
-+	isb();
-+}
-+
-+static void __debug_restore_brbe(u64 brbcr_el1)
-+{
-+	if (!brbcr_el1)
-+		return;
-+
-+	/* Restore BRBE controls */
-+	write_sysreg_s(brbcr_el1, SYS_BRBCR_EL1);
-+	isb();
-+}
-+
- void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
- {
- 	/* Disable and flush SPE data generation */
-@@ -87,6 +115,9 @@ void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
- 	/* Disable and flush Self-Hosted Trace generation */
- 	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
- 		__debug_save_trace(&vcpu->arch.host_debug_state.trfcr_el1);
-+	/* Disable BRBE branch records */
-+	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_BRBE))
-+		__debug_save_brbe(&vcpu->arch.host_debug_state.brbcr_el1);
- }
- 
- void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
-@@ -100,6 +131,8 @@ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
- 		__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
- 	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
- 		__debug_restore_trace(vcpu->arch.host_debug_state.trfcr_el1);
-+	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_BRBE))
-+		__debug_restore_brbe(vcpu->arch.host_debug_state.brbcr_el1);
- }
- 
- void __debug_switch_to_host(struct kvm_vcpu *vcpu)
 -- 
-2.25.1
-
+Without deviation from the norm, progress is not possible.
