@@ -1,113 +1,127 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA681EF1F
-	for <kvmarm@lists.linux.dev>; Thu, 25 Jan 2024 13:26:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9844C51001
+	for <kvmarm@lists.linux.dev>; Thu, 25 Jan 2024 13:30:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706189209; cv=none; b=MZ6CmjFxBsbwy1ghspNWA7vPR2v01N3giAjGoS5BTWbEHHm+8wLQ6zBilyFpNT3Z+1vnZKsK8cEZCTZ6InLJJ5cDo5Ns4YkH1wSNm4QEuL0txZPUXZxWQKVRyC1r/DUiGDkwegiDh7yW2ONv46vrwJsThDPys2ll7dxK5XCu/Ec=
+	t=1706189453; cv=none; b=IM97kwacy/Aqqa474Cinygvo0YKDUivNVxAsElWuJ/XHkjbGHaAsmbi3lJQEypE+4xR0543PSDEX9eX+93JGVAjqubsc1QOJuZf85/YGFGogjUAuqB6RgIaRO0/luVyA9T2I7XVeFhXc66L57mbC21zrdDI8Pzx3qHIvDtA+DVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706189209; c=relaxed/simple;
-	bh=6aRyImlj4ycKsBHnQ12//RVsPX0PTtNmLuHIWsmV5mI=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=qyTUnUR0s2LFKTOH3RqiO48NKMc4fAMyrTvMMn0flSd1iU0cEDzh+ZFTwSDVOrztU5a0iD0eDtHul/1WPKI84725W2JgtI8sLQ1B7JD5Kq3wpGAWDBq3QN0JnoXK+EH0ew+j8iQ70y8ADsgQIl+QIl0Ye/MWaXphgzvH6dFgJgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4TLM5P4qbRzXghn;
-	Thu, 25 Jan 2024 21:25:29 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9D1A518005C;
-	Thu, 25 Jan 2024 21:26:43 +0800 (CST)
-Received: from [10.174.185.210] (10.174.185.210) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 25 Jan 2024 21:26:42 +0800
-Subject: Re: [bug report] GICv4.1: doorbell interrupts will be lost in a
- corner case
+	s=arc-20240116; t=1706189453; c=relaxed/simple;
+	bh=oV6ygTLBYKMaWOfWcDorYF4Z6RcphDpNEfJG4Gywya4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kig0ms2gXEnkmbKB3Ak4xoS+unNbaJOwGEBiYCr1mRCjZCVXqUC1MKlqaCENuixDfEKbalDEJUSk0aOnryxMWp5g5B9qcY+1B8E+Dhed7b9uxcATe+MPVzziBgYs3UcXZXv1S+oy1kDG7A+NVjpwvfqpDDnslyZr3brE6gOf0lI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 34D741FB;
+	Thu, 25 Jan 2024 05:31:35 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 62FDC3F5A1;
+	Thu, 25 Jan 2024 05:30:49 -0800 (PST)
+Date: Thu, 25 Jan 2024 13:30:47 +0000
+From: Joey Gouly <joey.gouly@arm.com>
 To: Marc Zyngier <maz@kernel.org>
-CC: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
-	moderated for non-subscribers <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, "wanghaibin.wang@huawei.com"
-	<wanghaibin.wang@huawei.com>
-References: <4edc4d02-5c0b-a2e5-897a-7e60fbb0f3e3@huawei.com>
- <86cytq9a0r.wl-maz@kernel.org>
-From: Kunkun Jiang <jiangkunkun@huawei.com>
-Message-ID: <a5d9cdc1-cfc4-b6d9-ceb8-a9c2db55384c@huawei.com>
-Date: Thu, 25 Jan 2024 21:26:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 21/25] KVM: arm64: Make TLBI OS/Range UNDEF if not
+ advertised to the guest
+Message-ID: <20240125133047.GD1535978@e124191.cambridge.arm.com>
+References: <20240122201852.262057-1-maz@kernel.org>
+ <20240122201852.262057-22-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <86cytq9a0r.wl-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240122201852.262057-22-maz@kernel.org>
 
-Hi Marc,
+Question,
 
-On 2024/1/24 20:43, Marc Zyngier wrote:
-> On Wed, 24 Jan 2024 08:54:24 +0000,
-> Kunkun Jiang <jiangkunkun@huawei.com> wrote:
->> Hi all，
->>
->> In chapter 8.5 ("Doorbells") of the GIC spec, the affinity of
->> doorbell interrupt is described like this:
->>
->>> Doorbell interrupts target the Redistributor the vPE is
->>> currently mapped to, based on the previous VMAPP or VMOVP
->>> command for the vPE.
->> The doorbell interrupt here should refer to all types of
->> doorbell interrupt, right?
-> There is only one type of doorbell.
->
->> When GICv4.1 is enabled, the doorbell interrupt will be
->> truned on only when kvm handles WFI exit. There is a
->> corner case where will lost doorbell interrupt:
->> 1. doorbell interrupt enabled
->> 2. the cpu which the vPE is mapped to is manually offline
->>    through 'echo 0 > /sys/device/system/cpu/cpuX/online'
->> 3. According to the description of chapter 8.5 ("Doorbells"),
->>    the doorbell interrupt coming at this time will still
->>    be sent to the offline cpu.Then the interrupt will be
->>    lost.
->>
->> Should we add a cpu offline callback to handle the
->> doorbell interrupt mapped to this cpu?
-> That seems gross. The right way to do it is to track the affinity of
-> the doorbell (which we already do), and let the core code move the
-> interrupt somewhere else in this case (which is should already do).
->
-> Have you actually witnessed this issue? Or is that just idle
-> conjecture?
-When cpu offline, all interrupts will be migrated through
-irq_migrate_all_off_this_cpu.The doorbell interrupts will
-also try to move to other cpu via VMOVP in
-its_vpe_set_affinity.
+On Mon, Jan 22, 2024 at 08:18:48PM +0000, Marc Zyngier wrote:
+> Outer Shareable and Range TLBI instructions shouldn't be made available
+> to the guest if they are not advertised. Use FGU to disable those,
+> and set HCR_EL2.TLBIOS in the case the host doesn't have FGT.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 29 +++++++++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index a62efd8a2959..3c939ea4a28f 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -3949,6 +3949,9 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+>  
+>  	mutex_lock(&kvm->arch.config_lock);
+>  
+> +	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
+> +		vcpu->arch.hcr_el2 |= HCR_TTLBOS;
+> +
+>  	if (test_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags))
+>  		goto out;
+>  
+> @@ -3961,6 +3964,32 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+>  				       HFGxTR_EL2_nSMPRI_EL1_MASK	|
+>  				       HFGxTR_EL2_nTPIDR2_EL0_MASK);
+>  
+> +	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
+> +		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1OS|
+> +						HFGITR_EL2_TLBIRVALE1OS	|
+> +						HFGITR_EL2_TLBIRVAAE1OS	|
+> +						HFGITR_EL2_TLBIRVAE1OS	|
+> +						HFGITR_EL2_TLBIVAALE1OS	|
+> +						HFGITR_EL2_TLBIVALE1OS	|
+> +						HFGITR_EL2_TLBIVAAE1OS	|
+> +						HFGITR_EL2_TLBIASIDE1OS	|
+> +						HFGITR_EL2_TLBIVAE1OS	|
+> +						HFGITR_EL2_TLBIVMALLE1OS);
+> +
+> +	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, RANGE))
+> +		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1	|
+> +						HFGITR_EL2_TLBIRVALE1	|
+> +						HFGITR_EL2_TLBIRVAAE1	|
+> +						HFGITR_EL2_TLBIRVAE1	|
+> +						HFGITR_EL2_TLBIRVAALE1IS|
+> +						HFGITR_EL2_TLBIRVALE1IS	|
+> +						HFGITR_EL2_TLBIRVAAE1IS	|
+> +						HFGITR_EL2_TLBIRVAE1IS	|
+> +						HFGITR_EL2_TLBIRVAALE1OS|
+> +						HFGITR_EL2_TLBIRVALE1OS	|
+> +						HFGITR_EL2_TLBIRVAAE1OS	|
+> +						HFGITR_EL2_TLBIRVAE1OS);
+> +
+>  	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
+>  out:
+>  	mutex_unlock(&kvm->arch.config_lock);
 
-However, according to the current implementation, GICv4.1
-allows us to skip VMOVP if moving to a cpu whose RD is
-sharing its VPE table with the current one. And I have
-verified this:
-0. Each cpu die shares a VPE table and contains 32 CPUs
-   die0(CPU0-31) die1(CPU32-63)...
-1. Enable GICv4.1
-2. Create a 1U VM and bind the vcpu to CPU32, doorbell
-   affinity to CPU32
-3. Bind the vcpu to CPU16, doorbell affinity to CPU16
-3. Manually offline CPU16 on the host side.
-   echo 0 > /sys/devices/system/cpu/cpu16/online
-4. VMOVP will be skipped.
-   (The doorbell is migrated to CPU0 by default.)
+I think I'm right in saying..
 
-Looking forward to your reply.
+If the VM is running on a platform with ID_AA64ISAR0_EL1.TLB=0b010 (Outer
+Shareable and TLB range maintenance instructions are implemented.) but without
+support for FEAT_FGT, and the VMM sets the ID reg to ID_AA64ISAR0_EL1.TLB=0,
+this change will trap the TLBI *OS instructions but not the following: 
 
-Kunkun Jiang
+    TLBI RVAAE1
+    TLBI RVAAE1IS
+    TLBI RVAALE1
+    TLBI RVAALE1IS
+    TLBI RVAE1
+    TLBI RVAE1IS
+    TLBI RVALE1
+    TLBI RVALE1IS
+
+These TLB range instructions only trap with HCR_EL2.TTLB, however that traps
+all TLB instructions. You may have left this off intentionally, if so can you
+add something to the commit message.
+
+Thanks,
+Joey
