@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E903812FF9F
-	for <kvmarm@lists.linux.dev>; Thu, 25 Jan 2024 16:43:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD59F133993
+	for <kvmarm@lists.linux.dev>; Thu, 25 Jan 2024 16:44:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706201038; cv=none; b=fGfT656KfTG0oc0s/wmsMr2wMYqdkyXE/GKP80fXv8CHhaSb3shgBIoAvut4CVxGLBhoB/iPtZHQDBB1/77DBY6121vqrYVLrl90YLQGOhVs2cbE0fgOF5W3BaOLzw+73llMfQ6sm/7L6Mb4MZ2rlQMyrFHp7hsHs3KXiDTpz7Q=
+	t=1706201044; cv=none; b=GBE4JNjJSCIx0uHIYhzlj9S7lqbSdYBuU44aEs31iB2be3hWF3aFOkU/fUx8rACMsl17fCkXCH17AAIl0GylEpJrZXaX18nedT93egLeo96YHGAOTx1qSDop87GdamG2KCLMUEVtH2aZwfjkx/R1EQjYYhrH+l28nz8bxhzqSJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706201038; c=relaxed/simple;
-	bh=eSQaWCc2Px+2vbM1RKkbkoXSqzbcobRpPRCxEZJPC24=;
+	s=arc-20240116; t=1706201044; c=relaxed/simple;
+	bh=t0dAP6TAcUuIlGIYHAJGWd4RU2YFIjS4Zw/gn5LLLDY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RfzKNDADIOZC2gzA3z6xV8PAzJDi62NBI88mT4ZtXTOCnqiSOgdkOmMFiIKP1i92FmkfosTHcklsVqHJ53i+5e0otgg0mN4sXTdabFu7WNlmshOHNnQgZWr+lp6HgPDi6b1mrLH02Ze1f1Qk5Xu/KDPp4nswYsokeyY8+WLg25Q=
+	 MIME-Version; b=J6oWoTWUiOyiMq8QT777OhbLgDtwf1BbgBHNgQMNFz7BwvxxBQjwT8p2fMw8UakPkXNAOnDVpCedtykcQhLuVxr8RXFt9ZdT2j/L/CpdohIg/H2MPYjWAYEyozAW83F/JKV2Y97V6MZD/bz1uqSzwQ9Am6M+ZsVcXOb8dNDAdNM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CDDEF1576;
-	Thu, 25 Jan 2024 08:44:40 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B7E751596;
+	Thu, 25 Jan 2024 08:44:46 -0800 (PST)
 Received: from e121798.cable.virginm.net (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DE15E3F5A1;
-	Thu, 25 Jan 2024 08:43:50 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A76463F5A1;
+	Thu, 25 Jan 2024 08:43:56 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: catalin.marinas@arm.com,
 	will@kernel.org,
@@ -56,9 +56,9 @@ Cc: pcc@google.com,
 	linux-arch@vger.kernel.org,
 	linux-mm@kvack.org,
 	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH RFC v3 12/35] mm: Call arch_swap_prepare_to_restore() before arch_swap_restore()
-Date: Thu, 25 Jan 2024 16:42:33 +0000
-Message-Id: <20240125164256.4147-13-alexandru.elisei@arm.com>
+Subject: [PATCH RFC v3 13/35] mm: memory: Introduce fault-on-access mechanism for pages
+Date: Thu, 25 Jan 2024 16:42:34 +0000
+Message-Id: <20240125164256.4147-14-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240125164256.4147-1-alexandru.elisei@arm.com>
 References: <20240125164256.4147-1-alexandru.elisei@arm.com>
@@ -70,99 +70,307 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-arm64 uses arch_swap_restore() to restore saved tags before the page is
-swapped in and it's called in atomic context (with the ptl lock held).
+Introduce a mechanism that allows an architecture to trigger a page fault,
+and add the infrastructure to handle that fault accordingly. To use make
+use of this, an arch is expected to mark the table entry as PAGE_NONE (which
+will cause a fault next time it is accessed) and to implement an
+arch-specific method (like a software bit) for recognizing that the fault
+needs to be handled by the arch code.
 
-Introduce arch_swap_prepare_to_restore() that will allow an architecture to
-perform extra work during swap in and outside of a critical section.
-This will be used by arm64 to allocate a buffer in memory where to
-temporarily save tags if tag storage is not available for the page being
-swapped in.
+arm64 will use of this approach to reserve tag storage for pages which are
+mapped in an MTE enabled VMA, but the storage needed to store tags isn't
+reserved (for example, because of an mprotect(PROT_MTE) call on a VMA with
+existing pages).
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- include/linux/pgtable.h | 7 +++++++
- mm/memory.c             | 4 ++++
- mm/shmem.c              | 9 +++++++++
- mm/swapfile.c           | 5 +++++
- 4 files changed, 25 insertions(+)
 
+Changes since rfc v2:
+
+* New patch. Split from patch #19 ("mm: mprotect: Introduce PAGE_FAULT_ON_ACCESS
+for mprotect(PROT_MTE)") (David Hildenbrand).
+
+ include/linux/huge_mm.h |  4 ++--
+ include/linux/pgtable.h | 47 +++++++++++++++++++++++++++++++++++--
+ mm/Kconfig              |  3 +++
+ mm/huge_memory.c        | 36 +++++++++++++++++++++--------
+ mm/memory.c             | 51 ++++++++++++++++++++++++++---------------
+ 5 files changed, 109 insertions(+), 32 deletions(-)
+
+diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
+index 5adb86af35fc..4678a0a5e6a8 100644
+--- a/include/linux/huge_mm.h
++++ b/include/linux/huge_mm.h
+@@ -346,7 +346,7 @@ struct page *follow_devmap_pmd(struct vm_area_struct *vma, unsigned long addr,
+ struct page *follow_devmap_pud(struct vm_area_struct *vma, unsigned long addr,
+ 		pud_t *pud, int flags, struct dev_pagemap **pgmap);
+ 
+-vm_fault_t do_huge_pmd_numa_page(struct vm_fault *vmf);
++vm_fault_t handle_huge_pmd_protnone(struct vm_fault *vmf);
+ 
+ extern struct page *huge_zero_page;
+ extern unsigned long huge_zero_pfn;
+@@ -476,7 +476,7 @@ static inline spinlock_t *pud_trans_huge_lock(pud_t *pud,
+ 	return NULL;
+ }
+ 
+-static inline vm_fault_t do_huge_pmd_numa_page(struct vm_fault *vmf)
++static inline vm_fault_t handle_huge_pmd_protnone(struct vm_fault *vmf)
+ {
+ 	return 0;
+ }
 diff --git a/include/linux/pgtable.h b/include/linux/pgtable.h
-index 98f81ca08cbe..2d0f04042f62 100644
+index 2d0f04042f62..81a21be855a2 100644
 --- a/include/linux/pgtable.h
 +++ b/include/linux/pgtable.h
-@@ -959,6 +959,13 @@ static inline void arch_swap_invalidate_area(int type)
+@@ -1455,7 +1455,7 @@ static inline int pud_trans_unstable(pud_t *pud)
+ 	return 0;
  }
- #endif
  
-+#ifndef __HAVE_ARCH_SWAP_PREPARE_TO_RESTORE
-+static inline vm_fault_t arch_swap_prepare_to_restore(swp_entry_t entry, struct folio *folio)
+-#ifndef CONFIG_NUMA_BALANCING
++#if !defined(CONFIG_NUMA_BALANCING) && !defined(CONFIG_ARCH_HAS_FAULT_ON_ACCESS)
+ /*
+  * In an inaccessible (PROT_NONE) VMA, pte_protnone() may indicate "yes". It is
+  * perfectly valid to indicate "no" in that case, which is why our default
+@@ -1477,7 +1477,50 @@ static inline int pmd_protnone(pmd_t pmd)
+ {
+ 	return 0;
+ }
+-#endif /* CONFIG_NUMA_BALANCING */
++#endif /* !CONFIG_NUMA_BALANCING && !CONFIG_ARCH_HAS_FAULT_ON_ACCESS */
++
++#ifndef CONFIG_ARCH_HAS_FAULT_ON_ACCESS
++static inline bool arch_fault_on_access_pte(pte_t pte)
 +{
-+	return 0;
++	return false;
++}
++
++static inline bool arch_fault_on_access_pmd(pmd_t pmd)
++{
++	return false;
++}
++
++/*
++ * The function is called with the fault lock held and an elevated reference on
++ * the folio.
++ *
++ * Rules that an arch implementation of the function must follow:
++ *
++ * 1. The function must return with the elevated reference dropped.
++ *
++ * 2. If the return value contains VM_FAULT_RETRY or VM_FAULT_COMPLETED then:
++ *
++ * - if FAULT_FLAG_RETRY_NOWAIT is not set, the function must return with the
++ *   correct fault lock released, which can be accomplished with
++ *   release_fault_lock(vmf). Note that release_fault_lock() doesn't check if
++ *   FAULT_FLAG_RETRY_NOWAIT is set before releasing the mmap_lock.
++ *
++ * - if FAULT_FLAG_RETRY_NOWAIT is set, then the function must not release the
++ *   mmap_lock. The flag should be set only if the mmap_lock is held.
++ *
++ * 3. If the return value contains neither of the above, the function must not
++ * release the fault lock; the generic fault handler will take care of releasing
++ * the correct lock.
++ */
++static inline vm_fault_t arch_handle_folio_fault_on_access(struct folio *folio,
++							   struct vm_fault *vmf,
++							   bool *map_pte)
++{
++	*map_pte = false;
++
++	return VM_FAULT_SIGBUS;
 +}
 +#endif
+ 
+ #endif /* CONFIG_MMU */
+ 
+diff --git a/mm/Kconfig b/mm/Kconfig
+index 341cf53898db..153df67221f1 100644
+--- a/mm/Kconfig
++++ b/mm/Kconfig
+@@ -1006,6 +1006,9 @@ config IDLE_PAGE_TRACKING
+ config ARCH_HAS_CACHE_LINE_SIZE
+ 	bool
+ 
++config ARCH_HAS_FAULT_ON_ACCESS
++	bool
 +
- #ifndef __HAVE_ARCH_SWAP_RESTORE
- static inline void arch_swap_restore(swp_entry_t entry, struct folio *folio)
+ config ARCH_HAS_CURRENT_STACK_POINTER
+ 	bool
+ 	help
+diff --git a/mm/huge_memory.c b/mm/huge_memory.c
+index 94ef5c02b459..2bad63a7ec16 100644
+--- a/mm/huge_memory.c
++++ b/mm/huge_memory.c
+@@ -1698,7 +1698,7 @@ struct page *follow_trans_huge_pmd(struct vm_area_struct *vma,
+ }
+ 
+ /* NUMA hinting page fault entry point for trans huge pmds */
+-vm_fault_t do_huge_pmd_numa_page(struct vm_fault *vmf)
++vm_fault_t handle_huge_pmd_protnone(struct vm_fault *vmf)
  {
-diff --git a/mm/memory.c b/mm/memory.c
-index 7e1f4849463a..8a421e168b57 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -3975,6 +3975,10 @@ vm_fault_t do_swap_page(struct vm_fault *vmf)
- 
- 	folio_throttle_swaprate(folio, GFP_KERNEL);
- 
-+	ret = arch_swap_prepare_to_restore(entry, folio);
-+	if (ret)
-+		goto out_page;
-+
- 	/*
- 	 * Back out if somebody else already faulted in this pte.
- 	 */
-diff --git a/mm/shmem.c b/mm/shmem.c
-index 14427e9982f9..621fabc3b8c6 100644
---- a/mm/shmem.c
-+++ b/mm/shmem.c
-@@ -1855,6 +1855,7 @@ static int shmem_swapin_folio(struct inode *inode, pgoff_t index,
- 	struct swap_info_struct *si;
- 	struct folio *folio = NULL;
- 	swp_entry_t swap;
+ 	struct vm_area_struct *vma = vmf->vma;
+ 	pmd_t oldpmd = vmf->orig_pmd;
+@@ -1708,6 +1708,7 @@ vm_fault_t do_huge_pmd_numa_page(struct vm_fault *vmf)
+ 	int nid = NUMA_NO_NODE;
+ 	int target_nid, last_cpupid = (-1 & LAST_CPUPID_MASK);
+ 	bool migrated = false, writable = false;
 +	vm_fault_t ret;
- 	int error;
+ 	int flags = 0;
  
- 	VM_BUG_ON(!*foliop || !xa_is_value(*foliop));
-@@ -1903,6 +1904,14 @@ static int shmem_swapin_folio(struct inode *inode, pgoff_t index,
- 	}
- 	folio_wait_writeback(folio);
+ 	vmf->ptl = pmd_lock(vma->vm_mm, vmf->pmd);
+@@ -1731,6 +1732,20 @@ vm_fault_t do_huge_pmd_numa_page(struct vm_fault *vmf)
+ 	if (!folio)
+ 		goto out_map;
  
-+	ret = arch_swap_prepare_to_restore(swap, folio);
-+	if (ret) {
-+		if (fault_type)
-+			*fault_type = ret;
-+		error = -EINVAL;
-+		goto unlock;
++	folio_get(folio);
++	vma_set_access_pid_bit(vma);
++
++	if (arch_fault_on_access_pmd(oldpmd)) {
++		bool map_pte = false;
++
++		spin_unlock(vmf->ptl);
++		ret = arch_handle_folio_fault_on_access(folio, vmf, &map_pte);
++		if (ret || !map_pte)
++			return ret;
++		writable = false;
++		goto out_lock_and_map;
 +	}
 +
- 	/*
- 	 * Some architectures may have to restore extra metadata to the
- 	 * folio after reading from swap.
-diff --git a/mm/swapfile.c b/mm/swapfile.c
-index 556ff7347d5f..49425598f778 100644
---- a/mm/swapfile.c
-+++ b/mm/swapfile.c
-@@ -1785,6 +1785,11 @@ static int unuse_pte(struct vm_area_struct *vma, pmd_t *pmd,
- 		goto setpte;
- 	}
- 
-+	if (arch_swap_prepare_to_restore(entry, folio)) {
-+		ret = -EINVAL;
+ 	/* See similar comment in do_numa_page for explanation */
+ 	if (!writable)
+ 		flags |= TNF_NO_GROUP;
+@@ -1755,15 +1770,18 @@ vm_fault_t do_huge_pmd_numa_page(struct vm_fault *vmf)
+ 	if (migrated) {
+ 		flags |= TNF_MIGRATED;
+ 		nid = target_nid;
+-	} else {
+-		flags |= TNF_MIGRATE_FAIL;
+-		vmf->ptl = pmd_lock(vma->vm_mm, vmf->pmd);
+-		if (unlikely(!pmd_same(oldpmd, *vmf->pmd))) {
+-			spin_unlock(vmf->ptl);
+-			goto out;
+-		}
+-		goto out_map;
 +		goto out;
 +	}
 +
- 	/*
- 	 * Some architectures may have to restore extra metadata to the page
- 	 * when reading from swap. This metadata may be indexed by swap entry
++	flags |= TNF_MIGRATE_FAIL;
++
++out_lock_and_map:
++	vmf->ptl = pmd_lock(vma->vm_mm, vmf->pmd);
++	if (unlikely(!pmd_same(oldpmd, *vmf->pmd))) {
++		spin_unlock(vmf->ptl);
++		goto out;
+ 	}
++	goto out_map;
+ 
+ out:
+ 	if (nid != NUMA_NO_NODE)
+diff --git a/mm/memory.c b/mm/memory.c
+index 8a421e168b57..110fe2224277 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -4886,11 +4886,6 @@ static vm_fault_t do_fault(struct vm_fault *vmf)
+ int numa_migrate_prep(struct folio *folio, struct vm_area_struct *vma,
+ 		      unsigned long addr, int page_nid, int *flags)
+ {
+-	folio_get(folio);
+-
+-	/* Record the current PID acceesing VMA */
+-	vma_set_access_pid_bit(vma);
+-
+ 	count_vm_numa_event(NUMA_HINT_FAULTS);
+ 	if (page_nid == numa_node_id()) {
+ 		count_vm_numa_event(NUMA_HINT_FAULTS_LOCAL);
+@@ -4900,13 +4895,14 @@ int numa_migrate_prep(struct folio *folio, struct vm_area_struct *vma,
+ 	return mpol_misplaced(folio, vma, addr);
+ }
+ 
+-static vm_fault_t do_numa_page(struct vm_fault *vmf)
++static vm_fault_t handle_pte_protnone(struct vm_fault *vmf)
+ {
+ 	struct vm_area_struct *vma = vmf->vma;
+ 	struct folio *folio = NULL;
+ 	int nid = NUMA_NO_NODE;
+ 	bool writable = false;
+ 	int last_cpupid;
++	vm_fault_t ret;
+ 	int target_nid;
+ 	pte_t pte, old_pte;
+ 	int flags = 0;
+@@ -4939,6 +4935,20 @@ static vm_fault_t do_numa_page(struct vm_fault *vmf)
+ 	if (!folio || folio_is_zone_device(folio))
+ 		goto out_map;
+ 
++	folio_get(folio);
++	/* Record the current PID acceesing VMA */
++	vma_set_access_pid_bit(vma);
++
++	if (arch_fault_on_access_pte(old_pte)) {
++		bool map_pte = false;
++
++		pte_unmap_unlock(vmf->pte, vmf->ptl);
++		ret = arch_handle_folio_fault_on_access(folio, vmf, &map_pte);
++		if (ret || !map_pte)
++			return ret;
++		goto out_lock_and_map;
++	}
++
+ 	/* TODO: handle PTE-mapped THP */
+ 	if (folio_test_large(folio))
+ 		goto out_map;
+@@ -4983,18 +4993,21 @@ static vm_fault_t do_numa_page(struct vm_fault *vmf)
+ 	if (migrate_misplaced_folio(folio, vma, target_nid)) {
+ 		nid = target_nid;
+ 		flags |= TNF_MIGRATED;
+-	} else {
+-		flags |= TNF_MIGRATE_FAIL;
+-		vmf->pte = pte_offset_map_lock(vma->vm_mm, vmf->pmd,
+-					       vmf->address, &vmf->ptl);
+-		if (unlikely(!vmf->pte))
+-			goto out;
+-		if (unlikely(!pte_same(ptep_get(vmf->pte), vmf->orig_pte))) {
+-			pte_unmap_unlock(vmf->pte, vmf->ptl);
+-			goto out;
+-		}
+-		goto out_map;
++		goto out;
++	}
++
++	flags |= TNF_MIGRATE_FAIL;
++
++out_lock_and_map:
++	vmf->pte = pte_offset_map_lock(vma->vm_mm, vmf->pmd,
++				       vmf->address, &vmf->ptl);
++	if (unlikely(!vmf->pte))
++		goto out;
++	if (unlikely(!pte_same(ptep_get(vmf->pte), vmf->orig_pte))) {
++		pte_unmap_unlock(vmf->pte, vmf->ptl);
++		goto out;
+ 	}
++	goto out_map;
+ 
+ out:
+ 	if (nid != NUMA_NO_NODE)
+@@ -5151,7 +5164,7 @@ static vm_fault_t handle_pte_fault(struct vm_fault *vmf)
+ 		return do_swap_page(vmf);
+ 
+ 	if (pte_protnone(vmf->orig_pte) && vma_is_accessible(vmf->vma))
+-		return do_numa_page(vmf);
++		return handle_pte_protnone(vmf);
+ 
+ 	spin_lock(vmf->ptl);
+ 	entry = vmf->orig_pte;
+@@ -5272,7 +5285,7 @@ static vm_fault_t __handle_mm_fault(struct vm_area_struct *vma,
+ 		}
+ 		if (pmd_trans_huge(vmf.orig_pmd) || pmd_devmap(vmf.orig_pmd)) {
+ 			if (pmd_protnone(vmf.orig_pmd) && vma_is_accessible(vma))
+-				return do_huge_pmd_numa_page(&vmf);
++				return handle_huge_pmd_protnone(&vmf);
+ 
+ 			if ((flags & (FAULT_FLAG_WRITE|FAULT_FLAG_UNSHARE)) &&
+ 			    !pmd_write(vmf.orig_pmd)) {
 -- 
 2.43.0
 
