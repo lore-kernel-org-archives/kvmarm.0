@@ -1,148 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A3D1B278
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 09:17:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9D11B59A
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 09:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706260628; cv=none; b=qyYK0cUO/7BF9F1aRfgQdTKDDj08nYfB/2O0+ph3U9Tg/Sa8vqtpRk4ptBKJWMxE0sauRcKxp6CCG8FMz49pMD9DnB3fezz6GgkV4NuW43UKzApoCQqncSZcfJt5NTpr61qIXmMEHtU1jH9vmiDx8WnZyckwNAKfNof9QOhMNOw=
+	t=1706260692; cv=none; b=mWwgAqBbFKnqMdWfLY/F2qfGBhs+2m05CMpU3735AmauZlcduCaN1D8UU23cavSpNauutUvYNEoVB0Lwq4+5AyO6sIGhG30vHj9p8Ssm/Yl0IB9ONfSl56JBPH6/0M6A0C725PsYQVcYpVJOoJscPpODp1WZcgZ1hv50c9ngGDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706260628; c=relaxed/simple;
-	bh=1Hr0IDqCophLPAljtjPEqz3Du6URIPG9nybTZtoKW/g=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YaQmNLtdK8123/LPkZIDs5ERMFLIIJqsZ9yEaFSXZQeu+nobwMfQkqoxpz/BAogoIZvREOKC6JLdVsalEimQqre2MMlYUBbuWO/vEz/O+ds4itqBW5AdcDJraMlrXmuWMGKVMVG8k8TXHVHlkufGYO903oR3Qdcyhj4xmUJqqFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dSPGu/9I; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dSPGu/9I"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 765E3C433C7;
-	Fri, 26 Jan 2024 09:17:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706260627;
-	bh=1Hr0IDqCophLPAljtjPEqz3Du6URIPG9nybTZtoKW/g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dSPGu/9Iw3Su4/RzWYsYjlBbWpAWDyC+eNKLehLUnn0uv2URSMek/2c+3sHjqq6FY
-	 vDm8zsCpr0a8vqFv6XYkJvQE7KMOBKtBg6r7vTahtQy6wetKz4RQcrP6Uqfa+2gEzD
-	 QB90r50XwRCXsLPeMLWFcwNDgx4D3wxxM66V/njGuce/YqJsoxHdaTicjL3WfKSTGO
-	 PkuvkVQC3Xg7p66tMeF/ZkUYUlYtdbnbx18WPQrltQGsxQUM0F/lSwwdfpXBhFX576
-	 EmDTmhY3s5B7qfzDlnGho59OdaSulz+9vdqAW4eiDuWVaBmhKd3L/Jf7TbVBoNlsl3
-	 YIW0wTQw/rIew==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rTIKf-00Ezch-7K;
-	Fri, 26 Jan 2024 09:17:05 +0000
-Date: Fri, 26 Jan 2024 09:17:04 +0000
-Message-ID: <86wmrw78tr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 24/25] KVM: arm64: Make FEAT_MOPS UNDEF if not advertised to the guest
-In-Reply-To: <20240125162538.GF1535978@e124191.cambridge.arm.com>
-References: <20240122201852.262057-1-maz@kernel.org>
-	<20240122201852.262057-25-maz@kernel.org>
-	<20240125162538.GF1535978@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1706260692; c=relaxed/simple;
+	bh=4CIRkOMDtaRMqY+44dvSqf3umOCfrEUF1UOULw83lUM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LwkH1bNnX4dZaYg9ZKiOVWGmA+BVS/UPPuSrW3LmSoNCMkt9MtapvB0xO734m98pgy35iHrJAeqkY8HYJUn7KPRZgu6rysds0Qvwnq9CXppXsDsMXlK+03W4woazQuFZLvYGnfghFiD+H4+sxrpj+08LrjUNlOJ8HWtT89KfTVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TLsWS2S9gz1gxyG;
+	Fri, 26 Jan 2024 17:16:20 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 20A67140416;
+	Fri, 26 Jan 2024 17:18:06 +0800 (CST)
+Received: from DESKTOP-6NKE0BC.china.huawei.com (10.174.185.210) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 26 Jan 2024 17:18:05 +0800
+From: Kunkun Jiang <jiangkunkun@huawei.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Thomas Gleixner <tglx@linutronix.de>
+CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<wanghaibin.wang@huawei.com>, Kunkun Jiang <jiangkunkun@huawei.com>
+Subject: [PATCH] irqchip/gic-v4.1: Fix GICv4.1 doorbell affinity
+Date: Fri, 26 Jan 2024 17:17:52 +0800
+Message-ID: <20240126091752.1102-1-jiangkunkun@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Thu, 25 Jan 2024 16:25:38 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> On Mon, Jan 22, 2024 at 08:18:51PM +0000, Marc Zyngier wrote:
-> > We unconditionally enable FEAT_MOPS, which is obviously wrong.
-> > 
-> > So let's only do that when it is advertised to the guest.
-> > Which means we need to rely on a per-vcpu HCRX_EL2 shadow register.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_arm.h        | 4 +---
-> >  arch/arm64/include/asm/kvm_host.h       | 1 +
-> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
-> >  arch/arm64/kvm/sys_regs.c               | 8 ++++++++
-> >  4 files changed, 11 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> > index 3c6f8ba1e479..a1769e415d72 100644
-> > --- a/arch/arm64/include/asm/kvm_arm.h
-> > +++ b/arch/arm64/include/asm/kvm_arm.h
-> > @@ -102,9 +102,7 @@
-> >  #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
-> >  #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
-> >  
-> > -#define HCRX_GUEST_FLAGS \
-> > -	(HCRX_EL2_SMPME | HCRX_EL2_TCR2En | \
-> > -	 (cpus_have_final_cap(ARM64_HAS_MOPS) ? (HCRX_EL2_MSCEn | HCRX_EL2_MCE2) : 0))
-> > +#define HCRX_GUEST_FLAGS (HCRX_EL2_SMPME | HCRX_EL2_TCR2En)
-> >  #define HCRX_HOST_FLAGS (HCRX_EL2_MSCEn | HCRX_EL2_TCR2En)
-> >  
-> >  /* TCR_EL2 Registers bits */
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index fe5ed4bcded0..22343354db3e 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -584,6 +584,7 @@ struct kvm_vcpu_arch {
-> >  
-> >  	/* Values of trap registers for the guest. */
-> >  	u64 hcr_el2;
-> > +	u64 hcrx_el2;
-> >  	u64 mdcr_el2;
-> >  	u64 cptr_el2;
-> >  
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > index 2d5891518006..e3fcf8c4d5b4 100644
-> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > @@ -236,7 +236,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
-> >  	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
-> >  
-> >  	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
-> > -		u64 hcrx = HCRX_GUEST_FLAGS;
-> > +		u64 hcrx = vcpu->arch.hcrx_el2;
-> >  		if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
-> >  			u64 clr = 0, set = 0;
-> >  
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index afe6975fcf5c..b7977e08e4ef 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -3952,6 +3952,14 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
-> >  	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
-> >  		vcpu->arch.hcr_el2 |= HCR_TTLBOS;
-> >  
-> > +	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
-> > +		vcpu->arch.hcrx_el2 = HCRX_GUEST_FLAGS;
-> > +
-> > +		if (kvm_has_feat(kern_hyp_va(vcpu->kvm),
-> 
-> Not sure if the use of kern_hyp_va is intentional, seems out of place since we
-> use the bare `kvm` variable everyone else.
+commit dd3f050a216e ("irqchip/gic-v4.1: Implement the v4.1 flavour
+of VMOVP") make an optimization, VMOVP can be skipped if moving
+VPE to a cpu whose RD is sharing its VPE table with the current one.
+But when skipping VMOVP, the affinity recorded in irq_data is still
+updated. This causes the doorbell affinity recorfed in the irq_data
+to be inconsistent with the actual.
 
-That's totally wrong. No idea where that came from...
+In corner case, this may result in lost interrupts:
+0. Each cpu die shares a VPE table and contains 32 CPUs
+   die0(CPU0-31) die1(CPU32-63)...
+1. VPE resides on CPU32, doorbell affinity to CPU32.
+2. Move VPE to CPU33, skip VMOVP, doorbell still affinity to CPU32.
+   The affinity recorded in irq_data is CPU33.
+3. Manually offline CPU32 on the host side:
+   'echo 0 > /sys/devices/system/cpu/cpu32/online'
+4. Core code cannot move the doorbell affinity to CPU32, since the
+   record in irq_data is CPU33.
+5. Subsequent doorbell interrupts will be lost.
 
-Thanks for spotting it!
+So affinity recoreded in irq_data should not be updated when skipping
+VMOVP.
 
-	M.
+Fixes: dd3f050a216e ("irqchip/gic-v4.1: Implement the v4.1 flavour of VMOVP")
+Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+---
+ drivers/irqchip/irq-gic-v3-its.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index d097001c1e3e..4b1dbb697959 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -3850,8 +3850,9 @@ static int its_vpe_set_affinity(struct irq_data *d,
+ 	its_send_vmovp(vpe);
+ 	its_vpe_db_proxy_move(vpe, from, cpu);
+ 
+-out:
+ 	irq_data_update_effective_affinity(d, cpumask_of(cpu));
++
++out:
+ 	vpe_to_cpuid_unlock(vpe, flags);
+ 
+ 	return IRQ_SET_MASK_OK_DONE;
 -- 
-Without deviation from the norm, progress is not possible.
+2.33.0
+
