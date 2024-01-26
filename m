@@ -1,32 +1,32 @@
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713181EB3A
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 14:24:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E2501F958
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 14:24:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706279070; cv=none; b=a5IIKKp/q5P6YR8xQ8ww+yxoAflhkXrZUDZBN+juajS/mQlP+b0QYSSrWql6V0aVLyMrSM6tzpVREA00NdL70JhNK5GMRE9FNu7L4aB6Ktfrvi3gf+ZBGn91s96MsCn6DCZ0m56gze0yMNxATrYhY1H6EQHQhf3+k/38bj96n9s=
+	t=1706279072; cv=none; b=lTKJAwgWFF2OMN/ap1WMgPCodzNZA57FvZm4cjwuEH4vhxxT1sQIL6K2i2aGKFGS7mjfEQkA1vbak0YuNvGuFBTuUaVZ8S8f4cwzy6NqPyosalPKxlSj9EAMYTrG9JnoTHh1N3vAvIGTBfzNAwY8EtsKhE+1Y1puBRIyNp8r7iY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706279070; c=relaxed/simple;
-	bh=vSlJ7Ct1DAGV8YQbegg4W2ipKGldsefQuf1ja8MugpU=;
+	s=arc-20240116; t=1706279072; c=relaxed/simple;
+	bh=kkLHAT1aru4kqVRhTZTxDmoT7B2myDGPsJoLvPJ4LwY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=tWVCF3FdDYLoV7apCIXq1MTy9SnyvRoh6jz/oQuvfUaT0QZfP8NeJOjOIwuU0NKDvEmRsuB+0VQuOVkJpPBoNPGoJ+g85hBlo+httiU/gQSUCZE/bZD4U4IoYRugj/1adt1cDR2fLTX0r9HI/ZkKJ3/NldJn0UYXmu/8/s/Re7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cSf6sJNB; arc=none smtp.client-ip=95.215.58.173
+	 MIME-Version:Content-type; b=F+xfe6zXfoYFIZPuxM324HF5K4TOR8jMHm6G6N0FVrc3c/IcsCcilQFLOD8+O3AJ7Hs5ZCsfkFrqaNnFhM0NvgQ6MfwuRZUIte493u3YuZV/mcqWURw5mO3Qh5FMqAouIuOk6LE16LpYQ7C1vhy9d6pnFxmVMgyL3AbuNgcfowU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=abiT3c/R; arc=none smtp.client-ip=91.218.175.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cSf6sJNB"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="abiT3c/R"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706279066;
+	t=1706279069;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=utoylgPTkJdXuAHqdAXp52bAVwYjYgFvheHgylCUS70=;
-	b=cSf6sJNBlayx+5i2UKKh1cEpVGX+R+gFpPJ2dZS5nc9/HxbtsexmA3uuf0rhQeCD8zIcsd
-	93qd8WWpCXehoaD5bimLsW7PD+pf9wX19WlLObsghwGOMg0FdXeYcatPaORBT75UN9R7ly
-	S6A3rn9+cgyc9KM9PiAeOTRsIyKulyA=
+	bh=Wp48M57+460gf0h/vogiX45XJW/w1v5ntdv821ynfeQ=;
+	b=abiT3c/Rv209MgrKWt7WKdAoO6ptenT/EbJvxKeF0zuMnoCnATNPhuu9b8PueuQt5YrzJ0
+	4Ej7TPjCTEgdtqEtdXI6XVGwxZRLk40dP+hwfLcKM6ngplM/TzyZZNxZOlfSScih/zF3HK
+	PvRB36t6kTNtTviDjIDIjJ1Rdrt/Knw=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
@@ -38,9 +38,9 @@ Cc: ajones@ventanamicro.com,
 	thuth@redhat.com,
 	alexandru.elisei@arm.com,
 	eric.auger@redhat.com
-Subject: [kvm-unit-tests PATCH v2 22/24] riscv: Add isa string parsing
-Date: Fri, 26 Jan 2024 15:23:47 +0100
-Message-ID: <20240126142324.66674-48-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v2 23/24] gitlab-ci: Add riscv64 tests
+Date: Fri, 26 Jan 2024 15:23:48 +0100
+Message-ID: <20240126142324.66674-49-andrew.jones@linux.dev>
 In-Reply-To: <20240126142324.66674-26-andrew.jones@linux.dev>
 References: <20240126142324.66674-26-andrew.jones@linux.dev>
 Precedence: bulk
@@ -53,238 +53,43 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-We can probably get away with just assuming several important
-and popular extensions (at least everything covered by G), but
-we'll also want to use some extensions which we should ensure
-are present by parsing the isa string. Add a parser and already
-apply it to Sstc.
+Add build/run tests for riscv64. We would also add riscv32, but Fedora
+doesn't package what we need for that.
 
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 Acked-by: Thomas Huth <thuth@redhat.com>
 ---
- lib/riscv/asm/isa.h       |  33 ++++++++++
- lib/riscv/asm/processor.h |   1 +
- lib/riscv/isa.c           | 126 ++++++++++++++++++++++++++++++++++++++
- lib/riscv/processor.c     |   2 +
- riscv/Makefile            |   1 +
- 5 files changed, 163 insertions(+)
- create mode 100644 lib/riscv/asm/isa.h
- create mode 100644 lib/riscv/isa.c
+ .gitlab-ci.yml | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/lib/riscv/asm/isa.h b/lib/riscv/asm/isa.h
-new file mode 100644
-index 000000000000..df874173f4ed
---- /dev/null
-+++ b/lib/riscv/asm/isa.h
-@@ -0,0 +1,33 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef _ASMRISCV_ISA_H_
-+#define _ASMRISCV_ISA_H_
-+#include <bitops.h>
-+#include <asm/setup.h>
-+
-+/*
-+ * We assume and use several extensions, such as Zicsr and Zifencei.
-+ * Here we only track extensions which we don't assume and the
-+ * framework may want to use. Unit tests may check for extensions
-+ * by name not tracked here with cpu_has_extension_name()
-+ */
-+enum {
-+	ISA_SSTC,
-+	ISA_MAX,
-+};
-+_Static_assert(ISA_MAX <= __riscv_xlen, "Need to increase thread_info.isa");
-+
-+static inline bool cpu_has_extension(int cpu, int ext)
-+{
-+	return test_bit(ext, cpus[cpu].isa);
-+}
-+
-+bool cpu_has_extension_name(int cpu, const char *ext);
-+
-+static inline bool has_ext(const char *ext)
-+{
-+	return cpu_has_extension_name(current_thread_info()->cpu, ext);
-+}
-+
-+void isa_init(struct thread_info *info);
-+
-+#endif /* _ASMRISCV_ISA_H_ */
-diff --git a/lib/riscv/asm/processor.h b/lib/riscv/asm/processor.h
-index f20774d02d8e..32c499d0c0ab 100644
---- a/lib/riscv/asm/processor.h
-+++ b/lib/riscv/asm/processor.h
-@@ -11,6 +11,7 @@ typedef void (*exception_fn)(struct pt_regs *);
- struct thread_info {
- 	int cpu;
- 	unsigned long hartid;
-+	unsigned long isa[1];
- 	exception_fn exception_handlers[EXCEPTION_CAUSE_MAX];
- };
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 273ec9a7224b..71d986e9884e 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -87,6 +87,23 @@ build-ppc64le:
+      | tee results.txt
+  - if grep -q FAIL results.txt ; then exit 1 ; fi
  
-diff --git a/lib/riscv/isa.c b/lib/riscv/isa.c
-new file mode 100644
-index 000000000000..bc1c9c72045c
---- /dev/null
-+++ b/lib/riscv/isa.c
-@@ -0,0 +1,126 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2023, Ventana Micro Systems Inc., Andrew Jones <ajones@ventanamicro.com>
-+ */
-+#include <libcflat.h>
-+#include <bitops.h>
-+#include <devicetree.h>
-+#include <string.h>
-+#include <asm/isa.h>
-+#include <asm/setup.h>
++# build-riscv32:
++# Fedora doesn't package a riscv32 compiler for QEMU. Oh, well.
 +
-+typedef void (*isa_func_t)(const char *, int, void *);
++# Select 'rv64' with PROCESSOR_OVERRIDE in case QEMU is too old to have 'max'
++build-riscv64:
++ extends: .intree_template
++ script:
++ - dnf install -y qemu-system-riscv gcc-riscv64-linux-gnu
++ - ./configure --arch=riscv64 --cross-prefix=riscv64-linux-gnu-
++ - make -j2
++ - printf "FOO=foo\nBAR=bar\nBAZ=baz\nMVENDORID=0\n" >test-env
++ - PROCESSOR_OVERRIDE=rv64 ACCEL=tcg KVM_UNIT_TESTS_ENV=test-env ./run_tests.sh
++      selftest
++      sbi
++      | tee results.txt
++ - grep -q PASS results.txt && ! grep -q FAIL results.txt
 +
-+struct isa_info {
-+	unsigned long hartid;
-+	isa_func_t func;
-+	void *data;
-+};
-+
-+static bool isa_match(const char *ext, const char *name, int len)
-+{
-+	return len == strlen(ext) && !strncasecmp(name, ext, len);
-+}
-+
-+struct isa_check {
-+	const char *ext;
-+	bool found;
-+};
-+
-+static void isa_name(const char *name, int len, void *data)
-+{
-+	struct isa_check *check = (struct isa_check *)data;
-+
-+	if (isa_match(check->ext, name, len))
-+		check->found = true;
-+}
-+
-+static void isa_bit(const char *name, int len, void *data)
-+{
-+	struct thread_info *info = (struct thread_info *)data;
-+
-+	if (isa_match("sstc", name, len))
-+		set_bit(ISA_SSTC, info->isa);
-+}
-+
-+static void isa_parse(const char *isa_string, int len, struct isa_info *info)
-+{
-+	assert(isa_string[0] == 'r' && isa_string[1] == 'v');
-+#if __riscv_xlen == 32
-+	assert(isa_string[2] == '3' && isa_string[3] == '2');
-+#else
-+	assert(isa_string[2] == '6' && isa_string[3] == '4');
-+#endif
-+
-+	for (int i = 4; i < len; ++i) {
-+		if (isa_string[i] == '_') {
-+			const char *multi = &isa_string[++i];
-+			int start = i;
-+
-+			while (i < len - 1 && isa_string[i] != '_')
-+				++i;
-+			info->func(multi, i - start, info->data);
-+			if (i < len - 1)
-+				--i;
-+		} else {
-+			info->func(&isa_string[i], 1, info->data);
-+		}
-+	}
-+}
-+
-+static void isa_parse_fdt(int cpu_node, u64 hartid, void *data)
-+{
-+	struct isa_info *info = (struct isa_info *)data;
-+	const struct fdt_property *prop;
-+	int len;
-+
-+	if (hartid != info->hartid)
-+		return;
-+
-+	prop = fdt_get_property(dt_fdt(), cpu_node, "riscv,isa", &len);
-+	assert(prop);
-+
-+	isa_parse(prop->data, len, info);
-+}
-+
-+static void isa_init_acpi(void)
-+{
-+	assert_msg(false, "ACPI not available");
-+}
-+
-+void isa_init(struct thread_info *ti)
-+{
-+	struct isa_info info = {
-+		.hartid = ti->hartid,
-+		.func = isa_bit,
-+		.data = ti,
-+	};
-+	int ret;
-+
-+	if (dt_available()) {
-+		ret = dt_for_each_cpu_node(isa_parse_fdt, &info);
-+		assert(ret == 0);
-+	} else {
-+		isa_init_acpi();
-+	}
-+}
-+
-+bool cpu_has_extension_name(int cpu, const char *ext)
-+{
-+	struct isa_info info = {
-+		.hartid = cpus[cpu].hartid,
-+		.func = isa_name,
-+		.data = &(struct isa_check){ .ext = ext, },
-+	};
-+	struct isa_check *check = info.data;
-+	int ret;
-+
-+	if (dt_available()) {
-+		ret = dt_for_each_cpu_node(isa_parse_fdt, &info);
-+		assert(ret == 0);
-+	} else {
-+		assert_msg(false, "ACPI not available");
-+	}
-+
-+	return check->found;
-+}
-diff --git a/lib/riscv/processor.c b/lib/riscv/processor.c
-index 2bfbd4e9b274..e0904209c0da 100644
---- a/lib/riscv/processor.c
-+++ b/lib/riscv/processor.c
-@@ -4,6 +4,7 @@
-  */
- #include <libcflat.h>
- #include <asm/csr.h>
-+#include <asm/isa.h>
- #include <asm/processor.h>
- #include <asm/setup.h>
- 
-@@ -58,5 +59,6 @@ void thread_info_init(void)
- 	unsigned long hartid = csr_read(CSR_SSCRATCH);
- 	int cpu = hartid_to_cpu(hartid);
- 
-+	isa_init(&cpus[cpu]);
- 	csr_write(CSR_SSCRATCH, &cpus[cpu]);
- }
-diff --git a/riscv/Makefile b/riscv/Makefile
-index 61a1ff88d8ec..b51d9edfb792 100644
---- a/riscv/Makefile
-+++ b/riscv/Makefile
-@@ -30,6 +30,7 @@ cflatobjs += lib/on-cpus.o
- cflatobjs += lib/vmalloc.o
- cflatobjs += lib/riscv/bitops.o
- cflatobjs += lib/riscv/io.o
-+cflatobjs += lib/riscv/isa.o
- cflatobjs += lib/riscv/mmu.o
- cflatobjs += lib/riscv/processor.o
- cflatobjs += lib/riscv/sbi.o
+ build-s390x:
+  extends: .outoftree_template
+  script:
 -- 
 2.43.0
 
