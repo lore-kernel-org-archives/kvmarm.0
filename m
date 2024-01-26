@@ -1,38 +1,41 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3C514A90
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 10:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0387017582
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 10:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706265041; cv=none; b=s52h6hdnATxjoPJKq5JBuhk21KARZS5iaJV89zeTOEzWS0a8YmS8b7Cg42N9r5D4f392Vtm8KcX/N/5bf9NyhFYvZ5DKAyruAKHNM0kwAWu3WItnBsVRuUm615m8cGgqHrikM7nMnyQK5z/j4zgZ/BhAQeaS5HQV2NuU56wXJm8=
+	t=1706265044; cv=none; b=SbeQ3J1+oYvrr8b5ZKqhzN1cERLY6+M6pPrXCSozMYTTB0U2AC9aqNC2zjDdzEIUFumSfCeuGQW1Gpxmrontj2fsrXyeg3qF5ONwqBlmrxixFNilrR9Vj+NhjvjIksJ/ln47lZxbgBqo1rb2hL9Iug4EUgUUrvzmHBmwO11GjGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706265041; c=relaxed/simple;
-	bh=NKPNx5MCX0F2NvzOk6iFTbsUF/eOQIo5oNZt0SrM0iQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=e16SuKQQW4dCXCkoroOp8I+0+3ZwYH/JM5SHELZ8IKmDLdq1rzOODCxsDXFrU0n8IEI/QUO9xmuivL2U6Xa7Md3XEEQEYeiQZHu5HOvh53zv6CyGBrmEpoNnasRy+vsthfLxRQjeUgFgWl8lPhn7L08xaj0JZHQFY894wc1RSFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+	s=arc-20240116; t=1706265044; c=relaxed/simple;
+	bh=u/TdA1+8rWxqh4YEoBU8OGgJAEeCJCUELfEFDngjtbw=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ahyONpKSuXcOjCA5JT9a7alYftjFDuMdMKKjIvH89VYcTD+3DCx2U6XRq/RsHZbzudqGoGsXjBNtdZ1BokoBv8vIECVeCVBYrHE7fx5AoqrbkEzn0M3ZCJ5/3aMyq6ntRS/AzHFc+USKbdjfC5MTymWYNCF0ITQJcqpawAPIaXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4TLv7t62QYzsW7W;
-	Fri, 26 Jan 2024 18:29:30 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4TLv7m39rGzXgmk;
+	Fri, 26 Jan 2024 18:29:24 +0800 (CST)
 Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4A4CC140136;
-	Fri, 26 Jan 2024 18:30:36 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id B3BD1180073;
+	Fri, 26 Jan 2024 18:30:39 +0800 (CST)
 Received: from DESKTOP-6NKE0BC.china.huawei.com (10.174.185.210) by
  kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 26 Jan 2024 18:30:35 +0800
+ 15.1.2507.35; Fri, 26 Jan 2024 18:30:38 +0800
 From: Kunkun Jiang <jiangkunkun@huawei.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>, Thomas Gleixner <tglx@linutronix.de>
 CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
 	<wanghaibin.wang@huawei.com>, Kunkun Jiang <jiangkunkun@huawei.com>
-Subject: [PATCH v2 0/2] irqchip/gic-v4.1: Two bugfixes about doorbell affinity
-Date: Fri, 26 Jan 2024 18:30:10 +0800
-Message-ID: <20240126103012.1020-1-jiangkunkun@huawei.com>
+Subject: [PATCH v2 1/2] irqchip/gic-v4.1: Fix GICv4.1 doorbell affinity
+Date: Fri, 26 Jan 2024 18:30:11 +0800
+Message-ID: <20240126103012.1020-2-jiangkunkun@huawei.com>
 X-Mailer: git-send-email 2.26.2.windows.1
+In-Reply-To: <20240126103012.1020-1-jiangkunkun@huawei.com>
+References: <20240126103012.1020-1-jiangkunkun@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,16 +47,48 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  kwepemm600007.china.huawei.com (7.193.23.208)
 
-There are two bugs in current doorbell affinity settings. May cause lost
-interrupts. See the patches commit message for details.
+dd3f050a216e make an optimization, VMOVP can be skipped if moving
+VPE to a cpu whose RD is sharing its VPE table with the current one.
+But when skipping VMOVP, the affinity recorded in irq_data is still
+updated. This causes the doorbell affinity recorfed in the irq_data
+to be inconsistent with the actual.
 
-Kunkun Jiang (2):
-  irqchip/gic-v4.1: Fix GICv4.1 doorbell affinity
-  irqchip/gic-v4.1: Fix skipping VMOVP in cpu offline scenario
+In corner case, this may result in lost interrupts:
+0. Each cpu die shares a VPE table and contains 32 CPUs
+   die0(CPU0-31) die1(CPU32-63)...
+1. VPE resides on CPU32, doorbell affinity to CPU32.
+2. Move VPE to CPU33, skip VMOVP, doorbell still affinity to CPU32.
+   The affinity recorded in irq_data is CPU33.
+3. Manually offline CPU32 on the host side:
+   'echo 0 > /sys/devices/system/cpu/cpu32/online'
+4. Core code cannot move the doorbell affinity to CPU32, since the
+   record in irq_data is CPU33.
+5. Subsequent doorbell interrupts will be lost.
 
- drivers/irqchip/irq-gic-v3-its.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+So affinity recoreded in irq_data should not be updated when skipping
+VMOVP.
 
+Fixes: dd3f050a216e (irqchip/gic-v4.1: Implement the v4.1 flavour of VMOVP)
+Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+---
+ drivers/irqchip/irq-gic-v3-its.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index d097001c1e3e..4b1dbb697959 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -3850,8 +3850,9 @@ static int its_vpe_set_affinity(struct irq_data *d,
+ 	its_send_vmovp(vpe);
+ 	its_vpe_db_proxy_move(vpe, from, cpu);
+ 
+-out:
+ 	irq_data_update_effective_affinity(d, cpumask_of(cpu));
++
++out:
+ 	vpe_to_cpuid_unlock(vpe, flags);
+ 
+ 	return IRQ_SET_MASK_OK_DONE;
 -- 
 2.33.0
 
