@@ -1,87 +1,113 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40477200BE
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 14:24:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF75C1EA7C
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 17:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706279074; cv=none; b=J1UN+akuDt5p2lgRi5g4jwmoTW1jFSCDgOAs+X/Ue188t2FZou6sG5LRPzQbClPmoA9W4szxCr9u2Edg+U31Ju/edO6PBBUU6KjHTwZanz3tehCWD8JJAjzNtBwn+IWakWDlGHkRdqp7D1Szw+IHypoqvN8cZ1xS1dJ2iCwq9RY=
+	t=1706288516; cv=none; b=fVhcDJ/YqCchjNppv8AlXPaFD8oCMw1l5RDb6T2rBFbC4vITY/j+7Neu2qVaQNHW3LGsUQywfeTwHmCO3oo+7XSxtqHcqda+gNyxuY60NIcWUK35vEJ5gvCWtGorHiPz913p2xxRSJATRkqgR+J6hgqRVaV9xD4Br2jvnBOIk/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706279074; c=relaxed/simple;
-	bh=Lwxr3T+cfJEtbD54mSmzNgQX2Z5bUUs7cauujdhT2IQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=DpS33sKlk/TGgpP39TN6zz+0rhPWKtsCZn/UUUSjPXl+un5JKPBVEw+LkDfammKJ6kJEny4xhyo/e+TOrvFxX/oxaGnIl//Jv0pUaux4sQwg/I2ZeiG7HzKjG8kdLYvLSMsQD2Y9JyU0hHJbtFH/pM2lNOVjLLzTMmAxgsGaTk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lILEaTU4; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lILEaTU4"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706279071;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=X8VFzrw4pKeHz0xjQzxcc7aoy02nR4XaRu+jtTXZzoA=;
-	b=lILEaTU4VBqY29rZHsaMSJGIV4DifavLVMs316Ci6VHYoKBBlavaVQBxgTxVzjE7chsdBb
-	Hna/G9EA6k0SAX4mriUqsAFO1rOSTExwkBT761Ih8Dyo4wS+OR902msOaBzal1+58lBOXY
-	GxqqzSNDsgrUEXqbGvAoJPAi3XtrmxU=
-From: Andrew Jones <andrew.jones@linux.dev>
-To: kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: ajones@ventanamicro.com,
-	anup@brainfault.org,
-	atishp@atishpatra.org,
-	pbonzini@redhat.com,
-	thuth@redhat.com,
-	alexandru.elisei@arm.com,
-	eric.auger@redhat.com
-Subject: [kvm-unit-tests PATCH v2 24/24] MAINTAINERS: Add riscv
-Date: Fri, 26 Jan 2024 15:23:49 +0100
-Message-ID: <20240126142324.66674-50-andrew.jones@linux.dev>
-In-Reply-To: <20240126142324.66674-26-andrew.jones@linux.dev>
-References: <20240126142324.66674-26-andrew.jones@linux.dev>
+	s=arc-20240116; t=1706288516; c=relaxed/simple;
+	bh=6GPERIrZxF09zkQWtn0tgp8Ki0MeI06mRjUPdBNea5M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QnvM0lQWJnXAMkL0GcUmblw6sCJItX6+fdrM5Z2lyag9sRlp6r8604iNjbzZGUsnP59zv9vlmKu7pTwCYNgydDkCGNTpXZKTq+xt6ieaie0aFCfWtGKKjq5WMWCHWHpdHyXPnsqq2LZsgRdLN79YICzfaZRsE21a6+MgK8M5cFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 56F8B1FB;
+	Fri, 26 Jan 2024 09:02:38 -0800 (PST)
+Received: from raptor (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0D4953F762;
+	Fri, 26 Jan 2024 09:01:45 -0800 (PST)
+Date: Fri, 26 Jan 2024 17:01:42 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
+	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
+	rppt@kernel.org, hughd@google.com, pcc@google.com,
+	steven.price@arm.com, anshuman.khandual@arm.com,
+	vincenzo.frascino@arm.com, david@redhat.com, eugenis@google.com,
+	kcc@google.com, hyesoo.yu@samsung.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC v3 19/35] arm64: mte: Discover tag storage memory
+Message-ID: <ZbPldp5j_nDHWvHJ@raptor>
+References: <20240125164256.4147-1-alexandru.elisei@arm.com>
+ <20240125164256.4147-20-alexandru.elisei@arm.com>
+ <5b8ce251-0790-4e2c-b5b1-0d2aeacbdd92@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b8ce251-0790-4e2c-b5b1-0d2aeacbdd92@kernel.org>
 
-Most of the support for riscv is now in place. Let's make it official
-and start adding tests!
+Hi Krzysztof,
 
-Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
----
- MAINTAINERS | 8 ++++++++
- 1 file changed, 8 insertions(+)
+On Fri, Jan 26, 2024 at 09:50:58AM +0100, Krzysztof Kozlowski wrote:
+> On 25/01/2024 17:42, Alexandru Elisei wrote:
+> > Allow the kernel to get the base address, size, block size and associated
+> > memory node for tag storage from the device tree blob.
+> > 
+> 
+> Please use scripts/get_maintainers.pl to get a list of necessary people
+> and lists to CC. It might happen, that command when run on an older
+> kernel, gives you outdated entries. Therefore please be sure you base
+> your patches on recent Linux kernel.
+> 
+> Tools like b4 or scripts_getmaintainer.pl provide you proper list of
+> people, so fix your workflow. Tools might also fail if you work on some
+> ancient tree (don't, use mainline), work on fork of kernel (don't, use
+> mainline) or you ignore some maintainers (really don't). Just use b4 and
+> all the problems go away.
+> 
+> You missed at least devicetree list (maybe more), so this won't be
+> tested by automated tooling. Performing review on untested code might be
+> a waste of time, thus I will skip this patch entirely till you follow
+> the process allowing the patch to be tested.
+> 
+> Please kindly resend and include all necessary To/Cc entries.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 958735fbfd79..a2fa437da5c9 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -94,6 +94,14 @@ F: powerpc/
- F: lib/powerpc/
- F: lib/ppc64/
- 
-+RISCV
-+M: Andrew Jones <andrew.jones@linux.dev>
-+S: Supported
-+L: kvm-riscv@lists.infradead.org
-+F: riscv/
-+F: lib/riscv/
-+T: https://gitlab.com/jones-drew/kvm-unit-tests.git
-+
- S390X
- M: Janosch Frank <frankja@linux.ibm.com>
- M: Claudio Imbrenda <imbrenda@linux.ibm.com>
--- 
-2.43.0
+My mistake, the previous iteration of the series didn't include a
+devicetree binding and I forgot to update the To/Cc list. Thank you for the
+heads-up, hopefully you can have a look after I resend the series.
 
+> 
+> 
+> > A tag storage region represents the smallest contiguous memory region that
+> > holds all the tags for the associated contiguous memory region which can be
+> > tagged. For example, for a 32GB contiguous tagged memory the corresponding
+> > tag storage region is exactly 1GB of contiguous memory, not two adjacent
+> > 512M of tag storage memory, nor one 2GB tag storage region.
+> > 
+> > Tag storage is described as reserved memory; future patches will teach the
+> > kernel how to make use of it for data (non-tagged) allocations.
+> > 
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> > 
+> > Changes since rfc v2:
+> > 
+> > * Reworked from rfc v2 patch #11 ("arm64: mte: Reserve tag storage memory").
+> > * Added device tree schema (Rob Herring)
+> > * Tag storage memory is now described in the "reserved-memory" node (Rob
+> > Herring).
+> > 
+> >  .../reserved-memory/arm,mte-tag-storage.yaml  |  78 +++++++++
+> 
+> Please run scripts/checkpatch.pl and fix reported warnings. Some
+> warnings can be ignored, but the code here looks like it needs a fix.
+> Feel free to get in touch if the warning is not clear.
+
+Thank you for pointing it out, I'll move the binding to a separate patch.
+
+Alex
