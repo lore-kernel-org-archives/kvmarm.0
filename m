@@ -1,116 +1,186 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D4E22EE3
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 20:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58A0224EC
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 20:25:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706299252; cv=none; b=Jjzk2bDhjuNLqyhi6UPG1RZmCX8ChDdIbQ9tUv5b+x24APosOr0pJHzEcFK36KwlD5gD6FlEb1wRsqUxf08Bx2FP4M0q8DZl7ELab73nTN9QMEOjDGOvXMZ2IFMWkBe0S6FxoTM0SLMHDmUfJhqS/uu9Y9ol6byBkUwxJJZlutA=
+	t=1706300745; cv=none; b=CJaEpkSGDqbxK2Mm8kArIQiHOInOHYn3pnaHdgTvREqe3HNDuIkk6AzZh3t3i8WSDPTmsm5WAAbyoW7/8QBw1f7UfaHYzTfYq8p4/xCvnxgFRyMsztbd0VQyHnZ7Sa7dk3U5PIr/hGKRKPE1fiijDWaN7Iu4oD1xY1HEA5haP90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706299252; c=relaxed/simple;
-	bh=fcxQ3bc2/ycZVVRavVndN2TW1bmrjhqtW752nshgov4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YHD87IkFRKMVMfARFIDVIUpZC1cJEvbPlhV4wUqqVmanmHmWApNAvP464OdjJQQXQgdhA0+146g/Gz/VJUU+AEqh5nznPlQ39G2uvXMk1hjmkMwQATiy9/hMvO0F5J5S442PK5XLMZkNzgLAqWrfLo3F+8YxGm+gR6nF4tmDFjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y85u0fbC; arc=none smtp.client-ip=209.85.214.174
+	s=arc-20240116; t=1706300745; c=relaxed/simple;
+	bh=3cIgTjRr4HktkHh94CWSDggXBSkYHF5KchgT06kgK8E=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=R3PY4ZDb8ed0CZbS+FnasSef6eW4sf28pCvKYJHyDsDkJ/s1hTLph8/LVAwT32y7FeJ7OXu39mYR098J4fErtBLy7FfOm6Y8zbCBPQHyC7R5NtFM/YELidZlTLPMe9kOB5SdX+azlIGdeiKukHGwIyRCx7MfzaX8gRUYeweZyzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dMQGYUu1; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y85u0fbC"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1d72d240c69so20375ad.1
-        for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 12:00:50 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dMQGYUu1"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5c670f70a37so782197a12.2
+        for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 12:25:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706299250; x=1706904050; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MimXWUdcIvN0nH3+dB3+knWCETvDzwsFYg6Za1niF5A=;
-        b=Y85u0fbCJjCdMA13kOAVGUPsK4RtwYRj9H7GyRLR3UXJvh3LHOX7qvrDSKWbCO5zet
-         K1s7guEXAXv8hEiubNItHwTS5QXQ9NDm8VRf5bNCUm2HZcRemKzeF7tz8TIoCliin0gc
-         g9ABHxtkWl3/O6xLWZL+KYOlVEygbfO7DJbJrhCNi1sJda4O+1ivNmtKISv4fxmZ+yoW
-         j3y9lYz7OuLkaoi+yf9Myzxi/U1E7P9csDMPoVyJj3MyAwHmqUEXGKPVxQFz9NEtMcrw
-         LFj9heDSUQo7XhJpLI1DVncGh2+E6IS7uPkl8nOLyYFaaQJ3YmyfPyCWuDN4RogGhhbp
-         Q02A==
+        d=google.com; s=20230601; t=1706300743; x=1706905543; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Oz9w/MGSJCfVJoFxXdjwOXlp0YlOCXLVVNfaqF8/1eE=;
+        b=dMQGYUu1Gktk8bGDofwCfpa/efFV6VnWmzY0j5iGACHG3k8kaiLoNyPwmtqj61FvcS
+         q4xG/MyVfmErHCnuK3LGoXDvGL9q9qkBr2O5Qft9DvFiiuNf4T9SvmK3nJHRPvljH5Yn
+         kZIhyufBImdTIxZm7dDdWipsK4fS+qrLREyTFuLuWKl62MuJQuczORnhtofyp3ZAcm7n
+         0oJyNZpl3vNX7ODviDLyO7mBPrcLgNKHxFWe4iIghtxokp88XQZSxYdvWuiJPQFmfVkS
+         LGYos7M60ueDSOxhL3WIEYQIZH5R+tG0inUMgwiLPUr2lYnFoq1bkUHMj97gnteuyCVa
+         Fxnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706299250; x=1706904050;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MimXWUdcIvN0nH3+dB3+knWCETvDzwsFYg6Za1niF5A=;
-        b=ke0qdYbwOLyr4OWiFHVjJIecJxy2VkAtszxu15rJL6Ipt/z8e/Dl8v5T9AzGHa5gSL
-         Vk6N+kvOWYJG1TwR1cBXPCuxH6QHKn9LHQtEFgWjji/VdoT2iTAiIFx9WarqXB6yY5il
-         j689Vy5gCfjIZfV31DYM4Xx6LHCTpfb/P4XCa1uZLcZytiKXYakG+n2UmxIPOi6u7aMq
-         MFc33mW/gwkOxGQrSHoDG7zGTvoS594yDAFqx3OIye+r419+DzNVQBqsZ/NPTnBgRZhi
-         5pRtEN4vx3TyvTOPj8fQBxgbqHSQ+WXXgfLAk9jifD/rkVGR3BHH7KuPQFSxziqg21IF
-         QXeQ==
-X-Gm-Message-State: AOJu0Yyi19wbdasCvRcutVm3qZk0sgE+L1sBirOXQZk7ZPvDvTdRUIA3
-	DFio4JAfWw6ZF30wYBdODMnKSOPbzhe/wL+kXG9oqtEIMJskmzhg4Nng5IcJ2E9tgIK+RyHA8b/
-	yJJtu1wbF1DcNkOk+9CyE0nqHw8uOCo0sbWyc
-X-Google-Smtp-Source: AGHT+IFUiaxxx/fnNfe3njsMipgqF2fdYzG/YBwFDzOMI+2YRba8r80bUR3upqDy6QVJlcre5NJrJ1mYmBGhuhzNf/E=
-X-Received: by 2002:a17:903:1246:b0:1d8:a782:6cc2 with SMTP id
- u6-20020a170903124600b001d8a7826cc2mr127996plh.13.1706299249979; Fri, 26 Jan
- 2024 12:00:49 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706300743; x=1706905543;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Oz9w/MGSJCfVJoFxXdjwOXlp0YlOCXLVVNfaqF8/1eE=;
+        b=RjeL0yESdd5FTppcqhHHBZNg5SC52BZFXsNwa/sliimxEeByFQqb7+8FjHPAH8946C
+         rE2ENMnFVpoQmoTaT8/CaY20MSS/1WEzc03blWEU5LKnrJI5/fxtNda/SlJgd5aAygsg
+         g/EqpPzIoI+bQEFdl0LC+XRi6lbXrEQbMnphlnUf8DIqxMf30c90a3XlPdJcqf3eCaio
+         7yP2fQGS6CVihZPf2aDVR7ag8KkA3aIIP+HdUFxrOakp7j1+S2KTOxPFY0a5oXX2CtXF
+         lD+EXHt/1YqRS7EFyrd4tyg6yitGXIXA0Ek2gJOatwJSBw/DlL3ZM+dOJaYitk3DsMRo
+         pz9Q==
+X-Gm-Message-State: AOJu0YwZpUzG0f6Bm6myZZWHimKFrTH4R4e/uYXoleaSeXOf4Zm1xqPa
+	BCiPs5nJksr3xroxQfZA5E4ca7R7JBLZJoMnGTbX195G07SYXt2PE+I1GQxbZhhqLee1ibgG38j
+	sXQ==
+X-Google-Smtp-Source: AGHT+IF3uGps9y8JiME3Q7HhNRDpz9fB3O2K5T+wbXcJt2yNTs/tyQVPf6ztalhofyaP4n1VGV7ie9wiTj0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a02:78a:b0:5d7:97b9:3084 with SMTP id
+ cd10-20020a056a02078a00b005d797b93084mr2394pgb.0.1706300742964; Fri, 26 Jan
+ 2024 12:25:42 -0800 (PST)
+Date: Fri, 26 Jan 2024 12:25:41 -0800
+In-Reply-To: <20231117052210.26396-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20240125164256.4147-1-alexandru.elisei@arm.com> <20240125164256.4147-12-alexandru.elisei@arm.com>
-In-Reply-To: <20240125164256.4147-12-alexandru.elisei@arm.com>
-From: Peter Collingbourne <pcc@google.com>
-Date: Fri, 26 Jan 2024 12:00:36 -0800
-Message-ID: <CAMn1gO6hx7yaFHEYVbkpPocAxQmQc3JBgppcNSJw9SUfyvjwbQ@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 11/35] mm: Allow an arch to hook into folio
- allocation when VMA is known
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, 
-	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org, 
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, 
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org, 
-	bsegall@google.com, mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com, 
-	mhiramat@kernel.org, rppt@kernel.org, hughd@google.com, steven.price@arm.com, 
-	anshuman.khandual@arm.com, vincenzo.frascino@arm.com, david@redhat.com, 
-	eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-mm@kvack.org, 
-	linux-trace-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20231117052210.26396-1-shahuang@redhat.com>
+Message-ID: <ZbQVRX3V1P-ZE2Wf@google.com>
+Subject: Re: [PATCH v2] KVM: selftests: Fix the dirty_log_test semaphore imbalance
+From: Sean Christopherson <seanjc@google.com>
+To: Shaoqin Huang <shahuang@redhat.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Peter Xu <peterx@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Jan 25, 2024 at 8:43=E2=80=AFAM Alexandru Elisei
-<alexandru.elisei@arm.com> wrote:
->
-> arm64 uses VM_HIGH_ARCH_0 and VM_HIGH_ARCH_1 for enabling MTE for a VMA.
-> When VM_HIGH_ARCH_0, which arm64 renames to VM_MTE, is set for a VMA, and
-> the gfp flag __GFP_ZERO is present, the __GFP_ZEROTAGS gfp flag also gets
-> set in vma_alloc_zeroed_movable_folio().
->
-> Expand this to be more generic by adding an arch hook that modifes the gf=
-p
-> flags for an allocation when the VMA is known.
->
-> Note that __GFP_ZEROTAGS is ignored by the page allocator unless __GFP_ZE=
-RO
-> is also set; from that point of view, the current behaviour is unchanged,
-> even though the arm64 flag is set in more places.  When arm64 will have
-> support to reuse the tag storage for data allocation, the uses of the
-> __GFP_ZEROTAGS flag will be expanded to instruct the page allocator to tr=
-y
-> to reserve the corresponding tag storage for the pages being allocated.
->
-> The flags returned by arch_calc_vma_gfp() are or'ed with the flags set by
-> the caller; this has been done to keep an architecture from modifying the
-> flags already set by the core memory management code; this is similar to
-> how do_mmap() -> calc_vm_flag_bits() -> arch_calc_vm_flag_bits() has been
-> implemented. This can be revisited in the future if there's a need to do
-> so.
->
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
++Peter
 
-This patch also needs to update the non-CONFIG_NUMA definition of
-vma_alloc_folio in include/linux/gfp.h to call arch_calc_vma_gfp. See:
-https://r.android.com/2849146
+On Fri, Nov 17, 2023, Shaoqin Huang wrote:
+> When execute the dirty_log_test on some aarch64 machine, it sometimes
+> trigger the ASSERT:
+> 
+> ==== Test Assertion Failure ====
+>   dirty_log_test.c:384: dirty_ring_vcpu_ring_full
+>   pid=14854 tid=14854 errno=22 - Invalid argument
+>      1  0x00000000004033eb: dirty_ring_collect_dirty_pages at dirty_log_test.c:384
+>      2  0x0000000000402d27: log_mode_collect_dirty_pages at dirty_log_test.c:505
+>      3   (inlined by) run_test at dirty_log_test.c:802
+>      4  0x0000000000403dc7: for_each_guest_mode at guest_modes.c:100
+>      5  0x0000000000401dff: main at dirty_log_test.c:941 (discriminator 3)
+>      6  0x0000ffff9be173c7: ?? ??:0
+>      7  0x0000ffff9be1749f: ?? ??:0
+>      8  0x000000000040206f: _start at ??:?
+>   Didn't continue vcpu even without ring full
+> 
+> The dirty_log_test fails when execute the dirty-ring test, this is
+> because the sem_vcpu_cont and the sem_vcpu_stop is non-zero value when
+> execute the dirty_ring_collect_dirty_pages() function. When those two
+> sem_t variables are non-zero, the dirty_ring_wait_vcpu() at the
+> beginning of the dirty_ring_collect_dirty_pages() will not wait for the
+> vcpu to stop, but continue to execute the following code. In this case,
+> before vcpu stop, if the dirty_ring_vcpu_ring_full is true, and the
+> dirty_ring_collect_dirty_pages() has passed the check for the
+> dirty_ring_vcpu_ring_full but hasn't execute the check for the
+> continued_vcpu, the vcpu stop, and set the dirty_ring_vcpu_ring_full to
+> false. Then dirty_ring_collect_dirty_pages() will trigger the ASSERT.
+> 
+> Why sem_vcpu_cont and sem_vcpu_stop can be non-zero value? It's because
+> the dirty_ring_before_vcpu_join() execute the sem_post(&sem_vcpu_cont)
+> at the end of each dirty-ring test. It can cause two cases:
+> 
+> 1. sem_vcpu_cont be non-zero. When we set the host_quit to be true,
+>    the vcpu_worker directly see the host_quit to be true, it quit. So
+>    the log_mode_before_vcpu_join() function will set the sem_vcpu_cont
+>    to 1, since the vcpu_worker has quit, it won't consume it.
+> 2. sem_vcpu_stop be non-zero. When we set the host_quit to be true,
+>    the vcpu_worker has entered the guest state, the next time it exit
+>    from guest state, it will set the sem_vcpu_stop to 1, and then see
+>    the host_quit, no one will consume the sem_vcpu_stop.
+> 
+> When execute more and more dirty-ring tests, the sem_vcpu_cont and
+> sem_vcpu_stop can be larger and larger, which makes many code paths
+> don't wait for the sem_t. Thus finally cause the problem.
+> 
+> To fix this problem, we can wait a while before set the host_quit to
+> true, which gives the vcpu time to enter the guest state, so it will
+> exit again. Then we can wait the vcpu to exit, and let it continue
+> again, then the vcpu will see the host_quit. Thus the sem_vcpu_cont and
+> sem_vcpu_stop will be both zero when test finished.
+> 
+> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+> v1->v2:
+>   - Fix the real logic bug, not just fresh the context.
+> 
+> v1: https://lore.kernel.org/all/20231116093536.22256-1-shahuang@redhat.com/
+> ---
+>  tools/testing/selftests/kvm/dirty_log_test.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+> index 936f3a8d1b83..a6e0ff46a07c 100644
+> --- a/tools/testing/selftests/kvm/dirty_log_test.c
+> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
+> @@ -417,7 +417,8 @@ static void dirty_ring_after_vcpu_run(struct kvm_vcpu *vcpu, int ret, int err)
+>  
+>  static void dirty_ring_before_vcpu_join(void)
+>  {
+> -	/* Kick another round of vcpu just to make sure it will quit */
+> +	/* Wait vcpu exit, and let it continue to see the host_quit. */
+> +	dirty_ring_wait_vcpu();
+>  	sem_post(&sem_vcpu_cont);
+>  }
+>  
+> @@ -719,6 +720,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  	struct kvm_vm *vm;
+>  	unsigned long *bmap;
+>  	uint32_t ring_buf_idx = 0;
+> +	int sem_val;
+>  
+>  	if (!log_mode_supported()) {
+>  		print_skip("Log mode '%s' not supported",
+> @@ -726,6 +728,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  		return;
+>  	}
+>  
+> +	sem_getvalue(&sem_vcpu_stop, &sem_val);
+> +	assert(sem_val == 0);
+> +	sem_getvalue(&sem_vcpu_cont, &sem_val);
+> +	assert(sem_val == 0);
 
-Peter
+Never use bare assert() in selftests, they'll either get compiled out or IIRC,
+will cause the test to silently exit if they fail.  Either do nothing, or use
+TEST_ASSERT().
+
+> +
+>  	/*
+>  	 * We reserve page table for 2 times of extra dirty mem which
+>  	 * will definitely cover the original (1G+) test range.  Here
+> @@ -825,6 +832,13 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  		sync_global_to_guest(vm, iteration);
+>  	}
+>  
+> +	/*
+> +	 *
+> +	 * Before we set the host_quit, let the vcpu has time to run, to make
+> +	 * sure we consume the sem_vcpu_stop and the vcpu consume the
+> +	 * sem_vcpu_cont, to keep the semaphore balance.
+> +	 */
+> +	usleep(p->interval * 1000);
+
+Please no.  "Wait for a while" is never a complete solution for fixing races.
+In rare cases, adding a delay might be the only sane workaround, but I doubt that's
+the case here.
