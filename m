@@ -1,156 +1,148 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 267B61EB32;
-	Fri, 26 Jan 2024 08:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A3D1B278
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 09:17:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706259076; cv=none; b=G93pbwk6vSezdnMxYhhHGA5XMAisG8XzTttG3p/Lla5cwKdZ5h4jxTWNn4KMyXP3X8yRLoMWzzczDPaZGtf9pQQSXDsP6DQSyXzSyZtcNOMiCOi56aiFUiAmP9NTeVEXVxwbCJPwxjqtAvqrEZKGl49BNnGbSI8Yhvc5Nqk2DMc=
+	t=1706260628; cv=none; b=qyYK0cUO/7BF9F1aRfgQdTKDDj08nYfB/2O0+ph3U9Tg/Sa8vqtpRk4ptBKJWMxE0sauRcKxp6CCG8FMz49pMD9DnB3fezz6GgkV4NuW43UKzApoCQqncSZcfJt5NTpr61qIXmMEHtU1jH9vmiDx8WnZyckwNAKfNof9QOhMNOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706259076; c=relaxed/simple;
-	bh=3XXsZesR5z3OhQn6zEFimHzAIMaks6mfbzGYjcwVnzI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BayGc996EgjhhqLaLqZnHuA1UXSxZvMxgf/M90CBx99KHesc0OyK+//uLFEVuO4JgMW6bAGIp25ZMbofs5dphKgbjH14wfAXtPReA6rp7+IYgMl2tgxv1SGUeLFuTj1Rm/7+Udaq3ScFrsdml18BFLgjWxMGLKQrXG8BEZ+q5xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J5T251s+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706260628; c=relaxed/simple;
+	bh=1Hr0IDqCophLPAljtjPEqz3Du6URIPG9nybTZtoKW/g=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YaQmNLtdK8123/LPkZIDs5ERMFLIIJqsZ9yEaFSXZQeu+nobwMfQkqoxpz/BAogoIZvREOKC6JLdVsalEimQqre2MMlYUBbuWO/vEz/O+ds4itqBW5AdcDJraMlrXmuWMGKVMVG8k8TXHVHlkufGYO903oR3Qdcyhj4xmUJqqFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dSPGu/9I; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J5T251s+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B9D0C433C7;
-	Fri, 26 Jan 2024 08:51:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dSPGu/9I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 765E3C433C7;
+	Fri, 26 Jan 2024 09:17:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706259075;
-	bh=3XXsZesR5z3OhQn6zEFimHzAIMaks6mfbzGYjcwVnzI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=J5T251s+q/OwxjAgPmVxtcll+74iQnRmWb+BhB3KK5MyL8SMv+TTKWMWq2snsc7EI
-	 E1VBQyTib/Vjih2wWfjunpv8SIOlEGf7JLZ9GRK2pB7QBup/WxAC7Azcf0AhYM9ybU
-	 JZFaMKbf6okVil/kjHyiE8yl0d4NcnSe5o324okA/FM6f4o5dwOH7kb5GJf9AKy1yD
-	 uojpObGHUoEPD93zH6uAja88lzdACNNHiUIGzjks/Hn8FXtphEo+i40HFf/u9WXIup
-	 fIqATHk3If1ICrsc69qbc0PYfDi0eqZUSsNIbR7/hg/66L0KbaGoAOjDqZCA03RxKt
-	 E004d0i/z+ong==
-Message-ID: <5b8ce251-0790-4e2c-b5b1-0d2aeacbdd92@kernel.org>
-Date: Fri, 26 Jan 2024 09:50:58 +0100
+	s=k20201202; t=1706260627;
+	bh=1Hr0IDqCophLPAljtjPEqz3Du6URIPG9nybTZtoKW/g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dSPGu/9Iw3Su4/RzWYsYjlBbWpAWDyC+eNKLehLUnn0uv2URSMek/2c+3sHjqq6FY
+	 vDm8zsCpr0a8vqFv6XYkJvQE7KMOBKtBg6r7vTahtQy6wetKz4RQcrP6Uqfa+2gEzD
+	 QB90r50XwRCXsLPeMLWFcwNDgx4D3wxxM66V/njGuce/YqJsoxHdaTicjL3WfKSTGO
+	 PkuvkVQC3Xg7p66tMeF/ZkUYUlYtdbnbx18WPQrltQGsxQUM0F/lSwwdfpXBhFX576
+	 EmDTmhY3s5B7qfzDlnGho59OdaSulz+9vdqAW4eiDuWVaBmhKd3L/Jf7TbVBoNlsl3
+	 YIW0wTQw/rIew==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rTIKf-00Ezch-7K;
+	Fri, 26 Jan 2024 09:17:05 +0000
+Date: Fri, 26 Jan 2024 09:17:04 +0000
+Message-ID: <86wmrw78tr.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 24/25] KVM: arm64: Make FEAT_MOPS UNDEF if not advertised to the guest
+In-Reply-To: <20240125162538.GF1535978@e124191.cambridge.arm.com>
+References: <20240122201852.262057-1-maz@kernel.org>
+	<20240122201852.262057-25-maz@kernel.org>
+	<20240125162538.GF1535978@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v3 19/35] arm64: mte: Discover tag storage memory
-Content-Language: en-US
-To: Alexandru Elisei <alexandru.elisei@arm.com>, catalin.marinas@arm.com,
- will@kernel.org, oliver.upton@linux.dev, maz@kernel.org,
- james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- arnd@arndb.de, akpm@linux-foundation.org, mingo@redhat.com,
- peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
- dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
- mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com,
- mhiramat@kernel.org, rppt@kernel.org, hughd@google.com
-Cc: pcc@google.com, steven.price@arm.com, anshuman.khandual@arm.com,
- vincenzo.frascino@arm.com, david@redhat.com, eugenis@google.com,
- kcc@google.com, hyesoo.yu@samsung.com, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
-References: <20240125164256.4147-1-alexandru.elisei@arm.com>
- <20240125164256.4147-20-alexandru.elisei@arm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20240125164256.4147-20-alexandru.elisei@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 25/01/2024 17:42, Alexandru Elisei wrote:
-> Allow the kernel to get the base address, size, block size and associated
-> memory node for tag storage from the device tree blob.
+On Thu, 25 Jan 2024 16:25:38 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-
-Please use scripts/get_maintainers.pl to get a list of necessary people
-and lists to CC. It might happen, that command when run on an older
-kernel, gives you outdated entries. Therefore please be sure you base
-your patches on recent Linux kernel.
-
-Tools like b4 or scripts_getmaintainer.pl provide you proper list of
-people, so fix your workflow. Tools might also fail if you work on some
-ancient tree (don't, use mainline), work on fork of kernel (don't, use
-mainline) or you ignore some maintainers (really don't). Just use b4 and
-all the problems go away.
-
-You missed at least devicetree list (maybe more), so this won't be
-tested by automated tooling. Performing review on untested code might be
-a waste of time, thus I will skip this patch entirely till you follow
-the process allowing the patch to be tested.
-
-Please kindly resend and include all necessary To/Cc entries.
-
-
-> A tag storage region represents the smallest contiguous memory region that
-> holds all the tags for the associated contiguous memory region which can be
-> tagged. For example, for a 32GB contiguous tagged memory the corresponding
-> tag storage region is exactly 1GB of contiguous memory, not two adjacent
-> 512M of tag storage memory, nor one 2GB tag storage region.
+> On Mon, Jan 22, 2024 at 08:18:51PM +0000, Marc Zyngier wrote:
+> > We unconditionally enable FEAT_MOPS, which is obviously wrong.
+> > 
+> > So let's only do that when it is advertised to the guest.
+> > Which means we need to rely on a per-vcpu HCRX_EL2 shadow register.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_arm.h        | 4 +---
+> >  arch/arm64/include/asm/kvm_host.h       | 1 +
+> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
+> >  arch/arm64/kvm/sys_regs.c               | 8 ++++++++
+> >  4 files changed, 11 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > index 3c6f8ba1e479..a1769e415d72 100644
+> > --- a/arch/arm64/include/asm/kvm_arm.h
+> > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > @@ -102,9 +102,7 @@
+> >  #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
+> >  #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
+> >  
+> > -#define HCRX_GUEST_FLAGS \
+> > -	(HCRX_EL2_SMPME | HCRX_EL2_TCR2En | \
+> > -	 (cpus_have_final_cap(ARM64_HAS_MOPS) ? (HCRX_EL2_MSCEn | HCRX_EL2_MCE2) : 0))
+> > +#define HCRX_GUEST_FLAGS (HCRX_EL2_SMPME | HCRX_EL2_TCR2En)
+> >  #define HCRX_HOST_FLAGS (HCRX_EL2_MSCEn | HCRX_EL2_TCR2En)
+> >  
+> >  /* TCR_EL2 Registers bits */
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index fe5ed4bcded0..22343354db3e 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -584,6 +584,7 @@ struct kvm_vcpu_arch {
+> >  
+> >  	/* Values of trap registers for the guest. */
+> >  	u64 hcr_el2;
+> > +	u64 hcrx_el2;
+> >  	u64 mdcr_el2;
+> >  	u64 cptr_el2;
+> >  
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > index 2d5891518006..e3fcf8c4d5b4 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > @@ -236,7 +236,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+> >  	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+> >  
+> >  	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
+> > -		u64 hcrx = HCRX_GUEST_FLAGS;
+> > +		u64 hcrx = vcpu->arch.hcrx_el2;
+> >  		if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
+> >  			u64 clr = 0, set = 0;
+> >  
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index afe6975fcf5c..b7977e08e4ef 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -3952,6 +3952,14 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+> >  	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
+> >  		vcpu->arch.hcr_el2 |= HCR_TTLBOS;
+> >  
+> > +	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
+> > +		vcpu->arch.hcrx_el2 = HCRX_GUEST_FLAGS;
+> > +
+> > +		if (kvm_has_feat(kern_hyp_va(vcpu->kvm),
 > 
-> Tag storage is described as reserved memory; future patches will teach the
-> kernel how to make use of it for data (non-tagged) allocations.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
-> 
-> Changes since rfc v2:
-> 
-> * Reworked from rfc v2 patch #11 ("arm64: mte: Reserve tag storage memory").
-> * Added device tree schema (Rob Herring)
-> * Tag storage memory is now described in the "reserved-memory" node (Rob
-> Herring).
-> 
->  .../reserved-memory/arm,mte-tag-storage.yaml  |  78 +++++++++
+> Not sure if the use of kern_hyp_va is intentional, seems out of place since we
+> use the bare `kvm` variable everyone else.
 
-Please run scripts/checkpatch.pl and fix reported warnings. Some
-warnings can be ignored, but the code here looks like it needs a fix.
-Feel free to get in touch if the warning is not clear.
+That's totally wrong. No idea where that came from...
 
+Thanks for spotting it!
 
-Best regards,
-Krzysztof
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
