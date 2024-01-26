@@ -1,128 +1,227 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFDB12B6A
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 10:53:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D3C1C6A5
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 14:23:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706266380; cv=none; b=TtKsbUKtiVI7fhYn715D72MEiDAMHcsNo3D7W+fEcq4w8we19yCrsA8ORjif8biEtlk5lPmVGPBRuC3mZznubzo/1gULYXAs1CSSBblv/sY63TIPx04uK8F0wdyl5SobTDjBf5N18hnS0z/JWmGRwQBuXjeX1tw6kOJTfjb5+js=
+	t=1706279013; cv=none; b=XwmWraBWgh8j30zpR80ez0aSt/QGV9BUIFeMDt0hNQK9KIe94NF1zXCHWohLF4k5L/n1C1xSVBsT8idC5riE2o/Xvwy9ZBo9A3+DDCoJOdkN4t5lXpS2MFycqc0gck9iNGmztT3N3AWESvxHt8CgouJ937hvkgohqEL3xunNTHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706266380; c=relaxed/simple;
-	bh=sEgq4/YsbJNz7vu+BBSK9CDr8Ju97ZXzAHrlHF3qI5k=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hlIkI+y2vDR7jZiGBzzS4T9WEzecJSVYtFF8ScxTCZqtYl3nzxCt1y6zqYS090j9pTGA459D1ymWXFKYks7LusnzSq19qpcKxQwWFI2XMJDzxmEPNGxAkpMWmpljs7s2k75DSHcEqit5W+tlraS31q9HTTykXT6sWi1sIrdBVLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g4BiQYwD; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706279013; c=relaxed/simple;
+	bh=3DE/YZxLyMzDSvcrQRq44B0LcPTidWx7nC5zRllni8o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-type; b=fThzhyf/Yt1acSF+nOVK2lehCN0JC2u5CaELqjBQYxkHMraH7Sl3xeyYk6D5I1uQCJpxRaxVzTj7RN1kSHvkKMW6iPi9bgY5xlVhEQ4r/Zfh1V5QIcqRd2/VaYC1B0/LyscFC6eYUkooJ6KQBnGTpa7yDaxl12L79VTmWnku4bM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wICAl9ld; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g4BiQYwD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 148BEC433B1;
-	Fri, 26 Jan 2024 10:53:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706266380;
-	bh=sEgq4/YsbJNz7vu+BBSK9CDr8Ju97ZXzAHrlHF3qI5k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=g4BiQYwDNHe7n+2QTpulRT6DRltj441EHVKxGZFmfgxWkNGIhP7l7oKvaFabD+ZK7
-	 cjlPBSyIigftTx/aJtsBWcIGWKB/E3YLRpQXHr/Jb5q/Sgjikel+TMl/CscwQdhuK9
-	 t8LPWcgPhFI04W3QyCPg93JRCz4A8Zy3h6wc0GOHgm1gIL+YBtaYbXCIPd39qSTKq3
-	 WBmesJBqKTwVWstblC+efr0/I2bKSL53iIwA3AwnplFu/kRiqlhOmQhDl5IGNeJGqa
-	 wwRSYFV8kGB/o6zFJCsXMGZg+0fFgy0TAmHkHs97KSlK+HSfQmiiLP+3CJNEdKWzGs
-	 g/SmRP7GJ2vuQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rTJpR-00F1hi-QT;
-	Fri, 26 Jan 2024 10:52:57 +0000
-Date: Fri, 26 Jan 2024 10:52:57 +0000
-Message-ID: <86sf2k74dy.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Kunkun Jiang <jiangkunkun@huawei.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<wanghaibin.wang@huawei.com>
-Subject: Re: [PATCH v2 2/2] irqchip/gic-v4.1: Fix skipping VMOVP in cpu offline scenario
-In-Reply-To: <20240126103012.1020-3-jiangkunkun@huawei.com>
-References: <20240126103012.1020-1-jiangkunkun@huawei.com>
-	<20240126103012.1020-3-jiangkunkun@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wICAl9ld"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706279007;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AGdZaxsblPPQTcb4MiCja5v9bc/JeD30lRJSlJeOJ4k=;
+	b=wICAl9ld7yTz6MeEFnwdUtPTMXuJ/M1HUV0EZdrFjcZyixhEm80bgRfpX2IMy4hH8rLCym
+	aBvV2H7lJfu3+LSsQ4A21osXNrstXCvTrsGYsUTBuOb/YHIUrL1+Rt8z1t/lUfho36cnVn
+	4rZisFWDGC0YHsG3F3lc/23kxGC2wQE=
+From: Andrew Jones <andrew.jones@linux.dev>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: ajones@ventanamicro.com,
+	anup@brainfault.org,
+	atishp@atishpatra.org,
+	pbonzini@redhat.com,
+	thuth@redhat.com,
+	alexandru.elisei@arm.com,
+	eric.auger@redhat.com
+Subject: [kvm-unit-tests PATCH v2 00/24] Introduce RISC-V
+Date: Fri, 26 Jan 2024 15:23:25 +0100
+Message-ID: <20240126142324.66674-26-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 26 Jan 2024 10:30:12 +0000,
-Kunkun Jiang <jiangkunkun@huawei.com> wrote:
-> 
-> commit dd3f050a216e ("irqchip/gic-v4.1: Implement the v4.1 flavour
-> of VMOVP") make an optimization, VMOVP can be skipped if moving
-> VPE to a cpu whose RD is sharing its VPE table with the current one.
-> 
-> In the cpu offline scenario, the mask_val is the entire cpu range,
-> except for the offline cpu. Therefore, the first cpu is CPU0. In
-> corner case, this may result in lost interrupts:
-> 0. Each cpu die shares a VPE table and contains 32 CPUs
->    die0(CPU0-31) die1(CPU32-63)...
-> 1. VPE resides on CPU32, doorbell affinity to CPU32.
-> 2. Move VPE to CPU16, doorbell affinity to CPU16.
-> 3. Manually offline CPU16 on the host side:
->    'echo 0 > /sys/devices/system/cpu/cpu16/online'
-> 4. VMOVP will be skipped.
-> 5. Subsequent doorbell interrupts will be lost.
-> 
-> So VMOVP cannot be skipped when the affinity CPU is not in mask_val.
-> 
-> Fixes: dd3f050a216e ("irqchip/gic-v4.1: Implement the v4.1 flavour of VMOVP")
-> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
-> ---
->  drivers/irqchip/irq-gic-v3-its.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index 4b1dbb697959..bfb922f16bc6 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -3817,7 +3817,7 @@ static int its_vpe_set_affinity(struct irq_data *d,
->  				bool force)
->  {
->  	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
-> -	int from, cpu = cpumask_first(mask_val);
-> +	int cur, from, cpu = cpumask_first(mask_val);
->  	unsigned long flags;
->  
->  	/*
-> @@ -3839,11 +3839,13 @@ static int its_vpe_set_affinity(struct irq_data *d,
->  
->  	vpe->col_idx = cpu;
->  
-> +	cur = cpumask_first(irq_data_get_effective_affinity_mask(d));
+v2:
+ - While basing [1] on this series I found two bugs (one in exception
+   return and another in isa string parsing). I also decided to expose
+   a get_pte() function to unit tests and also an isa-extension-by-name
+   function to check for arbitrary extensions. Finally, I picked up
+   Thomas' gitlab-ci suggestion and his tags.
 
-When is this not equal to 'from'?
+(Having [1] and the selftests running makes me pretty happy with the
+series, so, unless somebody shouts, I'll merge this sometime next week.)
 
->  	/*
->  	 * GICv4.1 allows us to skip VMOVP if moving to a cpu whose RD
->  	 * is sharing its VPE table with the current one.
->  	 */
->  	if (gic_data_rdist_cpu(cpu)->vpe_table_mask &&
-> +	    cpumask_test_cpu(cur, mask_val) &&
->  	    cpumask_test_cpu(from, gic_data_rdist_cpu(cpu)->vpe_table_mask))
->  		goto out;
+[1] https://gitlab.com/jones-drew/kvm-unit-tests/-/commit/e9c6c58b1c799de77fd39970b358a7592ecd048f
 
-This looks utterly pointless to me.
+Thanks,
+drew
 
-	M.
+Original cover letter follows:
+
+This series adds another architecture to kvm-unit-tests (RISC-V, both
+32-bit and 64-bit). Much of the code is borrowed from arm/arm64 by
+mimicking its patterns or by first making the arm code more generic
+and moving it to the common lib.
+
+This series brings UART, SMP, MMU, and exception handling support.
+One should be able to start writing CPU validation tests in a mix
+of C and asm as well as write SBI tests, as is the plan for the SBI
+verification framework. kvm-unit-tests provides backtraces on asserts
+and input can be given to the tests through command line arguments,
+environment variables, and the DT (there's already an ISA string
+parser for extension detection).
+
+This series only targets QEMU TCG and KVM, but OpenSBI may be replaced
+with other SBI implementations, such as RustSBI. It's a goal to target
+bare-metal as soon as possible, so EFI support is already in progress
+and will be posted soon. More follow on series will come as well,
+bringing interrupt controller support for timer and PMU testing,
+support to run tests in usermode, and whatever else people need for
+their tests.
+
+
+Andrew Jones (24):
+  configure: Add ARCH_LIBDIR
+  riscv: Initial port, hello world
+  arm/arm64: Move cpumask.h to common lib
+  arm/arm64: Share cpu online, present and idle masks
+  riscv: Add DT parsing
+  riscv: Add initial SBI support
+  riscv: Add run script and unittests.cfg
+  riscv: Add riscv32 support
+  riscv: Add exception handling
+  riscv: Add backtrace support
+  arm/arm64: Generalize wfe/sev names in smp.c
+  arm/arm64: Remove spinlocks from on_cpu_async
+  arm/arm64: Share on_cpus
+  riscv: Compile with march
+  riscv: Add SMP support
+  arm/arm64: Share memregions
+  riscv: Populate memregions and switch to page allocator
+  riscv: Add MMU support
+  riscv: Enable the MMU in secondaries
+  riscv: Enable vmalloc
+  lib: Add strcasecmp and strncasecmp
+  riscv: Add isa string parsing
+  gitlab-ci: Add riscv64 tests
+  MAINTAINERS: Add riscv
+
+ .gitlab-ci.yml               |  17 +++
+ MAINTAINERS                  |   8 ++
+ Makefile                     |   2 +-
+ arm/Makefile.common          |   2 +
+ arm/selftest.c               |   3 +-
+ configure                    |  16 +++
+ lib/arm/asm/gic-v2.h         |   2 +-
+ lib/arm/asm/gic-v3.h         |   2 +-
+ lib/arm/asm/gic.h            |   2 +-
+ lib/arm/asm/setup.h          |  14 --
+ lib/arm/asm/smp.h            |  45 +-----
+ lib/arm/mmu.c                |   3 +-
+ lib/arm/setup.c              |  93 +++----------
+ lib/arm/smp.c                | 135 +-----------------
+ lib/arm64/asm/cpumask.h      |   1 -
+ lib/{arm/asm => }/cpumask.h  |  42 +++++-
+ lib/ctype.h                  |  10 ++
+ lib/elf.h                    |  11 ++
+ lib/ldiv32.c                 |  16 +++
+ lib/linux/const.h            |   2 +
+ lib/memregions.c             |  82 +++++++++++
+ lib/memregions.h             |  29 ++++
+ lib/on-cpus.c                | 154 +++++++++++++++++++++
+ lib/on-cpus.h                |  14 ++
+ lib/riscv/.gitignore         |   1 +
+ lib/riscv/asm-offsets.c      |  62 +++++++++
+ lib/riscv/asm/asm-offsets.h  |   1 +
+ lib/riscv/asm/barrier.h      |  20 +++
+ lib/riscv/asm/bitops.h       |  21 +++
+ lib/riscv/asm/bug.h          |  20 +++
+ lib/riscv/asm/csr.h          | 100 ++++++++++++++
+ lib/riscv/asm/io.h           |  87 ++++++++++++
+ lib/riscv/asm/isa.h          |  33 +++++
+ lib/riscv/asm/memory_areas.h |   1 +
+ lib/riscv/asm/mmu.h          |  32 +++++
+ lib/riscv/asm/page.h         |  21 +++
+ lib/riscv/asm/pgtable.h      |  42 ++++++
+ lib/riscv/asm/processor.h    |  29 ++++
+ lib/riscv/asm/ptrace.h       |  46 +++++++
+ lib/riscv/asm/sbi.h          |  54 ++++++++
+ lib/riscv/asm/setup.h        |  15 ++
+ lib/riscv/asm/smp.h          |  29 ++++
+ lib/riscv/asm/spinlock.h     |   7 +
+ lib/riscv/asm/stack.h        |  12 ++
+ lib/riscv/bitops.c           |  47 +++++++
+ lib/riscv/io.c               |  97 +++++++++++++
+ lib/riscv/isa.c              | 126 +++++++++++++++++
+ lib/riscv/mmu.c              | 205 +++++++++++++++++++++++++++
+ lib/riscv/processor.c        |  64 +++++++++
+ lib/riscv/sbi.c              |  40 ++++++
+ lib/riscv/setup.c            | 188 +++++++++++++++++++++++++
+ lib/riscv/smp.c              |  70 ++++++++++
+ lib/riscv/stack.c            |  32 +++++
+ lib/string.c                 |  14 ++
+ lib/string.h                 |   2 +
+ riscv/Makefile               | 106 ++++++++++++++
+ riscv/cstart.S               | 259 +++++++++++++++++++++++++++++++++++
+ riscv/flat.lds               |  75 ++++++++++
+ riscv/run                    |  41 ++++++
+ riscv/sbi.c                  |  41 ++++++
+ riscv/selftest.c             | 100 ++++++++++++++
+ riscv/sieve.c                |   1 +
+ riscv/unittests.cfg          |  37 +++++
+ 63 files changed, 2616 insertions(+), 267 deletions(-)
+ delete mode 100644 lib/arm64/asm/cpumask.h
+ rename lib/{arm/asm => }/cpumask.h (72%)
+ create mode 100644 lib/memregions.c
+ create mode 100644 lib/memregions.h
+ create mode 100644 lib/on-cpus.c
+ create mode 100644 lib/on-cpus.h
+ create mode 100644 lib/riscv/.gitignore
+ create mode 100644 lib/riscv/asm-offsets.c
+ create mode 100644 lib/riscv/asm/asm-offsets.h
+ create mode 100644 lib/riscv/asm/barrier.h
+ create mode 100644 lib/riscv/asm/bitops.h
+ create mode 100644 lib/riscv/asm/bug.h
+ create mode 100644 lib/riscv/asm/csr.h
+ create mode 100644 lib/riscv/asm/io.h
+ create mode 100644 lib/riscv/asm/isa.h
+ create mode 100644 lib/riscv/asm/memory_areas.h
+ create mode 100644 lib/riscv/asm/mmu.h
+ create mode 100644 lib/riscv/asm/page.h
+ create mode 100644 lib/riscv/asm/pgtable.h
+ create mode 100644 lib/riscv/asm/processor.h
+ create mode 100644 lib/riscv/asm/ptrace.h
+ create mode 100644 lib/riscv/asm/sbi.h
+ create mode 100644 lib/riscv/asm/setup.h
+ create mode 100644 lib/riscv/asm/smp.h
+ create mode 100644 lib/riscv/asm/spinlock.h
+ create mode 100644 lib/riscv/asm/stack.h
+ create mode 100644 lib/riscv/bitops.c
+ create mode 100644 lib/riscv/io.c
+ create mode 100644 lib/riscv/isa.c
+ create mode 100644 lib/riscv/mmu.c
+ create mode 100644 lib/riscv/processor.c
+ create mode 100644 lib/riscv/sbi.c
+ create mode 100644 lib/riscv/setup.c
+ create mode 100644 lib/riscv/smp.c
+ create mode 100644 lib/riscv/stack.c
+ create mode 100644 riscv/Makefile
+ create mode 100644 riscv/cstart.S
+ create mode 100644 riscv/flat.lds
+ create mode 100755 riscv/run
+ create mode 100644 riscv/sbi.c
+ create mode 100644 riscv/selftest.c
+ create mode 120000 riscv/sieve.c
+ create mode 100644 riscv/unittests.cfg
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.43.0
+
