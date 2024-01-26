@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E19112B6A
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 10:52:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFDB12B6A
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 10:53:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706266347; cv=none; b=Sb771RZ3hZ10wl05cZpOGjizMfMHo+b43StGlHWqXUAudJGGjhNsgcij2xP84Oo3q9qO0wsLL63t0b5Dfj6Aq1bWNzXDs3aumJ4PUDzzMiBuzDFkfulzRLLLxNCV29gIQ4TyPjIapo31BEyBN7tITDU9ziRFL6huOJne6aazql8=
+	t=1706266380; cv=none; b=TtKsbUKtiVI7fhYn715D72MEiDAMHcsNo3D7W+fEcq4w8we19yCrsA8ORjif8biEtlk5lPmVGPBRuC3mZznubzo/1gULYXAs1CSSBblv/sY63TIPx04uK8F0wdyl5SobTDjBf5N18hnS0z/JWmGRwQBuXjeX1tw6kOJTfjb5+js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706266347; c=relaxed/simple;
-	bh=tlcK5LgVuWz8xtFYtnpZEz5lTl9XOwv1OXh/bM5AUyA=;
+	s=arc-20240116; t=1706266380; c=relaxed/simple;
+	bh=sEgq4/YsbJNz7vu+BBSK9CDr8Ju97ZXzAHrlHF3qI5k=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F6+IiU5DcuN1fFAjYv+nxvZEw3VCRu68W//7AzVLJeOjMqtxyzhpQtw4WvLfccCr7kj54ne4Lk2TUo0JzqapLm1VDUzFCxb/B4AfvbDtOQi7RZ0xd+7BeYCRxAisqbOdww3zBTttHMfYAE0B/2OPPafRtxzcSKTTcsWdNUfqqio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o7jHf37P; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=hlIkI+y2vDR7jZiGBzzS4T9WEzecJSVYtFF8ScxTCZqtYl3nzxCt1y6zqYS090j9pTGA459D1ymWXFKYks7LusnzSq19qpcKxQwWFI2XMJDzxmEPNGxAkpMWmpljs7s2k75DSHcEqit5W+tlraS31q9HTTykXT6sWi1sIrdBVLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g4BiQYwD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o7jHf37P"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17C1FC433F1;
-	Fri, 26 Jan 2024 10:52:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g4BiQYwD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 148BEC433B1;
+	Fri, 26 Jan 2024 10:53:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706266347;
-	bh=tlcK5LgVuWz8xtFYtnpZEz5lTl9XOwv1OXh/bM5AUyA=;
+	s=k20201202; t=1706266380;
+	bh=sEgq4/YsbJNz7vu+BBSK9CDr8Ju97ZXzAHrlHF3qI5k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=o7jHf37Pn430PnhlaA+dzM8C0VCirwL3CTNmKJUM1EGYvTjyEwpEkFyh1qVvPf9DR
-	 jM9r7XbsOhzr6AWqu4gLlxLZli+DGiSR6q+czZO1SROP7uiyWy5J7EVOunJi3QzK2K
-	 LFc7psCvo1GTHNlhD4jnjpd9ACIFZi1HAWcWIVp1tYJHd4DlEfdp4GSaK9tTv2jhFx
-	 uEjLrBlQkpDMORUkzqWN3vzP0JQjJ6pWwaX6DM/9HLBonqEYTN6VRuCp+y8QIdvJdw
-	 nXEVCCcLUCKESaCPYQDFXuxvFeBHpRKFpUqoEWCm+v5U4JkBcVFqAVWheLcqpp4ofl
-	 upvvMYFbLufAg==
+	b=g4BiQYwDNHe7n+2QTpulRT6DRltj441EHVKxGZFmfgxWkNGIhP7l7oKvaFabD+ZK7
+	 cjlPBSyIigftTx/aJtsBWcIGWKB/E3YLRpQXHr/Jb5q/Sgjikel+TMl/CscwQdhuK9
+	 t8LPWcgPhFI04W3QyCPg93JRCz4A8Zy3h6wc0GOHgm1gIL+YBtaYbXCIPd39qSTKq3
+	 WBmesJBqKTwVWstblC+efr0/I2bKSL53iIwA3AwnplFu/kRiqlhOmQhDl5IGNeJGqa
+	 wwRSYFV8kGB/o6zFJCsXMGZg+0fFgy0TAmHkHs97KSlK+HSfQmiiLP+3CJNEdKWzGs
+	 g/SmRP7GJ2vuQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rTJou-00F1h0-RG;
-	Fri, 26 Jan 2024 10:52:25 +0000
-Date: Fri, 26 Jan 2024 10:52:24 +0000
-Message-ID: <86ttn074ev.wl-maz@kernel.org>
+	id 1rTJpR-00F1hi-QT;
+	Fri, 26 Jan 2024 10:52:57 +0000
+Date: Fri, 26 Jan 2024 10:52:57 +0000
+Message-ID: <86sf2k74dy.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Kunkun Jiang <jiangkunkun@huawei.com>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
@@ -44,10 +44,10 @@ Cc: Oliver Upton <oliver.upton@linux.dev>,
 	<linux-arm-kernel@lists.infradead.org>,
 	<kvmarm@lists.linux.dev>,
 	<wanghaibin.wang@huawei.com>
-Subject: Re: [PATCH v2 1/2] irqchip/gic-v4.1: Fix GICv4.1 doorbell affinity
-In-Reply-To: <20240126103012.1020-2-jiangkunkun@huawei.com>
+Subject: Re: [PATCH v2 2/2] irqchip/gic-v4.1: Fix skipping VMOVP in cpu offline scenario
+In-Reply-To: <20240126103012.1020-3-jiangkunkun@huawei.com>
 References: <20240126103012.1020-1-jiangkunkun@huawei.com>
-	<20240126103012.1020-2-jiangkunkun@huawei.com>
+	<20240126103012.1020-3-jiangkunkun@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,57 +63,66 @@ X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, oliver.upton@linux.dev, james.morse@a
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 26 Jan 2024 10:30:11 +0000,
+On Fri, 26 Jan 2024 10:30:12 +0000,
 Kunkun Jiang <jiangkunkun@huawei.com> wrote:
 > 
-> dd3f050a216e make an optimization, VMOVP can be skipped if moving
+> commit dd3f050a216e ("irqchip/gic-v4.1: Implement the v4.1 flavour
+> of VMOVP") make an optimization, VMOVP can be skipped if moving
 > VPE to a cpu whose RD is sharing its VPE table with the current one.
-> But when skipping VMOVP, the affinity recorded in irq_data is still
-> updated. This causes the doorbell affinity recorfed in the irq_data
-> to be inconsistent with the actual.
 > 
-> In corner case, this may result in lost interrupts:
+> In the cpu offline scenario, the mask_val is the entire cpu range,
+> except for the offline cpu. Therefore, the first cpu is CPU0. In
+> corner case, this may result in lost interrupts:
 > 0. Each cpu die shares a VPE table and contains 32 CPUs
 >    die0(CPU0-31) die1(CPU32-63)...
 > 1. VPE resides on CPU32, doorbell affinity to CPU32.
-> 2. Move VPE to CPU33, skip VMOVP, doorbell still affinity to CPU32.
->    The affinity recorded in irq_data is CPU33.
-> 3. Manually offline CPU32 on the host side:
->    'echo 0 > /sys/devices/system/cpu/cpu32/online'
-> 4. Core code cannot move the doorbell affinity to CPU32, since the
->    record in irq_data is CPU33.
+> 2. Move VPE to CPU16, doorbell affinity to CPU16.
+> 3. Manually offline CPU16 on the host side:
+>    'echo 0 > /sys/devices/system/cpu/cpu16/online'
+> 4. VMOVP will be skipped.
 > 5. Subsequent doorbell interrupts will be lost.
 > 
-> So affinity recoreded in irq_data should not be updated when skipping
-> VMOVP.
+> So VMOVP cannot be skipped when the affinity CPU is not in mask_val.
 > 
-> Fixes: dd3f050a216e (irqchip/gic-v4.1: Implement the v4.1 flavour of VMOVP)
+> Fixes: dd3f050a216e ("irqchip/gic-v4.1: Implement the v4.1 flavour of VMOVP")
 > Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
 > ---
->  drivers/irqchip/irq-gic-v3-its.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  drivers/irqchip/irq-gic-v3-its.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
 > diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index d097001c1e3e..4b1dbb697959 100644
+> index 4b1dbb697959..bfb922f16bc6 100644
 > --- a/drivers/irqchip/irq-gic-v3-its.c
 > +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -3850,8 +3850,9 @@ static int its_vpe_set_affinity(struct irq_data *d,
->  	its_send_vmovp(vpe);
->  	its_vpe_db_proxy_move(vpe, from, cpu);
+> @@ -3817,7 +3817,7 @@ static int its_vpe_set_affinity(struct irq_data *d,
+>  				bool force)
+>  {
+>  	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
+> -	int from, cpu = cpumask_first(mask_val);
+> +	int cur, from, cpu = cpumask_first(mask_val);
+>  	unsigned long flags;
 >  
-> -out:
->  	irq_data_update_effective_affinity(d, cpumask_of(cpu));
-> +
-> +out:
->  	vpe_to_cpuid_unlock(vpe, flags);
+>  	/*
+> @@ -3839,11 +3839,13 @@ static int its_vpe_set_affinity(struct irq_data *d,
 >  
->  	return IRQ_SET_MASK_OK_DONE;
+>  	vpe->col_idx = cpu;
+>  
+> +	cur = cpumask_first(irq_data_get_effective_affinity_mask(d));
 
-This is becoming *very* annoying. I've already told you this patch was
-wrong, yet you keep sending it (twice in just over an hour).
+When is this not equal to 'from'?
+
+>  	/*
+>  	 * GICv4.1 allows us to skip VMOVP if moving to a cpu whose RD
+>  	 * is sharing its VPE table with the current one.
+>  	 */
+>  	if (gic_data_rdist_cpu(cpu)->vpe_table_mask &&
+> +	    cpumask_test_cpu(cur, mask_val) &&
+>  	    cpumask_test_cpu(from, gic_data_rdist_cpu(cpu)->vpe_table_mask))
+>  		goto out;
+
+This looks utterly pointless to me.
 
 	M.
-
 
 -- 
 Without deviation from the norm, progress is not possible.
