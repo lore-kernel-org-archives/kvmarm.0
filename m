@@ -1,123 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE73E1EB21
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 10:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B697E125AB
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 10:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706264375; cv=none; b=FrB3s8HdsHlf7zMm67+zHcBBuj+5bpUYus46UP0691z4MEsCGsitiEhc461SSJU6sacsIlOK/zQfvPE+OFPE+U2S0JonHWiVE7icCDpkU2DamfsNWKDt/JA/uDeKV94Fr0ODa5RQU+mQjkfDWg1a3qV7Iqv6bt6yXAkQhi3gGOM=
+	t=1706264724; cv=none; b=UMVpReudrPdymZtuYXT3mAb75mQ4sJ95q8wZ7Rw3q+MH/2SvA+wVfwNHc0Tmt8G607AzbDndZQXuCNve9RK9qZCXqpIEyQirfVxYbsmlSfX4G2c8c0BuqTNzIuEv9bPp87pQFbVEWtYkXjMetNn8vhDi92CKudPYmalZeFwBmvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706264375; c=relaxed/simple;
-	bh=4I2oton0SUgmocgQVYV9z59NA8ybatyLZQMiNLrugkk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Hn93QFf7QquYJxyMNFEeNZb7XlOV6A8jH3aXktND3lUCgIbxMh8WwW74Dj04LkMbptNJujLKCEtgizmeEiH2HId3y9YRF+3IoXvDse3kzNF0IgsGpIJc8YUPXRk3gTN3IoYcqenlX5lS1QZOj9yWZ1sf4jmwu3ryrWqfybz1dLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BdINcwAy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706264724; c=relaxed/simple;
+	bh=S70PRABftOqa8emToRq/SOEAjS3k4Nc2hS3M0xK6WDo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iCRHnU4K7Z5otM4IozL9ymghivnqdhi9PDR6tP1j0DjYiMlp4buFa7OupSzFU8FhjOSxWx6MrbLCZMNhuFp2G5avhPS3uw58Xm0tIplS4Gs9LkLe6NDWT+oM+c3Q7V1r/QQbDkXCCc0eOGsZAWeWBHmt1JyghZkTQyLjoNMK2YM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PDZV9DRa; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BdINcwAy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F33FC43390;
-	Fri, 26 Jan 2024 10:19:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706264374;
-	bh=4I2oton0SUgmocgQVYV9z59NA8ybatyLZQMiNLrugkk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BdINcwAy0ZxLMWwoVDPV2wgxhc6q5y4Qpf0azslwvvj8LSFZCThjXzokBC5G+ekCs
-	 X54qIEnlCkEAOUvLECKkf4CefbUCa2dMiHeY4V/LIijSXEvx/dfL+ynNhhpLIfKypQ
-	 FI5eZ2chyQXEJ+kmbKIW5jET73LZOa8Wju5wRxKExH1nf55Qjet1gCI3CHPgXTnioY
-	 LgEkXBV+EezzE812ZXD2uCCCPAtWati4808IuFRNcSE8lOms9TpDcbqayDVA29wk3A
-	 vRB3tObr3A6msmrln7KEmZzGeA8184Ww6oFAnPcr91TPE19P+GKE2P2pbrMV53P0oU
-	 U3gVd7lD0VCzA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rTJJ4-00F15s-Oe;
-	Fri, 26 Jan 2024 10:19:30 +0000
-Date: Fri, 26 Jan 2024 10:19:30 +0000
-Message-ID: <86v87g75xp.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Kunkun Jiang <jiangkunkun@huawei.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<wanghaibin.wang@huawei.com>
-Subject: Re: [PATCH] irqchip/gic-v4.1: Fix GICv4.1 doorbell affinity
-In-Reply-To: <20240126091752.1102-1-jiangkunkun@huawei.com>
-References: <20240126091752.1102-1-jiangkunkun@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PDZV9DRa"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706264721;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5kQbVh0hcRgV8UMq6Vb5QM4EaBqOcOHGfTaVO2KwzEY=;
+	b=PDZV9DRaTeNgaXVJ0OlBVSmlY3in1102D6WDt0uWAKslDk/AtsrS8flYMMBO7z0Aj38SI6
+	J+Qg+G2xCVrtijw1meFozZ6G+JhBr1QB9UcWWPPTmqnKd21kD2gJam4rbGsDD2AwS//rem
+	pCvc66qcPbQsABbfE2KFHKH+lBbLJs4=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-379-mcpyRYKLMwGbkklqb6TDSA-1; Fri, 26 Jan 2024 05:25:20 -0500
+X-MC-Unique: mcpyRYKLMwGbkklqb6TDSA-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-68694f9e037so4071726d6.2
+        for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 02:25:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706264720; x=1706869520;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5kQbVh0hcRgV8UMq6Vb5QM4EaBqOcOHGfTaVO2KwzEY=;
+        b=fvyGJ1CZMOneTticTnzQtAC3R/ZQbTQSPpvjqnnvwrqQlqTvi6U3r/Xtq3JTmXQUr6
+         O4r0s9G2EpwL5zpcRKhIwtW31vAi+YRFZP9/pRmBMty+BKaW6UIihZk/7H1Jsu0X+F5m
+         bAhPpasohybpbfNMGghi828JJA+62gIBAEAlSEbLj4iK7P2Mi5sGPcdwGbCT35cX7HdQ
+         HVzAMyN+NdLIlXZqys1aFO5TjNblKoKirokt+4DlLdXXL30PsWZpmJUC9dojOMbRT/9d
+         DsUuPczG0gCmd3uYQKYOG+AMNKa9+xqhLPR5Rb44+E40MOw5YC3RDYCg6Kk15moD0PTv
+         EvFQ==
+X-Gm-Message-State: AOJu0YyAxBWbBucbhu6Tk5RxntxRm6AbMbswonV2OWC8oyfNvUYU7fqX
+	jZ5bTbTidd2Cgvj6EFSKTqow5qdD4h52gnjfhQxlxXRb8O5kUNvIgBOszmLBkLk1zgQ7kM9u0fh
+	29NoEACAP09nnANDZGDlT8hUxiFWTqUiHaCo0VcfhudNAV8MmCI6ZyQ==
+X-Received: by 2002:ad4:5d6e:0:b0:686:acaa:a4b6 with SMTP id fn14-20020ad45d6e000000b00686acaaa4b6mr1400873qvb.79.1706264719644;
+        Fri, 26 Jan 2024 02:25:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFtHbF0GQDnaATq85JoMxKpDaeP42Xl2uBvtV9mUCapJ2bmX+Zt1/9FX/b/+a1DH1cknGoOpQ==
+X-Received: by 2002:ad4:5d6e:0:b0:686:acaa:a4b6 with SMTP id fn14-20020ad45d6e000000b00686acaaa4b6mr1400856qvb.79.1706264719347;
+        Fri, 26 Jan 2024 02:25:19 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id h4-20020a0cd804000000b006869dae6edbsm398728qvj.77.2024.01.26.02.25.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Jan 2024 02:25:18 -0800 (PST)
+Message-ID: <51ca8edc-81e6-4c6d-9c72-80fe59919868@redhat.com>
+Date: Fri, 26 Jan 2024 11:25:15 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 0/5] KVM: selftests: aarch64: Introduce
+ pmu_event_filter_test
+To: Shaoqin Huang <shahuang@redhat.com>, Oliver Upton
+ <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
+ kvmarm@lists.linux.dev
+Cc: James Morse <james.morse@arm.com>, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>
+References: <20240116060129.55473-1-shahuang@redhat.com>
+From: Eric Auger <eauger@redhat.com>
+In-Reply-To: <20240116060129.55473-1-shahuang@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, 26 Jan 2024 09:17:52 +0000,
-Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+Hi Shaoqin,
+
+On 1/16/24 07:01, Shaoqin Huang wrote:
+> The test is inspired by the pmu_event_filter_test which implemented by x86. On
+> the arm64 platform, there is the same ability to set the pmu_event_filter
+> through the KVM_ARM_VCPU_PMU_V3_FILTER attribute. So add the test for arm64.
 > 
-> commit dd3f050a216e ("irqchip/gic-v4.1: Implement the v4.1 flavour
-> of VMOVP") make an optimization, VMOVP can be skipped if moving
-> VPE to a cpu whose RD is sharing its VPE table with the current one.
-> But when skipping VMOVP, the affinity recorded in irq_data is still
-> updated. This causes the doorbell affinity recorfed in the irq_data
-> to be inconsistent with the actual.
+> The series first move some pmu common code from vpmu_counter_access to
+> lib/aarch64/vpmu.c and include/aarch64/vpmu.h, which can be used by
+> pmu_event_filter_test. Then fix a bug related to the [enable|disable]_counter,
+> and at last, implement the test itself.
+which branch does it apply on? I fail to apply on top on main.
+
+Or can you provide a branch?
+
+Eric
 > 
-> In corner case, this may result in lost interrupts:
-> 0. Each cpu die shares a VPE table and contains 32 CPUs
->    die0(CPU0-31) die1(CPU32-63)...
-> 1. VPE resides on CPU32, doorbell affinity to CPU32.
-> 2. Move VPE to CPU33, skip VMOVP, doorbell still affinity to CPU32.
->    The affinity recorded in irq_data is CPU33.
-> 3. Manually offline CPU32 on the host side:
->    'echo 0 > /sys/devices/system/cpu/cpu32/online'
-> 4. Core code cannot move the doorbell affinity to CPU32, since the
->    record in irq_data is CPU33.
-> 5. Subsequent doorbell interrupts will be lost.
+> Changelog:
+> ----------
+> v2->v3:
+>   - Check the pmceid in guest code instead of pmu event count since different
+>   hardware may have different event count result, check pmceid makes it stable
+>   on different platform.                        [Eric]
+>   - Some typo fixed and commit message improved.
 > 
-> So affinity recoreded in irq_data should not be updated when skipping
-> VMOVP.
+> v1->v2:
+>   - Improve the commit message.                 [Eric]
+>   - Fix the bug in [enable|disable]_counter.    [Raghavendra & Marc]
+>   - Add the check if kvm has attr KVM_ARM_VCPU_PMU_V3_FILTER.
+>   - Add if host pmu support the test event throught pmceid0.
+>   - Split the test_invalid_filter() to another patch. [Eric]
 > 
-> Fixes: dd3f050a216e ("irqchip/gic-v4.1: Implement the v4.1 flavour of VMOVP")
-> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
-> ---
->  drivers/irqchip/irq-gic-v3-its.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> v1: https://lore.kernel.org/all/20231123063750.2176250-1-shahuang@redhat.com/
+> v2: https://lore.kernel.org/all/20231129072712.2667337-1-shahuang@redhat.com/
 > 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index d097001c1e3e..4b1dbb697959 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -3850,8 +3850,9 @@ static int its_vpe_set_affinity(struct irq_data *d,
->  	its_send_vmovp(vpe);
->  	its_vpe_db_proxy_move(vpe, from, cpu);
->  
-> -out:
->  	irq_data_update_effective_affinity(d, cpumask_of(cpu));
-> +
-> +out:
+> Shaoqin Huang (5):
+>   KVM: selftests: aarch64: Make the [create|destroy]_vpmu_vm() public
+>   KVM: selftests: aarch64: Move pmu helper functions into vpmu.h
+>   KVM: selftests: aarch64: Fix the buggy [enable|disable]_counter
+>   KVM: selftests: aarch64: Introduce pmu_event_filter_test
+>   KVM: selftests: aarch64: Add invalid filter test in
+>     pmu_event_filter_test
+> 
+>  tools/testing/selftests/kvm/Makefile          |   2 +
+>  .../kvm/aarch64/pmu_event_filter_test.c       | 255 ++++++++++++++++++
+>  .../kvm/aarch64/vpmu_counter_access.c         | 218 ++-------------
+>  .../selftests/kvm/include/aarch64/vpmu.h      | 135 ++++++++++
+>  .../testing/selftests/kvm/lib/aarch64/vpmu.c  |  74 +++++
+>  5 files changed, 490 insertions(+), 194 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+>  create mode 100644 tools/testing/selftests/kvm/include/aarch64/vpmu.h
+>  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vpmu.c
+> 
 
-That looks wrong. You are lying to the core code by saying that it's
-all OK, and yet haven't done *anything*. This stuff is obviously
-buggy, but I don't think this is right.
-
-In your example, you don't even solve the problem: if CPUs 32 and 33
-are part of the same ITS affinity group, you won't issue a VMOVP
-either, so this doesn't fix anything.
-
-At this stage, I think the VMOVP optimisation is wrong and that we
-should drop it.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
