@@ -1,169 +1,116 @@
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359D61DDEA
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 19:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D4E22EE3
+	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 20:00:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706295956; cv=none; b=kesoiTV+p3EB9/oVF6Gvl0g8qnpB4k/TFJfOmTIonJo8MgrjIeJaRNeTjnQoW/Jg20BTboxqk3DCntpNpLiVrup5b0iMMZWdoIEU0ViRLer8DPbzULg8ZV52KYVk3jdTMrvC30IrGhIzrwyMo1zjOp715/tMZS/XdeQDZlv5YKY=
+	t=1706299252; cv=none; b=Jjzk2bDhjuNLqyhi6UPG1RZmCX8ChDdIbQ9tUv5b+x24APosOr0pJHzEcFK36KwlD5gD6FlEb1wRsqUxf08Bx2FP4M0q8DZl7ELab73nTN9QMEOjDGOvXMZ2IFMWkBe0S6FxoTM0SLMHDmUfJhqS/uu9Y9ol6byBkUwxJJZlutA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706295956; c=relaxed/simple;
-	bh=zR4quB7eq1uUDGMAg/RxjP3luL1kUJg8Yn9rvFBZkSo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QfNvXou43+1xk8XXXFwWwyWOnfy/2KftHkhGEIC30u2GY4cCaRT5UM70k4/rO73caL41I5lAJP+gJrOly1SwBrJBVGBM/4YeBZnpV2Io/FmFSog3c9QtDTWc7ZIQ71m51MVQVnf0cC/LbkReg/OJIvbGoFd2SfjDmU03xFgkXRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vPbWd4Xf; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1706299252; c=relaxed/simple;
+	bh=fcxQ3bc2/ycZVVRavVndN2TW1bmrjhqtW752nshgov4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YHD87IkFRKMVMfARFIDVIUpZC1cJEvbPlhV4wUqqVmanmHmWApNAvP464OdjJQQXQgdhA0+146g/Gz/VJUU+AEqh5nznPlQ39G2uvXMk1hjmkMwQATiy9/hMvO0F5J5S442PK5XLMZkNzgLAqWrfLo3F+8YxGm+gR6nF4tmDFjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y85u0fbC; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vPbWd4Xf"
-Date: Fri, 26 Jan 2024 19:05:47 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706295952;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Jk9fgwZBRKzJP61HfhdNU0FZbzBbiCNcQ1Rr26fWDQo=;
-	b=vPbWd4XfW1WmRsuebYRpTjSvJj6ZApGXwqS7Ckb43uBozPhp3tuwEGNTG20eF0e1IgOLcc
-	wmAIJbp4DOFLcmBkTdv8afvksTxE2L8br7JaaJh/mS0pSNVc6uv00UBHBqZr4tvJ4Vaed0
-	XZ4YQtow/Z0oDEAywgFvPPSZ70olAV8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 02/25] KVM: arm64: Add feature checking helpers
-Message-ID: <ZbQCi_GZ6XuMx49a@linux.dev>
-References: <20240122201852.262057-1-maz@kernel.org>
- <20240122201852.262057-3-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y85u0fbC"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1d72d240c69so20375ad.1
+        for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 12:00:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706299250; x=1706904050; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MimXWUdcIvN0nH3+dB3+knWCETvDzwsFYg6Za1niF5A=;
+        b=Y85u0fbCJjCdMA13kOAVGUPsK4RtwYRj9H7GyRLR3UXJvh3LHOX7qvrDSKWbCO5zet
+         K1s7guEXAXv8hEiubNItHwTS5QXQ9NDm8VRf5bNCUm2HZcRemKzeF7tz8TIoCliin0gc
+         g9ABHxtkWl3/O6xLWZL+KYOlVEygbfO7DJbJrhCNi1sJda4O+1ivNmtKISv4fxmZ+yoW
+         j3y9lYz7OuLkaoi+yf9Myzxi/U1E7P9csDMPoVyJj3MyAwHmqUEXGKPVxQFz9NEtMcrw
+         LFj9heDSUQo7XhJpLI1DVncGh2+E6IS7uPkl8nOLyYFaaQJ3YmyfPyCWuDN4RogGhhbp
+         Q02A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706299250; x=1706904050;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MimXWUdcIvN0nH3+dB3+knWCETvDzwsFYg6Za1niF5A=;
+        b=ke0qdYbwOLyr4OWiFHVjJIecJxy2VkAtszxu15rJL6Ipt/z8e/Dl8v5T9AzGHa5gSL
+         Vk6N+kvOWYJG1TwR1cBXPCuxH6QHKn9LHQtEFgWjji/VdoT2iTAiIFx9WarqXB6yY5il
+         j689Vy5gCfjIZfV31DYM4Xx6LHCTpfb/P4XCa1uZLcZytiKXYakG+n2UmxIPOi6u7aMq
+         MFc33mW/gwkOxGQrSHoDG7zGTvoS594yDAFqx3OIye+r419+DzNVQBqsZ/NPTnBgRZhi
+         5pRtEN4vx3TyvTOPj8fQBxgbqHSQ+WXXgfLAk9jifD/rkVGR3BHH7KuPQFSxziqg21IF
+         QXeQ==
+X-Gm-Message-State: AOJu0Yyi19wbdasCvRcutVm3qZk0sgE+L1sBirOXQZk7ZPvDvTdRUIA3
+	DFio4JAfWw6ZF30wYBdODMnKSOPbzhe/wL+kXG9oqtEIMJskmzhg4Nng5IcJ2E9tgIK+RyHA8b/
+	yJJtu1wbF1DcNkOk+9CyE0nqHw8uOCo0sbWyc
+X-Google-Smtp-Source: AGHT+IFUiaxxx/fnNfe3njsMipgqF2fdYzG/YBwFDzOMI+2YRba8r80bUR3upqDy6QVJlcre5NJrJ1mYmBGhuhzNf/E=
+X-Received: by 2002:a17:903:1246:b0:1d8:a782:6cc2 with SMTP id
+ u6-20020a170903124600b001d8a7826cc2mr127996plh.13.1706299249979; Fri, 26 Jan
+ 2024 12:00:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240122201852.262057-3-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+References: <20240125164256.4147-1-alexandru.elisei@arm.com> <20240125164256.4147-12-alexandru.elisei@arm.com>
+In-Reply-To: <20240125164256.4147-12-alexandru.elisei@arm.com>
+From: Peter Collingbourne <pcc@google.com>
+Date: Fri, 26 Jan 2024 12:00:36 -0800
+Message-ID: <CAMn1gO6hx7yaFHEYVbkpPocAxQmQc3JBgppcNSJw9SUfyvjwbQ@mail.gmail.com>
+Subject: Re: [PATCH RFC v3 11/35] mm: Allow an arch to hook into folio
+ allocation when VMA is known
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, 
+	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org, 
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, 
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org, 
+	bsegall@google.com, mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com, 
+	mhiramat@kernel.org, rppt@kernel.org, hughd@google.com, steven.price@arm.com, 
+	anshuman.khandual@arm.com, vincenzo.frascino@arm.com, david@redhat.com, 
+	eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-mm@kvack.org, 
+	linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 22, 2024 at 08:18:29PM +0000, Marc Zyngier wrote:
-> In order to make it easier to check whether a particular feature
-> is exposed to a guest, add a new set of helpers, with kvm_has_feat()
-> being the most useful.
-> 
-> Follow-up work will make heavy use of these.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+On Thu, Jan 25, 2024 at 8:43=E2=80=AFAM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> arm64 uses VM_HIGH_ARCH_0 and VM_HIGH_ARCH_1 for enabling MTE for a VMA.
+> When VM_HIGH_ARCH_0, which arm64 renames to VM_MTE, is set for a VMA, and
+> the gfp flag __GFP_ZERO is present, the __GFP_ZEROTAGS gfp flag also gets
+> set in vma_alloc_zeroed_movable_folio().
+>
+> Expand this to be more generic by adding an arch hook that modifes the gf=
+p
+> flags for an allocation when the VMA is known.
+>
+> Note that __GFP_ZEROTAGS is ignored by the page allocator unless __GFP_ZE=
+RO
+> is also set; from that point of view, the current behaviour is unchanged,
+> even though the arm64 flag is set in more places.  When arm64 will have
+> support to reuse the tag storage for data allocation, the uses of the
+> __GFP_ZEROTAGS flag will be expanded to instruct the page allocator to tr=
+y
+> to reserve the corresponding tag storage for the pages being allocated.
+>
+> The flags returned by arch_calc_vma_gfp() are or'ed with the flags set by
+> the caller; this has been done to keep an architecture from modifying the
+> flags already set by the core memory management code; this is similar to
+> how do_mmap() -> calc_vm_flag_bits() -> arch_calc_vm_flag_bits() has been
+> implemented. This can be revisited in the future if there's a need to do
+> so.
+>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-I very much like the way these helpers appear to work. However, I
-noticed there are still a few places where we are doing explicit feature
-checks against register values instead of using the macros, did you want
-to address these?
+This patch also needs to update the non-CONFIG_NUMA definition of
+vma_alloc_folio in include/linux/gfp.h to call arch_calc_vma_gfp. See:
+https://r.android.com/2849146
 
-Using kvm_has_feat() consistently in KVM will hopefully drive the point
-home that this is the way we want to see things done going forward.
-
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 3d9467ff73bc..925522470b2b 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -64,12 +64,11 @@ u64 kvm_pmu_evtyper_mask(struct kvm *kvm)
- {
- 	u64 mask = ARMV8_PMU_EXCLUDE_EL1 | ARMV8_PMU_EXCLUDE_EL0 |
- 		   kvm_pmu_event_mask(kvm);
--	u64 pfr0 = IDREG(kvm, SYS_ID_AA64PFR0_EL1);
- 
--	if (SYS_FIELD_GET(ID_AA64PFR0_EL1, EL2, pfr0))
-+	if (kvm_has_feat(kvm, ID_AA64PFR0_EL1, EL2, IMP))
- 		mask |= ARMV8_PMU_INCLUDE_EL2;
- 
--	if (SYS_FIELD_GET(ID_AA64PFR0_EL1, EL3, pfr0))
-+	if (kvm_has_feat(kvm, ID_AA64PFR0_EL1, EL3, IMP))
- 		mask |= ARMV8_PMU_EXCLUDE_NS_EL0 |
- 			ARMV8_PMU_EXCLUDE_NS_EL1 |
- 			ARMV8_PMU_EXCLUDE_EL3;
-@@ -83,8 +82,10 @@ u64 kvm_pmu_evtyper_mask(struct kvm *kvm)
-  */
- static bool kvm_pmc_is_64bit(struct kvm_pmc *pmc)
- {
-+	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
-+
- 	return (pmc->idx == ARMV8_PMU_CYCLE_IDX ||
--		kvm_pmu_is_3p5(kvm_pmc_to_vcpu(pmc)));
-+		kvm_has_feat(vcpu->kvm, ID_AA64DFR0_EL1, PMUVer, V3P5));
- }
- 
- static bool kvm_pmc_has_64bit_overflow(struct kvm_pmc *pmc)
-@@ -556,7 +557,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
- 		return;
- 
- 	/* Fixup PMCR_EL0 to reconcile the PMU version and the LP bit */
--	if (!kvm_pmu_is_3p5(vcpu))
-+	if (!kvm_has_feat(vcpu->kvm, ID_AA64DFR0_EL1, PMUVer, V3P5))
- 		val &= ~ARMV8_PMU_PMCR_LP;
- 
- 	/* The reset bits don't indicate any state, and shouldn't be saved. */
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 30253bd19917..955eb06f821d 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -505,10 +505,9 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
- 			  struct sys_reg_params *p,
- 			  const struct sys_reg_desc *r)
- {
--	u64 val = IDREG(vcpu->kvm, SYS_ID_AA64MMFR1_EL1);
- 	u32 sr = reg_to_encoding(r);
- 
--	if (!(val & (0xfUL << ID_AA64MMFR1_EL1_LO_SHIFT))) {
-+	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, LO, IMP)) {
- 		kvm_inject_undefined(vcpu);
- 		return false;
- 	}
-@@ -2737,8 +2736,7 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
- 		return ignore_write(vcpu, p);
- 	} else {
- 		u64 dfr = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);
--		u64 pfr = IDREG(vcpu->kvm, SYS_ID_AA64PFR0_EL1);
--		u32 el3 = !!SYS_FIELD_GET(ID_AA64PFR0_EL1, EL3, pfr);
-+		u32 el3 = kvm_has_feat(vcpu->kvm, ID_AA64PFR0_EL1, EL3, IMP);
- 
- 		p->regval = ((SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, dfr) << 28) |
- 			     (SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, dfr) << 24) |
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 4b9d8fb393a8..eb4c369a79eb 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -90,16 +90,6 @@ void kvm_vcpu_pmu_resync_el0(void);
- 			vcpu->arch.pmu.events = *kvm_get_pmu_events();	\
- 	} while (0)
- 
--/*
-- * Evaluates as true when emulating PMUv3p5, and false otherwise.
-- */
--#define kvm_pmu_is_3p5(vcpu) ({						\
--	u64 val = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);		\
--	u8 pmuver = SYS_FIELD_GET(ID_AA64DFR0_EL1, PMUVer, val);	\
--									\
--	pmuver >= ID_AA64DFR0_EL1_PMUVer_V3P5;				\
--})
--
- u8 kvm_arm_pmu_get_pmuver_limit(void);
- u64 kvm_pmu_evtyper_mask(struct kvm *kvm);
- int kvm_arm_set_default_pmu(struct kvm *kvm);
-@@ -168,7 +158,6 @@ static inline u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
- }
- 
- #define kvm_vcpu_has_pmu(vcpu)		({ false; })
--#define kvm_pmu_is_3p5(vcpu)		({ false; })
- static inline void kvm_pmu_update_vcpu_events(struct kvm_vcpu *vcpu) {}
- static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
- static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
-
--- 
-Thanks,
-Oliver
+Peter
