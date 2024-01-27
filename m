@@ -1,186 +1,125 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58A0224EC
-	for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 20:25:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C6AB67F
+	for <kvmarm@lists.linux.dev>; Sat, 27 Jan 2024 02:42:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706300745; cv=none; b=CJaEpkSGDqbxK2Mm8kArIQiHOInOHYn3pnaHdgTvREqe3HNDuIkk6AzZh3t3i8WSDPTmsm5WAAbyoW7/8QBw1f7UfaHYzTfYq8p4/xCvnxgFRyMsztbd0VQyHnZ7Sa7dk3U5PIr/hGKRKPE1fiijDWaN7Iu4oD1xY1HEA5haP90=
+	t=1706323334; cv=none; b=YMEavTPCVB4REPcij7k+cna80e7uZ/yovJOwNBMICmK9+Xo+HIR5QaoxySoCk9uCfkcmQIHSPWDaDMizamOusnNDAE680ku4xD+E3Dls04KutgU9Zlpo3V08Am46X+r0quZ9Ezllqi2wom//dKzkecYcHkWWgSrPl1wHryXwv1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706300745; c=relaxed/simple;
-	bh=3cIgTjRr4HktkHh94CWSDggXBSkYHF5KchgT06kgK8E=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=R3PY4ZDb8ed0CZbS+FnasSef6eW4sf28pCvKYJHyDsDkJ/s1hTLph8/LVAwT32y7FeJ7OXu39mYR098J4fErtBLy7FfOm6Y8zbCBPQHyC7R5NtFM/YELidZlTLPMe9kOB5SdX+azlIGdeiKukHGwIyRCx7MfzaX8gRUYeweZyzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dMQGYUu1; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dMQGYUu1"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5c670f70a37so782197a12.2
-        for <kvmarm@lists.linux.dev>; Fri, 26 Jan 2024 12:25:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706300743; x=1706905543; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Oz9w/MGSJCfVJoFxXdjwOXlp0YlOCXLVVNfaqF8/1eE=;
-        b=dMQGYUu1Gktk8bGDofwCfpa/efFV6VnWmzY0j5iGACHG3k8kaiLoNyPwmtqj61FvcS
-         q4xG/MyVfmErHCnuK3LGoXDvGL9q9qkBr2O5Qft9DvFiiuNf4T9SvmK3nJHRPvljH5Yn
-         kZIhyufBImdTIxZm7dDdWipsK4fS+qrLREyTFuLuWKl62MuJQuczORnhtofyp3ZAcm7n
-         0oJyNZpl3vNX7ODviDLyO7mBPrcLgNKHxFWe4iIghtxokp88XQZSxYdvWuiJPQFmfVkS
-         LGYos7M60ueDSOxhL3WIEYQIZH5R+tG0inUMgwiLPUr2lYnFoq1bkUHMj97gnteuyCVa
-         Fxnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706300743; x=1706905543;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Oz9w/MGSJCfVJoFxXdjwOXlp0YlOCXLVVNfaqF8/1eE=;
-        b=RjeL0yESdd5FTppcqhHHBZNg5SC52BZFXsNwa/sliimxEeByFQqb7+8FjHPAH8946C
-         rE2ENMnFVpoQmoTaT8/CaY20MSS/1WEzc03blWEU5LKnrJI5/fxtNda/SlJgd5aAygsg
-         g/EqpPzIoI+bQEFdl0LC+XRi6lbXrEQbMnphlnUf8DIqxMf30c90a3XlPdJcqf3eCaio
-         7yP2fQGS6CVihZPf2aDVR7ag8KkA3aIIP+HdUFxrOakp7j1+S2KTOxPFY0a5oXX2CtXF
-         lD+EXHt/1YqRS7EFyrd4tyg6yitGXIXA0Ek2gJOatwJSBw/DlL3ZM+dOJaYitk3DsMRo
-         pz9Q==
-X-Gm-Message-State: AOJu0YwZpUzG0f6Bm6myZZWHimKFrTH4R4e/uYXoleaSeXOf4Zm1xqPa
-	BCiPs5nJksr3xroxQfZA5E4ca7R7JBLZJoMnGTbX195G07SYXt2PE+I1GQxbZhhqLee1ibgG38j
-	sXQ==
-X-Google-Smtp-Source: AGHT+IF3uGps9y8JiME3Q7HhNRDpz9fB3O2K5T+wbXcJt2yNTs/tyQVPf6ztalhofyaP4n1VGV7ie9wiTj0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:78a:b0:5d7:97b9:3084 with SMTP id
- cd10-20020a056a02078a00b005d797b93084mr2394pgb.0.1706300742964; Fri, 26 Jan
- 2024 12:25:42 -0800 (PST)
-Date: Fri, 26 Jan 2024 12:25:41 -0800
-In-Reply-To: <20231117052210.26396-1-shahuang@redhat.com>
+	s=arc-20240116; t=1706323334; c=relaxed/simple;
+	bh=fo7bzt3IKqefdd+Y7nnGddXTNh8ZGPn0tL7e6x9bJlM=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=oDqwjiPbVG2t5ptYkHSisVucCjagKQZXVV1kORHotb3jsOoJsT/d6cxbfLmsJPzlRhxaaLJDLCCgI1vjTc19h6+juZsYblND9xynAwzMcz2DW3Dt133vfsDh+zw962O8tpv+oixwLTrF31uc8sJ54lGos09coGAULOjkeoeP5bE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4TMJhs5vnLz18MHs;
+	Sat, 27 Jan 2024 10:41:01 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id EFD9518007D;
+	Sat, 27 Jan 2024 10:42:07 +0800 (CST)
+Received: from [10.174.185.210] (10.174.185.210) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sat, 27 Jan 2024 10:42:06 +0800
+Subject: Re: [PATCH v2 1/2] irqchip/gic-v4.1: Fix GICv4.1 doorbell affinity
+To: Marc Zyngier <maz@kernel.org>
+CC: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+	Thomas Gleixner <tglx@linutronix.de>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <wanghaibin.wang@huawei.com>
+References: <20240126103012.1020-1-jiangkunkun@huawei.com>
+ <20240126103012.1020-2-jiangkunkun@huawei.com> <86ttn074ev.wl-maz@kernel.org>
+From: Kunkun Jiang <jiangkunkun@huawei.com>
+Message-ID: <44051a41-f82e-57d9-001a-d4d195d59f2e@huawei.com>
+Date: Sat, 27 Jan 2024 10:41:55 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20231117052210.26396-1-shahuang@redhat.com>
-Message-ID: <ZbQVRX3V1P-ZE2Wf@google.com>
-Subject: Re: [PATCH v2] KVM: selftests: Fix the dirty_log_test semaphore imbalance
-From: Sean Christopherson <seanjc@google.com>
-To: Shaoqin Huang <shahuang@redhat.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Peter Xu <peterx@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+In-Reply-To: <86ttn074ev.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-+Peter
+Hi Marc,
 
-On Fri, Nov 17, 2023, Shaoqin Huang wrote:
-> When execute the dirty_log_test on some aarch64 machine, it sometimes
-> trigger the ASSERT:
-> 
-> ==== Test Assertion Failure ====
->   dirty_log_test.c:384: dirty_ring_vcpu_ring_full
->   pid=14854 tid=14854 errno=22 - Invalid argument
->      1  0x00000000004033eb: dirty_ring_collect_dirty_pages at dirty_log_test.c:384
->      2  0x0000000000402d27: log_mode_collect_dirty_pages at dirty_log_test.c:505
->      3   (inlined by) run_test at dirty_log_test.c:802
->      4  0x0000000000403dc7: for_each_guest_mode at guest_modes.c:100
->      5  0x0000000000401dff: main at dirty_log_test.c:941 (discriminator 3)
->      6  0x0000ffff9be173c7: ?? ??:0
->      7  0x0000ffff9be1749f: ?? ??:0
->      8  0x000000000040206f: _start at ??:?
->   Didn't continue vcpu even without ring full
-> 
-> The dirty_log_test fails when execute the dirty-ring test, this is
-> because the sem_vcpu_cont and the sem_vcpu_stop is non-zero value when
-> execute the dirty_ring_collect_dirty_pages() function. When those two
-> sem_t variables are non-zero, the dirty_ring_wait_vcpu() at the
-> beginning of the dirty_ring_collect_dirty_pages() will not wait for the
-> vcpu to stop, but continue to execute the following code. In this case,
-> before vcpu stop, if the dirty_ring_vcpu_ring_full is true, and the
-> dirty_ring_collect_dirty_pages() has passed the check for the
-> dirty_ring_vcpu_ring_full but hasn't execute the check for the
-> continued_vcpu, the vcpu stop, and set the dirty_ring_vcpu_ring_full to
-> false. Then dirty_ring_collect_dirty_pages() will trigger the ASSERT.
-> 
-> Why sem_vcpu_cont and sem_vcpu_stop can be non-zero value? It's because
-> the dirty_ring_before_vcpu_join() execute the sem_post(&sem_vcpu_cont)
-> at the end of each dirty-ring test. It can cause two cases:
-> 
-> 1. sem_vcpu_cont be non-zero. When we set the host_quit to be true,
->    the vcpu_worker directly see the host_quit to be true, it quit. So
->    the log_mode_before_vcpu_join() function will set the sem_vcpu_cont
->    to 1, since the vcpu_worker has quit, it won't consume it.
-> 2. sem_vcpu_stop be non-zero. When we set the host_quit to be true,
->    the vcpu_worker has entered the guest state, the next time it exit
->    from guest state, it will set the sem_vcpu_stop to 1, and then see
->    the host_quit, no one will consume the sem_vcpu_stop.
-> 
-> When execute more and more dirty-ring tests, the sem_vcpu_cont and
-> sem_vcpu_stop can be larger and larger, which makes many code paths
-> don't wait for the sem_t. Thus finally cause the problem.
-> 
-> To fix this problem, we can wait a while before set the host_quit to
-> true, which gives the vcpu time to enter the guest state, so it will
-> exit again. Then we can wait the vcpu to exit, and let it continue
-> again, then the vcpu will see the host_quit. Thus the sem_vcpu_cont and
-> sem_vcpu_stop will be both zero when test finished.
-> 
-> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
-> ---
-> v1->v2:
->   - Fix the real logic bug, not just fresh the context.
-> 
-> v1: https://lore.kernel.org/all/20231116093536.22256-1-shahuang@redhat.com/
-> ---
->  tools/testing/selftests/kvm/dirty_log_test.c | 16 +++++++++++++++-
->  1 file changed, 15 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-> index 936f3a8d1b83..a6e0ff46a07c 100644
-> --- a/tools/testing/selftests/kvm/dirty_log_test.c
-> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
-> @@ -417,7 +417,8 @@ static void dirty_ring_after_vcpu_run(struct kvm_vcpu *vcpu, int ret, int err)
->  
->  static void dirty_ring_before_vcpu_join(void)
->  {
-> -	/* Kick another round of vcpu just to make sure it will quit */
-> +	/* Wait vcpu exit, and let it continue to see the host_quit. */
-> +	dirty_ring_wait_vcpu();
->  	sem_post(&sem_vcpu_cont);
->  }
->  
-> @@ -719,6 +720,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  	struct kvm_vm *vm;
->  	unsigned long *bmap;
->  	uint32_t ring_buf_idx = 0;
-> +	int sem_val;
->  
->  	if (!log_mode_supported()) {
->  		print_skip("Log mode '%s' not supported",
-> @@ -726,6 +728,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  		return;
->  	}
->  
-> +	sem_getvalue(&sem_vcpu_stop, &sem_val);
-> +	assert(sem_val == 0);
-> +	sem_getvalue(&sem_vcpu_cont, &sem_val);
-> +	assert(sem_val == 0);
+On 2024/1/26 18:52, Marc Zyngier wrote:
+> On Fri, 26 Jan 2024 10:30:11 +0000,
+> Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+>> dd3f050a216e make an optimization, VMOVP can be skipped if moving
+>> VPE to a cpu whose RD is sharing its VPE table with the current one.
+>> But when skipping VMOVP, the affinity recorded in irq_data is still
+>> updated. This causes the doorbell affinity recorfed in the irq_data
+>> to be inconsistent with the actual.
+>>
+>> In corner case, this may result in lost interrupts:
+>> 0. Each cpu die shares a VPE table and contains 32 CPUs
+>>     die0(CPU0-31) die1(CPU32-63)...
+>> 1. VPE resides on CPU32, doorbell affinity to CPU32.
+>> 2. Move VPE to CPU33, skip VMOVP, doorbell still affinity to CPU32.
+>>     The affinity recorded in irq_data is CPU33.
+>> 3. Manually offline CPU32 on the host side:
+>>     'echo 0 > /sys/devices/system/cpu/cpu32/online'
+>> 4. Core code cannot move the doorbell affinity to CPU32, since the
+>>     record in irq_data is CPU33.
+>> 5. Subsequent doorbell interrupts will be lost.
+>>
+>> So affinity recoreded in irq_data should not be updated when skipping
+>> VMOVP.
+>>
+>> Fixes: dd3f050a216e (irqchip/gic-v4.1: Implement the v4.1 flavour of VMOVP)
+>> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+>> ---
+>>   drivers/irqchip/irq-gic-v3-its.c | 3 ++-
+>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+>> index d097001c1e3e..4b1dbb697959 100644
+>> --- a/drivers/irqchip/irq-gic-v3-its.c
+>> +++ b/drivers/irqchip/irq-gic-v3-its.c
+>> @@ -3850,8 +3850,9 @@ static int its_vpe_set_affinity(struct irq_data *d,
+>>   	its_send_vmovp(vpe);
+>>   	its_vpe_db_proxy_move(vpe, from, cpu);
+>>   
+>> -out:
+>>   	irq_data_update_effective_affinity(d, cpumask_of(cpu));
+>> +
+>> +out:
+>>   	vpe_to_cpuid_unlock(vpe, flags);
+>>   
+>>   	return IRQ_SET_MASK_OK_DONE;
+> This is becoming *very* annoying. I've already told you this patch was
+> wrong, yet you keep sending it (twice in just over an hour).
+Sorry, I didn't see that you had replied to me, when I sent it for
+the second time.I have no intention of doing this.Sincerely apologize
+for you.
 
-Never use bare assert() in selftests, they'll either get compiled out or IIRC,
-will cause the test to silently exit if they fail.  Either do nothing, or use
-TEST_ASSERT().
+Please allow me to put your previous reply here for discussion:
+> That looks wrong. You are lying to the core code by saying that it's
+> all OK, and yet haven't done*anything*. This stuff is obviously
+> buggy, but I don't think this is right.
+Make scene. I understand that the root cause of this problem is that
+there is a difference between the doorbell affinity recorded in the
+kernel and the actual hardware. So I'm just thinking about keeping
+both consistent.
+> In your example, you don't even solve the problem: if CPUs 32 and 33
+> are part of the same ITS affinity group, you won't issue a VMOVP
+> either, so this doesn't fix anything.
+No VMOVP is sent. But the affinity recorded in irq_data is correct.
+So when offline CPU32, core code can move doorbell to CPU0.The
+mask_val is the entire cpu range, except for the offline cpu.
+> At this stage, I think the VMOVP optimisation is wrong and that we
+> should drop it.
+This is the last resort. Maybe we can think of another way.
 
-> +
->  	/*
->  	 * We reserve page table for 2 times of extra dirty mem which
->  	 * will definitely cover the original (1G+) test range.  Here
-> @@ -825,6 +832,13 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  		sync_global_to_guest(vm, iteration);
->  	}
->  
-> +	/*
-> +	 *
-> +	 * Before we set the host_quit, let the vcpu has time to run, to make
-> +	 * sure we consume the sem_vcpu_stop and the vcpu consume the
-> +	 * sem_vcpu_cont, to keep the semaphore balance.
-> +	 */
-> +	usleep(p->interval * 1000);
+Kunkun Jiang
 
-Please no.  "Wait for a while" is never a complete solution for fixing races.
-In rare cases, adding a delay might be the only sane workaround, but I doubt that's
-the case here.
