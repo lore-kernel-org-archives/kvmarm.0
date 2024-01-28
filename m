@@ -1,114 +1,178 @@
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A10DA11702
-	for <kvmarm@lists.linux.dev>; Sat, 27 Jan 2024 02:59:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39AB208A6
+	for <kvmarm@lists.linux.dev>; Sun, 28 Jan 2024 13:28:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706324360; cv=none; b=AY0JyljWMZn3RaJS+fbi3X3yb8FWne2tZXDyWlqbQtc4URkahdLfNhZsSaHRbdXA+H2qk2Fqcy26TfNlZfikhqyn5+/4QRFyhzEm4D503M5dD6XlqtKepty2XWXeKhNLxTd8T7cuV+ULgnGAZ+msasVdJZJGsRRV7kho34JJhME=
+	t=1706448500; cv=none; b=AfUoRKaogpvqrwNvQ5ouSDBwnXjNq3X/NgKUb4gngWlV+MOTkgeKqkpZ/wqc8ENzci3ylnKvcBhb2f2VkszA4IAyItqqkVE2qERK8kQFgdOBroBVzBasUDj0lFzOD61P0GtwvguUZ0L5lV9GxDSDQhto3GtdqSwVhp2B01vG1KA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706324360; c=relaxed/simple;
-	bh=Hp0CYqoo5qTLY3dJfk3gzdYjEnX11hpy6Y1cPwy8pok=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=luWbrhbpsTwj+WnZOVA8T8kb3b1T900gJ9Hivz5UjkVy2vyj+eSExHfa9JGN+6uCEIbMT5q25tl8/d3NDHuDPxJp9HHys94dYeXgl7WfvSltk0peiwMnofvMK5ybIpgmAfOW9jLeB7Qc1s0w6+C6cT0BARuaXMM1U4gD93a3IiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4TMK4c6v7kz18MJ2;
-	Sat, 27 Jan 2024 10:58:08 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2512A1404FC;
-	Sat, 27 Jan 2024 10:59:15 +0800 (CST)
-Received: from [10.174.185.210] (10.174.185.210) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sat, 27 Jan 2024 10:59:14 +0800
-Subject: Re: [PATCH v2 2/2] irqchip/gic-v4.1: Fix skipping VMOVP in cpu
- offline scenario
-To: Marc Zyngier <maz@kernel.org>
-CC: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
-	Thomas Gleixner <tglx@linutronix.de>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <wanghaibin.wang@huawei.com>
+	s=arc-20240116; t=1706448500; c=relaxed/simple;
+	bh=PGASfPJtetItxs75hHstoZLUjCt1u7M5lKj4Owasdfc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ATjcrXuaABl2MKhjTXSP6h1AmU2Zf6/BJyyYuzJI1F0/cZmhiMo/WnBEnt1z+PBrDpDMc3NERIM1wLnE6pGMgW6APnF5xD0P28HL6r19gnLTYVWGcB7AYy7AasT8gWlNej3kMEth0jdNynV8IuS3lI7Vnk+JwcH0/4kGtsPKCmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J1+sxUVY; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J1+sxUVY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6050AC433C7;
+	Sun, 28 Jan 2024 13:28:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706448499;
+	bh=PGASfPJtetItxs75hHstoZLUjCt1u7M5lKj4Owasdfc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=J1+sxUVYtx9s45y8oK7LKPBXjVczJgKivL0on1CROCwrAZ+6giQ33gp3EqLiGMPbu
+	 51POfmO3BNP9DJFp3Udz+j7OY4sxx9CVDnu7KvDsua2x3UJkLOxd9smaB2oTvlxq+K
+	 uMLqm7/Q7w25iESId13rYWd8v5goZDoskMGMyW2Ol3338vR+JqddcaZ9cQJWY/Ejp6
+	 Vok+XNNopGQUQA0m+uq0UQ+3ZyBuxH6OWWcArEq42Yfx+ZO0z/6fi7EL7OE8PFWC6M
+	 btssfE7BdIKk5D16hIyTKjLkEvDNdEsK2yGxo8mHO3N37XgWBswdg6QpA5mP5aOuqN
+	 f1aEIBvDkLb2Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rU5Cq-00FWUq-VF;
+	Sun, 28 Jan 2024 13:28:17 +0000
+Date: Sun, 28 Jan 2024 13:28:16 +0000
+Message-ID: <86r0i17fkf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kunkun Jiang <jiangkunkun@huawei.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<wanghaibin.wang@huawei.com>
+Subject: Re: [PATCH v2 1/2] irqchip/gic-v4.1: Fix GICv4.1 doorbell affinity
+In-Reply-To: <44051a41-f82e-57d9-001a-d4d195d59f2e@huawei.com>
 References: <20240126103012.1020-1-jiangkunkun@huawei.com>
- <20240126103012.1020-3-jiangkunkun@huawei.com> <86sf2k74dy.wl-maz@kernel.org>
-From: Kunkun Jiang <jiangkunkun@huawei.com>
-Message-ID: <58a27892-d2c4-886e-905a-9b991c1c7941@huawei.com>
-Date: Sat, 27 Jan 2024 10:59:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+	<20240126103012.1020-2-jiangkunkun@huawei.com>
+	<86ttn074ev.wl-maz@kernel.org>
+	<44051a41-f82e-57d9-001a-d4d195d59f2e@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-In-Reply-To: <86sf2k74dy.wl-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
+On Sat, 27 Jan 2024 02:41:55 +0000,
+Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+>=20
+> > At this stage, I think the VMOVP optimisation is wrong and that we
+> > should drop it.
+> This is the last resort. Maybe we can think of another way.
 
-On 2024/1/26 18:52, Marc Zyngier wrote:
-> On Fri, 26 Jan 2024 10:30:12 +0000,
-> Kunkun Jiang <jiangkunkun@huawei.com> wrote:
->> commit dd3f050a216e ("irqchip/gic-v4.1: Implement the v4.1 flavour
->> of VMOVP") make an optimization, VMOVP can be skipped if moving
->> VPE to a cpu whose RD is sharing its VPE table with the current one.
->>
->> In the cpu offline scenario, the mask_val is the entire cpu range,
->> except for the offline cpu. Therefore, the first cpu is CPU0. In
->> corner case, this may result in lost interrupts:
->> 0. Each cpu die shares a VPE table and contains 32 CPUs
->>     die0(CPU0-31) die1(CPU32-63)...
->> 1. VPE resides on CPU32, doorbell affinity to CPU32.
->> 2. Move VPE to CPU16, doorbell affinity to CPU16.
->> 3. Manually offline CPU16 on the host side:
->>     'echo 0 > /sys/devices/system/cpu/cpu16/online'
->> 4. VMOVP will be skipped.
->> 5. Subsequent doorbell interrupts will be lost.
->>
->> So VMOVP cannot be skipped when the affinity CPU is not in mask_val.
->>
->> Fixes: dd3f050a216e ("irqchip/gic-v4.1: Implement the v4.1 flavour of VMOVP")
->> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
->> ---
->>   drivers/irqchip/irq-gic-v3-its.c | 4 +++-
->>   1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
->> index 4b1dbb697959..bfb922f16bc6 100644
->> --- a/drivers/irqchip/irq-gic-v3-its.c
->> +++ b/drivers/irqchip/irq-gic-v3-its.c
->> @@ -3817,7 +3817,7 @@ static int its_vpe_set_affinity(struct irq_data *d,
->>   				bool force)
->>   {
->>   	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
->> -	int from, cpu = cpumask_first(mask_val);
->> +	int cur, from, cpu = cpumask_first(mask_val);
->>   	unsigned long flags;
->>   
->>   	/*
->> @@ -3839,11 +3839,13 @@ static int its_vpe_set_affinity(struct irq_data *d,
->>   
->>   	vpe->col_idx = cpu;
->>   
->> +	cur = cpumask_first(irq_data_get_effective_affinity_mask(d));
-> When is this not equal to 'from'?
-It's based on my last patch. When skipping VMOVP, it is not equal to 'from'.
->>   	/*
->>   	 * GICv4.1 allows us to skip VMOVP if moving to a cpu whose RD
->>   	 * is sharing its VPE table with the current one.
->>   	 */
->>   	if (gic_data_rdist_cpu(cpu)->vpe_table_mask &&
->> +	    cpumask_test_cpu(cur, mask_val) &&
->>   	    cpumask_test_cpu(from, gic_data_rdist_cpu(cpu)->vpe_table_mask))
->>   		goto out;
-> This looks utterly pointless to me.
-Yes, there are some problems here. I'll think about it more carefully.
+I think the only other way is to never elide the VMOVP from
+set_affinity, but to only call into set_affinity when strictly
+necessary:
 
-Kunkun Jiang
+- when making the VPE resident on a CPU that isn't part of the same
+  affinity group (VPE migration outside of the affinity group)
+
+- when making the VPE non-resident on a CPU that isn't the doorbell
+  delivery CPU *AND* that there is a need for a doorbell (VPE
+  migration inside the affinity group)
+
+Which means it is the responsibility of the upper layers of the stack
+to make these decisions, and that we can keep the low-level driver as
+simple as possible.
+
+In the meantime, here's the patch I'm proposing to merge ASAP. Please
+let me know if that works for you.
+
+	M.
+
+=46rom 00c338e91d3b6600f402f56cdb64c9d370f911c8 Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Sun, 28 Jan 2024 13:05:24 +0000
+Subject: [PATCH] irqchip/gic-v3-its: Fix GICv4.1 VPE affinity update
+
+When updating the affinity of a VPE, we currently skip the VMOVP
+command if the two CPUs are part of the same VPE affinity.
+
+But this is wrong, as the doorbell corresponding to this VPE
+is still delivered on the 'old' CPU, which screws up the balancing.
+Furthermore, offlining that 'old' CPU results in doorbell interrupts
+generated for this VPE being discarded.
+
+The harsh reality is that we cannot easily elide VMOVP when
+a set_affinity request occurs. It needs to be obeyed, and if
+an optimisation is to be made, it is at the point where the affinity
+change request is made (such as in KVM).
+
+Drop the VMOVP elision altogether, and only use the vpe_table_mask
+to try and stay within the same ITS affinity group if at all possible.
+
+Fixes: dd3f050a216e (irqchip/gic-v4.1: Implement the v4.1 flavour of VMOVP)
+Reported-by: Kunkun Jiang <jiangkunkun@huawei.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org
+---
+ drivers/irqchip/irq-gic-v3-its.c | 22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-=
+its.c
+index 250b4562f308..78aece62bff5 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -3826,8 +3826,9 @@ static int its_vpe_set_affinity(struct irq_data *d,
+ 				bool force)
+ {
+ 	struct its_vpe *vpe =3D irq_data_get_irq_chip_data(d);
+-	int from, cpu =3D cpumask_first(mask_val);
++	struct cpumask common;
+ 	unsigned long flags;
++	int from, cpu;
+=20
+ 	/*
+ 	 * Changing affinity is mega expensive, so let's be as lazy as
+@@ -3843,19 +3844,22 @@ static int its_vpe_set_affinity(struct irq_data *d,
+ 	 * taken on any vLPI handling path that evaluates vpe->col_idx.
+ 	 */
+ 	from =3D vpe_to_cpuid_lock(vpe, &flags);
+-	if (from =3D=3D cpu)
+-		goto out;
+-
+-	vpe->col_idx =3D cpu;
+=20
+ 	/*
+-	 * GICv4.1 allows us to skip VMOVP if moving to a cpu whose RD
+-	 * is sharing its VPE table with the current one.
++	 * If we are offered another CPU in the same GICv4.1 ITS
++	 * affinity, pick this one. Otherwise, any CPU will do.
+ 	 */
+-	if (gic_data_rdist_cpu(cpu)->vpe_table_mask &&
+-	    cpumask_test_cpu(from, gic_data_rdist_cpu(cpu)->vpe_table_mask))
++	if (gic_data_rdist_cpu(from)->vpe_table_mask &&
++	    cpumask_and(&common, mask_val, gic_data_rdist_cpu(from)->vpe_table_ma=
+sk))
++		cpu =3D cpumask_first(&common);
++	else
++		cpu =3D cpumask_first(mask_val);
++
++	if (from =3D=3D cpu)
+ 		goto out;
+=20
++	vpe->col_idx =3D cpu;
++
+ 	its_send_vmovp(vpe);
+ 	its_vpe_db_proxy_move(vpe, from, cpu);
+=20
+--=20
+2.39.2
+
+
+--=20
+Without deviation from the norm, progress is not possible.
