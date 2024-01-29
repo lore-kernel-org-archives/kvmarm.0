@@ -1,178 +1,201 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39AB208A6
-	for <kvmarm@lists.linux.dev>; Sun, 28 Jan 2024 13:28:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5ADDDAD;
+	Mon, 29 Jan 2024 01:03:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706448500; cv=none; b=AfUoRKaogpvqrwNvQ5ouSDBwnXjNq3X/NgKUb4gngWlV+MOTkgeKqkpZ/wqc8ENzci3ylnKvcBhb2f2VkszA4IAyItqqkVE2qERK8kQFgdOBroBVzBasUDj0lFzOD61P0GtwvguUZ0L5lV9GxDSDQhto3GtdqSwVhp2B01vG1KA=
+	t=1706490238; cv=none; b=MmGl7v6SVOrp5IEOEpj3wQOMsMVIdgVKuDYtQAHMTfnRJ7XuNwqS4COsy1qWXPudv0lud4JnbIpS5nzsPhfSLt/MP8q6zfjOsXElS98fHErMcZv4bOyku+gwUvtenYb7U3dTUkF9uDcvWYut5z0rxnAiWJLGlLCS6Z+0jY0ZM5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706448500; c=relaxed/simple;
-	bh=PGASfPJtetItxs75hHstoZLUjCt1u7M5lKj4Owasdfc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ATjcrXuaABl2MKhjTXSP6h1AmU2Zf6/BJyyYuzJI1F0/cZmhiMo/WnBEnt1z+PBrDpDMc3NERIM1wLnE6pGMgW6APnF5xD0P28HL6r19gnLTYVWGcB7AYy7AasT8gWlNej3kMEth0jdNynV8IuS3lI7Vnk+JwcH0/4kGtsPKCmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J1+sxUVY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706490238; c=relaxed/simple;
+	bh=7dCyYyC9HvsH0TC63mIxeQgXtZjfv1V7t2rD9NAJ8Jk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d7epOqUOMbFtLjrDi20XtevXO9TZS1KC2I0B8do0/oMZGwcXdVfFHMCiQ/Nmu8jbCiCSGn0wh1QNm8+kAzmz5QnEU4jQa6Tcqj3NppDIqky/hZ2ixGWJiwd+L6VqkW7FYr+xD2HK6EqblIvVPWThNIpLBtF0UKL8no1rFsx7ziw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S4/0uFcB; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J1+sxUVY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6050AC433C7;
-	Sun, 28 Jan 2024 13:28:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706448499;
-	bh=PGASfPJtetItxs75hHstoZLUjCt1u7M5lKj4Owasdfc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=J1+sxUVYtx9s45y8oK7LKPBXjVczJgKivL0on1CROCwrAZ+6giQ33gp3EqLiGMPbu
-	 51POfmO3BNP9DJFp3Udz+j7OY4sxx9CVDnu7KvDsua2x3UJkLOxd9smaB2oTvlxq+K
-	 uMLqm7/Q7w25iESId13rYWd8v5goZDoskMGMyW2Ol3338vR+JqddcaZ9cQJWY/Ejp6
-	 Vok+XNNopGQUQA0m+uq0UQ+3ZyBuxH6OWWcArEq42Yfx+ZO0z/6fi7EL7OE8PFWC6M
-	 btssfE7BdIKk5D16hIyTKjLkEvDNdEsK2yGxo8mHO3N37XgWBswdg6QpA5mP5aOuqN
-	 f1aEIBvDkLb2Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rU5Cq-00FWUq-VF;
-	Sun, 28 Jan 2024 13:28:17 +0000
-Date: Sun, 28 Jan 2024 13:28:16 +0000
-Message-ID: <86r0i17fkf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Kunkun Jiang <jiangkunkun@huawei.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S4/0uFcB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706490237; x=1738026237;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7dCyYyC9HvsH0TC63mIxeQgXtZjfv1V7t2rD9NAJ8Jk=;
+  b=S4/0uFcB8Uljbg/BkszEOU3zfu+pUqqH2ruH97Jwrpf4T56Y2yAKjTDM
+   0zQEuPgKRdtyQSr9WcpK9aUxots4BtS55NLcQ5qwqXipCwpFt33f7x2fO
+   L0Q3taPTV52sw3/Tok1HVzRbjdZ+D0ZNwNKmXTj/6Nrj7kb706iP2RoG/
+   mXl9dktq3356bmomatL4ojw0OkZ4bXnurap22+K6+7orcwDHHz99k0Qne
+   zVKEJdigcJI3G5wK23nMFry1uNUFHRYwqS9L1U6mdBylnLU2ZQB+Ql7yK
+   cX4F1j3CsUtmukee8V5TfriUhzUyZFNXUvzeMrXI7wi/b52BIGT7w8lXZ
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10967"; a="10207109"
+X-IronPort-AV: E=Sophos;i="6.05,226,1701158400"; 
+   d="scan'208";a="10207109"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2024 17:03:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10967"; a="906910595"
+X-IronPort-AV: E=Sophos;i="6.05,226,1701158400"; 
+   d="scan'208";a="906910595"
+Received: from lkp-server01.sh.intel.com (HELO 370188f8dc87) ([10.239.97.150])
+  by fmsmga002.fm.intel.com with ESMTP; 28 Jan 2024 17:03:53 -0800
+Received: from kbuild by 370188f8dc87 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rUG3y-0003uW-2i;
+	Mon, 29 Jan 2024 01:03:50 +0000
+Date: Mon, 29 Jan 2024 09:03:25 +0800
+From: kernel test robot <lkp@intel.com>
+To: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
+Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<wanghaibin.wang@huawei.com>
-Subject: Re: [PATCH v2 1/2] irqchip/gic-v4.1: Fix GICv4.1 doorbell affinity
-In-Reply-To: <44051a41-f82e-57d9-001a-d4d195d59f2e@huawei.com>
-References: <20240126103012.1020-1-jiangkunkun@huawei.com>
-	<20240126103012.1020-2-jiangkunkun@huawei.com>
-	<86ttn074ev.wl-maz@kernel.org>
-	<44051a41-f82e-57d9-001a-d4d195d59f2e@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH 13/15] KVM: arm64: vgic-its: Protect cached vgic_irq
+ pointers with RCU
+Message-ID: <202401290835.TjDnhUFI-lkp@intel.com>
+References: <20240124204909.105952-14-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240124204909.105952-14-oliver.upton@linux.dev>
 
-On Sat, 27 Jan 2024 02:41:55 +0000,
-Kunkun Jiang <jiangkunkun@huawei.com> wrote:
->=20
-> > At this stage, I think the VMOVP optimisation is wrong and that we
-> > should drop it.
-> This is the last resort. Maybe we can think of another way.
+Hi Oliver,
 
-I think the only other way is to never elide the VMOVP from
-set_affinity, but to only call into set_affinity when strictly
-necessary:
+kernel test robot noticed the following build warnings:
 
-- when making the VPE resident on a CPU that isn't part of the same
-  affinity group (VPE migration outside of the affinity group)
+[auto build test WARNING on 6613476e225e090cc9aad49be7fa504e290dd33d]
 
-- when making the VPE non-resident on a CPU that isn't the doorbell
-  delivery CPU *AND* that there is a need for a doorbell (VPE
-  migration inside the affinity group)
+url:    https://github.com/intel-lab-lkp/linux/commits/Oliver-Upton/KVM-arm64-vgic-Store-LPIs-in-an-xarray/20240125-045255
+base:   6613476e225e090cc9aad49be7fa504e290dd33d
+patch link:    https://lore.kernel.org/r/20240124204909.105952-14-oliver.upton%40linux.dev
+patch subject: [PATCH 13/15] KVM: arm64: vgic-its: Protect cached vgic_irq pointers with RCU
+config: arm64-randconfig-r112-20240128 (https://download.01.org/0day-ci/archive/20240129/202401290835.TjDnhUFI-lkp@intel.com/config)
+compiler: clang version 18.0.0git (https://github.com/llvm/llvm-project a31a60074717fc40887cfe132b77eec93bedd307)
+reproduce: (https://download.01.org/0day-ci/archive/20240129/202401290835.TjDnhUFI-lkp@intel.com/reproduce)
 
-Which means it is the responsibility of the upper layers of the stack
-to make these decisions, and that we can keep the low-level driver as
-simple as possible.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202401290835.TjDnhUFI-lkp@intel.com/
 
-In the meantime, here's the patch I'm proposing to merge ASAP. Please
-let me know if that works for you.
+sparse warnings: (new ones prefixed by >>)
+>> arch/arm64/kvm/vgic/vgic-its.c:705:41: sparse: sparse: incorrect type in argument 2 (different address spaces) @@     expected struct vgic_irq *irq @@     got struct vgic_irq [noderef] __rcu *irq @@
+   arch/arm64/kvm/vgic/vgic-its.c:705:41: sparse:     expected struct vgic_irq *irq
+   arch/arm64/kvm/vgic/vgic-its.c:705:41: sparse:     got struct vgic_irq [noderef] __rcu *irq
+   arch/arm64/kvm/vgic/vgic-its.c:727:38: sparse: sparse: incorrect type in argument 2 (different address spaces) @@     expected struct vgic_irq *irq @@     got struct vgic_irq [noderef] __rcu *irq @@
+   arch/arm64/kvm/vgic/vgic-its.c:727:38: sparse:     expected struct vgic_irq *irq
+   arch/arm64/kvm/vgic/vgic-its.c:727:38: sparse:     got struct vgic_irq [noderef] __rcu *irq
+   arch/arm64/kvm/vgic/vgic-its.c:891:17: sparse: sparse: cast to restricted __le64
+   arch/arm64/kvm/vgic/vgic-its.c:1031:24: sparse: sparse: cast to restricted __le64
+   arch/arm64/kvm/vgic/vgic-its.c:2245:13: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned long long [assigned] [usertype] val @@     got restricted __le64 [usertype] @@
+   arch/arm64/kvm/vgic/vgic-its.c:2245:13: sparse:     expected unsigned long long [assigned] [usertype] val
+   arch/arm64/kvm/vgic/vgic-its.c:2245:13: sparse:     got restricted __le64 [usertype]
+   arch/arm64/kvm/vgic/vgic-its.c:2271:15: sparse: sparse: cast to restricted __le64
+   arch/arm64/kvm/vgic/vgic-its.c:2397:13: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned long long [assigned] [usertype] val @@     got restricted __le64 [usertype] @@
+   arch/arm64/kvm/vgic/vgic-its.c:2397:13: sparse:     expected unsigned long long [assigned] [usertype] val
+   arch/arm64/kvm/vgic/vgic-its.c:2397:13: sparse:     got restricted __le64 [usertype]
+   arch/arm64/kvm/vgic/vgic-its.c:2424:17: sparse: sparse: cast to restricted __le64
+   arch/arm64/kvm/vgic/vgic-its.c:2525:17: sparse: sparse: cast to restricted __le64
+   arch/arm64/kvm/vgic/vgic-its.c:2584:13: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned long long [assigned] [usertype] val @@     got restricted __le64 [usertype] @@
+   arch/arm64/kvm/vgic/vgic-its.c:2584:13: sparse:     expected unsigned long long [assigned] [usertype] val
+   arch/arm64/kvm/vgic/vgic-its.c:2584:13: sparse:     got restricted __le64 [usertype]
+   arch/arm64/kvm/vgic/vgic-its.c:2605:15: sparse: sparse: cast to restricted __le64
+   arch/arm64/kvm/vgic/vgic-its.c:39:24: sparse: sparse: context imbalance in 'vgic_add_lpi' - different lock contexts for basic block
+   arch/arm64/kvm/vgic/vgic-its.c:284:12: sparse: sparse: context imbalance in 'update_lpi_config' - different lock contexts for basic block
+   arch/arm64/kvm/vgic/vgic-its.c:458:9: sparse: sparse: context imbalance in 'its_sync_lpi_pending_table' - different lock contexts for basic block
+   arch/arm64/kvm/vgic/vgic-its.c: note: in included file (through include/linux/random.h, arch/arm64/include/asm/pointer_auth.h, arch/arm64/include/asm/processor.h, ...):
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   arch/arm64/kvm/vgic/vgic-its.c:796:12: sparse: sparse: context imbalance in 'vgic_its_trigger_msi' - different lock contexts for basic block
+   arch/arm64/kvm/vgic/vgic-its.c:818:5: sparse: sparse: context imbalance in 'vgic_its_inject_cached_translation' - wrong count at exit
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
 
-	M.
+vim +705 arch/arm64/kvm/vgic/vgic-its.c
 
-=46rom 00c338e91d3b6600f402f56cdb64c9d370f911c8 Mon Sep 17 00:00:00 2001
-From: Marc Zyngier <maz@kernel.org>
-Date: Sun, 28 Jan 2024 13:05:24 +0000
-Subject: [PATCH] irqchip/gic-v3-its: Fix GICv4.1 VPE affinity update
+73dcc3dd6274b9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  637  
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  638  static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  639  				       u32 devid, u32 eventid,
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  640  				       struct vgic_irq *irq)
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  641  {
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  642  	struct vgic_translation_cache_entry *new, *victim;
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  643  	struct vgic_dist *dist = &kvm->arch.vgic;
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  644  	unsigned long flags;
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  645  	phys_addr_t db;
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  646  
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  647  	/* Do not cache a directly injected interrupt */
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  648  	if (irq->hw)
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  649  		return;
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  650  
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  651  	new = victim = kzalloc(sizeof(*new), GFP_KERNEL_ACCOUNT);
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  652  	if (!new)
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  653  		return;
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  654  
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  655  	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
+131b61b5cd90e9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  656  	rcu_read_lock();
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  657  
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  658  	/*
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  659  	 * We could have raced with another CPU caching the same
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  660  	 * translation behind our back, so let's check it is not in
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  661  	 * already
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  662  	 */
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  663  	db = its->vgic_its_base + GITS_TRANSLATER;
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  664  	if (__vgic_its_check_cache(dist, db, devid, eventid))
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  665  		goto out;
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  666  
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  667  	if (dist->lpi_cache_count >= vgic_its_max_cache_size(kvm)) {
+73dcc3dd6274b9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  668  		victim = vgic_its_cache_victim(dist);
+73dcc3dd6274b9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  669  		if (WARN_ON_ONCE(!victim)) {
+73dcc3dd6274b9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  670  			victim = new;
+73dcc3dd6274b9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  671  			goto out;
+73dcc3dd6274b9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  672  		}
+73dcc3dd6274b9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  673  
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  674  		list_del(&victim->entry);
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  675  		dist->lpi_cache_count--;
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  676  	} else {
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  677  		victim = NULL;
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  678  	}
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  679  
+7f253bdb6144f3 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  680  	/*
+7f253bdb6144f3 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  681  	 * The irq refcount is guaranteed to be nonzero while holding the
+7f253bdb6144f3 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  682  	 * its_lock, as the ITE (and the reference it holds) cannot be freed.
+7f253bdb6144f3 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  683  	 */
+7f253bdb6144f3 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  684  	lockdep_assert_held(&its->its_lock);
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  685  	vgic_get_irq_kref(irq);
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  686  
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  687  	new->db		= db;
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  688  	new->devid	= devid;
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  689  	new->eventid	= eventid;
+131b61b5cd90e9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  690  	rcu_assign_pointer(new->irq, irq);
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  691  
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  692  	/* Move the new translation to the head of the list */
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  693  	list_add(&new->entry, &dist->lpi_translation_cache);
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  694  
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  695  out:
+131b61b5cd90e9 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  696  	rcu_read_unlock();
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  697  	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  698  
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  699  	/*
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  700  	 * Caching the translation implies having an extra reference
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  701  	 * to the interrupt, so drop the potential reference on what
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  702  	 * was in the cache, and increment it on the new interrupt.
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  703  	 */
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  704  	if (victim && victim->irq)
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24 @705  		vgic_put_irq(kvm, victim->irq);
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  706  
+8fb2f0e370c963 arch/arm64/kvm/vgic/vgic-its.c Oliver Upton 2024-01-24  707  	kfree(victim);
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  708  }
+89489ee9ced892 virt/kvm/arm/vgic/vgic-its.c   Marc Zyngier 2019-03-18  709  
 
-When updating the affinity of a VPE, we currently skip the VMOVP
-command if the two CPUs are part of the same VPE affinity.
-
-But this is wrong, as the doorbell corresponding to this VPE
-is still delivered on the 'old' CPU, which screws up the balancing.
-Furthermore, offlining that 'old' CPU results in doorbell interrupts
-generated for this VPE being discarded.
-
-The harsh reality is that we cannot easily elide VMOVP when
-a set_affinity request occurs. It needs to be obeyed, and if
-an optimisation is to be made, it is at the point where the affinity
-change request is made (such as in KVM).
-
-Drop the VMOVP elision altogether, and only use the vpe_table_mask
-to try and stay within the same ITS affinity group if at all possible.
-
-Fixes: dd3f050a216e (irqchip/gic-v4.1: Implement the v4.1 flavour of VMOVP)
-Reported-by: Kunkun Jiang <jiangkunkun@huawei.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org
----
- drivers/irqchip/irq-gic-v3-its.c | 22 +++++++++++++---------
- 1 file changed, 13 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-=
-its.c
-index 250b4562f308..78aece62bff5 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -3826,8 +3826,9 @@ static int its_vpe_set_affinity(struct irq_data *d,
- 				bool force)
- {
- 	struct its_vpe *vpe =3D irq_data_get_irq_chip_data(d);
--	int from, cpu =3D cpumask_first(mask_val);
-+	struct cpumask common;
- 	unsigned long flags;
-+	int from, cpu;
-=20
- 	/*
- 	 * Changing affinity is mega expensive, so let's be as lazy as
-@@ -3843,19 +3844,22 @@ static int its_vpe_set_affinity(struct irq_data *d,
- 	 * taken on any vLPI handling path that evaluates vpe->col_idx.
- 	 */
- 	from =3D vpe_to_cpuid_lock(vpe, &flags);
--	if (from =3D=3D cpu)
--		goto out;
--
--	vpe->col_idx =3D cpu;
-=20
- 	/*
--	 * GICv4.1 allows us to skip VMOVP if moving to a cpu whose RD
--	 * is sharing its VPE table with the current one.
-+	 * If we are offered another CPU in the same GICv4.1 ITS
-+	 * affinity, pick this one. Otherwise, any CPU will do.
- 	 */
--	if (gic_data_rdist_cpu(cpu)->vpe_table_mask &&
--	    cpumask_test_cpu(from, gic_data_rdist_cpu(cpu)->vpe_table_mask))
-+	if (gic_data_rdist_cpu(from)->vpe_table_mask &&
-+	    cpumask_and(&common, mask_val, gic_data_rdist_cpu(from)->vpe_table_ma=
-sk))
-+		cpu =3D cpumask_first(&common);
-+	else
-+		cpu =3D cpumask_first(mask_val);
-+
-+	if (from =3D=3D cpu)
- 		goto out;
-=20
-+	vpe->col_idx =3D cpu;
-+
- 	its_send_vmovp(vpe);
- 	its_vpe_db_proxy_move(vpe, from, cpu);
-=20
---=20
-2.39.2
-
-
---=20
-Without deviation from the norm, progress is not possible.
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
