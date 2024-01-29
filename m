@@ -1,129 +1,145 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5A457887
-	for <kvmarm@lists.linux.dev>; Mon, 29 Jan 2024 09:31:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADBC95BACE
+	for <kvmarm@lists.linux.dev>; Mon, 29 Jan 2024 11:42:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706520701; cv=none; b=Y9CZqfhbQ6C+gtuauFmZbXtAGINTOQd14WCKJi9JmNJWY3tyt+pnfqSS8B/MTzi3NaIK0BtCuUS5EJ33VvGMEQalTZues3DVT60xJWwZ1WH2RQZ7p9B/6uf3zoswvkgF/sJnaZkBqtJA8H1+6l64JYZuyBbya8VR0qRXY7BXxEc=
+	t=1706528526; cv=none; b=K6dG8K3C5SyU1+HCEtJxWd/iCDbIOZVlb7zMaPzaR1SF9alfdJlDaQMZWI0aV/WkU9xMUlffCkIFT4xVWKB5TLW7aIwzbpJ6Z6teCS4rKDmh9E19TPUHUSK+9Y4Lln7MGT8Nlj2JQWg+eB9VlfSvD1Ae8s2UDcb7i5ZLXjAvT80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706520701; c=relaxed/simple;
-	bh=f2nIjWzHpvckZF6FW2rjgzqK/Kl1yzYIbEFzQnXuNCA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uFPfUJ6MHkc3SQiI9Iyn3xS7DVKE7ZkbmFSnS3uh/8FIYw40xeY/l8maE3f+stOFmbfXPyNQw8lajC8CGzX/5e+eAOVsQXw+3ApaWOsUSjy5uv0dSR2X9J6CAZbyZ/OXMl6KECUGYbVROky2QRpjwnBNUdadZQI2h/h3kUNxd/o=
+	s=arc-20240116; t=1706528526; c=relaxed/simple;
+	bh=FkFZgG4NX2Z1MIleaUvoUwxX/KFV84CBNe8KsqtTFdk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W+or8psBmxSicIT43MMATIwbN0vSGygNf6nMwxoFK9hDSZo95WZB8WI9y3rglwgnp9gdwskwJw4YHmjSucpxAxNGhk06KmJUPKKypmRv+4I6p+JV0ZemjEGv8FR4jjSofMqZKcsdmq8Ju3wG1VlxLYaFY5R9f/8BOyfyikyfNUA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F0F771FB;
-	Mon, 29 Jan 2024 01:32:21 -0800 (PST)
-Received: from [10.162.42.11] (a077893.blr.arm.com [10.162.42.11])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1DA1E3F762;
-	Mon, 29 Jan 2024 01:31:26 -0800 (PST)
-Message-ID: <545bb7bd-31c7-4166-9f81-778b82ece6d4@arm.com>
-Date: Mon, 29 Jan 2024 15:01:24 +0530
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AEEA71FB;
+	Mon, 29 Jan 2024 03:42:47 -0800 (PST)
+Received: from raptor (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 86CCD3F5A1;
+	Mon, 29 Jan 2024 03:41:58 -0800 (PST)
+Date: Mon, 29 Jan 2024 11:41:55 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
+	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
+	rppt@kernel.org, hughd@google.com, pcc@google.com,
+	steven.price@arm.com, vincenzo.frascino@arm.com, david@redhat.com,
+	eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC v3 01/35] mm: page_alloc: Add gfp_flags parameter to
+ arch_alloc_page()
+Message-ID: <ZbePA2dGE6Vs-58t@raptor>
+References: <20240125164256.4147-1-alexandru.elisei@arm.com>
+ <20240125164256.4147-2-alexandru.elisei@arm.com>
+ <de0c74b3-0c7d-4f21-8454-659e8b616ea7@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v3 07/35] mm: cma: Add CMA_RELEASE_{SUCCESS,FAIL}
- events
-Content-Language: en-US
-To: Alexandru Elisei <alexandru.elisei@arm.com>, catalin.marinas@arm.com,
- will@kernel.org, oliver.upton@linux.dev, maz@kernel.org,
- james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- arnd@arndb.de, akpm@linux-foundation.org, mingo@redhat.com,
- peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
- dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
- mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com,
- mhiramat@kernel.org, rppt@kernel.org, hughd@google.com
-Cc: pcc@google.com, steven.price@arm.com, vincenzo.frascino@arm.com,
- david@redhat.com, eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-mm@kvack.org,
- linux-trace-kernel@vger.kernel.org
-References: <20240125164256.4147-1-alexandru.elisei@arm.com>
- <20240125164256.4147-8-alexandru.elisei@arm.com>
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20240125164256.4147-8-alexandru.elisei@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <de0c74b3-0c7d-4f21-8454-659e8b616ea7@arm.com>
 
+Hi,
 
+On Mon, Jan 29, 2024 at 11:18:59AM +0530, Anshuman Khandual wrote:
+> 
+> On 1/25/24 22:12, Alexandru Elisei wrote:
+> > Extend the usefulness of arch_alloc_page() by adding the gfp_flags
+> > parameter.
+> 
+> Although the change here is harmless in itself, it will definitely benefit
+> from some additional context explaining the rationale, taking into account
+> why-how arch_alloc_page() got added particularly for s390 platform and how
+> it's going to be used in the present proposal.
 
-On 1/25/24 22:12, Alexandru Elisei wrote:
-> Similar to the two events that relate to CMA allocations, add the
-> CMA_RELEASE_SUCCESS and CMA_RELEASE_FAIL events that count when CMA pages
-> are freed.
+arm64 will use it to reserve tag storage if the caller requested a tagged
+page. Right now that means that __GFP_ZEROTAGS is set in the gfp mask, but
+I'll rename it to __GFP_TAGGED in patch #18 ("arm64: mte: Rename
+__GFP_ZEROTAGS to __GFP_TAGGED") [1].
 
-How is this is going to be beneficial towards analyzing CMA alloc/release
-behaviour - particularly with respect to this series. OR just adding this
-from parity perspective with CMA alloc side counters ? Regardless this
-CMA change too could be discussed separately.
+[1] https://lore.kernel.org/lkml/20240125164256.4147-19-alexandru.elisei@arm.com/
+
+Thanks,
+Alex
 
 > 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
+> > 
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> > 
+> > Changes since rfc v2:
+> > 
+> > * New patch.
+> > 
+> >  arch/s390/include/asm/page.h | 2 +-
+> >  arch/s390/mm/page-states.c   | 2 +-
+> >  include/linux/gfp.h          | 2 +-
+> >  mm/page_alloc.c              | 2 +-
+> >  4 files changed, 4 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/s390/include/asm/page.h b/arch/s390/include/asm/page.h
+> > index 73b9c3bf377f..859f0958c574 100644
+> > --- a/arch/s390/include/asm/page.h
+> > +++ b/arch/s390/include/asm/page.h
+> > @@ -163,7 +163,7 @@ static inline int page_reset_referenced(unsigned long addr)
+> >  
+> >  struct page;
+> >  void arch_free_page(struct page *page, int order);
+> > -void arch_alloc_page(struct page *page, int order);
+> > +void arch_alloc_page(struct page *page, int order, gfp_t gfp_flags);
+> >  
+> >  static inline int devmem_is_allowed(unsigned long pfn)
+> >  {
+> > diff --git a/arch/s390/mm/page-states.c b/arch/s390/mm/page-states.c
+> > index 01f9b39e65f5..b986c8b158e3 100644
+> > --- a/arch/s390/mm/page-states.c
+> > +++ b/arch/s390/mm/page-states.c
+> > @@ -21,7 +21,7 @@ void arch_free_page(struct page *page, int order)
+> >  	__set_page_unused(page_to_virt(page), 1UL << order);
+> >  }
+> >  
+> > -void arch_alloc_page(struct page *page, int order)
+> > +void arch_alloc_page(struct page *page, int order, gfp_t gfp_flags)
+> >  {
+> >  	if (!cmma_flag)
+> >  		return;
+> > diff --git a/include/linux/gfp.h b/include/linux/gfp.h
+> > index de292a007138..9e8aa3d144db 100644
+> > --- a/include/linux/gfp.h
+> > +++ b/include/linux/gfp.h
+> > @@ -172,7 +172,7 @@ static inline struct zonelist *node_zonelist(int nid, gfp_t flags)
+> >  static inline void arch_free_page(struct page *page, int order) { }
+> >  #endif
+> >  #ifndef HAVE_ARCH_ALLOC_PAGE
+> > -static inline void arch_alloc_page(struct page *page, int order) { }
+> > +static inline void arch_alloc_page(struct page *page, int order, gfp_t gfp_flags) { }
+> >  #endif
+> >  
+> >  struct page *__alloc_pages(gfp_t gfp, unsigned int order, int preferred_nid,
+> > diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+> > index 150d4f23b010..2c140abe5ee6 100644
+> > --- a/mm/page_alloc.c
+> > +++ b/mm/page_alloc.c
+> > @@ -1485,7 +1485,7 @@ inline void post_alloc_hook(struct page *page, unsigned int order,
+> >  	set_page_private(page, 0);
+> >  	set_page_refcounted(page);
+> >  
+> > -	arch_alloc_page(page, order);
+> > +	arch_alloc_page(page, order, gfp_flags);
+> >  	debug_pagealloc_map_pages(page, 1 << order);
+> >  
+> >  	/*
 > 
-> Changes since rfc v2:
-> 
-> * New patch.
-> 
->  include/linux/vm_event_item.h | 2 ++
->  mm/cma.c                      | 6 +++++-
->  mm/vmstat.c                   | 2 ++
->  3 files changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/linux/vm_event_item.h b/include/linux/vm_event_item.h
-> index 747943bc8cc2..aba5c5bf8127 100644
-> --- a/include/linux/vm_event_item.h
-> +++ b/include/linux/vm_event_item.h
-> @@ -83,6 +83,8 @@ enum vm_event_item { PGPGIN, PGPGOUT, PSWPIN, PSWPOUT,
->  #ifdef CONFIG_CMA
->  		CMA_ALLOC_SUCCESS,
->  		CMA_ALLOC_FAIL,
-> +		CMA_RELEASE_SUCCESS,
-> +		CMA_RELEASE_FAIL,
->  #endif
->  		UNEVICTABLE_PGCULLED,	/* culled to noreclaim list */
->  		UNEVICTABLE_PGSCANNED,	/* scanned for reclaimability */
-> diff --git a/mm/cma.c b/mm/cma.c
-> index dbf7fe8cb1bd..543bb6b3be8e 100644
-> --- a/mm/cma.c
-> +++ b/mm/cma.c
-> @@ -562,8 +562,10 @@ bool cma_release(struct cma *cma, const struct page *pages,
->  {
->  	unsigned long pfn;
->  
-> -	if (!cma_pages_valid(cma, pages, count))
-> +	if (!cma_pages_valid(cma, pages, count)) {
-> +		count_vm_events(CMA_RELEASE_FAIL, count);
->  		return false;
-> +	}
->  
->  	pr_debug("%s(page %p, count %lu)\n", __func__, (void *)pages, count);
->  
-> @@ -575,6 +577,8 @@ bool cma_release(struct cma *cma, const struct page *pages,
->  	cma_clear_bitmap(cma, pfn, count);
->  	trace_cma_release(cma->name, pfn, pages, count);
->  
-> +	count_vm_events(CMA_RELEASE_SUCCESS, count);
-> +
->  	return true;
->  }
->  
-> diff --git a/mm/vmstat.c b/mm/vmstat.c
-> index db79935e4a54..eebfd5c6c723 100644
-> --- a/mm/vmstat.c
-> +++ b/mm/vmstat.c
-> @@ -1340,6 +1340,8 @@ const char * const vmstat_text[] = {
->  #ifdef CONFIG_CMA
->  	"cma_alloc_success",
->  	"cma_alloc_fail",
-> +	"cma_release_success",
-> +	"cma_release_fail",
->  #endif
->  	"unevictable_pgs_culled",
->  	"unevictable_pgs_scanned",
+> Otherwise LGTM.
