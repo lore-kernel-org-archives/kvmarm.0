@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF3E605C7
-	for <kvmarm@lists.linux.dev>; Mon, 29 Jan 2024 12:15:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E44326027C
+	for <kvmarm@lists.linux.dev>; Mon, 29 Jan 2024 12:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706530555; cv=none; b=uWwDF0O52Y/QMfIPY45VCWODV7verQhTCpfAtIS/52Gfy2lm0/8ph3bwaE7GGtDppEzTOhQHLwCKeH3pZJu3coT25ofD096DoN57GE7WxQUvA5uW4luy7UjTy750EQwVr/VqDf2ZpJEFQUALr/bPf0EkepI+6AMX99efpoIcAVY=
+	t=1706530817; cv=none; b=Kd69/gmpIuAkkliPoP9b6hyIcuiYUK3hK1/W6fE4oXLVlNUVEZQ7aCUTbdVSP48Aoc6j+rboo4+IPSbMl+54wwLkwiAPiZlSOZ/Wq4f/10sLwAxn5JVrA1cQ55LWhnkhn2CvcNwmGZduzgfUZkY+pLMB8rUC5i9nvNOqTlfhPtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706530555; c=relaxed/simple;
-	bh=4aaVTj6t2XkRkc4zxYijDiQs0KtJMNVXjj4V9tdn+6Q=;
+	s=arc-20240116; t=1706530817; c=relaxed/simple;
+	bh=FxPMJ7QeaXRJqjNkFk9dqwdB7KatB3cW4vpSSPc4bL0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HeCKnSpyo2NNv9dl+OrjJfxC5+KTgPOd0Vn6pw/do13U9xEunr0FZ8mYGyFzOm4IKgxPmLJnrAT1cRxaxW/+AEixNO98vq6IIpcWZUl3c8DUU5kxoL920Vhg3sEO8GYyJ268hYTRweplTXdylsqVVCoswL2SlWOBenLbWY0GMwY=
+	 In-Reply-To:Content-Type; b=pr35j+8qok1znGn40tERyF/OAPhmhmCLyaPUhJKzQ2W3sJJWY7VtLPy+1TCqtqWH/SPn1X9A/tPJA/GojoRgejtM9IGDgSRuiY+qme0KfvhO7dSFEiDMIQqJhCBP/siMPz4ZZk9IC0NsU+o51AFzsRtR5oKsiE/jw2aCbbR7hTY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 676B61FB;
-	Mon, 29 Jan 2024 04:16:35 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 283EF1FB;
+	Mon, 29 Jan 2024 04:20:58 -0800 (PST)
 Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E7DAE3F5A1;
-	Mon, 29 Jan 2024 04:15:48 -0800 (PST)
-Message-ID: <95d829b3-d30e-4dcd-a7ca-69d80b9be418@arm.com>
-Date: Mon, 29 Jan 2024 12:15:47 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6D3283F5A1;
+	Mon, 29 Jan 2024 04:20:10 -0800 (PST)
+Message-ID: <f30f3b77-0c72-49ab-8d30-48ba642ba0e8@arm.com>
+Date: Mon, 29 Jan 2024 12:20:08 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,8 +27,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V16 2/8] KVM: arm64: Prevent guest accesses into BRBE
- system registers/instructions
+Subject: Re: [PATCH V16 5/8] KVM: arm64: nvhe: Disable branch generation in
+ nVHE guests
 Content-Language: en-US
 To: Anshuman Khandual <anshuman.khandual@arm.com>,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -40,17 +40,16 @@ Cc: Mark Brown <broonie@kernel.org>, James Clark <james.clark@arm.com>,
  linux-perf-users@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
  James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev
 References: <20240125094119.2542332-1-anshuman.khandual@arm.com>
- <20240125094119.2542332-3-anshuman.khandual@arm.com>
+ <20240125094119.2542332-6-anshuman.khandual@arm.com>
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240125094119.2542332-3-anshuman.khandual@arm.com>
+In-Reply-To: <20240125094119.2542332-6-anshuman.khandual@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 25/01/2024 09:41, Anshuman Khandual wrote:
-> Currently BRBE feature is not supported in a guest environment. This hides
-> BRBE feature availability via masking ID_AA64DFR0_EL1.BRBE field. This also
-> blocks guest accesses into BRBE system registers and instructions as if the
-> underlying hardware never implemented FEAT_BRBE feature.
+> Disable the BRBE before we enter the guest, saving the status and enable it
+> back once we get out of the guest. This avoids capturing branch records in
+> the guest kernel or userspace, which would be confusing the host samples.
 > 
 > Cc: Marc Zyngier <maz@kernel.org>
 > Cc: Oliver Upton <oliver.upton@linux.dev>
@@ -60,53 +59,135 @@ On 25/01/2024 09:41, Anshuman Khandual wrote:
 > Cc: Will Deacon <will@kernel.org>
 > Cc: kvmarm@lists.linux.dev
 > Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-kernel@vger.kernel.org
+> CC: linux-kernel@vger.kernel.org
 > Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 > ---
 > Changes in V16:
 > 
-> - Added BRB_INF_SRC_TGT_EL1 macro for corresponding BRB_[INF|SRC|TGT] expansion
+> - Dropped BRBCR_EL1 and BRBFCR_EL1 from enum vcpu_sysreg
+> - Reverted back the KVM NVHE patch - used host_debug_state based 'brbcr_el1'
+>    element, and dropped the previous dependency on Jame's coresight series
 > 
->   arch/arm64/kvm/sys_regs.c | 56 +++++++++++++++++++++++++++++++++++++++
->   1 file changed, 56 insertions(+)
+>   arch/arm64/include/asm/kvm_host.h  |  5 ++++-
+>   arch/arm64/kvm/debug.c             |  5 +++++
+>   arch/arm64/kvm/hyp/nvhe/debug-sr.c | 33 ++++++++++++++++++++++++++++++
+>   3 files changed, 42 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 30253bd19917..6a06dc2f0c06 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1304,6 +1304,11 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
->   	return 0;
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 21c57b812569..bce8792092af 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -569,7 +569,7 @@ struct kvm_vcpu_arch {
+>   	u8 cflags;
+>   
+>   	/* Input flags to the hypervisor code, potentially cleared after use */
+> -	u8 iflags;
+> +	u16 iflags;
+>   
+>   	/* State flags for kernel bookkeeping, unused by the hypervisor code */
+>   	u8 sflags;
+> @@ -610,6 +610,7 @@ struct kvm_vcpu_arch {
+>   		u64 pmscr_el1;
+>   		/* Self-hosted trace */
+>   		u64 trfcr_el1;
+> +		u64 brbcr_el1;
+>   	} host_debug_state;
+>   
+>   	/* VGIC state */
+> @@ -779,6 +780,8 @@ struct kvm_vcpu_arch {
+>   #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
+>   /* vcpu running in HYP context */
+>   #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
+> +/* Save BRBE context if active  */
+> +#define DEBUG_STATE_SAVE_BRBE	__vcpu_single_flag(iflags, BIT(8))
+>   
+>   /* SVE enabled for host EL0 */
+>   #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index 8725291cb00a..99f85d8acbf3 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -335,10 +335,15 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
+>   	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
+>   	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
+>   		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+> +
+> +	/* Check if we have BRBE implemented and available at the host */
+> +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRBE_SHIFT))
+> +		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
 >   }
 >   
-> +#define BRB_INF_SRC_TGT_EL1(n)					\
-> +	{ SYS_DESC(SYS_BRBINF##n##_EL1), undef_access },	\
-> +	{ SYS_DESC(SYS_BRBSRC##n##_EL1), undef_access },	\
-> +	{ SYS_DESC(SYS_BRBTGT##n##_EL1), undef_access }		\
-> +
->   /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
->   #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
->   	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
-> @@ -1707,6 +1712,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->   	/* Hide SPE from guests */
->   	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
->   
-> +	/* Hide BRBE from guests */
-> +	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
-> +
->   	return val;
+>   void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+>   {
+>   	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+>   	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+> +	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
+>   }
+> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> index 4558c02eb352..79bcf0fb1326 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> @@ -79,6 +79,34 @@ static void __debug_restore_trace(u64 trfcr_el1)
+>   	write_sysreg_s(trfcr_el1, SYS_TRFCR_EL1);
 >   }
 >   
-> @@ -2195,6 +2203,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->   	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
->   	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
->   	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
-> +	{ SYS_DESC(OP_BRB_IALL), undef_access },
-> +	{ SYS_DESC(OP_BRB_INJ), undef_access },
->   
+> +static void __debug_save_brbe(u64 *brbcr_el1)
+> +{
+> +	*brbcr_el1 = 0;
+> +
+> +	/* Check if the BRBE is enabled */
+> +	if (!(read_sysreg_s(SYS_BRBCR_EL1) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
+> +		return;
+> +
+> +	/*
+> +	 * Prohibit branch record generation while we are in guest.
+> +	 * Since access to BRBCR_EL1 is trapped, the guest can't
+> +	 * modify the filtering set by the host.
+> +	 */
+> +	*brbcr_el1 = read_sysreg_s(SYS_BRBCR_EL1);
+> +	write_sysreg_s(0, SYS_BRBCR_EL1);
+> +	isb();
 
-heads up: This may conflict with Marc's patches to move the sys 
-instructions to a separate table. But otherwise, looks good to me.
+Is this isb() required here ? This can be synchronised with the Guest 
+entry ?
 
+> +}
+> +
+> +static void __debug_restore_brbe(u64 brbcr_el1)
+> +{
+> +	if (!brbcr_el1)
+> +		return;
+> +
+> +	/* Restore BRBE controls */
+> +	write_sysreg_s(brbcr_el1, SYS_BRBCR_EL1);
+> +	isb();
+
+Similarly here, exit back to EL1 host can synchronise the setting ?
 
 Suzuki
+
+> +}
+> +
+>   void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+>   {
+>   	/* Disable and flush SPE data generation */
+> @@ -87,6 +115,9 @@ void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+>   	/* Disable and flush Self-Hosted Trace generation */
+>   	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
+>   		__debug_save_trace(&vcpu->arch.host_debug_state.trfcr_el1);
+> +	/* Disable BRBE branch records */
+> +	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_BRBE))
+> +		__debug_save_brbe(&vcpu->arch.host_debug_state.brbcr_el1);
+>   }
+>   
+>   void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+> @@ -100,6 +131,8 @@ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+>   		__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
+>   	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
+>   		__debug_restore_trace(vcpu->arch.host_debug_state.trfcr_el1);
+> +	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_BRBE))
+> +		__debug_restore_brbe(vcpu->arch.host_debug_state.brbcr_el1);
+>   }
+>   
+>   void __debug_switch_to_host(struct kvm_vcpu *vcpu)
 
