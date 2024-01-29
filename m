@@ -1,193 +1,216 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E44326027C
-	for <kvmarm@lists.linux.dev>; Mon, 29 Jan 2024 12:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 577B6627EB;
+	Mon, 29 Jan 2024 13:03:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706530817; cv=none; b=Kd69/gmpIuAkkliPoP9b6hyIcuiYUK3hK1/W6fE4oXLVlNUVEZQ7aCUTbdVSP48Aoc6j+rboo4+IPSbMl+54wwLkwiAPiZlSOZ/Wq4f/10sLwAxn5JVrA1cQ55LWhnkhn2CvcNwmGZduzgfUZkY+pLMB8rUC5i9nvNOqTlfhPtw=
+	t=1706533442; cv=none; b=jJjV3NWEqLWsYgcvUYko8/sJNs+W3LbyvN/MipSd2Xb3/CkzmUBJix8MyG1lYJtv78nma+SOqBk38aOr0szq0a1HmJN0ZO1Gn/qpjBmo6pRfrTG2uHesU6MKADlB+fdRljvRNSijJu5/BZr8tO1J0S1a7wrtVqzPRWiO+6k+g7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706530817; c=relaxed/simple;
-	bh=FxPMJ7QeaXRJqjNkFk9dqwdB7KatB3cW4vpSSPc4bL0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pr35j+8qok1znGn40tERyF/OAPhmhmCLyaPUhJKzQ2W3sJJWY7VtLPy+1TCqtqWH/SPn1X9A/tPJA/GojoRgejtM9IGDgSRuiY+qme0KfvhO7dSFEiDMIQqJhCBP/siMPz4ZZk9IC0NsU+o51AFzsRtR5oKsiE/jw2aCbbR7hTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 283EF1FB;
-	Mon, 29 Jan 2024 04:20:58 -0800 (PST)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6D3283F5A1;
-	Mon, 29 Jan 2024 04:20:10 -0800 (PST)
-Message-ID: <f30f3b77-0c72-49ab-8d30-48ba642ba0e8@arm.com>
-Date: Mon, 29 Jan 2024 12:20:08 +0000
+	s=arc-20240116; t=1706533442; c=relaxed/simple;
+	bh=MW5KypFg1nPfOH+4Z7+YG9/XkLK+cVPVSXFwwG/gf9E=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Hl2CS7t2n56jw+0eeN2dUSa7casXH90d43P9jwfty0SuDl2nEQx4vl2QIh9jVYJYPow71gpQ9jlYCaCd8+r2YZFla0GK4qcDlwLBvpfYCCHdhV15xhKGkRJASD9hYmZ6MkRn6BbHnOOOs1OBIv9aa8R6I8oRSgJTCqe+z6q9cDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4TNpM75yZdz6K9JK;
+	Mon, 29 Jan 2024 21:00:51 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8F10A140A1B;
+	Mon, 29 Jan 2024 21:03:55 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 29 Jan
+ 2024 13:03:54 +0000
+Date: Mon, 29 Jan 2024 13:03:54 +0000
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+CC: "Rafael J. Wysocki" <rafael@kernel.org>, <linux-pm@vger.kernel.org>,
+	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <x86@kernel.org>,
+	<acpica-devel@lists.linuxfoundation.org>, <linux-csky@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-ia64@vger.kernel.org>,
+	<linux-parisc@vger.kernel.org>, Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, <jianyong.wu@arm.com>,
+	<justin.he@arm.com>, James Morse <james.morse@arm.com>,
+	<vishnu@os.amperecomputing.com>, <miguel.luis@oracle.com>
+Subject: Re: [PATCH RFC v3 03/21] ACPI: processor: Register CPUs that are
+ online, but not described in the DSDT
+Message-ID: <20240129130354.0000042b@Huawei.com>
+In-Reply-To: <20240123092725.00004382@Huawei.com>
+References: <ZXmn46ptis59F0CO@shell.armlinux.org.uk>
+	<E1rDOg2-00Dvjk-RI@rmk-PC.armlinux.org.uk>
+	<CAJZ5v0ju1JHgpjuFLHZVs4NZiARG6iBZN_wza6c2e0kDhZjK0w@mail.gmail.com>
+	<ZaURtUvWQyjYfiiO@shell.armlinux.org.uk>
+	<20240122160227.00002d83@Huawei.com>
+	<CAJZ5v0hamuXJ_w-TSmVb=5jGide=Lb7sCjbzzNb_rFuPrvkgxQ@mail.gmail.com>
+	<Za6mHRJVjb6M1mun@shell.armlinux.org.uk>
+	<20240123092725.00004382@Huawei.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V16 5/8] KVM: arm64: nvhe: Disable branch generation in
- nVHE guests
-Content-Language: en-US
-To: Anshuman Khandual <anshuman.khandual@arm.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com
-Cc: Mark Brown <broonie@kernel.org>, James Clark <james.clark@arm.com>,
- Rob Herring <robh@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- linux-perf-users@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev
-References: <20240125094119.2542332-1-anshuman.khandual@arm.com>
- <20240125094119.2542332-6-anshuman.khandual@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240125094119.2542332-6-anshuman.khandual@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On 25/01/2024 09:41, Anshuman Khandual wrote:
-> Disable the BRBE before we enter the guest, saving the status and enable it
-> back once we get out of the guest. This avoids capturing branch records in
-> the guest kernel or userspace, which would be confusing the host samples.
-> 
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: kvmarm@lists.linux.dev
-> Cc: linux-arm-kernel@lists.infradead.org
-> CC: linux-kernel@vger.kernel.org
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> ---
-> Changes in V16:
-> 
-> - Dropped BRBCR_EL1 and BRBFCR_EL1 from enum vcpu_sysreg
-> - Reverted back the KVM NVHE patch - used host_debug_state based 'brbcr_el1'
->    element, and dropped the previous dependency on Jame's coresight series
-> 
->   arch/arm64/include/asm/kvm_host.h  |  5 ++++-
->   arch/arm64/kvm/debug.c             |  5 +++++
->   arch/arm64/kvm/hyp/nvhe/debug-sr.c | 33 ++++++++++++++++++++++++++++++
->   3 files changed, 42 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 21c57b812569..bce8792092af 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -569,7 +569,7 @@ struct kvm_vcpu_arch {
->   	u8 cflags;
->   
->   	/* Input flags to the hypervisor code, potentially cleared after use */
-> -	u8 iflags;
-> +	u16 iflags;
->   
->   	/* State flags for kernel bookkeeping, unused by the hypervisor code */
->   	u8 sflags;
-> @@ -610,6 +610,7 @@ struct kvm_vcpu_arch {
->   		u64 pmscr_el1;
->   		/* Self-hosted trace */
->   		u64 trfcr_el1;
-> +		u64 brbcr_el1;
->   	} host_debug_state;
->   
->   	/* VGIC state */
-> @@ -779,6 +780,8 @@ struct kvm_vcpu_arch {
->   #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
->   /* vcpu running in HYP context */
->   #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
-> +/* Save BRBE context if active  */
-> +#define DEBUG_STATE_SAVE_BRBE	__vcpu_single_flag(iflags, BIT(8))
->   
->   /* SVE enabled for host EL0 */
->   #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index 8725291cb00a..99f85d8acbf3 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -335,10 +335,15 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
->   	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
->   	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
->   		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
-> +
-> +	/* Check if we have BRBE implemented and available at the host */
-> +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRBE_SHIFT))
-> +		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
->   }
->   
->   void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
->   {
->   	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
->   	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
-> +	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
->   }
-> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> index 4558c02eb352..79bcf0fb1326 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> @@ -79,6 +79,34 @@ static void __debug_restore_trace(u64 trfcr_el1)
->   	write_sysreg_s(trfcr_el1, SYS_TRFCR_EL1);
->   }
->   
-> +static void __debug_save_brbe(u64 *brbcr_el1)
-> +{
-> +	*brbcr_el1 = 0;
-> +
-> +	/* Check if the BRBE is enabled */
-> +	if (!(read_sysreg_s(SYS_BRBCR_EL1) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
-> +		return;
-> +
-> +	/*
-> +	 * Prohibit branch record generation while we are in guest.
-> +	 * Since access to BRBCR_EL1 is trapped, the guest can't
-> +	 * modify the filtering set by the host.
-> +	 */
-> +	*brbcr_el1 = read_sysreg_s(SYS_BRBCR_EL1);
-> +	write_sysreg_s(0, SYS_BRBCR_EL1);
-> +	isb();
+On Tue, 23 Jan 2024 09:27:25 +0000
+Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
 
-Is this isb() required here ? This can be synchronised with the Guest 
-entry ?
+> On Mon, 22 Jan 2024 17:30:05 +0000
+> "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+>=20
+> > On Mon, Jan 22, 2024 at 05:22:46PM +0100, Rafael J. Wysocki wrote: =20
+> > > On Mon, Jan 22, 2024 at 5:02=E2=80=AFPM Jonathan Cameron
+> > > <Jonathan.Cameron@huawei.com> wrote:   =20
+> > > >
+> > > > On Mon, 15 Jan 2024 11:06:29 +0000
+> > > > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> > > >   =20
+> > > > > On Mon, Dec 18, 2023 at 09:22:03PM +0100, Rafael J. Wysocki wrote=
+:   =20
+> > > > > > On Wed, Dec 13, 2023 at 1:49=E2=80=AFPM Russell King <rmk+kerne=
+l@armlinux.org.uk> wrote:   =20
+> > > > > > >
+> > > > > > > From: James Morse <james.morse@arm.com>
+> > > > > > >
+> > > > > > > ACPI has two descriptions of CPUs, one in the MADT/APIC table=
+, the other
+> > > > > > > in the DSDT. Both are required. (ACPI 6.5's 8.4 "Declaring Pr=
+ocessors"
+> > > > > > > says "Each processor in the system must be declared in the AC=
+PI
+> > > > > > > namespace"). Having two descriptions allows firmware authors =
+to get
+> > > > > > > this wrong.
+> > > > > > >
+> > > > > > > If CPUs are described in the MADT/APIC, they will be brought =
+online
+> > > > > > > early during boot. Once the register_cpu() calls are moved to=
+ ACPI,
+> > > > > > > they will be based on the DSDT description of the CPUs. When =
+CPUs are
+> > > > > > > missing from the DSDT description, they will end up online, b=
+ut not
+> > > > > > > registered.
+> > > > > > >
+> > > > > > > Add a helper that runs after acpi_init() has completed to reg=
+ister
+> > > > > > > CPUs that are online, but weren't found in the DSDT. Any CPU =
+that
+> > > > > > > is registered by this code triggers a firmware-bug warning an=
+d kernel
+> > > > > > > taint.
+> > > > > > >
+> > > > > > > Qemu TCG only describes the first CPU in the DSDT, unless cpu=
+-hotplug
+> > > > > > > is configured.   =20
+> > > > > >
+> > > > > > So why is this a kernel problem?   =20
+> > > > >
+> > > > > So what are you proposing should be the behaviour here? What this
+> > > > > statement seems to be saying is that QEMU as it exists today only
+> > > > > describes the first CPU in DSDT.   =20
+> > > >
+> > > > This confuses me somewhat, because I'm far from sure which machines=
+ this
+> > > > is true for in QEMU.  I'm guessing it's a legacy thing with
+> > > > some old distro version of QEMU - so we'll have to paper over it an=
+yway
+> > > > but for current QEMU I'm not sure it's true.
+> > > >
+> > > > Helpfully there are a bunch of ACPI table tests so I've been checki=
+ng
+> > > > through all the multi CPU cases.
+> > > >
+> > > > CPU hotplug not enabled.
+> > > > pc/DSDT.dimmpxm  - 4x Processor entries.  -smp 4
+> > > > pc/DSDT.acpihmat - 2x Processor entries.  -smp 2
+> > > > q35/DSDT.acpihmat - 2x Processor entries. -smp 2
+> > > > virt/DSDT.acpihmatvirt - 4x ACPI0007 entries -smp 4
+> > > > q35/DSDT.acpihmat-noinitiator - 4 x Processor () entries -smp 4
+> > > > virt/DSDT.topology - 8x ACPI0007 entries
+> > > >
+> > > > I've also looked at the code and we have various types of
+> > > > CPU hotplug on x86 but they all build appropriate numbers of
+> > > > Processor() entries in DSDT.
+> > > > Arm likewise seems to build the right number of ACPI0007 entries
+> > > > (and doesn't yet have CPU HP support).
+> > > >
+> > > > If anyone can add a reference on why this is needed that would be v=
+ery
+> > > > helpful.   =20
+> > >=20
+> > > Yes, it would.
+> > >=20
+> > > Personally, I would prefer to assume that it is not necessary until it
+> > > turns out that (1) there is firmware with this issue actually in use
+> > > and (2) updating the firmware in question to follow the specification
+> > > is not practical.
+> > >=20
+> > > Otherwise, we'd make it easier to ship non-compliant firmware for no
+> > > good reason.   =20
+> >=20
+> > If Salil can't come up with a reason, then I'm in favour of dropping
+> > the patch like already done for patch 2. If the code change serves no
+> > useful purpose, there's no point in making the change.
+> >  =20
+>=20
+> Salil's out today, but I've messaged him to follow up later in the week.
+>=20
+> It 'might' be the odd cold plug path where QEMU half comes up, then extra
+> CPUs are added, then it boots. (used by some orchestration frameworks)
 
-> +}
-> +
-> +static void __debug_restore_brbe(u64 brbcr_el1)
-> +{
-> +	if (!brbcr_el1)
-> +		return;
-> +
-> +	/* Restore BRBE controls */
-> +	write_sysreg_s(brbcr_el1, SYS_BRBCR_EL1);
-> +	isb();
+I poked this on x86 - it only applies with hotplug enabled anyway so
+same result as doing the hotplug later - All possible Processor() entries
+already exist in DSDT. Hence this isn't the source of the mysterious
+broken configuration.
 
-Similarly here, exit back to EL1 host can synchronise the setting ?
+If anyone does poke this path, the old discussion between James
+and Salil provides some instructions (mostly the thread is about
+another issue).
+https://op-lists.linaro.org/archives/list/linaro-open-discussions@op-lists.=
+linaro.org/thread/DNAGB2FB5ALVLV2BYWYOCLKGNF77PNXS/
 
-Suzuki
+Also on x86 a test involving smp 2,max-cpus=3D4 and adding cpu-id 3
+(so skipping 2) doesn't boot. (this is without Salil's QEMU patches).
+I guess there are some well known rules in there that I don't know about
+and QEMU isn't preventing people shooting themselves in the foot.
 
-> +}
-> +
->   void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
->   {
->   	/* Disable and flush SPE data generation */
-> @@ -87,6 +115,9 @@ void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
->   	/* Disable and flush Self-Hosted Trace generation */
->   	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
->   		__debug_save_trace(&vcpu->arch.host_debug_state.trfcr_el1);
-> +	/* Disable BRBE branch records */
-> +	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_BRBE))
-> +		__debug_save_brbe(&vcpu->arch.host_debug_state.brbcr_el1);
->   }
->   
->   void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
-> @@ -100,6 +131,8 @@ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
->   		__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
->   	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
->   		__debug_restore_trace(vcpu->arch.host_debug_state.trfcr_el1);
-> +	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_BRBE))
-> +		__debug_restore_brbe(vcpu->arch.host_debug_state.brbcr_el1);
->   }
->   
->   void __debug_switch_to_host(struct kvm_vcpu *vcpu)
+As I'm concerned, drop this patch.
+If there are platforms out there doing this wrong they'll surface once
+we get this into more test farms (so linux-next).  If we need this
+'fix' we can apply it when we have a problem firmware to point at.
+
+Thanks,
+
+Jonathan
+
+> I don't have a set up for that and I won't get to creating one today anyw=
+ay
+> (we all love start of the year planning workshops!)
+
+>=20
+> I've +CC'd a few people have run tests on the various iterations of this
+> work in the past.  Maybe one of them can shed some light on this?
+>=20
+> Jonathan
+>=20
+>=20
+>=20
+>=20
+>=20
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
 
