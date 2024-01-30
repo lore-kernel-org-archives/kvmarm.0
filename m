@@ -1,82 +1,126 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2230971B3D
-	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 20:26:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8730C69D35
+	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 20:45:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706646390; cv=none; b=HyS58S9t0tpta/kR07F99ohLEt/UdDh2cT4JPdopPl7r3xj+4TBtIP3HjvfSECq5VS5vOFkOoVe3clq5mMVTdINSOpawUWrtUDr7mazsdOF5ZGUUtle/j0W8+C9GuEUeSofhV5XMQX37msW4pGfLrerVf5WWb0gU9UMpWuPs110=
+	t=1706647547; cv=none; b=HkjT29fFYfw1uCCy3Pr5UWvcOdGmQGhFP5uTP3nLdpE9FlrQ99cYF8uU93d/Y6daiWHQAzFxbzeRQRtYYU1MzR3eai9XcEl8ci9ztb9Wjr5q3Jsy4hD8K8Yu/H/yNUDNBD6OWpNL7YljOgBcernXA23iCJ6TNJsgsv6/NfMRlOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706646390; c=relaxed/simple;
-	bh=61Oppu3AVzP+KtyffiFkREZRsy7hKLsaEdGCtMFJ2Tg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=is6hu+VoEVB2PrJNcJseX6nFalAA446ol3yDwoCp98Wc8KHHwxjuAixC+pXprPlA6gKEAL3Bv9IK+J96nByk4cJFGJgR7av4kUB1dd4KBRteJjvUFGfV91Mki2UXfc85y+DU1Wk38mWDmpHUQgbWNKnSfz4biE6xQcWOi5WZQ3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kN0R6Slu; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1706647547; c=relaxed/simple;
+	bh=TslrQQTy8inB70RnuWi+lLXP9OJHgh1SOHNDymI5k9M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QP8peNcr9rSX4ZfOFTxXVYfMjgzNSioswhKy8hMxtDA543eHNQB2pZizvahWJmkSP4Wo7kYa7MP01V8zOwkNFgWkIXTrvWyCFhdQoHxLW5Gvu+zEH+P6EqdsDHki+DWma973RUSOBtjT6jgm32E3dCAUcCrxL9IXuzDQa8c0jgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hxNpx91N; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kN0R6Slu"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dbf618042daso6648669276.0
-        for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 12:26:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706646387; x=1707251187; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=h5pgpMcGME2v9VvnIy7lBJB+U5dgrFCMGRIIdlijbWk=;
-        b=kN0R6SluLnMlAnN77jsp3DPWE2QKLd28KYyTth6VNolxgdajBRuP3cB8aKyiw9Ig0C
-         QCkEFb/i9prT+VCbsbR0f0y8SrFY4WYcB7FwhqHThgpmzctW0qBr8Lo2je6nqVUjviFa
-         6whFR8ckLZY/Anax/nJO4epsXONwvKOEWv1Qt3Id6LADI3EmlGEtfOc/8kt8WXX2yFwe
-         c7QtYLqMphG0fk7PxH/R+NmEANH7BSIPdm1B72yU0q5gOl5bsD/LaczoxyEZBpJIixsP
-         H2IdBMaV+VAp4mj+ou5y5X1CvFvq9v6aIvf33vHhPkc2Awi7Xg4BcqABpk3a6P+2MJNX
-         wnsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706646387; x=1707251187;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h5pgpMcGME2v9VvnIy7lBJB+U5dgrFCMGRIIdlijbWk=;
-        b=DeZSGn6xLbJjusb3HpiEzGDEmO0e55/HGov4HZYJXXmhqnmYsqGXioGc/f8SZE8f0w
-         eTKLubak2+FIhawm7J3pH47PItjdwNaA/JyacIJdhqBXL/1Cbu9kbRQTcfWftHvk+Px1
-         MoFDqbJT0qcKbZZ+B7M5a/FLAWARCrv+DUwy8Br31cvM8cK/YJiKjsQt6Kaw0Dv0vZHt
-         1Vs06BjNZOucp3++J/75FuorPhTMkB7ZHkbxVqDXOoHKDCnQdFjdDqR6LbYh+ZOC5MtP
-         31IbyPTSPbRzT0Vhcac9Oet47VSw5kNBZBtuBWmABtZTF9FGU+bbARBf/8buhGb45duv
-         TKEA==
-X-Gm-Message-State: AOJu0YzdB+y7qe/V3hx2qHBagNp6GX1PCEB1IMYCBGDUpQdQzaIGVycH
-	Bl7BVXFJvpc5pOWRg+YFA3EFqBFdZ+jpTcrPJlPOfmH73SuyWlZukH6uUrfCLNPhBJRTpWUgfbn
-	LFw==
-X-Google-Smtp-Source: AGHT+IHckChIdOpRwfbWV8GrXqEqx1z1rCFc0PlXBsdw7+n8o4dfOUWIS0du0dp6kzjap7P3rhIB7Jyts0A=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1b8b:b0:dc2:3db1:da48 with SMTP id
- ei11-20020a0569021b8b00b00dc23db1da48mr590192ybb.13.1706646387146; Tue, 30
- Jan 2024 12:26:27 -0800 (PST)
-Date: Tue, 30 Jan 2024 12:26:25 -0800
-In-Reply-To: <20231206170241.82801-12-ajones@ventanamicro.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hxNpx91N"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 167E4C433F1;
+	Tue, 30 Jan 2024 20:45:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706647547;
+	bh=TslrQQTy8inB70RnuWi+lLXP9OJHgh1SOHNDymI5k9M=;
+	h=From:To:Cc:Subject:Date:From;
+	b=hxNpx91N0mKhEW4xu+aysPZaKrI3ELudvvNiEH17u0Bt630y7bl0LWVW7PlOneQ84
+	 SdM2i7pSEcc0et9HYejsi/AJPzfRwE2gVT9ojkq9bm00yszNlNIESsVsQlI6bKyU1C
+	 3OinhCV4Oyo7ZwkQm7KSul0h2aSUFqzYpu+CwhDsW/cOs5nv8kzw65sA/YiHlitymD
+	 m7sSXMdL1PtT6LNUWjNV1pWGNTFW2rKAQ5IU6NgGbiM2YAi13KpkALQi3On4dFcxrC
+	 DIjjLUpfmOdoWbDRwNEjFyLEsxTRyrq/ayxyxLE78bg1Bo1aK4cV+doBJjWjnX8CR+
+	 GPPb4JTjcW9NQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rUuzI-00GNsE-Nw;
+	Tue, 30 Jan 2024 20:45:44 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: [PATCH v2 00/25] KVM/arm64: VM configuration enforcement
+Date: Tue, 30 Jan 2024 20:45:07 +0000
+Message-Id: <20240130204533.693853-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20231206170241.82801-7-ajones@ventanamicro.com> <20231206170241.82801-12-ajones@ventanamicro.com>
-Message-ID: <ZblbcUloeMqc-lR0@google.com>
-Subject: Re: [PATCH 5/5] KVM: selftests: x86_64: Remove redundant newlines
-From: Sean Christopherson <seanjc@google.com>
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev, 
-	anup@brainfault.org, borntraeger@linux.ibm.com, frankja@linux.ibm.com, 
-	imbrenda@linux.ibm.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Dec 06, 2023, Andrew Jones wrote:
-> @@ -162,7 +162,7 @@ static void check_clocksource(void)
->  		goto out;
->  	}
->  
-> -	TEST_ASSERT(!strncmp(clk_name, "tsc\n", st.st_size),
-> +	TEST_ASSERT(!strncmp(clk_name, "tsc", st.st_size),
+This is the second version of this configurationm enforcement series
+after some really awesome reviewing with from Joey.
 
-This newline is functionally necessary.  It's in the strncmp() (*#$@ sysfs appends
-newlines to everything), not the TEST_ASSERT message.  I'll give you a pass and
-fixup when applying since I'm guessing you don't have x86 hardware ;-)
+I think I have taken most of the feedback into account, but please
+shout if I have ignored something.
 
-I double checked the other arch patches and didn't see anything sneaky like this.
+* From v1: [1]
+  - Fix embarrassing crash with FEAT_MOPS
+  - Better error handling in the FGT code
+  - Added/Fixed comments
+  - Simplified the __vcpu_sys_reg() macro
+  - Fixed FEAT_PIR handling
+  - Folded in Oliver's PMU rework
+
+[1] https://lore.kernel.org/all/20240122201852.262057-1-maz@kernel.org
+
+Marc Zyngier (25):
+  arm64: sysreg: Add missing ID_AA64ISAR[13]_EL1 fields and variants
+  KVM: arm64: Add feature checking helpers
+  KVM: arm64: nv: Add sanitising to VNCR-backed sysregs
+  KVM: arm64: nv: Add sanitising to EL2 configuration registers
+  KVM: arm64: nv: Add sanitising to VNCR-backed FGT sysregs
+  KVM: arm64: nv: Add sanitising to VNCR-backed HCRX_EL2
+  KVM: arm64: nv: Drop sanitised_sys_reg() helper
+  KVM: arm64: Unify HDFG[WR]TR_GROUP FGT identifiers
+  KVM: arm64: nv: Correctly handle negative polarity FGTs
+  KVM: arm64: nv: Turn encoding ranges into discrete XArray stores
+  KVM: arm64: Drop the requirement for XARRAY_MULTI
+  KVM: arm64: nv: Move system instructions to their own sys_reg_desc
+    array
+  KVM: arm64: Always populate the trap configuration xarray
+  KVM: arm64: Register AArch64 system register entries with the sysreg
+    xarray
+  KVM: arm64: Use the xarray as the primary sysreg/sysinsn walker
+  KVM: arm64: Rename __check_nv_sr_forward() to triage_sysreg_trap()
+  KVM: arm64: Add Fine-Grained UNDEF tracking information
+  KVM: arm64: Propagate and handle Fine-Grained UNDEF bits
+  KVM: arm64: Move existing feature disabling over to FGU infrastructure
+  KVM: arm64: Streamline save/restore of HFG[RW]TR_EL2
+  KVM: arm64: Make TLBI OS/Range UNDEF if not advertised to the guest
+  KVM: arm64: Make PIR{,E0}_EL1 UNDEF if S1PIE is not advertised to the
+    guest
+  KVM: arm64: Make AMU sysreg UNDEF if FEAT_AMU is not advertised to the
+    guest
+  KVM: arm64: Make FEAT_MOPS UNDEF if not advertised to the guest
+  KVM: arm64: Add debugfs file for guest's ID registers
+
+ arch/arm64/include/asm/kvm_arm.h           |   4 +-
+ arch/arm64/include/asm/kvm_host.h          | 107 ++++++++-
+ arch/arm64/include/asm/kvm_nested.h        |   1 -
+ arch/arm64/kvm/Kconfig                     |   1 -
+ arch/arm64/kvm/arm.c                       |   7 +
+ arch/arm64/kvm/emulate-nested.c            | 231 +++++++++++++-----
+ arch/arm64/kvm/hyp/include/hyp/switch.h    | 130 +++++-----
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  24 +-
+ arch/arm64/kvm/nested.c                    | 265 ++++++++++++++++++++-
+ arch/arm64/kvm/pmu-emul.c                  |  11 +-
+ arch/arm64/kvm/sys_regs.c                  | 235 +++++++++++++++---
+ arch/arm64/kvm/sys_regs.h                  |   2 +
+ arch/arm64/tools/sysreg                    |   8 +-
+ include/kvm/arm_pmu.h                      |  11 -
+ 14 files changed, 856 insertions(+), 181 deletions(-)
+
+-- 
+2.39.2
+
