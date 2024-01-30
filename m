@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C318F6E2AA
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8CC969E19
 	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 20:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706647548; cv=none; b=eHOpi5iBF7c3hFnodP7HgL7VEP6XNDOz1W4lIxHRfzCshnDvmgcwd9aQ8jpUgozYWN9aby1UdE/SNjmSSHRQvIT2IVxR47ePukJM9g50DJcLGH3lQzzle/JXPUcWRxkHgjei+R93JztXanyry9VbQDPfBQDEbQEKwderXN/QTIM=
+	t=1706647548; cv=none; b=Y97EZqfeyT7NWIA9RJRnA1q4puqb9KgrU7l6nI6G45tc+9uLEtSz7r/7bXLr8w+XNyHA8M23AMt0+zq5kR/cIaeS2M20jYSV9FDZyh7EPC2RYjQdbtDMA3rWbnQ4EM3vuDy3bgH8RU/+PtMxDbpJBlAb6poUKnBsw0mvXJfpELU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706647548; c=relaxed/simple;
-	bh=gdQItqF9wrCeU9K1k7r+CsqbCmd6fVdvHdGx0wu2c64=;
+	bh=m73GaNk6Q1JttW/VA1g/4L96gSDtT/YiwI4oChhKoTg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GpX88l4dvZtRl4dZEMRWCXdDqZkpLbX1GWBaQdGDOaSwFuBEFD8yv8RwlmcCVTlP+YUJWO52/nC1Tryd1ESglRFmV8DZsLtZwALzY/EmfkZUioNw/wQaMbloN+bhFoKmoNh5B4957afBfF1PQ7YF6gIhLEznHAa2gJKjQksYg6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gsm/4qvG; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=CVYoSOJxDaqOE5jaHfDY1acEvYiPeSI05ngoi6p4bRXcBZK0au0ORtJMHFuZzBWCpveRXk9jnzz406IHUS2IjrmVRngZHu9BjJQuiA6W+cTsDJj6xFsRviub3/eWO6RA/yKDGq2zquLaF0qqNydHZ90QIjVvgznreI8Ta3sNhfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gmWam9MN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gsm/4qvG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4BF2C433F1;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gmWam9MN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4EB5C43394;
 	Tue, 30 Jan 2024 20:45:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1706647548;
-	bh=gdQItqF9wrCeU9K1k7r+CsqbCmd6fVdvHdGx0wu2c64=;
+	bh=m73GaNk6Q1JttW/VA1g/4L96gSDtT/YiwI4oChhKoTg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Gsm/4qvGW+Sq8WqrRfzOaCOtJSx5SHLfduCeS4OJeDdf7cwcALuDvestFe+5rv8D7
-	 8HFwES43DocotkIP6QuA4EkYfSii0oGTmWFONW9SQnLtFnZ24obn1cxhD3hmOBbA0s
-	 1UawxYMzA6M3CbFfgtih0ruF87yElJUX80L6wdwivQElLOPGp+3fI0o8yOyAh0x0sm
-	 64Nl3XE6dL6Gb1Ur5u/ROp5ZB9jtvr4ODWI2rEvybumCZ7wtWopkGJLo98ds2E2FPz
-	 qV9wSJRaj0XnpCL85MjwqwKwjQFMOfu1LgTrhN2VmRtuv4VM3FQMVb++BtMqDUllTN
-	 xf3bgPOdSVRNg==
+	b=gmWam9MNyEL6AvWpwSqfDBcC22kYI8Wz0rldTJPeghxDVE/RGBInJ/yYRKMVdowkz
+	 OsjSGCN/ZfRfWoJ1laxFBQWHrYJ9KVl6wc4rMgqECCI/Qb22rHMW5vu8EvJbEqU5KJ
+	 4hfNjZdMzMfQ8zTdTMZp6yJEgIH5RMxikND4BV3t5soS5jUOZvwEVuh8apOpf3854r
+	 9JhvJmR+1+i8jeSjg2bnY1XvVapPRhk0F5pgMUA6bStoweAt4sWpII9mHTFzDn8VNI
+	 a0kNUU95bS2mTVItfmYQI/ILqFrUGJOFFKzPf4BB8iCImG6TiasSVGTmlgyGAUQOK3
+	 7+MvrdUI3805Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rUuzK-00GNsE-PT;
+	id 1rUuzK-00GNsE-J8;
 	Tue, 30 Jan 2024 20:45:46 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v2 10/25] KVM: arm64: nv: Turn encoding ranges into discrete XArray stores
-Date: Tue, 30 Jan 2024 20:45:17 +0000
-Message-Id: <20240130204533.693853-11-maz@kernel.org>
+Subject: [PATCH v2 09/25] KVM: arm64: nv: Correctly handle negative polarity FGTs
+Date: Tue, 30 Jan 2024 20:45:16 +0000
+Message-Id: <20240130204533.693853-10-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240130204533.693853-1-maz@kernel.org>
 References: <20240130204533.693853-1-maz@kernel.org>
@@ -61,107 +61,99 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-In order to be able to store different values for member of an
-encoding range, replace xa_store_range() calls with discrete
-xa_store() calls and an encoding iterator.
+Negative trap bits are a massive pain. They are, on the surface,
+indistinguishable from RES0 bits. Do you trap? or do you ignore?
 
-We end-up using a bit more memory, but we gain some flexibility
-that we will make use of shortly.
+Thankfully, we now have the right infrastructure to check for RES0
+bits as long as the register is backed by VNCR, which is the case
+for the FGT registers.
 
-Take this opportunity to tidy up the error handling path.
+Use that information as a discriminant when handling a trap that
+is potentially caused by a FGT.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/emulate-nested.c | 49 ++++++++++++++++++++++++---------
- 1 file changed, 36 insertions(+), 13 deletions(-)
+ arch/arm64/kvm/emulate-nested.c | 59 +++++++++++++++++++++++++++++++--
+ 1 file changed, 56 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index ef46c2e45307..42f5b4483c80 100644
+index 8a1cfcf553a2..ef46c2e45307 100644
 --- a/arch/arm64/kvm/emulate-nested.c
 +++ b/arch/arm64/kvm/emulate-nested.c
-@@ -1757,6 +1757,28 @@ static __init void print_nv_trap_error(const struct encoding_to_trap_config *tc,
- 		err);
+@@ -1892,9 +1892,61 @@ static enum trap_behaviour compute_trap_behaviour(struct kvm_vcpu *vcpu,
+ 	return __compute_trap_behaviour(vcpu, tc.cgt, b);
  }
  
-+static u32 encoding_next(u32 encoding)
-+{
-+	u8 op0, op1, crn, crm, op2;
+-static bool check_fgt_bit(u64 val, const union trap_config tc)
++static u64 kvm_get_sysreg_res0(struct kvm *kvm, enum vcpu_sysreg sr)
+ {
+-	return ((val >> tc.bit) & 1) == tc.pol;
++	struct kvm_sysreg_masks *masks;
 +
-+	op0 = sys_reg_Op0(encoding);
-+	op1 = sys_reg_Op1(encoding);
-+	crn = sys_reg_CRn(encoding);
-+	crm = sys_reg_CRm(encoding);
-+	op2 = sys_reg_Op2(encoding);
++	/* Only handle the VNCR-backed regs for now */
++	if (sr < __VNCR_START__)
++		return 0;
 +
-+	if (op2 < Op2_mask)
-+		return sys_reg(op0, op1, crn, crm, op2 + 1);
-+	if (crm < CRm_mask)
-+		return sys_reg(op0, op1, crn, crm + 1, 0);
-+	if (crn < CRn_mask)
-+		return sys_reg(op0, op1, crn + 1, 0, 0);
-+	if (op1 < Op1_mask)
-+		return sys_reg(op0, op1 + 1, 0, 0, 0);
++	masks = kvm->arch.sysreg_masks;
 +
-+	return sys_reg(op0 + 1, 0, 0, 0, 0);
++	return masks->mask[sr - __VNCR_START__].res0;
 +}
 +
- int __init populate_nv_trap_config(void)
- {
- 	int ret = 0;
-@@ -1775,23 +1797,18 @@ int __init populate_nv_trap_config(void)
- 			ret = -EINVAL;
- 		}
- 
--		if (cgt->encoding != cgt->end) {
--			prev = xa_store_range(&sr_forward_xa,
--					      cgt->encoding, cgt->end,
--					      xa_mk_value(cgt->tc.val),
--					      GFP_KERNEL);
--		} else {
--			prev = xa_store(&sr_forward_xa, cgt->encoding,
-+		for (u32 enc = cgt->encoding; enc <= cgt->end; enc = encoding_next(enc)) {
-+			prev = xa_store(&sr_forward_xa, enc,
- 					xa_mk_value(cgt->tc.val), GFP_KERNEL);
- 			if (prev && !xa_is_err(prev)) {
- 				ret = -EINVAL;
- 				print_nv_trap_error(cgt, "Duplicate CGT", ret);
- 			}
--		}
- 
--		if (xa_is_err(prev)) {
--			ret = xa_err(prev);
--			print_nv_trap_error(cgt, "Failed CGT insertion", ret);
-+			if (xa_is_err(prev)) {
-+				ret = xa_err(prev);
-+				print_nv_trap_error(cgt, "Failed CGT insertion", ret);
-+			}
- 		}
- 	}
- 
-@@ -1804,6 +1821,7 @@ int __init populate_nv_trap_config(void)
- 	for (int i = 0; i < ARRAY_SIZE(encoding_to_fgt); i++) {
- 		const struct encoding_to_trap_config *fgt = &encoding_to_fgt[i];
- 		union trap_config tc;
-+		void *prev;
- 
- 		if (fgt->tc.fgt >= __NR_FGT_GROUP_IDS__) {
- 			ret = -EINVAL;
-@@ -1818,8 +1836,13 @@ int __init populate_nv_trap_config(void)
- 		}
- 
- 		tc.val |= fgt->tc.val;
--		xa_store(&sr_forward_xa, fgt->encoding,
--			 xa_mk_value(tc.val), GFP_KERNEL);
-+		prev = xa_store(&sr_forward_xa, fgt->encoding,
-+				xa_mk_value(tc.val), GFP_KERNEL);
++static bool check_fgt_bit(struct kvm *kvm, bool is_read,
++			  u64 val, const union trap_config tc)
++{
++	enum vcpu_sysreg sr;
 +
-+		if (xa_is_err(prev)) {
-+			ret = xa_err(prev);
-+			print_nv_trap_error(fgt, "Failed FGT insertion", ret);
-+		}
++	if (tc.pol)
++		return (val & BIT(tc.bit));
++
++	/*
++	 * FGTs with negative polarities are an absolute nightmare, as
++	 * we need to evaluate the bit in the light of the feature
++	 * that defines it. WTF were they thinking?
++	 *
++	 * So let's check if the bit has been earmarked as RES0, as
++	 * this indicates an unimplemented feature.
++	 */
++	if (val & BIT(tc.bit))
++		return false;
++
++	switch ((enum fgt_group_id)tc.fgt) {
++	case HFGxTR_GROUP:
++		sr = is_read ? HFGRTR_EL2 : HFGWTR_EL2;
++		break;
++
++	case HDFGRTR_GROUP:
++		sr = is_read ? HDFGRTR_EL2 : HDFGWTR_EL2;
++		break;
++
++	case HAFGRTR_GROUP:
++		sr = HAFGRTR_EL2;
++		break;
++
++	case HFGITR_GROUP:
++		sr = HFGITR_EL2;
++		break;
++
++	default:
++		WARN_ONCE(1, "Unhandled FGT group");
++		return false;
++	}
++
++	return !(kvm_get_sysreg_res0(kvm, sr) & BIT(tc.bit));
+ }
+ 
+ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+@@ -1969,7 +2021,8 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+ 		return false;
  	}
  
- 	kvm_info("nv: %ld fine grained trap handlers\n",
+-	if (tc.fgt != __NO_FGT_GROUP__ && check_fgt_bit(val, tc))
++	if (tc.fgt != __NO_FGT_GROUP__ && check_fgt_bit(vcpu->kvm, is_read,
++							val, tc))
+ 		goto inject;
+ 
+ 	b = compute_trap_behaviour(vcpu, tc);
 -- 
 2.39.2
 
