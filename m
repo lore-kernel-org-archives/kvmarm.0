@@ -1,160 +1,165 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF8C67A10
-	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 12:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8EA6BB4A
+	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 13:32:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706618774; cv=none; b=mCRAh0GwanvRXXgXUmSR79s66NrJ1MzaJqc1/g55/C5LKaklyULEMMvf3Tau5Rqa+aNRm/smzG57wEV5GkAE4hqcc/8LHdzRiQ8KDY8NqI2Kom64ZCDe47vczbndo7pRWOQWSrkP/FPRe/C07Kms8B3oQKCa/BP6fgFUfK1qdRA=
+	t=1706621554; cv=none; b=Lea9RGPLijz9za18xufez5Jiisy2NZ8U10XFVsqFCNdjx21nFdC9lZdl80+sWx3XuvlxGihe7CqDnOwu1xVNgbYpdabra2BbCtlDMXiQ+DFMnPtse7QEeyn0UNJpB8/xWlN07AMKlPw9RlrU2HeE1y8tXkV8AQy1atUF/8s4wP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706618774; c=relaxed/simple;
-	bh=w1qhXVmoOsaAWbr9C1RxDZMhwCNg+pqUUmMOX6zaYbA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q6O5cE4AbVeqpjh9MH1bvSrNe2cwEMGb0ccX7rXxJLHuwnJtM6pLrMDo4IuOiaIWjJRmc1zOzBmeIwvvp0/3f/mpwLfee01GmzTGldoFEiKAMyv9Gu1CaxgehLsesjJr9ibaHoIBH6fNligbvVlEKXBSTxBmLjGQ5vyOVl7HeTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QRETFO35; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QRETFO35"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CE81C433F1;
-	Tue, 30 Jan 2024 12:46:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706618773;
-	bh=w1qhXVmoOsaAWbr9C1RxDZMhwCNg+pqUUmMOX6zaYbA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QRETFO35X8lMrWo+JEgnWoqphjJV3lrfFZcZLsBNP2xjRVL4V7ilD1t+9BR3nQL1F
-	 MPl14W6Nv0ptOsXb1ODMizRAiA0z2wjXTN0Yvn73skNKdA4j+d3tdA8eeqhG+ZIct+
-	 7NIer+FrJ3L4SZY+QcKxwH+7oaKFti52gnu87X4Wfqng/dead7/pjmYRubnQNp0k7l
-	 Uf9LrMGIwJkuC8kw1PV+0wkKUQec36hGHjJGyxLwjtbHPu4Y3xdx09dI2/7YK5iTXm
-	 fQs4yCVNQwWiQt3zRqCAz2fjvGFAfolkBozwhlGRQ/CGZnHMm5OEYzSk2EEWAWLl2U
-	 TYvoaiN/e/8ow==
-Received: from [12.161.88.66] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rUnVD-00GG51-9e;
-	Tue, 30 Jan 2024 12:46:11 +0000
-Date: Tue, 30 Jan 2024 12:46:07 +0000
-Message-ID: <87o7d3vvjk.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 21/25] KVM: arm64: Make TLBI OS/Range UNDEF if not advertised to the guest
-In-Reply-To: <20240125133047.GD1535978@e124191.cambridge.arm.com>
-References: <20240122201852.262057-1-maz@kernel.org>
-	<20240122201852.262057-22-maz@kernel.org>
-	<20240125133047.GD1535978@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1706621554; c=relaxed/simple;
+	bh=vFOalYLkOuWPs8jcR7FeJPRR3AWKbFaB5EOQ2Hw62zE=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=G8DcGQHuzGbxXikcUT/uXK/14lCd6aBW3YVYKJ3ATHz5gkBeHG/ITwDYqQIg510cIDvM0I8CeYrrmZIh0pd55diLJqPl4pqYv7jpejVeBpVi7P0uhjsV9UyZ7Z0mndOHlorNwxe9+xzdGinIB0Chl7sEGY71vZkat44tUeU44EM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4TPQzz0hV1zJrKB;
+	Tue, 30 Jan 2024 21:31:27 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 835201402CD;
+	Tue, 30 Jan 2024 21:32:26 +0800 (CST)
+Received: from [10.174.185.210] (10.174.185.210) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 30 Jan 2024 21:32:25 +0800
+Subject: Re: [PATCH v2 1/2] irqchip/gic-v4.1: Fix GICv4.1 doorbell affinity
+To: Marc Zyngier <maz@kernel.org>
+CC: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+	Thomas Gleixner <tglx@linutronix.de>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <wanghaibin.wang@huawei.com>
+References: <20240126103012.1020-1-jiangkunkun@huawei.com>
+ <20240126103012.1020-2-jiangkunkun@huawei.com> <86ttn074ev.wl-maz@kernel.org>
+ <44051a41-f82e-57d9-001a-d4d195d59f2e@huawei.com>
+ <86r0i17fkf.wl-maz@kernel.org>
+From: Kunkun Jiang <jiangkunkun@huawei.com>
+Message-ID: <ecda5c79-9296-b4c6-0f09-7cb80ee3c91b@huawei.com>
+Date: Tue, 30 Jan 2024 21:32:24 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 12.161.88.66
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+In-Reply-To: <86r0i17fkf.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Thu, 25 Jan 2024 13:30:47 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> Question,
-> 
-> On Mon, Jan 22, 2024 at 08:18:48PM +0000, Marc Zyngier wrote:
-> > Outer Shareable and Range TLBI instructions shouldn't be made available
-> > to the guest if they are not advertised. Use FGU to disable those,
-> > and set HCR_EL2.TLBIOS in the case the host doesn't have FGT.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 29 +++++++++++++++++++++++++++++
-> >  1 file changed, 29 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index a62efd8a2959..3c939ea4a28f 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -3949,6 +3949,9 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
-> >  
-> >  	mutex_lock(&kvm->arch.config_lock);
-> >  
-> > +	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
-> > +		vcpu->arch.hcr_el2 |= HCR_TTLBOS;
-> > +
-> >  	if (test_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags))
-> >  		goto out;
-> >  
-> > @@ -3961,6 +3964,32 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
-> >  				       HFGxTR_EL2_nSMPRI_EL1_MASK	|
-> >  				       HFGxTR_EL2_nTPIDR2_EL0_MASK);
-> >  
-> > +	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
-> > +		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1OS|
-> > +						HFGITR_EL2_TLBIRVALE1OS	|
-> > +						HFGITR_EL2_TLBIRVAAE1OS	|
-> > +						HFGITR_EL2_TLBIRVAE1OS	|
-> > +						HFGITR_EL2_TLBIVAALE1OS	|
-> > +						HFGITR_EL2_TLBIVALE1OS	|
-> > +						HFGITR_EL2_TLBIVAAE1OS	|
-> > +						HFGITR_EL2_TLBIASIDE1OS	|
-> > +						HFGITR_EL2_TLBIVAE1OS	|
-> > +						HFGITR_EL2_TLBIVMALLE1OS);
-> > +
-> > +	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, RANGE))
-> > +		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1	|
-> > +						HFGITR_EL2_TLBIRVALE1	|
-> > +						HFGITR_EL2_TLBIRVAAE1	|
-> > +						HFGITR_EL2_TLBIRVAE1	|
-> > +						HFGITR_EL2_TLBIRVAALE1IS|
-> > +						HFGITR_EL2_TLBIRVALE1IS	|
-> > +						HFGITR_EL2_TLBIRVAAE1IS	|
-> > +						HFGITR_EL2_TLBIRVAE1IS	|
-> > +						HFGITR_EL2_TLBIRVAALE1OS|
-> > +						HFGITR_EL2_TLBIRVALE1OS	|
-> > +						HFGITR_EL2_TLBIRVAAE1OS	|
-> > +						HFGITR_EL2_TLBIRVAE1OS);
-> > +
-> >  	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
-> >  out:
-> >  	mutex_unlock(&kvm->arch.config_lock);
-> 
-> I think I'm right in saying..
-> 
-> If the VM is running on a platform with ID_AA64ISAR0_EL1.TLB=0b010 (Outer
-> Shareable and TLB range maintenance instructions are implemented.) but without
-> support for FEAT_FGT, and the VMM sets the ID reg to ID_AA64ISAR0_EL1.TLB=0,
-> this change will trap the TLBI *OS instructions but not the following: 
-> 
->     TLBI RVAAE1
->     TLBI RVAAE1IS
->     TLBI RVAALE1
->     TLBI RVAALE1IS
->     TLBI RVAE1
->     TLBI RVAE1IS
->     TLBI RVALE1
->     TLBI RVALE1IS
-> 
-> These TLB range instructions only trap with HCR_EL2.TTLB, however that traps
-> all TLB instructions. You may have left this off intentionally, if so can you
-> add something to the commit message.
+Hi Marc,
 
-You got it exactly right. Setting TTLB would be overkill, and is one
-of the cases where we have to strike a balance between efficiency and
-enforcement. I'll leave a comment to that effect to capture this.
+On 2024/1/28 21:28, Marc Zyngier wrote:
+> On Sat, 27 Jan 2024 02:41:55 +0000,
+> Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+>>> At this stage, I think the VMOVP optimisation is wrong and that we
+>>> should drop it.
+>> This is the last resort. Maybe we can think of another way.
+> I think the only other way is to never elide the VMOVP from
+> set_affinity, but to only call into set_affinity when strictly
+> necessary:
+>
+> - when making the VPE resident on a CPU that isn't part of the same
+>    affinity group (VPE migration outside of the affinity group)
+>
+> - when making the VPE non-resident on a CPU that isn't the doorbell
+>    delivery CPU *AND* that there is a need for a doorbell (VPE
+>    migration inside the affinity group)
+>
+> Which means it is the responsibility of the upper layers of the stack
+> to make these decisions, and that we can keep the low-level driver as
+> simple as possible.
+>
+> In the meantime, here's the patch I'm proposing to merge ASAP. Please
+> let me know if that works for you.
+This patch works. But I still have some questions, which I will
+write down below.
+>
+> 	M.
+>
+> >From 00c338e91d3b6600f402f56cdb64c9d370f911c8 Mon Sep 17 00:00:00 2001
+> From: Marc Zyngier <maz@kernel.org>
+> Date: Sun, 28 Jan 2024 13:05:24 +0000
+> Subject: [PATCH] irqchip/gic-v3-its: Fix GICv4.1 VPE affinity update
+>
+> When updating the affinity of a VPE, we currently skip the VMOVP
+> command if the two CPUs are part of the same VPE affinity.
+>
+> But this is wrong, as the doorbell corresponding to this VPE
+> is still delivered on the 'old' CPU, which screws up the balancing.
+> Furthermore, offlining that 'old' CPU results in doorbell interrupts
+> generated for this VPE being discarded.
+>
+> The harsh reality is that we cannot easily elide VMOVP when
+> a set_affinity request occurs. It needs to be obeyed, and if
+> an optimisation is to be made, it is at the point where the affinity
+> change request is made (such as in KVM).
+>
+> Drop the VMOVP elision altogether, and only use the vpe_table_mask
+> to try and stay within the same ITS affinity group if at all possible.
+>
+> Fixes: dd3f050a216e (irqchip/gic-v4.1: Implement the v4.1 flavour of VMOVP)
+> Reported-by: Kunkun Jiang <jiangkunkun@huawei.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org
+> ---
+>   drivers/irqchip/irq-gic-v3-its.c | 22 +++++++++++++---------
+>   1 file changed, 13 insertions(+), 9 deletions(-)
+>
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> index 250b4562f308..78aece62bff5 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> @@ -3826,8 +3826,9 @@ static int its_vpe_set_affinity(struct irq_data *d,
+>   				bool force)
+>   {
+>   	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
+> -	int from, cpu = cpumask_first(mask_val);
+> +	struct cpumask common;
+>   	unsigned long flags;
+> +	int from, cpu;
+>   
+>   	/*
+>   	 * Changing affinity is mega expensive, so let's be as lazy as
+> @@ -3843,19 +3844,22 @@ static int its_vpe_set_affinity(struct irq_data *d,
+>   	 * taken on any vLPI handling path that evaluates vpe->col_idx.
+>   	 */
+>   	from = vpe_to_cpuid_lock(vpe, &flags);
+> -	if (from == cpu)
+> -		goto out;
+> -
+> -	vpe->col_idx = cpu;
+>   
+>   	/*
+> -	 * GICv4.1 allows us to skip VMOVP if moving to a cpu whose RD
+> -	 * is sharing its VPE table with the current one.
+> +	 * If we are offered another CPU in the same GICv4.1 ITS
+> +	 * affinity, pick this one. Otherwise, any CPU will do.
+>   	 */
+> -	if (gic_data_rdist_cpu(cpu)->vpe_table_mask &&
+> -	    cpumask_test_cpu(from, gic_data_rdist_cpu(cpu)->vpe_table_mask))
+> +	if (gic_data_rdist_cpu(from)->vpe_table_mask &&
+> +	    cpumask_and(&common, mask_val, gic_data_rdist_cpu(from)->vpe_table_mask))
+> +		cpu = cpumask_first(&common);
+> +	else
+> +		cpu = cpumask_first(mask_val);
+> +
+> +	if (from == cpu)
+>   		goto out;
+The meaning here should be that VMOVP will be skipped
+only if from and target are the same. Then why do we
+still to judge whether they are in the same GICv4.1
+ITS affinity?
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Kunkun Jiang
+>   
+> +	vpe->col_idx = cpu;
+> +
+>   	its_send_vmovp(vpe);
+>   	its_vpe_db_proxy_move(vpe, from, cpu);
+>   
