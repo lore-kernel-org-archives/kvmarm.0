@@ -1,156 +1,99 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B01767751
-	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 11:58:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 591FF6775E
+	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 12:12:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706615904; cv=none; b=dec0yUD+lXfpx+6f+FvjHPL3gHbtCGumeBef8kKLl/soEj1lxFobnhES+P2MW8IqDQNFpBvQMS3ssNTy3cy3RUaawZ8imRLvCk8gxxbs6qSviPPnisluwzvEZDrWfmVAtrdt5nx5C+eXpyKWzc5x78/vVuVj9VePjWLLfqdfo1o=
+	t=1706616753; cv=none; b=kE6WJ4HCfgjESkvFAoAd3936GfqAJGIlGge31zBELtysNjz6KRtQmtJ+3WOz+sXosAakgz2kEY36+nvV4Lc6hV3xqeZ64Lgcz3Q61FttjwXYn5zcnmakDh+6Zc5/lxnNGMu0jdQIjOSO+UIPUSPNQgCfUNfc1FtRIzyDSGpCK3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706615904; c=relaxed/simple;
-	bh=jNHQrdd2Z4gnAKa15AMBURkRQv5zNH5s6N2REXaxEKA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q+OwI1oo1gwbxsV/fUGtpYEaQ40BGt1fiB5HCEo0EA0ShVhEibnKkJHdu6ii86kyPZLh//RWcsoyR6tvGkhkibfaGm1D5LqCectbU1xuAF5Ud93WhNRR4rEBnC5sHi7m71C+iw3lqHUCUfmoFwjQL5oMRNTtE09d6D5k9CEg+UY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7E04CDA7;
-	Tue, 30 Jan 2024 03:59:05 -0800 (PST)
-Received: from raptor (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 878FB3F762;
-	Tue, 30 Jan 2024 03:58:15 -0800 (PST)
-Date: Tue, 30 Jan 2024 11:58:04 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
-	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
-	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
-	rppt@kernel.org, hughd@google.com, pcc@google.com,
-	steven.price@arm.com, vincenzo.frascino@arm.com, david@redhat.com,
-	eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC v3 06/35] mm: cma: Make CMA_ALLOC_SUCCESS/FAIL count
- the number of pages
-Message-ID: <ZbjkTFEvSvyHNqmu@raptor>
-References: <20240125164256.4147-1-alexandru.elisei@arm.com>
- <20240125164256.4147-7-alexandru.elisei@arm.com>
- <0a71c87a-ae2c-4a61-8adb-3a51d6369b99@arm.com>
- <ZbeRQpGNnfXnjayQ@raptor>
- <2cb8288c-5378-4968-a75b-8462b41998c6@arm.com>
+	s=arc-20240116; t=1706616753; c=relaxed/simple;
+	bh=qtKz5PUT9mkDsa8isUg58tbqJCm6B3Touj9jntprnT4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=A7Vavqz+Gu4AxN7xkfrbHAE3rxO60obx8jYf1gv36EpEUfXsGHTW6sTuj7YL7JK57DBQU9FuXX6hlQeX6tV1Gz7+b5kZINl0twMayb/O9n3o+Lq/0FBL+5/gg9wG2/Psdu25AUFMpNsJMKK1t6A//REwnAlcjDg008/VSW8fUuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NrqOuS07; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NrqOuS07"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8A53C433C7;
+	Tue, 30 Jan 2024 12:12:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706616752;
+	bh=qtKz5PUT9mkDsa8isUg58tbqJCm6B3Touj9jntprnT4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NrqOuS07Jp2W7AUAgmBUQS096hW0Wbl+CnPwYM84PTwAZdzKD8I1rbgt+6OAUApYi
+	 X++8FSbNCtMxVh5DGwzItWhRNGutrz5Ot/qZ5zb8TEveu8nLCvHVvYXMUkFifN2ecQ
+	 J0fDpcEE8xAzh28C4zzhLhOnHgogvrVB5sa6WXK9QPs8tokxVY37yffWeoKqtJ34u3
+	 Rz9RHyEcx9lQNHU4KEt1OQPyVyxI73NN1Rpbgr0XcGQ4NWiIAld+IKAa3J4NYTrw4E
+	 w93sGxxfkPW81wwZEsjtpTpDpOavvv2DFxd2KnYAD/fPgacxWMMKnD9Wvg+LsPg9hU
+	 wX1pLKyPSAhvQ==
+Received: from [12.161.88.66] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rUmyc-00GFWy-Cu;
+	Tue, 30 Jan 2024 12:12:30 +0000
+Date: Tue, 30 Jan 2024 12:12:26 +0000
+Message-ID: <87r0hzvx3p.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 02/25] KVM: arm64: Add feature checking helpers
+In-Reply-To: <ZbQCi_GZ6XuMx49a@linux.dev>
+References: <20240122201852.262057-1-maz@kernel.org>
+	<20240122201852.262057-3-maz@kernel.org>
+	<ZbQCi_GZ6XuMx49a@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2cb8288c-5378-4968-a75b-8462b41998c6@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 12.161.88.66
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi,
-
-On Tue, Jan 30, 2024 at 10:22:11AM +0530, Anshuman Khandual wrote:
+On Fri, 26 Jan 2024 19:05:47 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> 
-> On 1/29/24 17:21, Alexandru Elisei wrote:
-> > Hi,
+> On Mon, Jan 22, 2024 at 08:18:29PM +0000, Marc Zyngier wrote:
+> > In order to make it easier to check whether a particular feature
+> > is exposed to a guest, add a new set of helpers, with kvm_has_feat()
+> > being the most useful.
 > > 
-> > On Mon, Jan 29, 2024 at 02:54:20PM +0530, Anshuman Khandual wrote:
-> >>
-> >>
-> >> On 1/25/24 22:12, Alexandru Elisei wrote:
-> >>> The CMA_ALLOC_SUCCESS, respectively CMA_ALLOC_FAIL, are increased by one
-> >>> after each cma_alloc() function call. This is done even though cma_alloc()
-> >>> can allocate an arbitrary number of CMA pages. When looking at
-> >>> /proc/vmstat, the number of successful (or failed) cma_alloc() calls
-> >>> doesn't tell much with regards to how many CMA pages were allocated via
-> >>> cma_alloc() versus via the page allocator (regular allocation request or
-> >>> PCP lists refill).
-> >>>
-> >>> This can also be rather confusing to a user who isn't familiar with the
-> >>> code, since the unit of measurement for nr_free_cma is the number of pages,
-> >>> but cma_alloc_success and cma_alloc_fail count the number of cma_alloc()
-> >>> function calls.
-> >>>
-> >>> Let's make this consistent, and arguably more useful, by having
-> >>> CMA_ALLOC_SUCCESS count the number of successfully allocated CMA pages, and
-> >>> CMA_ALLOC_FAIL count the number of pages the cma_alloc() failed to
-> >>> allocate.
-> >>>
-> >>> For users that wish to track the number of cma_alloc() calls, there are
-> >>> tracepoints for that already implemented.
-> >>>
-> >>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> >>> ---
-> >>>  mm/cma.c | 4 ++--
-> >>>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/mm/cma.c b/mm/cma.c
-> >>> index f49c95f8ee37..dbf7fe8cb1bd 100644
-> >>> --- a/mm/cma.c
-> >>> +++ b/mm/cma.c
-> >>> @@ -517,10 +517,10 @@ struct page *cma_alloc(struct cma *cma, unsigned long count,
-> >>>  	pr_debug("%s(): returned %p\n", __func__, page);
-> >>>  out:
-> >>>  	if (page) {
-> >>> -		count_vm_event(CMA_ALLOC_SUCCESS);
-> >>> +		count_vm_events(CMA_ALLOC_SUCCESS, count);
-> >>>  		cma_sysfs_account_success_pages(cma, count);
-> >>>  	} else {
-> >>> -		count_vm_event(CMA_ALLOC_FAIL);
-> >>> +		count_vm_events(CMA_ALLOC_FAIL, count);
-> >>>  		if (cma)
-> >>>  			cma_sysfs_account_fail_pages(cma, count);
-> >>>  	}
-> >>
-> >> Without getting into the merits of this patch - which is actually trying to do
-> >> semantics change to /proc/vmstat, wondering how is this even related to this
-> >> particular series ? If required this could be debated on it's on separately.
+> > Follow-up work will make heavy use of these.
 > > 
-> > Having the number of CMA pages allocated and the number of CMA pages freed
-> > allows someone to infer how many tagged pages are in use at a given time:
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > 
-> That should not be done in CMA which is a generic multi purpose allocator.
+> I very much like the way these helpers appear to work. However, I
+> noticed there are still a few places where we are doing explicit feature
+> checks against register values instead of using the macros, did you want
+> to address these?
 
-Ah, ok. Let me rephrase that: Having the number of CMA pages allocated, the
-number of failed CMA page allocations and the number of freed CMA pages
-allows someone to infer how many CMA pages are in use at a given time.
-That's valuable information for software designers and system
-administrators, as it allows them to tune the number of CMA pages available
-in a system.
-
-Or put another way: what would you consider to be more useful?  Knowing the
-number of cma_alloc()/cma_release() calls, or knowing the number of pages
-that cma_alloc()/cma_release() allocated or freed?
+Eventually, yes. It is just that there is a lot to do and I wanted to
+focus on the VM runtime configuration.
 
 > 
-> > (allocated CMA pages - CMA pages allocated by drivers* - CMA pages
-> > released) * 32. That is valuable information for software and hardware
-> > designers.
-> > 
-> > Besides that, for every iteration of the series, this has proven invaluable
-> > for discovering bugs with freeing and/or reserving tag storage pages.
-> 
-> I am afraid that might not be enough justification for getting something
-> merged mainline.
-> 
-> > 
-> > *that would require userspace reading cma_alloc_success and
-> > cma_release_success before any tagged allocations are performed.
-> 
-> While assuming that no other non-memory-tagged CMA based allocation amd free
-> call happens in the meantime ? That would be on real thin ice.
-> 
-> I suppose arm64 tagged memory specific allocation or free related counters
-> need to be created on the caller side, including arch_free_pages_prepare().
+> Using kvm_has_feat() consistently in KVM will hopefully drive the point
+> home that this is the way we want to see things done going forward.
 
-I'll think about this. At the very least, I can add tracepoints.
+Absolutely. I'll add these to the series.
 
-Thanks,
-Alex
+Thanks!
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
