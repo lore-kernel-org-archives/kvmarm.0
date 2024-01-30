@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3916A010
-	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 12:43:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF8C67A10
+	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 12:46:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706618616; cv=none; b=eMOpHh6eCwEHjyppXb3paxHP77HwalZ+ES4badq/U6OuEODepz3uppV/fke/5A18yKtTvj1fJokhqgGSj6Npz8SzEkcflwqAS0x2b6ZDpewMlv5cfDpHw+6pf1A8yggcaldN/FIGJ4QKZvgFYlXTy0pt1KXacxjMVeDvF4LyJPA=
+	t=1706618774; cv=none; b=mCRAh0GwanvRXXgXUmSR79s66NrJ1MzaJqc1/g55/C5LKaklyULEMMvf3Tau5Rqa+aNRm/smzG57wEV5GkAE4hqcc/8LHdzRiQ8KDY8NqI2Kom64ZCDe47vczbndo7pRWOQWSrkP/FPRe/C07Kms8B3oQKCa/BP6fgFUfK1qdRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706618616; c=relaxed/simple;
-	bh=6AuILVSfo995vrGWqoJwLioZFKPpmYA0IgTcq30CeS8=;
+	s=arc-20240116; t=1706618774; c=relaxed/simple;
+	bh=w1qhXVmoOsaAWbr9C1RxDZMhwCNg+pqUUmMOX6zaYbA=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=amtUaY5RvCcQoxVwtraERfVMLyOZDf8Y5ok2kVrWUk5oiyzEyLMm20cqf5p264q7RMnQQ+rbLV1H1Zs83NSQR0EzfLGlVJ1P6v6zjLm1Yxln6uTMFFRLdHwfPzSioGmcnwNdG2IEnALPpfwaGhQW89ad2DYGSZeUKdcDvzy/jTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u9edosx+; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Q6O5cE4AbVeqpjh9MH1bvSrNe2cwEMGb0ccX7rXxJLHuwnJtM6pLrMDo4IuOiaIWjJRmc1zOzBmeIwvvp0/3f/mpwLfee01GmzTGldoFEiKAMyv9Gu1CaxgehLsesjJr9ibaHoIBH6fNligbvVlEKXBSTxBmLjGQ5vyOVl7HeTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QRETFO35; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u9edosx+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FE6AC433F1;
-	Tue, 30 Jan 2024 12:43:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QRETFO35"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CE81C433F1;
+	Tue, 30 Jan 2024 12:46:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706618616;
-	bh=6AuILVSfo995vrGWqoJwLioZFKPpmYA0IgTcq30CeS8=;
+	s=k20201202; t=1706618773;
+	bh=w1qhXVmoOsaAWbr9C1RxDZMhwCNg+pqUUmMOX6zaYbA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=u9edosx+aaaEDT1wiQK7kYyPEoNxcxymytMhpFPVprBN7tZUDyi2Ewl5N0s5kBl+I
-	 p2q7Eg9jI6kmD8bgViEusJ0yOhSPdG9ciPgnuodhXo+VRZTMqxYJ0EtZmg8D3DvixM
-	 8JO28Pp0jgP7ZkbZYwat2n2w7cUQ/kQXImngJcOBoYgZtdYQ4yimSK+5zopV6twX5Y
-	 T0ptGC1hFZNsc5Wg7s7ncoNgLzJME3x8LwsTASDdS9OldkhhG9+tFBP+uplLckDtVY
-	 9XPOjlNqaqFs6z8heNCzOsD6quqG3cmkaU7Aw/PcVTWJOjF1UqtIqzqKD0Ze5tRmIi
-	 MqUaz1lSp/JGw==
+	b=QRETFO35X8lMrWo+JEgnWoqphjJV3lrfFZcZLsBNP2xjRVL4V7ilD1t+9BR3nQL1F
+	 MPl14W6Nv0ptOsXb1ODMizRAiA0z2wjXTN0Yvn73skNKdA4j+d3tdA8eeqhG+ZIct+
+	 7NIer+FrJ3L4SZY+QcKxwH+7oaKFti52gnu87X4Wfqng/dead7/pjmYRubnQNp0k7l
+	 Uf9LrMGIwJkuC8kw1PV+0wkKUQec36hGHjJGyxLwjtbHPu4Y3xdx09dI2/7YK5iTXm
+	 fQs4yCVNQwWiQt3zRqCAz2fjvGFAfolkBozwhlGRQ/CGZnHMm5OEYzSk2EEWAWLl2U
+	 TYvoaiN/e/8ow==
 Received: from [12.161.88.66] (helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rUnSf-00GG2X-GG;
-	Tue, 30 Jan 2024 12:43:33 +0000
-Date: Tue, 30 Jan 2024 12:43:29 +0000
-Message-ID: <87plxjvvny.wl-maz@kernel.org>
+	id 1rUnVD-00GG51-9e;
+	Tue, 30 Jan 2024 12:46:11 +0000
+Date: Tue, 30 Jan 2024 12:46:07 +0000
+Message-ID: <87o7d3vvjk.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Joey Gouly <joey.gouly@arm.com>
 Cc: kvmarm@lists.linux.dev,
@@ -45,11 +45,11 @@ Cc: kvmarm@lists.linux.dev,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 16/25] KVM: arm64: Rename __check_nv_sr_forward() to triage_sysreg_trap()
-In-Reply-To: <20240124165720.GL1283334@e124191.cambridge.arm.com>
+Subject: Re: [PATCH 21/25] KVM: arm64: Make TLBI OS/Range UNDEF if not advertised to the guest
+In-Reply-To: <20240125133047.GD1535978@e124191.cambridge.arm.com>
 References: <20240122201852.262057-1-maz@kernel.org>
-	<20240122201852.262057-17-maz@kernel.org>
-	<20240124165720.GL1283334@e124191.cambridge.arm.com>
+	<20240122201852.262057-22-maz@kernel.org>
+	<20240125133047.GD1535978@e124191.cambridge.arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -65,20 +65,94 @@ X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 24 Jan 2024 16:57:20 +0000,
+On Thu, 25 Jan 2024 13:30:47 +0000,
 Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> > +bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index);
-> > +
-> >  #define AA32(_x)	.aarch32_map = AA32_##_x
-> >  #define Op0(_x) 	.Op0 = _x
-> >  #define Op1(_x) 	.Op1 = _x
+> Question,
 > 
-> It's strange having triage_sysreg_trap() in emulate-nested.c, but moving that
-> would be churn for little benefit. Maybe once NV is all in.
+> On Mon, Jan 22, 2024 at 08:18:48PM +0000, Marc Zyngier wrote:
+> > Outer Shareable and Range TLBI instructions shouldn't be made available
+> > to the guest if they are not advertised. Use FGU to disable those,
+> > and set HCR_EL2.TLBIOS in the case the host doesn't have FGT.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 29 +++++++++++++++++++++++++++++
+> >  1 file changed, 29 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index a62efd8a2959..3c939ea4a28f 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -3949,6 +3949,9 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+> >  
+> >  	mutex_lock(&kvm->arch.config_lock);
+> >  
+> > +	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
+> > +		vcpu->arch.hcr_el2 |= HCR_TTLBOS;
+> > +
+> >  	if (test_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags))
+> >  		goto out;
+> >  
+> > @@ -3961,6 +3964,32 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+> >  				       HFGxTR_EL2_nSMPRI_EL1_MASK	|
+> >  				       HFGxTR_EL2_nTPIDR2_EL0_MASK);
+> >  
+> > +	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
+> > +		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1OS|
+> > +						HFGITR_EL2_TLBIRVALE1OS	|
+> > +						HFGITR_EL2_TLBIRVAAE1OS	|
+> > +						HFGITR_EL2_TLBIRVAE1OS	|
+> > +						HFGITR_EL2_TLBIVAALE1OS	|
+> > +						HFGITR_EL2_TLBIVALE1OS	|
+> > +						HFGITR_EL2_TLBIVAAE1OS	|
+> > +						HFGITR_EL2_TLBIASIDE1OS	|
+> > +						HFGITR_EL2_TLBIVAE1OS	|
+> > +						HFGITR_EL2_TLBIVMALLE1OS);
+> > +
+> > +	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, RANGE))
+> > +		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1	|
+> > +						HFGITR_EL2_TLBIRVALE1	|
+> > +						HFGITR_EL2_TLBIRVAAE1	|
+> > +						HFGITR_EL2_TLBIRVAE1	|
+> > +						HFGITR_EL2_TLBIRVAALE1IS|
+> > +						HFGITR_EL2_TLBIRVALE1IS	|
+> > +						HFGITR_EL2_TLBIRVAAE1IS	|
+> > +						HFGITR_EL2_TLBIRVAE1IS	|
+> > +						HFGITR_EL2_TLBIRVAALE1OS|
+> > +						HFGITR_EL2_TLBIRVALE1OS	|
+> > +						HFGITR_EL2_TLBIRVAAE1OS	|
+> > +						HFGITR_EL2_TLBIRVAE1OS);
+> > +
+> >  	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
+> >  out:
+> >  	mutex_unlock(&kvm->arch.config_lock);
+> 
+> I think I'm right in saying..
+> 
+> If the VM is running on a platform with ID_AA64ISAR0_EL1.TLB=0b010 (Outer
+> Shareable and TLB range maintenance instructions are implemented.) but without
+> support for FEAT_FGT, and the VMM sets the ID reg to ID_AA64ISAR0_EL1.TLB=0,
+> this change will trap the TLBI *OS instructions but not the following: 
+> 
+>     TLBI RVAAE1
+>     TLBI RVAAE1IS
+>     TLBI RVAALE1
+>     TLBI RVAALE1IS
+>     TLBI RVAE1
+>     TLBI RVAE1IS
+>     TLBI RVALE1
+>     TLBI RVALE1IS
+> 
+> These TLB range instructions only trap with HCR_EL2.TTLB, however that traps
+> all TLB instructions. You may have left this off intentionally, if so can you
+> add something to the commit message.
 
-My plan is to rename this to something like 'exception-routing.c',
-because that's what it is all about. Thoughts?
+You got it exactly right. Setting TTLB would be overkill, and is one
+of the cases where we have to strike a balance between efficiency and
+enforcement. I'll leave a comment to that effect to capture this.
+
+Thanks,
 
 	M.
 
