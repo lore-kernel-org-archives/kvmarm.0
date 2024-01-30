@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7CBA376F2
-	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 04:52:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB86381A2
+	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 05:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706590355; cv=none; b=kCiauNwJPt5Qj29K8RzgCAr6+QmrN7mHLEFbgdC1+0IKHh9iY1qewVpXE1Q7VEA0elo3xY385pmLEevAooYfYenw0b0BVd5fRoVruyU/3TV3wVcqbYI4yBa0Gt9VW+5LTCukmbxpSuUJ+HmKaAqlb8jDNxBIvvYQlorK/TGBOlI=
+	t=1706592019; cv=none; b=Tvj+iv7FArsJqOAvgFOpIgpCD44H//j/XapQzzyKt6LpBFV7bNMOTl9sEJFLxDw63B3BkQCajqrxe4o0uGD5RJlyvs+U3ZuuRTklZ+/XSOLQL8kiaZoS0/V0XgqJveajv59G/1/VLJX+KO7MrqOuKHFoueApvd1dPylpagYRZCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706590355; c=relaxed/simple;
-	bh=pSny46fbcm5afdgGkL8N9AZNYoV2BmDZXSWgbG1D29A=;
+	s=arc-20240116; t=1706592019; c=relaxed/simple;
+	bh=UXjR5+dcVj0uZ2Mi+pLNrfSsMCT9XDDXu1XkpjwGqHg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FiwWwK8W2KaiW70UdC00UOUOUPRyw6h31pgmuLzkaEzBE5AaVy85QzKyNE53XzqvTrPWOgiYxW19q/JmxiMwZxm2egSP9WWzyBrUccyP4GkM1N9gUrFNofLysLeMMs+2xnyvVsGzOkU9fBRFMrFAPKMiZkG0XkP8Hy6mP78QH7o=
+	 In-Reply-To:Content-Type; b=bgOgygivaSZprTXzEapfhnpXfmC1oxtx0KRi9nYgWXbPLXURAnmaj+P5EgQ5EA1jjxOawJaWXO2igmsKfEkefzYqs/qR/a5K1rRgzVHS5+aP8lYyhAv3EPQqapUWS7uPgjBMTpHj095GRxCj4j4HRhFIFOao97Ii4+xketoQN/8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5BB05DA7;
-	Mon, 29 Jan 2024 20:53:11 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 43296DA7;
+	Mon, 29 Jan 2024 21:21:00 -0800 (PST)
 Received: from [10.163.41.110] (unknown [10.163.41.110])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 45BD03F762;
-	Mon, 29 Jan 2024 20:52:15 -0800 (PST)
-Message-ID: <2cb8288c-5378-4968-a75b-8462b41998c6@arm.com>
-Date: Tue, 30 Jan 2024 10:22:11 +0530
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A76F93F762;
+	Mon, 29 Jan 2024 21:20:03 -0800 (PST)
+Message-ID: <61a3dbb7-25b6-4f49-aa70-9a8aaeb53365@arm.com>
+Date: Tue, 30 Jan 2024 10:50:00 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,109 +27,247 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v3 06/35] mm: cma: Make CMA_ALLOC_SUCCESS/FAIL count
- the number of pages
+Subject: Re: [PATCH RFC v3 08/35] mm: cma: Introduce cma_alloc_range()
 Content-Language: en-US
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
- maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
- mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
- vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org,
- bsegall@google.com, mgorman@suse.de, bristot@redhat.com,
- vschneid@redhat.com, mhiramat@kernel.org, rppt@kernel.org, hughd@google.com,
- pcc@google.com, steven.price@arm.com, vincenzo.frascino@arm.com,
+To: Alexandru Elisei <alexandru.elisei@arm.com>, catalin.marinas@arm.com,
+ will@kernel.org, oliver.upton@linux.dev, maz@kernel.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ arnd@arndb.de, akpm@linux-foundation.org, mingo@redhat.com,
+ peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+ mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com,
+ mhiramat@kernel.org, rppt@kernel.org, hughd@google.com
+Cc: pcc@google.com, steven.price@arm.com, vincenzo.frascino@arm.com,
  david@redhat.com, eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
  kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
  linux-arch@vger.kernel.org, linux-mm@kvack.org,
  linux-trace-kernel@vger.kernel.org
 References: <20240125164256.4147-1-alexandru.elisei@arm.com>
- <20240125164256.4147-7-alexandru.elisei@arm.com>
- <0a71c87a-ae2c-4a61-8adb-3a51d6369b99@arm.com> <ZbeRQpGNnfXnjayQ@raptor>
+ <20240125164256.4147-9-alexandru.elisei@arm.com>
 From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <ZbeRQpGNnfXnjayQ@raptor>
+In-Reply-To: <20240125164256.4147-9-alexandru.elisei@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
-On 1/29/24 17:21, Alexandru Elisei wrote:
-> Hi,
+On 1/25/24 22:12, Alexandru Elisei wrote:
+> Today, cma_alloc() is used to allocate a contiguous memory region. The
+> function allows the caller to specify the number of pages to allocate, but
+> not the starting address. cma_alloc() will walk over the entire CMA region
+> trying to allocate the first available range of the specified size.
 > 
-> On Mon, Jan 29, 2024 at 02:54:20PM +0530, Anshuman Khandual wrote:
->>
->>
->> On 1/25/24 22:12, Alexandru Elisei wrote:
->>> The CMA_ALLOC_SUCCESS, respectively CMA_ALLOC_FAIL, are increased by one
->>> after each cma_alloc() function call. This is done even though cma_alloc()
->>> can allocate an arbitrary number of CMA pages. When looking at
->>> /proc/vmstat, the number of successful (or failed) cma_alloc() calls
->>> doesn't tell much with regards to how many CMA pages were allocated via
->>> cma_alloc() versus via the page allocator (regular allocation request or
->>> PCP lists refill).
->>>
->>> This can also be rather confusing to a user who isn't familiar with the
->>> code, since the unit of measurement for nr_free_cma is the number of pages,
->>> but cma_alloc_success and cma_alloc_fail count the number of cma_alloc()
->>> function calls.
->>>
->>> Let's make this consistent, and arguably more useful, by having
->>> CMA_ALLOC_SUCCESS count the number of successfully allocated CMA pages, and
->>> CMA_ALLOC_FAIL count the number of pages the cma_alloc() failed to
->>> allocate.
->>>
->>> For users that wish to track the number of cma_alloc() calls, there are
->>> tracepoints for that already implemented.
->>>
->>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->>> ---
->>>  mm/cma.c | 4 ++--
->>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/mm/cma.c b/mm/cma.c
->>> index f49c95f8ee37..dbf7fe8cb1bd 100644
->>> --- a/mm/cma.c
->>> +++ b/mm/cma.c
->>> @@ -517,10 +517,10 @@ struct page *cma_alloc(struct cma *cma, unsigned long count,
->>>  	pr_debug("%s(): returned %p\n", __func__, page);
->>>  out:
->>>  	if (page) {
->>> -		count_vm_event(CMA_ALLOC_SUCCESS);
->>> +		count_vm_events(CMA_ALLOC_SUCCESS, count);
->>>  		cma_sysfs_account_success_pages(cma, count);
->>>  	} else {
->>> -		count_vm_event(CMA_ALLOC_FAIL);
->>> +		count_vm_events(CMA_ALLOC_FAIL, count);
->>>  		if (cma)
->>>  			cma_sysfs_account_fail_pages(cma, count);
->>>  	}
->>
->> Without getting into the merits of this patch - which is actually trying to do
->> semantics change to /proc/vmstat, wondering how is this even related to this
->> particular series ? If required this could be debated on it's on separately.
+> Introduce cma_alloc_range(), which makes CMA more versatile by allowing the
+> caller to specify a particular range in the CMA region, defined by the
+> start pfn and the size.
 > 
-> Having the number of CMA pages allocated and the number of CMA pages freed
-> allows someone to infer how many tagged pages are in use at a given time:
+> arm64 will make use of this function when tag storage management will be
+> implemented: cma_alloc_range() will be used to reserve the tag storage
+> associated with a tagged page.
 
-That should not be done in CMA which is a generic multi purpose allocator.
+Basically, you would like to pass on a preferred start address and the
+allocation could just fail if a contig range is not available from such
+a starting address ?
 
-> (allocated CMA pages - CMA pages allocated by drivers* - CMA pages
-> released) * 32. That is valuable information for software and hardware
-> designers.
-> 
-> Besides that, for every iteration of the series, this has proven invaluable
-> for discovering bugs with freeing and/or reserving tag storage pages.
+Then why not just change cma_alloc() to take a new argument 'start_pfn'.
+Why create a new but almost similar allocator ?
 
-I am afraid that might not be enough justification for getting something
-merged mainline.
+But then I am wondering why this could not be done in the arm64 platform
+code itself operating on a CMA area reserved just for tag storage. Unless
+this new allocator has other usage beyond MTE, this could be implemented
+in the platform itself.
 
 > 
-> *that would require userspace reading cma_alloc_success and
-> cma_release_success before any tagged allocations are performed.
-
-While assuming that no other non-memory-tagged CMA based allocation amd free
-call happens in the meantime ? That would be on real thin ice.
-
-I suppose arm64 tagged memory specific allocation or free related counters
-need to be created on the caller side, including arch_free_pages_prepare().
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+> 
+> Changes since rfc v2:
+> 
+> * New patch.
+> 
+>  include/linux/cma.h        |  2 +
+>  include/trace/events/cma.h | 59 ++++++++++++++++++++++++++
+>  mm/cma.c                   | 86 ++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 147 insertions(+)
+> 
+> diff --git a/include/linux/cma.h b/include/linux/cma.h
+> index 63873b93deaa..e32559da6942 100644
+> --- a/include/linux/cma.h
+> +++ b/include/linux/cma.h
+> @@ -50,6 +50,8 @@ extern int cma_init_reserved_mem(phys_addr_t base, phys_addr_t size,
+>  					struct cma **res_cma);
+>  extern struct page *cma_alloc(struct cma *cma, unsigned long count, unsigned int align,
+>  			      bool no_warn);
+> +extern int cma_alloc_range(struct cma *cma, unsigned long start, unsigned long count,
+> +			   unsigned tries, gfp_t gfp);
+>  extern bool cma_pages_valid(struct cma *cma, const struct page *pages, unsigned long count);
+>  extern bool cma_release(struct cma *cma, const struct page *pages, unsigned long count);
+>  
+> diff --git a/include/trace/events/cma.h b/include/trace/events/cma.h
+> index 25103e67737c..a89af313a572 100644
+> --- a/include/trace/events/cma.h
+> +++ b/include/trace/events/cma.h
+> @@ -36,6 +36,65 @@ TRACE_EVENT(cma_release,
+>  		  __entry->count)
+>  );
+>  
+> +TRACE_EVENT(cma_alloc_range_start,
+> +
+> +	TP_PROTO(const char *name, unsigned long start, unsigned long count,
+> +		 unsigned tries),
+> +
+> +	TP_ARGS(name, start, count, tries),
+> +
+> +	TP_STRUCT__entry(
+> +		__string(name, name)
+> +		__field(unsigned long, start)
+> +		__field(unsigned long, count)
+> +		__field(unsigned, tries)
+> +	),
+> +
+> +	TP_fast_assign(
+> +		__assign_str(name, name);
+> +		__entry->start = start;
+> +		__entry->count = count;
+> +		__entry->tries = tries;
+> +	),
+> +
+> +	TP_printk("name=%s start=%lx count=%lu tries=%u",
+> +		  __get_str(name),
+> +		  __entry->start,
+> +		  __entry->count,
+> +		  __entry->tries)
+> +);
+> +
+> +TRACE_EVENT(cma_alloc_range_finish,
+> +
+> +	TP_PROTO(const char *name, unsigned long start, unsigned long count,
+> +		 unsigned attempts, int err),
+> +
+> +	TP_ARGS(name, start, count, attempts, err),
+> +
+> +	TP_STRUCT__entry(
+> +		__string(name, name)
+> +		__field(unsigned long, start)
+> +		__field(unsigned long, count)
+> +		__field(unsigned, attempts)
+> +		__field(int, err)
+> +	),
+> +
+> +	TP_fast_assign(
+> +		__assign_str(name, name);
+> +		__entry->start = start;
+> +		__entry->count = count;
+> +		__entry->attempts = attempts;
+> +		__entry->err = err;
+> +	),
+> +
+> +	TP_printk("name=%s start=%lx count=%lu attempts=%u err=%d",
+> +		  __get_str(name),
+> +		  __entry->start,
+> +		  __entry->count,
+> +		  __entry->attempts,
+> +		  __entry->err)
+> +);
+> +
+>  TRACE_EVENT(cma_alloc_start,
+>  
+>  	TP_PROTO(const char *name, unsigned long count, unsigned int align),
+> diff --git a/mm/cma.c b/mm/cma.c
+> index 543bb6b3be8e..4a0f68b9443b 100644
+> --- a/mm/cma.c
+> +++ b/mm/cma.c
+> @@ -416,6 +416,92 @@ static void cma_debug_show_areas(struct cma *cma)
+>  static inline void cma_debug_show_areas(struct cma *cma) { }
+>  #endif
+>  
+> +/**
+> + * cma_alloc_range() - allocate pages in a specific range
+> + * @cma:   Contiguous memory region for which the allocation is performed.
+> + * @start: Starting pfn of the allocation.
+> + * @count: Requested number of pages
+> + * @tries: Number of tries if the range is busy
+> + * @no_warn: Avoid printing message about failed allocation
+> + *
+> + * This function allocates part of contiguous memory from a specific contiguous
+> + * memory area, from the specified starting address. The 'start' pfn and the the
+> + * 'count' number of pages must be aligned to the CMA bitmap order per bit.
+> + */
+> +int cma_alloc_range(struct cma *cma, unsigned long start, unsigned long count,
+> +		    unsigned tries, gfp_t gfp)
+> +{
+> +	unsigned long bitmap_maxno, bitmap_no, bitmap_start, bitmap_count;
+> +	unsigned long i = 0;
+> +	struct page *page;
+> +	int err = -EINVAL;
+> +
+> +	if (!cma || !cma->count || !cma->bitmap)
+> +		goto out_stats;
+> +
+> +	trace_cma_alloc_range_start(cma->name, start, count, tries);
+> +
+> +	if (!count || start < cma->base_pfn ||
+> +	    start + count > cma->base_pfn + cma->count)
+> +		goto out_stats;
+> +
+> +	if (!IS_ALIGNED(start | count, 1 << cma->order_per_bit))
+> +		goto out_stats;
+> +
+> +	bitmap_start = (start - cma->base_pfn) >> cma->order_per_bit;
+> +	bitmap_maxno = cma_bitmap_maxno(cma);
+> +	bitmap_count = cma_bitmap_pages_to_bits(cma, count);
+> +
+> +	spin_lock_irq(&cma->lock);
+> +	bitmap_no = bitmap_find_next_zero_area(cma->bitmap, bitmap_maxno,
+> +					       bitmap_start, bitmap_count, 0);
+> +	if (bitmap_no != bitmap_start) {
+> +		spin_unlock_irq(&cma->lock);
+> +		err = -EEXIST;
+> +		goto out_stats;
+> +	}
+> +	bitmap_set(cma->bitmap, bitmap_start, bitmap_count);
+> +	spin_unlock_irq(&cma->lock);
+> +
+> +	for (i = 0; i < tries; i++) {
+> +		mutex_lock(&cma_mutex);
+> +		err = alloc_contig_range(start, start + count, MIGRATE_CMA, gfp);
+> +		mutex_unlock(&cma_mutex);
+> +
+> +		if (err != -EBUSY)
+> +			break;
+> +	}
+> +
+> +	if (err) {
+> +		cma_clear_bitmap(cma, start, count);
+> +	} else {
+> +		page = pfn_to_page(start);
+> +
+> +		/*
+> +		 * CMA can allocate multiple page blocks, which results in
+> +		 * different blocks being marked with different tags. Reset the
+> +		 * tags to ignore those page blocks.
+> +		 */
+> +		for (i = 0; i < count; i++)
+> +			page_kasan_tag_reset(nth_page(page, i));
+> +	}
+> +
+> +out_stats:
+> +	trace_cma_alloc_range_finish(cma->name, start, count, i, err);
+> +
+> +	if (err) {
+> +		count_vm_events(CMA_ALLOC_FAIL, count);
+> +		if (cma)
+> +			cma_sysfs_account_fail_pages(cma, count);
+> +	} else {
+> +		count_vm_events(CMA_ALLOC_SUCCESS, count);
+> +		cma_sysfs_account_success_pages(cma, count);
+> +	}
+> +
+> +	return err;
+> +}
+> +
+> +
+>  /**
+>   * cma_alloc() - allocate pages from contiguous area
+>   * @cma:   Contiguous memory region for which the allocation is performed.
