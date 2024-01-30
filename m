@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30FC0376F4
-	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 04:34:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7CBA376F2
+	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 04:52:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706589261; cv=none; b=C1livO/Z+hUA1l0Vwyqg0A7cnRi6pbLBnrMKZIbRaH6/U3/PjvtAdAnUwIB1Wu7Sab95vGCEe/3P5rxXZNjsjGUXKZen8X0bS+x0GVNdi1WKCSCBx+AVTlpoylXq6Jmh1yK8GtwKLQy8OCcINX8P6nFkny1S7/X6XBleumUfa60=
+	t=1706590355; cv=none; b=kCiauNwJPt5Qj29K8RzgCAr6+QmrN7mHLEFbgdC1+0IKHh9iY1qewVpXE1Q7VEA0elo3xY385pmLEevAooYfYenw0b0BVd5fRoVruyU/3TV3wVcqbYI4yBa0Gt9VW+5LTCukmbxpSuUJ+HmKaAqlb8jDNxBIvvYQlorK/TGBOlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706589261; c=relaxed/simple;
-	bh=0F5mFah0QNd5K10CodthfzW/RM1sMIaJbOS1PHFaycA=;
+	s=arc-20240116; t=1706590355; c=relaxed/simple;
+	bh=pSny46fbcm5afdgGkL8N9AZNYoV2BmDZXSWgbG1D29A=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aIPu4cKegDmuvo63iSmM85q+kcNGhYsB3UKa+7FO6dy4Rk2Ba3drurjNN0kno24IkapyKRTkjRMRxr6OTnRVmeSr6FiqKY2PsdSDmNzRhLnSA125gzfXq1iWnGsGVc1CzT6vj+GlAUjElHBdU7httyGUkHUSg7WuYiXBKz78l/A=
+	 In-Reply-To:Content-Type; b=FiwWwK8W2KaiW70UdC00UOUOUPRyw6h31pgmuLzkaEzBE5AaVy85QzKyNE53XzqvTrPWOgiYxW19q/JmxiMwZxm2egSP9WWzyBrUccyP4GkM1N9gUrFNofLysLeMMs+2xnyvVsGzOkU9fBRFMrFAPKMiZkG0XkP8Hy6mP78QH7o=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3BC74DA7;
-	Mon, 29 Jan 2024 20:35:03 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5BB05DA7;
+	Mon, 29 Jan 2024 20:53:11 -0800 (PST)
 Received: from [10.163.41.110] (unknown [10.163.41.110])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6E3CB3F762;
-	Mon, 29 Jan 2024 20:34:06 -0800 (PST)
-Message-ID: <3983416f-b613-42c7-bb42-d3ab268ea1be@arm.com>
-Date: Tue, 30 Jan 2024 10:04:02 +0530
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 45BD03F762;
+	Mon, 29 Jan 2024 20:52:15 -0800 (PST)
+Message-ID: <2cb8288c-5378-4968-a75b-8462b41998c6@arm.com>
+Date: Tue, 30 Jan 2024 10:22:11 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,8 +27,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v3 04/35] mm: page_alloc: Partially revert "mm:
- page_alloc: remove stale CMA guard code"
+Subject: Re: [PATCH RFC v3 06/35] mm: cma: Make CMA_ALLOC_SUCCESS/FAIL count
+ the number of pages
 Content-Language: en-US
 To: Alexandru Elisei <alexandru.elisei@arm.com>
 Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
@@ -45,37 +45,91 @@ Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
  linux-arch@vger.kernel.org, linux-mm@kvack.org,
  linux-trace-kernel@vger.kernel.org
 References: <20240125164256.4147-1-alexandru.elisei@arm.com>
- <20240125164256.4147-5-alexandru.elisei@arm.com>
- <966a1a84-76dc-40da-bde2-251d2a81ee31@arm.com> <ZbeQBDwe8zc_pLDZ@raptor>
+ <20240125164256.4147-7-alexandru.elisei@arm.com>
+ <0a71c87a-ae2c-4a61-8adb-3a51d6369b99@arm.com> <ZbeRQpGNnfXnjayQ@raptor>
 From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <ZbeQBDwe8zc_pLDZ@raptor>
+In-Reply-To: <ZbeRQpGNnfXnjayQ@raptor>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
-On 1/29/24 17:16, Alexandru Elisei wrote:
+On 1/29/24 17:21, Alexandru Elisei wrote:
 > Hi,
 > 
-> On Mon, Jan 29, 2024 at 02:31:23PM +0530, Anshuman Khandual wrote:
+> On Mon, Jan 29, 2024 at 02:54:20PM +0530, Anshuman Khandual wrote:
 >>
 >>
 >> On 1/25/24 22:12, Alexandru Elisei wrote:
->>> The patch f945116e4e19 ("mm: page_alloc: remove stale CMA guard code")
->>> removed the CMA filter when allocating from the MIGRATE_MOVABLE pcp list
->>> because CMA is always allowed when __GFP_MOVABLE is set.
+>>> The CMA_ALLOC_SUCCESS, respectively CMA_ALLOC_FAIL, are increased by one
+>>> after each cma_alloc() function call. This is done even though cma_alloc()
+>>> can allocate an arbitrary number of CMA pages. When looking at
+>>> /proc/vmstat, the number of successful (or failed) cma_alloc() calls
+>>> doesn't tell much with regards to how many CMA pages were allocated via
+>>> cma_alloc() versus via the page allocator (regular allocation request or
+>>> PCP lists refill).
 >>>
->>> With the introduction of the arch_alloc_cma() function, the above is not
->>> true anymore, so bring back the filter.
+>>> This can also be rather confusing to a user who isn't familiar with the
+>>> code, since the unit of measurement for nr_free_cma is the number of pages,
+>>> but cma_alloc_success and cma_alloc_fail count the number of cma_alloc()
+>>> function calls.
+>>>
+>>> Let's make this consistent, and arguably more useful, by having
+>>> CMA_ALLOC_SUCCESS count the number of successfully allocated CMA pages, and
+>>> CMA_ALLOC_FAIL count the number of pages the cma_alloc() failed to
+>>> allocate.
+>>>
+>>> For users that wish to track the number of cma_alloc() calls, there are
+>>> tracepoints for that already implemented.
+>>>
+>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>>> ---
+>>>  mm/cma.c | 4 ++--
+>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/mm/cma.c b/mm/cma.c
+>>> index f49c95f8ee37..dbf7fe8cb1bd 100644
+>>> --- a/mm/cma.c
+>>> +++ b/mm/cma.c
+>>> @@ -517,10 +517,10 @@ struct page *cma_alloc(struct cma *cma, unsigned long count,
+>>>  	pr_debug("%s(): returned %p\n", __func__, page);
+>>>  out:
+>>>  	if (page) {
+>>> -		count_vm_event(CMA_ALLOC_SUCCESS);
+>>> +		count_vm_events(CMA_ALLOC_SUCCESS, count);
+>>>  		cma_sysfs_account_success_pages(cma, count);
+>>>  	} else {
+>>> -		count_vm_event(CMA_ALLOC_FAIL);
+>>> +		count_vm_events(CMA_ALLOC_FAIL, count);
+>>>  		if (cma)
+>>>  			cma_sysfs_account_fail_pages(cma, count);
+>>>  	}
 >>
->> This makes sense as arch_alloc_cma() now might prevent ALLOC_CMA being
->> assigned to alloc_flags in gfp_to_alloc_flags_cma().
+>> Without getting into the merits of this patch - which is actually trying to do
+>> semantics change to /proc/vmstat, wondering how is this even related to this
+>> particular series ? If required this could be debated on it's on separately.
 > 
-> Can I add your Reviewed-by tag then?
+> Having the number of CMA pages allocated and the number of CMA pages freed
+> allows someone to infer how many tagged pages are in use at a given time:
 
-I think all these changes need to be reviewed in their entirety
-even though some patches do look good on their own. For example
-this patch depends on whether [PATCH 03/35] is acceptable or not.
+That should not be done in CMA which is a generic multi purpose allocator.
 
-I would suggest separating out CMA patches which could be debated
-and merged regardless of this series.
+> (allocated CMA pages - CMA pages allocated by drivers* - CMA pages
+> released) * 32. That is valuable information for software and hardware
+> designers.
+> 
+> Besides that, for every iteration of the series, this has proven invaluable
+> for discovering bugs with freeing and/or reserving tag storage pages.
+
+I am afraid that might not be enough justification for getting something
+merged mainline.
+
+> 
+> *that would require userspace reading cma_alloc_success and
+> cma_release_success before any tagged allocations are performed.
+
+While assuming that no other non-memory-tagged CMA based allocation amd free
+call happens in the meantime ? That would be on real thin ice.
+
+I suppose arm64 tagged memory specific allocation or free related counters
+need to be created on the caller side, including arch_free_pages_prepare().
