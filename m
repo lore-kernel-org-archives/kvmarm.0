@@ -1,55 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 591FF6775E
-	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 12:12:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3916A010
+	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 12:43:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706616753; cv=none; b=kE6WJ4HCfgjESkvFAoAd3936GfqAJGIlGge31zBELtysNjz6KRtQmtJ+3WOz+sXosAakgz2kEY36+nvV4Lc6hV3xqeZ64Lgcz3Q61FttjwXYn5zcnmakDh+6Zc5/lxnNGMu0jdQIjOSO+UIPUSPNQgCfUNfc1FtRIzyDSGpCK3E=
+	t=1706618616; cv=none; b=eMOpHh6eCwEHjyppXb3paxHP77HwalZ+ES4badq/U6OuEODepz3uppV/fke/5A18yKtTvj1fJokhqgGSj6Npz8SzEkcflwqAS0x2b6ZDpewMlv5cfDpHw+6pf1A8yggcaldN/FIGJ4QKZvgFYlXTy0pt1KXacxjMVeDvF4LyJPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706616753; c=relaxed/simple;
-	bh=qtKz5PUT9mkDsa8isUg58tbqJCm6B3Touj9jntprnT4=;
+	s=arc-20240116; t=1706618616; c=relaxed/simple;
+	bh=6AuILVSfo995vrGWqoJwLioZFKPpmYA0IgTcq30CeS8=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A7Vavqz+Gu4AxN7xkfrbHAE3rxO60obx8jYf1gv36EpEUfXsGHTW6sTuj7YL7JK57DBQU9FuXX6hlQeX6tV1Gz7+b5kZINl0twMayb/O9n3o+Lq/0FBL+5/gg9wG2/Psdu25AUFMpNsJMKK1t6A//REwnAlcjDg008/VSW8fUuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NrqOuS07; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=amtUaY5RvCcQoxVwtraERfVMLyOZDf8Y5ok2kVrWUk5oiyzEyLMm20cqf5p264q7RMnQQ+rbLV1H1Zs83NSQR0EzfLGlVJ1P6v6zjLm1Yxln6uTMFFRLdHwfPzSioGmcnwNdG2IEnALPpfwaGhQW89ad2DYGSZeUKdcDvzy/jTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u9edosx+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NrqOuS07"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8A53C433C7;
-	Tue, 30 Jan 2024 12:12:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u9edosx+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FE6AC433F1;
+	Tue, 30 Jan 2024 12:43:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706616752;
-	bh=qtKz5PUT9mkDsa8isUg58tbqJCm6B3Touj9jntprnT4=;
+	s=k20201202; t=1706618616;
+	bh=6AuILVSfo995vrGWqoJwLioZFKPpmYA0IgTcq30CeS8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NrqOuS07Jp2W7AUAgmBUQS096hW0Wbl+CnPwYM84PTwAZdzKD8I1rbgt+6OAUApYi
-	 X++8FSbNCtMxVh5DGwzItWhRNGutrz5Ot/qZ5zb8TEveu8nLCvHVvYXMUkFifN2ecQ
-	 J0fDpcEE8xAzh28C4zzhLhOnHgogvrVB5sa6WXK9QPs8tokxVY37yffWeoKqtJ34u3
-	 Rz9RHyEcx9lQNHU4KEt1OQPyVyxI73NN1Rpbgr0XcGQ4NWiIAld+IKAa3J4NYTrw4E
-	 w93sGxxfkPW81wwZEsjtpTpDpOavvv2DFxd2KnYAD/fPgacxWMMKnD9Wvg+LsPg9hU
-	 wX1pLKyPSAhvQ==
+	b=u9edosx+aaaEDT1wiQK7kYyPEoNxcxymytMhpFPVprBN7tZUDyi2Ewl5N0s5kBl+I
+	 p2q7Eg9jI6kmD8bgViEusJ0yOhSPdG9ciPgnuodhXo+VRZTMqxYJ0EtZmg8D3DvixM
+	 8JO28Pp0jgP7ZkbZYwat2n2w7cUQ/kQXImngJcOBoYgZtdYQ4yimSK+5zopV6twX5Y
+	 T0ptGC1hFZNsc5Wg7s7ncoNgLzJME3x8LwsTASDdS9OldkhhG9+tFBP+uplLckDtVY
+	 9XPOjlNqaqFs6z8heNCzOsD6quqG3cmkaU7Aw/PcVTWJOjF1UqtIqzqKD0Ze5tRmIi
+	 MqUaz1lSp/JGw==
 Received: from [12.161.88.66] (helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rUmyc-00GFWy-Cu;
-	Tue, 30 Jan 2024 12:12:30 +0000
-Date: Tue, 30 Jan 2024 12:12:26 +0000
-Message-ID: <87r0hzvx3p.wl-maz@kernel.org>
+	id 1rUnSf-00GG2X-GG;
+	Tue, 30 Jan 2024 12:43:33 +0000
+Date: Tue, 30 Jan 2024 12:43:29 +0000
+Message-ID: <87plxjvvny.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
+To: Joey Gouly <joey.gouly@arm.com>
 Cc: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 02/25] KVM: arm64: Add feature checking helpers
-In-Reply-To: <ZbQCi_GZ6XuMx49a@linux.dev>
+Subject: Re: [PATCH 16/25] KVM: arm64: Rename __check_nv_sr_forward() to triage_sysreg_trap()
+In-Reply-To: <20240124165720.GL1283334@e124191.cambridge.arm.com>
 References: <20240122201852.262057-1-maz@kernel.org>
-	<20240122201852.262057-3-maz@kernel.org>
-	<ZbQCi_GZ6XuMx49a@linux.dev>
+	<20240122201852.262057-17-maz@kernel.org>
+	<20240124165720.GL1283334@e124191.cambridge.arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -61,37 +61,24 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 12.161.88.66
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, broonie@kernel.org
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 26 Jan 2024 19:05:47 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Wed, 24 Jan 2024 16:57:20 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> On Mon, Jan 22, 2024 at 08:18:29PM +0000, Marc Zyngier wrote:
-> > In order to make it easier to check whether a particular feature
-> > is exposed to a guest, add a new set of helpers, with kvm_has_feat()
-> > being the most useful.
-> > 
-> > Follow-up work will make heavy use of these.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > +bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index);
+> > +
+> >  #define AA32(_x)	.aarch32_map = AA32_##_x
+> >  #define Op0(_x) 	.Op0 = _x
+> >  #define Op1(_x) 	.Op1 = _x
 > 
-> I very much like the way these helpers appear to work. However, I
-> noticed there are still a few places where we are doing explicit feature
-> checks against register values instead of using the macros, did you want
-> to address these?
+> It's strange having triage_sysreg_trap() in emulate-nested.c, but moving that
+> would be churn for little benefit. Maybe once NV is all in.
 
-Eventually, yes. It is just that there is a lot to do and I wanted to
-focus on the VM runtime configuration.
-
-> 
-> Using kvm_has_feat() consistently in KVM will hopefully drive the point
-> home that this is the way we want to see things done going forward.
-
-Absolutely. I'll add these to the series.
-
-Thanks!
+My plan is to rename this to something like 'exception-routing.c',
+because that's what it is all about. Thoughts?
 
 	M.
 
