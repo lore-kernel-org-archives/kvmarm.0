@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F4371B49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D12EE71B5C
 	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 20:45:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706647551; cv=none; b=lwC3mfVm6P3JN97+SUZ3Z3uPZRbEjWF1KPgaeuXNV1W75g1Ds0ouNrrDGdNoijw0NiZfrBb00FVQ2Gjxs03Wjgc5+U7Yl2ooK+3mvdofGIwT57OEQu2n6DrpMePwQYOrg5/pRCCaZK9yFxFPgLbECywCz552T03Hhadjvs7ENSQ=
+	t=1706647551; cv=none; b=ZpfF29vWez1OK9h/84HsKBSMI4e67plxTzvGlMo6hnbWz//sTkQFgnz5LoKBF/WiSw2/LqRu1Z7Nr2x5g0fiUlbDPd8KS89xH8u7BRuLphefV5hl1D+0mlyVHxtji0kenXUnXwBxhPtSlov4HLoJcQlybLc4+7JdzGWwEdOT8IA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706647551; c=relaxed/simple;
-	bh=X9HRIoz3kgvhZ5nGDGscpLYIIFhYLJlYgdmtg53Di4Q=;
+	bh=P9aY9RTe8Jv15BRsJ1yTkgB9wXEsDQbbKKhHC7/BF+o=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=IPmklq5NKfQczv3JRZR9cW/CnPP3pRJqNDBbvCpFUPWq6bgOji67KmluZPrf2JARI7oJCy0qFTIAZKaqzVUx4dkyRclsQl+5toXXj88zdEQKvD+T6b9cTxCkq8wIFpToU/hwpvVNsaU4cEdwZx5+X30fGkHrS60CVjLh3cfL+5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mBEZbAgU; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=mK/Y9hNu+RaLNio/RgstgQGL6rbAC1fclv2ZfPA/onVYyyKPQf4/Zl3k/W2zlOT7BKkgi5bINnpzCp40wyOdSZ7CWII/vec+y1JeV4/GmKl9zVDri3ROW5mujIefkP0YwugGu/gtAAdLbjf3Bta12SUyVfBrhS4FDfIOUCdLv4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hHqYWd/I; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mBEZbAgU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F004C43399;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hHqYWd/I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A65DBC433F1;
 	Tue, 30 Jan 2024 20:45:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1706647551;
-	bh=X9HRIoz3kgvhZ5nGDGscpLYIIFhYLJlYgdmtg53Di4Q=;
+	bh=P9aY9RTe8Jv15BRsJ1yTkgB9wXEsDQbbKKhHC7/BF+o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mBEZbAgUzdBTgITPYvHgFCpAeTq2eDO8aCuWZeCYIltWlqnHTJYr46bxJK+1AxuYL
-	 cFMi5P0a8C2uQA9jVuZ5m9kEmNYnIgF4tRXfMONUKqs83IiTbXp0iLjxb1kks6RPfd
-	 ESWUZfr+PZeTiHIPp3pOLDtv8pj7fzLJUNSyK+UkDmeydAdYea8gq+RgTkFSAQEUd9
-	 ajyckQItmG9b0qqaQbN4ZTSqXu4N5uFvQFZPLhPWjSgTh19PMo0F9zIuUVZrWyvVRh
-	 q8bnwnBEo12CzsmK+KR1m9ly43IKzLBEHnl+jgbObxfIuflTFaUKQYNcUUz+cJGAVi
-	 l6GETx00vSouw==
+	b=hHqYWd/Ip/89KSxmEJgaph9YfZoWvjckdx32P7B3hPuOBkWJSg9zw2MGOh6zXZkrZ
+	 b/PWpR+7FGEwbnebQ5bf56jXtzwFwGL1wndQ6aUmWzy+DvcDUxxCGNbPNqiCw3ec2g
+	 ia/rC617/mcTiaNnV1VzNUHPrDG9kAr1NJrjqLoRVFk8Th0p268YxSAe2WR6JlK7zS
+	 SJv9aiTZdiTZcFnArzGN53G3vzDKvI4pCKR0BSYamncXaINBVIzYofpexy9P2yp+4o
+	 YG/qbcXKVA9CxHYlR6aQ+tOHmccyGKo0dLxsz3e/+DfQp7aktxDIYuTfY6ZDHTWBSm
+	 y1GB52pQ2xtCA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rUuzN-00GNsE-TD;
+	id 1rUuzN-00GNsE-Mz;
 	Tue, 30 Jan 2024 20:45:49 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v2 25/25] KVM: arm64: Add debugfs file for guest's ID registers
-Date: Tue, 30 Jan 2024 20:45:32 +0000
-Message-Id: <20240130204533.693853-26-maz@kernel.org>
+Subject: [PATCH v2 24/25] KVM: arm64: Make FEAT_MOPS UNDEF if not advertised to the guest
+Date: Tue, 30 Jan 2024 20:45:31 +0000
+Message-Id: <20240130204533.693853-25-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240130204533.693853-1-maz@kernel.org>
 References: <20240130204533.693853-1-maz@kernel.org>
@@ -61,134 +61,76 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Debugging ID register setup can be a complicated affair. Give the
-kernel hacker a way to dump that state in an easy to parse way.
+We unconditionally enable FEAT_MOPS, which is obviously wrong.
+
+So let's only do that when it is advertised to the guest.
+Which means we need to rely on a per-vcpu HCRX_EL2 shadow register.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  3 ++
- arch/arm64/kvm/sys_regs.c         | 81 +++++++++++++++++++++++++++++++
- 2 files changed, 84 insertions(+)
+ arch/arm64/include/asm/kvm_arm.h        | 4 +---
+ arch/arm64/include/asm/kvm_host.h       | 1 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
+ arch/arm64/kvm/sys_regs.c               | 7 +++++++
+ 4 files changed, 10 insertions(+), 4 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 3c6f8ba1e479..a1769e415d72 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -102,9 +102,7 @@
+ #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
+ #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
+ 
+-#define HCRX_GUEST_FLAGS \
+-	(HCRX_EL2_SMPME | HCRX_EL2_TCR2En | \
+-	 (cpus_have_final_cap(ARM64_HAS_MOPS) ? (HCRX_EL2_MSCEn | HCRX_EL2_MCE2) : 0))
++#define HCRX_GUEST_FLAGS (HCRX_EL2_SMPME | HCRX_EL2_TCR2En)
+ #define HCRX_HOST_FLAGS (HCRX_EL2_MSCEn | HCRX_EL2_TCR2En)
+ 
+ /* TCR_EL2 Registers bits */
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 50a122d42587..ea8acc1914aa 100644
+index eff894d59590..50a122d42587 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -319,6 +319,9 @@ struct kvm_arch {
- 	/* PMCR_EL0.N value for the guest */
- 	u8 pmcr_n;
+@@ -584,6 +584,7 @@ struct kvm_vcpu_arch {
  
-+	/* Iterator for idreg debugfs */
-+	u8	idreg_debugfs_iter;
-+
- 	/* Hypercall features firmware registers' descriptor */
- 	struct kvm_smccc_features smccc_feat;
- 	struct maple_tree smccc_filter;
+ 	/* Values of trap registers for the guest. */
+ 	u64 hcr_el2;
++	u64 hcrx_el2;
+ 	u64 mdcr_el2;
+ 	u64 cptr_el2;
+ 
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 2d5891518006..e3fcf8c4d5b4 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -236,7 +236,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+ 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+ 
+ 	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
+-		u64 hcrx = HCRX_GUEST_FLAGS;
++		u64 hcrx = vcpu->arch.hcrx_el2;
+ 		if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
+ 			u64 clr = 0, set = 0;
+ 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2cb69efac1dc..d08d67e2d441 100644
+index 38ed47bd29db..2cb69efac1dc 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -12,6 +12,7 @@
- #include <linux/bitfield.h>
- #include <linux/bsearch.h>
- #include <linux/cacheinfo.h>
-+#include <linux/debugfs.h>
- #include <linux/kvm_host.h>
- #include <linux/mm.h>
- #include <linux/printk.h>
-@@ -3421,6 +3422,81 @@ static bool emulate_sys_reg(struct kvm_vcpu *vcpu,
- 	return false;
- }
+@@ -3956,6 +3956,13 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+ 	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
+ 		vcpu->arch.hcr_el2 |= HCR_TTLBOS;
  
-+static void *idregs_debug_start(struct seq_file *s, loff_t *pos)
-+{
-+	struct kvm *kvm = s->private;
-+	u8 *iter;
++	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
++		vcpu->arch.hcrx_el2 = HCRX_GUEST_FLAGS;
 +
-+	mutex_lock(&kvm->arch.config_lock);
-+
-+	iter = &kvm->arch.idreg_debugfs_iter;
-+	if (*iter == (u8)~0) {
-+		*iter = *pos;
-+		if (*iter >= KVM_ARM_ID_REG_NUM)
-+			iter = NULL;
-+	} else {
-+		iter = ERR_PTR(-EBUSY);
++		if (kvm_has_feat(kvm, ID_AA64ISAR2_EL1, MOPS, IMP))
++			vcpu->arch.hcrx_el2 |= (HCRX_EL2_MSCEn | HCRX_EL2_MCE2);
 +	}
 +
-+	mutex_unlock(&kvm->arch.config_lock);
-+
-+	return iter;
-+}
-+
-+static void *idregs_debug_next(struct seq_file *s, void *v, loff_t *pos)
-+{
-+	struct kvm *kvm = s->private;
-+
-+	(*pos)++;
-+
-+	if ((kvm->arch.idreg_debugfs_iter + 1) < KVM_ARM_ID_REG_NUM) {
-+		kvm->arch.idreg_debugfs_iter++;
-+
-+		return &kvm->arch.idreg_debugfs_iter;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void idregs_debug_stop(struct seq_file *s, void *v)
-+{
-+	struct kvm *kvm = s->private;
-+
-+	if (IS_ERR(v))
-+		return;
-+
-+	mutex_lock(&kvm->arch.config_lock);
-+
-+	kvm->arch.idreg_debugfs_iter = ~0;
-+
-+	mutex_unlock(&kvm->arch.config_lock);
-+}
-+
-+static int idregs_debug_show(struct seq_file *s, void *v)
-+{
-+	struct kvm *kvm = s->private;
-+	const struct sys_reg_desc *desc;
-+
-+	desc = first_idreg + kvm->arch.idreg_debugfs_iter;
-+
-+	if (!desc->name)
-+		return 0;
-+
-+	seq_printf(s, "%20s:\t%016llx\n",
-+		   desc->name, IDREG(kvm, IDX_IDREG(kvm->arch.idreg_debugfs_iter)));
-+
-+	return 0;
-+}
-+
-+static const struct seq_operations idregs_debug_sops = {
-+	.start	= idregs_debug_start,
-+	.next	= idregs_debug_next,
-+	.stop	= idregs_debug_stop,
-+	.show	= idregs_debug_show,
-+};
-+
-+DEFINE_SEQ_ATTRIBUTE(idregs_debug);
-+
- static void kvm_reset_id_regs(struct kvm_vcpu *vcpu)
- {
- 	const struct sys_reg_desc *idreg = first_idreg;
-@@ -3440,6 +3516,11 @@ static void kvm_reset_id_regs(struct kvm_vcpu *vcpu)
- 		id = reg_to_encoding(idreg);
- 	}
- 
-+	kvm->arch.idreg_debugfs_iter = ~0;
-+
-+	debugfs_create_file("idregs", 0444, kvm->debugfs_dentry, kvm,
-+			    &idregs_debug_fops);
-+
- 	set_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags);
- }
+ 	if (test_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags))
+ 		goto out;
  
 -- 
 2.39.2
