@@ -1,45 +1,49 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C91F667728
-	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 11:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE1866B47
+	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 11:34:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706614406; cv=none; b=HzndM5qFI6hlg+/sMHGRhKFIAt/xu7LBfXentwJxDX+WBlIi/xq5DtjLSXEWeFeAHf5NiYaj01YO89Ev6LHMCikfEfDQ853XeTrFaaBQioLnfSsY3KSKFwbOkKdHtkf42cX6sYi1cIxYNiUgSVAdNCTKPSzwzTJ0tlH1uMUWfqs=
+	t=1706614446; cv=none; b=eWpsvO9Wia33pk8104VtAreONG52QJS3Yf/tyqyqCyRa4dlKx+rETBmToPQJvNkmu5kgO1vFvVZXpgjH5SjCnImRqvuJAXbgwODdyOI6io7gWyhaRakFUt92zyppCOXxln7cSYTCGvXmLnDgyUsssifLG2BwKbcPlc03NQJcDeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706614406; c=relaxed/simple;
-	bh=iYeZRBQMYetEM+TK5yHlgX6GcwqR9jGOdY9NNlijHeI=;
+	s=arc-20240116; t=1706614446; c=relaxed/simple;
+	bh=ENHOs+CW95ZPp9vhiJaKUnrUPARMC0OGRwPXzpMiOI0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FYEdbd+dLNNLH6c8GCinJ068l443W/+okXdqJ8LS/2D28WsK5fnbKROE4WBdT/gJSJqJU/2EGcr/auznQVnaLla5sxhkuJl5x4/f20aQawJPbMQrUW25kOiQ1413tNZN/KZ+c8vqC+hm30MJe8wAi/96nXKcMirbF2DO10qEBKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 121DBDA7;
-	Tue, 30 Jan 2024 03:34:03 -0800 (PST)
-Received: from raptor (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EA3D43F5A1;
-	Tue, 30 Jan 2024 03:33:13 -0800 (PST)
-Date: Tue, 30 Jan 2024 11:33:07 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
-	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
-	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
-	rppt@kernel.org, hughd@google.com, pcc@google.com,
-	steven.price@arm.com, vincenzo.frascino@arm.com, david@redhat.com,
-	eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC v3 09/35] mm: cma: Introduce cma_remove_mem()
-Message-ID: <ZbjecxWRUrBfOEdn@raptor>
-References: <20240125164256.4147-1-alexandru.elisei@arm.com>
- <20240125164256.4147-10-alexandru.elisei@arm.com>
- <830691cf-cb96-443e-b6eb-2adfe2edd587@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HT5URA5W/Vj5MUzkB4jVg59zTdZIujuL/aMAIetrmevcDi0CnVjGePx5iYtb7lqEiNMP53hm39OjgWP84GOgpS3jAFhaADuFZFeQnh7mVQt5osfakAelqMu9QlPae313G1+0grKRhzoxXigX7dhR+1XlYZ/gcJvPRRMLfeEPiMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bt0HK8ZI; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bt0HK8ZI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF385C433F1;
+	Tue, 30 Jan 2024 11:34:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706614445;
+	bh=ENHOs+CW95ZPp9vhiJaKUnrUPARMC0OGRwPXzpMiOI0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bt0HK8ZIlMnNtUOzr3tDObL0npWlvAFDrimIyIeUrMNN6tBbJhzu+tAtqF/ROYxwm
+	 iL2uH0zpcSkmzajPoNvOpCm3oyJpiGHhDZHAOu4PcLhOd/5iIaIdQaEEZmiuBnmJ8p
+	 NoMUHt4CpddsxJfBHLa8SAxG8yA+eVlM2Rj7YFfzekmo60n0n4mIUshzeRuNYOrDF3
+	 Adp5x1++nWSo0RxTevrzBH+UOMo2+XoJfHjt8zaDpo674j7E+wyM+jFoHL7/qntK4G
+	 VMIUjB7YOqPCbc3f8959fG4EsvqYdwpJR7VoNRCAywYNP4DU8MS+thUy7Xs6+/WQ2g
+	 sB3dRGHrZdg2g==
+Date: Tue, 30 Jan 2024 11:34:00 +0000
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v3 02/13] arm64: cpufeatures: Correctly handle signed
+ values
+Message-ID: <20240130113359.GA13551@willie-the-truck>
+References: <20231127114559.990314-1-maz@kernel.org>
+ <20231127114559.990314-3-maz@kernel.org>
+ <20231211122416.GA25277@willie-the-truck>
+ <86a5pfafbv.wl-maz@kernel.org>
+ <87plyau44c.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,198 +52,46 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <830691cf-cb96-443e-b6eb-2adfe2edd587@arm.com>
+In-Reply-To: <87plyau44c.wl-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Hi,
-
-I really appreciate the feedback you have given me so far. I believe the
-commit message isn't clear enough and there has been a confusion.
-
-A CMA user adds a CMA area to the cma_areas array with
-cma_declare_contiguous_nid() or cma_init_reserved_mem().
-init_cma_reserved_pageblock() then iterates over the array and activates
-all cma areas.
-
-The function cma_remove_mem() is intended to be used to remove a cma area
-from the cma_areas array **before** the area has been activated.
-
-Usecase: a driver (in this case, the arm64 dynamic tag storage code)
-manages several cma areas. The driver successfully adds the first area to
-the cma_areas array. When the driver tries to adds the second area, the
-function fails. Without cma_remove_mem(), the driver has no way to prevent
-the first area from being freed to the page allocator. cma_remove_mem() is
-about providing a means to do cleanup in case of error.
-
-Does that make more sense now?
-
-Ok Tue, Jan 30, 2024 at 11:20:56AM +0530, Anshuman Khandual wrote:
-> 
-> 
-> On 1/25/24 22:12, Alexandru Elisei wrote:
-> > Memory is added to CMA with cma_declare_contiguous_nid() and
-> > cma_init_reserved_mem(). This memory is then put on the MIGRATE_CMA list in
-> > cma_init_reserved_areas(), where the page allocator can make use of it.
-> 
-> cma_declare_contiguous_nid() reserves memory in memblock and marks the
-
-You forgot about about cma_init_reserved_mem() which does the same thing,
-but yes, you are right.
-
-> for subsequent CMA usage, where as cma_init_reserved_areas() activates
-> these memory areas through init_cma_reserved_pageblock(). Standard page
-> allocator only receives these memory via free_reserved_page() - only if
-
-I don't think that's correct. init_cma_reserved_pageblock() clears the
-PG_reserved page flag, sets the migratetype to MIGRATE_CMA and then frees
-the page. After that, the page is available to the standard page allocator
-to use for allocation. Otherwise, what would be the point of the
-MIGRATE_CMA migratetype?
-
-> the page block activation fails.
-
-For the sake of having a complete picture, I'll add that that only happens
-if cma->reserve_pages_on_error is false. If the CMA user sets the field to
-'true' (with cma_reserve_pages_on_error()), then the pages in the CMA
-region are kept PG_reserved if activation fails.
-
-> 
+On Tue, Jan 09, 2024 at 11:40:19AM +0000, Marc Zyngier wrote:
+> On Mon, 08 Jan 2024 17:46:12 +0000,
+> Marc Zyngier <maz@kernel.org> wrote:
 > > 
-> > If a device manages multiple CMA areas, and there's an error when one of
-> > the areas is added to CMA, there is no mechanism for the device to prevent
+> > On Mon, 11 Dec 2023 12:24:16 +0000,
+> > Will Deacon <will@kernel.org> wrote:
 > 
-> What kind of error ? init_cma_reserved_pageblock() fails ? But that will
-> not happen until cma_init_reserved_areas().
-
-I think I haven't been clear enough. When I say that "an area is added
-to CMA", I mean that the memory region is added to cma_areas array, via
-cma_declare_contiguous_nid() or cma_init_reserved_mem(). There are several
-ways in which either function can fail.
-
+> [...]
 > 
-> > the rest of the areas, which were added before the error occured, from
-> > being later added to the MIGRATE_CMA list.
-> 
-> Why is this mechanism required ? cma_init_reserved_areas() scans over all
-> CMA areas and try and activate each of them sequentially. Why is not this
-> sufficient ?
-
-This patch is about removing a struct cma from the cma_areas array after it
-has been added to the array, with cma_declare_contiguous_nid() or
-cma_init_reserved_mem(), to prevent the area from being activated in
-cma_init_reserved_areas(). Sorry for the confusion.
-
-I'll add a check in cma_remove_mem() to fail if the cma area has been
-activated, and a comment to the function to explain its usage.
-
-> 
+> > > > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> > > > index 646591c67e7a..bc8787f28ffd 100644
+> > > > --- a/arch/arm64/kernel/cpufeature.c
+> > > > +++ b/arch/arm64/kernel/cpufeature.c
+> > > > @@ -140,12 +140,42 @@ void dump_cpu_features(void)
+> > > >  	pr_emerg("0x%*pb\n", ARM64_NCAPS, &system_cpucaps);
+> > > >  }
+> > > >  
+> > > > +#define __ARM64_MAX_POSITIVE(reg, field)				\
+> > > > +		((reg##_##field##_SIGNED ?				\
+> > > > +		  BIT(reg##_##field##_WIDTH - 1) :			\
+> > > > +		  BIT(reg##_##field##_WIDTH)) - 1)
+> > > > +
+> > > > +#define __ARM64_MIN_NEGATIVE(reg, field)  BIT(reg##_##field##_WIDTH - 1)
+> > > 
+> > > I'm struggling to grok these two macros. For example, let's say I have a
+> > > 4-bit signed field. In that case, the maximum positive value is 7 (0b0111)
+> > > and the minimum negative value is -8 (0b1000), but the macros above appear
+> > > to give 0b1000 for both.
 > > 
-> > Add cma_remove_mem() which allows a previously reserved CMA area to be
-> > removed and thus it cannot be used by the page allocator.
+> > Crap. Well spotted. The signed maximum needs to be further adjusted
+> > like this:
 > 
-> Successfully activated CMA areas do not get used by the buddy allocator.
+> Actually, scratch that. The original code is correct and does return
+> 0b0111 for the max of a signed 4 bit value, and 0b1000 for the min.
+> The clue is in the bracketing (the '- 1' is applied to the result of
+> the conditional expression in the max case).
 
-I don't believe that is correct, see above.
+Gah, sorry, that trailing '- 1' really caught me out with the formatting!
 
-> 
-> > 
-> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > ---
-> > 
-> > Changes since rfc v2:
-> > 
-> > * New patch.
-> > 
-> >  include/linux/cma.h |  1 +
-> >  mm/cma.c            | 30 +++++++++++++++++++++++++++++-
-> >  2 files changed, 30 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/include/linux/cma.h b/include/linux/cma.h
-> > index e32559da6942..787cbec1702e 100644
-> > --- a/include/linux/cma.h
-> > +++ b/include/linux/cma.h
-> > @@ -48,6 +48,7 @@ extern int cma_init_reserved_mem(phys_addr_t base, phys_addr_t size,
-> >  					unsigned int order_per_bit,
-> >  					const char *name,
-> >  					struct cma **res_cma);
-> > +extern void cma_remove_mem(struct cma **res_cma);
-> >  extern struct page *cma_alloc(struct cma *cma, unsigned long count, unsigned int align,
-> >  			      bool no_warn);
-> >  extern int cma_alloc_range(struct cma *cma, unsigned long start, unsigned long count,
-> > diff --git a/mm/cma.c b/mm/cma.c
-> > index 4a0f68b9443b..2881bab12b01 100644
-> > --- a/mm/cma.c
-> > +++ b/mm/cma.c
-> > @@ -147,8 +147,12 @@ static int __init cma_init_reserved_areas(void)
-> >  {
-> >  	int i;
-> >  
-> > -	for (i = 0; i < cma_area_count; i++)
-> > +	for (i = 0; i < cma_area_count; i++) {
-> > +		/* Region was removed. */
-> > +		if (!cma_areas[i].count)
-> > +			continue;
-> 
-> Skip previously added CMA area (now zeroed out) ?
-
-Yes, that's what I meant with the comment "Region was removed". Do you
-think I should reword the comment?
-
-> 
-> >  		cma_activate_area(&cma_areas[i]);
-> > +	}
-> >  
-> >  	return 0;
-> >  }
-> 
-> cma_init_reserved_areas() gets called via core_initcall(). Some how
-> platform/device needs to call cma_remove_mem() before core_initcall()
-> gets called ? This might be time sensitive.
-
-I don't understand your point.
-
-> 
-> > @@ -216,6 +220,30 @@ int __init cma_init_reserved_mem(phys_addr_t base, phys_addr_t size,
-> >  	return 0;
-> >  }
-> >  
-> > +/**
-> > + * cma_remove_mem() - remove cma area
-> > + * @res_cma: Pointer to the cma region.
-> > + *
-> > + * This function removes a cma region created with cma_init_reserved_mem(). The
-> > + * ->count is set to 0.
-> > + */
-> > +void __init cma_remove_mem(struct cma **res_cma)
-> > +{
-> > +	struct cma *cma;
-> > +
-> > +	if (WARN_ON_ONCE(!res_cma || !(*res_cma)))
-> > +		return;
-> > +
-> > +	cma = *res_cma;
-> > +	if (WARN_ON_ONCE(!cma->count))
-> > +		return;
-> > +
-> > +	totalcma_pages -= cma->count;
-> > +	cma->count = 0;
-> > +
-> > +	*res_cma = NULL;
-> > +}
-> > +
-> >  /**
-> >   * cma_declare_contiguous_nid() - reserve custom contiguous area
-> >   * @base: Base address of the reserved area optional, use 0 for any
-> 
-> But first please do explain what are the errors device or platform might
-
-cma_declare_contiguous_nid() and cma_init_reserved_mem() can fail in a
-number of ways, the code should be self documenting.
-
-> see on a previously marked CMA area so that removing them on way becomes
-> necessary preventing their activation via cma_init_reserved_areas().
-
-I've described how the function is supposed to be used at the top of my
-reply.
-
-Thanks,
-Alex
+Will
