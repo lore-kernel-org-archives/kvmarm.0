@@ -1,26 +1,26 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA92567728
-	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 11:36:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6FBF6A33D
+	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 11:38:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706614565; cv=none; b=YYJi+aXtBkh946KR9zpgx5h6UG4CtTm+oLNz1RpjRmosVppQGXYKY3VyPyTL/XLjXi3OdGttOMfzRGc/UgdzkIKGVSf5bOxDqqmm2VJAX5kEXNn+KfmYi893AxufTkMP8jqTFEEHL9jE/VS8KRHRYWFbu5YfQo+CMsqXT0MPlak=
+	t=1706614694; cv=none; b=BJqmj8qhipm9eXCQVlANynsTVXy+XJoiUgk4XdqhsnstqIzP6HTl65UB4lL61n0YDeTzvhw0BNW8szkRBjZCO/KHeT5bIdMAEJg3b/etznD3QFktreXo2F+NP88y9JcsP56TGZDHZRhj8Z7+m1NKh2bJUBUJZd5E4yXeNdTpwSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706614565; c=relaxed/simple;
-	bh=WAaU6v81gufqF9xiusdx5rm8WpIZ9KbQZ5T5pInSwSg=;
+	s=arc-20240116; t=1706614694; c=relaxed/simple;
+	bh=/DsBAHX8HTlca+Vpy4zDg5DsZ5AAjetwE7nEWjeRix8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PJ9DCjp0tcP7vFTxXRgOeFSWiKtop+ABajy+URAs5o4I+Pj0u+9AwPq3cZAXoNPLdEZzMMcJ0zWyitT517YnwP4ytvWt2IRE3oRknW7IQDthxMY0vvBv2r//Ja1b1pbG7h8yOtJ5WqMvX2+6USHElAuZKMit7JFDaUjr01lCHGA=
+	 Content-Type:Content-Disposition:In-Reply-To; b=IW1Itqzqw8cudOkcbzE8ucWsDqplC9sH72UUGMoJakNb6SSklHd9igzu5aM2vgukDOqkpxqjou2uZmLPAHIPS40P7ViBJcZTiXoayj1OGquYA9cGzvQdiCeuSllMM36NS4gD0FfXci4o2C0na/z70S28ZD4lGMwoOZwDqemMeJQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 09868DA7;
-	Tue, 30 Jan 2024 03:36:47 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2F6CEDA7;
+	Tue, 30 Jan 2024 03:38:54 -0800 (PST)
 Received: from raptor (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D4B3C3F5A1;
-	Tue, 30 Jan 2024 03:35:57 -0800 (PST)
-Date: Tue, 30 Jan 2024 11:35:47 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 070733F5A1;
+	Tue, 30 Jan 2024 03:38:04 -0800 (PST)
+Date: Tue, 30 Jan 2024 11:38:02 +0000
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
+To: Peter Collingbourne <pcc@google.com>
 Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
 	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
 	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
@@ -28,271 +28,143 @@ Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
 	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
 	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
 	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
-	rppt@kernel.org, hughd@google.com, pcc@google.com,
-	steven.price@arm.com, vincenzo.frascino@arm.com, david@redhat.com,
-	eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC v3 08/35] mm: cma: Introduce cma_alloc_range()
-Message-ID: <ZbjfEzlNgprdxfxX@raptor>
+	rppt@kernel.org, hughd@google.com, steven.price@arm.com,
+	anshuman.khandual@arm.com, vincenzo.frascino@arm.com,
+	david@redhat.com, eugenis@google.com, kcc@google.com,
+	hyesoo.yu@samsung.com, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC v3 23/35] arm64: mte: Try to reserve tag storage in
+ arch_alloc_page()
+Message-ID: <ZbjfmqpYex4C8Uhm@raptor>
 References: <20240125164256.4147-1-alexandru.elisei@arm.com>
- <20240125164256.4147-9-alexandru.elisei@arm.com>
- <61a3dbb7-25b6-4f49-aa70-9a8aaeb53365@arm.com>
+ <20240125164256.4147-24-alexandru.elisei@arm.com>
+ <CAMn1gO5pGVRCErVF+Ca-4JgHRKEcq9sDGyEe--gEjj5ZLrB8sA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <61a3dbb7-25b6-4f49-aa70-9a8aaeb53365@arm.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMn1gO5pGVRCErVF+Ca-4JgHRKEcq9sDGyEe--gEjj5ZLrB8sA@mail.gmail.com>
 
-Hi,
+Hi Peter,
 
-On Tue, Jan 30, 2024 at 10:50:00AM +0530, Anshuman Khandual wrote:
-> 
-> 
-> On 1/25/24 22:12, Alexandru Elisei wrote:
-> > Today, cma_alloc() is used to allocate a contiguous memory region. The
-> > function allows the caller to specify the number of pages to allocate, but
-> > not the starting address. cma_alloc() will walk over the entire CMA region
-> > trying to allocate the first available range of the specified size.
-> > 
-> > Introduce cma_alloc_range(), which makes CMA more versatile by allowing the
-> > caller to specify a particular range in the CMA region, defined by the
-> > start pfn and the size.
-> > 
-> > arm64 will make use of this function when tag storage management will be
-> > implemented: cma_alloc_range() will be used to reserve the tag storage
-> > associated with a tagged page.
-> 
-> Basically, you would like to pass on a preferred start address and the
-> allocation could just fail if a contig range is not available from such
-> a starting address ?
-> 
-> Then why not just change cma_alloc() to take a new argument 'start_pfn'.
-> Why create a new but almost similar allocator ?
-
-I tried doing that, and I gave up because:
-
-- It made cma_alloc() even more complex and hard to follow.
-
-- What value should 'start_pfn' be to tell cma_alloc() that it should be
-  ignored? Or, to put it another way, what pfn number is invalid on **all**
-  platforms that Linux supports?
-
-I can give it another go if we can come up with an invalid value for
-'start_pfn'.
-
-> 
-> But then I am wondering why this could not be done in the arm64 platform
-> code itself operating on a CMA area reserved just for tag storage. Unless
-> this new allocator has other usage beyond MTE, this could be implemented
-> in the platform itself.
-
-I had the same idea in the previous iteration, David Hildenbrand suggested
-this approach [1].
-
-[1] https://lore.kernel.org/linux-fsdevel/2aafd53f-af1f-45f3-a08c-d11962254315@redhat.com/
-
-Thanks,
-Alex
-
-> 
-> > 
+On Mon, Jan 29, 2024 at 04:04:18PM -0800, Peter Collingbourne wrote:
+> On Thu, Jan 25, 2024 at 8:45 AM Alexandru Elisei
+> <alexandru.elisei@arm.com> wrote:
+> >
+> > Reserve tag storage for a page that is being allocated as tagged. This
+> > is a best effort approach, and failing to reserve tag storage is
+> > allowed.
+> >
+> > When all the associated tagged pages have been freed, return the tag
+> > storage pages back to the page allocator, where they can be used again for
+> > data allocations.
+> >
 > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > > ---
-> > 
+> >
 > > Changes since rfc v2:
-> > 
-> > * New patch.
-> > 
-> >  include/linux/cma.h        |  2 +
-> >  include/trace/events/cma.h | 59 ++++++++++++++++++++++++++
-> >  mm/cma.c                   | 86 ++++++++++++++++++++++++++++++++++++++
-> >  3 files changed, 147 insertions(+)
-> > 
-> > diff --git a/include/linux/cma.h b/include/linux/cma.h
-> > index 63873b93deaa..e32559da6942 100644
-> > --- a/include/linux/cma.h
-> > +++ b/include/linux/cma.h
-> > @@ -50,6 +50,8 @@ extern int cma_init_reserved_mem(phys_addr_t base, phys_addr_t size,
-> >  					struct cma **res_cma);
-> >  extern struct page *cma_alloc(struct cma *cma, unsigned long count, unsigned int align,
-> >  			      bool no_warn);
-> > +extern int cma_alloc_range(struct cma *cma, unsigned long start, unsigned long count,
-> > +			   unsigned tries, gfp_t gfp);
-> >  extern bool cma_pages_valid(struct cma *cma, const struct page *pages, unsigned long count);
-> >  extern bool cma_release(struct cma *cma, const struct page *pages, unsigned long count);
-> >  
-> > diff --git a/include/trace/events/cma.h b/include/trace/events/cma.h
-> > index 25103e67737c..a89af313a572 100644
-> > --- a/include/trace/events/cma.h
-> > +++ b/include/trace/events/cma.h
-> > @@ -36,6 +36,65 @@ TRACE_EVENT(cma_release,
-> >  		  __entry->count)
-> >  );
-> >  
-> > +TRACE_EVENT(cma_alloc_range_start,
+> >
+> > * Based on rfc v2 patch #16 ("arm64: mte: Manage tag storage on page
+> > allocation").
+> > * Fixed calculation of the number of associated tag storage blocks (Hyesoo
+> > Yu).
+> > * Tag storage is reserved in arch_alloc_page() instead of
+> > arch_prep_new_page().
+> >
+> >  arch/arm64/include/asm/mte.h             |  16 +-
+> >  arch/arm64/include/asm/mte_tag_storage.h |  31 +++
+> >  arch/arm64/include/asm/page.h            |   5 +
+> >  arch/arm64/include/asm/pgtable.h         |  19 ++
+> >  arch/arm64/kernel/mte_tag_storage.c      | 234 +++++++++++++++++++++++
+> >  arch/arm64/mm/fault.c                    |   7 +
+> >  fs/proc/page.c                           |   1 +
+> >  include/linux/kernel-page-flags.h        |   1 +
+> >  include/linux/page-flags.h               |   1 +
+> >  include/trace/events/mmflags.h           |   3 +-
+> >  mm/huge_memory.c                         |   1 +
+> >  11 files changed, 316 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/mte.h b/arch/arm64/include/asm/mte.h
+> > index 8034695b3dd7..6457b7899207 100644
+> > --- a/arch/arm64/include/asm/mte.h
+> > +++ b/arch/arm64/include/asm/mte.h
+> > @@ -40,12 +40,24 @@ void mte_free_tag_buf(void *buf);
+> >  #ifdef CONFIG_ARM64_MTE
+> >
+> >  /* track which pages have valid allocation tags */
+> > -#define PG_mte_tagged  PG_arch_2
+> > +#define PG_mte_tagged          PG_arch_2
+> >  /* simple lock to avoid multiple threads tagging the same page */
+> > -#define PG_mte_lock    PG_arch_3
+> > +#define PG_mte_lock            PG_arch_3
+> > +/* Track if a tagged page has tag storage reserved */
+> > +#define PG_tag_storage_reserved        PG_arch_4
 > > +
-> > +	TP_PROTO(const char *name, unsigned long start, unsigned long count,
-> > +		 unsigned tries),
+> > +#ifdef CONFIG_ARM64_MTE_TAG_STORAGE
+> > +DECLARE_STATIC_KEY_FALSE(tag_storage_enabled_key);
+> > +extern bool page_tag_storage_reserved(struct page *page);
+> > +#endif
+> >
+> >  static inline void set_page_mte_tagged(struct page *page)
+> >  {
+> > +#ifdef CONFIG_ARM64_MTE_TAG_STORAGE
+> > +       /* Open code mte_tag_storage_enabled() */
+> > +       WARN_ON_ONCE(static_branch_likely(&tag_storage_enabled_key) &&
+> > +                    !page_tag_storage_reserved(page));
+> > +#endif
+> >         /*
+> >          * Ensure that the tags written prior to this function are visible
+> >          * before the page flags update.
+> > diff --git a/arch/arm64/include/asm/mte_tag_storage.h b/arch/arm64/include/asm/mte_tag_storage.h
+> > index 7b3f6bff8e6f..09f1318d924e 100644
+> > --- a/arch/arm64/include/asm/mte_tag_storage.h
+> > +++ b/arch/arm64/include/asm/mte_tag_storage.h
+> > @@ -5,6 +5,12 @@
+> >  #ifndef __ASM_MTE_TAG_STORAGE_H
+> >  #define __ASM_MTE_TAG_STORAGE_H
+> >
+> > +#ifndef __ASSEMBLY__
 > > +
-> > +	TP_ARGS(name, start, count, tries),
+> > +#include <linux/mm_types.h>
 > > +
-> > +	TP_STRUCT__entry(
-> > +		__string(name, name)
-> > +		__field(unsigned long, start)
-> > +		__field(unsigned long, count)
-> > +		__field(unsigned, tries)
-> > +	),
+> > +#include <asm/mte.h>
 > > +
-> > +	TP_fast_assign(
-> > +		__assign_str(name, name);
-> > +		__entry->start = start;
-> > +		__entry->count = count;
-> > +		__entry->tries = tries;
-> > +	),
+> >  #ifdef CONFIG_ARM64_MTE_TAG_STORAGE
+> >
+> >  DECLARE_STATIC_KEY_FALSE(tag_storage_enabled_key);
+> > @@ -15,6 +21,15 @@ static inline bool tag_storage_enabled(void)
+> >  }
+> >
+> >  void mte_init_tag_storage(void);
 > > +
-> > +	TP_printk("name=%s start=%lx count=%lu tries=%u",
-> > +		  __get_str(name),
-> > +		  __entry->start,
-> > +		  __entry->count,
-> > +		  __entry->tries)
-> > +);
-> > +
-> > +TRACE_EVENT(cma_alloc_range_finish,
-> > +
-> > +	TP_PROTO(const char *name, unsigned long start, unsigned long count,
-> > +		 unsigned attempts, int err),
-> > +
-> > +	TP_ARGS(name, start, count, attempts, err),
-> > +
-> > +	TP_STRUCT__entry(
-> > +		__string(name, name)
-> > +		__field(unsigned long, start)
-> > +		__field(unsigned long, count)
-> > +		__field(unsigned, attempts)
-> > +		__field(int, err)
-> > +	),
-> > +
-> > +	TP_fast_assign(
-> > +		__assign_str(name, name);
-> > +		__entry->start = start;
-> > +		__entry->count = count;
-> > +		__entry->attempts = attempts;
-> > +		__entry->err = err;
-> > +	),
-> > +
-> > +	TP_printk("name=%s start=%lx count=%lu attempts=%u err=%d",
-> > +		  __get_str(name),
-> > +		  __entry->start,
-> > +		  __entry->count,
-> > +		  __entry->attempts,
-> > +		  __entry->err)
-> > +);
-> > +
-> >  TRACE_EVENT(cma_alloc_start,
-> >  
-> >  	TP_PROTO(const char *name, unsigned long count, unsigned int align),
-> > diff --git a/mm/cma.c b/mm/cma.c
-> > index 543bb6b3be8e..4a0f68b9443b 100644
-> > --- a/mm/cma.c
-> > +++ b/mm/cma.c
-> > @@ -416,6 +416,92 @@ static void cma_debug_show_areas(struct cma *cma)
-> >  static inline void cma_debug_show_areas(struct cma *cma) { }
-> >  #endif
-> >  
-> > +/**
-> > + * cma_alloc_range() - allocate pages in a specific range
-> > + * @cma:   Contiguous memory region for which the allocation is performed.
-> > + * @start: Starting pfn of the allocation.
-> > + * @count: Requested number of pages
-> > + * @tries: Number of tries if the range is busy
-> > + * @no_warn: Avoid printing message about failed allocation
-> > + *
-> > + * This function allocates part of contiguous memory from a specific contiguous
-> > + * memory area, from the specified starting address. The 'start' pfn and the the
-> > + * 'count' number of pages must be aligned to the CMA bitmap order per bit.
-> > + */
-> > +int cma_alloc_range(struct cma *cma, unsigned long start, unsigned long count,
-> > +		    unsigned tries, gfp_t gfp)
+> > +static inline bool alloc_requires_tag_storage(gfp_t gfp)
 > > +{
-> > +	unsigned long bitmap_maxno, bitmap_no, bitmap_start, bitmap_count;
-> > +	unsigned long i = 0;
-> > +	struct page *page;
-> > +	int err = -EINVAL;
-> > +
-> > +	if (!cma || !cma->count || !cma->bitmap)
-> > +		goto out_stats;
-> > +
-> > +	trace_cma_alloc_range_start(cma->name, start, count, tries);
-> > +
-> > +	if (!count || start < cma->base_pfn ||
-> > +	    start + count > cma->base_pfn + cma->count)
-> > +		goto out_stats;
-> > +
-> > +	if (!IS_ALIGNED(start | count, 1 << cma->order_per_bit))
-> > +		goto out_stats;
-> > +
-> > +	bitmap_start = (start - cma->base_pfn) >> cma->order_per_bit;
-> > +	bitmap_maxno = cma_bitmap_maxno(cma);
-> > +	bitmap_count = cma_bitmap_pages_to_bits(cma, count);
-> > +
-> > +	spin_lock_irq(&cma->lock);
-> > +	bitmap_no = bitmap_find_next_zero_area(cma->bitmap, bitmap_maxno,
-> > +					       bitmap_start, bitmap_count, 0);
-> > +	if (bitmap_no != bitmap_start) {
-> > +		spin_unlock_irq(&cma->lock);
-> > +		err = -EEXIST;
-> > +		goto out_stats;
-> > +	}
-> > +	bitmap_set(cma->bitmap, bitmap_start, bitmap_count);
-> > +	spin_unlock_irq(&cma->lock);
-> > +
-> > +	for (i = 0; i < tries; i++) {
-> > +		mutex_lock(&cma_mutex);
-> > +		err = alloc_contig_range(start, start + count, MIGRATE_CMA, gfp);
-> > +		mutex_unlock(&cma_mutex);
-> > +
-> > +		if (err != -EBUSY)
-> > +			break;
-> > +	}
-> > +
-> > +	if (err) {
-> > +		cma_clear_bitmap(cma, start, count);
-> > +	} else {
-> > +		page = pfn_to_page(start);
-> > +
-> > +		/*
-> > +		 * CMA can allocate multiple page blocks, which results in
-> > +		 * different blocks being marked with different tags. Reset the
-> > +		 * tags to ignore those page blocks.
-> > +		 */
-> > +		for (i = 0; i < count; i++)
-> > +			page_kasan_tag_reset(nth_page(page, i));
-> > +	}
-> > +
-> > +out_stats:
-> > +	trace_cma_alloc_range_finish(cma->name, start, count, i, err);
-> > +
-> > +	if (err) {
-> > +		count_vm_events(CMA_ALLOC_FAIL, count);
-> > +		if (cma)
-> > +			cma_sysfs_account_fail_pages(cma, count);
-> > +	} else {
-> > +		count_vm_events(CMA_ALLOC_SUCCESS, count);
-> > +		cma_sysfs_account_success_pages(cma, count);
-> > +	}
-> > +
-> > +	return err;
+> > +       return gfp & __GFP_TAGGED;
 > > +}
+> > +int reserve_tag_storage(struct page *page, int order, gfp_t gfp);
+> > +void free_tag_storage(struct page *page, int order);
 > > +
-> > +
-> >  /**
-> >   * cma_alloc() - allocate pages from contiguous area
-> >   * @cma:   Contiguous memory region for which the allocation is performed.
+> > +bool page_tag_storage_reserved(struct page *page);
+> >  #else
+> >  static inline bool tag_storage_enabled(void)
+> >  {
+> > @@ -23,6 +38,22 @@ static inline bool tag_storage_enabled(void)
+> >  static inline void mte_init_tag_storage(void)
+> >  {
+> >  }
+> > +static inline bool alloc_requires_tag_storage(struct page *page)
 > 
+> This function should take a gfp_t to match the
+> CONFIG_ARM64_MTE_TAG_STORAGE case.
+
+Ah, yes, it should, nice catch, the compiler didn't throw an error. Will
+fix, thanks!
+
+Alex
