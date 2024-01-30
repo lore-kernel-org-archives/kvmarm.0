@@ -1,86 +1,179 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3187678B52;
-	Tue, 30 Jan 2024 21:40:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7587EF0A
+	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 23:58:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706650850; cv=none; b=TJo3QyfBWGfV8E1jJGoItEA2IiyAqBgzJgqvL0Zv6E61UILTLyr0WKU/me4yK9Pt0UubbBl87N9yvpXLNJImEyWfaeYDLE2+h4wkb9vcFCW5mLNfqesF8fzjdec0LYzvBsumMw3AZdjR6KHBrk1Z/THM72TcFqpGCrY5C4B797w=
+	t=1706659124; cv=none; b=gzFppVHno7bmr6vP7U8UMtqI8JjVUXpqsLv5i0clv2QbTARr4Otl98zDv90ZOI6yfMt+O8AstjpIV+ocy2ky0gJjUADjRacN6m0x6k27zOg2FgYDhgRORb9KoRyaO4pZQEK1RrMN1rwTr1She9D6AQcITEGe0OS/meg0IJs05zE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706650850; c=relaxed/simple;
-	bh=pnAGIah8tDwiGmWDjULK1v1d3MLSt9GYUDCogaBsWHo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CaDucR3yaUa70qNOj1zYTmb4/MV07Z5UEaUU9ugHf/xdoUvjr6xa8/JT1YGLgXpfpGzRpOFt3H+nBFb39l5az6/f5M7G/rPrH8/vPMnWRlFbyLY8iyjqjV2hCNo6DrFFwZstAPZPiG3wq0lmUUIUeVl66HA8hAJS6BD6W+ECbM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PS5LsMnj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706659124; c=relaxed/simple;
+	bh=mqasyqEC+6fRhw5/p/l75otWoegYgzBu1zpsELr1ZTo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HDdPW4OLKaNvOf60y05iIIQpyRtCXCRi52b/VMc7towlrOhW68lGwSbgio3nzmBWoXpkg+/5/L3FXcHwL+1KzEymV88EtJsVXMVFTYKPqYr/D50cMg0APlK7F2PchoKp5nDjR6EY4xarvmfQ9Iktz5SDx4MThCKGQ1UIHaBhYAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WX3TNOoJ; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PS5LsMnj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA7A1C433C7;
-	Tue, 30 Jan 2024 21:40:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706650849;
-	bh=pnAGIah8tDwiGmWDjULK1v1d3MLSt9GYUDCogaBsWHo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PS5LsMnjn7Mbhs/Ij/7IDcnvl7UE3Kc9Cd4jIBG41zOwUg5pRGa8B/NQym6H4+J53
-	 zzTfwxKRGuOtwlBEm8UhSzwuEr1bbZmt/S5IcXEMAafUoliin1pyE6PH0jTH/KB3Ui
-	 nO3pvM6w0m6sKxodc2DogEdVlNta7XMT+zj0V4hoY+60mItBtiX6YOrmeccXs63c3m
-	 Pk29OiSeYXfO5yQhNrign4ozByI9vlJtxiakBeyec2hJ53DULGUE/VYtKokpgysX27
-	 djt8hj1WwehzMmQo4b2joiZ6fMajmpRNUDCHySxyaQjzQ8vYurH6iZZcU23i60PPP9
-	 QsVqPZfGNC2Wg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rUvqZ-00GOhj-Hv;
-	Tue, 30 Jan 2024 21:40:47 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Sebastian Ene <sebastianene@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kernel-team@android.com,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2] KVM: arm64: Fix circular locking dependency
-Date: Tue, 30 Jan 2024 21:40:43 +0000
-Message-Id: <170665083753.694736.5736115942255110234.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240124091027.1477174-2-sebastianene@google.com>
-References: <20240124091027.1477174-2-sebastianene@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WX3TNOoJ"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d8d08f9454so37555ad.1
+        for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 15:58:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706659122; x=1707263922; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1u062nTR9tMZBKXAMw2gk2T6BiQu6ezEgEfg4ndl1uI=;
+        b=WX3TNOoJGbAWc5k1iLpMdwwUnxvopx8uoJ8KM43+A56ck45+7BduSkRq9+D2EodJ05
+         9HM9bdhK09tvWV7ZQ1z5S8gvFQgNdHkVR3Dvo5UzC9wTlmZ6psOLqsGv7Cuwj+0dPNLD
+         o5aBnv2Sf+DRfKIgTXzJ6sEl1ZWZHiyQCTjCHnhZSJECIGTn1Bvwzmpe4stpJgaRIN2A
+         FzeoJYi0r+R62QyflJC1HRrHkERybkchUKjG2BS1LU68q13aB/pfrD+esFckKg9oHUZK
+         Y4bp7DKcJmhZfhcLEb7pFimZlkFcnAi+kVkD9gOxBqJWQYhnqMeav2U1STVmysmmPM6g
+         qDHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706659122; x=1707263922;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1u062nTR9tMZBKXAMw2gk2T6BiQu6ezEgEfg4ndl1uI=;
+        b=oTskkcuGCwF5TEVLwUKSbdfFIbUIKx//QRcqkZFf0W2neg0H1oBSaS3IM2Lu6hVUKY
+         XtelKSf8sDrqcI/Dx37EHXgInm+lj1NJ+0ERB2jCyKN3Om3/PJcjdlO26g7HYQwx4494
+         AnVexVQK2ZEJEtMHFdnnyl4tyzaAIOBcJ0+X5KngsG/Agm+6J/nwA1iztJdAaPgnfGiI
+         BfMSmnAfUtZ3BjKW8BxJXS1SqxfNXRoBGKOLc7X4FyQxACJuXd9RhHiPO7Sg4hkDNPsO
+         0BdrREY76931MQdFfPFPpP+9kWMLUPcoDvMDvpRNJ21WEh9idB48jgzlwC+jGcTPefO+
+         rCuA==
+X-Gm-Message-State: AOJu0YwDaLYwx5eLpGYZ5WtWAeUX8wScbukdd45K7muITGPyd84ucrnp
+	oqYaWV+mL+F5RQvl42O4+r4BWIhARsafh/9rwCtUBfiMAkqWK7cRt7zuSeboIqO4X2dvhQQWwcx
+	nZmOOUPETze54WFbLKKBtP/2Xyad7btKTe+1j
+X-Google-Smtp-Source: AGHT+IHcdkeyLXa6XCtLDjnDduk6glUOICOD9kwov8c2Kod0b9O1y98HahUbVVMf9/ahZ+kp6Ql6PausH1jHqmGnf44=
+X-Received: by 2002:a17:902:f688:b0:1d8:e7a1:8a87 with SMTP id
+ l8-20020a170902f68800b001d8e7a18a87mr405401plg.20.1706659122320; Tue, 30 Jan
+ 2024 15:58:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, oliver.upton@linux.dev, sebastianene@google.com, catalin.marinas@arm.com, yuzenghui@huawei.com, will@kernel.org, james.morse@arm.com, kvmarm@lists.linux.dev, kernel-team@android.com, linux-kernel@vger.kernel.org, stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-10-amoorthy@google.com>
+In-Reply-To: <20231109210325.3806151-10-amoorthy@google.com>
+From: James Houghton <jthoughton@google.com>
+Date: Tue, 30 Jan 2024 15:58:04 -0800
+Message-ID: <CADrL8HXLF+EQZt+oXJAiatoJNzz2E-fiwUSJj=YpHzGQxL00mQ@mail.gmail.com>
+Subject: Re: [PATCH v6 09/14] KVM: arm64: Enable KVM_CAP_EXIT_ON_MISSING and
+ annotate an EFAULT from stage-2 fault-handler
+To: Anish Moorthy <amoorthy@google.com>
+Cc: seanjc@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	oliver.upton@linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	robert.hoo.linux@gmail.com, dmatlack@google.com, axelrasmussen@google.com, 
+	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
+	kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 24 Jan 2024 09:10:28 +0000, Sebastian Ene wrote:
-> The rule inside kvm enforces that the vcpu->mutex is taken *inside*
-> kvm->lock. The rule is violated by the pkvm_create_hyp_vm() which acquires
-> the kvm->lock while already holding the vcpu->mutex lock from
-> kvm_vcpu_ioctl(). Avoid the circular locking dependency altogether by
-> protecting the hyp vm handle with the config_lock, much like we already
-> do for other forms of VM-scoped data.
+Hi Anish,
 
-Applied to fixes, thanks!
+Sorry to get back to you so late. :) I was hoping others would provide
+more feedback, but I have a little bit to give anyway. Overall the
+series looks good to me.
 
-[1/1] KVM: arm64: Fix circular locking dependency
-      commit: 10c02aad111df02088d1a81792a709f6a7eca6cc
+On Thu, Nov 9, 2023 at 1:03=E2=80=AFPM Anish Moorthy <amoorthy@google.com> =
+wrote:
+>
+> Prevent the stage-2 fault handler from faulting in pages when
+> KVM_MEM_EXIT_ON_MISSING is set by allowing its  __gfn_to_pfn_memslot()
+> calls to check the memslot flag.
+>
+> To actually make that behavior useful, prepare a KVM_EXIT_MEMORY_FAULT
+> when the stage-2 handler cannot resolve the pfn for a fault. With
+> KVM_MEM_EXIT_ON_MISSING enabled this effects the delivery of stage-2
+> faults as vCPU exits, which userspace can attempt to resolve without
+> terminating the guest.
+>
+> Delivering stage-2 faults to userspace in this way sidesteps the
+> significant scalabiliy issues associated with using userfaultfd for the
+> same purpose.
+>
+> Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst | 2 +-
+>  arch/arm64/kvm/Kconfig         | 1 +
+>  arch/arm64/kvm/mmu.c           | 7 +++++--
+>  3 files changed, 7 insertions(+), 3 deletions(-)
+>
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
+rst
+> index fd87bbfbfdf2..67fcb9dbe855 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -8068,7 +8068,7 @@ See KVM_EXIT_MEMORY_FAULT for more information.
+>  7.35 KVM_CAP_EXIT_ON_MISSING
+>  ----------------------------
+>
+> -:Architectures: x86
+> +:Architectures: x86, arm64
+>  :Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
+>
+>  The presence of this capability indicates that userspace may set the
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 1a777715199f..d6fae31f7e1a 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -43,6 +43,7 @@ menuconfig KVM
+>         select GUEST_PERF_EVENTS if PERF_EVENTS
+>         select INTERVAL_TREE
+>         select XARRAY_MULTI
+> +        select HAVE_KVM_EXIT_ON_MISSING
+>         help
+>           Support hosting virtualized guest machines.
+>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 13066a6fdfff..3b9fb80672ac 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1486,13 +1486,16 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, =
+phys_addr_t fault_ipa,
+>         mmap_read_unlock(current->mm);
+>
+>         pfn =3D __gfn_to_pfn_memslot(memslot, gfn, false, false, NULL,
+> -                                  write_fault, &writable, false, NULL);
+> +                                  write_fault, &writable, true, NULL);
+>         if (pfn =3D=3D KVM_PFN_ERR_HWPOISON) {
+>                 kvm_send_hwpoison_signal(hva, vma_shift);
+>                 return 0;
+>         }
+> -       if (is_error_noslot_pfn(pfn))
+> +       if (is_error_noslot_pfn(pfn)) {
+> +               kvm_prepare_memory_fault_exit(vcpu, gfn * PAGE_SIZE, PAGE=
+_SIZE,
+> +                                             write_fault, exec_fault, fa=
+lse);
 
-Cheers,
+I think that either (1) we move this kvm_prepare_memory_fault_exit
+logic into the previous patch[1], or (2) we merge this patch with the
+previous one. IIUC, we can only advertise KVM_CAP_MEMORY_FAULT_INFO on
+arm64 if this logic is present.
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+As for the changelog in the previous patch[1], if you leave it
+unmerged with this one, something like "Enable
+KVM_CAP_MEMORY_FAULT_INFO to make KVM_CAP_EXIT_ON_MISSING useful, as
+without it, userspace doesn't know which page(s) of memory it needs to
+fix" works for me.
 
+Also, I think we need to update the documentation for
+KVM_CAP_MEMORY_FAULT_INFO to say that it is available for arm64 now
+(just like you have done for KVM_CAP_EXIT_ON_MISSING).
 
+Thanks!
+
+[1]: https://lore.kernel.org/kvm/20231109210325.3806151-9-amoorthy@google.c=
+om/
+
+>                 return -EFAULT;
+> +       }
+>
+>         if (kvm_is_device_pfn(pfn)) {
+>                 /*
+> --
+> 2.42.0.869.gea05f2083d-goog
+>
