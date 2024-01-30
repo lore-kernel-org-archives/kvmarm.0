@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D313169D35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D30F35B1F6
 	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 20:45:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706647547; cv=none; b=jFK+JZBjQzsGhQpK0IVG1xNVdTWAYtG+1aZQjksD8kbokOnA53mOSnG/pREhW6KQ6sb9d7qxyINe7CdI68Lj3ORlbcJB+znPTlShtcVK+Ch4Il8stRN4ju3sRwIS67yvk+TdgjDn0BS2D+rAfS8qteoe9r97sfj3Cbh4mJoRcZA=
+	t=1706647547; cv=none; b=G1padtIrlLePLFcXEKltgWx85+TQk4HM08OJxQiClc1t3/6p+gHy1OlT6JjVCU4uPX8JMz9oGEOJvdgc71gQeYQRhSsIFYDk/UFs1RowhdWloq3iT34GvB9mqRURrPLASfDua+wjlcFXD44KgFnxs4T26/912cyICl2UmGSxuaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706647547; c=relaxed/simple;
-	bh=V4jsnFkvC/c/9ZemWtmHqJ/PM7bk5w2NZRCjWXInV9g=;
+	bh=YRUIO2rTLXTmxXp1dO9dENX9mdM8SujfC3o0pZZe0LE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=m5NsFUuD7pPt5yZesPTy9LvjJpB/ihWaNeM4RLVirr0k/n73dqf2X4SRLsjm801BrqBxfsBB3IEZ7x3oe7RS1piRwVFVNGXfQfhPHwNdFX3u3wZR5EXGpEg9CVvPUDe4jJifF36vVeUThQ7KzvOMFfgPRYMXSvYD3Tms8Id98xY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=caY0ec0B; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=qESRYaN8hvUAkQ+QdxiTEvHq82iekJN0HbvYQxcy+uDhsn3lm6+9189TvbQw4PyswtF7hiRKi3B4qxCWGFnf7s50kmWQEFb1cdBEbaLt0LWZJMJx7DL1pYQ0IdlZISlTKSHY1/c87slEu0ThLdgjnkGIK6+hKxoLzgjFZn/sKMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qh9WGUCH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="caY0ec0B"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 824F3C43609;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qh9WGUCH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82DDBC43142;
 	Tue, 30 Jan 2024 20:45:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1706647547;
-	bh=V4jsnFkvC/c/9ZemWtmHqJ/PM7bk5w2NZRCjWXInV9g=;
+	bh=YRUIO2rTLXTmxXp1dO9dENX9mdM8SujfC3o0pZZe0LE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=caY0ec0BkYihKE8bfL8x+8/+sxUrPdUdO5qdHyx5VCMlLFX6/UqwUxtCFg1eAHlK2
-	 VJibvSXw/T9y7/P/RISroWQ5rACw1t8kTIpT+m/ESU4vzDwOHd1odRiAn/WK36nw4t
-	 skPQT3B3EM99S7b+yHXbvxxvTSNb+JvxPAw7tgrBoApMxYdFlF6zBaIro5BvqGITqM
-	 AIKw+TTqy59bJEViMjnQBDQlo6cnrwK9c0WjuzeOquWxRwbsOP2OYl9xBn+icykKCJ
-	 9aELeWMks8Wxj6NPfycDZPhEQR/dqgQubTlr5YdbKbe853Ulh/bzDVOvyjkGbQk1ao
-	 UO4tx0ihRhicQ==
+	b=Qh9WGUCH3EkKoyn+RHO43TVjK9Fgs0UFphRaLvUEs9h/O3nPBvbYRDssni+Fx/Huv
+	 KtyKPwhPdFkGfY9UIdWOQ8UhjGO84ULUxCdmUtMHMDOKCzPcPKPgzK2U1wDld+31i2
+	 eW5F6pfb8yLEBH3XFcpW+hevN/a3R/ueRQFYDu4fUIM/hdXGj0lUjyONS+5q1hlNmc
+	 XBGddcAjLymFXzXAf8UnM1FAq+jy7+i2Jujkfav7m2R5W+Zs9Ck30VZQ9M9JSWZnjW
+	 yl5yGVksFpLYjU60k3d5omGnOmOBonM5dQAj1Lw8lR25ytdkq74L3LgURxzWfTwEoE
+	 Tr9k8MGGI5JWA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rUuzJ-00GNsE-KJ;
+	id 1rUuzJ-00GNsE-Dx;
 	Tue, 30 Jan 2024 20:45:45 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v2 04/25] KVM: arm64: nv: Add sanitising to EL2 configuration registers
-Date: Tue, 30 Jan 2024 20:45:11 +0000
-Message-Id: <20240130204533.693853-5-maz@kernel.org>
+Subject: [PATCH v2 03/25] KVM: arm64: nv: Add sanitising to VNCR-backed sysregs
+Date: Tue, 30 Jan 2024 20:45:10 +0000
+Message-Id: <20240130204533.693853-4-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240130204533.693853-1-maz@kernel.org>
 References: <20240130204533.693853-1-maz@kernel.org>
@@ -61,97 +61,152 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We can now start making use of our sanitising masks by setting them
-to values that depend on the guest's configuration.
+VNCR-backed "registers" are actually only memory. Which means that
+there is zero control over what the guest can write, and that it
+is the hypervisor's job to actually sanitise the content of the
+backing store. Yeah, this is fun.
 
-First up are VTTBR_EL2, VTCR_EL2, VMPIDR_EL2 and HCR_EL2.
+In order to preserve some form of sanity, add a repainting mechanism
+that makes use of a per-VM set of RES0/RES1 masks, one pair per VNCR
+register. These masks get applied on access to the backing store via
+__vcpu_sys_reg(), ensuring that the state that is consumed by KVM is
+correct.
+
+So far, nothing populates these masks, but stay tuned.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/nested.c | 56 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 55 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_host.h | 22 ++++++++++++++++-
+ arch/arm64/kvm/arm.c              |  1 +
+ arch/arm64/kvm/nested.c           | 41 ++++++++++++++++++++++++++++++-
+ 3 files changed, 62 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index c976cd4b8379..ee461e630527 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -181,7 +181,7 @@ u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg sr)
- 	return v;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index c0cf9c5f5e8d..816288e2d735 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -238,6 +238,8 @@ static inline u16 kvm_mpidr_index(struct kvm_mpidr_data *data, u64 mpidr)
+ 	return index;
  }
  
--static void __maybe_unused set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u64 res1)
-+static void set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u64 res1)
- {
- 	int i = sr - __VNCR_START__;
++struct kvm_sysreg_masks;
++
+ struct kvm_arch {
+ 	struct kvm_s2_mmu mmu;
  
-@@ -191,6 +191,7 @@ static void __maybe_unused set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u
+@@ -312,6 +314,9 @@ struct kvm_arch {
+ #define KVM_ARM_ID_REG_NUM	(IDREG_IDX(sys_reg(3, 0, 0, 7, 7)) + 1)
+ 	u64 id_regs[KVM_ARM_ID_REG_NUM];
  
++	/* Masks for VNCR-baked sysregs */
++	struct kvm_sysreg_masks	*sysreg_masks;
++
+ 	/*
+ 	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
+ 	 * the associated pKVM instance in the hypervisor.
+@@ -474,6 +479,13 @@ enum vcpu_sysreg {
+ 	NR_SYS_REGS	/* Nothing after this line! */
+ };
+ 
++struct kvm_sysreg_masks {
++	struct {
++		u64	res0;
++		u64	res1;
++	} mask[NR_SYS_REGS - __VNCR_START__];
++};
++
+ struct kvm_cpu_context {
+ 	struct user_pt_regs regs;	/* sp = sp_el0 */
+ 
+@@ -868,7 +880,15 @@ static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
+ 
+ #define ctxt_sys_reg(c,r)	(*__ctxt_sys_reg(c,r))
+ 
+-#define __vcpu_sys_reg(v,r)	(ctxt_sys_reg(&(v)->arch.ctxt, (r)))
++u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *, enum vcpu_sysreg);
++#define __vcpu_sys_reg(v,r)						\
++	(*({								\
++		const struct kvm_cpu_context *ctxt = &(v)->arch.ctxt;	\
++		u64 *__r = __ctxt_sys_reg(ctxt, (r));			\
++		if (vcpu_has_nv((v)) && (r) >= __VNCR_START__)		\
++			*__r = kvm_vcpu_sanitise_vncr_reg((v), (r));	\
++		__r;							\
++	}))
+ 
+ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg);
+ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index a25265aca432..c063e84fc72c 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -206,6 +206,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 		pkvm_destroy_hyp_vm(kvm);
+ 
+ 	kfree(kvm->arch.mpidr_data);
++	kfree(kvm->arch.sysreg_masks);
+ 	kvm_destroy_vcpus(kvm);
+ 
+ 	kvm_unshare_hyp(kvm, kvm + 1);
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index d55e809e26cb..c976cd4b8379 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -163,15 +163,54 @@ static u64 limit_nv_id_reg(u32 id, u64 val)
+ 
+ 	return val;
+ }
++
++u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg sr)
++{
++	u64 v = ctxt_sys_reg(&vcpu->arch.ctxt, sr);
++	struct kvm_sysreg_masks *masks;
++
++	masks = vcpu->kvm->arch.sysreg_masks;
++
++	if (masks) {
++		sr -= __VNCR_START__;
++
++		v &= ~masks->mask[sr].res0;
++		v |= masks->mask[sr].res1;
++	}
++
++	return v;
++}
++
++static void __maybe_unused set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u64 res1)
++{
++	int i = sr - __VNCR_START__;
++
++	kvm->arch.sysreg_masks->mask[i].res0 = res0;
++	kvm->arch.sysreg_masks->mask[i].res1 = res1;
++}
++
  int kvm_init_nv_sysregs(struct kvm *kvm)
  {
-+	u64 res0, res1;
- 	int ret = 0;
- 
++	int ret = 0;
++
  	mutex_lock(&kvm->arch.config_lock);
-@@ -209,6 +210,59 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
+ 
++	if (kvm->arch.sysreg_masks)
++		goto out;
++
++	kvm->arch.sysreg_masks = kzalloc(sizeof(*(kvm->arch.sysreg_masks)),
++					 GFP_KERNEL);
++	if (!kvm->arch.sysreg_masks) {
++		ret = -ENOMEM;
++		goto out;
++	}
++
+ 	for (int i = 0; i < KVM_ARM_ID_REG_NUM; i++)
  		kvm->arch.id_regs[i] = limit_nv_id_reg(IDX_IDREG(i),
  						       kvm->arch.id_regs[i]);
  
-+	/* VTTBR_EL2 */
-+	res0 = res1 = 0;
-+	if (!kvm_has_feat_enum(kvm, ID_AA64MMFR1_EL1, VMIDBits, 16))
-+		res0 |= GENMASK(63, 56);
-+	set_sysreg_masks(kvm, VTTBR_EL2, res0, res1);
-+
-+	/* VTCR_EL2 */
-+	res0 = GENMASK(63, 32) | GENMASK(30, 20);
-+	res1 = BIT(31);
-+	set_sysreg_masks(kvm, VTCR_EL2, res0, res1);
-+
-+	/* VMPIDR_EL2 */
-+	res0 = GENMASK(63, 40) | GENMASK(30, 24);
-+	res1 = BIT(31);
-+	set_sysreg_masks(kvm, VMPIDR_EL2, res0, res1);
-+
-+	/* HCR_EL2 */
-+	res0 = BIT(48);
-+	res1 = HCR_RW;
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, TWED, IMP))
-+		res0 |= GENMASK(63, 59);
-+	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, MTE, MTE2))
-+		res0 |= (HCR_TID5 | HCR_DCT | HCR_ATA);
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, EVT, TTLBxS))
-+		res0 |= (HCR_TTLBIS | HCR_TTLBOS);
-+	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, CSV2, CSV2_2) &&
-+	    !kvm_has_feat(kvm, ID_AA64PFR1_EL1, CSV2_frac, CSV2_1p2))
-+		res1 = HCR_ENSCXT;
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, EVT, IMP))
-+		res0 |= (HCR_TID4 | HCR_TICAB | HCR_TOCU);
-+	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, V1P1))
-+		res0 |= HCR_AMVOFFEN;
-+	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, V1P1))
-+		res0 |= HCR_FIEN;
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, FWB, IMP))
-+		res0 |= HCR_FWB;
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, NV, NV2))
-+		res0 |= HCR_NV2;
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, NV, IMP))
-+		res0 |= (HCR_AT | HCR_NV1 | HCR_NV);
-+	if (!(__vcpu_has_feature(&kvm->arch, KVM_ARM_VCPU_PTRAUTH_ADDRESS) &&
-+	      __vcpu_has_feature(&kvm->arch, KVM_ARM_VCPU_PTRAUTH_ADDRESS)))
-+		res0 |= (HCR_API | HCR_APK);
-+	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TME, IMP))
-+		res0 |= BIT(39);
-+	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP))
-+		res0 |= (HCR_TERR | HCR_TEA);
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, LO, IMP))
-+		res0 |= HCR_TLOR;
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR4_EL1, E2H0, IMP))
-+		res1 |= HCR_E2H;
-+	set_sysreg_masks(kvm, HCR_EL2, res0, res1);
-+
- out:
++out:
  	mutex_unlock(&kvm->arch.config_lock);
  
+-	return 0;
++	return ret;
+ }
 -- 
 2.39.2
 
