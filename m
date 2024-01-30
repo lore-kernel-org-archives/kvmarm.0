@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE8471B4C
-	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 20:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13AD771B58
+	for <kvmarm@lists.linux.dev>; Tue, 30 Jan 2024 20:45:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706647550; cv=none; b=lm/pgBozTjsWbhJxmef9GNuxdZ17di9bv8HgFGY1eTfGv4Ao1HpILdetzXMFytBCcbdhcwkQMYM60Be5Js0+j8Uu6vKu603XEg6jyxpyydkxw3+ptCS6r5LJVhcSpUCrYh9K/cCsQWTz0D3Xdhj0WomdWzUABfn1t41kPZs1pco=
+	t=1706647551; cv=none; b=aiPlyCPoipg/gxeYN/XanEdaEbj9dRvNc5SbhqN3KG/8MtKvPigTqa36yIYjC1PdFSDB+V2Gf4cu0NIPtLLO4oxho3GIaDC3oGMPM7gE7H+4UEZKGM9iekxFj3h2mzkBOhfzutMEBXwBI4g50D+FKRSwIkNLTKDv00iwgwdkK1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706647550; c=relaxed/simple;
-	bh=hSdauJw9sqqU1t6o28/fU6gzi3FgMMGYcmtUrNcsBTQ=;
+	s=arc-20240116; t=1706647551; c=relaxed/simple;
+	bh=PbEge0JmNmSSIOMrnpsKnrx1SCTWD+57m7f8qU0Od9Q=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dvsk4fZ+4AlbdukQET9krNJYEimQq5s2gY6nGXVI6av/vfP9xKXOlZe/NuJGLdstNQZKoN3I9JaoJImFRtuLhOVr3h9LnYNZwiZ4kZpodXf2Zbyd9k6xexrFvl1acw5aVDhPGyPCy9p3PVjiP/7o+GaDR8UbLBOxodmwtxbiQSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h2tpoKya; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=KDw1tcCNtbJt17IwxF7JqjrukMa3l+Ff2vJG7Jakt9dwsPmdDZpOIBgwMRSQaoUxFAkc4MCMJhhy5HWJgHJL99iehW3bphdtyg4PRtTopEuVxH/sgROPeG2k1Vc9P0fxPqF6zca6h8xocUK5Vs6v9enifSmEwWYEtsqSzcI+wi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WX1N3anf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h2tpoKya"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A76BFC433B1;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WX1N3anf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDD08C433B2;
 	Tue, 30 Jan 2024 20:45:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1706647550;
-	bh=hSdauJw9sqqU1t6o28/fU6gzi3FgMMGYcmtUrNcsBTQ=;
+	bh=PbEge0JmNmSSIOMrnpsKnrx1SCTWD+57m7f8qU0Od9Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=h2tpoKyaC0auS7mWWSe/9IaVVjmXel+Er2+ey+l/xO/gCOctUsvaX0mOX+ySYA2xS
-	 HC2TGBfo4boKRu0g6t4r9zJTpdtaKsAmvEDQ0KHT4tZa4TrtTyjklIPriyRe/wvodF
-	 kR3w5J3Et9WBbys8v+gSFr/I47AMuB9eDt+BqtY1fSIbUIoDYruHOf266iyCep/yIX
-	 dy/KEEy8QZzXhgNskoRBJj66U93T5vtDciJrpLhscjMsehy+Uy7RcijGUKCfwsc25v
-	 SXdb1UoQHBV887ltAvF2l2fZB+j9vnCumz09PmN8OsVOFc1cduJ4bxHzq4WQ30FZJa
-	 6Ya3WI9swyxdg==
+	b=WX1N3anf+Rfl2H1vQLVnz852lMOyCTpePAuvI5YmWa7r5vp7qMdSYLejfjc9XDdeP
+	 uKHd/CT2SdtZ5dn9NIGejWI06J1sI74f4iHN64GFlxKiAhaJxqJw06MnpxF9EQ3zYF
+	 7H+TbPx2cXMPO+01s85+X6J52iE4kyqrOmV7PVf9nbKZlDFH3igR2fLN7ZaF3TMpI1
+	 RAjJmEzsVi0VAbKpZGVxUdH3jLNo13DQLec8ELsYaGe9BwExT0QSmY5oz5vbTOBZOl
+	 U/KGWwzP3boe+FjFS0nXQiy4gAdoe1o+a4dOS1Z9xMud61XzxnXAsWbUNc52LFbH70
+	 9PvO+4yaI15pQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rUuzM-00GNsE-TD;
-	Tue, 30 Jan 2024 20:45:48 +0000
+	id 1rUuzN-00GNsE-3N;
+	Tue, 30 Jan 2024 20:45:49 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v2 20/25] KVM: arm64: Streamline save/restore of HFG[RW]TR_EL2
-Date: Tue, 30 Jan 2024 20:45:27 +0000
-Message-Id: <20240130204533.693853-21-maz@kernel.org>
+Subject: [PATCH v2 21/25] KVM: arm64: Make TLBI OS/Range UNDEF if not advertised to the guest
+Date: Tue, 30 Jan 2024 20:45:28 +0000
+Message-Id: <20240130204533.693853-22-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240130204533.693853-1-maz@kernel.org>
 References: <20240130204533.693853-1-maz@kernel.org>
@@ -61,82 +61,69 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The way we save/restore HFG[RW]TR_EL2 can now be simplified, and
-the Ampere erratum hack is the only thing that still stands out.
+Outer Shareable and Range TLBI instructions shouldn't be made available
+to the guest if they are not advertised. Use FGU to disable those,
+and set HCR_EL2.TLBIOS in the case the host doesn't have FGT. Note
+that in that later case, we cannot efficiently disable TLBI Range
+instructions, as this would require to trap all TLBIs.
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 42 ++++++-------------------
- 1 file changed, 9 insertions(+), 33 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 245f9c1ca666..2d5891518006 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -157,8 +157,6 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
--	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0;
--	u64 r_val, w_val;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 39e7c7f74717..f07ee7c89822 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3948,6 +3948,14 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
  
- 	CHECK_FGT_MASKS(HFGRTR_EL2);
- 	CHECK_FGT_MASKS(HFGWTR_EL2);
-@@ -171,34 +169,10 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
- 	if (!cpus_have_final_cap(ARM64_HAS_FGT))
- 		return;
+ 	mutex_lock(&kvm->arch.config_lock);
  
--	ctxt_sys_reg(hctxt, HFGRTR_EL2) = read_sysreg_s(SYS_HFGRTR_EL2);
--	ctxt_sys_reg(hctxt, HFGWTR_EL2) = read_sysreg_s(SYS_HFGWTR_EL2);
--
--	/*
--	 * Trap guest writes to TCR_EL1 to prevent it from enabling HA or HD.
--	 */
--	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
--		w_set |= HFGxTR_EL2_TCR_EL1_MASK;
--
--	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
--		compute_clr_set(vcpu, HFGRTR_EL2, r_clr, r_set);
--		compute_clr_set(vcpu, HFGWTR_EL2, w_clr, w_set);
--	}
--
--	compute_undef_clr_set(vcpu, kvm, HFGRTR_EL2, r_clr, r_set);
--	compute_undef_clr_set(vcpu, kvm, HFGWTR_EL2, w_clr, w_set);
--
--	r_val = __HFGRTR_EL2_nMASK;
--	r_val |= r_set;
--	r_val &= ~r_clr;
--
--	w_val = __HFGWTR_EL2_nMASK;
--	w_val |= w_set;
--	w_val &= ~w_clr;
--
--	write_sysreg_s(r_val, SYS_HFGRTR_EL2);
--	write_sysreg_s(w_val, SYS_HFGWTR_EL2);
--
-+	update_fgt_traps(hctxt, vcpu, kvm, HFGRTR_EL2);
-+	update_fgt_traps_cs(hctxt, vcpu, kvm, HFGWTR_EL2, 0,
-+			    cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38) ?
-+			    HFGxTR_EL2_TCR_EL1_MASK : 0);
- 	update_fgt_traps(hctxt, vcpu, kvm, HFGITR_EL2);
- 	update_fgt_traps(hctxt, vcpu, kvm, HDFGRTR_EL2);
- 	update_fgt_traps(hctxt, vcpu, kvm, HDFGWTR_EL2);
-@@ -223,9 +197,11 @@ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
- 	if (!cpus_have_final_cap(ARM64_HAS_FGT))
- 		return;
++	/*
++	 * In the absence of FGT, we cannot independently trap TLBI
++	 * Range instructions. This isn't great, but trapping all
++	 * TLBIs would be far worse. Live with it...
++	 */
++	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
++		vcpu->arch.hcr_el2 |= HCR_TTLBOS;
++
+ 	if (test_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags))
+ 		goto out;
  
--	write_sysreg_s(ctxt_sys_reg(hctxt, HFGRTR_EL2), SYS_HFGRTR_EL2);
--	write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
--
-+	__deactivate_fgt(hctxt, vcpu, kvm, HFGRTR_EL2);
-+	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
-+		write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
-+	else
-+		__deactivate_fgt(hctxt, vcpu, kvm, HFGWTR_EL2);
- 	__deactivate_fgt(hctxt, vcpu, kvm, HFGITR_EL2);
- 	__deactivate_fgt(hctxt, vcpu, kvm, HDFGRTR_EL2);
- 	__deactivate_fgt(hctxt, vcpu, kvm, HDFGWTR_EL2);
+@@ -3960,6 +3968,32 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+ 				       HFGxTR_EL2_nSMPRI_EL1_MASK	|
+ 				       HFGxTR_EL2_nTPIDR2_EL0_MASK);
+ 
++	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
++		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1OS|
++						HFGITR_EL2_TLBIRVALE1OS	|
++						HFGITR_EL2_TLBIRVAAE1OS	|
++						HFGITR_EL2_TLBIRVAE1OS	|
++						HFGITR_EL2_TLBIVAALE1OS	|
++						HFGITR_EL2_TLBIVALE1OS	|
++						HFGITR_EL2_TLBIVAAE1OS	|
++						HFGITR_EL2_TLBIASIDE1OS	|
++						HFGITR_EL2_TLBIVAE1OS	|
++						HFGITR_EL2_TLBIVMALLE1OS);
++
++	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, RANGE))
++		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1	|
++						HFGITR_EL2_TLBIRVALE1	|
++						HFGITR_EL2_TLBIRVAAE1	|
++						HFGITR_EL2_TLBIRVAE1	|
++						HFGITR_EL2_TLBIRVAALE1IS|
++						HFGITR_EL2_TLBIRVALE1IS	|
++						HFGITR_EL2_TLBIRVAAE1IS	|
++						HFGITR_EL2_TLBIRVAE1IS	|
++						HFGITR_EL2_TLBIRVAALE1OS|
++						HFGITR_EL2_TLBIRVALE1OS	|
++						HFGITR_EL2_TLBIRVAAE1OS	|
++						HFGITR_EL2_TLBIRVAE1OS);
++
+ 	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
+ out:
+ 	mutex_unlock(&kvm->arch.config_lock);
 -- 
 2.39.2
 
