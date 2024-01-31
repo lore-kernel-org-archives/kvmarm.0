@@ -1,64 +1,65 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEABD3A1CF
-	for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 22:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908D013E20A
+	for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 23:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706741151; cv=none; b=EuwT30PAmpM98ThxBc43iGKGvo2Gny5lSW2BBbBuJq14Pb2lZe4btJh+XntSa8QLhQEUbW80tcOk9VMkw17GZO/bmrrvmKf1WI29OyjCPEVEGYWJloWUcBzsH7uRo/QaFDImwDB2ok1keJi2z6GzMdxd7GnSK5xiqyrTZOdzbD4=
+	t=1706742233; cv=none; b=NijasT7GYsiKR0c4g5fjSl3MuT0ONaUSf0BSUBpX24EUneOGh9S1b+5kfBo6WjiUBwt57TRV0OqPCeOyztUxE+wSAEZVes//U5gnjPXD7kEE2xh5qf1OOk/R/Um7NKHcx+5GLw4CTu6SyV2f9OwBuGE9KnftEj4vi2PymHz8U4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706741151; c=relaxed/simple;
-	bh=AmunZczr7Dfx6/pExPG2SuXfqHdgyF1ugeSr+E7O7go=;
+	s=arc-20240116; t=1706742233; c=relaxed/simple;
+	bh=r+gw0hlTKtdohBZj+zXKIzyuXhBHBMj2XAt/CW5yWgQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Rie5b4QN4QvvQyFk4ucFnjG+0PEUIfP+xl/hWIOKAe7OtUJRA2b5XZdHFd1OHa6/r0oAUeiYwuFlkoeWwLIN0QhQhC43z3UEu8bYd8i5B2spWIdnN+x95TB9pKSiGApYF0l7zgbKTgynibVqnptftRO8PC1/Aj+Ev9SyEqhS8EA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r9HZbi8V; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=ArMiohcQ0DJ8XAoGUScIqHZnqoA+IBEtmSOrC6qgzGfOvof3PSRKnd9O0JuYZ7Yu72o5dMl6gX3oUyJvwv3zEWB4DbFuoQEbspppzB3PhrJN31IsnWmtbNmep8yR+4zvz9YGrRUUZnATSdB6xC+NLTIiFEnzpOLaXN6/kbs/aj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pe2noesU; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r9HZbi8V"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dbf216080f5so476875276.1
-        for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 14:45:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pe2noesU"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6040597d005so6064507b3.2
+        for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 15:03:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706741149; x=1707345949; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1706742230; x=1707347030; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LFZR+caDlnxynR006W8r06MBUXUFwhkI/G9N83P84WQ=;
-        b=r9HZbi8V6CyirJarmbpR8fSqB5HNz3UyAj7jU0pfCEOerH1EjhNpSexrcfAyU/yzs7
-         Z4LtEAlzjCdrCTCoHMNq1SjPhp61YroUzG0OCWW0NVYfjX7pJ9S++AUdlDJm7baDgXiU
-         FM+dKGrWd0aOF8M+H7/BHf21zvw1YGQQA+e/cBuASMi1VANgNcVu/FXs2IKmpkbMN+f+
-         qWiNDuYSvGmzpxFZvzAy3r/CgmpRQScLpZHBZw+uUKt0DhY/BiCeXsyAO9TTYga3Qil5
-         YacagLF99gFSPbJcQPsjTZc6VMV67VWIt0asBGoq7RA8LrG+eC/sp3nAQSoW0mhy7pim
-         BzXw==
+        bh=DZwweSSUYQvO/z20yvIqcaNFaLAc1RqILCFOCkMXbPM=;
+        b=pe2noesUdcawgBDe14LaF2UqNllK2K1yKEFuoZVcW0cKOQl0y02HZQVt2l7+sf2Ip9
+         JvKPtIdu/PmoC9cijcFPq7hW/ETuEBCzuO+CkXFms67EGNMoWyeYQwtnbjdnIDkzA1Sr
+         Ldw6Amdl5JP07igpQdBkBB1LhkOm/bjX4vNE4kd2bN0tGYKogAfHueQonbHgCDANo05L
+         yIdcDRdzO6N4SHHqlmQ+d2LfsK6OzwLF1Ve+BLpV7oa6s8aw0GphK2rL30ZSQdMyd8of
+         +YsGg7cH7CgRt6Gi8MrZLPHXHwVaEGANpYnvIa11UFnsMMhbviVrOVA7LIrf1GlKlkZK
+         ZboQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706741149; x=1707345949;
+        d=1e100.net; s=20230601; t=1706742230; x=1707347030;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LFZR+caDlnxynR006W8r06MBUXUFwhkI/G9N83P84WQ=;
-        b=ksqf4J0UXmEKUv3AqZOo2cH/CTPY07pbZlRwu///jjrtwe+ldjLlT5hgOXZ8BFIyAH
-         YAEOxvza1y1aMgfLJ/Y+57p8ZS2FS/uRyk4yoiDC4G5gfHf2OWQZRtZ4S3N+/1s7LbC+
-         5vhFUIEpG9wyPHBCOCh48OYyz/X+8kewCAfSRS19I7VlVB6ZkxMkG0vDvp8Nfjg4pgCM
-         m63Wx/ucYCatwFBonYzLtQ/dYUfzV8wuiTfNInuIwq75tP7zEAKYvXGq/AmrA2Fzk4Gu
-         uBJ7pV4EqHWL14xN3PNEmiOGbwl8JwkzczGoEPVRkCeLC04DovHDKltB2Mbu+UaqdDsI
-         4LZg==
-X-Gm-Message-State: AOJu0Yylvr7aLmR+PElzUVSbmREf1Oke6VP01NZ6kcfIcwrWq7JQysd+
-	mzJRnhpcTy7wWMglCftvp6vKxfzbPJTbY3hshQ4K+gkb+/XqO46GJqQ+OJ+IM0yepvpTNA59Mpy
-	Tlg==
-X-Google-Smtp-Source: AGHT+IHbj+iyys3ihZ/6xbW07HHtto50GCqd6T2uQS3vYWtVgZ/I/uUSlscC69aVq4ekwAFGEgKUUC6N6OE=
+        bh=DZwweSSUYQvO/z20yvIqcaNFaLAc1RqILCFOCkMXbPM=;
+        b=QN1MiBPQ6ghuzH79rKlVq7g9yrBKfa5VH3E8Eb3A2AfUXQfeNWSeqDFJ4iZ5Ajm1eO
+         WTYFF7F5tC5pE2xL48rR7RMjWc452GRFPC37LZLu7mVflIGtgDKkKck0lzjn/bJI5xwb
+         zPJUuyxIcRyWpu/KC76Pyh3ALbeQ9GeQft+bOMQu6n1+xDkxcAmfcqJXSmzlhXUVUq7t
+         TlO0ZKB2FsNKBoPjbuM7+KG2GM729orp5iF4MmkESB13NLSKi6GzsEaCG8ScYovu0oE4
+         7aXMJUfUEMrAvbr6RaufRclGa/xEMZE6RO7VH3IR0Lroc5Zdeqa5JQnVGlc54ROBjF8L
+         hGeg==
+X-Gm-Message-State: AOJu0YwOX0YVVRwTpvLyPdCHthTryZ5kD76Uxbf9XqMMJ4PoKdrS4uRT
+	X8pv7D6Kaz1Ig9Pf5zru1RudASkq9JvYksAtFxJaKk3inEsYSQR5T9cMhIsToIg0huzFeAl+LI/
+	VAQ==
+X-Google-Smtp-Source: AGHT+IFJbItnQs4Y8jmKkE5kxYlZxxDLejMwZjXJSJ/Pnb1uodzlMpEbl5+L7dgh/lCtAx5a7aAZSZtZzuc=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:11c3:b0:dc2:398d:a671 with SMTP id
- n3-20020a05690211c300b00dc2398da671mr827981ybu.10.1706741148737; Wed, 31 Jan
- 2024 14:45:48 -0800 (PST)
-Date: Wed, 31 Jan 2024 14:45:46 -0800
-In-Reply-To: <20231102155111.28821-2-guang.zeng@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:690c:dd6:b0:5fc:43cb:cb1e with SMTP id
+ db22-20020a05690c0dd600b005fc43cbcb1emr691136ywb.10.1706742230591; Wed, 31
+ Jan 2024 15:03:50 -0800 (PST)
+Date: Wed, 31 Jan 2024 15:03:48 -0800
+In-Reply-To: <20231102155111.28821-3-guang.zeng@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20231102155111.28821-1-guang.zeng@intel.com> <20231102155111.28821-2-guang.zeng@intel.com>
-Message-ID: <ZbrNmoSiufn4RM9K@google.com>
-Subject: Re: [RFC PATCH v1 1/8] KVM: selftests: x86: Fix bug in addr_arch_gva2gpa()
+References: <20231102155111.28821-1-guang.zeng@intel.com> <20231102155111.28821-3-guang.zeng@intel.com>
+Message-ID: <ZbrR1BJROP4O9eGx@google.com>
+Subject: Re: [RFC PATCH v1 2/8] KVM: selftests: x86: Support guest running on
+ canonical linear-address organization
 From: Sean Christopherson <seanjc@google.com>
 To: Zeng Guang <guang.zeng@intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
@@ -72,86 +73,70 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyn
 Content-Type: text/plain; charset="us-ascii"
 
 On Thu, Nov 02, 2023, Zeng Guang wrote:
-> Fix the approach to get page map from gva to gpa.
+> Setup execution environment running on 64-bit linear addresses for
+> user and supervisor mode.
 > 
-> If gva maps a 4-KByte page, current implementation of addr_arch_gva2gpa()
-> will obtain wrong page size and cannot derive correct offset from the guest
-> virtual address.
+> Define the linear address based on 48-bit canonical format in which
+> bits 63:47 of the address are identical. All addresses to system data
+> structure are shifted to supervisor-mode address space.
 > 
-> Meanwhile using HUGEPAGE_MASK(x) to calculate the offset within page
-> (1G/2M/4K) mistakenly incorporates the upper part of 64-bit canonical
-> linear address. That will work out improper guest physical address if
-> translating guest virtual address in supervisor-mode address space.
-
-The "Meanwhile ..." is a huge clue that this should be two separate patches.
-
+> Extend page table mapping for supervisor mode to same guest physical
+> address. This allows guest in supervisor mode can run in the
+> corresponding canonical linear address space.
+> 
 > Signed-off-by: Zeng Guang <guang.zeng@intel.com>
 > ---
->  tools/testing/selftests/kvm/lib/x86_64/processor.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  .../selftests/kvm/include/x86_64/processor.h  |  6 ++++
+>  tools/testing/selftests/kvm/lib/kvm_util.c    |  6 ++--
+>  .../selftests/kvm/lib/x86_64/processor.c      | 28 ++++++++++++-------
+>  3 files changed, 28 insertions(+), 12 deletions(-)
 > 
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> index 25bc61dac5fb..00f7337a520a 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -1256,4 +1256,10 @@ void virt_map_level(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+>  #define PFERR_GUEST_PAGE_MASK	BIT_ULL(PFERR_GUEST_PAGE_BIT)
+>  #define PFERR_IMPLICIT_ACCESS	BIT_ULL(PFERR_IMPLICIT_ACCESS_BIT)
+>  
+> +/*
+> + * X86 kernel linear address defines
+> + */
+> +#define KERNEL_LNA_OFFSET 0xffff800000000000
+
+Please don't make up acronyms, I can more or less glean what LNA is from the
+context _here_, but in other usage I would truly have no idea.
+
 > diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index d8288374078e..9f4b8c47edce 100644
+> index 9f4b8c47edce..6f4295a13d00 100644
 > --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
 > +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -293,6 +293,7 @@ uint64_t *__vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr,
->  	if (vm_is_target_pte(pde, level, PG_LEVEL_2M))
->  		return pde;
->  
-> +	*level = PG_LEVEL_4K;
->  	return virt_get_pte(vm, pde, vaddr, PG_LEVEL_4K);
->  }
->  
-> @@ -496,7 +497,7 @@ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
->  	 * No need for a hugepage mask on the PTE, x86-64 requires the "unused"
->  	 * address bits to be zero.
->  	 */
-> -	return PTE_GET_PA(*pte) | (gva & ~HUGEPAGE_MASK(level));
-> +	return PTE_GET_PA(*pte) | (gva & (HUGEPAGE_SIZE(level) - 1));
+> @@ -227,6 +227,13 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
+>  void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+>  {
+>  	__virt_pg_map(vm, vaddr, paddr, PG_LEVEL_4K);
+> +
+> +	/*
+> +	 * Map same paddr to kernel linear address space. Make execution
+> +	 * environment supporting running both in user and kernel mode.
+> +	 */
+> +	if (!(vaddr & BIT_ULL(63)))
+> +		__virt_pg_map(vm, (uint64_t)KERNEL_ADDR(vaddr), paddr, PG_LEVEL_4K);
 
-I think I would prefer to "fix" HUGEPAGE_MASK() and drop its incorporation of
-PHYSICAL_PAGE_MASK.  Regardless of anyone's personal views on whether or not
-PAGE_MASK and HUGEPAGE_MASK should only cover physical address bits, (a) the
-_one_ usage of HUGEPAGE_MASK is broken and (b) diverging from the kernel for
-something like is a terrible idea, and the kernel does:
+I really don't like the idea of piling hacks on top of selftests' misguided
+infrastructure.  Letting tests control virtual addresses is all kinds of stupid.
+Except for ARM's ucall_arch_init(), I don't think there's a single user of
+virt_map() that _needs_ a specific address, e.g. most tests just identity map
+the GPA.
 
-	#define PAGE_MASK		(~(PAGE_SIZE-1))
-	#define HPAGE_MASK		(~(HPAGE_SIZE - 1))
-	#define KVM_HPAGE_MASK(x)	(~(KVM_HPAGE_SIZE(x) - 1))
+So rather than fudge things by stuffing two mappings, which is wasteful for 99%
+of mappings and will likely be a maintenance nightmare, I think we should go
+straight to getting x86's kernel mappings setup correctly from time zero.
 
-Luckily, there are barely any users in x86, so I think the entirety of the
-conversion is this?
+From KUT experience, using USER mappings for kernel accesses is explosions waiting
+to happen due to SMAP and SMEP.  And expecting developers to remember to sprinkle
+KERNEL_ADDR() everywhere is not remotely maintainable.
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 0f4792083d01..ef895038c87f 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -352,11 +352,12 @@ static inline unsigned int x86_model(unsigned int eax)
- 
- #define PAGE_SHIFT             12
- #define PAGE_SIZE              (1ULL << PAGE_SHIFT)
--#define PAGE_MASK              (~(PAGE_SIZE-1) & PHYSICAL_PAGE_MASK)
-+#define PAGE_MASK              (~(PAGE_SIZE-1))
-+kvm_static_assert((PHYSICAL_PAGE_MASK & PAGE_MASK) == PHYSICAL_PAGE_MASK);
- 
- #define HUGEPAGE_SHIFT(x)      (PAGE_SHIFT + (((x) - 1) * 9))
- #define HUGEPAGE_SIZE(x)       (1UL << HUGEPAGE_SHIFT(x))
--#define HUGEPAGE_MASK(x)       (~(HUGEPAGE_SIZE(x) - 1) & PHYSICAL_PAGE_MASK)
-+#define HUGEPAGE_MASK(x)       (~(HUGEPAGE_SIZE(x) - 1))
- 
- #define PTE_GET_PA(pte)                ((pte) & PHYSICAL_PAGE_MASK)
- #define PTE_GET_PFN(pte)        (PTE_GET_PA(pte) >> PAGE_SHIFT)
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c b/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
-index 05b56095cf76..cc5730322072 100644
---- a/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
-@@ -623,7 +623,7 @@ int main(int argc, char *argv[])
-        for (i = 0; i < NTEST_PAGES; i++) {
-                pte = vm_get_page_table_entry(vm, data->test_pages + i * PAGE_SIZE);
-                gpa = addr_hva2gpa(vm, pte);
--               __virt_pg_map(vm, gva + PAGE_SIZE * i, gpa & PAGE_MASK, PG_LEVEL_4K);
-+               __virt_pg_map(vm, gva + PAGE_SIZE * i, gpa & PHYSICAL_PAGE_MASK, PG_LEVEL_4K);
-                data->test_pages_pte[i] = gva + (gpa & ~PAGE_MASK);
-        }
- 
-
+In other words, give virt_arch_pg_map() (or ideally, the common virt_map()) over
+picking the virtual address, and then plumb in information as to whether the
+allocation is USER vs. SUPERVISOR.
