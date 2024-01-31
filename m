@@ -1,103 +1,95 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F276B55C10
-	for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 06:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD8AA69DF2
+	for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 08:49:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706684049; cv=none; b=Tzi/JYdUl4ByHEyOE6a+Bz9Fz3XmmwgRKIXBH8rXDiJ4RWkRRmy5phRg4pKSrkJqSNgeyCmuKMXlWdBjbnnoKaAytodKo/odTa9oQt1wpbgKOXcyEXq6FsPPnUKJm2xU7xTZvuGRJv/SB3x8JKoTQbn8Hf+WpYZ1sJBmyZiAnn4=
+	t=1706690985; cv=none; b=h7j/9cXAy7vDQQdC9FJDwd8mEn4IYinT4KLjwehu/+KLWaQ4lhZW7u7IJwoUG5M1HBhE0QXJIuU9EtPWd+ugDgkze5F18+1DhmjCGWdlVsXzNHP8sdIHwBhzLXwtV+6fnGYfBTdHQdmMDjTswmNU6UE/zIASpywGuavxjKZWmkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706684049; c=relaxed/simple;
-	bh=Zdw5BUWFSFm+QflhlaaAobfZNFzFMokg/6LaDvxnxVI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DEMQ1dT+Q3XnuRm+klkE1WzonKDXYMbB3PRnwMfxjwjhofBphcu2O2/WQW3bpLjg88kkrXSNY7pUZ+ccCH94Nb7P60dJU1kbJC1Bc8uuwDasPBfTLwgrxKznfrsuwg4ZdwawaYc1QsW0jZY7dRu1bhv8aEqEpwkiPHKHqzlkn2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C3D5ADA7;
-	Tue, 30 Jan 2024 22:54:50 -0800 (PST)
-Received: from [10.163.41.195] (unknown [10.163.41.195])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EE9C73F5A1;
-	Tue, 30 Jan 2024 22:53:53 -0800 (PST)
-Message-ID: <7612b843-cd31-4917-87c0-c26802c5bef2@arm.com>
-Date: Wed, 31 Jan 2024 12:23:51 +0530
+	s=arc-20240116; t=1706690985; c=relaxed/simple;
+	bh=cp6hObYP6vO3TLjZQhgbViQN59Nd01J+jfFWB5Rty3w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nXawtwyaL3g1m3UsP3tlN0RPQ/H/8gWT2XyIkdVN8+Rl4Z2zRQYrosm0sYXJKXM4LfuOXo4dRxexHC5ZHRDxv9571qTTaoYQHvoHbtqxTjLDXh6+L1gE+PhuXYU7+KeOAmdtRgvDpfSotN90WIy8wL31BzJawSZj9xpuGzFpOy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=QdnxOPQB; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="QdnxOPQB"
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-55790581457so5997103a12.3
+        for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 00:49:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1706690982; x=1707295782; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UwrF8m8GQsGFceTJh31l3SS1YmhpII4/27Snk+jZIFo=;
+        b=QdnxOPQB3SSkzFrrheqz0ojxPqCeqXFoECWzBbKylBvzcd8ToRQlZ2MM//o9Uspu/h
+         q84+bfraf/VEUpZt5ltgEJmhytTCK1KFuDy8g8Ys1RDq2KoQ+KkUiJ2yRBtraJYBbFa7
+         p4dyYIjnzmCW5kZ2YUqv8Faxa/XSJSKtI6sGMVktwpbkbSG+uiXiT9DzZbW6AaVAWtSh
+         NG9iniIKVpADgM71bzTOktC1Yk+1Ly3KNkTRW/qfuGaEzTKlmycBy+Ho9ooF8i452bC/
+         BrT2ZgumBe9+fLLSLQy9CLy+PjKM5gIFWL0Ub1yM6Rpljt8h4nUGYWqdY9v2BE17iL6S
+         vL1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706690982; x=1707295782;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UwrF8m8GQsGFceTJh31l3SS1YmhpII4/27Snk+jZIFo=;
+        b=wMsZ07no6UPW/+A8Ud+GpsreCHbMOAJLkCO9whxoMhSF1WgxA5eGkz+uxjLzG9Gjba
+         b9CJXzvSjx+K4Bx/98hiUgJ3aUFrtXdnNjkEMmP4yEX4LyCAONdFbCcQ9BhXeBFtmUOr
+         Z/gWHztpFUjQmN5V5d+B3Fg+IPg7jlHmlWzju9m7IAbPnWz+s8uGe5CuewE7ALIDaD4S
+         k9qSsObdiBoxBi5ry7oUS5YRPQ0hBXj3pbMLrijyirkMg7YzWzidIKjdLrJ0dxjWjeIF
+         nwYRZxxCw+civ50cl0zsJmNkfYoTb9BlL8MLv4NPvtQWh23vwUYHt0wzbiyVes0as53w
+         bEdQ==
+X-Gm-Message-State: AOJu0Yya60cPRSiELikeSpIRIVIKSLdatgOkJ4q1h/OT8NxDfnmpU0E1
+	n76k9gbk6EgPblgZlYHvoy47TaF6RXIL7QCUUC1GpcGtRmgi52u9pgDXV1vcxec=
+X-Google-Smtp-Source: AGHT+IG59LQFPP5uvyfMTy1OF+ECx5mfRwwnUh01lCUMG3TenERfKODeoOZBRnXKky/WMQTQPIKPwA==
+X-Received: by 2002:a17:906:48ca:b0:a35:1f1a:ca50 with SMTP id d10-20020a17090648ca00b00a351f1aca50mr647395ejt.11.1706690982080;
+        Wed, 31 Jan 2024 00:49:42 -0800 (PST)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id c2-20020a170906170200b00a33604d2a41sm5953449eje.132.2024.01.31.00.49.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jan 2024 00:49:41 -0800 (PST)
+Date: Wed, 31 Jan 2024 09:49:40 +0100
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev, 
+	anup@brainfault.org, borntraeger@linux.ibm.com, frankja@linux.ibm.com, 
+	imbrenda@linux.ibm.com
+Subject: Re: Re: [PATCH 5/5] KVM: selftests: x86_64: Remove redundant newlines
+Message-ID: <20240131-aaad2df64c2f26b892623006@orel>
+References: <20231206170241.82801-7-ajones@ventanamicro.com>
+ <20231206170241.82801-12-ajones@ventanamicro.com>
+ <ZblbcUloeMqc-lR0@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v3 11/35] mm: Allow an arch to hook into folio
- allocation when VMA is known
-Content-Language: en-US
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
- maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
- mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
- vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org,
- bsegall@google.com, mgorman@suse.de, bristot@redhat.com,
- vschneid@redhat.com, mhiramat@kernel.org, rppt@kernel.org, hughd@google.com,
- pcc@google.com, steven.price@arm.com, vincenzo.frascino@arm.com,
- david@redhat.com, eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-mm@kvack.org,
- linux-trace-kernel@vger.kernel.org
-References: <20240125164256.4147-1-alexandru.elisei@arm.com>
- <20240125164256.4147-12-alexandru.elisei@arm.com>
- <1e03aec4-705a-41b6-b258-0b8944d9dc0c@arm.com> <Zbje4T5tZ5k707Wg@raptor>
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <Zbje4T5tZ5k707Wg@raptor>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZblbcUloeMqc-lR0@google.com>
 
-
-
-On 1/30/24 17:04, Alexandru Elisei wrote:
-> Hi,
+On Tue, Jan 30, 2024 at 12:26:25PM -0800, Sean Christopherson wrote:
+> On Wed, Dec 06, 2023, Andrew Jones wrote:
+> > @@ -162,7 +162,7 @@ static void check_clocksource(void)
+> >  		goto out;
+> >  	}
+> >  
+> > -	TEST_ASSERT(!strncmp(clk_name, "tsc\n", st.st_size),
+> > +	TEST_ASSERT(!strncmp(clk_name, "tsc", st.st_size),
 > 
-> On Tue, Jan 30, 2024 at 03:25:20PM +0530, Anshuman Khandual wrote:
->>
->> On 1/25/24 22:12, Alexandru Elisei wrote:
->>> arm64 uses VM_HIGH_ARCH_0 and VM_HIGH_ARCH_1 for enabling MTE for a VMA.
->>> When VM_HIGH_ARCH_0, which arm64 renames to VM_MTE, is set for a VMA, and
->>> the gfp flag __GFP_ZERO is present, the __GFP_ZEROTAGS gfp flag also gets
->>> set in vma_alloc_zeroed_movable_folio().
->>>
->>> Expand this to be more generic by adding an arch hook that modifes the gfp
->>> flags for an allocation when the VMA is known.
->>>
->>> Note that __GFP_ZEROTAGS is ignored by the page allocator unless __GFP_ZERO
->>> is also set; from that point of view, the current behaviour is unchanged,
->>> even though the arm64 flag is set in more places.  When arm64 will have
->>> support to reuse the tag storage for data allocation, the uses of the
->>> __GFP_ZEROTAGS flag will be expanded to instruct the page allocator to try
->>> to reserve the corresponding tag storage for the pages being allocated.
->> Right but how will pushing __GFP_ZEROTAGS addition into gfp_t flags further
->> down via a new arch call back i.e arch_calc_vma_gfp() while still maintaining
->> (vma->vm_flags & VM_MTE) conditionality improve the current scenario. Because
-> I'm afraid I don't follow you.
+> This newline is functionally necessary.  It's in the strncmp() (*#$@ sysfs appends
+> newlines to everything), not the TEST_ASSERT message.  I'll give you a pass and
+> fixup when applying since I'm guessing you don't have x86 hardware ;-)
 
-I was just asking whether the overall scope of __GFP_ZEROTAGS flag is being
-increased to cover more core MM paths through this patch. I think you have
-already answered that below.
+Thanks for the fixup!
 
 > 
->> the page allocator could have still analyzed alloc flags for __GFP_ZEROTAGS
->> for any additional stuff.
->>
->> OR this just adds some new core MM paths to get __GFP_ZEROTAGS which was not
->> the case earlier via this call back.
-> Before this patch: vma_alloc_zeroed_movable_folio() sets __GFP_ZEROTAGS.
-> After this patch: vma_alloc_folio() sets __GFP_ZEROTAGS.
+> I double checked the other arch patches and didn't see anything sneaky like this.
 
-Understood.
+And for the double check!
 
-> 
-> This patch is about adding __GFP_ZEROTAGS for more callers.
-
-Right, I guess that is the real motivation for this patch. But just wondering
-does this cover all possible anon fault paths for converting given vma_flag's
-VM_MTE flag into page alloc flag __GFP_ZEROTAGS ? Aren't there any other file
-besides (mm/shmem.c) which needs to be changed to include arch_calc_vma_gfp() ?
+drew
