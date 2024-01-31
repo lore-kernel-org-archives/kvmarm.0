@@ -1,105 +1,120 @@
-Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5E917BD7
-	for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 18:38:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E8039FC5
+	for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 22:00:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706726294; cv=none; b=gdZ13Nr89GGXepiN+mXMdwhSjohC8NG8zLlBIzEdSSRKRFDihpqVLbKyY7K182BoosmwX1zVzctHW8R/IjLUKPOu4DL48A78wrpyOU5TdPBc+0tUA3sxmC3dF9nxHt6t+89bLJQMzXyV0l0XzU9WX/CSz38AqoBymtEbN2Go6Os=
+	t=1706738409; cv=none; b=JlCIfvW9cIas2kOX/JiysSLqjDaoZcZH6FsdJLnOgCYZ8gVnwMSiC8qmMORN+8IJ0dxFLvjrXoOStpa7mrHIQOYDkQdX5HUkhJpWB1O7QGE3Um8oul0mEkvOgySRdCTYD8ystvmm/2JCByInSWeN9tMtM0L1ftMJAJ/sOKETW64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706726294; c=relaxed/simple;
-	bh=UfjYc4q1VOylXIyltW4pByW+ntMGUUi2w22Mn2XGXdw=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=XrAQBAM/e+cOQVDgIl1agn0ZZ6YhwgWJbv9WxAm+RU6PT5XKVOfaEIPOAKw/v2RxuwX9rjcUnZ8C9G5/+I3w8Ulxq0jTXo5JcNsvck8jOlmPpfBC2mcss3rpGa/RfAeyMFL/9lS5rT7hpWMpL32H0TK+8rVABurfP6TlZ7EfW+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IPTL/wvS; arc=none smtp.client-ip=209.85.166.73
+	s=arc-20240116; t=1706738409; c=relaxed/simple;
+	bh=pTPZRdj/clNw8Oelh7URCewuDtXPDjO7UvOoX7E79cU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q+9zZWdIliWiFKwmcCOy5oP7peQDj+4NAksltWXwoW4I3A3gmiFsLkW09wW1+aGvczi45O/C4BH0rK+Ed8hMJn5bE8PkCcc5DOpjwPKTEAdQqxbHBRtn8L0kL89vGIGvAxnsy4v7Yx2ptgJU/0ZYaXaw8eqfmA+8zUq3q4LoD5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oAhIzU/M; arc=none smtp.client-ip=209.85.167.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IPTL/wvS"
-Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-7c018ee4e46so4861939f.1
-        for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 10:38:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oAhIzU/M"
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3bb9b28acb4so190242b6e.2
+        for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 14:00:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706726292; x=1707331092; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=B+7qh5lgqKvRJ5XTxEYs6sYIXkTaK5rzWchXA2WiWMs=;
-        b=IPTL/wvSPs4/kof6uHF6UgFA/U5Nk71F6ZgpYw/dfQLntVUjukIKVc0esupEWow7Bz
-         9za3qZUq4eEsI7OinyhmZFimy9fPOgtCq1vbhCBWzodj5MflYhXS/0A/zXJsJPNUU4k1
-         fJazSQRlsBMRLAnB/GGxJAUzgu9hxhbbcUYrHy0vN12h5RmfMRFiIsOLhk6LISPWjvhV
-         FqDTaGVG2mxqM39PRmoeThEYFYEhF5K7Xx+80ZO3YvnTaJOWoFF4oFR+1FYPninRUwNY
-         S4Zbb+tT1S3cBBG3iEGwxAyRkLSE0wX8LnGqDYXdfinNuPR8hzj9YtUH2l8yvceAr07A
-         rq0Q==
+        d=google.com; s=20230601; t=1706738406; x=1707343206; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3HWn2vkHxIR1F0Lo5tspJmR3xmAUHbpogVpChRP7V7U=;
+        b=oAhIzU/MQ6uf4mymH+cIiiPcDD138VJXNy2ogj5aFL4xqtDvNYyNG1Vrd/uFZ1mDyH
+         2w2xOzrHpHunhejBgkdKGX+AtCUKEoWrSyYgtNOjTaYBxVEaal/DtnRn7o13JJcQRuLJ
+         27rCUI3UUJRntJdaF8Rr54HzMnFqL3ZD9bggkQIO+lkQLh9m+S2e0s7LJop9ROy3BR+7
+         cGC7pog0waZZ8kKxZQhyne11ZSzcywMYqQlyu/oAUa71ys0tlqGex7Hmj6rg40z5UNAQ
+         ipxEjs2dTG2zza860qeUsQ3QZMp3+85gV/h0DCUybMloSBIIQJmCOPhABFJP7PKHZmNq
+         Enbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706726292; x=1707331092;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B+7qh5lgqKvRJ5XTxEYs6sYIXkTaK5rzWchXA2WiWMs=;
-        b=FEwDXHKAgwwoRihN7c8+orUWIjcuF8wLDmZNEbzX31MBRkBpicp9xFXyrdSV44Uwbo
-         /F6EjUm1Seh6KnOD7xokTfxCJYBiYv4YnWXTPPYqVDJps8eJtfiIKQ20394d301xNzTT
-         uWzbjh34lwl9dieBd+xaQGLXcf+WLjpBFq7ymiFHKfGRsXYPvNPPv/n+vNHTlgNmgczV
-         CWY7xpkbNT7h139nCmyOVMBBR35ot7hRgPIuVVlsEWDtm6nS4RbVcoNHvOwSmWpr6ej3
-         Wi70osMtn4LcOWDNXHWl0M7sRrAF84N5jFFlgYheLkVB6ki6Snvgqnm/vxTFFNnFBEhc
-         3/Tg==
-X-Gm-Message-State: AOJu0YwEIh4m8JcGwmkGQVzOk2tLIVVbDUFPGadURXYQFw9Fbk5BO1ei
-	/iDi1PYOAAFKGOQ76PMe1Xl8qIlc88S5QbAOHvu/HrRkmqgF6OLQlkCMDHdF7Ht9d0y4qdiUvkT
-	cnCoUm2R22l1Eaesv9/VYgA==
-X-Google-Smtp-Source: AGHT+IEWULPllFBaQ8dQeEAuZdnKaMWtTDPxrWTLe4io4YQ7kFWLbe1eQTSY5SCp/s+Zau2KSwPR0XFYd0AUCsyFhw==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a5d:9c07:0:b0:7bf:ff87:209f with SMTP
- id 7-20020a5d9c07000000b007bfff87209fmr25977ioe.2.1706726292022; Wed, 31 Jan
- 2024 10:38:12 -0800 (PST)
-Date: Wed, 31 Jan 2024 18:38:10 +0000
-In-Reply-To: <Zbgx8hZgWCmtzMjH@linux.dev> (message from Oliver Upton on Mon,
- 29 Jan 2024 23:17:06 +0000)
+        d=1e100.net; s=20230601; t=1706738406; x=1707343206;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3HWn2vkHxIR1F0Lo5tspJmR3xmAUHbpogVpChRP7V7U=;
+        b=J0ZsdewB/MabLAzej0chEpDxN+eMY4MSdgxBsM7GVM6F+vRRHV7exuvaUqXZMXQ4em
+         DLG3YETxF1nOauKUtTuvycQl8k/KpyEleazciFcLDFNwWnZpUfsF4wOEjEXYlUHUzh+H
+         FGEdU6AXEARUWn7SPU+k0z88IN0F5g+DWsgvtG7glmn31VevIb8DJoE6Mq5CSNKhvfAC
+         mUTzIobgEMNAKY0PjsQDnbULvpR3hBCqq1BtUk95s1kngeAnlqO7Pg5F+G2T4aXaxgIA
+         Hn8iFExXQ4C6TEA5xKFAK9mVPuVQYpo30A2+QDVno9U6V8aP4MELH/HBVnamz30/Jbqv
+         aCkw==
+X-Gm-Message-State: AOJu0Yy9BMjjbd3XJTC2gqvH1pQnFws88NPpSbrsjAbKA0D2VDl4ORcf
+	90LWMXkcrtyVDSl//vu1xY5f2XPF4TBEQMYx73uXYvSKRmBVwtb+02RUIInRIpON7c1MTgWQ30k
+	b7bQmDTj2ax7FDWLitbnuHkHQmiTLTVmergdn
+X-Google-Smtp-Source: AGHT+IGKCsKTkygbpPhG3XJ9O5u/HE7aI2abahJw3REKjJnkzRFEpCfEVmamGfDvrnVqdpiddT5NVHn+Cs9fjWdogOQ=
+X-Received: by 2002:a05:6871:783:b0:210:af25:a5a0 with SMTP id
+ o3-20020a056871078300b00210af25a5a0mr3347929oap.1.1706738406281; Wed, 31 Jan
+ 2024 14:00:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsntcythl565.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH] KVM: arm64: Add capability for unconditional WFx passthrough
-From: Colton Lewis <coltonlewis@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, maz@kernel.org, james.morse@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-7-amoorthy@google.com>
+ <CADrL8HWYKSiDZ_ahGbMXjup=r75B4JqC3LvT8A-qPVenV+MOiw@mail.gmail.com>
+In-Reply-To: <CADrL8HWYKSiDZ_ahGbMXjup=r75B4JqC3LvT8A-qPVenV+MOiw@mail.gmail.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Wed, 31 Jan 2024 13:59:30 -0800
+Message-ID: <CAF7b7mrA3rB33sUZe3HX33+fXpF=8VwD284LpCcEn9KT9OgwUQ@mail.gmail.com>
+Subject: Re: [PATCH v6 06/14] KVM: Add memslot flag to let userspace force an
+ exit on missing hva mappings
+To: James Houghton <jthoughton@google.com>
+Cc: seanjc@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	oliver.upton@linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	robert.hoo.linux@gmail.com, dmatlack@google.com, axelrasmussen@google.com, 
+	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
+	kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Oliver Upton <oliver.upton@linux.dev> writes:
+On Tue, Jan 30, 2024 at 4:26=E2=80=AFPM James Houghton <jthoughton@google.c=
+om> wrote:
+>
+> Feel free to add:
+>
+> Reviewed-by: James Houghton <jthoughton@google.com>
 
-> Hi Colton,
+> If we include KVM_MEM_GUEST_MEMFD here, we should point the reader to
+> KVM_SET_USER_MEMORY_REGION2 and explain that using
+> KVM_SET_USER_MEMORY_REGION with this flag will always fail.
 
-> On Mon, Jan 29, 2024 at 09:39:17PM +0000, Colton Lewis wrote:
->> Add KVM_CAP_ARM_WFX_PASSTHROUGH capability to always allow WFE/WFI
->> instructions to run without trapping. Current behavior is to only
->> allow this if the vcpu is the only task running. This commit keeps the
->> old behavior when the capability is not set.
+Done and done (I've split the guest memfd doc update off into its own
+commit too).
 
->> This allows userspace to set deterministic behavior and increase
->> efficiency for platforms with direct interrupt injection support.
+> > @@ -3070,6 +3074,15 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_=
+memory_slot *slot, gfn_t gfn,
+> >                 writable =3D NULL;
+> >         }
+> >
+> > +       if (!atomic && can_exit_on_missing
+> > +           && kvm_is_slot_exit_on_missing(slot)) {
+> > +               atomic =3D true;
+> > +               if (async) {
+> > +                       *async =3D false;
+> > +                       async =3D NULL;
+> > +               }
+> > +       }
+> > +
+>
+> Perhaps we should have a comment for this? Maybe something like: "If
+> we want to exit-on-missing, we want to bail out if fast GUP fails, and
+> we do not want to go into slow GUP. Setting atomic=3Dtrue does exactly
+> this."
 
-> Marc and I actually had an offlist conversation (shame on us!) about
-> this very topic since there are users asking for the _opposite_ of this
-> patch (unconditionally trap) [*].
+I was going to push back on the use of "we" but I see that it's all
+over kvm_main.c :).
 
-> I had originally wanted something like this, but Marc made the very good
-> point that (1) the behavior of WFx traps is in no way user-visible and
-> (2) it is entirely an IMP DEF behavior. The architecture only requires
-> the traps be effective if the instruction does not complete in finite
-> time.
+I agree that a comment would be good, but isn't the "fast GUP only iff
+atomic=3Dtrue" statement a tautology? That's an actual question, my
+memory's fuzzy. What about
 
-> We need to think of an interface that doesn't depend on
-> implementation-specific behavior, such as a control based on runqueue
-> depth.
+> When the slot is exit-on-missing (and when we should respect that)
+> set atomic=3Dtrue to prevent GUP from faulting in the userspace
+> mappings.
 
-Good to know. I'll be thinking about that.
-
-
-> [*]  
-> https://lore.kernel.org/kvmarm/a481ef04-ddd2-dfc1-41b1-d2ec45c6a3b5@huawei.com/
-
-> --
-> Thanks,
-> Oliver
+instead?
