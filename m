@@ -1,198 +1,138 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642AF84A4D
-	for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 14:05:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF31F80BEC
+	for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 14:18:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706709936; cv=none; b=RxDUilAWCmoUntjDVsFUMNPl1HZrrzgzvJkuiaUKPTMAZAQypFq4D4vl+YRdjb25bSj5T4EKxPcr9AJZKkFXGgoe9k55jVhqx7rSyLluLGVk4XWmmNGJJZXhEv/kl96Km0s5oKVPPviNIzKxR0Ygc0b3MibxB6Q5siqJocvbbZc=
+	t=1706710716; cv=none; b=pb/+9QLaFReQoYWx8O2GvCDGsIiSiISnMAW3wjKxNauHAJeF9sBgGtiaF+GCYyIr3F1z7THKs1m+fAaW4RxH9VzV6Y2UPQKuIJT/DTXLq8Di+7v63fTLF3hf+agks00VY90YEkm96O7qcbOtZVxRMT/J10MUtgX/44Xl9OVriis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706709936; c=relaxed/simple;
-	bh=GaMZ0948xeDfn9kR8d8YGemHEgYUzVtp9ZX9hpkstxM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CqYVI12Gv+PTtQo2BO/5BfCVOywLyN1XwAH90OoAOCU1CoWQc57AgOsxK0EK45Jzji7WRI357ig3hJwyxkoTkWUJ9junva4Qjokz6G0pO6hSeE0yN9uBL20kHaFHykVEbghrDwmnhinbTZpMIJCs3O3ViUviBcJZnSknzRurZVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f75FCj3Q; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f75FCj3Q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB537C43142;
-	Wed, 31 Jan 2024 14:05:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706709935;
-	bh=GaMZ0948xeDfn9kR8d8YGemHEgYUzVtp9ZX9hpkstxM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=f75FCj3Qf3BHUDcRepSDwUJmB4/KSARZfJRWONHm6KgZ60sqqfUGZyoBzanJAufgY
-	 +CgHzpY1YXKY6wrMYGVBjuJOqRvL+3iVwYtlHmGobjn6quftcHtK2vPBRfXvrJDk+u
-	 aSO64ySvHYMJs0WRX6gMvl4M9QLoFyiYbx7Y+vVGvI6zFtcpVPdDMefr/GoJvbI1gH
-	 FjaS/AvEsjCU3FiA6ma+VEcagj43uIibqZU/Pp26TClYJAx4qW+iF60dfy2e6DQj34
-	 gAmWHLgEaSsq6TD0h8hynSqudybKM3kuXwHsMwUfrQ1f50wS3JhxnxWaZ1jeNEecRh
-	 VFVWBWBCeMoZw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rVBDZ-00Gcdh-Ca;
-	Wed, 31 Jan 2024 14:05:33 +0000
-Date: Wed, 31 Jan 2024 14:05:32 +0000
-Message-ID: <86mssl7g43.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Kunkun Jiang <jiangkunkun@huawei.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<wanghaibin.wang@huawei.com>
-Subject: Re: [PATCH v2 1/2] irqchip/gic-v4.1: Fix GICv4.1 doorbell affinity
-In-Reply-To: <72090b1b-21ab-6247-6231-1be2e11a2e4d@huawei.com>
-References: <20240126103012.1020-1-jiangkunkun@huawei.com>
-	<20240126103012.1020-2-jiangkunkun@huawei.com>
-	<86ttn074ev.wl-maz@kernel.org>
-	<44051a41-f82e-57d9-001a-d4d195d59f2e@huawei.com>
-	<86r0i17fkf.wl-maz@kernel.org>
-	<ecda5c79-9296-b4c6-0f09-7cb80ee3c91b@huawei.com>
-	<86plxj6i3o.wl-maz@kernel.org>
-	<72090b1b-21ab-6247-6231-1be2e11a2e4d@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1706710716; c=relaxed/simple;
+	bh=2efCmHXOKMA9e2vGpnP2bHu385K2t0wVYZiGw3jyuHQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ULuSKeLUO4acVcmnU/zKCBZ+JBBiEei3+Gp1/9tYHHO4wb5UsIKuochhoEmm9FExWTT8TESGxqZisEwnvKrRaAV/xbdWjaLm5xOUCE7A1nKSf2XhCrOlhscosStpqJXFJTbge3sJqItNlqbISoVCgT/Fi+cKwPrfr05l1CHAqHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5F9F4DA7;
+	Wed, 31 Jan 2024 06:19:17 -0800 (PST)
+Received: from raptor (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 150DA3F738;
+	Wed, 31 Jan 2024 06:18:28 -0800 (PST)
+Date: Wed, 31 Jan 2024 14:18:22 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
+	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
+	rppt@kernel.org, hughd@google.com, pcc@google.com,
+	steven.price@arm.com, vincenzo.frascino@arm.com, david@redhat.com,
+	eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC v3 08/35] mm: cma: Introduce cma_alloc_range()
+Message-ID: <ZbpWripbKW5MaV8J@raptor>
+References: <20240125164256.4147-1-alexandru.elisei@arm.com>
+ <20240125164256.4147-9-alexandru.elisei@arm.com>
+ <61a3dbb7-25b6-4f49-aa70-9a8aaeb53365@arm.com>
+ <ZbjfEzlNgprdxfxX@raptor>
+ <d22f63a0-f6de-44e1-874b-24d707907858@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d22f63a0-f6de-44e1-874b-24d707907858@arm.com>
 
-On Wed, 31 Jan 2024 01:29:40 +0000,
-Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+Hi,
+
+On Wed, Jan 31, 2024 at 11:54:17AM +0530, Anshuman Khandual wrote:
 > 
-> Hi Marc,
 > 
-> On 2024/1/30 21:55, Marc Zyngier wrote:
-> > On Tue, 30 Jan 2024 13:32:24 +0000,
-> > Kunkun Jiang <jiangkunkun@huawei.com> wrote:
-> >> Hi Marc,
-> >> 
-> >> On 2024/1/28 21:28, Marc Zyngier wrote:
-> >>> On Sat, 27 Jan 2024 02:41:55 +0000,
-> >>> Kunkun Jiang <jiangkunkun@huawei.com> wrote:
-> >>>>> At this stage, I think the VMOVP optimisation is wrong and that we
-> >>>>> should drop it.
-> >>>> This is the last resort. Maybe we can think of another way.
-> >>> I think the only other way is to never elide the VMOVP from
-> >>> set_affinity, but to only call into set_affinity when strictly
-> >>> necessary:
-> >>> 
-> >>> - when making the VPE resident on a CPU that isn't part of the same
-> >>>     affinity group (VPE migration outside of the affinity group)
-> >>> 
-> >>> - when making the VPE non-resident on a CPU that isn't the doorbell
-> >>>     delivery CPU *AND* that there is a need for a doorbell (VPE
-> >>>     migration inside the affinity group)
-> >>> 
-> >>> Which means it is the responsibility of the upper layers of the stack
-> >>> to make these decisions, and that we can keep the low-level driver as
-> >>> simple as possible.
-> >>> 
-> >>> In the meantime, here's the patch I'm proposing to merge ASAP. Please
-> >>> let me know if that works for you.
-> >> This patch works. But I still have some questions, which I will
-> >> write down below.
-> >>> 	M.
-> >>> 
-> >>> >From 00c338e91d3b6600f402f56cdb64c9d370f911c8 Mon Sep 17 00:00:00 2001
-> >>> From: Marc Zyngier <maz@kernel.org>
-> >>> Date: Sun, 28 Jan 2024 13:05:24 +0000
-> >>> Subject: [PATCH] irqchip/gic-v3-its: Fix GICv4.1 VPE affinity update
-> >>> 
-> >>> When updating the affinity of a VPE, we currently skip the VMOVP
-> >>> command if the two CPUs are part of the same VPE affinity.
-> >>> 
-> >>> But this is wrong, as the doorbell corresponding to this VPE
-> >>> is still delivered on the 'old' CPU, which screws up the balancing.
-> >>> Furthermore, offlining that 'old' CPU results in doorbell interrupts
-> >>> generated for this VPE being discarded.
-> >>> 
-> >>> The harsh reality is that we cannot easily elide VMOVP when
-> >>> a set_affinity request occurs. It needs to be obeyed, and if
-> >>> an optimisation is to be made, it is at the point where the affinity
-> >>> change request is made (such as in KVM).
-> >>> 
-> >>> Drop the VMOVP elision altogether, and only use the vpe_table_mask
-> >>> to try and stay within the same ITS affinity group if at all possible.
-> >>> 
-> >>> Fixes: dd3f050a216e (irqchip/gic-v4.1: Implement the v4.1 flavour of VMOVP)
-> >>> Reported-by: Kunkun Jiang <jiangkunkun@huawei.com>
-> >>> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> >>> Cc: stable@vger.kernel.org
-> >>> ---
-> >>>    drivers/irqchip/irq-gic-v3-its.c | 22 +++++++++++++---------
-> >>>    1 file changed, 13 insertions(+), 9 deletions(-)
-> >>> 
-> >>> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> >>> index 250b4562f308..78aece62bff5 100644
-> >>> --- a/drivers/irqchip/irq-gic-v3-its.c
-> >>> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> >>> @@ -3826,8 +3826,9 @@ static int its_vpe_set_affinity(struct irq_data *d,
-> >>>    				bool force)
-> >>>    {
-> >>>    	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
-> >>> -	int from, cpu = cpumask_first(mask_val);
-> >>> +	struct cpumask common;
-> >>>    	unsigned long flags;
-> >>> +	int from, cpu;
-> >>>      	/*
-> >>>    	 * Changing affinity is mega expensive, so let's be as lazy as
-> >>> @@ -3843,19 +3844,22 @@ static int its_vpe_set_affinity(struct irq_data *d,
-> >>>    	 * taken on any vLPI handling path that evaluates vpe->col_idx.
-> >>>    	 */
-> >>>    	from = vpe_to_cpuid_lock(vpe, &flags);
-> >>> -	if (from == cpu)
-> >>> -		goto out;
-> >>> -
-> >>> -	vpe->col_idx = cpu;
-> >>>      	/*
-> >>> -	 * GICv4.1 allows us to skip VMOVP if moving to a cpu whose RD
-> >>> -	 * is sharing its VPE table with the current one.
-> >>> +	 * If we are offered another CPU in the same GICv4.1 ITS
-> >>> +	 * affinity, pick this one. Otherwise, any CPU will do.
-> >>>    	 */
-> >>> -	if (gic_data_rdist_cpu(cpu)->vpe_table_mask &&
-> >>> -	    cpumask_test_cpu(from, gic_data_rdist_cpu(cpu)->vpe_table_mask))
-> >>> +	if (gic_data_rdist_cpu(from)->vpe_table_mask &&
-> >>> +	    cpumask_and(&common, mask_val, gic_data_rdist_cpu(from)->vpe_table_mask))
-> >>> +		cpu = cpumask_first(&common);
-> >>> +	else
-> >>> +		cpu = cpumask_first(mask_val);
-> >>> +
-> >>> +	if (from == cpu)
-> >>>    		goto out;
-> >> The meaning here should be that VMOVP will be skipped
-> >> only if from and target are the same. Then why do we
-> >> still to judge whether they are in the same GICv4.1
-> >> ITS affinity?
-> > Having the same ITS affinity is a performance optimisation, as this
-> > minimises traffic between ITSs and keep cache locality. If the
-> > proposed affinity contains CPUs that are in the same affinity as
-> > current one, then it makes sense to stay there if possible in order to
-> > keep the benefit of the warm translation caches.
-> Ok, I see. In another case, is it possible to skip VMOVP?
-> The from belongs to common, but it is not the first one.
+> On 1/30/24 17:05, Alexandru Elisei wrote:
+> > Hi,
+> > 
+> > On Tue, Jan 30, 2024 at 10:50:00AM +0530, Anshuman Khandual wrote:
+> >>
+> >> On 1/25/24 22:12, Alexandru Elisei wrote:
+> >>> Today, cma_alloc() is used to allocate a contiguous memory region. The
+> >>> function allows the caller to specify the number of pages to allocate, but
+> >>> not the starting address. cma_alloc() will walk over the entire CMA region
+> >>> trying to allocate the first available range of the specified size.
+> >>>
+> >>> Introduce cma_alloc_range(), which makes CMA more versatile by allowing the
+> >>> caller to specify a particular range in the CMA region, defined by the
+> >>> start pfn and the size.
+> >>>
+> >>> arm64 will make use of this function when tag storage management will be
+> >>> implemented: cma_alloc_range() will be used to reserve the tag storage
+> >>> associated with a tagged page.
+> >> Basically, you would like to pass on a preferred start address and the
+> >> allocation could just fail if a contig range is not available from such
+> >> a starting address ?
+> >>
+> >> Then why not just change cma_alloc() to take a new argument 'start_pfn'.
+> >> Why create a new but almost similar allocator ?
+> > I tried doing that, and I gave up because:
+> > 
+> > - It made cma_alloc() even more complex and hard to follow.
+> > 
+> > - What value should 'start_pfn' be to tell cma_alloc() that it should be
+> >   ignored? Or, to put it another way, what pfn number is invalid on **all**
+> >   platforms that Linux supports?
+> > 
+> > I can give it another go if we can come up with an invalid value for
+> > 'start_pfn'.
+> 
+> Something negative might work. How about -1/-1UL ? A quick search gives
+> some instances such as ...
+> 
+> git grep "pfn == -1"
+> 
+> mm/mm_init.c:   if (*start_pfn == -1UL)
+> mm/vmscan.c:            if (pfn == -1)
+> mm/vmscan.c:            if (pfn == -1)
+> mm/vmscan.c:            if (pfn == -1)
+> tools/testing/selftests/mm/hugepage-vmemmap.c:  if (pfn == -1UL) {
+> 
+> Could not -1UL be abstracted as common macro MM_INVALID_PFN to be used in
+> such scenarios including here ?
 
-You could have something like
+Ah yes, you are right, get_pte_pfn() already uses -1 as an invalid pfn, so
+I can just use that.
 
-		if (cpumask_test_cpu(from, &common))
-			cpu = from;
-		else
-			cpu = cpumask_first(&common);
+Will definitely give it a go on the next iteration, thanks for the
+suggestion!
 
-	M.
+> 
+> > 
+> >> But then I am wondering why this could not be done in the arm64 platform
+> >> code itself operating on a CMA area reserved just for tag storage. Unless
+> >> this new allocator has other usage beyond MTE, this could be implemented
+> >> in the platform itself.
+> > I had the same idea in the previous iteration, David Hildenbrand suggested
+> > this approach [1].
+> > 
+> > [1] https://lore.kernel.org/linux-fsdevel/2aafd53f-af1f-45f3-a08c-d11962254315@redhat.com/
+> 
+> There are two different cma_alloc() proposals here - including the next
+> patch i.e mm: cma: Fast track allocating memory when the pages are free
+> 
+> 1) Augment cma_alloc() or add cma_alloc_range() with start_pfn parameter
+> 2) Speed up cma_alloc() for small allocation requests when pages are free
+> 
+> The second one if separated out from this series could be considered on
+> its own as it will help all existing cma_alloc() callers. The first one
+> definitely needs an use case as provided in this series.
 
--- 
-Without deviation from the norm, progress is not possible.
+I understand, thanks for the input!
+
+Alex
