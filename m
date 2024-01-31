@@ -1,65 +1,65 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908D013E20A
-	for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 23:03:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E9713BEBA
+	for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 23:20:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706742233; cv=none; b=NijasT7GYsiKR0c4g5fjSl3MuT0ONaUSf0BSUBpX24EUneOGh9S1b+5kfBo6WjiUBwt57TRV0OqPCeOyztUxE+wSAEZVes//U5gnjPXD7kEE2xh5qf1OOk/R/Um7NKHcx+5GLw4CTu6SyV2f9OwBuGE9KnftEj4vi2PymHz8U4A=
+	t=1706743244; cv=none; b=kMP56Xf+e+4Xirjsz/xTC2dNSkRMPXIek9BzYbUR4GzZ0xGl+C7QzcHbH5pTt+PRPLkTHec4r6boH8DfbZG/fRUt4xkYxwI/V87ND+56qUrm62Wb7z7cd7TsdeiE+L+hcTytXWkR/BLzG1hGXt8tOX+sADDOaQvj6j7QfvMAmOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706742233; c=relaxed/simple;
-	bh=r+gw0hlTKtdohBZj+zXKIzyuXhBHBMj2XAt/CW5yWgQ=;
+	s=arc-20240116; t=1706743244; c=relaxed/simple;
+	bh=20/LowDbsSa6ybMupsfbqBknR9K6SfsjkkIXgL9bQ6g=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ArMiohcQ0DJ8XAoGUScIqHZnqoA+IBEtmSOrC6qgzGfOvof3PSRKnd9O0JuYZ7Yu72o5dMl6gX3oUyJvwv3zEWB4DbFuoQEbspppzB3PhrJN31IsnWmtbNmep8yR+4zvz9YGrRUUZnATSdB6xC+NLTIiFEnzpOLaXN6/kbs/aj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pe2noesU; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=ubZjb1X3GaaCoIf78N/wNAzcN36Iul3/EfonWpZZUGqKJQqsQ/u8C1kEGk/aipq86RxpPhyCGWrBoXoGYgFVWMiXxMIcfejNMa0OYJHkHMe2OBR1EPGPaUI61PL2B8IhwQWxJyLJmsmeYtC+Tk0jzGERQHSbXtCiM3Z6HVqdPCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lKbH3RSU; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pe2noesU"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6040597d005so6064507b3.2
-        for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 15:03:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lKbH3RSU"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-d9a541b720aso531166276.0
+        for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 15:20:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706742230; x=1707347030; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1706743242; x=1707348042; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DZwweSSUYQvO/z20yvIqcaNFaLAc1RqILCFOCkMXbPM=;
-        b=pe2noesUdcawgBDe14LaF2UqNllK2K1yKEFuoZVcW0cKOQl0y02HZQVt2l7+sf2Ip9
-         JvKPtIdu/PmoC9cijcFPq7hW/ETuEBCzuO+CkXFms67EGNMoWyeYQwtnbjdnIDkzA1Sr
-         Ldw6Amdl5JP07igpQdBkBB1LhkOm/bjX4vNE4kd2bN0tGYKogAfHueQonbHgCDANo05L
-         yIdcDRdzO6N4SHHqlmQ+d2LfsK6OzwLF1Ve+BLpV7oa6s8aw0GphK2rL30ZSQdMyd8of
-         +YsGg7cH7CgRt6Gi8MrZLPHXHwVaEGANpYnvIa11UFnsMMhbviVrOVA7LIrf1GlKlkZK
-         ZboQ==
+        bh=4LraT2XeL3rEGwAPZd0fqZsj1phEA9uuSczA3YvOZb4=;
+        b=lKbH3RSUMOaFx3aTvXD5rt96E9HzB2bOhHI1Gf0U1tCs4uvqacmdiMrPPOch4XRbmY
+         TPleluDs5+Gh3ZQj1dEulvOM4iRt71nMqFU7vRepy49rOeyWYlD+32L1JIiK9reQB8FO
+         c4XU8r4Qf93aw8w3vdyLA7hw9AvK1ZEftgQgOCiEuidEjEFwvxbMaAoINE7w9UkPAZWF
+         J0A5x1lDBvEpo3o29WW2FIyKnjX8w/ViD6OUxgetlfm83POHMufRspAdC7QCmq4mMlw0
+         OXjyDjMpk41BmHMYAC/YFmE9Z/UjHuyEz1MMwaml6FAQJDGiars0XvtTGHdK49C+ybTL
+         zJSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706742230; x=1707347030;
+        d=1e100.net; s=20230601; t=1706743242; x=1707348042;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DZwweSSUYQvO/z20yvIqcaNFaLAc1RqILCFOCkMXbPM=;
-        b=QN1MiBPQ6ghuzH79rKlVq7g9yrBKfa5VH3E8Eb3A2AfUXQfeNWSeqDFJ4iZ5Ajm1eO
-         WTYFF7F5tC5pE2xL48rR7RMjWc452GRFPC37LZLu7mVflIGtgDKkKck0lzjn/bJI5xwb
-         zPJUuyxIcRyWpu/KC76Pyh3ALbeQ9GeQft+bOMQu6n1+xDkxcAmfcqJXSmzlhXUVUq7t
-         TlO0ZKB2FsNKBoPjbuM7+KG2GM729orp5iF4MmkESB13NLSKi6GzsEaCG8ScYovu0oE4
-         7aXMJUfUEMrAvbr6RaufRclGa/xEMZE6RO7VH3IR0Lroc5Zdeqa5JQnVGlc54ROBjF8L
-         hGeg==
-X-Gm-Message-State: AOJu0YwOX0YVVRwTpvLyPdCHthTryZ5kD76Uxbf9XqMMJ4PoKdrS4uRT
-	X8pv7D6Kaz1Ig9Pf5zru1RudASkq9JvYksAtFxJaKk3inEsYSQR5T9cMhIsToIg0huzFeAl+LI/
-	VAQ==
-X-Google-Smtp-Source: AGHT+IFJbItnQs4Y8jmKkE5kxYlZxxDLejMwZjXJSJ/Pnb1uodzlMpEbl5+L7dgh/lCtAx5a7aAZSZtZzuc=
+        bh=4LraT2XeL3rEGwAPZd0fqZsj1phEA9uuSczA3YvOZb4=;
+        b=kXgtHuS4SsBInnPFJ2sey/0RQWNG7CTDSTcuQ0br8CDvUA7j7qbBlcDZn1iPHzx49k
+         hN+t1kv6YRxOeXW0pt4X3AoPuDczosr+j7zGtI0VFDiiCEIxhss86qJh90srn5oc0nt9
+         h4MsRYuBXzR26uw7IskD3TMJ1Ps7HgrndMuHPwC7Ia2hlJmtObUZVgwe9oHMiUQE0hNm
+         BZDF1s6cglfxmXqUnpO5VkPMohuhUkP2nHyDfnZBtxdc/d824V7uX2L92p1+QYTx3Kez
+         GQLgOHcTdK3x2YEjJLO+mqaomVLxvfSU3YRVaf8JCl9bPDdFOGeGY9nTAXIVDtODrlXQ
+         QOMQ==
+X-Gm-Message-State: AOJu0YysCEhIT/cQgdhQ3di/ie0cmbH8wYhJaUfR0iv1bIwVQp4tMhW9
+	rd2QheECVzA7oUihpEsn0zCSk01A6aGPt3r0owUXPzxTQWVPe8TUC9I61HKM8zTcBoLOsMPE5cz
+	zhg==
+X-Google-Smtp-Source: AGHT+IGN/AGCqkdJr6bpKzd1JOQ/JVcPRAqedMYNyR1G7Xg4nBku4fs5oM4yJkJ+BZj9xMDEHO8Wuiy2xjI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:dd6:b0:5fc:43cb:cb1e with SMTP id
- db22-20020a05690c0dd600b005fc43cbcb1emr691136ywb.10.1706742230591; Wed, 31
- Jan 2024 15:03:50 -0800 (PST)
-Date: Wed, 31 Jan 2024 15:03:48 -0800
-In-Reply-To: <20231102155111.28821-3-guang.zeng@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:920:b0:dc6:55ac:d08d with SMTP id
+ bu32-20020a056902092000b00dc655acd08dmr832536ybb.5.1706743241894; Wed, 31 Jan
+ 2024 15:20:41 -0800 (PST)
+Date: Wed, 31 Jan 2024 15:20:40 -0800
+In-Reply-To: <20231102155111.28821-4-guang.zeng@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20231102155111.28821-1-guang.zeng@intel.com> <20231102155111.28821-3-guang.zeng@intel.com>
-Message-ID: <ZbrR1BJROP4O9eGx@google.com>
-Subject: Re: [RFC PATCH v1 2/8] KVM: selftests: x86: Support guest running on
- canonical linear-address organization
+References: <20231102155111.28821-1-guang.zeng@intel.com> <20231102155111.28821-4-guang.zeng@intel.com>
+Message-ID: <ZbrVyB1Pj9KrH-Cl@google.com>
+Subject: Re: [RFC PATCH v1 3/8] KVM: selftests: Add virt_arch_ucall_prealloc()
+ arch specific implementation
 From: Sean Christopherson <seanjc@google.com>
 To: Zeng Guang <guang.zeng@intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
@@ -73,70 +73,47 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyn
 Content-Type: text/plain; charset="us-ascii"
 
 On Thu, Nov 02, 2023, Zeng Guang wrote:
-> Setup execution environment running on 64-bit linear addresses for
-> user and supervisor mode.
-> 
-> Define the linear address based on 48-bit canonical format in which
-> bits 63:47 of the address are identical. All addresses to system data
-> structure are shifted to supervisor-mode address space.
-> 
-> Extend page table mapping for supervisor mode to same guest physical
-> address. This allows guest in supervisor mode can run in the
-> corresponding canonical linear address space.
-> 
-> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
-> ---
->  .../selftests/kvm/include/x86_64/processor.h  |  6 ++++
->  tools/testing/selftests/kvm/lib/kvm_util.c    |  6 ++--
->  .../selftests/kvm/lib/x86_64/processor.c      | 28 ++++++++++++-------
->  3 files changed, 28 insertions(+), 12 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> index 25bc61dac5fb..00f7337a520a 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> @@ -1256,4 +1256,10 @@ void virt_map_level(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
->  #define PFERR_GUEST_PAGE_MASK	BIT_ULL(PFERR_GUEST_PAGE_BIT)
->  #define PFERR_IMPLICIT_ACCESS	BIT_ULL(PFERR_IMPLICIT_ACCESS_BIT)
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index a18db6a7b3cf..dbaa2cf83c1c 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -917,6 +917,23 @@ static inline void virt_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
+>  	virt_arch_dump(stream, vm, indent);
+>  }
 >  
 > +/*
-> + * X86 kernel linear address defines
+> + * Virtual UCALL memory pre-processing
+> + *
+> + * Input Args:
+> + *   ucall_gva - Guest virtual address point to memory of ucall pool
+> + *
+> + * Output Args: None
+> + *
+> + * Return:
+> + *   Processed guest virtual address point to memory of ucall pool
 > + */
-> +#define KERNEL_LNA_OFFSET 0xffff800000000000
 
-Please don't make up acronyms, I can more or less glean what LNA is from the
-context _here_, but in other usage I would truly have no idea.
+Please omit the massive comments, they are yet another misguided remnant in
+selftests that we are purging.
 
 > diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index 9f4b8c47edce..6f4295a13d00 100644
+> index 6f4295a13d00..525b714ee13c 100644
 > --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
 > +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -227,6 +227,13 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
->  void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
->  {
->  	__virt_pg_map(vm, vaddr, paddr, PG_LEVEL_4K);
+> @@ -388,6 +388,18 @@ void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
+>  	}
+>  }
+>  
+> +void *virt_arch_ucall_prealloc(uint64_t ucall_gva)
+> +{
+> +	unsigned short desc_cs;
 > +
-> +	/*
-> +	 * Map same paddr to kernel linear address space. Make execution
-> +	 * environment supporting running both in user and kernel mode.
-> +	 */
-> +	if (!(vaddr & BIT_ULL(63)))
-> +		__virt_pg_map(vm, (uint64_t)KERNEL_ADDR(vaddr), paddr, PG_LEVEL_4K);
+> +	asm volatile ("mov %%cs,%0" :  "=r" (desc_cs));
 
-I really don't like the idea of piling hacks on top of selftests' misguided
-infrastructure.  Letting tests control virtual addresses is all kinds of stupid.
-Except for ARM's ucall_arch_init(), I don't think there's a single user of
-virt_map() that _needs_ a specific address, e.g. most tests just identity map
-the GPA.
+Strictly speaking, CS.DPL is not the source of truth for CPL, SS.DPL is.  But
+that's probably a moot point, because I again think this is a hack that shows the
+overall approach isn't maintainable.
 
-So rather than fudge things by stuffing two mappings, which is wasteful for 99%
-of mappings and will likely be a maintenance nightmare, I think we should go
-straight to getting x86's kernel mappings setup correctly from time zero.
-
-From KUT experience, using USER mappings for kernel accesses is explosions waiting
-to happen due to SMAP and SMEP.  And expecting developers to remember to sprinkle
-KERNEL_ADDR() everywhere is not remotely maintainable.
-
-In other words, give virt_arch_pg_map() (or ideally, the common virt_map()) over
-picking the virtual address, and then plumb in information as to whether the
-allocation is USER vs. SUPERVISOR.
+Can you post the actual usage of userspace selftests, i.e. the "full" series?
+It's really hard to build a mental model of how this all fits together without
+seeing the actual usage.
