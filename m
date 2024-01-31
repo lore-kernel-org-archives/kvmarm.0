@@ -1,66 +1,59 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8204F80BEB;
-	Wed, 31 Jan 2024 13:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642AF84A4D
+	for <kvmarm@lists.linux.dev>; Wed, 31 Jan 2024 14:05:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706709029; cv=none; b=QSofSTeXzbYedSnVj/TLSKX+cZ41ZJn9F9RGfhBtCX9O7KQbf3eB+vxFaD6cdrAr9d67JgESWmhMdWqSVFsuSlraLfB9gmt5kSfYHqx9vMs6cBpERl3myINYICqyQ7StVK2I8tD21NZnL4tVTuctNKJkhvlVR5fScg4bI2zAwyU=
+	t=1706709936; cv=none; b=RxDUilAWCmoUntjDVsFUMNPl1HZrrzgzvJkuiaUKPTMAZAQypFq4D4vl+YRdjb25bSj5T4EKxPcr9AJZKkFXGgoe9k55jVhqx7rSyLluLGVk4XWmmNGJJZXhEv/kl96Km0s5oKVPPviNIzKxR0Ygc0b3MibxB6Q5siqJocvbbZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706709029; c=relaxed/simple;
-	bh=gDrDYiIKj2pNOm3RnEnHWThrb2793XbTCaCB63sQ+hw=;
+	s=arc-20240116; t=1706709936; c=relaxed/simple;
+	bh=GaMZ0948xeDfn9kR8d8YGemHEgYUzVtp9ZX9hpkstxM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KPFtfaExvqFERNV5Lx+LGfRWaZu6XwjcnOOG0tj2ZB4kK0RzuqLCa9cTi5GYKCr/Q9S40RSeZ/TSkNkte1aSNkFVzQ2s5D66M6qcwD0uQVhWRJCXbcbnSYOt1MfgI1co7sV0FIqwFx6hzafzRdwsqk+NSYEbdijXXo/uudwO6fY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uPLkcnf3; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=CqYVI12Gv+PTtQo2BO/5BfCVOywLyN1XwAH90OoAOCU1CoWQc57AgOsxK0EK45Jzji7WRI357ig3hJwyxkoTkWUJ9junva4Qjokz6G0pO6hSeE0yN9uBL20kHaFHykVEbghrDwmnhinbTZpMIJCs3O3ViUviBcJZnSknzRurZVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f75FCj3Q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uPLkcnf3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D66D5C433F1;
-	Wed, 31 Jan 2024 13:50:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f75FCj3Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB537C43142;
+	Wed, 31 Jan 2024 14:05:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706709029;
-	bh=gDrDYiIKj2pNOm3RnEnHWThrb2793XbTCaCB63sQ+hw=;
+	s=k20201202; t=1706709935;
+	bh=GaMZ0948xeDfn9kR8d8YGemHEgYUzVtp9ZX9hpkstxM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uPLkcnf3C1e1YK9ZTFbKTQ3lvdHvzdr6O+9KkN0xqsH0tgQS4mQePq7I0NCESTQgj
-	 H7uxDt9hiaXFT+l7+kzGBhHaCqn1hsc2XbcR0LGj2Pdj0kn+Ej4YWGmfbrfNtOBOFh
-	 rUVMYpDw8uemg0hqKEzsaedA0zUZoJ/um7ZlShyCk4D487VhksTZJGIswnR6pCczL4
-	 YDZScjdovUOkF3hklOD+yTr2J6RUZhjg7iZ6GPnUIOgz60FPJ0SUH73+LiqA6QRXwc
-	 sxyYEBH3QgNqRU9azDY6nYWNaxey+VAEs7TSxPMjXQUkduDnWUl9NpvyVVjFjWl9bK
-	 TaWj5CBesglgg==
+	b=f75FCj3Qf3BHUDcRepSDwUJmB4/KSARZfJRWONHm6KgZ60sqqfUGZyoBzanJAufgY
+	 +CgHzpY1YXKY6wrMYGVBjuJOqRvL+3iVwYtlHmGobjn6quftcHtK2vPBRfXvrJDk+u
+	 aSO64ySvHYMJs0WRX6gMvl4M9QLoFyiYbx7Y+vVGvI6zFtcpVPdDMefr/GoJvbI1gH
+	 FjaS/AvEsjCU3FiA6ma+VEcagj43uIibqZU/Pp26TClYJAx4qW+iF60dfy2e6DQj34
+	 gAmWHLgEaSsq6TD0h8hynSqudybKM3kuXwHsMwUfrQ1f50wS3JhxnxWaZ1jeNEecRh
+	 VFVWBWBCeMoZw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rVAyv-00GcQt-Te;
-	Wed, 31 Jan 2024 13:50:26 +0000
-Date: Wed, 31 Jan 2024 13:50:25 +0000
-Message-ID: <86o7d17gta.wl-maz@kernel.org>
+	id 1rVBDZ-00Gcdh-Ca;
+	Wed, 31 Jan 2024 14:05:33 +0000
+Date: Wed, 31 Jan 2024 14:05:32 +0000
+Message-ID: <86mssl7g43.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Darren Hart <darren@os.amperecomputing.com>,
-	Jintack Lim <jintack@cs.columbia.edu>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Miguel Luis <miguel.luis@oracle.com>,
+To: Kunkun Jiang <jiangkunkun@huawei.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	D Scott Phillips <scott@os.amperecomputing.com>
-Subject: Re: [PATCH v11 17/43] KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
-In-Reply-To: <3f30ac3a-9226-45fe-9e72-49c26a9f4c97@os.amperecomputing.com>
-References: <20231120131027.854038-1-maz@kernel.org>
-	<20231120131027.854038-18-maz@kernel.org>
-	<f0416fa9-b4f1-4bad-a73b-b1d7ecbffc62@os.amperecomputing.com>
-	<86le8g86t6.wl-maz@kernel.org>
-	<3b51d760-fd32-41b7-b142-5974fdf3e90e@os.amperecomputing.com>
-	<868r4d94c9.wl-maz@kernel.org>
-	<3f30ac3a-9226-45fe-9e72-49c26a9f4c97@os.amperecomputing.com>
+	Thomas Gleixner <tglx@linutronix.de>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<wanghaibin.wang@huawei.com>
+Subject: Re: [PATCH v2 1/2] irqchip/gic-v4.1: Fix GICv4.1 doorbell affinity
+In-Reply-To: <72090b1b-21ab-6247-6231-1be2e11a2e4d@huawei.com>
+References: <20240126103012.1020-1-jiangkunkun@huawei.com>
+	<20240126103012.1020-2-jiangkunkun@huawei.com>
+	<86ttn074ev.wl-maz@kernel.org>
+	<44051a41-f82e-57d9-001a-d4d195d59f2e@huawei.com>
+	<86r0i17fkf.wl-maz@kernel.org>
+	<ecda5c79-9296-b4c6-0f09-7cb80ee3c91b@huawei.com>
+	<86plxj6i3o.wl-maz@kernel.org>
+	<72090b1b-21ab-6247-6231-1be2e11a2e4d@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -72,151 +65,132 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, darren@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, scott@os.amperecomputing.com
+X-SA-Exim-Rcpt-To: jiangkunkun@huawei.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, wanghaibin.wang@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 31 Jan 2024 09:39:34 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> 
+On Wed, 31 Jan 2024 01:29:40 +0000,
+Kunkun Jiang <jiangkunkun@huawei.com> wrote:
 > 
 > Hi Marc,
 > 
-> On 25-01-2024 02:28 pm, Marc Zyngier wrote:
-> > On Thu, 25 Jan 2024 08:14:32 +0000,
-> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> >> 
-> >> 
+> On 2024/1/30 21:55, Marc Zyngier wrote:
+> > On Tue, 30 Jan 2024 13:32:24 +0000,
+> > Kunkun Jiang <jiangkunkun@huawei.com> wrote:
 > >> Hi Marc,
 > >> 
-> >> On 23-01-2024 07:56 pm, Marc Zyngier wrote:
-> >>> Hi Ganapatrao,
+> >> On 2024/1/28 21:28, Marc Zyngier wrote:
+> >>> On Sat, 27 Jan 2024 02:41:55 +0000,
+> >>> Kunkun Jiang <jiangkunkun@huawei.com> wrote:
+> >>>>> At this stage, I think the VMOVP optimisation is wrong and that we
+> >>>>> should drop it.
+> >>>> This is the last resort. Maybe we can think of another way.
+> >>> I think the only other way is to never elide the VMOVP from
+> >>> set_affinity, but to only call into set_affinity when strictly
+> >>> necessary:
 > >>> 
-> >>> On Tue, 23 Jan 2024 09:55:32 +0000,
-> >>> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> >>>> 
-> >>>> Hi Marc,
-> >>>> 
-> >>>>> +void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
-> >>>>> +{
-> >>>>> +	if (is_hyp_ctxt(vcpu)) {
-> >>>>> +		vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
-> >>>>> +	} else {
-> >>>>> +		write_lock(&vcpu->kvm->mmu_lock);
-> >>>>> +		vcpu->arch.hw_mmu = get_s2_mmu_nested(vcpu);
-> >>>>> +		write_unlock(&vcpu->kvm->mmu_lock);
-> >>>>> +	}
-> >>>> 
-> >>>> Due to race, there is a non-existing L2's mmu table is getting loaded
-> >>>> for some of vCPU while booting L1(noticed with L1 boot using large
-> >>>> number of vCPUs). This is happening since at the early stage the
-> >>>> e2h(hyp-context) is not set and trap to eret of L1 boot-strap code
-> >>>> resulting in context switch as if it is returning to L2(guest enter)
-> >>>> and loading not initialized mmu table on those vCPUs resulting in
-> >>>> unrecoverable traps and aborts.
+> >>> - when making the VPE resident on a CPU that isn't part of the same
+> >>>     affinity group (VPE migration outside of the affinity group)
 > >>> 
-> >>> I'm not sure I understand the problem you're describing here.
+> >>> - when making the VPE non-resident on a CPU that isn't the doorbell
+> >>>     delivery CPU *AND* that there is a need for a doorbell (VPE
+> >>>     migration inside the affinity group)
 > >>> 
-> >> 
-> >> IIUC, When the S2 fault happens, the faulted vCPU gets the pages from
-> >> qemu process and maps in S2 and copies the code to allocated
-> >> memory. Mean while other vCPUs which are in race to come online, when
-> >> they switches over to dummy S2 finds the mapping and returns to L1 and
-> >> subsequent execution does not fault instead fetches from memory where
-> >> no code exists yet(for some) and generates stage 1 instruction abort
-> >> and jumps to abort handler and even there is no code exist and keeps
-> >> aborting. This is happening on random vCPUs(no pattern).
-> > 
-> > Why is that any different from the way we handle faults in the
-> > non-nested case? If there is a case where we can map the PTE at S2
-> > before the data is available, this is a generic bug that can trigger
-> > irrespective of NV.
-> > 
-> >> 
-> >>> What is the race exactly? Why isn't the shadow S2 good enough? Not
-> >>> having HCR_EL2.VM set doesn't mean we can use the same S2, as the TLBs
-> >>> are tagged by a different VMID, so staying on the canonical S2 seems
-> >>> wrong.
-> >> 
-> >> IMO, it is unnecessary to switch-over for first ERET while L1 is
-> >> booting and repeat the faults and page allocation which is anyway
-> >> dummy once L1 switches to E2H.
-> > 
-> > It is mandated by the architecture. EL1 is, by definition, a different
-> > translation regime from EL2. So we *must* have a different S2, because
-> > that defines the boundaries of TLB creation and invalidation. The
-> > fact that these are the same pages is totally irrelevant.
-> > 
-> >> Let L1 use its S2 always which is created by L0. Even we should
-> >> consider avoiding the entry created for L1 in array(first entry in the
-> >> array) of S2-MMUs and avoid unnecessary iteration/lookup while unmap
-> >> of NestedVMs.
-> > 
-> > I'm sorry, but this is just wrong. You are merging the EL1 and EL2
-> > translation regimes, which is not acceptable.
-> > 
-> >> I am anticipating this unwanted switch-over wont happen when we have
-> >> NV2 only support in V12?
-> > 
-> > V11 is already NV2 only, so I really don't get what you mean here.
-> > Everything stays the same, and there is nothing to change here.
-> > 
-> 
-> I am using still V10 since V11(also V12/nv-6.9-sr-enforcement) has
-> issues to boot with QEMU.
+> >>> Which means it is the responsibility of the upper layers of the stack
+> >>> to make these decisions, and that we can keep the low-level driver as
+> >>> simple as possible.
+> >>> 
+> >>> In the meantime, here's the patch I'm proposing to merge ASAP. Please
+> >>> let me know if that works for you.
+> >> This patch works. But I still have some questions, which I will
+> >> write down below.
+> >>> 	M.
+> >>> 
+> >>> >From 00c338e91d3b6600f402f56cdb64c9d370f911c8 Mon Sep 17 00:00:00 2001
+> >>> From: Marc Zyngier <maz@kernel.org>
+> >>> Date: Sun, 28 Jan 2024 13:05:24 +0000
+> >>> Subject: [PATCH] irqchip/gic-v3-its: Fix GICv4.1 VPE affinity update
+> >>> 
+> >>> When updating the affinity of a VPE, we currently skip the VMOVP
+> >>> command if the two CPUs are part of the same VPE affinity.
+> >>> 
+> >>> But this is wrong, as the doorbell corresponding to this VPE
+> >>> is still delivered on the 'old' CPU, which screws up the balancing.
+> >>> Furthermore, offlining that 'old' CPU results in doorbell interrupts
+> >>> generated for this VPE being discarded.
+> >>> 
+> >>> The harsh reality is that we cannot easily elide VMOVP when
+> >>> a set_affinity request occurs. It needs to be obeyed, and if
+> >>> an optimisation is to be made, it is at the point where the affinity
+> >>> change request is made (such as in KVM).
+> >>> 
+> >>> Drop the VMOVP elision altogether, and only use the vpe_table_mask
+> >>> to try and stay within the same ITS affinity group if at all possible.
+> >>> 
+> >>> Fixes: dd3f050a216e (irqchip/gic-v4.1: Implement the v4.1 flavour of VMOVP)
+> >>> Reported-by: Kunkun Jiang <jiangkunkun@huawei.com>
+> >>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> >>> Cc: stable@vger.kernel.org
+> >>> ---
+> >>>    drivers/irqchip/irq-gic-v3-its.c | 22 +++++++++++++---------
+> >>>    1 file changed, 13 insertions(+), 9 deletions(-)
+> >>> 
+> >>> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> >>> index 250b4562f308..78aece62bff5 100644
+> >>> --- a/drivers/irqchip/irq-gic-v3-its.c
+> >>> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> >>> @@ -3826,8 +3826,9 @@ static int its_vpe_set_affinity(struct irq_data *d,
+> >>>    				bool force)
+> >>>    {
+> >>>    	struct its_vpe *vpe = irq_data_get_irq_chip_data(d);
+> >>> -	int from, cpu = cpumask_first(mask_val);
+> >>> +	struct cpumask common;
+> >>>    	unsigned long flags;
+> >>> +	int from, cpu;
+> >>>      	/*
+> >>>    	 * Changing affinity is mega expensive, so let's be as lazy as
+> >>> @@ -3843,19 +3844,22 @@ static int its_vpe_set_affinity(struct irq_data *d,
+> >>>    	 * taken on any vLPI handling path that evaluates vpe->col_idx.
+> >>>    	 */
+> >>>    	from = vpe_to_cpuid_lock(vpe, &flags);
+> >>> -	if (from == cpu)
+> >>> -		goto out;
+> >>> -
+> >>> -	vpe->col_idx = cpu;
+> >>>      	/*
+> >>> -	 * GICv4.1 allows us to skip VMOVP if moving to a cpu whose RD
+> >>> -	 * is sharing its VPE table with the current one.
+> >>> +	 * If we are offered another CPU in the same GICv4.1 ITS
+> >>> +	 * affinity, pick this one. Otherwise, any CPU will do.
+> >>>    	 */
+> >>> -	if (gic_data_rdist_cpu(cpu)->vpe_table_mask &&
+> >>> -	    cpumask_test_cpu(from, gic_data_rdist_cpu(cpu)->vpe_table_mask))
+> >>> +	if (gic_data_rdist_cpu(from)->vpe_table_mask &&
+> >>> +	    cpumask_and(&common, mask_val, gic_data_rdist_cpu(from)->vpe_table_mask))
+> >>> +		cpu = cpumask_first(&common);
+> >>> +	else
+> >>> +		cpu = cpumask_first(mask_val);
+> >>> +
+> >>> +	if (from == cpu)
+> >>>    		goto out;
+> >> The meaning here should be that VMOVP will be skipped
+> >> only if from and target are the same. Then why do we
+> >> still to judge whether they are in the same GICv4.1
+> >> ITS affinity?
+> > Having the same ITS affinity is a performance optimisation, as this
+> > minimises traffic between ITSs and keep cache locality. If the
+> > proposed affinity contains CPUs that are in the same affinity as
+> > current one, then it makes sense to stay there if possible in order to
+> > keep the benefit of the warm translation caches.
+> Ok, I see. In another case, is it possible to skip VMOVP?
+> The from belongs to common, but it is not the first one.
 
-Let's be clear: I have no interest in reports against a version that
-is older than the current one. If you still use V10, then
-congratulations, you are the maintainer of that version.
+You could have something like
 
-> Tried V11 with my local branch of QEMU which
-> is 7.2 based and also with Eric's QEMU[1] which rebased on 8.2. The
-> issue is QEMU crashes at the very beginning itself. Not sure about the
-> issue and yet to debug.
-> 
-> [1] https://github.com/eauger/qemu/tree/v8.2-nv
-
-I have already reported that QEMU was doing some horrible things
-behind the kernel's back, and I don't think it is working correctly.
-
-> 
-> > What you describe looks like a terrible bug somewhere on the
-> > page-fault path that has the potential to impact non-NV, and I'd like
-> > to focus on that.
-> 
-> I found the bug/issue and fixed it.
-> The problem was so random and was happening when tried booting L1 with
-> large cores(200 to 300+).
-> 
-> I have implemented(yet to send to ML for review) to fix the
-> performance issue[2] due to unmapping of Shadow tables by implementing
-> the lookup table to unmap only the mapped Shadow IPAs instead of
-> unmapping complete Shadow S2 of all active NestedVMs.
-
-Again, this is irrelevant:
-
-- you develop against an unmaintained version
-
-- you waste time prematurely optimising code that is clearly
-  advertised as throw-away
-
-> 
-> This lookup table was not adding the mappings created for the L1 when
-> it is using the shadow S2-MMU(my bad, missed to notice that the L1
-> hops between vEL2 and EL1 at the booting stage), hence when there is a
-> page migration, the unmap was not getting done for those pages and
-> resulting in access of stale pages/memory by the some of the VCPUs of
-> L1.
-> 
-> I have modified the check while adding the Shadow-IPA to PA mapping to
-> a lookup table to check, is this page is getting mapped to NestedVMs
-> or to  a L1 while it is using Shadow S2.
-> 
-> [2] https://www.spinics.net/lists/kvm/msg326638.html
-
-Do I read it correctly that I wasted hours trying to reproduce
-something that only exists with on an obsolete series together with
-private patches?
+		if (cpumask_test_cpu(from, &common))
+			cpu = from;
+		else
+			cpu = cpumask_first(&common);
 
 	M.
 
