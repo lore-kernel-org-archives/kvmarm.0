@@ -1,71 +1,85 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E82B18664F
-	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 13:49:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05FD5338E
+	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 14:07:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706795357; cv=none; b=T8kUltAG3ZNVjKe5ALjd/HkS7V4Vv1QFqXu0BtgQ7LZ2ReVtNM5E1k4tE27H1qZ8FZD6L9uT9OoSaAEKFaVZFyWFBfZG+GNz/OmSZwW6if+3Ev+2tTVo+OttciacGp4QGB1UcAHLwN5SAyKppokFtIQxIfw1vZNlS0esUUutFPg=
+	t=1706796460; cv=none; b=UFHyzSQDw9AhVeVkRc4h1nGbL8LHPhuIbAKlsQN+/NO68kSMBgavlHLg7ek77l0wIa1GxnIzD2FB14nuNNr/8XogP4wa1tCvklIpxeGdc9jXrmDxXGHvIam1MAoR9Vs/GZhxN4dRFZx2W2XpyRL+yW+QV+yL3WuXwFaQJx2EVVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706795357; c=relaxed/simple;
-	bh=bOId8USkLcb/U8KoLOJVOiQcwBkApRk2r63Q2Znl8io=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Rzi4jPExx9rlODGj3uDuX0ZKyzDKWqlZD7J6qTPwwWpNoikZF9t7OHDwRpuFLp8LacRb39eqOQQ1zTFFSqpzCJEsYTMHxbgTayw+rr8KS9f+2sxxxnjTv68TaYHWoHomE6W8uOEoE5eOw+esSEQPo3UWAidCa1/HR4MfFxiD68g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TQgGF0hGdz1xn42;
-	Thu,  1 Feb 2024 21:48:05 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4294D1400D4;
-	Thu,  1 Feb 2024 21:49:06 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 1 Feb 2024 21:49:05 +0800
-Subject: Re: [PATCH 00/10] KVM: arm64: fix many kernel-doc warnings
-To: Randy Dunlap <rdunlap@infradead.org>
-CC: <linux-kernel@vger.kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver
- Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, Catalin Marinas <catalin.marinas@arm.com>, Will
- Deacon <will@kernel.org>
-References: <20240117230714.31025-1-rdunlap@infradead.org>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <e875f1c6-2e1e-632a-3db0-5a21aa73f20f@huawei.com>
-Date: Thu, 1 Feb 2024 21:49:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+	s=arc-20240116; t=1706796460; c=relaxed/simple;
+	bh=YtLtuVt5vQKSAoGXbjHiPmAHSNvylt8YcQtO+iRY/Pg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W7AHzoDCkND+YukSH5Ecm8V72m2ZQIHZeGajy6yV56xyeF1qZr82DmRDqGPLRnBzQUMJBSMhUTz/uHI7Qp2UxcVolcrMvlhkAtAYCdrI6yJf9V5b9YTTOPmY4sHaSB3qYgMV1yfOvRDqa24KwvxYsC6onUiERQwepvzIS39x/34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v8EGgKte; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v8EGgKte"
+Date: Thu, 1 Feb 2024 15:07:33 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706796455;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3ntF7DWN6F8I0OAuVeni8p7DVjwqpl4tVp6WRDH3YQo=;
+	b=v8EGgKtenv72eLmWDr1zepVo2BZCviDOXDc54vso1yf79P4b21OE6OTSEj93VaLz7ApGWz
+	L3Tq2PoHEL0zugtqPFHYlbDx9zjodP15uSvCWInkePahq4j4RJrF6ztzR4+8XGF7p4Gpb4
+	8M7I4ton9TNUrqD0JJa/jNVKAJv6z5s=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	kvmarm@lists.linux.dev, ajones@ventanamicro.com, anup@brainfault.org, 
+	atishp@atishpatra.org, pbonzini@redhat.com, thuth@redhat.com, alexandru.elisei@arm.com
+Subject: Re: Re: [kvm-unit-tests PATCH v2 02/24] riscv: Initial port, hello
+ world
+Message-ID: <20240201-404e7aa6ecc346953b825dc5@orel>
+References: <20240126142324.66674-26-andrew.jones@linux.dev>
+ <20240126142324.66674-28-andrew.jones@linux.dev>
+ <b015765b-9833-4879-88fd-1c457b9c292f@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20240117230714.31025-1-rdunlap@infradead.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b015765b-9833-4879-88fd-1c457b9c292f@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 2024/1/18 7:07, Randy Dunlap wrote:
-> Fix a bunch of kernel-doc warnings in arch/arm64/kvm/.
-> 
->  [PATCH 01/10] KVM: arm64: debug: fix kernel-doc warnings
->  [PATCH 02/10] KVM: arm64: guest: fix kernel-doc warnings
->  [PATCH 03/10] KVM: arm64: hyp/aarch32: fix kernel-doc warnings
->  [PATCH 04/10] KVM: arm64: vhe: fix a kernel-doc warning
->  [PATCH 05/10] KVM: arm64: mmu: fix a kernel-doc warning
->  [PATCH 06/10] KVM: arm64: PMU: fix kernel-doc warnings
->  [PATCH 07/10] KVM: arm64: sys_regs: fix kernel-doc warnings
->  [PATCH 08/10] KVM: arm64: vgic-init: fix a kernel-doc warning
->  [PATCH 09/10] KVM: arm64: vgic-its: fix kernel-doc warnings
->  [PATCH 10/10] KVM: arm64: vgic: fix a kernel-doc warning
+On Thu, Feb 01, 2024 at 09:29:36AM +0100, Eric Auger wrote:
+...
+> > --- /dev/null
+> > +++ b/riscv/cstart.S
+> > @@ -0,0 +1,92 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +/*
+> > + * Boot entry point and assembler functions for riscv.
+> > + *
+> > + * Copyright (C) 2023, Ventana Micro Systems Inc., Andrew Jones <ajones@ventanamicro.com>
+> > + */
+> > +#include <asm/csr.h>
+> > +
+> > +.macro zero_range, tmp1, tmp2
+> For my education what were the tmp3/4 args used for on arm?
+> > +9998:	beq	\tmp1, \tmp2, 9997f
+> > +	sd	zero, 0(\tmp1)
+> > +	addi	\tmp1, \tmp1, 8
+> > +	j	9998b
+> > +9997:
+> > +.endm
+> > +
 
-All look good to me,
+arm doesn't have a zero register like arm64 and riscv32/64 have, so at
+least one extra tmp register is needed to hold the zero stored to the
+memory. We use two tmp registers because arm has a 'strd' instruction
+allowing us to write two at once, as long as the first register is
+an even-numbered register and the second is the immediately following
+odd-numbered register. (We should probably write a comment about the
+purpose and even/odd constraints of tmp3/4 above the zero_range macro
+in arm/cstart.S)
 
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-
-Thanks!
+Thanks,
+drew
