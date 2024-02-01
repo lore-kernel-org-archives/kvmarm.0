@@ -1,169 +1,109 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480454DA1C
-	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 09:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618D24DA0B
+	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 10:17:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706780757; cv=none; b=FtBegD/mfGWno9tH6cqOvhfOm5mYfesb0FTa48LyXw4yPi7m4bVWLU4Eb9342LyTzK3uGhNMZsyQ+xMRlNZP50rozYFZW8O8EHxs2CXzgibWJuqOSuJOAItXznpHPUX6CfgSUts3+jiq9h2IKaaXBV3aDEKnPMDQbiNO37/dZdc=
+	t=1706782659; cv=none; b=ilOEPdg8IVho11KHuQZt4VdHaocqzQ/gU5iv8XvCElX8K7KVABx/PXBc3Zcm3dqng//MAUT6kEGStFan+uhIkvRAgbEb+Nax0fXMzf3u8uCIysVmViZ0cxC0d08DBd8QKpQ7kzlxKuMf0uMkV+9I9rRY9CDR4JLIjmOMPCh4Kn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706780757; c=relaxed/simple;
-	bh=aNqWZW6RcqK8RA8lTfX+odywxwnNVRg2P8cqZ4BDSgU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qlwb/44zA80BzZUEQ00wY9upABYxt3qLQT5wgdH+kq66XCdRNNVjyXPWWYirX9NrOsDKPWycpAqKBb6rMM3woX2tGNEo16V3XdSskUz7oD41uw2xVPZSHisHGp5RcJoKMZbXpF/Yppr6onHLicXjj5n0dcTywZrmhtCpRf+eAds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dXjisPIu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1706782659; c=relaxed/simple;
+	bh=JakSA1SIkam0VDpcHM3yYmGak0/Ub8rhyhRsxA9Ahek=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=eo0YXPAYwyCRJSyXMKnOP+DERgNdSPYwZ6aDE1/0/EGRg5gHOXcUQ9K/M0FzfLK60BOzv0htjwbMF4vZd9fPpxKpzd8RgfBmqclCOHxLJTwRh5Q2jo2cUHRf3aQAOy0DHphWk6n+JSBWf94AC1X6E7n+akNnBJ0gtWdusbJiz6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JLbGh9I6; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dXjisPIu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706780754;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DrVU+bxCb/uw2+gU2fqkwUl2STpHNw8pC2Tx+pltE8s=;
-	b=dXjisPIu9NPGwquCDncceSDaCH9pyfHhzjapXl7JjWWBMxeW/2GsB33RYe16MfXzJjswNq
-	eAzgt+HhoiCnfmERR16GQ+x0YfHTMIGV/dajjHfOH38w8y8Vd8kbz5vqrwFO6sBDRcrg1v
-	CEZOVkvknb2Z9v2QFCrA7AkVoibUWng=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-441-P4IyO09MNYGAmdIvhw2dwg-1; Thu, 01 Feb 2024 04:45:52 -0500
-X-MC-Unique: P4IyO09MNYGAmdIvhw2dwg-1
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-68c4ea596cdso8149646d6.2
-        for <kvmarm@lists.linux.dev>; Thu, 01 Feb 2024 01:45:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JLbGh9I6"
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-55f0367b15fso961714a12.0
+        for <kvmarm@lists.linux.dev>; Thu, 01 Feb 2024 02:17:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1706782655; x=1707387455; darn=lists.linux.dev;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SlK6soAmcqVG2ecR9BfQrWlI8GpaFdWOJjTghV8Nrt0=;
+        b=JLbGh9I6Jhdw+rXlv7XF4orvFBQjDJXsL8mFWKsSnoQaDtiPPRtXnv6xhArRj4DXg4
+         YZ3OMpl3zLoMZt2LCtInVct0YsAJ88tWTN+C2om6aQ+dndxXhOfXNNBGjRx9gVa6jNx0
+         coZIi590PAdKm0Ecc0GcySS9myIq9wydLS85oMiH8JfIDZxUShD3vVAMqND4ajfQ3+zH
+         KUCGaCnk62FfjEb4fzUQ+G1+BBpA4tWyncTiRK0tBviixeGbI+PvHHHHZKwAIJ+WucNX
+         eWb3e3Z7B4J1VVteaffQm3MKIEZFYcIQDuybLCsBn1DpvYmXh02dFAB7u+CLJ3WPbwST
+         S62g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706780752; x=1707385552;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DrVU+bxCb/uw2+gU2fqkwUl2STpHNw8pC2Tx+pltE8s=;
-        b=vXWTaxCfa7yek9DRwGtweTOZqj6v508zwIzE4+8V6tC1UQLyhwZesvFtPub3xzpOc8
-         C9N1sXXmwa9QJ5K6nmzTjm1tyNUd8bF88KgZJyCme61XsWC/um3b3qz57RPqn2o5YB9n
-         4CTuQBtwiuh5z0+BsU0uPwQqnu/cHsIFTB12Dro45lr8kzr71+JNPtbenJjXa9IkP9AQ
-         GmLI6w6Ab1nIy04zqd2p2EEM/ZHqZvjcQUAQGiLhhuXA4Cr3Sj54RXnNjZ34d3HJKgjW
-         OrfXlpNhcwOi8wWBzUHsHqeFeUWI97QWkAgcjbWJlb3q5AMRpwz9n/nsV+qSSmOG/ZWK
-         M0Mw==
-X-Gm-Message-State: AOJu0YzmMoeTWnZOBrGvVv7slPyKUCrS4fc73NBbR2GNr4ZMGWHWV0Nr
-	mIyLRGN7xsxwkTFjZ2Cu9draryt3iffEa99fYZD5ygka1Sz6DsFJ42UrVHPRXclyDbrSwC7J1tH
-	nNL/CZHRA9Zq9R9+LXHliketsdbzAhgmJ1WZ5LdOuyIPdnk9KdzES/A==
-X-Received: by 2002:a05:6214:1314:b0:685:a8d7:4c24 with SMTP id pn20-20020a056214131400b00685a8d74c24mr4751658qvb.32.1706780752225;
-        Thu, 01 Feb 2024 01:45:52 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFG28NP3prMqpJ8rQDWnq3QonHb0ZxcexPRck7gHhbp2xafjHdgp1Ueix8Ur/1n+r+ZLdchpQ==
-X-Received: by 2002:a05:6214:1314:b0:685:a8d7:4c24 with SMTP id pn20-20020a056214131400b00685a8d74c24mr4751642qvb.32.1706780751974;
-        Thu, 01 Feb 2024 01:45:51 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXXSldVy67JtjS3zYuvLQ7dLV4xY/2lUtZvTKDaUuT0poXQEL5joBK+zCKbk+yFEg7eH7J4zGbGgVU8gLcIS2J0NtDzyEml/cW46f8HI9Ul/EsGro9DzrmVJYV83VPhR91gxoNGWiB9CYdGp24L8KdJ/kzwUm3oEt5OwURZHUKhPZO1lYPEeEOxPRxA/3sI2Xbh/OFBpmmc8ozfV+kKjCwC835yioAfFprDR7EzY5RKi1sqUcUC3Z+nFu2F9628d8GmbL/RsepRn4w+2Byvm7KkE90IojwX7w+6wUnCnrDy3X6dCVlv7/A=
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ma4-20020a0562145b0400b006843f949b29sm6375102qvb.16.2024.02.01.01.45.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Feb 2024 01:45:51 -0800 (PST)
-Message-ID: <9087ae37-e42c-456c-a9f1-b62fd101e9e0@redhat.com>
-Date: Thu, 1 Feb 2024 10:45:48 +0100
+        d=1e100.net; s=20230601; t=1706782655; x=1707387455;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SlK6soAmcqVG2ecR9BfQrWlI8GpaFdWOJjTghV8Nrt0=;
+        b=b1LDJ2wakstnljE8zj3W7M4asVDnpG5QHzFzDMtmi6YuxjJgyUAsBd0H/SayIYJL7T
+         /zLu+w4lsePHJp2zyIV4KMjJYu26woPQcLbOt0SeHtjYPm8rPJtioVkZfdmdjWPsLuT4
+         OaluF5tEWYSjB310u217h76LyJjFleXhq34aCiB/lBfGhI3HRjEq+nuOh+cpCT+rpDLL
+         XXBQi3yDRBj5yAUWQiVvuvZXvL1d3ZLxvVmB2Xm4xTnjkR6FM1vEaq6ed1CS4XKmGyxq
+         /C1ekZYYhLKs7O2OBAWfHnGauhP9nRTpbtMsdWtNzWQ45lqdTiRru9rdLFtgt9/aXDcF
+         Qf1Q==
+X-Gm-Message-State: AOJu0YyNM9WeU28OplqxgJRntKMfXaz5zpsJPIjikMbJ6jWYB2kUPHJE
+	PPrDChtaHPznfFF3XrEfWITL/s+bzkoEqLakd3zt3B1RXNbWCprPx5VoMeLSVP8=
+X-Google-Smtp-Source: AGHT+IGTquJMFOjWVwcDakJ2/kcpTAoYul8ecE3kBTsNkbEcKEEHYJGC7e74Gkfa7iLMRrB+fSVg7Q==
+X-Received: by 2002:aa7:df0e:0:b0:55f:acb3:f9e1 with SMTP id c14-20020aa7df0e000000b0055facb3f9e1mr1329974edy.28.1706782655544;
+        Thu, 01 Feb 2024 02:17:35 -0800 (PST)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id g13-20020aa7c84d000000b0055c1433be60sm6835389edt.50.2024.02.01.02.17.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Feb 2024 02:17:35 -0800 (PST)
+Date: Thu, 1 Feb 2024 13:17:15 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oliver.upton@linux.dev
+Cc: kvmarm@lists.linux.dev
+Subject: [bug report] KVM: arm64: Always invalidate TLB for stage-2
+ permission faults
+Message-ID: <1479cd6b-a10c-4459-8b34-318865cb807a@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 21/24] lib: Add strcasecmp and
- strncasecmp
-To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev
-Cc: ajones@ventanamicro.com, anup@brainfault.org, atishp@atishpatra.org,
- pbonzini@redhat.com, thuth@redhat.com, alexandru.elisei@arm.com
-References: <20240126142324.66674-26-andrew.jones@linux.dev>
- <20240126142324.66674-47-andrew.jones@linux.dev>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20240126142324.66674-47-andrew.jones@linux.dev>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+Hello Oliver Upton,
 
+The patch be097997a273: "KVM: arm64: Always invalidate TLB for
+stage-2 permission faults" from Sep 22, 2023 (linux-next), leads to
+the following Smatch static checker warning:
 
-On 1/26/24 15:23, Andrew Jones wrote:
-> We'll soon want a case insensitive string comparison. Add toupper()
-> and tolower() too (the latter gets used by the new string functions).
->
-> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Acked-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+	arch/arm64/kvm/hyp/nvhe/../pgtable.c:1342 kvm_pgtable_stage2_relax_perms()
+	error: uninitialized symbol 'level'.
 
-Eric
-> ---
->  lib/ctype.h  | 10 ++++++++++
->  lib/string.c | 14 ++++++++++++++
->  lib/string.h |  2 ++
->  3 files changed, 26 insertions(+)
->
-> diff --git a/lib/ctype.h b/lib/ctype.h
-> index 48a9c16300f8..45c96f111e19 100644
-> --- a/lib/ctype.h
-> +++ b/lib/ctype.h
-> @@ -37,4 +37,14 @@ static inline int isspace(int c)
->          return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\v' || c == '\f';
->  }
->  
-> +static inline int toupper(int c)
-> +{
-> +	return islower(c) ? c - 'a' + 'A' : c;
-> +}
-> +
-> +static inline int tolower(int c)
-> +{
-> +	return isupper(c) ? c - 'A' + 'a' : c;
-> +}
-> +
->  #endif /* _CTYPE_H_ */
-> diff --git a/lib/string.c b/lib/string.c
-> index 6d8a6380db92..ab6a724a3144 100644
-> --- a/lib/string.c
-> +++ b/lib/string.c
-> @@ -54,11 +54,25 @@ int strncmp(const char *a, const char *b, size_t n)
->  	return 0;
->  }
->  
-> +int strncasecmp(const char *a, const char *b, size_t n)
-> +{
-> +	for (; n--; ++a, ++b)
-> +		if (tolower(*a) != tolower(*b) || *a == '\0')
-> +			return tolower(*a) - tolower(*b);
-> +
-> +	return 0;
-> +}
-> +
->  int strcmp(const char *a, const char *b)
->  {
->  	return strncmp(a, b, SIZE_MAX);
->  }
->  
-> +int strcasecmp(const char *a, const char *b)
-> +{
-> +	return strncasecmp(a, b, SIZE_MAX);
-> +}
-> +
->  char *strchr(const char *s, int c)
->  {
->  	while (*s != (char)c)
-> diff --git a/lib/string.h b/lib/string.h
-> index 758dca8af36a..a28d75641530 100644
-> --- a/lib/string.h
-> +++ b/lib/string.h
-> @@ -15,6 +15,8 @@ extern char *strcat(char *dest, const char *src);
->  extern char *strcpy(char *dest, const char *src);
->  extern int strcmp(const char *a, const char *b);
->  extern int strncmp(const char *a, const char *b, size_t n);
-> +int strcasecmp(const char *a, const char *b);
-> +int strncasecmp(const char *a, const char *b, size_t n);
->  extern char *strchr(const char *s, int c);
->  extern char *strrchr(const char *s, int c);
->  extern char *strchrnul(const char *s, int c);
+arch/arm64/kvm/hyp/nvhe/../pgtable.c
+    1319 int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+    1320                                    enum kvm_pgtable_prot prot)
+    1321 {
+    1322         int ret;
+    1323         s8 level;
+    1324         kvm_pte_t set = 0, clr = 0;
+    1325 
+    1326         if (prot & KVM_PTE_LEAF_ATTR_HI_SW)
+    1327                 return -EINVAL;
+    1328 
+    1329         if (prot & KVM_PGTABLE_PROT_R)
+    1330                 set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+    1331 
+    1332         if (prot & KVM_PGTABLE_PROT_W)
+    1333                 set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+    1334 
+    1335         if (prot & KVM_PGTABLE_PROT_X)
+    1336                 clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
+    1337 
+    1338         ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level,
+    1339                                        KVM_PGTABLE_WALK_HANDLE_FAULT |
+    1340                                        KVM_PGTABLE_WALK_SHARED);
+    1341         if (!ret || ret == -EAGAIN)
+--> 1342                 kvm_call_hyp(__kvm_tlb_flush_vmid_ipa_nsh, pgt->mmu, addr, level);
+                                                                                    ^^^^^
+level is uninitialized if ret is -EAGAIN
 
+    1343         return ret;
+    1344 }
+
+regards,
+dan carpenter
