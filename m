@@ -1,169 +1,144 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B42A6FB80
-	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 17:38:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357147C6C4
+	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 17:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706809136; cv=none; b=hPr1b6Nbmg16yTLAvC4i4/CnnPPS1Cx4DhhtpcTMbAsVlz6aFQBhmLzUsx2Amv2/vGz47kzSiICPWP9YdGKUVvO/ZcXzgD45F2fzgQRu0HujJVtq8b1zuQbBza5JodlA3E52nC1M/Z/yfHHtS2AkFHUcL60CbLUldwo/zTXVq8Y=
+	t=1706809614; cv=none; b=Y4nPWwUTdVTHJOsS+lH4KmfwOXIDgeSSH+RoyS3vwaXlZeXYLepALAXUKf9qRV0gG4tVubWEWdHSM3Yg70gBzUL1TolRuKTasM3eXAyBPEh+NZRzHl6I6DiZu7ElgO8Spm8xYEK1ST8oS3oBcrUaNHbg0UM3/EvkbEHfB95snDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706809136; c=relaxed/simple;
-	bh=+jscayz1j5iTQ/gLXe+z+HvDEvJcz5+9nneP6cJ+HKk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E1Oy54BLboD4+svxMA0HRo41tJ+2bcrddkoFADgqFDbHUU9IMwqoOxBzB8XccNQrhMK2fPukgZFprHGGr8nucHvaMzSTZqE3vJcZZ909Zyt9TD/4PZP6bdtBI/70ea3rkwmTNB3YCDoFwrTJm1ZJiJ9Zw5XjffuJO6ItZC22Hps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 32134DA7;
-	Thu,  1 Feb 2024 09:39:36 -0800 (PST)
-Received: from raptor (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 95BF13F738;
-	Thu,  1 Feb 2024 09:38:48 -0800 (PST)
-Date: Thu, 1 Feb 2024 17:38:42 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev,
-	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org,
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
-	bristot@redhat.com, vschneid@redhat.com, mhiramat@kernel.org,
-	rppt@kernel.org, hughd@google.com, pcc@google.com,
-	steven.price@arm.com, vincenzo.frascino@arm.com, david@redhat.com,
-	eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC v3 31/35] khugepaged: arm64: Don't collapse MTE
- enabled VMAs
-Message-ID: <ZbvXImzAJNKQvamJ@raptor>
-References: <20240125164256.4147-1-alexandru.elisei@arm.com>
- <20240125164256.4147-32-alexandru.elisei@arm.com>
- <599769c3-0aef-4c5b-ac98-f109649862f7@arm.com>
+	s=arc-20240116; t=1706809614; c=relaxed/simple;
+	bh=UtrCl+//nMzOrjxzTW2hJCrpbv42WlAfJ1HSYNjMd1Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ERezpxOrNfXuxcFpsvkKUNE6odBlK0YMDujM/J2fjDmAaTbGQwSwaP2jjxXD4CKMRP6lELqqPSp1LIjiOkszqWYT0NpHp0oV49g+8Fy1EHfQxrEN6DjZxJjemHG0tO8WoM3y/QheY76u7OSPZPf+IT8yEOFT7IwpgpsiJp0fXg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ihK5pDi1; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ihK5pDi1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706809612;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8Pfr4KxXg16gh4zIma5BqG45urMrXkBX1Ao+OzgSrmg=;
+	b=ihK5pDi186Kjedu5CT+2qFSYlnuNjbprczMNbhlrR0Z4TpGL6eTvXQpExR78jwpbmJ+aIy
+	ae6H4yLXyac9CWnJ09m6qIr3sN2pV3jCUECZ6an6wFkNJffweQdH68yM4tJVD1jgM2VFOR
+	40Hnv0wtRINVOaEh9pIegYDD714QnDQ=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-684-EpZmL_BeM6aTvT1HKxhArA-1; Thu, 01 Feb 2024 12:46:50 -0500
+X-MC-Unique: EpZmL_BeM6aTvT1HKxhArA-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-783eb1d9aebso149249885a.3
+        for <kvmarm@lists.linux.dev>; Thu, 01 Feb 2024 09:46:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706809610; x=1707414410;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8Pfr4KxXg16gh4zIma5BqG45urMrXkBX1Ao+OzgSrmg=;
+        b=DxfKB1WEmj4sHsEvAnNWOxJszSrsmZo4l7HXMJo2bhAEBUw8m6ozI74LkkcaxjHLLJ
+         5ksM4nkPAsgHZH0YR3ZtQ6uIoUbcVJDaJQNmZ5+/M8eafXtb/7X3jfbTX4yCrZzMgv7a
+         lIiakO3Q1V9M/4EfYaIGtvZY8zfyWdkF9WhT45K4u2RPmjvqT3lZr0bPAk2AwDodnYIG
+         H7dhc92gi4bsNPlhbWa86t/OuIz7t1245X2b04D/5Yvvsg0QblmrOqmDUXquaIQHmlHx
+         Y04d5kCzhgCw+MvYzxVX+KOEv4qyibGTWUEuvWMgKLRGbi0QV5HbsRwlQ8at8bJdSweL
+         MTBQ==
+X-Gm-Message-State: AOJu0YypxBiIIM98zVbXOQpim2DluTd0XzESIVKDp0dPBX6teliA56S0
+	tHWVNJcB0m/FetfqV0ePZh6v3z7ozMdgL6ZxMvUIRt/6kzM2lQkqm0li2wR0UzUohRE5fyusnxY
+	1xOd4oRU0jMfKVh9xpwo48YKqvXXKFyro6UQZ7gbz1DQSPW0oVZ/ZHQ==
+X-Received: by 2002:a05:620a:4014:b0:783:f7a9:9cef with SMTP id h20-20020a05620a401400b00783f7a99cefmr4001837qko.16.1706809610351;
+        Thu, 01 Feb 2024 09:46:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGVkeTVrLRcUd7YlboQiZrp4IV61mP2U3t7oYqqsWCeH9M0QO425T0tKYqDxmrKuuUO20X6Bw==
+X-Received: by 2002:a05:620a:4014:b0:783:f7a9:9cef with SMTP id h20-20020a05620a401400b00783f7a99cefmr4001822qko.16.1706809610101;
+        Thu, 01 Feb 2024 09:46:50 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCU3ksgcpVhUOrPNNPWWNbdI3Oocz2WpGPfCP4NRqj8Igra3/lFT+ycuOqRpZkaFR+b6rYyUnUWnS5n1Bh94rEXkni93Kxo808C/N0CcTRK7/rDFdXHyZlLcwbAQ6ivxr0OaEmDpUuzGc4U4yDQQQwmn8LW7CpxUqn2ORSbfJG/tmBEcBrsFDWZPkf/RCGXIXTbBAMw2My2fFvkoGDFs8VY+exOjZqs7PbABabYQYxcisv6eV1visCdwx8CYu6HZhiyuiJyFsffkhL2JTL4AOYnQ4RkI8u0UG4fhVjb5pwJCDkiyx/KdVTX2qmhH
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id u20-20020a05620a085400b00783f669dc18sm2605qku.118.2024.02.01.09.46.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Feb 2024 09:46:49 -0800 (PST)
+Message-ID: <783ed9aa-82f7-41b7-a082-e3b75276bd7c@redhat.com>
+Date: Thu, 1 Feb 2024 18:46:46 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <599769c3-0aef-4c5b-ac98-f109649862f7@arm.com>
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 16/24] arm/arm64: Share memregions
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ kvmarm@lists.linux.dev, ajones@ventanamicro.com, anup@brainfault.org,
+ atishp@atishpatra.org, pbonzini@redhat.com, thuth@redhat.com,
+ alexandru.elisei@arm.com
+References: <20240126142324.66674-26-andrew.jones@linux.dev>
+ <20240126142324.66674-42-andrew.jones@linux.dev>
+ <730ca018-cb7b-4ef8-b544-7afdfce03bc8@redhat.com>
+ <20240201-522cd6aa1f8162c0c50f63b0@orel>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20240201-522cd6aa1f8162c0c50f63b0@orel>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 01, 2024 at 01:42:08PM +0530, Anshuman Khandual wrote:
-> 
-> 
-> On 1/25/24 22:12, Alexandru Elisei wrote:
-> > copy_user_highpage() will do memory allocation if there are saved tags for
-> > the destination page, and the page is missing tag storage.
-> > 
-> > After commit a349d72fd9ef ("mm/pgtable: add rcu_read_lock() and
-> > rcu_read_unlock()s"), collapse_huge_page() calls
-> > __collapse_huge_page_copy() -> .. -> copy_user_highpage() with the RCU lock
-> > held, which means that copy_user_highpage() can only allocate memory using
-> > GFP_ATOMIC or equivalent.
-> > 
-> > Get around this by refusing to collapse pages into a transparent huge page
-> > if the VMA is MTE-enabled.
-> 
-> Makes sense when copy_user_highpage() will allocate memory for tag storage.
-> 
-> > 
-> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > ---
-> > 
-> > Changes since rfc v2:
-> > 
-> > * New patch. I think an agreement on whether copy*_user_highpage() should be
-> > always allowed to sleep, or should not be allowed, would be useful.
-> 
-> This is a good question ! Even after preventing the collapse of MTE VMA here,
-> there still might be more paths where a sleeping (i.e memory allocating)
-> copy*_user_highpage() becomes problematic ?
 
-Exactly!
 
-> 
-> > 
-> >  arch/arm64/include/asm/pgtable.h    | 3 +++
-> >  arch/arm64/kernel/mte_tag_storage.c | 5 +++++
-> >  include/linux/khugepaged.h          | 5 +++++
-> >  mm/khugepaged.c                     | 4 ++++
-> >  4 files changed, 17 insertions(+)
-> > 
-> > diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-> > index 87ae59436162..d0473538c926 100644
-> > --- a/arch/arm64/include/asm/pgtable.h
-> > +++ b/arch/arm64/include/asm/pgtable.h
-> > @@ -1120,6 +1120,9 @@ static inline bool arch_alloc_cma(gfp_t gfp_mask)
-> >  	return true;
-> >  }
-> >  
-> > +bool arch_hugepage_vma_revalidate(struct vm_area_struct *vma, unsigned long address);
-> > +#define arch_hugepage_vma_revalidate arch_hugepage_vma_revalidate
-> > +
-> >  #endif /* CONFIG_ARM64_MTE_TAG_STORAGE */
-> >  #endif /* CONFIG_ARM64_MTE */
-> >  
-> > diff --git a/arch/arm64/kernel/mte_tag_storage.c b/arch/arm64/kernel/mte_tag_storage.c
-> > index ac7b9c9c585c..a99959b70573 100644
-> > --- a/arch/arm64/kernel/mte_tag_storage.c
-> > +++ b/arch/arm64/kernel/mte_tag_storage.c
-> > @@ -636,3 +636,8 @@ void arch_alloc_page(struct page *page, int order, gfp_t gfp)
-> >  	if (tag_storage_enabled() && alloc_requires_tag_storage(gfp))
-> >  		reserve_tag_storage(page, order, gfp);
-> >  }
-> > +
-> > +bool arch_hugepage_vma_revalidate(struct vm_area_struct *vma, unsigned long address)
-> > +{
-> > +	return !(vma->vm_flags & VM_MTE);
-> > +}
-> > diff --git a/include/linux/khugepaged.h b/include/linux/khugepaged.h
-> > index f68865e19b0b..461e4322dff2 100644
-> > --- a/include/linux/khugepaged.h
-> > +++ b/include/linux/khugepaged.h
-> > @@ -38,6 +38,11 @@ static inline void khugepaged_exit(struct mm_struct *mm)
-> >  	if (test_bit(MMF_VM_HUGEPAGE, &mm->flags))
-> >  		__khugepaged_exit(mm);
-> >  }
-> > +
-> > +#ifndef arch_hugepage_vma_revalidate
-> > +#define arch_hugepage_vma_revalidate(vma, address) 1
-> 
-> Please replace s/1/true as arch_hugepage_vma_revalidate() returns bool ?
+On 2/1/24 15:21, Andrew Jones wrote:
+> On Thu, Feb 01, 2024 at 01:03:54PM +0100, Eric Auger wrote:
+>> Hi Drew,
+>>
+>> On 1/26/24 15:23, Andrew Jones wrote:
+> ...
+>>> -static void mem_regions_add_assumed(void)
+>>> -{
+>>> -	phys_addr_t code_end = (phys_addr_t)(unsigned long)&_etext;
+>>> -	struct mem_region *r;
+>>> -
+>>> -	r = mem_region_find(code_end - 1);
+>>> -	assert(r);
+>>> +	struct mem_region *code, *data;
+>>>  
+>>>  	/* Split the region with the code into two regions; code and data */
+>>> -	mem_region_add(&(struct mem_region){
+>>> -		.start = code_end,
+>>> -		.end = r->end,
+>>> -	});
+>>> -	*r = (struct mem_region){
+>>> -		.start = r->start,
+>>> -		.end = code_end,
+>>> -		.flags = MR_F_CODE,
+>>> -	};
+>>> +	memregions_split((unsigned long)&_etext, &code, &data);
+>>> +	assert(code);
+>>> +	code->flags |= MR_F_CODE;
+>> I think this would deserve to be split into several patches, esp. this
+>> change in the implementation of
+>>
+>> mem_regions_add_assumed and the init changes. At the moment this is pretty difficult to review
+>>
+> Darn, you called me out on this one :-) I had a feeling I should split out
+> the introduction of memregions_split(), since it was sneaking a bit more
+> into the patch than just code motion as advertised, but then I hoped I
+> get away with putting a bit more burden on the reviewer instead. If you
+> haven't already convinced yourself that the new function is equivalent to
+> the old code, then I'll respin with the splitting and also create a new
+> patch for the 'mem_region' to 'memregions' rename while at it (so there
+> will be three patches instead of one). But, if you're already good with
+> it, then I'll leave it as is, since patch splitting is a pain...
+frankly I would prefer you split. But maybe somebody smarter than me
+will be able to review as is, maybe just wait a little bit until you
+respin ;-)
 
-Yeah, that's strange, I don't know why I used 1 there. Will change it to true,
-thanks for spotting it.
+Eric
+>
+> Thanks,
+> drew
+>
 
-> 
-> > +#endif
-> 
-> Right, above construct is much better than __HAVE_ARCH_XXXX based one.
-
-Thanks!
-
-Alex
-
-> 
-> > +
-> >  #else /* CONFIG_TRANSPARENT_HUGEPAGE */
-> >  static inline void khugepaged_fork(struct mm_struct *mm, struct mm_struct *oldmm)
-> >  {
-> > diff --git a/mm/khugepaged.c b/mm/khugepaged.c
-> > index 2b219acb528e..cb9a9ddb4d86 100644
-> > --- a/mm/khugepaged.c
-> > +++ b/mm/khugepaged.c
-> > @@ -935,6 +935,10 @@ static int hugepage_vma_revalidate(struct mm_struct *mm, unsigned long address,
-> >  	 */
-> >  	if (expect_anon && (!(*vmap)->anon_vma || !vma_is_anonymous(*vmap)))
-> >  		return SCAN_PAGE_ANON;
-> > +
-> > +	if (!arch_hugepage_vma_revalidate(vma, address))
-> > +		return SCAN_VMA_CHECK;
-> > +
-> >  	return SCAN_SUCCEED;
-> >  }
-> >  
-> 
-> Otherwise this LGTM.
