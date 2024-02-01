@@ -1,38 +1,42 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A299D5B670
-	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 14:56:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE6A5F483
+	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 15:24:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706799374; cv=none; b=Z2CZRZO7mtyvVJglN4mEtXq1HpN5hdQnrytlaagku+2udc1EBB8+9VqrvbqFulQQQ10jrLNjM2csT1/jo+RAI4P+oFDA3n9d4dzvUXVoPa9e20AzPrI4PMuUV/kGE1fAwxEt02/wjJVkmWO1Jt9a+yHNJNYqivVer6rOLdSIwTM=
+	t=1706801091; cv=none; b=RCGcwJGitzPNrTOT8p0n4dBEsWR4RuHt0Pg5I70gG8BKNidtx3pTfzdhsqSewPPQbq4ihcXgw3Piuo+w0xc2xCNQJC3bl0Al79G2yAf8hY43fcLa0QnFd+InS5g9gf1sna+OGPVINYODpF+SNaDGNmbloRF8fX25Q2GzD7n3TIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706799374; c=relaxed/simple;
-	bh=ZLCduID2/j7D+zjrlCVL2fhGLgA8sn8xXW5rtCJVfsk=;
+	s=arc-20240116; t=1706801091; c=relaxed/simple;
+	bh=XUnkRVzXP0J5ztlCEqt0Jnkrx//imaYicJF9DMcPF5g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MTLa6ffzvT/OocG4mnbYao51qt0eQdnFMnBLAm5Ai4NqYS+62WRVEIKeg0l2I2/0xil95dfmO295Cg5ro+V7DAv+7Qr9J8xJOwjr/U3D8dYtZL0Xt9lnpNZxRwdxV7iThvfstY2M2R3ULcjSFQcUEx4uS2lpmm/cRvGrF15r5To=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6EB92DA7;
-	Thu,  1 Feb 2024 06:56:53 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6F2533F738;
-	Thu,  1 Feb 2024 06:56:09 -0800 (PST)
-Date: Thu, 1 Feb 2024 14:56:07 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v2 04/25] KVM: arm64: nv: Add sanitising to EL2
- configuration registers
-Message-ID: <20240201145607.GH2284078@e124191.cambridge.arm.com>
-References: <20240130204533.693853-1-maz@kernel.org>
- <20240130204533.693853-5-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=TqdM/lRAD6e242/IOE/2u6TeKG6v0HS8EVRntWCW4GqZ01LSHkZjW9JiLy6VJPaom9ZAuVvxKN5eWre+JOnrZw9nK8f8g0EPxWFdnWaHmql3JfAKoS6Jmbgg+TBv5LWKUSKSwndHHnZriL/qY2DYTL3x5yHq1Lj440lrazddrb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GC1aR+1n; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GC1aR+1n"
+Date: Thu, 1 Feb 2024 16:24:43 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706801086;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DNm/YSjEI3MHXj9mUdpdM+XLsKI+Mq5SAxRsrNRS2Io=;
+	b=GC1aR+1n1SJMv8BfpOpsQDW1BIY8gPn5PsZ+8oWcco2nAdGypgeJtlgtUnyBIO1HR3Y2s5
+	jYUp+y/L5hHBUKK0YEtUUINb996KusIrZsss9FNpNK4mdgGHscTE5ioUO7RDHzeDzTzAEY
+	ieb1HZlKAPeI+dVu69ORuJCgE770j0U=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	kvmarm@lists.linux.dev
+Cc: ajones@ventanamicro.com, anup@brainfault.org, atishp@atishpatra.org, 
+	pbonzini@redhat.com, thuth@redhat.com, alexandru.elisei@arm.com, 
+	eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 08/24] riscv: Add riscv32 support
+Message-ID: <20240201-89bb062a591a3a65313f4cba@orel>
+References: <20240126142324.66674-26-andrew.jones@linux.dev>
+ <20240126142324.66674-34-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,105 +45,47 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240130204533.693853-5-maz@kernel.org>
+In-Reply-To: <20240126142324.66674-34-andrew.jones@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jan 30, 2024 at 08:45:11PM +0000, Marc Zyngier wrote:
-> We can now start making use of our sanitising masks by setting them
-> to values that depend on the guest's configuration.
-> 
-> First up are VTTBR_EL2, VTCR_EL2, VMPIDR_EL2 and HCR_EL2.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/nested.c | 56 ++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 55 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index c976cd4b8379..ee461e630527 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -181,7 +181,7 @@ u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg sr)
->  	return v;
->  }
+On Fri, Jan 26, 2024 at 03:23:33PM +0100, Andrew Jones wrote:
+...
+> diff --git a/lib/ldiv32.c b/lib/ldiv32.c
+> index 897a4b9cd39e..9ce2a6a1faf0 100644
+> --- a/lib/ldiv32.c
+> +++ b/lib/ldiv32.c
+> @@ -1,5 +1,21 @@
+>  #include <stdint.h>
 >  
-> -static void __maybe_unused set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u64 res1)
-> +static void set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u64 res1)
->  {
->  	int i = sr - __VNCR_START__;
->  
-> @@ -191,6 +191,7 @@ static void __maybe_unused set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u
->  
->  int kvm_init_nv_sysregs(struct kvm *kvm)
->  {
-> +	u64 res0, res1;
->  	int ret = 0;
->  
->  	mutex_lock(&kvm->arch.config_lock);
-> @@ -209,6 +210,59 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
->  		kvm->arch.id_regs[i] = limit_nv_id_reg(IDX_IDREG(i),
->  						       kvm->arch.id_regs[i]);
->  
-> +	/* VTTBR_EL2 */
-> +	res0 = res1 = 0;
-> +	if (!kvm_has_feat_enum(kvm, ID_AA64MMFR1_EL1, VMIDBits, 16))
-> +		res0 |= GENMASK(63, 56);
-> +	set_sysreg_masks(kvm, VTTBR_EL2, res0, res1);
+> +#if __riscv_xlen == 32
+> +int __clzdi2(unsigned long);
 > +
-> +	/* VTCR_EL2 */
-> +	res0 = GENMASK(63, 32) | GENMASK(30, 20);
-> +	res1 = BIT(31);
-> +	set_sysreg_masks(kvm, VTCR_EL2, res0, res1);
+> +int __clzdi2(unsigned long a)
+> +{
+> +	int n = 0;
 > +
-> +	/* VMPIDR_EL2 */
-> +	res0 = GENMASK(63, 40) | GENMASK(30, 24);
-> +	res1 = BIT(31);
-> +	set_sysreg_masks(kvm, VMPIDR_EL2, res0, res1);
+> +	while (a) {
+> +		++n;
+> +		a >>= 1;
+> +	}
 > +
-> +	/* HCR_EL2 */
-> +	res0 = BIT(48);
-> +	res1 = HCR_RW;
+> +	return 32 - n;
+> +}
+> +#endif
+> +
 
-Just want to clarify this bit actually, this is restricting the (first level
-only?) nested EL1 to run as AArch64?
-Should we be sanitising ID_AA64PFR0_EL1.EL1=0b0001?
+On riscv32, when attempting to do printf("%llx\n", x), where x is a 64-bit
+type, I found a bug with the above. It turns out that despite [1] stating
+that __clzdi2() takes an unsigned long, libgcc code which generates calls
+to it expect it to take an unsigned long long. I've fixed this for v3 by
+renaming the above function to __clzsi2() and adding
 
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, TWED, IMP))
-> +		res0 |= GENMASK(63, 59);
-> +	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, MTE, MTE2))
-> +		res0 |= (HCR_TID5 | HCR_DCT | HCR_ATA);
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, EVT, TTLBxS))
-> +		res0 |= (HCR_TTLBIS | HCR_TTLBOS);
-> +	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, CSV2, CSV2_2) &&
-> +	    !kvm_has_feat(kvm, ID_AA64PFR1_EL1, CSV2_frac, CSV2_1p2))
-> +		res1 = HCR_ENSCXT;
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, EVT, IMP))
-> +		res0 |= (HCR_TID4 | HCR_TICAB | HCR_TOCU);
-> +	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, V1P1))
-> +		res0 |= HCR_AMVOFFEN;
-> +	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, V1P1))
-> +		res0 |= HCR_FIEN;
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, FWB, IMP))
-> +		res0 |= HCR_FWB;
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, NV, NV2))
-> +		res0 |= HCR_NV2;
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, NV, IMP))
-> +		res0 |= (HCR_AT | HCR_NV1 | HCR_NV);
-> +	if (!(__vcpu_has_feature(&kvm->arch, KVM_ARM_VCPU_PTRAUTH_ADDRESS) &&
-> +	      __vcpu_has_feature(&kvm->arch, KVM_ARM_VCPU_PTRAUTH_ADDRESS)))
-> +		res0 |= (HCR_API | HCR_APK);
-> +	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TME, IMP))
-> +		res0 |= BIT(39);
-> +	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP))
-> +		res0 |= (HCR_TERR | HCR_TEA);
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, LO, IMP))
-> +		res0 |= HCR_TLOR;
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR4_EL1, E2H0, IMP))
-> +		res1 |= HCR_E2H;
-> +	set_sysreg_masks(kvm, HCR_EL2, res0, res1);
-> +
->  out:
->  	mutex_unlock(&kvm->arch.config_lock);
->  
+ int __clzdi2(uint64_t num)
+ {
+     return num >> 32 ? __clzsi2(num >> 32) : __clzsi2(num) + 32;
+ }
+
+[1] https://gcc.gnu.org/onlinedocs/gccint/Integer-library-routines.html
 
 Thanks,
-Joey
+drew
