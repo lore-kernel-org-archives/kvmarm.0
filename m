@@ -1,276 +1,118 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F21A11649D1
-	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 16:14:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6AC87E10A
+	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 16:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706804068; cv=none; b=pl7JV2Je0s/H29EuFYcMUOihPfM4r/pcIag9WdpcBnBZznJB4fSHzJdnuOuS1121BqaelaUJBt4mZM7NdQQCHPU/Dvu8h2b9TwLauEkfO4IGpSqpqx+PJQVz80jEocAtDVSGuR9gVthPv2h2iLN3WLidlKk9g/GAl8lN1afICJo=
+	t=1706804903; cv=none; b=FwfVy6mVyi8T2MECzzBmvW52kkqf1O0NMnN8WBaa+fjSNixRu/6rBMWQHFyptj7RogHmg74S9QOv0PZbqCO5UQPhoKaEZai5YnV2F+kkEPkWXCW1mBe9DFrH3NTcwHudU7DZapaFrmDio1/lWHqLJXl60G5s3Li9PUMW6brqr5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706804068; c=relaxed/simple;
-	bh=I2iQg10hWdVozFDY8hY/xeo6vUVw0V5jMT5OkqOtfeY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kdHuA9fXBOaVJAld+fqhohmVzT3DBmzwTJCU1/9OIjuRvjjyjk/RBU9MtCF8y/iOvRpHyFIxGsLgbEmcegwAA/MblM5urYWVCwHkqiZ1heD0DNMGwOdaPPLvF/TINxwxwm3GiOqp12Ht0reZHEnKWpz5gK12EnndNs40kLpxZHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 09F36DA7;
-	Thu,  1 Feb 2024 08:15:07 -0800 (PST)
-Received: from [192.168.1.100] (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E4F9F3F738;
-	Thu,  1 Feb 2024 08:14:20 -0800 (PST)
-Message-ID: <486c9452-2d36-f7c7-8b54-38427336d4c1@arm.com>
-Date: Thu, 1 Feb 2024 16:14:11 +0000
+	s=arc-20240116; t=1706804903; c=relaxed/simple;
+	bh=RQMfGk2sJ0rdt76vd4PcTcu/WBOV61LRsFVxlUgak2I=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Y+ZZLknrQVD2FTyioVo2NUxVebHcTYtj7Bd3f/VFl3ATiMlZdnscJEHguvehCJ5aSE+kpgxGTukfOljkMwNNzZptAp05BPYyUbpvNElYsQNivzSTv2/XKFmIdH1H3Qcawl8h+j1HAWhQSgDWYdYKupmw/Nbw1kKqSsl1kPXV1vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M0B6xMgC; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M0B6xMgC"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6531fa07fso1362709276.2
+        for <kvmarm@lists.linux.dev>; Thu, 01 Feb 2024 08:28:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706804900; x=1707409700; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bfEEknfYaN1apdI2sXi9cfWLVgQqiO/RJh7exSDt4iY=;
+        b=M0B6xMgCDtnRrxVo1m7JAFcI23KgOIaUPGgY5dCHHueebX+X8Z6j777DCt8dnrM1I1
+         RnT9jrwKJ0NvKPLmVmOAcuIz/ZtCtL1qVBufMpBHcqBekwweNfG3u9f9avSGmO5HWHgp
+         0UGNDhZOwa7Q6fCIN5UT5XyTvbeKlP4vertnJXUMOLqF5ZscT08zlFpyNXQDSS6SXABD
+         3URqCyFgmraj6mydP1N0o8+0DLH+Kxq9XGVMegpaTg+19xP/AUYQ3laDPIhRDLrSKCum
+         hScfDkn0x8wwUxO4yEDMDlJA3MgGJHHfy8i2B2PWP6+zym0r/PgmuSUNYy59Fs1lpOJO
+         Nt/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706804900; x=1707409700;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bfEEknfYaN1apdI2sXi9cfWLVgQqiO/RJh7exSDt4iY=;
+        b=FhGdVKCLmJv3XM1E/fmjccuYS8Jr0lqir7bqcpEsMi+w7aFD5/CSN+B7/ZKaqVSNao
+         P/V5bqAo1hyUX9/NL5NZrOg0oOhvFsBwZqNypJLKDDlDufPujtkpndYORP1SJZDjzTwQ
+         cHrctdRD9Lf48MoOgBEv9JIvegvDzj2qfnSCYCfO4MTDrH7pZfrCWtXApDRBbkbZwilw
+         tFHeQRw2sEle8VGY95zNrsBK83LCOpVLB1UxG4ME5rcx+Ev7vJkjFNVae3GodFrG5Hv/
+         cYSj2Q0tVpGICURifIe8Yh4s75vo/JOTIBZMBJjndfubaKXCI+qlZOtyGDn5WVkYlocl
+         QScA==
+X-Gm-Message-State: AOJu0YxfzRfn60dHzDeR1AJ8GDJzPSN7MF6HxHYW65/JcFAtl44dR3L9
+	RsAVVhlN9Zjq89UKfVOb/5k39+v71cXx8JKyv18LvdpgOhCgssTLq7cV3y1WOmZ2bx5fVkUKp48
+	h7g==
+X-Google-Smtp-Source: AGHT+IEM/kpoxGnS59af2IFUsnl8Hae3asOrNvlRUbSTpkZgi2SS0WuDgKjRP6lYwDZ8+IkSHWxZ1zIjAjs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2602:b0:dc2:3426:c9ee with SMTP id
+ dw2-20020a056902260200b00dc23426c9eemr184460ybb.11.1706804900620; Thu, 01 Feb
+ 2024 08:28:20 -0800 (PST)
+Date: Thu, 1 Feb 2024 08:28:19 -0800
+In-Reply-To: <ZbrxiSNV7e1C6LO-@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v4 2/7] arm64: KVM: Use shared area to pass PMU event
- state to hypervisor
-Content-Language: en-US
-To: maz@kernel.org
-Cc: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mike Leach <mike.leach@linaro.org>, Leo Yan <leo.yan@linaro.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
- <robh@kernel.org>, Miguel Luis <miguel.luis@oracle.com>,
- Jintack Lim <jintack.lim@linaro.org>, Ard Biesheuvel <ardb@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Arnd Bergmann <arnd@arndb.de>,
- Vincent Donnefort <vdonnefort@google.com>,
- Kristina Martsenko <kristina.martsenko@arm.com>,
- Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
- Akihiko Odaki <akihiko.odaki@daynix.com>, Jing Zhang
- <jingzhangos@google.com>, linux-kernel@vger.kernel.org,
- coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, broonie@kernel.org, suzuki.poulose@arm.com,
- acme@kernel.org
-References: <20240104162714.1062610-1-james.clark@arm.com>
- <20240104162714.1062610-3-james.clark@arm.com>
-From: James Clark <james.clark@arm.com>
-In-Reply-To: <20240104162714.1062610-3-james.clark@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-7-amoorthy@google.com>
+ <CADrL8HWYKSiDZ_ahGbMXjup=r75B4JqC3LvT8A-qPVenV+MOiw@mail.gmail.com>
+ <CAF7b7mrA3rB33sUZe3HX33+fXpF=8VwD284LpCcEn9KT9OgwUQ@mail.gmail.com>
+ <CADrL8HXSzm_C9UwUb8-H_c6-TRgpkKLE+qeXfyN-X_rHGj2vuw@mail.gmail.com> <ZbrxiSNV7e1C6LO-@linux.dev>
+Message-ID: <ZbvGoz67L3gtnHhI@google.com>
+Subject: Re: [PATCH v6 06/14] KVM: Add memslot flag to let userspace force an
+ exit on missing hva mappings
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: James Houghton <jthoughton@google.com>, Anish Moorthy <amoorthy@google.com>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	robert.hoo.linux@gmail.com, dmatlack@google.com, axelrasmussen@google.com, 
+	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
+	kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Feb 01, 2024, Oliver Upton wrote:
+> On Wed, Jan 31, 2024 at 04:26:08PM -0800, James Houghton wrote:
+> > On Wed, Jan 31, 2024 at 2:00=E2=80=AFPM Anish Moorthy <amoorthy@google.=
+com> wrote:
+>=20
+> [...]
+>=20
+> > On that note, I think we need to drop the patch that causes
+> > read-faults in RO memslots to go through fast GUP. KVM didn't do that
+> > for a good reason[1].
+> >=20
+> > That would break KVM_EXIT_ON_MISSING for RO memslots, so I think that
+> > the right way to implement KVM_EXIT_ON_MISSING is to have
+> > hva_to_pfn_slow pass FOLL_NOFAULT, at least for the RO memslot case.
+> > We still get the win we're looking for: don't grab the userfaultfd
+> > locks.
+>=20
+> Is there even a legitimate use case that warrants optimizing faults on
+> RO memslots? My expectation is that the VMM uses these to back things
+> like guest ROM, or at least that's what QEMU does. In that case I'd
+> expect faults to be exceedingly rare, and if the VMM actually cared it
+> could just pre-populate the primary mapping.
+>=20
+> I understand why we would want to support KVM_EXIT_ON_MISSING for the
+> sake of completeness of the UAPI, but it'd be surprising if this
+> mattered in the context of post-copy.
 
+Yeah, I let's just make KVM_EXIT_ON_MISSING mutually exclusive with
+KVM_MEM_READONLY.  KVM (oviously) honors the primary MMU protections, so us=
+erspace
+can (and does) map read-only memory into the guest without READONLY.  As Ol=
+iver
+pointed out, making the *memslot* RO is intended for use cases where usersp=
+ace
+wants writes to be treated like emulated MMIO.
 
-On 04/01/2024 16:27, James Clark wrote:
-> Currently the state of the PMU events is copied into the VCPU struct
-> before every VCPU run. This isn't scalable if more data for other
-> features needs to be added too. So make a writable area that's shared
-> between the host and the hypervisor to store this state.
-> 
-> Normal per-cpu constructs can't be used because although the framework
-> exists for the host to write to the hypervisor's per-cpu structs, this
-> only works until the protection is enabled. And for the other way
-> around, no framework exists for the hypervisor to access the host's size
-> and layout of per-cpu data. Instead of making a new framework for the
-> hypervisor to access the host's per-cpu data that would only be used
-> once, just define the new shared area as an array with NR_CPUS elements.
-> This also reduces the amount of sharing that needs to be done, because
-> unlike this array, the per-cpu data isn't contiguous.
-> 
-> Signed-off-by: James Clark <james.clark@arm.com>
-
-Hi Marc,
-
-Do you have any feedback about whether this what you were thinking of in
-your comment here:
-https://lore.kernel.org/kvmarm/86msuqb84g.wl-maz@kernel.org/
-
-Thanks
-James
-
-> ---
->  arch/arm64/include/asm/kvm_host.h |  8 ++++++++
->  arch/arm64/kernel/image-vars.h    |  1 +
->  arch/arm64/kvm/arm.c              | 16 ++++++++++++++--
->  arch/arm64/kvm/hyp/nvhe/setup.c   | 11 +++++++++++
->  arch/arm64/kvm/hyp/nvhe/switch.c  |  9 +++++++--
->  arch/arm64/kvm/pmu.c              |  4 +---
->  include/kvm/arm_pmu.h             | 17 -----------------
->  7 files changed, 42 insertions(+), 24 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 824f29f04916..93d38ad257ed 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -466,6 +466,14 @@ struct kvm_cpu_context {
->  	struct kvm_vcpu *__hyp_running_vcpu;
->  };
->  
-> +struct kvm_host_global_state {
-> +	struct kvm_pmu_events {
-> +		u32 events_host;
-> +		u32 events_guest;
-> +	} pmu_events;
-> +} ____cacheline_aligned;
-> +extern struct kvm_host_global_state kvm_host_global_state[NR_CPUS];
-> +
->  struct kvm_host_data {
->  	struct kvm_cpu_context host_ctxt;
->  };
-> diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-> index 119ca121b5f8..1a9dbb02bb4a 100644
-> --- a/arch/arm64/kernel/image-vars.h
-> +++ b/arch/arm64/kernel/image-vars.h
-> @@ -59,6 +59,7 @@ KVM_NVHE_ALIAS(alt_cb_patch_nops);
->  
->  /* Global kernel state accessed by nVHE hyp code. */
->  KVM_NVHE_ALIAS(kvm_vgic_global_state);
-> +KVM_NVHE_ALIAS(kvm_host_global_state);
->  
->  /* Kernel symbols used to call panic() from nVHE hyp code (via ERET). */
->  KVM_NVHE_ALIAS(nvhe_hyp_panic_handler);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 4796104c4471..bd6b2eda5f4f 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -47,6 +47,20 @@
->  
->  static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
->  
-> +/*
-> + * Host state that isn't associated with any VCPU, but will affect any VCPU
-> + * running on a host CPU in the future. This remains writable from the host and
-> + * readable in the hyp.
-> + *
-> + * PER_CPU constructs aren't compatible between the hypervisor and the host so
-> + * just define it as a NR_CPUS array. DECLARE_KVM_NVHE_PER_CPU works in both
-> + * places, but not after the hypervisor protection is initialised. After that,
-> + * kvm_arm_hyp_percpu_base isn't accessible from the host, so even if the
-> + * kvm_host_global_state struct was shared with the host, the per-cpu offset
-> + * can't be calculated without sharing even more data with the host.
-> + */
-> +struct kvm_host_global_state kvm_host_global_state[NR_CPUS];
-> +
->  DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
->  
->  DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
-> @@ -1016,8 +1030,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  
->  		kvm_vgic_flush_hwstate(vcpu);
->  
-> -		kvm_pmu_update_vcpu_events(vcpu);
-> -
->  		/*
->  		 * Ensure we set mode to IN_GUEST_MODE after we disable
->  		 * interrupts and before the final VCPU requests check.
-> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-> index b5452e58c49a..3e45cc10ba96 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-> @@ -159,6 +159,17 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
->  	if (ret)
->  		return ret;
->  
-> +	/*
-> +	 * Similar to kvm_vgic_global_state, but this one remains writable by
-> +	 * the host rather than read-only. Used to store per-cpu state about the
-> +	 * host that isn't associated with any particular VCPU.
-> +	 */
-> +	prot = pkvm_mkstate(KVM_PGTABLE_PROT_RW, PKVM_PAGE_SHARED_OWNED);
-> +	ret = pkvm_create_mappings(&kvm_host_global_state,
-> +				   &kvm_host_global_state + 1, prot);
-> +	if (ret)
-> +		return ret;
-> +
->  	ret = create_hyp_debug_uart_mapping();
->  	if (ret)
->  		return ret;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index c50f8459e4fc..89147a9dc38c 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -130,13 +130,18 @@ static void __hyp_vgic_restore_state(struct kvm_vcpu *vcpu)
->  	}
->  }
->  
-> +static struct kvm_pmu_events *kvm_nvhe_get_pmu_events(struct kvm_vcpu *vcpu)
-> +{
-> +	return &kvm_host_global_state[vcpu->cpu].pmu_events;
-> +}
-> +
->  /*
->   * Disable host events, enable guest events
->   */
->  #ifdef CONFIG_HW_PERF_EVENTS
->  static bool __pmu_switch_to_guest(struct kvm_vcpu *vcpu)
->  {
-> -	struct kvm_pmu_events *pmu = &vcpu->arch.pmu.events;
-> +	struct kvm_pmu_events *pmu = kvm_nvhe_get_pmu_events(vcpu);
->  
->  	if (pmu->events_host)
->  		write_sysreg(pmu->events_host, pmcntenclr_el0);
-> @@ -152,7 +157,7 @@ static bool __pmu_switch_to_guest(struct kvm_vcpu *vcpu)
->   */
->  static void __pmu_switch_to_host(struct kvm_vcpu *vcpu)
->  {
-> -	struct kvm_pmu_events *pmu = &vcpu->arch.pmu.events;
-> +	struct kvm_pmu_events *pmu = kvm_nvhe_get_pmu_events(vcpu);
->  
->  	if (pmu->events_guest)
->  		write_sysreg(pmu->events_guest, pmcntenclr_el0);
-> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-> index a243934c5568..136d5c6c1916 100644
-> --- a/arch/arm64/kvm/pmu.c
-> +++ b/arch/arm64/kvm/pmu.c
-> @@ -6,8 +6,6 @@
->  #include <linux/kvm_host.h>
->  #include <linux/perf_event.h>
->  
-> -static DEFINE_PER_CPU(struct kvm_pmu_events, kvm_pmu_events);
-> -
->  /*
->   * Given the perf event attributes and system type, determine
->   * if we are going to need to switch counters at guest entry/exit.
-> @@ -28,7 +26,7 @@ static bool kvm_pmu_switch_needed(struct perf_event_attr *attr)
->  
->  struct kvm_pmu_events *kvm_get_pmu_events(void)
->  {
-> -	return this_cpu_ptr(&kvm_pmu_events);
-> +	return &kvm_host_global_state[smp_processor_id()].pmu_events;
->  }
->  
->  /*
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 4b9d8fb393a8..71a835970ab5 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -18,14 +18,8 @@ struct kvm_pmc {
->  	struct perf_event *perf_event;
->  };
->  
-> -struct kvm_pmu_events {
-> -	u32 events_host;
-> -	u32 events_guest;
-> -};
-> -
->  struct kvm_pmu {
->  	struct irq_work overflow_work;
-> -	struct kvm_pmu_events events;
->  	struct kvm_pmc pmc[ARMV8_PMU_MAX_COUNTERS];
->  	int irq_num;
->  	bool created;
-> @@ -79,17 +73,6 @@ void kvm_vcpu_pmu_resync_el0(void);
->  #define kvm_vcpu_has_pmu(vcpu)					\
->  	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_PMU_V3))
->  
-> -/*
-> - * Updates the vcpu's view of the pmu events for this cpu.
-> - * Must be called before every vcpu run after disabling interrupts, to ensure
-> - * that an interrupt cannot fire and update the structure.
-> - */
-> -#define kvm_pmu_update_vcpu_events(vcpu)				\
-> -	do {								\
-> -		if (!has_vhe() && kvm_vcpu_has_pmu(vcpu))		\
-> -			vcpu->arch.pmu.events = *kvm_get_pmu_events();	\
-> -	} while (0)
-> -
->  /*
->   * Evaluates as true when emulating PMUv3p5, and false otherwise.
->   */
+We can always add support in the future in the extremely unlikely event som=
+eone
+comes along with a legitimate reason for KVM_EXIT_ON_MISSING to play nice w=
+ith
+KVM_MEM_READONLY.
