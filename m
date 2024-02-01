@@ -1,92 +1,136 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92CBA82C9B
-	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 17:59:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DAB38527B
+	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 19:25:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706810387; cv=none; b=jklzQm8IZbgaDEkFuPP1s8E/i2JZXm5vkvNfZYzRRYN4wW1Uhmm0CI7tPH662VLuAJhiBzryMCviHlIavzTPGzMwmOyC/qsBfnrtUB4LFRMUgb9R0QUWt6tTzPj5jNM6oLRTgmdLYPInYkK6Frae+VwLVs0IlZEW8AbFDLY8jYY=
+	t=1706815533; cv=none; b=U781K5at92u+xoDSVmSOqyDA50Sxml4724TwUIy6FdTJA6iorbKYdXt1S6IP7fXIsGmHECwQApaadZ2Qb2ry8j/t2AZ3sFATsEFfc3M8exI+/OHciDyMu4XnKqr+Pd2XZUPyO33zYy3w3up6cORo4ev6kvco1a9UaYGfpJW2Mp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706810387; c=relaxed/simple;
-	bh=/PO24TQk4cI40ArFvyE5MhsMIUXMZYXmH6IhB1Wc63o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AzvlDY7lQtNzhtvx1mrtpLHQlNOwjTjZrx3BG+mWJr+Eml8JdmC+VBxXCl7fb6AfMqtIu2pNvC3UQGFhKKLq8Hfxpx0/5b7rHanDFFRx+aCp2Sa7olQd+uA02ZKDIz4V19Uj4dDwvmEcP9F9XNIiXInnzWDKM2Q44hqKCZ7EDDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o+vsOE67; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1706815533; c=relaxed/simple;
+	bh=bvbCut5oOWOl+iOeVLTeOOig5dbdTfqbdQOGLCL2GfQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OlQvHJCMjDCGbtdnXg3tvDLnmBAQ433iOBO0ERUC38ChuzvLOOGStfH/0akllPVy6CYIDDsXbyKbsBGeX0soP9xD4hZiJ99sQR0OTftvHE62nkBQHEjVPeM+UQ5m8Jqbsyb+uNnN7Gv+Em5rV2Qyn0RO5LvahZc1+l9nDansHZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CFW0GX+q; arc=none smtp.client-ip=209.85.160.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o+vsOE67"
-Date: Thu, 1 Feb 2024 17:59:40 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706810383;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UiRn0OAJKn5YhuhyJNbq40oER1mFxzuC0QuszMeithE=;
-	b=o+vsOE67cX1xR1q2cun6gc/SxqNMLX3rfdAE9bwYDFTb/1IZlfNKvs4B0ySR8Yn9lAKVL/
-	dttNn6M5Fk/5SplYdOfsdMevYJf6C3sUoSPANaBW8YzYVgN7FXtX5Yinfwl8fPN7yvaCOP
-	HKNpFhqGDq2AHf4zInKSWQcV/n4fKaQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: kvmarm@lists.linux.dev
-Subject: Re: [bug report] KVM: arm64: Always invalidate TLB for stage-2
- permission faults
-Message-ID: <ZbvcDMPTWQIf5Vj8@linux.dev>
-References: <1479cd6b-a10c-4459-8b34-318865cb807a@moroto.mountain>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CFW0GX+q"
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-214d79d4a3cso756695fac.0
+        for <kvmarm@lists.linux.dev>; Thu, 01 Feb 2024 11:25:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706815531; x=1707420331; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ubal1OrVwa84Y35GoSFEWShJgB/F1V74QFj/kiIz0Io=;
+        b=CFW0GX+ql7ypQySrlra+1Oh+ooyTPA7+2/Tyo5upO1hZn8Wce5ayRrVXbBIfuMPAe7
+         a+uRdrCKfTI1p+8Fmp6KY9VWQ7QuyKDh5aMnUw+QijXwBtsbNPZVHpVwoB8srIha34U3
+         PG7pyE3WcFWPTZPmSqmoLIkI3JpdQgA1IP+teoXdgiqhpTBupE62EmJ5YKuuEnggc0e+
+         j5nGqKjtSVlpGpa2jy1sxeOPdsJYzYpDApwTT+AwG3BCAvigo7iFx4fAXE9Xu2q5UrEy
+         n93su1K+w979nsI0KMbpY4ev90ShTXFMSiCqskRfxPDlWXcg8t+mODrhx0ZHwvRika6b
+         iZZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706815531; x=1707420331;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ubal1OrVwa84Y35GoSFEWShJgB/F1V74QFj/kiIz0Io=;
+        b=lHkBTD4mqMEgvNta1bYPp+yU5uOo1MWS2+nf0CcsZ+VDnLUXGCI2I04CUU3oV3UpPv
+         f95Aktgp4XOH54tiw71oZdIpnjbV3hbekPrBP18EnoOklc50CVT7o55ur0oKkwTO3N47
+         FdjNY3GIDKzCSW3k2wR5DesiWp72mOk1Jz06q8BE/1P5MY/Ae0s3ooT1r8eoxHJUbutX
+         4E41GwSRzgzV6b48qNj1Zsg8DQu5+mRDMqlcU44tugn/aKIN7+H7Q1MxjzLWEB/WAvPz
+         /KNtb5XdtJAvzkvjtYrySgldcosJj3eeBc0EHHzbdk5Ce3TJYm2p+LBcgkxGFVxSdsDj
+         hkhw==
+X-Gm-Message-State: AOJu0YyubmugezkfJ9baBLIfYic5sFF1RY0A4BvnRpNA0Ai//z5AO1Y/
+	30YPgTm6piwU6vSJhCTJ1U8Ow986mtxvLuJ0Ky48xQQh2ljXbFn4fxnYYtTmYVwqWyTndNOJ3Fj
+	M36QJ4CwUO13raG3JQs6sAbuvWzrH/avAUor4
+X-Google-Smtp-Source: AGHT+IEmwK+hYVU5DGWRUAShOp5HV+LvB3R9bXJfvSEQJSjfQucoVuwPxZXFT8CL269XTs7i07H8EV8dXI8or3Sh96E=
+X-Received: by 2002:a05:6871:5224:b0:206:862e:1b86 with SMTP id
+ ht36-20020a056871522400b00206862e1b86mr6145413oac.31.1706815531449; Thu, 01
+ Feb 2024 11:25:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1479cd6b-a10c-4459-8b34-318865cb807a@moroto.mountain>
-X-Migadu-Flow: FLOW_OUT
+References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-7-amoorthy@google.com>
+ <CADrL8HWYKSiDZ_ahGbMXjup=r75B4JqC3LvT8A-qPVenV+MOiw@mail.gmail.com>
+ <CAF7b7mrA3rB33sUZe3HX33+fXpF=8VwD284LpCcEn9KT9OgwUQ@mail.gmail.com>
+ <CADrL8HXSzm_C9UwUb8-H_c6-TRgpkKLE+qeXfyN-X_rHGj2vuw@mail.gmail.com>
+ <ZbrxiSNV7e1C6LO-@linux.dev> <ZbvGoz67L3gtnHhI@google.com>
+In-Reply-To: <ZbvGoz67L3gtnHhI@google.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Thu, 1 Feb 2024 11:24:54 -0800
+Message-ID: <CAF7b7mpAt9Dr2jqU6uH=e9gno282BwtHcU7cSSrdBWz7adAW1A@mail.gmail.com>
+Subject: Re: [PATCH v6 06/14] KVM: Add memslot flag to let userspace force an
+ exit on missing hva mappings
+To: Sean Christopherson <seanjc@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, James Houghton <jthoughton@google.com>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	robert.hoo.linux@gmail.com, dmatlack@google.com, axelrasmussen@google.com, 
+	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
+	kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 01, 2024 at 01:17:15PM +0300, Dan Carpenter wrote:
-> Hello Oliver Upton,
-> 
-> The patch be097997a273: "KVM: arm64: Always invalidate TLB for
-> stage-2 permission faults" from Sep 22, 2023 (linux-next), leads to
-> the following Smatch static checker warning:
-> 
-> 	arch/arm64/kvm/hyp/nvhe/../pgtable.c:1342 kvm_pgtable_stage2_relax_perms()
-> 	error: uninitialized symbol 'level'.
-> 
-> arch/arm64/kvm/hyp/nvhe/../pgtable.c
->     1319 int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
->     1320                                    enum kvm_pgtable_prot prot)
->     1321 {
->     1322         int ret;
->     1323         s8 level;
->     1324         kvm_pte_t set = 0, clr = 0;
->     1325 
->     1326         if (prot & KVM_PTE_LEAF_ATTR_HI_SW)
->     1327                 return -EINVAL;
->     1328 
->     1329         if (prot & KVM_PGTABLE_PROT_R)
->     1330                 set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
->     1331 
->     1332         if (prot & KVM_PGTABLE_PROT_W)
->     1333                 set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
->     1334 
->     1335         if (prot & KVM_PGTABLE_PROT_X)
->     1336                 clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
->     1337 
->     1338         ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level,
->     1339                                        KVM_PGTABLE_WALK_HANDLE_FAULT |
->     1340                                        KVM_PGTABLE_WALK_SHARED);
->     1341         if (!ret || ret == -EAGAIN)
-> --> 1342                 kvm_call_hyp(__kvm_tlb_flush_vmid_ipa_nsh, pgt->mmu, addr, level);
->                                                                                     ^^^^^
-> level is uninitialized if ret is -EAGAIN
+On Wed, Jan 31, 2024 at 4:26=E2=80=AFPM James Houghton <jthoughton@google.c=
+om> wrote:
+>
+> On that note, I think we need to drop the patch that causes
+> read-faults in RO memslots to go through fast GUP. KVM didn't do that
+> for a good reason[1].
 
-Hmm, race detection can happen at any level in the walk and that may not
-be a leaf level. We can initialize level to -1 which would provide no
-TTL hint for this case.
+Thanks a ton for catching this James! That's some informative reading,
+and a good reminder to be extra careful messing with stuff I don't
+quite understand.
 
--- 
-Thanks,
+On Thu, Feb 1, 2024 at 8:28=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Thu, Feb 01, 2024, Oliver Upton wrote:
+> > On Wed, Jan 31, 2024 at 04:26:08PM -0800, James Houghton wrote:
+> > > On Wed, Jan 31, 2024 at 2:00=E2=80=AFPM Anish Moorthy <amoorthy@googl=
+e.com> wrote:
+> >
+> > [...]
+> >
+> > > On that note, I think we need to drop the patch that causes
+> > > read-faults in RO memslots to go through fast GUP. KVM didn't do that
+> > > for a good reason[1].
+> > >
+> > > That would break KVM_EXIT_ON_MISSING for RO memslots, so I think that
+> > > the right way to implement KVM_EXIT_ON_MISSING is to have
+> > > hva_to_pfn_slow pass FOLL_NOFAULT, at least for the RO memslot case.
+> > > We still get the win we're looking for: don't grab the userfaultfd
+> > > locks.
+> >
+> > Is there even a legitimate use case that warrants optimizing faults on
+> > RO memslots? My expectation is that the VMM uses these to back things
+> > like guest ROM, or at least that's what QEMU does. In that case I'd
+> > expect faults to be exceedingly rare, and if the VMM actually cared it
+> > could just pre-populate the primary mapping.
+> >
+> > I understand why we would want to support KVM_EXIT_ON_MISSING for the
+> > sake of completeness of the UAPI, but it'd be surprising if this
+> > mattered in the context of post-copy.
+>
+> Yeah, I let's just make KVM_EXIT_ON_MISSING mutually exclusive with
+> KVM_MEM_READONLY.  KVM (oviously) honors the primary MMU protections, so =
+userspace
+> can (and does) map read-only memory into the guest without READONLY.  As =
 Oliver
+> pointed out, making the *memslot* RO is intended for use cases where user=
+space
+> wants writes to be treated like emulated MMIO.
+>
+> We can always add support in the future in the extremely unlikely event s=
+omeone
+> comes along with a legitimate reason for KVM_EXIT_ON_MISSING to play nice=
+ with
+> KVM_MEM_READONLY.
+
+Gotcha, I'll go ahead and make the flags incompatible for the next
+version. Thanks for the tidbit on how RO memslots are used Oliver- I
+didn't know that we expect faults on these to be so rare.
