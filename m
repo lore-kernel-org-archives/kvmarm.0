@@ -1,109 +1,70 @@
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618D24DA0B
-	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 10:17:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 392D81F941
+	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 10:23:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706782659; cv=none; b=ilOEPdg8IVho11KHuQZt4VdHaocqzQ/gU5iv8XvCElX8K7KVABx/PXBc3Zcm3dqng//MAUT6kEGStFan+uhIkvRAgbEb+Nax0fXMzf3u8uCIysVmViZ0cxC0d08DBd8QKpQ7kzlxKuMf0uMkV+9I9rRY9CDR4JLIjmOMPCh4Kn4=
+	t=1706783033; cv=none; b=SjZUg6p5mcX/Re65i+gc+iPg1Azk+peVSLZ42uI4NbHgcaSRJKAPAwBA1CmmzdWrrmel1nqqVgKHaiBqymkGS6hAQGBNiCDkojDVVDQfsl/QUTFiG/SG0qGx8/rHSEdroLQZhh8j9dVz3WhqlOssmw/0j9Um5xK4jpWyExJJtGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706782659; c=relaxed/simple;
-	bh=JakSA1SIkam0VDpcHM3yYmGak0/Ub8rhyhRsxA9Ahek=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=eo0YXPAYwyCRJSyXMKnOP+DERgNdSPYwZ6aDE1/0/EGRg5gHOXcUQ9K/M0FzfLK60BOzv0htjwbMF4vZd9fPpxKpzd8RgfBmqclCOHxLJTwRh5Q2jo2cUHRf3aQAOy0DHphWk6n+JSBWf94AC1X6E7n+akNnBJ0gtWdusbJiz6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JLbGh9I6; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JLbGh9I6"
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-55f0367b15fso961714a12.0
-        for <kvmarm@lists.linux.dev>; Thu, 01 Feb 2024 02:17:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706782655; x=1707387455; darn=lists.linux.dev;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SlK6soAmcqVG2ecR9BfQrWlI8GpaFdWOJjTghV8Nrt0=;
-        b=JLbGh9I6Jhdw+rXlv7XF4orvFBQjDJXsL8mFWKsSnoQaDtiPPRtXnv6xhArRj4DXg4
-         YZ3OMpl3zLoMZt2LCtInVct0YsAJ88tWTN+C2om6aQ+dndxXhOfXNNBGjRx9gVa6jNx0
-         coZIi590PAdKm0Ecc0GcySS9myIq9wydLS85oMiH8JfIDZxUShD3vVAMqND4ajfQ3+zH
-         KUCGaCnk62FfjEb4fzUQ+G1+BBpA4tWyncTiRK0tBviixeGbI+PvHHHHZKwAIJ+WucNX
-         eWb3e3Z7B4J1VVteaffQm3MKIEZFYcIQDuybLCsBn1DpvYmXh02dFAB7u+CLJ3WPbwST
-         S62g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706782655; x=1707387455;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SlK6soAmcqVG2ecR9BfQrWlI8GpaFdWOJjTghV8Nrt0=;
-        b=b1LDJ2wakstnljE8zj3W7M4asVDnpG5QHzFzDMtmi6YuxjJgyUAsBd0H/SayIYJL7T
-         /zLu+w4lsePHJp2zyIV4KMjJYu26woPQcLbOt0SeHtjYPm8rPJtioVkZfdmdjWPsLuT4
-         OaluF5tEWYSjB310u217h76LyJjFleXhq34aCiB/lBfGhI3HRjEq+nuOh+cpCT+rpDLL
-         XXBQi3yDRBj5yAUWQiVvuvZXvL1d3ZLxvVmB2Xm4xTnjkR6FM1vEaq6ed1CS4XKmGyxq
-         /C1ekZYYhLKs7O2OBAWfHnGauhP9nRTpbtMsdWtNzWQ45lqdTiRru9rdLFtgt9/aXDcF
-         Qf1Q==
-X-Gm-Message-State: AOJu0YyNM9WeU28OplqxgJRntKMfXaz5zpsJPIjikMbJ6jWYB2kUPHJE
-	PPrDChtaHPznfFF3XrEfWITL/s+bzkoEqLakd3zt3B1RXNbWCprPx5VoMeLSVP8=
-X-Google-Smtp-Source: AGHT+IGTquJMFOjWVwcDakJ2/kcpTAoYul8ecE3kBTsNkbEcKEEHYJGC7e74Gkfa7iLMRrB+fSVg7Q==
-X-Received: by 2002:aa7:df0e:0:b0:55f:acb3:f9e1 with SMTP id c14-20020aa7df0e000000b0055facb3f9e1mr1329974edy.28.1706782655544;
-        Thu, 01 Feb 2024 02:17:35 -0800 (PST)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id g13-20020aa7c84d000000b0055c1433be60sm6835389edt.50.2024.02.01.02.17.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 02:17:35 -0800 (PST)
-Date: Thu, 1 Feb 2024 13:17:15 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oliver.upton@linux.dev
-Cc: kvmarm@lists.linux.dev
-Subject: [bug report] KVM: arm64: Always invalidate TLB for stage-2
- permission faults
-Message-ID: <1479cd6b-a10c-4459-8b34-318865cb807a@moroto.mountain>
+	s=arc-20240116; t=1706783033; c=relaxed/simple;
+	bh=l9xtZA6JyQO0ZHM7v7uq57ACeSAqeiH0RxnWACFvzGs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LcQgNz0SXYvVNbItUwquo9enuzmqDfXqkdD+4YAh7z6825Y85fRUxaMr7gFqSButkWOyk4HdU423XzJkuRo53saW8KSGBbLwvzItkqXUiD2l3djMPFIzoIC96UuVtDfrnvxtLmiHPo2QtNyiLhdiKJGX4LfLVS2Bpvdg3X9xb2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 48D84DA7;
+	Thu,  1 Feb 2024 02:24:33 -0800 (PST)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8C7F73F738;
+	Thu,  1 Feb 2024 02:23:47 -0800 (PST)
+Message-ID: <a05a9c6a-af7a-4591-a6b7-69e15109aed2@arm.com>
+Date: Thu, 1 Feb 2024 10:23:45 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/10] KVM: arm64: fix many kernel-doc warnings
+Content-Language: en-US
+To: Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+References: <20240117230714.31025-1-rdunlap@infradead.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20240117230714.31025-1-rdunlap@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello Oliver Upton,
+On 17/01/2024 23:07, Randy Dunlap wrote:
+> Fix a bunch of kernel-doc warnings in arch/arm64/kvm/.
+> 
+>   [PATCH 01/10] KVM: arm64: debug: fix kernel-doc warnings
+>   [PATCH 02/10] KVM: arm64: guest: fix kernel-doc warnings
+>   [PATCH 03/10] KVM: arm64: hyp/aarch32: fix kernel-doc warnings
+>   [PATCH 04/10] KVM: arm64: vhe: fix a kernel-doc warning
+>   [PATCH 05/10] KVM: arm64: mmu: fix a kernel-doc warning
+>   [PATCH 06/10] KVM: arm64: PMU: fix kernel-doc warnings
+>   [PATCH 07/10] KVM: arm64: sys_regs: fix kernel-doc warnings
+>   [PATCH 08/10] KVM: arm64: vgic-init: fix a kernel-doc warning
+>   [PATCH 09/10] KVM: arm64: vgic-its: fix kernel-doc warnings
+>   [PATCH 10/10] KVM: arm64: vgic: fix a kernel-doc warning
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Zenghui Yu <yuzenghui@huawei.com>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: kvmarm@lists.linux.dev
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
 
-The patch be097997a273: "KVM: arm64: Always invalidate TLB for
-stage-2 permission faults" from Sep 22, 2023 (linux-next), leads to
-the following Smatch static checker warning:
+For the series:
 
-	arch/arm64/kvm/hyp/nvhe/../pgtable.c:1342 kvm_pgtable_stage2_relax_perms()
-	error: uninitialized symbol 'level'.
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-arch/arm64/kvm/hyp/nvhe/../pgtable.c
-    1319 int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
-    1320                                    enum kvm_pgtable_prot prot)
-    1321 {
-    1322         int ret;
-    1323         s8 level;
-    1324         kvm_pte_t set = 0, clr = 0;
-    1325 
-    1326         if (prot & KVM_PTE_LEAF_ATTR_HI_SW)
-    1327                 return -EINVAL;
-    1328 
-    1329         if (prot & KVM_PGTABLE_PROT_R)
-    1330                 set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
-    1331 
-    1332         if (prot & KVM_PGTABLE_PROT_W)
-    1333                 set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-    1334 
-    1335         if (prot & KVM_PGTABLE_PROT_X)
-    1336                 clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
-    1337 
-    1338         ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level,
-    1339                                        KVM_PGTABLE_WALK_HANDLE_FAULT |
-    1340                                        KVM_PGTABLE_WALK_SHARED);
-    1341         if (!ret || ret == -EAGAIN)
---> 1342                 kvm_call_hyp(__kvm_tlb_flush_vmid_ipa_nsh, pgt->mmu, addr, level);
-                                                                                    ^^^^^
-level is uninitialized if ret is -EAGAIN
-
-    1343         return ret;
-    1344 }
-
-regards,
-dan carpenter
