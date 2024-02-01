@@ -1,37 +1,25 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 346D75FB9C;
-	Thu,  1 Feb 2024 06:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A115C1586EF
+	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 08:12:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706768360; cv=none; b=qGYiieCO6uzZLRHJW/PgIr2wq3f1L/3U1XnrdSb9+qTnhwKm5T6OoOhdzrNlnFFndFAOw1NBkxc32+v3NiZ4PmKe0k5GI0x8mJ/ppYkgGf0yZ4n3+OtRjF7ZP/HbgqAF5Vq3CSew9MiDsGvKnBv3dmRKyKrvpQZXQQcWx8MpdCw=
+	t=1706775150; cv=none; b=QWFQ/RdduEhpTClm0Dik9d7z7zaIYWSmX0w9cPwKGXs55kS4g5945drRuVj9JFWuKas5WZU8pOWvIRQm/mv2QoQPPKHCQxQzJO2nh681VaWmQZ7tJqdJ9N8rr7V8u3JX/YSGqw2pteqit7wJuI/2P+C+lap/jxk/N9+Vk8sSAg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706768360; c=relaxed/simple;
-	bh=0WQrkAB5ozC8QOgt+WRwba2ZGzlj0F5COm9Urd2BqYA=;
+	s=arc-20240116; t=1706775150; c=relaxed/simple;
+	bh=XWgkDI5LEjWrVN67JCy6YWdGvZ06tRRPL0Okk7aKAww=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cgBfgoiXniUYb2enIzOyu0snhh/1C2H/4sAxkp/rxFjUZ2r2u4cPPugTxI2J5Zhos9injLeLIrsfTvtwOE6+UKK00l2h23S1DsOHraBwKSEehahhkFW//lIPYlBrcx1U8xFgE2EvWcJwMp9f/7tjozuiihADJt6Fk2F3Rx9zvjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=2z2SCyDS; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="2z2SCyDS"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=jSO6Qj6Tg/KjBkU82SdhtrrXMKEyhoKG9bXOHoyz9tc=; b=2z2SCyDSFP2EJALXk9/uEzwDLs
-	dlFh6vMrCZPMU1uDerHRDtcxgzt988VbC8t+1xS2ESAW2ER/wKqzkw1wfznx85XZvF774N2jcxt82
-	rReOtIh0EFg4UkwI4yLX7xz/x+I2aBEqpBb/pVQrGBzj3DH7e5PR/UjaZbRBkdhSHjNoHyxFZJL3i
-	RWBBWtLj5+DiikqSZl3RT6iR9hMGTNhfGr6ruNPes/etEw4T7AupU6qmEa+1K/R/crk9k6WXnhc0s
-	eb342GUyjSmQeFNnREFiw2vjFDs8y/N9npkiMJl8jbZQ/6j8wWl6Z/71D5vUW64ymkKJChgiCUz0k
-	HbfdqA2Q==;
-Received: from [50.53.50.0] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rVQPr-00000006jz7-0mjm;
-	Thu, 01 Feb 2024 06:19:15 +0000
-Message-ID: <618cb278-0b9f-4cc2-bfc6-bfcbefc79b69@infradead.org>
-Date: Wed, 31 Jan 2024 22:19:14 -0800
+	 In-Reply-To:Content-Type; b=YsfyeFofZ18MFP6H722rYmtg1Fwo6dIls+piLJqy9YkdltTxfXn+AwI52bBW4s+n9W6/GMceSytV6T9mGvmOShWdlqJm7NV/wvx8KDygzMzCY14y+NKmppgcHqAQvl4pCxsLvttvzB0sPnajtTo5OeIa1XpkAXkcc192LM6XSVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2F301DA7;
+	Thu,  1 Feb 2024 00:13:05 -0800 (PST)
+Received: from [10.162.42.11] (a077893.blr.arm.com [10.162.42.11])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8267D3F738;
+	Thu,  1 Feb 2024 00:12:11 -0800 (PST)
+Message-ID: <599769c3-0aef-4c5b-ac98-f109649862f7@arm.com>
+Date: Thu, 1 Feb 2024 13:42:08 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -39,50 +27,130 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/10] KVM: arm64: fix many kernel-doc warnings
+Subject: Re: [PATCH RFC v3 31/35] khugepaged: arm64: Don't collapse MTE
+ enabled VMAs
 Content-Language: en-US
-To: linux-kernel@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-References: <20240117230714.31025-1-rdunlap@infradead.org>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20240117230714.31025-1-rdunlap@infradead.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>, catalin.marinas@arm.com,
+ will@kernel.org, oliver.upton@linux.dev, maz@kernel.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ arnd@arndb.de, akpm@linux-foundation.org, mingo@redhat.com,
+ peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+ mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com,
+ mhiramat@kernel.org, rppt@kernel.org, hughd@google.com
+Cc: pcc@google.com, steven.price@arm.com, vincenzo.frascino@arm.com,
+ david@redhat.com, eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-mm@kvack.org,
+ linux-trace-kernel@vger.kernel.org
+References: <20240125164256.4147-1-alexandru.elisei@arm.com>
+ <20240125164256.4147-32-alexandru.elisei@arm.com>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <20240125164256.4147-32-alexandru.elisei@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi,
 
-Any comments on this series?
 
-Thanks.
-
-On 1/17/24 15:07, Randy Dunlap wrote:
-> Fix a bunch of kernel-doc warnings in arch/arm64/kvm/.
+On 1/25/24 22:12, Alexandru Elisei wrote:
+> copy_user_highpage() will do memory allocation if there are saved tags for
+> the destination page, and the page is missing tag storage.
 > 
->  [PATCH 01/10] KVM: arm64: debug: fix kernel-doc warnings
->  [PATCH 02/10] KVM: arm64: guest: fix kernel-doc warnings
->  [PATCH 03/10] KVM: arm64: hyp/aarch32: fix kernel-doc warnings
->  [PATCH 04/10] KVM: arm64: vhe: fix a kernel-doc warning
->  [PATCH 05/10] KVM: arm64: mmu: fix a kernel-doc warning
->  [PATCH 06/10] KVM: arm64: PMU: fix kernel-doc warnings
->  [PATCH 07/10] KVM: arm64: sys_regs: fix kernel-doc warnings
->  [PATCH 08/10] KVM: arm64: vgic-init: fix a kernel-doc warning
->  [PATCH 09/10] KVM: arm64: vgic-its: fix kernel-doc warnings
->  [PATCH 10/10] KVM: arm64: vgic: fix a kernel-doc warning
+> After commit a349d72fd9ef ("mm/pgtable: add rcu_read_lock() and
+> rcu_read_unlock()s"), collapse_huge_page() calls
+> __collapse_huge_page_copy() -> .. -> copy_user_highpage() with the RCU lock
+> held, which means that copy_user_highpage() can only allocate memory using
+> GFP_ATOMIC or equivalent.
 > 
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Zenghui Yu <yuzenghui@huawei.com>
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: kvmarm@lists.linux.dev
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> 
+> Get around this by refusing to collapse pages into a transparent huge page
+> if the VMA is MTE-enabled.
 
--- 
-#Randy
+Makes sense when copy_user_highpage() will allocate memory for tag storage.
+
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+> 
+> Changes since rfc v2:
+> 
+> * New patch. I think an agreement on whether copy*_user_highpage() should be
+> always allowed to sleep, or should not be allowed, would be useful.
+
+This is a good question ! Even after preventing the collapse of MTE VMA here,
+there still might be more paths where a sleeping (i.e memory allocating)
+copy*_user_highpage() becomes problematic ?
+
+> 
+>  arch/arm64/include/asm/pgtable.h    | 3 +++
+>  arch/arm64/kernel/mte_tag_storage.c | 5 +++++
+>  include/linux/khugepaged.h          | 5 +++++
+>  mm/khugepaged.c                     | 4 ++++
+>  4 files changed, 17 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+> index 87ae59436162..d0473538c926 100644
+> --- a/arch/arm64/include/asm/pgtable.h
+> +++ b/arch/arm64/include/asm/pgtable.h
+> @@ -1120,6 +1120,9 @@ static inline bool arch_alloc_cma(gfp_t gfp_mask)
+>  	return true;
+>  }
+>  
+> +bool arch_hugepage_vma_revalidate(struct vm_area_struct *vma, unsigned long address);
+> +#define arch_hugepage_vma_revalidate arch_hugepage_vma_revalidate
+> +
+>  #endif /* CONFIG_ARM64_MTE_TAG_STORAGE */
+>  #endif /* CONFIG_ARM64_MTE */
+>  
+> diff --git a/arch/arm64/kernel/mte_tag_storage.c b/arch/arm64/kernel/mte_tag_storage.c
+> index ac7b9c9c585c..a99959b70573 100644
+> --- a/arch/arm64/kernel/mte_tag_storage.c
+> +++ b/arch/arm64/kernel/mte_tag_storage.c
+> @@ -636,3 +636,8 @@ void arch_alloc_page(struct page *page, int order, gfp_t gfp)
+>  	if (tag_storage_enabled() && alloc_requires_tag_storage(gfp))
+>  		reserve_tag_storage(page, order, gfp);
+>  }
+> +
+> +bool arch_hugepage_vma_revalidate(struct vm_area_struct *vma, unsigned long address)
+> +{
+> +	return !(vma->vm_flags & VM_MTE);
+> +}
+> diff --git a/include/linux/khugepaged.h b/include/linux/khugepaged.h
+> index f68865e19b0b..461e4322dff2 100644
+> --- a/include/linux/khugepaged.h
+> +++ b/include/linux/khugepaged.h
+> @@ -38,6 +38,11 @@ static inline void khugepaged_exit(struct mm_struct *mm)
+>  	if (test_bit(MMF_VM_HUGEPAGE, &mm->flags))
+>  		__khugepaged_exit(mm);
+>  }
+> +
+> +#ifndef arch_hugepage_vma_revalidate
+> +#define arch_hugepage_vma_revalidate(vma, address) 1
+
+Please replace s/1/true as arch_hugepage_vma_revalidate() returns bool ?
+
+> +#endif
+
+Right, above construct is much better than __HAVE_ARCH_XXXX based one.
+
+> +
+>  #else /* CONFIG_TRANSPARENT_HUGEPAGE */
+>  static inline void khugepaged_fork(struct mm_struct *mm, struct mm_struct *oldmm)
+>  {
+> diff --git a/mm/khugepaged.c b/mm/khugepaged.c
+> index 2b219acb528e..cb9a9ddb4d86 100644
+> --- a/mm/khugepaged.c
+> +++ b/mm/khugepaged.c
+> @@ -935,6 +935,10 @@ static int hugepage_vma_revalidate(struct mm_struct *mm, unsigned long address,
+>  	 */
+>  	if (expect_anon && (!(*vmap)->anon_vma || !vma_is_anonymous(*vmap)))
+>  		return SCAN_PAGE_ANON;
+> +
+> +	if (!arch_hugepage_vma_revalidate(vma, address))
+> +		return SCAN_VMA_CHECK;
+> +
+>  	return SCAN_SUCCEED;
+>  }
+>  
+
+Otherwise this LGTM.
