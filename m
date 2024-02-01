@@ -1,85 +1,69 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE08C20E4
-	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 01:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A237B3A8DA
+	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 03:30:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706750357; cv=none; b=SzQHn/1fS48c7yWO8UedboQ9wXoDju7Crvr/72XrjPBNto6nqUlEHz4a/DeruTYHW1WZ1L2i5CHW+41jnonf967LPYeurol/cNI/VscAuuzc7ItprBJpUTJ7LAZhKO9ZX1tnhmyjz9uisCB7Eb6QdOUT9oSXDodRqXCcNW3+Wyk=
+	t=1706758241; cv=none; b=hcYvPoR8W/2uCg5nc9z9glehCFcB7hL9dfV91r7N/jk36t2iDqYBb9Aiw6311tHYJ1g7psv0EX6dbjSbINqhiNwxgNQhNX8ZUHkkT1dktNcN4gACkQxM0YYtlwmQs6hBpzRpZkDOJRTsEQkGv7DNzIPpOmuViUSmdRKwqQntFww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706750357; c=relaxed/simple;
-	bh=7fRlzmXPRGNcP7/rdkvvjw/GywXiezprH3glel5e1Y0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qi7bQBzDQ6HHI6VC3y3r/41tKGVTJSSQ4mpaWQQ1XFyuBhkKgLXRBTjWnJS0ExAgXzSJygyEr8nHiW88/XQZhkz8DRDWM/O59ne66zMKE7tGmyaQ2OWE2NntG7vL34yy946IS64qzXAOA3ArmGGqhxMTiE4MhKt0t3v4LKEhCO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=T58wrdoS; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="T58wrdoS"
-Date: Thu, 1 Feb 2024 01:19:05 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706750351;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jdGWg9mLdgVQVzubThwyPSrz1+OTwVAbV3Hd5xxiYb4=;
-	b=T58wrdoSVWwBPyvZipAUQ5zN0guv+zb27w40axBq0O8RkShsNA6VT11q6sHwmGVS2UPohE
-	bUEIGzfmhOW4zzwLFga3AwvpM92q7Dovee16HHMTzJxUsdYTP+a0um4Pm5/h6hVRj8z7Lh
-	oNcIl9SG/A2IrGsuHFnDzfmec0woV8Q=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: James Houghton <jthoughton@google.com>
-Cc: Anish Moorthy <amoorthy@google.com>, seanjc@google.com,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
-	maz@kernel.org, robert.hoo.linux@gmail.com, dmatlack@google.com,
-	axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
-	isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
-Subject: Re: [PATCH v6 06/14] KVM: Add memslot flag to let userspace force an
- exit on missing hva mappings
-Message-ID: <ZbrxiSNV7e1C6LO-@linux.dev>
-References: <20231109210325.3806151-1-amoorthy@google.com>
- <20231109210325.3806151-7-amoorthy@google.com>
- <CADrL8HWYKSiDZ_ahGbMXjup=r75B4JqC3LvT8A-qPVenV+MOiw@mail.gmail.com>
- <CAF7b7mrA3rB33sUZe3HX33+fXpF=8VwD284LpCcEn9KT9OgwUQ@mail.gmail.com>
- <CADrL8HXSzm_C9UwUb8-H_c6-TRgpkKLE+qeXfyN-X_rHGj2vuw@mail.gmail.com>
+	s=arc-20240116; t=1706758241; c=relaxed/simple;
+	bh=0U0DRnxOD6IVrdCQPmo32znrfxpOuyUvuYMn1ho150w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AaU7UBeSPkm44jP2ZtQEVGGnbP0izIzyynUNf9/F/ulAMjwZtz2pXX5F2Z421wb4pV7gzH9KaGoqDUZswXuEXTNzjuyVQTeSVIPLW7fpdW7iuP7GDv0Ir8ARsg5p1rUq+j+c8b+zL1JuNpg3KYGrG+NZSkeqdZNeS45+jXdD44I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A4B63DA7;
+	Wed, 31 Jan 2024 19:31:21 -0800 (PST)
+Received: from [10.162.42.11] (a077893.blr.arm.com [10.162.42.11])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DADF33F738;
+	Wed, 31 Jan 2024 19:30:26 -0800 (PST)
+Message-ID: <08a4971e-c31d-46f7-afbc-7404bd9a293f@arm.com>
+Date: Thu, 1 Feb 2024 09:00:23 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADrL8HXSzm_C9UwUb8-H_c6-TRgpkKLE+qeXfyN-X_rHGj2vuw@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v3 12/35] mm: Call arch_swap_prepare_to_restore()
+ before arch_swap_restore()
+Content-Language: en-US
+To: Alexandru Elisei <alexandru.elisei@arm.com>, catalin.marinas@arm.com,
+ will@kernel.org, oliver.upton@linux.dev, maz@kernel.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ arnd@arndb.de, akpm@linux-foundation.org, mingo@redhat.com,
+ peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+ mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com,
+ mhiramat@kernel.org, rppt@kernel.org, hughd@google.com
+Cc: pcc@google.com, steven.price@arm.com, vincenzo.frascino@arm.com,
+ david@redhat.com, eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-mm@kvack.org,
+ linux-trace-kernel@vger.kernel.org
+References: <20240125164256.4147-1-alexandru.elisei@arm.com>
+ <20240125164256.4147-13-alexandru.elisei@arm.com>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <20240125164256.4147-13-alexandru.elisei@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 31, 2024 at 04:26:08PM -0800, James Houghton wrote:
-> On Wed, Jan 31, 2024 at 2:00 PM Anish Moorthy <amoorthy@google.com> wrote:
 
-[...]
 
-> On that note, I think we need to drop the patch that causes
-> read-faults in RO memslots to go through fast GUP. KVM didn't do that
-> for a good reason[1].
+On 1/25/24 22:12, Alexandru Elisei wrote:
+> arm64 uses arch_swap_restore() to restore saved tags before the page is
+> swapped in and it's called in atomic context (with the ptl lock held).
 > 
-> That would break KVM_EXIT_ON_MISSING for RO memslots, so I think that
-> the right way to implement KVM_EXIT_ON_MISSING is to have
-> hva_to_pfn_slow pass FOLL_NOFAULT, at least for the RO memslot case.
-> We still get the win we're looking for: don't grab the userfaultfd
-> locks.
+> Introduce arch_swap_prepare_to_restore() that will allow an architecture to
+> perform extra work during swap in and outside of a critical section.
+> This will be used by arm64 to allocate a buffer in memory where to
+> temporarily save tags if tag storage is not available for the page being
+> swapped in.
 
-Is there even a legitimate use case that warrants optimizing faults on
-RO memslots? My expectation is that the VMM uses these to back things
-like guest ROM, or at least that's what QEMU does. In that case I'd
-expect faults to be exceedingly rare, and if the VMM actually cared it
-could just pre-populate the primary mapping.
-
-I understand why we would want to support KVM_EXIT_ON_MISSING for the
-sake of completeness of the UAPI, but it'd be surprising if this
-mattered in the context of post-copy.
-
--- 
-Thanks,
-Oliver
+Just wondering if tag storage will always be unavailable for tagged pages
+being swapped in ? OR there are cases where allocation might not even be
+required ? This prepare phase needs to be outside the critical section -
+only because there might be memory allocations ?
