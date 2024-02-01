@@ -1,66 +1,25 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F2E215AAD1
-	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 08:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14A5515B0F5
+	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 09:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706777848; cv=none; b=F9qb/qWnb51A4+F6q8w+oo64xL3oUB7CklfunRRb9kIE+NxU+eqL2YTQ9fiwciQqlxeLZ7zGK8CYvhsoTPmnPS/fcKxZaKXELg6DjJ98CatOdMUYJer9UXZHcyDQjJs6FsOZ815IdA06FoqZMaZZKk7Aquq3k3Lm7ky9C2nc4gM=
+	t=1706779317; cv=none; b=mE2FDJtkiRzvUMwrXEPOo2f1dXHHg7xCd1+uSx+4dcH7qAPRSPzlu6bbTX0cpZ74ZzlDMdxZYPAYb1BMHCDO1ZowFdzX7Y/AtHdfDzyxSbx07lIMsyURAjjWQc7Jx7vqTkNzJ19UcM2rR7RQLI3f4kGD38rskyHIDPNC8d7lEsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706777848; c=relaxed/simple;
-	bh=j3Zd4mKrm216Zi80MFkLzEXQBZt3skOFnFm6RoTNJkY=;
+	s=arc-20240116; t=1706779317; c=relaxed/simple;
+	bh=Xan/dqyZBR9aQDewxYQ4N13dX6KyR4YMrUZL8g38qlQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qx+OrEZHmS8oQuIUO9iUnPOFPeA/dV4i0igk8UqW38Kf2h8Dw2kOx9vANFloNCBjXqHkJxjv1N+EnXo5QuLDbQqbO4ZqTR4Kt0ZWZ/AbHdxmQZbrpjdraaV/uYgvC+CszzPlc6SHzcxMnfi8lc/C9iX0pg73Y7KOJCZIljOr3nE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iEuFoIiG; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iEuFoIiG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706777845;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WmH3EWgqG+olCCSdo93j0hjDoEO8xtf6eODTmOyVxmc=;
-	b=iEuFoIiG1Bkc0wtbUnhL4mcAg7dcmNMf1qxgf5yhPonQ9KY1FIxYE7onGVpq2f40uFnOIw
-	38iygeSMlofcNVyOu5zsb3gmy1v/L0Fwb17JWKudQ1DY0iSDvR/KBwyciG6jcNetk3Mxce
-	FShCQi522dchHj1fz06OnpjRxKLGK/4=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-221-hzQU3OoxOZibHQgGdQotrA-1; Thu, 01 Feb 2024 03:57:23 -0500
-X-MC-Unique: hzQU3OoxOZibHQgGdQotrA-1
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-5ce9b15f4ccso218710a12.0
-        for <kvmarm@lists.linux.dev>; Thu, 01 Feb 2024 00:57:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706777843; x=1707382643;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WmH3EWgqG+olCCSdo93j0hjDoEO8xtf6eODTmOyVxmc=;
-        b=aR+zb44qSyjf/synst/Gl96oRWww5zffYeLFTmFDDa56fzz5vhjiAmyQ8BpRH7tv0R
-         mZAe22pT/dkJoMskNfRy3fxNxGrbIV+G8znJgzFBXRrnarhhf1iUT0W4U8nFKY9hc9KF
-         Ffoo60cpOemggEg1Gk66YGi+nsmXq3pQfLY9mdW+KsKC82vL3quUjSYv1rdzoBbQWq0K
-         Pki90DoOqn6q4477zMNv4UFOvyckBTKBRUeMEp4d/TbAro9T+nBCLrODPeGCc0Bto5rW
-         dLPyjweOIIy3t5uhMoys2yFe67UocybLn3S4pnDddSxKPyRYKjNo+ze/sajrBG7j/QgV
-         UbrQ==
-X-Forwarded-Encrypted: i=0; AJvYcCVunGQCblCHRby4C7VBjPswmT4+x2Yl5cMdxBilgNkQU2x1qzr9gA0vF9LI0YL5gJq3napv/6ahmLiCMt9SV82uvsun65U5
-X-Gm-Message-State: AOJu0YwNGyZ5cDoqDiN22QFqineDAv/TDwbW7Q6DTb1+Nf6A4yFJWc6C
-	MskDPQk3fMvbN13sn8PY4h/IpO4Umqz+azISAbYVl+oG2hesCMYS7EGZvL/O9+CuVR180ucJau7
-	6ZiBoDoBT+VvyTtruw8QBg/f4pXwAJY3UK4l3kmhKbFemZvYhFrBkzw==
-X-Received: by 2002:a05:6a20:160f:b0:19c:a8bf:cd8a with SMTP id l15-20020a056a20160f00b0019ca8bfcd8amr4380747pzj.6.1706777842869;
-        Thu, 01 Feb 2024 00:57:22 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGTFKwk/btSV/URCvdNmfvTLLCCyn2J86wXYURGOxFkP60VZpTwKUeSS6vccvZLBAnMS5i/pQ==
-X-Received: by 2002:a05:6a20:160f:b0:19c:a8bf:cd8a with SMTP id l15-20020a056a20160f00b0019ca8bfcd8amr4380731pzj.6.1706777842524;
-        Thu, 01 Feb 2024 00:57:22 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUP/ZIaNn49n5TVAR93hXxAwxjFEqEJt4iHPuOJgKwEjVloTkbnBVGpepDMZwP7FegNvKVoxj9riCBjxnnhojfbyPR9TGdcIyKENxVf03w30ZLoGFsf1nuH7zly7RWLiI0V8KZVmkbfH07smSntsCCYZYP+DDWQU1+Hmat3VqEYJbXLWzIrYOSbQhQ2erhMv+ccDRg4W26EmkMN555UWF4MegUUDvhBFe09n/brWh+bZXflVeTWO+ydsBnoAFTECQ==
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id jh21-20020a170903329500b001d951b9ce37sm765467plb.273.2024.02.01.00.57.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Feb 2024 00:57:22 -0800 (PST)
-Message-ID: <510f3534-b076-4d23-b4b8-361c1f872d57@redhat.com>
-Date: Thu, 1 Feb 2024 16:57:19 +0800
+	 In-Reply-To:Content-Type; b=RBJ2tbALwXkKUU3EPvaxk3rya4c4vn8cE0SfzboC3fh0M2ooIgREkbcFsNuN7bVXXyGH0nk9SzYSIa1eSkMwsgtXZrVHT0sxbMX7E5UY/9wFusGnmGKhc8Tm/8eajaBeDOaegsDYIF+UuQGS00p0jYoLtqwjPQJeHldzQ5WnK94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E1878DA7;
+	Thu,  1 Feb 2024 01:22:35 -0800 (PST)
+Received: from [10.162.42.11] (a077893.blr.arm.com [10.162.42.11])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 48A343F738;
+	Thu,  1 Feb 2024 01:21:41 -0800 (PST)
+Message-ID: <30278898-c4b2-4dd6-ba68-a19575f81a65@arm.com>
+Date: Thu, 1 Feb 2024 14:51:39 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -68,158 +27,100 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] KVM: selftests: Fix the dirty_log_test semaphore
- imbalance
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- Peter Xu <peterx@redhat.com>
-References: <20231117052210.26396-1-shahuang@redhat.com>
- <ZbQVRX3V1P-ZE2Wf@google.com>
-From: Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <ZbQVRX3V1P-ZE2Wf@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+Subject: Re: [PATCH RFC v3 30/35] arm64: mte: ptrace: Handle pages with
+ missing tag storage
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Alexandru Elisei <alexandru.elisei@arm.com>, catalin.marinas@arm.com,
+ will@kernel.org, oliver.upton@linux.dev, maz@kernel.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ arnd@arndb.de, akpm@linux-foundation.org, mingo@redhat.com,
+ peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+ mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com,
+ mhiramat@kernel.org, rppt@kernel.org, hughd@google.com
+Cc: pcc@google.com, steven.price@arm.com, vincenzo.frascino@arm.com,
+ david@redhat.com, eugenis@google.com, kcc@google.com, hyesoo.yu@samsung.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-mm@kvack.org,
+ linux-trace-kernel@vger.kernel.org
+References: <20240125164256.4147-1-alexandru.elisei@arm.com>
+ <20240125164256.4147-31-alexandru.elisei@arm.com>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <20240125164256.4147-31-alexandru.elisei@arm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Sean,
 
-Thanks for your reviewing.
 
-On 1/27/24 04:25, Sean Christopherson wrote:
-> +Peter
+On 1/25/24 22:12, Alexandru Elisei wrote:
+> A page can end up mapped in a MTE enabled VMA without the corresponding tag
+> storage block reserved. Tag accesses made by ptrace in this case can lead
+> to the wrong tags being read or memory corruption for the process that is
+> using the tag storage memory as data.
 > 
-> On Fri, Nov 17, 2023, Shaoqin Huang wrote:
->> When execute the dirty_log_test on some aarch64 machine, it sometimes
->> trigger the ASSERT:
->>
->> ==== Test Assertion Failure ====
->>    dirty_log_test.c:384: dirty_ring_vcpu_ring_full
->>    pid=14854 tid=14854 errno=22 - Invalid argument
->>       1  0x00000000004033eb: dirty_ring_collect_dirty_pages at dirty_log_test.c:384
->>       2  0x0000000000402d27: log_mode_collect_dirty_pages at dirty_log_test.c:505
->>       3   (inlined by) run_test at dirty_log_test.c:802
->>       4  0x0000000000403dc7: for_each_guest_mode at guest_modes.c:100
->>       5  0x0000000000401dff: main at dirty_log_test.c:941 (discriminator 3)
->>       6  0x0000ffff9be173c7: ?? ??:0
->>       7  0x0000ffff9be1749f: ?? ??:0
->>       8  0x000000000040206f: _start at ??:?
->>    Didn't continue vcpu even without ring full
->>
->> The dirty_log_test fails when execute the dirty-ring test, this is
->> because the sem_vcpu_cont and the sem_vcpu_stop is non-zero value when
->> execute the dirty_ring_collect_dirty_pages() function. When those two
->> sem_t variables are non-zero, the dirty_ring_wait_vcpu() at the
->> beginning of the dirty_ring_collect_dirty_pages() will not wait for the
->> vcpu to stop, but continue to execute the following code. In this case,
->> before vcpu stop, if the dirty_ring_vcpu_ring_full is true, and the
->> dirty_ring_collect_dirty_pages() has passed the check for the
->> dirty_ring_vcpu_ring_full but hasn't execute the check for the
->> continued_vcpu, the vcpu stop, and set the dirty_ring_vcpu_ring_full to
->> false. Then dirty_ring_collect_dirty_pages() will trigger the ASSERT.
->>
->> Why sem_vcpu_cont and sem_vcpu_stop can be non-zero value? It's because
->> the dirty_ring_before_vcpu_join() execute the sem_post(&sem_vcpu_cont)
->> at the end of each dirty-ring test. It can cause two cases:
->>
->> 1. sem_vcpu_cont be non-zero. When we set the host_quit to be true,
->>     the vcpu_worker directly see the host_quit to be true, it quit. So
->>     the log_mode_before_vcpu_join() function will set the sem_vcpu_cont
->>     to 1, since the vcpu_worker has quit, it won't consume it.
->> 2. sem_vcpu_stop be non-zero. When we set the host_quit to be true,
->>     the vcpu_worker has entered the guest state, the next time it exit
->>     from guest state, it will set the sem_vcpu_stop to 1, and then see
->>     the host_quit, no one will consume the sem_vcpu_stop.
->>
->> When execute more and more dirty-ring tests, the sem_vcpu_cont and
->> sem_vcpu_stop can be larger and larger, which makes many code paths
->> don't wait for the sem_t. Thus finally cause the problem.
->>
->> To fix this problem, we can wait a while before set the host_quit to
->> true, which gives the vcpu time to enter the guest state, so it will
->> exit again. Then we can wait the vcpu to exit, and let it continue
->> again, then the vcpu will see the host_quit. Thus the sem_vcpu_cont and
->> sem_vcpu_stop will be both zero when test finished.
->>
->> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
->> ---
->> v1->v2:
->>    - Fix the real logic bug, not just fresh the context.
->>
->> v1: https://lore.kernel.org/all/20231116093536.22256-1-shahuang@redhat.com/
->> ---
->>   tools/testing/selftests/kvm/dirty_log_test.c | 16 +++++++++++++++-
->>   1 file changed, 15 insertions(+), 1 deletion(-)
->>
->> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
->> index 936f3a8d1b83..a6e0ff46a07c 100644
->> --- a/tools/testing/selftests/kvm/dirty_log_test.c
->> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
->> @@ -417,7 +417,8 @@ static void dirty_ring_after_vcpu_run(struct kvm_vcpu *vcpu, int ret, int err)
->>   
->>   static void dirty_ring_before_vcpu_join(void)
->>   {
->> -	/* Kick another round of vcpu just to make sure it will quit */
->> +	/* Wait vcpu exit, and let it continue to see the host_quit. */
->> +	dirty_ring_wait_vcpu();
->>   	sem_post(&sem_vcpu_cont);
->>   }
->>   
->> @@ -719,6 +720,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->>   	struct kvm_vm *vm;
->>   	unsigned long *bmap;
->>   	uint32_t ring_buf_idx = 0;
->> +	int sem_val;
->>   
->>   	if (!log_mode_supported()) {
->>   		print_skip("Log mode '%s' not supported",
->> @@ -726,6 +728,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->>   		return;
->>   	}
->>   
->> +	sem_getvalue(&sem_vcpu_stop, &sem_val);
->> +	assert(sem_val == 0);
->> +	sem_getvalue(&sem_vcpu_cont, &sem_val);
->> +	assert(sem_val == 0);
+> Reserve tag storage by treating ptrace accesses like a fault.
 > 
-> Never use bare assert() in selftests, they'll either get compiled out or IIRC,
-> will cause the test to silently exit if they fail.  Either do nothing, or use
-> TEST_ASSERT().
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
 > 
-
-Sure. I will replace them with TEST_ASSERT().
-
->> +
->>   	/*
->>   	 * We reserve page table for 2 times of extra dirty mem which
->>   	 * will definitely cover the original (1G+) test range.  Here
->> @@ -825,6 +832,13 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->>   		sync_global_to_guest(vm, iteration);
->>   	}
->>   
->> +	/*
->> +	 *
->> +	 * Before we set the host_quit, let the vcpu has time to run, to make
->> +	 * sure we consume the sem_vcpu_stop and the vcpu consume the
->> +	 * sem_vcpu_cont, to keep the semaphore balance.
->> +	 */
->> +	usleep(p->interval * 1000);
+> Changes since rfc v2:
 > 
-> Please no.  "Wait for a while" is never a complete solution for fixing races.
-> In rare cases, adding a delay might be the only sane workaround, but I doubt that's
-> the case here.
-
-If that's the case. I guess I should keep the current solution. Except 
-you have any better solution, please let me know.
-
-Thanks,
-Shaoqin
-
+> * New patch, issue reported by Peter Collingbourne.
 > 
+>  arch/arm64/kernel/mte.c | 26 ++++++++++++++++++++++++--
+>  1 file changed, 24 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
+> index faf09da3400a..b1fa02dad4fd 100644
+> --- a/arch/arm64/kernel/mte.c
+> +++ b/arch/arm64/kernel/mte.c
+> @@ -412,10 +412,13 @@ static int __access_remote_tags(struct mm_struct *mm, unsigned long addr,
+>  	while (len) {
+>  		struct vm_area_struct *vma;
+>  		unsigned long tags, offset;
+> +		unsigned int fault_flags;
+> +		struct page *page;
+> +		vm_fault_t ret;
+>  		void *maddr;
+> -		struct page *page = get_user_page_vma_remote(mm, addr,
+> -							     gup_flags, &vma);
+>  
+> +get_page:
+> +		page = get_user_page_vma_remote(mm, addr, gup_flags, &vma);
 
--- 
-Shaoqin
+But if there is valid page returned here in the first GUP attempt, will there
+still be a subsequent handle_mm_fault() on the same vma and addr ?
 
+>  		if (IS_ERR(page)) {
+>  			err = PTR_ERR(page);
+>  			break;
+> @@ -433,6 +436,25 @@ static int __access_remote_tags(struct mm_struct *mm, unsigned long addr,
+>  			put_page(page);
+>  			break;
+>  		}
+> +
+> +		if (tag_storage_enabled() && !page_tag_storage_reserved(page)) {
+
+Should not '!page' be checked here as well ?
+
+> +			fault_flags = FAULT_FLAG_DEFAULT | \
+> +				      FAULT_FLAG_USER | \
+> +				      FAULT_FLAG_REMOTE | \
+> +				      FAULT_FLAG_ALLOW_RETRY | \
+> +				      FAULT_FLAG_RETRY_NOWAIT;
+> +			if (write)
+> +				fault_flags |= FAULT_FLAG_WRITE;
+> +
+> +			put_page(page);
+> +			ret = handle_mm_fault(vma, addr, fault_flags, NULL);
+> +			if (ret & VM_FAULT_ERROR) {
+> +				err = -EFAULT;
+> +				break;
+> +			}
+> +			goto get_page;
+> +		}
+> +
+>  		WARN_ON_ONCE(!page_mte_tagged(page));
+>  
+>  		/* limit access to the end of the page */
