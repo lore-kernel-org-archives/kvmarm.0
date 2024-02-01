@@ -1,67 +1,67 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B24115DBC9
-	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 09:34:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE4115959D
+	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 09:36:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706780076; cv=none; b=bD/o/QS7BHGby3Z6fA3wXJyq/iKiuKl7dstG9NaRJ96D9XX6a8RLdKRWq9iY3GAk0MlyRvD/oBz220oGFUxX510dq2/Pl8DAwrD6QdqN/UsrCG2WgWNmjwCW2ToZCSYqxQbXZTzIBQLraVb6l2m6uRO4tqA6erx1MSvfHbXYw2U=
+	t=1706780182; cv=none; b=H3HYrDNF5Pt8dY6j+4yPrXFXeLpYmygHCAQobhKvmdBoHFYmomJ9XSTzx+XKhw8bs3/nuOyxAMxGbf/rqJxQMmMEYkHgWs0FVsm3wBwyMj0UW9J46+PNkWLzBwMnC69ZiJ4iv+8UQTGcKHZ2C62daTCeJ0Wp8wIDGcxeOgoAHDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706780076; c=relaxed/simple;
-	bh=jbCMGhadY8+aTcrS8iELZ3H62oZgYB3Aqj3D9xUwvsI=;
+	s=arc-20240116; t=1706780182; c=relaxed/simple;
+	bh=k+JwVV9XpKIvFcoI8HvGsSxFY34QHvIOGM2hV5ezXGI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MZJZfXK1gJPJkqlNE/YShmFuDtysBCav4/fFf1de5fQn4BszfPaR9EzGbrx6EsKxs9dwhrbwihU6wCGEyIlD6NnWESSwwdw/9Mxiv0pvvnQWPdKeYRQXsF4j+UlvFMGwtdZf4ZcTAjkX5At3jaBMJ+LTODdVkvseCYXH/34Lqfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CmwgR67y; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=kzlH5V4mU59hK7rFhc1Cz7GaqK156vYY/vGoSevmKz6r1AOjD3NRRBKrWIunC71bMi6Up4dE8IN49F+g1VmXd7KfHUaQjkpqFOP7Wdaj6DS4bU66mDiamJ1JGZBihdzED92uds5Opea6EHn8nkhEy6azpKcssdQrzH9gJSVLzwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=crs0XT9L; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CmwgR67y"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="crs0XT9L"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706780073;
+	s=mimecast20190719; t=1706780179;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QbKXlj2qJmYcwwoAL264/SJMr9ivxzGCitMWNoXprno=;
-	b=CmwgR67yoLNlqb3fphyyWycrDPFPFK1OFv/60w1InRbtOzVQ8gWyDgFUYU8KRFvl3drDt6
-	HrNWntu0v4893z07S5lirwrykxD+fq5MUvltsFYGFzC0hcdXloZr8C0khDypMnAhqQX+v/
-	OmYpqZJX7wz07jIdct15/Z6yc6ss6Uc=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=r4qsCP/JyH1svm68MjhdAiUlx0jxEfav13iwrJc1tb4=;
+	b=crs0XT9LqJpPnxuDdk+6F6b2i8MU+gqPoR6oKs/aWY/T6RcRYLQad9O8DL6qH66CAw70NL
+	NHwjbPbNna1e+E+MWFICO7J7TxyF9kaFCj4qgmlQDP0TPonp62bqS/SH0VlLX+5GOfi+IA
+	fzv8GSD52jlM73tcewf1T1+FA4TxDPw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-694-OXGGWDsoMXSF54EIuNb5Lw-1; Thu, 01 Feb 2024 04:34:32 -0500
-X-MC-Unique: OXGGWDsoMXSF54EIuNb5Lw-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5111abb53aeso576323e87.1
-        for <kvmarm@lists.linux.dev>; Thu, 01 Feb 2024 01:34:32 -0800 (PST)
+ us-mta-663-i10d-VkoO3yRXoaaoTpOeQ-1; Thu, 01 Feb 2024 04:36:17 -0500
+X-MC-Unique: i10d-VkoO3yRXoaaoTpOeQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40e4478a3afso2693365e9.1
+        for <kvmarm@lists.linux.dev>; Thu, 01 Feb 2024 01:36:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706780071; x=1707384871;
+        d=1e100.net; s=20230601; t=1706780176; x=1707384976;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=QbKXlj2qJmYcwwoAL264/SJMr9ivxzGCitMWNoXprno=;
-        b=ZL84o9zabg/14g4+P7KY7noOspWNsZf0v55aDor27j3xJ9raBEgJ8f9YwCWbxhDsAF
-         Tm1YYRdK0z1I5eVEb081ZWRfbFvUVMxi/zDNq7ZqAV6xcaEyCk0Ghwq5RHARbQ9uhbkZ
-         BPWgoqVAxNagZIMZFTWlsVadcXnph028CC3QHgpLU5wrmrqPa4W5FTEbYSnOpYD6kuMd
-         UxqR21/wE8Mo18TeFep6VMDOPXAjyXZUVhBzVEKt3747foWOFLriaqss7KOCPJ4bhlQw
-         ZLabmJgycbaY8DRGJfyn5tMnXe65S4P4RnHtFpBaGSMqx0rWVbuSR72VItIYRAFCK55T
-         /qsw==
-X-Gm-Message-State: AOJu0YzpMDAj33SeYf2F4YGESSC4cW8Sz5Y0wBlDFY8dh2pBPDwBVF1j
-	T9O9mueHgWqksYvK1/Q8TIHOQNZkWTfCR9gbIKGqktJr5HyvZ8hCngQ56GwPKNoNoQW7YJR0rik
-	O+gK427vUyvix3pfwHo+NDk8ZCna/zie9FjvEpcLqWvy/8rxRNPCSpg==
-X-Received: by 2002:ac2:42c2:0:b0:511:2da1:d34f with SMTP id n2-20020ac242c2000000b005112da1d34fmr946810lfl.68.1706780071184;
-        Thu, 01 Feb 2024 01:34:31 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGvccMcskijAMysxvD7yYFYGNPus6UL4rYmCZTFAmOefTGXD1uzbrcKE/pB3OC9GGXxacmo0A==
-X-Received: by 2002:ac2:42c2:0:b0:511:2da1:d34f with SMTP id n2-20020ac242c2000000b005112da1d34fmr946637lfl.68.1706780066004;
-        Thu, 01 Feb 2024 01:34:26 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCW3PpPY/C3y3Z+XF8gr1uRDBGy7Qg283nXZee1wNMd3gy39QCZOZf10LIBFH6YXs0b+50OaE8RjhdGD8VFB2FnUdNmL8b5NBXWBnJS1OK7z3QxnABKWgjyouvVzC5OaL6OYnz5vZvOXEOi86j5RF8bCpryXqotjRcZTMKvg7G9PARh+rqSOtT3XHqrhlYMJHAVYvMil7gFnUeMVO2y0dQzplbsqppc/UWjyNjj16Ni9izNUJJq98HhfTo+1dwN0Kka34iMyySTdVulFR/XmNnoEYkGJf1jUa3qt2qM2hRqG+s/wnowbWFE=
+        bh=r4qsCP/JyH1svm68MjhdAiUlx0jxEfav13iwrJc1tb4=;
+        b=bYzpOTGVFvgBMPnx4sSRIaEOuX/5pABeHg7VWrJGjdiS5OHWuUwPAFLdauJxxFsbja
+         U0YiKwPKsYyHqDefJZ6ULL7vuS3YsfErl0yRF1uhEu6Coh3+WjOz2IDkBVibcYZbFKTx
+         O+vSDL1LV2gHlAo7XgidndB0CuFUIfacP8Lav7XIeOU4a9dTP22/rdjOFe3Eqq5z8fj2
+         lqVDnNPysllmGF31xxdMba00FFlp4zoAKl2GU680zFKohjWOPP4B41Aqds6JwhIrpM0i
+         +cQM5LZuua1KE5itngRCFr7QdxG3RLBnqZGN9zsS9j1jMSFFBTpmC8neDcFz45X77cmt
+         JOgA==
+X-Gm-Message-State: AOJu0Ywdg8ry2IZO3y1LXBClpVqFkWLwd+SsfpqRRiop8gsZ933saqnH
+	dekzSG+uUKtoAJjNoFJQG0fxAdrg/Xafvc7+HMlm+dF0jgKroX/+uRqelbZObu+5f0z8tmVN2/T
+	vUfOXZ1s6UfiUWHDatC89SvE88XwugNPOdsquGm1eNl9vL81UXOdb7Q==
+X-Received: by 2002:a05:600c:458e:b0:40f:5190:2f19 with SMTP id r14-20020a05600c458e00b0040f51902f19mr3590609wmo.1.1706780176197;
+        Thu, 01 Feb 2024 01:36:16 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEIY88dVmqC+TW+PCd4ZEBkJ9wJVyY+TArB5E0JDfK70netnau4aYcykZFrwc+CUiVhGFVBbQ==
+X-Received: by 2002:a05:600c:458e:b0:40f:5190:2f19 with SMTP id r14-20020a05600c458e00b0040f51902f19mr3590583wmo.1.1706780175824;
+        Thu, 01 Feb 2024 01:36:15 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCW7YBAU/BoVI9FiRKZExo7K+slyHArz5W3gzil9HmPioFrKnJkOwrhHW4tgQJsj7KkfmpW8DNs3Bx99PQmLj5dfSRbuLYqehvBB+D700meKjcn6R4LrFOMjG5QH/K9cMJgXW5RQaXqAblSxHFmu3xdOGBPz1EjpHq1F0856K2Tddf9Ym7hF9qMbC9otGayl3r+Ws9TS+KqSU8QsBXSOOWWfe5NcCgPSPMe3dz0UcRWEjDPzDVAKoSUpX8qgDPhf1LbIxvOI9gz6dgKsv56+0RzuDiXZtjzB153b+47bvJRyFkWiWUmRPr0=
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id s15-20020a05600c45cf00b0040e3635ca65sm3890448wmo.2.2024.02.01.01.34.24
+        by smtp.gmail.com with ESMTPSA id fc7-20020a05600c524700b0040fbdd6f69bsm831483wmb.33.2024.02.01.01.36.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Feb 2024 01:34:25 -0800 (PST)
-Message-ID: <f2c558f7-4ba6-4ea5-966a-7b820ee3a2b8@redhat.com>
-Date: Thu, 1 Feb 2024 10:34:24 +0100
+        Thu, 01 Feb 2024 01:36:15 -0800 (PST)
+Message-ID: <1bcabd2a-1d02-4ed3-8782-ee82db435351@redhat.com>
+Date: Thu, 1 Feb 2024 10:36:14 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -70,16 +70,15 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 12/24] arm/arm64: Remove spinlocks from
- on_cpu_async
+Subject: Re: [kvm-unit-tests PATCH v2 13/24] arm/arm64: Share on_cpus
 To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
  kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev
 Cc: ajones@ventanamicro.com, anup@brainfault.org, atishp@atishpatra.org,
  pbonzini@redhat.com, thuth@redhat.com, alexandru.elisei@arm.com
 References: <20240126142324.66674-26-andrew.jones@linux.dev>
- <20240126142324.66674-38-andrew.jones@linux.dev>
+ <20240126142324.66674-39-andrew.jones@linux.dev>
 From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20240126142324.66674-38-andrew.jones@linux.dev>
+In-Reply-To: <20240126142324.66674-39-andrew.jones@linux.dev>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -89,9 +88,9 @@ Content-Transfer-Encoding: 7bit
 
 
 On 1/26/24 15:23, Andrew Jones wrote:
-> Remove spinlocks from on_cpu_async() by pulling some of their
-> use into a new function and also by narrowing the locking to a
-> single on_cpu_info structure by introducing yet another cpumask.
+> Now that the previous patches have cleaned up Arm's on_cpus
+> implementation we can move it to the common lib where riscv
+> will share it.
 >
 > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 > Acked-by: Thomas Huth <thuth@redhat.com>
@@ -99,49 +98,243 @@ Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Eric
 > ---
->  lib/arm/asm/smp.h |  4 +++-
->  lib/arm/smp.c     | 37 ++++++++++++++++++++++++++++---------
->  2 files changed, 31 insertions(+), 10 deletions(-)
+>  arm/Makefile.common |   1 +
+>  lib/arm/asm/smp.h   |   8 +--
+>  lib/arm/smp.c       | 144 -----------------------------------------
+>  lib/on-cpus.c       | 154 ++++++++++++++++++++++++++++++++++++++++++++
+>  lib/on-cpus.h       |  14 ++++
+>  5 files changed, 170 insertions(+), 151 deletions(-)
+>  create mode 100644 lib/on-cpus.c
+>  create mode 100644 lib/on-cpus.h
 >
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index 5214c8acdab3..dc92a7433350 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -43,6 +43,7 @@ cflatobjs += lib/vmalloc.o
+>  cflatobjs += lib/alloc.o
+>  cflatobjs += lib/devicetree.o
+>  cflatobjs += lib/migrate.o
+> +cflatobjs += lib/on-cpus.o
+>  cflatobjs += lib/pci.o
+>  cflatobjs += lib/pci-host-generic.o
+>  cflatobjs += lib/pci-testdev.o
 > diff --git a/lib/arm/asm/smp.h b/lib/arm/asm/smp.h
-> index 9f6d839ab568..f0c0f97a19f8 100644
+> index f0c0f97a19f8..2e1dc27f7bd8 100644
 > --- a/lib/arm/asm/smp.h
 > +++ b/lib/arm/asm/smp.h
-> @@ -27,9 +27,11 @@ extern bool cpu0_calls_idle;
+> @@ -6,6 +6,7 @@
+>   * This work is licensed under the terms of the GNU LGPL, version 2.
+>   */
+>  #include <cpumask.h>
+> +#include <on-cpus.h>
+>  #include <asm/barrier.h>
+>  #include <asm/thread_info.h>
+>  
+> @@ -22,14 +23,7 @@ extern struct secondary_data secondary_data;
+>  #define smp_wait_for_event()	wfe()
+>  #define smp_send_event()	sev()
+>  
+> -extern bool cpu0_calls_idle;
+> -
 >  extern void halt(void);
->  extern void do_idle(void);
+> -extern void do_idle(void);
+> -
+> -extern void on_cpu_async(int cpu, void (*func)(void *data), void *data);
+> -extern void on_cpu(int cpu, void (*func)(void *data), void *data);
+> -extern void on_cpus(void (*func)(void *data), void *data);
 >  
-> -extern void smp_boot_secondary(int cpu, secondary_entry_fn entry);
->  extern void on_cpu_async(int cpu, void (*func)(void *data), void *data);
->  extern void on_cpu(int cpu, void (*func)(void *data), void *data);
->  extern void on_cpus(void (*func)(void *data), void *data);
->  
-> +extern void smp_boot_secondary(int cpu, secondary_entry_fn entry);
-> +extern void smp_boot_secondary_nofail(int cpu, secondary_entry_fn entry);
-> +
->  #endif /* _ASMARM_SMP_H_ */
+>  extern void smp_boot_secondary(int cpu, secondary_entry_fn entry);
+>  extern void smp_boot_secondary_nofail(int cpu, secondary_entry_fn entry);
 > diff --git a/lib/arm/smp.c b/lib/arm/smp.c
-> index c00fda2efb03..e0872a1a72c2 100644
+> index e0872a1a72c2..0207ca2a7d57 100644
 > --- a/lib/arm/smp.c
 > +++ b/lib/arm/smp.c
-> @@ -76,12 +76,32 @@ void smp_boot_secondary(int cpu, secondary_entry_fn entry)
+> @@ -10,13 +10,10 @@
+>  #include <cpumask.h>
+>  #include <asm/thread_info.h>
+>  #include <asm/spinlock.h>
+> -#include <asm/barrier.h>
+>  #include <asm/mmu.h>
+>  #include <asm/psci.h>
+>  #include <asm/smp.h>
+>  
+> -bool cpu0_calls_idle;
+> -
+>  cpumask_t cpu_present_mask;
+>  cpumask_t cpu_online_mask;
+>  cpumask_t cpu_idle_mask;
+> @@ -83,144 +80,3 @@ void smp_boot_secondary_nofail(int cpu, secondary_entry_fn entry)
+>  		__smp_boot_secondary(cpu, entry);
 >  	spin_unlock(&lock);
 >  }
->  
-> +void smp_boot_secondary_nofail(int cpu, secondary_entry_fn entry)
-> +{
-> +	spin_lock(&lock);
-> +	if (!cpu_online(cpu))
-> +		__smp_boot_secondary(cpu, entry);
-> +	spin_unlock(&lock);
-> +}
+> -
+> -struct on_cpu_info {
+> -	void (*func)(void *data);
+> -	void *data;
+> -	cpumask_t waiters;
+> -};
+> -static struct on_cpu_info on_cpu_info[NR_CPUS];
+> -static cpumask_t on_cpu_info_lock;
+> -
+> -static bool get_on_cpu_info(int cpu)
+> -{
+> -	return !cpumask_test_and_set_cpu(cpu, &on_cpu_info_lock);
+> -}
+> -
+> -static void put_on_cpu_info(int cpu)
+> -{
+> -	int ret = cpumask_test_and_clear_cpu(cpu, &on_cpu_info_lock);
+> -	assert(ret);
+> -}
+> -
+> -static void __deadlock_check(int cpu, const cpumask_t *waiters, bool *found)
+> -{
+> -	int i;
+> -
+> -	for_each_cpu(i, waiters) {
+> -		if (i == cpu) {
+> -			printf("CPU%d", cpu);
+> -			*found = true;
+> -			return;
+> -		}
+> -		__deadlock_check(cpu, &on_cpu_info[i].waiters, found);
+> -		if (*found) {
+> -			printf(" <=> CPU%d", i);
+> -			return;
+> -		}
+> -	}
+> -}
+> -
+> -static void deadlock_check(int me, int cpu)
+> -{
+> -	bool found = false;
+> -
+> -	__deadlock_check(cpu, &on_cpu_info[me].waiters, &found);
+> -	if (found) {
+> -		printf(" <=> CPU%d deadlock detectd\n", me);
+> -		assert(0);
+> -	}
+> -}
+> -
+> -static void cpu_wait(int cpu)
+> -{
+> -	int me = smp_processor_id();
+> -
+> -	if (cpu == me)
+> -		return;
+> -
+> -	cpumask_set_cpu(me, &on_cpu_info[cpu].waiters);
+> -	deadlock_check(me, cpu);
+> -	while (!cpu_idle(cpu))
+> -		smp_wait_for_event();
+> -	cpumask_clear_cpu(me, &on_cpu_info[cpu].waiters);
+> -}
+> -
+> -void do_idle(void)
+> -{
+> -	int cpu = smp_processor_id();
+> -
+> -	if (cpu == 0)
+> -		cpu0_calls_idle = true;
+> -
+> -	set_cpu_idle(cpu, true);
+> -	smp_send_event();
+> -
+> -	for (;;) {
+> -		while (cpu_idle(cpu))
+> -			smp_wait_for_event();
+> -		smp_rmb();
+> -		on_cpu_info[cpu].func(on_cpu_info[cpu].data);
+> -		on_cpu_info[cpu].func = NULL;
+> -		smp_wmb();
+> -		set_cpu_idle(cpu, true);
+> -		smp_send_event();
+> -	}
+> -}
+> -
+> -void on_cpu_async(int cpu, void (*func)(void *data), void *data)
+> -{
+> -	if (cpu == smp_processor_id()) {
+> -		func(data);
+> -		return;
+> -	}
+> -
+> -	assert_msg(cpu != 0 || cpu0_calls_idle, "Waiting on CPU0, which is unlikely to idle. "
+> -						"If this is intended set cpu0_calls_idle=1");
+> -
+> -	smp_boot_secondary_nofail(cpu, do_idle);
+> -
+> -	for (;;) {
+> -		cpu_wait(cpu);
+> -		if (get_on_cpu_info(cpu)) {
+> -			if ((volatile void *)on_cpu_info[cpu].func == NULL)
+> -				break;
+> -			put_on_cpu_info(cpu);
+> -		}
+> -	}
+> -
+> -	on_cpu_info[cpu].func = func;
+> -	on_cpu_info[cpu].data = data;
+> -	set_cpu_idle(cpu, false);
+> -	put_on_cpu_info(cpu);
+> -	smp_send_event();
+> -}
+> -
+> -void on_cpu(int cpu, void (*func)(void *data), void *data)
+> -{
+> -	on_cpu_async(cpu, func, data);
+> -	cpu_wait(cpu);
+> -}
+> -
+> -void on_cpus(void (*func)(void *data), void *data)
+> -{
+> -	int cpu, me = smp_processor_id();
+> -
+> -	for_each_present_cpu(cpu) {
+> -		if (cpu == me)
+> -			continue;
+> -		on_cpu_async(cpu, func, data);
+> -	}
+> -	func(data);
+> -
+> -	for_each_present_cpu(cpu) {
+> -		if (cpu == me)
+> -			continue;
+> -		cpumask_set_cpu(me, &on_cpu_info[cpu].waiters);
+> -		deadlock_check(me, cpu);
+> -	}
+> -	while (cpumask_weight(&cpu_idle_mask) < nr_cpus - 1)
+> -		smp_wait_for_event();
+> -	for_each_present_cpu(cpu)
+> -		cpumask_clear_cpu(me, &on_cpu_info[cpu].waiters);
+> -}
+> diff --git a/lib/on-cpus.c b/lib/on-cpus.c
+> new file mode 100644
+> index 000000000000..aed70f7b27b2
+> --- /dev/null
+> +++ b/lib/on-cpus.c
+> @@ -0,0 +1,154 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * on_cpus() support based on cpumasks.
+> + *
+> + * Copyright (C) 2015, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+> + */
+> +#include <libcflat.h>
+> +#include <cpumask.h>
+> +#include <on-cpus.h>
+> +#include <asm/barrier.h>
+> +#include <asm/smp.h>
 > +
->  struct on_cpu_info {
->  	void (*func)(void *data);
->  	void *data;
->  	cpumask_t waiters;
->  };
->  static struct on_cpu_info on_cpu_info[NR_CPUS];
+> +bool cpu0_calls_idle;
+> +
+> +struct on_cpu_info {
+> +	void (*func)(void *data);
+> +	void *data;
+> +	cpumask_t waiters;
+> +};
+> +static struct on_cpu_info on_cpu_info[NR_CPUS];
 > +static cpumask_t on_cpu_info_lock;
 > +
 > +static bool get_on_cpu_info(int cpu)
@@ -154,38 +347,146 @@ Eric
 > +	int ret = cpumask_test_and_clear_cpu(cpu, &on_cpu_info_lock);
 > +	assert(ret);
 > +}
->  
->  static void __deadlock_check(int cpu, const cpumask_t *waiters, bool *found)
->  {
-> @@ -158,22 +178,21 @@ void on_cpu_async(int cpu, void (*func)(void *data), void *data)
->  	assert_msg(cpu != 0 || cpu0_calls_idle, "Waiting on CPU0, which is unlikely to idle. "
->  						"If this is intended set cpu0_calls_idle=1");
->  
-> -	spin_lock(&lock);
-> -	if (!cpu_online(cpu))
-> -		__smp_boot_secondary(cpu, do_idle);
-> -	spin_unlock(&lock);
+> +
+> +static void __deadlock_check(int cpu, const cpumask_t *waiters, bool *found)
+> +{
+> +	int i;
+> +
+> +	for_each_cpu(i, waiters) {
+> +		if (i == cpu) {
+> +			printf("CPU%d", cpu);
+> +			*found = true;
+> +			return;
+> +		}
+> +		__deadlock_check(cpu, &on_cpu_info[i].waiters, found);
+> +		if (*found) {
+> +			printf(" <=> CPU%d", i);
+> +			return;
+> +		}
+> +	}
+> +}
+> +
+> +static void deadlock_check(int me, int cpu)
+> +{
+> +	bool found = false;
+> +
+> +	__deadlock_check(cpu, &on_cpu_info[me].waiters, &found);
+> +	if (found) {
+> +		printf(" <=> CPU%d deadlock detectd\n", me);
+> +		assert(0);
+> +	}
+> +}
+> +
+> +static void cpu_wait(int cpu)
+> +{
+> +	int me = smp_processor_id();
+> +
+> +	if (cpu == me)
+> +		return;
+> +
+> +	cpumask_set_cpu(me, &on_cpu_info[cpu].waiters);
+> +	deadlock_check(me, cpu);
+> +	while (!cpu_idle(cpu))
+> +		smp_wait_for_event();
+> +	cpumask_clear_cpu(me, &on_cpu_info[cpu].waiters);
+> +}
+> +
+> +void do_idle(void)
+> +{
+> +	int cpu = smp_processor_id();
+> +
+> +	if (cpu == 0)
+> +		cpu0_calls_idle = true;
+> +
+> +	set_cpu_idle(cpu, true);
+> +	smp_send_event();
+> +
+> +	for (;;) {
+> +		while (cpu_idle(cpu))
+> +			smp_wait_for_event();
+> +		smp_rmb();
+> +		on_cpu_info[cpu].func(on_cpu_info[cpu].data);
+> +		on_cpu_info[cpu].func = NULL;
+> +		smp_wmb();
+> +		set_cpu_idle(cpu, true);
+> +		smp_send_event();
+> +	}
+> +}
+> +
+> +void on_cpu_async(int cpu, void (*func)(void *data), void *data)
+> +{
+> +	if (cpu == smp_processor_id()) {
+> +		func(data);
+> +		return;
+> +	}
+> +
+> +	assert_msg(cpu != 0 || cpu0_calls_idle, "Waiting on CPU0, which is unlikely to idle. "
+> +						"If this is intended set cpu0_calls_idle=1");
+> +
 > +	smp_boot_secondary_nofail(cpu, do_idle);
->  
->  	for (;;) {
->  		cpu_wait(cpu);
-> -		spin_lock(&lock);
-> -		if ((volatile void *)on_cpu_info[cpu].func == NULL)
-> -			break;
-> -		spin_unlock(&lock);
+> +
+> +	for (;;) {
+> +		cpu_wait(cpu);
 > +		if (get_on_cpu_info(cpu)) {
 > +			if ((volatile void *)on_cpu_info[cpu].func == NULL)
 > +				break;
 > +			put_on_cpu_info(cpu);
 > +		}
->  	}
+> +	}
 > +
->  	on_cpu_info[cpu].func = func;
->  	on_cpu_info[cpu].data = data;
-> -	spin_unlock(&lock);
->  	set_cpu_idle(cpu, false);
+> +	on_cpu_info[cpu].func = func;
+> +	on_cpu_info[cpu].data = data;
+> +	set_cpu_idle(cpu, false);
 > +	put_on_cpu_info(cpu);
->  	smp_send_event();
->  }
->  
+> +	smp_send_event();
+> +}
+> +
+> +void on_cpu(int cpu, void (*func)(void *data), void *data)
+> +{
+> +	on_cpu_async(cpu, func, data);
+> +	cpu_wait(cpu);
+> +}
+> +
+> +void on_cpus(void (*func)(void *data), void *data)
+> +{
+> +	int cpu, me = smp_processor_id();
+> +
+> +	for_each_present_cpu(cpu) {
+> +		if (cpu == me)
+> +			continue;
+> +		on_cpu_async(cpu, func, data);
+> +	}
+> +	func(data);
+> +
+> +	for_each_present_cpu(cpu) {
+> +		if (cpu == me)
+> +			continue;
+> +		cpumask_set_cpu(me, &on_cpu_info[cpu].waiters);
+> +		deadlock_check(me, cpu);
+> +	}
+> +	while (cpumask_weight(&cpu_idle_mask) < nr_cpus - 1)
+> +		smp_wait_for_event();
+> +	for_each_present_cpu(cpu)
+> +		cpumask_clear_cpu(me, &on_cpu_info[cpu].waiters);
+> +}
+> diff --git a/lib/on-cpus.h b/lib/on-cpus.h
+> new file mode 100644
+> index 000000000000..41103b0245c7
+> --- /dev/null
+> +++ b/lib/on-cpus.h
+> @@ -0,0 +1,14 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +#ifndef _ON_CPUS_H_
+> +#define _ON_CPUS_H_
+> +#include <stdbool.h>
+> +
+> +extern bool cpu0_calls_idle;
+> +
+> +void do_idle(void);
+> +
+> +void on_cpu_async(int cpu, void (*func)(void *data), void *data);
+> +void on_cpu(int cpu, void (*func)(void *data), void *data);
+> +void on_cpus(void (*func)(void *data), void *data);
+> +
+> +#endif /* _ON_CPUS_H_ */
 
