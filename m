@@ -1,74 +1,96 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E81C15E5A0
-	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 19:17:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F7F80606
+	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 20:14:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706901467; cv=none; b=fiOYxxbt+dx8UJjIgLMZgc+KwbTswSQNJnyQtBsAQthgZnQ5JaiEJza9BC8Nsx9lsrxwTYn4dTCD6Et2RxWOFwBOD+9yjPkuynQN/5OLt2WH6BGZWb8dpS071cNEkLHLKMFx3/kOJoAXZy6LnH0grnWz/ggxsqC21hBnEWYWEtk=
+	t=1706904880; cv=none; b=MINSuBA1qvpZ/3fncfMmUcD1oBNaTCX9Tn2vNrff3VuNOYHg4LdN7g4urUiULcKYvGzEJiZyZU3q8H8rSLH/23uxRHHfT7eRGBGpPeefP584/RnZqDvmoVXIPhZYphFci60jegOTwuOEzdvlCV1E2Crf2E1LS+pVwI7u7MeCPjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706901467; c=relaxed/simple;
-	bh=7ubNXw4viBJ2sXirokr2xChMuQxVZzBTxsDi8LromhM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DYtFITZ0bO0PckFcM3DfYXAkvnuEMEMa0rtR3thsQgfkgciOeBtUxpRQHPyn3G6yY4u3C1XjY12KVEatTHqV6Hb9sjSgEXZa1UKkTUmI3df+IFYqtLIqGySV8JJVPq99imU1V9SQCNC1cA0cL4F2ggdGzTUqArlFkMrYchFRoZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Qg1f8Q5p; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1706904880; c=relaxed/simple;
+	bh=hVOYdqH1GUxVG4986/QzVDI+5cfC4MJ+3BNRLyQCxF4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OAVgrlRDOqVpDejNh7BUazrHjM0CwCReNbfqnUp6Xv6Dsv9i9NgBbAvVondf8eZ63NmyeYjpn6sqV46TMfiyzhfTArh+EXYJxF25/UNxrxGBvjjYWCuiEnXZ4fZwouFoYGS3FuYLxYg4pPOnwNpArG+HTOPVYbzqmsH+9r8y5Q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ldVNzFa0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Qg1f8Q5p"
-Date: Fri, 2 Feb 2024 19:17:37 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706901463;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YX/YmSgOL3ZRbb8FDX2ykhx1yGPO/NRhs6QxOJjbMjA=;
-	b=Qg1f8Q5piP4sjG5RkM8r0F5ZHUcvMUB56G/tUN5LPFNTr2iIpgAXjGz2uAX9E3sO9OFD0q
-	iy6diIEnCbctPWQOnrQf8K/4+EG89W6F+1RFtEeT5rTSDy1I0Wde53tsLOJ4eMW9k0KSEk
-	xLml+SmR31VewZZV93BX/ZQ/eGY76dg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ldVNzFa0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2A7BC43390;
+	Fri,  2 Feb 2024 20:14:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706904879;
+	bh=hVOYdqH1GUxVG4986/QzVDI+5cfC4MJ+3BNRLyQCxF4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ldVNzFa0nws//VO9B7+RU9B8INYNQ/pEVRIJI3o07VsO2FPStpA7y6E+5dVCyYUsG
+	 T05on1frERdZr1I8F3iWoQFl8YBxj6HVEf/GDpkEW378URbXNk3hXKOd7GaDI8Jh1W
+	 NnNz3Jd+G+GU9CCJrfgjKvBsix2OtJ5lV6QEDDBQ11n30cbgdav4ntQhgEbRiQZsT5
+	 0JFSTVOjvRJJxDL6s8XHwa71YTx5BiaeMG6BUsp+EhJcf+o1SOhdRqyxiJ6SZQuckg
+	 fycybPpBejL+Vrhd0thYLC1KrZdgwberXjNJuJ2edUZBLc/PKpB8v+odJaIfi3NK+1
+	 Wqyhm7BTKhdSA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rVzvp-00HPyD-KN;
+	Fri, 02 Feb 2024 20:14:37 +0000
+Date: Fri, 02 Feb 2024 20:14:37 +0000
+Message-ID: <86bk8y7hea.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v2 06/25] KVM: arm64: nv: Add sanitising to VNCR-backed
- HCRX_EL2
-Message-ID: <Zb0_0fq4E1_L7lC6@linux.dev>
+Subject: Re: [PATCH v2 06/25] KVM: arm64: nv: Add sanitising to VNCR-backed HCRX_EL2
+In-Reply-To: <Zb0_0fq4E1_L7lC6@linux.dev>
 References: <20240130204533.693853-1-maz@kernel.org>
- <20240130204533.693853-7-maz@kernel.org>
- <ZbytUKPFYiP2cdd8@linux.dev>
- <86h6iq7w3x.wl-maz@kernel.org>
- <Zb0jRzTYyc0IxR00@linux.dev>
+	<20240130204533.693853-7-maz@kernel.org>
+	<ZbytUKPFYiP2cdd8@linux.dev>
+	<86h6iq7w3x.wl-maz@kernel.org>
+	<Zb0jRzTYyc0IxR00@linux.dev>
+	<Zb0_0fq4E1_L7lC6@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zb0jRzTYyc0IxR00@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Feb 02, 2024 at 05:15:51PM +0000, Oliver Upton wrote:
-> On Fri, Feb 02, 2024 at 02:56:50PM +0000, Marc Zyngier wrote:
-> > No amount of warnings will do, because people don't give a damn.
-> > 
-> > I'm actually in favour of something far more radical: we snapshot the
-> > raw value of all the used RES0/1, and put BUILD_BUG_ON()s that fire if
-> > any value has changed. They will have to touch the KVM code to fix
-> > that, and we catch them red-handed.
+On Fri, 02 Feb 2024 19:17:37 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Oh I like that a lot more.
+> On Fri, Feb 02, 2024 at 05:15:51PM +0000, Oliver Upton wrote:
+> > On Fri, Feb 02, 2024 at 02:56:50PM +0000, Marc Zyngier wrote:
+> > > No amount of warnings will do, because people don't give a damn.
+> > > 
+> > > I'm actually in favour of something far more radical: we snapshot the
+> > > raw value of all the used RES0/1, and put BUILD_BUG_ON()s that fire if
+> > > any value has changed. They will have to touch the KVM code to fix
+> > > that, and we catch them red-handed.
+> > 
+> > Oh I like that a lot more.
+> 
+> Unsure which registers you planned to give this treatment, but all of
+> the ID registers we know about should probably go in this bucket too.
 
-Unsure which registers you planned to give this treatment, but all of
-the ID registers we know about should probably go in this bucket too.
+Yup. My current plan is to simply extract all RES0/RES1 values from
+arch/arm64/include/generated/asm/sysreg-defs.h (currently 232
+definitions), and assert on that. We can relax it for registers that
+don't have any RES0 or RES1 bits, but that's about it.
+
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
