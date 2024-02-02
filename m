@@ -1,55 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B378210FE
-	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 14:56:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0861713E228
+	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 14:58:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706885813; cv=none; b=YyP7l4k6N2b7ore4hTD0zrc6HG7Cmzmjyk5ckVfKx72BsfCLRfR5M7TpNF4+C0X62jeCfAaWfTXJjaSbpp04MWbUb+QcII2RRcTvrXtBFPhEqOqe2BDCVEj7VreLM+Z78OJLCeWAz4vT7QH0aw7dXkUntW2Fx42Uj0idYNIQF1s=
+	t=1706885931; cv=none; b=QShBYY4SEznQhQhx0G3A1mpzsJyXonwnPAxnZRz9jEoA8Z9A6XT45UDMwJX15iVDOZsBatVI805oPQR82sgW0+P6DFLaOuv7wz/eg28Hk3I5rI252yOtE3b9eEaX1YHMPHJf40gjcRwUBPBsslNE8U8GeEUONjLpYG+r3V51zqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706885813; c=relaxed/simple;
-	bh=CECvmIIhA7FaHci5GXCbPyJeXOB0NYrhJqSmfCFDKXs=;
+	s=arc-20240116; t=1706885931; c=relaxed/simple;
+	bh=1ucxNdP66BP9j80/dtcxFHrRXHWOczS/rJ/F7ZHIBLc=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fGjB8tzSba5+GdYemHTlFzYu9QiW/fUY+bhWV6hhSCu/ay2/f+BY7cAHWH8p0S5x3eOP7stAOnfX352UaTwsiUD0hf426CyP18xTifLhZuRr0qU6ocTjcgc4ixc0OERlm1hfpOoEjXx9xkbxToSvcbTl37mgkiyORLYuE/eqvy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hL6u6x0Y; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=JJCN0Q4SH1uuV8lJtdzEv6xooeOjVHrZQUQ5CWyiwrb9dLKEQknFaimTaw8mGPg66JDdGhsIvYRExaMat6XVm/w0Lp/Vn/b5xpLq9IIRtpQvk6kEPAtZSoAtiPMf+D6OVyiYeiYeOsHPr1CZEDXSSCibv6pC2ojRORaHK9fdsiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XxVDTR0l; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hL6u6x0Y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AF16C433F1;
-	Fri,  2 Feb 2024 14:56:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XxVDTR0l"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EC12C433F1;
+	Fri,  2 Feb 2024 14:58:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706885813;
-	bh=CECvmIIhA7FaHci5GXCbPyJeXOB0NYrhJqSmfCFDKXs=;
+	s=k20201202; t=1706885930;
+	bh=1ucxNdP66BP9j80/dtcxFHrRXHWOczS/rJ/F7ZHIBLc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hL6u6x0YzDVkLC7Ck0/akxOZnlHWQl10vCmIwD+CCshYgmVx/l8Htb6fJB4NpBvgb
-	 wGDcmnAQK2FEfKpmGJHHsPcb47yt9XeHp3kmT4UI0M1wwvVZZkGFHCNGZxCzkCffIY
-	 feWnvaKYxOwt0wwPQ+B1ZTsMkO84g3nyMxaEy1ZfXl++iw8u5k5SOy9pMBb0LKPOGe
-	 SaIOHwv+zl2M0qdmpB+LC6QWXfN1czUpk/RQ54LvRprXFlp2SNFZgm0lXHbfEAI8tt
-	 D9DaVLWvuuheJ40oQtztz/1V/KbPxOXBXAJ24oWqjpzE+CpGNzLEGZ2Mkt7F8GN04d
-	 +hzE9egsR0nug==
+	b=XxVDTR0l8kcQivVQ3IUuEeR5aaU6lDVg5c/g7/4opZW8rvAlEjnDC9EAn9XreKeYM
+	 Nm1EA2Ku3AYb+n19VNRiCqoTjp2m5xKw/l+mfPXQC4NdoivpoRDGQR0Ihf958YhxWG
+	 8pcGiT4Rzs+jsaCMV6IEUZSNSY/aDZ7a2c46jVTNvp7Re5JuJ77viiiTen2ltIqFaQ
+	 9p+rhcwysmNRcX6TbzqIe57fqJvdgxDTlbckoFqLKaV0L59Tk5+fGd7s1TtuONVtXV
+	 n6gF4V9NJwTFfUbtiMndg3Xf2OblED/XkHZ/46/veGi3WbRz5UkC/NYK+DlBAGtdZI
+	 HT2dEA7SXzA1g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rVuyI-00HI8Z-VE;
-	Fri, 02 Feb 2024 14:56:51 +0000
-Date: Fri, 02 Feb 2024 14:56:50 +0000
-Message-ID: <86h6iq7w3x.wl-maz@kernel.org>
+	id 1rVv0B-00HICK-T4;
+	Fri, 02 Feb 2024 14:58:48 +0000
+Date: Fri, 02 Feb 2024 14:58:46 +0000
+Message-ID: <86frya7w0p.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
+To: Joey Gouly <joey.gouly@arm.com>
 Cc: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v2 06/25] KVM: arm64: nv: Add sanitising to VNCR-backed HCRX_EL2
-In-Reply-To: <ZbytUKPFYiP2cdd8@linux.dev>
+Subject: Re: [PATCH v2 05/25] KVM: arm64: nv: Add sanitising to VNCR-backed FGT sysregs
+In-Reply-To: <20240201143806.GG2284078@e124191.cambridge.arm.com>
 References: <20240130204533.693853-1-maz@kernel.org>
-	<20240130204533.693853-7-maz@kernel.org>
-	<ZbytUKPFYiP2cdd8@linux.dev>
+	<20240130204533.693853-6-maz@kernel.org>
+	<20240201143806.GG2284078@e124191.cambridge.arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -61,79 +61,25 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, broonie@kernel.org
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 02 Feb 2024 08:52:32 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Thu, 01 Feb 2024 14:38:06 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> On Tue, Jan 30, 2024 at 08:45:13PM +0000, Marc Zyngier wrote:
-> > Just like its little friends, HCRX_EL2 gets the feature set treatment
-> > when backed by VNCR.
+> On Tue, Jan 30, 2024 at 08:45:12PM +0000, Marc Zyngier wrote:
+> > Fine Grained Traps are controlled by a whole bunch of features.
+> > Each one of them must be checked and the corresponding masks
+> > computed so that we don't let the guest apply traps it shouldn't
+> > be using.
 > > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/nested.c | 42 +++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 42 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index cdeef3259193..72db632b115a 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -263,6 +263,48 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
-> >  		res1 |= HCR_E2H;
-> >  	set_sysreg_masks(kvm, HCR_EL2, res0, res1);
-> >  
-> > +	/* HCRX_EL2 */
-> > +	res0 = HCRX_EL2_RES0;
-> > +	res1 = HCRX_EL2_RES1;
+> > This takes care of HFGxTR_EL2, HDFGxTR_EL2, and HAFGRTR_EL2.
 > 
-> I'm a bit worried that we're depending on the meaning of these generated
-> RES0/RES1 bitmasks not changing behind our backs.
-> 
-> Not like people read anything, but do you think it'd make sense to add a
-> warning comment to the sysreg file that adding new encodings can have a
-> functional change on KVM?
+>  ^^ and HFGITR_EL2
 
-No amount of warnings will do, because people don't give a damn.
-
-I'm actually in favour of something far more radical: we snapshot the
-raw value of all the used RES0/1, and put BUILD_BUG_ON()s that fire if
-any value has changed. They will have to touch the KVM code to fix
-that, and we catch them red-handed.
-
-> 
-> > +	if (!kvm_has_feat(kvm, ID_AA64ISAR3_EL1, PACM, TRIVIAL_IMP))
-> > +		res0 |= HCRX_EL2_PACMEn;
-> > +	if (!kvm_has_feat(kvm, ID_AA64PFR2_EL1, FPMR, IMP))
-> > +		res0 |= HCRX_EL2_EnFPM;
-> > +	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, GCS, IMP))
-> > +		res0 |= HCRX_EL2_GCSEn;
-> > +	if (!kvm_has_feat(kvm, ID_AA64ISAR2_EL1, SYSREG_128, IMP))
-> > +		res0 |= HCRX_EL2_EnIDCP128;
-> > +	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, ADERR, DEV_ASYNC))
-> > +		res0 |= (HCRX_EL2_EnSDERR | HCRX_EL2_EnSNERR);
-> > +	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, DF2, IMP))
-> > +		res0 |= HCRX_EL2_TMEA;
-> > +	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, D128, IMP))
-> > +		res0 |= HCRX_EL2_D128En;
-> > +	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, THE, IMP))
-> > +		res0 |= HCRX_EL2_PTTWI;
-> 
-> Ok, not fair. The latest public version of the ARM ARM doesn't have any
-> of this. Where are you getting it from?
-
-The bloody XML, from which all of this should, in theory, be extracted
-without any human intervention. Sadly, it seems that we are not
-allowed to do so, from what I have been told.
-
-The ARM ARM is, unfortunately, being quickly rendered obsolete by the
-lack of updates (FEAT_THE is part of the v9.4 architecture, released
-in 2022).
-
-I'll make sure to add a link to the XML in the cover letter when I
-repost the series.
+The intention was that it was covered by HFGxTR, but I can now see how
+that can be confusing.
 
 Thanks,
 
