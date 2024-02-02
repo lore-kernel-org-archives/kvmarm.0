@@ -1,57 +1,57 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2CE7182DA
-	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 06:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F4DF18635
+	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 06:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706857144; cv=none; b=IpBCuoGtioKVjY9+9zPlWHM+2Bat4OLg+WWigGZg6mGueGlVrCRFjoBqycDlLuw2Zu2J0L4j9du7nBATfSZQjJ2C2L/OV5Qb/sHVE72ZSbg2bxTelVn37UmmmV71tl+g9pjA1QLWL3dzf4N26Avu6dRfcly9JdunJcOY/Yphtdw=
+	t=1706857152; cv=none; b=WMDByQ/FhPHt2Cyz6Cib+YPzsI5oFmxCdmXEl+XWQg5Qug1bl8LNuhZhFi3Wu3dFPcWcQooKYm0MpKXaNzz56c/hUU966QOMd3mJcB0557QncCN5ECuvhyRKW1euinRFKGFNd3Es4xyFuz00hubih+EhJvKkyjMxXbRx/1NQs2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706857144; c=relaxed/simple;
-	bh=2beTdUj4YXNqigb6jUTF4KkxHyvHbagk5SI7K1z8HW0=;
+	s=arc-20240116; t=1706857152; c=relaxed/simple;
+	bh=6JbG9et4ggNViHk+xpnp84ZGRBT58T7v98W3F6J80+o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YDO4gojNJjJfIfMju16pviCw7qcAOeAW5VGiBaY0pgrQesMfD1anlAW9RRYO6kUJdelA747A3pfuKbSpgUHROkMcBg8YknrpKlzRdHyxGxMS5ZpH84HW3huZKgX/dDVNGy0CALJ2qwkIXM1HluPmukC+yUc3DHnmI2MPClmqfNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wj4x/dWZ; arc=none smtp.client-ip=209.85.214.172
+	 MIME-Version; b=sQLYp/q6Fm5dD4SISicFOl1Iy16tKCEzn2i4mwLZ9wqSaxAuaX3ESEY4ozoPzkTHKJQOYrAHmn3LhopUav+ZobM61+esTTO0jtsbXn2BLlg2qN0bnHj+PxcpVdUU/ZvE5hGh0tOmK4uKAly6XinSfzKCiFCZBwMpwapVba1ZlTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lPIhYpJK; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wj4x/dWZ"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1d918008b99so14160015ad.3
-        for <kvmarm@lists.linux.dev>; Thu, 01 Feb 2024 22:59:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lPIhYpJK"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d93f2c3701so10667785ad.3
+        for <kvmarm@lists.linux.dev>; Thu, 01 Feb 2024 22:59:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706857142; x=1707461942; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1706857150; x=1707461950; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AcbZ3b72z5JTsiEYQiD8/BwtKqeQBzzGW/MZj7+sxQo=;
-        b=Wj4x/dWZvKTFBAdiYA5UVuTjh0DzB/h4wLE1WM69UYpoP2BnQEuSvcAStl0ktLoWIz
-         FZ49tLv1SQdKjPHaWZ+k8aDLP2UKyUJLYjI+uciu5CKNWxA7pZV+TukkEeZPzLAKje/S
-         XJCOI1T1w0fFzsjDVOcvPu3ChHJNa/hxEfHsh4HD0MBOVNDkKeCTPb9dO8paFkhTraba
-         UsDrwdi2meHBJqutjsvOiDTUP1q+CIU7BNCITimwfS8qskYaB7b5sKkduFID4sILwcdj
-         2pkAdnHVPyhynhDrf+dHuKJVZMtflN33G4Hb+L85NqdA6BbR2TaV8QbqfFvbJdKbJt3o
-         BeZg==
+        bh=2A8b0YOIg6lGChxKQRkSufzy4suZ23mRhNBzFJEEdSM=;
+        b=lPIhYpJKXKWaNbNj57B+12qK+wT0QreSVPbydvI15d4gENx4MehidwxpgWqvJdbbGv
+         62+q6YAWxNuWgvO76iSXfdyux13GtfL3T4gahafSREzNu6g0m7Wy+CJAcS1BHe/chXhH
+         Iet/MTT/twfy9/NZxVqSdKTjcXcgsAwvM6HwHnRPO947MYMusq8h8bm110vKvHWdFo+k
+         xgnYcdXtrAOzRbpP8ahg2v8Fm1CXcUFABJ11NDHxb8GJXam/x+8u4Z/AFvRtvYAD8UrK
+         BIABoUTWsky995IX0Atf2MxufocjL6un9GHGWr9w5f4ulvU3ZNSuvaKlw02DT4az7flM
+         mdnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706857142; x=1707461942;
+        d=1e100.net; s=20230601; t=1706857150; x=1707461950;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AcbZ3b72z5JTsiEYQiD8/BwtKqeQBzzGW/MZj7+sxQo=;
-        b=ncmyJEFfdaz0yTLl7PuJGv1P9T0ZOdYFw+AkmyzfO0xDGixMkh65lXSx0lY30cYf1S
-         lgm4c4SBHOL7vNs/J+4Pji7kzvFBXa4tJ3LBKcNB4CabTtSmaydmvrBR0zw5WYCaEPON
-         11zivm83YUv2wmK5TwXXVHtQbSS3kmHVBUf0J3FkK0ariAvNTnMUq8YeACRDLtvvz2dq
-         Xe3h54xgcnSFlep2+0nmsbOVi5QbzNwCAaWgsOOMIOOAjwkRC3wwZZdKF768tyTIGIgG
-         evBVtDcHaF+n1Oo7XP9tayAJDi7SAFCq7GZ3U8m+Bo9QvB3ydJBXIGY5G4mJV7VPNZKY
-         392w==
-X-Gm-Message-State: AOJu0YwfjnRM0VY8BKXg0wl42uYXE7A53Ia+Nl3XtuQ2zhA7llJeqh93
-	qsgK+GpLBFc/QpqrIheSqtqE3i3de7dc2Yrx45t2iIKMeYPL0XN3
-X-Google-Smtp-Source: AGHT+IFs+IN8kqrNAOK7L1kdhKg2x+fFZzGf5XMf2+FBY9Nbg8lXWJKa6GZTbVG9lE7J4tad2sbYug==
-X-Received: by 2002:a17:902:ce8c:b0:1d9:7412:834 with SMTP id f12-20020a170902ce8c00b001d974120834mr719999plg.8.1706857141947;
-        Thu, 01 Feb 2024 22:59:01 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWSPDjupVheTRpWjNG3qQOcVOPZJWHEhIlPhxS7xEOECZT/j+hA5vA7EhckWrkOUVp1YN/gMV83pWB6BlPQnN464jm5KGO0FaR/AV/72oUiwHzfmmMXB6AfWsXAYGreRlgFfBq4q4v6indtcbkufNSdGjsgqswIjC9s7nUFqPjexotrw7C85wdEReHZ4i4Hc+8/N4m44m9fAMAT3yAWTKAuRw+HxNNdwwHUbfL06hssswrFRRGhvZqesWG9HRgrSFM5+hbwwelX/CD22eTA4iFEQsrzWQ1WCRHt1Rl3QDWgENNcYBjqIAfOAr+7Nw+VVm+kmHyXa61hG/SGbSzt47XfF81ZEZIU4/dt0kycXB3YA5i/hltb8mlyQhIfojSw8EiSEAX/hczMK1BJxR1JblUApaYd1Yu1trsAUfTu5Efg2L8YNp3UnHiMD9WXpZJcE6f79A5grOoZGB/t1Fq41wpCqsWUsrcSembgQLmQNRqA2UZytjtZI/hxLRLhl13CTJQgHhr2cqx8R6E=
+        bh=2A8b0YOIg6lGChxKQRkSufzy4suZ23mRhNBzFJEEdSM=;
+        b=jyXRmkVzXCO5/DWL9/FoNmMCY4Jjwaluo1+ybcvAFL/SRG2uJxivAUwdrpg71iWzf7
+         njpyrHlweUdUHZ2dotPu766IB2xPVGkUCQOP0064G7xNVrIZIhD9VSm9RQh0OhAc3Z2I
+         wmg9c6oL39V+vnnvxaDyCAPisHHSBuSj3QENb8AdzVMfYkEwmzkVEdfUYWaFsz3NtyfW
+         eJphY2Bd35Z5XoCjCGU8OcynqRGyt1hWzVrUMnLtyGSy9U19r7ZR+HAk0g2v8W+KNFD2
+         iMiElo2h/PooyhyAUJ2ijxINVaGd+r1FSzTk9HG1Wuc84sAnjJzqPcN5ZsI2NntA/EOg
+         GIsw==
+X-Gm-Message-State: AOJu0YzTS1GgrJMt+7OaRq9dVqwLCmA3k2wDE1IMsG5MqOVuMZLKmvRi
+	qrTKltVlEDjK3eGnNhBdqR37NKzoVdz4p4wBVOccrnHIwBPmyjzQ
+X-Google-Smtp-Source: AGHT+IEFt7kfJGu61jZUZZl3OY3s2dKrBdsO6NiQuZ9E3dIRck/n/RDkAL+FrMyrpMKk6m8nizxRPw==
+X-Received: by 2002:a17:902:7c97:b0:1d8:fae3:2216 with SMTP id y23-20020a1709027c9700b001d8fae32216mr5679839pll.35.1706857150341;
+        Thu, 01 Feb 2024 22:59:10 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUYncYvmvYyn1bIo4nQyp/+E/FnRz/SeAmt64eUXq2CiSJIqXGaPkB7FxwGpzIlNiEzEzB+LkGRAgVN2ozGXSgcLqCVtAOixnufvjh5CF4R7/qutE1ZgrgE8KPEDt4fEwlzL5vi4cWxKE2403WAfOQvf2qfTnsOZzjq6Bmn0UG5URuvkXMko5RrllOPDZ6rWDnfJe/g/oThk6+GyqcslLMVeLxnrFBw8vNdmX7qajZ8/TLHzwe4MC82JvQe07k0oMntr18YdbhE4iIh2XZVXmUOqvb/OUVvkCBThcjEti0ruRHPUECZ6k6xtj42LMpSwYOklQ9yQrKG5eg1EI/PkK11hDlHCljnGJcrbLlaaeWFCOQqUIS36VObLTPRw2jRtK0FVwVPAm9AWYvxfHOoGpAtpmnBkf8oFFpaUF//HU8VfpLXiNqo3RpxpdXdPQIsTmbOtlx+UbGTdVN/GI9VfcohRq7mEAffaqJs/ZAwZ5xRv1zdOrnEkFhJGpUJORVnhWanLA8LXQ7azRg=
 Received: from wheely.local0.net ([1.146.53.155])
-        by smtp.gmail.com with ESMTPSA id d18-20020a170903209200b001d948adc19fsm905734plc.46.2024.02.01.22.58.53
+        by smtp.gmail.com with ESMTPSA id d18-20020a170903209200b001d948adc19fsm905734plc.46.2024.02.01.22.59.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 22:59:01 -0800 (PST)
+        Thu, 01 Feb 2024 22:59:10 -0800 (PST)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -70,9 +70,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	linuxppc-dev@lists.ozlabs.org,
 	linux-s390@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: [kvm-unit-tests PATCH v2 7/9] migration: Add quiet migration support
-Date: Fri,  2 Feb 2024 16:57:38 +1000
-Message-ID: <20240202065740.68643-8-npiggin@gmail.com>
+Subject: [kvm-unit-tests PATCH v2 8/9] Add common/ directory for architecture-independent tests
+Date: Fri,  2 Feb 2024 16:57:39 +1000
+Message-ID: <20240202065740.68643-9-npiggin@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240202065740.68643-1-npiggin@gmail.com>
 References: <20240202065740.68643-1-npiggin@gmail.com>
@@ -84,72 +84,160 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Console output required to support migration becomes quite noisy
-when doing lots of migrations. Provide a migrate_quiet() call that
-suppresses console output and doesn't log a message.
+x86/sieve.c is used by s390x and arm via symbolic link. Make a new
+directory common/ for architecture-independent tests and move
+sieve.c here.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- lib/migrate.c         | 12 ++++++++++++
- lib/migrate.h         |  1 +
- scripts/arch-run.bash |  4 ++--
- 3 files changed, 15 insertions(+), 2 deletions(-)
+ arm/sieve.c    |  2 +-
+ common/sieve.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
+ s390x/sieve.c  |  2 +-
+ x86/sieve.c    | 52 +-------------------------------------------------
+ 4 files changed, 54 insertions(+), 53 deletions(-)
+ create mode 100644 common/sieve.c
+ mode change 100644 => 120000 x86/sieve.c
 
-diff --git a/lib/migrate.c b/lib/migrate.c
-index b7721659..4e0ab516 100644
---- a/lib/migrate.c
-+++ b/lib/migrate.c
-@@ -18,6 +18,18 @@ void migrate(void)
- 	report_info("Migration complete");
- }
- 
-+/*
-+ * Like migrate() but supporess output and logs, useful for intensive
-+ * migration stress testing without polluting logs. Test cases should
-+ * provide relevant information about migration in failure reports.
-+ */
-+void migrate_quiet(void)
+diff --git a/arm/sieve.c b/arm/sieve.c
+index 8f14a5c3..fe299f30 120000
+--- a/arm/sieve.c
++++ b/arm/sieve.c
+@@ -1 +1 @@
+-../x86/sieve.c
+\ No newline at end of file
++../common/sieve.c
+\ No newline at end of file
+diff --git a/common/sieve.c b/common/sieve.c
+new file mode 100644
+index 00000000..8150f2d9
+--- /dev/null
++++ b/common/sieve.c
+@@ -0,0 +1,51 @@
++#include "alloc.h"
++#include "libcflat.h"
++
++static int sieve(char* data, int size)
 +{
-+	puts("Now migrate the VM (quiet)\n");
-+	(void)getchar();
++    int i, j, r = 0;
++
++    for (i = 0; i < size; ++i)
++	data[i] = 1;
++
++    data[0] = data[1] = 0;
++
++    for (i = 2; i < size; ++i)
++	if (data[i]) {
++	    ++r;
++	    for (j = i*2; j < size; j += i)
++		data[j] = 0;
++	}
++    return r;
 +}
 +
++static void test_sieve(const char *msg, char *data, int size)
++{
++    int r;
 +
- /*
-  * Initiate migration and wait for it to complete.
-  * If this function is called more than once, it is a no-op.
-diff --git a/lib/migrate.h b/lib/migrate.h
-index 2af06a72..95b9102b 100644
---- a/lib/migrate.h
-+++ b/lib/migrate.h
-@@ -7,4 +7,5 @@
-  */
- 
- void migrate(void);
-+void migrate_quiet(void);
- void migrate_once(void);
-diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-index 0feaa190..5810f9a1 100644
---- a/scripts/arch-run.bash
-+++ b/scripts/arch-run.bash
-@@ -154,7 +154,7 @@ run_migration ()
- 		-chardev socket,id=mon,path=${src_qmp},server=on,wait=off \
- 		-mon chardev=mon,mode=control > ${src_outfifo} &
- 	live_pid=$!
--	cat ${src_outfifo} | tee ${src_out} &
-+	cat ${src_outfifo} | tee ${src_out} | grep -v "Now migrate the VM (quiet)" &
- 
- 	# The test must prompt the user to migrate, so wait for the "migrate"
- 	# keyword
-@@ -202,7 +202,7 @@ do_migration ()
- 		-mon chardev=mon,mode=control -incoming unix:${dst_incoming} \
- 		< <(cat ${dst_infifo}) > ${dst_outfifo} &
- 	incoming_pid=$!
--	cat ${dst_outfifo} | tee ${dst_out} &
-+	cat ${dst_outfifo} | tee ${dst_out} | grep -v "Now migrate the VM (quiet)" &
- 
- 	# The test must prompt the user to migrate, so wait for the "migrate" keyword
- 	while ! grep -q -i "Now migrate the VM" < ${src_out} ; do
++    printf("%s:", msg);
++    r = sieve(data, size);
++    printf("%d out of %d\n", r, size);
++}
++
++#define STATIC_SIZE 1000000
++#define VSIZE 100000000
++char static_data[STATIC_SIZE];
++
++int main(void)
++{
++    void *v;
++    int i;
++
++    printf("starting sieve\n");
++    test_sieve("static", static_data, STATIC_SIZE);
++    setup_vm();
++    test_sieve("mapped", static_data, STATIC_SIZE);
++    for (i = 0; i < 3; ++i) {
++	v = malloc(VSIZE);
++	test_sieve("virtual", v, VSIZE);
++	free(v);
++    }
++
++    return 0;
++}
+diff --git a/s390x/sieve.c b/s390x/sieve.c
+index 8f14a5c3..fe299f30 120000
+--- a/s390x/sieve.c
++++ b/s390x/sieve.c
+@@ -1 +1 @@
+-../x86/sieve.c
+\ No newline at end of file
++../common/sieve.c
+\ No newline at end of file
+diff --git a/x86/sieve.c b/x86/sieve.c
+deleted file mode 100644
+index 8150f2d9..00000000
+--- a/x86/sieve.c
++++ /dev/null
+@@ -1,51 +0,0 @@
+-#include "alloc.h"
+-#include "libcflat.h"
+-
+-static int sieve(char* data, int size)
+-{
+-    int i, j, r = 0;
+-
+-    for (i = 0; i < size; ++i)
+-	data[i] = 1;
+-
+-    data[0] = data[1] = 0;
+-
+-    for (i = 2; i < size; ++i)
+-	if (data[i]) {
+-	    ++r;
+-	    for (j = i*2; j < size; j += i)
+-		data[j] = 0;
+-	}
+-    return r;
+-}
+-
+-static void test_sieve(const char *msg, char *data, int size)
+-{
+-    int r;
+-
+-    printf("%s:", msg);
+-    r = sieve(data, size);
+-    printf("%d out of %d\n", r, size);
+-}
+-
+-#define STATIC_SIZE 1000000
+-#define VSIZE 100000000
+-char static_data[STATIC_SIZE];
+-
+-int main(void)
+-{
+-    void *v;
+-    int i;
+-
+-    printf("starting sieve\n");
+-    test_sieve("static", static_data, STATIC_SIZE);
+-    setup_vm();
+-    test_sieve("mapped", static_data, STATIC_SIZE);
+-    for (i = 0; i < 3; ++i) {
+-	v = malloc(VSIZE);
+-	test_sieve("virtual", v, VSIZE);
+-	free(v);
+-    }
+-
+-    return 0;
+-}
+diff --git a/x86/sieve.c b/x86/sieve.c
+new file mode 120000
+index 00000000..fe299f30
+--- /dev/null
++++ b/x86/sieve.c
+@@ -0,0 +1 @@
++../common/sieve.c
+\ No newline at end of file
 -- 
 2.42.0
 
