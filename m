@@ -1,213 +1,208 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817D8126F24
-	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 22:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B6212C814
+	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 23:46:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706913014; cv=none; b=TBInLqfsG9X9U9q5eyG7lFX1rZwZ7x6QkJ9r1fFvRxyflheojNnoGcTN83GQ+Pht4RO6jtJkwnkRrRQFsB8q9PkGYJLOc4wBJHNsydTai1B53JudXSsrTKoGmLPM4vLveI53ex378XnfnyM//iHIdWKAnTwtiieM8BpGErBxoN0=
+	t=1706917569; cv=none; b=hYEeQiiqLz3xu8/QD6s6m0y+ApYvd4z0ERLLWQine2DdHImeapPCpAdCfy2XLUSb0VE6HZ/Q2zpGGT1XZcpzfovO8ZBPYXHXAxuqaPmA60wNuj+6DjOQ70lPA6ss7SzQFCRx8O03BCFVnXu9JuJC6crhJ6JkOLYtPUj/5VUOw8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706913014; c=relaxed/simple;
-	bh=OKtyV3UcUMJMPvy1ECKXZVqMjFEDtE8zKK3U8e5aNc4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KlLad0NNA7lXD2K4TtWQanx8Ur+a2VK00STPSdbbvkVTbiIKjEmYfLc9bZzB86wrlTgboOXnvPNEtEw1rHZjzKr97y3encY0uUrqngrJay9D7VWRfOH5ksO+5PDbCyYNeVQJbJulsKv0ntyaee1tiuwyKywXJxcJUrCDYMuLlKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e3CTCmxz; arc=none smtp.client-ip=209.85.214.179
+	s=arc-20240116; t=1706917569; c=relaxed/simple;
+	bh=tCKrGRW7WN608392SeATTvTDea2Xb4gjQNimEpRumEo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=fhtmiLZ/k1xIbzL2nPmkf+W5iB17DhQKP5jDytbwXy9ILLnAbHh6jeLzpBv2RjF1q7KMsfo4YVC+EY3quWo01HlKEXWv2EnOF5OsXJKb8xkc/K+3gIMhdECOQvJE3T2g8Y2gn8aDMRnlgQjHGSPfOR1KKlX0p9kRNM4SXiW8QrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hid88D2s; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e3CTCmxz"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1d5ce88b51cso73145ad.0
-        for <kvmarm@lists.linux.dev>; Fri, 02 Feb 2024 14:30:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hid88D2s"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5cfc2041cdfso2632475a12.2
+        for <kvmarm@lists.linux.dev>; Fri, 02 Feb 2024 15:46:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706913012; x=1707517812; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4gHfXsDd1+NPNrp7/zCgopLQIxA18bpbncOGieuL0yc=;
-        b=e3CTCmxzazZ4OTecYZgLQDWqrxSpIpyPlS/mf5UsVCtv2gSHyf5dpvsDHZg/2n8NmN
-         CB4FaW/aKblvjpeKnriSxQVpXQ/RDd6Ea4fdgrBAVw/doIJ8NsmLToxKiwBEnYCmlxtM
-         8xlad5AWE03J5WJad2YnH1H70RD6X284EfhQAkGRT7crwmE5mnakzfz19Fj9mvLSu4BX
-         JMsOWpNMHCmlLkJ/Fi9Ki1oBAyLPAgoj3WsdrAI1qZke/aeIFYjlt/zjehyTtS4fnyxl
-         KggkvHHN0c9jDTpuwPPUHn8A3ACqrtmaujvf2juLeEsU0J9ur6KRSjce8rUtzZ3IL91g
-         Isew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706913012; x=1707517812;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=google.com; s=20230601; t=1706917566; x=1707522366; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4gHfXsDd1+NPNrp7/zCgopLQIxA18bpbncOGieuL0yc=;
-        b=hJiOnIDYQhS+L7jZfphBn5XJxbtMEUDsYQg1sHxpaEh2qvCZXkegAwyzvYxp9thtB+
-         5S+MES7fw/X+dNySJ1PVHccJ+uTuhfaHmHMaeVlInyD3nhvjPVLISXggUEYHdhg7mBv4
-         oZ+JW0somTrhukSfnwGpy2KGihbrEhP/g5J8BWm3MMFyw9zhbW8A1NN42mYuMqQxGPJv
-         +F3d5iVxkUxvtyuxqfLP/MCXLV1x4P2hXI0/b/x6Co3VqKtdk124LxGg15kix9Do1wsY
-         1EeWTeW17Bbl8ttIf1JjasIqqFT9S/iXJtk0QNexP8tHwrJoZOn4MdxoW8FkBdQuGgxS
-         587Q==
-X-Gm-Message-State: AOJu0Yw/UzOq3pXwfS0ee5SLvraYpUPlm220RL/stwHbnWqNKRUbvMSn
-	7+dlp8e6y0ArBZq1ORoGJUh5ifEt0D28v0+akWE9GUZkiEHOTXMUdAurlVDv1oQXBUB9BV00iYJ
-	k8bEMou2o+g28onT/BDUbnjPCuYXyvGJb3pQg
-X-Google-Smtp-Source: AGHT+IGYPtzOWKJUHpZOUv3WD2/u8xqCH2po02LT82xgQd99fQsVzRN06AKewo08mu5evakZqsXkrrjcw9wBJU3p9vw=
-X-Received: by 2002:a17:903:2349:b0:1d8:aada:a7e3 with SMTP id
- c9-20020a170903234900b001d8aadaa7e3mr26544plh.3.1706913011645; Fri, 02 Feb
- 2024 14:30:11 -0800 (PST)
+        bh=CadysjImRodM1JigoHu7x5dfRmrUFHW93Rcy1yZ8LIM=;
+        b=hid88D2sH5HTvjAi6422t9Z98ANlq6ROr1zjPu0M4tlJk7qJt6/ntCNHePlts5vfk5
+         M/NXir/BKLHoPwCUq6Az3Hm93ipasFOGn0Fxur8TdqiptKAejja0EebSv/y+UMUiBHZn
+         9isrOlm5w0Z5W9QG1NQWs0anaszWKNiWDRGD0HEFrQDb+CSeCmlfXBk4KVE23qkaro2m
+         0uPf0BM14Ll++E9lNEX5nHQK3ghIxZsLBKNHKclfN3notipAp+af//KM7jFL1Zk3vgdD
+         LHdumvAV45eVa4zNo4O38xkiy3jbWb4RUsHZhArv86mdMYhMLWf/2oV8NGNM6YM82+YC
+         QSwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706917566; x=1707522366;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CadysjImRodM1JigoHu7x5dfRmrUFHW93Rcy1yZ8LIM=;
+        b=WFZ4lL3VQ0Htz2A2805jmIm8pOepgMI/F4vaxty4VYJFoo0KCT3giXm/W0injk9dlk
+         egGm2qZpNS5wN3clE6hkfBsr6jgNxxeNzqNj8kD0qfcT4B648BvO1Q6cmb7LauJ+EeRA
+         QUHGfgLIhgSkGw5A8+NSOXlVdVp67n5olBoabql27hzkWc2yWY9n0xNZJEVMj8htOY8K
+         xVb05QA5fAgdYtugk4i20ypMufnqyq3sSmKQ79I+zB4U9Zs724KQQ2p/3Z4mxTwdbCb2
+         8JW9j5qvkbCs7sT8OQuX7f50QeOeoz8OqYl4AUdgkvoGj1I4Z4i6lUvx0h/UAXnmFvI5
+         6GdA==
+X-Gm-Message-State: AOJu0YzIbkA/vJdUqbmuhbZ5h99YyKhrHq7fnOIYPFbh8fVsUw2h9yGL
+	D9e3dLdYDeWPfO7QR40CrP7SBnkPDOuMAAtFa9npt1sq1RbC12tr74LKwfT6/kjPqxGWPPyk+gk
+	v0w==
+X-Google-Smtp-Source: AGHT+IHHsr4NU54NohTBduBzv4jpgrZuqG+/Ora3WvFzNYKUDGxh0aFGIwr7FvvMQVezeC1vmX7Awhvls+8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a65:6e85:0:b0:5ca:439c:86ac with SMTP id
+ bm5-20020a656e85000000b005ca439c86acmr132167pgb.8.1706917566148; Fri, 02 Feb
+ 2024 15:46:06 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri,  2 Feb 2024 15:46:03 -0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20240125164256.4147-1-alexandru.elisei@arm.com> <20240125164256.4147-23-alexandru.elisei@arm.com>
-In-Reply-To: <20240125164256.4147-23-alexandru.elisei@arm.com>
-From: Evgenii Stepanov <eugenis@google.com>
-Date: Fri, 2 Feb 2024 14:30:00 -0800
-Message-ID: <CAFKCwrhNE5PR7cu7tN8qMmSEUhdJ7ensGGrB-oodh-J_fdoRcw@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 22/35] arm64: mte: Enable tag storage if CMA areas
- have been activated
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, 
-	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org, 
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, 
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org, 
-	bsegall@google.com, mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com, 
-	mhiramat@kernel.org, rppt@kernel.org, hughd@google.com, pcc@google.com, 
-	steven.price@arm.com, anshuman.khandual@arm.com, vincenzo.frascino@arm.com, 
-	david@redhat.com, kcc@google.com, hyesoo.yu@samsung.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-mm@kvack.org, 
-	linux-trace-kernel@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
+Message-ID: <20240202234603.366925-1-seanjc@google.com>
+Subject: [PATCH] KVM: selftests: Fix GUEST_PRINTF() format warnings in ARM code
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 25, 2024 at 8:44=E2=80=AFAM Alexandru Elisei
-<alexandru.elisei@arm.com> wrote:
->
-> Before enabling MTE tag storage management, make sure that the CMA areas
-> have been successfully activated. If a CMA area fails activation, the pag=
-es
-> are kept as reserved. Reserved pages are never used by the page allocator=
-.
->
-> If this happens, the kernel would have to manage tag storage only for som=
-e
-> of the memory, but not for all memory, and that would make the code
-> unreasonably complicated.
->
-> Choose to disable tag storage management altogether if a CMA area fails t=
-o
-> be activated.
->
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->
-> Changes since v2:
->
-> * New patch.
->
->  arch/arm64/include/asm/mte_tag_storage.h | 12 ++++++
->  arch/arm64/kernel/mte_tag_storage.c      | 50 ++++++++++++++++++++++++
->  2 files changed, 62 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/mte_tag_storage.h b/arch/arm64/includ=
-e/asm/mte_tag_storage.h
-> index 3c2cd29e053e..7b3f6bff8e6f 100644
-> --- a/arch/arm64/include/asm/mte_tag_storage.h
-> +++ b/arch/arm64/include/asm/mte_tag_storage.h
-> @@ -6,8 +6,20 @@
->  #define __ASM_MTE_TAG_STORAGE_H
->
->  #ifdef CONFIG_ARM64_MTE_TAG_STORAGE
-> +
-> +DECLARE_STATIC_KEY_FALSE(tag_storage_enabled_key);
-> +
-> +static inline bool tag_storage_enabled(void)
-> +{
-> +       return static_branch_likely(&tag_storage_enabled_key);
-> +}
-> +
->  void mte_init_tag_storage(void);
->  #else
-> +static inline bool tag_storage_enabled(void)
-> +{
-> +       return false;
-> +}
->  static inline void mte_init_tag_storage(void)
->  {
->  }
-> diff --git a/arch/arm64/kernel/mte_tag_storage.c b/arch/arm64/kernel/mte_=
-tag_storage.c
-> index 9a1a8a45171e..d58c68b4a849 100644
-> --- a/arch/arm64/kernel/mte_tag_storage.c
-> +++ b/arch/arm64/kernel/mte_tag_storage.c
-> @@ -19,6 +19,8 @@
->
->  #include <asm/mte_tag_storage.h>
->
-> +__ro_after_init DEFINE_STATIC_KEY_FALSE(tag_storage_enabled_key);
-> +
->  struct tag_region {
->         struct range mem_range; /* Memory associated with the tag storage=
-, in PFNs. */
->         struct range tag_range; /* Tag storage memory, in PFNs. */
-> @@ -314,3 +316,51 @@ void __init mte_init_tag_storage(void)
->         num_tag_regions =3D 0;
->         pr_info("MTE tag storage region management disabled");
->  }
-> +
-> +static int __init mte_enable_tag_storage(void)
-> +{
-> +       struct range *tag_range;
-> +       struct cma *cma;
-> +       int i, ret;
-> +
-> +       if (num_tag_regions =3D=3D 0)
-> +               return 0;
-> +
-> +       for (i =3D 0; i < num_tag_regions; i++) {
-> +               tag_range =3D &tag_regions[i].tag_range;
-> +               cma =3D tag_regions[i].cma;
-> +               /*
-> +                * CMA will keep the pages as reserved when the region fa=
-ils
-> +                * activation.
-> +                */
-> +               if (PageReserved(pfn_to_page(tag_range->start)))
-> +                       goto out_disabled;
-> +       }
-> +
-> +       static_branch_enable(&tag_storage_enabled_key);
-> +       pr_info("MTE tag storage region management enabled");
-> +
-> +       return 0;
-> +
-> +out_disabled:
-> +       for (i =3D 0; i < num_tag_regions; i++) {
-> +               tag_range =3D &tag_regions[i].tag_range;
-> +               cma =3D tag_regions[i].cma;
-> +
-> +               if (PageReserved(pfn_to_page(tag_range->start)))
-> +                       continue;
-> +
-> +               /* Try really hard to reserve the tag storage. */
-> +               ret =3D cma_alloc(cma, range_len(tag_range), 8, true);
-> +               /*
-> +                * Tag storage is still in use for data, memory and/or ta=
-g
-> +                * corruption will ensue.
-> +                */
-> +               WARN_ON_ONCE(ret);
+Fix a pile of -Wformat warnings in the KVM ARM selftests code, almost all
+of which are benign "long" versus "long long" issues (selftests are 64-bit
+only, and the guest printf code treats "ll" the same as "l").  The code
+itself isn't problematic, but the warnings make it impossible to build ARM
+selftests with -Werror, which does detect real issues from time to time.
 
-cma_alloc returns (page *), so this condition needs to be inverted,
-and the type of `ret` changed.
-Not sure how it slipped through, this is a compile error with clang.
+Opportunistically have GUEST_ASSERT_BITMAP_REG() interpret set_expected,
+which is a bool, as an unsigned decimal value, i.e. have it print '0' or
+'1' instead of '0x0' or '0x1'.
 
-> +       }
-> +       num_tag_regions =3D 0;
-> +       pr_info("MTE tag storage region management disabled");
-> +
-> +       return -EINVAL;
-> +}
-> +arch_initcall(mte_enable_tag_storage);
-> --
-> 2.43.0
->
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+
+Compile tested only, mainly because I'm rushing through things on Friday
+afternoon, not because testing on ARM is actually problematic for me.
+
+ tools/testing/selftests/kvm/aarch64/arch_timer.c     |  4 ++--
+ .../testing/selftests/kvm/aarch64/debug-exceptions.c |  2 +-
+ tools/testing/selftests/kvm/aarch64/hypercalls.c     |  4 ++--
+ .../testing/selftests/kvm/aarch64/page_fault_test.c  |  2 +-
+ .../selftests/kvm/aarch64/vpmu_counter_access.c      | 12 ++++++------
+ 5 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+index 274b8465b42a..d5e8f365aa01 100644
+--- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
++++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+@@ -158,9 +158,9 @@ static void guest_validate_irq(unsigned int intid,
+ 
+ 	/* Basic 'timer condition met' check */
+ 	__GUEST_ASSERT(xcnt >= cval,
+-		       "xcnt = 0x%llx, cval = 0x%llx, xcnt_diff_us = 0x%llx",
++		       "xcnt = 0x%lx, cval = 0x%lx, xcnt_diff_us = 0x%lx",
+ 		       xcnt, cval, xcnt_diff_us);
+-	__GUEST_ASSERT(xctl & CTL_ISTATUS, "xcnt = 0x%llx", xcnt);
++	__GUEST_ASSERT(xctl & CTL_ISTATUS, "xcnt = 0x%lx", xcnt);
+ 
+ 	WRITE_ONCE(shared_data->nr_iter, shared_data->nr_iter + 1);
+ }
+diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+index 866002917441..2582c49e525a 100644
+--- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
++++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+@@ -365,7 +365,7 @@ static void guest_wp_handler(struct ex_regs *regs)
+ 
+ static void guest_ss_handler(struct ex_regs *regs)
+ {
+-	__GUEST_ASSERT(ss_idx < 4, "Expected index < 4, got '%u'", ss_idx);
++	__GUEST_ASSERT(ss_idx < 4, "Expected index < 4, got '%lu'", ss_idx);
+ 	ss_addr[ss_idx++] = regs->pc;
+ 	regs->pstate |= SPSR_SS;
+ }
+diff --git a/tools/testing/selftests/kvm/aarch64/hypercalls.c b/tools/testing/selftests/kvm/aarch64/hypercalls.c
+index 31f66ba97228..c62739d897d6 100644
+--- a/tools/testing/selftests/kvm/aarch64/hypercalls.c
++++ b/tools/testing/selftests/kvm/aarch64/hypercalls.c
+@@ -105,12 +105,12 @@ static void guest_test_hvc(const struct test_hvc_info *hc_info)
+ 		case TEST_STAGE_HVC_IFACE_FEAT_DISABLED:
+ 		case TEST_STAGE_HVC_IFACE_FALSE_INFO:
+ 			__GUEST_ASSERT(res.a0 == SMCCC_RET_NOT_SUPPORTED,
+-				       "a0 = 0x%lx, func_id = 0x%x, arg1 = 0x%llx, stage = %u",
++				       "a0 = 0x%lx, func_id = 0x%x, arg1 = 0x%lx, stage = %u",
+ 					res.a0, hc_info->func_id, hc_info->arg1, stage);
+ 			break;
+ 		case TEST_STAGE_HVC_IFACE_FEAT_ENABLED:
+ 			__GUEST_ASSERT(res.a0 != SMCCC_RET_NOT_SUPPORTED,
+-				       "a0 = 0x%lx, func_id = 0x%x, arg1 = 0x%llx, stage = %u",
++				       "a0 = 0x%lx, func_id = 0x%x, arg1 = 0x%lx, stage = %u",
+ 					res.a0, hc_info->func_id, hc_info->arg1, stage);
+ 			break;
+ 		default:
+diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+index 08a5ca5bed56..7bbd9fb5c8d6 100644
+--- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
++++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+@@ -292,7 +292,7 @@ static void guest_code(struct test_desc *test)
+ 
+ static void no_dabt_handler(struct ex_regs *regs)
+ {
+-	GUEST_FAIL("Unexpected dabt, far_el1 = 0x%llx", read_sysreg(far_el1));
++	GUEST_FAIL("Unexpected dabt, far_el1 = 0x%lx", read_sysreg(far_el1));
+ }
+ 
+ static void no_iabt_handler(struct ex_regs *regs)
+diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+index 9d51b5691349..f8f0c655c723 100644
+--- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
++++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+@@ -195,11 +195,11 @@ struct pmc_accessor pmc_accessors[] = {
+ 										 \
+ 	if (set_expected)							 \
+ 		__GUEST_ASSERT((_tval & mask),					 \
+-				"tval: 0x%lx; mask: 0x%lx; set_expected: 0x%lx", \
++				"tval: 0x%lx; mask: 0x%lx; set_expected: %u",	 \
+ 				_tval, mask, set_expected);			 \
+ 	else									 \
+ 		__GUEST_ASSERT(!(_tval & mask),					 \
+-				"tval: 0x%lx; mask: 0x%lx; set_expected: 0x%lx", \
++				"tval: 0x%lx; mask: 0x%lx; set_expected: %u",	 \
+ 				_tval, mask, set_expected);			 \
+ }
+ 
+@@ -286,7 +286,7 @@ static void test_access_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
+ 	acc->write_typer(pmc_idx, write_data);
+ 	read_data = acc->read_typer(pmc_idx);
+ 	__GUEST_ASSERT(read_data == write_data,
+-		       "pmc_idx: 0x%lx; acc_idx: 0x%lx; read_data: 0x%lx; write_data: 0x%lx",
++		       "pmc_idx: 0x%x; acc_idx: 0x%lx; read_data: 0x%lx; write_data: 0x%lx",
+ 		       pmc_idx, PMC_ACC_TO_IDX(acc), read_data, write_data);
+ 
+ 	/*
+@@ -297,14 +297,14 @@ static void test_access_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
+ 
+ 	/* The count value must be 0, as it is disabled and reset */
+ 	__GUEST_ASSERT(read_data == 0,
+-		       "pmc_idx: 0x%lx; acc_idx: 0x%lx; read_data: 0x%lx",
++		       "pmc_idx: 0x%x; acc_idx: 0x%lx; read_data: 0x%lx",
+ 		       pmc_idx, PMC_ACC_TO_IDX(acc), read_data);
+ 
+ 	write_data = read_data + pmc_idx + 0x12345;
+ 	acc->write_cntr(pmc_idx, write_data);
+ 	read_data = acc->read_cntr(pmc_idx);
+ 	__GUEST_ASSERT(read_data == write_data,
+-		       "pmc_idx: 0x%lx; acc_idx: 0x%lx; read_data: 0x%lx; write_data: 0x%lx",
++		       "pmc_idx: 0x%x; acc_idx: 0x%lx; read_data: 0x%lx; write_data: 0x%lx",
+ 		       pmc_idx, PMC_ACC_TO_IDX(acc), read_data, write_data);
+ }
+ 
+@@ -379,7 +379,7 @@ static void guest_code(uint64_t expected_pmcr_n)
+ 	int i, pmc;
+ 
+ 	__GUEST_ASSERT(expected_pmcr_n <= ARMV8_PMU_MAX_GENERAL_COUNTERS,
+-			"Expected PMCR.N: 0x%lx; ARMv8 general counters: 0x%lx",
++			"Expected PMCR.N: 0x%lx; ARMv8 general counters: 0x%x",
+ 			expected_pmcr_n, ARMV8_PMU_MAX_GENERAL_COUNTERS);
+ 
+ 	pmcr = read_sysreg(pmcr_el0);
+
+base-commit: 41bccc98fb7931d63d03f326a746ac4d429c1dd3
+-- 
+2.43.0.594.gd9cf4e227d-goog
+
