@@ -1,119 +1,213 @@
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4CED67A15
-	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 22:00:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817D8126F24
+	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 22:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706911254; cv=none; b=K6C3R9o8Fi3U2DNSAh00OLssZje0zEEPW9W6vfKCZVE+XMPN2KQSWBXA9Dlq2rcg2TmfAKNSmR6pycuXgS3gIM6T0m7w3IyKkSPbV71Y49J9+eEow+a8xQswiQTgbKwHwLj4ouynEwjiDP87qalphuWNh/MwZBYVGkyOGQ3wllI=
+	t=1706913014; cv=none; b=TBInLqfsG9X9U9q5eyG7lFX1rZwZ7x6QkJ9r1fFvRxyflheojNnoGcTN83GQ+Pht4RO6jtJkwnkRrRQFsB8q9PkGYJLOc4wBJHNsydTai1B53JudXSsrTKoGmLPM4vLveI53ex378XnfnyM//iHIdWKAnTwtiieM8BpGErBxoN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706911254; c=relaxed/simple;
-	bh=N7TSsTyTTpBhvIoyIV72Wm9XXJoUcSnN+bUHy/4yQS8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qx5DkIeP+kWiDk2n61vqdnZRnlgFDbMuonC6bCWgBl8CrIIqMPWvN/hpbsBCj4da/slEDI2iw1V19DWRMnhXpPxw5BO1s8KWL5bhPBE4XW5dVRXujqmUplSuXtpbcGhJhbksA7aqAPmEWM5gyR8R9cgI495W4pFBeLvb6Wz6Blw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JJ7tWXl+; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1706913014; c=relaxed/simple;
+	bh=OKtyV3UcUMJMPvy1ECKXZVqMjFEDtE8zKK3U8e5aNc4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KlLad0NNA7lXD2K4TtWQanx8Ur+a2VK00STPSdbbvkVTbiIKjEmYfLc9bZzB86wrlTgboOXnvPNEtEw1rHZjzKr97y3encY0uUrqngrJay9D7VWRfOH5ksO+5PDbCyYNeVQJbJulsKv0ntyaee1tiuwyKywXJxcJUrCDYMuLlKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e3CTCmxz; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JJ7tWXl+"
-Date: Fri, 2 Feb 2024 22:00:40 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706911249;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+zpF3hh3I48blUHSumiD5JMU6whQC2+CI14iV5XbGAM=;
-	b=JJ7tWXl+TCmh5A/3ptirM/eUN3eqQtT2AfiAKO5tZ1pUy6x3ZKvSR0taZR4bYN+3pcFneK
-	pOIJcFwAh7whf8AOwC8P1Kh1b/7HVlktnIpRJU9HbzQoZkyavGQnze9jNn3hSkT/H2Drpf
-	/H1OGLttkJYqaBRw+DDwl+sTpNaVhxs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: James Clark <james.clark@arm.com>
-Cc: coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, broonie@kernel.org, maz@kernel.org,
-	suzuki.poulose@arm.com, acme@kernel.org,
-	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mike Leach <mike.leach@linaro.org>,
-	Leo Yan <leo.yan@linaro.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Rob Herring <robh@kernel.org>, Miguel Luis <miguel.luis@oracle.com>,
-	Jintack Lim <jintack.lim@linaro.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>, Arnd Bergmann <arnd@arndb.de>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Kristina Martsenko <kristina.martsenko@arm.com>,
-	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Jing Zhang <jingzhangos@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 2/7] arm64: KVM: Use shared area to pass PMU event
- state to hypervisor
-Message-ID: <Zb1mCCi13AJ_YjFZ@linux.dev>
-References: <20240104162714.1062610-1-james.clark@arm.com>
- <20240104162714.1062610-3-james.clark@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e3CTCmxz"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1d5ce88b51cso73145ad.0
+        for <kvmarm@lists.linux.dev>; Fri, 02 Feb 2024 14:30:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706913012; x=1707517812; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4gHfXsDd1+NPNrp7/zCgopLQIxA18bpbncOGieuL0yc=;
+        b=e3CTCmxzazZ4OTecYZgLQDWqrxSpIpyPlS/mf5UsVCtv2gSHyf5dpvsDHZg/2n8NmN
+         CB4FaW/aKblvjpeKnriSxQVpXQ/RDd6Ea4fdgrBAVw/doIJ8NsmLToxKiwBEnYCmlxtM
+         8xlad5AWE03J5WJad2YnH1H70RD6X284EfhQAkGRT7crwmE5mnakzfz19Fj9mvLSu4BX
+         JMsOWpNMHCmlLkJ/Fi9Ki1oBAyLPAgoj3WsdrAI1qZke/aeIFYjlt/zjehyTtS4fnyxl
+         KggkvHHN0c9jDTpuwPPUHn8A3ACqrtmaujvf2juLeEsU0J9ur6KRSjce8rUtzZ3IL91g
+         Isew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706913012; x=1707517812;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4gHfXsDd1+NPNrp7/zCgopLQIxA18bpbncOGieuL0yc=;
+        b=hJiOnIDYQhS+L7jZfphBn5XJxbtMEUDsYQg1sHxpaEh2qvCZXkegAwyzvYxp9thtB+
+         5S+MES7fw/X+dNySJ1PVHccJ+uTuhfaHmHMaeVlInyD3nhvjPVLISXggUEYHdhg7mBv4
+         oZ+JW0somTrhukSfnwGpy2KGihbrEhP/g5J8BWm3MMFyw9zhbW8A1NN42mYuMqQxGPJv
+         +F3d5iVxkUxvtyuxqfLP/MCXLV1x4P2hXI0/b/x6Co3VqKtdk124LxGg15kix9Do1wsY
+         1EeWTeW17Bbl8ttIf1JjasIqqFT9S/iXJtk0QNexP8tHwrJoZOn4MdxoW8FkBdQuGgxS
+         587Q==
+X-Gm-Message-State: AOJu0Yw/UzOq3pXwfS0ee5SLvraYpUPlm220RL/stwHbnWqNKRUbvMSn
+	7+dlp8e6y0ArBZq1ORoGJUh5ifEt0D28v0+akWE9GUZkiEHOTXMUdAurlVDv1oQXBUB9BV00iYJ
+	k8bEMou2o+g28onT/BDUbnjPCuYXyvGJb3pQg
+X-Google-Smtp-Source: AGHT+IGYPtzOWKJUHpZOUv3WD2/u8xqCH2po02LT82xgQd99fQsVzRN06AKewo08mu5evakZqsXkrrjcw9wBJU3p9vw=
+X-Received: by 2002:a17:903:2349:b0:1d8:aada:a7e3 with SMTP id
+ c9-20020a170903234900b001d8aadaa7e3mr26544plh.3.1706913011645; Fri, 02 Feb
+ 2024 14:30:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240104162714.1062610-3-james.clark@arm.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20240125164256.4147-1-alexandru.elisei@arm.com> <20240125164256.4147-23-alexandru.elisei@arm.com>
+In-Reply-To: <20240125164256.4147-23-alexandru.elisei@arm.com>
+From: Evgenii Stepanov <eugenis@google.com>
+Date: Fri, 2 Feb 2024 14:30:00 -0800
+Message-ID: <CAFKCwrhNE5PR7cu7tN8qMmSEUhdJ7ensGGrB-oodh-J_fdoRcw@mail.gmail.com>
+Subject: Re: [PATCH RFC v3 22/35] arm64: mte: Enable tag storage if CMA areas
+ have been activated
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, 
+	maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, arnd@arndb.de, akpm@linux-foundation.org, 
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, 
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org, 
+	bsegall@google.com, mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com, 
+	mhiramat@kernel.org, rppt@kernel.org, hughd@google.com, pcc@google.com, 
+	steven.price@arm.com, anshuman.khandual@arm.com, vincenzo.frascino@arm.com, 
+	david@redhat.com, kcc@google.com, hyesoo.yu@samsung.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-mm@kvack.org, 
+	linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 04, 2024 at 04:27:02PM +0000, James Clark wrote:
-
-[...]
-
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index c50f8459e4fc..89147a9dc38c 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -130,13 +130,18 @@ static void __hyp_vgic_restore_state(struct kvm_vcpu *vcpu)
->  	}
->  }
->  
-> +static struct kvm_pmu_events *kvm_nvhe_get_pmu_events(struct kvm_vcpu *vcpu)
+On Thu, Jan 25, 2024 at 8:44=E2=80=AFAM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> Before enabling MTE tag storage management, make sure that the CMA areas
+> have been successfully activated. If a CMA area fails activation, the pag=
+es
+> are kept as reserved. Reserved pages are never used by the page allocator=
+.
+>
+> If this happens, the kernel would have to manage tag storage only for som=
+e
+> of the memory, but not for all memory, and that would make the code
+> unreasonably complicated.
+>
+> Choose to disable tag storage management altogether if a CMA area fails t=
+o
+> be activated.
+>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>
+> Changes since v2:
+>
+> * New patch.
+>
+>  arch/arm64/include/asm/mte_tag_storage.h | 12 ++++++
+>  arch/arm64/kernel/mte_tag_storage.c      | 50 ++++++++++++++++++++++++
+>  2 files changed, 62 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/mte_tag_storage.h b/arch/arm64/includ=
+e/asm/mte_tag_storage.h
+> index 3c2cd29e053e..7b3f6bff8e6f 100644
+> --- a/arch/arm64/include/asm/mte_tag_storage.h
+> +++ b/arch/arm64/include/asm/mte_tag_storage.h
+> @@ -6,8 +6,20 @@
+>  #define __ASM_MTE_TAG_STORAGE_H
+>
+>  #ifdef CONFIG_ARM64_MTE_TAG_STORAGE
+> +
+> +DECLARE_STATIC_KEY_FALSE(tag_storage_enabled_key);
+> +
+> +static inline bool tag_storage_enabled(void)
 > +{
-> +	return &kvm_host_global_state[vcpu->cpu].pmu_events;
+> +       return static_branch_likely(&tag_storage_enabled_key);
 > +}
 > +
->  /*
->   * Disable host events, enable guest events
->   */
->  #ifdef CONFIG_HW_PERF_EVENTS
->  static bool __pmu_switch_to_guest(struct kvm_vcpu *vcpu)
+>  void mte_init_tag_storage(void);
+>  #else
+> +static inline bool tag_storage_enabled(void)
+> +{
+> +       return false;
+> +}
+>  static inline void mte_init_tag_storage(void)
 >  {
-> -	struct kvm_pmu_events *pmu = &vcpu->arch.pmu.events;
-> +	struct kvm_pmu_events *pmu = kvm_nvhe_get_pmu_events(vcpu);
->  
->  	if (pmu->events_host)
->  		write_sysreg(pmu->events_host, pmcntenclr_el0);
-> @@ -152,7 +157,7 @@ static bool __pmu_switch_to_guest(struct kvm_vcpu *vcpu)
->   */
->  static void __pmu_switch_to_host(struct kvm_vcpu *vcpu)
->  {
-> -	struct kvm_pmu_events *pmu = &vcpu->arch.pmu.events;
-> +	struct kvm_pmu_events *pmu = kvm_nvhe_get_pmu_events(vcpu);
->  
->  	if (pmu->events_guest)
->  		write_sysreg(pmu->events_guest, pmcntenclr_el0);
+>  }
+> diff --git a/arch/arm64/kernel/mte_tag_storage.c b/arch/arm64/kernel/mte_=
+tag_storage.c
+> index 9a1a8a45171e..d58c68b4a849 100644
+> --- a/arch/arm64/kernel/mte_tag_storage.c
+> +++ b/arch/arm64/kernel/mte_tag_storage.c
+> @@ -19,6 +19,8 @@
+>
+>  #include <asm/mte_tag_storage.h>
+>
+> +__ro_after_init DEFINE_STATIC_KEY_FALSE(tag_storage_enabled_key);
+> +
+>  struct tag_region {
+>         struct range mem_range; /* Memory associated with the tag storage=
+, in PFNs. */
+>         struct range tag_range; /* Tag storage memory, in PFNs. */
+> @@ -314,3 +316,51 @@ void __init mte_init_tag_storage(void)
+>         num_tag_regions =3D 0;
+>         pr_info("MTE tag storage region management disabled");
+>  }
+> +
+> +static int __init mte_enable_tag_storage(void)
+> +{
+> +       struct range *tag_range;
+> +       struct cma *cma;
+> +       int i, ret;
+> +
+> +       if (num_tag_regions =3D=3D 0)
+> +               return 0;
+> +
+> +       for (i =3D 0; i < num_tag_regions; i++) {
+> +               tag_range =3D &tag_regions[i].tag_range;
+> +               cma =3D tag_regions[i].cma;
+> +               /*
+> +                * CMA will keep the pages as reserved when the region fa=
+ils
+> +                * activation.
+> +                */
+> +               if (PageReserved(pfn_to_page(tag_range->start)))
+> +                       goto out_disabled;
+> +       }
+> +
+> +       static_branch_enable(&tag_storage_enabled_key);
+> +       pr_info("MTE tag storage region management enabled");
+> +
+> +       return 0;
+> +
+> +out_disabled:
+> +       for (i =3D 0; i < num_tag_regions; i++) {
+> +               tag_range =3D &tag_regions[i].tag_range;
+> +               cma =3D tag_regions[i].cma;
+> +
+> +               if (PageReserved(pfn_to_page(tag_range->start)))
+> +                       continue;
+> +
+> +               /* Try really hard to reserve the tag storage. */
+> +               ret =3D cma_alloc(cma, range_len(tag_range), 8, true);
+> +               /*
+> +                * Tag storage is still in use for data, memory and/or ta=
+g
+> +                * corruption will ensue.
+> +                */
+> +               WARN_ON_ONCE(ret);
 
-This now allows the host to program event counters for a protected
-guest. That _might_ be a useful feature behind some debug option, but is
-most definitely *not* something we want to do for pVMs generally.
+cma_alloc returns (page *), so this condition needs to be inverted,
+and the type of `ret` changed.
+Not sure how it slipped through, this is a compile error with clang.
 
-Do we even need to make this shared data work at all for pKVM? The rest
-of the shared data between pKVM and the kernel is system information,
-which (importantly) doesn't have any guest context in it.
-
-I'm perfectly happy leaving these sorts of features broken for pKVM and
-using the 'normal' way of getting percpu data to the nVHE hypervisor
-otherwise.
-
--- 
-Thanks,
-Oliver
+> +       }
+> +       num_tag_regions =3D 0;
+> +       pr_info("MTE tag storage region management disabled");
+> +
+> +       return -EINVAL;
+> +}
+> +arch_initcall(mte_enable_tag_storage);
+> --
+> 2.43.0
+>
