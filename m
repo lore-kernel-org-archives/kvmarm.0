@@ -1,192 +1,269 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAD1148FFE;
-	Fri,  2 Feb 2024 17:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B0C914AD21
+	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 17:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706893462; cv=none; b=AA2h81QY6b/2vFtzeuQtcMC4dHENbVePtesjFnfosGUCbGi/5+vPDV0FX59Zi4f5ThXMyMmwGzDctS9VtrgV5cwtY2ocZCTcnVDGZt5Ig5HpDlFNTHK3lnXumkLMcJVc4dFBapPnn2GsLcIEGGgydwRKJUhaRmcJXJNhVqlTVu0=
+	t=1706894001; cv=none; b=hKwbaNguNsKXjVMYWNGcm0soFfgm7x+TFVhcSe3s/1GTHvvxYV0Q14rHeUPfhSoU0wI8lTnPYGWW8PPqPCc2AXU4nLnsVyk9iQLXNyGKMg2ALtYClI8mlcJsmV+PxLj90DKzpP47uy1/1urw8Qr9TBZIKvze29NsnyEbriaUSk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706893462; c=relaxed/simple;
-	bh=+6PX3jMjQrHTOGNXA5nPZT3qkryf5lBqoyw4ViAwdas=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OwIeojI5MPMefoZSB5zk2H+z0QxOeykMyJBZeH5GTPiDQW8s+qPCQRKibW0THf9qYwsmMaDntGrPhBTy4fIRY4zY7mBXcbMQsNHUaCh9FCUd9EW7KKonlEMGYwm+KAPjznfP4sER76zprolF1UH7zacCnaQzuiyMhitWub9+cyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4TRMV93hsYz6J9h8;
-	Sat,  3 Feb 2024 01:00:49 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 69A141400CD;
-	Sat,  3 Feb 2024 01:04:15 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 2 Feb
- 2024 17:04:14 +0000
-Date: Fri, 2 Feb 2024 17:04:13 +0000
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-CC: <linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-riscv@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<x86@kernel.org>, <acpica-devel@lists.linuxfoundation.org>,
-	<linux-csky@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-ia64@vger.kernel.org>, <linux-parisc@vger.kernel.org>, Salil Mehta
-	<salil.mehta@huawei.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	<jianyong.wu@arm.com>, <justin.he@arm.com>, James Morse
-	<james.morse@arm.com>, "Rafael J. Wysocki" <rafael@kernel.org>
-Subject: Re: [PATCH RFC v4 14/15] arm64: document virtual CPU hotplug's
- expectations
-Message-ID: <20240202170413.0000154e@Huawei.com>
-In-Reply-To: <E1rVDnU-0027Zf-GF@rmk-PC.armlinux.org.uk>
-References: <Zbp5xzmFhKDAgHws@shell.armlinux.org.uk>
-	<E1rVDnU-0027Zf-GF@rmk-PC.armlinux.org.uk>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1706894001; c=relaxed/simple;
+	bh=fYT9SIGtwjOoomki2663sVFXm/Xgfkyf6O/UbcX9y3U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K+Xc0rBdH/OVvpAWBJZYHVjmgvEkaj3KACeej94DG0EIZ6GpxMvwefEjGquBcQ4Axm/63/+Gr/vgDpfFKjDtXXcjst5gLNcRSMq/I5MdwYQwmLbrzTzbolx9xqruZMptNqVIBX8jzvUrSIzn1gOcBLB9KHr/iK85nIen/rPbsIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C239DA7;
+	Fri,  2 Feb 2024 09:13:52 -0800 (PST)
+Received: from [10.57.9.194] (unknown [10.57.9.194])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A5CC43F762;
+	Fri,  2 Feb 2024 09:13:08 -0800 (PST)
+Message-ID: <f47909b1-5e10-4149-8d2a-330bd0ceb2e0@arm.com>
+Date: Fri, 2 Feb 2024 17:13:07 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 02/25] KVM: arm64: Add feature checking helpers
+Content-Language: en-GB
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org
+Cc: James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Joey Gouly <joey.gouly@arm.com>, Mark Brown <broonie@kernel.org>
+References: <20240130204533.693853-1-maz@kernel.org>
+ <20240130204533.693853-3-maz@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20240130204533.693853-3-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Wed, 31 Jan 2024 16:50:48 +0000
-Russell King (Oracle) <rmk+kernel@armlinux.org.uk> wrote:
+Hi Marc,
 
-> From: James Morse <james.morse@arm.com>
+On 30/01/2024 20:45, Marc Zyngier wrote:
+> In order to make it easier to check whether a particular feature
+> is exposed to a guest, add a new set of helpers, with kvm_has_feat()
+> being the most useful.
 > 
-> Add a description of physical and virtual CPU hotplug, explain the
-> differences and elaborate on what is required in ACPI for a working
-> virtual hotplug system.
+> Let's start making use of them in the PMU code (courtesy of Oliver).
+> Follow-up work will intricude additional use patterns.
+
+I think there is a bit of inconsistency in the macros for signed
+and unsigned. The unsigned fields are extracted (i.e., as if they
+were shifted to bit 0). But the signed fields are not shifted completely 
+to bit '0' (in fact to different positions) and eventually we compare 
+wrong things.
+
+Using ID_AA64PFR0_EL1, fld=EL2, val=IMP for unsigned and
+ID_AA64PFR0_EL1, AdvSIMD, NI for signed.
+
 > 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Co-developed--by: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
-> Outstanding comment:
->  https://lore.kernel.org/r/20230914174137.00000a62@Huawei.com
-
-Outstanding but an ACPI Spec question rather than one about this description.
-I've finally regained access to Mantis etc so can follow that up at some point.
-
-If we get clarify on how to tell that CPUs that are present and enabled at boot
-can be removed later we can relax this text to allow for that.
-
-
->  https://lore.kernel.org/r/20231215170428.00000d81@Huawei.com
-That's a comment on the above comment to say I'm fine with it as is :)
-
-This @Huawei guy is really annoying ;)
-
-Jonathan
-
-> ---
->  Documentation/arch/arm64/cpu-hotplug.rst | 79 ++++++++++++++++++++++++
->  Documentation/arch/arm64/index.rst       |  1 +
->  2 files changed, 80 insertions(+)
->  create mode 100644 Documentation/arch/arm64/cpu-hotplug.rst
+>   arch/arm64/include/asm/kvm_host.h | 53 +++++++++++++++++++++++++++++++
+>   arch/arm64/kvm/pmu-emul.c         | 11 ++++---
+>   arch/arm64/kvm/sys_regs.c         |  6 ++--
+>   include/kvm/arm_pmu.h             | 11 -------
+>   4 files changed, 61 insertions(+), 20 deletions(-)
 > 
-> diff --git a/Documentation/arch/arm64/cpu-hotplug.rst b/Documentation/arch/arm64/cpu-hotplug.rst
-> new file mode 100644
-> index 000000000000..76ba8d932c72
-> --- /dev/null
-> +++ b/Documentation/arch/arm64/cpu-hotplug.rst
-> @@ -0,0 +1,79 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +.. _cpuhp_index:
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 21c57b812569..c0cf9c5f5e8d 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1233,4 +1233,57 @@ static inline void kvm_hyp_reserve(void) { }
+>   void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
+>   bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
+>   
+> +#define __expand_field_sign_unsigned(id, fld, val)			\
+> +	((u64)(id##_##fld##_##val))
+
+For unsigned features we get the actual "field" value, not the value in 
+position. e.g,: ID_AA64PFR0_EL1_EL2_IMP = (0x1)
+
 > +
-> +====================
-> +CPU Hotplug and ACPI
-> +====================
+> +#define __expand_field_sign_signed(id, fld, val)			\
+> +	({								\
+> +		s64 __val = id##_##fld##_##val;				\
+> +		__val <<= 64 - id##_##fld##_WIDTH;			\
+> +		__val >>= 64 - id##_##fld##_SHIFT - id##_##fld##_WIDTH;	\
+
+But for signed fields, we shift them back into the "position" as in the 
+ID_REG. e.g.,
+
+ID_AA64PFR0_EL1, AdvSIMD, NI we get:
+
+	__val = ID_AA64PFR0_EL1_AdvSIMD_NI; /* = 0xf */
+	__val <<= 64 - 4;		/* 0xf0_00_00_00_00_00_00_00 */
+	__val >>= 64 - 20 - 4;		/* 0xff_ff_ff_ff_ff_f0_00_00 */
+
+I think the last line instead should be:
+	__val >>= 64 - id##_##fld##_WIDTH;
+
+> +									\
+> +		__val;							\
+> +	})
 > +
-> +CPU hotplug in the arm64 world is commonly used to describe the kernel taking
-> +CPUs online/offline using PSCI. This document is about ACPI firmware allowing
-> +CPUs that were not available during boot to be added to the system later.
+> +#define expand_field_sign(id, fld, val)					\
+> +	(id##_##fld##_SIGNED ?						\
+> +	 __expand_field_sign_signed(id, fld, val) :			\
+> +	 __expand_field_sign_unsigned(id, fld, val))
 > +
-> +``possible`` and ``present`` refer to the state of the CPU as seen by linux.
+> +#define get_idreg_field_unsigned(kvm, id, fld)				\
+> +	({								\
+> +		u64 __val = IDREG(kvm, SYS_##id);			\
+> +		__val &= id##_##fld##_MASK;				\
+> +		__val >>= id##_##fld##_SHIFT;				\
+> +									\
+
+We extract the field value for unsigned field, i.e., shifted to bit"0" 
+and that matches the expand_field_sign().
+
+> +		__val;							\
+> +	})
 > +
+> +#define get_idreg_field_signed(kvm, id, fld)				\
+> +	({								\
+> +		s64 __val = IDREG(kvm, SYS_##id);			\
+> +		__val <<= 64 - id##_##fld##_SHIFT - id##_##fld##_WIDTH;	\
+> +		__val >>= id##_##fld##_SHIFT;				\
+
+However, here we get (assuming value ID_AA64PFR0_EL1_ASIMD = 0xf, and
+all other fields are 0 for clarity)
+	
+	__val = IDREG(kvm, SYS_ID_AA64PFR0_EL1); = 0xf0_00_00; 	/* 0xf << 20 */
+	__val <<= 64 - 20 - 4;	/* = 0xf0_00_00_00_00_00_00_00 */
+	__val >>= 20;		/* = 0xff_ff_ff_00_00_00_00_00 */
+
+Thus they don;t match. Instead the last line should be :
+
+	__val >>= id##_##fld##_WIDTH;
+
+
+Suzuki
+
+
+> +									\
+> +		__val;							\
+> +	})
 > +
-> +CPU Hotplug on physical systems - CPUs not present at boot
-> +----------------------------------------------------------
+> +#define get_idreg_field_enum(kvm, id, fld)				\
+> +	get_idreg_field_unsigned(kvm, id, fld)
 > +
-> +Physical systems need to mark a CPU that is ``possible`` but not ``present`` as
-> +being ``present``. An example would be a dual socket machine, where the package
-> +in one of the sockets can be replaced while the system is running.
+> +#define get_idreg_field(kvm, id, fld)					\
+> +	(id##_##fld##_SIGNED ?						\
+> +	 get_idreg_field_signed(kvm, id, fld) :				\
+> +	 get_idreg_field_unsigned(kvm, id, fld))
 > +
-> +This is not supported.
+> +#define kvm_has_feat(kvm, id, fld, limit)				\
+> +	(get_idreg_field((kvm), id, fld) >= expand_field_sign(id, fld, limit))
 > +
-> +In the arm64 world CPUs are not a single device but a slice of the system.
-> +There are no systems that support the physical addition (or removal) of CPUs
-> +while the system is running, and ACPI is not able to sufficiently describe
-> +them.
+> +#define kvm_has_feat_enum(kvm, id, fld, limit)				\
+> +	(get_idreg_field_unsigned((kvm), id, fld) == id##_##fld##_##limit)
 > +
-> +e.g. New CPUs come with new caches, but the platform's cache toplogy is
-> +described in a static table, the PPTT. How caches are shared between CPUs is
-> +not discoverable, and must be described by firmware.
+> +#define kvm_has_feat_range(kvm, id, fld, min, max)			\
+> +	(get_idreg_field((kvm), id, fld) >= expand_field_sign(id, fld, min) && \
+> +	 get_idreg_field((kvm), id, fld) <= expand_field_sign(id, fld, max))
 > +
-> +e.g. The GIC redistributor for each CPU must be accessed by the driver during
-> +boot to discover the system wide supported features. ACPI's MADT GICC
-> +structures can describe a redistributor associated with a disabled CPU, but
-> +can't describe whether the redistributor is accessible, only that it is not
-> +'always on'.
+>   #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 3d9467ff73bc..925522470b2b 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -64,12 +64,11 @@ u64 kvm_pmu_evtyper_mask(struct kvm *kvm)
+>   {
+>   	u64 mask = ARMV8_PMU_EXCLUDE_EL1 | ARMV8_PMU_EXCLUDE_EL0 |
+>   		   kvm_pmu_event_mask(kvm);
+> -	u64 pfr0 = IDREG(kvm, SYS_ID_AA64PFR0_EL1);
+>   
+> -	if (SYS_FIELD_GET(ID_AA64PFR0_EL1, EL2, pfr0))
+> +	if (kvm_has_feat(kvm, ID_AA64PFR0_EL1, EL2, IMP))
+>   		mask |= ARMV8_PMU_INCLUDE_EL2;
+>   
+> -	if (SYS_FIELD_GET(ID_AA64PFR0_EL1, EL3, pfr0))
+> +	if (kvm_has_feat(kvm, ID_AA64PFR0_EL1, EL3, IMP))
+>   		mask |= ARMV8_PMU_EXCLUDE_NS_EL0 |
+>   			ARMV8_PMU_EXCLUDE_NS_EL1 |
+>   			ARMV8_PMU_EXCLUDE_EL3;
+> @@ -83,8 +82,10 @@ u64 kvm_pmu_evtyper_mask(struct kvm *kvm)
+>    */
+>   static bool kvm_pmc_is_64bit(struct kvm_pmc *pmc)
+>   {
+> +	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
 > +
-> +arm64's ACPI tables assume that everything described is ``present``.
-> +
-> +
-> +CPU Hotplug on virtual systems - CPUs not enabled at boot
-> +---------------------------------------------------------
-> +
-> +Virtual systems have the advantage that all the properties the system will
-> +ever have can be described at boot. There are no power-domain considerations
-> +as such devices are emulated.
-> +
-> +CPU Hotplug on virtual systems is supported. It is distinct from physical
-> +CPU Hotplug as all resources are described as ``present``, but CPUs may be
-> +marked as disabled by firmware. Only the CPU's online/offline behaviour is
-> +influenced by firmware. An example is where a virtual machine boots with a
-> +single CPU, and additional CPUs are added once a cloud orchestrator deploys
-> +the workload.
-> +
-> +For a virtual machine, the VMM (e.g. Qemu) plays the part of firmware.
-> +
-> +Virtual hotplug is implemented as a firmware policy affecting which CPUs can be
-> +brought online. Firmware can enforce its policy via PSCI's return codes. e.g.
-> +``DENIED``.
-> +
-> +The ACPI tables must describe all the resources of the virtual machine. CPUs
-> +that firmware wishes to disable either from boot (or later) should not be
-> +``enabled`` in the MADT GICC structures, but should have the ``online capable``
-> +bit set, to indicate they can be enabled later. The boot CPU must be marked as
-> +``enabled``.  The 'always on' GICR structure must be used to describe the
-> +redistributors.
-> +
-> +CPUs described as ``online capable`` but not ``enabled`` can be set to enabled
-> +by the DSDT's Processor object's _STA method. On virtual systems the _STA method
-> +must always report the CPU as ``present``. Changes to the firmware policy can
-> +be notified to the OS via device-check or eject-request.
-> +
-> +CPUs described as ``enabled`` in the static table, should not have their _STA
-> +modified dynamically by firmware. Soft-restart features such as kexec will
-> +re-read the static properties of the system from these static tables, and
-> +may malfunction if these no longer describe the running system. Linux will
-> +re-discover the dynamic properties of the system from the _STA method later
-> +during boot.
-> diff --git a/Documentation/arch/arm64/index.rst b/Documentation/arch/arm64/index.rst
-> index d08e924204bf..78544de0a8a9 100644
-> --- a/Documentation/arch/arm64/index.rst
-> +++ b/Documentation/arch/arm64/index.rst
-> @@ -13,6 +13,7 @@ ARM64 Architecture
->      asymmetric-32bit
->      booting
->      cpu-feature-registers
-> +    cpu-hotplug
->      elf_hwcaps
->      hugetlbpage
->      kdump
+>   	return (pmc->idx == ARMV8_PMU_CYCLE_IDX ||
+> -		kvm_pmu_is_3p5(kvm_pmc_to_vcpu(pmc)));
+> +		kvm_has_feat(vcpu->kvm, ID_AA64DFR0_EL1, PMUVer, V3P5));
+>   }
+>   
+>   static bool kvm_pmc_has_64bit_overflow(struct kvm_pmc *pmc)
+> @@ -556,7 +557,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+>   		return;
+>   
+>   	/* Fixup PMCR_EL0 to reconcile the PMU version and the LP bit */
+> -	if (!kvm_pmu_is_3p5(vcpu))
+> +	if (!kvm_has_feat(vcpu->kvm, ID_AA64DFR0_EL1, PMUVer, V3P5))
+>   		val &= ~ARMV8_PMU_PMCR_LP;
+>   
+>   	/* The reset bits don't indicate any state, and shouldn't be saved. */
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 041b11825578..3c31f8cb9eef 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -505,10 +505,9 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
+>   			  struct sys_reg_params *p,
+>   			  const struct sys_reg_desc *r)
+>   {
+> -	u64 val = IDREG(vcpu->kvm, SYS_ID_AA64MMFR1_EL1);
+>   	u32 sr = reg_to_encoding(r);
+>   
+> -	if (!(val & (0xfUL << ID_AA64MMFR1_EL1_LO_SHIFT))) {
+> +	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, LO, IMP)) {
+>   		kvm_inject_undefined(vcpu);
+>   		return false;
+>   	}
+> @@ -2748,8 +2747,7 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
+>   		return ignore_write(vcpu, p);
+>   	} else {
+>   		u64 dfr = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);
+> -		u64 pfr = IDREG(vcpu->kvm, SYS_ID_AA64PFR0_EL1);
+> -		u32 el3 = !!SYS_FIELD_GET(ID_AA64PFR0_EL1, EL3, pfr);
+> +		u32 el3 = kvm_has_feat(vcpu->kvm, ID_AA64PFR0_EL1, EL3, IMP);
+>   
+>   		p->regval = ((SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, dfr) << 28) |
+>   			     (SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, dfr) << 24) |
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 4b9d8fb393a8..eb4c369a79eb 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -90,16 +90,6 @@ void kvm_vcpu_pmu_resync_el0(void);
+>   			vcpu->arch.pmu.events = *kvm_get_pmu_events();	\
+>   	} while (0)
+>   
+> -/*
+> - * Evaluates as true when emulating PMUv3p5, and false otherwise.
+> - */
+> -#define kvm_pmu_is_3p5(vcpu) ({						\
+> -	u64 val = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);		\
+> -	u8 pmuver = SYS_FIELD_GET(ID_AA64DFR0_EL1, PMUVer, val);	\
+> -									\
+> -	pmuver >= ID_AA64DFR0_EL1_PMUVer_V3P5;				\
+> -})
+> -
+>   u8 kvm_arm_pmu_get_pmuver_limit(void);
+>   u64 kvm_pmu_evtyper_mask(struct kvm *kvm);
+>   int kvm_arm_set_default_pmu(struct kvm *kvm);
+> @@ -168,7 +158,6 @@ static inline u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+>   }
+>   
+>   #define kvm_vcpu_has_pmu(vcpu)		({ false; })
+> -#define kvm_pmu_is_3p5(vcpu)		({ false; })
+>   static inline void kvm_pmu_update_vcpu_events(struct kvm_vcpu *vcpu) {}
+>   static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
+>   static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
 
