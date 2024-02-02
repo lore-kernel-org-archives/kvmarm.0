@@ -1,125 +1,100 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8EB35FEF1
-	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 09:31:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D165D46448
+	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 13:31:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706866264; cv=none; b=GwLXvv7Mfb8qbF7KQ6kxgF4Wtyw/QHE+Pn2mAo2Byo4SKJvrEwNIJ6g2VnqxGPY5i97fBmd9CnIKIwNjzrOshsTHlxTpEmkQgR3TpI3U2trJmcEk1uP+9hQdWUafDjExUCVecqX9zr1i9Kv7t4YE0AiqQmWrr8ofMejYxOZHtiM=
+	t=1706880664; cv=none; b=OfROahY0u9932WJzVWmLYUqt4vTl632WUqZQxHLZ+QIaAwg/UNpLLoDqlzoo64yMWtl+ySxtxu45PiRpI7FrfvmL03Hhj/OG8ntgUzzAfR/43bR+qjyjWOVrDdZ/01EOoahfTCi3hNWWjZZPIgIrBJMNCNEcxHBiCJDI1TgHYEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706866264; c=relaxed/simple;
-	bh=+cveynKtPc67KUyvZiYl0d4plxrvnOpuPmPIszjlAYk=;
+	s=arc-20240116; t=1706880664; c=relaxed/simple;
+	bh=A9NaAVFzxh6xMtlLojco0S+of3aUGoMNBajCF+WEn3E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sn9xf6tAbziwOCLFuVIJsKw0Aj0P0NoFQ8/1lrN5e7jMblWY/pTSzOJiKXRsCW5cI8AAPYCh+2Lf227SmRjYM38ycIfhV/jzOU2HdBVc6gXIt1VDxguR0Bh1Jin0uXKGY9AS+k+YKuVp+zij1ojGS87VkeepIBkl14XC1tWUFsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=evlI9VZA; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=JspBKwNvkGGW3Wv0uHQT54q+Wf2weq5Vb/XydvXYaazsaNakye/hMSu4MO4SmPVapVS5TeTTPaQ5KZEp7Pry7QAsv5zEn/MGLQ4pgli+KJnYHeQcheLxWY+CfEqtS6HA6vFaK8rUyisap58pIRdj7jwOkFh9bHpGcmttse0yQaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qAtkPYc8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="evlI9VZA"
-Date: Fri, 2 Feb 2024 10:30:53 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706866258;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+e8g883f/GpUsUxGkhvVc+5AX3DgxX1o9yUjsrVR4F4=;
-	b=evlI9VZAjia1/iXtCwCa9/DqNWD9130t2bEW3OBdtmPolS+c/WyvLG1i31fNKC8seNfn6s
-	TVQCaiV0EeroRK+hyrW72UM8yCCWZm+UrdBAsYWSX7AYWDAVQzyZs7GoPCIaTocIqRmHIb
-	HTcMmiXLzE0aXwhiC049O7+9Dzj3d5g=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org, 
-	Laurent Vivier <lvivier@redhat.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Nico Boehr <nrb@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Eric Auger <eric.auger@redhat.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	David Hildenbrand <david@redhat.com>, Marc Hartmayer <mhartmay@linux.ibm.com>, 
-	linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [kvm-unit-tests PATCH v2 1/9] (arm|powerpc|s390x): Makefile: Fix
- .aux.o generation
-Message-ID: <20240202-2f93f59553cec386791f7629@orel>
-References: <20240202065740.68643-1-npiggin@gmail.com>
- <20240202065740.68643-2-npiggin@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qAtkPYc8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB722C433C7;
+	Fri,  2 Feb 2024 13:31:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706880664;
+	bh=A9NaAVFzxh6xMtlLojco0S+of3aUGoMNBajCF+WEn3E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qAtkPYc8gXQ6V2154QLnwDl0S3s8NqO4k+MfOzPHpK0lGrs2gYfBIwNWeNtVsmCR9
+	 BmtN9VzRLJn75QYvuz5q7KwJ+FyhhdQq0YVldpsz1xoPO78Bgw285tp+pA5hEpeEv+
+	 uZ4zRSZcrKpxmn1RqisJvkKL5JH7lWBmc68KN0n5U2N2HNrCiqvQIXQu5c4rZAS1lU
+	 HBFXZ2Wwe+hBgq/tuBBKu5NmE1S12vbB4TAC/FmG27LYDaVmg1FkI7SDxe0Nqa21l7
+	 +5A5y3F/KlWIH74DtGyhTVB5FkvSE1/6t/vwnNUYWfEw6rdJl0wD5B+Wd7tQoFHpZ7
+	 Fg8XHJCFbrGbQ==
+Date: Fri, 2 Feb 2024 13:30:59 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH v2 06/25] KVM: arm64: nv: Add sanitising to VNCR-backed
+ HCRX_EL2
+Message-ID: <4911fc9f-5eeb-4861-b44b-f80f9f512fb1@sirena.org.uk>
+References: <20240130204533.693853-1-maz@kernel.org>
+ <20240130204533.693853-7-maz@kernel.org>
+ <ZbytUKPFYiP2cdd8@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="MPiD38BZhwoZZEbm"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240202065740.68643-2-npiggin@gmail.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <ZbytUKPFYiP2cdd8@linux.dev>
+X-Cookie: Do not write in this space.
 
-On Fri, Feb 02, 2024 at 04:57:32PM +1000, Nicholas Piggin wrote:
-> Using all prerequisites for the source file results in the build
-> dying on the second time around with:
-> 
-> gcc: fatal error: cannot specify ‘-o’ with ‘-c’, ‘-S’ or ‘-E’ with multiple files
-> 
-> This is due to auxinfo.h becoming a prerequisite after the first
-> build recorded the dependency.
-> 
-> Use the first prerequisite for this recipe.
-> 
-> Fixes: f2372f2d49135 ("(arm|powerpc|s390x): Makefile: add `%.aux.o` target")
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->  arm/Makefile.common     | 2 +-
->  powerpc/Makefile.common | 2 +-
->  s390x/Makefile          | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arm/Makefile.common b/arm/Makefile.common
-> index 54cb4a63..c2ee568c 100644
-> --- a/arm/Makefile.common
-> +++ b/arm/Makefile.common
-> @@ -71,7 +71,7 @@ FLATLIBS = $(libcflat) $(LIBFDT_archive) $(libeabi)
->  
->  ifeq ($(CONFIG_EFI),y)
->  %.aux.o: $(SRCDIR)/lib/auxinfo.c
-> -	$(CC) $(CFLAGS) -c -o $@ $^ \
-> +	$(CC) $(CFLAGS) -c -o $@ $< \
->  		-DPROGNAME=\"$(@:.aux.o=.efi)\" -DAUXFLAGS=$(AUXFLAGS)
 
-There are two instances of the %.aux.o target in arm/Makefile.common. We
-need to fix both. We can actually pull the target out of the two arms of
-the CONFIG_EFI if-else, though, by changing the .efi/.flat to .$(exe).
+--MPiD38BZhwoZZEbm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Thanks,
-drew
+On Fri, Feb 02, 2024 at 08:52:32AM +0000, Oliver Upton wrote:
+> On Tue, Jan 30, 2024 at 08:45:13PM +0000, Marc Zyngier wrote:
 
->  
->  %.so: EFI_LDFLAGS += -defsym=EFI_SUBSYSTEM=0xa --no-undefined
-> diff --git a/powerpc/Makefile.common b/powerpc/Makefile.common
-> index 483ff648..eb88398d 100644
-> --- a/powerpc/Makefile.common
-> +++ b/powerpc/Makefile.common
-> @@ -48,7 +48,7 @@ cflatobjs += lib/powerpc/smp.o
->  OBJDIRS += lib/powerpc
->  
->  %.aux.o: $(SRCDIR)/lib/auxinfo.c
-> -	$(CC) $(CFLAGS) -c -o $@ $^ -DPROGNAME=\"$(@:.aux.o=.elf)\"
-> +	$(CC) $(CFLAGS) -c -o $@ $< -DPROGNAME=\"$(@:.aux.o=.elf)\"
->  
->  FLATLIBS = $(libcflat) $(LIBFDT_archive)
->  %.elf: CFLAGS += $(arch_CFLAGS)
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index e64521e0..b72f7578 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -177,7 +177,7 @@ lds-autodepend-flags = -MMD -MF $(dir $*).$(notdir $*).d -MT $@
->  	$(CPP) $(lds-autodepend-flags) $(CPPFLAGS) -P -C -o $@ $<
->  
->  %.aux.o: $(SRCDIR)/lib/auxinfo.c
-> -	$(CC) $(CFLAGS) -c -o $@ $^ -DPROGNAME=\"$(@:.aux.o=.elf)\"
-> +	$(CC) $(CFLAGS) -c -o $@ $< -DPROGNAME=\"$(@:.aux.o=.elf)\"
->  
->  .SECONDEXPANSION:
->  %.elf: $(FLATLIBS) $(asmlib) $(SRCDIR)/s390x/flat.lds $$(snippets-obj) $$(snippet-hdr-obj) %.o %.aux.o
-> -- 
-> 2.42.0
-> 
+> > +	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, D128, IMP))
+> > +		res0 |= HCRX_EL2_D128En;
+> > +	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, THE, IMP))
+> > +		res0 |= HCRX_EL2_PTTWI;
+
+> Ok, not fair. The latest public version of the ARM ARM doesn't have any
+> of this. Where are you getting it from?
+
+We publish updates of the system register and instruction encodings much
+more frequently than we publish updates to the full ARM, these are
+released as DDI0601.  You can currently find them at:
+
+    https://developer.arm.com/documentation/ddi0601/
+    https://developer.arm.com/downloads/-/exploration-tools
+
+but those URLs might change at some point (the second one has downloads,
+the first is a directly viewable web page).  There's also DDI0602 with
+SVE instructions.  These are generally the first place that gets updated
+when new things are added.
+
+--MPiD38BZhwoZZEbm
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmW87pIACgkQJNaLcl1U
+h9A/cwf+JjX4+OtxqQN0ZE4w4tomIEOi352GLIB9ArXkwBSKwyCQaq8GaI+qICo1
+Shr6zuGSJc8TrL1YfVfztsBItZ8pFiTE/Z85E7IWuv1U3xSsMZaTLq4KNJc1Y5J5
+OA/9etVZUXevmUR72Ua6vpGfxDtX4WvjXGid+29g231qKK9i/zdUi/oP/tqFKFtS
+2dWydiefESKMBaBrISzIH0XDaaDihlrI+Vt7wO722JFNPlQ5kHkBMs2upawj9kBP
+7XHxJaZmCMXeg8AdqHVVPZMGMTEoURvutJar+d+tuJvIP9wcjeQTwGKhSUQ2OC8R
+z24lpdgTzVyu06csuV163+4cn3ed+g==
+=m4ZP
+-----END PGP SIGNATURE-----
+
+--MPiD38BZhwoZZEbm--
