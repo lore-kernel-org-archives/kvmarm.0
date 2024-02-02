@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13643144627
-	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 15:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C3B145B04
+	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 15:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706886348; cv=none; b=osU3S5qooyqdeH/+AyW9CFE4UmowujtTA99Nj1s1fn3R57lsl4g3YeD769wI8NiGn0wdhuC7+G0QAg2tuw5yRCv6xLH9k2eVODTRYh8gTx6h1Z9h+xTNtpn1F09S06Fl8x0YmXc6hUJMsBSc6GfpXuPjs/jOZvl+DOr6TJV3K8o=
+	t=1706886629; cv=none; b=hicGcS5O4pa3Exn3oh0jh5gXTh4DkyRd1JPDUwblT2f8WfupVyDr6xzG8ou6jnIGFig/jxtPDKx3d6EVRGIa2rBL36fg3Kxg5dGHU2m3092o2TQ8OWWdLZKs4kztgD7wuOWMrIDRXW74r6Hm++PYrePWBBBfwERizQOMgBhLynQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706886348; c=relaxed/simple;
-	bh=JKjI8hcly+A7qYywLkEjtUATElrBQX0XLzcJTim7yzU=;
+	s=arc-20240116; t=1706886629; c=relaxed/simple;
+	bh=IW/Yc2a7VB3hLUfz3Yt/mAo65lmsVam+O+ooLzsf4ec=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fQXJ7IiU2YWPbsnQVQ6+iCAIlc5efoMDKXojJq+vXKiWYn4rgevQPJAKGmc9Xh25wt6aQezGrO1vnSLfcC1d4kn8JK2X0ltcMPpSCyAnHmnSDHmNwYZET3CZ8xjWod227LXnlk2OAKhZtV4H5Olt1tQPK8nud6PvFIg9uVRm6Wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rz7Ts+Xl; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=rPpiUsWVQNAb/LD2kndq1RK5oGreoiTuA2EqmtyAU5vC25He63FT1ycE8JJhRr0ndgZav7pgbQHfH+EUB0RE29Rzp50WVE6LEYKZ6nuEOm4vFCV5D3bq4XQ7vxSXKBjIV77f2dgR6j6TwlVCdKqv3Cmy0VwouLqHHd2RK/qH960=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UyFnfNsC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rz7Ts+Xl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C104C43390;
-	Fri,  2 Feb 2024 15:05:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UyFnfNsC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3B99C433F1;
+	Fri,  2 Feb 2024 15:10:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706886347;
-	bh=JKjI8hcly+A7qYywLkEjtUATElrBQX0XLzcJTim7yzU=;
+	s=k20201202; t=1706886628;
+	bh=IW/Yc2a7VB3hLUfz3Yt/mAo65lmsVam+O+ooLzsf4ec=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rz7Ts+XlnlGocems590daMuBuNhPetKpGBo2DW9w3MwcnJ00TzJdG22gTwAZPSJiW
-	 aJxeLiD8RGudghEV7ZGq4gWKO2ohL0IHBGbR5BsHbMhWWgkDMZtdoQfxcPjK598oc9
-	 poQytyOUNFXF5G0Ja3u9mwbSPcWks/Lb5ordvfdztU8BEE/7mnGzMFwmTokN7tRKMp
-	 DZAgTaE+e5/ZZM8bxzlCtx9rK9/YDqeXSUa9Mv7Ux6BwZ7loIOPkk3rSEeFH36jW5C
-	 LFqYCJxGJLyQjIw6N50P06ziNlTj3yskV723j/mPqqLn59f7mpUA0CrLDjhcj4obuP
-	 x0F4A6WJFn+fw==
+	b=UyFnfNsCNblMnE/d5mhCuE4hSDZM90Ag3ChXc0s75EZaQO5JHJW+VGr3wrBjDrxVL
+	 m7N8njYzrEt3xMcWqQGmJhnV4JSDkOGY984KGPM3Lx/J1ayAieGMenzVZNRJgFWJif
+	 eeQUMIxQSOmUNYGI9iPNrwm3OIS72DinDRgGk+ypN5P5G+8LEMEWV91VcBto4pJfWA
+	 SnJWkEZz56CHlLXRi4UTsXew8e/NQyO/BCODR/gz4I6Q40wPqVb8aJ8gOHWbVkdO9t
+	 ncQ1C+EwDb5m7NkKwLScXAYTsEfN5ERCJElqwqZYf519VUdBG/Ld5eA8s+tlhv579X
+	 u8YkUpd6R8Jyw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rVv6v-00HILo-4F;
-	Fri, 02 Feb 2024 15:05:45 +0000
-Date: Fri, 02 Feb 2024 15:05:44 +0000
-Message-ID: <86eddu7vp3.wl-maz@kernel.org>
+	id 1rVvBS-00HIUe-FA;
+	Fri, 02 Feb 2024 15:10:26 +0000
+Date: Fri, 02 Feb 2024 15:10:26 +0000
+Message-ID: <86cyte7vh9.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Joey Gouly <joey.gouly@arm.com>
 Cc: kvmarm@lists.linux.dev,
@@ -46,10 +46,10 @@ Cc: kvmarm@lists.linux.dev,
 	Will Deacon <will@kernel.org>,
 	Mark Brown <broonie@kernel.org>
 Subject: Re: [PATCH v2 04/25] KVM: arm64: nv: Add sanitising to EL2 configuration registers
-In-Reply-To: <20240131171602.GF2284078@e124191.cambridge.arm.com>
+In-Reply-To: <20240201145607.GH2284078@e124191.cambridge.arm.com>
 References: <20240130204533.693853-1-maz@kernel.org>
 	<20240130204533.693853-5-maz@kernel.org>
-	<20240131171602.GF2284078@e124191.cambridge.arm.com>
+	<20240201145607.GH2284078@e124191.cambridge.arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -65,7 +65,7 @@ X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 31 Jan 2024 17:16:02 +0000,
+On Thu, 01 Feb 2024 14:56:07 +0000,
 Joey Gouly <joey.gouly@arm.com> wrote:
 > 
 > On Tue, Jan 30, 2024 at 08:45:11PM +0000, Marc Zyngier wrote:
@@ -109,12 +109,6 @@ Joey Gouly <joey.gouly@arm.com> wrote:
 > > +	if (!kvm_has_feat_enum(kvm, ID_AA64MMFR1_EL1, VMIDBits, 16))
 > > +		res0 |= GENMASK(63, 56);
 > > +	set_sysreg_masks(kvm, VTTBR_EL2, res0, res1);
-> 
-> CnP?
-
-Missing indeed. I'll add it.
-
-> 
 > > +
 > > +	/* VTCR_EL2 */
 > > +	res0 = GENMASK(63, 32) | GENMASK(30, 20);
@@ -129,89 +123,19 @@ Missing indeed. I'll add it.
 > > +	/* HCR_EL2 */
 > > +	res0 = BIT(48);
 > > +	res1 = HCR_RW;
-> > +	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, TWED, IMP))
-> > +		res0 |= GENMASK(63, 59);
-> > +	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, MTE, MTE2))
-> > +		res0 |= (HCR_TID5 | HCR_DCT | HCR_ATA);
-> > +	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, EVT, TTLBxS))
-> > +		res0 |= (HCR_TTLBIS | HCR_TTLBOS);
-> > +	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, CSV2, CSV2_2) &&
-> > +	    !kvm_has_feat(kvm, ID_AA64PFR1_EL1, CSV2_frac, CSV2_1p2))
-> > +		res1 = HCR_ENSCXT;
 > 
-> I'm confused here. If the VM doesn't have either CSV2_2 or CSV2_1p2.. HCR_ENSCXT is res1, that means we wouldn't trap?
-> 
-> The Arm ARM says:
-> 
-> 	EnSCXT, bit [53]
-> 		When FEAT_CSV2_2 is implemented or FEAT_CSV2_1p2 is implemented:
-> 
-> 			[..]
-> 
-> 		Otherwise:
-> 			RES0
-> 
-> And if you actually meant res1, then you need: res1 |= HCR_ENSCXT, otherwise you override the HCR_RW res1 bit!
+> Just want to clarify this bit actually, this is restricting the (first level
+> only?) nested EL1 to run as AArch64?
 
-You're right on all counts. This is a total thinko, coupled with a
-pretty bad bug.
+This is restricting it at all levels. The guest hypervisor will
+eventually write its own view of HCR_EL2.RW in the VNCR page, and if
+it has promised AArch32 to its own guest (at any level), it is in for
+a treat, because we will forcefully reset this bit to 1.
 
->
-> > +	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, EVT, IMP))
-> > +		res0 |= (HCR_TID4 | HCR_TICAB | HCR_TOCU);
-> 
-> minor nitpick: can you reverse these TOCU | TICAB | TID4 so it matches the relative positions in the register..
+> Should we be sanitising ID_AA64PFR0_EL1.EL1=0b0001?
 
-Sure can.
-
->
-> > +	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, V1P1))
-> > +		res0 |= HCR_AMVOFFEN;
-> 
-> We currently mask out ID_AA64PFR0_EL1.AMU (read_sanitised_id_aa64pfr0_el1 and
-> part of the .val in the sys_regs_desc[]), can't hurt to be feature
-> proof.
-
-That's my idea. We shouldn't have to worry about any of that in the
-core code, treat all features as potentially implemented, and actively
-check for them being disabled.
-
-> 
-> > +	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, V1P1))
-> > +		res0 |= HCR_FIEN;
-> > +	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, FWB, IMP))
-> > +		res0 |= HCR_FWB;
-> > +	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, NV, NV2))
-> > +		res0 |= HCR_NV2;
-> > +	if (!kvm_has_feat(kvm, ID_AA64MMFR2_EL1, NV, IMP))
-> > +		res0 |= (HCR_AT | HCR_NV1 | HCR_NV);
-> > +	if (!(__vcpu_has_feature(&kvm->arch, KVM_ARM_VCPU_PTRAUTH_ADDRESS) &&
-> > +	      __vcpu_has_feature(&kvm->arch, KVM_ARM_VCPU_PTRAUTH_ADDRESS)))
-> > +		res0 |= (HCR_API | HCR_APK);
-> > +	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TME, IMP))
-> > +		res0 |= BIT(39);
-> > +	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP))
-> > +		res0 |= (HCR_TERR | HCR_TEA);
-> 
-> Same annoying nitpick, flip the values order to match the positions.
-
-Will do.
-
-> 
-> > +	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, LO, IMP))
-> > +		res0 |= HCR_TLOR;
-> > +	if (!kvm_has_feat(kvm, ID_AA64MMFR4_EL1, E2H0, IMP))
-> > +		res1 |= HCR_E2H;
-> > +	set_sysreg_masks(kvm, HCR_EL2, res0, res1);
-> > +
-> >  out:
-> >  	mutex_unlock(&kvm->arch.config_lock);
-> >  
-> 
-> I need a lie down now.
-
-I know the feeling. This sort of crap ruins your day. Again, your
-effort is much appreciated!
+We already do. See limit_nv_id_reg() and how it constraints
+ID_AA64PFR0_EL1.ELx to 0b0001.
 
 Thanks,
 
