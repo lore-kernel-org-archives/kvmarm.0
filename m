@@ -1,129 +1,89 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 132F71474D6
-	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 16:26:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CDCA14830C;
+	Fri,  2 Feb 2024 16:44:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706891173; cv=none; b=iGs9lDogBi5+r6/dQbk+H2hGMJY6hoYMAdeoG/v6MTOwuIKgaWE+o6dbrPaEQuhqyz3t13+o8adgGGM9JrtjTDdLKsM7F1q6XNsW8iSXHoXHSbnHEF3qotdOplA6wdTWxkriSQHl8QYmgfjTwGLOAycxOjqYNPUo0zHvwE8CDOI=
+	t=1706892278; cv=none; b=owj4mmbdfkXopBgzl+6PNGWQH3QTH9OeWvegYhON4l7Y7C17xEy/FzuEL6gqUeN7T2vvz7R1DVe5R5ZlP6eV53jGAeNntr+sJcb4HaP/0Oa49YCELJg83i1lgsOcWzz7OLhpxJsUZh6sU8tM9rLwyO7yRJo7TuC61ifpZCxtAaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706891173; c=relaxed/simple;
-	bh=sfsn8zLJ9eCvP+K/MtYLIeo1muLaZEq7/NFMWMeByiU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sA7VNM3b7zk97YFEdXwutnUCnP29ifsnWE7j10/MoRKyREQNFRjyF+DRwjIalCGMFwOpOKAFXH3SHLLG2fsp2hdlB1UDpun+2JEgOssO5/jOZ54qZL3nqDfEvO919uqLA0mcXRu2p/Atj/nKXrrBPpIg7ESmCzIoWYLKBzneMZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B6003DA7;
-	Fri,  2 Feb 2024 08:26:52 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E0BFC3F5A1;
-	Fri,  2 Feb 2024 08:26:08 -0800 (PST)
-Date: Fri, 2 Feb 2024 16:26:03 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v2 04/25] KVM: arm64: nv: Add sanitising to EL2
- configuration registers
-Message-ID: <20240202162603.GA2636885@e124191.cambridge.arm.com>
-References: <20240130204533.693853-1-maz@kernel.org>
- <20240130204533.693853-5-maz@kernel.org>
- <20240201145607.GH2284078@e124191.cambridge.arm.com>
- <86cyte7vh9.wl-maz@kernel.org>
+	s=arc-20240116; t=1706892278; c=relaxed/simple;
+	bh=91dKtYL6nn7sT6XBkJUZhgPHoMOoFPhDfSgFduym7O0=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IO1cLI5W9GY5lZNaCBEM0klxkNv1hbQABPlRv0EJoMgehHD5E/mpQJjAEO899MVwUt9ncYHNjNzzWhrDgBXFHlDtmZ/dUtPXuc7HEBYxXEPQ5qxyKXWMNJqc0OxFSKLxcc82sWjgn0qAf8TMsr1r+izM/Mo53CMPZ99PaN375fo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4TRM3Q6Gpcz67pnj;
+	Sat,  3 Feb 2024 00:41:06 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id B846A1400D4;
+	Sat,  3 Feb 2024 00:44:32 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 2 Feb
+ 2024 16:44:31 +0000
+Date: Fri, 2 Feb 2024 16:44:31 +0000
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+CC: <linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
+	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-riscv@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<x86@kernel.org>, <acpica-devel@lists.linuxfoundation.org>,
+	<linux-csky@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-ia64@vger.kernel.org>, <linux-parisc@vger.kernel.org>, Salil Mehta
+	<salil.mehta@huawei.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	<jianyong.wu@arm.com>, <justin.he@arm.com>, James Morse
+	<james.morse@arm.com>, "Rafael J. Wysocki" <rafael@kernel.org>
+Subject: Re: [PATCH RFC v4 10/15] irqchip/gic-v3: Don't return errors from
+ gic_acpi_match_gicc()
+Message-ID: <20240202164431.00006f09@Huawei.com>
+In-Reply-To: <E1rVDn9-0027ZB-QN@rmk-PC.armlinux.org.uk>
+References: <Zbp5xzmFhKDAgHws@shell.armlinux.org.uk>
+	<E1rVDn9-0027ZB-QN@rmk-PC.armlinux.org.uk>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86cyte7vh9.wl-maz@kernel.org>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Fri, Feb 02, 2024 at 03:10:26PM +0000, Marc Zyngier wrote:
-> On Thu, 01 Feb 2024 14:56:07 +0000,
-> Joey Gouly <joey.gouly@arm.com> wrote:
-> > 
-> > On Tue, Jan 30, 2024 at 08:45:11PM +0000, Marc Zyngier wrote:
-> > > We can now start making use of our sanitising masks by setting them
-> > > to values that depend on the guest's configuration.
-> > > 
-> > > First up are VTTBR_EL2, VTCR_EL2, VMPIDR_EL2 and HCR_EL2.
-> > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/nested.c | 56 ++++++++++++++++++++++++++++++++++++++++-
-> > >  1 file changed, 55 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > > index c976cd4b8379..ee461e630527 100644
-> > > --- a/arch/arm64/kvm/nested.c
-> > > +++ b/arch/arm64/kvm/nested.c
-> > > @@ -181,7 +181,7 @@ u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg sr)
-> > >  	return v;
-> > >  }
-> > >  
-> > > -static void __maybe_unused set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u64 res1)
-> > > +static void set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u64 res1)
-> > >  {
-> > >  	int i = sr - __VNCR_START__;
-> > >  
-> > > @@ -191,6 +191,7 @@ static void __maybe_unused set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u
-> > >  
-> > >  int kvm_init_nv_sysregs(struct kvm *kvm)
-> > >  {
-> > > +	u64 res0, res1;
-> > >  	int ret = 0;
-> > >  
-> > >  	mutex_lock(&kvm->arch.config_lock);
-> > > @@ -209,6 +210,59 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
-> > >  		kvm->arch.id_regs[i] = limit_nv_id_reg(IDX_IDREG(i),
-> > >  						       kvm->arch.id_regs[i]);
-> > >  
-> > > +	/* VTTBR_EL2 */
-> > > +	res0 = res1 = 0;
-> > > +	if (!kvm_has_feat_enum(kvm, ID_AA64MMFR1_EL1, VMIDBits, 16))
-> > > +		res0 |= GENMASK(63, 56);
-> > > +	set_sysreg_masks(kvm, VTTBR_EL2, res0, res1);
-> > > +
-> > > +	/* VTCR_EL2 */
-> > > +	res0 = GENMASK(63, 32) | GENMASK(30, 20);
-> > > +	res1 = BIT(31);
-> > > +	set_sysreg_masks(kvm, VTCR_EL2, res0, res1);
-> > > +
-> > > +	/* VMPIDR_EL2 */
-> > > +	res0 = GENMASK(63, 40) | GENMASK(30, 24);
-> > > +	res1 = BIT(31);
-> > > +	set_sysreg_masks(kvm, VMPIDR_EL2, res0, res1);
-> > > +
-> > > +	/* HCR_EL2 */
-> > > +	res0 = BIT(48);
-> > > +	res1 = HCR_RW;
-> > 
-> > Just want to clarify this bit actually, this is restricting the (first level
-> > only?) nested EL1 to run as AArch64?
+On Wed, 31 Jan 2024 16:50:27 +0000
+Russell King (Oracle) <rmk+kernel@armlinux.org.uk> wrote:
+
+> From: James Morse <james.morse@arm.com>
 > 
-> This is restricting it at all levels. The guest hypervisor will
-> eventually write its own view of HCR_EL2.RW in the VNCR page, and if
-> it has promised AArch32 to its own guest (at any level), it is in for
-> a treat, because we will forcefully reset this bit to 1.
-
-Alright, thanks, I'll have to work through that some more.
-
+> gic_acpi_match_gicc() is only called via gic_acpi_count_gicr_regions().
+> It should only count the number of enabled redistributors, but it
+> also tries to sanity check the GICC entry, currently returning an
+> error if the Enabled bit is set, but the gicr_base_address is zero.
 > 
-> > Should we be sanitising ID_AA64PFR0_EL1.EL1=0b0001?
+> Adding support for the online-capable bit to the sanity check will
+> complicate it, for no benefit. The existing check implicitly depends on
+> gic_acpi_count_gicr_regions() previous failing to find any GICR regions
+> (as it is valid to have gicr_base_address of zero if the redistributors
+> are described via a GICR entry).
 > 
-> We already do. See limit_nv_id_reg() and how it constraints
-> ID_AA64PFR0_EL1.ELx to 0b0001.
+> Instead of complicating the check, remove it. Failures that happen at
+> this point cause the irqchip not to register, meaning no irqs can be
+> requested. The kernel grinds to a panic() pretty quickly.
 > 
+> Without the check, MADT tables that exhibit this problem are still
+> caught by gic_populate_rdist(), which helpfully also prints what went
+> wrong:
+> | CPU4: mpidr 100 has no re-distributor!
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Does what it says on the tin.
 
-I forgot about that, was looking at read_sanitised_id_aa64pfr0_el1() in the non-
-NV parts.
-
-Thanks,
-Joey
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
