@@ -1,145 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C3B145B04
-	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 15:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 132F71474D6
+	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 16:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706886629; cv=none; b=hicGcS5O4pa3Exn3oh0jh5gXTh4DkyRd1JPDUwblT2f8WfupVyDr6xzG8ou6jnIGFig/jxtPDKx3d6EVRGIa2rBL36fg3Kxg5dGHU2m3092o2TQ8OWWdLZKs4kztgD7wuOWMrIDRXW74r6Hm++PYrePWBBBfwERizQOMgBhLynQ=
+	t=1706891173; cv=none; b=iGs9lDogBi5+r6/dQbk+H2hGMJY6hoYMAdeoG/v6MTOwuIKgaWE+o6dbrPaEQuhqyz3t13+o8adgGGM9JrtjTDdLKsM7F1q6XNsW8iSXHoXHSbnHEF3qotdOplA6wdTWxkriSQHl8QYmgfjTwGLOAycxOjqYNPUo0zHvwE8CDOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706886629; c=relaxed/simple;
-	bh=IW/Yc2a7VB3hLUfz3Yt/mAo65lmsVam+O+ooLzsf4ec=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rPpiUsWVQNAb/LD2kndq1RK5oGreoiTuA2EqmtyAU5vC25He63FT1ycE8JJhRr0ndgZav7pgbQHfH+EUB0RE29Rzp50WVE6LEYKZ6nuEOm4vFCV5D3bq4XQ7vxSXKBjIV77f2dgR6j6TwlVCdKqv3Cmy0VwouLqHHd2RK/qH960=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UyFnfNsC; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UyFnfNsC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3B99C433F1;
-	Fri,  2 Feb 2024 15:10:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706886628;
-	bh=IW/Yc2a7VB3hLUfz3Yt/mAo65lmsVam+O+ooLzsf4ec=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UyFnfNsCNblMnE/d5mhCuE4hSDZM90Ag3ChXc0s75EZaQO5JHJW+VGr3wrBjDrxVL
-	 m7N8njYzrEt3xMcWqQGmJhnV4JSDkOGY984KGPM3Lx/J1ayAieGMenzVZNRJgFWJif
-	 eeQUMIxQSOmUNYGI9iPNrwm3OIS72DinDRgGk+ypN5P5G+8LEMEWV91VcBto4pJfWA
-	 SnJWkEZz56CHlLXRi4UTsXew8e/NQyO/BCODR/gz4I6Q40wPqVb8aJ8gOHWbVkdO9t
-	 ncQ1C+EwDb5m7NkKwLScXAYTsEfN5ERCJElqwqZYf519VUdBG/Ld5eA8s+tlhv579X
-	 u8YkUpd6R8Jyw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rVvBS-00HIUe-FA;
-	Fri, 02 Feb 2024 15:10:26 +0000
-Date: Fri, 02 Feb 2024 15:10:26 +0000
-Message-ID: <86cyte7vh9.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
+	s=arc-20240116; t=1706891173; c=relaxed/simple;
+	bh=sfsn8zLJ9eCvP+K/MtYLIeo1muLaZEq7/NFMWMeByiU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sA7VNM3b7zk97YFEdXwutnUCnP29ifsnWE7j10/MoRKyREQNFRjyF+DRwjIalCGMFwOpOKAFXH3SHLLG2fsp2hdlB1UDpun+2JEgOssO5/jOZ54qZL3nqDfEvO919uqLA0mcXRu2p/Atj/nKXrrBPpIg7ESmCzIoWYLKBzneMZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B6003DA7;
+	Fri,  2 Feb 2024 08:26:52 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E0BFC3F5A1;
+	Fri,  2 Feb 2024 08:26:08 -0800 (PST)
+Date: Fri, 2 Feb 2024 16:26:03 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v2 04/25] KVM: arm64: nv: Add sanitising to EL2 configuration registers
-In-Reply-To: <20240201145607.GH2284078@e124191.cambridge.arm.com>
+	Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v2 04/25] KVM: arm64: nv: Add sanitising to EL2
+ configuration registers
+Message-ID: <20240202162603.GA2636885@e124191.cambridge.arm.com>
 References: <20240130204533.693853-1-maz@kernel.org>
-	<20240130204533.693853-5-maz@kernel.org>
-	<20240201145607.GH2284078@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240130204533.693853-5-maz@kernel.org>
+ <20240201145607.GH2284078@e124191.cambridge.arm.com>
+ <86cyte7vh9.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86cyte7vh9.wl-maz@kernel.org>
 
-On Thu, 01 Feb 2024 14:56:07 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
+On Fri, Feb 02, 2024 at 03:10:26PM +0000, Marc Zyngier wrote:
+> On Thu, 01 Feb 2024 14:56:07 +0000,
+> Joey Gouly <joey.gouly@arm.com> wrote:
+> > 
+> > On Tue, Jan 30, 2024 at 08:45:11PM +0000, Marc Zyngier wrote:
+> > > We can now start making use of our sanitising masks by setting them
+> > > to values that depend on the guest's configuration.
+> > > 
+> > > First up are VTTBR_EL2, VTCR_EL2, VMPIDR_EL2 and HCR_EL2.
+> > > 
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/kvm/nested.c | 56 ++++++++++++++++++++++++++++++++++++++++-
+> > >  1 file changed, 55 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > > index c976cd4b8379..ee461e630527 100644
+> > > --- a/arch/arm64/kvm/nested.c
+> > > +++ b/arch/arm64/kvm/nested.c
+> > > @@ -181,7 +181,7 @@ u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg sr)
+> > >  	return v;
+> > >  }
+> > >  
+> > > -static void __maybe_unused set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u64 res1)
+> > > +static void set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u64 res1)
+> > >  {
+> > >  	int i = sr - __VNCR_START__;
+> > >  
+> > > @@ -191,6 +191,7 @@ static void __maybe_unused set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u
+> > >  
+> > >  int kvm_init_nv_sysregs(struct kvm *kvm)
+> > >  {
+> > > +	u64 res0, res1;
+> > >  	int ret = 0;
+> > >  
+> > >  	mutex_lock(&kvm->arch.config_lock);
+> > > @@ -209,6 +210,59 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
+> > >  		kvm->arch.id_regs[i] = limit_nv_id_reg(IDX_IDREG(i),
+> > >  						       kvm->arch.id_regs[i]);
+> > >  
+> > > +	/* VTTBR_EL2 */
+> > > +	res0 = res1 = 0;
+> > > +	if (!kvm_has_feat_enum(kvm, ID_AA64MMFR1_EL1, VMIDBits, 16))
+> > > +		res0 |= GENMASK(63, 56);
+> > > +	set_sysreg_masks(kvm, VTTBR_EL2, res0, res1);
+> > > +
+> > > +	/* VTCR_EL2 */
+> > > +	res0 = GENMASK(63, 32) | GENMASK(30, 20);
+> > > +	res1 = BIT(31);
+> > > +	set_sysreg_masks(kvm, VTCR_EL2, res0, res1);
+> > > +
+> > > +	/* VMPIDR_EL2 */
+> > > +	res0 = GENMASK(63, 40) | GENMASK(30, 24);
+> > > +	res1 = BIT(31);
+> > > +	set_sysreg_masks(kvm, VMPIDR_EL2, res0, res1);
+> > > +
+> > > +	/* HCR_EL2 */
+> > > +	res0 = BIT(48);
+> > > +	res1 = HCR_RW;
+> > 
+> > Just want to clarify this bit actually, this is restricting the (first level
+> > only?) nested EL1 to run as AArch64?
 > 
-> On Tue, Jan 30, 2024 at 08:45:11PM +0000, Marc Zyngier wrote:
-> > We can now start making use of our sanitising masks by setting them
-> > to values that depend on the guest's configuration.
-> > 
-> > First up are VTTBR_EL2, VTCR_EL2, VMPIDR_EL2 and HCR_EL2.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/nested.c | 56 ++++++++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 55 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index c976cd4b8379..ee461e630527 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -181,7 +181,7 @@ u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg sr)
-> >  	return v;
-> >  }
-> >  
-> > -static void __maybe_unused set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u64 res1)
-> > +static void set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u64 res1)
-> >  {
-> >  	int i = sr - __VNCR_START__;
-> >  
-> > @@ -191,6 +191,7 @@ static void __maybe_unused set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u
-> >  
-> >  int kvm_init_nv_sysregs(struct kvm *kvm)
-> >  {
-> > +	u64 res0, res1;
-> >  	int ret = 0;
-> >  
-> >  	mutex_lock(&kvm->arch.config_lock);
-> > @@ -209,6 +210,59 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
-> >  		kvm->arch.id_regs[i] = limit_nv_id_reg(IDX_IDREG(i),
-> >  						       kvm->arch.id_regs[i]);
-> >  
-> > +	/* VTTBR_EL2 */
-> > +	res0 = res1 = 0;
-> > +	if (!kvm_has_feat_enum(kvm, ID_AA64MMFR1_EL1, VMIDBits, 16))
-> > +		res0 |= GENMASK(63, 56);
-> > +	set_sysreg_masks(kvm, VTTBR_EL2, res0, res1);
-> > +
-> > +	/* VTCR_EL2 */
-> > +	res0 = GENMASK(63, 32) | GENMASK(30, 20);
-> > +	res1 = BIT(31);
-> > +	set_sysreg_masks(kvm, VTCR_EL2, res0, res1);
-> > +
-> > +	/* VMPIDR_EL2 */
-> > +	res0 = GENMASK(63, 40) | GENMASK(30, 24);
-> > +	res1 = BIT(31);
-> > +	set_sysreg_masks(kvm, VMPIDR_EL2, res0, res1);
-> > +
-> > +	/* HCR_EL2 */
-> > +	res0 = BIT(48);
-> > +	res1 = HCR_RW;
+> This is restricting it at all levels. The guest hypervisor will
+> eventually write its own view of HCR_EL2.RW in the VNCR page, and if
+> it has promised AArch32 to its own guest (at any level), it is in for
+> a treat, because we will forcefully reset this bit to 1.
+
+Alright, thanks, I'll have to work through that some more.
+
 > 
-> Just want to clarify this bit actually, this is restricting the (first level
-> only?) nested EL1 to run as AArch64?
+> > Should we be sanitising ID_AA64PFR0_EL1.EL1=0b0001?
+> 
+> We already do. See limit_nv_id_reg() and how it constraints
+> ID_AA64PFR0_EL1.ELx to 0b0001.
+> 
 
-This is restricting it at all levels. The guest hypervisor will
-eventually write its own view of HCR_EL2.RW in the VNCR page, and if
-it has promised AArch32 to its own guest (at any level), it is in for
-a treat, because we will forcefully reset this bit to 1.
-
-> Should we be sanitising ID_AA64PFR0_EL1.EL1=0b0001?
-
-We already do. See limit_nv_id_reg() and how it constraints
-ID_AA64PFR0_EL1.ELx to 0b0001.
+I forgot about that, was looking at read_sanitised_id_aa64pfr0_el1() in the non-
+NV parts.
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Joey
