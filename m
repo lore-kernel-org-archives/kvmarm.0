@@ -1,98 +1,82 @@
-Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA43226AFC
-	for <kvmarm@lists.linux.dev>; Thu,  1 Feb 2024 20:31:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DA653A1
+	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 01:01:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706819469; cv=none; b=SoIZ4OYxHdTVrI04gi6UuYXGbPbKYV3yadY9dW5MdkzPI94YUZx66tnxioZoXgY2wBOGzoXqBBt/cR6th6gRsNDOwylxfKq+53twubXdV3uoOcABsvhn2ynQSYX8O+sbAcFQwdN/nMup8f7mGdbvOj9HG9v4R67UqYenquxmtpI=
+	t=1706835704; cv=none; b=EVhqOO+y5bCcXbnAvWvEEhMZyrBhXfiGwsa95YMF/g1jcr9F/E8xoFzkM8Fi+nTJBIAasu6srzab15lpnH79ZmIS0JrA9yBJlxmvETiZX0ZA+b6Tllj3AYkfhNlpMz7H4oeQaZikKZO++rcReOz2JL/gM8y2iI0wZiMJgF/GwsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706819469; c=relaxed/simple;
-	bh=pl01XxJvCSr905362CLcoeAKt0+bHnRT0ALDhya3/yI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h3XRvdckuoX3V/TKoeGdQUOQQRAHt/+OB+fDRKPvcwjRwxTkLQxIRR5/gqwIiDAhA/9V8UBwfe6Izpu3N9bwpAgg3eBWAFYmhh3MUVq2SFx5uXsz2Lyr06Do/swWE2x0P2u7TEhzdsmC6LwrDQYmJztu9SHQ9dEb+I0tYKRkvu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dq/YUIlZ; arc=none smtp.client-ip=95.215.58.185
+	s=arc-20240116; t=1706835704; c=relaxed/simple;
+	bh=AHkze/xne8c2rDs/5YFU4CmPPZl+QCNpVbfvcAR9b8E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OEcoU5LW3ranpuOXLOX71hMripr68j0wFOh/jmHv4GvtOnR7Xrbf9k07M0A5t6UH7mcOXCmcMvLJyDjORrxQHOy6wAOAr6HLQKLq1r0HmYEH5nqyxiIkfvdlranBhcOM9F71HtkavXdJWWA9OTzR32YP54xAouCGJ2t9W8xcP+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uiDZLS8F; arc=none smtp.client-ip=91.218.175.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dq/YUIlZ"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uiDZLS8F"
+Date: Fri, 2 Feb 2024 01:01:34 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706819466;
+	t=1706835700;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=cwP6DcVMHmam3R5gLofRFfJeh4GcrsoYje2BNlcsz5k=;
-	b=dq/YUIlZ0XRTWoXuyrgAiNJkKdu4Bet/xKIqTO3mSElVcEBmCHVNqwQEQ7d1WdMnQY7wvD
-	uMMWlyrB5CemYCsknlVxTDBvU2fstX/weM/r3bTinQjj+npQibyJ1VyTD8YCh9o86Iz3Wf
-	Za9FRTRTdMVuKfBOoR5PkZ9QelMapIE=
+	bh=6rGJ8egVATVZUAxthY7XJKnLICupdZkdjp3Ldt/jpN8=;
+	b=uiDZLS8F47zN390ABNUPxK9LqG0DBwjE7CdRHKjDKHLEwwwKEFPOSsuiAZWme8f8Agzjxm
+	oigF4Q+Sifb5Ey3cmSRIaRDhepMSmlAvlYEXbvT0FQLa2KTsoe339l1BW6J/kzaxWcmId7
+	5H4NHPt4YnHufE6z/llS+RP7uKths20=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Randy Dunlap <rdunlap@infradead.org>,
-	linux-kernel@vger.kernel.org
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	Will Deacon <will@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 00/10] KVM: arm64: fix many kernel-doc warnings
-Date: Thu,  1 Feb 2024 20:30:19 +0000
-Message-ID: <170681941355.2769902.10865128203340654876.b4-ty@linux.dev>
-In-Reply-To: <20240117230714.31025-1-rdunlap@infradead.org>
-References: <20240117230714.31025-1-rdunlap@infradead.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: James Houghton <jthoughton@google.com>,
+	Anish Moorthy <amoorthy@google.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
+	robert.hoo.linux@gmail.com, dmatlack@google.com,
+	axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
+	isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
+Subject: Re: [PATCH v6 06/14] KVM: Add memslot flag to let userspace force an
+ exit on missing hva mappings
+Message-ID: <Zbw-7sxotjX3xWsO@linux.dev>
+References: <20231109210325.3806151-1-amoorthy@google.com>
+ <20231109210325.3806151-7-amoorthy@google.com>
+ <CADrL8HWYKSiDZ_ahGbMXjup=r75B4JqC3LvT8A-qPVenV+MOiw@mail.gmail.com>
+ <CAF7b7mrA3rB33sUZe3HX33+fXpF=8VwD284LpCcEn9KT9OgwUQ@mail.gmail.com>
+ <CADrL8HXSzm_C9UwUb8-H_c6-TRgpkKLE+qeXfyN-X_rHGj2vuw@mail.gmail.com>
+ <ZbrxiSNV7e1C6LO-@linux.dev>
+ <ZbvGoz67L3gtnHhI@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZbvGoz67L3gtnHhI@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, 17 Jan 2024 15:07:04 -0800, Randy Dunlap wrote:
-> Fix a bunch of kernel-doc warnings in arch/arm64/kvm/.
-> 
->  [PATCH 01/10] KVM: arm64: debug: fix kernel-doc warnings
->  [PATCH 02/10] KVM: arm64: guest: fix kernel-doc warnings
->  [PATCH 03/10] KVM: arm64: hyp/aarch32: fix kernel-doc warnings
->  [PATCH 04/10] KVM: arm64: vhe: fix a kernel-doc warning
->  [PATCH 05/10] KVM: arm64: mmu: fix a kernel-doc warning
->  [PATCH 06/10] KVM: arm64: PMU: fix kernel-doc warnings
->  [PATCH 07/10] KVM: arm64: sys_regs: fix kernel-doc warnings
->  [PATCH 08/10] KVM: arm64: vgic-init: fix a kernel-doc warning
->  [PATCH 09/10] KVM: arm64: vgic-its: fix kernel-doc warnings
->  [PATCH 10/10] KVM: arm64: vgic: fix a kernel-doc warning
-> 
-> [...]
+On Thu, Feb 01, 2024 at 08:28:19AM -0800, Sean Christopherson wrote:
 
-Applied to kvmarm/next, thanks!
+[...]
 
-[01/10] KVM: arm64: debug: fix kernel-doc warnings
-        https://git.kernel.org/kvmarm/kvmarm/c/c4d15f841570
-[02/10] KVM: arm64: guest: fix kernel-doc warnings
-        https://git.kernel.org/kvmarm/kvmarm/c/39db66e6b404
-[03/10] KVM: arm64: hyp/aarch32: fix kernel-doc warnings
-        https://git.kernel.org/kvmarm/kvmarm/c/bc13610b4240
-[04/10] KVM: arm64: vhe: fix a kernel-doc warning
-        https://git.kernel.org/kvmarm/kvmarm/c/aa96af24f320
-[05/10] KVM: arm64: mmu: fix a kernel-doc warning
-        https://git.kernel.org/kvmarm/kvmarm/c/ffd9eaffa34d
-[06/10] KVM: arm64: PMU: fix kernel-doc warnings
-        https://git.kernel.org/kvmarm/kvmarm/c/2a00f0855530
-[07/10] KVM: arm64: sys_regs: fix kernel-doc warnings
-        https://git.kernel.org/kvmarm/kvmarm/c/8ce783927268
-[08/10] KVM: arm64: vgic-init: fix a kernel-doc warning
-        https://git.kernel.org/kvmarm/kvmarm/c/dd609a574a02
-[09/10] KVM: arm64: vgic-its: fix kernel-doc warnings
-        https://git.kernel.org/kvmarm/kvmarm/c/f779d2c0176c
-[10/10] KVM: arm64: vgic: fix a kernel-doc warning
-        https://git.kernel.org/kvmarm/kvmarm/c/e634ff9598a4
+> Yeah, I let's just make KVM_EXIT_ON_MISSING mutually exclusive with
+> KVM_MEM_READONLY.  KVM (oviously) honors the primary MMU protections, so userspace
+> can (and does) map read-only memory into the guest without READONLY.  As Oliver
+> pointed out, making the *memslot* RO is intended for use cases where userspace
+> wants writes to be treated like emulated MMIO.
 
---
-Best,
+Well, it was clear enough to me what open source VMMs are doing, I was
+curious if Google's VMM is doing something strange with RO memslots that
+made the optimization desirable. But it sounds like we're all in
+agreement that RO memslots aren't consequential for post-copy.
+
+> We can always add support in the future in the extremely unlikely event someone
+> comes along with a legitimate reason for KVM_EXIT_ON_MISSING to play nice with
+> KVM_MEM_READONLY.
+
++1, the less stupid things we let userspace do the better.
+
+-- 
+Thanks,
 Oliver
