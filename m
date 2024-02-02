@@ -1,100 +1,235 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D165D46448
-	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 13:31:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98ABD145340
+	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 14:23:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706880664; cv=none; b=OfROahY0u9932WJzVWmLYUqt4vTl632WUqZQxHLZ+QIaAwg/UNpLLoDqlzoo64yMWtl+ySxtxu45PiRpI7FrfvmL03Hhj/OG8ntgUzzAfR/43bR+qjyjWOVrDdZ/01EOoahfTCi3hNWWjZZPIgIrBJMNCNEcxHBiCJDI1TgHYEs=
+	t=1706883785; cv=none; b=cF9Cn/RWuXE0UhElqvEW1Cq72xoSbK3WTQA03X2/G7BN+tDmOqCtz8FWkdlaeDAuBPkz8Rgepziva0jFawUSXsOPHwKXK8OGmIjxbevcyo1BlKOykuWuzdLFASZ+rbOETwEaKbM5+XRxdSSPkWAXnk6rvIlen4EfQ/FaGsX97dY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706880664; c=relaxed/simple;
-	bh=A9NaAVFzxh6xMtlLojco0S+of3aUGoMNBajCF+WEn3E=;
+	s=arc-20240116; t=1706883785; c=relaxed/simple;
+	bh=o/CxHtMHct/p3/M0YDsOR5zVnB7CaoXvuoPYTaQMFRg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JspBKwNvkGGW3Wv0uHQT54q+Wf2weq5Vb/XydvXYaazsaNakye/hMSu4MO4SmPVapVS5TeTTPaQ5KZEp7Pry7QAsv5zEn/MGLQ4pgli+KJnYHeQcheLxWY+CfEqtS6HA6vFaK8rUyisap58pIRdj7jwOkFh9bHpGcmttse0yQaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qAtkPYc8; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=qj3oDIbw7Cm8tuosuEoc3i+/HwV8e1m33iunB1ZdJi00CmugrCGKB1LNTjNc97Z//Z4Nuh+QoBguy2utGqxDFuPUOs/szNKr0cs4JYH/xVUNjGLHioN+O7eBX3GBW9KNvlOx56fBVc4xNiFq9xRGaYhoVGnR6bg0p+72EcnpItA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=A2e5ZvIR; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qAtkPYc8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB722C433C7;
-	Fri,  2 Feb 2024 13:31:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706880664;
-	bh=A9NaAVFzxh6xMtlLojco0S+of3aUGoMNBajCF+WEn3E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qAtkPYc8gXQ6V2154QLnwDl0S3s8NqO4k+MfOzPHpK0lGrs2gYfBIwNWeNtVsmCR9
-	 BmtN9VzRLJn75QYvuz5q7KwJ+FyhhdQq0YVldpsz1xoPO78Bgw285tp+pA5hEpeEv+
-	 uZ4zRSZcrKpxmn1RqisJvkKL5JH7lWBmc68KN0n5U2N2HNrCiqvQIXQu5c4rZAS1lU
-	 HBFXZ2Wwe+hBgq/tuBBKu5NmE1S12vbB4TAC/FmG27LYDaVmg1FkI7SDxe0Nqa21l7
-	 +5A5y3F/KlWIH74DtGyhTVB5FkvSE1/6t/vwnNUYWfEw6rdJl0wD5B+Wd7tQoFHpZ7
-	 Fg8XHJCFbrGbQ==
-Date: Fri, 2 Feb 2024 13:30:59 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH v2 06/25] KVM: arm64: nv: Add sanitising to VNCR-backed
- HCRX_EL2
-Message-ID: <4911fc9f-5eeb-4861-b44b-f80f9f512fb1@sirena.org.uk>
-References: <20240130204533.693853-1-maz@kernel.org>
- <20240130204533.693853-7-maz@kernel.org>
- <ZbytUKPFYiP2cdd8@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="A2e5ZvIR"
+Date: Fri, 2 Feb 2024 15:22:54 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706883779;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Px3nMvWeSyv0f0LL38am1XpF0fc9FEreGCFoqZZHAWA=;
+	b=A2e5ZvIRMa3Jgm1MQ6a6p5EkNAsG2SO7pbmklcr8ERAK4ghBTrWUPzNQvVYfuSGovz/JyS
+	XaqBPF0TxkgweVDbxzY0cDI7HMTs4xj3jUOJfqLFU1daX5LyYglYGFMPot+cb2jcueNu/P
+	O2HyPZ1COXKxaOW2wMevhX5EPpeZJ8k=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	kvmarm@lists.linux.dev
+Cc: ajones@ventanamicro.com, anup@brainfault.org, atishp@atishpatra.org, 
+	pbonzini@redhat.com, thuth@redhat.com, alexandru.elisei@arm.com, 
+	eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 00/24] Introduce RISC-V
+Message-ID: <20240202-af0abddd2969c13006cbbe1a@orel>
+References: <20240126142324.66674-26-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="MPiD38BZhwoZZEbm"
-Content-Disposition: inline
-In-Reply-To: <ZbytUKPFYiP2cdd8@linux.dev>
-X-Cookie: Do not write in this space.
-
-
---MPiD38BZhwoZZEbm
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20240126142324.66674-26-andrew.jones@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Feb 02, 2024 at 08:52:32AM +0000, Oliver Upton wrote:
-> On Tue, Jan 30, 2024 at 08:45:13PM +0000, Marc Zyngier wrote:
+On Fri, Jan 26, 2024 at 03:23:25PM +0100, Andrew Jones wrote:
+> v2:
+>  - While basing [1] on this series I found two bugs (one in exception
+>    return and another in isa string parsing). I also decided to expose
+>    a get_pte() function to unit tests and also an isa-extension-by-name
+>    function to check for arbitrary extensions. Finally, I picked up
+>    Thomas' gitlab-ci suggestion and his tags.
+> 
+> (Having [1] and the selftests running makes me pretty happy with the
+> series, so, unless somebody shouts, I'll merge this sometime next week.)
+> 
+> [1] https://gitlab.com/jones-drew/kvm-unit-tests/-/commit/e9c6c58b1c799de77fd39970b358a7592ecd048f
 
-> > +	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, D128, IMP))
-> > +		res0 |= HCRX_EL2_D128En;
-> > +	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, THE, IMP))
-> > +		res0 |= HCRX_EL2_PTTWI;
+With the fix for __clzdi2(), the makefile refactoring to add the %.aux.o
+target, and Eric's tags, I'm pleased to announce that I've created a v3
+branch and merged it.  Bring on the riscv tests!
 
-> Ok, not fair. The latest public version of the ARM ARM doesn't have any
-> of this. Where are you getting it from?
+Thanks,
+drew
 
-We publish updates of the system register and instruction encodings much
-more frequently than we publish updates to the full ARM, these are
-released as DDI0601.  You can currently find them at:
 
-    https://developer.arm.com/documentation/ddi0601/
-    https://developer.arm.com/downloads/-/exploration-tools
-
-but those URLs might change at some point (the second one has downloads,
-the first is a directly viewable web page).  There's also DDI0602 with
-SVE instructions.  These are generally the first place that gets updated
-when new things are added.
-
---MPiD38BZhwoZZEbm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmW87pIACgkQJNaLcl1U
-h9A/cwf+JjX4+OtxqQN0ZE4w4tomIEOi352GLIB9ArXkwBSKwyCQaq8GaI+qICo1
-Shr6zuGSJc8TrL1YfVfztsBItZ8pFiTE/Z85E7IWuv1U3xSsMZaTLq4KNJc1Y5J5
-OA/9etVZUXevmUR72Ua6vpGfxDtX4WvjXGid+29g231qKK9i/zdUi/oP/tqFKFtS
-2dWydiefESKMBaBrISzIH0XDaaDihlrI+Vt7wO722JFNPlQ5kHkBMs2upawj9kBP
-7XHxJaZmCMXeg8AdqHVVPZMGMTEoURvutJar+d+tuJvIP9wcjeQTwGKhSUQ2OC8R
-z24lpdgTzVyu06csuV163+4cn3ed+g==
-=m4ZP
------END PGP SIGNATURE-----
-
---MPiD38BZhwoZZEbm--
+> 
+> Thanks,
+> drew
+> 
+> Original cover letter follows:
+> 
+> This series adds another architecture to kvm-unit-tests (RISC-V, both
+> 32-bit and 64-bit). Much of the code is borrowed from arm/arm64 by
+> mimicking its patterns or by first making the arm code more generic
+> and moving it to the common lib.
+> 
+> This series brings UART, SMP, MMU, and exception handling support.
+> One should be able to start writing CPU validation tests in a mix
+> of C and asm as well as write SBI tests, as is the plan for the SBI
+> verification framework. kvm-unit-tests provides backtraces on asserts
+> and input can be given to the tests through command line arguments,
+> environment variables, and the DT (there's already an ISA string
+> parser for extension detection).
+> 
+> This series only targets QEMU TCG and KVM, but OpenSBI may be replaced
+> with other SBI implementations, such as RustSBI. It's a goal to target
+> bare-metal as soon as possible, so EFI support is already in progress
+> and will be posted soon. More follow on series will come as well,
+> bringing interrupt controller support for timer and PMU testing,
+> support to run tests in usermode, and whatever else people need for
+> their tests.
+> 
+> 
+> Andrew Jones (24):
+>   configure: Add ARCH_LIBDIR
+>   riscv: Initial port, hello world
+>   arm/arm64: Move cpumask.h to common lib
+>   arm/arm64: Share cpu online, present and idle masks
+>   riscv: Add DT parsing
+>   riscv: Add initial SBI support
+>   riscv: Add run script and unittests.cfg
+>   riscv: Add riscv32 support
+>   riscv: Add exception handling
+>   riscv: Add backtrace support
+>   arm/arm64: Generalize wfe/sev names in smp.c
+>   arm/arm64: Remove spinlocks from on_cpu_async
+>   arm/arm64: Share on_cpus
+>   riscv: Compile with march
+>   riscv: Add SMP support
+>   arm/arm64: Share memregions
+>   riscv: Populate memregions and switch to page allocator
+>   riscv: Add MMU support
+>   riscv: Enable the MMU in secondaries
+>   riscv: Enable vmalloc
+>   lib: Add strcasecmp and strncasecmp
+>   riscv: Add isa string parsing
+>   gitlab-ci: Add riscv64 tests
+>   MAINTAINERS: Add riscv
+> 
+>  .gitlab-ci.yml               |  17 +++
+>  MAINTAINERS                  |   8 ++
+>  Makefile                     |   2 +-
+>  arm/Makefile.common          |   2 +
+>  arm/selftest.c               |   3 +-
+>  configure                    |  16 +++
+>  lib/arm/asm/gic-v2.h         |   2 +-
+>  lib/arm/asm/gic-v3.h         |   2 +-
+>  lib/arm/asm/gic.h            |   2 +-
+>  lib/arm/asm/setup.h          |  14 --
+>  lib/arm/asm/smp.h            |  45 +-----
+>  lib/arm/mmu.c                |   3 +-
+>  lib/arm/setup.c              |  93 +++----------
+>  lib/arm/smp.c                | 135 +-----------------
+>  lib/arm64/asm/cpumask.h      |   1 -
+>  lib/{arm/asm => }/cpumask.h  |  42 +++++-
+>  lib/ctype.h                  |  10 ++
+>  lib/elf.h                    |  11 ++
+>  lib/ldiv32.c                 |  16 +++
+>  lib/linux/const.h            |   2 +
+>  lib/memregions.c             |  82 +++++++++++
+>  lib/memregions.h             |  29 ++++
+>  lib/on-cpus.c                | 154 +++++++++++++++++++++
+>  lib/on-cpus.h                |  14 ++
+>  lib/riscv/.gitignore         |   1 +
+>  lib/riscv/asm-offsets.c      |  62 +++++++++
+>  lib/riscv/asm/asm-offsets.h  |   1 +
+>  lib/riscv/asm/barrier.h      |  20 +++
+>  lib/riscv/asm/bitops.h       |  21 +++
+>  lib/riscv/asm/bug.h          |  20 +++
+>  lib/riscv/asm/csr.h          | 100 ++++++++++++++
+>  lib/riscv/asm/io.h           |  87 ++++++++++++
+>  lib/riscv/asm/isa.h          |  33 +++++
+>  lib/riscv/asm/memory_areas.h |   1 +
+>  lib/riscv/asm/mmu.h          |  32 +++++
+>  lib/riscv/asm/page.h         |  21 +++
+>  lib/riscv/asm/pgtable.h      |  42 ++++++
+>  lib/riscv/asm/processor.h    |  29 ++++
+>  lib/riscv/asm/ptrace.h       |  46 +++++++
+>  lib/riscv/asm/sbi.h          |  54 ++++++++
+>  lib/riscv/asm/setup.h        |  15 ++
+>  lib/riscv/asm/smp.h          |  29 ++++
+>  lib/riscv/asm/spinlock.h     |   7 +
+>  lib/riscv/asm/stack.h        |  12 ++
+>  lib/riscv/bitops.c           |  47 +++++++
+>  lib/riscv/io.c               |  97 +++++++++++++
+>  lib/riscv/isa.c              | 126 +++++++++++++++++
+>  lib/riscv/mmu.c              | 205 +++++++++++++++++++++++++++
+>  lib/riscv/processor.c        |  64 +++++++++
+>  lib/riscv/sbi.c              |  40 ++++++
+>  lib/riscv/setup.c            | 188 +++++++++++++++++++++++++
+>  lib/riscv/smp.c              |  70 ++++++++++
+>  lib/riscv/stack.c            |  32 +++++
+>  lib/string.c                 |  14 ++
+>  lib/string.h                 |   2 +
+>  riscv/Makefile               | 106 ++++++++++++++
+>  riscv/cstart.S               | 259 +++++++++++++++++++++++++++++++++++
+>  riscv/flat.lds               |  75 ++++++++++
+>  riscv/run                    |  41 ++++++
+>  riscv/sbi.c                  |  41 ++++++
+>  riscv/selftest.c             | 100 ++++++++++++++
+>  riscv/sieve.c                |   1 +
+>  riscv/unittests.cfg          |  37 +++++
+>  63 files changed, 2616 insertions(+), 267 deletions(-)
+>  delete mode 100644 lib/arm64/asm/cpumask.h
+>  rename lib/{arm/asm => }/cpumask.h (72%)
+>  create mode 100644 lib/memregions.c
+>  create mode 100644 lib/memregions.h
+>  create mode 100644 lib/on-cpus.c
+>  create mode 100644 lib/on-cpus.h
+>  create mode 100644 lib/riscv/.gitignore
+>  create mode 100644 lib/riscv/asm-offsets.c
+>  create mode 100644 lib/riscv/asm/asm-offsets.h
+>  create mode 100644 lib/riscv/asm/barrier.h
+>  create mode 100644 lib/riscv/asm/bitops.h
+>  create mode 100644 lib/riscv/asm/bug.h
+>  create mode 100644 lib/riscv/asm/csr.h
+>  create mode 100644 lib/riscv/asm/io.h
+>  create mode 100644 lib/riscv/asm/isa.h
+>  create mode 100644 lib/riscv/asm/memory_areas.h
+>  create mode 100644 lib/riscv/asm/mmu.h
+>  create mode 100644 lib/riscv/asm/page.h
+>  create mode 100644 lib/riscv/asm/pgtable.h
+>  create mode 100644 lib/riscv/asm/processor.h
+>  create mode 100644 lib/riscv/asm/ptrace.h
+>  create mode 100644 lib/riscv/asm/sbi.h
+>  create mode 100644 lib/riscv/asm/setup.h
+>  create mode 100644 lib/riscv/asm/smp.h
+>  create mode 100644 lib/riscv/asm/spinlock.h
+>  create mode 100644 lib/riscv/asm/stack.h
+>  create mode 100644 lib/riscv/bitops.c
+>  create mode 100644 lib/riscv/io.c
+>  create mode 100644 lib/riscv/isa.c
+>  create mode 100644 lib/riscv/mmu.c
+>  create mode 100644 lib/riscv/processor.c
+>  create mode 100644 lib/riscv/sbi.c
+>  create mode 100644 lib/riscv/setup.c
+>  create mode 100644 lib/riscv/smp.c
+>  create mode 100644 lib/riscv/stack.c
+>  create mode 100644 riscv/Makefile
+>  create mode 100644 riscv/cstart.S
+>  create mode 100644 riscv/flat.lds
+>  create mode 100755 riscv/run
+>  create mode 100644 riscv/sbi.c
+>  create mode 100644 riscv/selftest.c
+>  create mode 120000 riscv/sieve.c
+>  create mode 100644 riscv/unittests.cfg
+> 
+> -- 
+> 2.43.0
+> 
