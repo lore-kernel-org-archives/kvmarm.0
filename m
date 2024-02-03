@@ -1,56 +1,56 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53CF611CB1
-	for <kvmarm@lists.linux.dev>; Sat,  3 Feb 2024 00:09:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC0E12E54
+	for <kvmarm@lists.linux.dev>; Sat,  3 Feb 2024 00:09:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706918979; cv=none; b=F0ClZsQTxLswawpvr3xj9H0dQD435NUM/ewcirDGVXfEFCpKbdBccp7l203QJaNHCoUbb+KRqrLRnHSy538H7HtKlPPLzIOazdT9wV/rhG95th99ZsCcoUAb3693jk5qdH9oIGDAgA3Ev4CHa2DmQpaOz9485hfE4Rpuv0TzzFQ=
+	t=1706918981; cv=none; b=dxk7c0vFA2HhArQEhMPvoFuaCyznTQcc7SDWjAImDpIFTmKrVfXd/4sN/gMCNr5zleo2lbo4zxvWkOIAzIMzVIW12kcEUk1c4mEVUna46KmO50Iva2lHrLeDvG5VRKkgHSgQplBXVT2jw/pUD0m2ME/FPNg2dbek+axjnYrw1ps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706918979; c=relaxed/simple;
-	bh=51qYoiJXla3fcRiNNoPbF5xjAjxwljCMn92WKnY0s1Q=;
+	s=arc-20240116; t=1706918981; c=relaxed/simple;
+	bh=WErIq3K7OOqOd3xHpYtlDNEPs0UpZWxiYWZgTo/MP4I=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ehyBurljSDLAZyeRiKBLqkBTJyxseEg1Xvw5QBwGzl2DKp2e4BYZtF/QXpIlzh2NFaP06a8PfXegq6hJXtxMxNM03Wr6/gXyITXRqpzDZrHvxneIbGpaRGA+v86/LgeecmrD/PmSUFd4G4oFiO+YymPqritAKUTrr+b/Pf0bZbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KqrIWida; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=aIT52U8FPNVNQlv81FH4mg0/86B+2yPV7H2o5oiB0SDHowiQnhllu4x1IMyQd7HpU9P9B/fyE09CD6PrbN7iAwOU6becgseghguWNHv3QK1hOQI+YSMLdAgZTUyghtDt5LbW/2rmiAJMymKvxzbk+cG/SRwlWvV7LAIB3ba7BVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bDL1NZLy; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KqrIWida"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5cfd6ba1c11so2038894a12.0
-        for <kvmarm@lists.linux.dev>; Fri, 02 Feb 2024 16:09:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bDL1NZLy"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc693399655so4220881276.1
+        for <kvmarm@lists.linux.dev>; Fri, 02 Feb 2024 16:09:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706918976; x=1707523776; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1706918978; x=1707523778; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=lcHhkIfCfD5wroHUDfoUCPFb/M+i7HRMkWQ8hVkrcXw=;
-        b=KqrIWidacpuoFwQGiq+h6/v8pwIuVms5Yhykvvw8LnZgDKZ9Wa9ubLaEhU6qOI0swG
-         k+YC3bF69b8fJPFAkdn8fcWYSr9pOuPHivZGC2INHoKQDUj3VZe6gDPbdY/yyUhj3OqZ
-         rTH1b+WR3iAxthAqdNQvTG2qry7grDyr7UILIrrANlf1zRTVYf6nva2ME4NHBxzwuLcL
-         Gj62CR22aEipEmBPSU6hx5vX6uEnc/+0klkhCNkpjXpwkWCBXaM0bcTkahugzcM6MX1Y
-         c5beT0ldc0Z701MvTkX+hyg0jNTe3Z4DirzSq/ncXfXdpeyK9jqYcAWNkwBRz5EpvonX
-         ZGwA==
+        bh=XX/qPWiFzcrNc98rmsyPZwe0j7yaMHMPDZjofeW64Pk=;
+        b=bDL1NZLy/VsltjZsvFDjC4BfEZ4kc81XpnNdHm4B/dc2Zs7DCLsFDRy4Qmq80NCD86
+         zjSVspQGwN2z+Tvn1IddleHI6upieqyYg90nSqBIAvUJafFI4xL6/c6/A6ajhJHDhhK3
+         yLeBozLKYpP3ROQX0cShkhf/oosKYsOTQnNqm61t2l9T6m5Ax+05H4FdELI2iog9iB7L
+         mzu4kijpMgx6U9u5bn7DCB2FfpNg6VbaMZUrjvffYpW+Dmd807QcOlyBgd8HcPu1XIIX
+         twBEOxYQRnpNcbOUJleb3oc/o+8enh01oIC9os2VWOaRAC5kdWmQPDdM/Eap4D5F/RAM
+         9PRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706918976; x=1707523776;
+        d=1e100.net; s=20230601; t=1706918978; x=1707523778;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=lcHhkIfCfD5wroHUDfoUCPFb/M+i7HRMkWQ8hVkrcXw=;
-        b=K4Ako+nfgmOOjFRCVjw6p413yZLuobZ4rLL6gR2uWHb9Sg3pmlyEMm2O85a9PGIXW9
-         A1IsXkRW8OvkUMht+E1sQ8ETuGYr1lxVRNv8l8khjukQhdu1w8ThJR/l0AzFhVccMI/L
-         0gUKc2IJ8/0thtj/ukL4bQBG7sYdpP7w6orbdxsH7PQvpsHn+SciQLBA2zadhTM5IRB4
-         EpDog1ySmlZcem+CCY1TA2o0kxRk60PtjHqXbT8ZvtBK+S9q3bkzO0/BfJmIWUkmTbBy
-         e1KUs1BeJ4m62B9OEnOSTw7VF6YNl1M2IqeBytqilyVLA176GiTCLg8S+fJwZ8BidA2m
-         qZvQ==
-X-Gm-Message-State: AOJu0YzY9tcKzNKxqym2Eb5BeZEwBvA4E5OZjBpLHFGqAkKSiZrTk0ld
-	g3bw5ew3aWHQTJjDLhqyYcUyzTGZyiMlX1c9pOvAWo6d2eg7bH9LTi2LxfGMKeZ8Ab3T8irI+dD
-	DPQ==
-X-Google-Smtp-Source: AGHT+IGtjEyKQ/FlB/DvAbBZVs/io1W203brj4qiUGr0nkUTsq2oZkXZt8ym+VdrslT7p3urS8wYDG4U4Bk=
+        bh=XX/qPWiFzcrNc98rmsyPZwe0j7yaMHMPDZjofeW64Pk=;
+        b=KPUnbsfzg3nvqUZk4ktiy2DMWXKQ+f9CZhAIQUXExNbJ8Pm3P4BAobYB4ESX3Q3CQ6
+         1XRncaiTk9oQ/A4vJ62lxZNEtllIWHCMwpJa3LR7YfXgnhFqDKrOphtmhe9/IZ03evhR
+         PEkET1nJefGkVB/qbT55DV7qsWi9Ohaus98LTumq9BSoSkDkzsrvYgIFNCmbETqiOIik
+         wo0924yBHDtkvGpUR4996NDgPu1GH5zu/dQMFxx0LcFzlGn9w0TzP1qq0XGX6ZZe+nSp
+         pfhJSSnQXEYMD7UOZyMkSGAKmlkUaSmhfAPFlnv94dhTBdnll5U7ALMFh5+8Sy9km3+V
+         24iQ==
+X-Gm-Message-State: AOJu0YwKeg2co5I49rehDDMGfr2i2WEKMXx4Vb+Pzgqik2lm87toEeBA
+	5oMOul+yqwQhY3/9Q1ktT5d+CvACDG//vm3waZvEXiW9FQOhBkSmR7gbH41OMfhjva/YwU4aH6V
+	E3g==
+X-Google-Smtp-Source: AGHT+IGBKIXyRsAwi5cacC2RTa4GkVM2EUkU98GzGDTFoqRDoIOEQUQo2SlZwq83sHOJV7drFveoG9mVQK8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:628e:0:b0:5d8:be12:fa64 with SMTP id
- f14-20020a65628e000000b005d8be12fa64mr45328pgv.0.1706918976544; Fri, 02 Feb
- 2024 16:09:36 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1085:b0:dc6:e5e9:f3af with SMTP id
+ v5-20020a056902108500b00dc6e5e9f3afmr1242765ybu.9.1706918978596; Fri, 02 Feb
+ 2024 16:09:38 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  2 Feb 2024 16:09:14 -0800
+Date: Fri,  2 Feb 2024 16:09:15 -0800
 In-Reply-To: <20240203000917.376631-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -60,9 +60,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240203000917.376631-1-seanjc@google.com>
 X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
-Message-ID: <20240203000917.376631-9-seanjc@google.com>
-Subject: [PATCH v8 08/10] KVM: selftests: Add library for creating and
- interacting with SEV guests
+Message-ID: <20240203000917.376631-10-seanjc@google.com>
+Subject: [PATCH v8 09/10] KVM: selftests: Use the SEV library APIs in the
+ intra-host migration test
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Anup Patel <anup@brainfault.org>, 
@@ -78,410 +78,146 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Michael Roth <michael.roth@amd.com>, Peter Gonda <pgonda@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Peter Gonda <pgonda@google.com>
+Port the existing intra-host SEV(-ES) migration test to the recently added
+SEV library, which handles much of the boilerplate needed to create and
+configure SEV guests.
 
-Add a library/APIs for creating and interfacing with SEV guests, all of
-which need some amount of common functionality, e.g. an open file handle
-for the SEV driver (/dev/sev), ioctl() wrappers to pass said file handle
-to KVM, tracking of the C-bit, etc.
-
-Add an x86-specific hook to initialize address properties, a.k.a. the
-location of the C-bit.  An arch specific hook is rather gross, but x86
-already has a dedicated #ifdef-protected kvm_get_cpu_address_width() hook,
-i.e. the ugliest code already exists.
-
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Vishal Annapurve <vannapurve@google.com>
-Cc: Ackerly Tng <ackerleytng@google.com>
-cc: Andrew Jones <andrew.jones@linux.dev>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Michael Roth <michael.roth@amd.com>
-Originally-by: Michael Roth <michael.roth@amd.com>
-Signed-off-by: Peter Gonda <pgonda@google.com>
-Co-developed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/include/x86_64/kvm_util_arch.h        |   2 +
- .../selftests/kvm/include/x86_64/processor.h  |   8 ++
- .../selftests/kvm/include/x86_64/sev.h        | 110 +++++++++++++++
- tools/testing/selftests/kvm/lib/kvm_util.c    |   1 +
- .../selftests/kvm/lib/x86_64/processor.c      |  17 +++
- tools/testing/selftests/kvm/lib/x86_64/sev.c  | 128 ++++++++++++++++++
- 7 files changed, 267 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/include/x86_64/sev.h
- create mode 100644 tools/testing/selftests/kvm/lib/x86_64/sev.c
+ .../selftests/kvm/x86_64/sev_migrate_tests.c  | 67 ++++++-------------
+ 1 file changed, 21 insertions(+), 46 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index ce58098d80fd..169b6ee8f733 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -38,6 +38,7 @@ LIBKVM_x86_64 += lib/x86_64/hyperv.c
- LIBKVM_x86_64 += lib/x86_64/memstress.c
- LIBKVM_x86_64 += lib/x86_64/pmu.c
- LIBKVM_x86_64 += lib/x86_64/processor.c
-+LIBKVM_x86_64 += lib/x86_64/sev.c
- LIBKVM_x86_64 += lib/x86_64/svm.c
- LIBKVM_x86_64 += lib/x86_64/ucall.c
- LIBKVM_x86_64 += lib/x86_64/vmx.c
-diff --git a/tools/testing/selftests/kvm/include/x86_64/kvm_util_arch.h b/tools/testing/selftests/kvm/include/x86_64/kvm_util_arch.h
-index 17bb38236d97..205ed788aeb8 100644
---- a/tools/testing/selftests/kvm/include/x86_64/kvm_util_arch.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/kvm_util_arch.h
-@@ -8,6 +8,8 @@
- struct kvm_vm_arch {
- 	uint64_t c_bit;
- 	uint64_t s_bit;
-+	int sev_fd;
-+	bool is_pt_protected;
- };
- 
- static inline bool __vm_arch_has_protected_memory(struct kvm_vm_arch *arch)
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 0f4792083d01..3bd03b088dda 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -23,6 +23,12 @@
- extern bool host_cpu_is_intel;
- extern bool host_cpu_is_amd;
- 
-+enum vm_guest_x86_subtype {
-+	VM_SUBTYPE_NONE = 0,
-+	VM_SUBTYPE_SEV,
-+	VM_SUBTYPE_SEV_ES,
-+};
-+
- /* Forced emulation prefix, used to invoke the emulator unconditionally. */
- #define KVM_FEP "ud2; .byte 'k', 'v', 'm';"
- 
-@@ -276,6 +282,7 @@ struct kvm_x86_cpu_property {
- #define X86_PROPERTY_MAX_EXT_LEAF		KVM_X86_CPU_PROPERTY(0x80000000, 0, EAX, 0, 31)
- #define X86_PROPERTY_MAX_PHY_ADDR		KVM_X86_CPU_PROPERTY(0x80000008, 0, EAX, 0, 7)
- #define X86_PROPERTY_MAX_VIRT_ADDR		KVM_X86_CPU_PROPERTY(0x80000008, 0, EAX, 8, 15)
-+#define X86_PROPERTY_SEV_C_BIT			KVM_X86_CPU_PROPERTY(0x8000001F, 0, EBX, 0, 5)
- #define X86_PROPERTY_PHYS_ADDR_REDUCTION	KVM_X86_CPU_PROPERTY(0x8000001F, 0, EBX, 6, 11)
- 
- #define X86_PROPERTY_MAX_CENTAUR_LEAF		KVM_X86_CPU_PROPERTY(0xC0000000, 0, EAX, 0, 31)
-@@ -1093,6 +1100,7 @@ do {											\
- } while (0)
- 
- void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits);
-+void kvm_init_vm_address_properties(struct kvm_vm *vm);
- bool vm_is_unrestricted_guest(struct kvm_vm *vm);
- 
- struct ex_regs {
-diff --git a/tools/testing/selftests/kvm/include/x86_64/sev.h b/tools/testing/selftests/kvm/include/x86_64/sev.h
-new file mode 100644
-index 000000000000..262b16f574e9
---- /dev/null
-+++ b/tools/testing/selftests/kvm/include/x86_64/sev.h
-@@ -0,0 +1,110 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Helpers used for SEV guests
-+ *
-+ */
-+#ifndef SELFTEST_KVM_SEV_H
-+#define SELFTEST_KVM_SEV_H
-+
-+#include <stdint.h>
-+#include <stdbool.h>
-+
-+#include "linux/psp-sev.h"
-+
-+#include "kvm_util.h"
-+#include "svm_util.h"
-+#include "processor.h"
-+
-+#define SEV_FW_REQ_VER_MAJOR 0
-+#define SEV_FW_REQ_VER_MINOR 17
-+
-+enum sev_guest_state {
-+	SEV_GUEST_STATE_UNINITIALIZED = 0,
-+	SEV_GUEST_STATE_LAUNCH_UPDATE,
-+	SEV_GUEST_STATE_LAUNCH_SECRET,
-+	SEV_GUEST_STATE_RUNNING,
-+};
-+
-+#define SEV_POLICY_NO_DBG	(1UL << 0)
-+#define SEV_POLICY_ES		(1UL << 2)
-+
-+bool is_kvm_sev_supported(void);
-+
-+void sev_vm_launch(struct kvm_vm *vm, uint32_t policy);
-+void sev_vm_launch_measure(struct kvm_vm *vm, uint8_t *measurement);
-+void sev_vm_launch_finish(struct kvm_vm *vm);
-+
-+struct kvm_vm *vm_sev_create_with_one_vcpu(uint32_t policy, void *guest_code,
-+					   struct kvm_vcpu **cpu);
-+
-+kvm_static_assert(SEV_RET_SUCCESS == 0);
-+
-+/*
-+ * The KVM_MEMORY_ENCRYPT_OP uAPI is utter garbage and takes an "unsigned long"
-+ * instead of a proper struct.  The size of the parameter is embedded in the
-+ * ioctl number, i.e. is ABI and thus immutable.  Hack around the mess by
-+ * creating an overlay to pass in an "unsigned long" without a cast (casting
-+ * will make the compiler unhappy due to dereferencing an aliased pointer).
-+ */
-+#define __vm_sev_ioctl(vm, cmd, arg)					\
-+({									\
-+	int r;								\
-+									\
-+	union {								\
-+		struct kvm_sev_cmd c;					\
-+		unsigned long raw;					\
-+	} sev_cmd = { .c = {						\
-+		.id = (cmd),						\
-+		.data = (uint64_t)(arg),				\
-+		.sev_fd = (vm)->arch.sev_fd,				\
-+	} };								\
-+									\
-+	r = __vm_ioctl(vm, KVM_MEMORY_ENCRYPT_OP, &sev_cmd.raw);	\
-+	r ?: sev_cmd.c.error;						\
-+})
-+
-+#define vm_sev_ioctl(vm, cmd, arg)					\
-+({									\
-+	int ret = __vm_sev_ioctl(vm, cmd, arg);				\
-+									\
-+	__TEST_ASSERT_VM_VCPU_IOCTL(!ret, #cmd,	ret, vm);		\
-+})
-+
-+static inline void sev_vm_init(struct kvm_vm *vm)
-+{
-+	vm->arch.sev_fd = open_sev_dev_path_or_exit();
-+
-+	vm_sev_ioctl(vm, KVM_SEV_INIT, NULL);
-+}
-+
-+
-+static inline void sev_es_vm_init(struct kvm_vm *vm)
-+{
-+	vm->arch.sev_fd = open_sev_dev_path_or_exit();
-+
-+	vm_sev_ioctl(vm, KVM_SEV_ES_INIT, NULL);
-+}
-+
-+static inline void sev_register_encrypted_memory(struct kvm_vm *vm,
-+						 struct userspace_mem_region *region)
-+{
-+	struct kvm_enc_region range = {
-+		.addr = region->region.userspace_addr,
-+		.size = region->region.memory_size,
-+	};
-+
-+	vm_ioctl(vm, KVM_MEMORY_ENCRYPT_REG_REGION, &range);
-+}
-+
-+static inline void sev_launch_update_data(struct kvm_vm *vm, vm_paddr_t gpa,
-+					  uint64_t size)
-+{
-+	struct kvm_sev_launch_update_data update_data = {
-+		.uaddr = (unsigned long)addr_gpa2hva(vm, gpa),
-+		.len = size,
-+	};
-+
-+	vm_sev_ioctl(vm, KVM_SEV_LAUNCH_UPDATE_DATA, &update_data);
-+}
-+
-+#endif /* SELFTEST_KVM_SEV_H */
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 19511137d1ae..b2262b5fad9e 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -317,6 +317,7 @@ struct kvm_vm *____vm_create(struct vm_shape shape)
- 	case VM_MODE_PXXV48_4K:
- #ifdef __x86_64__
- 		kvm_get_cpu_address_width(&vm->pa_bits, &vm->va_bits);
-+		kvm_init_vm_address_properties(vm);
- 		/*
- 		 * Ignore KVM support for 5-level paging (vm->va_bits == 57),
- 		 * it doesn't take effect unless a CR4.LA57 is set, which it
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 6c1d2c0ec584..aa92220bf5da 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -9,6 +9,7 @@
+diff --git a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
+index a49828adf294..d6f7428e42c6 100644
+--- a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
++++ b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
+@@ -10,11 +10,9 @@
  #include "test_util.h"
  #include "kvm_util.h"
  #include "processor.h"
+-#include "svm_util.h"
 +#include "sev.h"
+ #include "kselftest.h"
  
- #ifndef NUM_INTERRUPTS
- #define NUM_INTERRUPTS 256
-@@ -278,6 +279,9 @@ uint64_t *__vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr,
+-#define SEV_POLICY_ES 0b100
+-
+ #define NR_MIGRATE_TEST_VCPUS 4
+ #define NR_MIGRATE_TEST_VMS 3
+ #define NR_LOCK_TESTING_THREADS 3
+@@ -22,46 +20,24 @@
+ 
+ bool have_sev_es;
+ 
+-static int __sev_ioctl(int vm_fd, int cmd_id, void *data, __u32 *fw_error)
+-{
+-	struct kvm_sev_cmd cmd = {
+-		.id = cmd_id,
+-		.data = (uint64_t)data,
+-		.sev_fd = open_sev_dev_path_or_exit(),
+-	};
+-	int ret;
+-
+-	ret = ioctl(vm_fd, KVM_MEMORY_ENCRYPT_OP, &cmd);
+-	*fw_error = cmd.error;
+-	return ret;
+-}
+-
+-static void sev_ioctl(int vm_fd, int cmd_id, void *data)
+-{
+-	int ret;
+-	__u32 fw_error;
+-
+-	ret = __sev_ioctl(vm_fd, cmd_id, data, &fw_error);
+-	TEST_ASSERT(ret == 0 && fw_error == SEV_RET_SUCCESS,
+-		    "%d failed: return code: %d, errno: %d, fw error: %d",
+-		    cmd_id, ret, errno, fw_error);
+-}
+-
+ static struct kvm_vm *sev_vm_create(bool es)
  {
- 	uint64_t *pml4e, *pdpe, *pde;
+ 	struct kvm_vm *vm;
+-	struct kvm_sev_launch_start start = { 0 };
+ 	int i;
  
-+	TEST_ASSERT(!vm->arch.is_pt_protected,
-+		    "Walking page tables of protected guests is impossible");
-+
- 	TEST_ASSERT(*level >= PG_LEVEL_NONE && *level < PG_LEVEL_NUM,
- 		    "Invalid PG_LEVEL_* '%d'", *level);
- 
-@@ -573,6 +577,11 @@ void kvm_arch_vm_post_create(struct kvm_vm *vm)
- 	vm_create_irqchip(vm);
- 	sync_global_to_guest(vm, host_cpu_is_intel);
- 	sync_global_to_guest(vm, host_cpu_is_amd);
-+
-+	if (vm->subtype == VM_SUBTYPE_SEV)
+ 	vm = vm_create_barebones();
+-	sev_ioctl(vm->fd, es ? KVM_SEV_ES_INIT : KVM_SEV_INIT, NULL);
++	if (!es)
 +		sev_vm_init(vm);
-+	else if (vm->subtype == VM_SUBTYPE_SEV_ES)
++	else
 +		sev_es_vm_init(vm);
- }
- 
- struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
-@@ -1063,6 +1072,14 @@ void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits)
- 	}
- }
- 
-+void kvm_init_vm_address_properties(struct kvm_vm *vm)
-+{
-+	if (vm->subtype == VM_SUBTYPE_SEV) {
-+		vm->arch.c_bit = BIT_ULL(this_cpu_property(X86_PROPERTY_SEV_C_BIT));
-+		vm->gpa_tag_mask = vm->arch.c_bit;
-+	}
-+}
 +
- static void set_idt_entry(struct kvm_vm *vm, int vector, unsigned long addr,
- 			  int dpl, unsigned short selector)
+ 	for (i = 0; i < NR_MIGRATE_TEST_VCPUS; ++i)
+ 		__vm_vcpu_add(vm, i);
++
++	sev_vm_launch(vm, es ? SEV_POLICY_ES : 0);
++
+ 	if (es)
+-		start.policy |= SEV_POLICY_ES;
+-	sev_ioctl(vm->fd, KVM_SEV_LAUNCH_START, &start);
+-	if (es)
+-		sev_ioctl(vm->fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL);
++		vm_sev_ioctl(vm, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL);
+ 	return vm;
+ }
+ 
+@@ -181,7 +157,7 @@ static void test_sev_migrate_parameters(void)
+ 	sev_vm = sev_vm_create(/* es= */ false);
+ 	sev_es_vm = sev_vm_create(/* es= */ true);
+ 	sev_es_vm_no_vmsa = vm_create_barebones();
+-	sev_ioctl(sev_es_vm_no_vmsa->fd, KVM_SEV_ES_INIT, NULL);
++	sev_es_vm_init(sev_es_vm_no_vmsa);
+ 	__vm_vcpu_add(sev_es_vm_no_vmsa, 1);
+ 
+ 	ret = __sev_migrate_from(sev_vm, sev_es_vm);
+@@ -230,13 +206,13 @@ static void sev_mirror_create(struct kvm_vm *dst, struct kvm_vm *src)
+ 	TEST_ASSERT(!ret, "Copying context failed, ret: %d, errno: %d", ret, errno);
+ }
+ 
+-static void verify_mirror_allowed_cmds(int vm_fd)
++static void verify_mirror_allowed_cmds(struct kvm_vm *vm)
  {
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/sev.c b/tools/testing/selftests/kvm/lib/x86_64/sev.c
-new file mode 100644
-index 000000000000..f37b1a7247ad
---- /dev/null
-+++ b/tools/testing/selftests/kvm/lib/x86_64/sev.c
-@@ -0,0 +1,128 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <stdint.h>
-+#include <stdbool.h>
-+
-+#include "sev.h"
-+
-+bool is_kvm_sev_supported(void)
-+{
-+	int sev_fd = open_sev_dev_path_or_exit();
-+	struct sev_user_data_status sev_status;
-+
-+	struct sev_issue_cmd arg = {
-+		.cmd = SEV_PLATFORM_STATUS,
-+		.data = (unsigned long)&sev_status,
-+	};
-+
-+	kvm_ioctl(sev_fd, SEV_ISSUE_CMD, &arg);
-+	close(sev_fd);
-+
-+	return sev_status.api_major > SEV_FW_REQ_VER_MAJOR ||
-+	       (sev_status.api_major == SEV_FW_REQ_VER_MAJOR &&
-+		sev_status.api_minor >= SEV_FW_REQ_VER_MINOR);
-+}
-+
-+/*
-+ * sparsebit_next_clear() can return 0 if [x, 2**64-1] are all set, and the
-+ * -1 would then cause an underflow back to 2**64 - 1. This is expected and
-+ * correct.
-+ *
-+ * If the last range in the sparsebit is [x, y] and we try to iterate,
-+ * sparsebit_next_set() will return 0, and sparsebit_next_clear() will try
-+ * and find the first range, but that's correct because the condition
-+ * expression would cause us to quit the loop.
-+ */
-+static void encrypt_region(struct kvm_vm *vm, struct userspace_mem_region *region)
-+{
-+	const struct sparsebit *protected_phy_pages = region->protected_phy_pages;
-+	const vm_paddr_t gpa_base = region->region.guest_phys_addr;
-+	const sparsebit_idx_t lowest_page_in_region = gpa_base >> vm->page_shift;
-+	sparsebit_idx_t i, j;
-+
-+	if (!sparsebit_any_set(protected_phy_pages))
-+		return;
-+
-+	sev_register_encrypted_memory(vm, region);
-+
-+	sparsebit_for_each_set_range(protected_phy_pages, i, j) {
-+		const uint64_t size = (j - i + 1) * vm->page_size;
-+		const uint64_t offset = (i - lowest_page_in_region) * vm->page_size;
-+
-+		sev_launch_update_data(vm, gpa_base + offset, size);
-+	}
-+}
-+
-+void sev_vm_launch(struct kvm_vm *vm, uint32_t policy)
-+{
-+	struct kvm_sev_launch_start launch_start = {
-+		.policy = policy,
-+	};
-+	struct userspace_mem_region *region;
-+	struct kvm_sev_guest_status status;
-+	int ctr;
-+
-+	vm_sev_ioctl(vm, KVM_SEV_LAUNCH_START, &launch_start);
+ 	struct kvm_sev_guest_status status;
++	int cmd_id;
+ 
+-	for (int cmd_id = KVM_SEV_INIT; cmd_id < KVM_SEV_NR_MAX; ++cmd_id) {
++	for (cmd_id = KVM_SEV_INIT; cmd_id < KVM_SEV_NR_MAX; ++cmd_id) {
+ 		int ret;
+-		__u32 fw_error;
+ 
+ 		/*
+ 		 * These commands are allowed for mirror VMs, all others are
+@@ -256,14 +232,13 @@ static void verify_mirror_allowed_cmds(int vm_fd)
+ 		 * These commands should be disallowed before the data
+ 		 * parameter is examined so NULL is OK here.
+ 		 */
+-		ret = __sev_ioctl(vm_fd, cmd_id, NULL, &fw_error);
+-		TEST_ASSERT(
+-			ret == -1 && errno == EINVAL,
+-			"Should not be able call command: %d. ret: %d, errno: %d",
+-			cmd_id, ret, errno);
++		ret = __vm_sev_ioctl(vm, cmd_id, NULL);
++		TEST_ASSERT(ret == -1 && errno == EINVAL,
++			    "Should not be able call command: %d. ret: %d, errno: %d",
++			    cmd_id, ret, errno);
+ 	}
+ 
+-	sev_ioctl(vm_fd, KVM_SEV_GUEST_STATUS, &status);
 +	vm_sev_ioctl(vm, KVM_SEV_GUEST_STATUS, &status);
-+
-+	TEST_ASSERT_EQ(status.policy, policy);
-+	TEST_ASSERT_EQ(status.state, SEV_GUEST_STATE_LAUNCH_UPDATE);
-+
-+	hash_for_each(vm->regions.slot_hash, ctr, region, slot_node)
-+		encrypt_region(vm, region);
-+
-+	vm->arch.is_pt_protected = true;
-+}
-+
-+void sev_vm_launch_measure(struct kvm_vm *vm, uint8_t *measurement)
-+{
-+	struct kvm_sev_launch_measure launch_measure;
-+	struct kvm_sev_guest_status guest_status;
-+
-+	launch_measure.len = 256;
-+	launch_measure.uaddr = (__u64)measurement;
-+	vm_sev_ioctl(vm, KVM_SEV_LAUNCH_MEASURE, &launch_measure);
-+
-+	vm_sev_ioctl(vm, KVM_SEV_GUEST_STATUS, &guest_status);
-+	TEST_ASSERT_EQ(guest_status.state, SEV_GUEST_STATE_LAUNCH_SECRET);
-+}
-+
-+void sev_vm_launch_finish(struct kvm_vm *vm)
-+{
-+	struct kvm_sev_guest_status status;
-+
-+	vm_sev_ioctl(vm, KVM_SEV_GUEST_STATUS, &status);
-+	TEST_ASSERT(status.state == SEV_GUEST_STATE_LAUNCH_UPDATE ||
-+		    status.state == SEV_GUEST_STATE_LAUNCH_SECRET,
-+		    "Unexpected guest state: %d", status.state);
-+
-+	vm_sev_ioctl(vm, KVM_SEV_LAUNCH_FINISH, NULL);
-+
-+	vm_sev_ioctl(vm, KVM_SEV_GUEST_STATUS, &status);
-+	TEST_ASSERT_EQ(status.state, SEV_GUEST_STATE_RUNNING);
-+}
-+
-+struct kvm_vm *vm_sev_create_with_one_vcpu(uint32_t policy, void *guest_code,
-+					   struct kvm_vcpu **cpu)
-+{
-+	struct vm_shape shape = {
-+		.type = VM_TYPE_DEFAULT,
-+		.mode = VM_MODE_DEFAULT,
-+		.subtype = VM_SUBTYPE_SEV,
-+	};
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *cpus[1];
-+	uint8_t measurement[512];
-+
-+	vm = __vm_create_with_vcpus(shape, 1, 0, guest_code, cpus);
-+	*cpu = cpus[0];
-+
-+	sev_vm_launch(vm, policy);
-+
-+	/* TODO: Validate the measurement is as expected. */
-+	sev_vm_launch_measure(vm, measurement);
-+
-+	sev_vm_launch_finish(vm);
-+
-+	return vm;
-+}
+ }
+ 
+ static void test_sev_mirror(bool es)
+@@ -281,9 +256,9 @@ static void test_sev_mirror(bool es)
+ 		__vm_vcpu_add(dst_vm, i);
+ 
+ 	if (es)
+-		sev_ioctl(dst_vm->fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL);
++		vm_sev_ioctl(dst_vm, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL);
+ 
+-	verify_mirror_allowed_cmds(dst_vm->fd);
++	verify_mirror_allowed_cmds(dst_vm);
+ 
+ 	kvm_vm_free(src_vm);
+ 	kvm_vm_free(dst_vm);
 -- 
 2.43.0.594.gd9cf4e227d-goog
 
