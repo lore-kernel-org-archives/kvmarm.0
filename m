@@ -1,135 +1,70 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9AEC7F7C4;
-	Sat,  3 Feb 2024 12:34:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC26168AF
+	for <kvmarm@lists.linux.dev>; Sat,  3 Feb 2024 22:27:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706963642; cv=none; b=KCDltrnfJjDSuKJKxUME2mqNEaFYvtvQ5YDoluWBOUmF4AWeHtpZg7GgJXN17nTgQSDBEhbeEWPyTxkVaftCpcm34CkBSrj6e27Fj2jpsGqfxQ/VQ3pm9cw3VJecrsEFuAzp7Dl9C/11aI2p5fgdveDSiTX/z6KSzMJLUqn5pHk=
+	t=1706999235; cv=none; b=q8x6Dft//Rajqm0CPSQZ/vvWbKmBNRtc78SCrx+AGVWjV77jMm2vcTtQMtQNLm2oJkBZTaYLy1P5Nta+cUeRasYL0rBBcs756hWEdx39cr1X4tcH6Sh53Xhl+EPWR9OW6HW9057VXWrZEpSbjlobqlSkLFrIKzxGYs6EP2PAiy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706963642; c=relaxed/simple;
-	bh=WXqbYsgYYOXFEeMs+roJ3AXRYBhuL60ozPF+o7O4bAk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=J0x4Q2/WSGuE4Gggb/RW1lKOpYVeFpOhQk2Pnpk/rt7+MXSnnUuRNbd5TtnexsVURHUPatuj4INhCIVWkXDTFk++qA/j55HOY4505t/GNtqwKMCbSfoIa46L/DZYc0cwsZQbFX4jkO7jTHNwo6UkcqN/02EJYmIlUuNIQaeoGIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F78PhGGK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1706999235; c=relaxed/simple;
+	bh=aahhH/EVTyCGj2vPjj00iOsqui8LSXEZU/AjnDeMmV8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a51mzNBzlAqAUPX8/p6xNGkdPqJaPXyLrpPaIRPjyPm5AZQB/Mqdxduk4MLG7tHOXbcRuTK8JQI35/wdLNtzvfkF2eIfEEm6pA/yOd2I7Xjv6NUVD3mfl3ayGDTyRZt7WxHNiFRCZyhxi+6cbV84HS4H7ZKSykU5uyPeIVIvd8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Y0Q6cJ4s; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F78PhGGK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35D85C43394;
-	Sat,  3 Feb 2024 12:33:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706963641;
-	bh=WXqbYsgYYOXFEeMs+roJ3AXRYBhuL60ozPF+o7O4bAk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=F78PhGGK2tKTlc1p2op6t75h6sAseztGvobKzgGSABUqePNhCLv6h7b0MXYZozVvf
-	 TMoM8VKK0ZO5F2e6/66jeGgtskS0UMHEiCAZUXqg+6vxYh1xgH6tpBdIJiNPgo7YpK
-	 EnaGYjMB/A//4+Sjcv0gbyN2txDslqcYGoLlVah+34dTkNIBFZPTZDpK5wR3pQL70I
-	 Dzxx0jU1Bjxx/D0JoI4d/HNBk5LzI9/lGYtAoE48s/fM91juriLFdFQwpik4auJ+g4
-	 1D/HN4P1oVK7bX97yoTav7bFx3jIr53qvhASYz8zdLRC/yDEo0s7d2QHFhc9ilv97S
-	 gLO6O0zcUVi6Q==
-From: Mark Brown <broonie@kernel.org>
-Date: Sat, 03 Feb 2024 12:26:04 +0000
-Subject: [PATCH v8 38/38] kselftest: Provide shadow stack enable helpers
- for arm64
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Y0Q6cJ4s"
+Date: Sat, 3 Feb 2024 14:26:55 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706999230;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=k36R5UvzRPlrw/DQ0hgA6MvLeuxxDoXMOSsEOQMkqGY=;
+	b=Y0Q6cJ4sMvlntRaHHNrMEuzR8PdJnVFjqNXoAeWY0ZHZ85WWe7PTTOBYj0jTUToge1hdk+
+	yayBlCurOdjKsqGcQP1i05CKEF3ItKTpUSElXRxcSOXUIvBMnqqZR4jRVz89W+ksG8PUlV
+	5JIKcHITTUIWnZrEbGqgrsADtBWqLRU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: Fix GUEST_PRINTF() format warnings in
+ ARM code
+Message-ID: <Zb69ryhz_mDw9UK4@linux.dev>
+References: <20240202234603.366925-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240203-arm64-gcs-v8-38-c9fec77673ef@kernel.org>
-References: <20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org>
-In-Reply-To: <20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Andrew Morton <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, 
- Oleg Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, 
- Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, 
- "Rick P. Edgecombe" <rick.p.edgecombe@intel.com>, 
- Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, 
- Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Cc: "H.J. Lu" <hjl.tools@gmail.com>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- Florian Weimer <fweimer@redhat.com>, Christian Brauner <brauner@kernel.org>, 
- Thiago Jung Bauermann <thiago.bauermann@linaro.org>, 
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
- kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
- linux-arch@vger.kernel.org, linux-mm@kvack.org, 
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-riscv@lists.infradead.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.13-dev-a684c
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2372; i=broonie@kernel.org;
- h=from:subject:message-id; bh=WXqbYsgYYOXFEeMs+roJ3AXRYBhuL60ozPF+o7O4bAk=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBlvjDvM7ObtGoCDxxiAl89DYa6RzxdLnWQy+FkForz
- aUSU5kiJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZb4w7wAKCRAk1otyXVSH0NEICA
- CCvybEtXLigY0Lceu5RSwEZ8U+9W6svq5+knPV3mZQY4TSxy9Yy4lyeVk8Pv21v/12qFvp6uqzLp0g
- k6+WV9GRZ/Pqfacx9BQ00Oc/rfhKVczK0MsQz3mDGVuLKbJ4qSNpb8/dqtFqZr2ObsOcGe2ZV7T/CG
- ALJt/tNjptHMxvEWIyQI3z/Smo1ZEdn4C7yaVXufiGkwDmFEB8wquT7O7Dh3npGDpxL78q4rAtfJy+
- 8dPSdobFohDZMcnrMhjgw8Klf2bbVp8Sut5M7DVJ/t3nRkqxRoYhyVFTjjG6NdjDWhhL+IKQdltpt4
- 8U4+ItNFhfAZrHX27/JjU9V30WRy/h
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240202234603.366925-1-seanjc@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Allow test programs to use the shadow stack helpers on arm64.
+On Fri, Feb 02, 2024 at 03:46:03PM -0800, Sean Christopherson wrote:
+> Fix a pile of -Wformat warnings in the KVM ARM selftests code, almost all
+> of which are benign "long" versus "long long" issues (selftests are 64-bit
+> only, and the guest printf code treats "ll" the same as "l").  The code
+> itself isn't problematic, but the warnings make it impossible to build ARM
+> selftests with -Werror, which does detect real issues from time to time.
+> 
+> Opportunistically have GUEST_ASSERT_BITMAP_REG() interpret set_expected,
+> which is a bool, as an unsigned decimal value, i.e. have it print '0' or
+> '1' instead of '0x0' or '0x1'.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/ksft_shstk.h | 37 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+This all looks good to me. Just want to confirm before applying: you're
+not planning any other patches that'll go through your tree that depend
+on this right?
 
-diff --git a/tools/testing/selftests/ksft_shstk.h b/tools/testing/selftests/ksft_shstk.h
-index 85d0747c1802..223e24b4eb80 100644
---- a/tools/testing/selftests/ksft_shstk.h
-+++ b/tools/testing/selftests/ksft_shstk.h
-@@ -50,6 +50,43 @@ static inline __attribute__((always_inline)) void enable_shadow_stack(void)
- 
- #endif
- 
-+#ifdef __aarch64__
-+#define PR_SET_SHADOW_STACK_STATUS      72
-+# define PR_SHADOW_STACK_ENABLE         (1UL << 0)
-+
-+#define my_syscall2(num, arg1, arg2)                                          \
-+({                                                                            \
-+	register long _num  __asm__ ("x8") = (num);                           \
-+	register long _arg1 __asm__ ("x0") = (long)(arg1);                    \
-+	register long _arg2 __asm__ ("x1") = (long)(arg2);                    \
-+	register long _arg3 __asm__ ("x2") = 0;                               \
-+	register long _arg4 __asm__ ("x3") = 0;                               \
-+	register long _arg5 __asm__ ("x4") = 0;                               \
-+	                                                                      \
-+	__asm__  volatile (                                                   \
-+		"svc #0\n"                                                    \
-+		: "=r"(_arg1)                                                 \
-+		: "r"(_arg1), "r"(_arg2),                                     \
-+		  "r"(_arg3), "r"(_arg4),                                     \
-+		  "r"(_arg5), "r"(_num)					      \
-+		: "memory", "cc"                                              \
-+	);                                                                    \
-+	_arg1;                                                                \
-+})
-+
-+#define ENABLE_SHADOW_STACK
-+static inline __attribute__((always_inline))  void enable_shadow_stack(void)
-+{
-+	int ret;
-+
-+	ret = my_syscall2(__NR_prctl, PR_SET_SHADOW_STACK_STATUS,
-+			  PR_SHADOW_STACK_ENABLE);
-+	if (ret == 0)
-+		shadow_stack_enabled = true;
-+}
-+
-+#endif
-+
- #ifndef __NR_map_shadow_stack
- #define __NR_map_shadow_stack 453
- #endif
+Figured not since you sent it separately, but just want to be sure.
 
 -- 
-2.30.2
-
+Thanks,
+Oliver
