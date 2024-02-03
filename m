@@ -1,54 +1,54 @@
 Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B6212C814
-	for <kvmarm@lists.linux.dev>; Fri,  2 Feb 2024 23:46:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E240625
+	for <kvmarm@lists.linux.dev>; Sat,  3 Feb 2024 00:09:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706917569; cv=none; b=hYEeQiiqLz3xu8/QD6s6m0y+ApYvd4z0ERLLWQine2DdHImeapPCpAdCfy2XLUSb0VE6HZ/Q2zpGGT1XZcpzfovO8ZBPYXHXAxuqaPmA60wNuj+6DjOQ70lPA6ss7SzQFCRx8O03BCFVnXu9JuJC6crhJ6JkOLYtPUj/5VUOw8g=
+	t=1706918962; cv=none; b=KadqzqqNpeJxJH3+Kn8HNgyfWsTC5Eml6WNesWGvh7mHkkyaV9h1ynSO2ItNGOIpTRvfM706Qy34+ItKabdxTqdihkkkni3mKv9hzz46Z56Z8b2farS7gmA+GCH6n6nGH4QSEsUG40PaYMM2usgd0k1ho7mrScYIYUDaM/TIiPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706917569; c=relaxed/simple;
-	bh=tCKrGRW7WN608392SeATTvTDea2Xb4gjQNimEpRumEo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=fhtmiLZ/k1xIbzL2nPmkf+W5iB17DhQKP5jDytbwXy9ILLnAbHh6jeLzpBv2RjF1q7KMsfo4YVC+EY3quWo01HlKEXWv2EnOF5OsXJKb8xkc/K+3gIMhdECOQvJE3T2g8Y2gn8aDMRnlgQjHGSPfOR1KKlX0p9kRNM4SXiW8QrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hid88D2s; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1706918962; c=relaxed/simple;
+	bh=x1BTam7mSj4YBuat3i1LceUOU7iyCLkuBarnLQ8SIT8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nwZL0ydx0klgqXDr6O865vZ1AHoJrut0YzFuW7/6y3pPAYiwURdgjxuaZBeR1X6DtA00cvdFMz9eS11YWQ2Dffp1vHSOsG52+7SakMIT562KFq5Xw/YlxasgyZXMnQneFxP1GOKwipgjmf7RMubCbBrXcc8oCNZ52+Lc0irVd3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J4Ciu+JF; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hid88D2s"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5cfc2041cdfso2632475a12.2
-        for <kvmarm@lists.linux.dev>; Fri, 02 Feb 2024 15:46:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J4Ciu+JF"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5cdfd47de98so2914633a12.1
+        for <kvmarm@lists.linux.dev>; Fri, 02 Feb 2024 16:09:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706917566; x=1707522366; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1706918961; x=1707523761; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CadysjImRodM1JigoHu7x5dfRmrUFHW93Rcy1yZ8LIM=;
-        b=hid88D2sH5HTvjAi6422t9Z98ANlq6ROr1zjPu0M4tlJk7qJt6/ntCNHePlts5vfk5
-         M/NXir/BKLHoPwCUq6Az3Hm93ipasFOGn0Fxur8TdqiptKAejja0EebSv/y+UMUiBHZn
-         9isrOlm5w0Z5W9QG1NQWs0anaszWKNiWDRGD0HEFrQDb+CSeCmlfXBk4KVE23qkaro2m
-         0uPf0BM14Ll++E9lNEX5nHQK3ghIxZsLBKNHKclfN3notipAp+af//KM7jFL1Zk3vgdD
-         LHdumvAV45eVa4zNo4O38xkiy3jbWb4RUsHZhArv86mdMYhMLWf/2oV8NGNM6YM82+YC
-         QSwA==
+        bh=Tvzfq6Tb+/LmzZGCY47OcGl4Yg3FqwT4x8FVTh6/pw0=;
+        b=J4Ciu+JFZiERrGEaRa5IKK9Rk3itI31jEUJw3TqqQM2Lt6y6kwM0+3QZau7uFFm39V
+         xYcPvDfwswa+rCo0IUwjWMxGR6pQXJwRc02qmpj2x9lHvHzTYQLFhsD4Se5B5FYvESsO
+         G8rQ4yZUeF4BZsWZz1bnNr+QCcQEVZHvCAWbYWAFJ8piZHTTpeAhbt4FgrFc7RqsZ3/h
+         J7r03gAjEuyim2nOKa0+thBva2teIhsQrGB5M1QRRu8icmTR4B0kS2hrTZAB/22kd+Ov
+         gqDgGAUvYdyzkbus09VTSA2mni1e0UjR1m9+daJzWBDARHF2MKr5J2g2k9sUT0K4wrTT
+         MfPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706917566; x=1707522366;
+        d=1e100.net; s=20230601; t=1706918961; x=1707523761;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CadysjImRodM1JigoHu7x5dfRmrUFHW93Rcy1yZ8LIM=;
-        b=WFZ4lL3VQ0Htz2A2805jmIm8pOepgMI/F4vaxty4VYJFoo0KCT3giXm/W0injk9dlk
-         egGm2qZpNS5wN3clE6hkfBsr6jgNxxeNzqNj8kD0qfcT4B648BvO1Q6cmb7LauJ+EeRA
-         QUHGfgLIhgSkGw5A8+NSOXlVdVp67n5olBoabql27hzkWc2yWY9n0xNZJEVMj8htOY8K
-         xVb05QA5fAgdYtugk4i20ypMufnqyq3sSmKQ79I+zB4U9Zs724KQQ2p/3Z4mxTwdbCb2
-         8JW9j5qvkbCs7sT8OQuX7f50QeOeoz8OqYl4AUdgkvoGj1I4Z4i6lUvx0h/UAXnmFvI5
-         6GdA==
-X-Gm-Message-State: AOJu0YzIbkA/vJdUqbmuhbZ5h99YyKhrHq7fnOIYPFbh8fVsUw2h9yGL
-	D9e3dLdYDeWPfO7QR40CrP7SBnkPDOuMAAtFa9npt1sq1RbC12tr74LKwfT6/kjPqxGWPPyk+gk
-	v0w==
-X-Google-Smtp-Source: AGHT+IHHsr4NU54NohTBduBzv4jpgrZuqG+/Ora3WvFzNYKUDGxh0aFGIwr7FvvMQVezeC1vmX7Awhvls+8=
+        bh=Tvzfq6Tb+/LmzZGCY47OcGl4Yg3FqwT4x8FVTh6/pw0=;
+        b=fuT9FyrhLyYYRaZEjxa+3WSYCNBCK791ZvuE3Zywdi3cCp1OpwkmZXMZTKyt+MOYY2
+         W/iv07CfycKfyIJYfNRluyfWxt8b2ZmnCX0+6NWTBJ5DzZDaRe6wg873Tzdrpn3zpK2u
+         4icVULSNzOlJhP7KSQuOBRWMl+3KverbGFZAelaziUBvK9V4Sfm4aTZiNW3p1OYksnYY
+         x3qQygpyT5Sy/BCLm7bjwkDsh4gsGeWFQOI1dC9vjNpOOvEbzkBgfNlWOKCpWyzVsqlc
+         Ph2YZ3UfyGYo3rWCgLnk1T3eJBiimWSo7smLecb1Y+HTSYkJCtyi4wYmeskAS9pFZ23P
+         kW4w==
+X-Gm-Message-State: AOJu0Yxgttx4Mg/JHwnJW3pp2qAyOoX/ZfmxvYC5GlK2SwWCLDIvRsja
+	kTV7lzrwNzVS6GkCQNQlthorDIsvRbjtpnvr3pqY3UppPO+PZcr6vkfHlJm8KAbZyZcrAlBUz5s
+	YWg==
+X-Google-Smtp-Source: AGHT+IEqzXCmN6ReYMmNGcuC8mmtBhOi0vEe5B/tBx3edOgmg4Vw4BtLnbB387naOpc+iWQYiMA/3I2Kvpo=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:6e85:0:b0:5ca:439c:86ac with SMTP id
- bm5-20020a656e85000000b005ca439c86acmr132167pgb.8.1706917566148; Fri, 02 Feb
- 2024 15:46:06 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a65:670b:0:b0:5d7:9b27:8ad4 with SMTP id
+ u11-20020a65670b000000b005d79b278ad4mr18346pgf.3.1706918960728; Fri, 02 Feb
+ 2024 16:09:20 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  2 Feb 2024 15:46:03 -0800
+Date: Fri,  2 Feb 2024 16:09:06 -0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,153 +56,139 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
-Message-ID: <20240202234603.366925-1-seanjc@google.com>
-Subject: [PATCH] KVM: selftests: Fix GUEST_PRINTF() format warnings in ARM code
+Message-ID: <20240203000917.376631-1-seanjc@google.com>
+Subject: [PATCH v8 00/10] KVM: selftests: Add SEV smoke test
 From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Andrew Jones <andrew.jones@linux.dev>, Tom Lendacky <thomas.lendacky@amd.com>, 
+	Michael Roth <michael.roth@amd.com>, Peter Gonda <pgonda@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Fix a pile of -Wformat warnings in the KVM ARM selftests code, almost all
-of which are benign "long" versus "long long" issues (selftests are 64-bit
-only, and the guest printf code treats "ll" the same as "l").  The code
-itself isn't problematic, but the warnings make it impossible to build ARM
-selftests with -Werror, which does detect real issues from time to time.
+Add a basic SEV smoke test.  Unlike the intra-host migration tests, this
+one actually runs a small chunk of code in the guest.
 
-Opportunistically have GUEST_ASSERT_BITMAP_REG() interpret set_expected,
-which is a bool, as an unsigned decimal value, i.e. have it print '0' or
-'1' instead of '0x0' or '0x1'.
+v8:
+ - Undo the kvm.h uAPI breakage.
+ - Take advantage of "struct vm_shape", introduced by the guest_memfd
+   selftests, to simply tracking the SEV/SEV-ES subtypes.
+ - Rename the test to "sev_smoke_test" instead of "sev_all_boot_test",
+   as the "all" is rather nonsensical, and the test isn't booting anything
+   in the traditional sense of the word.
+ - Drop vm->protected and instead add an arch hook to query if the VM has
+   protected memory.
+ - Assert that the target memory region supports protected memory when
+   allocating protected memory.
+ - Allocate protected_phy_pages for memory regions if and only if the VM
+   supports protected memory.
+ - Rename kvm_host.h to kvm_util_arch.h, and move it to selftests/kvm where
+   it belongs.
+ - Fix up some SoB goofs.
+ - Convert the intrahost SEV/SEV-ES migration tests to use common ioctl()
+   wrappers.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
+V7
+ * https://lore.kernel.org/all/20231218161146.3554657-1-pgonda@google.com
+ * See https://github.com/sean-jc/linux/tree/x86/sev_selftests_for_peter.
+ * I kept is_pt_protected because without it the page tables are never
+ readable. Its used for the elf loading in kvm_vm_elf_load().
 
-Compile tested only, mainly because I'm rushing through things on Friday
-afternoon, not because testing on ARM is actually problematic for me.
+V6
+ * Updated SEV VM create function based on Seanjc's feedback and new
+   changes to VM creation functions.
+ * Removed pte_me_mask based on feedback.
+ * Fixed s_bit usage based on TDX
+ * Fixed bugs and took Ackerly's code for enc_region setup code.
 
- tools/testing/selftests/kvm/aarch64/arch_timer.c     |  4 ++--
- .../testing/selftests/kvm/aarch64/debug-exceptions.c |  2 +-
- tools/testing/selftests/kvm/aarch64/hypercalls.c     |  4 ++--
- .../testing/selftests/kvm/aarch64/page_fault_test.c  |  2 +-
- .../selftests/kvm/aarch64/vpmu_counter_access.c      | 12 ++++++------
- 5 files changed, 12 insertions(+), 12 deletions(-)
+V5
+ * Rebase onto seanjc@'s latest ucall pool series.
+ * More review changes based on seanjc:
+ ** use protected instead of encrypted outside of SEV specific files
+ ** Swap memcrypt struct for kvm_vm_arch arch specific struct
+ ** Make protected page table data agnostic of address bit stealing specifics
+    of SEV
+ ** Further clean up for SEV library to just vm_sev_create_one_vcpu()
+ * Due to large changes moved more authorships from mroth@ to pgonda@. Gave
+   originally-by tags to mroth@ as suggested by Seanjc for this.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index 274b8465b42a..d5e8f365aa01 100644
---- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -158,9 +158,9 @@ static void guest_validate_irq(unsigned int intid,
- 
- 	/* Basic 'timer condition met' check */
- 	__GUEST_ASSERT(xcnt >= cval,
--		       "xcnt = 0x%llx, cval = 0x%llx, xcnt_diff_us = 0x%llx",
-+		       "xcnt = 0x%lx, cval = 0x%lx, xcnt_diff_us = 0x%lx",
- 		       xcnt, cval, xcnt_diff_us);
--	__GUEST_ASSERT(xctl & CTL_ISTATUS, "xcnt = 0x%llx", xcnt);
-+	__GUEST_ASSERT(xctl & CTL_ISTATUS, "xcnt = 0x%lx", xcnt);
- 
- 	WRITE_ONCE(shared_data->nr_iter, shared_data->nr_iter + 1);
- }
-diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-index 866002917441..2582c49e525a 100644
---- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-+++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-@@ -365,7 +365,7 @@ static void guest_wp_handler(struct ex_regs *regs)
- 
- static void guest_ss_handler(struct ex_regs *regs)
- {
--	__GUEST_ASSERT(ss_idx < 4, "Expected index < 4, got '%u'", ss_idx);
-+	__GUEST_ASSERT(ss_idx < 4, "Expected index < 4, got '%lu'", ss_idx);
- 	ss_addr[ss_idx++] = regs->pc;
- 	regs->pstate |= SPSR_SS;
- }
-diff --git a/tools/testing/selftests/kvm/aarch64/hypercalls.c b/tools/testing/selftests/kvm/aarch64/hypercalls.c
-index 31f66ba97228..c62739d897d6 100644
---- a/tools/testing/selftests/kvm/aarch64/hypercalls.c
-+++ b/tools/testing/selftests/kvm/aarch64/hypercalls.c
-@@ -105,12 +105,12 @@ static void guest_test_hvc(const struct test_hvc_info *hc_info)
- 		case TEST_STAGE_HVC_IFACE_FEAT_DISABLED:
- 		case TEST_STAGE_HVC_IFACE_FALSE_INFO:
- 			__GUEST_ASSERT(res.a0 == SMCCC_RET_NOT_SUPPORTED,
--				       "a0 = 0x%lx, func_id = 0x%x, arg1 = 0x%llx, stage = %u",
-+				       "a0 = 0x%lx, func_id = 0x%x, arg1 = 0x%lx, stage = %u",
- 					res.a0, hc_info->func_id, hc_info->arg1, stage);
- 			break;
- 		case TEST_STAGE_HVC_IFACE_FEAT_ENABLED:
- 			__GUEST_ASSERT(res.a0 != SMCCC_RET_NOT_SUPPORTED,
--				       "a0 = 0x%lx, func_id = 0x%x, arg1 = 0x%llx, stage = %u",
-+				       "a0 = 0x%lx, func_id = 0x%x, arg1 = 0x%lx, stage = %u",
- 					res.a0, hc_info->func_id, hc_info->arg1, stage);
- 			break;
- 		default:
-diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-index 08a5ca5bed56..7bbd9fb5c8d6 100644
---- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-@@ -292,7 +292,7 @@ static void guest_code(struct test_desc *test)
- 
- static void no_dabt_handler(struct ex_regs *regs)
- {
--	GUEST_FAIL("Unexpected dabt, far_el1 = 0x%llx", read_sysreg(far_el1));
-+	GUEST_FAIL("Unexpected dabt, far_el1 = 0x%lx", read_sysreg(far_el1));
- }
- 
- static void no_iabt_handler(struct ex_regs *regs)
-diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-index 9d51b5691349..f8f0c655c723 100644
---- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-+++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-@@ -195,11 +195,11 @@ struct pmc_accessor pmc_accessors[] = {
- 										 \
- 	if (set_expected)							 \
- 		__GUEST_ASSERT((_tval & mask),					 \
--				"tval: 0x%lx; mask: 0x%lx; set_expected: 0x%lx", \
-+				"tval: 0x%lx; mask: 0x%lx; set_expected: %u",	 \
- 				_tval, mask, set_expected);			 \
- 	else									 \
- 		__GUEST_ASSERT(!(_tval & mask),					 \
--				"tval: 0x%lx; mask: 0x%lx; set_expected: 0x%lx", \
-+				"tval: 0x%lx; mask: 0x%lx; set_expected: %u",	 \
- 				_tval, mask, set_expected);			 \
- }
- 
-@@ -286,7 +286,7 @@ static void test_access_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
- 	acc->write_typer(pmc_idx, write_data);
- 	read_data = acc->read_typer(pmc_idx);
- 	__GUEST_ASSERT(read_data == write_data,
--		       "pmc_idx: 0x%lx; acc_idx: 0x%lx; read_data: 0x%lx; write_data: 0x%lx",
-+		       "pmc_idx: 0x%x; acc_idx: 0x%lx; read_data: 0x%lx; write_data: 0x%lx",
- 		       pmc_idx, PMC_ACC_TO_IDX(acc), read_data, write_data);
- 
- 	/*
-@@ -297,14 +297,14 @@ static void test_access_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
- 
- 	/* The count value must be 0, as it is disabled and reset */
- 	__GUEST_ASSERT(read_data == 0,
--		       "pmc_idx: 0x%lx; acc_idx: 0x%lx; read_data: 0x%lx",
-+		       "pmc_idx: 0x%x; acc_idx: 0x%lx; read_data: 0x%lx",
- 		       pmc_idx, PMC_ACC_TO_IDX(acc), read_data);
- 
- 	write_data = read_data + pmc_idx + 0x12345;
- 	acc->write_cntr(pmc_idx, write_data);
- 	read_data = acc->read_cntr(pmc_idx);
- 	__GUEST_ASSERT(read_data == write_data,
--		       "pmc_idx: 0x%lx; acc_idx: 0x%lx; read_data: 0x%lx; write_data: 0x%lx",
-+		       "pmc_idx: 0x%x; acc_idx: 0x%lx; read_data: 0x%lx; write_data: 0x%lx",
- 		       pmc_idx, PMC_ACC_TO_IDX(acc), read_data, write_data);
- }
- 
-@@ -379,7 +379,7 @@ static void guest_code(uint64_t expected_pmcr_n)
- 	int i, pmc;
- 
- 	__GUEST_ASSERT(expected_pmcr_n <= ARMV8_PMU_MAX_GENERAL_COUNTERS,
--			"Expected PMCR.N: 0x%lx; ARMv8 general counters: 0x%lx",
-+			"Expected PMCR.N: 0x%lx; ARMv8 general counters: 0x%x",
- 			expected_pmcr_n, ARMV8_PMU_MAX_GENERAL_COUNTERS);
- 
- 	pmcr = read_sysreg(pmcr_el0);
+V4
+ * Rebase ontop of seanjc@'s latest Ucall Pool series:
+   https://lore.kernel.org/linux-arm-kernel/20220825232522.3997340-8-seanjc@google.com/
+ * Fix up review comments from seanjc
+ * Switch authorship on 2 patches because of significant changes, added
+ * Michael as suggested-by or originally-by.
 
-base-commit: 41bccc98fb7931d63d03f326a746ac4d429c1dd3
+V3
+ * Addressed more of andrew.jones@ in ucall patches.
+ * Fix build in non-x86 archs.
+
+V2
+ * Dropped RFC tag
+ * Correctly separated Sean's ucall patches into 2 as originally
+   intended.
+ * Addressed andrew.jones@ in ucall patches.
+ * Fixed ucall pool usage to work for other archs
+
+V1
+ * https://lore.kernel.org/all/20220715192956.1873315-1-pgonda@google.com/
+
+Ackerley Tng (1):
+  KVM: selftests: Add a macro to iterate over a sparsebit range
+
+Michael Roth (2):
+  KVM: selftests: Make sparsebit structs const where appropriate
+  KVM: selftests: Add support for protected vm_vaddr_* allocations
+
+Peter Gonda (5):
+  KVM: selftests: Add support for allocating/managing protected guest
+    memory
+  KVM: selftests: Explicitly ucall pool from shared memory
+  KVM: selftests: Allow tagging protected memory in guest page tables
+  KVM: selftests: Add library for creating and interacting with SEV
+    guests
+  KVM: selftests: Add a basic SEV smoke test
+
+Sean Christopherson (2):
+  KVM: selftests: Extend VM creation's @shape to allow control of VM
+    subtype
+  KVM: selftests: Use the SEV library APIs in the intra-host migration
+    test
+
+ tools/testing/selftests/kvm/Makefile          |   2 +
+ .../kvm/include/aarch64/kvm_util_arch.h       |   7 +
+ .../selftests/kvm/include/kvm_util_base.h     |  50 ++++++-
+ .../kvm/include/riscv/kvm_util_arch.h         |   7 +
+ .../kvm/include/s390x/kvm_util_arch.h         |   7 +
+ .../testing/selftests/kvm/include/sparsebit.h |  56 +++++---
+ .../kvm/include/x86_64/kvm_util_arch.h        |  23 ++++
+ .../selftests/kvm/include/x86_64/processor.h  |   8 ++
+ .../selftests/kvm/include/x86_64/sev.h        | 110 +++++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  67 +++++++--
+ tools/testing/selftests/kvm/lib/sparsebit.c   |  48 +++----
+ .../testing/selftests/kvm/lib/ucall_common.c  |   3 +-
+ .../selftests/kvm/lib/x86_64/processor.c      |  32 ++++-
+ tools/testing/selftests/kvm/lib/x86_64/sev.c  | 128 ++++++++++++++++++
+ .../selftests/kvm/x86_64/sev_migrate_tests.c  |  67 +++------
+ .../selftests/kvm/x86_64/sev_smoke_test.c     |  58 ++++++++
+ 16 files changed, 570 insertions(+), 103 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/kvm_util_arch.h
+ create mode 100644 tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h
+ create mode 100644 tools/testing/selftests/kvm/include/s390x/kvm_util_arch.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/kvm_util_arch.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/sev.h
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/sev.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/sev_smoke_test.c
+
+
+base-commit: 60eedcfceda9db46f1b333e5e1aa9359793f04fb
 -- 
 2.43.0.594.gd9cf4e227d-goog
 
