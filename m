@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814F9219F6
-	for <kvmarm@lists.linux.dev>; Sun,  4 Feb 2024 11:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E0A22081
+	for <kvmarm@lists.linux.dev>; Sun,  4 Feb 2024 11:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707044929; cv=none; b=gbgtfAEP9gKFnrUlqIa/WuRKtPbbD9aPN0KcUEl/rmDVr7BtRf1Healry8JE/guau+4Ec1s1nif6NIOz/0+RwQ3ifWfSf9TvNTEZtlyvyYfcbGA4WlzJ1ynyQuM+LbBHY7mJQGbpxaILupVgUw7DxImCUP7NfmG7Lzwt7NffBQQ=
+	t=1707047103; cv=none; b=EIysGJLU761qJSGCDnHq2kMxmq5qjzL1zampYlmPqkLyea3GTNLW8m1GajBdCeIqWcj2b+tndu/4X+QJRMzxdszT1uL3wKYL32VIPrWQ2leuhEr0kfs0YUUpFy4NEvpPIdMP4XD5xkPw3sxnESnvCDDFKenWDkGb17LhgnWI/u4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707044929; c=relaxed/simple;
-	bh=+4yK6IlEFR619F5ubKn5DvaduDKb7hyVB2D83YttV/o=;
+	s=arc-20240116; t=1707047103; c=relaxed/simple;
+	bh=qDwZmjvZ4j1vRpFDaOOS+N9djUDb3HUlSeBzoirgfqk=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=U1tJjDR/k0QVlc9BYOakfIMBr4BU4tT2NQ4yuIukgtgccayobQj4UOvSCSoJiHtJR5noz+JvpubEw9byxv4LHQtmbWFYoIyKV8i4hevu7H80tMarIFSvg5bbpVcHmhuhEUHV9bII7eV9NZQRzBjF2jtR8iboBY62FPL3/c8h1cc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OvcZ4rWF; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=H5k/yL+FA95mzsr9fWn6T4GE6KoEuuk5VTFTruJz+tx2Oue/JgE1JccMqzSVjK5aYJWI8vB7wy9LlfxCtHRoXr0rKGIc4vXx5SvIcdhVcvmIrO7kLa3L5J2qyT0uu3zF9FKuhiTtoyJtrvwu7R32MKNiGFZ3GV0dMr1+M+OKbXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dF/C1jQY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OvcZ4rWF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E90DDC433F1;
-	Sun,  4 Feb 2024 11:08:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dF/C1jQY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57B2BC433C7;
+	Sun,  4 Feb 2024 11:45:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707044929;
-	bh=+4yK6IlEFR619F5ubKn5DvaduDKb7hyVB2D83YttV/o=;
+	s=k20201202; t=1707047102;
+	bh=qDwZmjvZ4j1vRpFDaOOS+N9djUDb3HUlSeBzoirgfqk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OvcZ4rWFqXAS2Rbp3gKm0wevNDSQBG0JWUYT1FImtdXHRg5/s27oD/O3Jg7wZVBS2
-	 bYQxFWZFg4UETjTZEw81So5ss/ZMuVae2kTJ2RoogE9rTzOb4W5A8SOI5WFiT0fnbv
-	 Z7oJ0mSYETEMW1xfLCUuo/Ejj9uezZjE1x/RRv4dMKGD2xxrP0qbRgGgwisKOkrIDy
-	 7Asahq1Ut+CcvjI2UPf0KnrEAJg/y6HqlE/x4BOlQr+/HNWeLTsosmKL5pA/Zw/74y
-	 XfLbVUcrxvB35w5q0TpytyjPTMPEd2534lF7Acb6gra5SboYlH/X6tycojmqPSgjqD
-	 EEEhvShN7LIlw==
+	b=dF/C1jQYIKsAXySi1C+vrPyVN5osxwC3fKFYXXhfGkIHqP6HxxFS2I40Tgxp4aEwN
+	 wqALU1aZGcTXpyBRXJPuXBtyq6TF72VVFwPXqNRtYh6lBV3lV6hApZac65x4aZqGY5
+	 yysnuOwZuPHHpa8YsMP3CZdwIgZpFF9p7TURxCOdDC/6j6IiPgk0EDrPPRSarx9vRY
+	 1hHUQnbkuMiP82d9iU41/ho6HTAZe05i+qgWNSYC996+HBYqyYBiCzeiFlJyivq8Yd
+	 Rtn+xwiuwznCyBTVSFxTFfgUCHSeNLYpOepuNuHDticIlRcVMKLnj9/I+QgT7CDuQn
+	 n79U9b0RJhBsQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rWaMg-0009pR-8V;
-	Sun, 04 Feb 2024 11:08:46 +0000
-Date: Sun, 04 Feb 2024 11:08:45 +0000
-Message-ID: <87mssgwkoy.wl-maz@kernel.org>
+	id 1rWavj-000A5R-No;
+	Sun, 04 Feb 2024 11:44:59 +0000
+Date: Sun, 04 Feb 2024 11:44:58 +0000
+Message-ID: <87le80wj0l.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc: kvmarm@lists.linux.dev,
@@ -47,10 +47,11 @@ Cc: kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
 Subject: Re: [PATCH v2 02/25] KVM: arm64: Add feature checking helpers
-In-Reply-To: <f47909b1-5e10-4149-8d2a-330bd0ceb2e0@arm.com>
+In-Reply-To: <87mssgwkoy.wl-maz@kernel.org>
 References: <20240130204533.693853-1-maz@kernel.org>
 	<20240130204533.693853-3-maz@kernel.org>
 	<f47909b1-5e10-4149-8d2a-330bd0ceb2e0@arm.com>
+	<87mssgwkoy.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -66,122 +67,165 @@ X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvmarm@lists.linux.dev, linux-arm-ker
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 02 Feb 2024 17:13:07 +0000,
-Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+On Sun, 04 Feb 2024 11:08:45 +0000,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> Hi Marc,
-> 
-> On 30/01/2024 20:45, Marc Zyngier wrote:
-> > In order to make it easier to check whether a particular feature
-> > is exposed to a guest, add a new set of helpers, with kvm_has_feat()
-> > being the most useful.
+> On Fri, 02 Feb 2024 17:13:07 +0000,
+> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 > > 
-> > Let's start making use of them in the PMU code (courtesy of Oliver).
-> > Follow-up work will intricude additional use patterns.
+> > Hi Marc,
+> > 
+> > On 30/01/2024 20:45, Marc Zyngier wrote:
+> > > In order to make it easier to check whether a particular feature
+> > > is exposed to a guest, add a new set of helpers, with kvm_has_feat()
+> > > being the most useful.
+> > > 
+> > > Let's start making use of them in the PMU code (courtesy of Oliver).
+> > > Follow-up work will intricude additional use patterns.
+> > 
+> > I think there is a bit of inconsistency in the macros for signed
+> > and unsigned. The unsigned fields are extracted (i.e., as if they
+> > were shifted to bit 0). But the signed fields are not shifted
+> > completely to bit '0' (in fact to different positions) and eventually
+> > we compare wrong things.
+> > 
+> > Using ID_AA64PFR0_EL1, fld=EL2, val=IMP for unsigned and
+> > ID_AA64PFR0_EL1, AdvSIMD, NI for signed.
+> > 
+> > > 
+> > > Co-developed--by: Oliver Upton <oliver.upton@linux.dev>
+> > > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >   arch/arm64/include/asm/kvm_host.h | 53 +++++++++++++++++++++++++++++++
+> > >   arch/arm64/kvm/pmu-emul.c         | 11 ++++---
+> > >   arch/arm64/kvm/sys_regs.c         |  6 ++--
+> > >   include/kvm/arm_pmu.h             | 11 -------
+> > >   4 files changed, 61 insertions(+), 20 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index 21c57b812569..c0cf9c5f5e8d 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -1233,4 +1233,57 @@ static inline void kvm_hyp_reserve(void) { }
+> > >   void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
+> > >   bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
+> > >   +#define __expand_field_sign_unsigned(id, fld, val)
+> > > \
+> > > +	((u64)(id##_##fld##_##val))
+> > 
+> > For unsigned features we get the actual "field" value, not the value
+> > in position. e.g,: ID_AA64PFR0_EL1_EL2_IMP = (0x1)
+> > 
+> > > +
+> > > +#define __expand_field_sign_signed(id, fld, val)			\
+> > > +	({								\
+> > > +		s64 __val = id##_##fld##_##val;				\
+> > > +		__val <<= 64 - id##_##fld##_WIDTH;			\
+> > > +		__val >>= 64 - id##_##fld##_SHIFT - id##_##fld##_WIDTH;	\
+> > 
+> > But for signed fields, we shift them back into the "position" as in
+> > the ID_REG. e.g.,
+> > 
+> > ID_AA64PFR0_EL1, AdvSIMD, NI we get:
+> > 
+> > 	__val = ID_AA64PFR0_EL1_AdvSIMD_NI; /* = 0xf */
+> > 	__val <<= 64 - 4;		/* 0xf0_00_00_00_00_00_00_00 */
+> > 	__val >>= 64 - 20 - 4;		/* 0xff_ff_ff_ff_ff_f0_00_00 */
+> > 
+> > I think the last line instead should be:
+> > 	__val >>= 64 - id##_##fld##_WIDTH;
 > 
-> I think there is a bit of inconsistency in the macros for signed
-> and unsigned. The unsigned fields are extracted (i.e., as if they
-> were shifted to bit 0). But the signed fields are not shifted
-> completely to bit '0' (in fact to different positions) and eventually
-> we compare wrong things.
-> 
-> Using ID_AA64PFR0_EL1, fld=EL2, val=IMP for unsigned and
-> ID_AA64PFR0_EL1, AdvSIMD, NI for signed.
+> Huh, you're absolutely right.
 > 
 > > 
-> > Co-developed--by: Oliver Upton <oliver.upton@linux.dev>
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >   arch/arm64/include/asm/kvm_host.h | 53 +++++++++++++++++++++++++++++++
-> >   arch/arm64/kvm/pmu-emul.c         | 11 ++++---
-> >   arch/arm64/kvm/sys_regs.c         |  6 ++--
-> >   include/kvm/arm_pmu.h             | 11 -------
-> >   4 files changed, 61 insertions(+), 20 deletions(-)
+> > > +									\
+> > > +		__val;							\
+> > > +	})
+> > > +
+> > > +#define expand_field_sign(id, fld, val)					\
+> > > +	(id##_##fld##_SIGNED ?						\
+> > > +	 __expand_field_sign_signed(id, fld, val) :			\
+> > > +	 __expand_field_sign_unsigned(id, fld, val))
+> > > +
+> > > +#define get_idreg_field_unsigned(kvm, id, fld)				\
+> > > +	({								\
+> > > +		u64 __val = IDREG(kvm, SYS_##id);			\
+> > > +		__val &= id##_##fld##_MASK;				\
+> > > +		__val >>= id##_##fld##_SHIFT;				\
+> > > +									\
 > > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 21c57b812569..c0cf9c5f5e8d 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -1233,4 +1233,57 @@ static inline void kvm_hyp_reserve(void) { }
-> >   void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
-> >   bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
-> >   +#define __expand_field_sign_unsigned(id, fld, val)
-> > \
-> > +	((u64)(id##_##fld##_##val))
+> > We extract the field value for unsigned field, i.e., shifted to bit"0"
+> > and that matches the expand_field_sign().
+> > 
+> > > +		__val;							\
+> > > +	})
+> > > +
+> > > +#define get_idreg_field_signed(kvm, id, fld)				\
+> > > +	({								\
+> > > +		s64 __val = IDREG(kvm, SYS_##id);			\
+> > > +		__val <<= 64 - id##_##fld##_SHIFT - id##_##fld##_WIDTH;	\
+> > > +		__val >>= id##_##fld##_SHIFT;				\
+> > 
+> > However, here we get (assuming value ID_AA64PFR0_EL1_ASIMD = 0xf, and
+> > all other fields are 0 for clarity)
+> > 	
+> > 	__val = IDREG(kvm, SYS_ID_AA64PFR0_EL1); = 0xf0_00_00; 	/* 0xf << 20 */
+> > 	__val <<= 64 - 20 - 4;	/* = 0xf0_00_00_00_00_00_00_00 */
+> > 	__val >>= 20;		/* = 0xff_ff_ff_00_00_00_00_00 */
 > 
-> For unsigned features we get the actual "field" value, not the value
-> in position. e.g,: ID_AA64PFR0_EL1_EL2_IMP = (0x1)
+> Gah... again!
 > 
-> > +
-> > +#define __expand_field_sign_signed(id, fld, val)			\
-> > +	({								\
-> > +		s64 __val = id##_##fld##_##val;				\
-> > +		__val <<= 64 - id##_##fld##_WIDTH;			\
-> > +		__val >>= 64 - id##_##fld##_SHIFT - id##_##fld##_WIDTH;	\
+> >
+> > Thus they don;t match. Instead the last line should be :
+> > 
+> > 	__val >>= id##_##fld##_WIDTH;
 > 
-> But for signed fields, we shift them back into the "position" as in
-> the ID_REG. e.g.,
+> Shouldn't this be (64 - WIDTH) instead, since we want the value to be
+> shifted to bit 0? Otherwise, you get 0xff_00_00_00_00_00_00_00 (as per
+> your example).
 > 
-> ID_AA64PFR0_EL1, AdvSIMD, NI we get:
-> 
-> 	__val = ID_AA64PFR0_EL1_AdvSIMD_NI; /* = 0xf */
-> 	__val <<= 64 - 4;		/* 0xf0_00_00_00_00_00_00_00 */
-> 	__val >>= 64 - 20 - 4;		/* 0xff_ff_ff_ff_ff_f0_00_00 */
-> 
-> I think the last line instead should be:
-> 	__val >>= 64 - id##_##fld##_WIDTH;
+> Thanks a lot for spotting those, much appreciated.
 
-Huh, you're absolutely right.
+And since it is now obvious to anyone that I can't shift properly,
+let's just not do that. As it turns out, the kernel already has the
+required macros, and I can stop being clever with these:
 
-> 
-> > +									\
-> > +		__val;							\
-> > +	})
-> > +
-> > +#define expand_field_sign(id, fld, val)					\
-> > +	(id##_##fld##_SIGNED ?						\
-> > +	 __expand_field_sign_signed(id, fld, val) :			\
-> > +	 __expand_field_sign_unsigned(id, fld, val))
-> > +
-> > +#define get_idreg_field_unsigned(kvm, id, fld)				\
-> > +	({								\
-> > +		u64 __val = IDREG(kvm, SYS_##id);			\
-> > +		__val &= id##_##fld##_MASK;				\
-> > +		__val >>= id##_##fld##_SHIFT;				\
-> > +									\
-> 
-> We extract the field value for unsigned field, i.e., shifted to bit"0"
-> and that matches the expand_field_sign().
-> 
-> > +		__val;							\
-> > +	})
-> > +
-> > +#define get_idreg_field_signed(kvm, id, fld)				\
-> > +	({								\
-> > +		s64 __val = IDREG(kvm, SYS_##id);			\
-> > +		__val <<= 64 - id##_##fld##_SHIFT - id##_##fld##_WIDTH;	\
-> > +		__val >>= id##_##fld##_SHIFT;				\
-> 
-> However, here we get (assuming value ID_AA64PFR0_EL1_ASIMD = 0xf, and
-> all other fields are 0 for clarity)
-> 	
-> 	__val = IDREG(kvm, SYS_ID_AA64PFR0_EL1); = 0xf0_00_00; 	/* 0xf << 20 */
-> 	__val <<= 64 - 20 - 4;	/* = 0xf0_00_00_00_00_00_00_00 */
-> 	__val >>= 20;		/* = 0xff_ff_ff_00_00_00_00_00 */
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index ea8acc1914aa..3457fa313bad 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1290,11 +1290,8 @@ bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
+ 
+ #define __expand_field_sign_signed(id, fld, val)			\
+ 	({								\
+-		s64 __val = id##_##fld##_##val;				\
+-		__val <<= 64 - id##_##fld##_WIDTH;			\
+-		__val >>= 64 - id##_##fld##_SHIFT - id##_##fld##_WIDTH;	\
+-									\
+-		__val;							\
++		u64 __val = id##_##fld##_##val;				\
++		sign_extend64(__val, id##_##fld##_WIDTH - 1);		\
+ 	})
+ 
+ #define expand_field_sign(id, fld, val)					\
+@@ -1313,11 +1310,9 @@ bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
+ 
+ #define get_idreg_field_signed(kvm, id, fld)				\
+ 	({								\
+-		s64 __val = IDREG(kvm, SYS_##id);			\
+-		__val <<= 64 - id##_##fld##_SHIFT - id##_##fld##_WIDTH;	\
+-		__val >>= id##_##fld##_SHIFT;				\
+-									\
+-		__val;							\
++		u64 __val = IDREG(kvm, SYS_##id);			\
++		__val = FIELD_GET(id##_##fld##_MASK, __val);		\
++		sign_extend64(__val, id##_##fld##_WIDTH - 1);		\
+ 	})
+ 
+ #define get_idreg_field_enum(kvm, id, fld)				\
 
-Gah... again!
-
->
-> Thus they don;t match. Instead the last line should be :
-> 
-> 	__val >>= id##_##fld##_WIDTH;
-
-Shouldn't this be (64 - WIDTH) instead, since we want the value to be
-shifted to bit 0? Otherwise, you get 0xff_00_00_00_00_00_00_00 (as per
-your example).
-
-Thanks a lot for spotting those, much appreciated.
+Thoughts?
 
 	M.
 
