@@ -1,88 +1,140 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C072C684
-	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 14:17:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9043F208CF
+	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 14:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707142637; cv=none; b=heWA2oVnnyiKKlOxfFNWQNa1sW7E2IEYNf8jLnq95I11XCGxVlJKngRs53FCLIKQumnsbW4RgiRjv+vOmN5m+1/1UhQyLvQZgn7nkDKebCrxzpdwNqW+Cy1LYB8a0YnQdIW0H8RNGg+ozGHTD3B64YYFI43HvdABZO4XBdACC5o=
+	t=1707142834; cv=none; b=r5FBdIeUEoOOL/r+EJ2j12bt8FUPGNuRbyiAY1kQmLO0Chtkgz0ioUB8oASfyAt3uqVf/hVViwD5d6L3BTFcSCwo9k/2MWYY7X1GVOi9AwQb+vgx310CHpS6DfQs2akfUVcRnPZjy5TTYJ3wl9fpqy/q4Dm3duJLbDKmZLzdb/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707142637; c=relaxed/simple;
-	bh=nQTYnKbRzQLSB3AQO/WmD1zqTLESyqxm1/7PWB3Kn6M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ebLSvxj+QC0z4YBucubfNg1fMuldvN/IIE6Gyns+/wU5Eh8vzPzJp1aawx2DOg2KCIkuoqAxewaNjGuDdcmtAUEJxX+pxSAmsHaYS86VEK6Q7wLxTmTnzXt7mw1+nC1aq5m/gyH0TvSzo5xJoU1pDFcyd9BrkfbGP2UcN1YAjW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ECF051FB;
-	Mon,  5 Feb 2024 06:17:57 -0800 (PST)
-Received: from [192.168.1.100] (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4D44B3F5A1;
-	Mon,  5 Feb 2024 06:17:11 -0800 (PST)
-Message-ID: <a7cc7791-c476-fd81-b79d-a151293b8302@arm.com>
-Date: Mon, 5 Feb 2024 14:17:10 +0000
+	s=arc-20240116; t=1707142834; c=relaxed/simple;
+	bh=VKg4SZ+d8nDsJKhBYt3IUI+StMXktzFJPIAQBq8Yw3E=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=rB3bFys2kGQ9kvaXW+9Eh6HeUFNjWjAdElpwikAz5AWk86z6wW4s00D0nQrW9yvFKMFWw7TQGPgp79odbwBgE/RZchU7I/wN8dGB7wC1eExuAnPwBDLTo9Rgtq4r6f4DSrUV2jmRm+tETyjYNX9COqx8F5L3xjYynhW+uWQ3FJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BiRNHlK/; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BiRNHlK/"
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 415EIMcb031493;
+	Mon, 5 Feb 2024 14:20:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=bXHIioVqh5fYg2wfi29MHPmCBpLjApCBOLSYCA188qo=;
+ b=BiRNHlK/sbO74w/nyY/aZK1S2jnEQtslw2Rts/wDr/xuQZm6eKT2WrLuYzQWNnTiHlPi
+ NM48sGg/nUEqHzaVttwmAo4mwf4cacGzuV+jNKjbEDD/ycF++TBsyiuVng6PFCX0IKJ6
+ UYM1gtpp0SWTOpkCoAmRUz55J6bM7UXLUwVzABZKSUIZ1qEhiYRppVi4szuohvWMM7Yo
+ TamCCF6xjiMcscxM+6Z6rK/3pUwwUSwIb0J6mt/CKSybkoIHDKE28hOm2dK3jYI6+Wyh
+ aCQhs8DY27aojuJN5iCiuCkPah7Vlkx+ht11iHwk77qEOkBjQn7YrEG9iVihDd/pWTUy yQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w31aqg1es-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 05 Feb 2024 14:20:19 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 415EJRFv001741;
+	Mon, 5 Feb 2024 14:20:15 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w31aqg1dw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 05 Feb 2024 14:20:15 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 415CZVWl016215;
+	Mon, 5 Feb 2024 14:20:14 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3w22h1rebg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 05 Feb 2024 14:20:14 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 415EKBTj25756218
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 5 Feb 2024 14:20:11 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BEBB420049;
+	Mon,  5 Feb 2024 14:20:11 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AD77C20040;
+	Mon,  5 Feb 2024 14:20:10 +0000 (GMT)
+Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com (unknown [9.171.59.40])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon,  5 Feb 2024 14:20:10 +0000 (GMT)
+From: "Marc Hartmayer" <mhartmay@linux.ibm.com>
+To: Nicholas Piggin <npiggin@gmail.com>, Thomas Huth <thuth@redhat.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org,
+        Laurent Vivier
+ <lvivier@redhat.com>,
+        Shaoqin Huang <shahuang@redhat.com>,
+        Andrew Jones
+ <andrew.jones@linux.dev>, Nico Boehr <nrb@linux.ibm.com>,
+        Paolo Bonzini
+ <pbonzini@redhat.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Eric
+ Auger <eric.auger@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand
+ <david@redhat.com>, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [kvm-unit-tests PATCH v2 1/9] (arm|powerpc|s390x): Makefile:
+ Fix .aux.o generation
+In-Reply-To: <20240202065740.68643-2-npiggin@gmail.com>
+References: <20240202065740.68643-1-npiggin@gmail.com>
+ <20240202065740.68643-2-npiggin@gmail.com>
+Date: Mon, 05 Feb 2024 15:20:09 +0100
+Message-ID: <871q9ryova.fsf@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v4 2/7] arm64: KVM: Use shared area to pass PMU event
- state to hypervisor
-Content-Language: en-US
-To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
-Cc: coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, broonie@kernel.org, suzuki.poulose@arm.com,
- acme@kernel.org, James Morse <james.morse@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mike Leach <mike.leach@linaro.org>, Leo Yan <leo.yan@linaro.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
- <robh@kernel.org>, Miguel Luis <miguel.luis@oracle.com>,
- Jintack Lim <jintack.lim@linaro.org>, Ard Biesheuvel <ardb@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Arnd Bergmann <arnd@arndb.de>,
- Vincent Donnefort <vdonnefort@google.com>,
- Kristina Martsenko <kristina.martsenko@arm.com>,
- Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
- Akihiko Odaki <akihiko.odaki@daynix.com>, Jing Zhang
- <jingzhangos@google.com>, linux-kernel@vger.kernel.org
-References: <20240104162714.1062610-1-james.clark@arm.com>
- <20240104162714.1062610-3-james.clark@arm.com> <Zb1mCCi13AJ_YjFZ@linux.dev>
- <8a908ee8-620a-d9c2-734b-5a6402950072@arm.com> <ZcDc8-FQo8wKavA4@linux.dev>
- <867cjj6ohz.wl-maz@kernel.org> <ZcDg1sP3EYZG-i_3@linux.dev>
-From: James Clark <james.clark@arm.com>
-In-Reply-To: <ZcDg1sP3EYZG-i_3@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: E_UQLZzuAQX3Cmy0SGcM-0uS1WzSgQUT
+X-Proofpoint-ORIG-GUID: 3S1Vxil0i0--MMWXxApbW9AHcufAytFG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-05_08,2024-01-31_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 priorityscore=1501 mlxscore=0 spamscore=0
+ suspectscore=0 clxscore=1011 adultscore=0 phishscore=0 mlxlogscore=999
+ malwarescore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402050108
 
+On Fri, Feb 02, 2024 at 04:57 PM +1000, Nicholas Piggin <npiggin@gmail.com>=
+ wrote:
+> Using all prerequisites for the source file results in the build
+> dying on the second time around with:
+>
+> gcc: fatal error: cannot specify =E2=80=98-o=E2=80=99 with =E2=80=98-c=E2=
+=80=99, =E2=80=98-S=E2=80=99 or =E2=80=98-E=E2=80=99 with multiple files
+>
+> This is due to auxinfo.h becoming a prerequisite after the first
+> build recorded the dependency.
+>
+> Use the first prerequisite for this recipe.
+>
+> Fixes: f2372f2d49135 ("(arm|powerpc|s390x): Makefile: add `%.aux.o` targe=
+t")
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>  arm/Makefile.common     | 2 +-
 
+[=E2=80=A6snip]
 
-On 05/02/2024 13:21, Oliver Upton wrote:
-> On Mon, Feb 05, 2024 at 01:15:36PM +0000, Marc Zyngier wrote:
->> On Mon, 05 Feb 2024 13:04:51 +0000,
->> Oliver Upton <oliver.upton@linux.dev> wrote:
->>>
->>> Unless someone has strong opinions about making this work in protected
->>> mode, I am happy to see tracing support limited to the 'normal' nVHE
->>> configuration. The protected feature as a whole is just baggage until
->>> upstream support is completed.
->>
->> Limiting tracing to non-protected mode is a must IMO. Allowing tracing
->> when pKVM is enabled is a sure way to expose secrets that should
->> stay... secret. The only exception I can think of is when
->> CONFIG_NVHE_EL2_DEBUG is enabled, at which point all bets are off.
-> 
-> Zero argument there :) I left off the "and PMU" part of what I was
-> saying, because that was a feature that semi-worked in protected mode
-> before VM/VCPU shadowing support landed.
-> 
+Thanks a ton for fixing this!
 
-In that case I can hide all this behind CONFIG_NVHE_EL2_DEBUG for pKVM.
-This will also have the effect of disabling PMU again for pKVM because I
-moved that into this new shared area.
+Reviewed-by: Marc Hartmayer <mhartmay@linux.ibm.com>
 
-The same place will be used to store the state for normal nVHE and at
-least then there is some code re-use and flexibility to use trace and
-PMU for debugging if needed. And the copy on every switch gets deleted.
+--=20
+Kind regards / Beste Gr=C3=BC=C3=9Fe
+   Marc Hartmayer
+
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Wolfgang Wendt
+Gesch=C3=A4ftsf=C3=BChrung: David Faller
+Sitz der Gesellschaft: B=C3=B6blingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
