@@ -1,215 +1,121 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78E2544C8A
-	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 17:38:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C3448782
+	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 18:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707154709; cv=none; b=dkfzaG/nohhOjjnZhsmCJP1x26tUrst7s5mqreiuiDztSm3j8SDR+3dpfwT8H2LnMoJS4Cc/vfgmd1IlU46Cas+0CYY3PyujW5rK1jcg4Nu4iReiY+aUop5b1XqtWStFn1PrWwn3rhm+GeHDTLFMbO4nJnTRnScITQ427zAfHZM=
+	t=1707158623; cv=none; b=jFNUw5iPTgiSTUK3+iGwOtjkPYUGSOK0zfSmqx+S1fhEDw0/W9hRjxUsCt3ZzvLQZqGYBBCui0XdM73EQbyurtQSc0nClXHU6vLhPViWWaiRML8igByeVubDBv8IVs8vSJJCCuQhYKPFv7dD50EIkt+wNIbDKDzQSQ7S63FLhY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707154709; c=relaxed/simple;
-	bh=9Spm0Ff0m4tNQcH3R6VE3NIt6aLLKaf/fRN2ZWhwEvo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ruyk3N6gyjbp0NAcmM0ca8cDEczkCgUrKYyF0UzoGROLYsViwJ8ak+YBY2TYoHyxzpHgUe08o3NK4kfg9/U1X7NaQh5AbSd3JxOUD38YUxK/mG+5G1qvv1Kk8FSrJDi9J5adinVedRwiTl7GRW6+OzWJomd00CIGdmspU/sQtFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8578512FC;
-	Mon,  5 Feb 2024 09:39:09 -0800 (PST)
-Received: from [10.57.9.25] (unknown [10.57.9.25])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4509F3F5A1;
-	Mon,  5 Feb 2024 09:38:25 -0800 (PST)
-Message-ID: <35b69e13-757a-435c-8dcc-7079a0313f99@arm.com>
-Date: Mon, 5 Feb 2024 17:38:23 +0000
+	s=arc-20240116; t=1707158623; c=relaxed/simple;
+	bh=nmTgukHgTcZ/pZA80eYQ+M9fO2HDt9ms9ZXkd1+gOI8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nXoXyjGj+QG86iv4kBXv5P79lfkX7iAGRv9A0/NNbsS3HrTUGRfVAfJJRIpDUiSnsrdyTEn2B1ENjz1IZV21jkSBTOOu07FpLc4P7Jhmkv0VrDTKbyAdA+m0RJW3s7KraUQckgoskZqYifUdasrDzmVRcmw+6YRVot8tQZumpOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=t7vvPXVD; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="t7vvPXVD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1707158621; x=1738694621;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=n0UiRQIDwXPhO89gFc7hLFAJlLuRhv/umCxdj84c8o0=;
+  b=t7vvPXVD0XXwX6DX6nZjuNeze+0e1hVjieo69BH8ohs7td2PnFE9dhWv
+   zMfvVi0dKltnxX5tMJagvKd8z6/QhEYPqCVpHW61ZLftc4bCxpDiiYXM2
+   12HtgDyNubWWonL48stICQX4cIyDf/UHRBILWJx6zSpbjedNcwewi33FP
+   o=;
+X-IronPort-AV: E=Sophos;i="6.05,245,1701129600"; 
+   d="scan'208";a="63862469"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 18:43:39 +0000
+Received: from EX19MTAEUB001.ant.amazon.com [10.0.43.254:27241]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.8.155:2525] with esmtp (Farcaster)
+ id f9ee6ae2-72b7-46e1-a0c5-bc63b12df20d; Mon, 5 Feb 2024 18:43:38 +0000 (UTC)
+X-Farcaster-Flow-ID: f9ee6ae2-72b7-46e1-a0c5-bc63b12df20d
+Received: from EX19D031EUB002.ant.amazon.com (10.252.61.105) by
+ EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 5 Feb 2024 18:43:38 +0000
+Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
+ EX19D031EUB002.ant.amazon.com (10.252.61.105) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 5 Feb 2024 18:43:37 +0000
+Received: from dev-dsk-sauravsc-1a-8777b848.eu-west-1.amazon.com
+ (172.19.118.34) by mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40 via Frontend Transport; Mon, 5 Feb 2024 18:43:35 +0000
+From: Saurav Sachidanand <sauravsc@amazon.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+CC: Saurav Sachidanand <sauravsc@amazon.com>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH] [RFC] KVM: arm64/vgic: Populate GICR_TYPER with Aff3
+Date: Mon, 5 Feb 2024 18:43:26 +0000
+Message-ID: <20240205184326.78814-1-sauravsc@amazon.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 02/26] KVM: arm64: Add feature checking helpers
-Content-Language: en-GB
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org
-Cc: James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Joey Gouly <joey.gouly@arm.com>, Mark Brown <broonie@kernel.org>
-References: <20240205103431.1104133-1-maz@kernel.org>
- <20240205103431.1104133-3-maz@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240205103431.1104133-3-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 
-On 05/02/2024 10:34, Marc Zyngier wrote:
-> In order to make it easier to check whether a particular feature
-> is exposed to a guest, add a new set of helpers, with kvm_has_feat()
-> being the most useful.
-> 
-> Let's start making use of them in the PMU code (courtesy of Oliver).
-> Follow-up changes will introduce additional use patterns.
-> 
-> Co-developed--by: Oliver Upton <oliver.upton@linux.dev>
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+According to spec, bits [63:56] of the GICR_TYPER register are supposed
+to contain Affinity level 3 (Aff3) bits of the Processing Element (PE)
+associated with its GIC redistributor. Linux guests on boot match PEs
+with their redistributor using all four Affinity level bits from this
+register.
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Currently, vGIC populates GICR_TYPER with just the first three Affinity
+levels of a vCPU's MPIDR. This works fine for a Linux guest that boots
+with KVM's default vCPU MPIDR assignment, which also only populates till
+the first three Affinity levels.
+
+However, a hypervisor can override KVM's default MPIDR assignment by
+writing directly to a vCPU's MPIDR_EL1 register. If such a hypervisor
+were to populate Aff3 bits for a VM, a Linux guest booting there would
+fail to match vCPUs with their vGIC redistributors, since their virtual
+GICR_TYPER registers would be missing the respective Aff3 bits.
+
+To change that, let's populate GICR_TYPER using Aff3 bits [39:32] from
+the vCPU's MPIDR.
+
+Signed-off-by: Saurav Sachidanand <sauravsc@amazon.com>
+---
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index c15ee1df036a..26bc838ce14c 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -324,6 +324,7 @@ static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
+ 	u64 value;
+ 
+ 	value = (u64)(mpidr & GENMASK(23, 0)) << 32;
++	value |= (u64)((mpidr >> 32) & GENMASK(7, 0)) << 56;
+ 	value |= ((target_vcpu_id & 0xffff) << 8);
+ 
+ 	if (vgic_has_its(vcpu->kvm))
+-- 
+2.40.1
 
 
-> ---
->   arch/arm64/include/asm/kvm_host.h | 44 +++++++++++++++++++++++++++++++
->   arch/arm64/kvm/pmu-emul.c         | 11 ++++----
->   arch/arm64/kvm/sys_regs.c         |  6 ++---
->   include/kvm/arm_pmu.h             | 11 --------
->   4 files changed, 52 insertions(+), 20 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 21c57b812569..527da3d2cedb 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1233,4 +1233,48 @@ static inline void kvm_hyp_reserve(void) { }
->   void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
->   bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
->   
-> +#define __expand_field_sign_unsigned(id, fld, val)			\
-> +	((u64)SYS_FIELD_VALUE(id, fld, val))
-> +
-> +#define __expand_field_sign_signed(id, fld, val)			\
-> +	({								\
-> +		u64 __val = SYS_FIELD_VALUE(id, fld, val);		\
-> +		sign_extend64(__val, id##_##fld##_WIDTH - 1);		\
-> +	})
-> +
-> +#define expand_field_sign(id, fld, val)					\
-> +	(id##_##fld##_SIGNED ?						\
-> +	 __expand_field_sign_signed(id, fld, val) :			\
-> +	 __expand_field_sign_unsigned(id, fld, val))
-> +
-> +#define get_idreg_field_unsigned(kvm, id, fld)				\
-> +	({								\
-> +		u64 __val = IDREG((kvm), SYS_##id);			\
-> +		FIELD_GET(id##_##fld##_MASK, __val);			\
-> +	})
-> +
-> +#define get_idreg_field_signed(kvm, id, fld)				\
-> +	({								\
-> +		u64 __val = get_idreg_field_unsigned(kvm, id, fld);	\
-> +		sign_extend64(__val, id##_##fld##_WIDTH - 1);		\
-> +	})
-> +
-> +#define get_idreg_field_enum(kvm, id, fld)				\
-> +	get_idreg_field_unsigned(kvm, id, fld)
-> +
-> +#define get_idreg_field(kvm, id, fld)					\
-> +	(id##_##fld##_SIGNED ?						\
-> +	 get_idreg_field_signed(kvm, id, fld) :				\
-> +	 get_idreg_field_unsigned(kvm, id, fld))
-> +
-> +#define kvm_has_feat(kvm, id, fld, limit)				\
-> +	(get_idreg_field((kvm), id, fld) >= expand_field_sign(id, fld, limit))
-> +
-> +#define kvm_has_feat_enum(kvm, id, fld, val)				\
-> +	(get_idreg_field_unsigned((kvm), id, fld) == __expand_field_sign_unsigned(id, fld, val))
-> +
-> +#define kvm_has_feat_range(kvm, id, fld, min, max)			\
-> +	(get_idreg_field((kvm), id, fld) >= expand_field_sign(id, fld, min) && \
-> +	 get_idreg_field((kvm), id, fld) <= expand_field_sign(id, fld, max))
-> +
->   #endif /* __ARM64_KVM_HOST_H__ */
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 3d9467ff73bc..925522470b2b 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -64,12 +64,11 @@ u64 kvm_pmu_evtyper_mask(struct kvm *kvm)
->   {
->   	u64 mask = ARMV8_PMU_EXCLUDE_EL1 | ARMV8_PMU_EXCLUDE_EL0 |
->   		   kvm_pmu_event_mask(kvm);
-> -	u64 pfr0 = IDREG(kvm, SYS_ID_AA64PFR0_EL1);
->   
-> -	if (SYS_FIELD_GET(ID_AA64PFR0_EL1, EL2, pfr0))
-> +	if (kvm_has_feat(kvm, ID_AA64PFR0_EL1, EL2, IMP))
->   		mask |= ARMV8_PMU_INCLUDE_EL2;
->   
-> -	if (SYS_FIELD_GET(ID_AA64PFR0_EL1, EL3, pfr0))
-> +	if (kvm_has_feat(kvm, ID_AA64PFR0_EL1, EL3, IMP))
->   		mask |= ARMV8_PMU_EXCLUDE_NS_EL0 |
->   			ARMV8_PMU_EXCLUDE_NS_EL1 |
->   			ARMV8_PMU_EXCLUDE_EL3;
-> @@ -83,8 +82,10 @@ u64 kvm_pmu_evtyper_mask(struct kvm *kvm)
->    */
->   static bool kvm_pmc_is_64bit(struct kvm_pmc *pmc)
->   {
-> +	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
-> +
->   	return (pmc->idx == ARMV8_PMU_CYCLE_IDX ||
-> -		kvm_pmu_is_3p5(kvm_pmc_to_vcpu(pmc)));
-> +		kvm_has_feat(vcpu->kvm, ID_AA64DFR0_EL1, PMUVer, V3P5));
->   }
->   
->   static bool kvm_pmc_has_64bit_overflow(struct kvm_pmc *pmc)
-> @@ -556,7 +557,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
->   		return;
->   
->   	/* Fixup PMCR_EL0 to reconcile the PMU version and the LP bit */
-> -	if (!kvm_pmu_is_3p5(vcpu))
-> +	if (!kvm_has_feat(vcpu->kvm, ID_AA64DFR0_EL1, PMUVer, V3P5))
->   		val &= ~ARMV8_PMU_PMCR_LP;
->   
->   	/* The reset bits don't indicate any state, and shouldn't be saved. */
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 041b11825578..3c31f8cb9eef 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -505,10 +505,9 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
->   			  struct sys_reg_params *p,
->   			  const struct sys_reg_desc *r)
->   {
-> -	u64 val = IDREG(vcpu->kvm, SYS_ID_AA64MMFR1_EL1);
->   	u32 sr = reg_to_encoding(r);
->   
-> -	if (!(val & (0xfUL << ID_AA64MMFR1_EL1_LO_SHIFT))) {
-> +	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, LO, IMP)) {
->   		kvm_inject_undefined(vcpu);
->   		return false;
->   	}
-> @@ -2748,8 +2747,7 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
->   		return ignore_write(vcpu, p);
->   	} else {
->   		u64 dfr = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);
-> -		u64 pfr = IDREG(vcpu->kvm, SYS_ID_AA64PFR0_EL1);
-> -		u32 el3 = !!SYS_FIELD_GET(ID_AA64PFR0_EL1, EL3, pfr);
-> +		u32 el3 = kvm_has_feat(vcpu->kvm, ID_AA64PFR0_EL1, EL3, IMP);
->   
->   		p->regval = ((SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, dfr) << 28) |
->   			     (SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, dfr) << 24) |
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 4b9d8fb393a8..eb4c369a79eb 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -90,16 +90,6 @@ void kvm_vcpu_pmu_resync_el0(void);
->   			vcpu->arch.pmu.events = *kvm_get_pmu_events();	\
->   	} while (0)
->   
-> -/*
-> - * Evaluates as true when emulating PMUv3p5, and false otherwise.
-> - */
-> -#define kvm_pmu_is_3p5(vcpu) ({						\
-> -	u64 val = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);		\
-> -	u8 pmuver = SYS_FIELD_GET(ID_AA64DFR0_EL1, PMUVer, val);	\
-> -									\
-> -	pmuver >= ID_AA64DFR0_EL1_PMUVer_V3P5;				\
-> -})
-> -
->   u8 kvm_arm_pmu_get_pmuver_limit(void);
->   u64 kvm_pmu_evtyper_mask(struct kvm *kvm);
->   int kvm_arm_set_default_pmu(struct kvm *kvm);
-> @@ -168,7 +158,6 @@ static inline u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
->   }
->   
->   #define kvm_vcpu_has_pmu(vcpu)		({ false; })
-> -#define kvm_pmu_is_3p5(vcpu)		({ false; })
->   static inline void kvm_pmu_update_vcpu_events(struct kvm_vcpu *vcpu) {}
->   static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
->   static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
 
