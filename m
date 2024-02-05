@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED3F17584
-	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 10:34:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397E017584
+	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 10:34:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707129291; cv=none; b=A8EZTZPQYmRShnTboRaPLd+t7kLL6pP07Adt3aMDX2oahr+SKmTiS/sqmiJ/RJ+yCopqfZL3KGhiXKyWkxbyBkQKty1aGE/5v+GoyDQNfG3nBvIX9zWOzusAfyKjBYyWqGwaAULVMAEZHUECMSKtmXCzWEjswQukZeyY8VXobPI=
+	t=1707129291; cv=none; b=Q5CD8hjz3rWv40vscFdpB/Orgfsm0Ckd64RKlPNjWdKdltLsHXgj1jtSuGBRjKgf+4Fr1M26mjNbkr68wjRt2ls0eoiSTkIuMAljSSPP03bmQHLuospZCluBJ73IPulKdoke1vcmAMwbe9I1STCHp8Xddut5Bw4apeqTp9DsHcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707129291; c=relaxed/simple;
-	bh=PpOwuADAsLxu45+C0oIAS3LP3QD5ZWqEix6d/oXEM3U=;
+	bh=me/i8VvbW5YzSr9GKD5k6gAEkthuwdTWsJ1/VjL8978=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gs9XHS9Pd2yK2S9Hm6MG1mbiMge18U87RB7q4py+QeY4gdNSRzUdmi0ObFrn5LaYKo7eaPHIi+/HaKjtNNtgbhzdBZ0IuHiYYCogLqhV8f+auZ1UkZLucvu3BOPoAtN4OSjz5aVPLeotFLkGLRyZ4Ubrfq0UsKn1c6ZPVubJMKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M6/0QpIe; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=HgIiDIrikj9PUhSh620EUXtKTm/6Omy8/2OsyMobcwGH1yk7fygB8uBp60NzubJjEGMEIqBK3RhYuvN9gHOMlaDeLzKw7JO0RSthctJvqsXPzxWfflpjFuuZmkWpQ1TbcW9bUhciCl3GyVs9Ds/SNueUsDGc/I8gU6fI6rBmg+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KzzI0UFK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M6/0QpIe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAF97C43399;
-	Mon,  5 Feb 2024 10:34:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KzzI0UFK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 199CCC433B1;
+	Mon,  5 Feb 2024 10:34:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707129290;
-	bh=PpOwuADAsLxu45+C0oIAS3LP3QD5ZWqEix6d/oXEM3U=;
+	s=k20201202; t=1707129291;
+	bh=me/i8VvbW5YzSr9GKD5k6gAEkthuwdTWsJ1/VjL8978=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=M6/0QpIex7aX6m+XofA7Fbbg3vWnf6Nyd63vrjKTG+LAwbPXc353ZC2XAQqW9T/3R
-	 2jyeYxWMzgWorEJNhHHLCeWQCVMCzOCT53l4NjWqeooPnmFA46Zc9GJCYjpaJI6Hpr
-	 gu02b6ZcTbvc4ek8Y61+zOfjuGAs8zTHED1wXb5+fgKeUTO6sW3lk6Kehcj+D2vnhw
-	 MT1r9jNB8rXjpwr7oZHtNNk9ZVU8cbK381BELy+aKTZqgud6eEsprTsT4NbAETExdd
-	 NZnkMAIyzvIi23qiVWLMO88oG4rGOYk8msAtvnDFiyPl2PXOHg8wbAKzoswcCPHEuL
-	 Un5YizaNu8uHQ==
+	b=KzzI0UFKANvBF/1Soi2kgoRLPPZaO4qoPPIxzgSYYuyqae5fJd5+rAbbURi59CyUz
+	 ugVbIAA1ejuqS92oRMNkzcW94bxmSDwOm3BuS6DBWJDO0xvLFP3tJVirV9I33yjdmy
+	 YQEBjEOOX/mqGuNY/f6WhNlv1iUJ+i4I8r74TMP7pD/yv5dAlA35DJlutg2ekNEojn
+	 iYX2kegD05NetNgsQIS8ndxME345Q4oiLk5HNsgrhPKQ1l4oQKaXlI+DiAhvuwUkgf
+	 4DN5oQCPzae11m84EUg1YbJjlTQKnLEA6shH8yt19smS0JqzoyrOXzxDRmAdm9igiQ
+	 94bIufc/tQeIQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rWwJM-000Nc3-Qa;
-	Mon, 05 Feb 2024 10:34:48 +0000
+	id 1rWwJN-000Nc3-7l;
+	Mon, 05 Feb 2024 10:34:49 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v3 19/26] KVM: arm64: Move existing feature disabling over to FGU infrastructure
-Date: Mon,  5 Feb 2024 10:34:24 +0000
-Message-Id: <20240205103431.1104133-20-maz@kernel.org>
+Subject: [PATCH v3 21/26] KVM: arm64: Make TLBI OS/Range UNDEF if not advertised to the guest
+Date: Mon,  5 Feb 2024 10:34:26 +0000
+Message-Id: <20240205103431.1104133-22-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240205103431.1104133-1-maz@kernel.org>
 References: <20240205103431.1104133-1-maz@kernel.org>
@@ -61,138 +61,70 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We already trap a bunch of existing features for the purpose of
-disabling them (MAIR2, POR, ACCDATA, SME...).
+Outer Shareable and Range TLBI instructions shouldn't be made available
+to the guest if they are not advertised. Use FGU to disable those,
+and set HCR_EL2.TLBIOS in the case the host doesn't have FGT. Note
+that in that later case, we cannot efficiently disable TLBI Range
+instructions, as this would require to trap all TLBIs.
 
-Let's move them over to our brand new FGU infrastructure.
-
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h       |  4 ++++
- arch/arm64/kvm/arm.c                    |  6 ++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 17 +++--------------
- arch/arm64/kvm/sys_regs.c               | 23 +++++++++++++++++++++++
- 4 files changed, 36 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index c69b258fc989..968a997b3f02 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -297,6 +297,8 @@ struct kvm_arch {
- #define KVM_ARCH_FLAG_TIMER_PPIS_IMMUTABLE		6
- 	/* Initial ID reg values loaded */
- #define KVM_ARCH_FLAG_ID_REGS_INITIALIZED		7
-+	/* Fine-Grained UNDEF initialised */
-+#define KVM_ARCH_FLAG_FGU_INITIALIZED			8
- 	unsigned long flags;
- 
- 	/* VM-wide vCPU feature set */
-@@ -1107,6 +1109,8 @@ int __init populate_nv_trap_config(void);
- bool lock_all_vcpus(struct kvm *kvm);
- void unlock_all_vcpus(struct kvm *kvm);
- 
-+void kvm_init_sysreg(struct kvm_vcpu *);
-+
- /* MMIO helpers */
- void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
- unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index c063e84fc72c..9f806c9b7d5d 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -675,6 +675,12 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- 			return ret;
- 	}
- 
-+	/*
-+	 * This needs to happen after NV has imposed its own restrictions on
-+	 * the feature set
-+	 */
-+	kvm_init_sysreg(vcpu);
-+
- 	ret = kvm_timer_enable(vcpu);
- 	if (ret)
- 		return ret;
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index a09149fd91ed..245f9c1ca666 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -157,7 +157,7 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
- 	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
--	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0, tmp;
-+	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0;
- 	u64 r_val, w_val;
- 
- 	CHECK_FGT_MASKS(HFGRTR_EL2);
-@@ -174,13 +174,6 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
- 	ctxt_sys_reg(hctxt, HFGRTR_EL2) = read_sysreg_s(SYS_HFGRTR_EL2);
- 	ctxt_sys_reg(hctxt, HFGWTR_EL2) = read_sysreg_s(SYS_HFGWTR_EL2);
- 
--	if (cpus_have_final_cap(ARM64_SME)) {
--		tmp = HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_EL0_MASK;
--
--		r_clr |= tmp;
--		w_clr |= tmp;
--	}
--
- 	/*
- 	 * Trap guest writes to TCR_EL1 to prevent it from enabling HA or HD.
- 	 */
-@@ -195,15 +188,11 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
- 	compute_undef_clr_set(vcpu, kvm, HFGRTR_EL2, r_clr, r_set);
- 	compute_undef_clr_set(vcpu, kvm, HFGWTR_EL2, w_clr, w_set);
- 
--	/* The default to trap everything not handled or supported in KVM. */
--	tmp = HFGxTR_EL2_nAMAIR2_EL1 | HFGxTR_EL2_nMAIR2_EL1 | HFGxTR_EL2_nS2POR_EL1 |
--	      HFGxTR_EL2_nPOR_EL1 | HFGxTR_EL2_nPOR_EL0 | HFGxTR_EL2_nACCDATA_EL1;
--
--	r_val = __HFGRTR_EL2_nMASK & ~tmp;
-+	r_val = __HFGRTR_EL2_nMASK;
- 	r_val |= r_set;
- 	r_val &= ~r_clr;
- 
--	w_val = __HFGWTR_EL2_nMASK & ~tmp;
-+	w_val = __HFGWTR_EL2_nMASK;
- 	w_val |= w_set;
- 	w_val &= ~w_clr;
- 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 938df5dc3684..39e7c7f74717 100644
+index 39e7c7f74717..f07ee7c89822 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -3942,6 +3942,29 @@ int kvm_vm_ioctl_get_reg_writable_masks(struct kvm *kvm, struct reg_mask_range *
- 	return 0;
- }
+@@ -3948,6 +3948,14 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
  
-+void kvm_init_sysreg(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm *kvm = vcpu->kvm;
+ 	mutex_lock(&kvm->arch.config_lock);
+ 
++	/*
++	 * In the absence of FGT, we cannot independently trap TLBI
++	 * Range instructions. This isn't great, but trapping all
++	 * TLBIs would be far worse. Live with it...
++	 */
++	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
++		vcpu->arch.hcr_el2 |= HCR_TTLBOS;
 +
-+	mutex_lock(&kvm->arch.config_lock);
+ 	if (test_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags))
+ 		goto out;
+ 
+@@ -3960,6 +3968,32 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+ 				       HFGxTR_EL2_nSMPRI_EL1_MASK	|
+ 				       HFGxTR_EL2_nTPIDR2_EL0_MASK);
+ 
++	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
++		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1OS|
++						HFGITR_EL2_TLBIRVALE1OS	|
++						HFGITR_EL2_TLBIRVAAE1OS	|
++						HFGITR_EL2_TLBIRVAE1OS	|
++						HFGITR_EL2_TLBIVAALE1OS	|
++						HFGITR_EL2_TLBIVALE1OS	|
++						HFGITR_EL2_TLBIVAAE1OS	|
++						HFGITR_EL2_TLBIASIDE1OS	|
++						HFGITR_EL2_TLBIVAE1OS	|
++						HFGITR_EL2_TLBIVMALLE1OS);
 +
-+	if (test_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags))
-+		goto out;
++	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, RANGE))
++		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1	|
++						HFGITR_EL2_TLBIRVALE1	|
++						HFGITR_EL2_TLBIRVAAE1	|
++						HFGITR_EL2_TLBIRVAE1	|
++						HFGITR_EL2_TLBIRVAALE1IS|
++						HFGITR_EL2_TLBIRVALE1IS	|
++						HFGITR_EL2_TLBIRVAAE1IS	|
++						HFGITR_EL2_TLBIRVAE1IS	|
++						HFGITR_EL2_TLBIRVAALE1OS|
++						HFGITR_EL2_TLBIRVALE1OS	|
++						HFGITR_EL2_TLBIRVAAE1OS	|
++						HFGITR_EL2_TLBIRVAE1OS);
 +
-+	kvm->arch.fgu[HFGxTR_GROUP] = (HFGxTR_EL2_nAMAIR2_EL1		|
-+				       HFGxTR_EL2_nMAIR2_EL1		|
-+				       HFGxTR_EL2_nS2POR_EL1		|
-+				       HFGxTR_EL2_nPOR_EL1		|
-+				       HFGxTR_EL2_nPOR_EL0		|
-+				       HFGxTR_EL2_nACCDATA_EL1		|
-+				       HFGxTR_EL2_nSMPRI_EL1_MASK	|
-+				       HFGxTR_EL2_nTPIDR2_EL0_MASK);
-+
-+	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
-+out:
-+	mutex_unlock(&kvm->arch.config_lock);
-+}
-+
- int __init kvm_sys_reg_table_init(void)
- {
- 	struct sys_reg_params params;
+ 	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
+ out:
+ 	mutex_unlock(&kvm->arch.config_lock);
 -- 
 2.39.2
 
