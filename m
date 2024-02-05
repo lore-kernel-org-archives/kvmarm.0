@@ -1,121 +1,65 @@
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C3448782
-	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 18:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB9794A9B0
+	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 21:56:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707158623; cv=none; b=jFNUw5iPTgiSTUK3+iGwOtjkPYUGSOK0zfSmqx+S1fhEDw0/W9hRjxUsCt3ZzvLQZqGYBBCui0XdM73EQbyurtQSc0nClXHU6vLhPViWWaiRML8igByeVubDBv8IVs8vSJJCCuQhYKPFv7dD50EIkt+wNIbDKDzQSQ7S63FLhY4=
+	t=1707170189; cv=none; b=s4ni3GZVGXAsUb5HI+SMQUt+wd05yow4xYYDjlr5sejGdcNEQUWuFZpD7oaxJEwvSwtLBYrs+O9GLrV3txm5DvoywRoO3UhuqAzuj8wrFik+xwrMLSA9qB0kCpEmVt2kFnzX6HpffCPI8KwN8ZblyPsMzfTfHNx86CDBnrs/k8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707158623; c=relaxed/simple;
-	bh=nmTgukHgTcZ/pZA80eYQ+M9fO2HDt9ms9ZXkd1+gOI8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nXoXyjGj+QG86iv4kBXv5P79lfkX7iAGRv9A0/NNbsS3HrTUGRfVAfJJRIpDUiSnsrdyTEn2B1ENjz1IZV21jkSBTOOu07FpLc4P7Jhmkv0VrDTKbyAdA+m0RJW3s7KraUQckgoskZqYifUdasrDzmVRcmw+6YRVot8tQZumpOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=t7vvPXVD; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	s=arc-20240116; t=1707170189; c=relaxed/simple;
+	bh=LQnuxU1HCojSqMw5PprB5FS4EXyL1CKa2bYivcpQ2Lg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=a6N42MVGrHb3N3nKpqevr6ZXjf43TJJilWmkps3xqct0jP2n7JQKcGhlr4bKs+pO9Rp2Wuitrf6EOECamxqnphN7WM/zCdYQNOtG6BXzybD0/PVk1jeHictXjVj5sWfm2pG+2FVuL8Z2j82F0hyV07ObJQ1nt0KiT5mMaUcADg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IB3aXiqB; arc=none smtp.client-ip=209.85.167.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="t7vvPXVD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IB3aXiqB"
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3bbd6ea06f5so2038004b6e.1
+        for <kvmarm@lists.linux.dev>; Mon, 05 Feb 2024 13:56:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1707158621; x=1738694621;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=n0UiRQIDwXPhO89gFc7hLFAJlLuRhv/umCxdj84c8o0=;
-  b=t7vvPXVD0XXwX6DX6nZjuNeze+0e1hVjieo69BH8ohs7td2PnFE9dhWv
-   zMfvVi0dKltnxX5tMJagvKd8z6/QhEYPqCVpHW61ZLftc4bCxpDiiYXM2
-   12HtgDyNubWWonL48stICQX4cIyDf/UHRBILWJx6zSpbjedNcwewi33FP
-   o=;
-X-IronPort-AV: E=Sophos;i="6.05,245,1701129600"; 
-   d="scan'208";a="63862469"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 18:43:39 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [10.0.43.254:27241]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.8.155:2525] with esmtp (Farcaster)
- id f9ee6ae2-72b7-46e1-a0c5-bc63b12df20d; Mon, 5 Feb 2024 18:43:38 +0000 (UTC)
-X-Farcaster-Flow-ID: f9ee6ae2-72b7-46e1-a0c5-bc63b12df20d
-Received: from EX19D031EUB002.ant.amazon.com (10.252.61.105) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 5 Feb 2024 18:43:38 +0000
-Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
- EX19D031EUB002.ant.amazon.com (10.252.61.105) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 5 Feb 2024 18:43:37 +0000
-Received: from dev-dsk-sauravsc-1a-8777b848.eu-west-1.amazon.com
- (172.19.118.34) by mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40 via Frontend Transport; Mon, 5 Feb 2024 18:43:35 +0000
-From: Saurav Sachidanand <sauravsc@amazon.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-CC: Saurav Sachidanand <sauravsc@amazon.com>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH] [RFC] KVM: arm64/vgic: Populate GICR_TYPER with Aff3
-Date: Mon, 5 Feb 2024 18:43:26 +0000
-Message-ID: <20240205184326.78814-1-sauravsc@amazon.com>
-X-Mailer: git-send-email 2.40.1
+        d=google.com; s=20230601; t=1707170187; x=1707774987; darn=lists.linux.dev;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LQnuxU1HCojSqMw5PprB5FS4EXyL1CKa2bYivcpQ2Lg=;
+        b=IB3aXiqBvaWRQbsvJNkDqj5iU8o3mzxxjrRrzRet1Q8l2SPRjo2CbidiaPn/q/Imtx
+         V9UUnTn3ej3A1PWXttkdDWEC+P8AUOzgmT8V/g4Dwfvg2yCiExOIX5db/ZeC6zMwwJId
+         ko+N3oxzgzwrP61yh3XQhOEYCgHhWY4WCat+bTVmgGc1xPM3DICaXhjXOeFNR6OXHrNp
+         mDN/5V1fti8wXb0hvpEix6tL7tysJmRplULh0Yar4JfDrowj5ICYBV/MMzml7ozZMRuW
+         qr+NspvPFOQbvtFC0o8psiNFo/6ai5w3+m0Z/2s0LE6hgpkhXc1P8CEBzWNd92CXQZVd
+         +LTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707170187; x=1707774987;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LQnuxU1HCojSqMw5PprB5FS4EXyL1CKa2bYivcpQ2Lg=;
+        b=bIQ7PaMKvEHU6iVovUme5Kul+JeDVs3xVAP2/W/zm1lM78z3jOWMtgnkLaC8me4n0J
+         37PaDfk/LldviX+GmgglABHe4MsS/pjJpW3Zphieu2qJ9v+XHnDYmrtJ9rqQpfDD6BPl
+         MF0rYdfPxg9urfwM5mIC60/6sW0p+sZYW+ytEEW4RRhLC447VLh2bBho6TaPOTCcQ0Ag
+         +3XJRmpgI9Ca9WCGqqOqYu9OqPutPhMF/qhy3DV5fxMScVRm0pUuNYw4XKDqzCLx1jWs
+         nypXkE5ejxbkYgiLJXZHsEvutIJ3novVjaxz/NF9+H7CGJ4pTHlMGxG3XqKOSkRaf6zl
+         Y8Mw==
+X-Gm-Message-State: AOJu0YzGrz9SCqel53ytzOBNKlM1rij9WrBWHNbGjimLjBuMStlpHgXA
+	rEzyr2E3HUldoy/OueZdfvH6oblkJkJHEZJt5qFRp7F74VciUUIFyixYrbP3FAVQ5wmUEdYczTD
+	210NrWAwbJg0dHNqdJPkpT6vRQtOQjy7ui8y7
+X-Google-Smtp-Source: AGHT+IHJCzG1k6t5OdcSqCWDVM4SOxp7IeB0S7XvTeXg+mqlm+3/G/Uf+RVBY398zcSVCl+WtTQmgetcUCIIme3Sr3Y=
+X-Received: by 2002:a05:6808:44:b0:3bf:cb83:76a7 with SMTP id
+ v4-20020a056808004400b003bfcb8376a7mr450140oic.5.1707170186948; Mon, 05 Feb
+ 2024 13:56:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-6-amoorthy@google.com>
+In-Reply-To: <20231109210325.3806151-6-amoorthy@google.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Mon, 5 Feb 2024 13:55:50 -0800
+Message-ID: <CAF7b7mrOuBS=nOAy5QbVpR_TzsOG4Kop+_TiD7EZVYATvtWFDg@mail.gmail.com>
+Subject: Re: [PATCH v6 05/14] KVM: Try using fast GUP to resolve read faults
+To: kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-According to spec, bits [63:56] of the GICR_TYPER register are supposed
-to contain Affinity level 3 (Aff3) bits of the Processing Element (PE)
-associated with its GIC redistributor. Linux guests on boot match PEs
-with their redistributor using all four Affinity level bits from this
-register.
-
-Currently, vGIC populates GICR_TYPER with just the first three Affinity
-levels of a vCPU's MPIDR. This works fine for a Linux guest that boots
-with KVM's default vCPU MPIDR assignment, which also only populates till
-the first three Affinity levels.
-
-However, a hypervisor can override KVM's default MPIDR assignment by
-writing directly to a vCPU's MPIDR_EL1 register. If such a hypervisor
-were to populate Aff3 bits for a VM, a Linux guest booting there would
-fail to match vCPUs with their vGIC redistributors, since their virtual
-GICR_TYPER registers would be missing the respective Aff3 bits.
-
-To change that, let's populate GICR_TYPER using Aff3 bits [39:32] from
-the vCPU's MPIDR.
-
-Signed-off-by: Saurav Sachidanand <sauravsc@amazon.com>
----
- arch/arm64/kvm/vgic/vgic-mmio-v3.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index c15ee1df036a..26bc838ce14c 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -324,6 +324,7 @@ static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
- 	u64 value;
- 
- 	value = (u64)(mpidr & GENMASK(23, 0)) << 32;
-+	value |= (u64)((mpidr >> 32) & GENMASK(7, 0)) << 56;
- 	value |= ((target_vcpu_id & 0xffff) << 8);
- 
- 	if (vgic_has_its(vcpu->kvm))
--- 
-2.40.1
-
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
-
+Dropped as per https://lore.kernel.org/kvm/CADrL8HXSzm_C9UwUb8-H_c6-TRgpkKLE+qeXfyN-X_rHGj2vuw@mail.gmail.com/
