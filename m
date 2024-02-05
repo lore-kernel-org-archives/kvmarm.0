@@ -1,107 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7021EB56;
-	Mon,  5 Feb 2024 13:15:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A8A210E0
+	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 13:21:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707138940; cv=none; b=RvdbZbyoHH5o4rjEZlmX8QK9qbNBs2wylqXfTWvumGO3cBxsWm2OKX33BNm2K2Il3iaAKxutKMSs+GFkZW1NTFrD5M41marDca/LFZUuaePP0wfXTY2Roye0p/57K9Sz4n6iRAOfqlVGjD3GxopqwI5MrLxP61HLGiVsviKGt2k=
+	t=1707139294; cv=none; b=I7MPccfv8wMkb/pcpIouHYPcwXFSHG/nc6vDPalhHwvEhLdbekCXDocXsjuvjWbI9HZ1pgZjtA0IPIPV44VQvBuBfZ8UHUNteiXQAzadWYW1CbLcbaaNoHIVsJDavvFKdfbGnk1lAq4r0oad3l5ARgP1B2s7+DFpadN58IntIgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707138940; c=relaxed/simple;
-	bh=6JEN0DBAiHPFyGGPONH92+iR7vBOYSdVo4q0QeyWNw4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uWTGInSQ7HCJV+OMfl33Z0swEp6QVIq3xOCAg89DryJbgcohg/lDPEaj10p5D7EModSzvgUYjzfBi3mKkrgPkqpoIwOtZm/Pj4uc0ah4bJF/5nrKCMcMK77vjfocelOQYkAt+73k65TY+hGx1WxmrjBpfKrOzmg0HpUxB+XGUuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jEeuHPmW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707139294; c=relaxed/simple;
+	bh=mDdBJfptNTRev8vYPas+YaJMyNsKhfsljBz9EaTVLlI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A67t+aM3luuCbgqVhhtzcNrbpreJodGSuFtbAX5svn31JPRXZrDBQ4ncx9f1kLY+SUfn3t3rCwYoqrXLOi6rhplHI4U99PrU+5FM7P8eqGTiKz7uquQfQvnMF0pz7+8fqWHffdOk7OQPKE+ZoK5AsVhTBN4kQ+/Z5irBsMs0CIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YbgN3AeY; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jEeuHPmW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6A56C43390;
-	Mon,  5 Feb 2024 13:15:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707138939;
-	bh=6JEN0DBAiHPFyGGPONH92+iR7vBOYSdVo4q0QeyWNw4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jEeuHPmWknWSvna+7Tkazlgv5+2cap1HwWBU3db/vLXOWu5fTsL47AYuUR1PdXXC+
-	 rJMyAZ3b2LbVAbHAdVAoUNZRfpe09Jdon9H871vYPeQ0fQY9x0pS0V/yOlI9Ef85aX
-	 iBq+/oDFtAc6bYlLDHp3/5o9ioFollD/3p7B7NFZXTqwFB7LMKPwyzSJNb3RqtLePn
-	 VwLh+MiXFoMi5iSpKWcCUaXwJ8D6BBK0/s5aLRnva+OzHhL1ZYVT50m7TTlv8GpHqL
-	 af3/6Co5Umzh0CDlHePmM/csh2C0/Ctng3HE4yq3xB18uLtdRSjtc80nEvWFLzjM+K
-	 6av45lPley9iQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rWyoz-000QXp-A2;
-	Mon, 05 Feb 2024 13:15:37 +0000
-Date: Mon, 05 Feb 2024 13:15:36 +0000
-Message-ID: <867cjj6ohz.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: James Clark <james.clark@arm.com>,
-	coresight@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	broonie@kernel.org,
-	suzuki.poulose@arm.com,
-	acme@kernel.org,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YbgN3AeY"
+Date: Mon, 5 Feb 2024 13:21:26 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1707139289;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r8wLnWWA4PkBzsgde5n7CqFtTqXJKCoOlinRqF4VWvs=;
+	b=YbgN3AeYOgNDxaxv3aL5Fi28ARY/eOEICeZpSZRF0YfQU1YAdGSQfeldDujThmMNVzkW2y
+	30AMFFza0kmkbbJaalH9ea8uNYwRzjjABMlX74rwrM1rqkPl9nnwfsR+UVZlgwsd2NQw6B
+	kIbtuNJxoUI8q6fyV5ZW3UenW76RkIM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: James Clark <james.clark@arm.com>, coresight@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	broonie@kernel.org, suzuki.poulose@arm.com, acme@kernel.org,
 	James Morse <james.morse@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mike Leach <mike.leach@linaro.org>,
+	Will Deacon <will@kernel.org>, Mike Leach <mike.leach@linaro.org>,
 	Leo Yan <leo.yan@linaro.org>,
 	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Rob Herring <robh@kernel.org>,
-	Miguel Luis <miguel.luis@oracle.com>,
+	Rob Herring <robh@kernel.org>, Miguel Luis <miguel.luis@oracle.com>,
 	Jintack Lim <jintack.lim@linaro.org>,
 	Ard Biesheuvel <ardb@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
+	Mark Rutland <mark.rutland@arm.com>, Arnd Bergmann <arnd@arndb.de>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Kristina Martsenko <kristina.martsenko@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
+	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
 	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 2/7] arm64: KVM: Use shared area to pass PMU event state to hypervisor
-In-Reply-To: <ZcDc8-FQo8wKavA4@linux.dev>
+	Jing Zhang <jingzhangos@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 2/7] arm64: KVM: Use shared area to pass PMU event
+ state to hypervisor
+Message-ID: <ZcDg1sP3EYZG-i_3@linux.dev>
 References: <20240104162714.1062610-1-james.clark@arm.com>
-	<20240104162714.1062610-3-james.clark@arm.com>
-	<Zb1mCCi13AJ_YjFZ@linux.dev>
-	<8a908ee8-620a-d9c2-734b-5a6402950072@arm.com>
-	<ZcDc8-FQo8wKavA4@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240104162714.1062610-3-james.clark@arm.com>
+ <Zb1mCCi13AJ_YjFZ@linux.dev>
+ <8a908ee8-620a-d9c2-734b-5a6402950072@arm.com>
+ <ZcDc8-FQo8wKavA4@linux.dev>
+ <867cjj6ohz.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, james.clark@arm.com, coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, broonie@kernel.org, suzuki.poulose@arm.com, acme@kernel.org, james.morse@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, leo.yan@linaro.org, alexander.shishkin@linux.intel.com, anshuman.khandual@arm.com, robh@kernel.org, miguel.luis@oracle.com, jintack.lim@linaro.org, ardb@kernel.org, mark.rutland@arm.com, arnd@arndb.de, vdonnefort@google.com, kristina.martsenko@arm.com, tabba@google.com, joey.gouly@arm.com, akihiko.odaki@daynix.com, jingzhangos@google.com, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <867cjj6ohz.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 05 Feb 2024 13:04:51 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Mon, Feb 05, 2024 at 01:15:36PM +0000, Marc Zyngier wrote:
+> On Mon, 05 Feb 2024 13:04:51 +0000,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> > 
+> > Unless someone has strong opinions about making this work in protected
+> > mode, I am happy to see tracing support limited to the 'normal' nVHE
+> > configuration. The protected feature as a whole is just baggage until
+> > upstream support is completed.
 > 
-> Unless someone has strong opinions about making this work in protected
-> mode, I am happy to see tracing support limited to the 'normal' nVHE
-> configuration. The protected feature as a whole is just baggage until
-> upstream support is completed.
+> Limiting tracing to non-protected mode is a must IMO. Allowing tracing
+> when pKVM is enabled is a sure way to expose secrets that should
+> stay... secret. The only exception I can think of is when
+> CONFIG_NVHE_EL2_DEBUG is enabled, at which point all bets are off.
 
-Limiting tracing to non-protected mode is a must IMO. Allowing tracing
-when pKVM is enabled is a sure way to expose secrets that should
-stay... secret. The only exception I can think of is when
-CONFIG_NVHE_EL2_DEBUG is enabled, at which point all bets are off.
-
-Thanks,
-
-	M.
+Zero argument there :) I left off the "and PMU" part of what I was
+saying, because that was a feature that semi-worked in protected mode
+before VM/VCPU shadowing support landed.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
