@@ -1,182 +1,215 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1191B3EA9C;
-	Mon,  5 Feb 2024 16:58:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78E2544C8A
+	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 17:38:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707152307; cv=none; b=JsrA9ydtCvLudb2n3F06VgTddG5RWE6HeESpLmtr/hcRvJihEPb/835Ao0wh1GRwe/iDrg2aEXHzScAGAQxqcKbEq+d8+5avgQ5zOrXUY734ljyrc6v/HewKt+2ry20O6Vf89+KLXeMrT6WJdDo6Rgd6JLTxSH3uUzTupon+UZU=
+	t=1707154709; cv=none; b=dkfzaG/nohhOjjnZhsmCJP1x26tUrst7s5mqreiuiDztSm3j8SDR+3dpfwT8H2LnMoJS4Cc/vfgmd1IlU46Cas+0CYY3PyujW5rK1jcg4Nu4iReiY+aUop5b1XqtWStFn1PrWwn3rhm+GeHDTLFMbO4nJnTRnScITQ427zAfHZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707152307; c=relaxed/simple;
-	bh=9FpafEGlyrNhPgZJkrgRLS7U6aCYTe6Poar4f0Fu86c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UNX2AZ2loPzImhL2BHBwDYF++BgtrPHACT87etOZ+8o3NWj4+bPKrc6VbR4GO2P3ME3pv2tt3Xr38bF69f5AYUQ3qteh+jTXBuqAZsjliJo8IDzS552nPk1kYsEECngwnrQrNrzielmarhz5eWNXSbHxduGkpB040xBesVJlBAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jdAa96kD; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jdAa96kD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42EE0C433C7;
-	Mon,  5 Feb 2024 16:58:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707152306;
-	bh=9FpafEGlyrNhPgZJkrgRLS7U6aCYTe6Poar4f0Fu86c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jdAa96kD60IeV9lxQp0ubdqOgUSHcdsjtge2WP6mvoDwpwOe+Rw7nwcU7ORKlVlgr
-	 8Z6UYcfu0rXRgY6H147qPvpixPmJkpZDmWrIwgKeNqmHE5Dyf5eNNmQ5bBvWaONUZO
-	 0/G6+v/VmTdZm/r0jhWTvEEg+oGSkpJiB3YYAtdV41ad/d4EyHHPk7vnDwmNhbZO9W
-	 xGQCvUQAyZvm+DIKz7D+cBrAtQbQgXkRRwM6jx1tMc0pifYl3BcJGyd0M/p6YJjmTK
-	 m/3/iDifHMb1SIEd4HlIJDGTt/kOZPRgXRKA/sGbloE3oJcO4SJAp50Cw6wGa0iRnt
-	 6WaVOdTjOW2yA==
-Date: Mon, 5 Feb 2024 16:58:20 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v8 13/38] KVM: arm64: Manage GCS registers for guests
-Message-ID: <ZcETrPAFFfgAy/PT@finisterre.sirena.org.uk>
-References: <20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org>
- <20240203-arm64-gcs-v8-13-c9fec77673ef@kernel.org>
- <868r3z6y6v.wl-maz@kernel.org>
- <825d2b35-fa10-43ad-b3b3-b29a77f3fed0@sirena.org.uk>
- <8634u76i36.wl-maz@kernel.org>
+	s=arc-20240116; t=1707154709; c=relaxed/simple;
+	bh=9Spm0Ff0m4tNQcH3R6VE3NIt6aLLKaf/fRN2ZWhwEvo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ruyk3N6gyjbp0NAcmM0ca8cDEczkCgUrKYyF0UzoGROLYsViwJ8ak+YBY2TYoHyxzpHgUe08o3NK4kfg9/U1X7NaQh5AbSd3JxOUD38YUxK/mG+5G1qvv1Kk8FSrJDi9J5adinVedRwiTl7GRW6+OzWJomd00CIGdmspU/sQtFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8578512FC;
+	Mon,  5 Feb 2024 09:39:09 -0800 (PST)
+Received: from [10.57.9.25] (unknown [10.57.9.25])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4509F3F5A1;
+	Mon,  5 Feb 2024 09:38:25 -0800 (PST)
+Message-ID: <35b69e13-757a-435c-8dcc-7079a0313f99@arm.com>
+Date: Mon, 5 Feb 2024 17:38:23 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="CPooLl9HGmOME8a3"
-Content-Disposition: inline
-In-Reply-To: <8634u76i36.wl-maz@kernel.org>
-X-Cookie: You might have mail.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 02/26] KVM: arm64: Add feature checking helpers
+Content-Language: en-GB
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org
+Cc: James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Joey Gouly <joey.gouly@arm.com>, Mark Brown <broonie@kernel.org>
+References: <20240205103431.1104133-1-maz@kernel.org>
+ <20240205103431.1104133-3-maz@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20240205103431.1104133-3-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+On 05/02/2024 10:34, Marc Zyngier wrote:
+> In order to make it easier to check whether a particular feature
+> is exposed to a guest, add a new set of helpers, with kvm_has_feat()
+> being the most useful.
+> 
+> Let's start making use of them in the PMU code (courtesy of Oliver).
+> Follow-up changes will introduce additional use patterns.
+> 
+> Co-developed--by: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
 
---CPooLl9HGmOME8a3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> ---
+>   arch/arm64/include/asm/kvm_host.h | 44 +++++++++++++++++++++++++++++++
+>   arch/arm64/kvm/pmu-emul.c         | 11 ++++----
+>   arch/arm64/kvm/sys_regs.c         |  6 ++---
+>   include/kvm/arm_pmu.h             | 11 --------
+>   4 files changed, 52 insertions(+), 20 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 21c57b812569..527da3d2cedb 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1233,4 +1233,48 @@ static inline void kvm_hyp_reserve(void) { }
+>   void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
+>   bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
+>   
+> +#define __expand_field_sign_unsigned(id, fld, val)			\
+> +	((u64)SYS_FIELD_VALUE(id, fld, val))
+> +
+> +#define __expand_field_sign_signed(id, fld, val)			\
+> +	({								\
+> +		u64 __val = SYS_FIELD_VALUE(id, fld, val);		\
+> +		sign_extend64(__val, id##_##fld##_WIDTH - 1);		\
+> +	})
+> +
+> +#define expand_field_sign(id, fld, val)					\
+> +	(id##_##fld##_SIGNED ?						\
+> +	 __expand_field_sign_signed(id, fld, val) :			\
+> +	 __expand_field_sign_unsigned(id, fld, val))
+> +
+> +#define get_idreg_field_unsigned(kvm, id, fld)				\
+> +	({								\
+> +		u64 __val = IDREG((kvm), SYS_##id);			\
+> +		FIELD_GET(id##_##fld##_MASK, __val);			\
+> +	})
+> +
+> +#define get_idreg_field_signed(kvm, id, fld)				\
+> +	({								\
+> +		u64 __val = get_idreg_field_unsigned(kvm, id, fld);	\
+> +		sign_extend64(__val, id##_##fld##_WIDTH - 1);		\
+> +	})
+> +
+> +#define get_idreg_field_enum(kvm, id, fld)				\
+> +	get_idreg_field_unsigned(kvm, id, fld)
+> +
+> +#define get_idreg_field(kvm, id, fld)					\
+> +	(id##_##fld##_SIGNED ?						\
+> +	 get_idreg_field_signed(kvm, id, fld) :				\
+> +	 get_idreg_field_unsigned(kvm, id, fld))
+> +
+> +#define kvm_has_feat(kvm, id, fld, limit)				\
+> +	(get_idreg_field((kvm), id, fld) >= expand_field_sign(id, fld, limit))
+> +
+> +#define kvm_has_feat_enum(kvm, id, fld, val)				\
+> +	(get_idreg_field_unsigned((kvm), id, fld) == __expand_field_sign_unsigned(id, fld, val))
+> +
+> +#define kvm_has_feat_range(kvm, id, fld, min, max)			\
+> +	(get_idreg_field((kvm), id, fld) >= expand_field_sign(id, fld, min) && \
+> +	 get_idreg_field((kvm), id, fld) <= expand_field_sign(id, fld, max))
+> +
+>   #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 3d9467ff73bc..925522470b2b 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -64,12 +64,11 @@ u64 kvm_pmu_evtyper_mask(struct kvm *kvm)
+>   {
+>   	u64 mask = ARMV8_PMU_EXCLUDE_EL1 | ARMV8_PMU_EXCLUDE_EL0 |
+>   		   kvm_pmu_event_mask(kvm);
+> -	u64 pfr0 = IDREG(kvm, SYS_ID_AA64PFR0_EL1);
+>   
+> -	if (SYS_FIELD_GET(ID_AA64PFR0_EL1, EL2, pfr0))
+> +	if (kvm_has_feat(kvm, ID_AA64PFR0_EL1, EL2, IMP))
+>   		mask |= ARMV8_PMU_INCLUDE_EL2;
+>   
+> -	if (SYS_FIELD_GET(ID_AA64PFR0_EL1, EL3, pfr0))
+> +	if (kvm_has_feat(kvm, ID_AA64PFR0_EL1, EL3, IMP))
+>   		mask |= ARMV8_PMU_EXCLUDE_NS_EL0 |
+>   			ARMV8_PMU_EXCLUDE_NS_EL1 |
+>   			ARMV8_PMU_EXCLUDE_EL3;
+> @@ -83,8 +82,10 @@ u64 kvm_pmu_evtyper_mask(struct kvm *kvm)
+>    */
+>   static bool kvm_pmc_is_64bit(struct kvm_pmc *pmc)
+>   {
+> +	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+> +
+>   	return (pmc->idx == ARMV8_PMU_CYCLE_IDX ||
+> -		kvm_pmu_is_3p5(kvm_pmc_to_vcpu(pmc)));
+> +		kvm_has_feat(vcpu->kvm, ID_AA64DFR0_EL1, PMUVer, V3P5));
+>   }
+>   
+>   static bool kvm_pmc_has_64bit_overflow(struct kvm_pmc *pmc)
+> @@ -556,7 +557,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+>   		return;
+>   
+>   	/* Fixup PMCR_EL0 to reconcile the PMU version and the LP bit */
+> -	if (!kvm_pmu_is_3p5(vcpu))
+> +	if (!kvm_has_feat(vcpu->kvm, ID_AA64DFR0_EL1, PMUVer, V3P5))
+>   		val &= ~ARMV8_PMU_PMCR_LP;
+>   
+>   	/* The reset bits don't indicate any state, and shouldn't be saved. */
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 041b11825578..3c31f8cb9eef 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -505,10 +505,9 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
+>   			  struct sys_reg_params *p,
+>   			  const struct sys_reg_desc *r)
+>   {
+> -	u64 val = IDREG(vcpu->kvm, SYS_ID_AA64MMFR1_EL1);
+>   	u32 sr = reg_to_encoding(r);
+>   
+> -	if (!(val & (0xfUL << ID_AA64MMFR1_EL1_LO_SHIFT))) {
+> +	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, LO, IMP)) {
+>   		kvm_inject_undefined(vcpu);
+>   		return false;
+>   	}
+> @@ -2748,8 +2747,7 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
+>   		return ignore_write(vcpu, p);
+>   	} else {
+>   		u64 dfr = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);
+> -		u64 pfr = IDREG(vcpu->kvm, SYS_ID_AA64PFR0_EL1);
+> -		u32 el3 = !!SYS_FIELD_GET(ID_AA64PFR0_EL1, EL3, pfr);
+> +		u32 el3 = kvm_has_feat(vcpu->kvm, ID_AA64PFR0_EL1, EL3, IMP);
+>   
+>   		p->regval = ((SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, dfr) << 28) |
+>   			     (SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, dfr) << 24) |
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 4b9d8fb393a8..eb4c369a79eb 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -90,16 +90,6 @@ void kvm_vcpu_pmu_resync_el0(void);
+>   			vcpu->arch.pmu.events = *kvm_get_pmu_events();	\
+>   	} while (0)
+>   
+> -/*
+> - * Evaluates as true when emulating PMUv3p5, and false otherwise.
+> - */
+> -#define kvm_pmu_is_3p5(vcpu) ({						\
+> -	u64 val = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);		\
+> -	u8 pmuver = SYS_FIELD_GET(ID_AA64DFR0_EL1, PMUVer, val);	\
+> -									\
+> -	pmuver >= ID_AA64DFR0_EL1_PMUVer_V3P5;				\
+> -})
+> -
+>   u8 kvm_arm_pmu_get_pmuver_limit(void);
+>   u64 kvm_pmu_evtyper_mask(struct kvm *kvm);
+>   int kvm_arm_set_default_pmu(struct kvm *kvm);
+> @@ -168,7 +158,6 @@ static inline u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+>   }
+>   
+>   #define kvm_vcpu_has_pmu(vcpu)		({ false; })
+> -#define kvm_pmu_is_3p5(vcpu)		({ false; })
+>   static inline void kvm_pmu_update_vcpu_events(struct kvm_vcpu *vcpu) {}
+>   static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
+>   static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
 
-On Mon, Feb 05, 2024 at 03:34:05PM +0000, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
-> > On Mon, Feb 05, 2024 at 09:46:16AM +0000, Marc Zyngier wrote:
-
-> > > We have had this discussion in the past. This must be based on the
-> > > VM's configuration. Guarding the check with the host capability is a
-> > > valuable optimisation, but that's nowhere near enough. See the series
-> > > that I have posted on this very subject (you're on Cc), but you are
-> > > welcome to invent your own mechanism in the meantime.
-
-> > Right, which postdates the version you're replying to and isn't merged
-> > yet - the current code was what you were asking for at the time.
-
-> v1 and v2 predate it. And if the above is what I did ask, then I must
-> have done a very poor job of explaining what was required. For which I
-> apologise profusely.
-
-To be clear it's what was asked for prior to the switch to the
-forthcoming switch to the parsing idregs scheme, I haven't pulled in
-your idregs work yet since it's being rapidly iterated and this is an
-already large series with dependencies.
-
-> > I'm
-> > expecting to update all these feature series to work with that once it
-> > gets finalised and merged but it's not there yet, I do see I forgot to
-> > put a note in v9 about that like I did for dpISA - sorry about that, I
-> > was too focused on the clone3() rework when rebasing onto the new
-> > kernel.
-
-> > This particular series isn't going to get merged for a while yet anyway
-> > due to the time it'll take for userspace testing, I'm expecting your
-> > series to be in by the time it becomes an issue.
-
-> Right. Then I'll ignore it for the foreseeable future.
-
-Actually now I think about it would you be open to merging the guest
-context switching bit without the rest of the series (pending me fixing
-the issues you raise of course)?  If so I'll split that bit out in the
-hope that we can reduce the size of the series and CC list for the
-userspace support which I imagine would make people a bit happier.
-
-> > > > +		write_sysreg_s(ctxt_sys_reg(ctxt, GCSCRE0_EL1),
-> > > > +			       SYS_GCSCRE0_EL1);
-> > > > +	}
-
-> > > For the benefit of the unsuspecting reviewers, and in the absence of a
-> > > public specification (which the XML drop isn't), it would be good to
-> > > have the commit message explaining the rationale of what gets saved
-> > > when.
-
-> > What are you looking for in terms of rationale here?  The KVM house
-> > style is often very reliant on reader context so it would be good to
-> > know what considerations you'd like to see explicitly addressed.
-
-> Nothing to do with style, everything to do with substance: if nothing
-
-The style I'm referring to there is the style for documentation.
-
-> in the host kernel makes any use of these registers, why are they
-> eagerly saved/restored on nVHE/hVHE? I'm sure you have a reason for
-> it, but it isn't that obvious. Because these two modes need all the
-> help they can get in terms of overhead reduction.
-
-Ah, I see - yes, they should probably be moved somewhere else.  Though
-I'm not clear why some of the other registers that we're saving and
-restoring in the same place are being done eagerly?  The userspace
-TPIDRs stand out for example, they're in taken care of in
-__sysreg_save_user_state() which is called in the same paths.  IIRC my
-thinking there was something along the lines of "this is where we save
-and restore everything else that's just a general system register, I
-should be consistent".
-
-Am I right in thinking kvm_arch_vcpu_load()/_put() would make sense?
-Everything in there currently looked like it was there more due to doing
-something more complex than simple register save/restore and we weren't
-worrying too much about what was going on with just the sysregs.
-
-> > These
-> > registers shouldn't do anything when we aren't running the guest so
-> > they're not terribly ordering sensitive, the EL2 ones will need a bit
-> > more consideration in the face of nested virt.
-
-> The EL2 registers should follow the exact same pattern, specially once
-> you fix the VNCR bugs I pointed out.
-
-Great, that's what I'd thought thanks - I hadn't checked yet.
-
---CPooLl9HGmOME8a3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXBE6sACgkQJNaLcl1U
-h9AxYAgAgiMyW4DrBuI2SbKKpBxTNqFWS6hwvL/pz27nGc2T9cgR2P2ODSG3A9Cv
-MJh2K7irI4JHl/jj/8GLJLH5IVMOVyVYPtTxauHvCVu+I6RM92hSfVey9I7clK40
-Lxhri2n3D8Tj89RvRi90LvEgM0pJKqGBYYpc+lZBuUVhpsHDx1rwBsuMmryxpbyX
-U9xvwhFc+lNUfrCUYIVp0VThb8QBJzBYs0SSVyM1ggHARaP+t64DzE+vrtI9h5QN
-CQo6qN+H0ojTvx9E0MGZhqBPtNnGOs3jafSq88emxX431D+3kZSJwY4npbfFNQd3
-Il677REj9RoCNO5cSTKMWWb27EzOxg==
-=xxbo
------END PGP SIGNATURE-----
-
---CPooLl9HGmOME8a3--
