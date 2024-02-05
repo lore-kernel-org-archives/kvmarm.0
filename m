@@ -1,142 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E072C859;
-	Mon,  5 Feb 2024 12:36:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 439171CA9E
+	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 13:04:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707136563; cv=none; b=Q039HIxyetQidiyk+auvmGWLw7iWVfJ0n0SnMdVp+yuIDbh7JsgGIbsHGEZVwSPSGQ1kkUgIsg9LTDlywJ/etFfmEtchCvVVKb1VBvzegAubMVUITkPwjupK3bYERsZ2bJF0XYqJrAYsXACVEC86K2I3JFnFzuBzqZv61ibUCoI=
+	t=1707138300; cv=none; b=qdlHUseCD4Y+LNfA4j7P3lhmvMVkAOzF1KIJco6K+rG1jTwraCxTsNUqMwuxgwtCFmpizMFOHMLDhlBPMuHxFVw4oNzonJzLZGTxRktG/w09RUKETNeuw+ZwKx/fX7nn/4ywUKjZbrvFS6YfQBUbuGuLoL9SEaPQUg1ll9+VJtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707136563; c=relaxed/simple;
-	bh=W/gM23dRxGIQHhXX9oPXf9/doTEakFPicYrHGjQOU1o=;
+	s=arc-20240116; t=1707138300; c=relaxed/simple;
+	bh=6R73Y1eL+XW9/5GN5zqnbfIAD02pmTNPIsXX1PzbkQc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nAqc8fxcX4EQ9Hwi0WrQOIw82PJebCvNzno++fG7KNEItPNlKk8E4OUlZAtFuJdM0XUSKmsnod0i/17M9UQX+znq4FbpL2bj1Ud2DLOpSXu23NXdGhp0JkBZe3kZeDR0Yo2dIuiKHGgoqfMBXD3HbQERVQyhtkeFVkaE4PzP+os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kiq7v3WH; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=KDMljlHQPa+4npFQuOn2QtY0HkHLNr9M59DeaZ+j7vBXbSMuRO2oWcjmoxFBUl05sfVyrsINgXFlDXlJXXffE3kBOzLmkEZmpzKNiX3xgyc0SAq6PBgyj2RpDqh2tHQQxpTTvblwo+hPnbG1mkyo1YSAwsDy2ahk97d89UT4bNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=d5OTMkxI; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kiq7v3WH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5E9CC433F1;
-	Mon,  5 Feb 2024 12:35:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707136563;
-	bh=W/gM23dRxGIQHhXX9oPXf9/doTEakFPicYrHGjQOU1o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kiq7v3WH4BXjlBM5da8GhgVzNWrFmT69sXn2Z3kO+XSByinlTm+nldLGPza1A7/ZM
-	 wYC2Gg9vCokYw5fDYx/qQEg2c+CFP8iw+xofOVbNYvnsXNedFxCGd3ufs6VxoNBeXH
-	 50FKZLbJXyju+0fAQ40QoDCyBn6FtSNDMwDjUf/bYITVShxqCLWvtPS6T5UZsH074b
-	 a0LHJ05ccHIX0vYhq4C9uU5ICN03IOzpsz9v1K8Bnll82Jt9fqjDRwilIiy+Cj6O2j
-	 Bj2o/ErTqvL0oT0WwGQ3pMhdwKYHeSpKoUUHqRyRoHtoufMjdrU1igTNgB3FQOIkyG
-	 /jdgN58UpyTUQ==
-Date: Mon, 5 Feb 2024 12:35:53 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="d5OTMkxI"
+Date: Mon, 5 Feb 2024 13:04:51 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1707138294;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kjDbYJsA64v+kSKvUvgWTs/MwMgC5uCGKzp4l4kiFPQ=;
+	b=d5OTMkxIJ0g6UM3z7bHVp+C0KObAXlBjbpjAGtUI0R/TQZptwEcQ3TPCtL7tWTrDSzMYAy
+	OEIqo5T0Z0ZpuQ3X9or70pTazC4A7W2D8fH7WO3AfkMisgfErJgHNcefcgqSjmBGDZqsr1
+	QsiPxQfd2K9662ohcknZ8OQ8jJl523k=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: James Clark <james.clark@arm.com>
+Cc: coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, broonie@kernel.org, maz@kernel.org,
+	suzuki.poulose@arm.com, acme@kernel.org,
 	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v8 13/38] KVM: arm64: Manage GCS registers for guests
-Message-ID: <825d2b35-fa10-43ad-b3b3-b29a77f3fed0@sirena.org.uk>
-References: <20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org>
- <20240203-arm64-gcs-v8-13-c9fec77673ef@kernel.org>
- <868r3z6y6v.wl-maz@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mike Leach <mike.leach@linaro.org>,
+	Leo Yan <leo.yan@linaro.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Rob Herring <robh@kernel.org>, Miguel Luis <miguel.luis@oracle.com>,
+	Jintack Lim <jintack.lim@linaro.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>, Arnd Bergmann <arnd@arndb.de>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Kristina Martsenko <kristina.martsenko@arm.com>,
+	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Jing Zhang <jingzhangos@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 2/7] arm64: KVM: Use shared area to pass PMU event
+ state to hypervisor
+Message-ID: <ZcDc8-FQo8wKavA4@linux.dev>
+References: <20240104162714.1062610-1-james.clark@arm.com>
+ <20240104162714.1062610-3-james.clark@arm.com>
+ <Zb1mCCi13AJ_YjFZ@linux.dev>
+ <8a908ee8-620a-d9c2-734b-5a6402950072@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="SWF5NMV/X92Kf8zP"
-Content-Disposition: inline
-In-Reply-To: <868r3z6y6v.wl-maz@kernel.org>
-X-Cookie: No solicitors.
-
-
---SWF5NMV/X92Kf8zP
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <8a908ee8-620a-d9c2-734b-5a6402950072@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Feb 05, 2024 at 09:46:16AM +0000, Marc Zyngier wrote:
-> On Sat, 03 Feb 2024 12:25:39 +0000,
-> Mark Brown <broonie@kernel.org> wrote:
+On Mon, Feb 05, 2024 at 12:16:53PM +0000, James Clark wrote:
+> > This now allows the host to program event counters for a protected
+> > guest. That _might_ be a useful feature behind some debug option, but is
+> > most definitely *not* something we want to do for pVMs generally.
+> 
+> Unless I'm missing something, using PMUs on protected guests was added
+> by 722625c6f4c5b ("KVM: arm64: Reenable pmu in Protected Mode"). This
+> change is just a refactor that will allow us to add the same behavior
+> for a similar feature (tracing) without adding yet another copy of some
+> state before the guest switch.
 
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> > @@ -25,6 +25,8 @@ static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
-> >  {
-> >  	ctxt_sys_reg(ctxt, TPIDR_EL0)	= read_sysreg(tpidr_el0);
-> >  	ctxt_sys_reg(ctxt, TPIDRRO_EL0)	= read_sysreg(tpidrro_el0);
-> > +	if (has_gcs())
-> > +		ctxt_sys_reg(ctxt, GCSPR_EL0) = read_sysreg_s(SYS_GCSPR_EL0);
+Ha, I had forgotten about that patch (and I had reviewed it!)
 
-> We have had this discussion in the past. This must be based on the
-> VM's configuration. Guarding the check with the host capability is a
-> valuable optimisation, but that's nowhere near enough. See the series
-> that I have posted on this very subject (you're on Cc), but you are
-> welcome to invent your own mechanism in the meantime.
+My interpretation of the intent for that change was to enable the usage
+of vPMU for non-protected VMs. The situation has changed since then, as
+we use the shadow state for vCPUs unconditionally in protected mode as
+of commit  be66e67f1750 ("KVM: arm64: Use the pKVM hyp vCPU structure
+in handle___kvm_vcpu_run()")
 
-Right, which postdates the version you're replying to and isn't merged
-yet - the current code was what you were asking for at the time.  I'm
-expecting to update all these feature series to work with that once it
-gets finalised and merged but it's not there yet, I do see I forgot to
-put a note in v9 about that like I did for dpISA - sorry about that, I
-was too focused on the clone3() rework when rebasing onto the new
-kernel.
+Protected mode is well understood at this point to be a WIP feature, and
+that not all things are expected to work with it. Eventually we will
+need a way to distinguish between 'normal' VMs and true pVMs (i.e. the
+VMM selected full isolation) in nVHE, but right now what we have enables
+testing of some isolation features.
 
-This particular series isn't going to get merged for a while yet anyway
-due to the time it'll take for userspace testing, I'm expecting your
-series to be in by the time it becomes an issue.
+> > I'm perfectly happy leaving these sorts of features broken for pKVM and
+> > using the 'normal' way of getting percpu data to the nVHE hypervisor
+> > otherwise.
+> > 
+> 
+> I can do that. But do I also disable PMU at the same time in a new
+> commit? Now that both PMU and tracing is working maybe it would be a
+> waste to throw that away and hiding it behind an option is better. Or I
+> can leave the PMU as it is and just keep tracing disabled in pKVM.
+> 
+> I don't mind either way, my main goal was to get exclude/include guest
+> tracing working for normal VMs. For pKVM I don't have a strong opinion.
 
-> > +	if (has_gcs()) {
-> > +		write_sysreg_el1(ctxt_sys_reg(ctxt, GCSPR_EL1),	SYS_GCSPR);
-> > +		write_sysreg_el1(ctxt_sys_reg(ctxt, GCSCR_EL1),	SYS_GCSCR);
-> > +		write_sysreg_s(ctxt_sys_reg(ctxt, GCSCRE0_EL1),
-> > +			       SYS_GCSCRE0_EL1);
-> > +	}
+Unless someone has strong opinions about making this work in protected
+mode, I am happy to see tracing support limited to the 'normal' nVHE
+configuration. The protected feature as a whole is just baggage until
+upstream support is completed.
 
-> For the benefit of the unsuspecting reviewers, and in the absence of a
-> public specification (which the XML drop isn't), it would be good to
-> have the commit message explaining the rationale of what gets saved
-> when.
-
-What are you looking for in terms of rationale here?  The KVM house
-style is often very reliant on reader context so it would be good to
-know what considerations you'd like to see explicitly addressed.  These
-registers shouldn't do anything when we aren't running the guest so
-they're not terribly ordering sensitive, the EL2 ones will need a bit
-more consideration in the face of nested virt.
-
---SWF5NMV/X92Kf8zP
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXA1iYACgkQJNaLcl1U
-h9Dczgf8Co+AEsFdqthpdeHca9wZHZrvIV4GyHYFYxQUc2QQcQF8l68f9qpa+7WU
-wwyKL5wu1uARGynhBiI1rGQHAv8lBunf5D4wkD3kJ8X/AtB0wSRFutA2Q35fQDo3
-HcJi94+8UvNTLtAgbLMmiyihG6PxVhpUfwA3SZCuun068j81Zcd1hX4hUlpuSEXr
-hm5Hy73ooZ/T/F5OrYsxxUuEbTRWHYhPq+CXEhWhtyTK9wRAzDes+UK6rXdjfOmj
-iFWAR4jYhFukgcENJvGgwKKvS1YUFxMABGAPJmIfjjX/3eVNriZDeh5DFHyrrp+R
-LPixjIxkXqN9p1+ZfpiReAfH4T+wRQ==
-=7b9C
------END PGP SIGNATURE-----
-
---SWF5NMV/X92Kf8zP--
+-- 
+Thanks,
+Oliver
