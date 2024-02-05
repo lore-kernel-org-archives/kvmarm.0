@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE2E1755E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE00917581
 	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 10:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707129287; cv=none; b=OP8yNcxG91rGHZsecK7zRS9VWQ39atw5jQEUdjUJsdr3ZcolPQ94AKPb9sfZGwE4/WH96m4yk0uzj9gB/duxJGEsHu5H7/VHBByPCeHeToAgsjIicjB1S1dEEzXld0Hj3iVg1lyS7gqummqFG9+JJkJrYGyYORQfwhzUJDtMTRg=
+	t=1707129288; cv=none; b=eygaDOmLYITEemlYpdUm/14EkJQHOxv2fc9GeYf9TnjdtQu0mpP86B70jv9WSikERAkHZo9tR/YfBIaA3grWtt4QoOAsIyZnGu07YaJ2aFS35OQTiQhjocDXTcEnckjg46+zKsyyidOKofMnousNWWekYPBk1wz2dOnn+/XrOMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707129287; c=relaxed/simple;
-	bh=zAn9W2FF0W8qabLuUpsfbfwMJlihGUj+bnHo/MG53YE=;
+	s=arc-20240116; t=1707129288; c=relaxed/simple;
+	bh=5vRlXGNPw+t8CSN/WB8SMPvqzMf0CIBVixpJqhMcQMg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BWFJ+nRPjdaLbzTwtG7AhCL4/LafQpCS7GjrXVRsS4MWMTm0hr+7PF9MEbUDp5Uyo00RqwX8BuLBC/swqfYCZTssqVE8GI0y0M0sdheTrH8AvvSVsP3OScXr7Q56nvuCB9vj2Mc/Y0bTsTuj+FZvv1PMVspQQEJradst24kUowQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TXMM+Doz; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=E5Vh/lArppsQ7MLEC/2Bn6XNLcCe2LrheUNB1ctMP/PZNmrXN7SrRnDo+RI396cS4/jsKFwJdQPnFYh0hpD0Im9OOipmq77NFkD1sOCt2Y0oscNNwcdR2ZumNWb35PCRZxTJc+SCkU7mLGAfhoMI7kat09L7hw5FYLRMBPKCLtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G4mtYSO/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TXMM+Doz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50E01C43390;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G4mtYSO/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77E7BC43330;
 	Mon,  5 Feb 2024 10:34:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707129287;
-	bh=zAn9W2FF0W8qabLuUpsfbfwMJlihGUj+bnHo/MG53YE=;
+	bh=5vRlXGNPw+t8CSN/WB8SMPvqzMf0CIBVixpJqhMcQMg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TXMM+DozRtKip5UOZcFoc1qfWK9Y48w60wpLkT7OcxSlA0u8zSsSR9ytT8ZBODMf2
-	 M38BaWi9GSDHXCFa/VY1u4EHbx6sZnAdH1zplE6/gDMw132JwMsnsQAqyD66s5N0b4
-	 GJvjFEB+hYWqEszVCYf869csqHJkbc9ohCKRA1zYrAB9P45OJm9r++n1yvPxwqq2vC
-	 23osD3Ksz3i5fsSFm3c2IuWxEksiDlybYdAxlPO8GCJATNlsh8VaOmMsflQbL4uh30
-	 uz12MAFD3y1MDRhuWk2ZATbjo1j/kIcn+LYHdvBMbe/I/wQqE69JocKDdVM5mXpy+3
-	 +yDmttVd0qkvQ==
+	b=G4mtYSO/BB6tNzu7sdy3W651n3dnl5btLA+QyClzsCVU7uCUEKfuWj3dGdW/wHs9/
+	 DksgoSt/4MzmOTa7kaYBcV5LtYPHh5wFSBJvy/Q5dH+hCBpBdb7WFmNmyMIbpPOUXZ
+	 40MTRwQu5yFtSMIoWTf/pZJbrv/++iZVa3/7/cGX+w/iUPmwrBGgRrGCNt2bsHi+cE
+	 Vz8sa7nUYXc0T6D+EJta8r9y56ce7h37LNAgQa+8uUpFGQq9eeG9pX3SF/2MTB5YuR
+	 aaNxlUYc/ryccIcGhj4ynRwNmePmvE5LLB/WHMaEsfywz+d+6vDCJOTB5WKFFRQlJe
+	 y2eGDWHVGOUIg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rWwJJ-000Nc3-9i;
+	id 1rWwJJ-000Nc3-GA;
 	Mon, 05 Feb 2024 10:34:45 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v3 02/26] KVM: arm64: Add feature checking helpers
-Date: Mon,  5 Feb 2024 10:34:07 +0000
-Message-Id: <20240205103431.1104133-3-maz@kernel.org>
+Subject: [PATCH v3 03/26] KVM: arm64: nv: Add sanitising to VNCR-backed sysregs
+Date: Mon,  5 Feb 2024 10:34:08 +0000
+Message-Id: <20240205103431.1104133-4-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240205103431.1104133-1-maz@kernel.org>
 References: <20240205103431.1104133-1-maz@kernel.org>
@@ -61,171 +61,153 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-In order to make it easier to check whether a particular feature
-is exposed to a guest, add a new set of helpers, with kvm_has_feat()
-being the most useful.
+VNCR-backed "registers" are actually only memory. Which means that
+there is zero control over what the guest can write, and that it
+is the hypervisor's job to actually sanitise the content of the
+backing store. Yeah, this is fun.
 
-Let's start making use of them in the PMU code (courtesy of Oliver).
-Follow-up changes will introduce additional use patterns.
+In order to preserve some form of sanity, add a repainting mechanism
+that makes use of a per-VM set of RES0/RES1 masks, one pair per VNCR
+register. These masks get applied on access to the backing store via
+__vcpu_sys_reg(), ensuring that the state that is consumed by KVM is
+correct.
 
-Co-developed--by: Oliver Upton <oliver.upton@linux.dev>
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+So far, nothing populates these masks, but stay tuned.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 44 +++++++++++++++++++++++++++++++
- arch/arm64/kvm/pmu-emul.c         | 11 ++++----
- arch/arm64/kvm/sys_regs.c         |  6 ++---
- include/kvm/arm_pmu.h             | 11 --------
- 4 files changed, 52 insertions(+), 20 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 22 ++++++++++++++++-
+ arch/arm64/kvm/arm.c              |  1 +
+ arch/arm64/kvm/nested.c           | 41 ++++++++++++++++++++++++++++++-
+ 3 files changed, 62 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 21c57b812569..527da3d2cedb 100644
+index 527da3d2cedb..8cda003d6267 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1233,4 +1233,48 @@ static inline void kvm_hyp_reserve(void) { }
- void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
- bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu);
- 
-+#define __expand_field_sign_unsigned(id, fld, val)			\
-+	((u64)SYS_FIELD_VALUE(id, fld, val))
-+
-+#define __expand_field_sign_signed(id, fld, val)			\
-+	({								\
-+		u64 __val = SYS_FIELD_VALUE(id, fld, val);		\
-+		sign_extend64(__val, id##_##fld##_WIDTH - 1);		\
-+	})
-+
-+#define expand_field_sign(id, fld, val)					\
-+	(id##_##fld##_SIGNED ?						\
-+	 __expand_field_sign_signed(id, fld, val) :			\
-+	 __expand_field_sign_unsigned(id, fld, val))
-+
-+#define get_idreg_field_unsigned(kvm, id, fld)				\
-+	({								\
-+		u64 __val = IDREG((kvm), SYS_##id);			\
-+		FIELD_GET(id##_##fld##_MASK, __val);			\
-+	})
-+
-+#define get_idreg_field_signed(kvm, id, fld)				\
-+	({								\
-+		u64 __val = get_idreg_field_unsigned(kvm, id, fld);	\
-+		sign_extend64(__val, id##_##fld##_WIDTH - 1);		\
-+	})
-+
-+#define get_idreg_field_enum(kvm, id, fld)				\
-+	get_idreg_field_unsigned(kvm, id, fld)
-+
-+#define get_idreg_field(kvm, id, fld)					\
-+	(id##_##fld##_SIGNED ?						\
-+	 get_idreg_field_signed(kvm, id, fld) :				\
-+	 get_idreg_field_unsigned(kvm, id, fld))
-+
-+#define kvm_has_feat(kvm, id, fld, limit)				\
-+	(get_idreg_field((kvm), id, fld) >= expand_field_sign(id, fld, limit))
-+
-+#define kvm_has_feat_enum(kvm, id, fld, val)				\
-+	(get_idreg_field_unsigned((kvm), id, fld) == __expand_field_sign_unsigned(id, fld, val))
-+
-+#define kvm_has_feat_range(kvm, id, fld, min, max)			\
-+	(get_idreg_field((kvm), id, fld) >= expand_field_sign(id, fld, min) && \
-+	 get_idreg_field((kvm), id, fld) <= expand_field_sign(id, fld, max))
-+
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 3d9467ff73bc..925522470b2b 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -64,12 +64,11 @@ u64 kvm_pmu_evtyper_mask(struct kvm *kvm)
- {
- 	u64 mask = ARMV8_PMU_EXCLUDE_EL1 | ARMV8_PMU_EXCLUDE_EL0 |
- 		   kvm_pmu_event_mask(kvm);
--	u64 pfr0 = IDREG(kvm, SYS_ID_AA64PFR0_EL1);
- 
--	if (SYS_FIELD_GET(ID_AA64PFR0_EL1, EL2, pfr0))
-+	if (kvm_has_feat(kvm, ID_AA64PFR0_EL1, EL2, IMP))
- 		mask |= ARMV8_PMU_INCLUDE_EL2;
- 
--	if (SYS_FIELD_GET(ID_AA64PFR0_EL1, EL3, pfr0))
-+	if (kvm_has_feat(kvm, ID_AA64PFR0_EL1, EL3, IMP))
- 		mask |= ARMV8_PMU_EXCLUDE_NS_EL0 |
- 			ARMV8_PMU_EXCLUDE_NS_EL1 |
- 			ARMV8_PMU_EXCLUDE_EL3;
-@@ -83,8 +82,10 @@ u64 kvm_pmu_evtyper_mask(struct kvm *kvm)
-  */
- static bool kvm_pmc_is_64bit(struct kvm_pmc *pmc)
- {
-+	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
-+
- 	return (pmc->idx == ARMV8_PMU_CYCLE_IDX ||
--		kvm_pmu_is_3p5(kvm_pmc_to_vcpu(pmc)));
-+		kvm_has_feat(vcpu->kvm, ID_AA64DFR0_EL1, PMUVer, V3P5));
+@@ -238,6 +238,8 @@ static inline u16 kvm_mpidr_index(struct kvm_mpidr_data *data, u64 mpidr)
+ 	return index;
  }
  
- static bool kvm_pmc_has_64bit_overflow(struct kvm_pmc *pmc)
-@@ -556,7 +557,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
- 		return;
++struct kvm_sysreg_masks;
++
+ struct kvm_arch {
+ 	struct kvm_s2_mmu mmu;
  
- 	/* Fixup PMCR_EL0 to reconcile the PMU version and the LP bit */
--	if (!kvm_pmu_is_3p5(vcpu))
-+	if (!kvm_has_feat(vcpu->kvm, ID_AA64DFR0_EL1, PMUVer, V3P5))
- 		val &= ~ARMV8_PMU_PMCR_LP;
+@@ -312,6 +314,9 @@ struct kvm_arch {
+ #define KVM_ARM_ID_REG_NUM	(IDREG_IDX(sys_reg(3, 0, 0, 7, 7)) + 1)
+ 	u64 id_regs[KVM_ARM_ID_REG_NUM];
  
- 	/* The reset bits don't indicate any state, and shouldn't be saved. */
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 041b11825578..3c31f8cb9eef 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -505,10 +505,9 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
- 			  struct sys_reg_params *p,
- 			  const struct sys_reg_desc *r)
- {
--	u64 val = IDREG(vcpu->kvm, SYS_ID_AA64MMFR1_EL1);
- 	u32 sr = reg_to_encoding(r);
++	/* Masks for VNCR-baked sysregs */
++	struct kvm_sysreg_masks	*sysreg_masks;
++
+ 	/*
+ 	 * For an untrusted host VM, 'pkvm.handle' is used to lookup
+ 	 * the associated pKVM instance in the hypervisor.
+@@ -474,6 +479,13 @@ enum vcpu_sysreg {
+ 	NR_SYS_REGS	/* Nothing after this line! */
+ };
  
--	if (!(val & (0xfUL << ID_AA64MMFR1_EL1_LO_SHIFT))) {
-+	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, LO, IMP)) {
- 		kvm_inject_undefined(vcpu);
- 		return false;
- 	}
-@@ -2748,8 +2747,7 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
- 		return ignore_write(vcpu, p);
- 	} else {
- 		u64 dfr = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);
--		u64 pfr = IDREG(vcpu->kvm, SYS_ID_AA64PFR0_EL1);
--		u32 el3 = !!SYS_FIELD_GET(ID_AA64PFR0_EL1, EL3, pfr);
-+		u32 el3 = kvm_has_feat(vcpu->kvm, ID_AA64PFR0_EL1, EL3, IMP);
++struct kvm_sysreg_masks {
++	struct {
++		u64	res0;
++		u64	res1;
++	} mask[NR_SYS_REGS - __VNCR_START__];
++};
++
+ struct kvm_cpu_context {
+ 	struct user_pt_regs regs;	/* sp = sp_el0 */
  
- 		p->regval = ((SYS_FIELD_GET(ID_AA64DFR0_EL1, WRPs, dfr) << 28) |
- 			     (SYS_FIELD_GET(ID_AA64DFR0_EL1, BRPs, dfr) << 24) |
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 4b9d8fb393a8..eb4c369a79eb 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -90,16 +90,6 @@ void kvm_vcpu_pmu_resync_el0(void);
- 			vcpu->arch.pmu.events = *kvm_get_pmu_events();	\
- 	} while (0)
+@@ -868,7 +880,15 @@ static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
  
--/*
-- * Evaluates as true when emulating PMUv3p5, and false otherwise.
-- */
--#define kvm_pmu_is_3p5(vcpu) ({						\
--	u64 val = IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1);		\
--	u8 pmuver = SYS_FIELD_GET(ID_AA64DFR0_EL1, PMUVer, val);	\
--									\
--	pmuver >= ID_AA64DFR0_EL1_PMUVer_V3P5;				\
--})
--
- u8 kvm_arm_pmu_get_pmuver_limit(void);
- u64 kvm_pmu_evtyper_mask(struct kvm *kvm);
- int kvm_arm_set_default_pmu(struct kvm *kvm);
-@@ -168,7 +158,6 @@ static inline u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+ #define ctxt_sys_reg(c,r)	(*__ctxt_sys_reg(c,r))
+ 
+-#define __vcpu_sys_reg(v,r)	(ctxt_sys_reg(&(v)->arch.ctxt, (r)))
++u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *, enum vcpu_sysreg);
++#define __vcpu_sys_reg(v,r)						\
++	(*({								\
++		const struct kvm_cpu_context *ctxt = &(v)->arch.ctxt;	\
++		u64 *__r = __ctxt_sys_reg(ctxt, (r));			\
++		if (vcpu_has_nv((v)) && (r) >= __VNCR_START__)		\
++			*__r = kvm_vcpu_sanitise_vncr_reg((v), (r));	\
++		__r;							\
++	}))
+ 
+ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg);
+ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index a25265aca432..c063e84fc72c 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -206,6 +206,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 		pkvm_destroy_hyp_vm(kvm);
+ 
+ 	kfree(kvm->arch.mpidr_data);
++	kfree(kvm->arch.sysreg_masks);
+ 	kvm_destroy_vcpus(kvm);
+ 
+ 	kvm_unshare_hyp(kvm, kvm + 1);
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index d55e809e26cb..c976cd4b8379 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -163,15 +163,54 @@ static u64 limit_nv_id_reg(u32 id, u64 val)
+ 
+ 	return val;
  }
++
++u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg sr)
++{
++	u64 v = ctxt_sys_reg(&vcpu->arch.ctxt, sr);
++	struct kvm_sysreg_masks *masks;
++
++	masks = vcpu->kvm->arch.sysreg_masks;
++
++	if (masks) {
++		sr -= __VNCR_START__;
++
++		v &= ~masks->mask[sr].res0;
++		v |= masks->mask[sr].res1;
++	}
++
++	return v;
++}
++
++static void __maybe_unused set_sysreg_masks(struct kvm *kvm, int sr, u64 res0, u64 res1)
++{
++	int i = sr - __VNCR_START__;
++
++	kvm->arch.sysreg_masks->mask[i].res0 = res0;
++	kvm->arch.sysreg_masks->mask[i].res1 = res1;
++}
++
+ int kvm_init_nv_sysregs(struct kvm *kvm)
+ {
++	int ret = 0;
++
+ 	mutex_lock(&kvm->arch.config_lock);
  
- #define kvm_vcpu_has_pmu(vcpu)		({ false; })
--#define kvm_pmu_is_3p5(vcpu)		({ false; })
- static inline void kvm_pmu_update_vcpu_events(struct kvm_vcpu *vcpu) {}
- static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
- static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
++	if (kvm->arch.sysreg_masks)
++		goto out;
++
++	kvm->arch.sysreg_masks = kzalloc(sizeof(*(kvm->arch.sysreg_masks)),
++					 GFP_KERNEL);
++	if (!kvm->arch.sysreg_masks) {
++		ret = -ENOMEM;
++		goto out;
++	}
++
+ 	for (int i = 0; i < KVM_ARM_ID_REG_NUM; i++)
+ 		kvm->arch.id_regs[i] = limit_nv_id_reg(IDX_IDREG(i),
+ 						       kvm->arch.id_regs[i]);
+ 
++out:
+ 	mutex_unlock(&kvm->arch.config_lock);
+ 
+-	return 0;
++	return ret;
+ }
 -- 
 2.39.2
 
