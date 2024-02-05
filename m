@@ -1,117 +1,149 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6782732C8C
-	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 15:37:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27F60481C4;
+	Mon,  5 Feb 2024 15:50:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707147465; cv=none; b=biBF89Bt3r59tmW7hZGcKYaaVj4+gHlInszpzFqI6gpwO0lRtyXxSquacln7wB9xlXJnwR84ravtNSW3CSfGCmu6i5SUfpkPRyRIu0Nv2j4XfJjlyXPfxsF5yWTvH7CDZ8yFuoTNE38K9jAvFywhnYjtKy3o4ZXZp3WQsw3Q8Lc=
+	t=1707148216; cv=none; b=a0hlsn+A3cD1hTF/NQtnQAmgpZsG8KcSylIUjmzwkZqPjfx124MX4fW65KPl2+e8qhg/PBpqLq4P/FdcbN15Xqk2s3IAiR8Ou915DDCuh4M3vSrEXLchd8MRhD3iBxr5rhrCVMBFvLMo8s5+YP0VwyUDtfezKu++Wxzr2MiSez8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707147465; c=relaxed/simple;
-	bh=NAOhCgljajhu9rlMaYcMai/ExO7gay4hX8crqnQPk9k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s6mE2jUWR3oElwE7gqVgqmRnawUE7WMaL9E/O1L3Qt/QPrMUWxE00bP/iUVJR1G7zqERoALbzllFVn1MLXxLbuw9ejX1Vzon4IQl3dTjbdvHDDIm69mKBQK8rKuyOAoF7Ge6V/IySbWAti40MFy9xcH8krUbw/t2PEqG33eKeZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 618601FB;
-	Mon,  5 Feb 2024 07:38:25 -0800 (PST)
-Received: from [192.168.1.100] (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4D6B63F5A1;
-	Mon,  5 Feb 2024 07:37:39 -0800 (PST)
-Message-ID: <c773393c-221e-edd1-00b7-0ce6a2481c15@arm.com>
-Date: Mon, 5 Feb 2024 15:37:34 +0000
+	s=arc-20240116; t=1707148216; c=relaxed/simple;
+	bh=6aaZ8uJ98XEilRCdTFHbcsja0/sHt6JhMUEAjwCNq18=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AS47k0oWEL1p06RORBkWSbCqnhz++L5kvxKEFWhJxzlB5He42/dXmuqnOFMUZNiSzpRXjQIW8hgQpWV7aATpa8U2BrJDtJxKcyXRWjmQeGlhu9RofN8TpueeoNyeCp0CEIql0xCPDo3KavHFdyNTLyIjeL0YoDXSrKjXLEybqRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W854IR28; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W854IR28"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1C69C433F1;
+	Mon,  5 Feb 2024 15:50:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707148216;
+	bh=6aaZ8uJ98XEilRCdTFHbcsja0/sHt6JhMUEAjwCNq18=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=W854IR28Ybufk1yNVM4FlXNqDu6/4P8n54aADpEZx0fgXT3MIsUNmbHWYMcYlpNoy
+	 PkuhW+dcn9c6vKz+8Bb+BMBQhf1aKmWh3F4zAjsRRBqoYSYVKzKHr30SaJhrEUctek
+	 9W6STI8+TSyx73tVA3/+VjAD6bdDilXom3Y0+aiYVNr5prGZd2faowemSvBS9OWAUs
+	 u//x7a0MvXJru0vxtgY3iu1dyV5f3GFUh7i5mVceOhL5qQCd0ledwkf5qvFiwnDJob
+	 WKs1y9f+ZFunXL1bQdEdY6cbPSVL7UjljY5lTJFGRAL88gWlMG2XioLSWimlJ3XSk0
+	 gnV87k6YMFI3Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rX1Eb-000T9U-6N;
+	Mon, 05 Feb 2024 15:50:13 +0000
+Date: Mon, 05 Feb 2024 15:50:12 +0000
+Message-ID: <861q9q7vwr.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: James Clark <james.clark@arm.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	coresight@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	broonie@kernel.org,
+	suzuki.poulose@arm.com,
+	acme@kernel.org,
+	James Morse <james.morse@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mike Leach <mike.leach@linaro.org>,
+	Leo Yan <leo.yan@linaro.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Rob Herring
+ <robh@kernel.org>,
+	Miguel Luis <miguel.luis@oracle.com>,
+	Jintack Lim <jintack.lim@linaro.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Kristina Martsenko <kristina.martsenko@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Jing Zhang
+ <jingzhangos@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 2/7] arm64: KVM: Use shared area to pass PMU event state to hypervisor
+In-Reply-To: <c773393c-221e-edd1-00b7-0ce6a2481c15@arm.com>
+References: <20240104162714.1062610-1-james.clark@arm.com>
+	<20240104162714.1062610-3-james.clark@arm.com>
+	<Zb1mCCi13AJ_YjFZ@linux.dev>
+	<8a908ee8-620a-d9c2-734b-5a6402950072@arm.com>
+	<ZcDc8-FQo8wKavA4@linux.dev>
+	<867cjj6ohz.wl-maz@kernel.org>
+	<ZcDg1sP3EYZG-i_3@linux.dev>
+	<a7cc7791-c476-fd81-b79d-a151293b8302@arm.com>
+	<864jen6k0i.wl-maz@kernel.org>
+	<c773393c-221e-edd1-00b7-0ce6a2481c15@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v4 2/7] arm64: KVM: Use shared area to pass PMU event
- state to hypervisor
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, coresight@lists.linaro.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- broonie@kernel.org, suzuki.poulose@arm.com, acme@kernel.org,
- James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mike Leach <mike.leach@linaro.org>, Leo Yan <leo.yan@linaro.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, Rob Herring
- <robh@kernel.org>, Miguel Luis <miguel.luis@oracle.com>,
- Jintack Lim <jintack.lim@linaro.org>, Ard Biesheuvel <ardb@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Arnd Bergmann <arnd@arndb.de>,
- Vincent Donnefort <vdonnefort@google.com>,
- Kristina Martsenko <kristina.martsenko@arm.com>,
- Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
- Akihiko Odaki <akihiko.odaki@daynix.com>, Jing Zhang
- <jingzhangos@google.com>, linux-kernel@vger.kernel.org
-References: <20240104162714.1062610-1-james.clark@arm.com>
- <20240104162714.1062610-3-james.clark@arm.com> <Zb1mCCi13AJ_YjFZ@linux.dev>
- <8a908ee8-620a-d9c2-734b-5a6402950072@arm.com> <ZcDc8-FQo8wKavA4@linux.dev>
- <867cjj6ohz.wl-maz@kernel.org> <ZcDg1sP3EYZG-i_3@linux.dev>
- <a7cc7791-c476-fd81-b79d-a151293b8302@arm.com> <864jen6k0i.wl-maz@kernel.org>
-From: James Clark <james.clark@arm.com>
-In-Reply-To: <864jen6k0i.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: james.clark@arm.com, oliver.upton@linux.dev, coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, broonie@kernel.org, suzuki.poulose@arm.com, acme@kernel.org, james.morse@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, leo.yan@linaro.org, alexander.shishkin@linux.intel.com, anshuman.khandual@arm.com, robh@kernel.org, miguel.luis@oracle.com, jintack.lim@linaro.org, ardb@kernel.org, mark.rutland@arm.com, arnd@arndb.de, vdonnefort@google.com, kristina.martsenko@arm.com, tabba@google.com, joey.gouly@arm.com, akihiko.odaki@daynix.com, jingzhangos@google.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-
-
-On 05/02/2024 14:52, Marc Zyngier wrote:
-> On Mon, 05 Feb 2024 14:17:10 +0000,
-> James Clark <james.clark@arm.com> wrote:
->>
->> On 05/02/2024 13:21, Oliver Upton wrote:
->>> On Mon, Feb 05, 2024 at 01:15:36PM +0000, Marc Zyngier wrote:
->>>> On Mon, 05 Feb 2024 13:04:51 +0000,
->>>> Oliver Upton <oliver.upton@linux.dev> wrote:
->>>>>
->>>>> Unless someone has strong opinions about making this work in protected
->>>>> mode, I am happy to see tracing support limited to the 'normal' nVHE
->>>>> configuration. The protected feature as a whole is just baggage until
->>>>> upstream support is completed.
->>>>
->>>> Limiting tracing to non-protected mode is a must IMO. Allowing tracing
->>>> when pKVM is enabled is a sure way to expose secrets that should
->>>> stay... secret. The only exception I can think of is when
->>>> CONFIG_NVHE_EL2_DEBUG is enabled, at which point all bets are off.
->>>
->>> Zero argument there :) I left off the "and PMU" part of what I was
->>> saying, because that was a feature that semi-worked in protected mode
->>> before VM/VCPU shadowing support landed.
->>>
->>
->> In that case I can hide all this behind CONFIG_NVHE_EL2_DEBUG for pKVM.
->> This will also have the effect of disabling PMU again for pKVM because I
->> moved that into this new shared area.
+On Mon, 05 Feb 2024 15:37:34 +0000,
+James Clark <james.clark@arm.com> wrote:
 > 
-> I'm not sure what you have in mind, but dropping PMU support for
-> non-protected guests when protected-mode is enabled is not an
-> acceptable outcome.
 > 
-> Hiding the trace behind a debug option is fine as this is a global
-> setting that has no userspace impact, but impacting guests isn't.
 > 
-> 	M.
+> On 05/02/2024 14:52, Marc Zyngier wrote:
+> > On Mon, 05 Feb 2024 14:17:10 +0000,
+> > James Clark <james.clark@arm.com> wrote:
+> >>
+> >> On 05/02/2024 13:21, Oliver Upton wrote:
+> >>> On Mon, Feb 05, 2024 at 01:15:36PM +0000, Marc Zyngier wrote:
+> >>>> On Mon, 05 Feb 2024 13:04:51 +0000,
+> >>>> Oliver Upton <oliver.upton@linux.dev> wrote:
+> >>>>>
+> >>>>> Unless someone has strong opinions about making this work in protected
+> >>>>> mode, I am happy to see tracing support limited to the 'normal' nVHE
+> >>>>> configuration. The protected feature as a whole is just baggage until
+> >>>>> upstream support is completed.
+> >>>>
+> >>>> Limiting tracing to non-protected mode is a must IMO. Allowing tracing
+> >>>> when pKVM is enabled is a sure way to expose secrets that should
+> >>>> stay... secret. The only exception I can think of is when
+> >>>> CONFIG_NVHE_EL2_DEBUG is enabled, at which point all bets are off.
+> >>>
+> >>> Zero argument there :) I left off the "and PMU" part of what I was
+> >>> saying, because that was a feature that semi-worked in protected mode
+> >>> before VM/VCPU shadowing support landed.
+> >>>
+> >>
+> >> In that case I can hide all this behind CONFIG_NVHE_EL2_DEBUG for pKVM.
+> >> This will also have the effect of disabling PMU again for pKVM because I
+> >> moved that into this new shared area.
+> > 
+> > I'm not sure what you have in mind, but dropping PMU support for
+> > non-protected guests when protected-mode is enabled is not an
+> > acceptable outcome.
+> > 
+> > Hiding the trace behind a debug option is fine as this is a global
+> > setting that has no userspace impact, but impacting guests isn't.
+> > 
+> > 	M.
+> > 
 > 
+> Hmmm in that case if there's currently no way to distinguish between
+> normal VMs and pVMs in protected-mode then what I was thinking of
+> probably won't work.
 
-Hmmm in that case if there's currently no way to distinguish between
-normal VMs and pVMs in protected-mode then what I was thinking of
-probably won't work.
+Have you looked? kvm_vm_is_protected() has been in for a while, even
+if that's not a lot. The upcoming code will flesh this helper out,
 
-I'll actually just leave PMU as it is and only have tracing disabled in
-protected-mode.
+	M.
 
-My only question now is whether to:
-
- * Keep this new shared area and use it for both PMU and trace status
-   (well, for PMU only in protected mode as trace would always be
-   disabled and doesn't actually need any state)
-
- * Delete patch 2, add a new normal per-cpu struct just for
-   trace status that's only used in non-protected mode and revert to
-   copying the PMU status into the vCPU on guest switch as it was
-   previously.
+-- 
+Without deviation from the norm, progress is not possible.
