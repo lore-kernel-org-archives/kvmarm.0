@@ -1,105 +1,182 @@
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB773CF63
-	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 16:38:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1191B3EA9C;
+	Mon,  5 Feb 2024 16:58:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707151142; cv=none; b=flChlW+ylxssmtbi7Rqih0FFLTkT91O29BdEeQtGjajqpyu52tz8jz6360338WJ/oUgX/+dPSBHlMtVCaWSgfu1fwifKfeW4wRDwiZ8phlABbHUhLOwU0RziXK8MZ+zlHL09qT5HcKEAmVDhVY3tqyfdXbgVgvfoJxbq0M6XHUw=
+	t=1707152307; cv=none; b=JsrA9ydtCvLudb2n3F06VgTddG5RWE6HeESpLmtr/hcRvJihEPb/835Ao0wh1GRwe/iDrg2aEXHzScAGAQxqcKbEq+d8+5avgQ5zOrXUY734ljyrc6v/HewKt+2ry20O6Vf89+KLXeMrT6WJdDo6Rgd6JLTxSH3uUzTupon+UZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707151142; c=relaxed/simple;
-	bh=2PwzTeph8vt3rczITqgolgnSuYxWZnc2KI+Bl0TtM/c=;
+	s=arc-20240116; t=1707152307; c=relaxed/simple;
+	bh=9FpafEGlyrNhPgZJkrgRLS7U6aCYTe6Poar4f0Fu86c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BKIVC1ZtAyZfl48WG4nH0gvV0olYJJ9fyvCipkL2Dmi1PUBhNMMFD7r7oYxMS8F407/wpR2fOcSN6Mesuzrinqe6tRsiEBD4Akaed0TedzNiLGFLPwris/UQusGkgJoSCZmNGddi1NI6jvOuIDDQ9yhyS1qUB54Gd/VU5L6G/ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rGiA+b+T; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=UNX2AZ2loPzImhL2BHBwDYF++BgtrPHACT87etOZ+8o3NWj4+bPKrc6VbR4GO2P3ME3pv2tt3Xr38bF69f5AYUQ3qteh+jTXBuqAZsjliJo8IDzS552nPk1kYsEECngwnrQrNrzielmarhz5eWNXSbHxduGkpB040xBesVJlBAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jdAa96kD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rGiA+b+T"
-Date: Mon, 5 Feb 2024 16:38:55 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707151137;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5Mg8+9Ggqj2m4roy5J7E7b21K6K3wPABC3du7wYYYe4=;
-	b=rGiA+b+T0R8YEaWun8VLxYJXWs4sPF5mOf4Dbywr1gt7Qwn3PGIXXVEbRSkXLxDx7hhuK6
-	zqDd9vRtRyz4u+u91Ma8W7iyNkEZuJGWYLPrATjpx+fms0mpQmTSORNsbwV7ECs2ggtN6O
-	1gMJyNrgcqF5YDtJGRY5wp++4yUzkbs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jdAa96kD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42EE0C433C7;
+	Mon,  5 Feb 2024 16:58:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707152306;
+	bh=9FpafEGlyrNhPgZJkrgRLS7U6aCYTe6Poar4f0Fu86c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jdAa96kD60IeV9lxQp0ubdqOgUSHcdsjtge2WP6mvoDwpwOe+Rw7nwcU7ORKlVlgr
+	 8Z6UYcfu0rXRgY6H147qPvpixPmJkpZDmWrIwgKeNqmHE5Dyf5eNNmQ5bBvWaONUZO
+	 0/G6+v/VmTdZm/r0jhWTvEEg+oGSkpJiB3YYAtdV41ad/d4EyHHPk7vnDwmNhbZO9W
+	 xGQCvUQAyZvm+DIKz7D+cBrAtQbQgXkRRwM6jx1tMc0pifYl3BcJGyd0M/p6YJjmTK
+	 m/3/iDifHMb1SIEd4HlIJDGTt/kOZPRgXRKA/sGbloE3oJcO4SJAp50Cw6wGa0iRnt
+	 6WaVOdTjOW2yA==
+Date: Mon, 5 Feb 2024 16:58:20 +0000
+From: Mark Brown <broonie@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
-Cc: James Clark <james.clark@arm.com>, coresight@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	broonie@kernel.org, suzuki.poulose@arm.com, acme@kernel.org,
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mike Leach <mike.leach@linaro.org>,
-	Leo Yan <leo.yan@linaro.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Rob Herring <robh@kernel.org>, Miguel Luis <miguel.luis@oracle.com>,
-	Jintack Lim <jintack.lim@linaro.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>, Arnd Bergmann <arnd@arndb.de>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Kristina Martsenko <kristina.martsenko@arm.com>,
-	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Jing Zhang <jingzhangos@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 2/7] arm64: KVM: Use shared area to pass PMU event
- state to hypervisor
-Message-ID: <ZcEPHyfQ4n23YOTW@linux.dev>
-References: <20240104162714.1062610-3-james.clark@arm.com>
- <Zb1mCCi13AJ_YjFZ@linux.dev>
- <8a908ee8-620a-d9c2-734b-5a6402950072@arm.com>
- <ZcDc8-FQo8wKavA4@linux.dev>
- <867cjj6ohz.wl-maz@kernel.org>
- <ZcDg1sP3EYZG-i_3@linux.dev>
- <a7cc7791-c476-fd81-b79d-a151293b8302@arm.com>
- <864jen6k0i.wl-maz@kernel.org>
- <c773393c-221e-edd1-00b7-0ce6a2481c15@arm.com>
- <861q9q7vwr.wl-maz@kernel.org>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Thiago Jung Bauermann <thiago.bauermann@linaro.org>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v8 13/38] KVM: arm64: Manage GCS registers for guests
+Message-ID: <ZcETrPAFFfgAy/PT@finisterre.sirena.org.uk>
+References: <20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org>
+ <20240203-arm64-gcs-v8-13-c9fec77673ef@kernel.org>
+ <868r3z6y6v.wl-maz@kernel.org>
+ <825d2b35-fa10-43ad-b3b3-b29a77f3fed0@sirena.org.uk>
+ <8634u76i36.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="CPooLl9HGmOME8a3"
+Content-Disposition: inline
+In-Reply-To: <8634u76i36.wl-maz@kernel.org>
+X-Cookie: You might have mail.
+
+
+--CPooLl9HGmOME8a3
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <861q9q7vwr.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
 
-On Mon, Feb 05, 2024 at 03:50:12PM +0000, Marc Zyngier wrote:
-> On Mon, 05 Feb 2024 15:37:34 +0000,
-> James Clark <james.clark@arm.com> wrote:
-> > 
-> > Hmmm in that case if there's currently no way to distinguish between
-> > normal VMs and pVMs in protected-mode then what I was thinking of
-> > probably won't work.
-> 
-> Have you looked? kvm_vm_is_protected() has been in for a while, even
-> if that's not a lot. The upcoming code will flesh this helper out,
+On Mon, Feb 05, 2024 at 03:34:05PM +0000, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
+> > On Mon, Feb 05, 2024 at 09:46:16AM +0000, Marc Zyngier wrote:
 
-Blame me for the bad intel. What I was mentioning earlier is that (1) we
-use the hyp's shadowed vCPUs when running in protected mode and (2) we
-don't sync PMU state into the shadow vCPU. So really PMU support for
-non-protected guests has been broken since commit be66e67f1750 ("KVM:
-arm64: Use the pKVM hyp vCPU structure in handle___kvm_vcpu_run()").
+> > > We have had this discussion in the past. This must be based on the
+> > > VM's configuration. Guarding the check with the host capability is a
+> > > valuable optimisation, but that's nowhere near enough. See the series
+> > > that I have posted on this very subject (you're on Cc), but you are
+> > > welcome to invent your own mechanism in the meantime.
 
-Fixing PMU support for non-protected guests implies the hypervisor will
-conditionally trust data coming from the host based on the type of VM
-that it is running.
+> > Right, which postdates the version you're replying to and isn't merged
+> > yet - the current code was what you were asking for at the time.
 
-For protected guests the hypervisor will need a private location to
-do save/restore of the enable regs since I'm certain we will not trust
-whatever the host tells us in these circumstances.
+> v1 and v2 predate it. And if the above is what I did ask, then I must
+> have done a very poor job of explaining what was required. For which I
+> apologise profusely.
 
-Both of these reasons has me feeling like the PMU context still needs to
-be associated with the vCPU, though the tracing stuff can be percpu.
+To be clear it's what was asked for prior to the switch to the
+forthcoming switch to the parsing idregs scheme, I haven't pulled in
+your idregs work yet since it's being rapidly iterated and this is an
+already large series with dependencies.
 
--- 
-Thanks,
-Oliver
+> > I'm
+> > expecting to update all these feature series to work with that once it
+> > gets finalised and merged but it's not there yet, I do see I forgot to
+> > put a note in v9 about that like I did for dpISA - sorry about that, I
+> > was too focused on the clone3() rework when rebasing onto the new
+> > kernel.
+
+> > This particular series isn't going to get merged for a while yet anyway
+> > due to the time it'll take for userspace testing, I'm expecting your
+> > series to be in by the time it becomes an issue.
+
+> Right. Then I'll ignore it for the foreseeable future.
+
+Actually now I think about it would you be open to merging the guest
+context switching bit without the rest of the series (pending me fixing
+the issues you raise of course)?  If so I'll split that bit out in the
+hope that we can reduce the size of the series and CC list for the
+userspace support which I imagine would make people a bit happier.
+
+> > > > +		write_sysreg_s(ctxt_sys_reg(ctxt, GCSCRE0_EL1),
+> > > > +			       SYS_GCSCRE0_EL1);
+> > > > +	}
+
+> > > For the benefit of the unsuspecting reviewers, and in the absence of a
+> > > public specification (which the XML drop isn't), it would be good to
+> > > have the commit message explaining the rationale of what gets saved
+> > > when.
+
+> > What are you looking for in terms of rationale here?  The KVM house
+> > style is often very reliant on reader context so it would be good to
+> > know what considerations you'd like to see explicitly addressed.
+
+> Nothing to do with style, everything to do with substance: if nothing
+
+The style I'm referring to there is the style for documentation.
+
+> in the host kernel makes any use of these registers, why are they
+> eagerly saved/restored on nVHE/hVHE? I'm sure you have a reason for
+> it, but it isn't that obvious. Because these two modes need all the
+> help they can get in terms of overhead reduction.
+
+Ah, I see - yes, they should probably be moved somewhere else.  Though
+I'm not clear why some of the other registers that we're saving and
+restoring in the same place are being done eagerly?  The userspace
+TPIDRs stand out for example, they're in taken care of in
+__sysreg_save_user_state() which is called in the same paths.  IIRC my
+thinking there was something along the lines of "this is where we save
+and restore everything else that's just a general system register, I
+should be consistent".
+
+Am I right in thinking kvm_arch_vcpu_load()/_put() would make sense?
+Everything in there currently looked like it was there more due to doing
+something more complex than simple register save/restore and we weren't
+worrying too much about what was going on with just the sysregs.
+
+> > These
+> > registers shouldn't do anything when we aren't running the guest so
+> > they're not terribly ordering sensitive, the EL2 ones will need a bit
+> > more consideration in the face of nested virt.
+
+> The EL2 registers should follow the exact same pattern, specially once
+> you fix the VNCR bugs I pointed out.
+
+Great, that's what I'd thought thanks - I hadn't checked yet.
+
+--CPooLl9HGmOME8a3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXBE6sACgkQJNaLcl1U
+h9AxYAgAgiMyW4DrBuI2SbKKpBxTNqFWS6hwvL/pz27nGc2T9cgR2P2ODSG3A9Cv
+MJh2K7irI4JHl/jj/8GLJLH5IVMOVyVYPtTxauHvCVu+I6RM92hSfVey9I7clK40
+Lxhri2n3D8Tj89RvRi90LvEgM0pJKqGBYYpc+lZBuUVhpsHDx1rwBsuMmryxpbyX
+U9xvwhFc+lNUfrCUYIVp0VThb8QBJzBYs0SSVyM1ggHARaP+t64DzE+vrtI9h5QN
+CQo6qN+H0ojTvx9E0MGZhqBPtNnGOs3jafSq88emxX431D+3kZSJwY4npbfFNQd3
+Il677REj9RoCNO5cSTKMWWb27EzOxg==
+=xxbo
+-----END PGP SIGNATURE-----
+
+--CPooLl9HGmOME8a3--
