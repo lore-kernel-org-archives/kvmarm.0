@@ -1,140 +1,132 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9043F208CF
-	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 14:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5892C19D;
+	Mon,  5 Feb 2024 14:52:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707142834; cv=none; b=r5FBdIeUEoOOL/r+EJ2j12bt8FUPGNuRbyiAY1kQmLO0Chtkgz0ioUB8oASfyAt3uqVf/hVViwD5d6L3BTFcSCwo9k/2MWYY7X1GVOi9AwQb+vgx310CHpS6DfQs2akfUVcRnPZjy5TTYJ3wl9fpqy/q4Dm3duJLbDKmZLzdb/U=
+	t=1707144754; cv=none; b=T/TftYFhEQFhBX1QNQa16TqSYB0mV275JxksXoa5p5hRIBuBJXhFXVpBKLnCeFe5whoaXK2bsI69+Dx/J1TWOPxD2j8J1H0Ps7kwe3ecZaUn9h8bY6p7fy0E3Kcq7x3ExefWG9lGQK32cuPL6WNOVNAlQlPi/kDPw18/98IO2NQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707142834; c=relaxed/simple;
-	bh=VKg4SZ+d8nDsJKhBYt3IUI+StMXktzFJPIAQBq8Yw3E=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=rB3bFys2kGQ9kvaXW+9Eh6HeUFNjWjAdElpwikAz5AWk86z6wW4s00D0nQrW9yvFKMFWw7TQGPgp79odbwBgE/RZchU7I/wN8dGB7wC1eExuAnPwBDLTo9Rgtq4r6f4DSrUV2jmRm+tETyjYNX9COqx8F5L3xjYynhW+uWQ3FJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BiRNHlK/; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1707144754; c=relaxed/simple;
+	bh=fjMQKYSrzUd6ahmVPMrjRavcut9sSWmunk404/C9SHI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rX6z85dfNOS7QiEJKPUxSiuU59LAV5I7YG7osqqLO36dBsNFObHdNNoWcEsUcYVsU1fcVbwUrFuOu4nCs0n/useFkxUT2l+haDhN4PVZ1gOxhjDUUlvX9V3ZL04vciYNWnYsWGErzVgNiAjZ7Y8eCkTMTqhCOckNRQ98g63L1a4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d+vxXMg3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BiRNHlK/"
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 415EIMcb031493;
-	Mon, 5 Feb 2024 14:20:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=bXHIioVqh5fYg2wfi29MHPmCBpLjApCBOLSYCA188qo=;
- b=BiRNHlK/sbO74w/nyY/aZK1S2jnEQtslw2Rts/wDr/xuQZm6eKT2WrLuYzQWNnTiHlPi
- NM48sGg/nUEqHzaVttwmAo4mwf4cacGzuV+jNKjbEDD/ycF++TBsyiuVng6PFCX0IKJ6
- UYM1gtpp0SWTOpkCoAmRUz55J6bM7UXLUwVzABZKSUIZ1qEhiYRppVi4szuohvWMM7Yo
- TamCCF6xjiMcscxM+6Z6rK/3pUwwUSwIb0J6mt/CKSybkoIHDKE28hOm2dK3jYI6+Wyh
- aCQhs8DY27aojuJN5iCiuCkPah7Vlkx+ht11iHwk77qEOkBjQn7YrEG9iVihDd/pWTUy yQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w31aqg1es-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 05 Feb 2024 14:20:19 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 415EJRFv001741;
-	Mon, 5 Feb 2024 14:20:15 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w31aqg1dw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 05 Feb 2024 14:20:15 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 415CZVWl016215;
-	Mon, 5 Feb 2024 14:20:14 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3w22h1rebg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 05 Feb 2024 14:20:14 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 415EKBTj25756218
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 5 Feb 2024 14:20:11 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BEBB420049;
-	Mon,  5 Feb 2024 14:20:11 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AD77C20040;
-	Mon,  5 Feb 2024 14:20:10 +0000 (GMT)
-Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com (unknown [9.171.59.40])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon,  5 Feb 2024 14:20:10 +0000 (GMT)
-From: "Marc Hartmayer" <mhartmay@linux.ibm.com>
-To: Nicholas Piggin <npiggin@gmail.com>, Thomas Huth <thuth@redhat.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org,
-        Laurent Vivier
- <lvivier@redhat.com>,
-        Shaoqin Huang <shahuang@redhat.com>,
-        Andrew Jones
- <andrew.jones@linux.dev>, Nico Boehr <nrb@linux.ibm.com>,
-        Paolo Bonzini
- <pbonzini@redhat.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Eric
- Auger <eric.auger@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand
- <david@redhat.com>, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [kvm-unit-tests PATCH v2 1/9] (arm|powerpc|s390x): Makefile:
- Fix .aux.o generation
-In-Reply-To: <20240202065740.68643-2-npiggin@gmail.com>
-References: <20240202065740.68643-1-npiggin@gmail.com>
- <20240202065740.68643-2-npiggin@gmail.com>
-Date: Mon, 05 Feb 2024 15:20:09 +0100
-Message-ID: <871q9ryova.fsf@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d+vxXMg3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FB0BC433C7;
+	Mon,  5 Feb 2024 14:52:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707144753;
+	bh=fjMQKYSrzUd6ahmVPMrjRavcut9sSWmunk404/C9SHI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=d+vxXMg3O535t4GiNIaxACgO2E14a3T8adkMrgdyRWzz/KKlYEAeQuiVJqYKPIrse
+	 lci5KB9s948+wRFQSjHQ362v/2nm78HQEMIOD083k+4ETVSUfw1j99rB7DbjC/UrIr
+	 hguiNIeqRgfbUIU+mRJ1T6yCr8el+2eEyMy5VIWDSLPisTLlvngX5bJxlxn1MdLsah
+	 ugYDzwndbh6b24yN2y4oOVua88cGMclRmEMmho1hKHZ8uP3dbvG47wMklhXe+L8XMR
+	 C8ftLKSDavq1QFlyjBzgpTXCfGnOnnxlW7MKJq6PPGV2KPYcwZTrzk4EChO4SLV1bY
+	 vsuOGKILww4Qg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rX0Kk-000SGO-Lx;
+	Mon, 05 Feb 2024 14:52:30 +0000
+Date: Mon, 05 Feb 2024 14:52:29 +0000
+Message-ID: <864jen6k0i.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: James Clark <james.clark@arm.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	coresight@lists.linaro.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	broonie@kernel.org,
+	suzuki.poulose@arm.com,
+	acme@kernel.org,
+	James Morse <james.morse@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas
+ <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mike Leach <mike.leach@linaro.org>,
+	Leo Yan <leo.yan@linaro.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Rob Herring
+ <robh@kernel.org>,
+	Miguel Luis <miguel.luis@oracle.com>,
+	Jintack Lim <jintack.lim@linaro.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Kristina Martsenko <kristina.martsenko@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Jing Zhang
+ <jingzhangos@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 2/7] arm64: KVM: Use shared area to pass PMU event state to hypervisor
+In-Reply-To: <a7cc7791-c476-fd81-b79d-a151293b8302@arm.com>
+References: <20240104162714.1062610-1-james.clark@arm.com>
+	<20240104162714.1062610-3-james.clark@arm.com>
+	<Zb1mCCi13AJ_YjFZ@linux.dev>
+	<8a908ee8-620a-d9c2-734b-5a6402950072@arm.com>
+	<ZcDc8-FQo8wKavA4@linux.dev>
+	<867cjj6ohz.wl-maz@kernel.org>
+	<ZcDg1sP3EYZG-i_3@linux.dev>
+	<a7cc7791-c476-fd81-b79d-a151293b8302@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: E_UQLZzuAQX3Cmy0SGcM-0uS1WzSgQUT
-X-Proofpoint-ORIG-GUID: 3S1Vxil0i0--MMWXxApbW9AHcufAytFG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-05_08,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 priorityscore=1501 mlxscore=0 spamscore=0
- suspectscore=0 clxscore=1011 adultscore=0 phishscore=0 mlxlogscore=999
- malwarescore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402050108
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: james.clark@arm.com, oliver.upton@linux.dev, coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, broonie@kernel.org, suzuki.poulose@arm.com, acme@kernel.org, james.morse@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, leo.yan@linaro.org, alexander.shishkin@linux.intel.com, anshuman.khandual@arm.com, robh@kernel.org, miguel.luis@oracle.com, jintack.lim@linaro.org, ardb@kernel.org, mark.rutland@arm.com, arnd@arndb.de, vdonnefort@google.com, kristina.martsenko@arm.com, tabba@google.com, joey.gouly@arm.com, akihiko.odaki@daynix.com, jingzhangos@google.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Feb 02, 2024 at 04:57 PM +1000, Nicholas Piggin <npiggin@gmail.com>=
- wrote:
-> Using all prerequisites for the source file results in the build
-> dying on the second time around with:
+On Mon, 05 Feb 2024 14:17:10 +0000,
+James Clark <james.clark@arm.com> wrote:
 >
-> gcc: fatal error: cannot specify =E2=80=98-o=E2=80=99 with =E2=80=98-c=E2=
-=80=99, =E2=80=98-S=E2=80=99 or =E2=80=98-E=E2=80=99 with multiple files
->
-> This is due to auxinfo.h becoming a prerequisite after the first
-> build recorded the dependency.
->
-> Use the first prerequisite for this recipe.
->
-> Fixes: f2372f2d49135 ("(arm|powerpc|s390x): Makefile: add `%.aux.o` targe=
-t")
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->  arm/Makefile.common     | 2 +-
+> On 05/02/2024 13:21, Oliver Upton wrote:
+> > On Mon, Feb 05, 2024 at 01:15:36PM +0000, Marc Zyngier wrote:
+> >> On Mon, 05 Feb 2024 13:04:51 +0000,
+> >> Oliver Upton <oliver.upton@linux.dev> wrote:
+> >>>
+> >>> Unless someone has strong opinions about making this work in protected
+> >>> mode, I am happy to see tracing support limited to the 'normal' nVHE
+> >>> configuration. The protected feature as a whole is just baggage until
+> >>> upstream support is completed.
+> >>
+> >> Limiting tracing to non-protected mode is a must IMO. Allowing tracing
+> >> when pKVM is enabled is a sure way to expose secrets that should
+> >> stay... secret. The only exception I can think of is when
+> >> CONFIG_NVHE_EL2_DEBUG is enabled, at which point all bets are off.
+> > 
+> > Zero argument there :) I left off the "and PMU" part of what I was
+> > saying, because that was a feature that semi-worked in protected mode
+> > before VM/VCPU shadowing support landed.
+> > 
+> 
+> In that case I can hide all this behind CONFIG_NVHE_EL2_DEBUG for pKVM.
+> This will also have the effect of disabling PMU again for pKVM because I
+> moved that into this new shared area.
 
-[=E2=80=A6snip]
+I'm not sure what you have in mind, but dropping PMU support for
+non-protected guests when protected-mode is enabled is not an
+acceptable outcome.
 
-Thanks a ton for fixing this!
+Hiding the trace behind a debug option is fine as this is a global
+setting that has no userspace impact, but impacting guests isn't.
 
-Reviewed-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+	M.
 
---=20
-Kind regards / Beste Gr=C3=BC=C3=9Fe
-   Marc Hartmayer
-
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Wolfgang Wendt
-Gesch=C3=A4ftsf=C3=BChrung: David Faller
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
+-- 
+Without deviation from the norm, progress is not possible.
