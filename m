@@ -1,195 +1,168 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB461756F
-	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 10:34:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B6F518635
+	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 11:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707129292; cv=none; b=iuTZG6FSOnibRQYyYX3MAI9EAVM/aq++bfdDFAXQLDABFmkdW8UOKjbBUkr69OPRkVIQnL8Bb5bCe/p2vWCOkxJArLCpQZQXiJpbOcXKoJ4YAEMrgB3QrXUTt2JPahwTXZritLXGGIfyzsxEKVDYEtkRGm9O5aEZBrYFmcVYucs=
+	t=1707132529; cv=none; b=uHZzkEyRi0bcAfgvrghj2naOWyUK6O3IkGMpcz7lC/JOYVzRPy8kTlMPbovSY2vxgznmJCyc+kQ5akJq+d53tGRlgoWqelKZbMwboXMAemoYcN8WZqNRpp02XP81cMl6EpYyeJMNtP6JBDVcWy5s6JAkZLfPR+AsVhuLkoGIVxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707129292; c=relaxed/simple;
-	bh=tdA+RanhlYc1Yzx3TK/PJ3PZV8qD9pzS60GTK2Epn1I=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ryezJ7dZKlV1Z+Okf4kCwSHlV/f2TjSMRlm0HgUOc06wzwJh3Fsh3nMy7KxEPVUlmzZMAfduejmEPSOQt1hr0xMB8ZF0iOp3/wgd8C6IwGBXuwdJW7g/G4mmZ/dGF7DJoMMVrrOo3gQyTJykz7LpL9tr57Izl4k7vpyG9nk5+rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gvqmj2t7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707132529; c=relaxed/simple;
+	bh=2VJYWwkj282qmW4tJsn+V5pmShFHwuBYTY12vqnTrB4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TzELBgrKkgngfsPv+Ryy8BgGqUNg0sACKphf0OyyDpvsWpF0EiXM+yAeSL8+6dUZSdOgKGU7fmmB+WD7ke2bYhdX6+ibEl9QtQPSG7nyoXgb/ZeVABV34rDXVdXQKBVv1DmRO9f7KPeLZfupeKXDvMuk1oSwB8t1f8f8KR8ytUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=frWlSQHh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gvqmj2t7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26ACFC433C7;
-	Mon,  5 Feb 2024 10:34:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707129292;
-	bh=tdA+RanhlYc1Yzx3TK/PJ3PZV8qD9pzS60GTK2Epn1I=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Gvqmj2t7LpR1H1reJFBzrDhrR1flerLzhqofwwr7n3aXr/L9xzNUs7cr0t5qiYNnw
-	 4wRpVmkFyhRVZl+WjAjFbM7BNqYdU43QNpENMc6vgrNZ8GB8rU1LwYZIRyVv8Zt2Qw
-	 +UvmCzQwN878T17Sv5m8l9RbJVZ8z3ETlL0jTamX2R2ZBG1deXN255h6ydfWpv3G/Z
-	 5nQ8HFhPYGnFXsThTGBbv/q+vC4vYTmS5ijNJNPjtJorrWnaqCKkqhh1R6CeGzpAn5
-	 wC9cv53Esre/UiYoIGb0KNoZHLtPR7ACqkX+dN9onxX7JhL0O2kBLP0DMt9Qw2fFcz
-	 wuWTSD2hCemRw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rWwJO-000Nc3-A8;
-	Mon, 05 Feb 2024 10:34:50 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v3 26/26] KVM: arm64: Add debugfs file for guest's ID registers
-Date: Mon,  5 Feb 2024 10:34:31 +0000
-Message-Id: <20240205103431.1104133-27-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240205103431.1104133-1-maz@kernel.org>
-References: <20240205103431.1104133-1-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="frWlSQHh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707132527;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=nUaMZZu+Dp9dwRrEKB8bV8ysB1e4sCJY0FwagGA5ceE=;
+	b=frWlSQHhUaIrxA4ECNnKETP3hwojUlGTqcXbrTi/xW2BejpbPE/mZE3CAQhZ2yO3b404j7
+	OatKDvfPpv5Ht1wApKPuw1/mnOxR/Egc66+ZkfGC4cCtT6HuBHIbKvj3P3B8UGesKYVGXw
+	hD5sEj4ht1MXwfWlvrVwcIlIjpVELoI=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-628-eXsP_c6qNxG7qp8nrfFHiA-1; Mon, 05 Feb 2024 06:28:45 -0500
+X-MC-Unique: eXsP_c6qNxG7qp8nrfFHiA-1
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-68c88fe9dadso41985306d6.0
+        for <kvmarm@lists.linux.dev>; Mon, 05 Feb 2024 03:28:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707132525; x=1707737325;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nUaMZZu+Dp9dwRrEKB8bV8ysB1e4sCJY0FwagGA5ceE=;
+        b=xRBUemWYyGwLV3ZWyk9q9+VrwYfH12Pqyb4nOxe6E93rb7+RWKK2brMa320RJVXWr0
+         AEMasjL9AFI0yKMJZem4A+5BFt5fsHA9KRMjX5ZPuGV/QvrtG3woFFv6CnYHIswp0zK2
+         dg+OCbslMgNN2NxxX//7IebcqGY43TK3nc9m1FLBuQu7NEyiT1VfKTUn+OewCh/Up71h
+         4wKlO+2BAUhZ690sm0eLXEcx+dUPm24NQv0M4+HtwDYcvq5NGIvTr7olw3x6Rdw0tBtl
+         Xv0W1oql7aZK2OlqzqspCV7B+ca0FsbcY/K/V75T/veM5uI/vH5fiKm+KiEIFhc8pQbv
+         9UQQ==
+X-Gm-Message-State: AOJu0YyQ7mGfiax5+tEJHesINLe9RG16aiplYNql5ZYLZRU2QP8d6dB2
+	yKgyT4vqxlLZ9G54aeJ7AGku6/ZdImpbcGFxN65zUgMtOl6UmFdvsM8Uli9NPYes0rwqZwXJtuJ
+	X4VcB+pLtmxsxlj7PhqyOFaGZK6do12/5YEzuz8TQGpqqZKloaNmhbw==
+X-Received: by 2002:a05:6214:1bca:b0:68c:5aec:a777 with SMTP id m10-20020a0562141bca00b0068c5aeca777mr10444475qvc.15.1707132525288;
+        Mon, 05 Feb 2024 03:28:45 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG8EaWM4B1y1ZetAAd55Aml2aHxbapztaFPxB73e0x4SKOBYmOWyWuKnTkcVyTF/NaB0tj2yA==
+X-Received: by 2002:a05:6214:1bca:b0:68c:5aec:a777 with SMTP id m10-20020a0562141bca00b0068c5aeca777mr10444456qvc.15.1707132525076;
+        Mon, 05 Feb 2024 03:28:45 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXWPIeAmM4zXqyigLA0WaHjYvNc0iltB6bnBBy8QYvhZLHNBXkjYjHaucBRdJYPH0szT+kDLlvclxWkY5zxZP8lUzEhIXYmjGPkzkA3KlO3Qa2uRQXc9nXwApYOePPqxPh993CX+Ykh5jamYbUskGrr02J+wyVcxl+9yb35OMqMi48kHAZwZg/zppBC1scp8eyLC2fKAfLNawWG2xo2EawCIJYSrvkvLjxiVxsXNPOaclgOUBS2Qog+pId8rXLYpWHB/fFohXulmw0J7f8DgDSfPwPFRsOMVxURBnWOEI/X6tZAL8cEaDB2EZWPlvaEINY5yy9woLltLnE7jzYIZZGeRsspWNDvJgBPDqwzOYxDi3TAFncm1h9WOVQaLnZ8ZjiLaU40OkuC4ZMzb0k4f2AVGD5RBXnICUYtufL9szNSrdRZocVbgybUdJqs2dg617ubop/j5uGuX1VCXNWQ1YgZ2Su7HbPkAQ/hZidUC3/U
+Received: from [192.168.0.9] (ip-109-43-177-196.web.vodafone.de. [109.43.177.196])
+        by smtp.gmail.com with ESMTPSA id nz10-20020a0562143a8a00b0068c7664112bsm3658473qvb.52.2024.02.05.03.28.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Feb 2024 03:28:44 -0800 (PST)
+Message-ID: <003f43ab-cce9-408d-8354-b7884f513ad1@redhat.com>
+Date: Mon, 5 Feb 2024 12:28:38 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v2 1/9] (arm|powerpc|s390x): Makefile: Fix
+ .aux.o generation
+To: Andrew Jones <andrew.jones@linux.dev>, Nicholas Piggin <npiggin@gmail.com>
+Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
+ Shaoqin Huang <shahuang@redhat.com>, Nico Boehr <nrb@linux.ibm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Eric Auger <eric.auger@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Marc Hartmayer
+ <mhartmay@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+ linux-s390@vger.kernel.org, kvmarm@lists.linux.dev
+References: <20240202065740.68643-1-npiggin@gmail.com>
+ <20240202065740.68643-2-npiggin@gmail.com>
+ <20240202-2f93f59553cec386791f7629@orel>
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20240202-2f93f59553cec386791f7629@orel>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Debugging ID register setup can be a complicated affair. Give the
-kernel hacker a way to dump that state in an easy to parse way.
+On 02/02/2024 10.30, Andrew Jones wrote:
+> On Fri, Feb 02, 2024 at 04:57:32PM +1000, Nicholas Piggin wrote:
+>> Using all prerequisites for the source file results in the build
+>> dying on the second time around with:
+>>
+>> gcc: fatal error: cannot specify ‘-o’ with ‘-c’, ‘-S’ or ‘-E’ with multiple files
+>>
+>> This is due to auxinfo.h becoming a prerequisite after the first
+>> build recorded the dependency.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h |  3 ++
- arch/arm64/kvm/sys_regs.c         | 81 +++++++++++++++++++++++++++++++
- 2 files changed, 84 insertions(+)
+D'oh, of course I only tried to run "make" once when testing that patch :-/
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 3feabde9c926..181fef12e8e8 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -319,6 +319,9 @@ struct kvm_arch {
- 	/* PMCR_EL0.N value for the guest */
- 	u8 pmcr_n;
- 
-+	/* Iterator for idreg debugfs */
-+	u8	idreg_debugfs_iter;
-+
- 	/* Hypercall features firmware registers' descriptor */
- 	struct kvm_smccc_features smccc_feat;
- 	struct maple_tree smccc_filter;
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index b5335e5a6e6e..e3faedc8b7a3 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -12,6 +12,7 @@
- #include <linux/bitfield.h>
- #include <linux/bsearch.h>
- #include <linux/cacheinfo.h>
-+#include <linux/debugfs.h>
- #include <linux/kvm_host.h>
- #include <linux/mm.h>
- #include <linux/printk.h>
-@@ -3422,6 +3423,81 @@ static bool emulate_sys_reg(struct kvm_vcpu *vcpu,
- 	return false;
- }
- 
-+static void *idregs_debug_start(struct seq_file *s, loff_t *pos)
-+{
-+	struct kvm *kvm = s->private;
-+	u8 *iter;
-+
-+	mutex_lock(&kvm->arch.config_lock);
-+
-+	iter = &kvm->arch.idreg_debugfs_iter;
-+	if (*iter == (u8)~0) {
-+		*iter = *pos;
-+		if (*iter >= KVM_ARM_ID_REG_NUM)
-+			iter = NULL;
-+	} else {
-+		iter = ERR_PTR(-EBUSY);
-+	}
-+
-+	mutex_unlock(&kvm->arch.config_lock);
-+
-+	return iter;
-+}
-+
-+static void *idregs_debug_next(struct seq_file *s, void *v, loff_t *pos)
-+{
-+	struct kvm *kvm = s->private;
-+
-+	(*pos)++;
-+
-+	if ((kvm->arch.idreg_debugfs_iter + 1) < KVM_ARM_ID_REG_NUM) {
-+		kvm->arch.idreg_debugfs_iter++;
-+
-+		return &kvm->arch.idreg_debugfs_iter;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void idregs_debug_stop(struct seq_file *s, void *v)
-+{
-+	struct kvm *kvm = s->private;
-+
-+	if (IS_ERR(v))
-+		return;
-+
-+	mutex_lock(&kvm->arch.config_lock);
-+
-+	kvm->arch.idreg_debugfs_iter = ~0;
-+
-+	mutex_unlock(&kvm->arch.config_lock);
-+}
-+
-+static int idregs_debug_show(struct seq_file *s, void *v)
-+{
-+	struct kvm *kvm = s->private;
-+	const struct sys_reg_desc *desc;
-+
-+	desc = first_idreg + kvm->arch.idreg_debugfs_iter;
-+
-+	if (!desc->name)
-+		return 0;
-+
-+	seq_printf(s, "%20s:\t%016llx\n",
-+		   desc->name, IDREG(kvm, IDX_IDREG(kvm->arch.idreg_debugfs_iter)));
-+
-+	return 0;
-+}
-+
-+static const struct seq_operations idregs_debug_sops = {
-+	.start	= idregs_debug_start,
-+	.next	= idregs_debug_next,
-+	.stop	= idregs_debug_stop,
-+	.show	= idregs_debug_show,
-+};
-+
-+DEFINE_SEQ_ATTRIBUTE(idregs_debug);
-+
- static void kvm_reset_id_regs(struct kvm_vcpu *vcpu)
- {
- 	const struct sys_reg_desc *idreg = first_idreg;
-@@ -3441,6 +3517,11 @@ static void kvm_reset_id_regs(struct kvm_vcpu *vcpu)
- 		id = reg_to_encoding(idreg);
- 	}
- 
-+	kvm->arch.idreg_debugfs_iter = ~0;
-+
-+	debugfs_create_file("idregs", 0444, kvm->debugfs_dentry, kvm,
-+			    &idregs_debug_fops);
-+
- 	set_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags);
- }
- 
--- 
-2.39.2
+>> diff --git a/arm/Makefile.common b/arm/Makefile.common
+>> index 54cb4a63..c2ee568c 100644
+>> --- a/arm/Makefile.common
+>> +++ b/arm/Makefile.common
+>> @@ -71,7 +71,7 @@ FLATLIBS = $(libcflat) $(LIBFDT_archive) $(libeabi)
+>>   
+>>   ifeq ($(CONFIG_EFI),y)
+>>   %.aux.o: $(SRCDIR)/lib/auxinfo.c
+>> -	$(CC) $(CFLAGS) -c -o $@ $^ \
+>> +	$(CC) $(CFLAGS) -c -o $@ $< \
+>>   		-DPROGNAME=\"$(@:.aux.o=.efi)\" -DAUXFLAGS=$(AUXFLAGS)
+> 
+> There are two instances of the %.aux.o target in arm/Makefile.common. We
+> need to fix both. We can actually pull the target out of the two arms of
+> the CONFIG_EFI if-else, though, by changing the .efi/.flat to .$(exe).
+
+I went ahead and pushed this patch with the trivial fix for the else-branch 
+to the repo to unbreak the build. If you think it's worthwhile to unify the 
+target, please provide a patch to do so, thanks!
+
+  Thomas
 
