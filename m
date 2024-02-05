@@ -1,65 +1,65 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B6F518635
-	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 11:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D18919BCA
+	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 12:04:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707132529; cv=none; b=uHZzkEyRi0bcAfgvrghj2naOWyUK6O3IkGMpcz7lC/JOYVzRPy8kTlMPbovSY2vxgznmJCyc+kQ5akJq+d53tGRlgoWqelKZbMwboXMAemoYcN8WZqNRpp02XP81cMl6EpYyeJMNtP6JBDVcWy5s6JAkZLfPR+AsVhuLkoGIVxg=
+	t=1707134675; cv=none; b=OrFb3E6BXIBZ8eVWyXYlXQPx8asddUwvXT4DTLxvNwao1NGyBBfJ++rp+FSDll3EHT16YJRrWGQuj4RuulBByNMwcv11uExJFyiFXzMClQF232JmtRuFbuhGgZBplAXyzYEJzvaezkvTHfHkPup+sqqiE11IrCDIez0uEOWzXaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707132529; c=relaxed/simple;
-	bh=2VJYWwkj282qmW4tJsn+V5pmShFHwuBYTY12vqnTrB4=;
+	s=arc-20240116; t=1707134675; c=relaxed/simple;
+	bh=/ZRVuwJy3SQg04PlHWv//6vnnJxL7IiiSWt79kk2oxk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TzELBgrKkgngfsPv+Ryy8BgGqUNg0sACKphf0OyyDpvsWpF0EiXM+yAeSL8+6dUZSdOgKGU7fmmB+WD7ke2bYhdX6+ibEl9QtQPSG7nyoXgb/ZeVABV34rDXVdXQKBVv1DmRO9f7KPeLZfupeKXDvMuk1oSwB8t1f8f8KR8ytUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=frWlSQHh; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=NRAlq0nrtDcj2p9DyfGI0JzCHolTd4DOdMbnfwINWVznxlIi/LKrmaAHOD5i+8um9W39TBS3jfFAoTjJGB3iqV1mwIiVAbKs6kv68HYimdda9YPBZkoPpQDxuivo8jwmplpoI01juAkYZVz9QmgF6iTaje6xzS1NQiUf8XCMOk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=abgBrIgL; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="frWlSQHh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="abgBrIgL"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707132527;
+	s=mimecast20190719; t=1707134673;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=nUaMZZu+Dp9dwRrEKB8bV8ysB1e4sCJY0FwagGA5ceE=;
-	b=frWlSQHhUaIrxA4ECNnKETP3hwojUlGTqcXbrTi/xW2BejpbPE/mZE3CAQhZ2yO3b404j7
-	OatKDvfPpv5Ht1wApKPuw1/mnOxR/Egc66+ZkfGC4cCtT6HuBHIbKvj3P3B8UGesKYVGXw
-	hD5sEj4ht1MXwfWlvrVwcIlIjpVELoI=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=cgWqZ/ywcH/fgEspFo/6QfPQCVxD3Q8p3yiG7wvUpz8=;
+	b=abgBrIgLkOQtQ2VB89fIivHDGSM3r0UYrYItzf2lqwRRAKpZlKy4+n9qCHpqs1Riwoxxla
+	JUmrx6jCtICh+U9heEto6hR0IO5WQCZ69/cBsdz7/neWk9a9qJ3/kMM4xTlgWYjxYXWWOq
+	JWlsDORcg6oBw2Rs4IM2km6DqYjuViI=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-628-eXsP_c6qNxG7qp8nrfFHiA-1; Mon, 05 Feb 2024 06:28:45 -0500
-X-MC-Unique: eXsP_c6qNxG7qp8nrfFHiA-1
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-68c88fe9dadso41985306d6.0
-        for <kvmarm@lists.linux.dev>; Mon, 05 Feb 2024 03:28:45 -0800 (PST)
+ us-mta-696-KuPiml0oNrC9Azvk-W8lNg-1; Mon, 05 Feb 2024 07:04:29 -0500
+X-MC-Unique: KuPiml0oNrC9Azvk-W8lNg-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-68086d6c953so75267336d6.2
+        for <kvmarm@lists.linux.dev>; Mon, 05 Feb 2024 04:04:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707132525; x=1707737325;
+        d=1e100.net; s=20230601; t=1707134669; x=1707739469;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nUaMZZu+Dp9dwRrEKB8bV8ysB1e4sCJY0FwagGA5ceE=;
-        b=xRBUemWYyGwLV3ZWyk9q9+VrwYfH12Pqyb4nOxe6E93rb7+RWKK2brMa320RJVXWr0
-         AEMasjL9AFI0yKMJZem4A+5BFt5fsHA9KRMjX5ZPuGV/QvrtG3woFFv6CnYHIswp0zK2
-         dg+OCbslMgNN2NxxX//7IebcqGY43TK3nc9m1FLBuQu7NEyiT1VfKTUn+OewCh/Up71h
-         4wKlO+2BAUhZ690sm0eLXEcx+dUPm24NQv0M4+HtwDYcvq5NGIvTr7olw3x6Rdw0tBtl
-         Xv0W1oql7aZK2OlqzqspCV7B+ca0FsbcY/K/V75T/veM5uI/vH5fiKm+KiEIFhc8pQbv
-         9UQQ==
-X-Gm-Message-State: AOJu0YyQ7mGfiax5+tEJHesINLe9RG16aiplYNql5ZYLZRU2QP8d6dB2
-	yKgyT4vqxlLZ9G54aeJ7AGku6/ZdImpbcGFxN65zUgMtOl6UmFdvsM8Uli9NPYes0rwqZwXJtuJ
-	X4VcB+pLtmxsxlj7PhqyOFaGZK6do12/5YEzuz8TQGpqqZKloaNmhbw==
-X-Received: by 2002:a05:6214:1bca:b0:68c:5aec:a777 with SMTP id m10-20020a0562141bca00b0068c5aeca777mr10444475qvc.15.1707132525288;
-        Mon, 05 Feb 2024 03:28:45 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG8EaWM4B1y1ZetAAd55Aml2aHxbapztaFPxB73e0x4SKOBYmOWyWuKnTkcVyTF/NaB0tj2yA==
-X-Received: by 2002:a05:6214:1bca:b0:68c:5aec:a777 with SMTP id m10-20020a0562141bca00b0068c5aeca777mr10444456qvc.15.1707132525076;
-        Mon, 05 Feb 2024 03:28:45 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXWPIeAmM4zXqyigLA0WaHjYvNc0iltB6bnBBy8QYvhZLHNBXkjYjHaucBRdJYPH0szT+kDLlvclxWkY5zxZP8lUzEhIXYmjGPkzkA3KlO3Qa2uRQXc9nXwApYOePPqxPh993CX+Ykh5jamYbUskGrr02J+wyVcxl+9yb35OMqMi48kHAZwZg/zppBC1scp8eyLC2fKAfLNawWG2xo2EawCIJYSrvkvLjxiVxsXNPOaclgOUBS2Qog+pId8rXLYpWHB/fFohXulmw0J7f8DgDSfPwPFRsOMVxURBnWOEI/X6tZAL8cEaDB2EZWPlvaEINY5yy9woLltLnE7jzYIZZGeRsspWNDvJgBPDqwzOYxDi3TAFncm1h9WOVQaLnZ8ZjiLaU40OkuC4ZMzb0k4f2AVGD5RBXnICUYtufL9szNSrdRZocVbgybUdJqs2dg617ubop/j5uGuX1VCXNWQ1YgZ2Su7HbPkAQ/hZidUC3/U
+        bh=cgWqZ/ywcH/fgEspFo/6QfPQCVxD3Q8p3yiG7wvUpz8=;
+        b=loTcmRTVr1+eF8WDGsEgwetsQbcif8D60NOrUoCL/qPZs7WHvBSreLaIfrICvYXorP
+         GDlz7wBsbi4dcDEqaK0WNjf8tN/lz4TxNgR2HNkcTRxbqWH64t/5/a3z2ANC+KXZhFYN
+         GIFdGuD8xrkofQu4LsBaqg0C8sd0PdB5hYIct+KiSAIuUIlSKfuMcu1BTKFkw0L6IjWF
+         1LnhZ585gbwSui/vDfLrxQ/+pa1iogNUtpAMflBxZu+kytADyCXYzb5JwYIZbne5UvPX
+         NWWaCQ96J4xlwiJ7O6HufdjYNwd2YAY9nOWklN3w47Si3thm7mHQ0unO/ra2nWD3JJ/Z
+         uG/g==
+X-Gm-Message-State: AOJu0YzIKrbHXd5ZCKYj8B+laqf2/gDGIrChbaCzhZusb8Yg8gqBrJIj
+	nv6lClLYAyEsRzhN7XbPtVgS6soC5KW0g07xTSgQbGH3EICOAPIvVshLev3t9kKvYOwa9VGk5eS
+	XhVcfTRv/kcmLktc1jLkO+Hg1c/44dCaW5D9TUWLEOOT18IuBGA77Iw==
+X-Received: by 2002:a05:6214:5b0a:b0:68c:a02f:6079 with SMTP id ma10-20020a0562145b0a00b0068ca02f6079mr3441769qvb.29.1707134669269;
+        Mon, 05 Feb 2024 04:04:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFPoF8GgytGAV7N3xAL+dT9T6XQARIMDQXTEMpFPk8uuMyJ8vK0fkwLF4enOo9ZVfzxOqwKoQ==
+X-Received: by 2002:a05:6214:5b0a:b0:68c:a02f:6079 with SMTP id ma10-20020a0562145b0a00b0068ca02f6079mr3441756qvb.29.1707134669050;
+        Mon, 05 Feb 2024 04:04:29 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXmNidbUr0VtZ+6lzieCSIr/XlWKYGObahx4H5SEyWGq0u3Bb88mwSofTvDj6AAJNq+L4A7/2+Q2jCyGj/5T4McG2F7oHatZV/4mqxMUOl+55b0IXAnwYNCFHiZQIJaoOx4UB/5Tr+GbUq28A9lZCKKanKIfLyGg226L7Vbk2c4OlYqA3ClH79NbeHj3m+5qHyTIlX9eQIOoXWH9+7zjHYDI4EHL7Wqrn4vJM0KUfnYpZwJg2vdncFMOtTVhOr8YgxdP5G1wHWg2hGa0yJZt5HMXbkpga8BEsIUfIiF+PqEO/u89tBgFAETOL+nLrBmuu/9fUTjYCociI0dyVtaHl/PCl3lbpiI4f9nUj3zlYhNpDg06e5dXpdPKmE+q4Y45sFSdvBwMsl2g5XAoxVD86cgRaMY9BzZGZRQi8tsoIEVLi1s0JvlwR2hY9oE0NDiiG5nnPRwIBTUEeHvN7FvYl5Ex4NK4u0eoUm24JVSj6pixjtYR74=
 Received: from [192.168.0.9] (ip-109-43-177-196.web.vodafone.de. [109.43.177.196])
-        by smtp.gmail.com with ESMTPSA id nz10-20020a0562143a8a00b0068c7664112bsm3658473qvb.52.2024.02.05.03.28.41
+        by smtp.gmail.com with ESMTPSA id ql4-20020a056214540400b0068c95ebd14csm2194205qvb.2.2024.02.05.04.04.24
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Feb 2024 03:28:44 -0800 (PST)
-Message-ID: <003f43ab-cce9-408d-8354-b7884f513ad1@redhat.com>
-Date: Mon, 5 Feb 2024 12:28:38 +0100
+        Mon, 05 Feb 2024 04:04:28 -0800 (PST)
+Message-ID: <cc1b4733-9a6f-4bb6-b8e6-1a6a8807b317@redhat.com>
+Date: Mon, 5 Feb 2024 13:04:22 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,12 +67,11 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2 1/9] (arm|powerpc|s390x): Makefile: Fix
- .aux.o generation
-To: Andrew Jones <andrew.jones@linux.dev>, Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v2 3/9] arch-run: Clean up initrd cleanup
+To: Nicholas Piggin <npiggin@gmail.com>
 Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
- Shaoqin Huang <shahuang@redhat.com>, Nico Boehr <nrb@linux.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
+ Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
+ Nico Boehr <nrb@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Alexandru Elisei <alexandru.elisei@arm.com>,
  Eric Auger <eric.auger@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
  Claudio Imbrenda <imbrenda@linux.ibm.com>,
@@ -80,8 +79,7 @@ Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
  <mhartmay@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
  linux-s390@vger.kernel.org, kvmarm@lists.linux.dev
 References: <20240202065740.68643-1-npiggin@gmail.com>
- <20240202065740.68643-2-npiggin@gmail.com>
- <20240202-2f93f59553cec386791f7629@orel>
+ <20240202065740.68643-4-npiggin@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -125,44 +123,51 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240202-2f93f59553cec386791f7629@orel>
+In-Reply-To: <20240202065740.68643-4-npiggin@gmail.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 02/02/2024 10.30, Andrew Jones wrote:
-> On Fri, Feb 02, 2024 at 04:57:32PM +1000, Nicholas Piggin wrote:
->> Using all prerequisites for the source file results in the build
->> dying on the second time around with:
->>
->> gcc: fatal error: cannot specify ‘-o’ with ‘-c’, ‘-S’ or ‘-E’ with multiple files
->>
->> This is due to auxinfo.h becoming a prerequisite after the first
->> build recorded the dependency.
-
-D'oh, of course I only tried to run "make" once when testing that patch :-/
-
->> diff --git a/arm/Makefile.common b/arm/Makefile.common
->> index 54cb4a63..c2ee568c 100644
->> --- a/arm/Makefile.common
->> +++ b/arm/Makefile.common
->> @@ -71,7 +71,7 @@ FLATLIBS = $(libcflat) $(LIBFDT_archive) $(libeabi)
->>   
->>   ifeq ($(CONFIG_EFI),y)
->>   %.aux.o: $(SRCDIR)/lib/auxinfo.c
->> -	$(CC) $(CFLAGS) -c -o $@ $^ \
->> +	$(CC) $(CFLAGS) -c -o $@ $< \
->>   		-DPROGNAME=\"$(@:.aux.o=.efi)\" -DAUXFLAGS=$(AUXFLAGS)
+On 02/02/2024 07.57, Nicholas Piggin wrote:
+> Rather than put a big script into the trap handler, have it call
+> a function.
 > 
-> There are two instances of the %.aux.o target in arm/Makefile.common. We
-> need to fix both. We can actually pull the target out of the two arms of
-> the CONFIG_EFI if-else, though, by changing the .efi/.flat to .$(exe).
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>   scripts/arch-run.bash | 12 +++++++++++-
+>   1 file changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> index f22ead6f..cc7da7c5 100644
+> --- a/scripts/arch-run.bash
+> +++ b/scripts/arch-run.bash
+> @@ -271,10 +271,20 @@ search_qemu_binary ()
+>   	export PATH=$save_path
+>   }
+>   
+> +initrd_cleanup ()
+> +{
+> +	if [ "$KVM_UNIT_TESTS_ENV_OLD" ]; then
+> +		export KVM_UNIT_TESTS_ENV="$KVM_UNIT_TESTS_ENV_OLD"
+> +	else
+> +		unset KVM_UNIT_TESTS_ENV
+> +		unset KVM_UNIT_TESTS_ENV_OLD
+> +	fi
+> +}
+> +
+>   initrd_create ()
+>   {
+>   	if [ "$ENVIRON_DEFAULT" = "yes" ]; then
+> -		trap_exit_push 'rm -f $KVM_UNIT_TESTS_ENV; [ "$KVM_UNIT_TESTS_ENV_OLD" ] && export KVM_UNIT_TESTS_ENV="$KVM_UNIT_TESTS_ENV_OLD" || unset KVM_UNIT_TESTS_ENV; unset KVM_UNIT_TESTS_ENV_OLD'
+> +		trap_exit_push 'rm -f $KVM_UNIT_TESTS_ENV; initrd_cleanup'
+>
 
-I went ahead and pushed this patch with the trivial fix for the else-branch 
-to the repo to unbreak the build. If you think it's worthwhile to unify the 
-target, please provide a patch to do so, thanks!
+Why don't you move the 'rm -f $KVM_UNIT_TESTS_ENV' into the initrd_cleanup() 
+function, too? ... that would IMHO make more sense for a function that is 
+called *_cleanup() ?
 
   Thomas
+
 
