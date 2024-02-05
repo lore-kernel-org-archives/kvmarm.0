@@ -1,114 +1,153 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 439171CA9E
-	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 13:04:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6054168D7
+	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 13:10:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707138300; cv=none; b=qdlHUseCD4Y+LNfA4j7P3lhmvMVkAOzF1KIJco6K+rG1jTwraCxTsNUqMwuxgwtCFmpizMFOHMLDhlBPMuHxFVw4oNzonJzLZGTxRktG/w09RUKETNeuw+ZwKx/fX7nn/4ywUKjZbrvFS6YfQBUbuGuLoL9SEaPQUg1ll9+VJtg=
+	t=1707138642; cv=none; b=DC2HWE20qm1X6TiSZ2A31MFBOS5mC8iDgOo037RAuxovMlm+mf/7bd8vbDK4SH3/DQ/1bCYnVqMGNeAbVOxa8tNvcl/aQTPEdqj0eSzyDnIIj1378Uf969SBhILQcXlDjCD8cXTw0t45+HSOJfsdUCBoEbUqSr8V7UpDt2IWfNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707138300; c=relaxed/simple;
-	bh=6R73Y1eL+XW9/5GN5zqnbfIAD02pmTNPIsXX1PzbkQc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KDMljlHQPa+4npFQuOn2QtY0HkHLNr9M59DeaZ+j7vBXbSMuRO2oWcjmoxFBUl05sfVyrsINgXFlDXlJXXffE3kBOzLmkEZmpzKNiX3xgyc0SAq6PBgyj2RpDqh2tHQQxpTTvblwo+hPnbG1mkyo1YSAwsDy2ahk97d89UT4bNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=d5OTMkxI; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1707138642; c=relaxed/simple;
+	bh=a7C8ciPQZp5QzEHWJtui24Jra/hcnLQehMJdzgp1ngY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CnD4stc16BkjPA4uHMcbN3RZAh7UYBtlvP0J5c6RXGlOzK0aXE5zdW5PKtO7Bx6CByNg+gDb0VshwTNRfb8wxWW581ZIESRJDzTtwo9djiD0tF/hHT9qU1FdeaUVeOVwt0yVJBj0IpZzlBXsIqujekPs0IYKTIC1Hh6w0JrYgxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ATS2GVH0; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="d5OTMkxI"
-Date: Mon, 5 Feb 2024 13:04:51 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707138294;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kjDbYJsA64v+kSKvUvgWTs/MwMgC5uCGKzp4l4kiFPQ=;
-	b=d5OTMkxIJ0g6UM3z7bHVp+C0KObAXlBjbpjAGtUI0R/TQZptwEcQ3TPCtL7tWTrDSzMYAy
-	OEIqo5T0Z0ZpuQ3X9or70pTazC4A7W2D8fH7WO3AfkMisgfErJgHNcefcgqSjmBGDZqsr1
-	QsiPxQfd2K9662ohcknZ8OQ8jJl523k=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: James Clark <james.clark@arm.com>
-Cc: coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, broonie@kernel.org, maz@kernel.org,
-	suzuki.poulose@arm.com, acme@kernel.org,
-	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mike Leach <mike.leach@linaro.org>,
-	Leo Yan <leo.yan@linaro.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Rob Herring <robh@kernel.org>, Miguel Luis <miguel.luis@oracle.com>,
-	Jintack Lim <jintack.lim@linaro.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>, Arnd Bergmann <arnd@arndb.de>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Kristina Martsenko <kristina.martsenko@arm.com>,
-	Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Jing Zhang <jingzhangos@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 2/7] arm64: KVM: Use shared area to pass PMU event
- state to hypervisor
-Message-ID: <ZcDc8-FQo8wKavA4@linux.dev>
-References: <20240104162714.1062610-1-james.clark@arm.com>
- <20240104162714.1062610-3-james.clark@arm.com>
- <Zb1mCCi13AJ_YjFZ@linux.dev>
- <8a908ee8-620a-d9c2-734b-5a6402950072@arm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ATS2GVH0"
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-511413e52d4so2367650e87.1
+        for <kvmarm@lists.linux.dev>; Mon, 05 Feb 2024 05:10:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707138639; x=1707743439; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l52wGRJpdNZd5ZMPG8emXQNk5j5Wmg7cRfJ4UIcR334=;
+        b=ATS2GVH0qi87upvTDjQ7uf5D7OgMwY90Iuhfh+6zQEEh16nChdjmXxFEhOWrHEIVlp
+         L5mCbEsToEUspr6nea+JAuQMUANrtjQO13PUkdNax9bfgsbWxcoCLL4AkCwq3W4rwrEh
+         5O991Q28VZb7dT5A8OLtlitSpQC7cDaY9pQsoFzcxoHQ3RbXkdiG2ARduo8S6zkKHBwD
+         feY/rnRsPVyAxKuHbwaydYaz+OkViADwv9W5OMOEhcgaGew/h++0A7DhDUX5ixZusAUL
+         UAnkKVOAzSiZunDxErfdJStY5HBXCNz1gprVTeFJSb/IQ1z9EVI78b/y2IrZ9zkzAz1l
+         gcMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707138639; x=1707743439;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=l52wGRJpdNZd5ZMPG8emXQNk5j5Wmg7cRfJ4UIcR334=;
+        b=YlhG9pBYeFW0lx0SXFum25LJJlWMWRzY6gXCqgdbNeapXkxptOiKZxuj0kOn+gPIEa
+         qQ4Ug3WLtb4YsBbbDCTUPSF4Xrq04/wOibi5/Ai2rm009L+KqFQpbaqdLVcToSnj+ZCe
+         WMfS09Vne8ubw/glRURFa3JjJtqkMfnW2qU4PMtQSJhPCmN7O9uilOoMkT9dc51vRQ+p
+         tK6JAeZ+O5IT+q1lN8soCFV/5Gc22YDrTKbrw10qyqPO5ryrudn8tmhcKiyuP8UhHl/V
+         hPtXp/646uSdpA2EvuRyUevlCm8OlNsLR4fftNIVXIXutAgSlZfhWEhTtCloDYyFG1sk
+         o/9w==
+X-Gm-Message-State: AOJu0YxuhnWKRUNM71vIoFe3VNAw9xBSgTo/0/hUrqgw/1288wNqnTii
+	TCuBn24SCQ56f8Sk+MHzuNaeAyjPq389A8s6jMkaucFq+6t+uaGw5KE8GR/AVp5PXBtQLgua+H2
+	i/pv37Ps2uFT2wWqemMo6AWvzKUA=
+X-Google-Smtp-Source: AGHT+IHcjgafryspZvflYvXmNwPr/1ZTRC4o5v0aRZqmLV0WFqjr47M7EyynLPGoweDD8l30req/4VrqIPpQvTK6l0U=
+X-Received: by 2002:a05:6512:1150:b0:511:4e0c:bc3f with SMTP id
+ m16-20020a056512115000b005114e0cbc3fmr2466365lfg.51.1707138638651; Mon, 05
+ Feb 2024 05:10:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8a908ee8-620a-d9c2-734b-5a6402950072@arm.com>
-X-Migadu-Flow: FLOW_OUT
+References: <cover.1705916069.git.haibo1.xu@intel.com>
+In-Reply-To: <cover.1705916069.git.haibo1.xu@intel.com>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Mon, 5 Feb 2024 21:10:26 +0800
+Message-ID: <CAJve8onDbX44Ph6a-FdO2+p7QOQLah-7OyF+yUc06wud+SvmQQ@mail.gmail.com>
+Subject: Re: [PATCH v5 00/12] RISCV: Add kvm Sstc timer selftests
+To: Haibo Xu <haibo1.xu@intel.com>
+Cc: ajones@ventanamicro.com, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Guo Ren <guoren@kernel.org>, 
+	Conor Dooley <conor.dooley@microchip.com>, Mayuresh Chitale <mchitale@ventanamicro.com>, 
+	wchen <waylingii@gmail.com>, Greentime Hu <greentime.hu@sifive.com>, 
+	Jisheng Zhang <jszhang@kernel.org>, Samuel Holland <samuel@sholland.org>, 
+	Minda Chen <minda.chen@starfivetech.com>, Sean Christopherson <seanjc@google.com>, 
+	Peter Xu <peterx@redhat.com>, Like Xu <likexu@tencent.com>, 
+	Vipin Sharma <vipinsh@google.com>, Thomas Huth <thuth@redhat.com>, 
+	Aaron Lewis <aaronlewis@google.com>, 
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 05, 2024 at 12:16:53PM +0000, James Clark wrote:
-> > This now allows the host to program event counters for a protected
-> > guest. That _might_ be a useful feature behind some debug option, but is
-> > most definitely *not* something we want to do for pVMs generally.
-> 
-> Unless I'm missing something, using PMUs on protected guests was added
-> by 722625c6f4c5b ("KVM: arm64: Reenable pmu in Protected Mode"). This
-> change is just a refactor that will allow us to add the same behavior
-> for a similar feature (tracing) without adding yet another copy of some
-> state before the guest switch.
+Hi Marc,
 
-Ha, I had forgotten about that patch (and I had reviewed it!)
+Could you help review the first 3 patches in this series?
 
-My interpretation of the intent for that change was to enable the usage
-of vPMU for non-protected VMs. The situation has changed since then, as
-we use the shadow state for vCPUs unconditionally in protected mode as
-of commit  be66e67f1750 ("KVM: arm64: Use the pKVM hyp vCPU structure
-in handle___kvm_vcpu_run()")
-
-Protected mode is well understood at this point to be a WIP feature, and
-that not all things are expected to work with it. Eventually we will
-need a way to distinguish between 'normal' VMs and true pVMs (i.e. the
-VMM selected full isolation) in nVHE, but right now what we have enables
-testing of some isolation features.
-
-> > I'm perfectly happy leaving these sorts of features broken for pKVM and
-> > using the 'normal' way of getting percpu data to the nVHE hypervisor
-> > otherwise.
-> > 
-> 
-> I can do that. But do I also disable PMU at the same time in a new
-> commit? Now that both PMU and tracing is working maybe it would be a
-> waste to throw that away and hiding it behind an option is better. Or I
-> can leave the PMU as it is and just keep tracing disabled in pKVM.
-> 
-> I don't mind either way, my main goal was to get exclude/include guest
-> tracing working for normal VMs. For pKVM I don't have a strong opinion.
-
-Unless someone has strong opinions about making this work in protected
-mode, I am happy to see tracing support limited to the 'normal' nVHE
-configuration. The protected feature as a whole is just baggage until
-upstream support is completed.
-
--- 
 Thanks,
-Oliver
+Haibo
+
+On Mon, Jan 22, 2024 at 5:45=E2=80=AFPM Haibo Xu <haibo1.xu@intel.com> wrot=
+e:
+>
+> The RISC-V arch_timer selftests is used to validate Sstc timer
+> functionality in a guest, which sets up periodic timer interrupts
+> and check the basic interrupt status upon its receipt.
+>
+> This KVM selftests was ported from aarch64 arch_timer and tested
+> with Linux v6.7-rc8 on a Qemu riscv64 virt machine.
+>
+> ---
+> Changed since v4:
+>   * Rebased to Linux 6.7-rc8
+>   * Added new patch(2/12) to clean up the data type in struct test_args
+>   * Re-ordered patch(11/11) in v4 to patch(3/12)
+>   * Changed the timer_err_margin_us type from int to uint32_t
+>
+> Haibo Xu (11):
+>   KVM: arm64: selftests: Data type cleanup for arch_timer test
+>   KVM: arm64: selftests: Enable tuning of error margin in arch_timer
+>     test
+>   KVM: arm64: selftests: Split arch_timer test code
+>   KVM: selftests: Add CONFIG_64BIT definition for the build
+>   tools: riscv: Add header file csr.h
+>   tools: riscv: Add header file vdso/processor.h
+>   KVM: riscv: selftests: Switch to use macro from csr.h
+>   KVM: riscv: selftests: Add exception handling support
+>   KVM: riscv: selftests: Add guest helper to get vcpu id
+>   KVM: riscv: selftests: Change vcpu_has_ext to a common function
+>   KVM: riscv: selftests: Add sstc timer test
+>
+> Paolo Bonzini (1):
+>   selftests/kvm: Fix issues with $(SPLIT_TESTS)
+>
+>  tools/arch/riscv/include/asm/csr.h            | 541 ++++++++++++++++++
+>  tools/arch/riscv/include/asm/vdso/processor.h |  32 ++
+>  tools/testing/selftests/kvm/Makefile          |  27 +-
+>  .../selftests/kvm/aarch64/arch_timer.c        | 295 +---------
+>  tools/testing/selftests/kvm/arch_timer.c      | 259 +++++++++
+>  .../selftests/kvm/include/aarch64/processor.h |   4 -
+>  .../selftests/kvm/include/kvm_util_base.h     |   9 +
+>  .../selftests/kvm/include/riscv/arch_timer.h  |  71 +++
+>  .../selftests/kvm/include/riscv/processor.h   |  65 ++-
+>  .../testing/selftests/kvm/include/test_util.h |   2 +
+>  .../selftests/kvm/include/timer_test.h        |  45 ++
+>  .../selftests/kvm/lib/riscv/handlers.S        | 101 ++++
+>  .../selftests/kvm/lib/riscv/processor.c       |  87 +++
+>  .../testing/selftests/kvm/riscv/arch_timer.c  | 111 ++++
+>  .../selftests/kvm/riscv/get-reg-list.c        |  11 +-
+>  15 files changed, 1353 insertions(+), 307 deletions(-)
+>  create mode 100644 tools/arch/riscv/include/asm/csr.h
+>  create mode 100644 tools/arch/riscv/include/asm/vdso/processor.h
+>  create mode 100644 tools/testing/selftests/kvm/arch_timer.c
+>  create mode 100644 tools/testing/selftests/kvm/include/riscv/arch_timer.=
+h
+>  create mode 100644 tools/testing/selftests/kvm/include/timer_test.h
+>  create mode 100644 tools/testing/selftests/kvm/lib/riscv/handlers.S
+>  create mode 100644 tools/testing/selftests/kvm/riscv/arch_timer.c
+>
+> --
+> 2.34.1
+>
