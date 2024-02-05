@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58BF17586
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F385E17586
 	for <kvmarm@lists.linux.dev>; Mon,  5 Feb 2024 10:34:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707129288; cv=none; b=muCmwvje6YncuRpl1gzTtxt18aXSxvUPtPTPhhg9uDGpYou7GVBYBNxNPPRGQrCcEILuq3LXs8RO+0pxTGa7BggmROKGqquXSG3rKoI+lnP9bQBCrTe9y4rA9xs4cN6Z/j/tawXAd53kgibOyV/AGXbx3YsQfhx9MY+m7DfgnNI=
+	t=1707129289; cv=none; b=rTelUqr44SVo6p3RF/gT3r0B0/NrciLXLroVPf7jn+VNCN5QSXePKL8fZe9q5cT7wsHWPJ4b7EzogA+Keim03jQzxdNCsnYtF9sZrjtTuy/9GcILZDymtSFtTBZn+5Fycz6INqKiEBayJkLsmW1hD+/RGOf1VxCtrj+NlDB84TI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707129288; c=relaxed/simple;
-	bh=oheFs4+mGfJCXwIIaUZOBBGakXa8+TX2q4FgHBvfaTE=;
+	s=arc-20240116; t=1707129289; c=relaxed/simple;
+	bh=dPKdXan4l5AaxJXUMKbdMXX5peIFbEULFEDKVd3lkHs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Fq2hfTSYiYi5iXOWU6a49262lcbGAzdqY7c/sRGTbchIVl9ImJW2Blnx1ydWnS3QL4HQubfBimKhMFu2Nm3NEwpGxIuMC2GN/2uiPEtL54LHejOsG/AWMJcRJdYrLX4jSb7evTaIlx8XQOK+TYuNrJdDt3qMUUGxazTsPhF7C+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b5MBAIlk; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Q5dCUo9cC/fKtfWqUJTVDb8bj0oYAcxfJVg8B1/Aao/C2/0c/b2yXrLaopQGRpk4U7fSRNvEnm+46F3EWW4EuXIcWYuODwHUqBq62E+zMAev2p3v333Yu69+Id7dey5p5v2wE7XXcAoq9+BCe6MdLp1NrKTRWbgm70sFfTXce+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PuqHlXEc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b5MBAIlk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 292ABC43390;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PuqHlXEc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C785EC43399;
 	Mon,  5 Feb 2024 10:34:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707129288;
-	bh=oheFs4+mGfJCXwIIaUZOBBGakXa8+TX2q4FgHBvfaTE=;
+	bh=dPKdXan4l5AaxJXUMKbdMXX5peIFbEULFEDKVd3lkHs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=b5MBAIlkUtgPqW+5Ubu8gaC0NARqGUKchjTXndMrra9xB5G5XyxyWm4K8qmlv3IxS
-	 fCyww3OZQCidLTkh4X31bTtvtQTDUv9jZrgsYJzgWQibwu3ZGYmifkhqin3u4X02lR
-	 FntjhTGRHkeeLNBiK1U6PKeT9T24xnlV2sBR0sYZHvCNiHNVD1vcSe1eRezF3p6Sj6
-	 Bjs84gc8x4gqI1TcOtokJxaxfLjS0Wvy2pF86dbAntcUMePHBoP9xyQ9pYFTVIQ3b8
-	 W9NptAy7Zzucla+ftU3bJox13uCq+hIEvTXdiHKA50ZOwh1iFI5zA4q0kfjsYrN5TS
-	 Tf0pZFrILJz2w==
+	b=PuqHlXEc4MrYSSsep+2zRQfHyRG2/3p7pjhZFnHkZX51y1iLu5X74QU6VrAFNOhqp
+	 /me/+bQLfkmCOrF6f53YODW4s+BooGv3/Rs7OWihUYDyp2VL5hybFGeRBrjJhGPn+s
+	 diUHM+TdCyzQ2X5YlNBtGaKuAgXsYX5MhnfhNLiJXk2timqjx/oI1kQVb68kVYMQ+Y
+	 xvrdXfr4U4Z/LCPbE3DNxAfdkdbpzc4LnzoOXNoHns8vHsUbWBhM341mX6lTPkU2/v
+	 bezTAV2lLyg8Jq6xNY/6tFspL2M/PP2qF9oss+RVJxO64u/kFOnveuEwVJUe/3Nh++
+	 hO5rFSNmE/xcQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rWwJK-000Nc3-8X;
-	Mon, 05 Feb 2024 10:34:46 +0000
+	id 1rWwJL-000Nc3-1L;
+	Mon, 05 Feb 2024 10:34:47 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v3 07/26] KVM: arm64: nv: Drop sanitised_sys_reg() helper
-Date: Mon,  5 Feb 2024 10:34:12 +0000
-Message-Id: <20240205103431.1104133-8-maz@kernel.org>
+Subject: [PATCH v3 11/26] KVM: arm64: Drop the requirement for XARRAY_MULTI
+Date: Mon,  5 Feb 2024 10:34:16 +0000
+Message-Id: <20240205103431.1104133-12-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240205103431.1104133-1-maz@kernel.org>
 References: <20240205103431.1104133-1-maz@kernel.org>
@@ -61,76 +61,28 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Now that we have the infrastructure to enforce a sanitised register
-value depending on the VM configuration, drop the helper that only
-used the architectural RES0 value.
+Now that we don't use xa_store_range() anymore, drop the added
+complexity of XARRAY_MULTI for KVM. It is likely still pulled
+in by other bits of the kernel though.
 
 Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/emulate-nested.c | 22 +++++++---------------
- 1 file changed, 7 insertions(+), 15 deletions(-)
+ arch/arm64/kvm/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 431fd429932d..7a4a886adb9d 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -1897,14 +1897,6 @@ static bool check_fgt_bit(u64 val, const union trap_config tc)
- 	return ((val >> tc.bit) & 1) == tc.pol;
- }
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 6c3c8ca73e7f..5c2a672c06a8 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -39,7 +39,6 @@ menuconfig KVM
+ 	select HAVE_KVM_VCPU_RUN_PID_CHANGE
+ 	select SCHED_INFO
+ 	select GUEST_PERF_EVENTS if PERF_EVENTS
+-	select XARRAY_MULTI
+ 	help
+ 	  Support hosting virtualized guest machines.
  
--#define sanitised_sys_reg(vcpu, reg)			\
--	({						\
--		u64 __val;				\
--		__val = __vcpu_sys_reg(vcpu, reg);	\
--		__val &= ~__ ## reg ## _RES0;		\
--		(__val);				\
--	})
--
- bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
- {
- 	union trap_config tc;
-@@ -1940,25 +1932,25 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
- 
- 	case HFGxTR_GROUP:
- 		if (is_read)
--			val = sanitised_sys_reg(vcpu, HFGRTR_EL2);
-+			val = __vcpu_sys_reg(vcpu, HFGRTR_EL2);
- 		else
--			val = sanitised_sys_reg(vcpu, HFGWTR_EL2);
-+			val = __vcpu_sys_reg(vcpu, HFGWTR_EL2);
- 		break;
- 
- 	case HDFGRTR_GROUP:
- 	case HDFGWTR_GROUP:
- 		if (is_read)
--			val = sanitised_sys_reg(vcpu, HDFGRTR_EL2);
-+			val = __vcpu_sys_reg(vcpu, HDFGRTR_EL2);
- 		else
--			val = sanitised_sys_reg(vcpu, HDFGWTR_EL2);
-+			val = __vcpu_sys_reg(vcpu, HDFGWTR_EL2);
- 		break;
- 
- 	case HAFGRTR_GROUP:
--		val = sanitised_sys_reg(vcpu, HAFGRTR_EL2);
-+		val = __vcpu_sys_reg(vcpu, HAFGRTR_EL2);
- 		break;
- 
- 	case HFGITR_GROUP:
--		val = sanitised_sys_reg(vcpu, HFGITR_EL2);
-+		val = __vcpu_sys_reg(vcpu, HFGITR_EL2);
- 		switch (tc.fgf) {
- 			u64 tmp;
- 
-@@ -1966,7 +1958,7 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
- 			break;
- 
- 		case HCRX_FGTnXS:
--			tmp = sanitised_sys_reg(vcpu, HCRX_EL2);
-+			tmp = __vcpu_sys_reg(vcpu, HCRX_EL2);
- 			if (tmp & HCRX_EL2_FGTnXS)
- 				tc.fgt = __NO_FGT_GROUP__;
- 		}
 -- 
 2.39.2
 
