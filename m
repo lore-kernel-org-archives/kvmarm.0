@@ -1,60 +1,107 @@
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F364512E1E6
-	for <kvmarm@lists.linux.dev>; Tue,  6 Feb 2024 10:28:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02F1312EBCA;
+	Tue,  6 Feb 2024 10:29:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707215319; cv=none; b=n74uB55jtkUZJlxnkL/sfvUcfotye5x6MUCKp9jg9tqp972t8H17lTh5GUK9HDHvID1arVPlwPdpqyiYcqLCI9IeY24btSB+lP+JkQXkcfrnIspk8KohOfI6a7JGuFOTprxdC50U2fGtA+kVTM51JYFQPemp1qwqHT0qk4jhNNI=
+	t=1707215367; cv=none; b=MlxtzpLiopVKFvSz8e2L8sh9HzAZRkRP7EU9O6LyFkBkEraVqDMAlj0Cn5tLpLscdi0zDadhKz4pERR9I2agcRwuY4HFVuR6uo1yq7z6b8rqS90wMptfa+RpXmCiw8UkwFQHK7dTvIB4O3fGKnHlU9/Kh8vDdqSrY3LQ43nKnxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707215319; c=relaxed/simple;
-	bh=12ljC+gaSJ1gkfLRkLsG39AQOSWyWJvCPPJpVFot1CE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QHB9ufg93hTAcblBO9jERpvG//eyOVmZ/TTOr7IJrdtuUMCBmWPxSp2OCRngInyDfZCTviCp7DsbxvZFmzPKq9mytJRYrA3ecvuoYQvRcFpXlwpN1bB7DWQ+u7JwhOcIrduS/3IAkpSbm2wBNrU+SP7Ng0zIk/T7id8YiYt0d6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sC+ynBUj; arc=none smtp.client-ip=95.215.58.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1707215367; c=relaxed/simple;
+	bh=yQWyXDnKngD/mW309FyivfmArIxnKAMYY8kh8S/6+VI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LhSYZLXFdUXGN2n0u5OZp3xKaOsgEgIhJwRpzzjNWLfIiLKhj2diy13WGjoFfKsIJbLWl0hsHReoegIegaxPA00cSw5V4L0USohlqdhEWj1n/ylsMYs1mydgAOxfqsak+kngpIC/aZhSwJiDdyFga4FOiFh8uPOgBXF8kHGHR8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WbKK//aI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sC+ynBUj"
-Date: Tue, 6 Feb 2024 10:28:30 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707215316;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UH4qnyV5AlPKuzyHE4nU37Hkz+CAr8GksiGngTSrZn0=;
-	b=sC+ynBUjP2HdG1anTszZxl9OkpuQhhXiL+XqX9h1SsafTSnJQaWBtEA/1X4NVwjU4mAgrj
-	FDC2SjZo1erNoQrKFmiJEVJKovL9V9OLMFyI4sZdaMLBSIoP7TkY+vG2k1d1PcvoMoaSu7
-	Ud1L6lkEXjRKG6SfDrs0QxCo8xf9xpE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WbKK//aI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6250AC433F1;
+	Tue,  6 Feb 2024 10:29:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707215366;
+	bh=yQWyXDnKngD/mW309FyivfmArIxnKAMYY8kh8S/6+VI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WbKK//aI6LbFbaL6CNf9KRaD0f70vHAyf/CF4LqcDnLb7IIiAzF4HCGEPTwjx/jaF
+	 YJBo+W6bZyOltfXDXJbyRHgYTZon/v9oszDQXZ00GSw7qtVHyocEvvUeAiw2ynuRqV
+	 EGWVMFYmS8qEmZ9Ynaq/ZVrbJsKy1dmOqoOQu9PMpL6OGKzwhwEYS/EPED00QzRNa/
+	 FYCgqsWWAc7QndDh7l017QY949uz0Tw0AgaM+9zzs2KjYcOEbiYuNwB9J+9IAFjM/e
+	 xsF6GkadbDD7QNzlq8TnT7cGJzcF3yTDcXNuzNPi+gDMxH+uOhMbu4zpw3TuUHlLYN
+	 XMgCNVALA0Ijg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rXIhf-000m2E-Hz;
+	Tue, 06 Feb 2024 10:29:23 +0000
+Date: Tue, 06 Feb 2024 10:29:22 +0000
+Message-ID: <86y1bx6g3h.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Saurav Sachidanand <sauravsc@amazon.com>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+	Will Deacon <will@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH] [RFC] KVM: arm64/vgic: Populate GICR_TYPER with Aff3
-Message-ID: <ZcIJzn9KLR_bWdwc@linux.dev>
+In-Reply-To: <20240205184326.78814-1-sauravsc@amazon.com>
 References: <20240205184326.78814-1-sauravsc@amazon.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240205184326.78814-1-sauravsc@amazon.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sauravsc@amazon.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
 Hi Saurav,
 
-On Mon, Feb 05, 2024 at 06:43:26PM +0000, Saurav Sachidanand wrote:
+On Mon, 05 Feb 2024 18:43:26 +0000,
+Saurav Sachidanand <sauravsc@amazon.com> wrote:
+> 
+> According to spec, bits [63:56] of the GICR_TYPER register are supposed
+> to contain Affinity level 3 (Aff3) bits of the Processing Element (PE)
+> associated with its GIC redistributor. Linux guests on boot match PEs
+> with their redistributor using all four Affinity level bits from this
+> register.
 
-[...]
+If you read the spec carefully, you will notice that Aff3 support is
+*optional*, and that it is on purpose that we don't support Aff3: this
+cannot work for 32bit guests.
 
+The other thing is that there is no guarantee that the HW actually
+supports that either: ICH_VTR_EL2.A3V tells you whether the CPU
+interface actually supports it.
+
+> 
+> Currently, vGIC populates GICR_TYPER with just the first three Affinity
+> levels of a vCPU's MPIDR. This works fine for a Linux guest that boots
+> with KVM's default vCPU MPIDR assignment, which also only populates till
+> the first three Affinity levels.
+> 
+> However, a hypervisor can override KVM's default MPIDR assignment by
+> writing directly to a vCPU's MPIDR_EL1 register. If such a hypervisor
+> were to populate Aff3 bits for a VM, a Linux guest booting there would
+> fail to match vCPUs with their vGIC redistributors, since their virtual
+> GICR_TYPER registers would be missing the respective Aff3 bits.
+> 
+> To change that, let's populate GICR_TYPER using Aff3 bits [39:32] from
+> the vCPU's MPIDR.
+> 
+> Signed-off-by: Saurav Sachidanand <sauravsc@amazon.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
 > diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
 > index c15ee1df036a..26bc838ce14c 100644
 > --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
@@ -64,16 +111,23 @@ On Mon, Feb 05, 2024 at 06:43:26PM +0000, Saurav Sachidanand wrote:
 >  
 >  	value = (u64)(mpidr & GENMASK(23, 0)) << 32;
 > +	value |= (u64)((mpidr >> 32) & GENMASK(7, 0)) << 56;
+>  	value |= ((target_vcpu_id & 0xffff) << 8);
+>  
+>  	if (vgic_has_its(vcpu->kvm))
 
-This looks suspiciously similar to what MPIDR_AFFINITY_LEVEL()
-accomplishes. I think we can tolerate a few extra lines of code to make
-the entire thing more self-documenting, like:
+So if you consider the above remarks, this is neither sufficient nor
+guaranteed to work. I'm not opposed to having full Aff3 support (most
+of it is already there), but this needs to be done in a consistent
+way, and consider both the case of 32bit guests (which are not going
+away) and the capabilities of the HW (the current code being rather
+inconsistent in this regard).
 
-	value = ((u64)MPIDR_AFFINITY_LEVEL(mpidr, 3) << 56 |
-		MPIDR_AFFINITY_LEVEL(mpidr, 2) << 48 |
-		MPIDR_AFFINITY_LEVEL(mpidr, 1) << 40 |
-		MPIDR_AFFINITY_LEVEL(mpidr, 0) << 32);
+If you are willing to work on this, I'll happily review a more
+complete series of patches.
+
+Thanks,
+
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
