@@ -1,133 +1,122 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02F1312EBCA;
-	Tue,  6 Feb 2024 10:29:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9262E17741
+	for <kvmarm@lists.linux.dev>; Tue,  6 Feb 2024 19:58:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707215367; cv=none; b=MlxtzpLiopVKFvSz8e2L8sh9HzAZRkRP7EU9O6LyFkBkEraVqDMAlj0Cn5tLpLscdi0zDadhKz4pERR9I2agcRwuY4HFVuR6uo1yq7z6b8rqS90wMptfa+RpXmCiw8UkwFQHK7dTvIB4O3fGKnHlU9/Kh8vDdqSrY3LQ43nKnxU=
+	t=1707249517; cv=none; b=fyk0JGtZ8aJ4bGyIG14npJXVm589fJJZqZJif+bBkXYAIowBratDqHECUDeJD8x4b8Dt/njZYZB7BUK5CVOkPKLjp/aUpFQvdpVdFNZlOn5nZxJBeIi4fAbRU+5l0eYAWcifPmw+DjzNVrdy+Xomi9/ba1C2b6ddgQGMrSKVPfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707215367; c=relaxed/simple;
-	bh=yQWyXDnKngD/mW309FyivfmArIxnKAMYY8kh8S/6+VI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LhSYZLXFdUXGN2n0u5OZp3xKaOsgEgIhJwRpzzjNWLfIiLKhj2diy13WGjoFfKsIJbLWl0hsHReoegIegaxPA00cSw5V4L0USohlqdhEWj1n/ylsMYs1mydgAOxfqsak+kngpIC/aZhSwJiDdyFga4FOiFh8uPOgBXF8kHGHR8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WbKK//aI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707249517; c=relaxed/simple;
+	bh=CSs8R3eAqFpZbozTGGxVMdRi1LPhZmwG0SUML7+4tx4=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version; b=CYTAk3hhYzHA16KpDPxilvR2URX8yz/G9eIysehO6lbnmSSn0ZJu7dUgwdy0Dsu/fWIg8F30bGfycZK/c6ZOgFRqyLv3jP3UoK+UVw8KpS6TvHp3mkpX2G+S29MnaZqMLmRNB4UwCAuUMN2zv/BHYDet2a248QYK382iWLv69eY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=QVf5neav; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WbKK//aI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6250AC433F1;
-	Tue,  6 Feb 2024 10:29:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707215366;
-	bh=yQWyXDnKngD/mW309FyivfmArIxnKAMYY8kh8S/6+VI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WbKK//aI6LbFbaL6CNf9KRaD0f70vHAyf/CF4LqcDnLb7IIiAzF4HCGEPTwjx/jaF
-	 YJBo+W6bZyOltfXDXJbyRHgYTZon/v9oszDQXZ00GSw7qtVHyocEvvUeAiw2ynuRqV
-	 EGWVMFYmS8qEmZ9Ynaq/ZVrbJsKy1dmOqoOQu9PMpL6OGKzwhwEYS/EPED00QzRNa/
-	 FYCgqsWWAc7QndDh7l017QY949uz0Tw0AgaM+9zzs2KjYcOEbiYuNwB9J+9IAFjM/e
-	 xsF6GkadbDD7QNzlq8TnT7cGJzcF3yTDcXNuzNPi+gDMxH+uOhMbu4zpw3TuUHlLYN
-	 XMgCNVALA0Ijg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rXIhf-000m2E-Hz;
-	Tue, 06 Feb 2024 10:29:23 +0000
-Date: Tue, 06 Feb 2024 10:29:22 +0000
-Message-ID: <86y1bx6g3h.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Saurav Sachidanand <sauravsc@amazon.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="QVf5neav"
+Received: from rrs24-12-35.corp.microsoft.com (unknown [131.107.8.19])
+	by linux.microsoft.com (Postfix) with ESMTPSA id E764F20B2000;
+	Tue,  6 Feb 2024 11:58:33 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E764F20B2000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1707249514;
+	bh=YiGmA9Lr1a/CDIgqHElD8PPnAN1LFYjN75PS7RDnPho=;
+	h=From:To:Subject:Date:From;
+	b=QVf5neav0galuOadt6P17o8D+jpDq8FW0dD+dOrJecGZiNAcOz3KgLTnX01F6RU9G
+	 Kgt5DG9JP3uEkIGH1aTeUYBiD23JfuLOCzEo5q+slprE1w1TSUoWfrvMQVnGpRPk9Q
+	 XZXfHj/Uf9P1AOnahuIRFutrj/ftsu+Qlsgbah5Y=
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+To: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] [RFC] KVM: arm64/vgic: Populate GICR_TYPER with Aff3
-In-Reply-To: <20240205184326.78814-1-sauravsc@amazon.com>
-References: <20240205184326.78814-1-sauravsc@amazon.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Andre Przywara <andre.przywara@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Kristina Martsenko <kristina.martsenko@arm.com>,
+	linux-arm-kernel@lists.infradead.org (moderated list:ARM64 PORT (AARCH64 ARCHITECTURE)),
+	linux-kernel@vger.kernel.org (open list),
+	kvmarm@lists.linux.dev (open list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64))
+Subject: [RFC PATCH] KVM: arm64: Override Microsoft Azure Cobalt 100 MIDR value with ARM Neoverse N2
+Date: Tue,  6 Feb 2024 19:58:16 +0000
+Message-Id: <20240206195819.1146693-1-eahariha@linux.microsoft.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sauravsc@amazon.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi Saurav,
+Several workload optimizations and errata depend on validating that the
+optimization or errata are applicable to the particular CPU by checking
+the MIDR_EL1 system register value. With the Microsoft implementer ID
+for Azure Cobalt 100, the value doesn't match and ~20-25% performance
+regression is seen in these workloads. Override the Azure Cobalt 100
+value and replace it with the default ARM Neoverse N2 value that Azure
+Cobalt 100 is based on.
 
-On Mon, 05 Feb 2024 18:43:26 +0000,
-Saurav Sachidanand <sauravsc@amazon.com> wrote:
-> 
-> According to spec, bits [63:56] of the GICR_TYPER register are supposed
-> to contain Affinity level 3 (Aff3) bits of the Processing Element (PE)
-> associated with its GIC redistributor. Linux guests on boot match PEs
-> with their redistributor using all four Affinity level bits from this
-> register.
+Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+---
+ arch/arm64/include/asm/cputype.h   | 3 ++-
+ arch/arm64/include/asm/el2_setup.h | 5 +++++
+ arch/arm64/kvm/sys_regs.c          | 9 ++++++++-
+ 3 files changed, 15 insertions(+), 2 deletions(-)
 
-If you read the spec carefully, you will notice that Aff3 support is
-*optional*, and that it is on purpose that we don't support Aff3: this
-cannot work for 32bit guests.
-
-The other thing is that there is no guarantee that the HW actually
-supports that either: ICH_VTR_EL2.A3V tells you whether the CPU
-interface actually supports it.
-
-> 
-> Currently, vGIC populates GICR_TYPER with just the first three Affinity
-> levels of a vCPU's MPIDR. This works fine for a Linux guest that boots
-> with KVM's default vCPU MPIDR assignment, which also only populates till
-> the first three Affinity levels.
-> 
-> However, a hypervisor can override KVM's default MPIDR assignment by
-> writing directly to a vCPU's MPIDR_EL1 register. If such a hypervisor
-> were to populate Aff3 bits for a VM, a Linux guest booting there would
-> fail to match vCPUs with their vGIC redistributors, since their virtual
-> GICR_TYPER registers would be missing the respective Aff3 bits.
-> 
-> To change that, let's populate GICR_TYPER using Aff3 bits [39:32] from
-> the vCPU's MPIDR.
-> 
-> Signed-off-by: Saurav Sachidanand <sauravsc@amazon.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> index c15ee1df036a..26bc838ce14c 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> @@ -324,6 +324,7 @@ static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
->  	u64 value;
->  
->  	value = (u64)(mpidr & GENMASK(23, 0)) << 32;
-> +	value |= (u64)((mpidr >> 32) & GENMASK(7, 0)) << 56;
->  	value |= ((target_vcpu_id & 0xffff) << 8);
->  
->  	if (vgic_has_its(vcpu->kvm))
-
-So if you consider the above remarks, this is neither sufficient nor
-guaranteed to work. I'm not opposed to having full Aff3 support (most
-of it is already there), but this needs to be done in a consistent
-way, and consider both the case of 32bit guests (which are not going
-away) and the capabilities of the HW (the current code being rather
-inconsistent in this regard).
-
-If you are willing to work on this, I'll happily review a more
-complete series of patches.
-
-Thanks,
-
-	M.
-
+diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
+index 7c7493cb571f..0450c6c32377 100644
+--- a/arch/arm64/include/asm/cputype.h
++++ b/arch/arm64/include/asm/cputype.h
+@@ -262,7 +262,8 @@ is_midr_in_range_list(u32 midr, struct midr_range const *ranges)
+  */
+ static inline u32 __attribute_const__ read_cpuid_id(void)
+ {
+-	return read_cpuid(MIDR_EL1);
++	return (read_cpuid(MIDR_EL1) == 0x6D0FD490 ? 0x410FD490 :
++			read_cpuid(MIDR_EL1));
+ }
+ 
+ static inline u64 __attribute_const__ read_cpuid_mpidr(void)
+diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+index b7afaa026842..502a14e54a31 100644
+--- a/arch/arm64/include/asm/el2_setup.h
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -138,6 +138,11 @@
+ .macro __init_el2_nvhe_idregs
+ 	mrs	x0, midr_el1
+ 	mrs	x1, mpidr_el1
++	ldr	x2, =0x6D0FD490
++	cmp	x0, x2
++	bne	.Loverride_cobalt100_\@
++	ldr	x0, =0x410FD490
++.Loverride_cobalt100_\@:
+ 	msr	vpidr_el2, x0
+ 	msr	vmpidr_el2, x1
+ .endm
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 30253bd19917..8ea9c7fdabdb 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3574,7 +3574,14 @@ id_to_sys_reg_desc(struct kvm_vcpu *vcpu, u64 id,
+ 		return ((struct sys_reg_desc *)r)->val;			\
+ 	}
+ 
+-FUNCTION_INVARIANT(midr_el1)
++static u64 get_midr_el1(struct kvm_vcpu *v, const struct sys_reg_desc *r)
++{
++	((struct sys_reg_desc *)r)->val = read_sysreg(midr_el1);
++	if (((struct sys_reg_desc *)r)->val == 0x6D0FD490)
++		((struct sys_reg_desc *)r)->val == 0x410FD490;
++	return ((struct sys_reg_desc *)r)->val;
++}
++
+ FUNCTION_INVARIANT(revidr_el1)
+ FUNCTION_INVARIANT(aidr_el1)
+ 
 -- 
-Without deviation from the norm, progress is not possible.
+2.34.1
+
