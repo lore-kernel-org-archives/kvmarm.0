@@ -1,64 +1,64 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 062B43FC7
-	for <kvmarm@lists.linux.dev>; Tue,  6 Feb 2024 03:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF8773195
+	for <kvmarm@lists.linux.dev>; Tue,  6 Feb 2024 03:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707189397; cv=none; b=NYio56TYCbnBNqR4cxSng7OBIX8mdx2EmsIwsv32olteITQ/xM1MeH7s/D3g2eFBxQRUZhtaYbRd6u6kvZUxhNUMzv9b9uS3rwoCH+jdCTA5jVnFfRtRDO3jO5EuCSnRvJeEvDtJDDY8TEQIBt74BbEkUQg8t4Rc9fUE2DX1Aj4=
+	t=1707189808; cv=none; b=dc2UcMD7QGlz0zC21qDqsxCkDnphaMH4njpU7ecpOd4OowSJ4YFVR34cSuVKzY9lrriQHbJ/k4O+GRnmcng4Vr7u93MKG4rCuAY9Mnt0oPFQCBGYKSQKfKJvMw/rvG8w6ZugClRUQAfkVVKF9U88jcllDruZFvXZDmbMnuz5K5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707189397; c=relaxed/simple;
-	bh=CDLsR1ZUUpDk/9u8x2Knc8vzwibGd3+lwfgVYBEFEPQ=;
+	s=arc-20240116; t=1707189808; c=relaxed/simple;
+	bh=UDDsuWPSW+daCIoSbgJFsD9FLwQJiP9p3QmcFSmkrL8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qh+stXnQYZLWVTHFtfYsqCHnzRtPMVpaJ0Q4xTiOnMmQmpHvvI2U1za8b5bZW/gXK2TNuosT7PHnjzPLj1yKAeIRZiWs3I/iGhn895s+NNrdkv1bJ+2/hR+2kkqI0c4fNPt9LindtyEvwfP4S5VGLtdYC53WD6vUi8/U+hla+Jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lLa7Hwn6; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=NX7ysuCaojgNOHVRX1VXAji9z+dpcvpGSlA08GLVIPl6iY+GbapnWlaHYjlUa88hhz3JuhAn1If+8qobjCNNHizY5q/hOIXa3o8HfbKojD6xmCQ7ztmjwGiHXihPTPLWkBxz7PzEaJFsucGcHNSIVi/Bo+qY0w9ncFncf/2G890=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IPp+JQSL; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lLa7Hwn6"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6041c633cfaso82266627b3.1
-        for <kvmarm@lists.linux.dev>; Mon, 05 Feb 2024 19:16:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IPp+JQSL"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5ce97b87716so437273a12.0
+        for <kvmarm@lists.linux.dev>; Mon, 05 Feb 2024 19:23:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707189395; x=1707794195; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1707189806; x=1707794606; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MvC3MRJutUaxpyhNW1LkFy2eJ5hLYgf9cMf+Ks5GEgE=;
-        b=lLa7Hwn64sIZYkNPz0bHLHmvPC2RbLfB4LcGpBbd3iPTtHKPf4WCBwWat6x5J23vU+
-         KyRUJENy0DDXfk+p7q9BvW8Y2nvGNCGU0SMwkApjOV88IA9mp0b9ehFCoYd/pD1w223W
-         3ie8fTQDTY0K6LO402e0nVKzqbl2wEPGR0tih73t3cD4BhuEx/N0XDkMe3vR6BLFq5yB
-         5Q9CJnTRZOP6oLXL4iiFLm+vBcNPO3l5xwMwroFicDOMDBGYj5biOJnmmvAQP/0IkIBl
-         Py7BFLSdUfHNKhBwCIhi8iKg/Pf/BIIoBHSt/zFIbreGdoIWKMirS4LKrBxTJGSOlj95
-         AYJQ==
+        bh=8R1ERRzsuzMxbDKKjiu7D3XS5GbZ63vNtb/cSGihhOs=;
+        b=IPp+JQSL/ZA+CUEx7LrmhZsaSiuojcxFdXs4Y6DIA5TTBAPEx4gMK/2kjWihTK2o2p
+         jRUtSwU+m2DAbT0wLEZ7PjeEJKT/HnThtWJyTk2iIpZqK5tBRXi7kpLPaRpMx8LMAHZh
+         sdLu2REfx7+rjv6MoMjt3/wxRVM0JtcZdauY6WpufU5WidJd09IrbBM1K4AOstKKgCPJ
+         ReCa+BpPQfHkEdo0xQ9Rbq9uakU7BEk7IyljY+vwGDP6r/zkCiJmTRfSHHQTSOwofGFr
+         nFkTD5TywI7BiUbaG9FGk8UJMHi3nwMulNhNTgBSOffWG8NEbahbPkE2ZkdbyKI9bH3T
+         gRZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707189395; x=1707794195;
+        d=1e100.net; s=20230601; t=1707189806; x=1707794606;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MvC3MRJutUaxpyhNW1LkFy2eJ5hLYgf9cMf+Ks5GEgE=;
-        b=Ccr0CVPCKNA4a59RSnWx6Yu7hXszvHaoC26doFJeB2Mghc2ZjXlXdvHCf3Ugyi1gD/
-         TpNtLcra1Ey0EE3AL19bJMFnJ6Lrpu8mMKxSDBBpkK98afRVCwmbCASNM5eBdZVEVGFe
-         /xxxks6UZebxAkSwuqIMbyV294Vlg9sj+EfHzI7JZusicXucNJQvI//92Eg/EzOZiPNx
-         wVhBTkMgj54GIotdTM9gXHD3Wx5OTP2cbnwuKEADK8oUapqOBiUCl0Su5XM6rE91GfxK
-         tMdTnpuQI0IUKxnJn1SzJXZ2cgfggXYZbGVctxU0TX5Qq/ClQtsiBz6No5pM3C5C70v8
-         p8hg==
-X-Gm-Message-State: AOJu0YxCqwHFsjsLcIcg137KQXr8miYodPBVzGkk8QNCMyGwuDV6UNEI
-	K8nH79f5FcrfkLvXFFaw1YXnlOYmt5fDN2I/j/5AjfPrvLBdBSlgShDHZiINPiYq3gWxV1aZHYQ
-	y1g==
-X-Google-Smtp-Source: AGHT+IGm+xDF5ifX2TC/Wxist3sFnZeSnqNK6H+2R746GyxgyO5yCoDonpYAqmwboZsm2R0fmqQgQqI4SF8=
+        bh=8R1ERRzsuzMxbDKKjiu7D3XS5GbZ63vNtb/cSGihhOs=;
+        b=B22mClv1ifAWeOwgMQmnmiZiN0izpNLJTyDMjJVG3gUd7MUfuvSi1oToZ6w71GubUT
+         bpTfwzOC7y5qMN7AISQxBfxccCJCnPvvTNV179MQUDqF2NrYtFmgzSE0/Kf4/0NZJKsr
+         7NANykqi4bANerMTzQYklcHblahkC+i7T4Y9lOhW37SZCQIVlkOK0YyHoHpzJuDZVl3d
+         +Ki0cCNr6+EQrw/LliRQ6xIu0nuWxL5G3JynL1oRbXl89WZhdBRESJPUkCazqFFMfMtm
+         CWpPeQynZ8CGWSRwcFMG3fFrtFeLC7xyxRiPwr5P9AdsG3AsSmwvFqSjB+Gt1idG7+o5
+         Tnlg==
+X-Gm-Message-State: AOJu0YwmC6bIGFE1aBrlNN9/ZAT81DYnNYCDcruNbCcriYuDjPThpPR+
+	HUv2lJCwe9lWN8lCB8pSgvvn7O2h+IGrA2R8mYgtKQZPYu/6gf0I4FevzgWZPNsJWoaQMsNh0wB
+	Y4g==
+X-Google-Smtp-Source: AGHT+IE0G4SfzxxNcKBnPCRpYFdxC7UqdFDNFLn6IxTgkrQsyF2NU6Q4LbGrsElpxhUbA99G5w1BV9ZQ7JY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:cc6:b0:dc2:23db:1bc8 with SMTP id
- cq6-20020a0569020cc600b00dc223db1bc8mr18446ybb.3.1707189394995; Mon, 05 Feb
- 2024 19:16:34 -0800 (PST)
-Date: Mon, 5 Feb 2024 19:16:33 -0800
-In-Reply-To: <20230911021637.1941096-3-stevensd@google.com>
+ (user=seanjc job=sendgmr) by 2002:a17:903:22c4:b0:1d9:6380:5485 with SMTP id
+ y4-20020a17090322c400b001d963805485mr1077plg.13.1707189805737; Mon, 05 Feb
+ 2024 19:23:25 -0800 (PST)
+Date: Mon, 5 Feb 2024 19:23:24 -0800
+In-Reply-To: <20230911021637.1941096-7-stevensd@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230911021637.1941096-1-stevensd@google.com> <20230911021637.1941096-3-stevensd@google.com>
-Message-ID: <ZcGkkVAaT_Lz_ZVQ@google.com>
-Subject: Re: [PATCH v9 2/6] KVM: mmu: Introduce __kvm_follow_pfn function
+References: <20230911021637.1941096-1-stevensd@google.com> <20230911021637.1941096-7-stevensd@google.com>
+Message-ID: <ZcGmLKbLV2bVTxD1@google.com>
+Subject: Re: [PATCH v9 6/6] KVM: x86/mmu: Handle non-refcounted pages
 From: Sean Christopherson <seanjc@google.com>
 To: David Stevens <stevensd@chromium.org>
 Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
@@ -67,29 +67,37 @@ Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@gmail.
 Content-Type: text/plain; charset="us-ascii"
 
 On Mon, Sep 11, 2023, David Stevens wrote:
-> @@ -2681,24 +2668,22 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
->   * 2): @write_fault = false && @writable, @writable will tell the caller
->   *     whether the mapping is writable.
->   */
-> -kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool interruptible,
-> -		     bool *async, bool write_fault, bool *writable)
-> +kvm_pfn_t hva_to_pfn(struct kvm_follow_pfn *foll)
+> From: David Stevens <stevensd@chromium.org>
+> 
+> Handle non-refcounted pages in __kvm_faultin_pfn. This allows the host
+> to map memory into the guest that is backed by non-refcounted struct
+> pages - for example, the tail pages of higher order non-compound pages
+> allocated by the amdgpu driver via ttm_pool_alloc_page.
+> 
+> The bulk of this change is tracking the is_refcounted_page flag so that
+> non-refcounted pages don't trigger page_count() == 0 warnings. This is
+> done by storing the flag in an unused bit in the sptes. There are no
+> bits available in PAE SPTEs, so non-refcounted pages can only be handled
+> on TDP and x86-64.
+
+Can you split this into two patches?  One to add all of the SPTE tracking, and
+then one final patch to allow faulting in non-refcounted pages.  I want to isolate
+the latter as much as possible, both for review purposes and in case something
+goes awry and needs to be reverted.
+
+> @@ -4254,13 +4265,18 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+>  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
 >  {
->  	struct vm_area_struct *vma;
->  	kvm_pfn_t pfn;
->  	int npages, r;
->  
->  	/* we can do it either atomically or asynchronously, not both */
+>  	struct kvm_memory_slot *slot = fault->slot;
+> +	/*
+> +	 * There are no extra bits for tracking non-refcounted pages in
+> +	 * PAE SPTEs, so reject non-refcounted struct pages in that case.
+> +	 */
+> +	bool has_spte_refcount_bit = tdp_enabled && IS_ENABLED(CONFIG_X86_64);
 
-Can you change this comment?  Not your fault, as it's already wierd, but it ends
-being really confusing after the conversion to FOLL_NOWAIT, because not waiting
-in atomic context seems completely sane.
+Eh, just drop the local variable and do
 
-> -	BUG_ON(atomic && async);
-> +	BUG_ON(foll->atomic && (foll->flags & FOLL_NOWAIT));
+		.allow_non_refcounted_struct_page = tdp_enabled &&
+						    IS_ENABLED(CONFIG_X86_64);
+(but keep the comment)
 
-Side topic, a BUG_ON() here is ridiculous overkill.  Can you add a patch somewhere
-in the series to convert this to a WARN_ON_ONCE()?  The check is there purely to
-guard against incorrect usage in KVM, the absolutely worst case scenario is that
-KVM simply doesn't go down the slow path when it should and effectively DoS's the
-guest.
