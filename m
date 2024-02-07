@@ -1,130 +1,115 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 966E81B7F4
-	for <kvmarm@lists.linux.dev>; Wed,  7 Feb 2024 11:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E917CF03;
+	Wed,  7 Feb 2024 14:46:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707304393; cv=none; b=RvvpgQiOf3JHppAXqU4FUAnqqZwIsqZ8gbO43bfGAVg+yQmn/RBkHhHXLzagk9eUjZa0lg1ut5BURty0gF3bUurcAnkS11p9u9s3cp6vxyEHav7oCrSVeUHETE58PZzmCO7qm3FmO+vzIIgJBsDJ04qWHOZvXhFKysDGFqky7/w=
+	t=1707317184; cv=none; b=c/yT2hi4nwYiB3flqL1NJMU+oCOQJwVOb0PyPvFzjJhS7/Z1d72dv4XzAlYYwEs0JOsXLIXeD+B+G4kI12t0DP6QYZNqNRaJOQQHTDMRSNK+vHh+vEvxQZBDuafFTKm/NnuwF1DWY6IsT5HLdxyOAKti1HBrB8g42uqhoUAWLqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707304393; c=relaxed/simple;
-	bh=PlMmZWkNND6WcQqrcatfW2YaQpSiO6vrQWd7RUzRbVY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m9NxCDFFXUHUO1vqLd4G//zwBJ0VaX4qOHkfo11ID0ywxU9Hm1qefDS3tWRs86R8O6RCZy7zQd/b2vji8bX3cdQFkIAk9SuIt6QDHKlt/ZNPE07+9+Q0s1/LNiteK9udpo+EPNMZIWqRky3khtv45tlyGaoiLSZJPZ0SShP+wf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q+Q8i0aa; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707317184; c=relaxed/simple;
+	bh=ogco/FzOtjq0n+3+m8vpWui5nen+L0YKTOH8EtL1JDU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DFGUSrzEyOQI6v6e+mqf8svwJXMCR4+SG4lGHNXkjEKJ+pcNzyhKZfhwWblhV/yhkU+7yQRYNn7Au8y+krG0OWbM+/DTUx+OLIlikjwE2b3JGOU220HxwvSpTA5Z3xc6UlpBt0A8VWq91f1xoVlYtIGN91wWPlo5DPXeb6xiZAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=euyP0kTX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q+Q8i0aa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11E57C433C7;
-	Wed,  7 Feb 2024 11:13:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="euyP0kTX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C269C433F1;
+	Wed,  7 Feb 2024 14:46:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707304393;
-	bh=PlMmZWkNND6WcQqrcatfW2YaQpSiO6vrQWd7RUzRbVY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Q+Q8i0aaThZbWa4rTS8T9w2J6zziftZD56g/ltjhKTNgq0sMNlOTgceUooammyOKO
-	 Xm0xgjCh+/vX6oPvkR6sXopYWwsekKe4CAf7appdbCNvBz1BmRtPlkpZrYu0wr8OeM
-	 3P1IIX/i88xjfjB2/jg/y/OzLyHcecCWexeSQVASCvXX19pzmzLwcd/t6PuWbhIGA6
-	 rosBGSCC52BUFnGziMeBoqBAGneyigxGSBnBHrmDNK5zRsg0Drg4H+cgi1ZGqlTxXw
-	 NRCMTbfgEXFvmYbHSPiUEzhDN9FqNO7RQ0DsIFwrdhqtXX2SFpIq03tWmIPcdXTPR8
-	 TfUdaAxBbUZxg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1707317184;
+	bh=ogco/FzOtjq0n+3+m8vpWui5nen+L0YKTOH8EtL1JDU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=euyP0kTXIBKkYWf2OTzQF996LfIjvTuX3S6STo5ziv2iqFcu1LAahrWhG+WkTO0PO
+	 Q+KuN5Faveg+cefJ50SG+55aG1fyNrlX0ItttCbnF/OXq4g601tlpckoHqENogfHlN
+	 yOBAuHI3QaWdbw0S0yivIiPjfWQfIdnmuI7M6AoZaO+Thw7act01/cuHkbq1Pmvjxr
+	 grwMnGN/ebcsXDHAN8WmZbhfUGRaj+n8j5tFwilENMtyusJJDmCXgiqX99NMihJ2/Z
+	 OXHKyzyT4p7yAj8MIQKEgCBRDiliJzSuotGvig7x8vjbNEdfsdgmmOPFyYYtin4jW/
+	 v82pGVSzMSaKQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rXfra-0016Ff-Nt;
-	Wed, 07 Feb 2024 11:13:11 +0000
-Date: Wed, 07 Feb 2024 11:13:10 +0000
-Message-ID: <86o7cs5xyx.wl-maz@kernel.org>
+	id 1rXjBt-0019dG-GH;
+	Wed, 07 Feb 2024 14:46:21 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Masahiro Yamada <masahiroy@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Sebastian Ene <sebastianene@google.com>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3 05/26] KVM: arm64: nv: Add sanitising to VNCR-backed FGT sysregs
-In-Reply-To: <ZcNk1OC-qGcdF1fl@linux.dev>
-References: <20240205103431.1104133-1-maz@kernel.org>
-	<20240205103431.1104133-6-maz@kernel.org>
-	<ZcNiLYCbacgnRuaw@linux.dev>
-	<ZcNk1OC-qGcdF1fl@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: [PATCH 0/2] KVM/arm64 fixes for 6.8, take #1
+Date: Wed,  7 Feb 2024 14:46:11 +0000
+Message-Id: <20240207144611.1128848-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, broonie@kernel.org
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, masahiroy@kernel.org, oliver.upton@linux.dev, sebastianene@google.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 07 Feb 2024 11:09:08 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Wed, Feb 07, 2024 at 10:57:49AM +0000, Oliver Upton wrote:
-> > On Mon, Feb 05, 2024 at 10:34:10AM +0000, Marc Zyngier wrote:
-> > > Fine Grained Traps are controlled by a whole bunch of features.
-> > > Each one of them must be checked and the corresponding masks
-> > > computed so that we don't let the guest apply traps it shouldn't
-> > > be using.
-> > > 
-> > > This takes care of HFG[IRW]TR_EL2, HDFG[RW]TR_EL2, and HAFGRTR_EL2.
-> > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-> > > ---
-> > >  arch/arm64/kvm/nested.c | 128 ++++++++++++++++++++++++++++++++++++++++
-> > >  1 file changed, 128 insertions(+)
-> > > 
-> > > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > > index a8fe0f970e04..31c4ce0439d6 100644
-> > > --- a/arch/arm64/kvm/nested.c
-> > > +++ b/arch/arm64/kvm/nested.c
-> > > @@ -265,6 +265,134 @@ int kvm_init_nv_sysregs(struct kvm *kvm)
-> > >  		res1 |= HCR_E2H;
-> > >  	set_sysreg_masks(kvm, HCR_EL2, res0, res1);
-> > >  
-> > > +	/* HFG[RW]TR_EL2 */
-> > > +	res0 = res1 = 0;
-> > > +	if (!(__vcpu_has_feature(&kvm->arch, KVM_ARM_VCPU_PTRAUTH_ADDRESS) &&
-> > > +	      __vcpu_has_feature(&kvm->arch, KVM_ARM_VCPU_PTRAUTH_ADDRESS)))
-> > 
-> > Same thing here w/ the different flags.
+Hi Paolo,
 
-Yup, fixed both occurrences already.
+Things have been pretty quiet on the fixes front, and I'm tired of
+waiting for people to find bugs. So here's what i have so far, which
+is pretty little: Sebastian found yet another instance of locking
+order issue with pKVM, and Masahiro has offered a cleanup of the
+Kconfig file. None of them is majorly critical at this stage, but
+better fix them now.
 
-> > 
-> > > +	/* HDFG[RW]TR_EL2 */
-> > > +	res0 = res1 = 0;
-> > > +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, DoubleLock, IMP))
-> > > +		res0 |= HDFGRTR_EL2_OSDLR_EL1;
-> > > +	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMUVer, IMP))
-> > > +		res0 |= (HDFGRTR_EL2_PMEVCNTRn_EL0 | HDFGRTR_EL2_PMEVTYPERn_EL0 |
-> > > +			 HDFGRTR_EL2_PMCCFILTR_EL0 | HDFGRTR_EL2_PMCCNTR_EL0 |
-> > > +			 HDFGRTR_EL2_PMCNTEN | HDFGRTR_EL2_PMINTEN |
-> > > +			 HDFGRTR_EL2_PMOVS | HDFGRTR_EL2_PMSELR_EL0 |
-> > > +			 HDFGRTR_EL2_PMMIR_EL1 | HDFGRTR_EL2_PMUSERENR_EL0 |
-> > > +			 HDFGRTR_EL2_PMCEIDn_EL0);
-> > 
-> > I think you're missing HDFGWTR_EL2_PMSWINC_EL0 and HDFGWTR_EL2_PMCR_EL0
-> > here. Silly write-only and read-only registers...
-> 
-> I can't read. Looks like you're doing this a few lines down.
-
-Yeah, it's a bit tucked away to reuse the previously constructed
-masks.
-
-Thanks,
+Please pull,
 
 	M.
 
+Masahiro Yamada (1):
+  KVM: arm64: Do not source virt/lib/Kconfig twice
+
+Sebastian Ene (1):
+  KVM: arm64: Fix circular locking dependency
+
+ arch/arm64/kvm/Kconfig |  1 -
+ arch/arm64/kvm/pkvm.c  | 27 +++++++++++++++++----------
+ 2 files changed, 17 insertions(+), 11 deletions(-)
+
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.2
+
+The following changes since commit 6613476e225e090cc9aad49be7fa504e290dd33d:
+
+  Linux 6.8-rc1 (2024-01-21 14:11:32 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.8-1
+
+for you to fetch changes up to 42dfa94d802a48c871e2017cbf86153270c86632:
+
+  KVM: arm64: Do not source virt/lib/Kconfig twice (2024-02-04 13:08:28 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.8, take #1
+
+- Don't source the VFIO Kconfig twice
+
+- Fix protected-mode locking order between kvm and vcpus
+
+----------------------------------------------------------------
+Masahiro Yamada (1):
+      KVM: arm64: Do not source virt/lib/Kconfig twice
+
+Sebastian Ene (1):
+      KVM: arm64: Fix circular locking dependency
+
+ arch/arm64/kvm/Kconfig |  1 -
+ arch/arm64/kvm/pkvm.c  | 27 +++++++++++++++++----------
+ 2 files changed, 17 insertions(+), 11 deletions(-)
