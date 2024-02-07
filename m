@@ -1,85 +1,93 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4D21429A
-	for <kvmarm@lists.linux.dev>; Wed,  7 Feb 2024 10:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9810517BC5
+	for <kvmarm@lists.linux.dev>; Wed,  7 Feb 2024 10:57:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707302415; cv=none; b=TbOwYjYPvI3FrNn7OaQpZ5eKPgFHWXI97SlRbuYpGze7eP/AiatjQUWrcerthVAyweqQPg4B1pWtw7sqWeDnq0wEMqZ4VxFsdFQZInT1PAb3kRP8BLtG1C7LMpH6LxR6H01CrdcCpXltDqofsLfzExghD5RhSHKHeYokdbiOGYE=
+	t=1707303449; cv=none; b=eEn7yaSCUlHRMs6+GVpUx8YQmeaXNknqdArV25+XavRi18qALyKziUyF5wPRNbHWdXL1qT/WX6bQ0GwYiY67+ylrP0HnL3hIV3HlSFO3PiFlXE/T5xZ3eCKJwBdMWj4F7y6Ud/ELoeFxlFNpcpj/E7b23lGgnLS1KwUv5rnSGHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707302415; c=relaxed/simple;
-	bh=cAxhH+SONjD42Gw3gF+CFGXzaUkX8lnopUdQqjcQd0I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g27fCgLzXu7BNM1e0McG4IQlvMQ4MQWvU56fOAEPWoDyxVtcTtgzQQQNVBW/qDUswQw4Pt4dtk98xMKeABwyA5GezEytMv7ilJEbK7NtqV+pZWg5lMGiMLqNCMhSJdcBeGiUjRektLkIvOjKBiV7FP/Nu2eLryiVd15aEgC2hWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OVnT1IBv; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1707303449; c=relaxed/simple;
+	bh=aLLvXJglkNXytBnsPhnrcIuM6ogLdIutcYOhErhjbfo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J4gsYm11UZ0sXPN0YhtQL/TYPERGFdQpYibNq2H8BMzRKlWHHitI1E4tPYgQETJhrAEvu8R/KnFvOuOxPUKg1UZvRIhGLGmQrIuEj0beUhhAZD0TyiTPUF4j+RV6KKm5uMNZDMeTYFN6h5pSZTL3qIBzdNYNpBBvN1Hc4PlvMj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HAM20hA3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OVnT1IBv"
-Date: Wed, 7 Feb 2024 10:40:08 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707302410;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EOXmtPnFnBC290lPG3I2msiOcq62QDPQe0I4UIkLUi4=;
-	b=OVnT1IBvZqREiqu4C7ANpqTXrYLU+JqRJoIk2KmilaUJC+391mgYdDXoi02OI/bkY+iCAR
-	c2TPlSjx32vCnNkp1rkIcZ9MqSW4B9q6cCY5+8+0I7ug9cJ85RSbDJd75GiQdm8Kqo0Ru4
-	eQhqdIsHYP/Vr7j6Ut6UntGp4/QGcjw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HAM20hA3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 021DFC433C7;
+	Wed,  7 Feb 2024 10:57:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707303449;
+	bh=aLLvXJglkNXytBnsPhnrcIuM6ogLdIutcYOhErhjbfo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HAM20hA3zkFi6eFifC7tRI0AvHl6rTF++/kCXk3Cx0vQtB8p98DAWkjhAEogqNujF
+	 5OMbHD4b+R+y0IfCq32Xiq2jZIRHBmHE3ywzUF15srfMBDpqlvZg5BWbjI86zaRJfs
+	 5oTaeM/eqC3lNPxYXSZYJjECtS1kUhcWcg00heUJmH/tXvmmDFPWVZXzsMIlVn5lTf
+	 p5tgLSsbwSJb+CLy59+LSkpKzW/VcMxZZXAyv6+T5ekzALxWWutpDRn5vFjZtaRcuE
+	 YgQhetzuGxTojwZkZ6m2sSN6cRWyTAeBVeV19blB/jpm+zg7CFH93WbzgLjiCj15iR
+	 f1XAnjqEi6rZQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rXfcM-001627-Kk;
+	Wed, 07 Feb 2024 10:57:26 +0000
+Date: Wed, 07 Feb 2024 10:57:26 +0000
+Message-ID: <86plx85yp5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3 04/26] KVM: arm64: nv: Add sanitising to EL2
- configuration registers
-Message-ID: <ZcNeCACYeozbM_Dr@linux.dev>
+Subject: Re: [PATCH v3 04/26] KVM: arm64: nv: Add sanitising to EL2 configuration registers
+In-Reply-To: <ZcNeCACYeozbM_Dr@linux.dev>
 References: <20240205103431.1104133-1-maz@kernel.org>
- <20240205103431.1104133-5-maz@kernel.org>
+	<20240205103431.1104133-5-maz@kernel.org>
+	<ZcNeCACYeozbM_Dr@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240205103431.1104133-5-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Feb 05, 2024 at 10:34:09AM +0000, Marc Zyngier wrote:
-> +	if (!(__vcpu_has_feature(&kvm->arch, KVM_ARM_VCPU_PTRAUTH_ADDRESS) &&
-> +	      __vcpu_has_feature(&kvm->arch, KVM_ARM_VCPU_PTRAUTH_ADDRESS)))
-> +		res0 |= (HCR_API | HCR_APK);
+On Wed, 07 Feb 2024 10:40:08 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Mon, Feb 05, 2024 at 10:34:09AM +0000, Marc Zyngier wrote:
+> > +	if (!(__vcpu_has_feature(&kvm->arch, KVM_ARM_VCPU_PTRAUTH_ADDRESS) &&
+> > +	      __vcpu_has_feature(&kvm->arch, KVM_ARM_VCPU_PTRAUTH_ADDRESS)))
+> > +		res0 |= (HCR_API | HCR_APK);
+> 
+> I think what you probably meant here is _ADDRESS and _GENERIC, right? Of
+> course, this has no actual effect on the code, since we don't allow one
+> without the other.
 
-I think what you probably meant here is _ADDRESS and _GENERIC, right? Of
-course, this has no actual effect on the code, since we don't allow one
-without the other.
+Gah. Embarrassing. But yes, harmless as we set both bits all the time.
 
-Maybe we can just change KVM's representation to a single flag to avoid
-this pointless exercise.
+> Maybe we can just change KVM's representation to a single flag to avoid
+> this pointless exercise.
 
-> +	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TME, IMP))
-> +		res0 |= BIT(39);
-> +	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, RAS, IMP))
-> +		res0 |= (HCR_TEA | HCR_TERR);
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, LO, IMP))
-> +		res0 |= HCR_TLOR;
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR4_EL1, E2H0, IMP))
-> +		res1 |= HCR_E2H;
-> +	set_sysreg_masks(kvm, HCR_EL2, res0, res1);
-> +
->  out:
->  	mutex_unlock(&kvm->arch.config_lock);
->  
-> -- 
-> 2.39.2
+Yeah, it's been on my list of things to cleanup for a while. I'll look
+into it for a separate patch.
+
+Thanks,
+
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
