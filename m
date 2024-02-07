@@ -1,65 +1,64 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B207F471
-	for <kvmarm@lists.linux.dev>; Wed,  7 Feb 2024 15:26:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CC4980045
+	for <kvmarm@lists.linux.dev>; Wed,  7 Feb 2024 15:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707319607; cv=none; b=j9j0OFQj1o5XU2RIsSREZ1Sj5XSW4mCW5k3tkKMkhd4dTVF7zIWYC+VQ9BL4ytRIuOeAd6Szw1rvoAZmD/8qtccuX4OHueX270zVcq0xiPSQnX/W30a5+ywJOMny+0KMUhO+e+vRFtGPSS6f+E0n0SYNobdTvnvqigIo0yO77kE=
+	t=1707319826; cv=none; b=X/g3x3r2wIT2oyt24RRZ36Kp2h0yLFJsRHYBTVefC5uobZTaG2iXaJmxY0ILKvpZaJZf1Ry9O1/jv+4pKNP2v18SkU4/JeKoLsrvkZQxlJ8CN0hDjE8EhQR/Ir7EoN7IXoADhkfpzD+GF54WccCgs20Tz3nFdSn241jl9lR9Ki0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707319607; c=relaxed/simple;
-	bh=nBf9bw3jxqBF5jqhtpbO9vc/13Y/GXDtSQyt+7JsL4o=;
+	s=arc-20240116; t=1707319826; c=relaxed/simple;
+	bh=29vGtu7yU0AAORwx8Q0xZo25ggpOKaABrK7glygmnuI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=G1+UJ+Gpe8/cEfo1plmiqtrBvkoT3yGa6RXhaSLjPx7LrPqgK8aR3bHoO71U6yk6zDOSfUfxn5f4vQHV51xbxNbHU7upJctpCUWT9b/M8B4KwrH1l44kZoETYPwZZx8QIPP+JYOYWCL4SF0zWt9xD16CfhWLQmj7alrC2wqaKxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2jgueQN7; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=DO4cJKrGPH2v4hRTF/z2d7nK/A844ybONg6jgcG9NCsx7l+igmP3gTCBzQXIYCbxvU/vB5D+CnurCXlat1+m7d6cTGTpl47SoEksoTKmQFgsArdFqLqHcTUFygPnoB9xX3VzKllT+Hn8nlpVx4K5QI6kBVJSsqFWcrwSx7/Lnjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iDM6A/mb; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2jgueQN7"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5f6c12872fbso13564587b3.1
-        for <kvmarm@lists.linux.dev>; Wed, 07 Feb 2024 07:26:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iDM6A/mb"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6bad01539so1006970276.3
+        for <kvmarm@lists.linux.dev>; Wed, 07 Feb 2024 07:30:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707319604; x=1707924404; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1707319823; x=1707924623; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IrStt23DMMWYh0ENRShJKd9wb4dk+ZyCGtr69LJbA0I=;
-        b=2jgueQN7e42+OOGVGwbDpbsgRi7dwR9EdfiWuE8inMg6SG85AxHaooXnhiEZRUPBL3
-         EEkyMRSvUYwP2OP/iN1z3zkz2tNIAJfmOx9TjSmYMJn5/2wNzwjvzP+gWtIeDViwxM0k
-         uF5ZNKvPjzlSxp0OaLpthz0mVDG/8UD/lKRRBylCzO/KySkxr+9K4nlCrUy3262E/He6
-         d1VaDcC13v5tLyhn5gtbyCotJn9yt8o1BN/nRZbdEA2gdPISrhGUnwhRAtcb7bZQHdLq
-         rv9ob1EnprsZk4h58yMICpjvJ5xF6zaK48W0ges/NcKmEfGPlh0UUCqN8zT07c87rZsv
-         5lhQ==
+        bh=Z4HtoAHVB9z2HW85BOTsqebXKmcVqdZooPls6AoWI2E=;
+        b=iDM6A/mbLRGODD++sknKEBz9ySgtgzlQN4lC+On8a+hInNLPE/wzHh2o+lwUd1mJuZ
+         y9hLmZxTCKZHtPTROEp1U6zvUeEBRgpRTbmUHbaaY0KkKxLS4T6SnQC/uv22rkiYINOJ
+         Ig1kyQjEivD2GHGDJjIW57hbjqbCEy3BqQ6balraBlJIrWJkb/JkvJE7xVg/K9Ys8vk9
+         z1XLvKZGTDaWzookWvYJFS8bedcCKdpwa6cf0Mi41l8MHHsVG+RIBf8doFfId3eq7npW
+         QL1CTerzOgArBcr85tbz3Q/NYm8rAQ1am/2vj7TY3ZOwW5cDNkvJ9ZLudmLrbvHYVnVS
+         VBlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707319604; x=1707924404;
+        d=1e100.net; s=20230601; t=1707319823; x=1707924623;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IrStt23DMMWYh0ENRShJKd9wb4dk+ZyCGtr69LJbA0I=;
-        b=ticu/eKQCbpMK0LOA1z06KTw8lJl5IKDkoBImMJsMJ+Xy5g2rJGz1rFWLlf6FDaIZN
-         DLQghRF2rPSLmUB+Tk4GV/8ooj54Q0uNfB80zwwHq/1Fth1BxkXMYpZCyg4+yEoevxh7
-         OunIWMgsz6YwcxS9bM8j0X3V422Gmnp0+L9yme11ruMONc3XeM9u/RjDSiCW88+3waOy
-         IOytgdtlBpE9pShv/jiyOPmaI0DiFTBA1QyqNUannMxRzORNfK+TPC2Mx5l9GmIWv859
-         Q+821lye3QBZcBMa7f3QXIQsg4Dfe4xc65vPkULKJNlqa2tWprEZdWywm5YG5EBTjbGo
-         N5HA==
-X-Gm-Message-State: AOJu0YwuaqiF5Tcsh4gA+BAYgZRRc+wXutrd9n7VkhZnEzAR3ETp2je6
-	WKgIlZ+9c0X2GZe/ke0ifPjP5BV4OkyKV8l1rz+sfL6teQrRILkg5+42qZTplSd5LKWYScMUL5u
-	3QQ==
-X-Google-Smtp-Source: AGHT+IEprpVLHFnvzBSR1ktlp4D+f+yjpL3NKCZ0oafSWw9HVwyAwVcOgf6rQxEKnnysFCmQ3AbY38khA0s=
+        bh=Z4HtoAHVB9z2HW85BOTsqebXKmcVqdZooPls6AoWI2E=;
+        b=Y2KxHvgP2VNNyFOIEZyPbyl4dxOyj4XFfPEiRN5qeelRgw8qh85sVm/Md3h0LQPhBw
+         n+SbmEAVpbc+TyzN8X8+85q/izl02MSnsvPJV/m0CVZ6EAubkMTkGZQt14f4I+wf+JYk
+         La20xdcoVT+LIsYGo/cVH2Fb8xEjhZ6u0veocPRDGZXPKJZ5xXxwMGl4hkDVoc7S3BVw
+         J0+UU1jOc3xjOER+bNmC/LYnGDq6BIiSGzj4hA3c+9oyk46xEO3pIactzZhIPsxjDr+G
+         jgfHo2h9j5uGmSZ3DjtDVG7tfIdSaiW99P6CfLjl08h3Rrf6qGSFK2cjnxzaTR9x8TZI
+         z6GQ==
+X-Gm-Message-State: AOJu0Yx+VTg01LVHjANfdyYuNfbcKDwV1Z7lXytFHXPFaZzCG9cpg8FQ
+	Nrl1Ga5Rn7d09rMKs+mEoca+/chE3Ap92SxCZlXanUdHzeEP1kQzdhablj/DsLGUXftgqHqALM8
+	jvA==
+X-Google-Smtp-Source: AGHT+IHm0UAeTY0jrRYDjxsi6/W2lf2idjMOZ/39omY/MC1KZboNEYOdi+7r5MhNrDC85iynVdmlrecExE4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:9b87:0:b0:604:a0e:f659 with SMTP id
- s129-20020a819b87000000b006040a0ef659mr878219ywg.6.1707319604705; Wed, 07 Feb
- 2024 07:26:44 -0800 (PST)
-Date: Wed, 7 Feb 2024 07:26:43 -0800
-In-Reply-To: <20231109210325.3806151-2-amoorthy@google.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2302:b0:dc6:ebd4:cca2 with SMTP id
+ do2-20020a056902230200b00dc6ebd4cca2mr168524ybb.11.1707319823546; Wed, 07 Feb
+ 2024 07:30:23 -0800 (PST)
+Date: Wed, 7 Feb 2024 07:30:22 -0800
+In-Reply-To: <20231109210325.3806151-3-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-2-amoorthy@google.com>
-Message-ID: <ZcOhM5wPguyNC0j5@google.com>
-Subject: Re: [PATCH v6 01/14] KVM: Documentation: Clarify meaning of
- hva_to_pfn()'s 'atomic' parameter
+References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-3-amoorthy@google.com>
+Message-ID: <ZcOiDopfqnPc69rF@google.com>
+Subject: Re: [PATCH v6 02/14] KVM: Documentation: Add docstrings for __kvm_read/write_guest_page()
 From: Sean Christopherson <seanjc@google.com>
 To: Anish Moorthy <amoorthy@google.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev, 
@@ -69,33 +68,45 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, oliver.upton@linux.dev,
 	kconsul@linux.vnet.ibm.com
 Content-Type: text/plain; charset="us-ascii"
 
-This is not a Documentation change.  The comment might make its way to generated
-docs, but this is not Documentation/ and I most definitely did not expect a change
-to kvm_main.c based on the scope.
+Same "Documentation" issue.  And the purpose of the change isn't to add docstrings,
+the purpose is to clarify the goofy/strange parameters:
+
+  KVM: Add comment to clarify param usage for __kvm{read,_write}_guest_page()
 
 On Thu, Nov 09, 2023, Anish Moorthy wrote:
-> The current docstring can be read as "atomic -> allowed to sleep," when
-> in fact the intended statement is "atomic -> NOT allowed to sleep." Make
-> that clearer in the docstring.
+> The (gfn, data, offset, len) order of parameters is a little strange
+> since "offset" applies to "gfn" rather than to "data". Add docstrings to
+
+s/docstrings/function comments/.  This change has value and impact even if the
+kernel suddenly stops generating documentation from code.
+
+> make things perfectly clear.
 > 
 > Signed-off-by: Anish Moorthy <amoorthy@google.com>
 > ---
->  virt/kvm/kvm_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  virt/kvm/kvm_main.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
 > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 9170a61ea99f..687374138cfd 100644
+> index 687374138cfd..f521b6fd808f 100644
 > --- a/virt/kvm/kvm_main.c
 > +++ b/virt/kvm/kvm_main.c
-> @@ -2983,7 +2983,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
->  /*
->   * Pin guest page in memory and return its pfn.
->   * @addr: host virtual address which maps memory to the guest
-> - * @atomic: whether this function can sleep
-> + * @atomic: whether this function is forbidden from sleeping
->   * @interruptible: whether the process can be interrupted by non-fatal signals
->   * @async: whether this function need to wait IO complete if the
->   *         host page is not in the memory
+> @@ -3328,6 +3328,7 @@ static int next_segment(unsigned long len, int offset)
+>  		return len;
+>  }
+>  
+> +/* Copy @len bytes from guest memory at '(@gfn * PAGE_SIZE) + @offset' to @data */
+>  static int __kvm_read_guest_page(struct kvm_memory_slot *slot, gfn_t gfn,
+>  				 void *data, int offset, int len)
+>  {
+> @@ -3429,6 +3430,7 @@ int kvm_vcpu_read_guest_atomic(struct kvm_vcpu *vcpu, gpa_t gpa,
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_atomic);
+>  
+> +/* Copy @len bytes from @data into guest memory at '(@gfn * PAGE_SIZE) + @offset' */
+>  static int __kvm_write_guest_page(struct kvm *kvm,
+>  				  struct kvm_memory_slot *memslot, gfn_t gfn,
+>  			          const void *data, int offset, int len)
 > -- 
 > 2.42.0.869.gea05f2083d-goog
 > 
