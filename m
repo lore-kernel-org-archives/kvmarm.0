@@ -1,101 +1,82 @@
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0EA1E498
-	for <kvmarm@lists.linux.dev>; Wed,  7 Feb 2024 16:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80D086147
+	for <kvmarm@lists.linux.dev>; Wed,  7 Feb 2024 18:45:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707324093; cv=none; b=Uh4Erhmr+gpqXJpVWRinFsy+Cx2f7YlaFroW1hnomRqNF5g7clTugGL5UiFoslGFxjYR+mnsM/yY3EqaopQHuOR9xSoi8/cFEbIQp1oYSPhFCqbG8OusyKJfv0OunoMhzv9osob8+rzf++b5QKoxAB5mkXlLDrcdrwbgcuWT+6A=
+	t=1707331514; cv=none; b=bLudT99UrNJoeWRDbtl+WswygnDBweRdOq0DISPPo6T4bMnxJaQHb5aY+FqyjtHecHdDHUlKh02V62Aoxu1TJTt4rgVLV4f4KpZE9uKjaJuM20PdtNU2J9zmW2z8MApU0++lRU2SzWPe8JESmSJElMfYvvRplfgapjjLAesXrOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707324093; c=relaxed/simple;
-	bh=U7bZjJIVn7iu5ZSISZoEhaiGptV+4BzXZAANlSNHTnQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QJGFVZFK7rx1Ll8jun51XFu1SBaa5Gw38V3tX3xy17H9dsOKZLwvao72i98v9NAghaq+B9ofj1xAhK9B80OsSvcGr1Iw7yr+tPaXpYnS9Jq61aH5UKlAlayvBw0FkdQ3BnTqk9bRVL/eNqaXQHOf5M3f5kTvDJT8yongM48J5KI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r6ZmOxhS; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1707331514; c=relaxed/simple;
+	bh=rB6Ec3p7AhKSA+4vWbIWmOnRXzrkeuPKLZuukgZZEB4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fIxwpOM2otQJc5Ah2zbAKCY0aECrtzRQk61lSin0EzW7r9yUmwd15znZtEAjtJypNe07BRK0wYmkxAUKnqihzKRfH5aGRSnHICttKizUkIgu9QPu/IAfbkpOq/zZa8IbgWS1Ob1g65USIKuokF0xGUy86BZa7WW3irwZ1D0PJZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OHr6ByL2; arc=none smtp.client-ip=209.85.161.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r6ZmOxhS"
-Date: Wed, 7 Feb 2024 16:41:21 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707324088;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h3brB2Ix88lEEru6Nu3xjSB5Ty9y6qBPZLW9/MaXNCE=;
-	b=r6ZmOxhSCGZ1xBPeSYxeAuiAv9pVBchEI4FOy3CyE/+mRVXCiugZyzFN8crHASGa/pQJH+
-	jAaP8SUzIWZvvDp1fS0whOoPCUgbSZ7u07lKam4W7KQZtzOoyZX+kNlfhxul6kXvr+lNiF
-	cd0tqWYejaWtRSVT7fqFIa+ZNAUXO2M=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Anish Moorthy <amoorthy@google.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
-	robert.hoo.linux@gmail.com, jthoughton@google.com,
-	dmatlack@google.com, axelrasmussen@google.com, peterx@redhat.com,
-	nadav.amit@gmail.com, isaku.yamahata@gmail.com,
-	kconsul@linux.vnet.ibm.com
-Subject: Re: [PATCH v6 08/14] KVM: arm64: Enable KVM_CAP_MEMORY_FAULT_INFO
-Message-ID: <ZcOysZC2TI7hZBPA@linux.dev>
-References: <20231109210325.3806151-1-amoorthy@google.com>
- <20231109210325.3806151-9-amoorthy@google.com>
- <CAF7b7mqDN97OM7kgS--KsDygokUHd=wiZjYPVz3yk7UB0jF_6w@mail.gmail.com>
- <ZcOkRoQn7Q-GcQ_s@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OHr6ByL2"
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5957ede4deaso539563eaf.1
+        for <kvmarm@lists.linux.dev>; Wed, 07 Feb 2024 10:45:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707331512; x=1707936312; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D/ClBNBLoP9L3DooA9dVRQXDTvqkKaBQDDYFzsdwXvU=;
+        b=OHr6ByL2AaAcOuzgZreVh7gSHA3cq2yu+6Ek0A5rNnOfWppuwRrOKKaLN4ZL8S9yEm
+         rD80qKkOq/Rlc9s+UCOxwtC+A0xio3L/Jugdlzh+NELqSFVc2jyyOZwkGH1oD8x8+kHe
+         eLPqNIf7lal6+4eCr8oUcZdkvp9cqYM8OXgbVcx0DuKuyt2iG05ga07lzWWF2OD53z3m
+         G8RqSuEo8t6cgoWJUiJxmv1yedBFmr4GiAWrCBFWKANNLQ6k2Tn7qWuDwuBBkdPHv+l5
+         8f+XL1fUms5KdNxmxp2lSPz4wYjNHrGh6zELqBReNrCW/HCWrWzd8bsAeyinNZDLlWQR
+         XJHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707331512; x=1707936312;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=D/ClBNBLoP9L3DooA9dVRQXDTvqkKaBQDDYFzsdwXvU=;
+        b=Yy+l6HYGM0F5TlNvPOJs3i5S9/YFWVxHMBZewLtG8l0UiZMeKZ0asUOnLyUSxRc5UP
+         9pTwnpJ0aXsJ88BEprL+UrhbIklZmMmfIefiMg9K72qk62PmsIdHasAEQXSUYfonj+Ek
+         qa5Xje7PkiTSfHx29onO63mcYq30QEzf+hseLEUdXV51imYlg5m3Mmk4D1NZmBo5DKFS
+         vDvZadIIWClIjr/MXUXhLs44/eP3N52MvwPl4X6E5BurB+zkA3/tkQGgvkHiOmIwpjkF
+         OwHRXpVIhn0Uf0pjYv4fRXJoTwXd1sOV6D3SBYCvoHgffmmOT4qM8HxiNY96JI9Uyq2/
+         7u0g==
+X-Forwarded-Encrypted: i=1; AJvYcCUQ5YcPHwKab1zcgnQi+I/qF/rltVJe9G+XyAXrDfokmRIGo4Y0Z3dND9dTSau868hvzPleevqQzBPDSyeB2bB19OMydBi7
+X-Gm-Message-State: AOJu0YwVBl+6wnrGAXQ9o+J71nndzXyxxdTNo3+8IUzJHV7QzzgbbKNT
+	EYSBz06R41dU/ym4flAbYYakJQnu9zqMT/tF57IDmsoEApzxlzECxXO6X6c5kftF/lXEWoB7hDP
+	VCbEw/I4T7QTrAusPspBQpgpRHE9oBah9VlLi
+X-Google-Smtp-Source: AGHT+IFr75SrPnd63j+W0s/lOHj2a8WzH7MkXgPW3MqyBgjBBBpINO6XePXGPl2a+oNRSfCWUuFBSWROkh2x3mJJ2OQ=
+X-Received: by 2002:a4a:9c8b:0:b0:593:f906:614f with SMTP id
+ z11-20020a4a9c8b000000b00593f906614fmr7576755ooj.4.1707331511783; Wed, 07 Feb
+ 2024 10:45:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZcOkRoQn7Q-GcQ_s@google.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-2-amoorthy@google.com>
+ <ZcOhM5wPguyNC0j5@google.com>
+In-Reply-To: <ZcOhM5wPguyNC0j5@google.com>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Wed, 7 Feb 2024 10:44:34 -0800
+Message-ID: <CAF7b7mrfn5jbDQpDf4_0_1vtMq8YS9mo4MpUK1wKuxgQ328rBA@mail.gmail.com>
+Subject: Re: [PATCH v6 01/14] KVM: Documentation: Clarify meaning of
+ hva_to_pfn()'s 'atomic' parameter
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 07, 2024 at 07:39:50AM -0800, Sean Christopherson wrote:
-> On Thu, Nov 09, 2023, Anish Moorthy wrote:
-> > On Thu, Nov 9, 2023 at 1:03 PM Anish Moorthy <amoorthy@google.com> wrote:
-> > >
-> > > TODO: Changelog -- and possibly just merge into the "god" arm commit?
-> > 
-> > *Facepalm*
-> > 
-> > Well as you can tell, I wasn't sure if there was anything to actually
-> > put in the long-form log. Lmk if you have suggestions
-> 
-> I think the right way to organize things is to have this chunk:
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index b1e5e42bdeb4..bc978260d2be 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3309,6 +3309,10 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
->                 return RET_PF_RETRY;
->         }
-> 
-> +       WARN_ON_ONCE(fault->goal_level != PG_LEVEL_4K);
-> +
-> +       kvm_prepare_memory_fault_exit(vcpu, gfn_to_gpa(fault->gfn), PAGE_SIZE,
-> +                                     fault->write, fault->exec, fault->is_private);
->         return -EFAULT;
->  }
+On Wed, Feb 7, 2024 at 7:26=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> This is not a Documentation change.  The comment might make its way to ge=
+nerated
+> docs, but this is not Documentation/ and I most definitely did not expect=
+ a change
+> to kvm_main.c based on the scope.
 
-Err.. This is the arm64 patch. x86 already advertises KVM_CAP_MEMORY_FAULT_INFO.
-The rest of the advertisement happens over in the arch-neutral code when
-the arch selects CONFIG_HAVE_KVM_EXIT_ON_MISSING.
-
-Having said that...
-
-> be part of this patch.  Because otherwise, advertising KVM_CAP_MEMORY_FAULT_INFO
-> is a lie.  Userspace can't catch KVM in the lie, but that doesn't make it right.
-> 
-> That should in turn make it easier to write a useful changelog.
-
-The feedback still stands. The capability needs to be squashed into the
-patch that actually introduces the functionality.
-
--- 
-Thanks,
-Oliver
+Whoops, didn't realize that Documentation: carried that specific
+meaning- thanks for letting me know
