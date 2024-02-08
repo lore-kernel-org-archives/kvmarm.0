@@ -1,129 +1,85 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA50149DF4
-	for <kvmarm@lists.linux.dev>; Wed,  7 Feb 2024 22:07:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86870679F8
+	for <kvmarm@lists.linux.dev>; Thu,  8 Feb 2024 05:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707343659; cv=none; b=m+MyBKVrwYe9h7WV1OLDpPpvUteTmqR8B4ZUyTbOsvLQB0DdSQNs+HurK7vcoqMaR97bXDwX35dSEQAOAwHxKq1AfBHGzAaucJxmV6IAjd0D7XAskY329MoXtE/TFfibasx5wEWE8niMK7FQu7xA+0N3K5qXNhKtEmnIDt2C2bM=
+	t=1707368421; cv=none; b=l3onMuu5564VpK3xwHgu1XXO4W2EiwRJYN0jOjcXwwtb+JFRGG2LGAdbNbJwoqweUaSgrB8unV6S+PkQsdM4R76EnccbWFWsM2tXniawJhu8Scrr+uo5cuROEVvIkq1teTEojecX9PklWOemplavtvaLW8gIlTECNpd7IUwxQQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707343659; c=relaxed/simple;
-	bh=lQKTmXXfyL2HGCwmb6GhwD64ciTo7eQTjNUAe0lEzl4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JSzhdgLk6K1wLLC7C5S6FLI2bVE7H0ajeZAzeTRZWfGazrweqZyBJTw7gbYWocGXK0UC8oNaoRBXLbnHfcr2+SNAli05+29qa5CPp+83kIPiyG6ty43R4fAawAYF0toYsmnQ+XaUD9V8EQ7C5o8dJGpZYJt2gnhXRZ3GlQo5NJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TApMJgiS; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TApMJgiS"
-Date: Wed, 7 Feb 2024 22:07:32 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707343654;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=31fjjN/2eR9+G4chn6VsAsEY/daqpMI5kFarOQVJ+Oo=;
-	b=TApMJgiSddK6T73OIk+8bc+zjN5Ckb/zGPufuxwpRpcrqE0AAbToUBmGaLGYq/aOaL91k+
-	rBpb74dgeEPezUcB20eIplglFepUzPejJu7NrgBnIAWjLJNlcqRj6DAGGp/6g4LXtzuqgM
-	hbS0VMTzTuFuEz4t2xcKDXCppCyGer8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
-	robert.hoo.linux@gmail.com, jthoughton@google.com,
-	dmatlack@google.com, axelrasmussen@google.com, peterx@redhat.com,
-	nadav.amit@gmail.com, isaku.yamahata@gmail.com,
-	kconsul@linux.vnet.ibm.com
-Subject: Re: [PATCH v6 08/14] KVM: arm64: Enable KVM_CAP_MEMORY_FAULT_INFO
-Message-ID: <ZcP_JHsMJUlvjAs1@linux.dev>
-References: <20231109210325.3806151-1-amoorthy@google.com>
- <20231109210325.3806151-9-amoorthy@google.com>
- <CAF7b7mqDN97OM7kgS--KsDygokUHd=wiZjYPVz3yk7UB0jF_6w@mail.gmail.com>
- <ZcOkRoQn7Q-GcQ_s@google.com>
- <ZcOysZC2TI7hZBPA@linux.dev>
- <CAF7b7mqOCP2NiMsvzfpYaEaKWm4AzrRAHSGgQT9BWhRD1mcBcg@mail.gmail.com>
+	s=arc-20240116; t=1707368421; c=relaxed/simple;
+	bh=drzypQ4OMiu5rtVHsBnVb3sEPK383IRp3OEu0GSDqEA=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=AoCr5lXOVGZ7cN8YYQBCxwqIvIp3bIZss3Q3KfMIrGHTJ2iMeQ64ZgjF9JjzguT82cm9LguYyI+mo3B0BNhKcnplLJXNilSggdu/jBQZmRJ/CDu/X5JBG1c2GV6isRCiDy8AaTNn8mwacfFKmA/8HGG4X3ixdU8G2qWfSLWdqOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4TVl9d1Pylz1Q8k8;
+	Thu,  8 Feb 2024 12:58:13 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id C301F140429;
+	Thu,  8 Feb 2024 13:00:10 +0800 (CST)
+Received: from [10.174.185.179] (10.174.185.179) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 8 Feb 2024 13:00:09 +0800
+Subject: Re: [PATCH] KVM: selftests: Fix GUEST_PRINTF() format warnings in ARM
+ code
+To: Sean Christopherson <seanjc@google.com>
+CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>
+References: <20240202234603.366925-1-seanjc@google.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <3188e6f1-f150-f7d0-6c2b-5b7608b0b012@huawei.com>
+Date: Thu, 8 Feb 2024 13:00:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAF7b7mqOCP2NiMsvzfpYaEaKWm4AzrRAHSGgQT9BWhRD1mcBcg@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20240202234603.366925-1-seanjc@google.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Wed, Feb 07, 2024 at 01:21:05PM -0800, Anish Moorthy wrote:
-> On Wed, Feb 7, 2024 at 8:41 AM Oliver Upton <oliver.upton@linux.dev> wrote:
-> >
-> > On Wed, Feb 07, 2024 at 07:39:50AM -0800, Sean Christopherson wrote:
-> >
-> > Having said that...
-> >
-> > > be part of this patch.  Because otherwise, advertising KVM_CAP_MEMORY_FAULT_INFO
-> > > is a lie.  Userspace can't catch KVM in the lie, but that doesn't make it right.
-> > >
-> > > That should in turn make it easier to write a useful changelog.
-> >
-> > The feedback still stands. The capability needs to be squashed into the
-> > patch that actually introduces the functionality.
-> >
-> > --
-> > Thanks,
-> > Oliver
+On 2024/2/3 7:46, Sean Christopherson wrote:
+> Fix a pile of -Wformat warnings in the KVM ARM selftests code, almost all
+> of which are benign "long" versus "long long" issues (selftests are 64-bit
+> only, and the guest printf code treats "ll" the same as "l").  The code
+> itself isn't problematic, but the warnings make it impossible to build ARM
+> selftests with -Werror, which does detect real issues from time to time.
 > 
-> Hold on, I think there may be confusion here.
-
-No, there isn't.
-
-> KVM_CAP_MEMORY_FAULT_INFO is the mechanism for reporting annotated
-> EFAULTs. These are generic in that other things (such as the guest
-> memfd stuff) may also report information to userspace using annotated
-> EFAULTs.
+> Opportunistically have GUEST_ASSERT_BITMAP_REG() interpret set_expected,
+> which is a bool, as an unsigned decimal value, i.e. have it print '0' or
+> '1' instead of '0x0' or '0x1'.
 > 
-> KVM_CAP_EXIT_ON_MISSING is the thing that says "do an annotated EFAULT
-> when a stage-2 violation would require faulting in host mapping" On
-> both x86 and arm64, the relevant functionality is added and the cap is
-> advertised in a single patch.
-> 
-> I think it makes sense to enable/advertise the two caps separately (as
-> I've done here). The former, after all, just says that userspace "may
-> get annotated EFAULTs for whatever reason" (as opposed to the latter
-> cap, which says that userspace *will* get annotated EFAULTs when the
-> stage-2 handler is failed). So even if arm64 userspaces never get
-> annotated EFAULTs as of this patch, I don't think we're "lying" to
-> them.
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-I don't know about you, but I find describing UAPI in terms of "may" and
-"whatever reason" quite unsettling. I like to keep my interactions with
-userspace deterministic.
+Tested-by: Zenghui Yu <yuzenghui@huawei.com>
 
-Overall, I find the informational capability to be quite superfluous as
-it pertains to this feature. Userspace has *explicitly* opted in to a
-specific behavior, and the side band capability provides no useful
-information. You can easily document KVM_CAP_MEMORY_FAULT_INFO in
-such a way that userspace expects to take this sort of exit.
+> diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> index 274b8465b42a..d5e8f365aa01 100644
+> --- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> @@ -158,9 +158,9 @@ static void guest_validate_irq(unsigned int intid,
+>   
+>   	/* Basic 'timer condition met' check */
+>   	__GUEST_ASSERT(xcnt >= cval,
+> -		       "xcnt = 0x%llx, cval = 0x%llx, xcnt_diff_us = 0x%llx",
+> +		       "xcnt = 0x%lx, cval = 0x%lx, xcnt_diff_us = 0x%lx",
+>   		       xcnt, cval, xcnt_diff_us);
+> -	__GUEST_ASSERT(xctl & CTL_ISTATUS, "xcnt = 0x%llx", xcnt);
+> +	__GUEST_ASSERT(xctl & CTL_ISTATUS, "xcnt = 0x%lx", xcnt);
 
-Nobody has presented a use case for annotated EFAULTs on arm64 beyond this
-opt-in and there is zero interest in predefining UAPI for anything else.
-x86 may've done this a different way, but that's their business.
+Unrelated to your patch, but it looks to me that we actually want to
+print 'xctl' instead of 'xcnt' in the second __GUEST_ASSERT().
 
-We're not making UAPI out of any of our other EFAULT returns right now.
-
-> Consider a related problem: suppose that code is added in core KVM
-> which also generates annotated EFAULTs, and that later the arm64
-> "Enable KVM_CAP_EXIT_ON_MISSING"  patch [1] ends up needing to be
-> reverted for some reason.
-
-The single rule we try to uphold in the kernel is to *never break
-userspace*, so I don't see this being in the realm of possibility. The
-moment we expose a feature to userspace we're on the hook for it in
-perpetuity, and if we break that then you're welcome to send a nastygram
-to Marc or I.
-
--- 
 Thanks,
-Oliver
+Zenghui
