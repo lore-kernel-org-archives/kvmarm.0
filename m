@@ -1,161 +1,98 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63647763E7
-	for <kvmarm@lists.linux.dev>; Thu,  8 Feb 2024 13:15:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA3B6F082;
+	Thu,  8 Feb 2024 13:19:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707398131; cv=none; b=cjNv84rpO56gS1h5jJybFTgdGpcNRO9pvG6lvWLVossUjmXLn8EmZLCIrRSd6Jh244YMJFrIF8FD4cunxIms4gnxIyTPf9a8DhK12QPhWU+KMI9mhwgy8qSD+tSqnm2LyaXjeN9P1QntnTxttwIVtEDunPl1JF8La85dHCDmUyU=
+	t=1707398390; cv=none; b=AFmz5iCUaxTXKrfak/RGm8lpIgqmozZbeqrdwB1DSQNMFvPGhVybYHA3xJoqCj9sDd5/x40BXdCZxsGSKdmeJhGxphBYyeqdQProhALfXfBljek2RXXjK2HQvyCLmMZsCzJ1sqtSxFX7N3yhqp8f7G1W1UoH8KpvoH1GAsJiOwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707398131; c=relaxed/simple;
-	bh=wqi6AeSSUXacUg0aNJ1pZaOHBnXStrMSueuaPiIDdeE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NxA08nd5cFCS2QsvQxYhfJxytpF0rHmYO//eoFMbH+11LlMeSQzu7wFvwllea9DKcpdjoHg9pVINa5bfAHVPjkYAaC+6ligJX98Nj4VekadcWVJ5JnyknrHIBeTcBKc5xEqdHcLYqYD6K12I0pmS+vc5muq1Bbc63Wf1j982FaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bSF11ItC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707398390; c=relaxed/simple;
+	bh=u2aOtaES0XCeOIHcnCnk47OhtVva9gOZNTOt1HqeVlQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tSSYiR7iltTKODOj5h8ECNBSfORtXh4u36NDO0Fa05iT8VEOR5TTmDZdwORHVtLTn3Zv1BSf7N4ZNmAtK3J3P+RCyq/R+PoFEQZmxNeXgs0gCMoAcQmG6+muOMrZQx0zUKqDWjjcpatzzQGQ0rng6cM+z1JqiIc7hK12MF8tgVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EsWgE9UB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bSF11ItC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0E27C433C7;
-	Thu,  8 Feb 2024 13:15:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EsWgE9UB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0368C433C7;
+	Thu,  8 Feb 2024 13:19:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707398130;
-	bh=wqi6AeSSUXacUg0aNJ1pZaOHBnXStrMSueuaPiIDdeE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bSF11ItCOxtsjIgF6NrlMrL+YjY3aHYOUr27z2Pjh5gWZ54qoETeuRjiJGczYiLrB
-	 m/CngSg5wCc2gpn3QSQ7fXd1SjsOnp3J3Ha5YMbtH82IKAeyM6KSkaH090hFlGWnQb
-	 XQF9rmTOKk9wRcC8J+v5huyAQinezzgL5ipPR9xVrsdsQNh3KARTCRpXmKyz7swbgF
-	 ss2WgSx5zcW2cfjZwGVPa0uw73lyXB2eDlHxfoTtK+EuuSe6yzCqWUrRM6goqVVQ3C
-	 CPQvLzlE8Gt3p2h1JFkliTi3WSKRvmWYr8XBCXuTsDdj2l8Wc9m0c7LwIjt7Fqbj3L
-	 hmGX3eDKYDdoA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rY4FU-001RzA-8Y;
-	Thu, 08 Feb 2024 13:15:28 +0000
-Date: Thu, 08 Feb 2024 13:15:27 +0000
-Message-ID: <86il2z5c7k.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Miguel Luis <miguel.luis@oracle.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will
- Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Suzuki K
- Poulose <suzuki.poulose@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	James
- Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui
- Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 04/10] arm64: sysreg: Add layout for ID_AA64MMFR4_EL1
-In-Reply-To: <FFB5BF90-BD6C-489B-BDBF-78FC6D529262@oracle.com>
-References: <20240122181344.258974-1-maz@kernel.org>
-	<20240122181344.258974-5-maz@kernel.org>
-	<FFB5BF90-BD6C-489B-BDBF-78FC6D529262@oracle.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1707398389;
+	bh=u2aOtaES0XCeOIHcnCnk47OhtVva9gOZNTOt1HqeVlQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EsWgE9UB5Xhr5faBRJSC38oV1eFUo130oUkgiAW4oWOSmD6kCpUW9tDUji+/QWiMa
+	 cUHKOVSj2Z/gTeYr7lQgGtg0ORJkhDSt/Av2JGMNVX7WDHwi/kRRucS5M5EhssocfV
+	 AiNl63vjdb39XgB08OnnkEUtvSnGUcaC91J+ktoFSeBE53kA4ZqzIvSh6H+BTlyFhW
+	 HhOM+ktYTODFr2O0Mbuf7c13L1hYxtGpcoe1leLr0y4Eel5hRRoYN6HMEgzutg9Tqr
+	 5o56TKRWnpYiGA7ypamAOHWoE7g4FF+cBzFlk0eqMVwIDYyiljFh9kGsnYeVDMc9NR
+	 r8+xhr0Fsy7Cw==
+Date: Thu, 8 Feb 2024 13:19:39 +0000
+From: Will Deacon <will@kernel.org>
+To: ankita@nvidia.com
+Cc: jgg@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	reinette.chatre@intel.com, surenb@google.com, stefanha@redhat.com,
+	brauner@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com,
+	alex.williamson@redhat.com, kevin.tian@intel.com,
+	yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org,
+	andreyknvl@gmail.com, wangjinchao@xfusion.com, gshan@redhat.com,
+	ricarkol@google.com, linux-mm@kvack.org, lpieralisi@kernel.org,
+	rananta@google.com, ryan.roberts@arm.com, aniketa@nvidia.com,
+	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
+	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
+	jhubbard@nvidia.com, danw@nvidia.com, kvmarm@lists.linux.dev,
+	mochs@nvidia.com, zhiw@nvidia.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v6 1/4] kvm: arm64: introduce new flag for non-cacheable
+ IO memory
+Message-ID: <20240208131938.GB23428@willie-the-truck>
+References: <20240207204652.22954-1-ankita@nvidia.com>
+ <20240207204652.22954-2-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, suzuki.poulose@arm.com, ardb@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240207204652.22954-2-ankita@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Thu, 08 Feb 2024 13:06:52 +0000,
-Miguel Luis <miguel.luis@oracle.com> wrote:
->=20
-> Hi Marc,
->=20
-> > On 22 Jan 2024, at 17:13, Marc Zyngier <maz@kernel.org> wrote:
-> >=20
-> > ARMv9.5 has infroduced ID_AA64MMFR4_EL1 with a bunch of new features.
-> > Add the corresponding layout.
-> >=20
-> > This is extracted from the public ARM SysReg_xml_A_profile-2023-09
-> > delivery, timestamped d55f5af8e09052abe92a02adf820deea2eaed717.
-> >=20
-> > Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> > arch/arm64/tools/sysreg | 37 +++++++++++++++++++++++++++++++++++++
-> > 1 file changed, 37 insertions(+)
-> >=20
-> > diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> > index 4c9b67934367..fa3fe0856880 100644
-> > --- a/arch/arm64/tools/sysreg
-> > +++ b/arch/arm64/tools/sysreg
-> > @@ -1791,6 +1791,43 @@ UnsignedEnum 3:0 TCRX
-> > EndEnum
-> > EndSysreg
-> >=20
-> > +Sysreg ID_AA64MMFR4_EL1 3 0 0 7 4
-> > +Res0 63:40
-> > +UnsignedEnum 39:36 E3DSE
-> > + 0b0000 NI
-> > + 0b0001 IMP
-> > +EndEnum
-> > +Res0 35:28
-> > +SignedEnum 27:24 E2H0
-> > + 0b0000 IMP
-> > + 0b1110 NI_NV1
-> > + 0b1111 NI
-> > +EndEnum
-> > +UnsignedEnum 23:20 NV_frac
-> > + 0b0000 NV_NV2
-> > + 0b0001 NV2_ONLY
-> > +EndEnum
-> > +UnsignedEnum 19:16 FGWTE3
-> > + 0b0000 NI
-> > + 0b0001 IMP
-> > +EndEnum
-> > +UnsignedEnum 15:12 HACDBS
-> > + 0b0000 NI
-> > + 0b0001 IMP
-> > +EndEnum
-> > +UnsignedEnum 11:8 ASID2
-> > + 0b0000 NI
-> > + 0b0001 IMP
-> > +EndEnum
-> > +SignedEnum 7:4 EIESB
-> > + 0b0000 NI
-> > + 0b0001 ToEL3
-> > + 0b0010 ToELx
-> > + 0b1111 ANY
-> > +EndEnum
-> > +Res0 3:0
-> > +EndSysreg
-> > +
->=20
-> Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
->=20
-> Would you please help me understand how the kernel would cope with E2H0=
-=E2=80=99s
-> 0b0000  value on systems prior to ARMv9.5 where a read to
-> ID_AA64MMFR4_EL1 would be RES0 ?
+On Thu, Feb 08, 2024 at 02:16:49AM +0530, ankita@nvidia.com wrote:
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index c651df904fe3..2a893724ee9b 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -717,15 +717,28 @@ void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+>  static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot prot,
+>  				kvm_pte_t *ptep)
+>  {
+> -	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
+> -	kvm_pte_t attr = device ? KVM_S2_MEMATTR(pgt, DEVICE_nGnRE) :
+> -			    KVM_S2_MEMATTR(pgt, NORMAL);
+> +	kvm_pte_t attr;
+>  	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
+>  
+> +	switch (prot & (KVM_PGTABLE_PROT_DEVICE |
+> +			KVM_PGTABLE_PROT_NORMAL_NC)) {
+> +	case 0:
+> +		attr = KVM_S2_MEMATTR(pgt, NORMAL);
+> +		break;
+> +	case KVM_PGTABLE_PROT_DEVICE:
+> +		if (prot & KVM_PGTABLE_PROT_X)
+> +			return -EINVAL;
+> +		attr = KVM_S2_MEMATTR(pgt, DEVICE_nGnRE);
+> +		break;
+> +	case KVM_PGTABLE_PROT_NORMAL_NC:
+> +		attr = KVM_S2_MEMATTR(pgt, NORMAL_NC);
+> +		break;
+> +	default:
+> +		WARN_ON_ONCE(1);
+> +	}
 
-E2H0=3D=3D0 means that E2H can be set to 0. Which is what MMFR4 always
-indicated before the introduction of this anti-feature. On any system
-where E2H0 reports 0, there is no change at all for SW. Only if you
-want to correctly deal with a system where E2H0 reports something
-other than 0 would you need to do something different. Which is what
-this series is about, mostly.
+Cosmetic nit, but I'd find this a little easier to read if the normal
+case was the default (i.e. drop 'case 0') and we returned an error for
+DEVICE | NC.
 
-ARMv9.5 doesn't come into play, as this is an allowed anti-feature
-from ARMv8.1.
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+Will
