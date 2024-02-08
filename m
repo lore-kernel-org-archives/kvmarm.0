@@ -1,197 +1,157 @@
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2059.outbound.protection.outlook.com [40.107.100.59])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A05823C2
-	for <kvmarm@lists.linux.dev>; Thu,  8 Feb 2024 17:54:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707414884; cv=fail; b=qSOtl3ZhEjSOpx1SkOggTn5kR8ee97SMe196lkUOduyO7Td/xorhB6rv/54wJLFUQSYnkRa3NKhtVrmDAcI6diwGVJ0ElXCquhfHIDCuinjiG8FDeWaRKojt1tl4HAn0bFLSMpKiAMcRGTQKrKauLjxsZQE4h53l35IU2ZUjVf8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707414884; c=relaxed/simple;
-	bh=OIIUjliddAhyFws16WexoaNTPpgi2lyzQwxYTjn0VME=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=k+hLFz8FcE6BDEpjcXoCNdMdOr7imixWHDjxRKg3pTTsFzbCMNtm7ky2tm2TgDGx6fKgugKxN21DFjzp7NbgrZlFm/fIie0epFgJMfqNmTOW61GJ2ZaRbhqvntlcceq4qplUtpZD7MwL27n/ZzALMJuxG0SQvOuEPwOziRymP7w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rXihybVg; arc=fail smtp.client-ip=40.107.100.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 306AE36B0A
+	for <kvmarm@lists.linux.dev>; Thu,  8 Feb 2024 19:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707419774; cv=none; b=N033c45e3w1R9kq7lT4sJApoZusmUhoJvS+4SrJ43I4FZkSWLCso2wRcfoADPI4NuRD7XKVRuP2Qh+VsQRYFQFSGw+IOq3Oe0W913Y8vRFYjUYD70UTLqdOL5cxn++OTgdXh7UwC9UyB+EaIzg51GUQhI9DHgRnlbearqXCuy54=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707419774; c=relaxed/simple;
+	bh=eAlBG3F5We9GYEnpd8ZGWflzwz8JVxeSAkyDu+z1g0o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JMEuWznc26cg7+8coAHAp/40GAiuWg96eviw+Nbpt5A1+/n0vEO2o8wyfHtIWGAWdTcvBzcmhy5/PbVYUksc5GhKwHcjBk0xbUSsUq806NFEKdGtLKMPYXrAmbLE4FP7e2YFKzE7X8rJ9xvrA2gi++RFIIrnRlpGh/9krZC3f+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=geHfwa9B; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rXihybVg"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MU3nThMZc0PjWm14Zr4Yhzb8iYlMpGIJ3//ZQDiebBiLnB0yEPwCu9U2yxWn0Gg7aGPd0Eg5mFCt3G12bp7kiAP5TvFgQhYCyXgKBkEx8oplAfpyl/dNnnPtpMtzhwD8apv8ah/QMpylvKSkwCWvT4DBCQECNcEji15hVeR9gbGopaQtg0vbwHPA0WxCxdWTxJzDElWfSKzvG7qz/sTl3Bqm8thmTIbByGPFv2KkhyxBzOOmbxtOwpxVS8NWB2y6xHRTfmGAIL6bME9iDVSm2ufWhwlI0fOs9ELe8zzKTJfwsNI7ft2n12tWEwhyL4OyLoCNp8lm2xuY7vrt7I3DWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xqxw6e5DWVT0RzmWzxNy8uivJIwSoRLJ/LuJrj+mq7c=;
- b=jhFUYlOEnij6uZpTqzo1LcrokcU0bqNwEXwwor4moGZoAyktBwFqOvWf9F25EvsWA70NUIgwiWH6CVMgmo8Z3/EPakvJ87K7RUr2u6Utk6FuL+s8GHYXqbBJJK97I+pOqAOSuHr0eO6CtCSU4Hr2ZNRJnc7+4kUOI32YNizC3UjD5OiwlgKBk1YB9RA+XyF0AqlSfbfNcGMAqLCfwiF+P0Uy2NqyeQOkMCbbiQvG2aB+QnU7AitNlwfsqsYjhYvbDzN32F90xBcKzTlbq3fDfw5+I6BJbPqfBXE3/wx2aDbKfQXleoqC/ucRuH7ynTPwZHtvuhe3R7Pif4y6FZu6Iw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xqxw6e5DWVT0RzmWzxNy8uivJIwSoRLJ/LuJrj+mq7c=;
- b=rXihybVg9w4tvfSBepkQ7+B3K5i+A6F8ghQFG6q2RBYpO7CGuyQ3tfXk/K1gReIYtBEBDIWee4MCidwETsC3u1WPeTo27MsrfBbQs/umtVgtGgkkfkyMEYbMvYE1E6KA/mtnlMBa4kxuAhH/XDQXZDpSY62LTd1bxMb4ZnWwmjCEDgBSoJO1ZGliElvKANZ5mfjaEYZwJz2pwZVzFfWsNdqCORo4UMehWZYNYf7/vwmBv6/GSgGpTU8U8+mqE4acLbIq1AWJKs0uw/CnoiRNI0HgNWLcm16T0BJkiglNyGOVjwxurOON+KdlU/iSbVEVM/NturL1xR0g3qVdtqQCkQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SA0PR12MB4382.namprd12.prod.outlook.com (2603:10b6:806:9a::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.17; Thu, 8 Feb
- 2024 17:54:39 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::96dd:1160:6472:9873]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::96dd:1160:6472:9873%6]) with mapi id 15.20.7270.012; Thu, 8 Feb 2024
- 17:54:39 +0000
-Date: Thu, 8 Feb 2024 13:54:37 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: ankita@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	reinette.chatre@intel.com, surenb@google.com, stefanha@redhat.com,
-	brauner@kernel.org, catalin.marinas@arm.com, will@kernel.org,
-	mark.rutland@arm.com, kevin.tian@intel.com, yi.l.liu@intel.com,
-	ardb@kernel.org, akpm@linux-foundation.org, andreyknvl@gmail.com,
-	wangjinchao@xfusion.com, gshan@redhat.com, ricarkol@google.com,
-	linux-mm@kvack.org, lpieralisi@kernel.org, rananta@google.com,
-	ryan.roberts@arm.com, aniketa@nvidia.com, cjia@nvidia.com,
-	kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
-	acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
-	danw@nvidia.com, kvmarm@lists.linux.dev, mochs@nvidia.com,
-	zhiw@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v6 4/4] vfio: convey kvm that the vfio-pci device is wc
- safe
-Message-ID: <20240208175437.GN10476@nvidia.com>
-References: <20240207204652.22954-1-ankita@nvidia.com>
- <20240207204652.22954-5-ankita@nvidia.com>
- <20240208103022.452a1ba3.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240208103022.452a1ba3.alex.williamson@redhat.com>
-X-ClientProxiedBy: SN7PR04CA0116.namprd04.prod.outlook.com
- (2603:10b6:806:122::31) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="geHfwa9B"
+Received: from [100.64.216.206] (unknown [20.29.225.195])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 4AF49207E717;
+	Thu,  8 Feb 2024 11:16:07 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4AF49207E717
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1707419767;
+	bh=53VQ1wtJ3Bp3ZW1pWDvdrXvcvOq5kb+U1QAHuljf+Ro=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=geHfwa9Bi304IDw5TFIdHLnslxTlMpaAbDY02K8ezt1SN6vO1huHrI4j2PNrcqNqx
+	 h3IaJxy0EVDhJZ2xj2i4jP4eKF/7nNu0RSOdKPtO6FuL2GI5fh7YNzcwWcL4Rdvksj
+	 ajoLDo5KRXT/M7OVhNpMhx75deLRwdGUXHofMeCY=
+Message-ID: <7e6add2c-f519-4838-9dd9-57841c50e538@linux.microsoft.com>
+Date: Thu, 8 Feb 2024 11:16:06 -0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA0PR12MB4382:EE_
-X-MS-Office365-Filtering-Correlation-Id: 14dfc7ae-81a6-475c-fa85-08dc28cf0509
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	gY38sRbAX9KKtT9U/dmgvlHRYAHy4njlxSgIew5l1/HgoOLW2nT8+jH3C+fHHahwJq8w0wj6UV8y1J1D/gqmt46/LLCAeBEP29Yf6d00x7Xdh1Nz0h/yTCVT6tD8qNwmah2mkaE4gmpqS8Ntp7rX9eDeaEttZkGUMvlogr9PymMOG+1ymxx8CxdZTXhzzeh4gl6538RARrfIyY7pozer38mPQcxA/DkEbO8d479f467y2iXYPCmE9Eqf20lutuhfr+A1FdLxKIKMopWrLUGRas6Q6Sy25DupMjnC246jJ7TWd+9b7MSzYkKRM2tIqTC7NZV7Qc6J8FL9TTURMf4NkJ2FyGGDu8O4tAjelWKmZCBqUFY2i3xr1tPo5eDLAazzT9OKmlmDbOWKG84NhTZd5MHeWHvP+QuRONpwL4Id3o7m0bwECpyIwMZRhJWUTNiKctcgjV3hXPpC9ro6wXLK/MIvYAlqQarDVRoilXTZ8v9vQNdRTG325MwOC8SACofaH5E1NHPQAN7Xz/Cv3wrRFIfuSme2X3QDRexs83DuaKkEyiKROJ0MkZqCgZ4DifF7
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(396003)(136003)(346002)(366004)(230922051799003)(1800799012)(64100799003)(186009)(451199024)(41300700001)(66476007)(36756003)(8936002)(6486002)(8676002)(4326008)(316002)(66556008)(6916009)(66946007)(6506007)(2906002)(38100700002)(86362001)(7416002)(5660300002)(478600001)(6512007)(2616005)(33656002)(26005)(1076003)(83380400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?r77S6RF0yHkBa4u6f2ffuw3rxX/X8gTB9T/kBpP4oZMl4E8T6scZvzX0r1r5?=
- =?us-ascii?Q?IwWN411/pgy9bNg6CBVxRlxY90JsQihr45+ROtMIDCFjhQJ8taenAsIs6ssK?=
- =?us-ascii?Q?4gIOwvDaQj9Jn+C7v/g/nw7IfLcinpMa/wT4AYe7DYsu7sLR8RuWeUAsbpQD?=
- =?us-ascii?Q?P7mSkFCDRxMvlfpQW8YjcxgfP8nx2QIqk5ZdYgIoRBXKTFTzXzcpRX7r9Jwv?=
- =?us-ascii?Q?YOS8H+qTI7f7I7vinvO8oXV199icdq3Q5IvPRHlIDJQYH66lZ0gmst02nQRk?=
- =?us-ascii?Q?2Axt6fYgATFNR3CfeIvOcfznJypDBgFxUcsXUtheDApGH8VsHZBxhpwSEwkM?=
- =?us-ascii?Q?UsRW6iFurmB9ax3TKFwXWtI+tZDbrkJimURAdnJW87t0nTtM52rIP3jK2qgk?=
- =?us-ascii?Q?GDtZUfvb/+7/danRztAjIMGZh4VXIjYcznmzJ/swSG2Pyk9Ps1nKEXeP2RT2?=
- =?us-ascii?Q?3p08PU5aSQ6K/92iHojLDcYkF0BNDOTf4EdO/HAeH/fDLxgMwdnB1enInW+S?=
- =?us-ascii?Q?MZkJW4c0taU4gpz291qbwaRMfxgYcTDU9jrs86VrILIJxJbe5F0jzKc+X4hv?=
- =?us-ascii?Q?XO6dw5+iYAAY9HCVMKVLFLXCZtEpEWqZW3KEYzLHhhjEXwOqrL8/HBPYdYG5?=
- =?us-ascii?Q?xHQ0EmEs4s5L+UhzEgUpAveeRUPTwxTe9YW7mNc57E+AUtikPL9aQ3f6+8qD?=
- =?us-ascii?Q?42a7no+ZawNPucQ7CHGdYHLch10wNaOAR9LUg0gnPrW79qNmbs8AC+yR8Ltm?=
- =?us-ascii?Q?OqQfb7DifrwHUxyXeWZG0sTQxtkb11O8c2BdiS5HJL0R6wvqOk+VLGUEhffj?=
- =?us-ascii?Q?+olYyNf/xgQE53+yuLhrUkTYj4FEGhVtS0DqhsW8Bp/PjnrQBIA0H5uON+Fi?=
- =?us-ascii?Q?pE/Gde3SiFvBacxHrjhsMY2kiGX048+0AwEN3rxTV4J6a0zgtDUgmiEGWFSh?=
- =?us-ascii?Q?C0BOl9KoNMG9R51tg1v62Bya1tyNm0gzwVwnE1J5pswl2Iydtqxc6wgfsylx?=
- =?us-ascii?Q?YIAkK4OeWapBvesKZdYfopYW50/Fx+jQd5osQmOxKjU6tykVGV1cp9bah5zo?=
- =?us-ascii?Q?AmA+Opge3rmiE1UK9SaGfngJzig/Rc6h+QcHZTfC8zYszKj+PQMsjfceI/Po?=
- =?us-ascii?Q?6dxe0oJ7l7Z0xpOctOLqhZFIx+TZ6ebsPrOBqGAeQo91OFXz4GT6sebHyoLS?=
- =?us-ascii?Q?RrLYnXmE0R9CymhYp3VII3VwbjoYS5gi8+66nSz18crSo9IYXXih2BNRAKbE?=
- =?us-ascii?Q?wH/SuTqGsKsRev9PcfD6DRFG10ZAuelzi4/JqgUHIfXjOw9nv14y7/KVOcT1?=
- =?us-ascii?Q?AvI7IKlmXnM/XPAwoGN4/YE/eXTzLOfLYw2Ul7BaSfa4P6lkGN6clThkbOPw?=
- =?us-ascii?Q?tBoqoajEtd7BUlVMBJUqeg82mnwbEpC7vtLNNPxHBcJIj4/NisBwcdlcTmUT?=
- =?us-ascii?Q?c+YgBmhPHopuZ78RgjzGdFVGS6fxFXs4Qh2PQ3MkjL/QDJdvo1c6xRWA8h1/?=
- =?us-ascii?Q?DjdgkeS+Vc6H1LZAuFHF5NFvcoQTg5dNSq5wfPM3QzC+AfMY2A3tb5l84WxU?=
- =?us-ascii?Q?YFATxeoDW4EcEre20U5+R4tHikE9llKo9VPy+ToD?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 14dfc7ae-81a6-475c-fa85-08dc28cf0509
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Feb 2024 17:54:38.8848
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JDzxDXXfzjLbLFSHSyKpd9JhBWIRyDdWPF/tQyfg4X5BmZv18CAtdYvUlHlKjcSg
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4382
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH] KVM: arm64: Override Microsoft Azure Cobalt 100 MIDR
+ value with ARM Neoverse N2
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Andre Przywara <andre.przywara@arm.com>,
+ Rob Herring <robh@kernel.org>, Fuad Tabba <tabba@google.com>,
+ Joey Gouly <joey.gouly@arm.com>,
+ Kristina Martsenko <kristina.martsenko@arm.com>,
+ "moderated list:ARM64 PORT (AARCH64 ARCHITECTURE)"
+ <linux-arm-kernel@lists.infradead.org>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)"
+ <kvmarm@lists.linux.dev>
+References: <20240206195819.1146693-1-eahariha@linux.microsoft.com>
+ <86r0ho61ta.wl-maz@kernel.org>
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+In-Reply-To: <86r0ho61ta.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 08, 2024 at 10:30:22AM -0700, Alex Williamson wrote:
-> On Thu, 8 Feb 2024 02:16:52 +0530
-> <ankita@nvidia.com> wrote:
+On 2/7/2024 1:50 AM, Marc Zyngier wrote:
+> On Tue, 06 Feb 2024 19:58:16 +0000,
+> Easwar Hariharan <eahariha@linux.microsoft.com> wrote:
+>>
+>> Several workload optimizations and errata depend on validating that the
+>> optimization or errata are applicable to the particular CPU by checking
+>> the MIDR_EL1 system register value. With the Microsoft implementer ID
+>> for Azure Cobalt 100, the value doesn't match and ~20-25% performance
+>> regression is seen in these workloads. Override the Azure Cobalt 100
+>> value and replace it with the default ARM Neoverse N2 value that Azure
+>> Cobalt 100 is based on.
 > 
-> > From: Ankit Agrawal <ankita@nvidia.com>
-> > 
-> > The code to map the MMIO in S2 as NormalNC is enabled when conveyed
-> > that the device is WC safe using a new flag VM_VFIO_ALLOW_WC.
-> > 
-> > Make vfio-pci set the VM_VFIO_ALLOW_WC flag.
-> > 
-> > This could be extended to other devices in the future once that
-> > is deemed safe.
-> > 
-> > Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
-> > Suggested-by: Catalin Marinas <catalin.marinas@arm.com>
-> > Acked-by: Jason Gunthorpe <jgg@nvidia.com>
-> > ---
-> >  drivers/vfio/pci/vfio_pci_core.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> > index 1cbc990d42e0..c3f95ec7fc3a 100644
-> > --- a/drivers/vfio/pci/vfio_pci_core.c
-> > +++ b/drivers/vfio/pci/vfio_pci_core.c
-> > @@ -1863,7 +1863,8 @@ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma
-> >  	 * See remap_pfn_range(), called from vfio_pci_fault() but we can't
-> >  	 * change vm_flags within the fault handler.  Set them now.
-> >  	 */
-> > -	vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
-> > +	vm_flags_set(vma, VM_VFIO_ALLOW_WC | VM_IO | VM_PFNMAP |
-> > +			VM_DONTEXPAND | VM_DONTDUMP);
-> >  	vma->vm_ops = &vfio_pci_mmap_ops;
-> >  
-> >  	return 0;
+> Since you don't disclose *why* this particular value should have any
+> impact on the behaviour of the kernel, the answer should be "Thanks,
+> but no, thanks".
+>
+
+The optimizations mentioned in the commit message reside in userspace
+and depend on the MIDR value exposed to userspace by the kernel. As
+mentioned in my response to Anshuman, this patch was a proof of concept
+to have userspace apply the Neoverse N2 optimizations to Azure Cobalt 100
+as well.
+
+> Whatever the reason is for doing so, you should make it plain what you
+> are working around. Blindly overriding ID registers is not an option,
+> and you should simply add your MIDR value to whatever errata list that
+> actually matches your implementation.
+>
+
+Thank you, I will do that.
+
+>>
+>> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+>> ---
+>>  arch/arm64/include/asm/cputype.h   | 3 ++-
+>>  arch/arm64/include/asm/el2_setup.h | 5 +++++
+>>  arch/arm64/kvm/sys_regs.c          | 9 ++++++++-
+>>  3 files changed, 15 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
+>> index 7c7493cb571f..0450c6c32377 100644
+>> --- a/arch/arm64/include/asm/cputype.h
+>> +++ b/arch/arm64/include/asm/cputype.h
+>> @@ -262,7 +262,8 @@ is_midr_in_range_list(u32 midr, struct midr_range const *ranges)
+>>   */
+>>  static inline u32 __attribute_const__ read_cpuid_id(void)
+>>  {
+>> -	return read_cpuid(MIDR_EL1);
+>> +	return (read_cpuid(MIDR_EL1) == 0x6D0FD490 ? 0x410FD490 :
+>> +			read_cpuid(MIDR_EL1));
+>>  }
+>>  
+>>  static inline u64 __attribute_const__ read_cpuid_mpidr(void)
+>> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+>> index b7afaa026842..502a14e54a31 100644
+>> --- a/arch/arm64/include/asm/el2_setup.h
+>> +++ b/arch/arm64/include/asm/el2_setup.h
+>> @@ -138,6 +138,11 @@
+>>  .macro __init_el2_nvhe_idregs
+>>  	mrs	x0, midr_el1
+>>  	mrs	x1, mpidr_el1
+>> +	ldr	x2, =0x6D0FD490
+>> +	cmp	x0, x2
+>> +	bne	.Loverride_cobalt100_\@
+>> +	ldr	x0, =0x410FD490
+>> +.Loverride_cobalt100_\@:
+>>  	msr	vpidr_el2, x0
+>>  	msr	vmpidr_el2, x1
+>>  .endm
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index 30253bd19917..8ea9c7fdabdb 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -3574,7 +3574,14 @@ id_to_sys_reg_desc(struct kvm_vcpu *vcpu, u64 id,
+>>  		return ((struct sys_reg_desc *)r)->val;			\
+>>  	}
+>>  
+>> -FUNCTION_INVARIANT(midr_el1)
+>> +static u64 get_midr_el1(struct kvm_vcpu *v, const struct sys_reg_desc *r)
+>> +{
+>> +	((struct sys_reg_desc *)r)->val = read_sysreg(midr_el1);
+>> +	if (((struct sys_reg_desc *)r)->val == 0x6D0FD490)
+>> +		((struct sys_reg_desc *)r)->val == 0x410FD490;
 > 
-> The comment above this is justifying the flags as equivalent to those
-> set by the remap_pfn_range() path.  That's no longer the case and the
-> additional flag needs to be described there.
+> As pointed out to me by Joey, this line is really interesting, and
+> shows that you didn't really test this patch.
+>
+
+That has clearly escaped my notice, but we did test the patch and
+validate that the Neoverse N2 MIDR value showed up where we looked.
+Being new to arch/arm64, it's very possible that I may have modified
+this hunk without needing to.
+
+> Thanks,
 > 
-> I'm honestly surprised that a vm_flags bit named so specifically for a
-> single driver has gotten this far.  
+> 	M.
+> 
 
-IIRC there was a small bike shed and this is what we came up
-with. Realistically it should not be used by anything but VFIO and KVM
-together. Generic names do sometimes invite abuse :)
-
-> It seems like the vfio use case for
-> this and associated FUD for other use cases could all be encompassed
-> in
-
-I think Ankit is talking about vfio-platform drivers by "other
-devices".
-
-This is largely why it exists at all, there is a fear that the non-PCI
-VFIO devices will not be implemented the same as the PCI devices. If
-any platform devices have workloads that require WC and have HW that
-is safe then they will set the flag somehow in the vfio platform
-drivers.
-
-> the comment where the bit is defined and we could use a name like
-> VM_ALLOW_ANY_UNCACHED or VM_IO_ANY.  Thanks,
-
-I'd pick VM_ALLOW_ANY_UNCACHED of those two
-
-Thanks,
-Jason
