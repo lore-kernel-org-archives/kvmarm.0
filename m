@@ -1,78 +1,89 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EEC774E27
-	for <kvmarm@lists.linux.dev>; Thu,  8 Feb 2024 12:30:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1AB3762D5
+	for <kvmarm@lists.linux.dev>; Thu,  8 Feb 2024 12:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707395426; cv=none; b=ksGw7C2Nx7LRXJFBMU066e+xctNlnl2zU1ScCDXdMkkl5DsHwyRuKtdB/Fdth8vPoZvRtZZif3UUIL7qflHgovNkvuDzKqSEDwjASxbJRC2I1JBelyt01NjgJkNjsTOU4GkgVtWnqeBk5niZwZKys3sRa9GNR9IeGIwjJ0vhUaU=
+	t=1707395926; cv=none; b=r11hdJdTEK/DOSmwKhsv+SXIjMbG49kAGgtKMN7rDCv/dbSRwQiBCpkowhL1WcYydKeTzKRPj8kLcD4bksqVjPHxVUgLaG0fHPDN1XMn0Uq+PuINX2wG6ETsZMHzdrkUpdY1Icx+FKdH7V52SzfLGinpS85F/y7Owa7RL+MRLWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707395426; c=relaxed/simple;
-	bh=2vTN5YIeZ0RSvrSF6C0aE4zMxwHMEO4V6PIx/f0tzVk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Em6sstOQ/5BWJpgrcUBiIfgMO5K0uGUE+hcoo31ALVHdtnGWcE++DmZZq6SD8kNYxkGPWcwVWPd3tKAIL2gAIWjvpgV2mIAA7xWjii5ZHyf+PyAJQZI9eLih+5UPjK5do6z4ZohAVXnEdo4LCHgKA63B3uscO8JfIuYdKnj7b00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F19371FB;
-	Thu,  8 Feb 2024 04:31:05 -0800 (PST)
-Received: from arm.com (RQ4T19M611.cambridge.arm.com [10.1.31.53])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7D9233F5A1;
-	Thu,  8 Feb 2024 04:30:22 -0800 (PST)
-Date: Thu, 8 Feb 2024 12:30:20 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
+	s=arc-20240116; t=1707395926; c=relaxed/simple;
+	bh=w59XghNHAbBuQRuDnomSkmSM/8dI8765cUh+wvTQ5fU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p9X9X1b+U3+MnKUGDb6vvuRXhvsZ3FnFszQGNWshRHRBCtYHwZnVJrDbAyNhl8dYT6Av8UTgzjByvtaVy55u0n04SI0FK/8M+Z9L9+hmy0A7k/mhl0DGLLN8yFsg7t5dreSkNMVIIDDgzTimbQ5IZMKK7fQSxVFxEc5hnyl01N0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t8hH7rnY; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t8hH7rnY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BED7C433F1;
+	Thu,  8 Feb 2024 12:38:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707395926;
+	bh=w59XghNHAbBuQRuDnomSkmSM/8dI8765cUh+wvTQ5fU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=t8hH7rnYiDWBm5+TlFkm846NiCwRrcf+F1PBKH3Flu6N7Cz0H6Djy7oBksv0elQse
+	 uEm9p9cgn4+pF2IpJJ2nA6ar6QCh3wsk0QNYZDpbU8OMJ0HUikE0pa2Md3WVmaQy66
+	 TTbKRdqItF7fX86U3/w5Pvyhh5iEpXNHbq9/KTIavN9q8t3giB8A4j9COTKrbsDHdj
+	 gWzmv/IBGkeBZmolbyiFzJvRTdTh5nOELuj/VPWqhJcgoS+FmCfdL7m66Pl0wKltwh
+	 SQoDrezVl4ro9Lg3tl7NFnPTNVaFRvJqn5xfgKqzaTeiyweg8QNRORkmCMVp/HBDcj
+	 b6iah6zv9IC4Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rY3fv-001RJA-TT;
+	Thu, 08 Feb 2024 12:38:44 +0000
+Date: Thu, 08 Feb 2024 12:38:43 +0000
+Message-ID: <86le7v5dws.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	oliver.upton@linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>, James Morse <james.morse@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 00/10] arm64: Add support for FEAT_E2H0, or lack
- thereof
-Message-ID: <ZcTJXBThmtRmNbG8@arm.com>
-References: <20240122181344.258974-1-maz@kernel.org>
- <Zb08fXz23JUiF4hD@linux.dev>
+Subject: Re: [PATCH v1 0/2] small kern_hyp_va() cleanups
+In-Reply-To: <20240208105422.3444159-1-joey.gouly@arm.com>
+References: <20240208105422.3444159-1-joey.gouly@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zb08fXz23JUiF4hD@linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Feb 02, 2024 at 07:03:25PM +0000, Oliver Upton wrote:
-> On Mon, Jan 22, 2024 at 06:13:34PM +0000, Marc Zyngier wrote:
-> > Since ARMv8.1, the architecture has grown the VHE feature, which makes
-> > EL2 a superset of EL1. With ARMv9.5 (and retroactively allowed from
-> > ARMv8.1), the architecture allows implementations to have VHE as the
-> > *only* implemented behaviour, meaning that HCR_EL2.E2H can be
-> > implemented as RES1. As a follow-up, HCR_EL2.NV1 can also be
-> > implemented as RES0, making the VHE-ness of the architecture
-> > recursive.
-> > 
-> > This has a number of consequences, both at boot time and for KVM,
-> > though the changes at that level are pretty minor.
-> > 
-> > The real meat of this series is on the cpufeature front, as FEAT_E2H0
-> > is a *negative* feature, where 0b1111 (-1) represents E2H being RES1
-> > and 0b1110 (-2) additionally indicates that NV1 is RES0. Fun, isn't
-> > it?
+On Thu, 08 Feb 2024 10:54:20 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> This looks good to me. Catalin + Will, are you comfortable with the
-> cpufeature changes at this point?
+> Hello,
+> 
+> I wanted to add some comments to __kern_hyp_va(), since I was recently trying
+> to understand it, and I think it could be helpful for someone looking at it in
+> the future.
+> 
+> The second patch removes the assembly macro version, since it is unused. Maybe
+> (out-of-tree) pkvm uses it or it's just worth keeping around in case someone
+> needs it in the future. So if that patch isn't applied it's not too important.
 
-Yes, I acked those touching the arm64 files.
+I checked with Fuad, and he confirmed that there is no assembly code
+using kern_hyp_va() left in pKVM either, so this guys is definitely a
+goner.
 
-> No strong opinions on which tree these patches get applied to. Most of
-> the series is non-KVM code, so I'd understand if y'all wanted it to go
-> through arm64. OTOH, there are some other KVM features that might appear
-> in 6.9 that build on top of this, so at minimum I'd probably need a
-> shared branch.
+For the series,
 
-Please take it through the arm64 kvm tree but keep it on a separate
-stable branch in case I need to pull it.
+Acked-by: Marc Zyngier <maz@kernel.org>
+
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
