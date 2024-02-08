@@ -1,32 +1,32 @@
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6B037165
-	for <kvmarm@lists.linux.dev>; Thu,  8 Feb 2024 19:16:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F9A737169
+	for <kvmarm@lists.linux.dev>; Thu,  8 Feb 2024 19:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707419778; cv=none; b=LLXiHTymrq3CzJ8cWxywDXxNRdeeb/ewtwchirPcoTf/gqat4gBtIjz2UlYRB5dtTtDS+FiYohzpp0bpWCgSKYXg7SFXmYDQAt03Xdqqx68nsJ9317nbA1sidUxpYoL4H/itWB/Py+ffVKdeQYl4iMdnu3nqoevckrJv9XuuPSA=
+	t=1707419778; cv=none; b=fjPVtV5yKjQXUO6iDAjQkGCY7/k+0+n296UEyoKpVR5ZRh0dleX4jLCCR6Y1Bg/Oq4j1q/vC8P57jAKkRJod5jFoiLJGCtJhZ34CRAP90L+CZqLVuIFisKEmP0B+TgK4s/wN1+Yy4StcG8mFg82UXb5US2B7SFgTsEzt69M9qYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707419778; c=relaxed/simple;
-	bh=9UykkdzNYI0pXZaGCaLewlY8xeQZouarcxjnJfeH5Eo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=UoQgdp6hqQyxSwGPs7Ub0eV0cGpIx9z/wwsC13FtbhXUY7DLdkm9RtNSuP060p66e6483yx9sAJYPqU9PA/TSoT/5BaRea7ay40DPYmcwjoQQg0MGMA3+OpxirRZAlApSpRgMi6IN6i6lROj1N15taBD0JCOw60ytKQRLIrLfDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=nbawJt+I; arc=none smtp.client-ip=13.77.154.182
+	bh=b6c2t9B/pfloTiLl3QpaQz8LmLqZFIjOHYHcQTLOATY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pkKTH6c7Fdr9cFdpcbbka+JkzRK8hTfMFvCo+7rgvL9DKfFOtzDUZzRibvyBH7XvI9ItTcBME/72gwYeV7h+22TdJciD8+wanl7SbIX8NAROhbGppoe+oFGFFx9d1P4tlGMpfuN22k18lFTcGc2oJ7jbjSIYRF2lkvwmpyk8Ka4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=mVhRmfC8; arc=none smtp.client-ip=13.77.154.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="nbawJt+I"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="mVhRmfC8"
 Received: from [100.64.216.206] (unknown [20.29.225.195])
-	by linux.microsoft.com (Postfix) with ESMTPSA id E1F5A20B2000;
-	Thu,  8 Feb 2024 11:16:15 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E1F5A20B2000
+	by linux.microsoft.com (Postfix) with ESMTPSA id 03A0D207E718;
+	Thu,  8 Feb 2024 11:16:10 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 03A0D207E718
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1707419776;
-	bh=i98ZLKDqEvufPmP0CP03uDP997ifl1JzFY8QJyEq9Os=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=nbawJt+IKjHHu2ZEUdn88rrFMtw6DfFKq2Q/8J65HHXaLLL7e8Y9kPN6s75xn9yXD
-	 5zepTl3VZrcQM8p27ntxH4VRGdArqqvcC7zkzEzF6HAlm+CtFQqbFfpYP6ovxLYMqH
-	 L/TlX7/QsS9c7Hm/vZootksmDquirS/+NYZ7hW7A=
-Message-ID: <7ef4b699-0b62-4610-bcd1-68c9d253959c@linux.microsoft.com>
-Date: Thu, 8 Feb 2024 11:16:15 -0800
+	s=default; t=1707419771;
+	bh=u7Sr1GivyYQRssWu9Sxm5FwiQjNYTxwfTxEdxVnZrog=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=mVhRmfC8kQaVixsTdXy+xkNZpGrlA/MqXeC1o5PHI3bMWayHqbVhTVa+eNbHRSGKG
+	 LnHztq2MuuhiV41949Vmm2cz5jd2l7OiC2Zygyt545g873v1mN3H59AWkn3C47z4lY
+	 jeic5HaEFHEdLqFsoDO/GZe3uOKEnkkok1uiYnkY=
+Message-ID: <ed6c25dc-d5c7-4f15-8fdc-f2adf209e638@linux.microsoft.com>
+Date: Thu, 8 Feb 2024 11:16:10 -0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,8 +37,8 @@ User-Agent: Mozilla Thunderbird
 Subject: Re: [RFC PATCH] KVM: arm64: Override Microsoft Azure Cobalt 100 MIDR
  value with ARM Neoverse N2
 Content-Language: en-US
-To: Anshuman Khandual <anshuman.khandual@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
  Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
  James Morse <james.morse@arm.com>, Suzuki K Poulose
  <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
@@ -51,39 +51,45 @@ To: Anshuman Khandual <anshuman.khandual@arm.com>,
  "open list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)"
  <kvmarm@lists.linux.dev>
 References: <20240206195819.1146693-1-eahariha@linux.microsoft.com>
- <df731836-04ab-41b9-b317-434a1060ad61@arm.com>
+ <ZcNSI089xqia6lho@FVFF77S0Q05N.cambridge.arm.com>
 From: Easwar Hariharan <eahariha@linux.microsoft.com>
-In-Reply-To: <df731836-04ab-41b9-b317-434a1060ad61@arm.com>
+In-Reply-To: <ZcNSI089xqia6lho@FVFF77S0Q05N.cambridge.arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2/6/2024 11:54 PM, Anshuman Khandual wrote:
-> 
-> On 2/7/24 01:28, Easwar Hariharan wrote:
+On 2/7/2024 1:49 AM, Mark Rutland wrote:
+> On Tue, Feb 06, 2024 at 07:58:16PM +0000, Easwar Hariharan wrote:
 >> Several workload optimizations and errata depend on validating that the
 >> optimization or errata are applicable to the particular CPU by checking
 >> the MIDR_EL1 system register value. With the Microsoft implementer ID
-> 
-> Which is how it should be done.
-> 
 >> for Azure Cobalt 100, the value doesn't match and ~20-25% performance
 >> regression is seen in these workloads. Override the Azure Cobalt 100
 >> value and replace it with the default ARM Neoverse N2 value that Azure
 >> Cobalt 100 is based on.
 > 
-> Why cannot these MIDR values be classified as required and subscribed to
-> the existing erratas that is affecting such implementations. Hence these
-> work arounds will be triggered as and when applicable. Why then override
-> MIDR value instead ?
+> NAK to rewriting the MIDR in the kernel; we do not lie to userspace about the
+> MIDR, and this is not a can of worms we're going to open.
+> 
+> If you desire some microarchitectural performance optimizations in particular
+> projects, please submit patches to those projects to understand your MIDR
+> value.
+
+Understood.
+
+> 
+> Further, if Azure Cobalt 100 is based on ARM Neoverse N2, you presumably suffer
+> from the same errata; can you comment on that at all? e.g. are there any
+> changes in this part that *might* lead to differences in errata and/or
+> workarounds? How do the MIDR_EL1.{Variant,Revision} values compare to that of
+> Neoverse N2?
 >
 
-Thanks for the feedback, I will go ahead and add the Azure Cobalt 100 MIDR
-value to the range of MIDRs affected by the Neoverse N2 errata. This
-patch was a proof of concept to have userspace apply the Neoverse N2
-optimizations to Azure Cobalt 100 as well. As Mark mentioned in a sibling
-response, this is not an acceptable way to accomplish this.
+Yes, Azure Cobalt 100 suffers from the same errata as Neoverse N2. We had changes
+in the implementation, but according to our hardware folks, the Neoverse N2 errata
+we are affected by so far aren't affected by the changes made for Azure Cobalt 100.
 
->>
+> Mark.
+> 
 >> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
 >> ---
 >>  arch/arm64/include/asm/cputype.h   | 3 ++-
@@ -141,4 +147,8 @@ response, this is not an acceptable way to accomplish this.
 >>  FUNCTION_INVARIANT(revidr_el1)
 >>  FUNCTION_INVARIANT(aidr_el1)
 >>  
+>> -- 
+>> 2.34.1
+>>
+>>
 
