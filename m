@@ -1,105 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B3A76028
-	for <kvmarm@lists.linux.dev>; Thu,  8 Feb 2024 12:42:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EF41762EA
+	for <kvmarm@lists.linux.dev>; Thu,  8 Feb 2024 13:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707396148; cv=none; b=Aa7x74nr+49xN/sF7B3XjSmm3oEYqHCN7dS75ny0Kg0GhlrGp4klNGWJLHhSn2J2oH/OL2hlHqBIDu2EXeX/jc/E4NCC2QgHsPixC02UYx+T8r4Sta0bvA7Svz6BiIv8MAVrMANoJt0YhgPwG05g707WPzhsiv0P1QsBVgdvH64=
+	t=1707397269; cv=none; b=FYGTrOQt3tE7pq44eHMk9gQmtj6fXPkYgDHlGXDpFrx/skn36hhjrO+5aOS2PymskGZUKBvQpcByWeRglo2bXYMbnVELvzkYX4pT3ngpkkkGaugWzakqiUVanQHjN5tdvzpLaNxbpoBqhWv+8z/VrhoIRIMgnTTv0Dw2jwWF300=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707396148; c=relaxed/simple;
-	bh=XH+U5pCeF3OWttf2d9rJ1nyXW8JKsT0N/UnkhwonW1c=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OJ5cDy8ATrLPR8wbj3AEBDMHap0vrFB08Veo2vZLqg1O79uEmHDpze/De0MgQMlYiNeIypJvJg0Sul5hPNRhH5VXUHlORDc9t8VTiv1Bfzu0dYZZK8vW2NA0dg2GRC2CsLyq3aDJ1ZJcEtu4Wzfa6dx5XvbsGerop5oV97qs9i0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TcNbwS23; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TcNbwS23"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 562ADC433C7;
-	Thu,  8 Feb 2024 12:42:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707396148;
-	bh=XH+U5pCeF3OWttf2d9rJ1nyXW8JKsT0N/UnkhwonW1c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TcNbwS23goo6KZCZW9rdFa9bUHUaTutT2RLLRqNf2lfGsME3/EjksFG0wgZD8ktee
-	 KDH84LFsb7JWSxh8DxKyjZGFTOFJbahr7GeBaVQzUBUDX6zWKkSorju1Epq1t+dXBa
-	 gSDtpRpRlsugInSPCqq6qqh42ZRL1wDv3SJhYXY1DP8pVHYjFbP5QatY0NaT2dNdKH
-	 Aiet52UBqzI/ae777oQKHPMRgXGEzgan6V3VsJT3sLkbhlOgeQaiSJ4qVo+t8kuNfr
-	 XCvAgqpk7tK22AJKvXpxwDWqZhZfz2/FCFgaQTcVMCkh8D+qP2TVqSPshkmNujiLuc
-	 Q3/IFCJdVDWzg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rY3jV-001RO3-Uq;
-	Thu, 08 Feb 2024 12:42:26 +0000
-Date: Thu, 08 Feb 2024 12:42:25 +0000
-Message-ID: <86jznf5dqm.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	oliver.upton@linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v1 2/2] KVM: arm64: removed unused kern_hyp_va asm macro
-In-Reply-To: <20240208105422.3444159-3-joey.gouly@arm.com>
-References: <20240208105422.3444159-1-joey.gouly@arm.com>
-	<20240208105422.3444159-3-joey.gouly@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1707397269; c=relaxed/simple;
+	bh=MBMsm5Hty7waMz69tLQDq3T7dLAK/n2/fSO/BF9P+Ag=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WjTDQ4q7cK8NUkcVdTEqVhNRQw0FoaJlWiKu9ojdf/AUJIjJAyUX6kPTLl9+FCjaBCAuXw/T8Uo/+Avyo7pb0r4V2Ao+fhRo+pYYKlL/uwnIcYa0DY+JL9lvofrZ1tIIjKY9ihVJ8q4fdlfkJhWG2b6JCmKJ2H5PcGqftf7+SEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D4C6F1FB;
+	Thu,  8 Feb 2024 05:01:48 -0800 (PST)
+Received: from arm.com (RQ4T19M611.cambridge.arm.com [10.1.31.53])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CF6FB3F5A1;
+	Thu,  8 Feb 2024 05:01:01 -0800 (PST)
+Date: Thu, 8 Feb 2024 13:00:59 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: ankita@nvidia.com
+Cc: jgg@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	reinette.chatre@intel.com, surenb@google.com, stefanha@redhat.com,
+	brauner@kernel.org, will@kernel.org, mark.rutland@arm.com,
+	alex.williamson@redhat.com, kevin.tian@intel.com,
+	yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org,
+	andreyknvl@gmail.com, wangjinchao@xfusion.com, gshan@redhat.com,
+	ricarkol@google.com, linux-mm@kvack.org, lpieralisi@kernel.org,
+	rananta@google.com, ryan.roberts@arm.com, aniketa@nvidia.com,
+	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
+	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
+	jhubbard@nvidia.com, danw@nvidia.com, kvmarm@lists.linux.dev,
+	mochs@nvidia.com, zhiw@nvidia.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v6 1/4] kvm: arm64: introduce new flag for non-cacheable
+ IO memory
+Message-ID: <ZcTQi0wWZgvl05LB@arm.com>
+References: <20240207204652.22954-1-ankita@nvidia.com>
+ <20240207204652.22954-2-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240207204652.22954-2-ankita@nvidia.com>
 
-On Thu, 08 Feb 2024 10:54:22 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> The last usage of this macro was removed in:
->     commit 5dc33bd199ca ("KVM: arm64: nVHE: Pass pointers consistently to hyp-init")
-> 
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/include/asm/kvm_mmu.h | 21 ---------------------
->  1 file changed, 21 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index d248a7ae627a..961d4431654b 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -53,27 +53,6 @@
+On Thu, Feb 08, 2024 at 02:16:49AM +0530, ankita@nvidia.com wrote:
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index c651df904fe3..2a893724ee9b 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -717,15 +717,28 @@ void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+>  static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot prot,
+>  				kvm_pte_t *ptep)
+>  {
+> -	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
+> -	kvm_pte_t attr = device ? KVM_S2_MEMATTR(pgt, DEVICE_nGnRE) :
+> -			    KVM_S2_MEMATTR(pgt, NORMAL);
+> +	kvm_pte_t attr;
+>  	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
 >  
->  #include <asm/alternative.h>
->  
-> -/*
-> - * Convert a kernel VA into a HYP VA.
-> - * reg: VA to be converted.
-> - *
-> - * The actual code generation takes place in kvm_update_va_mask, and
-> - * the instructions below are only there to reserve the space and
-> - * perform the register allocation (kvm_update_va_mask uses the
-> - * specific registers encoded in the instructions).
+> +	switch (prot & (KVM_PGTABLE_PROT_DEVICE |
+> +			KVM_PGTABLE_PROT_NORMAL_NC)) {
+> +	case 0:
+> +		attr = KVM_S2_MEMATTR(pgt, NORMAL);
+> +		break;
+> +	case KVM_PGTABLE_PROT_DEVICE:
+> +		if (prot & KVM_PGTABLE_PROT_X)
+> +			return -EINVAL;
+> +		attr = KVM_S2_MEMATTR(pgt, DEVICE_nGnRE);
+> +		break;
+> +	case KVM_PGTABLE_PROT_NORMAL_NC:
+> +		attr = KVM_S2_MEMATTR(pgt, NORMAL_NC);
+> +		break;
 
-Consider moving this comment to the C version instead of deleting it
-completely (the part about the register allocation is pretty crucial).
+Does it make sense to allow executable here as well? I don't think it's
+harmful but not sure there's a use-case for it either.
 
-Oliver can probably fix this when applying it, and my previous Ack
-still stands.
+> +	default:
+> +		WARN_ON_ONCE(1);
 
-	M.
+Return -EINVAL?
 
 -- 
-Without deviation from the norm, progress is not possible.
+Catalin
