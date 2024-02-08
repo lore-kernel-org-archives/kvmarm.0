@@ -1,85 +1,65 @@
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86870679F8
-	for <kvmarm@lists.linux.dev>; Thu,  8 Feb 2024 05:00:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7FA6EB76
+	for <kvmarm@lists.linux.dev>; Thu,  8 Feb 2024 10:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707368421; cv=none; b=l3onMuu5564VpK3xwHgu1XXO4W2EiwRJYN0jOjcXwwtb+JFRGG2LGAdbNbJwoqweUaSgrB8unV6S+PkQsdM4R76EnccbWFWsM2tXniawJhu8Scrr+uo5cuROEVvIkq1teTEojecX9PklWOemplavtvaLW8gIlTECNpd7IUwxQQg=
+	t=1707389680; cv=none; b=ItsmAfETj4BmVyaOWKw+clruuEodrMRHu05tkAKL+iFaIfY/UCF3marNAIycgiYX+DswisF+ZDemWN34lJ2ByC5uR3oimpaHB8gRlGSZD7Qzc7lDem8aqCH3REKiwWDMywqZEEgSvQU8d8+wPSWCnAdpeSlz0y0hodkBu35R7WY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707368421; c=relaxed/simple;
-	bh=drzypQ4OMiu5rtVHsBnVb3sEPK383IRp3OEu0GSDqEA=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=AoCr5lXOVGZ7cN8YYQBCxwqIvIp3bIZss3Q3KfMIrGHTJ2iMeQ64ZgjF9JjzguT82cm9LguYyI+mo3B0BNhKcnplLJXNilSggdu/jBQZmRJ/CDu/X5JBG1c2GV6isRCiDy8AaTNn8mwacfFKmA/8HGG4X3ixdU8G2qWfSLWdqOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4TVl9d1Pylz1Q8k8;
-	Thu,  8 Feb 2024 12:58:13 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id C301F140429;
-	Thu,  8 Feb 2024 13:00:10 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 8 Feb 2024 13:00:09 +0800
-Subject: Re: [PATCH] KVM: selftests: Fix GUEST_PRINTF() format warnings in ARM
- code
-To: Sean Christopherson <seanjc@google.com>
-CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>
-References: <20240202234603.366925-1-seanjc@google.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <3188e6f1-f150-f7d0-6c2b-5b7608b0b012@huawei.com>
-Date: Thu, 8 Feb 2024 13:00:08 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+	s=arc-20240116; t=1707389680; c=relaxed/simple;
+	bh=OLWtKP0uVrFPnaCFYmHPoEhS423Sy4XFQXcamT8L5Zk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TxAslOi4FX09NhNQv+fJNMIV1g3srIDDtgE5vstCy9DkA3RcOoBc+S4LWRWSQDLSn2loXe+2KIQRszXJmcU1LjuuKXWezTHNaWrgQCIKagNHgNAd7ZBW2lqqLsw83XZ4mcfYMBXLfKQts6UU1HLej2FpHeuMFo92ZWcq4hAiPyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8F6DC1FB;
+	Thu,  8 Feb 2024 02:55:18 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 10AB03F762;
+	Thu,  8 Feb 2024 02:54:34 -0800 (PST)
+From: Joey Gouly <joey.gouly@arm.com>
+To: kvmarm@lists.linux.dev
+Cc: joey.gouly@arm.com,
+	maz@kernel.org,
+	oliver.upton@linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v1 0/2] small kern_hyp_va() cleanups
+Date: Thu,  8 Feb 2024 10:54:20 +0000
+Message-Id: <20240208105422.3444159-1-joey.gouly@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20240202234603.366925-1-seanjc@google.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Content-Transfer-Encoding: 8bit
 
-On 2024/2/3 7:46, Sean Christopherson wrote:
-> Fix a pile of -Wformat warnings in the KVM ARM selftests code, almost all
-> of which are benign "long" versus "long long" issues (selftests are 64-bit
-> only, and the guest printf code treats "ll" the same as "l").  The code
-> itself isn't problematic, but the warnings make it impossible to build ARM
-> selftests with -Werror, which does detect real issues from time to time.
-> 
-> Opportunistically have GUEST_ASSERT_BITMAP_REG() interpret set_expected,
-> which is a bool, as an unsigned decimal value, i.e. have it print '0' or
-> '1' instead of '0x0' or '0x1'.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+Hello,
 
-Tested-by: Zenghui Yu <yuzenghui@huawei.com>
+I wanted to add some comments to __kern_hyp_va(), since I was recently trying
+to understand it, and I think it could be helpful for someone looking at it in
+the future.
 
-> diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-> index 274b8465b42a..d5e8f365aa01 100644
-> --- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-> +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-> @@ -158,9 +158,9 @@ static void guest_validate_irq(unsigned int intid,
->   
->   	/* Basic 'timer condition met' check */
->   	__GUEST_ASSERT(xcnt >= cval,
-> -		       "xcnt = 0x%llx, cval = 0x%llx, xcnt_diff_us = 0x%llx",
-> +		       "xcnt = 0x%lx, cval = 0x%lx, xcnt_diff_us = 0x%lx",
->   		       xcnt, cval, xcnt_diff_us);
-> -	__GUEST_ASSERT(xctl & CTL_ISTATUS, "xcnt = 0x%llx", xcnt);
-> +	__GUEST_ASSERT(xctl & CTL_ISTATUS, "xcnt = 0x%lx", xcnt);
-
-Unrelated to your patch, but it looks to me that we actually want to
-print 'xctl' instead of 'xcnt' in the second __GUEST_ASSERT().
+The second patch removes the assembly macro version, since it is unused. Maybe
+(out-of-tree) pkvm uses it or it's just worth keeping around in case someone
+needs it in the future. So if that patch isn't applied it's not too important.
 
 Thanks,
-Zenghui
+Joey
+
+Joey Gouly (2):
+  KVM: arm64: add comments to __kern_hyp_va
+  KVM: arm64: removed unused kern_hyp_va asm macro
+
+ arch/arm64/include/asm/kvm_mmu.h | 41 ++++++++++++--------------------
+ 1 file changed, 15 insertions(+), 26 deletions(-)
+
+-- 
+2.25.1
+
