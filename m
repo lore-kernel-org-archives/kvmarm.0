@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1AB3762D5
-	for <kvmarm@lists.linux.dev>; Thu,  8 Feb 2024 12:38:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B3A76028
+	for <kvmarm@lists.linux.dev>; Thu,  8 Feb 2024 12:42:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707395926; cv=none; b=r11hdJdTEK/DOSmwKhsv+SXIjMbG49kAGgtKMN7rDCv/dbSRwQiBCpkowhL1WcYydKeTzKRPj8kLcD4bksqVjPHxVUgLaG0fHPDN1XMn0Uq+PuINX2wG6ETsZMHzdrkUpdY1Icx+FKdH7V52SzfLGinpS85F/y7Owa7RL+MRLWU=
+	t=1707396148; cv=none; b=Aa7x74nr+49xN/sF7B3XjSmm3oEYqHCN7dS75ny0Kg0GhlrGp4klNGWJLHhSn2J2oH/OL2hlHqBIDu2EXeX/jc/E4NCC2QgHsPixC02UYx+T8r4Sta0bvA7Svz6BiIv8MAVrMANoJt0YhgPwG05g707WPzhsiv0P1QsBVgdvH64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707395926; c=relaxed/simple;
-	bh=w59XghNHAbBuQRuDnomSkmSM/8dI8765cUh+wvTQ5fU=;
+	s=arc-20240116; t=1707396148; c=relaxed/simple;
+	bh=XH+U5pCeF3OWttf2d9rJ1nyXW8JKsT0N/UnkhwonW1c=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p9X9X1b+U3+MnKUGDb6vvuRXhvsZ3FnFszQGNWshRHRBCtYHwZnVJrDbAyNhl8dYT6Av8UTgzjByvtaVy55u0n04SI0FK/8M+Z9L9+hmy0A7k/mhl0DGLLN8yFsg7t5dreSkNMVIIDDgzTimbQ5IZMKK7fQSxVFxEc5hnyl01N0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t8hH7rnY; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=OJ5cDy8ATrLPR8wbj3AEBDMHap0vrFB08Veo2vZLqg1O79uEmHDpze/De0MgQMlYiNeIypJvJg0Sul5hPNRhH5VXUHlORDc9t8VTiv1Bfzu0dYZZK8vW2NA0dg2GRC2CsLyq3aDJ1ZJcEtu4Wzfa6dx5XvbsGerop5oV97qs9i0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TcNbwS23; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t8hH7rnY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BED7C433F1;
-	Thu,  8 Feb 2024 12:38:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TcNbwS23"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 562ADC433C7;
+	Thu,  8 Feb 2024 12:42:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707395926;
-	bh=w59XghNHAbBuQRuDnomSkmSM/8dI8765cUh+wvTQ5fU=;
+	s=k20201202; t=1707396148;
+	bh=XH+U5pCeF3OWttf2d9rJ1nyXW8JKsT0N/UnkhwonW1c=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=t8hH7rnYiDWBm5+TlFkm846NiCwRrcf+F1PBKH3Flu6N7Cz0H6Djy7oBksv0elQse
-	 uEm9p9cgn4+pF2IpJJ2nA6ar6QCh3wsk0QNYZDpbU8OMJ0HUikE0pa2Md3WVmaQy66
-	 TTbKRdqItF7fX86U3/w5Pvyhh5iEpXNHbq9/KTIavN9q8t3giB8A4j9COTKrbsDHdj
-	 gWzmv/IBGkeBZmolbyiFzJvRTdTh5nOELuj/VPWqhJcgoS+FmCfdL7m66Pl0wKltwh
-	 SQoDrezVl4ro9Lg3tl7NFnPTNVaFRvJqn5xfgKqzaTeiyweg8QNRORkmCMVp/HBDcj
-	 b6iah6zv9IC4Q==
+	b=TcNbwS23goo6KZCZW9rdFa9bUHUaTutT2RLLRqNf2lfGsME3/EjksFG0wgZD8ktee
+	 KDH84LFsb7JWSxh8DxKyjZGFTOFJbahr7GeBaVQzUBUDX6zWKkSorju1Epq1t+dXBa
+	 gSDtpRpRlsugInSPCqq6qqh42ZRL1wDv3SJhYXY1DP8pVHYjFbP5QatY0NaT2dNdKH
+	 Aiet52UBqzI/ae777oQKHPMRgXGEzgan6V3VsJT3sLkbhlOgeQaiSJ4qVo+t8kuNfr
+	 XCvAgqpk7tK22AJKvXpxwDWqZhZfz2/FCFgaQTcVMCkh8D+qP2TVqSPshkmNujiLuc
+	 Q3/IFCJdVDWzg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rY3fv-001RJA-TT;
-	Thu, 08 Feb 2024 12:38:44 +0000
-Date: Thu, 08 Feb 2024 12:38:43 +0000
-Message-ID: <86le7v5dws.wl-maz@kernel.org>
+	id 1rY3jV-001RO3-Uq;
+	Thu, 08 Feb 2024 12:42:26 +0000
+Date: Thu, 08 Feb 2024 12:42:25 +0000
+Message-ID: <86jznf5dqm.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Joey Gouly <joey.gouly@arm.com>
 Cc: kvmarm@lists.linux.dev,
@@ -44,9 +44,10 @@ Cc: kvmarm@lists.linux.dev,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v1 0/2] small kern_hyp_va() cleanups
-In-Reply-To: <20240208105422.3444159-1-joey.gouly@arm.com>
+Subject: Re: [PATCH v1 2/2] KVM: arm64: removed unused kern_hyp_va asm macro
+In-Reply-To: <20240208105422.3444159-3-joey.gouly@arm.com>
 References: <20240208105422.3444159-1-joey.gouly@arm.com>
+	<20240208105422.3444159-3-joey.gouly@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -62,26 +63,41 @@ X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, oliver.upton@linu
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 08 Feb 2024 10:54:20 +0000,
+On Thu, 08 Feb 2024 10:54:22 +0000,
 Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> Hello,
+> The last usage of this macro was removed in:
+>     commit 5dc33bd199ca ("KVM: arm64: nVHE: Pass pointers consistently to hyp-init")
 > 
-> I wanted to add some comments to __kern_hyp_va(), since I was recently trying
-> to understand it, and I think it could be helpful for someone looking at it in
-> the future.
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_mmu.h | 21 ---------------------
+>  1 file changed, 21 deletions(-)
 > 
-> The second patch removes the assembly macro version, since it is unused. Maybe
-> (out-of-tree) pkvm uses it or it's just worth keeping around in case someone
-> needs it in the future. So if that patch isn't applied it's not too important.
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index d248a7ae627a..961d4431654b 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -53,27 +53,6 @@
+>  
+>  #include <asm/alternative.h>
+>  
+> -/*
+> - * Convert a kernel VA into a HYP VA.
+> - * reg: VA to be converted.
+> - *
+> - * The actual code generation takes place in kvm_update_va_mask, and
+> - * the instructions below are only there to reserve the space and
+> - * perform the register allocation (kvm_update_va_mask uses the
+> - * specific registers encoded in the instructions).
 
-I checked with Fuad, and he confirmed that there is no assembly code
-using kern_hyp_va() left in pKVM either, so this guys is definitely a
-goner.
+Consider moving this comment to the C version instead of deleting it
+completely (the part about the register allocation is pretty crucial).
 
-For the series,
-
-Acked-by: Marc Zyngier <maz@kernel.org>
+Oliver can probably fix this when applying it, and my previous Ack
+still stands.
 
 	M.
 
