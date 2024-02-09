@@ -1,139 +1,99 @@
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B64374D2
-	for <kvmarm@lists.linux.dev>; Fri,  9 Feb 2024 12:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25F04D135;
+	Fri,  9 Feb 2024 13:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707482914; cv=none; b=rPu0CWDkyP7IbX/+6naYoSoVx4AT/HH3sv98uIsWMY1boaF58aAoF2/Uve37bcjNXUy1D30rjVX8oPOpIAJWhLYHvfp86SPTbf0OZScg4YAkypi90bB+3oOCB6Gx9Lz9yE4gqN9d5UN8Qaul0xL1PoiVcQR3F8/Kh59WayiK5n4=
+	t=1707486859; cv=none; b=UIcDhZRDCNee8I62JxKI+mnXU4tNIrzFhdFGCjfbm3DiOvt+SasX5N3a5IVzELB5Xama6dosbg2+GgnnHoeZsDR23JIwg4nS2GDuByWr21GcQXZLyZG8M5zwPqj2Mzn2UzSjpTMdEQOr3QTsGEOmFAE1R+zJzUpT3TeeIU7XMFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707482914; c=relaxed/simple;
-	bh=IM4q4X0gWydS60JSjkH5keOtJWJtq4G9Lb/U1VwXjTQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tc351fQl3ugrHA/vSiVs8Aa08M5zHuTFUraZh+guSRsw05Z6naLXObtX2OZBF6mSjLS8sFjzxRsZyEoiz7jIOP/gzPSTpisdvkqvH+b8qGjTYWT/Ttf2eLaYJDkEUP4CKkaPGLYVDYAsPQfXdW5maAp27KEmyU1AIZmf6tLcxM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=LdlnZS5+; arc=none smtp.client-ip=209.85.167.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="LdlnZS5+"
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3bba0ac2e88so1058797b6e.0
-        for <kvmarm@lists.linux.dev>; Fri, 09 Feb 2024 04:48:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1707482912; x=1708087712; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oWyRQWjZwGy5YBtNCBODdh66LwGl8ke0FcwUO1q6L1E=;
-        b=LdlnZS5+NPv/mP7SW8g6g3a/cJTjULcdFEJKq12du4kXzs/YlAXHPnaedh/HSo9bKH
-         yA0d+/NX4sntGx4pSaw7CkqsXVlyyURdeRFbHaghWy9LL3Z6Rr/QPEKiJNW43A0inMZi
-         fSa9isrj+ibbddr4FpqsTVRTpaX2bLi/L8cqtxnPZp9ZiPHOCmloaPrF8NwOsPg3yIGE
-         noUGJEeAb/wLYiVNB1iXo2lwZb0WLsdWisYiGWYBBeum4fzDM1Xui7vvM/WfPQlHM5Uj
-         tMHYdU2be/NJNs9SAK2+0A+ZKAG8e9HmIW/NvZq6+/RQB8cbvbYcpK/8aLtM3DQkIhSJ
-         HcLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707482912; x=1708087712;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oWyRQWjZwGy5YBtNCBODdh66LwGl8ke0FcwUO1q6L1E=;
-        b=DxDeLC8hKEF5W0v/LMkFu3keHS5OC9THF4hWr8DqcNFnyXIPwrL2kMdmPIm2nVi/Yg
-         etj4CjXaNrhVDxefxjuPF14+lacnFo0Hofg/oGEF7coV1o1vsE3RwZdKGT91qi7uUSos
-         sJKw2UQjtRMO6qvPQBf5PcvGqjcddQ/mhR7DulwrmHv1wG7QDifxMgd2Ak0IYOnSPFwC
-         GctU5clca0kKFYJKWxSLU6vOxC6lvO4vKLQ2E/mPePUX7ql6jH4HL3Vj73Y83y22bAPi
-         SyYfgLiWvfaOHxjf7aq4UP/EO0gQ7R2/KnLo4ofPRLgTtc2UeYfinCCTi83pKXd70u+N
-         /ypA==
-X-Gm-Message-State: AOJu0YzQsJkTPJHEkYGlGAN86tfXXCvLk/qyyjy4fQpKKUngQWp3E5nB
-	6bMRRtWZ4VyaTt81iO8aKWNscN+UnFykh1yKHKXVA/jYf48eXU7pJJApsXiRg7I=
-X-Google-Smtp-Source: AGHT+IHFPlR4wf7wjb3MRfreQQdqtvCuxiFKYBPPC7N+l8UE1yE7FNCdjopARBSlORizJZ/dGI5EsA==
-X-Received: by 2002:a05:6808:3195:b0:3bf:dd9d:4d0b with SMTP id cd21-20020a056808319500b003bfdd9d4d0bmr355246oib.13.1707482911751;
-        Fri, 09 Feb 2024 04:48:31 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUPwYEyUGD5aRT/+w0MJnpXz3rN94HARHVlk6JNRzkywXVQSfZLnyU/tNbTEAaMu3uFRZYqYPUzQAR73/2ePL21LXFO7pg+BD3dqk9biXkOojEIrKijKC473yLZaKAhs+fSe5kYVud3vj9tB56m6xRoQCPvb+sWZYAIFGHA4HcIDZvRRdHt3cZ4P4jWu9Q7/HlKtpNcuULmsBXf3ua7KJpcGJfq1mqzdZH4w0JOpz/KYi6K8VPoNi2A0JaaQAD8C7vMwVP0sddq+yJRXIPfKlgztVEwePf2HGnh+fkArqZk/GNTpkNBXg+OLsqRN4T/woIaXN8ixU43ZHUatKaQBsZkYIsxKMCAmwiZahVEGNKitRU7+mflXn1+mpQ2AYAvfoEyrjLgoRiYc+60ft11Ir95y1Twdi4w
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id c1-20020a544e81000000b003bfbeb8035esm243981oiy.8.2024.02.09.04.48.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Feb 2024 04:48:30 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1rYQIv-001zB2-Rs;
-	Fri, 09 Feb 2024 08:48:29 -0400
-Date: Fri, 9 Feb 2024 08:48:29 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
+	s=arc-20240116; t=1707486859; c=relaxed/simple;
+	bh=wGQ6YWEERNvpDAZ4j33/ujdxeP5Z2Kc+Pd9cA3dtAbE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=UNSVwA7klOtHG41xW1iFPkSr5CUc9m5tF6vltLc0d/2DgkqDxBB7o5goI6BVz9Gdhyk7Zzx57pPw+BhJ05kNn+1h9L4E+BzLGsLYb/0Nd30Fwgnj986JC6GMJnMz3w83SiQZInUfzAaT2rNFvI7f6F9qKUkJlkx55vzSomskQUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4TWZxC2CFCz6JB14;
+	Fri,  9 Feb 2024 21:50:23 +0800 (CST)
+Received: from lhrpeml500002.china.huawei.com (unknown [7.191.160.78])
+	by mail.maildlp.com (Postfix) with ESMTPS id C046E140595;
+	Fri,  9 Feb 2024 21:54:08 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ lhrpeml500002.china.huawei.com (7.191.160.78) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 9 Feb 2024 13:54:08 +0000
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.035;
+ Fri, 9 Feb 2024 13:54:08 +0000
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
 To: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linuxarm@huawei.com,
-	kevin.tian@intel.com, alex.williamson@redhat.com, maz@kernel.org,
-	oliver.upton@linux.dev, will@kernel.org, robin.murphy@arm.com,
-	jonathan.cameron@huawei.com
-Subject: Re: [RFC PATCH v2 0/7] iommu/arm-smmu-v3: Use pinned KVM VMID for
+CC: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "iommu@lists.linux.dev"
+	<iommu@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, Linuxarm <linuxarm@huawei.com>,
+	"kevin.tian@intel.com" <kevin.tian@intel.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "maz@kernel.org"
+	<maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"will@kernel.org" <will@kernel.org>, "robin.murphy@arm.com"
+	<robin.murphy@arm.com>, Jonathan Cameron <jonathan.cameron@huawei.com>
+Subject: RE: [RFC PATCH v2 0/7] iommu/arm-smmu-v3: Use pinned KVM VMID for
  stage 2
-Message-ID: <20240209124829.GB31743@ziepe.ca>
+Thread-Topic: [RFC PATCH v2 0/7] iommu/arm-smmu-v3: Use pinned KVM VMID for
+ stage 2
+Thread-Index: AQHaWqKd0D2tjroZbEixT8fjcriLLrEB6UwAgAAfllA=
+Date: Fri, 9 Feb 2024 13:54:08 +0000
+Message-ID: <1f0e938bbf684fe69ad7050b8cb3cc29@huawei.com>
 References: <20240208151837.35068-1-shameerali.kolothum.thodi@huawei.com>
  <20240209115824.GA2922446@myrica>
+In-Reply-To: <20240209115824.GA2922446@myrica>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240209115824.GA2922446@myrica>
 
-On Fri, Feb 09, 2024 at 11:58:24AM +0000, Jean-Philippe Brucker wrote:
 
-> * Stage-1 TLB entries in the SMMU have a bit (ASET) saying "this entry
->   is private and does not participate in BTM", which we set for private
->   SMMU address spaces.
-> 
->   Annoyingly, the stage-2 TLB entries do not have it. With BTM all VMIDs
->   are shared between CPU and SMMU.
 
-Right, the spec justified this decision like this:
+> -----Original Message-----
+> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Sent: Friday, February 9, 2024 11:58 AM
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: kvmarm@lists.linux.dev; iommu@lists.linux.dev; linux-arm-
+> kernel@lists.infradead.org; Linuxarm <linuxarm@huawei.com>;
+> kevin.tian@intel.com; jgg@ziepe.ca; alex.williamson@redhat.com;
+> maz@kernel.org; oliver.upton@linux.dev; will@kernel.org;
+> robin.murphy@arm.com; Jonathan Cameron
+> <jonathan.cameron@huawei.com>
+> Subject: Re: [RFC PATCH v2 0/7] iommu/arm-smmu-v3: Use pinned KVM
+> VMID for stage 2
+>=20
+> Hi Shameer,
+>=20
+> On Thu, Feb 08, 2024 at 03:18:30PM +0000, Shameer Kolothum wrote:
+> > Hi,
+> >
+> > On an ARM64 system with a SMMUv3 implementation that fully supports
+> > Broadcast TLB Maintenance(BTM) feature as part of the Distributed
+> > Virtual Memory(DVM) protocol, the CPU TLB invalidate instructions are
+> > received by SMMUv3. This is very useful when the SMMUv3 shares the
+> > page tables with the CPU(eg: Guest SVA use case). For this to work,
+> > the SMMUv3 must use the same VMID that is allocated by KVM to
+> configure
+> > the nested stage 2(S2) translations.
+>=20
+> The series makes sense to me. Maybe a little more detail to help the KVM
+> maintainers understand why we need something like this even though the s2
+> page tables aren't shared between CPU and SMMU:
 
- Note: Arm expects that SMMU stage 2 address spaces are generally
- shared with their respective PE virtual machine stage 2
- configuration. If broadcast invalidation is required to be avoided
- for a particular SMMU stage 2 address space, Arm recommends that a
- hypervisor configures the STE with a VMID that is not allocated for
- virtual machine use on the PEs.
+Thanks Jean for the nice write up. I will use this for next revisions of th=
+is series.
 
-Which doesn't match how Linux works and I think after the recent KVM
-PUCK call on this topic we can say it does not match how Linux will
-work going into the future. Assuming the KVM S2 and IOMMU S2 are
-shared is not true.
-
-So unfortuntely this creates a waste as the BTM will generate
-worthless invalidation workload on the related IOMMU S2. We cannot do
-as the spec suggests to avoid broadcast invalidation here with a
-unique VMID as that will break vSVA vBTM invalidation to the S1.
-
-I do wonder how much of a performance negative this will create. At
-least the S1 isn't flushed so perhaps the performace hit is
-small.
-
-Anyhow, I view it as a defect that the HW doesn't have a BTM ignore
-bit at the S2 level so that we can use the same VMID to make vBTM work
-but not participate in CPU originated invalidations for a non-shared
-S2. A global bit to disable S2 BTM would have been fine for Linux.
-
->   - The old VFIO_TYPE1_NESTING_IOMMU lets userspace allocate a private
->     stage-2, and has only been used for testing as far as I know. I don't
->     think I ever found a program that used it in the wild, but haven't
->     checked recently.
-
-There isn't, it is useless and cannot do anything. A patch has been
-waiting to remove it for a while now, I've got it in my part 3 right
-now.
-
->     It needs to be deprecated over a few releases (starting with a
->     warning maybe?),
-
-No need, we just NOP'd it. It has no user visible side effect,
-replacing the S2 with a S1 is fine.
-
->     and the replacement API shouldn't allow creating a
->     stage-2 without a KVM context.
-
-See my remarks yesterday.
-
-Jason
+Shameer
