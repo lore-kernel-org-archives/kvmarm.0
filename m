@@ -1,66 +1,66 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27984657C7
-	for <kvmarm@lists.linux.dev>; Fri,  9 Feb 2024 07:32:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20718657C5
+	for <kvmarm@lists.linux.dev>; Fri,  9 Feb 2024 07:43:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707463977; cv=none; b=lmz6smyz4m2issvBB5DfdRJu/4/cnK412T7njoqxqj350cAJPArU/QttcJdL4ZQEFLlLwDp9W0IJbkBTAQH33ewUWALZLMWgGYrZY8eo4hyrdn5af6UInf/WX9IFQWGsnSd1gCEt+F56fsw8s/j3r93VO5P8XCdNAKwDhRwLPR0=
+	t=1707464625; cv=none; b=HmMIA09azGi0IBsekS9P0r5Qawk5EfGX7d4jN/3iNwgcDThPgyApUz493peYky0x1IvdqMa0u9QCN5uSmvk0rES3G4eJg7i3HeNn3T6TiqnsKQhWcD6sSRuhaDBsKln2Mwfqx1nMJZqJO2XiBXT5OD+YrywP72R1EYw7aFsKNhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707463977; c=relaxed/simple;
-	bh=9/Aq/2z8oD43W7SROZgPyPplNP52aS000UhYAL8rihM=;
+	s=arc-20240116; t=1707464625; c=relaxed/simple;
+	bh=j/vRJan6i8+nJuusUqpxQYk0kwoxhm071oN71FOT140=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tVxq/KPUo/dL+mF85EDHbrxdicq9U0fDbo3XO3bmvM0pkBSDXb8HP5LZPzlapp7yI0CxRaXxPsB7mzfODthgR7vl4II/UkvzYzHDqayFKcN5VJ+Z8yUoTao7I2cnn/IwrKFhO1DEJ0NqK0F5z/Js3JJ+OGhKVq5puWx90OV3mec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RhrsSkaR; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=USjCqOZRYwY9bIORtAGR/RPU3ET3BiIl9tUfGypiNzjD6OAHEpJnQKhToZ824tfbdPTuh8R9hMLOhNHWCdXszucY95iGPotNG/ocS+ju1ZqGyHC/qtu6k1NbLAKHmZ/BJYZPjGxsmvtizUMC04hSnmNoytKRVHQFW6lvi9JNA5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mm+yqrH9; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RhrsSkaR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mm+yqrH9"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707463972;
+	s=mimecast20190719; t=1707464622;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=yY5P44hxC1Z4PKZ/FATMU8IHl7NhMLgeWkQFsYKZ1O8=;
-	b=RhrsSkaR9vSD7hp6+1CEVBg3kGc//i4uhbrHSs4h9wDsna4/WAQ7catPJK28vLm7iTlrsA
-	VGt77eWF6L+H1tWUYn5WIm84u8oiUxSl51I/yiOKJ7g9/LjUSOX0xQKZzE6fGeyCpMrw4n
-	8zngoPhGR60X7tVV1rMm+lQGYbqGnoY=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=uGf78GSSLTQpF5Eiu1od52sEG+/7hU+ZiNNhjo8N8WA=;
+	b=Mm+yqrH92zrud/DEaFTWFEXFDyHBWHskAUANGKibKLqc1LNdckn67W63boGBDsKZpiqbTq
+	cdCKDT94uyc5BsYA/bEM18luU2y/k5EGqmaCVjifJMuFQ1smhn5bWGjrwa5V0ne37UQP/R
+	tsR2tfs/7AE1/pSB5mvMnUVF60+pozQ=
+Received: from mail-yb1-f198.google.com (mail-yb1-f198.google.com
+ [209.85.219.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-433-fR6kEbLGOEO2hFWTq3eiqg-1; Fri, 09 Feb 2024 02:32:51 -0500
-X-MC-Unique: fR6kEbLGOEO2hFWTq3eiqg-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7830ab8fb5aso79235385a.2
-        for <kvmarm@lists.linux.dev>; Thu, 08 Feb 2024 23:32:51 -0800 (PST)
+ us-mta-630-ZNqZRqDTM3mtgPp4NhH0JA-1; Fri, 09 Feb 2024 02:43:41 -0500
+X-MC-Unique: ZNqZRqDTM3mtgPp4NhH0JA-1
+Received: by mail-yb1-f198.google.com with SMTP id 3f1490d57ef6-dc64b659a9cso1260430276.3
+        for <kvmarm@lists.linux.dev>; Thu, 08 Feb 2024 23:43:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707463971; x=1708068771;
+        d=1e100.net; s=20230601; t=1707464621; x=1708069421;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yY5P44hxC1Z4PKZ/FATMU8IHl7NhMLgeWkQFsYKZ1O8=;
-        b=lZUmAX7qvxn75dZjt+mqGTsUHp8lPP58C+IXKvyMIMtC2WJp//fFkOKK9NpvP3pEKz
-         h6kk/wDrgS2d9tVpyU+GisGMnvG9wDHHFrGzgOT2TDlhRTNC8IJWir6TCM+ySr1aIbmw
-         lDwGiqPFWtadcd++O9chv7jgvzpWNygeyb690zoQyp7LdIYQ5Jl+zjL3GQJ70w7X5IVa
-         2K877h31/jmX+g1wHyccltKS3Np9Q/4uX0doQAAt8tZE0SuzfJ0wVYa2AnM1R2VukVdc
-         K0LnbDLpEWxMXN7fiYfl01Jp4+YIcJ1Bl7dXAzZwjWiBsKa88vyc8564UFqI1dPSxuac
-         XO3g==
-X-Forwarded-Encrypted: i=1; AJvYcCUdm2Rhc/wxToPZKR79Up+rALjWGZ1N3ZugNvhW2qgp2yJ009A1vUwxdTUakVQJbkItYqhGC1e7JD31mQk4XblJ+JumYi5u
-X-Gm-Message-State: AOJu0YxqjkwXX6wTH7P2/KOSvePfXzt7ZAVYQQ9FK2heEC5S+ieK0HRO
-	K5guTtsBae9yVyD7vkJD7eOAeEopWy/ZXqHARUcXyQ08KCdqdxTckza7+yLkOv6PPKWBsvLufOX
-	nPCT5neNBFreK2vR5466qQcfIx41KeTRtEYwa10wd7fAk9aU6Duvc2w==
-X-Received: by 2002:a05:620a:4511:b0:785:4de5:e0cf with SMTP id t17-20020a05620a451100b007854de5e0cfmr839625qkp.13.1707463971214;
-        Thu, 08 Feb 2024 23:32:51 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH4tY5Tcj89/zw20tYT8a6Jj/CYnx9p7WyOp3A/Ob697w4U92gMwrcyM4oLMZ/oN/aG7asvNQ==
-X-Received: by 2002:a05:620a:4511:b0:785:4de5:e0cf with SMTP id t17-20020a05620a451100b007854de5e0cfmr839609qkp.13.1707463970921;
-        Thu, 08 Feb 2024 23:32:50 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCViAPNQIorc1kcwO9Rgc7RZTcKOU+uPz9myAgQRlco7n9MJu4+j2FyLRzCrI7EgnJc23AYjLTYW6JcxjAVZZzSUmcpZ8ZpKJxYIgvjz1QWTyq5LskBqsyYI0YzOnEryES2gygi9HP/Y4XD8F9zH7lzArTKcDiQ2mC8jERMIM7x2eDHad8G88x3XEdWcCtcN0OfqdzRFADac6Pyv6cISSEArBzIr6EBL6VHAfeV2rQAa1Je36FomE+MGCVXsYwf0ZeiMZafcy3S8m3oPhOBH91GFtpdTSN2o17dxaQ6I6ZIDliqB+kVl1Wo1ZlDeooyJ3eTFUOj00GAxNMvoPkiPU08uvqFLelS4ozgy9YqifaRBfukJSg8deIo+plDKu2G8vUdhWXhbh6bJ05/9E37SFwWQgei5LKmRulsNS1bHe+OahtONEUuOKGiEwbGXzz6l+n/lphYZukXvHhuD1A9lkc/GYAkRMJ9GyFShJTby9cECwc3g+UnAnxLQXV/TYh1fNVL80nqZE4ydMi8Xzf0Yb0/fXriF
+        bh=uGf78GSSLTQpF5Eiu1od52sEG+/7hU+ZiNNhjo8N8WA=;
+        b=mm8qZakv1qNWR6xLdIUS5Kt+vSTvVxNZ1AXCNaVctrp+A2QtApAqm1GL/DyqrWvr8T
+         tP56mOsVlyACUTViYb0jDEKKUB0kyz8SNoZrCpTdpFkItJ14wVB89SIFvG7zdwQ9wTno
+         OWN+0HewBNztn79T7NmSn1dMr3uSUMD8xSGVWO9Wo4yVfG1DjgQ6PGKIJ4pfQ+zPILz4
+         lMzfqjoVzk8Sq/vVA6N/WlxEnjLrc/4W986XnBIiI79T/PF+vPpnbE8Cb/M1RXRj5o2W
+         XNyQOio5ztd2znn51MYoaWR5XYQJrhR6Oic0uJ3M9wV0+S22LtSCpVw89X1vsV378ngL
+         DJaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW585EGBSXpVoYGlODpKp0feiGWVuLWexT9Ml+rPoDGGwHuN4f16ggxdO5jpN6L9ou60X7CLY6oyrZJk6p6lrd7yj+k9NKE
+X-Gm-Message-State: AOJu0YwbSTAvz12i8wkBbKQyoNn3Pe7C5hK1VJ2dn8spf8tXsBLVFPMR
+	VZbqJ5nQdQgjv1tjJTtNCscXLALZxvKSA5ERgQZD6UGtNtFVgKcezLNuXMW1/OIPpvZ28GeLwJg
+	eXamR/vV7aeYcvZnLj26eJOkFd5iwEqBf+M9F2QxtpHJ6w2ronEslGQ==
+X-Received: by 2002:a25:aa52:0:b0:dc7:43d3:f8ad with SMTP id s76-20020a25aa52000000b00dc743d3f8admr648606ybi.17.1707464620935;
+        Thu, 08 Feb 2024 23:43:40 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHbgR3CX6WL1xJqNIMgL+kDPRru4nEZNqoR3X4gAa+eKU/MkxNMcm314BtV0Lijrngudkcgkw==
+X-Received: by 2002:a25:aa52:0:b0:dc7:43d3:f8ad with SMTP id s76-20020a25aa52000000b00dc743d3f8admr648593ybi.17.1707464620627;
+        Thu, 08 Feb 2024 23:43:40 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU6g1EbNCn917cZPsbp5MO+NEUukYuQnS3RNDprf6cv3wTiBU7QEhHd5yUZYW9Qce6Q+uakpHlHL1ABMIZ9RuQn1oBW6Q67mSmjG/UXwZmwtGMs0JRvaEH6P18YWtmtxeAea1dbNFyEaI8WAfO44dYhNup8uFIOO0URyCcd/ycR5HrJEy/cNshtDkcDkPGrhLAyPT7YY8Ka9YyJIV20mCUc6lRn/GEfeRIiZAk0oceCZ21NlVwg/6kioJWPDVhdrLLgV3g7MjnG/D8CzCGSi3ry6GqqvfoYCHFkzCduzGYGL2vaYSe80DnIN+kCFZJK4V2m/fhPoqBa8JUwRHtjkOrtoOXi7mH4rSLfHdDOmRvjrN62uTaObl1mr48aJygF1P8FMihQ3JlHls4abX05/9ArPJ6IHXSJ4lcYeOCiqDQe4R1AMG1mIJ5i/ZpPqZ40p84vU0FPXrQHVXNzd/MsypENUB2Q5ZU41KmD8+o14mcjgfaKdYeNXcKV7gsyIxhGk+S0Zs7uktfVhxyDvqXIeRsSxNvK
 Received: from [192.168.0.9] (ip-109-43-177-145.web.vodafone.de. [109.43.177.145])
-        by smtp.gmail.com with ESMTPSA id d25-20020a05620a159900b007840a08a097sm505152qkk.76.2024.02.08.23.32.46
+        by smtp.gmail.com with ESMTPSA id i12-20020ac85c0c000000b0042bf5ec20f0sm481421qti.30.2024.02.08.23.43.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Feb 2024 23:32:50 -0800 (PST)
-Message-ID: <9fb2f113-db36-41a6-a6f2-0499f28ace0a@redhat.com>
-Date: Fri, 9 Feb 2024 08:32:45 +0100
+        Thu, 08 Feb 2024 23:43:40 -0800 (PST)
+Message-ID: <9b041258-e412-4745-a213-6798e682ea62@redhat.com>
+Date: Fri, 9 Feb 2024 08:43:35 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -68,7 +68,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v3 2/8] arch-run: Clean up initrd cleanup
+Subject: Re: [kvm-unit-tests PATCH v3 3/8] migration: use a more robust way to
+ wait for background job
 To: Nicholas Piggin <npiggin@gmail.com>
 Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
  Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
@@ -81,7 +82,7 @@ Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
  linux-s390@vger.kernel.org, kvmarm@lists.linux.dev,
  kvm-riscv@lists.infradead.org
 References: <20240209070141.421569-1-npiggin@gmail.com>
- <20240209070141.421569-3-npiggin@gmail.com>
+ <20240209070141.421569-4-npiggin@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -125,7 +126,7 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240209070141.421569-3-npiggin@gmail.com>
+In-Reply-To: <20240209070141.421569-4-npiggin@gmail.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -133,45 +134,71 @@ Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 09/02/2024 08.01, Nicholas Piggin wrote:
-> Rather than put a big script into the trap handler, have it call
-> a function.
+> Starting a pipeline of jobs in the background does not seem to have
+> a simple way to reliably find the pid of a particular process in the
+> pipeline (because not all processes are started when the shell
+> continues to execute).
+> 
+> The way PID of QEMU is derived can result in a failure waiting on a
+> PID that is not running. This is easier to hit with subsequent
+> multiple-migration support. Changing this to use $! by swapping the
+> pipeline for a fifo is more robust.
 > 
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->   scripts/arch-run.bash | 13 ++++++++++++-
->   1 file changed, 12 insertions(+), 1 deletion(-)
+>   scripts/arch-run.bash | 15 +++++++++++----
+>   1 file changed, 11 insertions(+), 4 deletions(-)
 > 
 > diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index 11d47a85..1e903e83 100644
+> index 1e903e83..3689d7c2 100644
 > --- a/scripts/arch-run.bash
 > +++ b/scripts/arch-run.bash
-> @@ -269,10 +269,21 @@ search_qemu_binary ()
->   	export PATH=$save_path
->   }
+> @@ -130,19 +130,22 @@ run_migration ()
+>   	fi
 >   
-> +initrd_cleanup ()
-> +{
-> +	rm -f $KVM_UNIT_TESTS_ENV
-> +	if [ "$KVM_UNIT_TESTS_ENV_OLD" ]; then
-> +		export KVM_UNIT_TESTS_ENV="$KVM_UNIT_TESTS_ENV_OLD"
-> +	else
-> +		unset KVM_UNIT_TESTS_ENV
-> +		unset KVM_UNIT_TESTS_ENV_OLD
-> +	fi
-> +}
+>   	trap 'trap - TERM ; kill 0 ; exit 2' INT TERM
+> -	trap 'rm -f ${migout1} ${migsock} ${qmp1} ${qmp2} ${fifo}' RETURN EXIT
+> +	trap 'rm -f ${migout1} ${migout_fifo1} ${migsock} ${qmp1} ${qmp2} ${fifo}' RETURN EXIT
+>   
+>   	migsock=$(mktemp -u -t mig-helper-socket.XXXXXXXXXX)
+>   	migout1=$(mktemp -t mig-helper-stdout1.XXXXXXXXXX)
+> +	migout_fifo1=$(mktemp -u -t mig-helper-fifo-stdout1.XXXXXXXXXX)
+>   	qmp1=$(mktemp -u -t mig-helper-qmp1.XXXXXXXXXX)
+>   	qmp2=$(mktemp -u -t mig-helper-qmp2.XXXXXXXXXX)
+>   	fifo=$(mktemp -u -t mig-helper-fifo.XXXXXXXXXX)
+>   	qmpout1=/dev/null
+>   	qmpout2=/dev/null
+>   
+> +	mkfifo ${migout_fifo1}
+>   	eval "$@" -chardev socket,id=mon1,path=${qmp1},server=on,wait=off \
+> -		-mon chardev=mon1,mode=control | tee ${migout1} &
+> -	live_pid=`jobs -l %+ | grep "eval" | awk '{print$2}'`
+> +		-mon chardev=mon1,mode=control > ${migout_fifo1} &
+> +	live_pid=$!
+> +	cat ${migout_fifo1} | tee ${migout1} &
+>   
+>   	# We have to use cat to open the named FIFO, because named FIFO's, unlike
+>   	# pipes, will block on open() until the other end is also opened, and that
+> @@ -150,7 +153,7 @@ run_migration ()
+>   	mkfifo ${fifo}
+>   	eval "$@" -chardev socket,id=mon2,path=${qmp2},server=on,wait=off \
+>   		-mon chardev=mon2,mode=control -incoming unix:${migsock} < <(cat ${fifo}) &
+> -	incoming_pid=`jobs -l %+ | awk '{print$2}'`
+> +	incoming_pid=$!
+>   
+>   	# The test must prompt the user to migrate, so wait for the "migrate" keyword
+>   	while ! grep -q -i "Now migrate the VM" < ${migout1} ; do
+> @@ -164,6 +167,10 @@ run_migration ()
+>   		sleep 1
+>   	done
+>   
+> +	# Wait until the destination has created the incoming and qmp sockets
+> +	while ! [ -S ${migsock} ] ; do sleep 0.1 ; done
+> +	while ! [ -S ${qmp2} ] ; do sleep 0.1 ; done
+> +
+>   	qmp ${qmp1} '"migrate", "arguments": { "uri": "unix:'${migsock}'" }' > ${qmpout1}
+>   
+>   	# Wait for the migration to complete
 
-Looking at the original code below, shouldn't this rather unset 
-KVM_UNIT_TESTS_ENV_OLD after the "fi" statement?
-
-  Thomas
-
-
->   initrd_create ()
->   {
->   	if [ "$ENVIRON_DEFAULT" = "yes" ]; then
-> -		trap_exit_push 'rm -f $KVM_UNIT_TESTS_ENV; [ "$KVM_UNIT_TESTS_ENV_OLD" ] && export KVM_UNIT_TESTS_ENV="$KVM_UNIT_TESTS_ENV_OLD" || unset KVM_UNIT_TESTS_ENV; unset KVM_UNIT_TESTS_ENV_OLD'
-> +		trap_exit_push 'initrd_cleanup'
->   		[ -f "$KVM_UNIT_TESTS_ENV" ] && export KVM_UNIT_TESTS_ENV_OLD="$KVM_UNIT_TESTS_ENV"
->   		export KVM_UNIT_TESTS_ENV=$(mktemp)
->   		env_params
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
