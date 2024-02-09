@@ -1,86 +1,106 @@
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 035094C6D
-	for <kvmarm@lists.linux.dev>; Fri,  9 Feb 2024 01:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AF9615D4
+	for <kvmarm@lists.linux.dev>; Fri,  9 Feb 2024 01:22:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707441260; cv=none; b=V4BB6jqoeUKx7iDsjommOBgkHuwb0BiDg7oW9vV1kEhDhAAcniEGy4QyqxkXDzSEuccGFhMdJHQr0LJvdBF5nrS06QNbbcnl83TU8PLf7yOlGqNBIJ3BNLd3eAfVLvxm7TnQNN2Mt/YYB09g2eVkeMzCQGrHJHZg50RobEWLtwc=
+	t=1707441743; cv=none; b=Ij2JpkrK5XH9vpHerzdFWdjmStvv3F10IgXsXu5JngdSfrn7kDdi/Rx1vlx0wuTBtlh6y39owlPGfhOThTgiebv1m7vdE9uhNHS2D1Bd3XFSjkAa5q5p/MBFjy41WO0JxW5fC+3bT65EvHzMYvJLMraze5Der5mo/BasijKJDnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707441260; c=relaxed/simple;
-	bh=w91A96XWL7bXEU1Sy7yi4pPndExcXO8TcSfVJwXM5fw=;
+	s=arc-20240116; t=1707441743; c=relaxed/simple;
+	bh=/TR1cJLKRZ7qu6VO47XamR64YLXHPgzQDbOxb2ul2qk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TvjZ00zluXrfaAQfVgeT41w4aQ72aQ7Ladjg5nHXkRYw6bf9qRkwdwr2FVRsi9ejljdc8Fmgxz2qZsLzXsYE74RbFW3BMGk4jVaSU4cTEFVI60t0lU+3XKbRrYgFqBgZzttuXdi7GGUO6kAP4lu3FI/X+8pATtRxRsFKPfivnUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MHdV64ZW; arc=none smtp.client-ip=209.85.161.52
+	 To:Cc:Content-Type; b=IEH2dNkcAkqaVGaiC7UQtb+v9FftJu1so+n3Lo3v4SR6FomQvsXSssTKK/V13Y1DaU6Y2vjXP7B1joixMXe7KlxmTpjstAg9pBH1PfMl2iVWPh4wcRSRS+DbN26okThpL4nvvlpO9YPYgupMZPsNWnLGCiu9OaYippDwnmruY5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cfMYY44R; arc=none smtp.client-ip=209.85.160.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MHdV64ZW"
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-59502aa878aso180461eaf.1
-        for <kvmarm@lists.linux.dev>; Thu, 08 Feb 2024 17:14:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cfMYY44R"
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-204235d0913so226035fac.1
+        for <kvmarm@lists.linux.dev>; Thu, 08 Feb 2024 17:22:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707441258; x=1708046058; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=w91A96XWL7bXEU1Sy7yi4pPndExcXO8TcSfVJwXM5fw=;
-        b=MHdV64ZWqUxcqDkEmG5ooDaYXDKRi7vperPF27q+jBVyZMXwVPpmjPRtRpOKN9XCr8
-         1ePhpRI8YeWagGwLm/vaGvA8cAnG7WILVe0kndxvs/hopCBx9h3FckP27r8dAdECtlsY
-         x801Ddd53vBNj/hW6vwsitFPCMkUvnILysKSmAepKwTTe9BfQjdDGSinDH3sJ1pQBNrH
-         tS+hBY8+yPsgLet0WgY5cuhoXP4Bn90wb6CPUgXEy60FXdFnWKP5dlReI0h5Ias4KRrt
-         siG/yni0KO5YmBm4Av2ksZj8YMEjkyVw/C7GSu0m49zzB2oO9fy7Xi02Ylfng+Z1i/Ev
-         fJJw==
+        d=google.com; s=20230601; t=1707441741; x=1708046541; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1bYUdUfxiMsyMg1eLJUlGCPzcBcDEpAd2dqR1EO83KU=;
+        b=cfMYY44RkIM60y8i7EfXNfXfA30UCBhC2wjRY01Ww/vm4373LYwfP/0qJnYA663bVl
+         UmXNtuUZvsoBMaktzpZisYcFn/wBf1471ervvLA8qE/PrIGZsScDGQXiChCJENx6Gxqm
+         /Od1wlv117wj93L64+v03IcPYpZ93XkvezZX4n6GGVNvg2xFo8pgwLHTdHK1vv6AjVi2
+         /HrPGz9h86K+Qn7LTE3Rnf9khGAMrISal/iYXJ4vkwpqwFFqRHNXU/ub1rqAJUXWgfwR
+         9WsDTi++CDm53I3G62ILAS8VQGRouml6Xc1Q0La5uEBBarjX7ed2gciIavsRHQeWMFL0
+         c/bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707441258; x=1708046058;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=w91A96XWL7bXEU1Sy7yi4pPndExcXO8TcSfVJwXM5fw=;
-        b=Kv56L1A0glu/xvcboK5ZgGAE3H8xz6KtjybpDsyJVP2ZGf37Zm6ilsdDdrUECOQ17A
-         d4NpLvCkyFXyzIsh4yo9F97LV8xdML6A2wA6NzeHgN2LQzV4fjIc9fsLUVZKplvknCWl
-         A4qQvwRImKfChbON1MO5XpE/GAErJEXjvpwBpDTl3hiS7h8fWBy8OfTDTWkluhGALYan
-         yjOALku89zDNwZ9/2TK88xTFX3iKf1EQsrI3QjygW+5GMlzeZd2aaw75DfB/6oZiC/Yn
-         ZNwPYe6YE8HffKdvQ9oOdVdQ+z7fPpPiJUAB0X3vf4l4iXidA3O717ZDHJqptXtRXI4p
-         sWYQ==
-X-Gm-Message-State: AOJu0YwaqbYdLi5NbzgbR94rkOBGY5MRG66AHv8CO7pWxZY2Qkx3w+4s
-	D21CAgWrHvJWbInA84f7CHUArwNyjucl/inMlq9tEwn61R82Kn/zHM32kqI9tF7NIv8soiv8oyr
-	sRMruEospm/AF5QZeUtbJABMmFrrsoWNuGJ5b
-X-Google-Smtp-Source: AGHT+IF/dPQomLThdGkmMsZvizB3rgBhDo4q1hHHTNNlblZJaZhwg5OYQa91iqPD6DBwWLCvN0ZuA8WlvV4pvd2O164=
-X-Received: by 2002:a4a:dfa7:0:b0:599:5575:bdaf with SMTP id
- k7-20020a4adfa7000000b005995575bdafmr222017ook.9.1707441257960; Thu, 08 Feb
- 2024 17:14:17 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707441741; x=1708046541;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1bYUdUfxiMsyMg1eLJUlGCPzcBcDEpAd2dqR1EO83KU=;
+        b=ejQUpPIVX6PCByU8E0QkxD9iu2CLQONof9F/8/XxlhZTdtHLPkxVKAz+VSho7CUulr
+         cbBhv6l5sNkIyy6BewmwpGmcKio/fq1/du5zfGtZzMBhl7UWD+rqsVhEweYheaQZZavG
+         R7qPw8PVCcg7NpY/GT1T9a40IjI5xerPw9o5rjnvu0daw1EnHdXbMldBAVe9QPRKpXs5
+         svrhwudNO6SRniALDLtqAomHfTMRhAMTHmoszKIW58PFgWyHMCTWFvdNLwYen3QLfdE3
+         7QVTWGtWdZK5lD9u2KJTpECB98p0PbNkfMi9z8JkKY4/7WYPAFpzW4peRgemig78AXa2
+         aouQ==
+X-Gm-Message-State: AOJu0YzFo803AOI7btFDpbDtlfStWaBSYBHnfgWOYTW2V/Z2pPmncAN3
+	wOxtVYie+UGysfBHEmawU+c3JjUVL2OPYcBG35TwZsbu6Qvf/650rN6Xb+Q0SGH890SPlx1ofjO
+	WU5LvmiIEe9VewZWHb+UuFjR4GpXnlDW2BB36
+X-Google-Smtp-Source: AGHT+IFSxFEFm392BLtgCppQjIi7plXowCwt6ua6fM2hmnZz5cd9La9OdUzvHyKYI93f8vW4Jx6A2frmFsO0KFzpH1Q=
+X-Received: by 2002:a05:6870:4725:b0:218:5017:af07 with SMTP id
+ b37-20020a056870472500b002185017af07mr208303oaq.0.1707441740910; Thu, 08 Feb
+ 2024 17:22:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-9-amoorthy@google.com>
- <CAF7b7mqDN97OM7kgS--KsDygokUHd=wiZjYPVz3yk7UB0jF_6w@mail.gmail.com>
- <ZcOkRoQn7Q-GcQ_s@google.com> <ZcOysZC2TI7hZBPA@linux.dev>
- <CAF7b7mqOCP2NiMsvzfpYaEaKWm4AzrRAHSGgQT9BWhRD1mcBcg@mail.gmail.com> <ZcP_JHsMJUlvjAs1@linux.dev>
-In-Reply-To: <ZcP_JHsMJUlvjAs1@linux.dev>
+References: <20231109210325.3806151-1-amoorthy@google.com> <20231109210325.3806151-10-amoorthy@google.com>
+ <CADrL8HXLF+EQZt+oXJAiatoJNzz2E-fiwUSJj=YpHzGQxL00mQ@mail.gmail.com> <CAF7b7mrALBBWCg+ctU867BjQhtLQNuX=Yo8u9TZEuDTEtCV6qw@mail.gmail.com>
+In-Reply-To: <CAF7b7mrALBBWCg+ctU867BjQhtLQNuX=Yo8u9TZEuDTEtCV6qw@mail.gmail.com>
 From: Anish Moorthy <amoorthy@google.com>
-Date: Thu, 8 Feb 2024 17:13:40 -0800
-Message-ID: <CAF7b7mqvAMR3G9Y6nq8SV+DBQ8oz9te0fdg40J97mOw_t3=fhg@mail.gmail.com>
-Subject: Re: [PATCH v6 08/14] KVM: arm64: Enable KVM_CAP_MEMORY_FAULT_INFO
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	pbonzini@redhat.com, maz@kernel.org, robert.hoo.linux@gmail.com, 
-	jthoughton@google.com, dmatlack@google.com, axelrasmussen@google.com, 
+Date: Thu, 8 Feb 2024 17:21:43 -0800
+Message-ID: <CAF7b7mr12opfJTTBC_kt1yoUWTKAV91Q8MrHk8_0ttQsXn9G9w@mail.gmail.com>
+Subject: Re: [PATCH v6 09/14] KVM: arm64: Enable KVM_CAP_EXIT_ON_MISSING and
+ annotate an EFAULT from stage-2 fault-handler
+To: James Houghton <jthoughton@google.com>
+Cc: seanjc@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	oliver.upton@linux.dev, pbonzini@redhat.com, maz@kernel.org, 
+	robert.hoo.linux@gmail.com, dmatlack@google.com, axelrasmussen@google.com, 
 	peterx@redhat.com, nadav.amit@gmail.com, isaku.yamahata@gmail.com, 
 	kconsul@linux.vnet.ibm.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Ah, I finally see what I'm being beaten over the head with- the
-kvm_prepare_memory_fault_exit() is a feature of
-KVM_CAP_MEMORY_FAULT_INFO, not EXIT_ON_MISSING. You're right of course
-
-Ok, so for this commit in the next version of the series I'm thinking
-the following description
-
-> KVM: arm64: Enable KVM_CAP_MEMORY_FAULT_INFO and annotate fault in the
-> stage-2 fault handler
+On Wed, Jan 31, 2024 at 2:38=E2=80=AFPM Anish Moorthy <amoorthy@google.com>=
+ wrote:
 >
-> At the moment the only intended use case for KVM_CAP_MEMORY_FAULT_INFO
-> on arm64 is to annotate EFAULTs from the stage-2 fault handler, so
-> add that annotation now.
+> On Tue, Jan 30, 2024 at 3:58=E2=80=AFPM James Houghton <jthoughton@google=
+.com> wrote:
+> >
+> > I think that either (1) we move this kvm_prepare_memory_fault_exit
+> > logic into the previous patch[1], or (2) we merge this patch with the
+> > previous one. IIUC, we can only advertise KVM_CAP_MEMORY_FAULT_INFO on
+> > arm64 if this logic is present.
+>
+> Actually (sorry, about-face from our off-list chat), *does* it make
+> sense to merge these two patches?
+
+As per [1]: yes, it makes sense to move the kvm_prepare_memory_fault_exit()=
+.
+
+So for the next version, the description is also going to change a bit to
+
+> KVM: arm64: Implement and advertise KVM_CAP_EXIT_ON_MISSING
+>
+> Prevent the stage-2 fault handler from faulting in pages when
+> KVM_MEM_EXIT_ON_MISSING is set by allowing its  __gfn_to_pfn_memslot()
+> call to check the memslot flag. This effects the delivery of stage-2
+> faults as vCPU exits (see KVM_CAP_MEMORY_FAULT_INFO), which userspace
+> can attempt to resolve without terminating the guest.
+
+> Delivering stage-2 faults to userspace in this way sidesteps the
+> significant scalabiliy issues associated with using userfaultfd for the
+> same purpose.
+
+[1] https://lore.kernel.org/kvm/ZcP_JHsMJUlvjAs1@linux.dev/#t
