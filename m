@@ -1,66 +1,66 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67313664A3
-	for <kvmarm@lists.linux.dev>; Fri,  9 Feb 2024 08:28:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E46BE657A8
+	for <kvmarm@lists.linux.dev>; Fri,  9 Feb 2024 08:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707467313; cv=none; b=gefqrKmJCZTW8IRa1g4iG89qjhr0t0zOrUR3WRk0hJEgRUccVKzRdbHJnDHoCgbqx/1Q3JlOk4wq5e5Y+R4GGroeIiyloYF3QTjSUcbY0wM9035Y8RutF9hB5xpoAj4h9HDGZgdwn4DI8BQUab/7CcAD+V0x81hkgszwBXiVKeU=
+	t=1707467354; cv=none; b=D14UQ2sg9xO5kneyPo847/hivIPR/JGdIs33QcK20D0X3G57ZzuUTOP0EpPcqvN+62Ja6ew5rGRGtLdsgUNJP7Im0AKw13enQFi5yNmCvtgwdDR1zL1x67dZHY+z9tkQVbqA0ll7S9f3K+DMnHx9icnuEZBrqs5F9hhfGo9AAIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707467313; c=relaxed/simple;
-	bh=3HreAf3C7WSTTW6o9UNHFC8JLdzrORRUrztXIvGrHdY=;
+	s=arc-20240116; t=1707467354; c=relaxed/simple;
+	bh=ar3mqjsIdbZN/oexSyU52xoSyOoZGf+sKohPZbfTlAA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QrHYYl7zT4dglNdqM7E2SEODYFaQ2rpagGhpr56QLMtl3lVjqQA/FmangXd4n+kCUHwe6SAY36vZDMsfZZJ+64KJiFlPlojmme2x99plOkMEzghV/N4rUwSYnA31Lm4TQ+oJS3P6MZJU/dRab0goR/fi5pHpSRtO+5B6zfsMXlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PF5b3RTY; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=NApOa3mqtY7971lLInaW7cPEsaBmttP0E3mSRRSofiO/p13TvjT5EZLvAcbXy6T9cyoEP9Ieeo7ZAAvDmAAuav5kgj7nJjRLs+FTeYv6i09yqZzzMipKyg28dKcfRhV5j/pgKJmaUfjbcGNTXzInbiGDnNQS4AjQ+KEcj4xQoho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A7C42zlq; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PF5b3RTY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A7C42zlq"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707467309;
+	s=mimecast20190719; t=1707467351;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=lSIosa7H9Vqr6g6wkjLttbFme+deNKcmttLyp+MsKjU=;
-	b=PF5b3RTY3bX/FYGj9Afd7GyBC+9oh4L8A9MeeDut3RY8MQzc1FNjZLgYoXIqD7kt2MCbhK
-	6tCWxSX8lkErbp7wasCs+8qIqwljIt40UWktV51uQL9UScWExDeAOxNZG55zsPPbCBhwSp
-	UbcZMZXglhyfz6BplHvvioudQOTtgFQ=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=CYwym9bcvYVUdfgrQAx0w53qMrol8jdhzpg8cj+Mxlw=;
+	b=A7C42zlqDL8JVekjfGK0YK8YtdW7a4sCmdfnfHpKLXZ5x/1CM/EhhaE9+1sJ6KSdiSyxww
+	/OUX5mMKLs58MhGZC61evbZNfJcIQkD8NNOPm701hK7wXTD7PgqX9dVq50bIDzExMoh6oS
+	DimGRw52o2FVjfpdo8UesXoX/cm1nII=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-83-7YDKdM-8NWGcql5IvUgagw-1; Fri, 09 Feb 2024 03:28:25 -0500
-X-MC-Unique: 7YDKdM-8NWGcql5IvUgagw-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-51147e15397so639214e87.3
-        for <kvmarm@lists.linux.dev>; Fri, 09 Feb 2024 00:28:25 -0800 (PST)
+ us-mta-668-bgOz4ifkPMGIq5LRX4RQxg-1; Fri, 09 Feb 2024 03:29:10 -0500
+X-MC-Unique: bgOz4ifkPMGIq5LRX4RQxg-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-50e9e5c8f49so747516e87.3
+        for <kvmarm@lists.linux.dev>; Fri, 09 Feb 2024 00:29:10 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707467304; x=1708072104;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lSIosa7H9Vqr6g6wkjLttbFme+deNKcmttLyp+MsKjU=;
-        b=vNujnTSihTeMWs9wmFWYW6CqRlHRUFD+f+FDwtURwhu2FA/+qiCxavCiUIUv3X7k7r
-         P22X02b2LKLTkvOZww/YXJqEz33vQrsZp1FNgQR/1XVQwR9e8KWtj8G4bVzi4M3zcBNu
-         +yBjDfZeClq62tCEbbA0YtwUTcAIDMB0TgTRg+rErdycBkRqr2Rjx/ztaG8eqGpHB8c6
-         pKVVCKvynKTF2dXzgofafngOJksCRCYyC+Gtx88XYeOOZoXeHveheqB/EsZJDGjjonKK
-         xNhmBSP7n8oEuahpZU+nh66SbNVd6GCjkGklxBs/a0uBEzBSrjqpH0fZzqrrb6LYYJCN
-         u85w==
-X-Gm-Message-State: AOJu0YwCZkPUbojlK+stxyj0krJkH+PL1SldKnVxZQsctHwM3RF4eV1P
-	UXtIwAMZ/C6rZ1pZIvBD+GAeLti4DXgk0oZwehwFDcpfXOy3P/T6AU+0NZUonU/3f0sMZwcPEz1
-	AtjaeSIrqdHwRYzEQZ/KN/+stqt0oMsiuzy9IG3aS8AdXBRl2JDvYsA==
-X-Received: by 2002:a19:8c50:0:b0:511:5361:20df with SMTP id i16-20020a198c50000000b00511536120dfmr532247lfj.13.1707467304490;
-        Fri, 09 Feb 2024 00:28:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH4iC+FRipMyVJYsUFGfBqVSr7OvTucmAa52sfLjON5ya4vVilp+U93Cecd2K9MevakvwHq5Q==
-X-Received: by 2002:a19:8c50:0:b0:511:5361:20df with SMTP id i16-20020a198c50000000b00511536120dfmr532225lfj.13.1707467304116;
-        Fri, 09 Feb 2024 00:28:24 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVltiJ29BtpoUYrPf1SZB45utAeCwTbqwI56ds2Aa8EuZgPms0LwddB+C5/ltorHPajgsPjWHznwdj56pQ6nu24/cSU0eXH1BGFKlLpjR6rvBc3CaDz7fawO3HG0y/7Gj1kRsXQceUY8H9DTHj7+R44o5x/+wAiDlcMMgMVxyLdLPEAfjjAlfUUxE++n5R8EJIaBBcUd/sybg4tB7HpCx0xfR7A3QZtmcA4CGK+PO2aZ3a4C3MTk7GaNjIS70jqUB8QQi/QEZtTvXyQPH2SeBlVAk3amng9fA+1lWXwUoI8AxAXRBESY/XUYLDZ8hU2RQuaRJyEuWMq21JPhPOlKlAvy0qf8iePnq2dDkTWjkRgl9+vU2u0DhldVHMj2B3GnDXN84fFK6s9RaZwI3YbGQeghRctNDpy3xzctkbPneerKo1h0eN4mdodAM7NkNUCmR5Z9nBofp5yuUCaQgVQg4gzECnx0ypTC+kVRzZq9/hWL3AcB68IavYtB4tow7DLo1gLXWRDd9TcE1hYecDqA1g4uLor
+        d=1e100.net; s=20230601; t=1707467348; x=1708072148;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CYwym9bcvYVUdfgrQAx0w53qMrol8jdhzpg8cj+Mxlw=;
+        b=l75QQTMMBFBVZqHtMIChEIfQIPnlJmJ6jfLGIJXJxnKIf7wS/IvqsjjwXuoupjxPFD
+         935s9eNdlp5S3WT2Pw+YcbPzlIV0Yu/rE3rpPF9URtOZ5K1UC36R0pQ6DDSML4NcCSSc
+         pCKmKu/949h6i1Stb2AspYEXTPRzInDkAS8OQFMIw1ym4XzWc1tT4RhtN4nH7Rz1dXMp
+         I/bRolVWQuq6mWKUp9uiNpGgLNL5z8fqIlmV10+CexRhPN4iFhE6cO7cPcIxOxPeDBRj
+         pbXjswUGo4QlwFw3AplQryDssvhEvzuxr2ZyKSXbAJWIdCSPFtWsBHTJGv585sRXE+wJ
+         LkFw==
+X-Forwarded-Encrypted: i=1; AJvYcCUzFvMDyZAU9ImXyow2DrAKphnpu0pykgFG8HtHtJQtgX/yeCEE7v3Ta/zS1BwMT2XqK9ORmlEkNtGQ+MsNglWj/NrFbuUj
+X-Gm-Message-State: AOJu0YyV9DOY8fsgOj/eUgjqceRQ4wGsBeV6t+IovtYS4S2/gpcPjaXg
+	kDrvbbde5SFTyTfslE4x1tjA77e9anRKrglEJX/nR438sTeWbJ/p6ASOt9fH+Zyhp02mqNPyS0d
+	gKVkl6pta1XizAbJt77U1jpfTJ2QdaCXgnn/eDbK6Z+tRntCmxyMlAA==
+X-Received: by 2002:a05:6512:308e:b0:511:4a3c:bc67 with SMTP id z14-20020a056512308e00b005114a3cbc67mr667569lfd.9.1707467348832;
+        Fri, 09 Feb 2024 00:29:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGwQzReLeDNTCJB+qOG+onzJW+a/6xHFTd6Il5yE+rs5dotq6oI7ml/IRzP9nwb4WRCRf2AHg==
+X-Received: by 2002:a05:6512:308e:b0:511:4a3c:bc67 with SMTP id z14-20020a056512308e00b005114a3cbc67mr667543lfd.9.1707467348491;
+        Fri, 09 Feb 2024 00:29:08 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVpQeKhZnUF9IF482WFoi5RSuK2K0dPm/viY5gZvvdBGW8PlAajaezs2kgDI06usWdUXLoRirtPMouC6vzNVLm1ebJIWnLWDLZ0GEN+Ijk5unz/HqQMvORGDIXXL3Dtf+prelx+pNyvYgYqYusGnquqaTXZA7QhS6HkQap6Y42pIVEN3/EQmJy7vAJs2JpmpxDIiPxkRPxrVbsmZSVnuPOwCDkwsek/pGDlArNd6Bhx7ExRfGSaMOQ2ipZnPHh4xKDAKmuDjNtcq0sQclTvVZDBpof/gkZtZFbDZHPz4rmJ1ciKFyS3O6Q898x0YkZAk2y+sY3IzMbJvaRgk+otdK75cu7gdEwEl57Q4sWFImYaPJDLS4LbMQtxErNNwect2IH8XoJ7esHEcOsAFRZwxa5aVSJRog7z8LtqPN/lXwq8u0iG8XVW+VdnuP/432M3PyFw2p8MGpGvbbSILN0vtIlZUve5ulCwIGBluVrh3YxuLzmOOdbG19SRLy0gaYXvLczv3TncY87RBF6BZarBaQ6IX1OF
 Received: from [192.168.0.9] (ip-109-43-177-145.web.vodafone.de. [109.43.177.145])
-        by smtp.gmail.com with ESMTPSA id x21-20020ac24895000000b00511749fec62sm90472lfc.72.2024.02.09.00.28.22
+        by smtp.gmail.com with ESMTPSA id x21-20020ac24895000000b00511749fec62sm90472lfc.72.2024.02.09.00.29.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Feb 2024 00:28:23 -0800 (PST)
-Message-ID: <cf01bf0c-ad31-4bb8-918f-98de47d40d7d@redhat.com>
-Date: Fri, 9 Feb 2024 09:28:21 +0100
+        Fri, 09 Feb 2024 00:29:07 -0800 (PST)
+Message-ID: <92633259-1a46-4342-a709-7200c6d215ab@redhat.com>
+Date: Fri, 9 Feb 2024 09:29:05 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -68,8 +68,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v3 5/8] arch-run: rename migration
- variables
+Subject: Re: [kvm-unit-tests PATCH v3 7/8] Add common/ directory for
+ architecture-independent tests
 To: Nicholas Piggin <npiggin@gmail.com>
 Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
  Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
@@ -82,7 +82,7 @@ Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
  linux-s390@vger.kernel.org, kvmarm@lists.linux.dev,
  kvm-riscv@lists.infradead.org
 References: <20240209070141.421569-1-npiggin@gmail.com>
- <20240209070141.421569-6-npiggin@gmail.com>
+ <20240209070141.421569-8-npiggin@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -126,7 +126,7 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240209070141.421569-6-npiggin@gmail.com>
+In-Reply-To: <20240209070141.421569-8-npiggin@gmail.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -134,15 +134,21 @@ Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 09/02/2024 08.01, Nicholas Piggin wrote:
-> Using 1 and 2 for source and destination is confusing, particularly
-> now with multiple migrations that flip between them. Do a rename
-> pass to tidy things up.
+> x86/sieve.c is used by s390x, arm, and riscv via symbolic link. Make a
+> new directory common/ for architecture-independent tests and move
+> sieve.c here.
 > 
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->   scripts/arch-run.bash | 115 +++++++++++++++++++++---------------------
->   1 file changed, 58 insertions(+), 57 deletions(-)
+>   arm/sieve.c    |  2 +-
+>   common/sieve.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
+>   riscv/sieve.c  |  2 +-
+>   s390x/sieve.c  |  2 +-
+>   x86/sieve.c    | 52 +-------------------------------------------------
+>   5 files changed, 55 insertions(+), 54 deletions(-)
+>   create mode 100644 common/sieve.c
+>   mode change 100644 => 120000 x86/sieve.c
 
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
