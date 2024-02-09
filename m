@@ -1,65 +1,66 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75197EF17
-	for <kvmarm@lists.linux.dev>; Fri,  9 Feb 2024 17:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CAFA7EF03
+	for <kvmarm@lists.linux.dev>; Fri,  9 Feb 2024 18:09:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707501446; cv=none; b=iP7jeP4tLjslmy4vD+ZhNGghdZa3q0bktm5l6NsWenTcj5L+GCB1EL2UfLX9fHbSlN2AnWNuI0EB2iGZwfe7whkl21q0NuICfqOm0EUFKfOxc8KRCjc41db0V+uyyFrKVbF2xzyriw4Ty/xuLu9lkxIxVrcxq9D38BZO12Tug8c=
+	t=1707502153; cv=none; b=iX80hh2yqxBSdwDHs3Yb2rmlqu5N5Jm5EhmGcFNxUWtphe47CEEYoXrExFi2onaWTEliiYSktntEPaV/MigYQgQCl/2DSaoBCv0lkzN6ecRMNyipk/QInizEdxoxMzV/uaNComYPoKRfSq4oVTEuXziOQJl+m+nkZU13XUJK29Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707501446; c=relaxed/simple;
-	bh=Ullq2irJQ2xO6WZijRd1IqfiDrXBUIKp6+qZkaAWTd4=;
+	s=arc-20240116; t=1707502153; c=relaxed/simple;
+	bh=iHIuE205CtTkxTOJ8QBT9VX2BzHHxLYDd/fid54PptY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hZdBmMagx/xv99BCvxPWYDer54OFsPybPFmqqgHi0H+pfplp/hTYn4xI3hgelaX/Mbwe5AoMscwhBNUPWlnQutDgNqz03hw/CDGSibDO6u7oh0rhP6Wk3ICzXZz2jcMv2qmqa/96j+9BTS47XklsxNzKFyDZ5Phvae7pBS+45yE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PPC5XmDG; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=GPP56pCUf9Jb0/V9mX7GD6ZA7WzuYR5cblLY9WblADH++S3FUQQRKRFUM02ZNqmpl1KGws2jUPrhq7TPOkfbYytzab/4IIkp0HRyGD0btkgWR/IYJYaWp87/Za27rIH6B7mLM+vlCjRHsIRhdoCFAQRVOxXFa1jQjX/VHjCUf58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JQHPGWmP; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PPC5XmDG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JQHPGWmP"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707501442;
+	s=mimecast20190719; t=1707502151;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=2kgITGNgRH4Wqk6mUUFnib2/8oqDp6rW8fOt5+7CaGI=;
-	b=PPC5XmDGBvqKXPIj5WdfBw6jE58eM6EhdzRfuAfs2GNOcc2H+NIbz0LNykEfDeSpburPTU
-	iNhNmuagYrekW4yMsMxQqU/12ZRufRT1YjTeLcPp6jgincqqbAwehlUExuf8g5OFXNBy3j
-	tEDL9za3/it0t2koGaLoQWj8rwXX43g=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=qWJBAjq5kZHM63Q92oX8rd7RVwpgAQWVuCWuJw6H2GI=;
+	b=JQHPGWmPbf9a22s9pyL5w8Y9pXiNV/y0OwXCGnXWepToDikQfSsndkquqGTkgaC2NSX5bk
+	tofIbygtxFX4EsKbEKmw9HJEKv6PV0cgFIfIGJCQoZSU6UKV6r6mv5z9ZxiKcErNW+x7Ni
+	CMHRJPYUxj3hVaqH6/Z8UE2zxq1AnM4=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-587-96MxkYTrN2Gfw_WYPQxyRw-1; Fri, 09 Feb 2024 12:57:21 -0500
-X-MC-Unique: 96MxkYTrN2Gfw_WYPQxyRw-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-781d8e14fd8so148831885a.3
-        for <kvmarm@lists.linux.dev>; Fri, 09 Feb 2024 09:57:21 -0800 (PST)
+ us-mta-624-DFiOw-FCOry5NMhCCBurog-1; Fri, 09 Feb 2024 13:09:09 -0500
+X-MC-Unique: DFiOw-FCOry5NMhCCBurog-1
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-68c4e69e121so17618566d6.2
+        for <kvmarm@lists.linux.dev>; Fri, 09 Feb 2024 10:09:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707501440; x=1708106240;
+        d=1e100.net; s=20230601; t=1707502149; x=1708106949;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2kgITGNgRH4Wqk6mUUFnib2/8oqDp6rW8fOt5+7CaGI=;
-        b=p26oQlNxE7rOLUOeYDCNrd9odHLYF4dxgZwXAb2zrndq6k5nK16AkSyNR/G9dg9C28
-         6myIOU/7KC3w4imAa7Bo7dXueQwMY6o2TD10J6WYlfZKVXDnP/wZHzauuKRkPe7bp2Ad
-         jMxmchgmv+e6Ey0gqQlnKgE6y7pZOrKepMaaPTV6O/ER4QyxWsKYJ1J2N4v4Hkxul/vR
-         OpWRKiX2qS44cFVbx8mNWcyT+fK3NNF2KEgsntJEFj64x0ypEsXJooH+onyGuCHzOEyU
-         fUk2d+UyS7Gws1cEu2ry4Yy/Ok4gNoVPQ/YcnlE3EivPizS7hqQeepiy53CNCvfvpp5A
-         TdOg==
-X-Gm-Message-State: AOJu0YxiA8Q0FtKuu+9DTIEjFkwYo/DnHMgxw0L8u9oBGmEV3eLnCgat
-	wwnW8tSP+SOsnO2r1xdSxqgpWPFxDICVaT7+2QMP7jQ7dfhkATuS5METfX05pn6Mt0T0OsB0Vmu
-	tzy3OasiZpS1aqgZuhsn6UZSimo3fRxGbXNv2uH7gGVuocnllEsjohw==
-X-Received: by 2002:a05:620a:199a:b0:783:cb5a:ec3b with SMTP id bm26-20020a05620a199a00b00783cb5aec3bmr2878167qkb.71.1707501440697;
-        Fri, 09 Feb 2024 09:57:20 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFh9eBa+uL0TgU8I7s2UC/0d5VeQVwvoUVp9Qb/f8h1ezUPmyU5PofF8iaO+q5Htkiy1Je+JQ==
-X-Received: by 2002:a05:620a:199a:b0:783:cb5a:ec3b with SMTP id bm26-20020a05620a199a00b00783cb5aec3bmr2878147qkb.71.1707501440460;
-        Fri, 09 Feb 2024 09:57:20 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXxdog3KtAVjA17ihb7yJMbtJys8LsF81l51sg4R8zhMr2ceg2lq62vOmj3gdhH39XD6aOFg9/L2Tk7nAT44EypfeNloh5Yb7v4MNhzbRx4awkuF9OcLqiBSxinoNtZLQBjd50L0P1ROKqAWPwz+/ohXd3W9z1cF830kNeU2FJXwo8LBlzxZMk/AsGOGTG7TvpjQJSar+4xvsPmATSrwMdekkSzwlnVvUqAtnC0xfnJVhcy2Hmwxh4+pZu2R3EXYzUgXla5jBmGgT1V2oyqG0bckI9VnJeIVGRD4sIsai7qCEtnLQHCyTtxBJWqJ+wj5SuLs48NSjgUR9iw/Pswh+ZmZiJOGnuxamkYGHPerL947oleU1N+nqSQmvm2Hpcrd3vXFVykzbExpeInqc9aC4rz6ohJv5jdthDnIk9YkLNxuQjJmRdFIKgVoKuyURm1BI+3Vnx2cIYKcvMdK74s3GZinvKMrYLpZcLDpnQGHSWPH4yUTeqivOQ3O1cRuvuqj2A4zqr0mjnP5HtxAM2hrc/gYj4Z
+        bh=qWJBAjq5kZHM63Q92oX8rd7RVwpgAQWVuCWuJw6H2GI=;
+        b=kIBC7c6xZcIOvngr/7CIoP9DYm0bWld4/bJBu09et5YXRq6NmO1yMmqV0bkVyMCvs1
+         oURynkKD4ZqUHo1mSTtrgktOWh5nEZByf2Li0eCRKOpC0zOTUpClDL+k0aASe4e3feav
+         V7EYoo6pG1Wyj5LjoNaFR8HoXdkkZaVZQ2OkH4wPeKajfDKbVytB9LShrU+05yhlAuQ0
+         uRtZlf6wZNwfS9BO+cAN69DJ1zJROgB387w5FdYBMBZeNSt/CdwZZ0Xky97q4LFKEJ6q
+         8ML5wA2+cgAPlgxcJdBMQZQTmnvTwfwW2iwWzdWBZr4HLEBwbbm3maTvyXK5K0sobi7F
+         g6Gw==
+X-Forwarded-Encrypted: i=1; AJvYcCVo4bKF/5fay00DpXmHcvArY86J3gPJ87HOa/2KXN+fMSzi9qQ78uFw8cqnAT1c+KrSzKWvz+7fFDuYyWszpJWWBoIhTw7S
+X-Gm-Message-State: AOJu0YyfGX5hEc6VltPM63MZbMp7Kh+sjoZWVkTqtyhJ9cUqOJFI2lmi
+	218WoT57cbGwQcGYLGc00rUtAyjmEIdKa25srxzzpK4/Crmns+/vSqZCPddZihT8ubBLEnyicv+
+	rPfAek+OhFzMoPheUCu7iscS+P0g89gpR7i5fA5DEh6sAaWlrF3G0Wg==
+X-Received: by 2002:ad4:5de8:0:b0:68c:8ee2:3fa0 with SMTP id jn8-20020ad45de8000000b0068c8ee23fa0mr2785584qvb.11.1707502149281;
+        Fri, 09 Feb 2024 10:09:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFtzks+e9Q2nimt+WHV4/eU5Wb7t5tJ07+77h0Wfr/SqqBOd3XyU6wdarwiFxt+G5VuHWYrMg==
+X-Received: by 2002:ad4:5de8:0:b0:68c:8ee2:3fa0 with SMTP id jn8-20020ad45de8000000b0068c8ee23fa0mr2785554qvb.11.1707502149049;
+        Fri, 09 Feb 2024 10:09:09 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWm4MgHh2FuocfMr0j0YAziH9jnpLxw46Vk1gOt4DPPwLZGIhOFvbtvc2/NiWd4RNK75vzcuho0FcXE876/WlhV32JQvZcs92n5psQ2MHVjJhkOnMZhtDfnlBlbEyjISh4Ki63oFKfhMZRzNE0YXFQVTnDHK4EuiQWSHTfcYtgBujW0y+WOniq1nh12MLWwXkry7LTR8a1JSfzQKZeEdTuRv2PEt5AibI09JqiKUTa6+3dvCZgAxHBnXYGbAYqrCe79U2CWjKHUeiN4WQ5LOqVWkBaWFIpsbfnW7RbQ8nUlM90s63Wf5D6WtoC1NpGmcCoWN8x2XRb/0P4vjhE0HXfnm9WPXwNKe3EdHAoPIO/+GcwI5Ln0ZPSxQSG2MmGK3tURNtcSNMsPjW8cM+BKpMVMt1HzkmXzcKg8KSkOQlRAWmIKyHq6a+9QMgm7oMb7bS0hUHzvOPTBx3kUUWWY06ik0mLyanfYuqeNFC+y718Zv57yIlofZac+3lzCWRXkoRvD6tPqHVKJF8aFGOMfHzaeCs1w
 Received: from [192.168.0.9] (ip-109-43-177-145.web.vodafone.de. [109.43.177.145])
-        by smtp.gmail.com with ESMTPSA id f6-20020a05620a12e600b0078552b5e161sm896441qkl.78.2024.02.09.09.57.17
+        by smtp.gmail.com with ESMTPSA id mc9-20020a056214554900b0068cb9a819a2sm1045597qvb.28.2024.02.09.10.09.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Feb 2024 09:57:20 -0800 (PST)
-Message-ID: <54232155-ef97-4911-b1c7-acc7ee06a676@redhat.com>
-Date: Fri, 9 Feb 2024 18:57:14 +0100
+        Fri, 09 Feb 2024 10:09:08 -0800 (PST)
+Message-ID: <62518aea-1214-4d33-8a15-41f1a494ee0b@redhat.com>
+Date: Fri, 9 Feb 2024 19:09:03 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,8 +68,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v4 4/8] migration: Support multiple
- migrations
+Subject: Re: [kvm-unit-tests PATCH v4 6/8] migration: Add quiet migration
+ support
 To: Nicholas Piggin <npiggin@gmail.com>
 Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
  Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
@@ -81,7 +82,7 @@ Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
  linux-s390@vger.kernel.org, kvmarm@lists.linux.dev,
  kvm-riscv@lists.infradead.org
 References: <20240209091134.600228-1-npiggin@gmail.com>
- <20240209091134.600228-5-npiggin@gmail.com>
+ <20240209091134.600228-7-npiggin@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -125,7 +126,7 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240209091134.600228-5-npiggin@gmail.com>
+In-Reply-To: <20240209091134.600228-7-npiggin@gmail.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -133,17 +134,16 @@ Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 09/02/2024 10.11, Nicholas Piggin wrote:
-> Support multiple migrations by flipping dest file/socket variables to
-> source after the migration is complete, ready to start again. A new
-> destination is created if the test outputs the migrate line again.
-> Test cases may now switch to calling migrate() one or more times.
+> Console output required to support migration becomes quite noisy
+> when doing lots of migrations. Provide a migrate_quiet() call that
+> suppresses console output and doesn't log a message.
 > 
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->   lib/migrate.c         |  8 ++--
+>   lib/migrate.c         | 11 +++++++++++
 >   lib/migrate.h         |  1 +
->   scripts/arch-run.bash | 86 ++++++++++++++++++++++++++++++++++++-------
->   3 files changed, 77 insertions(+), 18 deletions(-)
+>   scripts/arch-run.bash |  4 ++--
+>   3 files changed, 14 insertions(+), 2 deletions(-)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
