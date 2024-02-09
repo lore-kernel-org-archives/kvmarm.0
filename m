@@ -1,65 +1,66 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042BE657C7
-	for <kvmarm@lists.linux.dev>; Fri,  9 Feb 2024 07:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27984657C7
+	for <kvmarm@lists.linux.dev>; Fri,  9 Feb 2024 07:32:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707463754; cv=none; b=dZ7dhmPGKcaCQdLfekZa9uKCSmYcuQVdPcdYgYEhSe85xvk0zmSNuAfzz2MDlQrRsDIENZ1VZDqNLpGfPaM1eiAfQaavygsQxbpiRMR16kzfnD/2XlSCG/GuAYzrjAC+g0Aw+NP+l2LHd3FnuARz01hngA9/4VoK0j8w2VVBshQ=
+	t=1707463977; cv=none; b=lmz6smyz4m2issvBB5DfdRJu/4/cnK412T7njoqxqj350cAJPArU/QttcJdL4ZQEFLlLwDp9W0IJbkBTAQH33ewUWALZLMWgGYrZY8eo4hyrdn5af6UInf/WX9IFQWGsnSd1gCEt+F56fsw8s/j3r93VO5P8XCdNAKwDhRwLPR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707463754; c=relaxed/simple;
-	bh=xcZp+8mbHI9tXdmnrUIdeuEPJKN3vo4PeeisEgwX/ZY=;
+	s=arc-20240116; t=1707463977; c=relaxed/simple;
+	bh=9/Aq/2z8oD43W7SROZgPyPplNP52aS000UhYAL8rihM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kPNaf0TZZGyR5rHLL1gz898P2f3OjX95Jrr3bpPaaqSIhqtZ4CIrttyTrmNVtKQRM60Eozwqbfq21M2qg9u44ILObDw7MOUHJxptCV6nb5Na0/8syE6/8FEFpbXhHtWeG+TvDaUYPkZPP89i9v9dy98WxHZpgZZjOilWNGNFN98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YGzJRq0u; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=tVxq/KPUo/dL+mF85EDHbrxdicq9U0fDbo3XO3bmvM0pkBSDXb8HP5LZPzlapp7yI0CxRaXxPsB7mzfODthgR7vl4II/UkvzYzHDqayFKcN5VJ+Z8yUoTao7I2cnn/IwrKFhO1DEJ0NqK0F5z/Js3JJ+OGhKVq5puWx90OV3mec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RhrsSkaR; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YGzJRq0u"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RhrsSkaR"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707463751;
+	s=mimecast20190719; t=1707463972;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=/kCQkh1KyEVD4cmjxJdTLiN9QRnCpv4ZYb6SgTC6zQo=;
-	b=YGzJRq0uhYJKfgIBbI9MURxwYQteEcBy0ecKvIMwvKiFYWrOoyL+ClKVOZJqUw9fwZvdpB
-	4UKME4PpDui24bVu5ym/LL6MNkGtr9y0W3i5tVv5Br+Wkly9FJ7bnToiFocYi2DTEw5v1H
-	/igI9g60zaKkQDKCRRD01shCPk/v6p8=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=yY5P44hxC1Z4PKZ/FATMU8IHl7NhMLgeWkQFsYKZ1O8=;
+	b=RhrsSkaR9vSD7hp6+1CEVBg3kGc//i4uhbrHSs4h9wDsna4/WAQ7catPJK28vLm7iTlrsA
+	VGt77eWF6L+H1tWUYn5WIm84u8oiUxSl51I/yiOKJ7g9/LjUSOX0xQKZzE6fGeyCpMrw4n
+	8zngoPhGR60X7tVV1rMm+lQGYbqGnoY=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-417-gy_tXUvbO22rPSUYIR0pMA-1; Fri, 09 Feb 2024 02:29:10 -0500
-X-MC-Unique: gy_tXUvbO22rPSUYIR0pMA-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6800aa45af1so9764116d6.3
-        for <kvmarm@lists.linux.dev>; Thu, 08 Feb 2024 23:29:10 -0800 (PST)
+ us-mta-433-fR6kEbLGOEO2hFWTq3eiqg-1; Fri, 09 Feb 2024 02:32:51 -0500
+X-MC-Unique: fR6kEbLGOEO2hFWTq3eiqg-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7830ab8fb5aso79235385a.2
+        for <kvmarm@lists.linux.dev>; Thu, 08 Feb 2024 23:32:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707463750; x=1708068550;
+        d=1e100.net; s=20230601; t=1707463971; x=1708068771;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/kCQkh1KyEVD4cmjxJdTLiN9QRnCpv4ZYb6SgTC6zQo=;
-        b=RGcLMubHIBX1cr9p92Zw7EsIo1LN8uZJqRxq8i++i2j9XMyMbygHD5WuC2l8ZbCVpt
-         Rj3uz6xW9+xq9wmPMlergFU5/CSXsvOJ6qwI+BVe9DmWA2ANB8j1zbAqF5vSpb5B71MD
-         N/H5G4H9Q+Kx4eDq9xdIPRYvFKN3dHHf/cyWJ4bWf2jGHfJRbVaY4AvVRlWZDVbX2ElS
-         4X+W/VdQtI0h844LSe0HUWwDabMoLVSsQp1xmTHzesBfkWEJ8wQVmvvad+l+2prvcrp9
-         RF9rbJLImsThEMNV2f5lL1QwRkpkkzEHWZyV9UOMtFgWp4REC/uXrJaZ7GzHGuY+hlmo
-         FIfQ==
-X-Gm-Message-State: AOJu0Yya2luFEL77lDlal4dk6xUW/zWYIQtyUaOxCw91BD5P5eDvWPaC
-	y5SGnGO2+0I743gRX3MvPqsmkkenFDRSpWlQsOwf9cofvwCeBNXjcK2nkHd+5+8exTsj4NALmqC
-	+lWW8z3qHRCJnwKC17XWhaIf0xBKBRchQZbUHm34k0anpzB5sg6NWTg==
-X-Received: by 2002:a05:622a:1893:b0:42b:eba5:ddfa with SMTP id v19-20020a05622a189300b0042beba5ddfamr1059543qtc.45.1707463749918;
-        Thu, 08 Feb 2024 23:29:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFMxjVKgUnE4ZnmcUKcBrw8kAOVCQv/Rc0MeOA1nppU8LiVZdGnfF07uBuSMXuz36m7DpRJVA==
-X-Received: by 2002:a05:622a:1893:b0:42b:eba5:ddfa with SMTP id v19-20020a05622a189300b0042beba5ddfamr1059535qtc.45.1707463749665;
-        Thu, 08 Feb 2024 23:29:09 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUUx7B+ytx1jxJQX4+UCEaD6tXqKT6ucApPaiWJaZykn+w/0+a9uoX07+JiQbkbUn2PocH3WgLLSAwUWCRqHLGHfWw2RM4gftDO26hfG00892hDH/nJBHtY35xRnxec4jWrutSej2X3k58etZWZejKzojLkXvBJ7hvnLpXN0AoJ2560dbm7gHPx7EJppgxU63rFF0u8DPA+3VHkOqpci+TKf9Wp5TIhYbCCaygZuy+m1DQ5pbTM1MKkDYTdZB9UnU9lQPdwTJoEvO97tO2IdFk9FiKPj9ddRMld7j1xZPqY547vGm/HC+tp1mEl/USbhRvbnQ72Ad5RgfOARa2559A6Vt+yf24Q/bOtJmEGg3B6CWBY7L0Rg8RDCDi+fi04SNLskUP7nJczW7S7vwmU2WPv2EqZ+9Y53w1KMMTYX0YLPc/MGl6CV0YUBpPrD4O1KSAwTn7NQhEycInPV/3oHrbqfF7HYyqpqWNB9zMeyggz1/irjDv7QjtE1NmSqRVyQwe64oC6pBEOXKjOMY9TXeo57xpo
+        bh=yY5P44hxC1Z4PKZ/FATMU8IHl7NhMLgeWkQFsYKZ1O8=;
+        b=lZUmAX7qvxn75dZjt+mqGTsUHp8lPP58C+IXKvyMIMtC2WJp//fFkOKK9NpvP3pEKz
+         h6kk/wDrgS2d9tVpyU+GisGMnvG9wDHHFrGzgOT2TDlhRTNC8IJWir6TCM+ySr1aIbmw
+         lDwGiqPFWtadcd++O9chv7jgvzpWNygeyb690zoQyp7LdIYQ5Jl+zjL3GQJ70w7X5IVa
+         2K877h31/jmX+g1wHyccltKS3Np9Q/4uX0doQAAt8tZE0SuzfJ0wVYa2AnM1R2VukVdc
+         K0LnbDLpEWxMXN7fiYfl01Jp4+YIcJ1Bl7dXAzZwjWiBsKa88vyc8564UFqI1dPSxuac
+         XO3g==
+X-Forwarded-Encrypted: i=1; AJvYcCUdm2Rhc/wxToPZKR79Up+rALjWGZ1N3ZugNvhW2qgp2yJ009A1vUwxdTUakVQJbkItYqhGC1e7JD31mQk4XblJ+JumYi5u
+X-Gm-Message-State: AOJu0YxqjkwXX6wTH7P2/KOSvePfXzt7ZAVYQQ9FK2heEC5S+ieK0HRO
+	K5guTtsBae9yVyD7vkJD7eOAeEopWy/ZXqHARUcXyQ08KCdqdxTckza7+yLkOv6PPKWBsvLufOX
+	nPCT5neNBFreK2vR5466qQcfIx41KeTRtEYwa10wd7fAk9aU6Duvc2w==
+X-Received: by 2002:a05:620a:4511:b0:785:4de5:e0cf with SMTP id t17-20020a05620a451100b007854de5e0cfmr839625qkp.13.1707463971214;
+        Thu, 08 Feb 2024 23:32:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH4tY5Tcj89/zw20tYT8a6Jj/CYnx9p7WyOp3A/Ob697w4U92gMwrcyM4oLMZ/oN/aG7asvNQ==
+X-Received: by 2002:a05:620a:4511:b0:785:4de5:e0cf with SMTP id t17-20020a05620a451100b007854de5e0cfmr839609qkp.13.1707463970921;
+        Thu, 08 Feb 2024 23:32:50 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCViAPNQIorc1kcwO9Rgc7RZTcKOU+uPz9myAgQRlco7n9MJu4+j2FyLRzCrI7EgnJc23AYjLTYW6JcxjAVZZzSUmcpZ8ZpKJxYIgvjz1QWTyq5LskBqsyYI0YzOnEryES2gygi9HP/Y4XD8F9zH7lzArTKcDiQ2mC8jERMIM7x2eDHad8G88x3XEdWcCtcN0OfqdzRFADac6Pyv6cISSEArBzIr6EBL6VHAfeV2rQAa1Je36FomE+MGCVXsYwf0ZeiMZafcy3S8m3oPhOBH91GFtpdTSN2o17dxaQ6I6ZIDliqB+kVl1Wo1ZlDeooyJ3eTFUOj00GAxNMvoPkiPU08uvqFLelS4ozgy9YqifaRBfukJSg8deIo+plDKu2G8vUdhWXhbh6bJ05/9E37SFwWQgei5LKmRulsNS1bHe+OahtONEUuOKGiEwbGXzz6l+n/lphYZukXvHhuD1A9lkc/GYAkRMJ9GyFShJTby9cECwc3g+UnAnxLQXV/TYh1fNVL80nqZE4ydMi8Xzf0Yb0/fXriF
 Received: from [192.168.0.9] (ip-109-43-177-145.web.vodafone.de. [109.43.177.145])
-        by smtp.gmail.com with ESMTPSA id c19-20020a05622a025300b00427fb1d6b44sm480566qtx.5.2024.02.08.23.29.06
+        by smtp.gmail.com with ESMTPSA id d25-20020a05620a159900b007840a08a097sm505152qkk.76.2024.02.08.23.32.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Feb 2024 23:29:09 -0800 (PST)
-Message-ID: <4203f6dc-ad8c-4bcd-a366-f50f866c55ec@redhat.com>
-Date: Fri, 9 Feb 2024 08:29:04 +0100
+        Thu, 08 Feb 2024 23:32:50 -0800 (PST)
+Message-ID: <9fb2f113-db36-41a6-a6f2-0499f28ace0a@redhat.com>
+Date: Fri, 9 Feb 2024 08:32:45 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,8 +68,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v3 1/8] arch-run: Fix TRAP handler
- recursion to remove temporary files properly
+Subject: Re: [kvm-unit-tests PATCH v3 2/8] arch-run: Clean up initrd cleanup
 To: Nicholas Piggin <npiggin@gmail.com>
 Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
  Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
@@ -81,7 +81,7 @@ Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
  linux-s390@vger.kernel.org, kvmarm@lists.linux.dev,
  kvm-riscv@lists.infradead.org
 References: <20240209070141.421569-1-npiggin@gmail.com>
- <20240209070141.421569-2-npiggin@gmail.com>
+ <20240209070141.421569-3-npiggin@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
@@ -125,7 +125,7 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240209070141.421569-2-npiggin@gmail.com>
+In-Reply-To: <20240209070141.421569-3-npiggin@gmail.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -133,66 +133,45 @@ Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 09/02/2024 08.01, Nicholas Piggin wrote:
-> Migration files were not being removed when the QEMU process is
-> interrupted (e.g., with ^C). This is becaus the SIGINT propagates to the
-> bash TRAP handler, which recursively TRAPs due to the 'kill 0' in the
-> handler. This eventually crashes bash.
+> Rather than put a big script into the trap handler, have it call
+> a function.
 > 
-> This can be observed by interrupting a long-running test program that is
-> run with MIGRATION=yes, /tmp/mig-helper-* files remain afterwards.
-> 
-> Removing TRAP recursion solves this problem and allows the EXIT handler
-> to run and clean up the files.
-> 
-> This also moves the trap handler before temp file creation, and expands
-> the name variables at trap-time rather than install-time, which closes
-> the small race between creation trap handler install.
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->   scripts/arch-run.bash | 12 ++++++------
->   1 file changed, 6 insertions(+), 6 deletions(-)
+>   scripts/arch-run.bash | 13 ++++++++++++-
+>   1 file changed, 12 insertions(+), 1 deletion(-)
 > 
 > diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index d0864360..11d47a85 100644
+> index 11d47a85..1e903e83 100644
 > --- a/scripts/arch-run.bash
 > +++ b/scripts/arch-run.bash
-> @@ -129,6 +129,9 @@ run_migration ()
->   		return 77
->   	fi
+> @@ -269,10 +269,21 @@ search_qemu_binary ()
+>   	export PATH=$save_path
+>   }
 >   
-> +	trap 'trap - TERM ; kill 0 ; exit 2' INT TERM
-> +	trap 'rm -f ${migout1} ${migsock} ${qmp1} ${qmp2} ${fifo}' RETURN EXIT
-> +
->   	migsock=$(mktemp -u -t mig-helper-socket.XXXXXXXXXX)
->   	migout1=$(mktemp -t mig-helper-stdout1.XXXXXXXXXX)
->   	qmp1=$(mktemp -u -t mig-helper-qmp1.XXXXXXXXXX)
-> @@ -137,9 +140,6 @@ run_migration ()
->   	qmpout1=/dev/null
->   	qmpout2=/dev/null
->   
-> -	trap 'kill 0; exit 2' INT TERM
-> -	trap 'rm -f ${migout1} ${migsock} ${qmp1} ${qmp2} ${fifo}' RETURN EXIT
-> -
->   	eval "$@" -chardev socket,id=mon1,path=${qmp1},server=on,wait=off \
->   		-mon chardev=mon1,mode=control | tee ${migout1} &
->   	live_pid=`jobs -l %+ | grep "eval" | awk '{print$2}'`
-> @@ -209,11 +209,11 @@ run_panic ()
->   		return 77
->   	fi
->   
-> -	qmp=$(mktemp -u -t panic-qmp.XXXXXXXXXX)
-> -
-> -	trap 'kill 0; exit 2' INT TERM
-> +	trap 'trap - TERM ; kill 0 ; exit 2' INT TERM
->   	trap 'rm -f ${qmp}' RETURN EXIT
->   
-> +	qmp=$(mktemp -u -t panic-qmp.XXXXXXXXXX)
-> +
->   	# start VM stopped so we don't miss any events
->   	eval "$@" -chardev socket,id=mon1,path=${qmp},server=on,wait=off \
->   		-mon chardev=mon1,mode=control -S &
+> +initrd_cleanup ()
+> +{
+> +	rm -f $KVM_UNIT_TESTS_ENV
+> +	if [ "$KVM_UNIT_TESTS_ENV_OLD" ]; then
+> +		export KVM_UNIT_TESTS_ENV="$KVM_UNIT_TESTS_ENV_OLD"
+> +	else
+> +		unset KVM_UNIT_TESTS_ENV
+> +		unset KVM_UNIT_TESTS_ENV_OLD
+> +	fi
+> +}
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Looking at the original code below, shouldn't this rather unset 
+KVM_UNIT_TESTS_ENV_OLD after the "fi" statement?
+
+  Thomas
+
+
+>   initrd_create ()
+>   {
+>   	if [ "$ENVIRON_DEFAULT" = "yes" ]; then
+> -		trap_exit_push 'rm -f $KVM_UNIT_TESTS_ENV; [ "$KVM_UNIT_TESTS_ENV_OLD" ] && export KVM_UNIT_TESTS_ENV="$KVM_UNIT_TESTS_ENV_OLD" || unset KVM_UNIT_TESTS_ENV; unset KVM_UNIT_TESTS_ENV_OLD'
+> +		trap_exit_push 'initrd_cleanup'
+>   		[ -f "$KVM_UNIT_TESTS_ENV" ] && export KVM_UNIT_TESTS_ENV_OLD="$KVM_UNIT_TESTS_ENV"
+>   		export KVM_UNIT_TESTS_ENV=$(mktemp)
+>   		env_params
 
