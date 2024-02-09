@@ -1,55 +1,58 @@
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F66664D5
-	for <kvmarm@lists.linux.dev>; Fri,  9 Feb 2024 09:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04BF664C6
+	for <kvmarm@lists.linux.dev>; Fri,  9 Feb 2024 09:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707469908; cv=none; b=JPAUtU+VQYEaN7w1eMjQg7/0JQJTLyeizjE6SPNXZV6oJifQVvArcL9HEpW0UXp+gArI2ETPcYJZFGPDk1iGydAXgzLWY6twEDuj4JUiNhcnzDP4UECzNJxTe7OMUAP+RPShKhrqJQLr5rx2q4ALhbcIK2xWkvO4/kY4dKEsv4g=
+	t=1707469915; cv=none; b=QvWq26woV4W4T3X9/oJ/xBb294zzR3iT8dMv2AE3bwkqcpblsBYXGGBnOzP8igAM/c6+Is8WLseqb4cD0iM+FC5fpMdPLarDTmEQHBjrUoVHX9IQXiOxJtABWtu8yIYnFKuKxAOhHzFXd0JCUsJ1gUbidsmpjnxF9f/FMl/EAes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707469908; c=relaxed/simple;
-	bh=B8anZMNRBPcLlvRLKlObFqArty/ywxPpo4Jp/46Vlxs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gv6aC47V0gNksNzSKLlwj6Uo71jfw9xeLCBQtYRzM2utwlwnqL6l5vVVNQ1PFgahfuayvN0a52faswuKrwSrFjhq+W38oj6HBBhiP+RM0PtptRapIeJpYmpUxJ1V5QtFtOkzyU3pWcN4i42mjIjEP6ebAfhlARBZnsI5SZ4Skzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=imroTF9O; arc=none smtp.client-ip=209.85.167.174
+	s=arc-20240116; t=1707469915; c=relaxed/simple;
+	bh=ZAFsihb3M/bAq0syQwiiUvyBvzmIPevskZf5u2erS68=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=M0/X6zbV4dCuGKwRL48qUB8UXO42rAR6Qky3f861R6BJfyXPqlUJTvnVb4iJ68A55uR5AaT8FtOVfbNM9RcXyfUikFTmKi3Ap/DNunGhrN4XwMQ8+Pf25/SeoanHRpQ3nNVxdcNzw3pcqhjCR7487SVqoNI1jOZk2FudgKJOI0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kH9/nqff; arc=none smtp.client-ip=209.85.210.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="imroTF9O"
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3beab443a63so428021b6e.3
-        for <kvmarm@lists.linux.dev>; Fri, 09 Feb 2024 01:11:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kH9/nqff"
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6e2c402a5c2so381565a34.2
+        for <kvmarm@lists.linux.dev>; Fri, 09 Feb 2024 01:11:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707469905; x=1708074705; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+vVti2Abh8xz/VGQndlLuUefZ1rrTqLcNRInLl4jaCU=;
-        b=imroTF9O29RH/fbvxd2i+mp26iaYYY4rnJiKhUzSlGRTu4x+cagDTjZWEde8EFS3m5
-         9UWSY+ahEmD0I1ZyUBFreU9+7wV7B8oxnqR+s9qBQQHTDp38320zLwrU301sgNjkM5ej
-         HJ8gj3LVQ/7+6d0Be1kx6gmBTTVuhodUM59XLjHQa1h+V8kDzAut1+xXf9ftooKNJTaF
-         bTQfn6GOjQql/RSQ2Fgn8kqQDIYzdRjCNZ7HwyxiAbgKRoF6nUPp14ZQBTJcA1H3ruEs
-         vVRz2KxnwMemsnI9VfLXH/Z1AaxbvW8cmTRf8SI8MkEEdHnH33g8o7PcygQCF90gwceJ
-         1oKw==
+        d=gmail.com; s=20230601; t=1707469913; x=1708074713; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LxyXAGgGrfeNy34o4rw1jwmZjpNeqct9+4wIMTyRvKI=;
+        b=kH9/nqffYwi9kYGOvMrU1AfS2NNA/zgYNSGtFhfWc/g1/mgxUt9heRojnS9xe5fysc
+         RqZ1YWhiUA00lhlEQ51+JHvohVl999HMJEtM59zOu17C1uxWLLcf9BqisfumdEaaukzH
+         otqDfOZmXSSIsgeTInlhOXeCXufrVyxcIux4Ej0a3HlQkAh+avZlkiRCCSmG9qu17rg2
+         xfVkD48wxOdR5RAI02tUaaYJyN/fybKbrvySQSU15hoFvtDFRZIL/itNSmxIibf6QtCl
+         5cBEFZA5crlH+zev1SBF8ipiwqY6eVJylnf1ZDQfY03hQr4xpgSBJKQVDGQQmJMEdDRJ
+         QUYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707469905; x=1708074705;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+vVti2Abh8xz/VGQndlLuUefZ1rrTqLcNRInLl4jaCU=;
-        b=hADYQakfkKhARV6ruI0+MgCupbR5C9ubsgYdY0CwkhVgYiFQqKGNqZs/oeDUbMtIfM
-         OS3Rj/4CcK7BOb0zCoTLFknE9Up0HOk7dIEhzwLKh00Txrhmm+PI5iIAJTkdsD7wRRAB
-         aSXFHMoTycsr0TpngqQZzu2aTa5oTuweUg8essW55J/oOqVwvLcO5g1Zb5gqwAY6X671
-         ULBXURaq3ISjRG+zC/1OflglMYOyJTYBcLrLc77/h2b1y8iKyslq3ddhHO/enW1tT/b5
-         N1QhhTK3tzG3e4khQPSlBhtgVZ0flr92VlIC4sr2slm0TgmiFvC8+Q2UA+5KfxVnW85j
-         wC8A==
-X-Gm-Message-State: AOJu0Yxa71wKNs9qPLfHeivwt7iIU/95636NYucZB55OJagVSYu/BXYW
-	i0kknRVXFtnhNnQDXOZJH+ciSxkB3l/4st2xq9c5/VewM5gKflN8
-X-Google-Smtp-Source: AGHT+IG3zdJLlpnr4YMGnHBARjjI3k3jmK+vigqyhy9cel3bnwJ5WgU4GP+yPUZ/oLlX1seRUem1Dw==
-X-Received: by 2002:a05:6358:d381:b0:179:272e:54e9 with SMTP id mp1-20020a056358d38100b00179272e54e9mr987022rwb.30.1707469905629;
-        Fri, 09 Feb 2024 01:11:45 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU0PhkvLsxF+pFGpKPmBboiEOLww3D4Trh2Gnp8VhERt9RNQ+97flnppsx2wejpSO65vpdv3Kz/QekBz56jxf9FM2zOpoU5glNWmU+dHZHfjMM0wlGpxuSbH7HC4cQl0adtxvkosWDhxvIpC1Ez47nwO3G2bzjlVV7rao9m3dv73deWpUcOO8P+oFeW1BZOHt8jnAiUjaI1WQkiXQEez7QX8A+5eseqHuIlJQFpRMj530lUtXdGv5gO/Pwrq/ujaHwX/SCp/L+WgPcb6bmC8F48wD8SgSFQRK6o7i2hN8ANZHCU2NnTf9+9r+1PV8meIp1RVCMdgT+shuhLmzkqXGvWQE5jFiVvQx0NZ1gvyczsTIvSdCsLLnGYB/TJ33N0WYKA+Ay/rRmS9rWN7QmnDK0gatGkS0vEK2xtYymb9s1/mY8vCDxyJiiA/03cywPsAfejpyCNUWw8kZ28mnEyU4QXOmA4CYFY/frvo3IEoarAPLGyZ5XJ/uY2M0lxLKRjZTvsa8iUJLhEUOInj0UIZLTAJEZ9zEGa3nzxNIlggEV4CKbdqTWPXczh
+        d=1e100.net; s=20230601; t=1707469913; x=1708074713;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LxyXAGgGrfeNy34o4rw1jwmZjpNeqct9+4wIMTyRvKI=;
+        b=CNLjbFTQ+YtjhvnoKbHAPevm1P6ykHz0xoKlSppdqxs6Ro1+c0thTma9OjZwcNERxe
+         7Tq6df4gfVccucziQuaCsoeJIAY6nmd7i3sKdrwx12KHAoMsph7moQOpxXovEzaz8IFf
+         fTRDJy2w42Eaz+jn/frYYnQN236iR9FeMtxmm4qga39uJrXnao/DsrJXW10EOvbfo7zO
+         MjSJ52Xdyl0sTNRlJcdAiI96OGmEZR7+VMF9bVolOBNRdr6dUaw95Tyl4FVKXrfBWNuV
+         F04qHHptNhW38RLZoOyeMh/wN3FTrNKbduPUWNzCikRX4xeuSqzy6vsh126mz0S4t0wj
+         1J8A==
+X-Forwarded-Encrypted: i=1; AJvYcCVV1PuvbM77ThdQc9vTLAAg4S3QgzkOWoWliKuPshptINf5bjuXPgGKKK6e+fVkBT7OMtsFqL6k+LkC1y4KZnJNIe/6ZM73
+X-Gm-Message-State: AOJu0Yx8POPc35sIpAsoa5HR9E00xNJ2gH/WHbF++E0eOUoBc578lniC
+	GxO6p5x/YhLgVbC1JRrrxQBnbHars0bJDvQx1NLnxdSUXHtGEzjR
+X-Google-Smtp-Source: AGHT+IGcmytfLhFPegBL/6SAtwvaTgnR5fQUFdHgJo6Q2wspsRF4btaANrNXmauM6vRXjX9yxL/gWw==
+X-Received: by 2002:a9d:7592:0:b0:6e2:b1b8:84c7 with SMTP id s18-20020a9d7592000000b006e2b1b884c7mr748994otk.17.1707469912911;
+        Fri, 09 Feb 2024 01:11:52 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVKEs+ZzHCXAJAGHH6bSzYysqcGhmXYYuO3J7InQHWbz7ru+8zL9FzYLwO9GhlA0tw/acl/lYs3xPiH65/zsxoAQ+vOunmMdeJHj7fwM/7IYXS11Wbs/M5zRz5EFWAit+rW73a2VQG4xCIgTGUjXY82AdiRPTb/BavJVUTQGbV3aId10/C9+rVjQIpd1Sqv+goLw0U2es5OSA3dWuYu5H7d6q1pn6MwjszvCXwnamaxbAuWZvyYWownmRTeOrIzuI/+ZouL6nKh1dRZNCzbkzenpPqIA0lri7eCfEnpLGUSmDhy4bR7gdHEr2MhHc30t+XM2H24jxoeAD/txqPe/zWL8MvUSl69ZVEGcQKNNJ6fDjyFBPGZD7Q2/0JE/myZwW5iFPDzucesGj3v4iUc6Gk/lIsdO/3DaDrVpOb8Tk4ap7x5eab++yF7e1pnQgSA6kNfYSZA7kvMlw+hGoaFgZYDYEkSxXqNBeh1/zUpugm2h2n6a+WOGKyuzbfTM72zw7egy17LNvoMYibovcDaGQ1CqWgMjcNfN+R1vbsgD9BEUgLLhu9mWmXL
 Received: from wheely.local0.net ([118.208.150.76])
-        by smtp.gmail.com with ESMTPSA id cb1-20020a056a02070100b005c1ce3c960bsm1101742pgb.50.2024.02.09.01.11.38
+        by smtp.gmail.com with ESMTPSA id cb1-20020a056a02070100b005c1ce3c960bsm1101742pgb.50.2024.02.09.01.11.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Feb 2024 01:11:45 -0800 (PST)
+        Fri, 09 Feb 2024 01:11:52 -0800 (PST)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -69,10 +72,12 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	linux-s390@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	kvm-riscv@lists.infradead.org
-Subject: [kvm-unit-tests PATCH v4 0/8] Multi-migration support
-Date: Fri,  9 Feb 2024 19:11:26 +1000
-Message-ID: <20240209091134.600228-1-npiggin@gmail.com>
+Subject: [kvm-unit-tests PATCH v4 1/8] arch-run: Fix TRAP handler recursion to remove temporary files properly
+Date: Fri,  9 Feb 2024 19:11:27 +1000
+Message-ID: <20240209091134.600228-2-npiggin@gmail.com>
 X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20240209091134.600228-1-npiggin@gmail.com>
+References: <20240209091134.600228-1-npiggin@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,69 +86,65 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Thanks for the detailed reviews. Hopefully this is the last one...
+Migration files were not being removed when the QEMU process is
+interrupted (e.g., with ^C). This is becaus the SIGINT propagates to the
+bash TRAP handler, which recursively TRAPs due to the 'kill 0' in the
+handler. This eventually crashes bash.
 
-Since v3:
-- Addressed Thomas's review comments:
-- Patch 2 initrd cleanup unset the old variable in the correct place.
-- Patch 4 multi migration removed the extra wait for "Now migrate the
-  VM" message, and updated comments around it.
-- Patch 6 fix typo and whitespace in quiet migration support.
-- Patch 8 fix typo and whitespace in migration selftest.
+This can be observed by interrupting a long-running test program that is
+run with MIGRATION=yes, /tmp/mig-helper-* files remain afterwards.
 
-Since v2:
-- Rebase on riscv port and auxvinfo fix was merged.
-- Clean up initrd cleanup moves more commands into the new cleanup
-  function from the trap handler comands (suggested by Thomas).
-- "arch-run: Clean up temporary files properly" patch is now renamed
-  to "arch-run: Fix TRAP handler..."
-- Fix TRAP handler patch has redone changelog to be more precise about
-  the problem and including recipe to recreate it.
-- Fix TRAP handler patch reworked slightly to remove the theoretical
-  race rather than just adding a comment about it.
-- Patch 3 was missing a couple of fixes that leaked into patch 4,
-  those are moved into patch 3.
+Removing TRAP recursion solves this problem and allows the EXIT handler
+to run and clean up the files.
 
-Thanks,
-Nick
+This also moves the trap handler before temp file creation, which closes
+the small race between creation trap handler install.
 
-Nicholas Piggin (8):
-  arch-run: Fix TRAP handler recursion to remove temporary files
-    properly
-  arch-run: Clean up initrd cleanup
-  migration: use a more robust way to wait for background job
-  migration: Support multiple migrations
-  arch-run: rename migration variables
-  migration: Add quiet migration support
-  Add common/ directory for architecture-independent tests
-  migration: add a migration selftest
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
+ scripts/arch-run.bash | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
- arm/Makefile.common          |   1 +
- arm/selftest-migration.c     |   1 +
- arm/sieve.c                  |   2 +-
- arm/unittests.cfg            |   6 ++
- common/selftest-migration.c  |  34 +++++++
- common/sieve.c               |  51 ++++++++++
- lib/migrate.c                |  19 +++-
- lib/migrate.h                |   2 +
- powerpc/Makefile.common      |   1 +
- powerpc/selftest-migration.c |   1 +
- powerpc/unittests.cfg        |   4 +
- riscv/sieve.c                |   2 +-
- s390x/Makefile               |   1 +
- s390x/selftest-migration.c   |   1 +
- s390x/sieve.c                |   2 +-
- s390x/unittests.cfg          |   4 +
- scripts/arch-run.bash        | 177 +++++++++++++++++++++++++----------
- x86/sieve.c                  |  52 +---------
- 18 files changed, 253 insertions(+), 108 deletions(-)
- create mode 120000 arm/selftest-migration.c
- create mode 100644 common/selftest-migration.c
- create mode 100644 common/sieve.c
- create mode 120000 powerpc/selftest-migration.c
- create mode 120000 s390x/selftest-migration.c
- mode change 100644 => 120000 x86/sieve.c
-
+diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+index d0864360..11d47a85 100644
+--- a/scripts/arch-run.bash
++++ b/scripts/arch-run.bash
+@@ -129,6 +129,9 @@ run_migration ()
+ 		return 77
+ 	fi
+ 
++	trap 'trap - TERM ; kill 0 ; exit 2' INT TERM
++	trap 'rm -f ${migout1} ${migsock} ${qmp1} ${qmp2} ${fifo}' RETURN EXIT
++
+ 	migsock=$(mktemp -u -t mig-helper-socket.XXXXXXXXXX)
+ 	migout1=$(mktemp -t mig-helper-stdout1.XXXXXXXXXX)
+ 	qmp1=$(mktemp -u -t mig-helper-qmp1.XXXXXXXXXX)
+@@ -137,9 +140,6 @@ run_migration ()
+ 	qmpout1=/dev/null
+ 	qmpout2=/dev/null
+ 
+-	trap 'kill 0; exit 2' INT TERM
+-	trap 'rm -f ${migout1} ${migsock} ${qmp1} ${qmp2} ${fifo}' RETURN EXIT
+-
+ 	eval "$@" -chardev socket,id=mon1,path=${qmp1},server=on,wait=off \
+ 		-mon chardev=mon1,mode=control | tee ${migout1} &
+ 	live_pid=`jobs -l %+ | grep "eval" | awk '{print$2}'`
+@@ -209,11 +209,11 @@ run_panic ()
+ 		return 77
+ 	fi
+ 
+-	qmp=$(mktemp -u -t panic-qmp.XXXXXXXXXX)
+-
+-	trap 'kill 0; exit 2' INT TERM
++	trap 'trap - TERM ; kill 0 ; exit 2' INT TERM
+ 	trap 'rm -f ${qmp}' RETURN EXIT
+ 
++	qmp=$(mktemp -u -t panic-qmp.XXXXXXXXXX)
++
+ 	# start VM stopped so we don't miss any events
+ 	eval "$@" -chardev socket,id=mon1,path=${qmp},server=on,wait=off \
+ 		-mon chardev=mon1,mode=control -S &
 -- 
 2.42.0
 
