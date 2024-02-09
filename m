@@ -1,66 +1,32 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CAFA7EF03
-	for <kvmarm@lists.linux.dev>; Fri,  9 Feb 2024 18:09:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BFA853398
+	for <kvmarm@lists.linux.dev>; Fri,  9 Feb 2024 18:58:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707502153; cv=none; b=iX80hh2yqxBSdwDHs3Yb2rmlqu5N5Jm5EhmGcFNxUWtphe47CEEYoXrExFi2onaWTEliiYSktntEPaV/MigYQgQCl/2DSaoBCv0lkzN6ecRMNyipk/QInizEdxoxMzV/uaNComYPoKRfSq4oVTEuXziOQJl+m+nkZU13XUJK29Y=
+	t=1707505120; cv=none; b=Tr5bA9WsMA+BdmUfnnOJsxIjOxxlpxHAkXwmvYCC35jYjxDnN10Kx0r1NeLpqLXB1exhx4PFS+amNfq1V7eNJXbHvxV0F5eXsPtlhlbHw7DyFuCWqi7EQ8r7tT3GjjbDDjohSTL5mMxdTmt4aam+40BlrkG2nTa9O0h1E/TpD5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707502153; c=relaxed/simple;
-	bh=iHIuE205CtTkxTOJ8QBT9VX2BzHHxLYDd/fid54PptY=;
+	s=arc-20240116; t=1707505120; c=relaxed/simple;
+	bh=5uTKkg6MIbxxiUTeAtoiPotgK0/CeWUJqQ48BeNPQrQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GPP56pCUf9Jb0/V9mX7GD6ZA7WzuYR5cblLY9WblADH++S3FUQQRKRFUM02ZNqmpl1KGws2jUPrhq7TPOkfbYytzab/4IIkp0HRyGD0btkgWR/IYJYaWp87/Za27rIH6B7mLM+vlCjRHsIRhdoCFAQRVOxXFa1jQjX/VHjCUf58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JQHPGWmP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 In-Reply-To:Content-Type; b=N/iA/p0PINxs2MnUpMezQyMjLYoMyUYgECWRO1Xc8vkFo7MJdwtd/ZAgUzsETCvmur/MnZXMJMRQi2AscDmdPVeZeN99o1nQHPDjg4q1yWI28q3t+EsjZHCtdhG0hjf30pFK7HEOAOyaJGU00p5u0d23VYyjvzBL5FfiOzUe2Pg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=LMsKF6Xg; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JQHPGWmP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707502151;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=qWJBAjq5kZHM63Q92oX8rd7RVwpgAQWVuCWuJw6H2GI=;
-	b=JQHPGWmPbf9a22s9pyL5w8Y9pXiNV/y0OwXCGnXWepToDikQfSsndkquqGTkgaC2NSX5bk
-	tofIbygtxFX4EsKbEKmw9HJEKv6PV0cgFIfIGJCQoZSU6UKV6r6mv5z9ZxiKcErNW+x7Ni
-	CMHRJPYUxj3hVaqH6/Z8UE2zxq1AnM4=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-624-DFiOw-FCOry5NMhCCBurog-1; Fri, 09 Feb 2024 13:09:09 -0500
-X-MC-Unique: DFiOw-FCOry5NMhCCBurog-1
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-68c4e69e121so17618566d6.2
-        for <kvmarm@lists.linux.dev>; Fri, 09 Feb 2024 10:09:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707502149; x=1708106949;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qWJBAjq5kZHM63Q92oX8rd7RVwpgAQWVuCWuJw6H2GI=;
-        b=kIBC7c6xZcIOvngr/7CIoP9DYm0bWld4/bJBu09et5YXRq6NmO1yMmqV0bkVyMCvs1
-         oURynkKD4ZqUHo1mSTtrgktOWh5nEZByf2Li0eCRKOpC0zOTUpClDL+k0aASe4e3feav
-         V7EYoo6pG1Wyj5LjoNaFR8HoXdkkZaVZQ2OkH4wPeKajfDKbVytB9LShrU+05yhlAuQ0
-         uRtZlf6wZNwfS9BO+cAN69DJ1zJROgB387w5FdYBMBZeNSt/CdwZZ0Xky97q4LFKEJ6q
-         8ML5wA2+cgAPlgxcJdBMQZQTmnvTwfwW2iwWzdWBZr4HLEBwbbm3maTvyXK5K0sobi7F
-         g6Gw==
-X-Forwarded-Encrypted: i=1; AJvYcCVo4bKF/5fay00DpXmHcvArY86J3gPJ87HOa/2KXN+fMSzi9qQ78uFw8cqnAT1c+KrSzKWvz+7fFDuYyWszpJWWBoIhTw7S
-X-Gm-Message-State: AOJu0YyfGX5hEc6VltPM63MZbMp7Kh+sjoZWVkTqtyhJ9cUqOJFI2lmi
-	218WoT57cbGwQcGYLGc00rUtAyjmEIdKa25srxzzpK4/Crmns+/vSqZCPddZihT8ubBLEnyicv+
-	rPfAek+OhFzMoPheUCu7iscS+P0g89gpR7i5fA5DEh6sAaWlrF3G0Wg==
-X-Received: by 2002:ad4:5de8:0:b0:68c:8ee2:3fa0 with SMTP id jn8-20020ad45de8000000b0068c8ee23fa0mr2785584qvb.11.1707502149281;
-        Fri, 09 Feb 2024 10:09:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFtzks+e9Q2nimt+WHV4/eU5Wb7t5tJ07+77h0Wfr/SqqBOd3XyU6wdarwiFxt+G5VuHWYrMg==
-X-Received: by 2002:ad4:5de8:0:b0:68c:8ee2:3fa0 with SMTP id jn8-20020ad45de8000000b0068c8ee23fa0mr2785554qvb.11.1707502149049;
-        Fri, 09 Feb 2024 10:09:09 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWm4MgHh2FuocfMr0j0YAziH9jnpLxw46Vk1gOt4DPPwLZGIhOFvbtvc2/NiWd4RNK75vzcuho0FcXE876/WlhV32JQvZcs92n5psQ2MHVjJhkOnMZhtDfnlBlbEyjISh4Ki63oFKfhMZRzNE0YXFQVTnDHK4EuiQWSHTfcYtgBujW0y+WOniq1nh12MLWwXkry7LTR8a1JSfzQKZeEdTuRv2PEt5AibI09JqiKUTa6+3dvCZgAxHBnXYGbAYqrCe79U2CWjKHUeiN4WQ5LOqVWkBaWFIpsbfnW7RbQ8nUlM90s63Wf5D6WtoC1NpGmcCoWN8x2XRb/0P4vjhE0HXfnm9WPXwNKe3EdHAoPIO/+GcwI5Ln0ZPSxQSG2MmGK3tURNtcSNMsPjW8cM+BKpMVMt1HzkmXzcKg8KSkOQlRAWmIKyHq6a+9QMgm7oMb7bS0hUHzvOPTBx3kUUWWY06ik0mLyanfYuqeNFC+y718Zv57yIlofZac+3lzCWRXkoRvD6tPqHVKJF8aFGOMfHzaeCs1w
-Received: from [192.168.0.9] (ip-109-43-177-145.web.vodafone.de. [109.43.177.145])
-        by smtp.gmail.com with ESMTPSA id mc9-20020a056214554900b0068cb9a819a2sm1045597qvb.28.2024.02.09.10.09.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Feb 2024 10:09:08 -0800 (PST)
-Message-ID: <62518aea-1214-4d33-8a15-41f1a494ee0b@redhat.com>
-Date: Fri, 9 Feb 2024 19:09:03 +0100
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="LMsKF6Xg"
+Received: from [100.64.200.159] (unknown [20.29.225.195])
+	by linux.microsoft.com (Postfix) with ESMTPSA id CFD3120B2000;
+	Fri,  9 Feb 2024 10:58:37 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com CFD3120B2000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1707505118;
+	bh=CrUcm3Z/FRbdc3NNdp4+dNbyUDn4m5ZmrpvJXh/X+7I=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=LMsKF6Xg4IguZ6h/+LUCdvTxe+8L5lh3t0xuDRZLKvtC0AP7N1wxM4ptXb4DI/XuP
+	 aiV6j60Ssdr3XgW8medIOPGkp3cyUAS394lMmfjlCfXQ5UOhcVOEfcQkClfP2gTUuJ
+	 1cSFPJJ9aaUrvpZ7zJYWu72PyDBf/fwyc8gG8bMQ=
+Message-ID: <542e7f15-3898-4396-a8ff-7972d3308132@linux.microsoft.com>
+Date: Fri, 9 Feb 2024 10:58:36 -0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -68,83 +34,82 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v4 6/8] migration: Add quiet migration
- support
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
- Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
- Nico Boehr <nrb@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Eric Auger <eric.auger@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Marc Hartmayer
- <mhartmay@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
- linux-s390@vger.kernel.org, kvmarm@lists.linux.dev,
- kvm-riscv@lists.infradead.org
-References: <20240209091134.600228-1-npiggin@gmail.com>
- <20240209091134.600228-7-npiggin@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <20240209091134.600228-7-npiggin@gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+Subject: Re: [RFC PATCH] KVM: arm64: Override Microsoft Azure Cobalt 100 MIDR
+ value with ARM Neoverse N2
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Andre Przywara <andre.przywara@arm.com>, Rob Herring <robh@kernel.org>,
+ Fuad Tabba <tabba@google.com>, Joey Gouly <joey.gouly@arm.com>,
+ Kristina Martsenko <kristina.martsenko@arm.com>,
+ "moderated list:ARM64 PORT (AARCH64 ARCHITECTURE)"
+ <linux-arm-kernel@lists.infradead.org>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)"
+ <kvmarm@lists.linux.dev>
+References: <20240206195819.1146693-1-eahariha@linux.microsoft.com>
+ <ZcNSI089xqia6lho@FVFF77S0Q05N.cambridge.arm.com>
+ <ed6c25dc-d5c7-4f15-8fdc-f2adf209e638@linux.microsoft.com>
+ <ZcYNn5LDmH1g2dDB@FVFF77S0Q05N.cambridge.arm.com>
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+In-Reply-To: <ZcYNn5LDmH1g2dDB@FVFF77S0Q05N.cambridge.arm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 09/02/2024 10.11, Nicholas Piggin wrote:
-> Console output required to support migration becomes quite noisy
-> when doing lots of migrations. Provide a migrate_quiet() call that
-> suppresses console output and doesn't log a message.
+On 2/9/2024 3:33 AM, Mark Rutland wrote:
+> On Thu, Feb 08, 2024 at 11:16:10AM -0800, Easwar Hariharan wrote:
+>> On 2/7/2024 1:49 AM, Mark Rutland wrote:
+>>> On Tue, Feb 06, 2024 at 07:58:16PM +0000, Easwar Hariharan wrote:
+>>> Further, if Azure Cobalt 100 is based on ARM Neoverse N2, you presumably suffer
+>>> from the same errata; can you comment on that at all? e.g. are there any
+>>> changes in this part that *might* lead to differences in errata and/or
+>>> workarounds? How do the MIDR_EL1.{Variant,Revision} values compare to that of
+>>> Neoverse N2?
+>>
+>> Yes, Azure Cobalt 100 suffers from the same errata as Neoverse N2. We had changes
+>> in the implementation, but according to our hardware folks, the Neoverse N2 errata
+>> we are affected by so far aren't affected by the changes made for Azure Cobalt 100.
 > 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->   lib/migrate.c         | 11 +++++++++++
->   lib/migrate.h         |  1 +
->   scripts/arch-run.bash |  4 ++--
->   3 files changed, 14 insertions(+), 2 deletions(-)
+> Ok, so of the currently-known-and-mitigated errata, you'll be affected by:
+> 
+> 	ARM64_ERRATUM_2139208
+> 	ARM64_ERRATUM_2067961
+> 	ARM64_ERRATUM_2253138
+> 
+> ... and we'll need to extend the midr_range lists for those errata to cover
+> Azure Cobalt 100.
+> 
+>>From your patch, it looks like the Azure Cobalt 100 MIDR value (0x6D0FD490) is
+> the same as the Arm Neoverse-N2 r0p0 MIDR value (0x410FD490), except the
+> 'Implementer' field is 0x6D ('m' in ASCII) rather than 0x41 ('A' in ASCII).
+> 
+> Are you happy to send a patch extending arch/arm64/include/asm/cputype.h with
+> the relevant ARM_CPU_IMP_* and CPU_PART_* definitions, and use those to extend
+> the midr_range lists for those errata?
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Yes.
 
+> 
+> As above, if you could make any comment on how the MIDR_EL1.{Variant,Revision}
+> fields map to that of Arm Neoverse-N2, it would be very helpful. It's not clear
+> to me whether those fields correspond directly (and so this part is based on
+> r0p0), or whether you have a different scheme for revision numbers. That'll
+> matter for correctly matching any future errata and/or future revisions of
+> Azure Cobalt 100.
+> 
+
+Thanks for the clarifying detail on your question. Azure Cobalt 100 is indeed based
+on r0p0 of the Neoverse N-2 and we have not used a different scheme than Neoverse N2
+for the Variant and Revision fields.
+
+
+> Mark.
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
 
