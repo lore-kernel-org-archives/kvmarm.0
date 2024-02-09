@@ -1,74 +1,90 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 145491CD2E
-	for <kvmarm@lists.linux.dev>; Fri,  9 Feb 2024 10:37:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1829B2DF7D
+	for <kvmarm@lists.linux.dev>; Fri,  9 Feb 2024 11:33:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707475051; cv=none; b=S5LnGJTkBfVdL6+fl4t3/RUF45SLsRgiWUVva9ZyLU/UinP6s5CgyU9/sg0W/0540D/3/aJsi5VnBnOcFUmE52zWCafHCqxnKsbazASu5tpXBb8VBIoDs0J1zKsZXNNQqdFeRbncKidOpiiZbkg0Nj1fK5xi+/0jgYi6ZG7GlGY=
+	t=1707478443; cv=none; b=bdHtBDIjN9f/JUjMqfkcNNjNnhe/hn7d7Md043rno0TWQNzEuxXLd5TBLb7WoO1pHt1m/IlanWaSqeiL7msj6jB5asHE5H4a+D3SjAm+nivhqb4UipxbbkjfXqkiv3zRzAWM1e+ZMn60RJeCeH8zlP3ABqGwWi5lECRcKNIIXEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707475051; c=relaxed/simple;
-	bh=gREOrAGSPJgndiqESZcjrywvzLWOugfVaiU57m46WW0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mb9dk61HONhRTtDsG+1T7UWv+yBU21Ie/EbUeIHNphuY59fbDG9dGJVou9Lrg1UqLOmsy4tFokC0HCbDCUOujvH863xrEPsTTvtCUWDFt9R9xqf1iVpkvsecvPeb1qVpPl9I5IduTj6IEdWOTRR01TfTlEbAjcXAjSakbTwCYbc=
+	s=arc-20240116; t=1707478443; c=relaxed/simple;
+	bh=PSKKtV965YJulHFsXWn3UaKzi2QezX4LHDe2jIKgaig=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YmRnW1m7tmMIZpyWLoXqrhUiHIgLC7cZCsgsNfGx29fRIbpGXk7GIf4jq69xatxghtdKu3mKzrNitZd5YQvBVQRpFCRFcQBFOWdjot+sBrWkKfeGOp5zHQ+Vn6XQOkuoGFOuN7liG1U8unBKqtlfojzv+HzdIZhl4YEAf24tS4Y=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 83C20DA7;
-	Fri,  9 Feb 2024 02:38:11 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F15A23F5A1;
-	Fri,  9 Feb 2024 02:37:27 -0800 (PST)
-From: Joey Gouly <joey.gouly@arm.com>
-To: kvmarm@lists.linux.dev
-Cc: broonie@kernel.org,
-	joey.gouly@arm.com,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B3494DA7;
+	Fri,  9 Feb 2024 03:34:38 -0800 (PST)
+Received: from FVFF77S0Q05N.cambridge.arm.com (FVFF77S0Q05N.cambridge.arm.com [10.1.31.163])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8F42F3F762;
+	Fri,  9 Feb 2024 03:33:54 -0800 (PST)
+Date: Fri, 9 Feb 2024 11:33:51 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Easwar Hariharan <eahariha@linux.microsoft.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v1] KVM: arm64: print Hyp mode
-Date: Fri,  9 Feb 2024 10:37:19 +0000
-Message-Id: <20240209103719.3813599-1-joey.gouly@arm.com>
-X-Mailer: git-send-email 2.25.1
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Rob Herring <robh@kernel.org>, Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Kristina Martsenko <kristina.martsenko@arm.com>,
+	"moderated list:ARM64 PORT (AARCH64 ARCHITECTURE)" <linux-arm-kernel@lists.infradead.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" <kvmarm@lists.linux.dev>
+Subject: Re: [RFC PATCH] KVM: arm64: Override Microsoft Azure Cobalt 100 MIDR
+ value with ARM Neoverse N2
+Message-ID: <ZcYNn5LDmH1g2dDB@FVFF77S0Q05N.cambridge.arm.com>
+References: <20240206195819.1146693-1-eahariha@linux.microsoft.com>
+ <ZcNSI089xqia6lho@FVFF77S0Q05N.cambridge.arm.com>
+ <ed6c25dc-d5c7-4f15-8fdc-f2adf209e638@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ed6c25dc-d5c7-4f15-8fdc-f2adf209e638@linux.microsoft.com>
 
-Print which of the hyp modes is being used (hVHE, nVHE).
+On Thu, Feb 08, 2024 at 11:16:10AM -0800, Easwar Hariharan wrote:
+> On 2/7/2024 1:49 AM, Mark Rutland wrote:
+> > On Tue, Feb 06, 2024 at 07:58:16PM +0000, Easwar Hariharan wrote:
+> > Further, if Azure Cobalt 100 is based on ARM Neoverse N2, you presumably suffer
+> > from the same errata; can you comment on that at all? e.g. are there any
+> > changes in this part that *might* lead to differences in errata and/or
+> > workarounds? How do the MIDR_EL1.{Variant,Revision} values compare to that of
+> > Neoverse N2?
+> 
+> Yes, Azure Cobalt 100 suffers from the same errata as Neoverse N2. We had changes
+> in the implementation, but according to our hardware folks, the Neoverse N2 errata
+> we are affected by so far aren't affected by the changes made for Azure Cobalt 100.
 
-Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: Mark Brown <broonie@kernel.org>
----
+Ok, so of the currently-known-and-mitigated errata, you'll be affected by:
 
-From what I could tell there isn't a way to tell which of the two modes was
-actually booted in, and this could be useful for looking at log outputs.
+	ARM64_ERRATUM_2139208
+	ARM64_ERRATUM_2067961
+	ARM64_ERRATUM_2253138
 
- arch/arm64/kvm/arm.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+... and we'll need to extend the midr_range lists for those errata to cover
+Azure Cobalt 100.
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index a25265aca432..090dbc954157 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2591,7 +2591,8 @@ static __init int kvm_arm_init(void)
- 	} else if (in_hyp_mode) {
- 		kvm_info("VHE mode initialized successfully\n");
- 	} else {
--		kvm_info("Hyp mode initialized successfully\n");
-+		char mode = cpus_have_final_cap(ARM64_KVM_HVHE) ? 'h' : 'n';
-+		kvm_info("Hyp mode (%cVHE) initialized successfully\n", mode);
- 	}
- 
- 	/*
--- 
-2.25.1
+From your patch, it looks like the Azure Cobalt 100 MIDR value (0x6D0FD490) is
+the same as the Arm Neoverse-N2 r0p0 MIDR value (0x410FD490), except the
+'Implementer' field is 0x6D ('m' in ASCII) rather than 0x41 ('A' in ASCII).
 
+Are you happy to send a patch extending arch/arm64/include/asm/cputype.h with
+the relevant ARM_CPU_IMP_* and CPU_PART_* definitions, and use those to extend
+the midr_range lists for those errata?
+
+As above, if you could make any comment on how the MIDR_EL1.{Variant,Revision}
+fields map to that of Arm Neoverse-N2, it would be very helpful. It's not clear
+to me whether those fields correspond directly (and so this part is based on
+r0p0), or whether you have a different scheme for revision numbers. That'll
+matter for correctly matching any future errata and/or future revisions of
+Azure Cobalt 100.
+
+Mark.
