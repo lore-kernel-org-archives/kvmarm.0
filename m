@@ -1,44 +1,40 @@
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A454843AA8
-	for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 20:40:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74CC943AA8
+	for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 20:50:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707770418; cv=none; b=Ymk1fctUh3yCi/6wKctt5eEOQ1yLPIUoih94WvpTT/XM7B3kEuybbSoJK0krgT/UDwKnsjUSeHprzJs15RcS4aCwkViF68gFdn6Bz0msjdKVXIUz6ox34byTvt8e/9WgFfxDpjY9oL4glHGH7r1WCb3fjTHIQ1MdMh8Dn0Sn2TE=
+	t=1707771043; cv=none; b=JFkqr7OHL2K595PufRv0dzw18cniKI9JG/AhnjXOrUwY7SkxecQB7WKRE0jAHMawFHuxVaELgHKNYZJCqUJWDV29aWocVjHkVlW9ZxSYoskM1vy/uPg7bfrPOrW/2lZE32C8ghC7HNk5ObGdoFmGusivyYYm8D3WKby1NIkKOZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707770418; c=relaxed/simple;
-	bh=miMuI9wZpwSybczsfBp3fStDaxVi6pe02CNZLYVhiik=;
+	s=arc-20240116; t=1707771043; c=relaxed/simple;
+	bh=83/Rq5+9VR33j4Elywo0ZdM8hdp6fKuCdQOKK21jY+g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O6WWKhgQhFRHcEwFqHCKZRBIeTSS0vLdJO1G7yuHMJ4M6JoMIVxAjzgK0lRkgwxdk1QEyZbpy0ibWClMrNozW5dZZD5rlDIcS9jDR+l4IgzPYHTO3W74ueRSqg8d5TtTBm10jN96zOwzS93p4/WBLDsYaZPUPykxc04NA6bVoNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NhD5yrjG; arc=none smtp.client-ip=91.218.175.179
+	 Content-Type:Content-Disposition:In-Reply-To; b=CYcJW4sqgCIgQywp6PlWg8cXjEKbU1v3iDFLy88D3FrRL9dcLch2i3qKCGsQgDJ5HvkLD2kKecPbzxwx3e17wlhm18gxzCxlDfS8e35dOa64Q7AeeTY0BrokROsfRyGNVWAzUCc+5aW2HZmQsTKgblzirE8rgbvFFsUSFa25+jE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WbZ6Hs7h; arc=none smtp.client-ip=91.218.175.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NhD5yrjG"
-Date: Mon, 12 Feb 2024 20:40:08 +0000
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WbZ6Hs7h"
+Date: Mon, 12 Feb 2024 20:50:27 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707770414;
+	t=1707771038;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7nC0yQEK2ZP/P7RnX3Z3hQsI/3gbnKEFNnLlhsCr13s=;
-	b=NhD5yrjGqdHFBA0i1+DDxAyn1d0cRMs2xwQ/2yp0lnHjiy5wbtOucUCJqw3g3+OlWBpi+l
-	xutG0C1XjUnuwrfcb4qAnaGp1wPTjryq8EFr5k9/P/gvLNfpuDIBUuhgNPWcAA5kspX4Oo
-	pOBVqVF/Uyh8ZC8o+JAPmdWb5XNqTuw=
+	bh=zYpPKL/Y1qQVtjq1JAXZQxRcIoamgeLdOfY6ECA0RJI=;
+	b=WbZ6Hs7hakWIivaDx59Q0n3ptB0lNcjUMcBj/8oZgwngQ02s2WPXO5Z9PxO4MUTpUyiiS8
+	ID6C8WG10tdl9bUU02Awcs6vMs05uKronOQ4lBYIsvhUMjwnH16bZvOQ0acOh/cOZ5TK/k
+	o8N2xr1AMl+l7kvOqRMCBiE+CfFWVB8=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3 00/26] KVM/arm64: VM configuration enforcement
-Message-ID: <ZcqCKJOb2TeujGYV@linux.dev>
-References: <20240205103431.1104133-1-maz@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: Fix GUEST_PRINTF() format warnings in
+ ARM code
+Message-ID: <ZcqEk16eBKovb-hb@linux.dev>
+References: <20240202234603.366925-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,29 +43,28 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240205103431.1104133-1-maz@kernel.org>
+In-Reply-To: <20240202234603.366925-1-seanjc@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-Hey Marc,
++cc Anup
 
-On Mon, Feb 05, 2024 at 10:34:05AM +0000, Marc Zyngier wrote:
-> This is the third version of this configurationm enforcement series
-> after some heroic reviewing from Joey (again) and Suzuki. Many thanks
-> to both.
-> 
-> I think I have taken most of the feedback into account, but please
-> shout if I have ignored something.
-
-Want to make sure intentions are abundantly clear on this series, as
-there's been a decent amount of attention from folks on managing VM
-features.
-
-At the very least I plan on taking the first two patches for 6.9 so we
-have the groundwork to enable new feature work. I'd like to get more
-eyes on the tail end of the series. I'm going to catch up on the work I
-need to do for this merge window (including posting my own crap!) then
-come back to reviewing this afterwards.
+FYI -- this patch is touching the arch_timer code. I did a test merge
+with kvm_riscv_queue and there weren't any conflicts, but in case that
+changes this patch will appear on kvm-arm64/misc in my tree.
 
 -- 
 Thanks,
 Oliver
+
+On Fri, Feb 02, 2024 at 03:46:03PM -0800, Sean Christopherson wrote:
+> Fix a pile of -Wformat warnings in the KVM ARM selftests code, almost all
+> of which are benign "long" versus "long long" issues (selftests are 64-bit
+> only, and the guest printf code treats "ll" the same as "l").  The code
+> itself isn't problematic, but the warnings make it impossible to build ARM
+> selftests with -Werror, which does detect real issues from time to time.
+> 
+> Opportunistically have GUEST_ASSERT_BITMAP_REG() interpret set_expected,
+> which is a bool, as an unsigned decimal value, i.e. have it print '0' or
+> '1' instead of '0x0' or '0x1'.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
