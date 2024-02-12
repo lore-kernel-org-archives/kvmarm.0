@@ -1,72 +1,83 @@
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA3804C60B
-	for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 20:56:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C534A9BF
+	for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 21:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707771392; cv=none; b=KOYFsa0aKwyfGCdu2nCNDaTuOWYsg5vB7zrA3EewXBcOKmbKaZTKk/HK8tL1wxTnD0ROx3ZjglsIjx5NpMXWnpvemwqKra6uvCx9dKedAmQnxjGc/Or6gIDWdZebFycL96+l3DMzVCHl00m84uAUba0Gp5/aHaINJaOjUJ/m3Yw=
+	t=1707772211; cv=none; b=eDA6TTcigirPpmeF3rUoqcUHCAKrCbkZNoonFvstLjov1YJccZWN8QSewDZzEuMiU6dRsbsMv4Yx19VAplGjfz6gwoeO/sdqJ3wswawRbg2/GZKPmPdW/g5uArOAsbqeHzKBy2C5I7b0dQVJXEIVyheXfePUeevsY057L4XNPxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707771392; c=relaxed/simple;
-	bh=nioYI8QzAMJASNr/swtGxAoJRoICVkBq70p7F3S641g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ty9DlIAebzOznovwhI9KDZJgIoYlZ5BaX3D6Mtrvd0Edv/g5bEIOa/wF2pv4JstkUHUV1y75q3B07zfW9Nbbjg5wknvDbrmS4P03RgyPuNddqwejybqwQMI2j1wqxAMErPDN+DTTU0BMSmTvjboy0XN65pqyv12av1huKx4PrBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rV9G/aKR; arc=none smtp.client-ip=95.215.58.177
+	s=arc-20240116; t=1707772211; c=relaxed/simple;
+	bh=V2K3Tqa8gFu4PA1KW3ElYY3Gm+CaB0UlpxRc/Dm88V4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TJH253kqAbB+znmHwjMZO5VsI9AggAe8G21HfdmmlQwsbZ2717W0qw7jFglj/CRDWanBXMjIseBihAFrKvB/DQ6G1/0M20eIwsYlBRFWkemw50JsUFDzXh1/W+7+5Rz65hPnuwvdYu0ctpVY3YmARtj9wKzbeILcN4rMlWJlvkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=d9ei9th8; arc=none smtp.client-ip=95.215.58.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rV9G/aKR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="d9ei9th8"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707771388;
+	t=1707772207;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oO68mIHZbHwg1QujSUyddQTzN62mxLj24Qcfye1RG6k=;
-	b=rV9G/aKRuZKpoHt0MZ0FBk8TLUAHSaC4X2CCjHf1tVsuGDYJrG2vw3qotTrhAacseXRY8L
-	py/DofBCE/YUlC4HR1owo7xGWGDc78VgW6PPKsNW75BIP91Lv/PH81HmBnt+3+Dr0duNpH
-	MKK82nau0tnZEh82YnmcGWg4qcACbqQ=
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ho2ychX5rzcZXGqMft5IUPj+UTWREdBWn8Koftkvhk0=;
+	b=d9ei9th8fcogKE0TDUvOgUz6IIwo3rQmVdChHOVKeZ0S1+n3rZ3FgUStc9VVsDUEbJD1R0
+	QoYZvxKJJftGdkfCirawYzO+KT4wFkeMK6+LPwuPxr53YfunovI0mDgz94yL2bPbkItKAU
+	SVfmES5t3kgv86WmHRXSt1oGwe5f5kY=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>,
-	Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	kvmarm@lists.linux.dev,
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
 	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH] KVM: selftests: Fix GUEST_PRINTF() format warnings in ARM code
-Date: Mon, 12 Feb 2024 20:56:08 +0000
-Message-ID: <170777114723.3090079.16291479870607585815.b4-ty@linux.dev>
-In-Reply-To: <20240202234603.366925-1-seanjc@google.com>
-References: <20240202234603.366925-1-seanjc@google.com>
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH] KVM: selftests: Print timer ctl register in ISTATUS assertion
+Date: Mon, 12 Feb 2024 21:09:33 +0000
+Message-ID: <20240212210932.3095265-2-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Fri, 2 Feb 2024 15:46:03 -0800, Sean Christopherson wrote:
-> Fix a pile of -Wformat warnings in the KVM ARM selftests code, almost all
-> of which are benign "long" versus "long long" issues (selftests are 64-bit
-> only, and the guest printf code treats "ll" the same as "l").  The code
-> itself isn't problematic, but the warnings make it impossible to build ARM
-> selftests with -Werror, which does detect real issues from time to time.
-> 
-> Opportunistically have GUEST_ASSERT_BITMAP_REG() interpret set_expected,
-> which is a bool, as an unsigned decimal value, i.e. have it print '0' or
-> '1' instead of '0x0' or '0x1'.
-> 
-> [...]
+Zenghui noted that the test assertion for the ISTATUS bit is printing
+the current timer value instead of the control register in the case of
+failure. While the assertion is sound, printing CNT isn't informative.
 
-Applied to kvmarm/next, thanks!
+Change things around to actually print the CTL register value instead.
 
-[1/1] KVM: selftests: Fix GUEST_PRINTF() format warnings in ARM code
-      https://git.kernel.org/kvmarm/kvmarm/c/06fdd894b473
+Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+Closes: https://lore.kernel.org/kvmarm/3188e6f1-f150-f7d0-6c2b-5b7608b0b012@huawei.com/
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
 
---
-Best,
-Oliver
+Applies to kvmarm/next.
+
+ tools/testing/selftests/kvm/aarch64/arch_timer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+index d5e8f365aa01..ab4b604d8ec0 100644
+--- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
++++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+@@ -160,7 +160,7 @@ static void guest_validate_irq(unsigned int intid,
+ 	__GUEST_ASSERT(xcnt >= cval,
+ 		       "xcnt = 0x%lx, cval = 0x%lx, xcnt_diff_us = 0x%lx",
+ 		       xcnt, cval, xcnt_diff_us);
+-	__GUEST_ASSERT(xctl & CTL_ISTATUS, "xcnt = 0x%lx", xcnt);
++	__GUEST_ASSERT(xctl & CTL_ISTATUS, "xctl = 0x%lx", xctl);
+ 
+ 	WRITE_ONCE(shared_data->nr_iter, shared_data->nr_iter + 1);
+ }
+
+base-commit: 680f749c272378a796388a3244bab53b5a952d67
+-- 
+2.43.0.687.g38aa6559b0-goog
+
