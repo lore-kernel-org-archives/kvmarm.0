@@ -1,94 +1,156 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF763BB46;
-	Mon, 12 Feb 2024 14:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B80C4F60B
+	for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 17:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707749274; cv=none; b=IE7/nEMx8ViNth6oXQ6cZOAq6x0k7G5mZFeqbfNJ64y3EV5veTrrOOCgaykASulZONaLgJ29RoluBLB1sDPZVXz7vKi44CJm3WtsZ2Rsov35fvOuceTEgTUWofjxjptDIMl3wTCjBJZyaVoorOcWC1aKeN5H/nVBjEi46lNLtSw=
+	t=1707757510; cv=none; b=qwdutmEUBX21befCBO4dhwhfq2hcq9FDANHcvMSx+94EcAxyteuuTvS9ipatTxCBHb66DUGVjMyYgta5EwofNxjZl+ODcQRYavEcEczkYijGuV7G5Po72KJ3gi10VzUFgJo5ExQhauZAZU5Tdekl5bn4ifZcoqMOW3622ohyCK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707749274; c=relaxed/simple;
-	bh=e2C7pn2jEG5y+mAGuphlZridsZxMj3//yLEbi5gFAnY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lG/8YL7veUes20zF9pKjeCtx7djOUsnLThwcXAWCaxGD47llII9rktJ5SCRkxldY409cyUk92ex8iWmAzIVhn8ttggGkkxSee3IGUHvwzyb1mEVOEoHLQV3nMlMF+QFW1wpezGXhAZlApV1x/ZnS3g5zzW7tPerBZtheGLjYlqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JbtkfR5C; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707757510; c=relaxed/simple;
+	bh=/ppasOObi1vl2zoLkHHxsigE/xVlK8tLer+NXGAx/2E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RlABn/JNahW5m82unDK492MZ+qRvjh/WGga9N3Fv4oMHiouTKWHOa2Db9nk5NadXV2U5LTuL4vEAxVMBfgZFTxQ98P79luKN03szA4GC8Ml6SY/7v7M9oqqas7qod9VnBCjN6rRFQY9+5vxRdaOv9fFCP5qfN/HC/yl827InlYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BJwkiqz+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JbtkfR5C"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0E6AC43399;
-	Mon, 12 Feb 2024 14:47:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707749272;
-	bh=e2C7pn2jEG5y+mAGuphlZridsZxMj3//yLEbi5gFAnY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JbtkfR5CeQ4t6M7uN+V3IeG/JQPymb4VhfrnKlHy6Pyk5RE8xJsasB6Csp7BOwfaO
-	 WXDhFLUO0MTDS/W1+efQq6tNeq3QvSUPhIlc20y6PPevgqxvBxfdXV44aG2qgGEYnt
-	 q8x0s674ORBQ25NYVIk363iSvp5ERnYAhN1N+nlkoGZhNXsDUJc9Wh+nyInBalnPPJ
-	 Lqm+zSGUdeINdUfTFGRvktow0BYqLyDL8k7r+anEhJyDjkyedZ3jwQcRAqmgOWxjYi
-	 15fg5C9a5mfLW7YWGpwY6vC4oRZOL1oupsfDblyduP1jR+l4npZ1LVEiRWrMkcfq4A
-	 HdBqmmWG3QyBw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rZXb4-002SFp-K9;
-	Mon, 12 Feb 2024 14:47:50 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>
-Subject: [PATCH 2/2] arm64: cpufeatures: Only check for NV1 if NV is present
-Date: Mon, 12 Feb 2024 14:47:36 +0000
-Message-Id: <20240212144736.1933112-3-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240212144736.1933112-1-maz@kernel.org>
-References: <20240212144736.1933112-1-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BJwkiqz+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707757508;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AOauPAOUW8xmwdezNoz+IWSD863XpUK91dsGE3R14Gg=;
+	b=BJwkiqz+FdLvAn0xYXWPsEFTnhsviBjAS3z7y4R4w3R7cdO6/PNuYYHkMh/lktjzm5Xac8
+	/SQa7DzRweIK50F50R7LYqHlIpB5tCYrEegr86EUR0GNl6vY+c4coMKUW+Zax1uv96hSQZ
+	uVva3i+5auzqM9sTSHzQTa9neqUK8jo=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-572-ieACSmpjPh27sqddER09WA-1; Mon, 12 Feb 2024 12:05:06 -0500
+X-MC-Unique: ieACSmpjPh27sqddER09WA-1
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-363cff2c5ccso29945445ab.0
+        for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 09:05:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707757506; x=1708362306;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AOauPAOUW8xmwdezNoz+IWSD863XpUK91dsGE3R14Gg=;
+        b=VvEoHGrQ3fxefbynSUobvVUHq4/tj9KEWBg/+DS////MbIuI/qaWRwcRd6E4zQwuWj
+         mErG88HMVnmK5dZRKuh3D4uTtO5EW8ERseq6eA2349erINR7N+HKp7xutrP+lwGYq7ll
+         dwdzwjsnc6Djtrpj1/eceylQmXTL71tGHkbbVZSPSOJhm9fY30wzp/BM1hrec/LFHkCO
+         fj/Eztf00CyDk69Xge09IiMBd6Nklm9uWuHWhmb5B+g2QwOGsyv8HPuU8EtkpvPLojNy
+         ZOeJTcDKHeMP7ERDo+WSdgtHLduvlU/pSiToIXZXkTyRxiJBoAW2Z7gKReryvgIVXAy+
+         FySQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWgqrfPx4SS1Sox0pHsKzA+MGl8DogNpGVJOd2lc0e8Pwnt/LHNjibZhBtAXZEPEotfE2Idh3qkIEdcpUfZQdhDLlvYp0Ov
+X-Gm-Message-State: AOJu0YyfLRU/Aiwg+KABtiAHLx3u+hyETn4WKlulJPgQu6067ulr3V6t
+	8fvQiOSfqthlWbO8+1MxEWkznUkpp5LNSeKyMUmARpp0S8BK1f+/G0FZ7rU7az1wz4eT4rRcwvp
+	yaopYr3B+H4tSiK7In7Bmr3y99hEcM3SowSKVvrD8t870weIS5Vpmzg==
+X-Received: by 2002:a05:6e02:1c0f:b0:363:bf4f:9242 with SMTP id l15-20020a056e021c0f00b00363bf4f9242mr12359159ilh.0.1707757505976;
+        Mon, 12 Feb 2024 09:05:05 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFTr7BKAunXGu61vRYhJINkTJcmaRk0uei4AcQbQ44MkhVmZ5mwHzO7IldqcHZ1n+fHrehwBg==
+X-Received: by 2002:a05:6e02:1c0f:b0:363:bf4f:9242 with SMTP id l15-20020a056e021c0f00b00363bf4f9242mr12359090ilh.0.1707757505683;
+        Mon, 12 Feb 2024 09:05:05 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWTKjfqO4rkuhd2GHVkqqBNv4+4iVoZcGlDpy3HDG1uMMhT2d1jmDXMdgoX5DAWSe6wNqaoupDoOAQYGfaqx0u2YxoUAD4jOURcBV59dRJ0I84dPyAqjUa503odT/ihzOsHVyPnNOPJoHdYRT0Rkp1ITk30Z0jK0uQhOT8ZxCTTsDwHyplbhVXKzzWJ+5KLI0CW6tCa0uQX8eZY5XNRWRGf+QNcHvIm3yhzArCWF1+twWZ8ZnjPN50CfZ2MfWdE75xZdbBSioYKg/nzKmtiQE3HF/9lKHwRBYl6QkNkUBjfurx86zdYaK+ehhpNI3KCup/fqQW91N+qdWpE6M/4gD15NJDcY+cT9NbrcP/cidh0BMgG50wNuXrmnkXpm4oifG69lW1OlbPuCF3FwTEvBEMdMJNhwGJUq73Fb0yEEC3moByn74AQRxFN2+lKgvS7f3ETe1xbUchqRjQJYKyPvAv5d54L1Slq5ySDW0gE8KXZDMWQOLPNjP8lfWTWVQz2cegkBDFZnvSicLwrm7kx6Uyn4iQRg2Q2+2S092z+9EVssL4dTBcBiSfvzP4WR8BM9x2Cnj61ySifZP2b3sit2kXjDiHOKSpVT3XvUxV2NbiqyqaykRhfqoQWedicpEy2bUk4+6LGqp11TmwKitHZJVqrpjqEY5C20DTsYEiFK61AzM8/cBavnY1uHrFpyCAogoztCVgiLv6dR1pGSea50FebaaEoxsF0FdNhpT2In60GDbjrIIPJw9Yq3LE+A7pRuI8M2Pv2xba1cBmYG5BrQ/9vAC0AeyPnL/EjsEcqAD861Ut39qWpRqvM0jpvnlygSo13H7bWAWmrMWzOqUYutqVrxS1vCjbuNPAk4KPe0BHXnX+ou2Ou1LDGvKclXyNuba+zNe/6NIkiQ9tFgwZQWrO6cdbtM29KCOYYYy6I1yQguArOSxd54yZMFBXbHqlvq68ZD7
+ s5Ogdlm3vmILJeBjg6GR7Gfseo5SInXkPEJuISfamgJq1cKmYEkWiLHdpEXsU2z2bxLv6UizINdscavVhxNtO+f3YWyq67/6mkIHGegdJtwSQkFTQE38Qc6rY4wjyj3IoWWIw3JoTW1arS4PnomVhrCPLrZRuUcqKd4YW697swDORpqc5pjtaQmDUFd3HjddzZ2ykwrVpXhQU0MTWWohfdS3VaXxvAHWG/+cPs5+gvAChdu1Syik831EdMmJCOOtGu+BcmXFq/EhhR6d91D/vA9vXazLvjYergDYBNbDpREevkFO/zUNlr5Hb5RaVHWWDvXX9c
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id bf12-20020a056e02308c00b0036275404ab3sm2025858ilb.85.2024.02.12.09.05.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Feb 2024 09:05:04 -0800 (PST)
+Date: Mon, 12 Feb 2024 10:05:02 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: <ankita@nvidia.com>
+Cc: <jgg@nvidia.com>, <maz@kernel.org>, <oliver.upton@linux.dev>,
+ <james.morse@arm.com>, <suzuki.poulose@arm.com>, <yuzenghui@huawei.com>,
+ <reinette.chatre@intel.com>, <surenb@google.com>, <stefanha@redhat.com>,
+ <brauner@kernel.org>, <catalin.marinas@arm.com>, <will@kernel.org>,
+ <mark.rutland@arm.com>, <kevin.tian@intel.com>, <yi.l.liu@intel.com>,
+ <ardb@kernel.org>, <akpm@linux-foundation.org>, <andreyknvl@gmail.com>,
+ <wangjinchao@xfusion.com>, <gshan@redhat.com>, <shahuang@redhat.com>,
+ <ricarkol@google.com>, <linux-mm@kvack.org>, <lpieralisi@kernel.org>,
+ <rananta@google.com>, <ryan.roberts@arm.com>, <david@redhat.com>,
+ <linus.walleij@linaro.org>, <bhe@redhat.com>, <aniketa@nvidia.com>,
+ <cjia@nvidia.com>, <kwankhede@nvidia.com>, <targupta@nvidia.com>,
+ <vsethi@nvidia.com>, <acurrid@nvidia.com>, <apopple@nvidia.com>,
+ <jhubbard@nvidia.com>, <danw@nvidia.com>, <kvmarm@lists.linux.dev>,
+ <mochs@nvidia.com>, <zhiw@nvidia.com>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v7 4/4] vfio: convey kvm that the vfio-pci device is wc
+ safe
+Message-ID: <20240212100502.2b5009e4.alex.williamson@redhat.com>
+In-Reply-To: <20240211174705.31992-5-ankita@nvidia.com>
+References: <20240211174705.31992-1-ankita@nvidia.com>
+	<20240211174705.31992-5-ankita@nvidia.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, m.szyprowski@samsung.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-We handle ID_AA64MMFR4_EL1.E2H0 being 0 as NV1 being present.
-However, this is only true if FEAT_NV is implemented.
+On Sun, 11 Feb 2024 23:17:05 +0530
+<ankita@nvidia.com> wrote:
 
-Add the required check to has_nv1(), avoiding spuriously advertising
-NV1 on HW that doesn't have NV at all.
+> From: Ankit Agrawal <ankita@nvidia.com>
+> 
+> The code to map the MMIO in S2 as NormalNC is enabled when conveyed
+> that the device is WC safe using a new flag VM_ALLOW_ANY_UNCACHED.
+> 
+> Make vfio-pci set the VM_ALLOW_ANY_UNCACHED flag.
+> 
+> This could be extended to other devices in the future once that
+> is deemed safe.
+> 
+> Suggested-by: Catalin Marinas <catalin.marinas@arm.com>
+> Acked-by: Jason Gunthorpe <jgg@nvidia.com>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_core.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 1cbc990d42e0..eba2146202f9 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -1862,8 +1862,12 @@ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma
+>  	/*
+>  	 * See remap_pfn_range(), called from vfio_pci_fault() but we can't
+>  	 * change vm_flags within the fault handler.  Set them now.
+> +	 *
+> +	 * Set an additional flag VM_ALLOW_ANY_UNCACHED to convey kvm that
+> +	 * the device is wc safe.
+>  	 */
 
-Fixes: da9af5071b25 ("arm64: cpufeature: Detect HCR_EL2.NV1 being RES0")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kernel/cpufeature.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+That's a pretty superficial comment.  Check that this is accurate, but
+maybe something like:
 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 2f8958f27e9e..3421b684d340 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -1812,8 +1812,9 @@ static bool has_nv1(const struct arm64_cpu_capabilities *entry, int scope)
- 		{}
- 	};
- 
--	return !(has_cpuid_feature(entry, scope) ||
--		 is_midr_in_range_list(read_cpuid_id(), nv1_ni_list));
-+	return (this_cpu_has_cap(ARM64_HAS_NESTED_VIRT) &&
-+		!(has_cpuid_feature(entry, scope) ||
-+		  is_midr_in_range_list(read_cpuid_id(), nv1_ni_list)));
- }
- 
- #if defined(ID_AA64MMFR0_EL1_TGRAN_LPA2) && defined(ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_LPA2)
--- 
-2.39.2
+	The VM_ALLOW_ANY_UNCACHED flag is implemented for ARM64,
+	allowing stage 2 device mapping attributes to use Normal-NC
+	rather than DEVICE_nGnRE, which allows guest mappings
+	supporting combining attributes (WC).  This attribute has
+	potential risks with the GICv2 VCPU interface, but is expected
+	to be safe for vfio-pci use cases.
+
+And specifically, I think these other devices that may be problematic
+as described in the cover letter is a warning against use for
+vfio-platform, is that correct?
+
+Thanks,
+Alex
+
+> -	vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
+> +	vm_flags_set(vma, VM_ALLOW_ANY_UNCACHED | VM_IO | VM_PFNMAP |
+> +			VM_DONTEXPAND | VM_DONTDUMP);
+>  	vma->vm_ops = &vfio_pci_mmap_ops;
+>  
+>  	return 0;
 
