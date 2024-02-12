@@ -1,226 +1,247 @@
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2051.outbound.protection.outlook.com [40.107.94.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 757143A1C7
-	for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 12:48:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707742129; cv=none; b=mFmQW+cIP7SKPuBbe7gcqw5o+hL57s7y9vwUp2ztq7ycO7IH9UE3SXyuwEsfl1PYdGt7AytxFB/TnGNzZH/usdHV7QgzCAf0IitIYLKHRSrC9RVkIKeGRmMnK/jpV0C/Q4vsGFfcc5GqKz/jHHy/KFIvY38jGJGHyxTucgYffTY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707742129; c=relaxed/simple;
-	bh=5FQ3NiAdyEkTEr9w+FtaAYvNtplWskRxrnlkdh+9bJ0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=IBQ1sMCDZTN0i1J6u4fvzMG7A4oEJd+kCXU4MIPpM4IUpcpoAXaCupsv+0OKDI8WD9dUolYi3xHuDGLB37x4Y6LsAlgDr5Woq95tvjO7dzspXVY+P1GbSPykbKW8dpPTHAAkp8W8e+HO4EY5TKmVPMZATIPU7SgMLFqADo4Bgrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=rtvTyLpv; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E0613A1A0
+	for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 12:56:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707742620; cv=fail; b=PZIQNE/ibAeG0FMdQ6FEVg/9/eyz+3fegpWRfu4jaXAMDqs3tH3ZDw28tQl8tcFQeXsleWhNkLTBOt3EeQDRJF1g0jKlHf0ytxA3DPHGt1A/EGQlQauVVVXveAHmz2BGIYMjkWjiW57+lD1T/z5bXPHbpMewCRd1egBfik3t6D4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707742620; c=relaxed/simple;
+	bh=Mrsivu7FQJj8aBbg2cK17ndUBiJBSOEEsy+lOeH8yzI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=caC9TfdSjKodN8VHMwzhpmD4DZpxj63yUu5wXNFxiSAK5LQyKPzmvlpdx1+Am1jHOVFeq3YaCb6+ZHz7CDGXvgkyuYq13TUp+h0EzJDHrPGbiOK34sdYLIcZeoR48kIkazr00Pubq+ai+FQfROBPFr63h8So5ncIk3ashVc/tWQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=FErQBZyp; arc=fail smtp.client-ip=40.107.94.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="rtvTyLpv"
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20240212124837euoutp02206f72a97c8e179e082967b4b56d9633~zHmh8N0c41761417614euoutp02Y
-	for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 12:48:37 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20240212124837euoutp02206f72a97c8e179e082967b4b56d9633~zHmh8N0c41761417614euoutp02Y
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1707742117;
-	bh=d44lPDARd4ZiU6xOkjZaGnKZQJFHYJ/v3YSgkLgTRoI=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=rtvTyLpvZ0zmVc3Aoi4GYHoJ4eOYp2qkVFJe3PfUSJsag7dZ41g945W4DS05zdX0P
-	 iKd9R4uRqPJwaNBNkg6lkoBM7vUQxsfePcdrwqyJJcpMiFNxymNTptggqPVi9JynFo
-	 4k3RDBX3+wBXPFotUfwDkWmQFJs9dbJF04svY1gI=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20240212124837eucas1p1fe5faa2b5f0fa9cdeefd472d1e8d0abe~zHmhrCKFo1096910969eucas1p1P;
-	Mon, 12 Feb 2024 12:48:37 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-	eusmges2new.samsung.com (EUCPMTA) with SMTP id A1.43.09814.5A31AC56; Mon, 12
-	Feb 2024 12:48:37 +0000 (GMT)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20240212124837eucas1p231da54bb0ff8d46d38c6c7e627e50172~zHmhLxeUs0420104201eucas1p2o;
-	Mon, 12 Feb 2024 12:48:36 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240212124836eusmtrp2e9594420af1de918f494e64814f06127~zHmhK1ay52716027160eusmtrp2M;
-	Mon, 12 Feb 2024 12:48:36 +0000 (GMT)
-X-AuditID: cbfec7f4-711ff70000002656-e6-65ca13a52e93
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms1.samsung.com (EUCPMTA) with SMTP id A2.C7.09146.4A31AC56; Mon, 12
-	Feb 2024 12:48:36 +0000 (GMT)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240212124836eusmtip275f391299e69bba1f770809a1f9b5b1e~zHmgdE7NV1065510655eusmtip2P;
-	Mon, 12 Feb 2024 12:48:36 +0000 (GMT)
-Message-ID: <e3cc70fb-16d9-4e4e-aa35-f0eb2baaf166@samsung.com>
-Date: Mon, 12 Feb 2024 13:48:35 +0100
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FErQBZyp"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ku+mC8wcQkz9y3hQXm362lSdw+PZkZsIE3f4jT40W2iWAEgDN3uvb7PVV2JGye/c0JRAKUYDFD7D4NzKFNbdrZUww0Re9Nifyfcq3g+Ip1X/ugCWrTAsZlz0qgTEr0CNe1l8t+DURe43rRstSR9aQm2zNZKjQXReVsn2b97voif0ySOyQqo1IDuJLFJvXf8w4uvmPR2Bticv/xdwgqZ7sVA4kQxQA1mqVAffAvAIw/DjdnHIkiufwjlmnaGccv1Euchm6aEhjNnH7sfEVjjAINwxGJgoRNwtDWxuAzMCCHqFEqqazIbQDAp8637D3fAa9B32LX4MK4C2yI8Si1Xj/A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=B2ijP5D0AyjOPwbgv1vcIC8eaaBxrX9ITY0hxjITpYI=;
+ b=C7AJIif1jBSKSfqrFWsHqc84pz6mEdKFmLJ6X7TaQGlIwn+S+qYI1AVODtv73pHBYMRT4NmabGryHyyHtqoHBLm5ehQXEDKpahhu+x15NUHurUHYiqi0U+HWnM9ovxVxkbuQLPMIciFTGWePeRZce4pgEk0dQpEs7jkeyeCFBFF+rbCXYG5H0pNgDGujacTzKVpP2me3dcXezEUeI9pmPHuwrVLrEtJB/9sFhpWr6UQ75n5DBZIEpJDEoNOAcRiTsNHlHEsJ9VbY1IturldVS+bExBc/UwBmXQGgvQiqZZmCBMoc6cH6r5Kvy/NjrDR1s1jmFnuL4P9yoT2xxI2QRQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=B2ijP5D0AyjOPwbgv1vcIC8eaaBxrX9ITY0hxjITpYI=;
+ b=FErQBZypBO1B1fbdZnMhOHXKug/mqUzGbmisMWQtPXxLr/Lh+8zS3ygqjImOv5mgasGMHpNKQt+gtB5H8ihhV5udf5gpbPMHuSPgaKAx6hjf5YRrQyktTmXPpJXee2L6GdOwvtJtHmrzqtz/X61N3D6e4itnwOR8CR/CGAcRCgUWsh+9F0ruDhYSWpxDyoGAmh5HI+AxV6/ZKfeX6d45JP4Dx1J30eBlgEEGFwOx2XAHjPrUfR05VPTX1h75A78zCgZuaT23ZVTqPXFlmnmNs6PhDWj+WGA2C2DF0elpsBEY0E4z8yZfEZiHM0T27ATe/Li3+sR2KixNtLquu4gNjQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by BY5PR12MB4130.namprd12.prod.outlook.com (2603:10b6:a03:20b::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.25; Mon, 12 Feb
+ 2024 12:56:55 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::96dd:1160:6472:9873]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::96dd:1160:6472:9873%6]) with mapi id 15.20.7292.022; Mon, 12 Feb 2024
+ 12:56:55 +0000
+Date: Mon, 12 Feb 2024 08:56:54 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: ankita@nvidia.com, maz@kernel.org, oliver.upton@linux.dev,
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	reinette.chatre@intel.com, surenb@google.com, stefanha@redhat.com,
+	brauner@kernel.org, catalin.marinas@arm.com, will@kernel.org,
+	mark.rutland@arm.com, alex.williamson@redhat.com,
+	kevin.tian@intel.com, yi.l.liu@intel.com, ardb@kernel.org,
+	akpm@linux-foundation.org, andreyknvl@gmail.com,
+	wangjinchao@xfusion.com, gshan@redhat.com, shahuang@redhat.com,
+	ricarkol@google.com, linux-mm@kvack.org, lpieralisi@kernel.org,
+	rananta@google.com, ryan.roberts@arm.com, linus.walleij@linaro.org,
+	bhe@redhat.com, aniketa@nvidia.com, cjia@nvidia.com,
+	kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com,
+	acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com,
+	danw@nvidia.com, kvmarm@lists.linux.dev, mochs@nvidia.com,
+	zhiw@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v7 0/4] kvm: arm64: allow the VM to select DEVICE_* and
+ NORMAL_NC for IO memory
+Message-ID: <20240212125654.GV10476@nvidia.com>
+References: <20240211174705.31992-1-ankita@nvidia.com>
+ <aa6c1708-d6ac-46f7-b7ab-e97a273a90c2@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aa6c1708-d6ac-46f7-b7ab-e97a273a90c2@redhat.com>
+X-ClientProxiedBy: SA0PR11CA0015.namprd11.prod.outlook.com
+ (2603:10b6:806:d3::20) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 06/10] arm64: cpufeature: Detect HCR_EL2.NV1 being
- RES0
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
-	<will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Suzuki K Poulose
-	<suzuki.poulose@arm.com>, Ard Biesheuvel <ardb@kernel.org>, James Morse
-	<james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu
-	<yuzenghui@huawei.com>
-From: Marek Szyprowski <m.szyprowski@samsung.com>
-In-Reply-To: <20240122181344.258974-7-maz@kernel.org>
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrOKsWRmVeSWpSXmKPExsWy7djP87pLhU+lGtxYI2Hx88t7Rov3y3oY
-	Le7vW85k8WrLYRaLTY+vsVosvX6RyWLnnJOsFlN/vmGzmHn7NqNFyx1Ti5tLN7A7cHusmbeG
-	0aPlyFtWj02rOtk8FjZMZfbYvKTe48XmmYwBbFFcNimpOZllqUX6dglcGQ/6zzIV/JCv2HL3
-	CHsD42upLkZODgkBE4mLc4+zgNhCAisYJba1aXcxcgHZXxglvvStZ4JwPjNKzG3bzwrT0Xdk
-	KVRiOaPEr/mPWCGcj4wS81b9YwOp4hWwk3hyaz5YB4uAqsS9rVcZIeKCEidnPgHbJyogL3H/
-	1gx2EFtYIEDiReNisDizgLjErSfzmUBsEYFEide31rGBLGAW2MwkcezMXmaQBJuAoUTX2y6w
-	ZZwCphJTe24wQzTLSzRvnc0M0iAh0M4J1LCTGeJuF4lL7dsZIWxhiVfHt7BD2DIS/3fOZ4Jq
-	YJRY8Ps+lDOBUaLh+S2oDmuJO+d+Aa3jAFqhKbF+lz5E2FFi27cPYGEJAT6JG28FIY7gk5i0
-	bTozRJhXoqNNCKJaTWLW8XVwaw9euMQ8gVFpFlK4zELy/ywk78xC2LuAkWUVo3hqaXFuemqx
-	UV5quV5xYm5xaV66XnJ+7iZGYNo6/e/4lx2My1991DvEyMTBeIhRgoNZSYT30owTqUK8KYmV
-	ValF+fFFpTmpxYcYpTlYlMR5VVPkU4UE0hNLUrNTUwtSi2CyTBycUg1MLMJL30xYfiRL+Ij0
-	rmnBOnwWU5OkLqjpZpjcCE+/YSwY2xX4dsOHJQw57Ncdlx4Qyl+4y2uN3QaNiweENzhdPPtb
-	yqn8oNfmdPGiz5zbgyeemiuTkvjLOPtgaPe3buWyAzssFvo+36QrX7nB67fr5VrpjqPp4uc/
-	Ob5Iy/ueqhbF+m7uvyWMzx2KLqbc6GOYt+D/JiumrYeaNeVPH1+/5auiyIb/anXb/wYf6Fc7
-	Htb+z8WsfctyA7a/qh0L3U582feeb+ux8+7Fqo/PSj15Vsx9nV/aIHpVvPLN+zMF9yl/U/C+
-	t1NvkaRH75lzCRcZ5JOKJE095zzemvj97byTLGXXL6y3u+UbIs7XwLtISImlOCPRUIu5qDgR
-	AHOn6yrKAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrBIsWRmVeSWpSXmKPExsVy+t/xe7pLhE+lGrz9YGHx88t7Rov3y3oY
-	Le7vW85k8WrLYRaLTY+vsVosvX6RyWLnnJOsFlN/vmGzmHn7NqNFyx1Ti5tLN7A7cHusmbeG
-	0aPlyFtWj02rOtk8FjZMZfbYvKTe48XmmYwBbFF6NkX5pSWpChn5xSW2StGGFkZ6hpYWekYm
-	lnqGxuaxVkamSvp2NimpOZllqUX6dgl6GQ/6zzIV/JCv2HL3CHsD42upLkZODgkBE4m+I0uZ
-	uhi5OIQEljJKTDx8lAkiISNxcloDK4QtLPHnWhcbRNF7RomWDXvAingF7CSe3JoPVsQioCpx
-	b+tVRoi4oMTJmU9YQGxRAXmJ+7dmsIPYwgJ+Enf+dIHZzALiEreezAebIyKQKHHx+k6wBcwC
-	m5kkJhyaBDSUA2hbvET39HqQGjYBQ4mutyBHcHJwCphKTO25wQwxx0yia2sXI4QtL9G8dTbz
-	BEahWUjOmIVk3SwkLbOQtCxgZFnFKJJaWpybnltsqFecmFtcmpeul5yfu4kRGKXbjv3cvINx
-	3quPeocYmTgYDzFKcDArifBemnEiVYg3JbGyKrUoP76oNCe1+BCjKTAsJjJLiSbnA9NEXkm8
-	oZmBqaGJmaWBqaWZsZI4r2dBR6KQQHpiSWp2ampBahFMHxMHp1QDk3bHhQZd6fn2ggU3+J5O
-	khQTMZ2y2Et6g2B5ffa16aVfgtSOlPIzcC0K0J96J8awIf/GMtdehY3a8+Lr/p/8tCJw+zof
-	6Zr08tK7nz//mjn5TUjwMZMTXyr1Ny1Ru3gnimXqxO8rN5Uym0hOP9rx+mLaJ6FX224v0WJU
-	k1vk1FZieG3v6VMbLjfnf1uksTb50rWFSrF/wpPF1+jLtEdv/aXy++etk1O3P55bFbKyMaT+
-	1PULBooHfUMijU9qy3vEXDb7E6u7RXtTZrmG5rTq9rcicgvLHkqIb1ZwK+l7nPTH4N47pQfr
-	zbYUVilp7We7uGWu/37eumm/k98J5M+b6PT/grWQX61Iz7/za2LvzVdiKc5INNRiLipOBABQ
-	KiVHWwMAAA==
-X-CMS-MailID: 20240212124837eucas1p231da54bb0ff8d46d38c6c7e627e50172
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20240212124837eucas1p231da54bb0ff8d46d38c6c7e627e50172
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20240212124837eucas1p231da54bb0ff8d46d38c6c7e627e50172
-References: <20240122181344.258974-1-maz@kernel.org>
-	<20240122181344.258974-7-maz@kernel.org>
-	<CGME20240212124837eucas1p231da54bb0ff8d46d38c6c7e627e50172@eucas1p2.samsung.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BY5PR12MB4130:EE_
+X-MS-Office365-Filtering-Correlation-Id: cd83e47a-3382-4c8a-16f6-08dc2bca172d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	f0QjHpjT9U1mXtZwMyxuIUtuR1EAU0tX5eUCWWkHF3KsUFUPu6ygQ6+Fngag02MriL5sUp1qErZUtAKybD90rPYX+NZamt2366ZXsiSURJoYT9v9FItUQvECv75cGsjChQkiR//lD8AlJcgD4fn4091PoClcZeswCjO3othjmvax/yo4gZwWn6wEToskTu0PJvyJt+S5SajiqQ6HVptKHbLK3Y2QCR7Y6AkLqAFfdbOsTkp5JWtg2i5WMJMT/gb7M8wuekqHnVFdxWesytfQVsTOmQFFMwCmp+/PvbV9eXDCHkA7eq98OAy7zAygdu1jK7TJO+IBaBefRGKTzCO5ndGKhMkdzwi316lEUqRiX+aJ1ThkAbUS+CqSbuqRdJbdAuc1IJuvYCdTTirO2Z1z0aJLnaReStOAy2biyEPAF7YB5A5J8EVL98ogAw2X2FNpN1hx1QVvG9gn99JTQxsclqepWFo2bzj7+XgSZZfrF0ky+HNBjO8i9YOgRP/XMy0X4AukZ0s6PzMY/AALYMpeysm9djaJnW8qxv6wIlHxlXIfyk807ZHo6GuZYF3bH+nC
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(136003)(366004)(39850400004)(346002)(230922051799003)(186009)(64100799003)(1800799012)(451199024)(41300700001)(7406005)(7416002)(38100700002)(2616005)(4326008)(8676002)(8936002)(2906002)(316002)(5660300002)(36756003)(66556008)(66476007)(66946007)(6916009)(86362001)(1076003)(6512007)(26005)(83380400001)(6506007)(6486002)(478600001)(33656002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?odOmyOy23e1tjrwZ2xm+gGvs92RBUT0wN2UYi/NaEctZjo8o1tMrimPR/4/q?=
+ =?us-ascii?Q?nFpEy6nmpFgyFOkTlT/yHcyOO9h+nu2Cet4aXlo9gmTQdCpYyaRc7/pt4VOk?=
+ =?us-ascii?Q?HwIqOPdUdh8R/AKVrppgEzNckOm7Ou6Z+zreakErgtElCiYxEgh8qO/jEG9G?=
+ =?us-ascii?Q?36cbetHovWDw+dwQB49LZ9hN0n7qS6hQri6M9bqSFcsujeRqFydEe41ps1WB?=
+ =?us-ascii?Q?0TNbBzKNfQKJDMtMCoSv64+v/pEPQ/M/AsG+Ja0c4Yr4PCMreuVRuhmiLJXo?=
+ =?us-ascii?Q?vT7TXb0vl6ME8UxDpSUQXkELib9CSf7yQjpVBco+IOFUUAZ1ZPmmd7jGzEvO?=
+ =?us-ascii?Q?Myvmmwn2+QD7M55qZOvm2fHeB96qsosUfPe8nY4PTkggEJ82sboz3lR6bnMW?=
+ =?us-ascii?Q?a+nJztkrvIoZAVTKAcFJSVNb8DMVXTOy+L6SBAUsEevAj42BdMzeDwqyEdE+?=
+ =?us-ascii?Q?NGwOv5Ql1srJs9NkWo7ypnTdHlaOY5r9yScZRgzmHLsDbKKfUUIw93d6+cHB?=
+ =?us-ascii?Q?i0L17+2yh5fUKN+E4loOhO4NZyeT/8dBuBwuBHvIRpn4WRhk/hLmV+j1BV3u?=
+ =?us-ascii?Q?QEiYMFFrornTYciJNiJTDvCuAq9hXTpfeRdg7XbweljQXUYHdd5TypSImuoY?=
+ =?us-ascii?Q?gyF8K+gsNl8h6God0OD5sRZ73D7UuFATV939Gt5rPCFzadxmr+LW8I3QJEfu?=
+ =?us-ascii?Q?GrreaggReyoF+FqFQ5AFsnexfD02KwFzlMDFsoBP59b14rTGphvyNPzo8yv5?=
+ =?us-ascii?Q?lDvTIDTGcRWqdA7qBQKsLWC1tAvd1YG8ej91m1eZxROAAqN3B+jFKOjmtlhv?=
+ =?us-ascii?Q?X3oFW2TNRNlQMHKFwnxS6GydwcpK42LcMOQzYrQ5LfKUPFkoxbsSNjDHv6mz?=
+ =?us-ascii?Q?r4bHl225ZSy/Jk43bdrOIzFke/LqLYpVY8bzzXWMEDQjkOOAY/V2rrxQ1OuJ?=
+ =?us-ascii?Q?HeGtoWVoviiupJQihqaThzfwtJc5qUSJEZ0afnIMM0u7ZdYuFACJB9Z2bFSx?=
+ =?us-ascii?Q?0fCg1ufJ7F28sCRGyWP4oN1HovG8PuA7Jr++gQ/z3jQPpZx9zexBauMtnjTl?=
+ =?us-ascii?Q?zKRnxr8MoXsUsO3DmaxOhJzb4/FjZmGRVpl9J6TyvjnfsLpUrIjCtHvcD4sB?=
+ =?us-ascii?Q?w7DX+kHrEq+17CwZ9SYpdG9hIH9nVgcTAteFDq3pA+dXM6WO48hy+/hEUDS5?=
+ =?us-ascii?Q?kvJzngcrcacb637XhdiewVi61wbalPY5dDjy1KHOpAbn/a21xlGbHO5WNQ1p?=
+ =?us-ascii?Q?z0BqVy/327gMBL0nABEQnbhXRZyCZyoHvtq4sZbADwF5OU9+a01870BMFVNd?=
+ =?us-ascii?Q?QuYFZ7WcPR9B6R1cFz5ARDnzzgg+A10hi/cpEIYjIZ7z7spWcowNY8D2qtSp?=
+ =?us-ascii?Q?SAQnycMqr8Wnsr/cTk7/9BvjBoWmjzJorpuDHQwAnA6XJm4muwdRyF8C5N0x?=
+ =?us-ascii?Q?lOfqfApuQT68/QKtjoBWuGcpbZOQNrheIeBlehQIC9EcL74vZy8IZi66ajvr?=
+ =?us-ascii?Q?LFaamJ1JRxFse5go0gBnz3WqMUHfpRxRNdYEQCOrWGvaocKk86hIq7BUwwui?=
+ =?us-ascii?Q?ZGZdZOQB1g4IaLqh9ds=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cd83e47a-3382-4c8a-16f6-08dc2bca172d
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2024 12:56:55.3473
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RafhKT3ea9ocRpN/10DodrXtkhnKxd4j5Kkfe6FChRCj1zA0PN2pHwtnpy1U/ddS
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4130
 
-Dead All,
+On Mon, Feb 12, 2024 at 11:26:12AM +0100, David Hildenbrand wrote:
 
-On 22.01.2024 19:13, Marc Zyngier wrote:
-> A variant of FEAT_E2H0 not being implemented exists in the form of
-> HCR_EL2.E2H being RES1 *and* HCR_EL2.NV1 being RES0 (indicating that
-> only VHE is supported on the host and nested guests).
->
-> Add the necessary infrastructure for this new CPU capability.
->
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
+> I still have to digest some of the stuff I learned about this issue, please
+> bear with me :)
+> 
+> (1) PCI BARs might contain mixtures of RAM and MMIO, the exact
+> locations/semantics within a BAR are only really known to the actual device
+> driver.
 
-This patch landed recently in linux-next as commit da9af5071b25 ("arm64: 
-cpufeature: Detect HCR_EL2.NV1 being RES0"). I found that it causes a 
-following regression in the CPU hot-plug operation:
+Nit: Not RAM and MMIO but different kinds of MMIO that have different
+access patterns. The conclusion is correct.
 
-# for i in /sys/devices/system/cpu/cpu[1-9]; do echo 1 >$i/online; done
-------------[ cut here ]------------
-kernel BUG at arch/arm64/kernel/cpufeature.c:1468!
-Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
-Modules linked in: dw_hdmi_cec dw_hdmi_i2s_audio crct10dif_ce 
-snd_soc_simple_card rockchip_saradc industrialio_triggered_buffer 
-hantro_vpu kfifo_buf snd_soc_simple_card_utils rockchip_thermal 
-phy_rockchip_naneng_combphy display_connector gpio_ir_recv v4l2_vp9 
-v4l2_h264 v4l2_mem2mem dwmac_rk videobuf2_dma_contig stmmac_platform 
-videobuf2_memops videobuf2_v4l2 stmmac rockchipdrm videodev 
-snd_soc_rockchip_i2s_tdm snd_soc_rk817 pcs_xpcs panfrost rtc_rk808 
-rk805_pwrkey analogix_dp rk817_charger spi_rockchip_sfc dw_mipi_dsi 
-videobuf2_common dw_hdmi drm_shmem_helper mc gpu_sched 
-drm_display_helper ahci_dwc ip_tables x_tables ipv6
-CPU: 1 PID: 0 Comm: swapper/1 Not tainted 6.8.0-rc1+ #14563
-Hardware name: Hardkernel ODROID-M1 (DT)
-pstate: 800001c9 (Nzcv dAIF -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : __read_sysreg_by_encoding+0x38c/0x390
-lr : read_scoped_sysreg+0x4c/0x70
-...
-Call trace:
-  __read_sysreg_by_encoding+0x38c/0x390
-  read_scoped_sysreg+0x4c/0x70
-  has_nv1+0x18/0x48
-  verify_local_cpu_caps+0x54/0x124
-  check_local_cpu_capabilities+0x28/0x208
-  secondary_start_kernel+0xb0/0x154
-  __secondary_switched+0xb8/0xbc
-Code: d53802f3 17ffff3b d5380253 17ffff39 (d4210000)
----[ end trace 0000000000000000 ]---
-Kernel panic - not syncing: Attempted to kill the idle task!
-SMP: stopping secondary CPUs
-Kernel Offset: disabled
-CPU features: 0x1,80000000,80050295,2100721b
-Memory Limit: none
----[ end Kernel panic - not syncing: Attempted to kill the idle task! ]---
+> We must not unconditionally map PFNs "the wrong way", because it can have
+> undesired side effects. Side effects might include read-speculation, that
+> can be very problematic with MMIO regions.
 
-It looks that some additional checks are needed for the CPU hot-plug case.
+It is worse that some hand wavey "side effect". If you map memory with
+NORMAL_NC (ie for write combining) then writel() doesn't work
+correctly at all.
 
->   arch/arm64/kernel/cpufeature.c | 12 ++++++++++++
->   arch/arm64/tools/cpucaps       |  1 +
->   2 files changed, 13 insertions(+)
->
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index ad3753fbdcb1..91249d20883b 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -1794,6 +1794,11 @@ static bool unmap_kernel_at_el0(const struct arm64_cpu_capabilities *entry,
->   	return !meltdown_safe;
->   }
->   
-> +static bool has_nv1(const struct arm64_cpu_capabilities *entry, int scope)
-> +{
-> +	return !has_cpuid_feature(entry, scope);
-> +}
-> +
->   #if defined(ID_AA64MMFR0_EL1_TGRAN_LPA2) && defined(ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_LPA2)
->   static bool has_lpa2_at_stage1(u64 mmfr0)
->   {
-> @@ -2794,6 +2799,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->   		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
->   		.matches = has_lpa2,
->   	},
-> +	{
-> +		.desc = "NV1",
-> +		.capability = ARM64_HAS_HCR_NV1,
-> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.matches = has_nv1,
-> +		ARM64_CPUID_FIELDS_NEG(ID_AA64MMFR4_EL1, E2H0, NI_NV1)
-> +	},
->   	{},
->   };
->   
-> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-> index b912b1409fc0..65090dd34641 100644
-> --- a/arch/arm64/tools/cpucaps
-> +++ b/arch/arm64/tools/cpucaps
-> @@ -35,6 +35,7 @@ HAS_GENERIC_AUTH_IMP_DEF
->   HAS_GIC_CPUIF_SYSREGS
->   HAS_GIC_PRIO_MASKING
->   HAS_GIC_PRIO_RELAXED_SYNC
-> +HAS_HCR_NV1
->   HAS_HCX
->   HAS_LDAPR
->   HAS_LPA2
+The memory must be mapped according to which kernel APIs the actual
+driver in the VM will use. writel() vs __iowrite64_copy().
 
-Best regards
--- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
+> We can trigger both cases right now inside VMs, where we want the device
+> driver to actually make the decision.
 
+Yes
+ 
+> (2) For a VM, that device driver lives inside the VM, for DPDK and friends,
+> it lives in user space. They have this information.
+
+Yes
+ 
+> We only focus here on optimizing (fixing?) the mapping for VMs, DPDK is out
+> of the picture.
+
+DPDK will be solved through some VFIO ioctl, we know how to do it,
+just nobody has cared enough to do it.
+
+> So we want to allow the VM to achieve a WC/NC mapping by using a
+> relaxed (NC) mapping in stage-1. Whatever is set in stage-2 wins.
+
+Yes
+ 
+> 
+> (3) vfio knows whether using WC (and NC?) could be problematic, and must
+> forbid it, if that is the case. There are cases where we could otherwise
+> cause harm (bring down the host?). We must keep mapping the memory as
+> DEVICE_nGnRE when in doubt.
+
+Yes, there is an unspecific fear that on ARM platforms using NORMAL_NC
+in the wrong way can trigger a catastrophic error and kill the
+host. There is no way to know if the platform has this bug, so the
+agreement was to be conservative and only allow it for vfio-pci, based
+on some specific details of how PCI has to be implemented and ARM
+guidance on PCI integration..
+
+> Now, what the new mmap() flag does is tell the world "using the wrong
+> mapping type cannot bring down the host", and KVM uses that to use a
+> different mapping type (NC) in stage-1 as setup by vfio in the user space
+> page tables.
+
+The inverse meaning, we assume VMAs with the flag can bring down the
+host, but yes.
+
+> I was trying to find ways of avoiding a mmap() flag and was hoping that we
+> could just use a PTE bit that does not have semantics in VM_PFNMAP mappings.
+> Unfortunately, arm64 does not support uffd-wp, which I had in mind, so it's
+> not that easy.
+
+Seems like a waste of a valuable PTE bit to me.
+
+> Further, I was wondering if there would be a way to let DPDK similarly
+> benefit, because it looks like we are happily ignoring that (I was told they
+> apply some hacks to work around that).
+
+dpdk doesn't need the VMA bit, we know how to solve it with vfio
+ioctls, it is very straightforward. dpdk just does a ioctl & mmap and
+VFIO will create a vma with pgprote_writecombine(). Completely
+trivial, the only nasty bit is fitting this into the VFIO uAPI.
+
+> (a) User space tells VFIO which parts of a BAR it would like to have mapped
+> differently. For QEMU, this would mean, requesting a NC mapping for the
+> whole BAR. For DPDK, it could mean requesting different types for parts of a
+> BAR.
+
+We don't want to have have the memory mapped as NC in qemu. As I said
+above if it is mapped NC then writel() doesn't work. We can't have
+conflicting mappings that go toward NC when the right answer is
+DEVICE. 
+
+writel() on NC will malfunction.
+
+__iowrite64_copy() on DEVICE will be functionally correct but slower.
+
+The S2 mapping that KVM creates is special because it doesn't actually
+map it once the VM kernel gets started. The VM kernel always supplies
+a S1 table that sets the correct type.
+
+So if qemu has DEVICE, the S2 has NC and the VM's S1 has DEVICE then
+the mapping is realiably made to be DEVICE. The hidden S2 doesn't
+cause a problem.
+
+> That would mean, that we would map NC already in QEMU. I wonder if that
+> could be a problem with read speculation, even if QEMU never really accesses
+> that mmap'ed region.
+
+Also correct.
+
+Further, qemu may need to do emulation for MMIO in various cases and
+the qemu logic for this requires a DEVICE mapping or the emulation
+will malfunction.
+
+Using NC in qemu is off the table.
+
+Jason
