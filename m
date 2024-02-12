@@ -1,54 +1,44 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F34E482C0
-	for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 20:24:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A454843AA8
+	for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 20:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707769490; cv=none; b=j8Vq618Fu1PBak84m8w9Fomp/RMSibIhP001QVkBiKUgGQxaGvcQQ/LJzH6H2W+aNkxubFAicBkJCJa/xTqEHpZGZMEGvZyJOWjfo6nP9Hyn6NWA28OAEkpbFXT5GS4y2vJ9aZ4mOIenptSBUiAVkXQEj+s0IhSEOmTVBF70NgU=
+	t=1707770418; cv=none; b=Ymk1fctUh3yCi/6wKctt5eEOQ1yLPIUoih94WvpTT/XM7B3kEuybbSoJK0krgT/UDwKnsjUSeHprzJs15RcS4aCwkViF68gFdn6Bz0msjdKVXIUz6ox34byTvt8e/9WgFfxDpjY9oL4glHGH7r1WCb3fjTHIQ1MdMh8Dn0Sn2TE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707769490; c=relaxed/simple;
-	bh=EW1iwgQRXKT66+pbcKRYd+o9vCcGD15QbpagYfyY78A=;
+	s=arc-20240116; t=1707770418; c=relaxed/simple;
+	bh=miMuI9wZpwSybczsfBp3fStDaxVi6pe02CNZLYVhiik=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y8AwQ8IgEFRRR7tYcyYRWlPSYXDnBfHdfVgAvpVXBZ4ZzPGsbvBbXe6f5kFlqk1RAMJWeSfIWF3pBQBE8VT6A1/59Ncaj/JG6bzWBqZ5MOHSKE6HQku9eF3lCaYkCKiMKlegl93ERGsTqHw62RYJEQjZUuQwlI3xKYqtw7HvN5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=huo7uteC; arc=none smtp.client-ip=95.215.58.187
+	 Content-Type:Content-Disposition:In-Reply-To; b=O6WWKhgQhFRHcEwFqHCKZRBIeTSS0vLdJO1G7yuHMJ4M6JoMIVxAjzgK0lRkgwxdk1QEyZbpy0ibWClMrNozW5dZZD5rlDIcS9jDR+l4IgzPYHTO3W74ueRSqg8d5TtTBm10jN96zOwzS93p4/WBLDsYaZPUPykxc04NA6bVoNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NhD5yrjG; arc=none smtp.client-ip=91.218.175.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="huo7uteC"
-Date: Mon, 12 Feb 2024 20:24:36 +0000
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NhD5yrjG"
+Date: Mon, 12 Feb 2024 20:40:08 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707769486;
+	t=1707770414;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=i4xg3mWKHsd+1fYsNi4Rtxp1tHHU5nJ+XHR6qN8at3A=;
-	b=huo7uteCfELHBo8TMxLabpBxYmnmzdwnN/sLcsP79jePf7Mc8c3/ILRzwhsJOrGHEPkbR0
-	Lfz4a2Uc0mYAV80Yt4bS38aTzrhDI9TTjC4BCAus3jHCiReJKZ0qQEjMGD5T2Uq1fuQlKc
-	MJLrzegOaL66bjag9WKDbaF9pWlQRPY=
+	bh=7nC0yQEK2ZP/P7RnX3Z3hQsI/3gbnKEFNnLlhsCr13s=;
+	b=NhD5yrjGqdHFBA0i1+DDxAyn1d0cRMs2xwQ/2yp0lnHjiy5wbtOucUCJqw3g3+OlWBpi+l
+	xutG0C1XjUnuwrfcb4qAnaGp1wPTjryq8EFr5k9/P/gvLNfpuDIBUuhgNPWcAA5kspX4Oo
+	pOBVqVF/Uyh8ZC8o+JAPmdWb5XNqTuw=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: ankita@nvidia.com
-Cc: jgg@nvidia.com, maz@kernel.org, james.morse@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	reinette.chatre@intel.com, surenb@google.com, stefanha@redhat.com,
-	brauner@kernel.org, catalin.marinas@arm.com, will@kernel.org,
-	mark.rutland@arm.com, alex.williamson@redhat.com,
-	kevin.tian@intel.com, yi.l.liu@intel.com, ardb@kernel.org,
-	akpm@linux-foundation.org, andreyknvl@gmail.com,
-	wangjinchao@xfusion.com, gshan@redhat.com, shahuang@redhat.com,
-	ricarkol@google.com, linux-mm@kvack.org, lpieralisi@kernel.org,
-	rananta@google.com, ryan.roberts@arm.com, david@redhat.com,
-	linus.walleij@linaro.org, bhe@redhat.com, aniketa@nvidia.com,
-	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
-	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
-	jhubbard@nvidia.com, danw@nvidia.com, kvmarm@lists.linux.dev,
-	mochs@nvidia.com, zhiw@nvidia.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v7 0/4] kvm: arm64: allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
-Message-ID: <Zcp-hIlV-ZEu0Jou@linux.dev>
-References: <20240211174705.31992-1-ankita@nvidia.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v3 00/26] KVM/arm64: VM configuration enforcement
+Message-ID: <ZcqCKJOb2TeujGYV@linux.dev>
+References: <20240205103431.1104133-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,45 +47,28 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240211174705.31992-1-ankita@nvidia.com>
+In-Reply-To: <20240205103431.1104133-1-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Sun, Feb 11, 2024 at 11:17:01PM +0530, ankita@nvidia.com wrote:
-> From: Ankit Agrawal <ankita@nvidia.com>
-> 
-> Currently, KVM for ARM64 maps at stage 2 memory that is considered device
-> with DEVICE_nGnRE memory attributes; this setting overrides (per
-> ARM architecture [1]) any device MMIO mapping present at stage 1,
-> resulting in a set-up whereby a guest operating system cannot
-> determine device MMIO mapping memory attributes on its own but
-> it is always overridden by the KVM stage 2 default.
-> 
-> This set-up does not allow guest operating systems to select device
-> memory attributes independently from KVM stage-2 mappings
-> (refer to [1], "Combining stage 1 and stage 2 memory type attributes"),
-> which turns out to be an issue in that guest operating systems
-> (e.g. Linux) may request to map devices MMIO regions with memory
-> attributes that guarantee better performance (e.g. gathering
-> attribute - that for some devices can generate larger PCIe memory
-> writes TLPs) and specific operations (e.g. unaligned transactions)
-> such as the NormalNC memory type.
-> 
-> The default device stage 2 mapping was chosen in KVM for ARM64 since
-> it was considered safer (i.e. it would not allow guests to trigger
-> uncontained failures ultimately crashing the machine) but this
-> turned out to be asynchronous (SError) defeating the purpose.
-> 
-> For these reasons, relax the KVM stage 2 device memory attributes
-> from DEVICE_nGnRE to Normal-NC.
+Hey Marc,
 
-Hi Ankit,
+On Mon, Feb 05, 2024 at 10:34:05AM +0000, Marc Zyngier wrote:
+> This is the third version of this configurationm enforcement series
+> after some heroic reviewing from Joey (again) and Suzuki. Many thanks
+> to both.
+> 
+> I think I have taken most of the feedback into account, but please
+> shout if I have ignored something.
 
-Thanks for being responsive in respinning the series according to the
-feedback. I think we're pretty close here, but it'd be good to address
-the comment / changelog feedback as well.
+Want to make sure intentions are abundantly clear on this series, as
+there's been a decent amount of attention from folks on managing VM
+features.
 
-Can you respin this once more? Hopefully we can get this stuff soaking
-in -next thereafter.
+At the very least I plan on taking the first two patches for 6.9 so we
+have the groundwork to enable new feature work. I'd like to get more
+eyes on the tail end of the series. I'm going to catch up on the work I
+need to do for this merge window (including posting my own crap!) then
+come back to reviewing this afterwards.
 
 -- 
 Thanks,
