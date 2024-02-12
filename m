@@ -1,193 +1,163 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0371D3D0B8
-	for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 13:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A04A93B19E
+	for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 14:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707743799; cv=none; b=OlR5nXHvQzX2MoXCi/K+muDb5kxrIfNoWec2eY/Fm4d2phc4R7TYZBDLcYF+0NzyC5mRzetSZNOs+227hHsEJATCL67odUroq4oYpPKtWx9Ll7qdp9Of6pg4k4lLQwjV2oUC+wx9XG/SY9tBYhUw7ygAfsRleI0s6vT3uGTE3B4=
+	t=1707746452; cv=none; b=PU4rjpc5PDNXVnYaEUZ/cAl1fG7ncd/7OBDhx5J4IIKz3WFX4gCzmVRVTUQ2Qz4tPf5T+ir953zsGRo9hxI4DUYli7KcuD+S6kihDg3Uw3U8weQpKp1bHNqhYJuMskGp7m57j1Y02RMEWhpb7K06FMWpdU+/bXW9XPjV0Q7p3ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707743799; c=relaxed/simple;
-	bh=mOmu6bKnnbQ/T3Bsy4O7zqo47TuFJtZ6E9Rx8rVgL9c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FddphBzE+8TaQGick7PtKanN9qOf5M59wvprDIpG1mmzwWTNizYxsjOhChhI5TMm9/ub5yjzu7gNC/DYoa2odHo7ECO/ZKn+/2uodjpKh2Q5mou/R/c53Vx6Q3MV2JDe9ruHY3UePeovDpY2C+Msbdu1M8eqsqUiZXtBH1WRMac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NwIEI30M; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1707746452; c=relaxed/simple;
+	bh=/vkyCHmFM0WZYlkkthFUxg483NtsGf9YsNQH0br01aA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Jsy4KUru/YjoMb/Z+fAqkp3JtycG5TRPDQJlXTXAxH/RkeFTW8l8cXzWLFXbYTDszbN31nn5ike8RMAGt+yrTHEoO7DxLoKZ+JTM9Lo+eX6EsxkwXOzjbzwzOYBkhGZV1V4kZz4/968bRFcQvkoqj4ZVKHB8ai9Emk5XEbXDKvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sj4SU7DO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NwIEI30M"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707743796;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=VzDYwK2iuJ4LmgQXwNgJ7Lf6QDDAqXO/glvGyId4yYE=;
-	b=NwIEI30MQsMEltYFUqhGP9OPlNwXq5LXQd/9QO7I61i/NZ6gsEBrd9xRjvTqesVMw1Lk1o
-	ZEzW+uxmxNE9wD39uO82hs3wgIKDWbBrDxoiIYYwfzRkiuOwQuJqv26D9KEHTZYfXwzVDP
-	Yw+x57seNKEQetMGUc0FW2kLcYfBfaQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-596-V1pZZ9QYMEKG7TJBSIz-Dg-1; Mon, 12 Feb 2024 08:16:35 -0500
-X-MC-Unique: V1pZZ9QYMEKG7TJBSIz-Dg-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-337a9795c5cso2080377f8f.2
-        for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 05:16:34 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707743793; x=1708348593;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VzDYwK2iuJ4LmgQXwNgJ7Lf6QDDAqXO/glvGyId4yYE=;
-        b=ER3ndbINCpYGEf3NUIW3DDvYwgvd+4lNyjNBuz/BjdhwzK2tpSv+VRoKDoEO5U8PTt
-         WLEss3zMA6AbB7DveSHig8pB8eZA3J8+1TNciBzb7d/RkOmhdMVC6PHJ5OG8eSVp1ji+
-         VjQRWRPHxAe851mC5BtKBiejoGPOVMwxzga1W53QhaAIddU0kMlNMTJMoXHR0Yr+xWfZ
-         WFlmVQBqd7uyldL6dAkgQsgk/qh2FlR4UHbVSHlJdhYcDJ0QMhDoBrh08QHWOCH/nx8v
-         02zNPGSZqcseQ9TLQANBZmfn2pCl0nNz6xaz8atdhIShO3JWg/p5FoikzTMjQu7T9Yj0
-         zJuA==
-X-Gm-Message-State: AOJu0Yy/GVluRr8P7G7FNnxzlgbB+1T9P7rQwFo8/QsICW7jfVNbSAWw
-	nYNSm4tANFJxafA+k6aLPXYI5fLk3MxF/y0UbLRuTXsGg5/5bwrToFRInDR/IExz4TPZUflrESK
-	Fpztvx1bMJ7DMaiJym8kGopZplqtLPTMJMpj1Xh0OwFORpARNQNQECQ==
-X-Received: by 2002:adf:fe08:0:b0:33b:2fba:1ea8 with SMTP id n8-20020adffe08000000b0033b2fba1ea8mr4200511wrr.52.1707743792996;
-        Mon, 12 Feb 2024 05:16:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGxpBipBT3X0Dit4wAxSwyYUFXLETqTvvtgvVK9OQyhNeu7c1D+fK2Uy2PwFi2KixZcbrQThg==
-X-Received: by 2002:adf:fe08:0:b0:33b:2fba:1ea8 with SMTP id n8-20020adffe08000000b0033b2fba1ea8mr4200490wrr.52.1707743792624;
-        Mon, 12 Feb 2024 05:16:32 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWLYLeSLEG7e3LWjbCRQeUUwwjKwOp0UA0H5bXRyDYDGlbn5p9Uzq/h7qHON2mF8M/oLhRd6z2G0n/bh/DbNl4QHZ/TEV1YtjoDYtQloVAo0QXoy60jnrZa8ra4rQM4oruWjJfL4edsfAY8tYKQy192HX7aB+26OVmJ5I6wkDf3xiJBt0xQ4jnAgnXfOtqKwWbwYDs5JmiFiztMSeGa8XhRf3PQ2yByDazK81OLSw58jLsNr3/ixiE3v9Q4+t8sayNY7MHQYo9arpcYuji68swhVQ/+H2PIy+ZxcpILhiHiJD2eyCGToGaBydOhBXiwiw/1FpYMKW/VVNjZ3ee9mmUeOutHsce/p5xqucuPFeIib99cSjlhYGdCutX3NfOo9Hj/+mQ3lzivRBxKlkBkeGm2kBXuX4GkTd1aFBKgHXmFJADSmOm8mR+0E1UBAbYjlHZLNpySMPLeusSsJPWY45sAFpjNNd0qFJnDY46Gi1OT/6H+9PVuyB1gmnjaN8sJtXBmPzCNwxhKaa7e1CflLA46ZBUsYkv9PFsgyCnGqjSVbWFVHL2M8PFBl8SA708aufoKeJ4d0S4lr399pNrGCW69qgUIrbxER9VXU+ur+qXc+yvzSzOcGWxHdoLGk6o0Pqg4GnV3OwelOCZB1VLsAydUr1RVD1uYlLiv0R+F2w+fI6ZCwq9/eHRQHUxEdAxSKHiUcTUtZHALfa55bYUvnp8C6TAYOFNZ+JoNHiXDhs23K4sA48CV+hPGTRLdAGuVr6OxgxOdkOeN9/FkYdiRFBqDzs7FcnWyOvhRdJZAULWJ5tCNeltJqP02f6qNke+jDDyfV5J4v9aQSKzyKX1W7SH5cqLnMdW8d7+Ks1hEe5bUS6S29MFO61JQl0702IGBrVx4oZfbS4zb8iIjxhAQjLT0xj8NERSWMzUM02pVIyip0CcrGt8K1JgXSqkwpT1NviU0ts
- d7CotME1W6l8UzjPo6PRP0ag1qOZqO8+yu5qTI1Lq9KZNzVCvIWjmBHoy/rmIYjCrYdjoePY8WfthaU+r1YmmQKbWrQWEAJ8Rwn0FuPn/Iyj59quAE4HcNeXI/m52PP86nY4tfP9ZiBIuBgTrrC5I0IUd0qrTHMni5BZgN3GYBebK7jPMU/LevwcFebUWCC9Ojg3fDArD85Ac/nGAmwtMpGx3ZzbcBvKEiL4qtiU4aJA71DQjEc2lxKRZpU3b/MwNe9Y7BZbJ0HKUko4MJkQCYRhKUqm19tENATR8lFC+L3XvnaY9wKW+CrBf+D37PZhXUR/9TCyItDNLR
-Received: from ?IPV6:2003:cb:c730:2200:7229:83b1:524e:283a? (p200300cbc7302200722983b1524e283a.dip0.t-ipconnect.de. [2003:cb:c730:2200:7229:83b1:524e:283a])
-        by smtp.gmail.com with ESMTPSA id en8-20020a056000420800b0033b7d9c14desm3956966wrb.5.2024.02.12.05.16.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Feb 2024 05:16:32 -0800 (PST)
-Message-ID: <6ab142f0-bf66-4611-915d-938d58a277d3@redhat.com>
-Date: Mon, 12 Feb 2024 14:16:30 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sj4SU7DO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34B1AC433C7;
+	Mon, 12 Feb 2024 14:00:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707746452;
+	bh=/vkyCHmFM0WZYlkkthFUxg483NtsGf9YsNQH0br01aA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Sj4SU7DObFZmYwwKk3X4LKdSX9HkkBRBgNhhL+8TAgg6C+MMaNM52IKTha9aG1sLL
+	 NRccIu4D/RZF1g1EgQzRpuF4OQ7cXFquctUNUKUjrWO9nzt/XMwiDd/LeWWIw3WNgZ
+	 xogIlTEQsZWHUpG4eCWZUlXTBXe1b0CW6Opm+1NkctAxe+IHi5nQOJKgaxjgaUHwQ3
+	 GkMfpJVOk/LYoUSuqlLUwIRbq8Ts8/jGg9+bFq/zo4Su7/Q3jK6kNdfugXRkmRdGvW
+	 agpy34uf1bNdSbsEqTsVJx0kCs0Y7oDZsYLN57j3wccdXGIV2ioSYZx5R63Jl39I1L
+	 aidMCGgKwTPlQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rZWrZ-002RP8-5U;
+	Mon, 12 Feb 2024 14:00:49 +0000
+Date: Mon, 12 Feb 2024 14:00:47 +0000
+Message-ID: <86eddh6auo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon
+	<will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Suzuki K Poulose
+	<suzuki.poulose@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	James Morse
+	<james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu
+	<yuzenghui@huawei.com>
+Subject: Re: [PATCH v4 06/10] arm64: cpufeature: Detect HCR_EL2.NV1 being RES0
+In-Reply-To: <e3cc70fb-16d9-4e4e-aa35-f0eb2baaf166@samsung.com>
+References: <20240122181344.258974-1-maz@kernel.org>
+	<20240122181344.258974-7-maz@kernel.org>
+	<CGME20240212124837eucas1p231da54bb0ff8d46d38c6c7e627e50172@eucas1p2.samsung.com>
+	<e3cc70fb-16d9-4e4e-aa35-f0eb2baaf166@samsung.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 4/4] vfio: convey kvm that the vfio-pci device is wc
- safe
-To: ankita@nvidia.com, jgg@nvidia.com, maz@kernel.org,
- oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, reinette.chatre@intel.com, surenb@google.com,
- stefanha@redhat.com, brauner@kernel.org, catalin.marinas@arm.com,
- will@kernel.org, mark.rutland@arm.com, alex.williamson@redhat.com,
- kevin.tian@intel.com, yi.l.liu@intel.com, ardb@kernel.org,
- akpm@linux-foundation.org, andreyknvl@gmail.com, wangjinchao@xfusion.com,
- gshan@redhat.com, shahuang@redhat.com, ricarkol@google.com,
- linux-mm@kvack.org, lpieralisi@kernel.org, rananta@google.com,
- ryan.roberts@arm.com, linus.walleij@linaro.org, bhe@redhat.com
-Cc: aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com,
- targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com,
- apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com,
- kvmarm@lists.linux.dev, mochs@nvidia.com, zhiw@nvidia.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-References: <20240211174705.31992-1-ankita@nvidia.com>
- <20240211174705.31992-5-ankita@nvidia.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20240211174705.31992-5-ankita@nvidia.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: m.szyprowski@samsung.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, suzuki.poulose@arm.com, ardb@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 11.02.24 18:47, ankita@nvidia.com wrote:
-> From: Ankit Agrawal <ankita@nvidia.com>
-> 
-> The code to map the MMIO in S2 as NormalNC is enabled when conveyed
-> that the device is WC safe using a new flag VM_ALLOW_ANY_UNCACHED.
-> 
-> Make vfio-pci set the VM_ALLOW_ANY_UNCACHED flag.
-> 
-> This could be extended to other devices in the future once that
-> is deemed safe.
+On Mon, 12 Feb 2024 12:48:35 +0000,
+Marek Szyprowski <m.szyprowski@samsung.com> wrote:
+>=20
+> Dead All,
+>=20
+> On 22.01.2024 19:13, Marc Zyngier wrote:
+> > A variant of FEAT_E2H0 not being implemented exists in the form of
+> > HCR_EL2.E2H being RES1 *and* HCR_EL2.NV1 being RES0 (indicating that
+> > only VHE is supported on the host and nested guests).
+> >
+> > Add the necessary infrastructure for this new CPU capability.
+> >
+> > Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+>=20
+> This patch landed recently in linux-next as commit da9af5071b25 ("arm64: =
 
-Maybe add some more details how one could make a decision whether it 
-would be safe (either here or in patch #2).
+> cpufeature: Detect HCR_EL2.NV1 being RES0"). I found that it causes a=20
+> following regression in the CPU hot-plug operation:
+>=20
+> # for i in /sys/devices/system/cpu/cpu[1-9]; do echo 1 >$i/online; done
+> ------------[ cut here ]------------
+> kernel BUG at arch/arm64/kernel/cpufeature.c:1468!
+> Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
+> Modules linked in: dw_hdmi_cec dw_hdmi_i2s_audio crct10dif_ce=20
+> snd_soc_simple_card rockchip_saradc industrialio_triggered_buffer=20
+> hantro_vpu kfifo_buf snd_soc_simple_card_utils rockchip_thermal=20
+> phy_rockchip_naneng_combphy display_connector gpio_ir_recv v4l2_vp9=20
+> v4l2_h264 v4l2_mem2mem dwmac_rk videobuf2_dma_contig stmmac_platform=20
+> videobuf2_memops videobuf2_v4l2 stmmac rockchipdrm videodev=20
+> snd_soc_rockchip_i2s_tdm snd_soc_rk817 pcs_xpcs panfrost rtc_rk808=20
+> rk805_pwrkey analogix_dp rk817_charger spi_rockchip_sfc dw_mipi_dsi=20
+> videobuf2_common dw_hdmi drm_shmem_helper mc gpu_sched=20
+> drm_display_helper ahci_dwc ip_tables x_tables ipv6
+> CPU: 1 PID: 0 Comm: swapper/1 Not tainted 6.8.0-rc1+ #14563
+> Hardware name: Hardkernel ODROID-M1 (DT)
+> pstate: 800001c9 (Nzcv dAIF -PAN -UAO -TCO -DIT -SSBS BTYPE=3D--)
+> pc : __read_sysreg_by_encoding+0x38c/0x390
+> lr : read_scoped_sysreg+0x4c/0x70
+> ...
+> Call trace:
+>  =C2=A0__read_sysreg_by_encoding+0x38c/0x390
+>  =C2=A0read_scoped_sysreg+0x4c/0x70
+>  =C2=A0has_nv1+0x18/0x48
+>  =C2=A0verify_local_cpu_caps+0x54/0x124
+>  =C2=A0check_local_cpu_capabilities+0x28/0x208
+>  =C2=A0secondary_start_kernel+0xb0/0x154
+>  =C2=A0__secondary_switched+0xb8/0xbc
+> Code: d53802f3 17ffff3b d5380253 17ffff39 (d4210000)
+> ---[ end trace 0000000000000000 ]---
+> Kernel panic - not syncing: Attempted to kill the idle task!
+> SMP: stopping secondary CPUs
+> Kernel Offset: disabled
+> CPU features: 0x1,80000000,80050295,2100721b
+> Memory Limit: none
+> ---[ end Kernel panic - not syncing: Attempted to kill the idle task! ]---
+>=20
+> It looks that some additional checks are needed for the CPU hot-plug case.
 
-> 
-> Suggested-by: Catalin Marinas <catalin.marinas@arm.com>
-> Acked-by: Jason Gunthorpe <jgg@nvidia.com>
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
-> ---
->   drivers/vfio/pci/vfio_pci_core.c | 6 +++++-
->   1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index 1cbc990d42e0..eba2146202f9 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -1862,8 +1862,12 @@ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma
->   	/*
->   	 * See remap_pfn_range(), called from vfio_pci_fault() but we can't
->   	 * change vm_flags within the fault handler.  Set them now.
-> +	 *
-> +	 * Set an additional flag VM_ALLOW_ANY_UNCACHED to convey kvm that
-> +	 * the device is wc safe.
->   	 */
-> -	vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
-> +	vm_flags_set(vma, VM_ALLOW_ANY_UNCACHED | VM_IO | VM_PFNMAP |
-> +			VM_DONTEXPAND | VM_DONTDUMP);
->   	vma->vm_ops = &vfio_pci_mmap_ops;
->   
->   	return 0;
+Nah, that's much simpler.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+I simply missed a spot where ID_AA64MMFR4_EL1 must be handled (it is
+getting annoying that we have more than a single place where these
+"read all the ID registers" are handled).
 
--- 
-Cheers,
+Can you please give the following a go? If that works for you (it does
+for me here), I'll post an actual fix (plus another fix for another
+buglet I just noticed).
 
-David / dhildenb
+Thanks,
 
+	M.
+
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 0f29ac43c7a2..2f8958f27e9e 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1456,6 +1456,7 @@ u64 __read_sysreg_by_encoding(u32 sys_id)
+ 	read_sysreg_case(SYS_ID_AA64MMFR1_EL1);
+ 	read_sysreg_case(SYS_ID_AA64MMFR2_EL1);
+ 	read_sysreg_case(SYS_ID_AA64MMFR3_EL1);
++	read_sysreg_case(SYS_ID_AA64MMFR4_EL1);
+ 	read_sysreg_case(SYS_ID_AA64ISAR0_EL1);
+ 	read_sysreg_case(SYS_ID_AA64ISAR1_EL1);
+ 	read_sysreg_case(SYS_ID_AA64ISAR2_EL1);
+
+--=20
+Without deviation from the norm, progress is not possible.
