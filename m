@@ -1,42 +1,54 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8B5481B7
-	for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 20:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F34E482C0
+	for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 20:24:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707769163; cv=none; b=CFQzzD9JKFfNywZqgjWI2LBaZ8nw4zwxDy4oudMIgaFRp11DAbIUbgy5e8p0L4UYeObDES+QWwxX/kKGFB5vbGBLeX7MGw6j7ZwA28ZUXuQtzquo1OfY8B/BqXvLk2+X5rhU+awoTJQezWQSQxDBZr/LQdNosCGfbuZskK6wo0E=
+	t=1707769490; cv=none; b=j8Vq618Fu1PBak84m8w9Fomp/RMSibIhP001QVkBiKUgGQxaGvcQQ/LJzH6H2W+aNkxubFAicBkJCJa/xTqEHpZGZMEGvZyJOWjfo6nP9Hyn6NWA28OAEkpbFXT5GS4y2vJ9aZ4mOIenptSBUiAVkXQEj+s0IhSEOmTVBF70NgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707769163; c=relaxed/simple;
-	bh=PtFTQv9o+TuEraIql2Vy9ZUzDPdFkvliaeecMICn+jk=;
+	s=arc-20240116; t=1707769490; c=relaxed/simple;
+	bh=EW1iwgQRXKT66+pbcKRYd+o9vCcGD15QbpagYfyY78A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QHnFcp0vijzIzyb9djuIlVA80XGaBBnoUyENvqgm4wSNVzmCqh/DEcuotNxNvA4itdbcjiBysTcFTViWOzSJp3K4LiB35SPRb4xGVsQaVxxU6M+LoMSrXw4OkdOB66PzL1LONxQ9r5JwZ0NeFikG4iDZvSe0FVO34cFVYxj6t+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=so9pZx2X; arc=none smtp.client-ip=95.215.58.188
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y8AwQ8IgEFRRR7tYcyYRWlPSYXDnBfHdfVgAvpVXBZ4ZzPGsbvBbXe6f5kFlqk1RAMJWeSfIWF3pBQBE8VT6A1/59Ncaj/JG6bzWBqZ5MOHSKE6HQku9eF3lCaYkCKiMKlegl93ERGsTqHw62RYJEQjZUuQwlI3xKYqtw7HvN5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=huo7uteC; arc=none smtp.client-ip=95.215.58.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="so9pZx2X"
-Date: Mon, 12 Feb 2024 20:19:10 +0000
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="huo7uteC"
+Date: Mon, 12 Feb 2024 20:24:36 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707769158;
+	t=1707769486;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6nYiM9R96Ih/XpIMMmFH+5yUjveGVIQsheV6FPrZ+VA=;
-	b=so9pZx2XjKB64K0F7Ovv4TTtHHFnJmlCTCzvwDMbF9/PstYHS0el9ZsBz2GwYAeeCYjKEa
-	Pd3RWdiTYlrIIhx5PJrCJNE1kfa2ogHN5YGtM6KjWQpil7l1FvhQGUckcZL397s8z3GJ94
-	hCczhgKqMVSG9Y1umyUVP+Uw+GAFvUM=
+	bh=i4xg3mWKHsd+1fYsNi4Rtxp1tHHU5nJ+XHR6qN8at3A=;
+	b=huo7uteCfELHBo8TMxLabpBxYmnmzdwnN/sLcsP79jePf7Mc8c3/ILRzwhsJOrGHEPkbR0
+	Lfz4a2Uc0mYAV80Yt4bS38aTzrhDI9TTjC4BCAus3jHCiReJKZ0qQEjMGD5T2Uq1fuQlKc
+	MJLrzegOaL66bjag9WKDbaF9pWlQRPY=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	Ricardo Koller <ricarkol@google.com>
-Subject: Re: [RFC PATCH] KVM: arm64: Fix double-free following
- kvm_pgtable_stage2_free_unlinked()
-Message-ID: <Zcp9PiPCWKKn0Tkd@linux.dev>
-References: <20240212193052.27765-1-will@kernel.org>
- <Zcp8LcvsZiZVkNKe@linux.dev>
+To: ankita@nvidia.com
+Cc: jgg@nvidia.com, maz@kernel.org, james.morse@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	reinette.chatre@intel.com, surenb@google.com, stefanha@redhat.com,
+	brauner@kernel.org, catalin.marinas@arm.com, will@kernel.org,
+	mark.rutland@arm.com, alex.williamson@redhat.com,
+	kevin.tian@intel.com, yi.l.liu@intel.com, ardb@kernel.org,
+	akpm@linux-foundation.org, andreyknvl@gmail.com,
+	wangjinchao@xfusion.com, gshan@redhat.com, shahuang@redhat.com,
+	ricarkol@google.com, linux-mm@kvack.org, lpieralisi@kernel.org,
+	rananta@google.com, ryan.roberts@arm.com, david@redhat.com,
+	linus.walleij@linaro.org, bhe@redhat.com, aniketa@nvidia.com,
+	cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com,
+	vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com,
+	jhubbard@nvidia.com, danw@nvidia.com, kvmarm@lists.linux.dev,
+	mochs@nvidia.com, zhiw@nvidia.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v7 0/4] kvm: arm64: allow the VM to select DEVICE_* and
+ NORMAL_NC for IO memory
+Message-ID: <Zcp-hIlV-ZEu0Jou@linux.dev>
+References: <20240211174705.31992-1-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,77 +57,45 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zcp8LcvsZiZVkNKe@linux.dev>
+In-Reply-To: <20240211174705.31992-1-ankita@nvidia.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Mon, Feb 12, 2024 at 08:14:41PM +0000, Oliver Upton wrote:
-> On Mon, Feb 12, 2024 at 07:30:52PM +0000, Will Deacon wrote:
-> > kvm_pgtable_stage2_free_unlinked() does the final put_page() on the
-> > root page of the sub-tree before returning, so remove the additional
-> > put_page() invocations in the callers.
-> > 
-> > Cc: Marc Zyngier <maz@kernel.org>
-> > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > Cc: Ricardo Koller <ricarkol@google.com>
-> > Signed-off-by: Will Deacon <will@kernel.org>
-> > ---
-> > 
-> > Hi folks,
-> > 
-> > Sending this as an RFC as I only spotted it from code inspection and I'm
-> > surprised others aren't seeing fireworks if it's a genuine bug. I also
-> > couldn't come up with a sensible Fixes tag, as all of:
-> > 
-> >  e7c05540c694b ("KVM: arm64: Add helper for creating unlinked stage2 subtrees")
-> >  8f5a3eb7513fc ("KVM: arm64: Add kvm_pgtable_stage2_split()")
-> >  f6a27d6dc51b2 ("KVM: arm64: Drop last page ref in kvm_pgtable_stage2_free_removed()")
-> > 
-> > are actually ok in isolation. Hrm. Please tell me I'm wrong?
-> > 
-> >  arch/arm64/kvm/hyp/pgtable.c | 2 --
-> >  1 file changed, 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index c651df904fe3..ab9d05fcf98b 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -1419,7 +1419,6 @@ kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
-> >  				 level + 1);
-> >  	if (ret) {
-> >  		kvm_pgtable_stage2_free_unlinked(mm_ops, pgtable, level);
-> > -		mm_ops->put_page(pgtable);
-> >  		return ERR_PTR(ret);
-> >  	}
+On Sun, Feb 11, 2024 at 11:17:01PM +0530, ankita@nvidia.com wrote:
+> From: Ankit Agrawal <ankita@nvidia.com>
 > 
-> AFAICT, this entire branch is effectively dead code, unless there's a
-> KVM bug lurking behind the page table walk. The sub-tree isn't visible
-> to other software or hardware walkers yet, so none of the PTE races
-> could cause this to pop.
+> Currently, KVM for ARM64 maps at stage 2 memory that is considered device
+> with DEVICE_nGnRE memory attributes; this setting overrides (per
+> ARM architecture [1]) any device MMIO mapping present at stage 1,
+> resulting in a set-up whereby a guest operating system cannot
+> determine device MMIO mapping memory attributes on its own but
+> it is always overridden by the KVM stage 2 default.
 > 
-> So while this is very obviously a bug, it might be pure luck that folks
-> haven't seen smoke here. Perhaps while fixing the bug we should take the
-> opportunity to promote the condition to WARN_ON_ONCE().
+> This set-up does not allow guest operating systems to select device
+> memory attributes independently from KVM stage-2 mappings
+> (refer to [1], "Combining stage 1 and stage 2 memory type attributes"),
+> which turns out to be an issue in that guest operating systems
+> (e.g. Linux) may request to map devices MMIO regions with memory
+> attributes that guarantee better performance (e.g. gathering
+> attribute - that for some devices can generate larger PCIe memory
+> writes TLPs) and specific operations (e.g. unaligned transactions)
+> such as the NormalNC memory type.
 > 
-> > @@ -1502,7 +1501,6 @@ static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> >  
-> >  	if (!stage2_try_break_pte(ctx, mmu)) {
-> >  		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
-> > -		mm_ops->put_page(childp);
-> >  		return -EAGAIN;
-> >  	}
+> The default device stage 2 mapping was chosen in KVM for ARM64 since
+> it was considered safer (i.e. it would not allow guests to trigger
+> uncontained failures ultimately crashing the machine) but this
+> turned out to be asynchronous (SError) defeating the purpose.
 > 
-> This, on the other hand, seems possible. There exists a race where an
-> old block PTE could have the AF set on it and the underlying cmpxchg()
-> could fail.
+> For these reasons, relax the KVM stage 2 device memory attributes
+> from DEVICE_nGnRE to Normal-NC.
 
-That is to say, a race with a *HW* update to the PTE that sets AF.
+Hi Ankit,
 
-> There shouldn't be a race with any software walkers, as we
-> hold the MMU lock for write here.
-> 
-> -- 
-> Thanks,
-> Oliver
+Thanks for being responsive in respinning the series according to the
+feedback. I think we're pretty close here, but it'd be good to address
+the comment / changelog feedback as well.
+
+Can you respin this once more? Hopefully we can get this stuff soaking
+in -next thereafter.
 
 -- 
 Thanks,
