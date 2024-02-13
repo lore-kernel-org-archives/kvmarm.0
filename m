@@ -1,32 +1,32 @@
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB9122EE9
-	for <kvmarm@lists.linux.dev>; Tue, 13 Feb 2024 09:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3A224203
+	for <kvmarm@lists.linux.dev>; Tue, 13 Feb 2024 09:33:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707816802; cv=none; b=W6dqykPQmEzvLIuKmTlz+P7u8XCXwzZaaCiyyv5v9N2sFJ2H4K2aa/R/b8n4FYe7RZTIqLVnUI1S2QKnx25silIaf9E2b7oz6E++F1xMWlCCuLgFgMwwBuJMVhLMZvMJQBFTx9SkYBxtpjGr6xeUQVnKXfuT6r1il4dlq/pFCLU=
+	t=1707816803; cv=none; b=M7ygOXeqRXemhfWFUSJJP8Lzp3ZDw+KuTNukP7LvHfhvpZpuUrqPKas6r9aMEXwuZK0Qa0w3jmn1UnvWRGqunoUhJumkAJCmF6hjQ5fcQFpbqSR+c+2uLb0K/emUFsBHAbNgjzJ/X6uP0kGDfzpxcfZwKytzu6oH8d+A2B03OrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707816802; c=relaxed/simple;
-	bh=4brcHvDAVkgAUVv+EhHLpJGf3bgOIUhxLJMTpEy7pkA=;
+	s=arc-20240116; t=1707816803; c=relaxed/simple;
+	bh=42EjqTJnQjPHCRZ1CTq/hh9Jo/BrHMISVzmWYzrxSIE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YPKttytWriO9WEpKAXK+Ea7rf2AU6x+BXYDyfND0pUYFJmwCrdEu6/IJp6dcxKt37E32yVVK+HecQD0KN9FRM5iETonnvR6Ktq2MmTg+tjuOsmxrfA0HP6ZZ8iy/F8PX2CXArSXpdl/cN2MRZgRKJ9oddW/HO+J8SPDZV7Sxvyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=C7HSnkXR; arc=none smtp.client-ip=95.215.58.176
+	 MIME-Version; b=dUI4K+v8ZyLXLoshpiJoRTiKhp9lth6+Isu5ISxRcG5i7PfOwXSx1hJYLmlPurOBiZdjbdv6aQ54iYxNrRqHwS123Tn8nwV1tu7QhlXuGBNOx35DFtVtgY0yxFkvvc6gHvE8ef/4WPuUMy/Pp+tPQGYXcU0ybi5pfPIIRt7JBrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ycl6rikb; arc=none smtp.client-ip=95.215.58.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="C7HSnkXR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ycl6rikb"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707816798;
+	t=1707816800;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MN4YT9WjubbgV9vwymCrG2zbA0P41iVcrtZBfJr5OD0=;
-	b=C7HSnkXROz1+UoFZtjeg4W2NSgOZRroDA00Cdsa98sNQuumqq4yrXfLeNfcXS5vMpujcKT
-	OmC+dNgbyNxY5y311yrx0WTver+2ok75zp+yixGCV9iajwZaZBpvbGmw7RTG9c6dzlLqgO
-	71HwURum7tLyeuMsoVyAtjOEU1Opz+Y=
+	bh=vHotxBfo61Yf7VQTBp6voheJpujlHBDNO8X85Tkwjh0=;
+	b=Ycl6rikbVAanKCNVreZMOwzDdQAIGD1dS+LPBIe7vQ1Sq5OcJDWhFjgF6M0OGCEBYC8Y7K
+	ur7EsSz3WhyVCtrbPd2w9FWmNVdhshL4P9hcDsTwqyO5b4Che0EBVeFD9PRcxND2ZPnec+
+	cRTQI5/mj2t502UjVNydFjb1qWzhh50=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: kvm@vger.kernel.org,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-kernel@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 03/23] KVM: arm64: vgic: Use xarray to find LPI in vgic_get_lpi()
-Date: Tue, 13 Feb 2024 09:32:40 +0000
-Message-ID: <20240213093250.3960069-4-oliver.upton@linux.dev>
+Subject: [PATCH v2 04/23] KVM: arm64: vgic-v3: Iterate the xarray to find pending LPIs
+Date: Tue, 13 Feb 2024 09:32:41 +0000
+Message-ID: <20240213093250.3960069-5-oliver.upton@linux.dev>
 In-Reply-To: <20240213093250.3960069-1-oliver.upton@linux.dev>
 References: <20240213093250.3960069-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -50,53 +50,37 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Iterating over the LPI linked-list is less than ideal when the desired
-index is already known. Use the INTID to index the LPI xarray instead.
+Start walking the LPI xarray to find pending LPIs in preparation for
+the removal of the LPI linked-list. Note that the 'basic' iterator
+is chosen here as each iteration needs to drop the xarray read lock
+(RCU) as reads/writes to guest memory can potentially block.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/vgic/vgic.c | 19 +++++--------------
- 1 file changed, 5 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/vgic/vgic-v3.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index c126014f8395..d90c42ff051d 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -54,8 +54,9 @@ struct vgic_global kvm_vgic_global_state __ro_after_init = {
-  */
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 9465d3706ab9..4ea3340786b9 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -380,6 +380,7 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+ 	struct vgic_irq *irq;
+ 	gpa_t last_ptr = ~(gpa_t)0;
+ 	bool vlpi_avail = false;
++	unsigned long index;
+ 	int ret = 0;
+ 	u8 val;
  
- /*
-- * Iterate over the VM's list of mapped LPIs to find the one with a
-- * matching interrupt ID and return a reference to the IRQ structure.
-+ * Index the VM's xarray of mapped LPIs and return a reference to the IRQ
-+ * structure. The caller is expected to call vgic_put_irq() later once it's
-+ * finished with the IRQ.
-  */
- static struct vgic_irq *vgic_get_lpi(struct kvm *kvm, u32 intid)
- {
-@@ -65,20 +66,10 @@ static struct vgic_irq *vgic_get_lpi(struct kvm *kvm, u32 intid)
- 
- 	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
+@@ -396,7 +397,7 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+ 		vlpi_avail = true;
+ 	}
  
 -	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
--		if (irq->intid != intid)
--			continue;
--
--		/*
--		 * This increases the refcount, the caller is expected to
--		 * call vgic_put_irq() later once it's finished with the IRQ.
--		 */
-+	irq = xa_load(&dist->lpi_xa, intid);
-+	if (irq)
- 		vgic_get_irq_kref(irq);
--		goto out_unlock;
--	}
--	irq = NULL;
- 
--out_unlock:
- 	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
- 
- 	return irq;
++	xa_for_each(&dist->lpi_xa, index, irq) {
+ 		int byte_offset, bit_nr;
+ 		struct kvm_vcpu *vcpu;
+ 		gpa_t pendbase, ptr;
 -- 
 2.43.0.687.g38aa6559b0-goog
 
