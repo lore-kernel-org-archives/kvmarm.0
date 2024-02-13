@@ -1,125 +1,77 @@
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 285265FBBD
-	for <kvmarm@lists.linux.dev>; Tue, 13 Feb 2024 17:10:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CCB56768;
+	Tue, 13 Feb 2024 19:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707844241; cv=none; b=bCBJh71a67PnnUvPIbW91MCPrHH+Jm94N/W0TSnmea8IQx4Qrrzjs4aN/fC3koLnklj2EY1w8AqPJaMuNUlIENW9y6WmwJ8dEBa7QtLnN9MceEZh83h+pJ3ZkHYQBz//fnl+phhWlC6AFOK3uBbKjoydOqewn6+X/7YsToJpvrQ=
+	t=1707852323; cv=none; b=b0eBMKi2fpK4MVl/dlrIBA1pQpToiGcjmGfr/ixdPlePxEO1Oeo6iI3f74Uhs3tiqMjrzrzxKcvgjQLQbSIY4DzQ188b0cOhwG3xoTkNUfnV2NhUze3/HOIzfL+hVTQnIM7JC3gJ8dxiOzg4QBNLck2iXXHCWTOv5ZUdJhJ1hv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707844241; c=relaxed/simple;
-	bh=7jyPvAGQvkF5KRYVMFV8tgRFEjX4+bvU+GD9z15uSQE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s+Ke+QBc0a8cIA8F/ufKLAXs+eThPsFIfa3D132+eCySXV81OLfLSuRy+Q5KBTXS33DUf2eP0uOp5amx+9Ynn9Gob6m2CWjskrHBVeUpQ/+IO2CQdRUvwS8kAbaX180ncfRDrcEIea1yvqqSJfFNlVJfOS8WbvMBJGTLgOR7jF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pSy1UV+l; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1707852323; c=relaxed/simple;
+	bh=I6hO5jlwBaKJFc+VKnC3tf7xGWq+cLtrlW3tHXiWBho=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OSrx26smceRVFm/IhjmuCf0gd3OL8BFRqd2BC/K08tuqAfJgVE/faQEH7g9QeXCKeaUYeBHZlTRee0C4yOPPzK7YcAWWs45SYElDOQjNhQ0K2ZxpW5AqFiNgJ+0AVQ9IKYxu8ED9dcaJReS3BiQDpU1n9Y83TrbOWK993ey8DXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PnUA/PQA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pSy1UV+l"
-Date: Tue, 13 Feb 2024 17:10:30 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707844237;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XY+IFiGgHmCeoZd/AEfpX4a3LV5h8HfarWWWxCHWdMw=;
-	b=pSy1UV+lUx8nXsiVimgjdtfBP9tXfN5OBdGUJVJ0i/FeU/0/+KkWuHcwJEhXxFvakfaq7U
-	a3h+psZeEeZcRpXELh0tU+MNZmimtkdImBoUpExbCKGUDxnm+gynK0YxqGdmzBGNbI/yD5
-	niqgaKB2KlZFrMEr1kLiySYvt1gVcWQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: catalin.marinas@arm.com, gshan@redhat.com, james.morse@arm.com,
-	mark.rutland@arm.com, maz@kernel.org, rananta@google.com,
-	ricarkol@google.com, ryan.roberts@arm.com, shahuang@redhat.com,
-	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com,
-	vdonnefort@google.com
-Subject: Re: [PATCH v5 4/4] KVM: arm64: Initialize the ptdump parser with
- stage-2 attributes
-Message-ID: <ZcuihokcWA3q-pZS@linux.dev>
-References: <20240207144832.1017815-2-sebastianene@google.com>
- <20240207144832.1017815-6-sebastianene@google.com>
- <Zcq7AoII8qLWwjsu@linux.dev>
- <Zcuf1ZUvwhxBobuG@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PnUA/PQA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF8B7C433C7;
+	Tue, 13 Feb 2024 19:25:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707852322;
+	bh=I6hO5jlwBaKJFc+VKnC3tf7xGWq+cLtrlW3tHXiWBho=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=PnUA/PQAwLP7ry+1TEQd4Dzy+U76NeX7ehNECyNf8BUEVbl7sUR6aLeKiygsvASmM
+	 yBW/mLpsuPR3cq4DfEBWqsmfQ1v7/UqO52m2WIM5MFbhCaXThPYTAR6GbRxO4QbZVx
+	 QdDDst/fWw3i6IRA+KiGIMWCJnkLW/cduT1oNC3/asc3CIcA9wyuSds2FTv165JLA/
+	 aI/PAB8QZM68FSc33cVNCKMvtkHGsp3rIzwiqcbbYlGTeGVyRaBfOO1zLOyxQj+axX
+	 soVuJfXrFgr4/TGuQzyiBkmRSjN+N7xI3CG4lWcHV383Noau/FAJ+CDXNRmVsfKq2g
+	 ybDI1+le7luqw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rZyPA-002tNf-Hf;
+	Tue, 13 Feb 2024 19:25:20 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>,
+	kvmarm@lists.linux.dev
+Cc: linux-arm-kernel@lists.infradead.org,
+	Ricardo Koller <ricarkol@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH] KVM: arm64: Fix double-free following kvm_pgtable_stage2_free_unlinked()
+Date: Tue, 13 Feb 2024 19:25:16 +0000
+Message-Id: <170785230656.2847941.2376736166184489545.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240212193052.27765-1-will@kernel.org>
+References: <20240212193052.27765-1-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zcuf1ZUvwhxBobuG@google.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, ricarkol@google.com, oliver.upton@linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Feb 13, 2024 at 04:59:01PM +0000, Sebastian Ene wrote:
-> On Tue, Feb 13, 2024 at 12:42:42AM +0000, Oliver Upton wrote:
-> > On Wed, Feb 07, 2024 at 02:48:33PM +0000, Sebastian Ene wrote:
+On Mon, 12 Feb 2024 19:30:52 +0000, Will Deacon wrote:
+> kvm_pgtable_stage2_free_unlinked() does the final put_page() on the
+> root page of the sub-tree before returning, so remove the additional
+> put_page() invocations in the callers.
 
-[...]
+Applied to fixes, thanks!
 
-> > > +
-> > > +	snprintf(marker_msg, MARKER_MSG_LEN, "IPA bits %2u start lvl %1d",
-> > > +		 pgtable->ia_bits, pgtable->start_level);
-> > > +
-> > > +	ipa_addr_marker[0].name = marker_msg;
-> > 
-> > Is the dynamic name worth the added complexity? I see nothing wrong with
-> > exposing additional debugfs files for simple attributes like the IPA
-> > range and page table levels.
-> > 
-> > I know it isn't *that* much, just looking for every opportunity to
-> > simplify further.
-> > 
-> 
-> We can keep them separate, I have no strong opinion about this. I think
-> this was Vincent's, original suggestion to have them so I will check with
-> him as well.
+[1/1] KVM: arm64: Fix double-free following kvm_pgtable_stage2_free_unlinked()
+      commit: c60d847be7b8e69e419e02a2b3d19c2842a3c35d
 
-Well, if we get to the place where there's a single struct containing
-all of the required data upfront then this becomes less of an issue.
-This is useful information still, so let's see if we can go about it the
-other way.
+Cheers,
 
-> > > +	ret = kvm_ptdump_parser_init(&parser_state, mmu->pgt, m);
-> > > +	if (ret)
-> > > +		return ret;
-> > > +
-> > 
-> > Can this be done at open(), or am I missing something?
-> > 
-> 
-> I guess we can do this in open() but then we will have to add again that
-> struct that wraps some ptdump specific state tracking. It seemed a bit cleaner in
-> this way. What do you think ?
-
-Allocating something that looks like an iterator end embedding it in
-->private isn't too uncommon.
-
-> > >  	write_lock(&guest_kvm->mmu_lock);
-> > >  	ret = kvm_ptdump_show_common(m, mmu->pgt, &parser_state);
-> > >  	write_unlock(&guest_kvm->mmu_lock);
-> > >  
-> > > +	kvm_ptdump_parser_teardown(&parser_state);
-> > 
-> > Same question here, can this happen at close()? I guess you'll need a
-> > struct to encapsulate pg_state and a pointer to the VM at least.
-> >
-> 
-> Right, I tried to avoid using a separate struct as we discussed in v4.
-
-Sorry, I hope I didn't confuse you in my prior feedback.
-
-What I had issue with was the multiple layers of function ptr / ops
-structs for managing the file interface. I have zero concerns with
-organizing the _data_ for the walk this way.
-
-> > Actually, come to think of it, if you embed all of the data you need for
-> > the walker into a structure you can just do a single allocation for it
-> > upfront.
-
+	M.
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
+
+
