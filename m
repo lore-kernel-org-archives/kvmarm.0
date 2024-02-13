@@ -1,89 +1,170 @@
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7214C2C695
-	for <kvmarm@lists.linux.dev>; Tue, 13 Feb 2024 16:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 100732C695;
+	Tue, 13 Feb 2024 16:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707843084; cv=none; b=iNVR0JN6MCDiLQTUAl54pEqRXDJSBRs88d2LzZiEd8u4g4Bd+r9LVDdiaAWAp4NoXGdZDdmd5oD7k3ofX2YvRNQfID19k0TPWwLjX0osinJRLEbmQLz2sClHb2a6vFCysVU9FxhHY6JH+8hrwt1cqytZRSGkVj662WPqIWl/poc=
+	t=1707843160; cv=none; b=BXlEHwcEwvaQ3YTIoMQLJ9ryMDVsnSp+YlX2mIUuHg9yJPT+fb1mtfSM0MWVe3PIDbam575eMRwDo/Pbnl6eUpQE7AhYELFo4rOGCEX3ZMpeEy5cL+snQ+1kHr5FPSVV9u6V8keiqiH/TfpLyOlRBWdGK/DBjDo2isS59nAIUOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707843084; c=relaxed/simple;
-	bh=kl7ymghwoEm5fD1aXGSjAnJFh0kINLOOXi5jM40r5aA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JXXhP1oM8hxCyoUD5cpuvjxKTU5VJeycHFKnQBY29hoHW1+dq+18zTzcmm3mPZpv32kW8s7A6GXlJgE89fUBc+ppzQYk0hg7MtxmsygJ0BQmlnR3OuSUjfUtkwUjpgVX1G1nQxJ9NtEMCVw0H0+GALygVhNX9VwE/FaWVfvJ/gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nzMkqDRU; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1707843160; c=relaxed/simple;
+	bh=PXdxy1hTes8PVKE+xBuDu7zQhe1++IbzR9FzZbvGKBM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DfUL9bWNsmLqYJw2uhY0EGcG/+RchILD+l307cVMbDo2co987uUQpfBNQ5sBE1C2P3x+/46l4ycpLGElQEHWI7k+p5a+E6b6ng2QSVu+7Nq64IfnvdMP9WZgjkmrQr8u/gkRP1f0MYbv8iHzyJwY4nxqvvZggrijUz/BSd5tUec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gNz4eBY5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nzMkqDRU"
-Date: Tue, 13 Feb 2024 16:51:12 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707843080;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=E+a8il656wm0JNzy2XZ2whgFkgYGy3mjL1DXh5soG1M=;
-	b=nzMkqDRU7++7XpYRT6myB0KFUTXU8HbtM7x7fHvME6+8jN1MOBq0WYcuhXR+N3AN/q3TMQ
-	cPMI15KvdQT7jxXBwqTPjA9SGQ6QZxcPeWRIQmd5G3IC8nEE//IW38C5yea3gtmEGxhKj5
-	kthep06gyAyeELiwUsqhVRffxI7r6bw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: catalin.marinas@arm.com, gshan@redhat.com, james.morse@arm.com,
-	mark.rutland@arm.com, maz@kernel.org, rananta@google.com,
-	ricarkol@google.com, ryan.roberts@arm.com, shahuang@redhat.com,
-	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com,
-	vdonnefort@google.com
-Subject: Re: [PATCH v5 3/4] KVM: arm64: Register ptdump with debugfs on guest
- creation
-Message-ID: <ZcueAGbQISkxaTNR@linux.dev>
-References: <20240207144832.1017815-2-sebastianene@google.com>
- <20240207144832.1017815-5-sebastianene@google.com>
- <Zcq-NGa-Gd9rVVgF@linux.dev>
- <Zcub87FwaVPkCXQE@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gNz4eBY5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AB14C433C7;
+	Tue, 13 Feb 2024 16:52:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707843159;
+	bh=PXdxy1hTes8PVKE+xBuDu7zQhe1++IbzR9FzZbvGKBM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gNz4eBY5MfB0YkD0cIH7GgA3W+ofJnbeHVoUVVcXGT/4pS7rlMgsmAdgB2d/Jhi5h
+	 S4XjzDARZYlbxdazPlM/+VwxBlsAClBDBb0rg4qlL6gTUfn6vzY4//TCOLCnvI/e1B
+	 w4IUtm++lBt3NU6Rne5u2YGHGVI8eig+ypPIqR6RJigi8BhW79sJIz/ioy23UrvnSY
+	 5HDL5za63UCDg0uTV17WHlpamrJrhkrYK6qm39Bd8kQiZcDeGegVmGIqTbhN0QaVr6
+	 tfDZkadMbA0KasM9Q/KGy1nOLs6+nf5kjnntG8R7JbwJ4s2N88C0wGcJzrBlJId5g8
+	 oUxkk4RwpZb+A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rZw1N-002qby-2U;
+	Tue, 13 Feb 2024 16:52:37 +0000
+Date: Tue, 13 Feb 2024 16:52:36 +0000
+Message-ID: <868r3o5msr.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Will Deacon <will@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Ricardo Koller <ricarkol@google.com>
+Subject: Re: [RFC PATCH] KVM: arm64: Fix double-free following kvm_pgtable_stage2_free_unlinked()
+In-Reply-To: <ZcuY9rdvGaJ66edx@linux.dev>
+References: <20240212193052.27765-1-will@kernel.org>
+	<Zcp8LcvsZiZVkNKe@linux.dev>
+	<86cyt062jh.wl-maz@kernel.org>
+	<ZcuY9rdvGaJ66edx@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zcub87FwaVPkCXQE@google.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, ricarkol@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Feb 13, 2024 at 04:42:27PM +0000, Sebastian Ene wrote:
-> On Tue, Feb 13, 2024 at 12:56:20AM +0000, Oliver Upton wrote:
-> > On Wed, Feb 07, 2024 at 02:48:32PM +0000, Sebastian Ene wrote:
-
-[...]
-
-> > > +static int kvm_ptdump_guest_open(struct inode *inode, struct file *file)
-> > > +{
-> > > +	return single_open(file, kvm_ptdump_guest_show, inode->i_private);
-> > > +}
-> > > +
-> > 
-> > Shouldn't we take a reference on the KVM struct at open to avoid UAF?
-> > 
-> > 	struct kvm *kvm = inode->i_private;
-> > 
-> > 	if (!kvm_get_kvm_safe(kvm))
-> > 		return -ENOENT;
-> > 
-> > Then you can do a put on it at close().
-> > 
+On Tue, 13 Feb 2024 16:29:42 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Thanks, I though that the kvm_destroy_vm_debugfs will keep spinning if
-> there are opened paths to the debugfs entry, but I guess nothing prevents
-> that from happening and the kvm struct can be removed behind our back.
+> On Tue, Feb 13, 2024 at 11:12:34AM +0000, Marc Zyngier wrote:
+> > On Mon, 12 Feb 2024 20:14:37 +0000,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > 
+> > > On Mon, Feb 12, 2024 at 07:30:52PM +0000, Will Deacon wrote:
+> > > > kvm_pgtable_stage2_free_unlinked() does the final put_page() on the
+> > > > root page of the sub-tree before returning, so remove the additional
+> > > > put_page() invocations in the callers.
+> > > > 
+> > > > Cc: Marc Zyngier <maz@kernel.org>
+> > > > Cc: Oliver Upton <oliver.upton@linux.dev>
+> > > > Cc: Ricardo Koller <ricarkol@google.com>
+> > > > Signed-off-by: Will Deacon <will@kernel.org>
+> > > > ---
+> > > > 
+> > > > Hi folks,
+> > > > 
+> > > > Sending this as an RFC as I only spotted it from code inspection and I'm
+> > > > surprised others aren't seeing fireworks if it's a genuine bug. I also
+> > > > couldn't come up with a sensible Fixes tag, as all of:
+> > > > 
+> > > >  e7c05540c694b ("KVM: arm64: Add helper for creating unlinked stage2 subtrees")
+> > > >  8f5a3eb7513fc ("KVM: arm64: Add kvm_pgtable_stage2_split()")
+> > > >  f6a27d6dc51b2 ("KVM: arm64: Drop last page ref in kvm_pgtable_stage2_free_removed()")
+> > 
+> > I'd blame it on the last commit, as we really ought to have it if we
+> > have the others.
+> > 
+> > > >
+> > > > are actually ok in isolation. Hrm. Please tell me I'm wrong?
+> > > > 
+> > > >  arch/arm64/kvm/hyp/pgtable.c | 2 --
+> > > >  1 file changed, 2 deletions(-)
+> > > > 
+> > > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > > > index c651df904fe3..ab9d05fcf98b 100644
+> > > > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > > > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > > > @@ -1419,7 +1419,6 @@ kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> > > >  				 level + 1);
+> > > >  	if (ret) {
+> > > >  		kvm_pgtable_stage2_free_unlinked(mm_ops, pgtable, level);
+> > > > -		mm_ops->put_page(pgtable);
+> > > >  		return ERR_PTR(ret);
+> > > >  	}
+> > > 
+> > > AFAICT, this entire branch is effectively dead code, unless there's a
+> > > KVM bug lurking behind the page table walk. The sub-tree isn't visible
+> > > to other software or hardware walkers yet, so none of the PTE races
+> > > could cause this to pop.
+> > > 
+> > > So while this is very obviously a bug, it might be pure luck that folks
+> > > haven't seen smoke here. Perhaps while fixing the bug we should take the
+> > > opportunity to promote the condition to WARN_ON_ONCE().
+> > 
+> > Can't you construct a case where an allocation fails during the walk
+> > (memcache empty), and we end up on this exact path?
+> 
+> Possibly, but AFAICT that can only happen if there was a bug in KVM. We
+> don't start the walk at all if userspace set the split chunk size to 0,
+> and otherwise we expect it to be at least PMD_SIZE, which will top up
+> the cache to 1 every pass. stage2_split_walker() will 'do the right
+> thing' if there aren't enough preallocated pages to get down to level 3.
+> 
+> It really doesn't matter either way, I'm just trying to convince myself
+> of the reasons why we haven't seen this explode yet :)
 
-kvm_destroy_vm() will get called after the last put() on a kvm struct,
-so all debugfs files should be closed too if we're consistent about
-this.
+Yeah, that's probably very unlikely to hit given the current
+conditions.
+
+> 
+> > > 
+> > > > @@ -1502,7 +1501,6 @@ static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> > > >  
+> > > >  	if (!stage2_try_break_pte(ctx, mmu)) {
+> > > >  		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
+> > > > -		mm_ops->put_page(childp);
+> > > >  		return -EAGAIN;
+> > > >  	}
+> > > 
+> > > This, on the other hand, seems possible. There exists a race where an
+> > > old block PTE could have the AF set on it and the underlying cmpxchg()
+> > > could fail. There shouldn't be a race with any software walkers, as we
+> > > hold the MMU lock for write here.
+> > 
+> > AF update is indeed a likely candidate.
+> > 
+> > In any case, this patch looks good to me as it is, and we can always
+> > have a separate tweak to adjust the severity of the first case as
+> > required. Unless anyone objects, I'd like to queue it shortly.
+> 
+> Agreed, happy with the way this looks and should've added:
+> 
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+> 
+> the first time around.
+
+Thanks for that. I'll queue that shortly and send (another) PR.
+
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
