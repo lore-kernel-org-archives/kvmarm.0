@@ -1,170 +1,343 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 100732C695;
-	Tue, 13 Feb 2024 16:52:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AAF45DF18
+	for <kvmarm@lists.linux.dev>; Tue, 13 Feb 2024 16:59:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707843160; cv=none; b=BXlEHwcEwvaQ3YTIoMQLJ9ryMDVsnSp+YlX2mIUuHg9yJPT+fb1mtfSM0MWVe3PIDbam575eMRwDo/Pbnl6eUpQE7AhYELFo4rOGCEX3ZMpeEy5cL+snQ+1kHr5FPSVV9u6V8keiqiH/TfpLyOlRBWdGK/DBjDo2isS59nAIUOc=
+	t=1707843547; cv=none; b=mmmODi4leL1UHjejRp8c+bj3b6bZKrd3s1hTH8OnQ/JN0EVs0SKfpNedn8rA7F8vtu6PRFE11Gw1MGiAqGMLc5nzoSN0TaHlh3NoKlxddoOx8C2TBuxEehB99eV6U0teGVyuFFRxGLoB8R4wSbRsDntFmnijWyTPHXdhly0lnUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707843160; c=relaxed/simple;
-	bh=PXdxy1hTes8PVKE+xBuDu7zQhe1++IbzR9FzZbvGKBM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DfUL9bWNsmLqYJw2uhY0EGcG/+RchILD+l307cVMbDo2co987uUQpfBNQ5sBE1C2P3x+/46l4ycpLGElQEHWI7k+p5a+E6b6ng2QSVu+7Nq64IfnvdMP9WZgjkmrQr8u/gkRP1f0MYbv8iHzyJwY4nxqvvZggrijUz/BSd5tUec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gNz4eBY5; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707843547; c=relaxed/simple;
+	bh=i0Gnk8WjglIEP3k3txEC2+8M76N/IEkGhhy+lMVjaGs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q8fovCfGxy1lxAMyU5ZFu57A8MrLA0XPajJeHixlT7bWFbC78ubNObqQd0SunBBTq0KJ1uUMzm0Oxq5bFgbiO14Y+i285FcDGlAURcxhNZJ1uTvMxqSU0Nt8zeTZb07vkz0Twsz/tz0xk2s+jSGojnEHREElbH68BOyXUW97Beo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mH93jBdc; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gNz4eBY5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AB14C433C7;
-	Tue, 13 Feb 2024 16:52:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707843159;
-	bh=PXdxy1hTes8PVKE+xBuDu7zQhe1++IbzR9FzZbvGKBM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gNz4eBY5MfB0YkD0cIH7GgA3W+ofJnbeHVoUVVcXGT/4pS7rlMgsmAdgB2d/Jhi5h
-	 S4XjzDARZYlbxdazPlM/+VwxBlsAClBDBb0rg4qlL6gTUfn6vzY4//TCOLCnvI/e1B
-	 w4IUtm++lBt3NU6Rne5u2YGHGVI8eig+ypPIqR6RJigi8BhW79sJIz/ioy23UrvnSY
-	 5HDL5za63UCDg0uTV17WHlpamrJrhkrYK6qm39Bd8kQiZcDeGegVmGIqTbhN0QaVr6
-	 tfDZkadMbA0KasM9Q/KGy1nOLs6+nf5kjnntG8R7JbwJ4s2N88C0wGcJzrBlJId5g8
-	 oUxkk4RwpZb+A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rZw1N-002qby-2U;
-	Tue, 13 Feb 2024 16:52:37 +0000
-Date: Tue, 13 Feb 2024 16:52:36 +0000
-Message-ID: <868r3o5msr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mH93jBdc"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-410cf70a057so66045e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 13 Feb 2024 08:59:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707843544; x=1708448344; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RjHgRqK53+Z/Iq+FMNbpTXTAGux6p7HXMqS53v9U+74=;
+        b=mH93jBdcrIKKHbSe8VknQa1my0g8P0PI/3rdFxUc7t8mWleWPmBeA9Dh+eKWAyh33I
+         qvJu8mqVuqaL4HRgYeuS0Hiqf226Jkkk6YmrsshS9B6QCTi2RR3mfe+YxWmNPXTa9BOB
+         NxyqoRVCgfuMo5fL+N1NloX7XQcx3S0cPrdvSWpaef38c7jQm/LjsG1pdJZXkYBgvYqQ
+         JXVW+UEgbCqsHO4aC/lctol0WR7ZlFqVrQ1UA7e5yTwb3W6scDmldAL/SdGp7etNgaKK
+         MBX6zdKWgFagt9GmZH9rV93YyIc3vJ5dtZ2aPUykUfFsPdmZHiZnLTLfEmX9WmhYoepz
+         WB8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707843544; x=1708448344;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RjHgRqK53+Z/Iq+FMNbpTXTAGux6p7HXMqS53v9U+74=;
+        b=V4h5K6HXyfpCgIc4hDihMDy0mjcsATpCvttJ/dRF2t4UHd9gnH6EYm2SoQHvxtxbl3
+         GbcBd2xDZmZmF9yO+Y9PJGidPW72jDY7wrhe4nbbmX3h6Ln8OwoxB6tqXqYenxNWgvf/
+         fDzl904aA1prlh4cHuRy2KfO2rhpFmA92lLicRy/Xb2L6xd8fJtWQUjOaxPhemHqavKz
+         6fYycXuY9MEzWRy8RApJVfxNJ9MQYCyjs9852I9DQkVevxCz1EGXNiUzDMu3TtcsOug7
+         CvjJB+i+TGFzNbHaR0RpJ4EkuDR8h0Zr/nf6yoN4c7AEYGZtyXC6zv7bycUtCawgNol3
+         EKpw==
+X-Forwarded-Encrypted: i=1; AJvYcCXytf7pJNvXs4ufHuu7DZl3a/buHeSPrSA01RWt20RfwasMnWCMoYRcf7FGNGgJk/4J+ypscnTXCY26RRiMKRYmnlMq/PsT
+X-Gm-Message-State: AOJu0Yypp1dZclL1egNrM38ezhptevBWu9cuEka4PrX0x14CnASqfEMu
+	7vAIYKJGZpAJcszOaQj7DFRgDho62GYm0JvVAgI1rCSvpuMUfbX8cux5mfS6Ww==
+X-Google-Smtp-Source: AGHT+IGlCgeYc2G5NMvG/5KdHodX0ldfX5951gwHVabcierGBfqA2oBgQ+km8E7JEFS3ZUPtuyGqzw==
+X-Received: by 2002:a05:600c:4e06:b0:411:cf85:9549 with SMTP id b6-20020a05600c4e0600b00411cf859549mr17305wmq.3.1707843543608;
+        Tue, 13 Feb 2024 08:59:03 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWVgfBUBIeSfy/VTDfV7wJPSK+x9usF7TNREp66vg4zts9aON/TukvLypDt0PHHfe4amRnfxAR/udmtPFy+ZNo2kTjA/tHJ0BjcgzUq7dPE8mHk1yhjEUGq+5d70PeP91QhOLuzDgPjBiNgMTbfzvLTZrSoZB/zRQHkZxD0Jc9lrpesh2VEB2FFONgkmhOtOO3szgDEUvxKmQmnxE6Ut+HbnKlHEhgI0jewZtgXskMFp0BX3qVx/suLIK2STrqDtCzGu+VpHwG2krKu/oK13lHKhk+e5mECf28aTv/EpoSFcumE/fcAGzG+78+6DF5UWpu3NC/Bi6kXXvvo3nCYjVr7m/Q0ZffRJdRYG2OeyWVUnzIu5R8d+uMD4PhwzqIJNkqb7Ycylzobz+uji49yiVnzYoIQgin8BF5eY7aMZTHKjn/RvR6kL4ufGIyRGZCjoiuO50s+TUTrmBsxNfMin3O2hkdZp2MZHJ0wnAYJLYnsYWdjnDHRAMrAi1Q1Fp7UT6ZVuWhdAM3MhreQaZkg0lsRxGA4W9aYywhj4Q==
+Received: from google.com (161.126.77.34.bc.googleusercontent.com. [34.77.126.161])
+        by smtp.gmail.com with ESMTPSA id m14-20020a05600c4f4e00b00411bff9f7cbsm2296147wmq.37.2024.02.13.08.59.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Feb 2024 08:59:03 -0800 (PST)
+Date: Tue, 13 Feb 2024 16:59:01 +0000
+From: Sebastian Ene <sebastianene@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Will Deacon <will@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Ricardo Koller <ricarkol@google.com>
-Subject: Re: [RFC PATCH] KVM: arm64: Fix double-free following kvm_pgtable_stage2_free_unlinked()
-In-Reply-To: <ZcuY9rdvGaJ66edx@linux.dev>
-References: <20240212193052.27765-1-will@kernel.org>
-	<Zcp8LcvsZiZVkNKe@linux.dev>
-	<86cyt062jh.wl-maz@kernel.org>
-	<ZcuY9rdvGaJ66edx@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Cc: catalin.marinas@arm.com, gshan@redhat.com, james.morse@arm.com,
+	mark.rutland@arm.com, maz@kernel.org, rananta@google.com,
+	ricarkol@google.com, ryan.roberts@arm.com, shahuang@redhat.com,
+	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kernel-team@android.com,
+	vdonnefort@google.com
+Subject: Re: [PATCH v5 4/4] KVM: arm64: Initialize the ptdump parser with
+ stage-2 attributes
+Message-ID: <Zcuf1ZUvwhxBobuG@google.com>
+References: <20240207144832.1017815-2-sebastianene@google.com>
+ <20240207144832.1017815-6-sebastianene@google.com>
+ <Zcq7AoII8qLWwjsu@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, ricarkol@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zcq7AoII8qLWwjsu@linux.dev>
 
-On Tue, 13 Feb 2024 16:29:42 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Tue, Feb 13, 2024 at 11:12:34AM +0000, Marc Zyngier wrote:
-> > On Mon, 12 Feb 2024 20:14:37 +0000,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > 
-> > > On Mon, Feb 12, 2024 at 07:30:52PM +0000, Will Deacon wrote:
-> > > > kvm_pgtable_stage2_free_unlinked() does the final put_page() on the
-> > > > root page of the sub-tree before returning, so remove the additional
-> > > > put_page() invocations in the callers.
-> > > > 
-> > > > Cc: Marc Zyngier <maz@kernel.org>
-> > > > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > > > Cc: Ricardo Koller <ricarkol@google.com>
-> > > > Signed-off-by: Will Deacon <will@kernel.org>
-> > > > ---
-> > > > 
-> > > > Hi folks,
-> > > > 
-> > > > Sending this as an RFC as I only spotted it from code inspection and I'm
-> > > > surprised others aren't seeing fireworks if it's a genuine bug. I also
-> > > > couldn't come up with a sensible Fixes tag, as all of:
-> > > > 
-> > > >  e7c05540c694b ("KVM: arm64: Add helper for creating unlinked stage2 subtrees")
-> > > >  8f5a3eb7513fc ("KVM: arm64: Add kvm_pgtable_stage2_split()")
-> > > >  f6a27d6dc51b2 ("KVM: arm64: Drop last page ref in kvm_pgtable_stage2_free_removed()")
+On Tue, Feb 13, 2024 at 12:42:42AM +0000, Oliver Upton wrote:
+> On Wed, Feb 07, 2024 at 02:48:33PM +0000, Sebastian Ene wrote:
+> > Define a set of attributes used by the ptdump parser to display the
+> > properties of a guest memory region covered by a pagetable descriptor.
+> > Build a description of the pagetable levels and initialize the parser
+> > with this configuration.
 > > 
-> > I'd blame it on the last commit, as we really ought to have it if we
-> > have the others.
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > ---
+> >  arch/arm64/kvm/ptdump.c | 156 ++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 156 insertions(+)
 > > 
-> > > >
-> > > > are actually ok in isolation. Hrm. Please tell me I'm wrong?
-> > > > 
-> > > >  arch/arm64/kvm/hyp/pgtable.c | 2 --
-> > > >  1 file changed, 2 deletions(-)
-> > > > 
-> > > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > > > index c651df904fe3..ab9d05fcf98b 100644
-> > > > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > > > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > > > @@ -1419,7 +1419,6 @@ kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
-> > > >  				 level + 1);
-> > > >  	if (ret) {
-> > > >  		kvm_pgtable_stage2_free_unlinked(mm_ops, pgtable, level);
-> > > > -		mm_ops->put_page(pgtable);
-> > > >  		return ERR_PTR(ret);
-> > > >  	}
-> > > 
-> > > AFAICT, this entire branch is effectively dead code, unless there's a
-> > > KVM bug lurking behind the page table walk. The sub-tree isn't visible
-> > > to other software or hardware walkers yet, so none of the PTE races
-> > > could cause this to pop.
-> > > 
-> > > So while this is very obviously a bug, it might be pure luck that folks
-> > > haven't seen smoke here. Perhaps while fixing the bug we should take the
-> > > opportunity to promote the condition to WARN_ON_ONCE().
-> > 
-> > Can't you construct a case where an allocation fails during the walk
-> > (memcache empty), and we end up on this exact path?
+> > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+> > index a4e984da8aa7..60725d46f17b 100644
+> > --- a/arch/arm64/kvm/ptdump.c
+> > +++ b/arch/arm64/kvm/ptdump.c
+> > @@ -14,6 +14,69 @@
+> >  #include <kvm_ptdump.h>
+> >  
+> >  
+> > +#define ADDR_MARKER_LEN		(2)
+> > +#define MARKER_MSG_LEN		(32)
+> > +
+> > +static const struct prot_bits stage2_pte_bits[] = {
+> > +	{
+> > +		.mask	= PTE_VALID,
+> > +		.val	= PTE_VALID,
+> > +		.set	= " ",
+> > +		.clear	= "F",
+> > +	}, {
+> > +		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
+> > +		.val	= KVM_PTE_LEAF_ATTR_HI_S2_XN | PTE_VALID,
+> > +		.set	= "XN",
+> > +		.clear	= "  ",
+> > +	}, {
+> > +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
+> > +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | PTE_VALID,
+> > +		.set	= "R",
+> > +		.clear	= " ",
+> > +	}, {
+> > +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
+> > +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | PTE_VALID,
+> > +		.set	= "W",
+> > +		.clear	= " ",
+> > +	}, {
+> > +		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
+> > +		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF | PTE_VALID,
+> > +		.set	= "AF",
+> > +		.clear	= "  ",
+> > +	}, {
+> > +		.mask	= PTE_NG,
+> > +		.val	= PTE_NG,
+> > +		.set	= "FnXS",
+> > +		.clear	= "  ",
+> > +	}, {
+> > +		.mask	= PTE_CONT | PTE_VALID,
+> > +		.val	= PTE_CONT | PTE_VALID,
+> > +		.set	= "CON",
+> > +		.clear	= "   ",
+> > +	}, {
+> > +		.mask	= PTE_TABLE_BIT,
+> > +		.val	= PTE_TABLE_BIT,
+> > +		.set	= "   ",
+> > +		.clear	= "BLK",
 > 
-> Possibly, but AFAICT that can only happen if there was a bug in KVM. We
-> don't start the walk at all if userspace set the split chunk size to 0,
-> and otherwise we expect it to be at least PMD_SIZE, which will top up
-> the cache to 1 every pass. stage2_split_walker() will 'do the right
-> thing' if there aren't enough preallocated pages to get down to level 3.
+> <snip>
 > 
-> It really doesn't matter either way, I'm just trying to convince myself
-> of the reasons why we haven't seen this explode yet :)
+> > +	}, {
+> > +		.mask	= KVM_PGTABLE_PROT_SW0,
+> > +		.val	= KVM_PGTABLE_PROT_SW0,
+> > +		.set	= "SW0", /* PKVM_PAGE_SHARED_OWNED */
+> > +	}, {
+> > +		.mask   = KVM_PGTABLE_PROT_SW1,
+> > +		.val	= KVM_PGTABLE_PROT_SW1,
+> > +		.set	= "SW1", /* PKVM_PAGE_SHARED_BORROWED */
+> > +	}, {
+> > +		.mask	= KVM_PGTABLE_PROT_SW2,
+> > +		.val	= KVM_PGTABLE_PROT_SW2,
+> > +		.set	= "SW2",
+> > +	}, {
+> > +		.mask   = KVM_PGTABLE_PROT_SW3,
+> > +		.val	= KVM_PGTABLE_PROT_SW3,
+> > +		.set	= "SW3",
+> > +	},
+> 
+> </snip>
+> 
+> These bits are never set in a 'normal' stage-2 PTE, does it make sense
+> to carry descriptors for them here? In contexts where the SW bits are
+> used it might be more useful if the ptdump used the specific meaning of
+> the bit (e.g. OWNED, BORROWED, etc) instead of the generic SW%d.
+> 
+> That can all wait for when the pKVM bits come into play though.
+> 
 
-Yeah, that's probably very unlikely to hit given the current
-conditions.
+True, I guess we don't need these bits for now. We can insert them at a
+later time when we will have the pKVM support and then we will have to
+use their real maning for the state tracking.
 
+> > +};
+> > +
+> >  static int kvm_ptdump_guest_open(struct inode *inode, struct file *file);
+> >  static int kvm_ptdump_guest_show(struct seq_file *m, void *);
+> >  
+> > @@ -52,6 +115,94 @@ static int kvm_ptdump_show_common(struct seq_file *m,
+> >  	return kvm_pgtable_walk(pgtable, 0, BIT(pgtable->ia_bits), &walker);
+> >  }
+> >  
+> > +static void kvm_ptdump_build_levels(struct pg_level *level, u32 start_lvl)
+> > +{
+> > +	static const char * const level_names[] = {"PGD", "PUD", "PMD", "PTE"};
+> > +	u32 i = 0;
+> > +	u64 mask_lvl = 0;
 > 
-> > > 
-> > > > @@ -1502,7 +1501,6 @@ static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> > > >  
-> > > >  	if (!stage2_try_break_pte(ctx, mmu)) {
-> > > >  		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
-> > > > -		mm_ops->put_page(childp);
-> > > >  		return -EAGAIN;
-> > > >  	}
-> > > 
-> > > This, on the other hand, seems possible. There exists a race where an
-> > > old block PTE could have the AF set on it and the underlying cmpxchg()
-> > > could fail. There shouldn't be a race with any software walkers, as we
-> > > hold the MMU lock for write here.
-> > 
-> > AF update is indeed a likely candidate.
-> > 
-> > In any case, this patch looks good to me as it is, and we can always
-> > have a separate tweak to adjust the severity of the first case as
-> > required. Unless anyone objects, I'd like to queue it shortly.
+> nit: _lvl adds nothing to this, and actually confused me for a sec as
+> to whether the mask changed per level.
 > 
-> Agreed, happy with the way this looks and should've added:
-> 
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-> 
-> the first time around.
 
-Thanks for that. I'll queue that shortly and send (another) PR.
+I will drop it from the name to avoid the confusion.
 
-	M.
+> > +	if (start_lvl > 2) {
+> > +		pr_err("invalid start_lvl %u\n", start_lvl);
+> > +		return;
+> > +	}
+> 
+> Can't we get something like -EINVAL out here and fail initialization?
+> Otherwise breadcrumbs like this pr_err() are hard to connect to a
+> specific failure.
+>
 
--- 
-Without deviation from the norm, progress is not possible.
+Ok, I will add a return code for this function.
+
+> > +	for (i = 0; i < ARRAY_SIZE(stage2_pte_bits); i++)
+> > +		mask_lvl |= stage2_pte_bits[i].mask;
+> > +
+> > +	for (i = start_lvl; i <= KVM_PGTABLE_LAST_LEVEL; i++) {
+> > +		level[i].name = level_names[i];
+> > +		level[i].num = ARRAY_SIZE(stage2_pte_bits);
+> > +		level[i].bits = stage2_pte_bits;
+> > +		level[i].mask = mask_lvl;
+> > +	}
+> > +
+> > +	if (start_lvl > 0)
+> > +		level[start_lvl].name = level_names[0];
+> > +}
+> > +
+> > +static int kvm_ptdump_parser_init(struct pg_state *st,
+> > +				  struct kvm_pgtable *pgtable,
+> > +				  struct seq_file *m)
+> > +{
+> > +	struct addr_marker *ipa_addr_marker;
+> > +	char *marker_msg;
+> > +	struct pg_level *level_descr;
+> > +	struct ptdump_range *range;
+> > +
+> > +	ipa_addr_marker = kzalloc(sizeof(struct addr_marker) * ADDR_MARKER_LEN,
+> > +				  GFP_KERNEL_ACCOUNT);
+> > +	if (!ipa_addr_marker)
+> > +		return -ENOMEM;
+> > +
+> > +	marker_msg = kzalloc(MARKER_MSG_LEN, GFP_KERNEL_ACCOUNT);
+> > +	if (!marker_msg)
+> > +		goto free_with_marker;
+> > +
+> > +	level_descr = kzalloc(sizeof(struct pg_level) * (KVM_PGTABLE_LAST_LEVEL + 1),
+> > +			      GFP_KERNEL_ACCOUNT);
+> > +	if (!level_descr)
+> > +		goto free_with_msg;
+> > +
+> > +	range = kzalloc(sizeof(struct ptdump_range) * ADDR_MARKER_LEN,
+> > +			GFP_KERNEL_ACCOUNT);
+> > +	if (!range)
+> > +		goto free_with_level;
+> > +
+> > +	kvm_ptdump_build_levels(level_descr, pgtable->start_level);
+> > +
+> > +	snprintf(marker_msg, MARKER_MSG_LEN, "IPA bits %2u start lvl %1d",
+> > +		 pgtable->ia_bits, pgtable->start_level);
+> > +
+> > +	ipa_addr_marker[0].name = marker_msg;
+> 
+> Is the dynamic name worth the added complexity? I see nothing wrong with
+> exposing additional debugfs files for simple attributes like the IPA
+> range and page table levels.
+> 
+> I know it isn't *that* much, just looking for every opportunity to
+> simplify further.
+> 
+
+We can keep them separate, I have no strong opinion about this. I think
+this was Vincent's, original suggestion to have them so I will check with
+him as well.
+
+> > +	ipa_addr_marker[1].start_address = BIT(pgtable->ia_bits);
+> > +	range[0].end = BIT(pgtable->ia_bits);
+> > +
+> > +	st->seq = m;
+> > +	st->marker = ipa_addr_marker;
+> > +	st->level = -1,
+> > +	st->pg_level = level_descr,
+> > +	st->ptdump.range = range;
+> > +	return 0;
+> > +
+> > +free_with_level:
+> > +	kfree(level_descr);
+> > +free_with_msg:
+> > +	kfree(marker_msg);
+> > +free_with_marker:
+> > +	kfree(ipa_addr_marker);
+> > +	return -ENOMEM;
+> > +}
+> > +
+> > +static void kvm_ptdump_parser_teardown(struct pg_state *st)
+> > +{
+> > +	const struct addr_marker *ipa_addr_marker = st->marker;
+> > +
+> > +	kfree(ipa_addr_marker[0].name);
+> > +	kfree(ipa_addr_marker);
+> > +	kfree(st->pg_level);
+> > +	kfree(st->ptdump.range);
+> > +}
+> > +
+> >  static int kvm_ptdump_guest_show(struct seq_file *m, void *)
+> >  {
+> >  	struct kvm *guest_kvm = m->private;
+> > @@ -59,10 +210,15 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *)
+> >  	struct pg_state parser_state = {0};
+> >  	int ret;
+> >  
+> > +	ret = kvm_ptdump_parser_init(&parser_state, mmu->pgt, m);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> 
+> Can this be done at open(), or am I missing something?
+> 
+
+I guess we can do this in open() but then we will have to add again that
+struct that wraps some ptdump specific state tracking. It seemed a bit cleaner in
+this way. What do you think ?
+
+> >  	write_lock(&guest_kvm->mmu_lock);
+> >  	ret = kvm_ptdump_show_common(m, mmu->pgt, &parser_state);
+> >  	write_unlock(&guest_kvm->mmu_lock);
+> >  
+> > +	kvm_ptdump_parser_teardown(&parser_state);
+> 
+> Same question here, can this happen at close()? I guess you'll need a
+> struct to encapsulate pg_state and a pointer to the VM at least.
+>
+
+Right, I tried to avoid using a separate struct as we discussed in v4.
+
+> Actually, come to think of it, if you embed all of the data you need for
+> the walker into a structure you can just do a single allocation for it
+> upfront.
+> 
+> -- 
+> Thanks,
+> Oliver
+
+Thanks for the feedback,
+Seb
