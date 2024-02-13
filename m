@@ -1,83 +1,161 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B8E8F45
-	for <kvmarm@lists.linux.dev>; Tue, 13 Feb 2024 03:27:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA081BE49
+	for <kvmarm@lists.linux.dev>; Tue, 13 Feb 2024 03:39:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707794826; cv=none; b=J9/zrRFkOcxlOJqH3JfEg+gVG84Gr8BKwAswsQsWeS28yxrFVANrpzghfwdVUYeFWJeM8GtJCopZAF2w6eeHJb/LY/YSlfzauifNlgxGz6bddAWX6fb3x68t7rP+s6IXoq7AC8+X8pHS/QyllxGJn2p6awfzTQcixN2aJ0Y5Uc8=
+	t=1707795593; cv=none; b=QXKuSoKNw/IxORwOO5+wg9eJVcD5zj2HrDlchFHsCtefvo2xXC4f4lqocnJ7UhpkUS46oeScMTIZM98UzgjFvmr4l6XUvRzrX+D26kx1MA6IYt5Th5xY7SqNy3NiCchiPnWiEtWqPHfo2w1qbOylZQcLdj8dhBlkyRoRahFMxWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707794826; c=relaxed/simple;
-	bh=k2gfEby2avrtvHzBUfVvHLiP3n7nkuPha9dr1uxkNDY=;
+	s=arc-20240116; t=1707795593; c=relaxed/simple;
+	bh=5+qYZYJemzYwmTCaksNFbQuIKvJDzxrLlD2bZz/R0H8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=N4y2mi0J4zakt1NP6iq4KZMKO+mBu9mO4dH3PRjxr9acf4AFC31qMa58iu8F9w3Tusdgr9lJIRAFtwIND8VJSCjYtBAvcXcRNCrGOSZI1+R/Uv9gveB4tTnny7yYNrvKdHXyuEnMNbP8mcVOrQgaZPboWS+8B9mhnn5QMfQ//cA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uAJRWKBx; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=cVDxj2mAm0EptzbKumj1iFAPWV4My0WsU34lx7RKbhGjbuGxmc8NJPBTNjQ8cii4obmLGBUeZlCxbEdyZdssB+iccPPpV/jvdr5JBimWBllprb0yalYAqYJ2W68lI5ZFIBdQhNV0XzUv8p5iNL3hif7qTQg97me7CDFTxyUPRMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m2uUeIC2; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uAJRWKBx"
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1d992a23d76so53240925ad.1
-        for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 19:27:04 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m2uUeIC2"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6e0e690a604so1220999b3a.0
+        for <kvmarm@lists.linux.dev>; Mon, 12 Feb 2024 19:39:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707794824; x=1708399624; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4Ol3QEcIEiOh1BLpsgDjP1PLEFR06C0O0EZBWIwePAQ=;
-        b=uAJRWKBxE4Cmi6k5K3wSEuJIYMmsmX03Ojz//WT7m3i/1Kql1zdQPCOYGRW2kAVHVh
-         nKBCZgNDj1c+G2y8ihSyB4F7vQ06xBgfP3hiralC8EG85u7ZnefP7QSxsxX0xsXaO3ah
-         1SIx2v1DI88hGSeHwFazCp9rzweAfCkFJTIaxOrStaGvfZL0k6crYUqrvAf2aLzGhrTy
-         MvBQAk/u+OPa/082OSwFX9nkmqSKDNU/tcSN07wH2W7FYlssDFZ3fHgTKGuo572JBsEa
-         1p4Ffus6IoYlrHkVz1VrcWYJLK2hpFMlHBbqnD1mTGub6Ib+1f1ED/1Cx9jdaT5i3MkX
-         i2Fw==
+        d=google.com; s=20230601; t=1707795591; x=1708400391; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RA6zNvnSFSM19FK25XmCjdxkJlEdzHYrL47jTvjMoZg=;
+        b=m2uUeIC2nlDNjMJ1zLoQEpKIqqjc5422WmGkMizVSleqznR1MNCLyhYoXv7C07SzsL
+         BL9dKqN0WUrwNOzDMaSflF1+7Y0CehATfI31oGM/R2VDVLon0dizIPgl3BgCuiViAcDc
+         SR/4DCPJk0aMiu3d7WeS02AC5igF0BvLtuLu92AlZkWI++1jbDkciet6zZ3eo4T5ItPq
+         3S6U/bglJs4RPNIxyfamTOP0wnUeEelwsymm+pX+mWNBJQh+oPi1PAC8NQG2OVPVWn7+
+         3cF5+b72KbrsVKScUhw4rsdmUNDxXSPYMgRDMjgYozQsHIxJ+66OlvGe0iJarH4kxaNI
+         JHVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707794824; x=1708399624;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4Ol3QEcIEiOh1BLpsgDjP1PLEFR06C0O0EZBWIwePAQ=;
-        b=GPKyKUeAbw88BLEHF3diHP1bPyAU5pujiNnK9T8LD5XfI/ccnQ4apm1HhaTH47k7Zn
-         PDfDvKKAQfssOtIp/jZvOyvAbSAG9g6m+nCD4J03xhg0Rnybp+dBJbQ+k/wBn8tFhkbb
-         xZQK4M9ZQCTLsUaHzKc0xgfYuK8ExrNky4PtG7nlQacXQ1ywIYIygJkitmM8ulrRyxeI
-         YjQ6U/VKAzszfv84WV6lChSGdrYqHTsGVZJd6Qnlldpk/YO49+W45KRqFKAZw+KWfJpV
-         pJUrS/0L+qUhXBfDnPBiWb2/Qh1KlJdKckX/h+f2jeRDHV0FTtoZ9lQun5sBmguA1jRF
-         QzqQ==
-X-Gm-Message-State: AOJu0Ywow8H1K9iQu/n8rJndpvgpwOEXCOjtEhx6y5/mttCBN5vxDV97
-	xaoJgFEUf3GmhmBGR9dFBlUnPqMOxKvVtVtMcLm+FcdrKTWjXUsWstav5rMi39nxiPKiqD7MTUX
-	TpA==
-X-Google-Smtp-Source: AGHT+IE2/lvtUFa4iT45UhB99RCmacSvJqZ8c+JoTQ8zKhR7XCLP/GpvbJ/Z65s2wACzXrxrb6MA3pLj5cc=
+        d=1e100.net; s=20230601; t=1707795591; x=1708400391;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=RA6zNvnSFSM19FK25XmCjdxkJlEdzHYrL47jTvjMoZg=;
+        b=b/J5VJo3dDv8/CDYsDpQHaamI8qHrT6LVkHrNtYXoDpadvGjz5euWJqCMKpM602XY3
+         RDUT+ETW4BWWsCdbo2NJh0OW3rIlwQw+wCBmXI3GyjMCdyhT7rAYKVhXgYOKrPEN6/kc
+         z0QnjOi28+wtGUics/v16sx7k5TVK5IiDrMbww3Ub8iHCrA++wV2H/OqXibg8fdmAscC
+         BMkFhjfMYGe4c0rA75P06KeJyjT0uqd/VAUNbgjBAmHUagk3qtxIOIFeEQoPrI19H4Pa
+         06Nu12YliQzHUlKFWYS4JUjwaQaslW5aovtgF5bifdA88k7sl4B8scpW0UyA/FF8xfFR
+         qKIA==
+X-Gm-Message-State: AOJu0Yw74FtCnEbi7UqovW3H2sPmBtG+H32DAIuQ8SvtuK596d8xYJb0
+	i9i0hzaEV1adW0+JnAo/jdjN7jedGO0dpXrOvsduEHnqtEfW4zR8FollYhqZoszuJiQUd21XUTk
+	4nA==
+X-Google-Smtp-Source: AGHT+IEVp/50JegG3InAOxeb5TGvnesSNFGJiZW76v1yp1CrU8i9BBgmf4sz3sT9bQH82+Mrt5/Bh9zaKk0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:e5c5:b0:1d9:3d47:a440 with SMTP id
- u5-20020a170902e5c500b001d93d47a440mr278839plf.9.1707794824407; Mon, 12 Feb
- 2024 19:27:04 -0800 (PST)
-Date: Mon, 12 Feb 2024 19:27:03 -0800
-In-Reply-To: <20230911021637.1941096-3-stevensd@google.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2d2a:b0:6e0:e2f8:cf40 with SMTP id
+ fa42-20020a056a002d2a00b006e0e2f8cf40mr175477pfb.0.1707795591087; Mon, 12 Feb
+ 2024 19:39:51 -0800 (PST)
+Date: Mon, 12 Feb 2024 19:39:49 -0800
+In-Reply-To: <ZcGn0t3l8OCL5mv6@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20230911021637.1941096-1-stevensd@google.com> <20230911021637.1941096-3-stevensd@google.com>
-Message-ID: <Zcrhh1CyWjCn8eQm@google.com>
-Subject: Re: [PATCH v9 2/6] KVM: mmu: Introduce __kvm_follow_pfn function
+References: <20230911021637.1941096-1-stevensd@google.com> <CAD=HUj5733eL9momi=V53njm85BQv_QkVrX92xReiq0_9JhqxQ@mail.gmail.com>
+ <ZUEPn_nIoE-gLspp@google.com> <CAD=HUj5g9BoziHT5SbbZ1oFKv75UuXoo32x8DC3TYgLGZ6G_Bw@mail.gmail.com>
+ <ZYJFPoFYkp4xajRO@google.com> <ZcGn0t3l8OCL5mv6@google.com>
+Message-ID: <ZcrkhTn1Da5-vND2@google.com>
+Subject: Re: [PATCH v9 0/6] KVM: allow mapping non-refcounted pages
 From: Sean Christopherson <seanjc@google.com>
 To: David Stevens <stevensd@chromium.org>
-Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	Zhi Wang <zhi.wang.linux@gmail.com>, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 11, 2023, David Stevens wrote:
-> From: David Stevens <stevensd@chromium.org>
-> 
-> Introduce __kvm_follow_pfn, which will replace __gfn_to_pfn_memslot.
+On Mon, Feb 05, 2024, Sean Christopherson wrote:
+> On Tue, Dec 19, 2023, Sean Christopherson wrote:
+> > On Tue, Dec 12, 2023, David Stevens wrote:
+> > > On Tue, Oct 31, 2023 at 11:30=E2=80=AFPM Sean Christopherson <seanjc@=
+google.com> wrote:
+> > > >
+> > > > On Tue, Oct 31, 2023, David Stevens wrote:
+> > > > > Sean, have you been waiting for a new patch series with responses=
+ to
+> > > > > Maxim's comments? I'm not really familiar with kernel contributio=
+n
+> > > > > etiquette, but I was hoping to get your feedback before spending =
+the
+> > > > > time to put together another patch series.
+> > > >
+> > > > No, I'm working my way back toward it.  The guest_memfd series took=
+ precedence
+> > > > over everything that I wasn't confident would land in 6.7, i.e. lar=
+ger series
+> > > > effectively got put on the back burner.  Sorry :-(
+> > >=20
+> > > Is this series something that may be able to make it into 6.8 or 6.9?
+> >=20
+> > 6.8 isn't realistic.  Between LPC, vacation, and non-upstream stuff, I'=
+ve done
+> > frustratingly little code review since early November.  Sorry :-(
+> >=20
+> > I haven't paged this series back into memory, so take this with a grain=
+ of salt,
+> > but IIRC there was nothing that would block this from landing in 6.9.  =
+Timing will
+> > likely be tight though, especially for getting testing on all architect=
+ures.
+>=20
+> I did a quick-ish pass today.  If you can hold off on v10 until later thi=
+s week,
+> I'll try to take a more in-depth look by EOD Thursday.
 
-Please use parantheses when refeferencing functions, i.e. __kvm_follow_pfn(),
-__gfn_to_pfn_memslot(), etc.
+So I took a "deeper" look, but honestly it wasn't really any more in-depth =
+than
+the previous look.  I think I was somewhat surprised at the relatively smal=
+l amount
+of churn this ended up requiring.
 
-> __kvm_follow_pfn refactors the old API's arguments into a struct and,
-> where possible, combines the boolean arguments into a single flags
-> argument.
+Anywho, no major complaints.  This might be fodder for 6.9?  Maybe.  It'll =
+be
+tight.  At the very least though, I expect to shove v10 in a branch and sta=
+rt
+beating on it in anticipation of landing it no later than 6.10.
 
-This needs a more verbose changelog, but I honestly wouldn't mind doing that myself
-as a way of refreshing all of this, and to lay out out what the end state will
-(hopefully) look like when all architectures are converted.
+One question though: what happened to the !FOLL_GET logic in kvm_follow_ref=
+counted_pfn()?
+
+In a previous version, I suggested:
+
+  static kvm_pfn_t kvm_follow_refcounted_pfn(struct kvm_follow_pfn *foll,
+                                             struct page *page)
+  {
+       kvm_pfn_t pfn =3D page_to_pfn(page);
+
+       foll->is_refcounted_page =3D true;
+
+       /*
+        * FIXME: Ideally, KVM wouldn't pass FOLL_GET to gup() when the call=
+er
+        * doesn't want to grab a reference, but gup() doesn't support getti=
+ng
+        * just the pfn, i.e. FOLL_GET is effectively mandatory.  If that ev=
+er
+        * changes, drop this and simply don't pass FOLL_GET to gup().
+        */
+       if (!(foll->flags & FOLL_GET))
+               put_page(page);
+
+       return pfn;
+  }
+
+but in v9 it's simply:
+
+  static kvm_pfn_t kvm_follow_refcounted_pfn(struct kvm_follow_pfn *foll,
+					     struct page *page)
+  {
+	kvm_pfn_t pfn =3D page_to_pfn(page);
+
+	foll->is_refcounted_page =3D true;
+	return pfn;
+  }
+
+And instead the x86 page fault handlers manually drop the reference.  Why i=
+s that?
