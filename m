@@ -1,154 +1,147 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 280A35EE6D
-	for <kvmarm@lists.linux.dev>; Tue, 13 Feb 2024 14:54:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82DB85F866
+	for <kvmarm@lists.linux.dev>; Tue, 13 Feb 2024 16:29:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707836077; cv=none; b=XBww6XLHgnv+KMYEJNAdcXA+i69LaJDerlkm9icnzf/h9lUcUS6+HQkq3qI/0rkJAs9A7qRE6ghxoZF6zjabXjrg9KaWLqTsyWNTOwl0PeDkETS5/vMnhUyN4CFunDu7L3kWhkvQ6NkctcCMRqRMgWZwHZERs2F4HwXSTrK1PTo=
+	t=1707841792; cv=none; b=jjfh1yRPw+Ssa15Cqp8uB3DZUoCWbzUmtsEXbptV0rD9pm/WamD5w5eNPMOPOdWohPdDJd61gXrNFXtYdohE2v94sXK9YQMwKFexcXps+rwUc2WYb+8f76CsSWgUIPmAYTA+M29zNSZBtT7+PJ46YANskD7KJ1Kvlvw/w4KATxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707836077; c=relaxed/simple;
-	bh=8WlPc1CMmvGh2RZq/fSlwm1pfE7aApKAHmu79Ql5YBc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ghOmBXhvkXt/1WCIodxuFI8cRz6j8VOMR2LuvGuUjaklmTougR/6PA8aOhzkAw4dtUTc+pNvOX+B7AOZCPrNi0Hf5GsHdNEazMJKGIZR+iPBylmljoVnGsKfbaMDTg47NsvKvAi118FMID8f5VEnPv683PD81OnE1RtXr7FZTT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CB8B3DA7;
-	Tue, 13 Feb 2024 06:55:16 -0800 (PST)
-Received: from [10.57.50.4] (unknown [10.57.50.4])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 29B583F7B4;
-	Tue, 13 Feb 2024 06:54:34 -0800 (PST)
-Message-ID: <0593516b-2419-49b7-83aa-fe189ffad0c2@arm.com>
-Date: Tue, 13 Feb 2024 14:54:32 +0000
+	s=arc-20240116; t=1707841792; c=relaxed/simple;
+	bh=pwq/fcA6g9rlxCQRDTT5fhtljDd9PZwU2WOBG2ktlBs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=txvzZ7Mwe7Cdpl/IHSj5yLhp/Z/NBGws8fafDFaAfV6rA8H1yrSrrjQUzgMSvXQvUl3Av5hLO29/Vrg+z75mKIZIUNGXEKYY/6zrYWPRt1ip3T5KCCKiNn6DY5jwaFuB1ZplmVWu1zMXM/f3HXVe3eclggvFv84u7sOwdAaZcgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GZTwqKcD; arc=none smtp.client-ip=95.215.58.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GZTwqKcD"
+Date: Tue, 13 Feb 2024 16:29:42 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1707841787;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mF7J0g2Nxf+VBOHYwoPE53ZcMPEVUheZGZS5pd1pQoU=;
+	b=GZTwqKcD2J+jk67hFJUI3xSvi3EfxyJevFW4Mm24S4k7iXdUVJDaHRgP+ME3UCJML/Srlw
+	mz9++W2jHHizB72MeD3m/8UTo9wxGeZFTjbl4O28g8kSfkXpLD0yjGCESVeW9t/In3J4jm
+	1Yds7/qCgTwuF5j0aeLIT+dHrfTQyaA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Ricardo Koller <ricarkol@google.com>
+Subject: Re: [RFC PATCH] KVM: arm64: Fix double-free following
+ kvm_pgtable_stage2_free_unlinked()
+Message-ID: <ZcuY9rdvGaJ66edx@linux.dev>
+References: <20240212193052.27765-1-will@kernel.org>
+ <Zcp8LcvsZiZVkNKe@linux.dev>
+ <86cyt062jh.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] arm64: cpufeatures: Only check for NV1 if NV is
- present
-Content-Language: en-GB
-To: Marc Zyngier <maz@kernel.org>, Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-References: <20240212144736.1933112-1-maz@kernel.org>
- <CGME20240212144758eucas1p1345ba6f2000c10a4b33f8575f0a8d22b@eucas1p1.samsung.com>
- <20240212144736.1933112-3-maz@kernel.org>
- <5b2d8fee-9d0f-48f7-b9ec-b86e95387a61@samsung.com>
- <86bk8k5ts3.wl-maz@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <86bk8k5ts3.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86cyt062jh.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On 13/02/2024 14:21, Marc Zyngier wrote:
-> On Tue, 13 Feb 2024 11:14:37 +0000,
-> Marek Szyprowski <m.szyprowski@samsung.com> wrote:
->>
->> Hi
->>
->> On 12.02.2024 15:47, Marc Zyngier wrote:
->>> We handle ID_AA64MMFR4_EL1.E2H0 being 0 as NV1 being present.
->>> However, this is only true if FEAT_NV is implemented.
->>>
->>> Add the required check to has_nv1(), avoiding spuriously advertising
->>> NV1 on HW that doesn't have NV at all.
->>>
->>> Fixes: da9af5071b25 ("arm64: cpufeature: Detect HCR_EL2.NV1 being RES0")
->>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>
->> This patch in turn introduces the following warning during boot
->> (observed on today's linux-next):
->>
->> CPU: All CPU(s) started at EL2
->> CPU features: detected: 32-bit EL0 Support
->> CPU features: detected: 32-bit EL1 Support
->> CPU features: detected: CRC32 instructions
->> ------------[ cut here ]------------
->> WARNING: CPU: 0 PID: 1 at arch/arm64/kernel/cpufeature.c:3369
->> this_cpu_has_cap+0x18/0x70
->> Modules linked in:
->> CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.8.0-rc4-next-20240213 #8014
->> Hardware name: Khadas VIM3 (DT)
->> pstate: 80000005 (Nzcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
->> pc : this_cpu_has_cap+0x18/0x70
->> lr : has_nv1+0x24/0xcc
->> ...
->> Call trace:
->>    this_cpu_has_cap+0x18/0x70
->>    update_cpu_capabilities+0x50/0x134
->>    setup_system_features+0x30/0x120
->>    smp_cpus_done+0x48/0xb4
->>    smp_init+0x7c/0x8c
->>    kernel_init_freeable+0x18c/0x4e4
->>    kernel_init+0x20/0x1d8
->>    ret_from_fork+0x10/0x20
->> irq event stamp: 2846
->> hardirqs last  enabled at (2845): [<ffff80008012cf5c>]
->> console_unlock+0x164/0x190
->> hardirqs last disabled at (2846): [<ffff80008123a078>] el1_dbg+0x24/0x8c
->> softirqs last  enabled at (2842): [<ffff800080010a60>]
->> __do_softirq+0x4a0/0x4e8
->> softirqs last disabled at (2827): [<ffff8000800169b0>]
->> ____do_softirq+0x10/0x1c
->> ---[ end trace 0000000000000000 ]---
->> alternatives: applying system-wide alternatives
+On Tue, Feb 13, 2024 at 11:12:34AM +0000, Marc Zyngier wrote:
+> On Mon, 12 Feb 2024 20:14:37 +0000,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> > 
+> > On Mon, Feb 12, 2024 at 07:30:52PM +0000, Will Deacon wrote:
+> > > kvm_pgtable_stage2_free_unlinked() does the final put_page() on the
+> > > root page of the sub-tree before returning, so remove the additional
+> > > put_page() invocations in the callers.
+> > > 
+> > > Cc: Marc Zyngier <maz@kernel.org>
+> > > Cc: Oliver Upton <oliver.upton@linux.dev>
+> > > Cc: Ricardo Koller <ricarkol@google.com>
+> > > Signed-off-by: Will Deacon <will@kernel.org>
+> > > ---
+> > > 
+> > > Hi folks,
+> > > 
+> > > Sending this as an RFC as I only spotted it from code inspection and I'm
+> > > surprised others aren't seeing fireworks if it's a genuine bug. I also
+> > > couldn't come up with a sensible Fixes tag, as all of:
+> > > 
+> > >  e7c05540c694b ("KVM: arm64: Add helper for creating unlinked stage2 subtrees")
+> > >  8f5a3eb7513fc ("KVM: arm64: Add kvm_pgtable_stage2_split()")
+> > >  f6a27d6dc51b2 ("KVM: arm64: Drop last page ref in kvm_pgtable_stage2_free_removed()")
 > 
-> This is nothing short of embarrassing. It looks like I somehow managed
-> to drop CONFIG_PREEMPT from my test config, making it impossible to
-> identify these issues. Apologies for that.
+> I'd blame it on the last commit, as we really ought to have it if we
+> have the others.
 > 
-> The following patch fixes it for me. Could you please give it a go?
+> > >
+> > > are actually ok in isolation. Hrm. Please tell me I'm wrong?
+> > > 
+> > >  arch/arm64/kvm/hyp/pgtable.c | 2 --
+> > >  1 file changed, 2 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > > index c651df904fe3..ab9d05fcf98b 100644
+> > > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > > @@ -1419,7 +1419,6 @@ kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
+> > >  				 level + 1);
+> > >  	if (ret) {
+> > >  		kvm_pgtable_stage2_free_unlinked(mm_ops, pgtable, level);
+> > > -		mm_ops->put_page(pgtable);
+> > >  		return ERR_PTR(ret);
+> > >  	}
+> > 
+> > AFAICT, this entire branch is effectively dead code, unless there's a
+> > KVM bug lurking behind the page table walk. The sub-tree isn't visible
+> > to other software or hardware walkers yet, so none of the PTE races
+> > could cause this to pop.
+> > 
+> > So while this is very obviously a bug, it might be pure luck that folks
+> > haven't seen smoke here. Perhaps while fixing the bug we should take the
+> > opportunity to promote the condition to WARN_ON_ONCE().
 > 
-> Thanks,
-> 
-> 	M.
-> 
->  From cd75279d3b6c387c13972b61c486a203d9652e97 Mon Sep 17 00:00:00 2001
-> From: Marc Zyngier <maz@kernel.org>
-> Date: Tue, 13 Feb 2024 13:37:57 +0000
-> Subject: [PATCH] arm64: cpufeatures: Fix FEAT_NV check when checking for
->   FEAT_NV1
-> 
-> Using this_cpu_has_cap() has the potential to go wrong when
-> used system-wide on a preemptible kernel. Instead, use the
-> __system_matches_cap() helper when checking for FEAT_NV in the
-> FEAT_NV1 probing helper.
-> 
-> Fixes: 3673d01a2f55 ("arm64: cpufeatures: Only check for NV1 if NV is present")
-> Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->   arch/arm64/kernel/cpufeature.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 3421b684d340..f309fd542c20 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -1812,7 +1812,7 @@ static bool has_nv1(const struct arm64_cpu_capabilities *entry, int scope)
->   		{}
->   	};
->   
-> -	return (this_cpu_has_cap(ARM64_HAS_NESTED_VIRT) &&
-> +	return (__system_matches_cap(ARM64_HAS_NESTED_VIRT) &&
+> Can't you construct a case where an allocation fails during the walk
+> (memcache empty), and we end up on this exact path?
 
-Even though this change now uses SYSTEM scope for NESTED_VIRT, that is 
-the correct choice. Ideally, we should use the scope that was passed 
-into "has_v1", but as we have seen SCOPE_LOCAL is not safe. SYSTEM
-schope works fine as both NV1 and NESTED_VIRT are SYSTEM scope. The only 
-time we run them SCOPE_LOCAL is for hotplugged in CPUs, at which point 
-the SYSTEM wide caps are finalized and will use the right value.
+Possibly, but AFAICT that can only happen if there was a bug in KVM. We
+don't start the walk at all if userspace set the split chunk size to 0,
+and otherwise we expect it to be at least PMD_SIZE, which will top up
+the cache to 1 every pass. stage2_split_walker() will 'do the right
+thing' if there aren't enough preallocated pages to get down to level 3.
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+It really doesn't matter either way, I'm just trying to convince myself
+of the reasons why we haven't seen this explode yet :)
 
+> > 
+> > > @@ -1502,7 +1501,6 @@ static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> > >  
+> > >  	if (!stage2_try_break_pte(ctx, mmu)) {
+> > >  		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
+> > > -		mm_ops->put_page(childp);
+> > >  		return -EAGAIN;
+> > >  	}
+> > 
+> > This, on the other hand, seems possible. There exists a race where an
+> > old block PTE could have the AF set on it and the underlying cmpxchg()
+> > could fail. There shouldn't be a race with any software walkers, as we
+> > hold the MMU lock for write here.
+> 
+> AF update is indeed a likely candidate.
+> 
+> In any case, this patch looks good to me as it is, and we can always
+> have a separate tweak to adjust the severity of the first case as
+> required. Unless anyone objects, I'd like to queue it shortly.
 
+Agreed, happy with the way this looks and should've added:
 
->   		!(has_cpuid_feature(entry, scope) ||
->   		  is_midr_in_range_list(read_cpuid_id(), nv1_ni_list)));
->   }
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
+the first time around.
+
+-- 
+Thanks,
+Oliver
