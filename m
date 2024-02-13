@@ -1,43 +1,73 @@
-Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82DB85F866
-	for <kvmarm@lists.linux.dev>; Tue, 13 Feb 2024 16:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4091D60241
+	for <kvmarm@lists.linux.dev>; Tue, 13 Feb 2024 16:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707841792; cv=none; b=jjfh1yRPw+Ssa15Cqp8uB3DZUoCWbzUmtsEXbptV0rD9pm/WamD5w5eNPMOPOdWohPdDJd61gXrNFXtYdohE2v94sXK9YQMwKFexcXps+rwUc2WYb+8f76CsSWgUIPmAYTA+M29zNSZBtT7+PJ46YANskD7KJ1Kvlvw/w4KATxg=
+	t=1707842554; cv=none; b=lgAAh+V/gWNrx0M8/z5uzuoPZSpUWFtnPK1+DAeSiZV+7g1G/5yOe8PtFbc4V6Z1VUgpYTAbrkZ/i7d95AZoOsgngFVPiUbhlvGzCXi43Z1/3u03UUCHMF4RCrxoo/Z+GK1CJVg+w3UKLBwENtX+8nIwewtT0ebXn5pHtC9w+xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707841792; c=relaxed/simple;
-	bh=pwq/fcA6g9rlxCQRDTT5fhtljDd9PZwU2WOBG2ktlBs=;
+	s=arc-20240116; t=1707842554; c=relaxed/simple;
+	bh=5fbIdqjQ0pjST0jLB5/NYZqj5QUdWaDy2LETc337cM4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=txvzZ7Mwe7Cdpl/IHSj5yLhp/Z/NBGws8fafDFaAfV6rA8H1yrSrrjQUzgMSvXQvUl3Av5hLO29/Vrg+z75mKIZIUNGXEKYY/6zrYWPRt1ip3T5KCCKiNn6DY5jwaFuB1ZplmVWu1zMXM/f3HXVe3eclggvFv84u7sOwdAaZcgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GZTwqKcD; arc=none smtp.client-ip=95.215.58.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=WxWfJcgzsZIB8s/enlV7CsxkiXehYSJMbI6WFV2UKoomUDZ85kjEV/DvDu+nRcJ1smYA/CeQrMlxhYOQzgRimPquxViQKVOulA0tJIH6YKu1ckM0znWhOnrA9SucJhew7/MFKxPnx8aLEFSpsoMShuHoCE4xxmnYOXAYqGaFptg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oGHPwli5; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GZTwqKcD"
-Date: Tue, 13 Feb 2024 16:29:42 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707841787;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mF7J0g2Nxf+VBOHYwoPE53ZcMPEVUheZGZS5pd1pQoU=;
-	b=GZTwqKcD2J+jk67hFJUI3xSvi3EfxyJevFW4Mm24S4k7iXdUVJDaHRgP+ME3UCJML/Srlw
-	mz9++W2jHHizB72MeD3m/8UTo9wxGeZFTjbl4O28g8kSfkXpLD0yjGCESVeW9t/In3J4jm
-	1Yds7/qCgTwuF5j0aeLIT+dHrfTQyaA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Ricardo Koller <ricarkol@google.com>
-Subject: Re: [RFC PATCH] KVM: arm64: Fix double-free following
- kvm_pgtable_stage2_free_unlinked()
-Message-ID: <ZcuY9rdvGaJ66edx@linux.dev>
-References: <20240212193052.27765-1-will@kernel.org>
- <Zcp8LcvsZiZVkNKe@linux.dev>
- <86cyt062jh.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oGHPwli5"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-410cf70a057so63545e9.0
+        for <kvmarm@lists.linux.dev>; Tue, 13 Feb 2024 08:42:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707842549; x=1708447349; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=go1NDQqUFQni149mzcXDcSXrog8f9Zls+FdUA+jGdQk=;
+        b=oGHPwli5dzHRDirQsOsut45pRPK6/LM/DT/55uZt8AQSYEUExlFpSOmyz1b0XA3UOz
+         h3+yIOScGC7ThVmTWzffPZwL7Kikp57JX2jDlG/CXhNulnN5jFzKcR0y7OozBEA2ZGPe
+         KBbq3bGdq14BLb3nnpK+JbWAOazixJX2lvsApwadxkOUyZgx0vvWtXmrCHAveUf/rqFt
+         lTDrTOYceTMIvFXaUkGJJG2mNlSrcfOJtm17iq+Eo3y1bf2noxx0jCYg1kXRGwQXmO1v
+         QDk3dzjzRt3qxgZfZAUvrHHThRMii5IPpEjO8zoa1unzOm6zfuv6BRB5HtmNcNbp5KCc
+         amKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707842549; x=1708447349;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=go1NDQqUFQni149mzcXDcSXrog8f9Zls+FdUA+jGdQk=;
+        b=nGNNTlKd+qSQmCbnmh0KtXu4bLdMDm3xrqzZVQfiyjVyuqCKEOezf6CUvrfWzL1L85
+         e3XNr3B2xgHjtdx+hzeWE/Mvc0B200tCozsQL6B5J+YK78V0e7mhENL2nVRJcWua928r
+         yh6VZ06sw2M5SsYk6DzMXgQH/+5dqgxrbnJag9oGj5yQ0UG+YP8oWc3m7N5rpm1W/UFo
+         IH50ogD5t7JrU3rYH/9qXoWRm9byBTyHaWdZ2PtvxwFbDI4VYRFJHmOJo1lnx/ZuMDuV
+         GzgtEqAZVWQ1Be5IWaUnmvOaXpZQtBoWHNn4y5+qO+2aUCBJzQ0Kx5yBwfjgEGbZN7TT
+         caKg==
+X-Forwarded-Encrypted: i=1; AJvYcCWVF2u/SdV26qDHUIzDCjV/wBPN1LOGOUITP6Ua5TV/IZsUR/WsUkYzMpxELm4zBOxotuwgjh8wWUPoIfPUaY0NfEVAjYoU
+X-Gm-Message-State: AOJu0YwW17iLJANVostvEI6yfawe/42l30oocdESDwh8sMgkhC7fW9Ry
+	2WB1ngi08jkGPJSNhKSV4xuLpiJurGx7DS4D0/dE47aFrx/ydVDurHjAoM5Tow==
+X-Google-Smtp-Source: AGHT+IEQ4OF+7VY3dkS4xJoz0W42M2A0tS6ekcpBsUb3AD8IA75L0XaTEOsjHGusJ1xpxWDlVsgqAg==
+X-Received: by 2002:a05:600c:3d8f:b0:411:b159:1705 with SMTP id bi15-20020a05600c3d8f00b00411b1591705mr16193wmb.4.1707842549229;
+        Tue, 13 Feb 2024 08:42:29 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXfwGzBn6/aurEiTGpszh2LCsNgtKpZaK4O7KSdW15zt3eyvpV9u23g+v3vDptqHLzRGeVsJ3SKDXfsnt7e+UtF+Sg4rkbKRmuHXInQ2d6aDLuPgPfHFtSk6yg3gWBnknLRoqabklqiNrX+hs+xrbDaqtwwCzlMABDgBvnXxEX+zOPPNyKByAKcJuPlMxGBjSoAZPCIm2WqZrckhftEokC1hml+Ax6bV4UHjDYOZxMzRnWSgpezBZClJ+ddCUB6Fr3ar4Q3R0SWOVgJKbeG6vFcXtgH7BNJxL3kklmxx2VWHradejD05VcsQ0+o594aFRBYQJ01EFU6WvfYCtoEsqlvUBpgyMhOVq07zak64IJC/UuWYPWYxhBQpgDXHV5ea/z8TFEMIxlpZU7WVztwZww0EZzj+9dgqdYpzBb08GhdwoAv3hp1gRxH60PsGN88JH5T8dsPkcCxNquHoz2n8DRFShFJgIk8FapAKRRBjYc5/sOZZtdr2eQ5I7TCvo2rarim+kXSXWKWPxpM0d37bSQy5q2KvHmw2yEYAg==
+Received: from google.com (161.126.77.34.bc.googleusercontent.com. [34.77.126.161])
+        by smtp.gmail.com with ESMTPSA id az10-20020adfe18a000000b0033b4f82b301sm10232741wrb.3.2024.02.13.08.42.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Feb 2024 08:42:28 -0800 (PST)
+Date: Tue, 13 Feb 2024 16:42:27 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: catalin.marinas@arm.com, gshan@redhat.com, james.morse@arm.com,
+	mark.rutland@arm.com, maz@kernel.org, rananta@google.com,
+	ricarkol@google.com, ryan.roberts@arm.com, shahuang@redhat.com,
+	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kernel-team@android.com,
+	vdonnefort@google.com
+Subject: Re: [PATCH v5 3/4] KVM: arm64: Register ptdump with debugfs on guest
+ creation
+Message-ID: <Zcub87FwaVPkCXQE@google.com>
+References: <20240207144832.1017815-2-sebastianene@google.com>
+ <20240207144832.1017815-5-sebastianene@google.com>
+ <Zcq-NGa-Gd9rVVgF@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,102 +76,256 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86cyt062jh.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <Zcq-NGa-Gd9rVVgF@linux.dev>
 
-On Tue, Feb 13, 2024 at 11:12:34AM +0000, Marc Zyngier wrote:
-> On Mon, 12 Feb 2024 20:14:37 +0000,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
+On Tue, Feb 13, 2024 at 12:56:20AM +0000, Oliver Upton wrote:
+> On Wed, Feb 07, 2024 at 02:48:32PM +0000, Sebastian Ene wrote:
+
+Hello Oliver,
+
+> > While arch/*/mem/ptdump handles the kernel pagetable dumping code,
+> > introduce KVM/ptdump which shows the guest stage-2 pagetables. The
+> > separation is necessary because most of the definitions from the
+> > stage-2 pagetable reside in the KVM path and we will be invoking
+> > functionality **specific** to KVM.
 > > 
-> > On Mon, Feb 12, 2024 at 07:30:52PM +0000, Will Deacon wrote:
-> > > kvm_pgtable_stage2_free_unlinked() does the final put_page() on the
-> > > root page of the sub-tree before returning, so remove the additional
-> > > put_page() invocations in the callers.
-> > > 
-> > > Cc: Marc Zyngier <maz@kernel.org>
-> > > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > > Cc: Ricardo Koller <ricarkol@google.com>
-> > > Signed-off-by: Will Deacon <will@kernel.org>
-> > > ---
-> > > 
-> > > Hi folks,
-> > > 
-> > > Sending this as an RFC as I only spotted it from code inspection and I'm
-> > > surprised others aren't seeing fireworks if it's a genuine bug. I also
-> > > couldn't come up with a sensible Fixes tag, as all of:
-> > > 
-> > >  e7c05540c694b ("KVM: arm64: Add helper for creating unlinked stage2 subtrees")
-> > >  8f5a3eb7513fc ("KVM: arm64: Add kvm_pgtable_stage2_split()")
-> > >  f6a27d6dc51b2 ("KVM: arm64: Drop last page ref in kvm_pgtable_stage2_free_removed()")
-> 
-> I'd blame it on the last commit, as we really ought to have it if we
-> have the others.
-> 
-> > >
-> > > are actually ok in isolation. Hrm. Please tell me I'm wrong?
-> > > 
-> > >  arch/arm64/kvm/hyp/pgtable.c | 2 --
-> > >  1 file changed, 2 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > > index c651df904fe3..ab9d05fcf98b 100644
-> > > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > > @@ -1419,7 +1419,6 @@ kvm_pte_t *kvm_pgtable_stage2_create_unlinked(struct kvm_pgtable *pgt,
-> > >  				 level + 1);
-> > >  	if (ret) {
-> > >  		kvm_pgtable_stage2_free_unlinked(mm_ops, pgtable, level);
-> > > -		mm_ops->put_page(pgtable);
-> > >  		return ERR_PTR(ret);
-> > >  	}
+> > When a guest is created, register a new file entry under the guest
+> > debugfs dir which allows userspace to show the contents of the guest
+> > stage-2 pagetables when accessed.
 > > 
-> > AFAICT, this entire branch is effectively dead code, unless there's a
-> > KVM bug lurking behind the page table walk. The sub-tree isn't visible
-> > to other software or hardware walkers yet, so none of the PTE races
-> > could cause this to pop.
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > ---
+> >  arch/arm64/kvm/Kconfig      | 13 ++++++
+> >  arch/arm64/kvm/Makefile     |  1 +
+> >  arch/arm64/kvm/debug.c      |  7 ++++
+> >  arch/arm64/kvm/kvm_ptdump.h | 20 ++++++++++
+> >  arch/arm64/kvm/ptdump.c     | 79 +++++++++++++++++++++++++++++++++++++
+> >  5 files changed, 120 insertions(+)
+> >  create mode 100644 arch/arm64/kvm/kvm_ptdump.h
+> >  create mode 100644 arch/arm64/kvm/ptdump.c
 > > 
-> > So while this is very obviously a bug, it might be pure luck that folks
-> > haven't seen smoke here. Perhaps while fixing the bug we should take the
-> > opportunity to promote the condition to WARN_ON_ONCE().
+> > diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> > index 6c3c8ca73e7f..28097dd72174 100644
+> > --- a/arch/arm64/kvm/Kconfig
+> > +++ b/arch/arm64/kvm/Kconfig
+> > @@ -68,4 +68,17 @@ config PROTECTED_NVHE_STACKTRACE
+> >  
+> >  	  If unsure, or not using protected nVHE (pKVM), say N.
+> >  
+> > +config PTDUMP_STAGE2_DEBUGFS
+> > +       bool "Present the stage-2 pagetables to debugfs"
+> > +       depends on PTDUMP_DEBUGFS && KVM
+> > +       default n
+> > +       help
+> > +         Say Y here if you want to show the stage-2 kernel pagetables
+> > +         layout in a debugfs file. This information is only useful for kernel developers
+> > +         who are working in architecture specific areas of the kernel.
+> > +         It is probably not a good idea to enable this feature in a production
+> > +         kernel.
+> > +
+> > +         If in doubt, say N.
+> > +
+> >  endif # VIRTUALIZATION
+> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> > index c0c050e53157..190eac17538c 100644
+> > --- a/arch/arm64/kvm/Makefile
+> > +++ b/arch/arm64/kvm/Makefile
+> > @@ -23,6 +23,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+> >  	 vgic/vgic-its.o vgic/vgic-debug.o
+> >  
+> >  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
+> > +kvm-$(CONFIG_PTDUMP_STAGE2_DEBUGFS) += ptdump.o
+> >  
+> >  always-y := hyp_constants.h hyp-constants.s
+> >  
+> > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> > index 8725291cb00a..aef52836cd90 100644
+> > --- a/arch/arm64/kvm/debug.c
+> > +++ b/arch/arm64/kvm/debug.c
+> > @@ -14,6 +14,8 @@
+> >  #include <asm/kvm_arm.h>
+> >  #include <asm/kvm_emulate.h>
+> >  
+> > +#include <kvm_ptdump.h>
+> > +
+> >  #include "trace.h"
+> >  
+> >  /* These are the bits of MDSCR_EL1 we may manipulate */
+> > @@ -342,3 +344,8 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+> >  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+> >  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+> >  }
+> > +
+> > +int kvm_arch_create_vm_debugfs(struct kvm *kvm)
+> > +{
+> > +	return kvm_ptdump_guest_register(kvm);
+> > +}
+> > diff --git a/arch/arm64/kvm/kvm_ptdump.h b/arch/arm64/kvm/kvm_ptdump.h
+> > new file mode 100644
+> > index 000000000000..a7c00a28481b
+> > --- /dev/null
+> > +++ b/arch/arm64/kvm/kvm_ptdump.h
+> > @@ -0,0 +1,20 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + * Copyright (C) Google, 2023
+> > + * Author: Sebastian Ene <sebastianene@google.com>
+> > + */
+> > +
+> > +#ifndef __KVM_PTDUMP_H
+> > +#define __KVM_PTDUMP_H
+> > +
+> > +#include <linux/kvm_host.h>
+> > +#include <asm/ptdump.h>
+> > +
+> > +
+> > +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
+> > +int kvm_ptdump_guest_register(struct kvm *kvm);
+> > +#else
+> > +static inline int kvm_ptdump_guest_register(struct kvm *kvm) { return 0; }
+> > +#endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
+> > +
+> > +#endif /* __KVM_PTDUMP_H */
+> > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+> > new file mode 100644
+> > index 000000000000..a4e984da8aa7
+> > --- /dev/null
+> > +++ b/arch/arm64/kvm/ptdump.c
+> > @@ -0,0 +1,79 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +//
+> > +// Debug helper used to dump the stage-2 pagetables of the system and their
+> > +// associated permissions.
+> > +//
+> > +// Copyright (C) Google, 2023
+> > +// Author: Sebastian Ene <sebastianene@google.com>
 > 
-> Can't you construct a case where an allocation fails during the walk
-> (memcache empty), and we end up on this exact path?
-
-Possibly, but AFAICT that can only happen if there was a bug in KVM. We
-don't start the walk at all if userspace set the split chunk size to 0,
-and otherwise we expect it to be at least PMD_SIZE, which will top up
-the cache to 1 every pass. stage2_split_walker() will 'do the right
-thing' if there aren't enough preallocated pages to get down to level 3.
-
-It really doesn't matter either way, I'm just trying to convince myself
-of the reasons why we haven't seen this explode yet :)
-
-> > 
-> > > @@ -1502,7 +1501,6 @@ static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> > >  
-> > >  	if (!stage2_try_break_pte(ctx, mmu)) {
-> > >  		kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
-> > > -		mm_ops->put_page(childp);
-> > >  		return -EAGAIN;
-> > >  	}
-> > 
-> > This, on the other hand, seems possible. There exists a race where an
-> > old block PTE could have the AF set on it and the underlying cmpxchg()
-> > could fail. There shouldn't be a race with any software walkers, as we
-> > hold the MMU lock for write here.
+> Same comment as last time about ... the comment :)
 > 
-> AF update is indeed a likely candidate.
+> Should be of the form
 > 
-> In any case, this patch looks good to me as it is, and we can always
-> have a separate tweak to adjust the severity of the first case as
-> required. Unless anyone objects, I'd like to queue it shortly.
+> /*
+>  *
+>  */
+> 
 
-Agreed, happy with the way this looks and should've added:
+I forgot to update this, sorry. Let me fix it.
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+> > +#include <linux/debugfs.h>
+> > +#include <linux/kvm_host.h>
+> > +#include <linux/seq_file.h>
+> > +
+> > +#include <asm/kvm_pkvm.h>
+> 
+> is this needed?
+>
 
-the first time around.
+We only need  <asm/kvm_pgtable.h> so I will update this.
 
--- 
+> > +#include <kvm_ptdump.h>
+> > +
+> > +
+> > +static int kvm_ptdump_guest_open(struct inode *inode, struct file *file);
+> > +static int kvm_ptdump_guest_show(struct seq_file *m, void *);
+> 
+> can you structure the file in a way to avoid forward declarations?
+> 
+
+Sounds good, let me drop those.
+
+> > +static const struct file_operations kvm_ptdump_guest_fops = {
+> > +	.open		= kvm_ptdump_guest_open,
+> > +	.read		= seq_read,
+> > +	.llseek		= seq_lseek,
+> > +	.release	= single_release,
+> > +};
+> > +
+> > +static int kvm_ptdump_guest_open(struct inode *inode, struct file *file)
+> > +{
+> > +	return single_open(file, kvm_ptdump_guest_show, inode->i_private);
+> > +}
+> > +
+> 
+> Shouldn't we take a reference on the KVM struct at open to avoid UAF?
+> 
+> 	struct kvm *kvm = inode->i_private;
+> 
+> 	if (!kvm_get_kvm_safe(kvm))
+> 		return -ENOENT;
+> 
+> Then you can do a put on it at close().
+> 
+
+Thanks, I though that the kvm_destroy_vm_debugfs will keep spinning if
+there are opened paths to the debugfs entry, but I guess nothing prevents
+that from happening and the kvm struct can be removed behind our back.
+
+> > +static int kvm_ptdump_visitor(const struct kvm_pgtable_visit_ctx *ctx,
+> > +			      enum kvm_pgtable_walk_flags visit)
+> > +{
+> > +	struct pg_state *st = ctx->arg;
+> > +	struct ptdump_state *pt_st = &st->ptdump;
+> > +
+> > +	note_page(pt_st, ctx->addr, ctx->level, ctx->old);
+> > +	return 0;
+> > +}
+> > +
+> > +static int kvm_ptdump_show_common(struct seq_file *m,
+> > +				  struct kvm_pgtable *pgtable,
+> > +				  struct pg_state *parser_state)
+> > +{
+> > +	struct kvm_pgtable_walker walker = (struct kvm_pgtable_walker) {
+> > +		.cb     = kvm_ptdump_visitor,
+> > +		.arg	= parser_state,
+> > +		.flags	= KVM_PGTABLE_WALK_LEAF,
+> > +	};
+> > +
+> > +	return kvm_pgtable_walk(pgtable, 0, BIT(pgtable->ia_bits), &walker);
+> > +}
+> > +
+> > +static int kvm_ptdump_guest_show(struct seq_file *m, void *)
+> > +{
+> > +	struct kvm *guest_kvm = m->private;
+> > +	struct kvm_s2_mmu *mmu = &guest_kvm->arch.mmu;
+> > +	struct pg_state parser_state = {0};
+> > +	int ret;
+> > +
+> > +	write_lock(&guest_kvm->mmu_lock);
+> > +	ret = kvm_ptdump_show_common(m, mmu->pgt, &parser_state);
+> > +	write_unlock(&guest_kvm->mmu_lock);
+> > +
+> > +	return ret;
+> > +}
+> > +
+> > +int kvm_ptdump_guest_register(struct kvm *kvm)
+> > +{
+> > +	struct dentry *parent;
+> > +
+> > +	parent = debugfs_create_file("stage2_page_tables", 0400,
+> > +				     kvm->debugfs_dentry, kvm,
+> > +				     &kvm_ptdump_guest_fops);
+> > +	if (IS_ERR(parent))
+> > +		return PTR_ERR(parent);
+> 
+> This makes the otherwise benign debugfs failure into something fatal for
+> VM creation, no?
+> 
+> From the documentation on debugfs_create_file():
+> 
+>  * NOTE: it's expected that most callers should _ignore_ the errors returned
+>  * by this function. Other debugfs functions handle the fact that the "dentry"
+>  * passed to them could be an error and they don't crash in that case.
+>  * Drivers should generally work fine even if debugfs fails to init anyway.
+> 
+> The fact that kvm_arch_create_vm_debugfs() has a return value is a bit
+> of an anti-pattern to begin with.
+>
+
+Ack, I will ignore the retun code then.
+
+> -- 
+> Thanks,
+> Oliver
+
 Thanks,
-Oliver
+Sebastian
