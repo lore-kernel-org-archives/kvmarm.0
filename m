@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F1C95D49C;
-	Wed, 14 Feb 2024 16:47:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBFEA84FB0;
+	Wed, 14 Feb 2024 17:32:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707929273; cv=none; b=QIqEOVBaqNR0lueOLhVlMQ05URW7PssWCwp/O2pOG0R8WaZUtEOGJNWvChqIFyBpsl7lpwJXPScpc96oZpQ0aJ9r6hpCTJp+cQiEK/9wX7DiRP77W11+P6NEX6q2g0wMkLIuZTqZN0Yadt5cRrDO47dF4ii3t6pXrzaJQWypE50=
+	t=1707931950; cv=none; b=NNUdskc0BPj4D+gKWqr9G/L9BxGG9GVII9yADAg3bpKe6TtK3TWJTZmdCy3Ka9qkn1RH2ktyeDr2AM04m74MctsDBKar0uCm3vkLNOZc6R4R4yxucEbqb1w6v9PPtVP6IYuYEG3ABAOyEaS+02+w4gLTqjOwfpBowu52egqs5O8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707929273; c=relaxed/simple;
-	bh=DnnQl04MGaYTNcKzbKois0ch8l8Y5ji0lievz5/HVOI=;
+	s=arc-20240116; t=1707931950; c=relaxed/simple;
+	bh=Gdt6QWQ/tNpbmVUFRpOHJ0ZYJgZdr336s5CjL14q0dg=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C1J5aMzmrKsPtzT1ZqFR4fc5JAggB1jJEdRFQKJlv0jEPpP3RZCa/ve2b2F0IP+F8rwPi57hpr3RzAEfqVN3JzWrp+K/FJHX1+aJEdoluLyW9YuW60yxd8TOoblW6PI9D8/RpYHHtlm6b+HkesKKlEVOxY3LAN8DkLDeiQg1vws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AIO2g2/C; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=YIo8Cx47zFx6idPD4plX0qVDnex/5OHJG1VQb/vZ0QxwjXEQxuz7rgefRX71nc/0SiC1D8vmzGR8fM4BMZQkNVW6zXK8pUE3KXi6OR9lDQkvmRfdAj3o8+IQCfbkzGQV193axro7lck/S87jpYFbWRxo/iZJ0YL5mMmE0FfZn5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SSM67TSw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AIO2g2/C"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9A96C433C7;
-	Wed, 14 Feb 2024 16:47:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SSM67TSw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D107C433C7;
+	Wed, 14 Feb 2024 17:32:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707929272;
-	bh=DnnQl04MGaYTNcKzbKois0ch8l8Y5ji0lievz5/HVOI=;
+	s=k20201202; t=1707931949;
+	bh=Gdt6QWQ/tNpbmVUFRpOHJ0ZYJgZdr336s5CjL14q0dg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AIO2g2/CDd7ZJszKQwdaQI7N/ZVQqYEXaj7zK110O6TotyGDGa+gwxyWgxlUb4XJ4
-	 byojqWaanu5+ALMOkbJLvbhNOl2xVtQXjz5gIa9fHlAN0Skn78r83EiIG4TOdyLPFQ
-	 n/K9uLUzdsSHPGhUhCB0aHxgL241tEhKbpSrTEMkifCOK3Z6CNCDqerE60rxKmMknS
-	 rNUGE6IsJ+X0o+0OU1ZDWt8YcZi6zxXzqAoFIbG8uHgdpC1VusHBcqhes93cnvbiv8
-	 bGvjU+V8TKUo7yaXVqz1gYjM1EYZaLiqOtNAFmAr70RH18B42zvQdLUm7GhyZucL+9
-	 Uns4wZXQtTCZg==
+	b=SSM67TSw1cGhig7Qz9dRwfzWux4TZQkv3D9xpUi7gwkT+0aXTrekhPv97JB0Ii+kT
+	 DaS4MVlJkgv7eDCaNxGh4dh5LIfzaK92NZsqcd60a0xIIuUUAenrr7FQNZsNwxoY1w
+	 wkBebL4l3DR92TtJUlXoPYNBVw32RXgaDAlpmzLMLUk7mVMlTAhWpIOEhet5guXwSh
+	 PlytIGys4OLDxTRkOuCO4paR2oRjX7ZL9s/mndIuSzh4lKTB5dLN+1PK7ILTsq+gNl
+	 /Qp+L/oyjLu1VJaXNg36UJiAOBRs+QPpqqwUZSM1q/favo1SXaAHWoXPtmRKQk3L1h
+	 rvJJA65qed5mw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1raIQI-003Cnr-D8;
-	Wed, 14 Feb 2024 16:47:50 +0000
-Date: Wed, 14 Feb 2024 16:47:49 +0000
-Message-ID: <861q9f56x6.wl-maz@kernel.org>
+	id 1raJ7T-003Dll-1q;
+	Wed, 14 Feb 2024 17:32:27 +0000
+Date: Wed, 14 Feb 2024 17:32:25 +0000
+Message-ID: <86zfw33qae.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -42,10 +42,10 @@ Cc: kvmarm@lists.linux.dev,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 07/23] KVM: arm64: vgic: Use atomics to count LPIs
-In-Reply-To: <20240213093250.3960069-8-oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 19/23] KVM: selftests: Add a minimal library for interacting with an ITS
+In-Reply-To: <20240213094114.3961683-1-oliver.upton@linux.dev>
 References: <20240213093250.3960069-1-oliver.upton@linux.dev>
-	<20240213093250.3960069-8-oliver.upton@linux.dev>
+	<20240213094114.3961683-1-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -61,66 +61,337 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kern
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 13 Feb 2024 09:32:44 +0000,
+On Tue, 13 Feb 2024 09:41:14 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Switch to using atomics for LPI accounting, allowing vgic_irq references
-> to be dropped in parallel.
+> A prerequisite of testing LPI injection performance is of course
+> instantiating an ITS for the guest. Add a small library for creating an
+> ITS and interacting with it *from userspace*.
 > 
+> Yep, you read that right. KVM unintentionally allows userspace to send
+> commands to the virtual ITS via the command queue. Besides adding test
+> coverage for an elusive UAPI, interacting with the ITS in userspace
+> simplifies the handling of commands that need to allocate memory, like a
+> MAPD command with an ITT.
+
+I don't mean to derail the party, but I really think we should plug
+this hole. Either that, or we make it an official interface for state
+restore. And don't we all love to have multiple interfaces to do the
+same thing?
+
+>
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/kvm/vgic/vgic-debug.c | 2 +-
->  arch/arm64/kvm/vgic/vgic-its.c   | 4 ++--
->  arch/arm64/kvm/vgic/vgic.c       | 2 +-
->  include/kvm/arm_vgic.h           | 4 ++--
->  4 files changed, 6 insertions(+), 6 deletions(-)
+>  .../selftests/kvm/include/aarch64/gic.h       |   7 +-
+>  .../selftests/kvm/include/aarch64/vgic.h      |  20 ++
+>  .../testing/selftests/kvm/lib/aarch64/vgic.c  | 241 ++++++++++++++++++
+>  3 files changed, 267 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
-> index 85606a531dc3..389025ce7749 100644
-> --- a/arch/arm64/kvm/vgic/vgic-debug.c
-> +++ b/arch/arm64/kvm/vgic/vgic-debug.c
-> @@ -149,7 +149,7 @@ static void print_dist_state(struct seq_file *s, struct vgic_dist *dist)
->  	seq_printf(s, "vgic_model:\t%s\n", v3 ? "GICv3" : "GICv2");
->  	seq_printf(s, "nr_spis:\t%d\n", dist->nr_spis);
->  	if (v3)
-> -		seq_printf(s, "nr_lpis:\t%d\n", dist->lpi_list_count);
-> +		seq_printf(s, "nr_lpis:\t%d\n", atomic_read(&dist->lpi_count));
->  	seq_printf(s, "enabled:\t%d\n", dist->enabled);
->  	seq_printf(s, "\n");
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/gic.h b/tools/testing/selftests/kvm/include/aarch64/gic.h
+> index 16d944486e9c..abb41d67880c 100644
+> --- a/tools/testing/selftests/kvm/include/aarch64/gic.h
+> +++ b/tools/testing/selftests/kvm/include/aarch64/gic.h
+> @@ -11,7 +11,12 @@ enum gic_type {
+>  	GIC_TYPE_MAX,
+>  };
 >  
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index c68164d6cba0..048226812974 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -97,7 +97,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
->  		goto out_unlock;
->  	}
+> -#define GICD_BASE_GPA		0x8000000ULL
+> +/*
+> + * Note that the redistributor frames are at the end, as the range scales
+> + * with the number of vCPUs in the VM.
+> + */
+> +#define GITS_BASE_GPA		0x8000000ULL
+> +#define GICD_BASE_GPA		(GITS_BASE_GPA + SZ_128K)
+>  #define GICR_BASE_GPA		(GICD_BASE_GPA + SZ_64K)
 >  
-> -	dist->lpi_list_count++;
-> +	atomic_inc(&dist->lpi_count);
+>  /* The GIC is identity-mapped into the guest at the time of setup. */
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/vgic.h b/tools/testing/selftests/kvm/include/aarch64/vgic.h
+> index ce19aa0a8360..d45b2902439d 100644
+> --- a/tools/testing/selftests/kvm/include/aarch64/vgic.h
+> +++ b/tools/testing/selftests/kvm/include/aarch64/vgic.h
+> @@ -32,4 +32,24 @@ void kvm_irq_write_isactiver(int gic_fd, uint32_t intid, struct kvm_vcpu *vcpu);
 >  
->  out_unlock:
->  	if (ret)
-> @@ -345,7 +345,7 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
->  	 * command). If coming from another path (such as enabling LPIs),
->  	 * we must be careful not to overrun the array.
->  	 */
-> -	irq_count = READ_ONCE(dist->lpi_list_count);
-> +	irq_count = atomic_read(&dist->lpi_count);
+>  #define KVM_IRQCHIP_NUM_PINS	(1020 - 32)
+>  
+> +struct vgic_its {
+> +	int	its_fd;
+> +	void 	*cmdq_hva;
+> +	size_t	cmdq_size;
+> +};
+> +
+> +struct vgic_its *vgic_its_setup(struct kvm_vm *vm,
+> +				vm_paddr_t coll_tbl, size_t coll_tbl_sz,
+> +				vm_paddr_t device_tbl, size_t device_tbl_sz,
+> +				vm_paddr_t cmdq, size_t cmdq_size);
+> +void vgic_its_destroy(struct vgic_its *its);
+> +
+> +void vgic_its_send_mapd_cmd(struct vgic_its *its, u32 device_id,
+> +		            vm_paddr_t itt_base, size_t itt_size, bool valid);
+> +void vgic_its_send_mapc_cmd(struct vgic_its *its, struct kvm_vcpu *vcpu,
+> +			    u32 collection_id, bool valid);
+> +void vgic_its_send_mapti_cmd(struct vgic_its *its, u32 device_id,
+> +			     u32 event_id, u32 collection_id, u32 intid);
+> +void vgic_its_send_invall_cmd(struct vgic_its *its, u32 collection_id);
+> +
+>  #endif // SELFTEST_KVM_VGIC_H
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+> index ac55b6c2e915..fc7b4fbe6453 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+> @@ -12,6 +12,7 @@
+>  #include "vgic.h"
+>  #include "gic.h"
+>  #include "gic_v3.h"
+> +#include "processor.h"
+>  
+>  /*
+>   * vGIC-v3 default host setup
+> @@ -166,3 +167,243 @@ void kvm_irq_write_isactiver(int gic_fd, uint32_t intid, struct kvm_vcpu *vcpu)
+>  {
+>  	vgic_poke_irq(gic_fd, intid, vcpu, GICD_ISACTIVER);
+>  }
+> +
+> +static u64 vgic_its_read_reg(int its_fd, unsigned long offset)
+> +{
+> +	u64 attr;
+> +
+> +	kvm_device_attr_get(its_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
+> +			    offset, &attr);
+> +	return attr;
+> +}
+> +
+> +static void vgic_its_write_reg(int its_fd, unsigned long offset, u64 val)
+> +{
+> +	kvm_device_attr_set(its_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
+> +			    offset, &val);
+> +}
+> +
+> +static unsigned long vgic_its_find_baser(int its_fd, unsigned int type)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < GITS_BASER_NR_REGS; i++) {
+> +		u64 baser;
+> +		unsigned long offset = GITS_BASER + (i * sizeof(baser));
+> +
+> +		baser = vgic_its_read_reg(its_fd, offset);
+> +		if (GITS_BASER_TYPE(baser) == type)
+> +			return offset;
+> +	}
+> +
+> +	TEST_FAIL("Couldn't find an ITS BASER of type %u", type);
+> +	return -1;
+> +}
+> +
+> +static void vgic_its_install_table(int its_fd, unsigned int type, vm_paddr_t base,
+> +				   size_t size)
+> +{
+> +	unsigned long offset = vgic_its_find_baser(its_fd, type);
+> +	u64 baser;
+> +
+> +	baser = ((size / SZ_64K) - 1) |
+> +		GITS_BASER_PAGE_SIZE_64K |
+> +		GITS_BASER_InnerShareable |
+> +		base |
+> +		GITS_BASER_RaWaWb |
+> +		GITS_BASER_VALID;
+> +
+> +	vgic_its_write_reg(its_fd, offset, baser);
+> +}
+> +
+> +static void vgic_its_install_cmdq(int its_fd, vm_paddr_t base, size_t size)
+> +{
+> +	u64 cbaser;
+> +
+> +	cbaser = ((size / SZ_4K) - 1) |
+> +		 GITS_CBASER_InnerShareable |
+> +		 base |
+> +		 GITS_CBASER_RaWaWb |
+> +		 GITS_CBASER_VALID;
+> +
+> +	vgic_its_write_reg(its_fd, GITS_CBASER, cbaser);
+> +}
+> +
+> +struct vgic_its *vgic_its_setup(struct kvm_vm *vm,
+> +				vm_paddr_t coll_tbl, size_t coll_tbl_sz,
+> +				vm_paddr_t device_tbl, size_t device_tbl_sz,
+> +				vm_paddr_t cmdq, size_t cmdq_size)
+> +{
+> +	int its_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_ITS);
+> +	struct vgic_its *its = malloc(sizeof(struct vgic_its));
+> +	u64 attr, ctlr;
+> +
+> +	attr = GITS_BASE_GPA;
+> +	kvm_device_attr_set(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			    KVM_VGIC_ITS_ADDR_TYPE, &attr);
+> +
+> +	kvm_device_attr_set(its_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> +			    KVM_DEV_ARM_VGIC_CTRL_INIT, NULL);
+> +
+> +	vgic_its_install_table(its_fd, GITS_BASER_TYPE_COLLECTION, coll_tbl,
+> +			       coll_tbl_sz);
+> +	vgic_its_install_table(its_fd, GITS_BASER_TYPE_DEVICE, device_tbl,
+> +			       device_tbl_sz);
+> +
+> +	vgic_its_install_cmdq(its_fd, cmdq, cmdq_size);
+> +
+> +	ctlr = vgic_its_read_reg(its_fd, GITS_CTLR);
+> +	ctlr |= GITS_CTLR_ENABLE;
+> +	vgic_its_write_reg(its_fd, GITS_CTLR, ctlr);
+> +
+> +	*its = (struct vgic_its) {
+> +		.its_fd		= its_fd,
+> +		.cmdq_hva	= addr_gpa2hva(vm, cmdq),
+> +		.cmdq_size	= cmdq_size,
+> +	};
+> +
+> +	return its;
+> +}
+> +
+> +void vgic_its_destroy(struct vgic_its *its)
+> +{
+> +	close(its->its_fd);
+> +	free(its);
+> +}
+> +
+> +struct its_cmd_block {
+> +	union {
+> +		u64	raw_cmd[4];
+> +		__le64	raw_cmd_le[4];
+> +	};
+> +};
+> +
+> +static inline void its_fixup_cmd(struct its_cmd_block *cmd)
+> +{
+> +	/* Let's fixup BE commands */
+> +	cmd->raw_cmd_le[0] = cpu_to_le64(cmd->raw_cmd[0]);
+> +	cmd->raw_cmd_le[1] = cpu_to_le64(cmd->raw_cmd[1]);
+> +	cmd->raw_cmd_le[2] = cpu_to_le64(cmd->raw_cmd[2]);
+> +	cmd->raw_cmd_le[3] = cpu_to_le64(cmd->raw_cmd[3]);
+> +}
+> +
+> +static void its_mask_encode(u64 *raw_cmd, u64 val, int h, int l)
+> +{
+> +	u64 mask = GENMASK_ULL(h, l);
+> +	*raw_cmd &= ~mask;
+> +	*raw_cmd |= (val << l) & mask;
+> +}
+> +
+> +static void its_encode_cmd(struct its_cmd_block *cmd, u8 cmd_nr)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[0], cmd_nr, 7, 0);
+> +}
+> +
+> +static void its_encode_devid(struct its_cmd_block *cmd, u32 devid)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[0], devid, 63, 32);
+> +}
+> +
+> +static void its_encode_event_id(struct its_cmd_block *cmd, u32 id)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[1], id, 31, 0);
+> +}
+> +
+> +static void its_encode_phys_id(struct its_cmd_block *cmd, u32 phys_id)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[1], phys_id, 63, 32);
+> +}
+> +
+> +static void its_encode_size(struct its_cmd_block *cmd, u8 size)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[1], size, 4, 0);
+> +}
+> +
+> +static void its_encode_itt(struct its_cmd_block *cmd, u64 itt_addr)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[2], itt_addr >> 8, 51, 8);
+> +}
+> +
+> +static void its_encode_valid(struct its_cmd_block *cmd, int valid)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[2], !!valid, 63, 63);
+> +}
+> +
+> +static void its_encode_target(struct its_cmd_block *cmd, u64 target_addr)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[2], target_addr >> 16, 51, 16);
+> +}
+> +
+> +static void its_encode_collection(struct its_cmd_block *cmd, u16 col)
+> +{
+> +	its_mask_encode(&cmd->raw_cmd[2], col, 15, 0);
+> +}
+> +
+> +static void vgic_its_send_cmd(struct vgic_its *its, struct its_cmd_block *cmd)
+> +{
+> +	u64 cwriter = vgic_its_read_reg(its->its_fd, GITS_CWRITER);
+> +	struct its_cmd_block *dst = its->cmdq_hva + cwriter;
+> +	u64 next;
+> +
+> +	its_fixup_cmd(cmd);
+> +
+> +	WRITE_ONCE(*dst, *cmd);
+> +	dsb(ishst);
+> +
+> +	next = (cwriter + sizeof(*cmd)) % its->cmdq_size;
+> +	vgic_its_write_reg(its->its_fd, GITS_CWRITER, next);
+> +
+> +	TEST_ASSERT(vgic_its_read_reg(its->its_fd, GITS_CREADR) == next,
+> +		    "ITS didn't process command at offset: %lu\n", cwriter);
+> +}
+> +
+> +void vgic_its_send_mapd_cmd(struct vgic_its *its, u32 device_id,
+> +		            vm_paddr_t itt_base, size_t itt_size, bool valid)
+> +{
+> +	struct its_cmd_block cmd = {};
+> +
+> +	its_encode_cmd(&cmd, GITS_CMD_MAPD);
+> +	its_encode_devid(&cmd, device_id);
+> +	its_encode_size(&cmd, ilog2(itt_size) - 1);
+> +	its_encode_itt(&cmd, itt_base);
+> +	its_encode_valid(&cmd, valid);
+> +
+> +	vgic_its_send_cmd(its, &cmd);
+> +}
+> +
+> +void vgic_its_send_mapc_cmd(struct vgic_its *its, struct kvm_vcpu *vcpu,
+> +			    u32 collection_id, bool valid)
+> +{
+> +	struct its_cmd_block cmd = {};
+> +
+> +	its_encode_cmd(&cmd, GITS_CMD_MAPC);
+> +	its_encode_collection(&cmd, collection_id);
+> +	its_encode_target(&cmd, vcpu->id);
+> +	its_encode_valid(&cmd, valid);
+> +
+> +	vgic_its_send_cmd(its, &cmd);
+> +}
+> +
+> +void vgic_its_send_mapti_cmd(struct vgic_its *its, u32 device_id,
+> +			     u32 event_id, u32 collection_id, u32 intid)
+> +{
+> +	struct its_cmd_block cmd = {};
+> +
+> +	its_encode_cmd(&cmd, GITS_CMD_MAPTI);
+> +	its_encode_devid(&cmd, device_id);
+> +	its_encode_event_id(&cmd, event_id);
+> +	its_encode_phys_id(&cmd, intid);
+> +	its_encode_collection(&cmd, collection_id);
+> +
+> +	vgic_its_send_cmd(its, &cmd);
+> +}
+> +
+> +void vgic_its_send_invall_cmd(struct vgic_its *its, u32 collection_id)
+> +{
+> +	struct its_cmd_block cmd = {};
+> +
+> +	its_encode_cmd(&cmd, GITS_CMD_INVALL);
+> +	its_encode_collection(&cmd, collection_id);
+> +
+> +	vgic_its_send_cmd(its, &cmd);
+> +}
 
-I'd like to propose an alternative approach here. I've always hated
-this "copy a bunch of INTIDs" thing, and the only purpose of this
-silly counter is to dimension the resulting array.
-
-Could we instead rely on an xarray marking a bunch of entries (the
-ones we want to 'copy'), and get the reader to clear these marks once
-done?
-
-Of course, we only have 3 marks, so that's a bit restrictive from a
-concurrency perspective, but since most callers hold a lock, it should
-be OK.
-
-What do you think?
+Holy crap, that's a whole ITS driver in loserspace. *mindblown*.
 
 	M.
 
