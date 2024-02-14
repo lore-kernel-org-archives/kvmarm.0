@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823BF53800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 967C053801
 	for <kvmarm@lists.linux.dev>; Wed, 14 Feb 2024 13:18:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707916717; cv=none; b=pS1xCG3Q82tLwNNwkkZzNNUiNFT2dQMP+ILBpOjN7cmpw407MPjLJDQgmhJnPK0x3SbqkIp9HcX1g5CppI1BeJzoaByJIWR4yEk7kTQLNBTuOnAma5YHkySGGkfmSr9G6CazsEi2iUTvm2zUmbglwPFrqI4UdDr1GLLmNZ71keQ=
+	t=1707916717; cv=none; b=Ztx5/tEOhuyy+LhMNrnHwOk6QeJ6BHt/DkzQeWH36ByZNjIhylp8gP+ddjh9KCi73spf2Uy0HZon0eCSRv9Fs4q6RviRlUL/u22QzghOl0ACFoyePqYgz7UTKvvi6A1VOa2SGF2J/b+gE8LpLu+6b2UbYA/7wxs2vzQA+ZZ5Oqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707916717; c=relaxed/simple;
-	bh=dIJkF1mYYrrWiIgVuWE1ahoSVnnmnY+7OH6lcrJJCb8=;
+	bh=MSK9uIvhVI7ocNChg+YpHLbRXohZWodSIZ69qXfzdQk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EwRWlI++whhqIfBHRQUIaspMKB7CLv8KeQCqV3js8MfBmnxsPQcT8Y25L3VXcqsubpuCB7xF25K/iHfK3iaye2lCwpU904bxU3Na+evNv/5B/1+Ln/MtsLUo6ed3Ejw+NAasfCajyx8JYScQ7Vk7yyH3Qqsi/+8qE0R1ic/omnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o6jAYNc0; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=fxYbCxh9Tt8zWSBuQlJUOS3zSanRsfIEf6YqhS/mrgdghW3S+tkqqKuhWJcPu0Ip8LT5MJbiGRF50Gtx/XGNBDzRJKxVpeodDQIoIORk+vjq0/hgWZTpACAdg0rFV5qyScIG/uow6WlEXQ/1y/S3xu1kkX9un/zWmHFClv5/hdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iqwsU2i+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o6jAYNc0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58157C433C7;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iqwsU2i+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C76EC43390;
 	Wed, 14 Feb 2024 13:18:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707916717;
-	bh=dIJkF1mYYrrWiIgVuWE1ahoSVnnmnY+7OH6lcrJJCb8=;
+	bh=MSK9uIvhVI7ocNChg+YpHLbRXohZWodSIZ69qXfzdQk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=o6jAYNc03KQx5iRwjo/wQ9iEgiHkyK3IkKifSWlvzaZEar7gPsgAsk2tASbXwmRyz
-	 sBPMhc8WCBM60GdWK5nedOyN/vBDKL5d7zGD2kFfmt6NltVN9myeRyvi/6vm0d+aOs
-	 CTrP3AhZFAGGHPDA9CfLgbXs6EmqRvRdtQ4nQJn3EQ/F+ZR7TRoFRXYwpqraGFwJSE
-	 r5yz/zRtpcpc/+TNfCNxCHGKFGzVFHSdQxw3UD42m5yBoiVz5bkVXmXAES4TZuPQRG
-	 NJ2xn0uiwFMcyXpOaJaEueJg0ALSOBb6OLYrBrBMyotnIQ2y9WHssLyT56JOmM9X/l
-	 OBlNhGllt9yrw==
+	b=iqwsU2i+eNV6hze7WuuO6V5W/Qs68J0esnKXibjH+MalVhUxat5eTSIFXQxNw+trB
+	 CZwfpsPPltXXFmX3EgsuIFdswHilxaRRKkh1BoDBOGrhXyJ3CF4ZQFeIgeUloh7+ib
+	 zCb5dDZGKwya2kHAHt90eaZM6+jkcNlPQmTa390PksBIHCOFH+Gk9F7I56Pa8t8tZM
+	 sqRjfzTr7coFkxkKulcFR5tvcVqJS9z3mgUIZ8Ncfdx4JPOhrNbN0LpZ9aMsmExirp
+	 j/n+oaTJaSqf3NZAoqHhWh+TMLQUe7hSb04WOKv/tYlJc3bJ/EaWGjQoEHtDA6+P3p
+	 jsLdkS1hQCoew==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1raF9n-00394l-EA;
+	id 1raF9n-00394l-7b;
 	Wed, 14 Feb 2024 13:18:35 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 23/26] KVM: arm64: Make AMU sysreg UNDEF if FEAT_AMU is not advertised to the guest
-Date: Wed, 14 Feb 2024 13:18:24 +0000
-Message-Id: <20240214131827.2856277-24-maz@kernel.org>
+Subject: [PATCH v4 22/26] KVM: arm64: Make PIR{,E0}_EL1 UNDEF if S1PIE is not advertised to the guest
+Date: Wed, 14 Feb 2024 13:18:23 +0000
+Message-Id: <20240214131827.2856277-23-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240214131827.2856277-1-maz@kernel.org>
 References: <20240214131827.2856277-1-maz@kernel.org>
@@ -61,26 +61,86 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-No AMU? No AMU! IF we see an AMU-related trap, let's turn it into
-an UNDEF!
+As part of the ongoing effort to honor the guest configuration,
+add the necessary checks to make PIR_EL1 and co UNDEF if not
+advertised to the guest, and avoid context switching them.
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 ---
- arch/arm64/kvm/sys_regs.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 24 +++++++++++++++++++---
+ arch/arm64/kvm/sys_regs.c                  |  4 ++++
+ 2 files changed, 25 insertions(+), 3 deletions(-)
 
+diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+index bb6b571ec627..4be6a7fa0070 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+@@ -27,16 +27,34 @@ static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
+ 	ctxt_sys_reg(ctxt, TPIDRRO_EL0)	= read_sysreg(tpidrro_el0);
+ }
+ 
+-static inline bool ctxt_has_mte(struct kvm_cpu_context *ctxt)
++static inline struct kvm_vcpu *ctxt_to_vcpu(struct kvm_cpu_context *ctxt)
+ {
+ 	struct kvm_vcpu *vcpu = ctxt->__hyp_running_vcpu;
+ 
+ 	if (!vcpu)
+ 		vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
+ 
++	return vcpu;
++}
++
++static inline bool ctxt_has_mte(struct kvm_cpu_context *ctxt)
++{
++	struct kvm_vcpu *vcpu = ctxt_to_vcpu(ctxt);
++
+ 	return kvm_has_mte(kern_hyp_va(vcpu->kvm));
+ }
+ 
++static inline bool ctxt_has_s1pie(struct kvm_cpu_context *ctxt)
++{
++	struct kvm_vcpu *vcpu;
++
++	if (!cpus_have_final_cap(ARM64_HAS_S1PIE))
++		return false;
++
++	vcpu = ctxt_to_vcpu(ctxt);
++	return kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64MMFR3_EL1, S1PIE, IMP);
++}
++
+ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+ {
+ 	ctxt_sys_reg(ctxt, SCTLR_EL1)	= read_sysreg_el1(SYS_SCTLR);
+@@ -55,7 +73,7 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+ 	ctxt_sys_reg(ctxt, CONTEXTIDR_EL1) = read_sysreg_el1(SYS_CONTEXTIDR);
+ 	ctxt_sys_reg(ctxt, AMAIR_EL1)	= read_sysreg_el1(SYS_AMAIR);
+ 	ctxt_sys_reg(ctxt, CNTKCTL_EL1)	= read_sysreg_el1(SYS_CNTKCTL);
+-	if (cpus_have_final_cap(ARM64_HAS_S1PIE)) {
++	if (ctxt_has_s1pie(ctxt)) {
+ 		ctxt_sys_reg(ctxt, PIR_EL1)	= read_sysreg_el1(SYS_PIR);
+ 		ctxt_sys_reg(ctxt, PIRE0_EL1)	= read_sysreg_el1(SYS_PIRE0);
+ 	}
+@@ -131,7 +149,7 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg_el1(ctxt_sys_reg(ctxt, CONTEXTIDR_EL1), SYS_CONTEXTIDR);
+ 	write_sysreg_el1(ctxt_sys_reg(ctxt, AMAIR_EL1),	SYS_AMAIR);
+ 	write_sysreg_el1(ctxt_sys_reg(ctxt, CNTKCTL_EL1), SYS_CNTKCTL);
+-	if (cpus_have_final_cap(ARM64_HAS_S1PIE)) {
++	if (ctxt_has_s1pie(ctxt)) {
+ 		write_sysreg_el1(ctxt_sys_reg(ctxt, PIR_EL1),	SYS_PIR);
+ 		write_sysreg_el1(ctxt_sys_reg(ctxt, PIRE0_EL1),	SYS_PIRE0);
+ 	}
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index da9db99c77e7..38ed47bd29db 100644
+index f07ee7c89822..da9db99c77e7 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -3998,6 +3998,10 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
- 		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPIRE0_EL1 |
- 						HFGxTR_EL2_nPIR_EL1);
+@@ -3994,6 +3994,10 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+ 						HFGITR_EL2_TLBIRVAAE1OS	|
+ 						HFGITR_EL2_TLBIRVAE1OS);
  
-+	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, IMP))
-+		kvm->arch.fgu[HAFGRTR_GROUP] |= ~(HAFGRTR_EL2_RES0 |
-+						  HAFGRTR_EL2_RES1);
++	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
++		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPIRE0_EL1 |
++						HFGxTR_EL2_nPIR_EL1);
 +
  	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
  out:
