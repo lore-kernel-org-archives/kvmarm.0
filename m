@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 967C053801
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC68C53807
 	for <kvmarm@lists.linux.dev>; Wed, 14 Feb 2024 13:18:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707916717; cv=none; b=Ztx5/tEOhuyy+LhMNrnHwOk6QeJ6BHt/DkzQeWH36ByZNjIhylp8gP+ddjh9KCi73spf2Uy0HZon0eCSRv9Fs4q6RviRlUL/u22QzghOl0ACFoyePqYgz7UTKvvi6A1VOa2SGF2J/b+gE8LpLu+6b2UbYA/7wxs2vzQA+ZZ5Oqk=
+	t=1707916717; cv=none; b=X7kNmdbg6YbBwkca/6m0LYp1h3+azMyrMqsnxs993URtGBG1Uixzjouo0lvrlvrLGeUWK+fZXsqAiOgZdQOX6HJX4Win6aNX+rH16SkpSTW3CnBbYVnQKtdyozE/mt6FC4tgYY3MKQ+ChsmF0FJ3MYsp7GmrUAQgGx8ZG90oPfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707916717; c=relaxed/simple;
-	bh=MSK9uIvhVI7ocNChg+YpHLbRXohZWodSIZ69qXfzdQk=;
+	bh=tpnzjbaBSixEtleIiKRUI9e9c3KhM2pJgrn2J+/zS94=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fxYbCxh9Tt8zWSBuQlJUOS3zSanRsfIEf6YqhS/mrgdghW3S+tkqqKuhWJcPu0Ip8LT5MJbiGRF50Gtx/XGNBDzRJKxVpeodDQIoIORk+vjq0/hgWZTpACAdg0rFV5qyScIG/uow6WlEXQ/1y/S3xu1kkX9un/zWmHFClv5/hdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iqwsU2i+; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=PfJGxIbn2BuUygUPZ0eAN5ofux3ZkYYba2Y5TCZevWse3MgxV/1cwM22hdx8d8iU0sdJkx3J0R0BVk/EIqEbjNbIuUBKqd6DSX8ijO+AL1abJhq+IhyhhNe0S3xSE/pbzsgd+XWlNd2cTgEREeAAzOuQA8I3/SrIYbeknH0dWC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dWO2pdeW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iqwsU2i+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C76EC43390;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dWO2pdeW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 821DEC433B2;
 	Wed, 14 Feb 2024 13:18:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707916717;
-	bh=MSK9uIvhVI7ocNChg+YpHLbRXohZWodSIZ69qXfzdQk=;
+	bh=tpnzjbaBSixEtleIiKRUI9e9c3KhM2pJgrn2J+/zS94=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iqwsU2i+eNV6hze7WuuO6V5W/Qs68J0esnKXibjH+MalVhUxat5eTSIFXQxNw+trB
-	 CZwfpsPPltXXFmX3EgsuIFdswHilxaRRKkh1BoDBOGrhXyJ3CF4ZQFeIgeUloh7+ib
-	 zCb5dDZGKwya2kHAHt90eaZM6+jkcNlPQmTa390PksBIHCOFH+Gk9F7I56Pa8t8tZM
-	 sqRjfzTr7coFkxkKulcFR5tvcVqJS9z3mgUIZ8Ncfdx4JPOhrNbN0LpZ9aMsmExirp
-	 j/n+oaTJaSqf3NZAoqHhWh+TMLQUe7hSb04WOKv/tYlJc3bJ/EaWGjQoEHtDA6+P3p
-	 jsLdkS1hQCoew==
+	b=dWO2pdeWrfLX1M9V5TDVIAbGq7tp7gw6r+XbyzO67z+BMdQb4zb3Ooofk4uIriOYr
+	 8SwSUgl3QTkwcDlI18V9hLBeCmW7zh03xLTlBgbeyRogSH28jfQCqLJXQdO7vrPY3V
+	 oEkVpH+B62DCo50nCfA6Cj1uvy+2UfKwQ9NZ0oVBy4etDDiKU8JtCSQ3dmxh8i9BPF
+	 lLYnivmD5qTMnL6Hg0Ra05A3WG1owhU/qYX0CQ26rytZWrGR5S/VlKxP0wykJJ0arn
+	 owL6CDoln5iYgGfGvWjYnJDtOtXNgUh4sYqNWk++pIgOxp+hxJcRHUbHafV3t07cS3
+	 C+7U5YNe/myjQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1raF9n-00394l-7b;
+	id 1raF9n-00394l-LT;
 	Wed, 14 Feb 2024 13:18:35 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 22/26] KVM: arm64: Make PIR{,E0}_EL1 UNDEF if S1PIE is not advertised to the guest
-Date: Wed, 14 Feb 2024 13:18:23 +0000
-Message-Id: <20240214131827.2856277-23-maz@kernel.org>
+Subject: [PATCH v4 24/26] KVM: arm64: Make FEAT_MOPS UNDEF if not advertised to the guest
+Date: Wed, 14 Feb 2024 13:18:25 +0000
+Message-Id: <20240214131827.2856277-25-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240214131827.2856277-1-maz@kernel.org>
 References: <20240214131827.2856277-1-maz@kernel.org>
@@ -61,90 +61,78 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-As part of the ongoing effort to honor the guest configuration,
-add the necessary checks to make PIR_EL1 and co UNDEF if not
-advertised to the guest, and avoid context switching them.
+We unconditionally enable FEAT_MOPS, which is obviously wrong.
+
+So let's only do that when it is advertised to the guest.
+Which means we need to rely on a per-vcpu HCRX_EL2 shadow register.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 ---
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 24 +++++++++++++++++++---
- arch/arm64/kvm/sys_regs.c                  |  4 ++++
- 2 files changed, 25 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h        | 4 +---
+ arch/arm64/include/asm/kvm_host.h       | 1 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
+ arch/arm64/kvm/sys_regs.c               | 7 +++++++
+ 4 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index bb6b571ec627..4be6a7fa0070 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -27,16 +27,34 @@ static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
- 	ctxt_sys_reg(ctxt, TPIDRRO_EL0)	= read_sysreg(tpidrro_el0);
- }
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 3c6f8ba1e479..a1769e415d72 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -102,9 +102,7 @@
+ #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
+ #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
  
--static inline bool ctxt_has_mte(struct kvm_cpu_context *ctxt)
-+static inline struct kvm_vcpu *ctxt_to_vcpu(struct kvm_cpu_context *ctxt)
- {
- 	struct kvm_vcpu *vcpu = ctxt->__hyp_running_vcpu;
+-#define HCRX_GUEST_FLAGS \
+-	(HCRX_EL2_SMPME | HCRX_EL2_TCR2En | \
+-	 (cpus_have_final_cap(ARM64_HAS_MOPS) ? (HCRX_EL2_MSCEn | HCRX_EL2_MCE2) : 0))
++#define HCRX_GUEST_FLAGS (HCRX_EL2_SMPME | HCRX_EL2_TCR2En)
+ #define HCRX_HOST_FLAGS (HCRX_EL2_MSCEn | HCRX_EL2_TCR2En)
  
- 	if (!vcpu)
- 		vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
+ /* TCR_EL2 Registers bits */
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 968a997b3f02..3feabde9c926 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -584,6 +584,7 @@ struct kvm_vcpu_arch {
  
-+	return vcpu;
-+}
-+
-+static inline bool ctxt_has_mte(struct kvm_cpu_context *ctxt)
-+{
-+	struct kvm_vcpu *vcpu = ctxt_to_vcpu(ctxt);
-+
- 	return kvm_has_mte(kern_hyp_va(vcpu->kvm));
- }
+ 	/* Values of trap registers for the guest. */
+ 	u64 hcr_el2;
++	u64 hcrx_el2;
+ 	u64 mdcr_el2;
+ 	u64 cptr_el2;
  
-+static inline bool ctxt_has_s1pie(struct kvm_cpu_context *ctxt)
-+{
-+	struct kvm_vcpu *vcpu;
-+
-+	if (!cpus_have_final_cap(ARM64_HAS_S1PIE))
-+		return false;
-+
-+	vcpu = ctxt_to_vcpu(ctxt);
-+	return kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64MMFR3_EL1, S1PIE, IMP);
-+}
-+
- static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- {
- 	ctxt_sys_reg(ctxt, SCTLR_EL1)	= read_sysreg_el1(SYS_SCTLR);
-@@ -55,7 +73,7 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- 	ctxt_sys_reg(ctxt, CONTEXTIDR_EL1) = read_sysreg_el1(SYS_CONTEXTIDR);
- 	ctxt_sys_reg(ctxt, AMAIR_EL1)	= read_sysreg_el1(SYS_AMAIR);
- 	ctxt_sys_reg(ctxt, CNTKCTL_EL1)	= read_sysreg_el1(SYS_CNTKCTL);
--	if (cpus_have_final_cap(ARM64_HAS_S1PIE)) {
-+	if (ctxt_has_s1pie(ctxt)) {
- 		ctxt_sys_reg(ctxt, PIR_EL1)	= read_sysreg_el1(SYS_PIR);
- 		ctxt_sys_reg(ctxt, PIRE0_EL1)	= read_sysreg_el1(SYS_PIRE0);
- 	}
-@@ -131,7 +149,7 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, CONTEXTIDR_EL1), SYS_CONTEXTIDR);
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, AMAIR_EL1),	SYS_AMAIR);
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, CNTKCTL_EL1), SYS_CNTKCTL);
--	if (cpus_have_final_cap(ARM64_HAS_S1PIE)) {
-+	if (ctxt_has_s1pie(ctxt)) {
- 		write_sysreg_el1(ctxt_sys_reg(ctxt, PIR_EL1),	SYS_PIR);
- 		write_sysreg_el1(ctxt_sys_reg(ctxt, PIRE0_EL1),	SYS_PIRE0);
- 	}
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 2d5891518006..e3fcf8c4d5b4 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -236,7 +236,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+ 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+ 
+ 	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
+-		u64 hcrx = HCRX_GUEST_FLAGS;
++		u64 hcrx = vcpu->arch.hcrx_el2;
+ 		if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
+ 			u64 clr = 0, set = 0;
+ 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index f07ee7c89822..da9db99c77e7 100644
+index 38ed47bd29db..2cb69efac1dc 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -3994,6 +3994,10 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
- 						HFGITR_EL2_TLBIRVAAE1OS	|
- 						HFGITR_EL2_TLBIRVAE1OS);
+@@ -3956,6 +3956,13 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
+ 	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
+ 		vcpu->arch.hcr_el2 |= HCR_TTLBOS;
  
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
-+		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPIRE0_EL1 |
-+						HFGxTR_EL2_nPIR_EL1);
++	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
++		vcpu->arch.hcrx_el2 = HCRX_GUEST_FLAGS;
 +
- 	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
- out:
- 	mutex_unlock(&kvm->arch.config_lock);
++		if (kvm_has_feat(kvm, ID_AA64ISAR2_EL1, MOPS, IMP))
++			vcpu->arch.hcrx_el2 |= (HCRX_EL2_MSCEn | HCRX_EL2_MCE2);
++	}
++
+ 	if (test_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags))
+ 		goto out;
+ 
 -- 
 2.39.2
 
