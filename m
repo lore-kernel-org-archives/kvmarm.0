@@ -1,97 +1,116 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 240B5139575
-	for <kvmarm@lists.linux.dev>; Wed, 14 Feb 2024 19:00:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF121E4B7;
+	Wed, 14 Feb 2024 20:01:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707937209; cv=none; b=EBi6sUfd+b7r+leqhJq9EjpLFj53EAdbVMqReAMCPGAFQV7pwcN+oLiGqXayfTMhiffXpyVEupxtOyoylbvZYUQD/cvNDL069X0UBFWMAYrh3Co8wfnBKmAdNgb2bngL8Y0rP8ITBd35D76Ixf69O5heFLIHEcMVWhhJQJ44EC0=
+	t=1707940883; cv=none; b=E+m6blLONlBHtKvJXJVVbeQtmEFwwc0ABjP6t5acN+X5u5F8QV7YGSdI2BlVuFwE8qnnhIuH+qfw9PBUaPJPOfLz+O1SUyHNWYwvxS2wpZGC8tect6wnoV7bNp0wEK7cWMYxXjgq+IlCrwx6QXsmEEcDwxTopSi+uUi5k+W55lg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707937209; c=relaxed/simple;
-	bh=UjVHdWRKxR1wWlwd6TPzyXgOHZ46hNGBZS4G23VAcsg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Uk+WSiPAwfkoTo0qzVrzAUCSSCWggVdRtwot0Cmlkw3Fj1A8reckTX1l+xURLEFJoE0nW2JWDlsM5vEOBU2FqWgBoEDVkeIgxbVCV6ey0eikjgqjoQbbrtyZ9MO2MxT8hSLKc96XQ2/vfk5KaYlJyCY9VWjoCDto7RK2vkW6E6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=X/1nET5W; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1707940883; c=relaxed/simple;
+	bh=5K2WUn7NWr2ouERBIwh/bkIaCWPjJwbZxQ4mhPJU38M=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CdUcp/APOY72Pf5+OoP6iAhYDRS+opwN7lDnSAppeLmhEFzncZY4zf4iauJ69Os41DdX4ZXXfYl/PXKfT5/KavJDTucIhnAfq0xvMHU14h0ajkv/R3qmj0ixVA9cle/TCuojZzW6PGXS+P3vrWUYPbzchbFfK32YvYAS9nHSpWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TabFiwUh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="X/1nET5W"
-Date: Wed, 14 Feb 2024 11:00:00 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707937206;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4P041HuvLQ7qtWSEmdckANvsaD0Z2miUICFdYufhm48=;
-	b=X/1nET5WtPtVfcZtVet1QEGDzDL7K064t5P+ZUnZ8xbF7EWyqkGtFsTHy1iBUXEx21LNXr
-	SqhzO+L68HlVXmUP4J6fLej7uI3fLYtv63jfC9iKchwWjhLfOJbDkVRt2A67PT8ZGO5MDB
-	2B37z9Zrxg8evl211A+GeQGjgfQUc2g=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TabFiwUh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A529C433F1;
+	Wed, 14 Feb 2024 20:01:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707940883;
+	bh=5K2WUn7NWr2ouERBIwh/bkIaCWPjJwbZxQ4mhPJU38M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TabFiwUhrpgZtkQqgIS6buAF5wO7edIU7TzZN7bwb53XohYw2ZyyKROMmVrcCOb+d
+	 zPlFl+GCAj0Kg1k8Lc3rnbHbA/7izh8EHK0bcOIoslFyt/j8s0g0cbyIP58dtCfDBp
+	 yc11Wbtle+tQ08MjwC+XDB9usxyDR6Z4b6bZ0QmRutoZunwpOALIbHaPno3x+mdh/B
+	 /8GxDBlsctQJ1dRarDaVe2frX8y0XeZl5aREMGPa+N084xWR6V98dnf21hk7405ULN
+	 VOeGCZwDu0uNEs79kGxqF00BoCs6f5oObRWVH404vEPyaqFrtsuQLvJ049M2Iy4u9q
+	 NEVYGbLijFbzA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1raLRZ-003GBr-15;
+	Wed, 14 Feb 2024 20:01:21 +0000
+Date: Wed, 14 Feb 2024 20:01:19 +0000
+Message-ID: <86wmr64xyo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 19/23] KVM: selftests: Add a minimal library for
- interacting with an ITS
-Message-ID: <Zc0NsFm40nIqTmRf@linux.dev>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 07/23] KVM: arm64: vgic: Use atomics to count LPIs
+In-Reply-To: <Zc0HIorNZG9KG5Mg@linux.dev>
 References: <20240213093250.3960069-1-oliver.upton@linux.dev>
- <20240213094114.3961683-1-oliver.upton@linux.dev>
- <86zfw33qae.wl-maz@kernel.org>
+	<20240213093250.3960069-8-oliver.upton@linux.dev>
+	<861q9f56x6.wl-maz@kernel.org>
+	<Zc0HIorNZG9KG5Mg@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86zfw33qae.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Feb 14, 2024 at 05:32:25PM +0000, Marc Zyngier wrote:
-> On Tue, 13 Feb 2024 09:41:14 +0000,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > 
-> > A prerequisite of testing LPI injection performance is of course
-> > instantiating an ITS for the guest. Add a small library for creating an
-> > ITS and interacting with it *from userspace*.
-> > 
-> > Yep, you read that right. KVM unintentionally allows userspace to send
-> > commands to the virtual ITS via the command queue. Besides adding test
-> > coverage for an elusive UAPI, interacting with the ITS in userspace
-> > simplifies the handling of commands that need to allocate memory, like a
-> > MAPD command with an ITT.
+On Wed, 14 Feb 2024 18:32:02 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> I don't mean to derail the party, but I really think we should plug
-> this hole. Either that, or we make it an official interface for state
-> restore. And don't we all love to have multiple interfaces to do the
-> same thing?
+> Hey,
+> 
+> On Wed, Feb 14, 2024 at 04:47:49PM +0000, Marc Zyngier wrote:
+> > I'd like to propose an alternative approach here. I've always hated
+> > this "copy a bunch of INTIDs" thing,
+> 
+> Agree. 
+> 
+> > and the only purpose of this
+> > silly counter is to dimension the resulting array.
+> 
+> Well, we also use it to trivially print the number of LPIs for a
+> particular vgic in the debug interface.
 
-Ok, I've thought about it a bit more and I'm fully convinced we need to
-shut the door on this stupidity.
+I think we can get survive this... ;-)
 
-We expect CREADR == CWRITER at the time userspace saves the ITS
-registers, but we have a *hideous* ordering issue on the restore path.
+> 
+> > Could we instead rely on an xarray marking a bunch of entries (the
+> > ones we want to 'copy'), and get the reader to clear these marks once
+> > done?
+> 
+> I think that'd work. I'm trying to convince myself we don't have bugs
+> lurking in some of the existing usage of vgic_copy_lpi_list()...
+> 
+> > Of course, we only have 3 marks, so that's a bit restrictive from a
+> > concurrency perspective, but since most callers hold a lock, it should
+> > be OK.
+> 
+> They all hold *a* lock, but maybe not the same one! :)
 
-If the order of restore from userspace is CBASER, CWRITER, CREADR then
-we **wind up replaying the entire command queue**. While insane, I'm
-pretty sure it is legal for the guest to write garbage after the read
-pointer has moved past a particular command index.
+Indeed. But as long as there isn't more than 3 locks (and that the
+xarray is OK being concurrently updated with marks), we're good!
 
-Fsck!!!
+> Maybe we should serialize the use of markers on the LPI list on the
+> config_lock. A slight misuse, but we need a mutex since we're poking at
+> guest memory. Then we can go through the whole N-dimensional locking
+> puzzle and convince ourselves it is still correct.
 
-So, how about we do this:
+Maybe. This thing is already seeing so many abuses that one more may
+not matter much. Need to see how it fits in the whole hierarchy of
+GIC-related locks...
 
- - Provide a uaccess hook for CWRITER that changes the write-pointer
-   without processing any commands
+Thanks,
 
- - Assert an invariant that at any time CWRITER or CREADR are read from
-   userspace that CREADR == CWRITER. Fail the ioctl and scream if that
-   isn't the case, so that way we never need to worry about processing
-   'in-flight' commands at the destination.
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
