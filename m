@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA61535D1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0850A535D1
 	for <kvmarm@lists.linux.dev>; Wed, 14 Feb 2024 13:18:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707916714; cv=none; b=tg0y/SOYMi6dk5lib9KPhuOMcPy7/zss0u5rcs3YdAM3Me5qkGmeSmrm/93gOFntiWvvPfMS3f0nnWUhsF9N0iawT7N7HkQ/HJw6fMBsJ+JFNzJsigHqZLE4lZ84ZqS3N/HQGP4KUXxdn91P3w5tN/CWVdeiHJhqhTQ5QhgkP/A=
+	t=1707916715; cv=none; b=OlXl1ic/MR5hpImPkfUGdqc9cg6ht53B325ATLk/aVozlLjs4kwRE0DFB7dujQwCaYa00Da29JLIsr4nftGTcw3ibvlpB0scbSoZW/54cYg+KxD7MMwhCgtTx9Cm6FfF7QRddpG3gjXLrZcJpkRGL1rtulVzAC8BhOGdDnt/eT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707916714; c=relaxed/simple;
-	bh=oheFs4+mGfJCXwIIaUZOBBGakXa8+TX2q4FgHBvfaTE=;
+	s=arc-20240116; t=1707916715; c=relaxed/simple;
+	bh=m73GaNk6Q1JttW/VA1g/4L96gSDtT/YiwI4oChhKoTg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OxvXqwwiqLkEiT0DgUBeIbA54UEjM6g1EHqxrTCB+zQeBMagKOiF6lukNMeVLHzEmLP5N2mPFU08f73L8yj4VklfOMSivIbuIMTzsvbsRtNtAwvI9G/Na9YpMGRvpsfYb8vHrO4sP+rkT3K7HEWmnK2dj9xr5hnQlJKbIkk/KP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NYEwJERD; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=IismVVDe+r1yAOREAvWCCzbNTqGU1JLq7pUuZfjoAJ7TrBze5kGddQy/l9A4ktmOQcQet2t3W/nvsHVoacR42DYFYhoiyHVEb/lJnMrVZt9xtOZGjHCamaTRdcyH7KNnLjyEb9Hxn0PL6wttgCUG4th7BHpNkxG8uCxXxU+/yHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jczX5Gpv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NYEwJERD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EAFBC433C7;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jczX5Gpv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6973EC43394;
 	Wed, 14 Feb 2024 13:18:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707916714;
-	bh=oheFs4+mGfJCXwIIaUZOBBGakXa8+TX2q4FgHBvfaTE=;
+	bh=m73GaNk6Q1JttW/VA1g/4L96gSDtT/YiwI4oChhKoTg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NYEwJERD3VuaC9M8SLLoDFZJH+GYmZdpQBV67wxlW6EIJVFYHMd0+/RdaDmdWnvyc
-	 D/nRRJtRdSLUFtvL2iK6SWzCT5E6OBNEdxowdWrWb1yXjmcmYAsxVkdwUSeOoiOhLE
-	 6DXI6hPQwZBnvgCvm+IyAPWWX7IfJ+CoS5j8uIIQtrGtq9FAfeimf64kQZms5tfynb
-	 ahCOfX1BaJltUM+5ws4EXQr9p6AXJuc7/gngEbMwngUjqxHBYwxhdCLkVYZZ0jRs1+
-	 dNduiFmxE+t/8Yii67GeqPIm0ZpRikRkwy0qqzY+sa6nz46LF/ostl8V2dQz9RAL2o
-	 JBAIJKA6F3Beg==
+	b=jczX5GpvxR4oni9RGCfpZds8PxZ+T2ERFlsn1Y9TZQ9E3gg930f4IniHrBdrSvn+w
+	 oTIf0/3y+yYJWgsh+EQ80NWzXuE13Kx0mYRQDAVExZoOd8RnT7h83TKhKmQv3/Qblb
+	 oMs8Fjm1gdH8lqrUXuKt2aT9jefUrlLB6XpB37F8Ij2cjUE0WR4O5jb/bRPgQDc4q9
+	 UOtWKoeSnWDQC/oXDXN3jkffWaNPfJ8xYqcWrVx5hZorXVUtPcQL9eAzAy2jTd1eTS
+	 n1T0LKX7omtdO1SQk7Ig+s/uEI38otw30a9JDgD5oz7igr6x/Up9aqdhaHS6t2e7T7
+	 2I6IGCr8p0iNg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1raF9j-00394l-VM;
+	id 1raF9k-00394l-IW;
 	Wed, 14 Feb 2024 13:18:32 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 07/26] KVM: arm64: nv: Drop sanitised_sys_reg() helper
-Date: Wed, 14 Feb 2024 13:18:08 +0000
-Message-Id: <20240214131827.2856277-8-maz@kernel.org>
+Subject: [PATCH v4 09/26] KVM: arm64: nv: Correctly handle negative polarity FGTs
+Date: Wed, 14 Feb 2024 13:18:10 +0000
+Message-Id: <20240214131827.2856277-10-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240214131827.2856277-1-maz@kernel.org>
 References: <20240214131827.2856277-1-maz@kernel.org>
@@ -61,76 +61,99 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Now that we have the infrastructure to enforce a sanitised register
-value depending on the VM configuration, drop the helper that only
-used the architectural RES0 value.
+Negative trap bits are a massive pain. They are, on the surface,
+indistinguishable from RES0 bits. Do you trap? or do you ignore?
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+Thankfully, we now have the right infrastructure to check for RES0
+bits as long as the register is backed by VNCR, which is the case
+for the FGT registers.
+
+Use that information as a discriminant when handling a trap that
+is potentially caused by a FGT.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/emulate-nested.c | 22 +++++++---------------
- 1 file changed, 7 insertions(+), 15 deletions(-)
+ arch/arm64/kvm/emulate-nested.c | 59 +++++++++++++++++++++++++++++++--
+ 1 file changed, 56 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 431fd429932d..7a4a886adb9d 100644
+index 8a1cfcf553a2..ef46c2e45307 100644
 --- a/arch/arm64/kvm/emulate-nested.c
 +++ b/arch/arm64/kvm/emulate-nested.c
-@@ -1897,14 +1897,6 @@ static bool check_fgt_bit(u64 val, const union trap_config tc)
- 	return ((val >> tc.bit) & 1) == tc.pol;
+@@ -1892,9 +1892,61 @@ static enum trap_behaviour compute_trap_behaviour(struct kvm_vcpu *vcpu,
+ 	return __compute_trap_behaviour(vcpu, tc.cgt, b);
  }
  
--#define sanitised_sys_reg(vcpu, reg)			\
--	({						\
--		u64 __val;				\
--		__val = __vcpu_sys_reg(vcpu, reg);	\
--		__val &= ~__ ## reg ## _RES0;		\
--		(__val);				\
--	})
--
- bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+-static bool check_fgt_bit(u64 val, const union trap_config tc)
++static u64 kvm_get_sysreg_res0(struct kvm *kvm, enum vcpu_sysreg sr)
  {
- 	union trap_config tc;
-@@ -1940,25 +1932,25 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+-	return ((val >> tc.bit) & 1) == tc.pol;
++	struct kvm_sysreg_masks *masks;
++
++	/* Only handle the VNCR-backed regs for now */
++	if (sr < __VNCR_START__)
++		return 0;
++
++	masks = kvm->arch.sysreg_masks;
++
++	return masks->mask[sr - __VNCR_START__].res0;
++}
++
++static bool check_fgt_bit(struct kvm *kvm, bool is_read,
++			  u64 val, const union trap_config tc)
++{
++	enum vcpu_sysreg sr;
++
++	if (tc.pol)
++		return (val & BIT(tc.bit));
++
++	/*
++	 * FGTs with negative polarities are an absolute nightmare, as
++	 * we need to evaluate the bit in the light of the feature
++	 * that defines it. WTF were they thinking?
++	 *
++	 * So let's check if the bit has been earmarked as RES0, as
++	 * this indicates an unimplemented feature.
++	 */
++	if (val & BIT(tc.bit))
++		return false;
++
++	switch ((enum fgt_group_id)tc.fgt) {
++	case HFGxTR_GROUP:
++		sr = is_read ? HFGRTR_EL2 : HFGWTR_EL2;
++		break;
++
++	case HDFGRTR_GROUP:
++		sr = is_read ? HDFGRTR_EL2 : HDFGWTR_EL2;
++		break;
++
++	case HAFGRTR_GROUP:
++		sr = HAFGRTR_EL2;
++		break;
++
++	case HFGITR_GROUP:
++		sr = HFGITR_EL2;
++		break;
++
++	default:
++		WARN_ONCE(1, "Unhandled FGT group");
++		return false;
++	}
++
++	return !(kvm_get_sysreg_res0(kvm, sr) & BIT(tc.bit));
+ }
  
- 	case HFGxTR_GROUP:
- 		if (is_read)
--			val = sanitised_sys_reg(vcpu, HFGRTR_EL2);
-+			val = __vcpu_sys_reg(vcpu, HFGRTR_EL2);
- 		else
--			val = sanitised_sys_reg(vcpu, HFGWTR_EL2);
-+			val = __vcpu_sys_reg(vcpu, HFGWTR_EL2);
- 		break;
+ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+@@ -1969,7 +2021,8 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+ 		return false;
+ 	}
  
- 	case HDFGRTR_GROUP:
- 	case HDFGWTR_GROUP:
- 		if (is_read)
--			val = sanitised_sys_reg(vcpu, HDFGRTR_EL2);
-+			val = __vcpu_sys_reg(vcpu, HDFGRTR_EL2);
- 		else
--			val = sanitised_sys_reg(vcpu, HDFGWTR_EL2);
-+			val = __vcpu_sys_reg(vcpu, HDFGWTR_EL2);
- 		break;
+-	if (tc.fgt != __NO_FGT_GROUP__ && check_fgt_bit(val, tc))
++	if (tc.fgt != __NO_FGT_GROUP__ && check_fgt_bit(vcpu->kvm, is_read,
++							val, tc))
+ 		goto inject;
  
- 	case HAFGRTR_GROUP:
--		val = sanitised_sys_reg(vcpu, HAFGRTR_EL2);
-+		val = __vcpu_sys_reg(vcpu, HAFGRTR_EL2);
- 		break;
- 
- 	case HFGITR_GROUP:
--		val = sanitised_sys_reg(vcpu, HFGITR_EL2);
-+		val = __vcpu_sys_reg(vcpu, HFGITR_EL2);
- 		switch (tc.fgf) {
- 			u64 tmp;
- 
-@@ -1966,7 +1958,7 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
- 			break;
- 
- 		case HCRX_FGTnXS:
--			tmp = sanitised_sys_reg(vcpu, HCRX_EL2);
-+			tmp = __vcpu_sys_reg(vcpu, HCRX_EL2);
- 			if (tmp & HCRX_EL2_FGTnXS)
- 				tc.fgt = __NO_FGT_GROUP__;
- 		}
+ 	b = compute_trap_behaviour(vcpu, tc);
 -- 
 2.39.2
 
