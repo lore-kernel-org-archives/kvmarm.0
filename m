@@ -1,31 +1,31 @@
 Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3992313DBA4
-	for <kvmarm@lists.linux.dev>; Wed, 14 Feb 2024 21:06:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E1B2E629
+	for <kvmarm@lists.linux.dev>; Wed, 14 Feb 2024 23:01:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707944783; cv=none; b=Jh1dYm2YU6JeosZgJUKnUDSx3o+gsObKQrPCZe5OeB+xPEZ1r7Xi7dZFOKwTye1HukbkVGWQCHqOZMv+jCxAOuUwgSPoM1Z6tvUPDTXPaadH6VL7TKJRNdoYXW7T6TItK7kCv8CrOnJVciDDmvutRS/SCmltFZsB2LnRpaqulC0=
+	t=1707951673; cv=none; b=agD23svcwBxUwnAuj+y7/dibdVNZPDisc4l8K6PpmRFYASdKidnSO7T495Gn1rmRRyNJPKJbtYFLLlLSnZTaKkW2YP/HJIBBEHdksp3oWuRSNOaJPKcrK6iEKugQimFcIiWeiRI8dWpE8DNdbriV/7rQ/7BxFJZaJHvKv50Nz0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707944783; c=relaxed/simple;
-	bh=c+0UADNx4KkHHaeDm/qEDcDyoYmLg07y339g5RmUM14=;
+	s=arc-20240116; t=1707951673; c=relaxed/simple;
+	bh=pn7Lm4F3Ijht1DutwlSIkqI3zdpaiThaEe+q4HgUxEo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JmLOqPdwp0JzfqQDvwCZl5h6Wv2VQLVFvdJ+XAtCeyOO0DdHNyylB/gFYvZ3o1cwgsxSF02HAZSN6jnIidDElFQiNdBQaioLPvk73zJmVQ9RrB29VRm8XVcAuVlV/TT3apE8E51zEXJd6fV3kkIkXMCim7yt185Re4wtO6dn0tU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Qfvu4z1g; arc=none smtp.client-ip=95.215.58.185
+	 Content-Type:Content-Disposition:In-Reply-To; b=LrQNDTFP7wAnVAFPlkwF7Y72n9HZmYk5LaM3ULaZHKz1N0LuSX6njaOirIgiKdmPFw3RkGY/Bm40WPN5RpqGmdrloFLcm0J8TG37Dk+k5bWOLCizmGxgwKPv66a/YFgE1NvKESH3mZs84pFQjWb/V/foXUYc3o0Z1TqFNiaHl/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nEghvmqc; arc=none smtp.client-ip=95.215.58.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Qfvu4z1g"
-Date: Wed, 14 Feb 2024 13:06:12 -0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nEghvmqc"
+Date: Wed, 14 Feb 2024 23:01:04 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707944780;
+	t=1707951668;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uO6O9l/7u1FoWCDVNDPi12vidxMFWsbJFIEI+vbkcWI=;
-	b=Qfvu4z1ghH0eYQfo4WtcCs4NQnZnhnvCd/kiESIbOVEsb4Pk2KCeGoA7CpjxaUK3cNiCp/
-	N2IyDNCKrNA+pQoYJQOq+41kBXGMbfNasmhZgR/nS1tiefS9VwosW55GVWHiB7mKM1HoQQ
-	xT6DRaSpb0uF7ELaP9CtEQsQKIUfdHc=
+	bh=XQFwYXcKnv7TgRMN6YCVw8PApCD0oiTKGSM9n+rASIU=;
+	b=nEghvmqc3Mv3wEyoaHml99FbgpeGfWsZRUacafVLReuEtAND8jkMniWMKkUDCersOFwErg
+	5ZcMZF7ncZh0t4rzoMzTpM8sg79yRbTqa3qaxEJf+odUOoZtuF9RLUF0EcT/HJWxgC96UM
+	KTrnUYlifyvZ5Qvs34H1BYNz5S2GjiE=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
@@ -33,15 +33,13 @@ Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 19/23] KVM: selftests: Add a minimal library for
- interacting with an ITS
-Message-ID: <Zc0rRFLRhLfLshpm@linux.dev>
+Subject: Re: [PATCH v2 07/23] KVM: arm64: vgic: Use atomics to count LPIs
+Message-ID: <Zc1GMFjvy_f1KsXr@linux.dev>
 References: <20240213093250.3960069-1-oliver.upton@linux.dev>
- <20240213094114.3961683-1-oliver.upton@linux.dev>
- <86zfw33qae.wl-maz@kernel.org>
- <Zc0NsFm40nIqTmRf@linux.dev>
- <86v86q4xkf.wl-maz@kernel.org>
- <Zc0orzU-CeKEyx3j@linux.dev>
+ <20240213093250.3960069-8-oliver.upton@linux.dev>
+ <861q9f56x6.wl-maz@kernel.org>
+ <Zc0HIorNZG9KG5Mg@linux.dev>
+ <86wmr64xyo.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,59 +48,35 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zc0orzU-CeKEyx3j@linux.dev>
+In-Reply-To: <86wmr64xyo.wl-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Feb 14, 2024 at 12:55:11PM -0800, Oliver Upton wrote:
-> On Wed, Feb 14, 2024 at 08:09:52PM +0000, Marc Zyngier wrote:
-> > > If the order of restore from userspace is CBASER, CWRITER, CREADR then
-> > > we **wind up replaying the entire command queue**. While insane, I'm
-> > > pretty sure it is legal for the guest to write garbage after the read
-> > > pointer has moved past a particular command index.
-> > > 
-> > > Fsck!!!
+On Wed, Feb 14, 2024 at 08:01:19PM +0000, Marc Zyngier wrote:
+> > > Of course, we only have 3 marks, so that's a bit restrictive from a
+> > > concurrency perspective, but since most callers hold a lock, it should
+> > > be OK.
 > > 
-> > This is documented Documentation/virt/kvm/devices/arm-vgic-its.rst to
-> > some extent, and it is allowed for the guest to crap itself on behalf
-> > of userspace if the ordering isn't respected.
+> > They all hold *a* lock, but maybe not the same one! :)
 > 
-> Ah, fair, I missed the documentation here. If we require userspace to
-> write CTLR last then we _should_ be fine, but damn is this a tricky set
-> of expectations.
-> 
-> > > So, how about we do this:
-> > > 
-> > >  - Provide a uaccess hook for CWRITER that changes the write-pointer
-> > >    without processing any commands
-> > > 
-> > >  - Assert an invariant that at any time CWRITER or CREADR are read from
-> > >    userspace that CREADR == CWRITER. Fail the ioctl and scream if that
-> > >    isn't the case, so that way we never need to worry about processing
-> > >    'in-flight' commands at the destination.
-> > 
-> > Are we guaranteed that we cannot ever see CWRITER != CREADR at VM
-> > dumping time? I'm not convinced that we cannot preempt the vcpu thread
-> > at the right spot, specially given that you can have an arbitrary
-> > large batch of commands to execute.
-> > 
-> > Just add a page-fault to the mix, and a signal pending. Pronto, you
-> > see a guest exit and you should be able to start dumping things
-> > without the ITS having processed much. I haven't tried, but that
-> > doesn't seem totally unlikely.
-> 
-> Well, we would need to run all userspace reads and writes through the
-> cmd_lock in this case, which is what we already do for the CREADR
-> uaccess hook. To me the 'racy' queue accessors only make sense for guest
-> accesses, since the driver is expecting to poll for completion in that
-> case.
+> Indeed. But as long as there isn't more than 3 locks (and that the
+> xarray is OK being concurrently updated with marks), we're good!
 
-My proposed invariant cannot be maintained, of course, since userspace
-can do whatever it pleases on the cmdq pointers.
+Oh, you mean to give each existing caller their own mark?
 
-> Otherwise we decide the existing rules for restoring the ITS are fine
-> and I get to keep my funky driver :)
+> > Maybe we should serialize the use of markers on the LPI list on the
+> > config_lock. A slight misuse, but we need a mutex since we're poking at
+> > guest memory. Then we can go through the whole N-dimensional locking
+> > puzzle and convince ourselves it is still correct.
 > 
-> -- 
-> Thanks,
-> Oliver
-> 
+> Maybe. This thing is already seeing so many abuses that one more may
+> not matter much. Need to see how it fits in the whole hierarchy of
+> GIC-related locks...
+
+It doesn't work. We have it that the config_lock needs to be taken
+outside the its_lock.
+
+Too many damn locks!
+
+-- 
+Thanks,
+Oliver
