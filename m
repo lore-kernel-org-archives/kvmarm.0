@@ -1,144 +1,165 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F225B5DB;
-	Wed, 14 Feb 2024 15:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FEB612C8
+	for <kvmarm@lists.linux.dev>; Wed, 14 Feb 2024 16:29:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707926137; cv=none; b=VFw7sMwUku4NU0Z/84X5AGgNbDTs+0ol1bxaZGe9VniBHnehB6fmgzV/iE55Z1flcyyBHBzTAyXMxOO4rF4fQKWHsNgr4Z1OSNEFeVT37zNYI+PfUbqXlWyqW9MIZwtOD8TrYbjihqXat4krFRb7e4mbyDjoBwJkSFqdqqy9zQ4=
+	t=1707928191; cv=none; b=F/9Sa5yA2If7y/glCjeMTFgHmRGdEOjk8XAqY/ZaAIAIzvbbF3njZlQ8vpXZM52Pv0NCK7E9Rjwjcb2rD2WoVrpcbIydJ0vZ3FoZBsKrBozHGCQJor7S3axfGQo1u95sQz124EjDYL+POY6GhRXZpGl2YS1jZa3SgfqrgwKL5jQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707926137; c=relaxed/simple;
-	bh=3nBeVvDzPWSYkBUuAMGRboAigFEsz79F7jZ+9eTr11k=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KFKJ17cZAaVM/gTWUOBPLe8fPwmNe2kfmgL9JWoOPgDYk3lPUFxz43YOJUe7rzUr0dtlQabeArETjW+aImSsWqdnXSr9bQYBDeXac49v50gjwQDiHDyshkq/mNoJW8HfIYS16kPbIvaUN2qUl2ebtTw5klRC6CYv0USAC0qL0gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PDRU0t6i; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1707928191; c=relaxed/simple;
+	bh=+Hgot9mCszq9rkwkXCHwpnTcuuQ1rFaolx0bqd0P9X0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MheAqiDlo5/D2yplzNkYDBpmJpIOkrHx+BwOUbt3LaPt+SZuFlwITEHSJbQgRzfxg2JHgWTd4DyzNVjzpL1gbvHgY5rbjxwMXUTmrGIQC8O5xRSNmfFZR7sAyY3x4EuWPZr57tLOQXPPA4lNzh4zkiS0+Jr1JHwVSEW4UTQvEl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fKS5+Zdo; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PDRU0t6i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E806C433C7;
-	Wed, 14 Feb 2024 15:55:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707926137;
-	bh=3nBeVvDzPWSYkBUuAMGRboAigFEsz79F7jZ+9eTr11k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PDRU0t6iSS5gndYGuN7noRJU4+3sY22cJUlXpmJS0WbshlislZBuL+WOH78XbW4OQ
-	 2HKYlgz29AjLMgMt4FOTHonoqy8kkblX0mhaatZ9fv/L+oQVLhKBzwrpBJ/Y/Jhg30
-	 RBuNY8YlFdnOkIDmTia/G9nIEcEhf2d6lY+0AXhgYoP/wdpiiA5Br5RLbFIKk2m7ba
-	 Tf8k+tDS3NtMvxyIPx0MOOpZhuZNQ15yAFqkinuJlS89qseh9P1Dun2l9HiXRiNwgq
-	 dYQ2zD7ixKYVA5cVGgZRcxe8Omw/gJ6ZEKCbhYvGEv4usmNE5Ie8sH02Fx/wSTnwmN
-	 fSNtoIgjBWg1Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1raHbi-003Bjv-UN;
-	Wed, 14 Feb 2024 15:55:35 +0000
-Date: Wed, 14 Feb 2024 15:55:33 +0000
-Message-ID: <864jeb59ca.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fKS5+Zdo"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-410c9f17c9eso151585e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 14 Feb 2024 08:29:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707928188; x=1708532988; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vG7i4rTv5dN/K3IttStABw6h9ZHaBPfu/H1rnYVvfSA=;
+        b=fKS5+ZdoUWp3WpOHUC1TOWGXdgyjhIDlMoRjbbEPb3DBB/D6x/pfziaFxGoH7vUlQ5
+         Snznxm+5v1u9dFQM+PjON6rSWV/uk7sm57DLnx8XjpNPHJg03+qKdEFqGUUAEAFTdMpb
+         QtBcnVtfsPNhYSR+XjjpCdZn4GaghXHPl8stLL6qs2FXKhZYLL4U5KWA0exs3/gCGS5h
+         O7k6C71fGyoxEDv0koD8JSGHxkui9FcAEf4DtIDHooxxp/0NsJ6QUZ8SLxP9tdb/4UOZ
+         Dl4m0S685Q8kL5cyef+Zt5RaxFchuD1UTkT7XUimMtXo+sa6rBIUq4gy1aYbIoBOCl+r
+         10JA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707928188; x=1708532988;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vG7i4rTv5dN/K3IttStABw6h9ZHaBPfu/H1rnYVvfSA=;
+        b=mPYY/D3FAOOueGvTaXmShuER4vklFlEHfV+TH8qzeSZdU5+Z9xPGtQ5ozJuaNDI5E8
+         j1dS4mQLS7qBD9u/f8w8D533JT20S2xZlNJxT9JkQYppiO21YiVrDal2e5hPVjHcjE2a
+         q0rcFP9j+4+5u8NuhR3EWsNnClPF03MNMNnL2vcrAmbXe79WiBOQ6jmqTUD/zg7ko9rV
+         /HeqdUpzk3PSw3dRsbqYr0ZnI7CBQ4bHbmoKdcporw+zbaiWjmYECdlrWYW2klyXtHec
+         6NTPC3nOxFcidWBVso4trYQaMgycoExZ1FnIm2NAsdAeK+LFwpOGiuXOLePu0IdhIn2h
+         zFaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWcYS8Tk2hCeTndJBSmI85p0W7VWz7HtvkdIn2p3a8R7Q1Lqaj8i1noeLPoR8RbJPl3/4Ws+XLcXi5E1La9HJyEYxZdjA5g
+X-Gm-Message-State: AOJu0YxzRpWDEgMPwEeyiVLVrK5KMY+KPU/LvsK3naNVfhfLZbCsVDYM
+	k4iWRD1qFxqcnnfmeMueZIwpJHGJQu+FdkQd+NcqKQwQv+LTMyvngSXJaDRuLA==
+X-Google-Smtp-Source: AGHT+IEfoGVEcSkXcvHm9vOSlr8zdWFY2LiFK/ZqzUsRqAzqSErJ5TjzXMSPE5rGzs06KCKoPTgvzg==
+X-Received: by 2002:a05:600c:519b:b0:411:e5c1:9b2a with SMTP id fa27-20020a05600c519b00b00411e5c19b2amr166293wmb.2.1707928187624;
+        Wed, 14 Feb 2024 08:29:47 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXTndGOWllW29C9NCd6GB5W+GrXhfNKAS8hQ9ZMrGGufMYE0N0LcmrQqDdtFfrmT/CQmeC/ieRIBChaF/mS2ijPZEw10gGsdJpn1gd5kJ69gwGvog55s7r5Gl/IfVntFj+cGu3+V24FlEIIrzZ/C//5OZEEbduhMedb+DMQPnsXVuifDYpWbdcW6DKM6hK9rVVp6USakKw/rh9fkIWtFOe30xtca25+9QBCXzgeLq4pG1ldhq8hBPX2bXmxqEA3Bx2OTpw+CP8NIHcvg5BMN9Dz/jrI++2ml8mo5l63AzoZCn/aaWNtekd5WYyGk484sjRm0tbdMcLLjfK7lfbj6WZgOgEwF5gXHCNpAlKJnsUeVEERaAu+BIW3DcB9+yrqeeCJpJ55MARx9J8rjH4amn8edwIYiyGQbZLpa0auY2SjrE8RMesK+4njl2cEicQfsO03AzO+xPZyT0g7bXbgL6FtA6dM8nRkdCoSQFdgo2JlbG3MKL9tUSelDUjiKjyWH3lCMDr2Pg3NM02TCV28F7dx8ZUenim87Bt95w==
+Received: from google.com (161.126.77.34.bc.googleusercontent.com. [34.77.126.161])
+        by smtp.gmail.com with ESMTPSA id cl3-20020a5d5f03000000b0033b7ce8b496sm10424662wrb.108.2024.02.14.08.29.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Feb 2024 08:29:47 -0800 (PST)
+Date: Wed, 14 Feb 2024 16:29:45 +0000
+From: Sebastian Ene <sebastianene@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 01/23] KVM: arm64: Add tracepoints + stats for LPI cache effectiveness
-In-Reply-To: <20240213093250.3960069-2-oliver.upton@linux.dev>
-References: <20240213093250.3960069-1-oliver.upton@linux.dev>
-	<20240213093250.3960069-2-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Cc: catalin.marinas@arm.com, gshan@redhat.com, james.morse@arm.com,
+	mark.rutland@arm.com, maz@kernel.org, rananta@google.com,
+	ricarkol@google.com, ryan.roberts@arm.com, shahuang@redhat.com,
+	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kernel-team@android.com,
+	vdonnefort@google.com
+Subject: Re: [PATCH v5 4/4] KVM: arm64: Initialize the ptdump parser with
+ stage-2 attributes
+Message-ID: <ZczqeTEOVVcRPNi3@google.com>
+References: <20240207144832.1017815-2-sebastianene@google.com>
+ <20240207144832.1017815-6-sebastianene@google.com>
+ <Zcq7AoII8qLWwjsu@linux.dev>
+ <Zcuf1ZUvwhxBobuG@google.com>
+ <ZcuihokcWA3q-pZS@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZcuihokcWA3q-pZS@linux.dev>
 
-On Tue, 13 Feb 2024 09:32:38 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Tue, Feb 13, 2024 at 05:10:30PM +0000, Oliver Upton wrote:
+> On Tue, Feb 13, 2024 at 04:59:01PM +0000, Sebastian Ene wrote:
+> > On Tue, Feb 13, 2024 at 12:42:42AM +0000, Oliver Upton wrote:
+> > > On Wed, Feb 07, 2024 at 02:48:33PM +0000, Sebastian Ene wrote:
 > 
-> LPI translation and injection has been shown to have a significant
-> impact on the performance of VM workloads, so it probably makes sense to
-> add some signals in this area.
+> [...]
 > 
-> Introduce the concept of a KVM tracepoint that associates with a VM
-> stat and use it for the LPI translation cache tracepoints. It isn't too
-> uncommon for a kernel hacker to attach to tracepoints, while at the same
-> time userspace may open a 'binary stats' FD to peek at the corresponding
-> VM stats.
+> > > > +
+> > > > +	snprintf(marker_msg, MARKER_MSG_LEN, "IPA bits %2u start lvl %1d",
+> > > > +		 pgtable->ia_bits, pgtable->start_level);
+> > > > +
+> > > > +	ipa_addr_marker[0].name = marker_msg;
+> > > 
+> > > Is the dynamic name worth the added complexity? I see nothing wrong with
+> > > exposing additional debugfs files for simple attributes like the IPA
+> > > range and page table levels.
+> > > 
+> > > I know it isn't *that* much, just looking for every opportunity to
+> > > simplify further.
+> > > 
+> > 
+> > We can keep them separate, I have no strong opinion about this. I think
+> > this was Vincent's, original suggestion to have them so I will check with
+> > him as well.
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  3 ++
->  arch/arm64/kvm/guest.c            |  5 ++-
->  arch/arm64/kvm/vgic/trace.h       | 66 +++++++++++++++++++++++++++++++
->  arch/arm64/kvm/vgic/vgic-its.c    | 14 ++++++-
->  include/linux/kvm_host.h          |  4 ++
->  5 files changed, 89 insertions(+), 3 deletions(-)
+> Well, if we get to the place where there's a single struct containing
+> all of the required data upfront then this becomes less of an issue.
+> This is useful information still, so let's see if we can go about it the
+> other way.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 21c57b812569..6f88b76373a5 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -966,6 +966,9 @@ static inline bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
->  
->  struct kvm_vm_stat {
->  	struct kvm_vm_stat_generic generic;
-> +	u64 vgic_its_trans_cache_hit;
-> +	u64 vgic_its_trans_cache_miss;
-> +	u64 vgic_its_trans_cache_victim;
->  };
->  
->  struct kvm_vcpu_stat {
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index aaf1d4939739..354d67251fc2 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -30,7 +30,10 @@
->  #include "trace.h"
->  
->  const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
-> -	KVM_GENERIC_VM_STATS()
-> +	KVM_GENERIC_VM_STATS(),
-> +	STATS_DESC_COUNTER(VM, vgic_its_trans_cache_hit),
-> +	STATS_DESC_COUNTER(VM, vgic_its_trans_cache_miss),
-> +	STATS_DESC_COUNTER(VM, vgic_its_trans_cache_victim)
->  };
 
-We've talked about this offline, but I thought I'd make my position
-public on these.
+Allright, I will create separate entries for getting the ipa_space and the start
+level which will be exposed in the vm debugfs dir.
 
-I've very concerned that exposing these statistic, however useful they
-may be at a given point in time, will eventually become all wrong
-and/or misleading.
+> > > > +	ret = kvm_ptdump_parser_init(&parser_state, mmu->pgt, m);
+> > > > +	if (ret)
+> > > > +		return ret;
+> > > > +
+> > > 
+> > > Can this be done at open(), or am I missing something?
+> > > 
+> > 
+> > I guess we can do this in open() but then we will have to add again that
+> > struct that wraps some ptdump specific state tracking. It seemed a bit cleaner in
+> > this way. What do you think ?
+> 
+> Allocating something that looks like an iterator end embedding it in
+> ->private isn't too uncommon.
+> 
 
-Case in point, our discussion about this very series, where we landed
-on a potential reimplementation of the translation cache as a per-ITS
-xarray. If this comes to fruition, these stats will probably be
-totally useless (hit monotonically increasing at the rate of 1 per
-interrupt, miss being 0 or 1, victim being stuck to 0).
+Ack, will stick to this approach in this case.
 
-I'm *not* saying that such stats are totally useless. Just that they
-are, by definition, tied to a kernel-side implementation choice, which
-will evolve. The trouble is that they create an ABI that we need to
-support forever.
+> > > >  	write_lock(&guest_kvm->mmu_lock);
+> > > >  	ret = kvm_ptdump_show_common(m, mmu->pgt, &parser_state);
+> > > >  	write_unlock(&guest_kvm->mmu_lock);
+> > > >  
+> > > > +	kvm_ptdump_parser_teardown(&parser_state);
+> > > 
+> > > Same question here, can this happen at close()? I guess you'll need a
+> > > struct to encapsulate pg_state and a pointer to the VM at least.
+> > >
+> > 
+> > Right, I tried to avoid using a separate struct as we discussed in v4.
+> 
+> Sorry, I hope I didn't confuse you in my prior feedback.
+> 
+> What I had issue with was the multiple layers of function ptr / ops
+> structs for managing the file interface. I have zero concerns with
+> organizing the _data_ for the walk this way.
+>
 
-I wish we could work on something that would allow such statistics to
-be *extracted* (as opposed to published). Something like this as a
-discussion subject for a future KVM Forum or LPC uConf would get my
-full backing (and I'm pretty sure the networking folks have solved
-that problem a long time ago).
+Right, I see what you mean, thanks for the clarification.
 
-Thanks,
+> > > Actually, come to think of it, if you embed all of the data you need for
+> > > the walker into a structure you can just do a single allocation for it
+> > > upfront.
+> 
+> -- 
+> Thanks,
+> Oliver
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks for the feedback,
+Seb
