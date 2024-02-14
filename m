@@ -1,165 +1,128 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FEB612C8
-	for <kvmarm@lists.linux.dev>; Wed, 14 Feb 2024 16:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F1C95D49C;
+	Wed, 14 Feb 2024 16:47:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707928191; cv=none; b=F/9Sa5yA2If7y/glCjeMTFgHmRGdEOjk8XAqY/ZaAIAIzvbbF3njZlQ8vpXZM52Pv0NCK7E9Rjwjcb2rD2WoVrpcbIydJ0vZ3FoZBsKrBozHGCQJor7S3axfGQo1u95sQz124EjDYL+POY6GhRXZpGl2YS1jZa3SgfqrgwKL5jQ=
+	t=1707929273; cv=none; b=QIqEOVBaqNR0lueOLhVlMQ05URW7PssWCwp/O2pOG0R8WaZUtEOGJNWvChqIFyBpsl7lpwJXPScpc96oZpQ0aJ9r6hpCTJp+cQiEK/9wX7DiRP77W11+P6NEX6q2g0wMkLIuZTqZN0Yadt5cRrDO47dF4ii3t6pXrzaJQWypE50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707928191; c=relaxed/simple;
-	bh=+Hgot9mCszq9rkwkXCHwpnTcuuQ1rFaolx0bqd0P9X0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MheAqiDlo5/D2yplzNkYDBpmJpIOkrHx+BwOUbt3LaPt+SZuFlwITEHSJbQgRzfxg2JHgWTd4DyzNVjzpL1gbvHgY5rbjxwMXUTmrGIQC8O5xRSNmfFZR7sAyY3x4EuWPZr57tLOQXPPA4lNzh4zkiS0+Jr1JHwVSEW4UTQvEl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fKS5+Zdo; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1707929273; c=relaxed/simple;
+	bh=DnnQl04MGaYTNcKzbKois0ch8l8Y5ji0lievz5/HVOI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C1J5aMzmrKsPtzT1ZqFR4fc5JAggB1jJEdRFQKJlv0jEPpP3RZCa/ve2b2F0IP+F8rwPi57hpr3RzAEfqVN3JzWrp+K/FJHX1+aJEdoluLyW9YuW60yxd8TOoblW6PI9D8/RpYHHtlm6b+HkesKKlEVOxY3LAN8DkLDeiQg1vws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AIO2g2/C; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fKS5+Zdo"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-410c9f17c9eso151585e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 14 Feb 2024 08:29:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707928188; x=1708532988; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vG7i4rTv5dN/K3IttStABw6h9ZHaBPfu/H1rnYVvfSA=;
-        b=fKS5+ZdoUWp3WpOHUC1TOWGXdgyjhIDlMoRjbbEPb3DBB/D6x/pfziaFxGoH7vUlQ5
-         Snznxm+5v1u9dFQM+PjON6rSWV/uk7sm57DLnx8XjpNPHJg03+qKdEFqGUUAEAFTdMpb
-         QtBcnVtfsPNhYSR+XjjpCdZn4GaghXHPl8stLL6qs2FXKhZYLL4U5KWA0exs3/gCGS5h
-         O7k6C71fGyoxEDv0koD8JSGHxkui9FcAEf4DtIDHooxxp/0NsJ6QUZ8SLxP9tdb/4UOZ
-         Dl4m0S685Q8kL5cyef+Zt5RaxFchuD1UTkT7XUimMtXo+sa6rBIUq4gy1aYbIoBOCl+r
-         10JA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707928188; x=1708532988;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vG7i4rTv5dN/K3IttStABw6h9ZHaBPfu/H1rnYVvfSA=;
-        b=mPYY/D3FAOOueGvTaXmShuER4vklFlEHfV+TH8qzeSZdU5+Z9xPGtQ5ozJuaNDI5E8
-         j1dS4mQLS7qBD9u/f8w8D533JT20S2xZlNJxT9JkQYppiO21YiVrDal2e5hPVjHcjE2a
-         q0rcFP9j+4+5u8NuhR3EWsNnClPF03MNMNnL2vcrAmbXe79WiBOQ6jmqTUD/zg7ko9rV
-         /HeqdUpzk3PSw3dRsbqYr0ZnI7CBQ4bHbmoKdcporw+zbaiWjmYECdlrWYW2klyXtHec
-         6NTPC3nOxFcidWBVso4trYQaMgycoExZ1FnIm2NAsdAeK+LFwpOGiuXOLePu0IdhIn2h
-         zFaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWcYS8Tk2hCeTndJBSmI85p0W7VWz7HtvkdIn2p3a8R7Q1Lqaj8i1noeLPoR8RbJPl3/4Ws+XLcXi5E1La9HJyEYxZdjA5g
-X-Gm-Message-State: AOJu0YxzRpWDEgMPwEeyiVLVrK5KMY+KPU/LvsK3naNVfhfLZbCsVDYM
-	k4iWRD1qFxqcnnfmeMueZIwpJHGJQu+FdkQd+NcqKQwQv+LTMyvngSXJaDRuLA==
-X-Google-Smtp-Source: AGHT+IEfoGVEcSkXcvHm9vOSlr8zdWFY2LiFK/ZqzUsRqAzqSErJ5TjzXMSPE5rGzs06KCKoPTgvzg==
-X-Received: by 2002:a05:600c:519b:b0:411:e5c1:9b2a with SMTP id fa27-20020a05600c519b00b00411e5c19b2amr166293wmb.2.1707928187624;
-        Wed, 14 Feb 2024 08:29:47 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXTndGOWllW29C9NCd6GB5W+GrXhfNKAS8hQ9ZMrGGufMYE0N0LcmrQqDdtFfrmT/CQmeC/ieRIBChaF/mS2ijPZEw10gGsdJpn1gd5kJ69gwGvog55s7r5Gl/IfVntFj+cGu3+V24FlEIIrzZ/C//5OZEEbduhMedb+DMQPnsXVuifDYpWbdcW6DKM6hK9rVVp6USakKw/rh9fkIWtFOe30xtca25+9QBCXzgeLq4pG1ldhq8hBPX2bXmxqEA3Bx2OTpw+CP8NIHcvg5BMN9Dz/jrI++2ml8mo5l63AzoZCn/aaWNtekd5WYyGk484sjRm0tbdMcLLjfK7lfbj6WZgOgEwF5gXHCNpAlKJnsUeVEERaAu+BIW3DcB9+yrqeeCJpJ55MARx9J8rjH4amn8edwIYiyGQbZLpa0auY2SjrE8RMesK+4njl2cEicQfsO03AzO+xPZyT0g7bXbgL6FtA6dM8nRkdCoSQFdgo2JlbG3MKL9tUSelDUjiKjyWH3lCMDr2Pg3NM02TCV28F7dx8ZUenim87Bt95w==
-Received: from google.com (161.126.77.34.bc.googleusercontent.com. [34.77.126.161])
-        by smtp.gmail.com with ESMTPSA id cl3-20020a5d5f03000000b0033b7ce8b496sm10424662wrb.108.2024.02.14.08.29.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Feb 2024 08:29:47 -0800 (PST)
-Date: Wed, 14 Feb 2024 16:29:45 +0000
-From: Sebastian Ene <sebastianene@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AIO2g2/C"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9A96C433C7;
+	Wed, 14 Feb 2024 16:47:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707929272;
+	bh=DnnQl04MGaYTNcKzbKois0ch8l8Y5ji0lievz5/HVOI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AIO2g2/CDd7ZJszKQwdaQI7N/ZVQqYEXaj7zK110O6TotyGDGa+gwxyWgxlUb4XJ4
+	 byojqWaanu5+ALMOkbJLvbhNOl2xVtQXjz5gIa9fHlAN0Skn78r83EiIG4TOdyLPFQ
+	 n/K9uLUzdsSHPGhUhCB0aHxgL241tEhKbpSrTEMkifCOK3Z6CNCDqerE60rxKmMknS
+	 rNUGE6IsJ+X0o+0OU1ZDWt8YcZi6zxXzqAoFIbG8uHgdpC1VusHBcqhes93cnvbiv8
+	 bGvjU+V8TKUo7yaXVqz1gYjM1EYZaLiqOtNAFmAr70RH18B42zvQdLUm7GhyZucL+9
+	 Uns4wZXQtTCZg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1raIQI-003Cnr-D8;
+	Wed, 14 Feb 2024 16:47:50 +0000
+Date: Wed, 14 Feb 2024 16:47:49 +0000
+Message-ID: <861q9f56x6.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
-Cc: catalin.marinas@arm.com, gshan@redhat.com, james.morse@arm.com,
-	mark.rutland@arm.com, maz@kernel.org, rananta@google.com,
-	ricarkol@google.com, ryan.roberts@arm.com, shahuang@redhat.com,
-	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com,
-	vdonnefort@google.com
-Subject: Re: [PATCH v5 4/4] KVM: arm64: Initialize the ptdump parser with
- stage-2 attributes
-Message-ID: <ZczqeTEOVVcRPNi3@google.com>
-References: <20240207144832.1017815-2-sebastianene@google.com>
- <20240207144832.1017815-6-sebastianene@google.com>
- <Zcq7AoII8qLWwjsu@linux.dev>
- <Zcuf1ZUvwhxBobuG@google.com>
- <ZcuihokcWA3q-pZS@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 07/23] KVM: arm64: vgic: Use atomics to count LPIs
+In-Reply-To: <20240213093250.3960069-8-oliver.upton@linux.dev>
+References: <20240213093250.3960069-1-oliver.upton@linux.dev>
+	<20240213093250.3960069-8-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZcuihokcWA3q-pZS@linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Feb 13, 2024 at 05:10:30PM +0000, Oliver Upton wrote:
-> On Tue, Feb 13, 2024 at 04:59:01PM +0000, Sebastian Ene wrote:
-> > On Tue, Feb 13, 2024 at 12:42:42AM +0000, Oliver Upton wrote:
-> > > On Wed, Feb 07, 2024 at 02:48:33PM +0000, Sebastian Ene wrote:
+On Tue, 13 Feb 2024 09:32:44 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> [...]
+> Switch to using atomics for LPI accounting, allowing vgic_irq references
+> to be dropped in parallel.
 > 
-> > > > +
-> > > > +	snprintf(marker_msg, MARKER_MSG_LEN, "IPA bits %2u start lvl %1d",
-> > > > +		 pgtable->ia_bits, pgtable->start_level);
-> > > > +
-> > > > +	ipa_addr_marker[0].name = marker_msg;
-> > > 
-> > > Is the dynamic name worth the added complexity? I see nothing wrong with
-> > > exposing additional debugfs files for simple attributes like the IPA
-> > > range and page table levels.
-> > > 
-> > > I know it isn't *that* much, just looking for every opportunity to
-> > > simplify further.
-> > > 
-> > 
-> > We can keep them separate, I have no strong opinion about this. I think
-> > this was Vincent's, original suggestion to have them so I will check with
-> > him as well.
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/vgic/vgic-debug.c | 2 +-
+>  arch/arm64/kvm/vgic/vgic-its.c   | 4 ++--
+>  arch/arm64/kvm/vgic/vgic.c       | 2 +-
+>  include/kvm/arm_vgic.h           | 4 ++--
+>  4 files changed, 6 insertions(+), 6 deletions(-)
 > 
-> Well, if we get to the place where there's a single struct containing
-> all of the required data upfront then this becomes less of an issue.
-> This is useful information still, so let's see if we can go about it the
-> other way.
-> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
+> index 85606a531dc3..389025ce7749 100644
+> --- a/arch/arm64/kvm/vgic/vgic-debug.c
+> +++ b/arch/arm64/kvm/vgic/vgic-debug.c
+> @@ -149,7 +149,7 @@ static void print_dist_state(struct seq_file *s, struct vgic_dist *dist)
+>  	seq_printf(s, "vgic_model:\t%s\n", v3 ? "GICv3" : "GICv2");
+>  	seq_printf(s, "nr_spis:\t%d\n", dist->nr_spis);
+>  	if (v3)
+> -		seq_printf(s, "nr_lpis:\t%d\n", dist->lpi_list_count);
+> +		seq_printf(s, "nr_lpis:\t%d\n", atomic_read(&dist->lpi_count));
+>  	seq_printf(s, "enabled:\t%d\n", dist->enabled);
+>  	seq_printf(s, "\n");
+>  
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index c68164d6cba0..048226812974 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -97,7 +97,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+>  		goto out_unlock;
+>  	}
+>  
+> -	dist->lpi_list_count++;
+> +	atomic_inc(&dist->lpi_count);
+>  
+>  out_unlock:
+>  	if (ret)
+> @@ -345,7 +345,7 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
+>  	 * command). If coming from another path (such as enabling LPIs),
+>  	 * we must be careful not to overrun the array.
+>  	 */
+> -	irq_count = READ_ONCE(dist->lpi_list_count);
+> +	irq_count = atomic_read(&dist->lpi_count);
 
-Allright, I will create separate entries for getting the ipa_space and the start
-level which will be exposed in the vm debugfs dir.
+I'd like to propose an alternative approach here. I've always hated
+this "copy a bunch of INTIDs" thing, and the only purpose of this
+silly counter is to dimension the resulting array.
 
-> > > > +	ret = kvm_ptdump_parser_init(&parser_state, mmu->pgt, m);
-> > > > +	if (ret)
-> > > > +		return ret;
-> > > > +
-> > > 
-> > > Can this be done at open(), or am I missing something?
-> > > 
-> > 
-> > I guess we can do this in open() but then we will have to add again that
-> > struct that wraps some ptdump specific state tracking. It seemed a bit cleaner in
-> > this way. What do you think ?
-> 
-> Allocating something that looks like an iterator end embedding it in
-> ->private isn't too uncommon.
-> 
+Could we instead rely on an xarray marking a bunch of entries (the
+ones we want to 'copy'), and get the reader to clear these marks once
+done?
 
-Ack, will stick to this approach in this case.
+Of course, we only have 3 marks, so that's a bit restrictive from a
+concurrency perspective, but since most callers hold a lock, it should
+be OK.
 
-> > > >  	write_lock(&guest_kvm->mmu_lock);
-> > > >  	ret = kvm_ptdump_show_common(m, mmu->pgt, &parser_state);
-> > > >  	write_unlock(&guest_kvm->mmu_lock);
-> > > >  
-> > > > +	kvm_ptdump_parser_teardown(&parser_state);
-> > > 
-> > > Same question here, can this happen at close()? I guess you'll need a
-> > > struct to encapsulate pg_state and a pointer to the VM at least.
-> > >
-> > 
-> > Right, I tried to avoid using a separate struct as we discussed in v4.
-> 
-> Sorry, I hope I didn't confuse you in my prior feedback.
-> 
-> What I had issue with was the multiple layers of function ptr / ops
-> structs for managing the file interface. I have zero concerns with
-> organizing the _data_ for the walk this way.
->
+What do you think?
 
-Right, I see what you mean, thanks for the clarification.
+	M.
 
-> > > Actually, come to think of it, if you embed all of the data you need for
-> > > the walker into a structure you can just do a single allocation for it
-> > > upfront.
-> 
-> -- 
-> Thanks,
-> Oliver
-
-Thanks for the feedback,
-Seb
+-- 
+Without deviation from the norm, progress is not possible.
