@@ -1,31 +1,31 @@
 Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761D712CD95
-	for <kvmarm@lists.linux.dev>; Wed, 14 Feb 2024 18:40:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 240B5139575
+	for <kvmarm@lists.linux.dev>; Wed, 14 Feb 2024 19:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707936035; cv=none; b=eDZXF/uhPdquIyNOelkU26jsZfMA5c8jIIDmTC8HEXChSb8tMdMFbUbJV21fEdXFnrUaX6cGBdj8RGQl1vyhZCpVVaK/FpQiBZwFFCBD6l21kTy0oEcOVKv+mvYFVpDaYKPGNHxgt6UXM7J2+g/nZZkYEtJyuz2tXaMA4HrxxUE=
+	t=1707937209; cv=none; b=EBi6sUfd+b7r+leqhJq9EjpLFj53EAdbVMqReAMCPGAFQV7pwcN+oLiGqXayfTMhiffXpyVEupxtOyoylbvZYUQD/cvNDL069X0UBFWMAYrh3Co8wfnBKmAdNgb2bngL8Y0rP8ITBd35D76Ixf69O5heFLIHEcMVWhhJQJ44EC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707936035; c=relaxed/simple;
-	bh=QUSG3BjW4+NlVMe7Rm/SiimRN0MgjuaWYIne5NHr5SI=;
+	s=arc-20240116; t=1707937209; c=relaxed/simple;
+	bh=UjVHdWRKxR1wWlwd6TPzyXgOHZ46hNGBZS4G23VAcsg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PuO/TX/RhZ+N6x2rPJ6av1nq6XSCOKMEI/ZLSuN4Dm1zYrHAEk59Rj3ZQ517Os/EjSSBB7hgiKN56/oDKefhfaB7JjhyrjJEZ2j7QfFOfG92MF+pxVpVYkbPZF6HXXhEnUef8SQ5nPfrVYpGGe8tSwtZ8lWORtPzi9bcRPSxJLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CG61ZVSB; arc=none smtp.client-ip=91.218.175.183
+	 Content-Type:Content-Disposition:In-Reply-To; b=Uk+WSiPAwfkoTo0qzVrzAUCSSCWggVdRtwot0Cmlkw3Fj1A8reckTX1l+xURLEFJoE0nW2JWDlsM5vEOBU2FqWgBoEDVkeIgxbVCV6ey0eikjgqjoQbbrtyZ9MO2MxT8hSLKc96XQ2/vfk5KaYlJyCY9VWjoCDto7RK2vkW6E6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=X/1nET5W; arc=none smtp.client-ip=91.218.175.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CG61ZVSB"
-Date: Wed, 14 Feb 2024 10:40:27 -0800
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="X/1nET5W"
+Date: Wed, 14 Feb 2024 11:00:00 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707936032;
+	t=1707937206;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HteG6wI3EUm2H1LShgPJUXyy8lpsiiNykuq3fjbolTk=;
-	b=CG61ZVSBEE4WGfRWEOIp3h9wA3MZ2YPsnnaOpLGsZ8kAjbIAXomleuP4DeJUj9Rr7/uoSO
-	TeW9FXRK2h8MO7fonOUHoeePgk+/aF1XJHbHot4r3nXY1QpxU4xPyM/2BS81yRm3/JJ6aT
-	nZTs12ZOG2RjAJanbcCbZfvaUEPGAsw=
+	bh=4P041HuvLQ7qtWSEmdckANvsaD0Z2miUICFdYufhm48=;
+	b=X/1nET5WtPtVfcZtVet1QEGDzDL7K064t5P+ZUnZ8xbF7EWyqkGtFsTHy1iBUXEx21LNXr
+	SqhzO+L68HlVXmUP4J6fLej7uI3fLYtv63jfC9iKchwWjhLfOJbDkVRt2A67PT8ZGO5MDB
+	2B37z9Zrxg8evl211A+GeQGjgfQUc2g=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
@@ -33,10 +33,12 @@ Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 00/23] KVM: arm64: Improvements to LPI injection
-Message-ID: <Zc0JG8pNRanuXzvR@linux.dev>
+Subject: Re: [PATCH v2 19/23] KVM: selftests: Add a minimal library for
+ interacting with an ITS
+Message-ID: <Zc0NsFm40nIqTmRf@linux.dev>
 References: <20240213093250.3960069-1-oliver.upton@linux.dev>
- <86y1bn3pse.wl-maz@kernel.org>
+ <20240213094114.3961683-1-oliver.upton@linux.dev>
+ <86zfw33qae.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,45 +47,50 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86y1bn3pse.wl-maz@kernel.org>
+In-Reply-To: <86zfw33qae.wl-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Feb 14, 2024 at 05:43:13PM +0000, Marc Zyngier wrote:
-> On Tue, 13 Feb 2024 09:32:37 +0000,
+On Wed, Feb 14, 2024 at 05:32:25PM +0000, Marc Zyngier wrote:
+> On Tue, 13 Feb 2024 09:41:14 +0000,
 > Oliver Upton <oliver.upton@linux.dev> wrote:
 > > 
-> > For full details on the what/why, please see the cover letter in v1.
+> > A prerequisite of testing LPI injection performance is of course
+> > instantiating an ITS for the guest. Add a small library for creating an
+> > ITS and interacting with it *from userspace*.
 > > 
-> > Apologies for the delay on v2, I wanted to spend some time to get a
-> > microbenchmark in place to slam the ITS code pretty hard, and based on
-> > the results I'm glad I did.
+> > Yep, you read that right. KVM unintentionally allows userspace to send
+> > commands to the virtual ITS via the command queue. Besides adding test
+> > coverage for an elusive UAPI, interacting with the ITS in userspace
+> > simplifies the handling of commands that need to allocate memory, like a
+> > MAPD command with an ITT.
 > 
-> [...]
-> 
-> Buglets and potential improvements aside, I like the smell of this. At
-> least the first handful of patches could easily be taken as a separate
-> improvement series.
-> 
-> Let me know how you'd like to play this.
+> I don't mean to derail the party, but I really think we should plug
+> this hole. Either that, or we make it an official interface for state
+> restore. And don't we all love to have multiple interfaces to do the
+> same thing?
 
-Yeah, I think there's 3 independent series here if we want to take the
-initial improvements:
+Ok, I've thought about it a bit more and I'm fully convinced we need to
+shut the door on this stupidity.
 
- - Address contention around vgic_get_irq() / vgic_put_irq() with the
-   first 10 patches. Appears there is violent agreement these are good
-   to go.
+We expect CREADR == CWRITER at the time userspace saves the ITS
+registers, but we have a *hideous* ordering issue on the restore path.
 
- - Changing out the translation cache into a per-ITS xarray
+If the order of restore from userspace is CBASER, CWRITER, CREADR then
+we **wind up replaying the entire command queue**. While insane, I'm
+pretty sure it is legal for the guest to write garbage after the read
+pointer has moved past a particular command index.
 
- - A final series cleaning up a lot of the warts we have in LPI
-   management, like vgic_copy_lpi_list(). I believe we can get rid of
-   the lpi_list_lock as well, but this needs to be ordered after the
-   first 2.
+Fsck!!!
 
-I'd really like to de-risk the performance changes from the cleanups, as
-I'm convinced they're going to have their own respective piles of bugs.
+So, how about we do this:
 
-How does that sound?
+ - Provide a uaccess hook for CWRITER that changes the write-pointer
+   without processing any commands
+
+ - Assert an invariant that at any time CWRITER or CREADR are read from
+   userspace that CREADR == CWRITER. Fail the ioctl and scream if that
+   isn't the case, so that way we never need to worry about processing
+   'in-flight' commands at the destination.
 
 -- 
 Thanks,
