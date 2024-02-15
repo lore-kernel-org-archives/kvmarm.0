@@ -1,158 +1,110 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E941028E6
-	for <kvmarm@lists.linux.dev>; Thu, 15 Feb 2024 05:29:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D06A482C7;
+	Thu, 15 Feb 2024 09:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707974986; cv=none; b=Jx38/+TpmmEnTXaJRzkgxkDsyNM3qFFE4/bSnPL0zy7CQwGdCXfkks9DRYmmHhbBLv8vSjILdJaujPHgp2/odTiOYRb3k6iS1J1CxYpQhXAlQnqQQHa/PnKuMEkq0Kt3dXhOw808EOJm9hu+HcurjH1RXDUoldcIIbOfVEBZQIo=
+	t=1707990250; cv=none; b=g8KYUglBytp92XU+cyOSyOin0BlaDVNZvOAK72uM4MISZjspp1v3vpbtNppsELbfHkTColPenhsETC4nlCqooZ4qXwLPz+K907vYS7g8yjrn6J84bGsglIBru6wgR6pRIGPL8v6UQ+txKgD9A3w9cMdZXnlpmOXbILb/uJyQX3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707974986; c=relaxed/simple;
-	bh=uxfb1c2RaLDUFG8vm19/j7Iy8u7uEX3/DuKkwKNBZ4M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Uh+W7obFYsOQT7YMzo216yoUB9l3EAocQniEHCcSASbxSoeFIAPTrgwYf5WFSBGqDNOQSV7ZNR5nMzPXRKa7c3sHfe+n2aoxwVh6IbG2fY+gqDllqfCfR4NAJ3wuOc8xJ4RoACwMfdyH17CvBmNvYUZdnEp6J+7HCPi0dUk5rUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JMvt0zE8; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1707990250; c=relaxed/simple;
+	bh=NWspp6vFhXCaH1t40eZE2OkjP7lfHkq9fLzAHD5BjZc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gwX4Y8lXTolsRzi+UKCq/ZB47M2XwiJOWa6rDceAQBzv701oqfuV1YkZJUg1dF/qpBaHeEbGgeI13xCoab0CKbQHPQmPGNEjrFyIdJjK2aCCK7v6Ad4J1vf6u/zJCALXTKt2E5enUcmDK95tqKLfm0qLklJa1/f5hDFKzW4Z1RE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ho3gUMdC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JMvt0zE8"
-Date: Thu, 15 Feb 2024 14:29:28 +0900
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707974980;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DJo0Z4lBIwPC8cwQYpRIOozyv+hDmIUKGggHbYocrU8=;
-	b=JMvt0zE8GQid/p0MkbZRVsrGi+W1t/zzYgVElcer9c55Q/gCxwMPmPwlihKR9pJE5PDW6a
-	3TReNnyec55HT7lqFR8vxrbuXYbBEtah7kNXvaRJcOH5q6IAqYdGrmnRZNi1baOoo8DGHb
-	bAuguauFjnb5bxQGCxF8X/D8yC0/wLM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Itaru Kitayama <itaru.kitayama@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Vishal Annapurve <vannapurve@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Peter Gonda <pgonda@google.com>
-Subject: Re: [PATCH v8 05/10] KVM: selftests: Add support for protected
- vm_vaddr_* allocations
-Message-ID: <Zc2hOL1y+GIMaMux@vm3>
-References: <20240203000917.376631-1-seanjc@google.com>
- <20240203000917.376631-6-seanjc@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ho3gUMdC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74155C433F1;
+	Thu, 15 Feb 2024 09:44:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707990249;
+	bh=NWspp6vFhXCaH1t40eZE2OkjP7lfHkq9fLzAHD5BjZc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ho3gUMdC01T2IXbfggxAQMxOzxsSXLUKmRlBBcT3ak83XcVCjGhzMn7/YyKQcKKBz
+	 w3SmhRGG9h1p9y4v+1MvS9fXDSw3AvGfr3/DWNvMOKOoMtcJ4QxzQMa6BKzKL/n5hM
+	 VsXGXQLLFkK98cJgJu3BpdR5EIE+kwpu2/a4yih8aYhiC6c9BW4o2mIKlFwU86TiVc
+	 yvUnkwPhw9Yp5WPiqX56/ttlTufO+XbGPCQZfUaZxSh4u8NY1Lsf8nZpzM26c8VmGr
+	 jJP04Jk/NvqpZRaOFeqQ19Dhxqe5S6SZGm+o9i4+kwptkfBuvWO1CRM0H37ndL6jSQ
+	 x5IHJTVn7nfOA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1raYHn-003Qt3-48;
+	Thu, 15 Feb 2024 09:44:07 +0000
+Date: Thu, 15 Feb 2024 09:44:06 +0000
+Message-ID: <86sf1u3vvd.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 07/23] KVM: arm64: vgic: Use atomics to count LPIs
+In-Reply-To: <Zc1GMFjvy_f1KsXr@linux.dev>
+References: <20240213093250.3960069-1-oliver.upton@linux.dev>
+	<20240213093250.3960069-8-oliver.upton@linux.dev>
+	<861q9f56x6.wl-maz@kernel.org>
+	<Zc0HIorNZG9KG5Mg@linux.dev>
+	<86wmr64xyo.wl-maz@kernel.org>
+	<Zc1GMFjvy_f1KsXr@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240203000917.376631-6-seanjc@google.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Feb 02, 2024 at 04:09:11PM -0800, Sean Christopherson wrote:
-> From: Michael Roth <michael.roth@amd.com>
+On Wed, 14 Feb 2024 23:01:04 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Test programs may wish to allocate shared vaddrs for things like
-> sharing memory with the guest. Since protected vms will have their
-> memory encrypted by default an interface is needed to explicitly
-> request shared pages.
+> On Wed, Feb 14, 2024 at 08:01:19PM +0000, Marc Zyngier wrote:
+> > > > Of course, we only have 3 marks, so that's a bit restrictive from a
+> > > > concurrency perspective, but since most callers hold a lock, it should
+> > > > be OK.
+> > > 
+> > > They all hold *a* lock, but maybe not the same one! :)
+> > 
+> > Indeed. But as long as there isn't more than 3 locks (and that the
+> > xarray is OK being concurrently updated with marks), we're good!
 > 
-> Implement this by splitting the common code out from vm_vaddr_alloc()
-> and introducing a new vm_vaddr_alloc_shared().
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Vishal Annapurve <vannapurve@google.com>
-> Cc: Ackerly Tng <ackerleytng@google.com>
-> cc: Andrew Jones <andrew.jones@linux.dev>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Peter Gonda <pgonda@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  .../selftests/kvm/include/kvm_util_base.h     |  3 +++
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 26 +++++++++++++++----
->  2 files changed, 24 insertions(+), 5 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> index a82149305349..cb3159af6db3 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -590,6 +590,9 @@ vm_vaddr_t vm_vaddr_unused_gap(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_mi
->  vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
->  vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
->  			    enum kvm_mem_region_type type);
-> +vm_vaddr_t vm_vaddr_alloc_shared(struct kvm_vm *vm, size_t sz,
-> +				 vm_vaddr_t vaddr_min,
-> +				 enum kvm_mem_region_type type);
->  vm_vaddr_t vm_vaddr_alloc_pages(struct kvm_vm *vm, int nr_pages);
->  vm_vaddr_t __vm_vaddr_alloc_page(struct kvm_vm *vm,
->  				 enum kvm_mem_region_type type);
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index ea677aa019ef..e7f4f84f2e68 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -1431,15 +1431,17 @@ vm_vaddr_t vm_vaddr_unused_gap(struct kvm_vm *vm, size_t sz,
->  	return pgidx_start * vm->page_size;
->  }
->  
-> -vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
-> -			    enum kvm_mem_region_type type)
-> +static vm_vaddr_t ____vm_vaddr_alloc(struct kvm_vm *vm, size_t sz,
-> +				     vm_vaddr_t vaddr_min,
-> +				     enum kvm_mem_region_type type,
-> +				     bool protected)
->  {
->  	uint64_t pages = (sz >> vm->page_shift) + ((sz % vm->page_size) != 0);
->  
->  	virt_pgd_alloc(vm);
-> -	vm_paddr_t paddr = vm_phy_pages_alloc(vm, pages,
-> -					      KVM_UTIL_MIN_PFN * vm->page_size,
-> -					      vm->memslots[type]);
-> +	vm_paddr_t paddr = __vm_phy_pages_alloc(vm, pages,
-> +						KVM_UTIL_MIN_PFN * vm->page_size,
-> +						vm->memslots[type], protected);
->  
->  	/*
->  	 * Find an unused range of virtual page addresses of at least
-> @@ -1459,6 +1461,20 @@ vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
->  	return vaddr_start;
->  }
->  
-> +vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
-> +			    enum kvm_mem_region_type type)
-> +{
-> +	return ____vm_vaddr_alloc(vm, sz, vaddr_min, type,
-> +				  vm_arch_has_protected_memory(vm));
-> +}
-> +
-> +vm_vaddr_t vm_vaddr_alloc_shared(struct kvm_vm *vm, size_t sz,
-> +				 vm_vaddr_t vaddr_min,
-> +				 enum kvm_mem_region_type type)
-> +{
-> +	return ____vm_vaddr_alloc(vm, sz, vaddr_min, type, false);
-> +}
-> +
->  /*
->   * VM Virtual Address Allocate
->   *
-Reviewied-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+> Oh, you mean to give each existing caller their own mark?
 
-> -- 
-> 2.43.0.594.gd9cf4e227d-goog
+Well, each caller "class". Where "class" means "holding look
+'foo'". Same lock, same mark. With a maximum of 3 (and I think we can
+get away with 2).
+
+> > > Maybe we should serialize the use of markers on the LPI list on the
+> > > config_lock. A slight misuse, but we need a mutex since we're poking at
+> > > guest memory. Then we can go through the whole N-dimensional locking
+> > > puzzle and convince ourselves it is still correct.
+> > 
+> > Maybe. This thing is already seeing so many abuses that one more may
+> > not matter much. Need to see how it fits in the whole hierarchy of
+> > GIC-related locks...
 > 
+> It doesn't work. We have it that the config_lock needs to be taken
+> outside the its_lock.
+> 
+> Too many damn locks!
+
+Well, the joys of emulating highly complex HW with a braindead
+programming interface. I'd explore the above suggestion to avoid
+introducing a new lock, if at all possible.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
