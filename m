@@ -1,55 +1,55 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB5B3146004
-	for <kvmarm@lists.linux.dev>; Thu, 15 Feb 2024 23:54:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175E314601B
+	for <kvmarm@lists.linux.dev>; Thu, 15 Feb 2024 23:54:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708041257; cv=none; b=BYVK2JCfLRfc9JjGvo939Wph+x700pj3pxcdkvT44Nod4wQ+wop8iXEkufiI3aPjiq41GLAorjhWje7++d4vLTka+tl3H1GWE4mmAeRUFT4J0+CclHpnIVTqFQA4jPObQcDsRF279GrhQkf3/tT1TrrN9pfx1muBRGc7V+oUsAw=
+	t=1708041258; cv=none; b=pL+BMTRT7iPojLDJANYn69JGT0lhMfjvaeVOdd6l/HxJ0IKy2Le0hdM2we3J8qSzXUikqVhIoVB/YJGAnIxfoEyhCkmt0n0Lq3uwBkPluW3Cb+VGbHZ5qCa0PF2BoYguxBNMmeuefpA4W1p/5m7QSE1+GLLyDuosikateLBrKDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708041257; c=relaxed/simple;
-	bh=r2pWpzfAVdKs83bkb8yysRyBcLlfdbbrpFtdK+fTshk=;
+	s=arc-20240116; t=1708041258; c=relaxed/simple;
+	bh=Cgdei//BJ4TfS7THt3BBXytD0NBWfYjOmDteYlMCj40=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=C8elLeEsO9oEFqAkUPihMojC7ReOPOX28lg/p/Y2Yi3GadUfjEc79m6PBjuRkjPtEKdjPz4DTQHdoYtpoJpMWfuOS6QZotS64VTJHKbi7F5v4NjhgQgR7haB3RwEKR4jfIEqNX0C/mj4vKSf6Mc79iU4/ITQE3xokwnCD/fkYLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fxj4+wAk; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=gdd+ARoK4NQ/WrEArkByNCHZ2IquyBiA5x8GVOeO7xQovHOv+MDbiGKI3r0ywPVrp8ai9oor6VybPoWfPAjbndbbnSIHwJheVsn3OG4fGdJ3eu1IvO+WslswZ8OYFzgXTliAqv/DBOG32Dk/E9RJF8bhW/+iiq5/SXDd48LpSwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ONCJ69d5; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fxj4+wAk"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-607cef709dcso23359157b3.1
-        for <kvmarm@lists.linux.dev>; Thu, 15 Feb 2024 15:54:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ONCJ69d5"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dccc49ef73eso255458276.2
+        for <kvmarm@lists.linux.dev>; Thu, 15 Feb 2024 15:54:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708041255; x=1708646055; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1708041256; x=1708646056; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eziXXvGnuzc3MNfe8KeDVfyFrpM4nmh4XdH42oDvVIQ=;
-        b=Fxj4+wAkFUnuQ3m7ZlrQSP+w6ELn+o1cv1/HfIKMBK1jL/OWBD5tLRCQneGCyX1HGD
-         lNcCENv9FvaEQwyG5UbnkpMGL8GlP1Sxfg6VJwYx47K81ppbas6jmbnCwnJxxP8oBgpK
-         w1AgxHNSkCAC5k+uOFr9EW05Ge9ayHPiA8LjeR6A9mf92yBYF74N2KmqXdnaL8/CS3bq
-         HEMtJvcBoh35f4mKwl1TNp8JxFI+GwxKp6tppX99mifxju3xr7hM7KBMz1pGMLLAeA3P
-         MxOCxvXlm81TN2b27ej4YsRDIe7l8pSZptSytuYlIZtzZ2qixo8dtMZ8khfKCfG2LA+7
-         8fjA==
+        bh=1/E37B8pEtQeUXPVkKOjh16ZsPiNTw6lyoy6KXMrnX4=;
+        b=ONCJ69d5Fgu+jNDT7u50EXC8knDES9CigmRGn5NSFGMmv1mtdMC7p6bH4J2j+LiBny
+         7ID1USL9jJVQr2Ph8sidJEeqbNB+sD6lcJbf1xu17gA4R+Vt/ubL+rld38evrXGYURPH
+         BVDFaArOBT7Vk5JQ6Yh+Du/MpaIm1kZ1Tl8bW4Yv/cv6MNofHnEOPkMc8WNIxHYHFPoW
+         j4eWEQi5qWxdr8FZP3LLlFCmC0Za/uSymdELopUGUewkUwPbzqlsAEIDZYIU0Iwy7TmE
+         zPDD5d2EsS8mGS0HwnDFPTUy8zxB6q7hQvLa+2kTVK8zU6p1FnONKfn86qlvsBxhTVtS
+         IusQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708041255; x=1708646055;
+        d=1e100.net; s=20230601; t=1708041256; x=1708646056;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eziXXvGnuzc3MNfe8KeDVfyFrpM4nmh4XdH42oDvVIQ=;
-        b=Yh9Cfk3LClQ1gfoeY0FhBvOQNLfs4QtzveftrhVuLXcQvg1SlTXgeSMKoa5wb2KlTw
-         8a4HfDmAORj2K6tEt/c5d7K+6lnGnCQNSvMg2rQ6+GJqAMUO5WUPlbyyZLGMPU73RDyo
-         Tk0IZo+4J+JD0jC4Gxja5yhd2HTuX9ovYA7KzUEJconlM2zG9/3NUerccRP8VWpx6eit
-         3dqQMThRmePgsCS9hhbuDdCkCECppy36xXjpMNlt4008r8K/N5etjyKq24UWrjICr5GN
-         2pDGupNs+v0PzEZUeDdGvUUfjndPXW9gdH7UlbyneGfNWvP18sDxZtp9WcpSHCvmdRp5
-         1eOA==
-X-Forwarded-Encrypted: i=1; AJvYcCV93C9IZFOAXy1vzbjAw5s9WGkAAHDc0/7IaY87nAcqUZMB9rePJqTTA/tUnYkakpNrqydKWx41z4HUfQatCq0FG7cwcPrj
-X-Gm-Message-State: AOJu0Yzz7I0U+CWLRoMT9p0CPmLQtMPv398R7rYna52Zh7qzVF+xDwjM
-	JCWuUrSSHtHAEyFVVYu7hezFw9lkvNUNdvNLKDd4dmgC7MXgiD9soeMUD6FObxyqbkkqiXpc8TM
-	C+Nt1i/upPQ==
-X-Google-Smtp-Source: AGHT+IFww/v3CM+5seP7lyS6W1rnjeJciBbkYTG1sl3efm7OgTZ/7wSq8CJehcHQjIKBWPkZH378Co78DdrMgg==
+        bh=1/E37B8pEtQeUXPVkKOjh16ZsPiNTw6lyoy6KXMrnX4=;
+        b=wIgU981HL6UgbXc3eG4zHIfAhqQfLKWqWeTKBEn8TDzOXuNXM5ejbeX2zLNtekp5jO
+         DJIqnz7BrIy784xGHyM+/kjZmYUyn6wfYJa9OPJtS9i8ScHtMxK760Sv4bD98RFChOUm
+         iyup1D7Sltwg6lQPeLDi4kP1n//NpXYEMEU+vGevnsCEklgscoPIyhasr/jFvm7/RdDI
+         +jni0Q+3KOupjSGf1rN8zufnO7F+AShJmUS4LEdV1zNzcLiORoK/SHKjy1R8efLF4mcD
+         D43W+uRTGWxZHGNCtDNs+0R91fEzxnBYfEOWpP1eYb7WXBGKJ3HvALedSvFTQCdrVNAK
+         rjBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVhZYIlEB1IjFu5S9dbcUsuW+5ADpcGsmo/EeveQ2D82B9Sgjj2ORKi5paEnRFjSxkhzFwG53nz/NJRsuhB7iyAkqo0TVXU
+X-Gm-Message-State: AOJu0YxurOOZSp78BWHPXdd526C3UTDLwNIx4bdrbNr7PX/qtcBhCToT
+	+ST6EsSn9i4CHv12EmO9tZxYbLu6cs/JqwJ0J5xmA82/6mBY8CeGrpeR2wSHDJSgHjsDJb2G7wA
+	lu7l2IuzgnA==
+X-Google-Smtp-Source: AGHT+IHedA2uvd08JONpyjwItnwJE43l4fF1/9gQHix0D/EhvKZ7QtfHgjYc9NTkUnT48me3Qd8VZVAkzw6WqA==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a05:6902:705:b0:dc7:53a0:83ad with SMTP
- id k5-20020a056902070500b00dc753a083admr787010ybt.5.1708041255003; Thu, 15
- Feb 2024 15:54:15 -0800 (PST)
-Date: Thu, 15 Feb 2024 23:53:55 +0000
+ (user=amoorthy job=sendgmr) by 2002:a25:ad8e:0:b0:dc7:63e7:7a5c with SMTP id
+ z14-20020a25ad8e000000b00dc763e77a5cmr197747ybi.11.1708041256253; Thu, 15 Feb
+ 2024 15:54:16 -0800 (PST)
+Date: Thu, 15 Feb 2024 23:53:56 +0000
 In-Reply-To: <20240215235405.368539-1-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240215235405.368539-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
-Message-ID: <20240215235405.368539-5-amoorthy@google.com>
-Subject: [PATCH v7 04/14] KVM: Simplify error handling in __gfn_to_pfn_memslot()
+Message-ID: <20240215235405.368539-6-amoorthy@google.com>
+Subject: [PATCH v7 05/14] KVM: Define and communicate KVM_EXIT_MEMORY_FAULT
+ RWX flags to userspace
 From: Anish Moorthy <amoorthy@google.com>
 To: seanjc@google.com, oliver.upton@linux.dev, maz@kernel.org, 
 	kvm@vger.kernel.org, kvmarm@lists.linux.dev
@@ -69,39 +70,77 @@ Cc: robert.hoo.linux@gmail.com, jthoughton@google.com, amoorthy@google.com,
 	nadav.amit@gmail.com, isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
 Content-Type: text/plain; charset="UTF-8"
 
-KVM_HVA_ERR_RO_BAD satisfies kvm_is_error_hva(), so there's no need to
-duplicate the "if (writable)" block. Fix this by bringing all
-kvm_is_error_hva() cases under one conditional.
+kvm_prepare_memory_fault_exit() already takes parameters describing the
+RWX-ness of the relevant access but doesn't actually do anything with
+them. Define and use the flags necessary to pass this information on to
+userspace.
 
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- virt/kvm/kvm_main.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ Documentation/virt/kvm/api.rst | 5 +++++
+ include/linux/kvm_host.h       | 9 ++++++++-
+ include/uapi/linux/kvm.h       | 3 +++
+ 3 files changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 7186d301d617..67ca580a18c5 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3031,15 +3031,13 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
- 	if (hva)
- 		*hva = addr;
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 8f75fca2294e..9f5d45c49e36 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6964,6 +6964,9 @@ spec refer, https://github.com/riscv/riscv-sbi-doc.
  
--	if (addr == KVM_HVA_ERR_RO_BAD) {
--		if (writable)
--			*writable = false;
--		return KVM_PFN_ERR_RO_FAULT;
--	}
--
- 	if (kvm_is_error_hva(addr)) {
- 		if (writable)
- 			*writable = false;
-+
-+		if (addr == KVM_HVA_ERR_RO_BAD)
-+			return KVM_PFN_ERR_RO_FAULT;
-+
- 		return KVM_PFN_NOSLOT;
- 	}
+ 		/* KVM_EXIT_MEMORY_FAULT */
+ 		struct {
++  #define KVM_MEMORY_EXIT_FLAG_READ     (1ULL << 0)
++  #define KVM_MEMORY_EXIT_FLAG_WRITE    (1ULL << 1)
++  #define KVM_MEMORY_EXIT_FLAG_EXEC     (1ULL << 2)
+   #define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1ULL << 3)
+ 			__u64 flags;
+ 			__u64 gpa;
+@@ -6975,6 +6978,8 @@ could not be resolved by KVM.  The 'gpa' and 'size' (in bytes) describe the
+ guest physical address range [gpa, gpa + size) of the fault.  The 'flags' field
+ describes properties of the faulting access that are likely pertinent:
  
++ - KVM_MEMORY_EXIT_FLAG_READ/WRITE/EXEC - When set, indicates that the memory
++   fault occurred on a read/write/exec access respectively.
+  - KVM_MEMORY_EXIT_FLAG_PRIVATE - When set, indicates the memory fault occurred
+    on a private memory access.  When clear, indicates the fault occurred on a
+    shared access.
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 7e7fd25b09b3..32cbe5c3a9d1 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -2343,8 +2343,15 @@ static inline void kvm_prepare_memory_fault_exit(struct kvm_vcpu *vcpu,
+ 	vcpu->run->memory_fault.gpa = gpa;
+ 	vcpu->run->memory_fault.size = size;
+ 
+-	/* RWX flags are not (yet) defined or communicated to userspace. */
+ 	vcpu->run->memory_fault.flags = 0;
++
++	if (is_write)
++		vcpu->run->memory_fault.flags |= KVM_MEMORY_EXIT_FLAG_WRITE;
++	else if (is_exec)
++		vcpu->run->memory_fault.flags |= KVM_MEMORY_EXIT_FLAG_EXEC;
++	else
++		vcpu->run->memory_fault.flags |= KVM_MEMORY_EXIT_FLAG_READ;
++
+ 	if (is_private)
+ 		vcpu->run->memory_fault.flags |= KVM_MEMORY_EXIT_FLAG_PRIVATE;
+ }
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 2190adbe3002..36a51b162a71 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -428,6 +428,9 @@ struct kvm_run {
+ 		} notify;
+ 		/* KVM_EXIT_MEMORY_FAULT */
+ 		struct {
++#define KVM_MEMORY_EXIT_FLAG_READ       (1ULL << 0)
++#define KVM_MEMORY_EXIT_FLAG_WRITE      (1ULL << 1)
++#define KVM_MEMORY_EXIT_FLAG_EXEC       (1ULL << 2)
+ #define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1ULL << 3)
+ 			__u64 flags;
+ 			__u64 gpa;
 -- 
 2.44.0.rc0.258.g7320e95886-goog
 
