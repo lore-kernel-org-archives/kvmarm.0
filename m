@@ -1,55 +1,55 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9AC414691B
-	for <kvmarm@lists.linux.dev>; Thu, 15 Feb 2024 23:54:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC441474A6
+	for <kvmarm@lists.linux.dev>; Thu, 15 Feb 2024 23:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708041263; cv=none; b=RDLEyl5FpQkNEgsq9Xo8r+MCut7vxKvohaLTk5ZLPYrcBZV4hKmX2hVnv7O47e6jEKdmDhrFf7byGiDkDhzP5R/h3YM9B27GSDZgYjNbtFh/mipCn4Sz7x8+IAHdWw5NttCtRDkD7cFTafKF+Qv7VqIYTf9PsH/tUjAj0xHWMZk=
+	t=1708041265; cv=none; b=IcgBmYByhQW5gHRJrNjk3mkqw++0+rrr7vJjZ0NrMAzsqEILX8XoqnuRXP3/8Zu/TBVcxG6IsP6valNMHB6e7XY3CxXcmXDweM+fM6DVDczxYMl0+ogmSL8MSYihKWPp6q5ZBShMw6H4q/0PBp6nFZM6GRPVHKlK5FzGQcFr1fI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708041263; c=relaxed/simple;
-	bh=YToCq6YE1hZ8sueGTK5tm1JNAU/Na0mmX/7tgTx5B8w=;
+	s=arc-20240116; t=1708041265; c=relaxed/simple;
+	bh=LU+P22WMx8+l0j28eDp7TZSAb4K8ddezaIfE2HB5OjY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fo2XCJibeBJm1G6x0kfQFBTqTH/3d+BneEtUKuevszcHTjRmxc7m9IU9HDXbEB7Cadebq1U3fuz12p2tJG8wEIQiP9FqgUe+yvQDZsto8y29Je606v1alc6Q+wjvaNickocKcpcSMB0PJNCXHdL2bG0Za5w5DEHRab2xrUiZw84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OKDDBZRv; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=r6kZk7uWii4hTt8CAVF2GC09dBi2uDXgP3RypOKJPpgDMSIhq+U456p8tO4J4X4zBbtKeXoEAJf7uft9+B2PRUV2RzUsK0GDrNsRLdtTMT3MiiKgzSc8IK2Ck/y14lEI+U579pTEuQXhGhwfBvkAKW78D1DGo4hCQ7bcLs3ER6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xfi3g6I+; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OKDDBZRv"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6b269686aso2204299276.1
-        for <kvmarm@lists.linux.dev>; Thu, 15 Feb 2024 15:54:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xfi3g6I+"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-607c9677a91so27162967b3.2
+        for <kvmarm@lists.linux.dev>; Thu, 15 Feb 2024 15:54:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708041261; x=1708646061; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1708041262; x=1708646062; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=a2S+MA0gE/d7KfEW/MnTZniPFqQuhRYWD821pFFz3JE=;
-        b=OKDDBZRvdSW/y6CmT2/+YmcZiD5KvxRtQ+5GKeGWfUbwyUOEAQB4Iy1F7cs8k3JIW6
-         sIH8hQaFfakGR4cKByhsA2HvjyIw8JvO36XL+oJOyW1FtEn3Irmh4a7YafhtIf9i2oJe
-         4bH6JEcdV4wV+uld78fBLCZTAwTaPUK/cDUCDv+KEuXTcoD4eVv/Pwm1JbJuvCgS7hyk
-         Fm8qD1fUmYzBelVuHnukUOM5GMLufc35mBisSZzkBvL2u4T4WpIMcMY8tCFMPirCfZ6F
-         CYVeDN907BjHC9XhTdqjZHXbHUsWJIIe2NCwIwP9yottNO+L9NbU+3tNdWcmvQA1itfW
-         3Opw==
+        bh=wxgMpdjPiqAl5L5CrBln707OMjyjZ2YsrvRZmT9MQFg=;
+        b=Xfi3g6I+knyKIA7x2PvZStbh1ObnBzO2pG1czKemJKnG9dUtVVKhL6GYA870ZRXmPX
+         KcDTybskny65BJcTs39Gp06gukQ9VbJ3dqgIEnLTBnGEMINDKd5oA6V85wUTWMoljecl
+         o1ngSi3h+SmLvsJmbL7FNyEf1M0TjVt8h/B1eYHjfHinyge1m+00zh9EZ9n31MRt5MS0
+         /iGE0he3zKd9/oJSZ7sc5xWgoBZX95+kiBsK5IbOkSosA+ZuiZJPW4ZUzhZLJtcpLn/I
+         qZuJESEMBP6P1l7C8Eey0PEsQTNzaI/6BzlEG2LIytbztghVoJJianF86iRCgxlFwg/5
+         7vQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708041261; x=1708646061;
+        d=1e100.net; s=20230601; t=1708041262; x=1708646062;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a2S+MA0gE/d7KfEW/MnTZniPFqQuhRYWD821pFFz3JE=;
-        b=R/9PaKnqeWF19DIOweCwRE/ZJBxAErMeJ7hxbrf901Fau0KTE3KDA7oHIQwGLRJhGv
-         y818G3tiXude0hCyGraE5Pid77b3HoQowseOOEA9HfPAEQqWQPvI115eOYKcPl/ry4gN
-         tWwvsH06aTxO8jkDdpxAY4s6dmhtvnStUn4vdTtRNiphqGFpkc2xQxzKaV02NUI77+Jv
-         Iq79Uk74l/n9WV81G3AdySeLN1QRtzlAnDIowvacHtRKL3YBiZ65T27f43Z1RyPS+Vq3
-         +QHZHChL+BU1okrS/KzdCRn0yscycOPvSX9AqpCFgYxQqIy+2xYXhJy7p/OYC+I/ge4p
-         PuIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXKntXd44IKXglQcNP7UEBm/SGLEF5DY6Cu3fe8PC053+1ZYL1JbydWTJKxWzLLqQ6B/fCd3+QJh/J3EE7eOKni37xR99Kf
-X-Gm-Message-State: AOJu0YwacjvatsuKWPvCikMRc/sj9pZG+AAv6vRRVwAtiPGGeu86Scd5
-	j/8d5Tlc5XT8ToS9gg/fVC6GlDmc7bBDp2HvGv+WPIDwvx32adbguJdRN5FRYp5VO81SweVkYRK
-	zIPbO/txDxA==
-X-Google-Smtp-Source: AGHT+IGz7VwdL3z2Ro5FaEmODCGgndNM7ib0sMxb1cnlGqMmU2k8rLAE706Rj6Rrb94BZLFTt+/xxEEKwv9eHA==
+        bh=wxgMpdjPiqAl5L5CrBln707OMjyjZ2YsrvRZmT9MQFg=;
+        b=TJTjoE4KtYr5QMcNb3OuyfU3AOAbjje8XdpO6g/U01JY+qZBO0YxldXFXz0hGy6OmN
+         mxR4aFvyfk5usKto8xQD0H825aIbzNPNaehfFDSs0A9EQMkXEyrnbSIIuR6C0xQrFgjn
+         gndFj4EOeSdiSaFIDjD/MMLhmLbggEvpXgk5znzSOSV1w+bvj/y+jGl4+Ufa3XBOuBT1
+         17i4MHPkF0VmcZGiuPidKiK02CRyl8SsdUUEQzzwpuA8w4CumHc6u58fS7BzYdyUJIaN
+         67xIuZQXZOQTSzXU2LmHibgF/sgqtGEO4B3npzDaYvkZvSQwe0kT7fQWR6q8p78loYQq
+         FTCg==
+X-Forwarded-Encrypted: i=1; AJvYcCXDssmHcpabohYmUAQx8aRKuDRUsA2FTff6XkOT1yIJv4YvFQTfIzrZBgVxJZlYFWjJjGGh/sUI6/Rl4wdesB468Lkw5vHW
+X-Gm-Message-State: AOJu0YzxbQrzvqqmc7zhyrus+sEMKdYThgnJ2Us/E+0YrTiAxRKFiCkh
+	4doy1y1vPdGR/B7Uk5AmMW/Qt/OfMoKiLtchYQ5VB0zgHLXhZ0o7ZGsSm0404AF1u+AdRstk/om
+	EitT3PwfN5A==
+X-Google-Smtp-Source: AGHT+IGxwZE2D4TMTbojQuxIQsdHxi4CLt7P+BDw6owECL4gA7IpetyfAOdk5HtQUv5KTlzPChmWvxiHs6Ovkg==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a05:6902:110a:b0:dcb:fb69:eadc with SMTP
- id o10-20020a056902110a00b00dcbfb69eadcmr129670ybu.6.1708041260877; Thu, 15
- Feb 2024 15:54:20 -0800 (PST)
-Date: Thu, 15 Feb 2024 23:54:00 +0000
+ (user=amoorthy job=sendgmr) by 2002:a81:4c04:0:b0:607:cd22:1f32 with SMTP id
+ z4-20020a814c04000000b00607cd221f32mr774161ywa.0.1708041261933; Thu, 15 Feb
+ 2024 15:54:21 -0800 (PST)
+Date: Thu, 15 Feb 2024 23:54:01 +0000
 In-Reply-To: <20240215235405.368539-1-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240215235405.368539-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
-Message-ID: <20240215235405.368539-10-amoorthy@google.com>
-Subject: [PATCH v7 09/14] KVM: arm64: Implement and advertise KVM_CAP_EXIT_ON_MISSING
+Message-ID: <20240215235405.368539-11-amoorthy@google.com>
+Subject: [PATCH v7 10/14] KVM: selftests: Report per-vcpu demand paging rate
+ from demand paging test
 From: Anish Moorthy <amoorthy@google.com>
 To: seanjc@google.com, oliver.upton@linux.dev, maz@kernel.org, 
 	kvm@vger.kernel.org, kvmarm@lists.linux.dev
@@ -69,61 +70,51 @@ Cc: robert.hoo.linux@gmail.com, jthoughton@google.com, amoorthy@google.com,
 	nadav.amit@gmail.com, isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
 Content-Type: text/plain; charset="UTF-8"
 
-Prevent the stage-2 fault handler from faulting in pages when
-KVM_MEM_EXIT_ON_MISSING is set by allowing its  __gfn_to_pfn_memslot()
-call to check the memslot flag. This effects the delivery of stage-2
-faults as vCPU exits (see KVM_CAP_MEMORY_FAULT_INFO), which userspace
-can attempt to resolve without terminating the guest.
-
-Delivering stage-2 faults to userspace in this way sidesteps the
-significant scalabiliy issues associated with using userfaultfd for the
-same purpose.
+Using the overall demand paging rate to measure performance can be
+slightly misleading when vCPU accesses are not overlapped. Adding more
+vCPUs will (usually) increase the overall demand paging rate even
+if performance remains constant or even degrades on a per-vcpu basis. As
+such, it makes sense to report both the total and per-vcpu paging rates.
 
 Signed-off-by: Anish Moorthy <amoorthy@google.com>
 ---
- Documentation/virt/kvm/api.rst | 2 +-
- arch/arm64/kvm/Kconfig         | 1 +
- arch/arm64/kvm/mmu.c           | 2 +-
- 3 files changed, 3 insertions(+), 2 deletions(-)
+ tools/testing/selftests/kvm/demand_paging_test.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 7012f40332b3..01b762272b6f 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8052,7 +8052,7 @@ See KVM_EXIT_MEMORY_FAULT for more information.
- 7.35 KVM_CAP_EXIT_ON_MISSING
- ----------------------------
+diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+index 09c116a82a84..6dc823fa933a 100644
+--- a/tools/testing/selftests/kvm/demand_paging_test.c
++++ b/tools/testing/selftests/kvm/demand_paging_test.c
+@@ -135,6 +135,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	struct timespec ts_diff;
+ 	struct kvm_vm *vm;
+ 	int i;
++	double vcpu_paging_rate;
  
--:Architectures: x86
-+:Architectures: x86, arm64
- :Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
+ 	vm = memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1,
+ 				 p->src_type, p->partition_vcpu_memory_access);
+@@ -191,11 +192,17 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 			uffd_stop_demand_paging(uffd_descs[i]);
+ 	}
  
- The presence of this capability indicates that userspace may set the
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 01398d2996c7..309d8e7ebc1c 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -39,6 +39,7 @@ menuconfig KVM
- 	select SCHED_INFO
- 	select GUEST_PERF_EVENTS if PERF_EVENTS
- 	select XARRAY_MULTI
-+        select HAVE_KVM_EXIT_ON_MISSING
- 	help
- 	  Support hosting virtualized guest machines.
+-	pr_info("Total guest execution time: %ld.%.9lds\n",
++	pr_info("Total guest execution time:\t%ld.%.9lds\n",
+ 		ts_diff.tv_sec, ts_diff.tv_nsec);
+-	pr_info("Overall demand paging rate: %f pgs/sec\n",
+-		memstress_args.vcpu_args[0].pages * nr_vcpus /
+-		((double)ts_diff.tv_sec + (double)ts_diff.tv_nsec / NSEC_PER_SEC));
++
++	vcpu_paging_rate =
++		memstress_args.vcpu_args[0].pages
++		/ ((double)ts_diff.tv_sec
++			+ (double)ts_diff.tv_nsec / NSEC_PER_SEC);
++	pr_info("Per-vcpu demand paging rate:\t%f pgs/sec/vcpu\n",
++		vcpu_paging_rate);
++	pr_info("Overall demand paging rate:\t%f pgs/sec\n",
++		vcpu_paging_rate * nr_vcpus);
  
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 5b740ddfcc8e..b0f1fef0a52c 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1487,7 +1487,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	mmap_read_unlock(current->mm);
+ 	memstress_destroy_vm(vm);
  
- 	pfn = __gfn_to_pfn_memslot(memslot, gfn, false, false, NULL,
--				   write_fault, &writable, false, NULL);
-+				   write_fault, &writable, true, NULL);
- 	if (pfn == KVM_PFN_ERR_HWPOISON) {
- 		kvm_send_hwpoison_signal(hva, vma_shift);
- 		return 0;
 -- 
 2.44.0.rc0.258.g7320e95886-goog
 
