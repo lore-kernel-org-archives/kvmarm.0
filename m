@@ -1,117 +1,151 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63CD6133417;
-	Thu, 15 Feb 2024 15:37:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B953D132C31
+	for <kvmarm@lists.linux.dev>; Thu, 15 Feb 2024 16:06:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708011468; cv=none; b=Kvnyl7+WOhRaIAQUR2Ip05KVYhBibN9ScMKUD9JkI7WIMusXXnFe4PMGcOXEMBTW4PfrqBQ5Y3qm1NcBcAHrwVy8cXh1AQy60oNyDQ7lizPgBcwK77u3YeH1MS7HDN5lGBUvHNPL71yPScsYRjSzE4sbAjPjsOdK0jil3xUsJKk=
+	t=1708013165; cv=none; b=DEPLmpKhGdB6LNR0KFvkWu+MWSa0bTUrTATZvY/hcfJWZAFMM3JJmEK7CBrV/sTtwKCPN83PRNg9/61vijM64a+9VZuRe2bPOnXql6lAewsDU76lwIOs3hLgrqvIBJQcxb+47mD2Ay0bAmNUZWe0zMBZ7UpOxIPXzLP4fZiLLbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708011468; c=relaxed/simple;
-	bh=epnqDWcnhsCvgG8kTNd2ESNKS8KdAlToJJsau8BMXIc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fqd7swddS0Lf7lOsvRQauWLqkCngJsv+xOfXzbCgvFHkqdAk+Lf5lYpHzrjxhmC0M9oGVB26o2zAuWh0ik/Rf/U9HBQRidgp5L+ysdSsfECUGYp59ubxihxd8fI1wHqT5PEpSVeQsaPtCH3yNF8xjtKxJQb4J/t0hLNlM7C4HMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fnRNpVvc; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fnRNpVvc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8EA5C433F1;
-	Thu, 15 Feb 2024 15:37:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708011467;
-	bh=epnqDWcnhsCvgG8kTNd2ESNKS8KdAlToJJsau8BMXIc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fnRNpVvcgGMxdGApcy7TF29tirSa8C8+JxMTmSMPju7g0ZJMbUtGqichvYZSP+Cvy
-	 1UH+zm1VYtXWmZZCvRHHCVY6ThHOj9dYo5g5wrQlVV82SfTl/uN1iCQuDsV1B6gp96
-	 AaxASn+DTHmY5GpcHLPBZh8yYNrbY/ExsiDEte20tS2y2HBGiZzycjx5ynhNtNjtxB
-	 abStxkeTu28p/IN886ODSYyYVYcojM592btmkZHl60Ivou0y71N1TJlqfhU8lWaP9N
-	 Cy8xkYpxZQqqnKpUcWwdmsMt0GGz2J/kiNioZSSyJhypqNSEy6V8/YkmshLMV/YJlR
-	 6qlD14QTLTErw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rado1-003YAI-Iw;
-	Thu, 15 Feb 2024 15:37:45 +0000
-Date: Thu, 15 Feb 2024 15:37:45 +0000
-Message-ID: <86jzn54u2e.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 00/23] KVM: arm64: Improvements to LPI injection
-In-Reply-To: <Zc0JG8pNRanuXzvR@linux.dev>
-References: <20240213093250.3960069-1-oliver.upton@linux.dev>
-	<86y1bn3pse.wl-maz@kernel.org>
-	<Zc0JG8pNRanuXzvR@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1708013165; c=relaxed/simple;
+	bh=XaPBG0pjaE8UAvSa1cvBd8Q5DWmnq3k42psc6vJNDYM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=vB+7Le3kSXj55lpKkVTjfn8FpbyKD7WE5pncbBbPhRmncEm9MoPG7dxoOjV9qRDHXrv92GzrQ1xJhVrD7FXWw9XQK7aTDmJyFp/REnA+bnoANvu68UndokviCM6kWXcW/B5DwiTHrR/2ZK/S8ETvf76kmmBNeb/6UGf9UgzNgMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 164911FB;
+	Thu, 15 Feb 2024 08:06:43 -0800 (PST)
+Received: from raptor (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D5BBA3F766;
+	Thu, 15 Feb 2024 08:05:59 -0800 (PST)
+Date: Thu, 15 Feb 2024 16:05:56 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: Shaoqin Huang <shahuang@redhat.com>, kvmarm@lists.linux.dev,
+	Nikos Nikoleris <nikos.nikoleris@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Nico Boehr <nrb@linux.ibm.com>, David Woodhouse <dwmw@amazon.co.uk>,
+	Nadav Amit <namit@vmware.com>, kvm@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org
+Subject: Re: [kvm-unit-tests PATCH v1 01/18] Makefile: Define __ASSEMBLY__
+ for assembly files
+Message-ID: <Zc42ZJYMFpXpM4mD@raptor>
+References: <20231130090722.2897974-1-shahuang@redhat.com>
+ <20231130090722.2897974-2-shahuang@redhat.com>
+ <20240115-0c41f7d4aa09b7b82613faa8@orel>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240115-0c41f7d4aa09b7b82613faa8@orel>
 
-On Wed, 14 Feb 2024 18:40:27 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Wed, Feb 14, 2024 at 05:43:13PM +0000, Marc Zyngier wrote:
-> > On Tue, 13 Feb 2024 09:32:37 +0000,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > 
-> > > For full details on the what/why, please see the cover letter in v1.
-> > > 
-> > > Apologies for the delay on v2, I wanted to spend some time to get a
-> > > microbenchmark in place to slam the ITS code pretty hard, and based on
-> > > the results I'm glad I did.
-> > 
-> > [...]
-> > 
-> > Buglets and potential improvements aside, I like the smell of this. At
-> > least the first handful of patches could easily be taken as a separate
-> > improvement series.
-> > 
-> > Let me know how you'd like to play this.
-> 
-> Yeah, I think there's 3 independent series here if we want to take the
-> initial improvements:
-> 
->  - Address contention around vgic_get_irq() / vgic_put_irq() with the
->    first 10 patches. Appears there is violent agreement these are good
->    to go.
-> 
->  - Changing out the translation cache into a per-ITS xarray
-> 
->  - A final series cleaning up a lot of the warts we have in LPI
->    management, like vgic_copy_lpi_list(). I believe we can get rid of
->    the lpi_list_lock as well, but this needs to be ordered after the
->    first 2.
-> 
-> I'd really like to de-risk the performance changes from the cleanups, as
-> I'm convinced they're going to have their own respective piles of bugs.
-> 
-> How does that sound?
+Hi Drew,
 
-Yup, I'd be on board with that. If you can respin the first part with
-bugs fixed and without the stats, that'd be great. We can further
-bikeshed on the rest in the 6.10 time frame.
+On Mon, Jan 15, 2024 at 01:44:17PM +0100, Andrew Jones wrote:
+> On Thu, Nov 30, 2023 at 04:07:03AM -0500, Shaoqin Huang wrote:
+> > From: Alexandru Elisei <alexandru.elisei@arm.com>
+> > 
+> > There are 25 header files today (found with grep -r "#ifndef __ASSEMBLY__)
+> > with functionality relies on the __ASSEMBLY__ prepocessor constant being
+> > correctly defined to work correctly. So far, kvm-unit-tests has relied on
+> > the assembly files to define the constant before including any header
+> > files which depend on it.
+> > 
+> > Let's make sure that nobody gets this wrong and define it as a compiler
+> > constant when compiling assembly files. __ASSEMBLY__ is now defined for all
+> > .S files, even those that didn't set it explicitely before.
+> > 
+> > Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> > Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+> > ---
+> >  Makefile           | 5 ++++-
+> >  arm/cstart.S       | 1 -
+> >  arm/cstart64.S     | 1 -
+> >  powerpc/cstart64.S | 1 -
+> >  4 files changed, 4 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/Makefile b/Makefile
+> > index 602910dd..27ed14e6 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -92,6 +92,9 @@ CFLAGS += -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
+> >  
+> >  autodepend-flags = -MMD -MP -MF $(dir $*).$(notdir $*).d
+> >  
+> > +AFLAGS  = $(CFLAGS)
+> > +AFLAGS += -D__ASSEMBLY__
+> > +
+> >  LDFLAGS += -nostdlib $(no_pie) -z noexecstack
+> >  
+> >  $(libcflat): $(cflatobjs)
+> > @@ -113,7 +116,7 @@ directories:
+> >  	@mkdir -p $(OBJDIRS)
+> >  
+> >  %.o: %.S
+> > -	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
+> > +	$(CC) $(AFLAGS) -c -nostdlib -o $@ $<
+> 
+> I think we can drop the two hunks above from this patch and just rely on
+> the compiler to add __ASSEMBLY__ for us when compiling assembly files.
 
-Also please Cc: Eric Auger, as he dealt with a lot of the ITS
-save/restore stuff.
+I think the precompiler adds __ASSEMBLER__, not __ASSEMBLY__ [1]. Am I
+missing something?
+
+[1] https://gcc.gnu.org/onlinedocs/cpp/macros/predefined-macros.html#c.__ASSEMBLER__
 
 Thanks,
+Alex
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> 
+> Thanks,
+> drew
+> 
+> >  
+> >  -include */.*.d */*/.*.d
+> >  
+> > diff --git a/arm/cstart.S b/arm/cstart.S
+> > index 3dd71ed9..b24ecabc 100644
+> > --- a/arm/cstart.S
+> > +++ b/arm/cstart.S
+> > @@ -5,7 +5,6 @@
+> >   *
+> >   * This work is licensed under the terms of the GNU LGPL, version 2.
+> >   */
+> > -#define __ASSEMBLY__
+> >  #include <auxinfo.h>
+> >  #include <asm/assembler.h>
+> >  #include <asm/thread_info.h>
+> > diff --git a/arm/cstart64.S b/arm/cstart64.S
+> > index bc2be45a..a8ad6dc8 100644
+> > --- a/arm/cstart64.S
+> > +++ b/arm/cstart64.S
+> > @@ -5,7 +5,6 @@
+> >   *
+> >   * This work is licensed under the terms of the GNU GPL, version 2.
+> >   */
+> > -#define __ASSEMBLY__
+> >  #include <auxinfo.h>
+> >  #include <asm/asm-offsets.h>
+> >  #include <asm/assembler.h>
+> > diff --git a/powerpc/cstart64.S b/powerpc/cstart64.S
+> > index 34e39341..fa32ef24 100644
+> > --- a/powerpc/cstart64.S
+> > +++ b/powerpc/cstart64.S
+> > @@ -5,7 +5,6 @@
+> >   *
+> >   * This work is licensed under the terms of the GNU LGPL, version 2.
+> >   */
+> > -#define __ASSEMBLY__
+> >  #include <asm/hcall.h>
+> >  #include <asm/ppc_asm.h>
+> >  #include <asm/rtas.h>
+> > -- 
+> > 2.40.1
+> > 
