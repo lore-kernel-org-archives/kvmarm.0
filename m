@@ -1,101 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB3B13328A;
-	Thu, 15 Feb 2024 15:19:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D40C132C37;
+	Thu, 15 Feb 2024 15:29:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708010345; cv=none; b=s7s/DE/TNuv6PhP2OegR7KpVMb0p2MXjnxX98hqKhHfC4UJGiHjDSCKmipsUUc8+uog4SY7G8nAog7N8AFyN0ChMT2NVl0HJpMzo8PCGraAe8Vo0g+hmwzBR/rOyY5YvCG7CUqlBqOZx2gkmWjLX1evkl9Okdw8M/0EvFZFJzHk=
+	t=1708010982; cv=none; b=uamQg+xwUPdwzUOQqhRaHLL2hQelvhx2bYrIUZITfWjmKiohqUVsleTBDYNs3WW8t4rdS0k0A411kivQQeDOzwjs1lKm7BQkg78r+RF8ZbJIMgidR+jy/lYEuJMICl9uZVdnelg9i73AyySezNPa2ZCotdZeZFYW7pgzCbP5eH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708010345; c=relaxed/simple;
-	bh=NMs7kTL32Nd/ur9u7To0mO6WeoFKLvWO1eLpONhHuUE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=riMqUP0m8Zc8v+JXktlCxDrJIaoCAru/RZ5vmMHP9xjwFhnJpDgSDc9pWpu/8rqzkunBos3L96fHFx9u03t8S73YRyIJCLhEX7GQzLFINmJlkyZiif6v99rAkmTcBU0SLHifbWUaG3BJw0G/HM1Ddsm/gi9/+cO8jLM5rxWOie0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dflyDT+F; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708010982; c=relaxed/simple;
+	bh=Nnud892Bslm9egn9hKCn7asQA+cP79m2+G21dMWR1LY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VUlfhcWFnFj4XsG16v65IrPfoNxEGZQALe5UhnIYTNEWbzvhrM6I8Pq5BB0OvFmbZ7nJ6HnLmD6fIbogX2HpasA3XGPjROTYHxAkYlHCDbyJE/KxKeYH2+6aKCK9gGzSPo8sDxBiSqI79jeLH/8a0lnGW0CcVAiMg6lKKj+afR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ih/SmNUC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dflyDT+F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24849C433F1;
-	Thu, 15 Feb 2024 15:19:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ih/SmNUC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACE90C433C7;
+	Thu, 15 Feb 2024 15:29:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708010345;
-	bh=NMs7kTL32Nd/ur9u7To0mO6WeoFKLvWO1eLpONhHuUE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dflyDT+FdzoaVSHjeEtasnPxURajV9v/wf52c8IKwjwK+eFonWvcHFSsKtVCud7wP
-	 Czx94So12t25EzyYm22ESaVsE0Vld5T9HGCbY7BOzMBKaP2b+tct87VboMGO4cE+ZP
-	 M99h1wyEjgxdRHGgV5TYgEgtxxmKRxab1qzbMQws4BTA3N/Mf3MP505sznoCFY3p5R
-	 qdByw6zfikO7+n/YctWUwIlvm75if/NaJ8IAeC+FnODaFMU4bkIUNH482A5aEMMCp2
-	 2dtklRd/rs7aG0ree/M3kq2KD72xnZNS78rg5RCxsGNoDsS+JkLj+WBvpdnCnQf1X7
-	 g0R1LLev+BDyg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1708010981;
+	bh=Nnud892Bslm9egn9hKCn7asQA+cP79m2+G21dMWR1LY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Ih/SmNUCvkQ1V4RSA803oNyGazqyAgjHiYHZrR1OdR2xIUNEgyXTQ/eNccrdxDnS3
+	 VTV0MH5jrzlfI4Zzf4VrvlXdQ67DcTgnTpkzajQUh72pBdE+bnabnFsyv51BhOFZF3
+	 iBNJ7/SXTX5UVrKHgGjrkMiFzMYpukccyQ48F9Cei1KplJQmpH0N7d68/mB1LEhw+F
+	 4DHQD54Jemax69QTAiGdWnMwjdGha1cLLZmieaiNW3OgUAZsm2QJEWFL3MncQAWhEr
+	 SGNzIcuQMoifNsZ1ZpmAe47sscDez3sOIQiNehxwsbalkJf26d/SvCWeg57+ZP0iJK
+	 pJq+2p3/kBm5A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1radVu-003Xbz-Q0;
-	Thu, 15 Feb 2024 15:19:02 +0000
-Date: Thu, 15 Feb 2024 15:19:02 +0000
-Message-ID: <86le7l4uxl.wl-maz@kernel.org>
+	id 1radgB-003XsL-Co;
+	Thu, 15 Feb 2024 15:29:39 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Ricardo Koller <ricarkol@google.com>,
+	Will Deacon <will@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 2/2] arm64: cpufeatures: Only check for NV1 if NV is present
-In-Reply-To: <Zc1wsKzAvooOvR-v@linux.dev>
-References: <20240212144736.1933112-1-maz@kernel.org>
-	<CGME20240212144758eucas1p1345ba6f2000c10a4b33f8575f0a8d22b@eucas1p1.samsung.com>
-	<20240212144736.1933112-3-maz@kernel.org>
-	<5b2d8fee-9d0f-48f7-b9ec-b86e95387a61@samsung.com>
-	<86bk8k5ts3.wl-maz@kernel.org>
-	<Zc1wsKzAvooOvR-v@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Subject: [GIT PULL] KVM/arm64 fixes for 6.8, take #2
+Date: Thu, 15 Feb 2024 15:29:35 +0000
+Message-Id: <20240215152935.3093768-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, m.szyprowski@samsung.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, oliver.upton@linux.dev, ricarkol@google.com, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 15 Feb 2024 02:02:24 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Tue, Feb 13, 2024 at 02:21:48PM +0000, Marc Zyngier wrote:
-> > From cd75279d3b6c387c13972b61c486a203d9652e97 Mon Sep 17 00:00:00 2001
-> > From: Marc Zyngier <maz@kernel.org>
-> > Date: Tue, 13 Feb 2024 13:37:57 +0000
-> > Subject: [PATCH] arm64: cpufeatures: Fix FEAT_NV check when checking for
-> >  FEAT_NV1
-> > 
-> > Using this_cpu_has_cap() has the potential to go wrong when
-> > used system-wide on a preemptible kernel. Instead, use the
-> > __system_matches_cap() helper when checking for FEAT_NV in the
-> > FEAT_NV1 probing helper.
-> > 
-> > Fixes: 3673d01a2f55 ("arm64: cpufeatures: Only check for NV1 if NV is present")
-> > Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> 
-> b4 wasn't very happy with grabbing this patch in reply to a series
-> (probably user error), but I've picked this up for kvmarm/next.
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/commit/?id=9aa030cee1c45d6e962f6bf22ba63d4aff2b1644
+Hi Paolo,
 
-Ah, sorry, I should have posted as a proper patch instead of an inline
-patch. Thanks for picking it up despite that.
+Another week, another very small pull request. This time, the bug is
+irritating enough that I want it fixed and backported right away. It
+has only been found by inspection (thanks Will!), but once you've seen
+it, you can unsee it.
+
+If you haven't pulled the previous tag [1], you'll get both for free.
+
+Please pull,
 
 	M.
 
--- 
-Without deviation from the norm, progress is not possible.
+[1] https://lore.kernel.org/r/20240207144611.1128848-1-maz@kernel.org
+
+
+The following changes since commit 42dfa94d802a48c871e2017cbf86153270c86632:
+
+  KVM: arm64: Do not source virt/lib/Kconfig twice (2024-02-04 13:08:28 +0000)
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.8-2
+
+for you to fetch changes up to c60d847be7b8e69e419e02a2b3d19c2842a3c35d:
+
+  KVM: arm64: Fix double-free following kvm_pgtable_stage2_free_unlinked() (2024-02-13 19:22:03 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.8, take #2
+
+- Avoid dropping the page refcount twice when freeing an unlinked
+  page-table subtree.
+
+----------------------------------------------------------------
+Will Deacon (1):
+      KVM: arm64: Fix double-free following kvm_pgtable_stage2_free_unlinked()
+
+ arch/arm64/kvm/hyp/pgtable.c | 2 --
+ 1 file changed, 2 deletions(-)
