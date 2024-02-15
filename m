@@ -1,52 +1,172 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86CFE12E1C7
-	for <kvmarm@lists.linux.dev>; Thu, 15 Feb 2024 18:06:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED52184FC2
+	for <kvmarm@lists.linux.dev>; Thu, 15 Feb 2024 18:27:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708020398; cv=none; b=PzyncqDTCxgNJ8T+s6blodpc1mHO20wkGUVmt79kDqL/G5+P7ZgDdd/U3RiH/StG2oC22R0XmdSc9iJP7vIqocztil4ApKOz+G4kOIYmIbiOXQ/TzTOoklOEXrShWBr/JjntitJ34Ybv8AEyS2+Kr5UQumW5xDVRGifxkhIG16k=
+	t=1708021649; cv=none; b=p7/h6hZlMv6yJ7WPEj438B1V39zNjXRGyjQ+ShYWqOg9ylQ9smGhbNDEQIlOC8LbKJ3wY+h+F4AVgP9IBQ2Mw51wxVN2wbMaKVER5ir8TTt6pA9B/491qq22VDOVuV4sua/ql4W9WjcxdM9/T1MXo7jyeOCUYcLXv2N3ZD1d1dY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708020398; c=relaxed/simple;
-	bh=OosWs8u9cs8y9LWvS8gLD04v8o3jCysymmgHAPljOLk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mmBxsJUis/ay35IDHU/LFGZLaC23s/zrWbrwSSDq+0gkefeoUH7z6hxMe+2au7hwi0f/bip7Io1D9ztNeW6D0BgyLMbVGHsSfFdMFHcMgPqzmRCekp1fCs/Pvnrh86ug6YqX20NA7mGCJP+t7lvPtZBf8M1DWvHnplPEqZJ6MEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AF9FC433C7;
-	Thu, 15 Feb 2024 18:06:35 +0000 (UTC)
-Date: Thu, 15 Feb 2024 18:06:33 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>, Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v4 01/26] arm64: sysreg: Add missing ID_AA64ISAR[13]_EL1
- fields and variants
-Message-ID: <Zc5SqaxkjhLKR1o9@arm.com>
-References: <20240214131827.2856277-1-maz@kernel.org>
- <20240214131827.2856277-2-maz@kernel.org>
+	s=arc-20240116; t=1708021649; c=relaxed/simple;
+	bh=2wCnvjkhvn5BKoVcdNdw7iQW17hpGsSpN4YYTCOKtus=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fiD9a+Rxt14ycrDdR2VorHaMbwgG6z7WOTwmZO5ECpkHDgUhRGsTPPfzr64TmuVGIMnQEn7CRWcWoWSY4ylfyJ5Gcue/F3x9ZCfdkzoE6QoWSWykMNErdAkholARneroQTpoVY2nmD8SsEmqSl4T8R6BQ7Ldw+kl03QJKb23ffI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YH4PhfY9; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YH4PhfY9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708021646;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5rcuei6vVHQzEyNnihSudUV2QF1nleva1UrlbPjP+8U=;
+	b=YH4PhfY9hnjyophTCH+oPPxrmHCjBS+U+PO+g15wFlxQDwHSzwLA4bm20+giq3hVMzKpfm
+	qabzGeuf6RiYyDCmyRnJiH71lgkYLU4+Yj/GFlKWVAZr6iV02zuYyCtT7qiCzmlJPSL/BW
+	iCA9qfx/zRBlOrFIs/ApCsissBqoW2Q=
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
+ [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-490-Xex7eG8MO-2ZIwYErZZ6XQ-1; Thu, 15 Feb 2024 13:27:25 -0500
+X-MC-Unique: Xex7eG8MO-2ZIwYErZZ6XQ-1
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-3c03f775a05so1352908b6e.0
+        for <kvmarm@lists.linux.dev>; Thu, 15 Feb 2024 10:27:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708021645; x=1708626445;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5rcuei6vVHQzEyNnihSudUV2QF1nleva1UrlbPjP+8U=;
+        b=DRDdaaL15QQOPiLP4JKiB7jQqRiCLjFGROBZZ5H358pA5azYu1dVcxcmp5Y7Av+JbO
+         E4EM55dSz9oNXqfv1w2x33sOI+L1bbShXI8k+JWeWwWcSb9TkLuM4Y1QVSJWf+6qA9OO
+         zZUDU0ZkJdNAl8aXx8o9/uAlQ/7e12VziBed8HnyJ9S/090olQU81RHqRLMrckVlSq9x
+         dYoTAChohhS9p0Wur90ezAvLlyx2xqGUEzBTnr9EAwZ9tTMS2KLx4DtYquR7l0TZSu4G
+         /69cpqjjqB+dRCNarsbx4c9MzH0Av0J6olfg0Ke7c7iur3FFlC7jVZXPBT2wR/aM8806
+         F3Sw==
+X-Forwarded-Encrypted: i=1; AJvYcCWPPbsWDXeX/FZfSmALYSpLGvH4zHX+peQJz0Hi7GJlIQO98i/dUi5bi8+EbXFnALo/9IgVaI/RrGZ3FLT4RZCDjCXI9oVH
+X-Gm-Message-State: AOJu0YwaEl949aFqJlxC2BoYd4spClqGOL9Qx7KxEXHN0c0QMnXFdgn/
+	ZaeggivRd2Ojj3lo4wNj1NJUyQs+lf86G8qZHi8ydGuobl/3xrqftclRtjTtIp13f2LhhKGsuSK
+	SF/L7J5kd5x6qQ3D6sLoEvRwLrPZUecuvzX5a7LP7oLPBg/hGqyDfMA==
+X-Received: by 2002:aca:1204:0:b0:3c0:4056:a2ed with SMTP id 4-20020aca1204000000b003c04056a2edmr2420208ois.52.1708021644919;
+        Thu, 15 Feb 2024 10:27:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGZKI2Y5bw/n2gWg9WROC85Pjasnt5QCGU2b+OlWiTw1ItcyAVVMjpne9JYAbwflkR7xSrc1g==
+X-Received: by 2002:aca:1204:0:b0:3c0:4056:a2ed with SMTP id 4-20020aca1204000000b003c04056a2edmr2420190ois.52.1708021644653;
+        Thu, 15 Feb 2024 10:27:24 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id q15-20020a05622a030f00b0042c7f028606sm795543qtw.32.2024.02.15.10.27.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Feb 2024 10:27:24 -0800 (PST)
+Message-ID: <94ae4343-487a-4782-8b15-6f1201eed882@redhat.com>
+Date: Thu, 15 Feb 2024 19:27:20 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240214131827.2856277-2-maz@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 5/5] KVM: selftests: aarch64: Add invalid filter test
+ in pmu_event_filter_test
+To: Shaoqin Huang <shahuang@redhat.com>, Oliver Upton
+ <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
+ kvmarm@lists.linux.dev
+Cc: James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240202025659.5065-1-shahuang@redhat.com>
+ <20240202025659.5065-6-shahuang@redhat.com>
+From: Eric Auger <eauger@redhat.com>
+In-Reply-To: <20240202025659.5065-6-shahuang@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 14, 2024 at 01:18:02PM +0000, Marc Zyngier wrote:
-> Despite having the control bits for FEAT_SPECRES and FEAT_PACM,
-> the ID registers fields are either incomplete or missing.
+Hi Shaoqin,
+
+On 2/2/24 03:56, Shaoqin Huang wrote:
+> Add the invalid filter test includes sets the filter beyond the event
+s/includes/which
+> space and sets the invalid action to double check if the
+> KVM_ARM_VCPU_PMU_V3_FILTER will return the expected error.
 > 
-> Fix it.
+> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+>  .../kvm/aarch64/pmu_event_filter_test.c       | 36 +++++++++++++++++++
+>  1 file changed, 36 insertions(+)
 > 
-> Reviewed-by: Mark Brown <broonie@kernel.org>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> diff --git a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+> index d280382f362f..68e1f2003312 100644
+> --- a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+> +++ b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+> @@ -7,6 +7,7 @@
+>   * This test checks if the guest only see the limited pmu event that userspace
+>   * sets, if the guest can use those events which user allow, and if the guest
+>   * can't use those events which user deny.
+> + * It also checks that setting invalid filter ranges return the expected error.
+>   * This test runs only when KVM_CAP_ARM_PMU_V3, KVM_ARM_VCPU_PMU_V3_FILTER
+>   * is supported on the host.
+>   */
+> @@ -183,6 +184,39 @@ static void for_each_test(void)
+>  		run_test(t);
+>  }
+>  
+> +static void set_invalid_filter(struct vpmu_vm *vm, void *arg)
+> +{
+> +	struct kvm_pmu_event_filter invalid;
+> +	struct kvm_device_attr attr = {
+> +		.group	= KVM_ARM_VCPU_PMU_V3_CTRL,
+> +		.attr	= KVM_ARM_VCPU_PMU_V3_FILTER,
+> +		.addr	= (uint64_t)&invalid,
+> +	};
+> +	int ret = 0;
+> +
+> +	/* The max event number is (1 << 16), set a range largeer than it. */
+in  practice it is 16b on ARMv8.1 and 10b on ARMv8.0 but obvioulsy the
+check below works for both ;-)
 
-In case you need another ack on this patch:
+larger typ
+> +	invalid = __DEFINE_FILTER(BIT(15), BIT(15)+1, 0);
+space between "+"
+> +	ret = __vcpu_ioctl(vm->vcpu, KVM_SET_DEVICE_ATTR, &attr);
+kvm_device_attr_set() as commented by Oliver
+> +	TEST_ASSERT(ret && errno == EINVAL, "Set Invalid filter range "
+> +		    "ret = %d, errno = %d (expected ret = -1, errno = EINVAL)",
+> +		    ret, errno);
+> +
+> +	ret = 0;
+> +
+> +	/* Set the Invalid action. */
+> +	invalid = __DEFINE_FILTER(0, 1, 3);
+> +	ret = __vcpu_ioctl(vm->vcpu, KVM_SET_DEVICE_ATTR, &attr);
+> +	TEST_ASSERT(ret && errno == EINVAL, "Set Invalid filter action "
+> +		    "ret = %d, errno = %d (expected ret = -1, errno = EINVAL)",
+> +		    ret, errno);
+> +}
+> +
+> +static void test_invalid_filter(void)
+> +{
+> +	vpmu_vm = __create_vpmu_vm(guest_code, set_invalid_filter, NULL);
+> +	destroy_vpmu_vm(vpmu_vm);
+> +}
+> +
+>  static bool kvm_supports_pmu_event_filter(void)
+>  {
+>  	int r;
+> @@ -216,4 +250,6 @@ int main(void)
+>  	TEST_REQUIRE(host_pmu_supports_events());
+>  
+>  	for_each_test();
+> +
+> +	test_invalid_filter();
+>  }
+Thanks
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Eric
+
