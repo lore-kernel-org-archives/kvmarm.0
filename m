@@ -1,41 +1,33 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC344136659
-	for <kvmarm@lists.linux.dev>; Thu, 15 Feb 2024 17:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86CFE12E1C7
+	for <kvmarm@lists.linux.dev>; Thu, 15 Feb 2024 18:06:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708017370; cv=none; b=TvdwzJvF5RECZCWT4U5tvdBaM0In2fUOe1nVWn0zkOiIf74geduJVnndI15NPUVwBZW47G1g/OHZPHA9X7GDem+psEPSpGGkJBpG6rsE+uD6EUmTqwivb+GwEVSyOWcKFMNbDjZ+ixf11FeTDqGMxWTS/6zcihiLaWV+VYnzzks=
+	t=1708020398; cv=none; b=PzyncqDTCxgNJ8T+s6blodpc1mHO20wkGUVmt79kDqL/G5+P7ZgDdd/U3RiH/StG2oC22R0XmdSc9iJP7vIqocztil4ApKOz+G4kOIYmIbiOXQ/TzTOoklOEXrShWBr/JjntitJ34Ybv8AEyS2+Kr5UQumW5xDVRGifxkhIG16k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708017370; c=relaxed/simple;
-	bh=zxz0QrYMAAaMuEw9ynoZ7NA8W5JxzJkBnWva1dxS7gU=;
+	s=arc-20240116; t=1708020398; c=relaxed/simple;
+	bh=OosWs8u9cs8y9LWvS8gLD04v8o3jCysymmgHAPljOLk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nz01H7Hlv4pyxFCCjc4iGCjbCCyrRuQBzi7LGoTtJmXEaJEsBqzm+2h1yO6YVbc9P9WS7eN2+VFflR3zytgZEKtCxpM2JaSSgeLsP+MJ78sAmRchy+lIx1tT9wF05ALK+uCMbmDtcq1VSsoNS2HDLn1/W2FRBbxuXoIW59g75xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 127911FB;
-	Thu, 15 Feb 2024 09:16:48 -0800 (PST)
-Received: from raptor (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D392A3F766;
-	Thu, 15 Feb 2024 09:16:04 -0800 (PST)
-Date: Thu, 15 Feb 2024 17:16:01 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: Shaoqin Huang <shahuang@redhat.com>, kvmarm@lists.linux.dev,
-	Nikos Nikoleris <nikos.nikoleris@arm.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Nico Boehr <nrb@linux.ibm.com>, David Woodhouse <dwmw@amazon.co.uk>,
-	Nadav Amit <namit@vmware.com>, kvm@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org
-Subject: Re: [kvm-unit-tests PATCH v1 01/18] Makefile: Define __ASSEMBLY__
- for assembly files
-Message-ID: <Zc5G0Uu1QxJ1Qt36@raptor>
-References: <20231130090722.2897974-1-shahuang@redhat.com>
- <20231130090722.2897974-2-shahuang@redhat.com>
- <20240115-0c41f7d4aa09b7b82613faa8@orel>
- <Zc42ZJYMFpXpM4mD@raptor>
- <20240215-f2a2e3798b1f64923417df00@orel>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mmBxsJUis/ay35IDHU/LFGZLaC23s/zrWbrwSSDq+0gkefeoUH7z6hxMe+2au7hwi0f/bip7Io1D9ztNeW6D0BgyLMbVGHsSfFdMFHcMgPqzmRCekp1fCs/Pvnrh86ug6YqX20NA7mGCJP+t7lvPtZBf8M1DWvHnplPEqZJ6MEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AF9FC433C7;
+	Thu, 15 Feb 2024 18:06:35 +0000 (UTC)
+Date: Thu, 15 Feb 2024 18:06:33 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>, Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v4 01/26] arm64: sysreg: Add missing ID_AA64ISAR[13]_EL1
+ fields and variants
+Message-ID: <Zc5SqaxkjhLKR1o9@arm.com>
+References: <20240214131827.2856277-1-maz@kernel.org>
+ <20240214131827.2856277-2-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,75 +36,17 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240215-f2a2e3798b1f64923417df00@orel>
+In-Reply-To: <20240214131827.2856277-2-maz@kernel.org>
 
-Hi Drew,
-
-On Thu, Feb 15, 2024 at 05:32:22PM +0100, Andrew Jones wrote:
-> On Thu, Feb 15, 2024 at 04:05:56PM +0000, Alexandru Elisei wrote:
-> > Hi Drew,
-> > 
-> > On Mon, Jan 15, 2024 at 01:44:17PM +0100, Andrew Jones wrote:
-> > > On Thu, Nov 30, 2023 at 04:07:03AM -0500, Shaoqin Huang wrote:
-> > > > From: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > > 
-> > > > There are 25 header files today (found with grep -r "#ifndef __ASSEMBLY__)
-> > > > with functionality relies on the __ASSEMBLY__ prepocessor constant being
-> > > > correctly defined to work correctly. So far, kvm-unit-tests has relied on
-> > > > the assembly files to define the constant before including any header
-> > > > files which depend on it.
-> > > > 
-> > > > Let's make sure that nobody gets this wrong and define it as a compiler
-> > > > constant when compiling assembly files. __ASSEMBLY__ is now defined for all
-> > > > .S files, even those that didn't set it explicitely before.
-> > > > 
-> > > > Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> > > > Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
-> > > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > > Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
-> > > > ---
-> > > >  Makefile           | 5 ++++-
-> > > >  arm/cstart.S       | 1 -
-> > > >  arm/cstart64.S     | 1 -
-> > > >  powerpc/cstart64.S | 1 -
-> > > >  4 files changed, 4 insertions(+), 4 deletions(-)
-> > > > 
-> > > > diff --git a/Makefile b/Makefile
-> > > > index 602910dd..27ed14e6 100644
-> > > > --- a/Makefile
-> > > > +++ b/Makefile
-> > > > @@ -92,6 +92,9 @@ CFLAGS += -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
-> > > >  
-> > > >  autodepend-flags = -MMD -MP -MF $(dir $*).$(notdir $*).d
-> > > >  
-> > > > +AFLAGS  = $(CFLAGS)
-> > > > +AFLAGS += -D__ASSEMBLY__
-> > > > +
-> > > >  LDFLAGS += -nostdlib $(no_pie) -z noexecstack
-> > > >  
-> > > >  $(libcflat): $(cflatobjs)
-> > > > @@ -113,7 +116,7 @@ directories:
-> > > >  	@mkdir -p $(OBJDIRS)
-> > > >  
-> > > >  %.o: %.S
-> > > > -	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
-> > > > +	$(CC) $(AFLAGS) -c -nostdlib -o $@ $<
-> > > 
-> > > I think we can drop the two hunks above from this patch and just rely on
-> > > the compiler to add __ASSEMBLY__ for us when compiling assembly files.
-> > 
-> > I think the precompiler adds __ASSEMBLER__, not __ASSEMBLY__ [1]. Am I
-> > missing something?
-> > 
-> > [1] https://gcc.gnu.org/onlinedocs/cpp/macros/predefined-macros.html#c.__ASSEMBLER__
+On Wed, Feb 14, 2024 at 01:18:02PM +0000, Marc Zyngier wrote:
+> Despite having the control bits for FEAT_SPECRES and FEAT_PACM,
+> the ID registers fields are either incomplete or missing.
 > 
-> You're right. I'm not opposed to changing all the __ASSEMBLY__ references
-> to __ASSEMBLER__. I'll try to do that at some point unless you beat me to
-> it.
+> Fix it.
+> 
+> Reviewed-by: Mark Brown <broonie@kernel.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-Actually, I quite prefer the Linux style of using __ASSEMBLY__ instead of
-__ASSEMBLER__, because it makes reusing Linux files easier. That, and the
-habit formed by staring at Linux assembly files.
+In case you need another ack on this patch:
 
-Thanks,
-Alex
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
