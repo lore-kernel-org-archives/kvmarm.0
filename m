@@ -1,132 +1,142 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9004B78B55
-	for <kvmarm@lists.linux.dev>; Fri, 16 Feb 2024 12:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 616E312C541
+	for <kvmarm@lists.linux.dev>; Fri, 16 Feb 2024 14:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708085955; cv=none; b=XJgt5DFOUdzS7j70N3iZJCmWLQxo+rAJabRh1YHrtrSg8iuXT3rLr56jS/MtVo+t4CVFU7GHvYXhCBIyNQDI3AYsy9Ok2LBBOOqt/1tUg/BkSdPM/NaAcNPi3GWdD/SjcOushvcDR/9TkTlJyWqk4TlZiZpMglZR6d4gkiT+nlc=
+	t=1708092147; cv=none; b=UkMwjpace8amdJAqhg+QNC2e0TrsGTkgm70ha2Lk2+/xQaHqMVFoqGVREP5eAMTtG9aIChaT2yuVnpI5EkNbAnlTlYnXy4dFwgYIOWh+R+t4vaTaB74q2Sm9lizLU7wM497T0xKKIGt1DHeAlQ9VVacOpcKJ2dioz2huj8Sngdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708085955; c=relaxed/simple;
-	bh=PSJKhP9hWq4+Lbowvz+bBMW640SsgQDWr5Updtqd93I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b9sJtRDjII33msAyvM8Pe/C2Yqk/mh2vGu307yi3IWtd4mH3k79crQiLBcTcWCtn2iPv3J7Lo2rVbjWUnaKJUDxlQyLt4SZQmmGw6Xsiu9RU5r+EN9CppgPY6z2tK6Xf2RmYVZTcF2RH8xd+r8+yuhxDMQlVjiFbpD4pg2yT/tY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V3Q2Xvi6; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1708092147; c=relaxed/simple;
+	bh=K6LB6+MemA9fj3a/ZAx6PykgqUbVt5cwV8Jss8rIfdA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Q7Z1DGENPJ6iSl6KXoA9CEmKwI8ne5rH97ntwpeMDWoM+gbwmGt3btsR5+IiBLe1rZN7t4Pw1Ot3ly7gwzvq7aBGZsYieNOt1za2Sb+W5PXvCXSvmc9+xC6McPGHxXDt71ozD7gdGwgqW+UuXVhtsSZeS/SbPSaDZ1sd/TcpENc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PKHgdyDc; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V3Q2Xvi6"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-42dd91764bfso183571cf.1
-        for <kvmarm@lists.linux.dev>; Fri, 16 Feb 2024 04:19:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708085952; x=1708690752; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BNyrI9uKcDxqRatKZxhTwLZVrTwEVmRpCuf7a7BL5/8=;
-        b=V3Q2Xvi6o6NILeaXRxBjAiZ936QeRCiAE6ksMrUsPavJ2aktVf3E+q1MmbI7xQazmz
-         QvYn1ZON5pKnIC+S9ilhnOYrF0blyZTRdbsG1E2c82Ur5irFffnDPuIbYo9jPUmGyYbM
-         ZYROYXVJmyyg/ZIxRQ5i8Xvqlv6kzehwnZAiiBSu9X5mE4jDAxoWC/TLT5GE+7zuQTVI
-         jzESbcupOn3klKN8Jh3QplwDp3eDDvxaXvXG//4ZevsXl8QUrY/IQiDmrDBXXL1wC1At
-         5kYqAZUUEL5GcM/HRIr2aMSZbffbp7Lu2EO8pPEY2hYrBIr5qvHjASHhUdma4GO8OMR9
-         69OA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708085952; x=1708690752;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BNyrI9uKcDxqRatKZxhTwLZVrTwEVmRpCuf7a7BL5/8=;
-        b=H6cFHLTCfJAZPgi1CA2ZOnwlpNhxSxwJhxIOOBhsz+GfZuYRTdqH8uCNHALiHLwunM
-         7vEsWe8J0+h5BBBt/eW76BZmbQq/HXcnJJHfNMjGnBGRlv1hGq7pE0pXBq7QADRfIMC9
-         WjVrjZ8duVMWvYjBp4VItLEs5yaUuCPjigHAsvbxg+8D/D2HDFAtTQtVUK5ayG/+1Pin
-         JfZVcJTn6u0lKPHoqAi4bW4Qts2RPhL/lcAxwgc2b8G7UXAf6afY5y668c1CM+/FR0+S
-         LLO+hZxpLnVOqElLC4PVN90brAiW3hd5gzYOwbunNz741DDxH/9/ZpmQePF9zRI6Om+O
-         WkWA==
-X-Forwarded-Encrypted: i=1; AJvYcCXptxgkyT5Oq1tCJVjNvRcbe9tbZmESTjYwkW4nrjMDE+NJa1mW0QiF8IMMjMGOsznvJTgBmL/H2RGIcCVFO70KkQdinTsQ
-X-Gm-Message-State: AOJu0YxoUlW4sDaC5yAlpiOhLuKqikJJ4GH0j5o+VJMXzW5r1EKzTa7R
-	T5IsOl2IQcW+nEb9RcBohInF+LQwaCRxrm1Wd7eelrWyTkQl+/m5Q/Z8IF10wzmylkegiuzpYww
-	V3OyTwJuw66pKLmWTr6oIv+W8scd7oSRdH9e7
-X-Google-Smtp-Source: AGHT+IGkvkQyFc975szvjCF4iZYQJ1TRr3+sPw4K2/bF+uoQenC5Yx4J51IhUjufqlwpfdMzAh8/JCCTPqF/G7/nb3I=
-X-Received: by 2002:a05:622a:292:b0:42c:6905:c449 with SMTP id
- z18-20020a05622a029200b0042c6905c449mr314267qtw.12.1708085952265; Fri, 16 Feb
- 2024 04:19:12 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PKHgdyDc"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708092144;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FhaTO4DXP/qUKknQgbcg7AfYeRWWKpGtUjyGYREPOM0=;
+	b=PKHgdyDcR5Av3jyEo7l19MjqBYmcJtK/d0m7IEcQLUtVGw36HT7EOtjnKdVzjdhYTtN77l
+	AiyZd/XRknJQKDKo1pdMjdzqcPRaE3zHXq6MXKeakWhnE8lHIcGFGN/obhvHzakcopk6fA
+	kzkFSWMymsMSkPLweQIQ+Q5vt675WMk=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-335-PyC4bJcdN-2Mq5uo3tMMUw-1; Fri,
+ 16 Feb 2024 09:02:18 -0500
+X-MC-Unique: PyC4bJcdN-2Mq5uo3tMMUw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EF80638125B1;
+	Fri, 16 Feb 2024 14:02:13 +0000 (UTC)
+Received: from thuth-p1g4.redhat.com (unknown [10.39.192.46])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 66A0F2166B4F;
+	Fri, 16 Feb 2024 14:02:11 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Andrew Jones <andrew.jones@linux.dev>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	kvm@vger.kernel.org,
+	Nicholas Piggin <npiggin@gmail.com>
+Cc: kvmarm@lists.linux.dev
+Subject: [kvm-unit-tests PATCH] lib/arm/io: Fix calling getchar() multiple times
+Date: Fri, 16 Feb 2024 15:02:10 +0100
+Message-ID: <20240216140210.70280-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230201125328.2186498-1-jean-philippe@linaro.org>
- <20230201125328.2186498-25-jean-philippe@linaro.org> <CAFgf54qcTAru0Nvy1wH_tJMadOSW7Y3zEip5RTm+mtSa54Bymg@mail.gmail.com>
- <20240123194530.GA40099@myrica>
-In-Reply-To: <20240123194530.GA40099@myrica>
-From: Mostafa Saleh <smostafa@google.com>
-Date: Fri, 16 Feb 2024 12:19:01 +0000
-Message-ID: <CAFgf54pAtSLWjaqhZShxzKkOLWFkjXmsmMk1P0TdXOUWhn00sg@mail.gmail.com>
-Subject: Re: [RFC PATCH 24/45] KVM: arm64: smmu-v3: Setup stream table
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org, joro@8bytes.org, 
-	robin.murphy@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, 
-	oliver.upton@linux.dev, yuzenghui@huawei.com, dbrazdil@google.com, 
-	ryan.roberts@arm.com, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-On Tue, Jan 23, 2024 at 7:45=E2=80=AFPM Jean-Philippe Brucker
-<jean-philippe@linaro.org> wrote:
->
-> Hi Mostafa,
->
-> On Tue, Jan 16, 2024 at 08:59:41AM +0000, Mostafa Saleh wrote:
-> > > +__maybe_unused
-> > > +static int smmu_sync_ste(struct hyp_arm_smmu_v3_device *smmu, u32 si=
-d)
-> > > +{
-> > > +       struct arm_smmu_cmdq_ent cmd =3D {
-> > > +               .opcode =3D CMDQ_OP_CFGI_STE,
-> > > +               .cfgi.sid =3D sid,
-> > > +               .cfgi.leaf =3D true,
-> > > +       };
-> > > +
-> > > +       return smmu_send_cmd(smmu, &cmd);
-> > > +}
-> > > +
-> > I see the page tables are properly configured for ARM_SMMU_FEAT_COHEREN=
-CY but no
-> > handling for the STE or CMDQ, I believe here we should have something a=
-s:
-> > if (!(smmu->features & ARM_SMMU_FEAT_COHERENCY))
-> >         kvm_flush_dcache_to_poc(step, STRTAB_STE_DWORDS << 3);
-> >
-> > Similarly in "smmu_add_cmd" for the command queue. Or use NC mapping
-> > (which doesn't exist
-> > upstream as far as I can see)
->
-> Right, the host driver seems to do this. If I'm following correctly we en=
-d
-> up with dma_direct_alloc() calling pgprot_dmacoherent() and get
-> MT_NORMAL_NC, when the SMMU is declared non-coherent in DT/IORT.
->
-> So we'd get mismatched attributes if hyp is then mapping these structures
-> cacheable, but I don't remember how that works exactly. Might be fine
-> since host donates the pages to hyp and we'd have a cache flush in
-> between. I'll have to read up on that.
+getchar() can currently only be called once on arm since the implementation
+is a little bit too  naïve: After the first character has arrived, the
+data register never gets set to zero again. To properly check whether a
+byte is available, we need to check the "RX fifo empty" on the pl011 UART
+or the "RX data ready" bit on the ns16550a UART instead.
 
-I guess that is not enough, as the hypervisor writes the STE/CMDQ at any ti=
-me.
+With this proper check in place, we can finally also get rid of the
+ugly assert(count < 16) statement here.
 
-> Regardless, mapping NC seems cleaner, more readable. I'll see if I can ad=
-d
-> that attribute to kvm_pgtable_hyp_map().
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ lib/arm/io.c | 34 ++++++++++++++--------------------
+ 1 file changed, 14 insertions(+), 20 deletions(-)
 
-There is a patch for that already in Android
-https://android.googlesource.com/kernel/common/+/636c912401dec4d178f6cdf607=
-3f546b15828cf7%5E%21/#F0
+diff --git a/lib/arm/io.c b/lib/arm/io.c
+index c15e57c4..836fa854 100644
+--- a/lib/arm/io.c
++++ b/lib/arm/io.c
+@@ -28,6 +28,7 @@ static struct spinlock uart_lock;
+  */
+ #define UART_EARLY_BASE (u8 *)(unsigned long)CONFIG_UART_EARLY_BASE
+ static volatile u8 *uart0_base = UART_EARLY_BASE;
++bool is_pl011_uart;
+ 
+ static void uart0_init_fdt(void)
+ {
+@@ -59,7 +60,10 @@ static void uart0_init_fdt(void)
+ 			abort();
+ 		}
+ 
++		is_pl011_uart = (i == 0);
+ 	} else {
++		is_pl011_uart = !fdt_node_check_compatible(dt_fdt(), ret,
++		                                           "arm,pl011");
+ 		ret = dt_pbus_translate_node(ret, 0, &base);
+ 		assert(ret == 0);
+ 	}
+@@ -111,31 +115,21 @@ void puts(const char *s)
+ 	spin_unlock(&uart_lock);
+ }
+ 
+-static int do_getchar(void)
++int __getchar(void)
+ {
+-	int c;
++	int c = -1;
+ 
+ 	spin_lock(&uart_lock);
+-	c = readb(uart0_base);
+-	spin_unlock(&uart_lock);
+-
+-	return c ?: -1;
+-}
+-
+-/*
+- * Minimalist implementation for migration completion detection.
+- * Without FIFOs enabled on the QEMU UART device we just read
+- * the data register: we cannot read more than 16 characters.
+- */
+-int __getchar(void)
+-{
+-	int c = do_getchar();
+-	static int count;
+ 
+-	if (c != -1)
+-		++count;
++	if (is_pl011_uart) {
++		if (!(readb(uart0_base + 6 * 4) & 0x10))  /* RX not empty? */
++			c = readb(uart0_base);
++	} else {
++		if (readb(uart0_base + 5) & 0x01)         /* RX data ready? */
++			c = readb(uart0_base);
++	}
+ 
+-	assert(count < 16);
++	spin_unlock(&uart_lock);
+ 
+ 	return c;
+ }
+-- 
+2.43.0
 
-But I a guess as beginning CMO is enough, I have this POC for it
-https://android-kvm.googlesource.com/linux/+/193b027de376317eb8daa4eb207bad=
-aa1d6fda4a%5E%21/#F0
-
-Thanks,
-Mostafa
