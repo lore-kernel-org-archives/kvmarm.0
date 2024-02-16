@@ -1,88 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0B5130E3C;
-	Fri, 16 Feb 2024 17:13:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4292613541B
+	for <kvmarm@lists.linux.dev>; Fri, 16 Feb 2024 18:42:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708103595; cv=none; b=FhNjEBzAk5jBcHW7RaUbACvweH9uW/kFZcPu631kx7Gb7s0q+i9hHt8DqimnQDtovo6/wWY+zKHdQDiKimjNS4+xvgAoQFRpl9qNPPXQtHLHhC6W6QOynCP8uD9eJh6QgvOcs25zptlNwjq+oii0RDIIcOXvNpiO85yUkIWx5v0=
+	t=1708108930; cv=none; b=lxaRlcpyDQxvpl401EYl5dhGD+YgrerWtmeT08EPoE3dvFWmwoF7uTaofsTKyho27TZPfHyEtYeHANxLI3pGST6Htvd++tMCCZLAt+HQqUQH30NORdoPHWKBV7XtRpR2yUqO1pNq33wAFtbtBfeoe1PQfah4MOGUnKBeoUJrxm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708103595; c=relaxed/simple;
-	bh=kQ0H/sNCQPwBmNusOIBS5iWhM6nmH7hfh3eYJZ4zLjw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=drNl04cGeRDAMivqPBFn5pnZEE57qipMV2HeYtKuPFR/k3QoyJ38jR6KrZJ0hZ0aFD/gIoiSmfMOPGtzwYaTFF4FpViEuYlZnVZ5FLBdhaVgf5rp0q+DGaKdm4s0C4wr+swW2T0Im2kDglcfxlw5fNsSz79Atk2G8QdQJNQnhNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LyvjPkHR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708108930; c=relaxed/simple;
+	bh=QxChEtUBGhZVQmcitgUSn661JjnUAOsMvF/MSmXznAI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FgyVlaUNHzUTC6q6a+7IBblXfvwV6W0mDyGfZifHCkLADPKHG2MYNvR/GG1REkOoF6dIU0ieyDtA88Dvkth+yH3B1LtXVIpt5TeWl8BJ7zYER88sRoT8VDgyjS1ns/1s/ehwT3KkfnDkyFV5eKFxWUcHZeH0I2DHE0qIxFsH7I0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bShf0MgS; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LyvjPkHR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEAA5C433F1;
-	Fri, 16 Feb 2024 17:13:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708103594;
-	bh=kQ0H/sNCQPwBmNusOIBS5iWhM6nmH7hfh3eYJZ4zLjw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LyvjPkHRfPJnvy+KgUErXwGzLnSj9SB07qpiXXw3ah9U/PWYAwnHmimfWyoqtQ2U8
-	 KeuN7x4lqeuJAdBPahhcQYalW0qQr4hnpqPQn0WisKo7uFTYxBhY2wrS3C+XqqLgz1
-	 TcmebNQBsZSSWj4eMq40uno8d3Ec3Dnsu/Ox3hp40hrfELwTTWTD/DYbjHiS2HjN1U
-	 UEoo/qI8bkB9NXGs6U3o+Sq+51SN9auLEXCegGG1aVwnuAjiyaF9NoMC+9toIHrkjG
-	 l1ZR1QDVdmGXUFNXEA+u8eLmibIlKbf/DKAUCuPvLY3EBvTXG1J4SiK0Hee/apG9BY
-	 Ae/cvZmNb1Obg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rb1lu-003v2X-MX;
-	Fri, 16 Feb 2024 17:13:12 +0000
-Date: Fri, 16 Feb 2024 17:13:10 +0000
-Message-ID: <86h6i849jt.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bShf0MgS"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1708108925;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=dy9uGuDewCRmPkjUp3zVJbGMujkAY9qYVaz8IFv8Bxg=;
+	b=bShf0MgSqhuWrIL+S1qXovTFCfPLEhtIccDFfHBNEfhfP5OtCcTJr+ei8OFQ2UFIe50OQW
+	32WQuJTz/ZgYEbAy6Hf3Hhxp2YrhqtIWgNgStHoKgVgQ1DRYMx8JH7oKcQRUFSkFrv436F
+	WqvzO/QKMfXA7oylFbU9dCdjvrsqasU=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	aneesh.kumar@kernel.org,
-	naveen.n.rao@linux.ibm.com,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	linuxppc-dev@lists.ozlabs.org,
+	Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH] KVM: Get rid of return value from kvm_arch_create_vm_debugfs()
-In-Reply-To: <20240216155941.2029458-1-oliver.upton@linux.dev>
-References: <20240216155941.2029458-1-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v3 00/10] KVM: arm64: Avoid serializing LPI get() / put()
+Date: Fri, 16 Feb 2024 18:41:43 +0000
+Message-ID: <20240216184153.2714504-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvm@vger.kernel.org, npiggin@gmail.com, mpe@ellerman.id.au, christophe.leroy@csgroup.eu, aneesh.kumar@kernel.org, naveen.n.rao@linux.ibm.com, seanjc@google.com, pbonzini@redhat.com, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, sebastianene@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 16 Feb 2024 15:59:41 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> The general expectation with debugfs is that any initialization failure
-> is nonfatal. Nevertheless, kvm_arch_create_vm_debugfs() allows
-> implementations to return an error and kvm_create_vm_debugfs() allows
-> that to fail VM creation.
-> 
-> Change to a void return to discourage architectures from making debugfs
-> failures fatal for the VM. Seems like everyone already had the right
-> idea, as all implementations already return 0 unconditionally.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+As discussed, here is a slimmed-down series for addressing lock
+serialization in the vgic_get_irq() / vgic_put_irq() path for LPIs. The
+bulk of it is using an xarray to represent LPIs and leveraging RCU to
+avoid serializing readers of the LPI configuration state.
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+There's a lot of potential for clean-up, but this is intentionally
+deferred until after we fix up the LPI translation cache.
 
-	M.
+v2: https://lore.kernel.org/kvmarm/20240213093250.3960069-1-oliver.upton@linux.dev/
 
+v2 -> v3:
+ - Fix the stupid lock imbalance once and for all (Dan)
+ - Drop the tracepoints / stats I used for debugging my own crap (Marc)
+
+Oliver Upton (10):
+  KVM: arm64: vgic: Store LPIs in an xarray
+  KVM: arm64: vgic: Use xarray to find LPI in vgic_get_lpi()
+  KVM: arm64: vgic-v3: Iterate the xarray to find pending LPIs
+  KVM: arm64: vgic-its: Walk the LPI xarray in vgic_copy_lpi_list()
+  KVM: arm64: vgic: Get rid of the LPI linked-list
+  KVM: arm64: vgic: Use atomics to count LPIs
+  KVM: arm64: vgic: Free LPI vgic_irq structs in an RCU-safe manner
+  KVM: arm64: vgic: Rely on RCU protection in vgic_get_lpi()
+  KVM: arm64: vgic: Ensure the irq refcount is nonzero when taking a ref
+  KVM: arm64: vgic: Don't acquire the lpi_list_lock in vgic_put_irq()
+
+ arch/arm64/kvm/vgic/vgic-debug.c |  2 +-
+ arch/arm64/kvm/vgic/vgic-init.c  |  4 ++-
+ arch/arm64/kvm/vgic/vgic-its.c   | 53 +++++++++++++++++++-----------
+ arch/arm64/kvm/vgic/vgic-v3.c    |  3 +-
+ arch/arm64/kvm/vgic/vgic.c       | 56 ++++++++++----------------------
+ arch/arm64/kvm/vgic/vgic.h       | 15 ++++++---
+ include/kvm/arm_vgic.h           |  9 ++---
+ 7 files changed, 73 insertions(+), 69 deletions(-)
+
+
+base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
 -- 
-Without deviation from the norm, progress is not possible.
+2.44.0.rc0.258.g7320e95886-goog
+
