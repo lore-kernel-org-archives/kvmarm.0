@@ -1,133 +1,159 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2CD7B3D5
-	for <kvmarm@lists.linux.dev>; Sat, 17 Feb 2024 14:28:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A50D538A
+	for <kvmarm@lists.linux.dev>; Sun, 18 Feb 2024 06:41:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708180089; cv=none; b=UbRI6wcLD5Kqx3+7NnmCfag7g7LEcTfkGOMSgIxxjerUKJgZl9939LbpIvaZKEMUF4zO1XMnsnmAN/uMdQdZqV5e/9OBbZQBmufO41QI7lluxvbTQou6Vns+cFjFG+7PXAKIZMYNd2HH5Gyl6cpQyiTMpRF9jmYqKaZ7gL4uXQ0=
+	t=1708238476; cv=none; b=NgLjoESRIG8ZTNJvC1IcofASgMyRSRmZPZc59vvFMcWx5jNMpI9WvOeHH3obWZEBGV3IalFsA561I9+795WaCS7fsuBwGTu/zksS0hjZh43omUe6IClYjvy4OufzCnsi4nxLL6e4c1dXbzmYrzyIhpNvbG4QpnIHNmSCEm4c3+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708180089; c=relaxed/simple;
-	bh=/eUefz1FkIPQ1G768Xwe5fQSk8ibXAAs1dbntOk1WHo=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=iKTLtpgHPlO8Nt5zTnV40umoZvmPEN3nUGBrbf1qE6czexqR0GAqGs9PV9SFhDB3LUX4I1RrQKbBsdcce/YpygB+lY/0ulFA7oszwwEiF+8j50L4JH5IOO59Elb3qmdI5w3newL7o3UTFzLInZ0Q5wuIyziHYthSsZUyh+bQfhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OdhqC0Jm; arc=none smtp.client-ip=209.85.210.172
+	s=arc-20240116; t=1708238476; c=relaxed/simple;
+	bh=iuQbiFx2hJLfWb+6L78zmyCOPRaRIT6gS+4sPUW3K4I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=efMKckdG/nwfhPr1zMhwdH1j9eujlW8ha+5sjWSj+ZungxMVyNYMk0WRGME6YtKYmc9oz8NEaYTIGY8CsE4RIBDPAubH2O3qXzIlsUzAU4AV8jgn2kClZaOFuY/L2HdX2hng4ThjwaNZ0R/HUvQMDb1VXBeolW8wmdj2JGi5V5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jkjSGrEA; arc=none smtp.client-ip=209.85.208.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OdhqC0Jm"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6e09a890341so1709279b3a.3
-        for <kvmarm@lists.linux.dev>; Sat, 17 Feb 2024 06:28:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jkjSGrEA"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2d220e39907so21786031fa.1
+        for <kvmarm@lists.linux.dev>; Sat, 17 Feb 2024 22:41:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708180087; x=1708784887; darn=lists.linux.dev;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1708238473; x=1708843273; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=g+gk6WZ54fJiu1kZj993McRBYTJsNzCZTM/wPmv5yGs=;
-        b=OdhqC0JmYjacusAZWs9UYrpxvgBJjS9V4E3bzASwiCYQs/a7kgiXTNsOy4zdlTP5MW
-         sTpjXLPfXU6J5oM2C+MqqpJ9LOwRAoDSOTIkJTohQqfXi1MY/NAoa545DXGsDF/EGvqe
-         5TsGJJ51UcM+29OoTjIwnBiT2qlfieW7dE58sr1gTylXvkM9DUTwmBJdNuT9uhNVQtaf
-         2QNHViyzUuKunoTQW2WLvOp5eS3rGN1m5bCBjkCbPFcfU+oVZqVPsT7j9H+IY4p9IztV
-         BOandAlprXcRVlEAGSMyxGa6nUbkCHe3qJYdHxkF1mbMN/WLgJIDM1JvBtmvuRppMBsm
-         0ofA==
+        bh=Q0Y6u+5ShCMCnWeHjQjEcItSyrNAyQ4PzYVN7xsknZY=;
+        b=jkjSGrEAJNybCPUoxjR9i/TB+RXX2NvXxtNQECinygtaSxutJDBouXAu4kjSBBWQm9
+         W43kPnfhwK1frVeYX1/czwBahzOYL7F+bcRbB8gM12g+LyUeEfkZIrlxxP5EKRSFSKEs
+         3Vd8P8j+FMen20/oRW0z7gd5FxL6TIX0p0ZQ4axhMaefveSFe0rdz4F3eRN86aPW4x4U
+         GpnUGapqRD1UX26xbUe8TZ2GsewlblQTH16gqaN2fxHVTQ7En0LY/QzKiFpBkyUIf+KV
+         mqQfmELkbcCwk01KKFnLzs55JwZKn2PFCIWinqEzKfzYdS1CMoxAzq62vF4opsoKLdle
+         nZMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708180087; x=1708784887;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=g+gk6WZ54fJiu1kZj993McRBYTJsNzCZTM/wPmv5yGs=;
-        b=EpQCTJ2caHh0AdrP1H6/3xOuAHQSYXbhNZCJiFnU9M5iCRr5XQiwMWOzaqJdYWPf8p
-         PUN07qJG3Xrf1Uc/zAzKwBbwWNCMb0Fl/O4UGyJo2xie0SbX6B8f0l0PQ7OkTNgy0DRF
-         uxd9mcSC4DauNNth9hYKuZj7YVXVTODpbPwpNkAtGIql6q+vjqmvf0DzND4mFA+fFS5E
-         o/rHENiXeNRgHutSYK5RzVTKkQOj78oQbGaWPlYhZiDXhNAesjkYEKT1QkUq1uuWMG/5
-         yFK2EyRXQWqmAu31SWsjRLFhR6N3aM56AOeTnftbNv3iEO5p/WW9GEm6NXL/Wywtaufu
-         8jFw==
-X-Gm-Message-State: AOJu0YxZmbCKcHGSajaTQO1/owK0dLE+pVWejV21UaeOKXz9D66cDEIQ
-	EWskEFUD5l0C1YeHQBe4FLyI7emBLNQ6L8ilIC9fU+wJMtwjSXIk
-X-Google-Smtp-Source: AGHT+IFwe6pUDc/1M4pyvFmiJ+KMjxnvE6MnQ+K1nbKYGGj9eImdGKdJQNDRn3TdcgP6ofO6CwJq4g==
-X-Received: by 2002:a05:6a20:6f88:b0:19e:a5c9:144e with SMTP id gv8-20020a056a206f8800b0019ea5c9144emr8219405pzb.59.1708180086675;
-        Sat, 17 Feb 2024 06:28:06 -0800 (PST)
-Received: from localhost (123-243-155-241.static.tpgi.com.au. [123.243.155.241])
-        by smtp.gmail.com with ESMTPSA id t11-20020a62d14b000000b006e27558af8esm1441995pfl.76.2024.02.17.06.28.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 17 Feb 2024 06:28:06 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708238473; x=1708843273;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q0Y6u+5ShCMCnWeHjQjEcItSyrNAyQ4PzYVN7xsknZY=;
+        b=dp7l9KiTUkXzn4oY0kZa25ArHuvqGX3wkHY5lnj87u+e8XS/rmU/lmaSBnsYiPe89a
+         9jU9yE85j5fgU5Mp5GzYlMJxyZ3M7Ld3U8+Xc4AqjFAJCAXVJBAOwdi+sccaKUls61co
+         x7p9JqV42PuUZAnWndPrHbVjtCevUhUutOCSK/DFBkU/XHkW2eBMohXaLrO9ahXQyVf3
+         /GrpbErr5RroqOlesPLYsdmpDyAoBqfSOUdnCnjaUOcPWQfPk1m3JKmsrgzssQmVFz/j
+         Msd1NrSxZhilh4XbiAYNjFlD3v6XLSr+tMBW8794IQB875Gk6z3gQx2QIUcPv0SAVge6
+         pv8g==
+X-Forwarded-Encrypted: i=1; AJvYcCVrL+BP1u/NWUg1Itc3ICIxs4ksMhUvLZ/OARTqFavsLzXpHYlZU1cmmL8CCxk0KkH+Wveyr+yeow4/6/nACLksxcC039r3
+X-Gm-Message-State: AOJu0YymV79G9UnIVSyQblmUvSaXQot0rdxTSOsG6PTQteSMIuTx1qv/
+	0n6c+QIrgoLP17m7tNpZQRYJHrkPxI1hJo3/JqcEBglLlg6AIvx/SvKjNU6x09ecE2mAiO8gK7B
+	/GHtgqq3M6lutwFkC2gtXmPQSxDQ=
+X-Google-Smtp-Source: AGHT+IEU/ZiwgqWrDWfItsbjFQF1nhRZH5qrkBorAITC5xFGNJCVzU/oI+JZS45+PPkqBNqvb8/D/bZalu0eAbcSmoY=
+X-Received: by 2002:a2e:8684:0:b0:2d2:3913:5c4 with SMTP id
+ l4-20020a2e8684000000b002d2391305c4mr54562lji.37.1708238472941; Sat, 17 Feb
+ 2024 22:41:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
+MIME-Version: 1.0
+References: <cover.1705916069.git.haibo1.xu@intel.com> <CAAhSdy2wFzk0h5MiM5y9Fij0HyWake=7vNuV1MExUxkEtMWShw@mail.gmail.com>
+In-Reply-To: <CAAhSdy2wFzk0h5MiM5y9Fij0HyWake=7vNuV1MExUxkEtMWShw@mail.gmail.com>
+From: Haibo Xu <xiaobo55x@gmail.com>
+Date: Sun, 18 Feb 2024 14:41:00 +0800
+Message-ID: <CAJve8okkfvdRtvh8onQYL7_bmv9ntrViP54u805fQMq3apWFcQ@mail.gmail.com>
+Subject: Re: [PATCH v5 00/12] RISCV: Add kvm Sstc timer selftests
+To: Anup Patel <anup@brainfault.org>
+Cc: Haibo Xu <haibo1.xu@intel.com>, ajones@ventanamicro.com, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Atish Patra <atishp@atishpatra.org>, 
+	Guo Ren <guoren@kernel.org>, Conor Dooley <conor.dooley@microchip.com>, 
+	Mayuresh Chitale <mchitale@ventanamicro.com>, wchen <waylingii@gmail.com>, 
+	Greentime Hu <greentime.hu@sifive.com>, Jisheng Zhang <jszhang@kernel.org>, 
+	Samuel Holland <samuel@sholland.org>, Minda Chen <minda.chen@starfivetech.com>, 
+	Sean Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, Like Xu <likexu@tencent.com>, 
+	Vipin Sharma <vipinsh@google.com>, Thomas Huth <thuth@redhat.com>, 
+	Aaron Lewis <aaronlewis@google.com>, 
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Sun, 18 Feb 2024 00:28:01 +1000
-Message-Id: <CZ7FAVZ6J6DF.22SLKG0NAG6HL@wheely>
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Thomas Huth" <thuth@redhat.com>, "Andrew Jones"
- <andrew.jones@linux.dev>, "Alexandru Elisei" <alexandru.elisei@arm.com>,
- "Eric Auger" <eric.auger@redhat.com>, <kvm@vger.kernel.org>
-Cc: <kvmarm@lists.linux.dev>
-Subject: Re: [kvm-unit-tests PATCH] lib/arm/io: Fix calling getchar()
- multiple times
-X-Mailer: aerc 0.15.2
-References: <20240216140210.70280-1-thuth@redhat.com>
-In-Reply-To: <20240216140210.70280-1-thuth@redhat.com>
 
-On Sat Feb 17, 2024 at 12:02 AM AEST, Thomas Huth wrote:
-> getchar() can currently only be called once on arm since the implementati=
-on
-> is a little bit too  na=C3=AFve: After the first character has arrived, t=
-he
-> data register never gets set to zero again. To properly check whether a
-> byte is available, we need to check the "RX fifo empty" on the pl011 UART
-> or the "RX data ready" bit on the ns16550a UART instead.
+On Mon, Feb 12, 2024 at 8:24=E2=80=AFPM Anup Patel <anup@brainfault.org> wr=
+ote:
 >
-> With this proper check in place, we can finally also get rid of the
-> ugly assert(count < 16) statement here.
+> On Mon, Jan 22, 2024 at 3:15=E2=80=AFPM Haibo Xu <haibo1.xu@intel.com> wr=
+ote:
+> >
+> > The RISC-V arch_timer selftests is used to validate Sstc timer
+> > functionality in a guest, which sets up periodic timer interrupts
+> > and check the basic interrupt status upon its receipt.
+> >
+> > This KVM selftests was ported from aarch64 arch_timer and tested
+> > with Linux v6.7-rc8 on a Qemu riscv64 virt machine.
+> >
+> > ---
+> > Changed since v4:
+> >   * Rebased to Linux 6.7-rc8
+> >   * Added new patch(2/12) to clean up the data type in struct test_args
+> >   * Re-ordered patch(11/11) in v4 to patch(3/12)
+> >   * Changed the timer_err_margin_us type from int to uint32_t
+> >
+> > Haibo Xu (11):
+> >   KVM: arm64: selftests: Data type cleanup for arch_timer test
+> >   KVM: arm64: selftests: Enable tuning of error margin in arch_timer
+> >     test
+> >   KVM: arm64: selftests: Split arch_timer test code
+> >   KVM: selftests: Add CONFIG_64BIT definition for the build
+> >   tools: riscv: Add header file csr.h
+> >   tools: riscv: Add header file vdso/processor.h
+> >   KVM: riscv: selftests: Switch to use macro from csr.h
+> >   KVM: riscv: selftests: Add exception handling support
+> >   KVM: riscv: selftests: Add guest helper to get vcpu id
+> >   KVM: riscv: selftests: Change vcpu_has_ext to a common function
+> >   KVM: riscv: selftests: Add sstc timer test
+> >
+> > Paolo Bonzini (1):
+> >   selftests/kvm: Fix issues with $(SPLIT_TESTS)
+>
+> Rebased on Linux-6.8-rc4 and queued this series for Linux-6.9
 >
 
-Thanks, this seems to work well. But arm64 still behaves strangely
-with QEMU migration. It seems some odd corruption around __getchar,
-but this turns out not to have anything to do with the MMIO read,
-but it's just because the test case generally is spinning there
-when a migration happens.
+Thanks!
 
-I modified __getchar() to the following, which removes the MMIO
-entirely and just waits a number of times called before returning
-a getchar, chosen to be enough time for QEMU migration to complete
-on my system...
-
-int __getchar(void)
-{
-        static int i;
-        static volatile int locked;
-        int ret =3D -1;
-
-        assert(!locked);
-        locked =3D 1;
-        assert(locked);
-        cpu_relax();
-        assert(locked);
-
-        i++;
-        if (i >=3D 3000000) {
-                i =3D 0;
-                ret =3D 1;
-        }
-
-        assert(locked);
-        locked =3D 0;
-        assert(!locked);
-
-        return ret;
-}
-
-I get asserts on the line right after cpu_relax() on arm64 after a
-few migrations on migration selftest.
-
-Without the cpu_relax() it takes longer to hit an assert and it's
-usually the first one. I expect this is related to TCG translation
-blocks and where it exits back to be migrated. Something is very
-strange, I suspect it's QEMU migration bug.
-
-Thanks,
-Nick
+> Thanks,
+> Anup
+>
+> >
+> >  tools/arch/riscv/include/asm/csr.h            | 541 ++++++++++++++++++
+> >  tools/arch/riscv/include/asm/vdso/processor.h |  32 ++
+> >  tools/testing/selftests/kvm/Makefile          |  27 +-
+> >  .../selftests/kvm/aarch64/arch_timer.c        | 295 +---------
+> >  tools/testing/selftests/kvm/arch_timer.c      | 259 +++++++++
+> >  .../selftests/kvm/include/aarch64/processor.h |   4 -
+> >  .../selftests/kvm/include/kvm_util_base.h     |   9 +
+> >  .../selftests/kvm/include/riscv/arch_timer.h  |  71 +++
+> >  .../selftests/kvm/include/riscv/processor.h   |  65 ++-
+> >  .../testing/selftests/kvm/include/test_util.h |   2 +
+> >  .../selftests/kvm/include/timer_test.h        |  45 ++
+> >  .../selftests/kvm/lib/riscv/handlers.S        | 101 ++++
+> >  .../selftests/kvm/lib/riscv/processor.c       |  87 +++
+> >  .../testing/selftests/kvm/riscv/arch_timer.c  | 111 ++++
+> >  .../selftests/kvm/riscv/get-reg-list.c        |  11 +-
+> >  15 files changed, 1353 insertions(+), 307 deletions(-)
+> >  create mode 100644 tools/arch/riscv/include/asm/csr.h
+> >  create mode 100644 tools/arch/riscv/include/asm/vdso/processor.h
+> >  create mode 100644 tools/testing/selftests/kvm/arch_timer.c
+> >  create mode 100644 tools/testing/selftests/kvm/include/riscv/arch_time=
+r.h
+> >  create mode 100644 tools/testing/selftests/kvm/include/timer_test.h
+> >  create mode 100644 tools/testing/selftests/kvm/lib/riscv/handlers.S
+> >  create mode 100644 tools/testing/selftests/kvm/riscv/arch_timer.c
+> >
+> > --
+> > 2.34.1
+> >
