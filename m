@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5654822F0E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E89822F11;
 	Mon, 19 Feb 2024 09:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708334424; cv=none; b=EMzr72wQZIzjxXNb37Zk8Q7uYCZBCiwZoyUIBcmqE16oSM1mJFSPa8ruqkvy3ZzTgYb1wpgAwWumMIYsJTHwi7LtenFn2QrVrp/VRxSHNQxPIBbDiwo9IoCBsbgKD71J1Ixa1LD1kR7f2uSU9jQjoWAoBOd7etAORHibEqhPMG0=
+	t=1708334424; cv=none; b=n0yEk/J7Og+BjViWhPNotrPhFTR++/oMfHYM/SkirOloqtIdtee305InQJ7T7DfbZokxc6Z7PhhGnL3wWyjbY3bAiI/0W4oQxkcwkP4j6oBJhdLmGo2WLLe12JyBWk/duQDjQ/hdJ7dg8mlvV776meXunpGnaGZxEytQe5Ef2EM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708334424; c=relaxed/simple;
-	bh=o1Ph3OO1c4EdF4VuyObf2uVzB4bNnlJcJufbMYmIJXA=;
+	bh=3lCs6fO4A9a0jYPyLc7yNONM1pQDZQ+vkshJ4dFCPGc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mBcNx1iivMIw5n98sYBEHiTFnM0/tKF/JgYx1d0KsJUhNJMolHff0vOL/D003fPaajDmXxRvfAEaoR4CSwzFdD3RKDmYmg8AfppEE7FaZOfkSB94sfNsX3BG98iHjSfBOY1zf1tH/ujdwr1WNQaOEDFiP8Uxjm6i9SBgZgWQ+38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rmMmWLNn; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=NiW8g6YBxHllEqz9hs/0Enmqo3Y2QvFWQZ6R/0mZUjXVEAubgdya2jeeCI4Gq79qoomX2CmFY3nm15kxhcthTnU9rQdaPlkHMCGwBLY2sOA/ksnqpn9sS+0PyGkMywYZrBYJrn7O4Y3hJfsT2VfvFm3ohNcW7tMYPTlx7ZJnJqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=guVxLrj6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rmMmWLNn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE317C43394;
-	Mon, 19 Feb 2024 09:20:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="guVxLrj6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EA07C433B2;
+	Mon, 19 Feb 2024 09:20:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708334423;
-	bh=o1Ph3OO1c4EdF4VuyObf2uVzB4bNnlJcJufbMYmIJXA=;
+	s=k20201202; t=1708334424;
+	bh=3lCs6fO4A9a0jYPyLc7yNONM1pQDZQ+vkshJ4dFCPGc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rmMmWLNnjtkQ+2UxibAZipLUgaukJLI7EIA74lJdrMxEGlnZ93hie/shHjn0e4knL
-	 fQxU0qv3r/MT66AVw4gL+xSXbX4tx0YYA8Udscr0GkaGsISoVfVlRVvHQQBTcko2+6
-	 qKxYxUcMqfbypa6m5MTU1VvK25a6TuKyVubQ0efiqMaESRhfhyRcXEOAwQi/ZYG5Zt
-	 +DTQUag20T6wENZobhbiwa1Grq0j+zd4ea7zW8YwFgEcrJmceNiOpcMiUiKDrPIjhV
-	 xUVQ9Q/VDd9jl5FUZd2XWHdiyetUdwUBY32/TJ4lFl+/YonqUmk1wSr8jmvgdmF8hv
-	 1ODKvzQjFnUwg==
+	b=guVxLrj67RzPAyqymw7tWCBrSaK9TH9XR3bBkifZXwLSj9/JREzB0sIV3mop+mWTY
+	 EpjRCTAb/cBZx7Mvs7s3+iGrHVPAj2FHDrQBQow4N9+RiThVoWcCprkBTcd7Zo4pA4
+	 6d71a8wWwCWvUkMZms79GZkQvr/u6tV8Ak3yQe3spEXeqIDjZ7hgC/7hcRRTPicdh6
+	 4zFdl7sSdtmFzSm1Hr4U2OPItpzNeuNJ97d82iOL1Y6V/refY7GMR6fC1PYiG9Gyc7
+	 KCgnsXEuFsgB2k8WtX+btL69BqlZZo8BjwuGC9tZkgFdaQjgRJoAmcnnMoJkEHYTXH
+	 Z0JDUxfxPYraQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rbzoz-004WBZ-SP;
-	Mon, 19 Feb 2024 09:20:21 +0000
+	id 1rbzp0-004WBZ-7n;
+	Mon, 19 Feb 2024 09:20:22 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -42,9 +42,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH 02/13] KVM: arm64: Clarify ESR_ELx_ERET_ISS_ERET*
-Date: Mon, 19 Feb 2024 09:20:03 +0000
-Message-Id: <20240219092014.783809-3-maz@kernel.org>
+Subject: [PATCH 04/13] KVM: arm64: nv: Configure HCR_EL2 for FEAT_NV2
+Date: Mon, 19 Feb 2024 09:20:05 +0000
+Message-Id: <20240219092014.783809-5-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240219092014.783809-1-maz@kernel.org>
 References: <20240219092014.783809-1-maz@kernel.org>
@@ -60,56 +60,114 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The ESR_ELx_ERET_ISS_ERET* macros are a bit confusing:
+Add the HCR_EL2 configuration for FEAT_NV2, adding the required
+bits for running a guest hypervisor, and overall merging the
+allowed bits provided by the guest.
 
-- ESR_ELx_ERET_ISS_ERET really indicates that we have trapped an
-  ERETA* instruction, as opposed to an ERET
+This heavily replies on unavaliable features being sanitised
+when the HCR_EL2 shadow register is accessed, and only a couple
+of bits must be explicitly disabled.
 
-- ESR_ELx_ERET_ISS_ERETA reallu indicates that we have trapped
-  an ERETAB instruction, as opposed to an ERETAA.
-
-Repaint the two helpers such as:
-
-- ESR_ELx_ERET_ISS_ERET becomes ESR_ELx_ERET_ISS_ERETA
-
-- ESR_ELx_ERET_ISS_ERETA becomes ESR_ELx_ERET_ISS_ERETAB
-
-At the same time, use BIT() instead of raw values.
+Non-NV guests are completely unaffected by any of this.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/esr.h | 4 ++--
- arch/arm64/kvm/handle_exit.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/sysreg.h         |  1 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  4 +--
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
+ arch/arm64/kvm/hyp/vhe/switch.c         | 34 ++++++++++++++++++++++++-
+ 4 files changed, 36 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index 353fe08546cf..72c7810ccf2c 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -290,8 +290,8 @@
- 		 ESR_ELx_SYS64_ISS_OP2_SHIFT))
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 9e8999592f3a..a5361d9032a4 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -498,6 +498,7 @@
+ #define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
+ #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+ #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
++#define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
  
- /* ISS field definitions for ERET/ERETAA/ERETAB trapping */
--#define ESR_ELx_ERET_ISS_ERET		0x2
--#define ESR_ELx_ERET_ISS_ERETA		0x1
-+#define ESR_ELx_ERET_ISS_ERETA		BIT(1)
-+#define ESR_ELx_ERET_ISS_ERETAB		BIT(0)
+ #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
+ #define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index e3fcf8c4d5b4..f5f701f309a9 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -271,10 +271,8 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+ 	__deactivate_traps_hfgxtr(vcpu);
+ }
  
- /*
-  * ISS field definitions for floating-point exception traps
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 617ae6dea5d5..0646c623d1da 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -219,7 +219,7 @@ static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu)
- 
- static int kvm_handle_eret(struct kvm_vcpu *vcpu)
+-static inline void ___activate_traps(struct kvm_vcpu *vcpu)
++static inline void ___activate_traps(struct kvm_vcpu *vcpu, u64 hcr)
  {
--	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERET)
-+	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERETA)
- 		return kvm_handle_ptrauth(vcpu);
+-	u64 hcr = vcpu->arch.hcr_el2;
+-
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM))
+ 		hcr |= HCR_TVM;
  
- 	/*
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index c50f8459e4fc..4103625e46c5 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -40,7 +40,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val;
+ 
+-	___activate_traps(vcpu);
++	___activate_traps(vcpu, vcpu->arch.hcr_el2);
+ 	__activate_traps_common(vcpu);
+ 
+ 	val = vcpu->arch.cptr_el2;
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 58415783fd53..29f59c374f7a 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -33,11 +33,43 @@ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
+ DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+ DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
+ 
++/*
++ * HCR_EL2 bits that the NV guest can freely change (no RES0/RES1
++ * semantics, irrespective of the configuration), but that cannot be
++ * applied to the actual HW as things would otherwise break badly.
++ *
++ * - TGE: we want to use EL1, which is incompatible with it being set
++ *
++ * - API/APK: for hysterical raisins, we enable PAuth lazily, which
++ *   means that the guest's bits cannot be directly applied (we really
++ *   want to see the traps). Revisit this at some point.
++ */
++#define NV_HCR_GUEST_EXCLUDE	(HCR_TGE | HCR_API | HCR_APK)
++
++static u64 __compute_hcr(struct kvm_vcpu *vcpu)
++{
++	u64 hcr = vcpu->arch.hcr_el2;
++
++	if (!vcpu_has_nv(vcpu))
++		return hcr;
++
++	if (is_hyp_ctxt(vcpu)) {
++		hcr |= HCR_NV | HCR_NV2 | HCR_AT | HCR_TTLB;
++
++		if (!vcpu_el2_e2h_is_set(vcpu))
++			hcr |= HCR_NV1;
++
++		write_sysreg_s(vcpu->arch.ctxt.vncr_array, SYS_VNCR_EL2);
++	}
++
++	return hcr | (__vcpu_sys_reg(vcpu, HCR_EL2) & ~NV_HCR_GUEST_EXCLUDE);
++}
++
+ static void __activate_traps(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val;
+ 
+-	___activate_traps(vcpu);
++	___activate_traps(vcpu, __compute_hcr(vcpu));
+ 
+ 	if (has_cntpoff()) {
+ 		struct timer_map map;
 -- 
 2.39.2
 
