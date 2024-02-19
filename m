@@ -1,56 +1,57 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 673B62E3F3
-	for <kvmarm@lists.linux.dev>; Mon, 19 Feb 2024 11:58:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E09929424
+	for <kvmarm@lists.linux.dev>; Mon, 19 Feb 2024 12:02:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708343908; cv=none; b=qPux1SAF+F/rpirJXDf1eC4BB7rgKa/Wp8jayAu40IAiNEB+QaQF+HamhL7DgNx+DLZqWRmalpmGQOYDr+/iLxEM1YAJUNl7dIK+IUKL4TeNvQidcuvNaWxhKwUPK0QH2BnvclpLcbKTXByZTyajSFQwtbeUNQ+848XbldeJcRM=
+	t=1708344164; cv=none; b=Eq5s20dyhFpSibXC7vBZvtDWyY22B1E+e8q61gX0iR6IZUhk0GjrbAFXYNXXUAgV2Mri1SNVp55SMwph30xndQ+rxzyhRA2hStqmFVQlmihfynlwR1ZQ678VEQuF4/Rh/2sAwAgcLfi69J+X+E/mHUFZ3iH6iBu9xA+BcQOkhok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708343908; c=relaxed/simple;
-	bh=nJstLW9esmyElWFns2CzFB95hhSHbzyVH5WsxNSFQ2U=;
+	s=arc-20240116; t=1708344164; c=relaxed/simple;
+	bh=SJNxDovJQU4s53wEmE6hVUIUVXIND8lC8ymI4e7vDRc=;
 	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
-	 References:In-Reply-To; b=d1jXExACn2gI9Nf6sVyv/VVVeqPG283ZQpMNqPg6PaXRKmox9snZiAZo+WsHpP8H0fXfYAGUyy1NPL56aVJz+1Q+k2SJaOeEqNjoteFn4uEzGyzsuU7lNGcRi2JMDjU1HF7fysHqtGpFVlozhhOipOweilIsArkO6NX9bo0qmpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jjbSS4Wy; arc=none smtp.client-ip=209.85.214.173
+	 References:In-Reply-To; b=Eb2jMD1X0u9ysy5IXsJ7VO7rn45vWcDlLEt4boLWrClBBVS8ppvPKE1rcHYXvxlQ3XyA1OjK+TLZUsiXrOYNVzSghGk0RK4i+29O8ayGTbgpsf73GPCV9eGJi5KgJRAOkGeufqEA9lZr3L/a81RV6YC4fdTJJ2NP8xZHI7M/g34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EEf99pDm; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jjbSS4Wy"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1db5212e2f6so30109725ad.1
-        for <kvmarm@lists.linux.dev>; Mon, 19 Feb 2024 03:58:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EEf99pDm"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6e466a679bfso268512b3a.1
+        for <kvmarm@lists.linux.dev>; Mon, 19 Feb 2024 04:02:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708343906; x=1708948706; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1708344162; x=1708948962; darn=lists.linux.dev;
         h=in-reply-to:references:from:subject:cc:to:message-id:date
          :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qtKD19qauwfMDNEwLgCb7I5KxV73UoCs2lBAo1NZd7g=;
-        b=jjbSS4Wy31j4/Ntyka4H4aAgx7PXaGMifS6mQoFbaTJrrT84wTDtRjHzPXk+umCGcv
-         Je3jZmo5Qi81MxVDcK5U+qiNNnZ5WlaqkGBEoxpTlxd+zlCgx/Kz5RMoKRk3YYOIL/5E
-         SbiCKLWZr+28+ud0eG/qqHcE5+NiGYncM42u2TfK7FHb6R7Bzbk73tZPerytLMIJX7PO
-         bCUvrEsrArwPkriPPV6tSUkzwtXLQh/6mvwWm90W3JlWtgfgNYdW7aTCBmHtPbqaPBfU
-         1EGN+cZW4ObaoOu7lISy5Tt6BGBevuhRngnDZlKoB9LXgCUSqWxnGyCihCZP0IoLPNhU
-         RmEg==
+        bh=sXVHiQqTVvLwPVSN4wK295H+HuDvWyHMdFATUrh61Qw=;
+        b=EEf99pDmZR2M03IKy2iyKyttj3/Qw0v4dXinc0z4ZITSGs6NUdPDrXRAdQKplyXjbN
+         cQSy2Uu4wy8DoJet+2C071B2Ta4F9dLn1pthKaiDHQiG4Ecz8QQ+6RN2IG78fWMRwiKj
+         6H/WgQM2vXUl4n6masWZT6hIsOS06Xgny4+XVFxBLrXgzgMmYOadiVsrKXryriEP0jmm
+         RUCm8HT9F4BbOpNe4G9u61zdgZGUgRHLAr/DvuT7d25BrGWsR+4gjMr7I78Lly64A8wQ
+         aXk0tD1uBlzikEf7SgkwpOvine+Qlxt/U9eUzye9ziB9lH6dgsvugvIkM4mfDgHlr5sl
+         kmaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708343906; x=1708948706;
+        d=1e100.net; s=20230601; t=1708344162; x=1708948962;
         h=in-reply-to:references:from:subject:cc:to:message-id:date
          :content-transfer-encoding:mime-version:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=qtKD19qauwfMDNEwLgCb7I5KxV73UoCs2lBAo1NZd7g=;
-        b=Woi2aDnhuu97KO1eSS1+okYwuHzi2HNjtANKQ4P+oCN7D0rESE+U4DokzFJZtGvq1J
-         hT9w1lbqS/cRLrAPG3jRQVvRy2b2Wf40IS2x9b+VTMT1bBb0Oil1LhAoNMmFEfpuQWct
-         YR+2F+NVzeHcm0f68DY3jtVnRkRg/Y/qXr7k55SpH2Q9/MSVJ9wFpib2epi1DBikz2um
-         eIoRhFDFGiuOZu0CEDtjDZe8LjRgUf2ptKSCoB8y1i+2nTpwqO/ZdiyeQ9/q+rxfbHt9
-         rD7RzZaNq3F2grMyvbmEP8X3TD2mNNiH6RXVER6u2dZsw3kbgwIqSoDVUPnReVVvhxdq
-         JLZA==
-X-Gm-Message-State: AOJu0Yy3cIf7q/wKBSnyYYYP9tGBhHCEMIensynPuA/QWCiQHtFrQvgh
-	5QCoReOD6mo9Km+TiEyE/xyZxFY+tALVbLATPAsYxMPepbRJlu/P
-X-Google-Smtp-Source: AGHT+IE9b6RC9oHbAhWZTL2lD+mu5223dNrNzrbJxmVB0cgYIkGUcQQPDPnjzMu1ezsyMOuXvHSLQg==
-X-Received: by 2002:a17:902:e84a:b0:1db:e41f:bab with SMTP id t10-20020a170902e84a00b001dbe41f0babmr5023569plg.32.1708343905564;
-        Mon, 19 Feb 2024 03:58:25 -0800 (PST)
+        bh=sXVHiQqTVvLwPVSN4wK295H+HuDvWyHMdFATUrh61Qw=;
+        b=TfLYNLEUVksEk8SMxDh15MCAahN0ukJ/Bis4qIG6G6Udv+I2cSn5XUb7/7E5tYNriD
+         56qrlfs+8cNeckFaQGfkTGgili44mE22HrZoa88fKvRuh7p4ClC42Iy3aPiMJIpe3tpu
+         YiOxYyIcR4z/YnQFgATQ9Vs92hRj8J/wQifwo2wKoGNhrsnhj19Ucugb6SZ6yYfGrtGl
+         tJa6i6shVwkAl4KiD8Tz3ldDBIbIaB0vaqe+GBXZodLmk47ZScaOeXbUNsU/I+gemMsB
+         THILO/3TNjY67HnHThiyQ6Ua7zEB/qNoRyeb06aY1jwJ9boXzYFAjsq6onQkWZDOCsKG
+         cwTw==
+X-Forwarded-Encrypted: i=1; AJvYcCXHnIMQJQqviMtnQcwZR5fTGqqxmdMHL1HhHVqBEWbfTeperneF1gPVpiUXNWoh31+90lIwZUVUR4XEZDgNFFnwJZ2HkOlj
+X-Gm-Message-State: AOJu0Yxmq3q/2xTlB8vVeQwVY3MVh6FzZ178uNH21vdxLbRt8So5zXHJ
+	BO/Ubi5MuWM11swKCLkcnq1cmTi1zcpZVfzAQh8H0A5Qe27c+h44
+X-Google-Smtp-Source: AGHT+IGM/mBl6p+7VQ/UBUY0liSnc0g8tiRAnqqtUyMEBG/QP3L26RLnUqLU9SBZSVRFhEVzjBzHUg==
+X-Received: by 2002:a05:6a20:2d13:b0:1a0:aea4:f15c with SMTP id g19-20020a056a202d1300b001a0aea4f15cmr656909pzl.4.1708344161563;
+        Mon, 19 Feb 2024 04:02:41 -0800 (PST)
 Received: from localhost (123-243-155-241.static.tpgi.com.au. [123.243.155.241])
-        by smtp.gmail.com with ESMTPSA id t12-20020a1709028c8c00b001d949393c50sm4178505plo.187.2024.02.19.03.58.22
+        by smtp.gmail.com with ESMTPSA id y17-20020aa78551000000b006e0e66369e5sm4638738pfn.66.2024.02.19.04.02.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Feb 2024 03:58:25 -0800 (PST)
+        Mon, 19 Feb 2024 04:02:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -59,69 +60,86 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Mon, 19 Feb 2024 21:58:20 +1000
-Message-Id: <CZ91DDIGOAMM.3RLL24M34FXGK@wheely>
-To: "Thomas Huth" <thuth@redhat.com>, "Andrew Jones"
- <andrew.jones@linux.dev>, "Alexandru Elisei" <alexandru.elisei@arm.com>,
- "Eric Auger" <eric.auger@redhat.com>, <kvm@vger.kernel.org>
-Cc: <kvmarm@lists.linux.dev>
-Subject: Re: [kvm-unit-tests PATCH] lib/arm/io: Fix calling getchar()
- multiple times
+Date: Mon, 19 Feb 2024 22:02:32 +1000
+Message-Id: <CZ91GLI40959.3EGSUC8X9D0WU@wheely>
+To: "Thomas Huth" <thuth@redhat.com>
+Cc: <kvm@vger.kernel.org>, "Laurent Vivier" <lvivier@redhat.com>, "Shaoqin
+ Huang" <shahuang@redhat.com>, "Andrew Jones" <andrew.jones@linux.dev>,
+ "Nico Boehr" <nrb@linux.ibm.com>, "Paolo Bonzini" <pbonzini@redhat.com>,
+ "Alexandru Elisei" <alexandru.elisei@arm.com>, "Eric Auger"
+ <eric.auger@redhat.com>, "Janosch Frank" <frankja@linux.ibm.com>, "Claudio
+ Imbrenda" <imbrenda@linux.ibm.com>, "David Hildenbrand" <david@redhat.com>,
+ "Marc Hartmayer" <mhartmay@linux.ibm.com>, <linuxppc-dev@lists.ozlabs.org>,
+ <linux-s390@vger.kernel.org>, <kvmarm@lists.linux.dev>,
+ <kvm-riscv@lists.infradead.org>
+Subject: Re: [kvm-unit-tests PATCH v4 8/8] migration: add a migration
+ selftest
 From: "Nicholas Piggin" <npiggin@gmail.com>
 X-Mailer: aerc 0.15.2
-References: <20240216140210.70280-1-thuth@redhat.com>
- <CZ7AJ4JK5805.2N5QS85IP42QZ@wheely>
- <4986756f-6230-421b-9601-054c6c2969e8@redhat.com>
-In-Reply-To: <4986756f-6230-421b-9601-054c6c2969e8@redhat.com>
+References: <20240209091134.600228-1-npiggin@gmail.com>
+ <20240209091134.600228-9-npiggin@gmail.com>
+ <abbcbb47-1ae7-4793-a918-dede8dcaf07f@redhat.com>
+ <CZ7673PUQ853.DB10GSBEZ65Z@wheely>
+ <4d73467d-2091-4342-87a1-822f4aeb8b70@redhat.com>
+In-Reply-To: <4d73467d-2091-4342-87a1-822f4aeb8b70@redhat.com>
 
-On Mon Feb 19, 2024 at 4:59 PM AEST, Thomas Huth wrote:
-> On 17/02/2024 11.43, Nicholas Piggin wrote:
-> > On Sat Feb 17, 2024 at 12:02 AM AEST, Thomas Huth wrote:
-> >> getchar() can currently only be called once on arm since the implement=
-ation
-> >> is a little bit too  na=C3=AFve: After the first character has arrived=
-, the
-> >> data register never gets set to zero again. To properly check whether =
-a
-> >> byte is available, we need to check the "RX fifo empty" on the pl011 U=
-ART
-> >> or the "RX data ready" bit on the ns16550a UART instead.
+On Mon Feb 19, 2024 at 4:56 PM AEST, Thomas Huth wrote:
+> On 17/02/2024 08.19, Nicholas Piggin wrote:
+> > On Fri Feb 16, 2024 at 9:15 PM AEST, Thomas Huth wrote:
+> >> On 09/02/2024 10.11, Nicholas Piggin wrote:
+> >>> Add a selftest for migration support in  guest library and test harne=
+ss
+> >>> code. It performs migrations in a tight loop to irritate races and bu=
+gs
+> >>> in the test harness code.
+> >>>
+> >>> Include the test in arm, s390, powerpc.
+> >>>
+> >>> Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com> (s390x)
+> >>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> >>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> >>> ---
+> >>>    arm/Makefile.common          |  1 +
+> >>>    arm/selftest-migration.c     |  1 +
+> >>>    arm/unittests.cfg            |  6 ++++++
 > >>
-> >> With this proper check in place, we can finally also get rid of the
-> >> ugly assert(count < 16) statement here.
+> >>    Hi Nicholas,
 > >>
-> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >> I just gave the patches a try, but the arm test seems to fail for me: =
+Only
+> >> the first getchar() seems to wait for a character, all the subsequent =
+ones
+> >> don't wait anymore and just continue immediately ... is this working f=
+or
+> >> you? Or do I need another patch on top?
 > >=20
-> > Nice, thanks for fixing this up.
+> > Hey sorry missed this comment....
 > >=20
-> > I see what you mean about multi-migration not waiting. It seems
-> > to be an arm issue, ppc works properly.
+> > It does seem to work for me, I've mostly tested pseries but I did test
+> > others too (that's how I saw the arm getchar limit).
+> >=20
+> > How are you observing it not waiting for migration?
 >
-> Yes, it's an arm issue. s390x also works fine.
->
-> > This patch changed things
-> > so it works a bit better (or at least differently) now, but
-> > still has some bugs. Maybe buggy uart migration?
->
-> I'm also seeing hangs when running the arm migration-test multiple times,=
+> According to you other mail, I think you figured it out already, but just=
 =20
-> but also without my UART patch here - so I assume the problem is not real=
-ly=20
-> related to the UART?
+> for the records: You can see it when running the guest manually, e.g.=20
+> something like:
+>
+>   qemu-system-aarch64 -nodefaults -machine virt -accel tcg -cpu cortex-a5=
+7 \
+>     -device virtio-serial-device -device virtconsole,chardev=3Dctd \
+>     -chardev testdev,id=3Dctd -device pci-testdev -display none \
+>     -serial mon:stdio -kernel arm/selftest-migration.flat -smp 1
+>
+> Without my "lib/arm/io: Fix calling getchar() multiple times" patch, the=
+=20
+> guest only waits during the first getchar(), all the others simply return=
+=20
+> immediately.
 
-Yeah, I ended up figuring it out. A 11 year old TCG migration memory
-corruption bug!
-
-https://lists.gnu.org/archive/html/qemu-devel/2024-02/msg03486.html
-
-All the weirdness was just symptoms of that. The hang that arm usually
-got was target machine trying to lock the uart spinlock that is already
-locked (because the unlock store got lost in migration).
-
-powerpc and s390x were just luckier in avoiding the race, maybe the way
-their translation blocks around getchar code were constructed made the
-problem not show up easily or at all. I did end up causing problems
-for them by rearranging the code (test case is linked in that msg).
+Yeah I got it -- I re-ran it on arm and it is obvious since you told
+me it's not waiting. At the time I tested I thought it was just arm
+migrating really fast :D
 
 Thanks,
 Nick
