@@ -1,94 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0E725577;
-	Mon, 19 Feb 2024 09:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 629E625558
+	for <kvmarm@lists.linux.dev>; Mon, 19 Feb 2024 09:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708334425; cv=none; b=CKUCuuL+8YqPZO4yx/gWnZ/ls+8ePfcCxCvouI0w0WS52SHctR8irKdl4NZ1US+9oT1DNScSeV+PjPDEzy9lOXvpTcLTcjKzBwyaZf0kgP5hfvfxUK6bOnYkjxi19szA86fWRmziWHPkZqos1eBMmfhBAem9FwFHa6AMO9xeIzc=
+	t=1708335530; cv=none; b=uUHgy7CgQW6wRMjyC975WIDA9oU3GPKm5oMnNDkQ/4LRppzvlv/cO4/Lm4JRDzHk372CzlRFmecJWWOO1YQyI+HSFnjWXxWj7YJg7INNyZ70VcKTffNL44jFQGgH1vBWZ9N4TrE2iRGUVKMSyskUC37Bzqf3NexQbARRvauln/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708334425; c=relaxed/simple;
-	bh=vqA6TJBDRvY50fGHqcQfGVUDuzRuFzAfHui2TaG7QnU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=J/kiUh2wqtw/y0s2S1oLRTbgVlf78AjFJkVcZ1B9uABG73d5UTUA8w/b6Yl8ynqPBldJQaf8iisKHej9Slrb6WIDXjGqr3bZFVWoAyGUw2xleBPfgHYlKDqwSUoIpgs8ipJTVD7KJGppPZrx0/2q1rw3e+EPY7Ajz5zwd7iIJIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JITNI7nT; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JITNI7nT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0E67C433F1;
-	Mon, 19 Feb 2024 09:20:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708334425;
-	bh=vqA6TJBDRvY50fGHqcQfGVUDuzRuFzAfHui2TaG7QnU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JITNI7nToZ36zcDFmHdeJ/RSjkban3qSQ6zMKFUVhWemwfwSekomFisA3qyyfzY4D
-	 V9s9nbNVbqMQR9cwURhdzQar9WMNWIXLh5VxnDhzGk8a/mTrPK5h6zze9cVwph3e1D
-	 cS0sGixwb8QXvYAV4S59XMaQaCCKKjj+OatArSXjy1fgxtUZmL64omaEKbc2D66Cnl
-	 oD9T3JwzLf+kfgAbeLCY7m3EeneIDKOpvgAgzFvGEO0dMFzNEOxSecdEuIqCxbrqtZ
-	 Qky+q9Cf4uiVCncv/IZgqKezctHZVLNnX4KHeE82A+7RcqYS75gDdNPGxcXK1yRTlq
-	 efvRWJxDbYoHA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rbzp1-004WBZ-UH;
-	Mon, 19 Feb 2024 09:20:23 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH 13/13] KVM: arm64: nv: Advertise support for PAuth
-Date: Mon, 19 Feb 2024 09:20:14 +0000
-Message-Id: <20240219092014.783809-14-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240219092014.783809-1-maz@kernel.org>
-References: <20240219092014.783809-1-maz@kernel.org>
+	s=arc-20240116; t=1708335530; c=relaxed/simple;
+	bh=beV3HkcCobjEE+8GR3pJ/U2oTxy49Di4rABAON7noqk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=lj1LdBukcZpCcJBCF8kQhByfFKhrvizPJGa99acgaoYnMpHRolI5IJq1Swb60iLCLCj9T2zjmvmrvA6Tbbdgf9Zpb86rgfSCarz1JHaz+AC7V15FPyliw/NtOJeqgzTUJkJ5n/0PRa6KCNxbbPyeFuWN4Igy+b7wmLQey15c07k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Tdcr055lpzXhDH;
+	Mon, 19 Feb 2024 17:36:48 +0800 (CST)
+Received: from dggpeml500004.china.huawei.com (unknown [7.185.36.140])
+	by mail.maildlp.com (Postfix) with ESMTPS id 13CFF18007A;
+	Mon, 19 Feb 2024 17:38:40 +0800 (CST)
+Received: from [10.174.186.25] (10.174.186.25) by
+ dggpeml500004.china.huawei.com (7.185.36.140) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 19 Feb 2024 17:38:39 +0800
+Message-ID: <a3a41828-e65d-bc7f-ca75-7d3e9477042c@huawei.com>
+Date: Mon, 19 Feb 2024 17:38:15 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH] KVM: arm64: Add capability for unconditional WFx
+ passthrough
+Content-Language: en-US
+To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
+CC: James Morse <james.morse@arm.com>, Suzuki K Poulose
+	<suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas
+	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Paolo Bonzini
+	<pbonzini@redhat.com>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <linux-kernel@vger.kernel.org>, Colton Lewis
+	<coltonlewis@google.com>, <wanghaibin.wang@huawei.com>
+References: <20240129213918.3124494-1-coltonlewis@google.com>
+ <Zbgx8hZgWCmtzMjH@linux.dev>
+From: "sundongxu (A)" <sundongxu3@huawei.com>
+In-Reply-To: <Zbgx8hZgWCmtzMjH@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml500004.china.huawei.com (7.185.36.140)
 
-Now that we (hopefully) correctly handle ERETAx, drop the masking
-of the PAuth feature (something that was not even complete, as
-APA3 and AGA3 were still exposed).
+Hi Marc, Oliver,
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/nested.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+On 2024/1/30 7:17, Oliver Upton wrote:
+> Hi Colton,
+> 
+> On Mon, Jan 29, 2024 at 09:39:17PM +0000, Colton Lewis wrote:
+>> Add KVM_CAP_ARM_WFX_PASSTHROUGH capability to always allow WFE/WFI
+>> instructions to run without trapping. Current behavior is to only
+>> allow this if the vcpu is the only task running. This commit keeps the
+>> old behavior when the capability is not set.
+>>
+>> This allows userspace to set deterministic behavior and increase
+>> efficiency for platforms with direct interrupt injection support.
+> 
+> Marc and I actually had an offlist conversation (shame on us!) about
+> this very topic since there are users asking for the _opposite_ of this
+> patch (unconditionally trap) [*].
+> 
+> I had originally wanted something like this, but Marc made the very good
+> point that (1) the behavior of WFx traps is in no way user-visible and
+> (2) it is entirely an IMP DEF behavior. The architecture only requires
+> the traps be effective if the instruction does not complete in finite
+> time.
+> 
+> We need to think of an interface that doesn't depend on
+> implementation-specific behavior, such as a control based on runqueue
+> depth.
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index ced30c90521a..6813c7c7f00a 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -35,13 +35,9 @@ static u64 limit_nv_id_reg(u32 id, u64 val)
- 		break;
- 
- 	case SYS_ID_AA64ISAR1_EL1:
--		/* Support everything but PtrAuth and Spec Invalidation */
-+		/* Support everything but Spec Invalidation */
- 		val &= ~(GENMASK_ULL(63, 56)	|
--			 NV_FTR(ISAR1, SPECRES)	|
--			 NV_FTR(ISAR1, GPI)	|
--			 NV_FTR(ISAR1, GPA)	|
--			 NV_FTR(ISAR1, API)	|
--			 NV_FTR(ISAR1, APA));
-+			 NV_FTR(ISAR1, SPECRES));
- 		break;
- 
- 	case SYS_ID_AA64PFR0_EL1:
--- 
-2.39.2
+If I understand correctly, this run queue belongs to the scheduler, right?
+And I will be appreciated if you can share any more detail information
+about this.
 
+> 
+> [*] https://lore.kernel.org/kvmarm/a481ef04-ddd2-dfc1-41b1-d2ec45c6a3b5@huawei.com/
+> 
+
+Thanks,
+Dongxu
