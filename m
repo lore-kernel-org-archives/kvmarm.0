@@ -1,41 +1,32 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634F636134
-	for <kvmarm@lists.linux.dev>; Mon, 19 Feb 2024 14:22:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41F5A44388
+	for <kvmarm@lists.linux.dev>; Mon, 19 Feb 2024 16:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708352536; cv=none; b=AAALdNOJsT7VxFgl2AC/bhXhfbdnw8YQ+wTeMPiPfM6gkx0cVU4HIE0n2JzzjjY1drgmx2tSCmD1Q5AgJ1sgjCW7d4Fbm6SYOn2WpqVUrvPVNm9wKr9F4f1xcrVi3pubjAeLyi803M/OhCKKE3nzAoNeGS0OJfjyzStG4MZhVY4=
+	t=1708361771; cv=none; b=qucEtku9rq5BJzAD+AxFyUZkUCfpid8x5cN1xuZCaE9LZbTgtKuoEY15sOwegDQ07AYIKV6L1+P4XsV83dTJowXnxqqdKHWu4ewFtR7nKGwn5DAhyao0N8kcl95DD0a1M9BRBFg7kCn8B9Y0lGflriVm94mzd5+wYL2/VtBR6Nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708352536; c=relaxed/simple;
-	bh=chnIN4vL9jLnK4VypYkgOETR21m7QxjboNyAcNCEsbc=;
+	s=arc-20240116; t=1708361771; c=relaxed/simple;
+	bh=AkPcE8McHBhy/l2wJWb/CDxJG7R5AjV1tCPwRaX1pcM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qxsVF15Y3MPKHId8rmlSTPPeOTUctyfiXLa2mGMMuvPW0zJc69wRlJeELcTafIWPKwLQY8Iea3QOEzCydQlfAaABB2Y2gkkpn4XO/6CvlenwF/0qKzxltHXJoPuOjxPNdkldrL0+jjlzIXRbHdxweTABeBaEPELpeURAfysyQ7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VUaSSK87; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VUaSSK87"
-Date: Mon, 19 Feb 2024 15:22:07 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1708352531;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dEwETXJPSfp+ZHtoUMgCFOjnER5vHjcEDtT5CNqJGtk=;
-	b=VUaSSK87B9kpmQzeWGW2AM2Q9bOuUWaKtCiEwgrNDmt/xTZmzR8vVxSRGVTVGLJn8+sD9h
-	rVZ8o1PCTh35YRlz9lPgYO741JqS0V4finQWlm7uQ16NP3ymMKHH7T5XmXHHVw8qwy+fwU
-	RcSL6ig2k8EFgagHS81uZxk4b7I28xY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=t7cPYrzQVOpTQnmaQsoW9QYjNHWz/JmQvfDfjer5b8uknAYie0gGeUu3U58vkBvxXFK1Q0GYoeKBRaeZMsRkNo0604Oj1fPPl1FK0BV23G/RfbCwA6jnr3fA4FG52mcn/kPB9k4dLbxNZIavOLfXh8v4wiwinax107XsHtbLjN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6B307DA7;
+	Mon, 19 Feb 2024 08:56:49 -0800 (PST)
+Received: from raptor (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8C1CF3F762;
+	Mon, 19 Feb 2024 08:56:08 -0800 (PST)
+Date: Mon, 19 Feb 2024 16:56:05 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: Thomas Huth <thuth@redhat.com>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, 
-	kvmarm@lists.linux.dev
+Cc: Andrew Jones <andrew.jones@linux.dev>,
+	Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
+	Nicholas Piggin <npiggin@gmail.com>, kvmarm@lists.linux.dev
 Subject: Re: [kvm-unit-tests PATCH] lib/arm/io: Fix calling getchar()
  multiple times
-Message-ID: <20240219-a8fd2613c2a3dc474c966ffb@orel>
+Message-ID: <ZdOIJfvVm7C23ZdZ@raptor>
 References: <20240216140210.70280-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -43,15 +34,37 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 In-Reply-To: <20240216140210.70280-1-thuth@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+
+Hi,
+
+Thanks for writing this. I've tested it with kvmtool, which emulates a 8250
+UART:
+
+Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+This fixes a longstanding bug with kvmtool, where migrate_once() would read
+the last character that was sent, and then think that migration was
+completed even though it was never performed.
+
+While we are on the subject of migration:
+
+SKIP: gicv3: its-migration: Test requires at least 4 vcpus
+Now migrate the VM, then press a key to continue...
+INFO: gicv3: its-migration: Migration complete
+SUMMARY: 1 tests, 1 skipped
+
+That's extremely confusing. Why is migrate_once() executed after the
+test_its_pending() function call without checking if the test was skipped?
+
+Nitpicks below.
 
 On Fri, Feb 16, 2024 at 03:02:10PM +0100, Thomas Huth wrote:
 > getchar() can currently only be called once on arm since the implementation
-> is a little bit too  naïve: After the first character has arrived, the
+> is a little bit too  naÃ¯ve: After the first character has arrived, the
 > data register never gets set to zero again. To properly check whether a
 > byte is available, we need to check the "RX fifo empty" on the pl011 UART
 > or the "RX data ready" bit on the ns16550a UART instead.
@@ -118,15 +131,33 @@ On Fri, Feb 16, 2024 at 03:02:10PM +0100, Thomas Huth wrote:
 > -		++count;
 > +	if (is_pl011_uart) {
 > +		if (!(readb(uart0_base + 6 * 4) & 0x10))  /* RX not empty? */
+
+I think it would be useful if the magic numbers were replaced by something
+less opaque, something like:
+
+		if (!(readb(uart0_base + PL011_UARTFR) & PL011_UARTFR_RXFE))
+
 > +			c = readb(uart0_base);
 > +	} else {
 > +		if (readb(uart0_base + 5) & 0x01)         /* RX data ready? */
-> +			c = readb(uart0_base);
-> +	}
 
-I think I'd eventually prefer encapsulating these separate implementations
-into a console device, but that might be a bit heavy handed for a fix that
-we want to pull into the multi-migration series.
+Same as above, perhaps:
+
+		if (readb(uart0_base + UART16550_LSR) & UART16550_LSR_DR)
+
+Naming of course being subject to taste.
 
 Thanks,
-drew
+Alex
+
+> +			c = readb(uart0_base);
+> +	}
+>  
+> -	assert(count < 16);
+> +	spin_unlock(&uart_lock);
+>  
+>  	return c;
+>  }
+> -- 
+> 2.43.0
+> 
