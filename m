@@ -1,116 +1,105 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43DB766B2D
-	for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 11:30:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C6CF664D7
+	for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 11:31:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708428638; cv=none; b=CfopscYrmxznmQaSxn9zhaVsTIqLrpNGcEQHadNGyINCT0E16QfgCES2Grj67hCFWH3Jw0Bcsf/Dy93cm6Ni2ZoyLuRwHfCmaO08vzY8PsvtJomY9y2B2QX4uMTrsKaTaJYgJtDH9gNr95l7Mhxfa+UCtLSqkAG71R4BG9ojwr4=
+	t=1708428693; cv=none; b=UuPdmAcDZ7HMxQR0WNGs8gdHR8wCr1KfMpRe1OQ0y5oIA17uF9lcL+hnYWbguUI+nj/46E6zRIR3lVja6TuWbgvzLlNe5bvl5dTFgqJ3xiNwsedD9UIayxJXYsLFKij5Q3URw4Var8a9VSz0C0db1LDN2JoivmJGTvXS56O9RgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708428638; c=relaxed/simple;
-	bh=+DvpbPLBThjvTjdhN6hhOmNTy8Eu3RCG1WwHjSmI7lA=;
+	s=arc-20240116; t=1708428693; c=relaxed/simple;
+	bh=BwHXckH6JmSTNSejoJCBfxff7io4FiEoiaOCjMwDc6Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jq3uhAvjyjRFZQsupGuUOXMNxR1RNH4asnfpblEtVf299ITb5CCaDNjjdv3m+NyMf2fZuq9NWR1JaaD9sJMXZSNavfwEYkWh7wq1cuHxUOjioJgWRxbQiFA5o4cLDP7mzkdOzuHYuZ2+Aylf7ggR8MGwPOAgUDFIZN3zubtz7+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=fsSLVnDr; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="fsSLVnDr"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=8IV/wZQmZmc4s7oLURGMbrTnuZsGulpwAe3ozx8f5sY=; b=fsSLVnDrrExhI/ODinstjQY7lP
-	HmvWm3h/RGYKlbPxL1A0a3vxKmj936BI7nB63cCc77mwlQtB7EkoPA6H14gi2c2p/E94vjc8iDvBG
-	sTYvRG6F3Jh/G9K03LitnZXPFDFStmjvubNkyGKrSSNOKoBdv7pX/cIa7f/wQ/uTRXxgtCGsX+Xd9
-	iNnRTbExTSaP+A26vWf8MLn40QWYwDxMJQpAEhTzYKM60BfWf5+Zlf6TMkgCCa9IB3sdf1E4sBH1y
-	44k/ZKPTxdYPW/5h1mZtb/SBW5Ce7+ZtjigBjo2MnUsRqUrJzu0YXrD8uzaVjFfif5eSByJylyZiq
-	gtWBI+NA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39114)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rcOKU-0002Jp-0v;
-	Tue, 20 Feb 2024 11:30:30 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rcOKT-0000pa-2v; Tue, 20 Feb 2024 11:30:29 +0000
-Date: Tue, 20 Feb 2024 11:30:28 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
-	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
-	x86@kernel.org, acpica-devel@lists.linuxfoundation.org,
-	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	jianyong.wu@arm.com, justin.he@arm.com,
+	 Content-Type:Content-Disposition:In-Reply-To; b=liCCs7hkmePZS6TO4E782c8nk8/RkVNCGSCRVr0hRjPXYRpan2ncxDBp89AJPKlQBKRsPYqPT8Ax+7ECRjtNcvyYSxcqC+RSJ26iJbCZ8wl6erFkPukJr/xD/b00SKh0NJOP+31il/y1NOTVjjTPL8ViVwxlG9stXwoB0yRQMD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 56DFE106F;
+	Tue, 20 Feb 2024 03:32:10 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EA9823F762;
+	Tue, 20 Feb 2024 03:31:29 -0800 (PST)
+Date: Tue, 20 Feb 2024 11:31:27 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Subject: Re: [PATCH RFC v4 01/15] ACPI: Only enumerate enabled (or
- functional) processor devices
-Message-ID: <ZdSNVPjsti7XKxCV@shell.armlinux.org.uk>
-References: <Zbp5xzmFhKDAgHws@shell.armlinux.org.uk>
- <E1rVDmP-0027YJ-EW@rmk-PC.armlinux.org.uk>
- <CAJZ5v0hY_LXp41WMVPhiLosPe7YVzF38Uz=EhmJqVwqFn==Upw@mail.gmail.com>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH 02/13] KVM: arm64: Clarify ESR_ELx_ERET_ISS_ERET*
+Message-ID: <20240220113127.GB16168@e124191.cambridge.arm.com>
+References: <20240219092014.783809-1-maz@kernel.org>
+ <20240219092014.783809-3-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJZ5v0hY_LXp41WMVPhiLosPe7YVzF38Uz=EhmJqVwqFn==Upw@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20240219092014.783809-3-maz@kernel.org>
 
-On Thu, Feb 15, 2024 at 09:10:39PM +0100, Rafael J. Wysocki wrote:
-> On Wed, Jan 31, 2024 at 5:49 PM Russell King <rmk+kernel@armlinux.org.uk> wrote:
-> >
-> > From: James Morse <james.morse@arm.com>
-> >
-> > Today the ACPI enumeration code 'visits' all devices that are present.
-> >
-> > This is a problem for arm64, where CPUs are always present, but not
-> > always enabled. When a device-check occurs because the firmware-policy
-> > has changed and a CPU is now enabled, the following error occurs:
-> > | acpi ACPI0007:48: Enumeration failure
-> >
-> > This is ultimately because acpi_dev_ready_for_enumeration() returns
-> > true for a device that is not enabled. The ACPI Processor driver
-> > will not register such CPUs as they are not 'decoding their resources'.
-> >
-> > ACPI allows a device to be functional instead of maintaining the
-> > present and enabled bit, but we can't simply check the enabled bit
-> > for all devices since firmware can be buggy.
-> >
-> > If ACPI indicates that the device is present and enabled, then all well
-> > and good, we can enumate it. However, if the device is present and not
-> > enabled, then we also check whether the device is a processor device
-> > to limit the impact of this new check to just processor devices.
-> >
-> > This avoids enumerating present && functional processor devices that
-> > are not enabled.
-> >
-> > Signed-off-by: James Morse <james.morse@arm.com>
-> > Co-developed-by: Rafael J. Wysocki <rjw@rjwysocki.net>
-> > Tested-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> > Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+On Mon, Feb 19, 2024 at 09:20:03AM +0000, Marc Zyngier wrote:
+> The ESR_ELx_ERET_ISS_ERET* macros are a bit confusing:
 > 
-> I can queue this up for 6.9 as it looks like the rest of the series
-> will still need some work.  What do you think?
+> - ESR_ELx_ERET_ISS_ERET really indicates that we have trapped an
+>   ERETA* instruction, as opposed to an ERET
+> 
+> - ESR_ELx_ERET_ISS_ERETA reallu indicates that we have trapped
+>   an ERETAB instruction, as opposed to an ERETAA.
+> 
+> Repaint the two helpers such as:
+> 
+> - ESR_ELx_ERET_ISS_ERET becomes ESR_ELx_ERET_ISS_ERETA
+> 
+> - ESR_ELx_ERET_ISS_ERETA becomes ESR_ELx_ERET_ISS_ERETAB
+> 
+> At the same time, use BIT() instead of raw values.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-That seems to be the only way we can make some progress with this
-series. I've no idea how we progress from here because I can't answer
-your questions on patch 2.
+I'm somewhat against this, as the original names are what the Arm ARM specifies.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> ---
+>  arch/arm64/include/asm/esr.h | 4 ++--
+>  arch/arm64/kvm/handle_exit.c | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+> index 353fe08546cf..72c7810ccf2c 100644
+> --- a/arch/arm64/include/asm/esr.h
+> +++ b/arch/arm64/include/asm/esr.h
+> @@ -290,8 +290,8 @@
+>  		 ESR_ELx_SYS64_ISS_OP2_SHIFT))
+>  
+>  /* ISS field definitions for ERET/ERETAA/ERETAB trapping */
+> -#define ESR_ELx_ERET_ISS_ERET		0x2
+> -#define ESR_ELx_ERET_ISS_ERETA		0x1
+> +#define ESR_ELx_ERET_ISS_ERETA		BIT(1)
+> +#define ESR_ELx_ERET_ISS_ERETAB		BIT(0)
+>  
+>  /*
+>   * ISS field definitions for floating-point exception traps
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 617ae6dea5d5..0646c623d1da 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -219,7 +219,7 @@ static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu)
+>  
+>  static int kvm_handle_eret(struct kvm_vcpu *vcpu)
+>  {
+> -	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERET)
+> +	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERETA)
+
+If this part is confusing due to the name, maybe introduce a function in esr.h
+esr_is_pac_eret() (name pending bikeshedding)?
+
+>  		return kvm_handle_ptrauth(vcpu);
+>  
+>  	/*
+
+Thanks,
+Joey
