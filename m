@@ -1,149 +1,227 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0FC076413
-	for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 15:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE6076030
+	for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 15:14:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708441909; cv=none; b=ohM4Olvfl0C2JmJGMwzcdsHDOmvXDFsCiF63oeitZNo5HsTSHboo2GMqu7TbFb2akLc54Wc0CSk8B0DJEB389zgLGqK0sA11LWH233KNWTQRhx+L3aIr1yWMEzm+pLu2O8HZ4m8mx+DgmtdW8oCsJsTa5MrIfXt5OX+S5PguljI=
+	t=1708442064; cv=none; b=RMyYpUU0fZ2n8Ubawxk54e4ypWj3C8rEIF2s/e5lrmnozxzFLJFQfvCl+yYZg9YSmBf46fFUiSvkatsl4HJh+2Ap4tv/woMaOphLpQWxIRDazq476NoUDDV5iFBQ3FJae79sufn2DcQ3lL/Nn4m+bggwnX/7EoorfxYwnPmvSbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708441909; c=relaxed/simple;
-	bh=iAbfp5RMm6S0VsTLeL0qLihHKZbBLamOM0a8x66sOYk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qe6wi1L7P14TOowR6ZHzfYQFBE1uN6ixvAblIoTDhH7nh48lQaFivwhytnCMk0dtvUYuziQZ4GTE4s8tDcwDY93RXVpj87Jkm81VlBziWD6F5GaLHzZtMZFwePXpxN+4lCh5Bp6bJs5S53QC312ggDtspky04tHnvW1EGcEaeNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s3qQ9s7v; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
+	s=arc-20240116; t=1708442064; c=relaxed/simple;
+	bh=EerVHanUz2tefY83Hs9lDDnTHX9i7fSD2ZbOIE+Yu88=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N6QfU/+CRdfu9L8ieJdnLY8Vxc5L4Zm8E+hV6ocqPKQ2cHL57xZfd+gv/FkD1Wi5BmMLy+4DuozA6WXyA4i7duFWucMschA5UJ9lsqfAmcm/0o6sw5C5mMZp1jmKeGkWvDAElkOy8uW98MXPi5MnKuBYkPkbTqpsWB0QCs+Jxtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Xy5iv0Wr; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s3qQ9s7v"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4120faa1dacso31620055e9.2
-        for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 07:11:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708441906; x=1709046706; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=H7oP8Hepk3ownDnPLORI/cfTnoWlrJNhVmX40NRmmOs=;
-        b=s3qQ9s7v4BCNjmXMt5vgey795oZ5jTyu3FIpZRCmml7EuKTlSvc15oW1SCDmxbblbY
-         R3FjDR9RI6dODJiA5QTtjk9s+W9QlwB4claRMOXXaa9Mn+tCeVn0PencwYQ/XygskkRJ
-         xYzZmgS5UpajIaXE0h5L1QBIlG2WyOlh37rNH1kfIfeejj9nxsJf36IuTLWHUIOkNfdb
-         GN9H7t+ok74QOIrU9QEMFMys07ofpEIFFupwECsn+mGRVp1jaxmV931X354Hgoi2YKBL
-         4bcdeKg41JHrN1stYut18IR2/BFd/D3YJLw3RAXA3dWzlLVgfwjTOrJ8qCDp63kmIujN
-         bAmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708441906; x=1709046706;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H7oP8Hepk3ownDnPLORI/cfTnoWlrJNhVmX40NRmmOs=;
-        b=TP6JSBV4PTHuKYHglokYcFIYz1XhNevvkv5batXaa2G/dC1bcpQF8/FDDJzi7hQtub
-         QqcRzdPeVaAsSgk8l+KbvrFbqz5EtkwePBsGLseoNaTQfyaLmE/bwzlqagGMZM41oAGa
-         0/xz76j6vyUqpO4DdPdT2RJufPogz3hTrlNMwoCBFD6QRNF0rVHiWawPpPIirP9utdSS
-         KSsgs3yPS6AH4Fav/tKPQiuy3cz5RqqmtJUZQYsiTwjt4mvvAuwUWz501XQMkawTtJYe
-         0BSvy+UKybmMBZSGjcVewsoYqGynP49FNrdmBetSHbSp8rt1vqYXLWHgAHxLW9+LgCq2
-         uk7w==
-X-Gm-Message-State: AOJu0YwA0S9DQWibZ1sGgme1g375AiHULZm4vTh3SM0wN1eB0mRB69Gi
-	hstFquahM/PSYFJea8NuR0xoRv0luSwZmFp24WumxmRwOokG63fkb2j29b1aPG/xabOsPx5PTCU
-	saW+XakdjOsLL5OMc+RaRPVWN8g==
-X-Google-Smtp-Source: AGHT+IGB7BTGnDb3ZkCnAAs2rfcGHOBnu1LEeWRHD3gtXF/mQBI/OcbxgBVpxOTVwd/bVPF2OExz8lYc9i55R+XvxE0=
-X-Received: from sebkvm.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:cd5])
- (user=sebastianene job=sendgmr) by 2002:a05:600c:a:b0:411:ea5e:6142 with SMTP
- id g10-20020a05600c000a00b00411ea5e6142mr115684wmc.2.1708441906396; Tue, 20
- Feb 2024 07:11:46 -0800 (PST)
-Date: Tue, 20 Feb 2024 15:10:35 +0000
-In-Reply-To: <20240220151035.327199-1-sebastianene@google.com>
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Xy5iv0Wr"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=qgc8OUZCtZPjwVAIjMqiHy7ikwaI1Mbu1Mp1IdFRzDs=; b=Xy5iv0WrTLeAO0Yk5KZRnMdKyj
+	P5Il3QQ+baeCRbUTHw+M2pQGpzCvY2kVMWyp3dXDSELRc5Ju3nfd11YBuUEHjVI4tFW2/xraLQejU
+	8tft/vHldbP7aGpknVnTEenRzyIrR0qgmIZkTDpzWNYBWSARs/hgaqJkstanzehwL6LPfJLIeqFLo
+	gUb/82YcOQPZlEGA8PE5OTomL+YF+FqTubxG54uf45edRw2uSwN7RfBx+Du1NGHDAZjqfMWrmpglo
+	yS8bLYhbsuhKYbVHwDGhCbqZMUPo3WgWbTMTAIMeCbEX6XIBN4y0pMZBZKVgW6FRGfRXxX28yVi92
+	FpAy11Fw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45522)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rcRoq-00033P-2v;
+	Tue, 20 Feb 2024 15:14:05 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rcRok-0000xX-ST; Tue, 20 Feb 2024 15:13:58 +0000
+Date: Tue, 20 Feb 2024 15:13:58 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, acpica-devel@lists.linuxfoundation.org,
+	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com,
+	James Morse <james.morse@arm.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: [PATCH RFC v4 02/15] ACPI: processor: Register all CPUs from
+ acpi_processor_get_info()
+Message-ID: <ZdTBtt0oR6Q1RcAB@shell.armlinux.org.uk>
+References: <Zbp5xzmFhKDAgHws@shell.armlinux.org.uk>
+ <E1rVDmU-0027YP-Jz@rmk-PC.armlinux.org.uk>
+ <CAJZ5v0iiJpUWq5GMSnKFWQTzn_bdwoQz9m=hDaXNg4Lj_ePF4g@mail.gmail.com>
+ <ZdSMk93c1I6x973h@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240220151035.327199-1-sebastianene@google.com>
-X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
-Message-ID: <20240220151035.327199-7-sebastianene@google.com>
-Subject: [PATCH v6 6/6] KVM: arm64: Expose guest stage-2 pagetable config to debugfs
-From: Sebastian Ene <sebastianene@google.com>
-To: catalin.marinas@arm.com, gshan@redhat.com, james.morse@arm.com, 
-	mark.rutland@arm.com, maz@kernel.org, oliver.upton@linux.dev, 
-	rananta@google.com, ricarkol@google.com, ryan.roberts@arm.com, 
-	shahuang@redhat.com, suzuki.poulose@arm.com, will@kernel.org, 
-	yuzenghui@huawei.com
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kernel-team@android.com, vdonnefort@google.com, 
-	Sebastian Ene <sebastianene@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZdSMk93c1I6x973h@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Make the start level and the IPA bits properties available in the
-virtual machine debugfs directory. Make sure that the KVM structure
-doesn't disappear behind our back and keep a reference to the KVM struct
-while these files are opened.
+On Tue, Feb 20, 2024 at 11:27:15AM +0000, Russell King (Oracle) wrote:
+> On Thu, Feb 15, 2024 at 08:22:29PM +0100, Rafael J. Wysocki wrote:
+> > On Wed, Jan 31, 2024 at 5:50 PM Russell King <rmk+kernel@armlinux.org.uk> wrote:
+> > > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.c
+> > > index cf7c1cca69dd..a68c475cdea5 100644
+> > > --- a/drivers/acpi/acpi_processor.c
+> > > +++ b/drivers/acpi/acpi_processor.c
+> > > @@ -314,6 +314,18 @@ static int acpi_processor_get_info(struct acpi_device *device)
+> > >                         cpufreq_add_device("acpi-cpufreq");
+> > >         }
+> > >
+> > > +       /*
+> > > +        * Register CPUs that are present. get_cpu_device() is used to skip
+> > > +        * duplicate CPU descriptions from firmware.
+> > > +        */
+> > > +       if (!invalid_logical_cpuid(pr->id) && cpu_present(pr->id) &&
+> > > +           !get_cpu_device(pr->id)) {
+> > > +               int ret = arch_register_cpu(pr->id);
+> > > +
+> > > +               if (ret)
+> > > +                       return ret;
+> > > +       }
+> > > +
+> > >         /*
+> > >          *  Extra Processor objects may be enumerated on MP systems with
+> > >          *  less than the max # of CPUs. They should be ignored _iff
+> > 
+> > This is interesting, because right below there is the following code:
+> > 
+> >     if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
+> >         int ret = acpi_processor_hotadd_init(pr);
+> > 
+> >         if (ret)
+> >             return ret;
+> >     }
+> > 
+> > and acpi_processor_hotadd_init() essentially calls arch_register_cpu()
+> > with some extra things around it (more about that below).
+> > 
+> > I do realize that acpi_processor_hotadd_init() is defined under
+> > CONFIG_ACPI_HOTPLUG_CPU, so for the sake of the argument let's
+> > consider an architecture where CONFIG_ACPI_HOTPLUG_CPU is set.
+> > 
+> > So why are the two conditionals that almost contradict each other both
+> > needed?  It looks like the new code could be combined with
+> > acpi_processor_hotadd_init() to do the right thing in all cases.
+> > 
+> > Now, acpi_processor_hotadd_init() does some extra things that look
+> > like they should be done by the new code too.
+> > 
+> > 1. It checks invalid_phys_cpuid() which appears to be a good idea to me.
+> > 
+> > 2. It uses locking around arch_register_cpu() which doesn't seem
+> > unreasonable either.
+> > 
+> > 3. It calls acpi_map_cpu() and I'm not sure why this is not done by
+> > the new code.
+> > 
+> > The only thing that can be dropped from it is the _STA check AFAICS,
+> > because acpi_processor_add() won't even be called if the CPU is not
+> > present (and not enabled after the first patch).
+> > 
+> > So why does the code not do 1 - 3 above?
+> 
+> Honestly, I'm out of my depth with this and can't answer your
+> questions - and I really don't want to try fiddling with this code
+> because it's just too icky (even in its current form in mainline)
+> to be understandable to anyone who hasn't gained a detailed knowledge
+> of this code.
+> 
+> It's going to require a lot of analysis - how acpi_map_cpuid() behaves
+> in all circumstances, what this means for invalid_logical_cpuid() and
+> invalid_phys_cpuid(), what paths will be taken in each case. This code
+> is already just too hairy for someone who isn't an experienced ACPI
+> hacker to be able to follow and I don't see an obvious way to make it
+> more readable.
+> 
+> James' additions make it even more complex and less readable.
 
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
----
- arch/arm64/kvm/ptdump.c | 50 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+As an illustration of the problems I'm having here, I was just writing
+a reply to this with a suggestion of transforming this code ultimately
+to:
 
-diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-index 2c4e0c122d23..a68a22592e97 100644
---- a/arch/arm64/kvm/ptdump.c
-+++ b/arch/arm64/kvm/ptdump.c
-@@ -213,8 +213,58 @@ static const struct file_operations kvm_ptdump_guest_fops = {
- 	.release	= kvm_ptdump_guest_close,
- };
- 
-+static int kvm_pgtable_debugfs_show(struct seq_file *m, void *)
-+{
-+	const struct file *file = m->file;
-+	struct kvm_pgtable *pgtable = m->private;
-+
-+	if (!strcmp(file_dentry(file)->d_iname, "ipa_range"))
-+		seq_printf(m, "%2u\n", pgtable->ia_bits);
-+	else if (!strcmp(file_dentry(file)->d_iname, "stage2_levels"))
-+		seq_printf(m, "%1d\n", pgtable->start_level);
-+	return 0;
-+}
-+
-+static int kvm_pgtable_debugfs_open(struct inode *m, struct file *file)
-+{
-+	struct kvm *kvm = m->i_private;
-+	struct kvm_s2_mmu *mmu;
-+	struct kvm_pgtable *pgtable;
-+	int ret;
-+
-+	if (!kvm_get_kvm_safe(kvm))
-+		return -ENOENT;
-+
-+	mmu = &kvm->arch.mmu;
-+	pgtable = mmu->pgt;
-+
-+	ret = single_open(file, kvm_pgtable_debugfs_show, pgtable);
-+	if (ret < 0)
-+		kvm_put_kvm(kvm);
-+	return ret;
-+}
-+
-+static int kvm_pgtable_debugfs_close(struct inode *m, struct file *file)
-+{
-+	struct kvm *kvm = m->i_private;
-+
-+	kvm_put_kvm(kvm);
-+	return single_release(m, file);
-+}
-+
-+static const struct file_operations kvm_pgtable_debugfs_fops = {
-+	.open		= kvm_pgtable_debugfs_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= kvm_pgtable_debugfs_close,
-+};
-+
- void kvm_ptdump_guest_register(struct kvm *kvm)
- {
- 	debugfs_create_file("stage2_page_tables", 0400, kvm->debugfs_dentry,
- 			    kvm, &kvm_ptdump_guest_fops);
-+	debugfs_create_file("ipa_range", 0400, kvm->debugfs_dentry, kvm,
-+			    &kvm_pgtable_debugfs_fops);
-+	debugfs_create_file("stage2_levels", 0400, kvm->debugfs_dentry,
-+			    kvm, &kvm_pgtable_debugfs_fops);
- }
+	if (!get_cpu_device(pr->id)) {
+		int ret;
+
+		if (!invalid_logical_cpuid(pr->id) && cpu_present(pr->id))
+			ret = acpi_processor_make_enabled(pr);
+		else
+			ret = acpi_processor_make_present(pr);
+
+		if (ret)
+			return ret;
+	}
+
+(acpi_processor_make_present() would be acpi_processor_hotadd_init()
+and acpi_processor_make_enabled() would be arch_register_cpu() at this
+point.)
+
+Then I realised that's a bad idea - because we really need to check
+that pr->id is valid before calling get_cpu_device() on it, so this
+won't work. That leaves us with:
+
+	int ret;
+
+	if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
+		/* x86 et.al. path */
+		ret = acpi_processor_make_present(pr);
+	} else if (!get_cpu_device(pr->id)) {
+		/* Arm64 path */
+		ret = acpi_processor_make_enabled(pr);
+	} else {
+		ret = 0;
+	}
+
+	if (ret)
+		return ret;
+
+Now, the next transformation would be to move !get_cpu_device(pr->id)
+into acpi_processor_make_enabled() which would eliminate one of those
+if() legs.
+
+Now, if we want to somehow make the call to arch_regster_cpu() common
+in these two paths, the next question is what are the _precise_
+semantics of acpi_map_cpu(), particularly with respect to it
+modifying pr->id. Is it guaranteed to always give the same result
+for the same processor described in ACPI? What acpi_map_cpu() anyway,
+I can find no documentation for it.
+
+Then there's the question whether calling acpi_unmap_cpu() should be
+done on the failure path if arch_register_cpu() fails, which is done
+for the x86 path but not the Arm64 path. Should it be done for the
+Arm64 path? I've no idea, but as Arm64 doesn't implement either of
+these two functions, I guess they could be stubbed out and thus be
+no-ops - but then we open a hole where if pr->id is invalid, we
+end up passing that invalid value to arch_register_cpu() which I'm
+quite sure will explode with a negative CPU number.
+
+So, to my mind, what you're effectively asking for is a total rewrite
+of all the code in and called by acpi_processor_get_info()... and that
+is not something I am willing to do (because it's too far outside of
+my knowledge area.)
+
+As I said in my reply to patch 1, I think your comments on patch 2
+make Arm64 vcpu hotplug unachievable in a reasonable time frame, and
+certainly outside the bounds of what I can do to progress this.
+
+So, at this point I'm going to stand down from further participation
+with this patch set as I believe I've reached the limit of what I can
+do to progress it.
+
 -- 
-2.44.0.rc0.258.g7320e95886-goog
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
