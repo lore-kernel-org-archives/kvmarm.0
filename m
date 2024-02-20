@@ -1,210 +1,130 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B4B67C4E;
-	Tue, 20 Feb 2024 15:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C40C7640A;
+	Tue, 20 Feb 2024 16:11:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708443687; cv=none; b=Wl4WFnW79Xm2enZUa+6rJn6Nb+MBmc22R/gTLzOxcB5l4rGDpxlgkcnjMSE6G6nrqgeXIGOLVwNiY+Zfqy5d/SfoT3nPnIewtMTcHAEUqDM+VdmyPboStbyoRcptSCahU0q2oxebWnj9tt7LKogKNVTvUTAKiMEj2axjQpEpyWo=
+	t=1708445499; cv=none; b=fax1z+TGTbW9qc1/LBzhoLe5ohWOzHZvr9ktzVBtWQI7Q/QVrqc0BkvfdTroQRMjEPHzzcYonredt2UH7GNf7eVsLq4Odww5+anGRRc8EnBCbDsWxrt7BDo7QUv9k/gFcOY5VhnXke52X/ikgbBPVytAK1rnIPlcsUxvT/liP8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708443687; c=relaxed/simple;
-	bh=Rc2Iumg6kJhz1u6L7ZpPNjFfPAPoH7W2SUxWAqg8m5E=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GbatlnLQfquyZ1O+finswEM0WUTaJlZ5JbStxnHY68sCXB202r99umEn6A0qw8ekTuuAltydW/dCXNx1AovhbQ81c2mn7ZdTbfMNVGu3hfswabSvLeakYSmVKz2+zkB47L9pWWgNzLkii3Uop4WAFYxNWr53UXMF+NMvbmpeyZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mZaPlmEQ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708445499; c=relaxed/simple;
+	bh=fCJbgzdtJxxNPFzcJXDz7ixxdXTlq2P+306W5u4RkKA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q7irVYk1H/C/MG2eR+jrbh82zUFiz/IRzNlzv3zfAwernGpprEKSYUWaKqaU4xHQaSHd76hESKeeMDsXyfvAzR12AVUASwCnB0Glzh9xQgrEsp0588CzbXLcvu3oRHkVXHvy3XXMjvakoq+f8wtuj2yt8hqCqBkKN2Wd/JOhrA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SFtjRf56; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mZaPlmEQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF1A7C433C7;
-	Tue, 20 Feb 2024 15:41:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SFtjRf56"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCDCEC433C7;
+	Tue, 20 Feb 2024 16:11:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708443686;
-	bh=Rc2Iumg6kJhz1u6L7ZpPNjFfPAPoH7W2SUxWAqg8m5E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mZaPlmEQQUUiSUzRjJyIqol1tl/YTV7EUdYOyBExz5YqU2Y8xkUbTHsKQXwsYTwmc
-	 /frQrMYW0sxg3cqgUbi4AB7Ujl8MHeGlKKt0YJDHP425MJSls1seanDFz8n5ygo2eW
-	 ERelFApqfKztnMwqLGISv0XsHx+2h8XY8C3Du/jYba++eNhbaBnEx1O6VXY+yvf6JO
-	 lKrIUgUOe1HGNQwGZ+sqWqCclNcGiEjv3C7sdP5F5n5EfkW0J/CVN6bCjeUpH5KT+v
-	 I6O4Yqk3pv0V5VOJXgx6echjsquhdaRbwbel/sMCeFORX5Kud5WxR2y5ItxDfjqnui
-	 qplq8lljQqVSg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rcSFI-004xxT-8q;
-	Tue, 20 Feb 2024 15:41:24 +0000
-Date: Tue, 20 Feb 2024 15:41:23 +0000
-Message-ID: <86y1bf2lek.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+	s=k20201202; t=1708445498;
+	bh=fCJbgzdtJxxNPFzcJXDz7ixxdXTlq2P+306W5u4RkKA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SFtjRf56hxgtIcgTRK1NNfoAD+0lHtjNeN/mSRfhFCAFQMKnPkqnU4nW1WJ4gcUTZ
+	 aD0v0juZzak7d+U2X1esZ60fnje8edQNVle/Bt/ZSY9ZUM0ER8HB7kJ8BGtEhhKWgD
+	 NrVoCnd0MzhjDUGvVtNTsnnXR2O/ffkgIvKJMIa0SxOtvdhFT0A10Sbs+NsFCIdvIZ
+	 1a+wRGg84NDpg5CyAEz9Twsa1jH8XhsKDzDLW8Ldqk/Sw0AikaeMuQyrPRU2nGrwmB
+	 3JU23L0QsUMOav5pyiLTnAiSXTGQmvmiQlNcrUJmjUcHI03G2I39Mj8hbSIVwoKBTC
+	 yJxUG70YF1cDw==
+Date: Tue, 20 Feb 2024 16:11:30 +0000
+From: Mark Brown <broonie@kernel.org>
+To: James Clark <james.clark@arm.com>
+Cc: coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, maz@kernel.org, suzuki.poulose@arm.com,
+	acme@kernel.org, oliver.upton@linux.dev,
 	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 04/13] KVM: arm64: nv: Configure HCR_EL2 for FEAT_NV2
-In-Reply-To: <20240220151600.GC8575@e124191.cambridge.arm.com>
-References: <20240219092014.783809-1-maz@kernel.org>
-	<20240219092014.783809-5-maz@kernel.org>
-	<20240220151600.GC8575@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mike Leach <mike.leach@linaro.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Miguel Luis <miguel.luis@oracle.com>,
+	Joey Gouly <joey.gouly@arm.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Arnd Bergmann <arnd@arndb.de>, Mark Rutland <mark.rutland@arm.com>,
+	Kalesh Singh <kaleshsingh@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>, Fuad Tabba <tabba@google.com>,
+	Jing Zhang <jingzhangos@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 3/7] arm64/sysreg/tools: Move TRFCR definitions to
+ sysreg
+Message-ID: <18995343-e43e-4e92-a97d-3df74ec6ddb7@sirena.org.uk>
+References: <20240220100924.2761706-1-james.clark@arm.com>
+ <20240220100924.2761706-4-james.clark@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="wa66B86kvsE+u+/E"
+Content-Disposition: inline
+In-Reply-To: <20240220100924.2761706-4-james.clark@arm.com>
+X-Cookie: E = MC ** 2 +- 3db
 
-On Tue, 20 Feb 2024 15:16:00 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> Hi,
-> 
-> On Mon, Feb 19, 2024 at 09:20:05AM +0000, Marc Zyngier wrote:
-> > Add the HCR_EL2 configuration for FEAT_NV2, adding the required
-> > bits for running a guest hypervisor, and overall merging the
-> > allowed bits provided by the guest.
-> > 
-> > This heavily replies on unavaliable features being sanitised
-> > when the HCR_EL2 shadow register is accessed, and only a couple
-> > of bits must be explicitly disabled.
-> > 
-> > Non-NV guests are completely unaffected by any of this.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/sysreg.h         |  1 +
-> >  arch/arm64/kvm/hyp/include/hyp/switch.h |  4 +--
-> >  arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
-> >  arch/arm64/kvm/hyp/vhe/switch.c         | 34 ++++++++++++++++++++++++-
-> >  4 files changed, 36 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> > index 9e8999592f3a..a5361d9032a4 100644
-> > --- a/arch/arm64/include/asm/sysreg.h
-> > +++ b/arch/arm64/include/asm/sysreg.h
-> > @@ -498,6 +498,7 @@
-> >  #define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
-> >  #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
-> >  #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
-> > +#define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
-> >  
-> >  #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
-> >  #define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
-> 
-> I'm seeing double! (SYS_VNCR_EL2 is already defined a few lines
-> down)
 
-Ah, it got added by Miguel and my rebase didn't weed it out. It also
-doesn't help that SYS_TRFCR_EL2 is out of sequence... Anyway, I'll
-drop this, thanks for spotting it.
+--wa66B86kvsE+u+/E
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> 
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > index e3fcf8c4d5b4..f5f701f309a9 100644
-> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > @@ -271,10 +271,8 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
-> >  	__deactivate_traps_hfgxtr(vcpu);
-> >  }
-> >  
-> > -static inline void ___activate_traps(struct kvm_vcpu *vcpu)
-> > +static inline void ___activate_traps(struct kvm_vcpu *vcpu, u64 hcr)
-> >  {
-> > -	u64 hcr = vcpu->arch.hcr_el2;
-> > -
-> >  	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM))
-> >  		hcr |= HCR_TVM;
-> >  
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> > index c50f8459e4fc..4103625e46c5 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> > @@ -40,7 +40,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
-> >  {
-> >  	u64 val;
-> >  
-> > -	___activate_traps(vcpu);
-> > +	___activate_traps(vcpu, vcpu->arch.hcr_el2);
-> >  	__activate_traps_common(vcpu);
-> >  
-> >  	val = vcpu->arch.cptr_el2;
-> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> > index 58415783fd53..29f59c374f7a 100644
-> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> > @@ -33,11 +33,43 @@ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
-> >  DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
-> >  DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
-> >  
-> > +/*
-> > + * HCR_EL2 bits that the NV guest can freely change (no RES0/RES1
-> > + * semantics, irrespective of the configuration), but that cannot be
-> > + * applied to the actual HW as things would otherwise break badly.
-> > + *
-> > + * - TGE: we want to use EL1, which is incompatible with it being set
-> 
-> Can you make this a bit clearer:
-> 
-> 	we want the guest to use EL1
-> 
-> Assuming I've understood correctly. I first read it as 'we' == kvm.
+On Tue, Feb 20, 2024 at 10:09:13AM +0000, James Clark wrote:
+> Add separate definitions for ELx and EL2 as TRFCR_EL1 doesn't have CX.
+> This also mirrors the previous definition so no code change is required.
 
-Sure thing, happy to update that.
+This is also converting to automatic generation in the process.
 
->> > + *
-> > + * - API/APK: for hysterical raisins, we enable PAuth lazily, which
-> > + *   means that the guest's bits cannot be directly applied (we really
-> > + *   want to see the traps). Revisit this at some point.
-> > + */
-> > +#define NV_HCR_GUEST_EXCLUDE	(HCR_TGE | HCR_API | HCR_APK)
-> > +
-> > +static u64 __compute_hcr(struct kvm_vcpu *vcpu)
-> > +{
-> > +	u64 hcr = vcpu->arch.hcr_el2;
-> > +
-> > +	if (!vcpu_has_nv(vcpu))
-> > +		return hcr;
-> > +
-> > +	if (is_hyp_ctxt(vcpu)) {
-> > +		hcr |= HCR_NV | HCR_NV2 | HCR_AT | HCR_TTLB;
-> > +
-> > +		if (!vcpu_el2_e2h_is_set(vcpu))
-> > +			hcr |= HCR_NV1;
-> > +
-> > +		write_sysreg_s(vcpu->arch.ctxt.vncr_array, SYS_VNCR_EL2);
-> > +	}
-> > +
-> > +	return hcr | (__vcpu_sys_reg(vcpu, HCR_EL2) & ~NV_HCR_GUEST_EXCLUDE);
-> > +}
-> > +
-> >  static void __activate_traps(struct kvm_vcpu *vcpu)
-> >  {
-> >  	u64 val;
-> >  
-> > -	___activate_traps(vcpu);
-> > +	___activate_traps(vcpu, __compute_hcr(vcpu));
-> >  
-> >  	if (has_cntpoff()) {
-> >  		struct timer_map map;
-> 
-> Otherwise,
-> 
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+> +SysregFields TRFCR_EL2
+> +Res0	63:7
+> +UnsignedEnum	6:5	TS
+> +	0b0000	USE_TRFCR_EL1_TS
+> +	0b0001	VIRTUAL
+> +	0b0010	GUEST_PHYSICAL
+> +	0b0011	PHYSICAL
+> +EndEnum
+> +Res0	4
+> +Field	3	CX
+> +Res0	2
+> +Field	1	E2TRE
+> +Field	0	E0HTRE
+> +EndSysregFields
 
-Thanks!
+This has exactly one user and I'd not expect more so why have a separate
+SysregFields?
 
-	M.
+> +# TRFCR_EL1 doesn't have the CX bit so redefine it without CX instead of
+> +# using a shared definition between TRFCR_EL2 and TRFCR_EL1
 
--- 
-Without deviation from the norm, progress is not possible.
+This comment is reflecting the default state?
+
+> +Sysreg	TRFCR_EL1	3	0	1	2	1
+> +Fields	TRFCR_ELx
+> +EndSysreg
+> +
+> +Sysreg	TRFCR_EL2	3	4	1	2	1
+> +Fields	TRFCR_EL2
+> +EndSysreg
+> +
+> +Sysreg	TRFCR_EL12	3	5	1	2	1
+> +Fields	TRFCR_ELx
+> +EndSysreg
+
+These are generally sorted by encoding (simiarly to how sysreg.h was
+sorted historically).
+
+--wa66B86kvsE+u+/E
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXUzzEACgkQJNaLcl1U
+h9CQWAf/aD2427fNk360iRhg6pTosQgT0c+SaeDdLiO2QPiJqOQRiI4OQTlMpHOg
+KiSUIyzOV4tvIlc9v79q8DBHGkPqTWnwjdKAb/sicVgy2z0lsaHAF6NeqKbXYO7k
+Mt+VhXBJ+UeT0+VW9u6IbHQrrSU8s38uLBmE8ug8NTAVtytIsOI93FO8gpwtgqPk
+KBfruF9VtUoBXd/AAowPQYf4oa6AUhv+9mWgENaydDV7LrtgTOCpKZ4C8l16R5/6
+fCExQ3f3MKaaWy9W29qY/fNnDttFZtrTDT2FN4NNou0aAredkBxoUbzNAQhOCJD9
+w159Rk9+frryVxXJ4NYgdgKPiOc2FQ==
+=Slmu
+-----END PGP SIGNATURE-----
+
+--wa66B86kvsE+u+/E--
