@@ -1,123 +1,104 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA696A03E
-	for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 13:23:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49AE6A339;
+	Tue, 20 Feb 2024 13:41:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708435436; cv=none; b=j3ii+dFOXGmzi3m/+K5coV8sg4fq8atOXlizypOMsj83nYaf2nbLUcR3W1c2/OigLxLlFWgNCA5S3a+mq1ReAfkOJU6e5x+geeIXAsZCbjZav63oEGuaobYgYK70SmBVVcdM1xYyCqXlWbga852ptl1wm6Edyr+J/8ieB1FX+So=
+	t=1708436478; cv=none; b=KAXvaPuP3bqEmjNClO4QHufeh+wHqfFv0vXr7TMXNrT2Fc+hKvA8FhJVakB75T8VOZ8I/EGuy9JvXC+jXTrqobt8aGT4ohbHPyBvxxBIgF+8Lwbi44sBWv/DZ3VcRx9MDaGNk6Dbo7s3Lq5v/Jq6nk5A9cHQtn4XboapiZ3E8tE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708435436; c=relaxed/simple;
-	bh=DeeXSvIxgYiYaGQcMq9PvMO7guh9vNjSt50+vBd21A8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KEvuUv4UIBeP3We2EF5F1jRPRyuawoQEvU+hThBT4jmKj11Bp/KBJ2Kx8QQUGbigjq1FG71pYI2RCE8zk3ao5/m3yVi2M44X2hpTz3ueCyIziZ9G5IcyYCpswvLyiHnb1TAUrSfoAtmc0xWJZN2WENC0Jkvg7gFrz4mHOSlY19U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1D125FEC;
-	Tue, 20 Feb 2024 05:24:33 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B89923F73F;
-	Tue, 20 Feb 2024 05:23:52 -0800 (PST)
-Date: Tue, 20 Feb 2024 13:23:50 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	s=arc-20240116; t=1708436478; c=relaxed/simple;
+	bh=+Le9jOeWGGyC43vashfPZPJjhioL9TzLhUbZ0z/BMxo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EFg2hIPzQZ6dLgNbupepm0ZmKWYQW/JmmRRr2OsRQd4uMK5tkg/XmC9iXmT5gMn2GYnETPJe9BcKfThqN/EYQ/Sb+cu7QsqTzVZr+w+nsYzokAEHuluVxaLWuOLtPNsKTY2ogqC2DvKwVB9yn9VOYkPaXwWOMMY3GESPQ8mAYUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PKbIZm94; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PKbIZm94"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5809DC433C7;
+	Tue, 20 Feb 2024 13:41:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708436478;
+	bh=+Le9jOeWGGyC43vashfPZPJjhioL9TzLhUbZ0z/BMxo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PKbIZm94kMysi2iNMjcjkFcoGQs2vEdPS6OA7Hu/n0SOEHb1RHEouK1HSbcbZt76g
+	 P5cIvU2+nPAI2lHcivTLVb6COkzbG+XxQ7+cUWuhs4zrY1ci7g1+7907RJxPBMsTkD
+	 ubfVO5Eo4RN6+frTOhTAAQDfb2mnPkqDPPHYYJFS+BBGNmvviBbExNAicnOX2RpqF9
+	 gsVrtRMddA3wT8KkL2xoHiWcH3lKr/FjObX0YqwTd/BTJioPnazQuBT2XpC/VRsFqx
+	 BsOrrH+Gy/FcmbxVi8rLX1ZXtqHMN4b6c0x8HnW4kVEFIOL7cYJCoShivJm+e6ghyS
+	 xYb+NcshGzJIA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rcQN1-004vy2-OM;
+	Tue, 20 Feb 2024 13:41:16 +0000
+Date: Tue, 20 Feb 2024 13:41:15 +0000
+Message-ID: <86zfvv2qys.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
 Subject: Re: [PATCH 02/13] KVM: arm64: Clarify ESR_ELx_ERET_ISS_ERET*
-Message-ID: <20240220132350.GB8575@e124191.cambridge.arm.com>
+In-Reply-To: <20240220132350.GB8575@e124191.cambridge.arm.com>
 References: <20240219092014.783809-1-maz@kernel.org>
- <20240219092014.783809-3-maz@kernel.org>
- <20240220113127.GB16168@e124191.cambridge.arm.com>
- <861q9748ut.wl-maz@kernel.org>
+	<20240219092014.783809-3-maz@kernel.org>
+	<20240220113127.GB16168@e124191.cambridge.arm.com>
+	<861q9748ut.wl-maz@kernel.org>
+	<20240220132350.GB8575@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <861q9748ut.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Feb 20, 2024 at 12:29:30PM +0000, Marc Zyngier wrote:
-> On Tue, 20 Feb 2024 11:31:27 +0000,
-> Joey Gouly <joey.gouly@arm.com> wrote:
+On Tue, 20 Feb 2024 13:23:50 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
+> 
+> On Tue, Feb 20, 2024 at 12:29:30PM +0000, Marc Zyngier wrote:
+> > On Tue, 20 Feb 2024 11:31:27 +0000,
+> > Joey Gouly <joey.gouly@arm.com> wrote:
+> > > 
+> > > If this part is confusing due to the name, maybe introduce a function in esr.h
+> > > esr_is_pac_eret() (name pending bikeshedding)?
 > > 
-> > On Mon, Feb 19, 2024 at 09:20:03AM +0000, Marc Zyngier wrote:
-> > > The ESR_ELx_ERET_ISS_ERET* macros are a bit confusing:
-> > > 
-> > > - ESR_ELx_ERET_ISS_ERET really indicates that we have trapped an
-> > >   ERETA* instruction, as opposed to an ERET
-> > > 
-> > > - ESR_ELx_ERET_ISS_ERETA reallu indicates that we have trapped
-> > >   an ERETAB instruction, as opposed to an ERETAA.
-> > > 
-> > > Repaint the two helpers such as:
-> > > 
-> > > - ESR_ELx_ERET_ISS_ERET becomes ESR_ELx_ERET_ISS_ERETA
-> > > 
-> > > - ESR_ELx_ERET_ISS_ERETA becomes ESR_ELx_ERET_ISS_ERETAB
-> > > 
-> > > At the same time, use BIT() instead of raw values.
-> > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > That's indeed a better option. Now for the bikeshed aspect:
 > > 
-> > I'm somewhat against this, as the original names are what the Arm
-> > ARM specifies.
-> 
-> I don't disagree, but that doesn't make the ARM ARM right! ;-)
-> 
+> > - esr_iss_is_eretax(): check for ESR_ELx_ERET_ISS_ERET being set
 > > 
-> > > ---
-> > >  arch/arm64/include/asm/esr.h | 4 ++--
-> > >  arch/arm64/kvm/handle_exit.c | 2 +-
-> > >  2 files changed, 3 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> > > index 353fe08546cf..72c7810ccf2c 100644
-> > > --- a/arch/arm64/include/asm/esr.h
-> > > +++ b/arch/arm64/include/asm/esr.h
-> > > @@ -290,8 +290,8 @@
-> > >  		 ESR_ELx_SYS64_ISS_OP2_SHIFT))
-> > >  
-> > >  /* ISS field definitions for ERET/ERETAA/ERETAB trapping */
-> > > -#define ESR_ELx_ERET_ISS_ERET		0x2
-> > > -#define ESR_ELx_ERET_ISS_ERETA		0x1
-> > > +#define ESR_ELx_ERET_ISS_ERETA		BIT(1)
-> > > +#define ESR_ELx_ERET_ISS_ERETAB		BIT(0)
-> > >  
-> > >  /*
-> > >   * ISS field definitions for floating-point exception traps
-> > > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> > > index 617ae6dea5d5..0646c623d1da 100644
-> > > --- a/arch/arm64/kvm/handle_exit.c
-> > > +++ b/arch/arm64/kvm/handle_exit.c
-> > > @@ -219,7 +219,7 @@ static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu)
-> > >  
-> > >  static int kvm_handle_eret(struct kvm_vcpu *vcpu)
-> > >  {
-> > > -	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERET)
-> > > +	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERETA)
+> > - esr_iss_is_eretab(): check for ESR_ELx_ERET_ISS_ERETA being set
 > > 
-> > If this part is confusing due to the name, maybe introduce a function in esr.h
-> > esr_is_pac_eret() (name pending bikeshedding)?
+> > Thoughts?
+> > 
 > 
-> That's indeed a better option. Now for the bikeshed aspect:
-> 
-> - esr_iss_is_eretax(): check for ESR_ELx_ERET_ISS_ERET being set
-> 
-> - esr_iss_is_eretab(): check for ESR_ELx_ERET_ISS_ERETA being set
-> 
-> Thoughts?
-> 
+> I was trying to avoid the ERETA* confusion by suggesting 'pac_eret', but if I
+> were to pick between your options I'd pick esr_iss_is_eretax().
 
-I was trying to avoid the ERETA* confusion by suggesting 'pac_eret', but if I
-were to pick between your options I'd pick esr_iss_is_eretax().
+It's not an either/or situation. We actually need both:
+
+- esr_iss_is_eretax() being true tells you that you need to
+  authenticate the ERET
+
+- esr_iss_is_eretab() tells you that you need to use the A or B key
 
 Thanks,
-Joey
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
