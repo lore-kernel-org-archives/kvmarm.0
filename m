@@ -1,227 +1,107 @@
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A1B6405CF
-	for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 01:37:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FF7136B01
+	for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 02:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708393072; cv=none; b=mjKVo2Pa4BP7tXa3z4GpOGmW8YO/Q0Z0dMVVDvPEP0bO92AA9a2lODvOkPfh7kxywBNqzJGsMHfQK4jdLMJgRRZJa0HwYXlMQ+4x5QHMI0cgbxh8aQrcPWPT6dwl0f1tqxRjXj31FGatYwsCCZghA/B1uD3j6VUm8fEKkZaePw8=
+	t=1708394453; cv=none; b=TSZeDaE0MKRTndt4LoygSyyg4BYGdUNOr0yjACaibzdZGBHvMLw66ZoMor5b9oigJVHMBidL+VTPZRENOj31HN4aKUa0ZBZ3cjy7+CCgCNTPez72OwnDaE/6cKWoZafu95ysP0XaUWJdaLYjgnvL5LlgktmBXtWINgreAe+BuFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708393072; c=relaxed/simple;
-	bh=tZhbd5SMUDQHUNl5Fq6WaKWET16FL5fhIAh4Vm93LO4=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=CNXJ8Ddt7upkv01e+GO/ZFmW/v12Jr7H5KIBvXR67RuIelonLNnvDIiANI7vyxS/8IKFjaf+kpidgn7O4kjKe9zuYevt9sY7ZS1IttoNwiDlxk5kVCkLwaGNaBQbRw9Dvn43uPSfq5jwXrNI1iq39gZu07GFBoh2jh5k/IUVr6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bn+w7oDd; arc=none smtp.client-ip=209.85.167.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1708394453; c=relaxed/simple;
+	bh=qiYCOBCXkZA+S1xJHN9t4SVRhSQ71ysKQ9Kl/44/lHY=;
+	h=References:From:To:Cc:Subject:In-reply-to:Date:Message-ID:
+	 MIME-Version:Content-Type; b=dm+BxGTJpmu4h8IIAWZ6yxXImNdvh33a6hR/g36YGtIycXKh28UpbiUVDU8qKnnYali0MiTRwYazgaTf4AtkuOwC8bBJ+wu96lyCOkDt8Aj8PvXbZmaVoDev6cB8Fi8S3OrgLZEtrDYaQk45d4MXFvkN6HjH296/hiNKAhhLsKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=YxFeDpf2; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bn+w7oDd"
-Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3c03d6e5e56so5124409b6e.1
-        for <kvmarm@lists.linux.dev>; Mon, 19 Feb 2024 17:37:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YxFeDpf2"
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-53fa455cd94so3522577a12.2
+        for <kvmarm@lists.linux.dev>; Mon, 19 Feb 2024 18:00:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708393070; x=1708997870; darn=lists.linux.dev;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nFajET3gehPBC380UF5pOUPKWV3LT2rAo3DivAM+jaw=;
-        b=Bn+w7oDddV9qJ/1umgIlNY8NOm4dAlz1jpgUaiftcs+m7pPoK7szjD4iGf/qkr4EVP
-         DFiKcg6bbAwocWhg2q8iDT5rNLUhODhGKeqNBKoWACEhCxK3KQgFvyYeGvbKFjPdjFX1
-         rrusdOfuajV8EqpuXFIH90pBWMLO6zCgCcyEiMTmutMZzdRHoNOF1q+zjp0jZy4lidLe
-         x/5TgDRYyau2EQas2+dcuNNvCk5TSn5nZ/tWE0l+i0jbXNR0E4HemqgonQDU95NlwRXi
-         gFrrY2LeVhICq4Y9h/mRHwKcnWDJOkqNaICfvlkDW09f4L426ljcyr09zeWXIys5pEab
-         319Q==
+        d=linaro.org; s=google; t=1708394450; x=1708999250; darn=lists.linux.dev;
+        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=TPVEuybRyh8o5XcrU4e2hriNxyZdgI2hibiqaIMVscs=;
+        b=YxFeDpf2YSn/UiOKivgydgsNsNLAmoUrJ0cE1W9XKZB2trBiP0jUPh7hAHALwld/GF
+         JcfNXKyxb9IQvLbzc+96IRQ/68leBKG3nMbIBlWlL4027c/WDM96DCOps/apznrLRCGh
+         XQqk3bMxTr4PR8maM4NVJUvrSlPHbIhKWf9Ib+eOV0bKMBlV9W//BwSr1iVeoqxiTHuR
+         dHeLuVQ6ExqTEEN5AiG7TxfeQvU35HqmfCqEfF2OaPMrs6hWC0aRyUve8D18TIr33jvP
+         opWxFq76fC0omR5bZsARf9faUAm5hORwsbHLqQvBmnfTWKBsi332cICFgFA4MgiucDtX
+         FN5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708393070; x=1708997870;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=nFajET3gehPBC380UF5pOUPKWV3LT2rAo3DivAM+jaw=;
-        b=ChlWmlZBj6Iopo1KlasNI4R4CpqLm6t0SAV2dmtrOpJQTCbrGzp507zDpv9gyg82Jh
-         ef6Yx80wEY3ur5iudEaVq2x70wddAis9jmCQQOjoLMI+gbM2spnrcSK/SaUS8L5GKThA
-         i/NUevS/3KSJw5dzQCuxKRKorKPPUV55v1lxlrIIomWANrhlG69ie62BJLmNo97R/tKx
-         uLNPBdFtVYVLX0npF2NcMOWQkY6zETW9otTf83KDnZGB0F6ly6kLL2wCSCQzi747ekHq
-         qOX+5h8fwzBmGfBpjHcH6udJuREs35CurRLSWRDDEM0slHz/ug1LDr2WU8fRhxiYGGj+
-         0UKw==
-X-Forwarded-Encrypted: i=1; AJvYcCXBY6gqwuNJ6YGPMJUNQnNOVfEYf3X2LIMLVxRcDAPGnybLQI0o7qQYMPwNkGxvQcixIajf7Rn8nrdkJd1UC8jifsfOJ9u2
-X-Gm-Message-State: AOJu0YzPCaRus/eLrHujYFJOTKHX+k0RGltzeFAQqhFOyS591GKStRUj
-	AHcVNyrtKY/yFbh/ouaw2lOjd1rUg/dBnOEpNtKGJNoUazQip/HR
-X-Google-Smtp-Source: AGHT+IEgavf6g8kYYQ/AYPYws0X7emy2nUHVxar1CkHBpLrZcENDqEXdzI0imvbnFzSVw0u4o8uh/w==
-X-Received: by 2002:a05:6358:e486:b0:176:d0a8:8df with SMTP id by6-20020a056358e48600b00176d0a808dfmr16032730rwb.8.1708393070162;
-        Mon, 19 Feb 2024 17:37:50 -0800 (PST)
-Received: from localhost (123-243-155-241.static.tpgi.com.au. [123.243.155.241])
-        by smtp.gmail.com with ESMTPSA id l9-20020a170902eb0900b001db63cfe07dsm5035906plb.283.2024.02.19.17.37.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Feb 2024 17:37:49 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708394450; x=1708999250;
+        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TPVEuybRyh8o5XcrU4e2hriNxyZdgI2hibiqaIMVscs=;
+        b=wwqjkv88KNe+zCUSTXRblq376GNzlQ9G4sbWCDuwLi2TowUUuJ3H5XVi2xXohzALOJ
+         HL4qOqkiU0AYHdUt0FTI62BrImsjyRrcrNr6WhMdgmjkVvvD7okijUlbudrXsyBC2WtA
+         CzUvsUC+Oo9GwDERSAOXgIkA9mMrDbTMLOI2zx1xTLiN9zQqaCrKUfuYM4/IEPmbvPFX
+         0CNdkQCfzZYE4SmGBfhnAZMtpyO5/pgOpYy+GrVbeejZB249PIyoVIgEO1A135KypDOu
+         7TMJ0NjI8DCyRHx3SArVNeOJAlt6JAGESwR1jVGEcoCq/4Yz385rD9ow321Yn3RhOqmp
+         rkCw==
+X-Forwarded-Encrypted: i=1; AJvYcCUWZpTx3hvE0UIYAAdTxuj3Nza2L/0GfyDESsVhNgJYSAJnQQVoQmxDK7JM2wzumlReTIfb5bU7dAgYzulKjj+BJqJRacGh
+X-Gm-Message-State: AOJu0YwaXgXXUTTabLsQtbOV8Wk2fDJrKB1Ot5nOd1UwjEW5R6YbYSmf
+	dW+LixACSwZ2D16HIZ6Q7tJQpH7n78MDtRl8OKtM31GQFFEWN83e9/xNp75cohM=
+X-Google-Smtp-Source: AGHT+IHQRCR15jZ5TkL4psb84wN2RgNzkdO9BEfcOkiOYvFiSNgotMA3Enz/ysz1JOMgmumVFviryA==
+X-Received: by 2002:a17:90a:de0d:b0:299:3332:a649 with SMTP id m13-20020a17090ade0d00b002993332a649mr8755614pjv.18.1708394450582;
+        Mon, 19 Feb 2024 18:00:50 -0800 (PST)
+Received: from localhost ([2804:14d:7e39:8470:a328:9cae:8aed:4821])
+        by smtp.gmail.com with ESMTPSA id z19-20020a17090acb1300b00296e2434e7esm6167416pjt.53.2024.02.19.18.00.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Feb 2024 18:00:49 -0800 (PST)
+References: <20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org>
+User-agent: mu4e 1.10.8; emacs 29.1
+From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
+ <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Morton
+ <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
+ <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
+ Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, Oleg
+ Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, Kees
+ Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, "Rick P.
+ Edgecombe" <rick.p.edgecombe@intel.com>, Deepak Gupta
+ <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, Szabolcs Nagy
+ <Szabolcs.Nagy@arm.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
+ <aou@eecs.berkeley.edu>, Florian Weimer <fweimer@redhat.com>, Christian
+ Brauner <brauner@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v8 00/38] arm64/gcs: Provide support for GCS in userspace
+In-reply-to: <20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org>
+Date: Mon, 19 Feb 2024 23:00:46 -0300
+Message-ID: <878r3f99o1.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 20 Feb 2024 11:37:44 +1000
-Message-Id: <CZ9ISRDH0OPM.CL3D0AK4NN8M@wheely>
-Cc: "Andrew Jones" <andrew.jones@linux.dev>, "Eric Auger"
- <eric.auger@redhat.com>, <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>
-Subject: Re: [kvm-unit-tests PATCH] lib/arm/io: Fix calling getchar()
- multiple times
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Alexandru Elisei" <alexandru.elisei@arm.com>, "Thomas Huth"
- <thuth@redhat.com>
-X-Mailer: aerc 0.15.2
-References: <20240216140210.70280-1-thuth@redhat.com>
- <ZdOIJfvVm7C23ZdZ@raptor>
-In-Reply-To: <ZdOIJfvVm7C23ZdZ@raptor>
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Tue Feb 20, 2024 at 2:56 AM AEST, Alexandru Elisei wrote:
-> Hi,
->
-> Thanks for writing this. I've tested it with kvmtool, which emulates a 82=
-50
-> UART:
->
-> Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
->
-> This fixes a longstanding bug with kvmtool, where migrate_once() would re=
-ad
-> the last character that was sent, and then think that migration was
-> completed even though it was never performed.
->
-> While we are on the subject of migration:
->
-> SKIP: gicv3: its-migration: Test requires at least 4 vcpus
-> Now migrate the VM, then press a key to continue...
-> INFO: gicv3: its-migration: Migration complete
-> SUMMARY: 1 tests, 1 skipped
->
-> That's extremely confusing. Why is migrate_once() executed after the
-> test_its_pending() function call without checking if the test was skipped=
-?
 
-Looks like it was done so the test is skipped without killing the harness
-due to expected migration point not being reached.
+Hello,
 
-After the multi-migration series, you could just put a migrate_quiet()
-there as a quick fix.
+Mark Brown <broonie@kernel.org> writes:
 
-But I'm thinking we could just remove the requirement for the harness
-to see at least 1 migration point. The test itself knows how many
-migrations it should perform, by how many times it calls migrate*().
-It is somewhat a sanity test against test being invoked the wrong way
-and not doing the migration, but how much is that worth...? Actually
-we could have a new sideband message like "VM migration is skipped"
-that doesn't do anything except tell the test harness to not fail
-due to missing migration point. That gets the best of both worlds,
-just needs tests to be updated.
+> Changes in v8:
+> - Invalidate signal cap token on stack when consuming.
+> - Typo and other trivial fixes.
+> - Don't try to use process_vm_write() on GCS, it intentionally does not
+>   work.
+> - Fix leak of thread GCSs.
+> - Rebase onto latest clone3() series.
+> - Link to v7: https://lore.kernel.org/r/20231122-arm64-gcs-v7-0-201c483bd775@kernel.org
 
-Thanks,
-Nick
+Thank you for addressing my comments. I still have a few nets and
+questions in a few patches, but regardless of them:
 
->
-> Nitpicks below.
->
-> On Fri, Feb 16, 2024 at 03:02:10PM +0100, Thomas Huth wrote:
-> > getchar() can currently only be called once on arm since the implementa=
-tion
-> > is a little bit too  na=C3=AFve: After the first character has arrived,=
- the
-> > data register never gets set to zero again. To properly check whether a
-> > byte is available, we need to check the "RX fifo empty" on the pl011 UA=
-RT
-> > or the "RX data ready" bit on the ns16550a UART instead.
-> >=20
-> > With this proper check in place, we can finally also get rid of the
-> > ugly assert(count < 16) statement here.
-> >=20
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > ---
-> >  lib/arm/io.c | 34 ++++++++++++++--------------------
-> >  1 file changed, 14 insertions(+), 20 deletions(-)
-> >=20
-> > diff --git a/lib/arm/io.c b/lib/arm/io.c
-> > index c15e57c4..836fa854 100644
-> > --- a/lib/arm/io.c
-> > +++ b/lib/arm/io.c
-> > @@ -28,6 +28,7 @@ static struct spinlock uart_lock;
-> >   */
-> >  #define UART_EARLY_BASE (u8 *)(unsigned long)CONFIG_UART_EARLY_BASE
-> >  static volatile u8 *uart0_base =3D UART_EARLY_BASE;
-> > +bool is_pl011_uart;
-> > =20
-> >  static void uart0_init_fdt(void)
-> >  {
-> > @@ -59,7 +60,10 @@ static void uart0_init_fdt(void)
-> >  			abort();
-> >  		}
-> > =20
-> > +		is_pl011_uart =3D (i =3D=3D 0);
-> >  	} else {
-> > +		is_pl011_uart =3D !fdt_node_check_compatible(dt_fdt(), ret,
-> > +		                                           "arm,pl011");
-> >  		ret =3D dt_pbus_translate_node(ret, 0, &base);
-> >  		assert(ret =3D=3D 0);
-> >  	}
-> > @@ -111,31 +115,21 @@ void puts(const char *s)
-> >  	spin_unlock(&uart_lock);
-> >  }
-> > =20
-> > -static int do_getchar(void)
-> > +int __getchar(void)
-> >  {
-> > -	int c;
-> > +	int c =3D -1;
-> > =20
-> >  	spin_lock(&uart_lock);
-> > -	c =3D readb(uart0_base);
-> > -	spin_unlock(&uart_lock);
-> > -
-> > -	return c ?: -1;
-> > -}
-> > -
-> > -/*
-> > - * Minimalist implementation for migration completion detection.
-> > - * Without FIFOs enabled on the QEMU UART device we just read
-> > - * the data register: we cannot read more than 16 characters.
-> > - */
-> > -int __getchar(void)
-> > -{
-> > -	int c =3D do_getchar();
-> > -	static int count;
-> > =20
-> > -	if (c !=3D -1)
-> > -		++count;
-> > +	if (is_pl011_uart) {
-> > +		if (!(readb(uart0_base + 6 * 4) & 0x10))  /* RX not empty? */
->
-> I think it would be useful if the magic numbers were replaced by somethin=
-g
-> less opaque, something like:
->
-> 		if (!(readb(uart0_base + PL011_UARTFR) & PL011_UARTFR_RXFE))
->
-> > +			c =3D readb(uart0_base);
-> > +	} else {
-> > +		if (readb(uart0_base + 5) & 0x01)         /* RX data ready? */
->
-> Same as above, perhaps:
->
-> 		if (readb(uart0_base + UART16550_LSR) & UART16550_LSR_DR)
->
-> Naming of course being subject to taste.
->
-> Thanks,
-> Alex
->
-> > +			c =3D readb(uart0_base);
-> > +	}
-> > =20
-> > -	assert(count < 16);
-> > +	spin_unlock(&uart_lock);
-> > =20
-> >  	return c;
-> >  }
-> > --=20
-> > 2.43.0
-> >=20
+Reviewed-by: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
 
+-- 
+Thiago
