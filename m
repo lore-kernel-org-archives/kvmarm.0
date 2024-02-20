@@ -1,199 +1,259 @@
-Received: from brightrain.aerifal.cx (brightrain.aerifal.cx [104.156.224.86])
+Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA656A8D0
-	for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 19:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=104.156.224.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA63763EC;
+	Tue, 20 Feb 2024 19:59:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708456462; cv=none; b=DrnTHE5Nq/qJcrqirfRXaEKLbcU+ylIIEXJVkHiQT9TpB+0/FBz/fqpiMA8NeUbFg/U1uT+GhH9lRZelS2nTgWaXcb9eKmKqCLhnQUqQx72TAzoEjiwM5digSicBQHYZV8bQyjMisaGbBn7kTcte9g54qv8Sc0zxA7jYJPgjgQU=
+	t=1708459163; cv=none; b=SvUEs07ZHoKAze/Dp3q1GIhKn16AbSk2W3an0OvV4w3DM8aSbr6wn9mOo2hzP6CvXFnkOV1OrO2x8AxUnBUmK9f44o3YryncGGY4BSLihxLHjs5hNdJajPZ1xENhrjDBy1EITwOxrjllcEAIRVwnhBWOEvxfbOLbDOJmSa5viGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708456462; c=relaxed/simple;
-	bh=2AJMM3Na6vVTLu4s6ylsknzzYTfPF0vFcwg0MnVpps4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AjZOmI6/m0B6jbBvH6DX97E4/pCutR6sT2xR2c5ryMB3+kr0czhANl6anYWs9n8tQ8+DYOCTYpgz9DqSNEDlh3/ShFx7S7afbI9PZJfO2042Ex2qgr9HY88wa6E2wHaNXFQy7xTd4PRY/OfW8buQoHYCSatAFZWhLipWbNm76bM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=libc.org; spf=pass smtp.mailfrom=libc.org; arc=none smtp.client-ip=104.156.224.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=libc.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=libc.org
-Date: Tue, 20 Feb 2024 13:57:15 -0500
-From: Rich Felker <dalias@libc.org>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "corbet@lwn.net" <corbet@lwn.net>, "ardb@kernel.org" <ardb@kernel.org>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"shuah@kernel.org" <shuah@kernel.org>,
-	"Szabolcs.Nagy@arm.com" <Szabolcs.Nagy@arm.com>,
-	"keescook@chromium.org" <keescook@chromium.org>,
-	"james.morse@arm.com" <james.morse@arm.com>,
-	"debug@rivosinc.com" <debug@rivosinc.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"oleg@redhat.com" <oleg@redhat.com>,
-	"arnd@arndb.de" <arnd@arndb.de>,
-	"ebiederm@xmission.com" <ebiederm@xmission.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"sorear@fastmail.com" <sorear@fastmail.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"broonie@kernel.org" <broonie@kernel.org>,
-	"brauner@kernel.org" <brauner@kernel.org>,
-	"fweimer@redhat.com" <fweimer@redhat.com>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
-	"hjl.tools@gmail.com" <hjl.tools@gmail.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"palmer@dabbelt.com" <palmer@dabbelt.com>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-	"thiago.bauermann@linaro.org" <thiago.bauermann@linaro.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"musl@lists.openwall.com" <musl@lists.openwall.com>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
-Subject: Re: [musl] Re: [PATCH v8 00/38] arm64/gcs: Provide support for GCS
- in userspace
-Message-ID: <20240220185714.GO4163@brightrain.aerifal.cx>
-References: <20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org>
- <22a53b78-10d7-4a5a-a01e-b2f3a8c22e94@app.fastmail.com>
- <4c7bdf8fde9cc45174f10b9221fa58ffb450b755.camel@intel.com>
+	s=arc-20240116; t=1708459163; c=relaxed/simple;
+	bh=gTFvzomr2SRYgEzay2hZVATAf6NMiZMviM+Vp+HoWxw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=J6zf/em8jAVd52GqZPgdAdTZ/5Uq/QhxHH6a5uYVvW2GkO/Vx/z1JtAVigozBHWpCAxYxqeim/SCTVJyjPPZRSw6fhESBWhsO3V6jwGi16fD65cWZdbfvbJoQLygQ0l+4djFVV1oEfTtZHFNMyTTQKr9XWSUgxyXa5PXPYiZ1H8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.161.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-59a134e29d2so427377eaf.0;
+        Tue, 20 Feb 2024 11:59:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708459161; x=1709063961;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=c+V6DSEmqeSEaDPjDjO9NLLJHviZ8vUVb/gdG26wrMI=;
+        b=C5fSbOWlu0r/SeVRovhQ646PrrIQaJ+z6mmqdM4ss/WpXpF/HiQkZBJ9Kah9PLBq2I
+         6bciKjDmcsoDcyoI8w+ivvUuR8tGHyDwBBgKd2YSgud0GbKtRtraTLDstz5KjPgOG0WP
+         BKeU8u4MByqJN3nYqY42S2V4ssT4CHrHhXQg7oMqnxryZx8ZaYBcjNLH+DuKwCoPPz27
+         +WY60pcE+/9t0BVPVp24iP+0iqhdH/1OvDkejRMLlc3FRnuJ9O140LepGOXr3R8OwmB9
+         CFOrqAaMXgZqtY6kOGiqYyOyQMt8wGqVR7l9n7EIpU0SIroZ6ORbVEn5BzhXL9iL6+xM
+         Me6w==
+X-Forwarded-Encrypted: i=1; AJvYcCXRSum2KqQAsMwYU7fwoomPJbDgZt2w5NfNgvlBWRqKrgGrp10pHLHEwo+fQBq5BYjrTUmxcQatUZmP4hZjVbCJp3qMKKiOvglhk0X3muzJP9uhaQW4p+dpJzNcaKz5EA+j
+X-Gm-Message-State: AOJu0YxrUVF4Kpg3CKsYV8t847p7aUyVf7sb4tYITetiLpVDUrdhxa55
+	7rtBcpAiOhiHTJ3EH3oYgxWDFdANZORdVsWbbwIS0fGYJtYRNahrc5KVThPrK/IegQZQYVBQ3Qu
+	1rAJKkVyVdHFxiT5FhmRWjSfdbbM=
+X-Google-Smtp-Source: AGHT+IFEVWcuOTZaUbB0YtEa95vMeA6CLZt+FHpk+AcHJ2Mh/Pssv0ffdkJ0b+NvBNH99Q+SN4zocbYW2Cype01NQz0=
+X-Received: by 2002:a05:6820:1f8c:b0:59f:f650:61bb with SMTP id
+ eq12-20020a0568201f8c00b0059ff65061bbmr3732586oob.0.1708459161081; Tue, 20
+ Feb 2024 11:59:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4c7bdf8fde9cc45174f10b9221fa58ffb450b755.camel@intel.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+References: <Zbp5xzmFhKDAgHws@shell.armlinux.org.uk> <E1rVDmU-0027YP-Jz@rmk-PC.armlinux.org.uk>
+ <CAJZ5v0iiJpUWq5GMSnKFWQTzn_bdwoQz9m=hDaXNg4Lj_ePF4g@mail.gmail.com>
+ <ZdSMk93c1I6x973h@shell.armlinux.org.uk> <ZdTBtt0oR6Q1RcAB@shell.armlinux.org.uk>
+ <20240220162406.00005b59@Huawei.com>
+In-Reply-To: <20240220162406.00005b59@Huawei.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Tue, 20 Feb 2024 20:59:09 +0100
+Message-ID: <CAJZ5v0i0c3bg8E9yuRk00VAEW5isZ4N-mbnhRuTR8aiFLXo1_A@mail.gmail.com>
+Subject: Re: [PATCH RFC v4 02/15] ACPI: processor: Register all CPUs from acpi_processor_get_info()
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, "Rafael J. Wysocki" <rafael@kernel.org>, linux-pm@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-acpi@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	kvmarm@lists.linux.dev, x86@kernel.org, 
+	acpica-devel@lists.linuxfoundation.org, linux-csky@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-ia64@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, Salil Mehta <salil.mehta@huawei.com>, 
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com, justin.he@arm.com, 
+	James Morse <james.morse@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 20, 2024 at 06:41:05PM +0000, Edgecombe, Rick P wrote:
-> Hi,
-> 
-> I worked on the x86 kernel shadow stack support. I think it is an
-> interesting suggestion. Some questions below, and I will think more on
-> it.
-> 
-> On Tue, 2024-02-20 at 11:36 -0500, Stefan O'Rear wrote:
-> > While discussing the ABI implications of shadow stacks in the context
-> > of
-> > Zicfiss and musl a few days ago, I had the following idea for how to
-> > solve
-> > the source compatibility problems with shadow stacks in POSIX.1-2004
-> > and
-> > POSIX.1-2017:
-> > 
-> > 1. Introduce a "flexible shadow stack handling" option.  For what
-> > follows,
-> >    it doesn't matter if this is system-wide, per-mm, or per-vma.
-> > 
-> > 2. Shadow stack faults on non-shadow stack pages, if flexible shadow
-> > stack
-> >    handling is in effect, cause the affected page to become a shadow
-> > stack
-> >    page.  When this happens, the page filled with invalid address
-> > tokens.
-> 
-> Hmm, could the shadow stack underflow onto the real stack then? Not
-> sure how bad that is. INCSSP (incrementing the SSP register on x86)
-> loops are not rare so it seems like something that could happen.
+On Tue, Feb 20, 2024 at 5:24=E2=80=AFPM Jonathan Cameron
+<Jonathan.Cameron@huawei.com> wrote:
+>
+> On Tue, 20 Feb 2024 15:13:58 +0000
+> "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+>
+> > On Tue, Feb 20, 2024 at 11:27:15AM +0000, Russell King (Oracle) wrote:
+> > > On Thu, Feb 15, 2024 at 08:22:29PM +0100, Rafael J. Wysocki wrote:
+> > > > On Wed, Jan 31, 2024 at 5:50=E2=80=AFPM Russell King <rmk+kernel@ar=
+mlinux.org.uk> wrote:
+> > > > > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_pr=
+ocessor.c
+> > > > > index cf7c1cca69dd..a68c475cdea5 100644
+> > > > > --- a/drivers/acpi/acpi_processor.c
+> > > > > +++ b/drivers/acpi/acpi_processor.c
+> > > > > @@ -314,6 +314,18 @@ static int acpi_processor_get_info(struct ac=
+pi_device *device)
+> > > > >                         cpufreq_add_device("acpi-cpufreq");
+> > > > >         }
+> > > > >
+> > > > > +       /*
+> > > > > +        * Register CPUs that are present. get_cpu_device() is us=
+ed to skip
+> > > > > +        * duplicate CPU descriptions from firmware.
+> > > > > +        */
+> > > > > +       if (!invalid_logical_cpuid(pr->id) && cpu_present(pr->id)=
+ &&
+> > > > > +           !get_cpu_device(pr->id)) {
+> > > > > +               int ret =3D arch_register_cpu(pr->id);
+> > > > > +
+> > > > > +               if (ret)
+> > > > > +                       return ret;
+> > > > > +       }
+> > > > > +
+> > > > >         /*
+> > > > >          *  Extra Processor objects may be enumerated on MP syste=
+ms with
+> > > > >          *  less than the max # of CPUs. They should be ignored _=
+iff
+> > > >
+> > > > This is interesting, because right below there is the following cod=
+e:
+> > > >
+> > > >     if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
+> > > >         int ret =3D acpi_processor_hotadd_init(pr);
+> > > >
+> > > >         if (ret)
+> > > >             return ret;
+> > > >     }
+> > > >
+> > > > and acpi_processor_hotadd_init() essentially calls arch_register_cp=
+u()
+> > > > with some extra things around it (more about that below).
+> > > >
+> > > > I do realize that acpi_processor_hotadd_init() is defined under
+> > > > CONFIG_ACPI_HOTPLUG_CPU, so for the sake of the argument let's
+> > > > consider an architecture where CONFIG_ACPI_HOTPLUG_CPU is set.
+> > > >
+> > > > So why are the two conditionals that almost contradict each other b=
+oth
+> > > > needed?  It looks like the new code could be combined with
+> > > > acpi_processor_hotadd_init() to do the right thing in all cases.
+> > > >
+> > > > Now, acpi_processor_hotadd_init() does some extra things that look
+> > > > like they should be done by the new code too.
+> > > >
+> > > > 1. It checks invalid_phys_cpuid() which appears to be a good idea t=
+o me.
+> > > >
+> > > > 2. It uses locking around arch_register_cpu() which doesn't seem
+> > > > unreasonable either.
+> > > >
+> > > > 3. It calls acpi_map_cpu() and I'm not sure why this is not done by
+> > > > the new code.
+> > > >
+> > > > The only thing that can be dropped from it is the _STA check AFAICS=
+,
+> > > > because acpi_processor_add() won't even be called if the CPU is not
+> > > > present (and not enabled after the first patch).
+> > > >
+> > > > So why does the code not do 1 - 3 above?
+> > >
+> > > Honestly, I'm out of my depth with this and can't answer your
+> > > questions - and I really don't want to try fiddling with this code
+> > > because it's just too icky (even in its current form in mainline)
+> > > to be understandable to anyone who hasn't gained a detailed knowledge
+> > > of this code.
+> > >
+> > > It's going to require a lot of analysis - how acpi_map_cpuid() behave=
+s
+> > > in all circumstances, what this means for invalid_logical_cpuid() and
+> > > invalid_phys_cpuid(), what paths will be taken in each case. This cod=
+e
+> > > is already just too hairy for someone who isn't an experienced ACPI
+> > > hacker to be able to follow and I don't see an obvious way to make it
+> > > more readable.
+> > >
+> > > James' additions make it even more complex and less readable.
+> >
+> > As an illustration of the problems I'm having here, I was just writing
+> > a reply to this with a suggestion of transforming this code ultimately
+> > to:
+> >
+> >       if (!get_cpu_device(pr->id)) {
+> >               int ret;
+> >
+> >               if (!invalid_logical_cpuid(pr->id) && cpu_present(pr->id)=
+)
+> >                       ret =3D acpi_processor_make_enabled(pr);
+> >               else
+> >                       ret =3D acpi_processor_make_present(pr);
+> >
+> >               if (ret)
+> >                       return ret;
+> >       }
+> >
+> > (acpi_processor_make_present() would be acpi_processor_hotadd_init()
+> > and acpi_processor_make_enabled() would be arch_register_cpu() at this
+> > point.)
+> >
+> > Then I realised that's a bad idea - because we really need to check
+> > that pr->id is valid before calling get_cpu_device() on it, so this
+> > won't work. That leaves us with:
+> >
+> >       int ret;
+> >
+> >       if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
+> >               /* x86 et.al. path */
+> >               ret =3D acpi_processor_make_present(pr);
+> >       } else if (!get_cpu_device(pr->id)) {
+> >               /* Arm64 path */
+> >               ret =3D acpi_processor_make_enabled(pr);
+> >       } else {
+> >               ret =3D 0;
+> >       }
+> >
+> >       if (ret)
+> >               return ret;
+> >
+> > Now, the next transformation would be to move !get_cpu_device(pr->id)
+> > into acpi_processor_make_enabled() which would eliminate one of those
+> > if() legs.
+> >
+> > Now, if we want to somehow make the call to arch_regster_cpu() common
+> > in these two paths, the next question is what are the _precise_
+> > semantics of acpi_map_cpu(), particularly with respect to it
+> > modifying pr->id. Is it guaranteed to always give the same result
+> > for the same processor described in ACPI? What acpi_map_cpu() anyway,
+> > I can find no documentation for it.
+> >
+> > Then there's the question whether calling acpi_unmap_cpu() should be
+> > done on the failure path if arch_register_cpu() fails, which is done
+> > for the x86 path but not the Arm64 path. Should it be done for the
+> > Arm64 path? I've no idea, but as Arm64 doesn't implement either of
+> > these two functions, I guess they could be stubbed out and thus be
+> > no-ops - but then we open a hole where if pr->id is invalid, we
+> > end up passing that invalid value to arch_register_cpu() which I'm
+> > quite sure will explode with a negative CPU number.
+> >
+> > So, to my mind, what you're effectively asking for is a total rewrite
+> > of all the code in and called by acpi_processor_get_info()... and that
+> > is not something I am willing to do (because it's too far outside of
+> > my knowledge area.)
+> >
+> > As I said in my reply to patch 1, I think your comments on patch 2
+> > make Arm64 vcpu hotplug unachievable in a reasonable time frame, and
+> > certainly outside the bounds of what I can do to progress this.
+> >
+> > So, at this point I'm going to stand down from further participation
+> > with this patch set as I believe I've reached the limit of what I can
+> > do to progress it.
+> >
+>
+> Thanks for your hard work on this Russell - we have moved forwards.
+>
+> Short of anyone else stepping up I'll pick this up with
+> the help of some my colleagues. As such I'm keen on getting patch
+> 1 upstream ASAP so that we can exclude the need for some of the
+> other workarounds from earlier versions of this series (the ones
+> dropped before now).
 
-Shadow stack underflow should fault on attempt to access
-non-shadow-stack memory as shadow-stack, no?
+Applied (as 6.9 material).
 
-> >    Faults from non-shadow-stack accesses to a shadow-stack page which
-> > was
-> >    created by the previous paragraph will cause the page to revert to
-> >    non-shadow-stack usage, with or without clearing.
-> 
-> Won't this prevent catching stack overflows when they happen? An
-> overflow will just turn the shadow stack into normal stack and only get
-> detected when the shadow stack unwinds?
+> We will need a little time to get up to speed on the current status
+> and discussion points Russell raises above.
 
-I don't think that's as big a problem as it sounds like. It might make
-pinpointing the spot at which things went wrong take a little bit more
-work, but it should not admit any wrong-execution.
+Sure.
 
-> A related question would be how to handle the expanding nature of the
-> initial stack. I guess the initial stack could be special and have a
-> separate shadow stack.
+I'm planning to send comments for some other patches in the series this wee=
+k.
 
-That seems fine.
-
-> >    Important: a shadow stack operation can only load a valid address
-> > from
-> >    a page if that page has been in continuous shadow stack use since
-> > the
-> >    address was written by another shadow stack operation; the
-> > flexibility
-> >    delays error reporting in cases of stray writes but it never
-> > allows for
-> >    corruption of shadow stack operation.
-> 
-> Shadow stacks currently have automatic guard gaps to try to prevent one
-> thread from overflowing onto another thread's shadow stack. This would
-> somewhat opens that up, as the stack guard gaps are usually maintained
-> by userspace for new threads. It would have to be thought through if
-> these could still be enforced with checking at additional spots.
-
-I would think the existing guard pages would already do that if a
-thread's shadow stack is contiguous with its own data stack.
-
-> > 3. Standards-defined operations which use a user-provided stack
-> >    (makecontext, sigaltstack, pthread_attr_setstack) use a subrange
-> > of the
-> >    provided stack for shadow stack storage.  I propose to use a
-> > shadow
-> >    stack size of 1/32 of the provided stack size, rounded up to a
-> > positive
-> >    integer number of pages, and place the shadow stack allocation at
-> > the
-> >    lowest page-aligned address inside the provided stack region.
-> > 
-> >    Since page usage is flexible, no change in page permissions is
-> >    immediately needed; this merely sets the initial shadow stack
-> > pointer for
-> >    the new context.
-> > 
-> >    If the shadow stack grew in the opposite direction to the
-> > architectural
-> >    stack, it would not be necessary to pick a fixed direction.
-> > 
-> > 4. SIGSTKSZ and MINSIGSTKSZ are increased by 2 pages to provide
-> > sufficient
-> >    space for a minimum-sized shadow stack region and worst case
-> > alignment.
-> 
-> Do all makecontext() callers ensure the size is greater than this?
-> 
-> I guess glibc's makecontext() could do this scheme to prevent leaking
-> without any changes to the kernel. Basically steal a little of the
-> stack address range and overwrite it with a shadow stack mapping. But
-> only if the apps leave enough room. If they need to be updated, then
-> they could be updated to manage their own shadow stacks too I think.
-
-From the musl side, I have always looked at the entirely of shadow
-stack stuff with very heavy skepticism, and anything that breaks
-existing interface contracts, introduced places where apps can get
-auto-killed because a late resource allocation fails, or requires
-applications to code around the existence of something that should be
-an implementation detail, is a non-starter. To even consider shadow
-stack support, it must truely be fully non-breaking.
-
-> > _Without_ doing this, sigaltstack cannot be used to recover from
-> > stack
-> > overflows if the shadow stack limit is reached first, and makecontext
-> > cannot be supported without memory leaks and unreportable error
-> > conditions.
-> 
-> FWIW, I think the makecontext() shadow stack leaking is a bad idea. I
-> would prefer the existing makecontext() interface just didn't support
-> shadow stack, rather than the leaking solution glibc does today.
-
-AIUI the proposal by Stefan makes it non-leaking because it's just
-using normal memory that reverts to normal usage on any
-non-shadow-stack access.
-
-Rich
+Thanks!
