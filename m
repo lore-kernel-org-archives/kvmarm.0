@@ -1,83 +1,210 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF378745F1
-	for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 15:18:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B4B67C4E;
+	Tue, 20 Feb 2024 15:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708442341; cv=none; b=r86dG/8K1hHAMyp5p3Y+EYX6WLZBQBSJkX1JgPlTb4aCvr9hT2lHMcyy02iWtMcIi3FOry1vIU6XiPLQvoIS3/K404LJbvOt9sNpT15oK54WMvvWx98cXatRXDCXDbkflm1sK57uPCEqWg4C1FQiupZey5CubDzIRGyMvKDrsOg=
+	t=1708443687; cv=none; b=Wl4WFnW79Xm2enZUa+6rJn6Nb+MBmc22R/gTLzOxcB5l4rGDpxlgkcnjMSE6G6nrqgeXIGOLVwNiY+Zfqy5d/SfoT3nPnIewtMTcHAEUqDM+VdmyPboStbyoRcptSCahU0q2oxebWnj9tt7LKogKNVTvUTAKiMEj2axjQpEpyWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708442341; c=relaxed/simple;
-	bh=8M1w/VdbQnHgutFm242Apw7ANRyCWUvBTMdLcLoDsjs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PFXzteDi3odlIsQBp8fSgLtHCB1DCSEHhN1FoJThTX0xGviTfTcnn2+dJlvf3/ZyJE8Xrkg5XjjEgydc8z0ZOUgR/V/L9jfXG2I8Mgc6VIQ8yTiUXGmm2aO4sEkli2UkOYjMbNRRVNEu4ENbRtQ8XzXI2pq9sdSmu9mrM8EoUIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3728EFEC;
-	Tue, 20 Feb 2024 07:19:38 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D9B093F73F;
-	Tue, 20 Feb 2024 07:18:57 -0800 (PST)
-Date: Tue, 20 Feb 2024 15:18:51 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	s=arc-20240116; t=1708443687; c=relaxed/simple;
+	bh=Rc2Iumg6kJhz1u6L7ZpPNjFfPAPoH7W2SUxWAqg8m5E=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GbatlnLQfquyZ1O+finswEM0WUTaJlZ5JbStxnHY68sCXB202r99umEn6A0qw8ekTuuAltydW/dCXNx1AovhbQ81c2mn7ZdTbfMNVGu3hfswabSvLeakYSmVKz2+zkB47L9pWWgNzLkii3Uop4WAFYxNWr53UXMF+NMvbmpeyZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mZaPlmEQ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mZaPlmEQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF1A7C433C7;
+	Tue, 20 Feb 2024 15:41:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708443686;
+	bh=Rc2Iumg6kJhz1u6L7ZpPNjFfPAPoH7W2SUxWAqg8m5E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mZaPlmEQQUUiSUzRjJyIqol1tl/YTV7EUdYOyBExz5YqU2Y8xkUbTHsKQXwsYTwmc
+	 /frQrMYW0sxg3cqgUbi4AB7Ujl8MHeGlKKt0YJDHP425MJSls1seanDFz8n5ygo2eW
+	 ERelFApqfKztnMwqLGISv0XsHx+2h8XY8C3Du/jYba++eNhbaBnEx1O6VXY+yvf6JO
+	 lKrIUgUOe1HGNQwGZ+sqWqCclNcGiEjv3C7sdP5F5n5EfkW0J/CVN6bCjeUpH5KT+v
+	 I6O4Yqk3pv0V5VOJXgx6echjsquhdaRbwbel/sMCeFORX5Kud5WxR2y5ItxDfjqnui
+	 qplq8lljQqVSg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rcSFI-004xxT-8q;
+	Tue, 20 Feb 2024 15:41:24 +0000
+Date: Tue, 20 Feb 2024 15:41:23 +0000
+Message-ID: <86y1bf2lek.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 02/13] KVM: arm64: Clarify ESR_ELx_ERET_ISS_ERET*
-Message-ID: <20240220151851.GA57578@e124191.cambridge.arm.com>
+Subject: Re: [PATCH 04/13] KVM: arm64: nv: Configure HCR_EL2 for FEAT_NV2
+In-Reply-To: <20240220151600.GC8575@e124191.cambridge.arm.com>
 References: <20240219092014.783809-1-maz@kernel.org>
- <20240219092014.783809-3-maz@kernel.org>
- <20240220113127.GB16168@e124191.cambridge.arm.com>
- <861q9748ut.wl-maz@kernel.org>
- <20240220132350.GB8575@e124191.cambridge.arm.com>
- <86zfvv2qys.wl-maz@kernel.org>
+	<20240219092014.783809-5-maz@kernel.org>
+	<20240220151600.GC8575@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86zfvv2qys.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Feb 20, 2024 at 01:41:15PM +0000, Marc Zyngier wrote:
-> On Tue, 20 Feb 2024 13:23:50 +0000,
-> Joey Gouly <joey.gouly@arm.com> wrote:
+On Tue, 20 Feb 2024 15:16:00 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
+> 
+> Hi,
+> 
+> On Mon, Feb 19, 2024 at 09:20:05AM +0000, Marc Zyngier wrote:
+> > Add the HCR_EL2 configuration for FEAT_NV2, adding the required
+> > bits for running a guest hypervisor, and overall merging the
+> > allowed bits provided by the guest.
 > > 
-> > On Tue, Feb 20, 2024 at 12:29:30PM +0000, Marc Zyngier wrote:
-> > > On Tue, 20 Feb 2024 11:31:27 +0000,
-> > > Joey Gouly <joey.gouly@arm.com> wrote:
-> > > > 
-> > > > If this part is confusing due to the name, maybe introduce a function in esr.h
-> > > > esr_is_pac_eret() (name pending bikeshedding)?
-> > > 
-> > > That's indeed a better option. Now for the bikeshed aspect:
-> > > 
-> > > - esr_iss_is_eretax(): check for ESR_ELx_ERET_ISS_ERET being set
-> > > 
-> > > - esr_iss_is_eretab(): check for ESR_ELx_ERET_ISS_ERETA being set
-> > > 
-> > > Thoughts?
-> > > 
+> > This heavily replies on unavaliable features being sanitised
+> > when the HCR_EL2 shadow register is accessed, and only a couple
+> > of bits must be explicitly disabled.
 > > 
-> > I was trying to avoid the ERETA* confusion by suggesting 'pac_eret', but if I
-> > were to pick between your options I'd pick esr_iss_is_eretax().
+> > Non-NV guests are completely unaffected by any of this.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/sysreg.h         |  1 +
+> >  arch/arm64/kvm/hyp/include/hyp/switch.h |  4 +--
+> >  arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
+> >  arch/arm64/kvm/hyp/vhe/switch.c         | 34 ++++++++++++++++++++++++-
+> >  4 files changed, 36 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index 9e8999592f3a..a5361d9032a4 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -498,6 +498,7 @@
+> >  #define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
+> >  #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+> >  #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+> > +#define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
+> >  
+> >  #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
+> >  #define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
 > 
-> It's not an either/or situation. We actually need both:
-> 
-> - esr_iss_is_eretax() being true tells you that you need to
->   authenticate the ERET
-> 
-> - esr_iss_is_eretab() tells you that you need to use the A or B key
+> I'm seeing double! (SYS_VNCR_EL2 is already defined a few lines
+> down)
 
-Oh right, yes that makes sense (please add a brief comment like ^ above the
-functions)
+Ah, it got added by Miguel and my rebase didn't weed it out. It also
+doesn't help that SYS_TRFCR_EL2 is out of sequence... Anyway, I'll
+drop this, thanks for spotting it.
 
-Thanks,
-Joey
+> 
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > index e3fcf8c4d5b4..f5f701f309a9 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > @@ -271,10 +271,8 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+> >  	__deactivate_traps_hfgxtr(vcpu);
+> >  }
+> >  
+> > -static inline void ___activate_traps(struct kvm_vcpu *vcpu)
+> > +static inline void ___activate_traps(struct kvm_vcpu *vcpu, u64 hcr)
+> >  {
+> > -	u64 hcr = vcpu->arch.hcr_el2;
+> > -
+> >  	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM))
+> >  		hcr |= HCR_TVM;
+> >  
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> > index c50f8459e4fc..4103625e46c5 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> > @@ -40,7 +40,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+> >  {
+> >  	u64 val;
+> >  
+> > -	___activate_traps(vcpu);
+> > +	___activate_traps(vcpu, vcpu->arch.hcr_el2);
+> >  	__activate_traps_common(vcpu);
+> >  
+> >  	val = vcpu->arch.cptr_el2;
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index 58415783fd53..29f59c374f7a 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -33,11 +33,43 @@ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
+> >  DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+> >  DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
+> >  
+> > +/*
+> > + * HCR_EL2 bits that the NV guest can freely change (no RES0/RES1
+> > + * semantics, irrespective of the configuration), but that cannot be
+> > + * applied to the actual HW as things would otherwise break badly.
+> > + *
+> > + * - TGE: we want to use EL1, which is incompatible with it being set
+> 
+> Can you make this a bit clearer:
+> 
+> 	we want the guest to use EL1
+> 
+> Assuming I've understood correctly. I first read it as 'we' == kvm.
+
+Sure thing, happy to update that.
+
+>> > + *
+> > + * - API/APK: for hysterical raisins, we enable PAuth lazily, which
+> > + *   means that the guest's bits cannot be directly applied (we really
+> > + *   want to see the traps). Revisit this at some point.
+> > + */
+> > +#define NV_HCR_GUEST_EXCLUDE	(HCR_TGE | HCR_API | HCR_APK)
+> > +
+> > +static u64 __compute_hcr(struct kvm_vcpu *vcpu)
+> > +{
+> > +	u64 hcr = vcpu->arch.hcr_el2;
+> > +
+> > +	if (!vcpu_has_nv(vcpu))
+> > +		return hcr;
+> > +
+> > +	if (is_hyp_ctxt(vcpu)) {
+> > +		hcr |= HCR_NV | HCR_NV2 | HCR_AT | HCR_TTLB;
+> > +
+> > +		if (!vcpu_el2_e2h_is_set(vcpu))
+> > +			hcr |= HCR_NV1;
+> > +
+> > +		write_sysreg_s(vcpu->arch.ctxt.vncr_array, SYS_VNCR_EL2);
+> > +	}
+> > +
+> > +	return hcr | (__vcpu_sys_reg(vcpu, HCR_EL2) & ~NV_HCR_GUEST_EXCLUDE);
+> > +}
+> > +
+> >  static void __activate_traps(struct kvm_vcpu *vcpu)
+> >  {
+> >  	u64 val;
+> >  
+> > -	___activate_traps(vcpu);
+> > +	___activate_traps(vcpu, __compute_hcr(vcpu));
+> >  
+> >  	if (has_cntpoff()) {
+> >  		struct timer_map map;
+> 
+> Otherwise,
+> 
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
+Thanks!
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
