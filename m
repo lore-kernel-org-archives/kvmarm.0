@@ -1,225 +1,240 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8329660ED4
-	for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 10:11:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D0C259B41
+	for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 10:22:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708423885; cv=none; b=Zu5SoDByY+xCpKaJ1QUxRmIOIhelwLuObOp/EGkuw4ShJP8NmMV/mQHBvxAOPTZKKSYxz129ChAodkPWoz3Nu6JgMWHiOPb3LhOEXRJ1DrryJwuXthx36GQbxf61aVmEPAR+JlIs2C1V1UJLNYlXi1MrsubTUTtCvl7wxlVy/LY=
+	t=1708424558; cv=none; b=Fnojcqzeo/Lyk2VepF0gZ2nFGYcWwETqmqAn+FxQNESEowbXhQi5YeXfSWLCeRdW5qWrAPxOvR18SldCCugyYoDjRp1KcQKL+qVXLCb+PAoRFukNNPsrIcyk/ALSP1qoZiiw/GTiuSuZpcMEGb1f9RcMcZsxbfWfunBoOzhNz80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708423885; c=relaxed/simple;
-	bh=iQUVhMXan0N9d/UX9hOf/y32NkYSxDSZ3nvhEoqpFqg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lZk1x0yPIQb/K8qiqy1iUvXVuGBEXupKWoG1LIYKcGd5Gs9ZOhZnqrpww8pYAsen6Ar7CfJtvGSwfElKQ1c3IxaZp4Q7pK5mTJTxLP70KehAD0rjvo527ncXhrWCqYChTKQUnVlHTvcTM6DpF08lcvC5/5DW8VbitmiVxortwN4=
+	s=arc-20240116; t=1708424558; c=relaxed/simple;
+	bh=/VqLVMvwa2XWdYu6FEqTeiDwLlBH7WA1gb9JFElUk/U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JbxDX1AEa4enKZ+FCfHkbe37e1b6iXtI0rTtJummNlk0MfLzDnezcMD5mxPSAZWDlLyzB2xXyMNyzqv5yivF93mwezC5vR2P/EirL/KHTbn0g0nEwI/gn05k/BDaW48yCQY89w5cdCtrDHz9OD3shPMiby+WxkXWJbGnGVSE4AI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0FB031007;
-	Tue, 20 Feb 2024 02:12:00 -0800 (PST)
-Received: from e127643.broadband (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 95E8E3F762;
-	Tue, 20 Feb 2024 02:11:14 -0800 (PST)
-From: James Clark <james.clark@arm.com>
-To: coresight@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	maz@kernel.org,
-	suzuki.poulose@arm.com,
-	acme@kernel.org,
-	oliver.upton@linux.dev,
-	broonie@kernel.org
-Cc: James Clark <james.clark@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mike Leach <mike.leach@linaro.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Miguel Luis <miguel.luis@oracle.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Helge Deller <deller@gmx.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Kalesh Singh <kaleshsingh@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v5 7/7] coresight: Pass guest TRFCR value to KVM
-Date: Tue, 20 Feb 2024 10:09:17 +0000
-Message-Id: <20240220100924.2761706-8-james.clark@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240220100924.2761706-1-james.clark@arm.com>
-References: <20240220100924.2761706-1-james.clark@arm.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A8C2AFEC;
+	Tue, 20 Feb 2024 02:23:14 -0800 (PST)
+Received: from raptor (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 68DA23F762;
+	Tue, 20 Feb 2024 02:22:34 -0800 (PST)
+Date: Tue, 20 Feb 2024 10:22:25 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Thomas Huth <thuth@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
+	Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [kvm-unit-tests PATCH] lib/arm/io: Fix calling getchar()
+ multiple times
+Message-ID: <ZdR9Yb-XGKyuhFOL@raptor>
+References: <20240216140210.70280-1-thuth@redhat.com>
+ <ZdOIJfvVm7C23ZdZ@raptor>
+ <CZ9S150A3M1Y.1HVL51OVY2ZW8@wheely>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CZ9S150A3M1Y.1HVL51OVY2ZW8@wheely>
 
-Currently the userspace and kernel filters for guests are never set, so
-no trace will be generated for them. Add support for tracing guests by
-passing the desired TRFCR value to KVM so it can be applied to the
-guest.
+Hi,
 
-By writing either E1TRE or E0TRE, filtering on either guest kernel or
-guest userspace is also supported. And if both E1TRE and E0TRE are
-cleared when exclude_guest is set, that option is supported too. This
-change also brings exclude_host support which is difficult to add as a
-separate commit without excess churn and resulting in no trace at all.
+On Tue, Feb 20, 2024 at 06:51:51PM +1000, Nicholas Piggin wrote:
+> On Tue Feb 20, 2024 at 2:56 AM AEST, Alexandru Elisei wrote:
+> > Hi,
+> >
+> > Thanks for writing this. I've tested it with kvmtool, which emulates a 8250
+> > UART:
+> >
+> > Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> >
+> > This fixes a longstanding bug with kvmtool, where migrate_once() would read
+> > the last character that was sent, and then think that migration was
+> > completed even though it was never performed.
+> >
+> > While we are on the subject of migration:
+> >
+> > SKIP: gicv3: its-migration: Test requires at least 4 vcpus
+> > Now migrate the VM, then press a key to continue...
+> > INFO: gicv3: its-migration: Migration complete
+> > SUMMARY: 1 tests, 1 skipped
+> >
+> > That's extremely confusing. Why is migrate_once() executed after the
+> > test_its_pending() function call without checking if the test was skipped?
+> 
+> Seems not too hard, incremental patch on top of multi migration
+> series below. After this series is merged I can try that (s390
+> could benefit with some changes too).
 
-Testing
-=======
+Thank you for having a look at this so quickly. The changes to the gic test
+look good to me.
 
-The addresses were counted with the following:
+As an alternative, have you considered modifying the test harness to parse
+the SKIP message, and if the test is in the migration group to not mark it
+as a migration failure? That would require that the test name printed by a
+test matches the test name from unittests.cfg (should probably be the case
+already), but any new migration tests will just work, without having to put
+migrate_skip() at each failure point.
 
-  $ perf report -D | grep -Eo 'EL2|EL1|EL0' | sort | uniq -c
+Thanks,
+Alex
 
-Guest kernel only:
-
-  $ perf record -e cs_etm//Gk -a -- true
-    535 EL1
-      1 EL2
-
-Guest user only (only 5 addresses because the guest runs slowly in the
-model):
-
-  $ perf record -e cs_etm//Gu -a -- true
-    5 EL0
-
-Host kernel only:
-
-  $  perf record -e cs_etm//Hk -a -- true
-   3501 EL2
-
-Host userspace only:
-
-  $  perf record -e cs_etm//Hu -a -- true
-    408 EL0
-      1 EL2
-
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: James Clark <james.clark@arm.com>
----
- .../coresight/coresight-etm4x-core.c          | 42 ++++++++++++++++---
- drivers/hwtracing/coresight/coresight-etm4x.h |  2 +-
- drivers/hwtracing/coresight/coresight-priv.h  |  3 ++
- 3 files changed, 40 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/hwtracing/coresight/coresight-etm4x-core.c b/drivers/hwtracing/coresight/coresight-etm4x-core.c
-index ce1995a2827f..45a69bfdc6b5 100644
---- a/drivers/hwtracing/coresight/coresight-etm4x-core.c
-+++ b/drivers/hwtracing/coresight/coresight-etm4x-core.c
-@@ -6,6 +6,7 @@
- #include <linux/acpi.h>
- #include <linux/bitops.h>
- #include <linux/kernel.h>
-+#include <linux/kvm_host.h>
- #include <linux/moduleparam.h>
- #include <linux/init.h>
- #include <linux/types.h>
-@@ -271,9 +272,22 @@ static void etm4x_prohibit_trace(struct etmv4_drvdata *drvdata)
- 	/* If the CPU doesn't support FEAT_TRF, nothing to do */
- 	if (!drvdata->trfcr)
- 		return;
-+	kvm_etm_set_guest_trfcr(0);
- 	cpu_prohibit_trace();
- }
- 
-+static u64 etm4x_get_kern_user_filter(struct etmv4_drvdata *drvdata)
-+{
-+	u64 trfcr = drvdata->trfcr;
-+
-+	if (drvdata->config.mode & ETM_MODE_EXCL_KERN)
-+		trfcr &= ~TRFCR_ELx_ExTRE;
-+	if (drvdata->config.mode & ETM_MODE_EXCL_USER)
-+		trfcr &= ~TRFCR_ELx_E0TRE;
-+
-+	return trfcr;
-+}
-+
- /*
-  * etm4x_allow_trace - Allow CPU tracing in the respective ELs,
-  * as configured by the drvdata->config.mode for the current
-@@ -286,18 +300,28 @@ static void etm4x_prohibit_trace(struct etmv4_drvdata *drvdata)
-  */
- static void etm4x_allow_trace(struct etmv4_drvdata *drvdata)
- {
--	u64 trfcr = drvdata->trfcr;
-+	u64 trfcr;
- 
- 	/* If the CPU doesn't support FEAT_TRF, nothing to do */
--	if (!trfcr)
-+	if (!drvdata->trfcr)
- 		return;
- 
--	if (drvdata->config.mode & ETM_MODE_EXCL_KERN)
--		trfcr &= ~TRFCR_ELx_ExTRE;
--	if (drvdata->config.mode & ETM_MODE_EXCL_USER)
--		trfcr &= ~TRFCR_ELx_E0TRE;
-+	if (drvdata->config.mode & ETM_MODE_EXCL_HOST)
-+		trfcr = drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
-+	else
-+		trfcr = etm4x_get_kern_user_filter(drvdata);
- 
- 	write_trfcr(trfcr);
-+
-+	/* Set filters for guests and pass to KVM */
-+	if (drvdata->config.mode & ETM_MODE_EXCL_GUEST)
-+		trfcr = drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
-+	else
-+		trfcr = etm4x_get_kern_user_filter(drvdata);
-+
-+	/* TRFCR_EL1 doesn't have CX so mask it out. */
-+	trfcr &= ~TRFCR_EL2_CX;
-+	kvm_etm_set_guest_trfcr(trfcr);
- }
- 
- #ifdef CONFIG_ETM4X_IMPDEF_FEATURE
-@@ -655,6 +679,12 @@ static int etm4_parse_event_config(struct coresight_device *csdev,
- 	if (attr->exclude_user)
- 		config->mode = ETM_MODE_EXCL_USER;
- 
-+	if (attr->exclude_host)
-+		config->mode |= ETM_MODE_EXCL_HOST;
-+
-+	if (attr->exclude_guest)
-+		config->mode |= ETM_MODE_EXCL_GUEST;
-+
- 	/* Always start from the default config */
- 	etm4_set_default_config(config);
- 
-diff --git a/drivers/hwtracing/coresight/coresight-etm4x.h b/drivers/hwtracing/coresight/coresight-etm4x.h
-index da17b6c49b0f..70c29e91f4b5 100644
---- a/drivers/hwtracing/coresight/coresight-etm4x.h
-+++ b/drivers/hwtracing/coresight/coresight-etm4x.h
-@@ -841,7 +841,7 @@ enum etm_impdef_type {
-  * @s_ex_level: Secure ELs where tracing is supported.
-  */
- struct etmv4_config {
--	u32				mode;
-+	u64				mode;
- 	u32				pe_sel;
- 	u32				cfg;
- 	u32				eventctrl0;
-diff --git a/drivers/hwtracing/coresight/coresight-priv.h b/drivers/hwtracing/coresight/coresight-priv.h
-index 767076e07970..727dd27ba800 100644
---- a/drivers/hwtracing/coresight/coresight-priv.h
-+++ b/drivers/hwtracing/coresight/coresight-priv.h
-@@ -39,6 +39,9 @@
- 
- #define ETM_MODE_EXCL_KERN	BIT(30)
- #define ETM_MODE_EXCL_USER	BIT(31)
-+#define ETM_MODE_EXCL_HOST	BIT(32)
-+#define ETM_MODE_EXCL_GUEST	BIT(33)
-+
- struct cs_pair_attribute {
- 	struct device_attribute attr;
- 	u32 lo_off;
--- 
-2.34.1
-
+> 
+> Thanks,
+> Nick
+> 
+> ---
+> diff --git a/arm/gic.c b/arm/gic.c
+> index c950b0d15..bbf828f17 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -782,13 +782,15 @@ static void test_its_migration(void)
+>  	struct its_device *dev2, *dev7;
+>  	cpumask_t mask;
+>  
+> -	if (its_setup1())
+> +	if (its_setup1()) {
+> +		migrate_skip();
+>  		return;
+> +	}
+>  
+>  	dev2 = its_get_device(2);
+>  	dev7 = its_get_device(7);
+>  
+> -	migrate_once();
+> +	migrate();
+>  
+>  	stats_reset();
+>  	cpumask_clear(&mask);
+> @@ -819,8 +821,10 @@ static void test_migrate_unmapped_collection(void)
+>  	int pe0 = 0;
+>  	u8 config;
+>  
+> -	if (its_setup1())
+> +	if (its_setup1()) {
+> +		migrate_skip();
+>  		return;
+> +	}
+>  
+>  	if (!errata(ERRATA_UNMAPPED_COLLECTIONS)) {
+>  		report_skip("Skipping test, as this test hangs without the fix. "
+> @@ -836,7 +840,7 @@ static void test_migrate_unmapped_collection(void)
+>  	its_send_mapti(dev2, 8192, 0, col);
+>  	gicv3_lpi_set_config(8192, LPI_PROP_DEFAULT);
+>  
+> -	migrate_once();
+> +	migrate();
+>  
+>  	/* on the destination, map the collection */
+>  	its_send_mapc(col, true);
+> @@ -875,8 +879,10 @@ static void test_its_pending_migration(void)
+>  	void *ptr;
+>  	int i;
+>  
+> -	if (its_prerequisites(4))
+> +	if (its_prerequisites(4)) {
+> +		migrate_skip();
+>  		return;
+> +	}
+>  
+>  	dev = its_create_device(2 /* dev id */, 8 /* nb_ites */);
+>  	its_send_mapd(dev, true);
+> @@ -923,7 +929,7 @@ static void test_its_pending_migration(void)
+>  	gicv3_lpi_rdist_enable(pe0);
+>  	gicv3_lpi_rdist_enable(pe1);
+>  
+> -	migrate_once();
+> +	migrate();
+>  
+>  	/* let's wait for the 256 LPIs to be handled */
+>  	mdelay(1000);
+> @@ -970,17 +976,14 @@ int main(int argc, char **argv)
+>  	} else if (!strcmp(argv[1], "its-migration")) {
+>  		report_prefix_push(argv[1]);
+>  		test_its_migration();
+> -		migrate_once();
+>  		report_prefix_pop();
+>  	} else if (!strcmp(argv[1], "its-pending-migration")) {
+>  		report_prefix_push(argv[1]);
+>  		test_its_pending_migration();
+> -		migrate_once();
+>  		report_prefix_pop();
+>  	} else if (!strcmp(argv[1], "its-migrate-unmapped-collection")) {
+>  		report_prefix_push(argv[1]);
+>  		test_migrate_unmapped_collection();
+> -		migrate_once();
+>  		report_prefix_pop();
+>  	} else if (strcmp(argv[1], "its-introspection") == 0) {
+>  		report_prefix_push(argv[1]);
+> diff --git a/lib/migrate.c b/lib/migrate.c
+> index 92d1d957d..dde43a90e 100644
+> --- a/lib/migrate.c
+> +++ b/lib/migrate.c
+> @@ -43,3 +43,13 @@ void migrate_once(void)
+>  	migrated = true;
+>  	migrate();
+>  }
+> +
+> +/*
+> + * When the test has been started in migration mode, but the test case is
+> + * skipped and no migration point is reached, this can be used to tell the
+> + * harness not to mark it as a failure to migrate.
+> + */
+> +void migrate_skip(void)
+> +{
+> +	puts("Skipped VM migration (quiet)\n");
+> +}
+> diff --git a/lib/migrate.h b/lib/migrate.h
+> index 95b9102b0..db6e0c501 100644
+> --- a/lib/migrate.h
+> +++ b/lib/migrate.h
+> @@ -9,3 +9,5 @@
+>  void migrate(void);
+>  void migrate_quiet(void);
+>  void migrate_once(void);
+> +
+> +void migrate_skip(void);
+> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> index 2214d940c..3257d5218 100644
+> --- a/scripts/arch-run.bash
+> +++ b/scripts/arch-run.bash
+> @@ -152,7 +152,9 @@ run_migration ()
+>  		-chardev socket,id=mon,path=${src_qmp},server=on,wait=off \
+>  		-mon chardev=mon,mode=control > ${src_outfifo} &
+>  	live_pid=$!
+> -	cat ${src_outfifo} | tee ${src_out} | grep -v "Now migrate the VM (quiet)" &
+> +	cat ${src_outfifo} | tee ${src_out} | \
+> +		grep -v "Now migrate the VM (quiet)" | \
+> +		grep -v "Skipped VM migration (quiet)" &
+>  
+>  	# Start the first destination QEMU machine in advance of the test
+>  	# reaching the migration point, since we expect at least one migration.
+> @@ -190,16 +192,22 @@ do_migration ()
+>  		-mon chardev=mon,mode=control -incoming unix:${dst_incoming} \
+>  		< <(cat ${dst_infifo}) > ${dst_outfifo} &
+>  	incoming_pid=$!
+> -	cat ${dst_outfifo} | tee ${dst_out} | grep -v "Now migrate the VM (quiet)" &
+> +	cat ${dst_outfifo} | tee ${dst_out} | \
+> +		grep -v "Now migrate the VM (quiet)" | \
+> +		grep -v "Skipped VM migration (quiet)" &
+>  
+>  	# The test must prompt the user to migrate, so wait for the
+>  	# "Now migrate VM" console message.
+>  	while ! grep -q -i "Now migrate the VM" < ${src_out} ; do
+>  		if ! ps -p ${live_pid} > /dev/null ; then
+> -			echo "ERROR: Test exit before migration point." >&2
+>  			echo > ${dst_infifo}
+> -			qmp ${src_qmp} '"quit"'> ${src_qmpout} 2>/dev/null
+>  			qmp ${dst_qmp} '"quit"'> ${dst_qmpout} 2>/dev/null
+> +			if grep -q -i "Skipped VM migration" < ${src_out} ; then
+> +				wait ${live_pid}
+> +				return $?
+> +			fi
+> +			echo "ERROR: Test exit before migration point." >&2
+> +			qmp ${src_qmp} '"quit"'> ${src_qmpout} 2>/dev/null
+>  			return 3
+>  		fi
+>  		sleep 0.1
