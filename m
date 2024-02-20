@@ -1,237 +1,90 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AEB478B6A;
-	Tue, 20 Feb 2024 16:24:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4AC527447
+	for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 16:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708446254; cv=none; b=MApXGcsp5Ua9T+Zhdjt9NLn8SLoozmpzykjCBPhhMmOBvd2QyDKoSPH4JxWAIRgjHPwOvjf6cmNGfMi6fRCcB3Tgck/i9gtLj1+BC0Ax/ZxsgltsFSoGMkQxfpLftnfusZiabyuEEztZJGVy0/HJ6IJcg4rX8UGFbrerPztE230=
+	t=1708446661; cv=none; b=hdawrqj/oF/1VnL8TjCwgUgIz2n3xYOOsqs0a6OUIQoF94eZr6unRKEGOWUHEpXdN4j6WOWX2AoKsm8hz0UmYRYn6zttqpeAMJ7meM5sZe1dstOWxBCN96CXkrjL3k4kpDypxx9bkOLr4Im3AL3bFw+bbJgHlcDy1hZPUVxuv1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708446254; c=relaxed/simple;
-	bh=X1LmlBpp9/hB3Wl48tFmyVRbajeTNCx4reU1tnbF/qg=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cMpAGmn4Bx4OQ3vYD7aM2lVzitBDpk/iOpdT5qZymJm1yyKSLIt+PuEolU44+VZLvb2TCKjwaxSX5J+4cqm7KBQzcxKYcDOWuokJXAmFpc31OgDKdZ1Pzkl9c3I1qzBQVp4fLh4ZrEIlBdJwvWEbhdjAQiU0mpw0QsSyrnPr3e4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4TfPkb0bShz6J9dD;
-	Wed, 21 Feb 2024 00:19:51 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6B52E1400DD;
-	Wed, 21 Feb 2024 00:24:08 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 20 Feb
- 2024 16:24:07 +0000
-Date: Tue, 20 Feb 2024 16:24:06 +0000
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-CC: "Rafael J. Wysocki" <rafael@kernel.org>, <linux-pm@vger.kernel.org>,
-	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <x86@kernel.org>,
-	<acpica-devel@lists.linuxfoundation.org>, <linux-csky@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <linux-ia64@vger.kernel.org>,
-	<linux-parisc@vger.kernel.org>, Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, <jianyong.wu@arm.com>,
-	<justin.he@arm.com>, James Morse <james.morse@arm.com>
-Subject: Re: [PATCH RFC v4 02/15] ACPI: processor: Register all CPUs from
- acpi_processor_get_info()
-Message-ID: <20240220162406.00005b59@Huawei.com>
-In-Reply-To: <ZdTBtt0oR6Q1RcAB@shell.armlinux.org.uk>
-References: <Zbp5xzmFhKDAgHws@shell.armlinux.org.uk>
-	<E1rVDmU-0027YP-Jz@rmk-PC.armlinux.org.uk>
-	<CAJZ5v0iiJpUWq5GMSnKFWQTzn_bdwoQz9m=hDaXNg4Lj_ePF4g@mail.gmail.com>
-	<ZdSMk93c1I6x973h@shell.armlinux.org.uk>
-	<ZdTBtt0oR6Q1RcAB@shell.armlinux.org.uk>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1708446661; c=relaxed/simple;
+	bh=1+/RA9pWeDwmtnkvb1unZWEhB64IvThTUVkVaz20I0Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Tl6f8zzXdO3qWma6hXoUnMbbRohlFcDCzTtWj0J9OfdNXJqcweUmz0uqQrP14wwOe6PnKgbc/PCfygwtsjGvio4G2HgCFnyM5bsCznHw8NAeOV3tvIJoVHoc7cPK20juZxzRORFDcAJI28x3YZ6NNiGb4jEovGxo4TI2vLdImCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=i54KhuKP; arc=none smtp.client-ip=91.218.175.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="i54KhuKP"
+Message-ID: <f6a4587c-1db1-d477-5e6c-93dd603a11ec@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1708446656;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q36kWA/MC7EF1Sh3We0UtEcn1Ana4Gh6S3w6HUOZ5xw=;
+	b=i54KhuKP0AuNirJ0AqIJGXRMIbcP+ZxJwNOenJcEtrLHcMEcOyccJ9w4qD1teOQNwhPjR2
+	zq1poH3ELpJwXyyPVMs5m8G7vUjLw4Fhy81Cj+Mud9D69K7H7ZBoqE3Lfg3s4C5oiqZgpW
+	uGQnio/fuyhObOC46oRKYCEGK1GrnA0=
+Date: Wed, 21 Feb 2024 00:30:24 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: lhrpeml100005.china.huawei.com (7.191.160.25) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Subject: Re: [PATCH v3 01/10] KVM: arm64: vgic: Store LPIs in an xarray
+Content-Language: en-US
+To: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-kernel@vger.kernel.org
+References: <20240216184153.2714504-1-oliver.upton@linux.dev>
+ <20240216184153.2714504-2-oliver.upton@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zenghui Yu <zenghui.yu@linux.dev>
+In-Reply-To: <20240216184153.2714504-2-oliver.upton@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 20 Feb 2024 15:13:58 +0000
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+On 2024/2/17 02:41, Oliver Upton wrote:
+> Using a linked-list for LPIs is less than ideal as it of course requires
+> iterative searches to find a particular entry. An xarray is a better
+> data structure for this use case, as it provides faster searches and can
+> still handle a potentially sparse range of INTID allocations.
+> 
+> Start by storing LPIs in an xarray, punting usage of the xarray to a
+> subsequent change.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 
-> On Tue, Feb 20, 2024 at 11:27:15AM +0000, Russell King (Oracle) wrote:
-> > On Thu, Feb 15, 2024 at 08:22:29PM +0100, Rafael J. Wysocki wrote: =20
-> > > On Wed, Jan 31, 2024 at 5:50=E2=80=AFPM Russell King <rmk+kernel@arml=
-inux.org.uk> wrote: =20
-> > > > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_proc=
-essor.c
-> > > > index cf7c1cca69dd..a68c475cdea5 100644
-> > > > --- a/drivers/acpi/acpi_processor.c
-> > > > +++ b/drivers/acpi/acpi_processor.c
-> > > > @@ -314,6 +314,18 @@ static int acpi_processor_get_info(struct acpi=
-_device *device)
-> > > >                         cpufreq_add_device("acpi-cpufreq");
-> > > >         }
-> > > >
-> > > > +       /*
-> > > > +        * Register CPUs that are present. get_cpu_device() is used=
- to skip
-> > > > +        * duplicate CPU descriptions from firmware.
-> > > > +        */
-> > > > +       if (!invalid_logical_cpuid(pr->id) && cpu_present(pr->id) &&
-> > > > +           !get_cpu_device(pr->id)) {
-> > > > +               int ret =3D arch_register_cpu(pr->id);
-> > > > +
-> > > > +               if (ret)
-> > > > +                       return ret;
-> > > > +       }
-> > > > +
-> > > >         /*
-> > > >          *  Extra Processor objects may be enumerated on MP systems=
- with
-> > > >          *  less than the max # of CPUs. They should be ignored _if=
-f =20
-> > >=20
-> > > This is interesting, because right below there is the following code:
-> > >=20
-> > >     if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
-> > >         int ret =3D acpi_processor_hotadd_init(pr);
-> > >=20
-> > >         if (ret)
-> > >             return ret;
-> > >     }
-> > >=20
-> > > and acpi_processor_hotadd_init() essentially calls arch_register_cpu()
-> > > with some extra things around it (more about that below).
-> > >=20
-> > > I do realize that acpi_processor_hotadd_init() is defined under
-> > > CONFIG_ACPI_HOTPLUG_CPU, so for the sake of the argument let's
-> > > consider an architecture where CONFIG_ACPI_HOTPLUG_CPU is set.
-> > >=20
-> > > So why are the two conditionals that almost contradict each other both
-> > > needed?  It looks like the new code could be combined with
-> > > acpi_processor_hotadd_init() to do the right thing in all cases.
-> > >=20
-> > > Now, acpi_processor_hotadd_init() does some extra things that look
-> > > like they should be done by the new code too.
-> > >=20
-> > > 1. It checks invalid_phys_cpuid() which appears to be a good idea to =
-me.
-> > >=20
-> > > 2. It uses locking around arch_register_cpu() which doesn't seem
-> > > unreasonable either.
-> > >=20
-> > > 3. It calls acpi_map_cpu() and I'm not sure why this is not done by
-> > > the new code.
-> > >=20
-> > > The only thing that can be dropped from it is the _STA check AFAICS,
-> > > because acpi_processor_add() won't even be called if the CPU is not
-> > > present (and not enabled after the first patch).
-> > >=20
-> > > So why does the code not do 1 - 3 above? =20
-> >=20
-> > Honestly, I'm out of my depth with this and can't answer your
-> > questions - and I really don't want to try fiddling with this code
-> > because it's just too icky (even in its current form in mainline)
-> > to be understandable to anyone who hasn't gained a detailed knowledge
-> > of this code.
-> >=20
-> > It's going to require a lot of analysis - how acpi_map_cpuid() behaves
-> > in all circumstances, what this means for invalid_logical_cpuid() and
-> > invalid_phys_cpuid(), what paths will be taken in each case. This code
-> > is already just too hairy for someone who isn't an experienced ACPI
-> > hacker to be able to follow and I don't see an obvious way to make it
-> > more readable.
-> >=20
-> > James' additions make it even more complex and less readable. =20
->=20
-> As an illustration of the problems I'm having here, I was just writing
-> a reply to this with a suggestion of transforming this code ultimately
-> to:
->=20
-> 	if (!get_cpu_device(pr->id)) {
-> 		int ret;
->=20
-> 		if (!invalid_logical_cpuid(pr->id) && cpu_present(pr->id))
-> 			ret =3D acpi_processor_make_enabled(pr);
-> 		else
-> 			ret =3D acpi_processor_make_present(pr);
->=20
-> 		if (ret)
-> 			return ret;
-> 	}
->=20
-> (acpi_processor_make_present() would be acpi_processor_hotadd_init()
-> and acpi_processor_make_enabled() would be arch_register_cpu() at this
-> point.)
->=20
-> Then I realised that's a bad idea - because we really need to check
-> that pr->id is valid before calling get_cpu_device() on it, so this
-> won't work. That leaves us with:
->=20
-> 	int ret;
->=20
-> 	if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
-> 		/* x86 et.al. path */
-> 		ret =3D acpi_processor_make_present(pr);
-> 	} else if (!get_cpu_device(pr->id)) {
-> 		/* Arm64 path */
-> 		ret =3D acpi_processor_make_enabled(pr);
-> 	} else {
-> 		ret =3D 0;
-> 	}
->=20
-> 	if (ret)
-> 		return ret;
->=20
-> Now, the next transformation would be to move !get_cpu_device(pr->id)
-> into acpi_processor_make_enabled() which would eliminate one of those
-> if() legs.
->=20
-> Now, if we want to somehow make the call to arch_regster_cpu() common
-> in these two paths, the next question is what are the _precise_
-> semantics of acpi_map_cpu(), particularly with respect to it
-> modifying pr->id. Is it guaranteed to always give the same result
-> for the same processor described in ACPI? What acpi_map_cpu() anyway,
-> I can find no documentation for it.
->=20
-> Then there's the question whether calling acpi_unmap_cpu() should be
-> done on the failure path if arch_register_cpu() fails, which is done
-> for the x86 path but not the Arm64 path. Should it be done for the
-> Arm64 path? I've no idea, but as Arm64 doesn't implement either of
-> these two functions, I guess they could be stubbed out and thus be
-> no-ops - but then we open a hole where if pr->id is invalid, we
-> end up passing that invalid value to arch_register_cpu() which I'm
-> quite sure will explode with a negative CPU number.
->=20
-> So, to my mind, what you're effectively asking for is a total rewrite
-> of all the code in and called by acpi_processor_get_info()... and that
-> is not something I am willing to do (because it's too far outside of
-> my knowledge area.)
->=20
-> As I said in my reply to patch 1, I think your comments on patch 2
-> make Arm64 vcpu hotplug unachievable in a reasonable time frame, and
-> certainly outside the bounds of what I can do to progress this.
->=20
-> So, at this point I'm going to stand down from further participation
-> with this patch set as I believe I've reached the limit of what I can
-> do to progress it.
->=20
+[..]
 
-Thanks for your hard work on this Russell - we have moved forwards.
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index db2a95762b1b..c126014f8395 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -131,6 +131,7 @@ void __vgic_put_lpi_locked(struct kvm *kvm, struct vgic_irq *irq)
+>  		return;
+>  
+>  	list_del(&irq->lpi_list);
+> +	xa_erase(&dist->lpi_xa, irq->intid);
 
-Short of anyone else stepping up I'll pick this up with
-the help of some my colleagues. As such I'm keen on getting patch
-1 upstream ASAP so that we can exclude the need for some of the
-other workarounds from earlier versions of this series (the ones
-dropped before now).
+We can get here *after* grabbing the vgic_cpu->ap_list_lock (e.g.,
+vgic_flush_pending_lpis()/vgic_put_irq()).  And as according to vGIC's
+"Locking order", we should disable interrupts before taking the xa_lock
+in xa_erase() and we would otherwise see bad things like deadlock..
 
-We will need a little time to get up to speed on the current status
-and discussion points Russell raises above.
+It's not a problem before patch #10, where we drop the lpi_list_lock and
+start taking the xa_lock with interrupts enabled.  Consider switching to
+use xa_erase_irq() instead?
 
-Jonathan
+>  	dist->lpi_list_count--;
+>  
+>  	kfree(irq);
 
-
+Thanks,
+Zenghui
