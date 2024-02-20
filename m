@@ -1,109 +1,153 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796F6664B3
-	for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 11:20:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D00E67A07
+	for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 11:27:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708428039; cv=none; b=Hg9Ic9AQL1VsE1of6gJPmMzu+tQFRW3oPaDnAz5H9a4URX2F2a1zjPPr3iSzfR1f1YwkBPHqDyGJShK9OAXViFQX8MpWfsHbY1rm0VX+k/E5MOYfW52kOU0lahWNGaVhXRE6EyN/6IlFi2QKyVKCr3WanG36vpvIVisplmWldMI=
+	t=1708428458; cv=none; b=Yjfq1uVz/s40NRCbGAe8l5EYNdTY3kw+fqG0G4ZCm7MN+KF4pBU6lCU+dY4rkSPGs7j7iL4rSQYNvcQy0DNTjTucacEd+rca58iAR36YAVSm52PdaFCpt6h+TaEZWDOQAdaAMocLHp3bUGofk2eTTGpDmmhE0dgZ/5pCaDmuPnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708428039; c=relaxed/simple;
-	bh=9vK3DxoQJx4y6as+3zgVwpLjJ0R2NsMm/QW5KGBQzzQ=;
+	s=arc-20240116; t=1708428458; c=relaxed/simple;
+	bh=Mipp2WNrLFK4BBvNJ8I27aEf24TMVYEu5ip2QcqVhxI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KSVCe83JmQPN23xu+6gR2CVaO/Ur0tGj/VAS3HJ3lSWB2O1MhQwrDKhp5bhkmZ/Qyh9IcKlSK4QMTF2KfA+QqFBFtzLLwcYkJmZVTehsuDNP0FJRhx9PqU+RoaKsYU1SRkSCYcfQP9S517jwvzPJzMAazfQXHjM12Ww8icYLt24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C68E1FEC;
-	Tue, 20 Feb 2024 03:21:15 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 689DB3F762;
-	Tue, 20 Feb 2024 03:20:35 -0800 (PST)
-Date: Tue, 20 Feb 2024 11:20:31 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+	 Content-Type:Content-Disposition:In-Reply-To; b=FZeRvCPgVpWftpfNr23DNBplSFZDogX47aQJSLFiclHFNvKB+e8gclZKqVn7MpWRc1hp5qixOPZciM1ewQnLG3wrIlmuS/tkZQ371y3+02wsK7xoRUzMiYnCBIHwmd5jcRelcffQn+ogVHxx09w4DUYF8fvlX+Ul/EzLbFR1SPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=O6lRSVZh; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="O6lRSVZh"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=YAbiUOeHNTOOtMQq3T2dYQUt8NBgKEvDfS/NrGbV6TI=; b=O6lRSVZhxbh5i6u+BH25w3f3Cm
+	1Vw7wxiDSgvtyuvUnEQCtl4LHsD0HzY1J+QnwBBfWvzYrZnw4ZdEKbmD4OvhU0znyUN2QW3v3TQK6
+	acFANS/gPds8L+eRUinfOfYI/5P5/HHW8+MaTKOwBEFBIXcdD2h/rAjy4+NEGoLQ4VhzrvLbGSILa
+	e4bVQ4JEXiZ5ggyFjiYKM2SMFHyueGtUiByprCY7LB4A0i9T5NoqAM9yDfSyA8mANNn7sjoowzKXf
+	gZg39Bgc4AYxKTEmwc/LOvXE0VrkkOYgYtUo08k1FAqXJPZDFh0Fdt9VSeb+Bh6zHM/C3MKPJvsVF
+	UW/+AtXw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54660)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rcOHQ-0002Id-2W;
+	Tue, 20 Feb 2024 11:27:20 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rcOHM-0000pR-05; Tue, 20 Feb 2024 11:27:16 +0000
+Date: Tue, 20 Feb 2024 11:27:15 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev,
+	x86@kernel.org, acpica-devel@lists.linuxfoundation.org,
+	linux-csky@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-ia64@vger.kernel.org, linux-parisc@vger.kernel.org,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	jianyong.wu@arm.com, justin.he@arm.com,
 	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 01/13] KVM: arm64: Harden __ctxt_sys_reg() against
- out-of-range values
-Message-ID: <20240220112031.GA16168@e124191.cambridge.arm.com>
-References: <20240219092014.783809-1-maz@kernel.org>
- <20240219092014.783809-2-maz@kernel.org>
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: [PATCH RFC v4 02/15] ACPI: processor: Register all CPUs from
+ acpi_processor_get_info()
+Message-ID: <ZdSMk93c1I6x973h@shell.armlinux.org.uk>
+References: <Zbp5xzmFhKDAgHws@shell.armlinux.org.uk>
+ <E1rVDmU-0027YP-Jz@rmk-PC.armlinux.org.uk>
+ <CAJZ5v0iiJpUWq5GMSnKFWQTzn_bdwoQz9m=hDaXNg4Lj_ePF4g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240219092014.783809-2-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJZ5v0iiJpUWq5GMSnKFWQTzn_bdwoQz9m=hDaXNg4Lj_ePF4g@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Feb 19, 2024 at 09:20:02AM +0000, Marc Zyngier wrote:
-> The unsuspecting kernel tinkerer can be easily confused into
-> writing something that looks like this:
+On Thu, Feb 15, 2024 at 08:22:29PM +0100, Rafael J. Wysocki wrote:
+> On Wed, Jan 31, 2024 at 5:50 PM Russell King <rmk+kernel@armlinux.org.uk> wrote:
+> > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processor.c
+> > index cf7c1cca69dd..a68c475cdea5 100644
+> > --- a/drivers/acpi/acpi_processor.c
+> > +++ b/drivers/acpi/acpi_processor.c
+> > @@ -314,6 +314,18 @@ static int acpi_processor_get_info(struct acpi_device *device)
+> >                         cpufreq_add_device("acpi-cpufreq");
+> >         }
+> >
+> > +       /*
+> > +        * Register CPUs that are present. get_cpu_device() is used to skip
+> > +        * duplicate CPU descriptions from firmware.
+> > +        */
+> > +       if (!invalid_logical_cpuid(pr->id) && cpu_present(pr->id) &&
+> > +           !get_cpu_device(pr->id)) {
+> > +               int ret = arch_register_cpu(pr->id);
+> > +
+> > +               if (ret)
+> > +                       return ret;
+> > +       }
+> > +
+> >         /*
+> >          *  Extra Processor objects may be enumerated on MP systems with
+> >          *  less than the max # of CPUs. They should be ignored _iff
 > 
-> 	ikey.lo = __vcpu_sys_reg(vcpu, SYS_APIAKEYLO_EL1);
+> This is interesting, because right below there is the following code:
 > 
-> which seems vaguely sensible, until you realise that the second
-> parameter is the encoding of a sysreg, and not the index into
-> the vcpu sysreg file... Debugging what happens in this case is
-
-type safety :(
-
-> an interesting exercise in head<->wall interactions.
+>     if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
+>         int ret = acpi_processor_hotadd_init(pr);
 > 
-> As they often say: "Any resemblance to actual persons, living
-> or dead, or actual events is purely coincidental".
+>         if (ret)
+>             return ret;
+>     }
 > 
-> In order to save people's time, add some compile-time hardening
-> that will at least weed out the "stupidly out of range" values.
-> This will *not* catch anything that isn't a compile-time constant.
+> and acpi_processor_hotadd_init() essentially calls arch_register_cpu()
+> with some extra things around it (more about that below).
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
+> I do realize that acpi_processor_hotadd_init() is defined under
+> CONFIG_ACPI_HOTPLUG_CPU, so for the sake of the argument let's
+> consider an architecture where CONFIG_ACPI_HOTPLUG_CPU is set.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 181fef12e8e8..a5ec4c7d3966 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -895,7 +895,7 @@ struct kvm_vcpu_arch {
->   * Don't bother with VNCR-based accesses in the nVHE code, it has no
->   * business dealing with NV.
->   */
-> -static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
-> +static inline u64 *___ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
+> So why are the two conditionals that almost contradict each other both
+> needed?  It looks like the new code could be combined with
+> acpi_processor_hotadd_init() to do the right thing in all cases.
+> 
+> Now, acpi_processor_hotadd_init() does some extra things that look
+> like they should be done by the new code too.
+> 
+> 1. It checks invalid_phys_cpuid() which appears to be a good idea to me.
+> 
+> 2. It uses locking around arch_register_cpu() which doesn't seem
+> unreasonable either.
+> 
+> 3. It calls acpi_map_cpu() and I'm not sure why this is not done by
+> the new code.
+> 
+> The only thing that can be dropped from it is the _STA check AFAICS,
+> because acpi_processor_add() won't even be called if the CPU is not
+> present (and not enabled after the first patch).
+> 
+> So why does the code not do 1 - 3 above?
 
-When in doubt, add more underscores!
+Honestly, I'm out of my depth with this and can't answer your
+questions - and I really don't want to try fiddling with this code
+because it's just too icky (even in its current form in mainline)
+to be understandable to anyone who hasn't gained a detailed knowledge
+of this code.
 
->  {
->  #if !defined (__KVM_NVHE_HYPERVISOR__)
->  	if (unlikely(cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
-> @@ -905,6 +905,13 @@ static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
->  	return (u64 *)&ctxt->sys_regs[r];
->  }
->  
-> +#define __ctxt_sys_reg(c,r)						\
-> +	({								\
-> +	    	BUILD_BUG_ON(__builtin_constant_p(r) &&			\
-> +			     (r) >= NR_SYS_REGS);			\
-> +		___ctxt_sys_reg(c, r);					\
-> +	})
+It's going to require a lot of analysis - how acpi_map_cpuid() behaves
+in all circumstances, what this means for invalid_logical_cpuid() and
+invalid_phys_cpuid(), what paths will be taken in each case. This code
+is already just too hairy for someone who isn't an experienced ACPI
+hacker to be able to follow and I don't see an obvious way to make it
+more readable.
 
-I'm assuming the extra macro layer is to try make __builtin_constant_p() as
-effective as possible? Otherwise maybe it relies on the compiler inling the
-___ctxt_sys_reg() function? 
+James' additions make it even more complex and less readable.
 
-> +
->  #define ctxt_sys_reg(c,r)	(*__ctxt_sys_reg(c,r))
->  
->  u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *, enum vcpu_sysreg);
-
-Thanks,
-Joey
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
