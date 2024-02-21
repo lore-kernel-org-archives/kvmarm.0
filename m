@@ -1,22 +1,34 @@
-Received: from brightrain.aerifal.cx (brightrain.aerifal.cx [104.156.224.86])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474547FBB7
-	for <kvmarm@lists.linux.dev>; Wed, 21 Feb 2024 14:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=104.156.224.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB93F82865;
+	Wed, 21 Feb 2024 17:36:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708527468; cv=none; b=YHchI7S8BAn5vQwILdL+Trd3dUcN71OSrMlT4E9EAJGmkGonzDvNd6ovOTy4CApO46Nv+5TRkSSU+6PDRd+dogCjdphWKobvrimdQXAUnXWTWaARnZBCuh8S7hMzF9MPKJmZogo2t8Z1poPdyEXLQFLqd+RIpAbQ5WhUlzgYMKo=
+	t=1708536983; cv=none; b=oar2RshXI3OCV8qDYcrJvi1AW99x0vWqXR9A+fMDneD7eJcRpefdD6mrzG7Sy2LAg3QLX6eB9YgkVvLAd76il2NnbxB6/QK+Q5smlBcS3769SSafM7OWuHPF96IEuM5tZpy+kfHyOQse2Fo0mFY5cVxgI+JywSir8w1oT/Ab8dU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708527468; c=relaxed/simple;
-	bh=VXm+kZmxMVHqvGGNho4lRaBPvFnNMXrsUkhaZtCVkdg=;
+	s=arc-20240116; t=1708536983; c=relaxed/simple;
+	bh=yiMUcDHHU5n4NoQ84wGw656HnuqVIwBmqSIpUYSySM0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=di+Ph33/9JeP4ALbeKH/nteq+3JqDV4ThjtqH9emARidu3obJZKnTZ6LQ/AfmrvZbXi99bmQ14l+B9jpfL0t9wBVDY03RS2xEjZPv7E0ulhBrMDklvjf1iGBCamM/ZPbKnCK198k9kNEnqB3LS3eOFxGk6/DK17wTzGBt5aEWRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=libc.org; spf=pass smtp.mailfrom=libc.org; arc=none smtp.client-ip=104.156.224.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=libc.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=libc.org
-Date: Wed, 21 Feb 2024 09:58:01 -0500
-From: "dalias@libc.org" <dalias@libc.org>
-To: Mark Brown <broonie@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pm4hsDeN3YzFtJKMeEL4BpULGS6KHPSDVs55bYyiDpFpGaTnAW3znsuhOLg6vgMKtlOvKxvsvNhDKjuKYxpK4msIPatgic+wc/M2tHGFwruH2t/WTg16ZiC4rWWLZSKhznxa12MjoM5z5gljdXApqog/KsUKDz7T1nKtyGq7hXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O12n148t; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O12n148t"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 569D2C433F1;
+	Wed, 21 Feb 2024 17:36:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708536983;
+	bh=yiMUcDHHU5n4NoQ84wGw656HnuqVIwBmqSIpUYSySM0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=O12n148tnxl0hHrH0KNUw308nap2CMfsjiJaCO+G6etl5udAA3V57bqbWZBFQUGZs
+	 Kj4x4GxnB2NHbhBuzMjO33ReX0o4unLwDVUsx7rE6BrK0mSY+AQVi1U20errE3mUk7
+	 nVTIbjx7vjPf0I68CWxX1fA4b1OFc0RyrKyDq5swD9NlwBDQWruvA/i+WNXsvWkpRM
+	 uYyCW+odtKyrAny0HBpdXJaxNnNh93OFpmEFT500VAoVKZsfjMLpKQM8nF17WmQNVZ
+	 f7b+uqFxyhSA53z6Utjz7HKlp+QYfzdvrhQRfPQSg/ENFM+J0kh3Y5lihL5FmDHnX1
+	 07XkRuq4u5RdA==
+Date: Wed, 21 Feb 2024 17:36:12 +0000
+From: Mark Brown <broonie@kernel.org>
+To: "dalias@libc.org" <dalias@libc.org>
 Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
 	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
 	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
@@ -53,7 +65,7 @@ Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
 	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
 Subject: Re: [musl] Re: [PATCH v8 00/38] arm64/gcs: Provide support for GCS
  in userspace
-Message-ID: <20240221145800.GR4163@brightrain.aerifal.cx>
+Message-ID: <4a3809e8-61b2-4341-a868-292ba6e64e8a@sirena.org.uk>
 References: <20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org>
  <22a53b78-10d7-4a5a-a01e-b2f3a8c22e94@app.fastmail.com>
  <4c7bdf8fde9cc45174f10b9221fa58ffb450b755.camel@intel.com>
@@ -63,64 +75,70 @@ References: <20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org>
  <a57d6c7eada4b9a7c35addbc8556f5b53a0c3e6f.camel@intel.com>
  <20240221012736.GQ4163@brightrain.aerifal.cx>
  <d18f060d-37ac-48b1-9f67-a5c5db79b34e@sirena.org.uk>
+ <20240221145800.GR4163@brightrain.aerifal.cx>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="SXzKVr6cSzokmvVK"
+Content-Disposition: inline
+In-Reply-To: <20240221145800.GR4163@brightrain.aerifal.cx>
+X-Cookie: The second best policy is dishonesty.
+
+
+--SXzKVr6cSzokmvVK
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d18f060d-37ac-48b1-9f67-a5c5db79b34e@sirena.org.uk>
-User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Wed, Feb 21, 2024 at 01:53:10PM +0000, Mark Brown wrote:
-> On Tue, Feb 20, 2024 at 08:27:37PM -0500, dalias@libc.org wrote:
-> > On Wed, Feb 21, 2024 at 12:35:48AM +0000, Edgecombe, Rick P wrote:
-> 
-> > > (INCSSP, RSTORSSP, etc). These are a collection of instructions that
-> > > allow limited control of the SSP. When shadow stack gets disabled,
-> > > these suddenly turn into #UD generating instructions. So any other
-> > > threads executing those instructions when shadow stack got disabled
-> > > would be in for a nasty surprise.
-> 
-> > This is the kernel's problem if that's happening. It should be
-> > trapping these and returning immediately like a NOP if shadow stack
-> > has been disabled, not generating SIGILL.
-> 
-> I'm not sure that's going to work out well, all it takes is some code
-> that's looking at the shadow stack and expecting something to happen as
-> a result of the instructions it's executing and we run into trouble.  A
-> lot of things won't notice and will just happily carry on but I expect
-> there are going to be things that care.  We also end up with an
-> additional state for threads that have had shadow stacks transparently
-> disabled, that's managable but still.
+On Wed, Feb 21, 2024 at 09:58:01AM -0500, dalias@libc.org wrote:
+> On Wed, Feb 21, 2024 at 01:53:10PM +0000, Mark Brown wrote:
+> > On Tue, Feb 20, 2024 at 08:27:37PM -0500, dalias@libc.org wrote:
+> > > On Wed, Feb 21, 2024 at 12:35:48AM +0000, Edgecombe, Rick P wrote:
 
-I said NOP but there's no reason it strictly needs to be a NOP. It
-could instead do something reasonable to convey the state of racing
-with shadow stack being disabled.
+> > > > (INCSSP, RSTORSSP, etc). These are a collection of instructions that
+> > > > allow limited control of the SSP. When shadow stack gets disabled,
+> > > > these suddenly turn into #UD generating instructions. So any other
+> > > > threads executing those instructions when shadow stack got disabled
+> > > > would be in for a nasty surprise.
 
-> 
-> > > > The place where it's really needed to be able to allocate the shadow
-> > > > stack synchronously under userspace control, in order to harden
-> > > > normal
-> > > > applications that aren't doing funny things, is in pthread_create
-> > > > without a caller-provided stack.
-> 
-> > > Yea most apps don't do anything too tricky. Mostly shadow stack "just
-> > > works". But it's no excuse to just crash for the others.
-> 
-> > One thing to note here is that, to enable this, we're going to need
-> > some way to detect "new enough kernel that shadow stack semantics are
-> > all right". If there are kernels that have shadow stack support but
-> > with problems that make it unsafe to use (this sounds like the case),
-> > we can't turn it on without a way to avoid trying to use it on those.
-> 
-> If we have this automatic conversion of pages to shadow stack then we
-> should have an API for enabling it, userspace should be able to use the
-> presence of that API to determine if the feature is there.
+> > > This is the kernel's problem if that's happening. It should be
+> > > trapping these and returning immediately like a NOP if shadow stack
+> > > has been disabled, not generating SIGILL.
 
-Yes, or if a new prctl is needed to make disabling safe (see above)
-that could probably be used.
+> > I'm not sure that's going to work out well, all it takes is some code
+> > that's looking at the shadow stack and expecting something to happen as
+> > a result of the instructions it's executing and we run into trouble.  A
 
-Rich
+> I said NOP but there's no reason it strictly needs to be a NOP. It
+> could instead do something reasonable to convey the state of racing
+> with shadow stack being disabled.
+
+This feels like it's getting complicated and I fear it may be an uphill
+struggle to get such code merged, at least for arm64.  My instinct is
+that it's going to be much more robust and generally tractable to let
+things run to some suitable synchronisation point and then disable
+there, but if we're going to do that then userspace can hopefully
+arrange to do the disabling itself through the standard disable
+interface anyway.  Presumably it'll want to notice things being disabled
+at some point anyway?  TBH that's been how all the prior proposals for
+process wide disable I've seen were done.
+
+--SXzKVr6cSzokmvVK
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXWNIwACgkQJNaLcl1U
+h9CDBQf/b2osUy8IL9ugqihJXvxZdZ2gjHyphrXKAEbbUT4oT2dVS/P4nlvlYurY
+9IML2O8yTSshh0R+WaZCQ28PqhVENeRSLmgsuSIDiSrLY66okGApL4XVaAWAek2d
+KvQ3CU5OkGfGONdHJpiaDdcQbFBuEvUq258Kv+jUJnTKUnmFIjGeM1SIZzQMbrUH
+6cXrpAA0Pqc5yrwYFzYxky0ZScQRgr1RQMV43e7IbCtfGnFfbvevfzgWwzZINjf9
+kjz8RcfyhXuAoW1sAaXsPz49nL0NGr4l5riEdr3SmDYyvhJ5LEpDnFtANzD4lD3E
+cZMNKqJyog/SgaLaqh6dMTlV5Qd9gw==
+=pmML
+-----END PGP SIGNATURE-----
+
+--SXzKVr6cSzokmvVK--
