@@ -1,42 +1,68 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF66E78B7C
-	for <kvmarm@lists.linux.dev>; Wed, 21 Feb 2024 14:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from brightrain.aerifal.cx (brightrain.aerifal.cx [104.156.224.86])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474547FBB7
+	for <kvmarm@lists.linux.dev>; Wed, 21 Feb 2024 14:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=104.156.224.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708524121; cv=none; b=tqIyigLGt+E4pCuPqLekHQmyJDf1rsxOZcSfZjTX6CBnuMSi4qI8YdxrA2wx2wZ21RK4/70IHiXpovKfEPUfP/0gkkLLlqQHTvG/PHeszc38W0Ib6KwN2YfK9MC2JXLMiNaZJW0z0wIA23iejmruJedlQdC5VIsiYTW4wABwORw=
+	t=1708527468; cv=none; b=YHchI7S8BAn5vQwILdL+Trd3dUcN71OSrMlT4E9EAJGmkGonzDvNd6ovOTy4CApO46Nv+5TRkSSU+6PDRd+dogCjdphWKobvrimdQXAUnXWTWaARnZBCuh8S7hMzF9MPKJmZogo2t8Z1poPdyEXLQFLqd+RIpAbQ5WhUlzgYMKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708524121; c=relaxed/simple;
-	bh=c/4Nte9KbcyM3V81hnCB4+bkNG+IsRWEun+HCVlgx8U=;
+	s=arc-20240116; t=1708527468; c=relaxed/simple;
+	bh=VXm+kZmxMVHqvGGNho4lRaBPvFnNMXrsUkhaZtCVkdg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VSZ50R8AZAAMy98tbYC7S1IOPFt0Znp6UbtVVWVqN2RBFnVosego30sW6c47fo5PyHodJDWCwUapjq6Bp3Y69awYLmbfPG2uwwd4aLGjz2HPSJBLvBEE0pV5Iwi9ZZlIrdpKeUg7ptpFcgNqHg7LzIO9fGzLkhQMdJeh+sbgYjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D8D34FEC;
-	Wed, 21 Feb 2024 06:02:37 -0800 (PST)
-Received: from FVFF77S0Q05N (unknown [10.57.65.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D701B3F762;
-	Wed, 21 Feb 2024 06:01:56 -0800 (PST)
-Date: Wed, 21 Feb 2024 14:01:54 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	will@kernel.org, catalin.marinas@arm.com,
-	Mark Brown <broonie@kernel.org>, James Clark <james.clark@arm.com>,
-	Rob Herring <robh@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Suzuki Poulose <suzuki.poulose@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	linux-perf-users@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH V16 2/8] KVM: arm64: Prevent guest accesses into BRBE
- system registers/instructions
-Message-ID: <ZdYCUi9YVDNDz7fr@FVFF77S0Q05N>
-References: <20240125094119.2542332-1-anshuman.khandual@arm.com>
- <20240125094119.2542332-3-anshuman.khandual@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=di+Ph33/9JeP4ALbeKH/nteq+3JqDV4ThjtqH9emARidu3obJZKnTZ6LQ/AfmrvZbXi99bmQ14l+B9jpfL0t9wBVDY03RS2xEjZPv7E0ulhBrMDklvjf1iGBCamM/ZPbKnCK198k9kNEnqB3LS3eOFxGk6/DK17wTzGBt5aEWRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=libc.org; spf=pass smtp.mailfrom=libc.org; arc=none smtp.client-ip=104.156.224.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=libc.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=libc.org
+Date: Wed, 21 Feb 2024 09:58:01 -0500
+From: "dalias@libc.org" <dalias@libc.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"Szabolcs.Nagy@arm.com" <Szabolcs.Nagy@arm.com>,
+	"musl@lists.openwall.com" <musl@lists.openwall.com>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"palmer@dabbelt.com" <palmer@dabbelt.com>,
+	"debug@rivosinc.com" <debug@rivosinc.com>,
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+	"shuah@kernel.org" <shuah@kernel.org>,
+	"arnd@arndb.de" <arnd@arndb.de>, "maz@kernel.org" <maz@kernel.org>,
+	"oleg@redhat.com" <oleg@redhat.com>,
+	"fweimer@redhat.com" <fweimer@redhat.com>,
+	"keescook@chromium.org" <keescook@chromium.org>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	"ebiederm@xmission.com" <ebiederm@xmission.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"brauner@kernel.org" <brauner@kernel.org>,
+	"hjl.tools@gmail.com" <hjl.tools@gmail.com>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"thiago.bauermann@linaro.org" <thiago.bauermann@linaro.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"sorear@fastmail.com" <sorear@fastmail.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
+Subject: Re: [musl] Re: [PATCH v8 00/38] arm64/gcs: Provide support for GCS
+ in userspace
+Message-ID: <20240221145800.GR4163@brightrain.aerifal.cx>
+References: <20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org>
+ <22a53b78-10d7-4a5a-a01e-b2f3a8c22e94@app.fastmail.com>
+ <4c7bdf8fde9cc45174f10b9221fa58ffb450b755.camel@intel.com>
+ <20240220185714.GO4163@brightrain.aerifal.cx>
+ <9fc9c45ff6e14df80ad023e66ff7a978bd4ec91c.camel@intel.com>
+ <20240220235415.GP4163@brightrain.aerifal.cx>
+ <a57d6c7eada4b9a7c35addbc8556f5b53a0c3e6f.camel@intel.com>
+ <20240221012736.GQ4163@brightrain.aerifal.cx>
+ <d18f060d-37ac-48b1-9f67-a5c5db79b34e@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,140 +71,56 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240125094119.2542332-3-anshuman.khandual@arm.com>
+In-Reply-To: <d18f060d-37ac-48b1-9f67-a5c5db79b34e@sirena.org.uk>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Thu, Jan 25, 2024 at 03:11:13PM +0530, Anshuman Khandual wrote:
-> Currently BRBE feature is not supported in a guest environment. This hides
-> BRBE feature availability via masking ID_AA64DFR0_EL1.BRBE field.
-
-Does that means that a guest can currently see BRBE advertised in the
-ID_AA64DFR0_EL1.BRB field, or is that hidden by the regular cpufeature code
-today?
-
-> This also blocks guest accesses into BRBE system registers and instructions
-> as if the underlying hardware never implemented FEAT_BRBE feature.
+On Wed, Feb 21, 2024 at 01:53:10PM +0000, Mark Brown wrote:
+> On Tue, Feb 20, 2024 at 08:27:37PM -0500, dalias@libc.org wrote:
+> > On Wed, Feb 21, 2024 at 12:35:48AM +0000, Edgecombe, Rick P wrote:
 > 
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: kvmarm@lists.linux.dev
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-> ---
-> Changes in V16:
+> > > (INCSSP, RSTORSSP, etc). These are a collection of instructions that
+> > > allow limited control of the SSP. When shadow stack gets disabled,
+> > > these suddenly turn into #UD generating instructions. So any other
+> > > threads executing those instructions when shadow stack got disabled
+> > > would be in for a nasty surprise.
 > 
-> - Added BRB_INF_SRC_TGT_EL1 macro for corresponding BRB_[INF|SRC|TGT] expansion
+> > This is the kernel's problem if that's happening. It should be
+> > trapping these and returning immediately like a NOP if shadow stack
+> > has been disabled, not generating SIGILL.
 > 
->  arch/arm64/kvm/sys_regs.c | 56 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 56 insertions(+)
+> I'm not sure that's going to work out well, all it takes is some code
+> that's looking at the shadow stack and expecting something to happen as
+> a result of the instructions it's executing and we run into trouble.  A
+> lot of things won't notice and will just happily carry on but I expect
+> there are going to be things that care.  We also end up with an
+> additional state for threads that have had shadow stacks transparently
+> disabled, that's managable but still.
+
+I said NOP but there's no reason it strictly needs to be a NOP. It
+could instead do something reasonable to convey the state of racing
+with shadow stack being disabled.
+
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 30253bd19917..6a06dc2f0c06 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1304,6 +1304,11 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
->  	return 0;
->  }
->  
-> +#define BRB_INF_SRC_TGT_EL1(n)					\
-> +	{ SYS_DESC(SYS_BRBINF##n##_EL1), undef_access },	\
-> +	{ SYS_DESC(SYS_BRBSRC##n##_EL1), undef_access },	\
-> +	{ SYS_DESC(SYS_BRBTGT##n##_EL1), undef_access }		\
-
-With the changes suggested on the previous patch, this would need to change to be:
-
-	#define BRB_INF_SRC_TGT_EL1(n)					\
-		{ SYS_DESC(SYS_BRBINF_EL1(n)), undef_access },	\
-		{ SYS_DESC(SYS_BRBSRC_EL1(n)), undef_access },	\
-		{ SYS_DESC(SYS_BRBTGT_EL1(n)), undef_access }	\
-
-
-... which would also be easier for backporting (if necessary), since those
-definitions have existed for a while.
-
-Otherwise (modulo Suzuki's comment about rebasing), this looks good to me.
-
-Mark.
-
->  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
->  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
->  	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
-> @@ -1707,6 +1712,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->  	/* Hide SPE from guests */
->  	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
->  
-> +	/* Hide BRBE from guests */
-> +	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
-> +
->  	return val;
->  }
->  
-> @@ -2195,6 +2203,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
->  	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
->  	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
-> +	{ SYS_DESC(OP_BRB_IALL), undef_access },
-> +	{ SYS_DESC(OP_BRB_INJ), undef_access },
->  
->  	DBG_BCR_BVR_WCR_WVR_EL1(0),
->  	DBG_BCR_BVR_WCR_WVR_EL1(1),
-> @@ -2225,6 +2235,52 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
->  	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
->  
-> +	/*
-> +	 * BRBE branch record sysreg address space is interleaved between
-> +	 * corresponding BRBINF<N>_EL1, BRBSRC<N>_EL1, and BRBTGT<N>_EL1.
-> +	 */
-> +	BRB_INF_SRC_TGT_EL1(0),
-> +	BRB_INF_SRC_TGT_EL1(16),
-> +	BRB_INF_SRC_TGT_EL1(1),
-> +	BRB_INF_SRC_TGT_EL1(17),
-> +	BRB_INF_SRC_TGT_EL1(2),
-> +	BRB_INF_SRC_TGT_EL1(18),
-> +	BRB_INF_SRC_TGT_EL1(3),
-> +	BRB_INF_SRC_TGT_EL1(19),
-> +	BRB_INF_SRC_TGT_EL1(4),
-> +	BRB_INF_SRC_TGT_EL1(20),
-> +	BRB_INF_SRC_TGT_EL1(5),
-> +	BRB_INF_SRC_TGT_EL1(21),
-> +	BRB_INF_SRC_TGT_EL1(6),
-> +	BRB_INF_SRC_TGT_EL1(22),
-> +	BRB_INF_SRC_TGT_EL1(7),
-> +	BRB_INF_SRC_TGT_EL1(23),
-> +	BRB_INF_SRC_TGT_EL1(8),
-> +	BRB_INF_SRC_TGT_EL1(24),
-> +	BRB_INF_SRC_TGT_EL1(9),
-> +	BRB_INF_SRC_TGT_EL1(25),
-> +	BRB_INF_SRC_TGT_EL1(10),
-> +	BRB_INF_SRC_TGT_EL1(26),
-> +	BRB_INF_SRC_TGT_EL1(11),
-> +	BRB_INF_SRC_TGT_EL1(27),
-> +	BRB_INF_SRC_TGT_EL1(12),
-> +	BRB_INF_SRC_TGT_EL1(28),
-> +	BRB_INF_SRC_TGT_EL1(13),
-> +	BRB_INF_SRC_TGT_EL1(29),
-> +	BRB_INF_SRC_TGT_EL1(14),
-> +	BRB_INF_SRC_TGT_EL1(30),
-> +	BRB_INF_SRC_TGT_EL1(15),
-> +	BRB_INF_SRC_TGT_EL1(31),
-> +
-> +	/* Remaining BRBE sysreg addresses space */
-> +	{ SYS_DESC(SYS_BRBCR_EL1), undef_access },
-> +	{ SYS_DESC(SYS_BRBFCR_EL1), undef_access },
-> +	{ SYS_DESC(SYS_BRBTS_EL1), undef_access },
-> +	{ SYS_DESC(SYS_BRBINFINJ_EL1), undef_access },
-> +	{ SYS_DESC(SYS_BRBSRCINJ_EL1), undef_access },
-> +	{ SYS_DESC(SYS_BRBTGTINJ_EL1), undef_access },
-> +	{ SYS_DESC(SYS_BRBIDR0_EL1), undef_access },
-> +
->  	{ SYS_DESC(SYS_MDCCSR_EL0), trap_raz_wi },
->  	{ SYS_DESC(SYS_DBGDTR_EL0), trap_raz_wi },
->  	// DBGDTR[TR]X_EL0 share the same encoding
-> -- 
-> 2.25.1
+> > > > The place where it's really needed to be able to allocate the shadow
+> > > > stack synchronously under userspace control, in order to harden
+> > > > normal
+> > > > applications that aren't doing funny things, is in pthread_create
+> > > > without a caller-provided stack.
 > 
+> > > Yea most apps don't do anything too tricky. Mostly shadow stack "just
+> > > works". But it's no excuse to just crash for the others.
+> 
+> > One thing to note here is that, to enable this, we're going to need
+> > some way to detect "new enough kernel that shadow stack semantics are
+> > all right". If there are kernels that have shadow stack support but
+> > with problems that make it unsafe to use (this sounds like the case),
+> > we can't turn it on without a way to avoid trying to use it on those.
+> 
+> If we have this automatic conversion of pages to shadow stack then we
+> should have an API for enabling it, userspace should be able to use the
+> presence of that API to determine if the feature is there.
+
+Yes, or if a new prctl is needed to make disabling safe (see above)
+that could probably be used.
+
+Rich
