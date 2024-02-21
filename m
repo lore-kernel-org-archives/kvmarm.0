@@ -1,54 +1,54 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D38E3D571
-	for <kvmarm@lists.linux.dev>; Wed, 21 Feb 2024 07:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D3A3D982
+	for <kvmarm@lists.linux.dev>; Wed, 21 Feb 2024 07:26:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708500387; cv=none; b=Kcd1kyCpfs78iegDQDjVCB2+HLxCwRudWZoxNHtAsklokFps/l3B4OsyA+0jGkaBJ5+67CasRYWD3XTPQSEhNy/SBVXt33b+b8fp3PW9quCSwunv0/dT2g2d6cOx5Wsd9/p3lgGM5Z3iM07H/WvH9nbgruddwXJYuZ/cq/OgiuE=
+	t=1708500391; cv=none; b=qbdtPKLqltKwhQuVEZmZXN75W+ELha/+XY5WLk9D+b3w/JS5aj35TLDFGYBaFMFnJHPXwYHoJ5O9ySSF0icvwt+tCIs4UKWzAzb+7CcSY4Ak48ZYG7eSbkFKn95MPY1wo/8Y5GuSVuFQEcMEgB2HqDuV+y0rsqnEflpHGsYfUjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708500387; c=relaxed/simple;
-	bh=M3SuqSqPQHRRDSx0L7lAp5b3EfogWfgqYBhfsqO8LBM=;
+	s=arc-20240116; t=1708500391; c=relaxed/simple;
+	bh=2AzZkBo6nO7k/QxOvuRxl5TYVHdGaDzdj6X96G9LMJ8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PmJMRlatdRFqOGV8AD9+6W4uWvppD5qRkFYH+0OClqU0ILtyBz+K5X1b58xsZRgzAkT0h9noDf7nIilz0TQqNKJcmWiLluOlx0Dcns40b5bqCsCoeUoDHA72r5ZAjAX6v4d8BGv46ckRphU6bXKXvOcfPVLw9K+WaUe/lkf9Vi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=nVlJnN/D; arc=none smtp.client-ip=209.85.210.169
+	 MIME-Version; b=dKURJihUsr+ArU6sAMH2M51x1j/9Ym08fgnZFKpaWhUNxBTZZYBThUCkyTuSGi4tPSwJHCf488f0Gy17MJJOuIY6d0Vcydie9J0Ixz5aR+ua1K39jVqIoBdoCzHjDLNyG+YVjCYEou5k4kPbcL2ZTipylgBzq67e7xc51Xb+rjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=F6+8VfaH; arc=none smtp.client-ip=209.85.219.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nVlJnN/D"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6d9f94b9186so262177b3a.0
-        for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 23:26:25 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="F6+8VfaH"
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-dc6e080c1f0so5889185276.2
+        for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 23:26:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1708500385; x=1709105185; darn=lists.linux.dev;
+        d=chromium.org; s=google; t=1708500389; x=1709105189; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Pih8sW3nLr8uR7cM0/SKyhPbmHZuIiN96AmunLzN/Xw=;
-        b=nVlJnN/DOSMKIDGA7Q3TyeFM4cPSI+AvHRWpFJHrZ6y2Zc4u4jH4J8LAyPe7z+/xUU
-         1owhIGB/pKRvNHiGGBMYZu3Qksx8GIzJLvvVV2Slelyx/eST62WynnjCzd9rvitcrOlu
-         GARTqeNtVp/b98L2+FpY/Os9e62JtkrOUg0Hk=
+        bh=GIt47AOQhqYwbSmwly9ATjjcEw5hYcM2BxlkkvG0BKw=;
+        b=F6+8VfaHx2gUw8vt7NHQJH1A+0I643gn0dNAcvPFFqVoMTRqZp80E3dtbE6kyjc4eO
+         PhrJ07y6TK8gTPzuVRq0Rj5fvRNq5OwdMY57J8DBpIrq4Od/H9m8Mbae/R5kmxftEBjv
+         c6rcnLH1mFCDeajIHoMWuBID1PNldY4yamQs0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708500385; x=1709105185;
+        d=1e100.net; s=20230601; t=1708500389; x=1709105189;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Pih8sW3nLr8uR7cM0/SKyhPbmHZuIiN96AmunLzN/Xw=;
-        b=oUfhia5DEwuPFvTIHX5tEU8YWv77qXRcBo2WkZzeys2eONVeWsBxiYRvyJl9pVrCU1
-         dJIJrM9/aE4T44H6l1PBNhAzp7xK5Kgx4gu+ME4RNcBzcs3A/iE+ktVL0FyWPYO03f3f
-         0HMlPKcJbvQnN8NbdXuNNc3pgdhMN26Hl58WZJqgSkFTefqJhnQ9u5F4LyUqICAbRCFB
-         i0vH+a2yv0Ex4RNASMnD77prsfBCckQVA5t8sNhEOy9l4V+V33/G3yA+DJfzR6nS5rHM
-         WdSJrMBUGhSK5C+Dbre8NnURBp0PF3V3QsK6MpU/ptUoh/Lf9aSQTuKR1wHxTIRsbE8j
-         5WxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWn11tZcLvk8z3XIyGvh0+aIw9KLm/IXzO31BDPbqFAYxKmtLdIVE6pcXlc24RCbf0dl+xxBHpEK49dGwQHRmVGiu6Rc0De
-X-Gm-Message-State: AOJu0YwTVUG+E5BVX42jcL41WUp8RWHI692IvrQblfGmrtyE895JFaT8
-	GQk0gIk0uuhU2SGEO7c8pQWmR6SUDE7qXBeA1DLoETkJxKIS4Mq9SKTrJBnt/w==
-X-Google-Smtp-Source: AGHT+IHyypm/T0rwoWlLJexgzLRY5m4jjHnGc2zjD25rHsn1YoHjqJ8mJQow4Yfp2IIZNcTX4qemYQ==
-X-Received: by 2002:aa7:81d1:0:b0:6e1:4a02:6217 with SMTP id c17-20020aa781d1000000b006e14a026217mr14102447pfn.22.1708500384849;
-        Tue, 20 Feb 2024 23:26:24 -0800 (PST)
+        bh=GIt47AOQhqYwbSmwly9ATjjcEw5hYcM2BxlkkvG0BKw=;
+        b=AkTQ9EfNUPKft4voxszdKOQYugPiWCZ6QVkjtJQaGBhhw4yCcxohzFukxrg/VwULNA
+         Ut24PIokRUfmiJlk9HsvmiWoPygk6CUn4uj7qpQmG7S9kMF/9QS/IU4VryyhHgB0Fj4w
+         sXAfNvh8+90ecbwzuxbXs3wI6eRHgRYmyLoyH4EjtXeDCMwFW3DQOty5606QJko52kvn
+         E/yK+4n8g6AkG0cUOaCFyZZxw9UGEsbde9Mm9pk/gC2iRPRa/b3UMD1+sCXmnwv43Ghu
+         4LR33c2+n2VtKBry1wvd4BJB1BvWEPshXABlr2It5it2+MdhTBk3G0RUKWuph+PADdKj
+         COBg==
+X-Forwarded-Encrypted: i=1; AJvYcCUFc5fo0c+dHL1hjrWoQ2cIl57vkyUVSE+tlweLelyLyWm4GGQGA0zUv5bLhSSJWh2lz8pFdc3cYXQglD2xcVQ+1ELFe693
+X-Gm-Message-State: AOJu0Yygy/LDrQzv6CI8iDKf+n+XExNtm4q0PGglBJni0TOU3BW3L1z3
+	fpN//6rKZNHqlsNBITjtPbbMLJdEa/Jp2mDnCU7DXQVGZoCYe/LmQt9R6FUEEQ==
+X-Google-Smtp-Source: AGHT+IGIrXAFDvR+ce91/wX0UHTroMBo0ZdjQol8T7e9MNCa0XfG7X3z0mt0451t7GSOcS9P/JFR8w==
+X-Received: by 2002:a25:fe03:0:b0:dcd:990a:c02a with SMTP id k3-20020a25fe03000000b00dcd990ac02amr14224034ybe.63.1708500388968;
+        Tue, 20 Feb 2024 23:26:28 -0800 (PST)
 Received: from localhost ([2401:fa00:8f:203:b417:5d09:c226:a19c])
-        by smtp.gmail.com with UTF8SMTPSA id v184-20020a6389c1000000b005bdbe9a597fsm7933795pgd.57.2024.02.20.23.26.22
+        by smtp.gmail.com with UTF8SMTPSA id i73-20020a636d4c000000b005b458aa0541sm7776854pgc.15.2024.02.20.23.26.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Feb 2024 23:26:24 -0800 (PST)
+        Tue, 20 Feb 2024 23:26:28 -0800 (PST)
 From: David Stevens <stevensd@chromium.org>
 X-Google-Original-From: David Stevens <stevensd@google.com>
 To: Sean Christopherson <seanjc@google.com>
@@ -60,9 +60,9 @@ Cc: Yu Zhang <yu.c.zhang@linux.intel.com>,
 	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
 	David Stevens <stevensd@chromium.org>
-Subject: [PATCH v10 6/8] KVM: x86: Migrate to __kvm_follow_pfn
-Date: Wed, 21 Feb 2024 16:25:25 +0900
-Message-ID: <20240221072528.2702048-8-stevensd@google.com>
+Subject: [PATCH v10 6/8] KVM: x86: Migrate to kvm_follow_pfn()
+Date: Wed, 21 Feb 2024 16:25:26 +0900
+Message-ID: <20240221072528.2702048-9-stevensd@google.com>
 X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
 In-Reply-To: <20240221072528.2702048-1-stevensd@google.com>
 References: <20240221072528.2702048-1-stevensd@google.com>
@@ -76,17 +76,17 @@ Content-Transfer-Encoding: 8bit
 
 From: David Stevens <stevensd@chromium.org>
 
-Migrate functions which need access to is_refcounted_page to
-__kvm_follow_pfn. The functions which need this are __kvm_faultin_pfn
-and reexecute_instruction. The former requires replacing the async
-in/out parameter with FOLL_NOWAIT parameter and the KVM_PFN_ERR_NEEDS_IO
-return value. Handling non-refcounted pages is complicated, so it will
-be done in a followup. The latter is a straightforward refactor.
+Migrate functions which need to be able to map non-refcounted struct
+pages to kvm_follow_pfn(). These functions are kvm_faultin_pfn() and
+reexecute_instruction(). The former requires replacing the async in/out
+parameter with FOLL_NOWAIT parameter and the KVM_PFN_ERR_NEEDS_IO return
+value (actually handling non-refcounted pages is complicated, so it will
+be done in a followup). The latter is a straightforward refactor.
 
 APIC related callers do not need to migrate because KVM controls the
 memslot, so it will always be regular memory. Prefetch related callers
-do not need to be migrated because atomic gfn_to_pfn calls can never
-make it to hva_to_pfn_remapped.
+do not need to be migrated because atomic gfn_to_pfn() calls can never
+make it to hva_to_pfn_remapped().
 
 Signed-off-by: David Stevens <stevensd@chromium.org>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
