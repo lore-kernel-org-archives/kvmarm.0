@@ -1,196 +1,149 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993EC46B9B
-	for <kvmarm@lists.linux.dev>; Wed, 21 Feb 2024 13:08:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6532676C99;
+	Wed, 21 Feb 2024 13:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708520914; cv=none; b=LakiIqKHUyZDqBFNxIFk48rOPdDGFU5ZcuFbiRirWoRBYVc6AeFhKEclbI/DurOh8Tb52AHURTqO4qRUFD8taqoTjwQWVpRZFIf3RxMSOnwlcTFi3Wy8qNbDdohWKHRK53+ofZp0/ygZJHu7zyRr9nk/YzW/mUkpQEf+icMvmwE=
+	t=1708523600; cv=none; b=mv8H7iIi5f50H62oEtHw1Izhf5rR7mCA0fXRd6YmDPVEIa/+9lqyZx7SOyOXiQzhNSdp5yn2VG0YmH0vOJ+dbj5U1wifqTyKLiI6DW0NTVjZecbYjUine0sFmx5AYUZ0OQK0s0h0ptLkG6tMIPjXipXDzsJFDNyRb1BuMhnWCRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708520914; c=relaxed/simple;
-	bh=mWIx9PFeZocge748YA69ilYWO8vp7pIz8+RNbYpKzr0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hpNy2uQqVmFgBryzbGrgWFAKtUx/5AiUB6gg20rgBpVIp8C7dCFU2IJ/TtpxlmlxXr07bs6evthotrnzs0//JavtAuifV0VIV6ZQkDYFhWr1g/Lei/t238BO+XyTQXtvo48InCD3VeKWqzdQmMGU+j2j34ITGs41ZWd2D9a+qRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jxCawtqz; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1708523600; c=relaxed/simple;
+	bh=2qDB6aCchFqvsRrIZrlOnBUWRusFLsK6a7t86lO4/kc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=myu69FE7P+NnX/+X6Qtt7TxnZjPsU1wcAz28khjxoE0gcTRqTiE51tjsPQbh6YrXQR/b6OYitj6wX1XlKBVf88Vfc2gXXh2pj2BXzjphcj6venRC0FFyyMU+PU9FO1voszbr5LL2dZ7x849d9+oJjdHKKXkdPpqAXUb4c7NTL1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XYWFYY21; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jxCawtqz"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2d109e82bd0so87379381fa.3
-        for <kvmarm@lists.linux.dev>; Wed, 21 Feb 2024 05:08:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708520911; x=1709125711; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WxTdzzSE56mojm4+aLf5g+MB1IpHlx8dtkV73gFQqhM=;
-        b=jxCawtqzIheCSTDZjKVmyvx6i2MTL960pRwOopt4MSPVP+SALMRpbjgnR8/uJc/0Bk
-         xUIwFrMXaOP/nMokuhO/HnMr+1uiZpnx0kl1Mrcz7XB+AafoaqshTLTTPX7fRn3WXl3K
-         iSSL2UB1/HSiSxhszf8zD6Qui4sa8N5O4vxoxb90xkr6egSFICxBRSusw7OHfwBva2XB
-         sGkQuUTkEF/djl5F1pCnYavqrzsk4ETMsp2GStHm/DPKpe/r+Y4gi/jDfaUNvJ6epXD4
-         Pp9fVTP5pGYrBlVJrl/Tdju/Pw2n/8QYoUn14/aOq/KaM3UlW4N0SpiBy4yQmKNPb8ZR
-         krmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708520911; x=1709125711;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WxTdzzSE56mojm4+aLf5g+MB1IpHlx8dtkV73gFQqhM=;
-        b=xNCqZY/3cu0dWbVPb4lUZm+QuDmcKoAhhThG4dc0QjkwLthGWR3oeeyd+TR22DFZ/Z
-         LzhCXExOQdmX7Zt6QKdLxNvAHr0R7alD4hGXeEZlKl0b31mwaLYyQqdefKB9wPZQiClM
-         d30SyMl4VofRUJPCkKwQgpZ4k0D3n1QTJhp+0EijZeqbxOg8CLoMWg/mQbyey1jRuzio
-         I7VM4VWqDAQbUvrckUu9P/IrPZg4Pgax0OC5yV1REhwXRhIdbSP8rQ3fPjK3rckTq7Mg
-         ospHI0w6zE5biIU2CppXM+1gvAmjDsBUpjDBafWww+XYq+L0fPIvmlucaGvLtX61mx6d
-         EOUg==
-X-Forwarded-Encrypted: i=1; AJvYcCXYUgdEpynC1ZCqxmU8d36dAP8PF9DHrQuddfrjbtaEeQ6/1Jud1AgfA3AzAh0ojVM4sMZZjwriiqHRGNy9+V3DrYZovT5g
-X-Gm-Message-State: AOJu0YzeW5br5xIt25zp0/JinkPEtV2K5LQTmePuGgRoU2PbsxrOYESd
-	22BnRtV8agpXLcvpZSGz0KVppOL9Uf6I7ec/kLtYwQAs8ADQc3MVqcXhmCV1oASisysvu/5Bcaf
-	JHjgxrZ/6NoCvIu8YEbWBdmAAh+c=
-X-Google-Smtp-Source: AGHT+IEk4EjMAGYcW7Lzh75VAr5eflBXeC5jYHyhHnNqToNfa6pIH+DcVLj0qhM47mORzIqfli6g83qnltBwS3v9GvE=
-X-Received: by 2002:a2e:6e08:0:b0:2d0:aa06:f496 with SMTP id
- j8-20020a2e6e08000000b002d0aa06f496mr12067305ljc.40.1708520910575; Wed, 21
- Feb 2024 05:08:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XYWFYY21"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E8B9C433F1;
+	Wed, 21 Feb 2024 13:53:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708523600;
+	bh=2qDB6aCchFqvsRrIZrlOnBUWRusFLsK6a7t86lO4/kc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XYWFYY21ChMcDnqRafHBvRB0QxejjlT/bZHLI49dgPa5dRacaD3UN0LLMesLDhEVK
+	 FQALDj09HDwKPE6W4jj/Eh1jqbUH+H+QnFzr8lEIlZA/imkC3dRk/JOQvq/V/1qmnf
+	 AKtPOLPebGuFFRe5xPIXDbSmUtlL944IsVvIA7rGpLNSg/1AcaSk659q46C8HRHywn
+	 bhl8FLesEaZJjbv9GARHL60svpyiaFNTpyRdOuK9i5QgdctkDvVHFN/fMwhmSVZRSB
+	 /NtzQjotaqwXeqdsZ0ePVwa6GV0m+bjLd5HQ/Rwg6sMIIZRNIfrgzJfc4uR31QEOgk
+	 nbyq6X4Uq/GjQ==
+Date: Wed, 21 Feb 2024 13:53:10 +0000
+From: Mark Brown <broonie@kernel.org>
+To: "dalias@libc.org" <dalias@libc.org>
+Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"Szabolcs.Nagy@arm.com" <Szabolcs.Nagy@arm.com>,
+	"musl@lists.openwall.com" <musl@lists.openwall.com>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"palmer@dabbelt.com" <palmer@dabbelt.com>,
+	"debug@rivosinc.com" <debug@rivosinc.com>,
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+	"shuah@kernel.org" <shuah@kernel.org>,
+	"arnd@arndb.de" <arnd@arndb.de>, "maz@kernel.org" <maz@kernel.org>,
+	"oleg@redhat.com" <oleg@redhat.com>,
+	"fweimer@redhat.com" <fweimer@redhat.com>,
+	"keescook@chromium.org" <keescook@chromium.org>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	"ebiederm@xmission.com" <ebiederm@xmission.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"brauner@kernel.org" <brauner@kernel.org>,
+	"hjl.tools@gmail.com" <hjl.tools@gmail.com>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"thiago.bauermann@linaro.org" <thiago.bauermann@linaro.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"sorear@fastmail.com" <sorear@fastmail.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
+Subject: Re: [musl] Re: [PATCH v8 00/38] arm64/gcs: Provide support for GCS
+ in userspace
+Message-ID: <d18f060d-37ac-48b1-9f67-a5c5db79b34e@sirena.org.uk>
+References: <20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org>
+ <22a53b78-10d7-4a5a-a01e-b2f3a8c22e94@app.fastmail.com>
+ <4c7bdf8fde9cc45174f10b9221fa58ffb450b755.camel@intel.com>
+ <20240220185714.GO4163@brightrain.aerifal.cx>
+ <9fc9c45ff6e14df80ad023e66ff7a978bd4ec91c.camel@intel.com>
+ <20240220235415.GP4163@brightrain.aerifal.cx>
+ <a57d6c7eada4b9a7c35addbc8556f5b53a0c3e6f.camel@intel.com>
+ <20240221012736.GQ4163@brightrain.aerifal.cx>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <cover.1705916069.git.haibo1.xu@intel.com> <68856b86a93a4188558e5d0ebac0dd6aac8e404c.1705916069.git.haibo1.xu@intel.com>
- <CAOnJCULwRTSnrQkR2o1P53R=tJ3TAxX+y+XRBesW6OFEzgFv2g@mail.gmail.com>
- <CAJve8om2oOLg5-wKX7m7cBTgzwqiMcb35x=nDi1edY8evXjyMw@mail.gmail.com> <2c96c61a-2685-4cee-9cef-963ed833bf92@rivosinc.com>
-In-Reply-To: <2c96c61a-2685-4cee-9cef-963ed833bf92@rivosinc.com>
-From: Haibo Xu <xiaobo55x@gmail.com>
-Date: Wed, 21 Feb 2024 21:08:19 +0800
-Message-ID: <CAJve8omCZxsiP1jF0n5SBh0_U6q7Exj5A1ACFahWpdBoxohaMA@mail.gmail.com>
-Subject: Re: [PATCH v5 11/12] KVM: riscv: selftests: Change vcpu_has_ext to a
- common function
-To: Atish Patra <atishp@rivosinc.com>
-Cc: Atish Patra <atishp@atishpatra.org>, Haibo Xu <haibo1.xu@intel.com>, ajones@ventanamicro.com, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Anup Patel <anup@brainfault.org>, Guo Ren <guoren@kernel.org>, 
-	Mayuresh Chitale <mchitale@ventanamicro.com>, 
-	Daniel Henrique Barboza <dbarboza@ventanamicro.com>, Conor Dooley <conor.dooley@microchip.com>, 
-	Samuel Holland <samuel@sholland.org>, Minda Chen <minda.chen@starfivetech.com>, 
-	Jisheng Zhang <jszhang@kernel.org>, Sean Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, 
-	Like Xu <likexu@tencent.com>, Vipin Sharma <vipinsh@google.com>, Thomas Huth <thuth@redhat.com>, 
-	Aaron Lewis <aaronlewis@google.com>, 
-	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="cNQgfjDz+IAKI+aZ"
+Content-Disposition: inline
+In-Reply-To: <20240221012736.GQ4163@brightrain.aerifal.cx>
+X-Cookie: The second best policy is dishonesty.
 
-On Wed, Feb 21, 2024 at 4:37=E2=80=AFPM Atish Patra <atishp@rivosinc.com> w=
-rote:
->
-> On 2/20/24 18:13, Haibo Xu wrote:
-> > On Wed, Feb 21, 2024 at 7:03=E2=80=AFAM Atish Patra <atishp@atishpatra.=
-org> wrote:
-> >>
-> >> On Mon, Jan 22, 2024 at 1:48=E2=80=AFAM Haibo Xu <haibo1.xu@intel.com>=
- wrote:
-> >>>
-> >>> Move vcpu_has_ext to the processor.c and rename it to __vcpu_has_ext
-> >>> so that other test cases can use it for vCPU extension check.
-> >>>
-> >>> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> >>> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> >>> ---
-> >>>   tools/testing/selftests/kvm/include/riscv/processor.h |  2 ++
-> >>>   tools/testing/selftests/kvm/lib/riscv/processor.c     | 10 ++++++++=
-++
-> >>>   tools/testing/selftests/kvm/riscv/get-reg-list.c      | 11 +-------=
----
-> >>>   3 files changed, 13 insertions(+), 10 deletions(-)
-> >>>
-> >>> diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/=
-tools/testing/selftests/kvm/include/riscv/processor.h
-> >>> index b68b1b731a34..bd27e1c67579 100644
-> >>> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
-> >>> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
-> >>> @@ -42,6 +42,8 @@ static inline uint64_t __kvm_reg_id(uint64_t type, =
-uint64_t idx,
-> >>>   #define RISCV_ISA_EXT_REG(idx) __kvm_reg_id(KVM_REG_RISCV_ISA_EXT, =
-\
-> >>>                                               idx, KVM_REG_SIZE_ULONG=
-)
-> >>>
-> >>> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext);
-> >>> +
-> >>>   struct ex_regs {
-> >>>          unsigned long ra;
-> >>>          unsigned long sp;
-> >>> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tool=
-s/testing/selftests/kvm/lib/riscv/processor.c
-> >>> index 39a1e9902dec..dad73ce18164 100644
-> >>> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-> >>> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> >>> @@ -15,6 +15,16 @@
-> >>>
-> >>>   static vm_vaddr_t exception_handlers;
-> >>>
-> >>> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
-> >>> +{
-> >>> +       unsigned long value =3D 0;
-> >>> +       int ret;
-> >>> +
-> >>> +       ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
-> >>> +
-> >>> +       return !ret && !!value;
-> >>> +}
-> >>> +
-> >>
-> >> Not sure what was the base patch on which this was rebased. The actual
-> >> commit in the queue branch looks different.
-> >>
-> >
-> > This patch set was based on 6.7-rc8.
-> >
-> >> https://github.com/kvm-riscv/linux/commit/5563517cc2012e3326411b360c99=
-24d3f2706c8d
-> >>
-> >> Both seem to have the same bug though the tests fail now and require
-> >> the following fix.
-> >> The ext id should be uint64_t and we need to pass ext directly so that
-> >> SBI extension tests can also pass.
-> >>
-> >
-> > It's weird that 6.7-rc8 has already included Andrew's change on the ISA=
- ext reg,
-> > but this patch was not generated against his change.
-> >
-> > commit bdf6aa328f137e184b0fce607fd585354c3742f1
-> > Author: Andrew Jones <ajones@ventanamicro.com>
-> > Date:   Wed Dec 13 18:09:58 2023 +0100
-> >
-> >      RISC-V: KVM: selftests: Treat SBI ext regs like ISA ext regs
-> >
-> > Anyway, your changes were right. Please go ahead to include them when m=
-erging.
-> >
->
-> I am not sure what happened. Probably, a merge conflict issue.
->
-> I just realized I forgot to copy paste another fix in arch timer
->
-> +++ b/tools/testing/selftests/kvm/riscv/arch_timer.c
-> @@ -85,7 +85,7 @@ struct kvm_vm *test_vm_create(void)
->          int nr_vcpus =3D test_args.nr_vcpus;
->
->          vm =3D vm_create_with_vcpus(nr_vcpus, guest_code, vcpus);
-> -       __TEST_REQUIRE(__vcpu_has_ext(vcpus[0], KVM_RISCV_ISA_EXT_SSTC),
-> +       __TEST_REQUIRE(__vcpu_has_ext(vcpus[0],
-> RISCV_ISA_EXT_REG(KVM_RISCV_ISA_EXT_SSTC)),
->
 
-Right Fix!
-Please let me know if I need to rebase this patch series on your tree
-and resent it.
+--cNQgfjDz+IAKI+aZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Thanks,
-Haibo
+On Tue, Feb 20, 2024 at 08:27:37PM -0500, dalias@libc.org wrote:
+> On Wed, Feb 21, 2024 at 12:35:48AM +0000, Edgecombe, Rick P wrote:
+
+> > (INCSSP, RSTORSSP, etc). These are a collection of instructions that
+> > allow limited control of the SSP. When shadow stack gets disabled,
+> > these suddenly turn into #UD generating instructions. So any other
+> > threads executing those instructions when shadow stack got disabled
+> > would be in for a nasty surprise.
+
+> This is the kernel's problem if that's happening. It should be
+> trapping these and returning immediately like a NOP if shadow stack
+> has been disabled, not generating SIGILL.
+
+I'm not sure that's going to work out well, all it takes is some code
+that's looking at the shadow stack and expecting something to happen as
+a result of the instructions it's executing and we run into trouble.  A
+lot of things won't notice and will just happily carry on but I expect
+there are going to be things that care.  We also end up with an
+additional state for threads that have had shadow stacks transparently
+disabled, that's managable but still.
+
+> > > The place where it's really needed to be able to allocate the shadow
+> > > stack synchronously under userspace control, in order to harden
+> > > normal
+> > > applications that aren't doing funny things, is in pthread_create
+> > > without a caller-provided stack.
+
+> > Yea most apps don't do anything too tricky. Mostly shadow stack "just
+> > works". But it's no excuse to just crash for the others.
+
+> One thing to note here is that, to enable this, we're going to need
+> some way to detect "new enough kernel that shadow stack semantics are
+> all right". If there are kernels that have shadow stack support but
+> with problems that make it unsafe to use (this sounds like the case),
+> we can't turn it on without a way to avoid trying to use it on those.
+
+If we have this automatic conversion of pages to shadow stack then we
+should have an API for enabling it, userspace should be able to use the
+presence of that API to determine if the feature is there.
+
+--cNQgfjDz+IAKI+aZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXWAEUACgkQJNaLcl1U
+h9BTcAf+MujJo/pNOGU2neBJWmbVKrnAz60+j+uAD98t6m1YXtFChsz+YR6gQOA1
+7FEah97yBTtTiSGpgeKnKCJZMVaWEYHF0Oal7bU/cO0uO6DshP7BIWygF/xyL6/r
+AiFhQ5IAhgRYlGKzShiXTP3rx7ITjIS/1ejalkQ4vHwCOA/N0rsnZwJadUytQjJv
+bHJxu0pC95Sb9lZG3yrrOqZJdljkMsnb7ThBwPRENX0XmGz/Y8l0/FjQwiyWc+Bv
+i4HuekjDwxdxIknpEI/kciFlk8gjthTCrAloZNN/PGNExBEppzAMUg44bTcUkuuu
+CReIkIoN/x1s3gztzAkcLF2nu1EF6w==
+=wfib
+-----END PGP SIGNATURE-----
+
+--cNQgfjDz+IAKI+aZ--
