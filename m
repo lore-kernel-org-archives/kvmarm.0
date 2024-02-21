@@ -1,36 +1,23 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from brightrain.aerifal.cx (brightrain.aerifal.cx [104.156.224.86])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F0217D2;
-	Wed, 21 Feb 2024 00:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD11443E
+	for <kvmarm@lists.linux.dev>; Wed, 21 Feb 2024 01:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=104.156.224.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708476293; cv=none; b=rLYu+ukfo5jA5KyJgvV4+4ZVmxTMNgD3m9OF854cldBrkXlVbTbdVQW2HkyIsZrgIXbB9+a6IHy0N432IRMtCeKxQZHAbxvV4oTYX5YBZc3sZrIZwwjunJbAmAsgE5PYDnVSLYT+nKkS0MQS3kxdwuM76xGJ3WC3vNi6hylmk2s=
+	t=1708478844; cv=none; b=HB1qH4TMD8e+P1BiFg7d7LiNYCvUea8XRKzSTkVZ2T859ZD/ma5SrRVlo6r99t4xpZRRQHhPobZMcY55jCKi0amfVs+48w50QRhw2jsGVqfpLQvCRMIRORob5PISqtSMRyBzRe22AHgQfTCABaYd8cBngiPZtRJjE9TzfeCDQm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708476293; c=relaxed/simple;
-	bh=RgYHLlEs8Obx/1+1Ex9Dia48d76DvmFNDuLMAR9oXbs=;
+	s=arc-20240116; t=1708478844; c=relaxed/simple;
+	bh=pJwSeYFj2jRtte9Mv3vmD/7PvwCI3TccoqOgPr5VrYI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q8QCQiikidltPOET8y3Lh/KyvGv+l38zGWeXrV3B/NlZJDSR8u7+bWKpfhqNatbkaU8CZvR6yIGOSMo4FWwNMLAXD6arwEKkCb5iS/GWkZFDIR3K7erWCvjHebPaWtKLP/Exz1N89ckeS3n3uXPbq+0ZHosQ14YlkAk3ff6ffLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EO1AKxM9; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EO1AKxM9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C393C433F1;
-	Wed, 21 Feb 2024 00:44:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708476293;
-	bh=RgYHLlEs8Obx/1+1Ex9Dia48d76DvmFNDuLMAR9oXbs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EO1AKxM9atAW5ijESg1UGQbijOEntefJ4W7hvVziFA0UrM4OUrijGVaBzcLEs6wYr
-	 OjSIBHChIOgwKca7pXNbM5Cobz19+3leTFG2K/9EVjkOotzvVw0v6ez05ByOvLbcwV
-	 +CEf8bXXKN6XhhDI0KQZwE7hmlaMqLtNtNfWohmrOO5PLVL5FNBfFfrfun8qdbWle6
-	 BBkj3Iud3EUQQytsOc+psDxTBNOG28HZowRKkkW/VLD4pWv0zXFVJLZNdlQZAg0FeB
-	 on/Je8QMYpg2sD3Y5jNv2RyOVaFeGMIIzBve14j+nne6Gk0zkfJUvj0vvAw6pPQKrV
-	 0fcsjUUDb1b7Q==
-Date: Wed, 21 Feb 2024 00:44:43 +0000
-From: Mark Brown <broonie@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=u5s13mMLlyGoQP8GX8ghmNlfGOT5Vd2ueBHc/JMbPHfLz4lCwxhZPWwZKMg7bjO2RWKP8+9v8UjerPwDuYmZbY6+0wLzdDDNz/xJsgoaQODPdJA3JzGmWfo4iqCH01O8UF3fhXlWCD9VO6JPUG1gvxV3K2LO3KYyOMkfOn4Afkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=libc.org; spf=pass smtp.mailfrom=libc.org; arc=none smtp.client-ip=104.156.224.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=libc.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=libc.org
+Date: Tue, 20 Feb 2024 20:27:37 -0500
+From: "dalias@libc.org" <dalias@libc.org>
 To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "dalias@libc.org" <dalias@libc.org>,
-	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+Cc: "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
 	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
 	"Szabolcs.Nagy@arm.com" <Szabolcs.Nagy@arm.com>,
 	"musl@lists.openwall.com" <musl@lists.openwall.com>,
@@ -40,6 +27,7 @@ Cc: "dalias@libc.org" <dalias@libc.org>,
 	"corbet@lwn.net" <corbet@lwn.net>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"broonie@kernel.org" <broonie@kernel.org>,
 	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
 	"palmer@dabbelt.com" <palmer@dabbelt.com>,
 	"debug@rivosinc.com" <debug@rivosinc.com>,
@@ -65,7 +53,7 @@ Cc: "dalias@libc.org" <dalias@libc.org>,
 	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
 Subject: Re: [musl] Re: [PATCH v8 00/38] arm64/gcs: Provide support for GCS
  in userspace
-Message-ID: <cffc9c7e-ba1c-4894-a455-8b2d687182cd@sirena.org.uk>
+Message-ID: <20240221012736.GQ4163@brightrain.aerifal.cx>
 References: <20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org>
  <22a53b78-10d7-4a5a-a01e-b2f3a8c22e94@app.fastmail.com>
  <4c7bdf8fde9cc45174f10b9221fa58ffb450b755.camel@intel.com>
@@ -79,19 +67,145 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="zmCyS0Odp0mOsqor"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 In-Reply-To: <a57d6c7eada4b9a7c35addbc8556f5b53a0c3e6f.camel@intel.com>
-X-Cookie: E = MC ** 2 +- 3db
-
-
---zmCyS0Odp0mOsqor
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
 On Wed, Feb 21, 2024 at 12:35:48AM +0000, Edgecombe, Rick P wrote:
+> On Tue, 2024-02-20 at 18:54 -0500, dalias@libc.org wrote:
+> > On Tue, Feb 20, 2024 at 11:30:22PM +0000, Edgecombe, Rick P wrote:
+> > > On Tue, 2024-02-20 at 13:57 -0500, Rich Felker wrote:
+> > > > On Tue, Feb 20, 2024 at 06:41:05PM +0000, Edgecombe, Rick P
+> > > > > Shadow stacks currently have automatic guard gaps to try to
+> > > > > prevent
+> > > > > one
+> > > > > thread from overflowing onto another thread's shadow stack.
+> > > > > This
+> > > > > would
+> > > > > somewhat opens that up, as the stack guard gaps are usually
+> > > > > maintained
+> > > > > by userspace for new threads. It would have to be thought
+> > > > > through
+> > > > > if
+> > > > > these could still be enforced with checking at additional
+> > > > > spots.
+> > > > 
+> > > > I would think the existing guard pages would already do that if a
+> > > > thread's shadow stack is contiguous with its own data stack.
+> > > 
+> > > The difference is that the kernel provides the guard gaps, where
+> > > this
+> > > would rely on userspace to do it. It is not a showstopper either.
+> > > 
+> > > I think my biggest question on this is how does it change the
+> > > capability for two threads to share a shadow stack. It might
+> > > require
+> > > some special rules around the syscall that writes restore tokens.
+> > > So
+> > > I'm not sure. It probably needs a POC.
+> > 
+> > Why would they be sharing a shadow stack?
+> 
+> The guard gap was introduced originally based on a suggestion that
+> overflowing a shadow stack onto an adjacent shadow stack could cause
+> corruption that could be used by an attacker to work around the
+> protection. There wasn't any concrete demonstrated attacks or
+> suggestion that all the protection was moot.
 
+OK, so not sharing, just happening to be adjacent.
+
+I was thinking from a standpoint of allocating them as part of the
+same range as the main stack, just with different protections, where
+that would never happen; you'd always have intervening non-shadowstack
+pages. But when they're kernel-allocated, yes, they need their own
+guard pages.
+
+> But when we talk about capabilities for converting memory to shadow
+> stack with simple memory accesses, and syscalls that can write restore
+> token to shadow stacks, it's not immediately clear to me that it
+> wouldn't open up something like that. Like if two restore tokens were
+> written to a shadow stack, or two shadow stacks were adjacent with
+> normal memory between them that later got converted to shadow stack.
+> Those sorts of scenarios, but I won't lean on those specific examples.
+> Sorry for being hand wavy. It's just where I'm at, at this point.
+
+I don't think it's safe to have automatic conversions back and forth,
+only for normal accesses to convert shadowstack to normal memory (in
+which case, any subsequent attempt to operate on it as shadow stack
+indicates a critical bug and should be trapped to terminate the
+process).
+
+> > > > From the musl side, I have always looked at the entirely of
+> > > > shadow
+> > > > stack stuff with very heavy skepticism, and anything that breaks
+> > > > existing interface contracts, introduced places where apps can
+> > > > get
+> > > > auto-killed because a late resource allocation fails, or requires
+> > > > applications to code around the existence of something that
+> > > > should be
+> > > > an implementation detail, is a non-starter. To even consider
+> > > > shadow
+> > > > stack support, it must truely be fully non-breaking.
+> > > 
+> > > The manual assembly stack switching and JIT code in the apps needs
+> > > to
+> > > be updated. I don't think there is a way around it.
+> > 
+> > Indeed, I'm not talking about programs with JIT/manual stack-
+> > switching
+> > asm, just anything using existing APIs for control of stack --
+> > pthread_setstack, makecontext, sigaltstack, etc.
+> 
+> Then I think WRSS might fit your requirements better than what glibc
+> did. It was considered a reduced security mode that made libc's job
+> much easier and had better compatibility, but the last discussion was
+> to try to do it without WRSS.
+
+Where can I read more about this? Some searches I tried didn't turn up
+much useful information.
+
+> > > I agree though that the late allocation failures are not great.
+> > > Mark is
+> > > working on clone3 support which should allow moving the shadow
+> > > stack
+> > > allocation to happen in userspace with the normal stack. Even for
+> > > riscv
+> > > though, doesn't it need to update a new register in stack
+> > > switching?
+> > 
+> > If clone is called with signals masked, it's probably not necessary
+> > for the kernel to set the shadow stack register as part of clone3.
+> 
+> So you would want a mode of clone3 that basically leaves the shadow
+> stack bits alone? Mark was driving that effort, but it doesn't seem
+> horrible to me on first impression. If it would open up the possibility
+> of musl support.
+
+Well I'm not sure. That's what we're trying to figure out. But I don't
+think modifying it is a hard requirement, since it can be modified
+from userspace if needed as long as signals are masked.
+
+> > One reasonable thing to do, that might be preferable to
+> > overengineered
+> > solutions, is to disable shadow-stack process-wide if an interface
+> > incompatible with it is used (sigaltstack, pthread_create with an
+> > attribute setup using pthread_attr_setstack, makecontext, etc.), as
+> > well as if an incompatible library is is dlopened.
+> 
+> I think it would be an interesting approach to determining
+> compatibility. On x86 there has been cases of binaries getting
+> mismarked as supporting shadow stack. So an automated way of filtering
+> some of those out would be very useful I think. I guess the dynamic
+> linker could determine this based on some list of functions?
+
+I didn't follow this whole mess, but from our side (musl) it does not
+seem relevant. There are no legacy binaries wrongly marked because we
+have never supported shadow stacks so far.
+
+> The dlopen() bit gets complicated though. You need to disable shadow
+> stack for all threads, which presumably the kernel could be coaxed into
 > doing. But those threads might be using shadow stack instructions
 > (INCSSP, RSTORSSP, etc). These are a collection of instructions that
 > allow limited control of the SSP. When shadow stack gets disabled,
@@ -99,28 +213,23 @@ On Wed, Feb 21, 2024 at 12:35:48AM +0000, Edgecombe, Rick P wrote:
 > threads executing those instructions when shadow stack got disabled
 > would be in for a nasty surprise.
 
-> Glibc's permissive mode (that disables shadow stack when dlopen()ing a
-> DSO that doesn't support shadow stack) is quite limited because of
-> this. There was a POC for working around it, but I'll stop there for
-> now, to not spam you with the details. I'm not sure of arm and risc-v
-> details on this specific corner, but for x86.
+This is the kernel's problem if that's happening. It should be
+trapping these and returning immediately like a NOP if shadow stack
+has been disabled, not generating SIGILL.
 
-We have the same issue with disabling GCS causing GCS instructions to
-become undefined.
+> > The place where it's really needed to be able to allocate the shadow
+> > stack synchronously under userspace control, in order to harden
+> > normal
+> > applications that aren't doing funny things, is in pthread_create
+> > without a caller-provided stack.
+> 
+> Yea most apps don't do anything too tricky. Mostly shadow stack "just
+> works". But it's no excuse to just crash for the others.
 
---zmCyS0Odp0mOsqor
-Content-Type: application/pgp-signature; name="signature.asc"
+One thing to note here is that, to enable this, we're going to need
+some way to detect "new enough kernel that shadow stack semantics are
+all right". If there are kernels that have shadow stack support but
+with problems that make it unsafe to use (this sounds like the case),
+we can't turn it on without a way to avoid trying to use it on those.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXVR3oACgkQJNaLcl1U
-h9BO9Qf/bgPI/9ROkHiV6cP5ag9FVPBuoU4y8o043FWrLxXipYjgLbjIps3r7NYd
-VLNWiX+sScsGrwtujlkAC3JYU0QAro+3+MY0cp+MjZopgqrEpOHlREM+dZO4FSB+
-BH4GTQgpADdgkbaukCb71Yd8D8HkPkpjvvsEGO6Kv2Bq4kMF6w2sd5O/llI+5BPN
-0v1hps6/0VWFICJibmb4hRIRPMjb91mxGQRdpF8OTCgHa0w4UXaTHLttIE3iqCd4
-nyeOZPkoIxUv3fYTVZjAqm6emWXXodOaOQrOtjTM1shBFck2DtY+hJJopNkuwE2j
-qeuz0TLv83oNLhiCiSUgT5gKjQrvdA==
-=VhGm
------END PGP SIGNATURE-----
-
---zmCyS0Odp0mOsqor--
+Rich
