@@ -1,227 +1,161 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from brightrain.aerifal.cx (brightrain.aerifal.cx [104.156.224.86])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3806885C58
-	for <kvmarm@lists.linux.dev>; Wed, 21 Feb 2024 19:24:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708543453; cv=fail; b=Kz0lPNmwykCUndaKXWdRC2tR20P+Yfkx/SgXRS5B9SY/5dN9MlePpNzhhgM66hG/QYXOzUsweVJw4nHMv1cnQMHsmDSTEuYyL80Ju6hMeICnjhZWM1LKzdLgOLlJrLFqqve/vTfcF00rizQ5HZMdhoyWgNCpp8FVX0iSk8ohzLk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708543453; c=relaxed/simple;
-	bh=zcCPT7AHSGRei7HNsiUe5F7y+lEXjyUmqtMeTNfcCFQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=qnOdMawhrXMdDgni+b0ElOT4wBqtOomgT8pikafGT/08qM8RRAd+GB/bJYlmmZDwJi2ZXaO59Tu4oe56YmMLY3sfsLrWYNgGTylaFOI25N+gXBIAeCpDYBqtmmVJ6oKA2DR2MTgrVjMx344dtc4JVYM96HBNS+VXvtS4z6xwbb0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=miGM0tN5; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="miGM0tN5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708543451; x=1740079451;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=zcCPT7AHSGRei7HNsiUe5F7y+lEXjyUmqtMeTNfcCFQ=;
-  b=miGM0tN5Fs1U1Inem1P5CENRFEArFSdagcvRx/zQue66vsr3fPh3PhAh
-   BzRlzzQyn1CO9jq9Wbjyd+qGayPQqX0nI7uLFL9E5gEJGPBxa6GI6+o11
-   u4euMjh1FLIiT4V6Xi55BvMZiRHvNIZz7cZ9ieIapn2GIMhmiw1n/UC48
-   hu6Emlezdy9QL6eYLQMty0Nh0Ucxx18Zq7M8C3gf/VyOC7ZSY3Z1w53cw
-   vnSQQFH0NYaCfj1Sbkurf+XlnBHkElOU3yfGCK/7kMr4A3taLHh9D2T+A
-   WOy2JvAf4q9tXqdpR77PbdVWcQYl3yPM4pqmGyuoJF2E+HYC87WbrBReE
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10991"; a="20272083"
-X-IronPort-AV: E=Sophos;i="6.06,176,1705392000"; 
-   d="scan'208";a="20272083"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2024 11:22:31 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,176,1705392000"; 
-   d="scan'208";a="9816182"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Feb 2024 11:22:31 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 21 Feb 2024 11:22:30 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 21 Feb 2024 11:22:30 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 21 Feb 2024 11:22:25 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YZ0LuyKiRVsIomzWUC8kFovPWO0YbTobEJsKFMAdaQcolAUndQKRixhq7WUItfpnXTXuybefmDn4CC9DMapap8y1XnF00PVHHVQiOCv73Z1lA6Ti09XL6swXEtA9f/6rWKFKQaGSpMBJl2BGVDw1RLAscLaiUvch8iL+u/0p5mW09nVuS34DLn9H17MnykMXEvv3hvqo40dVOfvmeINfSmao+ikCRRT/+MU9pLGPgEmYcIoisxDQ/7lH/706dg4FyKLRcmpzONLhFi7SZkKc3mrVX7lwA4vXKD7m9+HyXxUC3eGYasvPXSLbwV9yQ3908TIA+MbLybm5THV0TJaCPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zcCPT7AHSGRei7HNsiUe5F7y+lEXjyUmqtMeTNfcCFQ=;
- b=ckIcSoYMBABQadoeO9+8s2WOjPcM4JWSR/fuh+K/rv4Ros0yO3abyYMiKiPA7unCBiXYKipV0Gl8yvtTXxLg3N0KbHLkbtmm7+XteaZnO1OGc3iG2opSE8yEtgrR7zEO3NcV/ajfg2L2BgR913qwtuOf4DlOGUAAOK+HmPocCM2az9JHPFTZoLI+smzPpoffTeidpssRqWGN9c5Gk2f1ii1Cl6lK8AVc0gW8BX82j9DfdTaMdDNDDxdj/CM9n2vXJm7qDJxZHx6eYyo7u6tsAEpZpztBS2T/s4CQjQu4WHGPmG6jQwd7tTtMvxS3eUS58+DgGTW0qt742sdnFXizTw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by CO1PR11MB4865.namprd11.prod.outlook.com (2603:10b6:303:9c::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.39; Wed, 21 Feb
- 2024 19:22:21 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::5d40:83fd:94ac:d409]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::5d40:83fd:94ac:d409%7]) with mapi id 15.20.7316.018; Wed, 21 Feb 2024
- 19:22:21 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "dalias@libc.org" <dalias@libc.org>
-CC: "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "Szabolcs.Nagy@arm.com"
-	<Szabolcs.Nagy@arm.com>, "musl@lists.openwall.com" <musl@lists.openwall.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7200586AE5
+	for <kvmarm@lists.linux.dev>; Wed, 21 Feb 2024 20:18:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=104.156.224.86
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708546704; cv=none; b=bIpHtUBAYC3ETe0xfDZ7H5cBLi6DyWYnapjkrk8+hEy8NSPdWyMoEM6uOjwYi5sI1DVo0SZD275v31XZEwy5CTAeChPxp+W5RgWb3ddkO2dBrDqssXhhpSFwNCgCfoyT/X8RVfFOkv5PISqhqkWEHU6TyB1J2T5VmgOnMi6ahP8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708546704; c=relaxed/simple;
+	bh=fxZvJOJiXDTvbkMu2Yj2fcSV/FlmP4uoP83ryrj44dk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h+LFF8iYpeaWUiENX6+0Q9sH8Wa0/JQAr7TMI/3JfWufSariv/QqjdOfz8s9NMMYley4pEvq4OMgs6dyT5dbyWkeKUO2tnfJup3abWLs7ryRTghxZqd6Xifm5Ei4fpgr6UYXF1RagMLPiICc5HLQRQX9tqCU/CJVvvVtwoKCi9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=libc.org; spf=pass smtp.mailfrom=libc.org; arc=none smtp.client-ip=104.156.224.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=libc.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=libc.org
+Date: Wed, 21 Feb 2024 15:18:37 -0500
+From: "dalias@libc.org" <dalias@libc.org>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"Szabolcs.Nagy@arm.com" <Szabolcs.Nagy@arm.com>,
+	"musl@lists.openwall.com" <musl@lists.openwall.com>,
 	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
 	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "corbet@lwn.net"
-	<corbet@lwn.net>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "broonie@kernel.org" <broonie@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "palmer@dabbelt.com"
-	<palmer@dabbelt.com>, "debug@rivosinc.com" <debug@rivosinc.com>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "shuah@kernel.org"
-	<shuah@kernel.org>, "arnd@arndb.de" <arnd@arndb.de>, "maz@kernel.org"
-	<maz@kernel.org>, "oleg@redhat.com" <oleg@redhat.com>, "fweimer@redhat.com"
-	<fweimer@redhat.com>, "keescook@chromium.org" <keescook@chromium.org>,
-	"james.morse@arm.com" <james.morse@arm.com>, "ebiederm@xmission.com"
-	<ebiederm@xmission.com>, "will@kernel.org" <will@kernel.org>,
-	"brauner@kernel.org" <brauner@kernel.org>, "hjl.tools@gmail.com"
-	<hjl.tools@gmail.com>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "paul.walmsley@sifive.com"
-	<paul.walmsley@sifive.com>, "ardb@kernel.org" <ardb@kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-mm@kvack.org"
-	<linux-mm@kvack.org>, "thiago.bauermann@linaro.org"
-	<thiago.bauermann@linaro.org>, "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>, "sorear@fastmail.com" <sorear@fastmail.com>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"broonie@kernel.org" <broonie@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"palmer@dabbelt.com" <palmer@dabbelt.com>,
+	"debug@rivosinc.com" <debug@rivosinc.com>,
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+	"shuah@kernel.org" <shuah@kernel.org>,
+	"arnd@arndb.de" <arnd@arndb.de>, "maz@kernel.org" <maz@kernel.org>,
+	"oleg@redhat.com" <oleg@redhat.com>,
+	"fweimer@redhat.com" <fweimer@redhat.com>,
+	"keescook@chromium.org" <keescook@chromium.org>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	"ebiederm@xmission.com" <ebiederm@xmission.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"brauner@kernel.org" <brauner@kernel.org>,
+	"hjl.tools@gmail.com" <hjl.tools@gmail.com>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"thiago.bauermann@linaro.org" <thiago.bauermann@linaro.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"sorear@fastmail.com" <sorear@fastmail.com>,
 	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
-Subject: Re: [musl] Re: [PATCH v8 00/38] arm64/gcs: Provide support for GCS in
- userspace
-Thread-Topic: [musl] Re: [PATCH v8 00/38] arm64/gcs: Provide support for GCS
+Subject: Re: [musl] Re: [PATCH v8 00/38] arm64/gcs: Provide support for GCS
  in userspace
-Thread-Index: AQHaVpxQxL7eT1mQek6VcjPJOSVEZ7ETiLSAgAAiyYCAAASHgIAATE8AgAAGrQCAAAuagIAADnuAgADQTgCAABIegIAALDIAgAAF54CAAAQ9gIAABSaAgAAGX4CAAAOdgIAABGIA
-Date: Wed, 21 Feb 2024 19:22:21 +0000
-Message-ID: <e3a432c0fa9f5fe837e9d2fc7b36304709a34428.camel@intel.com>
-References: <20240220235415.GP4163@brightrain.aerifal.cx>
-	 <a57d6c7eada4b9a7c35addbc8556f5b53a0c3e6f.camel@intel.com>
-	 <20240221012736.GQ4163@brightrain.aerifal.cx>
-	 <d18f060d-37ac-48b1-9f67-a5c5db79b34e@sirena.org.uk>
-	 <20240221145800.GR4163@brightrain.aerifal.cx>
-	 <4a3809e8-61b2-4341-a868-292ba6e64e8a@sirena.org.uk>
-	 <20240221175717.GS4163@brightrain.aerifal.cx>
-	 <f4a54297767eb098d903404cbe8860d655d79bed.camel@intel.com>
-	 <20240221183055.GT4163@brightrain.aerifal.cx>
-	 <c3085fbe10193dfe59b25bc7da776e60779b0e8c.camel@intel.com>
-	 <20240221190639.GU4163@brightrain.aerifal.cx>
-In-Reply-To: <20240221190639.GU4163@brightrain.aerifal.cx>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|CO1PR11MB4865:EE_
-x-ms-office365-filtering-correlation-id: 3bacb91a-3e7d-4d7e-4bad-08dc33126d57
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: lA1DGPK2VrKkREIodDb1OumuUukP/gvkYW69XCCKAnPIb6B6yCPyDGeE8y60EDwjp0ffJGgk0RMlpxC3IYBnBPf+jeYwUmBw4tC/r0PZJI0wOtk1TS31ojn49R4BcbYloMEZTM3kMeZQN/fEfGmEm9gjZhOKT0giy1rcdEEejfJGvp2ckrp2nFJ1aWQbu0kZ3eBRf8bMn9ls/hP5LbOcAgpte7qA1Tm+RZ+XRd00SHgOuuC6PlTWNo8/sDo3Yjh309xquB7I1mvTIVTj8auuTHOH4qgGdYZvFEAGCOzBrCjxlqZDW3AvDCsemiN99q8bCyVpHJhT7r5ZwtuhelArcWZmOw2kN9d1v7zCJN0sAWg58k2jiS/ufn9c9VgKcQpEablnFc8Cjv6gOumchwQ2G0TmD07FwnJtmA/PxqBuKy92JCUwUkTPNtjfCanhTwghUhtU361vPLSKRrJedOGc3tojJ0VOef5pB11Ob88o1n7wxjKfeUjFjJycGCerjpJRQxsuFmkaV6GrnE9aN256D7Eh+j7Ds2GBL4op5xQcKNkxQzd0e+RR4zlXoofEuyuOWablCFdqXQjtf8jCYngKLAm6NQFdX0Gk/GfGhJOqzG1Uliu8X9k8Fgs36aIIdfHf
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(230473577357003)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?MHBEMnFmRW9Tdk1la2hhUUluS2EvQm55bTMrUGRLbHVhelZDVWRya1J4K0V3?=
- =?utf-8?B?SmVibTBmNHdaNzdTa01BNlFxQURGR3pqeGpKODB5OE9Kbmk5L2FYd3hWZE50?=
- =?utf-8?B?dkM3eHpIckk0MHJ5YUU1c29kMWViR2JtcFN3S2w5TUdTRWdmeDZnaUZ0eGJM?=
- =?utf-8?B?emFJM2pudTFqaDl5SmduYnZ2dnBmbHdpeTZ4NGpGeDlwRmZvUlRiYStrM3pG?=
- =?utf-8?B?YU1ZRXdnMEwyN21tcHZSTVZZVUwwMWNHZnBoMXRvUXQ0MDNXR00yeHA3VU9F?=
- =?utf-8?B?Z1h2YkVaemMydUJLT2dLUTk2S1FWb3RoNXo5ZFY1dVY4U3h0MzZzVmVtRGxW?=
- =?utf-8?B?N1lzK0NTZlJuZEpRQ2JiM3lCUFJjUHZVUWlidk5QTnFLeksweEo3WklzWTVh?=
- =?utf-8?B?blJBWVV4SDFGZlUwcmdSVFBuNTlTRG42SUEyS21oaGdjMS9hUXlEWTdMYnh6?=
- =?utf-8?B?SnhYNHF4VktMSlB1dkR2SmF5SGhxcmZZRHZaSEtWVks2ODUwZkdaWXRNTzdO?=
- =?utf-8?B?NkxZRnlsVnI0WDZoeUdHdnFaL1UwcU8vOVZucWFia3hqTGo0SEFGTUxyZ1pK?=
- =?utf-8?B?a0NPaWNhT3J2YWluSzU3VUxoenhSY3pldnFpYXVJektKaVIvQUxGUW9Zc09D?=
- =?utf-8?B?VGZZZmJSdnpXa2ZoaFQwZDdCWnhFaUZwRHVNQzVOUENpWnhSdUFoWGZPZE54?=
- =?utf-8?B?Q3UvWlpmQWxqYlREbGRZK1ZveFpYR0JSelJsOXhOeUZFcDc4Y0c2ZHZJbEdK?=
- =?utf-8?B?VkJNR3BRb1MyaEhhSDhodzJkVk56UHFZcGlNKzV3S1FhSEM1b2w2S3pMejF6?=
- =?utf-8?B?QnUrUEpNNzFoS2Uxdm9URVp3YWJlbllOS3MyVEVOVE5QZ1RVaHZCdHNkMUN5?=
- =?utf-8?B?WnFMbG05WTJrT01BcWlNL2dDV0Q0V0FYOUVSR3FuLzJlb3FEVkx4Z3JUSy90?=
- =?utf-8?B?R1lYc25TQ0t4aUN0L1Npa1pwUVpyRHNmTmlnVkEreUJVVWVhcGNpUWVFVVJs?=
- =?utf-8?B?V1BYWmprN2htZUlWZW11Z1N1RmZ0R2xMQUpGdWhYcmk4cG9CUDkxbUZIUVpl?=
- =?utf-8?B?enQ2dXFqbmdLdmNFdlZCUy96YXA2Yk1iSHZIN2RWMmd6SVFaazVVVXNCOWZl?=
- =?utf-8?B?ZFRJaCtHcVl2ZGp5UkNtMmVHOGZGUUx0aHlFeUNqY2dGU2ViODdtRUd0ZTgw?=
- =?utf-8?B?MHdEMGVzbDE1aHBDcEgzWU1wSTJ4TXM5MWpuQzBnQUpEbFhvQ284ZlZvMitw?=
- =?utf-8?B?YkRoR1BRNGd5dkhWWGIzWk1mQzQvOWNXMTh0RUx1OXd5NFFPSVNnZ29nL0s0?=
- =?utf-8?B?eGFtUStadzRVbGpFUzV0QjhXTG5TZTRKMmVkc1RVa0dUekMyenVNaElFM2N3?=
- =?utf-8?B?TW1Oc1VXRitiR3RZZFhFeUpEbVZ3aFk3VE9obWFyMFFHenlSeDY5ZC9SKzJp?=
- =?utf-8?B?ckN2WThIVm9CTitHRi9mRE5CbGhJSlNXeFpJMDlVNVVvQXlJQno3Wjcrdlpl?=
- =?utf-8?B?MytCWEszNVc4VEJMMDBjUklWOE5hcDY3NEhxV3VNc3FJSjNOSXpYZzhoVmVJ?=
- =?utf-8?B?ZTBvcUJZR0pnbzFjc0l0TWVkMFFOQVN0d1FCRmtWWkJJUHVZa3I2UmJRSHNN?=
- =?utf-8?B?NGV0STlERGtUMjc2dzR1L1M0Um85bnJROVVYckJiNnU3RXRqQXRvN2thdUlC?=
- =?utf-8?B?V1RGaUJpQWEwM1YrdDIwZVVUaythYTBCV09IYzBmeVMvUE9HSkZrNk9qRklE?=
- =?utf-8?B?b2t6RFNpLzRXeS9HYUtHZitCeC9IeXpKNy95akNaK3RKS3pibGRwRkRSN2ZJ?=
- =?utf-8?B?d09DcUlHQVBQVWZGVUZpTnRLcHpCNTJkVEFDckFQQ2I5Rm95VkRrSVRyUTI2?=
- =?utf-8?B?c3I0RlhjbUVMa3lyM3lHUFRqSFY5R3p6Qjl0c2VPZ2xLKytJcWh1OVo1WWUz?=
- =?utf-8?B?MkpOT0o4bnM0ZytIWEZKSGV2bVlsWDNyTUI1bGduNWRmVkJBNUVzdUt3T0xo?=
- =?utf-8?B?Nk9ORGQ3UnA2Y01sa3dGeTlWUHorV3VsWkI0WTkwVzBpQ0lRU1Budlg0TERh?=
- =?utf-8?B?WTZ2TlYxcGpNcFYyZ2RMWlVnY3JDL1JFVjlUUDBKaVluaEJENFRTc2NwQ2V0?=
- =?utf-8?B?Tm1nQlcrbXo5YUsyS0p0ZXE1YW14MUhVMjdkcFVzNUUvZERWYm5DODJMelZa?=
- =?utf-8?Q?Xt8KuF4NfegkRcukoWb20HA=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4275E97108F917409F49BAA85992435A@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Message-ID: <20240221201837.GW4163@brightrain.aerifal.cx>
+References: <20240221012736.GQ4163@brightrain.aerifal.cx>
+ <d18f060d-37ac-48b1-9f67-a5c5db79b34e@sirena.org.uk>
+ <20240221145800.GR4163@brightrain.aerifal.cx>
+ <4a3809e8-61b2-4341-a868-292ba6e64e8a@sirena.org.uk>
+ <20240221175717.GS4163@brightrain.aerifal.cx>
+ <f4a54297767eb098d903404cbe8860d655d79bed.camel@intel.com>
+ <20240221183055.GT4163@brightrain.aerifal.cx>
+ <c3085fbe10193dfe59b25bc7da776e60779b0e8c.camel@intel.com>
+ <20240221190639.GU4163@brightrain.aerifal.cx>
+ <e3a432c0fa9f5fe837e9d2fc7b36304709a34428.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3bacb91a-3e7d-4d7e-4bad-08dc33126d57
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Feb 2024 19:22:21.6561
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: H8GCGNJh4YNueAWcT29XOHiiFIf0A+7NxpsO+z/QQPpGy+CliOKfumLxtAWpSJIOibGGdM1jQTCAzy2E92JwD6TgqNp7b70B3AmBnZZiPdw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4865
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e3a432c0fa9f5fe837e9d2fc7b36304709a34428.camel@intel.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-T24gV2VkLCAyMDI0LTAyLTIxIGF0IDE0OjA2IC0wNTAwLCBkYWxpYXNAbGliYy5vcmcgd3JvdGU6
-DQo+IER1ZSB0byBhcmJpdHJhcmlseSBuZXN0YWJsZSBzaWduYWwgZnJhbWVzLCBubywgdGhpcyBk
-b2VzIG5vdCBzdWZmaWNlLg0KPiBBbiBpbnRlcnJ1cHRlZCBvcGVyYXRpb24gdXNpbmcgdGhlIGxv
-Y2sgY291bGQgYmUgYXJiaXRyYXJpbHkgZGVsYXllZCwNCj4gZXZlbiBuZXZlciBleGVjdXRlIGFn
-YWluLCBtYWtpbmcgYW55IGNhbGwgdG8gZGxvcGVuIGRlYWRsb2NrLg0KDQpEb2ghIFllcCwgaXQg
-aXMgbm90IHJvYnVzdCB0byB0aGlzLiBUaGUgb25seSB0aGluZyB0aGF0IGNvdWxkIGJlIGRvbmUN
-CndvdWxkIGJlIGEgdGltZW91dCBpbiBkbG9wZW4oKS4gV2hpY2ggd291bGQgbWFrZSB0aGUgd2hv
-bGUgdGhpbmcganVzdA0KYmV0dGVyIHRoYW4gbm90aGluZy4NCg0KPiANCj4gPiANCj4gDQo+IEl0
-J3MgZmluZSB0byB0dXJuIFJEU1NQIGludG8gYW4gYWN0dWFsIGVtdWxhdGVkIHJlYWQgb2YgdGhl
-IFNTUCwgb3INCj4gYXQNCj4gbGVhc3QgYW4gZW11bGF0ZWQgbG9hZCBvZiB6ZXJvIHNvIHRoYXQg
-dW5pbml0aWFsaXplZCBkYXRhIGlzIG5vdCBsZWZ0DQo+IGluIHRoZSB0YXJnZXQgcmVnaXN0ZXIu
-DQoNCldlIGNhbid0IGludGVyY2VwdCBSRFNTUCwgYnV0IGl0IGJlY29tZXMgYSBOT1AgYnkgZGVm
-YXVsdC4gKGRpc2NsYWltZXINCng4Ni1vbmx5IGtub3dsZWRnZSkuDQoNCj4gIElmIGRvaW5nIHRo
-ZSBsYXR0ZXIsIGNvZGUgd29ya2luZyB3aXRoIHRoZQ0KPiBzaGFkb3cgc3RhY2sganVzdCBuZWVk
-cyB0byBiZSBwcmVwYXJlZCBmb3IgdGhlIHBvc3NpYmlsaXR5IHRoYXQgaXQNCj4gY291bGQgYmUg
-YXN5bmMtZGlzYWJsZWQsIGFuZCBjaGVjayB0aGUgcmV0dXJuIHZhbHVlLg0KPiANCj4gSSBoYXZl
-IG5vdCBsb29rZWQgYXQgYWxsIHRoZSBpbnN0cnVjdGlvbnMgdGhhdCBiZWNvbWUgI1VEIGJ1dCBJ
-DQo+IHN1c3BlY3QgdGhleSBhbGwgaGF2ZSByZWFzb25hYmxlIHRyaXZpYWwgd2F5cyB0byBpbXBs
-ZW1lbnQgYQ0KPiAiZGlzYWJsZWQiIHZlcnNpb24gb2YgdGhlbSB0aGF0IHVzZXJzcGFjZSBjYW4g
-YWN0IHVwb24gcmVhc29uYWJseS4NCg0KVGhpcyB3b3VsZCBoYXZlIHRvIGJlIHRob3VnaHQgdGhy
-b3VnaCBmdW5jdGlvbmFsbHkgYW5kIHBlcmZvcm1hbmNlDQp3aXNlLiBJJ20gbm90IG9wcG9zZWQg
-aWYgY2FuIGNvbWUgdXAgd2l0aCBhIGZ1bGx5IGZsZXNoZWQgb3V0IHBsYW4uIEhvdw0Kc2VyaW91
-cyBhcmUgeW91IGluIHB1cnN1aW5nIG11c2wgc3VwcG9ydCwgaWYgd2UgaGFkIHNvbWV0aGluZyBs
-aWtlDQp0aGlzPw0KDQpISiwgYW55IHRob3VnaHRzIG9uIHdoZXRoZXIgZ2xpYmMgd291bGQgdXNl
-IHRoaXMgYXMgd2VsbD8NCg0KSXQgaXMgcHJvYmFibHkgd29ydGggbWVudGlvbmluZyB0aGF0IGZy
-b20gdGhlIHNlY3VyaXR5IHNpZGUgKGFzIE1hcmsNCm1lbnRpb25lZCB0aGVyZSBpcyBhbHdheXMg
-dGVuc2lvbiBpbiB0aGUgdHJhZGVvZmZzIG9uIHRoZXNlIGZlYXR1cmVzKSwNCnBlcm1pc3NpdmUg
-bW9kZSBpcyBzZWVuIGJ5IHNvbWUgYXMgc29tZXRoaW5nIHRoYXQgd2Vha2VucyBzZWN1cml0eSB0
-b28NCm11Y2guIEFwcHMgY291bGQgY2FsbCBkbG9wZW4oKSBvbiBhIGtub3duIHVuc3VwcG9ydGVk
-IERTTyBiZWZvcmUgZG9pbmcNClJPUC4gSSBkb24ndCBrbm93IGlmIHlvdSBoYXZlIGFueSBtdXNs
-IHVzZXJzIHdpdGggc3BlY2lmaWMgc2hhZG93IHN0YWNrDQp1c2UgY2FzZXMgdG8gYXNrIGFib3V0
-IHRoaXMuDQo=
+On Wed, Feb 21, 2024 at 07:22:21PM +0000, Edgecombe, Rick P wrote:
+> On Wed, 2024-02-21 at 14:06 -0500, dalias@libc.org wrote:
+> > Due to arbitrarily nestable signal frames, no, this does not suffice.
+> > An interrupted operation using the lock could be arbitrarily delayed,
+> > even never execute again, making any call to dlopen deadlock.
+> 
+> Doh! Yep, it is not robust to this. The only thing that could be done
+> would be a timeout in dlopen(). Which would make the whole thing just
+> better than nothing.
+> 
+> > 
+> > > 
+> > 
+> > It's fine to turn RDSSP into an actual emulated read of the SSP, or
+> > at
+> > least an emulated load of zero so that uninitialized data is not left
+> > in the target register.
+> 
+> We can't intercept RDSSP, but it becomes a NOP by default. (disclaimer
+> x86-only knowledge).
+
+OK, then I think the contract just has to be that userspace, in a
+process that might dynamically disable shadow stack, needs to do
+something like xor %reg,%reg before rdssp so that the outcome is
+deterministic in disabled case.
+
+> >  If doing the latter, code working with the
+> > shadow stack just needs to be prepared for the possibility that it
+> > could be async-disabled, and check the return value.
+> > 
+> > I have not looked at all the instructions that become #UD but I
+> > suspect they all have reasonable trivial ways to implement a
+> > "disabled" version of them that userspace can act upon reasonably.
+> 
+> This would have to be thought through functionally and performance
+> wise. I'm not opposed if can come up with a fully fleshed out plan. How
+> serious are you in pursuing musl support, if we had something like
+> this?
+
+Up til this thread, my position was pretty much "nope" because it
+looked like it could not be done in a way compatible with existing
+interface requirements.
+
+However, what's been discussed here, contingent on a dynamic-disable
+(ideally allowing choice of per-thread or global, to minimize loss of
+hardening properties),
+
+Personally, I believe shadow stack has very low hardening value
+relative to cost/complexity, and my leaning would be just to ignore
+it. However, I also know it becomes marketing pressure, including
+pressure on distros that use musl -- "Why doesn't [distro] do shadow
+stack?? I thought you were security oriented!!!" -- and if it can be
+done in a non-breaking and non-invasive way, I think it's reasonable
+to pursue and make something work.
+
+> HJ, any thoughts on whether glibc would use this as well?
+> 
+> It is probably worth mentioning that from the security side (as Mark
+> mentioned there is always tension in the tradeoffs on these features),
+> permissive mode is seen by some as something that weakens security too
+> much. Apps could call dlopen() on a known unsupported DSO before doing
+> ROP. I don't know if you have any musl users with specific shadow stack
+> use cases to ask about this.
+
+Yes, this is potentially an argument for something like the option 2,
+if there's a way to leave SS enabled but then trap when something goes
+wrong, detect if it went wrong via SS-incompatible library code, and
+lazily disable SS, otherwise terminate.
+
+But I just realized, I'm not even sure why shared libraries need to be
+explicitly SS-compatible. Unless they're doing their own asm stack
+switches, shouldn't they just work by default? And since I don't
+understand this reason, I also don't understand what the failure mode
+is when an incompatible library is loaded, and thus whether it would
+be possible to detect and attribute the failure to the library, or
+whether the library would induce failure somewhere else.
+
+Anyway, a mechanism to allow the userspace implementation to disable
+SS doesn't inherently expose a means to do that. A system integrator
+doing maximum hardening might choose to build all libraries as
+SS-compatible, or to patch the loader to refuse to load incompatible
+libraries.
+
+Rich
