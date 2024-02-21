@@ -1,89 +1,268 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06830376E2;
-	Wed, 21 Feb 2024 10:34:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F414D9FF;
+	Wed, 21 Feb 2024 12:04:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708511663; cv=none; b=cF98F4R0Gtt5u0RgfyOVEm7dhbmD1lOsOImebxpp1PwuEvLDAt/Qd5Dq6wTQL3slsJsyv2a68KLq1ARmLLJQOYQ42yen762edg02GLsIHFDn0lvhs05s62RxVcENJ8pFrPARhIT9I7w9vzhKhBtAYPbxcVOCQu+m0RAWQIB86E0=
+	t=1708517098; cv=none; b=MR8maBUiGC0t9pGIhxB5HXt55gmcyPM40mZmnkgPSYJJ5j1+1OtXheZokiMm6fRtbBnBh4kDL5k9EduIMt8/su9T3RxXUOrJgV55AVTDrrGsZT7YcRPsiNcyimwc0bESKPEZKXqxovJpPQ0ur/HWewHthPs3Gl34NEtNk+P/RXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708511663; c=relaxed/simple;
-	bh=pSgaoW32A2ZW+Zstf/HfSXVhl29QTjYCBzXFumXW8S4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cfhO+ERGy6LpJEG7FbxckEvFAZbgKq0wsDtDgNLozZdlqEMzk6DTjNfCb901pTTZloxayG/kAKV9HA1vE4f3D6gC7DiMKzIR/DvvTsu9oMWRMy6E4bha6mUZMmf/yg8MTXfxsrIWgeW0OYHINWb+fV9E6oRbYeehL2Poo5XabvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bHMc7J8G; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bHMc7J8G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D8DBC433F1;
-	Wed, 21 Feb 2024 10:34:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708511662;
-	bh=pSgaoW32A2ZW+Zstf/HfSXVhl29QTjYCBzXFumXW8S4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bHMc7J8GzF/8YWnYAjGm1r2KrgrB5PaoUux3ZHfJaqkFQkbdQLZHwAEXKTXwO/8BU
-	 gEehdOQQrJ0o/7iOPEPg123PGzKuV7X28gvjRWstC+MH6YHKJUymd5AabtNMpDMu1c
-	 oEDG+5Dj8l52HW7+guH2H/lavdnWQnJ5radXOSlJBKk3Rl6657MOFH85Bu6q7uZcfC
-	 7vAKs13JZtiu6TUcrtuWllTFjP+LfXib6lfVhjl1waVxJ1X2ca2jm5CP0axTjTYKr8
-	 tRcptAzdF15dA0ZZErxxCEBKzGtLux4ypI/ySIx+BOgTh5X7xFCwh1PtlfyQ7ikCMD
-	 CkTS9NVBEassQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rcjvg-005Cq1-Kx;
-	Wed, 21 Feb 2024 10:34:20 +0000
-Date: Wed, 21 Feb 2024 10:34:20 +0000
-Message-ID: <86ttm22jir.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.8, take #3
-In-Reply-To: <CABgObfYhVK+qF25h8+hhuyCvbgfpocDo0UDac3CTEHghRGww+w@mail.gmail.com>
-References: <20240221101711.2105066-1-maz@kernel.org>
-	<CABgObfYhVK+qF25h8+hhuyCvbgfpocDo0UDac3CTEHghRGww+w@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1708517098; c=relaxed/simple;
+	bh=FUiL7Sai6eHgLUPNSBxzFpKmZumr4AKqeHY88JAN8u8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PHcAdmVElUIwV/GLZBiFjrZO8j8UdtQoX2wm36WfSbSPZqYyZ9YBVdwdt5qDuwtVfMMbA1fZIY+VPZcOkcdAmbjG2kGZoeqrdoXyoPoEVZMHK+6EtG/pU/i3Z+5SquwzEXDN/oBZwset/4ill4s2+6MYKj4ah/EzQICMQ7mXY7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-6e45439925aso566022a34.1;
+        Wed, 21 Feb 2024 04:04:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708517095; x=1709121895;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bd70CzVDcJLuCi0Mf2lAcBkkasP1RaXoMIQ30r8qKRE=;
+        b=uSH6XuZxTWCDkZY/tMppLeTB7oKL2kP7+QB/LdUfPOcvcYqfd+cgSY23TbY2TrnTHj
+         O4peAJi9JcuuEkOCJwMsYWMTvzEIKcxpD1+rDVCOTYNaP9pCtxSvS6pHm8ZJxqA2Ghc9
+         jzQ8P/gCz9O0CU34usy4cP4YbcmwCqup+cJwoAEg1uJAchy9TYrRllgaACYUo1SxrLHM
+         n8DICZhasCXfSMbT6eDsHHlGgKrLxnYnRPJf7H0oo5vNxalCnerpNzjaJgqlxLhxSBxD
+         FDW1FD7wN1CZfyLVSRP6X+eUT20XW17ODTNOEaiEjpLxGR/LhyaIPewd5vIQCNnlkECs
+         VAxA==
+X-Forwarded-Encrypted: i=1; AJvYcCXeBhG/QqtVqQHPTNTY9EgYxbYYWHbP0bHXfvpTLiXTmpLNOUCI685NgpAcutcWSMkfLAK64Vw6bHMJsaRqQ695BIUekYKoaQ1dXw+nt+NaTDsdwlGo2CaPaMuHkLI1Q+Rt
+X-Gm-Message-State: AOJu0YxFgQBLBfU16GRUxSuze3EOmvoYr3UPkyNUPNLZX1H1jm3smIpg
+	+7Um3Z2QqHyV2s9iCTOEIe7rsbRh8KEj3UNzGR5PLFWw8h8XwfKieVCCK+6COM7vy4FiPUT941H
+	utDXSjMofCQDwxTNYgpxozzi663Y=
+X-Google-Smtp-Source: AGHT+IHeaissm6JEdH7EPypXS7T8sNhbX/Qz4NatOo4m9Df9Q37Mfl1C4Kc8/AZCO27nxtnXyK+7klVD3+esvTxFkJA=
+X-Received: by 2002:a05:6820:1f8c:b0:59f:f650:61bb with SMTP id
+ eq12-20020a0568201f8c00b0059ff65061bbmr5425790oob.0.1708517095273; Wed, 21
+ Feb 2024 04:04:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+References: <Zbp5xzmFhKDAgHws@shell.armlinux.org.uk> <E1rVDmU-0027YP-Jz@rmk-PC.armlinux.org.uk>
+ <CAJZ5v0iiJpUWq5GMSnKFWQTzn_bdwoQz9m=hDaXNg4Lj_ePF4g@mail.gmail.com>
+ <ZdSMk93c1I6x973h@shell.armlinux.org.uk> <ZdTBtt0oR6Q1RcAB@shell.armlinux.org.uk>
+ <20240220162406.00005b59@Huawei.com> <CAJZ5v0i0c3bg8E9yuRk00VAEW5isZ4N-mbnhRuTR8aiFLXo1_A@mail.gmail.com>
+In-Reply-To: <CAJZ5v0i0c3bg8E9yuRk00VAEW5isZ4N-mbnhRuTR8aiFLXo1_A@mail.gmail.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Wed, 21 Feb 2024 13:04:43 +0100
+Message-ID: <CAJZ5v0hu32UCLPO6txptfn1DxCNqdYc+Ls-yNa09LdzhroyddQ@mail.gmail.com>
+Subject: Re: [PATCH RFC v4 02/15] ACPI: processor: Register all CPUs from acpi_processor_get_info()
+To: Jonathan Cameron <jonathan.cameron@huawei.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, linux-pm@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-acpi@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	kvmarm@lists.linux.dev, x86@kernel.org, 
+	acpica-devel@lists.linuxfoundation.org, linux-csky@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-ia64@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, Salil Mehta <salil.mehta@huawei.com>, 
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com, justin.he@arm.com, 
+	James Morse <james.morse@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 21 Feb 2024 10:22:04 +0000,
-Paolo Bonzini <pbonzini@redhat.com> wrote:
->=20
-> On Wed, Feb 21, 2024 at 11:17=E2=80=AFAM Marc Zyngier <maz@kernel.org> wr=
-ote:
+On Tue, Feb 20, 2024 at 8:59=E2=80=AFPM Rafael J. Wysocki <rafael@kernel.or=
+g> wrote:
+>
+> On Tue, Feb 20, 2024 at 5:24=E2=80=AFPM Jonathan Cameron
+> <Jonathan.Cameron@huawei.com> wrote:
 > >
-> > Hey Paolo,
+> > On Tue, 20 Feb 2024 15:13:58 +0000
+> > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 > >
-> > Another week, another couple of fixes. This time, two fixes for the
-> > ITS emulation that could result in non-existent LPIs being used, with
-> > unpredictable consequences. Thanks to Oliver for spotting those as he
-> > was reworking the ITS translation cache.
->=20
-> The consequences would really be NULL pointer dereferences, wouldn't they?
+> > > On Tue, Feb 20, 2024 at 11:27:15AM +0000, Russell King (Oracle) wrote=
+:
+> > > > On Thu, Feb 15, 2024 at 08:22:29PM +0100, Rafael J. Wysocki wrote:
+> > > > > On Wed, Jan 31, 2024 at 5:50=E2=80=AFPM Russell King <rmk+kernel@=
+armlinux.org.uk> wrote:
+> > > > > > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_=
+processor.c
+> > > > > > index cf7c1cca69dd..a68c475cdea5 100644
+> > > > > > --- a/drivers/acpi/acpi_processor.c
+> > > > > > +++ b/drivers/acpi/acpi_processor.c
+> > > > > > @@ -314,6 +314,18 @@ static int acpi_processor_get_info(struct =
+acpi_device *device)
+> > > > > >                         cpufreq_add_device("acpi-cpufreq");
+> > > > > >         }
+> > > > > >
+> > > > > > +       /*
+> > > > > > +        * Register CPUs that are present. get_cpu_device() is =
+used to skip
+> > > > > > +        * duplicate CPU descriptions from firmware.
+> > > > > > +        */
+> > > > > > +       if (!invalid_logical_cpuid(pr->id) && cpu_present(pr->i=
+d) &&
+> > > > > > +           !get_cpu_device(pr->id)) {
+> > > > > > +               int ret =3D arch_register_cpu(pr->id);
+> > > > > > +
+> > > > > > +               if (ret)
+> > > > > > +                       return ret;
+> > > > > > +       }
+> > > > > > +
+> > > > > >         /*
+> > > > > >          *  Extra Processor objects may be enumerated on MP sys=
+tems with
+> > > > > >          *  less than the max # of CPUs. They should be ignored=
+ _iff
+> > > > >
+> > > > > This is interesting, because right below there is the following c=
+ode:
+> > > > >
+> > > > >     if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
+> > > > >         int ret =3D acpi_processor_hotadd_init(pr);
+> > > > >
+> > > > >         if (ret)
+> > > > >             return ret;
+> > > > >     }
+> > > > >
+> > > > > and acpi_processor_hotadd_init() essentially calls arch_register_=
+cpu()
+> > > > > with some extra things around it (more about that below).
+> > > > >
+> > > > > I do realize that acpi_processor_hotadd_init() is defined under
+> > > > > CONFIG_ACPI_HOTPLUG_CPU, so for the sake of the argument let's
+> > > > > consider an architecture where CONFIG_ACPI_HOTPLUG_CPU is set.
+> > > > >
+> > > > > So why are the two conditionals that almost contradict each other=
+ both
+> > > > > needed?  It looks like the new code could be combined with
+> > > > > acpi_processor_hotadd_init() to do the right thing in all cases.
+> > > > >
+> > > > > Now, acpi_processor_hotadd_init() does some extra things that loo=
+k
+> > > > > like they should be done by the new code too.
+> > > > >
+> > > > > 1. It checks invalid_phys_cpuid() which appears to be a good idea=
+ to me.
+> > > > >
+> > > > > 2. It uses locking around arch_register_cpu() which doesn't seem
+> > > > > unreasonable either.
+> > > > >
+> > > > > 3. It calls acpi_map_cpu() and I'm not sure why this is not done =
+by
+> > > > > the new code.
+> > > > >
+> > > > > The only thing that can be dropped from it is the _STA check AFAI=
+CS,
+> > > > > because acpi_processor_add() won't even be called if the CPU is n=
+ot
+> > > > > present (and not enabled after the first patch).
+> > > > >
+> > > > > So why does the code not do 1 - 3 above?
+> > > >
+> > > > Honestly, I'm out of my depth with this and can't answer your
+> > > > questions - and I really don't want to try fiddling with this code
+> > > > because it's just too icky (even in its current form in mainline)
+> > > > to be understandable to anyone who hasn't gained a detailed knowled=
+ge
+> > > > of this code.
+> > > >
+> > > > It's going to require a lot of analysis - how acpi_map_cpuid() beha=
+ves
+> > > > in all circumstances, what this means for invalid_logical_cpuid() a=
+nd
+> > > > invalid_phys_cpuid(), what paths will be taken in each case. This c=
+ode
+> > > > is already just too hairy for someone who isn't an experienced ACPI
+> > > > hacker to be able to follow and I don't see an obvious way to make =
+it
+> > > > more readable.
+> > > >
+> > > > James' additions make it even more complex and less readable.
+> > >
+> > > As an illustration of the problems I'm having here, I was just writin=
+g
+> > > a reply to this with a suggestion of transforming this code ultimatel=
+y
+> > > to:
+> > >
+> > >       if (!get_cpu_device(pr->id)) {
+> > >               int ret;
+> > >
+> > >               if (!invalid_logical_cpuid(pr->id) && cpu_present(pr->i=
+d))
+> > >                       ret =3D acpi_processor_make_enabled(pr);
+> > >               else
+> > >                       ret =3D acpi_processor_make_present(pr);
+> > >
+> > >               if (ret)
+> > >                       return ret;
+> > >       }
+> > >
+> > > (acpi_processor_make_present() would be acpi_processor_hotadd_init()
+> > > and acpi_processor_make_enabled() would be arch_register_cpu() at thi=
+s
+> > > point.)
+> > >
+> > > Then I realised that's a bad idea - because we really need to check
+> > > that pr->id is valid before calling get_cpu_device() on it, so this
+> > > won't work. That leaves us with:
+> > >
+> > >       int ret;
+> > >
+> > >       if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
+> > >               /* x86 et.al. path */
+> > >               ret =3D acpi_processor_make_present(pr);
+> > >       } else if (!get_cpu_device(pr->id)) {
+> > >               /* Arm64 path */
+> > >               ret =3D acpi_processor_make_enabled(pr);
+> > >       } else {
+> > >               ret =3D 0;
+> > >       }
+> > >
+> > >       if (ret)
+> > >               return ret;
+> > >
+> > > Now, the next transformation would be to move !get_cpu_device(pr->id)
+> > > into acpi_processor_make_enabled() which would eliminate one of those
+> > > if() legs.
+> > >
+> > > Now, if we want to somehow make the call to arch_regster_cpu() common
+> > > in these two paths, the next question is what are the _precise_
+> > > semantics of acpi_map_cpu(), particularly with respect to it
+> > > modifying pr->id. Is it guaranteed to always give the same result
+> > > for the same processor described in ACPI? What acpi_map_cpu() anyway,
+> > > I can find no documentation for it.
+> > >
+> > > Then there's the question whether calling acpi_unmap_cpu() should be
+> > > done on the failure path if arch_register_cpu() fails, which is done
+> > > for the x86 path but not the Arm64 path. Should it be done for the
+> > > Arm64 path? I've no idea, but as Arm64 doesn't implement either of
+> > > these two functions, I guess they could be stubbed out and thus be
+> > > no-ops - but then we open a hole where if pr->id is invalid, we
+> > > end up passing that invalid value to arch_register_cpu() which I'm
+> > > quite sure will explode with a negative CPU number.
+> > >
+> > > So, to my mind, what you're effectively asking for is a total rewrite
+> > > of all the code in and called by acpi_processor_get_info()... and tha=
+t
+> > > is not something I am willing to do (because it's too far outside of
+> > > my knowledge area.)
+> > >
+> > > As I said in my reply to patch 1, I think your comments on patch 2
+> > > make Arm64 vcpu hotplug unachievable in a reasonable time frame, and
+> > > certainly outside the bounds of what I can do to progress this.
+> > >
+> > > So, at this point I'm going to stand down from further participation
+> > > with this patch set as I believe I've reached the limit of what I can
+> > > do to progress it.
+> > >
+> >
+> > Thanks for your hard work on this Russell - we have moved forwards.
+> >
+> > Short of anyone else stepping up I'll pick this up with
+> > the help of some my colleagues. As such I'm keen on getting patch
+> > 1 upstream ASAP so that we can exclude the need for some of the
+> > other workarounds from earlier versions of this series (the ones
+> > dropped before now).
+>
+> Applied (as 6.9 material).
 
-That's the effect. The consequences depend on how the fault is
-handled ('benign' oops, panic, or reboot...).
+And I'm going to drop it, because it is not correct.
 
-Thanks,
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+The problem is that it is going to affect non-processor devices, but
+let me comment on that patch itself.
