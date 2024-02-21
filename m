@@ -1,97 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C883A24B57;
-	Wed, 21 Feb 2024 10:17:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2D53D96A
+	for <kvmarm@lists.linux.dev>; Wed, 21 Feb 2024 10:22:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708510641; cv=none; b=kn0wXtFVnfmrOc96RMxdVREnKv/f8tQVD15RLVXnLqjVHguJVkAt9KH6HZe7yV7QFYEMZABtJfIG/5hRs5leX7qGHlrYbYDdwLybJEtMhKHlEVL+2wtccjChNMIr7UJptavk+eDjHz73QfbGS/uQVSlkmaekQrTcSG7NAunqxZ4=
+	t=1708510941; cv=none; b=PeKBtG+4XGpVoybcA+HvxTHsWKrl63+0clZKLK4gjxtg4MMEHrfL0+t/i9IFff/7CIgNVdwbkMSccbrQbSD7pVDO6GrsA/y0CB+/TfYgPFIa/fQRglxN1mJ6cRVtYGbSJZ96X95Q54Nt7EjwlqdxBDIlX/WbwXn5vRTEFMjKNNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708510641; c=relaxed/simple;
-	bh=rDihJ2qZsh4aBhB/KRNnvpywWBWh8t5oztOINSRoa38=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=I2DU8ZPdw8CtV95jkwvQb6gOsicS84wc6x+RGG6AhIDmS0pqN36CURUEqvm4dEUKYgujWmYi/3+pWGYVXtkmTYI9lrSpFla1MjwtSU+EFkCIeffLlfHZ43XKcbx3DbjEAlxZgZzuhOF6iyMVIY8xfdrttRqpFEaklE4aMA3XsPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GpsFCK1y; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708510941; c=relaxed/simple;
+	bh=MBN4tZLx9uqlClY2UUZIW6lED/pYey1dCXSJvx+odk4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=McF9LqHvBF16Rdi50i2Rmgk5yDKWU+uRTSDIDBdPS+zqpklwJ+kypDoJ6w7n5CoQtlgLCVzCGPGRftcJC1a72ebUK7OdIDCrT5/qEzDs7ffj+JnXXT5y6TGeIeiIJLXcYw+pEMHVHW9kFo8MGOA9IWPDBklBUNwmAXNN8aQwUv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=actkGSFE; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GpsFCK1y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57A16C433F1;
-	Wed, 21 Feb 2024 10:17:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708510641;
-	bh=rDihJ2qZsh4aBhB/KRNnvpywWBWh8t5oztOINSRoa38=;
-	h=From:To:Cc:Subject:Date:From;
-	b=GpsFCK1yYRU3q/SBnYoNLYgIczXs5unldlH1uRU7bLeidcWgiB2uuMkxRDPu7bNjd
-	 BEQvzR0SteLSMgXv587r0fWqLm5kbqC38ZCgJRXTWaF4J6IUHx/dSV93fV3mXXSVCX
-	 BZ5M2m+bHRVoyIbChNfLzz7TsaRD/wvsJxttQB9pFDy0H3sEd6QHU4m0G/R//we22v
-	 rCcTR5ylb5t/SUJXBs28vePTTkSZ9LHBzPgsApef8ZN21/oaOQYBmBYWI0blvnSrwW
-	 Lx81uXZavK8C6mn/zCWV6dQKYIzvy2yWyGBT59pE3byXlsczAR/6Ib0eyPxW825lR3
-	 Z8EDQ5sJqkLMg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rcjfD-005CWP-44;
-	Wed, 21 Feb 2024 10:17:19 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.8, take #3
-Date: Wed, 21 Feb 2024 10:17:11 +0000
-Message-Id: <20240221101711.2105066-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="actkGSFE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708510938;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MBN4tZLx9uqlClY2UUZIW6lED/pYey1dCXSJvx+odk4=;
+	b=actkGSFEJENdMmNbP270rrI+k6981DItSU5DYK2bK4NvNSHS6jzQSs3yJ1WGHQ51khygek
+	JiARMLlpwW+3pW0RcdmsRrVwpt1h2T4glf8Xv9GJBtl9iPhIcYxVbM06Elb91HCgO/DA8w
+	GspoFWtAl1WrAVrOZ6jayltI3+YmRtM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-55-lKTCQFdKPyOuEDEy0hQxBw-1; Wed, 21 Feb 2024 05:22:16 -0500
+X-MC-Unique: lKTCQFdKPyOuEDEy0hQxBw-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33d36736772so1456905f8f.0
+        for <kvmarm@lists.linux.dev>; Wed, 21 Feb 2024 02:22:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708510936; x=1709115736;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MBN4tZLx9uqlClY2UUZIW6lED/pYey1dCXSJvx+odk4=;
+        b=E6NmTrAhsZwdYMULSITtgcRavzgfx1rYxhoZJIgRW/S2i+jQk4bPsazEDRY1cibHCH
+         chSfGKSvnPnoRkox9vx1oXJYom//s243cu0JofSNhEywsUwh+IWFU8nJIrT88aYlAoaH
+         A577XQHH+oU5zDkMduz41M/72raeKsYoOK0MNWY2Sh7igVpGNSLRSb6PH7NwSa4eEl12
+         zH5w6MtyBlwdCwMnjrDgpLs2UxJatJsPyt2YfcQ7f1fmyvqZu7IW9hGP0nEgi/80xEuZ
+         mMrJGMtmO3qwug6NfM/OPvuGSVQlOK2Pr3Ka6YuTEV43asMj4syqbRes3scp6xMwmmYA
+         N0Fg==
+X-Forwarded-Encrypted: i=1; AJvYcCVZvGfMe41iCsPmdTs+/7hGt2ZQEv7suqdPP8T8BM8F4fVp8fySnlKZ8tguWvwrtMRLogIJhjlVYRzumhXk2opf5PhT6a8P
+X-Gm-Message-State: AOJu0YxK2Y9vrTedqnv4E3IBZZhs1Eshf0RE1O3IEs2HxylCbNIekl22
+	7LVxOfdx55YzW9W2DGGuREsd795MTx/lpoQ9vjS6TTG3Z04JKbPPGvlFZmdr21kCqn25VWzUFLW
+	HIEvj7OJ97UArTKC3ZpmpXWMkuxM3KtRmg6TbxeeeMNkDzN6Ighz6KYZunW35le8n6M3YGTcb2E
+	6E4tclX1bVOIPiBimSAJHRH6H8gMj3
+X-Received: by 2002:adf:f187:0:b0:33d:82a:14af with SMTP id h7-20020adff187000000b0033d082a14afmr10422415wro.64.1708510935908;
+        Wed, 21 Feb 2024 02:22:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEvDqSnBb58aQpo8cE5SEQccLaBDo+ZMPgrcp5t1F8E/OswfeRU0UTussQ1HTHhX/5fllx61sBxucn79Zk7EyY=
+X-Received: by 2002:adf:f187:0:b0:33d:82a:14af with SMTP id
+ h7-20020adff187000000b0033d082a14afmr10422408wro.64.1708510935638; Wed, 21
+ Feb 2024 02:22:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <20240221101711.2105066-1-maz@kernel.org>
+In-Reply-To: <20240221101711.2105066-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 21 Feb 2024 11:22:04 +0100
+Message-ID: <CABgObfYhVK+qF25h8+hhuyCvbgfpocDo0UDac3CTEHghRGww+w@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.8, take #3
+To: Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hey Paolo,
+On Wed, Feb 21, 2024 at 11:17=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
+e:
+>
+> Hey Paolo,
+>
+> Another week, another couple of fixes. This time, two fixes for the
+> ITS emulation that could result in non-existent LPIs being used, with
+> unpredictable consequences. Thanks to Oliver for spotting those as he
+> was reworking the ITS translation cache.
 
-Another week, another couple of fixes. This time, two fixes for the
-ITS emulation that could result in non-existent LPIs being used, with
-unpredictable consequences. Thanks to Oliver for spotting those as he
-was reworking the ITS translation cache.
+The consequences would really be NULL pointer dereferences, wouldn't they?
 
-Please pull,
+Pulled, thanks (not pushed so that I can adjust the merge commit message).
 
-	M.
+Paolo
 
-The following changes since commit c60d847be7b8e69e419e02a2b3d19c2842a3c35d:
-
-  KVM: arm64: Fix double-free following kvm_pgtable_stage2_free_unlinked() (2024-02-13 19:22:03 +0000)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.8-3
-
-for you to fetch changes up to 85a71ee9a0700f6c18862ef3b0011ed9dad99aca:
-
-  KVM: arm64: vgic-its: Test for valid IRQ in MOVALL handler (2024-02-21 10:06:41 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.8, take #3
-
-- Check for the validity of interrupts handled by a MOVALL
-  command
-
-- Check for the validity of interrupts while reading the
-  pending state on enabling LPIs.
-
-----------------------------------------------------------------
-Oliver Upton (2):
-      KVM: arm64: vgic-its: Test for valid IRQ in its_sync_lpi_pending_table()
-      KVM: arm64: vgic-its: Test for valid IRQ in MOVALL handler
-
- arch/arm64/kvm/vgic/vgic-its.c | 5 +++++
- 1 file changed, 5 insertions(+)
