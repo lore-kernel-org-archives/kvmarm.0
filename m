@@ -1,54 +1,54 @@
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB663CF72
-	for <kvmarm@lists.linux.dev>; Wed, 21 Feb 2024 07:26:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 640963D3B8
+	for <kvmarm@lists.linux.dev>; Wed, 21 Feb 2024 07:26:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708500379; cv=none; b=rhKj0uLn3G1OSuaAfv5K/FvQftTeCdnlpbhKDh+zb8dlytUH1VV/ZoKoRvLDH0SQRt0sN17MOfoVRUizNG3TtioWMvelClUm1UhALhkf9Le7qcAkJgIZQn0eoZKG9gCAaTFRFlVO1R7oF41Kh0RV56Z3nea8OR2VjagevQC5MgY=
+	t=1708500384; cv=none; b=Xs/za26rnRkqn5RVmjDIyMclpnLZPMRptqvHsnc2rJViVB1ZUi900MWqHN02pEMZJwjjo88UY7iQE8m5rRf+fZkWx8hVJp9WdM6swygmjqJ7KBZXYB7CN+isrKnY7FUY1oXJo9jnYzDzqBcVY8oky3+ozW4dFqZ7zf1dzDVlqfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708500379; c=relaxed/simple;
-	bh=1ox+KlmFyzigfEM1ahAanGLox6PX2sF7DV2hmNrOSqo=;
+	s=arc-20240116; t=1708500384; c=relaxed/simple;
+	bh=vFAefepjz3E0t+04lpw2yPf+Nx3onOaZVt72QR755hc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qZbS0graqj9tUnDkuaH0Q7kZvivWS3iKhSgzUk0Jjxv2RO+ZI1rS2j0YPAuB+3hclncvU0kM/57+3YblS6TNUrqcB2CFrH11bC3aBKn79b9JDpc1TPXGa1xpSTsHrzwY4Nh3S/Zq9BKDeevAZjYMv6AmqfiaYCSHEf9v9fLL2Nc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=VPasyeN1; arc=none smtp.client-ip=209.85.210.51
+	 MIME-Version; b=LmFeFVFL76F66ftSKhbzREDb9/nEUkYtyrpSHzv6bh4NJHYL61VDS1DPLMdadkPBHZl2Ff1xhLHwjaMSLPgkpB/SNwiwdUvPsC+0hJy+BEjHrWbNkik2npwT/1ybdEFPa3MRaCtbnChMqPhPvHL7AwZYMa2XiRV9Z5Blrtq2bBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Cz/RVeZg; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="VPasyeN1"
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-6e458a77be3so1293835a34.1
-        for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 23:26:17 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Cz/RVeZg"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1d93edfa76dso39473205ad.1
+        for <kvmarm@lists.linux.dev>; Tue, 20 Feb 2024 23:26:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1708500377; x=1709105177; darn=lists.linux.dev;
+        d=chromium.org; s=google; t=1708500381; x=1709105181; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wkUtPwrd2MxLHuSBqQ67neXeqjLzee+wPf1sR5jV+c0=;
-        b=VPasyeN1THYAxRDnXkqvv4sOp3hrKmZAqovzckoLgqx7PF5KDSwgqct2nAiuEv733M
-         paqrEYktyp6bddMxHarOM6WqOdhwioGPMBDRLsmGYYFmjnn3pE15Hu/9VoPC8Awt5liM
-         kJvtp1m0MSvmfjin24E6i8cJKZVX+BZr8CaiI=
+        bh=SWEaXNkEutzzfeWk4tkEh/aV9qyvddav9W73rpwAgUc=;
+        b=Cz/RVeZgBrqaWbYFBCLvgELNa/LF0ofX5TsI6skwTDIwWZpHPF9Z7rKOEBiWpoZh0m
+         PqpDX/81pJi3Y2qJ8dDzm/FEL7+s2hqqIGBjiTg5ltNTsF72iqNWO3qvITqE69cvzukw
+         2qMCldczI2TvgcfR7HoVtK/BVE1FS2FVvzNGs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708500377; x=1709105177;
+        d=1e100.net; s=20230601; t=1708500381; x=1709105181;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wkUtPwrd2MxLHuSBqQ67neXeqjLzee+wPf1sR5jV+c0=;
-        b=dx9oAE6aABPtxqf/rsnptPSImi3w/Y7Pid6+JFPBmBEb+8T52NvzgTRiWJe1qxBran
-         lld9sXwsV3IaU2Vat/akyKIQkGPzg4AA7kjNhzSSXXwzhMrg8WvkUiyvre+NBtmuqXZG
-         e253d8UIRLzEr+D1YWH8D/dMdBDCheMfPsqE4Vnth8kGVw/YwaGOWmTUQR8l29Hglyky
-         Zoxa08ehphRLCxDuCBgXo6KdgF2wCRsFwT1RFR84lU5azT76mKVRca9jMNfaLBplGuHj
-         9fUe1Ir2slj3p51LVccTErR2UudmKdk0fivvq/DSlZY4SoAnobwD/JMngtKIaL67sL8D
-         W1Vw==
-X-Forwarded-Encrypted: i=1; AJvYcCUYlE+oVubW90Nu8WTiyXSOffZLfLCMfNXjpOCx77GzKvqKC4QZOz1IeaHUpgoK7+9+rV5LHFNFwdu1a3+d5Iw6Z9FWOoxS
-X-Gm-Message-State: AOJu0YzC+DbXb6eghkcDrvan92+VLiuYemq9zODIb39+kaYOwm0imrVI
-	lVxjrtYZ+ZxGhxS1R03qUg/lgSm1VoxYMvDK7mkjNVujljDXh7oCrB6UWkpOMQ==
-X-Google-Smtp-Source: AGHT+IHIRmw7KOf0S7zevk1ZVHq4HTPptYom7wxTZTyuRHTWKzNijZn/KQq93KqEbVhWnYt7rNUGVA==
-X-Received: by 2002:a05:6830:10d3:b0:6e2:d888:6502 with SMTP id z19-20020a05683010d300b006e2d8886502mr21734446oto.11.1708500376915;
-        Tue, 20 Feb 2024 23:26:16 -0800 (PST)
+        bh=SWEaXNkEutzzfeWk4tkEh/aV9qyvddav9W73rpwAgUc=;
+        b=YeGNWEvcS+OPtDfoqiS76dgXJgiom9s+DOpgC+ftm8qeS9IXCH86K51cLcTwuJkkG1
+         8+kog1T9ztbtspbvXDTPGU1/uBlZWNWcOQhCNl5mG7K54rk52D/V39IkcEa8br/3mPXd
+         m/dYUNNv2pv4RmJ8wrmnbN6mbAqOx2WqQg0O9Z0bQcA6XK7a7zogxftYegnp5wu5szMD
+         rxbscmVSWL+FukBQJBFO1SC7GyiiMOVF/RW/bSiYerIep0GWdcY1p3DBZwukQY5FU6rb
+         QJ/rYUlhSp8v65hetEDj6fIXERdt32cOzqVKnbwrlCt7bcBLkuZvH/cYQrugAc5YDqTL
+         vQWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVz/h6qMKAAoOKfV6boAuX0oZVrN1kCgaoi2aP5h+1k/xOV+pT8r4miq9DQ4WRtFeteKkLowKhILVoJTdINgFI9c0ZY8+F+
+X-Gm-Message-State: AOJu0YwqNSXK+JX2qBQSqNnvPZzaU1rON0XzXoT1GzlzRbmD7Y8Q9Dex
+	0l/ZoAs8ZFOpRDkwUwSOkkYAAFz3gDBFkCa/nPoV0IGrBAHImRNNDooFndrHWA==
+X-Google-Smtp-Source: AGHT+IHTaM/Rw7dtF9Vc7sCfD1uYbTKNFQjI2s6I8Jpo/gJ3zxDAIPGiSzfjjSJYmob/3WCYbNzzWg==
+X-Received: by 2002:a17:902:6841:b0:1da:1c72:2ca7 with SMTP id f1-20020a170902684100b001da1c722ca7mr17564758pln.29.1708500380788;
+        Tue, 20 Feb 2024 23:26:20 -0800 (PST)
 Received: from localhost ([2401:fa00:8f:203:b417:5d09:c226:a19c])
-        by smtp.gmail.com with UTF8SMTPSA id d18-20020a63ed12000000b005dcbb699abfsm7827438pgi.34.2024.02.20.23.26.14
+        by smtp.gmail.com with UTF8SMTPSA id s3-20020a170902c64300b001d93ba1120dsm7387923pls.200.2024.02.20.23.26.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Feb 2024 23:26:16 -0800 (PST)
+        Tue, 20 Feb 2024 23:26:20 -0800 (PST)
 From: David Stevens <stevensd@chromium.org>
 X-Google-Original-From: David Stevens <stevensd@google.com>
 To: Sean Christopherson <seanjc@google.com>
@@ -60,9 +60,9 @@ Cc: Yu Zhang <yu.c.zhang@linux.intel.com>,
 	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
 	David Stevens <stevensd@chromium.org>
-Subject: [PATCH v10 5/8] KVM: Migrate kvm_vcpu_map to __kvm_follow_pfn
-Date: Wed, 21 Feb 2024 16:25:23 +0900
-Message-ID: <20240221072528.2702048-6-stevensd@google.com>
+Subject: [PATCH v10 5/8] KVM: Migrate kvm_vcpu_map() to kvm_follow_pfn()
+Date: Wed, 21 Feb 2024 16:25:24 +0900
+Message-ID: <20240221072528.2702048-7-stevensd@google.com>
 X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
 In-Reply-To: <20240221072528.2702048-1-stevensd@google.com>
 References: <20240221072528.2702048-1-stevensd@google.com>
@@ -76,8 +76,8 @@ Content-Transfer-Encoding: 8bit
 
 From: David Stevens <stevensd@chromium.org>
 
-Migrate kvm_vcpu_map to __kvm_follow_pfn. Track is_refcounted_page so
-that kvm_vcpu_unmap know whether or not it needs to release the page.
+Migrate kvm_vcpu_map() to kvm_follow_pfn(). Track is_refcounted_page so
+that kvm_vcpu_unmap() know whether or not it needs to release the page.
 
 Signed-off-by: David Stevens <stevensd@chromium.org>
 ---
