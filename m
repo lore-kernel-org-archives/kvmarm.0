@@ -1,55 +1,55 @@
 Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53DDC1509BF
-	for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 16:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7633154C0C
+	for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 16:11:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708618281; cv=none; b=T5lnC6cxtCoN2pHswGQiRb00mZC6ASUM8nqEY8pyJWuRFle8NzhJouBCiycgSgcX/Fdx4HLvpLxGojXcDLt8k53KYBiPsfoqo1Wmob1avUv1lzRwybDAdPYeaLCJCsIcLs8EFqOhPqlRKxlL1RknYQm3kzrw5SEYXzXhQFpCRxE=
+	t=1708618284; cv=none; b=bhzzM1Uj1rU4kyv8TQ1WROSg/eo+IStiLgdMzr2wlsDndJEROV67YhnoYgC/VVcGKy+NZqVOh7CbCU642qQLhYO63e1Wlo/HMmvs2XFgr1YdetM8u+SmCR5svad8+kAHWV4OTuegwH+qHL62OLJp5vTXhLx2o+bTs5ZpPss5XXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708618281; c=relaxed/simple;
-	bh=z/Ih8ZYT5NkMixOWg+Uyve5J68nFw5E7iGVbbYcEx3E=;
+	s=arc-20240116; t=1708618284; c=relaxed/simple;
+	bh=xoA6/QoNnISiMa1SzXuzX77CZKmuI5864LBCKgX+2hY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ss37AdmZeN8UhtCE+IyiRegxwRrm0AtKJAbI0bHgv6J0Beb1qb3JSyNp3Bqof+jHn3ZqCnIqrm51RvJEvGs8QK8jSOb0dCy6wVHXotMNQYnseOMqNJ4ULryI6rC/UMVuIZ2ZcEJPCH9XL0scNGPU2oMxjYVX3K4YnPaBWJP2EBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B55l6qkp; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=AtiH+uqcjb6djUxKpLKpYhxboFLZYzjHiNEuXXCK8pFjGs1lwJjAAc7B+OGhX2wFDR4OvCZUVSdMxoLXUxgGYXpMpQiqlBj6J6islpujGqKl/+Radeb3ehlXlUdOAC6wVVA2bbMovbK4HG5Gn+W7RIZfWd621QcKPMtBUAnJAqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qmCfWWN7; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B55l6qkp"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc657e9bdc4so10640871276.0
-        for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 08:11:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qmCfWWN7"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6b26783b4so8125911276.0
+        for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 08:11:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708618279; x=1709223079; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1708618282; x=1709223082; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=R9jqiln8R3A9VFnaGPClstGN9r3EmzNYJZRGHFrLYA8=;
-        b=B55l6qkp/2tLNdEevsho1TL0IUv+EnXZIlwVf39+SuoK1Bk0MXWcp4aO29L1bS7w/U
-         HUFVYbg6CMOHt8MqPkkooL0Np6gPOtnYjOmx62sMoCbx+AZdhogxY88pAxHT2htZfwBn
-         LJn/sjrXuVfUdnztd6H606Ypcq8NXwaYGS0KJsOBzH48yqW0yysyqKi6X1+WmZDbJDfN
-         jwyAlZY6jS1J5fiedLRg1u9C32BgZUYi/El+GmCY5Te7oHnNxG0nzZTjSrMDCG4Dqn0c
-         zgWuLokcYHqZeJ4P3NUfKFsH/LzJERnkQF6TjEBzsNiX0pYGB8hRYFnQ/Wf7ST4oHpq6
-         lQ+w==
+        bh=CeE6bcXPJ6+XfnAesbZJh5X/3MioJE5wiGBVIwsoMXY=;
+        b=qmCfWWN7pK2Tmg3gx/46h1gTHO/Z+e2LyBzHRcIvVY4LGSucvPMjvDnZK03tUSOFLf
+         HLiTvkwqMwqn7Y28OuXm/oRrECDKjY2wSv7hokL2t3poZl6FIRy4P3uWh80XhNwmlaYu
+         pZurDEon31/67cjPDBdJT98QlFPDJV2FqMDQv145K6ddl0t/wf4fuGy/UyZ9+hWyYfSn
+         hKO+G9qWxvUbUwly51Gxj/8E26Dhs3p2LFk4EQBDnXXudIklXnyRGIvGl57N/SyJ9HJA
+         uPU0Hnc5F2BJPi8oZSMrM+aJyGalm4VZDCeaQOkQ8SqEGVkHqAOKVfETLZRACMIjlxxM
+         QM5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708618279; x=1709223079;
+        d=1e100.net; s=20230601; t=1708618282; x=1709223082;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R9jqiln8R3A9VFnaGPClstGN9r3EmzNYJZRGHFrLYA8=;
-        b=GTDXOIS2nO+4uDlIM+V2Fp+dQULJna/u29wArwg5Of/9Ph3uLTv4vCibmRmIyZK7wQ
-         6+6wxYXXQ499DFSmJC8cB3juum/lbPF6t5SL7nA8r2Y1baTXJ0NYn8Zw81l8ZXK5+nhu
-         aPVVyCTRdDmpvr7cxrd7G2Vzjzzo5iqXQ5lVBe/iAIhgB6CEvfS0OjoT/l/wavB57tkn
-         hcAhctTeqXsYf2JiPI0bvjCTuXcqv07RvRqIjwSe4spKPat8z1IHDg24npCegiTfwxKT
-         zz550FAdh2Mpr07ai3iFlc3tDBzJfqPbF9VR/bFEIE6v8diEHzhuNqAcHMExIwOuCKWF
-         /HTw==
-X-Forwarded-Encrypted: i=1; AJvYcCW3Cq8ADIw+TnRzghj2meaS5UpDIvDfGazS0snHvCKngT72rrt7OagcpFx4gdokBHPcblbZ5WWNTCmjEU5eDINqNinP+ttD
-X-Gm-Message-State: AOJu0Yy9fWXP63MCSaUgyN/q9UZIFruoeMYG5U4jQDI1m93JSg5gd2Ui
-	IQbF6bCHWoFfrwEPX7MkJzNtBK2bs+00sKuF0PBMPVDE5eHNm3yM7xJLAeK6gQTJKo7km+/CGQ=
+        bh=CeE6bcXPJ6+XfnAesbZJh5X/3MioJE5wiGBVIwsoMXY=;
+        b=ohaNGCDbUF4A9uucB0rftG7xlSECMBrJPx20VVNcz0KfKNmS74q3ScKAj5MQSyx4tj
+         dFRnL7gs5OjfzG9HT4ZOCNlc7KxFIx6ECJkrhI3OEA+AhJX7QCQ9KCFjkDG7efdK8xIZ
+         LJFVDUEXKRtfosd7zusNVn1kyEI7K3nMj7xyJgPybytYUCXrx2X2pebsU8eofspv/Eru
+         6Tt053YdQsjosX92EvbmLg7OXkQQe/+gNWxs+IXhSelHcavWve6fBJoEW1c4D1sssKTk
+         ofvomT8U+ORiGYNhrPQ/TwxBvy7dPoj5SpGp0/3GyYQb7cgcrJdQiZ/ea5sZKT84Md74
+         vBxw==
+X-Forwarded-Encrypted: i=1; AJvYcCWKkly5usKOwmUW+9tFtGrA9IVEfEFwDNm6TJq7mUlKXTELTQhhOnF/AKn14gsU7h+viAgalwmJ5vrEmiRVjS7rrXQkyLqV
+X-Gm-Message-State: AOJu0YwTghF8D3M6tvesMmA+R/Qx5DDYXwem/wPG/lFK1ON9CVe3EhLl
+	/ai0okj0mhNLdAkUf4Rhj0FMQA2Op2I4XPvQXtmUSANhiQXiMDY/7j/lbO7SlnjGSBeFE7apog=
 	=
-X-Google-Smtp-Source: AGHT+IGzluF9KV0uQ74p+P4M/V/9xG11z3AVlCw5UzMHVkr7rD/AoyFybmDhnZwJeOh0w7FWclLKEm9ISQ==
+X-Google-Smtp-Source: AGHT+IFstTNpKcDxQ2leE1X3c1ER9vVPby1ys0ufBrD4msybQfHDs42OffDOkXrhTSWHmYX9zR+v4HUSxA==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:1081:b0:dc7:63e7:7a5c with SMTP id
- v1-20020a056902108100b00dc763e77a5cmr139205ybu.11.1708618279476; Thu, 22 Feb
- 2024 08:11:19 -0800 (PST)
-Date: Thu, 22 Feb 2024 16:10:33 +0000
+ (user=tabba job=sendgmr) by 2002:a05:6902:1008:b0:dbe:387d:a8ef with SMTP id
+ w8-20020a056902100800b00dbe387da8efmr90717ybt.1.1708618282006; Thu, 22 Feb
+ 2024 08:11:22 -0800 (PST)
+Date: Thu, 22 Feb 2024 16:10:34 +0000
 In-Reply-To: <20240222161047.402609-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240222161047.402609-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
-Message-ID: <20240222161047.402609-13-tabba@google.com>
-Subject: [RFC PATCH v1 12/26] KVM: arm64: Allow userspace to receive SHARE and
- UNSHARE notifications
+Message-ID: <20240222161047.402609-14-tabba@google.com>
+Subject: [RFC PATCH v1 13/26] KVM: arm64: Create hypercall return handler
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
@@ -83,62 +82,71 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-From: Will Deacon <will@kernel.org>
+Instead of handling the hypercall return to guest from host
+inline, create a handler function. More logic will be added to
+this handler in subsequent patches.
 
-Signed-off-by: Will Deacon <will@kernel.org>
+No functional change intended.
+
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/arm.c        | 3 ++-
- arch/arm64/kvm/hypercalls.c | 8 +++++++-
- 2 files changed, 9 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ arch/arm64/kvm/arm.c              |  8 +++-----
+ arch/arm64/kvm/hypercalls.c       | 10 ++++++++++
+ 3 files changed, 14 insertions(+), 5 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index f6187526685a..fb7aff14fd1a 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1100,6 +1100,7 @@ void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
+ unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
+ 
+ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu);
++int kvm_handle_hypercall_return(struct kvm_vcpu *vcpu);
+ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa);
+ 
+ /*
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index cd6c4df27c7b..6bba6f1fee88 100644
+index 6bba6f1fee88..ab7e02acb17d 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -61,7 +61,8 @@ static DEFINE_PER_CPU(unsigned char, kvm_hyp_initialized);
- DEFINE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+@@ -1092,11 +1092,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		if (ret <= 0)
+ 			return ret;
+ 	} else if (run->exit_reason == KVM_EXIT_HYPERCALL) {
+-		smccc_set_retval(vcpu,
+-				 vcpu->run->hypercall.ret,
+-				 vcpu->run->hypercall.args[0],
+-				 vcpu->run->hypercall.args[1],
+-				 vcpu->run->hypercall.args[2]);
++		ret = kvm_handle_hypercall_return(vcpu);
++		if (ret <= 0)
++			return ret;
+ 	}
  
- /* KVM "vendor" hypercalls which may be forwarded to userspace on request. */
--#define KVM_EXIT_HYPERCALL_VALID_MASK	(0)
-+#define KVM_EXIT_HYPERCALL_VALID_MASK	(BIT(ARM_SMCCC_KVM_FUNC_MEM_SHARE) |	\
-+					 BIT(ARM_SMCCC_KVM_FUNC_MEM_UNSHARE))
- 
- bool is_kvm_arm_initialised(void)
- {
+ 	vcpu_load(vcpu);
 diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index 5e04be7c026a..b93546dd222f 100644
+index b93546dd222f..b08e18128de4 100644
 --- a/arch/arm64/kvm/hypercalls.c
 +++ b/arch/arm64/kvm/hypercalls.c
-@@ -83,6 +83,8 @@ static bool kvm_smccc_default_allowed(u32 func_id)
- 	 */
- 	case ARM_SMCCC_VERSION_FUNC_ID:
- 	case ARM_SMCCC_ARCH_FEATURES_FUNC_ID:
-+	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_SHARE_FUNC_ID:
-+	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_UNSHARE_FUNC_ID:
- 		return true;
- 	default:
- 		/* PSCI 0.2 and up is in the 0:0x1f range */
-@@ -132,7 +134,7 @@ static bool kvm_smccc_test_fw_bmap(struct kvm_vcpu *vcpu, u32 func_id)
- 	}
- }
+@@ -24,6 +24,16 @@
+ 	f;								\
+ })
  
--static int __maybe_unused kvm_vcpu_exit_hcall(struct kvm_vcpu *vcpu, u32 nr, u32 nr_args)
-+static int kvm_vcpu_exit_hcall(struct kvm_vcpu *vcpu, u32 nr, u32 nr_args)
++int kvm_handle_hypercall_return(struct kvm_vcpu *vcpu)
++{
++	smccc_set_retval(vcpu, vcpu->run->hypercall.ret,
++			 vcpu->run->hypercall.args[0],
++			 vcpu->run->hypercall.args[1],
++			 vcpu->run->hypercall.args[2]);
++
++	return 1;
++}
++
+ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
  {
- 	u64 mask = vcpu->kvm->arch.hypercall_exit_enabled;
- 	u32 i;
-@@ -398,6 +400,10 @@ int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
- 		pkvm_host_reclaim_page(vcpu->kvm, smccc_get_arg1(vcpu));
- 		val[0] = SMCCC_RET_SUCCESS;
- 		break;
-+	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_SHARE_FUNC_ID:
-+		return kvm_vcpu_exit_hcall(vcpu, ARM_SMCCC_KVM_FUNC_MEM_SHARE, 3);
-+	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_UNSHARE_FUNC_ID:
-+		return kvm_vcpu_exit_hcall(vcpu, ARM_SMCCC_KVM_FUNC_MEM_UNSHARE, 3);
- 	case ARM_SMCCC_TRNG_VERSION:
- 	case ARM_SMCCC_TRNG_FEATURES:
- 	case ARM_SMCCC_TRNG_GET_UUID:
+ 	struct system_time_snapshot systime_snapshot;
 -- 
 2.44.0.rc1.240.g4c46232300-goog
 
