@@ -1,55 +1,55 @@
 Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC767155A4E
-	for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 16:11:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA9E15350F
+	for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 16:11:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708618301; cv=none; b=Ar0pgkLNSEgWE/d3RjLAlmrmRy/GTG5I/+HP3dG5JvmtNTB5NMPvVwanptHZWb4QcqqaOHw+dyiGFW7U0FEuKG5b9Iw+XKugxPlzrlUWX2pwTA7+0KK9hKEvybplw7SM6th+Hl7AGM1WnoIlDdZ+VkvE3yu4P7DjAB/PqJWTxyg=
+	t=1708618303; cv=none; b=DIWPPV4M86sOPdlqvG0SUWHi/mnkOCRswIB2yh4mZdWmBk2wUduoQNI1/f4MIETqrnFbO/zrVVWArh9umto7B+APVDG7h5DvyKnqvx/Nk4h2r5JV1HT1gPPptBfN5Th0iHWhrSV6LErBkgTpJ9Z/dYmClEPG0ODHl5pwsna/UVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708618301; c=relaxed/simple;
-	bh=MBXw36BeBpgzLpaJ6DDMj7mANbp5a67/tbxZ56a4zsI=;
+	s=arc-20240116; t=1708618303; c=relaxed/simple;
+	bh=npvYxmnOW8D70NS3ig9HnMx9N7r0Z+HXJuDOX7EAoRc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Z/+VJE0hnedgbDPyYLuBm5f22d9d7yZYI/kYcsEgCJjgtq8XTLMYUO1jYDEo+UojjgW4F835B7SaqNrQzXKqbkmgAHzW4XwUS8WT2MaZaRe0cFTcAZWd7f7hRz4eal1hNdGAIh4kwLh3ejppKSEZKz5hsvf39HWbuvlrqQ172oE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OKEXCZ7A; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=HS68a1nr0BRXsOooiDxVjFhMzF86SklZvUssDuzC1zTEYJnK6qVWIpRNJQcEKJIMO6wNpKTwB6ia40YXWyw0g4GomnYNCrr46zmgkAHOvVngOpA3UvfzNkaKUaX+2Ogc0jX4+Tnbz2axISFkpaLqBbaHy74wSDR8fI50h7OSMrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vbVCv+vg; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OKEXCZ7A"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4121c06be80so42893195e9.1
-        for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 08:11:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vbVCv+vg"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-40e4478a3afso5312755e9.1
+        for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 08:11:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708618298; x=1709223098; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1708618301; x=1709223101; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=G3PquBHsQ9j3O8VxfhBiNpCD7E3dPFUw+j7QK93cQQM=;
-        b=OKEXCZ7Az8Wx+pxlyYZtrF85ED+P3A9ezhO9HrcBDgo6YTWHtH8BCf14C5IfzltSlL
-         w4ByhiHIMzxVauN54xNUpxEMegARox1un73SVmnB3UaI0k4NcHmufi3atG4GNfDkwYzk
-         MOucPExDPMa0t13UJwU8xbbW76Dv1zeNl1fzQ5t1aGma/1+j8TfoNpXccGqkE1ewiGyo
-         hY647sNXJMuvN7Qd9tjIaJFVI4Zu5ew4JkSzRO1otFPF0Q9tAHEieXo5Kx3ilUmraTg+
-         GrzwRnnbNnIWsgXbjKDBL548PypZ4C4AgEiwYISeBdpFXnJ1LIHkz196zPEvEH4ZxhXn
-         6vCw==
+        bh=rSm6/qgBZCczn9Ke4uZTyz+5iwS2nAcQPMledMHWGz8=;
+        b=vbVCv+vgKmk+x3ZLwib/uIR04zpIlildYPYfq7UDUoyNViBPaL7ggoEvX0KdgYG8ZH
+         WC5NI/UhsIKW9vL/0H6hPEyrJYedmIYdHAI94hu5sDGqZ3Pciipqb/fx7wtcowklILjM
+         lkoaJ2HnYjxWZQSYAD9Uu5CuRiFOGJOABhKTgE3pZVBEOltEjYesxkOe7InHBW2n5iGy
+         jRS0ASZEYdnVG5NSbv8ZhlZaqGooFfc2vDUSoixS6qMn9bZLYDbFtoOPnDV8M1jMk9UZ
+         A3E4AJkEvTjXNiqMTlqdMNxmvhaBY8DF0jspXImz/4LGhP4dXbkZNS3qJwy81+B2Wn2Q
+         EbrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708618298; x=1709223098;
+        d=1e100.net; s=20230601; t=1708618301; x=1709223101;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G3PquBHsQ9j3O8VxfhBiNpCD7E3dPFUw+j7QK93cQQM=;
-        b=AD9+7ELhj71QlhVg1AzYLmtfLrOFAT6uNrSzc1WuObpx0LO32K6HkdFGuqHxfsTm9d
-         X3YJRrEhIF2OVH0vuN7rN+PSBF3X2jfdTEShRH+e7ZnUJMtAb5PAo+Z0seBCThSq9vkt
-         gNeUj5xvikvZqVggxWA3u5dNyhQiRfuybg0vpHkGqDrj73W9/tVRUvUZ4jCqhPncIFAh
-         nRLkz374iIRBHQZoWcf0HugSawzfBIvg5QgIB7I2njIXUMH2vZ/9AuAsCvmEbRZc/xmG
-         LBuU9EPQPl2AV7oeP3bp8kCiTdYLp3dSJ8wGbR4XzxD6VGURrUBZvvVIbiN46OgaicET
-         lCdg==
-X-Forwarded-Encrypted: i=1; AJvYcCWDAwQa/ZDJvXKjPE9wKGL1SSHqzSiNeHQxFpw/NqX0LbgR0h87Mzm6aAJKoscRutcksIfdY4MlowMqa/MqDZKeeGf9wEMP
-X-Gm-Message-State: AOJu0YygZfko/wVvaa8M2M3NAegF4K7jV022TCdPsq3b7lnA0bGbPa97
-	yVmAARDlChYe5Y2ZCCPs2AS/vRTSiMbMjXcunYm7lIb7uEnK56xcZo90elsJLQ3P9ejmwGiBXA=
+        bh=rSm6/qgBZCczn9Ke4uZTyz+5iwS2nAcQPMledMHWGz8=;
+        b=soGTVlRmsxND3AQVmv2rL68Zxc8qiDGVzfibNdhY2Q+/tb5a7m57SttIcEEB/5SbvZ
+         VkdF4fz1ce8B9uSIuqBqU2n8Bylho0j6YL6SVqeU1fnDbsdzZisAoZSEeS5fkbcZBQGo
+         S55QUvpsLHBab2qMPcD8BJDQEj+BXmFeKXNv0JKl1XlFsD9JVAJND0QoL/Vpb6BYadjw
+         HSfrA7BZ9Irpbd4UROg5RrmJFHlMRN+rh0cWsnIeQyeFUK5n/t4RrLKv9HCUr2GUtDT7
+         73+/0on68a+BINmWw1PaFZbRgePAElEd+4H/myd/FRnQDqFFsXNW0g8SGLzY+QRkUFNE
+         2eRA==
+X-Forwarded-Encrypted: i=1; AJvYcCU0BuZ7w5p/bTxn9VNqQ4KKXqW30bJY+wwSlvUau0Feu7PlqU8aQSFhyz/3kfdFFwkkHEbLk2hMbSeYbP1f598BjurdnuEu
+X-Gm-Message-State: AOJu0Ywu5gQqbOx8P8I++Xry8gG5vqCpU/axaJLW11C8tLK9UlmAbYat
+	NXh2YUL7OB1rzyNgY4W54Y5kMMy7TMWeFjKikJhM7Z89+swzFafzFscvpMnCTU5XAXxML5nmlw=
 	=
-X-Google-Smtp-Source: AGHT+IFHt8ljAgUFsumQUx43edqLPoztEr5s7k3xHUmGMWApCiCTFox1L/DuSqvEX2oWzicoQqDqguGfpg==
+X-Google-Smtp-Source: AGHT+IG/y8W3lb3JZO83cjx58GKuU0Lq2tsDnMqCffsClUcUdbIHBL/G3lXuTAChtYt/zyPvFkyCvnNNLw==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a7b:c2aa:0:b0:411:ea5e:615a with SMTP id
- c10-20020a7bc2aa000000b00411ea5e615amr248951wmk.1.1708618298281; Thu, 22 Feb
- 2024 08:11:38 -0800 (PST)
-Date: Thu, 22 Feb 2024 16:10:41 +0000
+ (user=tabba job=sendgmr) by 2002:a05:600c:1e8c:b0:412:8816:3723 with SMTP id
+ be12-20020a05600c1e8c00b0041288163723mr76370wmb.3.1708618300751; Thu, 22 Feb
+ 2024 08:11:40 -0800 (PST)
+Date: Thu, 22 Feb 2024 16:10:42 +0000
 In-Reply-To: <20240222161047.402609-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240222161047.402609-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
-Message-ID: <20240222161047.402609-21-tabba@google.com>
-Subject: [RFC PATCH v1 20/26] KVM: arm64: Track sharing of memory from
- protected guest to host
+Message-ID: <20240222161047.402609-22-tabba@google.com>
+Subject: [RFC PATCH v1 21/26] KVM: arm64: Mark a protected VM's memory as
+ unmappable at initialization
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
@@ -83,65 +83,63 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Track memory being explicitly shared by the guest to the host,
-and update the NOT_MAPPABLE attribute accordingly.  This would
-allow shared memory to be mapped by the host, and enable us to
-ensure that unshared memory is not mappable by the host.
+A protected VM's memory is private by default and not mappable by
+the host until explicitly shared by the guest. Therefore, start
+off with all the memory of a protected guest as NOT_MAPPABLE.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hypercalls.c | 30 ++++++++++++++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/pkvm.c | 32 ++++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index b08e18128de4..56fb4fa70eec 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -163,6 +163,32 @@ static int kvm_vcpu_exit_hcall(struct kvm_vcpu *vcpu, u32 nr, u32 nr_args)
- 	return 0;
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index bfd4858a7bd1..75247a3ced3d 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -220,13 +220,41 @@ bool pkvm_is_hyp_created(struct kvm *host_kvm)
+ 	return READ_ONCE(host_kvm->arch.pkvm.handle);
  }
  
-+static int kvm_vcpu_handle_xshare(struct kvm_vcpu *vcpu, u32 nr)
++static int pkvm_mark_protected_mem_not_mappable(struct kvm *kvm)
 +{
-+	if (IS_ENABLED(CONFIG_KVM_GENERIC_PRIVATE_MEM_MAPPABLE)) {
-+		u64 mask = vcpu->kvm->arch.hypercall_exit_enabled;
-+		gfn_t gfn = vcpu_get_reg(vcpu, 1) >> PAGE_SHIFT;
-+		unsigned long attributes = 0;
-+		int ret;
++	struct kvm_memory_slot *memslot;
++	struct kvm_memslots *slots;
++	int bkt, r;
 +
-+		if (!(mask & BIT(nr)))
-+			goto err;
++	if (!IS_ENABLED(CONFIG_KVM_GENERIC_PRIVATE_MEM_MAPPABLE))
++		return 0;
 +
-+		if (nr == ARM_SMCCC_KVM_FUNC_MEM_UNSHARE)
-+			attributes = KVM_MEMORY_ATTRIBUTE_NOT_MAPPABLE;
++	slots = kvm_memslots(kvm);
++	kvm_for_each_memslot(memslot, bkt, slots) {
++		if (!kvm_slot_can_be_private(memslot))
++			continue;
 +
-+		ret = kvm_vm_set_mem_attributes_kernel(vcpu->kvm, gfn, gfn + 1, attributes);
-+		if (ret)
-+			goto err;
++		r = kvm_vm_set_mem_attributes_kernel(kvm,
++			memslot->base_gfn, memslot->base_gfn + memslot->npages,
++			KVM_MEMORY_ATTRIBUTE_NOT_MAPPABLE);
++		if (r)
++			return r;
 +	}
 +
-+	return kvm_vcpu_exit_hcall(vcpu, nr, 3);
-+
-+err:
-+	smccc_set_retval(vcpu, SMCCC_RET_INVALID_PARAMETER, 0, 0, 0);
-+	return 1;
++	return 0;
 +}
 +
- #define SMC32_ARCH_RANGE_BEGIN	ARM_SMCCC_VERSION_FUNC_ID
- #define SMC32_ARCH_RANGE_END	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
- 						   ARM_SMCCC_SMC_32,		\
-@@ -411,9 +437,9 @@ int kvm_smccc_call_handler(struct kvm_vcpu *vcpu)
- 		val[0] = SMCCC_RET_SUCCESS;
- 		break;
- 	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_SHARE_FUNC_ID:
--		return kvm_vcpu_exit_hcall(vcpu, ARM_SMCCC_KVM_FUNC_MEM_SHARE, 3);
-+		return kvm_vcpu_handle_xshare(vcpu, ARM_SMCCC_KVM_FUNC_MEM_SHARE);
- 	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_UNSHARE_FUNC_ID:
--		return kvm_vcpu_exit_hcall(vcpu, ARM_SMCCC_KVM_FUNC_MEM_UNSHARE, 3);
-+		return kvm_vcpu_handle_xshare(vcpu, ARM_SMCCC_KVM_FUNC_MEM_UNSHARE);
- 	case ARM_SMCCC_TRNG_VERSION:
- 	case ARM_SMCCC_TRNG_FEATURES:
- 	case ARM_SMCCC_TRNG_GET_UUID:
+ int pkvm_create_hyp_vm(struct kvm *host_kvm)
+ {
+ 	int ret = 0;
+ 
+ 	mutex_lock(&host_kvm->lock);
+-	if (!pkvm_is_hyp_created(host_kvm))
+-		ret = __pkvm_create_hyp_vm(host_kvm);
++	if (!pkvm_is_hyp_created(host_kvm)) {
++		if (kvm_vm_is_protected(host_kvm))
++			ret = pkvm_mark_protected_mem_not_mappable(host_kvm);
++		if (!ret)
++			ret = __pkvm_create_hyp_vm(host_kvm);
++	}
+ 	mutex_unlock(&host_kvm->lock);
+ 
+ 	return ret;
 -- 
 2.44.0.rc1.240.g4c46232300-goog
 
