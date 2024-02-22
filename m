@@ -1,55 +1,55 @@
 Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7530152E0B
-	for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 16:10:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF9D1534F8
+	for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 16:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708618260; cv=none; b=WcIUcqBu+KiREbAKvKqoASxhLKXs4FnvbiEEFx04rE4pK/Bv1SlCvTVvq78TWm1hUAtXsL6n7mnj1DuQIX/wzCHHWcGKwt21VGJi3JhjHf9bwTljSM2LgrvFSuB5BNK0mIy7El97ICuLvUUQJLKMflfi6LXGDG1fngnBE1UYq8g=
+	t=1708618262; cv=none; b=kr+Hy4c25yP+6iQB/a5A5MLJ6RvkQP8gKzEvFonRKNouFtDmYtDQ60EndY15pVTM+3MJxhYw2KioPYQoCO+mrP7MOTbdRVPXJLda6POnNmrRD3ILn7QsZzTZZ9LZhF1HGwbHvjv5t8zPxJ9NreCSLLB5G7BSUuk7BNrGEvQdcCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708618260; c=relaxed/simple;
-	bh=us7/QCjxe2pxBhm9N56dE2zxrpgAV3//d0wRLBscLX4=;
+	s=arc-20240116; t=1708618262; c=relaxed/simple;
+	bh=X9b1S6yNSBLD+mqNBTikNYnbyUMFTya7TpTup5Rt/FI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VvVuwiKjrUKs8vhAcFpLc9VbI10ho6iT9ywjubqNOF+EgCouAIDCrcC0tEK8nCFyxiF2FwLbENVFo0U8hwr4ouHMGHZIvdyM3tzdPF/JnGYnyUyu9T4FLXKOM+B00QleFfWR5Sukc5tacPOuFTHpfwYlkuyAJmpJMUtcL/d7ouM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YjHYmSt6; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=RcTz8ctBfwriaxUvEtOcnAzsoN4o/TFs4raLOwF/WSrQO8fJ02OShmVKMLWOjpjambbJ/nfqwlCPvDmpk1KYYdlCvl3b1VAwOr27w3Co/LYRCeT2SFVLEnNovuNASUFRsCsxj0r+P7dvt8MvaEYUBfoiNBJqpc5DcZBdgPJm44s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qSJF+wPK; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YjHYmSt6"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60810219282so64712957b3.0
-        for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 08:10:58 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qSJF+wPK"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-607e8e8c2f1so132460187b3.3
+        for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 08:11:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708618257; x=1709223057; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1708618260; x=1709223060; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yE4jGMdyyWeWXwgLR+PwPglC0gS24rScRzYQNSe4bRs=;
-        b=YjHYmSt6YBLwwTJEfvVWKSKumOLR83Q9dngwvwjefgOV/OR8FJONBA2RZ5zWzBbZLq
-         d7+bGS8mZb2M+HhQ/QGQVv7CArYCsNf3X/bnqAqAlKgMvOkxKYccqhJpMF86k7XWzwQX
-         rB+yBsKU4pgirEUosmZ/GDHTXbeMYbzeuK139O/RIxwKFqNwKk6OMcY53zmjCKzDAJgZ
-         c/YIWU9lflTsuSyU3saTsLvzDl8v6t3GptkSPnoA7Hd8MhgcKN/mYf/LNZDVHsvdt5HE
-         VYh6zEsnzZsVPXlT+GuoF2w3mbUhaYelNc1Au/ew8zFKOKSOsYXLZL2+zlocULxdeMEq
-         s70w==
+        bh=s0Rj06sprumtF573AfEP0GeSqajU1zMKKEjxpZroPas=;
+        b=qSJF+wPKL/KuKBwRpUlsc7Ua4Wy+AcqyEiHSxktJWgi74v5iQXCInEfGWYZHYAodqe
+         xkxNU1weMxl0ALp/7MY+UY6ClvYje5C8su6aZnG0rQpEItN/pVxB1A4+Ahny+nW+JZVF
+         LT9CbE7TUjg4hWoObYbR8TyPAj1I78aE/fawTAF8b/IICJZX7uSpt21BEPpxgSNdAoxz
+         sb2+yMy5lLoOupVxVeVvdUF/nHJNd7SJcUK0W+WlZIrhF8+zLdBazS+42PzfDWf3qwGG
+         kSu0gMbG8DGDos7KqXmC30pftyuhHKieIkoG81Z8QkTnM/6RdKfFx2NnwWQ96FO9KGGY
+         ElCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708618257; x=1709223057;
+        d=1e100.net; s=20230601; t=1708618260; x=1709223060;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yE4jGMdyyWeWXwgLR+PwPglC0gS24rScRzYQNSe4bRs=;
-        b=ZiuUAhzFWdISk6yLRssX+Q0x1R/yodthcpifXcvmpqj9UgQ3nhq6Cafg6KFpG2wgjG
-         f1UegJTMrv0Ws1b5AlGMzyStyhP5izO+4Zk1BqGfKrXZetDLbFuAt/bGn1Ano5lzhw8w
-         9xAhM0N6RUI3XzMY1I+hllixJiLdoxhizezJ1mDEDJM425sq5+DujiJq0Ml2uB1HywUI
-         muTW0Zc7lYFREm1f3d6qrV4LSmNkVdr22jUZtr0T+sTV7qfA/A6Gu4jBt0blogrcMn5I
-         fb7HVuy0r/B2fnVbck5VdrFUio3BwKKtFg6cSuZVGe8Mnz+rYOvZrC3KR1d6Zf41X5Nz
-         lJPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWuScmWBCW7uMyqTT2tJ2V02aqaavAeVCwvHLbvTzbZD8+Zdf2Sbldh5tURrdlLlDn1PpFcU2/Jej2qBW4HKiQRoR1QXm8h
-X-Gm-Message-State: AOJu0Yz/4hzGxfgGFT2W4ZoVkpPFfvTiKjK3ToH2RFJ7XPRkOTHaazmz
-	kYJx5vK5cmxTSw06xZcYq8v6KLHXI4dvQS8rSehvVLmL0UWMRCoVphwnA2fV+4n3eQBEVmSBHw=
+        bh=s0Rj06sprumtF573AfEP0GeSqajU1zMKKEjxpZroPas=;
+        b=t814OzZ7BNRSLqs1Ejo1TWHigjdzrzBtbFjymM4LkFO0oeqyq9PEfC/xr0sHvB0ZJK
+         Y5sA/q8GY26zDqKUJRqY7HfCKDn/BmIBVxN0hW5q0A/UncCfvNlPstKvIdYwjnJAb3hL
+         JxBddS9V/u0720VUsAUfqSpbmSz5ZDIKOl+c7QrY3tPQYP6g2PYzqNbU+s63E+VkzGjd
+         HxQ15D3z3GTVthfTGEf0hO66aDaLrIW+afCAdU4XeKou1CvHChmiWeHDrJANcsTQqNeH
+         ama3+U6bXq5M5DPSUjzpWff8lwoTZgZ4sHO/Y+vMPc35JO39h5qhWnd2vzssSj69eTkt
+         xemA==
+X-Forwarded-Encrypted: i=1; AJvYcCU0Eese9FZDaLCCZ2T7QErUkCx8ah3cTRk2+3x58xGKW+UWY5nMGNvqaek2g8QFzFyuKF5zYlxDy4zGNWELv5lU7LOr0sCv
+X-Gm-Message-State: AOJu0YyDr7FWHyVrUcgTuxkzCCvqzYh/+fGJULjdrgoOsQdZh43oERYA
+	l/GJUbRFZtvoWbQ8VmVtKZwN852ELLdOFkcYLfRH/KArdTXEob+6B2gRA1xmZE0lTQjLyOR1aA=
 	=
-X-Google-Smtp-Source: AGHT+IFQNtSID3YHaARgbjVSrCLasDYkP7ccSohNQiPNyCa1y1SXwVIunIxS8EvvGL64GrHD6XE4b9xaKA==
+X-Google-Smtp-Source: AGHT+IFWb1sqSDVpFuZ3W8sqoZxZFPSTBJOjR01PwIQfs5Me2aRJCpsMpzSOCXlcfJYvEs2Ca8Gd5XNO5w==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:154f:b0:dc6:d890:1a97 with SMTP id
- r15-20020a056902154f00b00dc6d8901a97mr139007ybu.9.1708618257741; Thu, 22 Feb
- 2024 08:10:57 -0800 (PST)
-Date: Thu, 22 Feb 2024 16:10:24 +0000
+ (user=tabba job=sendgmr) by 2002:a81:a014:0:b0:608:a89e:be89 with SMTP id
+ x20-20020a81a014000000b00608a89ebe89mr174469ywg.3.1708618260297; Thu, 22 Feb
+ 2024 08:11:00 -0800 (PST)
+Date: Thu, 22 Feb 2024 16:10:25 +0000
 In-Reply-To: <20240222161047.402609-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240222161047.402609-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
-Message-ID: <20240222161047.402609-4-tabba@google.com>
-Subject: [RFC PATCH v1 03/26] KVM: Add restricted support for mapping guestmem
- by the host
+Message-ID: <20240222161047.402609-5-tabba@google.com>
+Subject: [RFC PATCH v1 04/26] KVM: Don't allow private attribute to be set if
+ mapped by host
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
@@ -83,160 +83,108 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Allow guestmem-backed memory to be mapped by the host if the
-configuration option is enabled, and the (newly added) KVM memory
-attribute KVM_MEMORY_ATTRIBUTE_NOT_MAPPABLE isn't set.
-
-This new attribute is a kernel attribute, which cannot be
-modified by userspace. This will be used in future patches so
-that KVM can decide whether to allow the host to map guest memory
-based on certain criteria, e.g., that the memory is shared with
-the host.
-
-This attribute has negative polarity (i.e., as opposed to being
-an ALLOW attribute), to simplify the code, since it will usually
-apply to memory marked as KVM_MEMORY_ATTRIBUTE_PRIVATE (i.e.,
-already has an entry in the xarray). Its absence implies that
-there are no restrictions for mapping that memory by the host.
-
-An invariant that future patches will maintain is that memory
-that is private for the guest, regardless whether it's marked
-with the PRIVATE attribute, must always be NOT_MAPPABLE.
+Guest private memory should never be mapped by the host.
+Therefore, do not allow setting the private attribute to guest
+memory if that memory is mapped by the host.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- include/linux/kvm_host.h | 13 ++++++++
- include/uapi/linux/kvm.h |  1 +
- virt/kvm/Kconfig         |  4 +++
- virt/kvm/guest_memfd.c   | 68 ++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 86 insertions(+)
+ include/linux/kvm_host.h |  7 ++++++
+ virt/kvm/kvm_main.c      | 51 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 58 insertions(+)
 
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index b96abeeb2b65..fad296baa84e 100644
+index fad296baa84e..f52d5503ddef 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -2402,4 +2402,17 @@ static inline int kvm_gmem_get_pfn_locked(struct kvm *kvm,
+@@ -2408,11 +2408,18 @@ static inline bool kvm_gmem_is_mappable(struct kvm *kvm, gfn_t gfn)
+ 	return !(kvm_get_memory_attributes(kvm, gfn) &
+ 		 KVM_MEMORY_ATTRIBUTE_NOT_MAPPABLE);
  }
- #endif /* CONFIG_KVM_PRIVATE_MEM */
++
++bool kvm_is_gmem_mapped(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end);
+ #else
+ static inline bool kvm_gmem_is_mappable(struct kvm *kvm, gfn_t gfn)
+ {
+ 	return false;
+ }
++
++static inline bool kvm_is_gmem_mapped(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
++{
++	return false;
++}
+ #endif /* CONFIG_KVM_GENERIC_PRIVATE_MEM_MAPPABLE */
+ 
+ #endif
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index fba4dc6e4107..9f6ff314bda3 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2516,6 +2516,48 @@ static __always_inline void kvm_handle_gfn_range(struct kvm *kvm,
+ 		KVM_MMU_UNLOCK(kvm);
+ }
  
 +#ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM_MAPPABLE
-+static inline bool kvm_gmem_is_mappable(struct kvm *kvm, gfn_t gfn)
++bool kvm_is_gmem_mapped(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
 +{
-+	return !(kvm_get_memory_attributes(kvm, gfn) &
-+		 KVM_MEMORY_ATTRIBUTE_NOT_MAPPABLE);
-+}
-+#else
-+static inline bool kvm_gmem_is_mappable(struct kvm *kvm, gfn_t gfn)
-+{
++	struct kvm_memslot_iter iter;
++
++	kvm_for_each_memslot_in_gfn_range(&iter, kvm_memslots(kvm), gfn_start, gfn_end) {
++		struct kvm_memory_slot *memslot = iter.slot;
++		gfn_t start, end, i;
++
++		start = max(gfn_start, memslot->base_gfn);
++		end = min(gfn_end, memslot->base_gfn + memslot->npages);
++		if (WARN_ON_ONCE(start >= end))
++			continue;
++
++		for (i = start; i < end; i++) {
++			struct page *page;
++			bool is_mapped;
++			kvm_pfn_t pfn;
++			int ret;
++
++			/*
++			 * Check the page_mapcount with the page lock held to
++			 * avoid racing with kvm_gmem_fault().
++			 */
++			ret = kvm_gmem_get_pfn_locked(kvm, memslot, i, &pfn, NULL);
++			if (WARN_ON_ONCE(ret))
++				continue;
++
++			page = pfn_to_page(pfn);
++			is_mapped = page_mapcount(page);
++			unlock_page(page);
++			put_page(page);
++
++			if (is_mapped)
++				return true;
++		}
++	}
++
 +	return false;
 +}
 +#endif /* CONFIG_KVM_GENERIC_PRIVATE_MEM_MAPPABLE */
 +
- #endif
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 0862d6cc3e66..b8db8fb88bbe 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -2227,6 +2227,7 @@ struct kvm_memory_attributes {
+ static bool kvm_pre_set_memory_attributes(struct kvm *kvm,
+ 					  struct kvm_gfn_range *range)
+ {
+@@ -2565,6 +2607,15 @@ static int __kvm_vm_set_mem_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
+ 	if (kvm_range_has_memory_attributes(kvm, start, end, attributes))
+ 		goto out_unlock;
  
- #define KVM_MEMORY_ATTRIBUTES_KERNEL_SHIFT     (16)
- #define KVM_MEMORY_ATTRIBUTES_KERNEL_MASK      GENMASK(63, KVM_MEMORY_ATTRIBUTES_KERNEL_SHIFT)
-+#define KVM_MEMORY_ATTRIBUTE_NOT_MAPPABLE      (1ULL << KVM_MEMORY_ATTRIBUTES_KERNEL_SHIFT)
- 
- #define KVM_CREATE_GUEST_MEMFD	_IOWR(KVMIO,  0xd4, struct kvm_create_guest_memfd)
- 
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index 184dab4ee871..457019de9e6d 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -108,3 +108,7 @@ config KVM_GENERIC_PRIVATE_MEM
-        select KVM_GENERIC_MEMORY_ATTRIBUTES
-        select KVM_PRIVATE_MEM
-        bool
-+
-+config KVM_GENERIC_PRIVATE_MEM_MAPPABLE
-+       bool
-+       depends on KVM_GENERIC_PRIVATE_MEM
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 7e3ea7a3f086..ca3a5d8b1fa7 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -248,7 +248,75 @@ static inline struct file *kvm_gmem_get_file(struct kvm_memory_slot *slot)
- 	return get_file_active(&slot->gmem.file);
- }
- 
-+#ifdef CONFIG_KVM_GENERIC_PRIVATE_MEM_MAPPABLE
-+static bool kvm_gmem_isfaultable(struct vm_fault *vmf)
-+{
-+	struct vm_area_struct *vma = vmf->vma;
-+	struct kvm_gmem *gmem = vma->vm_file->private_data;
-+	pgoff_t pgoff = vmf->pgoff;
-+	struct kvm_memory_slot *slot;
-+	struct kvm *kvm = gmem->kvm;
-+	unsigned long index;
-+
-+	xa_for_each_range(&gmem->bindings, index, slot, pgoff, pgoff) {
-+		pgoff_t base_gfn = slot->base_gfn;
-+		pgoff_t gfn_pgoff = slot->gmem.pgoff;
-+		pgoff_t gfn = base_gfn + max(gfn_pgoff, pgoff) - gfn_pgoff;
-+
-+		if (!kvm_gmem_is_mappable(kvm, gfn))
-+			return false;
++	if (IS_ENABLED(CONFIG_KVM_GENERIC_PRIVATE_MEM_MAPPABLE) && userspace) {
++		/* Host-mapped memory cannot be private. */
++		if ((attributes & KVM_MEMORY_ATTRIBUTE_PRIVATE) &&
++		    kvm_is_gmem_mapped(kvm, start, end)) {
++			r = -EPERM;
++			goto out_unlock;
++		}
 +	}
 +
-+	return true;
-+}
-+
-+static vm_fault_t kvm_gmem_fault(struct vm_fault *vmf)
-+{
-+	struct folio *folio;
-+
-+	folio = kvm_gmem_get_folio(file_inode(vmf->vma->vm_file), vmf->pgoff);
-+	if (!folio)
-+		return VM_FAULT_SIGBUS;
-+
-+	/*
-+	 * Check if the page is allowed to be faulted to the host, with the
-+	 * folio lock held to ensure that the check and incrementing the page
-+	 * count are protected by the same folio lock.
-+	 */
-+	if (!kvm_gmem_isfaultable(vmf)) {
-+		folio_unlock(folio);
-+		return VM_FAULT_SIGBUS;
-+	}
-+
-+	vmf->page = folio_file_page(folio, vmf->pgoff);
-+
-+	return VM_FAULT_LOCKED;
-+}
-+
-+static const struct vm_operations_struct kvm_gmem_vm_ops = {
-+	.fault = kvm_gmem_fault,
-+};
-+
-+static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
-+{
-+	/* No support for private mappings to avoid COW.  */
-+	if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=
-+	    (VM_SHARED | VM_MAYSHARE)) {
-+		return -EINVAL;
-+	}
-+
-+	file_accessed(file);
-+	vm_flags_set(vma, VM_DONTDUMP);
-+	vma->vm_ops = &kvm_gmem_vm_ops;
-+
-+	return 0;
-+}
-+#else
-+#define kvm_gmem_mmap NULL
-+#endif /* CONFIG_KVM_GENERIC_PRIVATE_MEM_MAPPABLE */
-+
- static struct file_operations kvm_gmem_fops = {
-+	.mmap		= kvm_gmem_mmap,
- 	.open		= generic_file_open,
- 	.release	= kvm_gmem_release,
- 	.fallocate	= kvm_gmem_fallocate,
+ 	/*
+ 	 * Reserve memory ahead of time to avoid having to deal with failures
+ 	 * partway through setting the new attributes.
 -- 
 2.44.0.rc1.240.g4c46232300-goog
 
