@@ -1,55 +1,55 @@
 Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B727E155309
-	for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 16:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF5215531C
+	for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 16:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708618294; cv=none; b=Kf1YnlQmYOFmzX9gKrDHHw5NDsWV9x9r0aKEI5b6Pa/GiWxIduv+4tvSWci5To4raJCyYXDpZSrvS4aW8UgZyIUKETevNbKiJpbloM/oKTQDH9uQOt3JRnmwO5dfkOljIiJEc+sfRiVsItTX0aUqT0RDvAoFsuqvqmYLVUq4SJQ=
+	t=1708618296; cv=none; b=I45X4KzLYgX+0QIb5wb9klVBI82MlJfQgG/Hw9Zmx08E5m92DOzTJ4rSHdy8k4r7jW2RzA4QAThTCzum6zSwEjkWG890+s+OFI3MXWEjg+3OPk301X4QJCt6tBoTS+KLHyTimIjpRJKm66ogctPBn1vxw9PR2yNFSwH1HVBxVT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708618294; c=relaxed/simple;
-	bh=6iVb08zKfzH5hJWQLjCXBzmY+3QGd9wO5l8hFYC0rUg=;
+	s=arc-20240116; t=1708618296; c=relaxed/simple;
+	bh=JOV+TEixxBnW38RYNc8zuei4nTFOo/1GSbfRHcogFxk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cJATuQv+fXSlNUlXkYIU7XyUkxZe8sNjNaK4xLJb8XT2lIeHnreR/k1x7/WJqWkSwUIEb3yw8BYigieY0LOJ/sp3cxeSgJP66BvZsfeKc7O3jfRRj+pnY5yPC+4r47FvMskmBYm98HZ3aDuAUboXP/cBhrEyyTUClwd8c5V1fOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c8sHGanu; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=YOfPA3O4mhbflnJssUDV2UjZFquhio182lhNObvWXxW+QFpHkO2Rwk4dRjX+xy4Lhamtfy/5V6qGw6nMj/6So9DxQTAipXfbTs8eo0atThAk1yA9EZlJefI1zPE+qylABUC8l+836MROQS5+mw/PkmqvbJl67Sf81nP1AFg0mbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gepo2dSY; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c8sHGanu"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-33d19ac07c5so915677f8f.0
-        for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 08:11:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gepo2dSY"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-33d6eb5e5a9so1634693f8f.3
+        for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 08:11:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708618291; x=1709223091; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1708618293; x=1709223093; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rlwq3mGjsbZmc2k1s/E60FvUuielQ8IuRYRmKjrhRfg=;
-        b=c8sHGanuXgUUO89kwin1TDj1qc2Xxj1Xaa5PJ52USOOBDpxiFfsQNRrwOY2GT1PHqm
-         F4TWKIhQtr0uW8cV0TzKTPMWoHGytAltbjk9jdMyVxhtVCUNKGi//VQ085DWItClv7/h
-         RnvaDyBEyT3W3rcTtbnePtYLdSeTKqdpjezaZnh6Pjeni6rhxmzAugcTGqSsiYfixPcG
-         R1sO7PAg/d8OAyVkI4NOl9Omuuck5FR8WHsS0G8SweqLh6stNxnNeSRftOJFoCfOy4OU
-         6U89JvEAFyqddgEIqb9JIkLyB5ywvByaoeETgKqjpuiycYXYZf2md/pzlEUV9uV1N2P5
-         2Fbg==
+        bh=vD9o5ECbAgPC1ivE6LlVq7cfQ2iwgRwXzAnUeOE4gIQ=;
+        b=gepo2dSY8fb7CdK16dQJlk+o+gdNKgA/jWQ1yiCUumUsFVHZbveitOFdElCpDCkSfi
+         wOq8VtKdMi4jS7qPkYs4pqcRN9LwBocI+YwqXWqzwYA52TE47e+LvIEL44Dca/h25EF+
+         QhqDSKt7sWp18Fy3QqjwDsLGM7AzTzBtuTx7FgdpdHBiWWeHWB1mmWIYBsON4UY49CkB
+         GEY3LWchtt6tz0nKQC13CLHWa/kxirtdbD3Lco/8MhCe32qsOW605yZu5A+nHLplSIuV
+         2f4P3hXsUKwEmQSxSm0NE8ssGRz7rfofSZ0DDxOl5xb5E3ZHfqTj+bH9B0LGif52ysDL
+         RRvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708618291; x=1709223091;
+        d=1e100.net; s=20230601; t=1708618293; x=1709223093;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rlwq3mGjsbZmc2k1s/E60FvUuielQ8IuRYRmKjrhRfg=;
-        b=LWyoU/rNUPGiJ9YYEXwXFEnz6cki8det8jxoPA2yTdLKxiKODKaV2TesIPfvz+m/YV
-         hFvc5Dgzx4lzas0eDJhq9dMl0irxk5D4cbsU26GE1mBfANkF7sPcAY80oWMVdkmq8x2k
-         OQ41RpP78NsktsIK5G3xT9EAXc6Gxlj61TPT3nrLhyRcJBu4Ts7vXGUGmGis5vszVFSc
-         9R+KFa9+uNZeSyin2HZXwbkCTl5hnIACBRJDTnLcQjJRwBItFUVerCqkVdQsgYcISPIf
-         Uhy+zjTJuy1avQYUqZEzThOfXwSLqQ5VNkP959ERlSIrsnJ7G6Kb0fBhjkgh9iY0t9AF
-         TAwA==
-X-Forwarded-Encrypted: i=1; AJvYcCUCkXyftBMZzh4MxGNucyRaSHP5e8yAP2h2Dlbw0rj1TuGatUcaDcjgwMb9UW0po6uhs7yk5ftfiCjPlF12wqczXM7HrkLU
-X-Gm-Message-State: AOJu0Yzp+Vf3DIe6fsMgv5hEZ2U3JrxAOUG3LaJrSdm56lNgdrPbrTpf
-	DFYD9V2Cr4LaSlfb3gGLexda2giOhUxZLglJXq0PQKjcuef/CUOuQBBSesPKUP9fUzNBCMmdYg=
+        bh=vD9o5ECbAgPC1ivE6LlVq7cfQ2iwgRwXzAnUeOE4gIQ=;
+        b=GkxiQYHGP8XdDsDdHLNuvZJeTfKs3pjRVr1IANAtOs7cagsJs5znSudYfE6pcHBfyL
+         hMvS8F1mTWCFEF+WEFUW7pakwRTIQMQbBX68vyop+/Ryt5gF7GJQJ/J54jh/InVs9vWH
+         rcaV3/MzxH1KpLkZ78Gsbqnm/QObh6U30K6Nc6covgq7fRrVsxwn6U7Btd9INJHq10A8
+         iyp34uFS8U4z+0hHp3wTy+Muv93HA1ghb+TNDErdmdysO+wLG9RoliNbFF6D/pSQ9h9a
+         QG95Wh8fUrEOz1RpoBdSJuukKECty7GpF5qVGKnLTCM6eIDDf0n5TFDqkXUhgmnCKvBl
+         oReg==
+X-Forwarded-Encrypted: i=1; AJvYcCUBpFLoZ+VRGRjY6HhOvtdVS5toE4pofzNBrgywwJW74UNGVPDfebNELAiAfHjsD0z8aLV/uy+vnX2LItzSfDijUmyBtiGe
+X-Gm-Message-State: AOJu0YyEFi6XcIp5NziurvkOkfgRzJGlTtHpY7Tfg1aRXugv3yNNL//d
+	/n0/oMYEvPg4I1dFz16LDUVWGq6QycgbBA4Uxl/GcnNcHdOV+fm8HM0dd6GCcgLRBH3TzIEEUA=
 	=
-X-Google-Smtp-Source: AGHT+IGPBlBEWHSVTXybSf5AXKW9r7iJYYYJVo0ATzUwHor8Yu6mnFaOUn7raP8SctTXcV/NU58hv2UYQg==
+X-Google-Smtp-Source: AGHT+IFjuzbek5MC2iMiGgTGZbnIVe892XN4fprFxq4qMMBT6/xXDjSro1ZNWROfqjD/CCRCrpUqesTMRw==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a5d:6f18:0:b0:33d:9fc2:5e26 with SMTP id
- ay24-20020a5d6f18000000b0033d9fc25e26mr109wrb.9.1708618291025; Thu, 22 Feb
- 2024 08:11:31 -0800 (PST)
-Date: Thu, 22 Feb 2024 16:10:38 +0000
+ (user=tabba job=sendgmr) by 2002:a05:6000:a0f:b0:33d:3ad2:67b1 with SMTP id
+ co15-20020a0560000a0f00b0033d3ad267b1mr32305wrb.4.1708618293417; Thu, 22 Feb
+ 2024 08:11:33 -0800 (PST)
+Date: Thu, 22 Feb 2024 16:10:39 +0000
 In-Reply-To: <20240222161047.402609-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240222161047.402609-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
-Message-ID: <20240222161047.402609-18-tabba@google.com>
-Subject: [RFC PATCH v1 17/26] KVM: arm64: Do not allow changes to private
- memory slots
+Message-ID: <20240222161047.402609-19-tabba@google.com>
+Subject: [RFC PATCH v1 18/26] KVM: arm64: Skip VMA checks for slots without
+ userspace address
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
@@ -83,30 +83,44 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Handling changes to private memory slots can be difficult, since
-it would probably require some cooperation from the hypervisor
-and/or the guest. Do not allow such changes for now.
+Memory slots backed by guest memory might be created with no
+intention of being mapped by the host. These are recognized by
+not having a userspace address in the memory slot.
+
+VMA checks are neither possible nor necessary for this kind of
+slot, so skip them.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/mmu.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/arm64/kvm/mmu.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 391d168e95d0..4d2881648b58 100644
+index 4d2881648b58..6ad79390b15c 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -2158,6 +2158,10 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 		}
- 	}
+@@ -973,6 +973,10 @@ static void stage2_unmap_memslot(struct kvm *kvm,
+ 	phys_addr_t size = PAGE_SIZE * memslot->npages;
+ 	hva_t reg_end = hva + size;
  
-+	if ((change == KVM_MR_MOVE || change == KVM_MR_FLAGS_ONLY) &&
-+	    ((kvm_slot_can_be_private(old)) || (kvm_slot_can_be_private(new))))
-+		return -EPERM;
++	/* Host will not map this private memory without a userspace address. */
++	if (kvm_slot_can_be_private(memslot) && !hva)
++		return;
 +
- 	if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
- 			change != KVM_MR_FLAGS_ONLY)
- 		return 0;
+ 	/*
+ 	 * A memory region could potentially cover multiple VMAs, and any holes
+ 	 * between them, so iterate over all of them to find out if we should
+@@ -2176,6 +2180,10 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 	hva = new->userspace_addr;
+ 	reg_end = hva + (new->npages << PAGE_SHIFT);
+ 
++	/* Host will not map this private memory without a userspace address. */
++	if ((kvm_slot_can_be_private(new)) && !hva)
++		return 0;
++
+ 	mmap_read_lock(current->mm);
+ 	/*
+ 	 * A memory region could potentially cover multiple VMAs, and any holes
 -- 
 2.44.0.rc1.240.g4c46232300-goog
 
