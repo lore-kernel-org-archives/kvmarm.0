@@ -1,56 +1,56 @@
 Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C43D17BC1
-	for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 22:42:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23BD71B7EB
+	for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 22:55:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708641735; cv=none; b=OUaQcKSEkZTxQllzgDvRZIMbdlB435T1sem1qagyfRdfrvFsf8Usp4xKBrXbJFIbfUkJ/Oh/4luaIhEnWBrhuh7sr+am2CXpL3wSgAKOeqou9jGeqlVK2f8ZDhLdAdsnxBnnietAFRNl+Ctokh6maMyHbxrTQp/l8ask4tIRK1o=
+	t=1708642534; cv=none; b=qEEAuRg9nnPMEOwy88B8Ny3fwKH4O92KVt/Y4Ihaa7daGlawy+0w4AVR/9ml1xjllQ8T/uemlYwUp7++i+TTGWRFAZqc0KEN9Zzz+I3fjK8E8GaHw9webBI2ok+yePVd431ZPBAvj40uhqz19+gPDINyCi0scXIeeR+y8U/ZHFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708641735; c=relaxed/simple;
-	bh=imYlGZaDB2n5vfS4ZwIvsXZiZqAKg8o6WkaCZH5L1Qw=;
+	s=arc-20240116; t=1708642534; c=relaxed/simple;
+	bh=v30ix5UBN1fgNn1Yl2t1RwDrBFJ0VxBN5nvmOI21F6U=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Content-Type; b=uzRIpRfZumTpDrm0lh1KsOx4t6XGCFO1LwdIKYH7SoYzvqKSYwDYTF3ya5mFgu1AvbS0+F2ttx9t5bQSpGoyXZnKVJtHqmy8tu83YSVPs9Af0JqAiPv63rdGWlPSMfh5/2unofqA4CuBuhe2rftEoEFFA4wcBxKN5bahRPH0sDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KotHSBeP; arc=none smtp.client-ip=209.85.128.202
+	 To:Content-Type; b=sBFXcebDf+k1HEOT0l2aALP+7Rvp+2jrFDH6X60CeE3NITc+/ju69+tu5z6BG5QdBzZ6ii7IzOVXmrR737HWMlpbsRIyNqX3kwjN3HL9qnenn4KS4vYvfqndJ17zjwtuIHlfalRYhadCkdrrD5KGfH6kc+cpwatvNfGbiCPD1zM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DAFsAbRm; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KotHSBeP"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-608575317f8so4400577b3.3
-        for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 14:42:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DAFsAbRm"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6081639fecfso4012507b3.1
+        for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 14:55:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708641732; x=1709246532; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1708642532; x=1709247332; darn=lists.linux.dev;
         h=to:from:subject:message-id:references:mime-version:in-reply-to:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=jFvVQg9UZb065hqoLsESeNre8JaYtsdQOcTRgkYVRKY=;
-        b=KotHSBePEqLbMhAUm6yt9pANQ4z7OY2Ie544J2sCLD8dgKQyMZvC+FgF11l6mGUY3W
-         klBSE+q1YXltbXOTj5ME61hMucbdVIcS22FXcy/HPtQ130kT8BXzBybTzZNNR7TqjV2f
-         4K16vrQbEhEyqYHx2HyYvjhYq3CuGmFRtXOsHKVquiORYnvNmPXTAmZvft10D27mcbll
-         GkzmljK5uCBT5XGK5HyoIlwmhsSV8VQOmcQGoH1tw2guOntqLH4mNmZpx3zWXEelfw7Q
-         Uuml2FlDNHAMAOZ8FUY44cCW4rGO/n0e4/62HsddhvY6hq0rfb18F7ZHo07asR3tUxJ1
-         GDzA==
+        bh=vd/YICqtxLMDMc5n5d3K7q6H9URrpma0RkwQ+FIE2QY=;
+        b=DAFsAbRmmCj31oDgTqYD6M+3t6M4okl6DuOSJS+LUuBxUT5c5tWcbWkMS8D71ADB/5
+         qMoPBvTVyinwbZBZf+vxbNcT8oGMmnFwny12rsAze/rUgvnaByZlHc9ATmAS62CJab7M
+         4z4MB6UCTpQFavhRFMq0P8c+OcKKCIMA/sNeiQbDVCl0lvP8gOiZS5IKYTgTfqzZV7px
+         0ASOrGhy3hYc6xrkmkbS2810/e7YFg16QQS626qPgOcLYG7XVNr+1uXZlcJxmXxYM1Lb
+         N/rwzJlvosiLiOmiJ+2AVOrqBwXIIbvP7uwAYEDuPi3jPobhfkKgddMnfK7eouP9KO6I
+         sEgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708641732; x=1709246532;
+        d=1e100.net; s=20230601; t=1708642532; x=1709247332;
         h=to:from:subject:message-id:references:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jFvVQg9UZb065hqoLsESeNre8JaYtsdQOcTRgkYVRKY=;
-        b=R073Km/Xb4Zio7OqQNkefzgCjP+X3HZDYMGx8n3pKVFUDjrM91ZY+FLTgArvTi4zuF
-         gerbZZeff80E+s4CUKeVzAa3C+msHYPtHd24FpJs19rPCJIFrSNmXHFnnjvxtRddMeZK
-         zfY8QSg5wxRH4wjZRc59a9dHKZZJ6zRzy3ZJW4cMVsyc6Ijhz/+lFHoXYUHFT4nWutOJ
-         mTGVyg/7oAXrRRmgk3s+laiWsWQqYUQp8ffrz3qy6ZqwN1R+pxO1kDta4OLyQD0XDiyh
-         7cGQVN2LNtXy46KVVXiXMfYbSKahaUXZNiz1kVcye0h+0SU9wEsOoajSfqBlm3fEPkdG
-         WW0A==
-X-Forwarded-Encrypted: i=1; AJvYcCU4fWkrKXVn3eBPfZm0xDv8lQYaolsh/u6y46zZid31+f1DpWbHKYPhiCo+8DvRKDczFZiA2KxUooPuRxQMr2WUTrRPGrN3
-X-Gm-Message-State: AOJu0Yw7bQ5qjI8n2m2ZANeR6w4vmxsAJq4cbrUgmv8ETN3ivk8mZEvd
-	T6I9j+fRtOeEStUU6FD7kKznHl4cSeEsbhkevrACK8oE3jbZvosUQYz//z7PNUYBzO4D7839V2Q
-	JDw==
-X-Google-Smtp-Source: AGHT+IEn84VsOMK3xly4fJg9p4ZGQL4jC+l+k5U6BnNNTDUyy7r/Gzq9iPM6OigIQq722pMhxaceeSC3g0o=
+        bh=vd/YICqtxLMDMc5n5d3K7q6H9URrpma0RkwQ+FIE2QY=;
+        b=WAoRDfH+nearUZhyeOVCIq6UKZT643/kaOcJctkXXlIoU3fm4v0JeE05BLoKUL+tYL
+         p/Nq8R2RS/zW/+XQRB4gvwNrloKMgRFZ3UkrT2hMhqCpBNx3gbfQmkQfuoVe9wVksIxV
+         XQW8CvjgrSYiXVuhuMwsJiV9kD8lS+uNNK0YdxjpqNizxZ4weN8lR0Lxp46QYEDrpWx9
+         KF+K5yX71wmHjrfoHYGgGrFkmboaX/JzUfawSaLPA5EJZvrZxELZbMLJQKq6VkkKQbF/
+         euepWhqIS+L8LEvMcRUZw+8pZ5GOS/elzdj/FQ0x/2heQ7QEu4Mr0UDttvbnMiZvercS
+         rWFg==
+X-Forwarded-Encrypted: i=1; AJvYcCXlu1J81CCX7q8IbOg9a1KTrZTQk8uUF1SNJZH82R/rz5EoybyWhqQTD9gAhYSfAq2C4uJNovxCliyCJPD0fPaKNR6Z9eBu
+X-Gm-Message-State: AOJu0YyjkXagg2fJRGdKdlyLSa/z7odxB2x0SjvVJXJVWUMXK0vHvRQn
+	0HOpO4XcWVsqmZT1tOkiNJo3OsCqGN6yahk8moOebTjcWL/nuYCzEQ8c5G3m783deHFCTobzD9r
+	ZzQ==
+X-Google-Smtp-Source: AGHT+IH6zbDx9owFk0HWBGgG9KN5obudLpTf6CD+r6Pc0oEDuyl4v9GZAk2ErtxIMUz9+tCkdL7Tsne7vIE=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:9242:0:b0:608:20df:8b0a with SMTP id
- j63-20020a819242000000b0060820df8b0amr102171ywg.6.1708641732562; Thu, 22 Feb
- 2024 14:42:12 -0800 (PST)
-Date: Thu, 22 Feb 2024 14:42:10 -0800
-In-Reply-To: <ZcKYRsNUAngWGy2a@google.com>
+ (user=seanjc job=sendgmr) by 2002:a81:9150:0:b0:608:a1ff:6c39 with SMTP id
+ i77-20020a819150000000b00608a1ff6c39mr130883ywg.2.1708642532143; Thu, 22 Feb
+ 2024 14:55:32 -0800 (PST)
+Date: Thu, 22 Feb 2024 14:55:30 -0800
+In-Reply-To: <ZdfNwhe2s0Mn2gB4@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,8 +58,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240203000917.376631-1-seanjc@google.com> <20240203000917.376631-11-seanjc@google.com>
- <ZcKYRsNUAngWGy2a@google.com>
-Message-ID: <ZdfNwhe2s0Mn2gB4@google.com>
+ <ZcKYRsNUAngWGy2a@google.com> <ZdfNwhe2s0Mn2gB4@google.com>
+Message-ID: <ZdfQ4jI8yT-bvbV4@google.com>
 Subject: Re: [PATCH v8 10/10] KVM: selftests: Add a basic SEV smoke test
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
@@ -75,20 +75,29 @@ To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
 	Peter Gonda <pgonda@google.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Feb 06, 2024, Sean Christopherson wrote:
-> On Fri, Feb 02, 2024, Sean Christopherson wrote:
-> > +int main(int argc, char *argv[])
-> > +{
-> > +	TEST_REQUIRE(is_kvm_sev_supported());
+On Thu, Feb 22, 2024, Sean Christopherson wrote:
+> On Tue, Feb 06, 2024, Sean Christopherson wrote:
+> > On Fri, Feb 02, 2024, Sean Christopherson wrote:
+> > > +int main(int argc, char *argv[])
+> > > +{
+> > > +	TEST_REQUIRE(is_kvm_sev_supported());
+> > 
+> > This also needs
+> > 
+> > 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SEV));
+> > 
+> > to handle the case where the platform supports SEV, i.e. /dev/sev exists, but
+> > KVM doesn't support SEV, e.g. if TDP is disabled, if SEV was explicitly disabled
+> > via module param, etc.
 > 
-> This also needs
-> 
-> 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SEV));
-> 
-> to handle the case where the platform supports SEV, i.e. /dev/sev exists, but
-> KVM doesn't support SEV, e.g. if TDP is disabled, if SEV was explicitly disabled
-> via module param, etc.
+> Thinking more about this, I think we should simply delete is_kvm_sev_supported().
+> (a) it obviously doesn't query _KVM_ support, and (b) if KVM says SEV is supported,
+> then it darn well actually be supported.
 
-Thinking more about this, I think we should simply delete is_kvm_sev_supported().
-(a) it obviously doesn't query _KVM_ support, and (b) if KVM says SEV is supported,
-then it darn well actually be supported.
+Ugh, and selftests also need to handle the scenario where SEV is enabled, but all
+ASIDs are assigned to SEV-ES.  We could try to create a dummy VM and check for an
+-EBUSY return, but that is ugly and could result in missing KVM bugs due to tests
+being skipped instead of failing.
+
+That's a future problem though, because I think we'll need new KVM functionality
+to surface that information.
