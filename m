@@ -1,248 +1,196 @@
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95AE82D79
-	for <kvmarm@lists.linux.dev>; Fri, 23 Feb 2024 15:52:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 726CB128834
+	for <kvmarm@lists.linux.dev>; Fri, 23 Feb 2024 16:40:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708703560; cv=none; b=Dh6E4cCZBcBSUgsYQlkw5Plod9Udx912/V8DLs6CqZtEhBjs/FSGvVMsjjHUEO0FRJHbOKlGduERjxG0h6hst0evPZB2fp9FleWbnGIofnSEZ1Rys12TpY2SROmJfapJSlm+KUSGAawjlicTJk/wwwpkvOfKwnrYJ2v3f+o0wr4=
+	t=1708706404; cv=none; b=pR1grQrSWwEkeRxeF6HeZSlvItHC/buijlIRt+7u/NgwSKHfGxAdw62RXuZGjwXOu2hD+YLC21C6K2M/Xtb0nqBrfrkyM3R82RHAPbQVShCRzA+NlIgTkFqHgMwT0hghBpS27/73S4s8uBgi9h7kOTiRfP3s8H0Gt2ID9ey/sNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708703560; c=relaxed/simple;
-	bh=5jLTrsvHP15/Wz1GlFMWRvMxJYOArtuWBJDxqVfFJD4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=Pyn8sExB9xn5O2QHjCoimRZhHpnfbJGZ+jeVKHg/2t7Ar3X2KlQJ0Y8SpP2L/CQq/NYajx32bZxSw4b3x1TxxX+YCGEg+MeP7T0I/w1JYHv4wCV3x3TLeKzk7O7i0++UampXZVy/EnphbYbtvhC/PGc1ZcjJZBszpKz3ZTwe8S8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NSf5eY60; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NSf5eY60"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1708703557;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=prhJrEEyjZ+UcC+HrmtwYVmqBHKB1vxR1mBsPDD9RRo=;
-	b=NSf5eY60KifFl5AMvfSAQlclI1n9EomXof33qovka5R/kMVsqB54mOpRH5pWfV+2SH7bBm
-	kxPLQD83FzeRbbp6IXb6tB6v+/wnwQDQrjtGssUToNwkfFWrugOPIIS5njSkmPCAit/ZAg
-	FGWa8ROjT8ARLFftmcR0PQKH8EX9IC4=
-From: Andrew Jones <andrew.jones@linux.dev>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: alexandru.elisei@arm.com,
-	eric.auger@redhat.com,
-	nikos.nikoleris@arm.com,
-	shahuang@redhat.com,
-	pbonzini@redhat.com,
-	thuth@redhat.com
-Subject: [kvm-unit-tests PATCH 14/14] arm64: Add memregions_efi_init
-Date: Fri, 23 Feb 2024 16:51:40 +0100
-Message-ID: <20240223155125.368512-30-andrew.jones@linux.dev>
-In-Reply-To: <20240223155125.368512-16-andrew.jones@linux.dev>
-References: <20240223155125.368512-16-andrew.jones@linux.dev>
+	s=arc-20240116; t=1708706404; c=relaxed/simple;
+	bh=LgBPi4YGvQiURBDu7BWFC4LVteBlxpmBQloXiDMEn0E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YV+ScOnIhEnEt98zWTbflnUHZrVHnXeMvEo2CI9IEnEiL9Gwdd8cfmmXZrq+ufwmlxnAatukbz+emcdtDz0XZpbWixfLE66VRTwbYJdEBCR2vqdp00oo5hTeogigYwSiTsT7PNuIMAvR8klW8AUPgXkFVqJlLYkNVmFPOmmnvCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 569D5DA7;
+	Fri, 23 Feb 2024 08:40:39 -0800 (PST)
+Received: from [10.57.51.6] (unknown [10.57.51.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3F76D3F762;
+	Fri, 23 Feb 2024 08:39:57 -0800 (PST)
+Message-ID: <9d3f9f70-0b34-7426-8b62-93dc173a0bb2@arm.com>
+Date: Fri, 23 Feb 2024 16:39:55 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-type: text/plain
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v5 5/7] arm64: KVM: Add interface to set guest value for
+ TRFCR register
+Content-Language: en-US
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mike Leach <mike.leach@linaro.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>,
+ Miguel Luis <miguel.luis@oracle.com>, Joey Gouly <joey.gouly@arm.com>,
+ Ard Biesheuvel <ardb@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Arnd Bergmann <arnd@arndb.de>, Helge Deller <deller@gmx.de>,
+ Andrew Walbran <qwandor@google.com>,
+ Vincent Donnefort <vdonnefort@google.com>,
+ Ryan Roberts <ryan.roberts@arm.com>, Fuad Tabba <tabba@google.com>,
+ Jing Zhang <jingzhangos@google.com>, linux-kernel@vger.kernel.org,
+ coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, maz@kernel.org, acme@kernel.org,
+ oliver.upton@linux.dev, broonie@kernel.org
+References: <20240220100924.2761706-1-james.clark@arm.com>
+ <20240220100924.2761706-6-james.clark@arm.com>
+ <c8819064-13c3-41c6-8b2e-779ef8a22ee8@arm.com>
+From: James Clark <james.clark@arm.com>
+In-Reply-To: <c8819064-13c3-41c6-8b2e-779ef8a22ee8@arm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Provide a memregions function which initialized memregions from an
-EFI memory map. The function also points out the largest conventional
-memory region by returning a pointer to it in the freemem parameter.
-Immediately apply this function to arm64's efi_mem_init(). riscv will
-make use of it as well.
 
-Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
----
- lib/arm/setup.c  | 76 ++++++++----------------------------------------
- lib/memregions.c | 57 ++++++++++++++++++++++++++++++++++++
- lib/memregions.h |  5 ++++
- 3 files changed, 74 insertions(+), 64 deletions(-)
 
-diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 631597b343f1..521928186fb0 100644
---- a/lib/arm/setup.c
-+++ b/lib/arm/setup.c
-@@ -295,58 +295,13 @@ static efi_status_t setup_rsdp(efi_bootinfo_t *efi_bootinfo)
- 
- static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
- {
--	int i;
--	unsigned long free_mem_pages = 0;
--	unsigned long free_mem_start = 0;
--	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
--	efi_memory_desc_t *buffer = *map->map;
--	efi_memory_desc_t *d = NULL;
--	struct mem_region r, *code, *data;
--	const void *fdt = efi_bootinfo->fdt;
--
--	/*
--	 * Record the largest free EFI_CONVENTIONAL_MEMORY region
--	 * which will be used to set up the memory allocator, so that
--	 * the memory allocator can work in the largest free
--	 * continuous memory region.
--	 */
--	for (i = 0; i < *(map->map_size); i += *(map->desc_size)) {
--		d = (efi_memory_desc_t *)(&((u8 *)buffer)[i]);
--
--		r.start = d->phys_addr;
--		r.end = d->phys_addr + d->num_pages * EFI_PAGE_SIZE;
--		r.flags = 0;
--
--		switch (d->type) {
--		case EFI_RESERVED_TYPE:
--		case EFI_LOADER_DATA:
--		case EFI_BOOT_SERVICES_CODE:
--		case EFI_BOOT_SERVICES_DATA:
--		case EFI_RUNTIME_SERVICES_CODE:
--		case EFI_RUNTIME_SERVICES_DATA:
--		case EFI_UNUSABLE_MEMORY:
--		case EFI_ACPI_RECLAIM_MEMORY:
--		case EFI_ACPI_MEMORY_NVS:
--		case EFI_PAL_CODE:
--			r.flags = MR_F_RESERVED;
--			break;
--		case EFI_MEMORY_MAPPED_IO:
--		case EFI_MEMORY_MAPPED_IO_PORT_SPACE:
--			r.flags = MR_F_IO;
--			break;
--		case EFI_LOADER_CODE:
--			r.flags = MR_F_CODE;
--			break;
--		case EFI_CONVENTIONAL_MEMORY:
--			if (free_mem_pages < d->num_pages) {
--				free_mem_pages = d->num_pages;
--				free_mem_start = d->phys_addr;
--			}
--			break;
--		}
-+	struct mem_region *freemem_mr = NULL, *code, *data;
-+	phys_addr_t freemem_start;
-+	void *freemem;
- 
--		memregions_add(&r);
--	}
-+	memregions_efi_init(&efi_bootinfo->mem_map, &freemem_mr);
-+	if (!freemem_mr)
-+		return EFI_OUT_OF_RESOURCES;
- 
- 	memregions_split((unsigned long)&_etext, &code, &data);
- 	assert(code && (code->flags & MR_F_CODE));
-@@ -366,24 +321,17 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
- 	}
- 	__phys_end &= PHYS_MASK;
- 
--	if (efi_bootinfo->fdt_valid) {
--		unsigned long old_start = free_mem_start;
--		void *freemem = (void *)free_mem_start;
-+	freemem = (void *)PAGE_ALIGN(freemem_mr->start);
- 
--		freemem_push_fdt(&freemem, fdt);
-+	if (efi_bootinfo->fdt_valid)
-+		freemem_push_fdt(&freemem, efi_bootinfo->fdt);
- 
--		free_mem_start = ALIGN((unsigned long)freemem, EFI_PAGE_SIZE);
--		free_mem_pages = (free_mem_start - old_start) >> EFI_PAGE_SHIFT;
--	}
-+	freemem_start = PAGE_ALIGN((unsigned long)freemem);
-+	assert(sizeof(long) == 8 || freemem_start < (3ul << 30));
- 
- 	asm_mmu_disable();
- 
--	if (free_mem_pages == 0)
--		return EFI_OUT_OF_RESOURCES;
--
--	assert(sizeof(long) == 8 || free_mem_start < (3ul << 30));
--
--	mem_allocator_init(free_mem_start, free_mem_start + (free_mem_pages << EFI_PAGE_SHIFT));
-+	mem_allocator_init(freemem_start, freemem_mr->end);
- 
- 	return EFI_SUCCESS;
- }
-diff --git a/lib/memregions.c b/lib/memregions.c
-index 96de86b27333..23c366c0f77d 100644
---- a/lib/memregions.c
-+++ b/lib/memregions.c
-@@ -80,3 +80,60 @@ void memregions_add_dt_regions(size_t max_nr)
- 		});
- 	}
- }
-+
-+#ifdef CONFIG_EFI
-+/*
-+ * Add memory regions based on the EFI memory map. Also set a pointer to the
-+ * memory region which corresponds to the largest EFI_CONVENTIONAL_MEMORY
-+ * region, as that region is the largest free, continuous region, making it
-+ * a good choice for the memory allocator.
-+ */
-+void memregions_efi_init(struct efi_boot_memmap *mem_map,
-+			 struct mem_region **freemem)
-+{
-+	u8 *buffer = (u8 *)*mem_map->map;
-+	u64 freemem_pages = 0;
-+
-+	*freemem = NULL;
-+
-+	for (int i = 0; i < *mem_map->map_size; i += *mem_map->desc_size) {
-+		efi_memory_desc_t *d = (efi_memory_desc_t *)&buffer[i];
-+		struct mem_region r = {
-+			.start = d->phys_addr,
-+			.end = d->phys_addr + d->num_pages * EFI_PAGE_SIZE,
-+			.flags = 0,
-+		};
-+
-+		switch (d->type) {
-+		case EFI_RESERVED_TYPE:
-+		case EFI_LOADER_DATA:
-+		case EFI_BOOT_SERVICES_CODE:
-+		case EFI_BOOT_SERVICES_DATA:
-+		case EFI_RUNTIME_SERVICES_CODE:
-+		case EFI_RUNTIME_SERVICES_DATA:
-+		case EFI_UNUSABLE_MEMORY:
-+		case EFI_ACPI_RECLAIM_MEMORY:
-+		case EFI_ACPI_MEMORY_NVS:
-+		case EFI_PAL_CODE:
-+			r.flags = MR_F_RESERVED;
-+			break;
-+		case EFI_MEMORY_MAPPED_IO:
-+		case EFI_MEMORY_MAPPED_IO_PORT_SPACE:
-+			r.flags = MR_F_IO;
-+			break;
-+		case EFI_LOADER_CODE:
-+			r.flags = MR_F_CODE;
-+			break;
-+		case EFI_CONVENTIONAL_MEMORY:
-+			if (freemem_pages < d->num_pages) {
-+				freemem_pages = d->num_pages;
-+				*freemem = memregions_add(&r);
-+				continue;
-+			}
-+			break;
-+		}
-+
-+		memregions_add(&r);
-+	}
-+}
-+#endif /* CONFIG_EFI */
-diff --git a/lib/memregions.h b/lib/memregions.h
-index 9a8e33182fe5..dc42bb66cc3e 100644
---- a/lib/memregions.h
-+++ b/lib/memregions.h
-@@ -26,4 +26,9 @@ uint32_t memregions_get_flags(phys_addr_t paddr);
- void memregions_split(phys_addr_t addr, struct mem_region **r1, struct mem_region **r2);
- void memregions_add_dt_regions(size_t max_nr);
- 
-+#ifdef CONFIG_EFI
-+#include <efi.h>
-+void memregions_efi_init(struct efi_boot_memmap *mem_map, struct mem_region **freemem);
-+#endif
-+
- #endif /* _MEMREGIONS_H_ */
--- 
-2.43.0
+On 23/02/2024 10:03, Suzuki K Poulose wrote:
+> On 20/02/2024 10:09, James Clark wrote:
+>> Add an interface for the Coresight driver to use to set the value of the
+>> TRFCR register for the guest. This register controls the exclude
+>> settings for trace at different exception levels, and is used to honor
+>> the exclude_host and exclude_guest parameters from the Perf session.
+>> This will be used to later write TRFCR_EL1 on nVHE at guest switch. For
+>> VHE, the host trace is controlled by TRFCR_EL2 and thus we can write to
+>> the TRFCR_EL1 immediately. Because guest writes to the register are
+>> trapped, the value will persist and can't be modified.
+>>
+>> Instead of adding a load of infrastructure to share the host's per-cpu
+>> offsets with the hypervisor, just define the new storage as a NR_CPUS
+>> array.
+>>
+>> Signed-off-by: James Clark <james.clark@arm.com>
+>> ---
+>>   arch/arm64/include/asm/kvm_host.h |  3 +++
+>>   arch/arm64/kernel/image-vars.h    |  1 +
+>>   arch/arm64/kvm/debug.c            | 26 ++++++++++++++++++++++++++
+>>   3 files changed, 30 insertions(+)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_host.h
+>> b/arch/arm64/include/asm/kvm_host.h
+>> index 85b5477bd1b4..56b7f7eca195 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -509,6 +509,7 @@ struct kvm_host_psci_config {
+>>       bool psci_0_1_cpu_off_implemented;
+>>       bool psci_0_1_migrate_implemented;
+>>   };
+>> +extern u64 ____cacheline_aligned kvm_guest_trfcr[NR_CPUS];
+>>     extern struct kvm_host_psci_config
+>> kvm_nvhe_sym(kvm_host_psci_config);
+>>   #define kvm_host_psci_config CHOOSE_NVHE_SYM(kvm_host_psci_config)
+>> @@ -1174,6 +1175,7 @@ void kvm_arch_vcpu_put_debug_state_flags(struct
+>> kvm_vcpu *vcpu);
+>>   void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
+>>   void kvm_clr_pmu_events(u32 clr);
+>>   bool kvm_set_pmuserenr(u64 val);
+>> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest);
+>>   #else
+>>   static inline void kvm_set_pmu_events(u32 set, struct
+>> perf_event_attr *attr) {}
+>>   static inline void kvm_clr_pmu_events(u32 clr) {}
+>> @@ -1181,6 +1183,7 @@ static inline bool kvm_set_pmuserenr(u64 val)
+>>   {
+>>       return false;
+>>   }
+>> +static inline void kvm_etm_set_guest_trfcr(u64 trfcr_guest) {}
+>>   #endif
+>>     void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu);
+>> diff --git a/arch/arm64/kernel/image-vars.h
+>> b/arch/arm64/kernel/image-vars.h
+>> index 5e4dc72ab1bd..a451e4f10804 100644
+>> --- a/arch/arm64/kernel/image-vars.h
+>> +++ b/arch/arm64/kernel/image-vars.h
+>> @@ -59,6 +59,7 @@ KVM_NVHE_ALIAS(alt_cb_patch_nops);
+>>     /* Global kernel state accessed by nVHE hyp code. */
+>>   KVM_NVHE_ALIAS(kvm_vgic_global_state);
+>> +KVM_NVHE_ALIAS(kvm_guest_trfcr);
+>>     /* Kernel symbols used to call panic() from nVHE hyp code (via
+>> ERET). */
+>>   KVM_NVHE_ALIAS(nvhe_hyp_panic_handler);
+>> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+>> index 49a13e72ddd2..c8d936ce6e2b 100644
+>> --- a/arch/arm64/kvm/debug.c
+>> +++ b/arch/arm64/kvm/debug.c
+>> @@ -22,6 +22,7 @@
+>>                   DBG_MDSCR_MDE)
+>>     static DEFINE_PER_CPU(u64, mdcr_el2);
+>> +u64 ____cacheline_aligned kvm_guest_trfcr[NR_CPUS];
+>>     /*
+>>    * save/restore_guest_debug_regs
+>> @@ -359,3 +360,28 @@ void kvm_arch_vcpu_put_debug_state_flags(struct
+>> kvm_vcpu *vcpu)
+>>       vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+>>       vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
+>>   }
+>> +
+>> +/*
+>> + * Interface for the Coresight driver to use to set the value of the
+>> TRFCR
+>> + * register for the guest. This register controls the exclude
+>> settings for trace
+>> + * at different exception levels, and is used to honor the
+>> exclude_host and
+>> + * exclude_guest parameters from the Perf session.
+>> + *
+>> + * This will be used to later write TRFCR_EL1 on nVHE at guest
+>> switch. For VHE,
+>> + * the host trace is controlled by TRFCR_EL2 and thus we can write to
+>> the
+>> + * TRFCR_EL1 immediately. Because guest writes to the register are
+>> trapped, the
+>> + * value will persist and can't be modified. For pKVM,
+>> kvm_guest_trfcr can't
+>> + * be read by the hypervisor, so don't bother writing it.
+>> + */
+>> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest)
+>> +{
+>> +    if
+>> (WARN_ON_ONCE(!cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
+>> +                                   ID_AA64DFR0_EL1_TraceFilt_SHIFT)))
+>> +        return;
+>> +
+>> +    if (has_vhe())
+>> +        write_sysreg_s(trfcr_guest, SYS_TRFCR_EL12);
+>> +    else if (!is_protected_kvm_enabled())
+>> +        kvm_guest_trfcr[smp_processor_id()] = trfcr_guest;
+> 
+> smp_processor_id() could sleep in some configurations ? Should we switch
+> to raw_smp_processor_id() to be safer ?
+> 
 
+I don't think so, it's #defined to raw_smp_processor_id() anyway. Unless
+DEBUG_PREEMPT is on, then it's still raw_smp_processor_id() but it
+validates that preemption is disabled so the value isn't stale.
+
+We actually want that validation, so should leave it as
+smp_processor_id(). I can add a comment saying that this function should
+only be called with preemption disabled, but I wouldn't add any extra
+validation. Every smp_processor_id() call is already checked when
+DEBUG_PREEMPT is on and this one doesn't seem to be special in any way.
+
+I also checked that the warning isn't triggered with DEBUG_PREEMPT on,
+and there are also a lot of other smp_processor_id() calls on similar
+paths in the Coresight driver.
+
+> Otherwise looks good to me.
+> 
+> Suzuki
+> 
+>> +}
+>> +EXPORT_SYMBOL_GPL(kvm_etm_set_guest_trfcr);
+> 
