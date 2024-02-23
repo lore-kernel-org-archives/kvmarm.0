@@ -1,144 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914972E3EB;
-	Fri, 23 Feb 2024 17:07:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAFF913F017
+	for <kvmarm@lists.linux.dev>; Fri, 23 Feb 2024 17:36:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708708051; cv=none; b=lt05ypba2S6MV7mARYEDE3qHrCa03j23Z6ejakNdV0kVw+K8/keot2G/59p1iG2/GoWBhNQnpXqCraAzsjRYYMBUg5hQRERf4uRpZhx7M010mQ5oambGXJW/6vb+9D+pZOmTFNcsqG0De/LClnQHDLNuWk+IeI1kHU1tS7dQzp4=
+	t=1708709820; cv=none; b=Rk7qvElz0FcJxnC991owkWCafYByVhZqWTGojc54fOp3CUiErCEDyxPYlzppu5Tb36mz+ucm51p3m/McKP3+7f/S+Pvx6xbdK5RnZBid8sJrv6nrjsJ+DYvV5s4u4s6sXCG2ODcHKYDMa2lXUpJntwQQjXEAELbxNH+ebVEhBJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708708051; c=relaxed/simple;
-	bh=6O1eMZbVgw3dOMVLlXiV+gwVN4SvOehqC98EVTWNLHE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oRV3hKVC3kZFVOE1+AF1UHhEt0gYADn5CU2PXQGMTr4YAd6eP8QkS0qtjqfSElP30ohvyH28hx3k0ybDn+Dw8Y90/aSBdglcYaBHxcXDFQHEK29XCSoAExqzYPAAdE82ThjTexL2X7xpD/2M4L/WBC3P011RzFhJtPTkVLKNggU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r2j2ss7E; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708709820; c=relaxed/simple;
+	bh=mPq99SHVDAlyu/Lw6k/HCBY8a5P8RgeYGBIuIYVU8jU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=VzduhiXoJZ5eCAlJ/KuqFbYlDeZfLBrtBtfRq7VvYmTaoKBv8TKm9QzwE4noUaIHuHw20Q2CU1VlJlWei1ybYhy0EUSANnck18o+AqSFh6J61Df/bRX/rtIcRN9/2GSdtSBEyNCatlGmgx4FmNn2u6QLTJVSiQ+XOnYfjG7WJO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nlKQ98pO; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r2j2ss7E"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6048DC433F1;
-	Fri, 23 Feb 2024 17:07:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708708051;
-	bh=6O1eMZbVgw3dOMVLlXiV+gwVN4SvOehqC98EVTWNLHE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=r2j2ss7EHgRl7YB5/iFJFuOP9o7G4SSMGFqDDXddcYEjtHlmJISDa2qC0/nQxdDg1
-	 JvV02hbCtKtCAeqULd+0UEucfVmCQl1Q+sbk45UPFigsa627OrroqaIzeBJTKs946W
-	 /WTNF+NAOIaVuj4kVBvPlE9OFFndl4dG7gX9nTlC1Y5Cf2/+sVsJYE0t1/s74O0rnl
-	 E3UhoGhdeGBMumK1ihaQokJqj60KNqPbHiBIulXaKoqV+XB3fYLQhRhe2L9SxSQSuC
-	 Ngrmb5jP1co6zWwFwRagrp6MBPj+8QOXw1gge80BGbX/5Jm+4bQ5590FCKw4KM9JU+
-	 fng3SLZ+mLnYA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rdZ1E-006AIj-Tv;
-	Fri, 23 Feb 2024 17:07:29 +0000
-Date: Fri, 23 Feb 2024 17:07:28 +0000
-Message-ID: <86il2f2jov.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: <ankita@nvidia.com>
-Cc: <jgg@nvidia.com>,
-	<oliver.upton@linux.dev>,
-	<james.morse@arm.com>,
-	<suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>,
-	<reinette.chatre@intel.com>,
-	<surenb@google.com>,
-	<stefanha@redhat.com>,
-	<brauner@kernel.org>,
-	<catalin.marinas@arm.com>,
-	<will@kernel.org>,
-	<mark.rutland@arm.com>,
-	<alex.williamson@redhat.com>,
-	<kevin.tian@intel.com>,
-	<yi.l.liu@intel.com>,
-	<ardb@kernel.org>,
-	<akpm@linux-foundation.org>,
-	<andreyknvl@gmail.com>,
-	<wangjinchao@xfusion.com>,
-	<gshan@redhat.com>,
-	<shahuang@redhat.com>,
-	<ricarkol@google.com>,
-	<linux-mm@kvack.org>,
-	<lpieralisi@kernel.org>,
-	<rananta@google.com>,
-	<ryan.roberts@arm.com>,
-	<david@redhat.com>,
-	<linus.walleij@linaro.org>,
-	<bhe@redhat.com>,
-	<aniketa@nvidia.com>,
-	<cjia@nvidia.com>,
-	<kwankhede@nvidia.com>,
-	<targupta@nvidia.com>,
-	<vsethi@nvidia.com>,
-	<acurrid@nvidia.com>,
-	<apopple@nvidia.com>,
-	<jhubbard@nvidia.com>,
-	<danw@nvidia.com>,
-	<kvmarm@lists.linux.dev>,
-	<mochs@nvidia.com>,
-	<zhiw@nvidia.com>,
-	<kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v8 3/4] kvm: arm64: set io memory s2 pte as normalnc for vfio pci device
-In-Reply-To: <20240220072926.6466-4-ankita@nvidia.com>
-References: <20240220072926.6466-1-ankita@nvidia.com>
-	<20240220072926.6466-4-ankita@nvidia.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nlKQ98pO"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbf216080f5so1758816276.1
+        for <kvmarm@lists.linux.dev>; Fri, 23 Feb 2024 09:36:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708709818; x=1709314618; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vQFkD/yeaXafYTambjNc8nGAaM5dCANMqU9RXbu0aLA=;
+        b=nlKQ98pO+4639zvSpowPTyZNRKD1xC+HdEMEL8cNEliZ8LwQ0ybCqPq0FX6mpvdN2g
+         7CaX7zFo53kaAlVNKBID/8iP4dmOK55JRIQS3RlJLEopk7Ixao1iD5dUA6E5ps+xQ1N7
+         IqfeHK2CAgTp+wN2EmZFpRUYU+iyA3nr+73Pq6rzrUdg8gLZ5AGvF5PJ977P4ewWa3md
+         yTcGU/595u+KLbgokxqOsQUp5zYrZkSsX/nHdjQBeJdXIWmKL/tbauGxtMDzxAwZ/n/7
+         KtLL/5YDSKkFFe/6G4t6XhF/N+09WfuG2dpF9sk3yKMTfHoJ3Tmr8iU1ubMQTnbrybl/
+         r7ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708709818; x=1709314618;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vQFkD/yeaXafYTambjNc8nGAaM5dCANMqU9RXbu0aLA=;
+        b=lpRVP/cIAWCTS6dKEOghTJfHg6WcBux5J6zLypj7ybiI7aMKyo+b3UH8fED/lQWV6j
+         RVwALBpXXt6SShrOAQ/FfoaTYEVAqiNbAKrtjAnukv18QBb1dBeYGo8slx/4HGSRlrOW
+         BK945/no6NPxKTQKDqtUoUiRF/NV5mDbwA3oWPaxCASz2tLG3CXEOGxq9pWsC+uiWkAq
+         kGNF6SWf3NVV0rLdWsWlZic6fOZiiZWCbDCW2ZDmqObB8ppAK3kkQYIIFPcMPUOO8U5w
+         EswyUR/L2Lra32NIwKZ7FQ2vAcxI5sAmqwukRPWiS6OIes+214Tu3ahilYxkxUii5Erv
+         ZYLg==
+X-Forwarded-Encrypted: i=1; AJvYcCVmobSJFY2lhtI2G+noBgvH3H7AoB/TZlR4Xr7yPqnH+FTuKuv/Iy7PLCnNe43Lbu631FaNtJnWHQ2jGRmNT3Nky6t0ZZ9c
+X-Gm-Message-State: AOJu0YwS8nqT0NXW9ENMudcYgxpAyQJ6h2+zhddkABk2DmnDTPNSDrdQ
+	6fNMCyNCE5Lg9LVRhJ513wAkHmicca5BMe5tEmUukQMfBlYS4uwY3mQOt6ZrMnvutZ0kMOCdqkS
+	wuw==
+X-Google-Smtp-Source: AGHT+IF6qHLLb++rm38SnHHY1oMkxzeH9qs55zcOOM7YnS3PnobaoRSUe6xFvYZWf184A1ED5DElZhno5QQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:ad9a:0:b0:dc2:550b:a4f4 with SMTP id
+ z26-20020a25ad9a000000b00dc2550ba4f4mr124968ybi.1.1708709817812; Fri, 23 Feb
+ 2024 09:36:57 -0800 (PST)
+Date: Fri, 23 Feb 2024 09:36:56 -0800
+In-Reply-To: <20240221072528.2702048-10-stevensd@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ankita@nvidia.com, jgg@nvidia.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, reinette.chatre@intel.com, surenb@google.com, stefanha@redhat.com, brauner@kernel.org, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, alex.williamson@redhat.com, kevin.tian@intel.com, yi.l.liu@intel.com, ardb@kernel.org, akpm@linux-foundation.org, andreyknvl@gmail.com, wangjinchao@xfusion.com, gshan@redhat.com, shahuang@redhat.com, ricarkol@google.com, linux-mm@kvack.org, lpieralisi@kernel.org, rananta@google.com, ryan.roberts@arm.com, david@redhat.com, linus.walleij@linaro.org, bhe@redhat.com, aniketa@nvidia.com, cjia@nvidia.com, kwankhede@nvidia.com, targupta@nvidia.com, vsethi@nvidia.com, acurrid@nvidia.com, apopple@nvidia.com, jhubbard@nvidia.com, danw@nvidia.com, kvmarm@lists.linux.dev, mochs@nvidia.com, zhiw@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20240221072528.2702048-1-stevensd@google.com> <20240221072528.2702048-10-stevensd@google.com>
+Message-ID: <ZdjXuH4jBaAZCrgy@google.com>
+Subject: Re: [PATCH v10 7/8] KVM: x86/mmu: Track if sptes refer to refcounted pages
+From: Sean Christopherson <seanjc@google.com>
+To: David Stevens <stevensd@chromium.org>
+Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	Zhi Wang <zhi.wang.linux@gmail.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 20 Feb 2024 07:29:25 +0000,
-<ankita@nvidia.com> wrote:
-> 
-> From: Ankit Agrawal <ankita@nvidia.com>
-> 
-> To provide VM with the ability to get device IO memory with NormalNC
-> property, map device MMIO in KVM for ARM64 at stage2 as NormalNC.
-> Having NormalNC S2 default puts guests in control (based on [1],
-> "Combining stage 1 and stage 2 memory type attributes") of device
-> MMIO regions memory mappings. The rules are summarized below:
-> ([(S1) - stage1], [(S2) - stage 2])
-> 
-> S1           |  S2           | Result
-> NORMAL-WB    |  NORMAL-NC    | NORMAL-NC
-> NORMAL-WT    |  NORMAL-NC    | NORMAL-NC
-> NORMAL-NC    |  NORMAL-NC    | NORMAL-NC
-> DEVICE<attr> |  NORMAL-NC    | DEVICE<attr>
-> 
-> Still this cannot be generalized to non PCI devices such as GICv2.
-> There is insufficient information and uncertainity in the behavior
-> of non PCI driver. A driver must indicate support using the
-> new flag VM_ALLOW_ANY_UNCACHED.
-> 
-> Adapt KVM to make use of the flag VM_ALLOW_ANY_UNCACHED as indicator to
-> activate the S2 setting to NormalNc.
-> 
-> [1] section D8.5.5 of DDI0487J_a_a-profile_architecture_reference_manual.pdf
-> 
-> Suggested-by: Catalin Marinas <catalin.marinas@arm.com>
-> Acked-by: Jason Gunthorpe <jgg@nvidia.com>
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+On Wed, Feb 21, 2024, David Stevens wrote:
+> + * Extra bits are only available for TDP SPTEs, since bits 62:52 are reserved
+> + * for PAE paging, including NPT PAE. When a tracking bit isn't available, we
+> + * will reject mapping non-refcounted struct pages.
+> + */
+> +static inline bool spte_has_refcount_bit(void)
+> +{
+> +	return tdp_enabled && IS_ENABLED(CONFIG_X86_64);
+> +}
+> +
+> +static inline bool is_refcounted_page_spte(u64 spte)
+> +{
+> +	return !spte_has_refcount_bit() || (spte & SPTE_MMU_PAGE_REFCOUNTED);
 
-Since people have asked for various commit message updates, I'll add
-my own: for the KVM/arm64 tree, the convention for the subject line is
-"KVM: arm64: Something starting with a capital".
+The preferred way to handle this in KVM's MMU is to use a global variable, e.g.
 
-Thanks,
+  extern u64 __read_mostly shadow_refcounted_mask;
 
-	M.
+that avoids conditional branches when creating SPTEs, and arguably yields slightly
+more readable code, e.g.
 
--- 
-Without deviation from the norm, progress is not possible.
+	return !shadow_refcounted_mask || (spte & shadow_refcounted_mask);
