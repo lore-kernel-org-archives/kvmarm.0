@@ -1,65 +1,25 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30DB012E6C
-	for <kvmarm@lists.linux.dev>; Fri, 23 Feb 2024 07:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E86911171E
+	for <kvmarm@lists.linux.dev>; Fri, 23 Feb 2024 07:28:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708671992; cv=none; b=W8AQRR76E3/8MKNdMJYO0W9hoO+2iQrglRHKam3XU/Ui859nMjwQbqJNLv/MFmM5r9YiRNlQ6AuSqD8Ifrvn1E9EUBMgtQQd9/kmcXCuW2B/mkM6OcS8UsHIiNkMaBa1dKazbewmKpta2XqeB+kNQdETJKzs0ZtrTybATCfVeCE=
+	t=1708673340; cv=none; b=EL2AWqDHSMjKvKsFo6iovd0hJUXEbzrGsGfMRhZKrxXNsbImJ6KFwC+0cI0aGg7CXH6ntk5W2uxVsGcS5HN+p7+zYhTM/Kld74QIEULypmrF3HyjnvcgLoafY5hvkJHJ770UnG1Yrixm1yfLzHiUN8b3R2mYjXQA5TWbIzAO5To=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708671992; c=relaxed/simple;
-	bh=pmhSqQma4mPAwB5S2erYwmJatbkcNNUJOPrvTZJemDE=;
+	s=arc-20240116; t=1708673340; c=relaxed/simple;
+	bh=1Yw4zzTDpL3qzqwnEAoUe0ALDjWjHg54HlZC8ZSIJRU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FbqhcTNKGiBv4tagc3eE5Sq/Sc7hwZ8p41u/YXTovujohPpGc5GrNb2gfing68nxa00FAoJNbRUmjwjDJTX7NAC9w/VddndiR2rZzVUt9L5UEIrF2nWg/nocWTooBkh0S0PAPbt6lT8eTVZORfLDp8BPphNGugH/FqdzDUT/vxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WdyaApC6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WdyaApC6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708671990;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=BRHsJbNJikGXBIx8gHv6naumiMpOU3Z17cOC43xcz8U=;
-	b=WdyaApC63lPTEYPRSnIg+6e2ndBdxbxjBRC0+PO1xOFrhKN9e8jS3CEFurv69mB4uRQeL4
-	cgcXrL4N54skNSGCX6HTT5Dy5sVRji4nDXzVSsCfFS1wxy9HlvWWMxBkryp6i3HpSQsUkj
-	deGIoxAnWhqPjEkfMJrswf3URVt43kA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-523-eUcLUPCdOqObo7AhAW_8yQ-1; Fri, 23 Feb 2024 02:06:26 -0500
-X-MC-Unique: eUcLUPCdOqObo7AhAW_8yQ-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33d5aee5f0dso171802f8f.1
-        for <kvmarm@lists.linux.dev>; Thu, 22 Feb 2024 23:06:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708671985; x=1709276785;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BRHsJbNJikGXBIx8gHv6naumiMpOU3Z17cOC43xcz8U=;
-        b=QEHrDyWl3wp80ui8JyY5ddNp9X57iM0j5YF4SQX1zrFlTQy2zpIGoi13XXuqPjoFz/
-         nNT2q1qXLMuYybkvBbhc6we0JhGrAAMYIIeGgdW0wqCSI5jfpqeXnrpkANiyr5T/R2Md
-         4mNAiYYk04Gfk33LvynAkAOYQ3yjYpVPrzbwr7uuPILKyfIQMhLZVDPBadXRDlDDl+/R
-         EYwrQz1ue2y9LMoE5zPVM+xnJ4jfL+JfZV7A4AI6qIqtUZuFm1v/G/G9ILa31mCN4Zx+
-         GfGOJ5Q7blbjKG383nyxXi+X7l0Wt9numhmcwhQN5sCFNZuQknk0dEjfh1TUErVFALG7
-         HcKg==
-X-Forwarded-Encrypted: i=1; AJvYcCUjjByusGiJN02jQdXUB9kJi/ND+Ixt9x9NDhkbmfj6z/BVlBU8nOh5MnF/Stz2TdUg+ASZY8IkWDoE1xWMZ6HdKLaPTy07
-X-Gm-Message-State: AOJu0YyZeJhfauSCk7SPdWBt44qievzNjcQRZuL3W+iQRZ5ihE81WYJw
-	Ma4PijWJcrPTIRwQRrPENyDQqBZpaPpBjWGjnPykB5Vgtst15Dse81wEf/Iy2QN5mJ2GEE9E9Qb
-	E6NSpV8y4Bb1ozvXDK33iy0NFjmiAloM0UJzzRdGdRFIjVJa3rRT8nQ==
-X-Received: by 2002:adf:db46:0:b0:33d:1d94:cd58 with SMTP id f6-20020adfdb46000000b0033d1d94cd58mr755804wrj.31.1708671984942;
-        Thu, 22 Feb 2024 23:06:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHvalV/mlPmxxuta0pv2rPSMKjBHyQZ4hLhmTogmzrMTWSxsy7nviVQ+FZm/pm87v/fSkTEWw==
-X-Received: by 2002:adf:db46:0:b0:33d:1d94:cd58 with SMTP id f6-20020adfdb46000000b0033d1d94cd58mr755780wrj.31.1708671984569;
-        Thu, 22 Feb 2024 23:06:24 -0800 (PST)
-Received: from [192.168.0.9] (ip-109-43-178-100.web.vodafone.de. [109.43.178.100])
-        by smtp.gmail.com with ESMTPSA id bx9-20020a5d5b09000000b0033d568f8310sm1655586wrb.89.2024.02.22.23.06.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Feb 2024 23:06:24 -0800 (PST)
-Message-ID: <5383a1b2-20ca-4d07-9729-e9d5115948dc@redhat.com>
-Date: Fri, 23 Feb 2024 08:06:21 +0100
+	 In-Reply-To:Content-Type; b=IBqq++fGrhLb996OyFEIhVMP1Q+vd3M++MQxlgj9Y0YMxBb2kQQiCBSlk5V8U1E5VSCoD37vJgaB7xvaMzH16sOje13Se3s0zI23jcRfOhq35JliGg5fFheh/wDG6t+S2O2tga2nBJ9KZXUXvJQTpxd/zvLuV7/WKg7S28fYQr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E77961650;
+	Thu, 22 Feb 2024 23:29:34 -0800 (PST)
+Received: from [10.163.46.223] (unknown [10.163.46.223])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F220A3F73F;
+	Thu, 22 Feb 2024 23:28:50 -0800 (PST)
+Message-ID: <ab50e67e-3d06-4ba7-a5f8-4684e9ef98a4@arm.com>
+Date: Fri, 23 Feb 2024 12:58:48 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,90 +27,190 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v5 0/8] Multi-migration support
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
- Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
- Nico Boehr <nrb@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Eric Auger <eric.auger@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Marc Hartmayer
- <mhartmay@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
- linux-s390@vger.kernel.org, kvmarm@lists.linux.dev,
- kvm-riscv@lists.infradead.org
-References: <20240221032757.454524-1-npiggin@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <20240221032757.454524-1-npiggin@gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+Subject: Re: [PATCH V16 2/8] KVM: arm64: Prevent guest accesses into BRBE
+ system registers/instructions
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, Mark Brown <broonie@kernel.org>,
+ James Clark <james.clark@arm.com>, Rob Herring <robh@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Suzuki Poulose <suzuki.poulose@arm.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ linux-perf-users@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev
+References: <20240125094119.2542332-1-anshuman.khandual@arm.com>
+ <20240125094119.2542332-3-anshuman.khandual@arm.com>
+ <ZdYCUi9YVDNDz7fr@FVFF77S0Q05N>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <ZdYCUi9YVDNDz7fr@FVFF77S0Q05N>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 21/02/2024 04.27, Nicholas Piggin wrote:
-> Now that strange arm64 hang is found to be QEMU bug, I'll repost.
-> Since arm64 requires Thomas's uart patch and it is worse affected
-> by the QEMU bug, I will just not build it on arm. The QEMU bug
-> still affects powerpc (and presumably s390x) but it's not causing
-> so much trouble for this test case.
+
+
+On 2/21/24 19:31, Mark Rutland wrote:
+> On Thu, Jan 25, 2024 at 03:11:13PM +0530, Anshuman Khandual wrote:
+>> Currently BRBE feature is not supported in a guest environment. This hides
+>> BRBE feature availability via masking ID_AA64DFR0_EL1.BRBE field.
 > 
-> I have another test case that can hit it reliably and doesn't
-> cause crashes but that takes some harness and common lib work so
-> I'll send that another time.
+> Does that means that a guest can currently see BRBE advertised in the
+> ID_AA64DFR0_EL1.BRB field, or is that hidden by the regular cpufeature code
+> today?
+
+IIRC it is hidden, but will have to double check. When experimenting for BRBE
+guest support enablement earlier, following changes were need for the feature
+to be visible in ID_AA64DFR0_EL1.
+
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 646591c67e7a..f258568535a8 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -445,6 +445,7 @@ static const struct arm64_ftr_bits ftr_id_mmfr0[] = {
+ };
+ 
+ static const struct arm64_ftr_bits ftr_id_aa64dfr0[] = {
++       S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_BRBE_SHIFT, 4, ID_AA64DFR0_EL1_BRBE_IMP),
+        S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_DoubleLock_SHIFT, 4, 0),
+        ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_PMSVer_SHIFT, 4, 0),
+        ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_CTX_CMPs_SHIFT, 4, 0),
+
+Should we add the following entry - explicitly hiding BRBE from the guest
+as a prerequisite patch ?
+
+S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_BRBE_SHIFT, 4, ID_AA64DFR0_EL1_BRBE_NI)
+
 > 
-> Since v4:
-> - Don't build selftest-migration on arm.
-> - Reduce selftest-migration iterations from 100 to 30 to make the
->    test run faster (it's ~0.5s per migration).
+>> This also blocks guest accesses into BRBE system registers and instructions
+>> as if the underlying hardware never implemented FEAT_BRBE feature.
+>>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: Oliver Upton <oliver.upton@linux.dev>
+>> Cc: James Morse <james.morse@arm.com>
+>> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: kvmarm@lists.linux.dev
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> Cc: linux-kernel@vger.kernel.org
+>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>> ---
+>> Changes in V16:
+>>
+>> - Added BRB_INF_SRC_TGT_EL1 macro for corresponding BRB_[INF|SRC|TGT] expansion
+>>
+>>  arch/arm64/kvm/sys_regs.c | 56 +++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 56 insertions(+)
+>>
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index 30253bd19917..6a06dc2f0c06 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -1304,6 +1304,11 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+>>  	return 0;
+>>  }
+>>  
+>> +#define BRB_INF_SRC_TGT_EL1(n)					\
+>> +	{ SYS_DESC(SYS_BRBINF##n##_EL1), undef_access },	\
+>> +	{ SYS_DESC(SYS_BRBSRC##n##_EL1), undef_access },	\
+>> +	{ SYS_DESC(SYS_BRBTGT##n##_EL1), undef_access }		\
+> 
+> With the changes suggested on the previous patch, this would need to change to be:
+> 
+> 	#define BRB_INF_SRC_TGT_EL1(n)					\
+> 		{ SYS_DESC(SYS_BRBINF_EL1(n)), undef_access },	\
+> 		{ SYS_DESC(SYS_BRBSRC_EL1(n)), undef_access },	\
+> 		{ SYS_DESC(SYS_BRBTGT_EL1(n)), undef_access }	\
 
-Thanks, I think the series is ready to go now ... we just have to wait for 
-your QEMU TCG migration fix to get merged first. Or should we maybe mark the 
-selftest-migration with "accel = kvm" for now and remove that line later 
-once QEMU has been fixed?
+Sure, already folded back in these above changes.
 
-  Thomas
+> 
+> 
+> ... which would also be easier for backporting (if necessary), since those
+> definitions have existed for a while.
+> 
+> Otherwise (modulo Suzuki's comment about rebasing), this looks good to me.
 
+Okay.
 
+> 
+> Mark.
+> 
+>>  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+>>  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+>>  	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
+>> @@ -1707,6 +1712,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+>>  	/* Hide SPE from guests */
+>>  	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
+>>  
+>> +	/* Hide BRBE from guests */
+>> +	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
+>> +
+>>  	return val;
+>>  }
+>>  
+>> @@ -2195,6 +2203,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>>  	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
+>>  	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
+>>  	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
+>> +	{ SYS_DESC(OP_BRB_IALL), undef_access },
+>> +	{ SYS_DESC(OP_BRB_INJ), undef_access },
+>>  
+>>  	DBG_BCR_BVR_WCR_WVR_EL1(0),
+>>  	DBG_BCR_BVR_WCR_WVR_EL1(1),
+>> @@ -2225,6 +2235,52 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>>  	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
+>>  	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
+>>  
+>> +	/*
+>> +	 * BRBE branch record sysreg address space is interleaved between
+>> +	 * corresponding BRBINF<N>_EL1, BRBSRC<N>_EL1, and BRBTGT<N>_EL1.
+>> +	 */
+>> +	BRB_INF_SRC_TGT_EL1(0),
+>> +	BRB_INF_SRC_TGT_EL1(16),
+>> +	BRB_INF_SRC_TGT_EL1(1),
+>> +	BRB_INF_SRC_TGT_EL1(17),
+>> +	BRB_INF_SRC_TGT_EL1(2),
+>> +	BRB_INF_SRC_TGT_EL1(18),
+>> +	BRB_INF_SRC_TGT_EL1(3),
+>> +	BRB_INF_SRC_TGT_EL1(19),
+>> +	BRB_INF_SRC_TGT_EL1(4),
+>> +	BRB_INF_SRC_TGT_EL1(20),
+>> +	BRB_INF_SRC_TGT_EL1(5),
+>> +	BRB_INF_SRC_TGT_EL1(21),
+>> +	BRB_INF_SRC_TGT_EL1(6),
+>> +	BRB_INF_SRC_TGT_EL1(22),
+>> +	BRB_INF_SRC_TGT_EL1(7),
+>> +	BRB_INF_SRC_TGT_EL1(23),
+>> +	BRB_INF_SRC_TGT_EL1(8),
+>> +	BRB_INF_SRC_TGT_EL1(24),
+>> +	BRB_INF_SRC_TGT_EL1(9),
+>> +	BRB_INF_SRC_TGT_EL1(25),
+>> +	BRB_INF_SRC_TGT_EL1(10),
+>> +	BRB_INF_SRC_TGT_EL1(26),
+>> +	BRB_INF_SRC_TGT_EL1(11),
+>> +	BRB_INF_SRC_TGT_EL1(27),
+>> +	BRB_INF_SRC_TGT_EL1(12),
+>> +	BRB_INF_SRC_TGT_EL1(28),
+>> +	BRB_INF_SRC_TGT_EL1(13),
+>> +	BRB_INF_SRC_TGT_EL1(29),
+>> +	BRB_INF_SRC_TGT_EL1(14),
+>> +	BRB_INF_SRC_TGT_EL1(30),
+>> +	BRB_INF_SRC_TGT_EL1(15),
+>> +	BRB_INF_SRC_TGT_EL1(31),
+>> +
+>> +	/* Remaining BRBE sysreg addresses space */
+>> +	{ SYS_DESC(SYS_BRBCR_EL1), undef_access },
+>> +	{ SYS_DESC(SYS_BRBFCR_EL1), undef_access },
+>> +	{ SYS_DESC(SYS_BRBTS_EL1), undef_access },
+>> +	{ SYS_DESC(SYS_BRBINFINJ_EL1), undef_access },
+>> +	{ SYS_DESC(SYS_BRBSRCINJ_EL1), undef_access },
+>> +	{ SYS_DESC(SYS_BRBTGTINJ_EL1), undef_access },
+>> +	{ SYS_DESC(SYS_BRBIDR0_EL1), undef_access },
+>> +
+>>  	{ SYS_DESC(SYS_MDCCSR_EL0), trap_raz_wi },
+>>  	{ SYS_DESC(SYS_DBGDTR_EL0), trap_raz_wi },
+>>  	// DBGDTR[TR]X_EL0 share the same encoding
+>> -- 
+>> 2.25.1
+>>
