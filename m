@@ -1,166 +1,264 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A8D229D08
-	for <kvmarm@lists.linux.dev>; Fri, 23 Feb 2024 10:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3329E250E2;
+	Fri, 23 Feb 2024 11:07:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708682619; cv=none; b=S94A4QqBGzb5lwo9g9MU79QjwGXTrSGWvzw165sWY3gNsoHTTWrNAEFAMs14nxADTbPyYcNzsCvX80TSXkISlNS1m8vNlIkv2sHmZYWNauzJVCeV0YrOvvTi1PW+ou8nltliQKIgRn+h8wwEYQKOpBe8i9SCtkvo7xgn6DxyTkY=
+	t=1708686426; cv=none; b=pM5etq6Sr8d3aw3iB/rcpv0d7BWoecKFWS34gKsp5WEzt/fclxqMrY6PqOJyWFyrSePKlO8JSB57qdA+/lK0xwwr7yTT/h5e4Er9StCI4Jza/aAxZPqzV1jOpeZyUkaH85EBEozqQsswi8nK1cGlfhhLYrhYvDd+s4OhedzMk6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708682619; c=relaxed/simple;
-	bh=uOF3gI3G9fZbRBVQZTQCCASCzYUaJzA1K5zrl26Opuo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kyu0b9tezShE+IxtAcNCkhdhdv7LyCiJgiadd7AYvWmRdW7xmHNwiuc45PJpQvpj60CYONgDFvN+MUXFtvqSfAqwgKye+VUazvt1EN4T84CZnqjF5qVGO6Cwc7qtJ+S3IzNXbJvhi88nqUKF/5SrUWM1YFJ2jmo49lo0ptAZk4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E90621596;
-	Fri, 23 Feb 2024 02:04:15 -0800 (PST)
-Received: from [10.57.11.12] (unknown [10.57.11.12])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 13E153F766;
-	Fri, 23 Feb 2024 02:03:33 -0800 (PST)
-Message-ID: <c8819064-13c3-41c6-8b2e-779ef8a22ee8@arm.com>
-Date: Fri, 23 Feb 2024 10:03:32 +0000
+	s=arc-20240116; t=1708686426; c=relaxed/simple;
+	bh=Zlm5d+QOs/dktmMB+z0HKv98GRZBJLPrBX3i8rbARso=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KJq7sIcMdK5z9iasMvSnOTUGp5JL97zTHk2q2/+eDoENelNAdXNFiVdIHRCHko5Ac9oBYQgmj9z79T+fQQsRZKPgutN685QXm1Ph+ztuHyW7aKXzzkCWGcwaKryvzgoTc1Ne/OXqbHWgRFhClWZcihtbBUdieczeqMqh4RPlywg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YAY3CJ5b; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YAY3CJ5b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 801FEC433F1;
+	Fri, 23 Feb 2024 11:07:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708686425;
+	bh=Zlm5d+QOs/dktmMB+z0HKv98GRZBJLPrBX3i8rbARso=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YAY3CJ5bB/KTy3+uDviC3rtHYpB5iZfKlvwFkPvcAsCbAFqyHYEYXThiV5Q5CMHhU
+	 j5a/GSSWxeub66LHvHTcWC1N3NXCWGn20UypDl00hL9UgnGxrInbr2ZidAuHyeXeqw
+	 xNAIC7vv+mTbC2hJfCSPozSvRc8xsz+XBtiFHtfBemd0JweUDx4bd9K2ICMO+ej5Mm
+	 HrLtBXBI/SnCHRRpmQAS8LrnLY+D7Mkl6kav5DgOjqhO8Gnt4Cb/39B49kgjdGrTD5
+	 RZPw6nxk2uPRXpZd7t8Hmui1cIq3Hpf5kVfj9qHwZr5TLhQ7QeB1lOYg2KY9kGFN+p
+	 uf98LxxIE3b2w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rdTOQ-0063wt-P7;
+	Fri, 23 Feb 2024 11:07:03 +0000
+Date: Fri, 23 Feb 2024 11:07:02 +0000
+Message-ID: <86r0h330dl.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Dave Martin <dave.martin@arm.com>,
+	kvmarm@lists.linux.dev,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v4 03/14] arm64/fpsimd: Support FEAT_FPMR
+In-Reply-To: <20240122-arm64-2023-dpisa-v4-3-776e094861df@kernel.org>
+References: <20240122-arm64-2023-dpisa-v4-0-776e094861df@kernel.org>
+	<20240122-arm64-2023-dpisa-v4-3-776e094861df@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 5/7] arm64: KVM: Add interface to set guest value for
- TRFCR register
-To: James Clark <james.clark@arm.com>, coresight@lists.linaro.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- maz@kernel.org, acme@kernel.org, oliver.upton@linux.dev, broonie@kernel.org
-Cc: James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Mike Leach <mike.leach@linaro.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>,
- Miguel Luis <miguel.luis@oracle.com>, Joey Gouly <joey.gouly@arm.com>,
- Ard Biesheuvel <ardb@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Arnd Bergmann <arnd@arndb.de>, Helge Deller <deller@gmx.de>,
- Andrew Walbran <qwandor@google.com>,
- Vincent Donnefort <vdonnefort@google.com>,
- Ryan Roberts <ryan.roberts@arm.com>, Fuad Tabba <tabba@google.com>,
- Jing Zhang <jingzhangos@google.com>, linux-kernel@vger.kernel.org
-References: <20240220100924.2761706-1-james.clark@arm.com>
- <20240220100924.2761706-6-james.clark@arm.com>
-Content-Language: en-GB
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240220100924.2761706-6-james.clark@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, corbet@lwn.net, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, dave.martin@arm.com, kvmarm@lists.linux.dev, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 20/02/2024 10:09, James Clark wrote:
-> Add an interface for the Coresight driver to use to set the value of the
-> TRFCR register for the guest. This register controls the exclude
-> settings for trace at different exception levels, and is used to honor
-> the exclude_host and exclude_guest parameters from the Perf session.
-> This will be used to later write TRFCR_EL1 on nVHE at guest switch. For
-> VHE, the host trace is controlled by TRFCR_EL2 and thus we can write to
-> the TRFCR_EL1 immediately. Because guest writes to the register are
-> trapped, the value will persist and can't be modified.
+On Mon, 22 Jan 2024 16:28:06 +0000,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> Instead of adding a load of infrastructure to share the host's per-cpu
-> offsets with the hypervisor, just define the new storage as a NR_CPUS
-> array.
+> FEAT_FPMR defines a new EL0 accessible register FPMR use to configure the
+> FP8 related features added to the architecture at the same time. Detect
+> support for this register and context switch it for EL0 when present.
 > 
-> Signed-off-by: James Clark <james.clark@arm.com>
+> Due to the sharing of responsibility for saving floating point state
+> between the host kernel and KVM FP8 support is not yet implemented in KVM
+> and a stub similar to that used for SVCR is provided for FPMR in order to
+> avoid bisection issues. To make it easier to share host state with the
+> hypervisor we store FPMR as a hardened usercopy field in uw (along with
+> some padding).
+> 
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->   arch/arm64/include/asm/kvm_host.h |  3 +++
->   arch/arm64/kernel/image-vars.h    |  1 +
->   arch/arm64/kvm/debug.c            | 26 ++++++++++++++++++++++++++
->   3 files changed, 30 insertions(+)
+>  arch/arm64/include/asm/cpufeature.h |  5 +++++
+>  arch/arm64/include/asm/fpsimd.h     |  2 ++
+>  arch/arm64/include/asm/kvm_host.h   |  1 +
+>  arch/arm64/include/asm/processor.h  |  4 ++++
+>  arch/arm64/kernel/cpufeature.c      |  9 +++++++++
+>  arch/arm64/kernel/fpsimd.c          | 13 +++++++++++++
+>  arch/arm64/kvm/fpsimd.c             |  1 +
+>  arch/arm64/tools/cpucaps            |  1 +
+>  8 files changed, 36 insertions(+)
 > 
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index 21c824edf8ce..34fcdbc65d7d 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -768,6 +768,11 @@ static __always_inline bool system_supports_tpidr2(void)
+>  	return system_supports_sme();
+>  }
+>  
+> +static __always_inline bool system_supports_fpmr(void)
+> +{
+> +	return alternative_has_cap_unlikely(ARM64_HAS_FPMR);
+> +}
+> +
+>  static __always_inline bool system_supports_cnp(void)
+>  {
+>  	return alternative_has_cap_unlikely(ARM64_HAS_CNP);
+> diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+> index 50e5f25d3024..6cf72b0d2c04 100644
+> --- a/arch/arm64/include/asm/fpsimd.h
+> +++ b/arch/arm64/include/asm/fpsimd.h
+> @@ -89,6 +89,7 @@ struct cpu_fp_state {
+>  	void *sve_state;
+>  	void *sme_state;
+>  	u64 *svcr;
+> +	unsigned long *fpmr;
+>  	unsigned int sve_vl;
+>  	unsigned int sme_vl;
+>  	enum fp_type *fp_type;
+> @@ -154,6 +155,7 @@ extern void cpu_enable_sve(const struct arm64_cpu_capabilities *__unused);
+>  extern void cpu_enable_sme(const struct arm64_cpu_capabilities *__unused);
+>  extern void cpu_enable_sme2(const struct arm64_cpu_capabilities *__unused);
+>  extern void cpu_enable_fa64(const struct arm64_cpu_capabilities *__unused);
+> +extern void cpu_enable_fpmr(const struct arm64_cpu_capabilities *__unused);
+>  
+>  extern u64 read_smcr_features(void);
+>  
 > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 85b5477bd1b4..56b7f7eca195 100644
+> index 21c57b812569..7993694a54af 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -509,6 +509,7 @@ struct kvm_host_psci_config {
->   	bool psci_0_1_cpu_off_implemented;
->   	bool psci_0_1_migrate_implemented;
->   };
-> +extern u64 ____cacheline_aligned kvm_guest_trfcr[NR_CPUS];
->   
->   extern struct kvm_host_psci_config kvm_nvhe_sym(kvm_host_psci_config);
->   #define kvm_host_psci_config CHOOSE_NVHE_SYM(kvm_host_psci_config)
-> @@ -1174,6 +1175,7 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu);
->   void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
->   void kvm_clr_pmu_events(u32 clr);
->   bool kvm_set_pmuserenr(u64 val);
-> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest);
->   #else
->   static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
->   static inline void kvm_clr_pmu_events(u32 clr) {}
-> @@ -1181,6 +1183,7 @@ static inline bool kvm_set_pmuserenr(u64 val)
->   {
->   	return false;
->   }
-> +static inline void kvm_etm_set_guest_trfcr(u64 trfcr_guest) {}
->   #endif
->   
->   void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-> index 5e4dc72ab1bd..a451e4f10804 100644
-> --- a/arch/arm64/kernel/image-vars.h
-> +++ b/arch/arm64/kernel/image-vars.h
-> @@ -59,6 +59,7 @@ KVM_NVHE_ALIAS(alt_cb_patch_nops);
->   
->   /* Global kernel state accessed by nVHE hyp code. */
->   KVM_NVHE_ALIAS(kvm_vgic_global_state);
-> +KVM_NVHE_ALIAS(kvm_guest_trfcr);
->   
->   /* Kernel symbols used to call panic() from nVHE hyp code (via ERET). */
->   KVM_NVHE_ALIAS(nvhe_hyp_panic_handler);
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index 49a13e72ddd2..c8d936ce6e2b 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -22,6 +22,7 @@
->   				DBG_MDSCR_MDE)
->   
->   static DEFINE_PER_CPU(u64, mdcr_el2);
-> +u64 ____cacheline_aligned kvm_guest_trfcr[NR_CPUS];
->   
->   /*
->    * save/restore_guest_debug_regs
-> @@ -359,3 +360,28 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
->   	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
->   	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
->   }
+> @@ -543,6 +543,7 @@ struct kvm_vcpu_arch {
+>  	enum fp_type fp_type;
+>  	unsigned int sve_max_vl;
+>  	u64 svcr;
+> +	unsigned long fpmr;
+
+As this directly represents a register, I'd rather you use a type that
+represents the size of that register unambiguously (u64).
+
+>  
+>  	/* Stage 2 paging state used by the hardware on next switch */
+>  	struct kvm_s2_mmu *hw_mmu;
+> diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
+> index 5b0a04810b23..b453c66d3fae 100644
+> --- a/arch/arm64/include/asm/processor.h
+> +++ b/arch/arm64/include/asm/processor.h
+> @@ -155,6 +155,8 @@ struct thread_struct {
+>  	struct {
+>  		unsigned long	tp_value;	/* TLS register */
+>  		unsigned long	tp2_value;
+> +		unsigned long	fpmr;
+> +		unsigned long	pad;
+>  		struct user_fpsimd_state fpsimd_state;
+>  	} uw;
+>  
+> @@ -253,6 +255,8 @@ static inline void arch_thread_struct_whitelist(unsigned long *offset,
+>  	BUILD_BUG_ON(sizeof_field(struct thread_struct, uw) !=
+>  		     sizeof_field(struct thread_struct, uw.tp_value) +
+>  		     sizeof_field(struct thread_struct, uw.tp2_value) +
+> +		     sizeof_field(struct thread_struct, uw.fpmr) +
+> +		     sizeof_field(struct thread_struct, uw.pad) +
+>  		     sizeof_field(struct thread_struct, uw.fpsimd_state));
+>  
+>  	*offset = offsetof(struct thread_struct, uw);
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index eae59ec0f4b0..0263565f617a 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -272,6 +272,7 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr1[] = {
+>  };
+>  
+>  static const struct arm64_ftr_bits ftr_id_aa64pfr2[] = {
+> +	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR2_EL1_FPMR_SHIFT, 4, 0),
+>  	ARM64_FTR_END,
+>  };
+>  
+> @@ -2767,6 +2768,14 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+>  		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+>  		.matches = has_lpa2,
+>  	},
+> +	{
+> +		.desc = "FPMR",
+> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> +		.capability = ARM64_HAS_FPMR,
+> +		.matches = has_cpuid_feature,
+> +		.cpu_enable = cpu_enable_fpmr,
+> +		ARM64_CPUID_FIELDS(ID_AA64PFR2_EL1, FPMR, IMP)
+> +	},
+>  	{},
+>  };
+>  
+> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> index a5dc6f764195..8e24b5e5e192 100644
+> --- a/arch/arm64/kernel/fpsimd.c
+> +++ b/arch/arm64/kernel/fpsimd.c
+> @@ -359,6 +359,9 @@ static void task_fpsimd_load(void)
+>  	WARN_ON(preemptible());
+>  	WARN_ON(test_thread_flag(TIF_KERNEL_FPSTATE));
+>  
+> +	if (system_supports_fpmr())
+> +		write_sysreg_s(current->thread.uw.fpmr, SYS_FPMR);
 > +
-> +/*
-> + * Interface for the Coresight driver to use to set the value of the TRFCR
-> + * register for the guest. This register controls the exclude settings for trace
-> + * at different exception levels, and is used to honor the exclude_host and
-> + * exclude_guest parameters from the Perf session.
-> + *
-> + * This will be used to later write TRFCR_EL1 on nVHE at guest switch. For VHE,
-> + * the host trace is controlled by TRFCR_EL2 and thus we can write to the
-> + * TRFCR_EL1 immediately. Because guest writes to the register are trapped, the
-> + * value will persist and can't be modified. For pKVM, kvm_guest_trfcr can't
-> + * be read by the hypervisor, so don't bother writing it.
-> + */
-> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest)
+>  	if (system_supports_sve() || system_supports_sme()) {
+>  		switch (current->thread.fp_type) {
+>  		case FP_STATE_FPSIMD:
+> @@ -446,6 +449,9 @@ static void fpsimd_save_user_state(void)
+>  	if (test_thread_flag(TIF_FOREIGN_FPSTATE))
+>  		return;
+>  
+> +	if (system_supports_fpmr())
+> +		*(last->fpmr) = read_sysreg_s(SYS_FPMR);
+> +
+>  	/*
+>  	 * If a task is in a syscall the ABI allows us to only
+>  	 * preserve the state shared with FPSIMD so don't bother
+> @@ -688,6 +694,12 @@ static void sve_to_fpsimd(struct task_struct *task)
+>  	}
+>  }
+>  
+> +void cpu_enable_fpmr(const struct arm64_cpu_capabilities *__always_unused p)
 > +{
-> +	if (WARN_ON_ONCE(!cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
-> +							       ID_AA64DFR0_EL1_TraceFilt_SHIFT)))
-> +		return;
-> +
-> +	if (has_vhe())
-> +		write_sysreg_s(trfcr_guest, SYS_TRFCR_EL12);
-> +	else if (!is_protected_kvm_enabled())
-> +		kvm_guest_trfcr[smp_processor_id()] = trfcr_guest;
-
-smp_processor_id() could sleep in some configurations ? Should we switch 
-to raw_smp_processor_id() to be safer ?
-
-Otherwise looks good to me.
-
-Suzuki
-
+> +	write_sysreg_s(read_sysreg_s(SYS_SCTLR_EL1) | SCTLR_EL1_EnFPM_MASK,
+> +		       SYS_SCTLR_EL1);
 > +}
-> +EXPORT_SYMBOL_GPL(kvm_etm_set_guest_trfcr);
+> +
+>  #ifdef CONFIG_ARM64_SVE
+>  /*
+>   * Call __sve_free() directly only if you know task can't be scheduled
+> @@ -1680,6 +1692,7 @@ static void fpsimd_bind_task_to_cpu(void)
+>  	last->sve_vl = task_get_sve_vl(current);
+>  	last->sme_vl = task_get_sme_vl(current);
+>  	last->svcr = &current->thread.svcr;
+> +	last->fpmr = &current->thread.uw.fpmr;
+>  	last->fp_type = &current->thread.fp_type;
+>  	last->to_save = FP_STATE_CURRENT;
+>  	current->thread.fpsimd_cpu = smp_processor_id();
+> diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+> index 8c1d0d4853df..e3e611e30e91 100644
+> --- a/arch/arm64/kvm/fpsimd.c
+> +++ b/arch/arm64/kvm/fpsimd.c
+> @@ -153,6 +153,7 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
+>  		fp_state.sve_vl = vcpu->arch.sve_max_vl;
+>  		fp_state.sme_state = NULL;
+>  		fp_state.svcr = &vcpu->arch.svcr;
+> +		fp_state.fpmr = &vcpu->arch.fpmr;
+>  		fp_state.fp_type = &vcpu->arch.fp_type;
 
+Given the number of fields you keep track of, it would make a lot more
+sense if these FP-related fields were in their own little structure
+and tracked by a single pointer (I don't think there is a case where
+we track them independently).
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
