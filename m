@@ -1,102 +1,98 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ADCB823D7
-	for <kvmarm@lists.linux.dev>; Fri, 23 Feb 2024 15:32:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAAE1405C7
+	for <kvmarm@lists.linux.dev>; Fri, 23 Feb 2024 15:51:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708702332; cv=none; b=DI3cILWHyemD0WkfoWhyD+emGZD2cX6lZpYt+0aLHWRv4RhQg6XD/9qLkKCZTFJtWHwONSRKvTcABG8X7+qnoZio3nQEig1lfya13OolU6J4Nur0NYgfhxA1KRkca7Z15ivq07WtsDubgrbN6Z8b59u+E7q6/P8eV5x/JyAl18I=
+	t=1708703496; cv=none; b=dlr66uj5DIJIPGvj2fNyCpnRsmC3yODyRkGFMb7ziqj92Pm4YVkpzf1t/QnH6/hBhuamq7o+rgXRuFlptcjC5MyjmwH/AA+6AZKMlpFfkwoecoDnfPOSIouw4cmCysFVAHFFcTzbM0thZbaCr9Ot6eHaUXTzth2qSjxtyfO22sM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708702332; c=relaxed/simple;
-	bh=ltXfiFuoTEtZlQ375zaRTODYeS+HobqFtlM+RXnHddQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W1XliHXj1C9ujUJvv4nC2bIi+FWV8x4sR5cAt2oG35bgmXg5tL5tR/SK4RpL/MQTtEWLlCbcCMR1XM3YgqVXchqOKnoK1wK1+/PaNOukUeS7SlnhLvgUlxmtMffQ2gZ3YB+SQR7pT1MrYXzOeHW41L9YDxS63mGgOSUoOMnzFKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y5gDWO71; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1708703496; c=relaxed/simple;
+	bh=h0zA9WdQU74HCMfHbY1PNi3WkSqUAxRSW4xoqvVnwQw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-type; b=OEjAEJ2AmG9NgieMyQKuyBxBen/nk8kbpjd+TpEGvh7YORlH+3KmkP8exwz6FhsebgKjRTSvBts0eFowxsHydW/uxotZaE6rvhSWdqHQp8TIy3klHvSKT43xaAGmgQcdFS29Hxob/6/7Cp75WEuKv6QY7l3+lJCcX0eSyzZTWFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SMu7yjw3; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y5gDWO71"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708702329;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SMu7yjw3"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1708703490;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ltXfiFuoTEtZlQ375zaRTODYeS+HobqFtlM+RXnHddQ=;
-	b=Y5gDWO713ZR9FvJq9wuF+JXDoCMfBC6gWYrhtjWKpYfYxw9fndlnyH1ZPf/vhFyZTQO2VL
-	zIdRK0IihCeE1GGx7gOj/fSBFndatbFZ21MvM1/Evn4LJsqA/swtSAmrOeLIR2peFN1Wuw
-	/bIbMzldyI0iwILvOTsVH6380gZgJgA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-119-eP_C0HVkNB-HDEghIon5Rw-1; Fri, 23 Feb 2024 10:32:08 -0500
-X-MC-Unique: eP_C0HVkNB-HDEghIon5Rw-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33d4c09ec04so513691f8f.0
-        for <kvmarm@lists.linux.dev>; Fri, 23 Feb 2024 07:32:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708702327; x=1709307127;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ltXfiFuoTEtZlQ375zaRTODYeS+HobqFtlM+RXnHddQ=;
-        b=uQ9DJAwhstLEPpuNI/5nlzrjbep+4yWVM4SfGMCBgcb34QeEIjqGH7fSqCzxUAEPlU
-         HnE7Qm9PwHfyeWjxt7QDuKjosUU1/O8xtT23m8E8vahhfzsD0SfsHTvMWczq0xCjVKGP
-         loHGAZNQhIirxsQEvFlHaKen2k0uR2fhZ/JI1hkHMchqXjWTII/4u2a7SoxIUjj0vcWe
-         hCj4GydfGLf2L1tGpW0SHdDOUA8osf/scewEMuYFQmmxlnCPciXHk1UtSvVrQi0UjBuj
-         +xP+nPnz5nGODDVZJ0rB4P7YYCTlifTNO7qdFJgfWtVc+uAO5VRi0k+bD/C442pbzXmY
-         BPOA==
-X-Forwarded-Encrypted: i=1; AJvYcCVqDONrG4KG1m2LPIC3nOzCQmfUhw5cQ7OQE2JL2wq68rDUYs6A6qU2rdODqoq/hhz1DCUeFC0xKXh+NDjrJtFoNi88WTMl
-X-Gm-Message-State: AOJu0YzHcPBuxaAV2AXLhXM+N1wqdBBn1cHkpQ0Wn8K3iUysv6CFPel/
-	pOEjhsn4BTQO0vLepJOGbPLUf0fu1bLkso2oE/BJW1xCe7DYUEQ8tHPub6BzKWuZCDl0/J8k71E
-	J5Ku2iAKkSueRtwurCU1OAfwY0i7VJwvFoXfaFIGzm1x9eJPW1sWN8Soa24Wn50l3su8Bj87c2f
-	uRpqZWOAi4Vs3OB9p88+hpMK5P3ykk
-X-Received: by 2002:adf:e511:0:b0:33d:5ae5:f356 with SMTP id j17-20020adfe511000000b0033d5ae5f356mr94667wrm.20.1708702327609;
-        Fri, 23 Feb 2024 07:32:07 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGLm2G66Tw4sgodVUIb9Jzv+TjNHaof3FgriahBQfesSvJsXof4hqEVZ82kEIdVUXv/1jq4kYYkRea+6qJNwbM=
-X-Received: by 2002:adf:e511:0:b0:33d:5ae5:f356 with SMTP id
- j17-20020adfe511000000b0033d5ae5f356mr94647wrm.20.1708702327323; Fri, 23 Feb
- 2024 07:32:07 -0800 (PST)
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=o+jaWAifqARW9h/jbOW/BR9w2AzoLYKV+yoHHEw++Hw=;
+	b=SMu7yjw3rzx0a5YNl0TjMpOhPVWStiYBeIxdTzOvK5yoXxTsDGzE5+k7MjydoHGob6H2bK
+	kVI365vOYhrGL9CTxn6Zn5KpSuNahZQUop61BhzfbiOc4tM6b/92UxidCfC3ArQKoscru0
+	n8EZnK1nE7rrX6S/Q79G7RTtVh/cWZo=
+From: Andrew Jones <andrew.jones@linux.dev>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: alexandru.elisei@arm.com,
+	eric.auger@redhat.com,
+	nikos.nikoleris@arm.com,
+	shahuang@redhat.com,
+	pbonzini@redhat.com,
+	thuth@redhat.com
+Subject: [kvm-unit-tests PATCH 00/14] arm64: EFI improvements
+Date: Fri, 23 Feb 2024 16:51:26 +0100
+Message-ID: <20240223155125.368512-16-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240216155941.2029458-1-oliver.upton@linux.dev>
-In-Reply-To: <20240216155941.2029458-1-oliver.upton@linux.dev>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 23 Feb 2024 16:31:55 +0100
-Message-ID: <CABgObfYZBnTjXh4TqH77HjO3zTMRfekaorTUVqQoFOMPJLjJTg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: Get rid of return value from kvm_arch_create_vm_debugfs()
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
-	aneesh.kumar@kernel.org, naveen.n.rao@linux.ibm.com, 
-	Sean Christopherson <seanjc@google.com>, linuxppc-dev@lists.ozlabs.org, 
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Marc Zyngier <maz@kernel.org>, Sebastian Ene <sebastianene@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Feb 16, 2024 at 5:00=E2=80=AFPM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> The general expectation with debugfs is that any initialization failure
-> is nonfatal. Nevertheless, kvm_arch_create_vm_debugfs() allows
-> implementations to return an error and kvm_create_vm_debugfs() allows
-> that to fail VM creation.
->
-> Change to a void return to discourage architectures from making debugfs
-> failures fatal for the VM. Seems like everyone already had the right
-> idea, as all implementations already return 0 unconditionally.
->
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+This series collects one fix ("Update MAX_SMP probe") with a bunch of
+improvements to the EFI setup code and run script. With the series
+applied one can add --enable-efi-direct when configuring and then
+run the EFI tests on QEMU much, much faster by using direct kernel
+boot for them (and environment variables will work too). The non-
+direct (original) way of running the EFI tests has also been sped up
+a bit by not running the dummy test and not generating the dtb twice.
+The cleanups in the setup code allow duplicated code to be removed
+(by sharing with the non-EFI setup code) and eventually for riscv
+to share some code too with the introduction of memregions_efi_init().
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Thanks,
+drew
 
-Feel free to place it in kvm-arm.
 
-Paolo
+Andrew Jones (13):
+  runtime: Update MAX_SMP probe
+  runtime: Add yet another 'no kernel' error message
+  arm64: efi: Don't create dummy test
+  arm64: efi: Remove redundant dtb generation
+  arm64: efi: Move run code into a function
+  arm64: efi: Remove EFI_USE_DTB
+  arm64: efi: Improve device tree discovery
+  lib/efi: Add support for loading the initrd
+  arm64: efi: Allow running tests directly
+  arm/arm64: Factor out some initial setup
+  arm/arm64: Factor out allocator init from mem_init
+  arm64: Simplify efi_mem_init
+  arm64: Add memregions_efi_init
+
+Shaoqin Huang (1):
+  arm64: efi: Make running tests on EFI can be parallel
+
+ arm/efi/run          |  65 ++++++++-----
+ arm/run              |   6 +-
+ configure            |  17 ++++
+ lib/arm/setup.c      | 223 +++++++++++++++++--------------------------
+ lib/efi.c            |  93 +++++++++++++++---
+ lib/efi.h            |   3 +-
+ lib/linux/efi.h      |  29 ++++++
+ lib/memregions.c     |  57 +++++++++++
+ lib/memregions.h     |   5 +
+ run_tests.sh         |   5 +-
+ scripts/runtime.bash |  21 ++--
+ 11 files changed, 343 insertions(+), 181 deletions(-)
+
+-- 
+2.43.0
 
