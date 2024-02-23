@@ -1,91 +1,87 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAFF913F017
-	for <kvmarm@lists.linux.dev>; Fri, 23 Feb 2024 17:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C8A7140E55
+	for <kvmarm@lists.linux.dev>; Fri, 23 Feb 2024 18:00:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708709820; cv=none; b=Rk7qvElz0FcJxnC991owkWCafYByVhZqWTGojc54fOp3CUiErCEDyxPYlzppu5Tb36mz+ucm51p3m/McKP3+7f/S+Pvx6xbdK5RnZBid8sJrv6nrjsJ+DYvV5s4u4s6sXCG2ODcHKYDMa2lXUpJntwQQjXEAELbxNH+ebVEhBJY=
+	t=1708711205; cv=none; b=DrmdoDhCc2ZHCv/tIKoyC8kNbzc9xK0iTQgYx+3Ni2uGFcmCFCZiQNlzS5LI/9cahgwhSjyf7Al0f7WCJl90VwlnexME0VXd9ScbSCIBFwjJNT8YkifYtopfOYj2Zhs0AIuquTa9MGEJ3aaLQ1JcsRc+KB04OaO8YmBP8rhmfhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708709820; c=relaxed/simple;
-	bh=mPq99SHVDAlyu/Lw6k/HCBY8a5P8RgeYGBIuIYVU8jU=;
+	s=arc-20240116; t=1708711205; c=relaxed/simple;
+	bh=JTIBShtgIr5g6rY0xtefZuQDFwfDgZS/8epM2acW8kM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VzduhiXoJZ5eCAlJ/KuqFbYlDeZfLBrtBtfRq7VvYmTaoKBv8TKm9QzwE4noUaIHuHw20Q2CU1VlJlWei1ybYhy0EUSANnck18o+AqSFh6J61Df/bRX/rtIcRN9/2GSdtSBEyNCatlGmgx4FmNn2u6QLTJVSiQ+XOnYfjG7WJO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nlKQ98pO; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=W9vu6UipD9sasHWzd34yoERsy+NFk3drA0Rz4Pala34wbY9gRbJjaTr/jn9CCtOQqsTVLNqj1iJ0tYp92ibjrq+BzztIyAUjcFKmhP2yUlLq1mZZiOD6V61KnBJpt3ZpX75LSldUzyIEDqU89njBh7Rb+96TyXc+ehtnMcmj/EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pFluGmR7; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nlKQ98pO"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbf216080f5so1758816276.1
-        for <kvmarm@lists.linux.dev>; Fri, 23 Feb 2024 09:36:58 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pFluGmR7"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-608a5b42559so20919457b3.2
+        for <kvmarm@lists.linux.dev>; Fri, 23 Feb 2024 10:00:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708709818; x=1709314618; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1708711203; x=1709316003; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vQFkD/yeaXafYTambjNc8nGAaM5dCANMqU9RXbu0aLA=;
-        b=nlKQ98pO+4639zvSpowPTyZNRKD1xC+HdEMEL8cNEliZ8LwQ0ybCqPq0FX6mpvdN2g
-         7CaX7zFo53kaAlVNKBID/8iP4dmOK55JRIQS3RlJLEopk7Ixao1iD5dUA6E5ps+xQ1N7
-         IqfeHK2CAgTp+wN2EmZFpRUYU+iyA3nr+73Pq6rzrUdg8gLZ5AGvF5PJ977P4ewWa3md
-         yTcGU/595u+KLbgokxqOsQUp5zYrZkSsX/nHdjQBeJdXIWmKL/tbauGxtMDzxAwZ/n/7
-         KtLL/5YDSKkFFe/6G4t6XhF/N+09WfuG2dpF9sk3yKMTfHoJ3Tmr8iU1ubMQTnbrybl/
-         r7ag==
+        bh=6ZlW1EJxs94ddQvEpIRIB6nMElLk51bT9baoyhTLzcw=;
+        b=pFluGmR7SsHtbb8B9H2ij1GZMdWKioVFUrTfc2CCSM8Rbea7XpXDFhG8ek/u+4G5/+
+         FDvRx5E9XFH7EDdUwbtYbUynOQxacO8FmCFu3AlaYQg3N+IT1bE/Dnt2+7vTsK+5AkcA
+         eAKWX3bmFh/RP29nft9cCOKbqDLLm0aKE2W18Zya5vZmN0J8v1IyVx5q05GeHpair+vj
+         i+HbV+Vo94RCIyu6vFRP2A02tezQ7nHfTGHh6UkyPYtZgMoyqnzf/ZJB2JBev9vpOF1D
+         yHItVDhgr3w98IjciHJxTTTs4pRlLluM/3gTH9TA3/nK7vNHRNUr3bh3qtd67YLIA7Rh
+         SHiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708709818; x=1709314618;
+        d=1e100.net; s=20230601; t=1708711203; x=1709316003;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vQFkD/yeaXafYTambjNc8nGAaM5dCANMqU9RXbu0aLA=;
-        b=lpRVP/cIAWCTS6dKEOghTJfHg6WcBux5J6zLypj7ybiI7aMKyo+b3UH8fED/lQWV6j
-         RVwALBpXXt6SShrOAQ/FfoaTYEVAqiNbAKrtjAnukv18QBb1dBeYGo8slx/4HGSRlrOW
-         BK945/no6NPxKTQKDqtUoUiRF/NV5mDbwA3oWPaxCASz2tLG3CXEOGxq9pWsC+uiWkAq
-         kGNF6SWf3NVV0rLdWsWlZic6fOZiiZWCbDCW2ZDmqObB8ppAK3kkQYIIFPcMPUOO8U5w
-         EswyUR/L2Lra32NIwKZ7FQ2vAcxI5sAmqwukRPWiS6OIes+214Tu3ahilYxkxUii5Erv
-         ZYLg==
-X-Forwarded-Encrypted: i=1; AJvYcCVmobSJFY2lhtI2G+noBgvH3H7AoB/TZlR4Xr7yPqnH+FTuKuv/Iy7PLCnNe43Lbu631FaNtJnWHQ2jGRmNT3Nky6t0ZZ9c
-X-Gm-Message-State: AOJu0YwS8nqT0NXW9ENMudcYgxpAyQJ6h2+zhddkABk2DmnDTPNSDrdQ
-	6fNMCyNCE5Lg9LVRhJ513wAkHmicca5BMe5tEmUukQMfBlYS4uwY3mQOt6ZrMnvutZ0kMOCdqkS
-	wuw==
-X-Google-Smtp-Source: AGHT+IF6qHLLb++rm38SnHHY1oMkxzeH9qs55zcOOM7YnS3PnobaoRSUe6xFvYZWf184A1ED5DElZhno5QQ=
+        bh=6ZlW1EJxs94ddQvEpIRIB6nMElLk51bT9baoyhTLzcw=;
+        b=O8KnrJ47l19S503+ke5o/1mO2OixIosFxcRJdC/9K4aBQyQIu9/n9UOoeEXJVVjyIa
+         sKGF2KS4oZOP1WqTHKK4jycqf8YVTpXJQNPtWnsAEiWW37Jl6BZuxkKi+j6Pws1m7Ti2
+         lE4fTu8qQ4kq/TS87fuzvlqTXaHu6izewW2mHIMlDWrS6KFEHg36rm3mzBZ7wGrxzXdN
+         QK0CP2v8UYLB1de8jEm6NyiZ6gAG1+3HvsmPaIeH0O6F4FJd5GtCpGKkncTuK4J7LeSP
+         pVuExf+2eeqbhn4pEZXFr+n9uMIBS40AFCST9Maql4iGevkEyZFZchHuiNtkihZk1pkE
+         vScQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVOLy8AnZNcm5kIeg3pDRXoGSr0SGOg73x6MFFZVNAarGhoLVqLCh3OZCVmbBEXiyzGSJyvGk9AqZ+9p3u9q06DOZgH5TdJ
+X-Gm-Message-State: AOJu0YxSOIhg/NEPpim25hufba90cjACr+T1E53N5/JdO1mBambSRBV4
+	WTOu2x/wDQkz1W6xTkIjEGFQ3VRmV56vPDbZEM7A3EBlaQVPKaARF85oQY5oGF0rbQgrnfxOM3m
+	fzA==
+X-Google-Smtp-Source: AGHT+IFddBZPJ0oMQJFmcgncflFQLIynO52TmQ0RXS5kF1rPgpXbVxpnqSicc8D4/kWxpa1H1Uj3I4Yk7aw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ad9a:0:b0:dc2:550b:a4f4 with SMTP id
- z26-20020a25ad9a000000b00dc2550ba4f4mr124968ybi.1.1708709817812; Fri, 23 Feb
- 2024 09:36:57 -0800 (PST)
-Date: Fri, 23 Feb 2024 09:36:56 -0800
-In-Reply-To: <20240221072528.2702048-10-stevensd@google.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:10c2:b0:dcc:9f24:692b with SMTP id
+ w2-20020a05690210c200b00dcc9f24692bmr24709ybu.13.1708711203125; Fri, 23 Feb
+ 2024 10:00:03 -0800 (PST)
+Date: Fri, 23 Feb 2024 10:00:01 -0800
+In-Reply-To: <5580a562-b6ac-448d-a8fe-cedc32d33bab@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20240221072528.2702048-1-stevensd@google.com> <20240221072528.2702048-10-stevensd@google.com>
-Message-ID: <ZdjXuH4jBaAZCrgy@google.com>
-Subject: Re: [PATCH v10 7/8] KVM: x86/mmu: Track if sptes refer to refcounted pages
+References: <20240221072528.2702048-1-stevensd@google.com> <20240221072528.2702048-5-stevensd@google.com>
+ <5580a562-b6ac-448d-a8fe-cedc32d33bab@redhat.com>
+Message-ID: <ZdjdIYNEA7k2Fmnu@google.com>
+Subject: Re: [PATCH v10 4/8] KVM: mmu: Improve handling of non-refcounted pfns
 From: Sean Christopherson <seanjc@google.com>
-To: David Stevens <stevensd@chromium.org>
-Cc: Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	Zhi Wang <zhi.wang.linux@gmail.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: David Stevens <stevensd@chromium.org>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@gmail.com>, Zhi Wang <zhi.wang.linux@gmail.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Feb 21, 2024, David Stevens wrote:
-> + * Extra bits are only available for TDP SPTEs, since bits 62:52 are reserved
-> + * for PAE paging, including NPT PAE. When a tracking bit isn't available, we
-> + * will reject mapping non-refcounted struct pages.
-> + */
-> +static inline bool spte_has_refcount_bit(void)
-> +{
-> +	return tdp_enabled && IS_ENABLED(CONFIG_X86_64);
-> +}
-> +
-> +static inline bool is_refcounted_page_spte(u64 spte)
-> +{
-> +	return !spte_has_refcount_bit() || (spte & SPTE_MMU_PAGE_REFCOUNTED);
+On Fri, Feb 23, 2024, Paolo Bonzini wrote:
+> On 2/21/24 08:25, David Stevens wrote:
+> > +	} else if (!kfp->refcounted_page &&
+> > +		   !kfp->guarded_by_mmu_notifier &&
+> > +		   !allow_unsafe_mappings) {
+> > +		r = -EFAULT;
+> 
+> Why is allow_unsafe_mappings desirable at all?
 
-The preferred way to handle this in KVM's MMU is to use a global variable, e.g.
+It's for use cases where memory is hidden from the kernel and managed by userspace,
+e.g. where AWS uses /dev/mem (I think) to map guest memory.  From a kernel
+perspective, that is unsafe because KVM won't do the right thing if userspace
+unmaps memory while it is exposed to L2 via a pfn in vmcs02.
 
-  extern u64 __read_mostly shadow_refcounted_mask;
-
-that avoids conditional branches when creating SPTEs, and arguably yields slightly
-more readable code, e.g.
-
-	return !shadow_refcounted_mask || (spte & shadow_refcounted_mask);
+I suggested allow_unsafe_mappings as a way to make upstream KVM safe by default,
+without completely breaking support for AWS and friends.
