@@ -1,87 +1,94 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC928003E;
-	Fri, 23 Feb 2024 14:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DBC979CC;
+	Fri, 23 Feb 2024 14:47:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708698226; cv=none; b=nQY/5cgP1vnoKIFoiXVRFPMC9f8+FUP4VcebyaWI6lXTi148mIJDn4YpZaS1Me3k2UWJs9oVm9nPC2QiCpKDFQbrvr4Ct1lv9OJ44xPxJwgQ/f27ffItc4Vyh7UCla8+wd7pgFYANXDKLayP7JiHNPZ4BEJ7SxNobQQc61aICyQ=
+	t=1708699622; cv=none; b=RIn9qiNKqAWUeyzK3Xjnvqdk+zHwOBDoLp8WpnJCLPV5g1JCKTceFZ22Do8sfEmhWiK5NYpDk08oSnBjhDHy6SB+vWjp3PUPxZaBRvvY9E7LDgnPkGx7ocYMK/r20sat4ST547PHVaySDyge1NK7340ptkg39LCcR5AnkgX01/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708698226; c=relaxed/simple;
-	bh=oG6lGxWEEemBwIFT+DyX89qfDgrB0Bkcpa14XrnC2Ks=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N/nFFY1nqUamf3mNRbAr3ldvfc8YsOY39wfRNAaW+poqLYAULSMe6nqDPxifoT3Wi/HS6iXb2YF5v1yJTqeDH+3Q6DFIwNCcqmb0nyKA3sOJwT/f5w2CNLXm2F5XK9fcQWClfu93YNqzrexaynY1vR7Nk3oWGSdpuw18AS06pdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q3/aUvmv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708699622; c=relaxed/simple;
+	bh=q8YZ4Jqh0OdMYxUhGwlEvT90DTayzIssQudujNgApkM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QqZMYz+ytAtoPURM9JeqShB9+31/Drui4isTqUIyyJQF6RNS8MJ/geJie5LhboVAv0L4EebPrhmzWHx4spfxWPlmsWY5uqLdnQMxQ9wp5qMgFvGnPsMiuKWjameRoQ7GRikLusM25EUhiUl16kHERIGDEz+WScfLhQ5lMhGqwoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JjBvEHz6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q3/aUvmv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE849C433F1;
-	Fri, 23 Feb 2024 14:23:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JjBvEHz6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBA50C433F1;
+	Fri, 23 Feb 2024 14:47:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708698225;
-	bh=oG6lGxWEEemBwIFT+DyX89qfDgrB0Bkcpa14XrnC2Ks=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Q3/aUvmvLzINogZY+JvkRDxgprMN4ZCuIBHfT85X/0fTg2sRO+Jvm6wLmvMo8z7Cc
-	 a3IIutESGxnmRYIr0S1djg5HZji8M/uNTk3Fxm6rorHLb19e7pVsZWrhgLmLM4pB4e
-	 Nyig2p/vY35Ln+VfjuSIGh2zgvbo/qI2J9S8XzN0J+ZI1pNH/SD+xKf2dATcNPLRBf
-	 xe3rlxJcRyM3v2dZ+4qm5eswOGOqCS+CZbtHLatve78QEsuWOHs5ucPi8J9y/Ize76
-	 StUau5ku3dzKZulk13jo5MaExtKXz/oU3Ln24Qrx9BQ0Gmcha2BqWxHuf3Vv62rTOv
-	 xtbOug6ltAtVQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rdWSl-0066qh-Cf;
-	Fri, 23 Feb 2024 14:23:43 +0000
-Date: Fri, 23 Feb 2024 14:23:42 +0000
-Message-ID: <86le7b2r9t.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
+	s=k20201202; t=1708699621;
+	bh=q8YZ4Jqh0OdMYxUhGwlEvT90DTayzIssQudujNgApkM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JjBvEHz6kUl/uCdmc0Fbofl0/L2+tWprk1uNCOiaVJXEhXl8LIF0c2I/PW7XOp7mO
+	 9hxJ7iCyymDlgJ8D7fmhHNpFtAL9dF7jz8uNoEJDwtqaIuN4CPuZk0pqcd94YqCOMt
+	 EzfKx1lbkpfjTuRw4nbZNVZggJPFmtnsw67EONWnuCRjL0ibPSKpy3X/I/RObxfepK
+	 KduLr4jHvMTTec3jaFdRG1x40vDpKD4A0QN6JVDDnJHvpMPVPa2plJsZbLGwKOVcEZ
+	 WsnJon4aU1/K+q4D6TXnkdB8C9XMnKkH6Upttv9dPFKtraBaB+rE1K7AsVIdYmLcix
+	 EsceGqWSMukMQ==
+Date: Fri, 23 Feb 2024 14:46:56 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-kernel@vger.kernel.org,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v4 00/10] KVM: arm64: Avoid serializing LPI get() / put()
-In-Reply-To: <20240221054253.3848076-1-oliver.upton@linux.dev>
-References: <20240221054253.3848076-1-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Dave Martin <dave.martin@arm.com>, kvmarm@lists.linux.dev,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v4 12/14] KVM: arm64: Support FEAT_FPMR for guests
+Message-ID: <Zdiv4E+sjo6JeiP8@finisterre.sirena.org.uk>
+References: <20240122-arm64-2023-dpisa-v4-0-776e094861df@kernel.org>
+ <20240122-arm64-2023-dpisa-v4-12-776e094861df@kernel.org>
+ <86plwn2ztw.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org, eric.auger@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="GH+IzJ0CKriU7ph5"
+Content-Disposition: inline
+In-Reply-To: <86plwn2ztw.wl-maz@kernel.org>
+X-Cookie: You might have mail.
 
-On Wed, 21 Feb 2024 05:42:43 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> Addressing a few more goofs that Zenghui was kind enough to point out.
-> Clearly all of the bugs have been found and addressed at this point.
-> 
-> v2: https://lore.kernel.org/kvmarm/20240213093250.3960069-1-oliver.upton@linux.dev/
-> v3: https://lore.kernel.org/kvmarm/20240216184153.2714504-1-oliver.upton@linux.dev/
-> 
-> v3 -> v4:
->  - Actually walk the LPI INTID range in vgic_copy_lpi_list() (Zenghui)
->  - Ensure xa_lock is taken w/ IRQs disabled, even after purging usage of
->    the lpi_list_lock (Zenghui)
->  - Document the lock ordering (Marc)
 
-This is looking good so far. I'll take it for a ride shortly, but in
-the meantime:
+--GH+IzJ0CKriU7ph5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+On Fri, Feb 23, 2024 at 11:18:51AM +0000, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-	M.
+> >  #define HCRX_GUEST_FLAGS \
+> > -	(HCRX_EL2_SMPME | HCRX_EL2_TCR2En | \
+> > +	(HCRX_EL2_SMPME | HCRX_EL2_TCR2En | HCRX_EL2_EnFPM | \
 
--- 
-Without deviation from the norm, progress is not possible.
+> No. We don't do that anymore. This can only be enabled if the guest
+> has it advertised via ID_AA64PFR2_EL1.FPMR.
+
+Right, as mentioned in the cover letter (and previously discussed with
+one of the other serieses) this needs a rework against your at the time
+of posting still pending changes to parse the ID registers.  It looks
+like everything is there for those now so I'll do that after the merge
+window.
+
+--GH+IzJ0CKriU7ph5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXYr+AACgkQJNaLcl1U
+h9Cl7gf/de45BtxdA27brC5etmUy5Ui3vnW6bYjHBKBu56enms/PZuUqOqd5/KBL
+0ikRdLAXsO+gpmqV1/kHeMeuWfVgcj/s3vM0leABNSKFzJ1AcNSWpNONQGC5zuXJ
+6YrBF7gitd+mCXTs+x2JERjw0C7KLd6/uFLX20gqRTS+7GLjpA7KUKfKqyw55vOa
+kRroWcD2lXyDZmF0kQ7WbF/zugHWIO0z2VslrYEwMWEWTDN2rqxB+TtY+OniI1Di
+uWUX9h41zV0HgJOKFXSAjkEs57KHAGrLzUnDiF3h/dJqZm26BwfH3SYymdcEfdC5
+pQBn84s5Thf6r843Z2zamQA6jXx7ZA==
+=DQlf
+-----END PGP SIGNATURE-----
+
+--GH+IzJ0CKriU7ph5--
