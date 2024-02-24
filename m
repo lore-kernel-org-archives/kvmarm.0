@@ -1,74 +1,163 @@
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A861AACE
-	for <kvmarm@lists.linux.dev>; Sat, 24 Feb 2024 09:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D67F182DB;
+	Sat, 24 Feb 2024 10:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708766150; cv=none; b=M19TgTqAW5zff1+RTE2DVfF2dY/i676V440+pgN0A7VwbYHaNjvzZhVlMSHckaAfHHzNOJbqd+Km0/ddgWA+/PdrM/C+E4b0ROWuOM2igrpOl1YRhrlMTFknwHoOFhXRndeEG0SgP03HZ9LBWnEU1MVhaDT74iGiWgWTdtMxNoU=
+	t=1708770610; cv=none; b=WsBuvCttdWJ2Z4GvGFyOr7hwBFSpeu5bDDGv9RiFBTCGfi/lhJ3lVJmvmcjOkazbXZYjalDPjJ6iynQwxF6Azuea3MGcVPhrb0Y2RsMolN/nE40utCQ6CkfAJNdHac/6D3Zo0kKpMIfoSw6H+HMjmkAlEznPTVGyVwIZqPVsw6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708766150; c=relaxed/simple;
-	bh=/nCNfFV9yOQlHaWyqCnWCiiTJ197iuFEo6L8MiqkLUk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aopCXzv+2TuBKO6ULvgYEO8Xm3jUfP/P4B2LXoXTPEIPBHQEGzAWFS1eN7UnFRYTscX/x8tHaixCNhKqiazgFo9hEHC/CqzQFP3mTCZa6FLm5HR8+xK8knVMoaja4hNCeT4i98arK89lZ1rvNp6FrqBQ5TI2g94UHNG4ECfE92o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xIBELcgT; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1708770610; c=relaxed/simple;
+	bh=Q/P2Z+7sh5cDxHvL/Ran0fKCcJPYbJEsm46nDR360jo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=W3j6fZY0mQswYAqDZfKpUWfz3izDd4qrZSJGBlVOFAligSuOPoRCREzw//IYbQRPoAwOYWFaWagDtdLFL/Qk5l7j9TMqwhTJdQLrVUcJnZCDZA4VMIFx7GFkvKXnehi0p/5UjR0tV5E2WXJSiYT6xYIjsnSDHNUf/1OZtHLtBMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UtJM5PGB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xIBELcgT"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1708766147;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HhVrqgB6eeZ/tDE1lRVyDBNfVZMl8Jpt9yJZadWr00Q=;
-	b=xIBELcgT62nj54hl49Gz51C1ZfDoO5tFtJqqTGqIUBUXx64dSxM+ReGylAMokje/sgCuAI
-	xJY9aGTrmzf3gU8MhRI5pUXl7+Pd5VdUbRkrke4y2syP+hmVRpfwe6uYcZEOiwMJDcIP0M
-	ZDF23hbkbPMLsTZ70zK1LVS1eVnpIG4=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Bjorn Helgaas <helgaas@kernel.org>,
-	Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UtJM5PGB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0518AC433C7;
+	Sat, 24 Feb 2024 10:30:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708770610;
+	bh=Q/P2Z+7sh5cDxHvL/Ran0fKCcJPYbJEsm46nDR360jo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UtJM5PGB/yoSdmqduIgAlzNJSsc9xAJsmgvaUVjDN1eagoM9nanvGjcV7lx64ClCE
+	 SwSA9FCr7Yih8FNDiKl0TUcIEYV33GPNOz+pA6MYEx5OmEwlFkMRzJKkjCqaQStirO
+	 DgbEJEkBI62ujbz3J92MukTO1wTEjJmOk+ZvwPt/aYaN/sHKJkNCFN6arXgfyjqd0a
+	 W39sC+qlXNLpW6OVfS3p2gIJzfQU8l/CS2K9xMkPHNedU41OIwxnQyFRhhn/9d2Hy6
+	 pA1/5NTHYPpaan17qft7J2juFIeIbIRRyatdYHsH5lQHpgEaBinbRDtxYglkF5E3t9
+	 o5+9BwBNU0Uzg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rdpIF-006LaQ-85;
+	Sat, 24 Feb 2024 10:30:07 +0000
+Date: Sat, 24 Feb 2024 10:30:04 +0000
+Message-ID: <87cysm9mtv.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Thomas Gleixner <tglx@linutronix.de>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
 	linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Bjorn Helgaas <bhelgaas@google.com>
-Subject: Re: (subset) [PATCH 5/8] KVM: arm64: Fix typos
-Date: Sat, 24 Feb 2024 09:15:35 +0000
-Message-ID: <170876611826.323614.1992753993268344387.b4-ty@linux.dev>
-In-Reply-To: <20240103231605.1801364-6-helgaas@kernel.org>
-References: <20240103231605.1801364-1-helgaas@kernel.org> <20240103231605.1801364-6-helgaas@kernel.org>
+	Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH 2/3] irqchip/gic-v3-its: Spin off GICv4 init into a separate function
+In-Reply-To: <20240219185809.286724-3-oliver.upton@linux.dev>
+References: <20240219185809.286724-1-oliver.upton@linux.dev>
+	<20240219185809.286724-3-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, tglx@linutronix.de, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, jingzhangos@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 3 Jan 2024 17:16:02 -0600, Bjorn Helgaas wrote:
-> From: Bjorn Helgaas <bhelgaas@google.com>
+On Mon, 19 Feb 2024 18:58:07 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Fix typos, most reported by "codespell arch/arm64".  Only touches comments,
-> no code changes.
+> Burying the GICv4 redistributor initialization into the routine for LPIs
+> is a bit confusing, and can lead to sillies where unexpected codepaths
+> may not fully initialize the RD.
 > 
+> Hoist it out of its_cpu_init_lpis() into a dedicated function.
 > 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  drivers/irqchip/irq-gic-v3-its.c | 32 +++++++++++++++++++++-----------
+>  1 file changed, 21 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> index 0022852ce494..63d1743f08cc 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> @@ -3173,8 +3173,25 @@ static void its_cpu_init_lpis(void)
+>  	writel_relaxed(val, rbase + GICR_CTLR);
+>  
+>  out:
+> -	if (gic_rdists->has_vlpis && !gic_rdists->has_rvpeid) {
+> +	/* Make sure the GIC has seen the above */
+> +	dsb(sy);
 
-Applied to kvmarm/next, thanks!
+So having hoisted the dsb() here...
 
-[5/8] KVM: arm64: Fix typos
-      https://git.kernel.org/kvmarm/kvmarm/c/75841d89f3ed
+> +	gic_data_rdist()->flags |= RD_LOCAL_LPI_ENABLED;
+> +	pr_info("GICv3: CPU%d: using %s LPI pending table @%pa\n",
+> +		smp_processor_id(),
+> +		gic_data_rdist()->flags & RD_LOCAL_PENDTABLE_PREALLOCATED ?
+> +		"reserved" : "allocated",
+> +		&paddr);
+> +}
+> +
+> +static void its_cpu_init_vlpis(void)
+> +{
+> +	/* No vLPIs? No problem. */
+> +	if (!gic_rdists->has_vlpis)
+> +		return;
+> +
+> +	if (!gic_rdists->has_rvpeid) {
+>  		void __iomem *vlpi_base = gic_data_rdist_vlpi_base();
+> +		u64 val;
+>  
+>  		/*
+>  		 * It's possible for CPU to receive VLPIs before it is
+> @@ -3193,7 +3210,8 @@ static void its_cpu_init_lpis(void)
+>  		 * ancient programming gets left in and has possibility of
+>  		 * corrupting memory.
+>  		 */
+> -		val = its_clear_vpend_valid(vlpi_base, 0, 0);
+> +		its_clear_vpend_valid(vlpi_base, 0, 0);
+> +		return;
 
---
-Best,
-Oliver
+I'm not sure about the necessity of this return statement.
+allocate_vpe_l1_table() checks for rvpeid already, so it should be
+fine to carry on.
+
+>  	}
+>  
+>  	if (allocate_vpe_l1_table()) {
+> @@ -3205,15 +3223,6 @@ static void its_cpu_init_lpis(void)
+>  		gic_rdists->has_rvpeid = false;
+>  		gic_rdists->has_vlpis = false;
+>  	}
+> -
+> -	/* Make sure the GIC has seen the above */
+> -	dsb(sy);
+
+... we're now missing a dsb affecting the VPE table programming, as we
+expect things to take effect immediately.
+
+> -	gic_data_rdist()->flags |= RD_LOCAL_LPI_ENABLED;
+> -	pr_info("GICv3: CPU%d: using %s LPI pending table @%pa\n",
+> -		smp_processor_id(),
+> -		gic_data_rdist()->flags & RD_LOCAL_PENDTABLE_PREALLOCATED ?
+> -		"reserved" : "allocated",
+> -		&paddr);
+>  }
+>  
+>  static void its_cpu_init_collection(struct its_node *its)
+> @@ -5265,6 +5274,7 @@ int its_cpu_init(void)
+>  			return ret;
+>  
+>  		its_cpu_init_lpis();
+> +		its_cpu_init_vlpis();
+>  		its_cpu_init_collections();
+>  	}
+>  
+
+I'm otherwise OK with the idea of splitting things up.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
