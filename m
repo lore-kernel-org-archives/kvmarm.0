@@ -1,95 +1,71 @@
 Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8CF1149388
-	for <kvmarm@lists.linux.dev>; Fri, 23 Feb 2024 21:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE691FAA
+	for <kvmarm@lists.linux.dev>; Sat, 24 Feb 2024 04:40:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708725145; cv=none; b=EL5/hJWqmQ7n7Tn51bGJzVcpOvOLsDQVkq9eTiOVLI8akw8iR7u4wDoODSUHQuIfbDB9Rv8Ni2n64gmQTbcy+LJQ9aFTSj2l/RL7mKcgl8m3U01b8j7URC/6i+u1UuGME4ike5AU1sNvkDfvgQp1TPG9GiJXMmn+Zhy9v6XUc6g=
+	t=1708749610; cv=none; b=WCZjCYXtamrYsfQt0nE9qSuVqeqJrNLtfsGmlfwGKWVdooaqmNwGp8ExYMtYGOboE/+x6nnXz1H7LB6h3hYkQwmuz9oasSVFvTAmqB98ImHMwQm4bDe4EA2EZRaphq4uOka7yvJiamqsCgb9RB7F0foDUET2Qy4q/qPxHegqUqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708725145; c=relaxed/simple;
-	bh=WghNiSEcslFUkasOpQxww+LCo1yWX13E/n+PrcQm1Go=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NruTnlob7f7nTO1tZr1n4iMoAmoXJQ0ch06jAwsE1HwoU/1rcjryyqXkDjsWZCDtfSFnawZepWt+2CdGKpoTu9jp/Z+Ak4f7gFXDS0EpUQdVf7/7FOdvioPqgSROt61llqAbnkjHBlC6hmUaDefGvzDbV9gukwc6Nr8v65sA/9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gTIP7f6q; arc=none smtp.client-ip=95.215.58.188
+	s=arc-20240116; t=1708749610; c=relaxed/simple;
+	bh=zoqMpwnFsGkBh/sRDdECm4eJ8KKnOivu3YrPBj84JVQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gg6/lm64QQaTXi5XAtdFoC4fcKPEx73/0ED7C4Zf5SKuyGdF1ejN1Jye/6rC4FnOOymz0qoFl3YOc2JTsSUV36tHk7Zyr//mPRs24ABsiXaDbTtdqzDk6GFY1W0VZuOOPPlb9xKUuMK6PfclacrbqHKB1X1Ugv8OC90P7/pMA3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ssRcDIyG; arc=none smtp.client-ip=95.215.58.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gTIP7f6q"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ssRcDIyG"
+Message-ID: <2cd87332-b3f9-e415-6458-57eb3615c43e@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1708725141;
+	t=1708749606;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4hHqqqhFF3Gydbv6RBgXfAetBdxsg+N/xk7e231yih0=;
-	b=gTIP7f6qjnayXOiMlXoD5jndqDv+4vM5rGrfvTzaU+1V9n9NzxjM+y5y1jn14ayzr0Alup
-	gihCIRbnJOZmif+3rwG+dZ7aLlx/+jEluaXwtVcIJ26VjUfv/8+DzrCiF8dAC/Ei9CfmRb
-	z+ouNR/5CcNUqGmcFIFNhsQB6qkfET8=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev,
-	Oliver Upton <oliver.upton@linux.dev>
-Cc: James Morse <james.morse@arm.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v4 00/10] KVM: arm64: Avoid serializing LPI get() / put()
-Date: Fri, 23 Feb 2024 21:52:09 +0000
-Message-ID: <170872506306.206263.12047189993769691373.b4-ty@linux.dev>
-In-Reply-To: <20240221054253.3848076-1-oliver.upton@linux.dev>
-References: <20240221054253.3848076-1-oliver.upton@linux.dev>
+	bh=qbH2yQi8V2/4J04upwXVMsEwYXEoMfqMqtz2IJ1i/Lk=;
+	b=ssRcDIyGPEfqOOGtmp+JiT5miQaMt+ZWaNkR0+GRxu1U9hjba9yC2Qbv2wLJWYFJtceGwF
+	jYVsGHfdW216TnhyJW6nAavLlXt8lprzCIR6OPocNHthQfPaR6NwtBx8xhG9nzdOGGg325
+	0R2Kq2wns/e6U2i/fUB5kM+kOebH+Qk=
+Date: Sat, 24 Feb 2024 12:39:34 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 5/8] KVM: arm64: Fix typos
+Content-Language: en-US
+To: Bjorn Helgaas <helgaas@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>
+Cc: Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org,
+ Bjorn Helgaas <bhelgaas@google.com>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev
+References: <20240103231605.1801364-1-helgaas@kernel.org>
+ <20240103231605.1801364-6-helgaas@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zenghui Yu <zenghui.yu@linux.dev>
+In-Reply-To: <20240103231605.1801364-6-helgaas@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, 21 Feb 2024 05:42:43 +0000, Oliver Upton wrote:
-> Addressing a few more goofs that Zenghui was kind enough to point out.
-> Clearly all of the bugs have been found and addressed at this point.
+On 2024/1/4 07:16, Bjorn Helgaas wrote:
+> From: Bjorn Helgaas <bhelgaas@google.com>
 > 
-> v2: https://lore.kernel.org/kvmarm/20240213093250.3960069-1-oliver.upton@linux.dev/
-> v3: https://lore.kernel.org/kvmarm/20240216184153.2714504-1-oliver.upton@linux.dev/
+> Fix typos, most reported by "codespell arch/arm64".  Only touches comments,
+> no code changes.
 > 
-> v3 -> v4:
->  - Actually walk the LPI INTID range in vgic_copy_lpi_list() (Zenghui)
->  - Ensure xa_lock is taken w/ IRQs disabled, even after purging usage of
->    the lpi_list_lock (Zenghui)
->  - Document the lock ordering (Marc)
-> 
-> [...]
+> Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Zenghui Yu <yuzenghui@huawei.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: kvmarm@lists.linux.dev
 
-Applied to kvmarm/next, thanks!
-
-[01/10] KVM: arm64: vgic: Store LPIs in an xarray
-        https://git.kernel.org/kvmarm/kvmarm/c/1d6f83f60f79
-[02/10] KVM: arm64: vgic: Use xarray to find LPI in vgic_get_lpi()
-        https://git.kernel.org/kvmarm/kvmarm/c/5a021df71916
-[03/10] KVM: arm64: vgic-v3: Iterate the xarray to find pending LPIs
-        https://git.kernel.org/kvmarm/kvmarm/c/49f0a468a158
-[04/10] KVM: arm64: vgic-its: Walk the LPI xarray in vgic_copy_lpi_list()
-        https://git.kernel.org/kvmarm/kvmarm/c/2798683b8c80
-[05/10] KVM: arm64: vgic: Get rid of the LPI linked-list
-        https://git.kernel.org/kvmarm/kvmarm/c/9880835af78e
-[06/10] KVM: arm64: vgic: Use atomics to count LPIs
-        https://git.kernel.org/kvmarm/kvmarm/c/05f4d4f5d462
-[07/10] KVM: arm64: vgic: Free LPI vgic_irq structs in an RCU-safe manner
-        https://git.kernel.org/kvmarm/kvmarm/c/a5c7f011cb58
-[08/10] KVM: arm64: vgic: Rely on RCU protection in vgic_get_lpi()
-        https://git.kernel.org/kvmarm/kvmarm/c/864d4304ec1e
-[09/10] KVM: arm64: vgic: Ensure the irq refcount is nonzero when taking a ref
-        https://git.kernel.org/kvmarm/kvmarm/c/50ac89bb7092
-[10/10] KVM: arm64: vgic: Don't acquire the lpi_list_lock in vgic_put_irq()
-        https://git.kernel.org/kvmarm/kvmarm/c/e27f2d561fee
-
---
-Best,
-Oliver
+Oliver, mind taking it into 6.9?
