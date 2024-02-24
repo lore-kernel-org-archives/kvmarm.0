@@ -1,118 +1,237 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2079.outbound.protection.outlook.com [40.107.237.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A8071B977;
-	Sat, 24 Feb 2024 11:31:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708774269; cv=none; b=pzgKj67CnwbEtT/gRykQ9NcOexXhks81Sw3ZAQ8MmgIKXzBBqw9Y+CvZFDc+m9OJrEwG9OEPZi1Nnr+yVWQJKTFiwt5sdQi/W7OLmYKXRTALzGgMnISFqsMXMTWcPRQqLsWgQ189KLRrOTfRO5Apmfn31sU+Nr9DIuwDcklaLvw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708774269; c=relaxed/simple;
-	bh=bcm3DdqghLXqV1NDYxNhc4E3ZjWsODb7HUSJWc8HasI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hYqbLzB0s/PsqWimPqVEW+rI0fS8l/gfYMrU+1YYoo5nTLcPozPGb5DUGHhhpdLZdNk/FoIvRW15RZDYakDQKA99rp9nDJ4F+che8w8EcwwE17ECMhr769myzpMJOp0ZqjkxAS+Mp41LfXkPo0lphtaBOT4/2Ku1zKe0Gj8RQ2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qBoXj187; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3A04B5CD
+	for <kvmarm@lists.linux.dev>; Sat, 24 Feb 2024 15:06:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.79
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708787181; cv=fail; b=Nd/yYnB0oaF8CUJQlhdtTyNjZKN1t1OymezNc+GCMoRXijYRT1SxR96DerV4+EK7E+wSDjy8wQjfsRh69JJJIzfBoGps8Z0VEvcGXe62P2FeKlUvrU59kaCOZQ+XsRJbxkUIBtBBDO7v+bmlltKj8n19FeMgJyct7/W1spepPJo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708787181; c=relaxed/simple;
+	bh=SAFwc2gxk+qvcLKJksQMjk3z+Hx1gl+kqX2TcGblaxM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ufhsgznpHVcktTw5tLfaABHxx4WAxZ0oIjcTWl5xirZt3zs/ck324Lwvi2oV5jaeKN5I7vjASg4Gpd6gI9H7IdZMmC1gSNUnPdpqYBZkyzq5pgBYnsr0fDo4tmzokdL0QW86la2QGrUwilqGRq0YbtzcMrbEK92oQwUeqOEhs3g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=tSsTR9Yg; arc=fail smtp.client-ip=40.107.237.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qBoXj187"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9E56C433C7;
-	Sat, 24 Feb 2024 11:31:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708774268;
-	bh=bcm3DdqghLXqV1NDYxNhc4E3ZjWsODb7HUSJWc8HasI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qBoXj187P+E9luvr9Axsx9150L4De7EaN940cIVttWMr7c7jJL8NXQgF8/raWWXNl
-	 Eq/F4upq5KMG93mJLniOyY0Je2IXCLhD7wNx/1VnJB/9hPIngT+tkA/qzhHoDfpmVR
-	 XTAfZm9tHemT/6HM+4nr34cEq8HHy7/iL8H9TSh8WiHSvhz121huf7QADtQbDrIU29
-	 KjGqs7oUnoAV2bnIgsQgJ2ya7XEIILD9abEaTYa+a64uSce8Cdix5fvOwPGJLqfL7E
-	 vzZH420bTizVHF6dPO8NqgrsWdVwafztNrTkORK2q0GU4dRwU/ICGWOxFXnbfgkRsX
-	 7ToAAzBRglDcw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rdqFG-006M9n-Jj;
-	Sat, 24 Feb 2024 11:31:06 +0000
-Date: Sat, 24 Feb 2024 11:31:05 +0000
-Message-ID: <878r3a9k06.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Thomas Gleixner <tglx@linutronix.de>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH 3/3] irqchip/gic-v3-its: Print the vPE table installed in redistributor
-In-Reply-To: <ZdnO7QIYkxgDdl0i@linux.dev>
-References: <20240219185809.286724-1-oliver.upton@linux.dev>
-	<20240219185809.286724-4-oliver.upton@linux.dev>
-	<87bk869man.wl-maz@kernel.org>
-	<ZdnO7QIYkxgDdl0i@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tSsTR9Yg"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FGgjjOf24/2cHpqOuwbkHPeOLrgWSiUzfKnKDbs7BmhlUc7suBQY2LPnF5509SJIxCGw/yYsly1kewFecCnG4xFUyC2iqmi74ikcMNx8rL2JtiiKI12zrkFXxnI1XqHUXguCRadmb8LBOtnKLYaTDDlASNyX86Unb6Avy1PlwmTtrC7EsfcSxTkqnqsGCD0n4ALEV4tRZqS/M34EyuCkkhB3qKVO27mUYx7JIrfGTyvD6IJrHG2nlWxnC0fN0d4SbhzUWK9DgePQGpObSydGo4w0dA/wMiZlYXwi70c+qses2wOcQUwJj7Yekt/SYwzkQb97+OWUFHLm/jB7MXg8Jg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LUZDIzYliEDlkf7KLAlMPoVkGBFu7l2QbwRHkYMVkeU=;
+ b=lzm1MkhfsNnnLt/9rCDyWRFq9WuBgkEsIyyZeGO4X7paPL1Lxq3nX2AhvLNk5s9+odEeGR+umhoLVldp4dTMfRlFvQmkuj9OcU0oEYau399hUfNSuVpbGzAP4sPdt5aZvm+6iYQS8+2SQa8WsLYLi7L+ZIFLwTmwJ1723K7HDCaNOnzj5UNv5mn/MccxVedytlRD90d6yEPHS/Dx48aMXiY/b01/4hHOrJQ0c592vjSP6GhtGRsBYNiXAKo+ey9sS14k98wx5isRSwiAnUqnnQHyUtmd9pklUCBCWxkmR+8YeLqY4T1688fvwvRQvfMZkh2XTgphemDq7f2u8Lo+QA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LUZDIzYliEDlkf7KLAlMPoVkGBFu7l2QbwRHkYMVkeU=;
+ b=tSsTR9YgA33hI8qhPsemnUL65Vx6oQcWh9EegAN18ZJxG6NIFDXbLojvPO7etL/fjezPf9b+5rzT0K85Wy4A/TL8t0JoWL3BF+3mipkl6zBbpt0fW4OfLL4bYoTUMMqOTDmc2sJjlY0M/sMliQ0XJGtqaO/5Lw7V16Eh8ymxUfBOx8BWOfyGSVvB2Wg6YTiO9M3r0TYTy/f0UHasK1W40fdh6Lb7qsnXROHo1aOWU1Q4xKGmTAfAFtYNflSirqrVseRcOdX06PzjXkRkwGFVuvT2ixRCu03mg0GT+enHeD94IITMiRW6bWhgQQvglpLimRqahHWE8vlNM9W+Kb2adQ==
+Received: from CH2PR19CA0011.namprd19.prod.outlook.com (2603:10b6:610:4d::21)
+ by DS0PR12MB7678.namprd12.prod.outlook.com (2603:10b6:8:135::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.24; Sat, 24 Feb
+ 2024 15:06:12 +0000
+Received: from DS3PEPF000099D7.namprd04.prod.outlook.com
+ (2603:10b6:610:4d:cafe::70) by CH2PR19CA0011.outlook.office365.com
+ (2603:10b6:610:4d::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.48 via Frontend
+ Transport; Sat, 24 Feb 2024 15:06:12 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS3PEPF000099D7.mail.protection.outlook.com (10.167.17.8) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7292.25 via Frontend Transport; Sat, 24 Feb 2024 15:06:12 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Sat, 24 Feb
+ 2024 07:06:02 -0800
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Sat, 24 Feb
+ 2024 07:06:00 -0800
+Received: from sgarnayak-dt.nvidia.com (10.127.8.9) by mail.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12 via Frontend
+ Transport; Sat, 24 Feb 2024 07:05:49 -0800
+From: <ankita@nvidia.com>
+To: <ankita@nvidia.com>, <jgg@nvidia.com>, <maz@kernel.org>,
+	<oliver.upton@linux.dev>, <james.morse@arm.com>, <suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>, <reinette.chatre@intel.com>, <surenb@google.com>,
+	<stefanha@redhat.com>, <brauner@kernel.org>, <catalin.marinas@arm.com>,
+	<will@kernel.org>, <mark.rutland@arm.com>, <alex.williamson@redhat.com>,
+	<kevin.tian@intel.com>, <yi.l.liu@intel.com>, <ardb@kernel.org>,
+	<akpm@linux-foundation.org>, <andreyknvl@gmail.com>,
+	<wangjinchao@xfusion.com>, <gshan@redhat.com>, <shahuang@redhat.com>,
+	<ricarkol@google.com>, <linux-mm@kvack.org>, <lpieralisi@kernel.org>,
+	<rananta@google.com>, <ryan.roberts@arm.com>, <david@redhat.com>,
+	<linus.walleij@linaro.org>, <bhe@redhat.com>
+CC: <aniketa@nvidia.com>, <cjia@nvidia.com>, <kwankhede@nvidia.com>,
+	<targupta@nvidia.com>, <vsethi@nvidia.com>, <acurrid@nvidia.com>,
+	<apopple@nvidia.com>, <jhubbard@nvidia.com>, <danw@nvidia.com>,
+	<kvmarm@lists.linux.dev>, <mochs@nvidia.com>, <zhiw@nvidia.com>,
+	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>
+Subject: [PATCH v9 0/4] KVM: arm64: Allow the VM to select DEVICE_* and NORMAL_NC for IO memory
+Date: Sat, 24 Feb 2024 20:35:42 +0530
+Message-ID: <20240224150546.368-1-ankita@nvidia.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, tglx@linutronix.de, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, jingzhangos@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099D7:EE_|DS0PR12MB7678:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8b8585ce-199d-4d54-838f-08dc354a23fa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	ktApkWdr0NlyvDIrtx6nokZHwdbcm8ERQF4MS21EeZynfmfRI1GDbnOWa3teX3388pJZ8ENP/VjXEDHlD9T0lu6IQnIL0V/+AQ9jzXlIK2oyLWL98vAOCmTf7Bsxivd5iLALVrELUNalpSczNgzSJ/Qpq+oNdZTlU4Ve9Yyma1iwAxET02HF5U8/hC3LbTg5VQkBSQHIe5DhHhmZPN1qsZapRS3e1hi5/qK8ubDTg1D7xQAyQLVpg2iAJcVBslelHT3awCLEcwoAdYueLg5dfybeReKFNxLJo8s2zlXs0l+7/5yjz6/OOe7g3DoonoW2hjReJRb+bgEd0qg0H5KYGjVUTOdUIoHHhIO2/8zh4MzwwuzjRjg6i3bHt/RO+rGdmuXWvDn+U+5Y3BnDdR3nhbsx3Gi7sVjX8LQz7r9bAm2njTNow90Gi7k0A8Qz2uhN588z6db+Malhtq4uh5JAkvZgwdsupZSH5audOVIdKdUR2h42zx/shx5oABuy09Fqj7T5BK+VmaJP+fIx7m6UdQ8l5ymQUU5Z0H+HDmxYnRPf2pT1e6JNREWIstPs52Z9Sfhgg6NM6I/mT+qJIICE7C8r3nkVePtppg4+tzFpIgVijl6JOLaOtlkZEhTu2yxFCgzONnAakhcDedEpVp5Y4DAf23AFbyQy96aYhTSAlCYrwrHfVdf+6maE6kVA8CMdf3BTgYtQYS0DIy0khMS0+Q==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(230273577357003)(36860700004)(40470700004)(46966006)(921011);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2024 15:06:12.4427
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b8585ce-199d-4d54-838f-08dc354a23fa
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF000099D7.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7678
 
-On Sat, 24 Feb 2024 11:11:41 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Sat, Feb 24, 2024 at 10:41:36AM +0000, Marc Zyngier wrote:
-> > On Mon, 19 Feb 2024 18:58:08 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > -	pr_debug("CPU%d: VPROPBASER = %llx %*pbl\n",
-> > > -		 smp_processor_id(), val,
-> > > -		 cpumask_pr_args(gic_data_rdist()->vpe_table_mask));
-> > > +	pr_info("CPU%d: Using %s vPE table @%llx (%s)\n",
-> > > +		smp_processor_id(),
-> > > +		(val & GICR_VPROPBASER_4_1_INDIRECT) ? "indirect" : "direct",
-> > > +		val & GICR_VPROPBASER_4_1_ADDR,
-> > > +		(page) ? "allocated" :
-> > > +			 ((from_its) ? "inherited from ITS" : "inherited from RD"));
-> > 
-> > From past experience, having the vpe_table_mask value displayed did
-> > help tracking VPE table affinity bugs.
-> 
-> My reasoning behind it was that the change expanded the table mask by
-> way of printing what's going on at every RD. But easy enough to throw
-> back in!
+From: Ankit Agrawal <ankita@nvidia.com>
 
-Yeah, true enough. But the mask presents a nice, concise way to
-express the affinities that comparing a bunch of lines doesn't exactly
-convey.
+Currently, KVM for ARM64 maps at stage 2 memory that is considered device
+with DEVICE_nGnRE memory attributes; this setting overrides (per
+ARM architecture [1]) any device MMIO mapping present at stage 1,
+resulting in a set-up whereby a guest operating system cannot
+determine device MMIO mapping memory attributes on its own but
+it is always overridden by the KVM stage 2 default.
 
-> 
-> > This said, my problem with this patch is that we already have tons of
-> > these statement printed once per CPU/RD. This is really huge and
-> > accounts for a significant part of the boot time on large machines
-> > (64+ CPUs).
-> > 
-> > Before we add more of those, I'd really want to have a way to tone
-> > them down and only print them at runtime *if* required by the user.
-> > Kind of a dymanic debug, but driven from the command-line and present
-> > early enough.
-> 
-> Yeah, what'd be really nice is a way to enable pr_debug() on a per
-> file / driver / whatever basis, since turning on all of it becomes a bit
-> of a firehose... But I guess that's what grep is for.
-> 
-> WDYT about leaving it at pr_debug() for now, with the additional context
-> of what exactly VPROPBASE is getting programmend with?
+This set-up does not allow guest operating systems to select device
+memory attributes independently from KVM stage-2 mappings
+(refer to [1], "Combining stage 1 and stage 2 memory type attributes"),
+which turns out to be an issue in that guest operating systems
+(e.g. Linux) may request to map devices MMIO regions with memory
+attributes that guarantee better performance (e.g. gathering
+attribute - that for some devices can generate larger PCIe memory
+writes TLPs) and specific operations (e.g. unaligned transactions)
+such as the NormalNC memory type.
 
-Yup, I'm all for that. Hopefully we can find a good way to way to
-control the debug output in the near future.
+The default device stage 2 mapping was chosen in KVM for ARM64 since
+it was considered safer (i.e. it would not allow guests to trigger
+uncontained failures ultimately crashing the machine) but this
+turned out to be asynchronous (SError) defeating the purpose.
 
-Thanks,
+For these reasons, relax the KVM stage 2 device memory attributes
+from DEVICE_nGnRE to Normal-NC.
 
-	M.
+Generalizing to other devices may be problematic, however. E.g.
+GICv2 VCPU interface, which is effectively a shared peripheral, can
+allow a guest to affect another guest's interrupt distribution. Hence
+limit the change to VFIO PCI as caution. This is achieved by
+making the VFIO PCI core module set a flag that is tested by KVM
+to activate the code. This could be extended to other devices in
+the future once that is deemed safe.
+
+[1] section D8.5 - DDI0487J_a_a-profile_architecture_reference_manual.pdf
+
+Applied over v6.8-rc5.
+
+History
+=======
+v8 -> v9
+- Collected Reviewed-by and Acked-by.
+- Updated the commit messages in 2/4 and 4/4 to passive voice and fix
+  spelling error.
+- Updated subjects to align with convention of using capitalized first
+  letter.
+- Added links in 1/4 on the previous conversation for tracking purpose.
+
+v7 -> v8
+- Changed commit message of patches 2/4 and 4/4 to include detailed
+  description of the VM_ALLOW_ANY_UNCACHED flag posted by Jason in
+  the commit message.
+- Added more detailed comment in the vfio_pci_core about
+  VM_ALLOW_ANY_UNCACHED flag.
+- Rebased to v6.8-rc5.
+
+v6 -> v7
+- Changed VM_VFIO_ALLOW_WC to VM_ALLOW_ANY_UNCACHED based on suggestion
+  from Alex Williamson.
+- Refactored stage2_set_prot_attr() based on Will's suggestion to
+  reorganize the switch cases. Also updated the case to return -EINVAL
+  when both KVM_PGTABLE_PROT_DEVICE and KVM_PGTABLE_PROT_NORMAL_NC set.
+- Fixed nits pointed by Oliver and Catalin.
+
+v5 -> v6
+- Rebased to v6.8-rc2
+
+v4 -> v5
+- Moved the cover letter description text to patch 1/4.
+- Cleaned up stage2_set_prot_attr() based on Marc Zyngier suggestions.
+- Moved the mm header file changes to a separate patch.
+- Rebased to v6.7-rc3.
+
+v3 -> v4
+- Moved the vfio-pci change to use the VM_VFIO_ALLOW_WC into
+  separate patch.
+- Added check to warn on the case NORMAL_NC and DEVICE are
+  set simultaneously.
+- Fixed miscellaneous nitpicks suggested in v3.
+
+v2 -> v3
+- Added a new patch (and converted to patch series) suggested by
+  Catalin Marinas to ensure the code changes are restricted to
+  VFIO PCI devices.
+- Introduced VM_VFIO_ALLOW_WC flag for VFIO PCI to communicate
+  with VMM.
+- Reverted GIC mapping to DEVICE.
+
+v1 -> v2
+- Updated commit log to the one posted by
+  Lorenzo Pieralisi <lpieralisi@kernel.org> (Thanks!)
+- Added new flag to represent the NORMAL_NC setting. Updated
+  stage2_set_prot_attr() to handle new flag.
+
+v8 Link:
+https://lore.kernel.org/all/20240220072926.6466-1-ankita@nvidia.com/
+
+Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+
+Ankit Agrawal (4):
+  KVM: arm64: Introduce new flag for non-cacheable IO memory
+  mm: Introduce new flag to indicate wc safe
+  KVM: arm64: Set io memory s2 pte as normalnc for vfio pci device
+  vfio: Convey kvm that the vfio-pci device is wc safe
+
+ arch/arm64/include/asm/kvm_pgtable.h |  2 ++
+ arch/arm64/include/asm/memory.h      |  2 ++
+ arch/arm64/kvm/hyp/pgtable.c         | 24 +++++++++++++++++++-----
+ arch/arm64/kvm/mmu.c                 | 14 ++++++++++----
+ drivers/vfio/pci/vfio_pci_core.c     | 19 ++++++++++++++++++-
+ include/linux/mm.h                   | 14 ++++++++++++++
+ 6 files changed, 65 insertions(+), 10 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.34.1
+
