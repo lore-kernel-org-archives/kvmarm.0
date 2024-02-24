@@ -1,145 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0041B59C;
-	Sat, 24 Feb 2024 10:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48BFB241E3
+	for <kvmarm@lists.linux.dev>; Sat, 24 Feb 2024 11:02:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708771300; cv=none; b=LoFuZZ5C7OLbjlH4WDbm9QK8b2LxHkUr6u/xWtMsQtLOC1zDUVciOUtmVHsA0VspTgr/cGSWbGZV8nMQwfbcrZZsgWd23YZI6ICpMptux1cslf6BYidLnNkFMcsd4DZs29GWbKDjWPBkEDXDgzaGPHQkssLgKLI/eUu2ecThWaQ=
+	t=1708772572; cv=none; b=Tzqof2rBP1xE3yIRZr+f3fenN2wiejsUpDK+RET2+JYhrvGtFNPce4/+20KfSPoMiEDyqDxpFPnKix5J6mg+JjbIurPVtrp49vTJ6Ps4RV3sO7yLXV+Nk6FdXTm64RjZBvvz08YMLHKuK56ExVd8Fs0yOCxZDM25TWTS9RfWoVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708771300; c=relaxed/simple;
-	bh=El8Tx8z+w76H7TlIq7DwaR1/BFADl77wHAkdidcCCz8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MDuiEca6lIWBxyZadc/Q82ccyj4QV3ZYlJFjG9Lzr3W4hn6TyV8q86tKL1pgGQmFU6F3Oi3bAKwVSWkjMrUP1Khop4JEMNdjXwJ14MbOTR0csHmD5SvnTHJZDQuVFA2XvjUCid3KJrUctMegy/wgtFTEqklgnXdkRXPL+i94Qo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uq2+nPV2; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708772572; c=relaxed/simple;
+	bh=uNjvaojA4iNqK2eMDEKYqtYjlOdhE1jDHAvMJPe/bCc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b9ZITx96Yfjnvk6i5rQxAyLURaiqtQc4OJTje+MhmVpRT48q5Avf0bhjbx5R85fshSWwcQjUYa1fq969abAU7z1Ftv2l/o2G6WFrMvo+NjMOfbDK/6M2vyZjZul4fDYVg2eCocByuQU/oPIhpoIVhg3npp+HFSzsiBxQeR2sQic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SVkU/0KO; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uq2+nPV2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C44DC433F1;
-	Sat, 24 Feb 2024 10:41:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708771300;
-	bh=El8Tx8z+w76H7TlIq7DwaR1/BFADl77wHAkdidcCCz8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Uq2+nPV2qDwwRd+8SJWZySXM2Z+a7VuqZIuLvLBUsVm72UcgEzLzd6O+4FgUsAwol
-	 dqSU6YsThde29eWsnyRpckCzQWrMh8NwZ7zOdzesnILnuKtbLwbt4DN/6QzvUvsJ0e
-	 oXasKsvHbQwZlCRpVVAc2WkvEgkcoVfNh67W5HiWgWo0JpXxBGSur4dfWen0AiUUfC
-	 3kfS5OVx9+qfov6D0xne2nZimNoepeBVtGcZkSg3lePyOkiF6hqWNp04b3YSf5uSlu
-	 IdiIKAZCMeHXcHYijfvEsbPgplSdwgj1TFVfOVD9lymGN9NPZkn5dZMHr9mFV+/uvj
-	 O+cyHr8F1D4GQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rdpTN-006Lh6-RL;
-	Sat, 24 Feb 2024 10:41:37 +0000
-Date: Sat, 24 Feb 2024 10:41:36 +0000
-Message-ID: <87bk869man.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Thomas Gleixner <tglx@linutronix.de>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH 3/3] irqchip/gic-v3-its: Print the vPE table installed in redistributor
-In-Reply-To: <20240219185809.286724-4-oliver.upton@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SVkU/0KO"
+Date: Sat, 24 Feb 2024 11:02:40 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1708772568;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vuWp/+7BcPYQXEWx/FGeNBwG2S56ypB+UYiRZv6cNM4=;
+	b=SVkU/0KOQbxe4zhbMr3MEjYxu/5B6QD+MuxKlmxcTzwOcIYpDaHYA0/0XmxIEgUR7ZE1pG
+	tq3vAoQsj2/P9WvPOZRO1kcgG11YUhVcBQuE9mU77Zvb25s0hUH+rH4QFl/+nUDpVvoGqO
+	d+Kx0MHdeBHQ6mweiSFL9KqbQn9b4Po=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH 2/3] irqchip/gic-v3-its: Spin off GICv4 init into a
+ separate function
+Message-ID: <ZdnM0DDsGCTPMpwl@linux.dev>
 References: <20240219185809.286724-1-oliver.upton@linux.dev>
-	<20240219185809.286724-4-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240219185809.286724-3-oliver.upton@linux.dev>
+ <87cysm9mtv.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, tglx@linutronix.de, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, jingzhangos@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87cysm9mtv.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 19 Feb 2024 18:58:08 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
->=20
-> Hindsight is 20/20 of course, but the recent vPE table programming bug
-> could've been root caused a bit more quickly if we print the table
-> getting installed at every redistributor.
->=20
-> Promote to pr_info() and add some additional context, such as the
-> provenance of the installed vPE table.
->=20
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  drivers/irqchip/irq-gic-v3-its.c | 16 +++++++++++-----
->  1 file changed, 11 insertions(+), 5 deletions(-)
->=20
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v=
-3-its.c
-> index 63d1743f08cc..c3ef9665a2ad 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -2835,7 +2835,8 @@ static int allocate_vpe_l1_table(void)
->  	u64 val, gpsz, npg, pa;
->  	unsigned int psz =3D SZ_64K;
->  	unsigned int np, epp, esz;
-> -	struct page *page;
-> +	struct page *page =3D NULL;
-> +	bool from_its =3D false;
-> =20
->  	if (!gic_rdists->has_rvpeid)
->  		return 0;
-> @@ -2865,8 +2866,10 @@ static int allocate_vpe_l1_table(void)
->  		return -ENOMEM;
-> =20
->  	val =3D inherit_vpe_l1_table_from_its();
-> -	if (val & GICR_VPROPBASER_4_1_VALID)
-> +	if (val & GICR_VPROPBASER_4_1_VALID) {
-> +		from_its =3D true;
->  		goto out;
-> +	}
+On Sat, Feb 24, 2024 at 10:30:04AM +0000, Marc Zyngier wrote:
+> On Mon, 19 Feb 2024 18:58:07 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
+> > @@ -3193,7 +3210,8 @@ static void its_cpu_init_lpis(void)
+> >  		 * ancient programming gets left in and has possibility of
+> >  		 * corrupting memory.
+> >  		 */
+> > -		val = its_clear_vpend_valid(vlpi_base, 0, 0);
+> > +		its_clear_vpend_valid(vlpi_base, 0, 0);
+> > +		return;
+> 
+> I'm not sure about the necessity of this return statement.
+> allocate_vpe_l1_table() checks for rvpeid already, so it should be
+> fine to carry on.
 
-nit:
-	from_its =3D val & GICR_VPROPBASER_4_1_VALID;
-	if (from_its)
-		...
+Yup, definitely not necessary. My aim was to have the control flow make
+it a bit more obvious to the reader what's going on.
 
-> =20
->  	/* First probe the page size */
->  	val =3D FIELD_PREP(GICR_VPROPBASER_4_1_PAGE_SIZE, GIC_PAGE_SIZE_64K);
-> @@ -2945,9 +2948,12 @@ static int allocate_vpe_l1_table(void)
->  	gicr_write_vpropbaser(val, vlpi_base + GICR_VPROPBASER);
->  	cpumask_set_cpu(smp_processor_id(), gic_data_rdist()->vpe_table_mask);
-> =20
-> -	pr_debug("CPU%d: VPROPBASER =3D %llx %*pbl\n",
-> -		 smp_processor_id(), val,
-> -		 cpumask_pr_args(gic_data_rdist()->vpe_table_mask));
-> +	pr_info("CPU%d: Using %s vPE table @%llx (%s)\n",
-> +		smp_processor_id(),
-> +		(val & GICR_VPROPBASER_4_1_INDIRECT) ? "indirect" : "direct",
-> +		val & GICR_VPROPBASER_4_1_ADDR,
-> +		(page) ? "allocated" :
-> +			 ((from_its) ? "inherited from ITS" : "inherited from RD"));
+Having what reads as an allocation helper do a feature check isn't
+entirely obvious.
 
-=46rom past experience, having the vpe_table_mask value displayed did
-help tracking VPE table affinity bugs.
+I have no opinion either way though.
 
-This said, my problem with this patch is that we already have tons of
-these statement printed once per CPU/RD. This is really huge and
-accounts for a significant part of the boot time on large machines
-(64+ CPUs).
+> >  	}
+> >  
+> >  	if (allocate_vpe_l1_table()) {
+> > @@ -3205,15 +3223,6 @@ static void its_cpu_init_lpis(void)
+> >  		gic_rdists->has_rvpeid = false;
+> >  		gic_rdists->has_vlpis = false;
+> >  	}
+> > -
+> > -	/* Make sure the GIC has seen the above */
+> > -	dsb(sy);
+> 
+> ... we're now missing a dsb affecting the VPE table programming, as we
+> expect things to take effect immediately.
 
-Before we add more of those, I'd really want to have a way to tone
-them down and only print them at runtime *if* required by the user.
-Kind of a dymanic debug, but driven from the command-line and present
-early enough.
+LOL, and on the back of a bugfix no less. I'll fix this.
 
-What do you think?
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+-- 
+Thanks,
+Oliver
