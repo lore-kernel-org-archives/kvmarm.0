@@ -1,90 +1,118 @@
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5857E22085
-	for <kvmarm@lists.linux.dev>; Sat, 24 Feb 2024 11:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A8071B977;
+	Sat, 24 Feb 2024 11:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708773109; cv=none; b=O6JFTM1s1vnVwK0+gBEAZ9MgsAOpP9+pplxzkseh1MMW9LkdzimcDBmJQY/cxKpAwfgB1YIVNxiq5Th8p0TFnPTBYWUttd2kud6Qd3KbsP85n3IJuZoEygO6HYIOWohpLc/PNBeSeUo+/aCrYQrIEeMShnjHB7wZ6ZHhiYyiwmg=
+	t=1708774269; cv=none; b=pzgKj67CnwbEtT/gRykQ9NcOexXhks81Sw3ZAQ8MmgIKXzBBqw9Y+CvZFDc+m9OJrEwG9OEPZi1Nnr+yVWQJKTFiwt5sdQi/W7OLmYKXRTALzGgMnISFqsMXMTWcPRQqLsWgQ189KLRrOTfRO5Apmfn31sU+Nr9DIuwDcklaLvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708773109; c=relaxed/simple;
-	bh=Ri3QxNhCdWRUzxtt6K30VQ9dDXusNJ9qdsWwkYHGcH4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=un0CA/JCTY7QNjwbae6xLn2P8LzNBNZEGIyiTJJrKvD59SeYezT0im96lxxcMHHaVFkcdXyzpws3gf+MXibrSm1GMUITGVl+CKonHhes28fjJ/ogL7OrXxrp7gOK74vLYLHC9MGswDDxwZuqUiRv3OXbXMqZmuviBB9DBDiUuqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eZXKR2Pd; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1708774269; c=relaxed/simple;
+	bh=bcm3DdqghLXqV1NDYxNhc4E3ZjWsODb7HUSJWc8HasI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hYqbLzB0s/PsqWimPqVEW+rI0fS8l/gfYMrU+1YYoo5nTLcPozPGb5DUGHhhpdLZdNk/FoIvRW15RZDYakDQKA99rp9nDJ4F+che8w8EcwwE17ECMhr769myzpMJOp0ZqjkxAS+Mp41LfXkPo0lphtaBOT4/2Ku1zKe0Gj8RQ2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qBoXj187; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eZXKR2Pd"
-Date: Sat, 24 Feb 2024 11:11:41 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1708773105;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OQrVRzuuc7x4zdDY3sLDy+NO1SlXGxkB6DC5Uppljl8=;
-	b=eZXKR2Pd1Av/I9U0Ezk8UX3ar7+YfQR9ykGcdg53Bk1TOg+ookw+EyPFAK2sLn7p4F/kj7
-	7NV+FsLpg5Z2ZwWuN1/8xTQDQ5xVyfMiBbG2p7WdFYTMcYOA4LLLO+iub7pGskJ7UW7wRo
-	Vk2iwcs7k6ApyTs5xY/hlNxxDLInrW0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH 3/3] irqchip/gic-v3-its: Print the vPE table installed in
- redistributor
-Message-ID: <ZdnO7QIYkxgDdl0i@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qBoXj187"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9E56C433C7;
+	Sat, 24 Feb 2024 11:31:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708774268;
+	bh=bcm3DdqghLXqV1NDYxNhc4E3ZjWsODb7HUSJWc8HasI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qBoXj187P+E9luvr9Axsx9150L4De7EaN940cIVttWMr7c7jJL8NXQgF8/raWWXNl
+	 Eq/F4upq5KMG93mJLniOyY0Je2IXCLhD7wNx/1VnJB/9hPIngT+tkA/qzhHoDfpmVR
+	 XTAfZm9tHemT/6HM+4nr34cEq8HHy7/iL8H9TSh8WiHSvhz121huf7QADtQbDrIU29
+	 KjGqs7oUnoAV2bnIgsQgJ2ya7XEIILD9abEaTYa+a64uSce8Cdix5fvOwPGJLqfL7E
+	 vzZH420bTizVHF6dPO8NqgrsWdVwafztNrTkORK2q0GU4dRwU/ICGWOxFXnbfgkRsX
+	 7ToAAzBRglDcw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rdqFG-006M9n-Jj;
+	Sat, 24 Feb 2024 11:31:06 +0000
+Date: Sat, 24 Feb 2024 11:31:05 +0000
+Message-ID: <878r3a9k06.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Thomas Gleixner <tglx@linutronix.de>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH 3/3] irqchip/gic-v3-its: Print the vPE table installed in redistributor
+In-Reply-To: <ZdnO7QIYkxgDdl0i@linux.dev>
 References: <20240219185809.286724-1-oliver.upton@linux.dev>
- <20240219185809.286724-4-oliver.upton@linux.dev>
- <87bk869man.wl-maz@kernel.org>
+	<20240219185809.286724-4-oliver.upton@linux.dev>
+	<87bk869man.wl-maz@kernel.org>
+	<ZdnO7QIYkxgDdl0i@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87bk869man.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, tglx@linutronix.de, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, jingzhangos@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, Feb 24, 2024 at 10:41:36AM +0000, Marc Zyngier wrote:
-> On Mon, 19 Feb 2024 18:58:08 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
-> > -	pr_debug("CPU%d: VPROPBASER = %llx %*pbl\n",
-> > -		 smp_processor_id(), val,
-> > -		 cpumask_pr_args(gic_data_rdist()->vpe_table_mask));
-> > +	pr_info("CPU%d: Using %s vPE table @%llx (%s)\n",
-> > +		smp_processor_id(),
-> > +		(val & GICR_VPROPBASER_4_1_INDIRECT) ? "indirect" : "direct",
-> > +		val & GICR_VPROPBASER_4_1_ADDR,
-> > +		(page) ? "allocated" :
-> > +			 ((from_its) ? "inherited from ITS" : "inherited from RD"));
+On Sat, 24 Feb 2024 11:11:41 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> From past experience, having the vpe_table_mask value displayed did
-> help tracking VPE table affinity bugs.
-
-My reasoning behind it was that the change expanded the table mask by
-way of printing what's going on at every RD. But easy enough to throw
-back in!
-
-> This said, my problem with this patch is that we already have tons of
-> these statement printed once per CPU/RD. This is really huge and
-> accounts for a significant part of the boot time on large machines
-> (64+ CPUs).
+> On Sat, Feb 24, 2024 at 10:41:36AM +0000, Marc Zyngier wrote:
+> > On Mon, 19 Feb 2024 18:58:08 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > -	pr_debug("CPU%d: VPROPBASER = %llx %*pbl\n",
+> > > -		 smp_processor_id(), val,
+> > > -		 cpumask_pr_args(gic_data_rdist()->vpe_table_mask));
+> > > +	pr_info("CPU%d: Using %s vPE table @%llx (%s)\n",
+> > > +		smp_processor_id(),
+> > > +		(val & GICR_VPROPBASER_4_1_INDIRECT) ? "indirect" : "direct",
+> > > +		val & GICR_VPROPBASER_4_1_ADDR,
+> > > +		(page) ? "allocated" :
+> > > +			 ((from_its) ? "inherited from ITS" : "inherited from RD"));
+> > 
+> > From past experience, having the vpe_table_mask value displayed did
+> > help tracking VPE table affinity bugs.
 > 
-> Before we add more of those, I'd really want to have a way to tone
-> them down and only print them at runtime *if* required by the user.
-> Kind of a dymanic debug, but driven from the command-line and present
-> early enough.
+> My reasoning behind it was that the change expanded the table mask by
+> way of printing what's going on at every RD. But easy enough to throw
+> back in!
 
-Yeah, what'd be really nice is a way to enable pr_debug() on a per
-file / driver / whatever basis, since turning on all of it becomes a bit
-of a firehose... But I guess that's what grep is for.
+Yeah, true enough. But the mask presents a nice, concise way to
+express the affinities that comparing a bunch of lines doesn't exactly
+convey.
 
-WDYT about leaving it at pr_debug() for now, with the additional context
-of what exactly VPROPBASE is getting programmend with?
+> 
+> > This said, my problem with this patch is that we already have tons of
+> > these statement printed once per CPU/RD. This is really huge and
+> > accounts for a significant part of the boot time on large machines
+> > (64+ CPUs).
+> > 
+> > Before we add more of those, I'd really want to have a way to tone
+> > them down and only print them at runtime *if* required by the user.
+> > Kind of a dymanic debug, but driven from the command-line and present
+> > early enough.
+> 
+> Yeah, what'd be really nice is a way to enable pr_debug() on a per
+> file / driver / whatever basis, since turning on all of it becomes a bit
+> of a firehose... But I guess that's what grep is for.
+> 
+> WDYT about leaving it at pr_debug() for now, with the additional context
+> of what exactly VPROPBASE is getting programmend with?
+
+Yup, I'm all for that. Hopefully we can find a good way to way to
+control the debug output in the near future.
+
+Thanks,
+
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
