@@ -1,66 +1,25 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E18566280A
-	for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 09:47:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307F91DA58
+	for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 09:52:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708940856; cv=none; b=HfT2zlaiNV8g1l7m8vtiqAuwduCzoISovM/AUXsczi/trdXEZmlguWeC9XWeCzJ1Uw5vn6MD3KuqKaRn+EuSsHqVfzU6r+b8wxVMNEB+HzlSTuuG43euB8/GDalx5LXopTYClJ8hSzcTOQ2C5H+ol1hNCdZJQ+l/SdO4w0Mscxc=
+	t=1708941156; cv=none; b=JzR8HQeJvOhGkeVmf1uwQs3Wn51DWWXHbVa6h287vly7ngIAA1AKXJyPuUbRkEE8lrwrvlpi7g+aq6XxmXrrJnlhoXj8E6nlMxlzgMR647//k9KEJn1CLgg5YAqmEvFt98duDIBZBz7exYFEFSM3mFAk/9YlK2ZcK0oN2tJUXrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708940856; c=relaxed/simple;
-	bh=5Wf7H81GlIOvk5qmre9pm+TCznwRkuERxX6YnoQ3FRc=;
+	s=arc-20240116; t=1708941156; c=relaxed/simple;
+	bh=BI3vHnQrL8eZBMmoQ4kVzllzrn0jROcl6BxkptM6u+E=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FdYWA00JyV6VAzumTTTUuaxpEMovN8vMcFd2aBpvoIvw43XFqZ0qtBKiwZ5EaPWrsnobYuOi3R7/5orP6sVrfyWnkZnq3zTdxpfEmqphJSU/kWlYTqLEKvhLX6ZZHu23zXfY0zfQpW8pCBzbGBSs+vhiZvC0ePfeomX3JGd3cOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S4PQcyE5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S4PQcyE5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708940853;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=6+zFtJC/a8/spEP7x6+UKSXwE1+CzSPt4+YKrSqfJlo=;
-	b=S4PQcyE5pIMtdpxFQSGqcassXAlUETPhLD2ieBZfv8w7WD48gV6D3tphVqItKfKyF4GJis
-	/0B80TBswG4geBPsSaH0viOL0SmRe58hGpQVtkxFLSkgasYQu35ZepAqR0ualjEuY6+cpQ
-	Gf/ibiiO2YC1bXH8UYuOh37uDRjPi/o=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-554-11uuKS0YMDK8n6cFlzkd6g-1; Mon, 26 Feb 2024 04:47:32 -0500
-X-MC-Unique: 11uuKS0YMDK8n6cFlzkd6g-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-512e9690876so2746884e87.2
-        for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 01:47:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708940850; x=1709545650;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6+zFtJC/a8/spEP7x6+UKSXwE1+CzSPt4+YKrSqfJlo=;
-        b=fTwPUQrzgQ+osCTXGsoTf1xHu1huthTnIIsfqCr2xzMLdwVMA2tbNGdVhNLn/z0yP7
-         zukdFKXRdLZr5Q5SJ/nnpTfWbOOdlkWuw+SYVasJ2LpEAfOjjtZbwktazKTC5jRcBGfr
-         XJMXQs9RxKg1aWASDM7Kj7pY4uRLN4jROawApBidsFFCbnLexC2ThwJSdIC40Es50gxb
-         2xAW0AC7D/Mx8ZGph0sCDdbaGdJvFoX7iNTjNxLSWdlZTFZI3fQFj4Mg3wOpoN7UwQs6
-         FQtOUSa3lP3uSkj+DbvcO0WBlUkO+609SGlf1L9Zt0tjmqT7qGETbnt6TWBoQhGzyVb/
-         CWhw==
-X-Forwarded-Encrypted: i=1; AJvYcCUm5nIfHpukb/Rf6hBsZYF7F2mu7+Vg+DhqgiZy5pX37niX05xUVDDvM98QZ0obe07i7nSj3WprHqSnTDrXoEoiKtv7tQku
-X-Gm-Message-State: AOJu0YxVZHZMgyykxeDyW0yZW9KoHDekFQYKpfKDd+sVBOEyl0l2Yb4p
-	3ybt2v7UUe3w9l4CiRscJpNowOgo+3k4RDHhI+KzXpGvVNKduiYoUeUTEgl6Ya16kyOOakKxHDH
-	tngMGNKt6vid6pLBfxuE1K6L9/Jk4GggSwI5OIabxpZ/hpz78a0HQJA==
-X-Received: by 2002:a05:6512:3104:b0:512:d5ff:1bcf with SMTP id n4-20020a056512310400b00512d5ff1bcfmr4207224lfb.19.1708940850659;
-        Mon, 26 Feb 2024 01:47:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF7MuuzRsag8u6BSuJDHkSoqtjdhb2i2DhgeyURk12De7YvjAowld6gsPKTT3J1aVU9dQN5fw==
-X-Received: by 2002:a05:6512:3104:b0:512:d5ff:1bcf with SMTP id n4-20020a056512310400b00512d5ff1bcfmr4207213lfb.19.1708940850247;
-        Mon, 26 Feb 2024 01:47:30 -0800 (PST)
-Received: from ?IPV6:2003:cb:c72f:f700:104b:9184:1b45:1898? (p200300cbc72ff700104b91841b451898.dip0.t-ipconnect.de. [2003:cb:c72f:f700:104b:9184:1b45:1898])
-        by smtp.gmail.com with ESMTPSA id m9-20020a05600c4f4900b00412a013817esm5696665wmq.7.2024.02.26.01.47.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Feb 2024 01:47:29 -0800 (PST)
-Message-ID: <9e983090-f336-43b9-8f2b-5dabe7e73b72@redhat.com>
-Date: Mon, 26 Feb 2024 10:47:27 +0100
+	 In-Reply-To:Content-Type; b=UPORd0NXk6LCJsG7rNqwANrsHCNzKzDfnuygOAv3g8YjBIg9pyc8yqS/wqF5XFBXWz8aHsV96mG5T95oRUyFxlOHblJ/R3D+Sdi92NXWjvyiebt3LI7emcTKVmckvuJvhKcA7TffOqNsEO7lYpNl84f19EVpa+kfS1z3mEA1DwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0FAF1DA7;
+	Mon, 26 Feb 2024 01:53:12 -0800 (PST)
+Received: from [10.57.50.187] (unknown [10.57.50.187])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C15EB3F6C4;
+	Mon, 26 Feb 2024 01:52:28 -0800 (PST)
+Message-ID: <125fe2f0-bd21-462f-893a-fbf80813dfbf@arm.com>
+Date: Mon, 26 Feb 2024 09:52:27 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -68,118 +27,186 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 00/26] KVM: Restricted mapping of guest_memfd at
- the host and pKVM/arm64 support
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
- jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
- yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net,
- vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
- mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com,
- liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
- quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
- quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
- yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
- will@kernel.org, qperret@google.com, keirf@google.com
-References: <20240222161047.402609-1-tabba@google.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20240222161047.402609-1-tabba@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
+Subject: Re: [PATCH v5 5/7] arm64: KVM: Add interface to set guest value for
+ TRFCR register
+To: James Clark <james.clark@arm.com>
+Cc: James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mike Leach <mike.leach@linaro.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>,
+ Miguel Luis <miguel.luis@oracle.com>, Joey Gouly <joey.gouly@arm.com>,
+ Ard Biesheuvel <ardb@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Arnd Bergmann <arnd@arndb.de>, Helge Deller <deller@gmx.de>,
+ Andrew Walbran <qwandor@google.com>,
+ Vincent Donnefort <vdonnefort@google.com>,
+ Ryan Roberts <ryan.roberts@arm.com>, Fuad Tabba <tabba@google.com>,
+ Jing Zhang <jingzhangos@google.com>, linux-kernel@vger.kernel.org,
+ coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, maz@kernel.org, acme@kernel.org,
+ oliver.upton@linux.dev, broonie@kernel.org
+References: <20240220100924.2761706-1-james.clark@arm.com>
+ <20240220100924.2761706-6-james.clark@arm.com>
+ <c8819064-13c3-41c6-8b2e-779ef8a22ee8@arm.com>
+ <9d3f9f70-0b34-7426-8b62-93dc173a0bb2@arm.com>
+Content-Language: en-GB
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <9d3f9f70-0b34-7426-8b62-93dc173a0bb2@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 22.02.24 17:10, Fuad Tabba wrote:
-> This series adds restricted mmap() support to guest_memfd [1], as
-> well as support guest_memfd on pKVM/arm64.
+On 23/02/2024 16:39, James Clark wrote:
 > 
-> This series is based on Linux 6.8-rc4 + our pKVM core series [2].
-> The KVM core patches apply to Linux 6.8-rc4 (patches 1-6), but
-> the remainder (patches 7-26) require the pKVM core series. A git
-> repo with this series applied can be found here [3]. We have a
-> (WIP) kvmtool port capable of running the code in this series
-> [4]. For a technical deep dive into pKVM, please refer to Quentin
-> Perret's KVM Forum Presentation [5, 6].
 > 
-> I've covered some of the issues presented here in my LPC 2023
-> presentation [7].
+> On 23/02/2024 10:03, Suzuki K Poulose wrote:
+>> On 20/02/2024 10:09, James Clark wrote:
+>>> Add an interface for the Coresight driver to use to set the value of the
+>>> TRFCR register for the guest. This register controls the exclude
+>>> settings for trace at different exception levels, and is used to honor
+>>> the exclude_host and exclude_guest parameters from the Perf session.
+>>> This will be used to later write TRFCR_EL1 on nVHE at guest switch. For
+>>> VHE, the host trace is controlled by TRFCR_EL2 and thus we can write to
+>>> the TRFCR_EL1 immediately. Because guest writes to the register are
+>>> trapped, the value will persist and can't be modified.
+>>>
+>>> Instead of adding a load of infrastructure to share the host's per-cpu
+>>> offsets with the hypervisor, just define the new storage as a NR_CPUS
+>>> array.
+>>>
+>>> Signed-off-by: James Clark <james.clark@arm.com>
+>>> ---
+>>>    arch/arm64/include/asm/kvm_host.h |  3 +++
+>>>    arch/arm64/kernel/image-vars.h    |  1 +
+>>>    arch/arm64/kvm/debug.c            | 26 ++++++++++++++++++++++++++
+>>>    3 files changed, 30 insertions(+)
+>>>
+>>> diff --git a/arch/arm64/include/asm/kvm_host.h
+>>> b/arch/arm64/include/asm/kvm_host.h
+>>> index 85b5477bd1b4..56b7f7eca195 100644
+>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>> @@ -509,6 +509,7 @@ struct kvm_host_psci_config {
+>>>        bool psci_0_1_cpu_off_implemented;
+>>>        bool psci_0_1_migrate_implemented;
+>>>    };
+>>> +extern u64 ____cacheline_aligned kvm_guest_trfcr[NR_CPUS];
+>>>      extern struct kvm_host_psci_config
+>>> kvm_nvhe_sym(kvm_host_psci_config);
+>>>    #define kvm_host_psci_config CHOOSE_NVHE_SYM(kvm_host_psci_config)
+>>> @@ -1174,6 +1175,7 @@ void kvm_arch_vcpu_put_debug_state_flags(struct
+>>> kvm_vcpu *vcpu);
+>>>    void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
+>>>    void kvm_clr_pmu_events(u32 clr);
+>>>    bool kvm_set_pmuserenr(u64 val);
+>>> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest);
+>>>    #else
+>>>    static inline void kvm_set_pmu_events(u32 set, struct
+>>> perf_event_attr *attr) {}
+>>>    static inline void kvm_clr_pmu_events(u32 clr) {}
+>>> @@ -1181,6 +1183,7 @@ static inline bool kvm_set_pmuserenr(u64 val)
+>>>    {
+>>>        return false;
+>>>    }
+>>> +static inline void kvm_etm_set_guest_trfcr(u64 trfcr_guest) {}
+>>>    #endif
+>>>      void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu);
+>>> diff --git a/arch/arm64/kernel/image-vars.h
+>>> b/arch/arm64/kernel/image-vars.h
+>>> index 5e4dc72ab1bd..a451e4f10804 100644
+>>> --- a/arch/arm64/kernel/image-vars.h
+>>> +++ b/arch/arm64/kernel/image-vars.h
+>>> @@ -59,6 +59,7 @@ KVM_NVHE_ALIAS(alt_cb_patch_nops);
+>>>      /* Global kernel state accessed by nVHE hyp code. */
+>>>    KVM_NVHE_ALIAS(kvm_vgic_global_state);
+>>> +KVM_NVHE_ALIAS(kvm_guest_trfcr);
+>>>      /* Kernel symbols used to call panic() from nVHE hyp code (via
+>>> ERET). */
+>>>    KVM_NVHE_ALIAS(nvhe_hyp_panic_handler);
+>>> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+>>> index 49a13e72ddd2..c8d936ce6e2b 100644
+>>> --- a/arch/arm64/kvm/debug.c
+>>> +++ b/arch/arm64/kvm/debug.c
+>>> @@ -22,6 +22,7 @@
+>>>                    DBG_MDSCR_MDE)
+>>>      static DEFINE_PER_CPU(u64, mdcr_el2);
+>>> +u64 ____cacheline_aligned kvm_guest_trfcr[NR_CPUS];
+>>>      /*
+>>>     * save/restore_guest_debug_regs
+>>> @@ -359,3 +360,28 @@ void kvm_arch_vcpu_put_debug_state_flags(struct
+>>> kvm_vcpu *vcpu)
+>>>        vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+>>>        vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
+>>>    }
+>>> +
+>>> +/*
+>>> + * Interface for the Coresight driver to use to set the value of the
+>>> TRFCR
+>>> + * register for the guest. This register controls the exclude
+>>> settings for trace
+>>> + * at different exception levels, and is used to honor the
+>>> exclude_host and
+>>> + * exclude_guest parameters from the Perf session.
+>>> + *
+>>> + * This will be used to later write TRFCR_EL1 on nVHE at guest
+>>> switch. For VHE,
+>>> + * the host trace is controlled by TRFCR_EL2 and thus we can write to
+>>> the
+>>> + * TRFCR_EL1 immediately. Because guest writes to the register are
+>>> trapped, the
+>>> + * value will persist and can't be modified. For pKVM,
+>>> kvm_guest_trfcr can't
+>>> + * be read by the hypervisor, so don't bother writing it.
+>>> + */
+>>> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest)
+>>> +{
+>>> +    if
+>>> (WARN_ON_ONCE(!cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
+>>> +                                   ID_AA64DFR0_EL1_TraceFilt_SHIFT)))
+>>> +        return;
+>>> +
+>>> +    if (has_vhe())
+>>> +        write_sysreg_s(trfcr_guest, SYS_TRFCR_EL12);
+>>> +    else if (!is_protected_kvm_enabled())
+>>> +        kvm_guest_trfcr[smp_processor_id()] = trfcr_guest;
+>>
+>> smp_processor_id() could sleep in some configurations ? Should we switch
+>> to raw_smp_processor_id() to be safer ?
+>>
 > 
-> We haven't started using this in Android yet, but we aim to move
-> away from anonymous memory to guest_memfd once we have the
-> necessary support merged upstream. Others (e.g., Gunyah [8]) are
-> also looking into guest_memfd for similar reasons as us.
+> I don't think so, it's #defined to raw_smp_processor_id() anyway. Unless
+> DEBUG_PREEMPT is on, then it's still raw_smp_processor_id() but it
+> validates that preemption is disabled so the value isn't stale. >
+> We actually want that validation, so should leave it as
+
+This is actually what we want. i.e., We don't want the coresight drivers
+to make this call from a non-premptible context. Relying on the 
+DEBUG_PREEMPT for detecting such erroneous uses is not a good idea, 
+production kernels may not do this and a comment doesn't go far.
+So, I think we need a :
+
+WARN_ON(preemptible()) in here and use smp_processor_id()
+
+> smp_processor_id(). I can add a comment saying that this function should
+> only be called with preemption disabled, but I wouldn't add any extra
+> validation. Every smp_processor_id() call is already checked when
+> DEBUG_PREEMPT is on and this one doesn't seem to be special in any way.
 > 
-> By design, guest_memfd cannot be mapped, read, or written by the
-> host userspace. In pKVM, memory shared between a protected guest
-> and the host is shared in-place, unlike the other confidential
-> computing solutions that guest_memfd was originally envisaged for
-> (e.g, TDX).
+> I also checked that the warning isn't triggered with DEBUG_PREEMPT on,
+> and there are also a lot of other smp_processor_id() calls on similar
+> paths in the Coresight driver.
 
-Can you elaborate (or point to a summary) why pKVM has to be special 
-here? Why can't you use guest_memfd only for private memory and another 
-(ordinary) memfd for shared memory, like the other confidential 
-computing technologies are planning to?
+Here, we are setting something for the KVM to program and if we set the
+filters on the wrong Physical CPU, then we mess up the tracing.
 
-What's the main reason for that decision and can it be avoided?
+Suzuki
 
-(s390x also shares in-place, but doesn't need any special-casing like 
-guest_memfd provides)
-
--- 
-Cheers,
-
-David / dhildenb
+> 
+>> Otherwise looks good to me.
+>>
+>> Suzuki
+>>
+>>> +}
+>>> +EXPORT_SYMBOL_GPL(kvm_etm_set_guest_trfcr);
+>>
 
