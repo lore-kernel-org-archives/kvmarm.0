@@ -1,224 +1,222 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C3604C631
-	for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 11:34:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C3F5381BB
+	for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 11:36:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708947269; cv=none; b=dw5+Yoi2AhMgokDCQi7//3BpcPZ+Bwju+nHVahP/EGOea1oLiVwp//pUA2bcDu01cD7UcswrVsxvHksCbQJgNIZ8YX4u8rWm/9k3NurORUEHLtFpEAMPmkemyq5jHgA6JpXfZrvaoJ3rJ8rgxmR/Wy+DT/5gf+kw8DqdU2t77v0=
+	t=1708947391; cv=none; b=VNac8S1KQpg4PhJq/JTs/7BVnOLCpil5GtARaYSjNqNP7AlQuXmv7s0xSSuHjDe2NGEyODeZlSwgDXgUNlBYcgD9fq10ebiR3xkWhzWeR66+ogo1pEXwpB38NsfefkHVJP4xRyoFUA1wMSkaSbeKkBSYr0doQVKpMJmDepcj708=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708947269; c=relaxed/simple;
-	bh=iQUVhMXan0N9d/UX9hOf/y32NkYSxDSZ3nvhEoqpFqg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XpLVjd7tmUxckwB43KuLanrUvewT+pvmr/Vo5Ys1rlej0pPWArYNBUZt7YHEranpJ3o0S+wN+gPvyNIbGe83umOGFTp4UfXc001hNwHX5oMoMeEACLiMq8eMdXt1Tl7n/1mWO6GN25+ahVy8PffhvdWU4DFN5X8UySKj7b8FSYk=
+	s=arc-20240116; t=1708947391; c=relaxed/simple;
+	bh=541BRO4/wZ6dwAolyK0ZZlVzB20RgVtdSPE1WZS4qJw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Smszl5jzpCudJTLHAZPciASOnawhey9UoHnbjsSx8WQ5EpqN/aBgPDBUnE9w4M/8vbdOt+QvNaxBIyJlUgjRbJ9yyokr/X6Om4q3T2tHIc2T/u1o38L3EUVghpDbUog3H8co38oOhumbUpnDbOYCsPFfsfMFrhkyM0i1+qBG6ps=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 69C8F1042;
-	Mon, 26 Feb 2024 03:35:05 -0800 (PST)
-Received: from e127643.broadband (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 68BED3F6C4;
-	Mon, 26 Feb 2024 03:34:23 -0800 (PST)
-From: James Clark <james.clark@arm.com>
-To: coresight@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	maz@kernel.org,
-	suzuki.poulose@arm.com,
-	acme@kernel.org,
-	oliver.upton@linux.dev,
-	broonie@kernel.org
-Cc: James Clark <james.clark@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mike Leach <mike.leach@linaro.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Miguel Luis <miguel.luis@oracle.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Helge Deller <deller@gmx.de>,
-	Quentin Perret <qperret@google.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v6 8/8] coresight: Pass guest TRFCR value to KVM
-Date: Mon, 26 Feb 2024 11:30:36 +0000
-Message-Id: <20240226113044.228403-9-james.clark@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240226113044.228403-1-james.clark@arm.com>
-References: <20240226113044.228403-1-james.clark@arm.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 91531DA7;
+	Mon, 26 Feb 2024 03:37:07 -0800 (PST)
+Received: from [192.168.1.100] (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0E63C3F6C4;
+	Mon, 26 Feb 2024 03:36:22 -0800 (PST)
+Message-ID: <acb73492-ccb7-5dba-d9d8-7ca096714adc@arm.com>
+Date: Mon, 26 Feb 2024 11:36:21 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v5 5/7] arm64: KVM: Add interface to set guest value for
+ TRFCR register
+Content-Language: en-US
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mike Leach <mike.leach@linaro.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>,
+ Miguel Luis <miguel.luis@oracle.com>, Joey Gouly <joey.gouly@arm.com>,
+ Ard Biesheuvel <ardb@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Arnd Bergmann <arnd@arndb.de>, Helge Deller <deller@gmx.de>,
+ Andrew Walbran <qwandor@google.com>,
+ Vincent Donnefort <vdonnefort@google.com>,
+ Ryan Roberts <ryan.roberts@arm.com>, Fuad Tabba <tabba@google.com>,
+ Jing Zhang <jingzhangos@google.com>, linux-kernel@vger.kernel.org,
+ coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, maz@kernel.org, acme@kernel.org,
+ oliver.upton@linux.dev, broonie@kernel.org
+References: <20240220100924.2761706-1-james.clark@arm.com>
+ <20240220100924.2761706-6-james.clark@arm.com>
+ <c8819064-13c3-41c6-8b2e-779ef8a22ee8@arm.com>
+ <9d3f9f70-0b34-7426-8b62-93dc173a0bb2@arm.com>
+ <125fe2f0-bd21-462f-893a-fbf80813dfbf@arm.com>
+From: James Clark <james.clark@arm.com>
+In-Reply-To: <125fe2f0-bd21-462f-893a-fbf80813dfbf@arm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Currently the userspace and kernel filters for guests are never set, so
-no trace will be generated for them. Add support for tracing guests by
-passing the desired TRFCR value to KVM so it can be applied to the
-guest.
 
-By writing either E1TRE or E0TRE, filtering on either guest kernel or
-guest userspace is also supported. And if both E1TRE and E0TRE are
-cleared when exclude_guest is set, that option is supported too. This
-change also brings exclude_host support which is difficult to add as a
-separate commit without excess churn and resulting in no trace at all.
 
-Testing
-=======
+On 26/02/2024 09:52, Suzuki K Poulose wrote:
+> On 23/02/2024 16:39, James Clark wrote:
+>>
+>>
+>> On 23/02/2024 10:03, Suzuki K Poulose wrote:
+>>> On 20/02/2024 10:09, James Clark wrote:
+>>>> Add an interface for the Coresight driver to use to set the value of
+>>>> the
+>>>> TRFCR register for the guest. This register controls the exclude
+>>>> settings for trace at different exception levels, and is used to honor
+>>>> the exclude_host and exclude_guest parameters from the Perf session.
+>>>> This will be used to later write TRFCR_EL1 on nVHE at guest switch. For
+>>>> VHE, the host trace is controlled by TRFCR_EL2 and thus we can write to
+>>>> the TRFCR_EL1 immediately. Because guest writes to the register are
+>>>> trapped, the value will persist and can't be modified.
+>>>>
+>>>> Instead of adding a load of infrastructure to share the host's per-cpu
+>>>> offsets with the hypervisor, just define the new storage as a NR_CPUS
+>>>> array.
+>>>>
+>>>> Signed-off-by: James Clark <james.clark@arm.com>
+>>>> ---
+>>>>    arch/arm64/include/asm/kvm_host.h |  3 +++
+>>>>    arch/arm64/kernel/image-vars.h    |  1 +
+>>>>    arch/arm64/kvm/debug.c            | 26 ++++++++++++++++++++++++++
+>>>>    3 files changed, 30 insertions(+)
+>>>>
+>>>> diff --git a/arch/arm64/include/asm/kvm_host.h
+>>>> b/arch/arm64/include/asm/kvm_host.h
+>>>> index 85b5477bd1b4..56b7f7eca195 100644
+>>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>>> @@ -509,6 +509,7 @@ struct kvm_host_psci_config {
+>>>>        bool psci_0_1_cpu_off_implemented;
+>>>>        bool psci_0_1_migrate_implemented;
+>>>>    };
+>>>> +extern u64 ____cacheline_aligned kvm_guest_trfcr[NR_CPUS];
+>>>>      extern struct kvm_host_psci_config
+>>>> kvm_nvhe_sym(kvm_host_psci_config);
+>>>>    #define kvm_host_psci_config CHOOSE_NVHE_SYM(kvm_host_psci_config)
+>>>> @@ -1174,6 +1175,7 @@ void kvm_arch_vcpu_put_debug_state_flags(struct
+>>>> kvm_vcpu *vcpu);
+>>>>    void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
+>>>>    void kvm_clr_pmu_events(u32 clr);
+>>>>    bool kvm_set_pmuserenr(u64 val);
+>>>> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest);
+>>>>    #else
+>>>>    static inline void kvm_set_pmu_events(u32 set, struct
+>>>> perf_event_attr *attr) {}
+>>>>    static inline void kvm_clr_pmu_events(u32 clr) {}
+>>>> @@ -1181,6 +1183,7 @@ static inline bool kvm_set_pmuserenr(u64 val)
+>>>>    {
+>>>>        return false;
+>>>>    }
+>>>> +static inline void kvm_etm_set_guest_trfcr(u64 trfcr_guest) {}
+>>>>    #endif
+>>>>      void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu);
+>>>> diff --git a/arch/arm64/kernel/image-vars.h
+>>>> b/arch/arm64/kernel/image-vars.h
+>>>> index 5e4dc72ab1bd..a451e4f10804 100644
+>>>> --- a/arch/arm64/kernel/image-vars.h
+>>>> +++ b/arch/arm64/kernel/image-vars.h
+>>>> @@ -59,6 +59,7 @@ KVM_NVHE_ALIAS(alt_cb_patch_nops);
+>>>>      /* Global kernel state accessed by nVHE hyp code. */
+>>>>    KVM_NVHE_ALIAS(kvm_vgic_global_state);
+>>>> +KVM_NVHE_ALIAS(kvm_guest_trfcr);
+>>>>      /* Kernel symbols used to call panic() from nVHE hyp code (via
+>>>> ERET). */
+>>>>    KVM_NVHE_ALIAS(nvhe_hyp_panic_handler);
+>>>> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+>>>> index 49a13e72ddd2..c8d936ce6e2b 100644
+>>>> --- a/arch/arm64/kvm/debug.c
+>>>> +++ b/arch/arm64/kvm/debug.c
+>>>> @@ -22,6 +22,7 @@
+>>>>                    DBG_MDSCR_MDE)
+>>>>      static DEFINE_PER_CPU(u64, mdcr_el2);
+>>>> +u64 ____cacheline_aligned kvm_guest_trfcr[NR_CPUS];
+>>>>      /*
+>>>>     * save/restore_guest_debug_regs
+>>>> @@ -359,3 +360,28 @@ void kvm_arch_vcpu_put_debug_state_flags(struct
+>>>> kvm_vcpu *vcpu)
+>>>>        vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+>>>>        vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
+>>>>    }
+>>>> +
+>>>> +/*
+>>>> + * Interface for the Coresight driver to use to set the value of the
+>>>> TRFCR
+>>>> + * register for the guest. This register controls the exclude
+>>>> settings for trace
+>>>> + * at different exception levels, and is used to honor the
+>>>> exclude_host and
+>>>> + * exclude_guest parameters from the Perf session.
+>>>> + *
+>>>> + * This will be used to later write TRFCR_EL1 on nVHE at guest
+>>>> switch. For VHE,
+>>>> + * the host trace is controlled by TRFCR_EL2 and thus we can write to
+>>>> the
+>>>> + * TRFCR_EL1 immediately. Because guest writes to the register are
+>>>> trapped, the
+>>>> + * value will persist and can't be modified. For pKVM,
+>>>> kvm_guest_trfcr can't
+>>>> + * be read by the hypervisor, so don't bother writing it.
+>>>> + */
+>>>> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest)
+>>>> +{
+>>>> +    if
+>>>> (WARN_ON_ONCE(!cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
+>>>> +                                   ID_AA64DFR0_EL1_TraceFilt_SHIFT)))
+>>>> +        return;
+>>>> +
+>>>> +    if (has_vhe())
+>>>> +        write_sysreg_s(trfcr_guest, SYS_TRFCR_EL12);
+>>>> +    else if (!is_protected_kvm_enabled())
+>>>> +        kvm_guest_trfcr[smp_processor_id()] = trfcr_guest;
+>>>
+>>> smp_processor_id() could sleep in some configurations ? Should we switch
+>>> to raw_smp_processor_id() to be safer ?
+>>>
+>>
+>> I don't think so, it's #defined to raw_smp_processor_id() anyway. Unless
+>> DEBUG_PREEMPT is on, then it's still raw_smp_processor_id() but it
+>> validates that preemption is disabled so the value isn't stale. >
+>> We actually want that validation, so should leave it as
+> 
+> This is actually what we want. i.e., We don't want the coresight drivers
+> to make this call from a non-premptible context. Relying on the
+> DEBUG_PREEMPT for detecting such erroneous uses is not a good idea,
+> production kernels may not do this and a comment doesn't go far.
+> So, I think we need a :
+> 
+> WARN_ON(preemptible()) in here and use smp_processor_id()
+> 
 
-The addresses were counted with the following:
+Ok yeah that's easy enough to add. I was worried it would be redundant
+with DEBUG_PREEMPT but I suppose it doesn't really cost anything.
 
-  $ perf report -D | grep -Eo 'EL2|EL1|EL0' | sort | uniq -c
-
-Guest kernel only:
-
-  $ perf record -e cs_etm//Gk -a -- true
-    535 EL1
-      1 EL2
-
-Guest user only (only 5 addresses because the guest runs slowly in the
-model):
-
-  $ perf record -e cs_etm//Gu -a -- true
-    5 EL0
-
-Host kernel only:
-
-  $  perf record -e cs_etm//Hk -a -- true
-   3501 EL2
-
-Host userspace only:
-
-  $  perf record -e cs_etm//Hu -a -- true
-    408 EL0
-      1 EL2
-
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: James Clark <james.clark@arm.com>
----
- .../coresight/coresight-etm4x-core.c          | 42 ++++++++++++++++---
- drivers/hwtracing/coresight/coresight-etm4x.h |  2 +-
- drivers/hwtracing/coresight/coresight-priv.h  |  3 ++
- 3 files changed, 40 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/hwtracing/coresight/coresight-etm4x-core.c b/drivers/hwtracing/coresight/coresight-etm4x-core.c
-index ce1995a2827f..45a69bfdc6b5 100644
---- a/drivers/hwtracing/coresight/coresight-etm4x-core.c
-+++ b/drivers/hwtracing/coresight/coresight-etm4x-core.c
-@@ -6,6 +6,7 @@
- #include <linux/acpi.h>
- #include <linux/bitops.h>
- #include <linux/kernel.h>
-+#include <linux/kvm_host.h>
- #include <linux/moduleparam.h>
- #include <linux/init.h>
- #include <linux/types.h>
-@@ -271,9 +272,22 @@ static void etm4x_prohibit_trace(struct etmv4_drvdata *drvdata)
- 	/* If the CPU doesn't support FEAT_TRF, nothing to do */
- 	if (!drvdata->trfcr)
- 		return;
-+	kvm_etm_set_guest_trfcr(0);
- 	cpu_prohibit_trace();
- }
- 
-+static u64 etm4x_get_kern_user_filter(struct etmv4_drvdata *drvdata)
-+{
-+	u64 trfcr = drvdata->trfcr;
-+
-+	if (drvdata->config.mode & ETM_MODE_EXCL_KERN)
-+		trfcr &= ~TRFCR_ELx_ExTRE;
-+	if (drvdata->config.mode & ETM_MODE_EXCL_USER)
-+		trfcr &= ~TRFCR_ELx_E0TRE;
-+
-+	return trfcr;
-+}
-+
- /*
-  * etm4x_allow_trace - Allow CPU tracing in the respective ELs,
-  * as configured by the drvdata->config.mode for the current
-@@ -286,18 +300,28 @@ static void etm4x_prohibit_trace(struct etmv4_drvdata *drvdata)
-  */
- static void etm4x_allow_trace(struct etmv4_drvdata *drvdata)
- {
--	u64 trfcr = drvdata->trfcr;
-+	u64 trfcr;
- 
- 	/* If the CPU doesn't support FEAT_TRF, nothing to do */
--	if (!trfcr)
-+	if (!drvdata->trfcr)
- 		return;
- 
--	if (drvdata->config.mode & ETM_MODE_EXCL_KERN)
--		trfcr &= ~TRFCR_ELx_ExTRE;
--	if (drvdata->config.mode & ETM_MODE_EXCL_USER)
--		trfcr &= ~TRFCR_ELx_E0TRE;
-+	if (drvdata->config.mode & ETM_MODE_EXCL_HOST)
-+		trfcr = drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
-+	else
-+		trfcr = etm4x_get_kern_user_filter(drvdata);
- 
- 	write_trfcr(trfcr);
-+
-+	/* Set filters for guests and pass to KVM */
-+	if (drvdata->config.mode & ETM_MODE_EXCL_GUEST)
-+		trfcr = drvdata->trfcr & ~(TRFCR_ELx_ExTRE | TRFCR_ELx_E0TRE);
-+	else
-+		trfcr = etm4x_get_kern_user_filter(drvdata);
-+
-+	/* TRFCR_EL1 doesn't have CX so mask it out. */
-+	trfcr &= ~TRFCR_EL2_CX;
-+	kvm_etm_set_guest_trfcr(trfcr);
- }
- 
- #ifdef CONFIG_ETM4X_IMPDEF_FEATURE
-@@ -655,6 +679,12 @@ static int etm4_parse_event_config(struct coresight_device *csdev,
- 	if (attr->exclude_user)
- 		config->mode = ETM_MODE_EXCL_USER;
- 
-+	if (attr->exclude_host)
-+		config->mode |= ETM_MODE_EXCL_HOST;
-+
-+	if (attr->exclude_guest)
-+		config->mode |= ETM_MODE_EXCL_GUEST;
-+
- 	/* Always start from the default config */
- 	etm4_set_default_config(config);
- 
-diff --git a/drivers/hwtracing/coresight/coresight-etm4x.h b/drivers/hwtracing/coresight/coresight-etm4x.h
-index da17b6c49b0f..70c29e91f4b5 100644
---- a/drivers/hwtracing/coresight/coresight-etm4x.h
-+++ b/drivers/hwtracing/coresight/coresight-etm4x.h
-@@ -841,7 +841,7 @@ enum etm_impdef_type {
-  * @s_ex_level: Secure ELs where tracing is supported.
-  */
- struct etmv4_config {
--	u32				mode;
-+	u64				mode;
- 	u32				pe_sel;
- 	u32				cfg;
- 	u32				eventctrl0;
-diff --git a/drivers/hwtracing/coresight/coresight-priv.h b/drivers/hwtracing/coresight/coresight-priv.h
-index 767076e07970..727dd27ba800 100644
---- a/drivers/hwtracing/coresight/coresight-priv.h
-+++ b/drivers/hwtracing/coresight/coresight-priv.h
-@@ -39,6 +39,9 @@
- 
- #define ETM_MODE_EXCL_KERN	BIT(30)
- #define ETM_MODE_EXCL_USER	BIT(31)
-+#define ETM_MODE_EXCL_HOST	BIT(32)
-+#define ETM_MODE_EXCL_GUEST	BIT(33)
-+
- struct cs_pair_attribute {
- 	struct device_attribute attr;
- 	u32 lo_off;
--- 
-2.34.1
-
+>> smp_processor_id(). I can add a comment saying that this function should
+>> only be called with preemption disabled, but I wouldn't add any extra
+>> validation. Every smp_processor_id() call is already checked when
+>> DEBUG_PREEMPT is on and this one doesn't seem to be special in any way.
+>>
+>> I also checked that the warning isn't triggered with DEBUG_PREEMPT on,
+>> and there are also a lot of other smp_processor_id() calls on similar
+>> paths in the Coresight driver.
+> 
+> Here, we are setting something for the KVM to program and if we set the
+> filters on the wrong Physical CPU, then we mess up the tracing.
+> 
+> Suzuki
+> 
+>>
+>>> Otherwise looks good to me.
+>>>
+>>> Suzuki
+>>>
+>>>> +}
+>>>> +EXPORT_SYMBOL_GPL(kvm_etm_set_guest_trfcr);
+>>>
+> 
