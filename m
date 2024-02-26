@@ -1,73 +1,73 @@
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B99219ED
-	for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 09:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3696C21A14
+	for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 09:05:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708938260; cv=none; b=gDxMfeRE2k+D/u5durJPN7O5GYlMxKM0r2yD/eJXiZ+ot6pSetbaTAwJ1IPPu+bk87hEEJc5b4DwYrElzfGTRIJg7TZzhmpfk//Z8Lkzp8LktWm6Tf8Jlx41WbQP3z03jZ8664Lluqkwtg4squhhisMqv5kEBhfhtu77LuSYW8U=
+	t=1708938354; cv=none; b=lU5yjg0KuK05L1GP1lzD7cnpw5Um/I6qLZBxMy/CHZijtbh0dqWNnoOh3C7X8E8/5057qTBsV2VxmxoTtiVSmbOqQi1vmge694jKUr+pulT80aoj+ZOJuR3OKZ4/zGG7gyvZQOS22bVc+5kyN9kZ8e80/XOIqm0fgPIqCrtfD4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708938260; c=relaxed/simple;
-	bh=yEZyECskv2rcwMp+c/P2OzQkmGTKaUReF3Ro5PzNU5M=;
+	s=arc-20240116; t=1708938354; c=relaxed/simple;
+	bh=DGDOY12oobXLPZUazkiYwX7hvCEsA/b9upyEJcRN6S0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cNwItUUMejPGsVAe+agT00ubRIX22d8Ex0OsfmakphBFo6jnFF8VDbLN3cpxwT/j6eyq6cb1X6lfZ2JjraP+/5qIXYJOEfnQAdP2oqx3oJPOarUk/CuVh/jSm9Sd9OqUTGxM8yurFiwTtgRENERLvRplWYKVdVkb10+q7/cBNks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R6Y+debA; arc=none smtp.client-ip=209.85.217.51
+	 To:Cc:Content-Type; b=Mo7AGPDIxwysQa+cZ7YOPBVcrc3oYBkWHrN30kEsLKpN1PKFPwHHOEkhQ8JXDa6RPm0AF4W+s5wEDK+GGvBvx5/9ctJvHoAmjOM6+xNB4hGrax5J/ZoNYSzk5o8SiQeAYd2RMJAQWtLCgFNda0TQaON9exPRWwPmv2GhISVFmNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=253W66SM; arc=none smtp.client-ip=209.85.222.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R6Y+debA"
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-470455b5352so336345137.2
-        for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 01:04:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="253W66SM"
+Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-7d643a40a91so1686816241.0
+        for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 01:05:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708938257; x=1709543057; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1708938351; x=1709543151; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yEZyECskv2rcwMp+c/P2OzQkmGTKaUReF3Ro5PzNU5M=;
-        b=R6Y+debALlVPYPKQQ5p9rE9e46uLAvLzP9+O9Lp42n5Mkd9B8u47Hs+4PpXbUj5gux
-         rX+34mvpKD3Z6ionk+rRvrkbwCJSDPJW9akF8KYs4afXIEELbM8ilwYDJrl48tNpEfay
-         Mp6L96RsmfZePqHIGssLyr/OWabHjQWuxNEdthkGLGEoaqJzrcJ1KJtotzzOwImvv3ce
-         oFfUb6QzleiVhXTS8hlWX9INM79bQvF5+/NIQKY0HbVBapqjXHK926AetPtroeF8LMRH
-         KSbKnC6G+Ie17pcQcUVLJ1PrUf9FEmoPf1M0f9qAARMd6yyH9mS271SQqKSGeBzKnpVB
-         UosA==
+        bh=29ukxl3SZDNqQP6DfxAR7ZWQCxlzQHsam7YuMTpfEGw=;
+        b=253W66SMM+9WWcCoVzubntxlVQikW/LWW/Fq3m2lrKtOv1GkZOBc45pLdIBBet1l9/
+         I5pLRfplmrj9Vq7fCuGH0uY82IS409wG5dzWBNt5+pC0OEq7ttet4apxOjuN8pbwVqC6
+         X6eGNptx0/P67glW+aRHmdCEWBMKF2jGmjPlxOoqhdpqSFbVd17KmPKQrsojdlzcSsKI
+         tHvqVXJrvyRX/KMUT2S2vtufjitLO/wt+0guxPufeFZ4EEoikb1CUpT7IJ6v4HCGyFLG
+         1DM8P0pPYqH2wLdzEvgS+qAxAHYjRcWrjrV51Nw94Bb1txB34qKYTzMYbEDIn2oy9pjf
+         J2Pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708938257; x=1709543057;
+        d=1e100.net; s=20230601; t=1708938351; x=1709543151;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yEZyECskv2rcwMp+c/P2OzQkmGTKaUReF3Ro5PzNU5M=;
-        b=XuBPcl1iJusuWhY8FT1sa2u6lSTXgpG7+6vAnIrdbRT4AI393Pw4H7mfJXz71IBm1g
-         zxbdYrjU5EaQMwmsLoBrfyIbtMHjenJJsmlUdFd3vFByJGGQUCRoJ70/1rK8Mmvi0VcR
-         dBPHZLu1/1iTcIEVnol18bhAcym9nwljSXYOPRMsIm2slrSCOQsTefa3phRJsQBcAVOb
-         x2eoQMFmn5Ixj6ScMdPgQodThb5ms5A43QEpotwezUngXo84IzpLqpjj8DrWnQXbGUhF
-         OZb7dPwSAkOb/8IsKC6kqprF1A9QJBys6/mqqmDzyvoxoXzXdJ1mUBIpMZeXX5EEjIZG
-         a+vg==
-X-Forwarded-Encrypted: i=1; AJvYcCUs9tGB1gKXpvo8iJG+Xgl/AFifgITWapwqxRvci31Ob8eJu6UUP60uZOeZe9R5PMSor+9f9unlNJNdXEtAFJwSNJq05iju
-X-Gm-Message-State: AOJu0YzSuLz/GWskF2QRfVpYx7/Xd4yqw9pWe6hWXagJ8YQ3UJlgNbiY
-	y/RLuFlpnI3nFOpnvCoCrCWkGjbDi3t8xO4C3aIAV2Rl4P3u7m5dwCYOl5i5r0KST5/GcTzFhAT
-	L2iYOCgraTO7W38a5XieZSdLv3sQJXlmDtRqW
-X-Google-Smtp-Source: AGHT+IGEsNplZutJPQCE2XWM33H2//sA0tBNvMZ/8xQCoXrQdHcbFYE1YTM2S71oQAfgwcpsit9Bxd7++DH7yVsIWtY=
-X-Received: by 2002:a67:ad02:0:b0:470:3adf:3ce2 with SMTP id
- t2-20020a67ad02000000b004703adf3ce2mr4465713vsl.10.1708938257027; Mon, 26 Feb
- 2024 01:04:17 -0800 (PST)
+        bh=29ukxl3SZDNqQP6DfxAR7ZWQCxlzQHsam7YuMTpfEGw=;
+        b=ha4VxTzJ8+SPDiE9SO3TdVXahCyo1WiRl5Urmqh+WQnuxYugDRMeMzoVDWtwKitGM+
+         gVaF0coN6fbpU9Zpk2/ZjxZuoTR9nnl3qTkReIe5SO2erzFkEKuwL+lu3+BvJ233Ix3r
+         SA7pM7tSfFKwA5hzeuVv94yNBMvfJdryT6EjTE7eiRG6A9yK1WCigd5t+XagrlWV83xH
+         ff1gQ9ILrWounupPpTUejm+7PaNf6BZNLVcK4O6HYo5RAOnCCnK1xVK2XqPl6IOhdj5+
+         qjVDBsZfGavV7njofJwiJ4SwU7QJsHJ/3VraUwFAOm7DZjnwxfTUzaFD1NwGb9p4/ICh
+         xYIg==
+X-Forwarded-Encrypted: i=1; AJvYcCUwbfX1sYVUyOzFwSUQ6r8xzA/PeTtAJasot68mTuOSKRPy7FylgHPWjo2Jq87c1feLkv/rcGdAQkfGHTR0NAF5292GE3J7
+X-Gm-Message-State: AOJu0YyYKzlhb+zObMwdW+t7BmZkDOomQapb5zgiW7vTSid/V3L78eOu
+	DoLcS6ziL+Z7T2/p0OYdlnM3/FKDsCjR2h4f45aaRimXocWqKJemECU9pboE9zbSlkM2sJAVZRd
+	QOCq+rWNduN427Fj0S5/HVQCOg8SljRVZ2wnN
+X-Google-Smtp-Source: AGHT+IFvKMvzj0x6NIYigHYi4Yda/z6JzMdz/VTHwIGPN9mQqjsPc/fpWPOdOkXwIljDLg4VV/RAi9mEKTLQLDnPXOk=
+X-Received: by 2002:a05:6102:54a5:b0:470:38fd:272e with SMTP id
+ bk37-20020a05610254a500b0047038fd272emr4568738vsb.12.1708938350698; Mon, 26
+ Feb 2024 01:05:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240222161047.402609-1-tabba@google.com> <20240222141602976-0800.eberman@hu-eberman-lv.qualcomm.com>
-In-Reply-To: <20240222141602976-0800.eberman@hu-eberman-lv.qualcomm.com>
+References: <20240222161047.402609-1-tabba@google.com> <ZdiI-40gNDKf6YgC@raptor>
+In-Reply-To: <ZdiI-40gNDKf6YgC@raptor>
 From: Fuad Tabba <tabba@google.com>
-Date: Mon, 26 Feb 2024 09:03:40 +0000
-Message-ID: <CA+EHjTwOx930n7Ja6yXZKCmVJ1t_tcccgGpA36o4JigYKEcVAQ@mail.gmail.com>
+Date: Mon, 26 Feb 2024 09:05:12 +0000
+Message-ID: <CA+EHjTyJqsCPGfvyjAsL763FdLdB9QhpwSewBe2y7Y195Y+5ig@mail.gmail.com>
 Subject: Re: [RFC PATCH v1 00/26] KVM: Restricted mapping of guest_memfd at
  the host and pKVM/arm64 support
-To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-mm@kvack.org
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, brauner@kernel.org, 
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org, 
 	willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, 
 	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
 	amoorthy@google.com, dmatlack@google.com, yu.c.zhang@linux.intel.com, 
@@ -76,39 +76,107 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
 	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
 	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
-	keirf@google.com
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Elliot,
+Hi Alex,
 
-On Thu, Feb 22, 2024 at 11:44=E2=80=AFPM Elliot Berman <quic_eberman@quicin=
-c.com> wrote:
+On Fri, Feb 23, 2024 at 12:01=E2=80=AFPM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> Hi,
+>
+> I have a question regarding memory shared between the host and a protecte=
+d
+> guest. I scanned the series, and the pKVM patches this series is based on=
+,
+> but I couldn't easily find the answer.
+>
+> When a page is shared, that page is not mapped in the stage 2 tables that
+> the host maintains for a regular VM (kvm->arch.mmu), right? It wouldn't
+> make much sense for KVM to maintain its own stage 2 that is never used, b=
+ut
+> I thought I should double check that to make sure I'm not missing
+> something.
+
+You're right. In protected mode the stage-2 tables are maintained by
+the hypervisor in EL2, since we don't trust the host kernel. It is
+still KVM of course, but not the regular VM structure, like you said.
+
+Cheers,
+/fuad
+
+>
+> Thanks,
+> Alex
 >
 > On Thu, Feb 22, 2024 at 04:10:21PM +0000, Fuad Tabba wrote:
 > > This series adds restricted mmap() support to guest_memfd [1], as
 > > well as support guest_memfd on pKVM/arm64.
 > >
+> > This series is based on Linux 6.8-rc4 + our pKVM core series [2].
+> > The KVM core patches apply to Linux 6.8-rc4 (patches 1-6), but
+> > the remainder (patches 7-26) require the pKVM core series. A git
+> > repo with this series applied can be found here [3]. We have a
+> > (WIP) kvmtool port capable of running the code in this series
+> > [4]. For a technical deep dive into pKVM, please refer to Quentin
+> > Perret's KVM Forum Presentation [5, 6].
+> >
+> > I've covered some of the issues presented here in my LPC 2023
+> > presentation [7].
+> >
 > > We haven't started using this in Android yet, but we aim to move
 > > away from anonymous memory to guest_memfd once we have the
 > > necessary support merged upstream. Others (e.g., Gunyah [8]) are
 > > also looking into guest_memfd for similar reasons as us.
->
-> I'm especially interested to see if we can factor out much of the common
-> implementation bits between KVM and Gunyah. In principle, we're doing
-> same thing: the difference is the exact mechanics to interact with the
-> hypervisor which (I think) could be easily extracted into an ops
-> structure.
-
-I agree. We should share and reuse as much code as possible. I'll sync
-with you before the V2 of this series.
-
-> [...]
->
+> >
+> > By design, guest_memfd cannot be mapped, read, or written by the
+> > host userspace. In pKVM, memory shared between a protected guest
+> > and the host is shared in-place, unlike the other confidential
+> > computing solutions that guest_memfd was originally envisaged for
+> > (e.g, TDX). When initializing a guest, as well as when accessing
+> > memory shared by the guest to the host, it would be useful to
+> > support mapping that memory at the host to avoid copying its
+> > contents.
+> >
+> > One of the benefits of guest_memfd is that it prevents a
+> > misbehaving host process from crashing the system when attempting
+> > to access (deliberately or accidentally) protected guest memory,
+> > since this memory isn't mapped to begin with. Without
+> > guest_memfd, the hypervisor would still prevent such accesses,
+> > but in certain cases the host kernel wouldn't be able to recover,
+> > causing the system to crash.
+> >
+> > Support for mmap() in this patch series maintains the invariant
+> > that only memory shared with the host, either explicitly by the
+> > guest or implicitly before the guest has started running (in
+> > order to populate its memory) is allowed to be mapped. At no time
+> > should private memory be mapped at the host.
+> >
+> > This patch series is divided into two parts:
+> >
+> > The first part is to the KVM core code (patches 1-6), and is
+> > based on guest_memfd as of Linux 6.8-rc4. It adds opt-in support
+> > for mapping guest memory only as long as it is shared. For that,
+> > the host needs to know the sharing status of guest memory.
+> > Therefore, the series adds a new KVM memory attribute, accessible
+> > only by the host kernel, that specifies whether the memory is
+> > allowed to be mapped by the host userspace.
+> >
+> > The second part of the series (patches 7-26) adds guest_memfd
+> > support for pKVM/arm64, and is based on the latest version of our
+> > pKVM series [2]. It uses guest_memfd instead of the current
+> > approach in Android (not upstreamed) of maintaining a long-term
+> > GUP on anonymous memory donated to the guest. These patches
+> > handle faulting in guest memory for a guest, as well as handling
+> > sharing and unsharing of guest memory while maintaining the
+> > invariant mentioned earlier.
+> >
 > > In addition to general feedback, we would like feedback on how we
 > > handle mmap() and faulting-in guest pages at the host (KVM: Add
 > > restricted support for mapping guest_memfd by the host).
@@ -130,29 +198,6 @@ with you before the V2 of this series.
 > > similar behavior in the kernel I believe, with MADV_HWPOISON and
 > > the hugetlbfs cgroups controller, which could SIGBUS at page
 > > fault time depending on the accounting limit.
->
-> I added a test: folio_mmapped() [1] which checks if there's a vma
-> covering the corresponding offset into the guest_memfd. I use this
-> test before trying to make page private to guest and I've been able to
-> ensure that userspace can't even mmap() private guest memory. If I try
-> to make memory private, I can test that it's not mmapped and not allow
-> memory to become private. In my testing so far, this is enough to
-> prevent SIGBUS from happening.
->
-> This test probably should be moved outside Gunyah specific code, and was
-> looking for maintainer to suggest the right home for it :)
->
-> [1]: https://lore.kernel.org/all/20240222-gunyah-v17-20-1e9da6763d38@quic=
-inc.com/
-
-Let's see what the mm-folks think about this [*].
-
-Thanks!
-/fuad
-
-[*] https://lore.kernel.org/all/ZdfoR3nCEP3HTtm1@casper.infradead.org/
-
-
 > >
 > > Another pKVM specific aspect we would like feedback on, is how to
 > > handle memory mapped by the host being unshared by a guest. The
@@ -192,11 +237,68 @@ tation)
 > > [8] Drivers for Gunyah (patch series)
 > > https://lore.kernel.org/all/20240109-gunyah-v16-0-634904bf4ce9@quicinc.=
 com/
->
-> As of 5 min ago when I send this, there's a v17:
-> https://lore.kernel.org/all/20240222-gunyah-v17-0-1e9da6763d38@quicinc.co=
-m/
->
-> Thanks,
-> Elliot
->
+> >
+> > Fuad Tabba (20):
+> >   KVM: Split KVM memory attributes into user and kernel attributes
+> >   KVM: Introduce kvm_gmem_get_pfn_locked(), which retains the folio loc=
+k
+> >   KVM: Add restricted support for mapping guestmem by the host
+> >   KVM: Don't allow private attribute to be set if mapped by host
+> >   KVM: Don't allow private attribute to be removed for unmappable memor=
+y
+> >   KVM: Implement kvm_(read|/write)_guest_page for private memory slots
+> >   KVM: arm64: Create hypercall return handler
+> >   KVM: arm64: Refactor code around handling return from host to guest
+> >   KVM: arm64: Rename kvm_pinned_page to kvm_guest_page
+> >   KVM: arm64: Add a field to indicate whether the guest page was pinned
+> >   KVM: arm64: Do not allow changes to private memory slots
+> >   KVM: arm64: Skip VMA checks for slots without userspace address
+> >   KVM: arm64: Handle guest_memfd()-backed guest page faults
+> >   KVM: arm64: Track sharing of memory from protected guest to host
+> >   KVM: arm64: Mark a protected VM's memory as unmappable at
+> >     initialization
+> >   KVM: arm64: Handle unshare on way back to guest entry rather than exi=
+t
+> >   KVM: arm64: Check that host unmaps memory unshared by guest
+> >   KVM: arm64: Add handlers for kvm_arch_*_set_memory_attributes()
+> >   KVM: arm64: Enable private memory support when pKVM is enabled
+> >   KVM: arm64: Enable private memory kconfig for arm64
+> >
+> > Keir Fraser (3):
+> >   KVM: arm64: Implement MEM_RELINQUISH SMCCC hypercall
+> >   KVM: arm64: Strictly check page type in MEM_RELINQUISH hypercall
+> >   KVM: arm64: Avoid unnecessary unmap walk in MEM_RELINQUISH hypercall
+> >
+> > Quentin Perret (1):
+> >   KVM: arm64: Turn llist of pinned pages into an rb-tree
+> >
+> > Will Deacon (2):
+> >   KVM: arm64: Add initial support for KVM_CAP_EXIT_HYPERCALL
+> >   KVM: arm64: Allow userspace to receive SHARE and UNSHARE notification=
+s
+> >
+> >  arch/arm64/include/asm/kvm_host.h             |  17 +-
+> >  arch/arm64/include/asm/kvm_pkvm.h             |   1 +
+> >  arch/arm64/kvm/Kconfig                        |   2 +
+> >  arch/arm64/kvm/arm.c                          |  32 ++-
+> >  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   2 +
+> >  arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |   1 +
+> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  24 +-
+> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  67 +++++
+> >  arch/arm64/kvm/hyp/nvhe/pkvm.c                |  89 +++++-
+> >  arch/arm64/kvm/hyp/nvhe/switch.c              |   1 +
+> >  arch/arm64/kvm/hypercalls.c                   | 117 +++++++-
+> >  arch/arm64/kvm/mmu.c                          | 138 +++++++++-
+> >  arch/arm64/kvm/pkvm.c                         |  83 +++++-
+> >  include/linux/arm-smccc.h                     |   7 +
+> >  include/linux/kvm_host.h                      |  34 +++
+> >  include/uapi/linux/kvm.h                      |   4 +
+> >  virt/kvm/Kconfig                              |   4 +
+> >  virt/kvm/guest_memfd.c                        |  89 +++++-
+> >  virt/kvm/kvm_main.c                           | 260 ++++++++++++++++--
+> >  19 files changed, 904 insertions(+), 68 deletions(-)
+> >
+> > --
+> > 2.44.0.rc1.240.g4c46232300-goog
+> >
+> >
