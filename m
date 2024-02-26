@@ -1,143 +1,199 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9267B12E1D5;
-	Mon, 26 Feb 2024 18:26:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C5E12C7F6
+	for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 21:15:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708972016; cv=none; b=cdNHIEmoB41f5DTBMEg5TK+mDeHyHF70McBUfOkoWnBT1s0E1EuBM+NC7uX0dj6ohHa2Qdwa1f6r2lKtWADPtnawJWQdTIhtDOo+8LjGSAdE3ehIPYQ4VL1nFR0XPe+aFj8E+jvbyhDda6RudUgXneN+AAr/Mlks5UW7KWqpfRM=
+	t=1708982123; cv=none; b=kZwp1smvtV3Po8G7lINk0ypcYivQrNOJ8HQIKbAqJ1FZLne7FQlDRj56thrTMbVJjIXQQEIpQSAmV4+eMjUgzj/5Y3tHTWgdYVCr7AFen8tLzvfr4KWm4RaXTz+57+F+C6fi9mjl1B4pyiJSFADAC5wUBilDwgiKWZgI81F6LcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708972016; c=relaxed/simple;
-	bh=OTxvF98lM2wvLgv0ClcVHjVFjeuU5uCdkdQwK6EWat4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=usIL04tIWYxNxSKL4690D0TGh2TC+imXdWLS9tRGCJTB1hlEhzOIpqmwH3NXd4l1qGcxMa96WJv7fBFwg82b/GoIcO8sDsyyglFtdAKg0PjU0iTkjnblgSz0BD1Xzztk4L3arxjcFrhkEWoYGwiw5HQ8fSB+BSVfyJPQFqITDus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QIgrb9UE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708982123; c=relaxed/simple;
+	bh=zVbEaCoi1j4R+WCBnZPm/8M5/ONb5t6QuuoqM9gQgPo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oQf3TNSFZGrFs52KNwGAphUWJuCUFtCJrwHhkSgT5aYllTE+THPPfrMmbcRXX0XxGXyzDi9t4KksIeW73k+T9UpQOIdBBWO32UQbeONk6ZO/hHXObLzT2EV8iHWJw98fm3/xk5K7TtCt90yI5dVpbG4GyyDBgdlsT9d8rWQetxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=eD+hmBVa; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QIgrb9UE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9919C43390;
-	Mon, 26 Feb 2024 18:26:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708972016;
-	bh=OTxvF98lM2wvLgv0ClcVHjVFjeuU5uCdkdQwK6EWat4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QIgrb9UELylu7ArM6YZNsOH5YDhIEIFuF5rm04hfK7/ZI442HhovZnrY1lHYJpFIB
-	 mJ2d0RHqgomX7D1M9EHMQoiSDU4UrTKdAE612mLR9UUoMkR2kH13lVcWOg442fKNfU
-	 OeiW+4HKyukOlmbU3nIs/RRWbjoGkSEkA15Au9erqXnbJYpRIKTsQSSP6+TNJr5KNq
-	 L7zzJf9V8WiryBd7DmZz6o9Va66/YDIDihR3UVKjbs8YHfLBTH5V0K6pc1BEEwt3v+
-	 J+wk9z5grS7W6XJwZrKTdVT+ct2BCyRNFDuucB+3eFQ/2JDIR1yPL2p45d1yGHsLR/
-	 jYjboCbYyqWxQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1refgj-006zTZ-GD;
-	Mon, 26 Feb 2024 18:26:53 +0000
-Date: Mon, 26 Feb 2024 18:26:53 +0000
-Message-ID: <868r372iaa.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: James Clark <james.clark@arm.com>
-Cc: coresight@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	suzuki.poulose@arm.com,
-	acme@kernel.org,
-	oliver.upton@linux.dev,
-	broonie@kernel.org,
-	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mike Leach <mike.leach@linaro.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Miguel Luis <miguel.luis@oracle.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Javier Martinez Canillas <javierm@redhat.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Andrew Walbran <qwandor@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 7/8] arm64: KVM: Write TRFCR value on guest switch with nVHE
-In-Reply-To: <20240226113044.228403-8-james.clark@arm.com>
-References: <20240226113044.228403-1-james.clark@arm.com>
-	<20240226113044.228403-8-james.clark@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="eD+hmBVa"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41QJfp45005556;
+	Mon, 26 Feb 2024 21:14:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	date:from:to:cc:subject:message-id:references:mime-version
+	:content-type:in-reply-to; s=qcppdkim1; bh=palv05N4kOBj98emYRCrI
+	16CO1nbfjBjijuX6/V+vrQ=; b=eD+hmBVaDcCFJTQM/Ufs0fBVLdSPt2EyXe3LP
+	lUzJ2vpdV5g03cNf8W+6AIo6GwXBIgIr+8qpUZKFgqqQa8cOtreh5W58MN+/1h73
+	6alzRC/dgwQlNZ7hNQKAXRi9FxdU4lFlY4IsvfCfAS1mYnWTwIQf/SUsocIpTDKd
+	2qatZHcw56uJ2s8tPl9B3GSElctSZSPIE7NUFSSNaBobqZ/YBmM5IVl8NcMclBob
+	Ce1fOHaybeeO5A4q415AHSMa7SF1cE9XxkZ7oHZGFS/CNpqsl1yIdGdOtOiBWk4A
+	csfcXPGDoV+QZQfJJERjLyxcezMiiVQqxCRa8DgqLUt/Sc1qg==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wgkxna428-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 26 Feb 2024 21:14:41 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41QLEdhP032494
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 26 Feb 2024 21:14:39 GMT
+Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
+ nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 26 Feb 2024 13:14:38 -0800
+Date: Mon, 26 Feb 2024 13:14:38 -0800
+From: Elliot Berman <quic_eberman@quicinc.com>
+To: David Hildenbrand <david@redhat.com>
+CC: Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>, <pbonzini@redhat.com>,
+        <chenhuacai@kernel.org>, <mpe@ellerman.id.au>, <anup@brainfault.org>,
+        <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
+        <aou@eecs.berkeley.edu>, <seanjc@google.com>,
+        <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
+        <akpm@linux-foundation.org>, <xiaoyao.li@intel.com>,
+        <yilun.xu@intel.com>, <chao.p.peng@linux.intel.com>,
+        <jarkko@kernel.org>, <amoorthy@google.com>, <dmatlack@google.com>,
+        <yu.c.zhang@linux.intel.com>, <isaku.yamahata@intel.com>,
+        <mic@digikod.net>, <vbabka@suse.cz>, <vannapurve@google.com>,
+        <ackerleytng@google.com>, <mail@maciej.szmigiero.name>,
+        <michael.roth@amd.com>, <wei.w.wang@intel.com>,
+        <liam.merwick@oracle.com>, <isaku.yamahata@gmail.com>,
+        <kirill.shutemov@linux.intel.com>, <suzuki.poulose@arm.com>,
+        <steven.price@arm.com>, <quic_mnalajal@quicinc.com>,
+        <quic_tsoni@quicinc.com>, <quic_svaddagi@quicinc.com>,
+        <quic_cvanscha@quicinc.com>, <quic_pderrin@quicinc.com>,
+        <quic_pheragu@quicinc.com>, <catalin.marinas@arm.com>,
+        <james.morse@arm.com>, <yuzenghui@huawei.com>,
+        <oliver.upton@linux.dev>, <maz@kernel.org>, <will@kernel.org>,
+        <qperret@google.com>, <keirf@google.com>, <linux-mm@kvack.org>
+Subject: Re: Re: folio_mmapped
+Message-ID: <20240226105258596-0800.eberman@hu-eberman-lv.qualcomm.com>
+Mail-Followup-To: David Hildenbrand <david@redhat.com>, 
+	Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, 
+	steven.price@arm.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, 
+	quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com, 
+	yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, 
+	qperret@google.com, keirf@google.com, linux-mm@kvack.org
+References: <20240222161047.402609-1-tabba@google.com>
+ <20240222141602976-0800.eberman@hu-eberman-lv.qualcomm.com>
+ <ZdfoR3nCEP3HTtm1@casper.infradead.org>
+ <40a8fb34-868f-4e19-9f98-7516948fc740@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: james.clark@arm.com, coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, suzuki.poulose@arm.com, acme@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, james.morse@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, alexander.shishkin@linux.intel.com, anshuman.khandual@arm.com, miguel.luis@oracle.com, joey.gouly@arm.com, ardb@kernel.org, javierm@redhat.com, mark.rutland@arm.com, arnd@arndb.de, qwandor@google.com, vdonnefort@google.com, ryan.roberts@arm.com, tabba@google.com, jingzhangos@google.com, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <40a8fb34-868f-4e19-9f98-7516948fc740@redhat.com>
+X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: Q6lIhduTNjI7frqLFxHqnJlNm939s38J
+X-Proofpoint-GUID: Q6lIhduTNjI7frqLFxHqnJlNm939s38J
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-26_11,2024-02-26_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 bulkscore=0
+ adultscore=0 lowpriorityscore=0 priorityscore=1501 suspectscore=0
+ mlxscore=0 impostorscore=0 clxscore=1015 malwarescore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2402120000 definitions=main-2402260163
 
-On Mon, 26 Feb 2024 11:30:35 +0000,
-James Clark <james.clark@arm.com> wrote:
+On Mon, Feb 26, 2024 at 10:28:11AM +0100, David Hildenbrand wrote:
+> On 23.02.24 01:35, Matthew Wilcox wrote:
+> > On Thu, Feb 22, 2024 at 03:43:56PM -0800, Elliot Berman wrote:
+> > > > This creates the situation where access to successfully mmap()'d
+> > > > memory might SIGBUS at page fault. There is precedence for
+> > > > similar behavior in the kernel I believe, with MADV_HWPOISON and
+> > > > the hugetlbfs cgroups controller, which could SIGBUS at page
+> > > > fault time depending on the accounting limit.
+> > > 
+> > > I added a test: folio_mmapped() [1] which checks if there's a vma
+> > > covering the corresponding offset into the guest_memfd. I use this
+> > > test before trying to make page private to guest and I've been able to
+> > > ensure that userspace can't even mmap() private guest memory. If I try
+> > > to make memory private, I can test that it's not mmapped and not allow
+> > > memory to become private. In my testing so far, this is enough to
+> > > prevent SIGBUS from happening.
+> > > 
+> > > This test probably should be moved outside Gunyah specific code, and was
+> > > looking for maintainer to suggest the right home for it :)
+> > > 
+> > > [1]: https://lore.kernel.org/all/20240222-gunyah-v17-20-1e9da6763d38@quicinc.com/
+> > 
+> > You, um, might have wanted to send an email to linux-mm, not bury it in
+> > the middle of a series of 35 patches?
+> > 
+> > So this isn't folio_mapped() because you're interested if anyone _could_
+> > fault this page, not whether the folio is currently present in anyone's
+> > page tables.
+> > 
+> > It's like walk_page_mapping() but with a trivial mm_walk_ops; not sure
+> > it's worth the effort to use walk_page_mapping(), but I would defer to
+> > David.
 > 
-> The guest value for TRFCR requested by the Coresight driver is saved in
-> kvm_guest_trfcr. On guest switch this value needs to be written to
-> the register. Currently TRFCR is only modified when we want to disable
-> trace completely in guests due to an issue with TRBE. Expand the
-> __debug_save_trace() function to always write to the register if a
-> different value for guests is required, but also keep the existing TRBE
-> disable behavior if that's required.
+> First, I suspect we are not only concerned about current+future VMAs
+> covering the page, we are also interested in any page pins that could have
+> been derived from such a VMA?
 > 
-> In pKVM, the kvm_guest_trfcr can't be read and the host isn't trusted,
-> so always disable trace.
+> Imagine user space mmap'ed the file, faulted in page, took a pin on the page
+> using pin_user_pages() and friends, and then munmap()'ed the VMA.
 > 
-> __debug_restore_trace() now has to restore unconditionally, because even
-> a value of 0 needs to be written to overwrite whatever was set for the
-> guest.
+> You likely want to catch that as well and not allow a conversion to private?
 > 
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: James Clark <james.clark@arm.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 53 +++++++++++++++++-------------
->  1 file changed, 31 insertions(+), 22 deletions(-)
+> [I assume you want to convert the page to private only if you hold all the
+> folio references -- i.e., if the refcount of a small folio is 1]
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> index 4558c02eb352..3adac2e01908 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> @@ -51,30 +51,39 @@ static void __debug_restore_spe(u64 pmscr_el1)
->  	write_sysreg_s(pmscr_el1, SYS_PMSCR_EL1);
->  }
->  
-> -static void __debug_save_trace(u64 *trfcr_el1)
-> +static void __debug_save_trace(struct kvm_vcpu *vcpu)
->  {
-> -	*trfcr_el1 = 0;
-> -
-> -	/* Check if the TRBE is enabled */
-> -	if (!(read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E))
-> -		return;
-> -	/*
-> -	 * Prohibit trace generation while we are in guest.
-> -	 * Since access to TRFCR_EL1 is trapped, the guest can't
-> -	 * modify the filtering set by the host.
-> -	 */
-> -	*trfcr_el1 = read_sysreg_s(SYS_TRFCR_EL1);
-> -	write_sysreg_s(0, SYS_TRFCR_EL1);
-> -	isb();
-> -	/* Drain the trace buffer to memory */
-> -	tsb_csync();
-> +	u64 host_trfcr_el1 = read_sysreg_s(SYS_TRFCR_EL1);
 
-Ah, and on top of that, this is already broken with hVHE.
+Ah, this was something I hadn't thought about. I think both Fuad and I
+need to update our series to check the refcount rather than mapcount
+(kvm_is_gmem_mapped for Fuad, gunyah_folio_lend_safe for me).
 
-I'll send a patch.
+> 
+> Now, regarding the original question (disallow mapping the page), I see the
+> following approaches:
+> 
+> 1) SIGBUS during page fault. There are other cases that can trigger
+>    SIGBUS during page faults: hugetlb when we are out of free hugetlb
+>    pages, userfaultfd with UFFD_FEATURE_SIGBUS.
+> 
+> -> Simple and should get the job done.
+> 
+> 2) folio_mmapped() + preventing new mmaps covering that folio
+> 
+> -> More complicated, requires an rmap walk on every conversion.
+> 
+> 3) Disallow any mmaps of the file while any page is private
+> 
+> -> Likely not what you want.
+> 
+> 
+> Why was 1) abandoned? I looks a lot easier and harder to mess up. Why are
+> you trying to avoid page faults? What's the use case?
+> 
 
-	M.
+We were chatting whether we could do better than the SIGBUS approach.
+SIGBUS/FAULT usually crashes userspace, so I was brainstorming ways to
+return errors early. One difference between hugetlb and this usecase is
+that running out of free hugetlb pages isn't something we could detect
+at mmap time. In guest_memfd usecase, we should be able to detect when
+SIGBUS becomes possible due to memory being lent to guest.
 
--- 
-Without deviation from the norm, progress is not possible.
+I can't think of a reason why userspace would want/be able to resume
+operation after trying to access a page that it shouldn't be allowed, so
+SIGBUS is functional. The advantage of trying to avoid SIGBUS was
+better/easier reporting to userspace.
+
+- Elliot
