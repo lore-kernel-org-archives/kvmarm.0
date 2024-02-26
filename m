@@ -1,235 +1,239 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B0813664B;
-	Mon, 26 Feb 2024 15:01:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 518B412BEBF
+	for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 15:41:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708959700; cv=none; b=bmEXCqDldWYwnxS9nlZFPrqXFUYtEhP+mTQ4TlR/ewG5MdxmIXn2kKJyzQCgQOOT9gbSjc/WTwWtt2ij0BRpQy3c9uRlvmt+C9Se4kZBeK5k4eP5eNLHI17DJpMdADehuGixFCrJG9cXmOkn4HgJ04Kzy1XcSfs0hKdxOfX2msw=
+	t=1708962070; cv=none; b=ln4FPo93XywDHxoj6xkg97UdjSfrTQbf/0Q6nMMG0mTTkRMyPEAqNxiCnDDWRCGmgTx21yOqxnJsg1TEjmTRHVG8ktnvM5OiDWVEfyl9bN9/Bspgdp+pvvLPxYFB0Tu9XBw+dmXLiYlCG6m8y3gmgl7W9Azhg6iELq7oH7x++LI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708959700; c=relaxed/simple;
-	bh=D8HlEBqMqa8Slmy0g5ueUVqytfKUCj85MN8+CdplaqM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=udvME7CKb6z2U6s6eizomjPvHmgKCNQGLGNrYMTOADS4fK8BMxTid5BmIicyi4JWPEaiY1xPNVotb4VmxLkyEDkl4Y6Je2e5J3q4F8E1JONi+5C2WyHvKQAt1GurBpP6wO60QmlWiFe8tx433xu+Lnh3+fBcCJ2kt9ZLjfN+tQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kwfH7y3J; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kwfH7y3J"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76AC8C43390;
-	Mon, 26 Feb 2024 15:01:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708959699;
-	bh=D8HlEBqMqa8Slmy0g5ueUVqytfKUCj85MN8+CdplaqM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kwfH7y3J13gAalkPS3+SMe3tnFBXCZCfL2ArmHbC8gG6YEUOdSfDGZDBR/hOmQIsl
-	 XQCtM5c/W9/yjbmIsPZGnB+H0RZDY9SvukwfWbzXOPoOrR5SA5MzRDxp3UUdFOEwq9
-	 QGAn2tY+CPrr40nvmShNdtT2H0AkH8iMkdkwfiSxRRq2gTaR1c8X0XqknTXFBrcMl4
-	 v7x0gire2v1iA/DTYaGlXcBqZPnMIdDmuOUxMnjkOA6/j00OJbgsr1mjTn1yDvGPfU
-	 wSwpKC0ze/oUgwUE8ln8NmwNUsquLkEAqVF/tlbf10/2FUgQNG07RDoil9hMh8BTOM
-	 tw1gq12sAiO4w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1recU4-006uX5-Lk;
-	Mon, 26 Feb 2024 15:01:36 +0000
-Date: Mon, 26 Feb 2024 15:01:35 +0000
-Message-ID: <86cysj2rsg.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: James Clark <james.clark@arm.com>
-Cc: coresight@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	suzuki.poulose@arm.com,
-	acme@kernel.org,
-	oliver.upton@linux.dev,
-	broonie@kernel.org,
-	James Morse <james.morse@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mike Leach <mike.leach@linaro.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Miguel Luis <miguel.luis@oracle.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Kalesh Singh <kaleshsingh@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 6/8] arm64: KVM: Add interface to set guest value for TRFCR register
-In-Reply-To: <20240226113044.228403-7-james.clark@arm.com>
-References: <20240226113044.228403-1-james.clark@arm.com>
-	<20240226113044.228403-7-james.clark@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1708962070; c=relaxed/simple;
+	bh=eP49OFEMvhH3M/3LwOB217nVAZoA5vsSqN74iTTOMKk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ngVRsru93/ene8NY8v39tjcj+sdLjTfWD7/9+EX0w5X3lnRgkt7EKOaLO1ntN2jReUuP4z4LgmiSLf55W+RMcxMQfFz1x8rdFV8lovySSnfVd1RgATRBgEccrljUw30t7pwoWIQ+Ar1qLM3MJ2fgbNB/xPahFYPkdLfiP9Eb6nw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 56106DA7;
+	Mon, 26 Feb 2024 07:41:46 -0800 (PST)
+Received: from [192.168.1.100] (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B25C43F762;
+	Mon, 26 Feb 2024 07:41:03 -0800 (PST)
+Message-ID: <8b9c1cce-401c-5084-ee2f-68beb03ad7a0@arm.com>
+Date: Mon, 26 Feb 2024 15:41:02 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: james.clark@arm.com, coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, suzuki.poulose@arm.com, acme@kernel.org, oliver.upton@linux.dev, broonie@kernel.org, james.morse@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mike.leach@linaro.org, alexander.shishkin@linux.intel.com, anshuman.khandual@arm.com, miguel.luis@oracle.com, joey.gouly@arm.com, ardb@kernel.org, mark.rutland@arm.com, gregkh@linuxfoundation.org, arnd@arndb.de, kaleshsingh@google.com, vdonnefort@google.com, ryan.roberts@arm.com, tabba@google.com, jingzhangos@google.com, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v6 5/8] arm64: KVM: Add iflag for FEAT_TRF
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+Cc: coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, suzuki.poulose@arm.com, acme@kernel.org,
+ oliver.upton@linux.dev, broonie@kernel.org, James Morse
+ <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Mike Leach <mike.leach@linaro.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>,
+ Miguel Luis <miguel.luis@oracle.com>, Joey Gouly <joey.gouly@arm.com>,
+ Ard Biesheuvel <ardb@kernel.org>, Quentin Perret <qperret@google.com>,
+ Javier Martinez Canillas <javierm@redhat.com>,
+ Mark Rutland <mark.rutland@arm.com>, Arnd Bergmann <arnd@arndb.de>,
+ Vincent Donnefort <vdonnefort@google.com>,
+ Ryan Roberts <ryan.roberts@arm.com>, Fuad Tabba <tabba@google.com>,
+ Jing Zhang <jingzhangos@google.com>, linux-kernel@vger.kernel.org
+References: <20240226113044.228403-1-james.clark@arm.com>
+ <20240226113044.228403-6-james.clark@arm.com> <86edcz2vrz.wl-maz@kernel.org>
+From: James Clark <james.clark@arm.com>
+In-Reply-To: <86edcz2vrz.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, 26 Feb 2024 11:30:34 +0000,
-James Clark <james.clark@arm.com> wrote:
+
+
+On 26/02/2024 13:35, Marc Zyngier wrote:
+> On Mon, 26 Feb 2024 11:30:33 +0000,
+> James Clark <james.clark@arm.com> wrote:
+>>
+>> Add an extra iflag to signify if the TRFCR register is accessible.
 > 
-> Add an interface for the Coresight driver to use to set the value of the
-> TRFCR register for the guest. This register controls the exclude
-
-This is not *for* the guest. It is the *host* value while running the
-guest.
-
-> settings for trace at different exception levels, and is used to honor
-> the exclude_host and exclude_guest parameters from the Perf session.
-> This will be used to later write TRFCR_EL1 on nVHE at guest switch. For
-> VHE, the host trace is controlled by TRFCR_EL2 and thus we can write to
-> the TRFCR_EL1 immediately. Because guest writes to the register are
-> trapped, the value will persist and can't be modified.
-
-See?
-
+> That's not what this flag means: it indicates whether TRFCR needs to
+> be saved. At lease that's what the name suggests.
 > 
-> Instead of adding a load of infrastructure to share the host's per-cpu
-> offsets with the hypervisor, just define the new storage as a NR_CPUS
-> array.
+>> Because TRBE requires FEAT_TRF, DEBUG_STATE_SAVE_TRBE still has the same
+>> behavior even though it's only set when FEAT_TRF is present.
 > 
-> Signed-off-by: James Clark <james.clark@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  3 +++
->  arch/arm64/kernel/image-vars.h    |  1 +
->  arch/arm64/kvm/debug.c            | 29 +++++++++++++++++++++++++++++
->  3 files changed, 33 insertions(+)
+> This sentence seems completely out of context, because you didn't
+> explain that you were making TRBE *conditional* on TRF being
+> implemented, as per the architecture requirements.
+> 
+>>
+>> The following holes are left in struct kvm_vcpu_arch, but there aren't
+>> enough other 8 bit fields to rearrange it to leave any hole smaller than
+>> 7 bytes:
+>>
+>>   u8                         cflags;               /*  2292     1 */
+>>   /* XXX 1 byte hole, try to pack */
+>>   u16                        iflags;               /*  2294     2 */
+>>   u8                         sflags;               /*  2296     1 */
+>>   bool                       pause;                /*  2297     1 */
+>>   /* XXX 6 bytes hole, try to pack */
+> 
+> I don't think that's particularly useful in a commit message, but more
+> relevant to the cover letter. However, see below.
+> 
+>>
+>> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: James Clark <james.clark@arm.com>
+>> ---
+>>  arch/arm64/include/asm/kvm_host.h |  4 +++-
+>>  arch/arm64/kvm/debug.c            | 24 ++++++++++++++++++++----
+>>  2 files changed, 23 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 21c57b812569..85b5477bd1b4 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -569,7 +569,7 @@ struct kvm_vcpu_arch {
+>>  	u8 cflags;
+>>  
+>>  	/* Input flags to the hypervisor code, potentially cleared after use */
+>> -	u8 iflags;
+>> +	u16 iflags;
+>>  
+>>  	/* State flags for kernel bookkeeping, unused by the hypervisor code */
+>>  	u8 sflags;
+>> @@ -779,6 +779,8 @@ struct kvm_vcpu_arch {
+>>  #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
+>>  /* vcpu running in HYP context */
+>>  #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
+>> +/* Save trace filter controls */
+>> +#define DEBUG_STATE_SAVE_TRFCR	__vcpu_single_flag(iflags, BIT(8))
+> 
+> I'd rather you cherry-pick [1] and avoid expanding the iflags.
+> 
+> [1] https://lore.kernel.org/r/20240226100601.2379693-4-maz@kernel.org
+> 
+> Now, I think the whole SPE/TRBE/TRCR flag management should be
+> improved, see below.
+> 
+>>
+>>  /* SVE enabled for host EL0 */
+>>  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+>> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+>> index ce8886122ed3..49a13e72ddd2 100644
+>> --- a/arch/arm64/kvm/debug.c
+>> +++ b/arch/arm64/kvm/debug.c
+>> @@ -332,14 +332,30 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
+>>  	    !(read_sysreg_s(SYS_PMBIDR_EL1) & BIT(PMBIDR_EL1_P_SHIFT)))
+>>  		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+>>  
+>> -	/* Check if we have TRBE implemented and available at the host */
+>> -	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
+>> -	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
+>> -		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+>> +	/*
+>> +	 * Set SAVE_TRFCR flag if FEAT_TRF (TraceFilt) exists. This flag
+>> +	 * signifies that the exclude_host/exclude_guest settings of any active
+>> +	 * host Perf session on a core running a VCPU can be written into
+>> +	 * TRFCR_EL1 on guest switch.
+>> +	 */
+>> +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceFilt_SHIFT)) {
+>> +		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
+> 
+> Can we avoid doing this unconditionally? It only makes sense to save
+> the trace crud if it is going to be changed, right?
+> 
+
+Do you mean to see if kvm_guest_trfcr was non-zero (and would have to be
+changed) at VCPU load? I assumed that it could be modified between load
+and switch. That would mean there is no way to do it conditionally.
+
+I also assumed that's the reason SPE and TRBE were implemented like
+this, with the feat check at load and the enabled check at switch. It
+doesn't feel like TRFCR is any different to those two.
+
+Or do you mean to only set DEBUG_STATE_SAVE_TRFCR on switch if tracing
+was enabled?
+
+I suppose the names DEBUG_STATE_SAVE_SPE and DEBUG_STATE_SAVE_TRBE are
+slightly misleading because neither are actually saved if they weren't
+enabled. They're more like DEBUG_STATE_HAS_SPE and DEBUG_STATE_HAS_TRBE.
+
+>> +		/*
+>> +		 * Check if we have TRBE implemented and available at the host.
+>> +		 * If it's in use at the time of guest switch then trace will
+>> +		 * need to be completely disabled. The architecture mandates
+>> +		 * FEAT_TRF with TRBE, so we only need to check for TRBE after
+>> +		 * TRF.
+>> +		 */
+>> +		if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
+>> +		    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
+>> +			vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+>> +	}
+>>  }
+>>  
+>>  void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+>>  {
+>>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+>>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+>> +	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
+>>  }
+> 
+> Dealing with flags that are strongly coupled in a disjoined way a
+> pretty bad idea. Look at the generated code, and realise we flip the
+> preempt flag on each access.
+> 
+> Can we do better? You bet. The vcpu_{set,clear}_flags infrastructure
+> is capable of dealing with multiple flags at once, as demonstrated by
+> the way we deal with exception encoding.
+> 
+
+Oops yeah I didn't realize that this was more than a bit set/clear. I
+will combine them. I think I could probably combine the TRBE/TRF set as
+well.
+
+Agree with the rest of the comments too.
+
+Thanks
+James
+
+> Something like:
 > 
 > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 85b5477bd1b4..56b7f7eca195 100644
+> index addf79ba8fa0..3e50e535fdd4 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -509,6 +509,7 @@ struct kvm_host_psci_config {
->  	bool psci_0_1_cpu_off_implemented;
->  	bool psci_0_1_migrate_implemented;
->  };
-> +extern u64 ____cacheline_aligned kvm_guest_trfcr[NR_CPUS];
-
-Great. So you are making it a guarantee that this is going to
-ping-pong on every CPU that accesses this stuff. I'm sure my nVHE 64
-core system is going to enjoy it. Not.
-
-Look, we already have some per-CPU context: it's called kvm_host_data,
-and we link to it from each and every vcpu. So as long as you're in
-the context of a vcpu, you have access to it. Simples. We even have
-accessors that pick the correct instance between VHE and (n/h)VHE.
-
-What is wrong with using that?
-
+> @@ -885,6 +885,10 @@ struct kvm_vcpu_arch {
+>  #define DEBUG_STATE_SAVE_SPE	__vcpu_single_flag(iflags, BIT(5))
+>  /* Save TRBE context if active  */
+>  #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
+> +/* Save Trace Filter Controls  */
+> +#define DEBUG_STATE_SAVE_TRFCR	__vcpu_single_flag(iflags, BIT(7))
+> +/* Global debug mask */
+> +#define DEBUG_STATE_SAVE_MASK	__vcpu_single_flag(iflags, GENMASK(7, 5))
 >  
->  extern struct kvm_host_psci_config kvm_nvhe_sym(kvm_host_psci_config);
->  #define kvm_host_psci_config CHOOSE_NVHE_SYM(kvm_host_psci_config)
-> @@ -1174,6 +1175,7 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu);
->  void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
->  void kvm_clr_pmu_events(u32 clr);
->  bool kvm_set_pmuserenr(u64 val);
-> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest);
->  #else
->  static inline void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr) {}
->  static inline void kvm_clr_pmu_events(u32 clr) {}
-> @@ -1181,6 +1183,7 @@ static inline bool kvm_set_pmuserenr(u64 val)
->  {
->  	return false;
->  }
-> +static inline void kvm_etm_set_guest_trfcr(u64 trfcr_guest) {}
->  #endif
->  
->  void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-> index 31daa1da191c..fe9e2bd7f43a 100644
-> --- a/arch/arm64/kernel/image-vars.h
-> +++ b/arch/arm64/kernel/image-vars.h
-> @@ -59,6 +59,7 @@ KVM_NVHE_ALIAS(alt_cb_patch_nops);
->  
->  /* Global kernel state accessed by nVHE hyp code. */
->  KVM_NVHE_ALIAS(kvm_vgic_global_state);
-> +KVM_NVHE_ALIAS(kvm_guest_trfcr);
->  
->  /* Kernel symbols used to call panic() from nVHE hyp code (via ERET). */
->  KVM_NVHE_ALIAS(nvhe_hyp_panic_handler);
+>  /* SVE enabled for host EL0 */
+>  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
 > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index 49a13e72ddd2..fe90bc7d6dd4 100644
+> index 8725291cb00a..f9b197a00582 100644
 > --- a/arch/arm64/kvm/debug.c
 > +++ b/arch/arm64/kvm/debug.c
-> @@ -22,6 +22,7 @@
->  				DBG_MDSCR_MDE)
+> @@ -339,6 +339,6 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
 >  
->  static DEFINE_PER_CPU(u64, mdcr_el2);
-> +u64 ____cacheline_aligned kvm_guest_trfcr[NR_CPUS];
->  
->  /*
->   * save/restore_guest_debug_regs
-> @@ -359,3 +360,31 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
->  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
->  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRFCR);
+>  void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+>  {
+> -	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+> -	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+> +	if (!has_vhe())
+> +	    vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_MASK);
 >  }
-> +
-> +/*
-> + * Interface for the Coresight driver to use to set the value of the TRFCR
-
-nit: s/to use//
-
-> + * register for the guest. This register controls the exclude settings for trace
-
-s/for the guest/for *tracing* the guest/
-
-> + * at different exception levels, and is used to honor the exclude_host and
-> + * exclude_guest parameters from the Perf session.
-> + *
-> + * This will be used to later write TRFCR_EL1 on nVHE at guest switch. For VHE,
-> + * the host trace is controlled by TRFCR_EL2 and thus we can write to the
-
-s/to the/to/
-
-> + * TRFCR_EL1 immediately. Because guest writes to the register are trapped, the
-> + * value will persist and can't be modified. For pKVM, kvm_guest_trfcr can't
-> + * be read by the hypervisor, so don't bother writing it.
-
-I don't know what you mean by "can't be read". Because controlling all
-of the EL1 memory is not enough?
-
-> + */
-> +void kvm_etm_set_guest_trfcr(u64 trfcr_guest)
-> +{
-> +	if (WARN_ON_ONCE(!cpuid_feature_extract_unsigned_field(read_sysreg(id_aa64dfr0_el1),
-> +							       ID_AA64DFR0_EL1_TraceFilt_SHIFT)))
-> +		return;
-> +
-> +	/* Warn in invalid use of smp_processor_id() */
-> +	WARN_ON_ONCE(preemptible());
-
-What does it buy us to WARN, but continue to do the *wrong* thing?
-
-> +
-> +	if (has_vhe())
-> +		write_sysreg_s(trfcr_guest, SYS_TRFCR_EL12);
-
-Please use write_sysreg_el1() instead.
-
-> +	else if (!is_protected_kvm_enabled())
-> +		kvm_guest_trfcr[smp_processor_id()] = trfcr_guest;
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_etm_set_guest_trfcr);
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> 
+> Thanks,
+> 
+> 	M.
+> 
