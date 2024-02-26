@@ -1,332 +1,123 @@
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62CADFC18
-	for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 05:47:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8CEE1C69E
+	for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 08:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708926478; cv=none; b=EUyZvK6CcwJJnIFgHZFwgyJ+1qQkZkMAT1uo3yjhmDThxPpIZGsdLjw+gDOhfHJNLZUxbEsnc67JDaL6hvZh92bJZaZGKlzqevGI08LsA0H0CTjrXmjlC/dAKtSLLdj2dlKPxlsXyj+eKImdyKNRDwhJhkrEYwjsVN7kFsg3FBM=
+	t=1708935014; cv=none; b=UyuGU08Ei34FFYHC0OFxuMjR5cs2FaqkekXLSkhlq3Tq5ovFiwxnsG984oAK7i2gqgarr7d1kgSsTsUKDMntp3PYlXIrOl+LV9qgftf/kNAzv4+IeTebM9uqu22eEcB1jzVPpjg5IuOBTX4f6HLXCeWuNWUbK0ll83Yl3xs98hA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708926478; c=relaxed/simple;
-	bh=K5EhxfTyAeXjdOEJjG8brOnAyWwyn43VJQUtjt5uYys=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O6vQM+7uPv0HX2FUHsCMe4KNAMl1ZPE58Y5frE2j1O2dYzRyJN9SPSRrjWtJYATzWA/KoicnWBn4NAvxsgpTMg7FOiUeEzetPBr1wFYnqsmA1DuLEIG3O6i/1Bs03d+FavabA40XjXksawMWvJhRboJHH6WrL7WlOW8HOgueYZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fFnEBPGP; arc=none smtp.client-ip=209.85.167.54
+	s=arc-20240116; t=1708935014; c=relaxed/simple;
+	bh=0rEJgdXMQFNKOG9TkEY6a7r5OzMiNPZsokrEY69bxso=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
+	 References:In-Reply-To; b=EuVG+SyMdVxjf8jde2yzAQ0GzGJVTOS2WALb3DUfex9ZfcaCmGxzfg0jlRTdLpfbM12eWldrDyCujLyjq2Gq4BLGz1JRhGfKnajdW6ylDS+LAN8fuP7l2jN4b8UWltLWjVwzfgxFMDLWmNIAstSIJkbPLaZJnM2FoenSxUh9QyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S+m8er1l; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fFnEBPGP"
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-512bde3d197so2105619e87.0
-        for <kvmarm@lists.linux.dev>; Sun, 25 Feb 2024 21:47:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S+m8er1l"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1dc139ed11fso17063595ad.0
+        for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 00:10:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708926474; x=1709531274; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1708935012; x=1709539812; darn=lists.linux.dev;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=c9AaAZqwaMM3hlPPn5OnhezHOMjAT7L8+u/HDWjjaS8=;
-        b=fFnEBPGPNYzmwO98OUpnRNIRPOEN2gQjrksoxOfBxpbb3lmGokbWuXSROdsnByaCR5
-         MSjCBl4aNhF9MAbNQX9dPpVcdeMj2CTKpJUeWMOaKHwHFDO+r3yT0IR4nKGwiCAboiSa
-         NJjgbXk9QjZgYpT2rqFPiWQw/vRB3lGOJfvmQ1bWbp4NQTw3E0OVLcdLNtQIYuUYNck+
-         Fd0D/6adTS2UUa0/U7ClS3ecnnhgiGY6tA2yeU2gle4g9BmQ9K5My9xfK4VgSFN7FiHy
-         Pp5OKUvxMh/K5S6E/393S9mJr4aIvy+V21ywapW2Cp+/op77bR2n/hoOq9NVbYL7Vgyp
-         JL+Q==
+        bh=40CoeWlqXJhcfzeZ8GLVER1J3s3pk7Hsd4Z6LBpACw4=;
+        b=S+m8er1ldRmiicKuVvLQNaG4xJ2aIkFkwcxtSfg0O5FKT2pKzbAT1pYRYE3xUbx711
+         DmaYM9iYE25Qy4Exq9JVt8sUmmmezBgcEfFs0dleci9ZdFZ5QKzYTe4npDkTNepvkK4X
+         ZBlIc1sGZta9+B6ADagh23y2QJCw5kZ2B6OdMBUfQnNKU35+BJV8MnhgtgwZfDvuoIeL
+         88haotWL7KlMR0WHzgTL8bccLXWQ9mZUoNvsww5kYGmc+CQ58oM7d+Z02CoY7XAGjcQh
+         PTur5BhBUn/5Pijh771P3uxuL1GVoyRWjnx4hbe9lKb1IDv4CQIghTFV8uYua9t7YMNy
+         urlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708926474; x=1709531274;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=c9AaAZqwaMM3hlPPn5OnhezHOMjAT7L8+u/HDWjjaS8=;
-        b=RxDsP1NzlSBMJYkFJgoZXvdETFNRZPxoJ7d1cHOPwmEW4rjPcyjkXY3zbLdvzQREBq
-         ISNBWoChutEE10rCBE9p0i5hFeDnL8UrPPGWve69D9jPTemns16EW1TgdPw2HcV55LNI
-         1QnxSuU5+avvs5GNkmmuZ7H1piUCsEs5FkgtK8GalRVvwMks3KiJDYHzL/pIkDzvFNJB
-         uYHZzWw2k4jPBZVuyytNpi6RKmkCoG+MZrGE17Im1jZNs7IzJ/AI1gQb32Yn66Fd8nrV
-         VRPgFXDkV6f/atd2i9lP61H9raNi7CCJARYGGo8ni14xBdEltjNX/dNZwz0P5RN1dnps
-         yY/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVaUAxh/+4+iDxyIkNJk4aInMC6tUo/rTGqngnOip7lNwOmSmHklt473yaet4apSe5kNeCqgAE0/J10daMFsGkZPjhjgl9N
-X-Gm-Message-State: AOJu0YxGFmywvFzPOVW4d413ORwkn7gn7kulEAwOSLsI5BDefgP5U+5n
-	JpCWewpsGDJTVBwPgcyYnWUYGgfQSNSC9u6afqmpjV2YGpVY/g2ycXdJYsHf/46jJwk6lgQWsyD
-	+R4Ksqs5GOUtULMdHoSJ4RJB8VHY=
-X-Google-Smtp-Source: AGHT+IFxFgCdVShdGgyihbmMGEdbb3FMU62WepRd4W/KTlGzWNAcQNvEg4IXZJAq58ExfevYjpOnAjGeQM4aCs7o1so=
-X-Received: by 2002:a05:6512:314d:b0:512:e1e3:cd2c with SMTP id
- s13-20020a056512314d00b00512e1e3cd2cmr2961307lfi.69.1708926474284; Sun, 25
- Feb 2024 21:47:54 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708935012; x=1709539812;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=40CoeWlqXJhcfzeZ8GLVER1J3s3pk7Hsd4Z6LBpACw4=;
+        b=X5EzK0N6UV0bzfIRQ8bKgUuaWbcHnbhkXWIcEu66cmvQfHn7JaW58Cotrmw/HgJ9oT
+         gjGtY/Mwc52t95tvSTb1711JoIXf0aShr3TWUVKNeAoF5gdSaVCjwlmHfpORvFOnKrm6
+         S5lb7CHcZXf/IVxFaXM4CjNWu5pbXTMxvofLnlggwfK+L3TGi/2nGidXlnZZecpoEfLs
+         PGrYmMlpWPqBHUeREHUM3udCKy4+Qbqqsf2dkH9nXL2bSp3IgIovPte5nbwFYWBiU3O0
+         BzWv6KS6nSP6KbkXLzvEQx4iG9bxz0DaVpt4pGqHzJHd9T6PtWB+hZlmIL7a3TSutSDW
+         wXpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUvLcb4/X9S69OkUV3Y5zr7dSAjCXQ/zLAvPhzRJ+LRER307NBj7iE8DvieDVfOgD3Ajeqks9zaIu9bTTmeo9uoAxEZkd1c
+X-Gm-Message-State: AOJu0YxBf0YS7ah1PIpt74PjAN9VvGjq6DZq3GR20uH8438MP5azA0b2
+	E8OQGYvhzws3FOz8cwcr1qCounQW268qGDNwYmtG5orNtVOPFmm2
+X-Google-Smtp-Source: AGHT+IGjewnhiknpGMm5HU4N8i6SJvrGSCvXNkP65jhcUFNHjZ9u6URsa8lY6wCVKeLBowpA/NdmVA==
+X-Received: by 2002:a17:902:e5c7:b0:1db:fc18:2da5 with SMTP id u7-20020a170902e5c700b001dbfc182da5mr8456349plf.30.1708935012131;
+        Mon, 26 Feb 2024 00:10:12 -0800 (PST)
+Received: from localhost ([1.146.74.212])
+        by smtp.gmail.com with ESMTPSA id mm12-20020a1709030a0c00b001d8d1a2e5fesm3348276plb.196.2024.02.26.00.10.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Feb 2024 00:10:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <cover.1705916069.git.haibo1.xu@intel.com> <68856b86a93a4188558e5d0ebac0dd6aac8e404c.1705916069.git.haibo1.xu@intel.com>
- <CAOnJCULwRTSnrQkR2o1P53R=tJ3TAxX+y+XRBesW6OFEzgFv2g@mail.gmail.com>
- <CAJve8om2oOLg5-wKX7m7cBTgzwqiMcb35x=nDi1edY8evXjyMw@mail.gmail.com>
- <2c96c61a-2685-4cee-9cef-963ed833bf92@rivosinc.com> <CAAhSdy2TVSt=gCJRf78AzXNVFKy8MGJ+QspSEHeedT7GPAYkUQ@mail.gmail.com>
-In-Reply-To: <CAAhSdy2TVSt=gCJRf78AzXNVFKy8MGJ+QspSEHeedT7GPAYkUQ@mail.gmail.com>
-From: Haibo Xu <xiaobo55x@gmail.com>
-Date: Mon, 26 Feb 2024 13:47:42 +0800
-Message-ID: <CAJve8onL5YB2w6duAr2H=8yJMh=SPsZCvgu+suhd=9U1_egHOg@mail.gmail.com>
-Subject: Re: [PATCH v5 11/12] KVM: riscv: selftests: Change vcpu_has_ext to a
- common function
-To: Anup Patel <anup@brainfault.org>
-Cc: Atish Patra <atishp@rivosinc.com>, Atish Patra <atishp@atishpatra.org>, 
-	Haibo Xu <haibo1.xu@intel.com>, ajones@ventanamicro.com, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Guo Ren <guoren@kernel.org>, 
-	Mayuresh Chitale <mchitale@ventanamicro.com>, 
-	Daniel Henrique Barboza <dbarboza@ventanamicro.com>, Conor Dooley <conor.dooley@microchip.com>, 
-	Samuel Holland <samuel@sholland.org>, Minda Chen <minda.chen@starfivetech.com>, 
-	Jisheng Zhang <jszhang@kernel.org>, Sean Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, 
-	Like Xu <likexu@tencent.com>, Vipin Sharma <vipinsh@google.com>, Thomas Huth <thuth@redhat.com>, 
-	Aaron Lewis <aaronlewis@google.com>, 
-	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 26 Feb 2024 18:10:02 +1000
+Message-Id: <CZEUWE22JA80.3S73L9F5A04RK@wheely>
+To: "Thomas Huth" <thuth@redhat.com>
+Cc: <kvm@vger.kernel.org>, "Laurent Vivier" <lvivier@redhat.com>, "Shaoqin
+ Huang" <shahuang@redhat.com>, "Andrew Jones" <andrew.jones@linux.dev>,
+ "Nico Boehr" <nrb@linux.ibm.com>, "Paolo Bonzini" <pbonzini@redhat.com>,
+ "Alexandru Elisei" <alexandru.elisei@arm.com>, "Eric Auger"
+ <eric.auger@redhat.com>, "Janosch Frank" <frankja@linux.ibm.com>, "Claudio
+ Imbrenda" <imbrenda@linux.ibm.com>, "David Hildenbrand" <david@redhat.com>,
+ "Marc Hartmayer" <mhartmay@linux.ibm.com>, <linuxppc-dev@lists.ozlabs.org>,
+ <linux-s390@vger.kernel.org>, <kvmarm@lists.linux.dev>,
+ <kvm-riscv@lists.infradead.org>
+Subject: Re: [kvm-unit-tests PATCH v5 0/8] Multi-migration support
+From: "Nicholas Piggin" <npiggin@gmail.com>
+X-Mailer: aerc 0.15.2
+References: <20240221032757.454524-1-npiggin@gmail.com>
+ <5383a1b2-20ca-4d07-9729-e9d5115948dc@redhat.com>
+In-Reply-To: <5383a1b2-20ca-4d07-9729-e9d5115948dc@redhat.com>
 
-On Mon, Feb 26, 2024 at 1:20=E2=80=AFPM Anup Patel <anup@brainfault.org> wr=
-ote:
+On Fri Feb 23, 2024 at 5:06 PM AEST, Thomas Huth wrote:
+> On 21/02/2024 04.27, Nicholas Piggin wrote:
+> > Now that strange arm64 hang is found to be QEMU bug, I'll repost.
+> > Since arm64 requires Thomas's uart patch and it is worse affected
+> > by the QEMU bug, I will just not build it on arm. The QEMU bug
+> > still affects powerpc (and presumably s390x) but it's not causing
+> > so much trouble for this test case.
+> >=20
+> > I have another test case that can hit it reliably and doesn't
+> > cause crashes but that takes some harness and common lib work so
+> > I'll send that another time.
+> >=20
+> > Since v4:
+> > - Don't build selftest-migration on arm.
+> > - Reduce selftest-migration iterations from 100 to 30 to make the
+> >    test run faster (it's ~0.5s per migration).
 >
-> On Wed, Feb 21, 2024 at 2:07=E2=80=AFPM Atish Patra <atishp@rivosinc.com>=
- wrote:
-> >
-> > On 2/20/24 18:13, Haibo Xu wrote:
-> > > On Wed, Feb 21, 2024 at 7:03=E2=80=AFAM Atish Patra <atishp@atishpatr=
-a.org> wrote:
-> > >>
-> > >> On Mon, Jan 22, 2024 at 1:48=E2=80=AFAM Haibo Xu <haibo1.xu@intel.co=
-m> wrote:
-> > >>>
-> > >>> Move vcpu_has_ext to the processor.c and rename it to __vcpu_has_ex=
-t
-> > >>> so that other test cases can use it for vCPU extension check.
-> > >>>
-> > >>> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
-> > >>> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> > >>> ---
-> > >>>   tools/testing/selftests/kvm/include/riscv/processor.h |  2 ++
-> > >>>   tools/testing/selftests/kvm/lib/riscv/processor.c     | 10 ++++++=
-++++
-> > >>>   tools/testing/selftests/kvm/riscv/get-reg-list.c      | 11 +-----=
------
-> > >>>   3 files changed, 13 insertions(+), 10 deletions(-)
-> > >>>
-> > >>> diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h =
-b/tools/testing/selftests/kvm/include/riscv/processor.h
-> > >>> index b68b1b731a34..bd27e1c67579 100644
-> > >>> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
-> > >>> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
-> > >>> @@ -42,6 +42,8 @@ static inline uint64_t __kvm_reg_id(uint64_t type=
-, uint64_t idx,
-> > >>>   #define RISCV_ISA_EXT_REG(idx) __kvm_reg_id(KVM_REG_RISCV_ISA_EXT=
-, \
-> > >>>                                               idx, KVM_REG_SIZE_ULO=
-NG)
-> > >>>
-> > >>> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext);
-> > >>> +
-> > >>>   struct ex_regs {
-> > >>>          unsigned long ra;
-> > >>>          unsigned long sp;
-> > >>> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/to=
-ols/testing/selftests/kvm/lib/riscv/processor.c
-> > >>> index 39a1e9902dec..dad73ce18164 100644
-> > >>> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-> > >>> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> > >>> @@ -15,6 +15,16 @@
-> > >>>
-> > >>>   static vm_vaddr_t exception_handlers;
-> > >>>
-> > >>> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
-> > >>> +{
-> > >>> +       unsigned long value =3D 0;
-> > >>> +       int ret;
-> > >>> +
-> > >>> +       ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value=
-);
-> > >>> +
-> > >>> +       return !ret && !!value;
-> > >>> +}
-> > >>> +
-> > >>
-> > >> Not sure what was the base patch on which this was rebased. The actu=
-al
-> > >> commit in the queue branch looks different.
-> > >>
-> > >
-> > > This patch set was based on 6.7-rc8.
-> > >
-> > >> https://github.com/kvm-riscv/linux/commit/5563517cc2012e3326411b360c=
-9924d3f2706c8d
-> > >>
-> > >> Both seem to have the same bug though the tests fail now and require
-> > >> the following fix.
-> > >> The ext id should be uint64_t and we need to pass ext directly so th=
-at
-> > >> SBI extension tests can also pass.
-> > >>
-> > >
-> > > It's weird that 6.7-rc8 has already included Andrew's change on the I=
-SA ext reg,
-> > > but this patch was not generated against his change.
-> > >
-> > > commit bdf6aa328f137e184b0fce607fd585354c3742f1
-> > > Author: Andrew Jones <ajones@ventanamicro.com>
-> > > Date:   Wed Dec 13 18:09:58 2023 +0100
-> > >
-> > >      RISC-V: KVM: selftests: Treat SBI ext regs like ISA ext regs
-> > >
-> > > Anyway, your changes were right. Please go ahead to include them when=
- merging.
-> > >
-> >
-> > I am not sure what happened. Probably, a merge conflict issue.
-> >
-> > I just realized I forgot to copy paste another fix in arch timer
-> >
-> > +++ b/tools/testing/selftests/kvm/riscv/arch_timer.c
-> > @@ -85,7 +85,7 @@ struct kvm_vm *test_vm_create(void)
-> >          int nr_vcpus =3D test_args.nr_vcpus;
-> >
-> >          vm =3D vm_create_with_vcpus(nr_vcpus, guest_code, vcpus);
-> > -       __TEST_REQUIRE(__vcpu_has_ext(vcpus[0], KVM_RISCV_ISA_EXT_SSTC)=
-,
-> > +       __TEST_REQUIRE(__vcpu_has_ext(vcpus[0],
-> > RISCV_ISA_EXT_REG(KVM_RISCV_ISA_EXT_SSTC)),
->
-> I have squashed this change into an existing commit in riscv_kvm_queue.
->
-> Thanks,
-> Anup
->
+> Thanks, I think the series is ready to go now ... we just have to wait fo=
+r=20
+> your QEMU TCG migration fix to get merged first. Or should we maybe mark =
+the=20
+> selftest-migration with "accel =3D kvm" for now and remove that line late=
+r=20
+> once QEMU has been fixed?
 
-Thanks a lot, Anup!
+Could we merge it? I'm juggling a bunch of different things and prone to
+lose track of something :\ I'll need to drum up a bit of interest to
+review the QEMU fixes from those who know the code too, so that may take
+some time.
 
-> >
-> >
-> > > Thanks,
-> > > Haibo
-> > >
-> > >>
-> > >> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
-> > >> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
-> > >> @@ -48,7 +48,7 @@ static inline uint64_t __kvm_reg_id(uint64_t type,
-> > >> uint64_t subtype,
-> > >> KVM_REG_RISCV_SBI_SINGLE, \
-> > >> idx, KVM_REG_SIZE_ULONG)
-> > >>
-> > >> -bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext);
-> > >> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, uint64_t ext);
-> > >>
-> > >> struct ex_regs {
-> > >> unsigned long ra;
-> > >> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c
-> > >> b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> > >> index 282587cd4bbc..ec66d331a127 100644
-> > >> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-> > >> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> > >> @@ -15,12 +15,12 @@
-> > >>
-> > >> static vm_vaddr_t exception_handlers;
-> > >>
-> > >> -bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
-> > >> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, uint64_t ext)
-> > >> {
-> > >> unsigned long value =3D 0;
-> > >> int ret;
-> > >>
-> > >> - ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
-> > >> + ret =3D __vcpu_get_reg(vcpu, ext, &value);
-> > >>
-> > >> return !ret && !!value;
-> > >> }
-> > >>
-> > >> With the above the fix, Both SBI/ISA extension tests pass.
-> > >> # ./get-reg-list
-> > >> sbi-base: PASS
-> > >> sbi-sta: PASS
-> > >> sbi-pmu: PASS
-> > >> sbi-dbcn: PASS
-> > >> aia: PASS
-> > >> fp_f: PASS
-> > >> fp_d: PASS
-> > >> 1..0 # SKIP - h not available, skipping tests
-> > >> smstateen: PASS
-> > >> sscofpmf: PASS
-> > >> sstc: PASS
-> > >> 1..0 # SKIP - svinval not available, skipping tests
-> > >> 1..0 # SKIP - svnapot not available, skipping tests
-> > >> 1..0 # SKIP - svpbmt not available, skipping tests
-> > >> zba: PASS
-> > >> zbb: PASS
-> > >> zbc: PASS
-> > >> 1..0 # SKIP - zbkb not available, skipping tests
-> > >> 1..0 # SKIP - zbkc not available, skipping tests
-> > >> 1..0 # SKIP - zbkx not available, skipping tests
-> > >> zbs: PASS
-> > >> zfa: PASS
-> > >> 1..0 # SKIP - zfh not available, skipping tests
-> > >> 1..0 # SKIP - zfhmin not available, skipping tests
-> > >> zicbom: PASS
-> > >> zicboz: PASS
-> > >> zicntr: PASS
-> > >> 1..0 # SKIP - zicond not available, skipping tests
-> > >> zicsr: PASS
-> > >> zifencei: PASS
-> > >> zihintntl: PASS
-> > >> zihintpause: PASS
-> > >> zihpm: PASS
-> > >>
-> > >>
-> > >>>   static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
-> > >>>   {
-> > >>>          return (v + vm->page_size) & ~(vm->page_size - 1);
-> > >>> diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/too=
-ls/testing/selftests/kvm/riscv/get-reg-list.c
-> > >>> index 25de4b8bc347..ed29ba45588c 100644
-> > >>> --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> > >>> +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> > >>> @@ -75,15 +75,6 @@ bool check_reject_set(int err)
-> > >>>          return err =3D=3D EINVAL;
-> > >>>   }
-> > >>>
-> > >>> -static inline bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
-> > >>> -{
-> > >>> -       int ret;
-> > >>> -       unsigned long value;
-> > >>> -
-> > >>> -       ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value=
-);
-> > >>> -       return (ret) ? false : !!value;
-> > >>> -}
-> > >>> -
-> > >>>   void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c=
-)
-> > >>>   {
-> > >>>          unsigned long isa_ext_state[KVM_RISCV_ISA_EXT_MAX] =3D { 0=
- };
-> > >>> @@ -111,7 +102,7 @@ void finalize_vcpu(struct kvm_vcpu *vcpu, struc=
-t vcpu_reg_list *c)
-> > >>>                  __vcpu_set_reg(vcpu, RISCV_ISA_EXT_REG(s->feature)=
-, 1);
-> > >>>
-> > >>>                  /* Double check whether the desired extension was =
-enabled */
-> > >>> -               __TEST_REQUIRE(vcpu_has_ext(vcpu, s->feature),
-> > >>> +               __TEST_REQUIRE(__vcpu_has_ext(vcpu, s->feature),
-> > >>>                                 "%s not available, skipping tests\n=
-", s->name);
-> > >>>          }
-> > >>>   }
-> > >>> --
-> > >>> 2.34.1
-> > >>>
-> > >>
-> > >>
-> > >> --
-> > >> Regards,
-> > >> Atish
-> >
+I left it out of arm unittests.cfg entirely, and s390 and powerpc seems
+to work by luck enough to be useful for gitlab CI so I don't think there
+is a chnage needed really unless you're paranoid.
+
+I do have a later patch that adds a memory tester that does trigger it
+right away on powerpc. I'll send that out after this series is merged...
+but we do still have the issue that the gitlab CI image has the old QEMU
+don't we? Until we update distro.
+
+Thanks,
+Nick
+
