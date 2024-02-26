@@ -1,66 +1,66 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B60FB55C07
-	for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 09:28:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E18566280A
+	for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 09:47:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708939701; cv=none; b=iciSgHp2BDb9xIgJvcTK3smbznrWAnHq0Yn/phBQ3WRSdG7iUBso4sqGF6dMcQJlBD3Hak7j6YOGIIVZcRwTw4rV3cXHP9QFQ+CljBxtDty/kiA113G3Em/8iCtCD+yScjoUE0fyHzzeLALn3F23P4dJvqX5Hz/BWnCVATc1fQA=
+	t=1708940856; cv=none; b=HfT2zlaiNV8g1l7m8vtiqAuwduCzoISovM/AUXsczi/trdXEZmlguWeC9XWeCzJ1Uw5vn6MD3KuqKaRn+EuSsHqVfzU6r+b8wxVMNEB+HzlSTuuG43euB8/GDalx5LXopTYClJ8hSzcTOQ2C5H+ol1hNCdZJQ+l/SdO4w0Mscxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708939701; c=relaxed/simple;
-	bh=2UJIICXGQwE2B22UfRJ8DMjaxvDTs17KAmtNi8diLOU=;
+	s=arc-20240116; t=1708940856; c=relaxed/simple;
+	bh=5Wf7H81GlIOvk5qmre9pm+TCznwRkuERxX6YnoQ3FRc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tAyd3iTCiv4t1GYI65CodZvRlusk8QfyAlPsYiPGNuZqjvX26OjESO2XPw/96giTTodEnpEcVMI9K9BWEW4rYvEgBustkIXoaUnXZjkg7jEUJ8im32Dcg9Cuq9F5F73SpzDcQxNmSaXDqd1U0z6XWaojuNLHz2m+lVBKksm7FrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z2QeC9x/; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=FdYWA00JyV6VAzumTTTUuaxpEMovN8vMcFd2aBpvoIvw43XFqZ0qtBKiwZ5EaPWrsnobYuOi3R7/5orP6sVrfyWnkZnq3zTdxpfEmqphJSU/kWlYTqLEKvhLX6ZZHu23zXfY0zfQpW8pCBzbGBSs+vhiZvC0ePfeomX3JGd3cOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S4PQcyE5; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z2QeC9x/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S4PQcyE5"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708939698;
+	s=mimecast20190719; t=1708940853;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=elcx7WkZMgK/pgWvuMLbbcWcSNmmuLeWieK7NCgmQ2k=;
-	b=Z2QeC9x/qPrT3nw3f/qR1lvOb9OubyHEHPt515Ylqa407i3Vt5ukvynu88lBKhQ9J0kdLC
-	wxuHKiLnaaawjHRYhpUt1MYCA2isSMAo/rQp0GvW64Ilb2xUsobAZDRqW7xuQacP7xh3q1
-	5fBWDYaUxzwkQ9QtVt1cROSMb2FRWX4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=6+zFtJC/a8/spEP7x6+UKSXwE1+CzSPt4+YKrSqfJlo=;
+	b=S4PQcyE5pIMtdpxFQSGqcassXAlUETPhLD2ieBZfv8w7WD48gV6D3tphVqItKfKyF4GJis
+	/0B80TBswG4geBPsSaH0viOL0SmRe58hGpQVtkxFLSkgasYQu35ZepAqR0ualjEuY6+cpQ
+	Gf/ibiiO2YC1bXH8UYuOh37uDRjPi/o=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-32-hdiPV4hrOTGMejrqXtwrZA-1; Mon, 26 Feb 2024 04:28:15 -0500
-X-MC-Unique: hdiPV4hrOTGMejrqXtwrZA-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33d7fcb70c2so1064308f8f.1
-        for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 01:28:15 -0800 (PST)
+ us-mta-554-11uuKS0YMDK8n6cFlzkd6g-1; Mon, 26 Feb 2024 04:47:32 -0500
+X-MC-Unique: 11uuKS0YMDK8n6cFlzkd6g-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-512e9690876so2746884e87.2
+        for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 01:47:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708939695; x=1709544495;
+        d=1e100.net; s=20230601; t=1708940850; x=1709545650;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :references:cc:to:content-language:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=elcx7WkZMgK/pgWvuMLbbcWcSNmmuLeWieK7NCgmQ2k=;
-        b=MuIa9u84Xc5H5cIaKzU+I/kKgrvvP+l4hAxv9vg3TlK/XJbDNIzmIKinvi/d6n4DL0
-         7cecMh3M6O24o9UuH0aW42pKz/iYfM7bZfmtiTdYDmlVjkokj3dYVziYpkjywZKArJbr
-         QXfghg0R7bZnK92Ow/Z+smHsHf3mF9cixPbjfRfzZ/LVgdAWgKIsd0/48XtaS/0VnVV8
-         iLtJAMTgCgeOI/eUzTdduIDm01K10y4u3Ni3E8C9xdZ3ik6rFJ2C/BD78pqhuAfqHfHB
-         mFnKDx/NSG7YcIN+bucrzHXTH4lDG1HjhwfAA2ajCJVdocXSY4CplCaFNjHr6FbNqmih
-         2TUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX7XWtAcXWwA0pPAr+3Sgw3zvisOVOuZQ4tjpOputidg5OwNmxMS71J2fnwLt5tMGKCd4qMirBUcZer6V3ZFCBAkACpOL7W
-X-Gm-Message-State: AOJu0Yy43l83Tx2mRBVIlQJmbVfXxxojFrE2w4w4Z5rEYeUXBAvnd/lR
-	D60llC9hJ3NnB7BgJO+lmT96WqaL2rAfa6Bc5YfsFwt7ebhpRjgImcJvfEm4O1VMwwRtckjSIwF
-	yiHqJxoHkG8/HGgMuEKwXNlmG5zPsMD+mp1Z5YouXEbDWhZEGM5SOnQ==
-X-Received: by 2002:adf:ce10:0:b0:33d:7682:49a8 with SMTP id p16-20020adfce10000000b0033d768249a8mr510143wrn.16.1708939694788;
-        Mon, 26 Feb 2024 01:28:14 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH4a5T0Zoi8hkU+OsZjGTBg4h4fN9HQzhA4VF3wIMNATDVEDz7OFGwNyVJlS8LXyMtws34Eiw==
-X-Received: by 2002:adf:ce10:0:b0:33d:7682:49a8 with SMTP id p16-20020adfce10000000b0033d768249a8mr510100wrn.16.1708939694378;
-        Mon, 26 Feb 2024 01:28:14 -0800 (PST)
+        bh=6+zFtJC/a8/spEP7x6+UKSXwE1+CzSPt4+YKrSqfJlo=;
+        b=fTwPUQrzgQ+osCTXGsoTf1xHu1huthTnIIsfqCr2xzMLdwVMA2tbNGdVhNLn/z0yP7
+         zukdFKXRdLZr5Q5SJ/nnpTfWbOOdlkWuw+SYVasJ2LpEAfOjjtZbwktazKTC5jRcBGfr
+         XJMXQs9RxKg1aWASDM7Kj7pY4uRLN4jROawApBidsFFCbnLexC2ThwJSdIC40Es50gxb
+         2xAW0AC7D/Mx8ZGph0sCDdbaGdJvFoX7iNTjNxLSWdlZTFZI3fQFj4Mg3wOpoN7UwQs6
+         FQtOUSa3lP3uSkj+DbvcO0WBlUkO+609SGlf1L9Zt0tjmqT7qGETbnt6TWBoQhGzyVb/
+         CWhw==
+X-Forwarded-Encrypted: i=1; AJvYcCUm5nIfHpukb/Rf6hBsZYF7F2mu7+Vg+DhqgiZy5pX37niX05xUVDDvM98QZ0obe07i7nSj3WprHqSnTDrXoEoiKtv7tQku
+X-Gm-Message-State: AOJu0YxVZHZMgyykxeDyW0yZW9KoHDekFQYKpfKDd+sVBOEyl0l2Yb4p
+	3ybt2v7UUe3w9l4CiRscJpNowOgo+3k4RDHhI+KzXpGvVNKduiYoUeUTEgl6Ya16kyOOakKxHDH
+	tngMGNKt6vid6pLBfxuE1K6L9/Jk4GggSwI5OIabxpZ/hpz78a0HQJA==
+X-Received: by 2002:a05:6512:3104:b0:512:d5ff:1bcf with SMTP id n4-20020a056512310400b00512d5ff1bcfmr4207224lfb.19.1708940850659;
+        Mon, 26 Feb 2024 01:47:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF7MuuzRsag8u6BSuJDHkSoqtjdhb2i2DhgeyURk12De7YvjAowld6gsPKTT3J1aVU9dQN5fw==
+X-Received: by 2002:a05:6512:3104:b0:512:d5ff:1bcf with SMTP id n4-20020a056512310400b00512d5ff1bcfmr4207213lfb.19.1708940850247;
+        Mon, 26 Feb 2024 01:47:30 -0800 (PST)
 Received: from ?IPV6:2003:cb:c72f:f700:104b:9184:1b45:1898? (p200300cbc72ff700104b91841b451898.dip0.t-ipconnect.de. [2003:cb:c72f:f700:104b:9184:1b45:1898])
-        by smtp.gmail.com with ESMTPSA id m17-20020adff391000000b0033da1c4c29csm7641215wro.91.2024.02.26.01.28.12
+        by smtp.gmail.com with ESMTPSA id m9-20020a05600c4f4900b00412a013817esm5696665wmq.7.2024.02.26.01.47.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Feb 2024 01:28:13 -0800 (PST)
-Message-ID: <40a8fb34-868f-4e19-9f98-7516948fc740@redhat.com>
-Date: Mon, 26 Feb 2024 10:28:11 +0100
+        Mon, 26 Feb 2024 01:47:29 -0800 (PST)
+Message-ID: <9e983090-f336-43b9-8f2b-5dabe7e73b72@redhat.com>
+Date: Mon, 26 Feb 2024 10:47:27 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -68,28 +68,27 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: folio_mmapped
-To: Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
- chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
- paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
- seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org,
- akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
- chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
- dmatlack@google.com, yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com,
- mic@digikod.net, vbabka@suse.cz, vannapurve@google.com,
- ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com,
- wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+Subject: Re: [RFC PATCH v1 00/26] KVM: Restricted mapping of guest_memfd at
+ the host and pKVM/arm64 support
+To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net,
+ vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
+ mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com,
+ liam.merwick@oracle.com, isaku.yamahata@gmail.com,
  kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
- quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
- quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
- james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
- maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com
-Cc: linux-mm@kvack.org
+ steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ will@kernel.org, qperret@google.com, keirf@google.com
 References: <20240222161047.402609-1-tabba@google.com>
- <20240222141602976-0800.eberman@hu-eberman-lv.qualcomm.com>
- <ZdfoR3nCEP3HTtm1@casper.infradead.org>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -136,78 +135,48 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <ZdfoR3nCEP3HTtm1@casper.infradead.org>
+In-Reply-To: <20240222161047.402609-1-tabba@google.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 23.02.24 01:35, Matthew Wilcox wrote:
-> On Thu, Feb 22, 2024 at 03:43:56PM -0800, Elliot Berman wrote:
->>> This creates the situation where access to successfully mmap()'d
->>> memory might SIGBUS at page fault. There is precedence for
->>> similar behavior in the kernel I believe, with MADV_HWPOISON and
->>> the hugetlbfs cgroups controller, which could SIGBUS at page
->>> fault time depending on the accounting limit.
->>
->> I added a test: folio_mmapped() [1] which checks if there's a vma
->> covering the corresponding offset into the guest_memfd. I use this
->> test before trying to make page private to guest and I've been able to
->> ensure that userspace can't even mmap() private guest memory. If I try
->> to make memory private, I can test that it's not mmapped and not allow
->> memory to become private. In my testing so far, this is enough to
->> prevent SIGBUS from happening.
->>
->> This test probably should be moved outside Gunyah specific code, and was
->> looking for maintainer to suggest the right home for it :)
->>
->> [1]: https://lore.kernel.org/all/20240222-gunyah-v17-20-1e9da6763d38@quicinc.com/
+On 22.02.24 17:10, Fuad Tabba wrote:
+> This series adds restricted mmap() support to guest_memfd [1], as
+> well as support guest_memfd on pKVM/arm64.
 > 
-> You, um, might have wanted to send an email to linux-mm, not bury it in
-> the middle of a series of 35 patches?
+> This series is based on Linux 6.8-rc4 + our pKVM core series [2].
+> The KVM core patches apply to Linux 6.8-rc4 (patches 1-6), but
+> the remainder (patches 7-26) require the pKVM core series. A git
+> repo with this series applied can be found here [3]. We have a
+> (WIP) kvmtool port capable of running the code in this series
+> [4]. For a technical deep dive into pKVM, please refer to Quentin
+> Perret's KVM Forum Presentation [5, 6].
 > 
-> So this isn't folio_mapped() because you're interested if anyone _could_
-> fault this page, not whether the folio is currently present in anyone's
-> page tables.
+> I've covered some of the issues presented here in my LPC 2023
+> presentation [7].
 > 
-> It's like walk_page_mapping() but with a trivial mm_walk_ops; not sure
-> it's worth the effort to use walk_page_mapping(), but I would defer to
-> David.
+> We haven't started using this in Android yet, but we aim to move
+> away from anonymous memory to guest_memfd once we have the
+> necessary support merged upstream. Others (e.g., Gunyah [8]) are
+> also looking into guest_memfd for similar reasons as us.
+> 
+> By design, guest_memfd cannot be mapped, read, or written by the
+> host userspace. In pKVM, memory shared between a protected guest
+> and the host is shared in-place, unlike the other confidential
+> computing solutions that guest_memfd was originally envisaged for
+> (e.g, TDX).
 
-First, I suspect we are not only concerned about current+future VMAs 
-covering the page, we are also interested in any page pins that could 
-have been derived from such a VMA?
+Can you elaborate (or point to a summary) why pKVM has to be special 
+here? Why can't you use guest_memfd only for private memory and another 
+(ordinary) memfd for shared memory, like the other confidential 
+computing technologies are planning to?
 
-Imagine user space mmap'ed the file, faulted in page, took a pin on the 
-page using pin_user_pages() and friends, and then munmap()'ed the VMA.
+What's the main reason for that decision and can it be avoided?
 
-You likely want to catch that as well and not allow a conversion to private?
-
-[I assume you want to convert the page to private only if you hold all 
-the folio references -- i.e., if the refcount of a small folio is 1]
-
-
-Now, regarding the original question (disallow mapping the page), I see 
-the following approaches:
-
-1) SIGBUS during page fault. There are other cases that can trigger
-    SIGBUS during page faults: hugetlb when we are out of free hugetlb
-    pages, userfaultfd with UFFD_FEATURE_SIGBUS.
-
--> Simple and should get the job done.
-
-2) folio_mmapped() + preventing new mmaps covering that folio
-
--> More complicated, requires an rmap walk on every conversion.
-
-3) Disallow any mmaps of the file while any page is private
-
--> Likely not what you want.
-
-
-Why was 1) abandoned? I looks a lot easier and harder to mess up. Why 
-are you trying to avoid page faults? What's the use case?
+(s390x also shares in-place, but doesn't need any special-casing like 
+guest_memfd provides)
 
 -- 
 Cheers,
