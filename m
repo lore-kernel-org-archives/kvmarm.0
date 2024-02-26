@@ -1,65 +1,66 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489497C6DF
-	for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 09:08:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B60FB55C07
+	for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 09:28:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708938504; cv=none; b=FJy/du86MDjpK/3rbebGk1HFjcakePDMkmN5DvfRwxET1VTKKP9hwz1o8v4XesBIkt7sqqNwzYpgvEiJcavGuYSUx2JnDZBh0B/wNrgzMOcxEgKwKk+lPqzTg/xeBrt6NDkrj6PkmrbmqggncSfyxONLyDysb2Ij14M8Awpk9H0=
+	t=1708939701; cv=none; b=iciSgHp2BDb9xIgJvcTK3smbznrWAnHq0Yn/phBQ3WRSdG7iUBso4sqGF6dMcQJlBD3Hak7j6YOGIIVZcRwTw4rV3cXHP9QFQ+CljBxtDty/kiA113G3Em/8iCtCD+yScjoUE0fyHzzeLALn3F23P4dJvqX5Hz/BWnCVATc1fQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708938504; c=relaxed/simple;
-	bh=tBZE/eacc6Q7GBJFLAV/5+38gZ+VtYaaXoBQ10tKnVY=;
+	s=arc-20240116; t=1708939701; c=relaxed/simple;
+	bh=2UJIICXGQwE2B22UfRJ8DMjaxvDTs17KAmtNi8diLOU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RkkjXc4NDSkH8tAfvStrtoBBUCY+pLWeJpZa0lPKjU3+JINKA8lHedgS2yBYz7ES3GgSIJSX0EU1Zyt25ah64AYoK/W3Fs10hugOQiCqNvUylVTDWz09jy8dMvPdglqdQIuYWHrAxChyelI1jHMmDL4MzzqS0uEuQM8Klf2Xqoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dUwThaGG; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=tAyd3iTCiv4t1GYI65CodZvRlusk8QfyAlPsYiPGNuZqjvX26OjESO2XPw/96giTTodEnpEcVMI9K9BWEW4rYvEgBustkIXoaUnXZjkg7jEUJ8im32Dcg9Cuq9F5F73SpzDcQxNmSaXDqd1U0z6XWaojuNLHz2m+lVBKksm7FrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z2QeC9x/; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dUwThaGG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z2QeC9x/"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708938501;
+	s=mimecast20190719; t=1708939698;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Nd4KNSHTsPg8sEq3delbthyC/APIQx24iJ0AiYrHHVk=;
-	b=dUwThaGG8mYIi57UaaQsSd7f0aYIMvHG5yxgq31Pu2+tUCkESC0IZ+RYH1ImWHxzyWqCGm
-	yaFlpFQWKyoNgc5WRh0hG6PCRW8sd9NMHOc0UnED9UrtO/rAOHmB5aGFQzEipY8ZqqN8VY
-	Tt0C1uVNCy909uOIU4Gj8bQFhkiCm1E=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=elcx7WkZMgK/pgWvuMLbbcWcSNmmuLeWieK7NCgmQ2k=;
+	b=Z2QeC9x/qPrT3nw3f/qR1lvOb9OubyHEHPt515Ylqa407i3Vt5ukvynu88lBKhQ9J0kdLC
+	wxuHKiLnaaawjHRYhpUt1MYCA2isSMAo/rQp0GvW64Ilb2xUsobAZDRqW7xuQacP7xh3q1
+	5fBWDYaUxzwkQ9QtVt1cROSMb2FRWX4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-21-kl6P989UNYiCZHBfLucuYw-1; Mon, 26 Feb 2024 04:08:19 -0500
-X-MC-Unique: kl6P989UNYiCZHBfLucuYw-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33d5e12bbbdso1220870f8f.1
-        for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 01:08:19 -0800 (PST)
+ us-mta-32-hdiPV4hrOTGMejrqXtwrZA-1; Mon, 26 Feb 2024 04:28:15 -0500
+X-MC-Unique: hdiPV4hrOTGMejrqXtwrZA-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33d7fcb70c2so1064308f8f.1
+        for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 01:28:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708938499; x=1709543299;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nd4KNSHTsPg8sEq3delbthyC/APIQx24iJ0AiYrHHVk=;
-        b=kdG/K4SSu+chszkuhPGueXiojKFhWDJnnXCi+qrKGaIFGqGql0SRN+uvvSidVBfLLI
-         j5eMF/V4ETMTRpPqF1Nn3x0skGcYr95vLlVsjcp8PnWz5g3NQXMrpStkpR8KNJ/GBzA0
-         Qbjtvt7leNYIcS8khfVmhFmv1x9OqsqpeRx/2rvN3ltO5E0TPlVPf+OherW9nAClIydx
-         +5DfpGaS4+awCfXE0cQbAf3UfwpnG4glM1RO4g1U6rkn5wAzs0SMhK4ZLV362RunAafS
-         oNL5820IL+O6ZkQpYQ71tIudWoP6ihkHqFpX8+Bm0HnucjihJAGEJJiUAudYtXNBvGTX
-         65Yg==
-X-Forwarded-Encrypted: i=1; AJvYcCVxTwj8HvZH4JdGiV65evUwFcZRp8qSVSxsVw0uxvYDO82h8fkhHa0zeiV5ycHG1u8ouSM+pWtHSq+Wyird78KRkL7KtE0U
-X-Gm-Message-State: AOJu0YxURSDKhEY5NnRjpSiOOPOJWl0AtPebjB8gzm85hFAiX5ACgb6C
-	heW/nXEKgYqQTSh5VFrXbqf3YSHEfBBgdaTy/ntib3vTVm3LPZ3isSUy7dn9SoYhoxXGjOrRH7w
-	4HSPQ6moqlQJphs+14TMsWlhJ29EUBZ07G9tayNebtX2wcXR52iArng==
-X-Received: by 2002:adf:f350:0:b0:33d:855d:7457 with SMTP id e16-20020adff350000000b0033d855d7457mr4399508wrp.21.1708938498794;
-        Mon, 26 Feb 2024 01:08:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGFjmnajipOzaVs1cymu3XapHbGqxmQuOJVM3lzDCaND8iWQ5Iz+3PcFM5ZHEhGzbfZOV1QvQ==
-X-Received: by 2002:adf:f350:0:b0:33d:855d:7457 with SMTP id e16-20020adff350000000b0033d855d7457mr4399486wrp.21.1708938498451;
-        Mon, 26 Feb 2024 01:08:18 -0800 (PST)
-Received: from [192.168.0.9] (ip-109-43-176-215.web.vodafone.de. [109.43.176.215])
-        by smtp.gmail.com with ESMTPSA id w4-20020a5d4044000000b0033b7ce8b496sm7491263wrp.108.2024.02.26.01.08.17
+        d=1e100.net; s=20230601; t=1708939695; x=1709544495;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=elcx7WkZMgK/pgWvuMLbbcWcSNmmuLeWieK7NCgmQ2k=;
+        b=MuIa9u84Xc5H5cIaKzU+I/kKgrvvP+l4hAxv9vg3TlK/XJbDNIzmIKinvi/d6n4DL0
+         7cecMh3M6O24o9UuH0aW42pKz/iYfM7bZfmtiTdYDmlVjkokj3dYVziYpkjywZKArJbr
+         QXfghg0R7bZnK92Ow/Z+smHsHf3mF9cixPbjfRfzZ/LVgdAWgKIsd0/48XtaS/0VnVV8
+         iLtJAMTgCgeOI/eUzTdduIDm01K10y4u3Ni3E8C9xdZ3ik6rFJ2C/BD78pqhuAfqHfHB
+         mFnKDx/NSG7YcIN+bucrzHXTH4lDG1HjhwfAA2ajCJVdocXSY4CplCaFNjHr6FbNqmih
+         2TUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX7XWtAcXWwA0pPAr+3Sgw3zvisOVOuZQ4tjpOputidg5OwNmxMS71J2fnwLt5tMGKCd4qMirBUcZer6V3ZFCBAkACpOL7W
+X-Gm-Message-State: AOJu0Yy43l83Tx2mRBVIlQJmbVfXxxojFrE2w4w4Z5rEYeUXBAvnd/lR
+	D60llC9hJ3NnB7BgJO+lmT96WqaL2rAfa6Bc5YfsFwt7ebhpRjgImcJvfEm4O1VMwwRtckjSIwF
+	yiHqJxoHkG8/HGgMuEKwXNlmG5zPsMD+mp1Z5YouXEbDWhZEGM5SOnQ==
+X-Received: by 2002:adf:ce10:0:b0:33d:7682:49a8 with SMTP id p16-20020adfce10000000b0033d768249a8mr510143wrn.16.1708939694788;
+        Mon, 26 Feb 2024 01:28:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH4a5T0Zoi8hkU+OsZjGTBg4h4fN9HQzhA4VF3wIMNATDVEDz7OFGwNyVJlS8LXyMtws34Eiw==
+X-Received: by 2002:adf:ce10:0:b0:33d:7682:49a8 with SMTP id p16-20020adfce10000000b0033d768249a8mr510100wrn.16.1708939694378;
+        Mon, 26 Feb 2024 01:28:14 -0800 (PST)
+Received: from ?IPV6:2003:cb:c72f:f700:104b:9184:1b45:1898? (p200300cbc72ff700104b91841b451898.dip0.t-ipconnect.de. [2003:cb:c72f:f700:104b:9184:1b45:1898])
+        by smtp.gmail.com with ESMTPSA id m17-20020adff391000000b0033da1c4c29csm7641215wro.91.2024.02.26.01.28.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Feb 2024 01:08:18 -0800 (PST)
-Message-ID: <d7d4644f-0c82-42b8-b211-f53d8135786c@redhat.com>
-Date: Mon, 26 Feb 2024 10:08:16 +0100
+        Mon, 26 Feb 2024 01:28:13 -0800 (PST)
+Message-ID: <40a8fb34-868f-4e19-9f98-7516948fc740@redhat.com>
+Date: Mon, 26 Feb 2024 10:28:11 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -67,120 +68,149 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v5 0/8] Multi-migration support
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
- Shaoqin Huang <shahuang@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
- Nico Boehr <nrb@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Eric Auger <eric.auger@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Marc Hartmayer
- <mhartmay@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
- linux-s390@vger.kernel.org, kvmarm@lists.linux.dev,
- kvm-riscv@lists.infradead.org
-References: <20240221032757.454524-1-npiggin@gmail.com>
- <5383a1b2-20ca-4d07-9729-e9d5115948dc@redhat.com>
- <CZEUWE22JA80.3S73L9F5A04RK@wheely>
-From: Thomas Huth <thuth@redhat.com>
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <CZEUWE22JA80.3S73L9F5A04RK@wheely>
+Subject: Re: folio_mmapped
+To: Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+ chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
+ paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+ seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org,
+ akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
+ chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
+ dmatlack@google.com, yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com,
+ mic@digikod.net, vbabka@suse.cz, vannapurve@google.com,
+ ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com,
+ wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+ quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+ quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
+ james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
+ maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com
+Cc: linux-mm@kvack.org
+References: <20240222161047.402609-1-tabba@google.com>
+ <20240222141602976-0800.eberman@hu-eberman-lv.qualcomm.com>
+ <ZdfoR3nCEP3HTtm1@casper.infradead.org>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <ZdfoR3nCEP3HTtm1@casper.infradead.org>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 26/02/2024 09.10, Nicholas Piggin wrote:
-> On Fri Feb 23, 2024 at 5:06 PM AEST, Thomas Huth wrote:
->> On 21/02/2024 04.27, Nicholas Piggin wrote:
->>> Now that strange arm64 hang is found to be QEMU bug, I'll repost.
->>> Since arm64 requires Thomas's uart patch and it is worse affected
->>> by the QEMU bug, I will just not build it on arm. The QEMU bug
->>> still affects powerpc (and presumably s390x) but it's not causing
->>> so much trouble for this test case.
->>>
->>> I have another test case that can hit it reliably and doesn't
->>> cause crashes but that takes some harness and common lib work so
->>> I'll send that another time.
->>>
->>> Since v4:
->>> - Don't build selftest-migration on arm.
->>> - Reduce selftest-migration iterations from 100 to 30 to make the
->>>     test run faster (it's ~0.5s per migration).
+On 23.02.24 01:35, Matthew Wilcox wrote:
+> On Thu, Feb 22, 2024 at 03:43:56PM -0800, Elliot Berman wrote:
+>>> This creates the situation where access to successfully mmap()'d
+>>> memory might SIGBUS at page fault. There is precedence for
+>>> similar behavior in the kernel I believe, with MADV_HWPOISON and
+>>> the hugetlbfs cgroups controller, which could SIGBUS at page
+>>> fault time depending on the accounting limit.
 >>
->> Thanks, I think the series is ready to go now ... we just have to wait for
->> your QEMU TCG migration fix to get merged first. Or should we maybe mark the
->> selftest-migration with "accel = kvm" for now and remove that line later
->> once QEMU has been fixed?
+>> I added a test: folio_mmapped() [1] which checks if there's a vma
+>> covering the corresponding offset into the guest_memfd. I use this
+>> test before trying to make page private to guest and I've been able to
+>> ensure that userspace can't even mmap() private guest memory. If I try
+>> to make memory private, I can test that it's not mmapped and not allow
+>> memory to become private. In my testing so far, this is enough to
+>> prevent SIGBUS from happening.
+>>
+>> This test probably should be moved outside Gunyah specific code, and was
+>> looking for maintainer to suggest the right home for it :)
+>>
+>> [1]: https://lore.kernel.org/all/20240222-gunyah-v17-20-1e9da6763d38@quicinc.com/
 > 
-> Could we merge it? I'm juggling a bunch of different things and prone to
-> lose track of something :\ I'll need to drum up a bit of interest to
-> review the QEMU fixes from those who know the code too, so that may take
-> some time.
+> You, um, might have wanted to send an email to linux-mm, not bury it in
+> the middle of a series of 35 patches?
+> 
+> So this isn't folio_mapped() because you're interested if anyone _could_
+> fault this page, not whether the folio is currently present in anyone's
+> page tables.
+> 
+> It's like walk_page_mapping() but with a trivial mm_walk_ops; not sure
+> it's worth the effort to use walk_page_mapping(), but I would defer to
+> David.
 
-Ok, I merged it, but with "accel = kvm" for the time being (otherwise this 
-would be quite a pitfall for people trying to run the k-u-t with TCG when 
-they don't know that they have to fetch a patch from the mailing list to get 
-it working).
+First, I suspect we are not only concerned about current+future VMAs 
+covering the page, we are also interested in any page pins that could 
+have been derived from such a VMA?
 
-> I left it out of arm unittests.cfg entirely, and s390 and powerpc seems
-> to work by luck enough to be useful for gitlab CI so I don't think there
-> is a chnage needed really unless you're paranoid.
+Imagine user space mmap'ed the file, faulted in page, took a pin on the 
+page using pin_user_pages() and friends, and then munmap()'ed the VMA.
 
-At least the s390x test does not work reliably at all when running with TCG 
-without your QEMU patch, so I think we really need the "accel = kvm" for the 
-time being here.
+You likely want to catch that as well and not allow a conversion to private?
 
-> I do have a later patch that adds a memory tester that does trigger it
-> right away on powerpc. I'll send that out after this series is merged...
-> but we do still have the issue that the gitlab CI image has the old QEMU
-> don't we? Until we update distro.
+[I assume you want to convert the page to private only if you hold all 
+the folio references -- i.e., if the refcount of a small folio is 1]
 
-We only run selected tests in the gitlab-CI, so unless you add it to 
-.gitlab-ci.yml, the selftest-migration test won't be run there.
 
-  Thomas
+Now, regarding the original question (disallow mapping the page), I see 
+the following approaches:
 
+1) SIGBUS during page fault. There are other cases that can trigger
+    SIGBUS during page faults: hugetlb when we are out of free hugetlb
+    pages, userfaultfd with UFFD_FEATURE_SIGBUS.
+
+-> Simple and should get the job done.
+
+2) folio_mmapped() + preventing new mmaps covering that folio
+
+-> More complicated, requires an rmap walk on every conversion.
+
+3) Disallow any mmaps of the file while any page is private
+
+-> Likely not what you want.
+
+
+Why was 1) abandoned? I looks a lot easier and harder to mess up. Why 
+are you trying to avoid page faults? What's the use case?
+
+-- 
+Cheers,
+
+David / dhildenb
 
