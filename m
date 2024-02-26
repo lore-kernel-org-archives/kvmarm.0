@@ -1,82 +1,81 @@
-Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05BC6A01D
-	for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 08:58:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B99219ED
+	for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 09:04:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708937934; cv=none; b=ZN/3yvy9YNLh4aHXaFLJPVWbAVlWUl7RK2YObJL2k/6EmDAT5btKUoTQ1rQOVX137oZgmghoa2N1ZwCBZ3FbFiLDaT6ZhCly5fNP7JToTMTQqfoNhLTqCsPn9fbLJwJu09DcyG7oXcFjcVdNjWy3Fipmi0kCSMlUmTcKvmW044k=
+	t=1708938260; cv=none; b=gDxMfeRE2k+D/u5durJPN7O5GYlMxKM0r2yD/eJXiZ+ot6pSetbaTAwJ1IPPu+bk87hEEJc5b4DwYrElzfGTRIJg7TZzhmpfk//Z8Lkzp8LktWm6Tf8Jlx41WbQP3z03jZ8664Lluqkwtg4squhhisMqv5kEBhfhtu77LuSYW8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708937934; c=relaxed/simple;
-	bh=oRe0qnXLfntPxezGQlL0FgbrraxE9KD4t753iLi4vJI=;
+	s=arc-20240116; t=1708938260; c=relaxed/simple;
+	bh=yEZyECskv2rcwMp+c/P2OzQkmGTKaUReF3Ro5PzNU5M=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rCdo3tbeDSXv8O9wRa7hDcgnk9Js0VsAOnRWZqkOPnTsKBqlBJaOaP9pdXI76YIzQad/HwA8w2xDmT25m3y86BBMkQ2oYHbH6unjFDmYQIGPY92ICOPYfM4Jm2+V4oE1IFKccrNuMtgM8mEkH9Nyx4UGV1e5Xz6BqR66oZtk7a4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nWLeduTQ; arc=none smtp.client-ip=209.85.217.42
+	 To:Cc:Content-Type; b=cNwItUUMejPGsVAe+agT00ubRIX22d8Ex0OsfmakphBFo6jnFF8VDbLN3cpxwT/j6eyq6cb1X6lfZ2JjraP+/5qIXYJOEfnQAdP2oqx3oJPOarUk/CuVh/jSm9Sd9OqUTGxM8yurFiwTtgRENERLvRplWYKVdVkb10+q7/cBNks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R6Y+debA; arc=none smtp.client-ip=209.85.217.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nWLeduTQ"
-Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-471e395f6baso101086137.0
-        for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 00:58:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R6Y+debA"
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-470455b5352so336345137.2
+        for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 01:04:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708937931; x=1709542731; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1708938257; x=1709543057; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9U5JeY4K4lhWUcooGtJNIKDdAgad5+rJlROqa9Ssovo=;
-        b=nWLeduTQ6db8lVQfmT2s6n8Ewh7pcTsFZtdLW8MYGikVc5luDBahFYW0cuh6GYRMAa
-         AEXwfZ/kbBnLqME9W7QgnHVBAspGEx8ne8tlyWYZGF61L/KUPNRQaIhHQsKkAXLmIog/
-         h2OnvV40mr+magpiQqe2wJ24APRiF3G87tw+LTxTIQitRfV1vURzsdprJDwBraqCqz6x
-         ceiey4n7X5X8IvIE8mZqvJ/m02HJDnebeD5j9UpJWHAGOAeJBR0DpfmUWhhSNltCEEEW
-         SGy4Y4m8uHgL+rrwU3U2EEhoLPwy3V+nSnmPZc3vhYvNRoAj2gAEP3ahy6AMnib6mXhn
-         ZN/w==
+        bh=yEZyECskv2rcwMp+c/P2OzQkmGTKaUReF3Ro5PzNU5M=;
+        b=R6Y+debALlVPYPKQQ5p9rE9e46uLAvLzP9+O9Lp42n5Mkd9B8u47Hs+4PpXbUj5gux
+         rX+34mvpKD3Z6ionk+rRvrkbwCJSDPJW9akF8KYs4afXIEELbM8ilwYDJrl48tNpEfay
+         Mp6L96RsmfZePqHIGssLyr/OWabHjQWuxNEdthkGLGEoaqJzrcJ1KJtotzzOwImvv3ce
+         oFfUb6QzleiVhXTS8hlWX9INM79bQvF5+/NIQKY0HbVBapqjXHK926AetPtroeF8LMRH
+         KSbKnC6G+Ie17pcQcUVLJ1PrUf9FEmoPf1M0f9qAARMd6yyH9mS271SQqKSGeBzKnpVB
+         UosA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708937931; x=1709542731;
+        d=1e100.net; s=20230601; t=1708938257; x=1709543057;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9U5JeY4K4lhWUcooGtJNIKDdAgad5+rJlROqa9Ssovo=;
-        b=PJRjBcU30Zq5Wt8E24zC9o3zKpQZ33i/f4edOtBMEY4VqmJSw2kDlFtCHfFDj4xmVR
-         3efkS/jV/01GCJRnSX110ld3UvU/MXmScVvy33zR+X6qIF3HU/ZM6ANUEKHPMNxkgRJB
-         Z+vrYFRWv59aDMTa8vcWAjdt1uONuj8gjgI/hL/VF2UPYW4/IhVYNFeezoGu6DqUWqv2
-         IznK3KkbYrp9xc6GqpUXd0yO7z99UHk5xkdxF7wVZlzqSwUCIY57UIHGiCSWHLy4oDUX
-         jTLpHHVxA3gMCqPYdBhEj/f9nCXbTZQwJN8gXB77tsqvBS7WZ2gADetfUghXa9qv1eRx
-         ZbkA==
-X-Forwarded-Encrypted: i=1; AJvYcCXFYlNECbLhNKxvl85i6N0LvUFjQ4xuRY40raG2kmJ9CtzZ2ENwRYGW9xWvufZ2eMaN569LocPpk5jnP8S5WLySIk47Pcdk
-X-Gm-Message-State: AOJu0YwzVr34Mc4rssYr4jw1A5Q2QOPtT5tPIg333TJ2BfbSOifVK2yR
-	9fmJoDK96/YptFBSweK2C070K02Ka1cdTq34ghxwHXLIGMSs9VLfUrb2h1/KvUX0xslpBiWPlns
-	aNw5UJWULDZPweDGth7ppF677S/ocJ80cuKKw
-X-Google-Smtp-Source: AGHT+IG85xMFFFXpIF/7pLhNnGD1E7F7LalAUcPFH59zJnBbm6zxfKv2RuWOntbLuG2WkYsWfNdsAbzFeWuZ5K32FPA=
-X-Received: by 2002:a05:6102:34cf:b0:470:575d:4c2c with SMTP id
- a15-20020a05610234cf00b00470575d4c2cmr3713136vst.34.1708937931407; Mon, 26
- Feb 2024 00:58:51 -0800 (PST)
+        bh=yEZyECskv2rcwMp+c/P2OzQkmGTKaUReF3Ro5PzNU5M=;
+        b=XuBPcl1iJusuWhY8FT1sa2u6lSTXgpG7+6vAnIrdbRT4AI393Pw4H7mfJXz71IBm1g
+         zxbdYrjU5EaQMwmsLoBrfyIbtMHjenJJsmlUdFd3vFByJGGQUCRoJ70/1rK8Mmvi0VcR
+         dBPHZLu1/1iTcIEVnol18bhAcym9nwljSXYOPRMsIm2slrSCOQsTefa3phRJsQBcAVOb
+         x2eoQMFmn5Ixj6ScMdPgQodThb5ms5A43QEpotwezUngXo84IzpLqpjj8DrWnQXbGUhF
+         OZb7dPwSAkOb/8IsKC6kqprF1A9QJBys6/mqqmDzyvoxoXzXdJ1mUBIpMZeXX5EEjIZG
+         a+vg==
+X-Forwarded-Encrypted: i=1; AJvYcCUs9tGB1gKXpvo8iJG+Xgl/AFifgITWapwqxRvci31Ob8eJu6UUP60uZOeZe9R5PMSor+9f9unlNJNdXEtAFJwSNJq05iju
+X-Gm-Message-State: AOJu0YzSuLz/GWskF2QRfVpYx7/Xd4yqw9pWe6hWXagJ8YQ3UJlgNbiY
+	y/RLuFlpnI3nFOpnvCoCrCWkGjbDi3t8xO4C3aIAV2Rl4P3u7m5dwCYOl5i5r0KST5/GcTzFhAT
+	L2iYOCgraTO7W38a5XieZSdLv3sQJXlmDtRqW
+X-Google-Smtp-Source: AGHT+IGEsNplZutJPQCE2XWM33H2//sA0tBNvMZ/8xQCoXrQdHcbFYE1YTM2S71oQAfgwcpsit9Bxd7++DH7yVsIWtY=
+X-Received: by 2002:a67:ad02:0:b0:470:3adf:3ce2 with SMTP id
+ t2-20020a67ad02000000b004703adf3ce2mr4465713vsl.10.1708938257027; Mon, 26 Feb
+ 2024 01:04:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240222161047.402609-1-tabba@google.com> <20240222161047.402609-4-tabba@google.com>
- <86461043-fa5b-405d-bd2e-dc1aba9977c5@redhat.com>
-In-Reply-To: <86461043-fa5b-405d-bd2e-dc1aba9977c5@redhat.com>
+References: <20240222161047.402609-1-tabba@google.com> <20240222141602976-0800.eberman@hu-eberman-lv.qualcomm.com>
+In-Reply-To: <20240222141602976-0800.eberman@hu-eberman-lv.qualcomm.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Mon, 26 Feb 2024 08:58:14 +0000
-Message-ID: <CA+EHjTyYQWdc14kFiQs0Ous2Hnep88v9-Us9m68TneLm9Eqvzw@mail.gmail.com>
-Subject: Re: [RFC PATCH v1 03/26] KVM: Add restricted support for mapping
- guestmem by the host
-To: David Hildenbrand <david@redhat.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org, 
+Date: Mon, 26 Feb 2024 09:03:40 +0000
+Message-ID: <CA+EHjTwOx930n7Ja6yXZKCmVJ1t_tcccgGpA36o4JigYKEcVAQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 00/26] KVM: Restricted mapping of guest_memfd at
+ the host and pKVM/arm64 support
+To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-mm@kvack.org
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, brauner@kernel.org, 
 	willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, 
 	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
 	amoorthy@google.com, dmatlack@google.com, yu.c.zhang@linux.intel.com, 
 	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
 	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
-	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
 	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
 	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
 	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
@@ -85,72 +84,119 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi David,
+Hi Elliot,
 
-On Thu, Feb 22, 2024 at 4:28=E2=80=AFPM David Hildenbrand <david@redhat.com=
-> wrote:
+On Thu, Feb 22, 2024 at 11:44=E2=80=AFPM Elliot Berman <quic_eberman@quicin=
+c.com> wrote:
 >
-> > +static vm_fault_t kvm_gmem_fault(struct vm_fault *vmf)
-> > +{
-> > +     struct folio *folio;
-> > +
-> > +     folio =3D kvm_gmem_get_folio(file_inode(vmf->vma->vm_file), vmf->=
-pgoff);
-> > +     if (!folio)
-> > +             return VM_FAULT_SIGBUS;
-> > +
-> > +     /*
-> > +      * Check if the page is allowed to be faulted to the host, with t=
-he
-> > +      * folio lock held to ensure that the check and incrementing the =
-page
-> > +      * count are protected by the same folio lock.
-> > +      */
-> > +     if (!kvm_gmem_isfaultable(vmf)) {
-> > +             folio_unlock(folio);
-> > +             return VM_FAULT_SIGBUS;
-> > +     }
-> > +
-> > +     vmf->page =3D folio_file_page(folio, vmf->pgoff);
+> On Thu, Feb 22, 2024 at 04:10:21PM +0000, Fuad Tabba wrote:
+> > This series adds restricted mmap() support to guest_memfd [1], as
+> > well as support guest_memfd on pKVM/arm64.
+> >
+> > We haven't started using this in Android yet, but we aim to move
+> > away from anonymous memory to guest_memfd once we have the
+> > necessary support merged upstream. Others (e.g., Gunyah [8]) are
+> > also looking into guest_memfd for similar reasons as us.
 >
-> We won't currently get hugetlb (or even THP) here. It mimics what shmem
-> would do.
+> I'm especially interested to see if we can factor out much of the common
+> implementation bits between KVM and Gunyah. In principle, we're doing
+> same thing: the difference is the exact mechanics to interact with the
+> hypervisor which (I think) could be easily extracted into an ops
+> structure.
 
-At the moment there isn't hugetlb support in guest_memfd(), and
-neither in pKVM. Although we do plan on supporting it.
+I agree. We should share and reuse as much code as possible. I'll sync
+with you before the V2 of this series.
 
-> finish_fault->set_pte_range() will call folio_add_file_rmap_ptes(),
-> getting the rmap involved.
+> [...]
 >
-> Do we have some tests in place that make sure that
-> fallocate(FALLOC_FL_PUNCH_HOLE|FALLOC_FL_KEEP_SIZE) will properly unmap
-> the page again (IOW, that the rmap does indeed work?).
+> > In addition to general feedback, we would like feedback on how we
+> > handle mmap() and faulting-in guest pages at the host (KVM: Add
+> > restricted support for mapping guest_memfd by the host).
+> >
+> > We don't enforce the invariant that only memory shared with the
+> > host can be mapped by the host userspace in
+> > file_operations::mmap(), but in vm_operations_struct:fault(). On
+> > vm_operations_struct::fault(), we check whether the page is
+> > shared with the host. If not, we deliver a SIGBUS to the current
+> > task. The reason for enforcing this at fault() is that mmap()
+> > does not elevate the pagecount(); it's the faulting in of the
+> > page which does. Even if we were to check at mmap() whether an
+> > address can be mapped, we would still need to check again on
+> > fault(), since between mmap() and fault() the status of the page
+> > can change.
+> >
+> > This creates the situation where access to successfully mmap()'d
+> > memory might SIGBUS at page fault. There is precedence for
+> > similar behavior in the kernel I believe, with MADV_HWPOISON and
+> > the hugetlbfs cgroups controller, which could SIGBUS at page
+> > fault time depending on the accounting limit.
+>
+> I added a test: folio_mmapped() [1] which checks if there's a vma
+> covering the corresponding offset into the guest_memfd. I use this
+> test before trying to make page private to guest and I've been able to
+> ensure that userspace can't even mmap() private guest memory. If I try
+> to make memory private, I can test that it's not mmapped and not allow
+> memory to become private. In my testing so far, this is enough to
+> prevent SIGBUS from happening.
+>
+> This test probably should be moved outside Gunyah specific code, and was
+> looking for maintainer to suggest the right home for it :)
+>
+> [1]: https://lore.kernel.org/all/20240222-gunyah-v17-20-1e9da6763d38@quic=
+inc.com/
 
-I'm not sure if you mean kernel tests, or if I've tested it. There are
-guest_memfd() tests for
-fallocate(FALLOC_FL_PUNCH_HOLE|FALLOC_FL_KEEP_SIZE) , which I have
-run. I've also tested it manually with sample programs, and it behaves
-as expected.
-
-Otherwise, for gunyah Elliot has used folio_mmapped() [], but Matthew
-doesn't think that it would do what we'd like it to do, i.e., ensure
-that _noone_ can fault in the page [2]
-
-I would appreciate any ideas, comments, or suggestions regarding this.
+Let's see what the mm-folks think about this [*].
 
 Thanks!
 /fuad
 
-[1] https://lore.kernel.org/all/20240222141602976-0800.eberman@hu-eberman-l=
-v.qualcomm.com/
-
-[2] https://lore.kernel.org/all/ZdfoR3nCEP3HTtm1@casper.infradead.org/
+[*] https://lore.kernel.org/all/ZdfoR3nCEP3HTtm1@casper.infradead.org/
 
 
-
-
-> --
-> Cheers,
+> >
+> > Another pKVM specific aspect we would like feedback on, is how to
+> > handle memory mapped by the host being unshared by a guest. The
+> > approach we've taken is that on an unshare call from the guest,
+> > the host userspace is notified that the memory has been unshared,
+> > in order to allow it to unmap it and mark it as PRIVATE as
+> > acknowledgment. If the host does not unmap the memory, the
+> > unshare call issued by the guest fails, which the guest is
+> > informed about on return.
+> >
+> > Cheers,
+> > /fuad
+> >
+> > [1] https://lore.kernel.org/all/20231105163040.14904-1-pbonzini@redhat.=
+com/
+> >
+> > [2] https://android-kvm.googlesource.com/linux/+/refs/heads/for-upstrea=
+m/pkvm-core
+> >
+> > [3] https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/guest=
+mem-6.8-rfc-v1
+> >
+> > [4] https://android-kvm.googlesource.com/kvmtool/+/refs/heads/tabba/gue=
+stmem-6.8
+> >
+> > [5] Protected KVM on arm64 (slides)
+> > https://static.sched.com/hosted_files/kvmforum2022/88/KVM%20forum%20202=
+2%20-%20pKVM%20deep%20dive.pdf
+> >
+> > [6] Protected KVM on arm64 (video)
+> > https://www.youtube.com/watch?v=3D9npebeVFbFw
+> >
+> > [7] Supporting guest private memory in Protected KVM on Android (presen=
+tation)
+> > https://lpc.events/event/17/contributions/1487/
+> >
+> > [8] Drivers for Gunyah (patch series)
+> > https://lore.kernel.org/all/20240109-gunyah-v16-0-634904bf4ce9@quicinc.=
+com/
 >
-> David / dhildenb
+> As of 5 min ago when I send this, there's a v17:
+> https://lore.kernel.org/all/20240222-gunyah-v17-0-1e9da6763d38@quicinc.co=
+m/
+>
+> Thanks,
+> Elliot
 >
