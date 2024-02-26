@@ -1,340 +1,318 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1331078B;
-	Sun, 25 Feb 2024 11:19:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E181B7E2
+	for <kvmarm@lists.linux.dev>; Mon, 26 Feb 2024 05:20:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708859950; cv=none; b=Nx4wKyEr7GGq/MhkJu3OqNUI5uj0pKB/KmgvzyV8+bSB/OJ32W+uqpmHVh8pKsyUkQUU67qVehg0mV9/eAoAZZwXb6q7PTfzqoOA1xQ6S48h3cml1JzmuCfzSldVbRKjMYy1jty6ksIUz8yAx1QRBVQgBX5zH7iVuqnkefNkdUY=
+	t=1708924803; cv=none; b=swDhl5S60mP+PZVOH4krVSV2Zae8mjvkY9maSIyxuOVzFYaoFwQfKfKfsBplFUgMI05r40XfFZw1l5DSXw5azYVXJxS4RfF2rNJ/OnU/q2R/OmmZYzGGMl6ftq2H71MjTCbKRephMW8HnkKCpgaOt7/EFCb0HPWB5zVFteliGNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708859950; c=relaxed/simple;
-	bh=zfoAQj3q170+Q5p9j4Wy1GVCIr8BVqhJWh3gz38npRU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dt2pCSJ/BLLyzlxDR/uATuxag2NNYxLQ7jMsE/e9kQUaXjT8PHRTVH4cCKURc4qutK6JnjG2+4pbdBK6LZbR8GZ4zlscE9GNsRvHPkxydIQyAQnrpNPVBrhtNIpceyL/SjipEAn4db/5KuHpqBZQqKE+u9ZX3L3wGhLq8hiH+AQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K8gIIyjJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1708924803; c=relaxed/simple;
+	bh=/PgP2P0hX/+bEV3aU0WEL7b5JNAP3+sF8FKj2czw6Ho=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Zd6RAwkEYvDuNoisf1GzYyiN0p+X3MQliTOmaU3G/xsTZGDfdtW3p4SyPsmsQaRknl33jBK6YEe5q8CzdAzwr+9GsGv1Asz210t6w32QqAVvQhX+8cxH8Ia+vSZiHXzhQchXlyN4sLJmpEXiq24cVlQSWoBlTBSjd8HzsvM1AbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=feFMyd6w; arc=none smtp.client-ip=209.85.166.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K8gIIyjJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D73ABC433F1;
-	Sun, 25 Feb 2024 11:19:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708859950;
-	bh=zfoAQj3q170+Q5p9j4Wy1GVCIr8BVqhJWh3gz38npRU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=K8gIIyjJq71NnkfCDh0Rd9WCrtifujKFBg1aNWBOPqiMd32ovI0KE1S+LU3t5w+oN
-	 cLZmGMva29/iBIIESUFWFKN96kEBqPgLExpuKCeFoCyM97VD4XRC1h/DCawys+ZVa2
-	 AtW/vxKUZLebKkQqQqJWhoROcmxyjhPAHm+Te2bOyJkNJQ4dSt+/HalwRrQzrwv4Zc
-	 AubqLj/aODjWUdkPkPJJJr2sAFB2nogsTQxC9RqNGqirBdP/a8wZg3Oz9Kv3Jfnjiy
-	 KVtebLl1qVlBHXgpFS+kituNN0znBrXuBKjdgyBTDjTkid4t7WLVSD88XS5BpWqqW0
-	 Eh3T+Bm7COZkQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1reCXC-006X95-Pb;
-	Sun, 25 Feb 2024 11:19:06 +0000
-Date: Sun, 25 Feb 2024 11:19:05 +0000
-Message-ID: <86frxg3i6u.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Cc: oliver.upton@linux.dev,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	sauravsc@amazon.com, Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH 1/1] KVM: arm64: Affinity level 3 support
-In-Reply-To: <20240225090237.775573-2-r09922117@csie.ntu.edu.tw>
-References: <20240225090237.775573-1-r09922117@csie.ntu.edu.tw>
-	<20240225090237.775573-2-r09922117@csie.ntu.edu.tw>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="feFMyd6w"
+Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-7bc332d3a8cso201707239f.2
+        for <kvmarm@lists.linux.dev>; Sun, 25 Feb 2024 21:20:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1708924800; x=1709529600; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fvD9c59bJDsB22IC2oo8c8Y8bED38e+VeFaxxSdJnPM=;
+        b=feFMyd6wSLOV08wNsh3hpQmMYudTQovi+j9E29NuAFn1R4C4FasCuiILGQanP1FUlo
+         JOpvLl288dcTsxUNSOG9bcwZ6b4ESwFr2jxFJB/gOvBmBQv9wqJOZRTrlksr7eBBc9ys
+         xmUIhF6dP+VI3pzuxa0vPhsMu4Ek1jnbtFRY6VlRFp3McWUNUSe0JY4uv9uqxVhMOL2R
+         CQ3P2MfwLVz0JEndP4aOezdlFOQpVGNWxWPIBtrBWvlOGT8fctpMnaKJPTWcecS9dvza
+         cw+BQnuHGOZyVC+skiM+QJii7TUIC89MUHTdxLQl7G1rabXHIFsR3IY5bsVv9egfFT1+
+         hPvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708924800; x=1709529600;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fvD9c59bJDsB22IC2oo8c8Y8bED38e+VeFaxxSdJnPM=;
+        b=BOiJlJUA7PRBbNsoXPoIY+4jqIxmowbiZDwh/BgM2ZTrIu+MLbttnun9T05izB0ebf
+         XZUDX7y56FBwNobDHrbz9kG+KMj0MJ3wkLwx7+TgghPyY7DxNf00GEJmC6lsB9wGgRQi
+         w2yPOJJxyCQCQwM/182rc4j6jbf12AlEEiA7HUqglmxYWPZfZd5uGHeMjS8aaQ6dJdS4
+         LN5YSFYho/VSNq5+xcvbxEgh2p8w3uizPDTfCXDschcVGvM80wZRIOXqF6Muzr1z4Idt
+         TihDMyXDTGQX6MYSPJyipIbYzKg98ztqV3AoXo19dSoqhWEug6e30HprGBNt2MDSbIcy
+         m/0A==
+X-Forwarded-Encrypted: i=1; AJvYcCXYvWLzX6XNJNNBH4kgGduYR6hnv2I08rw5+T+u/vA+t9QXa3NCpQdxnj414bTz4SqUDIlgub2nQHZcbz5suQ5Ji4EkCmIp
+X-Gm-Message-State: AOJu0YwM+ImDxWG4bU0h/DOmS4A4XglXzmHczuxeA0XWOigSRBBwSIAi
+	32vCiXtdvf3A1CpZPYSC3irlRRe7LaWriCYEiP3aEjamYyQZqxcQZGZr77vTxK3RL+l7X3ssaIt
+	Rgv2tajaVTnIZGsGm6VgOtobIWw1kFRHFVtwcxg==
+X-Google-Smtp-Source: AGHT+IFhPWWZbPSpZ41rJEGw9JQOC3MSyyZstWUE8ZQsGCxE1OndwcIjQLNxLORidft8I/HoA5DyZytqJFxaLx8Id3o=
+X-Received: by 2002:a05:6e02:d0d:b0:364:216e:d1dc with SMTP id
+ g13-20020a056e020d0d00b00364216ed1dcmr6656541ilj.22.1708924800237; Sun, 25
+ Feb 2024 21:20:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+References: <cover.1705916069.git.haibo1.xu@intel.com> <68856b86a93a4188558e5d0ebac0dd6aac8e404c.1705916069.git.haibo1.xu@intel.com>
+ <CAOnJCULwRTSnrQkR2o1P53R=tJ3TAxX+y+XRBesW6OFEzgFv2g@mail.gmail.com>
+ <CAJve8om2oOLg5-wKX7m7cBTgzwqiMcb35x=nDi1edY8evXjyMw@mail.gmail.com> <2c96c61a-2685-4cee-9cef-963ed833bf92@rivosinc.com>
+In-Reply-To: <2c96c61a-2685-4cee-9cef-963ed833bf92@rivosinc.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Mon, 26 Feb 2024 10:49:48 +0530
+Message-ID: <CAAhSdy2TVSt=gCJRf78AzXNVFKy8MGJ+QspSEHeedT7GPAYkUQ@mail.gmail.com>
+Subject: Re: [PATCH v5 11/12] KVM: riscv: selftests: Change vcpu_has_ext to a
+ common function
+To: Atish Patra <atishp@rivosinc.com>
+Cc: Haibo Xu <xiaobo55x@gmail.com>, Atish Patra <atishp@atishpatra.org>, 
+	Haibo Xu <haibo1.xu@intel.com>, ajones@ventanamicro.com, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Guo Ren <guoren@kernel.org>, 
+	Mayuresh Chitale <mchitale@ventanamicro.com>, 
+	Daniel Henrique Barboza <dbarboza@ventanamicro.com>, Conor Dooley <conor.dooley@microchip.com>, 
+	Samuel Holland <samuel@sholland.org>, Minda Chen <minda.chen@starfivetech.com>, 
+	Jisheng Zhang <jszhang@kernel.org>, Sean Christopherson <seanjc@google.com>, Peter Xu <peterx@redhat.com>, 
+	Like Xu <likexu@tencent.com>, Vipin Sharma <vipinsh@google.com>, Thomas Huth <thuth@redhat.com>, 
+	Aaron Lewis <aaronlewis@google.com>, 
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: r09922117@csie.ntu.edu.tw, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, sauravsc@amazon.com, eric.auger@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-[+Eric who was looking into something related recently]
-
-Hi Wei-Lin,
-
-Thanks for looking into this.
-
-On Sun, 25 Feb 2024 09:02:37 +0000,
-Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
->=20
-> Currently, KVM ARM64 avoids using the Aff3 field for VCPUs, which saves
-> us from having to check for hardware support in ICH_VTR_EL2.A3V or the
-
-That's not strictly true. We do check for A3V support at restore time.
-
-> guest's execution state. However a VCPU could still have its Aff3 bits
-> set to non-zero if the VMM directly changes the VCPU's MPIDR_EL1. This
-> causes a mismatch between MPIDR_EL1.Aff3 and GICR_TYPER[63:56] since 0s
-> are always returned for the latter, failing the GIC Redistributor
-> matching in the VM.
->=20
-> Let's fix this by only allowing userspace to write into the Aff3 field
-> of MPIDR_EL1 if Aff3 is valid.
-
-What does "valid" means here? 0 *is* a valid value. Or do you mean a
-non-zero value? Also, this now creates a dependency between GICR_TYPER
-and MPIDR_EL1. How is userspace supposed to order those when restoring
-a VM?
-
-> Additionally, extend reset_mpidr and
-> vgic_mmio_{read,write}_irouter to fully support Aff3. With theses
-> changes, GICR_TYPER can then safely return all four affinity levels.
->=20
-> Suggested-by: Saurav Sachidanand <sauravsc@amazon.com>
-> Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-> ---
->  arch/arm64/kvm/sys_regs.c          | 24 +++++++++++++++++++++---
->  arch/arm64/kvm/vgic/vgic-debug.c   |  2 +-
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 18 +++++++++++-------
->  include/kvm/arm_vgic.h             |  7 ++++++-
->  4 files changed, 39 insertions(+), 12 deletions(-)
->=20
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 30253bd199..6694ce851a 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -239,6 +239,19 @@ static u8 get_min_cache_line_size(bool icache)
->  	return field + 2;
->  }
-> =20
-> +static int set_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r=
-d,
-> +		   u64 val)
-> +{
-> +	bool aff3_valid =3D !vcpu_el1_is_32bit(vcpu) && kvm_vgic_has_a3v();
-
-What does this mean for a guest that doesn't have a GICv3?
-
-> +
-> +	if (!aff3_valid)
-> +		val &=3D ~((u64)MPIDR_LEVEL_MASK << MPIDR_LEVEL_SHIFT(3));
-> +
-> +	__vcpu_sys_reg(vcpu, rd->reg) =3D val;
-> +
-> +	return 0;
-> +}
-> +
->  /* Which cache CCSIDR represents depends on CSSELR value. */
->  static u32 get_ccsidr(struct kvm_vcpu *vcpu, u32 csselr)
->  {
-> @@ -817,10 +830,12 @@ static u64 reset_actlr(struct kvm_vcpu *vcpu, const=
- struct sys_reg_desc *r)
->  static u64 reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc =
-*r)
->  {
->  	u64 mpidr;
-> +	bool aff3_valid =3D !vcpu_el1_is_32bit(vcpu) && kvm_vgic_has_a3v();
-
-Same thing.
-
+On Wed, Feb 21, 2024 at 2:07=E2=80=AFPM Atish Patra <atishp@rivosinc.com> w=
+rote:
 >
->  	/*
-> -	 * Map the vcpu_id into the first three affinity level fields of
-> -	 * the MPIDR. We limit the number of VCPUs in level 0 due to a
-> +	 * Map the vcpu_id into the affinity level fields of the MPIDR. The
-> +	 * fourth level is mapped only if we are running a 64 bit guest and
-> +	 * A3V is supported. We limit the number of VCPUs in level 0 due to a
->  	 * limitation to 16 CPUs in that level in the ICC_SGIxR registers
->  	 * of the GICv3 to be able to address each CPU directly when
->  	 * sending IPIs.
-> @@ -828,6 +843,8 @@ static u64 reset_mpidr(struct kvm_vcpu *vcpu, const s=
-truct sys_reg_desc *r)
->  	mpidr =3D (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
->  	mpidr |=3D ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
->  	mpidr |=3D ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
-> +	if (aff3_valid)
-> +		mpidr |=3D (u64)((vcpu->vcpu_id >> 20) & 0xff) << MPIDR_LEVEL_SHIFT(3);
-
-=46rom virt/kcvm/kvm_main.c:
-
-static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
-{
-	int r;
-	struct kvm_vcpu *vcpu;
-	struct page *page;
-
-	if (id >=3D KVM_MAX_VCPU_IDS)
-		return -EINVAL;
-
-        [...]
-}
-
-So vcpu_id is capped at KVM_MAX_VCPU_IDS, which is 512 on arm64. How
-does this ever produce anything other than 0? This is, by the way,
-already true for Aff2. Which is why I have always found this change
-extremely questionable: why do you need to describe 2^32 CPUs when you
-can only create 512?
-
->  	mpidr |=3D (1ULL << 31);
->  	vcpu_write_sys_reg(vcpu, mpidr, MPIDR_EL1);
-> =20
-> @@ -2232,7 +2249,8 @@ static const struct sys_reg_desc sys_reg_descs[] =
-=3D {
-> =20
->  	{ SYS_DESC(SYS_DBGVCR32_EL2), trap_undef, reset_val, DBGVCR32_EL2, 0 },
-> =20
-> -	{ SYS_DESC(SYS_MPIDR_EL1), NULL, reset_mpidr, MPIDR_EL1 },
-> +	{ SYS_DESC(SYS_MPIDR_EL1), NULL, reset_mpidr, MPIDR_EL1,
-> +	  .get_user =3D NULL, .set_user =3D set_mpidr },
-> =20
->  	/*
->  	 * ID regs: all ID_SANITISED() entries here must have corresponding
-> diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-=
-debug.c
-> index 85606a531d..726cf1bd7b 100644
-> --- a/arch/arm64/kvm/vgic/vgic-debug.c
-> +++ b/arch/arm64/kvm/vgic/vgic-debug.c
-> @@ -206,7 +206,7 @@ static void print_irq_state(struct seq_file *s, struc=
-t vgic_irq *irq,
->  		      "    %2d "
->  		      "%d%d%d%d%d%d%d "
->  		      "%8d "
-> -		      "%8x "
-> +		      "%8llx "
->  		      " %2x "
->  		      "%3d "
->  		      "     %2d "
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgi=
-c-mmio-v3.c
-> index c15ee1df03..ea0d4ad85a 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> @@ -195,13 +195,13 @@ static unsigned long vgic_mmio_read_irouter(struct =
-kvm_vcpu *vcpu,
->  {
->  	int intid =3D VGIC_ADDR_TO_INTID(addr, 64);
->  	struct vgic_irq *irq =3D vgic_get_irq(vcpu->kvm, NULL, intid);
-> +	bool aff3_valid =3D !vcpu_el1_is_32bit(vcpu) && kvm_vgic_has_a3v();
-
-Hint: if you need to write the same expression more than once, you
-probably need a helper for it. Meaning that you will only have to fix
-it once.
-
->  	unsigned long ret =3D 0;
-> =20
->  	if (!irq)
->  		return 0;
-> =20
-> -	/* The upper word is RAZ for us. */
-> -	if (!(addr & 4))
-> +	if (aff3_valid || !(addr & 4))
->  		ret =3D extract_bytes(READ_ONCE(irq->mpidr), addr & 7, len);
+> On 2/20/24 18:13, Haibo Xu wrote:
+> > On Wed, Feb 21, 2024 at 7:03=E2=80=AFAM Atish Patra <atishp@atishpatra.=
+org> wrote:
+> >>
+> >> On Mon, Jan 22, 2024 at 1:48=E2=80=AFAM Haibo Xu <haibo1.xu@intel.com>=
+ wrote:
+> >>>
+> >>> Move vcpu_has_ext to the processor.c and rename it to __vcpu_has_ext
+> >>> so that other test cases can use it for vCPU extension check.
+> >>>
+> >>> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> >>> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> >>> ---
+> >>>   tools/testing/selftests/kvm/include/riscv/processor.h |  2 ++
+> >>>   tools/testing/selftests/kvm/lib/riscv/processor.c     | 10 ++++++++=
+++
+> >>>   tools/testing/selftests/kvm/riscv/get-reg-list.c      | 11 +-------=
+---
+> >>>   3 files changed, 13 insertions(+), 10 deletions(-)
+> >>>
+> >>> diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/=
+tools/testing/selftests/kvm/include/riscv/processor.h
+> >>> index b68b1b731a34..bd27e1c67579 100644
+> >>> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
+> >>> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
+> >>> @@ -42,6 +42,8 @@ static inline uint64_t __kvm_reg_id(uint64_t type, =
+uint64_t idx,
+> >>>   #define RISCV_ISA_EXT_REG(idx) __kvm_reg_id(KVM_REG_RISCV_ISA_EXT, =
+\
+> >>>                                               idx, KVM_REG_SIZE_ULONG=
+)
+> >>>
+> >>> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext);
+> >>> +
+> >>>   struct ex_regs {
+> >>>          unsigned long ra;
+> >>>          unsigned long sp;
+> >>> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tool=
+s/testing/selftests/kvm/lib/riscv/processor.c
+> >>> index 39a1e9902dec..dad73ce18164 100644
+> >>> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
+> >>> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
+> >>> @@ -15,6 +15,16 @@
+> >>>
+> >>>   static vm_vaddr_t exception_handlers;
+> >>>
+> >>> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
+> >>> +{
+> >>> +       unsigned long value =3D 0;
+> >>> +       int ret;
+> >>> +
+> >>> +       ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
+> >>> +
+> >>> +       return !ret && !!value;
+> >>> +}
+> >>> +
+> >>
+> >> Not sure what was the base patch on which this was rebased. The actual
+> >> commit in the queue branch looks different.
+> >>
+> >
+> > This patch set was based on 6.7-rc8.
+> >
+> >> https://github.com/kvm-riscv/linux/commit/5563517cc2012e3326411b360c99=
+24d3f2706c8d
+> >>
+> >> Both seem to have the same bug though the tests fail now and require
+> >> the following fix.
+> >> The ext id should be uint64_t and we need to pass ext directly so that
+> >> SBI extension tests can also pass.
+> >>
+> >
+> > It's weird that 6.7-rc8 has already included Andrew's change on the ISA=
+ ext reg,
+> > but this patch was not generated against his change.
+> >
+> > commit bdf6aa328f137e184b0fce607fd585354c3742f1
+> > Author: Andrew Jones <ajones@ventanamicro.com>
+> > Date:   Wed Dec 13 18:09:58 2023 +0100
+> >
+> >      RISC-V: KVM: selftests: Treat SBI ext regs like ISA ext regs
+> >
+> > Anyway, your changes were right. Please go ahead to include them when m=
+erging.
+> >
 >
->  	vgic_put_irq(vcpu->kvm, irq);
-> @@ -213,11 +213,12 @@ static void vgic_mmio_write_irouter(struct kvm_vcpu=
- *vcpu,
->  				    unsigned long val)
->  {
->  	int intid =3D VGIC_ADDR_TO_INTID(addr, 64);
-> +	bool aff3_valid =3D !vcpu_el1_is_32bit(vcpu) && kvm_vgic_has_a3v();
->  	struct vgic_irq *irq;
->  	unsigned long flags;
-> =20
-> -	/* The upper word is WI for us since we don't implement Aff3. */
-> -	if (addr & 4)
-> +	/* The upper word is WI if Aff3 is not valid. */
-> +	if (!aff3_valid && addr & 4)
->  		return;
-> =20
->  	irq =3D vgic_get_irq(vcpu->kvm, NULL, intid);
-> @@ -227,8 +228,7 @@ static void vgic_mmio_write_irouter(struct kvm_vcpu *=
-vcpu,
-> =20
->  	raw_spin_lock_irqsave(&irq->irq_lock, flags);
-> =20
-> -	/* We only care about and preserve Aff0, Aff1 and Aff2. */
-> -	irq->mpidr =3D val & GENMASK(23, 0);
-> +	irq->mpidr =3D val & MPIDR_HWID_BITMASK;
->  	irq->target_vcpu =3D kvm_mpidr_to_vcpu(vcpu->kvm, irq->mpidr);
-> =20
->  	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-> @@ -323,7 +323,11 @@ static unsigned long vgic_mmio_read_v3r_typer(struct=
- kvm_vcpu *vcpu,
->  	int target_vcpu_id =3D vcpu->vcpu_id;
->  	u64 value;
-> =20
-> -	value =3D (u64)(mpidr & GENMASK(23, 0)) << 32;
-> +	value =3D MPIDR_AFFINITY_LEVEL(mpidr, 3) << 56 |
-> +		MPIDR_AFFINITY_LEVEL(mpidr, 2) << 48 |
-> +		MPIDR_AFFINITY_LEVEL(mpidr, 1) << 40 |
-> +		MPIDR_AFFINITY_LEVEL(mpidr, 0) << 32;
+> I am not sure what happened. Probably, a merge conflict issue.
+>
+> I just realized I forgot to copy paste another fix in arch timer
+>
+> +++ b/tools/testing/selftests/kvm/riscv/arch_timer.c
+> @@ -85,7 +85,7 @@ struct kvm_vm *test_vm_create(void)
+>          int nr_vcpus =3D test_args.nr_vcpus;
+>
+>          vm =3D vm_create_with_vcpus(nr_vcpus, guest_code, vcpus);
+> -       __TEST_REQUIRE(__vcpu_has_ext(vcpus[0], KVM_RISCV_ISA_EXT_SSTC),
+> +       __TEST_REQUIRE(__vcpu_has_ext(vcpus[0],
+> RISCV_ISA_EXT_REG(KVM_RISCV_ISA_EXT_SSTC)),
 
-Maybe it is time to describe these shifts in an include file, and use
-FIELD_PREP() to construct the whole thing. It will be a lot more
-readable.
-
-> +
->  	value |=3D ((target_vcpu_id & 0xffff) << 8);
-> =20
->  	if (vgic_has_its(vcpu->kvm))
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 8cc38e836f..b464ac1b79 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -143,7 +143,7 @@ struct vgic_irq {
->  	unsigned int host_irq;		/* linux irq corresponding to hwintid */
->  	union {
->  		u8 targets;			/* GICv2 target VCPUs mask */
-> -		u32 mpidr;			/* GICv3 target VCPU */
-> +		u64 mpidr;			/* GICv3 target VCPU */
-
-Do we really need to grow each interrupt object by 4 bytes, specially
-when we at most use 4 bytes? I'd rather we store the affinity in a
-compact way and change the way we compare it to the vcpu's MPIDR_EL1.
-
->  	};
->  	u8 source;			/* GICv2 SGIs only */
->  	u8 active_source;		/* GICv2 SGIs only */
-> @@ -413,6 +413,11 @@ static inline int kvm_vgic_get_max_vcpus(void)
->  	return kvm_vgic_global_state.max_gic_vcpus;
->  }
-> =20
-> +static inline bool kvm_vgic_has_a3v(void)
-> +{
-> +	return kvm_vgic_global_state.ich_vtr_el2 & ICH_VTR_A3V_MASK;
-> +}
-> +
-
-I can see multiple problems with this:
-
-- this is the host state, which shouldn't necessarily represent the
-  guest state. It should be possible to restore a VM that have a
-  different A3V value and still have the same guarantees.  There is
-  however a small nit around ICV_CTLR_EL1.A3V, which would require
-  trapping to emulate the A3V bit.
-
-- this assumes GICv3, which is definitely not universal (we support
-  GICv2, for which no such restriction actually exists).
-
-Finally, I don't see VM save/restore being addressed here, and I
-suspect it hasn't been looked at.
-
-Overall, this patch does too many things, and it should be split in
-discrete changes. I also want to see an actual justification for Aff3
-support. And if we introduce it, it must be fully virtualised
-(independent of the A3V support on the host).
+I have squashed this change into an existing commit in riscv_kvm_queue.
 
 Thanks,
+Anup
 
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+>
+>
+> > Thanks,
+> > Haibo
+> >
+> >>
+> >> --- a/tools/testing/selftests/kvm/include/riscv/processor.h
+> >> +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
+> >> @@ -48,7 +48,7 @@ static inline uint64_t __kvm_reg_id(uint64_t type,
+> >> uint64_t subtype,
+> >> KVM_REG_RISCV_SBI_SINGLE, \
+> >> idx, KVM_REG_SIZE_ULONG)
+> >>
+> >> -bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext);
+> >> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, uint64_t ext);
+> >>
+> >> struct ex_regs {
+> >> unsigned long ra;
+> >> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c
+> >> b/tools/testing/selftests/kvm/lib/riscv/processor.c
+> >> index 282587cd4bbc..ec66d331a127 100644
+> >> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
+> >> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
+> >> @@ -15,12 +15,12 @@
+> >>
+> >> static vm_vaddr_t exception_handlers;
+> >>
+> >> -bool __vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
+> >> +bool __vcpu_has_ext(struct kvm_vcpu *vcpu, uint64_t ext)
+> >> {
+> >> unsigned long value =3D 0;
+> >> int ret;
+> >>
+> >> - ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
+> >> + ret =3D __vcpu_get_reg(vcpu, ext, &value);
+> >>
+> >> return !ret && !!value;
+> >> }
+> >>
+> >> With the above the fix, Both SBI/ISA extension tests pass.
+> >> # ./get-reg-list
+> >> sbi-base: PASS
+> >> sbi-sta: PASS
+> >> sbi-pmu: PASS
+> >> sbi-dbcn: PASS
+> >> aia: PASS
+> >> fp_f: PASS
+> >> fp_d: PASS
+> >> 1..0 # SKIP - h not available, skipping tests
+> >> smstateen: PASS
+> >> sscofpmf: PASS
+> >> sstc: PASS
+> >> 1..0 # SKIP - svinval not available, skipping tests
+> >> 1..0 # SKIP - svnapot not available, skipping tests
+> >> 1..0 # SKIP - svpbmt not available, skipping tests
+> >> zba: PASS
+> >> zbb: PASS
+> >> zbc: PASS
+> >> 1..0 # SKIP - zbkb not available, skipping tests
+> >> 1..0 # SKIP - zbkc not available, skipping tests
+> >> 1..0 # SKIP - zbkx not available, skipping tests
+> >> zbs: PASS
+> >> zfa: PASS
+> >> 1..0 # SKIP - zfh not available, skipping tests
+> >> 1..0 # SKIP - zfhmin not available, skipping tests
+> >> zicbom: PASS
+> >> zicboz: PASS
+> >> zicntr: PASS
+> >> 1..0 # SKIP - zicond not available, skipping tests
+> >> zicsr: PASS
+> >> zifencei: PASS
+> >> zihintntl: PASS
+> >> zihintpause: PASS
+> >> zihpm: PASS
+> >>
+> >>
+> >>>   static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
+> >>>   {
+> >>>          return (v + vm->page_size) & ~(vm->page_size - 1);
+> >>> diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools=
+/testing/selftests/kvm/riscv/get-reg-list.c
+> >>> index 25de4b8bc347..ed29ba45588c 100644
+> >>> --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> >>> +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
+> >>> @@ -75,15 +75,6 @@ bool check_reject_set(int err)
+> >>>          return err =3D=3D EINVAL;
+> >>>   }
+> >>>
+> >>> -static inline bool vcpu_has_ext(struct kvm_vcpu *vcpu, int ext)
+> >>> -{
+> >>> -       int ret;
+> >>> -       unsigned long value;
+> >>> -
+> >>> -       ret =3D __vcpu_get_reg(vcpu, RISCV_ISA_EXT_REG(ext), &value);
+> >>> -       return (ret) ? false : !!value;
+> >>> -}
+> >>> -
+> >>>   void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
+> >>>   {
+> >>>          unsigned long isa_ext_state[KVM_RISCV_ISA_EXT_MAX] =3D { 0 }=
+;
+> >>> @@ -111,7 +102,7 @@ void finalize_vcpu(struct kvm_vcpu *vcpu, struct =
+vcpu_reg_list *c)
+> >>>                  __vcpu_set_reg(vcpu, RISCV_ISA_EXT_REG(s->feature), =
+1);
+> >>>
+> >>>                  /* Double check whether the desired extension was en=
+abled */
+> >>> -               __TEST_REQUIRE(vcpu_has_ext(vcpu, s->feature),
+> >>> +               __TEST_REQUIRE(__vcpu_has_ext(vcpu, s->feature),
+> >>>                                 "%s not available, skipping tests\n",=
+ s->name);
+> >>>          }
+> >>>   }
+> >>> --
+> >>> 2.34.1
+> >>>
+> >>
+> >>
+> >> --
+> >> Regards,
+> >> Atish
+>
