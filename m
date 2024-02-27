@@ -1,32 +1,32 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B743B55783
-	for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 22:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F5E5576B
+	for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 22:43:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709073816; cv=none; b=Str69yufNcqmkat+s2vOLBYe9yVKD7yGEIrVsbFJhFoMrrT61D611a1/gjxdfxI6byXUrgypy8QkWtAvN+oEUy+nXQ5qv6yTcGZvGdyhfAJxEOtEFR+F7dV1yVhLemtjCwSrkk7FFhZ0v65KRtdhuvUU9SJMMq8ZJVknKlF8aVw=
+	t=1709073817; cv=none; b=Jy1vbOYrSc3hQOBgxH/7tD4ABeBRkdseTh1f2v89m74O3Uv8p6vzfaaZwEhJX8uBnFp2Gc/Ogp82BEhnEbhZkd6Pt9A3vZWzrP8JDhRD8uIV2dnALfWMbegMpNNrYCOk26LAHm7JoUIvw4PwoZPtO/+U4/QkriAuRGnuPPYjyXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709073816; c=relaxed/simple;
-	bh=W5bzvIxhndleH7uzapNhIEFiP6cXg9Gt90FwT9y1iR8=;
+	s=arc-20240116; t=1709073817; c=relaxed/simple;
+	bh=NhWRmonRuBVJIZxUaNLNrS2RE13UEHgSRO92UYrLLSs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YjPlxj+bsYCpgIvURqHLiMd/7yftUlKcG5NVq4LUC6jFJZx+hu7zzk12j8rg9usXpHwRKOh5dgdXK1AydSa3l1gf4C7EQCy4mDqhsdFN1edM2Jy+1EUmQjDydsEuwYL3BflVvcSkdFYY8XW7ajYroyL0cYgDHAtKA/pK8UQZwHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=k+Ka8btJ; arc=none smtp.client-ip=91.218.175.171
+	 MIME-Version; b=YHG4XIRaAxun/TiemIPbBC1P4DHOr/yMMfA/R6/QWJZ68YCWXfby56yC7S8rYei0IQaxQkzmB353cnX7RMo0sgwkiE4mjub+G0aB0PqbzReWHcstH2OYV+1LGrvBYgPo5/MtvcP0tKNpfghpjdXk+fA0Wk1KIpxShn6+tjFwK6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ioyHq4/1; arc=none smtp.client-ip=91.218.175.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="k+Ka8btJ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ioyHq4/1"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709073812;
+	t=1709073814;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OFw+4ZepL//y2v8Igorm5ctfryJ27K9qTBVjJCQPpz0=;
-	b=k+Ka8btJ7re4o29uliNEbU9Etu4HVgmo1UpHnhTU5Qnsmq5K99IMh4Ldb0YHG63do9aGa7
-	cxhJAVufGybXU4asU8qi+UDhv6FZNAeudOGCh2jtNI29rRyImmKFYA75ZGXv2E7RZMzam1
-	5gbDjehNRRs6zYcStTFJFHTBbBwrXeU=
+	bh=XkiMeBFOVjGqF8RscxA/xNY9dvkc24IpZ5he4t3rNwc=;
+	b=ioyHq4/1EXnZF7eU1O/QOQLG++2Xm77/UWSq2xlsli+Vs5zaNgVnYJ9wqpy0Bp6dtTKpgc
+	gvdOaNEfJHxm8z2QSzXfFxL1lOljvOAkbHU/hMr+8KxXH3InhYRTbzNZXPpYpwiYVD5/+G
+	3Ub8jIOtJa5Al+45jcJBDzQNr9elzws=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -35,9 +35,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 18/20] KVM: selftests: Use MPIDR_HWID_BITMASK from cputype.h
-Date: Tue, 27 Feb 2024 22:42:47 +0000
-Message-ID: <20240227224249.2209194-19-oliver.upton@linux.dev>
+Subject: [PATCH 19/20] KVM: selftests: Hack in support for aligned page allocations
+Date: Tue, 27 Feb 2024 22:42:48 +0000
+Message-ID: <20240227224249.2209194-20-oliver.upton@linux.dev>
 In-Reply-To: <20240227224249.2209194-1-oliver.upton@linux.dev>
 References: <20240227224249.2209194-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -49,41 +49,100 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-No need for a home-rolled definition, just rely on the common header.
+Many of the memory allocations handed off to a GIC ITS require 64K
+alignment. One would think that requesting 64K of pages would follow
+natural alignment in selftests (much like alloc_pages() in the kernel),
+however that is unfortunately not the case.
+
+Add a new helper to allow a caller to decide if they want
+naturally-aligned page allocations. Deliberately avoid making this the
+default in case this subtly breaks assumptions or memory overheads in
+other selftests.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- tools/testing/selftests/kvm/aarch64/psci_test.c         | 2 ++
- tools/testing/selftests/kvm/include/aarch64/processor.h | 2 --
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ .../selftests/kvm/include/kvm_util_base.h     |  2 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 27 ++++++++++++++++---
+ 2 files changed, 25 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/aarch64/psci_test.c b/tools/testing/selftests/kvm/aarch64/psci_test.c
-index 9b004905d1d3..9fa3578d47d5 100644
---- a/tools/testing/selftests/kvm/aarch64/psci_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/psci_test.c
-@@ -13,7 +13,9 @@
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index 9e5afc472c14..750638cfa849 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -830,6 +830,8 @@ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+ vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+ 			      vm_paddr_t paddr_min, uint32_t memslot);
+ vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm);
++vm_paddr_t vm_phy_pages_alloc_aligned(struct kvm_vm *vm, size_t num,
++				      vm_paddr_t paddr_min, uint32_t memslot);
  
- #define _GNU_SOURCE
+ /*
+  * ____vm_create() does KVM_CREATE_VM and little else.  __vm_create() also
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index e066d584c656..60948a004012 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -1984,8 +1984,9 @@ const char *exit_reason_str(unsigned int exit_reason)
+  * and their base address is returned. A TEST_ASSERT failure occurs if
+  * not enough pages are available at or above paddr_min.
+  */
+-vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+-			      vm_paddr_t paddr_min, uint32_t memslot)
++static vm_paddr_t __vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
++				       vm_paddr_t paddr_min, uint32_t memslot,
++				       bool aligned)
+ {
+ 	struct userspace_mem_region *region;
+ 	sparsebit_idx_t pg, base;
+@@ -1997,14 +1998,20 @@ vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+ 		"  paddr_min: 0x%lx page_size: 0x%x",
+ 		paddr_min, vm->page_size);
  
-+#include <linux/kernel.h>
- #include <linux/psci.h>
-+#include <asm/cputype.h>
++	TEST_ASSERT(!aligned || (paddr_min % vm->page_size * num) == 0,
++		    "Min physical address isn't naturally aligned.\n"
++		    "  paddr_min: 0x%lx page_size: 0x%x num: %lu",
++		    paddr_min, vm->page_size, num);
++
+ 	region = memslot2region(vm, memslot);
+ 	base = pg = paddr_min >> vm->page_shift;
  
- #include "kvm_util.h"
- #include "processor.h"
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index 884e31d9572e..b182b46dabad 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -58,8 +58,6 @@
- 	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |				\
- 	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT))
+ 	do {
+ 		for (; pg < base + num; ++pg) {
+ 			if (!sparsebit_is_set(region->unused_phy_pages, pg)) {
+-				base = pg = sparsebit_next_set(region->unused_phy_pages, pg);
+-				break;
++				do {
++					base = pg = sparsebit_next_set(region->unused_phy_pages, pg);
++				} while (aligned && ((pg % num) != 0));
+ 			}
+ 		}
+ 	} while (pg && pg != base + num);
+@@ -2024,6 +2031,12 @@ vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+ 	return base * vm->page_size;
+ }
  
--#define MPIDR_HWID_BITMASK (0xff00fffffful)
--
- void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init);
- struct kvm_vcpu *aarch64_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
- 				  struct kvm_vcpu_init *init, void *guest_code);
++vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
++			      vm_paddr_t paddr_min, uint32_t memslot)
++{
++	return __vm_phy_pages_alloc(vm, num, paddr_min, memslot, false);
++}
++
+ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+ 			     uint32_t memslot)
+ {
+@@ -2036,6 +2049,12 @@ vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm)
+ 				 vm->memslots[MEM_REGION_PT]);
+ }
+ 
++vm_paddr_t vm_phy_pages_alloc_aligned(struct kvm_vm *vm, size_t num,
++				      vm_paddr_t paddr_min, uint32_t memslot)
++{
++	return __vm_phy_pages_alloc(vm, num, paddr_min, memslot, true);
++}
++
+ /*
+  * Address Guest Virtual to Host Virtual
+  *
 -- 
 2.44.0.rc1.240.g4c46232300-goog
 
