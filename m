@@ -1,32 +1,32 @@
-Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72F455783
-	for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 22:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EDB65578D
+	for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 22:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709073810; cv=none; b=sxtEJ1PJyEVsMNwrLkTEiVQ1eNhq94bpbzNIcFJXX42KjFSSQyBlEOKT/L6w9VVyD5z/fo6CCsXUuRYKkCFmvQWxfSfkjiMtECkKtN2cSQWUktHarERtnWfTBmGLMLRPF+w3W12DGMlv/FOSh7H/BfCWiyx0DLeu6c6+U2uyrwg=
+	t=1709073812; cv=none; b=rkThf+NFo+uqOmRQT543pl0uqbJYEp/vhu5isJcU48OvoRTmtH7Xx8OaqLKFrPgIzO5LJADbP98bMaZ8uEn8eBGO3cVTGfRT3jMxUCNMe3aUpP77oPzkLY6dRdfREwPHwYXcc1+qiZpEe5NxXfBZsLsXdwMo2Q1zf/7OpYB8Nfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709073810; c=relaxed/simple;
-	bh=LZhnGMljJiHSUDRASbCDy6n2BnK+0klJ/bcIxdLAiXA=;
+	s=arc-20240116; t=1709073812; c=relaxed/simple;
+	bh=Mn/2q3AvE4OIFt8opmL1OufIVMK10S91IR/CaS9Wp/s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D13G06pabyIc0rSkPSUGxS+6PUcVW8MN4ePs9Yq6yMB7QH8/Wx5dQuo5yA9s787FjnzFZviAGOe71uPQSurwONxclFXoNS30VDI+nYFx6vjZa4mkKvDW8YsH00jTK7kTGtCapagBpRx7ssVjEo8C7uVrdpmjYGQL3taXKR+pMCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=n0P/nnUO; arc=none smtp.client-ip=91.218.175.176
+	 MIME-Version; b=OBSncEUpctXRpsHMgFQEXKWdslvRrF33pUW1gTm/a0Kb3zjohK3NW6/CXSNydRMrnhMYD5JW9oZbvBetJW5uHPhzYksWuTG3eFYbI8NjH6yg3+b9F8VpVxXd03CXU4y2GHjgfZGjo68p20o2jzjdkJRZRPqNGlFkaaoegVRv1hM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r4akRqFr; arc=none smtp.client-ip=91.218.175.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="n0P/nnUO"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r4akRqFr"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709073807;
+	t=1709073808;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=I7y6/77b8YjR91A6MI21pSAeAUKYD3YrahPlR9r/F+Q=;
-	b=n0P/nnUO6DM1rIjrL1zzMbP9yOwCSghRcMSuHRN5uUqRYn0T3wr+LRoAIJidhonjz+nNZe
-	esCao+l8o0n0V+VwHCKrySlT2WlV+PInQJvaon2C/gtLexCV9rhMdDfMsEBbC6KWGJC0nf
-	ty4XTQfVcWgWJ/yVSQmR/HRaJIvWlD0=
+	bh=2aiC//Sj7vv1TXpvDvbbGYR+rXgdC7Q45vA08CQ57nI=;
+	b=r4akRqFrr8RHpXla5A1Mio01isyf4IY2oud/y8O2/NlLspI2nNAh0afshLfUEUjEs7ErwA
+	MSUEJl8bEVTMaf0SpXruNltKaN/+qkrTT0LyrrrWs/FYb1gTuauW/rTXFh41DCh3eRv/9n
+	Y/AwVvoZEb0TFK7AmDLqj9qVqf0vvqU=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -35,9 +35,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 15/20] KVM: selftests: Add quadword MMIO accessors
-Date: Tue, 27 Feb 2024 22:42:44 +0000
-Message-ID: <20240227224249.2209194-16-oliver.upton@linux.dev>
+Subject: [PATCH 16/20] KVM: selftests: Add a minimal library for interacting with an ITS
+Date: Tue, 27 Feb 2024 22:42:45 +0000
+Message-ID: <20240227224249.2209194-17-oliver.upton@linux.dev>
 In-Reply-To: <20240227224249.2209194-1-oliver.upton@linux.dev>
 References: <20240227224249.2209194-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -49,47 +49,372 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The base registers in the GIC ITS and redistributor for LPIs are 64 bits
-wide. Add quadword accessors to poke at them.
+A prerequisite of testing LPI injection performance is of course
+instantiating an ITS for the guest. Add a small library for creating an
+ITS and interacting with it from the guest.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- .../selftests/kvm/include/aarch64/processor.h   | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/aarch64/gic.h       |   8 +-
+ .../kvm/include/aarch64/gic_v3_its.h          |  19 ++
+ .../selftests/kvm/include/aarch64/vgic.h      |   2 +
+ .../selftests/kvm/lib/aarch64/gic_v3_its.c    | 248 ++++++++++++++++++
+ .../testing/selftests/kvm/lib/aarch64/vgic.c  |  18 ++
+ 6 files changed, 295 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/gic_v3_its.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_v3_its.c
 
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index cf20e44e86f2..884e31d9572e 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -177,11 +177,28 @@ static __always_inline u32 __raw_readl(const volatile void *addr)
- 	return val;
- }
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 492e937fab00..f6ff84457686 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -43,6 +43,7 @@ LIBKVM_x86_64 += lib/x86_64/vmx.c
  
-+static __always_inline void __raw_writeq(u64 val, volatile void *addr)
+ LIBKVM_aarch64 += lib/aarch64/gic.c
+ LIBKVM_aarch64 += lib/aarch64/gic_v3.c
++LIBKVM_aarch64 += lib/aarch64/gic_v3_its.c
+ LIBKVM_aarch64 += lib/aarch64/handlers.S
+ LIBKVM_aarch64 += lib/aarch64/processor.c
+ LIBKVM_aarch64 += lib/aarch64/spinlock.c
+diff --git a/tools/testing/selftests/kvm/include/aarch64/gic.h b/tools/testing/selftests/kvm/include/aarch64/gic.h
+index 53617b3f52cf..6d03188435e4 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/gic.h
++++ b/tools/testing/selftests/kvm/include/aarch64/gic.h
+@@ -13,10 +13,16 @@ enum gic_type {
+ 	GIC_TYPE_MAX,
+ };
+ 
+-#define GICD_BASE_GPA		0x8000000ULL
++/*
++ * Note that the redistributor frames are at the end, as the range scales
++ * with the number of vCPUs in the VM.
++ */
++#define GITS_BASE_GPA		0x8000000ULL
++#define GICD_BASE_GPA		(GITS_BASE_GPA + KVM_VGIC_V3_ITS_SIZE)
+ #define GICR_BASE_GPA		(GICD_BASE_GPA + KVM_VGIC_V3_DIST_SIZE)
+ 
+ /* The GIC is identity-mapped into the guest at the time of setup. */
++#define GITS_BASE_GVA		((volatile void *)GITS_BASE_GPA)
+ #define GICD_BASE_GVA		((volatile void *)GICD_BASE_GPA)
+ #define GICR_BASE_GVA		((volatile void *)GICR_BASE_GPA)
+ 
+diff --git a/tools/testing/selftests/kvm/include/aarch64/gic_v3_its.h b/tools/testing/selftests/kvm/include/aarch64/gic_v3_its.h
+new file mode 100644
+index 000000000000..ecdf6b12caee
+--- /dev/null
++++ b/tools/testing/selftests/kvm/include/aarch64/gic_v3_its.h
+@@ -0,0 +1,19 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#ifndef __SELFTESTS_GIC_V3_ITS_H__
++#define __SELFTESTS_GIC_V3_ITS_H__
++
++#include <linux/sizes.h>
++
++void its_init(vm_paddr_t coll_tbl, size_t coll_tbl_sz,
++	      vm_paddr_t device_tbl, size_t device_tbl_sz,
++	      vm_paddr_t cmdq, size_t cmdq_size);
++
++void its_send_mapd_cmd(void *cmdq_base, u32 device_id, vm_paddr_t itt_base,
++		       size_t itt_size, bool valid);
++void its_send_mapc_cmd(void *cmdq_base, u32 vcpu_id, u32 collection_id, bool valid);
++void its_send_mapti_cmd(void *cmdq_base, u32 device_id, u32 event_id,
++			u32 collection_id, u32 intid);
++void its_send_invall_cmd(void *cmdq_base, u32 collection_id);
++
++#endif // __SELFTESTS_GIC_V3_ITS_H__
+diff --git a/tools/testing/selftests/kvm/include/aarch64/vgic.h b/tools/testing/selftests/kvm/include/aarch64/vgic.h
+index ce19aa0a8360..c481d0c00a5d 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/vgic.h
++++ b/tools/testing/selftests/kvm/include/aarch64/vgic.h
+@@ -32,4 +32,6 @@ void kvm_irq_write_isactiver(int gic_fd, uint32_t intid, struct kvm_vcpu *vcpu);
+ 
+ #define KVM_IRQCHIP_NUM_PINS	(1020 - 32)
+ 
++int vgic_its_setup(struct kvm_vm *vm);
++
+ #endif // SELFTEST_KVM_VGIC_H
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/gic_v3_its.c b/tools/testing/selftests/kvm/lib/aarch64/gic_v3_its.c
+new file mode 100644
+index 000000000000..09f270545646
+--- /dev/null
++++ b/tools/testing/selftests/kvm/lib/aarch64/gic_v3_its.c
+@@ -0,0 +1,248 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Guest ITS library, generously donated by drivers/irqchip/irq-gic-v3-its.c
++ * over in the kernel tree.
++ */
++
++#include <linux/kvm.h>
++#include <linux/sizes.h>
++#include <asm/kvm_para.h>
++#include <asm/kvm.h>
++
++#include "kvm_util.h"
++#include "vgic.h"
++#include "gic.h"
++#include "gic_v3.h"
++#include "processor.h"
++
++static u64 its_read_u64(unsigned long offset)
 +{
-+	asm volatile("str %0, [%1]" : : "rZ" (val), "r" (addr));
++	return readq_relaxed(GITS_BASE_GVA + offset);
 +}
 +
-+static __always_inline u64 __raw_readq(const volatile void *addr)
++static void its_write_u64(unsigned long offset, u64 val)
 +{
-+	u64 val;
-+	asm volatile("ldr %0, [%1]" : "=r" (val) : "r" (addr));
-+	return val;
++	writeq_relaxed(val, GITS_BASE_GVA + offset);
 +}
 +
- #define writel_relaxed(v,c)	((void)__raw_writel((__force u32)cpu_to_le32(v),(c)))
- #define readl_relaxed(c)	({ u32 __r = le32_to_cpu((__force __le32)__raw_readl(c)); __r; })
-+#define writeq_relaxed(v,c)	((void)__raw_writeq((__force u64)cpu_to_le64(v),(c)))
-+#define readq_relaxed(c)	({ u64 __r = le64_to_cpu((__force __le64)__raw_readq(c)); __r; })
- 
- #define writel(v,c)		({ __iowmb(); writel_relaxed((v),(c));})
- #define readl(c)		({ u32 __v = readl_relaxed(c); __iormb(__v); __v; })
-+#define writeq(v,c)		({ __iowmb(); writeq_relaxed((v),(c));})
-+#define readq(c)		({ u64 __v = readq_relaxed(c); __iormb(__v); __v; })
++static u32 its_read_u32(unsigned long offset)
++{
++	return readl_relaxed(GITS_BASE_GVA + offset);
++}
 +
- 
- static inline void local_irq_enable(void)
++static void its_write_u32(unsigned long offset, u32 val)
++{
++	writel_relaxed(val, GITS_BASE_GVA + offset);
++}
++
++static unsigned long its_find_baser(unsigned int type)
++{
++	int i;
++
++	for (i = 0; i < GITS_BASER_NR_REGS; i++) {
++		u64 baser;
++		unsigned long offset = GITS_BASER + (i * sizeof(baser));
++
++		baser = its_read_u64(offset);
++		if (GITS_BASER_TYPE(baser) == type)
++			return offset;
++	}
++
++	GUEST_FAIL("Couldn't find an ITS BASER of type %u", type);
++	return -1;
++}
++
++static void its_install_table(unsigned int type, vm_paddr_t base, size_t size)
++{
++	unsigned long offset = its_find_baser(type);
++	u64 baser;
++
++	baser = ((size / SZ_64K) - 1) |
++		GITS_BASER_PAGE_SIZE_64K |
++		GITS_BASER_InnerShareable |
++		base |
++		GITS_BASER_RaWaWb |
++		GITS_BASER_VALID;
++
++	its_write_u64(offset, baser);
++}
++
++static void its_install_cmdq(vm_paddr_t base, size_t size)
++{
++	u64 cbaser;
++
++	cbaser = ((size / SZ_4K) - 1) |
++		 GITS_CBASER_InnerShareable |
++		 base |
++		 GITS_CBASER_RaWaWb |
++		 GITS_CBASER_VALID;
++
++	its_write_u64(GITS_CBASER, cbaser);
++}
++
++void its_init(vm_paddr_t coll_tbl, size_t coll_tbl_sz,
++	      vm_paddr_t device_tbl, size_t device_tbl_sz,
++	      vm_paddr_t cmdq, size_t cmdq_size)
++{
++	u32 ctlr;
++
++	its_install_table(GITS_BASER_TYPE_COLLECTION, coll_tbl, coll_tbl_sz);
++	its_install_table(GITS_BASER_TYPE_DEVICE, device_tbl, device_tbl_sz);
++	its_install_cmdq(cmdq, cmdq_size);
++
++	ctlr = its_read_u32(GITS_CTLR);
++	ctlr |= GITS_CTLR_ENABLE;
++	its_write_u32(GITS_CTLR, ctlr);
++}
++
++struct its_cmd_block {
++	union {
++		u64	raw_cmd[4];
++		__le64	raw_cmd_le[4];
++	};
++};
++
++static inline void its_fixup_cmd(struct its_cmd_block *cmd)
++{
++	/* Let's fixup BE commands */
++	cmd->raw_cmd_le[0] = cpu_to_le64(cmd->raw_cmd[0]);
++	cmd->raw_cmd_le[1] = cpu_to_le64(cmd->raw_cmd[1]);
++	cmd->raw_cmd_le[2] = cpu_to_le64(cmd->raw_cmd[2]);
++	cmd->raw_cmd_le[3] = cpu_to_le64(cmd->raw_cmd[3]);
++}
++
++static void its_mask_encode(u64 *raw_cmd, u64 val, int h, int l)
++{
++	u64 mask = GENMASK_ULL(h, l);
++	*raw_cmd &= ~mask;
++	*raw_cmd |= (val << l) & mask;
++}
++
++static void its_encode_cmd(struct its_cmd_block *cmd, u8 cmd_nr)
++{
++	its_mask_encode(&cmd->raw_cmd[0], cmd_nr, 7, 0);
++}
++
++static void its_encode_devid(struct its_cmd_block *cmd, u32 devid)
++{
++	its_mask_encode(&cmd->raw_cmd[0], devid, 63, 32);
++}
++
++static void its_encode_event_id(struct its_cmd_block *cmd, u32 id)
++{
++	its_mask_encode(&cmd->raw_cmd[1], id, 31, 0);
++}
++
++static void its_encode_phys_id(struct its_cmd_block *cmd, u32 phys_id)
++{
++	its_mask_encode(&cmd->raw_cmd[1], phys_id, 63, 32);
++}
++
++static void its_encode_size(struct its_cmd_block *cmd, u8 size)
++{
++	its_mask_encode(&cmd->raw_cmd[1], size, 4, 0);
++}
++
++static void its_encode_itt(struct its_cmd_block *cmd, u64 itt_addr)
++{
++	its_mask_encode(&cmd->raw_cmd[2], itt_addr >> 8, 51, 8);
++}
++
++static void its_encode_valid(struct its_cmd_block *cmd, int valid)
++{
++	its_mask_encode(&cmd->raw_cmd[2], !!valid, 63, 63);
++}
++
++static void its_encode_target(struct its_cmd_block *cmd, u64 target_addr)
++{
++	its_mask_encode(&cmd->raw_cmd[2], target_addr >> 16, 51, 16);
++}
++
++static void its_encode_collection(struct its_cmd_block *cmd, u16 col)
++{
++	its_mask_encode(&cmd->raw_cmd[2], col, 15, 0);
++}
++
++#define GITS_CMDQ_POLL_ITERATIONS	0
++
++static void its_send_cmd(void *cmdq_base, struct its_cmd_block *cmd)
++{
++	u64 cwriter = its_read_u64(GITS_CWRITER);
++	struct its_cmd_block *dst = cmdq_base + cwriter;
++	u64 cbaser = its_read_u64(GITS_CBASER);
++	size_t cmdq_size;
++	u64 next;
++	int i;
++
++	cmdq_size = ((cbaser & 0xFF) + 1) * SZ_4K;
++
++	its_fixup_cmd(cmd);
++
++	WRITE_ONCE(*dst, *cmd);
++	dsb(ishst);
++	next = (cwriter + sizeof(*cmd)) % cmdq_size;
++	its_write_u64(GITS_CWRITER, next);
++
++	/*
++	 * Polling isn't necessary considering KVM's ITS emulation at the time
++	 * of writing this, as the CMDQ is processed synchronously after a write
++	 * to CWRITER.
++	 */
++	for (i = 0; its_read_u64(GITS_CREADR) != next; i++) {
++		__GUEST_ASSERT(i < GITS_CMDQ_POLL_ITERATIONS,
++			       "ITS didn't process command at offset %lu after %d iterations\n",
++			       cwriter, i);
++
++		cpu_relax();
++	}
++}
++
++void its_send_mapd_cmd(void *cmdq_base, u32 device_id, vm_paddr_t itt_base,
++		       size_t itt_size, bool valid)
++{
++	struct its_cmd_block cmd = {};
++
++	its_encode_cmd(&cmd, GITS_CMD_MAPD);
++	its_encode_devid(&cmd, device_id);
++	its_encode_size(&cmd, ilog2(itt_size) - 1);
++	its_encode_itt(&cmd, itt_base);
++	its_encode_valid(&cmd, valid);
++
++	its_send_cmd(cmdq_base, &cmd);
++}
++
++void its_send_mapc_cmd(void *cmdq_base, u32 vcpu_id, u32 collection_id, bool valid)
++{
++	struct its_cmd_block cmd = {};
++
++	its_encode_cmd(&cmd, GITS_CMD_MAPC);
++	its_encode_collection(&cmd, collection_id);
++	its_encode_target(&cmd, vcpu_id);
++	its_encode_valid(&cmd, valid);
++
++	its_send_cmd(cmdq_base, &cmd);
++}
++
++void its_send_mapti_cmd(void *cmdq_base, u32 device_id, u32 event_id,
++			u32 collection_id, u32 intid)
++{
++	struct its_cmd_block cmd = {};
++
++	its_encode_cmd(&cmd, GITS_CMD_MAPTI);
++	its_encode_devid(&cmd, device_id);
++	its_encode_event_id(&cmd, event_id);
++	its_encode_phys_id(&cmd, intid);
++	its_encode_collection(&cmd, collection_id);
++
++	its_send_cmd(cmdq_base, &cmd);
++}
++
++void its_send_invall_cmd(void *cmdq_base, u32 collection_id)
++{
++	struct its_cmd_block cmd = {};
++
++	its_encode_cmd(&cmd, GITS_CMD_INVALL);
++	its_encode_collection(&cmd, collection_id);
++
++	its_send_cmd(cmdq_base, &cmd);
++}
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+index ac55b6c2e915..62243ba12f23 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/vgic.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+@@ -166,3 +166,21 @@ void kvm_irq_write_isactiver(int gic_fd, uint32_t intid, struct kvm_vcpu *vcpu)
  {
+ 	vgic_poke_irq(gic_fd, intid, vcpu, GICD_ISACTIVER);
+ }
++
++int vgic_its_setup(struct kvm_vm *vm)
++{
++	int its_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_ITS);
++	u64 attr;
++
++	attr = GITS_BASE_GPA;
++	kvm_device_attr_set(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++			    KVM_VGIC_ITS_ADDR_TYPE, &attr);
++
++	kvm_device_attr_set(its_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
++			    KVM_DEV_ARM_VGIC_CTRL_INIT, NULL);
++
++	virt_map(vm, GITS_BASE_GPA, GITS_BASE_GPA,
++		 vm_calc_num_guest_pages(vm->mode, KVM_VGIC_V3_ITS_SIZE));
++
++	return its_fd;
++}
 -- 
 2.44.0.rc1.240.g4c46232300-goog
 
