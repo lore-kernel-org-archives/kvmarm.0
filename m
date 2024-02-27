@@ -1,32 +1,32 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E688A14AD07
-	for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 19:22:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490F7149399
+	for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 19:22:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709061742; cv=none; b=QFHnANYZJCSOVSQ8rpzQKOE6fR0cJkBr2GTqbMgStdeuvXi+9CI3t/bdLFTtZmDAHqKcJQV/QvPEOgxKwHUTVGFG+bmsz23752l17icoxZ1CsuoahALZnAvUK1d1Tniy5/ksWdvR0Dpcaa3PjCQs0JRhK+BV37KaLJjf/KGhAIs=
+	t=1709061744; cv=none; b=mSqFDSSdH69xPBINnLdA9PgJja/cqSmTux7uM311GM4KEy4jXGKVHZud4p9TZiWpTJ6BCzZfW898N+E/XTvj7Im6+BfJkLGd29FT5NwZa+OxGQ0ZkVlh4fk35+i7/QceSUjTwItoXzv0DYHUPdD4LhBCvXLpUN270WyM7TiQBMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709061742; c=relaxed/simple;
-	bh=DTqy6scdK0VMeDqGk7g/86rHlzjsUbVjS0nIDmPfMeU=;
+	s=arc-20240116; t=1709061744; c=relaxed/simple;
+	bh=2cNigJsJ6R/+g4e4oKY8+adSabfgLoQTTCYyuT80lCY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=ZjJc6lmHoxEgINZ5WmlcZi5lft7dHpnvVnEksKgFrfJtPiDoKxsM9g4/HUUnQ3KUnp5CzPT6yUYsX7DlQ1SvFrBRslcQZ1OEPKLUFmMXlxy6ssUWk2Qhn2h7ipi4XVFDNnArXSXkRCnYDOVZfQmXiYWrOKG34DTI368kawQwi0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Kv3umA/5; arc=none smtp.client-ip=91.218.175.172
+	 MIME-Version:Content-type; b=n0GT/Sx0UbHQpm09RWcQ0KsrIhWzerawPcrecesBvwX9c0wIZ4G+xEQt4EL9gTu823XQFdws6Cldk4ubqTBQqar59TvWo8rGPukXWO+LodBqhqB8k1qCZND/ExntHC25qwtPJZwx2f4xTy8wKIUnd+k/YPTonoSbYn4EEiF7has=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nubMGlgn; arc=none smtp.client-ip=91.218.175.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Kv3umA/5"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nubMGlgn"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709061737;
+	t=1709061741;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=X98r+E2HjjzpqAg3o8D8X25F7j+MlQGPDJRNThe9QrY=;
-	b=Kv3umA/5gtTS40mDTBkpHdoScti8RHZOAwgEBMMhbJggbkE2qaYaP9Nq12s5gRCBWQk5J8
-	AVyZaOcbQx+SnKfCujnZztiS7MdPF5/g7qR3q9u59I9+MaNVMl9FDbgTD9PhKakxBHY+rE
-	uMR/sEqQDv/y45AcL33YzQEQzBhhJgs=
+	bh=tEkS9mcwK16aQNtVBNfAwl68dPDUtPcmYv6jp7A4TCg=;
+	b=nubMGlgn+cuQiNM9PeSOiPR4E8ES9Fam8oLmlsIampWvzF++CiaXruwyYifxrG2KhMAG3y
+	/CFOegMw0imt2FPy89a8Bt4hrL7u0mEaS6B7t8w0yEBxtlyiZWIgPQB5/O77lFEQ04gPDG
+	TDduzzFb5I1uMqNB/RM6RNDqRY0FBHc=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -36,9 +36,9 @@ Cc: alexandru.elisei@arm.com,
 	shahuang@redhat.com,
 	pbonzini@redhat.com,
 	thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v2 15/18] arm64: efi: Don't map reserved regions
-Date: Tue, 27 Feb 2024 20:21:25 +0100
-Message-ID: <20240227192109.487402-35-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v2 16/18] arm64: efi: Fix _start returns from failed _relocate
+Date: Tue, 27 Feb 2024 20:21:26 +0100
+Message-ID: <20240227192109.487402-36-andrew.jones@linux.dev>
 In-Reply-To: <20240227192109.487402-20-andrew.jones@linux.dev>
 References: <20240227192109.487402-20-andrew.jones@linux.dev>
 Precedence: bulk
@@ -51,73 +51,67 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-We shouldn't need to map all the regions that the EFI memory map
-contains. Just map EFI_LOADER_CODE and EFI_LOADER_DATA, since
-those are for the loaded unit test, and any region types which
-could be used by the unit test for its own memory allocations. We
-still map EFI_BOOT_SERVICES_DATA since the primary stack is on a
-region of that type. In a later patch we'll switch to a stack we
-allocate ourselves to drop that one too.
+If _relocate fails we need to restore the frame pointer and the link
+register and return from _start. But we've pushed x0 and x1 on below
+the fp and lr, so, as the code was, we'd restore the wrong values.
+Revert parts of the code back to the way they are in gnu-efi and move
+the stack alignment below the loading of x0 and x1, after we've
+confirmed _relocate didn't fail.
 
+Fixes: d231b539a41f ("arm64: Use code from the gnu-efi when booting with EFI")
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- lib/arm/mmu.c    | 6 +-----
- lib/arm/setup.c  | 4 ++--
- lib/memregions.c | 8 ++++++++
- 3 files changed, 11 insertions(+), 7 deletions(-)
+ arm/efi/crt0-efi-aarch64.S | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
 
-diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
-index eb5e82a95f06..9dce7da85709 100644
---- a/lib/arm/mmu.c
-+++ b/lib/arm/mmu.c
-@@ -221,12 +221,8 @@ void *setup_mmu(phys_addr_t phys_end, void *unused)
- 		mmu_idmap = alloc_page();
+diff --git a/arm/efi/crt0-efi-aarch64.S b/arm/efi/crt0-efi-aarch64.S
+index 5d0dc04af54a..5fd3dc94dae8 100644
+--- a/arm/efi/crt0-efi-aarch64.S
++++ b/arm/efi/crt0-efi-aarch64.S
+@@ -111,17 +111,10 @@ section_table:
  
- 	for (r = mem_regions; r->end; ++r) {
--		if (r->flags & MR_F_IO) {
-+		if (r->flags & (MR_F_IO | MR_F_RESERVED)) {
- 			continue;
--		} else if (r->flags & MR_F_RESERVED) {
--			/* Reserved pages need to be writable for whatever reserved them */
--			mmu_set_range_ptes(mmu_idmap, r->start, r->start, r->end,
--					   __pgprot(PTE_WBWA));
- 		} else if (r->flags & MR_F_CODE) {
- 			/* armv8 requires code shared between EL1 and EL0 to be read-only */
- 			mmu_set_range_ptes(mmu_idmap, r->start, r->start, r->end,
-diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 521928186fb0..08658b9a222b 100644
---- a/lib/arm/setup.c
-+++ b/lib/arm/setup.c
-@@ -309,8 +309,8 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
- 		data->flags &= ~MR_F_CODE;
+ 	.align		12
+ _start:
+-	stp		x29, x30, [sp, #-16]!
+-
+-	/* Align sp; this is necessary due to way we store cpu0's thread_info */
++	stp		x29, x30, [sp, #-32]!
+ 	mov		x29, sp
+-	mov		x30, sp
+-	and		x30, x30, #THREAD_MASK
+-	mov		sp, x30
+-	str		x29, [sp, #-16]!
+-
+-	stp		x0, x1, [sp, #-16]!
  
- 	for (struct mem_region *m = mem_regions; m->end; ++m) {
--		if (m != code && (m->flags & MR_F_CODE))
--			m->flags = MR_F_RESERVED;
-+		if (m != code)
-+			assert(!(m->flags & MR_F_CODE));
++	stp		x0, x1, [sp, #16]
+ 	mov		x2, x0
+ 	mov		x3, x1
+ 	adr		x0, ImageBase
+@@ -130,12 +123,20 @@ _start:
+ 	bl		_relocate
+ 	cbnz		x0, 0f
  
- 		if (!(m->flags & MR_F_IO)) {
- 			if (m->start < __phys_offset)
-diff --git a/lib/memregions.c b/lib/memregions.c
-index 9cdbb639ab62..3c6f751eb4f2 100644
---- a/lib/memregions.c
-+++ b/lib/memregions.c
-@@ -112,6 +112,14 @@ void memregions_efi_init(struct efi_boot_memmap *mem_map,
- 		case EFI_LOADER_CODE:
- 			r.flags = MR_F_CODE;
- 			break;
-+		case EFI_LOADER_DATA:
-+			break;
-+		case EFI_BOOT_SERVICES_DATA:
-+			/*
-+			 * FIXME: This would ideally be MR_F_RESERVED, but the
-+			 * primary stack is in a region of this EFI type.
-+			 */
-+			break;
- 		case EFI_PERSISTENT_MEMORY:
- 			r.flags = MR_F_PERSISTENT;
- 			break;
+-	ldp		x0, x1, [sp], #16
++	ldp		x0, x1, [sp, #16]
++
++	/* Align sp; this is necessary due to way we store cpu0's thread_info */
++	mov		x29, sp
++	mov		x30, sp
++	and		x30, x30, #THREAD_MASK
++	mov		sp, x30
++	str		x29, [sp, #-16]!
++
+ 	bl		efi_main
+ 
+ 	/* Restore sp */
+ 	ldr		x30, [sp], #16
+-	mov             sp, x30
++	mov		sp, x30
+ 
+-0:	ldp		x29, x30, [sp], #16
++0:	ldp		x29, x30, [sp], #32
+ 	ret
 -- 
 2.43.0
 
