@@ -1,37 +1,42 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21CFF4E1DC
-	for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 19:09:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB4B51C33
+	for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 19:21:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709060991; cv=none; b=XHdeJH4CwzGa1ZLut/wwvjz05dKUPaNKa7ojrXcZ1w0yHV+hVNvbaEiLsPITR4L0qcuyOXJjdwv5qG5McdQWxsfE5sP7ia5FO9vi9yYV5NACWJi6hDViELwLGIWWC3U2wR1qux9F7Dhg4GuoA9vjcpB15t2BSiRoZffF39y0oI8=
+	t=1709061678; cv=none; b=NdTUYNTd+mMDUZoewRCQUBQXV1xNbogazMy4e/HC7Hie8p62oxX/f/agzmKdnwfss4UE23+u+xyBXCT5xZQb2YBmQ+TPnKccgxkN9Lf9dgYL0RtIAHKyxju6Su9Kr4Rn75A2PObrjGBxto4vNoxBQxOs8r7KHNEmWf4keYTwiUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709060991; c=relaxed/simple;
-	bh=V2LfPPDIN8jhFO9fYE4GxCvODU1jzhUhZnlTIR4lEl0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-type; b=ZJek4CTCBofx6TNSRUXBXI6rBKSlYbJRAvEwKh2KxBSRhw4MtC4XIiiDyCUoC1yD+CRYPSItJmoao+4JXIy5RNfpL8ZEUyZDt8JCSp4Cv3lXmOjsBVGUyrK06UlfbL8rnw6HvpjNUgOe9mKTD+c4AC2gQNr6hC0Lz+qVnrswzro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UW+2nQ/B; arc=none smtp.client-ip=91.218.175.171
+	s=arc-20240116; t=1709061678; c=relaxed/simple;
+	bh=mAay3FQRVDOwKDr/hK3B3D8SpehO8ApC+lwf1oZ8E5s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-type; b=eI+58iVE4M0TxX5akmRfBppfLreqP9NPRw/zk5tTJ2Cj0B49yJJWE59dT2O6e68F9vZtLHCrlA+PE5U8tCZ7dLeBX4kVPkHjSFYw5zzlCinbNEG28/1kMohBzxUAM9Y/eKJ3Vdlv1OdXmz6kWevDN3J41gJSAQXMCptbCUXxP+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=udLQN5+R; arc=none smtp.client-ip=95.215.58.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UW+2nQ/B"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="udLQN5+R"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709060985;
+	t=1709061674;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=O6PxlOSkjfmUE3MlUaRdlCKQgaiQQVwcoA25G6phrfg=;
-	b=UW+2nQ/BKWmWN1KAwy/cjjcKerysEXgcM9w5MePjnUgzZsKHr0qIprjnTgE+8V2IfRydoG
-	q9QVnLRM3u/3HMcjRc1F6FkQqWRFcVCarNO9EqXx1m4QSC686Omf1BgfqFhWhyX0UQqxKV
-	N2RbjPz/v3BK46Da/saf0fhUBRNxKOs=
+	bh=uN5YRcmU4+TYyuK3N4sp7o9YPMrd3e1u1vT6ipUfsgs=;
+	b=udLQN5+RT1cOx7P49ocEHGtmzeY78acuUIOHYL3PS4Q3h93C0gL8FQu1FXu43g9oKZK6y2
+	xjB/3XRhWsMI/n/qmx+Gt2F5pKIPDUmp5Y0msWlU95o3goZnXktzcrt+lnwQxMu6+pvBvi
+	JcrrqY0Orz/Afm7GNhdf43eJELNWnwk=
 From: Andrew Jones <andrew.jones@linux.dev>
-To: kvmarm@lists.linux.dev
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
 Cc: alexandru.elisei@arm.com,
-	eric.auger@redhat.com
-Subject: [kvm-unit-tests PATCH] arm64: Improve unhandled exception traces
-Date: Tue, 27 Feb 2024 20:09:36 +0100
-Message-ID: <20240227190935.486566-2-andrew.jones@linux.dev>
+	eric.auger@redhat.com,
+	nikos.nikoleris@arm.com,
+	shahuang@redhat.com,
+	pbonzini@redhat.com,
+	thuth@redhat.com
+Subject: [kvm-unit-tests PATCH v2 00/18] arm64: EFI improvements
+Date: Tue, 27 Feb 2024 20:21:10 +0100
+Message-ID: <20240227192109.487402-20-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -42,29 +47,67 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Put the stack trace at the bottom, rather than mixing it with
-register dumps, and also start the trace from the current PC.
+This series collects one fix ("Update MAX_SMP probe") with a bunch of
+improvements to the EFI setup code and run script. With the series
+applied one can add --enable-efi-direct when configuring and then
+run the EFI tests on QEMU much, much faster by using direct kernel
+boot for them (and environment variables will work too). The non-
+direct (original) way of running the EFI tests has also been sped up
+a bit by not running the dummy test and not generating the dtb twice.
+The cleanups in the setup code allow duplicated code to be removed
+(by sharing with the non-EFI setup code) and eventually for riscv
+to share some code too with the introduction of memregions_efi_init().
 
-Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
----
- lib/arm64/processor.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+v2:
+ - Add another improvement (patches 15-17), which is to stop mapping
+   EFI regions which we consider reserved (including
+   EFI_BOOT_SERVICES_DATA regions which requires moving the primary stack)
+ - Add EFI gitlab CI tests
+ - Fix one typo in configure help text
 
-diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
-index 5bcad679605e..06fd7cfcc548 100644
---- a/lib/arm64/processor.c
-+++ b/lib/arm64/processor.c
-@@ -130,9 +130,9 @@ static void bad_exception(enum vector v, struct pt_regs *regs,
- 	printf("Vector: %d (%s)\n", v, vector_names[v]);
- 	printf("ESR_EL1: %8s%08x, ec=%#x (%s)\n", "", esr, ec, ec_names[ec]);
- 	printf("FAR_EL1: %016lx (%svalid)\n", far, far_valid ? "" : "not ");
--	dump_stack();
- 	printf("Exception frame registers:\n");
- 	show_regs(regs);
-+	dump_frame_stack((void *)regs->pc, (void *)regs->regs[29]);
- 	abort();
- }
- 
+
+Thanks,
+drew
+
+
+Andrew Jones (17):
+  runtime: Update MAX_SMP probe
+  runtime: Add yet another 'no kernel' error message
+  arm64: efi: Don't create dummy test
+  arm64: efi: Remove redundant dtb generation
+  arm64: efi: Move run code into a function
+  arm64: efi: Remove EFI_USE_DTB
+  arm64: efi: Improve device tree discovery
+  lib/efi: Add support for loading the initrd
+  arm64: efi: Allow running tests directly
+  arm/arm64: Factor out some initial setup
+  arm/arm64: Factor out allocator init from mem_init
+  arm64: Simplify efi_mem_init
+  arm64: Add memregions_efi_init
+  arm64: efi: Don't map reserved regions
+  arm64: efi: Fix _start returns from failed _relocate
+  arm64: efi: Switch to our own stack
+  arm64: efi: Add gitlab CI
+
+Shaoqin Huang (1):
+  arm64: efi: Make running tests on EFI can be parallel
+
+ .gitlab-ci.yml             |  32 +++++-
+ arm/efi/crt0-efi-aarch64.S |  37 ++++--
+ arm/efi/run                |  65 +++++++----
+ arm/run                    |   6 +-
+ configure                  |  17 +++
+ lib/arm/mmu.c              |   6 +-
+ lib/arm/setup.c            | 227 +++++++++++++++----------------------
+ lib/efi.c                  |  93 +++++++++++++--
+ lib/efi.h                  |   3 +-
+ lib/linux/efi.h            |  29 +++++
+ lib/memregions.c           |  53 +++++++++
+ lib/memregions.h           |   6 +
+ run_tests.sh               |   5 +-
+ scripts/runtime.bash       |  21 ++--
+ 14 files changed, 396 insertions(+), 204 deletions(-)
+
 -- 
 2.43.0
 
