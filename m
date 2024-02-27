@@ -1,32 +1,32 @@
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9E2137C4B
-	for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 09:41:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5253C136989
+	for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 09:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709026891; cv=none; b=tNQMq9FrbrE8CFd7dfHQUcrfV+JWipQJgSm+K/TPkcKca+Mbfk0Qy5la/gKncgg1yK1aggwhixnbygMmcuMUJFJMRaVEhAkevleYi30D3DaILVKK5GutqUsk09NQ353MwENzLSxlUfgTM48h/oB71xgK1GO225/eg8T5+lztbds=
+	t=1709026894; cv=none; b=RoaisBnYSgCbr90iX0PHj11ykbWP7R18Zkq42Ivc09gINOgmbkFvGZJ3PNCtuONfxfGGRVnHHM0QFI4/EqsZ/tAoxGZaq0/Zreg/zMO79AWKOS5TTprdvD7tdzpqlExon6UamyCA8DzE3cosjS9APlYBGmjQRhXwJX30JrBBb+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709026891; c=relaxed/simple;
-	bh=5MfdbBBYrF+sXPSKJMncMlv2m0xXu8atQ8bn73l2bvA=;
+	s=arc-20240116; t=1709026894; c=relaxed/simple;
+	bh=KYqMEAx3KNzTVXzKFpKmaLV77MxDeZCls6ts/nHl4P4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mH0i0txeC+FgUEKmPMVN2jxzOQCaYYXm5WRD5HSTdtaQNPk4j0jp7hIXfmSXTFsncwzCgWGJOFFd58oPc9OjgHL3DPM51fF+rz/kvk5bw+9SQuskXeZehpeGsjR4+7OUC069us5m5wrkTO2geSEmfAjIBTjn6Rd16U0djRjCLpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U8twFEeY; arc=none smtp.client-ip=95.215.58.175
+	 MIME-Version; b=Zb/ZUmKJJozyWMHjBLcvx+SVyTPERg9T06s16JZ1T69SB1pTV7jFnpvRrucvinRFxQ0stKQUGkYNE064xUKBbsBT/W/ATl9ldAqjOsRqZwXW7MkUNz3nO7eeKTrCciNEhf0sr1cdyORMN7Iz82eI8GqMpzQeWnofX0GSjJem6rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ibcqrxT7; arc=none smtp.client-ip=95.215.58.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U8twFEeY"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ibcqrxT7"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709026887;
+	t=1709026889;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=oDyjjWDhGmx1ca9lumlKjUOBS9x26uk5yyf2UVJ2ll8=;
-	b=U8twFEeYiezzpQ6KHYWo2Rcz2+88SpCp1TjZI2k78+ffxpiB0WdnQbTQFM0xckfbmlGd2J
-	FwYZ2zXMg4x2X28XB96xtaW6g92ugYuGZRgtv1bKpq5zYCWYkgk91zJYZjxag5opXmDeck
-	Vdk8DVwowEUR+S7yQv9dRLsuigrFen8=
+	bh=1uVCVoiYU0b/g0luLUlHCDdl8srJQWG7/ffSYIN1vYM=;
+	b=ibcqrxT7ZiH1sXCBblalTizDvSQEL5NeD+MzriAPsZ7AYvaBOQzjJZXveUQ7nYJNvIEMbS
+	ksKeNNq03ymTotrI+XvEyWnEm0t0z6xsrSAtg+LewEw+ej0Xn1IUr/x08XJXqXERP0Q1iv
+	Cxuys7cmuzsKBMm5an7RvXWT64YZkR8=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 1/2] KVM: arm64: Fail the idreg iterator if idregs aren't initialized
-Date: Tue, 27 Feb 2024 09:41:14 +0000
-Message-ID: <20240227094115.1723330-2-oliver.upton@linux.dev>
+Subject: [PATCH 2/2] KVM: arm64: Don't initialize idreg debugfs w/ preemption disabled
+Date: Tue, 27 Feb 2024 09:41:15 +0000
+Message-ID: <20240227094115.1723330-3-oliver.upton@linux.dev>
 In-Reply-To: <20240227094115.1723330-1-oliver.upton@linux.dev>
 References: <20240227094115.1723330-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -48,29 +48,111 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Return an error to userspace if the VM's ID register values haven't been
-initialized in preparation for changing the debugfs file initialization
-order.
+Testing KVM with DEBUG_ATOMIC_SLEEP enabled doesn't get far before hitting the
+first splat:
 
+  BUG: sleeping function called from invalid context at kernel/locking/rwsem.c:1578
+  in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 13062, name: vgic_lpi_stress
+  preempt_count: 1, expected: 0
+  2 locks held by vgic_lpi_stress/13062:
+   #0: ffff080084553240 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0xc0/0x13f0
+   #1: ffff800080485f08 (&kvm->arch.config_lock){+.+.}-{3:3}, at: kvm_arch_vcpu_ioctl+0xd60/0x1788
+  CPU: 19 PID: 13062 Comm: vgic_lpi_stress Tainted: G        W  O       6.8.0-dbg-DEV #1
+  Call trace:
+   dump_backtrace+0xf8/0x148
+   show_stack+0x20/0x38
+   dump_stack_lvl+0xb4/0xf8
+   dump_stack+0x18/0x40
+   __might_resched+0x248/0x2a0
+   __might_sleep+0x50/0x88
+   down_write+0x30/0x150
+   start_creating+0x90/0x1a0
+   __debugfs_create_file+0x5c/0x1b0
+   debugfs_create_file+0x34/0x48
+   kvm_reset_sys_regs+0x120/0x1e8
+   kvm_reset_vcpu+0x148/0x270
+   kvm_arch_vcpu_ioctl+0xddc/0x1788
+   kvm_vcpu_ioctl+0xb6c/0x13f0
+   __arm64_sys_ioctl+0x98/0xd8
+   invoke_syscall+0x48/0x108
+   el0_svc_common+0xb4/0xf0
+   do_el0_svc+0x24/0x38
+   el0_svc+0x54/0x128
+   el0t_64_sync_handler+0x68/0xc0
+   el0t_64_sync+0x1a8/0x1b0
+
+kvm_reset_vcpu() disables preemption as it needs to unload vCPU state
+from the CPU to twiddle with it, which subsequently explodes when
+taking the parent inode's rwsem while creating the idreg debugfs file.
+
+Fix it by moving the initialization to kvm_arch_create_vm_debugfs().
+
+Fixes: 891766581dea ("KVM: arm64: Add debugfs file for guest's ID registers")
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/sys_regs.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ arch/arm64/kvm/arm.c              |  4 ++++
+ arch/arm64/kvm/sys_regs.c         | 13 ++++++++-----
+ 3 files changed, 13 insertions(+), 5 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 181fef12e8e8..6883963bbc3a 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1102,6 +1102,7 @@ int kvm_handle_cp15_64(struct kvm_vcpu *vcpu);
+ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu);
+ int kvm_handle_cp10_id(struct kvm_vcpu *vcpu);
+ 
++void kvm_sys_regs_create_debugfs(struct kvm *kvm);
+ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
+ 
+ int __init kvm_sys_reg_table_init(void);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 0df8507f66e3..3dee5490eea9 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -190,6 +190,10 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ 	return VM_FAULT_SIGBUS;
+ }
+ 
++void kvm_arch_create_vm_debugfs(struct kvm *kvm)
++{
++	kvm_sys_regs_create_debugfs(kvm);
++}
+ 
+ /**
+  * kvm_arch_destroy_vm - destroy the VM data structure
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 9a0b3a22a9d4..1ebc483c2b0c 100644
+index 1ebc483c2b0c..8e60aa4a8dfb 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -3434,7 +3434,8 @@ static void *idregs_debug_start(struct seq_file *s, loff_t *pos)
- 	mutex_lock(&kvm->arch.config_lock);
+@@ -3502,6 +3502,14 @@ static const struct seq_operations idregs_debug_sops = {
  
- 	iter = &kvm->arch.idreg_debugfs_iter;
--	if (*iter == (u8)~0) {
-+	if (test_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags) &&
-+	    *iter == (u8)~0) {
- 		*iter = *pos;
- 		if (*iter >= KVM_ARM_ID_REG_NUM)
- 			iter = NULL;
+ DEFINE_SEQ_ATTRIBUTE(idregs_debug);
+ 
++void kvm_sys_regs_create_debugfs(struct kvm *kvm)
++{
++	kvm->arch.idreg_debugfs_iter = ~0;
++
++	debugfs_create_file("idregs", 0444, kvm->debugfs_dentry, kvm,
++			    &idregs_debug_fops);
++}
++
+ static void kvm_reset_id_regs(struct kvm_vcpu *vcpu)
+ {
+ 	const struct sys_reg_desc *idreg = first_idreg;
+@@ -3521,11 +3529,6 @@ static void kvm_reset_id_regs(struct kvm_vcpu *vcpu)
+ 		id = reg_to_encoding(idreg);
+ 	}
+ 
+-	kvm->arch.idreg_debugfs_iter = ~0;
+-
+-	debugfs_create_file("idregs", 0444, kvm->debugfs_dentry, kvm,
+-			    &idregs_debug_fops);
+-
+ 	set_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags);
+ }
+ 
 -- 
 2.44.0.rc1.240.g4c46232300-goog
 
