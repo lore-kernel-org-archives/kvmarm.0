@@ -1,124 +1,177 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8462F12FB2C
-	for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 08:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498EF7BAE7
+	for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 09:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709023771; cv=none; b=m5hf/6l3kp9/ugHPIE5nRU7lBGAsUfAKzXrgVvhJ4wjO1+2PwnZel2uIE1N7Rcag767F/F49uRy957HD5oB+94ai2p9PQ+t8QwSCA/QDX6xd9eXB3N0Z/R/cagIgrEVmD1gZfhQMrczXBpC8iOz4StaTm+FExX4vQVALJt9q6OE=
+	t=1709026704; cv=none; b=qHYMFWl1A0Vw+L0FUh1pMWq7RAHt/V+rCxZq4OsvpSpV6t2hH9REfccouRGwZxvf7dSnfs3E/mcxpoA3kZJrvkxBUDJgVedS+qZAs9hgbSzgZYGmlGQ3GL1kRVityjpvAUn9DDJf2Ls/UPJxW91B6IjHA9+JdLbs+rPlpxd0aEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709023771; c=relaxed/simple;
-	bh=c2aw4Hw3anU8sRB0mw812/BpQbNSsLNusQqyDnPMQ+M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EhI/ArVhdlYgsFXDYxgYkOc+rgS19bEKYX0JCV63zDb2tXf4oH05cSqrv0vt7rZCdjsoIE8pf7WMtbNlwsDXrdrYqm3u/4M4Tx+cauYqRFoX45apb9D2yBgM6mJpRG2T/K2MlunXRUidelUTSuYTV1DdAbWL0ufdqvnUNe2JH00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=co+35iFF; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1709026704; c=relaxed/simple;
+	bh=lITNheftSYMR04YfLtv3K2IE6PAf+peApENOiHb/BYE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jMnVzYPlHP0+I1tLG55A839aqN6nWDI4eJk4ahMplrcwFYLFkL/PP81bezTn80RE7gwBZInAURzORvIqaGKfYvVTpPdxJvv9ySN3nZA4hsqZ4kke/oHr1ToItCpLsNecHSU3aY9JEY8mdpVzSk8WVaeZMtLvF4xAFo8jbGVnjEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IH6jVQ0g; arc=none smtp.client-ip=209.85.217.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="co+35iFF"
-Date: Tue, 27 Feb 2024 08:49:14 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709023766;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=B88acvmk3x+zIRZR32kMKESL53/0EUlRhoWm47p8/0I=;
-	b=co+35iFFA/D2wKUXn7nYHD6NVdDySS+UuNx5G2ngPxXIyl0msY/tX6gEHpymCPeo+6sFQo
-	WesPXGCplfJLDUVn6T0s2Fbj7Vi/qFridYIFJGgAwfFFvVX5IA3TIXXjnTHJB9qOTOkwB9
-	OZ6IXWi9a57oPkJFIWNi73/h0BPEt2Y=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Ankit Agrawal <ankita@nvidia.com>
-Cc: "wangjinchao@xfusion.com" <wangjinchao@xfusion.com>,
-	"shahuang@redhat.com" <shahuang@redhat.com>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>,
-	"yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-	"david@redhat.com" <david@redhat.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	"gshan@redhat.com" <gshan@redhat.com>,
-	"brauner@kernel.org" <brauner@kernel.org>,
-	"rananta@google.com" <rananta@google.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"kevin.tian@intel.com" <kevin.tian@intel.com>,
-	"surenb@google.com" <surenb@google.com>,
-	"ricarkol@google.com" <ricarkol@google.com>,
-	"linus.walleij@linaro.org" <linus.walleij@linaro.org>,
-	"james.morse@arm.com" <james.morse@arm.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"will@kernel.org" <will@kernel.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"bhe@redhat.com" <bhe@redhat.com>,
-	"reinette.chatre@intel.com" <reinette.chatre@intel.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"andreyknvl@gmail.com" <andreyknvl@gmail.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"mark.rutland@arm.com" <mark.rutland@arm.com>,
-	Dan Williams <danw@nvidia.com>, Andy Currid <acurrid@nvidia.com>,
-	Alistair Popple <apopple@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	John Hubbard <jhubbard@nvidia.com>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	Zhi Wang <zhiw@nvidia.com>, Kirti Wankhede <kwankhede@nvidia.com>,
-	Vikram Sethi <vsethi@nvidia.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"Tarun Gupta (SW-GPU)" <targupta@nvidia.com>
-Subject: Re: [PATCH v9 0/4] KVM: arm64: Allow the VM to select DEVICE_* and
- NORMAL_NC for IO memory
-Message-ID: <Zd2iCg5A0Zg_EyCm@linux.dev>
-References: <20240224150546.368-1-ankita@nvidia.com>
- <170899100569.1405597.5047894183843333522.b4-ty@linux.dev>
- <SA1PR12MB71992A7E86741878935DC385B0592@SA1PR12MB7199.namprd12.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IH6jVQ0g"
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-47253bce437so156646137.2
+        for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 01:38:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709026702; x=1709631502; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lITNheftSYMR04YfLtv3K2IE6PAf+peApENOiHb/BYE=;
+        b=IH6jVQ0gFgswKClUOpdiYOQxa36xGLqrbugYwKUocRkej3dL9rlNFloUo77Q6rbUMo
+         YinU+gbUTbN4mCqtD7JTHTYJAwC+0Gp/cG1Wt5mSMLUwkaP6BTD3NQl3aq5m73ciWTUX
+         +Ot5Yfxp6nsc+uaVCj8wzXpp7vIZ0+EnXHyBxpAYf6pcx6DUOBaRu0m2XlCoIaNg/u2E
+         LsNtPQh3hhwNVx6hZgpN4IpVur5z+gV6zT2ex/yWT4ONOkJJ5xVPC5J/ewRtFSKXoyu1
+         maxsGmkNxEFAIt5raIXgnMwKTv1NeTvS3Ia8Apo1SUjPhuqJoakx1YTZ8XxmryJ/eb0M
+         L7dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709026702; x=1709631502;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lITNheftSYMR04YfLtv3K2IE6PAf+peApENOiHb/BYE=;
+        b=TrotGrU9lrs0hFow8pCIENLo+1p1nyu0QRds5/lDkDjRwiZeqOeA8qy+RffqWm0j+R
+         JlXefDk8fzSvl7DPT7E1Jjx8buN9x/3WCyRaWTs3r2vBt2D1eYlQqzeW1S5UXcpCCUMJ
+         n3C8GHHw7vcN1jViwiZQzITihSkeVabX3QSKdOcWZiDa3+IBfWE2SBmdNkpGjWPDf59a
+         RtZRavmY3EsZhb5+BQyUiZtZUaXz2xnCflYMPlHul6eqy6FPx8QSbkPvoM2rW+y9LjiB
+         F3Huc082LhYtsqGzjHV+pdnT/kUJ12JtWo8X4dHLTDGDumpUx91z/jWMro+GpJJrl6ud
+         4tcA==
+X-Forwarded-Encrypted: i=1; AJvYcCWmyRb6dGQyr2+EemC2Ubf4hDVm9894DfX5Y4W4gKtogHW3genBjbchWe0ePVvsuFd64rGKQXjTNRV6yg8nTjXbItUufaT/
+X-Gm-Message-State: AOJu0Yyg5a1V/Od6aREobVxZLnzSsgaxhyht9zSps2w19Bf6vHthBAe7
+	YEcJmyWmJC0PjXUQakhIC4ChftJ0Un5TWJvqP9CDGpIKpvNHNzGYrjUVpt/m6Jo4ZBVHVEe//gs
+	YHr7xM+aBu2xfOzSFPYRMHYzBNnr2nOvdusK4
+X-Google-Smtp-Source: AGHT+IGtUSpwVCXklISxbQaZarJMI7q14JSgkprPOp6y3p4Ot6amI6BiQXX96hlj61rZiLNkfUPjDqMpwEnxXQpNCPo=
+X-Received: by 2002:a67:ed57:0:b0:471:e15d:71bf with SMTP id
+ m23-20020a67ed57000000b00471e15d71bfmr4819795vsp.30.1709026702061; Tue, 27
+ Feb 2024 01:38:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <SA1PR12MB71992A7E86741878935DC385B0592@SA1PR12MB7199.namprd12.prod.outlook.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20240222161047.402609-1-tabba@google.com> <9e983090-f336-43b9-8f2b-5dabe7e73b72@redhat.com>
+In-Reply-To: <9e983090-f336-43b9-8f2b-5dabe7e73b72@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 27 Feb 2024 09:37:44 +0000
+Message-ID: <CA+EHjTyGDv0z=X_EN5NAv3ZuqHkPw0rPtGmxjmkc21JqZ+oJLw@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 00/26] KVM: Restricted mapping of guest_memfd at
+ the host and pKVM/arm64 support
+To: David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org, 
+	willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, 
+	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
+	amoorthy@google.com, dmatlack@google.com, yu.c.zhang@linux.intel.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
+	keirf@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 27, 2024 at 08:45:38AM +0000, Ankit Agrawal wrote:
-> >>
-> >> Currently, KVM for ARM64 maps at stage 2 memory that is considered device
-> >> with DEVICE_nGnRE memory attributes; this setting overrides (per
-> >> ARM architecture [1]) any device MMIO mapping present at stage 1,
-> >> resulting in a set-up whereby a guest operating system cannot
-> >> determine device MMIO mapping memory attributes on its own but
-> >> it is always overridden by the KVM stage 2 default.
-> >>
-> >> [...]
+Hi David,
+
+On Mon, Feb 26, 2024 at 9:47=E2=80=AFAM David Hildenbrand <david@redhat.com=
+> wrote:
+>
+> On 22.02.24 17:10, Fuad Tabba wrote:
+> > This series adds restricted mmap() support to guest_memfd [1], as
+> > well as support guest_memfd on pKVM/arm64.
 > >
-> > High time to get this cooking in -next. Looks like there aren't any
-> > conflicts w/ VFIO, but if that changes I've pushed a topic branch to:
+> > This series is based on Linux 6.8-rc4 + our pKVM core series [2].
+> > The KVM core patches apply to Linux 6.8-rc4 (patches 1-6), but
+> > the remainder (patches 7-26) require the pKVM core series. A git
+> > repo with this series applied can be found here [3]. We have a
+> > (WIP) kvmtool port capable of running the code in this series
+> > [4]. For a technical deep dive into pKVM, please refer to Quentin
+> > Perret's KVM Forum Presentation [5, 6].
 > >
-> >  https://git.kernel.org/pub/scm/linux/kernel/git/oupton/linux.git/log/?h=kvm-arm64/vfio-normal-nc
+> > I've covered some of the issues presented here in my LPC 2023
+> > presentation [7].
 > >
-> > Applied to kvmarm/next, thanks!
-> 
-> Thanks Oliver for your efforts. Pardon my naivety, but what would the
-> sequence of steps that this series go through next before landing in an
-> rc branch? Also, what is the earliest branch this is supposed to land
-> assuming all goes well?
+> > We haven't started using this in Android yet, but we aim to move
+> > away from anonymous memory to guest_memfd once we have the
+> > necessary support merged upstream. Others (e.g., Gunyah [8]) are
+> > also looking into guest_memfd for similar reasons as us.
+> >
+> > By design, guest_memfd cannot be mapped, read, or written by the
+> > host userspace. In pKVM, memory shared between a protected guest
+> > and the host is shared in-place, unlike the other confidential
+> > computing solutions that guest_memfd was originally envisaged for
+> > (e.g, TDX).
+>
+> Can you elaborate (or point to a summary) why pKVM has to be special
+> here? Why can't you use guest_memfd only for private memory and another
+> (ordinary) memfd for shared memory, like the other confidential
+> computing technologies are planning to?
 
-We should see this showing up in linux-next imminently. Assuming there
-are no issues there, your changes will be sent out as part of the kvmarm
-pull request for 6.9.
+Because the same memory location can switch back and forth between
+being shared and private in-place. The host/vmm doesn't know
+beforehand which parts of the guest's private memory might be shared
+with it later, therefore, it cannot use guest_memfd() for the private
+memory and anonymous memory for the shared memory without resorting to
+copying. Even if it did know beforehand, it wouldn't help much since
+that memory can change back to being private later on. Other
+confidential computing proposals like TDX and Arm CCA don't share in
+place, and need to copy shared data between private and shared memory.
 
-At least in kvmarm, /next is used for patches that'll land in the next
-merge window and /fixes is for bugfixes that need to go in the current
-release cycle.
+If you're interested, there was also a more detailed discussion about
+this in an earlier guest_memfd() thread [1]
 
--- 
-Thanks,
-Oliver
+> What's the main reason for that decision and can it be avoided?
+> (s390x also shares in-place, but doesn't need any special-casing like
+> guest_memfd provides)
+
+In our current implementation of pKVM, we use anonymous memory with a
+long-term gup, and the host ends up with valid mappings. This isn't
+just a problem for pKVM, but also for TDX and Gunyah [2, 3]. In TDX,
+accessing guest private memory can be fatal to the host and the system
+as a whole since it could result in a machine check. In arm64 it's not
+necessarily fatal to the system as a whole if a userspace process were
+to attempt the access. However, a userspace process could trick the
+host kernel to try to access the protected guest memory, e.g., by
+having a process A strace a malicious process B which passes protected
+guest memory as argument to a syscall.
+
+What makes pKVM and Gunyah special is that both can easily share
+memory (and its contents) in place, since it's not encrypted, and
+convert memory locations between shared/unshared. I'm not familiar
+with how s390x handles sharing in place, or how it handles memory
+donated to the guest. I assume it's by donating anonymous memory. I
+would be also interested to know how it handles and recovers from
+similar situations, i.e., host (userspace or kernel) trying to access
+guest protected memory.
+
+Thank you,
+/fuad
+
+[1] https://lore.kernel.org/all/YkcTTY4YjQs5BRhE@google.com/
+
+[2] https://lore.kernel.org/all/20231105163040.14904-1-pbonzini@redhat.com/
+
+[3] https://lore.kernel.org/all/20240222-gunyah-v17-0-1e9da6763d38@quicinc.=
+com/
+
+
+
+>
+> --
+> Cheers,
+>
+> David / dhildenb
+>
