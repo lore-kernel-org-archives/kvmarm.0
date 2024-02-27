@@ -1,221 +1,114 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6D6145B07
-	for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 14:59:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10E35146910;
+	Tue, 27 Feb 2024 16:14:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709045986; cv=none; b=OCco/1qY+4h7PG/zyHt07iSDQg3dR4xNYjhqCE0r9otZLsrhib0GwakciJUPzdOUSCxaaKvlHhqOeEJ+1Di2rrxoyKPnIAFlYsqAMxQ8opsU6W7zceCKuKQ8ebbeU6lNQL0o2r5+qUirm5DYAdlVpAqXgfAeap+CLcybgQW1nDQ=
+	t=1709050470; cv=none; b=JVk862IcPEsv7ankVuCofQvHcXMsUAzqM5Dx9YC8xXlgfCX4LsyNA1FN5P1Qw86Bzbk4WZeuRRzEB7+CwfIDGiX5EL9sgGN1O+H2Qi0NF1XMBqBn1jO7Qr2QqLBf/fdZ/sH5IQdIvxUg16yJOCPLY8i1gOVO5EAz3yp4RuqK9Es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709045986; c=relaxed/simple;
-	bh=YP9S7kvmU/nh26fiuSz9bkhYDQFui1ONdmOPAkRXuFM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Hhixfecs1AYYWmz4wYwrH6QKk+KS1urScm0yEZ4k6l6Kk/3H4wxeZ8iAZdwFFGF10S1FMhuAoP0CkGVSPb8us2/YzVr1XLZqQJyfLw668LjGWFRbkkt3UIq5k1BU2yRtFT6xpPnZFDwhb5eFe7N23hEHFIIQb+RFJanqoPsPJiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YyR4kj/P; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1709050470; c=relaxed/simple;
+	bh=Z0zdHdGOC4SxL9F4fOxTZqBNKee6nTHQxhkxmuHIUy0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rtmGEeKuvPcDMXbTbYJ2zrtr3qwpbX7FrgzLdRf3R38mfB+0pNW3+8XJw1AfiJNMieyaMB+9LumYzYQT+TuEXIHnkHOXnDL8SYWZQfHNxz43A6EiSB25CPmKkXyV4iPiJTVEHTaL2dH23TOAJvgCra2rTyWIvEa3Ar8MKX04kvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bu6/7a9p; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YyR4kj/P"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709045983;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=0mkEdjfzddad8xEkEZypdVNSiWCr+WxVca8Ei5UPo9o=;
-	b=YyR4kj/P9lgkAQZj6hLUNLbA/5/I2afCZyw/wQHfr1Tc/O/cYalJIQnqT2gK73y3tvraW4
-	bXgQi/wkiOPxNt2EVuFKf3hWTARKb3cXZ2/apbd7rt7tzap9a102G06J4/XZe9mmix8HjJ
-	V6btNKl8zpD81wIvN0/RZ8VstzfWzv8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-574-DtJEg9qNNIGpDWq-riXy-A-1; Tue, 27 Feb 2024 09:59:42 -0500
-X-MC-Unique: DtJEg9qNNIGpDWq-riXy-A-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33d7e755f52so2135962f8f.1
-        for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 06:59:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709045981; x=1709650781;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0mkEdjfzddad8xEkEZypdVNSiWCr+WxVca8Ei5UPo9o=;
-        b=HaoUAy6LdoJVnVD4DRqjb5j51JKt1KoEIIq1zEtVj1l6sSv02l47N6+nbEox/SoCn5
-         rq7pJlMnAOwm+pB+QpQ+NgB7jBD2UM76PpA6tUbrsYxD8mD9E4B0oaSby1bdesOU8Ftx
-         mlKDT2DZoBsZlzhAwP2DAa/mTokbalWdO7sJjlQCXZ9KIVW8eDpds2vGl21cC7N6Xg5y
-         NhZAT5Z0WP45Yzggpd75RPlG5ck54HdLma+xgGhfXCkxtut4bxcuE8hQBFMuRfOP9Cfg
-         rooQkwleUywTePGKG2Bvw4qfKJtuH3xzUh0Ui5YfHJe1iHP7+4/ZlpVOyRdEnhEak1q2
-         Actg==
-X-Forwarded-Encrypted: i=1; AJvYcCWcwuoYQZuaWqBkLzv2GkarMGj5oeFpDNtuv3uUlDQf0tAq8kDyQtNQYVwLHuQQTA7+49+hPlNxLZYaemkBXL9JNQK9HW5p
-X-Gm-Message-State: AOJu0YwrZ7I4+SaVaP8iVsxMOFn70hNr5InPBV1aahxudGV6rFgdvZB9
-	I4u1ToTqjHETO6e/u/jgkWyYejUVEXtkQt1tWEZuhc7WmgkATpMG3yRvyPqKv5hrPg9r2YNFlod
-	HV1dTYdjWn5gG63H3v7x3eI9ZKDHKSUBKue3k9ghK3bN0UpHQIDgW9A==
-X-Received: by 2002:a5d:6d85:0:b0:33d:e174:2232 with SMTP id l5-20020a5d6d85000000b0033de1742232mr4239781wrs.6.1709045980619;
-        Tue, 27 Feb 2024 06:59:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHXKt/iu5/JyDE8hOZDKGMdvaigiSh38DTgHejbtH23fqlG5C9NB56kpO/tenntxgkUP7MHXQ==
-X-Received: by 2002:a5d:6d85:0:b0:33d:e174:2232 with SMTP id l5-20020a5d6d85000000b0033de1742232mr4239741wrs.6.1709045980202;
-        Tue, 27 Feb 2024 06:59:40 -0800 (PST)
-Received: from ?IPV6:2003:cb:c707:7600:5c18:5a7d:c5b7:e7a9? (p200300cbc70776005c185a7dc5b7e7a9.dip0.t-ipconnect.de. [2003:cb:c707:7600:5c18:5a7d:c5b7:e7a9])
-        by smtp.gmail.com with ESMTPSA id ck12-20020a5d5e8c000000b0033d9f0dcb35sm11920501wrb.87.2024.02.27.06.59.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Feb 2024 06:59:39 -0800 (PST)
-Message-ID: <925f8f5d-c356-4c20-a6a5-dd7efde5ee86@redhat.com>
-Date: Tue, 27 Feb 2024 15:59:37 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bu6/7a9p"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88E15C433C7;
+	Tue, 27 Feb 2024 16:14:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709050469;
+	bh=Z0zdHdGOC4SxL9F4fOxTZqBNKee6nTHQxhkxmuHIUy0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Bu6/7a9p0+arHtaKXxCctuJK9G25JMzbW0pwbRP43HOmbuMNqCWXbIHivT+3SBYMZ
+	 9Z4ouUH+AyfxbDMLHdHU7+7mkkDnVNyGnBHUcB+ZwwNRmRP51FhkAYq5CKL3UTbmoE
+	 DB+xHeddLTXOtf9IKAqE0dvA/4PIWfU3ueNrn5DlO8HzLcOUtj8WjCcyUj6BNlb/xU
+	 QbrcoC9cCuJ2bgEi1WNIcoMF7bSZ/e2/IG9KnSFMFnxBa2xeCX2bgrZGyUBPqxS/BC
+	 mTscCuzUtLrJRJPe3S4yN50sSOYiYXLMTnAeH9A8fHrDV4npTQ3Xx1CJbJABG24CJK
+	 KMCdpzNDk0URw==
+Date: Tue, 27 Feb 2024 16:14:20 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
+	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
+	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+	"H.J. Lu" <hjl.tools@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Florian Weimer <fweimer@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v8 33/38] kselftest/arm64: Add a GCS test program built
+ with the system libc
+Message-ID: <4adb0c7e-34a1-4c50-b011-6e31ef8813a7@sirena.org.uk>
+References: <20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org>
+ <20240203-arm64-gcs-v8-33-c9fec77673ef@kernel.org>
+ <87sf1n7uea.fsf@linaro.org>
+ <9b899b4e-7410-4c3b-967b-7794dac742e4@sirena.org.uk>
+ <87ttlzsyro.fsf@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: folio_mmapped
-To: Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
- chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
- paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
- seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org,
- akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
- chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
- dmatlack@google.com, yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com,
- mic@digikod.net, vbabka@suse.cz, vannapurve@google.com,
- ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com,
- wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
- quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
- quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
- james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
- maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com,
- linux-mm@kvack.org
-References: <20240222161047.402609-1-tabba@google.com>
- <20240222141602976-0800.eberman@hu-eberman-lv.qualcomm.com>
- <ZdfoR3nCEP3HTtm1@casper.infradead.org>
- <40a8fb34-868f-4e19-9f98-7516948fc740@redhat.com>
- <20240226105258596-0800.eberman@hu-eberman-lv.qualcomm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20240226105258596-0800.eberman@hu-eberman-lv.qualcomm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="4XK/IPqd7iEUtIhJ"
+Content-Disposition: inline
+In-Reply-To: <87ttlzsyro.fsf@linaro.org>
+X-Cookie: Please go away.
 
-> 
-> Ah, this was something I hadn't thought about. I think both Fuad and I
-> need to update our series to check the refcount rather than mapcount
-> (kvm_is_gmem_mapped for Fuad, gunyah_folio_lend_safe for me).
 
-An alternative might be !folio_mapped() && !folio_maybe_dma_pinned(). 
-But checking for any unexpected references might be better (there are 
-still some GUP users that don't use FOLL_PIN).
+--4XK/IPqd7iEUtIhJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-At least concurrent migration/swapout (that temporarily unmaps a folio 
-and can give you folio_mapped() "false negatives", which both take a 
-temporary folio reference and hold the page lock) should not be a 
-concern because guest_memfd doesn't support that yet.
+On Thu, Feb 22, 2024 at 11:24:59PM -0300, Thiago Jung Bauermann wrote:
+> Mark Brown <broonie@kernel.org> writes:
 
-> 
->>
->> Now, regarding the original question (disallow mapping the page), I see the
->> following approaches:
->>
->> 1) SIGBUS during page fault. There are other cases that can trigger
->>     SIGBUS during page faults: hugetlb when we are out of free hugetlb
->>     pages, userfaultfd with UFFD_FEATURE_SIGBUS.
->>
->> -> Simple and should get the job done.
->>
->> 2) folio_mmapped() + preventing new mmaps covering that folio
->>
->> -> More complicated, requires an rmap walk on every conversion.
->>
->> 3) Disallow any mmaps of the file while any page is private
->>
->> -> Likely not what you want.
->>
->>
->> Why was 1) abandoned? I looks a lot easier and harder to mess up. Why are
->> you trying to avoid page faults? What's the use case?
->>
-> 
-> We were chatting whether we could do better than the SIGBUS approach.
-> SIGBUS/FAULT usually crashes userspace, so I was brainstorming ways to
-> return errors early. One difference between hugetlb and this usecase is
-> that running out of free hugetlb pages isn't something we could detect
+> My rootfs is Ubuntu 22.04.3. In case it's useful, my kernel config is
+> here:
 
-With hugetlb reservation one can try detecting it at mmap() time. But as 
-reservations are not NUMA aware, it's not reliable.
+> https://people.linaro.org/~thiago.bauermann/gcs/config-v6.8.0-rc2
 
-> at mmap time. In guest_memfd usecase, we should be able to detect when
-> SIGBUS becomes possible due to memory being lent to guest.
-> 
-> I can't think of a reason why userspace would want/be able to resume
-> operation after trying to access a page that it shouldn't be allowed, so
-> SIGBUS is functional. The advantage of trying to avoid SIGBUS was
-> better/easier reporting to userspace.
+Does using defconfig make a difference for you?
 
-To me, it sounds conceptually easier and less error-prone to
+> Here are some firmware versions from early boot:
 
-1) Converting a page to private only if there are no unexpected
-    references (no mappings, GUP pins, ...)
-2) Disallowing mapping private pages and failing the page fault.
-3) Handling that small race window only (page lock?)
+These are (as you'd expect) the same.
 
-Instead of
+> It looks like our main differences are the kernel config and the distro.
 
-1) Converting a page to private only if there are no unexpected
-    references (no mappings, GUP pins, ...) and no VMAs covering it where
-    we could fault it in later
-2) Disallowing mmap when the range would contain any private page
-3) Handling races between mmap and page conversion
+Indeed.
 
--- 
-Cheers,
+--4XK/IPqd7iEUtIhJ
+Content-Type: application/pgp-signature; name="signature.asc"
 
-David / dhildenb
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXeClsACgkQJNaLcl1U
+h9BabAf/cpgfEVM3rUB3E+ztSqzGFbC8vSFUf7Y8lhyyC2yCzJVvWROYle2Au1N4
+JRDVph/nZGsbGjyJOWDudsQ8IfPw6m95s+21HkGPq7WI+97Y7gxQtf93zeMPr7Pd
+HWCr3QDaCFB+Fi6cdhukIJ+Q0HmaQExEt5Enpg5/ntl1oqafk6GiF5f2Ltzno+UG
+dWc07BNatMpKKSMict51j5K1n0Penjgc4B99WpRG3Vj5ErhBDRKjmTwTNW7qfRdE
+zxAHyE1N+Q4QSsXeQUXtsLMPP1ieXKLPbf5FwcaKIZMuOS03xP5kKJZ3jmn/DOVq
+V4ZcQAzA+dxVvH8SWCA8MFdxHym1mQ==
+=vAyG
+-----END PGP SIGNATURE-----
+
+--4XK/IPqd7iEUtIhJ--
