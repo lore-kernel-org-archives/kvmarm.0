@@ -1,244 +1,116 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8646D2E3EB
-	for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 11:13:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1352145FE5;
+	Tue, 27 Feb 2024 12:19:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709032416; cv=none; b=c4Nb6n0zQEt7gjj09oytsLq92cmYpMPxb0goqOoFyrVBG/ZOgnJCIwlvZY94Tf8EnFe+TL+8NZuuYyMWPSLjYO2hpewPKCIS2hRsBd4t2L0tXj1QfX9mCUT+qTiN83bcOiHGu0Hs06XASZuENtCtlX/qYqGIBFC1bmA9BY74ao8=
+	t=1709036363; cv=none; b=WYm2cPEu2wlAYt21d+BNYfWvh2mr4/Mls2Es9yg8vUw3bde/QGsU3Y+iK9CWz5PrH0TUYpE0E7OFNaRyc4Uf2gB9BuuHvBT2dUgare2yaDSrRXHUJMze1HVMvKx/ndjAuxPoaYnBeOuDar+xiSzA+Ci3DY9KtaAPIlO7FrlHQZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709032416; c=relaxed/simple;
-	bh=G3st7TS0Quj4TMM2kMls6eyZQXybBvZhsZY1mqdTgNc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HWXdg2bU3zIrT2oIlZ2S762RD/MUEP0L+YJQyZl01fmoKgLdJ8aepsjmUPz1fDfHv9k+fUz6L0nEY8w8dGjOcYbWW0QNixXB4y7YSUtSqeT1K5eODdVyhqbs5pA6yM88003zBkkUJlWdE021Gm014hokLCJSviVcFAMmMetpVeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3FD18DA7;
-	Tue, 27 Feb 2024 03:14:12 -0800 (PST)
-Received: from [10.163.48.107] (unknown [10.163.48.107])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3D7203F6C4;
-	Tue, 27 Feb 2024 03:13:27 -0800 (PST)
-Message-ID: <b134c30d-d855-41bb-a260-9f6437b77697@arm.com>
-Date: Tue, 27 Feb 2024 16:43:25 +0530
+	s=arc-20240116; t=1709036363; c=relaxed/simple;
+	bh=1jnYu+1dreShgBnY6P8ah6FUiK0jP61bmfktPpRRvmA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mz8FEr7BMBf2clwcfU+VNTaSCqLol1T6Q0UaR1OHAXstJ3P7SKjfqX4pra1XlFg1KWU/hX1ym2Xk0ICXE4KfeKURERsgDglUcF5msFp7iLV9hp7OQ2/5xTvFywOSwMLcH8fGTAMW3YLy9AFWqPRdOhXeIfzyMn63AQBI9NtlfXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e5IiFUeQ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e5IiFUeQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2E46C43394;
+	Tue, 27 Feb 2024 12:19:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709036362;
+	bh=1jnYu+1dreShgBnY6P8ah6FUiK0jP61bmfktPpRRvmA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=e5IiFUeQpWpfrHlLc2NoShlUWivRGWBb02ed2045EnpQf/dC2htcPT5NrsxM8lFpV
+	 N47cM+8V7lIakIuGdwZcLqyF1riY0p654CdGnY6rzdx7hJibhgoH4CkIIRp0iy4v9w
+	 Oe8KfYt4DtJ/FvDTr1QndgRLXFJakS4UQMhgXuPUY0DXODWh6CL1jR8PTiRhlX/VFg
+	 o2m5kr9c638k9ufQJsqJ2R1NqB5oCb/5DVys/DLwHHl5/TZNgCy5h5WJtlAHr3RROd
+	 3vQJaA77HrwVrjZg5xKmSIMGJ73J9wB1ElnAq1YApR8xYEH8EDpuz/ZNBOZPynChyG
+	 1DeUgq7/ziHdQ==
+Date: Tue, 27 Feb 2024 12:19:17 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] KVM: arm64: Reuse struct cpu_fp_state to track the
+ guest FP state
+Message-ID: <ce2b8cee-7ce0-4675-8b74-f455a206d7c8@sirena.org.uk>
+References: <20240226-kvm-arm64-group-fp-data-v1-0-07d13759517e@kernel.org>
+ <20240226-kvm-arm64-group-fp-data-v1-2-07d13759517e@kernel.org>
+ <Zd2KS3sVI-vPxurg@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V16 2/8] KVM: arm64: Prevent guest accesses into BRBE
- system registers/instructions
-Content-Language: en-US
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- will@kernel.org, catalin.marinas@arm.com, Mark Brown <broonie@kernel.org>,
- James Clark <james.clark@arm.com>, Rob Herring <robh@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Suzuki Poulose <suzuki.poulose@arm.com>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- linux-perf-users@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
- James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev
-References: <20240125094119.2542332-1-anshuman.khandual@arm.com>
- <20240125094119.2542332-3-anshuman.khandual@arm.com>
- <ZdYCUi9YVDNDz7fr@FVFF77S0Q05N>
- <ab50e67e-3d06-4ba7-a5f8-4684e9ef98a4@arm.com>
- <Zd2zy0oUk8XvoDJM@FVFF77S0Q05N>
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <Zd2zy0oUk8XvoDJM@FVFF77S0Q05N>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="bXSdeBv2ZD7+BSvR"
+Content-Disposition: inline
+In-Reply-To: <Zd2KS3sVI-vPxurg@linux.dev>
+X-Cookie: Please go away.
 
 
+--bXSdeBv2ZD7+BSvR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 2/27/24 15:34, Mark Rutland wrote:
-> On Fri, Feb 23, 2024 at 12:58:48PM +0530, Anshuman Khandual wrote:
->>
->>
->> On 2/21/24 19:31, Mark Rutland wrote:
->>> On Thu, Jan 25, 2024 at 03:11:13PM +0530, Anshuman Khandual wrote:
->>>> Currently BRBE feature is not supported in a guest environment. This hides
->>>> BRBE feature availability via masking ID_AA64DFR0_EL1.BRBE field.
->>>
->>> Does that means that a guest can currently see BRBE advertised in the
->>> ID_AA64DFR0_EL1.BRB field, or is that hidden by the regular cpufeature code
->>> today?
->>
->> IIRC it is hidden, but will have to double check. When experimenting for BRBE
->> guest support enablement earlier, following changes were need for the feature
->> to be visible in ID_AA64DFR0_EL1.
->>
->> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
->> index 646591c67e7a..f258568535a8 100644
->> --- a/arch/arm64/kernel/cpufeature.c
->> +++ b/arch/arm64/kernel/cpufeature.c
->> @@ -445,6 +445,7 @@ static const struct arm64_ftr_bits ftr_id_mmfr0[] = {
->>  };
->>  
->>  static const struct arm64_ftr_bits ftr_id_aa64dfr0[] = {
->> +       S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_BRBE_SHIFT, 4, ID_AA64DFR0_EL1_BRBE_IMP),
->>         S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_DoubleLock_SHIFT, 4, 0),
->>         ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_PMSVer_SHIFT, 4, 0),
->>         ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_CTX_CMPs_SHIFT, 4, 0),
->>
->> Should we add the following entry - explicitly hiding BRBE from the guest
->> as a prerequisite patch ?
->>
->> S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_BRBE_SHIFT, 4, ID_AA64DFR0_EL1_BRBE_NI)
-> 
-> Is it visbile currently, or is it hidden currently?
-> 
-> * If it is visible before this patch, that's a latent bug that we need to go
->   fix first, and that'll require more coordination.
-> 
-> * If it is not visible before this patch, there's no problem in the code, but
->   the commit message needs to explicitly mention that's the case as the commit
->   message currently implies it is visible by only mentioning hiding it.
-> 
-> ... so can you please double check as you suggested above? We should be able to
-> explain why it is or is not visible today.
+On Mon, Feb 26, 2024 at 11:07:55PM -0800, Oliver Upton wrote:
+> On Mon, Feb 26, 2024 at 08:44:11PM +0000, Mark Brown wrote:
 
-It is currently hidden i.e following code returns 1 in the host
-but returns 0 inside the guest.
+> >       vcpu->arch.fp_owner = FP_STATE_FREE;
 
-aa64dfr0 = read_sysreg_s(SYS_ID_AA64DFR0_EL1);
-brbe = cpuid_feature_extract_unsigned_field(aa64dfr0, ID_AA64DFR0_EL1_BRBE_SHIFT);
+...
 
-Hence - will update the commit message here as suggested.
+> > +	vcpu->arch.fp_state.st = &vcpu->arch.ctxt.fp_regs;
+> > +	vcpu->arch.fp_state.fp_type = &vcpu->arch.fp_type;
+> > +	vcpu->arch.fp_state.svcr = &vcpu->arch.svcr;
+> > +	vcpu->arch.fp_state.to_save = FP_STATE_FPSIMD;
 
-> 
-> Mark.
-> 
->>>> This also blocks guest accesses into BRBE system registers and instructions
->>>> as if the underlying hardware never implemented FEAT_BRBE feature.
->>>>
->>>> Cc: Marc Zyngier <maz@kernel.org>
->>>> Cc: Oliver Upton <oliver.upton@linux.dev>
->>>> Cc: James Morse <james.morse@arm.com>
->>>> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>> Cc: Catalin Marinas <catalin.marinas@arm.com>
->>>> Cc: Will Deacon <will@kernel.org>
->>>> Cc: kvmarm@lists.linux.dev
->>>> Cc: linux-arm-kernel@lists.infradead.org
->>>> Cc: linux-kernel@vger.kernel.org
->>>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
->>>> ---
->>>> Changes in V16:
->>>>
->>>> - Added BRB_INF_SRC_TGT_EL1 macro for corresponding BRB_[INF|SRC|TGT] expansion
->>>>
->>>>  arch/arm64/kvm/sys_regs.c | 56 +++++++++++++++++++++++++++++++++++++++
->>>>  1 file changed, 56 insertions(+)
->>>>
->>>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->>>> index 30253bd19917..6a06dc2f0c06 100644
->>>> --- a/arch/arm64/kvm/sys_regs.c
->>>> +++ b/arch/arm64/kvm/sys_regs.c
->>>> @@ -1304,6 +1304,11 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
->>>>  	return 0;
->>>>  }
->>>>  
->>>> +#define BRB_INF_SRC_TGT_EL1(n)					\
->>>> +	{ SYS_DESC(SYS_BRBINF##n##_EL1), undef_access },	\
->>>> +	{ SYS_DESC(SYS_BRBSRC##n##_EL1), undef_access },	\
->>>> +	{ SYS_DESC(SYS_BRBTGT##n##_EL1), undef_access }		\
->>>
->>> With the changes suggested on the previous patch, this would need to change to be:
->>>
->>> 	#define BRB_INF_SRC_TGT_EL1(n)					\
->>> 		{ SYS_DESC(SYS_BRBINF_EL1(n)), undef_access },	\
->>> 		{ SYS_DESC(SYS_BRBSRC_EL1(n)), undef_access },	\
->>> 		{ SYS_DESC(SYS_BRBTGT_EL1(n)), undef_access }	\
->>
->> Sure, already folded back in these above changes.
->>
->>>
->>>
->>> ... which would also be easier for backporting (if necessary), since those
->>> definitions have existed for a while.
->>>
->>> Otherwise (modulo Suzuki's comment about rebasing), this looks good to me.
->>
->> Okay.
->>
->>>
->>> Mark.
->>>
->>>>  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
->>>>  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
->>>>  	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
->>>> @@ -1707,6 +1712,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->>>>  	/* Hide SPE from guests */
->>>>  	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
->>>>  
->>>> +	/* Hide BRBE from guests */
->>>> +	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
->>>> +
->>>>  	return val;
->>>>  }
->>>>  
->>>> @@ -2195,6 +2203,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->>>>  	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
->>>>  	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
->>>>  	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
->>>> +	{ SYS_DESC(OP_BRB_IALL), undef_access },
->>>> +	{ SYS_DESC(OP_BRB_INJ), undef_access },
->>>>  
->>>>  	DBG_BCR_BVR_WCR_WVR_EL1(0),
->>>>  	DBG_BCR_BVR_WCR_WVR_EL1(1),
->>>> @@ -2225,6 +2235,52 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->>>>  	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
->>>>  	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
->>>>  
->>>> +	/*
->>>> +	 * BRBE branch record sysreg address space is interleaved between
->>>> +	 * corresponding BRBINF<N>_EL1, BRBSRC<N>_EL1, and BRBTGT<N>_EL1.
->>>> +	 */
->>>> +	BRB_INF_SRC_TGT_EL1(0),
->>>> +	BRB_INF_SRC_TGT_EL1(16),
->>>> +	BRB_INF_SRC_TGT_EL1(1),
->>>> +	BRB_INF_SRC_TGT_EL1(17),
->>>> +	BRB_INF_SRC_TGT_EL1(2),
->>>> +	BRB_INF_SRC_TGT_EL1(18),
->>>> +	BRB_INF_SRC_TGT_EL1(3),
->>>> +	BRB_INF_SRC_TGT_EL1(19),
->>>> +	BRB_INF_SRC_TGT_EL1(4),
->>>> +	BRB_INF_SRC_TGT_EL1(20),
->>>> +	BRB_INF_SRC_TGT_EL1(5),
->>>> +	BRB_INF_SRC_TGT_EL1(21),
->>>> +	BRB_INF_SRC_TGT_EL1(6),
->>>> +	BRB_INF_SRC_TGT_EL1(22),
->>>> +	BRB_INF_SRC_TGT_EL1(7),
->>>> +	BRB_INF_SRC_TGT_EL1(23),
->>>> +	BRB_INF_SRC_TGT_EL1(8),
->>>> +	BRB_INF_SRC_TGT_EL1(24),
->>>> +	BRB_INF_SRC_TGT_EL1(9),
->>>> +	BRB_INF_SRC_TGT_EL1(25),
->>>> +	BRB_INF_SRC_TGT_EL1(10),
->>>> +	BRB_INF_SRC_TGT_EL1(26),
->>>> +	BRB_INF_SRC_TGT_EL1(11),
->>>> +	BRB_INF_SRC_TGT_EL1(27),
->>>> +	BRB_INF_SRC_TGT_EL1(12),
->>>> +	BRB_INF_SRC_TGT_EL1(28),
->>>> +	BRB_INF_SRC_TGT_EL1(13),
->>>> +	BRB_INF_SRC_TGT_EL1(29),
->>>> +	BRB_INF_SRC_TGT_EL1(14),
->>>> +	BRB_INF_SRC_TGT_EL1(30),
->>>> +	BRB_INF_SRC_TGT_EL1(15),
->>>> +	BRB_INF_SRC_TGT_EL1(31),
->>>> +
->>>> +	/* Remaining BRBE sysreg addresses space */
->>>> +	{ SYS_DESC(SYS_BRBCR_EL1), undef_access },
->>>> +	{ SYS_DESC(SYS_BRBFCR_EL1), undef_access },
->>>> +	{ SYS_DESC(SYS_BRBTS_EL1), undef_access },
->>>> +	{ SYS_DESC(SYS_BRBINFINJ_EL1), undef_access },
->>>> +	{ SYS_DESC(SYS_BRBSRCINJ_EL1), undef_access },
->>>> +	{ SYS_DESC(SYS_BRBTGTINJ_EL1), undef_access },
->>>> +	{ SYS_DESC(SYS_BRBIDR0_EL1), undef_access },
->>>> +
->>>>  	{ SYS_DESC(SYS_MDCCSR_EL0), trap_raz_wi },
->>>>  	{ SYS_DESC(SYS_DBGDTR_EL0), trap_raz_wi },
->>>>  	// DBGDTR[TR]X_EL0 share the same encoding
->>>> -- 
->>>> 2.25.1
->>>>
+> I'm not too big of a fan of scattering the initialization in various
+> places... Why can't we have a unified helper for priming cpu_fp_state once
+> we know what we're dealing with?
+
+> That can be called from either kvm_setup_vcpu() or kvm_vcpu_finalize_sve()
+> depending on whether userspace signed up for SVE or not.
+
+It's just reflecting the existing structure of the code, we already
+split the initialisation between _create() and the SVE setup so this is
+just following along from that.
+
+I'm also happier with doing whatever initialisation we can prior to
+userspace getting involved, it wouldn't be an issue currently but this
+state is visible to userspace and it feels error prone to have it
+partially initialised when we aren't compelled to like we are with the
+configurability of the vector lengths.  Someone could too easily not
+notice that there's a window where the state is not yet initialised but
+userspace can try to access it when adding to the initisation function
+during future work.
+
+> > -		fpsimd_bind_state_to_cpu(&fp_state);
+> > +		fpsimd_bind_state_to_cpu(&vcpu->arch.fp_state);
+
+> Shouldn't we get rid of the fp_state local at this point? I'm pretty
+> sure a compiler would emit a warning here...
+
+Indeed, that was actually fixed locally - looks like that didn't make it
+into what got sent out somehow.
+
+--bXSdeBv2ZD7+BSvR
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXd00UACgkQJNaLcl1U
+h9ARiQf/YV2qnlrSCbRjTcYCelWbG/zwBa4+nA9ifX2NDoLB0bzL1SrgZcF7IPhV
+F8UvFLhSGVOorHSW/af9i5hCg0Vyp9cOVmgnZj5y39hskKWi9+LXtzOdoG3aVEUX
+LrQtHVIqeNRYPPyKv2VP9hcDTsbbRKdRsFXD8AYz6jYRKFpDa5vCDfd1ne6xA71i
+gqPhNQdhcvNGjLyDzBNBZ5yTBsdak7Ojpr401edQzXGl2EaH3qn58Hw0IU333YCq
+EkbiNwly1sI3BNhg8lXVl5D9pfu1HLNEA3nghUY1C+q41OC41ZKL20TZeKrkn9oA
+TEoFY5UKi3Ro0vi9EKdYIP5iReh1Bw==
+=U2fu
+-----END PGP SIGNATURE-----
+
+--bXSdeBv2ZD7+BSvR--
