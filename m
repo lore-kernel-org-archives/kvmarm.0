@@ -1,114 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10E35146910;
-	Tue, 27 Feb 2024 16:14:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC67A14C59D
+	for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 18:18:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709050470; cv=none; b=JVk862IcPEsv7ankVuCofQvHcXMsUAzqM5Dx9YC8xXlgfCX4LsyNA1FN5P1Qw86Bzbk4WZeuRRzEB7+CwfIDGiX5EL9sgGN1O+H2Qi0NF1XMBqBn1jO7Qr2QqLBf/fdZ/sH5IQdIvxUg16yJOCPLY8i1gOVO5EAz3yp4RuqK9Es=
+	t=1709057920; cv=none; b=fINIucDbcPiFtOxtYp6iUTaZb4++nd6qRebBlkzYPSDAr+99HnjPPXIb+cYPmp14WxpM7Y6P5qDPfjJ6y3LDLrwHT8o5otM0hDzSYS5D4RsDDDJkO8J+EYGv1H8Xaz4WT/MDtcWC/1pD7hFoE0+P7owqURVRr7XNERF6BlWZroM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709050470; c=relaxed/simple;
-	bh=Z0zdHdGOC4SxL9F4fOxTZqBNKee6nTHQxhkxmuHIUy0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rtmGEeKuvPcDMXbTbYJ2zrtr3qwpbX7FrgzLdRf3R38mfB+0pNW3+8XJw1AfiJNMieyaMB+9LumYzYQT+TuEXIHnkHOXnDL8SYWZQfHNxz43A6EiSB25CPmKkXyV4iPiJTVEHTaL2dH23TOAJvgCra2rTyWIvEa3Ar8MKX04kvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bu6/7a9p; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1709057920; c=relaxed/simple;
+	bh=qiEAxKzaK2EgDJCLqIEaZ/cT639kfZizVAJden8p1NQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=od11nGV7kjsDjiPj8mHiIyF993if1pfBFOH3OivUFNxCBSoC4R051bxZ1OAHHL/uhlXuEGCNjG+NNBxtE8If3nPVguZJWxoussJZYIRCewREZMoxHOdktbxUCPeUQdET9Rdh06x3PqSvFmUA5Rm8BKAYPXp6VRxXZeHkZKU31m8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SQ2EMDKw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bu6/7a9p"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88E15C433C7;
-	Tue, 27 Feb 2024 16:14:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SQ2EMDKw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27761C433F1;
+	Tue, 27 Feb 2024 18:18:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709050469;
-	bh=Z0zdHdGOC4SxL9F4fOxTZqBNKee6nTHQxhkxmuHIUy0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Bu6/7a9p0+arHtaKXxCctuJK9G25JMzbW0pwbRP43HOmbuMNqCWXbIHivT+3SBYMZ
-	 9Z4ouUH+AyfxbDMLHdHU7+7mkkDnVNyGnBHUcB+ZwwNRmRP51FhkAYq5CKL3UTbmoE
-	 DB+xHeddLTXOtf9IKAqE0dvA/4PIWfU3ueNrn5DlO8HzLcOUtj8WjCcyUj6BNlb/xU
-	 QbrcoC9cCuJ2bgEi1WNIcoMF7bSZ/e2/IG9KnSFMFnxBa2xeCX2bgrZGyUBPqxS/BC
-	 mTscCuzUtLrJRJPe3S4yN50sSOYiYXLMTnAeH9A8fHrDV4npTQ3Xx1CJbJABG24CJK
-	 KMCdpzNDk0URw==
-Date: Tue, 27 Feb 2024 16:14:20 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
+	s=k20201202; t=1709057920;
+	bh=qiEAxKzaK2EgDJCLqIEaZ/cT639kfZizVAJden8p1NQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SQ2EMDKwaD86JqZAvycQxO60q6j7Dn4hQW8IWIeiIkvVInfFbfQ/JujsqJ9QP+moT
+	 1FxxuwU7fjqLTaGi43sGQZGZIkmxSZKNd/bHb5rxPwDIUJaQohoVBPJWzf99lCg1Bi
+	 wcH4Q9jnhnbhIBwzrGRv+UpqPK6IRjq+8qKUjTUilIVNzPCseNl7HcBJDb1e1Q57iy
+	 cBfvSZdEiR62Xul/laK/OuKZhaiq8wsR/sWyTGx1ZD+8Ej9OcTDFXGB/vmlmG9enus
+	 BbdobUtSl20zjqP+s+aIpvVotP3h6HuDmqvdFtAbwO+0W8hCN5GiKCGHuHJvQbrfkg
+	 sIRNVyQKnHLQw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rf22H-007MCD-KA;
+	Tue, 27 Feb 2024 18:18:37 +0000
+Date: Tue, 27 Feb 2024 18:18:37 +0000
+Message-ID: <867cip3h4y.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Oleg Nesterov <oleg@redhat.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>,
-	"Rick P. Edgecombe" <rick.p.edgecombe@intel.com>,
-	Deepak Gupta <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-	"H.J. Lu" <hjl.tools@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Florian Weimer <fweimer@redhat.com>,
-	Christian Brauner <brauner@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v8 33/38] kselftest/arm64: Add a GCS test program built
- with the system libc
-Message-ID: <4adb0c7e-34a1-4c50-b011-6e31ef8813a7@sirena.org.uk>
-References: <20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org>
- <20240203-arm64-gcs-v8-33-c9fec77673ef@kernel.org>
- <87sf1n7uea.fsf@linaro.org>
- <9b899b4e-7410-4c3b-967b-7794dac742e4@sirena.org.uk>
- <87ttlzsyro.fsf@linaro.org>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/2] KVM: arm64: Fix splat relating to idregs debugfs
+In-Reply-To: <20240227094115.1723330-1-oliver.upton@linux.dev>
+References: <20240227094115.1723330-1-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="4XK/IPqd7iEUtIhJ"
-Content-Disposition: inline
-In-Reply-To: <87ttlzsyro.fsf@linaro.org>
-X-Cookie: Please go away.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Tue, 27 Feb 2024 09:41:13 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Looks like we're calling in to debugfs w/ preemption disabled, which
+> explodes when trying to take the parent inode's rwsem.
+> 
+> This is easy enough to work around, and we can just initialize at the
+> time of VM creation. No idreg values yet? Too bad, just kick an error
+> back at the user. All two of them.
+> 
+> Applies to kvmarm/next.
+> 
+> Oliver Upton (2):
+>   KVM: arm64: Fail the idreg iterator if idregs aren't initialized
+>   KVM: arm64: Don't initialize idreg debugfs w/ preemption disabled
 
---4XK/IPqd7iEUtIhJ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Thanks for tackling this!
 
-On Thu, Feb 22, 2024 at 11:24:59PM -0300, Thiago Jung Bauermann wrote:
-> Mark Brown <broonie@kernel.org> writes:
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-> My rootfs is Ubuntu 22.04.3. In case it's useful, my kernel config is
-> here:
+	M.
 
-> https://people.linaro.org/~thiago.bauermann/gcs/config-v6.8.0-rc2
-
-Does using defconfig make a difference for you?
-
-> Here are some firmware versions from early boot:
-
-These are (as you'd expect) the same.
-
-> It looks like our main differences are the kernel config and the distro.
-
-Indeed.
-
---4XK/IPqd7iEUtIhJ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXeClsACgkQJNaLcl1U
-h9BabAf/cpgfEVM3rUB3E+ztSqzGFbC8vSFUf7Y8lhyyC2yCzJVvWROYle2Au1N4
-JRDVph/nZGsbGjyJOWDudsQ8IfPw6m95s+21HkGPq7WI+97Y7gxQtf93zeMPr7Pd
-HWCr3QDaCFB+Fi6cdhukIJ+Q0HmaQExEt5Enpg5/ntl1oqafk6GiF5f2Ltzno+UG
-dWc07BNatMpKKSMict51j5K1n0Penjgc4B99WpRG3Vj5ErhBDRKjmTwTNW7qfRdE
-zxAHyE1N+Q4QSsXeQUXtsLMPP1ieXKLPbf5FwcaKIZMuOS03xP5kKJZ3jmn/DOVq
-V4ZcQAzA+dxVvH8SWCA8MFdxHym1mQ==
-=vAyG
------END PGP SIGNATURE-----
-
---4XK/IPqd7iEUtIhJ--
+-- 
+Without deviation from the norm, progress is not possible.
