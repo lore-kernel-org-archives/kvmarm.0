@@ -1,134 +1,282 @@
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C4014F998
-	for <kvmarm@lists.linux.dev>; Wed, 28 Feb 2024 14:01:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF8C14AD28
+	for <kvmarm@lists.linux.dev>; Wed, 28 Feb 2024 15:04:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709128904; cv=none; b=YZPx5EOpNupzQLVPjqzvvPxLg1BKL5z0ME4Plc4saXKUeWq5wRNlFyWts2pCukM6dYHEbK6JQgJtPny53l79QEGrC8zu/G9Ibg2BsUghA5eiqc/P96WkoDg1gWYaM6L85OMrW6Sgd9XiUOLbdFKSaSjgQTWWAXQY53UrN1TyZVY=
+	t=1709132678; cv=none; b=Iv/F15XL82gVvvJFPqXR7sXLYlpO2Uw8Dk6QsNVUjRzK4gRgAk3ldxqe9Uc+QtoZEedBqyimdyuHUktkpb8Qkm7/I4fVPZwEwF5llyB3pDHqojCirRowDEtvzRWMhFg7ZkrxKqyOVUtdp6fZgjPhAKrwI41MgNlM9K1jvLUEDjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709128904; c=relaxed/simple;
-	bh=xc76ZCeLWL3oTqKplyTXLIkjTzvs1c7E0/u3Cpm9N0M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OCA4gtg8ytkL8pLg1Ye7csBSqGQtoshBFDKXAHcPhpX3/MaaBiNVFlI2Wo+oRFA4VDcHqtfnycB+FN3IvvCbDxOf5fCfHwyiEc2Vx9mnE0jRR6Ezu7BwZyFhCM1hgf7VbsNkh6rowY2tkfpJbZcQyOEC5cHf7XiY4dLWloAHySE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J4BsQYHU; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1709132678; c=relaxed/simple;
+	bh=zV4+X266V/JuNuACFyKCNUvL7RQCGu1AtgltdLf8vvs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-type; b=KJkyp757BD/FKEiWxDS2OD9vMElD4SmUePs3bf915G7ODpH1pcvfOqq05FY92okMHzPGAYWiHy+v3CLQdZ18lfSnbDvxZNG+F0YWrpWAen6mUWiFGXduXUoH5gba8QUWrImR/DtQDmsQOv4NhHzt9ADB5FaANx3ev3K3rft0I4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jIaM/U3k; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J4BsQYHU"
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a34c5ca2537so742909966b.0
-        for <kvmarm@lists.linux.dev>; Wed, 28 Feb 2024 06:01:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709128901; x=1709733701; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EnEXRx8bnyUyfsm70CiXRdEbU0pNvdct3xMdEGSpg+U=;
-        b=J4BsQYHUJ+J31zs9elA4Ma0ws8egqKddc6pCfTJDaIAdufmQDd93CuJgg8zkiMFJoB
-         Y8P1smcvA7MqmzO5gp/WzpN5xtWmVG+IQP88hLPAUE8u5G9HigKgGagNDeQHAjY1nHPd
-         dOPW0OLPkK6gI+sk27NgPbEZcCiNWhi6qIGitRSzg4deN4bLFI96QlPQ++W2GiRreDJg
-         BDWyBNabUJE5UnhpyRHDcCDMMfV+CheFCmA8iJ0/tt9niiLBKOHzqsKGWX+aIqaarsQC
-         ty+VFqjxJxT24CHqO6WEhzjQ44x/q/yl4ovdRbaCthKnqkuPN5NQR7EQHhJQM3fqzLL4
-         pa+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709128901; x=1709733701;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EnEXRx8bnyUyfsm70CiXRdEbU0pNvdct3xMdEGSpg+U=;
-        b=h9hjSGX9V9Fnb2srxu+qU14wO3c+FO/T/ZsVdGlzgeeHdEnqgNLwgJXb8rcZ1Jz+T7
-         a8dr7zIUxPDS0rDy6coz+4kRqiUnlOABuq1hpyoVSmY8l1KHJOLDi/pNQx8QtyTadx9J
-         CE+hr/VOtc2QxB8hI/hROYaDI9PNjOexxmOjBRi2n1/DwEf1uvu5cvVLFapXpHEoqoig
-         Ha5GSzQm3BfgZ29HhlXPym8WymTUIx08JSDJXNzj0a4P+qjtDSxKvZ0lcZw3mfiZFtpd
-         JTeZA5jYHrXkOBvWUdCsxopLkFVE/rYNhyVUZSEFlaMMFpxUB3LeezS6PrxLkjv8UZ69
-         VISw==
-X-Forwarded-Encrypted: i=1; AJvYcCXG0GpvtTzRiOe6HhYM9HA5fVRNj1kFWnX23vxTiLf8QktFjnV/9+HFdIx8FCAlQ6qAIZYt36fQDYjmOO26x9zxrbwCq6k/
-X-Gm-Message-State: AOJu0YyCZ/gFMVPPJSZA03EJBz9XyxqSUbrxSGSjh0EqeqZJ4XBREHXs
-	2+6hLc3RzSOi4A3GTz71A0q5J91Ufdh6HSgfuf6a81j8GCeDKlGYKbNDb3iTjQ==
-X-Google-Smtp-Source: AGHT+IG+mMPw3nLKhBZME1EV6xBhg5as1F5Nh7tAbzSsU+HTsNt7AekMp+h4F9soXsgzhwe+C3070Q==
-X-Received: by 2002:a17:906:af0f:b0:a3f:384a:73ab with SMTP id lx15-20020a170906af0f00b00a3f384a73abmr8640197ejb.71.1709128900636;
-        Wed, 28 Feb 2024 06:01:40 -0800 (PST)
-Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
-        by smtp.gmail.com with ESMTPSA id cx9-20020a170907168900b00a43e8562566sm910600ejd.203.2024.02.28.06.01.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Feb 2024 06:01:39 -0800 (PST)
-Date: Wed, 28 Feb 2024 14:01:36 +0000
-From: Quentin Perret <qperret@google.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org,
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com,
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
-	xiaoyao.li@intel.com, yilun.xu@intel.com,
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
-	dmatlack@google.com, yu.c.zhang@linux.intel.com,
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
-	vannapurve@google.com, ackerleytng@google.com,
-	mail@maciej.szmigiero.name, michael.roth@amd.com,
-	wei.w.wang@intel.com, liam.merwick@oracle.com,
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
-	suzuki.poulose@arm.com, steven.price@arm.com,
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
-	quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
-	quic_pheragu@quicinc.com, catalin.marinas@arm.com,
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
-	maz@kernel.org, will@kernel.org, keirf@google.com
-Subject: Re: [RFC PATCH v1 00/26] KVM: Restricted mapping of guest_memfd at
- the host and pKVM/arm64 support
-Message-ID: <Zd88wFzxgGEWrhSb@google.com>
-References: <20240222161047.402609-1-tabba@google.com>
- <9e983090-f336-43b9-8f2b-5dabe7e73b72@redhat.com>
- <CA+EHjTyGDv0z=X_EN5NAv3ZuqHkPw0rPtGmxjmkc21JqZ+oJLw@mail.gmail.com>
- <a09996d9-17be-4017-9297-2004f0bc8ed3@redhat.com>
- <CA+EHjTxBOs3M7DNeUfq9EfpZ8wSw5Uh6SOr_fG_9V=xjTH2S_Q@mail.gmail.com>
- <0951868c-911d-4879-bc79-14b5d3959462@redhat.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jIaM/U3k"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1709132671;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A5w0UrDb88O9RJorQIIyDZcP2bQt2PRprTlXxIDoNBU=;
+	b=jIaM/U3keRArYn8Xly5XqqUx4hLCCQqkps6f+OsZCDvsLiZVMWrQS9rF+HPyRxIrDKpsOR
+	FLPRxaEBFutFpiGvDhaq0UikTaE0RYaUqizjal383PGUUOQjES9nX0VOhMT+v8ttZXskJF
+	iQOnm/uioxrXh2IwZJgUa9idpYrAq74=
+From: Andrew Jones <andrew.jones@linux.dev>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org
+Cc: pbonzini@redhat.com,
+	thuth@redhat.com,
+	kvmarm@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-s390@vger.kernel.org,
+	lvivier@redhat.com,
+	npiggin@gmail.com,
+	frankja@linux.ibm.com,
+	imbrenda@linux.ibm.com,
+	nrb@linux.ibm.com
+Subject: [kvm-unit-tests PATCH 03/13] treewide: lib/stack: Fix backtrace
+Date: Wed, 28 Feb 2024 16:04:19 +0100
+Message-ID: <20240228150416.248948-18-andrew.jones@linux.dev>
+In-Reply-To: <20240228150416.248948-15-andrew.jones@linux.dev>
+References: <20240228150416.248948-15-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0951868c-911d-4879-bc79-14b5d3959462@redhat.com>
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wednesday 28 Feb 2024 at 11:12:18 (+0100), David Hildenbrand wrote:
-> > > So you don't need any guest_memfd games to protect from that -- and one
-> > > doesn't have to travel back in time to have memory that isn't
-> > > swappable/migratable and only comes in one page size.
-> > > 
-> > > [I'm not up-to-date which obscure corner-cases CCA requirement the s390x
-> > > implementation cannot fulfill -- like replacing pages in page tables and
-> > > such; I suspect pKVM also cannot cover all these corner-cases]
-> > 
-> > Thanks for this. I'll do some more reading on how things work with s390x.
-> > 
-> > Right, and of course, one key difference of course is that pKVM
-> > doesn't encrypt anything, and only relies on stage-2 protection to
-> > protect the guest.
-> 
-> I don't remember what exactly s390x does, but I recall that it might only
-> encrypt the memory content as it transitions a page from secure to
-> non-secure.
-> 
-> Something like that could also be implemented using pKVM (unless I am
-> missing something), but it might not be that trivial, of course :)
+We should never pass the result of __builtin_frame_address(0) to
+another function since the compiler is within its rights to pop the
+frame to which it points before making the function call, as may be
+done for tail calls. Nobody has complained about backtrace(), so
+likely all compilations have been inlining backtrace_frame(), not
+dropping the frame on the tail call, or nobody is looking at traces.
+However, for riscv, when built for EFI, it does drop the frame on the
+tail call, and it was noticed. Preemptively fix backtrace() for all
+architectures.
 
-One of the complicated aspects of having the host migrate pages like so
-is for the hypervisor to make sure the content of the page has not been
-tempered with when the new page is re-mapped in the guest. That means
-having additional tracking in the hypervisor of pages that have been
-encrypted and returned to the host, indexed by IPA, with something like
-a 'checksum' of some sort, which is non-trivial to do securely from a
-cryptographic PoV.
+Fixes: 52266791750d ("lib: backtrace printing")
+Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+---
+ lib/arm/stack.c   | 13 +++++--------
+ lib/arm64/stack.c | 12 +++++-------
+ lib/riscv/stack.c | 12 +++++-------
+ lib/s390x/stack.c | 12 +++++-------
+ lib/stack.h       | 24 +++++++++++++++++-------
+ lib/x86/stack.c   | 12 +++++-------
+ 6 files changed, 42 insertions(+), 43 deletions(-)
 
-A simpler and secure way to do this is (I think) is to do
-hypervisor-assisted migration. IOW, pKVM exposes a new migrate_page(ipa,
-old_pa, new_pa) hypercall which Linux can call to migrate a page.
-pKVM unmaps the new page from the host stage-2, unmap the old page from
-guest stage-2, does the copy, wipes the old page, maps the pages in the
-respective page-tables, and off we go. That way the content is never
-visible to Linux and that avoids the problems I highlighted above by
-construction. The downside is that it doesn't work for swapping, but
-that is quite hard to do in general...
+diff --git a/lib/arm/stack.c b/lib/arm/stack.c
+index 7d081be7c6d0..66d18b47ea53 100644
+--- a/lib/arm/stack.c
++++ b/lib/arm/stack.c
+@@ -8,13 +8,16 @@
+ #include <libcflat.h>
+ #include <stack.h>
+ 
+-int backtrace_frame(const void *frame, const void **return_addrs,
+-		    int max_depth)
++int arch_backtrace_frame(const void *frame, const void **return_addrs,
++			 int max_depth, bool current_frame)
+ {
+ 	static int walking;
+ 	int depth;
+ 	const unsigned long *fp = (unsigned long *)frame;
+ 
++	if (current_frame)
++		fp = __builtin_frame_address(0);
++
+ 	if (walking) {
+ 		printf("RECURSIVE STACK WALK!!!\n");
+ 		return 0;
+@@ -33,9 +36,3 @@ int backtrace_frame(const void *frame, const void **return_addrs,
+ 	walking = 0;
+ 	return depth;
+ }
+-
+-int backtrace(const void **return_addrs, int max_depth)
+-{
+-	return backtrace_frame(__builtin_frame_address(0),
+-			       return_addrs, max_depth);
+-}
+diff --git a/lib/arm64/stack.c b/lib/arm64/stack.c
+index 82611f4b1815..f5eb57fd8892 100644
+--- a/lib/arm64/stack.c
++++ b/lib/arm64/stack.c
+@@ -8,7 +8,8 @@
+ 
+ extern char vector_stub_start, vector_stub_end;
+ 
+-int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
++int arch_backtrace_frame(const void *frame, const void **return_addrs,
++			 int max_depth, bool current_frame)
+ {
+ 	const void *fp = frame;
+ 	static bool walking;
+@@ -17,6 +18,9 @@ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
+ 	bool is_exception = false;
+ 	unsigned long addr;
+ 
++	if (current_frame)
++		fp = __builtin_frame_address(0);
++
+ 	if (walking) {
+ 		printf("RECURSIVE STACK WALK!!!\n");
+ 		return 0;
+@@ -54,9 +58,3 @@ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
+ 	walking = false;
+ 	return depth;
+ }
+-
+-int backtrace(const void **return_addrs, int max_depth)
+-{
+-	return backtrace_frame(__builtin_frame_address(0),
+-			       return_addrs, max_depth);
+-}
+diff --git a/lib/riscv/stack.c b/lib/riscv/stack.c
+index 712a5478d547..d865594b9671 100644
+--- a/lib/riscv/stack.c
++++ b/lib/riscv/stack.c
+@@ -2,12 +2,16 @@
+ #include <libcflat.h>
+ #include <stack.h>
+ 
+-int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
++int arch_backtrace_frame(const void *frame, const void **return_addrs,
++			 int max_depth, bool current_frame)
+ {
+ 	static bool walking;
+ 	const unsigned long *fp = (unsigned long *)frame;
+ 	int depth;
+ 
++	if (current_frame)
++		fp = __builtin_frame_address(0);
++
+ 	if (walking) {
+ 		printf("RECURSIVE STACK WALK!!!\n");
+ 		return 0;
+@@ -24,9 +28,3 @@ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
+ 	walking = false;
+ 	return depth;
+ }
+-
+-int backtrace(const void **return_addrs, int max_depth)
+-{
+-	return backtrace_frame(__builtin_frame_address(0),
+-			       return_addrs, max_depth);
+-}
+diff --git a/lib/s390x/stack.c b/lib/s390x/stack.c
+index 9f234a12adf6..d194f654e94d 100644
+--- a/lib/s390x/stack.c
++++ b/lib/s390x/stack.c
+@@ -14,11 +14,15 @@
+ #include <stack.h>
+ #include <asm/arch_def.h>
+ 
+-int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
++int arch_backtrace_frame(const void *frame, const void **return_addrs,
++			 int max_depth, bool current_frame)
+ {
+ 	int depth = 0;
+ 	struct stack_frame *stack = (struct stack_frame *)frame;
+ 
++	if (current_frame)
++		stack = __builtin_frame_address(0);
++
+ 	for (depth = 0; stack && depth < max_depth; depth++) {
+ 		return_addrs[depth] = (void *)stack->grs[8];
+ 		stack = stack->back_chain;
+@@ -28,9 +32,3 @@ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
+ 
+ 	return depth;
+ }
+-
+-int backtrace(const void **return_addrs, int max_depth)
+-{
+-	return backtrace_frame(__builtin_frame_address(0),
+-			       return_addrs, max_depth);
+-}
+diff --git a/lib/stack.h b/lib/stack.h
+index 10fc2f793354..6edc84344b51 100644
+--- a/lib/stack.h
++++ b/lib/stack.h
+@@ -11,17 +11,27 @@
+ #include <asm/stack.h>
+ 
+ #ifdef HAVE_ARCH_BACKTRACE_FRAME
+-extern int backtrace_frame(const void *frame, const void **return_addrs,
+-			   int max_depth);
++extern int arch_backtrace_frame(const void *frame, const void **return_addrs,
++				int max_depth, bool current_frame);
++
++static inline int backtrace_frame(const void *frame, const void **return_addrs,
++				  int max_depth)
++{
++	return arch_backtrace_frame(frame, return_addrs, max_depth, false);
++}
++
++static inline int backtrace(const void **return_addrs, int max_depth)
++{
++	return arch_backtrace_frame(NULL, return_addrs, max_depth, true);
++}
+ #else
+-static inline int
+-backtrace_frame(const void *frame __unused, const void **return_addrs __unused,
+-		int max_depth __unused)
++extern int backtrace(const void **return_addrs, int max_depth);
++
++static inline int backtrace_frame(const void *frame, const void **return_addrs,
++				  int max_depth)
+ {
+ 	return 0;
+ }
+ #endif
+ 
+-extern int backtrace(const void **return_addrs, int max_depth);
+-
+ #endif
+diff --git a/lib/x86/stack.c b/lib/x86/stack.c
+index 5ecd97ce90b9..58ab6c4b293a 100644
+--- a/lib/x86/stack.c
++++ b/lib/x86/stack.c
+@@ -1,12 +1,16 @@
+ #include <libcflat.h>
+ #include <stack.h>
+ 
+-int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
++int arch_backtrace_frame(const void *frame, const void **return_addrs,
++			 int max_depth, bool current_frame)
+ {
+ 	static int walking;
+ 	int depth = 0;
+ 	const unsigned long *bp = (unsigned long *) frame;
+ 
++	if (current_frame)
++		bp = __builtin_frame_address(0);
++
+ 	if (walking) {
+ 		printf("RECURSIVE STACK WALK!!!\n");
+ 		return 0;
+@@ -23,9 +27,3 @@ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
+ 	walking = 0;
+ 	return depth;
+ }
+-
+-int backtrace(const void **return_addrs, int max_depth)
+-{
+-	return backtrace_frame(__builtin_frame_address(0), return_addrs,
+-			       max_depth);
+-}
+-- 
+2.43.0
+
