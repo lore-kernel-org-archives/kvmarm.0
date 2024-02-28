@@ -1,131 +1,256 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE403145341
-	for <kvmarm@lists.linux.dev>; Wed, 28 Feb 2024 13:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A7273508
+	for <kvmarm@lists.linux.dev>; Wed, 28 Feb 2024 13:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709127248; cv=none; b=gmwbJ7youuTKF+AaIu+fNF5b+NjAu1FtuORAGwcFREJLRq/2gBwTempd1g10rhMePqbSNrn52zPAjPZ5vxfkoe/gyS7EjPNTJX4uvT3432M4iti7KPh0ldGNNpAMulQIVGRy5rfyO2jjoUHAVYmZ9M0G8yxgPBUANXGq/Il8Dfw=
+	t=1709127262; cv=none; b=Fr4h3BpW3WSBRlO3ef25ygCk2V8wE3mXGlc2ZvRYxmmlTeHB3662Ywszetjm+CPYy+yvOX/IfWB3NB80FkUOY2IgXuQeK/CAByVR32doI3v1ztpxCK1SaUtUR2ePpdjkw+Xl9FHtc/fokpc+L/mVozdAzNC4NhczuJ8RHiVmbcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709127248; c=relaxed/simple;
-	bh=1Z5GEE2jRYHSJRnYC7tg7IxQCI+nfsbBaarFpWs6BV8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I2RQ4w/pvR03quSAWaN0uKdJ1Dx9zfL6k9dB1n8CHEno1/JeQLJIBbAXalKWojLotSb1rlA7yUtNlHVHp06yIpaaHq3zQ5VQQSrL2Z6kIrolOPDanzFpQPwHZJQEGtQ41Q0ketmWm2PouWq7YhlHTCNhuQEpNlsUgDF7by49xmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O3srNkWs; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1709127262; c=relaxed/simple;
+	bh=ozl/hlU5zrJ7KnWlGiIKpovQ2nRt/k20Uwxhv7QksG8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bAGhsNAAT0qp+Ah8sQfSmaR0q9rqWLzHeGHolJjxruCBWxG/x+QyulRDmO4E8rJVXklL4zn//0u8+2n5l/4W/+JSX86Kz1wf4oRpPIKEtuhgf2tBhSuiBH/em1Cp3CAfS8DaJMTs5WLwu6C2magMPcgTn9+7ZeqRZqW4SIiT9gs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sAxZDwVx; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O3srNkWs"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709127246;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HD7Zn+ooZwqBG8+gZ+aapSG0LC1/KKa9iGT5T2W+rNg=;
-	b=O3srNkWswfNet5FUe1Da5F3p3GjtQGFICQ97VBuhoTgNpvSUnCGN0SF/hXkcEhmlWMpYyD
-	yC5/tPtg97ymj7y2OZUdMuWDC/COUv43GcjTbR4NBgcfe1rwlwa6BsYx5x/4vKxiG8QFuQ
-	Jt4i7qF1QC5vUZkoTq2cTQCYT0bE2H8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-464-bPI_D54UP_O7rFFUi_0zeA-1; Wed, 28 Feb 2024 08:34:03 -0500
-X-MC-Unique: bPI_D54UP_O7rFFUi_0zeA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33dcd5d117fso444515f8f.1
-        for <kvmarm@lists.linux.dev>; Wed, 28 Feb 2024 05:34:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sAxZDwVx"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-512e39226efso7168581e87.0
+        for <kvmarm@lists.linux.dev>; Wed, 28 Feb 2024 05:34:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709127259; x=1709732059; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=b+Bseu6VndN9Do7y+rDI8MGihp4rvxQrjFB6082I5iE=;
+        b=sAxZDwVxphK9qGMKH5vOPIUdHdiRojKnkiAt5G0xJh4TTOOP1vQ9DptIkg0ma3WxNo
+         bnwZPumY5taXSK86aynw/IvcSNIBbzEiq88UyFHYnUqt9RqAo4G7nFOIegsosh/guINY
+         puaEtZ3C3ISLEeI527PkqEqT8qkKJ9QsAckZ6iNzrHmMBJ3DauxwGzKmHrdoQERUZaSq
+         F6t5N7IeT9PMmPtJXB7KPOoIe9CYEZAnUEC6n3inA3poI08qr+1czarH9J1l8Zai5+uX
+         30POgroWIwo+PbnhGo6ThWQ2iDst0PkLpgrzlTbVnypPHHJlXVSg5B21Jn14h3f0mqyZ
+         QJtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709127242; x=1709732042;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HD7Zn+ooZwqBG8+gZ+aapSG0LC1/KKa9iGT5T2W+rNg=;
-        b=U17rOxwmZa8BwPUKLgHaaGIRN2r1nJHVVXI9pBjR89h6H/ttuieFfywzoYfUOtH3z7
-         qxslqU4y0TNKXJg+PLBBquB7DSg722Mex0CzOVxYwHiXstZ/3vpPMHyCmTxkmG5Pwu4n
-         bNjoyfB8v59USTIX3V7VulFMjyrne93mUWNwmdSXXFLviw27pYXrx7zRuoU2Yzza5Wfo
-         R2ZhtRXJ1c2NrS3e9S6Vn1eNaK/0wnPvSulhqnJFHNzZs1EMo6oUvcnjnq8aOpNN5jeq
-         0IZB7Gpu5Oe9FAxzAJxl2qj6V8UrWEfC0NN47dhq3f5T0LKbshIyQtyPh1aIhJa07nC4
-         NnLg==
-X-Gm-Message-State: AOJu0Yy7WsKx9BgROgYjIRG1seyPvX6gJUpVO9eL32npqxisYnT4mxm6
-	h94+kYO3wUOF6XEaSEnAqP0WvP3H7pJsPMU9AfPZkh27+PjoaxOb8zSJWnsE4UxIjHkjD4CvBFS
-	OR1j88hl0dMN11Lm6HSTZk+kex0F6uK38198SCTfbeGd5G2e3XGKgo2wKeU9bgP+PdTEqxP4ur3
-	UB4FRml5fk8PONRPzXITMakKfcDqE0
-X-Received: by 2002:a5d:4688:0:b0:33d:63b6:defd with SMTP id u8-20020a5d4688000000b0033d63b6defdmr2362104wrq.31.1709127242180;
-        Wed, 28 Feb 2024 05:34:02 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEtd2tk6xgK4hLDCtzHuf402VyxUlubL2Xe7rXGKCIAn572NNPGmDD2cCArVWu4nLnU9YuNdDYNkGJjwt1sgKw=
-X-Received: by 2002:a5d:4688:0:b0:33d:63b6:defd with SMTP id
- u8-20020a5d4688000000b0033d63b6defdmr2362079wrq.31.1709127241873; Wed, 28 Feb
- 2024 05:34:01 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709127259; x=1709732059;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b+Bseu6VndN9Do7y+rDI8MGihp4rvxQrjFB6082I5iE=;
+        b=OFRtsLzO9WRADtwxqTGwJ9GDa6O+BWhIQPe7a5Iz6r4vfsLOvGHqjjTJW6FUCtnemA
+         ODfiqn+uiUDn0LL4CdUdzvwTgmW2YPa3k0pgOR748WYCimekIYBwgSFFAfpgddaEpGc1
+         u0rp8T706s2+2vBBF6MY2Vet1l/HUF2zecXCNOkWMupwDor70TbiBDIWK+n7Gjajkxc+
+         iNSQt+F7ng5GsVb/QmRirB609HeBNDkrXRm0AEBSQrfplXyjGFRe04rCJ3+cjmzhenzB
+         RfJO2kYHwOEwz6+z+SzyVX/GbiOirxRRQQRz4Cnpf8fi94KrukCnQuABMAiC2BUXRyux
+         ksAA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+qEadGfLiYZYSTo0c9v0aAIdktTfLE1M2K5XbnNlHlJZpLF9uDPbyVqewcCoXIZJ2XNtWr1hocoSsX/flVj5cBA/dhh05
+X-Gm-Message-State: AOJu0YwMpu9b09UNASOi4kDVT2vjuiW57Vg6d9Ruz1PQL0Z0YzP8o7wy
+	w/mH1J3UEhG2ZTPJaUklFdhqrFEunSOa62bdh59jeO0Zr1C2KkiSSstydDEtJA==
+X-Google-Smtp-Source: AGHT+IHx9YONxPQwfsNJ4nIYylqWhaR1HBz0xEBN39j+kSw5uXUNC/Qhzhc9E2hw/epJxMh2XsXTaQ==
+X-Received: by 2002:a05:6512:3450:b0:513:150c:dca2 with SMTP id j16-20020a056512345000b00513150cdca2mr1981528lfr.37.1709127258676;
+        Wed, 28 Feb 2024 05:34:18 -0800 (PST)
+Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
+        by smtp.gmail.com with ESMTPSA id if3-20020a0564025d8300b0056659364b0fsm1012216edb.51.2024.02.28.05.34.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Feb 2024 05:34:18 -0800 (PST)
+Date: Wed, 28 Feb 2024 13:34:15 +0000
+From: Quentin Perret <qperret@google.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+	seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org,
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
+	dmatlack@google.com, yu.c.zhang@linux.intel.com,
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+	vannapurve@google.com, ackerleytng@google.com,
+	mail@maciej.szmigiero.name, michael.roth@amd.com,
+	wei.w.wang@intel.com, liam.merwick@oracle.com,
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+	suzuki.poulose@arm.com, steven.price@arm.com,
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com,
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com,
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org,
+	keirf@google.com, linux-mm@kvack.org
+Subject: Re: folio_mmapped
+Message-ID: <Zd82V1aY-ZDyaG8U@google.com>
+References: <20240222161047.402609-1-tabba@google.com>
+ <20240222141602976-0800.eberman@hu-eberman-lv.qualcomm.com>
+ <ZdfoR3nCEP3HTtm1@casper.infradead.org>
+ <40a8fb34-868f-4e19-9f98-7516948fc740@redhat.com>
+ <20240226105258596-0800.eberman@hu-eberman-lv.qualcomm.com>
+ <925f8f5d-c356-4c20-a6a5-dd7efde5ee86@redhat.com>
+ <Zd8PY504BOwMR4jO@google.com>
+ <755911e5-8d4a-4e24-89c7-a087a26ec5f6@redhat.com>
+ <Zd8qvwQ05xBDXEkp@google.com>
+ <99a94a42-2781-4d48-8b8c-004e95db6bb5@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240227224249.2209194-1-oliver.upton@linux.dev> <20240227224249.2209194-2-oliver.upton@linux.dev>
-In-Reply-To: <20240227224249.2209194-2-oliver.upton@linux.dev>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 28 Feb 2024 14:33:50 +0100
-Message-ID: <CABgObfY=fLa2aDBEHBvnhATHdsVyJX7Mx6q3gLRCAUMaYh3=zw@mail.gmail.com>
-Subject: Re: [PATCH 01/20] KVM: Treat the device list as an rculist
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Eric Auger <eric.auger@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <99a94a42-2781-4d48-8b8c-004e95db6bb5@redhat.com>
 
-On Tue, Feb 27, 2024 at 11:43=E2=80=AFPM Oliver Upton <oliver.upton@linux.d=
-ev> wrote:
-> A subsequent change to KVM/arm64 will necessitate walking the device
-> list outside of the kvm->lock. Prepare by converting to an rculist.
-> Note that this has zero effect the destruction path, as every reader
-> should be protected by a valid reference on the KVM struct.
->
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+On Wednesday 28 Feb 2024 at 14:00:50 (+0100), David Hildenbrand wrote:
+> > > > To add a layer of paint to the shed, the usage of SIGBUS for
+> > > > something that is really a permission access problem doesn't feel
+> > > 
+> > > SIGBUS stands for "BUS error (bad memory access)."
+> > > 
+> > > Which makes sense, if you try accessing something that can no longer be
+> > > accessed. It's now inaccessible. Even if it is temporarily.
+> > > 
+> > > Just like a page with an MCE error. Swapin errors. Etc. You cannot access
+> > > it.
+> > > 
+> > > It might be a permission problem on the pKVM side, but it's not the
+> > > traditional "permission problem" as in mprotect() and friends. You cannot
+> > > resolve that permission problem yourself. It's a higher entity that turned
+> > > that memory inaccessible.
+> > 
+> > Well that's where I'm not sure to agree. Userspace can, in fact, get
+> > back all of that memory by simply killing the protected VM. With the
+> 
+> Right, but that would likely "wipe" the pages so they can be made accessible
+> again, right?
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Yep, indeed.
 
+> That's the whole point why we are handing the pages over to the "higher
+> entity", and allow someone else (the VM) to turn them into a state where we
+> can no longer read them.
+> 
+> (if you follow the other discussion, it would actually be nice if we could
+> read them and would get encrypted content back, like s390x does; but that's
+> a different discussion and I assume pretty much out of scope :) )
 
-> ---
->  virt/kvm/kvm_main.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
->
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index c681149c382a..a1423f8064b0 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1326,10 +1326,12 @@ static void kvm_destroy_devices(struct kvm *kvm)
->         /*
->          * We do not need to take the kvm->lock here, because nobody else
->          * has a reference to the struct kvm at this point and therefore
-> -        * cannot access the devices list anyhow.
-> +        * cannot access the devices list anyhow. Furthermore, there are =
-no RCU
-> +        * readers after the last reference is dropped, so there is no ne=
-ed to
-> +        * defer destruction until a grace period has elapsed.
->          */
->         list_for_each_entry_safe(dev, tmp, &kvm->devices, vm_node) {
-> -               list_del(&dev->vm_node);
-> +               list_del_rcu(&dev->vm_node);
->                 dev->ops->destroy(dev);
->         }
->  }
-> @@ -4781,7 +4783,7 @@ static int kvm_ioctl_create_device(struct kvm *kvm,
->                 kfree(dev);
->                 return ret;
->         }
-> -       list_add(&dev->vm_node, &kvm->devices);
-> +       list_add_rcu(&dev->vm_node, &kvm->devices);
->         mutex_unlock(&kvm->lock);
->
->         if (ops->init)
-> --
-> 2.44.0.rc1.240.g4c46232300-goog
->
+Interesting, I'll read up. On a side note, I'm also considering adding a
+guest-facing hypervisor interface to let the guest decide to opt out of
+the hypervisor wipe as discussed above. That would be useful for a guest
+that is shutting itself down (which could be cooperating with the host
+Linux) and that knows it has erased its secrets. That is in general
+difficult to do for an OS, but a simple approach could be to poison all
+its memory (or maybe encrypt it?) before opting out of that wipe.
 
+The hypervisor wipe is done in hypervisor context (obviously), which is
+non-preemptible, so avoiding wiping (or encrypting) loads of memory
+there is highly desirable. Also pKVM doesn't have a linear map of all
+memory for security reasons, so we need to map/unmap the pages one by
+one, which sucks as much as it sounds.
+
+But yes, we're digressing, that is all for later :)
+
+> > approach suggested here, the guestmem pages are entirely accessible to
+> > the host until they are attached to a running protected VM which
+> > triggers the protection. It is very much userspace saying "I promise not
+> > to touch these pages from now on" when it does that, in a way that I
+> > personally find very comparable to the mprotect case. It is not some
+> > other entity that pulls the carpet from under userspace's feet, it is
+> > userspace being inconsistent with itself that causes the issue here, and
+> > that's why SIGBUS feels kinda wrong as it tends to be used to report
+> > external errors of some sort.
+> 
+> I recall that user space can also trigger SIGBUS when doing some
+> mmap()+truncate() thingies, and probably a bunch more, that could be fixed
+> up later.
+
+Right, so that probably still falls into "there is no page" bucket
+rather than the "there is a page that is already accounted against the
+userspace process, but it doesn't have the permission to access it
+bucket. But yes that's probably an infinite debate.
+
+> I don't see a problem with SIUGBUS here, but I do understand your view. I
+> consider the exact signal a minor detail, though.
+> 
+> > 
+> > > > appropriate. Allocating memory via guestmem and donating that to a
+> > > > protected guest is a way for userspace to voluntarily relinquish access
+> > > > permissions to the memory it allocated. So a userspace process violating
+> > > > that could, IMO, reasonably expect a SEGV instead of SIGBUS. By the
+> > > > point that signal would be sent, the page would have been accounted
+> > > > against that userspace process, so not sure the paging examples that
+> > > > were discussed earlier are exactly comparable. To illustrate that
+> > > > differently, given that pKVM and Gunyah use MMU-based protection, there
+> > > > is nothing architecturally that prevents a guest from sharing a page
+> > > > back with Linux as RO.
+> > > 
+> > > Sure, then allow page faults that allow for reads and give a signal on write
+> > > faults.
+> > > 
+> > > In the scenario, it even makes more sense to not constantly require new
+> > > mmap's from user space just to access a now-shared page.
+> > > 
+> > > > Note that we don't currently support this, so I
+> > > > don't want to conflate this use case, but that hopefully makes it a
+> > > > little more obvious that this is a "there is a page, but you don't
+> > > > currently have the permission to access it" problem rather than "sorry
+> > > > but we ran out of pages" problem.
+> > > 
+> > > We could user other signals, at least as the semantics are clear and it's
+> > > documented. Maybe SIGSEGV would be warranted.
+> > > 
+> > > I consider that a minor detail, though.
+> > > 
+> > > Requiring mmap()/munmap() dances just to access a page that is now shared
+> > > from user space sounds a bit suboptimal. But I don't know all the details of
+> > > the user space implementation.
+> > 
+> > Agreed, if we could save having to mmap() each page that gets shared
+> > back that would be a nice performance optimization.
+> > 
+> > > "mmap() the whole thing once and only access what you are supposed to
+ (> > > access" sounds reasonable to me. If you don't play by the rules, you get a
+> > > signal.
+> > 
+> > "... you get a signal, or maybe you don't". But yes I understand your
+> > point, and as per the above there are real benefits to this approach so
+> > why not.
+> > 
+> > What do we expect userspace to do when a page goes from shared back to
+> > being guest-private, because e.g. the guest decides to unshare? Use
+> > munmap() on that page? Or perhaps an madvise() call of some sort? Note
+> > that this will be needed when starting a guest as well, as userspace
+> > needs to copy the guest payload in the guestmem file prior to starting
+> > the protected VM.
+> 
+> Let's assume we have the whole guest_memfd mapped exactly once in our
+> process, a single VMA.
+> 
+> When setting up the VM, we'll write the payload and then fire up the VM.
+> 
+> That will (I assume) trigger some shared -> private conversion.
+> 
+> When we want to convert shared -> private in the kernel, we would first
+> check if the page is currently mapped. If it is, we could try unmapping that
+> page using an rmap walk.
+
+I had not considered that. That would most certainly be slow, but a well
+behaved userspace process shouldn't hit it so, that's probably not a
+problem...
+
+> Then, we'd make sure that there are really no other references and protect
+> against concurrent mapping of the page. Now we can convert the page to
+> private.
+
+Right.
+
+Alternatively, the shared->private conversion happens in the KVM vcpu
+run loop, so we'd be in a good position to exit the VCPU_RUN ioctl with a
+new exit reason saying "can't donate that page while it's shared" and
+have userspace use MADVISE_DONTNEED or munmap, or whatever on the back
+of that. But I tend to prefer the rmap option if it's workable as that
+avoids adding new KVM userspace ABI.
+
+> As we want to avoid the rmap walk, user space can be nice and simply
+> MADV_DONTNEED the shared memory portions once it's done with it. For
+> example, after writing the payload.
+
+That makes sense to me.
+
+Thanks,
+Quentin
