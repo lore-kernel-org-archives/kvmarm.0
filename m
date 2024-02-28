@@ -1,201 +1,127 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BABF15D5CE
-	for <kvmarm@lists.linux.dev>; Wed, 28 Feb 2024 16:08:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66347FBD7
+	for <kvmarm@lists.linux.dev>; Wed, 28 Feb 2024 17:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709136488; cv=none; b=ag77bO1c3+p+9i8vRear14u3nPEUz9SMVXbLAsHvCPz2f7X/f/R7LYMZ/T9J7lixkJysG3c2CWL/UzdArai7RTEX009Fy3v7hfJwP8OFDOc5miRahhPmHYKNsmQFynhtTkrVfiqAywrQQfgw5NFvmf6gHE/vkHTAPg6/SliVoWs=
+	t=1709140712; cv=none; b=GjuJfQ8CCLFA9oNaAieJCdTJaGe+20SsTqD69KbPDuEJAab5gjjMM7judrzR4LTHBbTtqWcSn8qmS7pHhdrigUKmDYHMH0dvgzF1LLQPfESy/4GlB/+M7Qg6evPMbzhQ3hfqmx4MJRv+fTafa3SZmRWvJScwX4C68kD128Db6Tc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709136488; c=relaxed/simple;
-	bh=Ici6SGl/O6VfHPgTIKijM8kxjG1VHFI+ROt9a9T32Fc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ppLBYpk5h43DFdCxNy2tR08cTSivYCD1nqkNLG/R+8yIBQ+PYJvBUhHxkFrjxhch1ysqZnFPNGUjNDnmOmG0OCy3qH4jLNSTJ3N++EX/lpzPn22Wym2sDULj098AQjTdRNlgQjrKydb3sTXMFUfYl01MVPya2tdbW4/8emH5KSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 39FA9C15;
-	Wed, 28 Feb 2024 08:08:45 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E57F63F762;
-	Wed, 28 Feb 2024 08:08:04 -0800 (PST)
-Date: Wed, 28 Feb 2024 16:08:00 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2 06/13] KVM: arm64: nv: Fast-track 'InHost' exception
- returns
-Message-ID: <20240228160800.GA3373815@e124191.cambridge.arm.com>
-References: <20240226100601.2379693-1-maz@kernel.org>
- <20240226100601.2379693-7-maz@kernel.org>
+	s=arc-20240116; t=1709140712; c=relaxed/simple;
+	bh=gdFLQtxmNl1zgubYebAtGvBdFMcqW1L9ozD/jkqzkA0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=uDX3101aKPcjCFJNjYQJOxwEidIdWEJowbyI/pGYZ07rTaXpiuU+DAIpgcNG46VtSwDHQpFxmWtsmNEscGsRoKGINwA5ZO7InBYl8u63iEY5a6QtFuQ50mr1BbciN36Q0Gc3hT09jH6nIdoLdOtOfnfOkCXmphwGXdsBsREK00g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ozciiPZz; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ozciiPZz"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6e4867c8ea5so4703477b3a.1
+        for <kvmarm@lists.linux.dev>; Wed, 28 Feb 2024 09:18:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709140710; x=1709745510; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3Wwd3A5xmYab7uI61nAv21c7S/JtMuKnzWjHlvyxvYw=;
+        b=ozciiPZzjWhI2ZBdD23LdEx0olAf7267hjweyS90FSIhPEcyKIwXBPt5KqfW3/YDrz
+         Xzn8m2JsszS94lovlBP0xG6CbFMYPGKxGIbb51htiurTNg0RcsfcFHQqrb+RW1vE/s/B
+         NM+i4gf3SDtTavEoKqZQ2O4qoCMvrdC3QJvLlHGQ8S2r1+EvsH3Deav4gllFuu7bs1Rt
+         h4iBc8wdbv5a8Loh8+yJc5IFK0EwRjGEw6X89rP2pJy4SUIwyWo29HNsAUhq34hwP5Nj
+         Rlr6OXSe+pRWCCj3t+qHXHHlt7/YZ53x4sGAh6ZP9y3FExq02EKJsCahXvlb8PcR7Nh0
+         RrDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709140710; x=1709745510;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3Wwd3A5xmYab7uI61nAv21c7S/JtMuKnzWjHlvyxvYw=;
+        b=n9fr2eGrICy59PAgjoAH+j5N1tK22t6bTRazj2pM6cfkwfJ/va+rt3ZstwzwB3Z4ok
+         x7jzNjfGppl0JfBUDFAJFwMXsjVcja3SjPgDs901ub/iCLATseLbgaWnlnvpBybn4b6f
+         cDvArl2OByruwse3w0RMngZ4uX+XptDLWN1iXXN4XFRqyxey26cbLMFzOm19Wwugi4li
+         wAOW/URcVhv6zc6j7AQlxBdFTfXciinDiDWnmNoo75D/MKnc9Rfnqx5YrOkYlA0OdTV8
+         xsPOMd78ow+xDBYlHJva2pl7ibSQLxgj5CRdna9GIXHN9zHmlm3gY0RUWqtxIWM5CNGl
+         la1A==
+X-Gm-Message-State: AOJu0YxlzGNNuimMFfYgQcGn3ssR+AxXoy0IUftOttR188IFuXnkQy51
+	WL3G94Nl32rmPfzBY4rXVGFHz6bE2l06BAyntmB1s6x/KE2ipZZIpn+ggKjNfUhZMn++avw/OQM
+	7xg==
+X-Google-Smtp-Source: AGHT+IHY3hfhNXeDtGP5NSA8+7LCTeObrtBft8/FQQX9fhmX2SiBjzDhRINwSxhE4e/94bcjHFqUyUh+s9Q=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1801:b0:6e5:3b98:b545 with SMTP id
+ y1-20020a056a00180100b006e53b98b545mr10648pfa.1.1709140710076; Wed, 28 Feb
+ 2024 09:18:30 -0800 (PST)
+Date: Wed, 28 Feb 2024 09:18:28 -0800
+In-Reply-To: <20240227224249.2209194-2-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240226100601.2379693-7-maz@kernel.org>
+Mime-Version: 1.0
+References: <20240227224249.2209194-1-oliver.upton@linux.dev> <20240227224249.2209194-2-oliver.upton@linux.dev>
+Message-ID: <Zd9q5KbkLnh5Wddf@google.com>
+Subject: Re: [PATCH 01/20] KVM: Treat the device list as an rculist
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Eric Auger <eric.auger@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Feb 26, 2024 at 10:05:54AM +0000, Marc Zyngier wrote:
-> A significant part of the FEAT_NV extension is to trap ERET
-> instructions so that the hypervisor gets a chance to switch
-> from a vEL2 L1 guest to an EL1 L2 guest.
-> 
-> But this also has the unfortunate consequence of trapping ERET
-> in unsuspecting circumstances, such as staying at vEL2 (interrupt
-> handling while being in the guest hypervisor), or returning to host
-> userspace in the case of a VHE guest.
-> 
-> Although we already make some effort to handle these ERET quicker
-> by not doing the put/load dance, it is still way too far down the
-> line for it to be efficient enough.
-> 
-> For these cases, it would ideal to ERET directly, no question asked.
-> Of course, we can't do that. But the next best thing is to do it as
-> early as possible, in fixup_guest_exit(), much as we would handle
-> FPSIMD exceptions.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+On Tue, Feb 27, 2024, Oliver Upton wrote:
+> A subsequent change to KVM/arm64 will necessitate walking the device
+> list outside of the kvm->lock. Prepare by converting to an rculist.
+> Note that this has zero effect the destruction path, as every reader
+> should be protected by a valid reference on the KVM struct.
+
+This should leave the destruction path alone then.  Simply using list_del_rcu()
+doesn't convert this to an rculist, you need to actually synchronize against RCU
+for this to have any meaning/protection.  The above alludes to this, and the
+comment in kvm_destroy_devices() helps a little, but the code itself is actively
+misleading.
+
+I don't know how I feel about using list_add_rcu() in combination with list_del(),
+but I like it a lot better than using list_del_rcu() in a way that is blatantly
+wrong.
+
+So if we don't have a better option, I would much rather do only the list_add_rcu(),
+and add a comment _there_ explaining why KVM inserts with RCU protection, but
+frees using regular ol' list_del().
+
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/kvm/emulate-nested.c | 29 +++-------------------
->  arch/arm64/kvm/hyp/vhe/switch.c | 44 +++++++++++++++++++++++++++++++++
->  2 files changed, 47 insertions(+), 26 deletions(-)
+>  virt/kvm/kvm_main.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 2d80e81ae650..63a74c0330f1 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -2172,8 +2172,7 @@ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
->  
->  void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
->  {
-> -	u64 spsr, elr, mode;
-> -	bool direct_eret;
-> +	u64 spsr, elr;
->  
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index c681149c382a..a1423f8064b0 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1326,10 +1326,12 @@ static void kvm_destroy_devices(struct kvm *kvm)
 >  	/*
->  	 * Forward this trap to the virtual EL2 if the virtual
-> @@ -2182,33 +2181,11 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
->  	if (forward_traps(vcpu, HCR_NV))
->  		return;
->  
-> -	/*
-> -	 * Going through the whole put/load motions is a waste of time
-> -	 * if this is a VHE guest hypervisor returning to its own
-> -	 * userspace, or the hypervisor performing a local exception
-> -	 * return. No need to save/restore registers, no need to
-> -	 * switch S2 MMU. Just do the canonical ERET.
-> -	 */
-> -	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
-> -	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
-> -
-> -	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
-> -
-> -	direct_eret  = (mode == PSR_MODE_EL0t &&
-> -			vcpu_el2_e2h_is_set(vcpu) &&
-> -			vcpu_el2_tge_is_set(vcpu));
-> -	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
-> -
-> -	if (direct_eret) {
-> -		*vcpu_pc(vcpu) = vcpu_read_sys_reg(vcpu, ELR_EL2);
-> -		*vcpu_cpsr(vcpu) = spsr;
-> -		trace_kvm_nested_eret(vcpu, *vcpu_pc(vcpu), spsr);
-> -		return;
-> -	}
-> -
->  	preempt_disable();
->  	kvm_arch_vcpu_put(vcpu);
->  
-> +	spsr = __vcpu_sys_reg(vcpu, SPSR_EL2);
-> +	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
->  	elr = __vcpu_sys_reg(vcpu, ELR_EL2);
->  
->  	trace_kvm_nested_eret(vcpu, elr, spsr);
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index d5fdcea2b366..eaf242b8e0cf 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -206,6 +206,49 @@ void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu)
->  	__vcpu_put_switch_sysregs(vcpu);
+>  	 * We do not need to take the kvm->lock here, because nobody else
+>  	 * has a reference to the struct kvm at this point and therefore
+> -	 * cannot access the devices list anyhow.
+> +	 * cannot access the devices list anyhow. Furthermore, there are no RCU
+> +	 * readers after the last reference is dropped, so there is no need to
+> +	 * defer destruction until a grace period has elapsed.
+>  	 */
+>  	list_for_each_entry_safe(dev, tmp, &kvm->devices, vm_node) {
+> -		list_del(&dev->vm_node);
+> +		list_del_rcu(&dev->vm_node);
+>  		dev->ops->destroy(dev);
+>  	}
 >  }
+> @@ -4781,7 +4783,7 @@ static int kvm_ioctl_create_device(struct kvm *kvm,
+>  		kfree(dev);
+>  		return ret;
+>  	}
+> -	list_add(&dev->vm_node, &kvm->devices);
+> +	list_add_rcu(&dev->vm_node, &kvm->devices);
+>  	mutex_unlock(&kvm->lock);
 >  
-> +static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
-> +{
-> +	u64 spsr, mode;
-> +
-> +	/*
-> +	 * Going through the whole put/load motions is a waste of time
-> +	 * if this is a VHE guest hypervisor returning to its own
-> +	 * userspace, or the hypervisor performing a local exception
-> +	 * return. No need to save/restore registers, no need to
-> +	 * switch S2 MMU. Just do the canonical ERET.
-> +	 *
-> +	 * Unless the trap has to be forwarded further down the line,
-> +	 * of course...
-> +	 */
-> +	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
-> +		return false;
-> +
-> +	spsr = read_sysreg_el1(SYS_SPSR);
-> +	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
-> +
-> +	switch (mode) {
-> +	case PSR_MODE_EL0t:
-> +		if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
-> +			return false;
-> +		break;
-> +	case PSR_MODE_EL2t:
-> +		mode = PSR_MODE_EL1t;
-> +		break;
-> +	case PSR_MODE_EL2h:
-> +		mode = PSR_MODE_EL1h;
-> +		break;
-> +	default:
-> +		return false;
-> +	}
-
-Thanks for pointing out to_hw_pstate() (off-list), I spent far too long trying
-to understand how the original code converted PSTATE.M from (v)EL2 to EL1, and
-missed that while browsing.
-
-Seems hard to re-use to_hw_pstate() here, since we want the early returns.
-
-> +
-> +	spsr = (spsr & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
-
-I don't think we need to mask out PSR_MODE32_BIT here again, since if it was
-set in `mode`, it wouldn't have matched in the switch statement. It's possibly
-out of 'defensiveness' though. And I'm being nitpicky.
-
-> +
-> +	write_sysreg_el2(spsr, SYS_SPSR);
-> +	write_sysreg_el2(read_sysreg_el1(SYS_ELR), SYS_ELR);
-> +
-> +	return true;
-> +}
-> +
->  static const exit_handler_fn hyp_exit_handlers[] = {
->  	[0 ... ESR_ELx_EC_MAX]		= NULL,
->  	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
-> @@ -216,6 +259,7 @@ static const exit_handler_fn hyp_exit_handlers[] = {
->  	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
->  	[ESR_ELx_EC_WATCHPT_LOW]	= kvm_hyp_handle_watchpt_low,
->  	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
-> +	[ESR_ELx_EC_ERET]		= kvm_hyp_handle_eret,
->  	[ESR_ELx_EC_MOPS]		= kvm_hyp_handle_mops,
->  };
->  
-
-Otherwise,
-
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-
-Thanks,
-Joey
+>  	if (ops->init)
+> -- 
+> 2.44.0.rc1.240.g4c46232300-goog
+> 
