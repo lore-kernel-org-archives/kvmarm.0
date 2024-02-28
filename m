@@ -1,325 +1,98 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB9915A498
-	for <kvmarm@lists.linux.dev>; Wed, 28 Feb 2024 17:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1C079B81
+	for <kvmarm@lists.linux.dev>; Wed, 28 Feb 2024 18:08:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709141658; cv=none; b=oN7pPlharijbE5jjSIu0yqhEsmmCuZF1uyVYcC30IFKnJqNHD4QVtxnOMT97pX2bxuw3n2Us5lC5OJmye0Z3wMLYAJZtzRNbqo7KBf8D3VO0DsbupqNLFr2k7vAFZGG/2RfmjBhm8ZE7tZwmfbHdds9zxCVyroGPGPr8+eENjpM=
+	t=1709143687; cv=none; b=HWC9BMEnFWHjzlBDEp09H789Lsk0rbcYoOFsc85z8c5CGaguwBfDRCb8cS7LwPlOTpLcCQAKHy63qCJ4oF1n9ejtcUNxpQZJZsEGO6b89fTZy+MwcHlqwOuGSO5KW7+A+Mt9ISxAKdXUpdurd5+9QOAYOhhhnSAblskezFFMZYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709141658; c=relaxed/simple;
-	bh=V5YYglesEgydSUOlj5Mm5Hd0JlQ1hf84iiAmBQhyfe8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cMFBP6MnIMEzMSOX3oA/E5RAz/ltX+3e8rXZ92p1vDFmzasmriPXiYZoqlAJA/vZYcyJv6drPfpBYy3eTPcip8RtlsXYZCh5pUOTeC/EIaTezLMIVTtrOFjyE/rS0XmCIHEA8Spptm8cWcQdv6jg7CgeF+TTCqjly7w9vAXCs74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sRvW4T9H; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1709143687; c=relaxed/simple;
+	bh=08G8VN0uzmV56yjMHo0iPxz/zkgkVPCJ9NHkoJphQNQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lZu8nq1OTIJEjSv25YnbPTvkRcPHsBEt0FcNuR8VW+gLpNna7bTBMMoWH3x1BPfOThkqLJ7eaEBBk3HGjopYg9wj49aVi6RutUtEnAknCFeTdSesG03vQxii/LZB67sm0OP/iJW/3gwmLBpU6Xh2ZQ4u9VKbV4Ndsplqusv7I+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TuyvF59I; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sRvW4T9H"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41SHRJAv007887;
-	Wed, 28 Feb 2024 17:34:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=5UEo5g8p7zZAhpUVRF+F3cMVGvp5KewyDxvM9D11adI=;
- b=sRvW4T9HMwfszCv7cmirR6GqMaxT14Sjx55SqMGkAszmho4aFGR6n1b1TMIK6NYMFefu
- Ug8eUt8Z1PNoibJ9psc2KOAgGfLm3cQpm/uB7FOCPGq0WuUXneSs53OU2uIi4SMAX9df
- 640O5FZmDmUgVuqBoPBwuIUTrEcBQZL1jhY9Ydpw8+CUETj7lpt944x1HZyoFn7bID9n
- 7fhev/gQnTYEVtCjTTecY66xq9zanU+BWT4cVk2UKCAaTiKbdwXNYrXdKDbQsjxrtOpj
- 2JFnf2bLIuT8eLih+32zlsv3C5rM9LoxupZJDh8UMB7efurHUJxEKGjH2Pn0BgDcPhix xA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wj9870awk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 Feb 2024 17:34:09 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41SHRMQq008005;
-	Wed, 28 Feb 2024 17:34:08 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wj9870avy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 Feb 2024 17:34:08 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41SHAhjk021291;
-	Wed, 28 Feb 2024 17:34:07 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wfusp7tqe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 Feb 2024 17:34:07 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41SHY1i61704620
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 28 Feb 2024 17:34:03 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 750F820040;
-	Wed, 28 Feb 2024 17:34:01 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 917D42004E;
-	Wed, 28 Feb 2024 17:34:00 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.171.7.158])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Wed, 28 Feb 2024 17:34:00 +0000 (GMT)
-Date: Wed, 28 Feb 2024 18:33:58 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, pbonzini@redhat.com,
-        thuth@redhat.com, kvmarm@lists.linux.dev,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        lvivier@redhat.com, npiggin@gmail.com, frankja@linux.ibm.com,
-        nrb@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH 03/13] treewide: lib/stack: Fix backtrace
-Message-ID: <20240228183358.5a72ce73@p-imbrenda>
-In-Reply-To: <20240228150416.248948-18-andrew.jones@linux.dev>
-References: <20240228150416.248948-15-andrew.jones@linux.dev>
-	<20240228150416.248948-18-andrew.jones@linux.dev>
-Organization: IBM
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TuyvF59I"
+Date: Wed, 28 Feb 2024 18:07:58 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1709143683;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1JCZDXl5Ga9ytKJXVUY0cigKZsgRNprFbnl8ggkmc7E=;
+	b=TuyvF59IuLAJy568PYp2jn2Bmg+jGuMeP2HsLs49JAte4BlDnOhlvgSQ3O1KC4ocN73jhs
+	Rsy73+b0lum+zEjhZIpVrYiYtndf8GxDS08d8d8owJd8/7BigTxxDhE97rN3VwsUNQv8W+
+	KJmeb/UIHa673Ai1LvmIhydRW8DJGbk=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 01/20] KVM: Treat the device list as an rculist
+Message-ID: <Zd92fobEy4HFOb24@linux.dev>
+References: <20240227224249.2209194-1-oliver.upton@linux.dev>
+ <20240227224249.2209194-2-oliver.upton@linux.dev>
+ <Zd9q5KbkLnh5Wddf@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: hLxiySRN2EcEgCzLsB6hSJivtfqmXw7j
-X-Proofpoint-GUID: VqnqFTru1FaCUB_11HvinyVG-RZd9EZ5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-28_08,2024-02-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
- mlxscore=0 priorityscore=1501 suspectscore=0 lowpriorityscore=0
- phishscore=0 mlxlogscore=999 impostorscore=0 clxscore=1011 spamscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402280138
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zd9q5KbkLnh5Wddf@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 28 Feb 2024 16:04:19 +0100
-Andrew Jones <andrew.jones@linux.dev> wrote:
-
-> We should never pass the result of __builtin_frame_address(0) to
-> another function since the compiler is within its rights to pop the
-> frame to which it points before making the function call, as may be
-> done for tail calls. Nobody has complained about backtrace(), so
-> likely all compilations have been inlining backtrace_frame(), not
-> dropping the frame on the tail call, or nobody is looking at traces.
-> However, for riscv, when built for EFI, it does drop the frame on the
-> tail call, and it was noticed. Preemptively fix backtrace() for all
-> architectures.
+On Wed, Feb 28, 2024 at 09:18:28AM -0800, Sean Christopherson wrote:
+> On Tue, Feb 27, 2024, Oliver Upton wrote:
+> > A subsequent change to KVM/arm64 will necessitate walking the device
+> > list outside of the kvm->lock. Prepare by converting to an rculist.
+> > Note that this has zero effect the destruction path, as every reader
+> > should be protected by a valid reference on the KVM struct.
 > 
-> Fixes: 52266791750d ("lib: backtrace printing")
-> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> This should leave the destruction path alone then.  Simply using list_del_rcu()
+> doesn't convert this to an rculist, you need to actually synchronize against RCU
+> for this to have any meaning/protection.
 
-Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Did anything about this diff give you the impression this wasn't
+thoroughly understood?
 
-> ---
->  lib/arm/stack.c   | 13 +++++--------
->  lib/arm64/stack.c | 12 +++++-------
->  lib/riscv/stack.c | 12 +++++-------
->  lib/s390x/stack.c | 12 +++++-------
->  lib/stack.h       | 24 +++++++++++++++++-------
->  lib/x86/stack.c   | 12 +++++-------
->  6 files changed, 42 insertions(+), 43 deletions(-)
+> The above alludes to this, and the
+> comment in kvm_destroy_devices() helps a little, but the code itself is actively
+> misleading.
+
+Which is what comments are for. I deliberately chose to use a consistent
+programming model (albeit unnecessary to anyone who actually understands
+how this works) with the hope that _if_ someone comes along and needs to
+delete from the list later on they consider the requirements of RCU
+protection.
+
+list_del() or list_del_rcu() will fail in an equally-miserable manner if
+the previously stated expectation of readers is violated. Poisoning the
+forward pointer would be nice from a debugging POV, but readers could
+still hit a use-after-free.
+
+> I don't know how I feel about using list_add_rcu() in combination with list_del(),
+> but I like it a lot better than using list_del_rcu() in a way that is blatantly
+> wrong.
 > 
-> diff --git a/lib/arm/stack.c b/lib/arm/stack.c
-> index 7d081be7c6d0..66d18b47ea53 100644
-> --- a/lib/arm/stack.c
-> +++ b/lib/arm/stack.c
-> @@ -8,13 +8,16 @@
->  #include <libcflat.h>
->  #include <stack.h>
->  
-> -int backtrace_frame(const void *frame, const void **return_addrs,
-> -		    int max_depth)
-> +int arch_backtrace_frame(const void *frame, const void **return_addrs,
-> +			 int max_depth, bool current_frame)
->  {
->  	static int walking;
->  	int depth;
->  	const unsigned long *fp = (unsigned long *)frame;
->  
-> +	if (current_frame)
-> +		fp = __builtin_frame_address(0);
-> +
->  	if (walking) {
->  		printf("RECURSIVE STACK WALK!!!\n");
->  		return 0;
-> @@ -33,9 +36,3 @@ int backtrace_frame(const void *frame, const void **return_addrs,
->  	walking = 0;
->  	return depth;
->  }
-> -
-> -int backtrace(const void **return_addrs, int max_depth)
-> -{
-> -	return backtrace_frame(__builtin_frame_address(0),
-> -			       return_addrs, max_depth);
-> -}
-> diff --git a/lib/arm64/stack.c b/lib/arm64/stack.c
-> index 82611f4b1815..f5eb57fd8892 100644
-> --- a/lib/arm64/stack.c
-> +++ b/lib/arm64/stack.c
-> @@ -8,7 +8,8 @@
->  
->  extern char vector_stub_start, vector_stub_end;
->  
-> -int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
-> +int arch_backtrace_frame(const void *frame, const void **return_addrs,
-> +			 int max_depth, bool current_frame)
->  {
->  	const void *fp = frame;
->  	static bool walking;
-> @@ -17,6 +18,9 @@ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
->  	bool is_exception = false;
->  	unsigned long addr;
->  
-> +	if (current_frame)
-> +		fp = __builtin_frame_address(0);
-> +
->  	if (walking) {
->  		printf("RECURSIVE STACK WALK!!!\n");
->  		return 0;
-> @@ -54,9 +58,3 @@ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
->  	walking = false;
->  	return depth;
->  }
-> -
-> -int backtrace(const void **return_addrs, int max_depth)
-> -{
-> -	return backtrace_frame(__builtin_frame_address(0),
-> -			       return_addrs, max_depth);
-> -}
-> diff --git a/lib/riscv/stack.c b/lib/riscv/stack.c
-> index 712a5478d547..d865594b9671 100644
-> --- a/lib/riscv/stack.c
-> +++ b/lib/riscv/stack.c
-> @@ -2,12 +2,16 @@
->  #include <libcflat.h>
->  #include <stack.h>
->  
-> -int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
-> +int arch_backtrace_frame(const void *frame, const void **return_addrs,
-> +			 int max_depth, bool current_frame)
->  {
->  	static bool walking;
->  	const unsigned long *fp = (unsigned long *)frame;
->  	int depth;
->  
-> +	if (current_frame)
-> +		fp = __builtin_frame_address(0);
-> +
->  	if (walking) {
->  		printf("RECURSIVE STACK WALK!!!\n");
->  		return 0;
-> @@ -24,9 +28,3 @@ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
->  	walking = false;
->  	return depth;
->  }
-> -
-> -int backtrace(const void **return_addrs, int max_depth)
-> -{
-> -	return backtrace_frame(__builtin_frame_address(0),
-> -			       return_addrs, max_depth);
-> -}
-> diff --git a/lib/s390x/stack.c b/lib/s390x/stack.c
-> index 9f234a12adf6..d194f654e94d 100644
-> --- a/lib/s390x/stack.c
-> +++ b/lib/s390x/stack.c
-> @@ -14,11 +14,15 @@
->  #include <stack.h>
->  #include <asm/arch_def.h>
->  
-> -int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
-> +int arch_backtrace_frame(const void *frame, const void **return_addrs,
-> +			 int max_depth, bool current_frame)
->  {
->  	int depth = 0;
->  	struct stack_frame *stack = (struct stack_frame *)frame;
->  
-> +	if (current_frame)
-> +		stack = __builtin_frame_address(0);
-> +
->  	for (depth = 0; stack && depth < max_depth; depth++) {
->  		return_addrs[depth] = (void *)stack->grs[8];
->  		stack = stack->back_chain;
-> @@ -28,9 +32,3 @@ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
->  
->  	return depth;
->  }
-> -
-> -int backtrace(const void **return_addrs, int max_depth)
-> -{
-> -	return backtrace_frame(__builtin_frame_address(0),
-> -			       return_addrs, max_depth);
-> -}
-> diff --git a/lib/stack.h b/lib/stack.h
-> index 10fc2f793354..6edc84344b51 100644
-> --- a/lib/stack.h
-> +++ b/lib/stack.h
-> @@ -11,17 +11,27 @@
->  #include <asm/stack.h>
->  
->  #ifdef HAVE_ARCH_BACKTRACE_FRAME
-> -extern int backtrace_frame(const void *frame, const void **return_addrs,
-> -			   int max_depth);
-> +extern int arch_backtrace_frame(const void *frame, const void **return_addrs,
-> +				int max_depth, bool current_frame);
-> +
-> +static inline int backtrace_frame(const void *frame, const void **return_addrs,
-> +				  int max_depth)
-> +{
-> +	return arch_backtrace_frame(frame, return_addrs, max_depth, false);
-> +}
-> +
-> +static inline int backtrace(const void **return_addrs, int max_depth)
-> +{
-> +	return arch_backtrace_frame(NULL, return_addrs, max_depth, true);
-> +}
->  #else
-> -static inline int
-> -backtrace_frame(const void *frame __unused, const void **return_addrs __unused,
-> -		int max_depth __unused)
-> +extern int backtrace(const void **return_addrs, int max_depth);
-> +
-> +static inline int backtrace_frame(const void *frame, const void **return_addrs,
-> +				  int max_depth)
->  {
->  	return 0;
->  }
->  #endif
->  
-> -extern int backtrace(const void **return_addrs, int max_depth);
-> -
->  #endif
-> diff --git a/lib/x86/stack.c b/lib/x86/stack.c
-> index 5ecd97ce90b9..58ab6c4b293a 100644
-> --- a/lib/x86/stack.c
-> +++ b/lib/x86/stack.c
-> @@ -1,12 +1,16 @@
->  #include <libcflat.h>
->  #include <stack.h>
->  
-> -int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
-> +int arch_backtrace_frame(const void *frame, const void **return_addrs,
-> +			 int max_depth, bool current_frame)
->  {
->  	static int walking;
->  	int depth = 0;
->  	const unsigned long *bp = (unsigned long *) frame;
->  
-> +	if (current_frame)
-> +		bp = __builtin_frame_address(0);
-> +
->  	if (walking) {
->  		printf("RECURSIVE STACK WALK!!!\n");
->  		return 0;
-> @@ -23,9 +27,3 @@ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
->  	walking = 0;
->  	return depth;
->  }
-> -
-> -int backtrace(const void **return_addrs, int max_depth)
-> -{
-> -	return backtrace_frame(__builtin_frame_address(0), return_addrs,
-> -			       max_depth);
-> -}
+> So if we don't have a better option, I would much rather do only the list_add_rcu(),
+> and add a comment _there_ explaining why KVM inserts with RCU protection, but
+> frees using regular ol' list_del().
 
+Describing our destruction rules on the insertion path? I feel like that
+borders on contempt for the reader. I'm happy to leave list_del() as-is
+but I'm going to insist on documenting destructor behavior in the
+destructor.
+
+-- 
+Thanks,
+Oliver
