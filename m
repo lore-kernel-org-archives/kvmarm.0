@@ -1,32 +1,30 @@
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C25E655789
-	for <kvmarm@lists.linux.dev>; Tue, 27 Feb 2024 22:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27141366
+	for <kvmarm@lists.linux.dev>; Wed, 28 Feb 2024 00:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709073819; cv=none; b=dICzpfI5RYEjHFyk5aC/jC1l4hIwOtWO0NfcvKZenNAT1F1RyEHalU1FyrgX5Tz3z5UCj/5F9aMkm1CzPjp6OQf7mqeXUKLhL5uUhxsOzZm6yK2STPShAlsac6ZXv31lS8h6Z2wr7lmpNJMORr8zuf2yfy/6UDvxjE/19fsF+4E=
+	t=1709078494; cv=none; b=FSGGPA6sLZqJ5o5N6ZFAv38t1/Ok/dyF41Md0iLNGnXK/jLOJQepJPM4gm40bzcYFE1DeY9E9ZD34VDw8VVdF7mzkFE8ivalr7bvuweQZbQXuptcYlBWgqUMPc62SGG9SduYcXdzbfVhad05JYyv9Su0pjsXRIewAeqzIRgo9jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709073819; c=relaxed/simple;
-	bh=BDXo/8wsbOSHEdWc35yXbYNbVFnhUDc8bVA2BswEOzg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QzvjUhm6q4fdN5GqxUiHfGInzmP8h1DzSpP2qRFLcsSmExvMRA8H9HdBE4E8pJqKop044VmL8qbMnjHP0oRaPfyJ/Rvzy9+Mm//NoQ/4cvVw6m00jpwy3z4G1wde6I4tqlavKyAtl3DApPh8xIGL6uK4Yyyukk0lGu8Y8E1uXLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=STjYMFoe; arc=none smtp.client-ip=91.218.175.174
+	s=arc-20240116; t=1709078494; c=relaxed/simple;
+	bh=uamqDXIqdZYw+0FNMX/IBNcVIqq24ZJB6a8e8S7mgMs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pRWR3FESWlTXLnASd8IVB7eM74F3wRBhIClocPYs89Tw72rFdJQbOB9OgVqO032V6wPGAbayfVcnn1uKN5JwOzz0w2flwX0cYTWGnrJUn/HHgAQR+k3c1DOREWdX7qbjZYjfvkBFokO83FWDOw6zY4io1lMSTI1Cfy6CFGgP/+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CmMlMPRd; arc=none smtp.client-ip=95.215.58.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="STjYMFoe"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CmMlMPRd"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709073816;
+	t=1709078489;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3FGvX9uzy3jLNvM6aKD0jIfGol9RM2eHdOzvc1hy4Ro=;
-	b=STjYMFoeucci6gigavo3Mi97YuYof/AS4vedSDO2LvCXGXPGmyNSWBNKRP8tJGwr5Wq3CH
-	usEXpTdpgVzGgNSE8ec5f/1WOqMyVW2TueWc0CHA8CvqTbS1tXBDUPbEM1O6x7cDIqLfSo
-	2VgtvblkurXhzUxyErfRaXWpUhgoH98=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=LhqjVfAUACvSzmbp1QQXBY3KxrDsN4eRTxmJccGrh+U=;
+	b=CmMlMPRdvkmnwL7qYXIlWR5rXteIHoMCWUVZODmBIZ8Zl7ovxb7H96YXDUdEPkFVsxd2wI
+	7I5E04/LHaUPuw3YfBvZ2UgfJoPPXz0IEkDzpK2HmEHZ717WdJLwAc0bgwIdfKQtLsa2NA
+	Oh4+xx9vacG6PwnmVEcdStqcNBYd7AU=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -35,11 +33,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 20/20] KVM: selftests: Add stress test for LPI injection
-Date: Tue, 27 Feb 2024 22:42:49 +0000
-Message-ID: <20240227224249.2209194-21-oliver.upton@linux.dev>
-In-Reply-To: <20240227224249.2209194-1-oliver.upton@linux.dev>
-References: <20240227224249.2209194-1-oliver.upton@linux.dev>
+Subject: [PATCH] KVM: arm64: vgic-v3: Don't load pending state when enabling LPIs on RD
+Date: Wed, 28 Feb 2024 00:01:17 +0000
+Message-ID: <20240228000117.2297982-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,456 +45,150 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Now that all the infrastructure is in place, add a test to stress KVM's
-LPI injection. Keep a 1:1 mapping of device IDs to signalling threads,
-allowing the user to scale up/down the sender side of an LPI. Make use
-of the new VM stats for the translation cache to estimate the
-translation hit rate.
+Reality check: KVM's GIC/ITS emulation does not handle pending LPI state
+to the letter of the architecture!
 
-Since the primary focus of the test is on performance, you'll notice
-that the guest code is not pedantic about the LPIs it receives. Counting
-the number of LPIs would require synchronization between the device and
-vCPU threads to avoid coalescing and would get in the way of performance
-numbers.
+Although the GIC spec defines LPI pending state on a per-redistributor
+basis, KVM's view of the LPIs in a VM are global by design. This is
+intentional, as it is a massive simplification to the way KVM organizes
+interrupts and deals with the interactions between the vCPUs and ITSes.
 
+So, with that in mind, the KVM emulation of PENDBASE is completely wrong,
+as unmapped INTIDs (i.e. not mapped in any ITS) are silently ignored,
+even though the expecatation is that IRQs would be generated in real
+hardware. Even more hilarious things can happen for the LPIs that are
+actually mapped, as an update to global LPI state can pend an interrupt
+on a different vCPU.
+
+vgic_add_lpi() fetches pending state when creating the global
+representation of an LPI. Both VM save/restore and guest interactions
+with the ITS find their way here, so the pending state will get loaded
+into KVM one way or another. That flow is slightly more correct, as it
+consults the pending table of the targeted redistributor.
+
+Anyway, it is clear that this code can never be correct and doesn't
+serve a purpose. If bisection led you here you've probably got a *very*
+funky guest, and should bring it up on the list...
+
+Suggested-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/vgic_lpi_stress.c   | 413 ++++++++++++++++++
- 2 files changed, 414 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/vgic_lpi_stress.c
+ arch/arm64/kvm/vgic/vgic-its.c     | 60 ------------------------------
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c |  8 +---
+ arch/arm64/kvm/vgic/vgic.h         |  1 -
+ 3 files changed, 2 insertions(+), 67 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index f6ff84457686..1ef899d9d65f 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -154,6 +154,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
- TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
-+TEST_GEN_PROGS_aarch64 += aarch64/vgic_lpi_stress
- TEST_GEN_PROGS_aarch64 += aarch64/vpmu_counter_access
- TEST_GEN_PROGS_aarch64 += access_tracking_perf_test
- TEST_GEN_PROGS_aarch64 += demand_paging_test
-diff --git a/tools/testing/selftests/kvm/aarch64/vgic_lpi_stress.c b/tools/testing/selftests/kvm/aarch64/vgic_lpi_stress.c
-new file mode 100644
-index 000000000000..6f925fa89179
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/vgic_lpi_stress.c
-@@ -0,0 +1,413 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * vgic_lpi_stress - Stress test for KVM's ITS emulation
-+ *
-+ * Copyright (c) 2024 Google LLC
-+ */
-+
-+#include <linux/sizes.h>
-+#include <pthread.h>
-+#include <stdatomic.h>
-+#include <sys/sysinfo.h>
-+
-+#include "kvm_util.h"
-+#include "gic.h"
-+#include "gic_v3.h"
-+#include "gic_v3_its.h"
-+#include "processor.h"
-+#include "ucall.h"
-+#include "vgic.h"
-+
-+#define TEST_MEMSLOT_INDEX	1
-+
-+#define GIC_LPI_OFFSET	8192
-+
-+static size_t nr_iterations = 1000;
-+static vm_paddr_t gpa_base;
-+
-+static struct kvm_vm *vm;
-+static struct kvm_vcpu **vcpus;
-+static int gic_fd, its_fd;
-+
-+static struct test_data {
-+	bool		request_vcpus_stop;
-+	u32		nr_cpus;
-+	u32		nr_devices;
-+	u32		nr_event_ids;
-+
-+	vm_paddr_t	device_table;
-+	vm_paddr_t	collection_table;
-+	vm_paddr_t	cmdq_base;
-+	void		*cmdq_base_va;
-+	vm_paddr_t	itt_tables;
-+
-+	vm_paddr_t	lpi_prop_table;
-+	vm_paddr_t	lpi_pend_tables;
-+} test_data =  {
-+	.nr_cpus	= 1,
-+	.nr_devices	= 1,
-+	.nr_event_ids	= 16,
-+};
-+
-+static void guest_irq_handler(struct ex_regs *regs)
-+{
-+	u32 intid = gic_get_and_ack_irq();
-+
-+	if (intid == IAR_SPURIOUS)
-+		return;
-+
-+	GUEST_ASSERT(intid >= GIC_LPI_OFFSET);
-+	gic_set_eoi(intid);
-+}
-+
-+static void guest_setup_its_mappings(void)
-+{
-+	u32 coll_id, device_id, event_id, intid = GIC_LPI_OFFSET;
-+	u32 nr_events = test_data.nr_event_ids;
-+	u32 nr_devices = test_data.nr_devices;
-+	u32 nr_cpus = test_data.nr_cpus;
-+
-+	for (coll_id = 0; coll_id < nr_cpus; coll_id++)
-+		its_send_mapc_cmd(test_data.cmdq_base_va, coll_id, coll_id, true);
-+
-+	/* Round-robin the LPIs to all of the vCPUs in the VM */
-+	coll_id = 0;
-+	for (device_id = 0; device_id < nr_devices; device_id++) {
-+		vm_paddr_t itt_base = test_data.itt_tables + (device_id * SZ_64K);
-+
-+		its_send_mapd_cmd(test_data.cmdq_base_va, device_id,
-+				  itt_base, SZ_64K, true);
-+
-+		for (event_id = 0; event_id < nr_events; event_id++) {
-+			its_send_mapti_cmd(test_data.cmdq_base_va, device_id,
-+					   event_id, coll_id, intid++);
-+
-+			coll_id = (coll_id + 1) % test_data.nr_cpus;
-+		}
-+	}
-+}
-+
-+static void guest_invalidate_all_rdists(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < test_data.nr_cpus; i++)
-+		its_send_invall_cmd(test_data.cmdq_base_va, i);
-+}
-+
-+static void guest_setup_gic(void)
-+{
-+	static atomic_int nr_cpus_ready = 0;
-+	u32 cpuid = guest_get_vcpuid();
-+
-+	gic_init(GIC_V3, test_data.nr_cpus);
-+	gic_rdist_enable_lpis(test_data.lpi_prop_table, SZ_64K,
-+			      test_data.lpi_pend_tables + (cpuid * SZ_64K));
-+
-+	atomic_fetch_add(&nr_cpus_ready, 1);
-+
-+	if (cpuid > 0)
-+		return;
-+
-+	while (atomic_load(&nr_cpus_ready) < test_data.nr_cpus)
-+		cpu_relax();
-+
-+	its_init(test_data.collection_table, SZ_64K,
-+		 test_data.device_table, SZ_64K,
-+		 test_data.cmdq_base, SZ_64K);
-+
-+	guest_setup_its_mappings();
-+	guest_invalidate_all_rdists();
-+}
-+
-+static void guest_code(size_t nr_lpis)
-+{
-+	guest_setup_gic();
-+
-+	GUEST_SYNC(0);
-+
-+	/*
-+	 * Don't use WFI here to avoid blocking the vCPU thread indefinitely and
-+	 * never getting the stop singal.
-+	 */
-+	while (!READ_ONCE(test_data.request_vcpus_stop))
-+		cpu_relax();
-+
-+	GUEST_DONE();
-+}
-+
-+static void setup_memslot(void)
-+{
-+	size_t pages;
-+	size_t sz;
-+
-+	/*
-+	 * For the ITS:
-+	 *  - A single level device table
-+	 *  - A single level collection table
-+	 *  - The command queue
-+	 *  - An ITT for each device
-+	 */
-+	sz = (3 + test_data.nr_devices) * SZ_64K;
-+
-+	/*
-+	 * For the redistributors:
-+	 *  - A shared LPI configuration table
-+	 *  - An LPI pending table for each vCPU
-+	 */
-+	sz += (1 + test_data.nr_cpus) * SZ_64K;
-+
-+	pages = sz / vm->page_size;
-+	gpa_base = ((vm_compute_max_gfn(vm) + 1) * vm->page_size) - sz;
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, gpa_base,
-+				    TEST_MEMSLOT_INDEX, pages, 0);
-+}
-+
-+#define LPI_PROP_DEFAULT_PRIO	0xa0
-+
-+static void configure_lpis(void)
-+{
-+	size_t nr_lpis = test_data.nr_devices * test_data.nr_event_ids;
-+	u8 *tbl = addr_gpa2hva(vm, test_data.lpi_prop_table);
-+	size_t i;
-+
-+	for (i = 0; i < nr_lpis; i++) {
-+		tbl[i] = LPI_PROP_DEFAULT_PRIO |
-+			 LPI_PROP_GROUP1 |
-+			 LPI_PROP_ENABLED;
-+	}
-+}
-+
-+static void setup_test_data(void)
-+{
-+	size_t pages_per_64k = vm_calc_num_guest_pages(vm->mode, SZ_64K);
-+	u32 nr_devices = test_data.nr_devices;
-+	u32 nr_cpus = test_data.nr_cpus;
-+	vm_paddr_t cmdq_base;
-+
-+	test_data.device_table = vm_phy_pages_alloc_aligned(vm, pages_per_64k,
-+							    gpa_base,
-+							    TEST_MEMSLOT_INDEX);
-+
-+	test_data.collection_table = vm_phy_pages_alloc_aligned(vm, pages_per_64k,
-+								gpa_base,
-+								TEST_MEMSLOT_INDEX);
-+
-+	cmdq_base = vm_phy_pages_alloc_aligned(vm, pages_per_64k, gpa_base,
-+					       TEST_MEMSLOT_INDEX);
-+	virt_map(vm, cmdq_base, cmdq_base, pages_per_64k);
-+	test_data.cmdq_base = cmdq_base;
-+	test_data.cmdq_base_va = (void *)cmdq_base;
-+
-+	test_data.itt_tables = vm_phy_pages_alloc_aligned(vm, pages_per_64k * nr_devices,
-+							  gpa_base,
-+							  TEST_MEMSLOT_INDEX);
-+
-+	test_data.lpi_prop_table = vm_phy_pages_alloc_aligned(vm, pages_per_64k,
-+							      gpa_base,
-+							      TEST_MEMSLOT_INDEX);
-+	configure_lpis();
-+
-+	test_data.lpi_pend_tables = vm_phy_pages_alloc_aligned(vm, pages_per_64k * nr_cpus,
-+							       gpa_base,
-+							       TEST_MEMSLOT_INDEX);
-+
-+	sync_global_to_guest(vm, test_data);
-+}
-+
-+static void setup_gic(void)
-+{
-+	gic_fd = vgic_v3_setup(vm, test_data.nr_cpus, 64);
-+	__TEST_REQUIRE(gic_fd >= 0, "Failed to create GICv3");
-+
-+	its_fd = vgic_its_setup(vm);
-+}
-+
-+static void signal_lpi(u32 device_id, u32 event_id)
-+{
-+	vm_paddr_t db_addr = GITS_BASE_GPA + GITS_TRANSLATER;
-+
-+	struct kvm_msi msi = {
-+		.address_lo	= db_addr,
-+		.address_hi	= db_addr >> 32,
-+		.data		= event_id,
-+		.devid		= device_id,
-+		.flags		= KVM_MSI_VALID_DEVID,
-+	};
-+
-+	/*
-+	 * KVM_SIGNAL_MSI returns 1 if the MSI wasn't 'blocked' by the VM,
-+	 * which for arm64 implies having a valid translation in the ITS.
-+	 */
-+	TEST_ASSERT(__vm_ioctl(vm, KVM_SIGNAL_MSI, &msi) == 1,
-+		    "KVM_SIGNAL_MSI ioctl failed");
-+}
-+
-+static pthread_barrier_t test_setup_barrier;
-+
-+static void *lpi_worker_thread(void *data)
-+{
-+	u32 device_id = (size_t)data;
-+	u32 event_id;
-+	size_t i;
-+
-+	pthread_barrier_wait(&test_setup_barrier);
-+
-+	for (i = 0; i < nr_iterations; i++)
-+		for (event_id = 0; event_id < test_data.nr_event_ids; event_id++)
-+			signal_lpi(device_id, event_id);
-+
-+	return NULL;
-+}
-+
-+static void *vcpu_worker_thread(void *data)
-+{
-+	struct kvm_vcpu *vcpu = data;
-+	struct ucall uc;
-+
-+	while (true) {
-+		vcpu_run(vcpu);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_SYNC:
-+			pthread_barrier_wait(&test_setup_barrier);
-+			continue;
-+		case UCALL_DONE:
-+			return NULL;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		default:
-+			TEST_FAIL("Unknown ucall: %lu", uc.cmd);
-+		}
-+	}
-+
-+	return NULL;
-+}
-+
-+static void report_stats(struct timespec delta)
-+{
-+	double nr_lpis;
-+	double time;
-+
-+	nr_lpis = test_data.nr_devices * test_data.nr_event_ids * nr_iterations;
-+
-+	time = delta.tv_sec;
-+	time += ((double)delta.tv_nsec) / NSEC_PER_SEC;
-+
-+	pr_info("Rate: %.2f LPIs/sec\n", nr_lpis / time);
-+}
-+
-+static void run_test(void)
-+{
-+	u32 nr_devices = test_data.nr_devices;
-+	u32 nr_vcpus = test_data.nr_cpus;
-+	pthread_t *lpi_threads = malloc(nr_devices * sizeof(pthread_t));
-+	pthread_t *vcpu_threads = malloc(nr_vcpus * sizeof(pthread_t));
-+	struct timespec start, delta;
-+	size_t i;
-+
-+	TEST_ASSERT(lpi_threads && vcpu_threads, "Failed to allocate pthread arrays");
-+
-+	pthread_barrier_init(&test_setup_barrier, NULL, nr_vcpus + nr_devices + 1);
-+
-+	for (i = 0; i < nr_vcpus; i++)
-+		pthread_create(&vcpu_threads[i], NULL, vcpu_worker_thread, vcpus[i]);
-+
-+	for (i = 0; i < nr_devices; i++)
-+		pthread_create(&lpi_threads[i], NULL, lpi_worker_thread, (void *)i);
-+
-+	pthread_barrier_wait(&test_setup_barrier);
-+
-+	clock_gettime(CLOCK_MONOTONIC, &start);
-+
-+	for (i = 0; i < nr_devices; i++)
-+		pthread_join(lpi_threads[i], NULL);
-+
-+	delta = timespec_elapsed(start);
-+	write_guest_global(vm, test_data.request_vcpus_stop, true);
-+
-+	for (i = 0; i < nr_vcpus; i++)
-+		pthread_join(vcpu_threads[i], NULL);
-+
-+	report_stats(delta);
-+}
-+
-+static void setup_vm(void)
-+{
-+	int i;
-+
-+	vcpus = malloc(test_data.nr_cpus * sizeof(struct kvm_vcpu));
-+	TEST_ASSERT(vcpus, "Failed to allocate vCPU array");
-+
-+	vm = vm_create_with_vcpus(test_data.nr_cpus, guest_code, vcpus);
-+
-+	vm_init_descriptor_tables(vm);
-+	for (i = 0; i < test_data.nr_cpus; i++)
-+		vcpu_init_descriptor_tables(vcpus[i]);
-+
-+	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT, guest_irq_handler);
-+
-+	setup_memslot();
-+
-+	setup_gic();
-+
-+	setup_test_data();
-+}
-+
-+static void destroy_vm(void)
-+{
-+	close(its_fd);
-+	close(gic_fd);
-+	kvm_vm_free(vm);
-+	free(vcpus);
-+}
-+
-+static void pr_usage(const char *name)
-+{
-+	pr_info("%s [-v NR_VCPUS] [-d NR_DEVICES] [-e NR_EVENTS] [-i ITERS] -h\n", name);
-+	pr_info("  -v:\tnumber of vCPUs (default: %u)\n", test_data.nr_cpus);
-+	pr_info("  -d:\tnumber of devices (default: %u)\n", test_data.nr_devices);
-+	pr_info("  -e:\tnumber of event IDs per device (default: %u)\n", test_data.nr_event_ids);
-+	pr_info("  -i:\tnumber of iterations (default: %lu)\n", nr_iterations);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	u32 nr_threads;
-+	int c;
-+
-+	while ((c = getopt(argc, argv, "hv:d:e:i:")) != -1) {
-+		switch (c) {
-+		case 'v':
-+			test_data.nr_cpus = atoi(optarg);
-+			break;
-+		case 'd':
-+			test_data.nr_devices = atoi(optarg);
-+			break;
-+		case 'e':
-+			test_data.nr_event_ids = atoi(optarg);
-+			break;
-+		case 'i':
-+			nr_iterations = strtoul(optarg, NULL, 0);
-+			break;
-+		case 'h':
-+		default:
-+			pr_usage(argv[0]);
-+			return 1;
-+		}
-+	}
-+
-+	nr_threads = test_data.nr_cpus + test_data.nr_devices;
-+	if (nr_threads > get_nprocs())
-+		pr_info("WARNING: running %u threads on %d CPUs; performance is degraded.\n",
-+			 nr_threads, get_nprocs());
-+
-+	setup_vm();
-+
-+	run_test();
-+
-+	destroy_vm();
-+
-+	return 0;
-+}
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index e2764d0ffa9f..c114dde3739b 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -426,59 +426,6 @@ static u32 max_lpis_propbaser(u64 propbaser)
+ 	return 1U << min(nr_idbits, INTERRUPT_ID_BITS_ITS);
+ }
+ 
+-/*
+- * Sync the pending table pending bit of LPIs targeting @vcpu
+- * with our own data structures. This relies on the LPI being
+- * mapped before.
+- */
+-static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
+-{
+-	gpa_t pendbase = GICR_PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
+-	struct vgic_irq *irq;
+-	int last_byte_offset = -1;
+-	int ret = 0;
+-	u32 *intids;
+-	int nr_irqs, i;
+-	unsigned long flags;
+-	u8 pendmask;
+-
+-	nr_irqs = vgic_copy_lpi_list(vcpu->kvm, vcpu, &intids);
+-	if (nr_irqs < 0)
+-		return nr_irqs;
+-
+-	for (i = 0; i < nr_irqs; i++) {
+-		int byte_offset, bit_nr;
+-
+-		byte_offset = intids[i] / BITS_PER_BYTE;
+-		bit_nr = intids[i] % BITS_PER_BYTE;
+-
+-		/*
+-		 * For contiguously allocated LPIs chances are we just read
+-		 * this very same byte in the last iteration. Reuse that.
+-		 */
+-		if (byte_offset != last_byte_offset) {
+-			ret = kvm_read_guest_lock(vcpu->kvm,
+-						  pendbase + byte_offset,
+-						  &pendmask, 1);
+-			if (ret) {
+-				kfree(intids);
+-				return ret;
+-			}
+-			last_byte_offset = byte_offset;
+-		}
+-
+-		irq = vgic_get_irq(vcpu->kvm, NULL, intids[i]);
+-		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+-		irq->pending_latch = pendmask & (1U << bit_nr);
+-		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+-		vgic_put_irq(vcpu->kvm, irq);
+-	}
+-
+-	kfree(intids);
+-
+-	return ret;
+-}
+-
+ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
+ 					      struct vgic_its *its,
+ 					      gpa_t addr, unsigned int len)
+@@ -1857,13 +1804,6 @@ static struct vgic_register_region its_registers[] = {
+ 		VGIC_ACCESS_32bit),
+ };
+ 
+-/* This is called on setting the LPI enable bit in the redistributor. */
+-void vgic_enable_lpis(struct kvm_vcpu *vcpu)
+-{
+-	if (!(vcpu->arch.vgic_cpu.pendbaser & GICR_PENDBASER_PTZ))
+-		its_sync_lpi_pending_table(vcpu);
+-}
+-
+ static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its,
+ 				   u64 addr)
+ {
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index c15ee1df036a..b555b1b424d3 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -280,12 +280,8 @@ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
+ 		vgic_its_invalidate_cache(vcpu->kvm);
+ 		atomic_set_release(&vgic_cpu->ctlr, 0);
+ 	} else {
+-		ctlr = atomic_cmpxchg_acquire(&vgic_cpu->ctlr, 0,
+-					      GICR_CTLR_ENABLE_LPIS);
+-		if (ctlr != 0)
+-			return;
+-
+-		vgic_enable_lpis(vcpu);
++		atomic_cmpxchg_acquire(&vgic_cpu->ctlr, 0,
++				       GICR_CTLR_ENABLE_LPIS);
+ 	}
+ }
+ 
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index 8d134569d0a1..b79c586343c0 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -250,7 +250,6 @@ void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu);
+ 
+ bool vgic_has_its(struct kvm *kvm);
+ int kvm_vgic_register_its_device(void);
+-void vgic_enable_lpis(struct kvm_vcpu *vcpu);
+ void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu);
+ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
+ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
+
+base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
 -- 
 2.44.0.rc1.240.g4c46232300-goog
 
