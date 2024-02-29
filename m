@@ -1,66 +1,241 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 510867E0F8;
-	Thu, 29 Feb 2024 13:36:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0052F7D40D;
+	Thu, 29 Feb 2024 13:44:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709213800; cv=none; b=AYve3ZacbMMU+3UgAaZk2XDXRr7yAxY8lrsHHOBwMRTtKD9dLFJI0L0/XMLAUq4t1ssh5tSICZabIY6Ep5boaXeG0v4O844AwH3QccQfrVWPavXlet5JABucWuj8aJCNsziR9bJcSDjnQDFdPE2MkOK+Ap9LC8nF4xBxGUydZCc=
+	t=1709214285; cv=none; b=H2EfKepC6/09HObyUTYQxQXWg13y6Qi46qGzk5vlrY0aYZqs4JXNcnOEckn6BFuc0MRlQ0Hl5iN5tPL7Ww4QPsyYYAyutBa06DEPkiCTVQEQ7KwWGnTexiCWMfApSVj1OkKiDh0fEYAhgcPAKuQtQVZJuez+1KYSySAcyE66E9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709213800; c=relaxed/simple;
-	bh=OLeINhUfZtPKoUaRZ8erFl7pF5Trs9Ph8RVF20T1Ib0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m0TxetqLe7pf9sek+5gVYmWrRQGRufT3jTHjxKLmrQ0nkrfMTOiO6NqanprAMN7QtwZrqSq2yDqHtyICIjgPDQI9Ld+Aj5R+iAjWHVbCGnsyUVkCvRXEeNswKddXsirNJDqB3LaJI56yiMmIFytjqlQUjPsVjVIgNUF+BXH9qb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Yf7Fif6n; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1709214285; c=relaxed/simple;
+	bh=XTpw44JNPqXPEVSHUU3pPsdOlJEurvo2VnwQIw4VifE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RT4nCbHI9F1+3pqtmN14se7PFpCJ0o1FTwBz3MGOHgUlJtyrrtE3Q2Cc4+AvMpcOD2IhvW5fYKlqylbcCULFb7XLmMQfFXIJcUNxZG+pj0odgK+LI4RRHj5qycswyjscvtzr2Ch8Ep7LvGTHgOyudM7YT07fGQj6gWCYV/aFetw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cOuAaWgm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Yf7Fif6n"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=OLeINhUfZtPKoUaRZ8erFl7pF5Trs9Ph8RVF20T1Ib0=; b=Yf7Fif6nPkaaSVI/xvdE9mfbMP
-	QdXu1MI+7vjxb2/wVe6xYz9eGlekFdNKWlsb6XlxrTRBZT2g7FKFxqVDoyyqIB0ik5aTlAUzCCnMj
-	w3+EgQRz9ZF0vQWhPcPJ6emIWXt+IRFHjvZcSaCgxNajY4Dx96dcSdfelJ35PBkCllfDYqgXDt+LG
-	TBgXppz8RkhtOMnBOAIuar5QspnqqzGMAWI24QNbbi5TaWXBP+uyTn+6MW7Xpg2LDPJADlSkaR9Ix
-	ilKUVP0Va8iES5XdVMr1T/lDU5dSowDIZbY50JWsvGngswAJXTyy83fHYHf2L1b91Ftk8w75kvxSU
-	gDzDaUwQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rfgaN-0000000Dgvg-2sfO;
-	Thu, 29 Feb 2024 13:36:31 +0000
-Date: Thu, 29 Feb 2024 05:36:31 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: David Stevens <stevensd@chromium.org>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Yu Zhang <yu.c.zhang@linux.intel.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	Zhi Wang <zhi.wang.linux@gmail.com>,
-	Maxim Levitsky <mlevitsk@redhat.com>, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v11 0/8] KVM: allow mapping non-refcounted pages
-Message-ID: <ZeCIX5Aw5s1L0YEh@infradead.org>
-References: <20240229025759.1187910-1-stevensd@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cOuAaWgm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A40AC433C7;
+	Thu, 29 Feb 2024 13:44:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709214284;
+	bh=XTpw44JNPqXPEVSHUU3pPsdOlJEurvo2VnwQIw4VifE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cOuAaWgmMO4i5vqB1r42gVQeHeWIczvckM4YcJ329GQ4NLDmCPttEy4nHE25iXen5
+	 EELckE/Ocfiphu54XgMpQwYstOefOeVoOORgvDTnzxrxVeGbKgAjIPFYZO6QC+t7N4
+	 mxGGQYM/15W+l8ee5WpfFprHSXtcT5jbm/iSnShHxUc1zBQMotcbVgsI4xPjx2n7xV
+	 YQQHvoylQ7JOSn/HbixkWGbnW8mCaX5L+oxk/J43TdvvX5FXo3ft7OCmylWm0znpej
+	 JQEY99CIBKavtyt0Flg/1FK31G6BGr9NuqUD0Xc+VnhEMqkOr+1v9/ddE5p3Xaqw00
+	 PZJ2VV7HAkpXQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rfgiH-0081RA-TQ;
+	Thu, 29 Feb 2024 13:44:42 +0000
+Date: Thu, 29 Feb 2024 13:44:40 +0000
+Message-ID: <865xy72xmf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v2 06/13] KVM: arm64: nv: Fast-track 'InHost' exception returns
+In-Reply-To: <20240228160800.GA3373815@e124191.cambridge.arm.com>
+References: <20240226100601.2379693-1-maz@kernel.org>
+	<20240226100601.2379693-7-maz@kernel.org>
+	<20240228160800.GA3373815@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240229025759.1187910-1-stevensd@google.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Feb 29, 2024 at 11:57:51AM +0900, David Stevens wrote:
-> Our use case is virtio-gpu blob resources [1], which directly map host
-> graphics buffers into the guest as "vram" for the virtio-gpu device.
-> This feature currently does not work on systems using the amdgpu driver,
-> as that driver allocates non-compound higher order pages via
-> ttm_pool_alloc_page().
+On Wed, 28 Feb 2024 16:08:00 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
+> 
+> On Mon, Feb 26, 2024 at 10:05:54AM +0000, Marc Zyngier wrote:
+> > A significant part of the FEAT_NV extension is to trap ERET
+> > instructions so that the hypervisor gets a chance to switch
+> > from a vEL2 L1 guest to an EL1 L2 guest.
+> > 
+> > But this also has the unfortunate consequence of trapping ERET
+> > in unsuspecting circumstances, such as staying at vEL2 (interrupt
+> > handling while being in the guest hypervisor), or returning to host
+> > userspace in the case of a VHE guest.
+> > 
+> > Although we already make some effort to handle these ERET quicker
+> > by not doing the put/load dance, it is still way too far down the
+> > line for it to be efficient enough.
+> > 
+> > For these cases, it would ideal to ERET directly, no question asked.
+> > Of course, we can't do that. But the next best thing is to do it as
+> > early as possible, in fixup_guest_exit(), much as we would handle
+> > FPSIMD exceptions.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/emulate-nested.c | 29 +++-------------------
+> >  arch/arm64/kvm/hyp/vhe/switch.c | 44 +++++++++++++++++++++++++++++++++
+> >  2 files changed, 47 insertions(+), 26 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> > index 2d80e81ae650..63a74c0330f1 100644
+> > --- a/arch/arm64/kvm/emulate-nested.c
+> > +++ b/arch/arm64/kvm/emulate-nested.c
+> > @@ -2172,8 +2172,7 @@ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
+> >  
+> >  void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+> >  {
+> > -	u64 spsr, elr, mode;
+> > -	bool direct_eret;
+> > +	u64 spsr, elr;
+> >  
+> >  	/*
+> >  	 * Forward this trap to the virtual EL2 if the virtual
+> > @@ -2182,33 +2181,11 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+> >  	if (forward_traps(vcpu, HCR_NV))
+> >  		return;
+> >  
+> > -	/*
+> > -	 * Going through the whole put/load motions is a waste of time
+> > -	 * if this is a VHE guest hypervisor returning to its own
+> > -	 * userspace, or the hypervisor performing a local exception
+> > -	 * return. No need to save/restore registers, no need to
+> > -	 * switch S2 MMU. Just do the canonical ERET.
+> > -	 */
+> > -	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
+> > -	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
+> > -
+> > -	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
+> > -
+> > -	direct_eret  = (mode == PSR_MODE_EL0t &&
+> > -			vcpu_el2_e2h_is_set(vcpu) &&
+> > -			vcpu_el2_tge_is_set(vcpu));
+> > -	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
+> > -
+> > -	if (direct_eret) {
+> > -		*vcpu_pc(vcpu) = vcpu_read_sys_reg(vcpu, ELR_EL2);
+> > -		*vcpu_cpsr(vcpu) = spsr;
+> > -		trace_kvm_nested_eret(vcpu, *vcpu_pc(vcpu), spsr);
+> > -		return;
+> > -	}
+> > -
+> >  	preempt_disable();
+> >  	kvm_arch_vcpu_put(vcpu);
+> >  
+> > +	spsr = __vcpu_sys_reg(vcpu, SPSR_EL2);
+> > +	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
+> >  	elr = __vcpu_sys_reg(vcpu, ELR_EL2);
+> >  
+> >  	trace_kvm_nested_eret(vcpu, elr, spsr);
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index d5fdcea2b366..eaf242b8e0cf 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -206,6 +206,49 @@ void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu)
+> >  	__vcpu_put_switch_sysregs(vcpu);
+> >  }
+> >  
+> > +static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+> > +{
+> > +	u64 spsr, mode;
+> > +
+> > +	/*
+> > +	 * Going through the whole put/load motions is a waste of time
+> > +	 * if this is a VHE guest hypervisor returning to its own
+> > +	 * userspace, or the hypervisor performing a local exception
+> > +	 * return. No need to save/restore registers, no need to
+> > +	 * switch S2 MMU. Just do the canonical ERET.
+> > +	 *
+> > +	 * Unless the trap has to be forwarded further down the line,
+> > +	 * of course...
+> > +	 */
+> > +	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
+> > +		return false;
+> > +
+> > +	spsr = read_sysreg_el1(SYS_SPSR);
+> > +	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
+> > +
+> > +	switch (mode) {
+> > +	case PSR_MODE_EL0t:
+> > +		if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
+> > +			return false;
+> > +		break;
+> > +	case PSR_MODE_EL2t:
+> > +		mode = PSR_MODE_EL1t;
+> > +		break;
+> > +	case PSR_MODE_EL2h:
+> > +		mode = PSR_MODE_EL1h;
+> > +		break;
+> > +	default:
+> > +		return false;
+> > +	}
+> 
+> Thanks for pointing out to_hw_pstate() (off-list), I spent far too long trying
+> to understand how the original code converted PSTATE.M from (v)EL2 to EL1, and
+> missed that while browsing.
+> 
+> Seems hard to re-use to_hw_pstate() here, since we want the early
+> returns.
 
-.. and just as last time around that is still the problem that needs
-to be fixed instead of creating a monster like this to map
-non-refcounted pages.
+Indeed. I tried to fit it in, but ended up checking for things twice,
+which isn't great either.
 
+> 
+> > +
+> > +	spsr = (spsr & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
+> 
+> I don't think we need to mask out PSR_MODE32_BIT here again, since if it was
+> set in `mode`, it wouldn't have matched in the switch statement. It's possibly
+> out of 'defensiveness' though. And I'm being nitpicky.
+
+It's a sanity thing. We want to make sure all of M[4:0] are cleared
+before or'ing the new mode. I agree that we wouldn't be there if
+PSR_MODE_32BIT was set, but this matches the usage in most other
+places in the code.
+
+> 
+> > +
+> > +	write_sysreg_el2(spsr, SYS_SPSR);
+> > +	write_sysreg_el2(read_sysreg_el1(SYS_ELR), SYS_ELR);
+> > +
+> > +	return true;
+> > +}
+> > +
+> >  static const exit_handler_fn hyp_exit_handlers[] = {
+> >  	[0 ... ESR_ELx_EC_MAX]		= NULL,
+> >  	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
+> > @@ -216,6 +259,7 @@ static const exit_handler_fn hyp_exit_handlers[] = {
+> >  	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
+> >  	[ESR_ELx_EC_WATCHPT_LOW]	= kvm_hyp_handle_watchpt_low,
+> >  	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
+> > +	[ESR_ELx_EC_ERET]		= kvm_hyp_handle_eret,
+> >  	[ESR_ELx_EC_MOPS]		= kvm_hyp_handle_mops,
+> >  };
+> >  
+> 
+> Otherwise,
+> 
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
+Thanks!
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
