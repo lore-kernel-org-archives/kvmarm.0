@@ -1,53 +1,61 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE3578295;
-	Thu, 29 Feb 2024 18:24:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139707828D;
+	Thu, 29 Feb 2024 18:40:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709231082; cv=none; b=Yl+/dpSQ3Hg9LVmj0hcqDzvGMVbZ87h6wqFrHW3ozIFnUbZcY+Q46oAk2Dal8h2jokHMHau0dNFxI1PV7oOy9UurZTrFWd+MbN/+hwWvC7aImfhMyd5A88c+DOPHMlBM1bshtq9CeGukE/6u2ovCiIvuxnPkFo2pp9hCNOVFXbk=
+	t=1709232059; cv=none; b=l/y5ovLxuLvAhI14G6C5M0zUTvKgrHpEaeKMpCJiq3eDJBExvfMAFwUZqAOsTMgKlwyAaJaCl/tSiAYJbeRYgjW9BCZFqlWzEXO1qtgwzHz+aGZHFjaJlMygQUc6/AzVdXo4mquxZkTlUb+IBuDRJMb/TNTilpSJR1Y8QnIfqHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709231082; c=relaxed/simple;
-	bh=djivfC0fMA7FF09Y1zo65j9t8YhyySEZcKWiLhmxvqQ=;
+	s=arc-20240116; t=1709232059; c=relaxed/simple;
+	bh=XOIwSKahWpPR9jGAWZnUuaG5OHH6sWJYuNj9i3WFYso=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QiTKDaXvDkchIHLRukR8KpOS+7Ej9BuxeoFi7/JXxkxRF7renwfwHKuvPwmg+YXOWJtcUymxtdDwXyeNn90+DHp1gK9ufdFSptBBGhz9mESDRFMFf68MkThrWH3WTzNukJRyjOFkhQv6OUT7obKzmJ4jeUIuDxEbxfSbBWeWKA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AVa8AwGO; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=S7uQqUJVScrQzx2qfpkpen3z3OFduL19my/oxwL80+9yt13pUXTA9AqvrYWr0zYQp+2K81ShkjG9xszAJGYLBqQ6m6zYBfOITkhzXo7hJvx91Uz5XwBDvw19BtNkPdF8Ozr1J5XV9Gc9ThVpu4ew+R/BCgGXnnpiJOD4c34ejI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z4C0qKd/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AVa8AwGO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5E30C433F1;
-	Thu, 29 Feb 2024 18:24:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z4C0qKd/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B3F5C433C7;
+	Thu, 29 Feb 2024 18:40:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709231079;
-	bh=djivfC0fMA7FF09Y1zo65j9t8YhyySEZcKWiLhmxvqQ=;
+	s=k20201202; t=1709232058;
+	bh=XOIwSKahWpPR9jGAWZnUuaG5OHH6sWJYuNj9i3WFYso=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AVa8AwGOMwnS0YIZ9bWOWt60pTx0ndN3pNV5X1TuFNy/3JN2w6nlqO1iKQBEzRRj1
-	 1x5u4eejF4L/5PIG5VfvtXe4T/q130l/tKQbBb1Re+/adh6exvUfOu8+UWFHTbb2vo
-	 B2V7eLTlQK5tu3P1seIjNo5n7DXgXexUig8AtNN7aKYxaN3d6cf37jfnZwBgNxh9Ap
-	 ruChnaKibGGLWAUb35b2OySoRvr0irrgLYrn8UTFBMxUOqmKVPi1IGlevd23Txws5g
-	 J75iuh4qvXGwt69VcEf7FWe/nl+Zq5zwn+It5fhrDoS8XDu+PV9ZqhXk2vnxyXkze6
-	 0RkBWqt47cSFg==
+	b=Z4C0qKd/Rb41/Yaf+xCj37agyrwn3r1ddkExRoiOTQQ1rOv6K0esta8w4jH7PujD+
+	 kD7/qP8No/C/78+0smVm9IZtu4d/jrk7LEqvuhyFtMxBc3j0LJtbp0URAThI+keGei
+	 qks/8U5YbqWJsiittU3E6aFngNaeGWrH/DmfvXcvuQjZSKoYhQxx9U49A0Gkb/15KR
+	 j9sQH34m8e6nV3/YFkW66ccdvDbTCUuikr9q5EpBgPuov6ncnUJDohVrx0fTvIKk01
+	 sVVwxjS5r90wPV2vfn4N5Gn1d3uC8zTkPgkNbpWl1EoFhHIEm+KMpBrfUVqBbnH6QE
+	 aw4KV5QlkVDCA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rfl5B-0087lh-F4;
-	Thu, 29 Feb 2024 18:24:37 +0000
-Date: Thu, 29 Feb 2024 18:24:37 +0000
-Message-ID: <864jdr2knu.wl-maz@kernel.org>
+	id 1rflKx-0088Cq-QW;
+	Thu, 29 Feb 2024 18:40:56 +0000
+Date: Thu, 29 Feb 2024 18:40:54 +0000
+Message-ID: <8634tb2jwp.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	mark.rutland@arm.com,
+	Mark Brown <broonie@kernel.org>,
 	James Clark <james.clark@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Fix TRFCR_EL1/PMSCR_EL1 access in hVHE mode
-In-Reply-To: <ZeDAxL9nr_qmYGS9@linux.dev>
-References: <20240229145417.3606279-1-maz@kernel.org>
-	<ZeDAxL9nr_qmYGS9@linux.dev>
+	Rob Herring <robh@kernel.org>,
+	Suzuki Poulose <suzuki.poulose@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	linux-perf-users@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH V16 5/8] KVM: arm64: nvhe: Disable branch generation in nVHE guests
+In-Reply-To: <20240125094119.2542332-6-anshuman.khandual@arm.com>
+References: <20240125094119.2542332-1-anshuman.khandual@arm.com>
+	<20240125094119.2542332-6-anshuman.khandual@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,58 +67,120 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, james.clark@arm.com, anshuman.khandual@arm.com
+X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, broonie@kernel.org, james.clark@arm.com, robh@kernel.org, suzuki.poulose@arm.com, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, linux-perf-users@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 29 Feb 2024 17:37:08 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Thu, 25 Jan 2024 09:41:16 +0000,
+Anshuman Khandual <anshuman.khandual@arm.com> wrote:
 > 
-> Hey,
+> Disable the BRBE before we enter the guest, saving the status and enable it
+> back once we get out of the guest. This avoids capturing branch records in
+> the guest kernel or userspace, which would be confusing the host samples.
 > 
-> On Thu, Feb 29, 2024 at 02:54:17PM +0000, Marc Zyngier wrote:
-> > When running in hVHE mode, EL1 accesses are performed with the EL12
-> > accessor, as we run with HCR_EL2.E2H=1.
-> > 
-> > Unfortunately, both PMSCR_EL1 and TRFCR_EL1 are used with the
-> > EL1 accessor, meaning that we actually affect the EL2 state. Duh.
-> > 
-> > Switch to using the {read,write}_sysreg_el1() helpers that will do
-> > the right thing in all circumstances.
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: kvmarm@lists.linux.dev
+> Cc: linux-arm-kernel@lists.infradead.org
+> CC: linux-kernel@vger.kernel.org
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> ---
+> Changes in V16:
 > 
-> I was wondering if there was a way to surface these screw-ups at compile
-> time, but there's nothing elegant that comes to mind. Guess we need to
-> be very careful reviewing "nVHE" changes going forward.
+> - Dropped BRBCR_EL1 and BRBFCR_EL1 from enum vcpu_sysreg
+> - Reverted back the KVM NVHE patch - used host_debug_state based 'brbcr_el1'
+>   element, and dropped the previous dependency on Jame's coresight series
+> 
+>  arch/arm64/include/asm/kvm_host.h  |  5 ++++-
+>  arch/arm64/kvm/debug.c             |  5 +++++
+>  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 33 ++++++++++++++++++++++++++++++
+>  3 files changed, 42 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 21c57b812569..bce8792092af 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -569,7 +569,7 @@ struct kvm_vcpu_arch {
+>  	u8 cflags;
+>  
+>  	/* Input flags to the hypervisor code, potentially cleared after use */
+> -	u8 iflags;
+> +	u16 iflags;
+>  
+>  	/* State flags for kernel bookkeeping, unused by the hypervisor code */
+>  	u8 sflags;
+> @@ -610,6 +610,7 @@ struct kvm_vcpu_arch {
+>  		u64 pmscr_el1;
+>  		/* Self-hosted trace */
+>  		u64 trfcr_el1;
+> +		u64 brbcr_el1;
+>  	} host_debug_state;
+>  
+>  	/* VGIC state */
+> @@ -779,6 +780,8 @@ struct kvm_vcpu_arch {
+>  #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
+>  /* vcpu running in HYP context */
+>  #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
+> +/* Save BRBE context if active  */
+> +#define DEBUG_STATE_SAVE_BRBE	__vcpu_single_flag(iflags, BIT(8))
+>  
+>  /* SVE enabled for host EL0 */
+>  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index 8725291cb00a..99f85d8acbf3 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -335,10 +335,15 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
+>  	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
+>  	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
+>  		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+> +
+> +	/* Check if we have BRBE implemented and available at the host */
+> +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRBE_SHIFT))
+> +		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
+>  }
+>  
+>  void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+>  {
+>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+> +	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
+>  }
+> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> index 4558c02eb352..79bcf0fb1326 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> @@ -79,6 +79,34 @@ static void __debug_restore_trace(u64 trfcr_el1)
+>  	write_sysreg_s(trfcr_el1, SYS_TRFCR_EL1);
+>  }
+>  
+> +static void __debug_save_brbe(u64 *brbcr_el1)
+> +{
+> +	*brbcr_el1 = 0;
+> +
+> +	/* Check if the BRBE is enabled */
+> +	if (!(read_sysreg_s(SYS_BRBCR_EL1) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
+> +		return;
+> +
+> +	/*
+> +	 * Prohibit branch record generation while we are in guest.
+> +	 * Since access to BRBCR_EL1 is trapped, the guest can't
+> +	 * modify the filtering set by the host.
+> +	 */
+> +	*brbcr_el1 = read_sysreg_s(SYS_BRBCR_EL1);
+> +	write_sysreg_s(0, SYS_BRBCR_EL1);
 
-My take on this is that there should hardly be any read_sysreg_s() in
-the KVM code at all. We should always use read_sysreg_el*() so that
-there is no ambiguity about the state we're dealing with (that's, of
-course, only valid for registers that have both an EL1 and an EL2
-counterpart -- registers that are shared across ELs must still use the
-read_sysreg_s() accessor).
+As for TRFCR and PMSCR, this is broken on hVHE.
 
-It would also free the drive-by hacker from having to understand the
-subtleties of the E2H redirection. The macros do the right thing
-everywhere (they are context aware), and they should be the first port
-of call.
-
-> 
-> > Note that the 'Fixes:' tag doesn't represent the point where the bug
-> > was introduced (there is no such point), but the first practical point
-> > where the hVHE feature is usable.
-> > 
-> > Cc: James Clark <james.clark@arm.com>
-> > Cc: Anshuman Khandual <anshuman.khandual@arm.com>
-> > Fixes: 38cba55008e5 ("KVM: arm64: Force HCR_E2H in guest context when ARM64_KVM_HVHE is set")
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> 
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-
-Thanks. What should we do about it? Fix for 6.8, or part of the 6.9
-drop? hVHE+tracing is a pretty niche thing, and I don't have any other
-fix for the time being...
+Please see [1]
 
 	M.
+
+[1] https://lore.kernel.org/r/20240229145417.3606279-1-maz@kernel.org
 
 -- 
 Without deviation from the norm, progress is not possible.
