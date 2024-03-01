@@ -1,75 +1,167 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 994742AF17
-	for <kvmarm@lists.linux.dev>; Fri,  1 Mar 2024 19:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D56737160;
+	Fri,  1 Mar 2024 19:14:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709319807; cv=none; b=AWcRsWs7Wm/Fse/C1qrvkuVjOAeFyZq3/OFUKuEOW+pwZnJNAHHLpmnkIO9nj3IrGwS6KILAnWTb0cydeR6UMKDxSNFI65ZiBQH9bqPy1mHnR+Yz/N72rKyAmlyQPjnp4TOnXx8qBJnkkz9H6eYe8PX+MX0RWrpuQ16KdgEfpI4=
+	t=1709320444; cv=none; b=kK8EyClij96rSxNKVA/Vtr34bnwCnaHlAqw/+cY0b8bK3SmaZzA4N8FF5RdZffvBBBnbNdcpIFcnP6qKYUAjXRWa6AiF22+LitBWSpfrRXlfMAPCfnhpxPRLMLmeFgyfVOe8qPb6/Q+3xHLoUrV6ULJUQAQdnIb1+DaABeb0aEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709319807; c=relaxed/simple;
-	bh=1cZqnZmdHKKZkhk+c1RSUoMsvk7V3EezrBDtydC2bvM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IY/K6Fv8yQH1gDOe1bpUmjud575Y5QSccW+3jmSmNMavnQQJkNgoKi9xSGonoF93NP104KF/Efz+QhEsO82y/WgoO29pkQEkf0WbYxA9YzWopigJhXUfu73QVls4PcArkYbnQpojpjy0XTpg/BHuIffGmZeuN5cU6PPV9wiWyik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nyd0oFQL; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1709320444; c=relaxed/simple;
+	bh=G6RwsnJujCGZ67YrDrQYHLQoE1KXq3LL5931ik8TiVo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ye2U0hEQQAu73j8KdYrDlc4AEuJ9n3X5UbZhX2VjLIW9DXwByDLxiCHK11qKOPnSJFTAqB3bJ9G0KDkzD4uHQFKA30RA7278fASUWJ1CSN6199bW2qEPak7rGIhAQ3BxmswifQ+YJVl7CqAfYOWV8DEWyjFksRaTDxj8g3mEh6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kjD/gQtE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nyd0oFQL"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709319803;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SrpNm4mnC143yOwr9eZ6I1eNSSegZA2JNP9wWT05P3c=;
-	b=nyd0oFQLTLeY4XnLHZjrEoYj5Jjk6OZhUnrnG918Ds+3rqimoW02ZTZ6+yaQ8I6L158BVH
-	AtW5HUIhdOVAiKVGXfFfG6cd+s3nG/9hgEWO98p0lmZu57MlhwQ3rmrVfQlThZVPo7QO2V
-	4nB5jLSS0gbPFNW/GkVSGvjsl4Jbxnk=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kjD/gQtE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B769C433C7;
+	Fri,  1 Mar 2024 19:14:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709320443;
+	bh=G6RwsnJujCGZ67YrDrQYHLQoE1KXq3LL5931ik8TiVo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kjD/gQtErWVyXc6zRpJZiD9pseQVm/52FreVVqQ9czqKNedDcJc7vTW7vQaanBFNL
+	 elVQCJqJU375Mp/p+bTPK6hgf1nxcVj6vgooMtH97YKfw3XkmPLch5ofZFRrL9vUdu
+	 dBF3Nf/zK7lP8og3M0gN8cmstnWYa+3CmdX/wkrMPFJ5ohYRZgUHDLe36pvPYK6Y0d
+	 QckoSBk11lZFDwr1+S8wrjnrniXDRYyZNe9LytWurb6q4tpBxuV+OO/wwQLAFYNG9S
+	 7h+h23pN1Me/iCjp7/iQi5JU4TT+B9ToiPoTFwyyMBGNMDaP/jQvvPZiII+Y74s6e/
+	 vMR6J4JIfGkWA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rg8KX-008buY-6I;
+	Fri, 01 Mar 2024 19:14:01 +0000
+Date: Fri, 01 Mar 2024 19:14:00 +0000
+Message-ID: <861q8t3guf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Clark <james.clark@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Fix TRFCR_EL1/PMSCR_EL1 access in hVHE mode
-Date: Fri,  1 Mar 2024 19:03:09 +0000
-Message-ID: <170931978598.3080605.10344567074374622004.b4-ty@linux.dev>
-In-Reply-To: <20240229145417.3606279-1-maz@kernel.org>
-References: <20240229145417.3606279-1-maz@kernel.org>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v2 07/13] KVM: arm64: nv: Honor HFGITR_EL2.ERET being set
+In-Reply-To: <20240301180734.GA3958355@e124191.cambridge.arm.com>
+References: <20240226100601.2379693-1-maz@kernel.org>
+	<20240226100601.2379693-8-maz@kernel.org>
+	<20240301180734.GA3958355@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 29 Feb 2024 14:54:17 +0000, Marc Zyngier wrote:
-> When running in hVHE mode, EL1 accesses are performed with the EL12
-> accessor, as we run with HCR_EL2.E2H=1.
+Hi Joey,
+
+On Fri, 01 Mar 2024 18:07:34 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> Unfortunately, both PMSCR_EL1 and TRFCR_EL1 are used with the
-> EL1 accessor, meaning that we actually affect the EL2 state. Duh.
+> Got a question about this one,
 > 
-> Switch to using the {read,write}_sysreg_el1() helpers that will do
-> the right thing in all circumstances.
+> On Mon, Feb 26, 2024 at 10:05:55AM +0000, Marc Zyngier wrote:
+> > If the L1 hypervisor decides to trap ERETs while running L2,
+> > make sure we don't try to emulate it, just like we wouldn't
+> > if it had its NV bit set.
+> > 
+> > The exception will be reinjected from the core handler.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/hyp/vhe/switch.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index eaf242b8e0cf..3ea9bdf6b555 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -220,7 +220,8 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  	 * Unless the trap has to be forwarded further down the line,
+> >  	 * of course...
+> >  	 */
+> > -	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
+> > +	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV) ||
+> > +	    (__vcpu_sys_reg(vcpu, HFGITR_EL2) & HFGITR_EL2_ERET))
+> >  		return false;
+> >  
+> >  	spsr = read_sysreg_el1(SYS_SPSR);
 > 
-> [...]
+> Are we missing a forward_traps() call in kvm_emulated_nested_eret() for the
+> HFGITR case?
+> 
+> Trying to follow the code path here, and I'm unsure of where else the
+> HFIGTR_EL2_ERET trap would be forwarded:
+> 
+> kvm_arm_vcpu_enter_exit ->
+> 	ERET executes in guest
+> 	fixup_guest_exit ->
+> 		kvm_hyp_handle_eret (returns false)
+> 
+> handle_exit ->
+> 	kvm_handle_eret ->
+> 		kvm_emulated_nested_eret
+> 			if HCR_NV
+> 				forward traps
+> 			else
+> 				emulate ERET
 
-Applied to kvmarm/next, thanks!
+There's a bit more happening in kvm_handle_eret().
 
-[1/1] KVM: arm64: Fix TRFCR_EL1/PMSCR_EL1 access in hVHE mode
-      https://git.kernel.org/kvmarm/kvmarm/c/9a3bfb27ef65
+> 
+> 
+> And if the answer is that it is being reinjected somewhere, putting that
+> function name in the commit instead of 'core handler' would help with
+> understanding!
 
---
-Best,
-Oliver
+Let's look at the code:
+
+	static int kvm_handle_eret(struct kvm_vcpu *vcpu)
+	{
+		[...]
+	
+		if (is_hyp_ctxt(vcpu))
+			kvm_emulate_nested_eret(vcpu);
+
+If we're doing an ERET from guest EL2, then we just emulate it,
+because there is nothing else to do. Crucially, HFGITR_EL2.ERET
+doesn't apply to EL2.
+
+		else
+			kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
+
+In any other case, we simply reinject the trap into the guest EL2,
+because that's the only possible outcome. And that's what you were
+missing.
+
+		return 1;
+	}
+	
+
+> I need to find the time to get an NV setup set-up, so I can do some experiments
+> myself.
+
+The FVP should be a good enough environment if you can bare the
+glacial speed. Other than that, I hear that QEMU has grown some NV
+support lately, but I haven't tried it yet. HW-wise, M2 is the only
+machine that can be bought by a human being (everything else is
+vapourware, or they would have already taken my money).
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
