@@ -1,167 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D56737160;
-	Fri,  1 Mar 2024 19:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E69D186F
+	for <kvmarm@lists.linux.dev>; Fri,  1 Mar 2024 19:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709320444; cv=none; b=kK8EyClij96rSxNKVA/Vtr34bnwCnaHlAqw/+cY0b8bK3SmaZzA4N8FF5RdZffvBBBnbNdcpIFcnP6qKYUAjXRWa6AiF22+LitBWSpfrRXlfMAPCfnhpxPRLMLmeFgyfVOe8qPb6/Q+3xHLoUrV6ULJUQAQdnIb1+DaABeb0aEY=
+	t=1709321557; cv=none; b=KTx8v2EzUeM2rjTNcYR9fllAeBNjPdpDHwOBVxjr+awgVhM2IgEYc4meetc0U2y5dJVKePeeayOXwdUk1nymlybAdx2qZrQWoKbHnwBPF20FJz3RTwhpE65oX/Y1fvSGwCSvBJga5MNvL8z6iuXD/nPYA16i7pfnaafVTCtNq+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709320444; c=relaxed/simple;
-	bh=G6RwsnJujCGZ67YrDrQYHLQoE1KXq3LL5931ik8TiVo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ye2U0hEQQAu73j8KdYrDlc4AEuJ9n3X5UbZhX2VjLIW9DXwByDLxiCHK11qKOPnSJFTAqB3bJ9G0KDkzD4uHQFKA30RA7278fASUWJ1CSN6199bW2qEPak7rGIhAQ3BxmswifQ+YJVl7CqAfYOWV8DEWyjFksRaTDxj8g3mEh6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kjD/gQtE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1709321557; c=relaxed/simple;
+	bh=LcvQwGjoQUP23QWtLhT8uHbzlcZ07DcLEO7OqTNEdog=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kKqgFWmvFHOYjZzulYVyz9tHQaBh5JMxdIPO+kSdHjIU2ICw+Ot6NHF3Nc95Tm5Es/d5EsOHCNiobJR1eBi/uUXoLYF2EMHmPUP1B7DosM9u4Arc66Q8sINLrK1LmR/LC37hOlVfJTTyFd5bQhjSgecvCZsgO6BpLXMiKVZfGDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OLlRCv3g; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kjD/gQtE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B769C433C7;
-	Fri,  1 Mar 2024 19:14:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709320443;
-	bh=G6RwsnJujCGZ67YrDrQYHLQoE1KXq3LL5931ik8TiVo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kjD/gQtErWVyXc6zRpJZiD9pseQVm/52FreVVqQ9czqKNedDcJc7vTW7vQaanBFNL
-	 elVQCJqJU375Mp/p+bTPK6hgf1nxcVj6vgooMtH97YKfw3XkmPLch5ofZFRrL9vUdu
-	 dBF3Nf/zK7lP8og3M0gN8cmstnWYa+3CmdX/wkrMPFJ5ohYRZgUHDLe36pvPYK6Y0d
-	 QckoSBk11lZFDwr1+S8wrjnrniXDRYyZNe9LytWurb6q4tpBxuV+OO/wwQLAFYNG9S
-	 7h+h23pN1Me/iCjp7/iQi5JU4TT+B9ToiPoTFwyyMBGNMDaP/jQvvPZiII+Y74s6e/
-	 vMR6J4JIfGkWA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rg8KX-008buY-6I;
-	Fri, 01 Mar 2024 19:14:01 +0000
-Date: Fri, 01 Mar 2024 19:14:00 +0000
-Message-ID: <861q8t3guf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OLlRCv3g"
+Date: Fri, 1 Mar 2024 19:32:28 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1709321553;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HzaS0m3kgMmQ46iSjHCEmGWFSVwIK1lU48lUWC7x/9I=;
+	b=OLlRCv3g39EBv5iR5AVvmplHOaKcHumVgJ+yTHRb96rvEhBl1BvSh+EZ4Ty2oVwQKvhWIs
+	TPgPKoPXmy4Z488b3SBF+Xv2kYKvSlCQFamzQrnSADaBPqjEco6IThlw2IBE+wdyRiLIEG
+	I2c1P/rUyoHO4sPA1h+bMrQIcP+AsWM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2 07/13] KVM: arm64: nv: Honor HFGITR_EL2.ERET being set
-In-Reply-To: <20240301180734.GA3958355@e124191.cambridge.arm.com>
-References: <20240226100601.2379693-1-maz@kernel.org>
-	<20240226100601.2379693-8-maz@kernel.org>
-	<20240301180734.GA3958355@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Only save S1PIE registers when dirty
+Message-ID: <ZeItTLQxdxxICw01@linux.dev>
+References: <20240301-kvm-arm64-defer-regs-v1-1-401e3de92e97@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240301-kvm-arm64-defer-regs-v1-1-401e3de92e97@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Joey,
-
-On Fri, 01 Mar 2024 18:07:34 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
+On Fri, Mar 01, 2024 at 06:05:53PM +0000, Mark Brown wrote:
+> Currently we save the S1PIE registers every time we exit the guest but
+> the expected usage pattern for these registers is that they will be
+> written to very infrequently, likely once during initialisation and then
+> never updated again.  This means that most likely most of our saves of
+> these registers are redundant.  Let's avoid these redundant saves by
+> enabling fine grained write traps for the EL0 and EL1 PIE registers when
+> switching to the guest and only saving if a write happened.
 > 
-> Got a question about this one,
+> We track if the registers have been written by storing a mask of bits
+> for HFGWTR_EL2, we may be able to use the same approach for other
+> registers with similar access patterns.  We assume that it is likely
+> that both registers will be written in quick succession and mark both
+> PIR_EL1 and PIRE0_EL1 as dirty if either is written in order to minimise
+> overhead.
 > 
-> On Mon, Feb 26, 2024 at 10:05:55AM +0000, Marc Zyngier wrote:
-> > If the L1 hypervisor decides to trap ERETs while running L2,
-> > make sure we don't try to emulate it, just like we wouldn't
-> > if it had its NV bit set.
-> > 
-> > The exception will be reinjected from the core handler.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/hyp/vhe/switch.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> > index eaf242b8e0cf..3ea9bdf6b555 100644
-> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> > @@ -220,7 +220,8 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
-> >  	 * Unless the trap has to be forwarded further down the line,
-> >  	 * of course...
-> >  	 */
-> > -	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
-> > +	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV) ||
-> > +	    (__vcpu_sys_reg(vcpu, HFGITR_EL2) & HFGITR_EL2_ERET))
-> >  		return false;
-> >  
-> >  	spsr = read_sysreg_el1(SYS_SPSR);
+> This will have a negative performance impact if guests do start updating
+> these registers frequently but since the PIE indexes have a wide impact
+> on the page tables it seems likely that this will not be the case.
 > 
-> Are we missing a forward_traps() call in kvm_emulated_nested_eret() for the
-> HFGITR case?
+> We do not need to check for FGT support since it is mandatory for
+> systems with PIE.
 > 
-> Trying to follow the code path here, and I'm unsure of where else the
-> HFIGTR_EL2_ERET trap would be forwarded:
-> 
-> kvm_arm_vcpu_enter_exit ->
-> 	ERET executes in guest
-> 	fixup_guest_exit ->
-> 		kvm_hyp_handle_eret (returns false)
-> 
-> handle_exit ->
-> 	kvm_handle_eret ->
-> 		kvm_emulated_nested_eret
-> 			if HCR_NV
-> 				forward traps
-> 			else
-> 				emulate ERET
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+> I don't have a good sense if this is a good idea or not, or if this is a
+> desirable implementation of the concept - the patch is based on some
+> concerns about the cost of the system register context switching.  We
+> should be able to do something similar for some of the other registers.
 
-There's a bit more happening in kvm_handle_eret().
+Is there any data beyond a microbenchmark to suggest save elision
+benefits the VM at all? The idea of baking the trap configuration based
+on what KVM _thinks_ the guest will do isn't particularly exciting. This
+doesn't seem to be a one-size-fits-all solution.
 
-> 
-> 
-> And if the answer is that it is being reinjected somewhere, putting that
-> function name in the commit instead of 'core handler' would help with
-> understanding!
+The overheads of guest exits are extremely configuration dependent, and
+on VHE the save/restore of EL1 state happens at vcpu_load() / vcpu_put()
+rather than every exit. There isn't a whole lot KVM can do to lessen the
+blow of sharing EL1 in the nVHE configuration.
 
-Let's look at the code:
-
-	static int kvm_handle_eret(struct kvm_vcpu *vcpu)
-	{
-		[...]
-	
-		if (is_hyp_ctxt(vcpu))
-			kvm_emulate_nested_eret(vcpu);
-
-If we're doing an ERET from guest EL2, then we just emulate it,
-because there is nothing else to do. Crucially, HFGITR_EL2.ERET
-doesn't apply to EL2.
-
-		else
-			kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-
-In any other case, we simply reinject the trap into the guest EL2,
-because that's the only possible outcome. And that's what you were
-missing.
-
-		return 1;
-	}
-	
-
-> I need to find the time to get an NV setup set-up, so I can do some experiments
-> myself.
-
-The FVP should be a good enough environment if you can bare the
-glacial speed. Other than that, I hear that QEMU has grown some NV
-support lately, but I haven't tried it yet. HW-wise, M2 is the only
-machine that can be bought by a human being (everything else is
-vapourware, or they would have already taken my money).
-
-Thanks,
-
-	M.
+Looking a bit further out, the cost of traps will be dramatically higher
+when running as a guest hypervisor, so we'd want to avoid them if
+possible...
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
