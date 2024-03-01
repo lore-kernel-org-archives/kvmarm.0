@@ -1,204 +1,167 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A325F63DD
-	for <kvmarm@lists.linux.dev>; Fri,  1 Mar 2024 00:40:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CACA82D046
+	for <kvmarm@lists.linux.dev>; Fri,  1 Mar 2024 02:21:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709253661; cv=none; b=WEcF1Ods/3Y5Ls9755Rxt0Vjxs23Lo5JBNdtvlR8oCQuwmgZm83r/rDAmbHEsOco7MAqAd3/JAUnw7u8D0l9rNlVTVWY66kEQfXubJRivXMq997dtnK1KRpzsyf19odK6RtvIJNmNio7UbknXkbqqohoEtkYIDsLg0UEsbOzHFw=
+	t=1709259666; cv=none; b=WaPrmfJMZbqgoCNayRFbDtghB6+VFWAeEYI3Mt5wQT2RMSQblRLrn8EjbX3G7qrjZm9/l/mI+ie76Ey12vYuOEOL91FqdFNfvNi+znvWUjg3eIRUg/AXZRlsw8Z+UbNvglmJN4WHAOCgLKhzab+I2Me8IDW+CjS6XQDagbAUivc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709253661; c=relaxed/simple;
-	bh=P80WilD5wdaTPQpIr/9V7Ybtdl702HiX1GAp64LOwnk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CMX0syMQYXQME/0YKIKjnOW6jE5bImckFEZM8oG0o98eyy0jcGd4SrJIM2nW/jNzJUmpKyjfJCnIPFaxry9q9nj0MB3VFF8/PDDvNCYcMcQupEhAgmMMMlcFANWDMTWmWUO3sbl53t3xxArAAMEbLZqSvZdtQLwIJxXYkjI6dG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=a9dsPynl; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="a9dsPynl"
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4210QUGO026455;
-	Fri, 1 Mar 2024 00:40:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	date:from:to:cc:subject:message-id:references:mime-version
-	:content-type:in-reply-to; s=qcppdkim1; bh=fAmtm81RwLGFezIhtTg09
-	a8+FIlqjPr8NQ8dQHAa7QY=; b=a9dsPynlV72fvZAGVQYtd9ghO3/7H4p0GFiKu
-	nNO83MJMpHZJuz00OyesNPnGPWDSuOO4+o+qUfyQiRlD20tgbQWvtn5XS4YChN5Y
-	BjjFhRW6Q2i+KdPvuCqF/B6pmFxyXZDgHpuPPdID7+NQeLWXi5cMdTR/rAEbjgdz
-	K3a4D0wfslswJVh/NcJcPjEBuS9aCeEyh+/M3NkFvoLZ6lWNCXc/alMkFLUzbyHX
-	oc2q+ZIqpS0UsuClXO5Rb+fRjj4oQ+zpZtbJZhdcbbuTQh4cTiIuiXLW8Kvk662+
-	G1R60o0wy7AJK2FoiS0hdtwJWHKRg3US3FjZahclnkcyihaag==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wjycdguu7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Mar 2024 00:40:16 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 4210eGbs027001
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 1 Mar 2024 00:40:16 GMT
-Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 29 Feb 2024 16:40:14 -0800
-Date: Thu, 29 Feb 2024 16:40:14 -0800
-From: Elliot Berman <quic_eberman@quicinc.com>
-To: Fuad Tabba <tabba@google.com>
-CC: David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
-        Matthew Wilcox <willy@infradead.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.linux.dev>, <pbonzini@redhat.com>,
-        <chenhuacai@kernel.org>, <mpe@ellerman.id.au>, <anup@brainfault.org>,
-        <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
-        <aou@eecs.berkeley.edu>, <seanjc@google.com>, <brauner@kernel.org>,
-        <akpm@linux-foundation.org>, <xiaoyao.li@intel.com>,
-        <yilun.xu@intel.com>, <chao.p.peng@linux.intel.com>,
-        <jarkko@kernel.org>, <amoorthy@google.com>, <dmatlack@google.com>,
-        <yu.c.zhang@linux.intel.com>, <isaku.yamahata@intel.com>,
-        <mic@digikod.net>, <vbabka@suse.cz>, <vannapurve@google.com>,
-        <ackerleytng@google.com>, <mail@maciej.szmigiero.name>,
-        <michael.roth@amd.com>, <wei.w.wang@intel.com>,
-        <liam.merwick@oracle.com>, <isaku.yamahata@gmail.com>,
-        <kirill.shutemov@linux.intel.com>, <suzuki.poulose@arm.com>,
-        <steven.price@arm.com>, <quic_mnalajal@quicinc.com>,
-        <quic_tsoni@quicinc.com>, <quic_svaddagi@quicinc.com>,
-        <quic_cvanscha@quicinc.com>, <quic_pderrin@quicinc.com>,
-        <quic_pheragu@quicinc.com>, <catalin.marinas@arm.com>,
-        <james.morse@arm.com>, <yuzenghui@huawei.com>,
-        <oliver.upton@linux.dev>, <maz@kernel.org>, <will@kernel.org>,
-        <keirf@google.com>, <linux-mm@kvack.org>
-Subject: Re: Re: folio_mmapped
-Message-ID: <20240229114526893-0800.eberman@hu-eberman-lv.qualcomm.com>
-Mail-Followup-To: Fuad Tabba <tabba@google.com>, 
-	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
-	Matthew Wilcox <willy@infradead.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
-	brauner@kernel.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, 
-	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
-	amoorthy@google.com, dmatlack@google.com, yu.c.zhang@linux.intel.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
-	ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, keirf@google.com, 
-	linux-mm@kvack.org
-References: <40a8fb34-868f-4e19-9f98-7516948fc740@redhat.com>
- <20240226105258596-0800.eberman@hu-eberman-lv.qualcomm.com>
- <925f8f5d-c356-4c20-a6a5-dd7efde5ee86@redhat.com>
- <Zd8PY504BOwMR4jO@google.com>
- <755911e5-8d4a-4e24-89c7-a087a26ec5f6@redhat.com>
- <Zd8qvwQ05xBDXEkp@google.com>
- <99a94a42-2781-4d48-8b8c-004e95db6bb5@redhat.com>
- <Zd82V1aY-ZDyaG8U@google.com>
- <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
- <CA+EHjTzHtsbhzrb-TWft1q3Ree3kgzZbsir+R9L0tDgSX-d-0g@mail.gmail.com>
+	s=arc-20240116; t=1709259666; c=relaxed/simple;
+	bh=lDcV+UIK2UmQdtVQx2J9DB22Eek2v9YcVzkNvM9HlEo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qv88LqYx2esdpqgBxqCn7gYky2mMQgaS2taMDFzTZM7U6+AHfmTnxScgwkyRPLRp/SwFGpuiat8Tw54FdrC0kv1OU8mXn5dMBuhDR4GR5AJ5f825h/Pr7gU3F5lqhp9o+iMtySXDMy/xwO8tUgkAH13DymbpbD0VZNfTmFnR8U0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 262C51FB;
+	Thu, 29 Feb 2024 18:21:34 -0800 (PST)
+Received: from [10.162.42.8] (a077893.blr.arm.com [10.162.42.8])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B5CB43F762;
+	Thu, 29 Feb 2024 18:20:50 -0800 (PST)
+Message-ID: <2adf726f-5a94-4e4f-85de-db30e1586584@arm.com>
+Date: Fri, 1 Mar 2024 07:50:47 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTzHtsbhzrb-TWft1q3Ree3kgzZbsir+R9L0tDgSX-d-0g@mail.gmail.com>
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: KUnnGdlrkBnGMyW3fU4tsf-S_7ez_xmz
-X-Proofpoint-ORIG-GUID: KUnnGdlrkBnGMyW3fU4tsf-S_7ez_xmz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-29_07,2024-02-29_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- mlxlogscore=999 impostorscore=0 bulkscore=0 priorityscore=1501
- lowpriorityscore=0 malwarescore=0 adultscore=0 suspectscore=0 spamscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2402120000 definitions=main-2403010004
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V16 5/8] KVM: arm64: nvhe: Disable branch generation in
+ nVHE guests
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com,
+ Mark Brown <broonie@kernel.org>, James Clark <james.clark@arm.com>,
+ Rob Herring <robh@kernel.org>, Suzuki Poulose <suzuki.poulose@arm.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ linux-perf-users@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev
+References: <20240125094119.2542332-1-anshuman.khandual@arm.com>
+ <20240125094119.2542332-6-anshuman.khandual@arm.com>
+ <8634tb2jwp.wl-maz@kernel.org>
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <8634tb2jwp.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 29, 2024 at 07:01:51PM +0000, Fuad Tabba wrote:
-> Hi David,
+
+
+On 3/1/24 00:10, Marc Zyngier wrote:
+> On Thu, 25 Jan 2024 09:41:16 +0000,
+> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+>>
+>> Disable the BRBE before we enter the guest, saving the status and enable it
+>> back once we get out of the guest. This avoids capturing branch records in
+>> the guest kernel or userspace, which would be confusing the host samples.
+>>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: Oliver Upton <oliver.upton@linux.dev>
+>> Cc: James Morse <james.morse@arm.com>
+>> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: kvmarm@lists.linux.dev
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> CC: linux-kernel@vger.kernel.org
+>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>> ---
+>> Changes in V16:
+>>
+>> - Dropped BRBCR_EL1 and BRBFCR_EL1 from enum vcpu_sysreg
+>> - Reverted back the KVM NVHE patch - used host_debug_state based 'brbcr_el1'
+>>   element, and dropped the previous dependency on Jame's coresight series
+>>
+>>  arch/arm64/include/asm/kvm_host.h  |  5 ++++-
+>>  arch/arm64/kvm/debug.c             |  5 +++++
+>>  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 33 ++++++++++++++++++++++++++++++
+>>  3 files changed, 42 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 21c57b812569..bce8792092af 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -569,7 +569,7 @@ struct kvm_vcpu_arch {
+>>  	u8 cflags;
+>>  
+>>  	/* Input flags to the hypervisor code, potentially cleared after use */
+>> -	u8 iflags;
+>> +	u16 iflags;
+>>  
+>>  	/* State flags for kernel bookkeeping, unused by the hypervisor code */
+>>  	u8 sflags;
+>> @@ -610,6 +610,7 @@ struct kvm_vcpu_arch {
+>>  		u64 pmscr_el1;
+>>  		/* Self-hosted trace */
+>>  		u64 trfcr_el1;
+>> +		u64 brbcr_el1;
+>>  	} host_debug_state;
+>>  
+>>  	/* VGIC state */
+>> @@ -779,6 +780,8 @@ struct kvm_vcpu_arch {
+>>  #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
+>>  /* vcpu running in HYP context */
+>>  #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
+>> +/* Save BRBE context if active  */
+>> +#define DEBUG_STATE_SAVE_BRBE	__vcpu_single_flag(iflags, BIT(8))
+>>  
+>>  /* SVE enabled for host EL0 */
+>>  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+>> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+>> index 8725291cb00a..99f85d8acbf3 100644
+>> --- a/arch/arm64/kvm/debug.c
+>> +++ b/arch/arm64/kvm/debug.c
+>> @@ -335,10 +335,15 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
+>>  	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
+>>  	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
+>>  		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+>> +
+>> +	/* Check if we have BRBE implemented and available at the host */
+>> +	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRBE_SHIFT))
+>> +		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
+>>  }
+>>  
+>>  void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
+>>  {
+>>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+>>  	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
+>> +	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
+>>  }
+>> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+>> index 4558c02eb352..79bcf0fb1326 100644
+>> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+>> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+>> @@ -79,6 +79,34 @@ static void __debug_restore_trace(u64 trfcr_el1)
+>>  	write_sysreg_s(trfcr_el1, SYS_TRFCR_EL1);
+>>  }
+>>  
+>> +static void __debug_save_brbe(u64 *brbcr_el1)
+>> +{
+>> +	*brbcr_el1 = 0;
+>> +
+>> +	/* Check if the BRBE is enabled */
+>> +	if (!(read_sysreg_s(SYS_BRBCR_EL1) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
+>> +		return;
+>> +
+>> +	/*
+>> +	 * Prohibit branch record generation while we are in guest.
+>> +	 * Since access to BRBCR_EL1 is trapped, the guest can't
+>> +	 * modify the filtering set by the host.
+>> +	 */
+>> +	*brbcr_el1 = read_sysreg_s(SYS_BRBCR_EL1);
+>> +	write_sysreg_s(0, SYS_BRBCR_EL1);
 > 
-> ...
+> As for TRFCR and PMSCR, this is broken on hVHE.
 > 
-> >>>> "mmap() the whole thing once and only access what you are supposed to
-> > >   (> > > access" sounds reasonable to me. If you don't play by the rules, you get a
-> > >>>> signal.
-> > >>>
-> > >>> "... you get a signal, or maybe you don't". But yes I understand your
-> > >>> point, and as per the above there are real benefits to this approach so
-> > >>> why not.
-> > >>>
-> > >>> What do we expect userspace to do when a page goes from shared back to
-> > >>> being guest-private, because e.g. the guest decides to unshare? Use
-> > >>> munmap() on that page? Or perhaps an madvise() call of some sort? Note
-> > >>> that this will be needed when starting a guest as well, as userspace
-> > >>> needs to copy the guest payload in the guestmem file prior to starting
-> > >>> the protected VM.
-> > >>
-> > >> Let's assume we have the whole guest_memfd mapped exactly once in our
-> > >> process, a single VMA.
-> > >>
-> > >> When setting up the VM, we'll write the payload and then fire up the VM.
-> > >>
-> > >> That will (I assume) trigger some shared -> private conversion.
-> > >>
-> > >> When we want to convert shared -> private in the kernel, we would first
-> > >> check if the page is currently mapped. If it is, we could try unmapping that
-> > >> page using an rmap walk.
-> > >
-> > > I had not considered that. That would most certainly be slow, but a well
-> > > behaved userspace process shouldn't hit it so, that's probably not a
-> > > problem...
-> >
-> > If there really only is a single VMA that covers the page (or even mmaps
-> > the guest_memfd), it should not be too bad. For example, any
-> > fallocate(PUNCHHOLE) has to do the same, to unmap the page before
-> > discarding it from the pagecache.
+> Please see [1]
 > 
-> I don't think that we can assume that only a single VMA covers a page.
+> 	M.
 > 
-> > But of course, no rmap walk is always better.
-> 
-> We've been thinking some more about how to handle the case where the
-> host userspace has a mapping of a page that later becomes private.
-> 
-> One idea is to refuse to run the guest (i.e., exit vcpu_run() to back
-> to the host with a meaningful exit reason) until the host unmaps that
-> page, and check for the refcount to the page as you mentioned earlier.
-> This is essentially what the RFC I sent does (minus the bugs :) ) .
-> 
-> The other idea is to use the rmap walk as you suggested to zap that
-> page. If the host tries to access that page again, it would get a
-> SIGBUS on the fault. This has the advantage that, as you'd mentioned,
-> the host doesn't need to constantly mmap() and munmap() pages. It
-> could potentially be optimised further as suggested if we have a
-> cooperating VMM that would issue a MADV_DONTNEED or something like
-> that, but that's just an optimisation and we would still need to have
-> the option of the rmap walk. However, I was wondering how practical
-> this idea would be if more than a single VMA covers a page?
+> [1] https://lore.kernel.org/r/20240229145417.3606279-1-maz@kernel.org
 > 
 
-Agree with all your points here. I changed Gunyah's implementation to do
-the unmap instead of erroring out. I didn't observe a significant
-performance difference. However, doing unmap might be a little faster
-because we can check folio_mapped() before doing the rmap walk. When
-erroring out at mmap() level, we always have to do the walk.
-
-> Also, there's the question of what to do if the page is gupped? In
-> this case I think the only thing we can do is refuse to run the guest
-> until the gup (and all references) are released, which also brings us
-> back to the way things (kind of) are...
-> 
-
-If there are gup users who don't do FOLL_PIN, I think we either need to
-fix them or live with possibility here? We don't have a reliable
-refcount for a folio to be safe to unmap: it might be that another vCPU
-is trying to get the same page, has incremented the refcount, and
-waiting for the folio_lock. This problem exists whether we block the
-mmap() or do SIGBUS.
-
-Thanks,
-Elliot
+Ahh I see, so the unified accessors read_sysreg_el1()/write_sysreg_el1()
+need to be used here - which will choose between BRBCR_EL1 & BRBCR_EL12
+as required. Will do the changes, thanks for pointing out.
