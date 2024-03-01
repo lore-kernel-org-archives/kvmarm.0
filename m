@@ -1,148 +1,204 @@
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B227A74BE0
-	for <kvmarm@lists.linux.dev>; Thu, 29 Feb 2024 22:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A325F63DD
+	for <kvmarm@lists.linux.dev>; Fri,  1 Mar 2024 00:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709244840; cv=none; b=eobxXSVnRyJWIgGgm1tkIwFjFo5R2fG19/B+n6pNVNYsclV27xWinTPRWIGDDlQltCLugtOOfbD8znNB/VaVm8Od8nR64bN04bp7lAGutqfjYF8D4pfMgfiO0/5hjmpE3lQhxVVD5nSaGBAkh8KR+p1gyB2P0FqABxpdSm5hcx0=
+	t=1709253661; cv=none; b=WEcF1Ods/3Y5Ls9755Rxt0Vjxs23Lo5JBNdtvlR8oCQuwmgZm83r/rDAmbHEsOco7MAqAd3/JAUnw7u8D0l9rNlVTVWY66kEQfXubJRivXMq997dtnK1KRpzsyf19odK6RtvIJNmNio7UbknXkbqqohoEtkYIDsLg0UEsbOzHFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709244840; c=relaxed/simple;
-	bh=t21HnzIGHk+n6QlvVMMSXJY9HBCCiiEVREtwL2Cu0k0=;
-	h=References:From:To:Cc:Subject:In-reply-to:Date:Message-ID:
-	 MIME-Version:Content-Type; b=mHGXyjAxxiwF4D+6696F2Ws0/Zw5CpIWwn5v3tm+HDG344O4wzCI8SezZoLadVgGF2pF5rds4+POLED2OjjxBugcS1rKAFtuz0622anXXeHXUQmsVyUKoy6EoH3097WZbRyo5nua8eJzBovheq/7SiJR9+f5PRdmFP+OjRGwsKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=J02uUBnr; arc=none smtp.client-ip=209.85.167.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1709253661; c=relaxed/simple;
+	bh=P80WilD5wdaTPQpIr/9V7Ybtdl702HiX1GAp64LOwnk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CMX0syMQYXQME/0YKIKjnOW6jE5bImckFEZM8oG0o98eyy0jcGd4SrJIM2nW/jNzJUmpKyjfJCnIPFaxry9q9nj0MB3VFF8/PDDvNCYcMcQupEhAgmMMMlcFANWDMTWmWUO3sbl53t3xxArAAMEbLZqSvZdtQLwIJxXYkjI6dG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=a9dsPynl; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J02uUBnr"
-Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3bb9b28acb4so1055560b6e.2
-        for <kvmarm@lists.linux.dev>; Thu, 29 Feb 2024 14:13:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709244838; x=1709849638; darn=lists.linux.dev;
-        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=F0bbqczj3Keglw64JiNfdvO4M759XtAlzANrlsOPWOc=;
-        b=J02uUBnrZHmUqFXdCLWqYdy+8Wa0gyzcCPuqQzo07AP4I7JiUdXTMcbtpj28hUCZAN
-         h4BOFBotOj+FOVmawMrU0SxA7j/bO96xCwl79fbSl5mHEoL4ueYkCtxSIhqXAqO4R6c0
-         c81Uj+YLtxgu1NSgZ3UFCL/QuhKX9PaSYy8B/gPu20V2rGMNEuH/51ZkJ9U8kU80QX9h
-         uCPfZiOKPohyZ1eTJj0X/w7Uj7F/S9GL5Br0zSrTCBaTV1O0qAdOJm0Qa9A+GB+GNkEk
-         bXqn0YuGS3ZZblodO0wVAzal6EYvRmKeuF3dJPLqbpaks69QQKnh9GLERBGa7WD8unH6
-         l06g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709244838; x=1709849638;
-        h=mime-version:message-id:date:in-reply-to:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F0bbqczj3Keglw64JiNfdvO4M759XtAlzANrlsOPWOc=;
-        b=oPkB/aQ8HSu3QZR/x39TjTrnDgKqlnjFyti7fN2B3G3tDhh79dZkvjVKVfUbUxvfqj
-         zT1wTaLL/bB3HhFrvGq7lahUbmW9ajD3z88jZ9olMhJiPoBYaVrSTDdvmP66WLXofNp7
-         zNl1/rZARIevF1nVKDLyC+0xsjGyw0SkbvtlxWWMz5TNN7W8ChoaIqeBPJ0tC8btabG7
-         U/dEb10y/4/q5M2oiFyVlIhF/2ZmjH8X9MRSiT7cYUw4V31uVFSHzyIuC5amzDTEjGwD
-         3uMjY39lhY2BNoaAIdf/zALopPAXDEPWYWEJ0kqZGzrdkLflOxwM8Fq9emri+lK8yinz
-         7QPw==
-X-Forwarded-Encrypted: i=1; AJvYcCVRjc/GpFSOi29tPeLwqP4uTb3FzVkxiFMPHfysOHWIz3Q6zc64BjewrAzdqqAXpqgf+9+W/hHaaumpJg/RaP311qb/WzKX
-X-Gm-Message-State: AOJu0YzPbjYLwaMSQ66Pj5O/XQUcLLBWWPV3gGum1+bt7818kqABRIqE
-	d0QRmZGnYMOImL2N6Ae9eG9fquPo032s+0ZQyLOGeufB0wxGkm8fpCZ6FCf5OEQ=
-X-Google-Smtp-Source: AGHT+IHdJxypAmK3qvNYc2vGOAmkw9y2ZwPcLUGqtAKe2grsU0Su0E62P6Tt4LBvrgbMxt6+5DcYzg==
-X-Received: by 2002:a05:6808:438f:b0:3c1:c2e6:b046 with SMTP id dz15-20020a056808438f00b003c1c2e6b046mr3051822oib.23.1709244837897;
-        Thu, 29 Feb 2024 14:13:57 -0800 (PST)
-Received: from localhost ([2804:14d:7e39:8470:a90b:ac37:af4a:feb9])
-        by smtp.gmail.com with ESMTPSA id ei4-20020a056a0080c400b006e57e220ceasm1771460pfb.6.2024.02.29.14.13.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Feb 2024 14:13:57 -0800 (PST)
-References: <20240203-arm64-gcs-v8-0-c9fec77673ef@kernel.org>
- <20240203-arm64-gcs-v8-33-c9fec77673ef@kernel.org>
- <87sf1n7uea.fsf@linaro.org>
- <9b899b4e-7410-4c3b-967b-7794dac742e4@sirena.org.uk>
- <87ttlzsyro.fsf@linaro.org>
- <c710a6b1-cf58-4e32-ada0-c0b256a62b2c@sirena.org.uk>
-User-agent: mu4e 1.10.8; emacs 29.1
-From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon
- <will@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Morton
- <akpm@linux-foundation.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
- <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Arnd Bergmann <arnd@arndb.de>, Oleg
- Nesterov <oleg@redhat.com>, Eric Biederman <ebiederm@xmission.com>, Kees
- Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, "Rick P.
- Edgecombe" <rick.p.edgecombe@intel.com>, Deepak Gupta
- <debug@rivosinc.com>, Ard Biesheuvel <ardb@kernel.org>, Szabolcs Nagy
- <Szabolcs.Nagy@arm.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
- <aou@eecs.berkeley.edu>, Florian Weimer <fweimer@redhat.com>, Christian
- Brauner <brauner@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v8 33/38] kselftest/arm64: Add a GCS test program built
- with the system libc
-In-reply-to: <c710a6b1-cf58-4e32-ada0-c0b256a62b2c@sirena.org.uk>
-Date: Thu, 29 Feb 2024 19:13:55 -0300
-Message-ID: <878r329avw.fsf@linaro.org>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="a9dsPynl"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4210QUGO026455;
+	Fri, 1 Mar 2024 00:40:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	date:from:to:cc:subject:message-id:references:mime-version
+	:content-type:in-reply-to; s=qcppdkim1; bh=fAmtm81RwLGFezIhtTg09
+	a8+FIlqjPr8NQ8dQHAa7QY=; b=a9dsPynlV72fvZAGVQYtd9ghO3/7H4p0GFiKu
+	nNO83MJMpHZJuz00OyesNPnGPWDSuOO4+o+qUfyQiRlD20tgbQWvtn5XS4YChN5Y
+	BjjFhRW6Q2i+KdPvuCqF/B6pmFxyXZDgHpuPPdID7+NQeLWXi5cMdTR/rAEbjgdz
+	K3a4D0wfslswJVh/NcJcPjEBuS9aCeEyh+/M3NkFvoLZ6lWNCXc/alMkFLUzbyHX
+	oc2q+ZIqpS0UsuClXO5Rb+fRjj4oQ+zpZtbJZhdcbbuTQh4cTiIuiXLW8Kvk662+
+	G1R60o0wy7AJK2FoiS0hdtwJWHKRg3US3FjZahclnkcyihaag==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wjycdguu7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 01 Mar 2024 00:40:16 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 4210eGbs027001
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 1 Mar 2024 00:40:16 GMT
+Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
+ nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 29 Feb 2024 16:40:14 -0800
+Date: Thu, 29 Feb 2024 16:40:14 -0800
+From: Elliot Berman <quic_eberman@quicinc.com>
+To: Fuad Tabba <tabba@google.com>
+CC: David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
+        Matthew Wilcox <willy@infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.linux.dev>, <pbonzini@redhat.com>,
+        <chenhuacai@kernel.org>, <mpe@ellerman.id.au>, <anup@brainfault.org>,
+        <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
+        <aou@eecs.berkeley.edu>, <seanjc@google.com>, <brauner@kernel.org>,
+        <akpm@linux-foundation.org>, <xiaoyao.li@intel.com>,
+        <yilun.xu@intel.com>, <chao.p.peng@linux.intel.com>,
+        <jarkko@kernel.org>, <amoorthy@google.com>, <dmatlack@google.com>,
+        <yu.c.zhang@linux.intel.com>, <isaku.yamahata@intel.com>,
+        <mic@digikod.net>, <vbabka@suse.cz>, <vannapurve@google.com>,
+        <ackerleytng@google.com>, <mail@maciej.szmigiero.name>,
+        <michael.roth@amd.com>, <wei.w.wang@intel.com>,
+        <liam.merwick@oracle.com>, <isaku.yamahata@gmail.com>,
+        <kirill.shutemov@linux.intel.com>, <suzuki.poulose@arm.com>,
+        <steven.price@arm.com>, <quic_mnalajal@quicinc.com>,
+        <quic_tsoni@quicinc.com>, <quic_svaddagi@quicinc.com>,
+        <quic_cvanscha@quicinc.com>, <quic_pderrin@quicinc.com>,
+        <quic_pheragu@quicinc.com>, <catalin.marinas@arm.com>,
+        <james.morse@arm.com>, <yuzenghui@huawei.com>,
+        <oliver.upton@linux.dev>, <maz@kernel.org>, <will@kernel.org>,
+        <keirf@google.com>, <linux-mm@kvack.org>
+Subject: Re: Re: folio_mmapped
+Message-ID: <20240229114526893-0800.eberman@hu-eberman-lv.qualcomm.com>
+Mail-Followup-To: Fuad Tabba <tabba@google.com>, 
+	David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>, 
+	Matthew Wilcox <willy@infradead.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
+	brauner@kernel.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, 
+	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
+	amoorthy@google.com, dmatlack@google.com, yu.c.zhang@linux.intel.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
+	ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com, 
+	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, keirf@google.com, 
+	linux-mm@kvack.org
+References: <40a8fb34-868f-4e19-9f98-7516948fc740@redhat.com>
+ <20240226105258596-0800.eberman@hu-eberman-lv.qualcomm.com>
+ <925f8f5d-c356-4c20-a6a5-dd7efde5ee86@redhat.com>
+ <Zd8PY504BOwMR4jO@google.com>
+ <755911e5-8d4a-4e24-89c7-a087a26ec5f6@redhat.com>
+ <Zd8qvwQ05xBDXEkp@google.com>
+ <99a94a42-2781-4d48-8b8c-004e95db6bb5@redhat.com>
+ <Zd82V1aY-ZDyaG8U@google.com>
+ <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
+ <CA+EHjTzHtsbhzrb-TWft1q3Ree3kgzZbsir+R9L0tDgSX-d-0g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTzHtsbhzrb-TWft1q3Ree3kgzZbsir+R9L0tDgSX-d-0g@mail.gmail.com>
+X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: KUnnGdlrkBnGMyW3fU4tsf-S_7ez_xmz
+X-Proofpoint-ORIG-GUID: KUnnGdlrkBnGMyW3fU4tsf-S_7ez_xmz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-29_07,2024-02-29_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ mlxlogscore=999 impostorscore=0 bulkscore=0 priorityscore=1501
+ lowpriorityscore=0 malwarescore=0 adultscore=0 suspectscore=0 spamscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2402120000 definitions=main-2403010004
 
-
-Mark Brown <broonie@kernel.org> writes:
-
-> [[PGP Signed Part:Undecided]]
-> On Thu, Feb 22, 2024 at 11:24:59PM -0300, Thiago Jung Bauermann wrote:
->> Mark Brown <broonie@kernel.org> writes:
->
->> > I believe based on prior discussions that you're running this using
->> > shrinkwrap - can you confirm exactly how please, including things like
->> > which firmware configuration you're using?  I'm using current git with
->> >
->> >   shrinkwrap run \
->> >         --rtvar KERNEL=arch/arm64/boot/Image \
->> >         --rtvar ROOTFS=${ROOTFS} \
->> >         --rtvar CMDLINE="${CMDLINE}" \
->> >         --overlay=arch/v9.4.yaml ns-edk2.yaml
->> >
->> > and a locally built yocto and everything seems perfectly happy.
->> 
->> Yes, this is how I'm running it:
->> 
->>   CMDLINE="Image dtb=fdt.dtb console=ttyAMA0 earlycon=pl011,0x1c090000 root=/dev/vda2 ip=dhcp maxcpus=1"
->> 
->>   shrinkwrap run \
->>       --rtvar=KERNEL=Image-gcs-v8-v6.7-rc4-14743-ga551a7d7af93 \
->
-> I guess that's bitrotted?
-
-Ah, sorry. When I renamed the Image I messed up the kernel version in the
-filename, but I did confirm via "uname -r" that I was running the
-correct version: 6.8.0-rc2-ga551a7d7af93.
-
->> My rootfs is Ubuntu 22.04.3. In case it's useful, my kernel config is
->> here:
->
+On Thu, Feb 29, 2024 at 07:01:51PM +0000, Fuad Tabba wrote:
+> Hi David,
+> 
 > ...
->
->> https://people.linaro.org/~thiago.bauermann/gcs/config-v6.8.0-rc2
->
-> Thanks, it seems to be something in your config that's making a
-> difference - I can see issues with that.  Hopefully that'll help me get
-> to the bottom of this quickly.  I spent a bunch of time fighting with
-> Ubuntu images to get them running but once I did they didn't seem to
-> make much difference.
+> 
+> >>>> "mmap() the whole thing once and only access what you are supposed to
+> > >   (> > > access" sounds reasonable to me. If you don't play by the rules, you get a
+> > >>>> signal.
+> > >>>
+> > >>> "... you get a signal, or maybe you don't". But yes I understand your
+> > >>> point, and as per the above there are real benefits to this approach so
+> > >>> why not.
+> > >>>
+> > >>> What do we expect userspace to do when a page goes from shared back to
+> > >>> being guest-private, because e.g. the guest decides to unshare? Use
+> > >>> munmap() on that page? Or perhaps an madvise() call of some sort? Note
+> > >>> that this will be needed when starting a guest as well, as userspace
+> > >>> needs to copy the guest payload in the guestmem file prior to starting
+> > >>> the protected VM.
+> > >>
+> > >> Let's assume we have the whole guest_memfd mapped exactly once in our
+> > >> process, a single VMA.
+> > >>
+> > >> When setting up the VM, we'll write the payload and then fire up the VM.
+> > >>
+> > >> That will (I assume) trigger some shared -> private conversion.
+> > >>
+> > >> When we want to convert shared -> private in the kernel, we would first
+> > >> check if the page is currently mapped. If it is, we could try unmapping that
+> > >> page using an rmap walk.
+> > >
+> > > I had not considered that. That would most certainly be slow, but a well
+> > > behaved userspace process shouldn't hit it so, that's probably not a
+> > > problem...
+> >
+> > If there really only is a single VMA that covers the page (or even mmaps
+> > the guest_memfd), it should not be too bad. For example, any
+> > fallocate(PUNCHHOLE) has to do the same, to unmap the page before
+> > discarding it from the pagecache.
+> 
+> I don't think that we can assume that only a single VMA covers a page.
+> 
+> > But of course, no rmap walk is always better.
+> 
+> We've been thinking some more about how to handle the case where the
+> host userspace has a mapping of a page that later becomes private.
+> 
+> One idea is to refuse to run the guest (i.e., exit vcpu_run() to back
+> to the host with a meaningful exit reason) until the host unmaps that
+> page, and check for the refcount to the page as you mentioned earlier.
+> This is essentially what the RFC I sent does (minus the bugs :) ) .
+> 
+> The other idea is to use the rmap walk as you suggested to zap that
+> page. If the host tries to access that page again, it would get a
+> SIGBUS on the fault. This has the advantage that, as you'd mentioned,
+> the host doesn't need to constantly mmap() and munmap() pages. It
+> could potentially be optimised further as suggested if we have a
+> cooperating VMM that would issue a MADV_DONTNEED or something like
+> that, but that's just an optimisation and we would still need to have
+> the option of the rmap walk. However, I was wondering how practical
+> this idea would be if more than a single VMA covers a page?
+> 
 
-In that case, it's interesting that I still run into the problem with
-the defconfig. One thing I failed to mention and perhaps is relevant
-considering your result, is that I didn't copy the modules into the disk
-image, so the FVP was running just with was built into the kernel.
+Agree with all your points here. I changed Gunyah's implementation to do
+the unmap instead of erroring out. I didn't observe a significant
+performance difference. However, doing unmap might be a little faster
+because we can check folio_mapped() before doing the rmap walk. When
+erroring out at mmap() level, we always have to do the walk.
 
-That was actually the main reason for me to use a custom config:
-I didn't want to have to deal with kernel modules, so I created a config
-that didn't have any.
+> Also, there's the question of what to do if the page is gupped? In
+> this case I think the only thing we can do is refuse to run the guest
+> until the gup (and all references) are released, which also brings us
+> back to the way things (kind of) are...
+> 
 
--- 
-Thiago
+If there are gup users who don't do FOLL_PIN, I think we either need to
+fix them or live with possibility here? We don't have a reliable
+refcount for a folio to be safe to unmap: it might be that another vCPU
+is trying to get the same page, has incremented the refcount, and
+waiting for the folio_lock. This problem exists whether we block the
+mmap() or do SIGBUS.
+
+Thanks,
+Elliot
