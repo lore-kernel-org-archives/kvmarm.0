@@ -1,66 +1,66 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F51A3D0BE
-	for <kvmarm@lists.linux.dev>; Fri,  1 Mar 2024 11:06:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A90F6A8D9
+	for <kvmarm@lists.linux.dev>; Fri,  1 Mar 2024 11:17:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709291172; cv=none; b=AiWvXJv69y0S85JtLRLQRzvbjI/FoFIfnHOcAFd9OiWLY52GuJJwawPh6Bghjz6fck1J+tSUArckwO78uouZYtiIdLpy8RrmPofftXK0pC5Z9+gZNPmdg+Yqb1V2q5/2bSL9j6+Tlg2HsAcN1YebC5qgzz7chy0ak6Cbe90B928=
+	t=1709291824; cv=none; b=KLkqaDdbLhMmg4syjFgw9NvH6cl8v9ZjHhdPW9amaTU8f2yFhmngv125L6Go6Xai/uzvyswqLNsEQpXsZGOMU3Skg1nOyIzygtnN6erjNkcEL40+b91JjOVxQDIVNQHVMAFNTuYL6M5Ih5uc2eNDTSaUvc11nWMnJISGAChwCzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709291172; c=relaxed/simple;
-	bh=op/dcZNAdhYlhoEh45q8h+j9w0m7hwMJuIawygV6gKA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t4qOUTSkUil72GVl6mjL4tpFO2WZTaoh7+eJ+Ey0TyTgvkqWJ0Kbn0S7PEIvp2D7t45tHLt529vKBsnPmcbI8q+tf6ALH6N2OiuzLu6UiuMgdqM8tNsj5GkgSp97nK/6WykU2B6SQJU5p9tG+9sDH5tfnilVwDjOOXMGt0FpevU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZmwnfFr2; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1709291824; c=relaxed/simple;
+	bh=2F5INcybYSBlsTuC5lQQe/pcELvA6BCsUmGtOzzVYcM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=MdPGD1AiAZ/OMo2UCpc08FVBFLHczImg+mwSoQlupdE1o7Ev3CDHsx3cWmWsSvjMV7AWVi17IYoGs5yGIqj75buI9mIZI7Hb6fQKeKvt64RaGsajyBPexXzcT7hgBtd1t3WqgqPR/5PnEbZ5fD+8xrlgAtypbxv4cRM6YxI5EZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e10SIWXy; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZmwnfFr2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e10SIWXy"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709291170;
+	s=mimecast20190719; t=1709291822;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=OTu9yQAz/Bq5q8qJRpL1GEaCaOVasim4Cds/yT3hKoY=;
-	b=ZmwnfFr2clSE5rY1a+B0FAig8Ae5C2LIYM77oN9PpN+WppwVm1lxuwd52XvN99SkMLU5mK
-	0Jmkay92YVd2E7LBSQNDq4rUdtyrToy3T5mZb2/6aYGTtiUBqx5JBPWfhWPG2Oqfi0aOMH
-	QHjm32Zo39Bn9dKShRwjgXw0lx38Vpw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=l7h8L36t6ZHKdWAqV7lhkUriHsYrS8uCVVI7qYoH0Mk=;
+	b=e10SIWXy1AVAx65atQ7iSTPL2xu7uUfjby4+MS56i70kyJdJ8Qx3JAy16mSk7/Aq3mKtBJ
+	SX3s6R7xkjC22BZh4WtFg6GgBmXOtwu1JXQ0tVOjG8eWHSc0DSMUeZoRhQmtup80vG3VbF
+	sbwrWl0Lp/zR33+XqrPXQ0TRHIarJXc=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-671-Wsbb67jMO7WxBFd4qJ5jUQ-1; Fri, 01 Mar 2024 06:06:08 -0500
-X-MC-Unique: Wsbb67jMO7WxBFd4qJ5jUQ-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40e4478a3afso10115925e9.1
-        for <kvmarm@lists.linux.dev>; Fri, 01 Mar 2024 03:06:08 -0800 (PST)
+ us-mta-663-s_C5jGUIM_ec48M6F8PqnA-1; Fri, 01 Mar 2024 06:16:58 -0500
+X-MC-Unique: s_C5jGUIM_ec48M6F8PqnA-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-33d11878726so904124f8f.0
+        for <kvmarm@lists.linux.dev>; Fri, 01 Mar 2024 03:16:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709291168; x=1709895968;
+        d=1e100.net; s=20230601; t=1709291817; x=1709896617;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OTu9yQAz/Bq5q8qJRpL1GEaCaOVasim4Cds/yT3hKoY=;
-        b=NGJr5BiclPn5ZcBxqFCITyXzswpPyTD89ewqaRDPf8+DEtbkc2u284jdoFHxaepQix
-         hO8BDAvfUf3wpJwTWYo+e2AYq3ei4jEuFkQ/i8uZwo1fF+AXOYSibixN1Ve4CWcQ006l
-         MEXI9/ghmMYKwMZUWp1MLkQa0bFGb6uug3336QEwmtNMglInSQPR/pTntMlaL7+DHG8f
-         GEoA67/k1RSxJDnkv/+91pt+mhQmRDBCoLeefSLMOx72xNoBOhVodC9bbfFG1GX3BLYU
-         MeNeeos6uCtaY6UiYEL1Op18og5iA/SLZVH26AxHyzt29xoh2Snxt6pjiBPaEpD91oky
-         5nZw==
-X-Forwarded-Encrypted: i=1; AJvYcCU/BQ0tJs5QQZlcjsNI/FKPzl4Ae7Vv9yIjEayd2GHJkPtqpD2FjlPU4swj7TsG5YMF+JXNQ5i6HD1JWSxEZ5fJGpC8FxC3
-X-Gm-Message-State: AOJu0YxU5MRNX6r1Pbma+tAhMsYwJF/AFi8YtLfuAZCD1U0WGCj+EkRI
-	RF8lgg2i7qtHNwB8Exr+8B0DJhWSYYfvFu+1jLF7eZmOygYR5tCSqWXhFuvYAa42mIIoM5lMdxk
-	/O9y55wynReB98mlz71cTV18eiDvWq8iDqe+vWjItM1r8N9IeBMrVHA==
-X-Received: by 2002:a05:600c:1d21:b0:412:bcca:751d with SMTP id l33-20020a05600c1d2100b00412bcca751dmr1521296wms.11.1709291167654;
-        Fri, 01 Mar 2024 03:06:07 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFWiHz7xg2JWGvWqpFUD5KHhM2g2oWKiybeNQjejSi0p04jASbNX1ljtzsf3Azwu4vHoKz6Sg==
-X-Received: by 2002:a05:600c:1d21:b0:412:bcca:751d with SMTP id l33-20020a05600c1d2100b00412bcca751dmr1521238wms.11.1709291167154;
-        Fri, 01 Mar 2024 03:06:07 -0800 (PST)
+         :references:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=l7h8L36t6ZHKdWAqV7lhkUriHsYrS8uCVVI7qYoH0Mk=;
+        b=LSgTPRleSnE0wx2otoohQ0oLr6ql43miC4qQ7nOWW55hH6p8kBzanGYQvPufcYsP3A
+         48duDzinpxnLR7YVFl8rICVlVdojxaIO5xelhQHfF0muyE3xx+C605C1vYCh9rRxauJv
+         moFl7k44IRkUU1+89vK0+qkvWJ2bQoeSeY4l3XKUxl1YnUWNow6H0SAj9LWsy5L2PgbD
+         QIezr6yY5pnF4S46q7ib0MKqrPwgqajCuYwW021NQhhJ3AxBajxNUMKhggz2sbsBpVg6
+         FzZ/ZePb/jL3CSzb9bUS2AeBCF9zeR/bUZ0ty69LRLMZE9+U4l3oWaHuz9ZbcNG8TOun
+         CeZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVJJ+ig3QeAo40tv9waCioNlcvz/b4ju8MqJvzU7tKVjVrLDYcoIglFcFS06rSsTYCeExvr2ZCZlAFkvrl/G+7qWi+Bc0eD
+X-Gm-Message-State: AOJu0YyVirYcNbNTFB4n/dpdax7g671ozDYcllcD1BNhKGUXajTMjas5
+	Ce+TsJBUTfHb96wWfkyOA+/wFTHs+zPneE1JBtZJAMHnii7rdlM7EKgPG6OwSX7+24wtBVIkFSe
+	xDG75SUdyubH+Rh7kn0b2rcOQHELsF3Dwe0TbQl+4MIH/TzLu0WQ2Fw==
+X-Received: by 2002:a5d:4e81:0:b0:33d:a190:f0c with SMTP id e1-20020a5d4e81000000b0033da1900f0cmr1064033wru.16.1709291817524;
+        Fri, 01 Mar 2024 03:16:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFp1isGyPm2fiySEuFOLcKwywN+DApFjRV+WU0CQMIn4Sv8KZcSZoBBQS3Ta/UefMvGZlkiSA==
+X-Received: by 2002:a5d:4e81:0:b0:33d:a190:f0c with SMTP id e1-20020a5d4e81000000b0033da1900f0cmr1063994wru.16.1709291817058;
+        Fri, 01 Mar 2024 03:16:57 -0800 (PST)
 Received: from ?IPV6:2003:cb:c713:3200:77d:8652:169f:b5f7? (p200300cbc7133200077d8652169fb5f7.dip0.t-ipconnect.de. [2003:cb:c713:3200:77d:8652:169f:b5f7])
-        by smtp.gmail.com with ESMTPSA id jp16-20020a05600c559000b00412a482cd90sm4910036wmb.25.2024.03.01.03.06.04
+        by smtp.gmail.com with ESMTPSA id cc6-20020a5d5c06000000b0033dd4673a4asm4408594wrb.71.2024.03.01.03.16.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Mar 2024 03:06:06 -0800 (PST)
-Message-ID: <80348181-016a-47ee-b4f0-51d8fe092138@redhat.com>
-Date: Fri, 1 Mar 2024 12:06:04 +0100
+        Fri, 01 Mar 2024 03:16:56 -0800 (PST)
+Message-ID: <d8e6c848-e26a-4014-b0c2-f3a21fb4e636@redhat.com>
+Date: Fri, 1 Mar 2024 12:16:54 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -69,28 +69,25 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: folio_mmapped
-To: Fuad Tabba <tabba@google.com>
-Cc: Quentin Perret <qperret@google.com>, Matthew Wilcox
- <willy@infradead.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, brauner@kernel.org,
- akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
- chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
- dmatlack@google.com, yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com,
- mic@digikod.net, vbabka@suse.cz, vannapurve@google.com,
- ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com,
- wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
- quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
- quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
- james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
- maz@kernel.org, will@kernel.org, keirf@google.com, linux-mm@kvack.org
-References: <20240222161047.402609-1-tabba@google.com>
- <20240222141602976-0800.eberman@hu-eberman-lv.qualcomm.com>
- <ZdfoR3nCEP3HTtm1@casper.infradead.org>
- <40a8fb34-868f-4e19-9f98-7516948fc740@redhat.com>
+To: Fuad Tabba <tabba@google.com>, Quentin Perret <qperret@google.com>,
+ Matthew Wilcox <willy@infradead.org>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org,
+ mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
+ palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com,
+ brauner@kernel.org, akpm@linux-foundation.org, xiaoyao.li@intel.com,
+ yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org,
+ amoorthy@google.com, dmatlack@google.com, yu.c.zhang@linux.intel.com,
+ isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+ vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
+ michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
+ isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+ suzuki.poulose@arm.com, steven.price@arm.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ will@kernel.org, keirf@google.com, linux-mm@kvack.org
+References: <40a8fb34-868f-4e19-9f98-7516948fc740@redhat.com>
  <20240226105258596-0800.eberman@hu-eberman-lv.qualcomm.com>
  <925f8f5d-c356-4c20-a6a5-dd7efde5ee86@redhat.com>
  <Zd8PY504BOwMR4jO@google.com>
@@ -100,6 +97,7 @@ References: <20240222161047.402609-1-tabba@google.com>
  <Zd82V1aY-ZDyaG8U@google.com>
  <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
  <CA+EHjTzHtsbhzrb-TWft1q3Ree3kgzZbsir+R9L0tDgSX-d-0g@mail.gmail.com>
+ <20240229114526893-0800.eberman@hu-eberman-lv.qualcomm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -146,91 +144,90 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <CA+EHjTzHtsbhzrb-TWft1q3Ree3kgzZbsir+R9L0tDgSX-d-0g@mail.gmail.com>
+In-Reply-To: <20240229114526893-0800.eberman@hu-eberman-lv.qualcomm.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 29.02.24 20:01, Fuad Tabba wrote:
-> Hi David,
-> 
-> ...
-> 
-
-Hi!
-
->>>>> "mmap() the whole thing once and only access what you are supposed to
->>>    (> > > access" sounds reasonable to me. If you don't play by the rules, you get a
->>>>>> signal.
->>>>>
->>>>> "... you get a signal, or maybe you don't". But yes I understand your
->>>>> point, and as per the above there are real benefits to this approach so
->>>>> why not.
->>>>>
->>>>> What do we expect userspace to do when a page goes from shared back to
->>>>> being guest-private, because e.g. the guest decides to unshare? Use
->>>>> munmap() on that page? Or perhaps an madvise() call of some sort? Note
->>>>> that this will be needed when starting a guest as well, as userspace
->>>>> needs to copy the guest payload in the guestmem file prior to starting
->>>>> the protected VM.
->>>>
->>>> Let's assume we have the whole guest_memfd mapped exactly once in our
->>>> process, a single VMA.
->>>>
->>>> When setting up the VM, we'll write the payload and then fire up the VM.
->>>>
->>>> That will (I assume) trigger some shared -> private conversion.
->>>>
->>>> When we want to convert shared -> private in the kernel, we would first
->>>> check if the page is currently mapped. If it is, we could try unmapping that
->>>> page using an rmap walk.
->>>
->>> I had not considered that. That would most certainly be slow, but a well
->>> behaved userspace process shouldn't hit it so, that's probably not a
->>> problem...
+>> I don't think that we can assume that only a single VMA covers a page.
 >>
->> If there really only is a single VMA that covers the page (or even mmaps
->> the guest_memfd), it should not be too bad. For example, any
->> fallocate(PUNCHHOLE) has to do the same, to unmap the page before
->> discarding it from the pagecache.
+>>> But of course, no rmap walk is always better.
+>>
+>> We've been thinking some more about how to handle the case where the
+>> host userspace has a mapping of a page that later becomes private.
+>>
+>> One idea is to refuse to run the guest (i.e., exit vcpu_run() to back
+>> to the host with a meaningful exit reason) until the host unmaps that
+>> page, and check for the refcount to the page as you mentioned earlier.
+>> This is essentially what the RFC I sent does (minus the bugs :) ) .
+>>
+>> The other idea is to use the rmap walk as you suggested to zap that
+>> page. If the host tries to access that page again, it would get a
+>> SIGBUS on the fault. This has the advantage that, as you'd mentioned,
+>> the host doesn't need to constantly mmap() and munmap() pages. It
+>> could potentially be optimised further as suggested if we have a
+>> cooperating VMM that would issue a MADV_DONTNEED or something like
+>> that, but that's just an optimisation and we would still need to have
+>> the option of the rmap walk. However, I was wondering how practical
+>> this idea would be if more than a single VMA covers a page?
+>>
 > 
-> I don't think that we can assume that only a single VMA covers a page.
-> 
->> But of course, no rmap walk is always better.
-> 
-> We've been thinking some more about how to handle the case where the
-> host userspace has a mapping of a page that later becomes private.
-> 
-> One idea is to refuse to run the guest (i.e., exit vcpu_run() to back
-> to the host with a meaningful exit reason) until the host unmaps that
-> page, and check for the refcount to the page as you mentioned earlier.
-> This is essentially what the RFC I sent does (minus the bugs :) ) .
+> Agree with all your points here. I changed Gunyah's implementation to do
+> the unmap instead of erroring out. I didn't observe a significant
+> performance difference. However, doing unmap might be a little faster
+> because we can check folio_mapped() before doing the rmap walk. When
+> erroring out at mmap() level, we always have to do the walk.
 
-:)
+Right. On the mmap() level you won't really have to walk page tables, as 
+the the munmap() already zapped the page and removed the "problematic" VMA.
+
+Likely, you really want to avoid repeatedly calling mmap()+munmap() just 
+to access shared memory; but that's just my best guess about your user 
+space app :)
 
 > 
-> The other idea is to use the rmap walk as you suggested to zap that
-> page. If the host tries to access that page again, it would get a
-> SIGBUS on the fault. This has the advantage that, as you'd mentioned,
-> the host doesn't need to constantly mmap() and munmap() pages. It
-> could potentially be optimised further as suggested if we have a
-> cooperating VMM that would issue a MADV_DONTNEED or something like
-> that, but that's just an optimisation and we would still need to have
-> the option of the rmap walk. However, I was wondering how practical
-> this idea would be if more than a single VMA covers a page?
-
-A few VMAs won't make a difference I assume. Any idea how many "sharers" 
-you'd expect in a sane configuration?
-
+>> Also, there's the question of what to do if the page is gupped? In
+>> this case I think the only thing we can do is refuse to run the guest
+>> until the gup (and all references) are released, which also brings us
+>> back to the way things (kind of) are...
+>>
 > 
-> Also, there's the question of what to do if the page is gupped? In
-> this case I think the only thing we can do is refuse to run the guest
-> until the gup (and all references) are released, which also brings us
-> back to the way things (kind of) are...
+> If there are gup users who don't do FOLL_PIN, I think we either need to
+> fix them or live with possibility here? We don't have a reliable
+> refcount for a folio to be safe to unmap: it might be that another vCPU
+> is trying to get the same page, has incremented the refcount, and
+> waiting for the folio_lock.
 
-Indeed. There is no way you could possibly make progress.
+Likely there could be a way to detect that when only the vCPUs are your 
+concern? But yes, it's nasty.
+
+(has to be handled in either case :()
+
+Disallowing any FOLL_GET|FOLL_PIN could work. Not sure how some 
+core-kernel FOLL_GET users would react to that, though.
+
+See vma_is_secretmem() and folio_is_secretmem() in mm/gup.c, where we 
+disallow any FOLL_GET|FOLL_PIN of secretmem pages.
+
+We'd need a way to teach core-mm similarly about guest_memfd, which 
+might end up rather tricky, but not impossible :)
+
+> This problem exists whether we block the
+> mmap() or do SIGBUS.
+
+There is work on doing more conversion to FOLL_PIN, but some cases are 
+harder to convert. Most of O_DIRECT should be using it nowadays, but 
+some other known use cases don't.
+
+The simplest and readily-available example is still vmsplice(). I don't 
+think it was fixed yet to use FOLL_PIN.
+
+Use vmsplice() to pin the page in the pipe (read-only). Unmap the VMA. 
+You can read the page any time later by reading from the pipe.
+
+So I wouldn't bet on all relevant cases being gone in the near future.
 
 -- 
 Cheers,
