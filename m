@@ -1,236 +1,207 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A90F6A8D9
-	for <kvmarm@lists.linux.dev>; Fri,  1 Mar 2024 11:17:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16C021115
+	for <kvmarm@lists.linux.dev>; Fri,  1 Mar 2024 12:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709291824; cv=none; b=KLkqaDdbLhMmg4syjFgw9NvH6cl8v9ZjHhdPW9amaTU8f2yFhmngv125L6Go6Xai/uzvyswqLNsEQpXsZGOMU3Skg1nOyIzygtnN6erjNkcEL40+b91JjOVxQDIVNQHVMAFNTuYL6M5Ih5uc2eNDTSaUvc11nWMnJISGAChwCzE=
+	t=1709297373; cv=none; b=n1DRtTCCJVtVtmTFtiDIYiG2EqExKgrYQ/ZWaYRhFTlEylHHYqrTeYLwT67ObLznNXz/emebr+Pj/1xVos2ZYQp8enfWT74OfAyZ5QffVTVqGgmTH8t+DgTXqwrUvfpFxV8pKd1wTD0MS1wi+MysEap2MhYRVgOKJdWmPpBz8IY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709291824; c=relaxed/simple;
-	bh=2F5INcybYSBlsTuC5lQQe/pcELvA6BCsUmGtOzzVYcM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=MdPGD1AiAZ/OMo2UCpc08FVBFLHczImg+mwSoQlupdE1o7Ev3CDHsx3cWmWsSvjMV7AWVi17IYoGs5yGIqj75buI9mIZI7Hb6fQKeKvt64RaGsajyBPexXzcT7hgBtd1t3WqgqPR/5PnEbZ5fD+8xrlgAtypbxv4cRM6YxI5EZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e10SIWXy; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e10SIWXy"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709291822;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=l7h8L36t6ZHKdWAqV7lhkUriHsYrS8uCVVI7qYoH0Mk=;
-	b=e10SIWXy1AVAx65atQ7iSTPL2xu7uUfjby4+MS56i70kyJdJ8Qx3JAy16mSk7/Aq3mKtBJ
-	SX3s6R7xkjC22BZh4WtFg6GgBmXOtwu1JXQ0tVOjG8eWHSc0DSMUeZoRhQmtup80vG3VbF
-	sbwrWl0Lp/zR33+XqrPXQ0TRHIarJXc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-663-s_C5jGUIM_ec48M6F8PqnA-1; Fri, 01 Mar 2024 06:16:58 -0500
-X-MC-Unique: s_C5jGUIM_ec48M6F8PqnA-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-33d11878726so904124f8f.0
-        for <kvmarm@lists.linux.dev>; Fri, 01 Mar 2024 03:16:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709291817; x=1709896617;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l7h8L36t6ZHKdWAqV7lhkUriHsYrS8uCVVI7qYoH0Mk=;
-        b=LSgTPRleSnE0wx2otoohQ0oLr6ql43miC4qQ7nOWW55hH6p8kBzanGYQvPufcYsP3A
-         48duDzinpxnLR7YVFl8rICVlVdojxaIO5xelhQHfF0muyE3xx+C605C1vYCh9rRxauJv
-         moFl7k44IRkUU1+89vK0+qkvWJ2bQoeSeY4l3XKUxl1YnUWNow6H0SAj9LWsy5L2PgbD
-         QIezr6yY5pnF4S46q7ib0MKqrPwgqajCuYwW021NQhhJ3AxBajxNUMKhggz2sbsBpVg6
-         FzZ/ZePb/jL3CSzb9bUS2AeBCF9zeR/bUZ0ty69LRLMZE9+U4l3oWaHuz9ZbcNG8TOun
-         CeZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVJJ+ig3QeAo40tv9waCioNlcvz/b4ju8MqJvzU7tKVjVrLDYcoIglFcFS06rSsTYCeExvr2ZCZlAFkvrl/G+7qWi+Bc0eD
-X-Gm-Message-State: AOJu0YyVirYcNbNTFB4n/dpdax7g671ozDYcllcD1BNhKGUXajTMjas5
-	Ce+TsJBUTfHb96wWfkyOA+/wFTHs+zPneE1JBtZJAMHnii7rdlM7EKgPG6OwSX7+24wtBVIkFSe
-	xDG75SUdyubH+Rh7kn0b2rcOQHELsF3Dwe0TbQl+4MIH/TzLu0WQ2Fw==
-X-Received: by 2002:a5d:4e81:0:b0:33d:a190:f0c with SMTP id e1-20020a5d4e81000000b0033da1900f0cmr1064033wru.16.1709291817524;
-        Fri, 01 Mar 2024 03:16:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFp1isGyPm2fiySEuFOLcKwywN+DApFjRV+WU0CQMIn4Sv8KZcSZoBBQS3Ta/UefMvGZlkiSA==
-X-Received: by 2002:a5d:4e81:0:b0:33d:a190:f0c with SMTP id e1-20020a5d4e81000000b0033da1900f0cmr1063994wru.16.1709291817058;
-        Fri, 01 Mar 2024 03:16:57 -0800 (PST)
-Received: from ?IPV6:2003:cb:c713:3200:77d:8652:169f:b5f7? (p200300cbc7133200077d8652169fb5f7.dip0.t-ipconnect.de. [2003:cb:c713:3200:77d:8652:169f:b5f7])
-        by smtp.gmail.com with ESMTPSA id cc6-20020a5d5c06000000b0033dd4673a4asm4408594wrb.71.2024.03.01.03.16.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Mar 2024 03:16:56 -0800 (PST)
-Message-ID: <d8e6c848-e26a-4014-b0c2-f3a21fb4e636@redhat.com>
-Date: Fri, 1 Mar 2024 12:16:54 +0100
+	s=arc-20240116; t=1709297373; c=relaxed/simple;
+	bh=NHCHlY1mNSUuowuDTVrXRqOA3e2iVPDG8y3jAmEeIFA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=imCEjsy5ncEuOqG0Qfg8V2uK8x6fFjVhwphxR2hGoGEUScasGlSvnYAzsoLltvhuMY276UfhNJDcbP04WdxmpqyT319wOqspW+86QROLzH3QfrhJ5/AdUlQo+NSS/fC261yIovAWpI0tR1+AmOo27JKE3Eg9409GEMuHHHCAn6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 728241FB;
+	Fri,  1 Mar 2024 04:50:08 -0800 (PST)
+Received: from FVFF77S0Q05N (unknown [10.57.69.134])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6D93D3F6C4;
+	Fri,  1 Mar 2024 04:49:27 -0800 (PST)
+Date: Fri, 1 Mar 2024 12:49:24 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	will@kernel.org, catalin.marinas@arm.com,
+	Mark Brown <broonie@kernel.org>, James Clark <james.clark@arm.com>,
+	Rob Herring <robh@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	linux-perf-users@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH V16 2/8] KVM: arm64: Prevent guest accesses into BRBE
+ system registers/instructions
+Message-ID: <ZeHO1OJsq98cdlk3@FVFF77S0Q05N>
+References: <20240125094119.2542332-1-anshuman.khandual@arm.com>
+ <20240125094119.2542332-3-anshuman.khandual@arm.com>
+ <ZdYCUi9YVDNDz7fr@FVFF77S0Q05N>
+ <ab50e67e-3d06-4ba7-a5f8-4684e9ef98a4@arm.com>
+ <Zd2zy0oUk8XvoDJM@FVFF77S0Q05N>
+ <b134c30d-d855-41bb-a260-9f6437b77697@arm.com>
+ <62e64ddd-266c-414e-b66a-8ca94f3c2bbf@arm.com>
+ <ZeB9kHheAGJ__TQU@FVFF77S0Q05N>
+ <3c5238e5-bf2b-4e6c-a81a-e7d7bb0d9fb4@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: folio_mmapped
-To: Fuad Tabba <tabba@google.com>, Quentin Perret <qperret@google.com>,
- Matthew Wilcox <willy@infradead.org>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org,
- mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
- palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com,
- brauner@kernel.org, akpm@linux-foundation.org, xiaoyao.li@intel.com,
- yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org,
- amoorthy@google.com, dmatlack@google.com, yu.c.zhang@linux.intel.com,
- isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
- vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
- michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
- isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
- suzuki.poulose@arm.com, steven.price@arm.com, quic_mnalajal@quicinc.com,
- quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
- quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
- yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
- will@kernel.org, keirf@google.com, linux-mm@kvack.org
-References: <40a8fb34-868f-4e19-9f98-7516948fc740@redhat.com>
- <20240226105258596-0800.eberman@hu-eberman-lv.qualcomm.com>
- <925f8f5d-c356-4c20-a6a5-dd7efde5ee86@redhat.com>
- <Zd8PY504BOwMR4jO@google.com>
- <755911e5-8d4a-4e24-89c7-a087a26ec5f6@redhat.com>
- <Zd8qvwQ05xBDXEkp@google.com>
- <99a94a42-2781-4d48-8b8c-004e95db6bb5@redhat.com>
- <Zd82V1aY-ZDyaG8U@google.com>
- <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
- <CA+EHjTzHtsbhzrb-TWft1q3Ree3kgzZbsir+R9L0tDgSX-d-0g@mail.gmail.com>
- <20240229114526893-0800.eberman@hu-eberman-lv.qualcomm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
- 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
- rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
- wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
- 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
- pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
- KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
- BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
- 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
- 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
- M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
- Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
- T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
- 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
- CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
- NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
- 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
- 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
- lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
- AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
- N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
- AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
- boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
- 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
- XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
- a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
- Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
- 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
- kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
- th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
- jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20240229114526893-0800.eberman@hu-eberman-lv.qualcomm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3c5238e5-bf2b-4e6c-a81a-e7d7bb0d9fb4@arm.com>
 
->> I don't think that we can assume that only a single VMA covers a page.
->>
->>> But of course, no rmap walk is always better.
->>
->> We've been thinking some more about how to handle the case where the
->> host userspace has a mapping of a page that later becomes private.
->>
->> One idea is to refuse to run the guest (i.e., exit vcpu_run() to back
->> to the host with a meaningful exit reason) until the host unmaps that
->> page, and check for the refcount to the page as you mentioned earlier.
->> This is essentially what the RFC I sent does (minus the bugs :) ) .
->>
->> The other idea is to use the rmap walk as you suggested to zap that
->> page. If the host tries to access that page again, it would get a
->> SIGBUS on the fault. This has the advantage that, as you'd mentioned,
->> the host doesn't need to constantly mmap() and munmap() pages. It
->> could potentially be optimised further as suggested if we have a
->> cooperating VMM that would issue a MADV_DONTNEED or something like
->> that, but that's just an optimisation and we would still need to have
->> the option of the rmap walk. However, I was wondering how practical
->> this idea would be if more than a single VMA covers a page?
->>
+On Fri, Mar 01, 2024 at 01:16:10PM +0530, Anshuman Khandual wrote:
 > 
-> Agree with all your points here. I changed Gunyah's implementation to do
-> the unmap instead of erroring out. I didn't observe a significant
-> performance difference. However, doing unmap might be a little faster
-> because we can check folio_mapped() before doing the rmap walk. When
-> erroring out at mmap() level, we always have to do the walk.
-
-Right. On the mmap() level you won't really have to walk page tables, as 
-the the munmap() already zapped the page and removed the "problematic" VMA.
-
-Likely, you really want to avoid repeatedly calling mmap()+munmap() just 
-to access shared memory; but that's just my best guess about your user 
-space app :)
-
+> On 2/29/24 18:20, Mark Rutland wrote:
+> > Hi Suzuki,
+> > 
+> > On Thu, Feb 29, 2024 at 11:45:08AM +0000, Suzuki K Poulose wrote:
+> >> On 27/02/2024 11:13, Anshuman Khandual wrote:
+> >>> On 2/27/24 15:34, Mark Rutland wrote:
+> >>>> On Fri, Feb 23, 2024 at 12:58:48PM +0530, Anshuman Khandual wrote:
+> >>>>> On 2/21/24 19:31, Mark Rutland wrote:
+> >>>>>> On Thu, Jan 25, 2024 at 03:11:13PM +0530, Anshuman Khandual wrote:
+> >>>>>>> Currently BRBE feature is not supported in a guest environment. This hides
+> >>>>>>> BRBE feature availability via masking ID_AA64DFR0_EL1.BRBE field.
+> >>>>>>
+> >>>>>> Does that means that a guest can currently see BRBE advertised in the
+> >>>>>> ID_AA64DFR0_EL1.BRB field, or is that hidden by the regular cpufeature code
+> >>>>>> today?
+> >>>>>
+> >>>>> IIRC it is hidden, but will have to double check. When experimenting for BRBE
+> >>>>> guest support enablement earlier, following changes were need for the feature
+> >>>>> to be visible in ID_AA64DFR0_EL1.
+> >>>>>
+> >>>>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> >>>>> index 646591c67e7a..f258568535a8 100644
+> >>>>> --- a/arch/arm64/kernel/cpufeature.c
+> >>>>> +++ b/arch/arm64/kernel/cpufeature.c
+> >>>>> @@ -445,6 +445,7 @@ static const struct arm64_ftr_bits ftr_id_mmfr0[] = {
+> >>>>>   };
+> >>>>>   static const struct arm64_ftr_bits ftr_id_aa64dfr0[] = {
+> >>>>> +       S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_BRBE_SHIFT, 4, ID_AA64DFR0_EL1_BRBE_IMP),
+> >>>>>          S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_DoubleLock_SHIFT, 4, 0),
+> >>>>>          ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_PMSVer_SHIFT, 4, 0),
+> >>>>>          ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_CTX_CMPs_SHIFT, 4, 0),
+> >>>>>
+> >>>>> Should we add the following entry - explicitly hiding BRBE from the guest
+> >>>>> as a prerequisite patch ?
+> >>
+> >> This has nothing to do with the Guest visibility of the BRBE. This is
+> >> specifically for host "userspace" (via MRS emulation).
+> >>
+> >>>>>
+> >>>>> S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_BRBE_SHIFT, 4, ID_AA64DFR0_EL1_BRBE_NI)
+> >>>>
+> >>>> Is it visbile currently, or is it hidden currently?
+> >>>>
+> >>>> * If it is visible before this patch, that's a latent bug that we need to go
+> >>>>    fix first, and that'll require more coordination.
+> >>>>
+> >>>> * If it is not visible before this patch, there's no problem in the code, but
+> >>>>    the commit message needs to explicitly mention that's the case as the commit
+> >>>>    message currently implies it is visible by only mentioning hiding it.
+> >>>>
+> >>>> ... so can you please double check as you suggested above? We should be able to
+> >>>> explain why it is or is not visible today.
+> >>>
+> >>> It is currently hidden i.e following code returns 1 in the host
+> >>> but returns 0 inside the guest.
+> >>>
+> >>> aa64dfr0 = read_sysreg_s(SYS_ID_AA64DFR0_EL1);
+> >>> brbe = cpuid_feature_extract_unsigned_field(aa64dfr0, ID_AA64DFR0_EL1_BRBE_SHIFT);
+> >>>
+> >>> Hence - will update the commit message here as suggested.
+> >>
+> >> This is by virtue of the masking we do in the kvm/sysreg.c below.
+> > 
+> > Yep, once this patch is applied.
+> > 
+> > I think we might have some crossed wires here; I'm only really asking for the
+> > commit message (and title) to be updated and clarified.
 > 
->> Also, there's the question of what to do if the page is gupped? In
->> this case I think the only thing we can do is refuse to run the guest
->> until the gup (and all references) are released, which also brings us
->> back to the way things (kind of) are...
->>
+> Understood.
 > 
-> If there are gup users who don't do FOLL_PIN, I think we either need to
-> fix them or live with possibility here? We don't have a reliable
-> refcount for a folio to be safe to unmap: it might be that another vCPU
-> is trying to get the same page, has incremented the refcount, and
-> waiting for the folio_lock.
+> > Ignoring the patchlet above, and just considering the original patch:
+> > 
+> > IIUC before the patch is applied, the ID_AA64DFR0_EL1.BRBE field is zero for
+> > the guest because we don't have an arm64_ftr_bits entry for the
+> > ID_AA64DFR0_EL1.BRBE field, and so init_cpu_ftr_reg() will leave that as zero
+> > in arm64_ftr_reg::sys_val, and hence when read_sanitised_id_aa64dfr0_el1()
+> > calls read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1), the BRBE field will be zero.
+> 
+> Makes sense, but should not arm64_ftr_reg::sys_val be explicitly set to '0' via
+> ID_AA64DFR0_EL1_BRBE_NI via adding a S_ARM64_FTR_BITS() into ftr_id_aa64dfr0[] ?
 
-Likely there could be a way to detect that when only the vCPUs are your 
-concern? But yes, it's nasty.
+I don't understand what you're asking here -- there's no way that a
+arm64_ftr_bits entry can explicitly zero a field.
 
-(has to be handled in either case :()
+> OR because it's going to be made visible via S_ARM64_FTR_BITS(FTR_VISIBLE
+> , ...., ID_AA64DFR0_EL1_BRBE_IMP) for enabling it in the guest, this might not be
+> necessary for now. Besides it is also being blocked explicitly now via this patch
+> in read_sanitised_id_aa64dfr0_el1().
 
-Disallowing any FOLL_GET|FOLL_PIN could work. Not sure how some 
-core-kernel FOLL_GET users would react to that, though.
+We are not going to add a FTR_VISIBLE entry -- as Suzuki already pointed out,
+that means *visible to userspace*.
 
-See vma_is_secretmem() and folio_is_secretmem() in mm/gup.c, where we 
-disallow any FOLL_GET|FOLL_PIN of secretmem pages.
+We currently have no need for an arm64_ftr_bits entry for BRBE. We can add one
+for the sake of documenting our policy for that field, like we do for PMUVer,
+but that's the only reason to do so, and doing that requires that we also mask
+the field within read_sanitised_id_aa64dfr0_el1().
 
-We'd need a way to teach core-mm similarly about guest_memfd, which 
-might end up rather tricky, but not impossible :)
+> > So the commit title should be something like:
+> > 
+> >   KVM: arm64: explicitly handle BRBE register accesses as UNDEFINED
+> > 
+> > ... and the message should mention the key points from the above.
+> > 
+> > Suzuki, does that sound right to you?
+> > 
+> > Anshuman, can you go re-write the commit message with that in mind?
+> 
+> Sure, will something like the following be okay ?
+> 
+> KVM: arm64: Explicitly handle BRBE register accesses as UNDEFINED
+> 
+> Although ID_AA64DFR0_EL1.BRBE field is zero for the guest because there is
+> no arm64_ftr_bits[] entry for the ID_AA64DFR0_EL1.BRBE field while getting
+> processed for read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1), this masks BRBE
+> feature here to be rather explicit. This will prevent unexpected exposure
+> of BRBE feature to guest when arm64_ftr_bits[] changes for ID_AA64DFR0_EL1.
+> This also makes all guest accesses into BRBE registers, and instructions
+> as undefined access explicitly.
 
-> This problem exists whether we block the
-> mmap() or do SIGBUS.
+How about:
 
-There is work on doing more conversion to FOLL_PIN, but some cases are 
-harder to convert. Most of O_DIRECT should be using it nowadays, but 
-some other known use cases don't.
+| KVM: arm64: Explicitly handle BRBE traps as UNDEFINED
+|
+| The Branch Record Buffer Extension (BRBE) adds a number of system registers
+| and instructions which we don't currently intend to expose to guests. Our
+| existing logic handles this safely, but could be improved with some explicit
+| handling of BRBE.
+|
+| The presence of BRBE is currently hidden from guests as the cpufeature code's
+| ftr_id_aa64dfr0[] table doesn't have an entry for the BRBE field, and so this
+| will be zero in the sanitised value of ID_AA64DFR0 exposed to guests via
+| read_sanitised_id_aa64dfr0_el1(). As the ftr_id_aa64dfr0[] table may gain an
+| entry for the BRBE field in future, for robustness we should explicitly mask
+| out the BRBE field in read_sanitised_id_aa64dfr0_el1().
+|
+| The BRBE system registers and instructions are currently trapped by the
+| existing configuration of the fine-grained traps. As the registers and
+| instructions are not described in the sys_reg_descs[] table,
+| emulate_sys_reg() will warn that these are unknown before injecting an
+| UNDEFINED exception into the guest. Well-behaved guests shouldn't try to use
+| the registers or instructions, but badly-behaved guests could, these,
+| resulting in unnecessary warnings. To avoid those warnings, we should
+| explicitly handle the BRBE registers and instructions as UNDEFINED.
+|
+| Address the above by having read_sanitised_id_aa64dfr0_el1() mask out the
+| ID_AA64DFR0.BRBE field, and by adding sys_reg_desc entries for all of the
+| BRBE system registers and instructions, treating these all as UNDEFINED.
 
-The simplest and readily-available example is still vmsplice(). I don't 
-think it was fixed yet to use FOLL_PIN.
-
-Use vmsplice() to pin the page in the pipe (read-only). Unmap the VMA. 
-You can read the page any time later by reading from the pipe.
-
-So I wouldn't bet on all relevant cases being gone in the near future.
-
--- 
-Cheers,
-
-David / dhildenb
-
+Mark.
