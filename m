@@ -1,159 +1,110 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E84C43C6AB
-	for <kvmarm@lists.linux.dev>; Fri,  1 Mar 2024 20:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1701A20DCD;
+	Fri,  1 Mar 2024 21:13:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709324153; cv=none; b=KUbdzOIr9z6YTkvhGuWHNtouRWTTlpo1z01Yud9UvfIweiFiI8EhSiOPpuf49eaCsIlogeCR0oxqShyz3+qP2DpugmewJZClrS3sA6/sb8y3qs6m/eKWmqoBm19la3T9EV96ZfhK7DLWNpX4Hld/iRxmGxQmyJrb96YAShzR9yE=
+	t=1709327612; cv=none; b=gGcCTUtcdgJOSpA8VGzvPjatkD8CJ78r+HRyMBw6TGm/ynCBxSexeyXYK7m//d4z5nbToWTkEJKUBezX2Uy9kIrDDbITPMTQfBFldojSO7vfnLLjWMH8oQpbUlAYymAXtPh6nFxOu4v9xtMr/Bolic3i10AuIk+7fJXrjIGIymU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709324153; c=relaxed/simple;
-	bh=bE1H3ZR3mcE6l2fGWaCh+j6K68SoFInxbaR7he+rkdQ=;
+	s=arc-20240116; t=1709327612; c=relaxed/simple;
+	bh=1WDHBEDvkTsJ8GXPJTt2btAiD+HC62L7my6p+2cyqug=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QsXiMGaBqTNqc3Q5z2jzqN0feJofwUD+OzAfeYJh3EAE3+bvqNyUke4NlJc1vEKSXYyiabzQDXYQ0SyGJ3Fce7qJ6csPSnQcWB3VKDODxZ+0fc+yA3OplSi0jc8nUgmbZgbCff4OKB/r9WP1ZnXlS/s++1rjuVkAOBCUG9rpumw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 247511FB;
-	Fri,  1 Mar 2024 12:16:29 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8CBAB3F73F;
-	Fri,  1 Mar 2024 12:15:49 -0800 (PST)
-Date: Fri, 1 Mar 2024 20:15:43 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=kSdYgIt6kA4XPRCOvw5lNf4Y2p68fCJTPa3Pr1tYmt3ganvo1axWl+ZhxCOQ70nlkJfG7x+W6zA57OCJwbcveYoU7crTfF+dPJ+knGb8P7+GP9YxkfVNq1VEs9XjUTFzatTE7+1vpgrcOAIjCeUOYIFQaxJuj1kLDnOb4FvDKhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hm8rbWmj; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hm8rbWmj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD2A3C433F1;
+	Fri,  1 Mar 2024 21:13:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709327611;
+	bh=1WDHBEDvkTsJ8GXPJTt2btAiD+HC62L7my6p+2cyqug=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hm8rbWmjRmZH5rvjYulWD5DcaIiyg3aGeAIOqqt0MYx29zKaWfKpRfTKvMUGl9goQ
+	 zaHEMyzXPe/bnNDs4cdnXmjxoC0xkeBJx8rExrEUftsrPsuCmG7PykdTIDYrOi0ObH
+	 xWbn3gQHPBURmbLs1eyKbTlzdYmvrwSB9OvvqY8L9Lr7QKLHNb69atirTnGxJ7FamN
+	 rZ86C8kum35aiJaHWeDOs/0Tdyvz2RubW3+hXmB7EBZnOLzH1szkd3GhX/3EwfXkx1
+	 uZh6lP77qtIIZ5okigHc9dJ2ntI2n8vi7xT9n43QtpnVR/yKtVl9vnY5TKHsE7Q6ti
+	 3ydX0qWfUiTRQ==
+Date: Fri, 1 Mar 2024 21:13:26 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2 07/13] KVM: arm64: nv: Honor HFGITR_EL2.ERET being set
-Message-ID: <20240301201543.GA3968751@e124191.cambridge.arm.com>
-References: <20240226100601.2379693-1-maz@kernel.org>
- <20240226100601.2379693-8-maz@kernel.org>
- <20240301180734.GA3958355@e124191.cambridge.arm.com>
- <861q8t3guf.wl-maz@kernel.org>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Only save S1PIE registers when dirty
+Message-ID: <562f5e62-c26c-41d9-9ab9-aac02c91c7ae@sirena.org.uk>
+References: <20240301-kvm-arm64-defer-regs-v1-1-401e3de92e97@kernel.org>
+ <ZeItTLQxdxxICw01@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="tCYQ/jJS3BIUwGub"
+Content-Disposition: inline
+In-Reply-To: <ZeItTLQxdxxICw01@linux.dev>
+X-Cookie: Schizophrenia beats being alone.
+
+
+--tCYQ/jJS3BIUwGub
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <861q8t3guf.wl-maz@kernel.org>
 
-On Fri, Mar 01, 2024 at 07:14:00PM +0000, Marc Zyngier wrote:
-> Hi Joey,
-> 
-> On Fri, 01 Mar 2024 18:07:34 +0000,
-> Joey Gouly <joey.gouly@arm.com> wrote:
-> > 
-> > Got a question about this one,
-> > 
-> > On Mon, Feb 26, 2024 at 10:05:55AM +0000, Marc Zyngier wrote:
-> > > If the L1 hypervisor decides to trap ERETs while running L2,
-> > > make sure we don't try to emulate it, just like we wouldn't
-> > > if it had its NV bit set.
-> > > 
-> > > The exception will be reinjected from the core handler.
-> > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/hyp/vhe/switch.c | 3 ++-
-> > >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> > > index eaf242b8e0cf..3ea9bdf6b555 100644
-> > > --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> > > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> > > @@ -220,7 +220,8 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
-> > >  	 * Unless the trap has to be forwarded further down the line,
-> > >  	 * of course...
-> > >  	 */
-> > > -	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
-> > > +	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV) ||
-> > > +	    (__vcpu_sys_reg(vcpu, HFGITR_EL2) & HFGITR_EL2_ERET))
-> > >  		return false;
-> > >  
-> > >  	spsr = read_sysreg_el1(SYS_SPSR);
-> > 
-> > Are we missing a forward_traps() call in kvm_emulated_nested_eret() for the
-> > HFGITR case?
-> > 
-> > Trying to follow the code path here, and I'm unsure of where else the
-> > HFIGTR_EL2_ERET trap would be forwarded:
-> > 
-> > kvm_arm_vcpu_enter_exit ->
-> > 	ERET executes in guest
-> > 	fixup_guest_exit ->
-> > 		kvm_hyp_handle_eret (returns false)
-> > 
-> > handle_exit ->
-> > 	kvm_handle_eret ->
-> > 		kvm_emulated_nested_eret
-> > 			if HCR_NV
-> > 				forward traps
-> > 			else
-> > 				emulate ERET
-> 
-> There's a bit more happening in kvm_handle_eret().
-> 
-> > 
-> > 
-> > And if the answer is that it is being reinjected somewhere, putting that
-> > function name in the commit instead of 'core handler' would help with
-> > understanding!
-> 
-> Let's look at the code:
-> 
-> 	static int kvm_handle_eret(struct kvm_vcpu *vcpu)
-> 	{
-> 		[...]
-> 	
-> 		if (is_hyp_ctxt(vcpu))
-> 			kvm_emulate_nested_eret(vcpu);
-> 
-> If we're doing an ERET from guest EL2, then we just emulate it,
-> because there is nothing else to do. Crucially, HFGITR_EL2.ERET
-> doesn't apply to EL2.
-> 
-> 		else
-> 			kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-> 
-> In any other case, we simply reinject the trap into the guest EL2,
-> because that's the only possible outcome. And that's what you were
-> missing.
-> 
-> 		return 1;
-> 	}
-> 	
+On Fri, Mar 01, 2024 at 07:32:28PM +0000, Oliver Upton wrote:
+> On Fri, Mar 01, 2024 at 06:05:53PM +0000, Mark Brown wrote:
 
-Thanks, that makes sense now! I was forgetting about the crucial fact that
-HFGITR_EL2.ERET applies to EL1, which is !is_hyp_ctxt(), so we take the other
-branch.
+> > I don't have a good sense if this is a good idea or not, or if this is a
+> > desirable implementation of the concept - the patch is based on some
+> > concerns about the cost of the system register context switching.  We
+> > should be able to do something similar for some of the other registers.
 
-With that cleared up:
+> Is there any data beyond a microbenchmark to suggest save elision
+> benefits the VM at all? The idea of baking the trap configuration based
+> on what KVM _thinks_ the guest will do isn't particularly exciting. This
+> doesn't seem to be a one-size-fits-all solution.
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+No, and as I said above I'm really not confident about this.  There's no
+hardware with these registers yet as far as I know so I don't know how
+meaningful any benchmark would be anyway, and as you suggest even with a
+benchmark a new guest could always come along and blow performance up
+with a change in access patterns.
 
-Thanks,
-Joey
+> The overheads of guest exits are extremely configuration dependent, and
+> on VHE the save/restore of EL1 state happens at vcpu_load() / vcpu_put()
+> rather than every exit. There isn't a whole lot KVM can do to lessen the
+> blow of sharing EL1 in the nVHE configuration.
 
-> 
-> > I need to find the time to get an NV setup set-up, so I can do some experiments
-> > myself.
-> 
-> The FVP should be a good enough environment if you can bare the
-> glacial speed. Other than that, I hear that QEMU has grown some NV
-> support lately, but I haven't tried it yet. HW-wise, M2 is the only
-> machine that can be bought by a human being (everything else is
-> vapourware, or they would have already taken my money).
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+> Looking a bit further out, the cost of traps will be dramatically higher
+> when running as a guest hypervisor, so we'd want to avoid them if
+> possible...
+
+Indeed, but OTOH I got some complaints about adding more system register
+switching in __sysreg_save_el1_state() for one of my other serieses that
+specifically mentioned nested virt and there don't seem to be a huge
+range of other options for reducing what we're doing with context
+switching without using traps to figure out what's in use, especially in
+the nVHE case.  I figured I'd send the patch so the idea could be
+considered.
+
+--tCYQ/jJS3BIUwGub
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXiRPYACgkQJNaLcl1U
+h9Dfuwf/bgBH01WZBV1RX0Vk8R30mTChMdhuVWMiQhutnkILMJwYVIpKOzni84N+
+wdMI7nOMHwqFa1XrlzB8Cgmukf//RTNSXEV0RAKT+a8xwzZMhd8LpU6iTUqDX2Au
+Mmlrc7A5zHPEsWmSyit1+417x5g9Ki/dAC8yk7IpzgC/PJVc/0uqjHqmd3c2vzuc
+vQQww4Iv9hVYlM/eAOmt8cl5+TOenP+VDEiHJ4HM8st5UD08RFu1w04VBsvmOw5S
+WxZXwRknDVscRutJixjhF9+jtWO9LbNWriH92Qor73z4fixi6II7ID2afKaWrCnl
+gSSUfnaTNmUoOzlL6Ax/ytrFsotx/w==
+=MPnZ
+-----END PGP SIGNATURE-----
+
+--tCYQ/jJS3BIUwGub--
