@@ -1,139 +1,111 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A2D714F7A;
-	Sat,  2 Mar 2024 10:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868E814293;
+	Sat,  2 Mar 2024 11:19:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709375304; cv=none; b=CZ59KYncEF2T9Xaujkkx/zgjjVLENvJ7QYIYdJLvHS+iXbw9I/C77eJcO37yxBxsBiAm340MfK2Enr5P37Z32MotFC9jq7Asl6HF5vBxO/HzwRO/HG/Nvvs/Xn3vbbxb0YSLe3mM7T5h1bWtZ8Pl6qkEysHsQx1MdrUO+rl5DUU=
+	t=1709378398; cv=none; b=pkFYxmS2x7AddmIDCqvG+vciTISPGHlq4Q4AJFPkKFmEzuemx6vxoAGN+wD9rgQSYH9vN9MLDvYPzP6N//b05tt9o3n4Y5CRfW3R9ATUUIG9ZSaajdiXJDIfqVfFrRXq9xYKSnMuRpB1DJ5G6xM7a2v3HlQq3EbchuWs07NSbxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709375304; c=relaxed/simple;
-	bh=kRNWOYU8T+ZFbq5usH3n+8N5CzZwfz8CMOtijDS/0aw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QsC5IrBjy3hnyXKtb89bdTYbYQchQZg8qh/A5vjYuoubzolflY9WrSuMNWVFB6EmsJcQnnjjvR+tTYAhKZRvXctyA2BBC99YllQjSSb9dP8DGPm8fiQ6XRRBTSOoqZOT8QOQPH/1qP0sUqijxdhfyrmVIE5xidHkUAHy072f8dA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RQGCCzLt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1709378398; c=relaxed/simple;
+	bh=3J0k5g/fnp9TIqJEjL4u2lVp2pibB+1Yu7BCqEtpkcc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Jym5wF8ulr+npDWYhbVVR/6sKJ5t51EwjDwft7YcYdiXN3jZowmSoMYOIb2p8XD2tf5xb9l2/iGfq912PBMADEheBEx52jn32a7p7DlzZIFrlATOUS46SrUBVAUQZWQwIPDg9GDmQ9jxaHRPrp0/6rfLdsG2md9wuqV9qXb53SY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pm9ufTbx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RQGCCzLt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2BFEC433C7;
-	Sat,  2 Mar 2024 10:28:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pm9ufTbx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6120CC433C7;
+	Sat,  2 Mar 2024 11:19:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709375303;
-	bh=kRNWOYU8T+ZFbq5usH3n+8N5CzZwfz8CMOtijDS/0aw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RQGCCzLttX84RHusWIlDSxVWEgvr+tWVds3hVN5QO819Y3k7qGK8p+drrUpCsnUjf
-	 N1k4fPme84VrtbEbXB9yUsqHkpgbIrnqexDOYECwp8bZhPzL5DGMwHW49/gfMdYaqs
-	 iZOuXFsOVI5C7tJXBBr/V+JHDapJh3qXnvU5emEypvZNTqMcvByXGEazzCPuifcX0L
-	 /TpQHXN/FNQvq33b01cprDZDZs6k7VrOpT9PVc6iqNPvI+RQFkV/PmKAqoupkXQft5
-	 oSDNHfK/zXMOTKzdJh42OA0pCSRkV76Cv5LRDfp0ZO9zqsjfvTbQ3Y9XRSLD4tK5/I
-	 ByXR9x9CKs4aQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1709378398;
+	bh=3J0k5g/fnp9TIqJEjL4u2lVp2pibB+1Yu7BCqEtpkcc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=pm9ufTbxxjZsBrr/XVm2dvtNYlj7rw2LvlPI3aQ64itVz0HOGeHwPQ5G07Gl4extj
+	 a27Wmu8v1cmYXnh4h56M9NPw4kgqpUsmD8ljh5VuzwVCxD8TnKtWJUW2mrlJQpQUYf
+	 2cOllCxzRpu6L1gFCQNu1kXsyb1eeT2WMTwXi32CiXVc3W4LloPmHtRVlIV4Sw7PHZ
+	 uPJZO2oDDX+ZPojNvuWBD7MZuvy7p7IKpZdRPQpPVVggfK9p+vNepJsixdGICmz+65
+	 hyC+6e/oS83P4J9yqTsVC7spYQoaUoNRIK4PmDdRfD3D+a77zyB0jz5OeNJalqINJ2
+	 AMMTxGiNpvRAw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rgMbN-008l2V-C6;
-	Sat, 02 Mar 2024 10:28:21 +0000
-Date: Sat, 02 Mar 2024 10:28:18 +0000
-Message-ID: <86zfvh0vy5.wl-maz@kernel.org>
+	id 1rgNPH-008lLw-RB;
+	Sat, 02 Mar 2024 11:19:56 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Only save S1PIE registers when dirty
-In-Reply-To: <562f5e62-c26c-41d9-9ab9-aac02c91c7ae@sirena.org.uk>
-References: <20240301-kvm-arm64-defer-regs-v1-1-401e3de92e97@kernel.org>
-	<ZeItTLQxdxxICw01@linux.dev>
-	<562f5e62-c26c-41d9-9ab9-aac02c91c7ae@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: [PATCH 0/5] KVM: arm64: Move host-specific data out of kvm_vcpu_arch
+Date: Sat,  2 Mar 2024 11:19:30 +0000
+Message-Id: <20240302111935.129994-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, james.clark@arm.com, anshuman.khandual@arm.com, broonie@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 01 Mar 2024 21:13:26 +0000,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> [1  <text/plain; us-ascii (7bit)>]
-> On Fri, Mar 01, 2024 at 07:32:28PM +0000, Oliver Upton wrote:
-> > On Fri, Mar 01, 2024 at 06:05:53PM +0000, Mark Brown wrote:
-> 
-> > > I don't have a good sense if this is a good idea or not, or if this is a
-> > > desirable implementation of the concept - the patch is based on some
-> > > concerns about the cost of the system register context switching.  We
-> > > should be able to do something similar for some of the other registers.
-> 
-> > Is there any data beyond a microbenchmark to suggest save elision
-> > benefits the VM at all? The idea of baking the trap configuration based
-> > on what KVM _thinks_ the guest will do isn't particularly exciting. This
-> > doesn't seem to be a one-size-fits-all solution.
-> 
-> No, and as I said above I'm really not confident about this.  There's no
-> hardware with these registers yet as far as I know so I don't know how
-> meaningful any benchmark would be anyway, and as you suggest even with a
-> benchmark a new guest could always come along and blow performance up
-> with a change in access patterns.
-> 
-> > The overheads of guest exits are extremely configuration dependent, and
-> > on VHE the save/restore of EL1 state happens at vcpu_load() / vcpu_put()
-> > rather than every exit. There isn't a whole lot KVM can do to lessen the
-> > blow of sharing EL1 in the nVHE configuration.
-> 
-> > Looking a bit further out, the cost of traps will be dramatically higher
-> > when running as a guest hypervisor, so we'd want to avoid them if
-> > possible...
-> 
-> Indeed, but OTOH I got some complaints about adding more system register
+It appears that over the years, we have accumulated a lot of cruft in
+the kvm_vcpu_arch structure. Part of the gunk is data that is strictly
+host CPU specific, and this result in two main problems:
 
-Complains from whom? I can't see anything in my inbox, so it my
-conclusion that these "issues" are not serious enough to be publicly
-mentioned.
+- the structure itself is stupidly large, over 8kB. With the
+  arch-agnostic kvm_vcpu, we're above 10kB, which is insane. This has
+  some ripple effects, as we need physically contiguous allocation to
+  be able to map it at EL2 for !VHE. There is more to it though, as
+  some data structures, although per-vcpu, could be allocated
+  separately.
 
-> switching in __sysreg_save_el1_state() for one of my other serieses that
-> specifically mentioned nested virt and there don't seem to be a huge
-> range of other options for reducing what we're doing with context
-> switching without using traps to figure out what's in use, especially in
-> the nVHE case.  I figured I'd send the patch so the idea could be
-> considered.
+- We lose track of the life-cycle of this data, because we're
+  guaranteed that it will be around forever and we start relying on
+  wrong assumptions. This is becoming a maintenance burden.
 
-nVHE has a cost. If someone finds it too slow, they can use VHE. If
-they rely on nVHE for isolation, then they know exactly what they are
-paying for.
+This series rectifies some of these things, starting with the two main
+offenders: debug and FP, a lot of which gets pushed out to the per-CPU
+host structure. Indeed, their lifetime really isn't that of the vcpu,
+but tied to the physical CPU the vpcu runs on.
 
-They can also avoid exposing the feature to the guest, which will
-remove *any* save/restore. because *that* is the right thing to do if
-you want to minimise the impact of additional features.
+This results in a small reduction of the vcpu size, but mainly a much
+clearer understanding of the life-cycle of these structures.
 
-If anything, I'm actually minded to remove existing instances of this
-stupid trapping, such as PAuth, which is entirely pointless.
+Patches against v6.8-rc6.
 
-Sysreg access should essentially be free. 90% of it is done out of
-context, and requires no synchronisation. If someone has HW that is so
-badly affected by something that should have the same cost as a NOP,
-they can borrow a hammer from my toolbox and put this HW out of its
-misery.
+Marc Zyngier (5):
+  KVM: arm64: Add accessor for per-CPU state
+  KVM: arm64: Exclude host_debug_data from vcpu_arch
+  KVM: arm64: Exclude mdcr_el2_host from kvm_vcpu_arch
+  KVM: arm64: Exclude host_fpsimd_state pointer from kvm_vcpu_arch
+  KVM: arm64: Exclude FP ownership from kvm_vcpu_arch
 
-The only case where this sort of trap can be beneficial is when the
-cost of the trap (over 60 64bit registers being saved/restored --
-that's host and guest's GPRs) is small compared to the cost of the
-context switch of the trapped state. This may make sense for FP, SVE
-and the like. Doesn't make much sense for anything else.
-
-	M.
+ arch/arm64/include/asm/kvm_emulate.h      |  4 +-
+ arch/arm64/include/asm/kvm_host.h         | 65 ++++++++++++++---------
+ arch/arm64/kvm/arm.c                      |  8 +--
+ arch/arm64/kvm/fpsimd.c                   | 13 +++--
+ arch/arm64/kvm/hyp/include/hyp/debug-sr.h |  8 +--
+ arch/arm64/kvm/hyp/include/hyp/switch.h   | 23 ++++----
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c        |  8 +--
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c        |  3 --
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c      |  2 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c           |  3 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c          |  6 +--
+ arch/arm64/kvm/hyp/vhe/switch.c           |  6 +--
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c        |  4 +-
+ arch/arm64/kvm/pmu.c                      |  2 +-
+ 14 files changed, 79 insertions(+), 76 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.2
+
