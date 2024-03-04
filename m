@@ -1,301 +1,133 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0D563B297
-	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 12:05:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E22118E2E
+	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 12:36:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709553929; cv=none; b=J7xOsqnqgHNM73QGfmJRlZYLV/mB/uEesolm/qyYEdzRiTAHqAnUkCOrEswU8opIY6eNmTuJpiSWWZFLEB7F62mqfhgRcjw5mdSNiaddheKPA4H9AeYP36sXFtQgpqnc/xE5UYTXcn623aj7/tox+nAnZl2fjtVlxw0R9T1g8LY=
+	t=1709555778; cv=none; b=dodXFfJMwkbhjbEtegdAdz4/bR5/nCCOr3salKmUKO/kYB8rKuNW4eqs6z27gQIstZhBrQUUzV26rrIreCo3Ic5ijSttFdUpiOqRkiqc8/LMifZMFICXx/zF7Br/V1AuC8iQKaaqlwD6fqLlGRZ/uvxA8DKIx2zV2C84VNngUKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709553929; c=relaxed/simple;
-	bh=sW/qFGO4EsnOf0l2Qbds6VZsqmlHMPA2nIhM5x95VjU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LrqExA5THtkPCBFeBoHMQ23JrnDsgGGwWpU33t2XX9gmDfMRusa8ZMzmoJ24ae5qLDV2B3smizx43PDAIJAz1h0GPn3SbrkJ9Qee51d0tpoRIzjaeiQEJzqVpJhMfuqgTXSFvyY0DsYbA270t8+XD/bd4yYboHlnB2ietV/EVAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 026601FB;
-	Mon,  4 Mar 2024 04:06:00 -0800 (PST)
-Received: from [10.57.51.9] (unknown [10.57.51.9])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BC27A3F738;
-	Mon,  4 Mar 2024 04:05:21 -0800 (PST)
-Message-ID: <4eba8428-fe6c-4c42-b135-ab831e5cf436@arm.com>
-Date: Mon, 4 Mar 2024 12:05:20 +0000
+	s=arc-20240116; t=1709555778; c=relaxed/simple;
+	bh=S+1AVOp60oQk0gYTiEn6/ihIAv3TjnXIhW8RcnH2AVE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YBIdG1mnW80RAvAc3GSmp0rfqgL8cM0Iw4afkZu84l05b4k5yY/IfR43tl3G2oqcOoBUUioAbVhd0/SwW+OVPYNCPNZIXcXbO4224JVDmg4Uc+V6I8Fs84CMWw1nGsMR+C7CYkyJTq8uQagnUwLM1wTT3Don4/u9wKvApaiTJVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PUj8XzS4; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PUj8XzS4"
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a3f893ad5f4so663279166b.2
+        for <kvmarm@lists.linux.dev>; Mon, 04 Mar 2024 04:36:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709555775; x=1710160575; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2tCjt8GyebtBYI2Xvz8sUiEyWim1o0bzRB2XeH8koPM=;
+        b=PUj8XzS4/KFc+vLFS7d6IxGXiid6r7A9ttcjmhbtSYxcrA4HXCMROTI5kWuJOEWdK+
+         m3r9nLd8XfrargPIRw4GAELPAeu3Ko3OufI3/HVOQAoUybxpmVtPbv+G7kPIfP9KVmMy
+         DInJrgUicy3E9xpsUHbu3UcJuXamFP3sRBF1jwmZWIsdoQ0gP3PyIYQp28GAqTLzqeMG
+         m47AxkGNujP6EZz6JJTugz0kvNQK3JW2y9KkzqEzQEAOsWB25YfMB2mj/yexAS4QQPhq
+         LMyq9qEN6e0D3rpW0i/yqmY5Zx+5K+Gu9wOEkFY+ISnCx/067bYylhYA3VPXkx5ofAQl
+         RVgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709555775; x=1710160575;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2tCjt8GyebtBYI2Xvz8sUiEyWim1o0bzRB2XeH8koPM=;
+        b=gMBzp31r7Qg+c7LjR+B2p7hf5Jii9rYWzB7RPkgdsgCL/g70yds98jmBiVCv47aXv1
+         Yul34PrxuCc9qWGP3adR74zD1trYOBdoi365Z7bXdtLFPiWTHTq5YogKO4JCQjSKfnq3
+         8PDYP8Jsp1Pvu8QD5y1m/wfO4fh9yVrIJIiA28xf+UY3K8ifbprTTQUaWSi/Z4R6kXnu
+         D+PEgnFYjH1HUy36GLtz497drFFi5SwW57b6G6em0tn13Ht40Z1UrO6hVQIJ4sYi1xsj
+         pw7cN24pSKgsfXvVoD2oqpuy6AL7jeF2aR+jZJbGhFBtdSXVLpmARc42hZ5DF1vt4SeW
+         DxDw==
+X-Forwarded-Encrypted: i=1; AJvYcCVWMMGtUBCKzPNSBxyDj0DQnw5k/JHH+9n3KWzIqnvERV8t9Ng7nHmvKB9yMpvgKYDrVKmd3RbQPfq7BkCO+QOqMjgii/s3
+X-Gm-Message-State: AOJu0YxMMOpY4XXANZJwBfvU172tBhokQ2mHkJmJ1KZ5Wf6ESWUtIYv3
+	aQM+mlMDWFDTtmzea/8brXt5ME9VCmY3rXKibZUmHVs7Go1DNot/c7jPKy8TBA==
+X-Google-Smtp-Source: AGHT+IF1Zf9BQZ8KhCs5HjLIj2UtmVes7lW/uaj/8C5cnvF9YC3mnsB1KcFgOCmmOgM4AgU2QoLqYg==
+X-Received: by 2002:a17:906:a2cf:b0:a3f:33b2:5ce2 with SMTP id by15-20020a170906a2cf00b00a3f33b25ce2mr6696648ejb.35.1709555774688;
+        Mon, 04 Mar 2024 04:36:14 -0800 (PST)
+Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
+        by smtp.gmail.com with ESMTPSA id j11-20020a170906830b00b00a44c723472bsm2910061ejx.57.2024.03.04.04.36.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Mar 2024 04:36:14 -0800 (PST)
+Date: Mon, 4 Mar 2024 12:36:10 +0000
+From: Quentin Perret <qperret@google.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+	seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org,
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
+	dmatlack@google.com, yu.c.zhang@linux.intel.com,
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+	vannapurve@google.com, ackerleytng@google.com,
+	mail@maciej.szmigiero.name, michael.roth@amd.com,
+	wei.w.wang@intel.com, liam.merwick@oracle.com,
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+	suzuki.poulose@arm.com, steven.price@arm.com,
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com,
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com,
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org,
+	keirf@google.com, linux-mm@kvack.org
+Subject: Re: folio_mmapped
+Message-ID: <ZeXAOit6O0stdxw3@google.com>
+References: <ZdfoR3nCEP3HTtm1@casper.infradead.org>
+ <40a8fb34-868f-4e19-9f98-7516948fc740@redhat.com>
+ <20240226105258596-0800.eberman@hu-eberman-lv.qualcomm.com>
+ <925f8f5d-c356-4c20-a6a5-dd7efde5ee86@redhat.com>
+ <Zd8PY504BOwMR4jO@google.com>
+ <755911e5-8d4a-4e24-89c7-a087a26ec5f6@redhat.com>
+ <Zd8qvwQ05xBDXEkp@google.com>
+ <99a94a42-2781-4d48-8b8c-004e95db6bb5@redhat.com>
+ <Zd82V1aY-ZDyaG8U@google.com>
+ <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] KVM: arm64: Add accessor for per-CPU state
-Content-Language: en-GB
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, James Clark <james.clark@arm.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>,
- Mark Brown <broonie@kernel.org>
-References: <20240302111935.129994-1-maz@kernel.org>
- <20240302111935.129994-2-maz@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240302111935.129994-2-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
 
-Hi Marc
-
-On 02/03/2024 11:19, Marc Zyngier wrote:
-> In order to facilitate the introduction of new per-CPU state,
-> add a new host_data_ptr() helped that hides some of the per-CPU
-> verbosity, and make it easier to move that state around in the
-> future.
+On Thursday 29 Feb 2024 at 11:04:09 (+0100), David Hildenbrand wrote:
+> An alternative would be to remember in pKVM that a page needs a wipe before
+> reaccess. Once re-accessed by anybody (hypervisor or new guest), it first
+> has to be wiped by pKVM.
 > 
+> ... but that also sounds complicated and similar requires the linear
+> map+unmap in pKVM page-by-page as they are reused. But at least a guest
+> shutdown would be faster.
 
-This series looks like a good cleanup to make the whole host
-data handling cleaner. One comment below.
+Yep, FWIW we did try that, but ended up having issues with Linux trying
+to DMA to these pages before 'touching' them from the CPU side. pKVM can
+keep the pages unmapped from the CPU and IOMMU stage-2 page-tables, and
+we can easily handle the CPU faults lazily, but not faults from other
+masters, our hardware generally doesn't support that.
 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->   arch/arm64/include/asm/kvm_host.h         | 13 +++++++++++++
->   arch/arm64/kvm/arm.c                      |  2 +-
->   arch/arm64/kvm/hyp/include/hyp/debug-sr.h |  4 ++--
->   arch/arm64/kvm/hyp/include/hyp/switch.h   | 11 +++++------
->   arch/arm64/kvm/hyp/nvhe/psci-relay.c      |  2 +-
->   arch/arm64/kvm/hyp/nvhe/setup.c           |  3 +--
->   arch/arm64/kvm/hyp/nvhe/switch.c          |  4 ++--
->   arch/arm64/kvm/hyp/vhe/switch.c           |  4 ++--
->   arch/arm64/kvm/hyp/vhe/sysreg-sr.c        |  4 ++--
->   arch/arm64/kvm/pmu.c                      |  2 +-
->   10 files changed, 30 insertions(+), 19 deletions(-)
+<snip>
+> As discussed in the sub-thread, that might still be required.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 21c57b812569..3ca2a9444f21 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -492,6 +492,17 @@ struct kvm_cpu_context {
->   	u64 *vncr_array;
->   };
->   
-> +/*
-> + * This structure is instanciated on a per-CPU basis, and contains
-> + * data that is:
-> + *
-> + * - tied to a single physical CPU, and
-> + * - either have a lifetime that does not extend past vcpu_put()
-> + * - or is an invariant for the lifetime of the system
-> + *
-> + * Use host_data_ptr(field) as a way to access a pointer to such a
-> + * field.
-> + */
->   struct kvm_host_data {
->   	struct kvm_cpu_context host_ctxt;
->   };
-> @@ -1114,6 +1125,8 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
->   
->   DECLARE_KVM_HYP_PER_CPU(struct kvm_host_data, kvm_host_data);
->   
-> +#define host_data_ptr(f)	(&this_cpu_ptr(&kvm_host_data)->f)
-> +
->   static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
->   {
->   	/* The host's MPIDR is immutable, so let's set it up at boot time */
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index a25265aca432..d3d14cc41cb5 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1960,7 +1960,7 @@ static void cpu_set_hyp_vector(void)
->   
->   static void cpu_hyp_init_context(void)
->   {
-> -	kvm_init_host_cpu_context(&this_cpu_ptr_hyp_sym(kvm_host_data)->host_ctxt);
-> +	kvm_init_host_cpu_context(host_data_ptr(host_ctxt));
+> One could think about completely forbidding GUP on these mmap'ed
+> guest-memfds. But likely, there might be use cases in the future where you
+> want to use GUP on shared memory inside a guest_memfd.
+> 
+> (the iouring example I gave might currently not work because
+> FOLL_PIN|FOLL_LONGTERM|FOLL_WRITE only works on shmem+hugetlb, and
+> guest_memfd will likely not be detected as shmem; 8ac268436e6d contains some
+> details)
 
-This silently changes the "this_cpu_ptr_hyp_sym" to "this_cpu_ptr()" and 
-thus we could be using the VHE host_data even in nVHE ?
-Rest looks fine to me.
+Perhaps it would be wise to start with GUP being forbidden if the
+current users do not need it (not sure if that is the case in Android,
+I'll check) ? We can always relax this constraint later when/if the
+use-cases arise, which is obviously much harder to do the other way
+around.
 
-Suzuki
-
-
->   
->   	if (!is_kernel_in_hyp_mode())
->   		cpu_init_hyp_mode();
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-> index 961bbef104a6..eec0f8ccda56 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-> @@ -135,7 +135,7 @@ static inline void __debug_switch_to_guest_common(struct kvm_vcpu *vcpu)
->   	if (!vcpu_get_flag(vcpu, DEBUG_DIRTY))
->   		return;
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   	guest_ctxt = &vcpu->arch.ctxt;
->   	host_dbg = &vcpu->arch.host_debug_state.regs;
->   	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-> @@ -154,7 +154,7 @@ static inline void __debug_switch_to_host_common(struct kvm_vcpu *vcpu)
->   	if (!vcpu_get_flag(vcpu, DEBUG_DIRTY))
->   		return;
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   	guest_ctxt = &vcpu->arch.ctxt;
->   	host_dbg = &vcpu->arch.host_debug_state.regs;
->   	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index a038320cdb08..9405a0c9b4c3 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -81,8 +81,7 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
->   
->   #define update_fgt_traps_cs(vcpu, reg, clr, set)			\
->   	do {								\
-> -		struct kvm_cpu_context *hctxt =				\
-> -			&this_cpu_ptr(&kvm_host_data)->host_ctxt;	\
-> +		struct kvm_cpu_context *hctxt =	host_data_ptr(host_ctxt);\
->   		u64 c = 0, s = 0;					\
->   									\
->   		ctxt_sys_reg(hctxt, reg) = read_sysreg_s(SYS_ ## reg);	\
-> @@ -121,7 +120,7 @@ static inline bool cpu_has_amu(void)
->   
->   static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
->   {
-> -	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
->   	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0, tmp;
->   	u64 r_val, w_val;
->   
-> @@ -185,7 +184,7 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
->   
->   static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
->   {
-> -	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
->   
->   	if (!cpus_have_final_cap(ARM64_HAS_FGT))
->   		return;
-> @@ -220,7 +219,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
->   
->   		write_sysreg(0, pmselr_el0);
->   
-> -		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +		hctxt = host_data_ptr(host_ctxt);
->   		ctxt_sys_reg(hctxt, PMUSERENR_EL0) = read_sysreg(pmuserenr_el0);
->   		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
->   		vcpu_set_flag(vcpu, PMUSERENR_ON_CPU);
-> @@ -254,7 +253,7 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
->   	if (kvm_arm_support_pmu_v3()) {
->   		struct kvm_cpu_context *hctxt;
->   
-> -		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +		hctxt = host_data_ptr(host_ctxt);
->   		write_sysreg(ctxt_sys_reg(hctxt, PMUSERENR_EL0), pmuserenr_el0);
->   		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
->   	}
-> diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> index d57bcb6ab94d..dfe8fe0f7eaf 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> @@ -205,7 +205,7 @@ asmlinkage void __noreturn __kvm_host_psci_cpu_entry(bool is_cpu_on)
->   	struct psci_boot_args *boot_args;
->   	struct kvm_cpu_context *host_ctxt;
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   
->   	if (is_cpu_on)
->   		boot_args = this_cpu_ptr(&cpu_on_args);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-> index bc58d1b515af..ae00dfa80801 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-> @@ -257,8 +257,7 @@ static int fix_hyp_pgtable_refcnt(void)
->   
->   void __noreturn __pkvm_init_finalise(void)
->   {
-> -	struct kvm_host_data *host_data = this_cpu_ptr(&kvm_host_data);
-> -	struct kvm_cpu_context *host_ctxt = &host_data->host_ctxt;
-> +	struct kvm_cpu_context *host_ctxt = host_data_ptr(host_ctxt);
->   	unsigned long nr_pages, reserved_pages, pfn;
->   	int ret;
->   
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index c50f8459e4fc..544a419b9a39 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -264,7 +264,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->   		pmr_sync();
->   	}
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   	host_ctxt->__hyp_running_vcpu = vcpu;
->   	guest_ctxt = &vcpu->arch.ctxt;
->   
-> @@ -367,7 +367,7 @@ asmlinkage void __noreturn hyp_panic(void)
->   	struct kvm_cpu_context *host_ctxt;
->   	struct kvm_vcpu *vcpu;
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   	vcpu = host_ctxt->__hyp_running_vcpu;
->   
->   	if (vcpu) {
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index 1581df6aec87..14b7a6bc5909 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -221,7 +221,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
->   	struct kvm_cpu_context *guest_ctxt;
->   	u64 exit_code;
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   	host_ctxt->__hyp_running_vcpu = vcpu;
->   	guest_ctxt = &vcpu->arch.ctxt;
->   
-> @@ -306,7 +306,7 @@ static void __hyp_call_panic(u64 spsr, u64 elr, u64 par)
->   	struct kvm_cpu_context *host_ctxt;
->   	struct kvm_vcpu *vcpu;
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   	vcpu = host_ctxt->__hyp_running_vcpu;
->   
->   	__deactivate_traps(vcpu);
-> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> index 8e1e0d5033b6..ae763061909a 100644
-> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> @@ -67,7 +67,7 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
->   	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
->   	struct kvm_cpu_context *host_ctxt;
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   	__sysreg_save_user_state(host_ctxt);
->   
->   	/*
-> @@ -110,7 +110,7 @@ void __vcpu_put_switch_sysregs(struct kvm_vcpu *vcpu)
->   	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
->   	struct kvm_cpu_context *host_ctxt;
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   
->   	__sysreg_save_el1_state(guest_ctxt);
->   	__sysreg_save_user_state(guest_ctxt);
-> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-> index a243934c5568..329819806096 100644
-> --- a/arch/arm64/kvm/pmu.c
-> +++ b/arch/arm64/kvm/pmu.c
-> @@ -232,7 +232,7 @@ bool kvm_set_pmuserenr(u64 val)
->   	if (!vcpu || !vcpu_get_flag(vcpu, PMUSERENR_ON_CPU))
->   		return false;
->   
-> -	hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	hctxt = host_data_ptr(host_ctxt);
->   	ctxt_sys_reg(hctxt, PMUSERENR_EL0) = val;
->   	return true;
->   }
-
+Thanks,
+Quentin
