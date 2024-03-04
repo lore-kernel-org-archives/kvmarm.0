@@ -1,104 +1,75 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AEF178B5C;
-	Mon,  4 Mar 2024 19:10:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4714379927
+	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 20:00:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709579414; cv=none; b=rRl1IcdVvc/1GzHg+hAJhbpRiskNJv/2NvRHcgKqhr6R5s0JfOP4wD6YtM6hV2iYElVuG8+8sqDe5ZJ152H7Lbo4c6V/xsL1Zb/k47RN9cNgpnaYSowfrf+4zLGThq+mLT3PbuyuMzXsK47lE0ty2fY6XBcqqs93aOyxWNMZjzQ=
+	t=1709582419; cv=none; b=Bd52a3069DDkqq1ZsR8xPdH7p9k4sbqPEPRatBKSncDLHxVBol4vkLCyL2rQ/nNm2UwwS5bOeu2mjo0xtNQsKFlCY2amAk9TQhSUYcG/AGvCcO1A0QikRdInQmRBhmYJUpQ+g3jpJph9lQ+g+I5wSrOCKVECrCeMmkEKoX5j2WE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709579414; c=relaxed/simple;
-	bh=938sL2j3ohr65qslp9QwEEHXoKL7O5+fVugpPrTHhXE=;
+	s=arc-20240116; t=1709582419; c=relaxed/simple;
+	bh=PwswC2QLgrfGkqvGJv5hVy5xAgaXNLvrQ1PnKfrapGY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kumUb7Eo9m65/84hGoNU4XMpAoVT/VpIKId8tlDS7PA4kl5AjMX8T+WRyziwQc1YXvSOAAjrPbxiZpBIGo+mALbOkz8g8LdgNyMySLWu4JEm8fHGoJXfVqjJiKAAE6r8gyp7h+K4+r9yZ37esurG0d0umlJKQiO91rkFjBzrJW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ao0/j/TN; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=OlWXz0QHX5GHy/Gy8yDzFJcmjPEw6IQIgFw1GM3Kwg5kVvUZjklTYcKa9GyDbDtY3yZy4nYBhTL0Ai1GLKgSTYA1wOaP7uHtCwOz3p/uKDpqQU0oiYxLtlTmesEL8E5U0+Tp7iV5/ccQVyKoQGs7kMHsuT28BzwPQ/GQGwNAm4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xCtRhKDX; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ao0/j/TN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA3AFC43394;
-	Mon,  4 Mar 2024 19:10:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709579414;
-	bh=938sL2j3ohr65qslp9QwEEHXoKL7O5+fVugpPrTHhXE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ao0/j/TNLYQITc3o6JNjvuh/CMc9DvdbDr/iluypBOkT1Vt4vjdv+Tjori9wQupxC
-	 5jNy0EgGmzoBQSeNHh9Ik8hKTE/EgKNzZOF5eoE49Bfk3c77LUD5s3GEuAmbXSzpUw
-	 OwI0S44QsOXfLdwqDTdZyGWGmlwKcVUa6hhll/KDQoZX7nLIKFLIg+RgbypAVYMw8Z
-	 HJ48htm/5E9/Owm4gFfHeNF+mF7VKZNOTeDf0nLlDUHDhMcRC2M7JuLesPPmhTW/Yx
-	 OF0EFfq8wGFVUG75Oe45X+x0vvEcKtGr9zj+7EQfnhQWJgcZ9FDt96Qo0BR+fc16Yd
-	 UZWqf3b8+T/TQ==
-Date: Mon, 4 Mar 2024 19:10:08 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	James Clark <james.clark@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH 5/5] KVM: arm64: Exclude FP ownership from kvm_vcpu_arch
-Message-ID: <6acffbef-6872-4a15-b24a-7a0ec6bbb373@sirena.org.uk>
-References: <20240302111935.129994-1-maz@kernel.org>
- <20240302111935.129994-6-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xCtRhKDX"
+Date: Mon, 4 Mar 2024 20:00:09 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1709582415;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XxJdQM9M8oSJx2poffbncc5kqBv+MVDtqlApqur8M/Q=;
+	b=xCtRhKDXkGmhyRTyD7OJzgZUEK3tlqvB6S5yysaKAkG8DWMPf2NiHcf1f4oLoQinspRh0d
+	hEuhzXeXZBnkGIBAag+W0QAyxwW2AvlMdB7Y1QunewULzkMjxHPh0Ebbbvz6qnc8tKpdZd
+	hbixfhz+jID8YGZM8gWc05QrPcOlw/I=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Anish Moorthy <amoorthy@google.com>
+Cc: seanjc@google.com, maz@kernel.org, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, robert.hoo.linux@gmail.com,
+	jthoughton@google.com, dmatlack@google.com,
+	axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
+	isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
+Subject: Re: [PATCH v7 08/14] KVM: arm64: Enable KVM_CAP_MEMORY_FAULT_INFO
+ and annotate fault in the stage-2 fault handler
+Message-ID: <ZeYoSSYtDxKma-gg@linux.dev>
+References: <20240215235405.368539-1-amoorthy@google.com>
+ <20240215235405.368539-9-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="J1BPLmtYAIajQQn7"
-Content-Disposition: inline
-In-Reply-To: <20240302111935.129994-6-maz@kernel.org>
-X-Cookie: He who hesitates is last.
-
-
---J1BPLmtYAIajQQn7
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240215235405.368539-9-amoorthy@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, Mar 02, 2024 at 11:19:35AM +0000, Marc Zyngier wrote:
-> In retrospect, it is fairly obvious that the FP state ownership
-> is only meaningful for a given CPU, and that locating this
-> information in the vcpu was just a mistake.
->=20
-> Move the ownership tracking into the host data structure, and
-> rename it from fp_state to fp_owner, which is a better description
-> (name suggested by Mark Brown).
+On Thu, Feb 15, 2024 at 11:53:59PM +0000, Anish Moorthy wrote:
 
-The SME patch series proposes adding an additional state to this
-enumeration which would say if the registers are stored in a format
-suitable for exchange with userspace, that would make this state part of
-the vCPU state.  With the addition of SME we can have two vector lengths
-in play so the series proposes picking the larger to be the format for
-userspace registers. =20
+[...]
 
-We could store this separately to fp_state/owner but it'd still be a
-value stored in the vCPU.  Storing in a format suitable for userspace
-usage all the time when we've got SME would most likely result in
-performance overhead if nothing else and feels more complicated than
-rewriting the data in the relatively unusual case where userspace looks
-at it.  Trying to convert userspace writes into the current layout would
-have issues if the current layout uses the smaller vector length and
-create fragility with ordering issues when loading the guest state.
+> +	if (is_error_noslot_pfn(pfn)) {
+> +		kvm_prepare_memory_fault_exit(vcpu, gfn * PAGE_SIZE, PAGE_SIZE,
+> +					      write_fault, exec_fault, false);
 
-The proposal is not the most lovely idea ever but given the architecture
-I think some degree of clunkiness would be unavoidable. =20
+Hmm... Reinterpreting the fault context into something that wants to be
+arch-neutral might make this a bit difficult for userspace to
+understand.
 
---J1BPLmtYAIajQQn7
-Content-Type: application/pgp-signature; name="signature.asc"
+The CPU can take an instruction abort on an S1PTW due to missing write
+permissions, i.e. hardware cannot write to the stage-1 descriptor for an
+AF or DBM update. In this case HPFAR points to the IPA of the stage-1
+descriptor that took the fault, not the target page.
 
------BEGIN PGP SIGNATURE-----
+It would seem this gets expressed to userspace as an intent to write and
+execute on the stage-1 page tables, no?
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXmHJAACgkQJNaLcl1U
-h9BYsQf+LIbSo6Bh6yoOvYNuRxS7018F18Km79T9F/FzkTjPjkU6O5R8UpYKPcc/
-vYV7qAWLd3mWuJ05Kdidw3JIPyxIDw4vFQ+fdV9RgVOoKn3H5DMx/Xb93T9STS5F
-BJHCnPvbpWUpxJOzOLVcI4QSmb/twDDA+k4DDMnnWi6r0hgZc2tF+p+bKvAqocRI
-8CrSn1tc1Jbj+oZwgygc40Ys/9OCYdDSZwErbYC6GAbczBENgBQgauXPEvStCdU0
-zrfH5gwT2DHx6DSZ/mRJnMQCvQ5iShy/stB46OulB3+hgKe6mMOZlULQmgt+em3D
-QFz/9XuCAOamKcJtuzfCH3i6elbWFg==
-=UfFB
------END PGP SIGNATURE-----
-
---J1BPLmtYAIajQQn7--
+-- 
+Thanks,
+Oliver
