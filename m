@@ -1,46 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6224B482E2;
-	Mon,  4 Mar 2024 16:27:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A6F39AF1;
+	Mon,  4 Mar 2024 17:09:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709569647; cv=none; b=SUEWiS+f1qgGx43mkAMIfWImFKUoroFAUkk4rwXDf2uW7lcEdar8TvS88Eg7M3hV7gFltmKaLEBBB9E/VUiis3glcsF5n1ay475Irvz7cgejc0LZcAVWXP5qEIr9QQR20d3C0tknLaWtLs6stPbzZelr5WXydxWC3Lp/CfToO+4=
+	t=1709572174; cv=none; b=Nq8DVVcMR/dD1o5V3HMG3z6oKSW7RvzhEfdD/sbqHKSHfDd2vHvpMVc0E/n4AEf7wvXM4O/m9abygI6HJia4Tp8RTfFs/esWkJuYKZcRTsKy2PJcQDZ8xekCe8FoqZeioPJ/TwzpXbuOHF/zsTTKqBPgKR6AbY/xLglnE2hha2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709569647; c=relaxed/simple;
-	bh=2Jb1vJn/xYd7ULjthjMCdzuXihA6/Atrjilwen7AQxA=;
+	s=arc-20240116; t=1709572174; c=relaxed/simple;
+	bh=tfmse9oyNlqgI6AiSd09oH+NFlRIxN1x6Z2RuuIvkJs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gOnC1NVtA8EGizvkCjcaefpJvCXMH2gkQ0oGptbPE4wKP2MrYz7eB4JytYLt30AL93gh7N4lkxAifejVUM/I6acHA5lWsKhnaooGKpBdHkRw9r67q8xikgZWlPV3b56TRA1tdcPcT4MZEyoz8CyOCS5od2z4XnuqT05ZTn1pcjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p1re9V+k; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ge0QC0LPJuSuz77yGJ3ApokEkym+WzFqyW45Zw7sXcOGc6bMvl7fGTPLI5o4L2XbYiU+sxyGfxx694FAWUnKJ8nZ870CAta8TkghjPIN+zq0DWwDRIZDoJF34QCExPm3iWSID49ZDK0SKelgIN614RA+AGIAqUIFUieu3zu2a0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=soX6GgBT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p1re9V+k"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E20CC433F1;
-	Mon,  4 Mar 2024 16:27:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="soX6GgBT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40226C43394;
+	Mon,  4 Mar 2024 17:09:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709569647;
-	bh=2Jb1vJn/xYd7ULjthjMCdzuXihA6/Atrjilwen7AQxA=;
+	s=k20201202; t=1709572174;
+	bh=tfmse9oyNlqgI6AiSd09oH+NFlRIxN1x6Z2RuuIvkJs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=p1re9V+kLVa6vGXJr3cQ/AT+HPrCsQDzi+BnkaaLsI+cie6mitgKvdT5y0Rw8UozW
-	 3yIJwOCzVhXDC6amqPHXPdBWMRTzPF6KAFTH/FVd3G8RQMs/X/MY/zoXI7/ASuW7j/
-	 9NPris8PYQIVlK0AojJKd7PavJvU25wsmgkBr1sbO6oG17Zd4+qtpwEjcxiEw8vxHp
-	 QvVyjgK7KkVyj3IHHhVQTdsy4khskiUgz3HcX+66mxQTBfmcV7Dvyg17SUYmYtGh9p
-	 qS/GUqUxCINUHv7Ds5CJZ0R7VVncTQOrmXpJFxIkQT17dWMoIH/Du31AlK3H7EBcB6
-	 1FyUiki1hCupw==
-Date: Mon, 4 Mar 2024 16:27:22 +0000
+	b=soX6GgBTFRn0lOQXRrK5UP+eWYLdnSfFrX3QatoCn7QWM7mdc/yW6Ut+6YLGvcclh
+	 j9i3rcu07+okBT+LA+7buYESrjxWgumdkSNx2cZfqD09nUJ/mvQET8gZxFj8Q+fSk+
+	 Jk+OYius5IXzHXACJ4oBiBlL4MFb6pcMcKe7aonL43HXQ7eAtQjO/PheqtLRLczcZc
+	 toH5tJ/+5bd559zsD5CWr3lRBW4sEoWj18n90DTdVLRAqXHQ00meZEMTs7REVtOjaA
+	 EB9dH+DjpB8WLpDpP1b2K0h6U7N5gOK+Dl6pZlsJMWBXZLCTsdQa0jviFzcOoujuYQ
+	 KxzCxAaIo2UoQ==
+Date: Mon, 4 Mar 2024 17:09:29 +0000
 From: Mark Brown <broonie@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
 Cc: Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] KVM: arm64: Reuse struct cpu_fp_state to track
- the guest FP state
-Message-ID: <607a10e4-6678-4148-9d5e-ec030b742207@sirena.org.uk>
-References: <20240229-kvm-arm64-group-fp-data-v2-0-276de0d550e8@kernel.org>
- <20240229-kvm-arm64-group-fp-data-v2-2-276de0d550e8@kernel.org>
- <86y1b027mc.wl-maz@kernel.org>
+	Will Deacon <will@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Only save S1PIE registers when dirty
+Message-ID: <dfae9e6e-080b-4724-a660-39febc7ab1b9@sirena.org.uk>
+References: <20240301-kvm-arm64-defer-regs-v1-1-401e3de92e97@kernel.org>
+ <ZeItTLQxdxxICw01@linux.dev>
+ <562f5e62-c26c-41d9-9ab9-aac02c91c7ae@sirena.org.uk>
+ <86zfvh0vy5.wl-maz@kernel.org>
+ <50c5cdd2-fceb-44c4-aff1-dc98180161a1@sirena.org.uk>
+ <86v86212p4.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,72 +51,78 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="D3tctJlyH4cuFut5"
+	protocol="application/pgp-signature"; boundary="Rwhc8ntAFC1zcQn8"
 Content-Disposition: inline
-In-Reply-To: <86y1b027mc.wl-maz@kernel.org>
+In-Reply-To: <86v86212p4.wl-maz@kernel.org>
 X-Cookie: He who hesitates is last.
 
 
---D3tctJlyH4cuFut5
+--Rwhc8ntAFC1zcQn8
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Mar 02, 2024 at 11:30:51AM +0000, Marc Zyngier wrote:
+On Mon, Mar 04, 2024 at 02:39:19PM +0000, Marc Zyngier wrote:
 > Mark Brown <broonie@kernel.org> wrote:
+> > On Sat, Mar 02, 2024 at 10:28:18AM +0000, Marc Zyngier wrote:
 
-> > At present we store the various bits of floating point state individual=
-ly
-> > in struct kvm_vcpu_arch and construct a struct cpu_fp_state to share wi=
-th
-> > the host each time we exit the guest. Let's simplify this a little by
-> > having a struct cpu_fp_state in the struct kvm_vcpu_arch and initialisi=
-ng
-> > this while initialising the guest.
+> > > Complains from whom? I can't see anything in my inbox, so it my
+> > > conclusion that these "issues" are not serious enough to be publicly
+> > > mentioned.
 
-> This structure is only useful to the physical CPU we run on, and does
-> not capture anything that is related to the guest state. Why should it
-> live in the vcpu structure, duplicating things we already have?
+> > This was you saying that adding more registers to be context switched
+> > here needed special explanation, rather than just being the default and
+> > generally unremarkable place to put context switching of registers for
+> > EL0/1.
 
-You were previously complaining that we were having to bind too much
-floating point state each time we bind a guest to a CPU, the goal here
-is to address this concern by filling in the structure at startup and
-then reusing it.  As noted in the commit log given that this state
-includes system registers there are difficulties in trying to rearrange
-things so everything is in a single structure, I'm not sure that having
-to special case the FP registers would be a win there. =20
+> What I remember saying is that it is wrong to add extra registers to
+> the context switch without gating them with the VM configuration.
+> Which is a very different thing.
 
-> This is just making things even more opaque.
+You said both things separately.  This is specifically addressing your
+comment:
 
-> If you need to add such a structure so that you can know what to
-> save/restore on context switch, then attach it to the per-CPU data
-> structure we already have.
+| For the benefit of the unsuspecting reviewers, and in the absence of a
+| public specification (which the XML drop isn't), it would be good to
+| have the commit message explaining the rationale of what gets saved
+| when.
 
-I'm having a hard time understanding what you're thinking of here, this
-is mainly about addressing whatever it is that's concering you but I'm
-not sure I have a good handle on what that is other than just a general
-concern that there's a lot of FP state which needs binding.  If we put
-something in the per-CPU state without reorganising the data a lot it'll
-look very similar to the code you were complaining about, the current
-code is doing roughly what you suggest already.
+which did not seem obviously tied to your separate comments about using
+your at the time still in flight patches to add support for parsing
+features out of the ID registers, it seemed like a separate concern.
 
-Personally I'm not overly concerned about the current state of the
-world and find it to be a reasonable tradeoff given what's going on,
-this is trying to address your feedback.
+> What I want to see explained in all cases is why a register has to be
+> eagerly switched and not deferred to the load/put phases, specially on
+> VHE. because that has a very visible impact on the overall performance.
 
---D3tctJlyH4cuFut5
+I'm confused here, the specific register save/restores that you were
+asking for an explanation of are as far as I can tell switched in
+load/put (eg, the specific complaint was attached to loads in
+__sysreg_restore_el1_state() which for VHE is called from=20
+
+	__vcpu_load_switch_sysregs()
+	kvm_vcpu_load_vhe()
+	kvm_arch_vcpu_load()
+
+which is to my understanding part of the load/put phase).  This should
+be true for all the GCS registers, the explanation would be something
+along the lines of "these are completely unremarkable EL0/1 registers
+and are switched in the default place where we switch all the other
+EL0/1 registers".
+
+--Rwhc8ntAFC1zcQn8
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXl9mkACgkQJNaLcl1U
-h9BioAf+NfHQfn/tMxiACNNhF5eYbNjv53vdlckqwV5LSBzV/wXC/CjhKz/UJnaZ
-1ewtyJ0dKGVdKWefX3V/gIl1tq1lpM6PBEVG2LrFIYj6NzF1cYn9LH0pFN+Icaey
-cgZ9xPNOa2jImOVghBSxsedQ91CmJR2Z/Ye2IGU9ud+h1gs46/hhccE/PYhuggh/
-/kt/GJVoSqJJncqUyBB/ETKSHgiJbJmiklNSg1RRAEKdd8zH62QABVlVeLf2XW+P
-hJ3dN2GPJkqFae1ir9QLLD2eDb3iuFvsXr9PKmw8SN7ntOVyLq1JuLyG4mUeVAiM
-qPGyqumFxtUakf5YFtKb8b7yea5vaA==
-=1Ccq
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXmAEgACgkQJNaLcl1U
+h9BJnQf9GzikoCtIUvJKBD40CKqUtV+C7nWo/dWWawV9xkNjDtFlpXhMxVi5UlDL
+6UnXNkN0QsYZK5DLUDzp3BH0G4eQifz6OLz4E59kyDsh05xGBPnfe4ypOSL6/SxH
+hfvk4bqe55sqkaxu0adUhQtNVUylPWzmcdNllm5blLz8et2KbEnCo7PCjjC9XJ5/
+bSpl+1SDgWhPslAblxLJtSwId8uJrM0I+u1QLQ5ogR9Mb/op9K2/6yLNmRSTPd/6
+dmcrgYD7xm0c26XU371QR/YN23HfBe8BeCWr2le79ixv+UA4Lf/ounlQhHutdX3m
+5RQ6vtPIHfESdaSFXm2PRfDym54b/g==
+=u/Yn
 -----END PGP SIGNATURE-----
 
---D3tctJlyH4cuFut5--
+--Rwhc8ntAFC1zcQn8--
