@@ -1,167 +1,171 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E3521A0A
-	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 09:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5836224FA
+	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 10:01:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709546149; cv=none; b=fCwg/Sl9wsaYONctSiUeNiwih9jrESzk4pY1C8a+Q2SaLzXvcFBRSQLGa7TfuGX2SoF6oQ5T9BBUHDqRHfE/qoGUBECIiDNUOuGMT1NCHPOMpd113rl9s5otGKb1uCk2NjBBsMXfstrzCAWSW2j1N39DUzrOIFKEHuYtzwVJ9So=
+	t=1709546515; cv=none; b=sPuoUNdj5gMINVW8mKSkROMGvpg96vQ3r9diN+eeq6+E4Yj6LCOsyro3E8HNVMhC2IHpn9NmuQw1Fsc5sq2uV2yAj7sGSAuUH/VgZ79yjAN7It1AiIf7NtEYKKkxwyzO/cryDvj1hjYLe3X9bgYmfhDp4dh3WSEu64v5ZeDgkEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709546149; c=relaxed/simple;
-	bh=1Mm9dRTQgjPzBkaNQnPnHrEGMtEfjaDgfmzP9NWshn0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L6EiOXxDa9clFS38svm38FaCUxZzspQAJni3dPXh4WuQeDjhZ0F/3hfiGg2uIMLMaf4WMEDpus0/314g4FNNVIWBfBXNeWEb0u81ynOjoO29GLnkJOEB/aBxUGSBjPmR7GvxiJThr2v2ShYhI2MxDDTmX8mhLM/oLRXq95HXl4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FFVw1ir9; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FFVw1ir9"
-Date: Mon, 4 Mar 2024 10:55:41 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709546144;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GGup8Lw+aSd2ugIO2sejSm6SajL8kCyGLyvMIExqoyg=;
-	b=FFVw1ir9bp4wHBTi0TBibjQS8aTlEAkNfY32ye2+nR76lwXqFaaFGcT+tcnib31hWKpmEg
-	7KCo4pArS0O/NdaYIt5z0w6KhhY7qL9o6mQK7RUVtJSS7Li00joqg2N14Ectis3pWiSF3H
-	AGnomtVeCCDjo1CrnO4EfJZRjD9oVYs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, alexandru.elisei@arm.com, 
-	eric.auger@redhat.com, shahuang@redhat.com, pbonzini@redhat.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 13/18] arm64: Simplify efi_mem_init
-Message-ID: <20240304-9cc10a0c64d1723d3c203cf2@orel>
-References: <20240227192109.487402-20-andrew.jones@linux.dev>
- <20240227192109.487402-33-andrew.jones@linux.dev>
- <3d0cb559-87dc-423f-9461-574e810fbdb2@arm.com>
+	s=arc-20240116; t=1709546515; c=relaxed/simple;
+	bh=nO/W4jh3XOG1Y2/4vz/5vcxaX2LuCxiH8Sp07kPHKRM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eE4EU/BDhNf6qKMLhKw+8KJgWWZqfi/EfNyYNp2Il3ZLJiB3BnyJb8wZ/51jp8HLTPQCDMvJZY711ZuCA7E3XlQ37SNMgJOWR70FqnjQyH6eetb4Sm7cMMt3CUValSZWdURPFQXNa6D1MukNZbA4VmONrHC1AEJ9m038ySMYXSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 15FA31FB;
+	Mon,  4 Mar 2024 02:02:30 -0800 (PST)
+Received: from [192.168.5.30] (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1DE643F738;
+	Mon,  4 Mar 2024 02:01:52 -0800 (PST)
+Message-ID: <cc7ed07d-d08f-4b0d-b642-bfaf4fbafdb1@arm.com>
+Date: Mon, 4 Mar 2024 10:01:51 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3d0cb559-87dc-423f-9461-574e810fbdb2@arm.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v2 13/18] arm64: Simplify efi_mem_init
+Content-Language: en-GB
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, alexandru.elisei@arm.com,
+ eric.auger@redhat.com, shahuang@redhat.com, pbonzini@redhat.com,
+ thuth@redhat.com
+References: <20240227192109.487402-20-andrew.jones@linux.dev>
+ <20240227192109.487402-33-andrew.jones@linux.dev>
+ <3d0cb559-87dc-423f-9461-574e810fbdb2@arm.com>
+ <20240304-9cc10a0c64d1723d3c203cf2@orel>
+From: Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <20240304-9cc10a0c64d1723d3c203cf2@orel>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 04, 2024 at 08:10:40AM +0000, Nikos Nikoleris wrote:
-> On 27/02/2024 19:21, Andrew Jones wrote:
-> > Reduce the EFI mem_map loop to only setting flags and finding the
-> > largest free memory region. Then, apply memregions_split() for
-> > the code/data region split and do the rest of the things that
-> > used to be done in the EFI mem_map loop in a separate mem_region
-> > loop.
-> > 
-> > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+On 04/03/2024 09:55, Andrew Jones wrote:
+> On Mon, Mar 04, 2024 at 08:10:40AM +0000, Nikos Nikoleris wrote:
+>> On 27/02/2024 19:21, Andrew Jones wrote:
+>>> Reduce the EFI mem_map loop to only setting flags and finding the
+>>> largest free memory region. Then, apply memregions_split() for
+>>> the code/data region split and do the rest of the things that
+>>> used to be done in the EFI mem_map loop in a separate mem_region
+>>> loop.
+>>>
+>>> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+>>
+>> Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 > 
-> Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> Thanks. While skimming this patch now to remind myself about it for v3,
+> I see the etext = ALIGN() below which I forgot to consider. We certainly
+> need the end of the text section to be on a page boundary, but that
+> doesn't seem to be the case right now. I think we need to add this
+> change
 
-Thanks. While skimming this patch now to remind myself about it for v3,
-I see the etext = ALIGN() below which I forgot to consider. We certainly
-need the end of the text section to be on a page boundary, but that
-doesn't seem to be the case right now. I think we need to add this
-change
-
-diff --git a/arm/efi/elf_aarch64_efi.lds b/arm/efi/elf_aarch64_efi.lds
-index 836d98255d88..7a4192b77900 100644
---- a/arm/efi/elf_aarch64_efi.lds
-+++ b/arm/efi/elf_aarch64_efi.lds
-@@ -13,6 +13,7 @@ SECTIONS
-     *(.rodata*)
-     . = ALIGN(16);
-   }
-+  . = ALIGN(4096);
-   _etext = .;
-   _text_size = . - _text;
-   .dynamic  : { *(.dynamic) }
+I missed and it didn't manifest in any of the runs I did. However, it 
+makes sense.
 
 Thanks,
-drew
+
+Nikos
 
 > 
+> diff --git a/arm/efi/elf_aarch64_efi.lds b/arm/efi/elf_aarch64_efi.lds
+> index 836d98255d88..7a4192b77900 100644
+> --- a/arm/efi/elf_aarch64_efi.lds
+> +++ b/arm/efi/elf_aarch64_efi.lds
+> @@ -13,6 +13,7 @@ SECTIONS
+>       *(.rodata*)
+>       . = ALIGN(16);
+>     }
+> +  . = ALIGN(4096);
+>     _etext = .;
+>     _text_size = . - _text;
+>     .dynamic  : { *(.dynamic) }
+> 
 > Thanks,
+> drew
 > 
-> Nikos
-> 
-> > ---
-> >   lib/arm/setup.c | 45 ++++++++++++++++++++-------------------------
-> >   1 file changed, 20 insertions(+), 25 deletions(-)
-> > 
-> > diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> > index d0be4c437708..631597b343f1 100644
-> > --- a/lib/arm/setup.c
-> > +++ b/lib/arm/setup.c
-> > @@ -301,9 +301,7 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
-> >   	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
-> >   	efi_memory_desc_t *buffer = *map->map;
-> >   	efi_memory_desc_t *d = NULL;
-> > -	struct mem_region r;
-> > -	uintptr_t text = (uintptr_t)&_text, etext = ALIGN((uintptr_t)&_etext, 4096);
-> > -	uintptr_t data = (uintptr_t)&_data, edata = ALIGN((uintptr_t)&_edata, 4096);
-> > +	struct mem_region r, *code, *data;
-> >   	const void *fdt = efi_bootinfo->fdt;
-> >   	/*
-> > @@ -337,21 +335,7 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
-> >   			r.flags = MR_F_IO;
-> >   			break;
-> >   		case EFI_LOADER_CODE:
-> > -			if (r.start <= text && r.end > text) {
-> > -				/* This is the unit test region. Flag the code separately. */
-> > -				phys_addr_t tmp = r.end;
-> > -
-> > -				assert(etext <= data);
-> > -				assert(edata <= r.end);
-> > -				r.flags = MR_F_CODE;
-> > -				r.end = data;
-> > -				memregions_add(&r);
-> > -				r.start = data;
-> > -				r.end = tmp;
-> > -				r.flags = 0;
-> > -			} else {
-> > -				r.flags = MR_F_RESERVED;
-> > -			}
-> > +			r.flags = MR_F_CODE;
-> >   			break;
-> >   		case EFI_CONVENTIONAL_MEMORY:
-> >   			if (free_mem_pages < d->num_pages) {
-> > @@ -361,15 +345,27 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
-> >   			break;
-> >   		}
-> > -		if (!(r.flags & MR_F_IO)) {
-> > -			if (r.start < __phys_offset)
-> > -				__phys_offset = r.start;
-> > -			if (r.end > __phys_end)
-> > -				__phys_end = r.end;
-> > -		}
-> >   		memregions_add(&r);
-> >   	}
-> > +	memregions_split((unsigned long)&_etext, &code, &data);
-> > +	assert(code && (code->flags & MR_F_CODE));
-> > +	if (data)
-> > +		data->flags &= ~MR_F_CODE;
-> > +
-> > +	for (struct mem_region *m = mem_regions; m->end; ++m) {
-> > +		if (m != code && (m->flags & MR_F_CODE))
-> > +			m->flags = MR_F_RESERVED;
-> > +
-> > +		if (!(m->flags & MR_F_IO)) {
-> > +			if (m->start < __phys_offset)
-> > +				__phys_offset = m->start;
-> > +			if (m->end > __phys_end)
-> > +				__phys_end = m->end;
-> > +		}
-> > +	}
-> > +	__phys_end &= PHYS_MASK;
-> > +
-> >   	if (efi_bootinfo->fdt_valid) {
-> >   		unsigned long old_start = free_mem_start;
-> >   		void *freemem = (void *)free_mem_start;
-> > @@ -380,7 +376,6 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
-> >   		free_mem_pages = (free_mem_start - old_start) >> EFI_PAGE_SHIFT;
-> >   	}
-> > -	__phys_end &= PHYS_MASK;
-> >   	asm_mmu_disable();
-> >   	if (free_mem_pages == 0)
+>>
+>> Thanks,
+>>
+>> Nikos
+>>
+>>> ---
+>>>    lib/arm/setup.c | 45 ++++++++++++++++++++-------------------------
+>>>    1 file changed, 20 insertions(+), 25 deletions(-)
+>>>
+>>> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+>>> index d0be4c437708..631597b343f1 100644
+>>> --- a/lib/arm/setup.c
+>>> +++ b/lib/arm/setup.c
+>>> @@ -301,9 +301,7 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
+>>>    	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
+>>>    	efi_memory_desc_t *buffer = *map->map;
+>>>    	efi_memory_desc_t *d = NULL;
+>>> -	struct mem_region r;
+>>> -	uintptr_t text = (uintptr_t)&_text, etext = ALIGN((uintptr_t)&_etext, 4096);
+>>> -	uintptr_t data = (uintptr_t)&_data, edata = ALIGN((uintptr_t)&_edata, 4096);
+>>> +	struct mem_region r, *code, *data;
+>>>    	const void *fdt = efi_bootinfo->fdt;
+>>>    	/*
+>>> @@ -337,21 +335,7 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
+>>>    			r.flags = MR_F_IO;
+>>>    			break;
+>>>    		case EFI_LOADER_CODE:
+>>> -			if (r.start <= text && r.end > text) {
+>>> -				/* This is the unit test region. Flag the code separately. */
+>>> -				phys_addr_t tmp = r.end;
+>>> -
+>>> -				assert(etext <= data);
+>>> -				assert(edata <= r.end);
+>>> -				r.flags = MR_F_CODE;
+>>> -				r.end = data;
+>>> -				memregions_add(&r);
+>>> -				r.start = data;
+>>> -				r.end = tmp;
+>>> -				r.flags = 0;
+>>> -			} else {
+>>> -				r.flags = MR_F_RESERVED;
+>>> -			}
+>>> +			r.flags = MR_F_CODE;
+>>>    			break;
+>>>    		case EFI_CONVENTIONAL_MEMORY:
+>>>    			if (free_mem_pages < d->num_pages) {
+>>> @@ -361,15 +345,27 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
+>>>    			break;
+>>>    		}
+>>> -		if (!(r.flags & MR_F_IO)) {
+>>> -			if (r.start < __phys_offset)
+>>> -				__phys_offset = r.start;
+>>> -			if (r.end > __phys_end)
+>>> -				__phys_end = r.end;
+>>> -		}
+>>>    		memregions_add(&r);
+>>>    	}
+>>> +	memregions_split((unsigned long)&_etext, &code, &data);
+>>> +	assert(code && (code->flags & MR_F_CODE));
+>>> +	if (data)
+>>> +		data->flags &= ~MR_F_CODE;
+>>> +
+>>> +	for (struct mem_region *m = mem_regions; m->end; ++m) {
+>>> +		if (m != code && (m->flags & MR_F_CODE))
+>>> +			m->flags = MR_F_RESERVED;
+>>> +
+>>> +		if (!(m->flags & MR_F_IO)) {
+>>> +			if (m->start < __phys_offset)
+>>> +				__phys_offset = m->start;
+>>> +			if (m->end > __phys_end)
+>>> +				__phys_end = m->end;
+>>> +		}
+>>> +	}
+>>> +	__phys_end &= PHYS_MASK;
+>>> +
+>>>    	if (efi_bootinfo->fdt_valid) {
+>>>    		unsigned long old_start = free_mem_start;
+>>>    		void *freemem = (void *)free_mem_start;
+>>> @@ -380,7 +376,6 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
+>>>    		free_mem_pages = (free_mem_start - old_start) >> EFI_PAGE_SHIFT;
+>>>    	}
+>>> -	__phys_end &= PHYS_MASK;
+>>>    	asm_mmu_disable();
+>>>    	if (free_mem_pages == 0)
