@@ -1,165 +1,63 @@
-Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2084.outbound.protection.outlook.com [40.107.241.84])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5B5134A3
-	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 07:20:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.241.84
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709536859; cv=fail; b=JqrMboQ2LYXJ5GgKuvkyVMqzWFjxiU/qcFM4ZtZrW0aD44FCDzYIZFhaqDiPzzy7lA4mIj+sdRSRDVB9Dxhq4UfjP7zDzrdKZYPhyhdUGRnudBq2yraRC6hZTVWOqdljeeHZYN7cfkXndS7ARWYPUIEGxLA1GipXJ6WaJb7cryY=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709536859; c=relaxed/simple;
-	bh=WPoTwCTsFjn34trcRlzGCnCPBYVZ51ZL+HFFEWfGSug=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=nKOmEN39QldNrVQ87ndugmao+6hVnDsvkI6T8vDlCy/N6h7PNkLyaXgERT06HXg/KAVWStcZCX0cdbIK6Gfl2ytwHvAKF7V5l5qmb6JlC5QYOpGRbBf9CRy1D8hSiV7CyoJGY/MzAF1pY/nNED+P/AA6Dl9cNjuR21zNmhPGRBE=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b=HjvASZJZ; dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b=HjvASZJZ; arc=fail smtp.client-ip=40.107.241.84
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8716613AD4
+	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 07:34:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709537690; cv=none; b=myRXGOiUYgDzdOUT/wlA1hfI6Rb9ZeAdAoN0YaTI8fPo6nLGTHXPUhaAxBq2cIkUCn7OBwXpVQ6vHrpFMklNYTjEux7qCVXaTm4LuErhJaZUg1ps07DaLLUi/MhLq05NC7QBLPtIdeIfmI5ASbaIpz6ZO1I8G6g4CYn58+Sh4dk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709537690; c=relaxed/simple;
+	bh=FLGfyB/PyHizEPkdbQDT/hBagjA+Li3QsQ+lD3mzDVQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BUZY7SN/ZHyDQofmSScJkrK3dVz9n7NX3jsdFyaHp4L6ef5FuF8HK07Ogt301lyHGm1Nz/unmZKyksfuw0Dl9O63PEf1VAVsW7wzgOGs3X5p27JQ8P+SkeV+wRAU5fD3R0cS0YwT2/szgT1BNAt8PSnC5vPmdoRI6TnERvEHo8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="HjvASZJZ";
-	dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="HjvASZJZ"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=pass;
- b=YAbBABOnTBSzi/ogNmff4Q0Kw+38r6V+gwDLW5lDHaAXcYBUAxbpl7TXJpyth2hRqdkUn0KZFUgHW9X1DUtDtIt8X0z9qkVMf12kVeTSIFk79soT9Lb2wEeTxEb/jkF4LLlHgH616jZxSk0Twp5rON6qlsNdOk78K8kuogMkj6Avi8b1dKUpTGAe0v/nnLn8QVPBG0w44VaHayRyy414UE+jnQT166MDQFt9jE3zH7PY3vdSDY+aqr0LeMBHPDU0CQUkOuohiExh4RDFMVr8y+14mYWcRvS9TfcxQU71fEkI7g6CM4ktFbPcX7tmRbKHxqBkAR1w4cyPrlXfjCJ41g==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XXSuWdxB59W2qJeUV8a5Nw0drObG4+zwNZc8Vl76kwY=;
- b=fQL2YD4wrXDtjbbY2uuVT/19MPBKvq+uhqNJJCeGyjc/HRBFUst/CYAP4ex8am4/YCzb+1VgJWa+GbSwfWzdGIjHi2BFuCdEaWZo9RvyicoVIvm4fH1QAUo6cZIsbNmngU/mvPiJHZrtFn/eXGPoIcwkg9mJg9Ms1jc4iM+89kQ3FBnMXu6quS7VI8fgF8AA4yP68qT6IjbJ2AzdolgbGpW77e0uzrsmdLiIHM9VaGpiqabuwN1DHRIvCl2xhZgpiucGXqs5EFyL6WV9pgVOZniq8RFp88JtPSUDuBVE9gLDKcyWicn0Z3sBiY7NTOH6B0IU3Qe46MBd/o3DAt/yVg==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 63.35.35.123) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=arm.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
- dkim=pass (signature was verified) header.d=armh.onmicrosoft.com; arc=pass (0
- oda=1 ltdi=1 spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XXSuWdxB59W2qJeUV8a5Nw0drObG4+zwNZc8Vl76kwY=;
- b=HjvASZJZQO6lmzj1ziLdcjykN0jwIfjBbtnekwSqhmMoIjSko97Ejtc2YrAS0gglsCTDMYYZTZ0oCz3DVJNOag4mGBvX58OCoe+vAh8GluN/8xKs/L1OztUk009XVI0Lv6048xxV48dKqPFIDX+gS7h/Q5vbuytiz+E6J17EDxY=
-Received: from AS4P191CA0016.EURP191.PROD.OUTLOOK.COM (2603:10a6:20b:5d9::11)
- by PAWPR08MB9122.eurprd08.prod.outlook.com (2603:10a6:102:342::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.38; Mon, 4 Mar
- 2024 07:20:52 +0000
-Received: from AM4PEPF00027A69.eurprd04.prod.outlook.com
- (2603:10a6:20b:5d9:cafe::d9) by AS4P191CA0016.outlook.office365.com
- (2603:10a6:20b:5d9::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.38 via Frontend
- Transport; Mon, 4 Mar 2024 07:20:51 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
- client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
- pr=C
-Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- AM4PEPF00027A69.mail.protection.outlook.com (10.167.16.87) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7362.11 via Frontend Transport; Mon, 4 Mar 2024 07:20:51 +0000
-Received: ("Tessian outbound c21fe6ca13cc:v228"); Mon, 04 Mar 2024 07:20:51 +0000
-X-CheckRecipientChecked: true
-X-CR-MTA-CID: ff437af2a78c815b
-X-CR-MTA-TID: 64aa7808
-Received: from 2ac324b2b3ed.2
-	by 64aa7808-outbound-1.mta.getcheckrecipient.com id BE27D57C-7BC7-4A90-BF4A-134A48B12624.1;
-	Mon, 04 Mar 2024 07:20:40 +0000
-Received: from EUR01-HE1-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 2ac324b2b3ed.2
-    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Mon, 04 Mar 2024 07:20:40 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=V6KOYXmJ+9c2QA+IcbA1bvsu/Zy6GDIk7N22K26MhpZT5Vrd8d4XOd7iO4ZjSUBXdEdJqIyVgWvNLSAs97PXaSZdzapBC9Mk+IGbK0DiEqgB0XViGgXNWPLqlcGzJX3+QPPgx/VfmQJ+uiooKr+Mo2+/pTYc2bN4sIHYrRog1inf+lZICC19OFWWs4YiUCV1axJtgco9jE95Ohq0nXAfmpYogW+eUhfqyssl+vEQKWDHuI1g4sIBnw54oJn9c+ogvwsqo9KgTWBcRm141IFze9Znu8vqxhX2y8mDgH6aRUfpGy4MBKP9sFL2tRbBf+nC0ymGGzWZbn+IVbsdpP3m3w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XXSuWdxB59W2qJeUV8a5Nw0drObG4+zwNZc8Vl76kwY=;
- b=YwJPrA7QAGtIYXlmG9Q7IiMQXaF0al5etgG54G04tw7Y+1Z3ZUU9Cn/0ELPCFET0VsrMy3iMhdk21vi6wKS+LlwSMvVnnjHF8IxSMg7YIZAq2Pe8EnDi3fYznJx+V+HaHiO0tJoYRAYv0Tl5hXjwWVmzWPIL7AbDRU4AWQu6qJEySdCGpl3q2yT1Jvo/JwSM3wy5iE1ZPmaYhfjPBRNMnhmrEqS2Z53lFCtme/WgPdx0ePbHMWtqOzLnEg1t9cKYwEuhMJ336D/ADD27OO9+VDp/KUxjtngSkeyUpbKj05d/LTTNJJtdQFn6CfT6AclQkwdbANyoxTTv6XTsMJeJlg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XXSuWdxB59W2qJeUV8a5Nw0drObG4+zwNZc8Vl76kwY=;
- b=HjvASZJZQO6lmzj1ziLdcjykN0jwIfjBbtnekwSqhmMoIjSko97Ejtc2YrAS0gglsCTDMYYZTZ0oCz3DVJNOag4mGBvX58OCoe+vAh8GluN/8xKs/L1OztUk009XVI0Lv6048xxV48dKqPFIDX+gS7h/Q5vbuytiz+E6J17EDxY=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from PAXPR08MB7017.eurprd08.prod.outlook.com (2603:10a6:102:1df::21)
- by DU2PR08MB10085.eurprd08.prod.outlook.com (2603:10a6:10:496::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.38; Mon, 4 Mar
- 2024 07:20:37 +0000
-Received: from PAXPR08MB7017.eurprd08.prod.outlook.com
- ([fe80::ff7d:ae5d:bc51:66fd]) by PAXPR08MB7017.eurprd08.prod.outlook.com
- ([fe80::ff7d:ae5d:bc51:66fd%4]) with mapi id 15.20.7339.035; Mon, 4 Mar 2024
- 07:20:36 +0000
-Message-ID: <92be0466-eb29-40f5-8313-d1b6326a6727@arm.com>
-Date: Mon, 4 Mar 2024 07:20:35 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2 07/18] arm64: efi: Remove EFI_USE_DTB
-Content-Language: en-GB
-To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: alexandru.elisei@arm.com, eric.auger@redhat.com, shahuang@redhat.com,
- pbonzini@redhat.com, thuth@redhat.com
-References: <20240227192109.487402-20-andrew.jones@linux.dev>
- <20240227192109.487402-27-andrew.jones@linux.dev>
-From: Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <20240227192109.487402-27-andrew.jones@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: LO4P123CA0538.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:319::8) To PAXPR08MB7017.eurprd08.prod.outlook.com
- (2603:10a6:102:1df::21)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABCB71FB;
+	Sun,  3 Mar 2024 23:35:23 -0800 (PST)
+Received: from [192.168.5.30] (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DA0F23F762;
+	Sun,  3 Mar 2024 23:34:45 -0800 (PST)
+Message-ID: <df9c5b95-0cc4-4d82-b8d9-603dc069f7de@arm.com>
+Date: Mon, 4 Mar 2024 07:34:44 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	PAXPR08MB7017:EE_|DU2PR08MB10085:EE_|AM4PEPF00027A69:EE_|PAWPR08MB9122:EE_
-X-MS-Office365-Filtering-Correlation-Id: df933981-58f4-4f0c-f815-08dc3c1b9f7c
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original:
- 95xpR97vKEMUz+XBqbiCDIoD+LIUvtp3dq/IZwGT0wwRAYe0mSw2x10pPu1WCjNyR0mf+bLW7WYbCt+iQRj5V/QlOuqsfc1ihKrvYX4LP82hRsJdyjm2DpotJDulNz9TNcFu9nAbz+x/ltjxZ0uZIzWqsgIm2CXK7QO6KgTJb+1gQWmS4s6zCO9ekQmF8gYqUslRh+yarodLPOUpH2kj3O+V8k2yELk5ARR58CH+S1vOHOQa/EMUN4IxSHBtwKoQpxzP4larW1zW1JXt2YpPm4W3UIR8TpqPkc+UEPav5m0Dv9ZCaI98eY2RwSrFxM6vqpsKAP4DfPeSWfRqjQeYvwSFM0uabyR3zjfoJ4Y1Xsqqy/xVKxk7ssp+FCyMj2RYhctn3JWTrLSmhBbPEpV6ASP9CDM716J1tgsAbK+sZW0JHvhZNhl1KXHlfpPnkorVhxbEPDxjPsLR1cqGuGKuzzDsVpKWOWMaOJiPd23xnBBxAB1YAvn2xLdzna9UeZIy9l/Nxr4PJD2yncHFLnvoHkggTntfp+z+7sY/tgJOv22eBTuaouLGTV+skuNWjuShWm96uqVgB6gN90V/uzE1iabDyWJSZsnZ50yLA28OVe539YLYyWHNyN7On9faM86SL9CVlQUu9YsYokoFjVWNenmmWbYf/1HFupoYFP0q+DA=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR08MB7017.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR08MB10085
-Original-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM4PEPF00027A69.eurprd04.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	60c2096f-9754-4b2d-67d4-08dc3c1b965c
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	3x4LKvawX452hV3pPXyNltm0hIMEeBUr0SBH2uOeCKYt15KJiQYeDz7cexOruQ8pxED6YR96aXlqGCsScHv2U3ugHkFHJBU2JZFnln5LK+6sS+w/VdScIfnQLFwzHzicoHQ74h5DzQsyiUo9zpd/huINn7R9Bv/sJK6P1H+5yMpx0LHi+tUt2YlorO3DVyDJiIeiKXKok8w+pMPdyWhdmWrGl7l8Hjpv8g9JcKaAVAGV5Hw2R3S23Vg4XbqIfzUh5Y9F1KCPBJkx8twnEBdF475/2V7PKoK9lyBAZ0ceTyUEfd3TMo0ekXyBN6ge5rPX2XHwIiOpeVziMaCFbg4Y9BvW4hNOmTvNq06xejo+k2DkGfS4MF0xXB3k8cXSXSo/QdpjYIGnv2ptCze2eqzIXC6oaJ3Jpb9/qAUmz9nGahQ0X1CZEF5DfDUWrrG6lpIbYcS4aYoMl71mNb8m6E8yZz59n+bRzDcQ72KP1/w2a0CdHGBbsDJ3z406qavveBmX5vOCPatIQFaUxLIRox4kOaRw+IpINfLHl/r2X3zUNvmUUjgCI1cbnygBoqLSLgVQvQgufT30qICcUcipxqCllW2aew2fTwd/ZxLh2eXla80GUMuVY1+KfEyBL8JM5JjyG7nF6UfL+Kva0LqD8BTBEUpPW0/alchSA4HdVu/NBlbTiKD9T0HzuUCpG3+QxNQ4l/Hx3PWtg/Z53aCUiKfLCdS3OadSHo6LQDQ2XFDSg4es/woAmAHCyIrW6LyqMx+X
-X-Forefront-Antispam-Report:
-	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230031)(82310400014)(376005)(36860700004);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2024 07:20:51.6693
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: df933981-58f4-4f0c-f815-08dc3c1b9f7c
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM4PEPF00027A69.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR08MB9122
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v2 08/18] arm64: efi: Improve device tree
+ discovery
+Content-Language: en-GB
+To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: alexandru.elisei@arm.com, eric.auger@redhat.com, shahuang@redhat.com,
+ pbonzini@redhat.com, thuth@redhat.com
+References: <20240227192109.487402-20-andrew.jones@linux.dev>
+ <20240227192109.487402-28-andrew.jones@linux.dev>
+From: Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <20240227192109.487402-28-andrew.jones@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 On 27/02/2024 19:21, Andrew Jones wrote:
-> We don't need two variables for one boolean property. Just use
-> !EFI_USE_ACPI to infer efi-use-dtb.
+> Zero is a valid address for the device tree so add an fdt_valid data
+> member to determine when the address is valid or not. Also, check the
+> device tree GUID when the environment variable is missing. The latter
+> change allows directly loading the unit test with QEMU's '-kernel'
+> command line parameter, which is much faster than putting the test
+> in the EFI file system and then running it from the UEFI shell.
 >
+
+Out of curiosity, the fdt pointer can be zero just in KUT or zero is an 
+address that efi_load_image or efi_get_system_config_table could return? 
+Similar code in Linux treats 0 an non valid address 
+https://elixir.bootlin.com/linux/latest/source/drivers/firmware/efi/libstub/fdt.c#L370
+
 > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+
+In any case, this won't hurt:
 
 Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 
@@ -168,34 +66,112 @@ Thanks,
 Nikos
 
 > ---
->   arm/efi/run | 4 +---
->   1 file changed, 1 insertion(+), 3 deletions(-)
->
-> diff --git a/arm/efi/run b/arm/efi/run
-> index 494ba9e7efe7..b7a8418a07f8 100755
-> --- a/arm/efi/run
-> +++ b/arm/efi/run
-> @@ -27,8 +27,6 @@ fi
->   : "${EFI_CASE_DIR:=3D"$EFI_TEST/$EFI_TESTNAME"}"
->   : "${EFI_VAR_GUID:=3D97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823}"
->
-> -[ "$EFI_USE_ACPI" =3D "y" ] || EFI_USE_DTB=3Dy
+>   lib/arm/setup.c |  3 ++-
+>   lib/efi.c       | 28 +++++++++++++++++-----------
+>   lib/efi.h       |  3 ++-
+>   lib/linux/efi.h |  2 ++
+>   4 files changed, 23 insertions(+), 13 deletions(-)
+> 
+> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+> index 0382cbdaf5a1..76aae4627a7b 100644
+> --- a/lib/arm/setup.c
+> +++ b/lib/arm/setup.c
+> @@ -342,7 +342,8 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
+>   		}
+>   		memregions_add(&r);
+>   	}
+> -	if (fdt) {
+> +
+> +	if (efi_bootinfo->fdt_valid) {
+>   		/* Move the FDT to the base of free memory */
+>   		fdt_size = fdt_totalsize(fdt);
+>   		ret = fdt_move(fdt, (void *)free_mem_start, fdt_size);
+> diff --git a/lib/efi.c b/lib/efi.c
+> index d94f0fa16fc0..0785bd3e8916 100644
+> --- a/lib/efi.c
+> +++ b/lib/efi.c
+> @@ -6,13 +6,13 @@
+>    *
+>    * SPDX-License-Identifier: LGPL-2.0-or-later
+>    */
 > -
->   if [ ! -f "$EFI_UEFI" ]; then
->       echo "UEFI firmware not found."
->       echo "Please specify the path with the env variable EFI_UEFI"
-> @@ -68,7 +66,7 @@ uefi_shell_run()
->       mkdir -p "$EFI_CASE_DIR"
->       cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_CASE_DIR/"
->       echo "@echo -off" > "$EFI_CASE_DIR/startup.nsh"
-> -     if [ "$EFI_USE_DTB" =3D "y" ]; then
-> +     if [ "$EFI_USE_ACPI" !=3D "y" ]; then
->               qemu_args+=3D(-machine acpi=3Doff)
->               FDT_BASENAME=3D"dtb"
->               UEFI_SHELL_RUN=3Dy $TEST_DIR/run -machine dumpdtb=3D"$EFI_C=
-ASE_DIR/$FDT_BASENAME" "${qemu_args[@]}"
-IMPORTANT NOTICE: The contents of this email and any attachments are confid=
-ential and may also be privileged. If you are not the intended recipient, p=
-lease notify the sender immediately and do not disclose the contents to any=
- other person, use it for any purpose, or store or copy the information in =
-any medium. Thank you.
+> -#include "efi.h"
+> +#include <libcflat.h>
+>   #include <argv.h>
+> -#include <stdlib.h>
+>   #include <ctype.h>
+> -#include <libcflat.h>
+> +#include <stdlib.h>
+>   #include <asm/setup.h>
+> +#include "efi.h"
+> +#include "libfdt/libfdt.h"
+>   
+>   /* From lib/argv.c */
+>   extern int __argc, __envc;
+> @@ -283,18 +283,24 @@ static void* efi_get_var(efi_handle_t handle, struct efi_loaded_image_64 *image,
+>   	return val;
+>   }
+>   
+> -static void *efi_get_fdt(efi_handle_t handle, struct efi_loaded_image_64 *image)
+> +static bool efi_get_fdt(efi_handle_t handle, struct efi_loaded_image_64 *image, void **fdt)
+>   {
+>   	efi_char16_t var[] = ENV_VARNAME_DTBFILE;
+>   	efi_char16_t *val;
+> -	void *fdt = NULL;
+> -	int fdtsize;
+> +	int fdtsize = 0;
+> +
+> +	*fdt = NULL;
+>   
+>   	val = efi_get_var(handle, image, var);
+> -	if (val)
+> -		efi_load_image(handle, image, &fdt, &fdtsize, val);
+> +	if (val) {
+> +		efi_load_image(handle, image, fdt, &fdtsize, val);
+> +		if (fdtsize == 0)
+> +			return false;
+> +	} else if (efi_get_system_config_table(DEVICE_TREE_GUID, fdt) != EFI_SUCCESS) {
+> +		return false;
+> +	}
+>   
+> -	return fdt;
+> +	return fdt_check_header(*fdt) == 0;
+>   }
+>   
+>   efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
+> @@ -335,7 +341,7 @@ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
+>   	}
+>   	setup_args(cmdline_ptr);
+>   
+> -	efi_bootinfo.fdt = efi_get_fdt(handle, image);
+> +	efi_bootinfo.fdt_valid = efi_get_fdt(handle, image, &efi_bootinfo.fdt);
+>   	/* Set up efi_bootinfo */
+>   	efi_bootinfo.mem_map.map = &map;
+>   	efi_bootinfo.mem_map.map_size = &map_size;
+> diff --git a/lib/efi.h b/lib/efi.h
+> index db46d45068ee..4bd01f7199ce 100644
+> --- a/lib/efi.h
+> +++ b/lib/efi.h
+> @@ -30,7 +30,8 @@
+>    */
+>   typedef struct {
+>   	struct efi_boot_memmap mem_map;
+> -	const void *fdt;
+> +	void *fdt;
+> +	bool fdt_valid;
+>   } efi_bootinfo_t;
+>   
+>   efi_status_t _relocate(long ldbase, Elf64_Dyn *dyn, efi_handle_t handle,
+> diff --git a/lib/linux/efi.h b/lib/linux/efi.h
+> index 410f0b1a0da1..92d798f79767 100644
+> --- a/lib/linux/efi.h
+> +++ b/lib/linux/efi.h
+> @@ -66,6 +66,8 @@ typedef guid_t efi_guid_t;
+>   #define ACPI_TABLE_GUID EFI_GUID(0xeb9d2d30, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d)
+>   #define ACPI_20_TABLE_GUID EFI_GUID(0x8868e871, 0xe4f1, 0x11d3,  0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81)
+>   
+> +#define DEVICE_TREE_GUID EFI_GUID(0xb1b621d5, 0xf19c, 0x41a5,  0x83, 0x0b, 0xd9, 0x15, 0x2c, 0x69, 0xaa, 0xe0)
+> +
+>   #define LOADED_IMAGE_PROTOCOL_GUID EFI_GUID(0x5b1b31a1, 0x9562, 0x11d2,  0x8e, 0x3f, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b)
+>   
+>   typedef struct {
