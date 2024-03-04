@@ -1,31 +1,31 @@
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4714379927
-	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 20:00:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A67A679DD2
+	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 20:10:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709582419; cv=none; b=Bd52a3069DDkqq1ZsR8xPdH7p9k4sbqPEPRatBKSncDLHxVBol4vkLCyL2rQ/nNm2UwwS5bOeu2mjo0xtNQsKFlCY2amAk9TQhSUYcG/AGvCcO1A0QikRdInQmRBhmYJUpQ+g3jpJph9lQ+g+I5wSrOCKVECrCeMmkEKoX5j2WE=
+	t=1709583040; cv=none; b=fvgFsx1wgJ9haIPyv+lpt4TkJlTg40zM7yLPD3vPaUIsBicmH18XLPBUZ6F6mLSPR9d6jB0C0H/1DU5zuIFtAyofKKStbV7puYPfUvCe7yAfrYh6VS5+3LtDHUZbCutqnMbNlRCBUwYt8RcW6QqnlhQeC1MUmaS4QdfICSdqwcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709582419; c=relaxed/simple;
-	bh=PwswC2QLgrfGkqvGJv5hVy5xAgaXNLvrQ1PnKfrapGY=;
+	s=arc-20240116; t=1709583040; c=relaxed/simple;
+	bh=CiWclHM92CxPgn9s8RDVTkFk5yMmG0gjX7Az/URkYxY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OlWXz0QHX5GHy/Gy8yDzFJcmjPEw6IQIgFw1GM3Kwg5kVvUZjklTYcKa9GyDbDtY3yZy4nYBhTL0Ai1GLKgSTYA1wOaP7uHtCwOz3p/uKDpqQU0oiYxLtlTmesEL8E5U0+Tp7iV5/ccQVyKoQGs7kMHsuT28BzwPQ/GQGwNAm4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xCtRhKDX; arc=none smtp.client-ip=95.215.58.181
+	 Content-Type:Content-Disposition:In-Reply-To; b=QrMYgeFSHCLuHkuKcmZMDOiVX7rUlku+aSSQat6fKz3LEgC22SH2M5H04aXRpfj+m+uUydGQ019wPBeZpyJni6CKT/gjf7lV7QPMt1FIQD8u8PJkTUq3tgA94uhAKdRTXswwWvptWXnI7Hdwawdan/HPqCMFI+RRxRQ46EVfQHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=g5Ea6CWf; arc=none smtp.client-ip=95.215.58.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xCtRhKDX"
-Date: Mon, 4 Mar 2024 20:00:09 +0000
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="g5Ea6CWf"
+Date: Mon, 4 Mar 2024 20:10:31 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709582415;
+	t=1709583037;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XxJdQM9M8oSJx2poffbncc5kqBv+MVDtqlApqur8M/Q=;
-	b=xCtRhKDXkGmhyRTyD7OJzgZUEK3tlqvB6S5yysaKAkG8DWMPf2NiHcf1f4oLoQinspRh0d
-	hEuhzXeXZBnkGIBAag+W0QAyxwW2AvlMdB7Y1QunewULzkMjxHPh0Ebbbvz6qnc8tKpdZd
-	hbixfhz+jID8YGZM8gWc05QrPcOlw/I=
+	bh=8c/7pMLh+RQyjtRpA/nPZD6CNVBcAA8WYXxa3p6I4O8=;
+	b=g5Ea6CWfdTANFc8SPnRnu872E2/sniqlKhhEx8TEiRQVu3vs2xSZ8o/5+6Cqm0dDTk9Pbo
+	BjwFZE9X4g448f+0+hWZ8+UAQhsQCyH0NDrYwhoW8uwRjeNWqqSTbT65mQVZnukjHKWqNd
+	d06kZFYmFiqzirM/LZtcD5jVYOH58zE=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Anish Moorthy <amoorthy@google.com>
@@ -36,9 +36,10 @@ Cc: seanjc@google.com, maz@kernel.org, kvm@vger.kernel.org,
 	isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
 Subject: Re: [PATCH v7 08/14] KVM: arm64: Enable KVM_CAP_MEMORY_FAULT_INFO
  and annotate fault in the stage-2 fault handler
-Message-ID: <ZeYoSSYtDxKma-gg@linux.dev>
+Message-ID: <ZeYqt86yVmCu5lKP@linux.dev>
 References: <20240215235405.368539-1-amoorthy@google.com>
  <20240215235405.368539-9-amoorthy@google.com>
+ <ZeYoSSYtDxKma-gg@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,28 +48,41 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240215235405.368539-9-amoorthy@google.com>
+In-Reply-To: <ZeYoSSYtDxKma-gg@linux.dev>
 X-Migadu-Flow: FLOW_OUT
 
-On Thu, Feb 15, 2024 at 11:53:59PM +0000, Anish Moorthy wrote:
+On Mon, Mar 04, 2024 at 08:00:15PM +0000, Oliver Upton wrote:
+> On Thu, Feb 15, 2024 at 11:53:59PM +0000, Anish Moorthy wrote:
+> 
+> [...]
+> 
+> > +	if (is_error_noslot_pfn(pfn)) {
+> > +		kvm_prepare_memory_fault_exit(vcpu, gfn * PAGE_SIZE, PAGE_SIZE,
+> > +					      write_fault, exec_fault, false);
+> 
+> Hmm... Reinterpreting the fault context into something that wants to be
+> arch-neutral might make this a bit difficult for userspace to
+> understand.
+> 
+> The CPU can take an instruction abort on an S1PTW due to missing write
+> permissions, i.e. hardware cannot write to the stage-1 descriptor for an
+> AF or DBM update. In this case HPFAR points to the IPA of the stage-1
+> descriptor that took the fault, not the target page.
+> 
+> It would seem this gets expressed to userspace as an intent to write and
+> execute on the stage-1 page tables, no?
 
-[...]
+Duh, kvm_vcpu_trap_is_exec_fault() (not to be confused with
+kvm_vcpu_trap_is_iabt()) filters for S1PTW, so this *should*
+shake out as a write fault on the stage-1 descriptor.
 
-> +	if (is_error_noslot_pfn(pfn)) {
-> +		kvm_prepare_memory_fault_exit(vcpu, gfn * PAGE_SIZE, PAGE_SIZE,
-> +					      write_fault, exec_fault, false);
+With that said, an architecture-neutral UAPI may not be able to capture
+the nuance of a fault. This UAPI will become much more load-bearing in
+the future, and the loss of granularity could become an issue.
 
-Hmm... Reinterpreting the fault context into something that wants to be
-arch-neutral might make this a bit difficult for userspace to
-understand.
-
-The CPU can take an instruction abort on an S1PTW due to missing write
-permissions, i.e. hardware cannot write to the stage-1 descriptor for an
-AF or DBM update. In this case HPFAR points to the IPA of the stage-1
-descriptor that took the fault, not the target page.
-
-It would seem this gets expressed to userspace as an intent to write and
-execute on the stage-1 page tables, no?
+Marc had some ideas about forwarding the register state to userspace
+directly, which should be the right level of information for _any_ fault
+taken to userspace.
 
 -- 
 Thanks,
