@@ -1,234 +1,124 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821787A736
-	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 20:22:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666CA8BE0
+	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 20:32:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709583777; cv=none; b=lYiD0Jk63pzmri/jPj5y/FwdlMfVRF/sUW76IXF5R0qAQ1L3hMUSpgYq/W9z5KsUYDm1oKU4SINZAri4+AsL8hpCFfSdegTy40pDrbF2N5DlWpTurdx7c1d1ErqyH0ZrjER/GC375aGPi4NclzZHEBV0VbmG3CVu2LBb2aAZ42w=
+	t=1709584375; cv=none; b=Blq30aMHt9ZeYaxNmLaTgD+GF4EIZwZfWqrwKkKhDBoGYwoZwyoCqIVKipAovN5rH836sxL2qnqJCmlUMI1D6yn9VvHxEGUrIZuTaN7JGwPLy2j4WaFFkVoDe//U4BVpVhahkOPgfl6xAAxSNE32yk3KlOG3PC3ZVyKsL5N/fmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709583777; c=relaxed/simple;
-	bh=95soPNUvVFgtoy742s6zRUav8gzz7P3zB3tjSRBiWv0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r2BBRiIT9YUKFAYINcYP0KRzDlbNlqGIz34lu7PU5RFDv86B9ywBHwVHRtwpv98k8t9IFYxjbzuHSAhdVOAOgf9fEBz5YlVibHOyzaNBlFR5QmoTAtZ6D749pGLBRcfcQzero6x4X0mnR7mq13CHw4roH7Xgtg1VurHxEEPo8qw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KbByelEb; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1709584375; c=relaxed/simple;
+	bh=aN7iBP0Fr7hMMlKq3I0xxEeo5y2nD9yxqABrzVhf8DU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=KjlBYW49NDw+vzCVxMqLMGO60USE/QlCgQnzmRTHN8HvI+e0Rsj6L2N4HzG5SKqHc+/awbBTbrCaa68dNwyV2veWmYsWc8O+YDjnUhGgE6898RJbVtfk/WsZpkzhf9+yUTM+tCF8mEZsFQg+mmm5MtzhkjT8oHUlHxHfECQW5fM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=atU4pDfD; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KbByelEb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709583774;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=vrXegXABZTyFa0KXs9B20qXl/6fycMW8Hyt3cgljlEk=;
-	b=KbByelEbAQ09m2k/v/wqQr51MpDpaDw5LRBzNtG0rw/c0Uwbs9Hf1B80/KjZXh/V8yrzMQ
-	83S9LtyC6eYOOh4JLdlN17U+Kjg718SCjCh2YW47eb613uRUVNDhPlc/i+FDpA2mEfCROc
-	tv6rxH+PDXWR9sIJiJ0yTF1HMi222Mg=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-541-AkJ3Z1NKPyOFxF8OojkGiw-1; Mon, 04 Mar 2024 15:22:49 -0500
-X-MC-Unique: AkJ3Z1NKPyOFxF8OojkGiw-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-41297aeece5so30144405e9.2
-        for <kvmarm@lists.linux.dev>; Mon, 04 Mar 2024 12:22:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="atU4pDfD"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc693399655so9036808276.1
+        for <kvmarm@lists.linux.dev>; Mon, 04 Mar 2024 12:32:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709584373; x=1710189173; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IGjbhidK9mIBRigo6mJIfMD0RxuUrgdaznMkQx4mOsU=;
+        b=atU4pDfDszKGmyRKuvys2Rwn6wEjoug5FO1CMFTygzoZzZL0WhpCECzvIkIGVAaR4c
+         MHfvnsend4hE3lLNVIDonlZoVjFDiRFSnlQ9/Pim6456LgBRuK3XlORq9NwTpy/fpkre
+         AxDpdS51oTSOUk3nAfvvh+uwLzkywJs7AkRp7jUeMPbU9LXDSRn1e4DKJsmtoV55n07e
+         9zekYiwFnKr47Vq4R2ItKem4+jzD49pETyaXn/3UBo8m4kD/FVIldoU+G7tDlkTj5vli
+         rNHdFluyAZcclzmCtY/bEv27YM2T4I+UmF5N7WQfc2g8qHThh7ZApOxpp34D5pxUNkxI
+         cg1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709583768; x=1710188568;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vrXegXABZTyFa0KXs9B20qXl/6fycMW8Hyt3cgljlEk=;
-        b=deLsZntH0f/oW9xgKnYcGMuDgyxOS1OE0AL5CeqAV/jTuuGjJNTrs+NHt1OyxPus5f
-         86HGx1Nlb/93zBwm5yLNnpA8eZam5Ud2Ex4eAdvq6doladmRAW+OtJwdR0PeIfNNK+kd
-         HMH0whdFYiRFfk5hrPpkTtd5kmgfJpcyC7TlPPO6NYe9CLjg41Zk/DIQ/UrI6WgCyDJL
-         TiDHKCXyeFwWeST7CY+oCWnXiSX9TeeSmGStllS4sYOeYxko0ZAMNrscRzElZLpre91s
-         KTJgwqYA2KzIy4gH9rhpG2MBLt1ds4fw9xcTKk2n0xb4niEaV6anQ9otMTe1O20ueowm
-         3G2w==
-X-Forwarded-Encrypted: i=1; AJvYcCXHdm1o9WgpmonD4uwv3VFnrkus/QbM949sva/rxzgIL+bImiSO018IrAQlXx07ZSxCIcjtYJR2571ODwgmw2e97hncx1b+
-X-Gm-Message-State: AOJu0YwIZwHAeMuq7jYMhZXNrgwTBvPGNpDToxAGUJ3ssHU0KhwC64Ar
-	TIS2ILDRL3qxOW2P3noJgXnXKrUbv6Q1rY1oYOolt01PP3JjtIzQEWjhgvE3TU4j23KboYLa0zh
-	dLfMfVgPWJfcPm5SBGf+p8BrlA8EmAsFhh91lGNH3ZYaa1KO7R+lHHw==
-X-Received: by 2002:a05:600c:1d9a:b0:412:eaf0:110c with SMTP id p26-20020a05600c1d9a00b00412eaf0110cmr287851wms.21.1709583768026;
-        Mon, 04 Mar 2024 12:22:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHVonbyQf18GJ5r1CJamDk7YTuN3n8J70bYXzUcKsIFZNq58Twho/fKUjxWq4+76er9hUMYKQ==
-X-Received: by 2002:a05:600c:1d9a:b0:412:eaf0:110c with SMTP id p26-20020a05600c1d9a00b00412eaf0110cmr287803wms.21.1709583767585;
-        Mon, 04 Mar 2024 12:22:47 -0800 (PST)
-Received: from ?IPV6:2003:cb:c733:f100:75e7:a0a4:9ac2:1abb? (p200300cbc733f10075e7a0a49ac21abb.dip0.t-ipconnect.de. [2003:cb:c733:f100:75e7:a0a4:9ac2:1abb])
-        by smtp.gmail.com with ESMTPSA id i4-20020a05600c354400b004101f27737asm18975536wmq.29.2024.03.04.12.22.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Mar 2024 12:22:47 -0800 (PST)
-Message-ID: <2773d2e1-9d73-4d38-97f1-4d90c17b2e26@redhat.com>
-Date: Mon, 4 Mar 2024 21:22:44 +0100
+        d=1e100.net; s=20230601; t=1709584373; x=1710189173;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IGjbhidK9mIBRigo6mJIfMD0RxuUrgdaznMkQx4mOsU=;
+        b=i6mKaRa0HuZz08oxr7Yqcq8xxLWTcnkm68FCDa6QPEC7PdcaOdRBbHD4OWbfTbPd+d
+         hzoYYlaEtY6sw9mERPDmBADXaVOrQhvckwkqNaG2dDcuU0jIbRtW+a65E8aUf4W4fn8B
+         p9czEod+pqujKJyjotnlFtXQH14bfokdwvGgh1/ON4zWlqCFUa3CjbxLNTr+QdvOY3bw
+         9Zu8E5diFgukSIrv8raX5SIQU+w4CR831vMnpBKKTA5w1GvluxVnj0Pk/W5ljskkHBA5
+         F0Qc/JAWf+w7VwChaw7VL1oyTD7L7Ovms9Hi1PkVuyrea4Q2wQNndiVOl5dyD7vixFzS
+         ncuw==
+X-Forwarded-Encrypted: i=1; AJvYcCUe3uevOXDK0Qzz0uk5qQ4L6oeYHxmm/VlxOjKC1k6NbzeP/9YyVhl0Ev3fsVi2FgwyXTVLtO66yne3ai/Nq8Wc16XX7/n1
+X-Gm-Message-State: AOJu0Yz8OiwIc59wCatVpCHC87UklccWJcco/JBJm3rHAUXwFKQrTbOw
+	LWOqDz/i7N2HWGxU6dwpMEnzHzONtmW1GaDLAkMWwSoEEzNaHzmt81jUn0D3qz0megFy5xplg5X
+	M3g==
+X-Google-Smtp-Source: AGHT+IEmRdAyXCmSUg6f9/OpeGnPuqGycjin7usqBi6tnzcnwZA/qldiy/+AtwEb+/ocbiyWAY5WKQraOik=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1004:b0:dc7:48ce:d17f with SMTP id
+ w4-20020a056902100400b00dc748ced17fmr2609142ybt.10.1709584373516; Mon, 04 Mar
+ 2024 12:32:53 -0800 (PST)
+Date: Mon, 4 Mar 2024 12:32:51 -0800
+In-Reply-To: <ZeYqt86yVmCu5lKP@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: folio_mmapped
-To: Quentin Perret <qperret@google.com>
-Cc: Fuad Tabba <tabba@google.com>, Matthew Wilcox <willy@infradead.org>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
- chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
- paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
- seanjc@google.com, brauner@kernel.org, akpm@linux-foundation.org,
- xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
- jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
- yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net,
- vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
- mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com,
- liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
- quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
- quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
- james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
- maz@kernel.org, will@kernel.org, keirf@google.com, linux-mm@kvack.org
-References: <925f8f5d-c356-4c20-a6a5-dd7efde5ee86@redhat.com>
- <Zd8PY504BOwMR4jO@google.com>
- <755911e5-8d4a-4e24-89c7-a087a26ec5f6@redhat.com>
- <Zd8qvwQ05xBDXEkp@google.com>
- <99a94a42-2781-4d48-8b8c-004e95db6bb5@redhat.com>
- <Zd82V1aY-ZDyaG8U@google.com>
- <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
- <CA+EHjTzHtsbhzrb-TWft1q3Ree3kgzZbsir+R9L0tDgSX-d-0g@mail.gmail.com>
- <20240229114526893-0800.eberman@hu-eberman-lv.qualcomm.com>
- <d8e6c848-e26a-4014-b0c2-f3a21fb4e636@redhat.com>
- <ZeXEUMPn27J5je8T@google.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <ZeXEUMPn27J5je8T@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240215235405.368539-1-amoorthy@google.com> <20240215235405.368539-9-amoorthy@google.com>
+ <ZeYoSSYtDxKma-gg@linux.dev> <ZeYqt86yVmCu5lKP@linux.dev>
+Message-ID: <ZeYv86atkVpVMa2S@google.com>
+Subject: Re: [PATCH v7 08/14] KVM: arm64: Enable KVM_CAP_MEMORY_FAULT_INFO and
+ annotate fault in the stage-2 fault handler
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Anish Moorthy <amoorthy@google.com>, maz@kernel.org, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, robert.hoo.linux@gmail.com, jthoughton@google.com, 
+	dmatlack@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	nadav.amit@gmail.com, isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="us-ascii"
 
-On 04.03.24 13:53, Quentin Perret wrote:
-> On Friday 01 Mar 2024 at 12:16:54 (+0100), David Hildenbrand wrote:
->>>> I don't think that we can assume that only a single VMA covers a page.
->>>>
->>>>> But of course, no rmap walk is always better.
->>>>
->>>> We've been thinking some more about how to handle the case where the
->>>> host userspace has a mapping of a page that later becomes private.
->>>>
->>>> One idea is to refuse to run the guest (i.e., exit vcpu_run() to back
->>>> to the host with a meaningful exit reason) until the host unmaps that
->>>> page, and check for the refcount to the page as you mentioned earlier.
->>>> This is essentially what the RFC I sent does (minus the bugs :) ) .
->>>>
->>>> The other idea is to use the rmap walk as you suggested to zap that
->>>> page. If the host tries to access that page again, it would get a
->>>> SIGBUS on the fault. This has the advantage that, as you'd mentioned,
->>>> the host doesn't need to constantly mmap() and munmap() pages. It
->>>> could potentially be optimised further as suggested if we have a
->>>> cooperating VMM that would issue a MADV_DONTNEED or something like
->>>> that, but that's just an optimisation and we would still need to have
->>>> the option of the rmap walk. However, I was wondering how practical
->>>> this idea would be if more than a single VMA covers a page?
->>>>
->>>
->>> Agree with all your points here. I changed Gunyah's implementation to do
->>> the unmap instead of erroring out. I didn't observe a significant
->>> performance difference. However, doing unmap might be a little faster
->>> because we can check folio_mapped() before doing the rmap walk. When
->>> erroring out at mmap() level, we always have to do the walk.
->>
->> Right. On the mmap() level you won't really have to walk page tables, as the
->> the munmap() already zapped the page and removed the "problematic" VMA.
->>
->> Likely, you really want to avoid repeatedly calling mmap()+munmap() just to
->> access shared memory; but that's just my best guess about your user space
->> app :)
+On Mon, Mar 04, 2024, Oliver Upton wrote:
+> On Mon, Mar 04, 2024 at 08:00:15PM +0000, Oliver Upton wrote:
+> > On Thu, Feb 15, 2024 at 11:53:59PM +0000, Anish Moorthy wrote:
+> > 
+> > [...]
+> > 
+> > > +	if (is_error_noslot_pfn(pfn)) {
+> > > +		kvm_prepare_memory_fault_exit(vcpu, gfn * PAGE_SIZE, PAGE_SIZE,
+> > > +					      write_fault, exec_fault, false);
+> > 
+> > Hmm... Reinterpreting the fault context into something that wants to be
+> > arch-neutral might make this a bit difficult for userspace to
+> > understand.
+> > 
+> > The CPU can take an instruction abort on an S1PTW due to missing write
+> > permissions, i.e. hardware cannot write to the stage-1 descriptor for an
+> > AF or DBM update. In this case HPFAR points to the IPA of the stage-1
+> > descriptor that took the fault, not the target page.
+> > 
+> > It would seem this gets expressed to userspace as an intent to write and
+> > execute on the stage-1 page tables, no?
 > 
-> Ack, and expecting userspace to munmap the pages whenever we hit a valid
-> mapping in userspace page-tables in the KVM faults path makes for a
-> somewhat unusual interface IMO. Userspace can munmap, mmap again, and if
-> it doesn't touch the pages, it can proceed to run the guest just fine,
-> is that the expectation? If so, it feels like we're 'leaking' internal
-
-It would be weird, and I would not suggest that. It's either
-
-(1) you can leave it mmap'ed, but any access to private memory will 
-SIGBUS. The kernel will try zapping pages inside a VMA itself.
-
-(2) you cannot leave it mmap'ed. In order to convert shared -> private, 
-you have to munmap. mmap will fail if it would cover a currently-private 
-page.
-
-So for (1) you could mmap once in user space and be done with it. For 
-(2) you would have to mmap+munmap when accessing shared memory.
-
-> kernel state somehow. The kernel is normally well within its rights to
-> zap userspace mappings if it wants to e.g. swap. (Obviously mlock is a
-> weird case, but even in that case, IIRC the kernel still has a certain
-> amount of flexibility and can use compaction and friends). Similarly,
-> it should be well within its right to proactively create them. How
-> would this scheme work if, 10 years from now, something like
-> Speculative Page Faults makes it into the kernel in a different form?
-
-At least with (2), speculative page faults would never generate a 
-SIGBUS. Just like HW must not generate a fault on speculative access.
-
+> Duh, kvm_vcpu_trap_is_exec_fault() (not to be confused with
+> kvm_vcpu_trap_is_iabt()) filters for S1PTW, so this *should*
+> shake out as a write fault on the stage-1 descriptor.
 > 
-> Not requiring to userspace to unmap makes the userspace interface a lot
-> simpler I think -- once a protected guest starts, you better not touch
-> its memory if it's not been shared back or you'll get slapped on the
-> wrist. Whether or not those pages have been accessed beforehand for
-> example is irrelevant.
+> With that said, an architecture-neutral UAPI may not be able to capture
+> the nuance of a fault. This UAPI will become much more load-bearing in
+> the future, and the loss of granularity could become an issue.
 
-Yes. So the theory :)
+What is the possible fallout from loss of granularity/nuance?  E.g. if the worst
+case scenario is that KVM may exit to userspace multiple times in order to resolve
+the problem, IMO that's an acceptable cost for having "dumb", common uAPI.
 
--- 
-Cheers,
+The intent/contract of the exit to userspace isn't for userspace to be able to
+completely understand what fault occurred, but rather for KVM to communicate what
+action userspace needs to take in order for KVM to make forward progress.
 
-David / dhildenb
+> Marc had some ideas about forwarding the register state to userspace
+> directly, which should be the right level of information for _any_ fault
+> taken to userspace.
 
+I don't know enough about ARM to weigh in on that side of things, but for x86
+this definitely doesn't hold true.  E.g. on the x86 side, KVM intentionally sets
+reserved bits in SPTEs for "caching" emulated MMIO accesses, and the resulting
+fault captures the "reserved bits set" information in register state.  But that's
+purely an (optional) imlementation detail of KVM that should never be exposed to
+userspace.
+
+Ditto for things like access tracking on hardware without A/D bits, and shadow
+paging, which again can generate fault state that is inscrutable/misleading
+without context that only KVM knows (and shouldn't expose to userspace).
