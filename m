@@ -1,66 +1,66 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1219F7A70C
-	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 20:17:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821787A736
+	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 20:22:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709583440; cv=none; b=dQfqitBDZcVK345Du6CsjL1SRXfZ0vJMZBUhrA9KIe50JviaLvXKZLqMwoO4nqIOAIeoKFR95FcQZHaKRNbNVZQ7uJJ5gSWZzvnPAC9KrVQS0KX5Wwg0vR4yYQ/IUx8UBTHnmd6Qj2uVaePGTNMDlbWq9pgLpEBM2wSgG3oO9ok=
+	t=1709583777; cv=none; b=lYiD0Jk63pzmri/jPj5y/FwdlMfVRF/sUW76IXF5R0qAQ1L3hMUSpgYq/W9z5KsUYDm1oKU4SINZAri4+AsL8hpCFfSdegTy40pDrbF2N5DlWpTurdx7c1d1ErqyH0ZrjER/GC375aGPi4NclzZHEBV0VbmG3CVu2LBb2aAZ42w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709583440; c=relaxed/simple;
-	bh=uslhwkWiAUrsN3g6Bt14e+xDI3jEAOwUECarhPGbJuk=;
+	s=arc-20240116; t=1709583777; c=relaxed/simple;
+	bh=95soPNUvVFgtoy742s6zRUav8gzz7P3zB3tjSRBiWv0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=l4D4UcoZ5eKg6dTeHx/LHAB/Oy82m+yoN1/2iDNWXVeeV45qRqZO+Z0EITvyPkIUKaIz2lgDtIOJJ3fNVZWUokQ25+/1q3jB51y9kzU5hkFhojS7AyFCJOPqs7vmgiLVu951TIKmJjHJ78WS+xluizyfaBbHuIL2jX9bI1OvDZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PS0NqiVC; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=r2BBRiIT9YUKFAYINcYP0KRzDlbNlqGIz34lu7PU5RFDv86B9ywBHwVHRtwpv98k8t9IFYxjbzuHSAhdVOAOgf9fEBz5YlVibHOyzaNBlFR5QmoTAtZ6D749pGLBRcfcQzero6x4X0mnR7mq13CHw4roH7Xgtg1VurHxEEPo8qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KbByelEb; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PS0NqiVC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KbByelEb"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709583431;
+	s=mimecast20190719; t=1709583774;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=XUyc8q6ByaqAn+t6YqnVNICc+5KdV2+c43xDgTSyudY=;
-	b=PS0NqiVC/U6tkZDDY64s5o2Z9XPVOXop5hcbJjFJAjjcfJI1/MRN7MPr/5lcmPo8DsHHlx
-	HdIOGDUXOEBq7SwftfrVxNSjhpJWXtNTxGC0iLsF1MPFSxPowjUYMvhc9k+dxpLgYz9CeH
-	TZsq+caJ0ntTTnl42fvNUkUGNAa/Ytc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=vrXegXABZTyFa0KXs9B20qXl/6fycMW8Hyt3cgljlEk=;
+	b=KbByelEbAQ09m2k/v/wqQr51MpDpaDw5LRBzNtG0rw/c0Uwbs9Hf1B80/KjZXh/V8yrzMQ
+	83S9LtyC6eYOOh4JLdlN17U+Kjg718SCjCh2YW47eb613uRUVNDhPlc/i+FDpA2mEfCROc
+	tv6rxH+PDXWR9sIJiJ0yTF1HMi222Mg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-195-A0HRazFmN2mW0-6VGn6Vsg-1; Mon, 04 Mar 2024 15:17:09 -0500
-X-MC-Unique: A0HRazFmN2mW0-6VGn6Vsg-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-412d1f1ee7cso15018905e9.3
-        for <kvmarm@lists.linux.dev>; Mon, 04 Mar 2024 12:17:09 -0800 (PST)
+ us-mta-541-AkJ3Z1NKPyOFxF8OojkGiw-1; Mon, 04 Mar 2024 15:22:49 -0500
+X-MC-Unique: AkJ3Z1NKPyOFxF8OojkGiw-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-41297aeece5so30144405e9.2
+        for <kvmarm@lists.linux.dev>; Mon, 04 Mar 2024 12:22:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709583428; x=1710188228;
+        d=1e100.net; s=20230601; t=1709583768; x=1710188568;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :references:cc:to:content-language:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XUyc8q6ByaqAn+t6YqnVNICc+5KdV2+c43xDgTSyudY=;
-        b=QFEJQu1lxyg3xfhDIUjmSW3qx5wZyUkC7rwiZZJLnoubaSxbp6nwMERM7Eynre9oJ2
-         WTBWH8YEX1dAGN6Vbv4v7IVDjJMp8ryh3QEfedEmIt5Y76BTbcbukj2RCzEpVy/QgNoO
-         Rz2CWuwKSazL3wpE/is6bn8VmRZIBrtlZ8lSYe1PYYK017DGoWhytH+j4PElHn+c9wHL
-         cFghfnatgdSEcZHgJcFboMVVVVelqvwDUlzi0N7ssot1ZLfe2I8ShVan1YFRzaNBsU2j
-         9cqtljK8NYaJbmBT1gN2HTqJfVFeUfW9ya+iqdP7iFO5VgLj+3dP575Y6n3tuHCluQOd
-         qBVw==
-X-Forwarded-Encrypted: i=1; AJvYcCXCa65pJwW2W3IEbAXHVoNIpzpgMAQHoI4f3Ll7szXWQ5ELcZYjnVoJEI9T9Qe5aFsETTByDREeSpp6XzBt7Imn1EKcCZ5S
-X-Gm-Message-State: AOJu0YxllQAd2ymH/CS5rUm7rIk7bVhn0bkTwBx1r1zvcJ4ubo1EHk0H
-	3PinYUVlSKMAsxUL26Lrg012muX45qY/Lnw88NPmDsqgZQuNmnUO29AFwsyq7dTEckE5R2zMsVt
-	Js1Wx+ufZ4lZtExIJvW05pD6OuDFACmrjllDtKjKJJKJ6TRtQg4Aciw==
-X-Received: by 2002:a05:600c:34d6:b0:412:e784:1a6f with SMTP id d22-20020a05600c34d600b00412e7841a6fmr1653341wmq.17.1709583428632;
-        Mon, 04 Mar 2024 12:17:08 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHfjr46aXrQPoxi3kIb/H+ZC31GWzvVOt0EfNP9BwKX4senOARdvOEGngW08GAKIZ3m3XRF8A==
-X-Received: by 2002:a05:600c:34d6:b0:412:e784:1a6f with SMTP id d22-20020a05600c34d600b00412e7841a6fmr1653306wmq.17.1709583428189;
-        Mon, 04 Mar 2024 12:17:08 -0800 (PST)
+        bh=vrXegXABZTyFa0KXs9B20qXl/6fycMW8Hyt3cgljlEk=;
+        b=deLsZntH0f/oW9xgKnYcGMuDgyxOS1OE0AL5CeqAV/jTuuGjJNTrs+NHt1OyxPus5f
+         86HGx1Nlb/93zBwm5yLNnpA8eZam5Ud2Ex4eAdvq6doladmRAW+OtJwdR0PeIfNNK+kd
+         HMH0whdFYiRFfk5hrPpkTtd5kmgfJpcyC7TlPPO6NYe9CLjg41Zk/DIQ/UrI6WgCyDJL
+         TiDHKCXyeFwWeST7CY+oCWnXiSX9TeeSmGStllS4sYOeYxko0ZAMNrscRzElZLpre91s
+         KTJgwqYA2KzIy4gH9rhpG2MBLt1ds4fw9xcTKk2n0xb4niEaV6anQ9otMTe1O20ueowm
+         3G2w==
+X-Forwarded-Encrypted: i=1; AJvYcCXHdm1o9WgpmonD4uwv3VFnrkus/QbM949sva/rxzgIL+bImiSO018IrAQlXx07ZSxCIcjtYJR2571ODwgmw2e97hncx1b+
+X-Gm-Message-State: AOJu0YwIZwHAeMuq7jYMhZXNrgwTBvPGNpDToxAGUJ3ssHU0KhwC64Ar
+	TIS2ILDRL3qxOW2P3noJgXnXKrUbv6Q1rY1oYOolt01PP3JjtIzQEWjhgvE3TU4j23KboYLa0zh
+	dLfMfVgPWJfcPm5SBGf+p8BrlA8EmAsFhh91lGNH3ZYaa1KO7R+lHHw==
+X-Received: by 2002:a05:600c:1d9a:b0:412:eaf0:110c with SMTP id p26-20020a05600c1d9a00b00412eaf0110cmr287851wms.21.1709583768026;
+        Mon, 04 Mar 2024 12:22:48 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHVonbyQf18GJ5r1CJamDk7YTuN3n8J70bYXzUcKsIFZNq58Twho/fKUjxWq4+76er9hUMYKQ==
+X-Received: by 2002:a05:600c:1d9a:b0:412:eaf0:110c with SMTP id p26-20020a05600c1d9a00b00412eaf0110cmr287803wms.21.1709583767585;
+        Mon, 04 Mar 2024 12:22:47 -0800 (PST)
 Received: from ?IPV6:2003:cb:c733:f100:75e7:a0a4:9ac2:1abb? (p200300cbc733f10075e7a0a49ac21abb.dip0.t-ipconnect.de. [2003:cb:c733:f100:75e7:a0a4:9ac2:1abb])
-        by smtp.gmail.com with ESMTPSA id d16-20020a05600c34d000b00412eb0d455dsm266005wmq.41.2024.03.04.12.17.05
+        by smtp.gmail.com with ESMTPSA id i4-20020a05600c354400b004101f27737asm18975536wmq.29.2024.03.04.12.22.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Mar 2024 12:17:07 -0800 (PST)
-Message-ID: <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
-Date: Mon, 4 Mar 2024 21:17:05 +0100
+        Mon, 04 Mar 2024 12:22:47 -0800 (PST)
+Message-ID: <2773d2e1-9d73-4d38-97f1-4d90c17b2e26@redhat.com>
+Date: Mon, 4 Mar 2024 21:22:44 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -69,13 +69,12 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: folio_mmapped
-To: Sean Christopherson <seanjc@google.com>,
- Quentin Perret <qperret@google.com>
-Cc: Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>,
+To: Quentin Perret <qperret@google.com>
+Cc: Fuad Tabba <tabba@google.com>, Matthew Wilcox <willy@infradead.org>,
  kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
  chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
  paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
- viro@zeniv.linux.org.uk, brauner@kernel.org, akpm@linux-foundation.org,
+ seanjc@google.com, brauner@kernel.org, akpm@linux-foundation.org,
  xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
  jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
  yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net,
@@ -88,16 +87,17 @@ Cc: Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>,
  quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
  james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
  maz@kernel.org, will@kernel.org, keirf@google.com, linux-mm@kvack.org
-References: <40a8fb34-868f-4e19-9f98-7516948fc740@redhat.com>
- <20240226105258596-0800.eberman@hu-eberman-lv.qualcomm.com>
- <925f8f5d-c356-4c20-a6a5-dd7efde5ee86@redhat.com>
+References: <925f8f5d-c356-4c20-a6a5-dd7efde5ee86@redhat.com>
  <Zd8PY504BOwMR4jO@google.com>
  <755911e5-8d4a-4e24-89c7-a087a26ec5f6@redhat.com>
  <Zd8qvwQ05xBDXEkp@google.com>
  <99a94a42-2781-4d48-8b8c-004e95db6bb5@redhat.com>
  <Zd82V1aY-ZDyaG8U@google.com>
  <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
- <ZeXAOit6O0stdxw3@google.com> <ZeYbUjiIkPevjrRR@google.com>
+ <CA+EHjTzHtsbhzrb-TWft1q3Ree3kgzZbsir+R9L0tDgSX-d-0g@mail.gmail.com>
+ <20240229114526893-0800.eberman@hu-eberman-lv.qualcomm.com>
+ <d8e6c848-e26a-4014-b0c2-f3a21fb4e636@redhat.com>
+ <ZeXEUMPn27J5je8T@google.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -144,46 +144,88 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <ZeYbUjiIkPevjrRR@google.com>
+In-Reply-To: <ZeXEUMPn27J5je8T@google.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 04.03.24 20:04, Sean Christopherson wrote:
-> On Mon, Mar 04, 2024, Quentin Perret wrote:
->>> As discussed in the sub-thread, that might still be required.
+On 04.03.24 13:53, Quentin Perret wrote:
+> On Friday 01 Mar 2024 at 12:16:54 (+0100), David Hildenbrand wrote:
+>>>> I don't think that we can assume that only a single VMA covers a page.
+>>>>
+>>>>> But of course, no rmap walk is always better.
+>>>>
+>>>> We've been thinking some more about how to handle the case where the
+>>>> host userspace has a mapping of a page that later becomes private.
+>>>>
+>>>> One idea is to refuse to run the guest (i.e., exit vcpu_run() to back
+>>>> to the host with a meaningful exit reason) until the host unmaps that
+>>>> page, and check for the refcount to the page as you mentioned earlier.
+>>>> This is essentially what the RFC I sent does (minus the bugs :) ) .
+>>>>
+>>>> The other idea is to use the rmap walk as you suggested to zap that
+>>>> page. If the host tries to access that page again, it would get a
+>>>> SIGBUS on the fault. This has the advantage that, as you'd mentioned,
+>>>> the host doesn't need to constantly mmap() and munmap() pages. It
+>>>> could potentially be optimised further as suggested if we have a
+>>>> cooperating VMM that would issue a MADV_DONTNEED or something like
+>>>> that, but that's just an optimisation and we would still need to have
+>>>> the option of the rmap walk. However, I was wondering how practical
+>>>> this idea would be if more than a single VMA covers a page?
+>>>>
 >>>
->>> One could think about completely forbidding GUP on these mmap'ed
->>> guest-memfds. But likely, there might be use cases in the future where you
->>> want to use GUP on shared memory inside a guest_memfd.
->>>
->>> (the iouring example I gave might currently not work because
->>> FOLL_PIN|FOLL_LONGTERM|FOLL_WRITE only works on shmem+hugetlb, and
->>> guest_memfd will likely not be detected as shmem; 8ac268436e6d contains some
->>> details)
+>>> Agree with all your points here. I changed Gunyah's implementation to do
+>>> the unmap instead of erroring out. I didn't observe a significant
+>>> performance difference. However, doing unmap might be a little faster
+>>> because we can check folio_mapped() before doing the rmap walk. When
+>>> erroring out at mmap() level, we always have to do the walk.
 >>
->> Perhaps it would be wise to start with GUP being forbidden if the
->> current users do not need it (not sure if that is the case in Android,
->> I'll check) ? We can always relax this constraint later when/if the
->> use-cases arise, which is obviously much harder to do the other way
->> around.
+>> Right. On the mmap() level you won't really have to walk page tables, as the
+>> the munmap() already zapped the page and removed the "problematic" VMA.
+>>
+>> Likely, you really want to avoid repeatedly calling mmap()+munmap() just to
+>> access shared memory; but that's just my best guess about your user space
+>> app :)
 > 
-> +1000.  At least on the KVM side, I would like to be as conservative as possible
-> when it comes to letting anything other than the guest access guest_memfd.
+> Ack, and expecting userspace to munmap the pages whenever we hit a valid
+> mapping in userspace page-tables in the KVM faults path makes for a
+> somewhat unusual interface IMO. Userspace can munmap, mmap again, and if
+> it doesn't touch the pages, it can proceed to run the guest just fine,
+> is that the expectation? If so, it feels like we're 'leaking' internal
 
-So we'll have to do it similar to any occurrences of "secretmem" in 
-gup.c. We'll have to see how to marry KVM guest_memfd with core-mm code 
-similar to e.g., folio_is_secretmem().
+It would be weird, and I would not suggest that. It's either
 
-IIRC, we might not be able to de-reference the actual mapping because it 
-could get free concurrently ...
+(1) you can leave it mmap'ed, but any access to private memory will 
+SIGBUS. The kernel will try zapping pages inside a VMA itself.
 
-That will then prohibit any kind of GUP access to these pages, including 
-reading/writing for ptrace/debugging purposes, for core dumping purposes 
-etc. But at least, you know that nobody was able to optain page 
-references using GUP that might be used for reading/writing later.
+(2) you cannot leave it mmap'ed. In order to convert shared -> private, 
+you have to munmap. mmap will fail if it would cover a currently-private 
+page.
+
+So for (1) you could mmap once in user space and be done with it. For 
+(2) you would have to mmap+munmap when accessing shared memory.
+
+> kernel state somehow. The kernel is normally well within its rights to
+> zap userspace mappings if it wants to e.g. swap. (Obviously mlock is a
+> weird case, but even in that case, IIRC the kernel still has a certain
+> amount of flexibility and can use compaction and friends). Similarly,
+> it should be well within its right to proactively create them. How
+> would this scheme work if, 10 years from now, something like
+> Speculative Page Faults makes it into the kernel in a different form?
+
+At least with (2), speculative page faults would never generate a 
+SIGBUS. Just like HW must not generate a fault on speculative access.
+
+> 
+> Not requiring to userspace to unmap makes the userspace interface a lot
+> simpler I think -- once a protected guest starts, you better not touch
+> its memory if it's not been shared back or you'll get slapped on the
+> wrist. Whether or not those pages have been accessed beforehand for
+> example is irrelevant.
+
+Yes. So the theory :)
 
 -- 
 Cheers,
