@@ -1,113 +1,78 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39DD21A58B
-	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 09:06:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE44F18EC3
+	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 09:35:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709543190; cv=none; b=U1YPWXQPZ8H+TpDwPG9NvLpCFmIiqJiNBFyltAgROX+cNtSPY0UMTb7677GZrNKTI/nNkLRNlLIiR0jJGVlQCLghVoQh9LCJLC7fBcllqfhOxjChx8BpHpDQNWjjvoDFdlPIZTS03p7qWBq8qhclYGGMLNSnrPQXZzk7R+QRz3k=
+	t=1709544946; cv=none; b=F4lE5tSirfq7Xa2E4lYkYjRyBhS3B6FBhT/BoAnhKCVvYnAcPgZv2r+ApNrW5b5OjYGx0iD8uk0MhcdNBPcoCggQtGopwTLNoQOy+EJaFR6+kyWtPDH2jW1I1jcRllv4l1OZmS3UtNMQqfcB8Urvj5MyNqCQIxxAEc3zx3aezxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709543190; c=relaxed/simple;
-	bh=SOJNLxkPigcuNWjUVf5cDijUNYpZP5lkl6kkKnK18ok=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MWYZSsx+fqZ+IXn03aUZuI5ouIjvydosdARSblZbexVSeTqsLXK3eeXzTPEqfxPnk1Ch6/nxXHwF+sFedQ4XFb37iVGNrVZ4BTn/tQOlxeqM0oxOQJQnXyP8I25zKre8TLYQTRq8RlFPeZaVs2e/sLetj4TfYngw69meohz9g68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7AC631FB;
-	Mon,  4 Mar 2024 01:07:03 -0800 (PST)
-Received: from [192.168.5.30] (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8DA143F762;
-	Mon,  4 Mar 2024 01:06:25 -0800 (PST)
-Message-ID: <17147e9a-6650-49c3-9b16-03ed1486f70c@arm.com>
-Date: Mon, 4 Mar 2024 09:06:24 +0000
+	s=arc-20240116; t=1709544946; c=relaxed/simple;
+	bh=TmtoqtCD90+hu5haU1fOtO+gJCHRpT/5xAaKNLdSEDo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fSdoB/YVJqz24WEQkY44o5EqZkuI/15VPk0nHoryiEQgGK0nroVXthRYOla4M6F8xVuS1PVHYQ/lOX94BVQkEa/JdYdV8gUr3IeOJwHAvAIbDZsrmxSm8mquaNUJjErfZrPd7u0QBJpNtbu9hMTp0RYBhQHOXd3jY77MrtZkWuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ie+X/buz; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ie+X/buz"
+Date: Mon, 4 Mar 2024 10:35:30 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1709544941;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OR1BVIVJEjGitG9/qm9PEeUe6YVToGd+KX6pGKDiA5U=;
+	b=Ie+X/buzgm477blXLM65wi7mURzs1uEDfuyEqEejQ+122E7kWjiyBCrUFxSoCfFzqEnJHt
+	WrWAkm+tlZy0VqjEQw9ChpzCdaZk16ogVFQ2J4DI/z2cKDD4GleB+sd1JbemxpfPwiFumd
+	R+CmAkLdAKgvWo+rPNTUcLkktkxgvhw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, alexandru.elisei@arm.com, 
+	eric.auger@redhat.com, shahuang@redhat.com, pbonzini@redhat.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 08/18] arm64: efi: Improve device tree
+ discovery
+Message-ID: <20240304-da434501d4e2e0685e6a954e@orel>
+References: <20240227192109.487402-20-andrew.jones@linux.dev>
+ <20240227192109.487402-28-andrew.jones@linux.dev>
+ <df9c5b95-0cc4-4d82-b8d9-603dc069f7de@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2 18/18] arm64: efi: Add gitlab CI
-Content-Language: en-GB
-To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: alexandru.elisei@arm.com, eric.auger@redhat.com, shahuang@redhat.com,
- pbonzini@redhat.com, thuth@redhat.com
-References: <20240227192109.487402-20-andrew.jones@linux.dev>
- <20240227192109.487402-38-andrew.jones@linux.dev>
-From: Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <20240227192109.487402-38-andrew.jones@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <df9c5b95-0cc4-4d82-b8d9-603dc069f7de@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 27/02/2024 19:21, Andrew Jones wrote:
-> Now that we have efi-direct and tests run much faster, add a few
-> (just selftests) to the CI. Test with both DT and ACPI. While
-> touching the file update arm and arm64's pass/fail criteria to
-> the new style that ensures they're not all skips.
+On Mon, Mar 04, 2024 at 07:34:44AM +0000, Nikos Nikoleris wrote:
+> On 27/02/2024 19:21, Andrew Jones wrote:
+> > Zero is a valid address for the device tree so add an fdt_valid data
+> > member to determine when the address is valid or not. Also, check the
+> > device tree GUID when the environment variable is missing. The latter
+> > change allows directly loading the unit test with QEMU's '-kernel'
+> > command line parameter, which is much faster than putting the test
+> > in the EFI file system and then running it from the UEFI shell.
+> > 
 > 
-> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> Out of curiosity, the fdt pointer can be zero just in KUT or zero is an
+> address that efi_load_image or efi_get_system_config_table could return?
+> Similar code in Linux treats 0 an non valid address https://elixir.bootlin.com/linux/latest/source/drivers/firmware/efi/libstub/fdt.c#L370
 
-Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+Actually, on second thought, it can't be zero. I momentarily forgot that
+when we get the fdt pointer from EFI it'll be a virtual address (unlike
+when we get it from x0). For v2, I'll drop the fdt_valid since fdt==NULL
+is sufficient.
 
-I really like --enable-efi-direct, thanks for adding support for this 
-and all the clean-ups!
+> 
+> > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> 
+> In any case, this won't hurt:
+> 
+> Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 
 Thanks,
-
-Nikos
-
-> ---
->   .gitlab-ci.yml | 32 ++++++++++++++++++++++++++++++--
->   1 file changed, 30 insertions(+), 2 deletions(-)
-> 
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> index 71d986e9884e..ff34b1f5062e 100644
-> --- a/.gitlab-ci.yml
-> +++ b/.gitlab-ci.yml
-> @@ -44,7 +44,35 @@ build-aarch64:
->         selftest-vectors-user
->         timer
->         | tee results.txt
-> - - if grep -q FAIL results.txt ; then exit 1 ; fi
-> + - grep -q PASS results.txt && ! grep -q FAIL results.txt
-> +
-> +build-aarch64-efi:
-> + extends: .intree_template
-> + script:
-> + - dnf install -y qemu-system-aarch64 gcc-aarch64-linux-gnu edk2-aarch64
-> + - ./configure --arch=aarch64 --cross-prefix=aarch64-linux-gnu- --enable-efi --enable-efi-direct
-> + - make -j2
-> + - ACCEL=tcg MAX_SMP=8 ./run_tests.sh
-> +      selftest-setup
-> +      selftest-smp
-> +      selftest-vectors-kernel
-> +      selftest-vectors-user
-> +      | tee results.txt
-> + - grep -q PASS results.txt && ! grep -q FAIL results.txt
-> +
-> +build-aarch64-efi-acpi:
-> + extends: .intree_template
-> + script:
-> + - dnf install -y qemu-system-aarch64 gcc-aarch64-linux-gnu edk2-aarch64
-> + - ./configure --arch=aarch64 --cross-prefix=aarch64-linux-gnu- --enable-efi --enable-efi-direct
-> + - make -j2
-> + - EFI_USE_ACPI=y ACCEL=tcg MAX_SMP=8 ./run_tests.sh
-> +      selftest-setup
-> +      selftest-smp
-> +      selftest-vectors-kernel
-> +      selftest-vectors-user
-> +      | tee results.txt
-> + - grep -q PASS results.txt && ! grep -q FAIL results.txt
->   
->   build-arm:
->    extends: .outoftree_template
-> @@ -59,7 +87,7 @@ build-arm:
->        pci-test pmu-cycle-counter gicv2-ipi gicv2-mmio gicv3-ipi gicv2-active
->        gicv3-active
->        | tee results.txt
-> - - if grep -q FAIL results.txt ; then exit 1 ; fi
-> + - grep -q PASS results.txt && ! grep -q FAIL results.txt
->   
->   build-ppc64be:
->    extends: .outoftree_template
+drew
