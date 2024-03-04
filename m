@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8716613AD4
-	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 07:34:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CD5853A6
+	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 07:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709537690; cv=none; b=myRXGOiUYgDzdOUT/wlA1hfI6Rb9ZeAdAoN0YaTI8fPo6nLGTHXPUhaAxBq2cIkUCn7OBwXpVQ6vHrpFMklNYTjEux7qCVXaTm4LuErhJaZUg1ps07DaLLUi/MhLq05NC7QBLPtIdeIfmI5ASbaIpz6ZO1I8G6g4CYn58+Sh4dk=
+	t=1709538254; cv=none; b=uHwZGwob4cd7dcOuWnQDDx6WKkpg+P445Y8XI0JF7R9vGJ8OIDE4vgSzUohqa4XLzwbdU/pPCDwgLnzxsboO88uYtT7Up8Fbqn9157OyuFLFRhdPBRhJAeYHxS7Z8IzRtKZ2VhiXyRGIxCtD1B043QicZbdRSjpNVGFTiW2hZOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709537690; c=relaxed/simple;
-	bh=FLGfyB/PyHizEPkdbQDT/hBagjA+Li3QsQ+lD3mzDVQ=;
+	s=arc-20240116; t=1709538254; c=relaxed/simple;
+	bh=OAAfpBcb+FwoO1Cw3Ia3y4FKUCihykLf0FCiszFhcZw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BUZY7SN/ZHyDQofmSScJkrK3dVz9n7NX3jsdFyaHp4L6ef5FuF8HK07Ogt301lyHGm1Nz/unmZKyksfuw0Dl9O63PEf1VAVsW7wzgOGs3X5p27JQ8P+SkeV+wRAU5fD3R0cS0YwT2/szgT1BNAt8PSnC5vPmdoRI6TnERvEHo8s=
+	 In-Reply-To:Content-Type; b=iaFhhMZeb+NlIejwjnTLTgfze4PCoWH/mqJl2WjxaDhCRuKbz3Pq7P0no8xbBdrIpekHEeDdgrm3PGeUWPDIq7QZIDX87fsbQFiN3PUZBC/D3IeCiR7tK3z1y6vKiTrhfXSLWhcl2q0yy25HrI6FNTTdSiNg2HljADZwAIoz8Rk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABCB71FB;
-	Sun,  3 Mar 2024 23:35:23 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6DEDB1FB;
+	Sun,  3 Mar 2024 23:44:49 -0800 (PST)
 Received: from [192.168.5.30] (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DA0F23F762;
-	Sun,  3 Mar 2024 23:34:45 -0800 (PST)
-Message-ID: <df9c5b95-0cc4-4d82-b8d9-603dc069f7de@arm.com>
-Date: Mon, 4 Mar 2024 07:34:44 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 914033F762;
+	Sun,  3 Mar 2024 23:44:11 -0800 (PST)
+Message-ID: <7e3c6401-902e-4f6f-83b6-140835dc9256@arm.com>
+Date: Mon, 4 Mar 2024 07:44:10 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,37 +27,31 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2 08/18] arm64: efi: Improve device tree
- discovery
+Subject: Re: [kvm-unit-tests PATCH v2 09/18] lib/efi: Add support for loading
+ the initrd
 Content-Language: en-GB
 To: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: alexandru.elisei@arm.com, eric.auger@redhat.com, shahuang@redhat.com,
  pbonzini@redhat.com, thuth@redhat.com
 References: <20240227192109.487402-20-andrew.jones@linux.dev>
- <20240227192109.487402-28-andrew.jones@linux.dev>
+ <20240227192109.487402-29-andrew.jones@linux.dev>
 From: Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <20240227192109.487402-28-andrew.jones@linux.dev>
+In-Reply-To: <20240227192109.487402-29-andrew.jones@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 27/02/2024 19:21, Andrew Jones wrote:
-> Zero is a valid address for the device tree so add an fdt_valid data
-> member to determine when the address is valid or not. Also, check the
-> device tree GUID when the environment variable is missing. The latter
-> change allows directly loading the unit test with QEMU's '-kernel'
-> command line parameter, which is much faster than putting the test
-> in the EFI file system and then running it from the UEFI shell.
->
-
-Out of curiosity, the fdt pointer can be zero just in KUT or zero is an 
-address that efi_load_image or efi_get_system_config_table could return? 
-Similar code in Linux treats 0 an non valid address 
-https://elixir.bootlin.com/linux/latest/source/drivers/firmware/efi/libstub/fdt.c#L370
-
+> When loading non-efi tests with QEMU's '-kernel' option we also load
+> an environ with the '-initrd' option. Now that efi tests can also be
+> loaded with the '-kernel' option also provide the '-initrd' environ.
+> For EFI, we use the EFI_LOAD_FILE2_PROTOCOL_GUID protocol to load
+> LINUX_EFI_INITRD_MEDIA_GUID. Each architecture which wants to use the
+> initrd for the environ will need to call setup_env() on the initrd
+> data. As usual, the new efi function is heavily influenced by Linux's
+> implementation.
+> 
 > Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-
-In any case, this won't hurt:
 
 Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 
@@ -66,112 +60,157 @@ Thanks,
 Nikos
 
 > ---
->   lib/arm/setup.c |  3 ++-
->   lib/efi.c       | 28 +++++++++++++++++-----------
->   lib/efi.h       |  3 ++-
->   lib/linux/efi.h |  2 ++
->   4 files changed, 23 insertions(+), 13 deletions(-)
+>   lib/efi.c       | 65 +++++++++++++++++++++++++++++++++++++++++++++++++
+>   lib/linux/efi.h | 27 ++++++++++++++++++++
+>   2 files changed, 92 insertions(+)
 > 
-> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> index 0382cbdaf5a1..76aae4627a7b 100644
-> --- a/lib/arm/setup.c
-> +++ b/lib/arm/setup.c
-> @@ -342,7 +342,8 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
->   		}
->   		memregions_add(&r);
->   	}
-> -	if (fdt) {
-> +
-> +	if (efi_bootinfo->fdt_valid) {
->   		/* Move the FDT to the base of free memory */
->   		fdt_size = fdt_totalsize(fdt);
->   		ret = fdt_move(fdt, (void *)free_mem_start, fdt_size);
 > diff --git a/lib/efi.c b/lib/efi.c
-> index d94f0fa16fc0..0785bd3e8916 100644
+> index 0785bd3e8916..edfcc80ef114 100644
 > --- a/lib/efi.c
 > +++ b/lib/efi.c
-> @@ -6,13 +6,13 @@
->    *
->    * SPDX-License-Identifier: LGPL-2.0-or-later
->    */
-> -
-> -#include "efi.h"
-> +#include <libcflat.h>
->   #include <argv.h>
-> -#include <stdlib.h>
->   #include <ctype.h>
-> -#include <libcflat.h>
-> +#include <stdlib.h>
->   #include <asm/setup.h>
-> +#include "efi.h"
-> +#include "libfdt/libfdt.h"
+> @@ -14,6 +14,10 @@
+>   #include "efi.h"
+>   #include "libfdt/libfdt.h"
 >   
+> +/* From each arch */
+> +extern char *initrd;
+> +extern u32 initrd_size;
+> +
 >   /* From lib/argv.c */
 >   extern int __argc, __envc;
-> @@ -283,18 +283,24 @@ static void* efi_get_var(efi_handle_t handle, struct efi_loaded_image_64 *image,
->   	return val;
+>   extern char *__argv[100];
+> @@ -303,6 +307,65 @@ static bool efi_get_fdt(efi_handle_t handle, struct efi_loaded_image_64 *image,
+>   	return fdt_check_header(*fdt) == 0;
 >   }
 >   
-> -static void *efi_get_fdt(efi_handle_t handle, struct efi_loaded_image_64 *image)
-> +static bool efi_get_fdt(efi_handle_t handle, struct efi_loaded_image_64 *image, void **fdt)
->   {
->   	efi_char16_t var[] = ENV_VARNAME_DTBFILE;
->   	efi_char16_t *val;
-> -	void *fdt = NULL;
-> -	int fdtsize;
-> +	int fdtsize = 0;
-> +
-> +	*fdt = NULL;
->   
->   	val = efi_get_var(handle, image, var);
-> -	if (val)
-> -		efi_load_image(handle, image, &fdt, &fdtsize, val);
-> +	if (val) {
-> +		efi_load_image(handle, image, fdt, &fdtsize, val);
-> +		if (fdtsize == 0)
-> +			return false;
-> +	} else if (efi_get_system_config_table(DEVICE_TREE_GUID, fdt) != EFI_SUCCESS) {
-> +		return false;
+> +static const struct {
+> +	struct efi_vendor_dev_path	vendor;
+> +	struct efi_generic_dev_path	end;
+> +} __packed initrd_dev_path = {
+> +	{
+> +		{
+> +			EFI_DEV_MEDIA,
+> +			EFI_DEV_MEDIA_VENDOR,
+> +			sizeof(struct efi_vendor_dev_path),
+> +		},
+> +		LINUX_EFI_INITRD_MEDIA_GUID
+> +	}, {
+> +		EFI_DEV_END_PATH,
+> +		EFI_DEV_END_ENTIRE,
+> +		sizeof(struct efi_generic_dev_path)
 > +	}
->   
-> -	return fdt;
-> +	return fdt_check_header(*fdt) == 0;
->   }
->   
+> +};
+> +
+> +static void efi_load_initrd(void)
+> +{
+> +	efi_guid_t lf2_proto_guid = EFI_LOAD_FILE2_PROTOCOL_GUID;
+> +	efi_device_path_protocol_t *dp;
+> +	efi_load_file2_protocol_t *lf2;
+> +	efi_handle_t handle;
+> +	efi_status_t status;
+> +	unsigned long file_size = 0;
+> +
+> +	initrd = NULL;
+> +	initrd_size = 0;
+> +
+> +	dp = (efi_device_path_protocol_t *)&initrd_dev_path;
+> +	status = efi_bs_call(locate_device_path, &lf2_proto_guid, &dp, &handle);
+> +	if (status != EFI_SUCCESS)
+> +		return;
+> +
+> +	status = efi_bs_call(handle_protocol, handle, &lf2_proto_guid, (void **)&lf2);
+> +	assert(status == EFI_SUCCESS);
+> +
+> +	status = efi_call_proto(lf2, load_file, dp, false, &file_size, NULL);
+> +	assert(status == EFI_BUFFER_TOO_SMALL);
+> +
+> +	status = efi_bs_call(allocate_pool, EFI_LOADER_DATA, file_size, (void **)&initrd);
+> +	assert(status == EFI_SUCCESS);
+> +
+> +	status = efi_call_proto(lf2, load_file, dp, false, &file_size, (void *)initrd);
+> +	assert(status == EFI_SUCCESS);
+> +
+> +	initrd_size = (u32)file_size;
+> +
+> +	/*
+> +	 * UEFI appends initrd=initrd to the command line when an initrd is present.
+> +	 * Remove it in order to avoid confusing unit tests.
+> +	 */
+> +	if (!strcmp(__argv[__argc - 1], "initrd=initrd")) {
+> +		__argv[__argc - 1] = NULL;
+> +		__argc -= 1;
+> +	}
+> +}
+> +
 >   efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
-> @@ -335,7 +341,7 @@ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
+>   {
+>   	int ret;
+> @@ -341,6 +404,8 @@ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
 >   	}
 >   	setup_args(cmdline_ptr);
 >   
-> -	efi_bootinfo.fdt = efi_get_fdt(handle, image);
-> +	efi_bootinfo.fdt_valid = efi_get_fdt(handle, image, &efi_bootinfo.fdt);
+> +	efi_load_initrd();
+> +
+>   	efi_bootinfo.fdt_valid = efi_get_fdt(handle, image, &efi_bootinfo.fdt);
 >   	/* Set up efi_bootinfo */
 >   	efi_bootinfo.mem_map.map = &map;
->   	efi_bootinfo.mem_map.map_size = &map_size;
-> diff --git a/lib/efi.h b/lib/efi.h
-> index db46d45068ee..4bd01f7199ce 100644
-> --- a/lib/efi.h
-> +++ b/lib/efi.h
-> @@ -30,7 +30,8 @@
->    */
->   typedef struct {
->   	struct efi_boot_memmap mem_map;
-> -	const void *fdt;
-> +	void *fdt;
-> +	bool fdt_valid;
->   } efi_bootinfo_t;
->   
->   efi_status_t _relocate(long ldbase, Elf64_Dyn *dyn, efi_handle_t handle,
 > diff --git a/lib/linux/efi.h b/lib/linux/efi.h
-> index 410f0b1a0da1..92d798f79767 100644
+> index 92d798f79767..8fa23ad078ce 100644
 > --- a/lib/linux/efi.h
 > +++ b/lib/linux/efi.h
-> @@ -66,6 +66,8 @@ typedef guid_t efi_guid_t;
->   #define ACPI_TABLE_GUID EFI_GUID(0xeb9d2d30, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d)
->   #define ACPI_20_TABLE_GUID EFI_GUID(0x8868e871, 0xe4f1, 0x11d3,  0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81)
+> @@ -70,6 +70,9 @@ typedef guid_t efi_guid_t;
 >   
-> +#define DEVICE_TREE_GUID EFI_GUID(0xb1b621d5, 0xf19c, 0x41a5,  0x83, 0x0b, 0xd9, 0x15, 0x2c, 0x69, 0xaa, 0xe0)
-> +
 >   #define LOADED_IMAGE_PROTOCOL_GUID EFI_GUID(0x5b1b31a1, 0x9562, 0x11d2,  0x8e, 0x3f, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b)
 >   
+> +#define EFI_LOAD_FILE2_PROTOCOL_GUID EFI_GUID(0x4006c0c1, 0xfcb3, 0x403e,  0x99, 0x6d, 0x4a, 0x6c, 0x87, 0x24, 0xe0, 0x6d)
+> +#define LINUX_EFI_INITRD_MEDIA_GUID EFI_GUID(0x5568e427, 0x68fc, 0x4f3d,  0xac, 0x74, 0xca, 0x55, 0x52, 0x31, 0xcc, 0x68)
+> +
 >   typedef struct {
+>   	efi_guid_t guid;
+>   	void *table;
+> @@ -248,6 +251,12 @@ struct efi_generic_dev_path {
+>   	u16				length;
+>   } __packed;
+>   
+> +struct efi_vendor_dev_path {
+> +	struct efi_generic_dev_path	header;
+> +	efi_guid_t			vendorguid;
+> +	u8				vendordata[];
+> +} __packed;
+> +
+>   typedef struct efi_generic_dev_path efi_device_path_protocol_t;
+>   
+>   /*
+> @@ -449,6 +458,19 @@ typedef struct _efi_simple_file_system_protocol efi_simple_file_system_protocol_
+>   typedef struct _efi_file_protocol efi_file_protocol_t;
+>   typedef efi_simple_file_system_protocol_t efi_file_io_interface_t;
+>   typedef efi_file_protocol_t efi_file_t;
+> +typedef union efi_load_file_protocol efi_load_file_protocol_t;
+> +typedef union efi_load_file_protocol efi_load_file2_protocol_t;
+> +
+> +union efi_load_file_protocol {
+> +	struct {
+> +		efi_status_t (__efiapi *load_file)(efi_load_file_protocol_t *,
+> +						   efi_device_path_protocol_t *,
+> +						   bool, unsigned long *, void *);
+> +	};
+> +	struct {
+> +		u32 load_file;
+> +	} mixed_mode;
+> +};
+>   
+>   typedef efi_status_t efi_simple_file_system_protocol_open_volume(
+>   	efi_simple_file_system_protocol_t *this,
+> @@ -544,7 +566,12 @@ typedef struct {
+>   	efi_char16_t	file_name[1];
+>   } efi_file_info_t;
+>   
+> +#define efi_fn_call(inst, func, ...) (inst)->func(__VA_ARGS__)
+>   #define efi_bs_call(func, ...) efi_system_table->boottime->func(__VA_ARGS__)
+>   #define efi_rs_call(func, ...) efi_system_table->runtime->func(__VA_ARGS__)
+> +#define efi_call_proto(inst, func, ...) ({				\
+> +		__typeof__(inst) __inst = (inst);			\
+> +		efi_fn_call(__inst, func, __inst, ##__VA_ARGS__);	\
+> +})
+>   
+>   #endif /* __LINUX_UEFI_H */
