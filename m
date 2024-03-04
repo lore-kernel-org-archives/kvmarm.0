@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5836224FA
-	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 10:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0D563B297
+	for <kvmarm@lists.linux.dev>; Mon,  4 Mar 2024 12:05:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709546515; cv=none; b=sPuoUNdj5gMINVW8mKSkROMGvpg96vQ3r9diN+eeq6+E4Yj6LCOsyro3E8HNVMhC2IHpn9NmuQw1Fsc5sq2uV2yAj7sGSAuUH/VgZ79yjAN7It1AiIf7NtEYKKkxwyzO/cryDvj1hjYLe3X9bgYmfhDp4dh3WSEu64v5ZeDgkEY=
+	t=1709553929; cv=none; b=J7xOsqnqgHNM73QGfmJRlZYLV/mB/uEesolm/qyYEdzRiTAHqAnUkCOrEswU8opIY6eNmTuJpiSWWZFLEB7F62mqfhgRcjw5mdSNiaddheKPA4H9AeYP36sXFtQgpqnc/xE5UYTXcn623aj7/tox+nAnZl2fjtVlxw0R9T1g8LY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709546515; c=relaxed/simple;
-	bh=nO/W4jh3XOG1Y2/4vz/5vcxaX2LuCxiH8Sp07kPHKRM=;
+	s=arc-20240116; t=1709553929; c=relaxed/simple;
+	bh=sW/qFGO4EsnOf0l2Qbds6VZsqmlHMPA2nIhM5x95VjU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eE4EU/BDhNf6qKMLhKw+8KJgWWZqfi/EfNyYNp2Il3ZLJiB3BnyJb8wZ/51jp8HLTPQCDMvJZY711ZuCA7E3XlQ37SNMgJOWR70FqnjQyH6eetb4Sm7cMMt3CUValSZWdURPFQXNa6D1MukNZbA4VmONrHC1AEJ9m038ySMYXSI=
+	 In-Reply-To:Content-Type; b=LrqExA5THtkPCBFeBoHMQ23JrnDsgGGwWpU33t2XX9gmDfMRusa8ZMzmoJ24ae5qLDV2B3smizx43PDAIJAz1h0GPn3SbrkJ9Qee51d0tpoRIzjaeiQEJzqVpJhMfuqgTXSFvyY0DsYbA270t8+XD/bd4yYboHlnB2ietV/EVAw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 15FA31FB;
-	Mon,  4 Mar 2024 02:02:30 -0800 (PST)
-Received: from [192.168.5.30] (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1DE643F738;
-	Mon,  4 Mar 2024 02:01:52 -0800 (PST)
-Message-ID: <cc7ed07d-d08f-4b0d-b642-bfaf4fbafdb1@arm.com>
-Date: Mon, 4 Mar 2024 10:01:51 +0000
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 026601FB;
+	Mon,  4 Mar 2024 04:06:00 -0800 (PST)
+Received: from [10.57.51.9] (unknown [10.57.51.9])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BC27A3F738;
+	Mon,  4 Mar 2024 04:05:21 -0800 (PST)
+Message-ID: <4eba8428-fe6c-4c42-b135-ab831e5cf436@arm.com>
+Date: Mon, 4 Mar 2024 12:05:20 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,145 +27,275 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2 13/18] arm64: Simplify efi_mem_init
+Subject: Re: [PATCH 1/5] KVM: arm64: Add accessor for per-CPU state
 Content-Language: en-GB
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, alexandru.elisei@arm.com,
- eric.auger@redhat.com, shahuang@redhat.com, pbonzini@redhat.com,
- thuth@redhat.com
-References: <20240227192109.487402-20-andrew.jones@linux.dev>
- <20240227192109.487402-33-andrew.jones@linux.dev>
- <3d0cb559-87dc-423f-9461-574e810fbdb2@arm.com>
- <20240304-9cc10a0c64d1723d3c203cf2@orel>
-From: Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <20240304-9cc10a0c64d1723d3c203cf2@orel>
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, James Clark <james.clark@arm.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>,
+ Mark Brown <broonie@kernel.org>
+References: <20240302111935.129994-1-maz@kernel.org>
+ <20240302111935.129994-2-maz@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20240302111935.129994-2-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 04/03/2024 09:55, Andrew Jones wrote:
-> On Mon, Mar 04, 2024 at 08:10:40AM +0000, Nikos Nikoleris wrote:
->> On 27/02/2024 19:21, Andrew Jones wrote:
->>> Reduce the EFI mem_map loop to only setting flags and finding the
->>> largest free memory region. Then, apply memregions_split() for
->>> the code/data region split and do the rest of the things that
->>> used to be done in the EFI mem_map loop in a separate mem_region
->>> loop.
->>>
->>> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
->>
->> Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> 
-> Thanks. While skimming this patch now to remind myself about it for v3,
-> I see the etext = ALIGN() below which I forgot to consider. We certainly
-> need the end of the text section to be on a page boundary, but that
-> doesn't seem to be the case right now. I think we need to add this
-> change
+Hi Marc
 
-I missed and it didn't manifest in any of the runs I did. However, it 
-makes sense.
-
-Thanks,
-
-Nikos
-
+On 02/03/2024 11:19, Marc Zyngier wrote:
+> In order to facilitate the introduction of new per-CPU state,
+> add a new host_data_ptr() helped that hides some of the per-CPU
+> verbosity, and make it easier to move that state around in the
+> future.
 > 
-> diff --git a/arm/efi/elf_aarch64_efi.lds b/arm/efi/elf_aarch64_efi.lds
-> index 836d98255d88..7a4192b77900 100644
-> --- a/arm/efi/elf_aarch64_efi.lds
-> +++ b/arm/efi/elf_aarch64_efi.lds
-> @@ -13,6 +13,7 @@ SECTIONS
->       *(.rodata*)
->       . = ALIGN(16);
->     }
-> +  . = ALIGN(4096);
->     _etext = .;
->     _text_size = . - _text;
->     .dynamic  : { *(.dynamic) }
+
+This series looks like a good cleanup to make the whole host
+data handling cleaner. One comment below.
+
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>   arch/arm64/include/asm/kvm_host.h         | 13 +++++++++++++
+>   arch/arm64/kvm/arm.c                      |  2 +-
+>   arch/arm64/kvm/hyp/include/hyp/debug-sr.h |  4 ++--
+>   arch/arm64/kvm/hyp/include/hyp/switch.h   | 11 +++++------
+>   arch/arm64/kvm/hyp/nvhe/psci-relay.c      |  2 +-
+>   arch/arm64/kvm/hyp/nvhe/setup.c           |  3 +--
+>   arch/arm64/kvm/hyp/nvhe/switch.c          |  4 ++--
+>   arch/arm64/kvm/hyp/vhe/switch.c           |  4 ++--
+>   arch/arm64/kvm/hyp/vhe/sysreg-sr.c        |  4 ++--
+>   arch/arm64/kvm/pmu.c                      |  2 +-
+>   10 files changed, 30 insertions(+), 19 deletions(-)
 > 
-> Thanks,
-> drew
-> 
->>
->> Thanks,
->>
->> Nikos
->>
->>> ---
->>>    lib/arm/setup.c | 45 ++++++++++++++++++++-------------------------
->>>    1 file changed, 20 insertions(+), 25 deletions(-)
->>>
->>> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
->>> index d0be4c437708..631597b343f1 100644
->>> --- a/lib/arm/setup.c
->>> +++ b/lib/arm/setup.c
->>> @@ -301,9 +301,7 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
->>>    	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
->>>    	efi_memory_desc_t *buffer = *map->map;
->>>    	efi_memory_desc_t *d = NULL;
->>> -	struct mem_region r;
->>> -	uintptr_t text = (uintptr_t)&_text, etext = ALIGN((uintptr_t)&_etext, 4096);
->>> -	uintptr_t data = (uintptr_t)&_data, edata = ALIGN((uintptr_t)&_edata, 4096);
->>> +	struct mem_region r, *code, *data;
->>>    	const void *fdt = efi_bootinfo->fdt;
->>>    	/*
->>> @@ -337,21 +335,7 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
->>>    			r.flags = MR_F_IO;
->>>    			break;
->>>    		case EFI_LOADER_CODE:
->>> -			if (r.start <= text && r.end > text) {
->>> -				/* This is the unit test region. Flag the code separately. */
->>> -				phys_addr_t tmp = r.end;
->>> -
->>> -				assert(etext <= data);
->>> -				assert(edata <= r.end);
->>> -				r.flags = MR_F_CODE;
->>> -				r.end = data;
->>> -				memregions_add(&r);
->>> -				r.start = data;
->>> -				r.end = tmp;
->>> -				r.flags = 0;
->>> -			} else {
->>> -				r.flags = MR_F_RESERVED;
->>> -			}
->>> +			r.flags = MR_F_CODE;
->>>    			break;
->>>    		case EFI_CONVENTIONAL_MEMORY:
->>>    			if (free_mem_pages < d->num_pages) {
->>> @@ -361,15 +345,27 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
->>>    			break;
->>>    		}
->>> -		if (!(r.flags & MR_F_IO)) {
->>> -			if (r.start < __phys_offset)
->>> -				__phys_offset = r.start;
->>> -			if (r.end > __phys_end)
->>> -				__phys_end = r.end;
->>> -		}
->>>    		memregions_add(&r);
->>>    	}
->>> +	memregions_split((unsigned long)&_etext, &code, &data);
->>> +	assert(code && (code->flags & MR_F_CODE));
->>> +	if (data)
->>> +		data->flags &= ~MR_F_CODE;
->>> +
->>> +	for (struct mem_region *m = mem_regions; m->end; ++m) {
->>> +		if (m != code && (m->flags & MR_F_CODE))
->>> +			m->flags = MR_F_RESERVED;
->>> +
->>> +		if (!(m->flags & MR_F_IO)) {
->>> +			if (m->start < __phys_offset)
->>> +				__phys_offset = m->start;
->>> +			if (m->end > __phys_end)
->>> +				__phys_end = m->end;
->>> +		}
->>> +	}
->>> +	__phys_end &= PHYS_MASK;
->>> +
->>>    	if (efi_bootinfo->fdt_valid) {
->>>    		unsigned long old_start = free_mem_start;
->>>    		void *freemem = (void *)free_mem_start;
->>> @@ -380,7 +376,6 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
->>>    		free_mem_pages = (free_mem_start - old_start) >> EFI_PAGE_SHIFT;
->>>    	}
->>> -	__phys_end &= PHYS_MASK;
->>>    	asm_mmu_disable();
->>>    	if (free_mem_pages == 0)
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 21c57b812569..3ca2a9444f21 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -492,6 +492,17 @@ struct kvm_cpu_context {
+>   	u64 *vncr_array;
+>   };
+>   
+> +/*
+> + * This structure is instanciated on a per-CPU basis, and contains
+> + * data that is:
+> + *
+> + * - tied to a single physical CPU, and
+> + * - either have a lifetime that does not extend past vcpu_put()
+> + * - or is an invariant for the lifetime of the system
+> + *
+> + * Use host_data_ptr(field) as a way to access a pointer to such a
+> + * field.
+> + */
+>   struct kvm_host_data {
+>   	struct kvm_cpu_context host_ctxt;
+>   };
+> @@ -1114,6 +1125,8 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
+>   
+>   DECLARE_KVM_HYP_PER_CPU(struct kvm_host_data, kvm_host_data);
+>   
+> +#define host_data_ptr(f)	(&this_cpu_ptr(&kvm_host_data)->f)
+> +
+>   static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
+>   {
+>   	/* The host's MPIDR is immutable, so let's set it up at boot time */
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index a25265aca432..d3d14cc41cb5 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1960,7 +1960,7 @@ static void cpu_set_hyp_vector(void)
+>   
+>   static void cpu_hyp_init_context(void)
+>   {
+> -	kvm_init_host_cpu_context(&this_cpu_ptr_hyp_sym(kvm_host_data)->host_ctxt);
+> +	kvm_init_host_cpu_context(host_data_ptr(host_ctxt));
+
+This silently changes the "this_cpu_ptr_hyp_sym" to "this_cpu_ptr()" and 
+thus we could be using the VHE host_data even in nVHE ?
+Rest looks fine to me.
+
+Suzuki
+
+
+>   
+>   	if (!is_kernel_in_hyp_mode())
+>   		cpu_init_hyp_mode();
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+> index 961bbef104a6..eec0f8ccda56 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
+> @@ -135,7 +135,7 @@ static inline void __debug_switch_to_guest_common(struct kvm_vcpu *vcpu)
+>   	if (!vcpu_get_flag(vcpu, DEBUG_DIRTY))
+>   		return;
+>   
+> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +	host_ctxt = host_data_ptr(host_ctxt);
+>   	guest_ctxt = &vcpu->arch.ctxt;
+>   	host_dbg = &vcpu->arch.host_debug_state.regs;
+>   	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+> @@ -154,7 +154,7 @@ static inline void __debug_switch_to_host_common(struct kvm_vcpu *vcpu)
+>   	if (!vcpu_get_flag(vcpu, DEBUG_DIRTY))
+>   		return;
+>   
+> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +	host_ctxt = host_data_ptr(host_ctxt);
+>   	guest_ctxt = &vcpu->arch.ctxt;
+>   	host_dbg = &vcpu->arch.host_debug_state.regs;
+>   	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index a038320cdb08..9405a0c9b4c3 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -81,8 +81,7 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+>   
+>   #define update_fgt_traps_cs(vcpu, reg, clr, set)			\
+>   	do {								\
+> -		struct kvm_cpu_context *hctxt =				\
+> -			&this_cpu_ptr(&kvm_host_data)->host_ctxt;	\
+> +		struct kvm_cpu_context *hctxt =	host_data_ptr(host_ctxt);\
+>   		u64 c = 0, s = 0;					\
+>   									\
+>   		ctxt_sys_reg(hctxt, reg) = read_sysreg_s(SYS_ ## reg);	\
+> @@ -121,7 +120,7 @@ static inline bool cpu_has_amu(void)
+>   
+>   static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>   {
+> -	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
+>   	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0, tmp;
+>   	u64 r_val, w_val;
+>   
+> @@ -185,7 +184,7 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>   
+>   static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>   {
+> -	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
+>   
+>   	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+>   		return;
+> @@ -220,7 +219,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+>   
+>   		write_sysreg(0, pmselr_el0);
+>   
+> -		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +		hctxt = host_data_ptr(host_ctxt);
+>   		ctxt_sys_reg(hctxt, PMUSERENR_EL0) = read_sysreg(pmuserenr_el0);
+>   		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+>   		vcpu_set_flag(vcpu, PMUSERENR_ON_CPU);
+> @@ -254,7 +253,7 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+>   	if (kvm_arm_support_pmu_v3()) {
+>   		struct kvm_cpu_context *hctxt;
+>   
+> -		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +		hctxt = host_data_ptr(host_ctxt);
+>   		write_sysreg(ctxt_sys_reg(hctxt, PMUSERENR_EL0), pmuserenr_el0);
+>   		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
+>   	}
+> diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+> index d57bcb6ab94d..dfe8fe0f7eaf 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+> @@ -205,7 +205,7 @@ asmlinkage void __noreturn __kvm_host_psci_cpu_entry(bool is_cpu_on)
+>   	struct psci_boot_args *boot_args;
+>   	struct kvm_cpu_context *host_ctxt;
+>   
+> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +	host_ctxt = host_data_ptr(host_ctxt);
+>   
+>   	if (is_cpu_on)
+>   		boot_args = this_cpu_ptr(&cpu_on_args);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> index bc58d1b515af..ae00dfa80801 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> @@ -257,8 +257,7 @@ static int fix_hyp_pgtable_refcnt(void)
+>   
+>   void __noreturn __pkvm_init_finalise(void)
+>   {
+> -	struct kvm_host_data *host_data = this_cpu_ptr(&kvm_host_data);
+> -	struct kvm_cpu_context *host_ctxt = &host_data->host_ctxt;
+> +	struct kvm_cpu_context *host_ctxt = host_data_ptr(host_ctxt);
+>   	unsigned long nr_pages, reserved_pages, pfn;
+>   	int ret;
+>   
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index c50f8459e4fc..544a419b9a39 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -264,7 +264,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>   		pmr_sync();
+>   	}
+>   
+> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +	host_ctxt = host_data_ptr(host_ctxt);
+>   	host_ctxt->__hyp_running_vcpu = vcpu;
+>   	guest_ctxt = &vcpu->arch.ctxt;
+>   
+> @@ -367,7 +367,7 @@ asmlinkage void __noreturn hyp_panic(void)
+>   	struct kvm_cpu_context *host_ctxt;
+>   	struct kvm_vcpu *vcpu;
+>   
+> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +	host_ctxt = host_data_ptr(host_ctxt);
+>   	vcpu = host_ctxt->__hyp_running_vcpu;
+>   
+>   	if (vcpu) {
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 1581df6aec87..14b7a6bc5909 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -221,7 +221,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+>   	struct kvm_cpu_context *guest_ctxt;
+>   	u64 exit_code;
+>   
+> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +	host_ctxt = host_data_ptr(host_ctxt);
+>   	host_ctxt->__hyp_running_vcpu = vcpu;
+>   	guest_ctxt = &vcpu->arch.ctxt;
+>   
+> @@ -306,7 +306,7 @@ static void __hyp_call_panic(u64 spsr, u64 elr, u64 par)
+>   	struct kvm_cpu_context *host_ctxt;
+>   	struct kvm_vcpu *vcpu;
+>   
+> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +	host_ctxt = host_data_ptr(host_ctxt);
+>   	vcpu = host_ctxt->__hyp_running_vcpu;
+>   
+>   	__deactivate_traps(vcpu);
+> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> index 8e1e0d5033b6..ae763061909a 100644
+> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> @@ -67,7 +67,7 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
+>   	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
+>   	struct kvm_cpu_context *host_ctxt;
+>   
+> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +	host_ctxt = host_data_ptr(host_ctxt);
+>   	__sysreg_save_user_state(host_ctxt);
+>   
+>   	/*
+> @@ -110,7 +110,7 @@ void __vcpu_put_switch_sysregs(struct kvm_vcpu *vcpu)
+>   	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
+>   	struct kvm_cpu_context *host_ctxt;
+>   
+> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +	host_ctxt = host_data_ptr(host_ctxt);
+>   
+>   	__sysreg_save_el1_state(guest_ctxt);
+>   	__sysreg_save_user_state(guest_ctxt);
+> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+> index a243934c5568..329819806096 100644
+> --- a/arch/arm64/kvm/pmu.c
+> +++ b/arch/arm64/kvm/pmu.c
+> @@ -232,7 +232,7 @@ bool kvm_set_pmuserenr(u64 val)
+>   	if (!vcpu || !vcpu_get_flag(vcpu, PMUSERENR_ON_CPU))
+>   		return false;
+>   
+> -	hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> +	hctxt = host_data_ptr(host_ctxt);
+>   	ctxt_sys_reg(hctxt, PMUSERENR_EL0) = val;
+>   	return true;
+>   }
+
