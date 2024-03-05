@@ -1,32 +1,32 @@
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72321944F
-	for <kvmarm@lists.linux.dev>; Tue,  5 Mar 2024 16:47:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00FA17756
+	for <kvmarm@lists.linux.dev>; Tue,  5 Mar 2024 16:47:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709657237; cv=none; b=f6BxAO0cH0hMH2VimlJxCmcLLjhx6CVNueYOCcyZn3/6d+kvk7WT086tfHjo8NCzx9/6llocAXQukP9hipataoFT5AlHtLltPiPZlEIHBzWV1bNX75pQeeoeigBS8WjybRbq5DQpML0QFPzDgsAlY64i+7jVvD5EoVhqnYBMSEE=
+	t=1709657237; cv=none; b=Ifp/FXkERa3jAr0ZaegUBL47wuQr5EEb/pBkZoa1lGs6VEviFjxNMblcUuY9CTu43Zef41S8ra8FC73SJD3Q+dfswd+L6CJUTzFLhl0ugZYUVVbcrIoEJDeJdcxzP3I530/Hy4qIMTYhgLmUSwjSpfBCLRO7hrQqmQ5nNTk/fjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709657237; c=relaxed/simple;
-	bh=j1EKqWAzlpHa1+kUnwwWvWM65Jsb0fYM/Z//tj53g+s=;
+	bh=XBJZp6ep8E7+cVBx43W9FeQM1BKgBcJ15SCjBL3J220=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=b2PnH59FlR9HA1QZwSzIOWL6aA2FidmvgssR0hmAZyFy/06w3dP3z8IOdVy4nNBeKvmn8puWZfAs6KBTbCASA2v7IKvQxRj5ljGtbYYylvBOKn/eH9d3JLHQ4MWysl/qHMjPJa/pKjIvuTsf/dctMYcWzeNZ1xpszW6L8LvtEeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ov/y7R7u; arc=none smtp.client-ip=91.218.175.170
+	 MIME-Version:Content-type; b=kk63+Wj1w3eUFWECYp1zbjBPH3tyym2PM4vIvWmWsWaEhh0le87N2VBm7RAU9NDOZGm6dGRTAf3zb8h19/FTbb37cv/kAbB2JVr0nrf3b4G1gtaQhDZcYfl2TxsmPzPzg2bWE++RN1cGXM2IdXbo+RVphiwE6FNtMa+vgGVxYbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AXZXHZqC; arc=none smtp.client-ip=95.215.58.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ov/y7R7u"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AXZXHZqC"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709657229;
+	t=1709657234;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=dH+fV3gyfx8+OxNIUICQcE5u8Z7VrJ8xj0gMnCCl3o8=;
-	b=Ov/y7R7uEwoY6gp23HjZQg9WEPSB6H7UUZc+F4G7x8DD+USoBBXjW3yrthYv/Gzik7TuX6
-	v/bJpsqgFNNyZd3jvPfKblpIDOyc6WDqKQ5u223u13pocPZK22/NGZbfoOf5fyAhuHq6UZ
-	aVqJrVdhPsI2d2vyQxqtXuhVfUwEPlo=
+	bh=vJm1m+a6ogkgQ7YvI/xJOAAFGjcodxS9hnq7BUF+HMU=;
+	b=AXZXHZqCY0XghW3jF/URRyYKeBvrwwlGMxv/UQ9paHtzEe2qVaeBCiBeI2v8oLmYAwHYsA
+	C8FhONQ2TwG5VUXw+FR3esJ83DqA4IiYByn3ljpffg7dAoNycHsa+y5nahUf2WR4nobqDS
+	j1pgJFxqtkcK3aMRaSVH0NaCloYepUc=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -36,9 +36,9 @@ Cc: alexandru.elisei@arm.com,
 	shahuang@redhat.com,
 	pbonzini@redhat.com,
 	thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v3 13/18] arm64: Simplify efi_mem_init
-Date: Tue,  5 Mar 2024 17:46:37 +0100
-Message-ID: <20240305164623.379149-33-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v3 15/18] arm64: efi: Don't map reserved regions
+Date: Tue,  5 Mar 2024 17:46:39 +0100
+Message-ID: <20240305164623.379149-35-andrew.jones@linux.dev>
 In-Reply-To: <20240305164623.379149-20-andrew.jones@linux.dev>
 References: <20240305164623.379149-20-andrew.jones@linux.dev>
 Precedence: bulk
@@ -51,111 +51,74 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Reduce the EFI mem_map loop to only setting flags and finding the
-largest free memory region. Then, apply memregions_split() for
-the code/data region split (which requires ensuring _etext is
-page aligned). Finally, do the rest of the things that used to be
-done in the EFI mem_map loop in a separate mem_region loop.
+We shouldn't need to map all the regions that the EFI memory map
+contains. Just map EFI_LOADER_CODE and EFI_LOADER_DATA, since
+those are for the loaded unit test, and any region types which
+could be used by the unit test for its own memory allocations. We
+still map EFI_BOOT_SERVICES_DATA since the primary stack is on a
+region of that type. In a later patch we'll switch to a stack we
+allocate ourselves to drop that one too.
 
 Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- arm/efi/elf_aarch64_efi.lds |  1 +
- lib/arm/setup.c             | 45 +++++++++++++++++--------------------
- 2 files changed, 21 insertions(+), 25 deletions(-)
+ lib/arm/mmu.c    | 6 +-----
+ lib/arm/setup.c  | 4 ++--
+ lib/memregions.c | 8 ++++++++
+ 3 files changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/arm/efi/elf_aarch64_efi.lds b/arm/efi/elf_aarch64_efi.lds
-index 836d98255d88..7a4192b77900 100644
---- a/arm/efi/elf_aarch64_efi.lds
-+++ b/arm/efi/elf_aarch64_efi.lds
-@@ -13,6 +13,7 @@ SECTIONS
-     *(.rodata*)
-     . = ALIGN(16);
-   }
-+  . = ALIGN(4096);
-   _etext = .;
-   _text_size = . - _text;
-   .dynamic  : { *(.dynamic) }
+diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
+index eb5e82a95f06..9dce7da85709 100644
+--- a/lib/arm/mmu.c
++++ b/lib/arm/mmu.c
+@@ -221,12 +221,8 @@ void *setup_mmu(phys_addr_t phys_end, void *unused)
+ 		mmu_idmap = alloc_page();
+ 
+ 	for (r = mem_regions; r->end; ++r) {
+-		if (r->flags & MR_F_IO) {
++		if (r->flags & (MR_F_IO | MR_F_RESERVED)) {
+ 			continue;
+-		} else if (r->flags & MR_F_RESERVED) {
+-			/* Reserved pages need to be writable for whatever reserved them */
+-			mmu_set_range_ptes(mmu_idmap, r->start, r->start, r->end,
+-					   __pgprot(PTE_WBWA));
+ 		} else if (r->flags & MR_F_CODE) {
+ 			/* armv8 requires code shared between EL1 and EL0 to be read-only */
+ 			mmu_set_range_ptes(mmu_idmap, r->start, r->start, r->end,
 diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 7f2043907634..b8c88b5bf011 100644
+index f5dbb48e721a..50a3bb65d865 100644
 --- a/lib/arm/setup.c
 +++ b/lib/arm/setup.c
-@@ -301,9 +301,7 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
- 	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
- 	efi_memory_desc_t *buffer = *map->map;
- 	efi_memory_desc_t *d = NULL;
--	struct mem_region r;
--	uintptr_t text = (uintptr_t)&_text, etext = ALIGN((uintptr_t)&_etext, 4096);
--	uintptr_t data = (uintptr_t)&_data, edata = ALIGN((uintptr_t)&_edata, 4096);
-+	struct mem_region r, *code, *data;
- 	const void *fdt = efi_bootinfo->fdt;
+@@ -309,8 +309,8 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
+ 		data->flags &= ~MR_F_CODE;
  
- 	/*
-@@ -337,21 +335,7 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
- 			r.flags = MR_F_IO;
- 			break;
+ 	for (struct mem_region *m = mem_regions; m->end; ++m) {
+-		if (m != code && (m->flags & MR_F_CODE))
+-			m->flags = MR_F_RESERVED;
++		if (m != code)
++			assert(!(m->flags & MR_F_CODE));
+ 
+ 		if (!(m->flags & MR_F_IO)) {
+ 			if (m->start < __phys_offset)
+diff --git a/lib/memregions.c b/lib/memregions.c
+index 9cdbb639ab62..3c6f751eb4f2 100644
+--- a/lib/memregions.c
++++ b/lib/memregions.c
+@@ -112,6 +112,14 @@ void memregions_efi_init(struct efi_boot_memmap *mem_map,
  		case EFI_LOADER_CODE:
--			if (r.start <= text && r.end > text) {
--				/* This is the unit test region. Flag the code separately. */
--				phys_addr_t tmp = r.end;
--
--				assert(etext <= data);
--				assert(edata <= r.end);
--				r.flags = MR_F_CODE;
--				r.end = data;
--				memregions_add(&r);
--				r.start = data;
--				r.end = tmp;
--				r.flags = 0;
--			} else {
--				r.flags = MR_F_RESERVED;
--			}
-+			r.flags = MR_F_CODE;
+ 			r.flags = MR_F_CODE;
  			break;
- 		case EFI_CONVENTIONAL_MEMORY:
- 			if (free_mem_pages < d->num_pages) {
-@@ -361,15 +345,27 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
++		case EFI_LOADER_DATA:
++			break;
++		case EFI_BOOT_SERVICES_DATA:
++			/*
++			 * FIXME: This would ideally be MR_F_RESERVED, but the
++			 * primary stack is in a region of this EFI type.
++			 */
++			break;
+ 		case EFI_PERSISTENT_MEMORY:
+ 			r.flags = MR_F_PERSISTENT;
  			break;
- 		}
- 
--		if (!(r.flags & MR_F_IO)) {
--			if (r.start < __phys_offset)
--				__phys_offset = r.start;
--			if (r.end > __phys_end)
--				__phys_end = r.end;
--		}
- 		memregions_add(&r);
- 	}
- 
-+	memregions_split((unsigned long)&_etext, &code, &data);
-+	assert(code && (code->flags & MR_F_CODE));
-+	if (data)
-+		data->flags &= ~MR_F_CODE;
-+
-+	for (struct mem_region *m = mem_regions; m->end; ++m) {
-+		if (m != code && (m->flags & MR_F_CODE))
-+			m->flags = MR_F_RESERVED;
-+
-+		if (!(m->flags & MR_F_IO)) {
-+			if (m->start < __phys_offset)
-+				__phys_offset = m->start;
-+			if (m->end > __phys_end)
-+				__phys_end = m->end;
-+		}
-+	}
-+	__phys_end &= PHYS_MASK;
-+
- 	if (fdt) {
- 		unsigned long old_start = free_mem_start;
- 		void *freemem = (void *)free_mem_start;
-@@ -380,7 +376,6 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
- 		free_mem_pages = (free_mem_start - old_start) >> EFI_PAGE_SHIFT;
- 	}
- 
--	__phys_end &= PHYS_MASK;
- 	asm_mmu_disable();
- 
- 	if (free_mem_pages == 0)
 -- 
 2.44.0
 
