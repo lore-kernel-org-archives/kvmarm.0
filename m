@@ -1,63 +1,145 @@
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD4751033
-	for <kvmarm@lists.linux.dev>; Tue,  5 Mar 2024 08:46:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A688566D;
+	Tue,  5 Mar 2024 11:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709628420; cv=none; b=r3mi+cX/IpKQ3OVAv+HzN60srwzpcLEfZs+tJKDDYaUyV6B/D09kNV0z5R8PH6XRIJLNIlJYLML67/hW8FJvUbI+8WSuQqtE4ZMjtcbhH7mdIPf3dsxdN7gIb2D4WM1/EhPAjOsJWPPJkD/UR97mSs4+ii2COoCaovJODtxWdCs=
+	t=1709637208; cv=none; b=CEL/Iul9pBMfQ7qoDe/EXg/fVsa1fWEfs5NSIx1kP1XmxImOvUUIuSnC+ANK/HS5dxD+8bbbI2cnG5fL0XoGxes8sCcVg3PFEqeV/pPg461GBR7hZvUFnuDSV4XWHOjO2aJZV8pTra3s71vXUxln4gaWHnxsgqX6rbLDyX5fep0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709628420; c=relaxed/simple;
-	bh=ypBAMq1xD122eQYCVVu/e4bhCUfHMyxBwy6PiUei7ls=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rG6/Km9paO4PA8dzeGnorMynyYf/eSOaQSWR/GXjF92iSGy+d9iyTvbZnRH+qBR1Ih3z5p7DCYkKklKHbBkpEJFoV9v2f1qVAzOc331YkZfG+Re0N5gyMzHfyhK4QaJZvP5G6GMAr06Tz28MJQE+l919c1+/7msOI59vTXktnQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=exzf0ZN0; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1709637208; c=relaxed/simple;
+	bh=+nKFvbjIEO/C4qNxSG508FL/jDF0Yk3m2k2wKnF96aY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L8qkS1YBiR8WhaSLR/18qzmZftsqGNUtjT9gAV0UZt/T5wXL3+usLbsaNJfWwwIAz8ethH3v/iwUNtE/Y1kuDZ8OzBPmC+IbLJLF8YkGh023oMF5GhqyMUN0oPaoL65SdafvcD5sXBL6WqgN/M+XwMCvmS010KB+TM8bcqL3/64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TAxm36U+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="exzf0ZN0"
-Date: Tue, 5 Mar 2024 08:46:44 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709628415;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XFrbfdZsWF6FXVs3YMWczDqjRAtMwJZL7VFOKOOlg+8=;
-	b=exzf0ZN0e5j8rMXz84wObFPRDcs6l2hsX6ODjXb4yQ9XbrZ5cOhDSPVnhoEilxaX/AXwaG
-	JuKcJjNVUN2eFnRsS3Vdg+kvZKp8irQlGJQSsKMKZ971NA5s7tOzMQ1dEcqFM7GC1gBe9M
-	rYwzzXADn1SJ13vRZk4LoTRzQpZZNfE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TAxm36U+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1C32C433C7;
+	Tue,  5 Mar 2024 11:13:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709637207;
+	bh=+nKFvbjIEO/C4qNxSG508FL/jDF0Yk3m2k2wKnF96aY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TAxm36U+NwPNwM2RVKs70IwU81D7DxFLmY9tXDKNKCmxwSqewPSfmZjDg+bLaqTop
+	 ES0/laclWMonOb9tGF7pmMqMLuxCa4qXXRc49B3uayANbEEcO84gHfUnB/QiBEymTg
+	 WB/GXxJLhOTtq+1kV3mefSEmcolPHBKIYzeVvw/H6baAeypVlvW+4953iTDJ3IjJyo
+	 awjwQDwhrsYyhW2n7xk5dQQvlNBe4/T4UZzCxtfPcJYAsc1iezgUx8ceqkFi17Poxd
+	 Mb03N2A5Yl7eGg0LNrQihcnWHgiempQEcvgjseWtdNOYcGO1dxLj+1KilEdTrnLQNi
+	 xHvXb50hSShmw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rhSjd-009XWE-Ff;
+	Tue, 05 Mar 2024 11:13:25 +0000
+Date: Tue, 05 Mar 2024 11:13:22 +0000
+Message-ID: <86sf150w4t.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	maz@kernel.org, darren@os.amperecomputing.com,
-	d.scott.phillips@amperecomputing.com,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [RFC PATCH] kvm: nv: Optimize the unmapping of shadow S2-MMU
- tables.
-Message-ID: <Zebb9CyihqC4JqnK@linux.dev>
+Cc: kvmarm@lists.linux.dev,	kvm@vger.kernel.org,	linux-arm-kernel@lists.infradead.org,	linux-kernel@vger.kernel.org,	oliver.upton@linux.dev,	darren@os.amperecomputing.com,	d.scott.phillips@amperecomputing.com
+Subject: Re: [RFC PATCH] kvm: nv: Optimize the unmapping of shadow S2-MMU tables.
+In-Reply-To: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
 References: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, darren@os.amperecomputing.com, d.scott.phillips@amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
--cc old kvmarm list
-+cc new kvmarm list, reviewers
+[re-sending with kvmarm@ fixed]
 
-Please run scripts/get_maintainer.pl next time around so we get the
-right people looking at a patch.
+On Tue, 05 Mar 2024 05:46:06 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> 
+> As per 'commit 178a6915434c ("KVM: arm64: nv: Unmap/flush shadow stage 2
 
-On Mon, Mar 04, 2024 at 09:46:06PM -0800, Ganapatrao Kulkarni wrote:
+$ git describe --contains 178a6915434c --match=v\*
+fatal: cannot describe '178a6915434c141edefd116b8da3d55555ea3e63'
+
+This commit simply doesn't exist upstream. It only lives in a
+now deprecated branch that will never be merged.
+
+> page tables")', when ever there is unmap of pages that
+> are mapped to L1, they are invalidated from both L1 S2-MMU and from
+> all the active shadow/L2 S2-MMU tables. Since there is no mapping
+> to invalidate the IPAs of Shadow S2 to a page, there is a complete
+> S2-MMU page table walk and invalidation is done covering complete
+> address space allocated to a L2. This has performance impacts and
+> even soft lockup for NV(L1 and L2) boots with higher number of
+> CPUs and large Memory.
+> 
+> Adding a lookup table of mapping of Shadow IPA to Canonical IPA
+> whenever a page is mapped to any of the L2. While any page is
+> unmaped, this lookup is helpful to unmap only if it is mapped in
+> any of the shadow S2-MMU tables. Hence avoids unnecessary long
+> iterations of S2-MMU table walk-through and invalidation for the
+> complete address space.
+
+All of this falls in the "premature optimisation" bucket. Why should
+we bother with any of this when not even 'AT S1' works correctly,
+making it trivial to prevent a guest from making forward progress? You
+also show no numbers that would hint at a measurable improvement under
+any particular workload.
+
+I am genuinely puzzled that you are wasting valuable engineering time
+on *this*.
+
+>
+> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h |   5 ++
+>  arch/arm64/include/asm/kvm_host.h    |  14 ++++
+>  arch/arm64/include/asm/kvm_nested.h  |   4 +
+>  arch/arm64/kvm/mmu.c                 |  19 ++++-
+>  arch/arm64/kvm/nested.c              | 113 +++++++++++++++++++++++++++
+>  5 files changed, 152 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 5173f8cf2904..f503b2eaedc4 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -656,4 +656,9 @@ static inline bool kvm_is_shadow_s2_fault(struct kvm_vcpu *vcpu)
+>  		vcpu->arch.hw_mmu->nested_stage2_enabled);
+>  }
+>  
+> +static inline bool kvm_is_l1_using_shadow_s2(struct kvm_vcpu *vcpu)
+> +{
+> +	return (vcpu->arch.hw_mmu != &vcpu->kvm->arch.mmu);
+> +}
+
+Isn't that the very definition of "!in_hyp_ctxt()"? You are abusing
+the hw_mmu pointer to derive something, but the source of truth is the
+translation regime, as defined by HCR_EL2.{E2H,TGE} and PSTATE.M.
+
+> +
+>  #endif /* __ARM64_KVM_EMULATE_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 8da3c9a81ae3..f61c674c300a 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -144,6 +144,13 @@ struct kvm_vmid {
+>  	atomic64_t id;
+>  };
+>  
+> +struct mapipa_node {
+> +	struct rb_node node;
+> +	phys_addr_t ipa;
+> +	phys_addr_t shadow_ipa;
+> +	long size;
+> +};
+> +
+>  struct kvm_s2_mmu {
+>  	struct kvm_vmid vmid;
+>  
 > @@ -216,6 +223,13 @@ struct kvm_s2_mmu {
 >  	 * >0: Somebody is actively using this.
 >  	 */
@@ -68,21 +150,17 @@ On Mon, Mar 04, 2024 at 09:46:06PM -0800, Ganapatrao Kulkarni wrote:
 > +	 */
 > +	struct rb_root nested_mapipa_root;
 
-There isn't any benefit to tracking the canonical IPA -> shadow IPA(s)
-mapping on a per-S2 basis, as there already exists a one-to-many problem
-(more below). Maintaining a per-VM data structure (since this is keyed
-by canonical IPA) makes a bit more sense.
+Why isn't this a maple tree? If there is no overlap between mappings
+(and it really shouldn't be any), why should we use a bare-bone rb-tree?
 
 > +	rwlock_t mmu_lock;
+
+Hell no. We have plenty of locking already, and there is no reason why
+this should gain its own locking. I can't see a case where you would
+take this lock outside of holding the *real* mmu_lock -- extra bonus
+point for the ill-chosen name.
+
 > +
-
-Err, is there any reason the existing mmu_lock is insufficient here?
-Surely taking a new reference on a canonical IPA for a shadow S2 must be
-done behind the MMU lock for it to be safe against MMU notifiers...
-
-Also, Reusing the exact same name for it is sure to produce some lock
-imbalance funnies.
-
 >  };
 >  
 >  static inline bool kvm_s2_mmu_valid(struct kvm_s2_mmu *mmu)
@@ -97,10 +175,85 @@ imbalance funnies.
 > +extern void add_shadow_ipa_map_node(
 > +		struct kvm_s2_mmu *mmu,
 > +		phys_addr_t ipa, phys_addr_t shadow_ipa, long size);
+>  
+>  union tlbi_info;
+>  
+> @@ -123,6 +126,7 @@ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
+>  extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
+>  extern void kvm_nested_s2_wp(struct kvm *kvm);
+>  extern void kvm_nested_s2_unmap(struct kvm *kvm);
+> +extern void kvm_nested_s2_unmap_range(struct kvm *kvm, struct kvm_gfn_range *range);
+>  extern void kvm_nested_s2_flush(struct kvm *kvm);
+>  int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+>  
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 61bdd8798f83..3948681426a0 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1695,6 +1695,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  					     memcache,
+>  					     KVM_PGTABLE_WALK_HANDLE_FAULT |
+>  					     KVM_PGTABLE_WALK_SHARED);
+> +		if ((nested || kvm_is_l1_using_shadow_s2(vcpu)) && !ret) {
 
-style nitpick: no newline between the open bracket and first parameter.
-Wrap as needed at 80 (or a bit more) columns.
+I don't understand this condition. If nested is non-NULL, it's because
+we're using a shadow S2. So why the additional condition?
 
+> +			struct kvm_s2_mmu *shadow_s2_mmu;
+> +
+> +			ipa &= ~(vma_pagesize - 1);
+> +			shadow_s2_mmu = lookup_s2_mmu(vcpu);
+> +			add_shadow_ipa_map_node(shadow_s2_mmu, ipa, fault_ipa, vma_pagesize);
+> +		}
+>  	}
+>  
+>  	/* Mark the page dirty only if the fault is handled successfully */
+> @@ -1918,7 +1925,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+>  			     (range->end - range->start) << PAGE_SHIFT,
+>  			     range->may_block);
+>  
+> -	kvm_nested_s2_unmap(kvm);
+> +	kvm_nested_s2_unmap_range(kvm, range);
+>  	return false;
+>  }
+>  
+> @@ -1953,7 +1960,7 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>  			       PAGE_SIZE, __pfn_to_phys(pfn),
+>  			       KVM_PGTABLE_PROT_R, NULL, 0);
+>  
+> -	kvm_nested_s2_unmap(kvm);
+> +	kvm_nested_s2_unmap_range(kvm, range);
+>  	return false;
+>  }
+>  
+> @@ -2223,12 +2230,18 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
+>  void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+>  				   struct kvm_memory_slot *slot)
+>  {
+> +	struct kvm_gfn_range range;
+> +
+>  	gpa_t gpa = slot->base_gfn << PAGE_SHIFT;
+>  	phys_addr_t size = slot->npages << PAGE_SHIFT;
+>  
+> +	range.start = gpa;
+> +	range.end = gpa + size;
+> +	range.may_block = true;
+> +
+>  	write_lock(&kvm->mmu_lock);
+>  	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
+> -	kvm_nested_s2_unmap(kvm);
+> +	kvm_nested_s2_unmap_range(kvm, &range);
+>  	write_unlock(&kvm->mmu_lock);
+>  }
+>  
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index f88d9213c6b3..888ec9fba4a0 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -565,6 +565,88 @@ void kvm_s2_mmu_iterate_by_vmid(struct kvm *kvm, u16 vmid,
+>  	write_unlock(&kvm->mmu_lock);
+>  }
+>  
 > +/*
 > + * Create a node and add to lookup table, when a page is mapped to
 > + * Canonical IPA and also mapped to Shadow IPA.
@@ -116,17 +269,11 @@ Wrap as needed at 80 (or a bit more) columns.
 > +	new = kzalloc(sizeof(struct mapipa_node), GFP_KERNEL);
 > +	if (!new)
 > +		return;
-
-Should be GFP_KERNEL_ACCOUNT, you want to charge this to the user.
-
 > +
 > +	new->shadow_ipa = shadow_ipa;
 > +	new->ipa = ipa;
 > +	new->size = size;
-
-What about aliasing? You could have multiple shadow IPAs that point to
-the same canonical IPA, even within a single MMU.
-
+> +
 > +	write_lock(&mmu->mmu_lock);
 > +
 > +	while (*node) {
@@ -149,17 +296,20 @@ the same canonical IPA, even within a single MMU.
 > +	rb_insert_color(&new->node, ipa_root);
 > +	write_unlock(&mmu->mmu_lock);
 
-Meh, one of the annoying things with rbtree is you have to build your
-own search functions...
+All this should be removed in favour of simply using a maple tree.
 
-It would appear that the rbtree intends to express intervals (i.e. GPA +
-size), but the search implementation treats GPA as an index. So I don't
-think this works as intended.
-
-Have you considered other abstract data types (e.g. xarray, maple tree)
-and how they might apply here?
-
+> +}
+> +
+> +/*
+> + * Iterate over the lookup table of Canonical IPA to Shadow IPA.
+> + * Return Shadow IPA, if the page mapped to Canonical IPA is
+> + * also mapped to a Shadow IPA.
+> + *
+> + */
 > +bool get_shadow_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa, phys_addr_t *shadow_ipa, long *size)
+
+static?
+
 > +{
 > +	struct rb_node *node;
 > +	struct mapipa_node *tmp = NULL;
@@ -171,6 +321,11 @@ and how they might apply here?
 > +		tmp = container_of(node, struct mapipa_node, node);
 > +
 > +		if (tmp->ipa == ipa)
+
+What guarantees that the mapping you have for L1 has the same starting
+address as the one you have for L2? L1 could have a 2MB mapping and L2
+only 4kB *in the middle*.
+
 > +			break;
 > +		else if (ipa > tmp->ipa)
 > +			node = node->rb_right;
@@ -179,21 +334,97 @@ and how they might apply here?
 > +	}
 > +
 > +	read_unlock(&mmu->mmu_lock);
+
+Why would you drop the lock here....
+
 > +
 > +	if (tmp && tmp->ipa == ipa) {
 > +		*shadow_ipa = tmp->shadow_ipa;
 > +		*size = tmp->size;
 > +		write_lock(&mmu->mmu_lock);
+
+... if taking it again here? What could have changed in between?
+
 > +		rb_erase(&tmp->node, &mmu->nested_mapipa_root);
 > +		write_unlock(&mmu->mmu_lock);
 > +		kfree(tmp);
 > +		return true;
 > +	}
+> +	return false;
+> +}
 
-Implicitly evicting the entry isn't going to work if we want to use it
-for updates to a stage-2 that do not evict the mapping, like write
-protection or access flag updates.
+So simply hitting in the reverse mapping structure *frees* it? Meaning
+that you cannot use it as a way to update a mapping?
+
+> +
+>  /* Must be called with kvm->mmu_lock held */
+>  struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu)
+>  {
+> @@ -674,6 +756,7 @@ void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
+>  	mmu->tlb_vttbr = 1;
+>  	mmu->nested_stage2_enabled = false;
+>  	atomic_set(&mmu->refcnt, 0);
+> +	mmu->nested_mapipa_root = RB_ROOT;
+>  }
+>  
+>  void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
+> @@ -760,6 +843,36 @@ void kvm_nested_s2_unmap(struct kvm *kvm)
+>  	}
+>  }
+>  
+> +void kvm_nested_s2_unmap_range(struct kvm *kvm, struct kvm_gfn_range *range)
+> +{
+> +	int i;
+> +	long size;
+> +	bool ret;
+> +
+> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +
+> +		if (kvm_s2_mmu_valid(mmu)) {
+> +			phys_addr_t shadow_ipa, start, end;
+> +
+> +			start = range->start << PAGE_SHIFT;
+> +			end = range->end << PAGE_SHIFT;
+> +
+> +			while (start < end) {
+> +				size = PAGE_SIZE;
+> +				/*
+> +				 * get the Shadow IPA if the page is mapped
+> +				 * to L1 and also mapped to any of active L2.
+> +				 */
+
+Why is L1 relevant here?
+
+> +				ret = get_shadow_ipa(mmu, start, &shadow_ipa, &size);
+> +				if (ret)
+> +					kvm_unmap_stage2_range(mmu, shadow_ipa, size);
+> +				start += size;
+> +			}
+> +		}
+> +	}
+> +}
+> +
+>  /* expects kvm->mmu_lock to be held */
+>  void kvm_nested_s2_flush(struct kvm *kvm)
+>  {
+
+There are a bunch of worrying issues with this patch. But more
+importantly, this looks like a waste of effort until the core issues
+that NV still has are solved, and I will not consider anything of the
+sort until then.
+
+I get the ugly feeling that you are trying to make it look as if it
+was "production ready", which it won't be for another few years,
+specially if the few interested people (such as you) are ignoring the
+core issues in favour of marketing driven features ("make it fast").
+
+Thanks,
+
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
+
+-- 
+Without deviation from the norm, progress is not possible.
