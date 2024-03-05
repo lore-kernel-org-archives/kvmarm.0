@@ -1,32 +1,32 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF74D12B95
-	for <kvmarm@lists.linux.dev>; Tue,  5 Mar 2024 16:47:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8CD14003
+	for <kvmarm@lists.linux.dev>; Tue,  5 Mar 2024 16:47:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709657228; cv=none; b=aM1bP9DcApAl3Fj0hampi8xHNd6sxd5UZQ04Y6wS9PbEjV/eEnIIkeNqcno/1bxb8b5B28bMoj/kpOYonBT/rfZzWUNOTGy37BeQYz245ALAkeOV6AWlBakekunT2DIBeB6m+J4XYeO9UsjdS17f36ifKfqYYzk4iyysLpS8IF0=
+	t=1709657235; cv=none; b=d3qLbcobIBku8LdL7OMzjnZjh2ie6RNaLWwnN57cjILt8MCrhBe4Xv/4r/xvD276vox4CvmZ6q8iwpdMAGz2LaY4h4NUEe4Cvve0+rfk9eE1glXmDgJRT2ABbdq9aU6YdjhQhlxlUV6EmA9AfomO4rPWlqO3Z8/2guLJNNwvV0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709657228; c=relaxed/simple;
-	bh=h6O3seZiA9b8+3PlXp4vhDu0pZ/VP4dGBA1KJ8NykTM=;
+	s=arc-20240116; t=1709657235; c=relaxed/simple;
+	bh=nmehJeG09arD0MaJTS0r158jHqTVKDhu7zVwG0sIfPc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=EghM1Pwuh+cgnYGSUnSiSlVlS74Tm2TgImUD0wJXtN5PyB7jsy42UfPbxRpdDW1Lq1qBS88vtQLae7TKHiDQbLaLJqI3ow3L0TVSX3M8simjl38Ssh85GPbf6vK2lYE9gAF5I8XeZYsMeBUTV2E1f6ur9gPhPs9zoQNG8xijEec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lgEcWn07; arc=none smtp.client-ip=95.215.58.187
+	 MIME-Version:Content-type; b=DtLgCt1bn87Th9qaM2zxuzoX9D33ywtUCeoDKGZucQp+epKfm5ySPpgoaw3ivp4ciCbwK1LTG+Hqoch2uso3B23triP3bwMBshy8gNWDR5MjTQSq1zmN5YbHTFzWp+UWrNz1Uu6nyjXkX0kp+1y8PIGfHS2E3ALO0Yd4zx/Jr1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jsDKjqAc; arc=none smtp.client-ip=95.215.58.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lgEcWn07"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jsDKjqAc"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709657225;
+	t=1709657231;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=BwLFefKq+oA9hZOQVmfzE0aV7cVOxT8zoDlTx543JRg=;
-	b=lgEcWn07uME9WllqvL1VzgxqsFqZ07Rxnz+gHLLsqsLA7morooWt/pnX7rqTjLdMioXcOP
-	7gQrSBCxVzZMBvKD3PAZb9kyz4NlHw/3JB9DarGPukGNYWhjbZPXR/0wqrtjJmtn3THKed
-	hYPGESL6HBJKKXbCt87EM6BSxkRAQi4=
+	bh=WkHOaSsaLXlA1l6WB933kJgmde4VgVqbGMRv3lcOX9s=;
+	b=jsDKjqAcreVuwFsj6Beqfgv+XDD6ozxJSmas7dXIPZuI8SSzHpSK50TSKqv1OlzUyuJ5HY
+	E1IPaEZPu7VYRReGEN7ve8JlmxjWT7C3qa9nqB7amAxLvCgtUvGRc+w8QugftAnYh6jRwv
+	06xFlq++tQDt/wxXuRkGcGfMGp6OXnY=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -36,9 +36,9 @@ Cc: alexandru.elisei@arm.com,
 	shahuang@redhat.com,
 	pbonzini@redhat.com,
 	thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v3 12/18] arm/arm64: Factor out allocator init from mem_init
-Date: Tue,  5 Mar 2024 17:46:36 +0100
-Message-ID: <20240305164623.379149-32-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v3 14/18] arm64: Add memregions_efi_init
+Date: Tue,  5 Mar 2024 17:46:38 +0100
+Message-ID: <20240305164623.379149-34-andrew.jones@linux.dev>
 In-Reply-To: <20240305164623.379149-20-andrew.jones@linux.dev>
 References: <20240305164623.379149-20-andrew.jones@linux.dev>
 Precedence: bulk
@@ -51,95 +51,203 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The allocator init is identical for mem_init() and efi_mem_init().
-Share it.
+Provide a memregions function which initialized memregions from an
+EFI memory map. Add a new memregions flag (MR_F_PERSISTENT) for
+EFI_PERSISTENT_MEMORY since that type should not be reserved, but it
+should also be distinct from conventional memory. The function also
+points out the largest conventional memory region by returning a
+pointer to it in the freemem parameter. Immediately apply this
+function to arm64's efi_mem_init(). riscv will make use of it as well.
 
 Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- lib/arm/setup.c | 46 ++++++++++++++++++++++------------------------
- 1 file changed, 22 insertions(+), 24 deletions(-)
+ lib/arm/setup.c  | 76 ++++++++----------------------------------------
+ lib/memregions.c | 51 ++++++++++++++++++++++++++++++++
+ lib/memregions.h |  6 ++++
+ 3 files changed, 69 insertions(+), 64 deletions(-)
 
 diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 80f952377cf9..7f2043907634 100644
+index b8c88b5bf011..f5dbb48e721a 100644
 --- a/lib/arm/setup.c
 +++ b/lib/arm/setup.c
-@@ -136,9 +136,28 @@ static void arm_memregions_add_assumed(void)
- #endif
- }
+@@ -295,58 +295,13 @@ static efi_status_t setup_rsdp(efi_bootinfo_t *efi_bootinfo)
  
--static void mem_init(phys_addr_t freemem_start)
-+static void mem_allocator_init(phys_addr_t freemem_start, phys_addr_t freemem_end)
+ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
  {
- 	phys_addr_t base, top;
-+
-+	freemem_start = PAGE_ALIGN(freemem_start);
-+	freemem_end &= PAGE_MASK;
-+
-+	phys_alloc_init(freemem_start, freemem_end - freemem_start);
-+	phys_alloc_set_minimum_alignment(SMP_CACHE_BYTES);
-+
-+	phys_alloc_get_unused(&base, &top);
-+	base = PAGE_ALIGN(base);
-+	top &= PAGE_MASK;
-+	assert(sizeof(long) == 8 || !(base >> 32));
-+	if (sizeof(long) != 8 && (top >> 32) != 0)
-+		top = ((uint64_t)1 << 32);
-+	page_alloc_init_area(0, base >> PAGE_SHIFT, top >> PAGE_SHIFT);
-+	page_alloc_ops_enable();
-+}
-+
-+static void mem_init(phys_addr_t freemem_start)
-+{
- 	struct mem_region *freemem, *r, mem = {
- 		.start = (phys_addr_t)-1,
- 	};
-@@ -169,17 +188,7 @@ static void mem_init(phys_addr_t freemem_start)
- 	__phys_offset = mem.start;	/* PHYS_OFFSET */
- 	__phys_end = mem.end;		/* PHYS_END */
- 
--	phys_alloc_init(freemem_start, freemem->end - freemem_start);
--	phys_alloc_set_minimum_alignment(SMP_CACHE_BYTES);
+-	int i;
+-	unsigned long free_mem_pages = 0;
+-	unsigned long free_mem_start = 0;
+-	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
+-	efi_memory_desc_t *buffer = *map->map;
+-	efi_memory_desc_t *d = NULL;
+-	struct mem_region r, *code, *data;
+-	const void *fdt = efi_bootinfo->fdt;
 -
--	phys_alloc_get_unused(&base, &top);
--	base = PAGE_ALIGN(base);
--	top = top & PAGE_MASK;
--	assert(sizeof(long) == 8 || !(base >> 32));
--	if (sizeof(long) != 8 && (top >> 32) != 0)
--		top = ((uint64_t)1 << 32);
--	page_alloc_init_area(0, base >> PAGE_SHIFT, top >> PAGE_SHIFT);
--	page_alloc_ops_enable();
-+	mem_allocator_init(freemem_start, freemem->end);
- }
- 
- static void freemem_push_fdt(void **freemem, const void *fdt)
-@@ -292,7 +301,6 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
- 	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
- 	efi_memory_desc_t *buffer = *map->map;
- 	efi_memory_desc_t *d = NULL;
--	phys_addr_t base, top;
- 	struct mem_region r;
- 	uintptr_t text = (uintptr_t)&_text, etext = ALIGN((uintptr_t)&_etext, 4096);
- 	uintptr_t data = (uintptr_t)&_data, edata = ALIGN((uintptr_t)&_edata, 4096);
-@@ -380,17 +388,7 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
- 
- 	assert(sizeof(long) == 8 || free_mem_start < (3ul << 30));
- 
--	phys_alloc_init(free_mem_start, free_mem_pages << EFI_PAGE_SHIFT);
--	phys_alloc_set_minimum_alignment(SMP_CACHE_BYTES);
+-	/*
+-	 * Record the largest free EFI_CONVENTIONAL_MEMORY region
+-	 * which will be used to set up the memory allocator, so that
+-	 * the memory allocator can work in the largest free
+-	 * continuous memory region.
+-	 */
+-	for (i = 0; i < *(map->map_size); i += *(map->desc_size)) {
+-		d = (efi_memory_desc_t *)(&((u8 *)buffer)[i]);
 -
--	phys_alloc_get_unused(&base, &top);
--	base = PAGE_ALIGN(base);
--	top = top & PAGE_MASK;
--	assert(sizeof(long) == 8 || !(base >> 32));
--	if (sizeof(long) != 8 && (top >> 32) != 0)
--		top = ((uint64_t)1 << 32);
--	page_alloc_init_area(0, base >> PAGE_SHIFT, top >> PAGE_SHIFT);
--	page_alloc_ops_enable();
-+	mem_allocator_init(free_mem_start, free_mem_start + (free_mem_pages << EFI_PAGE_SHIFT));
+-		r.start = d->phys_addr;
+-		r.end = d->phys_addr + d->num_pages * EFI_PAGE_SIZE;
+-		r.flags = 0;
+-
+-		switch (d->type) {
+-		case EFI_RESERVED_TYPE:
+-		case EFI_LOADER_DATA:
+-		case EFI_BOOT_SERVICES_CODE:
+-		case EFI_BOOT_SERVICES_DATA:
+-		case EFI_RUNTIME_SERVICES_CODE:
+-		case EFI_RUNTIME_SERVICES_DATA:
+-		case EFI_UNUSABLE_MEMORY:
+-		case EFI_ACPI_RECLAIM_MEMORY:
+-		case EFI_ACPI_MEMORY_NVS:
+-		case EFI_PAL_CODE:
+-			r.flags = MR_F_RESERVED;
+-			break;
+-		case EFI_MEMORY_MAPPED_IO:
+-		case EFI_MEMORY_MAPPED_IO_PORT_SPACE:
+-			r.flags = MR_F_IO;
+-			break;
+-		case EFI_LOADER_CODE:
+-			r.flags = MR_F_CODE;
+-			break;
+-		case EFI_CONVENTIONAL_MEMORY:
+-			if (free_mem_pages < d->num_pages) {
+-				free_mem_pages = d->num_pages;
+-				free_mem_start = d->phys_addr;
+-			}
+-			break;
+-		}
++	struct mem_region *freemem_mr = NULL, *code, *data;
++	phys_addr_t freemem_start;
++	void *freemem;
+ 
+-		memregions_add(&r);
+-	}
++	memregions_efi_init(&efi_bootinfo->mem_map, &freemem_mr);
++	if (!freemem_mr)
++		return EFI_OUT_OF_RESOURCES;
+ 
+ 	memregions_split((unsigned long)&_etext, &code, &data);
+ 	assert(code && (code->flags & MR_F_CODE));
+@@ -366,24 +321,17 @@ static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
+ 	}
+ 	__phys_end &= PHYS_MASK;
+ 
+-	if (fdt) {
+-		unsigned long old_start = free_mem_start;
+-		void *freemem = (void *)free_mem_start;
++	freemem = (void *)PAGE_ALIGN(freemem_mr->start);
+ 
+-		freemem_push_fdt(&freemem, fdt);
++	if (efi_bootinfo->fdt)
++		freemem_push_fdt(&freemem, efi_bootinfo->fdt);
+ 
+-		free_mem_start = ALIGN((unsigned long)freemem, EFI_PAGE_SIZE);
+-		free_mem_pages = (free_mem_start - old_start) >> EFI_PAGE_SHIFT;
+-	}
++	freemem_start = PAGE_ALIGN((unsigned long)freemem);
++	assert(sizeof(long) == 8 || freemem_start < (3ul << 30));
+ 
+ 	asm_mmu_disable();
+ 
+-	if (free_mem_pages == 0)
+-		return EFI_OUT_OF_RESOURCES;
+-
+-	assert(sizeof(long) == 8 || free_mem_start < (3ul << 30));
+-
+-	mem_allocator_init(free_mem_start, free_mem_start + (free_mem_pages << EFI_PAGE_SHIFT));
++	mem_allocator_init(freemem_start, freemem_mr->end);
  
  	return EFI_SUCCESS;
  }
+diff --git a/lib/memregions.c b/lib/memregions.c
+index 96de86b27333..9cdbb639ab62 100644
+--- a/lib/memregions.c
++++ b/lib/memregions.c
+@@ -80,3 +80,54 @@ void memregions_add_dt_regions(size_t max_nr)
+ 		});
+ 	}
+ }
++
++#ifdef CONFIG_EFI
++/*
++ * Add memory regions based on the EFI memory map. Also set a pointer to the
++ * memory region which corresponds to the largest EFI_CONVENTIONAL_MEMORY
++ * region, as that region is the largest free, continuous region, making it
++ * a good choice for the memory allocator.
++ */
++void memregions_efi_init(struct efi_boot_memmap *mem_map,
++			 struct mem_region **freemem)
++{
++	u8 *buffer = (u8 *)*mem_map->map;
++	u64 freemem_pages = 0;
++
++	*freemem = NULL;
++
++	for (int i = 0; i < *mem_map->map_size; i += *mem_map->desc_size) {
++		efi_memory_desc_t *d = (efi_memory_desc_t *)&buffer[i];
++		struct mem_region r = {
++			.start = d->phys_addr,
++			.end = d->phys_addr + d->num_pages * EFI_PAGE_SIZE,
++			.flags = 0,
++		};
++
++		switch (d->type) {
++		case EFI_MEMORY_MAPPED_IO:
++		case EFI_MEMORY_MAPPED_IO_PORT_SPACE:
++			r.flags = MR_F_IO;
++			break;
++		case EFI_LOADER_CODE:
++			r.flags = MR_F_CODE;
++			break;
++		case EFI_PERSISTENT_MEMORY:
++			r.flags = MR_F_PERSISTENT;
++			break;
++		case EFI_CONVENTIONAL_MEMORY:
++			if (freemem_pages < d->num_pages) {
++				freemem_pages = d->num_pages;
++				*freemem = memregions_add(&r);
++				continue;
++			}
++			break;
++		default:
++			r.flags = MR_F_RESERVED;
++			break;
++		}
++
++		memregions_add(&r);
++	}
++}
++#endif /* CONFIG_EFI */
+diff --git a/lib/memregions.h b/lib/memregions.h
+index 9a8e33182fe5..1600530ad7bf 100644
+--- a/lib/memregions.h
++++ b/lib/memregions.h
+@@ -9,6 +9,7 @@
+ #define MR_F_IO				BIT(0)
+ #define MR_F_CODE			BIT(1)
+ #define MR_F_RESERVED			BIT(2)
++#define MR_F_PERSISTENT			BIT(3)
+ #define MR_F_UNKNOWN			BIT(31)
+ 
+ struct mem_region {
+@@ -26,4 +27,9 @@ uint32_t memregions_get_flags(phys_addr_t paddr);
+ void memregions_split(phys_addr_t addr, struct mem_region **r1, struct mem_region **r2);
+ void memregions_add_dt_regions(size_t max_nr);
+ 
++#ifdef CONFIG_EFI
++#include <efi.h>
++void memregions_efi_init(struct efi_boot_memmap *mem_map, struct mem_region **freemem);
++#endif
++
+ #endif /* _MEMREGIONS_H_ */
 -- 
 2.44.0
 
