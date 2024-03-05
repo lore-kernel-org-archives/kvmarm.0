@@ -1,32 +1,32 @@
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C2DC13B
-	for <kvmarm@lists.linux.dev>; Tue,  5 Mar 2024 16:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A370214003
+	for <kvmarm@lists.linux.dev>; Tue,  5 Mar 2024 16:46:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709657200; cv=none; b=NOvfcM6t1n12lFOiYcD/Jq48dT5NDMkLHbY3pb6iv1XSo866r7iCkJqpGiw1uUmlb0BSVh24PJDogA5ETh+oyZbpCKWAh6eN48rAiA6uJR993Mpkr1qXIe8Yvm2xAgxx5bM7x992H2vAyR8J7ErC8Y6S6KBeaQoXujRdNWGr4xg=
+	t=1709657201; cv=none; b=MJV7uHKRJ2BzqliRQ0GrU85W1b3TOcWaYw9izzYIHhKr6ylMbsaBt4jDxKZhr0o7SV4NZQDhwSbJrmMa1I3tHrbqI5OPDq464at341LMNGp/uPZ/xzmhNwN6P9iG6L6YNO5GWqP8orvomvmtDPXgZa6WxpSPg556ezV42WZaCYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709657200; c=relaxed/simple;
-	bh=tloykq4FipHwzmG+LtYESH6X6ycS0Nf4/O5QnjtLbyg=;
+	s=arc-20240116; t=1709657201; c=relaxed/simple;
+	bh=tFhbxtYyeFR7DQV04WEp9S1dqAxKC1qIlGAM3c/wg2Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=DRp/fXzAx8GkNdjkXcflCOGzHd4mQYPDxYj4uqC/KjjA9u+GJ6+nwb/HYqlrVO72oR/WX8aGi6y9FmuPogc+Y6BpDrgmYNmTNK9jCbzpMbBxs4dsnO+h142wu5YJsCrxSBtiWNZIBySSGTCQNGdj7EQRSTvYWqy21g7fhgcv1bc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IfPQbcFv; arc=none smtp.client-ip=95.215.58.171
+	 MIME-Version:Content-type; b=FBsHHNsDlKzxLNMlnKWn3jXiTDuy6c8suUByaq0pOpjXacafNV/dqbXCn914N1qZBW1sO2v+FP96qUS6Avrbj/vyb4KBn3GV6Fg5af1DsT01e2paXaazICnbpNJgZ2Sbso5QeEpblyiAaOPjtMDv8vsmBzSTEsEaezMN3j+l/TU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EuQHOExU; arc=none smtp.client-ip=95.215.58.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IfPQbcFv"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EuQHOExU"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709657195;
+	t=1709657197;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fpQfrotHy+/SWb8R20YZRRn8M8ivZ5IKPumNkXdds/M=;
-	b=IfPQbcFvR12atPYoxuk/D5YyZnpxN0QHT6CP7AgR7NRl23jMoERaSyl2nMwgVf0RRBdtvM
-	K8QtYY6WBzUwROTSES/mhdH7AxPjhsooXOuXtaKMacg8/Xp6R0M2z1VAVXYPLxV119r5wG
-	FUzwD5VRVkvqT/jRSQBz0MFVq+poi6Y=
+	bh=6v4dgcC88/jGlNFEQij8AjD/BQIJSZRkdeHFYEeHLqk=;
+	b=EuQHOExUQwv3OO5cmBLsY05p5V4kGzmMW1pHsT6c5erNvYa4WKotzZA4zQIigq/xXshhMY
+	sbfFtG3vUzZO86eQLRf8/0BGiAC1k2WT6FyHC6jyBGP7up9gzPTQ39lcrHXA/xqSkiPobZ
+	JNUyvzOOAUwv6KBMGXWCmMW2QJYs1fE=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -36,9 +36,9 @@ Cc: alexandru.elisei@arm.com,
 	shahuang@redhat.com,
 	pbonzini@redhat.com,
 	thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v3 03/18] arm64: efi: Don't create dummy test
-Date: Tue,  5 Mar 2024 17:46:27 +0100
-Message-ID: <20240305164623.379149-23-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v3 04/18] arm64: efi: Make running tests on EFI can be parallel
+Date: Tue,  5 Mar 2024 17:46:28 +0100
+Message-ID: <20240305164623.379149-24-andrew.jones@linux.dev>
 In-Reply-To: <20240305164623.379149-20-andrew.jones@linux.dev>
 References: <20240305164623.379149-20-andrew.jones@linux.dev>
 Precedence: bulk
@@ -51,42 +51,98 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The purpose of the _NO_FILE_4Uhere_ kernel is to check that all the
-QEMU command line options that have been pulled together by the
-scripts will work. Since booting with UEFI and the -kernel command
-line is supported by QEMU, then we don't need to create a dummy
-test for _NO_FILE_4Uhere_ and go all the way into UEFI's shell and
-execute it to prove the command line is OK, since we would have
-failed much before all that if it wasn't. Just run QEMU "normally",
-i.e. no EFI_RUN=y, but add the UEFI -bios and its file system command
-line options, in order to check the full command line.
+From: Shaoqin Huang <shahuang@redhat.com>
 
+Currently running tests on EFI in parallel can cause part of tests to
+fail, this is because arm/efi/run script use the EFI_CASE to create the
+subdir under the efi-tests, and the EFI_CASE is the filename of the
+test, when running tests in parallel, the multiple tests exist in the
+same filename will execute at the same time, which will use the same
+directory and write the test specific things into it, this cause
+chaotic and make some tests fail.
+
+For example, if we running the pmu-sw-incr and pmu-chained-counters
+and other pmu tests on EFI at the same time, the EFI_CASE will be pmu.
+So they will write their $cmd_args to the $EFI/TEST/pmu/startup.nsh
+at the same time, which will corrupt the startup.nsh file.
+
+And we can get the log which outputs:
+
+* pmu-sw-incr.log:
+  - ABORT: pmu: Unknown sub-test 'pmu-mem-acce'
+* pmu-chained-counters.log
+  - ABORT: pmu: Unknown sub-test 'pmu-mem-access-reliab'
+
+And the efi-tests/pmu/startup.nsh:
+
+@echo -off
+setvar fdtfile -guid 97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823 -rt =L"dtb"
+pmu.efi pmu-mem-access-reliability
+setvar fdtfile -guid 97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823 -rt =L"dtb"
+pmu.efi pmu-chained-sw-incr
+
+As you can see, when multiple tests write to the same startup.nsh file,
+it causes the issue.
+
+To Fix this issue, use the testname instead of the filename to create
+the subdir under the efi-tests. We use the EFI_TESTNAME to replace the
+EFI_CASE in script. Since every testname is specific, now the tests
+can be run parallel. It also considers when user directly use the
+arm/efi/run to run test, in this case, still use the filename.
+
+Besides, replace multiple $EFI_TEST/$EFI_CASE to the $EFI_CASE_DIR, this
+makes the script looks more clean and we don'e need to replace many
+EFI_CASE to EFI_TESTNAME.
+
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- arm/efi/run | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ arm/efi/run | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
 diff --git a/arm/efi/run b/arm/efi/run
-index 6872c337c945..e629abde5273 100755
+index e629abde5273..8b6512520026 100755
 --- a/arm/efi/run
 +++ b/arm/efi/run
-@@ -53,7 +53,14 @@ while (( "$#" )); do
- done
+@@ -25,6 +25,8 @@ fi
+ : "${EFI_UEFI:=$DEFAULT_UEFI}"
+ : "${EFI_TEST:=efi-tests}"
+ : "${EFI_CASE:=$(basename $1 .efi)}"
++: "${EFI_TESTNAME:=$TESTNAME}"
++: "${EFI_TESTNAME:=$EFI_CASE}"
+ : "${EFI_VAR_GUID:=97ef3e03-7329-4a6a-b9ba-6c1fdcc5f823}"
  
- if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
--	EFI_CASE=dummy
-+	EFI_CASE_DIR="$EFI_TEST/dummy"
-+	mkdir -p "$EFI_CASE_DIR"
-+	$TEST_DIR/run \
-+		$EFI_CASE \
-+		-bios "$EFI_UEFI" \
-+		-drive file.dir="$EFI_CASE_DIR/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
-+		"${qemu_args[@]}"
-+	exit
+ [ "$EFI_USE_ACPI" = "y" ] || EFI_USE_DTB=y
+@@ -63,20 +65,20 @@ if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
+ 	exit
  fi
  
- : "${EFI_CASE_DIR:="$EFI_TEST/$EFI_CASE"}"
+-: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_CASE"}"
++: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_TESTNAME"}"
+ mkdir -p "$EFI_CASE_DIR"
+ 
+-cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
+-echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
++cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_CASE_DIR/"
++echo "@echo -off" > "$EFI_CASE_DIR/startup.nsh"
+ if [ "$EFI_USE_DTB" = "y" ]; then
+ 	qemu_args+=(-machine acpi=off)
+ 	FDT_BASENAME="dtb"
+-	$(EFI_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_TEST/$EFI_CASE/$FDT_BASENAME" "${qemu_args[@]}")
+-	echo "setvar fdtfile -guid $EFI_VAR_GUID -rt =L\"$FDT_BASENAME\""  >> "$EFI_TEST/$EFI_CASE/startup.nsh"
++	$(EFI_RUN=y $TEST_DIR/run -machine dumpdtb="$EFI_CASE_DIR/$FDT_BASENAME" "${qemu_args[@]}")
++	echo "setvar fdtfile -guid $EFI_VAR_GUID -rt =L\"$FDT_BASENAME\""  >> "$EFI_CASE_DIR/startup.nsh"
+ fi
+-echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_TEST/$EFI_CASE/startup.nsh"
++echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_CASE_DIR/startup.nsh"
+ 
+ EFI_RUN=y $TEST_DIR/run \
+        -bios "$EFI_UEFI" \
+-       -drive file.dir="$EFI_TEST/$EFI_CASE/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
++       -drive file.dir="$EFI_CASE_DIR/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
+        "${qemu_args[@]}"
 -- 
 2.44.0
 
