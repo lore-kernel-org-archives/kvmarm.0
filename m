@@ -1,183 +1,130 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A187584FAC
-	for <kvmarm@lists.linux.dev>; Wed,  6 Mar 2024 12:51:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357B4130AEB
+	for <kvmarm@lists.linux.dev>; Wed,  6 Mar 2024 13:23:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709729498; cv=none; b=LlyT+Mi2NRYMVhCFsMwUOxKmXF9IfIEcCkboQmctxv2pIzLE6GfnSOm//knjFgn9GPe5CQPmUhvNFTCuMCxa3WJuSPSA2n1Acrib/bUp1sc/X7iDWzY/vPT8sloeL7lVjQWZt4TBLVJ5OhDndl9qPEw2x5a5E3d3IFP2K4Fyczw=
+	t=1709731435; cv=none; b=QU3AV2ZszpecznFGsrvlV1R+qR1o32ECncdQwwQYK2QdNRzJMS36jxabHA0JX+dotZpT6gRI307JNfPzAsIqPSWruFzfRz2QHzQW3IXTMOKyYpbIuQgzHcewtgDYYEC3/Dn4C5AcffKRdYZJEc/YocTeKsvBsA6A6U4GMleuVMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709729498; c=relaxed/simple;
-	bh=ft0AWz4SOE0fZeNxVCcXJtIXw3InLx9aXgawOGYsbu0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gKSYaEVr9cABOygtqqSEC+3nfuBhS9UYupqiKD2FNzB8GA/gTK/qkW8P//FB0ztCncP53Ds6DneGaL2Mq9Ob0o0yHO4obUjCx3BQQW3ig7F7zIMxuvDO0sorKvWqr11hQDA+cfLL54dgOlTekx7e3/YfH8pxLIAacsQDO0qBdtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K6ycD4nc; arc=none smtp.client-ip=209.85.128.47
+	s=arc-20240116; t=1709731435; c=relaxed/simple;
+	bh=OA7zeIJZLHcgghthUXFKNKrHU5Y4QafkMwGkTbrbuK8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ngPX/PBAW+BdO7VxD/X/QSwq3rv6n34h7ylF825yWu2gZU8xKIxSueHwSgXKMsgixjeKPDewcaUQL+x4AJx95Yqs1VlE8t3FlQrRo/0L978fU/K/EEZ3TluTJ8wefSVWp800JDWFKZtMkPK7AyuLEimV/9uUtWc8O1Q3bsIsQ4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jzj+agJ+; arc=none smtp.client-ip=209.85.222.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K6ycD4nc"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-412d84ffbfaso71655e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 06 Mar 2024 04:51:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jzj+agJ+"
+Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-7cedcea89a0so4164518241.1
+        for <kvmarm@lists.linux.dev>; Wed, 06 Mar 2024 05:23:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709729494; x=1710334294; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=tM1chBD6Cze8MbSTN6oJIjYyTDYaAp1NtgWbkaFmd3c=;
-        b=K6ycD4ncT/2fEiiCT0MQz3EInYsIoviFvxJmUEKUaHtTxOdZAKTWyH3wDk7YoROEgU
-         qOocbIgLDJue3SRHwq1vydAYWrORc8a5lU5QgRz76prvl0ntg4+mAWeWpbRCglTOWtuc
-         Vx9cIg2rAvtSAW8yv/Ml/m9OaFbTb97ERkWErCokLlhBqOZSMrfTPwMqltVO4oi0pw/u
-         RJ18YyKkVYLflaariNyOXNzy2Wbn8Z41a4BEvi/6dgEvud2alrXiUIzD6050QFVTKbJI
-         rpmbnFaU5iC7Jkl2RQbRW7thhmRn5C81T+0JWg1Tt/arh+3fbvTNHgNhZY6aVbZ9yMKf
-         GDEQ==
+        d=google.com; s=20230601; t=1709731433; x=1710336233; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DJnwWEva68qgKopVRsRYp5pwWFnl6Z1zVuOttOvia+g=;
+        b=jzj+agJ+nqWv3GOUHU8Uf842S/LenuXRwpZFWOaDFlKP7j7wG6Z0ebAREoc62X6147
+         bJzCDuXpjQh1YKBzzftc5oP0lvlF6hLzUw2NvyoomPBoku0eG1NJQhxcWa+q4pzozgzM
+         +hJGMmDgSSB4eUNLAdEsNRCD9XBwwbNvmu4Xw/7quoV7H7+BDI9W1OqBMwuPdg7Fp3cy
+         V2z4xarc6exC6zK/yeFAZv2M3Z5geQEjDhrB1OcBPbnj/t7d9cbzrp3gY+UFuihLUGZX
+         cZgLNLHwp9PR64ht/voGUz+IH0e3Z9BEKetdJUtgGcUXmXeBXWPNUtmzlSsN/QRZS4+E
+         Le1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709729494; x=1710334294;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tM1chBD6Cze8MbSTN6oJIjYyTDYaAp1NtgWbkaFmd3c=;
-        b=CQMMDOQh8ZOFIOn4dMrOiyYpLKJSIhyZhFksxHyfTpNsoSyp8lmuYOKUkVprqBdckL
-         tugQ5UtHHjImXIJyqkAcutB1z4WsYuySoWTLdDHmGKdW5KegrmXjlfeLO1dePaOsry3g
-         SNUmsA73DTQdGRDFiTBCd4WjWns+BEjGS5MIWse3yBtMfkzMQomyFYuHKnwheDB6DsUJ
-         xWXiM0KuTb/Qm7yt0S0nRKlMPF5Gs8hQrtss8H0iFobpc6xNJp+cvFfE5NDoZnLdebSQ
-         TZWQAANi1iKW8tGG3zptYmcKUvZk9xRBzIbiC2gWpGUqaPnzuTC+Ze2N4v58kvJB+7Ik
-         7KnA==
-X-Forwarded-Encrypted: i=1; AJvYcCXgvCPJQ02JjiErNgLjQz5M+OchvdMWQfT7ze4yZEgvqkav9q3QI1feKPNs0M4k51jd4ca2ImOYQn4JTjnPxw/fc0nQJORx
-X-Gm-Message-State: AOJu0YyE06IfPLcTeOKKUAjyThI0b/8QVs3BpLoGwlGJIrA043sVdzSF
-	BRT3pfJ9LJDSYmdaySnHwRw2BgV4VPRB0HPyPbZaxYA3HkzYeAebWHSK3b0+1Q==
-X-Google-Smtp-Source: AGHT+IFobmqb8Y7aHK1JkGE/eGsjqIXPupLPeTU4ZQu5iZYMf7M2LupPjQjOgwv327j5mZHNoSXSrA==
-X-Received: by 2002:a05:600c:5106:b0:412:c3d0:593d with SMTP id o6-20020a05600c510600b00412c3d0593dmr346589wms.5.1709729493277;
-        Wed, 06 Mar 2024 04:51:33 -0800 (PST)
-Received: from google.com (216.131.76.34.bc.googleusercontent.com. [34.76.131.216])
-        by smtp.gmail.com with ESMTPSA id co14-20020a0560000a0e00b0033e3ce48ba1sm8504913wrb.16.2024.03.06.04.51.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Mar 2024 04:51:32 -0800 (PST)
-Date: Wed, 6 Mar 2024 12:51:28 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
-	joro@8bytes.org, robin.murphy@arm.com, james.morse@arm.com,
-	suzuki.poulose@arm.com, oliver.upton@linux.dev,
-	yuzenghui@huawei.com, dbrazdil@google.com, ryan.roberts@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	iommu@lists.linux.dev
-Subject: Re: [RFC PATCH 24/45] KVM: arm64: smmu-v3: Setup stream table
-Message-ID: <Zehm0GC7MyxcRx7d@google.com>
-References: <20230201125328.2186498-1-jean-philippe@linaro.org>
- <20230201125328.2186498-25-jean-philippe@linaro.org>
- <CAFgf54qcTAru0Nvy1wH_tJMadOSW7Y3zEip5RTm+mtSa54Bymg@mail.gmail.com>
- <20240123194530.GA40099@myrica>
- <CAFgf54pAtSLWjaqhZShxzKkOLWFkjXmsmMk1P0TdXOUWhn00sg@mail.gmail.com>
- <20240226141352.GC1579460@myrica>
+        d=1e100.net; s=20230601; t=1709731433; x=1710336233;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DJnwWEva68qgKopVRsRYp5pwWFnl6Z1zVuOttOvia+g=;
+        b=RamUJZe44yA9Q898YxOOZ7sNBxjPY6Zo6qnwYlbwpzTWjq+Dp/q11Rhlx0y89FsPMH
+         SLQ9g81Jpt4p8u2as+/DGubchGSqodHB3UqHQ59oHe743STbcQGFJ3ODicyhVYc38Etl
+         GKO5VxaKwGRII7hI/Jw1HDikUuERaH+Cmk7tM7e6eA8sZlNA8UeMQahejWguLkh+1O+G
+         I2tefNgCmCGbHvc6OfSF401RRLfRxEAkb1Ruwmixnj5uwhIKT+cGlM9G5sW2A/sd1P2S
+         c4PA6CElh5ZvwxK90vg8K38WKomKbGHqB31e+AwFBL/rBMBN2HH2wkgvF/9R3AL6QhYN
+         FQKw==
+X-Forwarded-Encrypted: i=1; AJvYcCVX+QNCdsE1c69FspALfp6leT0EDquL4HV93WU+BX9+uIL7LeZbVPsdRD44gpe8yYyznWxS1BiMukF+1b6Tk0rtcDsdRmT7
+X-Gm-Message-State: AOJu0YyYRhFq1sEX261SoDOuzZGKzyeRkWbodGhR418iYZ/20CzAN5rP
+	3/YjTZcqsVx3qw6QvrZfc4tZfBSiUcew+cgl4qHJJsWTKzfpjFbiBOleGJcBeNx/yq+/oN1Dl0T
+	CAq07337pfUGo+WSbTLIwn9c6XOo0R4bEISxQ
+X-Google-Smtp-Source: AGHT+IFbLiMgejA2Kufk6Ex1H+VgzRc5NOdfS/eYlp25Tp/3aoQ6/fiyRcifkS7keDNWvSRVwaKUMT1eIPiRNGbWKpU=
+X-Received: by 2002:a67:c78a:0:b0:472:d43e:9e30 with SMTP id
+ t10-20020a67c78a000000b00472d43e9e30mr4919059vsk.16.1709731432918; Wed, 06
+ Mar 2024 05:23:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240226141352.GC1579460@myrica>
+References: <20240305184840.636212-1-oliver.upton@linux.dev>
+ <20240305184840.636212-2-oliver.upton@linux.dev> <87a5nbr7x3.wl-maz@kernel.org>
+ <ZehC96E3Y8lgidOC@linux.dev>
+In-Reply-To: <ZehC96E3Y8lgidOC@linux.dev>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 6 Mar 2024 13:23:15 +0000
+Message-ID: <CA+EHjTypgA=OTjexD58BzC28+DngkG1qNWuucRDZKWhNaidwzg@mail.gmail.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: pkvm: Actually enable/disable PMU events
+ when running vCPU
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 26, 2024 at 02:13:52PM +0000, Jean-Philippe Brucker wrote:
-> On Fri, Feb 16, 2024 at 12:19:01PM +0000, Mostafa Saleh wrote:
-> > On Tue, Jan 23, 2024 at 7:45 PM Jean-Philippe Brucker
-> > <jean-philippe@linaro.org> wrote:
-> > >
-> > > Hi Mostafa,
-> > >
-> > > On Tue, Jan 16, 2024 at 08:59:41AM +0000, Mostafa Saleh wrote:
-> > > > > +__maybe_unused
-> > > > > +static int smmu_sync_ste(struct hyp_arm_smmu_v3_device *smmu, u32 sid)
-> > > > > +{
-> > > > > +       struct arm_smmu_cmdq_ent cmd = {
-> > > > > +               .opcode = CMDQ_OP_CFGI_STE,
-> > > > > +               .cfgi.sid = sid,
-> > > > > +               .cfgi.leaf = true,
-> > > > > +       };
-> > > > > +
-> > > > > +       return smmu_send_cmd(smmu, &cmd);
-> > > > > +}
-> > > > > +
-> > > > I see the page tables are properly configured for ARM_SMMU_FEAT_COHERENCY but no
-> > > > handling for the STE or CMDQ, I believe here we should have something as:
-> > > > if (!(smmu->features & ARM_SMMU_FEAT_COHERENCY))
-> > > >         kvm_flush_dcache_to_poc(step, STRTAB_STE_DWORDS << 3);
-> > > >
-> > > > Similarly in "smmu_add_cmd" for the command queue. Or use NC mapping
-> > > > (which doesn't exist
-> > > > upstream as far as I can see)
-> > >
-> > > Right, the host driver seems to do this. If I'm following correctly we end
-> > > up with dma_direct_alloc() calling pgprot_dmacoherent() and get
-> > > MT_NORMAL_NC, when the SMMU is declared non-coherent in DT/IORT.
-> > >
-> > > So we'd get mismatched attributes if hyp is then mapping these structures
-> > > cacheable, but I don't remember how that works exactly. Might be fine
-> > > since host donates the pages to hyp and we'd have a cache flush in
-> > > between. I'll have to read up on that.
-> > 
-> > I guess that is not enough, as the hypervisor writes the STE/CMDQ at any time.
-> > 
-> > > Regardless, mapping NC seems cleaner, more readable. I'll see if I can add
-> > > that attribute to kvm_pgtable_hyp_map().
-> > 
-> > There is a patch for that already in Android
-> > https://android.googlesource.com/kernel/common/+/636c912401dec4d178f6cdf6073f546b15828cf7%5E%21/#F0
-> 
-> Nice, I've added this (rather than CMO, to avoid mismatched attributes)
-> but don't have the hardware to test it:
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c b/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
-> index 4b0b70017f59..e43011b51ef4 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
-> @@ -268,12 +268,17 @@ static int smmu_init_registers(struct hyp_arm_smmu_v3_device *smmu)
->  }
->  
->  /* Transfer ownership of structures from host to hyp */
-> -static void *smmu_take_pages(u64 base, size_t size)
-> +static void *smmu_take_pages(struct hyp_arm_smmu_v3_device *smmu, u64 base,
-> +			     size_t size)
->  {
->  	void *hyp_ptr;
-> +	enum kvm_pgtable_prot prot = PAGE_HYP;
-> +
-> +	if (!(smmu->features & ARM_SMMU_FEAT_COHERENCY))
-> +		prot |= KVM_PGTABLE_PROT_NC;
->  
->  	hyp_ptr = hyp_phys_to_virt(base);
-> -	if (pkvm_create_mappings(hyp_ptr, hyp_ptr + size, PAGE_HYP))
-> +	if (pkvm_create_mappings(hyp_ptr, hyp_ptr + size, prot))
->  		return NULL;
->  
->  	return hyp_ptr;
-> @@ -293,7 +298,7 @@ static int smmu_init_cmdq(struct hyp_arm_smmu_v3_device *smmu)
->  	cmdq_size = cmdq_nr_entries * CMDQ_ENT_DWORDS * 8;
->  
->  	cmdq_base &= Q_BASE_ADDR_MASK;
-> -	smmu->cmdq_base = smmu_take_pages(cmdq_base, cmdq_size);
-> +	smmu->cmdq_base = smmu_take_pages(smmu, cmdq_base, cmdq_size);
->  	if (!smmu->cmdq_base)
->  		return -EINVAL;
->  
-> @@ -350,7 +355,7 @@ static int smmu_init_strtab(struct hyp_arm_smmu_v3_device *smmu)
->  	}
->  
->  	strtab_base &= STRTAB_BASE_ADDR_MASK;
-> -	smmu->strtab_base = smmu_take_pages(strtab_base, strtab_size);
-> +	smmu->strtab_base = smmu_take_pages(smmu, strtab_base, strtab_size);
->  	if (!smmu->strtab_base)
->  		return -EINVAL;
+Hi,
 
-Thanks, that is missing the L2 for the STE, but I guess for that we can
-just CMO for now, as the HW doen't update it, unlike the CMDQ which must
-be mapped as NC and CMO won't be enough.
+On Wed, Mar 6, 2024 at 10:20=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+>
+> On Wed, Mar 06, 2024 at 10:06:32AM +0000, Marc Zyngier wrote:
+> > On Tue, 05 Mar 2024 18:48:38 +0000, Oliver Upton <oliver.upton@linux.de=
+v> wrote:
+> > > +static void flush_debug_state(struct pkvm_hyp_vcpu *hyp_vcpu)
+> > > +{
+> > > +   struct kvm_vcpu *host_vcpu =3D hyp_vcpu->host_vcpu;
+> > > +
+> > > +   hyp_vcpu->vcpu.arch.mdcr_el2    =3D host_vcpu->arch.mdcr_el2;
+> > > +   hyp_vcpu->vcpu.arch.debug_ptr   =3D kern_hyp_va(host_vcpu->arch.d=
+ebug_ptr);
+> > > +
+> > > +   /*
+> > > +    * The host's PMU context cannot be trusted for protected VMs. Re=
+fer to
+> > > +    * hardware to determine which PMCs need to be disabled/enabled o=
+n vCPU
+> > > +    * entry/exit, respectively.
+> > > +    */
+> > > +   if (kvm_vm_is_protected(kern_hyp_va(host_vcpu->kvm))) {
+> >
+> > This looks wrong. We should never rely on *host* controlled data to
+> > make a decision at EL2 in the pKVM case. Use of this helper at EL2
+> > should be constrained to the hyp view of the kvm structure only.
+>
+> I should've spelled this out explicitly. Looking at what we have
+> upstream, there's no hyp-controlled view on a VM's protection (yet).
+>
+> I had imagined this hilariously wrong expression was a placeholder for
+> pKVM folks, much like we have in early_exit_filter() and
+> kvm_get_exit_handler_array(). But that's no good, and I probably
+> should've added one myself that can be updated with the 'right' thing
+> later on.
+>
+> > The other thing is that most of this code is going to be thrown away,
+> > hopefully soon... (hint, nudge...).
+>
+> I was hoping Will could provide some insight on whether or not the
+> 'real' pKVM hyp state management carries the same bug. Nothing wrong
+> with fixing what we already have though...
 
-I am investigating to see if we can map the memory donated from the host
-on demand with differet prot, in that case iommu_donate_pages can return
-memory with the different attributes.
+Like you said, this is bad/buggy placeholder code. PMU isn't supported
+for protected guests, and the "real" pKVM code we plan to upstream
+(soon!) doesn't have this bug.
 
 Thanks,
-Mostafa
+/fuad
+
+> --
+> Thanks,
+> Oliver
+>
