@@ -1,51 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E40C5DF29;
-	Wed,  6 Mar 2024 10:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A395F86C
+	for <kvmarm@lists.linux.dev>; Wed,  6 Mar 2024 10:06:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709719203; cv=none; b=otz1LCRYp6+O6EvzGpzRmtUIAzI2LsSGDWSWhgFo6TZ7sE1BL/TH2QzuRbHWhbemQJ9NouOchHy4BT+EgK/TtBGpYp1g+Dpo70nfUcIgsMUzU9n8RDdgNTVZlAEk7kvhUwA9flKpJ+qR+8/vfVX+6pn6u8Ej/aohBGp20ID7MBE=
+	t=1709719608; cv=none; b=Ddjzw+KpRDi3M33/ekf4y3nxFwYWrLHltnJuphgAuKAmLhDtPfCsoSW0wCVRIlGeb22M+oJ8gvNCvfTrItS9JRT9swN8wl7JOFDIO2uvVS9L0G7bZWZ9NQ+1bWanZcmVN/+1xUkosM8pg1k+uZEdR1w4eGaD1oCxN1fcIzpE1/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709719203; c=relaxed/simple;
-	bh=i4/4QrpJfHFNXJZarfGFvLLrG901WJW0hZMDBQXduhM=;
+	s=arc-20240116; t=1709719608; c=relaxed/simple;
+	bh=e+FPOldskOHKf/wIiXUyREw1hKDdespK0uv1/16h0Ic=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Auy0IVR5oWWj89s1DKdQ5i34ogJ2RuE3gVXYE57vbOFRxT1/yeYtZ5uasY2poLylpYgSyDlznpi755Ave9UlwS2e14NSAuDXIwPXSMu+R4HDL++UrFAKei0KWpRQwtKLf4LI/WrXYuzHXhrXSUHgjT9iGS3ZPLXVNZD3F71s5bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CTQzxWRq; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=h2dsg6yj4DEy+SRjH/DcoivwCimA9es1KJs57V+4wJPVS0gQb/p1wM5tiC4wsmYSxzIVuiP/MRmdQxznBmW8nAw8j3yNT+G9vx4nY4RuLMJvB+OPqawSGyWTrCk0R58uRgsG/ewXaHkAg5oMtwlW2ME5aJx5jXyDGo/6lFGHte4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f+F5sd0r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CTQzxWRq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE852C433F1;
-	Wed,  6 Mar 2024 10:00:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f+F5sd0r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3D11C43390;
+	Wed,  6 Mar 2024 10:06:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709719202;
-	bh=i4/4QrpJfHFNXJZarfGFvLLrG901WJW0hZMDBQXduhM=;
+	s=k20201202; t=1709719607;
+	bh=e+FPOldskOHKf/wIiXUyREw1hKDdespK0uv1/16h0Ic=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CTQzxWRqpbjpJWqbgq43IPovJFKAa9pwbfzREiSxHWpbmJYBIMecE+xiQzZjXI7hV
-	 up1JXO4iBHcodx4vM6dP2zUjLl1shtuPe0RD40V/wg9UgdXczqY+6wB4y9tjIP8AnG
-	 nsJkJ2SnZcqlwzMG/F2K16ZkC1e61V/LRdiT0ioNfId/nVbYsaQyhM4+n5Si7r1RbV
-	 2lp5fIuZdun/CxSLZ347OUtePFAwCKPG/yqLRtAFvNIt76rUG8cR7ETt1vnuKf1Itg
-	 qO5LvvwH+6gcC6Ki64IMPUKZZA2wVLuVTV/D8f8H+3ClcCYE8FpzXdlkAhCaeAysr+
-	 Igxx5XvP5Nflw==
+	b=f+F5sd0r09k/kdLIeAsivIxzJgmi2/ZxWxW6hCaNtdbPdd6a0RCizIyASkrSk+4+D
+	 GaNO105IN0YKiE5ePs0ZUhKWlt6CMHyxgp4Ri9/M+LCP1M2My7hzXqpA9OBKRbH1UF
+	 Igtgi0z534TnuV10KUzhEXd59qpukW9aPVb9FrHeqjXgD3EAKXy41v+//k06mvQnOw
+	 ogFC3qlXH70QNStFwiQWNqJCz5XCOHGdjlatrZn+OPnbzCXZr7GzLx/tfa1dCETD/I
+	 mmj59aKaRActWISecUPtRViUh9SJQdFOClCxVdP5yXz/kAMMkZcYcsaTfHX4iB00Zi
+	 H3hrAGnbNERAQ==
 Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rho47-009t3x-TN;
-	Wed, 06 Mar 2024 10:00:00 +0000
-Date: Wed, 06 Mar 2024 09:59:57 +0000
-Message-ID: <87bk7rr882.wl-maz@kernel.org>
+	id 1rhoAf-009tEk-NI;
+	Wed, 06 Mar 2024 10:06:45 +0000
+Date: Wed, 06 Mar 2024 10:06:32 +0000
+Message-ID: <87a5nbr7x3.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 2/3] KVM: arm64: Fix host-programmed guest events in nVHE
-In-Reply-To: <20240305184840.636212-3-oliver.upton@linux.dev>
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 1/3] KVM: arm64: pkvm: Actually enable/disable PMU events when running vCPU
+In-Reply-To: <20240305184840.636212-2-oliver.upton@linux.dev>
 References: <20240305184840.636212-1-oliver.upton@linux.dev>
-	<20240305184840.636212-3-oliver.upton@linux.dev>
+	<20240305184840.636212-2-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -57,45 +56,67 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 05 Mar 2024 18:48:39 +0000,
+On Tue, 05 Mar 2024 18:48:38 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Programming PMU events in the host that count during guest execution is
-> a feature supported by perf, e.g.
+> flush_hyp_vcpu() does not carry through the PMU event context from the
+> host, regardless of whether the VM is protected or not. This is
+> problematic for two reasons:
 > 
->   perf stat -e cpu_cycles:G ./lkvm run
+>  - The expectation for non-protected VMs is that the protected-mode
+>    hypervisor has feature parity with the 'normal' KVM configuration.
+>    However, PMU events programmed to run with the guest do not work.
 > 
-> While this works for VHE, the guest/host event bitmaps are not carried
-> through to the hypervisor in the nVHE configuration. Make
-> kvm_pmu_update_vcpu_events() conditional on whether or not _hardware_
-> supports PMUv3 rather than if the vCPU as vPMU enabled.
+>  - The protected-mode hypervisor needs to prevent the host from peering
+>    in on the guest. Nothing stops the host from leaving an event enabled
+>    straight past guest entry...
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: 84d751a019a9 ("KVM: arm64: Pass pmu events to hyp via vcpu")
+> Address the both of these issues by priming the hyp vCPU's PMU event
+> context before entering the guest. Take special care to not trust the
+> host in the case of pVMs by referring directly to what hardware says is
+> enabled.
+> 
+> Cc: Will Deacon <will@kernel.org>
+> Fixes: be66e67f1750 ("KVM: arm64: Use the pKVM hyp vCPU structure in handle___kvm_vcpu_run()")
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  include/kvm/arm_pmu.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 24 ++++++++++++++++++++++--
+>  1 file changed, 22 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 4b9d8fb393a8..df32355e3e38 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -86,7 +86,7 @@ void kvm_vcpu_pmu_resync_el0(void);
->   */
->  #define kvm_pmu_update_vcpu_events(vcpu)				\
->  	do {								\
-> -		if (!has_vhe() && kvm_vcpu_has_pmu(vcpu))		\
-> +		if (!has_vhe() && kvm_arm_support_pmu_v3())		\
->  			vcpu->arch.pmu.events = *kvm_get_pmu_events();	\
->  	} while (0)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 2385fd03ed87..8621f8383f0c 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -23,6 +23,26 @@ DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
 >  
+>  void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
+>  
+> +static void flush_debug_state(struct pkvm_hyp_vcpu *hyp_vcpu)
+> +{
+> +	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
+> +
+> +	hyp_vcpu->vcpu.arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
+> +	hyp_vcpu->vcpu.arch.debug_ptr	= kern_hyp_va(host_vcpu->arch.debug_ptr);
+> +
+> +	/*
+> +	 * The host's PMU context cannot be trusted for protected VMs. Refer to
+> +	 * hardware to determine which PMCs need to be disabled/enabled on vCPU
+> +	 * entry/exit, respectively.
+> +	 */
+> +	if (kvm_vm_is_protected(kern_hyp_va(host_vcpu->kvm))) {
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+This looks wrong. We should never rely on *host* controlled data to
+make a decision at EL2 in the pKVM case. Use of this helper at EL2
+should be constrained to the hyp view of the kvm structure only.
+
+The other thing is that most of this code is going to be thrown away,
+hopefully soon... (hint, nudge...).
+
+Thanks,
 
 	M.
 
