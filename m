@@ -1,48 +1,47 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DDC2135403;
-	Wed,  6 Mar 2024 16:41:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6817719BA5;
+	Wed,  6 Mar 2024 22:19:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709743309; cv=none; b=dVEDDZJLJDDfBVS7HNr3TcznYm40FoNBk0j+SaJCdsMzSzbdBp6SQx1go5HmcELf8yIXZ1CYkye+cVPDANVNQV5Fw8k1Zp2mLCpVppr21JrmNfiEsCetzqFNQ5Qlygz9sTkZ4s9RRsIJ4C1VZhMJI21UuUnp65VysaI1go5YFjI=
+	t=1709763548; cv=none; b=JAvZxSe5WQ6RZO/vHV/V4DLLWcYN53nprbX/CueK80j4ZFbjiI5RHjhB2MFFcOa0lQcDdo86VbXSPUwzrfiXOpdSbuwYKEUznvDPK7sksryytTfBZufrl9lA3TWuM0JT2js0a32DgCZBqyC8OzSq+wUa4DvfEtZ/cKbN8sul8xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709743309; c=relaxed/simple;
-	bh=wGBQne2ty3/taGy9HQjjtG+8Fp+vs6DMKxTi7WRGvyE=;
+	s=arc-20240116; t=1709763548; c=relaxed/simple;
+	bh=t48F+o0edpL0osyU8lhPuUtT2+HsGKdKH8ZVTh6h7V4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cqOpHOejeydO14fIydiK6lfjieTMum4XbqWiGltuOJQ5zLMlZ1C+U7bKmDgzkIdnvrT1J3n/yxZ0ARXo6XUGpX9CfARDRbMDvd4Bht37VsUixQhhxm/1JSjVGhDmwIhC48ycLZ6FNTQu7eIEaFguxzELVZ67Mn7kLFTmDLVdQOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GppPyV3r; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=hq29Sn1Udk0MAxykzRAHRuv/LZIr4LSjJKrebeLltYWq48vcQHelM6C2lqcRQcTgJGYNhQyxrImvJZU9T5AtOIQBFnjsYxYm18/nAWmUaUiJ6PJ4xZEgpH4HBvKV1dvDkxH49k7Iy7l/6iA/UL1zd4dXfsLxrg7Z2Zno0Yzx0S8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yr/Nie1y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GppPyV3r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3FBFC433C7;
-	Wed,  6 Mar 2024 16:41:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yr/Nie1y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E02ACC433F1;
+	Wed,  6 Mar 2024 22:19:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709743308;
-	bh=wGBQne2ty3/taGy9HQjjtG+8Fp+vs6DMKxTi7WRGvyE=;
+	s=k20201202; t=1709763548;
+	bh=t48F+o0edpL0osyU8lhPuUtT2+HsGKdKH8ZVTh6h7V4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GppPyV3rzK/xE80tjNFWepHf8hXDwBG28/3MXkYmRLJ1+A5Las0Ak2fTCY3lANmuQ
-	 Y7J6njFEPsjWONxUxWZbw00mzqg/b05IgkQmZP0TyxkcjmqhsSLthX8wqe6xsDlRgW
-	 N6aM9s4w3hsA9rm+uPV0Z8WQP8s+1LlzutUwUMKkdRMmOKbo69uWKlWBMgIXOkal3p
-	 tqHq4rdqmW3kaOADWFMJL4gfPMJ4tTuVCEo3eHTPoL6PYyGMtfNoFrBTvnwatSiAQ4
-	 viBpMCeiz3mZENWu3phlxvzVv1Fu6j7zYVak4uoiuThlQXjYTd2lqPZbcYczrRkEcT
-	 zOV6KAWagcTjQ==
-Date: Wed, 6 Mar 2024 16:41:42 +0000
+	b=Yr/Nie1y90Vwms77nfC9eejNfoDV156uvdr9UabpNQ+lzf7LSMN+E3PFa1FZaqT7K
+	 uLhJEsSrm+Ic+JguWnz/cAClEzk0R+YkQxHqBxi6MmZUezB1wJUabVbRuFOaNn0v5b
+	 IcLxD4ilvMu68a0fe+IXImx2wC27tYbIz45UQNsCIn/kmMmreaOyc3EDWCUTRwYOeV
+	 uc+dNECA+Y4cmUr0VhMeP9GacwA1JcDT5UFccjUmrMGATJm+tn+PrA9ee3TnM2/txe
+	 SsREslj1yVhHNhxgzi4TTLQY/FTP0SAi0XIL5dbP46wWGGOyRZi2tc4sDkmwldiMk5
+	 3pKNr0rF3DydQ==
+Date: Wed, 6 Mar 2024 22:19:03 +0000
 From: Mark Brown <broonie@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Dave Martin <dave.martin@arm.com>, kvmarm@lists.linux.dev,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v4 03/14] arm64/fpsimd: Support FEAT_FPMR
-Message-ID: <c7e3d57d-92fa-4013-b0fc-e2941fb43d20@sirena.org.uk>
-References: <20240122-arm64-2023-dpisa-v4-0-776e094861df@kernel.org>
- <20240122-arm64-2023-dpisa-v4-3-776e094861df@kernel.org>
- <86r0h330dl.wl-maz@kernel.org>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>
+Subject: Re: [PATCH 5/5] KVM: arm64: Exclude FP ownership from kvm_vcpu_arch
+Message-ID: <a8416451-011c-4159-b9e4-b492b81f5a2c@sirena.org.uk>
+References: <20240302111935.129994-1-maz@kernel.org>
+ <20240302111935.129994-6-maz@kernel.org>
+ <6acffbef-6872-4a15-b24a-7a0ec6bbb373@sirena.org.uk>
+ <87edcnr8zy.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,70 +49,133 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="T+O4zNYAuWrtYgTu"
+	protocol="application/pgp-signature"; boundary="g1jHqhZvHhgVxiRs"
 Content-Disposition: inline
-In-Reply-To: <86r0h330dl.wl-maz@kernel.org>
+In-Reply-To: <87edcnr8zy.wl-maz@kernel.org>
 X-Cookie: Have at you!
 
 
---T+O4zNYAuWrtYgTu
+--g1jHqhZvHhgVxiRs
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 23, 2024 at 11:07:02AM +0000, Marc Zyngier wrote:
+On Wed, Mar 06, 2024 at 09:43:13AM +0000, Marc Zyngier wrote:
 > Mark Brown <broonie@kernel.org> wrote:
+> > On Sat, Mar 02, 2024 at 11:19:35AM +0000, Marc Zyngier wrote:
 
-> > --- a/arch/arm64/kvm/fpsimd.c
-> > +++ b/arch/arm64/kvm/fpsimd.c
-> > @@ -153,6 +153,7 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
-> >  		fp_state.sve_vl =3D vcpu->arch.sve_max_vl;
-> >  		fp_state.sme_state =3D NULL;
-> >  		fp_state.svcr =3D &vcpu->arch.svcr;
-> > +		fp_state.fpmr =3D &vcpu->arch.fpmr;
-> >  		fp_state.fp_type =3D &vcpu->arch.fp_type;
+> > > Move the ownership tracking into the host data structure, and
+> > > rename it from fp_state to fp_owner, which is a better description
+> > > (name suggested by Mark Brown).
 
-> Given the number of fields you keep track of, it would make a lot more
-> sense if these FP-related fields were in their own little structure
-> and tracked by a single pointer (I don't think there is a case where
-> we track them independently).
+> > The SME patch series proposes adding an additional state to this
+> > enumeration which would say if the registers are stored in a format
+> > suitable for exchange with userspace, that would make this state part of
+> > the vCPU state.  With the addition of SME we can have two vector lengths
+> > in play so the series proposes picking the larger to be the format for
+> > userspace registers.
 
-I sent a patch series that attempted to address this somewhat by
-refactoring things so that we initialise the struct we bind during vCPU
-setup rather than each time we prepare to switch away from the guest:
+> What does this addition have anything to do with the ownership of the
+> physical register file? Not a lot, it seems.
 
-    https://lore.kernel.org/linux-arm-kernel/20240226-kvm-arm64-group-fp-da=
-ta-v1-0-07d13759517e@kernel.org/
+> Specially as there better be no state resident on the CPU when
+> userspace messes up with it.
 
-which you weren't terribly enthusiastic about:
+If we have a situation where the state might be stored in memory in
+multiple formats it seems reasonable to consider the metadata which
+indicates which format is currently in use as part of the state.
 
-    https://lore.kernel.org/all/86y1b027mc.wl-maz@kernel.org/
+> > We could store this separately to fp_state/owner but it'd still be a
+> > value stored in the vCPU.
 
-As covered in the changelog for patch 2 of that series the FP state
-includes both system registers which KVM wants to expose via it's system
-register ABI and FPSIMD state which the host kernel wants to flag as
-suitable for hardended usercopy by embedding in thread_struct.uw.  This
-means that pulling everything into a single structure which is used
-throughout the kernel would require a bunch of surgery which I'm not
-sure is worth the effort or ongoing maintainance cost.=20
+> I totally disagree.
 
-The current approach is verbose but not complicated and localised to the
-code managing the FP state, as I said in the discussion on that thread I
-think it represents a reasonable tradeoff.
+Where would you expect to see the state stored?
 
---T+O4zNYAuWrtYgTu
+> > Storing in a format suitable for userspace
+> > usage all the time when we've got SME would most likely result in
+> > performance overhead
+
+> What performance overhead? Why should we care?
+
+Since in situations where we're not using the larger VL we would need to
+load and store the registers using a vector length other than the
+currently configured vector length we would not be able to use the
+ability to load and store to a location based on a multiple of the
+vector length that the architecture has:
+
+   LDR <Zt>, [<Xn|SP>{, #<imm>, MUL VL}]
+   LDR <Pt>, [<Xn|SP>{, #<imm>, MUL VL}]
+  =20
+   STR <Zt>, [<Xn|SP>{, #<imm>, MUL VL}]
+   STR <Pt>, [<Xn|SP>{, #<imm>, MUL VL}]
+
+and would instead need to manually compute the memory locations where
+values are stored.  As well as the extra instructions when using the
+smaller vector length we'd also be working with sparser data likely over
+more cache lines.
+
+We would also need to consider if we need to zero the holes in the data
+when saving, we'd only potentially be leaking information from the guest
+but it might cause nasty surprises given that transitioning to/from
+streaming mode is expected to zero values.  If we do need to zero then
+that would be additional work that would need doing.
+
+Exactly what the performance hit would be will be system and use case
+dependent.  *Hopefully* we aren't needing to save and load the guest
+state too often but I would be very surprised if we didn't have people
+considering any cost in the guest context switch path worth paying
+attention to.
+
+As well as the performance overhead there would be some code complexity
+cost, if nothing else we'd not be using the same format as fpsimd_save()
+and would need to rearrange how we handle saving the register state.
+
+Spending more effort to implement something which also has more runtime
+performance overhead for the case of saving and restoring guest state
+which I expect to be vastly more common than the VMM accessing the guest
+registers just doesn't seem like an appealing choice.
+
+> > if nothing else and feels more complicated than
+> > rewriting the data in the relatively unusual case where userspace looks
+> > at it.  Trying to convert userspace writes into the current layout would
+> > have issues if the current layout uses the smaller vector length and
+> > create fragility with ordering issues when loading the guest state.
+
+> What ordering issues? If userspace manipulates the guest state, the
+> guest isn't running. If it is, all bets are off.
+
+If we were storing the data in the native format for the guest then that
+format will change if streaming mode is changed via a write to SVCR.
+This would mean that the host would need to understand that when writing
+values SVCR needs to be written before the Z and P registers.  To be
+clear I don't think this is a good idea.
+
+> > The proposal is not the most lovely idea ever but given the architecture
+> > I think some degree of clunkiness would be unavoidable.
+
+> It is only unavoidable if we decide to make a bad job of it.
+
+I don't think the handling of the vector registers for KVM with SME is
+something where there is a clear good and bad job we can do - I don't
+see how we can reasonably avoid at some point needing to translate
+vector lengths or to/from FPSIMD format (in the case of a system with
+SME but not SVE) which is just inherently a sharp edge.  It's just a
+question of when and how we do that.
+
+--g1jHqhZvHhgVxiRs
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXonMYACgkQJNaLcl1U
-h9B/+Qf/X/CYJWoG3QUjQ5cmho9TBU5+IqB0WCYPIzgJVWLlUrRY08PS7uM0PF8N
-vNaNHLP8Z+zIOThBVW9/pBaXMN9m0jlecqbQAKL0lvtlpFMuzJP4zedWghG9yO+D
-rdoghtMVlnOqhPffn3r6+m4XIpXPZ9LCG6qXErTRuqPq+sC43suO71htli7syZH1
-TaiV35xQc16sCRmFfGtF9raNEIBNTti+SNYjaglAeQ/XvWIiLIGKKaOLtLyDEUIL
-fmCY6Ky815C65RMnc6KwNTnVhv7wfQhpFBRmN2oswlJZbPOocYoNo1vGr1yKi+z7
-zHvnBZOnpV5QqRJUCGzLlPE0DIB4hQ==
-=MdZw
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXo69YACgkQJNaLcl1U
+h9D0xAf8CC4owu06ic4id2BQ4lmWheCdTsOUUHb6p0KGQyInu0+qSwz9w44RCXVh
+GBqbisSAo9UlcgNM2SZ2QGFqovvzID3tznVN8TWPquZGWmqAnKTIi2WkRcTEXEha
+lBC7YzQGWRCt/dpqqQToWDidHktxkzDfE6p+DxUchLPWFkO1mqCcvQfishmqdLgN
+MDPXWLC7w4ZigAyxsqwqY4Le8Ec76B8v0WKhGvpA4SwRdKpk4K4Ij3gN4vGvZqrU
+UnpgqyRnEu/jkAJB5ZW4Y7o+bjuLG9MoZFFRvOEgsZmRU0++zgBAMblpJYTDAKQ1
+IcxJ4RTgSQQ5G6ybth29YTp+UvPmWQ==
+=SNg1
 -----END PGP SIGNATURE-----
 
---T+O4zNYAuWrtYgTu--
+--g1jHqhZvHhgVxiRs--
