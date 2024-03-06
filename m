@@ -1,175 +1,293 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2077.outbound.protection.outlook.com [40.107.220.77])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3D4A50
-	for <kvmarm@lists.linux.dev>; Wed,  6 Mar 2024 01:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62261BDCD
+	for <kvmarm@lists.linux.dev>; Wed,  6 Mar 2024 05:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.100
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709689604; cv=fail; b=KyU7PX4U0iUhs9ysAtWsufkEW0MTq3F/OzbMZ1afWxC+92+2Q3HVkivp25rs0VD8+1Oo1GdHdDiwqOsutfE/YrRGNx7/urV7cVncLkK+WbXJG63NwMJVUY6M+ma7zxVohos0/YFsR2CtYNw4vYuHDtcinHTMzai5PqcI1QUatL0=
+	t=1709703083; cv=fail; b=A15bGBDszlkfuh+Oi1HzjZuPC/IdAkSL1SBotq8nMcrR7/oqKWF24WtAtOvdmuHhr+IYBF9Ay30LMdeTe8DdB1DZ6Kh7bHa6Z4avwPo8bMTvgxbHj5a5dz3ha1qbj7tj9a7BVxe3EjN2vg11/GxLThK48xdZ6jQsyy8QUSFNB28=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709689604; c=relaxed/simple;
-	bh=ZNR1L/zKPnC8uJW112JW0NEwNsWFjwnGnqemJTdDMNQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ZyjXc/GoqVw64XAvlD5cXuvewnpNSCr4KsVYRV9nOvDyC8iV8/dcqEJPbShtA3Vmc19lCDNkd33VgUVQ0c2bJ04h5FDMS657mWjMinboIHA9XjUqVUxvBlEMqBPk+ayGedlnFrKoJypgupKdiswVqnDnJwJcksS4kqyw0hqR+Kg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=UkFxtyTJ; arc=fail smtp.client-ip=40.107.220.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1709703083; c=relaxed/simple;
+	bh=15ihCUMFyCFT+Q7/z8oQtBWCtN2GtMKp5V/oPbUKsbQ=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=lj6Lz/4CrFx9TqCKSn5NK3DylO8gpKtPPRcQdyy7kDlGOShe0PTt4D1/ij+kgLISLJPhCKbuKh3CRQ4xqjhEeUjzrLADEPLJ0WzFXK5rXZ/v+MYv8JKxU3ecqXWlFK94VYuKXGpPVciw4ZWFU15w6uSyu/vMDiMLPcxbGqLPBTQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=tdkp9yP5; arc=fail smtp.client-ip=40.107.236.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="UkFxtyTJ"
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="tdkp9yP5"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IX19jhrDG813jqElzG5Eh2rEVSy/F4euTcD9Z83sdqfSMeHlYXPGt9ZWonEv3OA7mk3sgj151XvFwKcnswBZgtURctx1OegCWkEFlNGdKG+S45LzkMcPIOeeHLeiOXLSoHdobxBp+8Qh9GxS4ChR9x02Oj64TtORIPSp3imAIWc9KsL9IBODPh3ibbD5Mwp6q1inTO8JisIoDFUyDcBt0OZ3N0NqedP3olglPNS7pu5ICi4ZIYZdpuhde3GkqGTfZPkLbvjVkb3aQSfBgCxooHDAFIKl26AH2d9GEsbq2bujHCdHKOwpoC5+LAjUg7da32ie5rRDZjmrqhjeJAz3qQ==
+ b=Zgg3BKHsY1EWvLKiPSE9k1HPJB39nRZoLFHJpDCt/U62qG/kJmHqq5PCkTmEBAdgYAv7fqv0m/0yq7DxCJnDSxfnb6FWZE75fe+AxGJpw8s4AM3/PVvgIuIm2/05MZqDd+C7odRq1lZ1xIQw9XYDYhJmFggXsst2YXm82L65JL/QRRkaBcwMijUEIU/EY8D7/gX1ep/q24jPw4Edh3m8Yscz8GHcTivMv5uB1wkb0Vmp+XLoc07md2Cqk1rFAU5hlm3lqoHk2m7eKTsUiiYSOicwTVWun1itAabyOrt2Wd1H5UvhsGZNdhA6DfqLpYAc5SS3wmTiL7nkTzcLLxWBwA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZNR1L/zKPnC8uJW112JW0NEwNsWFjwnGnqemJTdDMNQ=;
- b=XZNaS2QxuDBRVH97+Aujizk2uL5BoJkUc9CxYgk9Rqy/RuMVrWj8oqonlkWgb79R28O6sSOIvX2CmDMMPUFsux58iKCIl9a5ZU0W62EDpLgT0tNYxmuy5ncnct3rcYpD+/7y6DdQfnJp2pLYZShslxhh+zFO747RZj0gNp/Np2iJqNs13vQ85aPpEBZH2cBboaq/c+80Phey+MJMbtLfi+4qGTSMsivHf/5EsXhZfqnbJX1bvQzq74UitLy8+BoyCoshaGjVSMv4IsGFUm0p4RkCU1ZcRlAfGrEPJirXxwUkiy6/IzMvcQll0JxzbZ2IXfs3ar2/iGYFGratsGVkZw==
+ bh=OSsErPnPH5VnY3x+qIrHYfUqffNXqeBD9V4XaZqTjuk=;
+ b=oMwH7EYFC+YvjIAUOteoBZVmDPhramH54EeF+BZuAomYCTL5uRoxonku2/AzKBc7M34ftkn5nrm8xL06wAkHvFUJcG0Cn4tuZPcyHJk4pb88Vhs/Ae7tYjfycgqNLtHWntrPy8aoyM/JekUgvBqgs0BZUgjGnJsFxQkJSkKWq6L8wwwz7a8xPpHEfVwiOBkMdgzBuxJG4LOx+3989RPisu4GdDVpO+zQW8XYOzpF9hCnIne6k9E/m5KYPC/xaUQvXzaAmvoYeXmiZ+82Z6+6ad1LBXXF9Cg78cyAPIg9xiQTjY86ZyKq46J3hgrVCYd9ziHBNQonp+WzK8aGyusksQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZNR1L/zKPnC8uJW112JW0NEwNsWFjwnGnqemJTdDMNQ=;
- b=UkFxtyTJ0JbsVEqusj68aaUuNjNr5C5xuWK7oobyaHvL+eKn2WNc91oYpf7GK0S9XstQfWxuXlew4+XwgmYS3hRUuLNDQivEl2+Kdwm0kq89YFZK9x70TMvk43muxz54nbOJu6q3LNTOEToQNBYL+INmHg5/kxKp6gNJNmLdELPMpUvpU8HpFx8M54XXmvcqwHlTvsbuA1tG83jTtmWkH68hk5miKCncKPoOaW2xYU5lPhRZuKHLdSo5KgJBd2oEeBIllzIKW+28jAGiAGMf//ebGJY62ksxtiQeqOwHeoRVto9DZrIuu9kOOD2m/33Rtbkz6MGEHXWQaKxGowp9EA==
-Received: from SA1PR12MB7199.namprd12.prod.outlook.com (2603:10b6:806:2bc::21)
- by SA1PR12MB8742.namprd12.prod.outlook.com (2603:10b6:806:373::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.38; Wed, 6 Mar
- 2024 01:46:39 +0000
-Received: from SA1PR12MB7199.namprd12.prod.outlook.com
- ([fe80::284c:211f:16dc:f7b2]) by SA1PR12MB7199.namprd12.prod.outlook.com
- ([fe80::284c:211f:16dc:f7b2%5]) with mapi id 15.20.7316.032; Wed, 6 Mar 2024
- 01:46:38 +0000
-From: Ankit Agrawal <ankita@nvidia.com>
-To: Alex Williamson <alex.williamson@redhat.com>, Oliver Upton
-	<oliver.upton@linux.dev>
-CC: Jason Gunthorpe <jgg@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
-	"shameerali.kolothum.thodi@huawei.com"
-	<shameerali.kolothum.thodi@huawei.com>, "kevin.tian@intel.com"
-	<kevin.tian@intel.com>, Aniket Agashe <aniketa@nvidia.com>, Neo Jia
-	<cjia@nvidia.com>, Kirti Wankhede <kwankhede@nvidia.com>, "Tarun Gupta
- (SW-GPU)" <targupta@nvidia.com>, Vikram Sethi <vsethi@nvidia.com>, Andy
- Currid <acurrid@nvidia.com>, Alistair Popple <apopple@nvidia.com>, John
- Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>, Rahul
- Rameshbabu <rrameshbabu@nvidia.com>, Zhi Wang <zhiw@nvidia.com>, "Anuj
- Aggarwal (SW-GPU)" <anuaggarwal@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>
-Subject: Re: [PATCH v2 1/1] vfio/nvgrace-gpu: Convey kvm to map device memory
- region as noncached
-Thread-Topic: [PATCH v2 1/1] vfio/nvgrace-gpu: Convey kvm to map device memory
- region as noncached
-Thread-Index: AQHaa0cN2WI85WCFtk20cXCANmaSKbEpzsIAgAApxtc=
-Date: Wed, 6 Mar 2024 01:46:38 +0000
-Message-ID:
- <SA1PR12MB71996264714B5EBE01ED7646B0212@SA1PR12MB7199.namprd12.prod.outlook.com>
-References: <20240229193934.2417-1-ankita@nvidia.com>
- <20240305161256.09bda6c4.alex.williamson@redhat.com>
-In-Reply-To: <20240305161256.09bda6c4.alex.williamson@redhat.com>
-Accept-Language: en-US
+ bh=OSsErPnPH5VnY3x+qIrHYfUqffNXqeBD9V4XaZqTjuk=;
+ b=tdkp9yP5a6saQf7ofDcq5G/nZnshwd6IwTRnrTEa1iEpUf5AdZwyK3jqK1lZX4Y4OgdLf9phY55qlqd2MeTe45bNHk9hdaQqNb2RTYhZsWOOWoz7zXUjqnMMXkvbIeM+iGLWfDNJEhiblCrQHoJEWSAH92OLqhXq4dkFO3k0lng=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
+ PH0PR01MB6119.prod.exchangelabs.com (2603:10b6:510:d::10) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7339.38; Wed, 6 Mar 2024 05:31:17 +0000
+Received: from SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::d3dd:ece:637f:bde9]) by SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::d3dd:ece:637f:bde9%3]) with mapi id 15.20.7339.035; Wed, 6 Mar 2024
+ 05:31:16 +0000
+Message-ID: <8e2ee8dd-4412-4133-8b08-75d64ab79649@os.amperecomputing.com>
+Date: Wed, 6 Mar 2024 11:01:09 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH] kvm: nv: Optimize the unmapping of shadow S2-MMU
+ tables.
 Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR12MB7199:EE_|SA1PR12MB8742:EE_
-x-ms-office365-filtering-correlation-id: 8bb309ad-dafb-4a42-afd7-08dc3d7f43ca
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- cHOvBpTvBBMY3XoyX/AFqFVFey1fiM8KPanZwz/dkIB8rojJexUPbYH/M4NhTt7Oc+FFiWFaSDccTLbxhQeyUIXs2ZssX+gTzfGo+m/z/GMeeTqs9RQIEMYFUen9Od0yspyDbwkgUxutlc6pDoy8TtDp4s7EGddPRldXV6dY0yCehreawyWeXm/iiB8T7f+1WYg36TD3dri6bBXbEdUMB9lNYCe/7HWniKx35G6Eb2IUEpbXF7zDE9Lr+O+HOBQ6Yjbl1oT+B0/gmU47iHu6mXFTV5EpbQu7Bt/S+a7YLnJY6aZFWktiWWabZf/H0nW49QWnKPtZJbFZWMihV4s1Ym42v5H54GlZHuv4U86wdUibLeHTEO3F0ER0eur9sLJiHZlYsed1K6i5xmGU0iNrR3KKWciq+rsWkLmwtedrJ6137QW3GezZOCbp0ZWvn4UemsTvuSND7J+3z20mQKD1hgiccRkzHG6GTaFKP+1xF6r8ctTSMdCsfo6/3NoyUKGqWqIPE/pN1CewPv7L7MSSXRbxexoehY57Yridlg107KkkqnyrYh52hASb934nLdzfoXXkC7Wq3wPNLFKD03xbhTG5wws1cht1tBPqlE+8owCF7USayDaA+fwoQULO8QNmVTUUnrxV8fjUb2kNHIuCu2CG9SyoY5VIOCHR0GZV6znocYtVauTscmK/c9AcBmNhSCm5uGoR50MtVY/zcqzU7yPkSkhuzx+xxIONRudm3ag=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR12MB7199.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?u6Fp0ix2nstzsDRFoqQZdi6Hy4zEGcbI5Ep3uIn+PX1RQpTssRR/W6Mbed?=
- =?iso-8859-1?Q?L+5tA0yCHd2B2eKhVuM0G9Yw0lGQCm4KzYQhRMOAyQLkE7JuydKuvkZUM6?=
- =?iso-8859-1?Q?OzC/njwMJrxM4wq1n62RnlSi1Sb/7yc3H9n2TvCqS3ta6H7LgHZAlL8DcD?=
- =?iso-8859-1?Q?h2LG5lnL5BHORzXEDw8n9eEZEGYkUUXUWNFY2BvQmmQKDBweE0dvcYMZeV?=
- =?iso-8859-1?Q?iawdQxzb5AtP3k2ajTBW7XhHegzOr14lUCA9JHvpn4MhEV+mYzudB4V2Y4?=
- =?iso-8859-1?Q?YFoBb3IftDmge61QJ590QN45vRzoZkGyFNLo3b3SG5m6nexT2eMSSwPY6m?=
- =?iso-8859-1?Q?sjbQ7jAMI7mjDLXQ+L5Z3Y+vt3lvHaxbY0Oe0aB/WwfJEZZYqePJEc6s0Q?=
- =?iso-8859-1?Q?QaZ7LIkap8eDCdDObC7x3+RqC25LElxJGdqrLxUIwsOWr3gdmxIpCyzG0q?=
- =?iso-8859-1?Q?3LWe5RCV9D0h2SisvAMMXvObklyhQwny0Qa/t3r9cgnY+QyEitsti4GnDX?=
- =?iso-8859-1?Q?8gsBZjmFsNO2yBQT8hzF6uqVhATKjQQgmFXmd8httdaegPVGwg7vYJeHJa?=
- =?iso-8859-1?Q?WT2klImcmVli9AI/UfMeGXJ+vpRujOspeDFzyKFLZO04nvkFRZ633tE0yy?=
- =?iso-8859-1?Q?762RoW40yENC3AlVYqNslNi1voBdoRhR7CSuIACiWlONKh72SU+rBRf81V?=
- =?iso-8859-1?Q?p2DGSq91vPwrGbD10tw5jluCRrDBu4y03m4G7iRWzoiTdo+P4dGaF5YBjw?=
- =?iso-8859-1?Q?Dr+q587jX8eKsNDJEu/FDmFt5ADOn0QilbNB5kRwIOsC4LOe7VVt2oxj9c?=
- =?iso-8859-1?Q?Bwha3bXiOyVwc1Fo50HPuv7ODtCChfwNdRr1qvm9lXgV7eJKxacYgWfBxa?=
- =?iso-8859-1?Q?Xh39X5XwkHF0xfW75Gtl8p4Pt0dfAx1LvaWDBhNIHOs/2Rs0YfBbWvgj7C?=
- =?iso-8859-1?Q?IA/gV2S+iRHH3+jdcg3lqcazx7g1BridpKTwMIeQribkNAZOmh5r4A3YZn?=
- =?iso-8859-1?Q?ADRPiPnZML0Fq7h+XlAiU/3GJkWbnEbweRr2GNx7AP7TPuDk8W5T2qmdqf?=
- =?iso-8859-1?Q?R/A5Y72hnVj4i+LYXKh7wub3UH8DI0XVeeoylvmfQN1Tyr4ETiSMh3KTA7?=
- =?iso-8859-1?Q?ZKfXcb7FwtI/z1MIuBhC1s83siuKjk9Y++zpnbs2/4Nm/NVNYFTmeyCm1T?=
- =?iso-8859-1?Q?yMUTc5HoEu4I5FIL3OeAvNt7MXNEIxG/RUgi13nw92ocOsvaxtO+3+7RLO?=
- =?iso-8859-1?Q?hpYSd9w6AZvZuI4GOxCss+/tXXM/jwfD9PzCjkd1xpAcAKt5eyvu1sNnll?=
- =?iso-8859-1?Q?qkLTYFFC3SVlWdMKlYkCnfVzVLsKwNdbxF1kvsoVDRpCfzVtlL5otZuhww?=
- =?iso-8859-1?Q?LJ4oDqEgoo5EQL8CcMPZhqNJ9lVhIeDdw3o3UT2S/cq9xjZqwfpRlt+0/M?=
- =?iso-8859-1?Q?EctlSFAnO4DRV7oYxROr51sc5rK1S1qMH7LG/EWQKS3+6760j2sC/nGapX?=
- =?iso-8859-1?Q?qzm4c+883b55KeBRzs3F6lnMQbKWU7ZTcVBmQskKHNXEX9p3tglN2EofhU?=
- =?iso-8859-1?Q?4h+YiMbCN+rsPf0nnU9l319rMikWC/OEqIMdQxaAd7qrYM4zD6sPaX74RR?=
- =?iso-8859-1?Q?FEcqLkmh4vuWQ=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ maz@kernel.org, darren@os.amperecomputing.com,
+ d.scott.phillips@amperecomputing.com, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
+ <Zebb9CyihqC4JqnK@linux.dev>
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <Zebb9CyihqC4JqnK@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH2PR07CA0034.namprd07.prod.outlook.com
+ (2603:10b6:610:20::47) To SJ2PR01MB8101.prod.exchangelabs.com
+ (2603:10b6:a03:4f6::10)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|PH0PR01MB6119:EE_
+X-MS-Office365-Filtering-Correlation-Id: f531f617-31cf-4534-1abd-08dc3d9ea554
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	GA8nJdZX8vSurkpzIGVWE9mcn3ZfmXbXmF26jsOMH7jtXvcOCeM4/kx7W99Y8vcsHNuhrEMxenbc9x91MyJxEG9zMvhxXhiTCQnfHLaeqQs4H59Mj6QDyWHlChkOnOntX1gEVrhlP76jIRuZO28RVuNLkW3jqUvoOywD0BtsH+8VK+bzw87mcmy0rTCn8kjd7ZVUqG7pMBQwfXKmb3KlHfhIv09IHDrOwOaagSHfg+5ScKRwp+oPwBa8gA6HQVTx/Ukeh7+DhnwuPvYq7pgA6CU9nqhq66eEkmgOufo5NNZoQmmB5Fjqc7pKZ2GcN6JS74BGBOyT3vAyksVdIugZTIRSB+SJF4PZZ8kltHzUI7O+qm+y2HePhk6z+xx7vq2qzyGrsBJkpMZM964+9xUjbzRisg6ImeCqpxzVonD4bKjbM2dt9t0euLJ/4eWggIF7yZA4IrrAssnTITGHDwOduTAwgiLFwrMm6nweJpAFBGiBpCRV3wKYCs9FiNeG/SBs2JbUCRkgZlz9pvmhwbs2ecPvTMWH+GbMdhaohucCOng6c0wiv0zsQTbUosTcKM3VZ6WmBBF0+WVpAjdZYAj1bXqQn71+E89PUMKckuFuW3N8zWQuH7Mevx4dfGHcSk8Mg8rD4kDuFGaiV0IXtHQrhFl2OEnmZkj5Th517X1uXMY=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(376005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?YUtRaUtNM2NtbGo2ZTlsN0VGcmE0cWNpa0xPR3NqTXVwN21mNVlTU1c3NzJi?=
+ =?utf-8?B?T2pLKzFpdUlMb2h0SzRhVnRveUxpVTZmaUxpc0VYb2gxZFI4cUVqS0Z6TGJ4?=
+ =?utf-8?B?NHJ2Q0o4WGJETFNyVVhkU1VEMGljM01YcHdWZjhhWmRaVEw5aXowekpaK3Ni?=
+ =?utf-8?B?TnZjQm0yaWVPalhuNzZUTnNCRG90ajlxaldtWVFSY3B4SmZxOHlTOXRkZEV6?=
+ =?utf-8?B?dUkxblZhNWVUeDRTYWYraVhWczNWVWVSN3hRMTVYWlAzWHlrb3FhM1dzTEFL?=
+ =?utf-8?B?emZtd0RnRTFKVk1yTHB2SFMwdCtkY0pEL3hMODBEQ1BLbzNWZmVla3MrV3l4?=
+ =?utf-8?B?cmtvcm9KY3Z6cFFCeDlNNSt3aGJDV1pySnRXTDdUS3JwTHRhcGZ5ckgwSVJm?=
+ =?utf-8?B?RTdCSDhEZVovcnJuekw5ZC9tNDhvYzVrb0xRWFpQY0NWS0hwWE9vc3pEM2JJ?=
+ =?utf-8?B?MjJ5TTdQRGUwWWdyN0NXcE5yek1tMjR1eXJzSlVvcS9VelF3OGlIWFY4dlpS?=
+ =?utf-8?B?RVhYRTJkSE5jWWp6WUhuKzZOZ2xTZjZwcXNlUGc0QmdwQkFBYTJYUUUrREpo?=
+ =?utf-8?B?OFJ5NGlLeVdzUlV2eTg3QmdwOWQ5cFM4L3VtR3NjaEhMdE5JQitLSXN6dzRN?=
+ =?utf-8?B?QzM3T2hqNjVHRURKdVNyejJjUG10Wi80elhVM3ZKWmNDeEVRMmZ1SXlSa1o1?=
+ =?utf-8?B?RVJ5MDlhOHo3cDFEWXYvM2tRTHpYYU5QaVc2clZ5MmV4TTRyaG0wSVNxZUFP?=
+ =?utf-8?B?aFk1b2NsSHc4bHFXeE9hTGNWTU51QVRFNkZtc2ZFb0RIMGRsRy9WcEFBV09o?=
+ =?utf-8?B?eUFlQlc3S3VBVW5saVF5WUhsZmtzQkhhVlgxeG52NkRNMkZVbzNvNEE1Nysw?=
+ =?utf-8?B?M2lTT1RJbzFzOWdHWEhETVpjZnFkaHIzVEFyazZBVndTM2VGc2lrU295ckZP?=
+ =?utf-8?B?UGFiU1o0ak1UcU1KdEgyQkMrcHBrcXNtcEQxNUJDWVFzZlBpUGdxS3RGYjdI?=
+ =?utf-8?B?NHN5MHFTVDlXNGlSYkNlWmtMYTJrRjEyQjRSVHRkL0V1enRNM21aT3FsQy9Z?=
+ =?utf-8?B?Z0J6dDVXb2F6Qis1aVZqS1h5RTRIUW1Tcy81bENCZS8yUzBIR3doRmQzaDgy?=
+ =?utf-8?B?MkdQRUYwTFVlaXMzemFRemYxbDBNZWxpQ28xZ2swdWo2SXdIS1ZwOHVXZlV4?=
+ =?utf-8?B?aFdUWWgvMlp6UlFwcStHZytBUEpNb2hneW91UWJHTlRhWi9DUEkwRWVsbzlr?=
+ =?utf-8?B?Y1gxYU11aWliV244bThUeUd1WGE5YVhZanBZSHVMOWhuYzJRZlk1VWxwekNj?=
+ =?utf-8?B?UE9UM2FIN0VhZUR5MTdtbkI5dGZnVlJ2aU1IaTZOUksyVWNEZ0g3clpZd2Rr?=
+ =?utf-8?B?YmY4aE5vM3JqVFRoL3p2UUtmZTFiT0EyN250VkhSZ3N2N0FVd3lSTlJxZGhM?=
+ =?utf-8?B?TmNUcEpQZ20wcG5XdDdydW1rQmVpYkVxanowak54RXJsTElTUXRhc21iT1V6?=
+ =?utf-8?B?cjJ0RVhTQ25aOWNpUkN1ZkJWYlFyRzRNWlFlamsxaExoOElOazJLbDFndTdQ?=
+ =?utf-8?B?d2c5QkM5eDlWa2VUajY3eXJCa1lqT2Y5UUhoOHhMaEdVd0s2RTVxaDNlRWNL?=
+ =?utf-8?B?eW1SVyt0N3FDVDZBVWRsS2V0M2NVa1Nlbmxha2tLbDJBS01mbzlzT1NlVWxr?=
+ =?utf-8?B?eVFudWRkazl6T3Z3Zms0dGh6SzFDRUhiYnVqUG5hNTNFTHNQQ0tSSTJKZldP?=
+ =?utf-8?B?Y3NNMDBjaEpZY3JrTkd5SmNZVzk2bFJtZWV5aWUzN281b2tGK3RPMnNqRFJL?=
+ =?utf-8?B?ZEwzTmc3NTA3SlpYOUEvempKWlpHdGlTWWEvUm15djBTOWhKRFdwWnRFWjlC?=
+ =?utf-8?B?MzRRLy9UaDRreXdTT3BxQU5CYjNkNXZGb3VjQlFNZlQ4blcyVTh5dTFxTkRW?=
+ =?utf-8?B?WHRHNVlFUzNsNXdrYVl3SFQxTjZwSTJLcU1iZGdnSm1UMnlzTDZPeEZ5WUpm?=
+ =?utf-8?B?c0ZhbHJTYWN3WHJzNXNHaGcxN1NxOXVBMW9KTHZoNXpjbC9FeWtpU2RrMWZW?=
+ =?utf-8?B?T0d5emJaMjNpamRteVNldHYxcWRwUjdsV2ExOHV2d0o3d2Y1allOTjZOdjlr?=
+ =?utf-8?B?Z09xV2J3OHFxMGFwUkJQMEhVMGxPZE1UdHZEZERlcG5XTFE0OUNJQklJakw5?=
+ =?utf-8?Q?qULJK2Coyn3gWARCDF9O3AA=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f531f617-31cf-4534-1abd-08dc3d9ea554
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR12MB7199.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8bb309ad-dafb-4a42-afd7-08dc3d7f43ca
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Mar 2024 01:46:38.6670
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2024 05:31:16.8784
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: e5AFnjRgRyPFFQlqiLd02dCnbOWtdY+/Fnf4OB6D8+hMPikvxqwLUHyyFhkcJGX1Yl5DIYaYyNDBIauzauMKUA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8742
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: v3VKAtUPAYu4SOZk6ki6D3fDVk4F6MJuf0lAMep6V4YikZ4/MmZUqQx98UUMthZsdt9qe05It6v4BLxNMVtbte18LUy5U7Dv5USY1QsTvo1D+HRCzHvq/YGsfDdUq3R7
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR01MB6119
 
->> To use VM_ALLOW_ANY_UNCACHED flag, the platform must guarantee that=0A=
->> no action taken on the MMIO mapping can trigger an uncontained=0A=
->> failure. The Grace Hopper satisfies this requirement. So set=0A=
->> the VM_ALLOW_ANY_UNCACHED flag in the VMA.=0A=
->>=0A=
->> Applied over next-20240227.=0A=
->> base-commit: 22ba90670a51=0A=
->>=0A=
->> Link: https://lore.kernel.org/all/20240220115055.23546-4-ankita@nvidia.c=
-om/=A0[1]=0A=
->> Link: https://www.nvidia.com/en-in/technologies/multi-instance-gpu/=A0[2=
-]=0A=
->> Link: https://developer.arm.com/documentation/ddi0487/latest/=A0section =
-D8.5.5 [3]=0A=
->> Link: https://lore.kernel.org/all/20240224150546.368-1-ankita@nvidia.com=
-/=A0[4]=0A=
->>=0A=
->> Cc: Alex Williamson <alex.williamson@redhat.com>=0A=
->> Cc: Kevin Tian <kevin.tian@intel.com>=0A=
->> Cc: Jason Gunthorpe <jgg@nvidia.com>=0A=
->> Cc: Vikram Sethi <vsethi@nvidia.com>=0A=
->> Cc: Zhi Wang <zhiw@nvidia.com>=0A=
->> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>=0A=
->> ---=0A=
->>=A0 drivers/vfio/pci/nvgrace-gpu/main.c | 11 ++++++++++-=0A=
->>=A0 1 file changed, 10 insertions(+), 1 deletion(-)=0A=
->=0A=
-> Applied to vfio next branch for v6.9.=0A=
->=0A=
-> Oliver, FYI I did merge the branch you provided in [1] for this, thanks=
-=0A=
-> for the foresight in providing that.=0A=
->=0A=
-> Alex=0A=
->=0A=
-> [1]https://lore.kernel.org/all/170899100569.1405597.5047894183843333522.b=
-4-ty@linux.dev/=0A=
-=0A=
-Many thanks Alex, appreciate your help with this!=
+
+
+On 05-03-2024 02:16 pm, Oliver Upton wrote:
+> -cc old kvmarm list
+> +cc new kvmarm list, reviewers
+> 
+> Please run scripts/get_maintainer.pl next time around so we get the
+> right people looking at a patch.
+> 
+
+Of course I know this script -:)
+I didn't cc since I felt to avoid unnecessary overloading someone's 
+inbox. I don't think anyone(even ARM) is interested in this feature 
+other than Marc and me/Ampere. Otherwise this would have merged upstream 
+by now.
+BTW, NV feature development started way back in 2016/17.
+
+> On Mon, Mar 04, 2024 at 09:46:06PM -0800, Ganapatrao Kulkarni wrote:
+>> @@ -216,6 +223,13 @@ struct kvm_s2_mmu {
+>>   	 * >0: Somebody is actively using this.
+>>   	 */
+>>   	atomic_t refcnt;
+>> +
+>> +	/*
+>> +	 * For a Canonical IPA to Shadow IPA mapping.
+>> +	 */
+>> +	struct rb_root nested_mapipa_root;
+> 
+> There isn't any benefit to tracking the canonical IPA -> shadow IPA(s)
+> mapping on a per-S2 basis, as there already exists a one-to-many problem
+> (more below). Maintaining a per-VM data structure (since this is keyed
+> by canonical IPA) makes a bit more sense.
+> 
+>> +	rwlock_t mmu_lock;
+>> +
+> 
+> Err, is there any reason the existing mmu_lock is insufficient here?
+> Surely taking a new reference on a canonical IPA for a shadow S2 must be
+> done behind the MMU lock for it to be safe against MMU notifiers...
+> 
+> Also, Reusing the exact same name for it is sure to produce some lock
+> imbalance funnies.
+> 
+>>   };
+>>   
+>>   static inline bool kvm_s2_mmu_valid(struct kvm_s2_mmu *mmu)
+>> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+>> index da7ebd2f6e24..c31a59a1fdc6 100644
+>> --- a/arch/arm64/include/asm/kvm_nested.h
+>> +++ b/arch/arm64/include/asm/kvm_nested.h
+>> @@ -65,6 +65,9 @@ extern void kvm_init_nested(struct kvm *kvm);
+>>   extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
+>>   extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
+>>   extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu);
+>> +extern void add_shadow_ipa_map_node(
+>> +		struct kvm_s2_mmu *mmu,
+>> +		phys_addr_t ipa, phys_addr_t shadow_ipa, long size);
+> 
+> style nitpick: no newline between the open bracket and first parameter.
+> Wrap as needed at 80 (or a bit more) columns.
+> 
+>> +/*
+>> + * Create a node and add to lookup table, when a page is mapped to
+>> + * Canonical IPA and also mapped to Shadow IPA.
+>> + */
+>> +void add_shadow_ipa_map_node(struct kvm_s2_mmu *mmu,
+>> +			phys_addr_t ipa,
+>> +			phys_addr_t shadow_ipa, long size)
+>> +{
+>> +	struct rb_root *ipa_root = &(mmu->nested_mapipa_root);
+>> +	struct rb_node **node = &(ipa_root->rb_node), *parent = NULL;
+>> +	struct mapipa_node *new;
+>> +
+>> +	new = kzalloc(sizeof(struct mapipa_node), GFP_KERNEL);
+>> +	if (!new)
+>> +		return;
+> 
+> Should be GFP_KERNEL_ACCOUNT, you want to charge this to the user.
+> 
+>> +
+>> +	new->shadow_ipa = shadow_ipa;
+>> +	new->ipa = ipa;
+>> +	new->size = size;
+> 
+> What about aliasing? You could have multiple shadow IPAs that point to
+> the same canonical IPA, even within a single MMU.
+> 
+>> +	write_lock(&mmu->mmu_lock);
+>> +
+>> +	while (*node) {
+>> +		struct mapipa_node *tmp;
+>> +
+>> +		tmp = container_of(*node, struct mapipa_node, node);
+>> +		parent = *node;
+>> +		if (new->ipa < tmp->ipa) {
+>> +			node = &(*node)->rb_left;
+>> +		} else if (new->ipa > tmp->ipa) {
+>> +			node = &(*node)->rb_right;
+>> +		} else {
+>> +			write_unlock(&mmu->mmu_lock);
+>> +			kfree(new);
+>> +			return;
+>> +		}
+>> +	}
+>> +
+>> +	rb_link_node(&new->node, parent, node);
+>> +	rb_insert_color(&new->node, ipa_root);
+>> +	write_unlock(&mmu->mmu_lock);
+> 
+> Meh, one of the annoying things with rbtree is you have to build your
+> own search functions...
+> 
+> It would appear that the rbtree intends to express intervals (i.e. GPA +
+> size), but the search implementation treats GPA as an index. So I don't
+> think this works as intended.
+> 
+> Have you considered other abstract data types (e.g. xarray, maple tree)
+> and how they might apply here?
+> 
+
+Thanks for suggesting the maple tree based lookup, I will try it in next 
+version.
+
+>> +bool get_shadow_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa, phys_addr_t *shadow_ipa, long *size)
+>> +{
+>> +	struct rb_node *node;
+>> +	struct mapipa_node *tmp = NULL;
+>> +
+>> +	read_lock(&mmu->mmu_lock);
+>> +	node = mmu->nested_mapipa_root.rb_node;
+>> +
+>> +	while (node) {
+>> +		tmp = container_of(node, struct mapipa_node, node);
+>> +
+>> +		if (tmp->ipa == ipa)
+>> +			break;
+>> +		else if (ipa > tmp->ipa)
+>> +			node = node->rb_right;
+>> +		else
+>> +			node = node->rb_left;
+>> +	}
+>> +
+>> +	read_unlock(&mmu->mmu_lock);
+>> +
+>> +	if (tmp && tmp->ipa == ipa) {
+>> +		*shadow_ipa = tmp->shadow_ipa;
+>> +		*size = tmp->size;
+>> +		write_lock(&mmu->mmu_lock);
+>> +		rb_erase(&tmp->node, &mmu->nested_mapipa_root);
+>> +		write_unlock(&mmu->mmu_lock);
+>> +		kfree(tmp);
+>> +		return true;
+>> +	}
+> 
+> Implicitly evicting the entry isn't going to work if we want to use it
+> for updates to a stage-2 that do not evict the mapping, like write
+> protection or access flag updates.
+> 
+
+Thanks,
+Ganapat
