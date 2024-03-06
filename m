@@ -1,55 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD6E60DDC;
-	Wed,  6 Mar 2024 09:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F22FE5E3A5
+	for <kvmarm@lists.linux.dev>; Wed,  6 Mar 2024 09:53:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709718221; cv=none; b=uh81pJEZdk75Rn23CZazporG/AXQ/QXw5DvIDwTCiUfFKO1g3UMolPt2rngneW/04PJ2higR8EMwMn436gDEKMCCHse1WnC3I8NwDHNYdJ6DtRYKA4/WdpF0mRb0nXYdeyODvIfwAMfWvjEup9wzA7VVrvC+rzNNeMotfMxSvTU=
+	t=1709718781; cv=none; b=rEAi6WwC0rGp67gb2BpKGinJavezVrfiVygj9RR1aV2yxRdwgcKQ1XDFwAYymITY69TklEcBkoKBup4QsaU4U1o1c5tHSUnFyLpDv7sre+F0PdjYPz3vq/JdHDhlCnBVx9ZPpCnNYsXzI9N7hfSjL90Tc4CCBpVoR0kn0MEO8/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709718221; c=relaxed/simple;
-	bh=VlacLIJetZbSc37w9oCgwWXUQ4SkJoVFKp/+32psVko=;
+	s=arc-20240116; t=1709718781; c=relaxed/simple;
+	bh=OrOJrjrHLYV66AHb3j8IyqGwyrRIfGhPZkG3rIOf5oM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UAvUc/vfH/S2TetZWw6EHCt9UVpBeFP+8xPms2nDwC2vLi1YzPMweytbcjvGy4uJ2OEbLJIhek/k35tmUs22v1p+oiKalrG/oB6/wSw/KpJc6X0fQ2ZKhEXmziFhr+Z8Ua0mL3f+FHBydTNaazYEk2dxjLWuGOpcq5jeq6grx38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PNyDIZhd; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=UFlegx51j66Mt0bOJgQo4QVGm1Zb2iaKJnGxUfDduF4i3loGRhOgycUwrfNNA5cC+rfponaAFuyl+leEpqYbglonxBCJk2dKH4IztxVjqm29JGrrRCxzj3vzBOs8I/iqpQBibkauyTtgEUEwgUq8RcJOqpL0BpXLbHo5quSrP3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TxICfwHQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PNyDIZhd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD56FC433C7;
-	Wed,  6 Mar 2024 09:43:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TxICfwHQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 776D5C433C7;
+	Wed,  6 Mar 2024 09:53:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709718220;
-	bh=VlacLIJetZbSc37w9oCgwWXUQ4SkJoVFKp/+32psVko=;
+	s=k20201202; t=1709718780;
+	bh=OrOJrjrHLYV66AHb3j8IyqGwyrRIfGhPZkG3rIOf5oM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PNyDIZhdO1Map2G6d312fQ+R4uj7Oko/SG1vXb/T+mcs7mNxUFEfjumYvZB2nbFSc
-	 OgDu5OKOhDlr3Yx4uEzDy1/3uL3ntEGBau1Gs9j6O5dZ3mUDhqq5oJy61RwaxOUlPB
-	 q/rlFlsav4ajiR52rEpi3CVXmDOFfMpmNg6ZrBVF1O2GIhfTe/mY/EVK/CGfFTFI/8
-	 C5PhcaHrax6zprup1/lXjqwgrtXle+FgxSKWUTQCjKh+XsQnoYdgsCFvhYNAFo6tKw
-	 ArMgHNAqTcoTKfusv6a/ak7ffy9Y7kzrwFUtKn1AXk1JfvrtOjzda4yRVLF8QGXTvf
-	 hj7YRdmDj2BwA==
+	b=TxICfwHQtdOoFhduYyrGNTG/1XYWx8rg4suGS5YmxUhSydeB2a+OzFyeMr/jKTRAH
+	 gFAlsQYcIaoVg8bTE9vZTGOGYNib/FrdZrDHxWBbEHDmg7pBC4kXrNnmWw8whjTT3H
+	 1AtAm1c/y/hhRNowHt3MNHRBBhDH9poxzzgau8PH+NnaY/gBPKq1BRAnVaojkNomjl
+	 4LhSEuvMnPO0QxVwPv4mzsBcpw5KoER8Kj805GftAGpee8fCNmcUN+D7Qm9pAzbDCb
+	 1P7gOzD1FM00Jg7HGdyBzsE0Ru/Av2PR/jP8Z2wjPHzvi//MqQN1RHE15KQOs0I41P
+	 T7lDnk+nj5r/Q==
 Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rhnoH-009sbl-1f;
-	Wed, 06 Mar 2024 09:43:38 +0000
-Date: Wed, 06 Mar 2024 09:43:13 +0000
-Message-ID: <87edcnr8zy.wl-maz@kernel.org>
+	id 1rhnxJ-009srb-QH;
+	Wed, 06 Mar 2024 09:52:58 +0000
+Date: Wed, 06 Mar 2024 09:52:56 +0000
+Message-ID: <87cys7r8jr.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	James Clark <james.clark@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH 5/5] KVM: arm64: Exclude FP ownership from kvm_vcpu_arch
-In-Reply-To: <6acffbef-6872-4a15-b24a-7a0ec6bbb373@sirena.org.uk>
-References: <20240302111935.129994-1-maz@kernel.org>
-	<20240302111935.129994-6-maz@kernel.org>
-	<6acffbef-6872-4a15-b24a-7a0ec6bbb373@sirena.org.uk>
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 3/3] KVM: arm64: Do not disable preemption in kvm_vcpu_pmu_restore_guest()
+In-Reply-To: <20240305184840.636212-4-oliver.upton@linux.dev>
+References: <20240305184840.636212-1-oliver.upton@linux.dev>
+	<20240305184840.636212-4-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -61,62 +56,26 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, james.clark@arm.com, anshuman.khandual@arm.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 04 Mar 2024 19:10:08 +0000,
-Mark Brown <broonie@kernel.org> wrote:
+On Tue, 05 Mar 2024 18:48:40 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> [1  <text/plain; us-ascii (quoted-printable)>]
-> On Sat, Mar 02, 2024 at 11:19:35AM +0000, Marc Zyngier wrote:
-> > In retrospect, it is fairly obvious that the FP state ownership
-> > is only meaningful for a given CPU, and that locating this
-> > information in the vcpu was just a mistake.
-> > 
-> > Move the ownership tracking into the host data structure, and
-> > rename it from fp_state to fp_owner, which is a better description
-> > (name suggested by Mark Brown).
-> 
-> The SME patch series proposes adding an additional state to this
-> enumeration which would say if the registers are stored in a format
-> suitable for exchange with userspace, that would make this state part of
-> the vCPU state.  With the addition of SME we can have two vector lengths
-> in play so the series proposes picking the larger to be the format for
-> userspace registers.
+> The caller has already disabled preemption, no need to nest further.
 
-What does this addition have anything to do with the ownership of the
-physical register file? Not a lot, it seems.
+A quick survey indicates that it doesn't seem to be the case, I'm
+afraid. access_pmu_evtyper() and access_pmcnten() both seem to be
+preemptible.
 
-Specially as there better be no state resident on the CPU when
-userspace messes up with it.
+Which probably means that these spots are doing the wrong thing and
+that we should instead turn it into a KVM_REQ_RESYNC_PMU_EL0 request.
 
-> 
-> We could store this separately to fp_state/owner but it'd still be a
-> value stored in the vCPU.
+Then the preemption can be actually dropped, and even replaced by an
+assertion.
 
-I totally disagree.
-
-> Storing in a format suitable for userspace
-> usage all the time when we've got SME would most likely result in
-> performance overhead
-
-What performance overhead? Why should we care?
-
-> if nothing else and feels more complicated than
-> rewriting the data in the relatively unusual case where userspace looks
-> at it.  Trying to convert userspace writes into the current layout would
-> have issues if the current layout uses the smaller vector length and
-> create fragility with ordering issues when loading the guest state.
-
-What ordering issues? If userspace manipulates the guest state, the
-guest isn't running. If it is, all bets are off.
-
-> 
-> The proposal is not the most lovely idea ever but given the architecture
-> I think some degree of clunkiness would be unavoidable.
-
-It is only unavoidable if we decide to make a bad job of it.
+Thanks,
 
 	M.
 
