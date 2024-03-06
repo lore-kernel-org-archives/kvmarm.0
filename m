@@ -1,75 +1,124 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5299A3A262
-	for <kvmarm@lists.linux.dev>; Wed,  6 Mar 2024 08:39:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD6E60DDC;
+	Wed,  6 Mar 2024 09:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709714393; cv=none; b=Iod7bgsgS4NmpD4bUT667CuUPlx3Nq4ffEoBcE0byGZ+nm1o0ghTCgFskcK9M4F+m/Q5TDitNGVnkw+pZQ1N6XgmvIiLIAy5zeXNuzEkwdgG0eeHRCQZCmxI54nsAZDjiM2D4bHNapNiLvM6sXwBCHBVgMVxURbt2BHD6o2fcus=
+	t=1709718221; cv=none; b=uh81pJEZdk75Rn23CZazporG/AXQ/QXw5DvIDwTCiUfFKO1g3UMolPt2rngneW/04PJ2higR8EMwMn436gDEKMCCHse1WnC3I8NwDHNYdJ6DtRYKA4/WdpF0mRb0nXYdeyODvIfwAMfWvjEup9wzA7VVrvC+rzNNeMotfMxSvTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709714393; c=relaxed/simple;
-	bh=kSiViu/PNwEQ6CeKZ88X2MM/44fvA8higRaew3HJTkE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MEuZxCjW92dplfap9dlpw7+1fWAbfFXJ9cE94xqolmq4JyIVJqtsdZ33W1FJZy9QGWnNzKKDmysUcm8jXeSty12bPqQy2ijXWwnqHj2S96Nb8xpTZcQhn9HX1Qo1DBEoz7/14rAAqMtuImMsKShgtbz2Ca0p3QOSrMey53nrW+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kM2SK1RR; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1709718221; c=relaxed/simple;
+	bh=VlacLIJetZbSc37w9oCgwWXUQ4SkJoVFKp/+32psVko=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UAvUc/vfH/S2TetZWw6EHCt9UVpBeFP+8xPms2nDwC2vLi1YzPMweytbcjvGy4uJ2OEbLJIhek/k35tmUs22v1p+oiKalrG/oB6/wSw/KpJc6X0fQ2ZKhEXmziFhr+Z8Ua0mL3f+FHBydTNaazYEk2dxjLWuGOpcq5jeq6grx38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PNyDIZhd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kM2SK1RR"
-Date: Wed, 6 Mar 2024 00:39:42 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1709714389;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=esGonkOHKLwe5cJdl4RDMJ39QA6gaSTz6ugwpE4PceU=;
-	b=kM2SK1RRAqE3BIYVmPqKxyr/Bn9blz228x8OZ9r6uiZH5LkalR/HNKJHi4g+M4GDYHgzAo
-	QrKK+ALWY8fD3ewEfvRA1dFK1BcxQ6LdPRohhEqKlttCqHKRligQYvnDZqU9lfW8K8r7Rg
-	PeWBU01QQwG5u8nxftuXEc6DG5qkrp0=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	maz@kernel.org, darren@os.amperecomputing.com,
-	d.scott.phillips@amperecomputing.com,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PNyDIZhd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD56FC433C7;
+	Wed,  6 Mar 2024 09:43:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709718220;
+	bh=VlacLIJetZbSc37w9oCgwWXUQ4SkJoVFKp/+32psVko=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PNyDIZhdO1Map2G6d312fQ+R4uj7Oko/SG1vXb/T+mcs7mNxUFEfjumYvZB2nbFSc
+	 OgDu5OKOhDlr3Yx4uEzDy1/3uL3ntEGBau1Gs9j6O5dZ3mUDhqq5oJy61RwaxOUlPB
+	 q/rlFlsav4ajiR52rEpi3CVXmDOFfMpmNg6ZrBVF1O2GIhfTe/mY/EVK/CGfFTFI/8
+	 C5PhcaHrax6zprup1/lXjqwgrtXle+FgxSKWUTQCjKh+XsQnoYdgsCFvhYNAFo6tKw
+	 ArMgHNAqTcoTKfusv6a/ak7ffy9Y7kzrwFUtKn1AXk1JfvrtOjzda4yRVLF8QGXTvf
+	 hj7YRdmDj2BwA==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rhnoH-009sbl-1f;
+	Wed, 06 Mar 2024 09:43:38 +0000
+Date: Wed, 06 Mar 2024 09:43:13 +0000
+Message-ID: <87edcnr8zy.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [RFC PATCH] kvm: nv: Optimize the unmapping of shadow S2-MMU
- tables.
-Message-ID: <ZegrzpC-GODaO1yB@linux.dev>
-References: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
- <Zebb9CyihqC4JqnK@linux.dev>
- <8e2ee8dd-4412-4133-8b08-75d64ab79649@os.amperecomputing.com>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>
+Subject: Re: [PATCH 5/5] KVM: arm64: Exclude FP ownership from kvm_vcpu_arch
+In-Reply-To: <6acffbef-6872-4a15-b24a-7a0ec6bbb373@sirena.org.uk>
+References: <20240302111935.129994-1-maz@kernel.org>
+	<20240302111935.129994-6-maz@kernel.org>
+	<6acffbef-6872-4a15-b24a-7a0ec6bbb373@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8e2ee8dd-4412-4133-8b08-75d64ab79649@os.amperecomputing.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, james.clark@arm.com, anshuman.khandual@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Mar 06, 2024 at 11:01:09AM +0530, Ganapatrao Kulkarni wrote:
-> Of course I know this script -:)
-> I didn't cc since I felt to avoid unnecessary overloading someone's inbox.
+On Mon, 04 Mar 2024 19:10:08 +0000,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> [1  <text/plain; us-ascii (quoted-printable)>]
+> On Sat, Mar 02, 2024 at 11:19:35AM +0000, Marc Zyngier wrote:
+> > In retrospect, it is fairly obvious that the FP state ownership
+> > is only meaningful for a given CPU, and that locating this
+> > information in the vcpu was just a mistake.
+> > 
+> > Move the ownership tracking into the host data structure, and
+> > rename it from fp_state to fp_owner, which is a better description
+> > (name suggested by Mark Brown).
+> 
+> The SME patch series proposes adding an additional state to this
+> enumeration which would say if the registers are stored in a format
+> suitable for exchange with userspace, that would make this state part of
+> the vCPU state.  With the addition of SME we can have two vector lengths
+> in play so the series proposes picking the larger to be the format for
+> userspace registers.
 
-People signed up as reviewers for a subsystem know what they've gotten
-themselves into... or at least realize it after the fact with the pile
-of patches in their inbox.
+What does this addition have anything to do with the ownership of the
+physical register file? Not a lot, it seems.
 
-> I don't think anyone(even ARM) is interested in this feature other than Marc
-> and me/Ampere.
+Specially as there better be no state resident on the CPU when
+userspace messes up with it.
 
-... and based on this _presumption_ it's OK to leave folks in the dark?
+> 
+> We could store this separately to fp_state/owner but it'd still be a
+> value stored in the vCPU.
 
-> Otherwise this would have merged upstream by now.
+I totally disagree.
 
-Stuff lands upstream when it is ready, no sooner.
+> Storing in a format suitable for userspace
+> usage all the time when we've got SME would most likely result in
+> performance overhead
+
+What performance overhead? Why should we care?
+
+> if nothing else and feels more complicated than
+> rewriting the data in the relatively unusual case where userspace looks
+> at it.  Trying to convert userspace writes into the current layout would
+> have issues if the current layout uses the smaller vector length and
+> create fragility with ordering issues when loading the guest state.
+
+What ordering issues? If userspace manipulates the guest state, the
+guest isn't running. If it is, all bets are off.
+
+> 
+> The proposal is not the most lovely idea ever but given the architecture
+> I think some degree of clunkiness would be unavoidable.
+
+It is only unavoidable if we decide to make a bad job of it.
+
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
