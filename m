@@ -1,187 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465FD12F379;
-	Thu,  7 Mar 2024 15:59:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69988131E3C
+	for <kvmarm@lists.linux.dev>; Thu,  7 Mar 2024 18:39:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709827142; cv=none; b=cOnJpMC/YSpvzBt/ktGKiMsFyztnONHVD1DCXCt2sTdWPo8KjtUNWWz1SL8WycYrVZYN/g7Yg+0LIKLZn9TsJQmPhjz3uP8fwptMlpHYMosE9n4N8AnJVRD8xy/1I3kuYnHWmF21mP6zQ8V2s4Fe2wGb8JyEE+VIkRhd/uCX6vc=
+	t=1709836796; cv=none; b=m4ztjnmOYaAOhxPLpr3OPi9W7agbKgSagZh6Y+lv+bY1O7MjEAVuq91WePjx0lWdfm+aEOJoduqfdL+PG0USSWONjdTGoMDNSfs+vBC2qDEWmEA9PicYcnb5iGxvUcHCb2F0QENn8EgamQ8tyyNqS5KP5vrKUsn2zZMgKmLh9Sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709827142; c=relaxed/simple;
-	bh=UYtkG8yfOSupBSMZ3Yyq2qnzTXCcLitPyHm9qpOJKYc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZYtjgWEnQsXDHzA9nA3edpa+IFwbazwL9lD1AJomRLpM7XnNstkj+n6O9kpreL9moX/fB1gpa1+tIUxc8y+Iv0t7StfY7Zg4oK9M3OZNgJ4LL/MXLLe/xvU79Px5D2sYN1zrjraA9N70FgDs4haJAXnuUl1Cq2QoYpn+1fD7ia0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FUh5wB7t; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1709836796; c=relaxed/simple;
+	bh=akk9bHSXL2p2/76CztMO7vrfVTA+C6sHDz1aSSJxcrI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=pV5Bq8F29ctAn7sk7B/XTSpwGQelTpiQgj7JQ4ch8c8P3fkSfFolQT+OiiAkkDF8Aft/8mHb5imfiZlCDl3E1wwel5RY3jsbLngCu+CXPugfP4JRGhfRxqo37qHDYwkQZGcEJdEu0WxNiNaXdC3snC9giDneNYl0Lzt8BSmkiho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Wun+UNTc; arc=none smtp.client-ip=209.85.166.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FUh5wB7t"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C335DC433F1;
-	Thu,  7 Mar 2024 15:59:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709827141;
-	bh=UYtkG8yfOSupBSMZ3Yyq2qnzTXCcLitPyHm9qpOJKYc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FUh5wB7teSfQ4E3Jgt0/JB2cACgh+qZ1YBngLgiU9iyk5TbuFh30QrjPlGT7cgcCc
-	 LSVaniC6YV079btLKS2gC+lyWgl46McHPlku5Ycsh7D0HzJUt9C03O8PP8Cm4iRJEn
-	 wcYPGkpeHfulvLEjQdx27NmEXEMNwWow1JZNwW9vZLA/hH7ExoXVWyMOqZS+w4hA7T
-	 XKeU/BeQDd5sxV5FWYurXRXsxP60aw3h+BCe7nSbFOY0yWMsFocdKOmWhGiyVwNiNz
-	 v1ltzB4Ib3Nl9eWkh/xmI6BGnqu29l7ZY8LXNcMHX0UQdM4D/YiVeP6XqjVlzuwmY3
-	 twceigxI/L1mA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1riG94-00AMt8-FV;
-	Thu, 07 Mar 2024 15:58:58 +0000
-Date: Thu, 07 Mar 2024 15:58:58 +0000
-Message-ID: <86il1y11a5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2 08/13] KVM: arm64: nv: Handle HCR_EL2.{API,APK} independently
-In-Reply-To: <20240307151454.GA913041@e124191.cambridge.arm.com>
-References: <20240226100601.2379693-1-maz@kernel.org>
-	<20240226100601.2379693-9-maz@kernel.org>
-	<20240307151454.GA913041@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Wun+UNTc"
+Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-7c495649efdso143380639f.2
+        for <kvmarm@lists.linux.dev>; Thu, 07 Mar 2024 10:39:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709836794; x=1710441594; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=vNMOfHTWILvXvO6xXs7ecY4oaxm2hms9W+5pBi1MYDs=;
+        b=Wun+UNTcoxyV75SQ0Ps5UlMgfC1JFlLDRrRPsIyVs/jyggAY7d85dnmUzehth0G3Tp
+         sEdkiWtLkM8yjk7XpnDw1z2//Deam/5WgUsJdMq8uiW+UqCrGeoVefAjkUNkqeICanfP
+         pUSuqLvV3bFZ4kOKmTCJ3IHZfLRfZOsZL4KkEKf+h11JommNzjfCuZgNx//R9mP5wZWl
+         G0AANkq7e3q9XNmLZqk977rXHruFys7BOpmiLFBCs5QXHJBNn1ftbVOKKNW33uMCNrjg
+         ZaXpOQj5X/fOUKOof90/6IIkaZyrH24H7uBhGaVUsqpSodY09xoz1Ma5cIkc6Wz2f2n9
+         WUAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709836794; x=1710441594;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vNMOfHTWILvXvO6xXs7ecY4oaxm2hms9W+5pBi1MYDs=;
+        b=BpLepHbybatqkDdmyLP0+gPS+Rwt5N1WDMWLTe0C2/GR+LZr+YdYAQBu53uwm0Zp3L
+         QDffD4l2qNZquaVJkcWx2dH89/gF8gSR8MmLLwRlTnJloX9eJaxFwsCa5uOGPH5Je90a
+         cEi5T05pTw6D4w1nFQd90zg9pGRXXhgTsw48f4ZptSnSxH/kVa90fHpm0jFPmtGVDzHb
+         yYgSDR3o45r5OOKvBrvF6Rwx8n0d+AaFuBQ0GxRj8P3IqUbEeAP5IchymwTHvmoAU7mp
+         4HJcjXWpg8nn1wgUR9Mrz0SEFpr005sWAc0vbcE426hZ5Zvi3ijmK/t600AHQJA8/QlX
+         ChSA==
+X-Forwarded-Encrypted: i=1; AJvYcCXOSUrk0aFQuUWszwsAniQ7ROoTd2ZvbeIrPaxr6KUks0gQ8GadmGy/4yViYbKp90JCFk0zTMHU2SejuEaEg7u/UQlVnU45
+X-Gm-Message-State: AOJu0YxaH5JSh1nWc+7gvSR+GaYb3L+2s6UIbHL3tp8RXuaWCJ1uUp2T
+	t7j6I/HayF/Ain8CzKeUbOdD20uwGHXWqkW6AklsZ+Pjq4dMCu6GdL4ee36CdrBk25zGt9hmDkv
+	kBgJl6MFj0A/Rcbs4XStkFg==
+X-Google-Smtp-Source: AGHT+IHn+sE1Yd5hWukLNm6By8efRqP8K6LAQ3UzMWo/06dXPuuyn1o2cC1Gk4A10pen0rB7atZJaPWELfUv2bnXlg==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6638:16ca:b0:474:b9df:7315 with
+ SMTP id g10-20020a05663816ca00b00474b9df7315mr1010188jat.2.1709836794515;
+ Thu, 07 Mar 2024 10:39:54 -0800 (PST)
+Date: Thu,  7 Mar 2024 18:39:04 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
+Message-ID: <20240307183907.1184775-1-coltonlewis@google.com>
+Subject: [PATCH v4 0/3] Add arch_timer_edge_cases selftest
+From: Colton Lewis <coltonlewis@google.com>
+To: kvm@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Ricardo Koller <ricarkol@google.com>, kvmarm@lists.linux.dev, 
+	Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 07 Mar 2024 15:14:54 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> On Mon, Feb 26, 2024 at 10:05:56AM +0000, Marc Zyngier wrote:
-> > Although KVM couples API and APK for simplicity, the architecture
-> > makes no such requirement, and the two can be independently set or
-> > cleared.
-> > 
-> > Check for which of the two possible reasons we have trapped here,
-> > and if the corresponding L1 control bit isn't set, delegate the
-> > handling for forwarding.
-> > 
-> > Otherwise, set this exact bit in HCR_EL2 and resume the guest.
-> > Of course, in the non-NV case, we keep setting both bits and
-> > be done with it. Note that the entry core already saves/restores
-> > the keys should any of the two control bits be set.
-> > 
-> > This results in a bit of rework, and the removal of the (trivial)
-> > vcpu_ptrauth_enable() helper.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_emulate.h    |  5 ----
-> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 32 +++++++++++++++++++++----
-> >  2 files changed, 27 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> > index debc3753d2ef..d2177bc77844 100644
-> > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> > @@ -125,11 +125,6 @@ static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
-> >  	vcpu->arch.hcr_el2 |= HCR_TWI;
-> >  }
-> >  
-> > -static inline void vcpu_ptrauth_enable(struct kvm_vcpu *vcpu)
-> > -{
-> > -	vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
-> > -}
-> > -
-> >  static inline void vcpu_ptrauth_disable(struct kvm_vcpu *vcpu)
-> >  {
-> >  	vcpu->arch.hcr_el2 &= ~(HCR_API | HCR_APK);
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > index f5f701f309a9..a0908d7a8f56 100644
-> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > @@ -480,11 +480,35 @@ DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
-> >  static bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
-> >  {
-> >  	struct kvm_cpu_context *ctxt;
-> > -	u64 val;
-> > +	u64 enable = 0;
-> >  
-> >  	if (!vcpu_has_ptrauth(vcpu))
-> >  		return false;
-> >  
-> > +	/*
-> > +	 * NV requires us to handle API and APK independently, just in
-> > +	 * case the hypervisor is totally nuts. Please barf >here<.
-> > +	 */
-> > +	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
-> > +		switch (ESR_ELx_EC(kvm_vcpu_get_esr(vcpu))) {
-> > +		case ESR_ELx_EC_PAC:
-> > +			if (!(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_API))
-> > +				return false;
-> > +
-> > +			enable |= HCR_API;
-> > +			break;
-> > +
-> > +		case ESR_ELx_EC_SYS64:
-> > +			if (!(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_APK))
-> > +				return false;
-> > +
-> > +			enable |= HCR_APK;
-> > +			break;
-> > +		}
-> > +	} else {
-> > +		enable = HCR_API | HCR_APK;
-> > +	}
-> > +
-> >  	ctxt = this_cpu_ptr(&kvm_hyp_ctxt);
-> >  	__ptrauth_save_key(ctxt, APIA);
-> >  	__ptrauth_save_key(ctxt, APIB);
-> > @@ -492,11 +516,9 @@ static bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
-> >  	__ptrauth_save_key(ctxt, APDB);
-> >  	__ptrauth_save_key(ctxt, APGA);
-> >  
-> > -	vcpu_ptrauth_enable(vcpu);
-> >  
-> > -	val = read_sysreg(hcr_el2);
-> > -	val |= (HCR_API | HCR_APK);
-> > -	write_sysreg(val, hcr_el2);
-> > +	vcpu->arch.hcr_el2 |= enable;
-> > +	sysreg_clear_set(hcr_el2, 0, enable);
-> >  
-> >  	return true;
-> >  }
-> 
-> A bit of sleuthing tells me you plan to delete kvm_hyp_handle_ptrauth() anyway,
-> so presumably it makes some sense to put that patch before this to avoid
-> modifying the code just to delete it!
+Add arch_timer_edge_cases selftest to test various corner cases of the
+ARM timers such as:
 
-Well, I haven't posted that patch yet (soon!), but it is also
-important to show how these things interact overall. *if* we agree
-that there is no point in the current approach, then I'll squash the
-two.
+* timers above the max TVAL value
+* timers in the past
+* moving counters ahead and behind pending timers
+* reprograming timers
+* timers fired multiple times
+* masking/unmasking using the timer control mask
 
-But there is a lot to be said about:
+These are intentionally unusual scenarios to stress compliance with
+the arm architecture.
 
-- discussion on the list first
-- minimal changes to track regressions
+v4:
+* Convert macros to functions where possible
+* Remove magic numbers
+* Improve naming of variables and types
 
-So I think there is still value in reviewing this patch on its own!
+v3:
+https://lore.kernel.org/kvmarm/20231103192915.2209393-1-coltonlewis@google.com/
 
-Thanks,
+v2:
+https://lore.kernel.org/kvmarm/20230928210201.1310536-1-coltonlewis@google.com/
 
-	M.
+v1:
+https://lore.kernel.org/kvm/20230516213731.387132-1-coltonlewis@google.com/
 
--- 
-Without deviation from the norm, progress is not possible.
+Colton Lewis (3):
+  KVM: arm64: selftests: Standardize GIC base addresses
+  KVM: arm64: selftests: Guarantee interrupts are handled
+  KVM: arm64: selftests: Add arch_timer_edge_cases selftest
+
+ tools/testing/selftests/kvm/Makefile          |    1 +
+ .../selftests/kvm/aarch64/arch_timer.c        |    8 +-
+ .../kvm/aarch64/arch_timer_edge_cases.c       | 1102 +++++++++++++++++
+ .../testing/selftests/kvm/aarch64/vgic_irq.c  |   23 +-
+ .../kvm/aarch64/vpmu_counter_access.c         |    3 +-
+ .../selftests/kvm/dirty_log_perf_test.c       |    5 +-
+ .../kvm/include/aarch64/arch_timer.h          |   18 +-
+ .../selftests/kvm/include/aarch64/gic.h       |    8 +-
+ .../selftests/kvm/include/aarch64/vgic.h      |    3 +-
+ tools/testing/selftests/kvm/lib/aarch64/gic.c |   12 +-
+ .../testing/selftests/kvm/lib/aarch64/vgic.c  |    7 +-
+ 11 files changed, 1158 insertions(+), 32 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c
+
+--
+2.44.0.278.ge034bb2e1d-goog
