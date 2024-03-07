@@ -1,80 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921AF136675;
-	Thu,  7 Mar 2024 19:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACDD13DB99
+	for <kvmarm@lists.linux.dev>; Thu,  7 Mar 2024 22:17:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709838390; cv=none; b=XaMB+x2QD21bXoJ/5qH69oABF4HNfT+Opy21nTdmVlzB453AVyz325O/vN0LSOq7DTS1ep6Cv9SndERgSVleabqev4VXs0kngdS0nkVyehVjOZW45uxHjbgnrkxcUrCz891/lKKruRhmyFn/a6sB7bRb8Guryt6xSpGANgmNz1g=
+	t=1709849865; cv=none; b=rzdbzW8PDX2WnPn4MpTnKN3zmyzHulBzWFiuYsio9HSpffo6dewIgbuPV6lQQIqqRnkts/dyOntOtsX6OGrm6E07Wz2CZujpigEeyM053gVaRqUk/vn6EqMEKzgsn2vQ8I74gsncGxjvSd0UwwQ0Yk1h3t8iXyyVaB3KC9cxqYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709838390; c=relaxed/simple;
-	bh=/aVycPzQGuUIJyeAnfbKezN/GZbL5wsOs/DnCoWd/cQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BV4Nujf2MzFzicz3mzItniqk+n/syhB7XfVN+i1n2qDAThdauOpwmGTFulvho8qtKOHvbW3ccpSr0vHf7vtxgJRM++0kJNUR23DNfAOWZCwBRxCa+3qNHji7PnEqx3PaoY41ebFc9PsW91CUbUB+rRu0UBzCr4H1Fd7ceYSwPGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70ED0C433F1;
-	Thu,  7 Mar 2024 19:06:27 +0000 (UTC)
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
+	s=arc-20240116; t=1709849865; c=relaxed/simple;
+	bh=mcVv85Y4EzW+ezvYao5rOnNjIVcYIVFYdvdOhYlj1TM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=vGsWY5xQILcuwmLSqPQI8oJ8+yagoHqWUOzJL2fJdMNRrXtDNf5yvr5E3tbJq983cmMDgIAAk6jwAXBw1ChbMQI87vdeOo+hMJea9QBVBdUXK/Rc7BIaeS0DPNkMgNUV2YK3Vl4jg2wTUjY8ZAoxZj9AU9UOlCP0ZTRgX1kxYhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lF9P/7XK; arc=none smtp.client-ip=91.218.175.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lF9P/7XK"
+Date: Thu, 7 Mar 2024 22:17:34 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1709849860;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vYSZIyK2isZFgtLWNp5tqo04dM1Ssq7AMjL+0jjmigk=;
+	b=lF9P/7XKffvo6S5bw+4ysZaBIjZG/dHK8JhCDJA2mGMWzAK2oaEfpUzw7dj97wwGyTXJk0
+	wC8kkhkP8rXTBQYQT+Ary6L3NMfXgHBNmuAleTwon/jqaZKHFBd56XfDWnar0Iu4xK/HZO
+	2HBOd4bd6ljj8WvXppsSnlg3XzPOvPY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Colin Ian King <colin.i.king@gmail.com>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <shuah@kernel.org>,
-	Mark Brown <broonie@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Dave Martin <Dave.Martin@arm.com>,
-	kvmarm@lists.linux.dev,
-	linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 0/9] arm64: Support for 2023 DPISA extensions
-Date: Thu,  7 Mar 2024 19:06:25 +0000
-Message-Id: <170983837968.1825324.3417487578888141721.b4-ty@arm.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240306-arm64-2023-dpisa-v5-0-c568edc8ed7f@kernel.org>
-References: <20240306-arm64-2023-dpisa-v5-0-c568edc8ed7f@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH][next] KVM: selftests: Fix spelling mistake "trigged" ->
+ "triggered"
+Message-ID: <Zeo8_ulDb4wYI_rO@linux.dev>
+References: <20240307081951.1954830-1-colin.i.king@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240307081951.1954830-1-colin.i.king@gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 06 Mar 2024 23:14:45 +0000, Mark Brown wrote:
-> This series enables support for the data processing extensions in the
-> newly released 2023 architecture, this is mainly support for 8 bit
-> floating point formats.  Most of the extensions only introduce new
-> instructions and therefore only require hwcaps but there is a new EL0
-> visible control register FPMR used to control the 8 bit floating point
-> formats, we need to manage traps for this and context switch it.
+Thanks for the fix Colin. Paolo/Anup, up to you how you want to play it,
+I see the 6.9 PR is already out for riscv.
+
+Acked-by: Oliver Upton <oliver.upton@linux.dev>
+
+On Thu, Mar 07, 2024 at 08:19:51AM +0000, Colin Ian King wrote:
+> There are spelling mistakes in __GUEST_ASSERT messages. Fix them.
 > 
-> [...]
-
-Applied to arm64 (for-next/dpisa), thanks!
-
-[1/9] arm64/cpufeature: Hook new identification registers up to cpufeature
-      https://git.kernel.org/arm64/c/cc9f69a3dad3
-[2/9] arm64/fpsimd: Enable host kernel access to FPMR
-      https://git.kernel.org/arm64/c/b6c0b424cb91
-[3/9] arm64/fpsimd: Support FEAT_FPMR
-      https://git.kernel.org/arm64/c/203f2b95a882
-[4/9] arm64/signal: Add FPMR signal handling
-      https://git.kernel.org/arm64/c/8c46def44409
-[5/9] arm64/ptrace: Expose FPMR via ptrace
-      https://git.kernel.org/arm64/c/4035c22ef7d4
-[6/9] arm64/hwcap: Define hwcaps for 2023 DPISA features
-      https://git.kernel.org/arm64/c/c1932cac7902
-[7/9] kselftest/arm64: Handle FPMR context in generic signal frame parser
-      https://git.kernel.org/arm64/c/f4dcccdda586
-[8/9] kselftest/arm64: Add basic FPMR test
-      https://git.kernel.org/arm64/c/7bcebadda045
-[9/9] kselftest/arm64: Add 2023 DPISA hwcap test coverage
-      https://git.kernel.org/arm64/c/44d10c27bd75
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+> ---
+>  tools/testing/selftests/kvm/aarch64/arch_timer.c | 2 +-
+>  tools/testing/selftests/kvm/riscv/arch_timer.c   | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> index ddba2c2fb5de..16ac74d07d68 100644
+> --- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> @@ -136,7 +136,7 @@ static void guest_run_stage(struct test_vcpu_shared_data *shared_data,
+>  		irq_iter = READ_ONCE(shared_data->nr_iter);
+>  		__GUEST_ASSERT(config_iter + 1 == irq_iter,
+>  				"config_iter + 1 = 0x%lx, irq_iter = 0x%lx.\n"
+> -				"  Guest timer interrupt was not trigged within the specified\n"
+> +				"  Guest timer interrupt was not triggered within the specified\n"
+>  				"  interval, try to increase the error margin by [-e] option.\n",
+>  				config_iter + 1, irq_iter);
+>  	}
+> diff --git a/tools/testing/selftests/kvm/riscv/arch_timer.c b/tools/testing/selftests/kvm/riscv/arch_timer.c
+> index e22848f747c0..0f9cabd99fd4 100644
+> --- a/tools/testing/selftests/kvm/riscv/arch_timer.c
+> +++ b/tools/testing/selftests/kvm/riscv/arch_timer.c
+> @@ -60,7 +60,7 @@ static void guest_run(struct test_vcpu_shared_data *shared_data)
+>  		irq_iter = READ_ONCE(shared_data->nr_iter);
+>  		__GUEST_ASSERT(config_iter + 1 == irq_iter,
+>  				"config_iter + 1 = 0x%x, irq_iter = 0x%x.\n"
+> -				"  Guest timer interrupt was not trigged within the specified\n"
+> +				"  Guest timer interrupt was not triggered within the specified\n"
+>  				"  interval, try to increase the error margin by [-e] option.\n",
+>  				config_iter + 1, irq_iter);
+>  	}
+> -- 
+> 2.39.2
+> 
 
 -- 
-Catalin
-
+Thanks,
+Oliver
