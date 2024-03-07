@@ -1,146 +1,187 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC7412D1E2
-	for <kvmarm@lists.linux.dev>; Thu,  7 Mar 2024 15:15:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465FD12F379;
+	Thu,  7 Mar 2024 15:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709824506; cv=none; b=LuT5q13kmSlDGx1HC1UC4omeSvxW7N7E7Btrrjoq2j2E6XyfiIp0sk+A4eaJmfJWH6dlKIRkpGN/PoW+7/3wGmoYd57qZfFj4K5KNxFcb0sz2rlWnSAdSO2KZRArRNIP5SFFX+Qw/+ejfVJ1+Cy5grBoZfc/33G1//30NnI3u/g=
+	t=1709827142; cv=none; b=cOnJpMC/YSpvzBt/ktGKiMsFyztnONHVD1DCXCt2sTdWPo8KjtUNWWz1SL8WycYrVZYN/g7Yg+0LIKLZn9TsJQmPhjz3uP8fwptMlpHYMosE9n4N8AnJVRD8xy/1I3kuYnHWmF21mP6zQ8V2s4Fe2wGb8JyEE+VIkRhd/uCX6vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709824506; c=relaxed/simple;
-	bh=g20Xpc6OyJvxtAVwhdWMbolXe263sghDZOnUASUTrdw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LWvGjGTPWePaWxhrh3wgDdV4M+6D/wUJ7eLZh2/8IH7vAG6PVyUMRkb4kpNjvBopUvX2E62IVr/mepNqJOcBAj/KUVFIiWy9rS4PQZrI7kPN5HfX5IMMn4rEfWYhssncU/D+eYGOD+kYUrqriv8N+NJQ03UdrPUj7N9aAjQfHxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 736EB1FB;
-	Thu,  7 Mar 2024 07:15:38 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EB0243F73F;
-	Thu,  7 Mar 2024 07:14:59 -0800 (PST)
-Date: Thu, 7 Mar 2024 15:14:54 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	s=arc-20240116; t=1709827142; c=relaxed/simple;
+	bh=UYtkG8yfOSupBSMZ3Yyq2qnzTXCcLitPyHm9qpOJKYc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZYtjgWEnQsXDHzA9nA3edpa+IFwbazwL9lD1AJomRLpM7XnNstkj+n6O9kpreL9moX/fB1gpa1+tIUxc8y+Iv0t7StfY7Zg4oK9M3OZNgJ4LL/MXLLe/xvU79Px5D2sYN1zrjraA9N70FgDs4haJAXnuUl1Cq2QoYpn+1fD7ia0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FUh5wB7t; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FUh5wB7t"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C335DC433F1;
+	Thu,  7 Mar 2024 15:59:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709827141;
+	bh=UYtkG8yfOSupBSMZ3Yyq2qnzTXCcLitPyHm9qpOJKYc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FUh5wB7teSfQ4E3Jgt0/JB2cACgh+qZ1YBngLgiU9iyk5TbuFh30QrjPlGT7cgcCc
+	 LSVaniC6YV079btLKS2gC+lyWgl46McHPlku5Ycsh7D0HzJUt9C03O8PP8Cm4iRJEn
+	 wcYPGkpeHfulvLEjQdx27NmEXEMNwWow1JZNwW9vZLA/hH7ExoXVWyMOqZS+w4hA7T
+	 XKeU/BeQDd5sxV5FWYurXRXsxP60aw3h+BCe7nSbFOY0yWMsFocdKOmWhGiyVwNiNz
+	 v1ltzB4Ib3Nl9eWkh/xmI6BGnqu29l7ZY8LXNcMHX0UQdM4D/YiVeP6XqjVlzuwmY3
+	 twceigxI/L1mA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1riG94-00AMt8-FV;
+	Thu, 07 Mar 2024 15:58:58 +0000
+Date: Thu, 07 Mar 2024 15:58:58 +0000
+Message-ID: <86il1y11a5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2 08/13] KVM: arm64: nv: Handle HCR_EL2.{API,APK}
- independently
-Message-ID: <20240307151454.GA913041@e124191.cambridge.arm.com>
+Subject: Re: [PATCH v2 08/13] KVM: arm64: nv: Handle HCR_EL2.{API,APK} independently
+In-Reply-To: <20240307151454.GA913041@e124191.cambridge.arm.com>
 References: <20240226100601.2379693-1-maz@kernel.org>
- <20240226100601.2379693-9-maz@kernel.org>
+	<20240226100601.2379693-9-maz@kernel.org>
+	<20240307151454.GA913041@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240226100601.2379693-9-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Feb 26, 2024 at 10:05:56AM +0000, Marc Zyngier wrote:
-> Although KVM couples API and APK for simplicity, the architecture
-> makes no such requirement, and the two can be independently set or
-> cleared.
+On Thu, 07 Mar 2024 15:14:54 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> Check for which of the two possible reasons we have trapped here,
-> and if the corresponding L1 control bit isn't set, delegate the
-> handling for forwarding.
+> On Mon, Feb 26, 2024 at 10:05:56AM +0000, Marc Zyngier wrote:
+> > Although KVM couples API and APK for simplicity, the architecture
+> > makes no such requirement, and the two can be independently set or
+> > cleared.
+> > 
+> > Check for which of the two possible reasons we have trapped here,
+> > and if the corresponding L1 control bit isn't set, delegate the
+> > handling for forwarding.
+> > 
+> > Otherwise, set this exact bit in HCR_EL2 and resume the guest.
+> > Of course, in the non-NV case, we keep setting both bits and
+> > be done with it. Note that the entry core already saves/restores
+> > the keys should any of the two control bits be set.
+> > 
+> > This results in a bit of rework, and the removal of the (trivial)
+> > vcpu_ptrauth_enable() helper.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_emulate.h    |  5 ----
+> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 32 +++++++++++++++++++++----
+> >  2 files changed, 27 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > index debc3753d2ef..d2177bc77844 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > @@ -125,11 +125,6 @@ static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
+> >  	vcpu->arch.hcr_el2 |= HCR_TWI;
+> >  }
+> >  
+> > -static inline void vcpu_ptrauth_enable(struct kvm_vcpu *vcpu)
+> > -{
+> > -	vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
+> > -}
+> > -
+> >  static inline void vcpu_ptrauth_disable(struct kvm_vcpu *vcpu)
+> >  {
+> >  	vcpu->arch.hcr_el2 &= ~(HCR_API | HCR_APK);
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > index f5f701f309a9..a0908d7a8f56 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > @@ -480,11 +480,35 @@ DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+> >  static bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  {
+> >  	struct kvm_cpu_context *ctxt;
+> > -	u64 val;
+> > +	u64 enable = 0;
+> >  
+> >  	if (!vcpu_has_ptrauth(vcpu))
+> >  		return false;
+> >  
+> > +	/*
+> > +	 * NV requires us to handle API and APK independently, just in
+> > +	 * case the hypervisor is totally nuts. Please barf >here<.
+> > +	 */
+> > +	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
+> > +		switch (ESR_ELx_EC(kvm_vcpu_get_esr(vcpu))) {
+> > +		case ESR_ELx_EC_PAC:
+> > +			if (!(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_API))
+> > +				return false;
+> > +
+> > +			enable |= HCR_API;
+> > +			break;
+> > +
+> > +		case ESR_ELx_EC_SYS64:
+> > +			if (!(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_APK))
+> > +				return false;
+> > +
+> > +			enable |= HCR_APK;
+> > +			break;
+> > +		}
+> > +	} else {
+> > +		enable = HCR_API | HCR_APK;
+> > +	}
+> > +
+> >  	ctxt = this_cpu_ptr(&kvm_hyp_ctxt);
+> >  	__ptrauth_save_key(ctxt, APIA);
+> >  	__ptrauth_save_key(ctxt, APIB);
+> > @@ -492,11 +516,9 @@ static bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  	__ptrauth_save_key(ctxt, APDB);
+> >  	__ptrauth_save_key(ctxt, APGA);
+> >  
+> > -	vcpu_ptrauth_enable(vcpu);
+> >  
+> > -	val = read_sysreg(hcr_el2);
+> > -	val |= (HCR_API | HCR_APK);
+> > -	write_sysreg(val, hcr_el2);
+> > +	vcpu->arch.hcr_el2 |= enable;
+> > +	sysreg_clear_set(hcr_el2, 0, enable);
+> >  
+> >  	return true;
+> >  }
 > 
-> Otherwise, set this exact bit in HCR_EL2 and resume the guest.
-> Of course, in the non-NV case, we keep setting both bits and
-> be done with it. Note that the entry core already saves/restores
-> the keys should any of the two control bits be set.
-> 
-> This results in a bit of rework, and the removal of the (trivial)
-> vcpu_ptrauth_enable() helper.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h    |  5 ----
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 32 +++++++++++++++++++++----
->  2 files changed, 27 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index debc3753d2ef..d2177bc77844 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -125,11 +125,6 @@ static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
->  	vcpu->arch.hcr_el2 |= HCR_TWI;
->  }
->  
-> -static inline void vcpu_ptrauth_enable(struct kvm_vcpu *vcpu)
-> -{
-> -	vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
-> -}
-> -
->  static inline void vcpu_ptrauth_disable(struct kvm_vcpu *vcpu)
->  {
->  	vcpu->arch.hcr_el2 &= ~(HCR_API | HCR_APK);
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index f5f701f309a9..a0908d7a8f56 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -480,11 +480,35 @@ DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
->  static bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
->  {
->  	struct kvm_cpu_context *ctxt;
-> -	u64 val;
-> +	u64 enable = 0;
->  
->  	if (!vcpu_has_ptrauth(vcpu))
->  		return false;
->  
-> +	/*
-> +	 * NV requires us to handle API and APK independently, just in
-> +	 * case the hypervisor is totally nuts. Please barf >here<.
-> +	 */
-> +	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
-> +		switch (ESR_ELx_EC(kvm_vcpu_get_esr(vcpu))) {
-> +		case ESR_ELx_EC_PAC:
-> +			if (!(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_API))
-> +				return false;
-> +
-> +			enable |= HCR_API;
-> +			break;
-> +
-> +		case ESR_ELx_EC_SYS64:
-> +			if (!(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_APK))
-> +				return false;
-> +
-> +			enable |= HCR_APK;
-> +			break;
-> +		}
-> +	} else {
-> +		enable = HCR_API | HCR_APK;
-> +	}
-> +
->  	ctxt = this_cpu_ptr(&kvm_hyp_ctxt);
->  	__ptrauth_save_key(ctxt, APIA);
->  	__ptrauth_save_key(ctxt, APIB);
-> @@ -492,11 +516,9 @@ static bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
->  	__ptrauth_save_key(ctxt, APDB);
->  	__ptrauth_save_key(ctxt, APGA);
->  
-> -	vcpu_ptrauth_enable(vcpu);
->  
-> -	val = read_sysreg(hcr_el2);
-> -	val |= (HCR_API | HCR_APK);
-> -	write_sysreg(val, hcr_el2);
-> +	vcpu->arch.hcr_el2 |= enable;
-> +	sysreg_clear_set(hcr_el2, 0, enable);
->  
->  	return true;
->  }
+> A bit of sleuthing tells me you plan to delete kvm_hyp_handle_ptrauth() anyway,
+> so presumably it makes some sense to put that patch before this to avoid
+> modifying the code just to delete it!
 
-A bit of sleuthing tells me you plan to delete kvm_hyp_handle_ptrauth() anyway,
-so presumably it makes some sense to put that patch before this to avoid
-modifying the code just to delete it!
+Well, I haven't posted that patch yet (soon!), but it is also
+important to show how these things interact overall. *if* we agree
+that there is no point in the current approach, then I'll squash the
+two.
+
+But there is a lot to be said about:
+
+- discussion on the list first
+- minimal changes to track regressions
+
+So I think there is still value in reviewing this patch on its own!
 
 Thanks,
-Joey
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
