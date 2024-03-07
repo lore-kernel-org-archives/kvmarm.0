@@ -1,226 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B74FF127B7C;
-	Thu,  7 Mar 2024 11:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D693233
+	for <kvmarm@lists.linux.dev>; Thu,  7 Mar 2024 12:13:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709809845; cv=none; b=YspgX0rTYah1WNmskHizDOWcB5xw7dmz6vqcORR8i95a2zOLgT8yQO7nnzE2VlVnHRnKnBQtiM+d5CebAd9UqGvVs94RYKJvJZJ0QC43EMtxpF5O8Fi7gnoanTU8JMDHwfOkjo6jWk15/A5fCzD7lD8j0wag7nECK9IVu6ADh60=
+	t=1709813629; cv=none; b=kBRyL2gBZNn33ki1J0y4m0dHZhvFCsY0Tq+f8/OAAHkfAngRKlBh4joDrStGPIWXIMGFFjEjbdJMQnpwRD9Q2JgeI50qsa4rHIfLpwyB6bqEsMFapzH1FwXPyK1Uu56lr0NuJVRQQnAVcGNLvx6QWGI57Kjd5nZfNdy/ZX0eHhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709809845; c=relaxed/simple;
-	bh=TYL2VXcJsX0IXYej7YEq+AZLx+ZRvw4xRl9UAvuFn2c=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b/UfCEcTcXcbjw9vQ+xi9/IcG+EAWueZbNKfmLBva0HfBz66h0sOdiqooiybOO7hUBqZeK5M2SVpt72Ezdkkixl2obdZH1kUgguSBkBBdX8fO/D1PROeB/Yinr3iOzgitgUu0tZN5lOlp1JLpwpxM8MueS1bumo3QFicJ5WW+gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sg8YeDUm; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sg8YeDUm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3240DC433C7;
-	Thu,  7 Mar 2024 11:10:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709809845;
-	bh=TYL2VXcJsX0IXYej7YEq+AZLx+ZRvw4xRl9UAvuFn2c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Sg8YeDUmmwuUIJRbuzkUkqY8dkFdcEVcRM6Sr5SV1qhSlr4wfLAMPG5yZf7WH/K2x
-	 x1VwbOtCiF08hR8ClKCQDVNBQav3fgN9E/1JW/27txBU7HNBUwpXaqdmQV7xtlYcD3
-	 usS1zeVkMKIpmvcATz8zlSmgE3TRKETXDzmZZjMO9he2MKAyHSeL8V+VYUpSR3COcb
-	 mwkEr9P7QD1x8IRf2iIM/sqC+S+WVuD7zzZbKfjjOr9XLKtDGXGnOeIxNnQijZnSIK
-	 GXFECGl93EXSpcKtbDTObn9U9hDvb3WISf5yC4kDh8x/RtpTSvjcpctyGXbz3xa6MG
-	 57xfrH+5HYq1g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1riBe5-00AGAv-RT;
-	Thu, 07 Mar 2024 11:10:41 +0000
-Date: Thu, 07 Mar 2024 11:10:40 +0000
-Message-ID: <86msra1emn.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	James Clark <james.clark@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH 5/5] KVM: arm64: Exclude FP ownership from kvm_vcpu_arch
-In-Reply-To: <a8416451-011c-4159-b9e4-b492b81f5a2c@sirena.org.uk>
-References: <20240302111935.129994-1-maz@kernel.org>
-	<20240302111935.129994-6-maz@kernel.org>
-	<6acffbef-6872-4a15-b24a-7a0ec6bbb373@sirena.org.uk>
-	<87edcnr8zy.wl-maz@kernel.org>
-	<a8416451-011c-4159-b9e4-b492b81f5a2c@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1709813629; c=relaxed/simple;
+	bh=/22fk4H/gqA/hl7Gc04COki3MYGl9Y4jrL7zU/diTxs=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=dbjiwRgPauoDya3oLxHKFwtZ0I8/vE95oUHG7gPkniPHvBKKkS+P5MqeKhLWi/wwlbBrFjBV7DotvoO74CIxTXVBtCz1bevKLDS76IEcugLJPc2CLqHuk3iNoY/6q60mB+RxToJsM8eewMu8NC3zEVKHocXqvMmz3Yyo+nDxBSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Tr7SV6Lywz1QB0r;
+	Thu,  7 Mar 2024 20:11:22 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 47F161A016C;
+	Thu,  7 Mar 2024 20:13:45 +0800 (CST)
+Received: from [10.174.185.179] (10.174.185.179) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 7 Mar 2024 20:13:44 +0800
+Subject: Re: [PATCH] KVM: arm64: vgic-v3: Don't load pending state when
+ enabling LPIs on RD
+To: Marc Zyngier <maz@kernel.org>
+CC: Oliver Upton <oliver.upton@linux.dev>, <kvmarm@lists.linux.dev>, James
+ Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Eric
+ Auger <eric.auger@redhat.com>
+References: <20240228000117.2297982-1-oliver.upton@linux.dev>
+ <db2920fd-9fe8-1ff4-3f00-34dc4afdcdd5@huawei.com>
+ <86o7bq1hhd.wl-maz@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <453f7cef-2b53-ccc6-40d2-6e147353f220@huawei.com>
+Date: Thu, 7 Mar 2024 20:13:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, james.clark@arm.com, anshuman.khandual@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+In-Reply-To: <86o7bq1hhd.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Wed, 06 Mar 2024 22:19:03 +0000,
-Mark Brown <broonie@kernel.org> wrote:
+Hi Marc,
+
+On 2024/3/7 18:09, Marc Zyngier wrote:
+> Hi Zenghui,
 > 
-> [1  <text/plain; us-ascii (quoted-printable)>]
-> On Wed, Mar 06, 2024 at 09:43:13AM +0000, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> > > On Sat, Mar 02, 2024 at 11:19:35AM +0000, Marc Zyngier wrote:
+> On Thu, 07 Mar 2024 09:00:42 +0000,
+> Zenghui Yu <yuzenghui@huawei.com> wrote:
+>>
+>> So I've tested it with kvm-unit-tests and got failure with the
+>> its-pending-migration case:
+>>
+>> INFO: gicv3: its-pending-migration: Migration complete
+>> INFO: gicv3: its-pending-migration: expected 128 LPIs on PE #30, 0 observed
+>> FAIL: gicv3: its-pending-migration: 128 LPIs on both PE0 and PE1 after
+>> migration
+>> SUMMARY: 1 tests, 1 unexpected failures
+>>
+>> where the guest SW directly writes to the pending table when
+>> GICR_CTLR.EnableLPIs == 0. I seriously doubt there is any use case like
+>> that in real world. But not sure whether it is a funky behaviour from
+>> the architectural perspective.
 > 
-> > > > Move the ownership tracking into the host data structure, and
-> > > > rename it from fp_state to fp_owner, which is a better description
-> > > > (name suggested by Mark Brown).
+> Right, so this is *exactly* the thing I was worried about. A mapping
+> has been established, the interrupt wasn't pending, all good. Now, an
+> interrupt lands while GICR_CTLR.EnableLPIs == 0.
 > 
-> > > The SME patch series proposes adding an additional state to this
-> > > enumeration which would say if the registers are stored in a format
-> > > suitable for exchange with userspace, that would make this state part of
-> > > the vCPU state.  With the addition of SME we can have two vector lengths
-> > > in play so the series proposes picking the larger to be the format for
-> > > userspace registers.
+> The spec says (4.7.3 "Effect of disabling interrupts")
 > 
-> > What does this addition have anything to do with the ownership of the
-> > physical register file? Not a lot, it seems.
+>   "When GICR_CTLR.EnableLPIs == 0, LPIs are never set pending."
 > 
-> > Specially as there better be no state resident on the CPU when
-> > userspace messes up with it.
-> 
-> If we have a situation where the state might be stored in memory in
-> multiple formats it seems reasonable to consider the metadata which
-> indicates which format is currently in use as part of the state.
+> which to me is a pretty damning indication that we shouldn't take
+> these bits into account.
 
-There is no reason why the state should be in multiple formats
-*simultaneously*. All the FP/SIMD/SVE/SME state is largely
-overlapping, and we only need to correctly invalidate the state that
-isn't relevant to writes from userspace.
+Ah, thanks for pointing it out! And I believe this is the rationale of
+Oliver's patch.
 
-> 
-> > > We could store this separately to fp_state/owner but it'd still be a
-> > > value stored in the vCPU.
-> 
-> > I totally disagree.
-> 
-> Where would you expect to see the state stored?
+What confused me is that the spec also says (5.1.2 "LPI Pending tables")
 
-Sorry, that came out wrong. I expect *some* vcpu state to describe the
-current use of the FP/vector registers, and that's about it. Not the
-ownership information.
+| "For physical LPIs, when GICR_CTLR.EnableLPIs is changed to 1, the
+|  Redistributor must read the pending status of the physical LPIs from
+|  the physical LPI Pending table."
 
-> 
-> > > Storing in a format suitable for userspace
-> > > usage all the time when we've got SME would most likely result in
-> > > performance overhead
-> 
-> > What performance overhead? Why should we care?
-> 
-> Since in situations where we're not using the larger VL we would need to
-> load and store the registers using a vector length other than the
-> currently configured vector length we would not be able to use the
-> ability to load and store to a location based on a multiple of the
-> vector length that the architecture has:
-> 
->    LDR <Zt>, [<Xn|SP>{, #<imm>, MUL VL}]
->    LDR <Pt>, [<Xn|SP>{, #<imm>, MUL VL}]
->    
->    STR <Zt>, [<Xn|SP>{, #<imm>, MUL VL}]
->    STR <Pt>, [<Xn|SP>{, #<imm>, MUL VL}]
-> 
-> and would instead need to manually compute the memory locations where
-> values are stored.  As well as the extra instructions when using the
-> smaller vector length we'd also be working with sparser data likely over
-> more cache lines.
+which implicitly indicates that the pending table can contain some
+pending bits (=1) when EnableLPIs == 0, which would be loaded by RD and
+make the relevant LPIs pending when EnableLPIs is written from 0 to 1.
 
-Are you talking about a context switch? or userspace accesses? I don't
-give a damn about the latter, as it statistically never happens. The
-former is of course of interest, but you still don't explain why the
-above is a problem.
+I have no idea how to interpret these rules ;-) .
 
-Nothing prevent you from storing the registers using the *current* VL,
-since there is no data sharing between the SVE registers and the
-streaming-SVE ones. All you need to do is to make sure you don't mix
-the two.
+> Of course, there is a grey area, in the sense that when we restore an
+> LPI via the restore interface, we are actually consuming pending bits
+> before EnableLPIs is set to 1.
 
-> We would also need to consider if we need to zero the holes in the data
-> when saving, we'd only potentially be leaking information from the guest
-> but it might cause nasty surprises given that transitioning to/from
-> streaming mode is expected to zero values.  If we do need to zero then
-> that would be additional work that would need doing.
+The restore path is clear to me now. VMM follows the "ITS Restore
+Sequence" of arm-vgic-its.rst, KVM then restores pending status for all
+LPIs via vgic_its_restore_ite()/vgic_v3_lpi_sync_pending_status().
 
-The zeroing is mandated by the architecture, AFAIU. That's not optional.
+Removing vgic_enable_lpis()/its_sync_lpi_pending_table() (in this patch)
+makes it much clearer.
 
-> 
-> Exactly what the performance hit would be will be system and use case
-> dependent.  *Hopefully* we aren't needing to save and load the guest
-> state too often but I would be very surprised if we didn't have people
-> considering any cost in the guest context switch path worth paying
-> attention to.
+> But I would tend to draw the line between an interrupt that is
+> restored as part of rebuilding the KVM state, and an interrupt that is
+> forcefully injected behind our back.
 
-These people can come out of the wood with numbers and reproducible
-workloads. Until they do, their concerns do not really exist.
++1!
 
-> As well as the performance overhead there would be some code complexity
-> cost, if nothing else we'd not be using the same format as fpsimd_save()
-> and would need to rearrange how we handle saving the register state.
-
-And I'm fine with that. The way we store things is nobody's business
-but ours, and I'm not sentimentally attached to 15 year old code.
-
-> Spending more effort to implement something which also has more runtime
-> performance overhead for the case of saving and restoring guest state
-> which I expect to be vastly more common than the VMM accessing the guest
-> registers just doesn't seem like an appealing choice.
-
-I don't buy the runtime performance aspect at all. As long as you have
-the space to dump the largest possible VL, you can always dump it in
-the native format.
-
-> > > if nothing else and feels more complicated than
-> > > rewriting the data in the relatively unusual case where userspace looks
-> > > at it.  Trying to convert userspace writes into the current layout would
-> > > have issues if the current layout uses the smaller vector length and
-> > > create fragility with ordering issues when loading the guest state.
-> 
-> > What ordering issues? If userspace manipulates the guest state, the
-> > guest isn't running. If it is, all bets are off.
-> 
-> If we were storing the data in the native format for the guest then that
-> format will change if streaming mode is changed via a write to SVCR.
-> This would mean that the host would need to understand that when writing
-> values SVCR needs to be written before the Z and P registers.  To be
-> clear I don't think this is a good idea.
-
-The architecture is crystal clear: you flip SVCR.SM, you loose all
-data in both Z and P regs. If userspace doesn't understand the
-architecture, that's their problem. The only thing we need to provide
-is a faithful emulation of the architecture.
-
-> 
-> > > The proposal is not the most lovely idea ever but given the architecture
-> > > I think some degree of clunkiness would be unavoidable.
-> 
-> > It is only unavoidable if we decide to make a bad job of it.
-> 
-> I don't think the handling of the vector registers for KVM with SME is
-> something where there is a clear good and bad job we can do - I don't
-> see how we can reasonably avoid at some point needing to translate
-> vector lengths or to/from FPSIMD format (in the case of a system with
-> SME but not SVE) which is just inherently a sharp edge.  It's just a
-> question of when and how we do that.
-
-My point is that there is no reason to translate the vector registers.
-As long as your vcpu is in a given mode, all storage is done in that
-mode. You switch mode, you lose data, as per the architecture. And
-yes, there is some zeroing and invalidation to perform if the vcpu has
-switched mode behind your back.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Zenghui
