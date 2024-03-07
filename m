@@ -1,54 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4579E12D776
-	for <kvmarm@lists.linux.dev>; Thu,  7 Mar 2024 13:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF9A12DDBB;
+	Thu,  7 Mar 2024 14:24:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709819421; cv=none; b=DTKPAp+2gXOZX5QIA1uBxW/9Ge+4TbzXa7uF4cWVJP48FraZD2Y0p6/fazFZTkmDIZykxjOSQATv+dv4n6dgnG2MJyQv7UG7r0Nx6G1zULd2TQdZzdvb2KBBkAzkdwGLqugFVnu7YHSVPU5pyPbtZJbOg8BwqgolpdTAlNFlFeI=
+	t=1709821455; cv=none; b=X6p1tZOv6QEWNp6AVjgnvPArRoaTiQYoEFeQatDF9FptGXaMucxFfIQF7NdfTXAmJ2vmQc9uBlvTLTR+rgDrFq/qKFUDWU2/mhFkEq4xY4jw0q9jtK/sFlaX3qjdbzr4VaehScwmv6Y2DYNqfbpg6VnwdgQTKWhjpmx2j/YuZSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709819421; c=relaxed/simple;
-	bh=HiqIhTVJ214R9Vb2kkfXbavmR7C6iP6xiPmPUyFhWis=;
+	s=arc-20240116; t=1709821455; c=relaxed/simple;
+	bh=SeKYgsfD02CyxjqB1q3f/vCt6yt6vglHNBbzp9JzJAs=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cgdPWWQR+WbkSC6KinuHlTIQI3JD42gmNjr0xCLdgLeACOIzb3EJJEeAE3WAu7SSQOOOd2pMlvDsRR38HWIHaKYKSMV9RD1LTVnjsOVnkQSnMl/wUkG9QHvj+N6P18j8EGdEFYX21QRxgFDWjkgL6pdAry6QdcdxKD2BZDUz9A4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o0iSnY3p; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=CgYq4w21YeA/38zLpTE3WSD4oquuo2C+pACsOBZMBnuSGmtKgYGu6n/vXBzucks61nH7RTV3MAAabvNQcAX5/keBBEEUQmoIZ3SqjaURtetTkTikbeVjG0+sWPttxfYf9Thyh+NKTN1H1R+gxZD1Ue3bheJ1xculWl7eONl8BEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EjfA4eA8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o0iSnY3p"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C20EBC433C7;
-	Thu,  7 Mar 2024 13:50:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EjfA4eA8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18CEEC433F1;
+	Thu,  7 Mar 2024 14:24:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709819420;
-	bh=HiqIhTVJ214R9Vb2kkfXbavmR7C6iP6xiPmPUyFhWis=;
+	s=k20201202; t=1709821455;
+	bh=SeKYgsfD02CyxjqB1q3f/vCt6yt6vglHNBbzp9JzJAs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=o0iSnY3pz/mnQEslFaxfUOzGEfm+zOF1o5xpNc6YAwm+3VcKH8NshshD2X3XGZIKr
-	 0ouAs+4l6RyybNDol3OgmVLD8FAgXIPGGhZcbaN8HDz7gW/iYy1nz9RknzhEyhfVJz
-	 fOLDOlW8gh/iU9AclT5mLT2zjCnJiDFvQ3zOydrg+KP916gjM+X1rjxK+Ne3PC6X8h
-	 RxEWAwB+QRHDYONxx+6ub+HNYCynDTCQN/TI3IEK2uKrO18WxiGAJzU4aGqR4kdUS0
-	 9cryFdF6k5rJCRHd58PDAu+5EL1DBq7HGxqRpDCVxbmY0GtWjRBG/hknLskr2jPlky
-	 bwZRJgsQXUDNg==
+	b=EjfA4eA81nA2FgcONi2/awMPpKz1pJzeHgN2n7J6MzyMifAm71iMv9bO0nhpgn+G7
+	 woBM6im54N61Wi1tY09OZZg91/1owMN100h56VBHD0aPO5dOhKJs7Z+89w2ef+tQT7
+	 IjJ2uVCowc0k9hUaIRsQzmjg5TtWRD6mWsE3XpF9CuEANVQDYRMril7jV4yZdjEsPX
+	 2wUifaJDCfhhbsHvVZqY7kOs0p4d0vmweKtb0z3TSwyFXQ/blFAiexKx26Ife/eBHh
+	 xXdtv+mEwuztWit8kqDKORvCY1UopOaBdq29W4d6MQ2Aur5xL8eHY62NeA8fGYB5d3
+	 G3aJJ9WPDejig==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1riE8X-00AK3C-UP;
-	Thu, 07 Mar 2024 13:50:18 +0000
-Date: Thu, 07 Mar 2024 13:50:17 +0000
-Message-ID: <86le6u178m.wl-maz@kernel.org>
+	id 1riEfL-00AKwL-OU;
+	Thu, 07 Mar 2024 14:24:11 +0000
+Date: Thu, 07 Mar 2024 14:24:11 +0000
+Message-ID: <86jzme15o4.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	<kvmarm@lists.linux.dev>,
-	James
- Morse <james.morse@arm.com>,
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Eric
- Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH] KVM: arm64: vgic-v3: Don't load pending state when enabling LPIs on RD
-In-Reply-To: <453f7cef-2b53-ccc6-40d2-6e147353f220@huawei.com>
-References: <20240228000117.2297982-1-oliver.upton@linux.dev>
-	<db2920fd-9fe8-1ff4-3f00-34dc4afdcdd5@huawei.com>
-	<86o7bq1hhd.wl-maz@kernel.org>
-	<453f7cef-2b53-ccc6-40d2-6e147353f220@huawei.com>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v2 11/13] KVM: arm64: nv: Add emulation for ERETAx instructions
+In-Reply-To: <20240307133912.GA861552@e124191.cambridge.arm.com>
+References: <20240226100601.2379693-1-maz@kernel.org>
+	<20240226100601.2379693-12-maz@kernel.org>
+	<20240307133912.GA861552@e124191.cambridge.arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,82 +61,161 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 07 Mar 2024 12:13:43 +0000,
-Zenghui Yu <yuzenghui@huawei.com> wrote:
+On Thu, 07 Mar 2024 13:39:12 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> Hi Marc,
-> 
-> On 2024/3/7 18:09, Marc Zyngier wrote:
-> > Hi Zenghui,
-> > 
-> > On Thu, 07 Mar 2024 09:00:42 +0000,
-> > Zenghui Yu <yuzenghui@huawei.com> wrote:
-> >> 
-> >> So I've tested it with kvm-unit-tests and got failure with the
-> >> its-pending-migration case:
-> >> 
-> >> INFO: gicv3: its-pending-migration: Migration complete
-> >> INFO: gicv3: its-pending-migration: expected 128 LPIs on PE #30, 0 observed
-> >> FAIL: gicv3: its-pending-migration: 128 LPIs on both PE0 and PE1 after
-> >> migration
-> >> SUMMARY: 1 tests, 1 unexpected failures
-> >> 
-> >> where the guest SW directly writes to the pending table when
-> >> GICR_CTLR.EnableLPIs == 0. I seriously doubt there is any use case like
-> >> that in real world. But not sure whether it is a funky behaviour from
-> >> the architectural perspective.
-> > 
-> > Right, so this is *exactly* the thing I was worried about. A mapping
-> > has been established, the interrupt wasn't pending, all good. Now, an
-> > interrupt lands while GICR_CTLR.EnableLPIs == 0.
-> > 
-> > The spec says (4.7.3 "Effect of disabling interrupts")
-> > 
-> >   "When GICR_CTLR.EnableLPIs == 0, LPIs are never set pending."
-> > 
-> > which to me is a pretty damning indication that we shouldn't take
-> > these bits into account.
-> 
-> Ah, thanks for pointing it out! And I believe this is the rationale of
-> Oliver's patch.
-> 
-> What confused me is that the spec also says (5.1.2 "LPI Pending tables")
-> 
-> | "For physical LPIs, when GICR_CTLR.EnableLPIs is changed to 1, the
-> |  Redistributor must read the pending status of the physical LPIs from
-> |  the physical LPI Pending table."
-> 
-> which implicitly indicates that the pending table can contain some
-> pending bits (=1) when EnableLPIs == 0, which would be loaded by RD and
-> make the relevant LPIs pending when EnableLPIs is written from 0 to 1.
-> 
-> I have no idea how to interpret these rules ;-) .
+> Note that this is my first time looking at PAuth.
 
-Yeah, even after all this time, the GICv3 spec never fails to
-entertain.  My take on this is that it is there to support the
-different ways to build a GICv3:
+I'm sorry! ;-)
 
-- either RDs are completely independent of the ITSs, and only deal
-  with the forwarding of enabled interrupts. In this case, setting
-  EnableLPIs to 1 would naturally lead to interrupt being forwarded to
-  the CPU. New bits are not allowed to be made pending while it is set
-  to 0 though, which matches 4.7.3.
+> 
+> On Mon, Feb 26, 2024 at 10:05:59AM +0000, Marc Zyngier wrote:
+> > FEAT_NV has the interesting property of relying on ERET being
+> > trapped. An added complexity is that it also traps ERETAA and
+> > ERETAB, meaning that the Pointer Authentication aspect of these
+> > instruction must be emulated.
+> > 
+> > Add an emulation of Pointer Authentication, limited to ERETAx
+> > (always using SP_EL2 as the modifier and ELR_EL2 as the pointer),
+> > using the Generic Authentication instructions.
+> > 
+> > The emulation, however small, is placed in its own compilation
+> > unit so that it can be avoided if the configuration doesn't
+> > include it (or the toolchan in not up to the task).
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_nested.h    |  12 ++
+> >  arch/arm64/include/asm/pgtable-hwdef.h |   1 +
+> >  arch/arm64/kvm/Makefile                |   1 +
+> >  arch/arm64/kvm/pauth.c                 | 196 +++++++++++++++++++++++++
+> >  4 files changed, 210 insertions(+)
+> >  create mode 100644 arch/arm64/kvm/pauth.c
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> > index dbc4e3a67356..5e0ab0596246 100644
+> > --- a/arch/arm64/include/asm/kvm_nested.h
+> > +++ b/arch/arm64/include/asm/kvm_nested.h
+> > @@ -64,4 +64,16 @@ extern bool forward_smc_trap(struct kvm_vcpu *vcpu);
+> >  
+> >  int kvm_init_nv_sysregs(struct kvm *kvm);
+> >  
+> > +#ifdef CONFIG_ARM64_PTR_AUTH
+> > +bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr);
+> > +#else
+> > +static inline bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr)
+> > +{
+> > +	/* We really should never execute this... */
+> > +	WARN_ON_ONCE(1);
+> > +	*elr = 0xbad9acc0debadbad;
+> > +	return false;
+> > +}
+> > +#endif
+> > +
+> >  #endif /* __ARM64_KVM_NESTED_H */
+> > diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+> > index e4944d517c99..bb88e9ef6296 100644
+> > --- a/arch/arm64/include/asm/pgtable-hwdef.h
+> > +++ b/arch/arm64/include/asm/pgtable-hwdef.h
+> > @@ -277,6 +277,7 @@
+> >  #define TCR_TBI1		(UL(1) << 38)
+> >  #define TCR_HA			(UL(1) << 39)
+> >  #define TCR_HD			(UL(1) << 40)
+> > +#define TCR_TBID0		(UL(1) << 51)
+> >  #define TCR_TBID1		(UL(1) << 52)
+> >  #define TCR_NFD0		(UL(1) << 53)
+> >  #define TCR_NFD1		(UL(1) << 54)
+> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> > index c0c050e53157..04882b577575 100644
+> > --- a/arch/arm64/kvm/Makefile
+> > +++ b/arch/arm64/kvm/Makefile
+> > @@ -23,6 +23,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+> >  	 vgic/vgic-its.o vgic/vgic-debug.o
+> >  
+> >  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
+> > +kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
+> >  
+> >  always-y := hyp_constants.h hyp-constants.s
+> >  
+> > diff --git a/arch/arm64/kvm/pauth.c b/arch/arm64/kvm/pauth.c
+> > new file mode 100644
+> > index 000000000000..a3a5c404375b
+> > --- /dev/null
+> > +++ b/arch/arm64/kvm/pauth.c
+> > @@ -0,0 +1,196 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + * Copyright (C) 2024 - Google LLC
+> > + * Author: Marc Zyngier <maz@kernel.org>
+> > + *
+> > + * Primitive PAuth emulation for ERETAA/ERETAB.
+> > + *
+> > + * This code assumes that is is run from EL2, and that it is part of
+> > + * the emulation of ERETAx for a guest hypervisor. That's a lot of
+> > + * baked-in assumptions and shortcuts.
+> > + *
+> > + * Do no reuse for anything else!
+> > + */
+> > +
+> > +#include <linux/kvm_host.h>
+> > +
+> > +#include <asm/kvm_emulate.h>
+> > +#include <asm/pointer_auth.h>
+> > +
+> > +static u64 compute_pac(struct kvm_vcpu *vcpu, u64 ptr,
+> > +		       struct ptrauth_key ikey)
+> > +{
+> > +	struct ptrauth_key gkey;
+> > +	u64 mod, pac = 0;
+> > +
+> > +	preempt_disable();
+> > +
+> > +	if (!vcpu_get_flag(vcpu, SYSREGS_ON_CPU))
+> > +		mod = __vcpu_sys_reg(vcpu, SP_EL2);
+> > +	else
+> > +		mod = read_sysreg(sp_el1);
+> > +
+> > +	gkey.lo = read_sysreg_s(SYS_APGAKEYLO_EL1);
+> > +	gkey.hi = read_sysreg_s(SYS_APGAKEYHI_EL1);
+> > +
+> > +	__ptrauth_key_install_nosync(APGA, ikey);
+> > +	isb();
+> > +
+> > +	asm volatile(ARM64_ASM_PREAMBLE ".arch_extension pauth\n"
+> > +		     "pacga %0, %1, %2" : "=r" (pac) : "r" (ptr), "r" (mod));
+> 
+> To use `pacga`, we require that the Address authentication and Generic
+> authentication use the same algorithm, right?
 
-- or RDs and ITSs are pretty monolithic, and the GIC infrastructure as
-  a whole maintain the pending state as a result of a translation, not
-  as a set of bits in the pending tables. In this case, EnableLPIs
-  gates the translation process and there are no new pending bits
-  being produced when it is set to 0. We can easily satisfy 5.1.2 by
-  not having created new pending bits.
+Indeed. It is a strong requirement, and if we don't have that, nothing
+works.
 
-So the two rules are more or less correct. They just are saying that
-it is IMPDEF what happens in this case, which is pretty damming for an
-interrupt controller architecture. I feel dirty just having to think
-of these things!
+Or rather, emulating ERETAx becomes so bloody complicated it isn't
+funny: you need to somehow to replay the auth in the context of a
+guest so that all of TCR_EL2, SP_EL2, SCTLR_EL2, HCR_EL2, ELR_EL2 are
+correctly set, get the value back, and compare it to the one you are
+trying to authenticate.
+
+Not happening! Mark and I talked about it ages ago and concluded it
+was absolutely insane. PACGA allows us to sidestep the whole thing and
+reconstruct the PAC like the pseudocode does using the ComputePAC()
+function.
+
+> There doesn't seem to be a check for that up front. There is kinda a check for
+> that if the PAC doesn't match, (by kvm_has_pauth()).
+
+Indeed. The main issue is that it is really hard to prevent that
+unless we forbid it for all KVM guests, not just NV guests. It is also
+that I don't know of any HW that would implement two different auth
+methods (which would be really bizarre from an implementation
+perspective).
+
+I'm happy to harden system_has_full_ptr_auth() in that case, which
+would do the trick.
 
 Thanks,
 
