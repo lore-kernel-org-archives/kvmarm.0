@@ -1,134 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921251E4A9;
-	Fri,  8 Mar 2024 17:54:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044BB5F564;
+	Fri,  8 Mar 2024 21:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709920464; cv=none; b=QfYkj7EPPwr7QgzIvrjtNjrcZS6wszbCJqJeTe/Xgs0KaFXo9jDr2OPGOpEFUm6Gd4lypu1ieumJig/SgW9pAg2l/s/PXxzPtZ5EqNnm6CE60VNFEuAidji4yd+DeAHGsAfu6N8V6Hingy7WE0aZBeY0fpgrIlXJjtAJY7s1Ef0=
+	t=1709931924; cv=none; b=fYkRCPYBJ/xFTVCNwyAqDPegi6wSlzTCgt5PSt3NdWDRnqORq/4N6USav1/XpdXCJ/93HIOPxwJIZ/PiwQQfWWnWeKfo/ahnLLaybmqr5A8fwsRnNw8JocBuVOUOJFe1jqHXyPyXFClnsfEwn9vPkFR0WaXKuWdONNguM+xYG2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709920464; c=relaxed/simple;
-	bh=XTDBgV8u300JsMhzl1J3kH/u694G+TtTR7EwriVVNnY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EcXrssmuFDONd595P3+J2OLC9iyTbzbQVMhnMUgttCoKpBYS+moQvqqqmxfH0b+qoTVr80VvQJbvhUFnR5HgFp4pYz/MVtYiyyXVmn9MyXD3NR0aWWAeGz/BXlBk741KNeIQ2Pn3Ts66tJErnVytkWPVrtBi5nUSbKfN4aAOoYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fxbPq530; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1709931924; c=relaxed/simple;
+	bh=HRn+4j3s0uvW5ahHq0WE6UyDKv//dbnY5NHz7Jy33W8=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=qTAze8nQBqW5NYqle4y97w7Q8VJaOUN5ydNnSJHbfGbvlTX/NVE+h2EonGa/AIOMRcm8nNm3fc22TAFh7LjCurFwo/iF7ubaGLSOiN9BILtE/+8/ws0WUGI+kzzd0w2tkKuBefCZSl4Vdotxi88VsYxG8Cy5F2aRr0Pn6In+bUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Lewi80TI; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fxbPq530"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27556C433F1;
-	Fri,  8 Mar 2024 17:54:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709920464;
-	bh=XTDBgV8u300JsMhzl1J3kH/u694G+TtTR7EwriVVNnY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fxbPq530X418y/lnp+f2Ysg5ehGiPcYvB1590PEmOhg/JgnRwvxDeh1+qS0XE5bYv
-	 UXNukxslcG88YyJXAu/G5Aa6s0G0/ap1L8Xbg5zHAqsMDbQ9eZknSM3HDVeY+p4OOB
-	 MlAWFNdBRV8iWajZeahsPMFLDVO6BpWwLk6zFjHoONG40w9mqWq4Ecme0FpIsyXZgS
-	 hwosj7aMZj4bKbdy9/gWy/XV8mkD/ppH65+TOFD6JHOQgf2LLyTCyj9RgnJ4tDDKPZ
-	 ajQ7I/Xfcz+xwjTfmcUq+YMrVO3cdu1oEdCvtAMNk8PpbocVKmiJe+RfmDN13La02L
-	 slsIiycvr1ivA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rieQH-00AnhP-Qm;
-	Fri, 08 Mar 2024 17:54:22 +0000
-Date: Fri, 08 Mar 2024 17:54:20 +0000
-Message-ID: <86h6hg1uer.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2 11/13] KVM: arm64: nv: Add emulation for ERETAx instructions
-In-Reply-To: <20240308172059.GA1052268@e124191.cambridge.arm.com>
-References: <20240226100601.2379693-1-maz@kernel.org>
-	<20240226100601.2379693-12-maz@kernel.org>
-	<20240308172059.GA1052268@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Lewi80TI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1709931923; x=1741467923;
+  h=from:to:cc:subject:date:message-id:content-id:
+   content-transfer-encoding:mime-version;
+  bh=HRn+4j3s0uvW5ahHq0WE6UyDKv//dbnY5NHz7Jy33W8=;
+  b=Lewi80TINxoSsKj+QRgv/7cACcM/B6W8qdJNkD40KASD7IHhDbLxe5UL
+   tr7WN0WDixDEp5Rt8B1ERPkbYBc3wo9GuY2kBtwzv61EiyIzb2r1Vloeo
+   rBW/KhRw3ZHwq6ZhgAbWq4+fp3lS0Hj5Ir9yHQClRliRm4jhiEVduFUag
+   w=;
+X-IronPort-AV: E=Sophos;i="6.07,110,1708387200"; 
+   d="scan'208";a="71864338"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2024 21:05:22 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [10.0.10.100:33697]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.9.238:2525] with esmtp (Farcaster)
+ id 0d5eeb03-8eea-46eb-993f-a3909d8a0217; Fri, 8 Mar 2024 21:05:21 +0000 (UTC)
+X-Farcaster-Flow-ID: 0d5eeb03-8eea-46eb-993f-a3909d8a0217
+Received: from EX19D022EUC001.ant.amazon.com (10.252.51.254) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 8 Mar 2024 21:05:21 +0000
+Received: from EX19D003UWC002.ant.amazon.com (10.13.138.169) by
+ EX19D022EUC001.ant.amazon.com (10.252.51.254) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 8 Mar 2024 21:05:20 +0000
+Received: from EX19D003UWC002.ant.amazon.com ([fe80::ab31:cc39:59f9:18b3]) by
+ EX19D003UWC002.ant.amazon.com ([fe80::ab31:cc39:59f9:18b3%3]) with mapi id
+ 15.02.1258.028; Fri, 8 Mar 2024 21:05:19 +0000
+From: "Manwaring, Derek" <derekmn@amazon.com>
+To: David Woodhouse <dwmw2@infradead.org>, David Matlack
+	<dmatlack@google.com>, Brendan Jackman <jackmanb@google.com>,
+	"tabba@google.com" <tabba@google.com>, "qperret@google.com"
+	<qperret@google.com>, "jason.cj.chen@intel.com" <jason.cj.chen@intel.com>
+CC: "Gowans, James" <jgowans@amazon.com>, "seanjc@google.com"
+	<seanjc@google.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"Roy, Patrick" <roypat@amazon.co.uk>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "rppt@kernel.org" <rppt@kernel.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Kalyazin, Nikita"
+	<kalyazin@amazon.co.uk>, "lstoakes@gmail.com" <lstoakes@gmail.com>,
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "linux-mm@kvack.org"
+	<linux-mm@kvack.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+	"vbabka@suse.cz" <vbabka@suse.cz>, "mst@redhat.com" <mst@redhat.com>,
+	"somlo@cmu.edu" <somlo@cmu.edu>, "Graf (AWS), Alexander" <graf@amazon.de>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-coco@lists.linux.dev"
+	<linux-coco@lists.linux.dev>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "kvmarm@lists.cs.columbia.edu"
+	<kvmarm@lists.cs.columbia.edu>
+Subject: Re: Unmapping KVM Guest Memory from Host Kernel
+Thread-Topic: Unmapping KVM Guest Memory from Host Kernel
+Thread-Index: AQHacZxTeX10YUH0O0SiQBg1zQLaEw==
+Date: Fri, 8 Mar 2024 21:05:19 +0000
+Message-ID: <335E21FA-7F1E-4540-8A70-01A63D8C72FA@amazon.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <105008749F655A45808AA99CDA7541DE@amazon.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
 
-On Fri, 08 Mar 2024 17:20:59 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> Phew..
-
-[...]
-
-> Each function in this file is quite small, but there's certainly a lot of
-> complexity and background knowledge required to understand them!
-> 
-> I spent quite some time on each part to see if it matches what I understood
-> from the Arm ARM.
-> 
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-
-Thanks a lot for putting up with it, much appreciated.
-
-> A side note / thing I considered. KVM doesn't currently handle ERET exceptions
-> from EL1.
-
-EL1 is ambiguous here. Is that EL1 from the PoV of the guest?
-
->
-> 1. If an ERETA{A,B} were executed from a nested EL1 guest, that would be
-> trapped up to Host KVM at EL2.
-
-There are two possibilities for that (assuming EL1 from the PoV of a
-L1 guest):
-
-(1) this EL1 guest is itself a guest hypervisor (i.e. we are running
-    an L1 guest which itself is using NV and running an L2 which
-    itself is a hypervisor). In that case, ERET* would have to be
-    trapped to EL2 and re-injected. Note that we do not support NV
-    under NV. Yet...
-
-(2) the L2 guest is not a hypervisor (no recursive NV), but the L1
-    hypervisor has set HFGITR_EL2.ERET==1. We'd have to re-inject the
-    exception into L1, just like in the precedent case.
-
-If neither HCR_EL2.NV nor HFGITR_EL2.ERET are set, then no ERET* gets
-trapped at all. Crucially, when running an L2 guest that doesn't isn't
-itself a hypervisor (no nested NV), we do not trap ERET* at all.
-
-In a way, the NV overhead is mostly when running L1. Once you run L2,
-the overhead "vanishes", to some extent (as long as you don't exit,
-because that's where the cost is).
-
-> 2. kvm_hyp_handle_eret() returns false since it's not from vEL2.  Inside
-> kvm_handle_eret(), is_hyp_ctxt() is false so the exception is injected into
-> vEL2 (via kvm_inject_nested_sync()).
-> 
-> 3. vEL2 gets the exception, kvm_hyp_handle_eret() returns false as before.
-> Inside kvm_handle_eret(), is_hyp_ctxt() is also false, so
-> kvm_inject_nested_sync() is called but now errors out since vcpu_has_nv() is
-> false.
-> 
-> Is that flow right? Am I missing something?
-
-I'm not sure. The cases where ERET gets trapped are really limited to
-the above two cases.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+T24gMjAyNC0wMy0wOCBhdCAxMDo0Ni0wNzAwLCBEYXZpZCBXb29kaG91c2Ugd3JvdGU6DQo+IE9u
+IEZyaSwgMjAyNC0wMy0wOCBhdCAwOTozNSAtMDgwMCwgRGF2aWQgTWF0bGFjayB3cm90ZToNCj4g
+PiBJIHRoaW5rIHdoYXQgSmFtZXMgaXMgbG9va2luZyBmb3IgKGFuZCB3aGF0IHdlIGFyZSBhbHNv
+IGludGVyZXN0ZWQNCj4gPiBpbiksIGlzIF9lbGltaW5hdGluZ18gdGhlIGFiaWxpdHkgdG8gYWNj
+ZXNzIGd1ZXN0IG1lbW9yeSBmcm9tIHRoZQ0KPiA+IGRpcmVjdCBtYXAgZW50aXJlbHkuIEFuZCBp
+biBnZW5lcmFsLCBlbGltaW5hdGUgdGhlIGFiaWxpdHkgdG8gYWNjZXNzDQo+ID4gZ3Vlc3QgbWVt
+b3J5IGluIGFzIG1hbnkgd2F5cyBhcyBwb3NzaWJsZS4NCj4NCj4gV2VsbCwgcEtWTSBkb2VzIHRo
+YXQuLi4NCg0KWWVzIHdlJ3ZlIGJlZW4gbG9va2luZyBhdCBwS1ZNIGFuZCBpdCBhY2NvbXBsaXNo
+ZXMgYSBsb3Qgb2Ygd2hhdCB3ZSdyZSB0cnlpbmcNCnRvIGRvLiBPdXIgaW5pdGlhbCBpbmNsaW5h
+dGlvbiBpcyB0aGF0IHdlIHdhbnQgdG8gc3RpY2sgd2l0aCBWSEUgZm9yIHRoZSBsb3dlcg0Kb3Zl
+cmhlYWQuIFdlIGFsc28gd2FudCBmbGV4aWJpbGl0eSBhY3Jvc3Mgc2VydmVyIHBhcnRzLCBzbyB3
+ZSB3b3VsZCBuZWVkIHRvDQpnZXQgcEtWTSB3b3JraW5nIG9uIEludGVsICYgQU1EIGlmIHdlIHdl
+bnQgdGhpcyByb3V0ZS4NCg0KQ2VydGFpbmx5IHRoZXJlIGFyZSBhZHZhbnRhZ2VzIG9mIHBLVk0g
+b24gdGhlIHBlcmYgc2lkZSBsaWtlIHRoZSBpbi1wbGFjZQ0KbWVtb3J5IHNoYXJpbmcgcmF0aGVy
+IHRoYW4gY29weWluZyBhcyB3ZWxsIGFzIG9uIHRoZSBzZWN1cml0eSBzaWRlIGJ5IHNpbXBseQ0K
+cmVkdWNpbmcgdGhlIFRDQi4gSSdkIGJlIGludGVyZXN0ZWQgdG8gaGVhciBvdGhlcnMnIHRob3Vn
+aHRzIG9uIHBLVk0gdnMNCm1lbWZkX3NlY3JldCBvciBnZW5lcmFsIEFTSS4NCg0KRGVyZWsNCg0K
