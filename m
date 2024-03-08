@@ -1,111 +1,134 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA0620B0E
-	for <kvmarm@lists.linux.dev>; Fri,  8 Mar 2024 17:48:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921251E4A9;
+	Fri,  8 Mar 2024 17:54:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709920126; cv=none; b=BxOOw6CnKXzUdY4evbLKliR8ecBEBGePzIpHKmR/VCGmaRkNN4SBCijZ7/NCKQ/zavveFIN1WgsLo9WNPaA6KsmTAfYxuwl+7PC97taS3/2+UfaMxZ+UvR8xKyyJqHdV2YayaSJA/fFOxaet1weE+FrqvwPUiF++Kt+s0wFRkto=
+	t=1709920464; cv=none; b=QfYkj7EPPwr7QgzIvrjtNjrcZS6wszbCJqJeTe/Xgs0KaFXo9jDr2OPGOpEFUm6Gd4lypu1ieumJig/SgW9pAg2l/s/PXxzPtZ5EqNnm6CE60VNFEuAidji4yd+DeAHGsAfu6N8V6Hingy7WE0aZBeY0fpgrIlXJjtAJY7s1Ef0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709920126; c=relaxed/simple;
-	bh=eg7AYpEbK2NlGF33NSqJViSum65hZETVGpUibsACD4o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hvcl2C57aeZjAlWL5rWt2VE+mHNJ93BcdpxsYsBfLnSdHL9vQzF2Oy3Chl1wqZVpnKTtDPMgYJathmO+5DT89VeI4bdNpqwcDP3S7QI7ZviZDVkADWy7Z0xoVH2SSaCsG20uCF1iAGkPQtbPwR9FHwbnSNqdmKFfveohz2q8UA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CtoyRC1A; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1709920464; c=relaxed/simple;
+	bh=XTDBgV8u300JsMhzl1J3kH/u694G+TtTR7EwriVVNnY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EcXrssmuFDONd595P3+J2OLC9iyTbzbQVMhnMUgttCoKpBYS+moQvqqqmxfH0b+qoTVr80VvQJbvhUFnR5HgFp4pYz/MVtYiyyXVmn9MyXD3NR0aWWAeGz/BXlBk741KNeIQ2Pn3Ts66tJErnVytkWPVrtBi5nUSbKfN4aAOoYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fxbPq530; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CtoyRC1A"
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d33986dbc0so24918991fa.2
-        for <kvmarm@lists.linux.dev>; Fri, 08 Mar 2024 09:48:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709920123; x=1710524923; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eg7AYpEbK2NlGF33NSqJViSum65hZETVGpUibsACD4o=;
-        b=CtoyRC1A+OjTAtFbNFtVLaNbd+PI8bAY+770GrbJTjhnMEgunPV7pXsdIj+2dQKo9p
-         QS+vapucEZqs4AtsIH8nCIPNpTx1PO6OeQ6JnPZSOB5xGEDLBT0DzPHOFaDezUjsjPrH
-         RvNH8MN8+N+O73ppSWJdWBAJQj0Mr1yBCPPgi7A/YAOr3QrEIK3ftqob+ey3zWEZzpEJ
-         Z+xq0hXZNVGXniCIo3QsUIiuwR8Cda1biipveDCL0fvEBJDo577cIg/d0HXJPO7dD2+N
-         p08ZMAqFo+qUS/S6/Oru7cIs3QRQf1ff2rvi1TLhvmzGUbSWGK4zcFi5Tqi0wzh+KUNn
-         Ldlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709920123; x=1710524923;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eg7AYpEbK2NlGF33NSqJViSum65hZETVGpUibsACD4o=;
-        b=UxIvmLWOdz31A5witNewYnB5VN5CU43lOP5UYcQq0UasnAJN5flfERuGX6fMj2/0MB
-         gTt/vv4g75w1IG0BQ7oRaipqkPiFLVeHE8eZOcFqGThMLqSFtK7wpuIzXJGfdb9QZqOr
-         SNtzErJavITkPjuhfhJe/XsUKXdyZ0EuBVfCniMBwpqkG+26QqhrhkjoCTD9wOG+HHAR
-         lOqtL2vkC9J7uOU8F3p18qD4ELIJmTYP94LPmP0CO2hyI7YugySnMe6GnisG5kNM7XU9
-         E9yteeQxIDQFEe7rnHc/ojDmR0jeluweRBJOsxZSvLEg70m7hWNkYnwUn4rtXb/A1zYO
-         mlpA==
-X-Forwarded-Encrypted: i=1; AJvYcCVmIbTxrDQOImvMljVr5VtUCRvbPVsYos89hgC4xvC9KUPvM9VI0Qh4sMl66sZ+WEKpDfYr3SxA3VFQRfMgAk6PWGS57/Cb
-X-Gm-Message-State: AOJu0Yy3oi4ExX1ng4cstzl5495NcIEd+Nxxrr1cAHeHKnxrGXoHIhDf
-	lZB6MzZFcpI5kKnTz0KNBAef5GUvwUhGhCK8h5pry00VOsJ+KKN7mg2NTnn0L8Sk8X+IBgNhmoU
-	iKx/9Bl5lbqEyub/vtvxXcnfSxeKwGNX0dhRo
-X-Google-Smtp-Source: AGHT+IEPBynRMHTbGiNCHfkAEBAnFTM/utzuMZjv9yJKypOxhApm2NaGzLIYnTTQ7vfOdVVpvnnq2R66XM2GgBR0Hb8=
-X-Received: by 2002:a05:651c:1049:b0:2d2:4474:2e69 with SMTP id
- x9-20020a05651c104900b002d244742e69mr4074164ljm.9.1709920122526; Fri, 08 Mar
- 2024 09:48:42 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fxbPq530"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27556C433F1;
+	Fri,  8 Mar 2024 17:54:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709920464;
+	bh=XTDBgV8u300JsMhzl1J3kH/u694G+TtTR7EwriVVNnY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fxbPq530X418y/lnp+f2Ysg5ehGiPcYvB1590PEmOhg/JgnRwvxDeh1+qS0XE5bYv
+	 UXNukxslcG88YyJXAu/G5Aa6s0G0/ap1L8Xbg5zHAqsMDbQ9eZknSM3HDVeY+p4OOB
+	 MlAWFNdBRV8iWajZeahsPMFLDVO6BpWwLk6zFjHoONG40w9mqWq4Ecme0FpIsyXZgS
+	 hwosj7aMZj4bKbdy9/gWy/XV8mkD/ppH65+TOFD6JHOQgf2LLyTCyj9RgnJ4tDDKPZ
+	 ajQ7I/Xfcz+xwjTfmcUq+YMrVO3cdu1oEdCvtAMNk8PpbocVKmiJe+RfmDN13La02L
+	 slsIiycvr1ivA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rieQH-00AnhP-Qm;
+	Fri, 08 Mar 2024 17:54:22 +0000
+Date: Fri, 08 Mar 2024 17:54:20 +0000
+Message-ID: <86h6hg1uer.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v2 11/13] KVM: arm64: nv: Add emulation for ERETAx instructions
+In-Reply-To: <20240308172059.GA1052268@e124191.cambridge.arm.com>
+References: <20240226100601.2379693-1-maz@kernel.org>
+	<20240226100601.2379693-12-maz@kernel.org>
+	<20240308172059.GA1052268@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20231207150804.3425468-1-james.morse@arm.com> <ZXoTG1Y4O16Cjq39@linux.dev>
- <f06ed418-922d-54c5-22a0-bde127146b5a@arm.com> <ZbAMxyGcSZY7Kl7Z@linux.dev>
-In-Reply-To: <ZbAMxyGcSZY7Kl7Z@linux.dev>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Fri, 8 Mar 2024 09:48:30 -0800
-Message-ID: <CAAdAUtgr-AmQKUhAf4Dbg+jurzzDJ1xCzJkptwACuWAnZv_d_A@mail.gmail.com>
-Subject: Re: [PATCH v2 0/4] KVM: arm64: Hide unsupported MPAM from the guest
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi James,
+On Fri, 08 Mar 2024 17:20:59 +0000,
+Joey Gouly <joey.gouly@arm.com> wrote:
+> 
+> Phew..
 
-Will you have a new version for this patch series?
+[...]
 
-Jing
+> Each function in this file is quite small, but there's certainly a lot of
+> complexity and background knowledge required to understand them!
+> 
+> I spent quite some time on each part to see if it matches what I understood
+> from the Arm ARM.
+> 
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-On Tue, Jan 23, 2024 at 11:06=E2=80=AFAM Oliver Upton <oliver.upton@linux.d=
-ev> wrote:
+Thanks a lot for putting up with it, much appreciated.
+
+> A side note / thing I considered. KVM doesn't currently handle ERET exceptions
+> from EL1.
+
+EL1 is ambiguous here. Is that EL1 from the PoV of the guest?
+
 >
-> On Fri, Jan 19, 2024 at 05:15:59PM +0000, James Morse wrote:
->
-> [...]
->
-> > > We've already done something similar to hide our mistakes with IMP DE=
-F
-> > > PMU versions in commit f90f9360c3d7 ("KVM: arm64: Rewrite IMPDEF PMU
-> > > version as NI"), and I think MPAM may be a good candidate for somethi=
-ng
-> > > similar.
-> >
-> > As there is precedent, I feel less dirty doing that!
-> >
-> > This also solves the problem of the VMM re-writing the broken value aft=
-er the vCPU has
-> > started running, and getting a surprise error. A weird side effect of d=
-oing this would be
-> > you can write MPAM=3D1 on A53 and KVM will ignore it, I don't want user=
--space to start
-> > relying on that! I'll add a final-cap check so this can only be ignored=
- on hardware that
-> > actually has MPAM, and could have been exposed to the bug.
->
-> Ah, good idea. I probably should've done something similar in the PMU
-> case.
->
-> --
-> Thanks,
-> Oliver
->
+> 1. If an ERETA{A,B} were executed from a nested EL1 guest, that would be
+> trapped up to Host KVM at EL2.
+
+There are two possibilities for that (assuming EL1 from the PoV of a
+L1 guest):
+
+(1) this EL1 guest is itself a guest hypervisor (i.e. we are running
+    an L1 guest which itself is using NV and running an L2 which
+    itself is a hypervisor). In that case, ERET* would have to be
+    trapped to EL2 and re-injected. Note that we do not support NV
+    under NV. Yet...
+
+(2) the L2 guest is not a hypervisor (no recursive NV), but the L1
+    hypervisor has set HFGITR_EL2.ERET==1. We'd have to re-inject the
+    exception into L1, just like in the precedent case.
+
+If neither HCR_EL2.NV nor HFGITR_EL2.ERET are set, then no ERET* gets
+trapped at all. Crucially, when running an L2 guest that doesn't isn't
+itself a hypervisor (no nested NV), we do not trap ERET* at all.
+
+In a way, the NV overhead is mostly when running L1. Once you run L2,
+the overhead "vanishes", to some extent (as long as you don't exit,
+because that's where the cost is).
+
+> 2. kvm_hyp_handle_eret() returns false since it's not from vEL2.  Inside
+> kvm_handle_eret(), is_hyp_ctxt() is false so the exception is injected into
+> vEL2 (via kvm_inject_nested_sync()).
+> 
+> 3. vEL2 gets the exception, kvm_hyp_handle_eret() returns false as before.
+> Inside kvm_handle_eret(), is_hyp_ctxt() is also false, so
+> kvm_inject_nested_sync() is called but now errors out since vcpu_has_nv() is
+> false.
+> 
+> Is that flow right? Am I missing something?
+
+I'm not sure. The cases where ERET gets trapped are really limited to
+the above two cases.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
