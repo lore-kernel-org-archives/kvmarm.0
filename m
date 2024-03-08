@@ -1,346 +1,111 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 532CE4C627
-	for <kvmarm@lists.linux.dev>; Fri,  8 Mar 2024 17:21:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA0620B0E
+	for <kvmarm@lists.linux.dev>; Fri,  8 Mar 2024 17:48:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709918471; cv=none; b=q/Omdon+3bgfqctuIUb1XdE7ZysUxROW0ElUDQqMUz/Ipc0qNj7ED3FVpA4XDjTuRlzobqfhvl1OMQHXwphyHRpC0DJPd9MuBjkNXlnEnH0IFUzp23mwOtLLGLTgkWB9MWQcr0hNsqSI1DT1j7APa3K2t+nKYXIBiwdH2w3Rrpg=
+	t=1709920126; cv=none; b=BxOOw6CnKXzUdY4evbLKliR8ecBEBGePzIpHKmR/VCGmaRkNN4SBCijZ7/NCKQ/zavveFIN1WgsLo9WNPaA6KsmTAfYxuwl+7PC97taS3/2+UfaMxZ+UvR8xKyyJqHdV2YayaSJA/fFOxaet1weE+FrqvwPUiF++Kt+s0wFRkto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709918471; c=relaxed/simple;
-	bh=i37/8mp8aujBGo+6L2woz8WoAapVoQ4OPIaSRPWVPMw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QuHBAq+H0ksNq9xpgw+5jVH2KxIhMm1wzdb0A1bYV8MJfitxu4I8CR4hUfcWMV1IBu/AKHqwEXH3HVS6Sq8r0K13xWvzBHDfdGUL35tuBBKTFy2TbuOvAnSz8nky43oFh2ew9lpOTa28QKGsJ8gEiyaTG1KYupdXGAG+ixYVb8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 78594C15;
-	Fri,  8 Mar 2024 09:21:45 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5611C3F738;
-	Fri,  8 Mar 2024 09:21:07 -0800 (PST)
-Date: Fri, 8 Mar 2024 17:20:59 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2 11/13] KVM: arm64: nv: Add emulation for ERETAx
- instructions
-Message-ID: <20240308172059.GA1052268@e124191.cambridge.arm.com>
-References: <20240226100601.2379693-1-maz@kernel.org>
- <20240226100601.2379693-12-maz@kernel.org>
+	s=arc-20240116; t=1709920126; c=relaxed/simple;
+	bh=eg7AYpEbK2NlGF33NSqJViSum65hZETVGpUibsACD4o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hvcl2C57aeZjAlWL5rWt2VE+mHNJ93BcdpxsYsBfLnSdHL9vQzF2Oy3Chl1wqZVpnKTtDPMgYJathmO+5DT89VeI4bdNpqwcDP3S7QI7ZviZDVkADWy7Z0xoVH2SSaCsG20uCF1iAGkPQtbPwR9FHwbnSNqdmKFfveohz2q8UA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CtoyRC1A; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CtoyRC1A"
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d33986dbc0so24918991fa.2
+        for <kvmarm@lists.linux.dev>; Fri, 08 Mar 2024 09:48:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1709920123; x=1710524923; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eg7AYpEbK2NlGF33NSqJViSum65hZETVGpUibsACD4o=;
+        b=CtoyRC1A+OjTAtFbNFtVLaNbd+PI8bAY+770GrbJTjhnMEgunPV7pXsdIj+2dQKo9p
+         QS+vapucEZqs4AtsIH8nCIPNpTx1PO6OeQ6JnPZSOB5xGEDLBT0DzPHOFaDezUjsjPrH
+         RvNH8MN8+N+O73ppSWJdWBAJQj0Mr1yBCPPgi7A/YAOr3QrEIK3ftqob+ey3zWEZzpEJ
+         Z+xq0hXZNVGXniCIo3QsUIiuwR8Cda1biipveDCL0fvEBJDo577cIg/d0HXJPO7dD2+N
+         p08ZMAqFo+qUS/S6/Oru7cIs3QRQf1ff2rvi1TLhvmzGUbSWGK4zcFi5Tqi0wzh+KUNn
+         Ldlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709920123; x=1710524923;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eg7AYpEbK2NlGF33NSqJViSum65hZETVGpUibsACD4o=;
+        b=UxIvmLWOdz31A5witNewYnB5VN5CU43lOP5UYcQq0UasnAJN5flfERuGX6fMj2/0MB
+         gTt/vv4g75w1IG0BQ7oRaipqkPiFLVeHE8eZOcFqGThMLqSFtK7wpuIzXJGfdb9QZqOr
+         SNtzErJavITkPjuhfhJe/XsUKXdyZ0EuBVfCniMBwpqkG+26QqhrhkjoCTD9wOG+HHAR
+         lOqtL2vkC9J7uOU8F3p18qD4ELIJmTYP94LPmP0CO2hyI7YugySnMe6GnisG5kNM7XU9
+         E9yteeQxIDQFEe7rnHc/ojDmR0jeluweRBJOsxZSvLEg70m7hWNkYnwUn4rtXb/A1zYO
+         mlpA==
+X-Forwarded-Encrypted: i=1; AJvYcCVmIbTxrDQOImvMljVr5VtUCRvbPVsYos89hgC4xvC9KUPvM9VI0Qh4sMl66sZ+WEKpDfYr3SxA3VFQRfMgAk6PWGS57/Cb
+X-Gm-Message-State: AOJu0Yy3oi4ExX1ng4cstzl5495NcIEd+Nxxrr1cAHeHKnxrGXoHIhDf
+	lZB6MzZFcpI5kKnTz0KNBAef5GUvwUhGhCK8h5pry00VOsJ+KKN7mg2NTnn0L8Sk8X+IBgNhmoU
+	iKx/9Bl5lbqEyub/vtvxXcnfSxeKwGNX0dhRo
+X-Google-Smtp-Source: AGHT+IEPBynRMHTbGiNCHfkAEBAnFTM/utzuMZjv9yJKypOxhApm2NaGzLIYnTTQ7vfOdVVpvnnq2R66XM2GgBR0Hb8=
+X-Received: by 2002:a05:651c:1049:b0:2d2:4474:2e69 with SMTP id
+ x9-20020a05651c104900b002d244742e69mr4074164ljm.9.1709920122526; Fri, 08 Mar
+ 2024 09:48:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240226100601.2379693-12-maz@kernel.org>
+References: <20231207150804.3425468-1-james.morse@arm.com> <ZXoTG1Y4O16Cjq39@linux.dev>
+ <f06ed418-922d-54c5-22a0-bde127146b5a@arm.com> <ZbAMxyGcSZY7Kl7Z@linux.dev>
+In-Reply-To: <ZbAMxyGcSZY7Kl7Z@linux.dev>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Fri, 8 Mar 2024 09:48:30 -0800
+Message-ID: <CAAdAUtgr-AmQKUhAf4Dbg+jurzzDJ1xCzJkptwACuWAnZv_d_A@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] KVM: arm64: Hide unsupported MPAM from the guest
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Phew..
+Hi James,
 
-On Mon, Feb 26, 2024 at 10:05:59AM +0000, Marc Zyngier wrote:
-> FEAT_NV has the interesting property of relying on ERET being
-> trapped. An added complexity is that it also traps ERETAA and
-> ERETAB, meaning that the Pointer Authentication aspect of these
-> instruction must be emulated.
-> 
-> Add an emulation of Pointer Authentication, limited to ERETAx
-> (always using SP_EL2 as the modifier and ELR_EL2 as the pointer),
-> using the Generic Authentication instructions.
-> 
-> The emulation, however small, is placed in its own compilation
-> unit so that it can be avoided if the configuration doesn't
-> include it (or the toolchan in not up to the task).
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_nested.h    |  12 ++
->  arch/arm64/include/asm/pgtable-hwdef.h |   1 +
->  arch/arm64/kvm/Makefile                |   1 +
->  arch/arm64/kvm/pauth.c                 | 196 +++++++++++++++++++++++++
->  4 files changed, 210 insertions(+)
->  create mode 100644 arch/arm64/kvm/pauth.c
-> 
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index dbc4e3a67356..5e0ab0596246 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -64,4 +64,16 @@ extern bool forward_smc_trap(struct kvm_vcpu *vcpu);
->  
->  int kvm_init_nv_sysregs(struct kvm *kvm);
->  
-> +#ifdef CONFIG_ARM64_PTR_AUTH
-> +bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr);
-> +#else
-> +static inline bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr)
-> +{
-> +	/* We really should never execute this... */
-> +	WARN_ON_ONCE(1);
-> +	*elr = 0xbad9acc0debadbad;
-> +	return false;
-> +}
-> +#endif
-> +
->  #endif /* __ARM64_KVM_NESTED_H */
-> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-> index e4944d517c99..bb88e9ef6296 100644
-> --- a/arch/arm64/include/asm/pgtable-hwdef.h
-> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
-> @@ -277,6 +277,7 @@
->  #define TCR_TBI1		(UL(1) << 38)
->  #define TCR_HA			(UL(1) << 39)
->  #define TCR_HD			(UL(1) << 40)
-> +#define TCR_TBID0		(UL(1) << 51)
->  #define TCR_TBID1		(UL(1) << 52)
->  #define TCR_NFD0		(UL(1) << 53)
->  #define TCR_NFD1		(UL(1) << 54)
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index c0c050e53157..04882b577575 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -23,6 +23,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->  	 vgic/vgic-its.o vgic/vgic-debug.o
->  
->  kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
-> +kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
->  
->  always-y := hyp_constants.h hyp-constants.s
->  
-> diff --git a/arch/arm64/kvm/pauth.c b/arch/arm64/kvm/pauth.c
-> new file mode 100644
-> index 000000000000..a3a5c404375b
-> --- /dev/null
-> +++ b/arch/arm64/kvm/pauth.c
-> @@ -0,0 +1,196 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2024 - Google LLC
-> + * Author: Marc Zyngier <maz@kernel.org>
-> + *
-> + * Primitive PAuth emulation for ERETAA/ERETAB.
-> + *
-> + * This code assumes that is is run from EL2, and that it is part of
-> + * the emulation of ERETAx for a guest hypervisor. That's a lot of
-> + * baked-in assumptions and shortcuts.
-> + *
-> + * Do no reuse for anything else!
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +
-> +#include <asm/kvm_emulate.h>
-> +#include <asm/pointer_auth.h>
-> +
-> +static u64 compute_pac(struct kvm_vcpu *vcpu, u64 ptr,
-> +		       struct ptrauth_key ikey)
-> +{
-> +	struct ptrauth_key gkey;
-> +	u64 mod, pac = 0;
-> +
-> +	preempt_disable();
-> +
-> +	if (!vcpu_get_flag(vcpu, SYSREGS_ON_CPU))
-> +		mod = __vcpu_sys_reg(vcpu, SP_EL2);
-> +	else
-> +		mod = read_sysreg(sp_el1);
-> +
-> +	gkey.lo = read_sysreg_s(SYS_APGAKEYLO_EL1);
-> +	gkey.hi = read_sysreg_s(SYS_APGAKEYHI_EL1);
-> +
-> +	__ptrauth_key_install_nosync(APGA, ikey);
-> +	isb();
-> +
-> +	asm volatile(ARM64_ASM_PREAMBLE ".arch_extension pauth\n"
-> +		     "pacga %0, %1, %2" : "=r" (pac) : "r" (ptr), "r" (mod));
-> +	isb();
-> +
-> +	__ptrauth_key_install_nosync(APGA, gkey);
-> +
-> +	preempt_enable();
-> +
-> +	/* PAC in the top 32bits */
-> +	return pac;
-> +}
-> +
-> +static bool effective_tbi(struct kvm_vcpu *vcpu, bool bit55)
-> +{
-> +	u64 tcr = vcpu_read_sys_reg(vcpu, TCR_EL2);
-> +	bool tbi, tbid;
-> +
-> +	/*
-> +	 * Since we are authenticating an instruction address, we have
-> +	 * to take TBID into account. If E2H==0, ignore VA[55], as
-> +	 * TCR_EL2 only has a single TBI/TBID. If VA[55] was set in
-> +	 * this case, this is likely a guest bug...
-> +	 */
-> +	if (!vcpu_el2_e2h_is_set(vcpu)) {
-> +		tbi = tcr & BIT(20);
-> +		tbid = tcr & BIT(29);
-> +	} else if (bit55) {
-> +		tbi = tcr & TCR_TBI1;
-> +		tbid = tcr & TCR_TBID1;
-> +	} else {
-> +		tbi = tcr & TCR_TBI0;
-> +		tbid = tcr & TCR_TBID0;
-> +	}
-> +
-> +	return tbi && !tbid;
-> +}
-> +
-> +static int compute_bottom_pac(struct kvm_vcpu *vcpu, bool bit55)
-> +{
-> +	static const int maxtxsz = 39; // Revisit these two values once
-> +	static const int mintxsz = 16; // (if) we support TTST/LVA/LVA2
-> +	u64 tcr = vcpu_read_sys_reg(vcpu, TCR_EL2);
-> +	int txsz;
-> +
-> +	if (!vcpu_el2_e2h_is_set(vcpu) || !bit55)
-> +		txsz = FIELD_GET(TCR_T0SZ_MASK, tcr);
-> +	else
-> +		txsz = FIELD_GET(TCR_T1SZ_MASK, tcr);
-> +
-> +	return 64 - clamp(txsz, mintxsz, maxtxsz);
-> +}
-> +
-> +static u64 compute_pac_mask(struct kvm_vcpu *vcpu, bool bit55)
-> +{
-> +	int bottom_pac;
-> +	u64 mask;
-> +
-> +	bottom_pac = compute_bottom_pac(vcpu, bit55);
-> +
-> +	mask = GENMASK(54, bottom_pac);
-> +	if (!effective_tbi(vcpu, bit55))
-> +		mask |= GENMASK(63, 56);
-> +
-> +	return mask;
-> +}
-> +
-> +static u64 to_canonical_addr(struct kvm_vcpu *vcpu, u64 ptr, u64 mask)
-> +{
-> +	bool bit55 = !!(ptr & BIT(55));
-> +
-> +	if (bit55)
-> +		return ptr | mask;
-> +
-> +	return ptr & ~mask;
-> +}
-> +
-> +static u64 corrupt_addr(struct kvm_vcpu *vcpu, u64 ptr)
-> +{
-> +	bool bit55 = !!(ptr & BIT(55));
-> +	u64 mask, error_code;
-> +	int shift;
-> +
-> +	if (effective_tbi(vcpu, bit55)) {
-> +		mask = GENMASK(54, 53);
-> +		shift = 53;
-> +	} else {
-> +		mask = GENMASK(62, 61);
-> +		shift = 61;
-> +	}
-> +
-> +	if (esr_iss_is_eretab(kvm_vcpu_get_esr(vcpu)))
-> +		error_code = 2 << shift;
-> +	else
-> +		error_code = 1 << shift;
-> +
-> +	ptr &= ~mask;
-> +	ptr |= error_code;
-> +
-> +	return ptr;
-> +}
-> +
-> +/*
-> + * Authenticate an ERETAA/ERETAB instruction, returning true if the
-> + * authentication succeeded and false otherwise. In all cases, *elr
-> + * contains the VA to ERET to. Potential exception injection is left
-> + * to the caller.
-> + */
-> +bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr)
-> +{
-> +	u64 sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL2);
-> +	u64 esr = kvm_vcpu_get_esr(vcpu);
-> +	u64 ptr, cptr, pac, mask;
-> +	struct ptrauth_key ikey;
-> +
-> +	*elr = ptr = vcpu_read_sys_reg(vcpu, ELR_EL2);
-> +
-> +	/* We assume we're already in the context of an ERETAx */
-> +	if (esr_iss_is_eretab(esr)) {
-> +		if (!(sctlr & SCTLR_EL1_EnIB))
-> +			return true;
-> +
-> +		ikey.lo = __vcpu_sys_reg(vcpu, APIBKEYLO_EL1);
-> +		ikey.hi = __vcpu_sys_reg(vcpu, APIBKEYHI_EL1);
-> +	} else {
-> +		if (!(sctlr & SCTLR_EL1_EnIA))
-> +			return true;
-> +
-> +		ikey.lo = __vcpu_sys_reg(vcpu, APIAKEYLO_EL1);
-> +		ikey.hi = __vcpu_sys_reg(vcpu, APIAKEYHI_EL1);
-> +	}
-> +
-> +	mask = compute_pac_mask(vcpu, !!(ptr & BIT(55)));
-> +	cptr = to_canonical_addr(vcpu, ptr, mask);
-> +
-> +	pac = compute_pac(vcpu, cptr, ikey);
-> +
-> +	/*
-> +	 * Slightly deviate from the pseudocode: if we have a PAC
-> +	 * match with the signed pointer, then it must be good.
-> +	 * Anything after this point is pure error handling.
-> +	 */
-> +	if ((pac & mask) == (ptr & mask)) {
-> +		*elr = cptr;
-> +		return true;
-> +	}
-> +
-> +	/*
-> +	 * Authentication failed, corrupt the canonical address if
-> +	 * PAuth2 isn't implemented, or some XORing if it is.
-> +	 */
-> +	if (!kvm_has_pauth(vcpu->kvm, PAuth2))
-> +		cptr = corrupt_addr(vcpu, cptr);
-> +	else
-> +		cptr = ptr ^ (pac & mask);
-> +
-> +	*elr = cptr;
-> +	return false;
-> +}
+Will you have a new version for this patch series?
 
-Each function in this file is quite small, but there's certainly a lot of
-complexity and background knowledge required to understand them!
+Jing
 
-I spent quite some time on each part to see if it matches what I understood
-from the Arm ARM.
-
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-
-
-A side note / thing I considered. KVM doesn't currently handle ERET exceptions
-from EL1.
-
-1. If an ERETA{A,B} were executed from a nested EL1 guest, that would be
-trapped up to Host KVM at EL2.
-
-2. kvm_hyp_handle_eret() returns false since it's not from vEL2.  Inside
-kvm_handle_eret(), is_hyp_ctxt() is false so the exception is injected into
-vEL2 (via kvm_inject_nested_sync()).
-
-3. vEL2 gets the exception, kvm_hyp_handle_eret() returns false as before.
-Inside kvm_handle_eret(), is_hyp_ctxt() is also false, so
-kvm_inject_nested_sync() is called but now errors out since vcpu_has_nv() is
-false.
-
-Is that flow right? Am I missing something?
-
-Thanks,
-Joey
+On Tue, Jan 23, 2024 at 11:06=E2=80=AFAM Oliver Upton <oliver.upton@linux.d=
+ev> wrote:
+>
+> On Fri, Jan 19, 2024 at 05:15:59PM +0000, James Morse wrote:
+>
+> [...]
+>
+> > > We've already done something similar to hide our mistakes with IMP DE=
+F
+> > > PMU versions in commit f90f9360c3d7 ("KVM: arm64: Rewrite IMPDEF PMU
+> > > version as NI"), and I think MPAM may be a good candidate for somethi=
+ng
+> > > similar.
+> >
+> > As there is precedent, I feel less dirty doing that!
+> >
+> > This also solves the problem of the VMM re-writing the broken value aft=
+er the vCPU has
+> > started running, and getting a surprise error. A weird side effect of d=
+oing this would be
+> > you can write MPAM=3D1 on A53 and KVM will ignore it, I don't want user=
+-space to start
+> > relying on that! I'll add a final-cap check so this can only be ignored=
+ on hardware that
+> > actually has MPAM, and could have been exposed to the bug.
+>
+> Ah, good idea. I probably should've done something similar in the PMU
+> case.
+>
+> --
+> Thanks,
+> Oliver
+>
