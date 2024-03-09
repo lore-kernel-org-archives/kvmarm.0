@@ -1,111 +1,257 @@
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA008208A8;
-	Sat,  9 Mar 2024 02:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D87662576F;
+	Sat,  9 Mar 2024 11:01:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709952366; cv=none; b=LEQb9yvJnJK7p7QozGIAeY68GE7/zoy45MeojXtwOmGsiBtoAgDiszok0brt3Vid1YQuL35TOxISuxl/iWAJRyWu0eGAJjZAqvu5tWPYkgAyUjCBMg528/CjBIjijVqEXRlCTIdRR0b0hhrbgn/NBTabMGke6NJ4WiazUXuxCgo=
+	t=1709982120; cv=none; b=A68Zo5e068OJ/3X0c+XKdFUjEBghJvUwaZgTlG4AAfIpbV/A1cgFA+1Rimavdck6lXeq3jCESBbXvdNp4pDOWtIdOrjKklLEO2U1gBCsqwo0wSOhZk5bRk9dConFWrlLEENJcgTZ/gKBN6tqMobO0KepRcarbHc/8ucbFYOowN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709952366; c=relaxed/simple;
-	bh=FaGxOMw8hAeHVyQkCVZb0DCHhnDYyHKuxNIwAvfWDWA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=R4GP+5m4sL7LmFKZZwbsB72EZF9rhNk0mAYfLmfCTZV130yeeuCjVW/0yK+XyXRyGlTrkVdMEjIhhblKpPZ+X84NhgvI/AehXE/e1ivFCGCvu8ziA+U9YTW9eX5L3lL6iL+xY1k1JrnaV1Ig1ja7MOsLDGneKUZ46+EaLi/YeBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=UOZxGP+S; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1709982120; c=relaxed/simple;
+	bh=RsmnT8yijIQReCiMf84E8ULKcx+KD4+6IrTHhka7J2Y=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J/lrxdcTy9eHvLNlxMsriXOrNsT7+SJ4VeZWgAc684/gmYhlYfjB9Z7w6wUHayqVfJKCBhO1lV+I+Q7cxYXStJmWu1vBBTMnvfwrGvUBGWSYaZxGcARTIgxObwBoMOknvwlxeepWbgYNTZErHrJLgUzZlMQPIX0tdY+oWQZ5Qrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gntl3tue; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UOZxGP+S"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1709952365; x=1741488365;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=FaGxOMw8hAeHVyQkCVZb0DCHhnDYyHKuxNIwAvfWDWA=;
-  b=UOZxGP+SQ074FfySbKC37cep1lgEsuXLpRPWE4A/IO9giYAY3iVVc/L2
-   zStTNjtDS2DXgRh2mKu5bpMKScz22RWyCAsNfXLOzlygLoMBPGW/y6MUT
-   uGCOfzcsLAlnKCU8mCGygW16qYA+HJF4hv4o673ROn/+WCJIZ4ujbPlSS
-   4=;
-X-IronPort-AV: E=Sophos;i="6.07,111,1708387200"; 
-   d="scan'208";a="643486831"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2024 02:46:02 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:58391]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.222:2525] with esmtp (Farcaster)
- id 8be3daf9-db1b-4473-aca9-d0c64320ade8; Sat, 9 Mar 2024 02:46:01 +0000 (UTC)
-X-Farcaster-Flow-ID: 8be3daf9-db1b-4473-aca9-d0c64320ade8
-Received: from EX19D003UWC002.ant.amazon.com (10.13.138.169) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Sat, 9 Mar 2024 02:46:01 +0000
-Received: from [192.168.12.128] (10.106.101.5) by
- EX19D003UWC002.ant.amazon.com (10.13.138.169) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Sat, 9 Mar 2024 02:45:59 +0000
-Message-ID: <8e3c2b45-356d-4ca9-bebc-012505235142@amazon.com>
-Date: Fri, 8 Mar 2024 19:45:57 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gntl3tue"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F475C433F1;
+	Sat,  9 Mar 2024 11:01:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709982119;
+	bh=RsmnT8yijIQReCiMf84E8ULKcx+KD4+6IrTHhka7J2Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Gntl3tuevBvGuL4XZfvWyy0PxHRtbKS7eKv+4GEi7bWijVML+LiFKnLn6+1RY0vpc
+	 ugZFtFpXPqPLczXxH+RZd2oTLI0yVqH4OAYdqbVAT4NeQxZu5a4AGbWd6+svrk+Nrc
+	 yc7Q4hCXh2VxWHinXq71CRsOs/XjDGHYY/tkC2JwRpAjhdYoxzbhN/JPXfiCoIj09T
+	 H4Fv/FU+hxskaK824qMx2hsUVJxlnKehW/9sbhOB/t3Elv3IjzAqgI2sDqS/9i1uEg
+	 HvCyzVAOb/5dqLnYE3yS0i6HPE5Pzl9p/7suhcvUKyRQkW7BDRSIYkUUb1EF4+/hJw
+	 8a5CRr7hHhA2A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1riuSi-00AyIW-HL;
+	Sat, 09 Mar 2024 11:01:56 +0000
+Date: Sat, 09 Mar 2024 11:01:56 +0000
+Message-ID: <871q8jr7mj.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>
+Subject: Re: [PATCH 5/5] KVM: arm64: Exclude FP ownership from kvm_vcpu_arch
+In-Reply-To: <3d731a55-300e-4a14-89bb-4effbd16b781@sirena.org.uk>
+References: <20240302111935.129994-1-maz@kernel.org>
+	<20240302111935.129994-6-maz@kernel.org>
+	<6acffbef-6872-4a15-b24a-7a0ec6bbb373@sirena.org.uk>
+	<87edcnr8zy.wl-maz@kernel.org>
+	<a8416451-011c-4159-b9e4-b492b81f5a2c@sirena.org.uk>
+	<86msra1emn.wl-maz@kernel.org>
+	<3d731a55-300e-4a14-89bb-4effbd16b781@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Unmapping KVM Guest Memory from Host Kernel
-Content-Language: en-US
-To: David Matlack <dmatlack@google.com>, Brendan Jackman <jackmanb@google.com>
-CC: "Gowans, James" <jgowans@amazon.com>, "seanjc@google.com"
-	<seanjc@google.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"Roy, Patrick" <roypat@amazon.co.uk>, "chao.p.peng@linux.intel.com"
-	<chao.p.peng@linux.intel.com>, "rppt@kernel.org" <rppt@kernel.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Woodhouse, David"
-	<dwmw@amazon.co.uk>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
-	"lstoakes@gmail.com" <lstoakes@gmail.com>, "Liam.Howlett@oracle.com"
-	<Liam.Howlett@oracle.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-	"vbabka@suse.cz" <vbabka@suse.cz>, "mst@redhat.com" <mst@redhat.com>,
-	"somlo@cmu.edu" <somlo@cmu.edu>, "Graf (AWS), Alexander" <graf@amazon.de>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-coco@lists.linux.dev"
-	<linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>, <tabba@google.com>,
-	<qperret@google.com>, <jason.cj.chen@intel.com>
-References: <cc1bb8e9bc3e1ab637700a4d3defeec95b55060a.camel@amazon.com>
- <CA+i-1C34VT5oFQL7en1n+MdRrO7AXaAMdNVvjFPxOaTDGXu9Dw@mail.gmail.com>
- <CALzav=fO2hpaErSRHGCJCKTrJKD7b9F5oEg7Ljhb0u1gB=VKwg@mail.gmail.com>
-From: "Manwaring, Derek" <derekmn@amazon.com>
-In-Reply-To: <CALzav=fO2hpaErSRHGCJCKTrJKD7b9F5oEg7Ljhb0u1gB=VKwg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D042UWA003.ant.amazon.com (10.13.139.44) To
- EX19D003UWC002.ant.amazon.com (10.13.138.169)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, james.clark@arm.com, anshuman.khandual@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2024-03-08 10:36-0700, David Matlack wrote:
-> On Fri, Mar 8, 2024 at 8:25 AM Brendan Jackman <jackmanb@google.com> wrote:
-> > On Fri, 8 Mar 2024 at 16:50, Gowans, James <jgowans@amazon> wrote:
-> > > Our goal is to more completely address the class of issues whose leak
-> > > origin is categorized as "Mapped memory" [1].
-> >
-> > Did you forget a link below? I'm interested in hearing about that
-> > categorisation.
+On Thu, 07 Mar 2024 14:26:30 +0000,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> On Thu, Mar 07, 2024 at 11:10:40AM +0000, Marc Zyngier wrote:
+> > Mark Brown <broonie@kernel.org> wrote:
+> > > On Wed, Mar 06, 2024 at 09:43:13AM +0000, Marc Zyngier wrote:
+> > > > Mark Brown <broonie@kernel.org> wrote:
+> > > > > On Sat, Mar 02, 2024 at 11:19:35AM +0000, Marc Zyngier wrote:
+> 
+> > > > > The SME patch series proposes adding an additional state to this
+> > > > > enumeration which would say if the registers are stored in a format
+> > > > > suitable for exchange with userspace, that would make this state part of
+> > > > > the vCPU state.  With the addition of SME we can have two vector lengths
+> > > > > in play so the series proposes picking the larger to be the format for
+> > > > > userspace registers.
+> 
+> > > > What does this addition have anything to do with the ownership of the
+> > > > physical register file? Not a lot, it seems.
+> 
+> > > > Specially as there better be no state resident on the CPU when
+> > > > userspace messes up with it.
+> 
+> > > If we have a situation where the state might be stored in memory in
+> > > multiple formats it seems reasonable to consider the metadata which
+> > > indicates which format is currently in use as part of the state.
+> 
+> > There is no reason why the state should be in multiple formats
+> > *simultaneously*. All the FP/SIMD/SVE/SME state is largely
+> > overlapping, and we only need to correctly invalidate the state that
+> > isn't relevant to writes from userspace.
+> 
+> I agree that we don't want to store multiple copies, the proposed
+> implementation for SME does that - when converting between guest native
+> and userspace formats we discard the original format after conversion
+> and updates the metadata which says which format is stored.  That
+> metadata is modeled as adding a new owner.
 
-The paper from Hertogh, et al. is https://download.vusec.net/papers/quarantine_raid23.pdf
-specifically Table 1.
+What conversion? If userspace writes to FP, the upper bits of the SVE
+registers should get zeroed. If it writes to SVE, it writes using the
+current VL for the current streaming/non-streaming mode.
 
-> > It's perhaps a bigger hammer than you are looking for, but the
-> > solution we're working on at Google is "Address Space Isolation" (ASI)
-> > - the latest posting about that is [2].
+If the current userspace API doesn't give us the tools to do so, we
+rev it.
+
 >
-> I think what James is looking for (and what we are also interested
-> in), is _eliminating_ the ability to access guest memory from the
-> direct map entirely.
+> > > > > We could store this separately to fp_state/owner but it'd still be a
+> > > > > value stored in the vCPU.
+> 
+> > > > I totally disagree.
+> 
+> > > Where would you expect to see the state stored?
+> 
+> > Sorry, that came out wrong. I expect *some* vcpu state to describe the
+> > current use of the FP/vector registers, and that's about it. Not the
+> > ownership information.
+> 
+> Ah, I think the distinction here is that you're modeling the state
+> tracking updated by this patch as purely tracking the registers in which
+> case yes, we should just add a separate variable in the vCPU for
+> tracking the format of the data.  I was modeling the state tracking as
+> covering both the state in the registers and the state of the storage
+> backing them (since the guest state being in the registers means that
+> the state in memory is invalid).
+> 
+> > > > > Storing in a format suitable for userspace
+> > > > > usage all the time when we've got SME would most likely result in
+> > > > > performance overhead
+> 
+> > > > What performance overhead? Why should we care?
+> > > 
+> > > Since in situations where we're not using the larger VL we would need to
+> > > load and store the registers using a vector length other than the
+> 
+> ...
+> 
+> > > and would instead need to manually compute the memory locations where
+> > > values are stored.  As well as the extra instructions when using the
+> > > smaller vector length we'd also be working with sparser data likely over
+> > > more cache lines.
+> 
+> > Are you talking about a context switch? or userspace accesses? I don't
+> > give a damn about the latter, as it statistically never happens. The
+> > former is of course of interest, but you still don't explain why the
+> > above is a problem.
+> 
+> Well, there will be a cost in any rewriting so I'm trying to shift it
+> away from context switch to userspace access since as you say they are
+> negligably frequent.
 
-Actually, just preventing speculation of guest memory through the
-direct map is sufficient for our current focus.
+So we're in violent agreement.
 
-Brendan,
-I will look into the general ASI approach, thank you. Did you consider
-memfd_secret or a guest_memfd-based approach for Userspace-ASI? Based on
-Sean's earlier reply to James it sounds like the vision of guest_memfd
-aligns with ASI's goals.
+> > Nothing prevent you from storing the registers using the *current* VL,
+> > since there is no data sharing between the SVE registers and the
+> > streaming-SVE ones. All you need to do is to make sure you don't mix
+> > the two.
+> 
+> You seem to be suggesting modeling the streaming mode registers as a
+> completely different set of registers in the KVM ABI.
 
-Derek
+Where are you reading this? I *never* said anything of the sort. There
+is only one set of SVE registers. The fact that they change size and
+get randomly zeroed when userspace flips bits is a property of the
+architecture. The HW *can* implements them as two sets of registers if
+SME is a separate accelerator, but that's not architectural.
+
+All I'm saying is that you can have a *single* register file, spanning
+both FPSIMD and SVE, using the maximum VL achievable in the guest, and
+be done with it. Yes, you'll have to refactor the code so that FPSIMD
+lands at the right spot in the SVE register file. Big deal.
+
+> That would
+> certainly be another option, though it's a bit unclear from an
+> architecture point of view and it didn't seem to entirely fit with the
+> handling of the FPSIMD registers when SVE is in use.  From an
+> architecture point of view the streaming mode registers aren't really a
+> separate set of registers.  When in streaming mode it is not possible to
+> observe the non-streaming register state and vice versa, and entering or
+> exiting streaming mode zeros the register state so functionally you just
+> have floating point registers.
+> 
+> You'd need to handle what happens with access to the inactive register
+> set from userspace, the simplest thing to implement would be to read the
+> logical value of zero and either discard or return an error on writes.
+> 
+> > > We would also need to consider if we need to zero the holes in the data
+> > > when saving, we'd only potentially be leaking information from the guest
+> > > but it might cause nasty surprises given that transitioning to/from
+> > > streaming mode is expected to zero values.  If we do need to zero then
+> > > that would be additional work that would need doing.
+> 
+> > The zeroing is mandated by the architecture, AFAIU. That's not optional.
+> 
+> Yes, we need to zero at some point - we could just do it on userspace
+> read though I think rather than having to do it when saving.
+
+As long as the guest only observes an architecturally compliant state,
+I'm find with that.
+
+> 
+> > > Spending more effort to implement something which also has more runtime
+> > > performance overhead for the case of saving and restoring guest state
+> > > which I expect to be vastly more common than the VMM accessing the guest
+> > > registers just doesn't seem like an appealing choice.
+> 
+> > I don't buy the runtime performance aspect at all. As long as you have
+> > the space to dump the largest possible VL, you can always dump it in
+> > the native format.
+> 
+> Sure, my point was that you appeared to be asking to dump in a
+> non-native format.  
+
+Again, what makes you think that? You keep putting words in my mouth.
+
+>
+> > > If we were storing the data in the native format for the guest then that
+> > > format will change if streaming mode is changed via a write to SVCR.
+> > > This would mean that the host would need to understand that when writing
+> > > values SVCR needs to be written before the Z and P registers.  To be
+> > > clear I don't think this is a good idea.
+> 
+> > The architecture is crystal clear: you flip SVCR.SM, you loose all
+> > data in both Z and P regs. If userspace doesn't understand the
+> > architecture, that's their problem. The only thing we need to provide
+> > is a faithful emulation of the architecture.
+> 
+> It is not clear to me that the intention behind the KVM register ABI is
+> that it should have all the ordering requirements that the architecture
+> has, and decisions like hiding the V registers when SVE is active do
+> take us away from just a natural architectural point of view.
+
+My intention is that userspace accesses should be as close as possible
+as that of a guest. If the current ABI doesn't allow this, I'm all for
+changing it. Won't be the first time, won't be the last.
+
+> My
+> understanding was that it was intended that userspace should be able to
+> do something like just enumerate all the registers, save them and then
+> later on restore them without really understanding them.
+
+And this statement doesn't get in the way of anything above. We own
+the ABI, and can change it as we see fit when SME is enabled.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
