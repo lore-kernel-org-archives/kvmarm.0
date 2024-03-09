@@ -1,125 +1,111 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724CD627
-	for <kvmarm@lists.linux.dev>; Sat,  9 Mar 2024 00:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA008208A8;
+	Sat,  9 Mar 2024 02:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709945198; cv=none; b=K0J6rUajjM1mP0UhMrJY8JGeSPZz7VNVJEcJ1vtvzvURq9UHradhVJQZ6IQS5SGCSi9X+LBJ2HhkNLuWE8tUnODFC+YEfyLT0QWKc2vBTJAxYGFPBVnvjhiTaJ3i6lIWS3wzISVcDWAzAsDscyx+4QHo9xCegTOu+86rrvFmO5I=
+	t=1709952366; cv=none; b=LEQb9yvJnJK7p7QozGIAeY68GE7/zoy45MeojXtwOmGsiBtoAgDiszok0brt3Vid1YQuL35TOxISuxl/iWAJRyWu0eGAJjZAqvu5tWPYkgAyUjCBMg528/CjBIjijVqEXRlCTIdRR0b0hhrbgn/NBTabMGke6NJ4WiazUXuxCgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709945198; c=relaxed/simple;
-	bh=XnwCQlYciyf3IeX6pM24no5SoUvOGXQU0xT5IaEgZB4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SfDoV1fJ78voxJ8nBiOZ8yAKU7eUfqXrSUXw8t3SFKFLd5frF+jIo8/6rAOf78KuoFzG0VeZaX/58UjMdqQyBsHQ9PzH3nsG94mcEQZysT6QaVRDZwWhsODcIoiaV4uMhKNgz7zxLGeuJYWL3Pz/2AUdjacB/lFWdKuPOj+MCbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a0ZRnmg9; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1709952366; c=relaxed/simple;
+	bh=FaGxOMw8hAeHVyQkCVZb0DCHhnDYyHKuxNIwAvfWDWA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=R4GP+5m4sL7LmFKZZwbsB72EZF9rhNk0mAYfLmfCTZV130yeeuCjVW/0yK+XyXRyGlTrkVdMEjIhhblKpPZ+X84NhgvI/AehXE/e1ivFCGCvu8ziA+U9YTW9eX5L3lL6iL+xY1k1JrnaV1Ig1ja7MOsLDGneKUZ46+EaLi/YeBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=UOZxGP+S; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a0ZRnmg9"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6e64647af39so2579163b3a.1
-        for <kvmarm@lists.linux.dev>; Fri, 08 Mar 2024 16:46:37 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UOZxGP+S"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709945197; x=1710549997; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wagJ5bb0RSx3p5Ow1rY4xtUtbXLWil/+U/7AEuF2y7s=;
-        b=a0ZRnmg9lF05grZ89w87vjiJp3U80ROWBoCGQSNF0itECNjmHz8h0Qw8ecPxS/7AAw
-         W1/5a3rpm97VfFqkLd4hjfY7ZVtITjBnKHnns0ePAfL4wMaMVqzFOqsa2+oQ/Z8VssqU
-         AWTpN6dQml45Cs7ExbboOuOwcEnmOSNsxUVI3FQmUHD6jqEOZkNHgG8vrDys2qkPaLV4
-         yFh7IQlj7HSPViXnCU6rOA1j/U2GO4VGkwQj4frVSh8ltbOUfwKdjNP47J4FHmY7DJAL
-         IinNihUIAGcSB8t/PTEsh1rXv7jYwUtyMCzwkwK+HCbP6/KEb/75JECagWJ9TU9bY5wH
-         iM0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709945197; x=1710549997;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wagJ5bb0RSx3p5Ow1rY4xtUtbXLWil/+U/7AEuF2y7s=;
-        b=Mpfk1Q79Qxq+OhIfV+0mEAq/RPEJTlGGPKx+k5bdPfbXNfCjkSNHS0sc3B/mSo7/2e
-         pzGRJVof90PyDnTPWl02JJGgVb5XjRUl58XEhGoV5ITSDKuHEfkBy19bs28mW0qlb0WE
-         UMHX26v/nroaxI9nTIY4pEdcSV4t0kk+3k9KkptkHvvKVnKfyPByZF/hQSwyxqXPUlTZ
-         t2t6Q7SmRMQ/Boc7N9YV1ND3imMUEn4FT8EIH+8C6aOcsey+m9yWTYXtFdvvM48Vn7/Z
-         gYgdkK0YpQ7uxOSclTqS38Eqm78vtugm18ktSDsEIdXJhuXIqThMcckdygfHnmehigY6
-         kJ7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWjJG3Yb3T4ZLY6lRWrklA81GsB8Vd8u859g2F1+LRsVBoYe9+QcIUVjTModwedAXywBfzGSokWccOX84skOuq1cvCDxL0G
-X-Gm-Message-State: AOJu0YwV8usfrAhzsGg6gbo6sqUf+U8J3YZcpT6wEX9OC+zEu6j7WXc5
-	b8dDyA5nzAIdrWRQ9Rxiqxc4++ptYS06TlPZCa0FciabJkdcod5vZPlOGzdZkw==
-X-Google-Smtp-Source: AGHT+IHM1VN1Fjzl6sZbFiIRHPQ/sssnHDssRMi7SSnmYWHqJ9Z3fUPXXzQY3JbPdG92rjZEFQOAuw==
-X-Received: by 2002:a05:6a00:1406:b0:6e6:4fb1:6e97 with SMTP id l6-20020a056a00140600b006e64fb16e97mr659530pfu.10.1709945196546;
-        Fri, 08 Mar 2024 16:46:36 -0800 (PST)
-Received: from google.com (61.139.125.34.bc.googleusercontent.com. [34.125.139.61])
-        by smtp.gmail.com with ESMTPSA id y25-20020a62b519000000b006e65d676d3dsm293234pfe.18.2024.03.08.16.46.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Mar 2024 16:46:35 -0800 (PST)
-Date: Fri, 8 Mar 2024 16:46:32 -0800
-From: David Matlack <dmatlack@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Anish Moorthy <amoorthy@google.com>, oliver.upton@linux.dev,
-	maz@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	robert.hoo.linux@gmail.com, jthoughton@google.com,
-	axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
-	isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
-Subject: Re: [PATCH v7 06/14] KVM: Add memslot flag to let userspace force an
- exit on missing hva mappings
-Message-ID: <ZeuxaHlZzI4qnnFq@google.com>
-References: <20240215235405.368539-1-amoorthy@google.com>
- <20240215235405.368539-7-amoorthy@google.com>
- <ZeuMEdQTFADDSFkX@google.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1709952365; x=1741488365;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=FaGxOMw8hAeHVyQkCVZb0DCHhnDYyHKuxNIwAvfWDWA=;
+  b=UOZxGP+SQ074FfySbKC37cep1lgEsuXLpRPWE4A/IO9giYAY3iVVc/L2
+   zStTNjtDS2DXgRh2mKu5bpMKScz22RWyCAsNfXLOzlygLoMBPGW/y6MUT
+   uGCOfzcsLAlnKCU8mCGygW16qYA+HJF4hv4o673ROn/+WCJIZ4ujbPlSS
+   4=;
+X-IronPort-AV: E=Sophos;i="6.07,111,1708387200"; 
+   d="scan'208";a="643486831"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2024 02:46:02 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:58391]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.222:2525] with esmtp (Farcaster)
+ id 8be3daf9-db1b-4473-aca9-d0c64320ade8; Sat, 9 Mar 2024 02:46:01 +0000 (UTC)
+X-Farcaster-Flow-ID: 8be3daf9-db1b-4473-aca9-d0c64320ade8
+Received: from EX19D003UWC002.ant.amazon.com (10.13.138.169) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Sat, 9 Mar 2024 02:46:01 +0000
+Received: from [192.168.12.128] (10.106.101.5) by
+ EX19D003UWC002.ant.amazon.com (10.13.138.169) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Sat, 9 Mar 2024 02:45:59 +0000
+Message-ID: <8e3c2b45-356d-4ca9-bebc-012505235142@amazon.com>
+Date: Fri, 8 Mar 2024 19:45:57 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZeuMEdQTFADDSFkX@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: Unmapping KVM Guest Memory from Host Kernel
+Content-Language: en-US
+To: David Matlack <dmatlack@google.com>, Brendan Jackman <jackmanb@google.com>
+CC: "Gowans, James" <jgowans@amazon.com>, "seanjc@google.com"
+	<seanjc@google.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"Roy, Patrick" <roypat@amazon.co.uk>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "rppt@kernel.org" <rppt@kernel.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Woodhouse, David"
+	<dwmw@amazon.co.uk>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+	"lstoakes@gmail.com" <lstoakes@gmail.com>, "Liam.Howlett@oracle.com"
+	<Liam.Howlett@oracle.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+	"vbabka@suse.cz" <vbabka@suse.cz>, "mst@redhat.com" <mst@redhat.com>,
+	"somlo@cmu.edu" <somlo@cmu.edu>, "Graf (AWS), Alexander" <graf@amazon.de>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-coco@lists.linux.dev"
+	<linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>, <tabba@google.com>,
+	<qperret@google.com>, <jason.cj.chen@intel.com>
+References: <cc1bb8e9bc3e1ab637700a4d3defeec95b55060a.camel@amazon.com>
+ <CA+i-1C34VT5oFQL7en1n+MdRrO7AXaAMdNVvjFPxOaTDGXu9Dw@mail.gmail.com>
+ <CALzav=fO2hpaErSRHGCJCKTrJKD7b9F5oEg7Ljhb0u1gB=VKwg@mail.gmail.com>
+From: "Manwaring, Derek" <derekmn@amazon.com>
+In-Reply-To: <CALzav=fO2hpaErSRHGCJCKTrJKD7b9F5oEg7Ljhb0u1gB=VKwg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D042UWA003.ant.amazon.com (10.13.139.44) To
+ EX19D003UWC002.ant.amazon.com (10.13.138.169)
 
-On 2024-03-08 02:07 PM, Sean Christopherson wrote:
-> On Thu, Feb 15, 2024, Anish Moorthy wrote:
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index 9f5d45c49e36..bf7bc21d56ac 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -1353,6 +1353,7 @@ yet and must be cleared on entry.
-> >    #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
-> >    #define KVM_MEM_READONLY	(1UL << 1)
-> >    #define KVM_MEM_GUEST_MEMFD      (1UL << 2)
-> > +  #define KVM_MEM_EXIT_ON_MISSING  (1UL << 3)
-> 
-> David M.,
-> 
-> Before this gets queued anywhere, a few questions related to the generic KVM
-> userfault stuff you're working on:
-> 
->   1. Do you anticipate reusing KVM_MEM_EXIT_ON_MISSING to communicate that a vCPU
->      should exit to userspace, even for guest_memfd?  Or are you envisioning the
->      "data invalid" gfn attribute as being a superset?
-> 
->      We danced very close to this topic in the PUCK call, but I don't _think_ we
->      ever explicitly talked about whether or not KVM_MEM_EXIT_ON_MISSING would
->      effectively be obsoleted by a KVM_SET_MEMORY_ATTRIBUTES-based "invalid data"
->      flag.
-> 
->      I was originally thinking that KVM_MEM_EXIT_ON_MISSING would be re-used,
->      but after re-watching parts of the PUCK recording, e.g. about decoupling
->      KVM from userspace page tables, I suspect past me was wrong.
+On 2024-03-08 10:36-0700, David Matlack wrote:
+> On Fri, Mar 8, 2024 at 8:25 AM Brendan Jackman <jackmanb@google.com> wrote:
+> > On Fri, 8 Mar 2024 at 16:50, Gowans, James <jgowans@amazon> wrote:
+> > > Our goal is to more completely address the class of issues whose leak
+> > > origin is categorized as "Mapped memory" [1].
+> >
+> > Did you forget a link below? I'm interested in hearing about that
+> > categorisation.
 
-No I don't anticipate reusing KVM_MEM_EXIT_ON_MISSING.
+The paper from Hertogh, et al. is https://download.vusec.net/papers/quarantine_raid23.pdf
+specifically Table 1.
 
-The plan is to introduce a new gfn attribute and exit to userspace based
-on that. I do forsee having an on/off switch for the new attribute, but
-it wouldn't make sense to reuse KVM_MEM_EXIT_ON_MISSING for that.
+> > It's perhaps a bigger hammer than you are looking for, but the
+> > solution we're working on at Google is "Address Space Isolation" (ASI)
+> > - the latest posting about that is [2].
+>
+> I think what James is looking for (and what we are also interested
+> in), is _eliminating_ the ability to access guest memory from the
+> direct map entirely.
 
-> 
->   2. What is your best guess as to when KVM userfault patches will be available,
->      even if only in RFC form?
+Actually, just preventing speculation of guest memory through the
+direct map is sufficient for our current focus.
 
-We're aiming for the end of April for RFC with KVM/ARM support.
+Brendan,
+I will look into the general ASI approach, thank you. Did you consider
+memfd_secret or a guest_memfd-based approach for Userspace-ASI? Based on
+Sean's earlier reply to James it sounds like the vision of guest_memfd
+aligns with ASI's goals.
 
-> 
-> The reason I ask is because Oliver pointed out (off-list) that (a) Google is the
-> primary user for KVM_MEM_EXIT_ON_MISSING, possibly the _only_ user for the
-> forseeable future, and (b) if Google moves on to KVM userfault before ever
-> ingesting KVM_MEM_EXIT_ON_MISSING from upstream, then we'll have effectively
-> added dead code to KVM's eternal ABI.
+Derek
