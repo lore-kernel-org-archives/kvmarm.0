@@ -1,388 +1,191 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2071.outbound.protection.outlook.com [40.107.223.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B53B15BE
-	for <kvmarm@lists.linux.dev>; Sat,  9 Mar 2024 16:40:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710002423; cv=none; b=p9+e0bkRXk5oWWYf5oWryfWlKiDzQd4lnkvYQvaWvi2VdtotFmi3XKHY7hbRYwyOsaG1o75ZhtfhrBp6BS5Mm4ugzTWo595C0V8Rwb3CW7C1qIkiicOuycqEL0+4wojr4raLrjuANL+Q3bOIO42hWbdDykMoPU2vK1dOPSgLRUA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710002423; c=relaxed/simple;
-	bh=R30PQyYqiqJNS18gmSJDV/P48omUH2ofvCiz/RbOGtI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=OMZPgSKTQNo5XXR8uMc9E6qVlQBGt6QDdHIl3K9YgB80sMh73sPamKgOdnJo7zTPHABHPHqZ9PU+Jv53VONaAsqW+0sLO21BZ5jZgm22hNtpzWtPpGkGhM7ABbn1zCHNF0c0tRhZDA+PUpRDOND6Iycvfq0TeHbg3QJy/Q9dGvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Qd0GxRWb; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5382DFC03
+	for <kvmarm@lists.linux.dev>; Sun, 10 Mar 2024 03:49:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.71
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710042583; cv=fail; b=hVNnVRvMw1EHO3/WNopAtjxDWUG0Kuvhg1rdh5W7yD3OK9F/ks31lpJPC995PUEPAS5oLHUNMV86JeXJFLt3kSYqmRQkt70cWweeCRYmHX6/AFguRf5DQcDWETpc7bNMPmY1VhwBxSESNNIV1sGPx1Tdtt1PctCQHD82/q6nYzQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710042583; c=relaxed/simple;
+	bh=IFnaB297gZQOzvHHH0+AJAAHcvfkd+Mij4ksvN8JMp4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=mfKhY2MSvfAS9vK9UCFCIq6j+omiag3yWOIdSyfnNmipqw0aiSyk/6A2LIJ9fveQNcDRg1x05e4d1VTXh3tITvuOPC8zBjQDBHWqFtxeM0jd8Gxl24o+KzYSSxa4/vCkbc10Vq+JOgLsUz9lXwCwZK33toVYAb5Un8sOqSD/DAY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=VCEXloP8; arc=fail smtp.client-ip=40.107.223.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Qd0GxRWb"
-Date: Sat, 9 Mar 2024 08:40:05 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1710002417;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=XZq7PGYR9cBujBQNgj+ZMS0WfFU95iMA+4xN9RNQBUY=;
-	b=Qd0GxRWbvohBE//EmZdq5V6jRunRu42yZke7GavYgaFGDpyScRg5qcfQXZME/9a0Vs71w1
-	ADCTd+1NDeMnOr6NPlNlus63/7mhFNgavfmZJM+udk5XWGqrAj/Y55izC0Munm2LoMI1DG
-	u+M88qpjbBtnVHlJXEW9PjNkUlVcTWs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: ankita@nvidia.com, bhelgaas@google.com, jingzhangos@google.com,
-	joey.gouly@arm.com, maz@kernel.org, rananta@google.com,
-	rdunlap@infradead.org, seanjc@google.com, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: [GIT PULL] KVM/arm64 updates for 6.9
-Message-ID: <ZeyQ5TK3pULYc32o@thinky-boi>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="VCEXloP8"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DcStmSQY1FrVBn3R/+rwS5+CbQYu9IXW3fQzGbwlw2PoPtu1vLppAoP0wgTanLRqcdJu6gnWzUac5ewW5dCMR3QesJox//gY+H6+XJR5C3508D40QdBbwNERZKw8ZEXBgbskcOzqloDI7jHgM545FJFQh0qVhQcXoGV0J3An4SoK+B7aViLrYeblT1eSk8PIDtSDLV3RC5AuxC7/U4U2G5eiJ4gMbOciHHLWQM7KFhfFypETCPYy+hNmZ36qVcIY6Nr4Uz/OYO70iAurz22T0ZQbwEI5L2GXC3L2914CFgfuu+oQe0XjbrKeZNTdENkB+mGBuio4ef3LxlJKSGyZXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IFnaB297gZQOzvHHH0+AJAAHcvfkd+Mij4ksvN8JMp4=;
+ b=YUs8fRs4atCg5jQZS5U0o1Ggr8O+jXymjkpL4qgUBNMoZjeucryXOhK1fH9n90iCxJvjb/UdE5DJA11enut0WCE6999/A2GNYY3X1Z2blJtnG80dLRs6ACIoKEU6F8vytBPFltrbejofd0o56lLN3LFHV8jLRMZKYiFTb8G5Wh9W+MHxe+WTUDQSJdVCg4sGq8TFZZoCIKXTvCGlN0zWCj5+PRk/ydyflp/bC2KHRzipNKBJVgpfLhYxZ0ZHzd2lTFQeAf+v62DqJH/9U9hWk7jLTMWSVoArt1vV6EQjwdrU0wZHa9paBlMpXTPbHF/XqKJs6RoMxsk9GkK8a0AbKQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IFnaB297gZQOzvHHH0+AJAAHcvfkd+Mij4ksvN8JMp4=;
+ b=VCEXloP8Z3PFojno5Qo1DQ7AAKaEjjpuT2asRUiwsx2l272PZwfa5Zhn8W6DRKO4JoYXRPyF0KqXp+TakucmfJB9A3pO+nc2GvQglrJFrm7A+zSFZIsqUA0kUT/FJBDdk2ecjYNYr+nS8WEMFLfOcDaiPx0gnlBNnKzhdEFHbXyaA1lfNfi36oBkxsNiMpbVA45sYSX78gtKNVciEhIgc3TZXE/N/vI0rgK/9V+v6cUYwr6g/bFuhNjVY+kNfteWevwdeKDlJRX8GrEBv78ai3MDNLGqYbTtaouqlyxa5g0COb7LVKXiRz+ZynydbiY0kOdZczWt7XMUN4V31wBjCw==
+Received: from SA1PR12MB7199.namprd12.prod.outlook.com (2603:10b6:806:2bc::21)
+ by DS7PR12MB5982.namprd12.prod.outlook.com (2603:10b6:8:7d::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.33; Sun, 10 Mar
+ 2024 03:49:36 +0000
+Received: from SA1PR12MB7199.namprd12.prod.outlook.com
+ ([fe80::284c:211f:16dc:f7b2]) by SA1PR12MB7199.namprd12.prod.outlook.com
+ ([fe80::284c:211f:16dc:f7b2%5]) with mapi id 15.20.7316.032; Sun, 10 Mar 2024
+ 03:49:36 +0000
+From: Ankit Agrawal <ankita@nvidia.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Jason Gunthorpe
+	<jgg@nvidia.com>
+CC: "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, "will@kernel.org" <will@kernel.org>, Aniket Agashe
+	<aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>, Kirti Wankhede
+	<kwankhede@nvidia.com>, "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>, Vikram
+ Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>, Alistair Popple
+	<apopple@nvidia.com>, John Hubbard <jhubbard@nvidia.com>, Dan Williams
+	<danw@nvidia.com>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v1 1/2] KVM: arm64: determine memory type from VMA
+Thread-Topic: [PATCH v1 1/2] KVM: arm64: determine memory type from VMA
+Thread-Index:
+ AQHZ4bc9eKM9qzFPEkOCPCVLZRI57LA7iuuAgAAK/gCAB7HcAIAACxYAgAAlfgCAABHzAIABh9MAgAAOv4CAAWqOgIDq6ccH
+Date: Sun, 10 Mar 2024 03:49:36 +0000
+Message-ID:
+ <SA1PR12MB7199AB860E0C76B80B421C66B0252@SA1PR12MB7199.namprd12.prod.outlook.com>
+References: <20230907181459.18145-1-ankita@nvidia.com>
+ <20230907181459.18145-2-ankita@nvidia.com> <ZR7hKYU1Wj+VTqpO@arm.com>
+ <20231005165458.GM682044@nvidia.com> <ZSVe0nb02S4kz5D2@arm.com>
+ <20231010150502.GM3952@nvidia.com> <ZSWHkvhutlnvVLUZ@arm.com>
+ <20231010182328.GS3952@nvidia.com> <ZSbfUNLwDkaYL4ts@arm.com>
+ <20231011183839.GC3952@nvidia.com> <ZSgb0WBSsXHHYJT0@arm.com>
+In-Reply-To: <ZSgb0WBSsXHHYJT0@arm.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR12MB7199:EE_|DS7PR12MB5982:EE_
+x-ms-office365-filtering-correlation-id: 7d57bfed-2025-4fb6-a2ef-08dc40b51aa9
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ +ubToWL19CsqHFN0n+zypFWNCddIli2QgkVRmqClCmMawhPeYvvih8AAInhZcxKV2ik2Jg5IMvMLB15A1Dr5RjhNgGEuMhDjUXMGCi8oYSk7h0yN4+JbQbYH0XjRTjidW7xrklQYzkCgpH0HrlAeS0vDhgzQdo168/t42PtGHHR7sIjiygoQAEHJDK1vb4iSJwe7v97shWIRsL+RwlhijtBvO6EoLzEvGwLIOAA5KyhJs6xPBVUrZ3jn3dS7KBE6VKz260LRQCId2PI1qOXwe+ocxuXMD1mCK7htpJv1S+cycCt/rO6Xvr/PNj5F9jTVQoSdFOP76uJlsRUi86PJWodOglnYiqGRDra38+lDVV4pLO7vVQHEwf5qP8qyAd+t6HVmx+ACwFQv6y+yfHYEn62Y3ufiol/glXcobPk99bivbSxybnwWeKoLSyFGXifcIboCocibLHW9/r0sf+tunREtCEZgem/8DN0KZeKIrGIjY1cFdSoGCriYXd8MH2b/7Cyoclzl/+S3bCK0vBLb+ihzFxvDHuUQuVaV1xhZQosod1wspEiWxZI2Y2Ly98DtNZe+wFeksUxzzPeWKAEN7WbhR8hmt04oFtm4gQi/4cAAIuQuaUYr4AG47UX0YDAe1B9PDkR5cVMt6/kGPxUNVtWxMuss3RutRx9r5vVmamPPaKdgbBDoxo8y+knXb4ImmhBvuniTjxv1W/E4B7ig0eCMUqNYbfaP0eUYdpVe9B4=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR12MB7199.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?qFlkR63l09EL99uoPXRGplmeJlKgyIao0Tne2+telPjdULuzbNOpAxqqR7?=
+ =?iso-8859-1?Q?TMxxSZIvwX9tGoi1nA1VziRBEBRaHFkNX5x4kQKgDAfstdyYd1W74Nl8WU?=
+ =?iso-8859-1?Q?vTOdCUTi5NRIneaTqV5RTKXBvQtNww2/7K9OllpOF6BKCCrcVEq46Ssg9p?=
+ =?iso-8859-1?Q?cgUUxrD1f+rDyvPVid/AJd8MH9zXyutWeaxPJirflowbJnx/e4MFO/s817?=
+ =?iso-8859-1?Q?gCtnd4XgVvn69G4l8lkTKgz25lKx5WSkS9Zr7pBbtLAC/1H0lbwipUQveB?=
+ =?iso-8859-1?Q?0cQffXGuUGUxGa2jrnfTKtDEHh9yztD4a06/90/kwd864FPP6uZoQkYUST?=
+ =?iso-8859-1?Q?83mxCyCHnkD1QFSvPJfwsyP3wUFY6MzVuOita3ax4brOQJObKd5FjV273O?=
+ =?iso-8859-1?Q?RO/Qp3jQPhIlbE00+3AHIjqxLnGdaoFC6A4DayBYuD2YKCKnHYVSL75Ens?=
+ =?iso-8859-1?Q?7HSIcm+OlDQuha1bHjTJsW2RBvqVf2J4EVmSlhPltVR+LYdl8Vsi4n1FvA?=
+ =?iso-8859-1?Q?MDy/AcYrmim7kT332bYLklHD9f3cHld2Vs6fABnwHtQ0CxIapVI3ZoZHda?=
+ =?iso-8859-1?Q?M0Huicru9PNk35IqhQ0z4QYC4tzXO2tZgwqch86fbNxLnzFKqdFIMzHL7J?=
+ =?iso-8859-1?Q?mWG+eHdQM7pVZfcCyvxpuvhvs4bpNk8tCcH0moWbZglLehuVXv8XCpxe4U?=
+ =?iso-8859-1?Q?+varg+cqz1cJYAfXx9QxZGWorvbb6rwIqC3HM5r8nZkLg7v9YJbg5t+KSw?=
+ =?iso-8859-1?Q?HI5wI/Q6dd3+tmggmuSLXj7Ncxz6TUdavTqcqJvnO8wRRrZ5SljiplJUU5?=
+ =?iso-8859-1?Q?Y0AlqPID+/hLy7hRHzDNosXMYsRQohY0sRQoducjtrntMc9nrvT3+uACFg?=
+ =?iso-8859-1?Q?kSWvu7L8XGi0AyqQB8UEqUBiv2ZwVowe5TY7iag4zrWTf7zWXdDnjFHjjj?=
+ =?iso-8859-1?Q?b2NJRFSMpmaqDqK73dlh1qEhMO7d1wsBq7x5BQ1t+mphXJV5BWG+1EUt/Q?=
+ =?iso-8859-1?Q?CPZNVPMFOMOkaz7qhMDtbR87Asy1y5v3uv7OH0huXoivoQc81xDEgs+q+2?=
+ =?iso-8859-1?Q?dZ6MPeewKqH2CETvuLPwZT4o7SrLuDHIMnIl9KXp6dYJpXVjnl5OGv6EZp?=
+ =?iso-8859-1?Q?+cjrCjEjIFDUgX3WKjwCvsraNs4sVe0KGlhOCOfRfqzoWxxOR36RN9dFd9?=
+ =?iso-8859-1?Q?MKvkDfcjFlvI5PzMY/nMWYzk9/iyr5KxebOcVz1P1u1PcpsHCxJ9NMhBum?=
+ =?iso-8859-1?Q?96X+evAvCj1jLYvPzd+7InhhOxEP6c0GTZuwntP8CpdjV7zAymApWeAtAg?=
+ =?iso-8859-1?Q?XEp6Hyhhz43KajVT+gpYc4eJzSOocz5ghWn4GzcB3EOrrc0tz9i8rZJaVO?=
+ =?iso-8859-1?Q?bKNunzmDGV8miwJ5iqK0CloTwfTsf0TK5BCLnop/jL5SHwd23FgMh0cLBl?=
+ =?iso-8859-1?Q?mMFRz49gPC7HfKPPKXk3zeSgVMVOc+//RiU+nhes03MZStlu6W3R+PD63F?=
+ =?iso-8859-1?Q?QICpvrsY6Q2gL5Brt0i232MtW7ckuivzjTVKYNO4b10QuUsQ1uw9+2fwiP?=
+ =?iso-8859-1?Q?jYMbmtnJYxBAWzo58jq43LQSG+W8vmKQeEu9bhpbdGl5C2ZsRmB1463UI6?=
+ =?iso-8859-1?Q?1ulU1AP/DR4Yo=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Migadu-Flow: FLOW_OUT
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR12MB7199.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7d57bfed-2025-4fb6-a2ef-08dc40b51aa9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Mar 2024 03:49:36.0203
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: wlnD2xZpAkmqkCZQhqtMSizfsDVjYW9KhgCHXgE20XNqryjgsyMvO1lOZ8owkZDsDmFZ7yxP034DsS7twPhVgw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5982
 
-Hi Paolo,
-
-Here's all the KVM/arm64 changes for 6.9. As usual, details about the changes
-can be found in the tag.
-
-In terms of interactions with other trees, Alex has pulled my topic branch for
-vfio-pci Normal-NC mappings and a (trivial) conflict with the arm64 tree.
-Appended my resolution at the end.
-
-Please pull.
-
--- 
-Thanks,
-Oliver
-
-The following changes since commit 6613476e225e090cc9aad49be7fa504e290dd33d:
-
-  Linux 6.8-rc1 (2024-01-21 14:11:32 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-6.9
-
-for you to fetch changes up to 4a09ddb8333a3efec715f6cfd099f9dc4fbaa7cc:
-
-  Merge branch kvm-arm64/kerneldoc into kvmarm/next (2024-03-07 00:56:16 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 updates for 6.9
-
- - Infrastructure for building KVM's trap configuration based on the
-   architectural features (or lack thereof) advertised in the VM's ID
-   registers
-
- - Support for mapping vfio-pci BARs as Normal-NC (vaguely similar to
-   x86's WC) at stage-2, improving the performance of interacting with
-   assigned devices that can tolerate it
-
- - Conversion of KVM's representation of LPIs to an xarray, utilized to
-   address serialization some of the serialization on the LPI injection
-   path
-
- - Support for _architectural_ VHE-only systems, advertised through the
-   absence of FEAT_E2H0 in the CPU's ID register
-
- - Miscellaneous cleanups, fixes, and spelling corrections to KVM and
-   selftests
-
-----------------------------------------------------------------
-Ankit Agrawal (4):
-      KVM: arm64: Introduce new flag for non-cacheable IO memory
-      mm: Introduce new flag to indicate wc safe
-      KVM: arm64: Set io memory s2 pte as normalnc for vfio pci device
-      vfio: Convey kvm that the vfio-pci device is wc safe
-
-Bjorn Helgaas (1):
-      KVM: arm64: Fix typos
-
-Jing Zhang (1):
-      KVM: arm64: selftests: Handle feature fields with nonzero minimum value correctly
-
-Joey Gouly (3):
-      KVM: arm64: print Hyp mode
-      KVM: arm64: add comments to __kern_hyp_va
-      KVM: arm64: removed unused kern_hyp_va asm macro
-
-Marc Zyngier (41):
-      arm64: Add macro to compose a sysreg field value
-      arm64: cpufeatures: Correctly handle signed values
-      arm64: cpufeature: Correctly display signed override values
-      arm64: sysreg: Add layout for ID_AA64MMFR4_EL1
-      arm64: cpufeature: Add ID_AA64MMFR4_EL1 handling
-      arm64: cpufeature: Detect HCR_EL2.NV1 being RES0
-      arm64: Treat HCR_EL2.E2H as RES1 when ID_AA64MMFR4_EL1.E2H0 is negative
-      KVM: arm64: Expose ID_AA64MMFR4_EL1 to guests
-      KVM: arm64: Force guest's HCR_EL2.E2H RES1 when NV1 is not implemented
-      KVM: arm64: Handle Apple M2 as not having HCR_EL2.NV1 implemented
-      arm64: cpufeatures: Add missing ID_AA64MMFR4_EL1 to __read_sysreg_by_encoding()
-      arm64: cpufeatures: Only check for NV1 if NV is present
-      arm64: cpufeatures: Fix FEAT_NV check when checking for FEAT_NV1
-      arm64: sysreg: Add missing ID_AA64ISAR[13]_EL1 fields and variants
-      KVM: arm64: Add feature checking helpers
-      KVM: arm64: nv: Add sanitising to VNCR-backed sysregs
-      KVM: arm64: nv: Add sanitising to EL2 configuration registers
-      KVM: arm64: nv: Add sanitising to VNCR-backed FGT sysregs
-      KVM: arm64: nv: Add sanitising to VNCR-backed HCRX_EL2
-      KVM: arm64: nv: Drop sanitised_sys_reg() helper
-      KVM: arm64: Unify HDFG[WR]TR_GROUP FGT identifiers
-      KVM: arm64: nv: Correctly handle negative polarity FGTs
-      KVM: arm64: nv: Turn encoding ranges into discrete XArray stores
-      KVM: arm64: Drop the requirement for XARRAY_MULTI
-      KVM: arm64: nv: Move system instructions to their own sys_reg_desc array
-      KVM: arm64: Always populate the trap configuration xarray
-      KVM: arm64: Register AArch64 system register entries with the sysreg xarray
-      KVM: arm64: Use the xarray as the primary sysreg/sysinsn walker
-      KVM: arm64: Rename __check_nv_sr_forward() to triage_sysreg_trap()
-      KVM: arm64: Add Fine-Grained UNDEF tracking information
-      KVM: arm64: Propagate and handle Fine-Grained UNDEF bits
-      KVM: arm64: Move existing feature disabling over to FGU infrastructure
-      KVM: arm64: Streamline save/restore of HFG[RW]TR_EL2
-      KVM: arm64: Make TLBI OS/Range UNDEF if not advertised to the guest
-      KVM: arm64: Make PIR{,E0}_EL1 UNDEF if S1PIE is not advertised to the guest
-      KVM: arm64: Make AMU sysreg UNDEF if FEAT_AMU is not advertised to the guest
-      KVM: arm64: Make FEAT_MOPS UNDEF if not advertised to the guest
-      KVM: arm64: Snapshot all non-zero RES0/RES1 sysreg fields for later checking
-      KVM: arm64: Add debugfs file for guest's ID registers
-      KVM: arm64: Make build-time check of RES0/RES1 bits optional
-      KVM: arm64: Fix TRFCR_EL1/PMSCR_EL1 access in hVHE mode
-
-Oliver Upton (20):
-      KVM: selftests: Print timer ctl register in ISTATUS assertion
-      KVM: Get rid of return value from kvm_arch_create_vm_debugfs()
-      KVM: arm64: vgic: Store LPIs in an xarray
-      KVM: arm64: vgic: Use xarray to find LPI in vgic_get_lpi()
-      KVM: arm64: vgic-v3: Iterate the xarray to find pending LPIs
-      KVM: arm64: vgic-its: Walk the LPI xarray in vgic_copy_lpi_list()
-      KVM: arm64: vgic: Get rid of the LPI linked-list
-      KVM: arm64: vgic: Use atomics to count LPIs
-      KVM: arm64: vgic: Free LPI vgic_irq structs in an RCU-safe manner
-      KVM: arm64: vgic: Rely on RCU protection in vgic_get_lpi()
-      KVM: arm64: vgic: Ensure the irq refcount is nonzero when taking a ref
-      KVM: arm64: vgic: Don't acquire the lpi_list_lock in vgic_put_irq()
-      KVM: arm64: Fail the idreg iterator if idregs aren't initialized
-      KVM: arm64: Don't initialize idreg debugfs w/ preemption disabled
-      Merge branch kvm-arm64/feat_e2h0 into kvmarm/next
-      Merge branch kvm-arm64/misc into kvmarm/next
-      Merge branch kvm-arm64/vm-configuration into kvmarm/next
-      Merge branch kvm-arm64/lpi-xarray into kvmarm/next
-      Merge branch kvm-arm64/vfio-normal-nc into kvmarm/next
-      Merge branch kvm-arm64/kerneldoc into kvmarm/next
-
-Raghavendra Rao Ananta (1):
-      KVM: selftests: aarch64: Remove unused functions from vpmu test
-
-Randy Dunlap (10):
-      KVM: arm64: debug: fix kernel-doc warnings
-      KVM: arm64: guest: fix kernel-doc warnings
-      KVM: arm64: hyp/aarch32: fix kernel-doc warnings
-      KVM: arm64: vhe: fix a kernel-doc warning
-      KVM: arm64: mmu: fix a kernel-doc warning
-      KVM: arm64: PMU: fix kernel-doc warnings
-      KVM: arm64: sys_regs: fix kernel-doc warnings
-      KVM: arm64: vgic-init: fix a kernel-doc warning
-      KVM: arm64: vgic-its: fix kernel-doc warnings
-      KVM: arm64: vgic: fix a kernel-doc warning
-
-Sean Christopherson (1):
-      KVM: selftests: Fix GUEST_PRINTF() format warnings in ARM code
-
- arch/arm64/include/asm/cpu.h                       |   1 +
- arch/arm64/include/asm/cpufeature.h                |   1 +
- arch/arm64/include/asm/kvm_arm.h                   |   4 +-
- arch/arm64/include/asm/kvm_emulate.h               |   3 +-
- arch/arm64/include/asm/kvm_host.h                  |  99 +++++++-
- arch/arm64/include/asm/kvm_hyp.h                   |   2 +-
- arch/arm64/include/asm/kvm_mmu.h                   |  46 ++--
- arch/arm64/include/asm/kvm_nested.h                |   1 -
- arch/arm64/include/asm/kvm_pgtable.h               |   2 +
- arch/arm64/include/asm/memory.h                    |   2 +
- arch/arm64/include/asm/sysreg.h                    |   5 +-
- arch/arm64/kernel/cpufeature.c                     | 105 +++++++-
- arch/arm64/kernel/cpuinfo.c                        |   1 +
- arch/arm64/kernel/head.S                           |  23 +-
- arch/arm64/kvm/Kconfig                             |  12 +-
- arch/arm64/kvm/arch_timer.c                        |   2 +-
- arch/arm64/kvm/arm.c                               |  14 +-
- arch/arm64/kvm/check-res-bits.h                    | 125 ++++++++++
- arch/arm64/kvm/debug.c                             |   3 +-
- arch/arm64/kvm/emulate-nested.c                    | 231 ++++++++++++-----
- arch/arm64/kvm/fpsimd.c                            |   2 +-
- arch/arm64/kvm/guest.c                             |   7 +-
- arch/arm64/kvm/hyp/aarch32.c                       |   4 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h            | 130 +++++-----
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h         |  24 +-
- arch/arm64/kvm/hyp/nvhe/debug-sr.c                 |  12 +-
- arch/arm64/kvm/hyp/nvhe/host.S                     |   2 +-
- arch/arm64/kvm/hyp/nvhe/mm.c                       |   4 +-
- arch/arm64/kvm/hyp/pgtable.c                       |  24 +-
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c                 |   2 +-
- arch/arm64/kvm/inject_fault.c                      |   2 +-
- arch/arm64/kvm/mmu.c                               |  16 +-
- arch/arm64/kvm/nested.c                            | 274 ++++++++++++++++++++-
- arch/arm64/kvm/pmu-emul.c                          |  15 +-
- arch/arm64/kvm/sys_regs.c                          | 266 ++++++++++++++++----
- arch/arm64/kvm/sys_regs.h                          |   2 +
- arch/arm64/kvm/vgic/vgic-debug.c                   |   2 +-
- arch/arm64/kvm/vgic/vgic-init.c                    |  10 +-
- arch/arm64/kvm/vgic/vgic-its.c                     |  63 +++--
- arch/arm64/kvm/vgic/vgic-v3.c                      |   3 +-
- arch/arm64/kvm/vgic/vgic.c                         |  62 ++---
- arch/arm64/kvm/vgic/vgic.h                         |  15 +-
- arch/arm64/tools/cpucaps                           |   1 +
- arch/arm64/tools/sysreg                            |  45 +++-
- arch/powerpc/kvm/powerpc.c                         |   3 +-
- arch/x86/kvm/debugfs.c                             |   3 +-
- drivers/vfio/pci/vfio_pci_core.c                   |  19 +-
- include/kvm/arm_pmu.h                              |  11 -
- include/kvm/arm_vgic.h                             |   9 +-
- include/linux/kvm_host.h                           |   2 +-
- include/linux/mm.h                                 |  14 ++
- tools/testing/selftests/kvm/aarch64/arch_timer.c   |   4 +-
- .../selftests/kvm/aarch64/debug-exceptions.c       |   2 +-
- tools/testing/selftests/kvm/aarch64/hypercalls.c   |   4 +-
- .../selftests/kvm/aarch64/page_fault_test.c        |   2 +-
- tools/testing/selftests/kvm/aarch64/set_id_regs.c  |  18 +-
- .../selftests/kvm/aarch64/vpmu_counter_access.c    |  28 +--
- virt/kvm/kvm_main.c                                |   8 +-
- 58 files changed, 1409 insertions(+), 387 deletions(-)
- create mode 100644 arch/arm64/kvm/check-res-bits.h
-
---- 
-diff --cc arch/arm64/include/asm/cpu.h
-index 6c13fd47e170,96379be913cd..9b73fd0cd721
---- a/arch/arm64/include/asm/cpu.h
-+++ b/arch/arm64/include/asm/cpu.h
-@@@ -56,11 -57,12 +57,13 @@@ struct cpuinfo_arm64 
-  	u64		reg_id_aa64mmfr1;
-  	u64		reg_id_aa64mmfr2;
-  	u64		reg_id_aa64mmfr3;
- +	u64		reg_id_aa64mmfr4;
-  	u64		reg_id_aa64pfr0;
-  	u64		reg_id_aa64pfr1;
-+ 	u64		reg_id_aa64pfr2;
-  	u64		reg_id_aa64zfr0;
-  	u64		reg_id_aa64smfr0;
-+ 	u64		reg_id_aa64fpfr0;
-  
-  	struct cpuinfo_32bit	aarch32;
-  };
-diff --cc arch/arm64/include/asm/kvm_arm.h
-index a1769e415d72,7f45ce9170bb..e01bb5ca13b7
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@@ -102,8 -102,10 +102,8 @@@
-  #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
-  #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
-  
- -#define HCRX_GUEST_FLAGS \
- -	(HCRX_EL2_SMPME | HCRX_EL2_TCR2En | \
- -	 (cpus_have_final_cap(ARM64_HAS_MOPS) ? (HCRX_EL2_MSCEn | HCRX_EL2_MCE2) : 0))
- +#define HCRX_GUEST_FLAGS (HCRX_EL2_SMPME | HCRX_EL2_TCR2En)
-- #define HCRX_HOST_FLAGS (HCRX_EL2_MSCEn | HCRX_EL2_TCR2En)
-+ #define HCRX_HOST_FLAGS (HCRX_EL2_MSCEn | HCRX_EL2_TCR2En | HCRX_EL2_EnFPM)
-  
-  /* TCR_EL2 Registers bits */
-  #define TCR_EL2_DS		(1UL << 32)
-diff --cc arch/arm64/kernel/cpufeature.c
-index f309fd542c20,d6679d8b737e..432d8ee5857c
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@@ -752,14 -754,16 +789,17 @@@ static const struct __ftr_reg_entry 
-  			       &id_aa64isar1_override),
-  	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64ISAR2_EL1, ftr_id_aa64isar2,
-  			       &id_aa64isar2_override),
-+ 	ARM64_FTR_REG(SYS_ID_AA64ISAR3_EL1, ftr_id_aa64isar3),
-  
-  	/* Op1 = 0, CRn = 0, CRm = 7 */
-- 	ARM64_FTR_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0),
-+ 	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0,
-+ 			       &id_aa64mmfr0_override),
-  	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1,
-  			       &id_aa64mmfr1_override),
-- 	ARM64_FTR_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2),
-+ 	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2,
-+ 			       &id_aa64mmfr2_override),
-  	ARM64_FTR_REG(SYS_ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3),
- +	ARM64_FTR_REG(SYS_ID_AA64MMFR4_EL1, ftr_id_aa64mmfr4),
-  
-  	/* Op1 = 1, CRn = 0, CRm = 0 */
-  	ARM64_FTR_REG(SYS_GMID_EL1, ftr_gmid),
-@@@ -1084,11 -1088,12 +1125,13 @@@ void __init init_cpu_features(struct cp
-  	init_cpu_ftr_reg(SYS_ID_AA64MMFR1_EL1, info->reg_id_aa64mmfr1);
-  	init_cpu_ftr_reg(SYS_ID_AA64MMFR2_EL1, info->reg_id_aa64mmfr2);
-  	init_cpu_ftr_reg(SYS_ID_AA64MMFR3_EL1, info->reg_id_aa64mmfr3);
- +	init_cpu_ftr_reg(SYS_ID_AA64MMFR4_EL1, info->reg_id_aa64mmfr4);
-  	init_cpu_ftr_reg(SYS_ID_AA64PFR0_EL1, info->reg_id_aa64pfr0);
-  	init_cpu_ftr_reg(SYS_ID_AA64PFR1_EL1, info->reg_id_aa64pfr1);
-+ 	init_cpu_ftr_reg(SYS_ID_AA64PFR2_EL1, info->reg_id_aa64pfr2);
-  	init_cpu_ftr_reg(SYS_ID_AA64ZFR0_EL1, info->reg_id_aa64zfr0);
-  	init_cpu_ftr_reg(SYS_ID_AA64SMFR0_EL1, info->reg_id_aa64smfr0);
-+ 	init_cpu_ftr_reg(SYS_ID_AA64FPFR0_EL1, info->reg_id_aa64fpfr0);
-  
-  	if (id_aa64pfr0_32bit_el0(info->reg_id_aa64pfr0))
-  		init_32bit_cpu_features(&info->aarch32);
-@@@ -2817,13 -2750,32 +2828,39 @@@ static const struct arm64_cpu_capabilit
-  		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-  		.matches = has_lpa2,
-  	},
- +	{
- +		.desc = "NV1",
- +		.capability = ARM64_HAS_HCR_NV1,
- +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
- +		.matches = has_nv1,
- +		ARM64_CPUID_FIELDS_NEG(ID_AA64MMFR4_EL1, E2H0, NI_NV1)
- +	},
-+ 	{
-+ 		.desc = "FPMR",
-+ 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+ 		.capability = ARM64_HAS_FPMR,
-+ 		.matches = has_cpuid_feature,
-+ 		.cpu_enable = cpu_enable_fpmr,
-+ 		ARM64_CPUID_FIELDS(ID_AA64PFR2_EL1, FPMR, IMP)
-+ 	},
-+ #ifdef CONFIG_ARM64_VA_BITS_52
-+ 	{
-+ 		.capability = ARM64_HAS_VA52,
-+ 		.type = ARM64_CPUCAP_BOOT_CPU_FEATURE,
-+ 		.matches = has_cpuid_feature,
-+ #ifdef CONFIG_ARM64_64K_PAGES
-+ 		.desc = "52-bit Virtual Addressing (LVA)",
-+ 		ARM64_CPUID_FIELDS(ID_AA64MMFR2_EL1, VARange, 52)
-+ #else
-+ 		.desc = "52-bit Virtual Addressing (LPA2)",
-+ #ifdef CONFIG_ARM64_4K_PAGES
-+ 		ARM64_CPUID_FIELDS(ID_AA64MMFR0_EL1, TGRAN4, 52_BIT)
-+ #else
-+ 		ARM64_CPUID_FIELDS(ID_AA64MMFR0_EL1, TGRAN16, 52_BIT)
-+ #endif
-+ #endif
-+ 	},
-+ #endif
-  	{},
-  };
-  
-diff --cc arch/arm64/kernel/cpuinfo.c
-index 7ca3fbd200f0,f0abb150f73e..09eeaa24d456
---- a/arch/arm64/kernel/cpuinfo.c
-+++ b/arch/arm64/kernel/cpuinfo.c
-@@@ -447,11 -463,12 +463,13 @@@ static void __cpuinfo_store_cpu(struct 
-  	info->reg_id_aa64mmfr1 = read_cpuid(ID_AA64MMFR1_EL1);
-  	info->reg_id_aa64mmfr2 = read_cpuid(ID_AA64MMFR2_EL1);
-  	info->reg_id_aa64mmfr3 = read_cpuid(ID_AA64MMFR3_EL1);
- +	info->reg_id_aa64mmfr4 = read_cpuid(ID_AA64MMFR4_EL1);
-  	info->reg_id_aa64pfr0 = read_cpuid(ID_AA64PFR0_EL1);
-  	info->reg_id_aa64pfr1 = read_cpuid(ID_AA64PFR1_EL1);
-+ 	info->reg_id_aa64pfr2 = read_cpuid(ID_AA64PFR2_EL1);
-  	info->reg_id_aa64zfr0 = read_cpuid(ID_AA64ZFR0_EL1);
-  	info->reg_id_aa64smfr0 = read_cpuid(ID_AA64SMFR0_EL1);
-+ 	info->reg_id_aa64fpfr0 = read_cpuid(ID_AA64FPFR0_EL1);
-  
-  	if (id_aa64pfr1_mte(info->reg_id_aa64pfr1))
-  		info->reg_gmid = read_cpuid(GMID_EL1);
+Bringing this to the fore.=0A=
+=0A=
+>> Where does that leave us for this patch? We check the VM_MTE_ALLOWED=0A=
+>> and check for ZONE_MOVABLE struct pages as one of the conditions for=0A=
+>> NORMAL?=0A=
+>=0A=
+> I think we should keep it as simple as possible and, looking at it=0A=
+> again, maybe even ignore vm_page_prot. Two questions though:=0A=
+>=0A=
+> 1. Does VM_IO imply vm_page_prot never having MT_NORMAL or=0A=
+> =A0=A0 MT_NORMAL_TAGGED?=0A=
+>=0A=
+> 2. Do all I/O ranges (side-effects, non-RAM) mapped into a guest (and=0A=
+>=A0=A0 which end up in user_mem_abort()) imply VM_IO?=0A=
+>=0A=
+> If yes to both, I think something like below would do:=0A=
+=0A=
+How may we get the answer to these? It seems to be the logical behavior, bu=
+t=0A=
+how can we confirm?=0A=
+=0A=
+While we discuss on that, I am considering to send out the next version of =
+this=0A=
+patch (incorporating the feedbacks on the thread) that is rebased to a comm=
+it=0A=
+inclusive of the recently applied KVM patch series:=0A=
+=0A=
+[KVM: arm64: Allow the VM to select DEVICE_* and NORMAL_NC for IO memory]=
+=0A=
+https://lore.kernel.org/all/20240224150546.368-1-ankita@nvidia.com/=0A=
+=0A=
+>=A0=A0=A0=A0=A0=A0=A0 mte_allowed =3D kvm_vma_mte_allowed(vma);=0A=
+>=A0=A0=A0=A0=A0=A0=A0 noncacheable =3D false;=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 // or 'device' as in us=
+er_mem_abort()=0A=
+>=A0=A0=A0=A0=A0=A0=A0 ...=0A=
+>=A0=A0=A0=A0=A0=A0=A0 if (vma->flags & VM_IO)=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 // replaces !pfn_is_map_memor=
+y()=0A=
+>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 noncacheable =3D true;=0A=
+>=A0=A0=A0=A0=A0=A0=A0 else if (!mte_allowed && kvm_has_mte())=0A=
+>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 noncaheable =3D true;=0A=
+>=A0=A0=A0=A0=A0=A0=A0 ...=0A=
+>=A0=A0=A0=A0=A0=A0=A0 if (noncacheable)=0A=
+>=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 prot |=3D KVM_PGTABLE_PROT_D=
+EVICE;=A0=A0=A0=A0=A0=A0=A0 // or the new KVM_PGTABLE_PROT_NC=0A=
+>=0A=
+> mte_allowed would cover DAX mappings (and, who knows, some future DAX=0A=
+> mapping may allow MTE and the driver explicitly set the flag). Anything=
+=0A=
+> else hot-plugged into ZONE_MOVABLE should have VM_MTE_ALLOWED set or=0A=
+> MTE disabled altogether.=0A=
+=0A=
+--=0A=
+Catalin=
