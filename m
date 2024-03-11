@@ -1,139 +1,125 @@
-Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 236EA2F55
-	for <kvmarm@lists.linux.dev>; Mon, 11 Mar 2024 04:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F31182CF
+	for <kvmarm@lists.linux.dev>; Mon, 11 Mar 2024 09:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710133062; cv=none; b=Kyt2zspiwpaJQN7zV1cQOS9Snn2PO9BaBHLQx4772VeryfvkTT1LId2Jv4UFICseMMDSiQARiBGbGmGLTzG6HV9Alj2BgJAHEHN9PSye4MHbpASDBooDd/fda1/uVWsRMaCeEjKGK6ZOhL7yScpza/cnoKtbc7GSlX9OYKUdDus=
+	t=1710149233; cv=none; b=WQf3nWBdjSEZduQmutWSfWrFxVXsU7dAheIhZ/I0WWESoiPi8N96WLuLUeDbpNuTvjg5Nf323bgMtN/X6jurY7t5hcgWBbMQoG5D2T6Ob41vsP0UQKP9qUKAqghz6RYb4nQAnKJSDSsbYjBI0l0Sx7QB+25xkFaqEZ8Fjg4MTQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710133062; c=relaxed/simple;
-	bh=xjQzlJl9OraInuNo/twNVtJ2VMOlG7ZoZONnXTUCgoA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qdTxZmOCycf4UFKiuH8/YjoWi7Nb5JcH/cH/wuN0WSUUekIqHvwXSTzh0qe/qzGiMBYQG6O5GtYTQTIOSpj5X+OSM8GF9eoVOmeArMJFGQAgYJRPEEL7vaqDCtPy3AwUvzLnaPiiHC66NTuyQx2u0rMcBASWG2u+/V+p3nDRdXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UGqSue40; arc=none smtp.client-ip=95.215.58.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1710149233; c=relaxed/simple;
+	bh=8zth3mwh/cKPnkQ6EEGd+vNlUKFtCYJEHeMahy8I+ig=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hXPAFqSD+TJcoN8gQpqgMTOHT631RkcwrBg793cU3Z746SezUTg31pc/zIwFdXX+6PJAN+rCrZDlbyND1dYsLR5hBqbThpwkDdD6F7p7ep321jGME6BoExmP5vHbKjlntIKqOCoFUTWWGE/e/8U+5AvB3bsvQh7N7B/E+aDUpt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PlKslLXY; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UGqSue40"
-Date: Sun, 10 Mar 2024 21:57:21 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1710133058;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z8//AGzztt4+rMVOK6OmLLzYmbCGtHTn6bRJ5+iBV8U=;
-	b=UGqSue40cB4RjIDDEcEFeUbFzFKCggFcnLT5+OLC/YIEGbEiJQ6HbgJu5db+qay05sVOiX
-	KqwTa3NW0ZXPRl+Z1ZxIWs2k9pJdxcpWLCE2toy0OpFe5HWEqOeddHGjQXdQ/FtcE7XirM
-	Zz+INmRszTZKQgiUiWHcvqMFnM5R0C4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ricardo Koller <ricarkol@google.com>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 2/3] KVM: arm64: selftests: Guarantee interrupts are
- handled
-Message-ID: <Ze6PMRMfIK8z0q4F@thinky-boi>
-References: <20240307183907.1184775-1-coltonlewis@google.com>
- <20240307183907.1184775-3-coltonlewis@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PlKslLXY"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d26227d508so62471611fa.2
+        for <kvmarm@lists.linux.dev>; Mon, 11 Mar 2024 02:27:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710149229; x=1710754029; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8zth3mwh/cKPnkQ6EEGd+vNlUKFtCYJEHeMahy8I+ig=;
+        b=PlKslLXY43obBA1Ju5ApNZR+W3u6qj/cbHi+j/718+gZyPA+05DbPwzVQKyT/Hn3bt
+         L6B/q90J678hxy6GvIeUXqpLm+4AFKFGdyIZlxepYTjzegCcmDmGjNe+C+quWGWvZzTJ
+         NvKU2GnD1SbamFeyLxXAuLDUvwPsHdZ0tV1VA9Sb+6RQ8S3Qf1bcF+kw/XEUcr4vvs9n
+         jGcL7u2C8Xiktvg6dkOL2R8N37INezSsTeJMZMHwiPAArkCHnqSDQSSVt1yLyo2voChL
+         b7l/epN53O/fXVaKchTx0rR04XNqMMiecv7RGck800Jdku6sRNu51d8esRhoV7Dmqmp/
+         V9yQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710149229; x=1710754029;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8zth3mwh/cKPnkQ6EEGd+vNlUKFtCYJEHeMahy8I+ig=;
+        b=eSULLekdKlYnsbkLXHB0H1Fh/8g/jMg05NhCWLNIZYcJkSWE5amqDPsyor5qn0rr1W
+         maWcP9XklF0cP1zCjVUgW7u3Een/yAKntMDtPHkvH+DrsnFXGheRPaQSyG0OG7aqKmy2
+         E7qs9aM0ix8Ln6A/dqsWg8tuTLmlEEcIofz500iilId3crO1fhQeGSDToQMDM7RjaylE
+         VXIR3sYmA74xET/wXe/a1Uj6Qk2UDfVsvz1KtS/EYUEgMQm8qw4EKPqCLlQ4sBpW/jxc
+         oaMDxTvJYA6plPJ8Bx4noY4bOuBHLQlJdohh+GrogRo8JeTIRBcoSocjCuaKIfcyzngZ
+         TyPA==
+X-Forwarded-Encrypted: i=1; AJvYcCUpFlJxaunQWffNR09cLevBv1kBDpdKBxbo1BhJs/gr/nLabH5BkzIkan5cc578dvMN2heKSHUwuNWqYLqKQitKp4bhpwbB
+X-Gm-Message-State: AOJu0YwM/LjisV/ATZnLYG1fWKCbPlwCEXh12WRpPrOci+v5NZLgWhBK
+	3S0X8HMwXk90XxTPf8QQj8/yRM30As9A9YNRLo2zXJohxwJBCcgHIY9ssMMOGQ79Nf7LahMBIDk
+	s5M5ZObAn6XhAfYKfnNcoirFF+56kxzUITgDn
+X-Google-Smtp-Source: AGHT+IFzr2Y971s9TIBNchuVSVv96nsdJjBYbviMit/edW0+/JwqZBjOrNfaM4862cuUg6dthFfgr61zIEYjCiYlE2E=
+X-Received: by 2002:a05:6512:3baa:b0:513:b102:7d93 with SMTP id
+ g42-20020a0565123baa00b00513b1027d93mr690098lfv.24.1710149229222; Mon, 11 Mar
+ 2024 02:27:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240307183907.1184775-3-coltonlewis@google.com>
-X-Migadu-Flow: FLOW_OUT
+References: <335E21FA-7F1E-4540-8A70-01A63D8C72FA@amazon.com>
+In-Reply-To: <335E21FA-7F1E-4540-8A70-01A63D8C72FA@amazon.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 11 Mar 2024 09:26:12 +0000
+Message-ID: <CA+EHjTxpBM6LyqGfE_y--Uy1oR4oP7Ozcp3mBwFvAijOZe0i+Q@mail.gmail.com>
+Subject: Re: Unmapping KVM Guest Memory from Host Kernel
+To: "Manwaring, Derek" <derekmn@amazon.com>
+Cc: David Woodhouse <dwmw2@infradead.org>, David Matlack <dmatlack@google.com>, 
+	Brendan Jackman <jackmanb@google.com>, "qperret@google.com" <qperret@google.com>, 
+	"jason.cj.chen@intel.com" <jason.cj.chen@intel.com>, "Gowans, James" <jgowans@amazon.com>, 
+	"seanjc@google.com" <seanjc@google.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
+	"Roy, Patrick" <roypat@amazon.co.uk>, 
+	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>, "rppt@kernel.org" <rppt@kernel.org>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>, 
+	"lstoakes@gmail.com" <lstoakes@gmail.com>, "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, 
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, 
+	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
+	"mst@redhat.com" <mst@redhat.com>, "somlo@cmu.edu" <somlo@cmu.edu>, "Graf (AWS), Alexander" <graf@amazon.de>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, 
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
+	"kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-nitpick: Shortlog should read
+Hi,
 
-  KVM: selftests: Ensure pending interrupts are handled in arch_timer test
+On Fri, Mar 8, 2024 at 9:05=E2=80=AFPM Manwaring, Derek <derekmn@amazon.com=
+> wrote:
+>
+> On 2024-03-08 at 10:46-0700, David Woodhouse wrote:
+> > On Fri, 2024-03-08 at 09:35 -0800, David Matlack wrote:
+> > > I think what James is looking for (and what we are also interested
+> > > in), is _eliminating_ the ability to access guest memory from the
+> > > direct map entirely. And in general, eliminate the ability to access
+> > > guest memory in as many ways as possible.
+> >
+> > Well, pKVM does that...
+>
+> Yes we've been looking at pKVM and it accomplishes a lot of what we're tr=
+ying
+> to do. Our initial inclination is that we want to stick with VHE for the =
+lower
+> overhead. We also want flexibility across server parts, so we would need =
+to
+> get pKVM working on Intel & AMD if we went this route.
+>
+> Certainly there are advantages of pKVM on the perf side like the in-place
+> memory sharing rather than copying as well as on the security side by sim=
+ply
+> reducing the TCB. I'd be interested to hear others' thoughts on pKVM vs
+> memfd_secret or general ASI.
 
-The fact that we're dealing with pending interrupts is critical here;
-the ISB has no interaction with the GIC in terms of interrupt timing as
-it gets to the PE.
+The work we've done for pKVM is still an RFC [*], but there is nothing
+in it that limits it to nVHE (at least not intentionally). It should
+work with VHE and hVHE as well. On respinning the patch series [*], we
+plan on adding support for normal VMs to use guest_memfd() as well in
+arm64, mainly for testing, and to make it easier for others to base
+their work on it.
 
-On Thu, Mar 07, 2024 at 06:39:06PM +0000, Colton Lewis wrote:
-> Break up the asm instructions poking daifclr and daifset to handle
-> interrupts. R_RBZYL specifies pending interrupts will be handle after
-> context synchronization events such as an ISB.
-> 
-> Introduce a function wrapper for the WFI instruction.
-> 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> ---
->  tools/testing/selftests/kvm/aarch64/vgic_irq.c    | 12 ++++++------
->  tools/testing/selftests/kvm/include/aarch64/gic.h |  3 +++
->  tools/testing/selftests/kvm/lib/aarch64/gic.c     |  5 +++++
->  3 files changed, 14 insertions(+), 6 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-> index d3bf584d2cc1..85f182704d79 100644
-> --- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-> +++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-> @@ -269,13 +269,13 @@ static void guest_inject(struct test_args *args,
->  	KVM_INJECT_MULTI(cmd, first_intid, num);
->  
->  	while (irq_handled < num) {
-> -		asm volatile("wfi\n"
-> -			     "msr daifclr, #2\n"
-> -			     /* handle IRQ */
-> -			     "msr daifset, #2\n"
-> -			     : : : "memory");
-> +		gic_wfi();
-> +		local_irq_enable();
-> +		isb();
-> +		/* handle IRQ */
-> +		local_irq_disable();
+Cheers,
+/fuad
 
-Sorry, this *still* annoys me. Please move the comment above the ISB,
-you're documenting a behavior that is implied by the instruction, not
-anything else.
-
->  	}
-> -	asm volatile("msr daifclr, #2" : : : "memory");
-> +	local_irq_enable();
->  
->  	GUEST_ASSERT_EQ(irq_handled, num);
->  	for (i = first_intid; i < num + first_intid; i++)
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/gic.h b/tools/testing/selftests/kvm/include/aarch64/gic.h
-> index 9043eaef1076..f474714e4cb2 100644
-> --- a/tools/testing/selftests/kvm/include/aarch64/gic.h
-> +++ b/tools/testing/selftests/kvm/include/aarch64/gic.h
-> @@ -47,4 +47,7 @@ void gic_irq_clear_pending(unsigned int intid);
->  bool gic_irq_get_pending(unsigned int intid);
->  void gic_irq_set_config(unsigned int intid, bool is_edge);
->  
-> +/* Execute a Wait For Interrupt instruction. */
-> +void gic_wfi(void);
-> +
->  #endif /* SELFTEST_KVM_GIC_H */
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/gic.c b/tools/testing/selftests/kvm/lib/aarch64/gic.c
-> index 9d15598d4e34..392e3f581ae0 100644
-> --- a/tools/testing/selftests/kvm/lib/aarch64/gic.c
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/gic.c
-> @@ -164,3 +164,8 @@ void gic_irq_set_config(unsigned int intid, bool is_edge)
->  	GUEST_ASSERT(gic_common_ops);
->  	gic_common_ops->gic_irq_set_config(intid, is_edge);
->  }
-> +
-> +void gic_wfi(void)
-> +{
-> +	asm volatile("wfi");
-> +}
-
-Ok, I left a comment about this last time...
-
-WFI instructions are only relevant in the context of a PE, so it would
-be natural to add such a helper to aarch64/processor.h. There are
-definitely implementations out there that do not use a GIC and still
-have WFI instructions.
-
--- 
-Thanks,
-Oliver
+[*] https://lore.kernel.org/all/20240222161047.402609-1-tabba@google.com
+>
+> Derek
+>
