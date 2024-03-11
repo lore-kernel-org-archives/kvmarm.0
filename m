@@ -1,66 +1,66 @@
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F31182CF
-	for <kvmarm@lists.linux.dev>; Mon, 11 Mar 2024 09:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C16B17577
+	for <kvmarm@lists.linux.dev>; Mon, 11 Mar 2024 09:29:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710149233; cv=none; b=WQf3nWBdjSEZduQmutWSfWrFxVXsU7dAheIhZ/I0WWESoiPi8N96WLuLUeDbpNuTvjg5Nf323bgMtN/X6jurY7t5hcgWBbMQoG5D2T6Ob41vsP0UQKP9qUKAqghz6RYb4nQAnKJSDSsbYjBI0l0Sx7QB+25xkFaqEZ8Fjg4MTQc=
+	t=1710149400; cv=none; b=drc5+9X+LCvOVeMkGLNt1Q7eOHNK3h62dcur0xSFAdYZf25NGBCx1lISiR2n23j9yyxTZ8torNW876F74okj/astBZdKmZUVyt+9UV0yzQ52RkYRLbopSHHNTRO3ixwb45EioWdwb8V1tvPvt1rdpg5C9kYcFWGpNQRHLW9RrRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710149233; c=relaxed/simple;
-	bh=8zth3mwh/cKPnkQ6EEGd+vNlUKFtCYJEHeMahy8I+ig=;
+	s=arc-20240116; t=1710149400; c=relaxed/simple;
+	bh=yYwZNAyl9eI8xnn6G8iPccTROZ3bREOUqaEgbZaMdn4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hXPAFqSD+TJcoN8gQpqgMTOHT631RkcwrBg793cU3Z746SezUTg31pc/zIwFdXX+6PJAN+rCrZDlbyND1dYsLR5hBqbThpwkDdD6F7p7ep321jGME6BoExmP5vHbKjlntIKqOCoFUTWWGE/e/8U+5AvB3bsvQh7N7B/E+aDUpt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PlKslLXY; arc=none smtp.client-ip=209.85.208.174
+	 To:Cc:Content-Type; b=F+Sjo8OMrnuvkF0fCep+Sk1raoaPB4hCJlONQ5xAq1ds+3KzNlf85v0RHe6+Ev4EypUvwRSXOaLddg8a3QAH2+N/OmTriMdNGf+Uhi3D3NUDacAE4T/I3Q6cPFi7y+v0Y5xthFx3U/cZUPtS9BwgJAa9uDbDmA1OlB8hGuCUCpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aIvetu5A; arc=none smtp.client-ip=209.85.221.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PlKslLXY"
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d26227d508so62471611fa.2
-        for <kvmarm@lists.linux.dev>; Mon, 11 Mar 2024 02:27:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aIvetu5A"
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-33e8e9a4edaso1702051f8f.2
+        for <kvmarm@lists.linux.dev>; Mon, 11 Mar 2024 02:29:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710149229; x=1710754029; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1710149397; x=1710754197; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8zth3mwh/cKPnkQ6EEGd+vNlUKFtCYJEHeMahy8I+ig=;
-        b=PlKslLXY43obBA1Ju5ApNZR+W3u6qj/cbHi+j/718+gZyPA+05DbPwzVQKyT/Hn3bt
-         L6B/q90J678hxy6GvIeUXqpLm+4AFKFGdyIZlxepYTjzegCcmDmGjNe+C+quWGWvZzTJ
-         NvKU2GnD1SbamFeyLxXAuLDUvwPsHdZ0tV1VA9Sb+6RQ8S3Qf1bcF+kw/XEUcr4vvs9n
-         jGcL7u2C8Xiktvg6dkOL2R8N37INezSsTeJMZMHwiPAArkCHnqSDQSSVt1yLyo2voChL
-         b7l/epN53O/fXVaKchTx0rR04XNqMMiecv7RGck800Jdku6sRNu51d8esRhoV7Dmqmp/
-         V9yQ==
+        bh=yYwZNAyl9eI8xnn6G8iPccTROZ3bREOUqaEgbZaMdn4=;
+        b=aIvetu5AKR3Tg8SgLGT4E1QPhiQORuDxdK8whnZztvHyTPHtd1xOR0YGQaBMExbMe2
+         NyXe4tP1mak26dXwwoMvC2c9ULStSfVqChrHTZorYy98t7fvYVGFVeZRwk/G+mmUj/W/
+         qWkFh8uzq/O4xxYnO2Lx2wBkRfhawSetE1gBATLoqebaN/R6ZFcZZpUidfilMXxV5mFB
+         LnTO73DhjbTPXgljVyO4uub84jIV7VYG8rVJMYMTHt2DIN2GkJL/AH2Rd71SM8d4bWrM
+         tpW+mbzqHWLdcSot6mbBEpK0mBKZBbP5OzCcGMEOKaJquYMc2r5/oSjFoqAq7vTO+tgL
+         r2uQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710149229; x=1710754029;
+        d=1e100.net; s=20230601; t=1710149397; x=1710754197;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8zth3mwh/cKPnkQ6EEGd+vNlUKFtCYJEHeMahy8I+ig=;
-        b=eSULLekdKlYnsbkLXHB0H1Fh/8g/jMg05NhCWLNIZYcJkSWE5amqDPsyor5qn0rr1W
-         maWcP9XklF0cP1zCjVUgW7u3Een/yAKntMDtPHkvH+DrsnFXGheRPaQSyG0OG7aqKmy2
-         E7qs9aM0ix8Ln6A/dqsWg8tuTLmlEEcIofz500iilId3crO1fhQeGSDToQMDM7RjaylE
-         VXIR3sYmA74xET/wXe/a1Uj6Qk2UDfVsvz1KtS/EYUEgMQm8qw4EKPqCLlQ4sBpW/jxc
-         oaMDxTvJYA6plPJ8Bx4noY4bOuBHLQlJdohh+GrogRo8JeTIRBcoSocjCuaKIfcyzngZ
-         TyPA==
-X-Forwarded-Encrypted: i=1; AJvYcCUpFlJxaunQWffNR09cLevBv1kBDpdKBxbo1BhJs/gr/nLabH5BkzIkan5cc578dvMN2heKSHUwuNWqYLqKQitKp4bhpwbB
-X-Gm-Message-State: AOJu0YwM/LjisV/ATZnLYG1fWKCbPlwCEXh12WRpPrOci+v5NZLgWhBK
-	3S0X8HMwXk90XxTPf8QQj8/yRM30As9A9YNRLo2zXJohxwJBCcgHIY9ssMMOGQ79Nf7LahMBIDk
-	s5M5ZObAn6XhAfYKfnNcoirFF+56kxzUITgDn
-X-Google-Smtp-Source: AGHT+IFzr2Y971s9TIBNchuVSVv96nsdJjBYbviMit/edW0+/JwqZBjOrNfaM4862cuUg6dthFfgr61zIEYjCiYlE2E=
-X-Received: by 2002:a05:6512:3baa:b0:513:b102:7d93 with SMTP id
- g42-20020a0565123baa00b00513b1027d93mr690098lfv.24.1710149229222; Mon, 11 Mar
- 2024 02:27:09 -0700 (PDT)
+        bh=yYwZNAyl9eI8xnn6G8iPccTROZ3bREOUqaEgbZaMdn4=;
+        b=LWkKqnr+RXJzcL9nFORo9cEFNkzZbHBgkVRMdX2m69rElb0FTWHPmDETDAhrhvIg3d
+         3xgB1Wkekh3oekbO9JpJWJVTrMEI1HyX+oCffbL/Nxyf23cEJrvgnRWpM0O3IaTlVPAm
+         QeniCwLfTqV6vohJVgdB8Y6AZAMMyiKlfs+8ywYL5BQaBWdaJmSNICkUQulCpfkXDMiv
+         v6pxr0rFwuwy2Ydx20lQv6lxRromwc5BQx+iy4sgDNAYV9IWxQk5e6xCDKZclfe5vMlB
+         aTLGMId9sJsiEnob+VYfdb3j8IryzQlCC+Rdfxza5xFbQVSFon3SZNCLLf1QOenFPDEn
+         ENbw==
+X-Forwarded-Encrypted: i=1; AJvYcCX0D674lZENGrg5z9Xlo9zUdvfZB7NPDa4ADuenzL9v+prtb6KnGJKbN9bt8F+Bj2n50JpWMFLThFEzYKQOAmfX901F0cbh
+X-Gm-Message-State: AOJu0YwQCJVm6gRAwapoV94P8he2Byzv1kchkcfoL4sCZ4m6DPwdUkvz
+	MPnw4mdXyVSvWugsjwN66kIQE9v1YnR3MGRYqDTxsQ9pCb6MFfp9GRqP4DXu7P8LOioc2Rj9/Iz
+	mPIK0djA3izWw7LLPji0JJax8t8zmlazhpNzd
+X-Google-Smtp-Source: AGHT+IHSfs26GHVI09JkKNk9HoDRqOW4oeQ0rJHE/UNYx/wsSmfgrD7ev79myOziiYJpopiGSTSS0pKlBEG+6nVcKtI=
+X-Received: by 2002:a5d:5188:0:b0:33d:e1d2:2694 with SMTP id
+ k8-20020a5d5188000000b0033de1d22694mr3718979wrv.63.1710149396551; Mon, 11 Mar
+ 2024 02:29:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <335E21FA-7F1E-4540-8A70-01A63D8C72FA@amazon.com>
-In-Reply-To: <335E21FA-7F1E-4540-8A70-01A63D8C72FA@amazon.com>
+References: <335E21FA-7F1E-4540-8A70-01A63D8C72FA@amazon.com> <CA+EHjTxpBM6LyqGfE_y--Uy1oR4oP7Ozcp3mBwFvAijOZe0i+Q@mail.gmail.com>
+In-Reply-To: <CA+EHjTxpBM6LyqGfE_y--Uy1oR4oP7Ozcp3mBwFvAijOZe0i+Q@mail.gmail.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Mon, 11 Mar 2024 09:26:12 +0000
-Message-ID: <CA+EHjTxpBM6LyqGfE_y--Uy1oR4oP7Ozcp3mBwFvAijOZe0i+Q@mail.gmail.com>
+Date: Mon, 11 Mar 2024 09:29:11 +0000
+Message-ID: <CA+EHjTyqjTHN+b42THuppBwabbbPTE7+s3+4gzELN=SVddVtDg@mail.gmail.com>
 Subject: Re: Unmapping KVM Guest Memory from Host Kernel
 To: "Manwaring, Derek" <derekmn@amazon.com>
 Cc: David Woodhouse <dwmw2@infradead.org>, David Matlack <dmatlack@google.com>, 
@@ -81,45 +81,54 @@ Cc: David Woodhouse <dwmw2@infradead.org>, David Matlack <dmatlack@google.com>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
-
-On Fri, Mar 8, 2024 at 9:05=E2=80=AFPM Manwaring, Derek <derekmn@amazon.com=
-> wrote:
+On Mon, Mar 11, 2024 at 9:26=E2=80=AFAM Fuad Tabba <tabba@google.com> wrote=
+:
 >
-> On 2024-03-08 at 10:46-0700, David Woodhouse wrote:
-> > On Fri, 2024-03-08 at 09:35 -0800, David Matlack wrote:
-> > > I think what James is looking for (and what we are also interested
-> > > in), is _eliminating_ the ability to access guest memory from the
-> > > direct map entirely. And in general, eliminate the ability to access
-> > > guest memory in as many ways as possible.
+> Hi,
+>
+> On Fri, Mar 8, 2024 at 9:05=E2=80=AFPM Manwaring, Derek <derekmn@amazon.c=
+om> wrote:
 > >
-> > Well, pKVM does that...
+> > On 2024-03-08 at 10:46-0700, David Woodhouse wrote:
+> > > On Fri, 2024-03-08 at 09:35 -0800, David Matlack wrote:
+> > > > I think what James is looking for (and what we are also interested
+> > > > in), is _eliminating_ the ability to access guest memory from the
+> > > > direct map entirely. And in general, eliminate the ability to acces=
+s
+> > > > guest memory in as many ways as possible.
+> > >
+> > > Well, pKVM does that...
+> >
+> > Yes we've been looking at pKVM and it accomplishes a lot of what we're =
+trying
+> > to do. Our initial inclination is that we want to stick with VHE for th=
+e lower
+> > overhead. We also want flexibility across server parts, so we would nee=
+d to
+> > get pKVM working on Intel & AMD if we went this route.
+> >
+> > Certainly there are advantages of pKVM on the perf side like the in-pla=
+ce
+> > memory sharing rather than copying as well as on the security side by s=
+imply
+> > reducing the TCB. I'd be interested to hear others' thoughts on pKVM vs
+> > memfd_secret or general ASI.
 >
-> Yes we've been looking at pKVM and it accomplishes a lot of what we're tr=
-ying
-> to do. Our initial inclination is that we want to stick with VHE for the =
-lower
-> overhead. We also want flexibility across server parts, so we would need =
-to
-> get pKVM working on Intel & AMD if we went this route.
->
-> Certainly there are advantages of pKVM on the perf side like the in-place
-> memory sharing rather than copying as well as on the security side by sim=
-ply
-> reducing the TCB. I'd be interested to hear others' thoughts on pKVM vs
-> memfd_secret or general ASI.
+> The work we've done for pKVM is still an RFC [*], but there is nothing
+> in it that limits it to nVHE (at least not intentionally). It should
+> work with VHE and hVHE as well. On respinning the patch series [*], we
+> plan on adding support for normal VMs to use guest_memfd() as well in
+> arm64, mainly for testing, and to make it easier for others to base
+> their work on it.
 
-The work we've done for pKVM is still an RFC [*], but there is nothing
-in it that limits it to nVHE (at least not intentionally). It should
-work with VHE and hVHE as well. On respinning the patch series [*], we
-plan on adding support for normal VMs to use guest_memfd() as well in
-arm64, mainly for testing, and to make it easier for others to base
-their work on it.
-
-Cheers,
-/fuad
-
-[*] https://lore.kernel.org/all/20240222161047.402609-1-tabba@google.com
+Just to clarify, I am referring specifically to the work we did in
+porting guest_memfd() to pKVM/arm64. pKVM itself works only in nVHE
+mode.
 >
-> Derek
+> Cheers,
+> /fuad
 >
+> [*] https://lore.kernel.org/all/20240222161047.402609-1-tabba@google.com
+> >
+> > Derek
+> >
