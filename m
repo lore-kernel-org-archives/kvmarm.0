@@ -1,55 +1,55 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ADB851C5A
-	for <kvmarm@lists.linux.dev>; Mon, 11 Mar 2024 17:14:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6343851C58
+	for <kvmarm@lists.linux.dev>; Mon, 11 Mar 2024 17:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710177270; cv=none; b=BXbxYkO2LqOJcEH37C8npFhgHAS4JcqywHqLsDleBq8BvN80GeoQi4uYGqVXxetldv4JzbYL2TlDUhxtWdO8D9j1Uddr/tkWRkoF30ZX1AEoPSos2Szo6/GZvycZBqhYHCyYzR/HB6ywtglfR94+EvK2EXlSQt9sYpm6qzxYjuE=
+	t=1710179320; cv=none; b=nAdDzQnp7/x1arLPKuU5xmqb/2aga9ouAJ3ca+2joqJ6T8eih05ErM5vJQb2R901tD4gWiAmAIkkTpjtO2ZYIpU+fGOVl0FFsc6MUwf785jgfv0+YVKXVYP35ZjENqHhA0thb3HjAhzoscaKn1J+LLh0WDjv+mEDFTNEQAhoT/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710177270; c=relaxed/simple;
-	bh=YcXPJcyTFYDeB5IHFg7mdy5MhaqvIkCQDHuIHsmF8A0=;
+	s=arc-20240116; t=1710179320; c=relaxed/simple;
+	bh=L1n1/YHrPlqMMkbS0uthBiig9NG84l+9uiSYaBNVKOc=;
 	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=HFInVygP3THNR5NOgM72/eamsOW20prIUZNwEX+aeZyqWfOJeI3zKfIAI7D2qA8eYR093QHI0Qmznl1MRdjvRXh2ZTBrq8oiSSOfPHu1yR2hyn56xfNNu0QiurIFN0MjNXUo/mpYiOQKZWJawyOQXqDZdX3wlkCC/G5Rqu/Hlbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I3rcFXA3; arc=none smtp.client-ip=209.85.128.202
+	 Content-Type; b=LxQQn6bHMAyNRp003NktYzeUwKEE2EON39SB+xAOrWNsxKP/Z9ZoSmjw8ZPcNMk+uFs4TFEG8Lrgzlpc5ZkU6ibSLg1lyaBme78jGH/Slku9nOexwQwdDm7lmY4NMw6GibUytCsR/QVwQM+3sImkhFgqAFyUKwKHC/Ro/k14PAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZfDTsBKp; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I3rcFXA3"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60a20c33f07so33195197b3.3
-        for <kvmarm@lists.linux.dev>; Mon, 11 Mar 2024 10:14:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZfDTsBKp"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-60a2386e932so35250647b3.1
+        for <kvmarm@lists.linux.dev>; Mon, 11 Mar 2024 10:48:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710177268; x=1710782068; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1710179318; x=1710784118; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=mxI402kfSmdHwvl7iNI+EypEnmQOFeIIPXsLUmkhg9o=;
-        b=I3rcFXA3dGG+KjJJ/Iszk9DoACdhz6i/scHA8hf6SU1UAXyxGSsMWgkmh4ZhqX//U1
-         NEbKJO0oz1wYQtyocuOZJ5vJYL56JZSvL13BQGikZGTzAli7+2ieLGHSA5CiQ2HSsL2u
-         dPGGh6ETkGUeHvdQXjAax/UHrIIwDGo4s0xQ9+QWNlIVAFxRseLcwOD3Lbx7PQaJy06G
-         1Kl3qRDBO/rv1AVYBUdU5n4IS20pFDubvRgcVf0AjmtvHcOJtZiGYFF+hY3WjmqsWo3p
-         yESoxL2qbkvMd3nv7tjuvlGObJz6IL1rSAOFO2og3TmTjwRI+fgPvKSTIRtH28FC8Wgy
-         lhNQ==
+        bh=BiOP5uhojwXrQMEQN8gcT/txErWrlOzb94LiHfJQtiY=;
+        b=ZfDTsBKp2rtxB7VPA0VT91V0pGjRQtVe10Q8JC78eBUWV27sHFNV3pXROzR83FmfNh
+         jcR0esz2K+cLNDnD7UnxluMC2n8kqADgfT8eRmGNT2fqc+B8bV+xyV9qo37LdIMAk0OX
+         NmdyHTJ/AW0WaqSO8xcWvQnIPG2GhXEj60PhccsXbLUc7YYRnClm1BYZiQzVOUL2PLCn
+         tAhxN9P33n9gheApJOxEAjuZKnlSWaJVLrGWmwFECZ4rjfULHZJolLRjWt3v/g0ETix2
+         ZFH9nAlbQFlrecGFlWYpe5JKe1mXboEB78bKlNbXUQp/XUXZjizHuHA4Mfq06lhAKTlA
+         C6oA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710177268; x=1710782068;
+        d=1e100.net; s=20230601; t=1710179318; x=1710784118;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mxI402kfSmdHwvl7iNI+EypEnmQOFeIIPXsLUmkhg9o=;
-        b=tdkI6Xmd/CxqiGuX/fYNjuDuh0lOrNs7WWGJNaeiufmZZBsso+zqBQNKEK0B78AVTl
-         D449tPATrdFp6geQtfsmhlbXTOkU6WQOwtQ3GgfDmwDofhUpKOtBScMe9lurU0pKR1lW
-         asLrK+HcWPhmBZ5UkzS/PV4cZP5AIZDO8WS7//tOpI2eiXiSjnQaUTyf2t0JHnVYzWT6
-         Uu7ZJZJ2mdcJO2GAWtjbSPS7+9ELp52NWqkN8cqYoRNoylVIFp9qKkh6SZqbNlzD5UWi
-         R1buOoAcdjX8X8nDfPFwJb/PgG0Au+s4mx0bAA0gsthpMbUfSCBhpqIiUkfXsyi24BvK
-         BYhw==
-X-Forwarded-Encrypted: i=1; AJvYcCVzLHVXGOpsyAgyt/R6p0oxttm8ZGkIM4ciTOWJ/8YodsBacAN/WhVGNbyoyxJK5iFkM7zTuysXKep2wi3Ln16Q0QjT6T+V
-X-Gm-Message-State: AOJu0YxKyfEFWPAr85UIkwYiugLCJVt6ymk0uyfc9hmKFPcRIlHHiUSL
-	pQ5uAiudedtR9O2L+Hp7sf42k0RYQYSfPUCFQR6E9bjqY3CzKAQoXNAhy9u6Bt5ITjByNT5WgVW
-	7PFjUDF4jdLkJCspJW6jcKw==
-X-Google-Smtp-Source: AGHT+IG2N8cV0iCT1a4n7m3pkLJ3zouBgC9e+45Gm77ZrHMqRbbS1wEXl9E6jo6FuMZO96tK24fy68HfVkAScpo4lw==
+        bh=BiOP5uhojwXrQMEQN8gcT/txErWrlOzb94LiHfJQtiY=;
+        b=ECkqV7qZg3MwuZ098RWp6uLanOu5DgtBlah6B67HS1IYLrummHa3yn2y7CT9V8hKqh
+         tY2uMZyibXcpO80krGqIhT7L35Kg8bMlcCbn9lI+JU8onJK9/sXBZ6NXBe0U5w2zj4q8
+         DKYOAzvuUa5lE/USr3l2DoDmSL7xvCnW8Gzkezv/r6jiW3H7dXn+LRdvt3vtwpZ5FPBD
+         MHlYu9jG4ipfaG+aE6tcEo/7bDAnAszSgSmSv74yDI+n2unC7JIIlNXz9K+MMD+K65Po
+         WSt7Eqj8c+/DbiEupgyypwEmbmOPdDDsNXxgRQO2udVoCzr9N2b26DEy1tUkBr1aklo6
+         bi3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWF8BWD3xpEAm0QgNWVlDy7j6tgaICX7VU1tZp8nFaif+x9yjT+vNN3MtptcQCoEYSqQWpEUTTPYrnrtcKYgftqSHY85PcX
+X-Gm-Message-State: AOJu0YzVnnDtUY0q5dhdTx1k6PfGf4J9sZibhkHXBaBuNnYWZWGWHssC
+	V7FB84QmN38+Ougytulf4LatFR4ELEDv4tDZxJfl/Ma6skQ41/92FEcKphqU6XytdFudkFPYqcz
+	RDXm3AesLEJJGSZqu/gtw8Q==
+X-Google-Smtp-Source: AGHT+IGFlAS1WdzxYj387xVx8jJoAYV0MEk2zSj5ce9EnqPrBq6hYHzb4A6q6s61+sDLDrkY8tMPGxgQ8QXCcYndpA==
 X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a81:4917:0:b0:60a:1201:9e67 with SMTP
- id w23-20020a814917000000b0060a12019e67mr1982263ywa.6.1710177268311; Mon, 11
- Mar 2024 10:14:28 -0700 (PDT)
-Date: Mon, 11 Mar 2024 17:14:27 +0000
+ (user=coltonlewis job=sendgmr) by 2002:a05:690c:f8e:b0:609:25d1:ea9a with
+ SMTP id df14-20020a05690c0f8e00b0060925d1ea9amr2008993ywb.9.1710179318418;
+ Mon, 11 Mar 2024 10:48:38 -0700 (PDT)
+Date: Mon, 11 Mar 2024 17:48:37 +0000
 In-Reply-To: <Ze6PMRMfIK8z0q4F@thinky-boi> (message from Oliver Upton on Sun,
  10 Mar 2024 21:57:21 -0700)
 Precedence: bulk
@@ -58,7 +58,7 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-Message-ID: <gsnt34swu1vw.fsf@coltonlewis-kvm.c.googlers.com>
+Message-ID: <gsntzfv4slqi.fsf@coltonlewis-kvm.c.googlers.com>
 Subject: Re: [PATCH v4 2/3] KVM: arm64: selftests: Guarantee interrupts are handled
 From: Colton Lewis <coltonlewis@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>
@@ -69,39 +69,6 @@ Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
 Oliver Upton <oliver.upton@linux.dev> writes:
 
-> nitpick: Shortlog should read
-
->    KVM: selftests: Ensure pending interrupts are handled in arch_timer test
-
-> The fact that we're dealing with pending interrupts is critical here;
-> the ISB has no interaction with the GIC in terms of interrupt timing as
-> it gets to the PE.
-
-I'll change that.
-
-> On Thu, Mar 07, 2024 at 06:39:06PM +0000, Colton Lewis wrote:
->> Break up the asm instructions poking daifclr and daifset to handle
->> interrupts. R_RBZYL specifies pending interrupts will be handle after
->> context synchronization events such as an ISB.
-
->> Introduce a function wrapper for the WFI instruction.
-
->> Signed-off-by: Colton Lewis <coltonlewis@google.com>
->> ---
->>   tools/testing/selftests/kvm/aarch64/vgic_irq.c    | 12 ++++++------
->>   tools/testing/selftests/kvm/include/aarch64/gic.h |  3 +++
->>   tools/testing/selftests/kvm/lib/aarch64/gic.c     |  5 +++++
->>   3 files changed, 14 insertions(+), 6 deletions(-)
-
->> diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c  
->> b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
->> index d3bf584d2cc1..85f182704d79 100644
->> --- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
->> +++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
->> @@ -269,13 +269,13 @@ static void guest_inject(struct test_args *args,
->>   	KVM_INJECT_MULTI(cmd, first_intid, num);
-
->>   	while (irq_handled < num) {
 >> -		asm volatile("wfi\n"
 >> -			     "msr daifclr, #2\n"
 >> -			     /* handle IRQ */
@@ -117,46 +84,5 @@ I'll change that.
 > you're documenting a behavior that is implied by the instruction, not
 > anything else.
 
->>   	}
->> -	asm volatile("msr daifclr, #2" : : : "memory");
->> +	local_irq_enable();
-
->>   	GUEST_ASSERT_EQ(irq_handled, num);
->>   	for (i = first_intid; i < num + first_intid; i++)
->> diff --git a/tools/testing/selftests/kvm/include/aarch64/gic.h  
->> b/tools/testing/selftests/kvm/include/aarch64/gic.h
->> index 9043eaef1076..f474714e4cb2 100644
->> --- a/tools/testing/selftests/kvm/include/aarch64/gic.h
->> +++ b/tools/testing/selftests/kvm/include/aarch64/gic.h
->> @@ -47,4 +47,7 @@ void gic_irq_clear_pending(unsigned int intid);
->>   bool gic_irq_get_pending(unsigned int intid);
->>   void gic_irq_set_config(unsigned int intid, bool is_edge);
-
->> +/* Execute a Wait For Interrupt instruction. */
->> +void gic_wfi(void);
->> +
->>   #endif /* SELFTEST_KVM_GIC_H */
->> diff --git a/tools/testing/selftests/kvm/lib/aarch64/gic.c  
->> b/tools/testing/selftests/kvm/lib/aarch64/gic.c
->> index 9d15598d4e34..392e3f581ae0 100644
->> --- a/tools/testing/selftests/kvm/lib/aarch64/gic.c
->> +++ b/tools/testing/selftests/kvm/lib/aarch64/gic.c
->> @@ -164,3 +164,8 @@ void gic_irq_set_config(unsigned int intid, bool  
->> is_edge)
->>   	GUEST_ASSERT(gic_common_ops);
->>   	gic_common_ops->gic_irq_set_config(intid, is_edge);
->>   }
->> +
->> +void gic_wfi(void)
->> +{
->> +	asm volatile("wfi");
->> +}
-
-> Ok, I left a comment about this last time...
-
-> WFI instructions are only relevant in the context of a PE, so it would
-> be natural to add such a helper to aarch64/processor.h. There are
-> definitely implementations out there that do not use a GIC and still
-> have WFI instructions.
-
-Apologies if I missed it. I'll remove gic_from the name.
+Fixing this too. I changed this in the third patch but forgot there
+was also an instance in the second.
