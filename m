@@ -1,79 +1,187 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1030A57312
-	for <kvmarm@lists.linux.dev>; Mon, 11 Mar 2024 21:21:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0118C111AC
+	for <kvmarm@lists.linux.dev>; Tue, 12 Mar 2024 05:45:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710192100; cv=none; b=EplJc7LO774WY2sShdVav+lu/A+DdvGp+KlMZjryWxA6gC7guEb0eokhHH8AUgC8THvmAknA84gfbpG8pXfRneDK7NAqFCRwcXvS22w3D61OJ8BqypQxYrsqSoGrg9/1P/U/9dFgBqpuZzNAwxZqhkGpkvcKFkAqEBVSUutgUgI=
+	t=1710222314; cv=none; b=CCvVDH8zDuDrPPIvqNkEpN+IWSsUjnEtYv3wQb67O/Jhj3FmTSIKYJBN9ZAryzXU4LZ1uH5zQxZuh4VCxGrudskl0HLmsQ7o2idgjQekE4DiUVDTN9ojiHgBuZYY9zP+AcwGf/XPHGkAuK/d8JDZZoTFJPyBxoi2V00G2ZcwONU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710192100; c=relaxed/simple;
-	bh=w4t2z9lIWD6PRlVmGfRKSpZ+qk+SJzuSZHzgHEeBwDk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sIPsSopGMIA0eTqQnPJieLsxn55tQTzzxzwnn9MS89hO4QJ2Vp+GfbUNtM7MPVnTZvG6OROlR4Yc4cMe2G1uGTNm/og4klVELbcRo6H27UDn7d/S604lNpgaDNdNkFVY5oThw++HkxJzxEzbF69D7vtb7pmH5UGnc45WEcHDxQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JDc6r03g; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1710222314; c=relaxed/simple;
+	bh=GOxn/4eVruIEi7HrVevp33vbMyZtD/J7uxQzZT6p2d8=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=bnYkVmkYiS1YoXl3nr94dszXOhZLplz8S36Sc5HJf2Aud56qVEylgFthjRufn5FtwdFYsbaOizthNwzVczmUXdhdtOA0ofZcIENXShOfJj2IuAF06B5LViqc+JVv3ZT1AO9Fx9Q4i16/xNmomrzQTKVDmis+2yeUaYJZQ9XHWFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GczdepKV; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JDc6r03g"
-Date: Mon, 11 Mar 2024 21:21:28 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1710192095;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GyQ0ysw8I+Q95ceNsfL2Bdbg5666+zaoSDt+ddjY9LE=;
-	b=JDc6r03gsNPf53wZFl0XDvL7mhTYjrfpnqQTNNoSWqWDfcaTR08ecf44YiohCQ0EsU6TBF
-	4isDDloaexp0JIzyrqLJLiqdhjHyVgx3Aem8VJheIm5l3QRfK8Kr7fyFeUzoUSUfUGY+uy
-	RD28Bf23rBh0X9/JqMv4mbSFGzI3rxA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	David Matlack <dmatlack@google.com>, maz@kernel.org,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	robert.hoo.linux@gmail.com, jthoughton@google.com,
-	axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
-	isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
-Subject: Re: [PATCH v7 06/14] KVM: Add memslot flag to let userspace force an
- exit on missing hva mappings
-Message-ID: <Ze912ONhTo99RRpR@linux.dev>
-References: <20240215235405.368539-1-amoorthy@google.com>
- <20240215235405.368539-7-amoorthy@google.com>
- <ZeuMEdQTFADDSFkX@google.com>
- <ZeuxaHlZzI4qnnFq@google.com>
- <Ze6Md/RF8Lbg38Rf@thinky-boi>
- <Ze8y-vGzbDSLP-2G@google.com>
- <CAF7b7mpgeLJudcT9YhjQOqsXxz07Y9PY1a-F0ts6oVsVJwrnpA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GczdepKV"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1dc1ff3ba1aso38275885ad.3
+        for <kvmarm@lists.linux.dev>; Mon, 11 Mar 2024 22:45:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710222312; x=1710827112; darn=lists.linux.dev;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fW/EcKaMbEkneZDxVrHKCHliy210kWmaiqbzUm1tuZw=;
+        b=GczdepKVEjrVLeD3c6F0InLdsbRnbBc8BvjAhHrs7WRk23KXonW9A4qHZOOID2+LD/
+         OOJn+sRRjWYmL52wy0F+8tFjBEYPhDuLue5qOnedZc3bGNhVcsgqesxibS7QTblPar6M
+         ywFy4LmSirYpLhBHuYHRfhQJA50yRkPFqFGXah/ZmOd6mPOP51YrkHjb7EpDthqRtMcK
+         2aPjMNv0YSQnb05WNEvqPPGMudA08Eg0VzTyFPGUKQGCNceEiEQN/KBzOLuX8w+a60MU
+         8ztsAIQk3mgody6+1Eo7alckHqx3NKA5rTJxgyJMf4HDp75O/ccZ4KqBzyRVZmEShbNh
+         KYow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710222312; x=1710827112;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=fW/EcKaMbEkneZDxVrHKCHliy210kWmaiqbzUm1tuZw=;
+        b=AmfgRv6Z7Hig3JLlOdPVXag6rfOQQHDb/MNVzzUn39Xcq4/cdhO2erBPZv6KsjI4Jn
+         ArUCLB/8pfYkzfsyCD+AQb0Ev4B7gdzqhd5/95DpTfoFuIBLFiSP3OsPSY1IZ5YM3ehc
+         FsaU5lWlESqtj2qE2VeFbjgpQrQsfsiGw+2Kd6+JuIE6djPyhaXhliylli7QNIGvm1+H
+         Crrlchu8vjzKix8uNc3CUDGrCKBPBJPKO3oASwtyBQ3SkLdUUfQ+WEXg+x70xq58vO53
+         pc3HbSj/fnUqHXz673x2gHDf77ekyGvsfF+lZqiDruEtxo5xdU1WZjS13HvkIEUrFmUC
+         oM2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV52RwjcckD48TfkdLitHChnrl1Zf4iLDOu9TjHv259kb9BxMPh0mLKlebTn5jSfkdOr3yV3MHIAm6NvaEv9rtWUvJwJVEO
+X-Gm-Message-State: AOJu0Yzz8Fn7kc1E0i2GPumTJGkC1PMopUwToGxTjwpH5euJ4TxRY2zN
+	puaz+yi3piuNeodT88eDS8x6H1Vlhj0wfrnl1cA4y8Gr33ciUiti
+X-Google-Smtp-Source: AGHT+IFv14RRSVORaVxPGv7Pgc/FfkulvwmrU9WcDb6eZGl4gISl+ryDpVeng37EST8Ipt5IeQErUQ==
+X-Received: by 2002:a17:902:e54f:b0:1db:5b41:c5ac with SMTP id n15-20020a170902e54f00b001db5b41c5acmr7737568plf.68.1710222312180;
+        Mon, 11 Mar 2024 22:45:12 -0700 (PDT)
+Received: from localhost ([1.146.55.44])
+        by smtp.gmail.com with ESMTPSA id y7-20020a17090322c700b001da1fae8a73sm3335793plg.12.2024.03.11.22.45.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Mar 2024 22:45:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAF7b7mpgeLJudcT9YhjQOqsXxz07Y9PY1a-F0ts6oVsVJwrnpA@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 12 Mar 2024 15:45:05 +1000
+Message-Id: <CZRJ7KVBS2ZT.3144ZIHYUZRNY@wheely>
+From: "Nicholas Piggin" <npiggin@gmail.com>
+To: "Andrew Jones" <andrew.jones@linux.dev>, <kvm@vger.kernel.org>,
+ <kvm-riscv@lists.infradead.org>
+Cc: <pbonzini@redhat.com>, <thuth@redhat.com>, <kvmarm@lists.linux.dev>,
+ <linuxppc-dev@lists.ozlabs.org>, <linux-s390@vger.kernel.org>,
+ <lvivier@redhat.com>, <frankja@linux.ibm.com>, <imbrenda@linux.ibm.com>,
+ <nrb@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v2 04/13] treewide: lib/stack: Make
+ base_address arch specific
+X-Mailer: aerc 0.15.2
+References: <20240305170858.395836-15-andrew.jones@linux.dev>
+ <20240305170858.395836-19-andrew.jones@linux.dev>
+In-Reply-To: <20240305170858.395836-19-andrew.jones@linux.dev>
 
-On Mon, Mar 11, 2024 at 10:08:56AM -0700, Anish Moorthy wrote:
-> I think patches 10/11/12 are useful changes to the selftest that make
-> sense to merge even with KVM_MEM_EXIT_ON_MISSING being mothballed-
-> they should rebase without any issues. And the annotations on the
-> stage-2 fault handlers seem like they should still be added, but I
-> suppose David can do that with his series.
+On Wed Mar 6, 2024 at 3:09 AM AEST, Andrew Jones wrote:
+> Calculating the offset of an address is image specific, which is
+> architecture specific. Until now, all architectures and architecture
+> configurations which select CONFIG_RELOC were able to subtract
+> _etext, but the EFI configuration of riscv cannot (it must subtract
+> ImageBase). Make this function weak, such that an architecture may
+> override it when necessary, to accommodate the image layout. Then,
+> immediately supply the riscv override.
+>
 
-Yeah, let's fold the vCPU exit portions of the UAPI into the overall KVM
-userfault series. In that case there is sufficient context at the time
-of the "memory fault" to generate a 'precise' fault context (this GFN
-failed since it isn't marked as present).
+Thanks for making these changes. Looks good. For the generic parts,
 
-Compare that to the current implementation, which actually annotates
-_any_ __gfn_to_pfn_memslot() failures on the way out to userspace. I
-haven't seen anyone saying their userspace wants to use this, and I'd
-rather not take a new feature without a user, even if it is comparably
-trivial.
+Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
 
--- 
 Thanks,
-Oliver
+Nick
+
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+> ---
+>  lib/riscv/stack.c | 18 ++++++++++++++++++
+>  lib/stack.c       |  8 ++++----
+>  lib/stack.h       |  2 ++
+>  3 files changed, 24 insertions(+), 4 deletions(-)
+>
+> diff --git a/lib/riscv/stack.c b/lib/riscv/stack.c
+> index d865594b9671..2cd7f012738b 100644
+> --- a/lib/riscv/stack.c
+> +++ b/lib/riscv/stack.c
+> @@ -2,6 +2,24 @@
+>  #include <libcflat.h>
+>  #include <stack.h>
+> =20
+> +#ifdef CONFIG_RELOC
+> +extern char ImageBase, _text, _etext;
+> +
+> +bool arch_base_address(const void *rebased_addr, unsigned long *addr)
+> +{
+> +	unsigned long ra =3D (unsigned long)rebased_addr;
+> +	unsigned long base =3D (unsigned long)&ImageBase;
+> +	unsigned long start =3D (unsigned long)&_text;
+> +	unsigned long end =3D (unsigned long)&_etext;
+> +
+> +	if (ra < start || ra >=3D end)
+> +		return false;
+> +
+> +	*addr =3D ra - base;
+> +	return true;
+> +}
+> +#endif
+> +
+>  int arch_backtrace_frame(const void *frame, const void **return_addrs,
+>  			 int max_depth, bool current_frame)
+>  {
+> diff --git a/lib/stack.c b/lib/stack.c
+> index dd6bfa8dac6e..086fec544a81 100644
+> --- a/lib/stack.c
+> +++ b/lib/stack.c
+> @@ -14,7 +14,7 @@
+>  #ifdef CONFIG_RELOC
+>  extern char _text, _etext;
+> =20
+> -static bool base_address(const void *rebased_addr, unsigned long *addr)
+> +bool __attribute__((weak)) arch_base_address(const void *rebased_addr, u=
+nsigned long *addr)
+>  {
+>  	unsigned long ra =3D (unsigned long)rebased_addr;
+>  	unsigned long start =3D (unsigned long)&_text;
+> @@ -27,7 +27,7 @@ static bool base_address(const void *rebased_addr, unsi=
+gned long *addr)
+>  	return true;
+>  }
+>  #else
+> -static bool base_address(const void *rebased_addr, unsigned long *addr)
+> +bool __attribute__((weak)) arch_base_address(const void *rebased_addr, u=
+nsigned long *addr)
+>  {
+>  	*addr =3D (unsigned long)rebased_addr;
+>  	return true;
+> @@ -45,13 +45,13 @@ static void print_stack(const void **return_addrs, in=
+t depth,
+>  	/* @addr indicates a non-return address, as expected by the stack
+>  	 * pretty printer script. */
+>  	if (depth > 0 && !top_is_return_address) {
+> -		if (base_address(return_addrs[0], &addr))
+> +		if (arch_base_address(return_addrs[0], &addr))
+>  			printf(" @%lx", addr);
+>  		i++;
+>  	}
+> =20
+>  	for (; i < depth; i++) {
+> -		if (base_address(return_addrs[i], &addr))
+> +		if (arch_base_address(return_addrs[i], &addr))
+>  			printf(" %lx", addr);
+>  	}
+>  	printf("\n");
+> diff --git a/lib/stack.h b/lib/stack.h
+> index 6edc84344b51..df076d94bf8f 100644
+> --- a/lib/stack.h
+> +++ b/lib/stack.h
+> @@ -34,4 +34,6 @@ static inline int backtrace_frame(const void *frame, co=
+nst void **return_addrs,
+>  }
+>  #endif
+> =20
+> +bool __attribute__((weak)) arch_base_address(const void *rebased_addr, u=
+nsigned long *addr);
+> +
+>  #endif
+
