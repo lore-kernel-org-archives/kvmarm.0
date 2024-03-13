@@ -1,212 +1,128 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F7E47A55
-	for <kvmarm@lists.linux.dev>; Wed, 13 Mar 2024 15:47:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13BA47A7A;
+	Wed, 13 Mar 2024 15:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710344871; cv=none; b=Us0wzcK4fZ1kCQDJpIrPJqcNt6bn9erU76pib8L2OZXkJf3zKzQT8W+tq4mHcCigJnt8acPvzPtH8iuadUD89koEMe0kzU3n8tmiTbeIwi4vSKIKw+9wnxAzKK509hhDDRRsOYsprjU6yos4/htO5LviIeWz9ibuP0WTwkAy0V4=
+	t=1710345257; cv=none; b=juxnr7g6q92HWVoU1W4/y3bZeJMy5UhnFb9RS8HsiCg+yp91A412J8cadCKd+tFr7Ha9vyWZmXZvM+MNsWQAhTcqKcg37DpO+rR0cmwGp/TpQCbpPYHRAHGwXa1I4I5fdGF6CbpGLJHqul/3uOmxRpXDi+O+5L0n6r4QH3e4ujA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710344871; c=relaxed/simple;
-	bh=DXU7ph51IFvnFqSwDtmBTf5RGlHHgDbueVIPKluOaU8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=X/C6KHO6nVahKbRKNo/Bl+HNkLAuSrDWWI6ensONvUXun1fPyXEzyGwmD5KNipmJBv/+QE7znS4pVoJj/ysClDb934RO3LrptnTkFYy2EfYG3iE1BZRxk00dG4uQO5b2z/8ckbFZ7SPzrxkP7MrfCoZAjfsq+9nwqnvDrhfD+D0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dBclQufl; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1710345257; c=relaxed/simple;
+	bh=yCPcm0HuACe7Ylcl84l9GUNnikcf7P+tj8+cPMTT1gw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dGOrxS2byWp/Cff+L4H4hLvg/zt7+BMmnzgvOweKy5j+rg5hbbkMyBi0KkU4PcquVgmK1WaITT68FywKUi9qipkLxj5RiPxXnm58CxzBBbAlh4eZQ9QHjMkeenlGY+TuV4lFV4KAgC/3DbsGoKxzL5GNGmEzRkp959SHvIvrxR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mxj88dHc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dBclQufl"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5d8dbe37d56so903244a12.0
-        for <kvmarm@lists.linux.dev>; Wed, 13 Mar 2024 08:47:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710344869; x=1710949669; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=e/Z6H8FJpqkR5eo4Ljxl8hO8FSLCWuqRj+smCk6ObEc=;
-        b=dBclQufl8Pcx9cIK+Sj5+hTjQmSAFFMxDhyS6qkyMy/IAL2RttVLGCU8qVtMFUkJMr
-         TVdSkMXlctt3Oi2f7+8F2Q+aE1tu7Nz9yiWuwaYwguh4SYeWfNOHiQnwqd/um5iUb/LA
-         TgMcQKDoUMZjZeAjW5HNQ1IE0zPPauX2gRK/bBYjIOBMZkaTyY00ptbp7utJU3HUbDHV
-         Q6LviudSNUtPAUdt3H/ydtrIjuF+Il4Vdn9Z82IDev/fPoYuD4SE9sOj6KCNpNs0EFSg
-         Urf1eeFy4Rdap9uWYFPK8ep5dEg8qOoiitUYhbO5zG+vUstl9JZqoSm5Vrcyw5ODuvUp
-         cCSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710344869; x=1710949669;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=e/Z6H8FJpqkR5eo4Ljxl8hO8FSLCWuqRj+smCk6ObEc=;
-        b=s9tlaCvSBW6O23hjiFX45XlwRE0DycR45mMVHIini4fzw9shkXdo68G2ezCz5yhRNv
-         MI3ql5F3odBu4thH6Kk+3poExOgny82A+a3cyfmiv8MT5TMByqAtQ0fwVAnAkD9Kiuk5
-         pmJqnPHFBLDkEI/VE02hr6SvyNZwkabwJpnfwlx/mTRpoZb+gyuLFdyYzvuZzG/tsV7a
-         qLuUWasBElWJhYo7EMoTyW4GGhW6gJ2kYtuIQXTZKWfKTXgJon50nfOY4LVcWW41CTxN
-         ux7T06qbh1TSVq1FOXbtqr6nWbqMGOV9cQMnXoDLD8Gh8oNcqWZPXdbh0eAoV75ktrs6
-         p/OQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWHq+00NXelL3RKu18N6oU9jmXPL2IRvHXIWqkyyNL4HAzLfZnwLvOxjZ31t9qNy3o8Zf9LyPoVMrNiA7AbqlluDoHs0io1
-X-Gm-Message-State: AOJu0YwQQdODaE4c4oyXzNCPDo1/8h4D9Hqp7nN1QV+N5WkA41j/AUyS
-	JxHmgKiODVb49qjn4bv+435B5txyeXVTkTpS5BAlkeRkFkuv2D9RjiMxlD/ykJq3A5kVarIvSfC
-	4+Q==
-X-Google-Smtp-Source: AGHT+IGJ6RZ0IkgPXm+643N45QY0e2z6ADAKgdz99dpQRYWWh6VJ9xo8TROXQkD9DyMcWkMBuXFLtkFK0+w=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:d4c4:b0:1dd:47b7:47f9 with SMTP id
- o4-20020a170902d4c400b001dd47b747f9mr9378plg.11.1710344868617; Wed, 13 Mar
- 2024 08:47:48 -0700 (PDT)
-Date: Wed, 13 Mar 2024 15:47:47 +0000
-In-Reply-To: <9e604f99-5b63-44d7-8476-00859dae1dc4@amd.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mxj88dHc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66BA9C433C7;
+	Wed, 13 Mar 2024 15:54:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710345256;
+	bh=yCPcm0HuACe7Ylcl84l9GUNnikcf7P+tj8+cPMTT1gw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mxj88dHc33oAxVBxSHr88C5zoxchwh2o2neCu/oC/+61SIFU/4RmGQ+A1DG8z5YJn
+	 fKvYkA8piLJN2vAye9c8K2mulAYh7BB62yMwlLRsd2hBByg8r/2ehaHOwb+k6KrPa+
+	 RamzaIzG7oNKH0YdXZTNgXkFAHniAsk+Hb6nDT6Ebg5kAHmCaLgBslSZMaTciVf+Su
+	 3bGr9hxMttOWS/IqAMhp9g1SXvJoZbCL4aQv2rBG2dxi2FSo2/qtHLlfJb91hHrVmI
+	 Xf4MosYqY69TwWn5EVoB1zVKLYw+/1LI3JAQOTG4JiJN8A5qHwNPKqVbDv9S79K9hc
+	 RgGZa7geV9heA==
+Received: from [209.214.232.173] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rkQvl-00C75Z-IU;
+	Wed, 13 Mar 2024 15:54:14 +0000
+Date: Wed, 13 Mar 2024 15:54:07 +0000
+Message-ID: <87ttlap1pc.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: cheung wall <zzqq0103.hey@gmail.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: memory leak in kvm_init_stage2_mmu
+In-Reply-To: <CAKHoSAtTA7pTi5T7oYZkNdVwt79sXbW+1=V=LZxpKdJGRSk0Eg@mail.gmail.com>
+References: <CAKHoSAtTA7pTi5T7oYZkNdVwt79sXbW+1=V=LZxpKdJGRSk0Eg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240229025759.1187910-1-stevensd@google.com> <ZeCIX5Aw5s1L0YEh@infradead.org>
- <CAD=HUj7fT2CVXLfi5mty0rSzpG_jK9fhcKYGQnTf_H8Hg-541Q@mail.gmail.com>
- <72285e50-6ffc-4f24-b97b-8c381b1ddf8e@amd.com> <ZfGrS4QS_WhBWiDl@google.com>
- <0b109bc4-ee4c-4f13-996f-b89fbee09c0b@amd.com> <ZfG801lYHRxlhZGT@google.com> <9e604f99-5b63-44d7-8476-00859dae1dc4@amd.com>
-Message-ID: <ZfHKoxVMcBAMqcSC@google.com>
-Subject: Re: [PATCH v11 0/8] KVM: allow mapping non-refcounted pages
-From: Sean Christopherson <seanjc@google.com>
-To: "Christian =?utf-8?B?S8O2bmln?=" <christian.koenig@amd.com>
-Cc: David Stevens <stevensd@chromium.org>, Christoph Hellwig <hch@infradead.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@gmail.com>, Zhi Wang <zhi.wang.linux@gmail.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 209.214.232.173
+X-SA-Exim-Rcpt-To: zzqq0103.hey@gmail.com, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Mar 13, 2024, Christian K=C3=B6nig wrote:
-> Am 13.03.24 um 15:48 schrieb Sean Christopherson:
-> > On Wed, Mar 13, 2024, Christian K=C3=B6nig wrote:
-> > > Am 13.03.24 um 14:34 schrieb Sean Christopherson:
-> > > > What Christoph is objecting to is that, in this series, KVM is expl=
-icitly adding
-> > > > support for mapping non-compound (huge)pages into KVM guests.  Davi=
-d is arguing
-> > > > that Christoph's objection to _KVM_ adding support is unfair, becau=
-se the real
-> > > > problem is that the kernel already maps such pages into host usersp=
-ace.  I.e. if
-> > > > the userspace mapping ceases to exist, then there are no mappings f=
-or KVM to follow
-> > > > and propagate to KVM's stage-2 page tables.
-> > > And I have to agree with Christoph that this doesn't make much sense.=
- KVM
-> > > should *never* map (huge) pages from VMAs marked with VM_PFNMAP into =
-KVM
-> > > guests in the first place.
-> > >=20
-> > > What it should do instead is to mirror the PFN from the host page tab=
-les
-> > > into the guest page tables.
-> > That's exactly what this series does.  Christoph is objecting to KVM pl=
-aying nice
-> > with non-compound hugepages, as he feels that such mappings should not =
-exist
-> > *anywhere*.
->=20
-> Well Christoph is right those mappings shouldn't exists and they also don=
-'t
-> exists.
->
-> What happens here is that a driver has allocated some contiguous memory t=
-o
-> do DMA with. And then some page table is pointing to a PFN inside that
-> memory because userspace needs to provide parameters for the DMA transfer=
-.
->=20
-> This is *not* a mapping of a non-compound hugepage, it's simply a PTE
-> pointing to some PFN.=20
+On Wed, 13 Mar 2024 04:53:52 +0000,
+cheung wall <zzqq0103.hey@gmail.com> wrote:
+> 
+> Hello,
+> 
+> when using Syzkaller to fuzz the latest Linux Kernel arm64 version,
+> the following crash
+> 
+> was triggered on:
+> 
+> 
+> HEAD commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a  (tag: v6.7)
+> 
+> git tree: upstream
+> 
+> console output: https://pastebin.com/raw/MLVZbN01
 
-Yes, I know.  And David knows.  By "such mappings" I did not mean "huge PMD=
- mappings
-that point at non-compound pages", I meant "any mapping in the host userspa=
-ce
-VMAs and page tables that points at memory that is backed by a larger-than-=
-order-0,
-non-compound allocation".
+This reports "Forbidden".
 
-And even then, the whole larger-than-order-0 mapping is not something we on=
- the
-KVM side care about, at all.  The _only_ new thing KVM is trying to do in t=
-his
-series is to allow mapping non-refcounted struct page memory into KVM guest=
-.
-Those details were brought up purely because they provide context on how/wh=
-y such
-non-refcounted pages exist.
+> kernel config: https://pastebin.com/raw/PFD96ZwE
 
-> It can trivially be that userspace only maps 4KiB of some 2MiB piece of
-> memory the driver has allocate.
->
-> > I.e. Christoph is (implicitly) saying that instead of modifying KVM to =
-play nice,
-> > we should instead fix the TTM allocations.  And David pointed out that =
-that was
-> > tried and got NAK'd.
->=20
-> Well as far as I can see Christoph rejects the complexity coming with the
-> approach of sometimes grabbing the reference and sometimes not.
+# CONFIG_KVM is not set
 
-Unless I've wildly misread multiple threads, that is not Christoph's object=
-ion.
-From v9 (https://lore.kernel.org/all/ZRpiXsm7X6BFAU%2Fy@infradead.org):
+How do you expect this to work?
 
-  On Sun, Oct 1, 2023 at 11:25=E2=80=AFPM Christoph Hellwig <hch@infradead.=
-org> wrote:
-  >
-  > On Fri, Sep 29, 2023 at 09:06:34AM -0700, Sean Christopherson wrote:
-  > > KVM needs to be aware of non-refcounted struct page memory no matter =
-what; see
-  > > CVE-2021-22543 and, commit f8be156be163 ("KVM: do not allow mapping v=
-alid but
-  > > non-reference-counted pages"). =C2=A0I don't think it makes any sense=
- whatsoever to
-  > > remove that code and assume every driver in existence will do the rig=
-ht thing.
-  >
-  > Agreed.
-  >
-  > >
-  > > With the cleanups done, playing nice with non-refcounted paged instea=
-d of outright
-  > > rejecting them is a wash in terms of lines of code, complexity, and o=
-ngoing
-  > > maintenance cost.
-  >
-  > I tend to strongly disagree with that, though. =C2=A0We can't just let =
-these
-  > non-refcounted pages spread everywhere and instead need to fix their
-  > usage.
+> 
+> C reproducer: https://pastebin.com/raw/rHmMzvGt
+> 
+> Syzlang reproducer: https://pastebin.com/raw/dAt714WD
+> 
+> 
+> If you fix this issue, please add the following tag to the commit:
+> 
+> Reported-by: Qiang Zhang <zzqq0103.hey@gmail.com>
+> 
+> ----------------------------------------------------------
+> 
+> 2024/03/05 18:24:34 executed programs: 0
+> 2024/03/05 18:26:41 executed programs: 8
+> BUG: memory leak
+> unreferenced object 0xffff023ad74b8100 (size 128):
+>   comm "syz-executor.3", pid 3911, jiffies 4295149819 (age 22.132s)
+>   hex dump (first 32 bytes):
+>     28 00 00 00 01 00 00 00 00 40 4e d7 3a 02 ff ff  (........@N.:...
+>     80 d9 5f a4 48 d3 ff ff c8 69 46 d7 3a 02 ff ff  .._.H....iF.:...
+>   backtrace:
+>     [<000000008d295845>] kmemleak_alloc_recursive
+> data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/./include/linux/kmemleak.h:42
 
-> And I have to agree that this is extremely odd.
+[...]
 
-Yes, it's odd and not ideal.  But with nested virtualization, KVM _must_ "m=
-ap"
-pfns directly into the guest via fields in the control structures that are
-consumed by hardware.  I.e. pfns are exposed to the guest in an "out-of-ban=
-d"
-structure that is NOT part of the stage-2 page tables.  And wiring those up=
- to
-the MMU notifiers is extremely difficult for a variety of reasons[*].
+I suspect this report suffers from the same problem as the other one,
+where this is actually against 6.1.61 rather than 6.7 as advertised?
 
-Because KVM doesn't control which pfns are mapped this way, KVM's compromis=
-e is
-to grab a reference to the struct page while the out-of-band mapping exists=
-, i.e.
-to pin the page to prevent use-after-free.  And KVM's historical ABI is to =
-support
-any refcounted page for these out-of-band mappings, regardless of whether t=
-he
-page was obtained by gup() or follow_pte().
+I ran the reproducer locally on 6.8, and didn't observe any failure. I
+had to modify the it though, as I'm using a host with 16kB page size.
 
-Thus, to support non-refouncted VM_PFNMAP pages without breaking existing u=
-serspace,
-KVM resorts to conditionally grabbing references and disllowing non-refcoun=
-ted
-pages from being inserted into the out-of-band mappings.
+Please let me know if I'm missing something.
 
-But again, I don't think these details are relevant to Christoph's objectio=
-n.
+	M.
 
-[*] https://lore.kernel.org/all/ZBEEQtmtNPaEqU1i@google.com
+-- 
+Without deviation from the norm, progress is not possible.
