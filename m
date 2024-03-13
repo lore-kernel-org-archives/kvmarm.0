@@ -1,224 +1,105 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DCC3168A8
-	for <kvmarm@lists.linux.dev>; Wed, 13 Mar 2024 04:54:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3921119E
+	for <kvmarm@lists.linux.dev>; Wed, 13 Mar 2024 04:55:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710305647; cv=none; b=Rwcq8Sm2EggDmsH837cUq9BTWme5dsM/nNUS10kMkEhOxtJREojNe81ZIXUE5vYkk04UZILBhzVq4bEEhILnYegg42HXotkPJgMi5DhEmRiJDwaoj61S8ptcktgskIhDY02TYD44UTtK4zF8LzoXojVGbpjY5E9LxH2oJEYqoio=
+	t=1710305734; cv=none; b=C94gOme+RNddh+IGiX/8wV40czu70UE5aaKxN4YoyEOIReS32imO927GPZk74cK51pgoJDmwvLKRChJh6lg4thYSVO+Ldja4zr5BmMUsOr43waQedG/rO3cuJHJwKtPPMyVMtPXXy2/F2neg6jHJyVsPqIFofSm/qpY8U0y5zrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710305647; c=relaxed/simple;
-	bh=RwE1SZFykbFIEdXhc32E9CCRRyP1RnAu8GR+ZlbsO/s=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=S6FoDLPNG3Lne0ygrNKb777jECWPPNgW0Y0vuL8D0Mg8mtH9DhhG+aiBjmfq+ngDZZ6ZgSqMkqfhcdf9cyOWIPLOaSR5kTzyN5MhzyrCG3qypV8uQUoqK3peLVAp59OO1ED3UydbkC5WqJOjnkYsrrnxld5W6r9jeuupxraLpxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KtC5WmL5; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1710305734; c=relaxed/simple;
+	bh=RTWz8EpSDEWKJM3TEtQ8z2nh961615KfzXWZv+DoDH8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KqeATIHEls1GsehGbaosdQWhvg/01Loe4Du2iBq2OwrJg3fCSuzvneWb+T3AX37tcyrM1dUGabOdbbr/M+yf8XIxHpU3xVtHPAJEKDayuSqMrgG3pF8/hk5P8616KDnLxlE2nxGn764a38RgO/cZs3DwwnKHG6m4zBX5wFRQtVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=kMPI7108; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KtC5WmL5"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a4649c6f040so146394666b.0
-        for <kvmarm@lists.linux.dev>; Tue, 12 Mar 2024 21:54:05 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="kMPI7108"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-513b16bb739so2365371e87.3
+        for <kvmarm@lists.linux.dev>; Tue, 12 Mar 2024 21:55:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710305644; x=1710910444; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=lmEJWusqrVjTeVeazF5ThOOQa2SgJsJeK5CBTdQJlGQ=;
-        b=KtC5WmL5dhblTgx8jRSml4MYnrj+EQrcVKStOFDrnRftoV8nu8hMiBYIRfreaK0F1G
-         yvWxgQIxMcUGUhXFRWXJc4vpMXpz2tCE6ela8EWBvoU65WOrtIxCuuYnpEZdXpTTmkOz
-         f8MBCu2vxy47c65sidmOfESNd0d3NhQJ6fsBcnFNc8EDONgq1MplVvIe5TitKKwUYpAW
-         IEDJars8yswwHdbHxYBsgGWYhLezfmJreSO3wZVm1PB0/V6srLkGaDogQKhizccBtoPt
-         vFNVYxdME+wLDJVaQ93o/O1Fml5005Eu64hY0NXrQm9gpUZnF6kbU+O/bv69QwBuZXhA
-         W6Tg==
+        d=chromium.org; s=google; t=1710305731; x=1710910531; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RTWz8EpSDEWKJM3TEtQ8z2nh961615KfzXWZv+DoDH8=;
+        b=kMPI7108QMi0NasO2PMsSSqzmf+eQXL9unEr87o2KgMUuWx5oMi3QLDYXTB2QMU3Cs
+         vIutn0FVtUEeeS9YG9yPXsU6aHeDKTarS8S7j4fCb7ShpAqoO4t721zIu0arY9IkJj2y
+         q8yg/dV4RKBPqt+5AN4rUpqZiWVMkoxZxGacg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710305644; x=1710910444;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lmEJWusqrVjTeVeazF5ThOOQa2SgJsJeK5CBTdQJlGQ=;
-        b=mjh8322iKdvpNZQL1GIFUxtJ4Cxf3nZTVYQ57NVI+ZOJ9JMubcAP+Ku2oeDvczLQgK
-         sr6MZBAHB2yAR7RnJ4XedV/zUaZCLbFJa582AdjXV+pOy014mL/I8MBaqiHU3HnXBcvX
-         Y7ufw5MgEHPswyxV1oNUvYGkTJNHXLMIO102ReidPeasDA8QEhSvGLKMCUm0rOEU7okH
-         8wF/VHXGsdTrKQtzye6VffFOY8TowmJuaXzgqAocWOyBqBOeXO8ysmKG3xCxbLKRARPE
-         jfZoLODCRpEqAIkDtPnseL2sZpfQkDYlTWip3KeiQqgOqhtjQb4lLT3V94iz6bMBZRn8
-         Vq4w==
-X-Forwarded-Encrypted: i=1; AJvYcCVPiq7JJ+DqFnbhEbO+BXCNydi2uYdY0dAt8vca9KE0DioXQCk3jx9YHPI1V2Y1FhE6+p43pfyrwSr1N0Hzzhxwm6JmReuz
-X-Gm-Message-State: AOJu0Yy6Zjiz9zE1M7PaRl7tP66UiQqITpHEc4jlB2I2jAyR54Z5DQO2
-	40MFASfcpx9OLz5wFH8HJH1FJ9OSzyQpSx6Fgm3jj44OWB4N3uEa9LlKT8ZQmyxETIu35ik6CmC
-	BTh0pH3vLxF2nIyTS0T2wf7Tycew=
-X-Google-Smtp-Source: AGHT+IGA6jXg1KHSmhq3jxMUXwOEZxn4SaAY8LwGrOjltmSJhZU1yi1SAptl3xHhi6p/lunMrGzl1F2xeKA6/jBhX1Y=
-X-Received: by 2002:a17:906:fb81:b0:a43:29e1:6db8 with SMTP id
- lr1-20020a170906fb8100b00a4329e16db8mr7240435ejb.9.1710305643877; Tue, 12 Mar
- 2024 21:54:03 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1710305731; x=1710910531;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RTWz8EpSDEWKJM3TEtQ8z2nh961615KfzXWZv+DoDH8=;
+        b=uLSE3n0LE2caKgL2GWx3a8ezKPn6OL6y+eZ4Zyvo7FTkt8rNnw3X/4lHivUoUB/GWH
+         h7irm3GrBOssTregs6kIBQ8f9cYg2+RjpWtDkRWWk+F8Go8OXtiANqKFFSC0zX52p3AG
+         TZDg5F3/YLNTqs6CDw0IX/Ry15KItgQUG9xSeqv4AwmlHPLeXpMnjr3K8nqyxnn6Y1Vs
+         kbH45PPSg00tJQ4FVCRoVoZgBNBxwAjyGfu2rArWMh6Ng0ykO7qnTCv9ymG6NyVL1Udv
+         k8m46eVd0SKg4x/4Iegtz2ZOGCvc9M33AnsE/gMO1fVq9Ig2FzW2SYtKNKndnwq69mZ8
+         Dnhw==
+X-Forwarded-Encrypted: i=1; AJvYcCVeNtQi0+nXQOtIJnwPuyKYaAE/tCFUnSYIYAvLgnPNuXs1/LaD3ChuEVDja5Ar7qmhvEoUWSKsGi420WcjqBMd/TEmi9aB
+X-Gm-Message-State: AOJu0YzzA6cDvlB2CsYXpkn4Lq65xMnO4PZwL5Ecw9NIxLR9PDEBEeFw
+	lpwNosIFq5U2aLZHXlucCSHduckm4mS26xYt8XUWaw7RYknvODwuopMgy7+tkRqDH1EIXd8b47k
+	OVku41mqo4fWH/ANGg2Aw3duAatMwagAUTBev
+X-Google-Smtp-Source: AGHT+IFnrqxk91ihDavcZ15Yamg0oeFHaSxOKuxqRQfg8amMGoR83ZIRGkueW8eCFqCm+gR78/kxhDbJgQE9zn7EngE=
+X-Received: by 2002:a05:6512:556:b0:513:c1e6:3c55 with SMTP id
+ h22-20020a056512055600b00513c1e63c55mr1925135lfl.69.1710305731589; Tue, 12
+ Mar 2024 21:55:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-From: cheung wall <zzqq0103.hey@gmail.com>
-Date: Wed, 13 Mar 2024 12:53:52 +0800
-Message-ID: <CAKHoSAtTA7pTi5T7oYZkNdVwt79sXbW+1=V=LZxpKdJGRSk0Eg@mail.gmail.com>
-Subject: memory leak in kvm_init_stage2_mmu
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Cc: James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20240229025759.1187910-1-stevensd@google.com> <ZeCIX5Aw5s1L0YEh@infradead.org>
+In-Reply-To: <ZeCIX5Aw5s1L0YEh@infradead.org>
+From: David Stevens <stevensd@chromium.org>
+Date: Wed, 13 Mar 2024 13:55:20 +0900
+Message-ID: <CAD=HUj7fT2CVXLfi5mty0rSzpG_jK9fhcKYGQnTf_H8Hg-541Q@mail.gmail.com>
+Subject: Re: [PATCH v11 0/8] KVM: allow mapping non-refcounted pages
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Christian Koenig <christian.koenig@amd.com>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@gmail.com>, Zhi Wang <zhi.wang.linux@gmail.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Thu, Feb 29, 2024 at 10:36=E2=80=AFPM Christoph Hellwig <hch@infradead.o=
+rg> wrote:
+>
+> On Thu, Feb 29, 2024 at 11:57:51AM +0900, David Stevens wrote:
+> > Our use case is virtio-gpu blob resources [1], which directly map host
+> > graphics buffers into the guest as "vram" for the virtio-gpu device.
+> > This feature currently does not work on systems using the amdgpu driver=
+,
+> > as that driver allocates non-compound higher order pages via
+> > ttm_pool_alloc_page().
+>
+> .. and just as last time around that is still the problem that needs
+> to be fixed instead of creating a monster like this to map
+> non-refcounted pages.
+>
 
-when using Syzkaller to fuzz the latest Linux Kernel arm64 version,
-the following crash
+Patches to amdgpu to have been NAKed [1] with the justification that
+using non-refcounted pages is working as intended and KVM is in the
+wrong for wanting to take references to pages mapped with VM_PFNMAP
+[2].
 
-was triggered on:
+The existence of the VM_PFNMAP implies that the existence of
+non-refcounted pages is working as designed. We can argue about
+whether or not VM_PFNMAP should exist, but until VM_PFNMAP is removed,
+KVM should be able to handle it. Also note that this is not adding a
+new source of non-refcounted pages, so it doesn't make removing
+non-refcounted pages more difficult, if the kernel does decide to go
+in that direction.
 
+-David
 
-HEAD commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a  (tag: v6.7)
-
-git tree: upstream
-
-console output: https://pastebin.com/raw/MLVZbN01
-
-kernel config: https://pastebin.com/raw/PFD96ZwE
-
-C reproducer: https://pastebin.com/raw/rHmMzvGt
-
-Syzlang reproducer: https://pastebin.com/raw/dAt714WD
-
-
-If you fix this issue, please add the following tag to the commit:
-
-Reported-by: Qiang Zhang <zzqq0103.hey@gmail.com>
-
-----------------------------------------------------------
-
-2024/03/05 18:24:34 executed programs: 0
-2024/03/05 18:26:41 executed programs: 8
-BUG: memory leak
-unreferenced object 0xffff023ad74b8100 (size 128):
-  comm "syz-executor.3", pid 3911, jiffies 4295149819 (age 22.132s)
-  hex dump (first 32 bytes):
-    28 00 00 00 01 00 00 00 00 40 4e d7 3a 02 ff ff  (........@N.:...
-    80 d9 5f a4 48 d3 ff ff c8 69 46 d7 3a 02 ff ff  .._.H....iF.:...
-  backtrace:
-    [<000000008d295845>] kmemleak_alloc_recursive
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/./include/linux/kmemleak.h:42
-[inline]
-    [<000000008d295845>] slab_post_alloc_hook
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/mm/slab.h:740
-[inline]
-    [<000000008d295845>] slab_alloc_node
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/mm/slub.c:3398
-[inline]
-    [<000000008d295845>] __kmem_cache_alloc_node+0x1f4/0x320
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/mm/slub.c:3437
-    [<000000003fbdfe35>] kmalloc_trace+0x44/0x6c
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/mm/slab_common.c:1045
-    [<00000000a94cbf84>] kmalloc
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/./include/linux/slab.h:553
-[inline]
-    [<00000000a94cbf84>] kzalloc
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/./include/linux/slab.h:689
-[inline]
-    [<00000000a94cbf84>] kvm_init_stage2_mmu+0x88/0x450
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kvm/mmu.c:712
-    [<00000000d7d73550>] kvm_arch_init_vm+0x6c/0x2d0
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kvm/arm.c:145
-    [<000000001e472e33>] kvm_create_vm
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kvm/../../../virt/kvm/kvm_main.c:1219
-[inline]
-    [<000000001e472e33>] kvm_dev_ioctl_create_vm
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kvm/../../../virt/kvm/kvm_main.c:5009
-[inline]
-    [<000000001e472e33>] kvm_dev_ioctl+0x790/0x158c
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kvm/../../../virt/kvm/kvm_main.c:5051
-    [<000000005f1541e3>] vfs_ioctl
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/fs/ioctl.c:51
-[inline]
-    [<000000005f1541e3>] __do_sys_ioctl
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/fs/ioctl.c:870
-[inline]
-    [<000000005f1541e3>] __se_sys_ioctl
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/fs/ioctl.c:856
-[inline]
-    [<000000005f1541e3>] __arm64_sys_ioctl+0x17c/0x204
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/fs/ioctl.c:856
-    [<00000000721fb6b6>] __invoke_syscall
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kernel/syscall.c:38
-[inline]
-    [<00000000721fb6b6>] invoke_syscall+0x84/0x2d0
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kernel/syscall.c:52
-    [<00000000718e28b1>] el0_svc_common.constprop.0+0xe8/0x2e4
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kernel/syscall.c:142
-    [<000000001553392f>] do_el0_svc+0x64/0x1fc
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kernel/syscall.c:206
-    [<00000000585b9848>] el0_svc+0x2c/0x6c
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kernel/entry-common.c:637
-    [<0000000051149d12>] el0t_64_sync_handler+0xf4/0x120
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kernel/entry-common.c:655
-    [<00000000decfe0e2>] el0t_64_sync+0x18c/0x190
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kernel/entry.S:585
-
-BUG: memory leak
-unreferenced object 0xffff023ad0484d00 (size 128):
-  comm "syz-executor.2", pid 3935, jiffies 4295150036 (age 21.268s)
-  hex dump (first 32 bytes):
-    28 00 00 00 01 00 00 00 00 00 13 c7 3a 02 ff ff  (...........:...
-    80 d9 5f a4 48 d3 ff ff c8 a9 c3 cd 3a 02 ff ff  .._.H.......:...
-  backtrace:
-    [<000000008d295845>] kmemleak_alloc_recursive
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/./include/linux/kmemleak.h:42
-[inline]
-    [<000000008d295845>] slab_post_alloc_hook
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/mm/slab.h:740
-[inline]
-    [<000000008d295845>] slab_alloc_node
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/mm/slub.c:3398
-[inline]
-    [<000000008d295845>] __kmem_cache_alloc_node+0x1f4/0x320
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/mm/slub.c:3437
-    [<000000003fbdfe35>] kmalloc_trace+0x44/0x6c
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/mm/slab_common.c:1045
-    [<00000000a94cbf84>] kmalloc
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/./include/linux/slab.h:553
-[inline]
-    [<00000000a94cbf84>] kzalloc
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/./include/linux/slab.h:689
-[inline]
-    [<00000000a94cbf84>] kvm_init_stage2_mmu+0x88/0x450
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kvm/mmu.c:712
-    [<00000000d7d73550>] kvm_arch_init_vm+0x6c/0x2d0
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kvm/arm.c:145
-    [<000000001e472e33>] kvm_create_vm
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kvm/../../../virt/kvm/kvm_main.c:1219
-[inline]
-    [<000000001e472e33>] kvm_dev_ioctl_create_vm
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kvm/../../../virt/kvm/kvm_main.c:5009
-[inline]
-    [<000000001e472e33>] kvm_dev_ioctl+0x790/0x158c
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kvm/../../../virt/kvm/kvm_main.c:5051
-    [<000000005f1541e3>] vfs_ioctl
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/fs/ioctl.c:51
-[inline]
-    [<000000005f1541e3>] __do_sys_ioctl
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/fs/ioctl.c:870
-[inline]
-    [<000000005f1541e3>] __se_sys_ioctl
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/fs/ioctl.c:856
-[inline]
-    [<000000005f1541e3>] __arm64_sys_ioctl+0x17c/0x204
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/fs/ioctl.c:856
-    [<00000000721fb6b6>] __invoke_syscall
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kernel/syscall.c:38
-[inline]
-    [<00000000721fb6b6>] invoke_syscall+0x84/0x2d0
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kernel/syscall.c:52
-    [<00000000718e28b1>] el0_svc_common.constprop.0+0xe8/0x2e4
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kernel/syscall.c:142
-    [<000000001553392f>] do_el0_svc+0x64/0x1fc
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kernel/syscall.c:206
-    [<00000000585b9848>] el0_svc+0x2c/0x6c
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kernel/entry-common.c:637
-    [<0000000051149d12>] el0t_64_sync_handler+0xf4/0x120
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kernel/entry-common.c:655
-    [<00000000decfe0e2>] el0t_64_sync+0x18c/0x190
-data/embfuzz/emblinux/linux-4a61839152cc3e9e00ac059d73a28d148d622b30/arch/arm64/kernel/entry.S:585
+[1] https://lore.kernel.org/lkml/8230a356-be38-f228-4a8e-95124e8e8db6@amd.c=
+om/
+[2] https://lore.kernel.org/lkml/594f1013-b925-3c75-be61-2d649f5ca54e@amd.c=
+om/
