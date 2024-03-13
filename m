@@ -1,74 +1,212 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF4445978
-	for <kvmarm@lists.linux.dev>; Wed, 13 Mar 2024 15:34:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F7E47A55
+	for <kvmarm@lists.linux.dev>; Wed, 13 Mar 2024 15:47:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710344093; cv=none; b=GD/vEGleu00Nec6rQ08gg79XN5c1ddSTDynthzUWnV5l9iBYe9PZIBle4r0PQ91vNaeIQu+2Zx65BYcBAlc8HfkeMUnt7RBg8o79PA6LFzsNFyV0eFSC77hlu6vy49jSPR1xSOH71IHYNSU41qBlyQ4/7ZXPLVp1hcRx18mDV/I=
+	t=1710344871; cv=none; b=Us0wzcK4fZ1kCQDJpIrPJqcNt6bn9erU76pib8L2OZXkJf3zKzQT8W+tq4mHcCigJnt8acPvzPtH8iuadUD89koEMe0kzU3n8tmiTbeIwi4vSKIKw+9wnxAzKK509hhDDRRsOYsprjU6yos4/htO5LviIeWz9ibuP0WTwkAy0V4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710344093; c=relaxed/simple;
-	bh=C7nU4SN7cfBWO5pOM0SsB5sh9GBra6/N3Zhn61BhuEE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lea6xs6ekQPNdztHYqSibWm716Rm/5J5cCJTt/Hh2/5ZMPcwOjykSXGSH9FqpxMQueIM1uQozOANOcqCB/u6p2LK+AYY7ty7+uhgTvCVmYg4SKwkfbPHVtUy50DSnUO7iCeLqNS8P3av9ihwmr/Xug7403VpdR6kExYlG7MdbBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 354C11007;
-	Wed, 13 Mar 2024 08:35:27 -0700 (PDT)
-Received: from bogus (e103737-lin.cambridge.arm.com [10.1.197.49])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 24A883F73F;
-	Wed, 13 Mar 2024 08:34:47 -0700 (PDT)
-Date: Wed, 13 Mar 2024 15:34:44 +0000
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-	Mostafa Saleh <smostafa@google.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-pm@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] arm64: Use SYSTEM_OFF2 PSCI call to power off
- for hibernate
-Message-ID: <ZfHHlBgSNr8Qm22D@bogus>
-References: <20240312135958.727765-1-dwmw2@infradead.org>
- <20240312135958.727765-3-dwmw2@infradead.org>
- <ZfB7c9ifUiZR6gy1@bogus>
- <520ce28050c29cca754493f0595d4a64d45796ee.camel@infradead.org>
+	s=arc-20240116; t=1710344871; c=relaxed/simple;
+	bh=DXU7ph51IFvnFqSwDtmBTf5RGlHHgDbueVIPKluOaU8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=X/C6KHO6nVahKbRKNo/Bl+HNkLAuSrDWWI6ensONvUXun1fPyXEzyGwmD5KNipmJBv/+QE7znS4pVoJj/ysClDb934RO3LrptnTkFYy2EfYG3iE1BZRxk00dG4uQO5b2z/8ckbFZ7SPzrxkP7MrfCoZAjfsq+9nwqnvDrhfD+D0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dBclQufl; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dBclQufl"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5d8dbe37d56so903244a12.0
+        for <kvmarm@lists.linux.dev>; Wed, 13 Mar 2024 08:47:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710344869; x=1710949669; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=e/Z6H8FJpqkR5eo4Ljxl8hO8FSLCWuqRj+smCk6ObEc=;
+        b=dBclQufl8Pcx9cIK+Sj5+hTjQmSAFFMxDhyS6qkyMy/IAL2RttVLGCU8qVtMFUkJMr
+         TVdSkMXlctt3Oi2f7+8F2Q+aE1tu7Nz9yiWuwaYwguh4SYeWfNOHiQnwqd/um5iUb/LA
+         TgMcQKDoUMZjZeAjW5HNQ1IE0zPPauX2gRK/bBYjIOBMZkaTyY00ptbp7utJU3HUbDHV
+         Q6LviudSNUtPAUdt3H/ydtrIjuF+Il4Vdn9Z82IDev/fPoYuD4SE9sOj6KCNpNs0EFSg
+         Urf1eeFy4Rdap9uWYFPK8ep5dEg8qOoiitUYhbO5zG+vUstl9JZqoSm5Vrcyw5ODuvUp
+         cCSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710344869; x=1710949669;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=e/Z6H8FJpqkR5eo4Ljxl8hO8FSLCWuqRj+smCk6ObEc=;
+        b=s9tlaCvSBW6O23hjiFX45XlwRE0DycR45mMVHIini4fzw9shkXdo68G2ezCz5yhRNv
+         MI3ql5F3odBu4thH6Kk+3poExOgny82A+a3cyfmiv8MT5TMByqAtQ0fwVAnAkD9Kiuk5
+         pmJqnPHFBLDkEI/VE02hr6SvyNZwkabwJpnfwlx/mTRpoZb+gyuLFdyYzvuZzG/tsV7a
+         qLuUWasBElWJhYo7EMoTyW4GGhW6gJ2kYtuIQXTZKWfKTXgJon50nfOY4LVcWW41CTxN
+         ux7T06qbh1TSVq1FOXbtqr6nWbqMGOV9cQMnXoDLD8Gh8oNcqWZPXdbh0eAoV75ktrs6
+         p/OQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWHq+00NXelL3RKu18N6oU9jmXPL2IRvHXIWqkyyNL4HAzLfZnwLvOxjZ31t9qNy3o8Zf9LyPoVMrNiA7AbqlluDoHs0io1
+X-Gm-Message-State: AOJu0YwQQdODaE4c4oyXzNCPDo1/8h4D9Hqp7nN1QV+N5WkA41j/AUyS
+	JxHmgKiODVb49qjn4bv+435B5txyeXVTkTpS5BAlkeRkFkuv2D9RjiMxlD/ykJq3A5kVarIvSfC
+	4+Q==
+X-Google-Smtp-Source: AGHT+IGJ6RZ0IkgPXm+643N45QY0e2z6ADAKgdz99dpQRYWWh6VJ9xo8TROXQkD9DyMcWkMBuXFLtkFK0+w=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:d4c4:b0:1dd:47b7:47f9 with SMTP id
+ o4-20020a170902d4c400b001dd47b747f9mr9378plg.11.1710344868617; Wed, 13 Mar
+ 2024 08:47:48 -0700 (PDT)
+Date: Wed, 13 Mar 2024 15:47:47 +0000
+In-Reply-To: <9e604f99-5b63-44d7-8476-00859dae1dc4@amd.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <520ce28050c29cca754493f0595d4a64d45796ee.camel@infradead.org>
+Mime-Version: 1.0
+References: <20240229025759.1187910-1-stevensd@google.com> <ZeCIX5Aw5s1L0YEh@infradead.org>
+ <CAD=HUj7fT2CVXLfi5mty0rSzpG_jK9fhcKYGQnTf_H8Hg-541Q@mail.gmail.com>
+ <72285e50-6ffc-4f24-b97b-8c381b1ddf8e@amd.com> <ZfGrS4QS_WhBWiDl@google.com>
+ <0b109bc4-ee4c-4f13-996f-b89fbee09c0b@amd.com> <ZfG801lYHRxlhZGT@google.com> <9e604f99-5b63-44d7-8476-00859dae1dc4@amd.com>
+Message-ID: <ZfHKoxVMcBAMqcSC@google.com>
+Subject: Re: [PATCH v11 0/8] KVM: allow mapping non-refcounted pages
+From: Sean Christopherson <seanjc@google.com>
+To: "Christian =?utf-8?B?S8O2bmln?=" <christian.koenig@amd.com>
+Cc: David Stevens <stevensd@chromium.org>, Christoph Hellwig <hch@infradead.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	Isaku Yamahata <isaku.yamahata@gmail.com>, Zhi Wang <zhi.wang.linux@gmail.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 12, 2024 at 04:36:05PM +0000, David Woodhouse wrote:
-> On Tue, 2024-03-12 at 15:57 +0000, Sudeep Holla wrote:
-> > Looked briefly at register_sys_off_handler and it should be OK to call
-> > it from psci_init_system_off2() below. Any particular reason for having
-> > separate initcall to do this ? We can even eliminate the need for
-> > psci_init_system_off2 if it can be called from there. What am I missing ?
+On Wed, Mar 13, 2024, Christian K=C3=B6nig wrote:
+> Am 13.03.24 um 15:48 schrieb Sean Christopherson:
+> > On Wed, Mar 13, 2024, Christian K=C3=B6nig wrote:
+> > > Am 13.03.24 um 14:34 schrieb Sean Christopherson:
+> > > > What Christoph is objecting to is that, in this series, KVM is expl=
+icitly adding
+> > > > support for mapping non-compound (huge)pages into KVM guests.  Davi=
+d is arguing
+> > > > that Christoph's objection to _KVM_ adding support is unfair, becau=
+se the real
+> > > > problem is that the kernel already maps such pages into host usersp=
+ace.  I.e. if
+> > > > the userspace mapping ceases to exist, then there are no mappings f=
+or KVM to follow
+> > > > and propagate to KVM's stage-2 page tables.
+> > > And I have to agree with Christoph that this doesn't make much sense.=
+ KVM
+> > > should *never* map (huge) pages from VMAs marked with VM_PFNMAP into =
+KVM
+> > > guests in the first place.
+> > >=20
+> > > What it should do instead is to mirror the PFN from the host page tab=
+les
+> > > into the guest page tables.
+> > That's exactly what this series does.  Christoph is objecting to KVM pl=
+aying nice
+> > with non-compound hugepages, as he feels that such mappings should not =
+exist
+> > *anywhere*.
+>=20
+> Well Christoph is right those mappings shouldn't exists and they also don=
+'t
+> exists.
 >
-> My first attempt did that. I don't think we can kmalloc that early:
+> What happens here is that a driver has allocated some contiguous memory t=
+o
+> do DMA with. And then some page table is pointing to a PFN inside that
+> memory because userspace needs to provide parameters for the DMA transfer=
+.
+>=20
+> This is *not* a mapping of a non-compound hugepage, it's simply a PTE
+> pointing to some PFN.=20
+
+Yes, I know.  And David knows.  By "such mappings" I did not mean "huge PMD=
+ mappings
+that point at non-compound pages", I meant "any mapping in the host userspa=
+ce
+VMAs and page tables that points at memory that is backed by a larger-than-=
+order-0,
+non-compound allocation".
+
+And even then, the whole larger-than-order-0 mapping is not something we on=
+ the
+KVM side care about, at all.  The _only_ new thing KVM is trying to do in t=
+his
+series is to allow mapping non-refcounted struct page memory into KVM guest=
+.
+Those details were brought up purely because they provide context on how/wh=
+y such
+non-refcounted pages exist.
+
+> It can trivially be that userspace only maps 4KiB of some 2MiB piece of
+> memory the driver has allocate.
 >
+> > I.e. Christoph is (implicitly) saying that instead of modifying KVM to =
+play nice,
+> > we should instead fix the TTM allocations.  And David pointed out that =
+that was
+> > tried and got NAK'd.
+>=20
+> Well as far as I can see Christoph rejects the complexity coming with the
+> approach of sometimes grabbing the reference and sometimes not.
 
-That was was initial guess. But a quick hack on my setup and running it on
-the FVP model didn't complain. I think either I messed up or something else
-wrong, I must check on some h/w. Anyways sorry for the noise and thanks for
-the response.
+Unless I've wildly misread multiple threads, that is not Christoph's object=
+ion.
+From v9 (https://lore.kernel.org/all/ZRpiXsm7X6BFAU%2Fy@infradead.org):
 
--- 
-Regards,
-Sudeep
+  On Sun, Oct 1, 2023 at 11:25=E2=80=AFPM Christoph Hellwig <hch@infradead.=
+org> wrote:
+  >
+  > On Fri, Sep 29, 2023 at 09:06:34AM -0700, Sean Christopherson wrote:
+  > > KVM needs to be aware of non-refcounted struct page memory no matter =
+what; see
+  > > CVE-2021-22543 and, commit f8be156be163 ("KVM: do not allow mapping v=
+alid but
+  > > non-reference-counted pages"). =C2=A0I don't think it makes any sense=
+ whatsoever to
+  > > remove that code and assume every driver in existence will do the rig=
+ht thing.
+  >
+  > Agreed.
+  >
+  > >
+  > > With the cleanups done, playing nice with non-refcounted paged instea=
+d of outright
+  > > rejecting them is a wash in terms of lines of code, complexity, and o=
+ngoing
+  > > maintenance cost.
+  >
+  > I tend to strongly disagree with that, though. =C2=A0We can't just let =
+these
+  > non-refcounted pages spread everywhere and instead need to fix their
+  > usage.
+
+> And I have to agree that this is extremely odd.
+
+Yes, it's odd and not ideal.  But with nested virtualization, KVM _must_ "m=
+ap"
+pfns directly into the guest via fields in the control structures that are
+consumed by hardware.  I.e. pfns are exposed to the guest in an "out-of-ban=
+d"
+structure that is NOT part of the stage-2 page tables.  And wiring those up=
+ to
+the MMU notifiers is extremely difficult for a variety of reasons[*].
+
+Because KVM doesn't control which pfns are mapped this way, KVM's compromis=
+e is
+to grab a reference to the struct page while the out-of-band mapping exists=
+, i.e.
+to pin the page to prevent use-after-free.  And KVM's historical ABI is to =
+support
+any refcounted page for these out-of-band mappings, regardless of whether t=
+he
+page was obtained by gup() or follow_pte().
+
+Thus, to support non-refouncted VM_PFNMAP pages without breaking existing u=
+serspace,
+KVM resorts to conditionally grabbing references and disllowing non-refcoun=
+ted
+pages from being inserted into the out-of-band mappings.
+
+But again, I don't think these details are relevant to Christoph's objectio=
+n.
+
+[*] https://lore.kernel.org/all/ZBEEQtmtNPaEqU1i@google.com
