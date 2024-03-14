@@ -1,111 +1,188 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C84B623;
-	Thu, 14 Mar 2024 22:40:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9F014A90
+	for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 23:26:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710456050; cv=none; b=HmMRRsE7Xy4XYxDARgaJhsUTnFtTIc+sRK5+kyJDykrm0LKEWhDTuCog3clV8X2PJ7cPwtxO2dvD6Hjo3O+Irhf7apYdDyjP1xQ43e7AxaSxOaeb7hIigsPUBC3Na1JJ8zyb6UyvXq5zU9MFeOx0CQqirJieRogNnY+Wy1PVSm4=
+	t=1710458802; cv=none; b=mv7Q4QAQ0QZhV2wVBs0eyN09gt6Z2FK+A6Y0r4J7rvTlniUtXItnyGGbDmp4zXsU7u3diLrhWGbHw3U8WTWzCcT1OOdFmT+rg7cVc689Gq2EzjWhKV63L8wyS7QvkpG+wi0UEfJnnBVN/TzSZ1tS1kvwrj50vqRuIhReIvGwWXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710456050; c=relaxed/simple;
-	bh=IJPqVtR8QSM/d1Gfah9hBxpHWVHr3H8lUxgZ+S0EhzA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZUd933BZiZ018wc0FmKsL9Db7FXracm6Cz1lgzIbFNkxSaCzHDuAU2CDY2BfN0/+mZWakWNazQX914ChBqYK8ZBsvnnut+l04zIKHzhvc2DqWJVXuZa0/MF5fnx6NDSCIbbICYvmmH4fj3XTjI20Vp2tub2Zr8VQY5mnx9+YRUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RJi/YQ1C; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1710458802; c=relaxed/simple;
+	bh=rHlVStDEOKpOujnyeMUdLxN9RPKooIOT8Uf7Wm0+6SM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=svRolHz79Via0BZlqZg2ftKErSABCTJiNeSIs0uBVfXtJ/jlaNEFtb9HFs8ZMp9hVRrkVs1bOd1LX720BgvgmthsyFT4CAQHwkiXJ9NQOK++s06H9hFV5YD2WjmW7PNgnXuudQRiIoDf7B+8+s4yYN3qCtst02aAeGg9nZBmOfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d1bhHqnR; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RJi/YQ1C"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 208D3C433F1;
-	Thu, 14 Mar 2024 22:40:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710456050;
-	bh=IJPqVtR8QSM/d1Gfah9hBxpHWVHr3H8lUxgZ+S0EhzA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RJi/YQ1C6bMovlwymdVGTi5vND+ai9juEP5OI0xr6YimWdI9+4gWZnreAhrV0SwEr
-	 ES1tLHh6gGA5m14fQug4hxWqk2m6FLJB+aoFUZp9KpmvmUfm9wmAI1lWiJpSvs67I3
-	 H9eSw0EYg0wQPRTHmvr3MzScpDBhWIcVQsR8bXfsXIIA0R4U49zGwrb5A2uv/FfEYq
-	 SAWZht/LWwUay0vjmyc3+30qCWoTqs1uY5zC2KsD9L/F/iZL00YZBp9FgoUIUlcHDw
-	 B/wUfvZnqVI0yiqcWMm8TATrI3zrMIc+ZslB2IVdP3KlWsBGpr8o4vyFc0W9pdt9mC
-	 FtoeUxDFAyJGQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rktkl-00CWD8-O5;
-	Thu, 14 Mar 2024 22:40:47 +0000
-Date: Thu, 14 Mar 2024 22:40:47 +0000
-Message-ID: <86edcc1low.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: =?UTF-8?B?UGllcnJlLUNsw6ltZW50?= Tosi <ptosi@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 00/10] KVM: arm64: Add support for hypervisor kCFI
-In-Reply-To: <cover.1710446682.git.ptosi@google.com>
-References: <cover.1710446682.git.ptosi@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d1bhHqnR"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-609fe93b5cfso27435347b3.0
+        for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 16:26:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710458800; x=1711063600; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=h7s5Hb/mvTE7PCNAe2dunBDM+z2TyWomMuHISUh3bYw=;
+        b=d1bhHqnRQ1SQW+kbReEWrIhQ21SYNplHbmMwiunpPd9XWsN8JXTIYXu6Kg7hYUTDlG
+         T+1rpQ85KV8fLyeeSdSXebj8PY9Y7/AZX2jkBy7s/8peNkeucN/g+4uIUInKP89SFBNN
+         vn72SVEHFBeHGb9EqAEagjRsYtwJxsI2HQQrOUgTR7ftgLq5R/8n3ruK+quz3czxknGC
+         rPV1MT5twwWRO6hRgY3c+WnkUJr6We0l9sPxUKPv+96b9LApXOkB35npeDwcUXjfEYN6
+         zzIY51rA3nVnNAHUkS8Ut3RcAYzPH2yf4AF0/V8JjWtcuQfidQ8tSyunGG+cttpdSKsT
+         7HHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710458800; x=1711063600;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h7s5Hb/mvTE7PCNAe2dunBDM+z2TyWomMuHISUh3bYw=;
+        b=n4o/dLFk5FE0QVe6AIqSyQDTM37LBQbVHGOq47QAO9NA1k+gNG2+yF9A2L/RkLQVhq
+         rtws+yeIOXGzrRy/xkFvgJECwVtrXU+29QHzzEOSqBdX4iJqRPCKxHwOLIJELoIVbBZV
+         CxNT18aUjvyDUd0dIp/EnZGzFJvArmPRQ13UQBj4Uzw+zL1QH1qu/DH36fjypMeZ1MQE
+         LEYkk9SpKoiieGyknZ4YDl21ZGDZVldvkhVZ5w90q0wY6zCR7iKCmIuLivP11gOnL0ja
+         s9dr/VD0QAZxL4QHVo2hYaUuHWCffMGiKJriddIejw3jq6eYO+7pt97RhapAiWYiUGwc
+         QrvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW9+VcPD0ERsviNVeLayhEyeVTM/cmNp76bUkGX8FseJdySd789WjAtzCst/AgFdrlPbFyxFkN7JUx6BNGO4U7cR7jLBYqS
+X-Gm-Message-State: AOJu0YyNF4BrASaLW+WdK7mRZnSaO08uQxy4dtuY7yYU5Jc2jIfWETBt
+	2bTsza6AaJ99m4FGpRsWuSw+S4jfRhZWNF1TfqU3fdSK5h4Xah1k2n3oFnTCLaivbVH/QSXQ/If
+	Otw==
+X-Google-Smtp-Source: AGHT+IHgAdumMdpyEXTw01m4vqKLDoztLrdIMo9Notb2dmLotdpfdICdJ17nIIZegdAzzB6H1KgUKYmEItw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:f10f:0:b0:60d:47bf:235a with SMTP id
+ h15-20020a81f10f000000b0060d47bf235amr173723ywm.5.1710458799770; Thu, 14 Mar
+ 2024 16:26:39 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 14 Mar 2024 16:26:19 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ptosi@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, samitolvanen@google.com, mark.rutland@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.291.gc1ea87d7ee-goog
+Message-ID: <20240314232637.2538648-1-seanjc@google.com>
+Subject: [PATCH 00/18] KVM: selftests: Clean up x86's DT initialization
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Sean Christopherson <seanjc@google.com>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Ackerley Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Pierre-Cl=C3=A9ment,
+The vast majority of this series is x86 specific, and aims to clean up the
+core library's handling of descriptor tables and segments.  Currently, the
+library (a) waits until vCPUs are created to allocate per-VM assets, and
+(b) forces tests to opt-in to allocate the structures needed to handler
+exceptions, which has result in some rather odd tests, and makes it
+unnecessarily difficult to debug unexpected exceptions.
 
-On Thu, 14 Mar 2024 20:23:00 +0000,
-Pierre-Cl=C3=A9ment Tosi <ptosi@google.com> wrote:
->=20
-> CONFIG_CFI_CLANG ("kernel Control Flow Integrity") makes the compiler inj=
-ect
-> runtime type checks before any indirect function call. On AArch64, it gen=
-erates
-> a BRK instruction to be executed on type mismatch and encodes the indices=
- of the
-> registers holding the branch target and expected type in the immediate of=
- the
-> instruction. As a result, a synchronous exception gets triggered on kCFI =
-failure
-> and the fault handler can retrieve the immediate (and indices) from ESR_E=
-Lx.
->=20
-> This feature has been supported at EL1 ("host") since it was introduced by
-> b26e484b8bb3 ("arm64: Add CFI error handling"), where cfi_handler() decod=
-es
-> ESR_EL1, giving informative panic messages such as
->=20
->   [   21.885179] CFI failure at lkdtm_indirect_call+0x2c/0x44 [lkdtm]
->   (target: lkdtm_increment_int+0x0/0x1c [lkdtm]; expected type: 0x7e0c52a)
->   [   21.886593] Internal error: Oops - CFI: 0 [#1] PREEMPT SMP
->=20
-> However, it is not or only partially supported at EL2: in nVHE (or pKVM),
-> CONFIG_CFI_CLANG gets filtered out at build time, preventing the compiler=
- from
-> injecting the checks. In VHE (or hVHE), EL2 code gets compiled with the c=
-hecks
+By the end of this series, the descriptor tables, segments, and exception
+handlers are allocated and installed when non-barebones VMs are created.
 
-Are you sure about hVHE? hVHE is essentially the nVHE object running
-with a slightly different HCR_EL2 configuration. So if you don't have
-the checks in the nVHE code, you don't have them for hVHE either.
+Patch 1 is a selftests-tree-wide change to drop kvm_util_base.h.  The
+existence of that file has baffled (and annoyed) me for quite a long time.
+After rereading its initial changelog multiple times, I realized that the
+_only_ reason it exists is so that files don't need to manually #include
+ucall_common.h.
 
-Or am I missing something obvious?
+Patch 1 will obviously create conflicts all over the place, though with
+the help of meld, I've found them all trivially easy to resolve.  If no
+objects to the removal of kvm_util_base.h, I will try to bribe Paolo into
+grabbing it early in the 6.10 cycle so that everyone can bring it into
+the arch trees.
 
-Thanks,
+Ackerley Tng (1):
+  KVM: selftests: Fix off-by-one initialization of GDT limit
 
-	M.
+Sean Christopherson (17):
+  Revert "kvm: selftests: move base kvm_util.h declarations to
+    kvm_util_base.h"
+  KVM: sefltests: Add kvm_util_types.h to hold common types, e.g.
+    vm_vaddr_t
+  KVM: selftests: Move GDT, IDT, and TSS fields to x86's kvm_vm_arch
+  KVM: selftests: Move platform_info_test's main assert into guest code
+  KVM: selftests: Rework platform_info_test to actually verify #GP
+  KVM: selftests: Explicitly clobber the IDT in the "delete memslot"
+    testcase
+  KVM: selftests: Move x86's descriptor table helpers "up" in
+    processor.c
+  KVM: selftests: Rename x86's vcpu_setup() to vcpu_init_sregs()
+  KVM: selftests: Init IDT and exception handlers for all VMs/vCPUs on
+    x86
+  KVM: selftests: Map x86's exception_handlers at VM creation, not vCPU
+    setup
+  KVM: selftests: Allocate x86's GDT during VM creation
+  KVM: selftests: Drop superfluous switch() on vm->mode in
+    vcpu_init_sregs()
+  KVM: selftests: Fold x86's descriptor tables helpers into
+    vcpu_init_sregs()
+  KVM: selftests: Allocate x86's TSS at VM creation
+  KVM: selftests: Add macro for TSS selector, rename up code/data macros
+  KVM: selftests: Init x86's segments during VM creation
+  KVM: selftests: Drop @selector from segment helpers
 
---=20
-Without deviation from the norm, progress is not possible.
+ .../selftests/kvm/aarch64/arch_timer.c        |    1 +
+ tools/testing/selftests/kvm/arch_timer.c      |    1 +
+ .../selftests/kvm/demand_paging_test.c        |    1 +
+ .../selftests/kvm/dirty_log_perf_test.c       |    1 +
+ tools/testing/selftests/kvm/dirty_log_test.c  |    1 +
+ .../testing/selftests/kvm/guest_memfd_test.c  |    2 +-
+ .../testing/selftests/kvm/guest_print_test.c  |    1 +
+ .../selftests/kvm/include/aarch64/processor.h |    2 +
+ .../selftests/kvm/include/aarch64/ucall.h     |    2 +-
+ .../testing/selftests/kvm/include/kvm_util.h  | 1111 +++++++++++++++-
+ .../selftests/kvm/include/kvm_util_base.h     | 1135 -----------------
+ .../selftests/kvm/include/kvm_util_types.h    |   20 +
+ .../selftests/kvm/include/s390x/ucall.h       |    2 +-
+ .../kvm/include/x86_64/kvm_util_arch.h        |    6 +
+ .../selftests/kvm/include/x86_64/processor.h  |    5 +-
+ .../selftests/kvm/include/x86_64/ucall.h      |    2 +-
+ .../selftests/kvm/kvm_page_table_test.c       |    1 +
+ .../selftests/kvm/lib/aarch64/processor.c     |    2 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |    1 +
+ tools/testing/selftests/kvm/lib/memstress.c   |    1 +
+ .../selftests/kvm/lib/riscv/processor.c       |    1 +
+ .../testing/selftests/kvm/lib/ucall_common.c  |    5 +-
+ .../selftests/kvm/lib/x86_64/processor.c      |  305 ++---
+ .../testing/selftests/kvm/riscv/arch_timer.c  |    1 +
+ tools/testing/selftests/kvm/rseq_test.c       |    1 +
+ tools/testing/selftests/kvm/s390x/cmma_test.c |    1 +
+ tools/testing/selftests/kvm/s390x/memop.c     |    1 +
+ tools/testing/selftests/kvm/s390x/tprot.c     |    1 +
+ .../selftests/kvm/set_memory_region_test.c    |   12 +
+ tools/testing/selftests/kvm/steal_time.c      |    1 +
+ tools/testing/selftests/kvm/x86_64/amx_test.c |    2 -
+ .../x86_64/dirty_log_page_splitting_test.c    |    1 +
+ .../x86_64/exit_on_emulation_failure_test.c   |    2 +-
+ .../selftests/kvm/x86_64/fix_hypercall_test.c |    2 -
+ .../selftests/kvm/x86_64/hyperv_evmcs.c       |    2 -
+ .../selftests/kvm/x86_64/hyperv_features.c    |    6 -
+ .../testing/selftests/kvm/x86_64/hyperv_ipi.c |    3 -
+ .../selftests/kvm/x86_64/kvm_pv_test.c        |    3 -
+ .../selftests/kvm/x86_64/monitor_mwait_test.c |    3 -
+ .../selftests/kvm/x86_64/platform_info_test.c |   59 +-
+ .../selftests/kvm/x86_64/pmu_counters_test.c  |    3 -
+ .../kvm/x86_64/pmu_event_filter_test.c        |    6 -
+ .../smaller_maxphyaddr_emulation_test.c       |    3 -
+ .../selftests/kvm/x86_64/svm_int_ctl_test.c   |    3 -
+ .../kvm/x86_64/svm_nested_shutdown_test.c     |    5 +-
+ .../kvm/x86_64/svm_nested_soft_inject_test.c  |    5 +-
+ .../kvm/x86_64/ucna_injection_test.c          |    5 -
+ .../kvm/x86_64/userspace_msr_exit_test.c      |    3 -
+ .../vmx_exception_with_invalid_guest_state.c  |    3 -
+ .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  |    3 -
+ .../selftests/kvm/x86_64/xapic_ipi_test.c     |    2 -
+ .../selftests/kvm/x86_64/xcr0_cpuid_test.c    |    3 -
+ .../selftests/kvm/x86_64/xen_shinfo_test.c    |    2 -
+ 53 files changed, 1335 insertions(+), 1421 deletions(-)
+ delete mode 100644 tools/testing/selftests/kvm/include/kvm_util_base.h
+ create mode 100644 tools/testing/selftests/kvm/include/kvm_util_types.h
+
+
+base-commit: e9a2bba476c8332ed547fce485c158d03b0b9659
+-- 
+2.44.0.291.gc1ea87d7ee-goog
+
