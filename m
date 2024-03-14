@@ -1,232 +1,131 @@
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2048.outbound.protection.outlook.com [40.107.93.48])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415F56F065
-	for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 11:51:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710417112; cv=fail; b=llfJK8wS+YhaBAKt0/S6nk8ypYSWcmBGg8NwTiu95LSP99jMqY7ENL1JSJ82vVdPXwDlxXuunxk6+WhTOLYi+hRf3TftXq1PoVgMQwOYkRdaFKoS4aO/arE6Y68Ht7SkmdfrYzFccIKGhz68xWlCm/DHj765LwTQfM9uAdM+VHk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710417112; c=relaxed/simple;
-	bh=+YGwuRBObJ7WrUrBwf/tQnCLPpCYGAUuzvOnIeVSL8I=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=EzvV3CmpLDuZ66ds39Ew76NcXDAk3AspXp/o8k+YIAE6j+6AToKmvPAUrdISm/zCdb2IbbmRjl2qAuas7x/aa9wt/rVj2OBx+mc0vCCEbmSiGePXEoJFq893zIX+43O4n8Yz9ZwNvGM8YlUm75eIGEXsmVffkgSwR/ETEujEkHM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Dz4kb4ps; arc=fail smtp.client-ip=40.107.93.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62AAA6EB74;
+	Thu, 14 Mar 2024 14:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710425020; cv=none; b=fi+VNCUEz4MU8M2N4j3ApbHWLa/dNw2Pc3QAgI0XDbQmtwc0RagABowO5Bd5fP3Gyg0gtC5S+WZz7BQ/l/hCIdjaFF4DgX1/OqMgWWNy8Ef979ePg+YWEahGRJj1dBWWlzh0dFxAZ6ZrWUCgGx+RnovOx/YedbBSYQD37jvHNZs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710425020; c=relaxed/simple;
+	bh=ocgVFU/TLLicKSAOp5e6Jw1mceRESxNPxDSwgKLBNEA=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qDizKREOZ2RgjVRx4bbzDj3beuAaHN34rQiCxj5TdtSukYTrhIvaFueWeVmmcdygC2fs5Ww56b5q4lpt6pHHwSTRWbPwXDgY/wS1x992R4wJHdgIvzlyFHDNw9z0RlIqnxrnRXyioQxcLSMFpe8FGP1pzrogXp/ZNPuayqJxpUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/9GI0MN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Dz4kb4ps"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RLme0Va0b9oWzI8fqK+5tlBFPqJo7J8iUPFP7eeJXgqtA0vBe4KjVuLMvSV9UmuNtm2XVlLzq3VkrnoPIQvW5ajKJapnzkNiEkHdDpZrivpHRGBkIF3GjM1qJ3IwilCspGXWLAvQUoxpW4xqaPaWXRalHYoDdgxjyZg5B+k1MdSvb04B00WLXW5KtWQoFGNLab/EocBKWCE8CIZMUI6FVa/e8iwU/joZlFXQI0SVzT07JQrRCTYxgI5m+S0d/0dhxafLuyZ1zstsHwKUtaWNo2gZ2ppICfsV/IRZ8JW4Sh0fHMURvkeXwc0ZrB7nI7RUN4ti2VzQ/3HN72BbXglcRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0R5C9HvTm5nWMo1LvD/6YeJMx3C5f2h0XRv8b/3T3PY=;
- b=SDLl1bEm7hZ9ZCR7HqrdaJdE1QLKc9gRG62B05r76C6EYdMjdJaZIzwMjpZlADn2Ash/niDRETUMu+8T/u1rM3mGvtrI2y0fT+/nJVBgdYKi8QMFIvULDvNcW+g0TpBVeDSp7XvBdA4G6/DuRCKfrETf9+vbwpOBDPkpLLVjDokSmlrbw8v01FgrCbnSZBgKMd7+9yJpgH0cayd9n7cQPL8OjRn4HSshZQ4/krfunW7mEmIJK5lIsPj6I60oY0dGe9dhuqQDrtG9cykJmffBu3maMyQs8EImMAVGZogh93dPpC8fOfiWu7Fd6HzbWvRXYxZqAMBSBGy6cQ/JeTkhQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0R5C9HvTm5nWMo1LvD/6YeJMx3C5f2h0XRv8b/3T3PY=;
- b=Dz4kb4psZqxgG8lPo/J3lnNhZo5PbOiKsAKbyQ8qKe789eTJOzPnIR2CnvbPCvrzmlrw+oyBb8zXUlz4FaAJsHk3v9lO/jhgXM/iw2AFnV8cdTcX5itEkOjgMOKxdQAz+L0g8a42/o/zEho2IVY7X2Glu/bdLjC7vrubrzfw2ns=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
- by DM6PR12MB4233.namprd12.prod.outlook.com (2603:10b6:5:210::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.20; Thu, 14 Mar
- 2024 11:51:47 +0000
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::f2b6:1034:76e8:f15a]) by PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::f2b6:1034:76e8:f15a%6]) with mapi id 15.20.7386.017; Thu, 14 Mar 2024
- 11:51:47 +0000
-Message-ID: <985fd7f8-f8dd-4ce4-aa07-7e47728e3ebd@amd.com>
-Date: Thu, 14 Mar 2024 12:51:40 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 0/8] KVM: allow mapping non-refcounted pages
-Content-Language: en-US
-To: David Stevens <stevensd@chromium.org>
-Cc: Sean Christopherson <seanjc@google.com>,
- Christoph Hellwig <hch@infradead.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Yu Zhang <yu.c.zhang@linux.intel.com>,
- Isaku Yamahata <isaku.yamahata@gmail.com>,
- Zhi Wang <zhi.wang.linux@gmail.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20240229025759.1187910-1-stevensd@google.com>
- <ZeCIX5Aw5s1L0YEh@infradead.org>
- <CAD=HUj7fT2CVXLfi5mty0rSzpG_jK9fhcKYGQnTf_H8Hg-541Q@mail.gmail.com>
- <72285e50-6ffc-4f24-b97b-8c381b1ddf8e@amd.com> <ZfGrS4QS_WhBWiDl@google.com>
- <0b109bc4-ee4c-4f13-996f-b89fbee09c0b@amd.com> <ZfG801lYHRxlhZGT@google.com>
- <9e604f99-5b63-44d7-8476-00859dae1dc4@amd.com> <ZfHKoxVMcBAMqcSC@google.com>
- <93df19f9-6dab-41fc-bbcd-b108e52ff50b@amd.com> <ZfHhqzKVZeOxXMnx@google.com>
- <c84fcf0a-f944-4908-b7f6-a1b66a66a6bc@amd.com>
- <d2a95b5c-4c93-47b1-bb5b-ef71370be287@amd.com>
- <CAD=HUj5k+N+zrv-Yybj6K3EvfYpfGNf-Ab+ov5Jv+Zopf-LJ+g@mail.gmail.com>
-From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-In-Reply-To: <CAD=HUj5k+N+zrv-Yybj6K3EvfYpfGNf-Ab+ov5Jv+Zopf-LJ+g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR5P281CA0005.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:f2::18) To PH7PR12MB5685.namprd12.prod.outlook.com
- (2603:10b6:510:13c::22)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/9GI0MN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 000D1C433F1;
+	Thu, 14 Mar 2024 14:03:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710425019;
+	bh=ocgVFU/TLLicKSAOp5e6Jw1mceRESxNPxDSwgKLBNEA=;
+	h=Date:From:To:Subject:References:In-Reply-To:From;
+	b=D/9GI0MNs8JWQAPf5Z1G4ogPOnDtQG33rHgiHHxOa92Emq5WYrPE2KautM9N9cX+a
+	 WbAAwO3Wj6eGQhlBVLL1NOWBqJbIlFLWdPaqBN/vgFeUiLRGt27X/853VR56NhzJPM
+	 bhGT0rC8lV23Q2AvhaQZDdo1vP+n3SNU5ZK6A1oMZc/AgCrrdI/vToA98gaZ6j16XQ
+	 410z3sbYFy+9A6BbGCT/624NNsQU9AsUlIbj4QVgBsD7FAG1GJ9BPAnQ5tp06sJY54
+	 ZxTk2LafU3ZP/TjsguM9rT43oB0GzuUw09qEcfHP28AKHoMaGH0kFo3KBKE2b2YYZk
+	 0oMCxcfNdjKUg==
+Date: Thu, 14 Mar 2024 14:03:30 +0000
+From: Mark Brown <broonie@kernel.org>
+To: "dalias@libc.org" <dalias@libc.org>,
+	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"Szabolcs.Nagy@arm.com" <Szabolcs.Nagy@arm.com>,
+	"musl@lists.openwall.com" <musl@lists.openwall.com>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"palmer@dabbelt.com" <palmer@dabbelt.com>,
+	"debug@rivosinc.com" <debug@rivosinc.com>,
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+	"shuah@kernel.org" <shuah@kernel.org>,
+	"arnd@arndb.de" <arnd@arndb.de>, "maz@kernel.org" <maz@kernel.org>,
+	"oleg@redhat.com" <oleg@redhat.com>,
+	"fweimer@redhat.com" <fweimer@redhat.com>,
+	"keescook@chromium.org" <keescook@chromium.org>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	"ebiederm@xmission.com" <ebiederm@xmission.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"brauner@kernel.org" <brauner@kernel.org>,
+	"hjl.tools@gmail.com" <hjl.tools@gmail.com>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"thiago.bauermann@linaro.org" <thiago.bauermann@linaro.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"sorear@fastmail.com" <sorear@fastmail.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
+Subject: Re: [musl] Re: [PATCH v8 00/38] arm64/gcs: Provide support for GCS
+ in userspace
+Message-ID: <d334e9b9-659c-476f-b28d-42d3ac3dc591@sirena.org.uk>
+References: <4c7bdf8fde9cc45174f10b9221fa58ffb450b755.camel@intel.com>
+ <20240220185714.GO4163@brightrain.aerifal.cx>
+ <9fc9c45ff6e14df80ad023e66ff7a978bd4ec91c.camel@intel.com>
+ <20240220235415.GP4163@brightrain.aerifal.cx>
+ <a57d6c7eada4b9a7c35addbc8556f5b53a0c3e6f.camel@intel.com>
+ <20240221012736.GQ4163@brightrain.aerifal.cx>
+ <d18f060d-37ac-48b1-9f67-a5c5db79b34e@sirena.org.uk>
+ <20240221145800.GR4163@brightrain.aerifal.cx>
+ <4a3809e8-61b2-4341-a868-292ba6e64e8a@sirena.org.uk>
+ <20240302145702.GD1884416@port70.net>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|DM6PR12MB4233:EE_
-X-MS-Office365-Filtering-Correlation-Id: b72d2beb-2126-48f6-2324-08dc441d20ad
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	zNBGcOLLGvGOMkQUDLBwq4UCe+m7fKDsLtQXkDBTjyN6SX6VJ2CPjniSyGrCmOkw7oasOoTndh8Y6SJevdHVWRgCuUuMcSTi769wH4Fypat4WCogKAezOyVeKRMll0iha4dZ68IQBhUBxdQYhGgi/K3v4i2HpY/iY2aK1cmn9UeyHo9kI8x8HE0BHW3My3xll76kk+JJn6w0acGGF5NtOZ+R7dlyInOeVnt+S2rRAbOZ6x6bmOdZ3+nFUGNGRe3b2UhXm06i3c9ICtV45oQRq0X8HCIdiL/p3nV3TiaVo5bGOBkEjlSCH3qvWaDp59xEXDT+B3+gEvJlMVzhVEjzVcmbMsbIaOfXoE2A20OBkJ7645HsrjjvfY2UetpU0mF+XGXX+X5ucLqyT/ZqFmbVMgwYrf5X8Lin4xXsjZjs1acShGx/3JSHWcrfCnhHegh1TvZCLSOJJpmeC1JRfEUGm4MM39Q7ohKei+ihRAdZVeKaPveIyoTN2C0mIAvtnmwpPQde1foq3mVh3/N6ZNMMMVPqtZP3B6cbBmWEE+/dlitYuBnLj5kyzSJemWfs6kcUIZu5pbyWYicBcrJyK3CSV9GRuqBu6aJ3y+hfn06mGho=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(376005)(1800799015);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TXo5RnIxa0c3S2VtRC9Cb1grdDcxYUpOeFBpSlFqMTY2d0dMWithZGdyaWZJ?=
- =?utf-8?B?c0twMUtIeUlQZkgxYzF3akd2dmcrNTBiU0E4TmxybGFtdnZybWpReEZBWlR2?=
- =?utf-8?B?c3lFeW9LK2NqVEdmNHYybXh0R1Vtbi8vanZGM3dzNWFZd0J2M0VsaExSYTUv?=
- =?utf-8?B?K0lLdGM1YnNnYmo5SHJnL0FZemJpK1llY2sreGQwSTViNVBIUjE4NkFpNG1o?=
- =?utf-8?B?YzZyWE9LVVkxc3VrdnJvRkIyUkV5VFVhejg3czcvQ3MrVmo5VE9MQTVQd3lK?=
- =?utf-8?B?akJlYXVLN0YrRHJ5UXovWUtORFZGYmtxWERlUlBQTUhJdDlOL2F6UStmNCsy?=
- =?utf-8?B?cUU0Y0NCWkswT2xIVU94WElhN25UbnEwaVlzYXBvaGRaQThzcmt6bUdrQXJq?=
- =?utf-8?B?SDVKUmkwNWlpY1FXVTRHZUdJRkZoTldkWE9VelNmaStPTDV4bzJlYzNqRzIw?=
- =?utf-8?B?NlArb3JnTVpadzRSM1I5eWZtckkvb1lhY1hWTWtibTZWcW52bm5rbVlPczlw?=
- =?utf-8?B?R0poTTRVVlpkVWRCZmhIZlVhQjZZemIwaThiWCtrbzFnM2ZqUUdtQXR2TUZV?=
- =?utf-8?B?dm0rMDg3U2RLUFVzb1VraWxuOFh2V1hkQTZmdnF2czJoT29pQUM4MGlqejNI?=
- =?utf-8?B?RTlyZjJ3Zm1HanlGb25FV2U1YnBncFZXU0kycmpBUlhpUk5sSGFiRW1sSjFN?=
- =?utf-8?B?bm5BTmpyMFR2Z0FjMnBBZUtWeDBvenNCK2ErSnVHL01UWVpNc0xRNjJtd2ZG?=
- =?utf-8?B?TzAxcVFhMkE5aUdIOTdlcGE4NDZiNDQwNm5xSTVLRlcxWVRqZDNEUG9NTk03?=
- =?utf-8?B?WDg1SEJyWWsvTCt6b3FFMjlhY1VSbGxHWFVjbG5NUHhjdXRiSm9HOVAxbWxm?=
- =?utf-8?B?clcwS3FhRFZ2dmw4Mld4N2dxQ254OVFScGN0MXdQUnhiTDRJMFZwVkJWWExq?=
- =?utf-8?B?Nk9WUCtpRW1PdW4rY2RBdlRjVExnOE1TdlpBVXY5TEZLd0RKcFdXek5GZ2JL?=
- =?utf-8?B?ZVlycG1ib2o1UnJiYlNYK3QvTFVXY1FBUmJhdW1EYngzN0tDYW9weVJabEQv?=
- =?utf-8?B?UWZCK1lLSGdQMFgrM21QczYvbXJqZUVKMDdMUGlBNURvMmJFNlFwUjB6enE1?=
- =?utf-8?B?OEdPSkVMRFZrbVBXZWN6Y0cxR1lrSEZJamYzMzNta0FybUJsenhSYXNRVEk0?=
- =?utf-8?B?amRQZUVWN0Y4a1c3SHBnVjk1NW42MUFGcmREcmRsWHBYSldDQlFidDNVRk1H?=
- =?utf-8?B?cFcwQTFXbDhWc1oybkxPNFFCUU5XdC92YmYxbjZKN2QySlgyVnJIU2NRdDVP?=
- =?utf-8?B?WXM4dVBqMG9ERGhRYmdjMjMvZEhRWWgvUmVGUCtNYTA3NVJjRElHMzArbCs0?=
- =?utf-8?B?dnZadXBLeHZ6Z3V0cDBLSlozdkxyUVJFdnBRUmNoZVdpRExqZTd4UERVdGlT?=
- =?utf-8?B?L1hEYzRZUGU3VTJvTDVGZnBtZ2NpZUpHcVZDMmJSeTc5UzVPMmpQakUrS2JT?=
- =?utf-8?B?bWIrdDN5c1l0NjJiRSt3NEZBQ3FyT2kwSVVITHpBak5RZ1hjb1JNQjRIbElo?=
- =?utf-8?B?czBPOGRTTE1XdUpWTXczSWRMQ3Zwb2lhZy9xRWQwWHZQamJsbWIweWRqNWlG?=
- =?utf-8?B?MS9xQU1nRVdaNkNCSUNsQXQ0N3dmUXhteDBuTmpXdFJCZ1dGL3dVQytRRHVk?=
- =?utf-8?B?OW5ydHZESmxMMXJiaFBrMVRtQys4S0paU3p4WjdoZ1JsYmpMR2ppYTlSWGhJ?=
- =?utf-8?B?SHVSVDBCOSs1WUVzaE1OVmJZWWtFdkJYc0RDa1N0QjJ1cU1MODhvSXROelJy?=
- =?utf-8?B?RkZMaWxodHpZdE1XdHYyVkpOY0RJTVo4Vm9BUlJidmJIeUNCczViNG1PVDFL?=
- =?utf-8?B?M0ZndU1qM0NCT2ZLQTdVT1Bjb3JrYmtPQUhuVTFleFJPY3o5WEhDOHl1OGN1?=
- =?utf-8?B?SHRpV3k4RzdqRElyRURzMldUYjJJMlJoWkdtaWp2RVE5NFBWNURKa2lHY2lQ?=
- =?utf-8?B?dkpZVWxmSURFVmFzNDhsUEhFWkE0NDBrM3B0VUhMb2ZpYm40a2NEYXlLZ2Mr?=
- =?utf-8?B?TUVEWEhnL3ptLzRDNkp1WkI1eHhTdTlpbzZKVHI2cUU1RlNMQnRwS3FPYmJE?=
- =?utf-8?Q?KoYK/NORlT5zWVSC63TliCpL6?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b72d2beb-2126-48f6-2324-08dc441d20ad
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2024 11:51:47.5023
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zCIbB9ekzAUTinHRPMjzBcS5Bsh7QUNjcxd1cF7aHyITg0Cdm1o7jtVCM1ZUMv5X
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4233
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="pT4wHotY8cx/YSEA"
+Content-Disposition: inline
+In-Reply-To: <20240302145702.GD1884416@port70.net>
+X-Cookie: WYSIWYG:
 
-Am 14.03.24 um 12:31 schrieb David Stevens:
-> On Thu, Mar 14, 2024 at 6:20 PM Christian König
-> <christian.koenig@amd.com> wrote:
->> Sending that out once more since the AMD email servers have converted it
->> to HTML mail once more :(
->>
->> Grrr,
->> Christian.
->>
->> Am 14.03.24 um 10:18 schrieb Christian König:
->>> Am 13.03.24 um 18:26 schrieb Sean Christopherson:
->>>> On Wed, Mar 13, 2024, Christian König wrote:
->>>>> Am 13.03.24 um 16:47 schrieb Sean Christopherson:
->>>>>> [SNIP]
->>>>>>> It can trivially be that userspace only maps 4KiB of some 2MiB piece of
->>>>>>> memory the driver has allocate.
->>>>>>>
->>>>>>>> I.e. Christoph is (implicitly) saying that instead of modifying KVM to play nice,
->>>>>>>> we should instead fix the TTM allocations.  And David pointed out that that was
->>>>>>>> tried and got NAK'd.
->>>>>>> Well as far as I can see Christoph rejects the complexity coming with the
->>>>>>> approach of sometimes grabbing the reference and sometimes not.
->>>>>> Unless I've wildly misread multiple threads, that is not Christoph's objection.
->>>>>>    From v9 (https://lore.kernel.org/all/ZRpiXsm7X6BFAU%2Fy@infradead.org):
->>>>>>
->>>>>>      On Sun, Oct 1, 2023 at 11:25 PM Christoph Hellwig<hch@infradead.org>   wrote:
->>>>>>      >
->>>>>>      > On Fri, Sep 29, 2023 at 09:06:34AM -0700, Sean Christopherson wrote:
->>>>>>      > > KVM needs to be aware of non-refcounted struct page memory no matter what; see
->>>>>>      > > CVE-2021-22543 and, commit f8be156be163 ("KVM: do not allow mapping valid but
->>>>>>      > > non-reference-counted pages").  I don't think it makes any sense whatsoever to
->>>>>>      > > remove that code and assume every driver in existence will do the right thing.
->>>>>>      >
->>>>>>      > Agreed.
->>>>>>      >
->>>>>>      > >
->>>>>>      > > With the cleanups done, playing nice with non-refcounted paged instead of outright
->>>>>>      > > rejecting them is a wash in terms of lines of code, complexity, and ongoing
->>>>>>      > > maintenance cost.
->>>>>>      >
->>>>>>      > I tend to strongly disagree with that, though.  We can't just let these
->>>>>>      > non-refcounted pages spread everywhere and instead need to fix their
->>>>>>      > usage.
->>>>> And I can only repeat myself that I completely agree with Christoph here.
->>>> I am so confused.  If you agree with Christoph, why not fix the TTM allocations?
->>> Because the TTM allocation isn't broken in any way.
->>>
->>> See in some configurations TTM even uses the DMA API for those
->>> allocations and that is actually something Christoph coded.
->>>
->>> What Christoph is really pointing out is that absolutely nobody should
->>> put non-refcounted pages into a VMA, but again this isn't something
->>> TTM does. What TTM does instead is to work with the PFN and puts that
->>> into a VMA.
->>>
->>> It's just that then KVM comes along and converts the PFN back into a
->>> struct page again and that is essentially what causes all the
->>> problems, including CVE-2021-22543.
-> Does Christoph's objection come from my poorly worded cover letter and
-> commit messages, then?
 
-Yes, that could certainly be.
+--pT4wHotY8cx/YSEA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> Fundamentally, what this series is doing is
-> allowing pfns returned by follow_pte to be mapped into KVM's shadow
-> MMU without inadvertently translating them into struct pages.
+On Sat, Mar 02, 2024 at 03:57:02PM +0100, Szabolcs Nagy wrote:
+> * Mark Brown <broonie@kernel.org> [2024-02-21 17:36:12 +0000]:
 
-As far as I can tell that is really the right thing to do. Yes.
+> > > I said NOP but there's no reason it strictly needs to be a NOP. It
+> > > could instead do something reasonable to convey the state of racing
+> > > with shadow stack being disabled.
 
-> If I'm understand this discussion correctly, since KVM's shadow MMU is hooked
-> up to MMU notifiers, this shouldn't be controversial. However, my
-> cover letter got a little confused because KVM is currently doing
-> something that it sounds like it shouldn't - translating pfns returned
-> by follow_pte into struct pages with kvm_try_get_pfn. Because of that,
-> the specific type of pfns that don't work right now are pfn_valid() &&
-> !PG_Reserved && !page_ref_count() - what I called the non-refcounted
-> pages in a bad choice of words. If that's correct, then perhaps this
-> series should go a little bit further in modifying
-> hva_to_pfn_remapped, but it isn't fundamentally wrong.
+> > This feels like it's getting complicated and I fear it may be an uphill
+> > struggle to get such code merged, at least for arm64.  My instinct is
 
-Completely agree. In my thinking when you go a step further and offload 
-grabbing the page reference to get_user_pages() then you are always on 
-the save side.
+> the aarch64 behaviour is already nop
+> for gcs instructions when gcs is disabled.
+> the isa was designed so async disable is
+> possible.
 
-Because then it is no longer the responsibility of the KVM code to get 
-all the rules around that right, instead you are relying on a core 
-functionality which should (at least in theory) do the correct thing.
+Yeah, we'd need to handle GCSPR_EL0 somehow (currently it's inaccessible
+when GCS is disabled) and userspace would need to take care it's not
+doing something that could get stuck if for example a pop didn't
+actually *do* anything.
 
-Regards,
-Christian.
+--pT4wHotY8cx/YSEA
+Content-Type: application/pgp-signature; name="signature.asc"
 
->
-> -David
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXzA7EACgkQJNaLcl1U
+h9DtMwf+JnNjwm9DjgfaCHDp+cP7YhhFhwS5JiqPHng947Eq2YICGNh1KUf/HVq8
+VjnGVfZYycl6Q5XcsKtiIge6fzgb0z/vDrjYKaCVLhu7sC03mGroef90nO0gvw2K
+OvMgE+0BzMA7XrMHBWIQlu7p5Wm6rF6U/pVowEHQNunK3uQEyFUzjJUyTYewV/YV
+vuEPBmX2VzqLAzACX142ClcYwHzODx0SQPdvnzrSpXnpw7440+JMYNK/x7QKwPV+
+kWJg2tTuYGo37YLUmSXzk/EQLoQ2mMtcC423i+XHC3W1ATJC6lioyhuPFrec4rmw
+f6AuUBTWAwPFswxpCAmg1ZfUVZGWZg==
+=Oz06
+-----END PGP SIGNATURE-----
+
+--pT4wHotY8cx/YSEA--
