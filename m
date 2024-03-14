@@ -1,66 +1,66 @@
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90D2173196
-	for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 20:24:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EC8D73196
+	for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 20:24:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710447862; cv=none; b=jsTQHNy9xQ2g2vfIY9p3mkeCVRMG4RKe6ygtE/cgsSFKyhfQBN/iwCbx0qSxgj1W4tHIgyfPeBTEnLsneD147Q6xL/k44XagXwtu8q+hkE4C1mDjoBgQJazr+G/mf8WJQgrPCZU0VxIaNJ07MrBfB6SYhtWfNqg7EmmamaB2OMY=
+	t=1710447878; cv=none; b=BDq3+6NxXlyoH+HyatqCatIP+X33qB4s4ZOF2e0cLmqaXabn07LP8cTKYK5kjZfnjwoqz6l34fULIIXkSRgob4E9UdTsBEy8FhLW3I4YGphNpyDb17ZwrYZq1yCNgnjMMY8GG20g2a4szi3swKjbkOnWSh1xSCjREGjl2g7UINM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710447862; c=relaxed/simple;
-	bh=VNW8QZydmWpg/n7NPOfyNLIqspWVeZ/mxJN8WQ/9sL8=;
+	s=arc-20240116; t=1710447878; c=relaxed/simple;
+	bh=dGbffwfi9F8o5vKXOK784z8lOxK3B61CBLe05LF4uDg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RibB6cGOKBhQJ0kt7bUlUAz7EIpc+KrATwAUlvVubAzXeeVLuDtv0Wocv0GsckYNyjSQKPtLu1JYXEspwMoqQe/08ktQ2eDBQ7kfmQ3W3iuuuXJ8rM+R/fcsnPVuGT5DXXpkbDERoron8p9MlYI8NM+D7LEwf8Gx4DBf2Wvfif8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yAFytwWt; arc=none smtp.client-ip=209.85.208.46
+	 Content-Type:Content-Disposition:In-Reply-To; b=i/v1Omr1/vKvRUxhr8WPzvj34R5p57GqFNWWaMKzZSHGAvpRIvX4SgS36rUbnw4PQtgUT0BfGPqOUlbN+VSOdkbjajDmbww2/62wi1//cWoj7MeGaARkA/HzAxcRv6s002Qka4tZjBmd8+wsoftfez25YhFasTEZUgQSPUlnm7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bFHLNw+F; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yAFytwWt"
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-568a53d2ce0so1082469a12.0
-        for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 13:24:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bFHLNw+F"
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a46644fee93so193006666b.2
+        for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 13:24:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710447858; x=1711052658; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1710447875; x=1711052675; darn=lists.linux.dev;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=FGHXKr9Rrdhb7ltTqwpYqVe2UrsjZifyrXsCqgg5SVI=;
-        b=yAFytwWtidMdgpLS6cR6SkjSNRgG+wdTaYzyX9d4qHiZB6wTJ2Y7hXs0i6xoSNFMDn
-         n6FZs2yc+NCuuwGp8BJKWOvVUYViJWbEA86WKi2k34eicMLmWAhTC3hBOmSk51AdzBv1
-         lXElty1kfYsD+QFvd/0kd7UDk3joSA7E8B3N2CVhd6nTkki4ERHyVjDC+jNBt7JTWFPA
-         tiw8JDAaa3wuPlR14v8C2mEm3ZYM6A1+/tlUDbW088ksIbi+PsPkGBd1IafPdfsp2Npl
-         QEFyazsKPbD/NJZuxZe7nMn0t5+sCl24Z7BQkWuZxbLceDnL7kc+eEhS92sKsoU1bkDD
-         Js5w==
+        bh=KeVadU2hZeC83X7EyIxA1rm2PDaUR9fvRb0RDycrigU=;
+        b=bFHLNw+FgK/jlEY6a/O+0DOZq14sj5KpXIchWIB1fjSu9GErIqBiEbxxaPiZDUnsUs
+         pJiiuYvukiHv6Gg1GLIQF5j7PZ6zw2QPD6zQ9ZB55RGGSrlUhFWFFWCv2+gipcsTXgmy
+         /hKemcjN62h58dNSAItWzpU87xezRU2C7csgFHrjAEiEphOQaWlXYhSvQ/iVHYl6fN5N
+         3YDwhFUK46UCkZ1F/GBDv6CfJ+EKpz0M99mbtn+FXHTzgzAb6cW24B9ArbX+6N6blQ1m
+         a35ghDQcbrJDGuSrLZfnJEm1F4EaHwZIm3BYFjCa9efkqmiRtKLmUK9wLbIvmqIIZS0i
+         RirQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710447858; x=1711052658;
+        d=1e100.net; s=20230601; t=1710447875; x=1711052675;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FGHXKr9Rrdhb7ltTqwpYqVe2UrsjZifyrXsCqgg5SVI=;
-        b=D9C+qA3QrHVC44Dssu/mUvSaJCQ6o/SvL7/ELYkRumoyWcfFmqq6bXkGwvHRelsphx
-         L3gnVgXWoiNgQLPYUHVCdQP5z0sdGSGSPx0z1VXvLoffS3BXqMOqR0IiLE0EQVLfP5tL
-         +s5zK6s3nCVYh8Pf9AXLsCIWQdiEutCtKj/BGooSXDTWufcCUQ4Qe57j5gPI/Cl7idIW
-         P1otJf+hckyGQ11/G8L8a6JyWOft7ERNS2peMYekXdds5hNnGyGeAXMIM3g81tnRilbC
-         mcrpC5TxKvnEZvo+3DjmmvA0nOb0K0jUaDY/TUmlraWBUmc/yVFM2t2UVJZQ30rM2/0d
-         tlrg==
-X-Gm-Message-State: AOJu0YzS5s2MH/BLSTRwJ6yHEQfgPaqIGqMzC9o18StyHGpSGOu0Vj4o
-	CJMKXpWJZt8g8832BpX9UTAyylJaYP8lXjLG8s2UQipJSPH/XpJCxMJxvh4cyioK6kOpFXhD4hy
-	26gfX
-X-Google-Smtp-Source: AGHT+IGDSjzpxZf8AVYQE+b2VkhZATxpfpcqloyDmGyoEsgY/Kxfu5Lu+ucHeadFj0dWnxHl32HuWQ==
-X-Received: by 2002:a05:6402:160c:b0:568:335d:a95d with SMTP id f12-20020a056402160c00b00568335da95dmr1235050edv.18.1710447858444;
-        Thu, 14 Mar 2024 13:24:18 -0700 (PDT)
+        bh=KeVadU2hZeC83X7EyIxA1rm2PDaUR9fvRb0RDycrigU=;
+        b=rqdUfYUdvUo0gpZe5PrYovfDinRgYZ4F6eKXe+K+A+BILZWL7JHG6zG5U1FbV1Gqmd
+         AOeVOJOZ8pYFFoUf3QGXDa5s+b/Pm1CqmCPx4vaLB67c1cRkrfNlwgrNwDsmCJdqW0Ts
+         q0LqH+8aCQ5UdXrloAUCf/bpe5/GRx9ZTeP2BsShm4lYsnMx/dm//S4nVO/A14zQWJ2N
+         hCrqZfN6frBhtHw7Hown5NIcMg00gbkvFgZKr9jRWnhA9oj+v5KVLXOdWkXOA3SeY9uM
+         qJNWLoqf4drhabhUPM3zTDTh462O3aM5nvJPkLMYnASglPEMY6SeoU8rpP4ktQty2AAZ
+         4ZWQ==
+X-Gm-Message-State: AOJu0YxDhIa279Xol308v+G9TyyKU+F0iOf0Ec9whJWiNLkhWHulkyAa
+	b1JcPMAefpUEE2iFmtwhv2yTfVlq1J5IaCDM4PoJCZTKnNMq1BguWebgNQuBxWlSDxoSoZ9rfpG
+	192dy
+X-Google-Smtp-Source: AGHT+IHucnNpHcGZETVpGOJfR1+fsfUsDKCT0Rc1DvLZfkdGAS5fojQQqY/5p5KP8nfAh80FDRV5yA==
+X-Received: by 2002:a17:906:bc56:b0:a46:5e38:29d7 with SMTP id s22-20020a170906bc5600b00a465e3829d7mr1861511ejv.10.1710447875391;
+        Thu, 14 Mar 2024 13:24:35 -0700 (PDT)
 Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
-        by smtp.gmail.com with ESMTPSA id m24-20020aa7d358000000b0056729e902f7sm1019134edr.56.2024.03.14.13.24.18
+        by smtp.gmail.com with ESMTPSA id vi2-20020a170907d40200b00a45c8b6e965sm1012429ejc.3.2024.03.14.13.24.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Mar 2024 13:24:18 -0700 (PDT)
-Date: Thu, 14 Mar 2024 20:24:14 +0000
+        Thu, 14 Mar 2024 13:24:35 -0700 (PDT)
+Date: Thu, 14 Mar 2024 20:24:31 +0000
 From: =?utf-8?Q?Pierre-Cl=C3=A9ment?= Tosi <ptosi@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org
 Cc: James Morse <james.morse@arm.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Marc Zyngier <maz@kernel.org>, Andrew Scull <ascull@google.com>
-Subject: [PATCH 04/10] KVM: arm64: nVHE: Simplify __guest_exit_panic path
-Message-ID: <b13ddc391fce3ea01cffae9c694d997381598616.1710446682.git.ptosi@google.com>
+	Zenghui Yu <yuzenghui@huawei.com>, Marc Zyngier <maz@kernel.org>
+Subject: [PATCH 05/10] KVM: arm64: nVHE: Add EL2 sync exception handler
+Message-ID: <cebafe40b170589d52e2ef66f3bfac7396fa1f56.1710446682.git.ptosi@google.com>
 References: <cover.1710446682.git.ptosi@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -73,131 +73,58 @@ Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 In-Reply-To: <cover.1710446682.git.ptosi@google.com>
 
-Immediately jump to __guest_exit_panic when taking an invalid EL2
-exception with the nVHE host vector table instead of first duplicating
-the vCPU context check that __guest_exit_panic will also perform.
+Introduce handlers for EL2{t,h} synchronous exceptions distinct from
+handlers for other "invalid" exceptions when running with the nVHE host
+vector. This will allow a future patch to handle CFI (synchronous)
+errors without affecting other classes of exceptions.
 
-Fix the wrong (probably bitrotten) __guest_exit_panic ABI doc to reflect
-how it is used by VHE and (now) nVHE and rename the routine to
-__hyp_panic to better reflect that it might not exit through the guest
-but will always (directly or indirectly) end up executing hyp_panic().
-
-Use CPU_LR_OFFSET to clarify that the routine returns to hyp_panic().
+Remove superfluous SP overflow check from the non-synchronous handlers.
 
 Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
 ---
- arch/arm64/kvm/hyp/entry.S              | 14 +++++++++-----
- arch/arm64/kvm/hyp/hyp-entry.S          |  2 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h |  4 ++--
- arch/arm64/kvm/hyp/nvhe/host.S          |  8 +-------
- 4 files changed, 13 insertions(+), 15 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/host.S | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index 9cdf46da3051..ac8aa8571b2f 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -83,7 +83,7 @@ alternative_else_nop_endif
- 	eret
- 	sb
- 
--SYM_INNER_LABEL(__guest_exit_panic_with_restored_elr, SYM_L_GLOBAL)
-+SYM_INNER_LABEL(__hyp_panic_with_restored_elr, SYM_L_GLOBAL)
- 	// x0-x29,lr: hyp regs
- 
- 	stp	x0, x1, [sp, #-16]!
-@@ -92,13 +92,15 @@ SYM_INNER_LABEL(__guest_exit_panic_with_restored_elr, SYM_L_GLOBAL)
- 	msr	elr_el2, x0
- 	ldp	x0, x1, [sp], #16
- 
--SYM_INNER_LABEL(__guest_exit_panic, SYM_L_GLOBAL)
--	// x2-x29,lr: vcpu regs
--	// vcpu x0-x1 on the stack
-+SYM_INNER_LABEL(__hyp_panic, SYM_L_GLOBAL)
-+	// x0-x29,lr: vcpu regs
-+
-+	stp	x0, x1, [sp, #-16]!
- 
- 	// If the hyp context is loaded, go straight to hyp_panic
- 	get_loaded_vcpu x0, x1
- 	cbnz	x0, 1f
-+	ldp	x0, x1, [sp], #16
- 	b	hyp_panic
- 
- 1:
-@@ -110,10 +112,12 @@ SYM_INNER_LABEL(__guest_exit_panic, SYM_L_GLOBAL)
- 	// accurate if the guest had been completely restored.
- 	adr_this_cpu x0, kvm_hyp_ctxt, x1
- 	adr_l	x1, hyp_panic
--	str	x1, [x0, #CPU_XREG_OFFSET(30)]
-+	str	x1, [x0, #CPU_LR_OFFSET]
- 
- 	get_vcpu_ptr	x1, x0
- 
-+	// Keep x0-x1 on the stack for __guest_exit
-+
- SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
- 	// x0: return code
- 	// x1: vcpu
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 03f97d71984c..7e65ef738ec9 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -122,7 +122,7 @@ el2_error:
- 	eret
- 	sb
- 
--.macro invalid_vector	label, target = __guest_exit_panic
-+.macro invalid_vector	label, target = __hyp_panic
- 	.align	2
- SYM_CODE_START_LOCAL(\label)
- 	b \target
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 6a8dc8d3c193..0dc721ced358 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -747,7 +747,7 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
- 
- static inline void __kvm_unexpected_el2_exception(void)
- {
--	extern char __guest_exit_panic_with_restored_elr[];
-+	extern char __hyp_panic_with_restored_elr[];
- 	unsigned long addr, fixup;
- 	struct kvm_exception_table_entry *entry, *end;
- 	unsigned long elr_el2 = read_sysreg(elr_el2);
-@@ -769,7 +769,7 @@ static inline void __kvm_unexpected_el2_exception(void)
- 	}
- 
- 	/* Trigger a panic after restoring the hyp context. */
--	write_sysreg(__guest_exit_panic_with_restored_elr, elr_el2);
-+	write_sysreg(__hyp_panic_with_restored_elr, elr_el2);
- 
- 	this_cpu_ptr(&kvm_hyp_ctxt)->sys_regs[ELR_EL2] = elr_el2;
- }
 diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-index 7693a6757cd7..27c989c4976d 100644
+index 27c989c4976d..1b9111c2b480 100644
 --- a/arch/arm64/kvm/hyp/nvhe/host.S
 +++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -196,19 +196,13 @@ SYM_FUNC_END(__host_hvc)
- 	tbz	x0, #PAGE_SHIFT, .L__hyp_sp_overflow\@
- 	sub	x0, sp, x0			// x0'' = sp' - x0' = (sp + x0) - sp = x0
- 	sub	sp, sp, x0			// sp'' = sp' - x0 = (sp + x0) - x0 = sp
--
- 	/* If a guest is loaded, panic out of it. */
--	stp	x0, x1, [sp, #-16]!
--	get_loaded_vcpu x0, x1
--	cbnz	x0, __guest_exit_panic
--	add	sp, sp, #16
--
- 	/*
- 	 * The panic may not be clean if the exception is taken before the host
- 	 * context has been saved by __host_exit or after the hyp context has
- 	 * been partially clobbered by __host_enter.
- 	 */
--	b	hyp_panic
-+	b	__hyp_panic
+@@ -183,7 +183,7 @@ SYM_FUNC_END(__host_hvc)
+ .endif
+ .endm
  
- .L__hyp_sp_overflow\@:
- 	/* Switch to the overflow stack */
+-.macro invalid_host_el2_vect
++.macro host_el2_sync_vect
+ 	.align 7
+ 
+ 	/*
+@@ -221,6 +221,11 @@ SYM_FUNC_END(__host_hvc)
+ 	b	__hyp_do_panic
+ .endm
+ 
++.macro invalid_host_el2_vect
++	.align 7
++	b	__hyp_panic
++.endm
++
+ /*
+  * The host vector does not use an ESB instruction in order to avoid consuming
+  * SErrors that should only be consumed by the host. Guest entry is deferred by
+@@ -233,12 +238,12 @@ SYM_FUNC_END(__host_hvc)
+  */
+ 	.align 11
+ SYM_CODE_START(__kvm_hyp_host_vector)
+-	invalid_host_el2_vect			// Synchronous EL2t
++	host_el2_sync_vect			// Synchronous EL2t
+ 	invalid_host_el2_vect			// IRQ EL2t
+ 	invalid_host_el2_vect			// FIQ EL2t
+ 	invalid_host_el2_vect			// Error EL2t
+ 
+-	invalid_host_el2_vect			// Synchronous EL2h
++	host_el2_sync_vect			// Synchronous EL2h
+ 	invalid_host_el2_vect			// IRQ EL2h
+ 	invalid_host_el2_vect			// FIQ EL2h
+ 	invalid_host_el2_vect			// Error EL2h
 
 -- 
 Pierre
