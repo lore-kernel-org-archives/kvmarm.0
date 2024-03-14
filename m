@@ -1,57 +1,57 @@
 Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4D117C9B
-	for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 23:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79404182B9
+	for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 23:26:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710458809; cv=none; b=ksjToo+tKujwc2gsl1yPfX9J/73+ZzHzbdmw1amFz/RSTqeP/RvWqRRvalaPyushK/tXlQLsZsZaKOR7S1pk4PdsYFULsnWBBjS6XQDkZitSeuiNFrnCLKApCpqQ9DXrAvHEj7cbNr7mBm/Fu703rty0o4D4Sr4wbYphhJ/bf5Q=
+	t=1710458811; cv=none; b=TIGFf2dBXSmVRSFqftGvxJHF0OvLOxfhobs/yoBtdKTmlFnfEV4vtpC9Z40LYJ963HBZYs0W63fK+wxuDCmkE6YfVx7i9tIFbaA/MQpETzI6cVRdSrIuSsxjoOgEyuk9JoKzAOCF5mF4cSvOkB5lCHou6OUCr+hNREF1aBATxLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710458809; c=relaxed/simple;
-	bh=hVROtGdDjNDokjJTyibuSKcjvmcYXHYDj2oTedDMiks=;
+	s=arc-20240116; t=1710458811; c=relaxed/simple;
+	bh=kL1anMirud9R6581IlVg1+Shvk0whf3zxCiXUgx5dcE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Z0rMFq9NAWtPfci5MBJ0uQN1eMT0XibBK3M1zPng9juHGGXGHjf2lRgYPw3NqTaCTZ/JPEG+7xm5hEq7BMU+KSweNR2vrJhh6QoxIOtfaWfe4T2ZYIqkwNAy9/MT/pQxXBRbnKpbKTkvXBXcL6BK8dHKmh0HbgIZF0l1lPgA6ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UfA1i5KF; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=LRITzfMeFaXf/Dyo1EfLFzcDYoGvXX6Zogp+WisWkEnG+AYFFPMcq0JrIJpL3Mnz+3FVHodaQjKYe16Ap1m4Y2Wthp2uCA4Hxt6u9BUPIzECcoKSBF12Q+2281a5qzM1K8lsWNE4ULKaeFVDGYRyfHycOmrUhOekptKd3YjqGCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CY69QKc+; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UfA1i5KF"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6e6edde53cfso625834b3a.0
-        for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 16:26:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CY69QKc+"
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6e6b9895301so1353545b3a.3
+        for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 16:26:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710458807; x=1711063607; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1710458809; x=1711063609; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=f7mdClvgIXUuf9+yuKM3CelLdMACw57Fq4PBdMk33ZU=;
-        b=UfA1i5KFN8j+oDfRjtI6YitAkF1h2iG2KMlkIEuYUqQpc1Ci2DxuRMYi1cvXAjgGnm
-         BAYUp8y4deJme6P2dzpyjFSjYVsA58D9zCr3qiANIW60HaF5rxoc/0eSsb84VvvBaZrP
-         UrOFDJp67MwGiHWT+KlIn5Vmzqj4ma5NYaihOrxKfhuzG0mEdOtQbwfHvG+gJpVOeay8
-         bTM8oxIad/M4/ah/n6dVbF+r3oTjJUsF8zzbhtyLCAX509VTfUBemRgJBGV6ckoezrLe
-         u1I2Wu4HbMMAh8xOXDJJ3s3GnM7xiML3NWjkVfXvRuLaEGr25nvY8W7PD3myJUhU8bnf
-         u08A==
+        bh=k1ceQ+0+7x0dggVxu3pfjgACx/CpWN/VJ25BN1jj24Q=;
+        b=CY69QKc+U9KjTE/3NeCDunaWv4O7rqt+fxsTlqHrWr1a7y+/Bi6QhXiuwgM6n2J9F+
+         SNcmDIcGpiztEPmY2HjkKWV8nRKAPbHeUUTa20QGc78qzU9mBbJ9r0/SQCxb07oDmWsk
+         hmEEyTNRZUI9Dq+p1A8Vd8d3GUFTbMQ4dYWa6URNBiipwZ/Znicav8sxUil9PZrqF97a
+         70yfrzQeuXMv6Y9gEwGUpM1YN4Zq/k8RMos5HG02glCdxJVYS7unnYAoj6pf/CZcNdo8
+         62jXkscQJZgbIfZ2Pmg1HalrcbPnsnZmSK6qHM4csb15+GVDpaJy5H8nT4lc3rSGcWQ7
+         dJYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710458807; x=1711063607;
+        d=1e100.net; s=20230601; t=1710458809; x=1711063609;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=f7mdClvgIXUuf9+yuKM3CelLdMACw57Fq4PBdMk33ZU=;
-        b=KaqHot3KBRavU9bcRCh1WA+uRhej3JBmrXrBc+PMgKVVRW0vbElOj0d5XLPXJGAkFi
-         SzvNzCZ8g63XKKLinISw/09Xucbq8gqyr4sFZFGv11A/2t5VfccnkB0hPo3FdyEIdjtN
-         Pj+PwMkavJI6/WJaH8n39wcSW2EJBr2/aE2BHJXMgB2XkWrI4OVQWOfaLvfdtUyqVWVI
-         XcxtOxw/HqY/4uMVYseSyvNvrzA86tUSSs2g3i7FOHXSUqaGcePd5mB/WjMFwL/8KHd2
-         e8GIdhBAxuTRsDrjJW5mv9uqdcAJr2KJgJk1k7Ty6lkS1LgaL4KVHR6mYsX3UjoKDQR6
-         J84g==
-X-Forwarded-Encrypted: i=1; AJvYcCWTL0yGULM3W1MAZUDhBMpBvp2+El1RQdTUwE2wPlKENlSA+dlLFCt6E+uSmTqrZcn4FQPBM9evohymhOqYXt/jEgz2LXe8
-X-Gm-Message-State: AOJu0Yz1sYqVTjs1THu7lJFU5cASbLRE7+2e9jiiiFMjGsQHrYF/7YLP
-	Z3qgcjA21wrdbkyyzEJgjVRMhhfwPIv/mD0MUOrsibl4T82Kt8HoBAzNp4IaPoMbTUdIAOkirPr
-	fww==
-X-Google-Smtp-Source: AGHT+IHP+9uB+bS3/lKcsyk7/8c0Ce59jwpM+G35vfnwrWKSRS2+iNaQrX8dqel6o4dt3H0Nsgf9UIQa3fs=
+        bh=k1ceQ+0+7x0dggVxu3pfjgACx/CpWN/VJ25BN1jj24Q=;
+        b=l/y5lUGmLsv76U2H4hsuhhedtDyP4DfC+RavnD5UU83mqpuyzKtHOKeUccmJv+QOWb
+         psVLx5FLDpSyIb4o65JLnNJzQnp5SVQ3VLcI4jDKQxI6ssc0lk24OY14IViwe4U5kSLH
+         uUueU99rYV6uCEM4+L4fsfKNIqFi6go7uGNIBYBXHn/f6Vgp6cuePVB5voGIpYF3Pc3C
+         887aNgjUwxMiQcqOEadY2LKMQBRUImySsqG0afFgTyMf6U9uGuCkGl0UhuqjH1ljFPMn
+         E8DRzadvxZAJ3pwAuN6zT6njMhQk7lXBaqibtfK8Q63LiAPqsDDjnPCk07vkDljQDcqn
+         kYeg==
+X-Forwarded-Encrypted: i=1; AJvYcCUNaUopkxRTNTJBRLmEc+DuD9uX/9xn1M5MhXkJn2wZTj4oDsR1edcN2Cem3HA3NYOR6oSFhTn+f7auv9//2cInWSNZft7B
+X-Gm-Message-State: AOJu0Yz4CQQwCUOuCUEz12p1r9j6QTWnI+AdjR0s13nhFWjUD6EkDzFS
+	EjZngetJPWuuEciaksBQgtJMBlPyjTvQMWpC6XnImnXmWxizOhqE/Qn/F4J8cIZinSqXH2uleST
+	DIQ==
+X-Google-Smtp-Source: AGHT+IFa6Xo5alB77JWBKkmfaT2866W5+uuYd+R94MhsO58PTc0FssqvQ3Br5ekzS9Hb9uDd/sllma8cTz8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1a:b0:6e6:eefe:945d with SMTP id
- h26-20020a056a00001a00b006e6eefe945dmr9863pfk.0.1710458807233; Thu, 14 Mar
- 2024 16:26:47 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:23c6:b0:6e6:c374:f104 with SMTP id
+ g6-20020a056a0023c600b006e6c374f104mr152102pfc.0.1710458808854; Thu, 14 Mar
+ 2024 16:26:48 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 14 Mar 2024 16:26:23 -0700
+Date: Thu, 14 Mar 2024 16:26:24 -0700
 In-Reply-To: <20240314232637.2538648-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240314232637.2538648-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.291.gc1ea87d7ee-goog
-Message-ID: <20240314232637.2538648-5-seanjc@google.com>
-Subject: [PATCH 04/18] KVM: selftests: Fix off-by-one initialization of GDT limit
+Message-ID: <20240314232637.2538648-6-seanjc@google.com>
+Subject: [PATCH 05/18] KVM: selftests: Move platform_info_test's main assert
+ into guest code
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
@@ -76,37 +77,54 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Ackerley Tng <ackerleytng@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Ackerley Tng <ackerleytng@google.com>
+As a first step toward gracefully handling the expected #GP on RDMSR in
+platform_info_test, move the test's assert on the non-faulting RDMSR
+result into the guest itself.  This will allow using a unified flow for
+the host userspace side of things.
 
-Fix an off-by-one bug in the initialization of the GDT limit, which as
-defined in the SDM is inclusive, not exclusive.
-
-Note, vcpu_init_descriptor_tables() gets the limit correct, it's only
-vcpu_setup() that is broken, i.e. only tests that _don't_ invoke
-vcpu_init_descriptor_tables() can have problems.  And the fact that KVM
-effectively initializes the GDT twice will be cleaned up in the near
-future.
-
-Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-[sean: rewrite changelog]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/lib/x86_64/processor.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../selftests/kvm/x86_64/platform_info_test.c | 20 +++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 45f965c052a1..eaeba907bb53 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -522,7 +522,7 @@ static void kvm_setup_gdt(struct kvm_vm *vm, struct kvm_dtable *dt)
- 		vm->arch.gdt = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
+diff --git a/tools/testing/selftests/kvm/x86_64/platform_info_test.c b/tools/testing/selftests/kvm/x86_64/platform_info_test.c
+index 87011965dc41..cdad7e2124c8 100644
+--- a/tools/testing/selftests/kvm/x86_64/platform_info_test.c
++++ b/tools/testing/selftests/kvm/x86_64/platform_info_test.c
+@@ -29,7 +29,9 @@ static void guest_code(void)
  
- 	dt->base = vm->arch.gdt;
--	dt->limit = getpagesize();
-+	dt->limit = getpagesize() - 1;
+ 	for (;;) {
+ 		msr_platform_info = rdmsr(MSR_PLATFORM_INFO);
+-		GUEST_SYNC(msr_platform_info);
++		GUEST_ASSERT_EQ(msr_platform_info & MSR_PLATFORM_INFO_MAX_TURBO_RATIO,
++				MSR_PLATFORM_INFO_MAX_TURBO_RATIO);
++		GUEST_SYNC(0);
+ 		asm volatile ("inc %r11");
+ 	}
+ }
+@@ -42,13 +44,15 @@ static void test_msr_platform_info_enabled(struct kvm_vcpu *vcpu)
+ 	vcpu_run(vcpu);
+ 	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
+ 
+-	get_ucall(vcpu, &uc);
+-	TEST_ASSERT(uc.cmd == UCALL_SYNC,
+-			"Received ucall other than UCALL_SYNC: %lu", uc.cmd);
+-	TEST_ASSERT((uc.args[1] & MSR_PLATFORM_INFO_MAX_TURBO_RATIO) ==
+-		MSR_PLATFORM_INFO_MAX_TURBO_RATIO,
+-		"Expected MSR_PLATFORM_INFO to have max turbo ratio mask: %i.",
+-		MSR_PLATFORM_INFO_MAX_TURBO_RATIO);
++	switch (get_ucall(vcpu, &uc)) {
++	case UCALL_SYNC:
++		break;
++	case UCALL_ABORT:
++		REPORT_GUEST_ASSERT(uc);
++	default:
++		TEST_FAIL("Unexpected ucall %lu", uc.cmd);
++		break;
++	}
  }
  
- static void kvm_setup_tss_64bit(struct kvm_vm *vm, struct kvm_segment *segp,
+ static void test_msr_platform_info_disabled(struct kvm_vcpu *vcpu)
 -- 
 2.44.0.291.gc1ea87d7ee-goog
 
