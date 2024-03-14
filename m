@@ -1,109 +1,111 @@
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D85E374E21;
-	Thu, 14 Mar 2024 21:45:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C84B623;
+	Thu, 14 Mar 2024 22:40:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710452747; cv=none; b=PwRugFeBqNFYXIbQ4BH3LyYgCV18Jukwu/2NoPI4esU7vgrIWDubpGn4FiWFYOtzaDbibYkO7BpCSpYJ/mVuceVBOoSLfgn//RVavgSR9rel2S6eK9RLqdEiepmAcSBSyKgt0GuU15V92+YccFLgy2Q7l4AJ4fi+NqlzUhahJd8=
+	t=1710456050; cv=none; b=HmMRRsE7Xy4XYxDARgaJhsUTnFtTIc+sRK5+kyJDykrm0LKEWhDTuCog3clV8X2PJ7cPwtxO2dvD6Hjo3O+Irhf7apYdDyjP1xQ43e7AxaSxOaeb7hIigsPUBC3Na1JJ8zyb6UyvXq5zU9MFeOx0CQqirJieRogNnY+Wy1PVSm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710452747; c=relaxed/simple;
-	bh=vp3hGSwgMbzRk72sOUpHptWRQ85XgRAAacWGIwKWzDg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=j0Qm6fk8dxKl/2kG+zQog0jfbqEZ5YFu9899VEoyct8+Z6xCj2cQ6/vky0toEvSu0qhWSc19xmCssisxarIf2DtPq6wd4eAzAKjyjb1zPIHgiujsm9yRNuBjBpNtcdFpLjnp++BSEpqWCyBEVv4btW91x0r4PeEPOfo5lpB8mFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Tuf8XY1U; arc=none smtp.client-ip=207.171.190.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1710456050; c=relaxed/simple;
+	bh=IJPqVtR8QSM/d1Gfah9hBxpHWVHr3H8lUxgZ+S0EhzA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZUd933BZiZ018wc0FmKsL9Db7FXracm6Cz1lgzIbFNkxSaCzHDuAU2CDY2BfN0/+mZWakWNazQX914ChBqYK8ZBsvnnut+l04zIKHzhvc2DqWJVXuZa0/MF5fnx6NDSCIbbICYvmmH4fj3XTjI20Vp2tub2Zr8VQY5mnx9+YRUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RJi/YQ1C; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Tuf8XY1U"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1710452746; x=1741988746;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=vp3hGSwgMbzRk72sOUpHptWRQ85XgRAAacWGIwKWzDg=;
-  b=Tuf8XY1UJImoeIpp2nYoC3VB9tJ6uCOPQAbDPuMKToRLWt9cIXfoW/iX
-   09JBGG0k78MjrBdT7vnOo0LKWzTkILY1aOcSJtpa6H4UzTkJS6BCjfwqW
-   cKUCLDIXOAOqDuCcHcBPucRcyQhWp6mICtR5LGwm0ABhNp9MXuFn4/Yna
-   I=;
-X-IronPort-AV: E=Sophos;i="6.07,126,1708387200"; 
-   d="scan'208";a="332923184"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 21:45:43 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:4706]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.8.10:2525] with esmtp (Farcaster)
- id b3e2a354-b5d8-40da-9532-79da56e6a481; Thu, 14 Mar 2024 21:45:42 +0000 (UTC)
-X-Farcaster-Flow-ID: b3e2a354-b5d8-40da-9532-79da56e6a481
-Received: from EX19D003UWC002.ant.amazon.com (10.13.138.169) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 14 Mar 2024 21:45:35 +0000
-Received: from [10.119.229.181] (10.119.229.181) by
- EX19D003UWC002.ant.amazon.com (10.13.138.169) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 14 Mar 2024 21:45:34 +0000
-Message-ID: <404fec0f-430b-44f1-8cdf-13573f0ae522@amazon.com>
-Date: Thu, 14 Mar 2024 14:45:33 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RJi/YQ1C"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 208D3C433F1;
+	Thu, 14 Mar 2024 22:40:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710456050;
+	bh=IJPqVtR8QSM/d1Gfah9hBxpHWVHr3H8lUxgZ+S0EhzA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RJi/YQ1C6bMovlwymdVGTi5vND+ai9juEP5OI0xr6YimWdI9+4gWZnreAhrV0SwEr
+	 ES1tLHh6gGA5m14fQug4hxWqk2m6FLJB+aoFUZp9KpmvmUfm9wmAI1lWiJpSvs67I3
+	 H9eSw0EYg0wQPRTHmvr3MzScpDBhWIcVQsR8bXfsXIIA0R4U49zGwrb5A2uv/FfEYq
+	 SAWZht/LWwUay0vjmyc3+30qCWoTqs1uY5zC2KsD9L/F/iZL00YZBp9FgoUIUlcHDw
+	 B/wUfvZnqVI0yiqcWMm8TATrI3zrMIc+ZslB2IVdP3KlWsBGpr8o4vyFc0W9pdt9mC
+	 FtoeUxDFAyJGQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rktkl-00CWD8-O5;
+	Thu, 14 Mar 2024 22:40:47 +0000
+Date: Thu, 14 Mar 2024 22:40:47 +0000
+Message-ID: <86edcc1low.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: =?UTF-8?B?UGllcnJlLUNsw6ltZW50?= Tosi <ptosi@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 00/10] KVM: arm64: Add support for hypervisor kCFI
+In-Reply-To: <cover.1710446682.git.ptosi@google.com>
+References: <cover.1710446682.git.ptosi@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Unmapping KVM Guest Memory from Host Kernel
-To: Sean Christopherson <seanjc@google.com>, James Gowans <jgowans@amazon.com>
-CC: "akpm@linux-foundation.org" <akpm@linux-foundation.org>, Patrick Roy
-	<roypat@amazon.co.uk>, "chao.p.peng@linux.intel.com"
-	<chao.p.peng@linux.intel.com>, "rppt@kernel.org" <rppt@kernel.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, David Woodhouse
-	<dwmw@amazon.co.uk>, Nikita Kalyazin <kalyazin@amazon.co.uk>,
-	"lstoakes@gmail.com" <lstoakes@gmail.com>, "Liam.Howlett@oracle.com"
-	<Liam.Howlett@oracle.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-	"vbabka@suse.cz" <vbabka@suse.cz>, "mst@redhat.com" <mst@redhat.com>,
-	"somlo@cmu.edu" <somlo@cmu.edu>, Alexander Graf <graf@amazon.de>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-coco@lists.linux.dev"
-	<linux-coco@lists.linux.dev>, <xmarcalx@amazon.com>, <tabba@google.com>,
-	<qperret@google.com>, <kvmarm@lists.linux.dev>
-References: <cc1bb8e9bc3e1ab637700a4d3defeec95b55060a.camel@amazon.com>
- <ZeudRmZz7M6fWPVM@google.com>
-Content-Language: en-US
-From: "Manwaring, Derek" <derekmn@amazon.com>
-In-Reply-To: <ZeudRmZz7M6fWPVM@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D042UWB002.ant.amazon.com (10.13.139.175) To
- EX19D003UWC002.ant.amazon.com (10.13.138.169)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ptosi@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, samitolvanen@google.com, mark.rutland@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 8 Mar 2024 15:22:50 -0800, Sean Christopherson wrote:
-> On Fri, Mar 08, 2024, James Gowans wrote:
-> > We are also aware of ongoing work on guest_memfd. The current
-> > implementation unmaps guest memory from VMM address space, but leaves it
-> > in the kernel’s direct map. We’re not looking at unmapping from VMM
-> > userspace yet; we still need guest RAM there for PV drivers like virtio
-> > to continue to work. So KVM’s gmem doesn’t seem like the right solution?
->
-> We (and by "we", I really mean the pKVM folks) are also working on allowing
-> userspace to mmap() guest_memfd[*].  pKVM aside, the long term vision I have for
-> guest_memfd is to be able to use it for non-CoCo VMs, precisely for the security
-> and robustness benefits it can bring.
->
-> What I am hoping to do with guest_memfd is get userspace to only map memory it
-> needs, e.g. for emulated/synthetic devices, on-demand.  I.e. to get to a state
-> where guest memory is mapped only when it needs to be.
+Hi Pierre-Cl=C3=A9ment,
 
-Thank you for the direction, this is super helpful.
+On Thu, 14 Mar 2024 20:23:00 +0000,
+Pierre-Cl=C3=A9ment Tosi <ptosi@google.com> wrote:
+>=20
+> CONFIG_CFI_CLANG ("kernel Control Flow Integrity") makes the compiler inj=
+ect
+> runtime type checks before any indirect function call. On AArch64, it gen=
+erates
+> a BRK instruction to be executed on type mismatch and encodes the indices=
+ of the
+> registers holding the branch target and expected type in the immediate of=
+ the
+> instruction. As a result, a synchronous exception gets triggered on kCFI =
+failure
+> and the fault handler can retrieve the immediate (and indices) from ESR_E=
+Lx.
+>=20
+> This feature has been supported at EL1 ("host") since it was introduced by
+> b26e484b8bb3 ("arm64: Add CFI error handling"), where cfi_handler() decod=
+es
+> ESR_EL1, giving informative panic messages such as
+>=20
+>   [   21.885179] CFI failure at lkdtm_indirect_call+0x2c/0x44 [lkdtm]
+>   (target: lkdtm_increment_int+0x0/0x1c [lkdtm]; expected type: 0x7e0c52a)
+>   [   21.886593] Internal error: Oops - CFI: 0 [#1] PREEMPT SMP
+>=20
+> However, it is not or only partially supported at EL2: in nVHE (or pKVM),
+> CONFIG_CFI_CLANG gets filtered out at build time, preventing the compiler=
+ from
+> injecting the checks. In VHE (or hVHE), EL2 code gets compiled with the c=
+hecks
 
-We are new to the guest_memfd space, and for simplicity we'd prefer to
-leave guest_memfd completely mapped in userspace. Even in the long term,
-we actually don't have any use for unmapping from host userspace. The
-current form of marking pages shared doesn't quite align with what we're
-trying to do either since it also shares the pages with the host kernel.
+Are you sure about hVHE? hVHE is essentially the nVHE object running
+with a slightly different HCR_EL2 configuration. So if you don't have
+the checks in the nVHE code, you don't have them for hVHE either.
 
-What are your thoughts on a flag for KVM_CREATE_GUEST_MEMFD that only
-removes from the host kernel's direct map, but leaves everything mapped
-in userspace?
+Or am I missing something obvious?
 
-Derek
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
