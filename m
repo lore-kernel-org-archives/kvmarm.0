@@ -1,170 +1,232 @@
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2048.outbound.protection.outlook.com [40.107.93.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B635D5DF0E
-	for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 11:31:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710415917; cv=none; b=S7McWFBisRddzCbh5f7SnrGmpMkygUZYWFCsKdhPz22ytxmgbsbdJjdQA3A6LBn+3QOmDYvxBgC6WAa/izlTvxMFLIHiY5+daon2kZw+STCYIW/MugeF41Qgjf7tfsX2TJWHWbbBqFvi35ySkgzmlUzLVPgeOPaT9eymTc04FKM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710415917; c=relaxed/simple;
-	bh=DkGmVrrfdoYHC3Jz/8H/PUrLj/0yjctqv7dzZzPfV+I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GucxUWe+mmmUvGcSfUIikoL06Wl/SVGK8O4MNizkLTXdd4xXa+dcMoCAPDph7dP9so+ZcvnsDx1BoAcigLS84i0cC9RbsLc28qQaCiCkxQAK8H57NDa52NqHcBEYP6SN2OZahhDJpMBTi2dhdCcRk7r148yaC6XgZfjJktl2pKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=b3QpCRDd; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415F56F065
+	for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 11:51:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710417112; cv=fail; b=llfJK8wS+YhaBAKt0/S6nk8ypYSWcmBGg8NwTiu95LSP99jMqY7ENL1JSJ82vVdPXwDlxXuunxk6+WhTOLYi+hRf3TftXq1PoVgMQwOYkRdaFKoS4aO/arE6Y68Ht7SkmdfrYzFccIKGhz68xWlCm/DHj765LwTQfM9uAdM+VHk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710417112; c=relaxed/simple;
+	bh=+YGwuRBObJ7WrUrBwf/tQnCLPpCYGAUuzvOnIeVSL8I=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=EzvV3CmpLDuZ66ds39Ew76NcXDAk3AspXp/o8k+YIAE6j+6AToKmvPAUrdISm/zCdb2IbbmRjl2qAuas7x/aa9wt/rVj2OBx+mc0vCCEbmSiGePXEoJFq893zIX+43O4n8Yz9ZwNvGM8YlUm75eIGEXsmVffkgSwR/ETEujEkHM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Dz4kb4ps; arc=fail smtp.client-ip=40.107.93.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="b3QpCRDd"
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-513173e8191so1251430e87.1
-        for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 04:31:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1710415914; x=1711020714; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yz8VDnDE+R4/3GaE6xKTtBRvYNqP8oWy3j0hIR9rH5E=;
-        b=b3QpCRDdoxwdRsV9oSzu0fZi3C+pHpLaaTUZ9c5PPYB7wJu1sAPGLcpn5o6tbQpRLG
-         zYqoJNSp9maNHq2S5Vbik5YgHPINvRskzUZ6iteaQom05noD0LE93dWHPrjRGttENsZv
-         4AbwJ5U8XQBdfZhT4neaFSE0REVmWR4dgAP9A=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710415914; x=1711020714;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yz8VDnDE+R4/3GaE6xKTtBRvYNqP8oWy3j0hIR9rH5E=;
-        b=r+W0aWR5MCtlkSAGIN2F32bZimoHYttyzYMg/NnfOKjWamQqKeGQMymxKwky64QTW8
-         mzc8GvsCnoyqyXIBy1eFWRiwxKojrAq5xJmKnSPj0jID07Zd3yeT5QDPXbTxjFzyP+YY
-         TamZI01qwuuCIMBrDUmP3A5X+tmcqKYUqRIoM/ho3gCnFU5mh1G22iByBEjAf1UPJMLJ
-         CKBGAAWr3x+3ZvVJmt0OyQU76DA+aDwPAS6bpuHrD0jaG6J0Wo8e28OdHLsDY30E76nR
-         Vifo5jNXurI6NypTUULbJNj+xsuiW+OSUpapGo8k185T3m4dZEzTmuepNj5C/EAIcqMc
-         //6w==
-X-Forwarded-Encrypted: i=1; AJvYcCW8Oon7NuE9XSE6x4ih/YksHhd65QyaGOiXGYGzblHIHM6w6cCLGz48BfnGZUFmQ63Ao++5qQc0U/TFrhcINfG6DxMyei7q
-X-Gm-Message-State: AOJu0YwQnhamfD/Q6rNhdhZ0Xijsa5AAT6IzKnbrjp2ClYpjTEBOQPIC
-	uCIkPGzNKszYqb3ct6EsvEEL+wKQuDTKlBx1rA++9BxDRs7F9bHCfbRaSrqadsoUhlqXnvpfiF+
-	jzaKJmTP7DlHfIbH3b5BenvnM1jDL/Ov5hmon
-X-Google-Smtp-Source: AGHT+IEErLnsUpPSn5OuQW0nErSoEkxGmLTnTNLjr47z9ypWv0NCJP0c5okv782N6eOZdUJQb14YhAgzE39EMvVWqU0=
-X-Received: by 2002:ac2:4acd:0:b0:513:cf5a:f872 with SMTP id
- m13-20020ac24acd000000b00513cf5af872mr828006lfp.69.1710415913826; Thu, 14 Mar
- 2024 04:31:53 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Dz4kb4ps"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RLme0Va0b9oWzI8fqK+5tlBFPqJo7J8iUPFP7eeJXgqtA0vBe4KjVuLMvSV9UmuNtm2XVlLzq3VkrnoPIQvW5ajKJapnzkNiEkHdDpZrivpHRGBkIF3GjM1qJ3IwilCspGXWLAvQUoxpW4xqaPaWXRalHYoDdgxjyZg5B+k1MdSvb04B00WLXW5KtWQoFGNLab/EocBKWCE8CIZMUI6FVa/e8iwU/joZlFXQI0SVzT07JQrRCTYxgI5m+S0d/0dhxafLuyZ1zstsHwKUtaWNo2gZ2ppICfsV/IRZ8JW4Sh0fHMURvkeXwc0ZrB7nI7RUN4ti2VzQ/3HN72BbXglcRQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0R5C9HvTm5nWMo1LvD/6YeJMx3C5f2h0XRv8b/3T3PY=;
+ b=SDLl1bEm7hZ9ZCR7HqrdaJdE1QLKc9gRG62B05r76C6EYdMjdJaZIzwMjpZlADn2Ash/niDRETUMu+8T/u1rM3mGvtrI2y0fT+/nJVBgdYKi8QMFIvULDvNcW+g0TpBVeDSp7XvBdA4G6/DuRCKfrETf9+vbwpOBDPkpLLVjDokSmlrbw8v01FgrCbnSZBgKMd7+9yJpgH0cayd9n7cQPL8OjRn4HSshZQ4/krfunW7mEmIJK5lIsPj6I60oY0dGe9dhuqQDrtG9cykJmffBu3maMyQs8EImMAVGZogh93dPpC8fOfiWu7Fd6HzbWvRXYxZqAMBSBGy6cQ/JeTkhQg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0R5C9HvTm5nWMo1LvD/6YeJMx3C5f2h0XRv8b/3T3PY=;
+ b=Dz4kb4psZqxgG8lPo/J3lnNhZo5PbOiKsAKbyQ8qKe789eTJOzPnIR2CnvbPCvrzmlrw+oyBb8zXUlz4FaAJsHk3v9lO/jhgXM/iw2AFnV8cdTcX5itEkOjgMOKxdQAz+L0g8a42/o/zEho2IVY7X2Glu/bdLjC7vrubrzfw2ns=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+ by DM6PR12MB4233.namprd12.prod.outlook.com (2603:10b6:5:210::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.20; Thu, 14 Mar
+ 2024 11:51:47 +0000
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::f2b6:1034:76e8:f15a]) by PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::f2b6:1034:76e8:f15a%6]) with mapi id 15.20.7386.017; Thu, 14 Mar 2024
+ 11:51:47 +0000
+Message-ID: <985fd7f8-f8dd-4ce4-aa07-7e47728e3ebd@amd.com>
+Date: Thu, 14 Mar 2024 12:51:40 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 0/8] KVM: allow mapping non-refcounted pages
+Content-Language: en-US
+To: David Stevens <stevensd@chromium.org>
+Cc: Sean Christopherson <seanjc@google.com>,
+ Christoph Hellwig <hch@infradead.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Isaku Yamahata <isaku.yamahata@gmail.com>,
+ Zhi Wang <zhi.wang.linux@gmail.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20240229025759.1187910-1-stevensd@google.com>
+ <ZeCIX5Aw5s1L0YEh@infradead.org>
+ <CAD=HUj7fT2CVXLfi5mty0rSzpG_jK9fhcKYGQnTf_H8Hg-541Q@mail.gmail.com>
+ <72285e50-6ffc-4f24-b97b-8c381b1ddf8e@amd.com> <ZfGrS4QS_WhBWiDl@google.com>
+ <0b109bc4-ee4c-4f13-996f-b89fbee09c0b@amd.com> <ZfG801lYHRxlhZGT@google.com>
+ <9e604f99-5b63-44d7-8476-00859dae1dc4@amd.com> <ZfHKoxVMcBAMqcSC@google.com>
+ <93df19f9-6dab-41fc-bbcd-b108e52ff50b@amd.com> <ZfHhqzKVZeOxXMnx@google.com>
+ <c84fcf0a-f944-4908-b7f6-a1b66a66a6bc@amd.com>
+ <d2a95b5c-4c93-47b1-bb5b-ef71370be287@amd.com>
+ <CAD=HUj5k+N+zrv-Yybj6K3EvfYpfGNf-Ab+ov5Jv+Zopf-LJ+g@mail.gmail.com>
+From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+In-Reply-To: <CAD=HUj5k+N+zrv-Yybj6K3EvfYpfGNf-Ab+ov5Jv+Zopf-LJ+g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR5P281CA0005.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:f2::18) To PH7PR12MB5685.namprd12.prod.outlook.com
+ (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240229025759.1187910-1-stevensd@google.com> <ZeCIX5Aw5s1L0YEh@infradead.org>
- <CAD=HUj7fT2CVXLfi5mty0rSzpG_jK9fhcKYGQnTf_H8Hg-541Q@mail.gmail.com>
- <72285e50-6ffc-4f24-b97b-8c381b1ddf8e@amd.com> <ZfGrS4QS_WhBWiDl@google.com>
- <0b109bc4-ee4c-4f13-996f-b89fbee09c0b@amd.com> <ZfG801lYHRxlhZGT@google.com>
- <9e604f99-5b63-44d7-8476-00859dae1dc4@amd.com> <ZfHKoxVMcBAMqcSC@google.com>
- <93df19f9-6dab-41fc-bbcd-b108e52ff50b@amd.com> <ZfHhqzKVZeOxXMnx@google.com>
- <c84fcf0a-f944-4908-b7f6-a1b66a66a6bc@amd.com> <d2a95b5c-4c93-47b1-bb5b-ef71370be287@amd.com>
-In-Reply-To: <d2a95b5c-4c93-47b1-bb5b-ef71370be287@amd.com>
-From: David Stevens <stevensd@chromium.org>
-Date: Thu, 14 Mar 2024 20:31:42 +0900
-Message-ID: <CAD=HUj5k+N+zrv-Yybj6K3EvfYpfGNf-Ab+ov5Jv+Zopf-LJ+g@mail.gmail.com>
-Subject: Re: [PATCH v11 0/8] KVM: allow mapping non-refcounted pages
-To: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-Cc: Sean Christopherson <seanjc@google.com>, Christoph Hellwig <hch@infradead.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
-	Isaku Yamahata <isaku.yamahata@gmail.com>, Zhi Wang <zhi.wang.linux@gmail.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|DM6PR12MB4233:EE_
+X-MS-Office365-Filtering-Correlation-Id: b72d2beb-2126-48f6-2324-08dc441d20ad
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	zNBGcOLLGvGOMkQUDLBwq4UCe+m7fKDsLtQXkDBTjyN6SX6VJ2CPjniSyGrCmOkw7oasOoTndh8Y6SJevdHVWRgCuUuMcSTi769wH4Fypat4WCogKAezOyVeKRMll0iha4dZ68IQBhUBxdQYhGgi/K3v4i2HpY/iY2aK1cmn9UeyHo9kI8x8HE0BHW3My3xll76kk+JJn6w0acGGF5NtOZ+R7dlyInOeVnt+S2rRAbOZ6x6bmOdZ3+nFUGNGRe3b2UhXm06i3c9ICtV45oQRq0X8HCIdiL/p3nV3TiaVo5bGOBkEjlSCH3qvWaDp59xEXDT+B3+gEvJlMVzhVEjzVcmbMsbIaOfXoE2A20OBkJ7645HsrjjvfY2UetpU0mF+XGXX+X5ucLqyT/ZqFmbVMgwYrf5X8Lin4xXsjZjs1acShGx/3JSHWcrfCnhHegh1TvZCLSOJJpmeC1JRfEUGm4MM39Q7ohKei+ihRAdZVeKaPveIyoTN2C0mIAvtnmwpPQde1foq3mVh3/N6ZNMMMVPqtZP3B6cbBmWEE+/dlitYuBnLj5kyzSJemWfs6kcUIZu5pbyWYicBcrJyK3CSV9GRuqBu6aJ3y+hfn06mGho=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TXo5RnIxa0c3S2VtRC9Cb1grdDcxYUpOeFBpSlFqMTY2d0dMWithZGdyaWZJ?=
+ =?utf-8?B?c0twMUtIeUlQZkgxYzF3akd2dmcrNTBiU0E4TmxybGFtdnZybWpReEZBWlR2?=
+ =?utf-8?B?c3lFeW9LK2NqVEdmNHYybXh0R1Vtbi8vanZGM3dzNWFZd0J2M0VsaExSYTUv?=
+ =?utf-8?B?K0lLdGM1YnNnYmo5SHJnL0FZemJpK1llY2sreGQwSTViNVBIUjE4NkFpNG1o?=
+ =?utf-8?B?YzZyWE9LVVkxc3VrdnJvRkIyUkV5VFVhejg3czcvQ3MrVmo5VE9MQTVQd3lK?=
+ =?utf-8?B?akJlYXVLN0YrRHJ5UXovWUtORFZGYmtxWERlUlBQTUhJdDlOL2F6UStmNCsy?=
+ =?utf-8?B?cUU0Y0NCWkswT2xIVU94WElhN25UbnEwaVlzYXBvaGRaQThzcmt6bUdrQXJq?=
+ =?utf-8?B?SDVKUmkwNWlpY1FXVTRHZUdJRkZoTldkWE9VelNmaStPTDV4bzJlYzNqRzIw?=
+ =?utf-8?B?NlArb3JnTVpadzRSM1I5eWZtckkvb1lhY1hWTWtibTZWcW52bm5rbVlPczlw?=
+ =?utf-8?B?R0poTTRVVlpkVWRCZmhIZlVhQjZZemIwaThiWCtrbzFnM2ZqUUdtQXR2TUZV?=
+ =?utf-8?B?dm0rMDg3U2RLUFVzb1VraWxuOFh2V1hkQTZmdnF2czJoT29pQUM4MGlqejNI?=
+ =?utf-8?B?RTlyZjJ3Zm1HanlGb25FV2U1YnBncFZXU0kycmpBUlhpUk5sSGFiRW1sSjFN?=
+ =?utf-8?B?bm5BTmpyMFR2Z0FjMnBBZUtWeDBvenNCK2ErSnVHL01UWVpNc0xRNjJtd2ZG?=
+ =?utf-8?B?TzAxcVFhMkE5aUdIOTdlcGE4NDZiNDQwNm5xSTVLRlcxWVRqZDNEUG9NTk03?=
+ =?utf-8?B?WDg1SEJyWWsvTCt6b3FFMjlhY1VSbGxHWFVjbG5NUHhjdXRiSm9HOVAxbWxm?=
+ =?utf-8?B?clcwS3FhRFZ2dmw4Mld4N2dxQ254OVFScGN0MXdQUnhiTDRJMFZwVkJWWExq?=
+ =?utf-8?B?Nk9WUCtpRW1PdW4rY2RBdlRjVExnOE1TdlpBVXY5TEZLd0RKcFdXek5GZ2JL?=
+ =?utf-8?B?ZVlycG1ib2o1UnJiYlNYK3QvTFVXY1FBUmJhdW1EYngzN0tDYW9weVJabEQv?=
+ =?utf-8?B?UWZCK1lLSGdQMFgrM21QczYvbXJqZUVKMDdMUGlBNURvMmJFNlFwUjB6enE1?=
+ =?utf-8?B?OEdPSkVMRFZrbVBXZWN6Y0cxR1lrSEZJamYzMzNta0FybUJsenhSYXNRVEk0?=
+ =?utf-8?B?amRQZUVWN0Y4a1c3SHBnVjk1NW42MUFGcmREcmRsWHBYSldDQlFidDNVRk1H?=
+ =?utf-8?B?cFcwQTFXbDhWc1oybkxPNFFCUU5XdC92YmYxbjZKN2QySlgyVnJIU2NRdDVP?=
+ =?utf-8?B?WXM4dVBqMG9ERGhRYmdjMjMvZEhRWWgvUmVGUCtNYTA3NVJjRElHMzArbCs0?=
+ =?utf-8?B?dnZadXBLeHZ6Z3V0cDBLSlozdkxyUVJFdnBRUmNoZVdpRExqZTd4UERVdGlT?=
+ =?utf-8?B?L1hEYzRZUGU3VTJvTDVGZnBtZ2NpZUpHcVZDMmJSeTc5UzVPMmpQakUrS2JT?=
+ =?utf-8?B?bWIrdDN5c1l0NjJiRSt3NEZBQ3FyT2kwSVVITHpBak5RZ1hjb1JNQjRIbElo?=
+ =?utf-8?B?czBPOGRTTE1XdUpWTXczSWRMQ3Zwb2lhZy9xRWQwWHZQamJsbWIweWRqNWlG?=
+ =?utf-8?B?MS9xQU1nRVdaNkNCSUNsQXQ0N3dmUXhteDBuTmpXdFJCZ1dGL3dVQytRRHVk?=
+ =?utf-8?B?OW5ydHZESmxMMXJiaFBrMVRtQys4S0paU3p4WjdoZ1JsYmpMR2ppYTlSWGhJ?=
+ =?utf-8?B?SHVSVDBCOSs1WUVzaE1OVmJZWWtFdkJYc0RDa1N0QjJ1cU1MODhvSXROelJy?=
+ =?utf-8?B?RkZMaWxodHpZdE1XdHYyVkpOY0RJTVo4Vm9BUlJidmJIeUNCczViNG1PVDFL?=
+ =?utf-8?B?M0ZndU1qM0NCT2ZLQTdVT1Bjb3JrYmtPQUhuVTFleFJPY3o5WEhDOHl1OGN1?=
+ =?utf-8?B?SHRpV3k4RzdqRElyRURzMldUYjJJMlJoWkdtaWp2RVE5NFBWNURKa2lHY2lQ?=
+ =?utf-8?B?dkpZVWxmSURFVmFzNDhsUEhFWkE0NDBrM3B0VUhMb2ZpYm40a2NEYXlLZ2Mr?=
+ =?utf-8?B?TUVEWEhnL3ptLzRDNkp1WkI1eHhTdTlpbzZKVHI2cUU1RlNMQnRwS3FPYmJE?=
+ =?utf-8?Q?KoYK/NORlT5zWVSC63TliCpL6?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b72d2beb-2126-48f6-2324-08dc441d20ad
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2024 11:51:47.5023
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zCIbB9ekzAUTinHRPMjzBcS5Bsh7QUNjcxd1cF7aHyITg0Cdm1o7jtVCM1ZUMv5X
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4233
 
-On Thu, Mar 14, 2024 at 6:20=E2=80=AFPM Christian K=C3=B6nig
-<christian.koenig@amd.com> wrote:
->
-> Sending that out once more since the AMD email servers have converted it
-> to HTML mail once more :(
->
-> Grrr,
-> Christian.
->
-> Am 14.03.24 um 10:18 schrieb Christian K=C3=B6nig:
-> > Am 13.03.24 um 18:26 schrieb Sean Christopherson:
-> >> On Wed, Mar 13, 2024, Christian K=C3=B6nig wrote:
-> >>> Am 13.03.24 um 16:47 schrieb Sean Christopherson:
-> >>>> [SNIP]
-> >>>>> It can trivially be that userspace only maps 4KiB of some 2MiB piec=
-e of
-> >>>>> memory the driver has allocate.
-> >>>>>
-> >>>>>> I.e. Christoph is (implicitly) saying that instead of modifying KV=
-M to play nice,
-> >>>>>> we should instead fix the TTM allocations.  And David pointed out =
-that that was
-> >>>>>> tried and got NAK'd.
-> >>>>> Well as far as I can see Christoph rejects the complexity coming wi=
-th the
-> >>>>> approach of sometimes grabbing the reference and sometimes not.
-> >>>> Unless I've wildly misread multiple threads, that is not Christoph's=
- objection.
-> >>>>   From v9 (https://lore.kernel.org/all/ZRpiXsm7X6BFAU%2Fy@infradead.=
-org):
-> >>>>
-> >>>>     On Sun, Oct 1, 2023 at 11:25=E2=80=AFPM Christoph Hellwig<hch@in=
-fradead.org>   wrote:
-> >>>>     >
-> >>>>     > On Fri, Sep 29, 2023 at 09:06:34AM -0700, Sean Christopherson =
-wrote:
-> >>>>     > > KVM needs to be aware of non-refcounted struct page memory n=
-o matter what; see
-> >>>>     > > CVE-2021-22543 and, commit f8be156be163 ("KVM: do not allow =
-mapping valid but
-> >>>>     > > non-reference-counted pages").  I don't think it makes any s=
-ense whatsoever to
-> >>>>     > > remove that code and assume every driver in existence will d=
-o the right thing.
-> >>>>     >
-> >>>>     > Agreed.
-> >>>>     >
-> >>>>     > >
-> >>>>     > > With the cleanups done, playing nice with non-refcounted pag=
-ed instead of outright
-> >>>>     > > rejecting them is a wash in terms of lines of code, complexi=
-ty, and ongoing
-> >>>>     > > maintenance cost.
-> >>>>     >
-> >>>>     > I tend to strongly disagree with that, though.  We can't just =
-let these
-> >>>>     > non-refcounted pages spread everywhere and instead need to fix=
- their
-> >>>>     > usage.
-> >>> And I can only repeat myself that I completely agree with Christoph h=
-ere.
-> >> I am so confused.  If you agree with Christoph, why not fix the TTM al=
-locations?
-> >
-> > Because the TTM allocation isn't broken in any way.
-> >
-> > See in some configurations TTM even uses the DMA API for those
-> > allocations and that is actually something Christoph coded.
-> >
-> > What Christoph is really pointing out is that absolutely nobody should
-> > put non-refcounted pages into a VMA, but again this isn't something
-> > TTM does. What TTM does instead is to work with the PFN and puts that
-> > into a VMA.
-> >
-> > It's just that then KVM comes along and converts the PFN back into a
-> > struct page again and that is essentially what causes all the
-> > problems, including CVE-2021-22543.
+Am 14.03.24 um 12:31 schrieb David Stevens:
+> On Thu, Mar 14, 2024 at 6:20 PM Christian König
+> <christian.koenig@amd.com> wrote:
+>> Sending that out once more since the AMD email servers have converted it
+>> to HTML mail once more :(
+>>
+>> Grrr,
+>> Christian.
+>>
+>> Am 14.03.24 um 10:18 schrieb Christian König:
+>>> Am 13.03.24 um 18:26 schrieb Sean Christopherson:
+>>>> On Wed, Mar 13, 2024, Christian König wrote:
+>>>>> Am 13.03.24 um 16:47 schrieb Sean Christopherson:
+>>>>>> [SNIP]
+>>>>>>> It can trivially be that userspace only maps 4KiB of some 2MiB piece of
+>>>>>>> memory the driver has allocate.
+>>>>>>>
+>>>>>>>> I.e. Christoph is (implicitly) saying that instead of modifying KVM to play nice,
+>>>>>>>> we should instead fix the TTM allocations.  And David pointed out that that was
+>>>>>>>> tried and got NAK'd.
+>>>>>>> Well as far as I can see Christoph rejects the complexity coming with the
+>>>>>>> approach of sometimes grabbing the reference and sometimes not.
+>>>>>> Unless I've wildly misread multiple threads, that is not Christoph's objection.
+>>>>>>    From v9 (https://lore.kernel.org/all/ZRpiXsm7X6BFAU%2Fy@infradead.org):
+>>>>>>
+>>>>>>      On Sun, Oct 1, 2023 at 11:25 PM Christoph Hellwig<hch@infradead.org>   wrote:
+>>>>>>      >
+>>>>>>      > On Fri, Sep 29, 2023 at 09:06:34AM -0700, Sean Christopherson wrote:
+>>>>>>      > > KVM needs to be aware of non-refcounted struct page memory no matter what; see
+>>>>>>      > > CVE-2021-22543 and, commit f8be156be163 ("KVM: do not allow mapping valid but
+>>>>>>      > > non-reference-counted pages").  I don't think it makes any sense whatsoever to
+>>>>>>      > > remove that code and assume every driver in existence will do the right thing.
+>>>>>>      >
+>>>>>>      > Agreed.
+>>>>>>      >
+>>>>>>      > >
+>>>>>>      > > With the cleanups done, playing nice with non-refcounted paged instead of outright
+>>>>>>      > > rejecting them is a wash in terms of lines of code, complexity, and ongoing
+>>>>>>      > > maintenance cost.
+>>>>>>      >
+>>>>>>      > I tend to strongly disagree with that, though.  We can't just let these
+>>>>>>      > non-refcounted pages spread everywhere and instead need to fix their
+>>>>>>      > usage.
+>>>>> And I can only repeat myself that I completely agree with Christoph here.
+>>>> I am so confused.  If you agree with Christoph, why not fix the TTM allocations?
+>>> Because the TTM allocation isn't broken in any way.
+>>>
+>>> See in some configurations TTM even uses the DMA API for those
+>>> allocations and that is actually something Christoph coded.
+>>>
+>>> What Christoph is really pointing out is that absolutely nobody should
+>>> put non-refcounted pages into a VMA, but again this isn't something
+>>> TTM does. What TTM does instead is to work with the PFN and puts that
+>>> into a VMA.
+>>>
+>>> It's just that then KVM comes along and converts the PFN back into a
+>>> struct page again and that is essentially what causes all the
+>>> problems, including CVE-2021-22543.
+> Does Christoph's objection come from my poorly worded cover letter and
+> commit messages, then?
 
-Does Christoph's objection come from my poorly worded cover letter and
-commit messages, then? Fundamentally, what this series is doing is
-allowing pfns returned by follow_pte to be mapped into KVM's shadow
-MMU without inadvertently translating them into struct pages. If I'm
-understand this discussion correctly, since KVM's shadow MMU is hooked
-up to MMU notifiers, this shouldn't be controversial. However, my
-cover letter got a little confused because KVM is currently doing
-something that it sounds like it shouldn't - translating pfns returned
-by follow_pte into struct pages with kvm_try_get_pfn. Because of that,
-the specific type of pfns that don't work right now are pfn_valid() &&
-!PG_Reserved && !page_ref_count() - what I called the non-refcounted
-pages in a bad choice of words. If that's correct, then perhaps this
-series should go a little bit further in modifying
-hva_to_pfn_remapped, but it isn't fundamentally wrong.
+Yes, that could certainly be.
 
--David
+> Fundamentally, what this series is doing is
+> allowing pfns returned by follow_pte to be mapped into KVM's shadow
+> MMU without inadvertently translating them into struct pages.
+
+As far as I can tell that is really the right thing to do. Yes.
+
+> If I'm understand this discussion correctly, since KVM's shadow MMU is hooked
+> up to MMU notifiers, this shouldn't be controversial. However, my
+> cover letter got a little confused because KVM is currently doing
+> something that it sounds like it shouldn't - translating pfns returned
+> by follow_pte into struct pages with kvm_try_get_pfn. Because of that,
+> the specific type of pfns that don't work right now are pfn_valid() &&
+> !PG_Reserved && !page_ref_count() - what I called the non-refcounted
+> pages in a bad choice of words. If that's correct, then perhaps this
+> series should go a little bit further in modifying
+> hva_to_pfn_remapped, but it isn't fundamentally wrong.
+
+Completely agree. In my thinking when you go a step further and offload 
+grabbing the page reference to get_user_pages() then you are always on 
+the save side.
+
+Because then it is no longer the responsibility of the KVM code to get 
+all the rules around that right, instead you are relying on a core 
+functionality which should (at least in theory) do the correct thing.
+
+Regards,
+Christian.
+
+>
+> -David
+
