@@ -1,57 +1,57 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164484F1F8
-	for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 23:27:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED8D524A5
+	for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 23:27:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710458822; cv=none; b=inyvQdzH9oph9yEzDz78bkjbHRwv08yHxadrD7H4nIkWAYE9QKToB1psniCvWQXYtIfFIgoTNMqgkdIy3CCCdQ/w7rgqoLNjP5t+JuvTXPF5+5lT8Z2wK3ziuxXTPtkY3aoLZdQl+KH+n+yxHB7TBL3nhQiCbYTzddXHpMGCTWM=
+	t=1710458824; cv=none; b=ic7Qvr9TnZ3+QgbIIdOLzVDecrXs29suTVcHxvhWHPr9Z1kHmc7f3Hsn9uDP3EiK+p8ci/qv3clL0JKeddV2E20jxAJX6lb+w/2BBUGKN+8sCzIT4CKSTDei25t2CwDhY+ddvJ6Ft/agScnWcxpxAj+O39oke7yQqEg7zLammwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710458822; c=relaxed/simple;
-	bh=AqTYa7MHtMGSvPyMPSqX9mCVN3CkOd0u5L3U2bv1DqM=;
+	s=arc-20240116; t=1710458824; c=relaxed/simple;
+	bh=UQIrurCe0zuaeY9y89rSu7jemDgb1Rydb7LX7x9KcOM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Xo2guBwpgIkDKS7Fec9bYKmROZpiAbzpVNSWiAZUaLiF2/1ezZCdH8IEuP2TNrPO0ABG9EIcRwfd5z7hhYJc2u53bvvSB+WGK5nfD5lY1isXqj1glbUmK1n5YChPefhwnRVpUapr0iBnpjKLhmHWE5aGmWefPWD1amDhUmu7SA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I6j8AwR6; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=twfVdQVTTWUAeZr1k9zOrbuPSzyoe1JgJgvtVbYNsMTNeMRKuW7Iw1OWGCpjilTv/LcpL0PMjW+701p5GAzEKdWJz3/+FKJnk147FSKGuWjgcCDSEw9wggevIKY0ww4tiM0lvcj4EZv4bdUWV5S5hV7gdku2iuDXxQKAYVt19HY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PbixjOzz; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I6j8AwR6"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbf618042daso2233784276.0
-        for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 16:27:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PbixjOzz"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-29df49083afso48158a91.0
+        for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 16:27:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710458820; x=1711063620; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1710458822; x=1711063622; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=j/j/mb3JtyoyPDhLhkSAITq95aQFSMlle8Dlg66amAk=;
-        b=I6j8AwR63q+WIajXOH3QqRrQDUg9xXpn5vwDdBma3fv1iwigLRzKs1HZurWBvZ5MPW
-         LRWOHmNz9f0hlaZ5fELM3Vx2qIhsgdPzz8/ko5NYietft2jn3XDPscaoc0l64NgLdLZc
-         FLQn8+lY2vRQXnK+pFEKOjPsYjwR+S7XTomL5/B5MttmG+TXSIXTxsqCSlSWK/+ewlFT
-         i96Awqi1YQzwNh8ApGlO29GNQotbm+Ouvyz5CeYC+8d0l9tNISCgRN0YDMw/RjJRAuew
-         yauKT+6FFuanMc1xjvWfIRUuTIJ6NXfadu5YolLABeM/iUhl8P1zagJ1J/bjWce4vnru
-         fmoQ==
+        bh=uvANWFYN1jpIYLHOo6AYUHWQUhBZT4UdCnC51A9DHBc=;
+        b=PbixjOzz5Ep7gmx6U0O0jUWBYSmfRZJ9muBqYPDCVwngbHlMsdUBNCfcPV235q6TQv
+         yaLr/o/Rxvz/zh8Op+70mtczt4L35lvH9vKZbUSqSG0qHV8SplNMhmUa8nGqgsh2Ka0d
+         YUGrufYvoBir6L0u6wQVrjdXBs1+V6zDU5QCfMQ0wVgT2PWT9vb9ZsjB1xlP1ElcMcWo
+         EBhxCVZ1LH0B+OorRsikXVdXFE+g9oXgq3B5+tXf8+voGma/MPk51SzI7q1KJFjO9kuu
+         7i8EFCrNmK6bvySYvTbkvr72WnOwE//LfxuhHutheR7aPL7pd7CX7YJ21npM+GMX0NdF
+         jtwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710458820; x=1711063620;
+        d=1e100.net; s=20230601; t=1710458822; x=1711063622;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=j/j/mb3JtyoyPDhLhkSAITq95aQFSMlle8Dlg66amAk=;
-        b=LldzvJGWMr8FhCz9TecTIDr9xfJ9jMw4A1QHPnIJ7bYoqI/2itxt5kuAxxm/y9Hi2x
-         uZRlp+ErpaFhYgH89PbvO17OBOFFtZm5IQXSrhxUkMLAwT2aKxeaR0SYxm7+L8F6CZ+w
-         l2iP7OqCQOki0KL3FknwSiTni0lAW4sbvJiap/namLMxojBH3MTTFcZXpEhIMzyJY0BE
-         GXFEV9A5EheLpqRY3YBM6cZ1qJwlDEo4Z73VbzC9bBuaD97q7PuRK9reyBI91lNu6bko
-         fT1J+DMeihVaE+2Kg8cUO5ATHTAsjvTuTSC47FeOPO9luUfG1qDDu6xlfKCu2+yPZ2aP
-         Jl+w==
-X-Forwarded-Encrypted: i=1; AJvYcCX7TvebwzuCE9qofAi5izhbIEcyJoEDA3EUmGrrMeLIrh3T/rpdKYOUGsitsh87yEC/yvI17tQ0rJfEqZT0XdBKE66vOant
-X-Gm-Message-State: AOJu0YwOaeYn92AcLCmSuHPng00KAlnl0RDOGbqnfWQR0zx4+jU4mal5
-	6ZBboEnlQ1qmY06Lc7VKfXF5SiVul83JuagPkB4rcPPrg8lQ9U46CpSmaPSoVrzU2JWVQ5XccK7
-	28g==
-X-Google-Smtp-Source: AGHT+IEgFldUzAavXJ42YJM5+Q6BHlgBbuisK5vIFOhA5ma+0WFPVDRLg0oxmN/Zi21+BucUmJd5KHT651s=
+        bh=uvANWFYN1jpIYLHOo6AYUHWQUhBZT4UdCnC51A9DHBc=;
+        b=YOKbYFIoKIAvjpSk/MpAYnY4+H6ank34DWsLwt3qJoiBVlhyLiLV5ay1eND83vSgom
+         N5I2IJ6OQoaHXSVOZyRmHk96GSzDpFsGm9mphiBsgrrvZaLeceqe3uEZm0rRadpt1I2j
+         TMe9eQvlQUZ5XaTKIQj6an5bpRaWMdF32F1Mkcs1ytmTsPtBal/cGND3HQqGVF/Hsgk8
+         96fMq9w+DT/ttRaFupv61OPd2COCSxelWNIUQByTWKzfyQf8wfWjxMiSpFqCUxoicth+
+         AcbkQ2EyLR1G8Og9YEhqR1ttChu67yuT06V62h0EwJpP2v4582Tgo7BiF9FK6elvvORQ
+         WUwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVg8KqU6y15i1BDy3cKVqZA9SRlG3y32P06xcXKvhHWLHm8acHQSGufIAVxklssrY0xx7swzh7JiS67N2nezb9Ef7zD0Le5
+X-Gm-Message-State: AOJu0YzsHPFKqJF0eV8f/QafP8LSQu99H7f/gfht4PA8S5sCafvCfrDD
+	Hs02LOwhTlvcyeHoDt2yG2RY2NVZjb8+/WE7arZbENmHdTCoS6240pfPAocxpdXAkiIKQNHS1X6
+	fJQ==
+X-Google-Smtp-Source: AGHT+IEmqFL1IXL1pIFLbyp7eKBr0s6FFOiXRR1g8DgzlSysrKWmAergLMAyluCim6XJlXtnyauxch/eeT4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:72e:b0:dcc:94b7:a7a3 with SMTP id
- l14-20020a056902072e00b00dcc94b7a7a3mr183110ybt.12.1710458820208; Thu, 14 Mar
- 2024 16:27:00 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90b:b07:b0:29c:6d5f:a6a8 with SMTP id
+ bf7-20020a17090b0b0700b0029c6d5fa6a8mr8117pjb.0.1710458822156; Thu, 14 Mar
+ 2024 16:27:02 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 14 Mar 2024 16:26:30 -0700
+Date: Thu, 14 Mar 2024 16:26:31 -0700
 In-Reply-To: <20240314232637.2538648-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240314232637.2538648-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.291.gc1ea87d7ee-goog
-Message-ID: <20240314232637.2538648-12-seanjc@google.com>
-Subject: [PATCH 11/18] KVM: selftests: Map x86's exception_handlers at VM
- creation, not vCPU setup
+Message-ID: <20240314232637.2538648-13-seanjc@google.com>
+Subject: [PATCH 12/18] KVM: selftests: Allocate x86's GDT during VM creation
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
@@ -77,35 +76,38 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Ackerley Tng <ackerleytng@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Map x86's exception handlers at VM creation, not vCPU setup, as the
-mapping is per-VM, i.e. doesn't need to be (re)done for every vCPU.
+Allocate the GDT during creation of non-barebones VMs instead of waiting
+until the first vCPU is created, as the whole point of non-barebones VMs
+is to be able to run vCPUs, i.e. the GDT is going to get allocated no
+matter what.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/lib/x86_64/processor.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ tools/testing/selftests/kvm/lib/x86_64/processor.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 5813d93b2e7c..f4046029f168 100644
+index f4046029f168..8547833ffa26 100644
 --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
 +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -552,7 +552,6 @@ static void vcpu_init_descriptor_tables(struct kvm_vcpu *vcpu)
- 	sregs.gdt.limit = getpagesize() - 1;
- 	kvm_seg_set_kernel_data_64bit(NULL, DEFAULT_DATA_SELECTOR, &sregs.gs);
- 	vcpu_sregs_set(vcpu, &sregs);
--	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
- }
+@@ -518,9 +518,6 @@ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
  
- static void vcpu_init_sregs(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
-@@ -651,6 +650,8 @@ static void vm_init_descriptor_tables(struct kvm_vm *vm)
- 	for (i = 0; i < NUM_INTERRUPTS; i++)
- 		set_idt_entry(vm, i, (unsigned long)(&idt_handlers)[i], 0,
- 			DEFAULT_CODE_SELECTOR);
-+
-+	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
+ static void kvm_setup_gdt(struct kvm_vm *vm, struct kvm_dtable *dt)
+ {
+-	if (!vm->arch.gdt)
+-		vm->arch.gdt = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
+-
+ 	dt->base = vm->arch.gdt;
+ 	dt->limit = getpagesize() - 1;
  }
+@@ -644,6 +641,7 @@ static void vm_init_descriptor_tables(struct kvm_vm *vm)
+ 	extern void *idt_handlers;
+ 	int i;
  
- void vm_install_exception_handler(struct kvm_vm *vm, int vector,
++	vm->arch.gdt = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
+ 	vm->arch.idt = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
+ 	vm->handlers = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
+ 	/* Handlers have the same address in both address spaces.*/
 -- 
 2.44.0.291.gc1ea87d7ee-goog
 
