@@ -1,66 +1,67 @@
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EC8D73196
-	for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 20:24:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A09D73196
+	for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 20:24:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710447878; cv=none; b=BDq3+6NxXlyoH+HyatqCatIP+X33qB4s4ZOF2e0cLmqaXabn07LP8cTKYK5kjZfnjwoqz6l34fULIIXkSRgob4E9UdTsBEy8FhLW3I4YGphNpyDb17ZwrYZq1yCNgnjMMY8GG20g2a4szi3swKjbkOnWSh1xSCjREGjl2g7UINM=
+	t=1710447897; cv=none; b=QS0Ii64r6kZIVwBu8dGpLGLCkqzhGUHNesa6n1MEKxVfskT2718h78rCzHvmdB4yIjFWv6biKCvGfZsxeVCMGcLddLvXUvQWR1c7THm87o7tNuctgopVKQj4t8H8cTCdJL/3w4/gGiOgyKgr7fTIUGcXcIBQ+QtBwEF4cRzJokw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710447878; c=relaxed/simple;
-	bh=dGbffwfi9F8o5vKXOK784z8lOxK3B61CBLe05LF4uDg=;
+	s=arc-20240116; t=1710447897; c=relaxed/simple;
+	bh=6/Yu0QDPKynolND3gmbYFuiviBU1OTdPkmZfwvNmj30=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i/v1Omr1/vKvRUxhr8WPzvj34R5p57GqFNWWaMKzZSHGAvpRIvX4SgS36rUbnw4PQtgUT0BfGPqOUlbN+VSOdkbjajDmbww2/62wi1//cWoj7MeGaARkA/HzAxcRv6s002Qka4tZjBmd8+wsoftfez25YhFasTEZUgQSPUlnm7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bFHLNw+F; arc=none smtp.client-ip=209.85.218.45
+	 Content-Type:Content-Disposition:In-Reply-To; b=YYH0z3l2Ce1ObMJX4dXYnAYRtjvKrmUHIkKs+Ycgh6tgK3CZlmmum8O2m3OeyHvy64c41dBwL/4DVEQnALk5VmSKw30J4uGJSUDWenm4g3NCvHTgCETXW1E7H2hK+1z/WGCWbw1QUt+W6lrJAXPM2QJ9WxmsnHADm2TIzegkd8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gtVZ2TFQ; arc=none smtp.client-ip=209.85.208.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bFHLNw+F"
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a46644fee93so193006666b.2
-        for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 13:24:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gtVZ2TFQ"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2d46e25d6b9so19716521fa.1
+        for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 13:24:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710447875; x=1711052675; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1710447894; x=1711052694; darn=lists.linux.dev;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=KeVadU2hZeC83X7EyIxA1rm2PDaUR9fvRb0RDycrigU=;
-        b=bFHLNw+FgK/jlEY6a/O+0DOZq14sj5KpXIchWIB1fjSu9GErIqBiEbxxaPiZDUnsUs
-         pJiiuYvukiHv6Gg1GLIQF5j7PZ6zw2QPD6zQ9ZB55RGGSrlUhFWFFWCv2+gipcsTXgmy
-         /hKemcjN62h58dNSAItWzpU87xezRU2C7csgFHrjAEiEphOQaWlXYhSvQ/iVHYl6fN5N
-         3YDwhFUK46UCkZ1F/GBDv6CfJ+EKpz0M99mbtn+FXHTzgzAb6cW24B9ArbX+6N6blQ1m
-         a35ghDQcbrJDGuSrLZfnJEm1F4EaHwZIm3BYFjCa9efkqmiRtKLmUK9wLbIvmqIIZS0i
-         RirQ==
+        bh=xuCZTiMpeaXF4P5JXeYvn/6B04UPpdx+BA/DKeRB3B0=;
+        b=gtVZ2TFQKu3/wO/4bk85MJJYAuixclSdaCRaJo0fLhZOPveoJ4+xfM8YFp5PZj1NNy
+         p1AQHfkMnWGDaCYea/CC0vjlqAhr+3GUE/1PLdgz4tFOxjbulaxj8T/fKwLNyfue+mVH
+         V3Wkalp7sbaVJIz3c+j4gcpUIgq3aMhZDT5U1f8R/FHG3OHFVoitVO+sAB6Dt5jcCIcf
+         JQ3Tp/kCPAUZKKrkn9wvjIYiSQXyB3woruO04RMDoN9Ijsp/DJDhlAFpW/NnX0sRS2Ch
+         wlmxl71r0AlzEHXb9lT4knHIBWOxAfEWHTkrrzT62T/4Z4FayGXAGI1vNXxaeb/u1n5x
+         g4Xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710447875; x=1711052675;
+        d=1e100.net; s=20230601; t=1710447894; x=1711052694;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KeVadU2hZeC83X7EyIxA1rm2PDaUR9fvRb0RDycrigU=;
-        b=rqdUfYUdvUo0gpZe5PrYovfDinRgYZ4F6eKXe+K+A+BILZWL7JHG6zG5U1FbV1Gqmd
-         AOeVOJOZ8pYFFoUf3QGXDa5s+b/Pm1CqmCPx4vaLB67c1cRkrfNlwgrNwDsmCJdqW0Ts
-         q0LqH+8aCQ5UdXrloAUCf/bpe5/GRx9ZTeP2BsShm4lYsnMx/dm//S4nVO/A14zQWJ2N
-         hCrqZfN6frBhtHw7Hown5NIcMg00gbkvFgZKr9jRWnhA9oj+v5KVLXOdWkXOA3SeY9uM
-         qJNWLoqf4drhabhUPM3zTDTh462O3aM5nvJPkLMYnASglPEMY6SeoU8rpP4ktQty2AAZ
-         4ZWQ==
-X-Gm-Message-State: AOJu0YxDhIa279Xol308v+G9TyyKU+F0iOf0Ec9whJWiNLkhWHulkyAa
-	b1JcPMAefpUEE2iFmtwhv2yTfVlq1J5IaCDM4PoJCZTKnNMq1BguWebgNQuBxWlSDxoSoZ9rfpG
-	192dy
-X-Google-Smtp-Source: AGHT+IHucnNpHcGZETVpGOJfR1+fsfUsDKCT0Rc1DvLZfkdGAS5fojQQqY/5p5KP8nfAh80FDRV5yA==
-X-Received: by 2002:a17:906:bc56:b0:a46:5e38:29d7 with SMTP id s22-20020a170906bc5600b00a465e3829d7mr1861511ejv.10.1710447875391;
-        Thu, 14 Mar 2024 13:24:35 -0700 (PDT)
+        bh=xuCZTiMpeaXF4P5JXeYvn/6B04UPpdx+BA/DKeRB3B0=;
+        b=KwvS/ABhCBqMCjGNy7Bb+rAbF5m8YiI8M7fF+8ri/7dd5+m1TejwoBBwOj5G5mImUq
+         usg+PfHAk76vqm4SBD242sgIcmCciDGWEf2IirX9l9puOYCCrHO4IB9y5g23fx9MgRti
+         p7AvJJtboUWcKNCU1W8rNpKm+pnxqYo2++7XnRTkrdMxK9ynhMKIY8tUNXfYsmMio3+l
+         uLbuxqV31kObf3GIsvNIZjhDpA4339iSkAVbXvmpaljjI/qgux18aDQb5kg8rmqj0IXD
+         Ivky9u4KUQye1CqpER4uWq+xHV3Zo997+GNJSwoD61/TCYuN8ekDlrRscZnIOwVaHV7y
+         PrWg==
+X-Gm-Message-State: AOJu0Yz/aPhIOO3hcPagW8RgwaUCFkCFwFJC5N5E683vSG87yhsjOtg1
+	jJk1lojiuEPp64jiiV2q+HYMjc+oYz/zl+vc/hHQ0XpM/ujp5qCw+2RRbs2RV2boeNxOhTyl1Ix
+	u3fF7
+X-Google-Smtp-Source: AGHT+IGdzgal9d7jECsheAve01ljHpLhiGK1mtn9v3Osy56JhBtqA4ZSO+j/CgBHoCEF6ku+b5RVYA==
+X-Received: by 2002:ac2:4ed1:0:b0:513:caa7:3773 with SMTP id p17-20020ac24ed1000000b00513caa73773mr867447lfr.63.1710447893822;
+        Thu, 14 Mar 2024 13:24:53 -0700 (PDT)
 Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
-        by smtp.gmail.com with ESMTPSA id vi2-20020a170907d40200b00a45c8b6e965sm1012429ejc.3.2024.03.14.13.24.34
+        by smtp.gmail.com with ESMTPSA id jy5-20020a170907762500b00a4675490095sm746999ejc.42.2024.03.14.13.24.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Mar 2024 13:24:35 -0700 (PDT)
-Date: Thu, 14 Mar 2024 20:24:31 +0000
+        Thu, 14 Mar 2024 13:24:53 -0700 (PDT)
+Date: Thu, 14 Mar 2024 20:24:49 +0000
 From: =?utf-8?Q?Pierre-Cl=C3=A9ment?= Tosi <ptosi@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org
 Cc: James Morse <james.morse@arm.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Marc Zyngier <maz@kernel.org>
-Subject: [PATCH 05/10] KVM: arm64: nVHE: Add EL2 sync exception handler
-Message-ID: <cebafe40b170589d52e2ef66f3bfac7396fa1f56.1710446682.git.ptosi@google.com>
+	Zenghui Yu <yuzenghui@huawei.com>, Marc Zyngier <maz@kernel.org>, 
+	David Brazdil <dbrazdil@google.com>
+Subject: [PATCH 06/10] KVM: arm64: nVHE: gen-hyprel: Skip R_AARCH64_ABS32
+Message-ID: <e017fb72f9aef1de10cb958bfeda87496d3ee9e0.1710446682.git.ptosi@google.com>
 References: <cover.1710446682.git.ptosi@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -73,58 +74,42 @@ Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 In-Reply-To: <cover.1710446682.git.ptosi@google.com>
 
-Introduce handlers for EL2{t,h} synchronous exceptions distinct from
-handlers for other "invalid" exceptions when running with the nVHE host
-vector. This will allow a future patch to handle CFI (synchronous)
-errors without affecting other classes of exceptions.
-
-Remove superfluous SP overflow check from the non-synchronous handlers.
+Ignore R_AARCH64_ABS32 relocations, instead of panicking, when emitting
+the relocation table of the hypervisor. The toolchain might produce them
+when generating function calls with KCFI, to allow type ID resolution
+across compilation units (between the call-site check and the callee's
+prefixed u32) at link time. They are therefore not needed in the final
+(runtime) relocation table.
 
 Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/host.S | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/gen-hyprel.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-index 27c989c4976d..1b9111c2b480 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -183,7 +183,7 @@ SYM_FUNC_END(__host_hvc)
- .endif
- .endm
- 
--.macro invalid_host_el2_vect
-+.macro host_el2_sync_vect
- 	.align 7
- 
- 	/*
-@@ -221,6 +221,11 @@ SYM_FUNC_END(__host_hvc)
- 	b	__hyp_do_panic
- .endm
- 
-+.macro invalid_host_el2_vect
-+	.align 7
-+	b	__hyp_panic
-+.endm
-+
- /*
-  * The host vector does not use an ESB instruction in order to avoid consuming
-  * SErrors that should only be consumed by the host. Guest entry is deferred by
-@@ -233,12 +238,12 @@ SYM_FUNC_END(__host_hvc)
-  */
- 	.align 11
- SYM_CODE_START(__kvm_hyp_host_vector)
--	invalid_host_el2_vect			// Synchronous EL2t
-+	host_el2_sync_vect			// Synchronous EL2t
- 	invalid_host_el2_vect			// IRQ EL2t
- 	invalid_host_el2_vect			// FIQ EL2t
- 	invalid_host_el2_vect			// Error EL2t
- 
--	invalid_host_el2_vect			// Synchronous EL2h
-+	host_el2_sync_vect			// Synchronous EL2h
- 	invalid_host_el2_vect			// IRQ EL2h
- 	invalid_host_el2_vect			// FIQ EL2h
- 	invalid_host_el2_vect			// Error EL2h
+diff --git a/arch/arm64/kvm/hyp/nvhe/gen-hyprel.c b/arch/arm64/kvm/hyp/nvhe/gen-hyprel.c
+index 6bc88a756cb7..7b046d97b301 100644
+--- a/arch/arm64/kvm/hyp/nvhe/gen-hyprel.c
++++ b/arch/arm64/kvm/hyp/nvhe/gen-hyprel.c
+@@ -50,6 +50,9 @@
+ #ifndef R_AARCH64_ABS64
+ #define R_AARCH64_ABS64			257
+ #endif
++#ifndef R_AARCH64_ABS32
++#define R_AARCH64_ABS32			258
++#endif
+ #ifndef R_AARCH64_PREL64
+ #define R_AARCH64_PREL64		260
+ #endif
+@@ -383,6 +386,9 @@ static void emit_rela_section(Elf64_Shdr *sh_rela)
+ 		case R_AARCH64_ABS64:
+ 			emit_rela_abs64(rela, sh_orig_name);
+ 			break;
++		/* Allow 32-bit absolute relocation, for KCFI type hashes. */
++		case R_AARCH64_ABS32:
++			break;
+ 		/* Allow position-relative data relocations. */
+ 		case R_AARCH64_PREL64:
+ 		case R_AARCH64_PREL32:
 
 -- 
 Pierre
