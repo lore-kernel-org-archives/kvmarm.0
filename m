@@ -1,184 +1,123 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D5B5A4E5
-	for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 23:27:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB4A182AE
+	for <kvmarm@lists.linux.dev>; Fri, 15 Mar 2024 10:22:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710458837; cv=none; b=oMo+E9gNffglw0UhY583ICKIqZsS0/8hihOrba3ytV/HDf9Rx5kXVSLQKbnRzCLyAiB5BSJb5hlLOZxxNIKeoHcfVLKuF2pHmijXc8jbyPLKookcNpl8b5OXuoUIC+euNaEQ2qnt/Zp0HkOIzSO+ClSK8yfc4hHgEZWp3xE8nf8=
+	t=1710498148; cv=none; b=ZJzp6h/6kpe/wTtOdb8uJp6UxV+ymYLg6wFZA/kx42FPBE+nhfA1WV4rlMbQHRZNRlU757Ave2Xhny9MSl0aKFG0ekbc3DapDIluTIgGF9DocoGNN+B7AWHAKpYJOOKJwERPQmm5jAty4Slk2WlEVqo5O9JiMgqTClmCOVoASPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710458837; c=relaxed/simple;
-	bh=U+2Hob5P6Gh09tf0pwrrrWPczRSLurLoqR4c4omlOk0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=P+U/FCISn34oAijNTuFd3a6Fcd5ftcT8+zBnxDru5e/Z3OU5mfbwxwbB6t6asSXjN7TsBmiv1CaEWvMNcAnkY/Uh/dIEiqh7cOwU8FrO0XvTsqEBxZO3v3VArwlyMvGQp2q+eEeFkfDHxY+zqItd3Van+40wKcPGo28V69KcxdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=POf6gC8l; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1710498148; c=relaxed/simple;
+	bh=5U2FdyBJ9x2N/ZT3lykt6b/ppnU43zp52hERVtbnd4s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZKJE8IaYq8NF9AXG1drd3GVrLYlliYuORtRKuRZZdeYaDYH91Sln1JTj5cyBVHh9ZSdUm9uBjcOvAqt9TWkKvBIdYuQYdlx9vJNReS+t4Jupg7gk+ZmUzsv2qjsYJeT/PygXuXy9qD5mfcM8arZ76nfFceVS9VpxIRsTqN3brG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MKSW+tZH; arc=none smtp.client-ip=209.85.167.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="POf6gC8l"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5e4df21f22dso1147168a12.0
-        for <kvmarm@lists.linux.dev>; Thu, 14 Mar 2024 16:27:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MKSW+tZH"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-513cfd48224so2616358e87.2
+        for <kvmarm@lists.linux.dev>; Fri, 15 Mar 2024 03:22:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710458835; x=1711063635; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=fVWd/4nHkGU+RZSRNxZTIKvgC6ZcIUosAi3U9bNiK5o=;
-        b=POf6gC8lQfU6Z9EsaKitq2ng5PEvJRwp5FamDAu1A5tQij68ZHCMC17DF2qv7SAieK
-         GQoJX74Esm+sS+A6ciysBZvNxJ742hNUFSQSfVPBDrLe7x1c4d+YtBecxT0v06bwJVLa
-         3bcu/QWaSzTHVVLxerMcrRcVAooH4OiQKk+dRLNSZ31qJu35FiZodMdJSeYI9855SgDq
-         UQmwxyD1jdaViLBI7cIA8AvTBWKAn0DuvrS+OH/O2Wj7RH4yp5bPJ73le0ajt7jqRzYZ
-         U8mH0AzMKyEL69cBlxQNq/0I9PA9nofXxzdq3k0pqNH14sF5IFS6c7Wjpmzjac60bj00
-         gjVg==
+        d=google.com; s=20230601; t=1710498145; x=1711102945; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=4hKS13cZNwTAuS0CQMQLil3nPF8VhVj/moqaBbt3e4Q=;
+        b=MKSW+tZHnaoZd1nwJxoZ0wyxqNmDypP/t+2ErVH3aNKMYy9eFSz+lZDJdUNNMuea/F
+         qoSHn9+CoTEcD8eD7arTgWn9NK0pGwPXQqN0JA2SA5WUBbIwjmoZUZ6O4oV520LJQXLj
+         QkLvCciLxu0s/NWrgPHqqMRr5Vhna8S6kxvrp7ysCvtCWECb5eBJaPdTXE1fZPr8Y8fq
+         u1ZnkhRHpJWtstT4GM4SIz/CCEdNVHKcl34EPvBOgCy7NDvXp5mrTUo2Y5m72R37V81x
+         2Lw4bV5vBiNZGLGUgRXclRR0DqtfQ8mvlYpeCdbxTYBGwG3UtDUyQn58sOAK6+FDGRmv
+         fqdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710458835; x=1711063635;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fVWd/4nHkGU+RZSRNxZTIKvgC6ZcIUosAi3U9bNiK5o=;
-        b=TXz4/VnA9Li3UtKC5kzNB2Ecw37aEa0AfrZze4g6KiwT+B7ImXVx1TvOJ4OYCzT39Q
-         +2iUzVRUg3I+zVEkDLhJrARa6eA4HOL5Q5Nv1CsgNFYXDBm1rihKZA9Y5HD0R2zIJEhS
-         /4EN7jpR1ZfILVVC1pE0Uc1E5WARyohCJp3Zj+kkRHo1erDcoslemA7slV7fKgA0jb5m
-         DaKqky2TrKewX6Lva6zMrTGxq4+XN7R7voJmtRbylmCBobLp5ZFIxvorMzkvBYYwTKvG
-         mEjyCS9PyA6nmUn57MbV19A3UVdYsQbFUON1MLUZUzkSe/jG6pOJ0St6b0vkL+U4VHdF
-         cQ9w==
-X-Forwarded-Encrypted: i=1; AJvYcCXQgzHXTKrzgVQ63zhBcJGjeaKO5fH4CqJhUEO7I9z+uLTXDA1gWJ0enow1JVHcLCxzZ+xKlWHgA8GoWDtnOLIQrpOCeE3b
-X-Gm-Message-State: AOJu0YyGl7hxohhvLIWgKAzYESh2g2dYWyjx1qTZP7D+O/WRmj9jdB9u
-	45p2qsRdLMShCdCSuQdymIpP6IkeAAwbszEYOh7xQ2C7kq8Y5VzI8vcm4dAkWPKi3qeCWSd8fj4
-	Lrw==
-X-Google-Smtp-Source: AGHT+IGRI5hc5CP3CR9IYz2Kmbchzln3C1e7PEoGzqGhInO36w6Nc4buOmgVEVYtprnFqx8Z8ErRa1R6iOg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:6483:0:b0:5dc:2a75:9a19 with SMTP id
- y125-20020a636483000000b005dc2a759a19mr12387pgb.2.1710458834658; Thu, 14 Mar
- 2024 16:27:14 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 14 Mar 2024 16:26:37 -0700
-In-Reply-To: <20240314232637.2538648-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1710498145; x=1711102945;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4hKS13cZNwTAuS0CQMQLil3nPF8VhVj/moqaBbt3e4Q=;
+        b=pI0r4a+J2OAD+j+OJ0ZLwgHAigMrm/ngjYFsGYlTsv2Txb9jCe8KQQXXLfUy1haKwT
+         LYkeLlGoIN1DuOpZ6VWUbTU7Hd1j3+IUKR04ol8g4BVUmUkMJ3DctURksvKCbT4YpFc1
+         3wW1eRvJj2GMRgGhnwHoqsdHi5tMyBdckaW9F7TZjbTxBr2NdN8v+44KjCbQdM8kXKjK
+         2TXapNvqhvWiUfqM98X/OcWgZg8CzFcXPMHFMbQ2O/7wRk1oR0C0zeelpYLg96Vc/hrs
+         4HtfUM4+TOJcriMb4QPbbRdVXHt0q0P2VMtrhce7kO7ySO6bfvENY9xGsncMwryToVf7
+         1LcA==
+X-Gm-Message-State: AOJu0YxHazyZZDJzcyX9rqZQYkKOW1eJvcaUw4u+CoLbVSN6bTdGUs0q
+	2y2DgpdaNNJaXOu/LWID1WsH0+OAjOTr8vlzbN8+E726TUp/KaOqq7+NhvlDSQ==
+X-Google-Smtp-Source: AGHT+IED8mmZANKTy9MzOwavrd3Hatz/1kDglj3tvY7tFGNBe5aHeRsc9tnZUPRJMEZX60J8/tNElQ==
+X-Received: by 2002:a05:6512:10d4:b0:513:db29:8905 with SMTP id k20-20020a05651210d400b00513db298905mr1317908lfg.69.1710498145116;
+        Fri, 15 Mar 2024 03:22:25 -0700 (PDT)
+Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
+        by smtp.gmail.com with ESMTPSA id v23-20020a1709067d9700b00a461a7ba686sm1578047ejo.75.2024.03.15.03.22.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Mar 2024 03:22:24 -0700 (PDT)
+Date: Fri, 15 Mar 2024 10:22:16 +0000
+From: =?utf-8?Q?Pierre-Cl=C3=A9ment?= Tosi <ptosi@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Sami Tolvanen <samitolvanen@google.com>, 
+	Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 00/10] KVM: arm64: Add support for hypervisor kCFI
+Message-ID: <wlkwdcati2klte4u3xvjiacf7hbuvupd2gksaa6ekjgfjuiy7j@7jvkv45iwdkx>
+References: <cover.1710446682.git.ptosi@google.com>
+ <86edcc1low.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20240314232637.2538648-1-seanjc@google.com>
-X-Mailer: git-send-email 2.44.0.291.gc1ea87d7ee-goog
-Message-ID: <20240314232637.2538648-19-seanjc@google.com>
-Subject: [PATCH 18/18] KVM: selftests: Drop @selector from segment helpers
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Sean Christopherson <seanjc@google.com>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Ackerley Tng <ackerleytng@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <86edcc1low.wl-maz@kernel.org>
 
-Drop the @selector from the kernel code, data, and TSS builders and
-instead hardcode the respective selector in the helper.  Accepting a
-selector but not a base makes the selector useless, e.g. the data helper
-can't create per-vCPU for FS or GS, and so loading GS with KERNEL_DS is
-the only logical choice.
+Hi Marc,
 
-And for code and TSS, there is no known reason to ever want multiple
-segments, e.g. there are zero plans to support 32-bit kernel code (and
-again, that would require more than just the selector).
+On Thu, Mar 14, 2024 at 10:40:47PM +0000, Marc Zyngier wrote:
+> Hi Pierre-Clément,
+> 
+> On Thu, 14 Mar 2024 20:23:00 +0000,
+> Pierre-Clément Tosi <ptosi@google.com> wrote:
+> > 
+> > CONFIG_CFI_CLANG ("kernel Control Flow Integrity") makes the compiler inject
+> > runtime type checks before any indirect function call. On AArch64, it generates
+> > a BRK instruction to be executed on type mismatch and encodes the indices of the
+> > registers holding the branch target and expected type in the immediate of the
+> > instruction. As a result, a synchronous exception gets triggered on kCFI failure
+> > and the fault handler can retrieve the immediate (and indices) from ESR_ELx.
+> > 
+> > This feature has been supported at EL1 ("host") since it was introduced by
+> > b26e484b8bb3 ("arm64: Add CFI error handling"), where cfi_handler() decodes
+> > ESR_EL1, giving informative panic messages such as
+> > 
+> >   [   21.885179] CFI failure at lkdtm_indirect_call+0x2c/0x44 [lkdtm]
+> >   (target: lkdtm_increment_int+0x0/0x1c [lkdtm]; expected type: 0x7e0c52a)
+> >   [   21.886593] Internal error: Oops - CFI: 0 [#1] PREEMPT SMP
+> > 
+> > However, it is not or only partially supported at EL2: in nVHE (or pKVM),
+> > CONFIG_CFI_CLANG gets filtered out at build time, preventing the compiler from
+> > injecting the checks. In VHE (or hVHE), EL2 code gets compiled with the checks
+> 
+> Are you sure about hVHE? hVHE is essentially the nVHE object running
+> with a slightly different HCR_EL2 configuration. So if you don't have
+> the checks in the nVHE code, you don't have them for hVHE either.
 
-If KVM selftests ever do add support for per-vCPU segments, it'd arguably
-be more readable to add a dedicated helper for building/setting the
-per-vCPU segment, and move the common data segment code to an inner
-helper.
+No, I am not and my assumption that hVHE was running the VHE hyp code was wrong.
+FYI, these patches were tested in VHE, nVHE, and pKVM (with NVHE_EL2_DEBUG set
+and unset) but not in hVHE (clearly!). Thanks for pointing this out.
 
-Lastly, hardcoding the selector reduces the probability of setting the
-wrong selector in the vCPU versus what was created by the VM in the GDT.
+> 
+> Or am I missing something obvious?
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../selftests/kvm/lib/x86_64/processor.c      | 29 +++++++++----------
- 1 file changed, 14 insertions(+), 15 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index dab719ee7734..6abd50d6e59d 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -438,10 +438,10 @@ static void kvm_seg_fill_gdt_64bit(struct kvm_vm *vm, struct kvm_segment *segp)
- 		desc->base3 = segp->base >> 32;
- }
- 
--static void kvm_seg_set_kernel_code_64bit(uint16_t selector, struct kvm_segment *segp)
-+static void kvm_seg_set_kernel_code_64bit(struct kvm_segment *segp)
- {
- 	memset(segp, 0, sizeof(*segp));
--	segp->selector = selector;
-+	segp->selector = KERNEL_CS;
- 	segp->limit = 0xFFFFFFFFu;
- 	segp->s = 0x1; /* kTypeCodeData */
- 	segp->type = 0x08 | 0x01 | 0x02; /* kFlagCode | kFlagCodeAccessed
-@@ -452,10 +452,10 @@ static void kvm_seg_set_kernel_code_64bit(uint16_t selector, struct kvm_segment
- 	segp->present = 1;
- }
- 
--static void kvm_seg_set_kernel_data_64bit(uint16_t selector, struct kvm_segment *segp)
-+static void kvm_seg_set_kernel_data_64bit(struct kvm_segment *segp)
- {
- 	memset(segp, 0, sizeof(*segp));
--	segp->selector = selector;
-+	segp->selector = KERNEL_DS;
- 	segp->limit = 0xFFFFFFFFu;
- 	segp->s = 0x1; /* kTypeCodeData */
- 	segp->type = 0x00 | 0x01 | 0x02; /* kFlagData | kFlagDataAccessed
-@@ -480,13 +480,12 @@ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
- 	return vm_untag_gpa(vm, PTE_GET_PA(*pte)) | (gva & ~HUGEPAGE_MASK(level));
- }
- 
--static void kvm_seg_set_tss_64bit(vm_vaddr_t base, struct kvm_segment *segp,
--				  int selector)
-+static void kvm_seg_set_tss_64bit(vm_vaddr_t base, struct kvm_segment *segp)
- {
- 	memset(segp, 0, sizeof(*segp));
- 	segp->base = base;
- 	segp->limit = 0x67;
--	segp->selector = selector;
-+	segp->selector = KERNEL_TSS;
- 	segp->type = 0xb;
- 	segp->present = 1;
- }
-@@ -510,11 +509,11 @@ static void vcpu_init_sregs(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
- 	sregs.efer |= (EFER_LME | EFER_LMA | EFER_NX);
- 
- 	kvm_seg_set_unusable(&sregs.ldt);
--	kvm_seg_set_kernel_code_64bit(KERNEL_CS, &sregs.cs);
--	kvm_seg_set_kernel_data_64bit(KERNEL_DS, &sregs.ds);
--	kvm_seg_set_kernel_data_64bit(KERNEL_DS, &sregs.es);
--	kvm_seg_set_kernel_data_64bit(KERNEL_DS, &sregs.gs);
--	kvm_seg_set_tss_64bit(vm->arch.tss, &sregs.tr, KERNEL_TSS);
-+	kvm_seg_set_kernel_code_64bit(&sregs.cs);
-+	kvm_seg_set_kernel_data_64bit(&sregs.ds);
-+	kvm_seg_set_kernel_data_64bit(&sregs.es);
-+	kvm_seg_set_kernel_data_64bit(&sregs.gs);
-+	kvm_seg_set_tss_64bit(vm->arch.tss, &sregs.tr);
- 
- 	sregs.cr3 = vm->pgd;
- 	vcpu_sregs_set(vcpu, &sregs);
-@@ -588,13 +587,13 @@ static void vm_init_descriptor_tables(struct kvm_vm *vm)
- 
- 	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
- 
--	kvm_seg_set_kernel_code_64bit(KERNEL_CS, &seg);
-+	kvm_seg_set_kernel_code_64bit(&seg);
- 	kvm_seg_fill_gdt_64bit(vm, &seg);
- 
--	kvm_seg_set_kernel_data_64bit(KERNEL_DS, &seg);
-+	kvm_seg_set_kernel_data_64bit(&seg);
- 	kvm_seg_fill_gdt_64bit(vm, &seg);
- 
--	kvm_seg_set_tss_64bit(vm->arch.tss, &seg, KERNEL_TSS);
-+	kvm_seg_set_tss_64bit(vm->arch.tss, &seg);
- 	kvm_seg_fill_gdt_64bit(vm, &seg);
- }
- 
 -- 
-2.44.0.291.gc1ea87d7ee-goog
-
+Pierre
