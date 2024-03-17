@@ -1,89 +1,127 @@
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B07E10FD
-	for <kvmarm@lists.linux.dev>; Sat, 16 Mar 2024 00:51:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F861B947;
+	Sun, 17 Mar 2024 11:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710550309; cv=none; b=trxQ/SVxuyZcC9Pi9yplx/J7r23wbRZrxodukyBX31DFFXA+KTMgACbnttPXDOcOyendjpLHtAQ42/H0q6xBxyL6vhSL4PjX19aOBp48mNDU9MkCxikuBAXKkIoR1QkKhlZrhQpYKOT6Y+dtOcXkqKv7ohX5Sx9c9NNAoCYYFjk=
+	t=1710675769; cv=none; b=tUjrUGR8b9x9NraWwj48DQEKx9z6x57p5k4p4YPnCGBcY3Y4vNElXStZSJlQJqBQuIa/qSak/FsWDYoxhkH8+xVL6FqG4bZmX9jZydVs9UXVVufkzp6xP2txlXhe+vXvvd5L4MG7eU+TMSruMN1dfpqqu57QAHuXUogaoS8e5GA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710550309; c=relaxed/simple;
-	bh=veGHBF3H13JsJeE4FDnKI5tpEmZeeZRyQgx+bxMNAi0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=acaE6kZQz1rKwbBYt4U9fuL39WldlZmAkR3AumAnHRju09GkMaX2xKUeqy9nZsayVnj3RAQlIQYa+GXsfN5qSlnJK4VIal+01lNDXExrNj74zh2gc1Q8Rh86Jg46J0eXPJTqeknqsWcFcpqPRusyCXlovnQdOeyt8XUSMtQJaBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=Qj61R53m; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1710675769; c=relaxed/simple;
+	bh=yIs6FmWfE+g2CBU9z0E91nMt7P9sDGyQXWi8VWIJaV4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fKmP5fTe/z3jPpz0n8FgNvEAQ4iMc4lr+glso4Hx0TU1o6NWWh69PQ3c4JkLXV5LvHc/jPIP1k/aqGEdh/YK2fp9jxPTobhazQDHn8E/Kx5uLICL7+mwHgbEzDkJLluhzzyYKEOhz3IjWn2AKDIrrzrCw99r8dYD4k4XnWDXmpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hqbwkovl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="Qj61R53m"
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-568a3292916so2854713a12.1
-        for <kvmarm@lists.linux.dev>; Fri, 15 Mar 2024 17:51:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1710550303; x=1711155103; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=krWZ+WRoA2zaA7Cdw3TM52PMtly6Zf/um2GekWUiV7E=;
-        b=Qj61R53mQnetmQ0Xub9thSbaKHGNm2muh+jx6cLXwSigboQmY6ONFOK0bU4633XqXk
-         iPPBCyCVStWP/CEIcDySanB+K0bAjXMwQhtotV0SbXnDYltaA5Agu8QaedxJiIak5fn6
-         dCr1axXkejfx4Bywc3F24IVAMoVV/h6yfqru0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710550303; x=1711155103;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=krWZ+WRoA2zaA7Cdw3TM52PMtly6Zf/um2GekWUiV7E=;
-        b=lsVLf/Aqz0s6oIYnL0Z3q8P93a5plsExkuxNax+i8wu+b+Dljq+B6TCeEnMKhtBrWK
-         i3urB4RLWURdLy4ox1ixgz1tKTyfmu4FFpHy/FuzYt+itsb3vuXhD9d7NqXBugkQYeR7
-         LQMESyKc68t65w3Dk2856/doRgSx+8ur/0Vdt50iiIjp/lB3iBOTbnHTO9s7p3CnXXgO
-         9J6lEw4Rl8UXIKXbob0b7q6XO+6Pf8slevkwgt2X2g74xZdjGkbGpg4OwjSBS7eGkJjb
-         wM2WMoILhJLFweU6UEIDX6bhPfeWq1SxUkHLr+AAU0d2Yl0f/rZP6ZDK78rjKAoDGvdb
-         JqDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXpGBLQsRs+oCo1BzDYfRyQm8qDkzZwk7lbdz8fnH9U5Iunp0+1bpN1AVdZhVl9M0YY8CUECmeNuQ+aegcTty7UWcOQpyJc
-X-Gm-Message-State: AOJu0Yz8LJvrISHCtQ+jYbFynZSIoIgTe0LVb1tIi7f4mIDWMHIQObQu
-	0pazNXRAbXiLlEjQwDpqP3oap5mBMcmKSzIUg0AAebj4/gmxZZkZJPO5q0SIYmTGn5Vfis0LCLB
-	FFdq0KA==
-X-Google-Smtp-Source: AGHT+IFOIbuLBXqi/Hd1XC33AEdZACSlrVr8krNBUMD/LFV3yJXA/0DjuqBaTVeRFzk17rCZsev7ug==
-X-Received: by 2002:a17:907:c706:b0:a46:23ea:79c1 with SMTP id ty6-20020a170907c70600b00a4623ea79c1mr5118307ejc.56.1710550303526;
-        Fri, 15 Mar 2024 17:51:43 -0700 (PDT)
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com. [209.85.218.43])
-        by smtp.gmail.com with ESMTPSA id h21-20020a17090619d500b00a46447348e8sm2185661ejd.191.2024.03.15.17.51.42
-        for <kvmarm@lists.linux.dev>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Mar 2024 17:51:42 -0700 (PDT)
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a466fc8fcccso308243966b.1
-        for <kvmarm@lists.linux.dev>; Fri, 15 Mar 2024 17:51:42 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVXbnHT1mIhI+w3R7/rOxPvqU23Mz78ZdzoASxcitH1RXkti/eErtsAZ7nnmWYX1/O1ntsBzaJorU9MHDNFPmalEF0eVv2o
-X-Received: by 2002:a17:906:eb0a:b0:a46:59c6:2a42 with SMTP id
- mb10-20020a170906eb0a00b00a4659c62a42mr4188815ejb.76.1710550302338; Fri, 15
- Mar 2024 17:51:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hqbwkovl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D25E9C433F1;
+	Sun, 17 Mar 2024 11:42:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710675768;
+	bh=yIs6FmWfE+g2CBU9z0E91nMt7P9sDGyQXWi8VWIJaV4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hqbwkovlvfUoXlY5ydcjEvUyjUsyhjG29LkaktzOCa5mdJsmPTJOdiRAcxGrXOPoN
+	 Fo8lOmhBOanUnDA6D4IvYcURviaTQpTT9afwL1ZSLgX+wbKRj/1/uutdjprNW5aZLn
+	 Oo9rA53m5P2vXKSr2TVNtBE0r1GIw3It+f2Sl6Hc0z+AS3bDAFeBWffWAyHzqKj20g
+	 hb101omTBtdaUhaENDy6Ci7TwgbmtNrHdjCW9zJbLL3pqv35DWpQEHPnlWoFk2+SKZ
+	 /HYfENlc7nY+DjMtYc+hIwm94Q+QwlN0f2dPnBX7AOk2n8pD17EZMB04WZb5y4Dgqd
+	 yRJWWyIpEy3QA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rlouc-00D1X5-H0;
+	Sun, 17 Mar 2024 11:42:46 +0000
+Date: Sun, 17 Mar 2024 11:42:44 +0000
+Message-ID: <86bk7d13uz.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: =?UTF-8?B?UGllcnJlLUNsw6ltZW50?= Tosi <ptosi@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 05/10] KVM: arm64: nVHE: Add EL2 sync exception handler
+In-Reply-To: <cebafe40b170589d52e2ef66f3bfac7396fa1f56.1710446682.git.ptosi@google.com>
+References: <cover.1710446682.git.ptosi@google.com>
+	<cebafe40b170589d52e2ef66f3bfac7396fa1f56.1710446682.git.ptosi@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <CAHk-=whCvkhc8BbFOUf1ddOsgSGgEjwoKv77=HEY1UiVCydGqw@mail.gmail.com>
- <20240316002457.3568887-1-oliver.upton@linux.dev>
-In-Reply-To: <20240316002457.3568887-1-oliver.upton@linux.dev>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 15 Mar 2024 17:51:25 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wjJv-Y1ZXbusknXpQVTx_kWudtORoKQPc+Rh9F944+Rvw@mail.gmail.com>
-Message-ID: <CAHk-=wjJv-Y1ZXbusknXpQVTx_kWudtORoKQPc+Rh9F944+Rvw@mail.gmail.com>
-Subject: Re: [PATCH] Revert "KVM: arm64: Snapshot all non-zero RES0/RES1
- sysreg fields for later checking"
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ptosi@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 15 Mar 2024 at 17:25, Oliver Upton <oliver.upton@linux.dev> wrote:
->
-> This reverts commits 99101dda29e3186b1356b0dc4dbb835c02c71ac9 and
-> b80b701d5a67d07f4df4a21e09cb31f6bc1feeca.
+On Thu, 14 Mar 2024 20:24:31 +0000,
+Pierre-Cl=C3=A9ment Tosi <ptosi@google.com> wrote:
+>=20
+> Introduce handlers for EL2{t,h} synchronous exceptions distinct from
+> handlers for other "invalid" exceptions when running with the nVHE host
+> vector. This will allow a future patch to handle CFI (synchronous)
+> errors without affecting other classes of exceptions.
+>=20
+> Remove superfluous SP overflow check from the non-synchronous
+> handlers.
 
-Applied.  Thanks,
+Why are they superfluous? Because we are panic'ing? Detecting a stack
+overflow is pretty valuable in any circumstances.
 
-          Linus
+>=20
+> Signed-off-by: Pierre-Cl=C3=A9ment Tosi <ptosi@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/host.S | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/hos=
+t.S
+> index 27c989c4976d..1b9111c2b480 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/host.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
+> @@ -183,7 +183,7 @@ SYM_FUNC_END(__host_hvc)
+>  .endif
+>  .endm
+> =20
+> -.macro invalid_host_el2_vect
+> +.macro host_el2_sync_vect
+>  	.align 7
+> =20
+>  	/*
+> @@ -221,6 +221,11 @@ SYM_FUNC_END(__host_hvc)
+>  	b	__hyp_do_panic
+>  .endm
+> =20
+> +.macro invalid_host_el2_vect
+> +	.align 7
+> +	b	__hyp_panic
+> +.endm
+> +
+>  /*
+>   * The host vector does not use an ESB instruction in order to avoid con=
+suming
+>   * SErrors that should only be consumed by the host. Guest entry is defe=
+rred by
+> @@ -233,12 +238,12 @@ SYM_FUNC_END(__host_hvc)
+>   */
+>  	.align 11
+>  SYM_CODE_START(__kvm_hyp_host_vector)
+> -	invalid_host_el2_vect			// Synchronous EL2t
+> +	host_el2_sync_vect			// Synchronous EL2t
+
+The real question is: under which circumstances would running with
+SP_EL0 be valid? I cannot see good reason for it.
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
