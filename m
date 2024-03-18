@@ -1,71 +1,149 @@
-Received: from mail.linx-info.com (unknown [121.69.130.50])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09C932D61B
-	for <kvmarm@lists.linux.dev>; Mon, 18 Mar 2024 10:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=121.69.130.50
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B996F2D042
+	for <kvmarm@lists.linux.dev>; Mon, 18 Mar 2024 10:17:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710756175; cv=none; b=K8FqC9noMrQSU600XaO/qWEXTQI1GFDUzFGYDtB1ZpiOkVrcW7mv1rUorfA+q9xlktWPpipBknkDVbeksm5LtTIu+IqKKasaRTX5EofPd9FwYCVcgUnUOmsdC38gXE0DRIADKdOR41/m/rXtFXzRaaHbtFq4wn7c/xlXg2Cx9HI=
+	t=1710757070; cv=none; b=suGIRmujNalFHE+VgHRoehdeTzYRIbuD5ZPp5G6kfrRoRf0nu+gPxafTeAUeicxmVVBXLqZjJcGYqYLh0wRSf9/E+eAd4AuDu4sDRr5YVJLhUMAeuWVrTBbIzrjYEw6KYQTqRo6dqCjbtnhuRE7YgkEiClgau/xov2XiohJJhFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710756175; c=relaxed/simple;
-	bh=EvlgHDWmzdvnNrNyl/1/m1REhFbIQScAOUNceqJZrmg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YxrVL1Iy6T3cydQcSwWFAD4LNumHzss4aZt5LuWs9Pa36YSJejn4lVVNpbShPug7Zsgh9FpsGuTWawFy6yTOMw95j15eYhHutN7lY9497Z9PzVE4m4aMxCURwibV3TgzR/LdMro2HEzofbowGQX2tS2FaZMQlhPzG2Lsjqvn8kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linx-info.com; spf=none smtp.mailfrom=linx-info.com; arc=none smtp.client-ip=121.69.130.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linx-info.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linx-info.com
-Received: from localhost (localhost [127.0.0.1])
-	by mail.linx-info.com (Postfix) with ESMTP id 16AFB32118B;
-	Mon, 18 Mar 2024 18:02:52 +0800 (CST)
-X-Virus-Scanned: Debian amavisd-new at linx-info.com
-Received: from mail.linx-info.com ([127.0.0.1])
-	by localhost (mail.linx-info.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hsff18ftpPwW; Mon, 18 Mar 2024 18:02:51 +0800 (CST)
-Received: from linx.. (unknown [172.16.0.253])
-	by mail.linx-info.com (Postfix) with ESMTP id 5F123320CE6;
-	Mon, 18 Mar 2024 18:02:51 +0800 (CST)
-From: Wujie Duan <wjduan@linx-info.com>
-To: maz@kernel.org
+	s=arc-20240116; t=1710757070; c=relaxed/simple;
+	bh=7/j+bZFORRmLvc392a8wld6gs98pKwOY8NXOcE5cpa0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XTOIsAW/nJfclN8OIFlTNjSxTuc2WEI0dtGWgDSjMqgwT6aMfmxV/113LTWXKUNU5zDvNmBoBW0cbOPhtzHxbQMs643BSbsNxBXM3I8E29z5FK8FqLFJij1m+vz2NA2SeeQx8vm2SLQvBDvsEITiJCLmhJqSR7CTMrSoToC38DY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FRISgR1c; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FRISgR1c"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99D17C433C7;
+	Mon, 18 Mar 2024 10:17:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710757070;
+	bh=7/j+bZFORRmLvc392a8wld6gs98pKwOY8NXOcE5cpa0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FRISgR1ci1CXIhes5NutFxysBRz3u4YCncMd/k/QMpYTX87/8VbpLmG8wHeVCsEVQ
+	 l5b6DbFbcPlL5B4+kgrw0283KhF7brdHKqAiNRQBktmw/4e3ct88aA5yu2meB77Mz8
+	 sN+MqDnQYxFfSDUhTnJKEW1vlYrA4qqMI3Dl8dEqBUPimWTKYzsDMCkpAB+/uuduEE
+	 CPsy4ytnYz/qzojKjkC0WnW6ceM49WQaVwOhtWp9yGliponFCma+ChGv4vFeGX+nyQ
+	 B4++glWiLyDYviDtErTtW+Zx9vtccW6GTjB1gbFu1J9xfG3wOUjvCi/R78RmuQfCTv
+	 9z/VzYT5jTNjw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rmA3w-00DEy8-2v;
+	Mon, 18 Mar 2024 10:17:48 +0000
+Date: Mon, 18 Mar 2024 10:17:47 +0000
+Message-ID: <864jd3269g.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Wujie Duan <wjduan@linx-info.com>
 Cc: oliver.upton@linux.dev,
 	james.morse@arm.com,
 	suzuki.poulose@arm.com,
 	yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev,
-	Wujie Duan <wjduan@linx-info.com>
-Subject: [PATCH] KVM: arm64: Change back kvm fault condition to translation
-Date: Mon, 18 Mar 2024 18:02:49 +0800
-Message-Id: <20240318100249.220897-1-wjduan@linx-info.com>
-X-Mailer: git-send-email 2.40.1
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH] KVM: arm64: Change back kvm fault condition to translation
+In-Reply-To: <20240318100249.220897-1-wjduan@linx-info.com>
+References: <20240318100249.220897-1-wjduan@linx-info.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: wjduan@linx-info.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-KVM: arm64: Condition should be esr_fsc_is_translation_fault
+On Mon, 18 Mar 2024 10:02:49 +0000,
+Wujie Duan <wjduan@linx-info.com> wrote:
+>=20
+> KVM: arm64: Condition should be esr_fsc_is_translation_fault
+>=20
+> In commit '11e5ea5242e3 ("KVM: arm64: Use helpers to
+>         classify exception types reported via ESR")'
+> the KVM code was optimized, but the code logic was incorrectly modified.
+> Therefore, it is being corrected.
+>=20
+> Signed-off-by: Wujie Duan <wjduan@linx-info.com>
+> ---
+>  arch/arm64/kvm/mmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 18680771cdb0..dc04bc767865 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1637,7 +1637,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  	fault_ipa =3D kvm_vcpu_get_fault_ipa(vcpu);
+>  	is_iabt =3D kvm_vcpu_trap_is_iabt(vcpu);
+> =20
+> -	if (esr_fsc_is_permission_fault(esr)) {
+> +	if (esr_fsc_is_translation_fault(esr)) {
+>  		/* Beyond sanitised PARange (which is the IPA limit) */
+>  		if (fault_ipa >=3D BIT_ULL(get_kvm_ipa_limit())) {
+>  			kvm_inject_size_fault(vcpu);
 
-In commit '11e5ea5242e3 ("KVM: arm64: Use helpers to
-        classify exception types reported via ESR")'
-the KVM code was optimized, but the code logic was incorrectly modified.
-Therefore, it is being corrected.
+I think 7 tries are enough ;-). Here's what I was expecting:
 
+- a subject indicating the nature of the issue as a one-liner
+- a commit message describing the exact situation
+- a Fixes: tag indicating the commit being fixed
+- a Cc: stable tag to indicate this needs backporting
+- Ard's Ack, as he's been kind enough to look into it
+
+See below for the full patch and my own RB tag. In the future, please
+try to follow these guidelines.
+
+Oliver, can you please pick this ASAP?
+
+Thanks,
+
+	M.
+
+=46rom 10febd177a551e1f9bfb708a0b3865ca642f9a85 Mon Sep 17 00:00:00 2001
+From: Wujie Duan <wjduan@linx-info.com>
+Date: Mon, 18 Mar 2024 17:47:35 +0800
+Subject: [PATCH] KVM: arm64: Fix out-of-IPA space translation fault handling
+
+Commit 11e5ea5242e3 ("KVM: arm64: Use helpers to classify exception
+types reported via ESR") tried to abstract the translation fault
+check when handling an out-of IPA space condition, but incorrectly
+replaced it with a permission fault check.
+
+Restore the previous translation fault check.
+
+Fixes: 11e5ea5242e3 ("KVM: arm64: Use helpers to classify exception types r=
+eported via ESR")
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Wujie Duan <wjduan@linx-info.com>
+Cc: stable@vger.kernel.org
 ---
  arch/arm64/kvm/mmu.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 18680771cdb0..dc04bc767865 100644
+index 2902f3ffca3c..df90ebc039dc 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
 @@ -1637,7 +1637,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
- 	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
- 
+ 	fault_ipa =3D kvm_vcpu_get_fault_ipa(vcpu);
+ 	is_iabt =3D kvm_vcpu_trap_is_iabt(vcpu);
+=20
 -	if (esr_fsc_is_permission_fault(esr)) {
 +	if (esr_fsc_is_translation_fault(esr)) {
  		/* Beyond sanitised PARange (which is the IPA limit) */
- 		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
+ 		if (fault_ipa >=3D BIT_ULL(get_kvm_ipa_limit())) {
  			kvm_inject_size_fault(vcpu);
--- 
-2.40.1
+--=20
+2.39.2
 
+
+--=20
+Without deviation from the norm, progress is not possible.
