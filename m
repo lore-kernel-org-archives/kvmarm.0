@@ -1,158 +1,145 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6369B381BB
-	for <kvmarm@lists.linux.dev>; Mon, 18 Mar 2024 11:45:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 831F6383BB
+	for <kvmarm@lists.linux.dev>; Mon, 18 Mar 2024 13:11:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710762316; cv=none; b=n8e9fHs/ttr4AOsZfhfrMG/0zLdmbRJK6tOzi/AEn2iNCANS1gwuH8OG9V/TFTPFRB/Gi5CSbPt9L4xrWW3ALHyQa9ItkzA04gazT06jcPZbg8puhv4VEJEtk4ao8U9sCahtL5ClZfo5XLaPk/bRn/wD5SuWUcjtLT95H/hd+/E=
+	t=1710767475; cv=none; b=aitgJwnHguJNpgeEu5vKZ/mcWnqPZ+sSL71U41HOBPtwsO01g1t5jc3uXcBkqJOqED26PSA5xCIpqk8ZTg8bdorxlCRYDpVlNq4z5QbMAWFd+Y+t4R4/6kQJ1CfJxVjkt+K6rz3ylY4T4TbT5ApcUidnf9Fnw0V7AdufMbwCIv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710762316; c=relaxed/simple;
-	bh=vp6/if81oVUs+4yoGVf48qpm+QepcAiQjU6gYsiuU7A=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IDoAbrqOILIiTOXM7/E6fzKuPoT/Uw37Nix2CUvlTuv0MfDzq4QzbrPP15zOpIoUblmSUYomotK7oZHhFfYcnDANUW1cjAfwCEUJ3r1MrKpTLUnLFiGm0pfH0HMcO1TKHHtOAFw6H6SKDTy8ERzujbSOGXnX3nctyV0+zkEojD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V2QbGmYn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1710767475; c=relaxed/simple;
+	bh=6+niSvsrlTdoebUFvZkR5TjyZ5KAxqQlNjvmrnyAdUU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=O3oFbGYunC03I4XcdoDYo+dBL/PtEU6iBqg5K21nrOYMIPdS0oOulJp5AVnx+Z5ErkpUGZBKxq0L6TjTUia3x3fJA21PcT/gq6fYLo+t1G1QZLtekUhvNsFf9IoL7l/dfR2X86knHJpo60rk5sahl9Q3UTeTRRpsAwfNadOcCW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EBikxk6B; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V2QbGmYn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39A41C433C7;
-	Mon, 18 Mar 2024 11:45:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710762316;
-	bh=vp6/if81oVUs+4yoGVf48qpm+QepcAiQjU6gYsiuU7A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=V2QbGmYneQ30JuaTz6S+2XPLLKeTaPyQCZEjl2oqFL7RB5sAp900GhJM+ew/mDVED
-	 GFNS4Hr/2oJdLsB4MOyCZU4Wm0tJZcZfu6ca1LAFw6r0NroOAB+4LNaMcQm288gxgW
-	 Chldk9Q1BvS6DYNkVEN+lBP3t32tvgWomolOp5BRZ4bS9f9x18+80tEP4j3WuxNBJC
-	 7OHHjq+RHuL8zr1ALOh8Reotlk7HpvejFQasE+JNTxhb7rg4uUdENnS1EQFqVbMw2Z
-	 HubFNfvhNulp+Z9+uN9Nct9uL+AMQp4mSgnTG1L7E4rj5T3x/AcA0yWblJQO6REKBU
-	 hGifjgMKHJ/GA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rmBQY-00DGQp-Bp;
-	Mon, 18 Mar 2024 11:45:14 +0000
-Date: Mon, 18 Mar 2024 11:45:14 +0000
-Message-ID: <8634sn227p.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ott <sebott@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	kvmarm <kvmarm@lists.linux.dev>
-Subject: Re: [PATCH 1/4] KVM: arm64: add emulation for CTR_EL0 register
-In-Reply-To: <20240318111636.10613-2-sebott@redhat.com>
-References: <20240318111636.10613-1-sebott@redhat.com>
-	<20240318111636.10613-2-sebott@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EBikxk6B"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710767472;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9neb2kg1Bn3mmLQBIkZNqW8zmI6QIZ7MrEWOD5a8wx4=;
+	b=EBikxk6Bfxqz8AQ2C2pY9oPygkK1YOByUK0j0zebzb1x6251ktEfanKOr4a+oIhUruLXPv
+	v3OwWtcem3DQr3X8qyYdiPU/nWgBU11B0JWohkPPizXSBGJgzhA52wCjFE+ChvN+as6c0+
+	vLW6KNu/oCmsUYlUzYuSIPawbVaCveY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-439-EAdjJGz3NWit8p1xxkrAHQ-1; Mon, 18 Mar 2024 09:11:09 -0400
+X-MC-Unique: EAdjJGz3NWit8p1xxkrAHQ-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33e4397540bso2746536f8f.3
+        for <kvmarm@lists.linux.dev>; Mon, 18 Mar 2024 06:11:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710767468; x=1711372268;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9neb2kg1Bn3mmLQBIkZNqW8zmI6QIZ7MrEWOD5a8wx4=;
+        b=FsmBufVpJegloFstAWooErwxAlyaz1pl63o5NCKiF+NobRSNVioLYpCMIAjprOk9y7
+         GUcRNwS6SlW5SvTwzaYu9xcocEYpYyghQwk45SFDEGJgibghL7lN9JsPFzuer9zbGWRT
+         1z7XD1SXsTf6ehBouM2ayd/qRD1DfypNebFicqhwBSPc+jMRGuPxHOTNSNtVQrplfEoC
+         FjvkBkYOQcDKoOFo0hh+DPmZxOPiY1gr4gw2FxxVET3gVXKPqwqyxFJ6jNZULyi+w+W6
+         PMzMu1T6i1w1p/KskA+1szgrax/VtVcZ6dEPqlq9L9Y69i7hHtVKlpdJH/yKO7eiBw1j
+         36QQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXAh0NtKbU2QNtzE4yrSqB9SoQEHE2NWhdjjK6DhrR5WWqB5L09txBcAmMjucBimeK5hjNjk1U4lUWGBgp4PyXzb/wJOQI8
+X-Gm-Message-State: AOJu0YxdegPl1NsSYU6OiU/4cR/e778VTxskGfaH4prOAC8Ouzor1XWt
+	2EcSlgcHrDRA/fvv/6hmPhKAECcJqhsTKqwxVU7i19qQ1t13nkNk7jsIMTyLosavWlvmo9bXise
+	KjrTHVPCE9TovskKxvz4RvKQmAfepZfGrXicnIl/DpaHdCI1IMvpoV6o9DJG5k32GyTvtE3hwOM
+	nri2fOBzSX/gomR5gM3TExjczeRHQv
+X-Received: by 2002:adf:e745:0:b0:33e:7621:e15f with SMTP id c5-20020adfe745000000b0033e7621e15fmr8170832wrn.39.1710767468019;
+        Mon, 18 Mar 2024 06:11:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGyQ6S+WKFdZAsvaIMGYmlFh0x17pkrdrAjmpMvBAmA8hhGJBijSIHID0mFmSY2uazi/xgXq4p4w28uS6bhFxU=
+X-Received: by 2002:adf:e745:0:b0:33e:7621:e15f with SMTP id
+ c5-20020adfe745000000b0033e7621e15fmr8170817wrn.39.1710767467700; Mon, 18 Mar
+ 2024 06:11:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sebott@redhat.com, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <0b109bc4-ee4c-4f13-996f-b89fbee09c0b@amd.com> <ZfG801lYHRxlhZGT@google.com>
+ <9e604f99-5b63-44d7-8476-00859dae1dc4@amd.com> <ZfHKoxVMcBAMqcSC@google.com>
+ <93df19f9-6dab-41fc-bbcd-b108e52ff50b@amd.com> <ZfHhqzKVZeOxXMnx@google.com>
+ <c84fcf0a-f944-4908-b7f6-a1b66a66a6bc@amd.com> <d2a95b5c-4c93-47b1-bb5b-ef71370be287@amd.com>
+ <CAD=HUj5k+N+zrv-Yybj6K3EvfYpfGNf-Ab+ov5Jv+Zopf-LJ+g@mail.gmail.com>
+ <985fd7f8-f8dd-4ce4-aa07-7e47728e3ebd@amd.com> <ZfeYU6hqlVF7y9YO@infradead.org>
+In-Reply-To: <ZfeYU6hqlVF7y9YO@infradead.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 18 Mar 2024 14:10:55 +0100
+Message-ID: <CABgObfZCay5-zaZd9mCYGMeS106L055CxsdOWWvRTUk2TPYycg@mail.gmail.com>
+Subject: Re: [PATCH v11 0/8] KVM: allow mapping non-refcounted pages
+To: Christoph Hellwig <hch@infradead.org>
+Cc: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	David Stevens <stevensd@chromium.org>, Sean Christopherson <seanjc@google.com>, 
+	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	Zhi Wang <zhi.wang.linux@gmail.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Please add all the reviewers and the relevant mailing lists.
+On Mon, Mar 18, 2024 at 3:07=E2=80=AFAM Christoph Hellwig <hch@infradead.or=
+g> wrote:
+> > > Fundamentally, what this series is doing is
+> > > allowing pfns returned by follow_pte to be mapped into KVM's shadow
+> > > MMU without inadvertently translating them into struct pages.
+> >
+> > As far as I can tell that is really the right thing to do. Yes.
+>
+> IFF your callers don't need pages and you just want to track the
+> mapping in the shadow mmu and never take a refcount that is a good
+> thing.
 
-On Mon, 18 Mar 2024 11:16:33 +0000,
-Sebastian Ott <sebott@redhat.com> wrote:
-> 
-> CTR_EL0 is currently handled as an invariant register, thus
-> guests will be presented with the host value of that register.
-> Add emulation for CTR_EL0 and maintain a per vcpu value. The
-> only thing that is allowed to be changed compared to the host
-> value is to switch off the DIC bit which describes Icache
-> invalidation requirements.
-> 
-> Signed-off-by: Sebastian Ott <sebott@redhat.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 44 +++++++++++++++++++++++++++++++--------
->  1 file changed, 35 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 30253bd19917..b2019faa9d73 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1871,10 +1871,42 @@ static bool access_ctr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  	if (p->is_write)
->  		return write_to_read_only(vcpu, p, r);
->  
-> -	p->regval = read_sanitised_ftr_reg(SYS_CTR_EL0);
-> +	p->regval = __vcpu_sys_reg(vcpu, r->reg);
->  	return true;
->  }
->  
-> +static u64 reset_ctr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
-> +{
-> +	u64 val = read_sanitised_ftr_reg(SYS_CTR_EL0);
-> +
-> +	__vcpu_sys_reg(vcpu, rd->reg) = val;
-> +	return __vcpu_sys_reg(vcpu, rd->reg);
+Yes, that's the case and for everything else we can use a function
+that goes from guest physical address to struct page with a reference
+taken, similar to the current gfn_to_page family of functions.
 
-I really don't think we should make this a per-CPU value, and instead
-keep it a VM-wide value, just like any other ID register.
+> But unless I completely misunderstood the series that doesn't seem
+> to be the case - it builds a new kvm_follow_pfn API which is another
+> of these weird multiplexers like get_user_pages that can to tons of
+> different things depending on the flags.  And some of that still
+> grabs the refcount, right?
 
-Also, rd->reg isn't set to anything useful, leading to memory
-corruption (hint, there is no CTR_EL0 in the vcpu sysreg file).
+Yes, for a couple reasons. First, a lot of the lookup logic is shared
+by the two cases; second, it's easier for both developers and
+reviewers if you first convert to the new API, and remove the refcount
+in a separate commit. Also, you have to do this for every architecture
+since we agree that this is the direction that all of them should move
+to.
 
-> +}
-> +
-> +static int get_ctr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> +		   u64 *val)
-> +{
-> +	*val = __vcpu_sys_reg(vcpu, rd->reg);
-> +	return 0;
-> +}
-> +
-> +static int set_ctr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> +		   u64 val)
-> +{
-> +	u64 ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0);
-> +
-> +	if (kvm_vm_has_ran_once(vcpu->kvm) &&
-> +	    val != __vcpu_sys_reg(vcpu, rd->reg))
-> +		return -EBUSY;
-> +
-> +	if (((ctr_el0 & ~CTR_EL0_DIC_MASK) != (val & ~CTR_EL0_DIC_MASK)) ||
-> +	    ((ctr_el0 & CTR_EL0_DIC_MASK) < (val & CTR_EL0_DIC_MASK)))
-> +		return -EINVAL;
+So what we could do, would be to start with something like David's
+patches, and move towards forbidding the FOLL_GET flag (the case that
+returns the page with elevated refcount) in the new kvm_follow_pfn()
+API.
 
-Why limit this to DIC only? Anything that advertises something
-"weaker" than what the HW has, such as a smaller cache line size, is
-equally valid.
+Another possibility is to have a double-underscore version that allows
+FOLL_GET, and have the "clean" kvm_follow_pfn() forbid it. So you
+would still have the possibility to convert to __kvm_follow_pfn() with
+FOLL_GET first, and then when you remove the refcount you switch to
+kvm_follow_pfn().
 
-> +
-> +	__vcpu_sys_reg(vcpu, rd->reg) = val;
-> +	return 0;
-> +}
-> +
->  static bool access_clidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  			 const struct sys_reg_desc *r)
->  {
-> @@ -2461,7 +2493,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
->  	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
->  	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
-> -	{ SYS_DESC(SYS_CTR_EL0), access_ctr },
-> +	{ SYS_DESC(SYS_CTR_EL0), access_ctr, .reset = reset_ctr,
-> +	  .get_user = get_ctr, .set_user = set_ctr},
 
-Now, who traps this? Since c876c3f182a5 ("KVM: arm64: Relax trapping
-of CTR_EL0 when FEAT_EVT is available"), we don't trap it anymore when
-FEAT_EVT is present. Surely you should account for this.
+Paolo
 
-Also, we really shouldn't trap it unless the guest view is different,
-as this has a very visible impact on any userspace.
+> > Completely agree. In my thinking when you go a step further and offload
+> > grabbing the page reference to get_user_pages() then you are always on =
+the
+> > save side.
+>
+> Agreed.
+>
+> > Because then it is no longer the responsibility of the KVM code to get =
+all
+> > the rules around that right, instead you are relying on a core function=
+ality
+> > which should (at least in theory) do the correct thing.
+>
+> Exactly.
+>
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
