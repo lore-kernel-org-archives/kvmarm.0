@@ -1,211 +1,100 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 896BF1FB5;
-	Mon, 18 Mar 2024 14:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A1C54BC4;
+	Mon, 18 Mar 2024 16:47:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710771285; cv=none; b=gF+SlWiCX2n3IyvBJ42j1kUsJpp8IL2EVJtU9lqycZ7J6EeT72+kq8cuLODuQya7ME7xUxDsuxJusRGY5iePb2SCVMkHilFqu0F6OWjbJGlvEySUN3gB/3FGuxCHRlH+ehQnce/fuCkJ9cudaXR0eFnQnyFcmL8YBX+Bf093l3E=
+	t=1710780431; cv=none; b=ZVZHkI8n2rmVrm/cumVZGC3FfSl15wzVSM6aS1wRWQ9fDaGqQCe3i+Fvvmsjz8uo78MqBXhMZf0cVRMLN9aFNM1gMaKqFCn36qNsaAgjckokg8b03B2cB+qHA9jJ11ztuwBh+oO2xs4ieQbO8tT/Xo8fTxicXxUkG89XD+iFKQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710771285; c=relaxed/simple;
-	bh=UO+5wsSGymUVPt4vVeQZ8EDKQ64Wom2tgJ8iYeh7rSY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CVGaMUbC009+QGrJKfbbY5UoezHR5rwHizkhKUMjhOznuXXf3nAxS7cD+bnLEBUiDdGSgsCY6jt8LnjbQvjfM/Xslrtb1HRzbgUieiL1QlKXOtIETITKAeSQarrVtjcF9v4g0vVqdZ4IdtucSFyminYx8OupXOoy35eDo2024io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C94DBDA7;
-	Mon, 18 Mar 2024 07:15:17 -0700 (PDT)
-Received: from [10.57.12.69] (unknown [10.57.12.69])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8F1013F67D;
-	Mon, 18 Mar 2024 07:14:39 -0700 (PDT)
-Message-ID: <fff76a4f-28c3-4e46-945f-54554441a93c@arm.com>
-Date: Mon, 18 Mar 2024 14:14:40 +0000
+	s=arc-20240116; t=1710780431; c=relaxed/simple;
+	bh=JVi4X3Yp8llR/EjNT7yP76NQ5cLtcJoGUEbvuYaKKYU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DKbXfbOlaQlGVrmK3bgWIhRVXnBk00FrV1iG2Lm9qWVMvMvMgsfmsSHb3c+pGWAgR95lHslvWXEu/j7sBuRCzI6TU8oO/tYdEr8RQzxH7GnpsoqxQWZLfmkNxCXQ6qOBBhZK43OkWw7WlqbZ9Z2WUyjbL/6oUohdb9tG0FAwNzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ipCVPLOO; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ipCVPLOO"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+	Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=4Zpz2JcjWhGlazAgpId/FsjMBJt7sqHYOH/Rw/CmRqw=; b=ipCVPLOOed/JkOQ7fF2XxmRcmK
+	4Wru5XuYC6dRfKrzA1pgKjldfZ4KZBEoIcQcPPPhnTwH199fTLRQJy1vHvS8sCR5f9ENR6BhRkwTz
+	wm1235unu71rA+0gWC8ckQiMGHzaIqzp3aCZ0SUPzrCQvo7r5dgm3qV285R6KiuqIK9gWFYIlwpFn
+	sylBy6nqwmvlo5jLaPbtHTe2OubULNEfzeaAtKhxSoldoqhmtissBea2kO2HS7h8NtHiTLb+HskTT
+	/kB+Uu9GckQ6m58bDpfjOtWOXIb/ObhLLMU/xSyf8n9aoFD0rS56j15E3x1Yzyr8xO6iqUSvsDfUi
+	lhslC9Qg==;
+Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rmG8Y-0000000HYwj-0erY;
+	Mon, 18 Mar 2024 16:47:02 +0000
+Received: from dwoodhou by i7.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rmG8W-00000004F1K-1QMs;
+	Mon, 18 Mar 2024 16:46:56 +0000
+From: David Woodhouse <dwmw2@infradead.org>
+To: linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <len.brown@intel.com>,
+	Pavel Machek <pavel@ucw.cz>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Mostafa Saleh <smostafa@google.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-pm@vger.kernel.org
+Subject: [RFC PATCH v2 3/4] KVM: arm64: nvhe: Pass through PSCI v1.3 SYSTEM_OFF2 call
+Date: Mon, 18 Mar 2024 16:14:25 +0000
+Message-ID: <20240318164646.1010092-4-dwmw2@infradead.org>
+X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20240318164646.1010092-1-dwmw2@infradead.org>
+References: <20240318164646.1010092-1-dwmw2@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 12/28] KVM: arm64: Support timers in realm RECs
-Content-Language: en-GB
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
- <20230127112932.38045-1-steven.price@arm.com>
- <20230127112932.38045-13-steven.price@arm.com>
- <9ae4b453-4d5b-4537-b004-4db60183019a@os.amperecomputing.com>
-From: Steven Price <steven.price@arm.com>
-In-Reply-To: <9ae4b453-4d5b-4537-b004-4db60183019a@os.amperecomputing.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Sender: David Woodhouse <dwmw2@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-On 18/03/2024 11:28, Ganapatrao Kulkarni wrote:
-> 
-> 
-> On 27-01-2023 04:59 pm, Steven Price wrote:
->> The RMM keeps track of the timer while the realm REC is running, but on
->> exit to the normal world KVM is responsible for handling the timers.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>   arch/arm64/kvm/arch_timer.c  | 53 ++++++++++++++++++++++++++++++++----
->>   include/kvm/arm_arch_timer.h |  2 ++
->>   2 files changed, 49 insertions(+), 6 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
->> index bb24a76b4224..d4af9ee58550 100644
->> --- a/arch/arm64/kvm/arch_timer.c
->> +++ b/arch/arm64/kvm/arch_timer.c
->> @@ -130,6 +130,11 @@ static void timer_set_offset(struct
->> arch_timer_context *ctxt, u64 offset)
->>   {
->>       struct kvm_vcpu *vcpu = ctxt->vcpu;
->>   +    if (kvm_is_realm(vcpu->kvm)) {
->> +        WARN_ON(offset);
->> +        return;
->> +    }
->> +
->>       switch(arch_timer_ctx_index(ctxt)) {
->>       case TIMER_VTIMER:
->>           __vcpu_sys_reg(vcpu, CNTVOFF_EL2) = offset;
->> @@ -411,6 +416,21 @@ static void kvm_timer_update_irq(struct kvm_vcpu
->> *vcpu, bool new_level,
->>       }
->>   }
->>   +void kvm_realm_timers_update(struct kvm_vcpu *vcpu)
->> +{
->> +    struct arch_timer_cpu *arch_timer = &vcpu->arch.timer_cpu;
->> +    int i;
->> +
->> +    for (i = 0; i < NR_KVM_TIMERS; i++) {
-> 
-> Do we required to check for all timers, is realm/rmm uses hyp timers?
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-Good point, the realm guest can't use the hyp timers, so this should be
-NR_KVM_EL0_TIMERS. The hyp timers are used by the host to interrupt the
-guest execution. I think this code was written before NV support added
-the extra timers.
+Pass through the SYSTEM_OFF2 function for hibernation, just like SYSTEM_OFF.
 
->> +        struct arch_timer_context *timer = &arch_timer->timers[i];
->> +        bool status = timer_get_ctl(timer) & ARCH_TIMER_CTRL_IT_STAT;
->> +        bool level = kvm_timer_irq_can_fire(timer) && status;
->> +
->> +        if (level != timer->irq.level)
->> +            kvm_timer_update_irq(vcpu, level, timer);
->> +    }
->> +}
->> +
->>   /* Only called for a fully emulated timer */
->>   static void timer_emulate(struct arch_timer_context *ctx)
->>   {
->> @@ -621,6 +641,11 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
->>       if (unlikely(!timer->enabled))
->>           return;
->>   +    kvm_timer_unblocking(vcpu);
->> +
->> +    if (vcpu_is_rec(vcpu))
->> +        return;
->> +
-> 
-> For realm, timer->enabled is not set, load returns before this check.
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-True, this can be simplified. Thanks.
-
-Steve
-
->>       get_timer_map(vcpu, &map);
->>         if (static_branch_likely(&has_gic_active_state)) {
->> @@ -633,8 +658,6 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
->>         set_cntvoff(timer_get_offset(map.direct_vtimer));
->>   -    kvm_timer_unblocking(vcpu);
->> -
->>       timer_restore_state(map.direct_vtimer);
->>       if (map.direct_ptimer)
->>           timer_restore_state(map.direct_ptimer);
->> @@ -668,6 +691,9 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
->>       if (unlikely(!timer->enabled))
->>           return;
->>   +    if (vcpu_is_rec(vcpu))
->> +        goto out;
->> +
->>       get_timer_map(vcpu, &map);
->>         timer_save_state(map.direct_vtimer);
->> @@ -686,9 +712,6 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
->>       if (map.emul_ptimer)
->>           soft_timer_cancel(&map.emul_ptimer->hrtimer);
->>   -    if (kvm_vcpu_is_blocking(vcpu))
->> -        kvm_timer_blocking(vcpu);
->> -
->>       /*
->>        * The kernel may decide to run userspace after calling
->> vcpu_put, so
->>        * we reset cntvoff to 0 to ensure a consistent read between user
->> @@ -697,6 +720,11 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
->>        * virtual offset of zero, so no need to zero CNTVOFF_EL2 register.
->>        */
->>       set_cntvoff(0);
->> +
->> +out:
->> +    if (kvm_vcpu_is_blocking(vcpu))
->> +        kvm_timer_blocking(vcpu);
->> +
->>   }
->>     /*
->> @@ -785,12 +813,18 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->>       struct arch_timer_cpu *timer = vcpu_timer(vcpu);
->>       struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
->>       struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
->> +    u64 cntvoff;
->>         vtimer->vcpu = vcpu;
->>       ptimer->vcpu = vcpu;
->>   +    if (kvm_is_realm(vcpu->kvm))
->> +        cntvoff = 0;
->> +    else
->> +        cntvoff = kvm_phys_timer_read();
->> +
->>       /* Synchronize cntvoff across all vtimers of a VM. */
->> -    update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
->> +    update_vtimer_cntvoff(vcpu, cntvoff);
->>       timer_set_offset(ptimer, 0);
->>         hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC,
->> HRTIMER_MODE_ABS_HARD);
->> @@ -1265,6 +1299,13 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
->>           return -EINVAL;
->>       }
->>   +    /*
->> +     * We don't use mapped IRQs for Realms because the RMI doesn't allow
->> +     * us setting the LR.HW bit in the VGIC.
->> +     */
->> +    if (vcpu_is_rec(vcpu))
->> +        return 0;
->> +
->>       get_timer_map(vcpu, &map);
->>         ret = kvm_vgic_map_phys_irq(vcpu,
->> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
->> index cd6d8f260eab..158280e15a33 100644
->> --- a/include/kvm/arm_arch_timer.h
->> +++ b/include/kvm/arm_arch_timer.h
->> @@ -76,6 +76,8 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu,
->> struct kvm_device_attr *attr);
->>   int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct
->> kvm_device_attr *attr);
->>   int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct
->> kvm_device_attr *attr);
->>   +void kvm_realm_timers_update(struct kvm_vcpu *vcpu);
->> +
->>   u64 kvm_phys_timer_read(void);
->>     void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu);
-> 
-> Thanks,
-> Ganapat
+diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+index d57bcb6ab94d..76c7643e7eff 100644
+--- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
++++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+@@ -265,6 +265,8 @@ static unsigned long psci_1_0_handler(u64 func_id, struct kvm_cpu_context *host_
+ 	case PSCI_1_0_FN_PSCI_FEATURES:
+ 	case PSCI_1_0_FN_SET_SUSPEND_MODE:
+ 	case PSCI_1_1_FN64_SYSTEM_RESET2:
++	case PSCI_1_3_FN_SYSTEM_OFF2:
++	case PSCI_1_3_FN64_SYSTEM_OFF2:
+ 		return psci_forward(host_ctxt);
+ 	case PSCI_1_0_FN64_SYSTEM_SUSPEND:
+ 		return psci_system_suspend(func_id, host_ctxt);
+-- 
+2.44.0
 
