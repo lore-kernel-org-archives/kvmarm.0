@@ -1,119 +1,115 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD59157886
-	for <kvmarm@lists.linux.dev>; Mon, 18 Mar 2024 16:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88CED38F96;
+	Mon, 18 Mar 2024 16:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710780487; cv=none; b=I1eJefNWIAtn7ko8g9gMcs7q+CLjF6rx9crEBPZ0rkOcXbkV5IB24/yZtu5eJH5C0kaLmvut/TQfdjkOCA+rOIa+dmhcVkI5OwsRfBix+nO9SWb3ksxxHtK7vYvgT9fMSANRRPEhkR7eY3x02sBJ73XQwn/4DBspr4XQLkMEWq0=
+	t=1710781026; cv=none; b=DjQjDFMouAiTH5YkLGP1kjm7KDmk5svEcmyH5eZi3+B7KbmEioSByAGXXYp1ALGWt+O/d1vi+Al/HkqO0Y7bgaAJU0V5SxECMnGfVyNkztRuucDOI1CxSmCI2FKPUxBUzzIQqPxC3D+CXtv+d/dWtINy5/J+/XrZ3NvpjN+Wc8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710780487; c=relaxed/simple;
-	bh=byVLjBQ+PDKkjG98lJBvuTPI9sOWJC+KcaUGTHpUfw0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tua+fz9JRp3gRkdQraIoBvoykBuCYyqeItVHOhc1zn20b4R8LNFa58774YrPxFw4L/TPY1fC85gF0twU/t233ujScG+gqFicyhtTOQVKtczVuGZwYGzKWmuCc4M0KS6pF5ooXPXYYZUyIu56+FXvaDf2d+z2PCn/wYmSvvyKO4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uvq+TOp2; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1710781026; c=relaxed/simple;
+	bh=ACEAxDulSpAl5CvzyquQ2Fyq+IxD/YQAwg/steyISSE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ndzObaCQDTaGSwPNhdmGGW7AQREhcx3ArjXPx5tZhzc8oi9/e9cnacNRLfAOr/xTDuHte69TpcjQepyt5ozludsSmt8luFW7rb7e2b6MMsAz0By2ZevxRY7tRser+rNUhNRGoaKQf2sccEy48NaeUYEGSjLBCHpzqSQ0wXRfCLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K2K3MjRQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uvq+TOp2"
-Date: Mon, 18 Mar 2024 17:47:57 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1710780482;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dfWnUvJx9zSzTytX26V2scFE+BhFjwp/e/8ZZRBVnVk=;
-	b=uvq+TOp2eTS3R0SZ2xSLxaoQVYzgCuUP3YVelBKPW+bNEuoO8V8vvX/kxJD0HTGNUY5FXN
-	DWgu67/tTk3UfrJ0Zivp7gm03tXhrC+n9KpX62zKmX9huAfmEm1ex89dRVH2OfrxEwrT8g
-	qtEJ+7vPiXNmjjtaiyT7E0rb1YJlIes=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: alexandru.elisei@arm.com, eric.auger@redhat.com, 
-	nikos.nikoleris@arm.com, shahuang@redhat.com, pbonzini@redhat.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 00/18] arm64: EFI improvements
-Message-ID: <20240318-28422707d47001e973cc5a37@orel>
-References: <20240305164623.379149-20-andrew.jones@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K2K3MjRQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C825C433C7;
+	Mon, 18 Mar 2024 16:57:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710781026;
+	bh=ACEAxDulSpAl5CvzyquQ2Fyq+IxD/YQAwg/steyISSE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=K2K3MjRQsAxYRhiuVZoKeQjCmOY3DKwAf4XgxYpHVel83SYbS2T62gKVc2Le5iM5e
+	 vzNYzG+D+wdAX9lcqB1Os8yYkAg6QRNy4BPiaERel+qoX1rIkfIM9+1wyQrQjo0FR5
+	 UsRR/NNu/nUH/5v35Jufm5pFujLDlifp81HZ6Ny6MTJMhMAUJohyYQBj4efIFtL+AW
+	 am6l1hguWkRREYax8xvMGBKa8/osdsd1RKWMSueeJvVWMoFpXyEZDkIAhSFIMSg5fU
+	 xiSyDl0TPyBGJ7km8VX82BcORYsMu2xYP3SybVda+fYHDj1w040bUxp1ckQ8Qocr7D
+	 8xmowg1ahZkig==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rmGII-00DKXR-L6;
+	Mon, 18 Mar 2024 16:57:02 +0000
+Date: Mon, 18 Mar 2024 16:57:02 +0000
+Message-ID: <86wmpzzdep.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <len.brown@intel.com>,
+	Pavel Machek <pavel@ucw.cz>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Mostafa Saleh <smostafa@google.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-pm@vger.kernel.org
+Subject: Re: [RFC PATCH v2 0/4] arm64: Add PSCI v1.3 SYSTEM_OFF2 support for hibernation
+In-Reply-To: <20240318164646.1010092-1-dwmw2@infradead.org>
+References: <20240318164646.1010092-1-dwmw2@infradead.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240305164623.379149-20-andrew.jones@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dwmw2@infradead.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, lpieralisi@kernel.org, rafael@kernel.org, len.brown@intel.com, pavel@ucw.cz, dwmw@amazon.co.uk, smostafa@google.com, jean-philippe@linaro.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-pm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Mar 05, 2024 at 05:46:24PM +0100, Andrew Jones wrote:
-> This series collects one fix ("Update MAX_SMP probe") with a bunch of
-> improvements to the EFI setup code and run script. With the series
-> applied one can add --enable-efi-direct when configuring and then
-> run the EFI tests on QEMU much, much faster by using direct kernel
-> boot for them (and environment variables will work too). The non-
-> direct (original) way of running the EFI tests has also been sped up
-> a bit by not running the dummy test and not generating the dtb twice.
-> The cleanups in the setup code allow duplicated code to be removed
-> (by sharing with the non-EFI setup code) and eventually for riscv
-> to share some code too with the introduction of memregions_efi_init().
+On Mon, 18 Mar 2024 16:14:22 +0000,
+David Woodhouse <dwmw2@infradead.org> wrote:
 > 
-> v3:
->  - Dropped fdt_valid
->  - Factored out qemu_args+=(-machine acpi=off) [Nikos]
->  - Ensure etext is page aligned
->  - Picked up Nikos's r-b's
+> The PSCI v1.3 spec (https://developer.arm.com/documentation/den0022, 
+> currently in Alpha state, hence 'RFC') adds support for a SYSTEM_OFF2 
+> function enabling a HIBERNATE_OFF state which is analogous to ACPI S4. 
+> This will allow hosting environments to determine that a guest is 
+> hibernated rather than just powered off, and ensure that they preserve 
+> the virtual environment appropriately to allow the guest to resume 
+> safely (or bump the hardware_signature in the FACS to trigger a clean 
+> reboot instead).
 > 
-> v2:
->  - Add another improvement (patches 15-17), which is to stop mapping
->    EFI regions which we consider reserved (including
->    EFI_BOOT_SERVICES_DATA regions which requires moving the primary stack)
->  - Add EFI gitlab CI tests
->  - Fix one typo in configure help text
+> This adds support for it to KVM, exactly the same way as the existing 
+> support for SYSTEM_RESET2 as added in commits d43583b890e7 ("KVM: arm64: 
+> Expose PSCI SYSTEM_RESET2 call to the guest") and 34739fd95fab ("KVM: 
+> arm64: Indicate SYSTEM_RESET2 in kvm_run::system_event flags field").
 > 
+> Back then, KVM was unconditionally bumped to expose PSCI v1.1. This 
+> means that a kernel upgrade causes guest visible behaviour changes 
+> without any explicit opt-in from the VMM, which is... unconventional. In 
+> some cases, a PSCI update isn't just about new optional calls; PSCI v1.2 
+> for example adds a new permitted error return from the existing CPU_ON 
+> function.
 > 
-> Andrew Jones (17):
->   runtime: Update MAX_SMP probe
->   runtime: Add yet another 'no kernel' error message
->   arm64: efi: Don't create dummy test
->   arm64: efi: Remove redundant dtb generation
->   arm64: efi: Move run code into a function
->   arm64: efi: Remove EFI_USE_DTB
->   arm64: efi: Improve device tree discovery
->   lib/efi: Add support for loading the initrd
->   arm64: efi: Allow running tests directly
->   arm/arm64: Factor out some initial setup
->   arm/arm64: Factor out allocator init from mem_init
->   arm64: Simplify efi_mem_init
->   arm64: Add memregions_efi_init
->   arm64: efi: Don't map reserved regions
->   arm64: efi: Fix _start returns from failed _relocate
->   arm64: efi: Switch to our own stack
->   arm64: efi: Add gitlab CI
-> 
-> Shaoqin Huang (1):
->   arm64: efi: Make running tests on EFI can be parallel
-> 
->  .gitlab-ci.yml              |  32 ++++-
->  arm/efi/crt0-efi-aarch64.S  |  37 ++++--
->  arm/efi/elf_aarch64_efi.lds |   1 +
->  arm/efi/run                 |  64 ++++++----
->  arm/run                     |   6 +-
->  configure                   |  17 +++
->  lib/arm/mmu.c               |   6 +-
->  lib/arm/setup.c             | 227 ++++++++++++++----------------------
->  lib/efi.c                   |  84 +++++++++++--
->  lib/linux/efi.h             |  29 +++++
->  lib/memregions.c            |  53 +++++++++
->  lib/memregions.h            |   6 +
->  run_tests.sh                |   5 +-
->  scripts/runtime.bash        |  21 ++--
->  14 files changed, 389 insertions(+), 199 deletions(-)
-> 
-> -- 
-> 2.44.0
->
+> There *is* a way for a VMM to opt *out* of newer PSCI versions... by 
+> setting a per-vCPU "special" register that actually ends up setting the 
+> PSCI version KVM-wide. Quite why this isn't just a simple KVM_CAP, I 
+> have no idea.
 
-Merged.
+Because the expectations are that the VMM can blindly save/restore the
+guest's state, including the PSCI version, and restore that blindly.
+KVM CAPs are just a really bad design pattern for this sort of things.
 
-Thanks,
-drew
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
