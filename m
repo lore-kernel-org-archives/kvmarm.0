@@ -1,149 +1,68 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B996F2D042
-	for <kvmarm@lists.linux.dev>; Mon, 18 Mar 2024 10:17:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0FFA2A
+	for <kvmarm@lists.linux.dev>; Mon, 18 Mar 2024 10:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710757070; cv=none; b=suGIRmujNalFHE+VgHRoehdeTzYRIbuD5ZPp5G6kfrRoRf0nu+gPxafTeAUeicxmVVBXLqZjJcGYqYLh0wRSf9/E+eAd4AuDu4sDRr5YVJLhUMAeuWVrTBbIzrjYEw6KYQTqRo6dqCjbtnhuRE7YgkEiClgau/xov2XiohJJhFY=
+	t=1710757877; cv=none; b=oKb/wlvZmG6CJ6jo/nMDsvxlzm7BvUGZt1BbNFV0fBQEsEPKgeoTgp6lTvrlGfN+I5aifM/lcZwiIgiOwiZjRLdKtAN1kWi2sIFmsOSX71Hpk2AZGuKTY4Ms5lYUXPUONyFwWF9jz+ZDx5SPr6Fh9fny2CUhRVCQhNljgxZTdvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710757070; c=relaxed/simple;
-	bh=7/j+bZFORRmLvc392a8wld6gs98pKwOY8NXOcE5cpa0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XTOIsAW/nJfclN8OIFlTNjSxTuc2WEI0dtGWgDSjMqgwT6aMfmxV/113LTWXKUNU5zDvNmBoBW0cbOPhtzHxbQMs643BSbsNxBXM3I8E29z5FK8FqLFJij1m+vz2NA2SeeQx8vm2SLQvBDvsEITiJCLmhJqSR7CTMrSoToC38DY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FRISgR1c; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FRISgR1c"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99D17C433C7;
-	Mon, 18 Mar 2024 10:17:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710757070;
-	bh=7/j+bZFORRmLvc392a8wld6gs98pKwOY8NXOcE5cpa0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FRISgR1ci1CXIhes5NutFxysBRz3u4YCncMd/k/QMpYTX87/8VbpLmG8wHeVCsEVQ
-	 l5b6DbFbcPlL5B4+kgrw0283KhF7brdHKqAiNRQBktmw/4e3ct88aA5yu2meB77Mz8
-	 sN+MqDnQYxFfSDUhTnJKEW1vlYrA4qqMI3Dl8dEqBUPimWTKYzsDMCkpAB+/uuduEE
-	 CPsy4ytnYz/qzojKjkC0WnW6ceM49WQaVwOhtWp9yGliponFCma+ChGv4vFeGX+nyQ
-	 B4++glWiLyDYviDtErTtW+Zx9vtccW6GTjB1gbFu1J9xfG3wOUjvCi/R78RmuQfCTv
-	 9z/VzYT5jTNjw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rmA3w-00DEy8-2v;
-	Mon, 18 Mar 2024 10:17:48 +0000
-Date: Mon, 18 Mar 2024 10:17:47 +0000
-Message-ID: <864jd3269g.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Wujie Duan <wjduan@linx-info.com>
-Cc: oliver.upton@linux.dev,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH] KVM: arm64: Change back kvm fault condition to translation
-In-Reply-To: <20240318100249.220897-1-wjduan@linx-info.com>
+	s=arc-20240116; t=1710757877; c=relaxed/simple;
+	bh=NeyLNWAIyDQ0JUE+fLAY1CNq7XcVqi8QrWGhOCgZKXU=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Y+qV3vTF2y2zTjrH8cn+kA6Ag98ptNcNJdT85h9YT7rlAcwXzJzBHf4T70a1/nCudx40YqB3HTYdoKcOjm1nPDu5ojyMz6TAce+42MYQvm4SK44IS6Kkriy8JRnJzI0Dnt+b5yn6r9hRsAWKQg53pvXNe2w7tkc5r+FnfDWxIpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Tyrfm1LsrzXjHQ;
+	Mon, 18 Mar 2024 18:28:32 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id B1A1D140259;
+	Mon, 18 Mar 2024 18:31:05 +0800 (CST)
+Received: from [10.174.185.179] (10.174.185.179) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 18 Mar 2024 18:31:04 +0800
+Subject: Re: [PATCH] KVM: arm64: Change back kvm fault condition to
+ translation
+To: Marc Zyngier <maz@kernel.org>
+CC: Wujie Duan <wjduan@linx-info.com>, <oliver.upton@linux.dev>,
+	<james.morse@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>
 References: <20240318100249.220897-1-wjduan@linx-info.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <864jd3269g.wl-maz@kernel.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <14f40fcd-6951-5c86-b6b6-da5735105dc1@huawei.com>
+Date: Mon, 18 Mar 2024 18:31:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: wjduan@linx-info.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+In-Reply-To: <864jd3269g.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Mon, 18 Mar 2024 10:02:49 +0000,
-Wujie Duan <wjduan@linx-info.com> wrote:
->=20
-> KVM: arm64: Condition should be esr_fsc_is_translation_fault
->=20
-> In commit '11e5ea5242e3 ("KVM: arm64: Use helpers to
->         classify exception types reported via ESR")'
-> the KVM code was optimized, but the code logic was incorrectly modified.
-> Therefore, it is being corrected.
->=20
+On 2024/3/18 18:17, Marc Zyngier wrote:
+> Subject: [PATCH] KVM: arm64: Fix out-of-IPA space translation fault handling
+> 
+> Commit 11e5ea5242e3 ("KVM: arm64: Use helpers to classify exception
+> types reported via ESR") tried to abstract the translation fault
+> check when handling an out-of IPA space condition, but incorrectly
+> replaced it with a permission fault check.
+> 
+> Restore the previous translation fault check.
+> 
+> Fixes: 11e5ea5242e3 ("KVM: arm64: Use helpers to classify exception types reported via ESR")
+> Acked-by: Ard Biesheuvel <ardb@kernel.org>
+> Reviewed-by: Marc Zyngier <maz@kernel.org>
 > Signed-off-by: Wujie Duan <wjduan@linx-info.com>
-> ---
->  arch/arm64/kvm/mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 18680771cdb0..dc04bc767865 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1637,7 +1637,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  	fault_ipa =3D kvm_vcpu_get_fault_ipa(vcpu);
->  	is_iabt =3D kvm_vcpu_trap_is_iabt(vcpu);
-> =20
-> -	if (esr_fsc_is_permission_fault(esr)) {
-> +	if (esr_fsc_is_translation_fault(esr)) {
->  		/* Beyond sanitised PARange (which is the IPA limit) */
->  		if (fault_ipa >=3D BIT_ULL(get_kvm_ipa_limit())) {
->  			kvm_inject_size_fault(vcpu);
+> Cc:stable@vger.kernel.org
 
-I think 7 tries are enough ;-). Here's what I was expecting:
-
-- a subject indicating the nature of the issue as a one-liner
-- a commit message describing the exact situation
-- a Fixes: tag indicating the commit being fixed
-- a Cc: stable tag to indicate this needs backporting
-- Ard's Ack, as he's been kind enough to look into it
-
-See below for the full patch and my own RB tag. In the future, please
-try to follow these guidelines.
-
-Oliver, can you please pick this ASAP?
-
-Thanks,
-
-	M.
-
-=46rom 10febd177a551e1f9bfb708a0b3865ca642f9a85 Mon Sep 17 00:00:00 2001
-From: Wujie Duan <wjduan@linx-info.com>
-Date: Mon, 18 Mar 2024 17:47:35 +0800
-Subject: [PATCH] KVM: arm64: Fix out-of-IPA space translation fault handling
-
-Commit 11e5ea5242e3 ("KVM: arm64: Use helpers to classify exception
-types reported via ESR") tried to abstract the translation fault
-check when handling an out-of IPA space condition, but incorrectly
-replaced it with a permission fault check.
-
-Restore the previous translation fault check.
-
-Fixes: 11e5ea5242e3 ("KVM: arm64: Use helpers to classify exception types r=
-eported via ESR")
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Wujie Duan <wjduan@linx-info.com>
-Cc: stable@vger.kernel.org
----
- arch/arm64/kvm/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 2902f3ffca3c..df90ebc039dc 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1637,7 +1637,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 	fault_ipa =3D kvm_vcpu_get_fault_ipa(vcpu);
- 	is_iabt =3D kvm_vcpu_trap_is_iabt(vcpu);
-=20
--	if (esr_fsc_is_permission_fault(esr)) {
-+	if (esr_fsc_is_translation_fault(esr)) {
- 		/* Beyond sanitised PARange (which is the IPA limit) */
- 		if (fault_ipa >=3D BIT_ULL(get_kvm_ipa_limit())) {
- 			kvm_inject_size_fault(vcpu);
---=20
-2.39.2
-
-
---=20
-Without deviation from the norm, progress is not possible.
+Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
