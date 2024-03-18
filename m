@@ -1,197 +1,76 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D2955764
-	for <kvmarm@lists.linux.dev>; Mon, 18 Mar 2024 17:06:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B434A55776
+	for <kvmarm@lists.linux.dev>; Mon, 18 Mar 2024 17:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710781588; cv=none; b=jdZkdUwW050bsLJbnO2PAAbqmUnb1HhEciThpGWYQ959lioA8EVVRah9Hv+YLGbNmoezgo4biCFw3+u00WtxYIuY9nFfKrDBaoKJYmv4ng94aGcrwn2eWzCHTfs5g3Dt4HPjnqgu29h+czQXdGUl0PRGqJNeXo6wb6+1oQLmiAw=
+	t=1710782551; cv=none; b=inPnDedPye4Ax3OZl97iKLVJIn+ViM4LJx3dCx42zJzv9L4J3WRotO7o2AtyBqXHh1ztbgqjGHR7q6+zPNiQQdbWnjQDHUtnsfL+D4ICEg+2DXEtzjTzB5lVlb4E4iGDYc8zwka18RznNKBKi1vcrYesi+4fB8CGY8pKONhOO5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710781588; c=relaxed/simple;
-	bh=wO1r7n/fmpmHJNO7C7t/Fiaw0aLE27GJ1ob1HSjzT3w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N7ILR0SbVfxD+RDTrO0JQ9Scal0FYrLvFwiEPKAUaWIZJ0i2kTHu4AQdqSW7weGqZZzw/tjri/zaxae8qvs0sz25XDU0d3R+srwifdoFzDoOQGJhrJFGswmPfCGeKn5bC0sevHkkWOiAA6hT/vvrM2QiHz0iUuAv+XsfUrJKTdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jC0FgCxC; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1710782551; c=relaxed/simple;
+	bh=RJrWgzeoMtAA8xGKCEjgqVBMRizykgj3qzhMbAcO5Bs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N4c4b8AtFtFQFnDXhn7wFi82td95LCJaa0LXHnNQGf1OnWzlQdckI3qYwUZBiwudWTEABzxsliZzau0pvAjPwYjkaE8cBpYKoe6mHdp3l8sLcfMjpoE13xENw+y5LotUOFD3Sk/E49dz0c8lAGzne593oNql8iLVzIdfBQ4ONA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Bj5cdJJq; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jC0FgCxC"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-78850ab4075so191230485a.1
-        for <kvmarm@lists.linux.dev>; Mon, 18 Mar 2024 10:06:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710781586; x=1711386386; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NF57ccWL2fW0MRBAd8FHi6iAKCBMMg0jPBtwttJtVt4=;
-        b=jC0FgCxCwjR7OmIR7wXiMLAngm6OFyvEBf0GJo69w4MCUi7Z6wtha8DeF3FzAcP8W+
-         MHkWN4KfvpAqSsSj0Y2bZ3Q0Ncz87RGI9DOJrbrH7VcDwwSvGRLDh5NFj4ZT3hWbxIPl
-         HfiyCo6e3P1GMLQeHDj5VOUcKW2cck/GJ/v0sL85ipd3eapVZUOrbZgEr+uEiTID/xws
-         J8BoFUdEJ8/7MdyDYpi3UPiMHCcbIEIDfolYL1qtIk4o5cxFlDjq8ru2p38rqBONLS7c
-         Jl+Wtlc6FzIKTKWMYu1uy5M1nPjm4sTX7UPKAW5KzMns38RBoWDKM23D+OmSqDUAWd9T
-         wHpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710781586; x=1711386386;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NF57ccWL2fW0MRBAd8FHi6iAKCBMMg0jPBtwttJtVt4=;
-        b=Rh3JUOYaTGdOxwzDcNzBkSJjwrcQ4jJQGCxbyIxR0g5tZ05zkvl54mQSji/ey0I5eU
-         VZ7kwJviKArcQ+dNPlVqio6yqztsrZVUoctSCWjxNWuauOF/avU5X5jRLd+KYrLfEA+x
-         kzp0mPADKBmcyUjy+FeF5JVm0pKkrMwZ+pU0m+kQkKS6R8vh4oQ7ZLwl741eBbkoiAK2
-         U1ngoWeWc+0ZxhQQDO4guN6uLQ5EkO5iw/LS/tRr/Yl3f3Wu3+oYFnAfu9Cc9pXyBmWv
-         +aogwRFLF64IAI2Jcry3i8+e+iEHK1RQZJrM/4lQ384HbOGOr53WJ1Glb+02CEeC6lkh
-         0xlA==
-X-Forwarded-Encrypted: i=1; AJvYcCVBsYy6KlhRFawh49HicBFuVZ2qNfFz9+zTkBMVQtqHiO0O1ar6rJpcnPRnHWjfs/MT0/P93pa1Qpp+YgMn7R3OgbdV5Zee
-X-Gm-Message-State: AOJu0Ywd9+uJwKxv7b7XB4mtPesslrX/4oFhMzWSsfUKx3Rf1XS7zlZ/
-	V/7qfZJTA4d403V9dvolI+H19sx1ztYiOzQ0BMSWsKpgMlMpY4CdebfedPb+5gXo8n1ehY34v2R
-	wKvMcXnYWeOmaBD5yI37L+1t8quTu22ZIOjJP
-X-Google-Smtp-Source: AGHT+IGchNmpKqEvOsyJsORM6Rdk76HLItKpY9KUt3EAsDMcebiP7GEsuPfgxQ4qtBtUYHV/dqgAjPV9ICe9FSECPPA=
-X-Received: by 2002:ad4:5699:0:b0:690:ca65:3393 with SMTP id
- bd25-20020ad45699000000b00690ca653393mr11918853qvb.33.1710781585330; Mon, 18
- Mar 2024 10:06:25 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Bj5cdJJq"
+Date: Mon, 18 Mar 2024 17:22:20 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1710782546;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lmUnuMT6X6ljCwro06ZGTVVzpas2u24v+V3uk0OS4nk=;
+	b=Bj5cdJJqm5Krv61/uQ7n4LUBPl93+J1ThiZbmohZp2SKFmW4IaC6/BydvJh/slMDKZFyRn
+	r7+ERpHq+rS2QvBLEXi4zQhInOKiBBQ3MWVxFqbz8ik0XY7A8ShEGrTiV8CQKZp/ESKKX0
+	LasH9Dmhb9oZxdxx2LFV3iuzvG+kJdA=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Wujie Duan <wjduan@linx-info.com>, james.morse@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH] KVM: arm64: Change back kvm fault condition to
+ translation
+Message-ID: <Zfh4TOQxzTUxGePf@linux.dev>
+References: <20240318100249.220897-1-wjduan@linx-info.com>
+ <864jd3269g.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <40a8fb34-868f-4e19-9f98-7516948fc740@redhat.com>
- <20240226105258596-0800.eberman@hu-eberman-lv.qualcomm.com>
- <925f8f5d-c356-4c20-a6a5-dd7efde5ee86@redhat.com> <Zd8PY504BOwMR4jO@google.com>
- <755911e5-8d4a-4e24-89c7-a087a26ec5f6@redhat.com> <Zd8qvwQ05xBDXEkp@google.com>
- <99a94a42-2781-4d48-8b8c-004e95db6bb5@redhat.com> <Zd82V1aY-ZDyaG8U@google.com>
- <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com> <ZeXAOit6O0stdxw3@google.com>
- <ZeYbUjiIkPevjrRR@google.com> <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
-In-Reply-To: <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Mon, 18 Mar 2024 10:06:11 -0700
-Message-ID: <CAGtprH-17s7ipmr=+cC6YuH-R0Bvr7kJS7Zo9a+Dc9VEt2BAcQ@mail.gmail.com>
-Subject: Re: folio_mmapped
-To: David Hildenbrand <david@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>, Quentin Perret <qperret@google.com>, 
-	Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, 
-	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
-	amoorthy@google.com, dmatlack@google.com, yu.c.zhang@linux.intel.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, keirf@google.com, 
-	linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <864jd3269g.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Mar 4, 2024 at 12:17=E2=80=AFPM David Hildenbrand <david@redhat.com=
-> wrote:
->
-> On 04.03.24 20:04, Sean Christopherson wrote:
-> > On Mon, Mar 04, 2024, Quentin Perret wrote:
-> >>> As discussed in the sub-thread, that might still be required.
-> >>>
-> >>> One could think about completely forbidding GUP on these mmap'ed
-> >>> guest-memfds. But likely, there might be use cases in the future wher=
-e you
-> >>> want to use GUP on shared memory inside a guest_memfd.
-> >>>
-> >>> (the iouring example I gave might currently not work because
-> >>> FOLL_PIN|FOLL_LONGTERM|FOLL_WRITE only works on shmem+hugetlb, and
-> >>> guest_memfd will likely not be detected as shmem; 8ac268436e6d contai=
-ns some
-> >>> details)
-> >>
-> >> Perhaps it would be wise to start with GUP being forbidden if the
-> >> current users do not need it (not sure if that is the case in Android,
-> >> I'll check) ? We can always relax this constraint later when/if the
-> >> use-cases arise, which is obviously much harder to do the other way
-> >> around.
-> >
-> > +1000.  At least on the KVM side, I would like to be as conservative as=
- possible
-> > when it comes to letting anything other than the guest access guest_mem=
-fd.
->
-> So we'll have to do it similar to any occurrences of "secretmem" in
-> gup.c. We'll have to see how to marry KVM guest_memfd with core-mm code
-> similar to e.g., folio_is_secretmem().
->
-> IIRC, we might not be able to de-reference the actual mapping because it
-> could get free concurrently ...
->
-> That will then prohibit any kind of GUP access to these pages, including
-> reading/writing for ptrace/debugging purposes, for core dumping purposes
-> etc. But at least, you know that nobody was able to optain page
-> references using GUP that might be used for reading/writing later.
->
+Hey,
 
-There has been little discussion about supporting 1G pages with
-guest_memfd for TDX/SNP or pKVM. I would like to restart this
-discussion [1]. 1G pages should be a very important usecase for guest
-memfd, especially considering large VM sizes supporting confidential
-GPU/TPU workloads.
+On Mon, Mar 18, 2024 at 10:17:47AM +0000, Marc Zyngier wrote:
 
-Using separate backing stores for private and shared memory ranges is
-not going to work effectively when using 1G pages. Consider the
-following scenario of memory conversion when using 1G pages to back
-private memory:
-* Guest requests conversion of 4KB range from private to shared, host
-in response ideally does following steps:
-    a) Updates the guest memory attributes
-    b) Unbacks the corresponding private memory
-    c) Allocates corresponding shared memory or let it be faulted in
-when guest accesses it
+> I think 7 tries are enough ;-). Here's what I was expecting:
 
-Step b above can't be skipped here, otherwise we would have two
-physical pages (1 backing private memory, another backing the shared
-memory) for the same GPA range causing "double allocation".
+Hopefully I'm looking at the right thread!
 
-With 1G pages, it would be difficult to punch KBs or even MBs sized
-hole since to support that:
-1G page would need to be split (which hugetlbfs doesn't support today
-because of right reasons), causing -
-        - loss of vmemmap optimization [3]
-        - losing ability to reconstitute the huge page again,
-especially as private pages in CVMs are not relocatable today,
-increasing overall fragmentation over time.
-              - unless a smarter algorithm is devised for memory
-reclaim to reconstitute large pages for unmovable memory.
+> - a subject indicating the nature of the issue as a one-liner
+> - a commit message describing the exact situation
+> - a Fixes: tag indicating the commit being fixed
+> - a Cc: stable tag to indicate this needs backporting
+> - Ard's Ack, as he's been kind enough to look into it
+> 
+> See below for the full patch and my own RB tag. In the future, please
+> try to follow these guidelines.
+> 
+> Oliver, can you please pick this ASAP?
 
-With the above limitations in place, best thing could be to allow:
- - single backing store for both shared and private memory ranges
- - host userspace to mmap the guest memfd (as this series is trying to do)
- - allow userspace to fault in memfd file ranges that correspond to
-shared GPA ranges
-     - pagetable mappings will need to be restricted to shared memory
-ranges causing higher granularity mappings (somewhat similar to what
-HGM series from James [2] was trying to do) than 1G.
- - Allow IOMMU also to map those pages (pfns would be requested using
-get_user_pages* APIs) to allow devices to access shared memory. IOMMU
-management code would have to be enlightened or somehow restricted to
-map only shared regions of guest memfd.
- - Upon conversion from shared to private, host will have to ensure
-that there are no mappings/references present for the memory ranges
-being converted to private.
+Yup, I'll queue it up but I only plan on sending the first set of fixes
+after -rc1 as I'll be AFK for a few days this week. I'll get a respin of
+the vPMU + nVHE stuff out too.
 
-If the above usecase sounds reasonable, GUP access to guest memfd
-pages should be allowed.
-
-[1] https://lore.kernel.org/lkml/CAGtprH_H1afUJ2cUnznWqYLTZVuEcOogRwXF6uBAe=
-HbLMQsrsQ@mail.gmail.com/
-[2] https://lore.kernel.org/lkml/20230218002819.1486479-2-jthoughton@google=
-.com/
-[3] https://docs.kernel.org/mm/vmemmap_dedup.html
-
-
-
-> --
-> Cheers,
->
-> David / dhildenb
->
+-- 
+Thanks,
+Oliver
