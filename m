@@ -1,103 +1,425 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2119.outbound.protection.outlook.com [40.107.92.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77DBD18E1D;
-	Mon, 18 Mar 2024 01:26:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710725210; cv=none; b=Hr/1Cy2i+7STe4HpB2B6Bi3fTWO5SxeOsohdLnX0priWkB6KSvcyBf3/+nhMmwzq7V8m5OE76mDX9eek5d/lD936/n+dFL7Eq8aUltuV7MqM7f2CMWurIsmyX96wlANVT1XfJjFJDcnBIOBx1/sob6nghLebHv7hRssDh+qJJws=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710725210; c=relaxed/simple;
-	bh=ftsEb9yXw9uzcEt530OlE8K0MzCs2GPsLpuZS+alOiM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RMODDrcQJndYyawJFKOjIn3wVjrwGvw4pQgaAgviPJKXlRTKFG3nQc2myVFhm5Vz2cDm8COOJOnYsYlqXT65AEPVF275IeTqM/jo0sgyvve9dWQoB9oF66pEBxfdZgAMCXziLDHhVNpTm5RJGX4XnnDU1T21BNph2AD94QhfR6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=SIGz/bxS; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B83922EEF;
+	Mon, 18 Mar 2024 07:03:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.119
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710745435; cv=fail; b=luic7e/3wKYeZAQvCzD2fIyGJqghVOezUIxWR+bPl7ykCyxW5snF1Gz2VRQGw9uxrrsNqFCsYhIicyMwyqkleLMKU9SfvIwywO1sCzpcw3E2srYuOofao4aY+9H8/p+WDlV1AkxQ2dXPddPayDBgbbvhgwalDmzOcOIFXzXB4GE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710745435; c=relaxed/simple;
+	bh=2Nfhux9MmYuj73BDBWvXhlhfMM/VmWLXd9ALj4gG88w=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=RffHwT7G2GLm5eBk/GwOALeC9Uhipi6klwvXk6bxVATv5BoDp5q56QIuY5r3Om3JVYCNlyYDS+P0ANQJVhO1O6hXKqE0WZOy7Sy55CoqYkH4vsrw5/CY1VewZzI/3+ja9F+6ciNqA7lB8LVdRwftTM0rEEthGVDdUHM1o38zh0E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=v3m9tVgQ; arc=fail smtp.client-ip=40.107.92.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SIGz/bxS"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=S56ZGNytYd3VhDY57h4xgye0OIXsSZDMpFlintu/yL4=; b=SIGz/bxSjrLiXEBNRwH7HY2z9N
-	ze2G+vMckoZFXpELmcxty/8/rRu6ercUJM+AKkzsvPsc+AeEUa4B+9kS9TUucwrUWbH60pUnCk4Mo
-	HnVHxteb47hRWwvyrJoQXwTkhaNCgqTIhykAZglB60rDw7uEEAgogEuDssvDS9Ih4HuBrAg9t5tlO
-	FIek4XTcu958qiFl7n98VYbFgOwmSoGfZkKC9NwnB0NWx+C+0uRtov5BCKGIIpPw18XYba61FE+m7
-	hvQFDcf92qnwzqwor7OtC4tXY3ktOWU8D57VdoIvvhhO/S95vswBbWqV0qBCS1eovzom2kZENxwPW
-	STOnZ7/A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rm1lz-00000006uvt-2Snu;
-	Mon, 18 Mar 2024 01:26:43 +0000
-Date: Sun, 17 Mar 2024 18:26:43 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
-Cc: David Stevens <stevensd@chromium.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Yu Zhang <yu.c.zhang@linux.intel.com>,
-	Isaku Yamahata <isaku.yamahata@gmail.com>,
-	Zhi Wang <zhi.wang.linux@gmail.com>,
-	Maxim Levitsky <mlevitsk@redhat.com>, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v11 0/8] KVM: allow mapping non-refcounted pages
-Message-ID: <ZfeYU6hqlVF7y9YO@infradead.org>
-References: <0b109bc4-ee4c-4f13-996f-b89fbee09c0b@amd.com>
- <ZfG801lYHRxlhZGT@google.com>
- <9e604f99-5b63-44d7-8476-00859dae1dc4@amd.com>
- <ZfHKoxVMcBAMqcSC@google.com>
- <93df19f9-6dab-41fc-bbcd-b108e52ff50b@amd.com>
- <ZfHhqzKVZeOxXMnx@google.com>
- <c84fcf0a-f944-4908-b7f6-a1b66a66a6bc@amd.com>
- <d2a95b5c-4c93-47b1-bb5b-ef71370be287@amd.com>
- <CAD=HUj5k+N+zrv-Yybj6K3EvfYpfGNf-Ab+ov5Jv+Zopf-LJ+g@mail.gmail.com>
- <985fd7f8-f8dd-4ce4-aa07-7e47728e3ebd@amd.com>
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="v3m9tVgQ"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cQE4XzblOMJR5b8arnv4p45wLLxEjJ/0WrzX72YHohJROQECXTnVy66gs44sAFgw4FuzDJKEydPbuFUmJauFYYm/k9wPV3YNPYuK9ZMdpw3umUsWesmpwe8W0pk6JTJvytXkrR0msGS3SY9MisRfTE3JCUwszEo5s+Pabl8lDYUGTKlfd5e3jRKDe5kfI6lr7tWl3pWAjwSqao5zNG9CvwfphALsS7gxsvl/dowJe/ORHXldneOtKqjaoOVXCPUjAbirxq5yoHcUeDGNgbON8s+LzcXG1qtDRUQiqa8XUQTaO2GJIgwMX487dFkYHtXi7JfQkIcW8OW5MR93MTfluA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=anAnmk5BmAO/1JV6SIU9HcG4NDo+kycBOv8dI1swjUU=;
+ b=fmjrmJgrdF65mh8+GlMKruo37dAioe5zTNBmxexzIBPGJcJvHteGEOjKglUUtoYSxhRlkXKDFZMR3zmm1ppo9S1BmOcUf8dMTEIWgWeFaEITClNbZCyxdO59z7TJDEskSLC/Du0/+KzJzdPGciLaRgBzrmgc/UTwa8j7AAU2Jg4IspfSWvtXj1zhhJXoz1X4wLargV86ap9e2rvLClSSaKOci7pyrrERtDhjQGRx2WK5eejjRyubmpVMlotmg5EE7B4ZYUC3s/F/m7JIkdkPssMrAUwnMfJE6h7azSSK9tEYpJBiSeYtq5dwC+D39jj0tw52fYgTKBxZdzYoMaMxPQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=anAnmk5BmAO/1JV6SIU9HcG4NDo+kycBOv8dI1swjUU=;
+ b=v3m9tVgQbkfaAkrOlYSIWDqWMl1leV/WbmTRE3iphXgJphx4/rIR8IDnhs12rynLwkwrn6jntaeAHnyi7qJvbWyv51WWiVAO3IBEmkERIAcgU7UtBWdRiQcuJQ8HsJZUA3OIYbNFQY6+f97yRYrdnK5bpGZbv0Jb/brUPMs27Ow=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
+ CH0PR01MB7019.prod.exchangelabs.com (2603:10b6:610:108::10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7386.27; Mon, 18 Mar 2024 07:03:48 +0000
+Received: from SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::d3dd:ece:637f:bde9]) by SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::d3dd:ece:637f:bde9%3]) with mapi id 15.20.7386.025; Mon, 18 Mar 2024
+ 07:03:47 +0000
+Message-ID: <aaf10e76-657f-4667-a920-e71b93419efd@os.amperecomputing.com>
+Date: Mon, 18 Mar 2024 12:33:35 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 03/28] arm64: RME: Add wrappers for RMI calls
+Content-Language: en-US
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev
+References: <20230127112248.136810-1-suzuki.poulose@arm.com>
+ <20230127112932.38045-1-steven.price@arm.com>
+ <20230127112932.38045-4-steven.price@arm.com>
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <20230127112932.38045-4-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH0PR13CA0059.namprd13.prod.outlook.com
+ (2603:10b6:610:b2::34) To SJ2PR01MB8101.prod.exchangelabs.com
+ (2603:10b6:a03:4f6::10)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <985fd7f8-f8dd-4ce4-aa07-7e47728e3ebd@amd.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|CH0PR01MB7019:EE_
+X-MS-Office365-Filtering-Correlation-Id: bdc93212-92db-4b1a-f417-08dc47198ef2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	P+1LQS5uj3jdMe4KbK/szEd7O6ZL34TnkIGzhrha8hVmAH7uQe1st834CSLEjPHpFhzEQKeZ7Zz0ZejdTeWCk4+H+OkEbz8/7nSMNMpUs+SqH1s0LliRAvLXUcHiCT+6fq+258bm6eZdDZsPwQ0Vcd/9TSYhEOZsGRwDgIrTjnzy7MZpuQlttL7NCLDVwSrRWqHit//QyE9w2se/gTHpcz6Aoz8Lq6n8bBBX/Zq9Vg961ZcDkjhw84FgiEznhUUl2sNJvLrtsIf5wxeIJRX9vVyi6NWxZ0FNIDiiuKFU6V5YOh1Sd5GSbRVX7eM50nAfuXbUTNFnsWneHQ7n/GVrSdqjNJsZIrkuhK15Q8PhQvu9qAkgy/MqmFoqYLITJuHViVXAYi84HE0xRf73J1Zr0Krt8Ar3J+2DJHu15gCjLY8PsJPtV+uItjzquhp+Mn0LoOzHZg57HZwKDZmlmAiKpCz0zr4wWn8timp5d3EykFG3spn7niiMbTZfm/h+PmYS1H2Nrdtk+pFrvG70UjVTbZ5bgxXUsrGQ29MZCdvXJjwfOJKXSAY3lxvGxoA+hC+I58hoUx/gUIeqUMnsq38b+BdbPk/wPi687iOGLAjtiu9OWeQYlXbiRNwnnokgW2Pk4S99kp0qTYADYHZ67BU5dsnp8UzKqDUx12+UI3zmFDo=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(376005)(1800799015)(366007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dGdHcXdnMnN5OVEzeTF3RC9XYVM4SGtIK0pQREozTER6YWJqTFVuTUtKZWJu?=
+ =?utf-8?B?YUsxVXdkM2RqczJmTmNBRmpSckdsOVFuOXFZUTNLSTcvOFliNkJuNVlpQWtt?=
+ =?utf-8?B?aWFFOVNsTnRxQzY2QThNVmJBRlQ4U3o2N2ZBd3lDS1Y3RW1vYUY1RktkMVF2?=
+ =?utf-8?B?dTZRME5keGVvU3FIa2hwM2dtdGFiWWtld1pMQTlkL0tia3lhbzVtRkh6V0h4?=
+ =?utf-8?B?UG9lWk01aGxWWWYySFpFalF4VEtWSGF0ZXFvUm41V1hWeXFaVnlYR2RNb1NJ?=
+ =?utf-8?B?TGYzQW90S1RqRzNLenUrOHhmcUMrZnY0WC9lNDAzbEVSa2JZVWovSVRwVXow?=
+ =?utf-8?B?ekVNcWhwQkNCcFY0UEVOK29Jdmp5ckUzZkdoTEZ2cEFOdmcwWDg1T01HUERL?=
+ =?utf-8?B?UGp2Q2FTWlhyRExIdzVMN3QxWERLV0JrRFpwWFNScmlBVUhGeFhKMm84N1A3?=
+ =?utf-8?B?NXBNa3cwQ3BxSXhnTGFvRERXb3RRK0t5RDJNUkN2NVpUY0ZCN1Y1ZHpyZ1JE?=
+ =?utf-8?B?V2N4L281OGl1NUs4dTVxOFE3NVhyb0I0VFZWc0JiRll1d0VoVkROazRUYm1h?=
+ =?utf-8?B?Z2pxcFJkV29XZ3pNWFJFNUE4d1VhT3d1UTdxTWJGbkwwNFJKdlBad25XT2x3?=
+ =?utf-8?B?ZzRxeS9xTXdMSTBWWEVVT3hKY3Y0a29FQXFWOTJDSzBIRnhZblF4emxiWno5?=
+ =?utf-8?B?WXUxQTRVdjFHbktLSmR1MjN0aCtXeFV1Nk9JV0tsZ21QM2hYeTFDY1Z2NGJq?=
+ =?utf-8?B?SWErQklJOGQ5RHVRMW95RFI2aEs1cjhUZEM5eG5Va2lDSXdnTTNNYXZDbFlh?=
+ =?utf-8?B?aXFmbDFhU2s3dW9ROXhaelg1ampBeFNyN0lZTDc1QS9RYUg5cXIrVVh4MnhN?=
+ =?utf-8?B?YkxsNWFjcXZxR1BadnAxdEYyaWJRc0ROaUpHYXlvM0tpOG53OWV2SWxEZlZ3?=
+ =?utf-8?B?NC9RMVFWc095ZVdQWnVoTXlDdmdvNThHNVVqZHFza2k5NGJhMjBLOU9VZDhv?=
+ =?utf-8?B?QkRGditxa0JwS2JIVmlLcUJsWHY1ZnVpb1Z6cnByWGN2MzlQWloreVZ5VVZU?=
+ =?utf-8?B?N05QY1BIbVg2WjZVN1BNWXhyMHNYU3JBVkoza1ZpMERtTlpRS3FXZjVKNXVW?=
+ =?utf-8?B?YmFNMGxRNkI1VHViRzNidWdwQitzdlpsc2EzdC9VOHpEMEZEUHVGNU84NnVr?=
+ =?utf-8?B?alpQVnZnNndRWWJHdzQzU0NLZ1kzWG4vQlhuQ1ZqOWZLMjBadXhDajY3clZj?=
+ =?utf-8?B?eW41NlI1c2ZJUE1kYXVjdlF1NlE3RmhNMzFQSE1RQXRKV1RCSzFHVTNXaXFS?=
+ =?utf-8?B?bUdLYjV3T3I2RzJmVy8rWU5lSFlTQzBzK0FtTVNzTEpsMllCTkVRYy9XQ2Jo?=
+ =?utf-8?B?aktJRkxTcnYrQXJpRUNyZER2UXQrY3QrVUVwMVYzWXV4Rm1selhLd2NnTDlh?=
+ =?utf-8?B?STNGcWtUUlVxV1cwZDJvTEpJT2F0dFlvOG12MnVpYXdkNmpzSHpmMmdaMHBX?=
+ =?utf-8?B?NHBzb3Nza1B0SzJ4NjJaWUxOZlhIUVdwQUZHa3JaajR1SFhDVDluUUxUdHNH?=
+ =?utf-8?B?NVpicDQraTNGQ001d2hnWVl2aTFCQmdmOGJOU2wvWkxLZCt1SCthOGJXeDVY?=
+ =?utf-8?B?MDZvTWJLSEpjWlQ3SUlJQlIzVkRhWEQ0R0VqY1VYajJKZXRjV0hoZTNOSktL?=
+ =?utf-8?B?dEhZWTBDYTZCSFlXMnh4VlNtR0M0WU1Vc3BMcEcyVzhIMS9DNkxSQkFOUVN1?=
+ =?utf-8?B?djlPSjNLSlJFbHVTeWQ4TjBjUlNtQzNsOWdRZ3gxT01GU2tzaTBVL21JZ2Ir?=
+ =?utf-8?B?YUNIc2NrL2RDSW1sTEVCOWZUVW1jNnYxUExJUnlTTXdIZTd2WWJkT0FVbDc5?=
+ =?utf-8?B?eGNmQXo5WlpwNE45cnIwMkNNV0xFR2ZndmlsTFlhazhPQU0ralowa21OcmNl?=
+ =?utf-8?B?UFpIY0d4M0VGL0tnUWd1enY1LzdJRnhRVGtDK0tkN2FEOFlMRS8wUlJ5Y0Vx?=
+ =?utf-8?B?Qm5DWllsdUlqK0JadlowZ1ZkSTV0cU1Od3lyQmhrTUVZcWxJRHNpcTRsZTJL?=
+ =?utf-8?B?OVRVY01zY01HTkdrdFlJUEt4amE2bXpwY3BQb0pCejVNNU1saVZxQXhJUmVh?=
+ =?utf-8?B?YjluZ0Q5MnZZOXg2VTVVckZuUGlKS2JWZmYzT1dMNDRIUVVoNWNYVGh3eklz?=
+ =?utf-8?Q?nZUVyoGN1Pj1lGcJBtfgUQmOapSNAkV2lNpyGjZXHGsA?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bdc93212-92db-4b1a-f417-08dc47198ef2
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Mar 2024 07:03:47.8906
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4ZFqcD3bv/BuCrj/J4v2+ZNjtw78UaLyd9QGABlLxKwpHJ7CprdngnAbWkKpIAsYWY7NCHV4JV15oDvi2wDb7iGrQeLHuDdf0120BjDsGhmwpc6oLZLfC3p5k9gZvbEh
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR01MB7019
 
-On Thu, Mar 14, 2024 at 12:51:40PM +0100, Christian König wrote:
-> > Does Christoph's objection come from my poorly worded cover letter and
-> > commit messages, then?
+
+Hi Steven,
+
+On 27-01-2023 04:59 pm, Steven Price wrote:
+> The wrappers make the call sites easier to read and deal with the
+> boiler plate of handling the error codes from the RMM.
 > 
-> Yes, that could certainly be.
-
-That's definitively a big part of it, but I think not the only one.
-
-> > Fundamentally, what this series is doing is
-> > allowing pfns returned by follow_pte to be mapped into KVM's shadow
-> > MMU without inadvertently translating them into struct pages.
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>   arch/arm64/include/asm/rmi_cmds.h | 259 ++++++++++++++++++++++++++++++
+>   1 file changed, 259 insertions(+)
+>   create mode 100644 arch/arm64/include/asm/rmi_cmds.h
 > 
-> As far as I can tell that is really the right thing to do. Yes.
+> diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
+> new file mode 100644
+> index 000000000000..d5468ee46f35
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/rmi_cmds.h
+> @@ -0,0 +1,259 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2023 ARM Ltd.
+> + */
+> +
+> +#ifndef __ASM_RMI_CMDS_H
+> +#define __ASM_RMI_CMDS_H
+> +
+> +#include <linux/arm-smccc.h>
+> +
+> +#include <asm/rmi_smc.h>
+> +
+> +struct rtt_entry {
+> +	unsigned long walk_level;
+> +	unsigned long desc;
+> +	int state;
+> +	bool ripas;
+> +};
+> +
+> +static inline int rmi_data_create(unsigned long data, unsigned long rd,
+> +				  unsigned long map_addr, unsigned long src,
+> +				  unsigned long flags)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_DATA_CREATE, data, rd, map_addr, src,
+> +			     flags, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_data_create_unknown(unsigned long data,
+> +					  unsigned long rd,
+> +					  unsigned long map_addr)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_DATA_CREATE_UNKNOWN, data, rd, map_addr,
+> +			     &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_data_destroy(unsigned long rd, unsigned long map_addr)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_DATA_DESTROY, rd, map_addr, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_features(unsigned long index, unsigned long *out)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_FEATURES, index, &res);
+> +
+> +	*out = res.a1;
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_granule_delegate(unsigned long phys)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_GRANULE_DELEGATE, phys, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_granule_undelegate(unsigned long phys)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_GRANULE_UNDELEGATE, phys, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_psci_complete(unsigned long calling_rec,
+> +				    unsigned long target_rec)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_PSCI_COMPLETE, calling_rec, target_rec,
+> +			     &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_realm_activate(unsigned long rd)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_REALM_ACTIVATE, rd, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_realm_create(unsigned long rd, unsigned long params_ptr)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_REALM_CREATE, rd, params_ptr, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_realm_destroy(unsigned long rd)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_REALM_DESTROY, rd, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rec_aux_count(unsigned long rd, unsigned long *aux_count)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_REC_AUX_COUNT, rd, &res);
+> +
+> +	*aux_count = res.a1;
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rec_create(unsigned long rec, unsigned long rd,
+> +				 unsigned long params_ptr)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_REC_CREATE, rec, rd, params_ptr, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rec_destroy(unsigned long rec)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_REC_DESTROY, rec, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rec_enter(unsigned long rec, unsigned long run_ptr)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_REC_ENTER, rec, run_ptr, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rtt_create(unsigned long rtt, unsigned long rd,
+> +				 unsigned long map_addr, unsigned long level)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_CREATE, rtt, rd, map_addr, level,
+> +			     &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rtt_destroy(unsigned long rtt, unsigned long rd,
+> +				  unsigned long map_addr, unsigned long level)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_DESTROY, rtt, rd, map_addr, level,
+> +			     &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rtt_fold(unsigned long rtt, unsigned long rd,
+> +			       unsigned long map_addr, unsigned long level)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_FOLD, rtt, rd, map_addr, level, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rtt_init_ripas(unsigned long rd, unsigned long map_addr,
+> +				     unsigned long level)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_INIT_RIPAS, rd, map_addr, level, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rtt_map_unprotected(unsigned long rd,
+> +					  unsigned long map_addr,
+> +					  unsigned long level,
+> +					  unsigned long desc)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_MAP_UNPROTECTED, rd, map_addr, level,
+> +			     desc, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rtt_read_entry(unsigned long rd, unsigned long map_addr,
+> +				     unsigned long level, struct rtt_entry *rtt)
+> +{
+> +	struct arm_smccc_1_2_regs regs = {
+> +		SMC_RMI_RTT_READ_ENTRY,
+> +		rd, map_addr, level
+> +	};
+> +
+> +	arm_smccc_1_2_smc(&regs, &regs);
+> +
+> +	rtt->walk_level = regs.a1;
+> +	rtt->state = regs.a2 & 0xFF;
+> +	rtt->desc = regs.a3;
+> +	rtt->ripas = regs.a4 & 1;
+> +
+> +	return regs.a0;
+> +}
+> +
+> +static inline int rmi_rtt_set_ripas(unsigned long rd, unsigned long rec,
+> +				    unsigned long map_addr, unsigned long level,
+> +				    unsigned long ripas)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_SET_RIPAS, rd, rec, map_addr, level,
+> +			     ripas, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline int rmi_rtt_unmap_unprotected(unsigned long rd,
+> +					    unsigned long map_addr,
+> +					    unsigned long level)
+> +{
+> +	struct arm_smccc_res res;
+> +
+> +	arm_smccc_1_1_invoke(SMC_RMI_RTT_UNMAP_UNPROTECTED, rd, map_addr,
+> +			     level, &res);
+> +
+> +	return res.a0;
+> +}
+> +
+> +static inline phys_addr_t rmi_rtt_get_phys(struct rtt_entry *rtt)
+> +{
+> +	return rtt->desc & GENMASK(47, 12);
+> +}
+> +
+> +#endif
 
-IFF your callers don't need pages and you just want to track the
-mapping in the shadow mmu and never take a refcount that is a good
-thing.
+Can we please replace all occurrence of "unsigned long" with u64?
+Also as per spec, RTT level is Int64, can we change accordingly?
 
-But unless I completely misunderstood the series that doesn't seem
-to be the case - it builds a new kvm_follow_pfn API which is another
-of these weird multiplexers like get_user_pages that can to tons of
-different things depending on the flags.  And some of that still
-grabs the refcount, right?
+Please CC me in future cca patch-sets.
+gankulkarni@os.amperecomputing.com
 
-> Completely agree. In my thinking when you go a step further and offload
-> grabbing the page reference to get_user_pages() then you are always on the
-> save side.
 
-Agreed.
-
-> Because then it is no longer the responsibility of the KVM code to get all
-> the rules around that right, instead you are relying on a core functionality
-> which should (at least in theory) do the correct thing.
-
-Exactly.
-
+Thanks,
+Ganapat
