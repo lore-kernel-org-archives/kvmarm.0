@@ -1,73 +1,51 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1BC23B18D;
-	Mon, 18 Mar 2024 17:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98A955E6B
+	for <kvmarm@lists.linux.dev>; Mon, 18 Mar 2024 17:43:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710783676; cv=none; b=L7ZFPgEiV/xeZKDSN5rwcHK92JPRDW7jAY5P5T5BMNP4dYhF6see4lNbBTiS2ym8Cw5nH5crf+dDNdvY3PuvTmeDucQpG3a+KHtobsus85gLb59TA9QXYToN8f5NPCP2yxUWHEOahleRMg/jYRCe8iZqDZYoRNebs72M8InpTEo=
+	t=1710783827; cv=none; b=LuAYdC17MpG9AuM1WHVFu1ilhlOUqxcVzbUZk8g2VFkGmJuUxiygVtk/gPYSjR25kFdkPk44Oa+De7PHnlDWjfDURAdYOBOeQekJSZJBxwqA7wDC9zDpjkrUinJ5D1HqZrY7w/GjO+Oil08Z4j5dE1V5FJyLIi52SG8+KO/xjpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710783676; c=relaxed/simple;
-	bh=E9X/vXcE+KfbqUnxxDsQCnC6isDz8nMc3x3A5fhOaPY=;
+	s=arc-20240116; t=1710783827; c=relaxed/simple;
+	bh=KpB04qUAZ2JztXk36+T3pYQjyhXMHtBJL2grT+gUe1M=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pv24dSbeacilhaYZ/XK7bQo8iCWh2uIQCmW/YiaKXGDpB7Es+kDPcP8hkRaqAflaVAsoexjhVKNmVtoky84Ta++gQ/4QR7ZTjWfBC211xYurw57J38A3QqXzOH6rgSkhBDCBN0ojEjEZsZWbHvdJaBB3Ln637FOGp24ASbRN4KY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NBp3bQEc; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=mhAkJ3xh/X3h6glUq2D+rnqIFhH+DZtpUbKllYpeaPs2lUM6sk6EnNkArzUmqVzpIZQywDAoOPHAeIy2NgEVMNaAFzrSczEaTUQywHzuf4IwhZUX5oPPLAzOAyPiAawszwIWR3v+iwwRBEd+6JubWavrnnr+hZQNUrppE8bhEzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ExWNWKEx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NBp3bQEc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 208E6C43390;
-	Mon, 18 Mar 2024 17:41:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ExWNWKEx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47259C433F1;
+	Mon, 18 Mar 2024 17:43:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710783676;
-	bh=E9X/vXcE+KfbqUnxxDsQCnC6isDz8nMc3x3A5fhOaPY=;
+	s=k20201202; t=1710783827;
+	bh=KpB04qUAZ2JztXk36+T3pYQjyhXMHtBJL2grT+gUe1M=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NBp3bQEcp/MJFUxlDZZdTRT+zxsK1KhrVvtNTwiqett4hZDhYBEgYGIHpc6UHCEvS
-	 EkesHyPTiPyQPuHPBWc3avUjHOjXPt3NkwrF0DsetSTiEtkfzualAki1E+D3pBjcm8
-	 eXdQUP8pYq03mJEPUXChGIOxc2mqGZQroTdoXoB933rxnvhuy6Sw4ne2cIJjdr1+1G
-	 4Aq4xVgsM7VpfafU7r33mRbSswMvvvE27KRCQUQY9WPyk9SO9NyAeeCn8w94lHJ5yi
-	 ZRzmAq6ACJNrSOAJlD88wxRiVFOYzqLKEysA6vU9bbD+DKbNkSiUwyXvK+RVEZ4igi
-	 H7zgOUD6oUWNw==
+	b=ExWNWKExF2M5qSMhFEVR8rQ1fpPQNgg9flYA/eVpGSnNup2CFDKLcLTw9+I4SJUqw
+	 0kCcbmyl6nynLxScyH3U9ocGwQwnFaNEINo7uv/yK9qlUMcZGFYYFtDVjvs475GrQ+
+	 fxh8TplQ/oklVB0xwRRhllQ95fp6cyAHoTjw1VMrSagsokKeOde8zNr7FBFEXytQqq
+	 DUIGd9NsJImEBbAZo97IXh+W2+ZQKm7WqAmj928gH4phzwY63zPC7owso98BiEjcL7
+	 QwQ9785BMFPV/sCR661tqlSf5LRWxe+2cYPlvt/JKYskhbFEwQ3BR8YZvBKtJW9Nev
+	 bJQYWiXnhaXCQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rmGz2-00DLD7-Q3;
-	Mon, 18 Mar 2024 17:41:12 +0000
-Date: Mon, 18 Mar 2024 17:41:12 +0000
-Message-ID: <86ttl3zbd3.wl-maz@kernel.org>
+	id 1rmH1V-00DLGA-8A;
+	Mon, 18 Mar 2024 17:43:45 +0000
+Date: Mon, 18 Mar 2024 17:43:41 +0000
+Message-ID: <86sf0nzb8y.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Paolo Bonzini
- <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Oliver Upton
- <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K
- Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Lorenzo Pieralisi
- <lpieralisi@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Len Brown
- <len.brown@intel.com>,
-	Pavel Machek <pavel@ucw.cz>,
-	Mostafa Saleh
- <smostafa@google.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-pm@vger.kernel.org
-Subject: Re: [RFC PATCH v2 0/4] arm64: Add PSCI v1.3 SYSTEM_OFF2 support for hibernation
-In-Reply-To: <eb9215850e8231ab8ef75f523925be671cc6f5a0.camel@infradead.org>
-References: <20240318164646.1010092-1-dwmw2@infradead.org>
-	<86wmpzzdep.wl-maz@kernel.org>
-	<eb9215850e8231ab8ef75f523925be671cc6f5a0.camel@infradead.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Wujie Duan <wjduan@linx-info.com>,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH] KVM: arm64: Change back kvm fault condition to translation
+In-Reply-To: <Zfh4TOQxzTUxGePf@linux.dev>
+References: <20240318100249.220897-1-wjduan@linx-info.com>
+	<864jd3269g.wl-maz@kernel.org>
+	<Zfh4TOQxzTUxGePf@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -79,56 +57,43 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: dwmw2@infradead.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, lpieralisi@kernel.org, rafael@kernel.org, len.brown@intel.com, pavel@ucw.cz, smostafa@google.com, jean-philippe@linaro.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-pm@vger.kernel.org
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, wjduan@linx-info.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 18 Mar 2024 17:26:07 +0000,
-David Woodhouse <dwmw2@infradead.org> wrote:
+On Mon, 18 Mar 2024 17:22:20 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> [1  <text/plain; UTF-8 (quoted-printable)>]
-> On Mon, 2024-03-18 at 16:57 +0000, Marc Zyngier wrote:
-> > 
-> > > 
-> > > There *is* a way for a VMM to opt *out* of newer PSCI versions... by 
-> > > setting a per-vCPU "special" register that actually ends up setting the 
-> > > PSCI version KVM-wide. Quite why this isn't just a simple KVM_CAP, I 
-> > > have no idea.
-> > 
-> > Because the expectations are that the VMM can blindly save/restore the
-> > guest's state, including the PSCI version, and restore that blindly.
-> > KVM CAPs are just a really bad design pattern for this sort of things.
+> Hey,
 > 
-> Hm, am I missing something here? Does the *guest* get to set the PSCI
-> version somehow, and opt into the latest version that it understands
-> regardless of what the firmware/host can support?
+> On Mon, Mar 18, 2024 at 10:17:47AM +0000, Marc Zyngier wrote:
+> 
+> > I think 7 tries are enough ;-). Here's what I was expecting:
+> 
+> Hopefully I'm looking at the right thread!
 
-No. The *VMM* sets the PSCI version by writing to a pseudo register.
-It means that when the guest migrates, the VMM saves and restores that
-version, and the guest doesn't see any change.
+You are!
 
-The host firmware has nothing to do with it, obviously. This is all
-about KVM's own implementation of the "firmware", as seen by the guest.
+> 
+> > - a subject indicating the nature of the issue as a one-liner
+> > - a commit message describing the exact situation
+> > - a Fixes: tag indicating the commit being fixed
+> > - a Cc: stable tag to indicate this needs backporting
+> > - Ard's Ack, as he's been kind enough to look into it
+> > 
+> > See below for the full patch and my own RB tag. In the future, please
+> > try to follow these guidelines.
+> > 
+> > Oliver, can you please pick this ASAP?
+> 
+> Yup, I'll queue it up but I only plan on sending the first set of fixes
+> after -rc1 as I'll be AFK for a few days this week. I'll get a respin of
+> the vPMU + nVHE stuff out too.
 
-> Because if not, surely it's just part of the basic shape of the
-> machine, like "how many vCPUs does it have". You don't need to be able
-> to query it back again.
+Sounds good. This is only a corner case anyway, which is why it didn't
+show up in my testing, and -rc1 is the right spot for it.
 
-Nobody needs to do this.
-
-> I don't think we ever aspired to be able to hand an arbitrary KVM fd to
-> a userspace VMM and have the VMM be able to drive that VM without
-> having any a priori context, did we?
-
-Arbitrary? No. This is actually very specific and pretty well
-documented.
-
-Also, to answer your question about why we treat 0.1 differently from
-0.2+: 0.1 didn't specify the PSCI SMC/HCR encoding, meaning that KVM
-implemented something that was never fully specified. The VMM has to
-provide firmware tables that describe that. With 0.2+, there is a
-standard encoding for all functions, and the VMM doesn't have to
-provide the encoding to the guest.
+Thanks,
 
 	M.
 
