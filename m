@@ -1,294 +1,77 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D105C60A
-	for <kvmarm@lists.linux.dev>; Mon, 18 Mar 2024 23:07:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905145DF2D;
+	Mon, 18 Mar 2024 23:20:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710803255; cv=none; b=gV/TpiwEt4DoxBPOQxwg3z7Em3jc/KvWSbp3+OWUN4VDPaFkmZOnWgc6DLHuRo6v8ecFypQ+nV1iY+4G3Z4K1oiZjdlRW3vjV6oE0j2Go2v4ibWygQKuV1GDRkZTwhtOBqLm8zPI/1HnFXfjKRidsxPSf7jwzdqqYphgKFXReZg=
+	t=1710804048; cv=none; b=ptHv1SOe8RZBxmvU9vy9AB27E+UxjI0G/bWhAws28Eprp8FxMufZEWosYKlBkKozHnaOOvGu2I/5DT1t1cJ2ZpLULQVHOslMuIUEujItdY+YjvaKBg7iURheNAE4v4eCPDIvYG4fT3uTBmu3hFVYcouZCzOMz/47shcTGvuMva8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710803255; c=relaxed/simple;
-	bh=XUmpAfX/w1ZQy6clKR8DOYl5lGv4Q4a63T94QWBwBoc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rfcC+bubSeTpO1xyM7Bh9OzzIQDRfTnmyjlYSpYmnTV829I+DD2U16BLQ2U55q5NZHw5VhlUsvWGEmzGHhQbHrGQ6AA0n7XqEJHPwqxLYMR5GMUYv4yWR+nDWZgtxY2mZYiFXgikL11yMH9rI8UnG2vMHbpiwhaMbXuHsdBpwJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=37rJ/Cg8; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1710804048; c=relaxed/simple;
+	bh=DDHPuHjimB+eInGEiyuX23sCywLwLYXf4GLYlJb7AWY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s//hlv5HP9OxkONus6Ql6BcxtLhx0nWk53rDEMIQ0SyP3YIHtmG+yL7ISu+Jn8ZMNtZxbMVhbv3n/I9GDmFB+Su1MQ+Id+QYPhqYzxR01AaO+L180fxbk5XE3lVGSK5tyQ/NvINXCa/mCmz9M1ObjO1ryB65aMdTU9n/OE+/P7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=3RZ1lIWn; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="37rJ/Cg8"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-430b6ff2a20so17936801cf.2
-        for <kvmarm@lists.linux.dev>; Mon, 18 Mar 2024 16:07:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710803250; x=1711408050; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XtoRdxoafB+izb75r+ENF2jJrhZLgMd/wrxfQtY2ZiQ=;
-        b=37rJ/Cg8nI1SgaRBbc+5eeOgVN9QTwaSG924aERylAQOsC5bVFxACD19thASa/QQV6
-         JXWu6QU6lb4Xy41Rdbt6tGn15f5g5NhS26z2KrTzTh/nn8/HgCVbF8dPOCV4EA3oAyLa
-         wSPqEIJtqkQ+sJDfe7Y24VczH4j/HNi2mBhmhpR5WdcKVGjp0pHQxp9MjeUlA3wO+0+5
-         S9tF7Ha+Zx5Ul7EIsX9H7yIS3gqKqm1RdKfa6cuw7fnFqIChahnEvUhXnhsrZUHA86MB
-         edqH67h0OPX6jtL/L0PTRyKla/8l3lp6iTcgziWQWaA5O4vOACdpzX0A9yWRzDLw6EbB
-         7L6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710803250; x=1711408050;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XtoRdxoafB+izb75r+ENF2jJrhZLgMd/wrxfQtY2ZiQ=;
-        b=ZbxzxGKSXgFl5Ik15/hdo8uuWP8ldARuTGh05WgDRv2YwYR0vY5tqHySXce5SZUIBU
-         qznVfssWT1b9UHjlhEisyLHyZFR1Pp/Xfm6k9EdTv1pCeOApkYSMx6iGHy/U6BXmX+6m
-         4WK4gtaRVncF6SMeAyC5Z3/7Av+GaT7dwU6RcAcHfJ4vPz5SiBv9JQt5J78lPsyNAgG6
-         R0bkMlXeO7VDA0IwYqcSt1IS0esqQYH44gofcYrjhX8Wc5OofESfMDYt7sVyaJO9RaQA
-         6dIBFDEEqjzMsUhHs/KZVH7+YErK4jZzL5UOOfeIVjesyHVtCL58hCpavnG2Yd+G0uq9
-         ujyA==
-X-Forwarded-Encrypted: i=1; AJvYcCXRHfKjOH9XyiiZ79lOmrNj+8H0i1NOjTwgDfJvuoZsbESO2o9QzvmqGYUNr0IYOgoT8MGA4MIjb+gvf7TG04p4li/QQ3q0
-X-Gm-Message-State: AOJu0YztQtuyVlqedEZZxos//S5T5OY8z4ObS1wkMvXZeQ0La93DIwp/
-	bHz25Xjc8TOcSy3WV+iA3XWh8yPqI4ZxAn9awRfd2ddpV2V59SvaBF57PBhMze8aOmuaIhYcnnk
-	RPCkHWAYfp2cdrptjw2ZDzkBzBLxL81/sppJx
-X-Google-Smtp-Source: AGHT+IH9yJI/i6oqN/ivT8exgGUckpYT00y2kBtIzCdk9KZ4pICJwRpD3sqFxltbt691NQS+UUMns+tMe64zO1I63ac=
-X-Received: by 2002:a05:6214:4c0f:b0:690:a707:8857 with SMTP id
- qh15-20020a0562144c0f00b00690a7078857mr12564306qvb.62.1710803249486; Mon, 18
- Mar 2024 16:07:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="3RZ1lIWn"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=U5hIl2aY7B11ZMNAsPi+v840t3fuUcO6Vox3nrOcilQ=; b=3RZ1lIWnO0oWioItdZPDwSg9rF
+	EsyCQtd7T3cLWBxmAjAEpkvTFkcHEYQ1gM4uCyKlfY0x5IWBgd/nzM5BxShXPz3kqAbHEerSvMWv4
+	l5bA2UDexKOMPIFD/BWlomNsu1kQP5jDMGYiKcTJWGcF9+s1ifnKdBZYbewBulXj0ls0KMte2tkYU
+	Wnz78Ch3JZQrEoeCuEqNFc733Ds+qJPIoOGnmGRbb58btmR3aSnQsjItIBR+f7cbhm+P3EKtdkHQ/
+	MehX1Ea56OmyMghzoowEKb6MbP2euzT22LPDI4egr8Oa84S/Ggkhpw5G2B5Ia2AseuzgHBkpHgt9C
+	7cxfHhrg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rmMHX-0000000AWmW-3N6Y;
+	Mon, 18 Mar 2024 23:20:39 +0000
+Date: Mon, 18 Mar 2024 16:20:39 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	David Stevens <stevensd@chromium.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Yu Zhang <yu.c.zhang@linux.intel.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	Zhi Wang <zhi.wang.linux@gmail.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v11 0/8] KVM: allow mapping non-refcounted pages
+Message-ID: <ZfjMRzJrN6cfhHJI@infradead.org>
+References: <9e604f99-5b63-44d7-8476-00859dae1dc4@amd.com>
+ <ZfHKoxVMcBAMqcSC@google.com>
+ <93df19f9-6dab-41fc-bbcd-b108e52ff50b@amd.com>
+ <ZfHhqzKVZeOxXMnx@google.com>
+ <c84fcf0a-f944-4908-b7f6-a1b66a66a6bc@amd.com>
+ <d2a95b5c-4c93-47b1-bb5b-ef71370be287@amd.com>
+ <CAD=HUj5k+N+zrv-Yybj6K3EvfYpfGNf-Ab+ov5Jv+Zopf-LJ+g@mail.gmail.com>
+ <985fd7f8-f8dd-4ce4-aa07-7e47728e3ebd@amd.com>
+ <ZfeYU6hqlVF7y9YO@infradead.org>
+ <CABgObfZCay5-zaZd9mCYGMeS106L055CxsdOWWvRTUk2TPYycg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <40a8fb34-868f-4e19-9f98-7516948fc740@redhat.com>
- <20240226105258596-0800.eberman@hu-eberman-lv.qualcomm.com>
- <925f8f5d-c356-4c20-a6a5-dd7efde5ee86@redhat.com> <Zd8PY504BOwMR4jO@google.com>
- <755911e5-8d4a-4e24-89c7-a087a26ec5f6@redhat.com> <Zd8qvwQ05xBDXEkp@google.com>
- <99a94a42-2781-4d48-8b8c-004e95db6bb5@redhat.com> <Zd82V1aY-ZDyaG8U@google.com>
- <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com> <ZeXAOit6O0stdxw3@google.com>
- <ZeYbUjiIkPevjrRR@google.com> <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
- <CAGtprH-17s7ipmr=+cC6YuH-R0Bvr7kJS7Zo9a+Dc9VEt2BAcQ@mail.gmail.com> <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
-In-Reply-To: <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Mon, 18 Mar 2024 16:07:16 -0700
-Message-ID: <CAGtprH8B8y0Khrid5X_1twMce7r-Z7wnBiaNOi-QwxVj4D+L3w@mail.gmail.com>
-Subject: Re: folio_mmapped
-To: David Hildenbrand <david@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>, Quentin Perret <qperret@google.com>, 
-	Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, 
-	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
-	amoorthy@google.com, dmatlack@google.com, yu.c.zhang@linux.intel.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, keirf@google.com, 
-	linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABgObfZCay5-zaZd9mCYGMeS106L055CxsdOWWvRTUk2TPYycg@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Mar 18, 2024 at 3:02=E2=80=AFPM David Hildenbrand <david@redhat.com=
-> wrote:
->
-> On 18.03.24 18:06, Vishal Annapurve wrote:
-> > On Mon, Mar 4, 2024 at 12:17=E2=80=AFPM David Hildenbrand <david@redhat=
-.com> wrote:
-> >>
-> >> On 04.03.24 20:04, Sean Christopherson wrote:
-> >>> On Mon, Mar 04, 2024, Quentin Perret wrote:
-> >>>>> As discussed in the sub-thread, that might still be required.
-> >>>>>
-> >>>>> One could think about completely forbidding GUP on these mmap'ed
-> >>>>> guest-memfds. But likely, there might be use cases in the future wh=
-ere you
-> >>>>> want to use GUP on shared memory inside a guest_memfd.
-> >>>>>
-> >>>>> (the iouring example I gave might currently not work because
-> >>>>> FOLL_PIN|FOLL_LONGTERM|FOLL_WRITE only works on shmem+hugetlb, and
-> >>>>> guest_memfd will likely not be detected as shmem; 8ac268436e6d cont=
-ains some
-> >>>>> details)
-> >>>>
-> >>>> Perhaps it would be wise to start with GUP being forbidden if the
-> >>>> current users do not need it (not sure if that is the case in Androi=
-d,
-> >>>> I'll check) ? We can always relax this constraint later when/if the
-> >>>> use-cases arise, which is obviously much harder to do the other way
-> >>>> around.
-> >>>
-> >>> +1000.  At least on the KVM side, I would like to be as conservative =
-as possible
-> >>> when it comes to letting anything other than the guest access guest_m=
-emfd.
-> >>
-> >> So we'll have to do it similar to any occurrences of "secretmem" in
-> >> gup.c. We'll have to see how to marry KVM guest_memfd with core-mm cod=
-e
-> >> similar to e.g., folio_is_secretmem().
-> >>
-> >> IIRC, we might not be able to de-reference the actual mapping because =
-it
-> >> could get free concurrently ...
-> >>
-> >> That will then prohibit any kind of GUP access to these pages, includi=
-ng
-> >> reading/writing for ptrace/debugging purposes, for core dumping purpos=
-es
-> >> etc. But at least, you know that nobody was able to optain page
-> >> references using GUP that might be used for reading/writing later.
-> >>
-> >
-> > There has been little discussion about supporting 1G pages with
-> > guest_memfd for TDX/SNP or pKVM. I would like to restart this
-> > discussion [1]. 1G pages should be a very important usecase for guest
-> > memfd, especially considering large VM sizes supporting confidential
-> > GPU/TPU workloads.
-> >
-> > Using separate backing stores for private and shared memory ranges is
-> > not going to work effectively when using 1G pages. Consider the
-> > following scenario of memory conversion when using 1G pages to back
-> > private memory:
-> > * Guest requests conversion of 4KB range from private to shared, host
-> > in response ideally does following steps:
-> >      a) Updates the guest memory attributes
-> >      b) Unbacks the corresponding private memory
-> >      c) Allocates corresponding shared memory or let it be faulted in
-> > when guest accesses it
-> >
-> > Step b above can't be skipped here, otherwise we would have two
-> > physical pages (1 backing private memory, another backing the shared
-> > memory) for the same GPA range causing "double allocation".
-> >
-> > With 1G pages, it would be difficult to punch KBs or even MBs sized
-> > hole since to support that:
-> > 1G page would need to be split (which hugetlbfs doesn't support today
-> > because of right reasons), causing -
-> >          - loss of vmemmap optimization [3]
-> >          - losing ability to reconstitute the huge page again,
-> > especially as private pages in CVMs are not relocatable today,
-> > increasing overall fragmentation over time.
-> >                - unless a smarter algorithm is devised for memory
-> > reclaim to reconstitute large pages for unmovable memory.
-> >
-> > With the above limitations in place, best thing could be to allow:
-> >   - single backing store for both shared and private memory ranges
-> >   - host userspace to mmap the guest memfd (as this series is trying to=
- do)
-> >   - allow userspace to fault in memfd file ranges that correspond to
-> > shared GPA ranges
-> >       - pagetable mappings will need to be restricted to shared memory
-> > ranges causing higher granularity mappings (somewhat similar to what
-> > HGM series from James [2] was trying to do) than 1G.
-> >   - Allow IOMMU also to map those pages (pfns would be requested using
-> > get_user_pages* APIs) to allow devices to access shared memory. IOMMU
-> > management code would have to be enlightened or somehow restricted to
-> > map only shared regions of guest memfd.
-> >   - Upon conversion from shared to private, host will have to ensure
-> > that there are no mappings/references present for the memory ranges
-> > being converted to private.
-> >
-> > If the above usecase sounds reasonable, GUP access to guest memfd
-> > pages should be allowed.
->
-> To say it with nice words: "Not a fan".
->
-> First, I don't think only 1 GiB will be problematic. Already 2 MiB ones
-> will be problematic and so far it is even unclear how guest_memfd will
-> consume them in a way acceptable to upstream MM. Likely not using
-> hugetlb from what I recall after the previous discussions with Mike.
->
+On Mon, Mar 18, 2024 at 02:10:55PM +0100, Paolo Bonzini wrote:
+> Another possibility is to have a double-underscore version that allows
+> FOLL_GET, and have the "clean" kvm_follow_pfn() forbid it. So you
+> would still have the possibility to convert to __kvm_follow_pfn() with
+> FOLL_GET first, and then when you remove the refcount you switch to
+> kvm_follow_pfn().
 
-Agree, the support for 1G pages with guest memfd is yet to be figured
-out, but it remains a scenario to be considered here.
+That does sound much better.  Then again anything that actually wants
+pages (either for a good reason or historic reasons) really should be
+using get/pin_user_pages anyway and not use follow_pte.
 
-> Second, we should find better ways to let an IOMMU map these pages,
-> *not* using GUP. There were already discussions on providing a similar
-> fd+offset-style interface instead. GUP really sounds like the wrong
-> approach here. Maybe we should look into passing not only guest_memfd,
-> but also "ordinary" memfds.
-
-I need to dig into past discussions around this, but agree that
-passing guest memfds to VFIO drivers in addition to HVAs seems worth
-exploring. This may be required anyways for devices supporting TDX
-connect [1].
-
-If we are talking about the same file catering to both private and
-shared memory, there has to be some way to keep track of references on
-the shared memory from both host userspace and IOMMU.
-
->
-> Third, I don't think we should be using huge pages where huge pages
-> don't make any sense. Using a 1 GiB page so the VM will convert some
-> pieces to map it using PTEs will destroy the whole purpose of using 1
-> GiB pages. It doesn't make any sense.
-
-I had started a discussion for this [2] using an RFC series. Main
-challenge here remain:
-1) Unifying all the conversions under one layer
-2) Ensuring shared memory allocations are huge page aligned at boot
-time and runtime.
-
-Using any kind of unified shared memory allocator (today this part is
-played by SWIOTLB) will need to support huge page aligned dynamic
-increments, which can be only guaranteed by carving out enough memory
-at boot time for CMA area and using CMA area for allocation at
-runtime.
-   - Since it's hard to come up with a maximum amount of shared memory
-needed by VM, especially with GPUs/TPUs around, it's difficult to come
-up with CMA area size at boot time.
-
-I think it's arguable that even if a VM converts 10 % of its memory to
-shared using 4k granularity, we still have fewer page table walks on
-the rest of the memory when using 1G/2M pages, which is a significant
-portion.
-
->
-> A direction that might make sense is either (A) enlighting the VM about
-> the granularity in which memory can be converted (but also problematic
-> for 1 GiB pages) and/or (B) physically restricting the memory that can
-> be converted.
-
-Physically restricting the memory will still need a safe maximum bound
-to be calculated based on all the shared memory usecases that VM can
-encounter.
-
->
-> For example, one could create a GPA layout where some regions are backed
-> by gigantic pages that cannot be converted/can only be converted as a
-> whole, and some are backed by 4k pages that can be converted back and
-> forth. We'd use multiple guest_memfds for that. I recall that physically
-> restricting such conversions/locations (e.g., for bounce buffers) in
-> Linux was already discussed somewhere, but I don't recall the details.
->
-> It's all not trivial and not easy to get "clean".
-
-Yeah, agree with this point, it's difficult to get a clean solution
-here, but the host side solution might be easier to deploy (not
-necessarily easier to implement) and possibly cleaner than attempts to
-regulate the guest side.
-
->
-> Concluding that individual pieces of a 1 GiB / 2 MiB huge page should
-> not be converted back and forth might be a reasonable. Although I'm sure
-> people will argue the opposite and develop hackish solutions in
-> desperate ways to make it work somehow.
->
-> Huge pages, and especially gigantic pages, are simply a bad fit if the
-> VM will convert individual 4k pages.
->
->
-> But to answer your last question: we might be able to avoid GUP by using
-> a different mapping API, similar to the once KVM now provides.
->
-> --
-> Cheers,
->
-> David / dhildenb
->
-
-[1] -> https://cdrdv2.intel.com/v1/dl/getContent/773614
-[2] https://lore.kernel.org/lkml/20240112055251.36101-2-vannapurve@google.c=
-om/
