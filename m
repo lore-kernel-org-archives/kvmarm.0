@@ -1,422 +1,211 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065AE4F8AB
-	for <kvmarm@lists.linux.dev>; Tue, 19 Mar 2024 21:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20283FBAF
+	for <kvmarm@lists.linux.dev>; Tue, 19 Mar 2024 23:54:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710882538; cv=none; b=p4Uqvq68tTE2Lim0QVMLkQpYRawdoDtmC1u0f8HWXINxhiNrtnR+XvRsA8AYMeAiBFLxA7pfpSNulOo3akkmUKYjwT/WBg4SNciIhA0QXraNOSFMLHd/iIl6Jd2t2Uw6z+9MF5orMyWUxHTqkZfb7VI7Wq9KIFEnIfX1b91eNqs=
+	t=1710892497; cv=none; b=Np78uv1GlYw2pb1Ef9fD2dz5R+JEjK2P6x0R5+6Xh34/C64Dd3tXexWiA+PSXDZY7xcyquVBNwkcSz1Zvfy3kpWVJES5xSQ5PKiFRxvTKaucX1p0JHe4tPGmTZjJQzcWCrxDCxp6ppp+iRkbLcThXG3Oe5kaig7bU0oj2UO4JTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710882538; c=relaxed/simple;
-	bh=5nGNfcxBrP+5QaQ6VA2Mc5gGslMBt7K0yrM8ebhuqjo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XvQf7Y8QZ+NjdVwpjPjPNjXsf6vvlElqo1LphYrjgw6Naktb3GWtf8mz5wobgwM522D7boa/KsmwO6i4D+T+dgBdzz4OR8u0kQOxTTeo7QmTwWfeHeeTpb2Yoh6tpWVBvrb43rC1jsff/n0HhlCooKDkrewvIIOB0K2ljf2dUFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WcwLSMOb; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1710892497; c=relaxed/simple;
+	bh=LyLfsXArmpaIz1dWIS+ezi31pdNTzLESJRdI9KREBIk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=deuFg+VX2pW5g5A3fHQJ7k6KHmxkSqBGtXjx6brKVS6GLDfyzHKBEVbrIdL347VEvhSW+hpfnQe1sHIc2czsQYCc5hkvbKw866VYV4xLCmvMrtolkT/fCbvdqOg+DrYudSyS6WldzjapOUioLwlofz6dgicJRh0NsmSikHgl2S4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=EPKR0POT; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WcwLSMOb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710882535;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ir844MiELycfzO0ieT/ny2MZXcBF3MWLnOIfhQ/CQlQ=;
-	b=WcwLSMObPgef2K7cVWeOXl2DRABvRC28SUA0kceplIP3+ksMeFoIXAr0OxgUTkJLB69Zw7
-	HqWtoBydPZe5VQYFUOsXlM/tyfKSKF+N2zoXpYHti9bYAyfrKiAnkHKfgrP50fWd0ld+PW
-	LgYj0eGUfb4C9Ua6CXZ4Tu/mFlDOkQs=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-651-yyrBpKjKMf67zameyEq4yw-1; Tue, 19 Mar 2024 17:08:54 -0400
-X-MC-Unique: yyrBpKjKMf67zameyEq4yw-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2d48e62e525so36408701fa.1
-        for <kvmarm@lists.linux.dev>; Tue, 19 Mar 2024 14:08:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710882532; x=1711487332;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ir844MiELycfzO0ieT/ny2MZXcBF3MWLnOIfhQ/CQlQ=;
-        b=SOT7W5WOMbpAGNkIQrRtGypXrMCoxTkjusZltKlOv8PRIUPjTjZ4gIgNR3tG29p75U
-         bSbofSHEOv1Itxhrx3neyi+zwTibGknFbQCojdwDkfNN8NjmdijhBqfmBuP+3nauslfc
-         1Un/lFSVlqPNGfJT7UJI706qUS/DKNBgCe8cyl7YlI0YVzE2z0+o8WhRTqjd9y5gqguZ
-         lL2BJxRBVWmBFk0+rejwMDwC6m9oXpMsGmlZ+a73dXcDxNDfoU1u5Fs6T3BxgQDX0axs
-         3XiSUFkhP1App84g+VV403zOCqOXMk3lqBFxpdCmCF1DjdCoqCnzc0YMxghYOxy/KIUO
-         OgyA==
-X-Forwarded-Encrypted: i=1; AJvYcCVwC6GQW4M0y8cz2NSQgMUrGufnsilI9iLG+lJ0c8diC69xe5LRsVR5REgAYL2ZWDo2Tcm1Z6JC/cnCQBU3JGNHaxyV/Mjm
-X-Gm-Message-State: AOJu0Yz2A3Fv3d905JcTAv+sLzrxA5lisKCTUHeSvEEaKo5TyezFMK0e
-	xGEnZ9Mzu8XYFXpdAsO2uqHuDWnxW1Ze3Obswsvsg2jOSfM89z9cuXyy9hU7o8UAt6/lQXIXIjT
-	9xGUB0kvuPIGxMLC4NngOBEmGlDIXnNMEKZEgTEINWKxtYGiU8mzKxQ==
-X-Received: by 2002:a2e:350d:0:b0:2d4:ae2f:cd0 with SMTP id z13-20020a2e350d000000b002d4ae2f0cd0mr2228645ljz.43.1710882532653;
-        Tue, 19 Mar 2024 14:08:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHDFsUVhvhKYbegDfgVzJN3MoD5TmQs5uCcJncswZr2XYtYk0dByCpKhVkPxpLo/AhaE4H8rQ==
-X-Received: by 2002:a2e:350d:0:b0:2d4:ae2f:cd0 with SMTP id z13-20020a2e350d000000b002d4ae2f0cd0mr2228631ljz.43.1710882532258;
-        Tue, 19 Mar 2024 14:08:52 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id w14-20020a05600c474e00b004146973e473sm37657wmo.7.2024.03.19.14.08.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Mar 2024 14:08:51 -0700 (PDT)
-Message-ID: <8f48a54b-f174-4cc6-a220-ae3aa12fef86@redhat.com>
-Date: Tue, 19 Mar 2024 22:08:49 +0100
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="EPKR0POT"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42JMfNxS000987;
+	Tue, 19 Mar 2024 23:54:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	date:from:to:cc:subject:message-id:references:mime-version
+	:content-type:content-transfer-encoding:in-reply-to; s=
+	qcppdkim1; bh=aeq5QRLdnBnxL7CPkUwlT7Hq5FWu/MXH5rgdftDhMUE=; b=EP
+	KR0POTMpUHtBZ6m2OzvR66QXx487ED+ItB/VzztJtiMhmhYv1mupobx0MSesEaWD
+	bvgiYbnkdL6T41Ob7m8uuiOKh4kME9BVsw0Kt77FOuZJ+BUzCyuH767UPNN5Nn8Q
+	z2zY7A63E5HkxIkwonqY/ffJxNK8vSDfp8Jr8uCAb4IFdJzYAioB9O3aj7c7RmqR
+	H0Zzz/cDrAPYvxXhekUjQxE0rVFa7T/eetY3tbyQssKrDUhIMnDWa3YrrZyy5sD8
+	YGmDiLJvR/4SnzKN9uCYEcin3dijLJcDKqN9q7f8Ux/f2ggzWq8+TDZHnTYbPEoL
+	nFR+IJo9PCVbfdWup7/w==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wy9ee9qcy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Mar 2024 23:54:13 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42JNsC0b001314
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Mar 2024 23:54:12 GMT
+Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
+ nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Tue, 19 Mar 2024 16:54:11 -0700
+Date: Tue, 19 Mar 2024 16:54:10 -0700
+From: Elliot Berman <quic_eberman@quicinc.com>
+To: Will Deacon <will@kernel.org>
+CC: David Hildenbrand <david@redhat.com>,
+        Sean Christopherson
+	<seanjc@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Quentin Perret
+	<qperret@google.com>,
+        Matthew Wilcox <willy@infradead.org>, Fuad Tabba
+	<tabba@google.com>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>, <pbonzini@redhat.com>,
+        <chenhuacai@kernel.org>, <mpe@ellerman.id.au>, <anup@brainfault.org>,
+        <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
+        <aou@eecs.berkeley.edu>, <viro@zeniv.linux.org.uk>,
+        <brauner@kernel.org>, <akpm@linux-foundation.org>,
+        <xiaoyao.li@intel.com>, <yilun.xu@intel.com>,
+        <chao.p.peng@linux.intel.com>, <jarkko@kernel.org>,
+        <amoorthy@google.com>, <dmatlack@google.com>,
+        <yu.c.zhang@linux.intel.com>, <isaku.yamahata@intel.com>,
+        <mic@digikod.net>, <vbabka@suse.cz>, <ackerleytng@google.com>,
+        <mail@maciej.szmigiero.name>, <michael.roth@amd.com>,
+        <wei.w.wang@intel.com>, <liam.merwick@oracle.com>,
+        <isaku.yamahata@gmail.com>, <kirill.shutemov@linux.intel.com>,
+        <suzuki.poulose@arm.com>, <steven.price@arm.com>,
+        <quic_mnalajal@quicinc.com>, <quic_tsoni@quicinc.com>,
+        <quic_svaddagi@quicinc.com>, <quic_cvanscha@quicinc.com>,
+        <quic_pderrin@quicinc.com>, <quic_pheragu@quicinc.com>,
+        <catalin.marinas@arm.com>, <james.morse@arm.com>,
+        <yuzenghui@huawei.com>, <oliver.upton@linux.dev>, <maz@kernel.org>,
+        <keirf@google.com>, <linux-mm@kvack.org>
+Subject: Re: Re: folio_mmapped
+Message-ID: <20240319155648990-0700.eberman@hu-eberman-lv.qualcomm.com>
+Mail-Followup-To: Will Deacon <will@kernel.org>, 
+	David Hildenbrand <david@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Quentin Perret <qperret@google.com>, 
+	Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, brauner@kernel.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com, 
+	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, keirf@google.com, linux-mm@kvack.org
+References: <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
+ <ZeXAOit6O0stdxw3@google.com>
+ <ZeYbUjiIkPevjrRR@google.com>
+ <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
+ <CAGtprH-17s7ipmr=+cC6YuH-R0Bvr7kJS7Zo9a+Dc9VEt2BAcQ@mail.gmail.com>
+ <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
+ <CAGtprH8B8y0Khrid5X_1twMce7r-Z7wnBiaNOi-QwxVj4D+L3w@mail.gmail.com>
+ <ZfjYBxXeh9lcudxp@google.com>
+ <40f82a61-39b0-4dda-ac32-a7b5da2a31e8@redhat.com>
+ <20240319143119.GA2736@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 2/3] KVM: selftests: aarch64: Introduce
- pmu_event_filter_test
-To: Shaoqin Huang <shahuang@redhat.com>, Oliver Upton
- <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
- kvmarm@lists.linux.dev
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <20240229065625.114207-1-shahuang@redhat.com>
- <20240229065625.114207-3-shahuang@redhat.com>
-From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <20240229065625.114207-3-shahuang@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240319143119.GA2736@willie-the-truck>
+X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: FEqxfT4Zfq9jRu8C0SNX6rBbDdaZhX_-
+X-Proofpoint-ORIG-GUID: FEqxfT4Zfq9jRu8C0SNX6rBbDdaZhX_-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-19_10,2024-03-18_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ lowpriorityscore=0 priorityscore=1501 mlxlogscore=999 bulkscore=0
+ impostorscore=0 clxscore=1011 phishscore=0 spamscore=0 suspectscore=0
+ adultscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2403140001 definitions=main-2403190185
 
+On Tue, Mar 19, 2024 at 02:31:19PM +0000, Will Deacon wrote:
+> On Tue, Mar 19, 2024 at 11:26:05AM +0100, David Hildenbrand wrote:
+> > On 19.03.24 01:10, Sean Christopherson wrote:
+> > > On Mon, Mar 18, 2024, Vishal Annapurve wrote:
+> > > > On Mon, Mar 18, 2024 at 3:02 PM David Hildenbrand <david@redhat.com> wrote:
+> > > > > Second, we should find better ways to let an IOMMU map these pages,
+> > > > > *not* using GUP. There were already discussions on providing a similar
+> > > > > fd+offset-style interface instead. GUP really sounds like the wrong
+> > > > > approach here. Maybe we should look into passing not only guest_memfd,
+> > > > > but also "ordinary" memfds.
+> > > 
+> > > +1.  I am not completely opposed to letting SNP and TDX effectively convert
+> > > pages between private and shared, but I also completely agree that letting
+> > > anything gup() guest_memfd memory is likely to end in tears.
+> > 
+> > Yes. Avoid it right from the start, if possible.
+> > 
+> > People wanted guest_memfd to *not* have to mmap guest memory ("even for
+> > ordinary VMs"). Now people are saying we have to be able to mmap it in order
+> > to GUP it. It's getting tiring, really.
+> 
+> From the pKVM side, we're working on guest_memfd primarily to avoid
+> diverging from what other CoCo solutions end up using, but if it gets
+> de-featured (e.g. no huge pages, no GUP, no mmap) compared to what we do
+> today with anonymous memory, then it's a really hard sell to switch over
+> from what we have in production. We're also hoping that, over time,
+> guest_memfd will become more closely integrated with the mm subsystem to
+> enable things like hypervisor-assisted page migration, which we would
+> love to have.
+> 
+> Today, we use the existing KVM interfaces (i.e. based on anonymous
+> memory) and it mostly works with the one significant exception that
+> accessing private memory via a GUP pin will crash the host kernel. If
+> all guest_memfd() can offer to solve that problem is preventing GUP
+> altogether, then I'd sooner just add that same restriction to what we
+> currently have instead of overhauling the user ABI in favour of
+> something which offers us very little in return.
 
+How would we add the restriction to anonymous memory?
 
-On 2/29/24 07:56, Shaoqin Huang wrote:
-> Introduce pmu_event_filter_test for arm64 platforms. The test configures
-> PMUv3 for a vCPU, and sets different pmu event filters for the vCPU, and
-> check if the guest can see those events which user allow and can't use
-> those events which use deny.
-> 
-> This test refactor the create_vpmu_vm() and make it a wrapper for
-> __create_vpmu_vm(), which allows some extra init code before
-> KVM_ARM_VCPU_PMU_V3_INIT.
-> 
-> And this test use the KVM_ARM_VCPU_PMU_V3_FILTER attribute to set the
-> pmu event filter in KVM. And choose to filter two common event
-> branches_retired and instructions_retired, and let the guest to check if
-> it see the right pmceid register.
-> 
-> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
-> ---
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../kvm/aarch64/pmu_event_filter_test.c       | 287 ++++++++++++++++++
->  2 files changed, 288 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 492e937fab00..732ca5f8bfc0 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -147,6 +147,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
->  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
->  TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
->  TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
-> +TEST_GEN_PROGS_aarch64 += aarch64/pmu_event_filter_test
->  TEST_GEN_PROGS_aarch64 += aarch64/psci_test
->  TEST_GEN_PROGS_aarch64 += aarch64/set_id_regs
->  TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
-> diff --git a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-> new file mode 100644
-> index 000000000000..2dd8ea418f47
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-> @@ -0,0 +1,287 @@
-> +
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * pmu_event_filter_test - Test user limit pmu event for guest.
-> + *
-> + * Copyright (c) 2023 Red Hat, Inc.
-> + *
-> + * This test checks if the guest only see the limited pmu event that userspace
-> + * sets, if the guest can use those events which user allow, and if the guest
-> + * can't use those events which user deny.
-> + * This test runs only when KVM_CAP_ARM_PMU_V3, KVM_ARM_VCPU_PMU_V3_FILTER
-> + * is supported on the host.
-> + */
-> +#include <kvm_util.h>
-> +#include <processor.h>
-> +#include <vgic.h>
-> +#include <vpmu.h>
-> +#include <test_util.h>
-> +#include <perf/arm_pmuv3.h>
-> +
-> +struct pmu_common_event_ids {
-> +	uint64_t pmceid0;
-> +	uint64_t pmceid1;
-> +} max_pmce, expected_pmce;
-> +
-> +struct vpmu_vm {
-> +	struct kvm_vm *vm;
-> +	struct kvm_vcpu *vcpu;
-> +	int gic_fd;
-> +};
-> +
-> +static struct vpmu_vm vpmu_vm;
-> +
-> +#define FILTER_NR 10
-> +
-> +struct test_desc {
-> +	const char *name;
-> +	struct kvm_pmu_event_filter filter[FILTER_NR];
-> +};
-> +
-> +#define __DEFINE_FILTER(base, num, act)		\
-> +	((struct kvm_pmu_event_filter) {	\
-> +		.base_event	= base,		\
-> +		.nevents	= num,		\
-> +		.action		= act,		\
-> +	})
-> +
-> +#define DEFINE_FILTER(base, act) __DEFINE_FILTER(base, 1, act)
-that's a pity you are never exercising filters with more than 1 events.
+Thinking aloud -- do you mean like some sort of "exclusive GUP" flag
+where mm can ensure that the exclusive GUP pin is the only pin? If the
+refcount for the page is >1, then the exclusive GUP fails. Any future
+GUP pin attempts would fail if the refcount has the EXCLUSIVE_BIAS.
 
-Eric
-> +
-> +static void guest_code(void)
-> +{
-> +	uint64_t pmceid0 = read_sysreg(pmceid0_el0);
-> +	uint64_t pmceid1 = read_sysreg(pmceid1_el0);
-> +
-> +	GUEST_ASSERT_EQ(expected_pmce.pmceid0, pmceid0);
-> +	GUEST_ASSERT_EQ(expected_pmce.pmceid1, pmceid1);
-> +
-> +	GUEST_DONE();
-> +}
-> +
-> +static void guest_get_pmceid(void)
-> +{
-> +	max_pmce.pmceid0 = read_sysreg(pmceid0_el0);
-> +	max_pmce.pmceid1 = read_sysreg(pmceid1_el0);
-> +
-> +	GUEST_DONE();
-> +}
-> +
-> +static void run_vcpu(struct kvm_vcpu *vcpu)
-> +{
-> +	struct ucall uc;
-> +
-> +	while (1) {
-> +		vcpu_run(vcpu);
-> +		switch (get_ucall(vcpu, &uc)) {
-> +		case UCALL_DONE:
-> +			return;
-> +		case UCALL_ABORT:
-> +			REPORT_GUEST_ASSERT(uc);
-> +			break;
-> +		default:
-> +			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-> +		}
-> +	}
-> +}
-> +
-> +static void set_pmce(struct pmu_common_event_ids *pmce, int action, int event)
-> +{
-> +	int base = 0;
-> +	uint64_t *pmceid = NULL;
-> +
-> +	if (event >= 0x4000) {
-> +		event -= 0x4000;
-> +		base = 32;
-> +	}
-> +
-> +	if (event >= 0 && event <= 0x1F) {
-> +		pmceid = &pmce->pmceid0;
-> +	} else if (event >= 0x20 && event <= 0x3F) {
-> +		event -= 0x20;
-> +		pmceid = &pmce->pmceid1;
-> +	} else {
-> +		return;
-> +	}
-> +
-> +	event += base;
-> +	if (action == KVM_PMU_EVENT_ALLOW)
-> +		*pmceid |= BIT(event);
-> +	else
-> +		*pmceid &= ~BIT(event);
-> +}
-> +
-> +static void prepare_expected_pmce(struct kvm_pmu_event_filter *filter)
-> +{
-> +	struct pmu_common_event_ids pmce_mask = { ~0, ~0 };
-> +	bool first_filter = true;
-> +
-> +	while (filter && filter->nevents != 0) {
-> +		if (first_filter) {
-> +			if (filter->action == KVM_PMU_EVENT_ALLOW)
-> +				memset(&pmce_mask, 0, sizeof(pmce_mask));
-> +			first_filter = false;
-> +		}
-> +
-> +		set_pmce(&pmce_mask, filter->action, filter->base_event);
-> +		filter++;
-> +	}
-> +
-> +	expected_pmce.pmceid0 = max_pmce.pmceid0 & pmce_mask.pmceid0;
-> +	expected_pmce.pmceid1 = max_pmce.pmceid1 & pmce_mask.pmceid1;
-> +}
-> +
-> +static void pmu_event_filter_init(struct kvm_pmu_event_filter *filter)
-> +{
-> +	while (filter && filter->nevents != 0) {
-> +		kvm_device_attr_set(vpmu_vm.vcpu->fd,
-> +				    KVM_ARM_VCPU_PMU_V3_CTRL,
-> +				    KVM_ARM_VCPU_PMU_V3_FILTER,
-> +				    filter);
-> +		filter++;
-> +	}
-> +}
-> +
-> +#define GICD_BASE_GPA	0x8000000ULL
-> +#define GICR_BASE_GPA	0x80A0000ULL
-> +
-> +/* Create a VM that has one vCPU with PMUv3 configured. */
-> +static void create_vpmu_vm_with_filter(void *guest_code,
-> +				       struct kvm_pmu_event_filter *filter)
-> +{
-> +	uint64_t irq = 23;
-> +
-> +	/* The test creates the vpmu_vm multiple times. Ensure a clean state */
-> +	memset(&vpmu_vm, 0, sizeof(vpmu_vm));
-> +
-> +	vpmu_vm.vm = vm_create(1);
-> +	vpmu_vm.vcpu = vm_vcpu_add_with_vpmu(vpmu_vm.vm, 0, guest_code);
-> +	vpmu_vm.gic_fd = vgic_v3_setup(vpmu_vm.vm, 1, 64,
-> +					GICD_BASE_GPA, GICR_BASE_GPA);
-> +	__TEST_REQUIRE(vpmu_vm.gic_fd >= 0,
-> +		       "Failed to create vgic-v3, skipping");
-> +
-> +	pmu_event_filter_init(filter);
-> +
-> +	/* Initialize vPMU */
-> +	vpmu_set_irq(vpmu_vm.vcpu, irq);
-> +	vpmu_init(vpmu_vm.vcpu);
-> +}
-> +
-> +static void create_vpmu_vm(void *guest_code)
-> +{
-> +	create_vpmu_vm_with_filter(guest_code, NULL);
-> +}
-> +
-> +static void destroy_vpmu_vm(void)
-> +{
-> +	close(vpmu_vm.gic_fd);
-> +	kvm_vm_free(vpmu_vm.vm);
-> +}
-> +
-> +static void run_test(struct test_desc *t)
-> +{
-> +	pr_info("Test: %s\n", t->name);
-> +
-> +	create_vpmu_vm_with_filter(guest_code, t->filter);
-> +	prepare_expected_pmce(t->filter);
-> +	sync_global_to_guest(vpmu_vm.vm, expected_pmce);
-> +
-> +	run_vcpu(vpmu_vm.vcpu);
-> +
-> +	destroy_vpmu_vm();
-> +}
-> +
-> +static struct test_desc tests[] = {
-> +	{
-> +		.name = "without_filter",
-> +		.filter = {
-> +			{ 0 }
-> +		},
-> +	},
-> +	{
-> +		.name = "member_allow_filter",
-> +		.filter = {
-> +			DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_SW_INCR, 0),
-> +			DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_INST_RETIRED, 0),
-> +			DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_BR_RETIRED, 0),
-> +			{ 0 },
-> +		},
-> +	},
-> +	{
-> +		.name = "member_deny_filter",
-> +		.filter = {
-> +			DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_SW_INCR, 1),
-> +			DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_INST_RETIRED, 1),
-> +			DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_BR_RETIRED, 1),
-> +			{ 0 },
-> +		},
-> +	},
-> +	{
-> +		.name = "not_member_deny_filter",
-> +		.filter = {
-> +			DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_SW_INCR, 1),
-> +			{ 0 },
-> +		},
-> +	},
-> +	{
-> +		.name = "not_member_allow_filter",
-> +		.filter = {
-> +			DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_SW_INCR, 0),
-> +			{ 0 },
-> +		},
-> +	},
-> +	{
-> +		.name = "deny_chain_filter",
-> +		.filter = {
-> +			DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_CHAIN, 1),
-> +			{ 0 },
-> +		},
-> +	},
-> +	{
-> +		.name = "deny_cpu_cycles_filter",
-> +		.filter = {
-> +			DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_CPU_CYCLES, 1),
-> +			{ 0 },
-> +		},
-> +	},
-> +	{
-> +		.name = "cancle_filter",
-> +		.filter = {
-> +			DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_CPU_CYCLES, 0),
-> +			DEFINE_FILTER(ARMV8_PMUV3_PERFCTR_CPU_CYCLES, 1),
-> +		},
-> +	},
-> +	{ 0 }
-> +};
-> +
-> +static void run_tests(void)
-> +{
-> +	struct test_desc *t;
-> +
-> +	for (t = &tests[0]; t->name; t++)
-> +		run_test(t);
-> +}
-> +
-> +static bool kvm_pmu_support_events(void)
-> +{
-> +	create_vpmu_vm(guest_get_pmceid);
-> +
-> +	memset(&max_pmce, 0, sizeof(max_pmce));
-> +	sync_global_to_guest(vpmu_vm.vm, max_pmce);
-> +	run_vcpu(vpmu_vm.vcpu);
-> +	sync_global_from_guest(vpmu_vm.vm, max_pmce);
-> +	destroy_vpmu_vm();
-> +
-> +	return max_pmce.pmceid0 &
-> +	       (ARMV8_PMUV3_PERFCTR_BR_RETIRED |
-> +	       ARMV8_PMUV3_PERFCTR_INST_RETIRED |
-> +	       ARMV8_PMUV3_PERFCTR_CHAIN);
-> +}
-> +
-> +int main(void)
-> +{
-> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
-> +	TEST_REQUIRE(kvm_pmu_support_events());
-> +
-> +	run_tests();
-> +}
+> On the mmap() side of things for guest_memfd, a simpler option for us
+> than what has currently been proposed might be to enforce that the VMM
+> has unmapped all private pages on vCPU run, failing the ioctl if that's
+> not the case. It needs a little more tracking in guest_memfd but I think
+> GUP will then fall out in the wash because only shared pages will be
+> mapped by userspace and so GUP will fail by construction for private
+> pages.
+
+We can prevent GUP after the pages are marked private, but the pages
+could be marked private after the pages were already GUP'd. I don't have
+a good way to detect this, so converting a page to private is difficult.
+
+> We're happy to pursue alternative approaches using anonymous memory if
+> you'd prefer to keep guest_memfd limited in functionality (e.g.
+> preventing GUP of private pages by extending mapping_flags as per [1]),
+> but we're equally willing to contribute to guest_memfd if extensions are
+> welcome.
+> 
+> What do you prefer?
+> 
+
+I like this as a stepping stone. For the Android use cases, we don't
+need to be able to convert a private page to shared and then also be
+able to GUP it. If you want to GUP a page, use anonymous memory and that
+memory will always be shared. If you don't care about GUP'ing (e.g. it's
+going to be guest-private or you otherwise know you won't be GUP'ing),
+you can use guest_memfd.
+
+I don't think this design prevents us from adding "sometimes you can
+GUP" to guest_memfd in the future. I don't think it creates extra
+changes for KVM since anonymous memory is already supported; although
+I'd have to add the support for Gunyah.
+
+> [1] https://lore.kernel.org/r/4b0fd46a-cc4f-4cb7-9f6f-ce19a2d3064e@redhat.com
+
+Thanks,
+Elliot
 
