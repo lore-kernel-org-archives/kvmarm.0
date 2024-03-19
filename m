@@ -1,197 +1,165 @@
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D5A54775
-	for <kvmarm@lists.linux.dev>; Tue, 19 Mar 2024 08:01:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D017CF39
+	for <kvmarm@lists.linux.dev>; Tue, 19 Mar 2024 09:47:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710835316; cv=none; b=ducwV6B0ZjJEOFs/tBXniNAkgFaHObrtcPuQCJrhygMvdwU70IPT1davvBWH1a+dCislIEjOKC/jgXq8dRH6/0YNbWq3ezBtweaE5CWejoBCXODd1Jj1K7RviKkz7nOl++omNXBxwX6Y49pLqUrcp3W6fUxpJLWRtrFbemvVgL8=
+	t=1710841668; cv=none; b=pNKhk385KguyRqx+HtDCtlPlVNiwJ2karwoIjgD2SCN6YuLsYSUacdXuSvN1to5vl8PsZyUe4u92ffsctBK1/LOQyI3pGQ+mTjvq/GHKnFF+XoSsPWqy7GjOWK6wsdMz7MdZT0IbfcdGM+cwJrMVrWt7223zkK3SLZhVJD0mykw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710835316; c=relaxed/simple;
-	bh=uOh2bHKLRUXUaO+Y4SQ5EIoftUs7uj6ScZRl2vQddKM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VmhDt2zBaPyUtRW8Rzuc9HI+gnIde+KN1CWyh7X5MQw0Wu7+vTPPJmWrKODZNXhmIPJ4omYFfSY0EIffOxnmB0ZWDiPif5DyyIHM+8fR2/FAANVANXPoGu/bDngfEae8M9zc8GKG6Jvg5LhDc8gIAvRA1xrRAqvym/b3LRF0Nh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FTXY4FdQ; arc=none smtp.client-ip=209.85.210.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1710841668; c=relaxed/simple;
+	bh=tB59vQHrrWfNtXgOa+QXun/KGjIcXOV4U0cREwm/b3A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GVNaqUpHx3eTZWff4GVxs5uObTqvBkmvUAVvkIlk59lRkQPNdQMea41KlkJ+jds2Ar35DjrV9k9kIh8AguCvkVNhJ2rmawfVn3YIWPX52W9Jlj9Up7gj+P/fMnrYJztYbWTjvIZYvbfb/5UZPXBTS/vqU8J65i886htvuVKA/Po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TdCD7nNS; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FTXY4FdQ"
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-6e67cf739d0so2289704a34.1
-        for <kvmarm@lists.linux.dev>; Tue, 19 Mar 2024 01:01:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TdCD7nNS"
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a46cca2a979so97509866b.3
+        for <kvmarm@lists.linux.dev>; Tue, 19 Mar 2024 02:47:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710835314; x=1711440114; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lYCFo5qndkhUTKD0ju2V6NpbPZWgrF0rvNKi9F72sCM=;
-        b=FTXY4FdQEzl+lo2bkE89ukxVsJzEs/aXCJFa/jc6FsUtjdBjZfLcNzX0YP86dZwcfJ
-         Fh2GoW3nVaqTlWXqOSzjVzIqoBssl6/o7LgArvTdllucmWqB07GKFyeTr0BCTP3UnSpR
-         n3lrFIJGssdlad8fhf2kTRV57i+8ATA/NQZG6zMEm+r2mIzU/9inGSphn7aPDp4gHCcb
-         busZxheOVaQupmjg9iZBDukJmQQMdJQIttfvDjD7ixwwJgqDLiGobe++8KOzIpLOZGpO
-         lchjW6zSSJ4sZUmNg2HQLBqmY0zWAnR68e+dhshvS02yMP4pHIQNfOrO1t9zlzEa3XMU
-         8UWg==
+        d=google.com; s=20230601; t=1710841665; x=1711446465; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/HHhyDwGvRCaPjjju0RIkoEll4g5zmeDctgezA6gAMo=;
+        b=TdCD7nNSONUUBXfTC6im0Ttg2QUIdh1WXqnqzvsTc2yGWLmxCFtjm5xWuApMBIp8Xu
+         6/YcdCojjfhJvGutLKCCBNUS2rUd+buLSZRuQf2WMAT+hItWKHnRcMDbp8AqifKkqvya
+         1c3dJi6x8zDxXktx0W4bgPdrKFY0R3GLiMVfi9AeDBvxF/88p06LYzKj/h9lA41RRfkN
+         GeAPIn2uJ3IdAMZiBCBxyAjlnmgsj+DtWWj0ZsFaIxMUYwhlWse5rLGWQ08RDkZgCZsl
+         bJ2QmK2vfrRROY6HWTKNXchnPwFcLgxxU0rr/IpT4c8/9ftnRu15/7gGRPLAdavyB2+8
+         cLkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710835314; x=1711440114;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lYCFo5qndkhUTKD0ju2V6NpbPZWgrF0rvNKi9F72sCM=;
-        b=O2/ZqVMQSFqlG0qLqaow5QdhtvAPKOD+KScxLsCh/lulOiFnj7ofkYFn5Jg7Vlxt+W
-         m02P2VdLCSyyivAzDutNJIkIIuU7r1ehouQ9GTpN2/QdmiaLNURXoNTjkgIPZqZBSXbC
-         Gct3r0h9FECJPLHivjaJhRoW0hEyvrsHxb11cCOuEhYugcAEcHKVyoQVmWRRR7o8kT5z
-         ZVlUXLIw7pt6546+PTP43LTk3nLC/jU4E5uZD3yMHc+fMUsES7RxOYSGybJJmOVZo47m
-         fyRC0xcov9WkIVvrtFc9AWeNVgM0Y0/yx3z1tGo+lkJL4hskEmD2ANqFsATgPzyVk+ol
-         t4FA==
-X-Forwarded-Encrypted: i=1; AJvYcCUR5UjAF4HtVpLHLK0S0YMv6wRwsRINRW0X9cAfZS9g+8BX8JvSROP1pGGY046pOzJLCIy+JYoIaRysGmy/AjRQh5hVZADC
-X-Gm-Message-State: AOJu0YyXXspz91dn7+DWCmgM5f9LJOVq/jClxzcBHmazsyphnhdEqMPm
-	OeXFiOIUpNgXMP4bSDTkmTKk65KG59PvV4vJc89em5n51yZ5VINs
-X-Google-Smtp-Source: AGHT+IF70kukuIUslOKRONbnfx6Q5qzHIC6G6YQbr4o/AriQpKZiTDdR6gDB2b8R+nXV1Kt8v8DJvA==
-X-Received: by 2002:a05:6870:e308:b0:220:932f:1a1e with SMTP id z8-20020a056870e30800b00220932f1a1emr17263158oad.12.1710835314432;
-        Tue, 19 Mar 2024 01:01:54 -0700 (PDT)
-Received: from wheely.local0.net (193-116-208-39.tpgi.com.au. [193.116.208.39])
-        by smtp.gmail.com with ESMTPSA id q23-20020a62ae17000000b006e5c464c0a9sm9121283pff.23.2024.03.19.01.01.47
+        d=1e100.net; s=20230601; t=1710841665; x=1711446465;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/HHhyDwGvRCaPjjju0RIkoEll4g5zmeDctgezA6gAMo=;
+        b=gWjk7ZzuTbTK1qSUMYYrB0G/ryvtOGNR6f/vV7tZVW8OT6NqRsFPzLrjUpELcuaZug
+         rd+LGB3lnAQtIj6+HKMrc5cY/y0WSqGgy0QvGnjfv8c9P72XhNpWOAv+oViRMpkaB2e3
+         KPWweRRe09js4mr2i1I1G0ZWjmnCUr6RIMWGPtxF+4eT9UO31kncEGCKZ/oStQ3NE3E5
+         Of3lYpg8Lhdsw5CySk1nUdF1QCHZpfMMcqTnpqVE5hahXRzR68/rTsj2JiXK06Vu8qII
+         1HzglhDF35Hs8ZGbgAhUzpQp2SReFiRIcXQzrLAfTxPuXF+ykyHwExPUa1ajTXGXjo51
+         B76g==
+X-Forwarded-Encrypted: i=1; AJvYcCXGf5N4PC/LCvzfMe+9tsWk7MAYDWj6G9mVylLN1PlXGOdRWPDf4PGM9u1DCpV40G4Fjg/lgyM+lhB54o3B4rb+AL0XuAyo
+X-Gm-Message-State: AOJu0Ywp4Nwx5gVfQ94QvHSdHhW1fQgQxy0t1w2Y/0zlAHeFI7qwlyDV
+	qj8lUJgCpglkM+hQsEJP9cd01Iw1ypa/sEjIcUlj3St9ed+7my1r0eBLHMT9DQ==
+X-Google-Smtp-Source: AGHT+IF/puef8zhuN1727aKfDCay8r7kOdm59liIzFTyv3w/POjfIRKnd9fb5D53y8VNfxHFZefOTw==
+X-Received: by 2002:a05:6402:448c:b0:568:1599:b854 with SMTP id er12-20020a056402448c00b005681599b854mr6246355edb.42.1710841665168;
+        Tue, 19 Mar 2024 02:47:45 -0700 (PDT)
+Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
+        by smtp.gmail.com with ESMTPSA id p11-20020a056402044b00b00568d325acf8sm2526799edw.20.2024.03.19.02.47.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Mar 2024 01:01:53 -0700 (PDT)
-From: Nicholas Piggin <npiggin@gmail.com>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>,
-	Laurent Vivier <lvivier@redhat.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	linuxppc-dev@lists.ozlabs.org,
-	kvm@vger.kernel.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	=?UTF-8?q?Nico=20B=C3=B6hr?= <nrb@linux.ibm.com>,
-	linux-s390@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	kvm-riscv@lists.infradead.org
-Subject: [kvm-unit-tests PATCH v7 33/35] configure: Make arch_libdir a first-class entity
-Date: Tue, 19 Mar 2024 17:59:24 +1000
-Message-ID: <20240319075926.2422707-34-npiggin@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240319075926.2422707-1-npiggin@gmail.com>
-References: <20240319075926.2422707-1-npiggin@gmail.com>
+        Tue, 19 Mar 2024 02:47:44 -0700 (PDT)
+Date: Tue, 19 Mar 2024 09:47:40 +0000
+From: Quentin Perret <qperret@google.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+	viro@zeniv.linux.org.uk, brauner@kernel.org,
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
+	dmatlack@google.com, yu.c.zhang@linux.intel.com,
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+	vannapurve@google.com, ackerleytng@google.com,
+	mail@maciej.szmigiero.name, michael.roth@amd.com,
+	wei.w.wang@intel.com, liam.merwick@oracle.com,
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+	suzuki.poulose@arm.com, steven.price@arm.com,
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com,
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com,
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org,
+	keirf@google.com, linux-mm@kvack.org
+Subject: Re: folio_mmapped
+Message-ID: <ZflfPDhZFufZdmp0@google.com>
+References: <755911e5-8d4a-4e24-89c7-a087a26ec5f6@redhat.com>
+ <Zd8qvwQ05xBDXEkp@google.com>
+ <99a94a42-2781-4d48-8b8c-004e95db6bb5@redhat.com>
+ <Zd82V1aY-ZDyaG8U@google.com>
+ <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
+ <ZeXAOit6O0stdxw3@google.com>
+ <ZeYbUjiIkPevjrRR@google.com>
+ <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
+ <20240304132732963-0800.eberman@hu-eberman-lv.qualcomm.com>
+ <4b0fd46a-cc4f-4cb7-9f6f-ce19a2d3064e@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4b0fd46a-cc4f-4cb7-9f6f-ce19a2d3064e@redhat.com>
 
-arch_libdir was brought in to improve the heuristic determination of
-the lib/ directory based on arch and testdir names, but it did not
-entirely clean that mess up.
+On Monday 04 Mar 2024 at 22:58:49 (+0100), David Hildenbrand wrote:
+> On 04.03.24 22:43, Elliot Berman wrote:
+> > On Mon, Mar 04, 2024 at 09:17:05PM +0100, David Hildenbrand wrote:
+> > > On 04.03.24 20:04, Sean Christopherson wrote:
+> > > > On Mon, Mar 04, 2024, Quentin Perret wrote:
+> > > > > > As discussed in the sub-thread, that might still be required.
+> > > > > > 
+> > > > > > One could think about completely forbidding GUP on these mmap'ed
+> > > > > > guest-memfds. But likely, there might be use cases in the future where you
+> > > > > > want to use GUP on shared memory inside a guest_memfd.
+> > > > > > 
+> > > > > > (the iouring example I gave might currently not work because
+> > > > > > FOLL_PIN|FOLL_LONGTERM|FOLL_WRITE only works on shmem+hugetlb, and
+> > > > > > guest_memfd will likely not be detected as shmem; 8ac268436e6d contains some
+> > > > > > details)
+> > > > > 
+> > > > > Perhaps it would be wise to start with GUP being forbidden if the
+> > > > > current users do not need it (not sure if that is the case in Android,
+> > > > > I'll check) ? We can always relax this constraint later when/if the
+> > > > > use-cases arise, which is obviously much harder to do the other way
+> > > > > around.
+> > > > 
+> > > > +1000.  At least on the KVM side, I would like to be as conservative as possible
+> > > > when it comes to letting anything other than the guest access guest_memfd.
+> > > 
+> > > So we'll have to do it similar to any occurrences of "secretmem" in gup.c.
+> > > We'll have to see how to marry KVM guest_memfd with core-mm code similar to
+> > > e.g., folio_is_secretmem().
+> > > 
+> > > IIRC, we might not be able to de-reference the actual mapping because it
+> > > could get free concurrently ...
+> > > 
+> > > That will then prohibit any kind of GUP access to these pages, including
+> > > reading/writing for ptrace/debugging purposes, for core dumping purposes
+> > > etc. But at least, you know that nobody was able to optain page references
+> > > using GUP that might be used for reading/writing later.
+> > 
+> > Do you have any concerns to add to enum mapping_flags, AS_NOGUP, and
+> > replacing folio_is_secretmem() with a test of this bit instead of
+> > comparing the a_ops? I think it scales better.
+> 
+> The only concern I have are races, but let's look into the details:
+> 
+> In GUP-fast, we can essentially race with unmap of folios, munmap() of VMAs
+> etc.
+> 
+> We had a similar discussion recently about possible races. It's documented
+> in folio_fast_pin_allowed() regarding disabled IRQs and RCU grace periods.
+> 
+> "inodes and thus their mappings are freed under RCU, which means the mapping
+> cannot be freed beneath us and thus we can safely dereference it."
+> 
+> So if we follow the same rules as folio_fast_pin_allowed(), we can
+> de-reference folio->mapping, for example comparing mapping->a_ops.
+> 
+> [folio_is_secretmem should better follow the same approach]
 
-Remove the arch_libdir->arch->testdir heuristic and just require
-everybody sets arch_libdir correctly. Fail if the lib/arch or
-lib/arch/asm directories can not be found.
+Resurecting this discussion, I had discussions internally and as it
+turns out Android makes extensive use of vhost/vsock when communicating
+with guest VMs, which requires GUP. So, my bad, not supporting GUP for
+the pKVM variant of guest_memfd is a bit of a non-starter, we'll need to
+support it from the start. But again this should be a matter of 'simply'
+having a dedicated KVM exit reason so hopefully it's not too bad.
 
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>
-Cc: Janosch Frank <frankja@linux.ibm.com>
-Cc: Laurent Vivier <lvivier@redhat.com>
-Cc: Nico Böhr <nrb@linux.ibm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org
-Cc: kvmarm@lists.linux.dev
-Cc: kvm-riscv@lists.infradead.org
-Cc: linuxppc-dev@lists.ozlabs.org
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- Makefile  |  2 +-
- configure | 18 +++++++++++++-----
- 2 files changed, 14 insertions(+), 6 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 4f35fffc6..4e0f54543 100644
---- a/Makefile
-+++ b/Makefile
-@@ -10,7 +10,7 @@ include config.mak
- VPATH = $(SRCDIR)
- 
- libdirs-get = $(shell [ -d "lib/$(1)" ] && echo "lib/$(1) lib/$(1)/asm")
--ARCH_LIBDIRS := $(call libdirs-get,$(ARCH_LIBDIR)) $(call libdirs-get,$(TEST_DIR))
-+ARCH_LIBDIRS := $(call libdirs-get,$(ARCH_LIBDIR))
- OBJDIRS := $(ARCH_LIBDIRS)
- 
- DESTDIR := $(PREFIX)/share/kvm-unit-tests/
-diff --git a/configure b/configure
-index e19ba6f0c..a1308db8e 100755
---- a/configure
-+++ b/configure
-@@ -216,7 +216,6 @@ fi
- arch_name=$arch
- [ "$arch" = "aarch64" ] && arch="arm64"
- [ "$arch_name" = "arm64" ] && arch_name="aarch64"
--arch_libdir=$arch
- 
- if [ "$arch" = "riscv" ]; then
-     echo "riscv32 or riscv64 must be specified"
-@@ -286,8 +285,10 @@ fi
- 
- if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
-     testdir=x86
-+    arch_libdir=x86
- elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
-     testdir=arm
-+    arch_libdir=$arch
-     if [ "$target" = "qemu" ]; then
-         arm_uart_early_addr=0x09000000
-     elif [ "$target" = "kvmtool" ]; then
-@@ -336,6 +337,7 @@ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
-     fi
- elif [ "$arch" = "ppc64" ]; then
-     testdir=powerpc
-+    arch_libdir=ppc64
-     firmware="$testdir/boot_rom.bin"
-     if [ "$endian" != "little" ] && [ "$endian" != "big" ]; then
-         echo "You must provide endianness (big or little)!"
-@@ -346,6 +348,7 @@ elif [ "$arch" = "riscv32" ] || [ "$arch" = "riscv64" ]; then
-     arch_libdir=riscv
- elif [ "$arch" = "s390x" ]; then
-     testdir=s390x
-+    arch_libdir=s390x
- else
-     echo "arch $arch is not supported!"
-     arch=
-@@ -355,6 +358,10 @@ if [ ! -d "$srcdir/$testdir" ]; then
-     echo "$srcdir/$testdir does not exist!"
-     exit 1
- fi
-+if [ ! -d "$srcdir/lib/$arch_libdir" ]; then
-+    echo "$srcdir/lib/$arch_libdir does not exist!"
-+    exit 1
-+fi
- 
- if [ "$efi" = "y" ] && [ -f "$srcdir/$testdir/efi/run" ]; then
-     ln -fs "$srcdir/$testdir/efi/run" $testdir-run
-@@ -417,10 +424,11 @@ fi
- # link lib/asm for the architecture
- rm -f lib/asm
- asm="asm-generic"
--if [ -d "$srcdir/lib/$arch/asm" ]; then
--	asm="$srcdir/lib/$arch/asm"
--elif [ -d "$srcdir/lib/$testdir/asm" ]; then
--	asm="$srcdir/lib/$testdir/asm"
-+if [ -d "$srcdir/lib/$arch_libdir/asm" ]; then
-+    asm="$srcdir/lib/$arch_libdir/asm"
-+else
-+    echo "$srcdir/lib/$arch_libdir/asm does not exist"
-+    exit 1
- fi
- mkdir -p lib
- ln -sf "$asm" lib/asm
--- 
-2.42.0
-
+Thanks,
+Quentin
