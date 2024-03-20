@@ -1,211 +1,261 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20283FBAF
-	for <kvmarm@lists.linux.dev>; Tue, 19 Mar 2024 23:54:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52EDC69DE9
+	for <kvmarm@lists.linux.dev>; Wed, 20 Mar 2024 20:54:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710892497; cv=none; b=Np78uv1GlYw2pb1Ef9fD2dz5R+JEjK2P6x0R5+6Xh34/C64Dd3tXexWiA+PSXDZY7xcyquVBNwkcSz1Zvfy3kpWVJES5xSQ5PKiFRxvTKaucX1p0JHe4tPGmTZjJQzcWCrxDCxp6ppp+iRkbLcThXG3Oe5kaig7bU0oj2UO4JTw=
+	t=1710968090; cv=none; b=cOQjN9Fvvz1xy0qGcRAjatssvcz4yrWc+Iux/WlChUTra16NF9aJdJO1Xb0YXxTx2z6HjhmmGSlfiCuN43NxguDDdeixhlHZrCHznbZQUwOWA/2pFMXH+YO6bx2HmtivThYNMd5SgEB1Wr1v1tMrgsEgmgdLargxw+xdzWOGoJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710892497; c=relaxed/simple;
-	bh=LyLfsXArmpaIz1dWIS+ezi31pdNTzLESJRdI9KREBIk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=deuFg+VX2pW5g5A3fHQJ7k6KHmxkSqBGtXjx6brKVS6GLDfyzHKBEVbrIdL347VEvhSW+hpfnQe1sHIc2czsQYCc5hkvbKw866VYV4xLCmvMrtolkT/fCbvdqOg+DrYudSyS6WldzjapOUioLwlofz6dgicJRh0NsmSikHgl2S4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=EPKR0POT; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1710968090; c=relaxed/simple;
+	bh=XhFojGRriaPCLI2McEy+lswO1UFG6gWja66SzVIzjrc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NqOsJBAZ3Xw/mI9cO6w1Q61ftx9yNtS+M9Nrm3EpFUXM6kSOvJ8kZ0gdftjCVOlcVEzqiJvcdp83xlIB0SM7PEMTYLh+SrRc4p9XQnCEIv6qtmNyIsRaglhWA2F9XUQqj47SFXDJhEIaF28Sb1TSzsYHoyuCyIdhfrY5v9YP9g8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iHuOxjxi; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="EPKR0POT"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42JMfNxS000987;
-	Tue, 19 Mar 2024 23:54:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	date:from:to:cc:subject:message-id:references:mime-version
-	:content-type:content-transfer-encoding:in-reply-to; s=
-	qcppdkim1; bh=aeq5QRLdnBnxL7CPkUwlT7Hq5FWu/MXH5rgdftDhMUE=; b=EP
-	KR0POTMpUHtBZ6m2OzvR66QXx487ED+ItB/VzztJtiMhmhYv1mupobx0MSesEaWD
-	bvgiYbnkdL6T41Ob7m8uuiOKh4kME9BVsw0Kt77FOuZJ+BUzCyuH767UPNN5Nn8Q
-	z2zY7A63E5HkxIkwonqY/ffJxNK8vSDfp8Jr8uCAb4IFdJzYAioB9O3aj7c7RmqR
-	H0Zzz/cDrAPYvxXhekUjQxE0rVFa7T/eetY3tbyQssKrDUhIMnDWa3YrrZyy5sD8
-	YGmDiLJvR/4SnzKN9uCYEcin3dijLJcDKqN9q7f8Ux/f2ggzWq8+TDZHnTYbPEoL
-	nFR+IJo9PCVbfdWup7/w==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wy9ee9qcy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Mar 2024 23:54:13 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42JNsC0b001314
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Mar 2024 23:54:12 GMT
-Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 19 Mar 2024 16:54:11 -0700
-Date: Tue, 19 Mar 2024 16:54:10 -0700
-From: Elliot Berman <quic_eberman@quicinc.com>
-To: Will Deacon <will@kernel.org>
-CC: David Hildenbrand <david@redhat.com>,
-        Sean Christopherson
-	<seanjc@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Quentin Perret
-	<qperret@google.com>,
-        Matthew Wilcox <willy@infradead.org>, Fuad Tabba
-	<tabba@google.com>,
-        <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>, <pbonzini@redhat.com>,
-        <chenhuacai@kernel.org>, <mpe@ellerman.id.au>, <anup@brainfault.org>,
-        <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
-        <aou@eecs.berkeley.edu>, <viro@zeniv.linux.org.uk>,
-        <brauner@kernel.org>, <akpm@linux-foundation.org>,
-        <xiaoyao.li@intel.com>, <yilun.xu@intel.com>,
-        <chao.p.peng@linux.intel.com>, <jarkko@kernel.org>,
-        <amoorthy@google.com>, <dmatlack@google.com>,
-        <yu.c.zhang@linux.intel.com>, <isaku.yamahata@intel.com>,
-        <mic@digikod.net>, <vbabka@suse.cz>, <ackerleytng@google.com>,
-        <mail@maciej.szmigiero.name>, <michael.roth@amd.com>,
-        <wei.w.wang@intel.com>, <liam.merwick@oracle.com>,
-        <isaku.yamahata@gmail.com>, <kirill.shutemov@linux.intel.com>,
-        <suzuki.poulose@arm.com>, <steven.price@arm.com>,
-        <quic_mnalajal@quicinc.com>, <quic_tsoni@quicinc.com>,
-        <quic_svaddagi@quicinc.com>, <quic_cvanscha@quicinc.com>,
-        <quic_pderrin@quicinc.com>, <quic_pheragu@quicinc.com>,
-        <catalin.marinas@arm.com>, <james.morse@arm.com>,
-        <yuzenghui@huawei.com>, <oliver.upton@linux.dev>, <maz@kernel.org>,
-        <keirf@google.com>, <linux-mm@kvack.org>
-Subject: Re: Re: folio_mmapped
-Message-ID: <20240319155648990-0700.eberman@hu-eberman-lv.qualcomm.com>
-Mail-Followup-To: Will Deacon <will@kernel.org>, 
-	David Hildenbrand <david@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Quentin Perret <qperret@google.com>, 
-	Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, brauner@kernel.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, keirf@google.com, linux-mm@kvack.org
-References: <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
- <ZeXAOit6O0stdxw3@google.com>
- <ZeYbUjiIkPevjrRR@google.com>
- <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
- <CAGtprH-17s7ipmr=+cC6YuH-R0Bvr7kJS7Zo9a+Dc9VEt2BAcQ@mail.gmail.com>
- <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
- <CAGtprH8B8y0Khrid5X_1twMce7r-Z7wnBiaNOi-QwxVj4D+L3w@mail.gmail.com>
- <ZfjYBxXeh9lcudxp@google.com>
- <40f82a61-39b0-4dda-ac32-a7b5da2a31e8@redhat.com>
- <20240319143119.GA2736@willie-the-truck>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iHuOxjxi"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-414633f7a52so2631515e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 20 Mar 2024 13:54:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710968086; x=1711572886; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M9OJbJMLYpLTqaMrgQ5F4CTDV8TnBXcToRrQB4UYTw0=;
+        b=iHuOxjxihfxhh+nihBd8RtilLYA48Lbj36NvyVPo6vs7zIH2yoXKw/zd2onhaV9aU8
+         D71cmFC2jGKTk+c4F7hHR0rcTC0bZwEpaPETCzAwHbfpQ1KbxitTuIadQLxG+xlFcJhU
+         DKgMqcbODWSleP7qp3UaGTiKBp7q8WWiJBIAs7T5HY5ymD6h0ZUYWrdqq8YpYBACtfCa
+         hqew1CuxCDlZSuv5wF1PpErM62WsFJxJNkbM9JtLuX4ZM++zBQdQEWiizIzT0zTt9CUi
+         yzgrC+2BW9oap2rBhwxcJGNzdIuQ+CY+qJi6LmetmIlIQm06CWA6nLOE7wxcFH6ONYPT
+         t3Tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710968086; x=1711572886;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M9OJbJMLYpLTqaMrgQ5F4CTDV8TnBXcToRrQB4UYTw0=;
+        b=pA6sMI4pOUV/R86FR5Ge6yDonNXHbUzeNvlODX/bDOC29X+IPcr1e/6pDcGUv9pcbv
+         WvodU2QuZveKrh1KwsYHIVtnzsfkdWxetBhSzkXq7i1u9LsMBzmn8RTtduuNSaVPvU5I
+         LCeNI030vQQ5brWfdZyfYzUzVPFm2M8e4SEUredEdnqcludh7FzTJNdcbxAh7UPEGIiK
+         QcAuh0pIR7ik9hdY7+R40dB6+xbIQP6eqksflfBgpGPm38Ydf6WZ8UtytRGUTqx3UMYG
+         p5GLJV8iR3qMqwhEwlMCt9rCYLIKKwgnuV075iEQeePyEbcWNeZQSyiu7bsZljo+ySoe
+         rwAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU1liXfVpFfd1rIGmFwlNy4mGeLwmjNTfIwWyR7dusk2zv/dXXCfq49jjXYdLFZtnN+XSCjKW+lz38FEHHQPrLonWhkuUhu
+X-Gm-Message-State: AOJu0YwsMVKsnpkn2KaDnqLQ1RI8SkddWdUItF4Skkq+v6cTD34B+4gm
+	316w0t0cH1dlkQ6ET2aR7ubD1r7MSiAFHY7UO7nzQLZXItiZhJHZl7VS+lIcgGJxyKHKICZ5LVX
+	/838dvF4CLEY6GGMWQjBb0WcKWS/jfRTnOUOZ
+X-Google-Smtp-Source: AGHT+IH87XnoWDBP/JxyANKouNDuOvhC2d4maSHSsazIVN31uoJwJMNqdiRF8UnED+uAboiXZOXtAHHYnunpxv28wyE=
+X-Received: by 2002:a05:6000:4020:b0:341:906b:3351 with SMTP id
+ cp32-20020a056000402000b00341906b3351mr284860wrb.0.1710968086423; Wed, 20 Mar
+ 2024 13:54:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240319143119.GA2736@willie-the-truck>
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: FEqxfT4Zfq9jRu8C0SNX6rBbDdaZhX_-
-X-Proofpoint-ORIG-GUID: FEqxfT4Zfq9jRu8C0SNX6rBbDdaZhX_-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-19_10,2024-03-18_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 priorityscore=1501 mlxlogscore=999 bulkscore=0
- impostorscore=0 clxscore=1011 phishscore=0 spamscore=0 suspectscore=0
- adultscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2403140001 definitions=main-2403190185
+References: <ZfG801lYHRxlhZGT@google.com> <9e604f99-5b63-44d7-8476-00859dae1dc4@amd.com>
+ <ZfHKoxVMcBAMqcSC@google.com> <93df19f9-6dab-41fc-bbcd-b108e52ff50b@amd.com>
+ <ZfHhqzKVZeOxXMnx@google.com> <c84fcf0a-f944-4908-b7f6-a1b66a66a6bc@amd.com>
+ <d2a95b5c-4c93-47b1-bb5b-ef71370be287@amd.com> <CAD=HUj5k+N+zrv-Yybj6K3EvfYpfGNf-Ab+ov5Jv+Zopf-LJ+g@mail.gmail.com>
+ <ZfMjCXZWuUD76r_5@google.com> <ZfMxj_e7M_toVR3a@google.com> <ZfSMaUFa5hsPP-eR@google.com>
+In-Reply-To: <ZfSMaUFa5hsPP-eR@google.com>
+From: Axel Rasmussen <axelrasmussen@google.com>
+Date: Wed, 20 Mar 2024 13:54:07 -0700
+Message-ID: <CAJHvVchGxd3ECA4mySYmUBNgq+N_4ws3aE6thSjBtjicJDJD=g@mail.gmail.com>
+Subject: Re: [PATCH v11 0/8] KVM: allow mapping non-refcounted pages
+To: Sean Christopherson <seanjc@google.com>
+Cc: David Stevens <stevensd@chromium.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
+	Zhi Wang <zhi.wang.linux@gmail.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 19, 2024 at 02:31:19PM +0000, Will Deacon wrote:
-> On Tue, Mar 19, 2024 at 11:26:05AM +0100, David Hildenbrand wrote:
-> > On 19.03.24 01:10, Sean Christopherson wrote:
-> > > On Mon, Mar 18, 2024, Vishal Annapurve wrote:
-> > > > On Mon, Mar 18, 2024 at 3:02 PM David Hildenbrand <david@redhat.com> wrote:
-> > > > > Second, we should find better ways to let an IOMMU map these pages,
-> > > > > *not* using GUP. There were already discussions on providing a similar
-> > > > > fd+offset-style interface instead. GUP really sounds like the wrong
-> > > > > approach here. Maybe we should look into passing not only guest_memfd,
-> > > > > but also "ordinary" memfds.
-> > > 
-> > > +1.  I am not completely opposed to letting SNP and TDX effectively convert
-> > > pages between private and shared, but I also completely agree that letting
-> > > anything gup() guest_memfd memory is likely to end in tears.
-> > 
-> > Yes. Avoid it right from the start, if possible.
-> > 
-> > People wanted guest_memfd to *not* have to mmap guest memory ("even for
-> > ordinary VMs"). Now people are saying we have to be able to mmap it in order
-> > to GUP it. It's getting tiring, really.
-> 
-> From the pKVM side, we're working on guest_memfd primarily to avoid
-> diverging from what other CoCo solutions end up using, but if it gets
-> de-featured (e.g. no huge pages, no GUP, no mmap) compared to what we do
-> today with anonymous memory, then it's a really hard sell to switch over
-> from what we have in production. We're also hoping that, over time,
-> guest_memfd will become more closely integrated with the mm subsystem to
-> enable things like hypervisor-assisted page migration, which we would
-> love to have.
-> 
-> Today, we use the existing KVM interfaces (i.e. based on anonymous
-> memory) and it mostly works with the one significant exception that
-> accessing private memory via a GUP pin will crash the host kernel. If
-> all guest_memfd() can offer to solve that problem is preventing GUP
-> altogether, then I'd sooner just add that same restriction to what we
-> currently have instead of overhauling the user ABI in favour of
-> something which offers us very little in return.
+On Fri, Mar 15, 2024 at 10:59=E2=80=AFAM Sean Christopherson <seanjc@google=
+.com> wrote:
+>
+> On Thu, Mar 14, 2024, Sean Christopherson wrote:
+> > +Alex, who is looking at the huge-VM_PFNMAP angle in particular.
+>
+> Oof, *Axel*.  Sorry Axel.
 
-How would we add the restriction to anonymous memory?
 
-Thinking aloud -- do you mean like some sort of "exclusive GUP" flag
-where mm can ensure that the exclusive GUP pin is the only pin? If the
-refcount for the page is >1, then the exclusive GUP fails. Any future
-GUP pin attempts would fail if the refcount has the EXCLUSIVE_BIAS.
+No worries. Believe it or not this happens frequently. :) I'm well
+past being bothered about it.
 
-> On the mmap() side of things for guest_memfd, a simpler option for us
-> than what has currently been proposed might be to enforce that the VMM
-> has unmapped all private pages on vCPU run, failing the ioctl if that's
-> not the case. It needs a little more tracking in guest_memfd but I think
-> GUP will then fall out in the wash because only shared pages will be
-> mapped by userspace and so GUP will fail by construction for private
-> pages.
+>
+>
+> > On Thu, Mar 14, 2024, Sean Christopherson wrote:
+> > > -Christ{oph,ian} to avoid creating more noise...
+> > >
+> > > On Thu, Mar 14, 2024, David Stevens wrote:
+> > > > Because of that, the specific type of pfns that don't work right no=
+w are
+> > > > pfn_valid() && !PG_Reserved && !page_ref_count() - what I called th=
+e
+> > > > non-refcounted pages in a bad choice of words. If that's correct, t=
+hen
+> > > > perhaps this series should go a little bit further in modifying
+> > > > hva_to_pfn_remapped, but it isn't fundamentally wrong.
+> > >
+> > > Loosely related to all of this, I have a mildly ambitious idea.  Well=
+, one mildly
+> > > ambitious idea, and one crazy ambitious idea.  Crazy ambitious idea f=
+irst...
+> > >
+> > > Something we (GCE side of Google) have been eyeballing is adding supp=
+ort for huge
+> > > VM_PFNMAP memory, e.g. for mapping large amounts of device (a.k.a. GP=
+U) memory
+> > > into guests using hugepages.  One of the hiccups is that follow_pte()=
+ doesn't play
+> > > nice with hugepages, at all, e.g. even has a "VM_BUG_ON(pmd_trans_hug=
+e(*pmd))".
+> > > Teaching follow_pte() to play nice with hugepage probably is doing, b=
+ut making
+> > > sure all existing users are aware, maybe not so much.
 
-We can prevent GUP after the pages are marked private, but the pages
-could be marked private after the pages were already GUP'd. I don't have
-a good way to detect this, so converting a page to private is difficult.
 
-> We're happy to pursue alternative approaches using anonymous memory if
-> you'd prefer to keep guest_memfd limited in functionality (e.g.
-> preventing GUP of private pages by extending mapping_flags as per [1]),
-> but we're equally willing to contribute to guest_memfd if extensions are
-> welcome.
-> 
-> What do you prefer?
-> 
+Right. The really basic idea I had was, to modify remap_pfn_range so
+it can, if possible (if it sees a (sub)range which is aligned + big
+enough), it can just install a leaf pud or pmd instead of always going
+down to the pte level.
 
-I like this as a stepping stone. For the Android use cases, we don't
-need to be able to convert a private page to shared and then also be
-able to GUP it. If you want to GUP a page, use anonymous memory and that
-memory will always be shared. If you don't care about GUP'ing (e.g. it's
-going to be guest-private or you otherwise know you won't be GUP'ing),
-you can use guest_memfd.
+follow_pte is problematic though, because it returns a pte
+specifically so it's unclear to me how to have it "just work" for
+existing callers with an area mapped this way. So I think the idea
+would be to change follow_pte to detect this case and bail out
+(-EINVAL I guess), and then add some new function which can properly
+support these mappings.
 
-I don't think this design prevents us from adding "sometimes you can
-GUP" to guest_memfd in the future. I don't think it creates extra
-changes for KVM since anonymous memory is already supported; although
-I'd have to add the support for Gunyah.
+>
+> > >
+> > > My first (half baked, crazy ambitious) idea is to move away from foll=
+ow_pte() and
+> > > get_user_page_fast_only() for mmu_notifier-aware lookups, i.e. that d=
+on't need
+> > > to grab references, and replace them with a new converged API that lo=
+cklessly walks
+> > > host userspace page tables, and grabs the hugepage size along the way=
+, e.g. so that
+> > > arch code wouldn't have to do a second walk of the page tables just t=
+o get the
+> > > hugepage size.
+> > >
+> > > In other words, for the common case (mmu_notifier integration, no ref=
+erence needed),
+> > > route hva_to_pfn_fast() into the new API and walk the userspace page =
+tables (probably
+> > > only for write faults, to avoid CoW compliciations) before doing anyt=
+hing else.
+> > >
+> > > Uses of hva_to_pfn() that need to get a reference to the struct page =
+couldn't be
+> > > converted, e.g. when stuffing physical addresses into the VMCS for ne=
+sted virtualization.
+> > > But for everything else, grabbing a reference is a non-goal, i.e. act=
+ually "getting"
+> > > a user page is wasted effort and actively gets in the way.
+> > >
+> > > I was initially hoping we could go super simple and use something lik=
+e x86's
+> > > host_pfn_mapping_level(), but there are too many edge cases in gup() =
+that need to
+> > > be respected, e.g. to avoid mapping memfd_secret pages into KVM guest=
+s.  I.e. the
+> > > API would need to be a formal mm-owned thing, not some homebrewed KVM=
+ implementation.
+> > >
+> > > I can't tell if the payoff would be big enough to justify the effort =
+involved, i.e.
+> > > having a single unified API for grabbing PFNs from the primary MMU mi=
+ght just be a
+> > > pie-in-the-sky type idea.
 
-> [1] https://lore.kernel.org/r/4b0fd46a-cc4f-4cb7-9f6f-ce19a2d3064e@redhat.com
+Yeah, I have been thinking about this.
 
-Thanks,
-Elliot
+One thing is, KVM is not the only caller of follow_pte today. At least
+naively it would be nice if any existing callers could benefit from
+this new support, not just KVM.
 
+Another thing I noticed is, most callers don't need much; they don't
+need a reference to the page, they don't even really need the pte
+itself. Most callers just want a ptl held, and they want to know the
+pgprot flags or whether the pte is writable or not, and they want to
+know the pfn for this address. IOW follow_pte is sort of overkill for
+most callers.
+
+KVM is a bit different, it does call GUP to get the page. One other
+thing is, KVM at least on x86 also cares about the "level" of the
+mapping, in host_pfn_mapping_level(). That code is all fairly x86
+specific so I'm not sure how to generalize it. Also I haven't looked
+closely at what's going on for other architectures.
+
+I'm not sure yet where is the right place to end up, but I at least
+think it's worth trying to build some general API under mm/ which
+supports these various things.
+
+In general I'm thinking of proceeding in two steps. First,
+enlightening remap_pfn_range, updating follow_pte to return -EINVAL,
+and then adding some new function which tries to be somewhat close to
+a drop-in replacement for existing follow_pte callers. Once I get that
+proof of concept working / tested, I think the next step is figuring
+out how we can extend it a bit to build some more general solution
+like Sean is describing here.
+
+> > >
+> > > My second, less ambitious idea: the previously linked LWN[*] article =
+about the
+> > > writeback issues reminded me of something that has bugged me for a lo=
+ng time.  IIUC,
+> > > getting a writable mapping from the primary MMU marks the page/folio =
+dirty, and that
+> > > page/folio stays dirty until the data is written back and the mapping=
+ is made read-only.
+> > > And because KVM is tapped into the mmu_notifiers, KVM will be notifie=
+d *before* the
+> > > RW=3D>RO conversion completes, i.e. before the page/folio is marked c=
+lean.
+> > >
+> > > I _think_ that means that calling kvm_set_page_dirty() when zapping a=
+ SPTE (or
+> > > dropping any mmu_notifier-aware mapping) is completely unnecessary.  =
+If that is the
+> > > case, _and_ we can weasel our way out of calling kvm_set_page_accesse=
+d() too, then
+> > > with FOLL_GET plumbed into hva_to_pfn(), we can:
+> > >
+> > >   - Drop kvm_{set,release}_pfn_{accessed,dirty}(), because all caller=
+s of hva_to_pfn()
+> > >     that aren't tied into mmu_notifiers, i.e. aren't guaranteed to dr=
+op mappings
+> > >     before the page/folio is cleaned, will *know* that they hold a re=
+fcounted struct
+> > >     page.
+> > >
+> > >   - Skip "KVM: x86/mmu: Track if sptes refer to refcounted pages" ent=
+irely, because
+> > >     KVM never needs to know if a SPTE points at a refcounted page.
+> > >
+> > > In other words, double down on immediately doing put_page() after gup=
+() if FOLL_GET
+> > > isn't specified, and naturally make all KVM MMUs compatible with pfn_=
+valid() PFNs
+> > > that are acquired by follow_pte().
+> > >
+> > > I suspect we can simply mark pages as access when a page is retrieved=
+ from the primary
+> > > MMU, as marking a page accessed when its *removed* from the guest is =
+rather nonsensical.
+> > > E.g. if a page is mapped into the guest for a long time and it gets s=
+wapped out, marking
+> > > the page accessed when KVM drops its SPTEs in response to the swap ad=
+ds no value.  And
+> > > through the mmu_notifiers, KVM already plays nice with setups that us=
+e idle page
+> > > tracking to make reclaim decisions.
+> > >
+> > > [*] https://lwn.net/Articles/930667
