@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F351A1292D1;
-	Thu, 21 Mar 2024 15:54:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1369B86622;
+	Thu, 21 Mar 2024 15:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711036472; cv=none; b=JSD/AUGYuCcvst9wC1ykLKQ+OT7gW3pFyljtkTRYIF6Z6pbICQ+/jRbZzs17ppavj0tt7rXabH+IJ2oC6Nh+qa7f56RsasAjAMGq2+8oa51SeTRJtXr0BQB+R5MfYR1FnxFNmk7GjnmQcqGENRCaL3cSZxyqx5eA/BVwV3Mr2n0=
+	t=1711036472; cv=none; b=YAh01xmhFcRrgyIENl/sJVZtclzunCZpMjGxbVjf1pEp7/Am7J018Q7wu5YFjEY3Wqmn4RbS0PaGljAFsRUlpYZF28SbvfdGF0fA+kb9FjZ28F8Fx6y+mx6o1xzt6k0JHnyvfWu6PAH4riDRALqzPkZ9rzbnS2hGU0wK0f548UU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1711036472; c=relaxed/simple;
-	bh=B5KlM7mxnuT+54M22DLYGxp97WwZIk75EIF9VXlqvD0=;
+	bh=GA1KleUB16oUS7y7HqfqvAiW952IEgag5B1ooVUmgBo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EX8AZ9/L+f722DdgHNVdfLXoWZ19i31N/BF+/EXj09Bf3E7qO4y6oEfPUzyqY7i6J9ZBp+eQ/MVms5kEQybvbv1ag0FKUbL5NaacMEXN4XXDJcUxkOrfC9PLqKbtGiFll7eMjBSBO23zIEpy/S9r0X2QR0hW8A2aF2zjFsSg1ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eu2HViKn; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=UuE2IoG0XDANfy0fv/XBpRPRablTQTxkd+/C3jjFbgtbytqCbi4KLzNM2aPt9407/9uD1b2akUHf2wRnLUot+1MRDe+RXKw72nJ+/m5rHTLNV0Sm/a3wcQ0gip7R88wQ0ny1Sp+nZFTQFqscc9lQD6xDNxo8qnIT0sIDLrK40cE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GUkk7VLM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eu2HViKn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90611C43399;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GUkk7VLM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2AE1C433C7;
 	Thu, 21 Mar 2024 15:54:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1711036471;
-	bh=B5KlM7mxnuT+54M22DLYGxp97WwZIk75EIF9VXlqvD0=;
+	bh=GA1KleUB16oUS7y7HqfqvAiW952IEgag5B1ooVUmgBo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eu2HViKnqOA5mgCVXXVbN4AWQCs83gyVoAZQ/uqXBmGPgfEDPjnPzxYWSSA2E+IVO
-	 yKuexCAaAsEL4VbCd9+Hq6j5Q/hqjHEoGTmiL9Gt3puRpj6Bo+JSMmaIPtelabPODH
-	 A1M9A0GbxnyosB2oTkjSrDMs2D8BTwGiatzncq0qETOaPUtxI32D5kQ/H96POUXD0X
-	 F8aMvJtgsZFFP9r89CghfbtS5ZeZbtc6RxECACxHLOqqmTUyPH6vpDS+4nInycruJE
-	 SczOfg1fwrv6GBkCVduM1Eo6i2HDT7G3NRKkdO1w3LOYhaadUMOeTBMKrwfdJAuLND
-	 ixIr6vFrmcXng==
+	b=GUkk7VLMUvssGxWt0sH6W69zpMQreu6SDVV9cBkLs0TQXgUMFFCBLMrOs+21mcbLN
+	 Avf/YfiBcVP1v3cZOv51Kjn1GhGiSLErtfcVotA1MR/hf+K3XpdvmZgq0TPZ9WqWgA
+	 SETqT7HGsOLavOTEmA7a1Sk8XuIUmLMv7NjMkiGaAWpTG5wouW3u/yhoBuq4yGLwtT
+	 66oeyvP1MSX/dOR90knHtdvWOZwmOj81BGs6Nzu4NZiZ7lHMoQg8Ic704Zj+T/Z+b9
+	 o3wqZdOP/mKBSfpCTn3vBfPS56h9xHNcOMKunvj7c3F2n25f2xKa+UVp0L1+8oyWpI
+	 t6Af6Z6yd/GGQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rnKkP-00EEqz-HJ;
-	Thu, 21 Mar 2024 15:54:29 +0000
+	id 1rnKkQ-00EEqz-68;
+	Thu, 21 Mar 2024 15:54:30 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH v3 01/15] KVM: arm64: Harden __ctxt_sys_reg() against out-of-range values
-Date: Thu, 21 Mar 2024 15:53:42 +0000
-Message-Id: <20240321155356.3236459-2-maz@kernel.org>
+Subject: [PATCH v3 04/15] KVM: arm64: nv: Drop VCPU_HYP_CONTEXT flag
+Date: Thu, 21 Mar 2024 15:53:45 +0000
+Message-Id: <20240321155356.3236459-5-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240321155356.3236459-1-maz@kernel.org>
 References: <20240321155356.3236459-1-maz@kernel.org>
@@ -61,56 +61,55 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The unsuspecting kernel tinkerer can be easily confused into
-writing something that looks like this:
-
-	ikey.lo = __vcpu_sys_reg(vcpu, SYS_APIAKEYLO_EL1);
-
-which seems vaguely sensible, until you realise that the second
-parameter is the encoding of a sysreg, and not the index into
-the vcpu sysreg file... Debugging what happens in this case is
-an interesting exercise in head<->wall interactions.
-
-As they often say: "Any resemblance to actual persons, living
-or dead, or actual events is purely coincidental".
-
-In order to save people's time, add some compile-time hardening
-that will at least weed out the "stupidly out of range" values.
-This will *not* catch anything that isn't a compile-time constant.
+It has become obvious that HCR_EL2.NV serves the exact same use
+as VCPU_HYP_CONTEXT, only in an architectural way. So just drop
+the flag for good.
 
 Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_host.h | 2 --
+ arch/arm64/kvm/hyp/vhe/switch.c   | 7 +------
+ 2 files changed, 1 insertion(+), 8 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 6883963bbc3a..839c76529bb2 100644
+index 839c76529bb2..3f1c3c91e5c2 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -895,7 +895,7 @@ struct kvm_vcpu_arch {
-  * Don't bother with VNCR-based accesses in the nVHE code, it has no
-  * business dealing with NV.
-  */
--static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
-+static inline u64 *___ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
- {
- #if !defined (__KVM_NVHE_HYPERVISOR__)
- 	if (unlikely(cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
-@@ -905,6 +905,13 @@ static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
- 	return (u64 *)&ctxt->sys_regs[r];
- }
+@@ -816,8 +816,6 @@ struct kvm_vcpu_arch {
+ #define DEBUG_STATE_SAVE_SPE	__vcpu_single_flag(iflags, BIT(5))
+ /* Save TRBE context if active  */
+ #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
+-/* vcpu running in HYP context */
+-#define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
  
-+#define __ctxt_sys_reg(c,r)						\
-+	({								\
-+	    	BUILD_BUG_ON(__builtin_constant_p(r) &&			\
-+			     (r) >= NR_SYS_REGS);			\
-+		___ctxt_sys_reg(c, r);					\
-+	})
-+
- #define ctxt_sys_reg(c,r)	(*__ctxt_sys_reg(c,r))
+ /* SVE enabled for host EL0 */
+ #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 1581df6aec87..58415783fd53 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -197,7 +197,7 @@ static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	 * If we were in HYP context on entry, adjust the PSTATE view
+ 	 * so that the usual helpers work correctly.
+ 	 */
+-	if (unlikely(vcpu_get_flag(vcpu, VCPU_HYP_CONTEXT))) {
++	if (unlikely(read_sysreg(hcr_el2) & HCR_NV)) {
+ 		u64 mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
  
- u64 kvm_vcpu_sanitise_vncr_reg(const struct kvm_vcpu *, enum vcpu_sysreg);
+ 		switch (mode) {
+@@ -240,11 +240,6 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	sysreg_restore_guest_state_vhe(guest_ctxt);
+ 	__debug_switch_to_guest(vcpu);
+ 
+-	if (is_hyp_ctxt(vcpu))
+-		vcpu_set_flag(vcpu, VCPU_HYP_CONTEXT);
+-	else
+-		vcpu_clear_flag(vcpu, VCPU_HYP_CONTEXT);
+-
+ 	do {
+ 		/* Jump in the fire! */
+ 		exit_code = __guest_enter(vcpu);
 -- 
 2.39.2
 
