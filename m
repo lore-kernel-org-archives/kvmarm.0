@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F86112BE83;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634CB12BE87;
 	Thu, 21 Mar 2024 15:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711036472; cv=none; b=ZtZBaR6hrgcNQR0nxxXuHt0g+QZXt/7SRzidXyw0r4j4MHLTP12ugHMP4Zo8fGk/lJ5ablcSD0cHio2VLQjZC7jatyUPeettgtWQBMlxzLyfIQo2oh5jQ7QXpo+3eiDePK+jamow8AJqRbgY0FMyeZUgvS5/l77WbgjguR4HhJI=
+	t=1711036472; cv=none; b=QG3Q4DXm7ygFjRbUNxNeuBFf5GvXEwrlxfKsGyMI11vi/ui+llFR8HgIbNQ/TJmyPjCTcmuyIqZd4XpVsecDOluK4b19PpRcvy0yl62Apjwz03dj8Vp+Hffhpn6B/AgtUYFmTRVPiY7X9zoVhUFYaJfr9CBV7fHcWd0ABbWYTZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1711036472; c=relaxed/simple;
-	bh=0ghS+d/37kG9I38a1NzWxGiZYdqk3MoQyhIqBHrfUaA=;
+	bh=nuP68np28bnX5e9ek2TaXzYB9gLQsB4wYLjkmlaziwg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=E5SAgUOglmXGsGvm98F500bYxnihqHqHP0NZTl+rjM3nCchAZ9LcGIhli5I1KDnZcEqFcMsUaPYssGNaiofCF4/O04a0EbJQyxuHC2tJic5mmXhDhiTjEdXdalx+kMQ2bskSZovSsa81UAQWWHcM4zfed2QaaMaau55Kjey95dY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WzurQnp2; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=k7UhKQBXiCO/SRXZQqTWAuR6AodS1IEjR07NLYkQ1idluuqfkFIpJGtERKTpuw9ivenEOlFeM25wK4r5rMhMpQZ1M57ISQZmGBl8BDujYYtxogd3B/yPrcNTPHqxApoZ6hXvyjx7PhjuuOmj8Mc4La03c4onGv7X+TiXM/rdU20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nnClQDZW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WzurQnp2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB429C433B2;
-	Thu, 21 Mar 2024 15:54:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nnClQDZW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E161C43141;
+	Thu, 21 Mar 2024 15:54:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1711036472;
-	bh=0ghS+d/37kG9I38a1NzWxGiZYdqk3MoQyhIqBHrfUaA=;
+	bh=nuP68np28bnX5e9ek2TaXzYB9gLQsB4wYLjkmlaziwg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WzurQnp2Eb3cqwb0sQwtXGmi7gjcxe1/fYld48UwPl1hkdMWscrnshluASGaRUPaq
-	 vo+hFjlBSXFA32tgYHbNOmo1uqleLNomfxvt6dZb0jiPTwmF5bFhxn7vFpw/fRaU6a
-	 WQc8ZycZ3eoDidNHRdboCKu8Q4JC5ZFTTfXzKhyucUsfod0LP3ZPv2G2WcjfMfsuRh
-	 XlitGgtRRzujSaq5eF+3zP7j/XLsRhxq/IsroKqnugI0Mo6XiXl2FILOKYjBd4zSSU
-	 T19IHu0fL//JN/jKNfUtYeC3yXuS0jtGvs/Lbyj92scQQDjSdo4rmBSssrcEs0erjJ
-	 qd4JDNp5eOr8A==
+	b=nnClQDZWyqAwQa9iAdvLpqZsNNFFT4J/rlRnCJITGgHSDaHLjpE9YMNBi04Qk8b9e
+	 LtuBoy+lRd6/uvrpNdgI/saNFzPP2phdXQWMuRJcKzvsJnbNw7P+S99UdFdSsEXahf
+	 aslN++Rareoluak0BnmJHv9hQTxurhX+9nQgu6PVQAxOzMrlme3qci8RtvjRyXubrn
+	 +UgG4pTD+dNs3PrAmrx6j8LPKpaaUMdMLsthbrCN1YHoaBuNDgvtTBTsoEdMyFhHW+
+	 scwMLMA4hPSpW2tKH2XFpXZPx02y0HzgTtJTuJ0G1qPQ4evYrVrHL5gu4RTQrjDp7p
+	 xZxHVSW75qU5w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rnKkP-00EEqz-Ve;
+	id 1rnKkQ-00EEqz-CK;
 	Thu, 21 Mar 2024 15:54:30 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH v3 03/15] KVM: arm64: Constraint PAuth support to consistent implementations
-Date: Thu, 21 Mar 2024 15:53:44 +0000
-Message-Id: <20240321155356.3236459-4-maz@kernel.org>
+Subject: [PATCH v3 05/15] KVM: arm64: nv: Configure HCR_EL2 for FEAT_NV2
+Date: Thu, 21 Mar 2024 15:53:46 +0000
+Message-Id: <20240321155356.3236459-6-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240321155356.3236459-1-maz@kernel.org>
 References: <20240321155356.3236459-1-maz@kernel.org>
@@ -61,88 +61,103 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-PAuth comes it two parts: address authentication, and generic
-authentication. So far, KVM mandates that both are implemented.
+Add the HCR_EL2 configuration for FEAT_NV2, adding the required
+bits for running a guest hypervisor, and overall merging the
+allowed bits provided by the guest.
 
-PAuth also comes in three flavours: Q5, Q3, and IMPDEF. Only one
-can be implemented for any of address and generic authentication.
+This heavily replies on unavaliable features being sanitised
+when the HCR_EL2 shadow register is accessed, and only a couple
+of bits must be explicitly disabled.
 
-Crucially, the architecture doesn't mandate that address and generic
-authentication implement the *same* flavour. This would make
-implementing ERETAx very difficult for NV, something we are not
-terribly keen on.
+Non-NV guests are completely unaffected by any of this.
 
-So only allow PAuth support for KVM on systems that are not totally
-insane. Which is so far 100% of the known HW.
-
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arm.c | 38 ++++++++++++++++++++++++++++++++++++--
- 1 file changed, 36 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  4 +--
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
+ arch/arm64/kvm/hyp/vhe/switch.c         | 35 ++++++++++++++++++++++++-
+ 3 files changed, 36 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 3dee5490eea9..a7178af1ab0c 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -218,6 +218,40 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
- 	kvm_arm_teardown_hypercalls(kvm);
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index e3fcf8c4d5b4..f5f701f309a9 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -271,10 +271,8 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+ 	__deactivate_traps_hfgxtr(vcpu);
  }
  
-+static bool kvm_has_full_ptr_auth(void)
+-static inline void ___activate_traps(struct kvm_vcpu *vcpu)
++static inline void ___activate_traps(struct kvm_vcpu *vcpu, u64 hcr)
+ {
+-	u64 hcr = vcpu->arch.hcr_el2;
+-
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM))
+ 		hcr |= HCR_TVM;
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index c50f8459e4fc..4103625e46c5 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -40,7 +40,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val;
+ 
+-	___activate_traps(vcpu);
++	___activate_traps(vcpu, vcpu->arch.hcr_el2);
+ 	__activate_traps_common(vcpu);
+ 
+ 	val = vcpu->arch.cptr_el2;
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 58415783fd53..d5fdcea2b366 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -33,11 +33,44 @@ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
+ DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+ DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
+ 
++/*
++ * HCR_EL2 bits that the NV guest can freely change (no RES0/RES1
++ * semantics, irrespective of the configuration), but that cannot be
++ * applied to the actual HW as things would otherwise break badly.
++ *
++ * - TGE: we want the guest to use EL1, which is incompatible with
++ *   this bit being set
++ *
++ * - API/APK: for hysterical raisins, we enable PAuth lazily, which
++ *   means that the guest's bits cannot be directly applied (we really
++ *   want to see the traps). Revisit this at some point.
++ */
++#define NV_HCR_GUEST_EXCLUDE	(HCR_TGE | HCR_API | HCR_APK)
++
++static u64 __compute_hcr(struct kvm_vcpu *vcpu)
 +{
-+	bool apa, gpa, api, gpi, apa3, gpa3;
-+	u64 isar1, isar2, val;
++	u64 hcr = vcpu->arch.hcr_el2;
 +
-+	/*
-+	 * Check that:
-+	 *
-+	 * - both Address and Generic auth are implemented for a given
-+         *   algorithm (Q5, IMPDEF or Q3)
-+	 * - only a single algorithm is implemented.
-+	 */
-+	if (!system_has_full_ptr_auth())
-+		return false;
++	if (!vcpu_has_nv(vcpu))
++		return hcr;
 +
-+	isar1 = read_sanitised_ftr_reg(SYS_ID_AA64ISAR1_EL1);
-+	isar2 = read_sanitised_ftr_reg(SYS_ID_AA64ISAR2_EL1);
++	if (is_hyp_ctxt(vcpu)) {
++		hcr |= HCR_NV | HCR_NV2 | HCR_AT | HCR_TTLB;
 +
-+	apa = !!FIELD_GET(ID_AA64ISAR1_EL1_APA_MASK, isar1);
-+	val = FIELD_GET(ID_AA64ISAR1_EL1_GPA_MASK, isar1);
-+	gpa = (val == ID_AA64ISAR1_EL1_GPA_IMP);
++		if (!vcpu_el2_e2h_is_set(vcpu))
++			hcr |= HCR_NV1;
 +
-+	api = !!FIELD_GET(ID_AA64ISAR1_EL1_API_MASK, isar1);
-+	val = FIELD_GET(ID_AA64ISAR1_EL1_GPI_MASK, isar1);
-+	gpi = (val == ID_AA64ISAR1_EL1_GPI_IMP);
++		write_sysreg_s(vcpu->arch.ctxt.vncr_array, SYS_VNCR_EL2);
++	}
 +
-+	apa3 = !!FIELD_GET(ID_AA64ISAR2_EL1_APA3_MASK, isar2);
-+	val  = FIELD_GET(ID_AA64ISAR2_EL1_GPA3_MASK, isar2);
-+	gpa3 = (val == ID_AA64ISAR2_EL1_GPA3_IMP);
-+
-+	return (apa == gpa && api == gpi && apa3 == gpa3 &&
-+		(apa + api + apa3) == 1);
++	return hcr | (__vcpu_sys_reg(vcpu, HCR_EL2) & ~NV_HCR_GUEST_EXCLUDE);
 +}
 +
- int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ static void __activate_traps(struct kvm_vcpu *vcpu)
  {
- 	int r;
-@@ -311,7 +345,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		break;
- 	case KVM_CAP_ARM_PTRAUTH_ADDRESS:
- 	case KVM_CAP_ARM_PTRAUTH_GENERIC:
--		r = system_has_full_ptr_auth();
-+		r = kvm_has_full_ptr_auth();
- 		break;
- 	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
- 		if (kvm)
-@@ -1270,7 +1304,7 @@ static unsigned long system_supported_vcpu_features(void)
- 	if (!system_supports_sve())
- 		clear_bit(KVM_ARM_VCPU_SVE, &features);
+ 	u64 val;
  
--	if (!system_has_full_ptr_auth()) {
-+	if (!kvm_has_full_ptr_auth()) {
- 		clear_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, &features);
- 		clear_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, &features);
- 	}
+-	___activate_traps(vcpu);
++	___activate_traps(vcpu, __compute_hcr(vcpu));
+ 
+ 	if (has_cntpoff()) {
+ 		struct timer_map map;
 -- 
 2.39.2
 
