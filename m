@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A51925FBB3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 525FF60250;
 	Fri, 22 Mar 2024 17:10:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711127409; cv=none; b=Cv1vkkxEc+qt6nF5zrs1Wc9AFF1KYjVNvMWnCNXfhI0fZvwaDOyvVi9Q2RtWmw1UjsDQ5MsAg1gB9ngaFhoZBBXVnCJAymYlNoClLRYDnRKFMcwyXzhSeIMbJzLVnAh4AD9oCOeQTddzbiquWZ8TRvDUFqxu2Wpl/ybhy2yAIH0=
+	t=1711127410; cv=none; b=f1oSYa4Mjhosf644PKLKJ3sdZAo/VawCD1pOAZYy17JBm742MhOAVEdrECQJGDPRSt2N3PH10Kybk6gLNQjIArtyW02xpFKmBoBqlLAWkUo+KZovEtMqA0ibf7aiuF1pGspQ3ZdTS7Bg3BKJ6yKjXGM9Tv1XpoLFF82/4rnhSac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711127409; c=relaxed/simple;
-	bh=cEH2I6cJrwITa9Xq6BXzrY044eCA7MlALrT8LCNqqvI=;
+	s=arc-20240116; t=1711127410; c=relaxed/simple;
+	bh=c5ov7MoopiyIqC/Sc9KFDMUQ3B5zqwvzsPpFo/WFKSg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FORAWuazrPNV73W1EB0VfqpXycBMXD9zkYWz2+tHQCb+n219KPFtcsRPVBrYRXQdG2ueOmOhn0EQaYUTcmSCaqbt7YxBwfQACo5LcatmQo0qWhH4MDksQo5WcpPMdgZ1qU0NCd0dmBmIaA5+N6Ga7sRf0NuqLzY8EtdgPPWRKvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=taIzpTuT; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=m60RbaQXBRKe6vliYwQcdDI1M+IMnXVK2yXYBcoznnJtGSyNV6K0sMrTK4G7n7eA1p9XwKm42T+6FK7smDnQkBDKl7xz3rtLZrIUf2U9nlRpNgEXko7uEm8FBEKuvu8iLi8fHAVZ6ofQLp4Ha8H5pZ4JTT85kl5npeDmoZn/EI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eugTRHl3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="taIzpTuT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5831AC433B1;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eugTRHl3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6FCFC43330;
 	Fri, 22 Mar 2024 17:10:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1711127409;
-	bh=cEH2I6cJrwITa9Xq6BXzrY044eCA7MlALrT8LCNqqvI=;
+	bh=c5ov7MoopiyIqC/Sc9KFDMUQ3B5zqwvzsPpFo/WFKSg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=taIzpTuTk5pRQhCfPJjpty9PjFR0idaZXzegyUARAc/GTSBj/u/EvY9Rovm9C0bDo
-	 cyMEO2XYq/sq5TO0tXueiy9WgCVGGmekCG6myxrGH/S5k7uJKxcCMdL5tc6F+9JPfx
-	 HMZyQEQzfKuhCVsOkdHKfqM8LHxXN03w+Pqa187FWN0caXeinQjPSYyY8lv5P/BbwU
-	 DyRTRo1+wMQSMsIeF0a9ko6JDBmtyJ4vLR1FFXMsk1GrldsGLLYy6cag6ZfuwGSqQz
-	 L4i+xn8A8lyubCVjP7LaS0wBYByZ/dGSpW+G8l3tvRcQhV47Pv9P5hPVfxeKoDX/BL
-	 xylcEkrUohz+Q==
+	b=eugTRHl3LHxH7QyUk4Bz2ehrVrj7KUufZcSdZjke5AkYoYxavXp7P+EGlAOj3l6h1
+	 kry5zquEwXzjHQ65WDW4KtFjjFAHEpO7BakM02qGxUhwgBVmFe8YCIWCyDB9ULdxm4
+	 PSczeyXQS/sFuSAymW6+AFL3BSj/an2SF/FowxwzrTAH9WXxFThXzAtE9zQve96RSW
+	 mi8/iuBgsI2lB3JrzXgdmu7g7A6v/q8uBnQ4ZrMPhfEXC6p1x/HFo24/tq2whEHN+I
+	 Q8AdRRqWXFxO+oK+N7sQuJ1FJHconMH0vOPqKQ6h62SmbVfJxeygJ64a8MIhkWfcmt
+	 OVq06Ef6Ipg4g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rniP9-00EZPz-CI;
+	id 1rniP9-00EZPz-PG;
 	Fri, 22 Mar 2024 17:10:07 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -44,9 +44,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	Mark Brown <broonie@kernel.org>,
 	Dongli Zhang <dongli.zhang@oracle.com>
-Subject: [PATCH v2 2/5] KVM: arm64: Exclude host_debug_data from vcpu_arch
-Date: Fri, 22 Mar 2024 17:09:42 +0000
-Message-Id: <20240322170945.3292593-3-maz@kernel.org>
+Subject: [PATCH v2 4/5] KVM: arm64: Exclude host_fpsimd_state pointer from kvm_vcpu_arch
+Date: Fri, 22 Mar 2024 17:09:44 +0000
+Message-Id: <20240322170945.3292593-5-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240322170945.3292593-1-maz@kernel.org>
 References: <20240322170945.3292593-1-maz@kernel.org>
@@ -62,128 +62,88 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Keeping host_debug_state on a per-vcpu basis is completely
-pointless. The lifetime of this data is only that of the inner
-run-loop, which means it is never accessed outside of the core
-EL2 code.
+As the name of the field indicates, host_fpsimd_state is strictly
+a host piece of data, and we reset this pointer on each PID change.
 
-Move the structure into kvm_host_data, and save over 500 bytes
-per vcpu.
+So let's move it where it belongs, and set it at load-time. Although
+this is slightly more often, it is a well defined life-cycle which
+matches other pieces of data.
 
+Reviewed-by: Mark Brown <broonie@kernel.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h         | 31 +++++++++++++----------
- arch/arm64/kvm/hyp/include/hyp/debug-sr.h |  4 +--
- arch/arm64/kvm/hyp/nvhe/debug-sr.c        |  8 +++---
- 3 files changed, 23 insertions(+), 20 deletions(-)
+ arch/arm64/include/asm/kvm_host.h       | 2 +-
+ arch/arm64/kvm/fpsimd.c                 | 3 +--
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 1 -
+ 4 files changed, 3 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index ca6ef663950d..8c149e4ae99d 100644
+index 590e8767b720..838cdee2ecf7 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -543,6 +543,19 @@ struct kvm_cpu_context {
+@@ -543,6 +543,7 @@ struct kvm_cpu_context {
   */
  struct kvm_host_data {
  	struct kvm_cpu_context host_ctxt;
-+
-+	/*
-+	 * host_debug_state contains the host registers which are
-+	 * saved and restored during world switches.
-+	 */
-+	 struct {
-+		/* {Break,watch}point registers */
-+		struct kvm_guest_debug_arch regs;
-+		/* Statistical profiling extension */
-+		u64 pmscr_el1;
-+		/* Self-hosted trace */
-+		u64 trfcr_el1;
-+	} host_debug_state;
- };
++	struct user_fpsimd_state *fpsimd_state;	/* hyp VA */
  
- struct kvm_host_psci_config {
-@@ -637,11 +650,10 @@ struct kvm_vcpu_arch {
- 	 * We maintain more than a single set of debug registers to support
- 	 * debugging the guest from the host and to maintain separate host and
- 	 * guest state during world switches. vcpu_debug_state are the debug
--	 * registers of the vcpu as the guest sees them.  host_debug_state are
--	 * the host registers which are saved and restored during
--	 * world switches. external_debug_state contains the debug
--	 * values we want to debug the guest. This is set via the
--	 * KVM_SET_GUEST_DEBUG ioctl.
-+	 * registers of the vcpu as the guest sees them.
-+	 *
-+	 * external_debug_state contains the debug values we want to debug the
-+	 * guest. This is set via the KVM_SET_GUEST_DEBUG ioctl.
- 	 *
- 	 * debug_ptr points to the set of debug registers that should be loaded
- 	 * onto the hardware when running the guest.
-@@ -653,15 +665,6 @@ struct kvm_vcpu_arch {
- 	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
+ 	/*
+ 	 * host_debug_state contains the host registers which are
+@@ -661,7 +662,6 @@ struct kvm_vcpu_arch {
+ 	struct kvm_guest_debug_arch vcpu_debug_state;
+ 	struct kvm_guest_debug_arch external_debug_state;
+ 
+-	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
  	struct task_struct *parent_task;
  
--	struct {
--		/* {Break,watch}point registers */
--		struct kvm_guest_debug_arch regs;
--		/* Statistical profiling extension */
--		u64 pmscr_el1;
--		/* Self-hosted trace */
--		u64 trfcr_el1;
--	} host_debug_state;
--
  	/* VGIC state */
- 	struct vgic_cpu vgic_cpu;
- 	struct arch_timer_cpu timer_cpu;
-diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-index eec0f8ccda56..d00093699aaf 100644
---- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-@@ -137,7 +137,7 @@ static inline void __debug_switch_to_guest_common(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index 571cf6eef1e1..e6bd99358615 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -49,8 +49,6 @@ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
+ 	if (ret)
+ 		return ret;
  
- 	host_ctxt = host_data_ptr(host_ctxt);
- 	guest_ctxt = &vcpu->arch.ctxt;
--	host_dbg = &vcpu->arch.host_debug_state.regs;
-+	host_dbg = host_data_ptr(host_debug_state.regs);
- 	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+-	vcpu->arch.host_fpsimd_state = kern_hyp_va(fpsimd);
+-
+ 	/*
+ 	 * We need to keep current's task_struct pinned until its data has been
+ 	 * unshared with the hypervisor to make sure it is not re-used by the
+@@ -87,6 +85,7 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+ 	 * FP_STATE_FREE if the flag set.
+ 	 */
+ 	vcpu->arch.fp_state = FP_STATE_HOST_OWNED;
++	*host_data_ptr(fpsimd_state) = kern_hyp_va(&current->thread.uw.fpsimd_state);
  
- 	__debug_save_state(host_dbg, host_ctxt);
-@@ -156,7 +156,7 @@ static inline void __debug_switch_to_host_common(struct kvm_vcpu *vcpu)
+ 	vcpu_clear_flag(vcpu, HOST_SVE_ENABLED);
+ 	if (read_sysreg(cpacr_el1) & CPACR_EL1_ZEN_EL0EN)
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 7d7de0245ed0..6def6ad8dd48 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -377,7 +377,7 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
  
- 	host_ctxt = host_data_ptr(host_ctxt);
- 	guest_ctxt = &vcpu->arch.ctxt;
--	host_dbg = &vcpu->arch.host_debug_state.regs;
-+	host_dbg = host_data_ptr(host_debug_state.regs);
- 	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
+ 	/* Write out the host state if it's in the registers */
+ 	if (vcpu->arch.fp_state == FP_STATE_HOST_OWNED)
+-		__fpsimd_save_state(vcpu->arch.host_fpsimd_state);
++		__fpsimd_save_state(*host_data_ptr(fpsimd_state));
  
- 	__debug_save_state(guest_dbg, guest_ctxt);
-diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-index 7746ea507b6f..53efda0235cf 100644
---- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-@@ -83,10 +83,10 @@ void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
- {
- 	/* Disable and flush SPE data generation */
- 	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_SPE))
--		__debug_save_spe(&vcpu->arch.host_debug_state.pmscr_el1);
-+		__debug_save_spe(host_data_ptr(host_debug_state.pmscr_el1));
- 	/* Disable and flush Self-Hosted Trace generation */
- 	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
--		__debug_save_trace(&vcpu->arch.host_debug_state.trfcr_el1);
-+		__debug_save_trace(host_data_ptr(host_debug_state.trfcr_el1));
- }
+ 	/* Restore the guest state */
+ 	if (sve_guest)
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 2385fd03ed87..c5f625dc1f07 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -42,7 +42,6 @@ static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
+ 	hyp_vcpu->vcpu.arch.fp_state	= host_vcpu->arch.fp_state;
  
- void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
-@@ -97,9 +97,9 @@ void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
- void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
- {
- 	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_SPE))
--		__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
-+		__debug_restore_spe(*host_data_ptr(host_debug_state.pmscr_el1));
- 	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
--		__debug_restore_trace(vcpu->arch.host_debug_state.trfcr_el1);
-+		__debug_restore_trace(*host_data_ptr(host_debug_state.trfcr_el1));
- }
+ 	hyp_vcpu->vcpu.arch.debug_ptr	= kern_hyp_va(host_vcpu->arch.debug_ptr);
+-	hyp_vcpu->vcpu.arch.host_fpsimd_state = host_vcpu->arch.host_fpsimd_state;
  
- void __debug_switch_to_host(struct kvm_vcpu *vcpu)
+ 	hyp_vcpu->vcpu.arch.vsesr_el2	= host_vcpu->arch.vsesr_el2;
+ 
 -- 
 2.39.2
 
