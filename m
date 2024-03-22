@@ -1,236 +1,260 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A98B6EB66
-	for <kvmarm@lists.linux.dev>; Fri, 22 Mar 2024 18:47:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7DA274417;
+	Fri, 22 Mar 2024 18:53:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711133233; cv=none; b=TA8CqsqgyjauR/JTdHDQfKCmj25AORh0vAo9Y8Ir0X4Gx4ArKGzSQ5zFUvsd5QQxEZxvlazFw+A+5OCrezPuwcJl01Qz/Oci9hvtC2ffXqWoXazvsn4ZvvAT9jAF7keIDXK1nxWZHvsWaSMQSYOXwVpqiWliYvrbxYcIEUGaQog=
+	t=1711133620; cv=none; b=UMeuQoyonR8TtJfF8UVReB/mwA7diCWh3+aUH7mfIjyy9ndTGrE4Nfiq688mLpQhvj/UVvC32kHnj98j6e+HEDCB9rXv07D6IjPxfDcpdKhNoLQIMs8Z6HHZyxH9FLsP45rXgUWeMRYhBeQUPEqxLdLaFz1yzF6eE6bRNE5y5xI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711133233; c=relaxed/simple;
-	bh=yLasx7ugjnbHtxzYsdod1oyAUG0e2zmPgE7e4gE2eoE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L0s+XpQyucMIRVHrUe2KcbwpCmpUHAKiLk9jMxPrdek3Fl+wsckyIYfqWPOdLVKl44mo7z1hTZX9I54YaNxNp2bvqu39tGD787Ff1h7qHLtIByJS4tLdZn0bOfqu6MOAByHjqOd77nUBHeMeNu+0j6cpyJwx0qNd2QixeBk9DhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Tw2OjtgO; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Tw2OjtgO"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42MBQklN024736;
-	Fri, 22 Mar 2024 18:46:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	date:from:to:cc:subject:message-id:references:mime-version
-	:content-type:in-reply-to; s=qcppdkim1; bh=d9aPd7iDjqttzRs468Xk9
-	dTSHBIOlc/IfTxqCu9i+pI=; b=Tw2OjtgOb88MSB3+gu+9gYRUUQsGeYp2sUiz6
-	JptKVzKgAB0yW1Pk0Y3rT3qHOFdSKBhTuXro+vvk5CLuY+XaU3lmHkkiWtvXSf2h
-	LDBZciCrlnW3F+4+QrZJnhEPyf4vRxhw9XH9XOySQ3eTuRwq0yJvowB1ZlTcccOR
-	JiC20aPuODkiRrIj/mV+FSDJ7irYvx+GZttBXrK2mywMbPM3PhylwblmQ4gbGNn1
-	tOLi56EiM+LktAlk5BLUKRhTUlC95zYwRUMut9Fmws4PZ8y8ECdgvPUmPPEjZ96o
-	JA+okuyyPT1nfLSU5ASBRKFMFuBpivSSdh9OMDskBUtnXXs2Q==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3x0wy8u13q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 22 Mar 2024 18:46:26 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42MIkCWQ032407
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 22 Mar 2024 18:46:12 GMT
-Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 22 Mar 2024 11:46:10 -0700
-Date: Fri, 22 Mar 2024 11:46:10 -0700
-From: Elliot Berman <quic_eberman@quicinc.com>
-To: Will Deacon <will@kernel.org>
-CC: David Hildenbrand <david@redhat.com>,
-        Sean Christopherson
-	<seanjc@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Quentin Perret
-	<qperret@google.com>,
-        Matthew Wilcox <willy@infradead.org>, Fuad Tabba
-	<tabba@google.com>,
-        <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>, <pbonzini@redhat.com>,
-        <chenhuacai@kernel.org>, <mpe@ellerman.id.au>, <anup@brainfault.org>,
-        <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
-        <aou@eecs.berkeley.edu>, <viro@zeniv.linux.org.uk>,
-        <brauner@kernel.org>, <akpm@linux-foundation.org>,
-        <xiaoyao.li@intel.com>, <yilun.xu@intel.com>,
-        <chao.p.peng@linux.intel.com>, <jarkko@kernel.org>,
-        <amoorthy@google.com>, <dmatlack@google.com>,
-        <yu.c.zhang@linux.intel.com>, <isaku.yamahata@intel.com>,
-        <mic@digikod.net>, <vbabka@suse.cz>, <ackerleytng@google.com>,
-        <mail@maciej.szmigiero.name>, <michael.roth@amd.com>,
-        <wei.w.wang@intel.com>, <liam.merwick@oracle.com>,
-        <isaku.yamahata@gmail.com>, <kirill.shutemov@linux.intel.com>,
-        <suzuki.poulose@arm.com>, <steven.price@arm.com>,
-        <quic_mnalajal@quicinc.com>, <quic_tsoni@quicinc.com>,
-        <quic_svaddagi@quicinc.com>, <quic_cvanscha@quicinc.com>,
-        <quic_pderrin@quicinc.com>, <quic_pheragu@quicinc.com>,
-        <catalin.marinas@arm.com>, <james.morse@arm.com>,
-        <yuzenghui@huawei.com>, <oliver.upton@linux.dev>, <maz@kernel.org>,
-        <keirf@google.com>, <linux-mm@kvack.org>
-Subject: Re: Re: Re: folio_mmapped
-Message-ID: <20240322111214274-0700.eberman@hu-eberman-lv.qualcomm.com>
-Mail-Followup-To: Will Deacon <will@kernel.org>, 
-	David Hildenbrand <david@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Quentin Perret <qperret@google.com>, 
-	Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, brauner@kernel.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, keirf@google.com, linux-mm@kvack.org
-References: <ZeYbUjiIkPevjrRR@google.com>
- <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
- <CAGtprH-17s7ipmr=+cC6YuH-R0Bvr7kJS7Zo9a+Dc9VEt2BAcQ@mail.gmail.com>
- <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
- <CAGtprH8B8y0Khrid5X_1twMce7r-Z7wnBiaNOi-QwxVj4D+L3w@mail.gmail.com>
- <ZfjYBxXeh9lcudxp@google.com>
- <40f82a61-39b0-4dda-ac32-a7b5da2a31e8@redhat.com>
- <20240319143119.GA2736@willie-the-truck>
- <20240319155648990-0700.eberman@hu-eberman-lv.qualcomm.com>
- <20240322163654.GG5634@willie-the-truck>
+	s=arc-20240116; t=1711133620; c=relaxed/simple;
+	bh=82RQYANYJuMNTPGQtKxqLwhxuDAzIWGQjTW9EV+4+ZU=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=llfzmnNL45RHC5ieXybZJLfZ5MO6ScLq+/8CjYjRkjlURu1u2V3Boo19U5vL5luBIHK99G/1O1p4lSnkgi0pkKAXRsgu8Lp+nKP3x8u+DEd9M9AlE3arm70luLULwZYCw0YFY0aII5Q3e3eDXE5PQSUVklqd211ZZlLaekvvtlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4V1Wfp02xRz6K62w;
+	Sat, 23 Mar 2024 02:52:50 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2A1251400CF;
+	Sat, 23 Mar 2024 02:53:29 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Fri, 22 Mar
+ 2024 18:53:28 +0000
+Date: Fri, 22 Mar 2024 18:53:27 +0000
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+CC: Russell King <rmk+kernel@armlinux.org.uk>, <linux-pm@vger.kernel.org>,
+	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <x86@kernel.org>,
+	<acpica-devel@lists.linuxfoundation.org>, <linux-csky@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-ia64@vger.kernel.org>,
+	<linux-parisc@vger.kernel.org>, Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, <jianyong.wu@arm.com>,
+	<justin.he@arm.com>, James Morse <james.morse@arm.com>
+Subject: Re: [PATCH RFC v4 02/15] ACPI: processor: Register all CPUs from
+ acpi_processor_get_info()
+Message-ID: <20240322185327.00002416@Huawei.com>
+In-Reply-To: <CAJZ5v0iiJpUWq5GMSnKFWQTzn_bdwoQz9m=hDaXNg4Lj_ePF4g@mail.gmail.com>
+References: <Zbp5xzmFhKDAgHws@shell.armlinux.org.uk>
+	<E1rVDmU-0027YP-Jz@rmk-PC.armlinux.org.uk>
+	<CAJZ5v0iiJpUWq5GMSnKFWQTzn_bdwoQz9m=hDaXNg4Lj_ePF4g@mail.gmail.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240322163654.GG5634@willie-the-truck>
-X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 4Iv94yt67x3r7p0CElbDGTl-2mqX9tDX
-X-Proofpoint-GUID: 4Iv94yt67x3r7p0CElbDGTl-2mqX9tDX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-22_11,2024-03-21_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 impostorscore=0 phishscore=0 mlxlogscore=999 adultscore=0
- priorityscore=1501 mlxscore=0 spamscore=0 bulkscore=0 suspectscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2403210001 definitions=main-2403220135
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Fri, Mar 22, 2024 at 04:36:55PM +0000, Will Deacon wrote:
-> Hi Elliot,
-> 
-> On Tue, Mar 19, 2024 at 04:54:10PM -0700, Elliot Berman wrote:
-> > On Tue, Mar 19, 2024 at 02:31:19PM +0000, Will Deacon wrote:
-> > > On Tue, Mar 19, 2024 at 11:26:05AM +0100, David Hildenbrand wrote:
-> > > > On 19.03.24 01:10, Sean Christopherson wrote:
-> > > > > +1.  I am not completely opposed to letting SNP and TDX effectively convert
-> > > > > pages between private and shared, but I also completely agree that letting
-> > > > > anything gup() guest_memfd memory is likely to end in tears.
-> > > > 
-> > > > Yes. Avoid it right from the start, if possible.
-> > > > 
-> > > > People wanted guest_memfd to *not* have to mmap guest memory ("even for
-> > > > ordinary VMs"). Now people are saying we have to be able to mmap it in order
-> > > > to GUP it. It's getting tiring, really.
-> > > 
-> > > From the pKVM side, we're working on guest_memfd primarily to avoid
-> > > diverging from what other CoCo solutions end up using, but if it gets
-> > > de-featured (e.g. no huge pages, no GUP, no mmap) compared to what we do
-> > > today with anonymous memory, then it's a really hard sell to switch over
-> > > from what we have in production. We're also hoping that, over time,
-> > > guest_memfd will become more closely integrated with the mm subsystem to
-> > > enable things like hypervisor-assisted page migration, which we would
-> > > love to have.
-> > > 
-> > > Today, we use the existing KVM interfaces (i.e. based on anonymous
-> > > memory) and it mostly works with the one significant exception that
-> > > accessing private memory via a GUP pin will crash the host kernel. If
-> > > all guest_memfd() can offer to solve that problem is preventing GUP
-> > > altogether, then I'd sooner just add that same restriction to what we
-> > > currently have instead of overhauling the user ABI in favour of
-> > > something which offers us very little in return.
-> > 
-> > How would we add the restriction to anonymous memory?
-> > 
-> > Thinking aloud -- do you mean like some sort of "exclusive GUP" flag
-> > where mm can ensure that the exclusive GUP pin is the only pin? If the
-> > refcount for the page is >1, then the exclusive GUP fails. Any future
-> > GUP pin attempts would fail if the refcount has the EXCLUSIVE_BIAS.
-> 
-> Yes, I think we'd want something like that, but I don't think using a
-> bias on its own is a good idea as false positives due to a large number
-> of page references will then actually lead to problems (i.e. rejecting
-> GUP spuriously), no? I suppose if you only considered the new bias in
-> conjunction with the AS_NOGUP flag you proposed then it might be ok
-> (i.e. when you see the bias, you then go check the address space to
-> confirm). What do you think?
-> 
+On Thu, 15 Feb 2024 20:22:29 +0100
+"Rafael J. Wysocki" <rafael@kernel.org> wrote:
 
-I think the AS_NOGUP would prevent GUPing the first place. If we set the
-EXCLUSIVE_BIAS value to something like INT_MAX, do we need to be worried
-about there being INT_MAX-1 valid GUPs and wanting to add another?  From
-the GUPer's perspective, I don't think it would be much different from
-overflowing the refcount.
+> On Wed, Jan 31, 2024 at 5:50=E2=80=AFPM Russell King <rmk+kernel@armlinux=
+.org.uk> wrote:
+> >
+> > From: James Morse <james.morse@arm.com>
+> >
+> > To allow ACPI to skip the call to arch_register_cpu() when the _STA
+> > value indicates the CPU can't be brought online right now, move the
+> > arch_register_cpu() call into acpi_processor_get_info().
+> >
+> > Systems can still be booted with 'acpi=3Doff', or not include an
+> > ACPI description at all. For these, the CPUs continue to be
+> > registered by cpu_dev_register_generic().
+> >
+> > This moves the CPU register logic back to a subsys_initcall(),
+> > while the memory nodes will have been registered earlier.
+> >
+> > Signed-off-by: James Morse <james.morse@arm.com>
+> > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > Tested-by: Miguel Luis <miguel.luis@oracle.com>
+> > Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
+> > Tested-by: Jianyong Wu <jianyong.wu@arm.com>
+> > Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > ---
+> > Changes since RFC v2:
+> >  * Fixup comment in acpi_processor_get_info() (Gavin Shan)
+> >  * Add comment in cpu_dev_register_generic() (Gavin Shan)
+> > ---
+> >  drivers/acpi/acpi_processor.c | 12 ++++++++++++
+> >  drivers/base/cpu.c            |  6 +++++-
+> >  2 files changed, 17 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processo=
+r.c
+> > index cf7c1cca69dd..a68c475cdea5 100644
+> > --- a/drivers/acpi/acpi_processor.c
+> > +++ b/drivers/acpi/acpi_processor.c
+> > @@ -314,6 +314,18 @@ static int acpi_processor_get_info(struct acpi_dev=
+ice *device)
+> >                         cpufreq_add_device("acpi-cpufreq");
+> >         }
+> >
+> > +       /*
+> > +        * Register CPUs that are present. get_cpu_device() is used to =
+skip
+> > +        * duplicate CPU descriptions from firmware.
+> > +        */
+> > +       if (!invalid_logical_cpuid(pr->id) && cpu_present(pr->id) &&
+> > +           !get_cpu_device(pr->id)) {
+> > +               int ret =3D arch_register_cpu(pr->id);
+> > +
+> > +               if (ret)
+> > +                       return ret;
+> > +       }
+> > +
+> >         /*
+> >          *  Extra Processor objects may be enumerated on MP systems with
+> >          *  less than the max # of CPUs. They should be ignored _iff =20
+>=20
+> This is interesting, because right below there is the following code:
+>=20
+>     if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
+>         int ret =3D acpi_processor_hotadd_init(pr);
+>=20
+>         if (ret)
+>             return ret;
+>     }
+>=20
+> and acpi_processor_hotadd_init() essentially calls arch_register_cpu()
+> with some extra things around it (more about that below).
+>=20
+> I do realize that acpi_processor_hotadd_init() is defined under
+> CONFIG_ACPI_HOTPLUG_CPU, so for the sake of the argument let's
+> consider an architecture where CONFIG_ACPI_HOTPLUG_CPU is set.
+>=20
+> So why are the two conditionals that almost contradict each other both
+> needed?  It looks like the new code could be combined with
+> acpi_processor_hotadd_init() to do the right thing in all cases.
 
-> > > On the mmap() side of things for guest_memfd, a simpler option for us
-> > > than what has currently been proposed might be to enforce that the VMM
-> > > has unmapped all private pages on vCPU run, failing the ioctl if that's
-> > > not the case. It needs a little more tracking in guest_memfd but I think
-> > > GUP will then fall out in the wash because only shared pages will be
-> > > mapped by userspace and so GUP will fail by construction for private
-> > > pages.
-> > 
-> > We can prevent GUP after the pages are marked private, but the pages
-> > could be marked private after the pages were already GUP'd. I don't have
-> > a good way to detect this, so converting a page to private is difficult.
-> 
-> For anonymous memory, marking the page as private is going to involve an
-> exclusive GUP so that the page can safely be donated to the guest. In
-> that case, any existing GUP pin should cause that to fail gracefully.
-> What is the situation you are concerned about here?
-> 
+I jumped on to the end of this series to look at this as the two legs
+look more similar at that point. I'll figure out how to drive
+any changes through the series once the end goal is clear.
 
-I wasn't thinking about exclusive GUP here. The exclusive GUP should be
-able to get the guarantees we need.
+To make testing easy I made the acpi_process_make_enabled() look as
+much like acpi_process_make_present() as possible.
 
-I was thinking about making sure we gracefully handle a race to provide
-the same page. The kernel should detect the difference between "we're
-already providing the page" and "somebody has an unexpected pin". We can
-easily read the refcount if we couldn't take the exclusive pin to know.
+>=20
+> Now, acpi_processor_hotadd_init() does some extra things that look
+> like they should be done by the new code too.
+>=20
+> 1. It checks invalid_phys_cpuid() which appears to be a good idea to me.
 
-Thanks,
-Elliot
+Indeed that is sensible. Not sure there is a path to here where it fails,
+but defense in depth is good.
 
-> > > We're happy to pursue alternative approaches using anonymous memory if
-> > > you'd prefer to keep guest_memfd limited in functionality (e.g.
-> > > preventing GUP of private pages by extending mapping_flags as per [1]),
-> > > but we're equally willing to contribute to guest_memfd if extensions are
-> > > welcome.
-> > > 
-> > > What do you prefer?
-> > > 
-> > 
-> > I like this as a stepping stone. For the Android use cases, we don't
-> > need to be able to convert a private page to shared and then also be
-> > able to GUP it.
-> 
-> I wouldn't want to rule that out, though. The VMM should be able to use
-> shared pages just like it can with normal anonymous pages.
-> 
-> > I don't think this design prevents us from adding "sometimes you can
-> > GUP" to guest_memfd in the future.
-> 
-> Technically, I think we can add all the stuff we need to guest_memfd,
-> but there's a desire to keep that as simple as possible for now, which
-> is why I'm keen to explore alternatives to unblock the pKVM upstreaming.
-> 
-> Will
-> 
+>=20
+> 2. It uses locking around arch_register_cpu() which doesn't seem
+> unreasonable either.
+
+Seems reasonable, though exactly what this protecting is unclear to me
+- is the arch_register_cpu() and/or the acpi_map_cpu().
+Whilst it would be nice to be sure, appears harmless, so let us
+take it for consistency if nothing else.
+
+The cpu_maps_update_begin()/end() calls though aren't necessary as
+we aren't touching the cpu_present or cpu_online masks.
+
+
+>=20
+> 3. It calls acpi_map_cpu() and I'm not sure why this is not done by
+> the new code.
+
+Doesn't exist except on x86 and longarch as Russell mentioned. So let's
+see what it does (on x86)  So we are into the realm of interfaces that
+look generic but really aren't :(  I particularly like the
+generic_processor_info() which isn't particularly generic.
+
+1. cpu =3D acpi_register_lapic()
+
+Docs say: Register a local apic and generates a logic cpu number
+
+2. generic_processor_info() in arch/x86/kernel/acpi/acpi.c
+
+Checks against nr_cpus_ids - maybe that bit is useful
+
+Allocate_logical_cpuid().
+Digging in, it seems to do similar to setting __cpu_logical_map on arm64.
+That's done in acpi_map_gic_cpu_interface, which happens when MADT is
+parsed and I believe it's one of the the things we need to do whether
+or not the CPU is enabled at boot. So already done.
+
+acpi_processor_set_pdc() -- configure _PDC support (which I'd never heard
+of before now).  Deprecated in ACPI 3.0. Given we are using stuff only added
+in 6.5 we can probably skip that even if it would be harmless.
+
+acpi_map_cpu2node() -- evalulate _PXM and set __apicid_to_node[]
+entry. That is only used from x86 code. Not sure what equivalent would be.
+Also numa_set_node(cpu, nid);  Which again sounds a lot more generic than
+it is. Load of x86 specific stuff + set_cpu_numa_node() which is generic
+and for ARM64 (and anything using CONFIG_GENERIC_ARCH_NUMA) is called
+by numa_store_cpu_info() either from early_map_cpu_to_node() or smp_prepare=
+_cpus()
+which is called for_each_possible_cpu() and hence has already been done.
+
+So conclusion on this one is there doesn't seem to be anything to do.
+We could provide a __weak function or an ARM64 specific one that does
+nothing or gate it on an appropriate config variable.  However, given
+I presume 'future' ARM64 support for CPU hotplug will want to do something
+in these calls, perhaps a better bet is to pass a bool into the function
+to indicate these should be skipped if present is not changing.
+
+Having done that, we end up with code that is messy enough we are
+better off keeping them as separate functions, though they may
+look a little more similar than in this version.
+
+There is a final thing in here you didn't mention
+setting pr->flags.need_hotplug_init
+which causes extra stuff to occur in processor_driver.c
+The extra stuff doesn't seem to be necessary for the enable case
+despite being needed for change of present status.
+I haven't figured this bit out yet (I need to mess around on x86
+to understand what goes wrong if you don't use that flag).
+
+
+>=20
+> The only thing that can be dropped from it is the _STA check AFAICS,
+> because acpi_processor_add() won't even be called if the CPU is not
+> present (and not enabled after the first patch).
+>=20
+> So why does the code not do 1 - 3 above?
+I agree with 1 and 2, reasoning for 3 given above.
+
+>=20
+> > diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
+> > index 47de0f140ba6..13d052bf13f4 100644
+> > --- a/drivers/base/cpu.c
+> > +++ b/drivers/base/cpu.c
+> > @@ -553,7 +553,11 @@ static void __init cpu_dev_register_generic(void)
+> >  {
+> >         int i, ret;
+> >
+> > -       if (!IS_ENABLED(CONFIG_GENERIC_CPU_DEVICES))
+> > +       /*
+> > +        * When ACPI is enabled, CPUs are registered via
+> > +        * acpi_processor_get_info().
+> > +        */
+> > +       if (!IS_ENABLED(CONFIG_GENERIC_CPU_DEVICES) || !acpi_disabled)
+> >                 return; =20
+>=20
+> Honestly, this looks like a quick hack to me and it absolutely
+> requires an ACK from the x86 maintainers to go anywhere.
+Will address this separately.
+
+>=20
+> >
+> >         for_each_present_cpu(i) {
+> > -- =20
+
