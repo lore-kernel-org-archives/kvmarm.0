@@ -1,260 +1,317 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7DA274417;
-	Fri, 22 Mar 2024 18:53:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050C77F7ED
+	for <kvmarm@lists.linux.dev>; Fri, 22 Mar 2024 21:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711133620; cv=none; b=UMeuQoyonR8TtJfF8UVReB/mwA7diCWh3+aUH7mfIjyy9ndTGrE4Nfiq688mLpQhvj/UVvC32kHnj98j6e+HEDCB9rXv07D6IjPxfDcpdKhNoLQIMs8Z6HHZyxH9FLsP45rXgUWeMRYhBeQUPEqxLdLaFz1yzF6eE6bRNE5y5xI=
+	t=1711142478; cv=none; b=gaKoAxGyMI9wyarzTmMTA4sY4QWPBCMG451wqaMYj2xR12XHjX955EQBSDJD8nE7ZmuyZ1e022eXcMpXAFHHK+GwlydH8hJgggHCef2Mmf1Wtr4nLJu0VM3BSjxLTb24WXPhIMAVOxcmjAM2QFqEwUy2J36CHdjWPXUncQZ//xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711133620; c=relaxed/simple;
-	bh=82RQYANYJuMNTPGQtKxqLwhxuDAzIWGQjTW9EV+4+ZU=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=llfzmnNL45RHC5ieXybZJLfZ5MO6ScLq+/8CjYjRkjlURu1u2V3Boo19U5vL5luBIHK99G/1O1p4lSnkgi0pkKAXRsgu8Lp+nKP3x8u+DEd9M9AlE3arm70luLULwZYCw0YFY0aII5Q3e3eDXE5PQSUVklqd211ZZlLaekvvtlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4V1Wfp02xRz6K62w;
-	Sat, 23 Mar 2024 02:52:50 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2A1251400CF;
-	Sat, 23 Mar 2024 02:53:29 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Fri, 22 Mar
- 2024 18:53:28 +0000
-Date: Fri, 22 Mar 2024 18:53:27 +0000
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-CC: Russell King <rmk+kernel@armlinux.org.uk>, <linux-pm@vger.kernel.org>,
-	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <x86@kernel.org>,
-	<acpica-devel@lists.linuxfoundation.org>, <linux-csky@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <linux-ia64@vger.kernel.org>,
-	<linux-parisc@vger.kernel.org>, Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, <jianyong.wu@arm.com>,
-	<justin.he@arm.com>, James Morse <james.morse@arm.com>
-Subject: Re: [PATCH RFC v4 02/15] ACPI: processor: Register all CPUs from
- acpi_processor_get_info()
-Message-ID: <20240322185327.00002416@Huawei.com>
-In-Reply-To: <CAJZ5v0iiJpUWq5GMSnKFWQTzn_bdwoQz9m=hDaXNg4Lj_ePF4g@mail.gmail.com>
-References: <Zbp5xzmFhKDAgHws@shell.armlinux.org.uk>
-	<E1rVDmU-0027YP-Jz@rmk-PC.armlinux.org.uk>
-	<CAJZ5v0iiJpUWq5GMSnKFWQTzn_bdwoQz9m=hDaXNg4Lj_ePF4g@mail.gmail.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1711142478; c=relaxed/simple;
+	bh=xFwdii2/VVY5k98pGS3dbOhA33m6x1IRSLqol7l7oOs=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=hEjTjJ+RXRpbjFZxfKxBnmUZ8IX1jCD1uJ6eFFtM1GsDYOvJ6c/XiQk/ycFSFM82ZgMDo51ucx9qOgYwo1gRxqEvReuEK3emFAUjgK1UYWMn2pZ83N3WilV+pND9Etk/gfsGkl+3GXKtBRwlpN4uVGkCd/wIiNWRUf+9mSht60M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NXdBBYET; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NXdBBYET"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711142476;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=/2NHAkcAhytdyju8HTzX8/9lOwZ6eY2/n5U6+M1doi0=;
+	b=NXdBBYETl0Dv39TtcVBTAYdtW0PNOknHtcrPzkA7nW2vNri+dO6yZnbN1ULAWCVMk30NF1
+	IGtLPV4t7oBuFxeThnbRWO0qMkxzyO5ecyTv/9XcdyEX3RDMQvjdg3G7R+ZNkjEUVBGsuF
+	J7aTg9WpwucViwGhK0HJVXGAoQ7/7yk=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-383-zcUsiI4mNyKURPDi8kDHqQ-1; Fri, 22 Mar 2024 17:21:14 -0400
+X-MC-Unique: zcUsiI4mNyKURPDi8kDHqQ-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33ec6c43a9cso1903591f8f.1
+        for <kvmarm@lists.linux.dev>; Fri, 22 Mar 2024 14:21:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711142473; x=1711747273;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :references:cc:to:from:content-language:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/2NHAkcAhytdyju8HTzX8/9lOwZ6eY2/n5U6+M1doi0=;
+        b=uUuiVUPvwFI1N2Xn8NTQFiNurcycFCfACazwMoIJSUjvGbA9p8X8CiV1Ih3KEkxRt1
+         jiE/FikvfDRS9RLJ/BuO8lIyWQNQFLMlvvAHPN4Dpbz4gIL0dYPkocjyox0pl7GbQoFQ
+         NTT5bbB5e+1+MHba4DFPJ1bW7Kq+4tt0Comt+LNMUiROGR57Xe9u08k07mhOLHRW2poM
+         C1qLSvkvScdWjEAlZaSfawOygrV45ez35gdWGi4VxwE1jd63rauuZ7qD7uAqb05k6TM5
+         u6de0CxTpuEWvgcYeOHjS9GTcAy5tdD1ZIFr2UqngjqMjmpYfyyVHsTz4qduicf6Ps9C
+         Oyow==
+X-Forwarded-Encrypted: i=1; AJvYcCVW0DhGiXZ96cN8C2y+dade/4dW1z2xDhqJG4xPzqin9rIVmk65gXS2P/qintO5kEQmb5mlp4DTEr/AWsoOseDCrDByBZVg
+X-Gm-Message-State: AOJu0Yz9Ls8Smr9UAabjsYHvVQcIRAZ92vMj/0Ima//rlPgP53l2CjoA
+	LzUzPiJ87E9EYlbpEpro7rY3GBIQuCyaOmMn7/o7Qvg+HdaJdkngH2g/Y52DqJDTCug0taSC41d
+	8xyy63+dmpsWSf5X4qj0ettrz+Cdu7NNp7AwXGGb8+V71szQLdEsA9Fz0QfMOkg==
+X-Received: by 2002:adf:eccd:0:b0:341:906b:3351 with SMTP id s13-20020adfeccd000000b00341906b3351mr565232wro.0.1711142473363;
+        Fri, 22 Mar 2024 14:21:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEaBcj1kdVlkLNKjKedUTQg6bQ687/NvosXDtUD9LYVEMlbn+oUlfZ+Cbt6AQmQivUD+3LR2A==
+X-Received: by 2002:adf:eccd:0:b0:341:906b:3351 with SMTP id s13-20020adfeccd000000b00341906b3351mr565177wro.0.1711142472816;
+        Fri, 22 Mar 2024 14:21:12 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c71b:7e00:9339:4017:7111:82d0? (p200300cbc71b7e0093394017711182d0.dip0.t-ipconnect.de. [2003:cb:c71b:7e00:9339:4017:7111:82d0])
+        by smtp.gmail.com with ESMTPSA id i5-20020a5d5585000000b0033ed7181fd1sm2894975wrv.62.2024.03.22.14.21.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Mar 2024 14:21:12 -0700 (PDT)
+Message-ID: <f8a8c432-728a-4a79-8200-4c3f282ba415@redhat.com>
+Date: Fri, 22 Mar 2024 22:21:09 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+User-Agent: Mozilla Thunderbird
+Subject: Re: folio_mmapped
+From: David Hildenbrand <david@redhat.com>
+To: Will Deacon <will@kernel.org>
+Cc: Sean Christopherson <seanjc@google.com>,
+ Vishal Annapurve <vannapurve@google.com>, Quentin Perret
+ <qperret@google.com>, Matthew Wilcox <willy@infradead.org>,
+ Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, brauner@kernel.org,
+ akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
+ chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
+ dmatlack@google.com, yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com,
+ mic@digikod.net, vbabka@suse.cz, ackerleytng@google.com,
+ mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com,
+ liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+ quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+ quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
+ james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
+ maz@kernel.org, keirf@google.com, linux-mm@kvack.org
+References: <Zd82V1aY-ZDyaG8U@google.com>
+ <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
+ <ZeXAOit6O0stdxw3@google.com> <ZeYbUjiIkPevjrRR@google.com>
+ <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
+ <CAGtprH-17s7ipmr=+cC6YuH-R0Bvr7kJS7Zo9a+Dc9VEt2BAcQ@mail.gmail.com>
+ <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
+ <CAGtprH8B8y0Khrid5X_1twMce7r-Z7wnBiaNOi-QwxVj4D+L3w@mail.gmail.com>
+ <ZfjYBxXeh9lcudxp@google.com>
+ <40f82a61-39b0-4dda-ac32-a7b5da2a31e8@redhat.com>
+ <20240319143119.GA2736@willie-the-truck>
+ <2d6fc3c0-a55b-4316-90b8-deabb065d007@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <2d6fc3c0-a55b-4316-90b8-deabb065d007@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, 15 Feb 2024 20:22:29 +0100
-"Rafael J. Wysocki" <rafael@kernel.org> wrote:
+On 22.03.24 18:52, David Hildenbrand wrote:
+> On 19.03.24 15:31, Will Deacon wrote:
+>> Hi David,
+> 
+> Hi Will,
+> 
+> sorry for the late reply!
+> 
+>>
+>> On Tue, Mar 19, 2024 at 11:26:05AM +0100, David Hildenbrand wrote:
+>>> On 19.03.24 01:10, Sean Christopherson wrote:
+>>>> On Mon, Mar 18, 2024, Vishal Annapurve wrote:
+>>>>> On Mon, Mar 18, 2024 at 3:02 PM David Hildenbrand <david@redhat.com> wrote:
+>>>>>> Second, we should find better ways to let an IOMMU map these pages,
+>>>>>> *not* using GUP. There were already discussions on providing a similar
+>>>>>> fd+offset-style interface instead. GUP really sounds like the wrong
+>>>>>> approach here. Maybe we should look into passing not only guest_memfd,
+>>>>>> but also "ordinary" memfds.
+>>>>
+>>>> +1.  I am not completely opposed to letting SNP and TDX effectively convert
+>>>> pages between private and shared, but I also completely agree that letting
+>>>> anything gup() guest_memfd memory is likely to end in tears.
+>>>
+>>> Yes. Avoid it right from the start, if possible.
+>>>
+>>> People wanted guest_memfd to *not* have to mmap guest memory ("even for
+>>> ordinary VMs"). Now people are saying we have to be able to mmap it in order
+>>> to GUP it. It's getting tiring, really.
+>>
+>>   From the pKVM side, we're working on guest_memfd primarily to avoid
+>> diverging from what other CoCo solutions end up using, but if it gets
+>> de-featured (e.g. no huge pages, no GUP, no mmap) compared to what we do
+>> today with anonymous memory, then it's a really hard sell to switch over
+>> from what we have in production. We're also hoping that, over time,
+>> guest_memfd will become more closely integrated with the mm subsystem to
+>> enable things like hypervisor-assisted page migration, which we would
+>> love to have.
+> 
+> Reading Sean's reply, he has a different view on that. And I think
+> that's the main issue: there are too many different use cases and too
+> many different requirements that could turn guest_memfd into something
+> that maybe it really shouldn't be.
+> 
+>>
+>> Today, we use the existing KVM interfaces (i.e. based on anonymous
+>> memory) and it mostly works with the one significant exception that
+>> accessing private memory via a GUP pin will crash the host kernel. If
+>> all guest_memfd() can offer to solve that problem is preventing GUP
+>> altogether, then I'd sooner just add that same restriction to what we
+>> currently have instead of overhauling the user ABI in favour of
+>> something which offers us very little in return.
+>>
+>> On the mmap() side of things for guest_memfd, a simpler option for us
+>> than what has currently been proposed might be to enforce that the VMM
+>> has unmapped all private pages on vCPU run, failing the ioctl if that's
+>> not the case. It needs a little more tracking in guest_memfd but I think
+>> GUP will then fall out in the wash because only shared pages will be
+>> mapped by userspace and so GUP will fail by construction for private
+>> pages.
+>>
+>> We're happy to pursue alternative approaches using anonymous memory if
+>> you'd prefer to keep guest_memfd limited in functionality (e.g.
+>> preventing GUP of private pages by extending mapping_flags as per [1]),
+>> but we're equally willing to contribute to guest_memfd if extensions are
+>> welcome.
+>>
+>> What do you prefer?
+> 
+> Let me summarize the history:
+> 
+> AMD had its thing running and it worked for them (but I recall it was
+> hacky :) ).
+> 
+> TDX made it possible to crash the machine when accessing secure memory
+> from user space (MCE).
+> 
+> So secure memory must not be mapped into user space -- no page tables.
+> Prototypes with anonymous memory existed (and I didn't hate them,
+> although hacky), but one of the other selling points of guest_memfd was
+> that we could create VMs that wouldn't need any page tables at all,
+> which I found interesting.
+> 
+> There was a bit more to that (easier conversion, avoiding GUP,
+> specifying on allocation that the memory was unmovable ...), but I'll
+> get to that later.
+> 
+> The design principle was: nasty private memory (unmovable, unswappable,
+> inaccessible, un-GUPable) is allocated from guest_memfd, ordinary
+> "shared" memory is allocated from an ordinary memfd.
+> 
+> This makes sense: shared memory is neither nasty nor special. You can
+> migrate it, swap it out, map it into page tables, GUP it, ... without
+> any issues.
+> 
+> 
+> So if I would describe some key characteristics of guest_memfd as of
+> today, it would probably be:
+> 
+> 1) Memory is unmovable and unswappable. Right from the beginning, it is
+>      allocated as unmovable (e.g., not placed on ZONE_MOVABLE, CMA, ...).
+> 2) Memory is inaccessible. It cannot be read from user space, the
+>      kernel, it cannot be GUP'ed ... only some mechanisms might end up
+>      touching that memory (e.g., hibernation, /proc/kcore) might end up
+>      touching it "by accident", and we usually can handle these cases.
+> 3) Memory can be discarded in page granularity. There should be no cases
+>      where you cannot discard memory to over-allocate memory for private
+>      pages that have been replaced by shared pages otherwise.
+> 4) Page tables are not required (well, it's an memfd), and the fd could
+>      in theory be passed to other processes.
+> 
+> Having "ordinary shared" memory in there implies that 1) and 2) will
+> have to be adjusted for them, which kind-of turns it "partially" into
+> ordinary shmem again.
+> 
+> 
+> Going back to the beginning: with pKVM, we likely want the following
+> 
+> 1) Convert pages private<->shared in-place
+> 2) Stop user space + kernel from accessing private memory in process
+>      context. Likely for pKVM we would only crash the process, which
+>      would be acceptable.
+> 3) Prevent GUP to private memory. Otherwise we could crash the kernel.
+> 4) Prevent private pages from swapout+migration until supported.
+> 
+> 
+> I suspect your current solution with anonymous memory gets all but 3)
+> sorted out, correct?
+> 
+> I'm curious, may there be a requirement in the future that shared memory
+> could be mapped into other processes? (thinking vhost-user and such
+> things). Of course that's impossible with anonymous memory; teaching
+> shmem to contain private memory would kind-of lead to ... guest_memfd,
+> just that we don't have shared memory there.
+> 
 
-> On Wed, Jan 31, 2024 at 5:50=E2=80=AFPM Russell King <rmk+kernel@armlinux=
-.org.uk> wrote:
-> >
-> > From: James Morse <james.morse@arm.com>
-> >
-> > To allow ACPI to skip the call to arch_register_cpu() when the _STA
-> > value indicates the CPU can't be brought online right now, move the
-> > arch_register_cpu() call into acpi_processor_get_info().
-> >
-> > Systems can still be booted with 'acpi=3Doff', or not include an
-> > ACPI description at all. For these, the CPUs continue to be
-> > registered by cpu_dev_register_generic().
-> >
-> > This moves the CPU register logic back to a subsys_initcall(),
-> > while the memory nodes will have been registered earlier.
-> >
-> > Signed-off-by: James Morse <james.morse@arm.com>
-> > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > Tested-by: Miguel Luis <miguel.luis@oracle.com>
-> > Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
-> > Tested-by: Jianyong Wu <jianyong.wu@arm.com>
-> > Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > ---
-> > Changes since RFC v2:
-> >  * Fixup comment in acpi_processor_get_info() (Gavin Shan)
-> >  * Add comment in cpu_dev_register_generic() (Gavin Shan)
-> > ---
-> >  drivers/acpi/acpi_processor.c | 12 ++++++++++++
-> >  drivers/base/cpu.c            |  6 +++++-
-> >  2 files changed, 17 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/acpi/acpi_processor.c b/drivers/acpi/acpi_processo=
-r.c
-> > index cf7c1cca69dd..a68c475cdea5 100644
-> > --- a/drivers/acpi/acpi_processor.c
-> > +++ b/drivers/acpi/acpi_processor.c
-> > @@ -314,6 +314,18 @@ static int acpi_processor_get_info(struct acpi_dev=
-ice *device)
-> >                         cpufreq_add_device("acpi-cpufreq");
-> >         }
-> >
-> > +       /*
-> > +        * Register CPUs that are present. get_cpu_device() is used to =
-skip
-> > +        * duplicate CPU descriptions from firmware.
-> > +        */
-> > +       if (!invalid_logical_cpuid(pr->id) && cpu_present(pr->id) &&
-> > +           !get_cpu_device(pr->id)) {
-> > +               int ret =3D arch_register_cpu(pr->id);
-> > +
-> > +               if (ret)
-> > +                       return ret;
-> > +       }
-> > +
-> >         /*
-> >          *  Extra Processor objects may be enumerated on MP systems with
-> >          *  less than the max # of CPUs. They should be ignored _iff =20
->=20
-> This is interesting, because right below there is the following code:
->=20
->     if (invalid_logical_cpuid(pr->id) || !cpu_present(pr->id)) {
->         int ret =3D acpi_processor_hotadd_init(pr);
->=20
->         if (ret)
->             return ret;
->     }
->=20
-> and acpi_processor_hotadd_init() essentially calls arch_register_cpu()
-> with some extra things around it (more about that below).
->=20
-> I do realize that acpi_processor_hotadd_init() is defined under
-> CONFIG_ACPI_HOTPLUG_CPU, so for the sake of the argument let's
-> consider an architecture where CONFIG_ACPI_HOTPLUG_CPU is set.
->=20
-> So why are the two conditionals that almost contradict each other both
-> needed?  It looks like the new code could be combined with
-> acpi_processor_hotadd_init() to do the right thing in all cases.
+I was just thinking of something stupid, not sure if it makes any sense. 
+I'll raise it here before I forget over the weekend.
 
-I jumped on to the end of this series to look at this as the two legs
-look more similar at that point. I'll figure out how to drive
-any changes through the series once the end goal is clear.
+... what if we glued one guest_memfd and a memfd (shmem) together in the 
+kernel somehow?
 
-To make testing easy I made the acpi_process_make_enabled() look as
-much like acpi_process_make_present() as possible.
+(1) A to-shared conversion moves a page from the guest_memfd to the memfd.
 
->=20
-> Now, acpi_processor_hotadd_init() does some extra things that look
-> like they should be done by the new code too.
->=20
-> 1. It checks invalid_phys_cpuid() which appears to be a good idea to me.
+(2) A to-private conversion moves a page from the memfd to the guest_memfd.
 
-Indeed that is sensible. Not sure there is a path to here where it fails,
-but defense in depth is good.
-
->=20
-> 2. It uses locking around arch_register_cpu() which doesn't seem
-> unreasonable either.
-
-Seems reasonable, though exactly what this protecting is unclear to me
-- is the arch_register_cpu() and/or the acpi_map_cpu().
-Whilst it would be nice to be sure, appears harmless, so let us
-take it for consistency if nothing else.
-
-The cpu_maps_update_begin()/end() calls though aren't necessary as
-we aren't touching the cpu_present or cpu_online masks.
-
-
->=20
-> 3. It calls acpi_map_cpu() and I'm not sure why this is not done by
-> the new code.
-
-Doesn't exist except on x86 and longarch as Russell mentioned. So let's
-see what it does (on x86)  So we are into the realm of interfaces that
-look generic but really aren't :(  I particularly like the
-generic_processor_info() which isn't particularly generic.
-
-1. cpu =3D acpi_register_lapic()
-
-Docs say: Register a local apic and generates a logic cpu number
-
-2. generic_processor_info() in arch/x86/kernel/acpi/acpi.c
-
-Checks against nr_cpus_ids - maybe that bit is useful
-
-Allocate_logical_cpuid().
-Digging in, it seems to do similar to setting __cpu_logical_map on arm64.
-That's done in acpi_map_gic_cpu_interface, which happens when MADT is
-parsed and I believe it's one of the the things we need to do whether
-or not the CPU is enabled at boot. So already done.
-
-acpi_processor_set_pdc() -- configure _PDC support (which I'd never heard
-of before now).  Deprecated in ACPI 3.0. Given we are using stuff only added
-in 6.5 we can probably skip that even if it would be harmless.
-
-acpi_map_cpu2node() -- evalulate _PXM and set __apicid_to_node[]
-entry. That is only used from x86 code. Not sure what equivalent would be.
-Also numa_set_node(cpu, nid);  Which again sounds a lot more generic than
-it is. Load of x86 specific stuff + set_cpu_numa_node() which is generic
-and for ARM64 (and anything using CONFIG_GENERIC_ARCH_NUMA) is called
-by numa_store_cpu_info() either from early_map_cpu_to_node() or smp_prepare=
-_cpus()
-which is called for_each_possible_cpu() and hence has already been done.
-
-So conclusion on this one is there doesn't seem to be anything to do.
-We could provide a __weak function or an ARM64 specific one that does
-nothing or gate it on an appropriate config variable.  However, given
-I presume 'future' ARM64 support for CPU hotplug will want to do something
-in these calls, perhaps a better bet is to pass a bool into the function
-to indicate these should be skipped if present is not changing.
-
-Having done that, we end up with code that is messy enough we are
-better off keeping them as separate functions, though they may
-look a little more similar than in this version.
-
-There is a final thing in here you didn't mention
-setting pr->flags.need_hotplug_init
-which causes extra stuff to occur in processor_driver.c
-The extra stuff doesn't seem to be necessary for the enable case
-despite being needed for change of present status.
-I haven't figured this bit out yet (I need to mess around on x86
-to understand what goes wrong if you don't use that flag).
+Only the memfd can be mmap'ed/read/written/GUP'ed. Pages in the memfd 
+behave like any shmem pages: migratable, swappable etc.
 
 
->=20
-> The only thing that can be dropped from it is the _STA check AFAICS,
-> because acpi_processor_add() won't even be called if the CPU is not
-> present (and not enabled after the first patch).
->=20
-> So why does the code not do 1 - 3 above?
-I agree with 1 and 2, reasoning for 3 given above.
+Of course, (2) is only possible if the page is not pinned, not mapped 
+(we can unmap it). AND, the page must not reside on ZONE_MOVABLE / 
+MIGRATE_CMA.
 
->=20
-> > diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
-> > index 47de0f140ba6..13d052bf13f4 100644
-> > --- a/drivers/base/cpu.c
-> > +++ b/drivers/base/cpu.c
-> > @@ -553,7 +553,11 @@ static void __init cpu_dev_register_generic(void)
-> >  {
-> >         int i, ret;
-> >
-> > -       if (!IS_ENABLED(CONFIG_GENERIC_CPU_DEVICES))
-> > +       /*
-> > +        * When ACPI is enabled, CPUs are registered via
-> > +        * acpi_processor_get_info().
-> > +        */
-> > +       if (!IS_ENABLED(CONFIG_GENERIC_CPU_DEVICES) || !acpi_disabled)
-> >                 return; =20
->=20
-> Honestly, this looks like a quick hack to me and it absolutely
-> requires an ACK from the x86 maintainers to go anywhere.
-Will address this separately.
+We'd have to decide what to do when we access a "hole" in the memfd -- 
+instead of allocating a fresh page and filling the hole, we'd want to 
+SIGBUS.
 
->=20
-> >
-> >         for_each_present_cpu(i) {
-> > -- =20
+-- 
+Cheers,
+
+David / dhildenb
 
