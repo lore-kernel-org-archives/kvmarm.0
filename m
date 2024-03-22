@@ -1,210 +1,292 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52FBD47793;
-	Fri, 22 Mar 2024 17:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD2F605C4
+	for <kvmarm@lists.linux.dev>; Fri, 22 Mar 2024 17:52:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711128817; cv=none; b=Q6bN/t/qArh5crq+1x/EXTowaEHnSxjLntVm029A0zrPy91OFBayYtOwI3tkmHq4qAOnh/CDJBdK+M5xzeodI8FBqHBZLxAT5mxz7wwaERFTXWWI7HxRlXt12zEq5EUhEavVTOcxXJn+PqMX2veEcbzRj6JLiqOBKhcF+QxYgJI=
+	t=1711129943; cv=none; b=Vaj2BawqrTqvNwRWRTNO03/pSL62FwdoZBHVEZOrYEPLqi54gbT9FZ8AdHT2ZGUNZ1fQ+XNmj8cSAk6n4IozkxKlpK/4d4NPQ44wzf63w4nIy5ruL9TWkWkVL/L8WnGWZZyzwDcWD0AWpe3ezbM2gPpSp8V7o+sRG63yOHiw7uU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711128817; c=relaxed/simple;
-	bh=q7JrrZOo5+hDRmBzvN6hqsChrFOx8TL6QdxH1nPbXi0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=UIFHwWitNLhGwzaJmE8fPWOCACMK1AGHTBBeI3M0iTlLuH18lTaN6RgvYmq2hxNmPpnheVQixCtEZe7QewSoIwZbhMtBzip5FBSx1pN88yDpO5x1r38bDiFrLsGKPz5stTDY6gsteWAQyOq8UtSJwLGXu2kBQsyktAWWtLIEKp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hDV+Gsar; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+	s=arc-20240116; t=1711129943; c=relaxed/simple;
+	bh=Ps/2zmED4V/4Mugj19V5O+VRXCAuSuCB45zhIkms8Fs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ot15ZkMeE4zGyL6RGdOUQAaex/djUwyHKhh3MRA99PyHRSpS/TaElARNQzAj/etZv/HDoO3/YHD7zanofFvjm51igWeN/4Z15KF5oAa85w/gDofOMbaBWBb7WWIzoYyTWFS53XiVE63Dt3ZvRU50aa4Jb5K6yoQre8s27IsqnlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R1HW8Qqi; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hDV+Gsar"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=q7JrrZOo5+hDRmBzvN6hqsChrFOx8TL6QdxH1nPbXi0=; b=hDV+GsarAMswANiPSzZVSI6aya
-	3ZGnTr9/kRt8YK+k5u7fXM1I9HxHEyvYkPrjveia29W/ffSUzXlOI2O2hJ4NMZ9DDyiqzxy0cMxop
-	eevJS3SbIidU4rhMhe5Fl8gBQBT+HAL1/SerEAbZWc+o1xKVOBUr3uIq/sKO91CJZ6FRbWf+Rdzdx
-	JHGGRvxATaAEOGD13Ywo/wTtWVdLZFWwF61Dn+7xozDrcplLtBORsSV1xQd5jdY96G5/a+slvU38C
-	48A3syXLzPpDftPk/xdWIJBVpwMXyA9KOnFWJ+daVeWtyNvLK8aabiQdgIW3TkL/8yCFeZmGHXVph
-	OGfOtF4w==;
-Received: from [2001:8b0:10b:5:244c:6ee0:3d43:8a85] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rnili-00000009uux-0lzX;
-	Fri, 22 Mar 2024 17:33:26 +0000
-Message-ID: <66fd33e9d113669cdeb46a008bd69acff1d1aa74.camel@infradead.org>
-Subject: Re: [RFC PATCH v3 0/5] Add PSCI v1.3 SYSTEM_OFF2 support for
- hibernation
-From: David Woodhouse <dwmw2@infradead.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, 
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Paolo Bonzini
- <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, James Morse
- <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui
- Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, Will
- Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Lorenzo
- Pieralisi <lpieralisi@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
- Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>, Mostafa Saleh
- <smostafa@google.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev,  linux-pm@vger.kernel.org
-Date: Fri, 22 Mar 2024 17:33:25 +0000
-In-Reply-To: <86frwiz1rs.wl-maz@kernel.org>
-References: <20240319130957.1050637-1-dwmw2@infradead.org>
-	 <Zfmu3wnFbIGQZD-j@linux.dev>
-	 <9e7a6e0f9c290a4b84c5bcc8cf3d4aba3cae2be5.camel@infradead.org>
-	 <Zfnpj2FShq05QZpf@linux.dev>
-	 <248ec30e7b5c8a42d184f029c1cc9b664656b356.camel@infradead.org>
-	 <86frwiz1rs.wl-maz@kernel.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-4348LFrQyy97fOemnDcW"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R1HW8Qqi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711129940;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Gb9Qa2HC9PUpp7JrzETLi4Q7+02gJGK5TZHjydmjtS0=;
+	b=R1HW8QqiOukJmQSguZbsa5hxS5q18/FhC1o7aDlr8/Ak66/fsSN8VL/P7tvrUKQSuvQXfd
+	+z2Sw3h0yIUzKELgFWURO03s9CTnLX1ClX9GsaZpHDfY5tEtr49VMy1JGrWvmb2ovNKbRN
+	Rt7aYUCTcc5BFWGMDTk4njUB/yDWLDs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-167-ZuO839wINoGbMbASADD7Ig-1; Fri, 22 Mar 2024 13:52:19 -0400
+X-MC-Unique: ZuO839wINoGbMbASADD7Ig-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33ed71800f2so1236998f8f.2
+        for <kvmarm@lists.linux.dev>; Fri, 22 Mar 2024 10:52:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711129938; x=1711734738;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Gb9Qa2HC9PUpp7JrzETLi4Q7+02gJGK5TZHjydmjtS0=;
+        b=Ldr6j/BDAdOe6zjJ/6T9bNah7SreNxO7KFApIA/O4/g69gyrS7K5p+cift2lj5sUEa
+         7L7mwTgCdOHDGK7IF3XRpPrjenpEd9f1iVgsFInxQhY6E2YQi7SggO7kedDIwM08OREl
+         eyUBXfRgT6/Obyqu16uXlNfzAcZlYdoYY1lz1tEcDf2iDyd3TB+xTT8mvhXE3NxUh8S1
+         xpPX8lT6v3VOfXrt2OiY6g45G61NqG0+L5UwAxAY6YOXcc4XdIfB7GkXcQtRONbxpiQF
+         6bTYy6VIfaVuXLzJ/6X5PaBUCyte6DiLIKcxjRgUFfgJNInW/gVBkrS8BNL2IhzUk3yI
+         YTxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUSnRvSp5iMlhn7egb1ov0k6jK+bIb5+LL7M5y62ImLQ9SYI5K/XEAPfvuB1GACVIely2EM41f4LElbquxWFKNTdr79yQ2S
+X-Gm-Message-State: AOJu0YzDCajm/psnTGDaU1A3Eti2T0Yy6X1t0BgVNTwOIpOaYuSYMEM0
+	Vds1pdMN7IvAlNtgtH6S9RGP7wVCeunhZ9es/nhPh8VlhR1FB97H2hbOgmwus6W+UjWLW43fVOH
+	xQTRzMQhAG/u6Om+sh0/HD76W9HJWkbO63JdT8x+wbBYxtbrPRSoaMO3nBMfvCg==
+X-Received: by 2002:adf:e7c5:0:b0:33e:7b2d:7419 with SMTP id e5-20020adfe7c5000000b0033e7b2d7419mr70066wrn.15.1711129937967;
+        Fri, 22 Mar 2024 10:52:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFNYbeWlc5wQeQXdFbbaLRwiJJvNBai7rukIfba3St2pQT4smTvMpf+YFXpFMLEBtq2T62Osg==
+X-Received: by 2002:adf:e7c5:0:b0:33e:7b2d:7419 with SMTP id e5-20020adfe7c5000000b0033e7b2d7419mr70003wrn.15.1711129937431;
+        Fri, 22 Mar 2024 10:52:17 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c71b:7e00:9339:4017:7111:82d0? (p200300cbc71b7e0093394017711182d0.dip0.t-ipconnect.de. [2003:cb:c71b:7e00:9339:4017:7111:82d0])
+        by smtp.gmail.com with ESMTPSA id x16-20020a5d6b50000000b0033e93e00f68sm2544543wrw.61.2024.03.22.10.52.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Mar 2024 10:52:16 -0700 (PDT)
+Message-ID: <2d6fc3c0-a55b-4316-90b8-deabb065d007@redhat.com>
+Date: Fri, 22 Mar 2024 18:52:14 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: folio_mmapped
+To: Will Deacon <will@kernel.org>
+Cc: Sean Christopherson <seanjc@google.com>,
+ Vishal Annapurve <vannapurve@google.com>, Quentin Perret
+ <qperret@google.com>, Matthew Wilcox <willy@infradead.org>,
+ Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, viro@zeniv.linux.org.uk, brauner@kernel.org,
+ akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
+ chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
+ dmatlack@google.com, yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com,
+ mic@digikod.net, vbabka@suse.cz, ackerleytng@google.com,
+ mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com,
+ liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+ quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+ quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com,
+ james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
+ maz@kernel.org, keirf@google.com, linux-mm@kvack.org
+References: <Zd82V1aY-ZDyaG8U@google.com>
+ <fc486cb4-0fe3-403f-b5e6-26d2140fcef9@redhat.com>
+ <ZeXAOit6O0stdxw3@google.com> <ZeYbUjiIkPevjrRR@google.com>
+ <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
+ <CAGtprH-17s7ipmr=+cC6YuH-R0Bvr7kJS7Zo9a+Dc9VEt2BAcQ@mail.gmail.com>
+ <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
+ <CAGtprH8B8y0Khrid5X_1twMce7r-Z7wnBiaNOi-QwxVj4D+L3w@mail.gmail.com>
+ <ZfjYBxXeh9lcudxp@google.com>
+ <40f82a61-39b0-4dda-ac32-a7b5da2a31e8@redhat.com>
+ <20240319143119.GA2736@willie-the-truck>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
+ AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
+ 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
+ rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
+ wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
+ 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
+ pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
+ KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
+ BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
+ 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
+ 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
+ M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
+ Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
+ T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
+ 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
+ CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
+ NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
+ 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
+ 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
+ lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
+ AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
+ N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
+ AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
+ boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
+ 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
+ XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
+ a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
+ Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
+ 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
+ kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
+ th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
+ jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20240319143119.GA2736@willie-the-truck>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+
+On 19.03.24 15:31, Will Deacon wrote:
+> Hi David,
+
+Hi Will,
+
+sorry for the late reply!
+
+> 
+> On Tue, Mar 19, 2024 at 11:26:05AM +0100, David Hildenbrand wrote:
+>> On 19.03.24 01:10, Sean Christopherson wrote:
+>>> On Mon, Mar 18, 2024, Vishal Annapurve wrote:
+>>>> On Mon, Mar 18, 2024 at 3:02 PM David Hildenbrand <david@redhat.com> wrote:
+>>>>> Second, we should find better ways to let an IOMMU map these pages,
+>>>>> *not* using GUP. There were already discussions on providing a similar
+>>>>> fd+offset-style interface instead. GUP really sounds like the wrong
+>>>>> approach here. Maybe we should look into passing not only guest_memfd,
+>>>>> but also "ordinary" memfds.
+>>>
+>>> +1.  I am not completely opposed to letting SNP and TDX effectively convert
+>>> pages between private and shared, but I also completely agree that letting
+>>> anything gup() guest_memfd memory is likely to end in tears.
+>>
+>> Yes. Avoid it right from the start, if possible.
+>>
+>> People wanted guest_memfd to *not* have to mmap guest memory ("even for
+>> ordinary VMs"). Now people are saying we have to be able to mmap it in order
+>> to GUP it. It's getting tiring, really.
+> 
+>  From the pKVM side, we're working on guest_memfd primarily to avoid
+> diverging from what other CoCo solutions end up using, but if it gets
+> de-featured (e.g. no huge pages, no GUP, no mmap) compared to what we do
+> today with anonymous memory, then it's a really hard sell to switch over
+> from what we have in production. We're also hoping that, over time,
+> guest_memfd will become more closely integrated with the mm subsystem to
+> enable things like hypervisor-assisted page migration, which we would
+> love to have.
+
+Reading Sean's reply, he has a different view on that. And I think 
+that's the main issue: there are too many different use cases and too 
+many different requirements that could turn guest_memfd into something 
+that maybe it really shouldn't be.
+
+> 
+> Today, we use the existing KVM interfaces (i.e. based on anonymous
+> memory) and it mostly works with the one significant exception that
+> accessing private memory via a GUP pin will crash the host kernel. If
+> all guest_memfd() can offer to solve that problem is preventing GUP
+> altogether, then I'd sooner just add that same restriction to what we
+> currently have instead of overhauling the user ABI in favour of
+> something which offers us very little in return.
+> 
+> On the mmap() side of things for guest_memfd, a simpler option for us
+> than what has currently been proposed might be to enforce that the VMM
+> has unmapped all private pages on vCPU run, failing the ioctl if that's
+> not the case. It needs a little more tracking in guest_memfd but I think
+> GUP will then fall out in the wash because only shared pages will be
+> mapped by userspace and so GUP will fail by construction for private
+> pages.
+> 
+> We're happy to pursue alternative approaches using anonymous memory if
+> you'd prefer to keep guest_memfd limited in functionality (e.g.
+> preventing GUP of private pages by extending mapping_flags as per [1]),
+> but we're equally willing to contribute to guest_memfd if extensions are
+> welcome.
+> 
+> What do you prefer?
+
+Let me summarize the history:
+
+AMD had its thing running and it worked for them (but I recall it was 
+hacky :) ).
+
+TDX made it possible to crash the machine when accessing secure memory 
+from user space (MCE).
+
+So secure memory must not be mapped into user space -- no page tables. 
+Prototypes with anonymous memory existed (and I didn't hate them, 
+although hacky), but one of the other selling points of guest_memfd was 
+that we could create VMs that wouldn't need any page tables at all, 
+which I found interesting.
+
+There was a bit more to that (easier conversion, avoiding GUP, 
+specifying on allocation that the memory was unmovable ...), but I'll 
+get to that later.
+
+The design principle was: nasty private memory (unmovable, unswappable, 
+inaccessible, un-GUPable) is allocated from guest_memfd, ordinary 
+"shared" memory is allocated from an ordinary memfd.
+
+This makes sense: shared memory is neither nasty nor special. You can 
+migrate it, swap it out, map it into page tables, GUP it, ... without 
+any issues.
 
 
---=-4348LFrQyy97fOemnDcW
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+So if I would describe some key characteristics of guest_memfd as of 
+today, it would probably be:
 
-On Fri, 2024-03-22 at 16:09 +0000, Marc Zyngier wrote:
->=20
-> > Marc, I think I've also addressed your feedback? Is there anything else
-> > to do other than wait for the spec to be published?
->=20
-> Other than the couple of minor nits I mentioned in replies to the
-> individual patches, this looks good to me.
+1) Memory is unmovable and unswappable. Right from the beginning, it is
+    allocated as unmovable (e.g., not placed on ZONE_MOVABLE, CMA, ...).
+2) Memory is inaccessible. It cannot be read from user space, the
+    kernel, it cannot be GUP'ed ... only some mechanisms might end up
+    touching that memory (e.g., hibernation, /proc/kcore) might end up
+    touching it "by accident", and we usually can handle these cases.
+3) Memory can be discarded in page granularity. There should be no cases
+    where you cannot discard memory to over-allocate memory for private
+    pages that have been replaced by shared pages otherwise.
+4) Page tables are not required (well, it's an memfd), and the fd could
+    in theory be passed to other processes.
 
-I believe I've handled all that. And also Sudeep's implicit nudge to
-use BIT() instead of manually shifting (1<<PSCI_1_3_HIBERNATE_TYPE_OFF).
-
-Rebased onto 6.8 and pushed to
-https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/psci-hi=
-bernate-6.8
-
-> > Shall I post a v4 with PSCI v1.3 as default and the self-test? Would
-> > you apply that into a branch ready for merging when the spec is ready,
-> > or should I just wait and repost it all then?
->=20
-> I think this can wait for the final spec. I assume that you are
-> directly tracking this anyway, so we don't need to poll for the spec
-> update.
-
-Indeed, will post again when the spec is published. Thanks.
-
---=-4348LFrQyy97fOemnDcW
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwMzIyMTczMzI1WjAvBgkqhkiG9w0BCQQxIgQgr30gcu5A
-XM04pBs2LzfEtzWH1hHwcK89alPrbvcB+T0wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAGlSyjJ73U0nQa8i6tMFLpOZoMe5NiUhcg
-BUceMEQ9CLMTuBKNmV+ILAvQWLQngvwJ7ksICWqqr/8PFYDyqk6WpbmmThq3pEQvpJP6Ra2PcU8B
-26SRfTI9pJgZg3Gz/bChL9lIiTvACYEYo+wtsMAAfwEX4LT613Ch0NNnqFInPcoWY8y/LyvySwwv
-6aT1WsP5/i3hOMJny4EFU2GexDHO7TWDi2Kt0Q2f+trd57S8HV4r3oc8rUFF8AGpC+X3uXySY+bB
-89xQC/oaiJ6FrkO2cA30Jvkcu7qZYmT3J54WiNTkL2tvkbbi4w2hPmhMI7Ok+fKAbBmpAuQl1JgY
-FHWekwUtV6q1KXn9CjV95izX//fsBXqlFUlCM0xqpBfxjcN70QlqMSZVBNTuM2dCFWulJcDsObnU
-2F8bHCRyM4l/3m96Hj6629KkWfUdVV5lu7B/Iec2GU1WVsyHmyqTl54lkCuv8z9a/t21jYcLZBPL
-t+N5IxsVoMiS47NcH+wt+hnacRRcnoae4Q9iBpxl+BkOLLtyJXmJ0m8JIiF2T5Ni2RKDqRicbRWg
-JKqNzzP6STvxK5YuyMVvwX+kFES1ebPDq5JS3ueYdbNRJsMbj5PRjQ/3XXcqt5cJ9y4EcdT6pIXW
-Sfpzyr+DcM+y1nyIaOXwm9QEi3ruQQiJiuqETUQQaQAAAAAAAA==
+Having "ordinary shared" memory in there implies that 1) and 2) will 
+have to be adjusted for them, which kind-of turns it "partially" into 
+ordinary shmem again.
 
 
---=-4348LFrQyy97fOemnDcW--
+Going back to the beginning: with pKVM, we likely want the following
+
+1) Convert pages private<->shared in-place
+2) Stop user space + kernel from accessing private memory in process
+    context. Likely for pKVM we would only crash the process, which
+    would be acceptable.
+3) Prevent GUP to private memory. Otherwise we could crash the kernel.
+4) Prevent private pages from swapout+migration until supported.
+
+
+I suspect your current solution with anonymous memory gets all but 3) 
+sorted out, correct?
+
+I'm curious, may there be a requirement in the future that shared memory 
+could be mapped into other processes? (thinking vhost-user and such 
+things). Of course that's impossible with anonymous memory; teaching 
+shmem to contain private memory would kind-of lead to ... guest_memfd, 
+just that we don't have shared memory there.
+
+-- 
+Cheers,
+
+David / dhildenb
+
