@@ -1,69 +1,125 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D97A31
-	for <kvmarm@lists.linux.dev>; Sat, 23 Mar 2024 02:08:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF185A0ED;
+	Sat, 23 Mar 2024 19:06:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711159684; cv=none; b=L0uxGIujP/eCagg303j39axf26+beHGXANtX3v64z3whbkgoogun793fkiOFGzvl/A18pFz/FE1Sns0NfYTCCRiYSqR9SzjvS3/IJvlVLl9YEmywNQbIXYO8Cow5Md1zUMXr8N8I0m7fbZ2Vfz6SLFEBamR1D5JYAk7G3yKnG6A=
+	t=1711220788; cv=none; b=ilbbAtr2HcLqVb/Z7L/CZHRfixy2OLbGwhKEUbmidOy5e0TWfZNFt1meiLVXr22dSl6SXPGpUjI7ArrYQQpAuoNzSoe77cMlqCM1p0HPy5WlFe0jPatQLKYhU+7tRd+oraffPbieIeN6dk93IFcVaM/bw4vqH34GzZMpvRWUje0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711159684; c=relaxed/simple;
-	bh=G0qqejbTt8x+fQsE2uIDzXF2fMgwgfYI1BMVmDEbtVw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O1pK5Q4LAyAhB8d1CWofbh2Jw7OsQ8TZl9WlCE0KWvl173io7/IiujDxScFhWU2g2SDbtHnIsSSd/m1O12lCG+9XsC1fR6AT2Wq0s4qex1RnnZb1nlAJqAAT++QIHpsgHnqQizUohTTOT+xV7I1wQ1w4FiAMAKsiEcvRnQz2+sY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SDHpXhFd; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1711220788; c=relaxed/simple;
+	bh=WTfe3lrUHJOBTlsrGu5xz4DGupXjIeeLGswZjNtLNKw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ga6uMkp9Zyu4FMnnKYv6Jb9zRLMHDomGFPTBxTWvEXrbY4piiHqlsXQSxvgrAQhtWLl4rPQO+vG8b7kkG/L6dihl/P8OAC9eRrqRbN7+gV9YFP4Ofnz0jPtIL0s+OL0y2qBGSwrQjj1bcien2A+u6wEFGM1YI2q7GJdE7b9ae1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ewY/xmNM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SDHpXhFd"
-Date: Fri, 22 Mar 2024 19:07:52 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1711159681;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5VkD5z9YkAdX6FArt2jg1nT/B62sh2p7lPRadskyhS4=;
-	b=SDHpXhFdepH9Nj+WO/hIIjmvTRVCgXX6AKi+TQQXTYMd1JS/R4MWvwg2QeCz5Aza55n83d
-	GkB2zofd2b4riHxCi3zhFaTsWoBg0QiEQG46JIHRc+WKtDgpogxfMXOXnsnveH9HCUaWhT
-	pXFNjI9dkhah5sJIwmnK7NeD46SWwrs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org,
-	maz@kernel.org, qperret@google.com, qwandor@google.com,
-	suzuki.poulose@arm.com, tabba@google.com, will@kernel.org,
-	yuzenghui@huawei.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kernel-team@android.com
-Subject: Re: [PATCH 2/2] KVM: arm64: Allow only the specified FF-A calls to
- be forwarded to TZ
-Message-ID: <Zf45eDs8Bd1UQ94Z@linux.dev>
-References: <20240322124303.309423-1-sebastianene@google.com>
- <20240322124303.309423-2-sebastianene@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ewY/xmNM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52363C43330;
+	Sat, 23 Mar 2024 19:06:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711220788;
+	bh=WTfe3lrUHJOBTlsrGu5xz4DGupXjIeeLGswZjNtLNKw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ewY/xmNMicY9KBujm8nTwKaPZEkpJUu9YP0YFoPDNyhQKhPG17lNqqkWuQol6f/HK
+	 oS1DHZB4d2NZ16svZG0yKOGjy/qhdTVyQPKTiSGZQmreAuDy7S331KvQjYbChPA9qd
+	 rT6ErZygXBTjrlnfpMgqWxd3mXxJgwwaJFjbvuWikGmvwlFZFIjtUgDBPrM9BTuRhB
+	 v1ZDNt7UvTES0YihzKYAMwqwWevZr/BzR2SBcW8iRBGdvBbif+/16U2wz1XRk9fUOt
+	 q0w0eqXDJ5g5HReSoJjctgHw8RCRJmd7YDP6HrYik8MUZ9ehZkLKXM+v6ZdElJ6NeD
+	 zf9ppz8Qtbblw==
+Received: from [193.117.140.69] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ro6hF-00EtFe-Ve;
+	Sat, 23 Mar 2024 19:06:26 +0000
+Date: Sat, 23 Mar 2024 19:06:24 +0000
+Message-ID: <87edc0sr7z.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Dongli Zhang <dongli.zhang@oracle.com>
+Subject: Re: [PATCH v2 5/5] KVM: arm64: Exclude FP ownership from kvm_vcpu_arch
+In-Reply-To: <fe5edef8-e61d-42b3-b4da-6f6bebd60013@sirena.org.uk>
+References: <20240322170945.3292593-1-maz@kernel.org>
+	<20240322170945.3292593-6-maz@kernel.org>
+	<fe5edef8-e61d-42b3-b4da-6f6bebd60013@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240322124303.309423-2-sebastianene@google.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 193.117.140.69
+X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, james.clark@arm.com, anshuman.khandual@arm.com, dongli.zhang@oracle.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Mar 22, 2024 at 12:43:03PM +0000, Sebastian Ene wrote:
-> The previous logic used a deny list to filter the FF-A calls. Because of
-> this, some of the calls escaped the check and they were forwarded by
-> default to Trustzone. (eg. FFA_MSG_SEND_DIRECT_REQ was denied but the 64
-> bit version of the call was not).
-> Modify the logic to use an allowlist and allow only the calls specified in
-> the filter function to be proxied to TZ from the hypervisor.
+On Fri, 22 Mar 2024 17:52:45 +0000,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> On Fri, Mar 22, 2024 at 05:09:45PM +0000, Marc Zyngier wrote:
+> > In retrospect, it is fairly obvious that the FP state ownership
+> > is only meaningful for a given CPU, and that locating this
+> > information in the vcpu was just a mistake.
+> > 
+> > Move the ownership tracking into the host data structure, and
+> > rename it from fp_state to fp_owner, which is a better description
+> > (name suggested by Mark Brown).
+> 
+> There's still the thing with the interaction with SME support - to
+> summarise what I think you're asking for the userspace ABI there:
 
-I had discussed this with Will back when the feature was upstreamed and
-he said there's a lot of off-label calls that necessitate a denylist
-implementation. Has anything changed to give us confidence that we can
-be restrictive, at least on the FF-A range?
+Well, the SME support is still pretty prospective, and this patch has
+no impact on an existing ABI.
+
+> 
+>  - Create a requirement for userspace to set SVCR prior to setting any
+>    vector impacted register to ensure the correct format and that data
+>    isn't zeroed when SVCR is set.
+>  - Use the value of SVCR.SM and the guest maximum SVE and SME VLs to
+>    select the currently visible vector length for the Z, P and FFR
+>    registers, and if FFR can be accessed if not available in streaming
+>    mode.
+>  - Changes to SVCR.SM zero register data in the same way writes to the
+>    physical register do.
+>  - This also implies discarding or failing all writes to ZA and ZT0
+>    unless SVCR.ZA is set for consistency.
+
+All of that seems reasonable, as long as it is comes as a consequence
+of enabling SME. It should be run by the QEMU people though, as they
+are the ones that will make use of it. Please Cc them when you post
+the patches or even better, reach out to them beforehand.
+
+>  - Add support for the V registers in the sysreg interface when SVE is
+>    enabled.
+
+We already support the V registers with KVM_REG_ARM_CORE_REG(). Why
+would you add any new interface for this?  The kernel should be
+perfectly capable of dealing with the placement of the data in the
+internal structures, and there is no need to tie the userspace ABI to
+how we deal with that placement (kvm_regs is already purely
+userspace).
+
+> then the implementation can do what it likes to achieve that, the most
+> obvious thing being to store in native format for the current hardware
+> mode based on SVCR.{SM,ZA}.  Does that sound about right?
+
+Apart from the statement about the V registers, this seems OK. But
+again, I want to see this agreed with the QEMU folks.
+
+	M.
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
