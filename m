@@ -1,125 +1,117 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF185A0ED;
-	Sat, 23 Mar 2024 19:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00618139CED;
+	Mon, 25 Mar 2024 00:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711220788; cv=none; b=ilbbAtr2HcLqVb/Z7L/CZHRfixy2OLbGwhKEUbmidOy5e0TWfZNFt1meiLVXr22dSl6SXPGpUjI7ArrYQQpAuoNzSoe77cMlqCM1p0HPy5WlFe0jPatQLKYhU+7tRd+oraffPbieIeN6dk93IFcVaM/bw4vqH34GzZMpvRWUje0=
+	t=1711326469; cv=none; b=tMccDUXrIPDVel6zC+3p1TOI0wX5XrmBOTvJX2J8V98UX+wEwpJ0fwwULbTXEPQ6YvjgoXQkmX2+oqZsiPJ6EwossjDqkLtNr3NRIib8IGg6H/bhYuGItr74YlEzhi7mIB/qJq8X7bAe+tWS8ckl1YsdiUpUufTU+4lTgIjI4Y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711220788; c=relaxed/simple;
-	bh=WTfe3lrUHJOBTlsrGu5xz4DGupXjIeeLGswZjNtLNKw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ga6uMkp9Zyu4FMnnKYv6Jb9zRLMHDomGFPTBxTWvEXrbY4piiHqlsXQSxvgrAQhtWLl4rPQO+vG8b7kkG/L6dihl/P8OAC9eRrqRbN7+gV9YFP4Ofnz0jPtIL0s+OL0y2qBGSwrQjj1bcien2A+u6wEFGM1YI2q7GJdE7b9ae1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ewY/xmNM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711326469; c=relaxed/simple;
+	bh=ZVLxUpVlIvjbnpmT2kSzRca0o7lSJyL7hhcWuoMZ+rI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t2PjibipCXr465o/yp3ug4vAhxaVpp45AtKpwF/aVEMCToLyqfd2sJsqSegHzDakil9M1Aebi/NZlkwE23g4jqDDyS6jrEjvphSJg/52qsWtHVYasBOX9gf6FpFTFQGqXR+FPg+TQsjFusRKzpxRtztInGjDAHFEEYeGyVWOuDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=slcQVupW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ewY/xmNM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52363C43330;
-	Sat, 23 Mar 2024 19:06:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="slcQVupW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 649DEC433F1;
+	Mon, 25 Mar 2024 00:27:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711220788;
-	bh=WTfe3lrUHJOBTlsrGu5xz4DGupXjIeeLGswZjNtLNKw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ewY/xmNMicY9KBujm8nTwKaPZEkpJUu9YP0YFoPDNyhQKhPG17lNqqkWuQol6f/HK
-	 oS1DHZB4d2NZ16svZG0yKOGjy/qhdTVyQPKTiSGZQmreAuDy7S331KvQjYbChPA9qd
-	 rT6ErZygXBTjrlnfpMgqWxd3mXxJgwwaJFjbvuWikGmvwlFZFIjtUgDBPrM9BTuRhB
-	 v1ZDNt7UvTES0YihzKYAMwqwWevZr/BzR2SBcW8iRBGdvBbif+/16U2wz1XRk9fUOt
-	 q0w0eqXDJ5g5HReSoJjctgHw8RCRJmd7YDP6HrYik8MUZ9ehZkLKXM+v6ZdElJ6NeD
-	 zf9ppz8Qtbblw==
-Received: from [193.117.140.69] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ro6hF-00EtFe-Ve;
-	Sat, 23 Mar 2024 19:06:26 +0000
-Date: Sat, 23 Mar 2024 19:06:24 +0000
-Message-ID: <87edc0sr7z.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
+	s=k20201202; t=1711326468;
+	bh=ZVLxUpVlIvjbnpmT2kSzRca0o7lSJyL7hhcWuoMZ+rI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=slcQVupWCneGjeDxb9bFbNb+n+B7z9OfDHUdFec56clRKUt5ShKk7S2RUoUrELIXD
+	 2rKCfL4aHZXsQjn/cg6m0B14xco9x2iCZyP6w54TjS3wgc53o4Bh/agft+lCafwyEr
+	 na/WunzwAKfliEqbqiNBVanFksNkFLpnGuUVNPdd1CyQhdUjmole8DfQ3BVEzrmAuh
+	 vs63h7IAlmVe0pDMw1nvLvr6+2tApj3a8laekBX6Qf1leWS+uPVrmOfktWUTjC7LiG
+	 DthjPfPs85Qtf/tlX+9Ok8qfitorIeCKMmbFzqhsWECN8CD5XOq/e4fEk8mYFKmnp5
+	 V0QafA+HdDAqA==
+Date: Mon, 25 Mar 2024 00:27:43 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	James Clark <james.clark@arm.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	Dongli Zhang <dongli.zhang@oracle.com>
-Subject: Re: [PATCH v2 5/5] KVM: arm64: Exclude FP ownership from kvm_vcpu_arch
-In-Reply-To: <fe5edef8-e61d-42b3-b4da-6f6bebd60013@sirena.org.uk>
+Subject: Re: [PATCH v2 5/5] KVM: arm64: Exclude FP ownership from
+ kvm_vcpu_arch
+Message-ID: <252bc993-e93d-4412-bfc6-13930b80dbd8@sirena.org.uk>
 References: <20240322170945.3292593-1-maz@kernel.org>
-	<20240322170945.3292593-6-maz@kernel.org>
-	<fe5edef8-e61d-42b3-b4da-6f6bebd60013@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240322170945.3292593-6-maz@kernel.org>
+ <fe5edef8-e61d-42b3-b4da-6f6bebd60013@sirena.org.uk>
+ <87edc0sr7z.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 193.117.140.69
-X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, james.clark@arm.com, anshuman.khandual@arm.com, dongli.zhang@oracle.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="YEMFtPRhUeSHVnyH"
+Content-Disposition: inline
+In-Reply-To: <87edc0sr7z.wl-maz@kernel.org>
+X-Cookie: To order, call toll-free.
 
-On Fri, 22 Mar 2024 17:52:45 +0000,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> On Fri, Mar 22, 2024 at 05:09:45PM +0000, Marc Zyngier wrote:
-> > In retrospect, it is fairly obvious that the FP state ownership
-> > is only meaningful for a given CPU, and that locating this
-> > information in the vcpu was just a mistake.
-> > 
-> > Move the ownership tracking into the host data structure, and
-> > rename it from fp_state to fp_owner, which is a better description
-> > (name suggested by Mark Brown).
-> 
-> There's still the thing with the interaction with SME support - to
-> summarise what I think you're asking for the userspace ABI there:
 
-Well, the SME support is still pretty prospective, and this patch has
-no impact on an existing ABI.
+--YEMFtPRhUeSHVnyH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> 
->  - Create a requirement for userspace to set SVCR prior to setting any
->    vector impacted register to ensure the correct format and that data
->    isn't zeroed when SVCR is set.
->  - Use the value of SVCR.SM and the guest maximum SVE and SME VLs to
->    select the currently visible vector length for the Z, P and FFR
->    registers, and if FFR can be accessed if not available in streaming
->    mode.
->  - Changes to SVCR.SM zero register data in the same way writes to the
->    physical register do.
->  - This also implies discarding or failing all writes to ZA and ZT0
->    unless SVCR.ZA is set for consistency.
+On Sat, Mar 23, 2024 at 07:06:24PM +0000, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-All of that seems reasonable, as long as it is comes as a consequence
-of enabling SME. It should be run by the QEMU people though, as they
-are the ones that will make use of it. Please Cc them when you post
-the patches or even better, reach out to them beforehand.
+> > There's still the thing with the interaction with SME support - to
+> > summarise what I think you're asking for the userspace ABI there:
 
->  - Add support for the V registers in the sysreg interface when SVE is
->    enabled.
+> Well, the SME support is still pretty prospective, and this patch has
+> no impact on an existing ABI.
 
-We already support the V registers with KVM_REG_ARM_CORE_REG(). Why
-would you add any new interface for this?  The kernel should be
-perfectly capable of dealing with the placement of the data in the
-internal structures, and there is no need to tie the userspace ABI to
-how we deal with that placement (kvm_regs is already purely
-userspace).
+Sure, hopefully I should have a new verison out this release - it was
+mostly held up waiting for the ID register parsing framework you got
+merged last release.  Though holidays do make things a bit tight timing
+wise.
 
-> then the implementation can do what it likes to achieve that, the most
-> obvious thing being to store in native format for the current hardware
-> mode based on SVCR.{SM,ZA}.  Does that sound about right?
+> >  - Add support for the V registers in the sysreg interface when SVE is
+> >    enabled.
 
-Apart from the statement about the V registers, this seems OK. But
-again, I want to see this agreed with the QEMU folks.
+> We already support the V registers with KVM_REG_ARM_CORE_REG(). Why
+> would you add any new interface for this?  The kernel should be
+> perfectly capable of dealing with the placement of the data in the
+> internal structures, and there is no need to tie the userspace ABI to
+> how we deal with that placement (kvm_regs is already purely
+> userspace).
 
-	M.
+This was referring to the fact that currently when SVE is enabled access
+to the V registers as V registers via _CORE_REG() is blocked and they
+can only be accessed as a subset of the Z registers (see the check at
+the end of core_reg_size_from_offset() in guest.c).
 
--- 
-Without deviation from the norm, progress is not possible.
+> > then the implementation can do what it likes to achieve that, the most
+> > obvious thing being to store in native format for the current hardware
+> > mode based on SVCR.{SM,ZA}.  Does that sound about right?
+
+> Apart from the statement about the V registers, this seems OK. But
+> again, I want to see this agreed with the QEMU folks.
+
+Great, thanks.
+
+--YEMFtPRhUeSHVnyH
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmYAxP4ACgkQJNaLcl1U
+h9CH2Qf9Fx+ewTCANRoicCF0rfM1fQqAlV3VSgLdU71g83ieZ6J/qY4xCDhv9sBG
+OiXMksNTT6IzR7+uNkNcv9Zyqziu7YZYEtl7x+AbHLxLH3Vmyhzz2gIz4KEzoTm+
+bv9EsL48ZPQj6luzAcWy9MXwv1m4XqUC7JF/oCoPPVXctVVd6MYowBzwJbSfBYuD
+G6YVaGuXLdGv+xMCq2/+5hznLC7ILu0WXvBInFjyMVW99Tip55AFTO+ZCsoZVxFm
+6TiTAm3xrkT99CvHrokMVtnbK1x6VM2M/kKtnqC+LSH/X6D7UrxB+VbvbCiMgUau
+68nmUNhFO+NLq4iCVwEdZ3fNpMpcfw==
+=x8zP
+-----END PGP SIGNATURE-----
+
+--YEMFtPRhUeSHVnyH--
