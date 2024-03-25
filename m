@@ -1,311 +1,110 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C70DD12A174
-	for <kvmarm@lists.linux.dev>; Mon, 25 Mar 2024 14:31:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8071417109E;
+	Mon, 25 Mar 2024 14:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711377113; cv=none; b=TXFsy0WJ/J8x8On7tWXmrtxY9O1DuBS9WyHT8NNbNt7rkcoxB+ymgnX2wB5C4X6TyuGnGf97jmKWE5KfeZ9i+fvyc7BDV4LXTMT7+5Bxo72d+YIh4Gq9QqHRAB+D8/zlYl5G1mXBwBS6RSkzH4De+/mCnzsQhObLxvOO8NffDag=
+	t=1711378653; cv=none; b=W6E0M9OCq1EteYXyhzrOdcBu8j8XCGCjcnvobZVME918R/IuTTFmLGMPkjL4v0WVEn8J79dwjPTPyfDnmxbSNxHeoh8s5uJdzDyhobFGpVJQSWIm7NX0tD/fcWgvKhoAWmvT3uLOtPF5abbEVo5b1LIIZRgS81DteiIlAdKAcSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711377113; c=relaxed/simple;
-	bh=Gy67W0JvnS2xSGP/xBO8oCI5ZFpvKCIYR1XVOhRjaQ4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ieVREGJ1vSFK9bV84Ask4jdGNUb1uZVE16+lUMlvdglHmtUFH81vHqhB4sJoc4UVd+AFUG76QNnhNzidnoRiVDCNwkIo/r8MQsQVjHDf9vxpInrvS71idogSZFTJEwGFJa4xLzNw3Yu1TMNfUaa3hEUNxgGUkZFESW1VpJBdywc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B2D852F4;
-	Mon, 25 Mar 2024 07:32:24 -0700 (PDT)
-Received: from [10.57.82.187] (unknown [10.57.82.187])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9B46D3F694;
-	Mon, 25 Mar 2024 07:31:49 -0700 (PDT)
-Message-ID: <f6d1eaab-ce2c-4c59-a182-bd43edf8da59@arm.com>
-Date: Mon, 25 Mar 2024 14:31:48 +0000
+	s=arc-20240116; t=1711378653; c=relaxed/simple;
+	bh=4iYKYravWH9cBjEWpiEgWot/Rprt2Qy66JfxmdpsEds=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sWDrESUfPsl7MngNDGyT6Hun4wPRLodOtpCHAG6dKPqq8hNaNYxsgqMBYRp0WHRq48jg9rej+J0x2OyW1R2QU0sA0gdDQfsoCooWj0hxb4IlIBI2uChBvfDF0FlDIsQnk7uy4TcPQd74y3a/qxIxxkKGD/ucOeic4Q1QCPIDJU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HppgJVyw; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HppgJVyw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5168C43399;
+	Mon, 25 Mar 2024 14:57:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711378652;
+	bh=4iYKYravWH9cBjEWpiEgWot/Rprt2Qy66JfxmdpsEds=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HppgJVywSnViwY+ifBCk3LJ/5bTDtvM5hTK94hEq7ilMYe7NnVlmoqPbx2aLGiDeT
+	 yZyPfhlUcBEGT+FY5G9KUnkEpt074+dVr20q4MoKpnzIQpY0tZZ/MYQR6OjD/9A9QM
+	 pce7M5gVIrqDkpZM/PjZRTgPCnpZ7UMd7EIsjMeG9mspvdSzYKooXMFKDi9z+vJeNU
+	 4B9BAICFWNBh7rS8EuBOZpcg+65Q/N+0JIWbJG1xUUlAANoBv+uaAf8XxHECNFodXX
+	 ar6jUxdk7ZyC8TYum99LQnZ1zQCzRHF6h3if2qH5UCXIASQfNvrXtgxxqXsUWxasZk
+	 Px3BBUoz6+GWA==
+Date: Mon, 25 Mar 2024 14:57:27 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	James Clark <james.clark@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Dongli Zhang <dongli.zhang@oracle.com>
+Subject: Re: [PATCH v2 5/5] KVM: arm64: Exclude FP ownership from
+ kvm_vcpu_arch
+Message-ID: <55f2f1f7-6f23-45f2-ae6c-a1111e3271db@sirena.org.uk>
+References: <20240322170945.3292593-1-maz@kernel.org>
+ <20240322170945.3292593-6-maz@kernel.org>
+ <fe5edef8-e61d-42b3-b4da-6f6bebd60013@sirena.org.uk>
+ <87edc0sr7z.wl-maz@kernel.org>
+ <252bc993-e93d-4412-bfc6-13930b80dbd8@sirena.org.uk>
+ <87cyrism0p.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/5] KVM: arm64: Add accessor for per-CPU state
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, James Clark <james.clark@arm.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>,
- Mark Brown <broonie@kernel.org>, Dongli Zhang <dongli.zhang@oracle.com>
-References: <20240322170945.3292593-1-maz@kernel.org>
- <20240322170945.3292593-2-maz@kernel.org>
-Content-Language: en-GB
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240322170945.3292593-2-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="TZBBMhFGqQPVUNeD"
+Content-Disposition: inline
+In-Reply-To: <87cyrism0p.wl-maz@kernel.org>
+X-Cookie: Evil isn't all bad.
 
-Hi Marc
 
-On 22/03/2024 17:09, Marc Zyngier wrote:
-> In order to facilitate the introduction of new per-CPU state,
-> add a new host_data_ptr() helped that hides some of the per-CPU
-> verbosity, and make it easier to move that state around in the
-> future.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->   arch/arm64/include/asm/kvm_host.h         | 37 +++++++++++++++++++++++
->   arch/arm64/kvm/arm.c                      |  2 +-
->   arch/arm64/kvm/hyp/include/hyp/debug-sr.h |  4 +--
->   arch/arm64/kvm/hyp/include/hyp/switch.h   |  8 ++---
->   arch/arm64/kvm/hyp/nvhe/psci-relay.c      |  2 +-
->   arch/arm64/kvm/hyp/nvhe/setup.c           |  3 +-
->   arch/arm64/kvm/hyp/nvhe/switch.c          |  4 +--
->   arch/arm64/kvm/hyp/vhe/switch.c           |  4 +--
->   arch/arm64/kvm/hyp/vhe/sysreg-sr.c        |  4 +--
->   arch/arm64/kvm/pmu.c                      |  2 +-
->   10 files changed, 53 insertions(+), 17 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 6883963bbc3a..ca6ef663950d 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -530,6 +530,17 @@ struct kvm_cpu_context {
->   	u64 *vncr_array;
->   };
->   
-> +/*
-> + * This structure is instantiated on a per-CPU basis, and contains
-> + * data that is:
-> + *
-> + * - tied to a single physical CPU, and
-> + * - either have a lifetime that does not extend past vcpu_put()
-> + * - or is an invariant for the lifetime of the system
-> + *
-> + * Use host_data_ptr(field) as a way to access a pointer to such a
-> + * field.
-> + */
->   struct kvm_host_data {
->   	struct kvm_cpu_context host_ctxt;
->   };
-> @@ -1167,6 +1178,32 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
->   
->   DECLARE_KVM_HYP_PER_CPU(struct kvm_host_data, kvm_host_data);
->   
-> +/*
-> + * How we access per-CPU host data depends on the where we access it from,
-> + * and the mode we're in:
-> + *
-> + * - VHE and nVHE hypervisor bits use their locally defined instance
-> + *
-> + * - the rest of the kernel use either the VHE or nVHE one, depending on
-> + *   the mode we're running in.
-> + *
-> + *   Unless we're in protected mode, fully deprivileged, and the nVHE
-> + *   per-CPU stuff is exclusively accessible to the protected EL2 code.
-> + *   In this case, the EL1 code uses the *VHE* data as its private state
-> + *   (which makes sense in a way as there shouldn't be any shared state
-> + *   between the host and the hypervisor).
+--TZBBMhFGqQPVUNeD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Does this mean we have a bug in cpu_hyp_init_context(), e.g. for a 
-hotplugged CPU and needs to be fixed for stable ?
+On Mon, Mar 25, 2024 at 09:23:18AM +0000, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-Eitherways,
+> > This was referring to the fact that currently when SVE is enabled access
+> > to the V registers as V registers via _CORE_REG() is blocked and they
+> > can only be accessed as a subset of the Z registers (see the check at
+> > the end of core_reg_size_from_offset() in guest.c).
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> But what behaviour do you expect from allowing such a write? Insert in
+> place? Or zero the upper bits of the vector, as per R_WKYLB? One is
+> wrong, and the other wrecks havoc on unsuspecting userspace.
 
-> + *
-> + * Yes, this is all totally trivial. Shoot me now.
-> + */
-> +#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
-> +#define host_data_ptr(f)	(&this_cpu_ptr(&kvm_host_data)->f)
-> +#else
-> +#define host_data_ptr(f)						\
-> +	(static_branch_unlikely(&kvm_protected_mode_initialized) ?	\
-> +	 &this_cpu_ptr(&kvm_host_data)->f :				\
-> +	 &this_cpu_ptr_hyp_sym(kvm_host_data)->f)
-> +#endif
-> +
->   static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
->   {
->   	/* The host's MPIDR is immutable, so let's set it up at boot time */
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 3dee5490eea9..a24287c3ba99 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1971,7 +1971,7 @@ static void cpu_set_hyp_vector(void)
->   
->   static void cpu_hyp_init_context(void)
->   {
-> -	kvm_init_host_cpu_context(&this_cpu_ptr_hyp_sym(kvm_host_data)->host_ctxt);
-> +	kvm_init_host_cpu_context(host_data_ptr(host_ctxt));
->   
->   	if (!is_kernel_in_hyp_mode())
->   		cpu_init_hyp_mode();
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-> index 961bbef104a6..eec0f8ccda56 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/debug-sr.h
-> @@ -135,7 +135,7 @@ static inline void __debug_switch_to_guest_common(struct kvm_vcpu *vcpu)
->   	if (!vcpu_get_flag(vcpu, DEBUG_DIRTY))
->   		return;
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   	guest_ctxt = &vcpu->arch.ctxt;
->   	host_dbg = &vcpu->arch.host_debug_state.regs;
->   	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-> @@ -154,7 +154,7 @@ static inline void __debug_switch_to_host_common(struct kvm_vcpu *vcpu)
->   	if (!vcpu_get_flag(vcpu, DEBUG_DIRTY))
->   		return;
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   	guest_ctxt = &vcpu->arch.ctxt;
->   	host_dbg = &vcpu->arch.host_debug_state.regs;
->   	guest_dbg = kern_hyp_va(vcpu->arch.debug_ptr);
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index e3fcf8c4d5b4..ae198b84ca01 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -155,7 +155,7 @@ static inline bool cpu_has_amu(void)
->   
->   static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
->   {
-> -	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
->   	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
->   
->   	CHECK_FGT_MASKS(HFGRTR_EL2);
-> @@ -191,7 +191,7 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
->   
->   static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
->   {
-> -	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	struct kvm_cpu_context *hctxt = host_data_ptr(host_ctxt);
->   	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
->   
->   	if (!cpus_have_final_cap(ARM64_HAS_FGT))
-> @@ -226,7 +226,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
->   
->   		write_sysreg(0, pmselr_el0);
->   
-> -		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +		hctxt = host_data_ptr(host_ctxt);
->   		ctxt_sys_reg(hctxt, PMUSERENR_EL0) = read_sysreg(pmuserenr_el0);
->   		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
->   		vcpu_set_flag(vcpu, PMUSERENR_ON_CPU);
-> @@ -260,7 +260,7 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
->   	if (kvm_arm_support_pmu_v3()) {
->   		struct kvm_cpu_context *hctxt;
->   
-> -		hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +		hctxt = host_data_ptr(host_ctxt);
->   		write_sysreg(ctxt_sys_reg(hctxt, PMUSERENR_EL0), pmuserenr_el0);
->   		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
->   	}
-> diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> index d57bcb6ab94d..dfe8fe0f7eaf 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> @@ -205,7 +205,7 @@ asmlinkage void __noreturn __kvm_host_psci_cpu_entry(bool is_cpu_on)
->   	struct psci_boot_args *boot_args;
->   	struct kvm_cpu_context *host_ctxt;
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   
->   	if (is_cpu_on)
->   		boot_args = this_cpu_ptr(&cpu_on_args);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-> index bc58d1b515af..ae00dfa80801 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-> @@ -257,8 +257,7 @@ static int fix_hyp_pgtable_refcnt(void)
->   
->   void __noreturn __pkvm_init_finalise(void)
->   {
-> -	struct kvm_host_data *host_data = this_cpu_ptr(&kvm_host_data);
-> -	struct kvm_cpu_context *host_ctxt = &host_data->host_ctxt;
-> +	struct kvm_cpu_context *host_ctxt = host_data_ptr(host_ctxt);
->   	unsigned long nr_pages, reserved_pages, pfn;
->   	int ret;
->   
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index c50f8459e4fc..544a419b9a39 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -264,7 +264,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->   		pmr_sync();
->   	}
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   	host_ctxt->__hyp_running_vcpu = vcpu;
->   	guest_ctxt = &vcpu->arch.ctxt;
->   
-> @@ -367,7 +367,7 @@ asmlinkage void __noreturn hyp_panic(void)
->   	struct kvm_cpu_context *host_ctxt;
->   	struct kvm_vcpu *vcpu;
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   	vcpu = host_ctxt->__hyp_running_vcpu;
->   
->   	if (vcpu) {
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index 1581df6aec87..14b7a6bc5909 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -221,7 +221,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
->   	struct kvm_cpu_context *guest_ctxt;
->   	u64 exit_code;
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   	host_ctxt->__hyp_running_vcpu = vcpu;
->   	guest_ctxt = &vcpu->arch.ctxt;
->   
-> @@ -306,7 +306,7 @@ static void __hyp_call_panic(u64 spsr, u64 elr, u64 par)
->   	struct kvm_cpu_context *host_ctxt;
->   	struct kvm_vcpu *vcpu;
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   	vcpu = host_ctxt->__hyp_running_vcpu;
->   
->   	__deactivate_traps(vcpu);
-> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> index a8b9ea496706..e12bd7d6d2dc 100644
-> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> @@ -67,7 +67,7 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
->   	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
->   	struct kvm_cpu_context *host_ctxt;
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   	__sysreg_save_user_state(host_ctxt);
->   
->   	/*
-> @@ -110,7 +110,7 @@ void __vcpu_put_switch_sysregs(struct kvm_vcpu *vcpu)
->   	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
->   	struct kvm_cpu_context *host_ctxt;
->   
-> -	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	host_ctxt = host_data_ptr(host_ctxt);
->   
->   	__sysreg_save_el1_state(guest_ctxt);
->   	__sysreg_save_user_state(guest_ctxt);
-> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-> index a243934c5568..329819806096 100644
-> --- a/arch/arm64/kvm/pmu.c
-> +++ b/arch/arm64/kvm/pmu.c
-> @@ -232,7 +232,7 @@ bool kvm_set_pmuserenr(u64 val)
->   	if (!vcpu || !vcpu_get_flag(vcpu, PMUSERENR_ON_CPU))
->   		return false;
->   
-> -	hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> +	hctxt = host_data_ptr(host_ctxt);
->   	ctxt_sys_reg(hctxt, PMUSERENR_EL0) = val;
->   	return true;
->   }
+It would have to be the former due to the ABI issue I think.
 
+> My take on this is that when a VM is S*E aware, only the writes to the
+> largest *enabled* registers should take place. This is similar to what
+> we do for FP/SIMD: we only allow writes to the V registers, and not to
+> Q, D, S, H or B, although that happens by construction. For S*E,
+> dropping the write on the floor (or return some error that userspace
+> will understand as benign) is the least bad option.
+
+OK, this does mean that in the case of a SME only guest we'll end up
+with registers not just changing size but appearing and disappearing
+depending on SVCR.SM.  It wasn't clear to me that this was a good idea
+=66rom an ABI point of view, it's a level up beyond the size changing
+thing and there's a tradeoff with the "model what the architecture does"
+model.
+
+--TZBBMhFGqQPVUNeD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmYBkNYACgkQJNaLcl1U
+h9ByJwf/U/oIV6AVIVoNAwLZzAornj6Pob8m36s2usB/NGn2FM/OBCqaAjCYBPPO
+G+h3JWn4Esv2fR2rPsmObyN4hUuYb9YORvoEzt7o37u9BPCwnk89KfIDBMxZBQ2c
+dhZ8wF69nYwATMf0JrVqPi7QkXAMoFy4kbaGVavuYksABFnqH8IfL4PpSrKulmJL
++IQ1x7rrPAPWiUpoH2bFBvlxHxETYrCQNNakQ6BiGvQ8FZsUvOBXkmFpX24tBhvm
+6TItHxSAIJIiHPXbuMcJ32CTCa/0BccsQBfOVoAAGX86x8voLVRMufVIImbnUYnJ
+/XjM6kyFpFkPyV2gx+HkNoDLyURW3g==
+=pUvj
+-----END PGP SIGNATURE-----
+
+--TZBBMhFGqQPVUNeD--
