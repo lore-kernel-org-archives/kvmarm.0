@@ -1,148 +1,135 @@
-Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD50752F97
-	for <kvmarm@lists.linux.dev>; Mon, 25 Mar 2024 20:12:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE4C06FE16
+	for <kvmarm@lists.linux.dev>; Mon, 25 Mar 2024 21:59:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711397528; cv=none; b=epLzIoQyeaz7IfA/UqSxE1JEeEdepLLH6E1cJse3mISMNzraFjgEpw7NzKbW3a8j58X8Ct9Nnqb19THZvuueV9NdMOa8Rvn5R0kNt0mgBIVsEdj6CZmdHuy1Qo19wpJllBAPdn6KzpHdSKx+V7gU/I3idLk7EV5dDNjuXwu/K60=
+	t=1711403946; cv=none; b=fhUnE3u5Wo6f9FBhh5AL8sBXqqHwnMbI1rc2INvvSFyiJ3FnpaLkl7oAuZLWnvxQ7pFHbdp0/j422K4ItuAfmI7NGsDnAeQWHEvvLlpOV9ikgRTPeIvCU9ieqPQ37TXFziB0TfMQ0SNf4f07yXQ876ilJWiquAUDUz5VL4kAoDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711397528; c=relaxed/simple;
-	bh=TS58LtBep+V3y21GNNI5AUCkkhJt90huKHWlMzlnjIk=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=ffbZAq5suExqzMt5MHfftyktiFAJkXMobKTyFxcCXowFeZsFNnnzwoZerpt0hV2XIZcNgiu7kXkFzBZTf8StNhfqLph2z5Z0MvtciX1Sz0zmXhkojipXQMUIzAWjSzF9VFceNJsLKjJviFxSjyXftpLuL/AtiXJC2y21C2GJgF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PYua8RSR; arc=none smtp.client-ip=209.85.166.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PYua8RSR"
-Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-7c8742bedd4so359501139f.1
-        for <kvmarm@lists.linux.dev>; Mon, 25 Mar 2024 13:12:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711397526; x=1712002326; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=T2hv5W0oxITVtYMp7qscmbVqdlTYLfE2MA0LIJYCuQE=;
-        b=PYua8RSRw8cQgdyNKBlrCsdxG9QrqVSICv26vd3XUxTQltPtGg3rGXzDYaMPCwI+97
-         7jX31fNWFN7leGTeoPLvADHV8TVAfYp0zsKnpcFQevuX3jWvYPo8D1H06q5PEvMqjIwI
-         mobFvedhMYXgDuWepLsTjwaeAjtcAd1b4gUY8z4gQlU5IC+gukNgbLHdwAs3QnYBzVv9
-         LDYwG29/fqOmHb4iWLbkpw5oKepK2yjvaCh1KORNJogwvJVtrUAQhwTEXczFepyUmMsJ
-         +fOOth7lCfSvJipETQeVMyDnZYoBEWAkajgObQ5aXzCx8fB4pBeucPlp4ohwTytYcemR
-         aWgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711397526; x=1712002326;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T2hv5W0oxITVtYMp7qscmbVqdlTYLfE2MA0LIJYCuQE=;
-        b=wYnzpfQkh/C3CIJuB31zsBj646mtE+GdFHuYGAGvmfNA3gDC148MkMRXgFOf5aUxzi
-         qkb4Nk4F4fE68uahjTh+V6c/V5AD4r3BhjFVPuRyhRchuepNrvgVMQ2yk6u6zP1NjlPG
-         XoylIizPCE/GM/06meaV8xgRCQfwtZ4SIGBWvUUuxegl19oe66KCI4wC3M8kIpDxetya
-         J69sCan8QgR3DLVAzKmcV64mtrol3TN0oBkWjxL3m7T+9m9cyC6I3shbsyki4ymGIRor
-         o9fKaCW7kXl1wqTB2tdC0gbx079WPxYzfSPBs2JZN58VC3i+i2datsxmsCV6BJ8ELq2m
-         Ythg==
-X-Forwarded-Encrypted: i=1; AJvYcCU2PQQ8rMKYUxGBfA0DHjpZDP1i1+I1BR2Y5n9bsK78ZaQGEhALbr6mM77myMJVbPppRtKZ6xBp7Q+1nTKC74U4Gy2O9YZj
-X-Gm-Message-State: AOJu0Yw2LqtgXiCWkXmAHLtaT488ywuTvYHHhCHGJYVdH0AUHjy0Nl0D
-	VAHE+Vy21cn/eBugUvYcZweSg1Uq/ZHF8JagqRGrELj1+XeeW+GsIfAZjIB61+fcn322Orv0LhY
-	cMEtZ8lVPanDgrbEkIwWl6Q==
-X-Google-Smtp-Source: AGHT+IFCjgD983eCqYT6Ydi/m/c3Lfnobnc1zjBwoflNgQEaRbyw02u5gMlW85KgYgJ6uWEVFXJUhDbaLvXhfNn8rQ==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6638:3724:b0:47c:125e:7f3e with
- SMTP id k36-20020a056638372400b0047c125e7f3emr304187jav.3.1711397526087; Mon,
- 25 Mar 2024 13:12:06 -0700 (PDT)
-Date: Mon, 25 Mar 2024 20:12:04 +0000
-In-Reply-To: <Zf2W-8duBlCk5LVm@google.com> (message from Quentin Perret on
- Fri, 22 Mar 2024 14:34:35 +0000)
+	s=arc-20240116; t=1711403946; c=relaxed/simple;
+	bh=Y4nc67WpaM6F71EsZCC2P9fcf1/dtUO8c5BEqGBiVNg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cJyM7Gxtfi1pte3KGMfDAP0DCgCmw2F+w8gN8XpJsWQVx4KdV1xm+SL8MGnt34ScUbjigQSidseIFWszsWsNpfDcT+PSEjeOA8Xllvvrq20qVx3zXuhr9tu/KCNXCFqvGT7nTmP1rqtgbyb9KMhGG96+y1YfpHmlzboYt93Njn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AE4D32F4;
+	Mon, 25 Mar 2024 14:59:36 -0700 (PDT)
+Received: from [10.57.72.244] (unknown [10.57.72.244])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ED6D93F694;
+	Mon, 25 Mar 2024 14:59:01 -0700 (PDT)
+Message-ID: <b7ca796b-8883-4048-b441-fd5c5bdc4d52@arm.com>
+Date: Mon, 25 Mar 2024 21:59:00 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsntjzlqax63.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v2] KVM: arm64: Add KVM_CAP to control WFx trapping
-From: Colton Lewis <coltonlewis@google.com>
-To: Quentin Perret <qperret@google.com>
-Cc: kvm@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, 
-	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, 
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org, 
-	bsegall@google.com, mgorman@suse.de, bristot@redhat.com, vschneid@redhat.com, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v3 08/18] arm64: efi: Improve device tree
+ discovery
+To: "Paluri, PavanKumar" <papaluri@amd.com>,
+ Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: alexandru.elisei@arm.com, eric.auger@redhat.com, shahuang@redhat.com,
+ pbonzini@redhat.com, thuth@redhat.com
+References: <20240305164623.379149-20-andrew.jones@linux.dev>
+ <20240305164623.379149-28-andrew.jones@linux.dev>
+ <39d0ed49-a6a2-c812-c4e7-444a460cb18b@amd.com>
+Content-Language: en-GB
+From: Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <39d0ed49-a6a2-c812-c4e7-444a460cb18b@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Thanks for the feedback.
+On 25/03/2024 16:24, Paluri, PavanKumar wrote:
+> Hi,
+> 
+> On 3/5/2024 10:46 AM, Andrew Jones wrote:
+>> Check the device tree GUID when the environment variable is missing,
+>> which allows directly loading the unit test with QEMU's '-kernel'
+>> command line parameter, which is much faster than putting the test
+>> in the EFI file system and then running it from the UEFI shell.
+>>
+>> Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+>> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+>> ---
+>>   lib/efi.c       | 19 ++++++++++++-------
+>>   lib/linux/efi.h |  2 ++
+>>   2 files changed, 14 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/lib/efi.c b/lib/efi.c
+>> index d94f0fa16fc0..4d1126b4a64e 100644
+>> --- a/lib/efi.c
+>> +++ b/lib/efi.c
+>> @@ -6,13 +6,13 @@
+>>    *
+>>    * SPDX-License-Identifier: LGPL-2.0-or-later
+>>    */
+>> -
+>> -#include "efi.h"
+>> +#include <libcflat.h>
+>>   #include <argv.h>
+>> -#include <stdlib.h>
+>>   #include <ctype.h>
+>> -#include <libcflat.h>
+>> +#include <stdlib.h>
+>>   #include <asm/setup.h>
+>> +#include "efi.h"
+>> +#include "libfdt/libfdt.h"
+>>   
+>>   /* From lib/argv.c */
+>>   extern int __argc, __envc;
+>> @@ -288,13 +288,18 @@ static void *efi_get_fdt(efi_handle_t handle, struct efi_loaded_image_64 *image)
+>>   	efi_char16_t var[] = ENV_VARNAME_DTBFILE;
+>>   	efi_char16_t *val;
+>>   	void *fdt = NULL;
+>> -	int fdtsize;
+>> +	int fdtsize = 0;
+>>   
+>>   	val = efi_get_var(handle, image, var);
+>> -	if (val)
+>> +	if (val) {
+>>   		efi_load_image(handle, image, &fdt, &fdtsize, val);
+>> +		if (fdtsize == 0)
+>> +			return NULL;
+>> +	} else if (efi_get_system_config_table(DEVICE_TREE_GUID, &fdt) != EFI_SUCCESS) {
+>> +		return NULL;
+>> +	}
+>>   
+>> -	return fdt;
+>> +	return fdt_check_header(fdt) == 0 ? fdt : NULL;
+> 
+> The call to fdt_check_header() seems to be breaking x86 based UEFI
+> tests. I have tested it with .x86/efi/run ./x86/smptest.efi
 
-Quentin Perret <qperret@google.com> writes:
+I am not familiar with the x86 boot process but I would have thought 
+that the efi shell variable "fdtfile" is not set and as a result val 
+would be NULL. Then efi_get_system_config_table(DEVICE_TREE_GUID, &fdt) 
+would return EFI_NOT_FOUND and efi_get_fdt would return NULL without 
+executing the line fdt_check_header(fdt).
 
-> On Friday 22 Mar 2024 at 14:24:35 (+0000), Quentin Perret wrote:
->> On Tuesday 19 Mar 2024 at 16:43:41 (+0000), Colton Lewis wrote:
->> > Add a KVM_CAP to control WFx (WFI or WFE) trapping based on scheduler
->> > runqueue depth. This is so they can be passed through if the runqueue
->> > is shallow or the CPU has support for direct interrupt injection. They
->> > may be always trapped by setting this value to 0. Technically this
->> > means traps will be cleared when the runqueue depth is 0, but that
->> > implies nothing is running anyway so there is no reason to care. The
->> > default value is 1 to preserve previous behavior before adding this
->> > option.
+Thanks,
 
->> I recently discovered that this was enabled by default, but it's not
->> obvious to me everyone will want this enabled, so I'm in favour of
->> figuring out a way to turn it off (in fact we might want to make this
->> feature opt in as the status quo used to be to always trap).
+Nikos
 
-Setting the introduced threshold to zero will cause it to trap whenever
-something is running. Is there a problem with doing it that way?
-
-I'd also be interested to get more input before changing the current
-default behavior.
-
-
->> There are a few potential issues I see with having this enabled:
-
->>   - a lone vcpu thread on a CPU will completely screw up the host
->>     scheduler's load tracking metrics if the vCPU actually spends a
->>     significant amount of time in WFI (the PELT signal will no longer
->>     be a good proxy for "how much CPU time does this task need");
-
->>   - the scheduler's decision will impact massively the behaviour of the
->>     vcpu task itself. Co-scheduling a task with a vcpu task (or not) will
->>     impact massively the perceived behaviour of the vcpu task in a way
->>     that is entirely unpredictable to the scheduler;
-
->>   - while the above problems might be OK for some users, I don't think
->>     this will always be true, e.g. when running on big.LITTLE systems the
->>     above sounds nightmare-ish;
-
->>   - the guest spending long periods of time in WFI prevents the host from
->>     being able to enter deeper idle states, which will impact power very
->>     negatively;
-
->> And probably a whole bunch of other things.
-
->> > Think about his option as a threshold. The instruction will be trapped
->> > if the runqueue depth is higher than the threshold.
-
->> So talking about the exact interface, I'm not sure exposing this to
->> userspace is really appropriate. The current rq depth is next to
->> impossible for userspace to control well.
-
-Using runqueue depth is going off of a suggestion from Oliver [1], who I've
-also talked to internally at Google a few times about this.
-
-But hearing your comment makes me lean more towards having some
-enumeration of behaviors like TRAP_ALWAYS, TRAP_NEVER,
-TRAP_IF_MULTIPLE_TASKS.
-
->> My gut feeling tells me we might want to gate all of this on
->> PREEMPT_FULL instead, since PREEMPT_FULL is pretty much a way to say
->> "I'm willing to give up scheduler tracking accuracy to gain throughput
->> when I've got a task running alone on a CPU". Thoughts?
-
-> And obviously I meant s/PREEMPT_FULL/NOHZ_FULL, but hopefully that was
-> clear :-)
-
-Sounds good to me but I've not touched anything scheduling related before.
-
-[1] https://lore.kernel.org/kvmarm/Zbgx8hZgWCmtzMjH@linux.dev/
+> 
+> Thanks,
+> Pavan
+>>   }
+>>   
+>>   efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
+>> diff --git a/lib/linux/efi.h b/lib/linux/efi.h
+>> index 410f0b1a0da1..92d798f79767 100644
+>> --- a/lib/linux/efi.h
+>> +++ b/lib/linux/efi.h
+>> @@ -66,6 +66,8 @@ typedef guid_t efi_guid_t;
+>>   #define ACPI_TABLE_GUID EFI_GUID(0xeb9d2d30, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d)
+>>   #define ACPI_20_TABLE_GUID EFI_GUID(0x8868e871, 0xe4f1, 0x11d3,  0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81)
+>>   
+>> +#define DEVICE_TREE_GUID EFI_GUID(0xb1b621d5, 0xf19c, 0x41a5,  0x83, 0x0b, 0xd9, 0x15, 0x2c, 0x69, 0xaa, 0xe0)
+>> +
+>>   #define LOADED_IMAGE_PROTOCOL_GUID EFI_GUID(0x5b1b31a1, 0x9562, 0x11d2,  0x8e, 0x3f, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b)
+>>   
+>>   typedef struct {
