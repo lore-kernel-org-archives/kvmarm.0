@@ -1,71 +1,106 @@
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC2876041
-	for <kvmarm@lists.linux.dev>; Tue, 26 Mar 2024 13:48:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B15076022
+	for <kvmarm@lists.linux.dev>; Tue, 26 Mar 2024 13:48:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711460910; cv=none; b=Z9tR+AJZ2RVVJinrrg/5GpaDprAHLS4FiwKh+GHymEkK0/5LkpG7HG+HQ/0r3wdq9dVJI3V3manRbMdfOxZ1muEruc/Njz8fjGq6XYvYc4GIA4f8ymiyiE39TWCxkQ+5ZmpqjpSEF7NPVp8BX/mCy27EQ9QKTz4RBkMn7TsD5wk=
+	t=1711460933; cv=none; b=BunjtFTcju9JH0TBYrSfsAy+iv1puPt40wjGEPGl+LzSYWApVTJEe7f2PeFdjRyfkCeya+B4z+AW2OoZdZ5m9+NM5Iot0T7EkdR6nHn/v6J1VMTGrYb+DarfFhRy33x/Zg5wF3dRFtLxmaUO04JOmxSyHMkMCG/RCwoAqXWrkPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711460910; c=relaxed/simple;
-	bh=mxHCqqVJyWTLNThPMWwO7HztrmqJPlXHx8L8vaa7NCA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VQtGDQzjWbRLZjrXMqwElkY6EFechFKoVNbix5H79QhfsHtezfslXPquTv+otzrk8N34Hlv5mtRUP/4h9o24ukXqr0MfWMyyeAD48I4lk1nnSLhJKJ1G2KAmIz578PcBt7A56xZNgW5uPUNs0seFJf88WBbUUGTsviK0FSGN3Xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=viyhFYm6; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="viyhFYm6"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1711460905;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L2VGWTteO0+TFmvwaciLninPLvbIJwtSZb4p8Z0MFh8=;
-	b=viyhFYm6tjgcEVelNULpEePyfDyTR2VG+HQspC2ZbXtNyBItjsB9JXu5+iz5u4+jkgOFVO
-	oJgBFF/VDkY44qY0tPxelVkoptXq0Rw5qKViUIai9VlJwsjDM+M8Q7L/qbRLZxyKIdl2y7
-	UzsXjJzh9b0RVv5nrhty+MD0LlP6B0Y=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: maz@kernel.org,
-	Wujie Duan <wjduan@linx-info.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev
-Subject: Re: (subset) [PATCH] KVM: arm64: Change back kvm fault condition to translation
-Date: Tue, 26 Mar 2024 06:48:05 -0700
-Message-Id: <171146083370.371832.3901832143255309218.b4-ty@linux.dev>
-In-Reply-To: <20240318100249.220897-1-wjduan@linx-info.com>
-References: <20240318100249.220897-1-wjduan@linx-info.com>
+	s=arc-20240116; t=1711460933; c=relaxed/simple;
+	bh=/reoyI/6hKkDFudg/aUgFGgBoyW1HH5oaMhs+HJaptg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LZJmfoI4Mz94h+2MiyCxfe0Xq98+KjQ5naOuWd9s63tozaZMjkdLsUShbccpaUFTepj97JXt5HJnhTtuhCKhwCsU+f4bWKYaMqCJktg8XOumQ9/8FTiTRV8EGDUPPcjoR6ahAgQ6F/SQl9itDzE2KTCglB9sPJXeA3XQO03X0Ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 42F6C2F4;
+	Tue, 26 Mar 2024 06:49:24 -0700 (PDT)
+Received: from [10.1.29.179] (XHFQ2J9959.cambridge.arm.com [10.1.29.179])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8E5303F64C;
+	Tue, 26 Mar 2024 06:48:48 -0700 (PDT)
+Message-ID: <b3177895-5ed0-4f1a-bede-4d0c87935bbc@arm.com>
+Date: Tue, 26 Mar 2024 13:48:46 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] KVM: arm64: Use TLBI_TTL_UNKNOWN in
+ __kvm_tlb_flush_vmid_range()
+Content-Language: en-GB
+To: Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev
+Cc: linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Gavin Shan <gshan@redhat.com>,
+ Marc Zyngier <maz@kernel.org>, Mostafa Saleh <smostafa@google.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Quentin Perret <qperret@google.com>,
+ Raghavendra Rao Ananta <rananta@google.com>,
+ Shaoqin Huang <shahuang@redhat.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+References: <20240325185158.8565-1-will@kernel.org>
+ <20240325185158.8565-4-will@kernel.org>
+From: Ryan Roberts <ryan.roberts@arm.com>
+In-Reply-To: <20240325185158.8565-4-will@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 25/03/2024 18:51, Will Deacon wrote:
+> Commit c910f2b65518 ("arm64/mm: Update tlb invalidation routines for
+> FEAT_LPA2") updated the __tlbi_level() macro to take the target level
+> as an argument, with TLBI_TTL_UNKNOWN (rather than 0) indicating that
+> the caller cannot provide level information. Unfortunately, the two
+> implementations of __kvm_tlb_flush_vmid_range() were not updated and so
+> now ask for an level 0 invalidation if FEAT_LPA2 is implemented.
 
-On Mon, 18 Mar 2024 18:02:49 +0800, Wujie Duan wrote:
-> KVM: arm64: Condition should be esr_fsc_is_translation_fault
+Ouch, sorry about this! I remember rebasing my change onto the KVM tlbi range
+changes and having a few conflicts. Obviously I didn't do a good enough job of
+reviewing the result and missed this new user.
+
 > 
-> In commit '11e5ea5242e3 ("KVM: arm64: Use helpers to
->         classify exception types reported via ESR")'
-> the KVM code was optimized, but the code logic was incorrectly modified.
-> Therefore, it is being corrected.
+> Fix the problem by passing TLBI_TTL_UNKNOWN instead of 0 as the level
+> argument to __flush_s2_tlb_range_op() in __kvm_tlb_flush_vmid_range().
 > 
-> [...]
+> Cc: Ryan Roberts <ryan.roberts@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Fixes: c910f2b65518 ("arm64/mm: Update tlb invalidation routines for FEAT_LPA2")
+> Signed-off-by: Will Deacon <will@kernel.org>
 
-Applied to kvmarm/fixes, thanks!
+Reviewed-by: Ryan Roberts <ryan.roberts@arm.com>
 
-[1/1] KVM: arm64: Change back kvm fault condition to translation
-	f5fe0adeed6019df495497a64cb57d563ead2296
+> ---
+>  arch/arm64/kvm/hyp/nvhe/tlb.c | 3 ++-
+>  arch/arm64/kvm/hyp/vhe/tlb.c  | 3 ++-
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> index a60fb13e2192..2fc68da4036d 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> @@ -154,7 +154,8 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+>  	/* Switch to requested VMID */
+>  	__tlb_switch_to_guest(mmu, &cxt, false);
+>  
+> -	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride, 0);
+> +	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride,
+> +				TLBI_TTL_UNKNOWN);
+>  
+>  	dsb(ish);
+>  	__tlbi(vmalle1is);
+> diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
+> index b32e2940df7d..1a60b95381e8 100644
+> --- a/arch/arm64/kvm/hyp/vhe/tlb.c
+> +++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+> @@ -171,7 +171,8 @@ void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+>  	/* Switch to requested VMID */
+>  	__tlb_switch_to_guest(mmu, &cxt);
+>  
+> -	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride, 0);
+> +	__flush_s2_tlb_range_op(ipas2e1is, start, pages, stride,
+> +				TLBI_TTL_UNKNOWN);
+>  
+>  	dsb(ish);
+>  	__tlbi(vmalle1is);
 
--- 
-Best,
-Oliver
