@@ -1,145 +1,106 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39057129A71
-	for <kvmarm@lists.linux.dev>; Tue, 26 Mar 2024 03:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D9421353
+	for <kvmarm@lists.linux.dev>; Tue, 26 Mar 2024 08:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711424245; cv=none; b=CzrCipX146cOsrVt101kogS2LKVb4nRKAPbRHDbkk/XwNOT7q3U4ZtuXZEgNJibvVunScY9OYMnJ5ZVUyLGwzwt/feURXQ9dEn8hMelPYT6Iip73fqG8t/pAJt/d9gXTsgmSwVDSgTAtKQC+yFIbzKtVyaPyto7nTqLW8CV+My8=
+	t=1711442067; cv=none; b=efeaj0cdzDr3qsc1+Hg2SFH/GfDYlmiYgdqwOYVNzw9hjGMcpaGBzyRWYLrbn+kHw9BbFWNcTVdAGuARMJxj2VC3JNLyzYNX2EpJGbNhyidJfsQZHuiJcR4bzCi7ppyuMxvh14pe/3y7M/RKqOLLogPMXOIPHI9rIy38VAi8SmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711424245; c=relaxed/simple;
-	bh=MS5IwQmQqsaEA9p/vcGU+GsLWuP/9Xajs6oOmUaLEE8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rJp7Fn6XOxpSJg7ll0H6Qt5Xr0O/rA0uVYUHGaBN5qbFZJmlxO+xybGk8j9dTxTusEj6JdzWaR23rRufHje6T0PtJ5sS7sTmD6EDO/aLvvEWmQeDWLj4nr0Dl90PNI5+sYwKP8vsTS0BFqSnozU0Vv4X8Jh+pBOVfG/dIYs97Ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bAvhYnQU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1711442067; c=relaxed/simple;
+	bh=flxk4m6JSt3pxxcIddnfswfAnLGdcwgqkAa4FWF+B7I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FtWVOqIqnsX0avX+TttNhLnC+7tVvIuD6tiGR9dsB++DzVTeiAuEVhNf+pz3NKvM7IH+5OZZqV2+gkSpv2htfj6/wxipxbySqBdUW7Nqcin9EKNB1sIKQ2ZvOmwrcAcz9PYLwROjzQKOVZslaFKlbSxdavZItp8jxRwFX7FeInA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=USXG375V; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bAvhYnQU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711424242;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="USXG375V"
+Date: Tue, 26 Mar 2024 01:34:17 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1711442062;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=oG2sCvjeDxaEtg9ntHQJT0QEXacOPLyS1NEK27r9on0=;
-	b=bAvhYnQU2Dks1/x00UwZlduapgoq8JUHWz9hzyLsUaxkMdc3zg5huqOUCW0faDcR+MODa4
-	xZfMpzfmhGQido9JerF6ixa1mGu2jwuI9iK0C4491u/aE1LL3bfl72FkoCQn4b+5axrLMk
-	XbhdibVjlua5v3ykxwv2ZdvvPfd3b7E=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-564-7x3Mwbx-P7mSl5eCsRyhgQ-1; Mon,
- 25 Mar 2024 23:37:16 -0400
-X-MC-Unique: 7x3Mwbx-P7mSl5eCsRyhgQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BDA931C05152;
-	Tue, 26 Mar 2024 03:37:15 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7B9F6492BD0;
-	Tue, 26 Mar 2024 03:37:15 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>,
-	kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	James Morse <james.morse@arm.com>,
+	bh=a5Qd+NuqhOMxkePHM7IZmqHPBd6oxS5Xxd9L3bfHHfY=;
+	b=USXG375Vv8L3dUSSTZ8DW/Q1PMHqssfPfdtzbygRL9hSHys72/eP0YL+TFLqhz6A43lvcq
+	uAqURNDGbwpwmo5LZtDqCKF6Nv3cWJhCoMDGjHe/s64oMXxkR6tcuKROQ67IwGS9wzv8aF
+	lrAQlYLR4QIScvxWKjozlZrBVC/QTxc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Gavin Shan <gshan@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	Mostafa Saleh <smostafa@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v6 3/3] KVM: selftests: aarch64: Add invalid filter test in pmu_event_filter_test
-Date: Mon, 25 Mar 2024 23:37:02 -0400
-Message-Id: <20240326033706.117189-4-shahuang@redhat.com>
-In-Reply-To: <20240326033706.117189-1-shahuang@redhat.com>
-References: <20240326033706.117189-1-shahuang@redhat.com>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: Don't defer TLB invalidation when
+ zapping table entries
+Message-ID: <ZgKIides0YAA2j5Y@linux.dev>
+References: <20240325185158.8565-1-will@kernel.org>
+ <20240325185158.8565-2-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240325185158.8565-2-will@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-Add the invalid filter test which sets the filter beyond the event
-space and sets the invalid action to double check if the
-KVM_ARM_VCPU_PMU_V3_FILTER will return the expected error.
+Hey Will,
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
- .../kvm/aarch64/pmu_event_filter_test.c       | 38 +++++++++++++++++++
- 1 file changed, 38 insertions(+)
+On Mon, Mar 25, 2024 at 06:51:56PM +0000, Will Deacon wrote:
+> Commit 7657ea920c54 ("KVM: arm64: Use TLBI range-based instructions for
+> unmap") introduced deferred TLB invalidation for the stage-2 page-table
+> so that range-based invalidation can be used for the accumulated
+> addresses. This works fine if the structure of the page-tables remains
+> unchanged, but if entire tables are zapped and subsequently freed then
+> we transiently leave the hardware page-table walker with a reference
+> to freed memory thanks to the translation walk caches.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-index 972384e81067..1abcd9ab325e 100644
---- a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-@@ -8,6 +8,7 @@
-  * This test checks if the guest only see the limited pmu event that userspace
-  * sets, if the guest can use those events which user allow, and if the guest
-  * can't use those events which user deny.
-+ * It also checks that setting invalid filter ranges return the expected error.
-  * This test runs only when KVM_CAP_ARM_PMU_V3, KVM_ARM_VCPU_PMU_V3_FILTER
-  * is supported on the host.
-  */
-@@ -273,6 +274,41 @@ static void run_tests(void)
- 		run_test(t);
- }
- 
-+static void test_invalid_filter(void)
-+{
-+	struct kvm_pmu_event_filter invalid;
-+	int ret;
-+
-+	pr_info("Test: test_invalid_filter\n");
-+
-+	memset(&vpmu_vm, 0, sizeof(vpmu_vm));
-+
-+	vpmu_vm.vm = vm_create(1);
-+	vpmu_vm.vcpu = vm_vcpu_add_with_vpmu(vpmu_vm.vm, 0, guest_code);
-+	vpmu_vm.gic_fd = vgic_v3_setup(vpmu_vm.vm, 1, 64,
-+					GICD_BASE_GPA, GICR_BASE_GPA);
-+	__TEST_REQUIRE(vpmu_vm.gic_fd >= 0,
-+		       "Failed to create vgic-v3, skipping");
-+
-+	/* The max event number is (1 << 16), set a range largeer than it. */
-+	invalid = __DEFINE_FILTER(BIT(15), BIT(15) + 1, 0);
-+	ret = __kvm_device_attr_set(vpmu_vm.vcpu->fd, KVM_ARM_VCPU_PMU_V3_CTRL,
-+				    KVM_ARM_VCPU_PMU_V3_FILTER, &invalid);
-+	TEST_ASSERT(ret && errno == EINVAL, "Set Invalid filter range "
-+		    "ret = %d, errno = %d (expected ret = -1, errno = EINVAL)",
-+		    ret, errno);
-+
-+	/* Set the Invalid action. */
-+	invalid = __DEFINE_FILTER(0, 1, 3);
-+	ret = __kvm_device_attr_set(vpmu_vm.vcpu->fd, KVM_ARM_VCPU_PMU_V3_CTRL,
-+				    KVM_ARM_VCPU_PMU_V3_FILTER, &invalid);
-+	TEST_ASSERT(ret && errno == EINVAL, "Set Invalid filter action "
-+		    "ret = %d, errno = %d (expected ret = -1, errno = EINVAL)",
-+		    ret, errno);
-+
-+	destroy_vpmu_vm();
-+}
-+
- static bool kvm_pmu_support_events(void)
- {
- 	create_vpmu_vm(guest_get_pmceid);
-@@ -295,4 +331,6 @@ int main(void)
- 	TEST_REQUIRE(kvm_pmu_support_events());
- 
- 	run_tests();
-+
-+	test_invalid_filter();
- }
+Yikes! Well spotted. This is rather unfortunate because the unmap path
+has been found to be a massive pain w/o aggregating invalidations. But
+sacrificing correctness in the name of performance... No thanks :)
+
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 3fae5830f8d2..de0b667ba296 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -896,9 +896,11 @@ static void stage2_unmap_put_pte(const struct kvm_pgtable_visit_ctx *ctx,
+>  	if (kvm_pte_valid(ctx->old)) {
+>  		kvm_clear_pte(ctx->ptep);
+>  
+> -		if (!stage2_unmap_defer_tlb_flush(pgt))
+> +		if (!stage2_unmap_defer_tlb_flush(pgt) ||
+> +		    kvm_pte_table(ctx->old, ctx->level)) {
+>  			kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
+>  					ctx->addr, ctx->level);
+> +		}
+
+I'm not sure this is correct, though. My understanding of TTL is that
+we're telling hardware where the *leaf* entry we're invalidating is
+found, however here we know that the addressed PTE is a table entry.
+
+So maybe in the case of a table PTE this invalidation should
+TLBI_TTL_UNKNOWN.
+
+>  	}
+>  
+>  	mm_ops->put_page(ctx->ptep);
+
+At least for the 'normal' MMU where we use RCU, this could be changed to
+->free_unlinked_table() which would defer the freeing of memory til
+after the invalidation completes. But that still hoses pKVM's stage-2
+MMU freeing in-place.
+
 -- 
-2.40.1
-
+Thanks,
+Oliver
