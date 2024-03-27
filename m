@@ -1,55 +1,55 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E2A14EC59
-	for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 17:36:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72496F4E2
+	for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 17:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711560993; cv=none; b=EMqwUk3QhOL9XT8pJhT+zqkxJ7Pkv+3ywO6WzFSz4Jy41DCtfU9CO1tuFwosc702CSzp0gUAlOQj3aLe//9Q5gX1Eiv8jQO9Clz0cdYsj3g0CRomdLuWt2sO6hQpCWR3FX4RojKueV/BqVaRyAnUiJKxElSbTEMiDmnr6UIDgts=
+	t=1711560995; cv=none; b=Pc96RF9UM8n0k2SQw0BO0kN3g+rfUE89lZGJaJWJcRFJWqtdW9tuGEL1vs+VOeQwwUCf22+6xF34cydR0qt9gjObl/+fI/UwqjNn4JIYw6JRowAiI413P5bgZrm14nj1OtNIXEzM0eZdO3xG1BWQSBIygwQzWM6eeINmqOjnN9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711560993; c=relaxed/simple;
-	bh=TWw8GSHpbvCQEeG5Vl1VuWj9Nqtl/FyXDE95CmRt6LI=;
+	s=arc-20240116; t=1711560995; c=relaxed/simple;
+	bh=txYqIpe+xjqkIIi9KrCQ8EbvesNldBg2s6QDhLiJvPY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AZE0OH3LxtBOSoXqfkLclrPXgWluDm80UFtFky4q01kS0NTK8UZ1lmL+mMO83lM32Rs2ybOiz0TgXNmIPE1KVAJWa3bYWMuJFMPV8c/82uK3WqwvN37AWnqnXTzwBvsNYzvNvA1KNKIAfPGh//L08N9DVofu3k7CxcLD7eN9yXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eUPHbfS5; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=PQbTnf3d2NGh2N2vcLitCCQUOtmGA22pAupJtNAekIbUIeX/o0G22oqQZHef/nvpYycIYUX6X7Ws+OZdtBIP0lntUUG2jo8ONBw8I8MLy6s2cJ/ZLPkqfKbhYYU5HxCpDqPvczbX9Ppmye9Kf8GqYW706/rEb9PSPhAXl85scGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Pd48AT74; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eUPHbfS5"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dced704f17cso71403276.1
-        for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 10:36:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Pd48AT74"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-33ed234bcb1so587083f8f.0
+        for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 10:36:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711560989; x=1712165789; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1711560992; x=1712165792; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S2ox9frODKq27/FQSYGQW7YaTxoEZALwWxso0rx8Zp0=;
-        b=eUPHbfS58PzfzPs7+XXo7x/mdXdW7vAMs8wTBMrWXTwhhRg2oOUCiHoqklxmd+evt0
-         JfOKo8zxUnIPq8dZJNK++2bURRq0Br64YF9+d6Aws836KpYRDtvo9d1TppbU1G4vB0sw
-         DwZIEVZLDMqBLfpZa2mRpCYVSEQPfSPPAvi8PicycEHoWJKiZA2CEfkDa6/SHZZPKPX4
-         0kxB5IgpIx+WX07ir0B6WuRF2C/Cmk2ME8gtMbrtFR4U4GwVmoVQlEcVdlEfLwop9E2r
-         ZDiTZuit540YqO2RYBc9WlJ/QRV4fSNNE+6mmGbkgKvKKHlxZ4GNAOJcIp8T8N7wizbW
-         AD3g==
+        bh=bU4K1p9xUOoNjPUUGzz0OZdRCG9DRm+TJoM/2iBuq54=;
+        b=Pd48AT74OdNMlsDaS7VLN3/LIoR4HwF9Y3sExmETvKOAjvau+sSY3YbT6oQBtVR442
+         2UJtxAJIqbYNol0FOT0QNLPUcGwGV2Tr2Q3qbvzMRNMWCkHU+2Mehdn8+b8OzBwbQXyC
+         zpSH8dcSRWk95ryjzBtm/faZ5qSVmM7DzX7DmgoUZlug47gpbOwg5+bKH2GOIWvvbWa9
+         k3eA8Bm7HrL+LBxi4nTIdGBx1wcVhNP9f0323Exzip1S9cfrJf1v30gGVSHogq3JSd46
+         S/pGowmYSj6rKKY4C/3VjI/gMN8jfIC/MN1grFRUsuHNXZ9w+GtK70SbjcZozbC77hFb
+         ME8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711560989; x=1712165789;
+        d=1e100.net; s=20230601; t=1711560992; x=1712165792;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S2ox9frODKq27/FQSYGQW7YaTxoEZALwWxso0rx8Zp0=;
-        b=n8efHDguFXLawhhGy86kc5+NOoG3hWRGUhWQj74vVYgKhnGqGrHSFhrpqjVOxPnAs4
-         3jF8C0VTvIJrMPCIWRRthJxQGXLHj8pFbsXjqlLMqTQzwlbgI03l71U/MWKKfmBTajps
-         toNSmeP0MwQ+jaIN0oEWvPm/TSDPwSdwXtqnSJieNLpnzcRIN6t+GWGB2BCCNR4avgSv
-         DWZmetw4m5reaRZt5btGj9eY17Gv61FnR/TUqumUtlT9pL6SQ6A1YEcgz0buarahyXl4
-         rbT3RVT7PHDLZsOLIpQlqtvqVOvpkxkT9Vj6LTP6ehLcBZveNKO2zXZdOKcGSGi+tJuS
-         hV5Q==
-X-Gm-Message-State: AOJu0YwDO8XDqJgdbcI9KQ3SMoRAzylvsVdgMb9q4fX1nzbaFDjcOM7L
-	cmXxAB8SY066E65p9Fxmqg51ElNOcKmjD/t9rP5C7ZY02xEgNC3uOzhiBDxgNxARf9I4gY/ogqw
-	qpVbFiQ2KTTDPmrsZfhC5cQUY66PD2sFM+L4xloQFHhDjlSPFZSbwu1Nuwi13r+mvr6dt49uUBa
-	C9bdAzJ7sAxb5hMEkWuFsWB/Eg5Nc=
-X-Google-Smtp-Source: AGHT+IFw/wM0050s76hBQvrPUVvQW8rI0JT60RWVVIRlEGMx8b1iF5k0DYCPsycO8UnBylnRLnmaA5YrEQ==
+        bh=bU4K1p9xUOoNjPUUGzz0OZdRCG9DRm+TJoM/2iBuq54=;
+        b=VWDwkrSb+4bt/2c1SNziQgJBXPR6E0f/Z67DoadtD24CemspVw/fqxCevAiewND9z/
+         xaZ2Vxh7BVmmTGmK/HWCBAghfmq36CRF3MxINafOHWnLghsZw3K9dpEQRgdoLWnopRIK
+         DNovD5ykXVOAplCFHD4dhEClj838ODJX0r04sz3F1fCmCQ/wosFgbABcwKsjCGevzrot
+         YcvwYm5RH1z5fRbr9KIjJF04boGR0tDcKR4lSKhw+9LgIrAZ57QjNdWU3Wp1wYtg/V8a
+         CkRF9MPGHB0WpQMO+R1CebDDKxCWlpFd5QfooIlWnbT4Nv1oujnBBMyM7PZeqgVyk2gY
+         o+nA==
+X-Gm-Message-State: AOJu0YwNFEAz4jrgnfkqAwI7PI8d2G+DwRiNy81Xb74QbhJxFMgfl+Yi
+	Y07X1EvQroJZdbx1pYqg10JBwY6MLhMKgshFNTsS1uOMx0m4eEGgNiXV1sjvlHSoTEZj6xg7dIQ
+	LgneKXpNRiQLzPw8qipf54xCC2G9Bg15MjH0LOgn6v9EkGcHscSfzJLmJ4yNm1fnxiOm7zIF6eM
+	Tu4bya/hVlcjkqrpSaIhEbJe5UT5A=
+X-Google-Smtp-Source: AGHT+IHspt94IoyEKVEO8TzMg7kIe+GmYNHczLzeh66L3wSPvZDjS5OoGR+HzzHUZEzRWmhFran2CDY+Xg==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:2311:b0:dbe:d0a9:2be8 with SMTP id
- do17-20020a056902231100b00dbed0a92be8mr59891ybb.0.1711560989531; Wed, 27 Mar
- 2024 10:36:29 -0700 (PDT)
-Date: Wed, 27 Mar 2024 17:35:11 +0000
+ (user=tabba job=sendgmr) by 2002:adf:b1c9:0:b0:341:a63b:64fe with SMTP id
+ r9-20020adfb1c9000000b00341a63b64femr621wra.1.1711560991677; Wed, 27 Mar 2024
+ 10:36:31 -0700 (PDT)
+Date: Wed, 27 Mar 2024 17:35:12 +0000
 In-Reply-To: <20240327173531.1379685-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240327173531.1379685-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240327173531.1379685-25-tabba@google.com>
-Subject: [PATCH v1 24/44] KVM: arm64: Do not use the hva in kvm_handle_guest_abort()
+Message-ID: <20240327173531.1379685-26-tabba@google.com>
+Subject: [PATCH v1 25/44] KVM: arm64: Introduce hyp_rwlock_t
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -70,94 +70,153 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-The hva isn't needed by kvm_handle_guest_abort(), but is used as
-a proxy for determining whether there's an error or a write
-fault. Use the newly introduced gfn_to_hva_memslot_prot() to
-determine errors or write faults.
+From: Will Deacon <will@kernel.org>
 
-No functional change intended.
+Introduce a simple counter-based rwlock for EL2 which can reduce locking
+contention on read-mostly data structures when compared to a spinlock.
 
+Signed-off-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/mmu.c | 17 +++++++----------
- 1 file changed, 7 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/hyp/include/nvhe/rwlock.h | 129 +++++++++++++++++++++++
+ 1 file changed, 129 insertions(+)
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/rwlock.h
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 3afc42d8833e..b35a20901794 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1375,7 +1375,7 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
- }
- 
- static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
--			  struct kvm_memory_slot *memslot, unsigned long hva,
-+			  struct kvm_memory_slot *memslot,
- 			  bool fault_is_perm)
- {
- 	int ret = 0;
-@@ -1387,12 +1387,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
- 	struct vm_area_struct *vma;
- 	short vma_shift;
--	gfn_t gfn;
-+	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
- 	kvm_pfn_t pfn;
- 	bool logging_active = memslot_is_logging(memslot);
- 	long vma_pagesize, fault_granule;
- 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
- 	struct kvm_pgtable *pgt;
-+	unsigned long hva = gfn_to_hva_memslot_prot(memslot, gfn, NULL);
- 
- 	if (fault_is_perm)
- 		fault_granule = kvm_vcpu_trap_get_perm_fault_granule(vcpu);
-@@ -1469,7 +1470,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
- 		fault_ipa &= ~(vma_pagesize - 1);
- 
--	gfn = fault_ipa >> PAGE_SHIFT;
- 	mte_allowed = kvm_vma_mte_allowed(vma);
- 
- 	vfio_allow_any_uc = vma->vm_flags & VM_ALLOW_ANY_UNCACHED;
-@@ -1629,7 +1629,6 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 	unsigned long esr;
- 	phys_addr_t fault_ipa;
- 	struct kvm_memory_slot *memslot;
--	unsigned long hva;
- 	bool is_iabt, write_fault, writable;
- 	gfn_t gfn;
- 	int ret, idx;
-@@ -1687,10 +1686,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 	idx = srcu_read_lock(&vcpu->kvm->srcu);
- 
- 	gfn = fault_ipa >> PAGE_SHIFT;
--	memslot = gfn_to_memslot(vcpu->kvm, gfn);
--	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
-+	memslot = gfn_to_memslot_prot(vcpu->kvm, gfn, &writable);
- 	write_fault = kvm_is_write_fault(vcpu);
--	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
-+	if (!memslot || (write_fault && !writable)) {
- 		/*
- 		 * The guest has put either its instructions or its page-tables
- 		 * somewhere it shouldn't have. Userspace won't be able to do
-@@ -1718,7 +1716,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 		 * So let's assume that the guest is just being
- 		 * cautious, and skip the instruction.
- 		 */
--		if (kvm_is_error_hva(hva) && kvm_vcpu_dabt_is_cm(vcpu)) {
-+		if (!memslot && kvm_vcpu_dabt_is_cm(vcpu)) {
- 			kvm_incr_pc(vcpu);
- 			ret = 1;
- 			goto out_unlock;
-@@ -1744,8 +1742,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 		goto out_unlock;
- 	}
- 
--	ret = user_mem_abort(vcpu, fault_ipa, memslot, hva,
--			     esr_fsc_is_permission_fault(esr));
-+	ret = user_mem_abort(vcpu, fault_ipa, memslot, esr_fsc_is_permission_fault(esr));
- 	if (ret == 0)
- 		ret = 1;
- out:
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/rwlock.h b/arch/arm64/kvm/hyp/include/nvhe/rwlock.h
+new file mode 100644
+index 000000000000..365084497e59
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/include/nvhe/rwlock.h
+@@ -0,0 +1,129 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * A stand-alone rwlock implementation for use by the non-VHE KVM
++ * hypervisor code running at EL2. This is *not* a fair lock and is
++ * likely to scale very badly under contention.
++ *
++ * Copyright (C) 2022 Google LLC
++ * Author: Will Deacon <will@kernel.org>
++ *
++ * Heavily based on the implementation removed by 087133ac9076 which was:
++ * Copyright (C) 2012 ARM Ltd.
++ */
++
++#ifndef __ARM64_KVM_NVHE_RWLOCK_H__
++#define __ARM64_KVM_NVHE_RWLOCK_H__
++
++#include <linux/bits.h>
++
++typedef struct {
++	u32	__val;
++} hyp_rwlock_t;
++
++#define __HYP_RWLOCK_INITIALIZER \
++	{ .__val = 0 }
++
++#define __HYP_RWLOCK_UNLOCKED \
++	((hyp_rwlock_t) __HYP_RWLOCK_INITIALIZER)
++
++#define DEFINE_HYP_RWLOCK(x)	hyp_rwlock_t x = __HYP_RWLOCK_UNLOCKED
++
++#define hyp_rwlock_init(l)						\
++do {									\
++	*(l) = __HYP_RWLOCK_UNLOCKED;					\
++} while (0)
++
++#define __HYP_RWLOCK_WRITER_BIT	31
++
++static inline void hyp_write_lock(hyp_rwlock_t *lock)
++{
++	u32 tmp;
++
++	asm volatile(ARM64_LSE_ATOMIC_INSN(
++	/* LL/SC */
++	"	sevl\n"
++	"1:	wfe\n"
++	"2:	ldaxr	%w0, %1\n"
++	"	cbnz	%w0, 1b\n"
++	"	stxr	%w0, %w2, %1\n"
++	"	cbnz	%w0, 2b\n"
++	__nops(1),
++	/* LSE atomics */
++	"1:	mov	%w0, wzr\n"
++	"2:	casa	%w0, %w2, %1\n"
++	"	cbz	%w0, 3f\n"
++	"	ldxr	%w0, %1\n"
++	"	cbz	%w0, 2b\n"
++	"	wfe\n"
++	"	b	1b\n"
++	"3:")
++	: "=&r" (tmp), "+Q" (lock->__val)
++	: "r" (BIT(__HYP_RWLOCK_WRITER_BIT))
++	: "memory");
++}
++
++static inline void hyp_write_unlock(hyp_rwlock_t *lock)
++{
++	asm volatile(ARM64_LSE_ATOMIC_INSN(
++	"	stlr	wzr, %0",
++	"	swpl	wzr, wzr, %0")
++	: "=Q" (lock->__val) :: "memory");
++}
++
++static inline void hyp_read_lock(hyp_rwlock_t *lock)
++{
++	u32 tmp, tmp2;
++
++	asm volatile(
++	"	sevl\n"
++	ARM64_LSE_ATOMIC_INSN(
++	/* LL/SC */
++	"1:	wfe\n"
++	"2:	ldaxr	%w0, %2\n"
++	"	add	%w0, %w0, #1\n"
++	"	tbnz	%w0, %3, 1b\n"
++	"	stxr	%w1, %w0, %2\n"
++	"	cbnz	%w1, 2b\n"
++	__nops(1),
++	/* LSE atomics */
++	"1:	wfe\n"
++	"2:	ldxr	%w0, %2\n"
++	"	adds	%w1, %w0, #1\n"
++	"	tbnz	%w1, %3, 1b\n"
++	"	casa	%w0, %w1, %2\n"
++	"	sbc	%w0, %w1, %w0\n"
++	"	cbnz	%w0, 2b")
++	: "=&r" (tmp), "=&r" (tmp2), "+Q" (lock->__val)
++	: "i" (__HYP_RWLOCK_WRITER_BIT)
++	: "cc", "memory");
++}
++
++static inline void hyp_read_unlock(hyp_rwlock_t *lock)
++{
++	u32 tmp, tmp2;
++
++	asm volatile(ARM64_LSE_ATOMIC_INSN(
++	/* LL/SC */
++	"1:	ldxr	%w0, %2\n"
++	"	sub	%w0, %w0, #1\n"
++	"	stlxr	%w1, %w0, %2\n"
++	"	cbnz	%w1, 1b",
++	/* LSE atomics */
++	"	movn	%w0, #0\n"
++	"	staddl	%w0, %2\n"
++	__nops(2))
++	: "=&r" (tmp), "=&r" (tmp2), "+Q" (lock->__val)
++	:
++	: "memory");
++}
++
++#ifdef CONFIG_NVHE_EL2_DEBUG
++static inline void hyp_assert_write_lock_held(hyp_rwlock_t *lock)
++{
++	BUG_ON(!(READ_ONCE(lock->__val) & BIT(__HYP_RWLOCK_WRITER_BIT)));
++}
++#else
++static inline void hyp_assert_write_lock_held(hyp_rwlock_t *lock) { }
++#endif
++
++#endif	/* __ARM64_KVM_NVHE_RWLOCK_H__ */
 -- 
 2.44.0.478.gd926399ef9-goog
 
