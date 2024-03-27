@@ -1,55 +1,55 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01344F4E2
-	for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 17:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945B5F4E2
+	for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 17:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711560938; cv=none; b=S4pqFdrDPx9Jv2sKxPGTwjyd+7rWBES1LFgGVAZqAqjruWfSX7vpI9CRKCVGxWVA+6kbQJA0sO7tHIHRJquPyLhRQphz0l2xDlaVtp5CwbUJnK/skWHPugWsN9jgQBJKtWs9LGigDkM+n0vTO4m7UFygxM34zzX90oic95CWTyw=
+	t=1711560941; cv=none; b=JU+CWq7CXrNn8wYuAQnhXCmImZZNIIKNZDXlVpOy8Z/ipXU42yd+9aLI+3yVOpznfyfYd/BH2j5d+54bFIy0nv5BhFLe7EuQaEh0wjtowxmIFtFAqpsMx5dHw0TFnUBUi4oLStI1S/TGa76IrDnUbdkHzAuYJ5SgakY/V7ZkAD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711560938; c=relaxed/simple;
-	bh=3Ze2dh2Q3LhBnSu0FJy8N0KSnNwXekuBjpqcZjTM6cI=;
+	s=arc-20240116; t=1711560941; c=relaxed/simple;
+	bh=Mjyl6m0ZPxQLo7f+KWqCmulgaboejtjxvawOVa5pD7w=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uqavLOpLinTlqGJiHK4nCDSht1WDo9zFDcr1hzaPoJH/fOsdD57IjxsohVqwlR8DhUWBswYhB6l4SOv6xh64rNGR7s7soSLF/MNvzbtD4dlStq49rHlQeI7GW1VeWuCFU4NtuOoSRJ9joLsj7lbZ9y4y2LHs6LGiL5FcOxCvq6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jKg/3+iS; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=n4dqUhPRkgHPaJocvFS/3F4f9ez1nY5yopXomd5gwTaPC7arX/6Bdb5DP/qPk6W2wSz/oz5ZGggO1Kk77RRCwsR/pWsCtrKAkR0i9zV9YMObDunmA9cW0vMwAPz/4/6+OkjhpEW0iKvZDOSOFwnAwtLrl5tvttb976w0baVMnkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xZNOIYRS; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jKg/3+iS"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc64f63d768so57175276.2
-        for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 10:35:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xZNOIYRS"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4140d2917e6so292565e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 10:35:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711560936; x=1712165736; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1711560938; x=1712165738; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mcCUfCHjg8qq7hQCzlQuSEVLa2Bvc3FhV/pDaQ2wLzw=;
-        b=jKg/3+iSwgwK5xwCRsM94dRSW8demhEVY7zClsrsYRTF1vCwPfb45HF6HjE61Go5jG
-         9UXpVoAZ9PmHMoLpvOv34s0hIiIRl6BUJ1E0hRGT5J6aFJ7poe4yTqGir5I4QJWuFnJA
-         gx6N5skRtXByexIdeyouuXhwj+UNhyBhN0AVVTpn2qBqNDyT/hqd+f/6InYwrPuqiJNN
-         tVHGZhrQfAdGhrDK27BDdBoNKczvDc7o1TDh0PBqj+rcWRiHyDZSsVw2Ya48pNNBNnlG
-         bAAwML240T3Rq9O4xfQBN0Z0sqfKk5X0iSEPt7I77SY3EVXFt4zc5MD3mz3OTenHfHg8
-         1GeA==
+        bh=NUzKcYrrG9GVcJ2vQ+rL1jGLyHzQALHGWx/8oAcLBPo=;
+        b=xZNOIYRS9v6I3IHdH4eVH0ROh6TPdyw0dXspbFdxabFGucGjDAFSDkxu933R/WSHP5
+         uOpruCYIy1OHQL92C0ZUff/UAazY6LN196JdS0S9ASfwBEKIxoLNfPgqIdy+VgtYn/Zg
+         gAY/nFdvLM0BKpkyLzy9vuQzqHsoqxLCtzBm/et3VKo+m7lTWie92JIXfva0a04i7yod
+         tXDQu3CBRn57aWFO3BP557L7KhZJKUIL/K1s34ECpC9VajJ1/oXWLe79qMFU/k4ySL7N
+         SZlzPEGi9hkHUGyHlaH1iBGitmp0vty7cTS4w7oocZrH8zFBhSlfjU9EqIIhedWWyuk5
+         hAfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711560936; x=1712165736;
+        d=1e100.net; s=20230601; t=1711560938; x=1712165738;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mcCUfCHjg8qq7hQCzlQuSEVLa2Bvc3FhV/pDaQ2wLzw=;
-        b=aigVXRGdQjF4izUVUuY5zH6pHyucWmphesEvZzc+w27lCoDxEu+0W2n1EEsSkKBSf4
-         +JWK35Q2F3DjVc3hmI9S315QKcsmviEshAx2qPgR+VcuDJ/fanG5Zcf7tlYh/zgD1rtc
-         Y+TOEqEiOrdXXkWfj6RVlK2TQt5sQoQ79SqRAokCKzg6X+CCGponAnsY5TKarSC2tGqI
-         Cqr0u2hrrt5EiBuTRx1OZ4BqyOTeLFwWIj2jHtCBRo3CqGpvJneK1SVUxlPkyBWUoxLu
-         75aBiN+P3fRsPBoQbTM+k0238BhYVD9YcC8LAjEjV/dyuKgIL1qR7o9ZL2DihqQ4PrOq
-         UZtA==
-X-Gm-Message-State: AOJu0Yya28MAtVy63lbmZ6j4MkTo+KwzB8SgJvY/WvhB+D0izOuhMW2y
-	w4C+L1+G4GkX7MB6ezKUAWyiY5WyoST3bjAvpFnrnVF3iBk75SQr5YF6JEzY3QN6sRDmXe1d3BO
-	1sDuYJGWMd/I8QMEGy7tpyWl+FYZVQrRN1AqDTyabIsf+kgMNvRDXOGjdZiUgUmeX7Bnppz13V8
-	fZ/aaL+JNqanQZfSOANXwftfOqwyQ=
-X-Google-Smtp-Source: AGHT+IHdNBvTsJs++HX8LLEb7m+jLZ2UgZBjmm7G8dTwvMgnsu3/sW0/Wp8F6s4GIv+OU2/B+ouu1VjOag==
+        bh=NUzKcYrrG9GVcJ2vQ+rL1jGLyHzQALHGWx/8oAcLBPo=;
+        b=uHrRZoxhvWfCy/G/I7sd+M0G7tkWaiTHiAWj0L8WxDkN2LNrw4OIuosyQZTwokVFmn
+         8dk+gbl6iwzPq/+iKMHXJd7n9vhMlBur9Y7WxsUMkJtDZms6txNHMf0YLAl8DxzmkC/S
+         5/DBiMIZVIhfEig5VAq65fBo4FitmIJly8bGj7lu3hO1tXkQf+D/wrfMlFvVaW24xMTY
+         IxcSZdUgyUBCAuBwpbLgG+2GtLlC6ljiYSVfODzFhw9lqV5mWtpp7d5029CqMZbByXg5
+         /hr4mLE3DNBUSpVzbiMifHhIqOLb/jvVWfo8Oy1t95cq+61Yp5vANNBwkAQs4ZlY7Ouv
+         4+iw==
+X-Gm-Message-State: AOJu0Yy+Ak4IpDe6bs8fcQjIVT+Vf81Gw1inPcQ9tAF+hEot1n7c3/Zq
+	JDTqZQfqZ/vp2cDSUe5OBs7XPjtoerMEenaZVILFlnFXEPgceNBL6q2wa7Wk2OdKpsJxsI5G6jq
+	aChToL7ZTnxPvLXB4KR2CJPN7t6cEZlYr0IPuKyibq1QcKuTsvLIjfGMYPcYiD6KA62cj0NLJPh
+	fThPVUtM6hPG/siILNw9rAxtSIBBQ=
+X-Google-Smtp-Source: AGHT+IFnh+YJoXTF/ddcOJzmAC5tyPFA4uaqNRelpY/UTPu4VWuCrmQyszMHGVttJANobHzxGMzkaqGa+w==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:1502:b0:dd9:1dc0:b6c5 with SMTP id
- q2-20020a056902150200b00dd91dc0b6c5mr156328ybu.6.1711560935893; Wed, 27 Mar
- 2024 10:35:35 -0700 (PDT)
-Date: Wed, 27 Mar 2024 17:34:48 +0000
+ (user=tabba job=sendgmr) by 2002:a05:600c:1d1f:b0:414:21c:fb13 with SMTP id
+ l31-20020a05600c1d1f00b00414021cfb13mr109wms.2.1711560938083; Wed, 27 Mar
+ 2024 10:35:38 -0700 (PDT)
+Date: Wed, 27 Mar 2024 17:34:49 +0000
 In-Reply-To: <20240327173531.1379685-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240327173531.1379685-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240327173531.1379685-2-tabba@google.com>
-Subject: [PATCH v1 01/44] KVM: arm64: Change kvm_handle_mmio_return() return polarity
+Message-ID: <20240327173531.1379685-3-tabba@google.com>
+Subject: [PATCH v1 02/44] KVM: arm64: Use enum instead of helper for checking FP-state
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -70,55 +70,64 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Most exit handlers return <= 0 to indicate that the host needs to
-handle the exit. Make kvm_handle_mmio_return() consistent with
-the exit handlers in handle_exit(). This makes the code easier to
-reason about, and makes it easier to add other handlers in future
-patches.
+Before the conversion of the various FP-state booleans into an
+enum representing the state, this helper may have clarified
+things. Since the introduction of the enum, the helper obfuscates
+rather than clarifies. This also makes the code consistent with
+other parts that check the FP-state.
 
 No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/arm.c  | 2 +-
- arch/arm64/kvm/mmio.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 6 ------
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 2 +-
+ arch/arm64/kvm/hyp/vhe/switch.c         | 2 +-
+ 3 files changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 3dee5490eea9..a38943cda7cf 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -980,7 +980,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index e3fcf8c4d5b4..1a6dfd035531 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -39,12 +39,6 @@ struct kvm_exception_table_entry {
+ extern struct kvm_exception_table_entry __start___kvm_ex_table;
+ extern struct kvm_exception_table_entry __stop___kvm_ex_table;
  
- 	if (run->exit_reason == KVM_EXIT_MMIO) {
- 		ret = kvm_handle_mmio_return(vcpu);
--		if (ret)
-+		if (ret <= 0)
- 			return ret;
+-/* Check whether the FP regs are owned by the guest */
+-static inline bool guest_owns_fp_regs(struct kvm_vcpu *vcpu)
+-{
+-	return vcpu->arch.fp_state == FP_STATE_GUEST_OWNED;
+-}
+-
+ /* Save the 32-bit only FPSIMD system register state */
+ static inline void __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
+ {
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index c50f8459e4fc..2a0b0d6da7c7 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -53,7 +53,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 			val |= CPTR_EL2_TSM;
  	}
  
-diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-index 200c8019a82a..5e1ffb0d5363 100644
---- a/arch/arm64/kvm/mmio.c
-+++ b/arch/arm64/kvm/mmio.c
-@@ -86,7 +86,7 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
+-	if (!guest_owns_fp_regs(vcpu)) {
++	if (vcpu->arch.fp_state != FP_STATE_GUEST_OWNED) {
+ 		if (has_hvhe())
+ 			val &= ~(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
+ 				 CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN);
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 1581df6aec87..e9197f086137 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -75,7 +75,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
  
- 	/* Detect an already handled MMIO return */
- 	if (unlikely(!vcpu->mmio_needed))
--		return 0;
-+		return 1;
+ 	val |= CPTR_EL2_TAM;
  
- 	vcpu->mmio_needed = 0;
- 
-@@ -117,7 +117,7 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
- 	 */
- 	kvm_incr_pc(vcpu);
- 
--	return 0;
-+	return 1;
- }
- 
- int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+-	if (guest_owns_fp_regs(vcpu)) {
++	if (vcpu->arch.fp_state == FP_STATE_GUEST_OWNED) {
+ 		if (vcpu_has_sve(vcpu))
+ 			val |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
+ 	} else {
 -- 
 2.44.0.478.gd926399ef9-goog
 
