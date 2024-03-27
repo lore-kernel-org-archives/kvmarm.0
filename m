@@ -1,86 +1,98 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB976136E16
-	for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 12:45:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89DD01E521
+	for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 12:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711543542; cv=none; b=CcksoqA3krYbG8ZNU3hkvv7W1N0jlDCZuzJnoltsOMLUQBtc8Ri4sAIPBNHSTb3meJ571SHbCwxuXFtCuTMehsYblmjHL7lJxvZJp+oppmpvohgfb5+ObhdmWAO3mhBvZ/6aJkQgFE2ClrZJw9zXfav0Pmi5WO/q7jMnQZ0Wz00=
+	t=1711543739; cv=none; b=bJV0OKGGF/ajk7CAFzSk0aLSDCsVovRM3FOqdb/U975tNozGL7X1jc31b/Y+dWXp7jlglHy1/TLWYVE1cNNKIax/dOZnelF8LzcE5fXfTbpwMli7E///Ti2OawHmE4a4RdE5fRvxYrBANeAzfKh/v6gIS2T80de7wrEoSxTc4tM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711543542; c=relaxed/simple;
-	bh=UG+sWCgJdW5QMJRXuangEUOiQHJCcImOBJ7ALiw3A+s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J+SsATAqt07XYKtvWpdUA64fnrEEgjbCYRGvnzQq7ISO/29rcJo65p9tW9dJrNvZ9Vhe88oL4AkCYcl84Zpig7sPqQzwcUecDANSycw6cTJIwAEdWBwcotQxR/n6Lx53uUKRMMD64eID/cVbCz/uAHs5wROy1kcwhFMElTONfU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AjG1DV51; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711543739; c=relaxed/simple;
+	bh=fuAcbl1HUcDciZWkZFFDkTuXy9Ebs9u1HiWJgXNc2Mw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=p3SSXvsknZA0YBJr6fiZ8uFbb74oG75pmPKOQqNeAF6GQP7xxQdN+wOpDFLOzj3GyeJMlUUOTvzvnBWyG42h+W3zuZYxMeH6FmByfDc+0pCzTyTCaURbXGM0xD7929jE2apdcBI+cjMou7BLbPuW2mf9DkWFqHCSzLSPAsnSH2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E36lGumE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AjG1DV51"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 335FBC43394;
-	Wed, 27 Mar 2024 12:45:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E36lGumE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0200C433C7;
+	Wed, 27 Mar 2024 12:48:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711543541;
-	bh=UG+sWCgJdW5QMJRXuangEUOiQHJCcImOBJ7ALiw3A+s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AjG1DV51cFLTNpfm3NxY8PrL9hGn+XQNXMMyZPfnyiBNfR9WvTZLb2pv8nrQq0sXQ
-	 BQbBzJLW3SB4C5elH0EG9mzbKEj+046NQ9Rfeh6jS4e9shDpJEGm5OuC6NEAy7XfHK
-	 aIh8+FPnvdsgth9RN4CobaidDaRMIQNESRT3iND/n9YbL80xdxpK2k5w7zNQPo2mZm
-	 uTG1VIZhXdqROHyoDTU134Tm14XPqawybdeRI3nviUwilHQYzowP9AuD5NlBmykaYs
-	 41CDToMAKZTB1NELr8Ha0LBI3dZbzsGtHcik2URxmc8Vw9qnJISPDIFWok056cV0LR
-	 7RpApRFItLzFw==
-Date: Wed, 27 Mar 2024 12:45:35 +0000
+	s=k20201202; t=1711543739;
+	bh=fuAcbl1HUcDciZWkZFFDkTuXy9Ebs9u1HiWJgXNc2Mw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=E36lGumE0/pL970qKfZoqn/wk3TA+5a0Ze+dmjy4b5hS+GEPt04zRkwX43llnpc6U
+	 qN5GaUePeJs6dRm0nnXhllrDy3zc+BLQsdVDkj7OtoJDSiAMTbNUWKINAC+8VLnT+U
+	 yVqSmK0q5H99tO3rg9YO+4zMHVhAMy8Wg9Wzffz/1P06qG2yN6Wi5GB6MSBPiY8+9T
+	 CEEkSXtQPnkVwn8pKGeshIuqI6J06zutHQyOKU2pR15Q7ufQGrUJmp8QMbzqEcUuNk
+	 skVfOFHrPnuhErzZ9hsdEt/yM9CgWaj3IRbKxBMEKzPz9ZftDwrpbqiXtiru1DKFwu
+	 nZwq43zHfL66w==
 From: Will Deacon <will@kernel.org>
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+To: kvmarm@lists.linux.dev
+Cc: linux-arm-kernel@lists.infradead.org,
+	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Gavin Shan <gshan@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	Gavin Shan <gshan@redhat.com>,
+	Marc Zyngier <maz@kernel.org>,
 	Mostafa Saleh <smostafa@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Quentin Perret <qperret@google.com>,
 	Raghavendra Rao Ananta <rananta@google.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 3/3] KVM: arm64: Use TLBI_TTL_UNKNOWN in
- __kvm_tlb_flush_vmid_range()
-Message-ID: <20240327124535.GA11031@willie-the-truck>
-References: <20240325185158.8565-1-will@kernel.org>
- <20240325185158.8565-4-will@kernel.org>
- <b3177895-5ed0-4f1a-bede-4d0c87935bbc@arm.com>
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Shaoqin Huang <shahuang@redhat.com>
+Subject: [PATCH v2 0/4] KVM: arm64: TLBI fixes for the pgtable code
+Date: Wed, 27 Mar 2024 12:48:49 +0000
+Message-Id: <20240327124853.11206-1-will@kernel.org>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b3177895-5ed0-4f1a-bede-4d0c87935bbc@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 26, 2024 at 01:48:46PM +0000, Ryan Roberts wrote:
-> On 25/03/2024 18:51, Will Deacon wrote:
-> > Commit c910f2b65518 ("arm64/mm: Update tlb invalidation routines for
-> > FEAT_LPA2") updated the __tlbi_level() macro to take the target level
-> > as an argument, with TLBI_TTL_UNKNOWN (rather than 0) indicating that
-> > the caller cannot provide level information. Unfortunately, the two
-> > implementations of __kvm_tlb_flush_vmid_range() were not updated and so
-> > now ask for an level 0 invalidation if FEAT_LPA2 is implemented.
-> 
-> Ouch, sorry about this! I remember rebasing my change onto the KVM tlbi range
-> changes and having a few conflicts. Obviously I didn't do a good enough job of
-> reviewing the result and missed this new user.
+Hi again,
 
-No problem, it's easily done. It's also not your fault, as we shouldn't have
-been using the reserved encoding of 0 to mean "no hint" in the first place!
+This is version two of the series I previously posted on Monday:
 
-> > Cc: Ryan Roberts <ryan.roberts@arm.com>
-> > Cc: Catalin Marinas <catalin.marinas@arm.com>
-> > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > Cc: Marc Zyngier <maz@kernel.org>
-> > Fixes: c910f2b65518 ("arm64/mm: Update tlb invalidation routines for FEAT_LPA2")
-> > Signed-off-by: Will Deacon <will@kernel.org>
-> 
-> Reviewed-by: Ryan Roberts <ryan.roberts@arm.com>
+  https://lore.kernel.org/r/20240325185158.8565-1-will@kernel.org
 
-Thanks.
+We've got a long weekend coming up in the UK, so I wanted to get this
+out before I chuck the laptop in the river.
+
+Changes since v1 include:
+
+  * Add Ryan's Reviewed-by on the third patch
+  * Add an extra patch to ensure correct alignment of range TLBI address
+    argument
+  * Tweak commit messages
+
+Cheers,
 
 Will
+
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Gavin Shan <gshan@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Mostafa Saleh <smostafa@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: Quentin Perret <qperret@google.com>
+Cc: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Shaoqin Huang <shahuang@redhat.com>
+
+--->8
+
+Will Deacon (4):
+  KVM: arm64: Don't defer TLB invalidation when zapping table entries
+  KVM: arm64: Don't pass a TLBI level hint when zapping table entries
+  KVM: arm64: Use TLBI_TTL_UNKNOWN in __kvm_tlb_flush_vmid_range()
+  KVM: arm64: Ensure target address is granule-aligned for range TLBI
+
+ arch/arm64/kvm/hyp/nvhe/tlb.c |  3 ++-
+ arch/arm64/kvm/hyp/pgtable.c  | 23 +++++++++++++++--------
+ arch/arm64/kvm/hyp/vhe/tlb.c  |  3 ++-
+ 3 files changed, 19 insertions(+), 10 deletions(-)
+
+-- 
+2.44.0.396.g6e790dbe36-goog
+
