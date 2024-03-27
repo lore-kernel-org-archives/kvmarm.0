@@ -1,55 +1,55 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A7812D748
-	for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 17:36:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C8614E2E5
+	for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 17:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711561001; cv=none; b=F+jqRP64iml5uYTAYdk+jYHpB7QAZcs9QbJfPiq7/9E2/hUtbdN2M7NW/lGJlNKUP3rUPX/edyEa1FPqjYduBdAfUDm5a7asaoMOv7zFzGGjZMJMNXAQPt4rs5yyGS7nJCitGA58UxWSHbay8cknhFtDhxAzgJ4SK8KS79muYSw=
+	t=1711561003; cv=none; b=hpVVq37yN1hbGmRnQqEK7ZPpOfub/Gjmcy924tgrFw5yxL/qY6+02C3ustFAGBZ/ycSi6VL1NcDrUSHoUuSbKBY/X5qPLF4oA/QEytKM8vPV0xsEuU3/qSMo99kjad8E4n7tlhq3+5s5R40GjAYMce7KyXaWr0OUUCPdvx3qKvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711561001; c=relaxed/simple;
-	bh=eM/y9n6oAhq3GdEWeO5WEdE1IHmMYMGEHly+Oa5YZB8=;
+	s=arc-20240116; t=1711561003; c=relaxed/simple;
+	bh=bYmaOF1ob1oe9Y5D6VYqlPuhloY2wDLrXHSl+jaGS1s=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=j9Pip0ShckExfVbpUjqKt8I8BQroic1iawORpRVwSmatICduhvKJOJoxGl+3Bfu54p6I2061Bb/gr8+7UdiAaU03iXlNukkm8dakQsZXkUwlYyC48U2jMHcykxCd8Zq3/A84s5oSdRLO1wk7nSBxKO3KBCsx8lsDNVY+IdAf3Kg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PkZLbVEJ; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=p17V9c5waLr50MgLVob2iGYMa8CdJKTd2/UFxyGKaAPNFYHXM8/9LeLVpSsmBOwXnJbvVrNcb6VFmRp+bX5VkQV/cFetfkLdXpfX/BHqh0wnHPDqjaRMFYGp9ztTL0GoiVKkZYN2LvOXzb2g6URaeEFvKuEfUtxspCYx6jA4xvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gWH9zxZ/; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PkZLbVEJ"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-ddaf2f115f2so36092276.3
-        for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 10:36:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gWH9zxZ/"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc647f65573so54442276.2
+        for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 10:36:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711560999; x=1712165799; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1711561001; x=1712165801; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qC9nJYgq3KADrJVHmOmGn/dJpO571FX+lr6dw4HsnMs=;
-        b=PkZLbVEJHJ1DlzXUsl+dNqfm82rSRqF5P8eEdwrK76yHLYkP6kGu4IP6dnzHl+UEVv
-         u/zPCOT21v3svDVK52dATXzTuoiXQswF44KEqM8nfIcWRroT/Gsm6gyBUjjgZRe7WfuT
-         LydziMTM0TFPWbC1uZTGXjVvGHhy8TuCDA4GMvJlhjX4v3hh7sWP8sujF/+hDOC9fc+v
-         Y9hu39bqSkrC7zx+nZJENj6xukKFMxRrTtTjGzAMStds2nMBC5Kh7vcFxbNwPo5X7nZ8
-         I8ID606M2I9oy7R8t5OGyPLkvRKP3C6A5FgGR6bHhNsrmGj+gGAW9A0HEi5JNF/X8xA7
-         tJvg==
+        bh=9QrnwjRpR8ayGFQ7qSq8ttTSNPnh+hqg7Tod4h7cVFQ=;
+        b=gWH9zxZ/Jo2qOZsrEPHxhTRoZfT2nGoeKw2MnSTAOtt2lVP8GUnsdaEdcNcprqNC8E
+         l3hUA1V8k3wekuqnxgpWhfegHkMa+OeKgqguiRcKb4wHRRnPrn+hJQmAzkNepe5Mbp95
+         AvLg5whQWYLU6NxXdsF7LMZIHok/Esfk9zm1+K4P2fESqKnqmCDzLQuXmB9q72WSHZIE
+         vHnNp/sgxwqRVrzb45XDLyc11+WNQgEyCDJjvKCT0yte8/PnHG+uqUFWKZTsWmp6L6tL
+         KHMlFzyY9P+8ezVmtwguq6jTGK0gAjrt7qc6RxQmN9FJQEqwEKQHJoxQkkbhKaO1sZnI
+         xbHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711560999; x=1712165799;
+        d=1e100.net; s=20230601; t=1711561001; x=1712165801;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qC9nJYgq3KADrJVHmOmGn/dJpO571FX+lr6dw4HsnMs=;
-        b=Y79R/jh7roezYzstCb+laEyGwtIoqg79bVy7g6umLi3IXEPY6wC9Ouh9mD44p6Fl9m
-         9HNrffdD1T91LAuR1ltRnqPr0UExx5gw33XP+/YQM9/o1S4G4VEBGEs1L10JS1kQF5Ba
-         RapSiwgLD0suGlEXF2PsSV7miXJUiNffN+jyUe4OVcJS7c190YqZANWmFsIW28CIt5tK
-         nKmpygQLP7AxfobPgUmrZlS+xHn6m2XR+bNOHHbeEROLf4BtR1ODrXVYW9zlflqg5CRS
-         MtoqqxehqbLx3RgGNNamDBrAYgtLXI1CxeNCA/AtDpzTHsv6VUuoV9tT17psE9rHFj19
-         WjdA==
-X-Gm-Message-State: AOJu0Ywdo/f1KtOonOx/s+QnRKfBWIBsIg/fbGFUuZxtFDuzQj+VL/Jb
-	Cnfpe9GvFgeBndK+YNv21BtOGizFgJ6oG8cqNsQ2MgqFHyKAZiCSVay4xx82ULqBJUPbOdOJtKG
-	KQs8BBlrPaB+BOxuvxKQtL7ItptuC5Mb75IixVK+6ZS5DfRl5EHAzZ/ihBvHkHkgHQtuujuK5Jd
-	WLbiBJ/xgnQv9K4KtkQBXnwjfmrLI=
-X-Google-Smtp-Source: AGHT+IEXWdpsCtaYjLi7tn3rWBuFz72NBm6vuHAp5tTw4sVoNOvnpnu3FuWufcEcihoTAGBvglJ72kW1+A==
+        bh=9QrnwjRpR8ayGFQ7qSq8ttTSNPnh+hqg7Tod4h7cVFQ=;
+        b=o70mmiqy049Qkel/wDOwpyHVKOoBHYPoJvWwb9YDuFsfafaqmNL4/Rr9U8rFJZnn0j
+         Lk905HABBj4akVsHySgfJ94zMVPbt8VU3Fvf5UFiu6cv1iHka1PnwQUUBrrwv8RyyzXq
+         MMYzXQ6XEscm/5esFuIyfRA9oJl8aTtawVL9MUzmsGCewYYysj+dqyaqbP9fMMyGoI54
+         vU5FYSqN5TtD6MOeQbBvvqSsinx/ET5GBSpehIQ4g4TDYt1HwAGAOYu1IZ+p6xrc3IeU
+         FVJYK3wYPXZqnaeuwq9G1u0QZkAE6aRsfg6PDw1HvPLKT+cStrfKApD5DOGKOheUv2CP
+         8LIA==
+X-Gm-Message-State: AOJu0YyaLrv40fknZ1llRb68xivTF/dYYfaScW1d68418oCKwKFQ6a52
+	+b7OFd/6Yp9Frb+sE351tSbv/xI/Ux0ztGtEzFHNPqiZcE2CCzgZ1IbAPBvsFdbK0TXjdGgKcd5
+	rX6tmPKTpL8SeyF2Jg3O4GIrpLN+6oTGAM45lMhkH1YSZKCZ24oq/HPlF3ZgqfHTHtRzhN46PhQ
+	mkMPxzD3+HcNcDN3vnKEEL+6FzF20=
+X-Google-Smtp-Source: AGHT+IEE9V1iuur8hYy9w51CAXGw/p93DB8mC3ZcR8b1bNgan8Ocr+YegAWgB6NbeYcePzJx8lFwJ+14lA==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:1009:b0:dc6:b768:2994 with SMTP id
- w9-20020a056902100900b00dc6b7682994mr64868ybt.0.1711560998756; Wed, 27 Mar
- 2024 10:36:38 -0700 (PDT)
-Date: Wed, 27 Mar 2024 17:35:15 +0000
+ (user=tabba job=sendgmr) by 2002:a05:6902:1b0b:b0:dcd:5e5d:458b with SMTP id
+ eh11-20020a0569021b0b00b00dcd5e5d458bmr129772ybb.3.1711561000937; Wed, 27 Mar
+ 2024 10:36:40 -0700 (PDT)
+Date: Wed, 27 Mar 2024 17:35:16 +0000
 In-Reply-To: <20240327173531.1379685-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240327173531.1379685-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240327173531.1379685-29-tabba@google.com>
-Subject: [PATCH v1 28/44] KVM: arm64: Remove locking from EL2 allocation fast-paths
+Message-ID: <20240327173531.1379685-30-tabba@google.com>
+Subject: [PATCH v1 29/44] KVM: arm64: Reformat/beautify PTP hypercall documentation
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -72,83 +72,67 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Will Deacon <will@kernel.org>
 
-hyp_{get,put}_page() are called extensively from the page-table code
-to adjust reference counts on page-table pages. As a small step towards
-removing reader serialisation on these paths, drop the 'hyp_pool' lock
-in the case where the refcount remains positive, only taking the lock
-if the page is to be freed back to the allocator.
+The PTP hypercall documentation doesn't produce the best-looking table
+when formatting in HTML as all of the return value definitions end up
+on the same line.
 
-Remove a misleading comment at the same time, which implies that a page
-with a refcount of zero and which is not attached to a freelist is
-unsafe whereas in practice it's the other way around which can lead to
-problems.
+Reformat the PTP hypercall documentation to follow the formatting used
+by hypercalls.rst.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/include/nvhe/gfp.h |  6 +-----
- arch/arm64/kvm/hyp/nvhe/page_alloc.c  | 16 ++++------------
- 2 files changed, 5 insertions(+), 17 deletions(-)
+ Documentation/virt/kvm/arm/ptp_kvm.rst | 38 ++++++++++++++++----------
+ 1 file changed, 24 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/gfp.h b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
-index 97c527ef53c2..24eb7840d98e 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/gfp.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
-@@ -10,11 +10,7 @@
- #define HYP_NO_ORDER	USHRT_MAX
+diff --git a/Documentation/virt/kvm/arm/ptp_kvm.rst b/Documentation/virt/kvm/arm/ptp_kvm.rst
+index aecdc80ddcd8..7c0960970a0e 100644
+--- a/Documentation/virt/kvm/arm/ptp_kvm.rst
++++ b/Documentation/virt/kvm/arm/ptp_kvm.rst
+@@ -7,19 +7,29 @@ PTP_KVM is used for high precision time sync between host and guests.
+ It relies on transferring the wall clock and counter value from the
+ host to the guest using a KVM-specific hypercall.
  
- struct hyp_pool {
--	/*
--	 * Spinlock protecting concurrent changes to the memory pool as well as
--	 * the struct hyp_page of the pool's pages until we have a proper atomic
--	 * API at EL2.
--	 */
-+	/* lock protecting concurrent changes to the memory pool. */
- 	hyp_spinlock_t lock;
- 	struct list_head free_area[NR_PAGE_ORDERS];
- 	phys_addr_t range_start;
-diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-index 169cdb43b4b8..96b52f545af0 100644
---- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-+++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-@@ -155,33 +155,25 @@ static struct hyp_page *__hyp_extract_page(struct hyp_pool *pool,
+-* ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID: 0x86000001
++``ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID``
++----------------------------------------
  
- static void __hyp_put_page(struct hyp_pool *pool, struct hyp_page *p)
- {
--	if (hyp_page_ref_dec_and_test(p))
-+	if (hyp_page_ref_dec_and_test(p)) {
-+		hyp_spin_lock(&pool->lock);
- 		__hyp_attach_page(pool, p);
-+		hyp_spin_unlock(&pool->lock);
-+	}
- }
+-This hypercall uses the SMC32/HVC32 calling convention:
++Retrieve current time information for the specific counter. There are no
++endianness restrictions.
  
--/*
-- * Changes to the buddy tree and page refcounts must be done with the hyp_pool
-- * lock held. If a refcount change requires an update to the buddy tree (e.g.
-- * hyp_put_page()), both operations must be done within the same critical
-- * section to guarantee transient states (e.g. a page with null refcount but
-- * not yet attached to a free list) can't be observed by well-behaved readers.
-- */
- void hyp_put_page(struct hyp_pool *pool, void *addr)
- {
- 	struct hyp_page *p = hyp_virt_to_page(addr);
- 
--	hyp_spin_lock(&pool->lock);
- 	__hyp_put_page(pool, p);
--	hyp_spin_unlock(&pool->lock);
- }
- 
- void hyp_get_page(struct hyp_pool *pool, void *addr)
- {
- 	struct hyp_page *p = hyp_virt_to_page(addr);
- 
--	hyp_spin_lock(&pool->lock);
- 	hyp_page_ref_inc(p);
--	hyp_spin_unlock(&pool->lock);
- }
- 
- void hyp_split_page(struct hyp_page *p)
+-ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID
+-    ==============    ========    =====================================
+-    Function ID:      (uint32)    0x86000001
+-    Arguments:        (uint32)    KVM_PTP_VIRT_COUNTER(0)
+-                                  KVM_PTP_PHYS_COUNTER(1)
+-    Return Values:    (int32)     NOT_SUPPORTED(-1) on error, or
+-                      (uint32)    Upper 32 bits of wall clock time (r0)
+-                      (uint32)    Lower 32 bits of wall clock time (r1)
+-                      (uint32)    Upper 32 bits of counter (r2)
+-                      (uint32)    Lower 32 bits of counter (r3)
+-    Endianness:                   No Restrictions.
+-    ==============    ========    =====================================
+++---------------------+-------------------------------------------------------+
++| Presence:           | Optional                                              |
+++---------------------+-------------------------------------------------------+
++| Calling convention: | HVC32                                                 |
+++---------------------+----------+--------------------------------------------+
++| Function ID:        | (uint32) | 0x86000001                                 |
+++---------------------+----------+----+---------------------------------------+
++| Arguments:          | (uint32) | R1 | ``KVM_PTP_VIRT_COUNTER (0)``          |
++|                     |          |    +---------------------------------------+
++|                     |          |    | ``KVM_PTP_PHYS_COUNTER (1)``          |
+++---------------------+----------+----+---------------------------------------+
++| Return Values:      | (int32)  | R0 | ``NOT_SUPPORTED (-1)`` on error, else |
++|                     |          |    | upper 32 bits of wall clock time      |
++|                     +----------+----+---------------------------------------+
++|                     | (uint32) | R1 | Lower 32 bits of wall clock time      |
++|                     +----------+----+---------------------------------------+
++|                     | (uint32) | R2 | Upper 32 bits of counter              |
++|                     +----------+----+---------------------------------------+
++|                     | (uint32) | R3 | Lower 32 bits of counter              |
+++---------------------+----------+----+---------------------------------------+
 -- 
 2.44.0.478.gd926399ef9-goog
 
