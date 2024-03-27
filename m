@@ -1,55 +1,55 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B34314C5A7
-	for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 17:36:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC79014D6EE
+	for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 17:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711560984; cv=none; b=Xbhk49glGoAXr0/FN1l6ZP4FIGJV8nrpuZHb658MsAcHRE1Q9cHf3QnYAHJXrdkOwUa2fg4W/vRAM3mmDzib738vj5tmQwLZUiMZ9jxvY+MrsJqwxTYbTuxLBFknpSKchywPcjanr+FeZiVnP2rjFEYFZmU6iekAMLa6kxv/0TY=
+	t=1711560988; cv=none; b=a13CBrTUHhs95HDvnoGcoWqEv0QfvuQbTfXqvUQiVvfkN5dF+7rTeAKHcP1WeRHBBUf0v35c2i/2d4jAxntlMevikqT5ckC14a4DkFDuKT1zT4f9MXfOpZh3Ayv4WRS0GXNgWRw3UUY+bSLGWTZsugJVKLQltjINd0+Bw5NugeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711560984; c=relaxed/simple;
-	bh=DvEA2DsoZwN1b+8wToQ/5AET2wpS1QIPzq8eViMhxPg=;
+	s=arc-20240116; t=1711560988; c=relaxed/simple;
+	bh=rZRBKCgv056DXWMS3QIFJfh4k5iz9h8Qz1AILB9aRso=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jKJneXONcqLWDXokCGkJaGSvdKnm8Jh/SMyguf/Uc/ZqB8BlNp70EPDYEcSOwdkUQFKp65iLW+SQ/IhNTCDG6wbq+OA4A9WALyxHuEri5oAts5AdaqlfcFQPkAJdpjjLVYEff3vUYSDRiZso4ntLv8Qaj20+c17Q7MCsA18WKKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iVH+WHgz; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=lSt6iSxoIOTAi0jueHy7huJrmCoFCuR9S6WkoCU2j1gujwzJwPBC5wW4igGU5kOLen28GuX1FIlC2dQHYQ9CjPaOonWNHbMbTPvPKR+jfDI1kaEFVvjI6WP28arjebUt+FqkwJUNrlPtZjBYUUrmBQVebYaXuy4YIdMQA2FEI1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ECFFP8pv; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iVH+WHgz"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbf618042daso69772276.0
-        for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 10:36:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ECFFP8pv"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-41495e1c1e9so180065e9.2
+        for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 10:36:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711560982; x=1712165782; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1711560985; x=1712165785; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GG/17rfXKx/eRqq4EbWCpiNZCoYJ682KJooA3YdXPxw=;
-        b=iVH+WHgzfzCXo88gG6uIeATsqGzL4RwP1lPmwriavQlU7pmSG/4gRuzzOB0uzfkVtY
-         EpXRJBSrpyFDyZLdPQvQFxdheOJCpe+Q7qZ9pxVC1gWCWsVmwJMFGp6cgvg/od3Wn+c6
-         vFk9u5GwoOCH35lIS7/DoKLfBAt61FqZmJOOfXJf6Nea7umDLEbQCvXaMJ8Xnslu4JGj
-         bkDvVz27J/UPCW7EsaqTSl+DFm2G/v+1MLh2pjpbFgqD0pymQlyX14AiUsIItBIcJPlP
-         vnBOw5nMSoXjRk2tAkqw2c4U8EOlr4q75w+tqCm3frFpZ3nVL7NR4EWe9+vO1m9qX0JN
-         2y9g==
+        bh=gf27lyI8HZ1SSa6nC8AMOUxMXF7+J0R52t1GAGG5yk0=;
+        b=ECFFP8pvzqN6in3mV7nKPRFmpfsvwxyXJ37xpdEad9axBoIxs9WPH/Re4StAbUmp5V
+         ozWet01KXfir/jNtOT2FRUIBIrDkkUFytzKilR6DP3MfKs3bXWPKsMwjtg5zXP2IR2tW
+         7Sk5bMPii1OZ9foZ3yV9mzcIVBWhJeRhjDM50CUYx55qZMsopLiVBsd73uPYqOfxQvXG
+         2q/WTTT74WLgWEldQizfzREonWPbpy26djTDDoSUVdgy9yhOeBIrGRm0g6Emzcy6u3Wl
+         P3tc9kj7L6xZSKS9A47ffctbKchUl35yUFX2B8vmxHJV5jnbF1r0hceJ5bn/cVdziwG1
+         3yHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711560982; x=1712165782;
+        d=1e100.net; s=20230601; t=1711560985; x=1712165785;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GG/17rfXKx/eRqq4EbWCpiNZCoYJ682KJooA3YdXPxw=;
-        b=hjyMkIIk6osBdfq8Sd8wbPSctjypt2yQdnAv5+3/1gjGtYF77oMPuMnG5qquZWmqeR
-         vocUOob1meEbHZNjqTTSVXK3czikO4uoF9XOF11weKVrnD2184vdIZbYNJ/LGsYtPIIy
-         HnVKxfYfqugEki4QLgm5r5YA/23Q9xYQNYmIfiOFZKfKZAyuIiArSLh/wtbpScxoXw7a
-         3F1Cayg/VEqTfQZ1+wkHRvQpNKRUesgWR4D+v47JOIHrQazIs3w9WEkl4HXTbN8MLN++
-         O0Xad9zlaflYBRr6Pc/4H2fsH4k7eitdHOlOVUMZDfN57DZweELfwAdDiQNOekaWKSqy
-         K1nw==
-X-Gm-Message-State: AOJu0YzEid/zJ2T41RpqB4y7lqUwP4iMSJNhX4LomXrpu5tp/OISANrS
-	7A+B7hY61n6ReS4/qplte0Xwf+NsbKftBhqc52OgaDENCIvqZU/1wSPNtyQsroVfqwG9GGQocJ8
-	c/rSireSI8owWpbKqgV0KeRUkwCAv5DrYnKCe6j8Oykohad/U/wjyoEO38rqIRTBjGMKuhPMPKJ
-	yKKbJ1bA/UrOv79ub5idYezhCSq7Q=
-X-Google-Smtp-Source: AGHT+IEGAwxzsL1U3Lh1GidH2+TaWZoIimXq8Fb4bRfgEqs8/ppmU8IgZDvCzkx0BrIEQCE3ZP0vb7CBQg==
+        bh=gf27lyI8HZ1SSa6nC8AMOUxMXF7+J0R52t1GAGG5yk0=;
+        b=PxEqKSPu/SFC0yB/9v0yLD5iJwbiOdx4iqQfOd1q2zonODufh9XCMhymqhuyjUIHwe
+         Fl6XsnuOD8VbZ5rnlZ+MWHJikJ14AexUi8wZlImKcYSXIR85w7tGNiwX4t1AnEO4BuMP
+         lrIeyuK9XUka2WbNM1R2d3+7HEI1N6OqDbg4bcHJA6wOiGMJU79pmRIB8vD2hLFUcqeB
+         e+JH60KBWiRDj9bqCZFs1+8GhZhulSfwioOG5nBu+VtSQHTwsdct2Oq7kTuwUuOejzci
+         quxsxwzze9oSz5Sjb9dlweHzqcVQJqoa1xa8cEAqxJRGpaOgVJqFLqxrXFtxf+VCdryo
+         3UsA==
+X-Gm-Message-State: AOJu0YzOJ1W16NJXNM+Wap7q6kkji3TiWwz3oB2zS/IOPZExgmh3vjwV
+	1/VL3hyceSfIAoD/bj9FPIeYkuLZiADIUoNclC83WSXJDfnb/vBK+Vfg+x1ULuFAGoCIMgDhKpA
+	49bobNutYb6qTGmvAikhNWMKEZRjbSoo4c9CjXtHIkaTx4HjuilOpX9ryth6zzzd+VVu1sMBdr6
+	LBSghQb4Cpq9hUmUUl9Ch2C/aMgm8=
+X-Google-Smtp-Source: AGHT+IFbZDCQRopXCXJ51tMtcMkZq8f0Hxe5/Zjf7oZzmhskSMt//uSvVu1LA1EeA1UzOirQB8cKtYydxQ==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:100e:b0:dd9:2a64:e98a with SMTP id
- w14-20020a056902100e00b00dd92a64e98amr60029ybt.9.1711560982568; Wed, 27 Mar
- 2024 10:36:22 -0700 (PDT)
-Date: Wed, 27 Mar 2024 17:35:08 +0000
+ (user=tabba job=sendgmr) by 2002:a05:600c:19cc:b0:414:1181:3845 with SMTP id
+ u12-20020a05600c19cc00b0041411813845mr73wmq.6.1711560984706; Wed, 27 Mar 2024
+ 10:36:24 -0700 (PDT)
+Date: Wed, 27 Mar 2024 17:35:09 +0000
 In-Reply-To: <20240327173531.1379685-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240327173531.1379685-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240327173531.1379685-22-tabba@google.com>
-Subject: [PATCH v1 21/44] KVM: arm64: Add PC_UPDATE_REQ flags covering all PC updates
+Message-ID: <20240327173531.1379685-23-tabba@google.com>
+Subject: [PATCH v1 22/44] KVM: arm64: Add vcpu flag copy primitive
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -72,31 +72,49 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Marc Zyngier <maz@kernel.org>
 
-In order to deal with PC updates (such as INCREMENT_PC and the
-collection of flags that come with PENDING_EXCEPTION), add a single
-mask that covers them all.
+Contrary to vanilla KVM, pKVM not only deals with flags in a vcpu,
+but also synchronises them across host and hypervisor views of the same
+vcpu.
 
-This will be used to manipulate these flags as a single entity.
+Most of the time, this is about copying flags from one vcpu structure
+to another, so let's offer a primitive that does this.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/include/asm/kvm_host.h | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index cdbbfa3246c1..3c0fefb1dd73 100644
+index 3c0fefb1dd73..da5fc300d691 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -786,6 +786,8 @@ struct kvm_vcpu_arch {
- #define INCREMENT_PC		__vcpu_single_flag(iflags, BIT(1))
- /* Target EL/MODE (not a single flag, but let's abuse the macro) */
- #define EXCEPT_MASK		__vcpu_single_flag(iflags, GENMASK(3, 1))
-+/* Cover both PENDING_EXCEPTION and EXCEPT_MASK for global operations */
-+#define PC_UPDATE_REQ		__vcpu_single_flag(iflags, GENMASK(3, 0))
+@@ -764,9 +764,25 @@ struct kvm_vcpu_arch {
+ 		__vcpu_flags_preempt_enable();			\
+ 	} while (0)
  
- /* Helpers to encode exceptions with minimum fuss */
- #define __EXCEPT_MASK_VAL	unpack_vcpu_flag(EXCEPT_MASK)
++#define __vcpu_copy_flag(vt, vs, flagset, f, m)			\
++	do {							\
++		typeof(vs->arch.flagset) tmp, val;		\
++								\
++		__build_check_flag(vs, flagset, f, m);		\
++								\
++		val = READ_ONCE(vs->arch.flagset);		\
++		val &= (m);					\
++		tmp = READ_ONCE(vt->arch.flagset);		\
++		tmp &= ~(m);					\
++		tmp |= val;					\
++		WRITE_ONCE(vt->arch.flagset, tmp);		\
++	} while (0)
++
++
+ #define vcpu_get_flag(v, ...)	__vcpu_get_flag((v), __VA_ARGS__)
+ #define vcpu_set_flag(v, ...)	__vcpu_set_flag((v), __VA_ARGS__)
+ #define vcpu_clear_flag(v, ...)	__vcpu_clear_flag((v), __VA_ARGS__)
++#define vcpu_copy_flag(vt, vs, ...) __vcpu_copy_flag((vt), (vs), __VA_ARGS__)
+ 
+ /* SVE exposed to guest */
+ #define GUEST_HAS_SVE		__vcpu_single_flag(cflags, BIT(0))
 -- 
 2.44.0.478.gd926399ef9-goog
 
