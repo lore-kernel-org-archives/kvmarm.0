@@ -1,60 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C76D36138;
-	Wed, 27 Mar 2024 09:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA1C14A0BB;
+	Wed, 27 Mar 2024 12:13:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711530287; cv=none; b=nuz4eCam3+uBpLN/4WjJjGXGGX5ty/1lVy4mfRprhj9gVZscyrLVRshn/Ll6miOI0yf6tVkKiGaWwMQb2vEq4YP+WxrUwAGVZHmD+qqiC6Ii6U5yL6lR2zmn7AAunMeWh0ZjXInv83vO8nsMooobglhghPIWpEdrG3XQ/NCYV1Y=
+	t=1711541591; cv=none; b=bqYerT1RdXaeFHxWaHd27CrAi6PFVuewyTC3pJzv4HENQva0Qt3JU+v9xmTFVJyLczO2v8T4i3uc8fDGtJ7iFGv86uomdm2/2tmZPWG2OwZMLnd/VyAkg7tIa4f7m+n25ecnBV65oUljDAglkZVCKfVoiyF7LTuxDPTP0Okpqw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711530287; c=relaxed/simple;
-	bh=bMyARdE0JIrslD3mQvkVUjwAyfKxGRyE+PhZMbxwV2U=;
+	s=arc-20240116; t=1711541591; c=relaxed/simple;
+	bh=6nzb64oC/aS+38eYkHxWrJnO/Ec/5COHzsOHpbHjwq8=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NG/k9aLg2wQOM7Z50GsR2EFctRHN6toaMn0MU+J9g1hFOYbkZkG02E+YueWmmGO4qds5EKQWkTRNChHcqEESYyCOlIB9J6QWNUApi0Kyh2wXXA2dXl7RpoGCMszGjNl3tNUnMsVXJYauCGY77nuSPDShazk6aA/3Ef+499BqPbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OUiODDVL; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=aTPFQRFl42qPfCNEDy9nL/3QaBNhNub0f4WGXKbUU4KIdomxnEr8Iafk+9o0Z2G0IUzcg13Kr33XjitQlCQ1xx4pcXSCZ1HnybFS9+s5VchCkLLV4QVcBfQyLiP7IzZ14zx8qwvkX8VaMxiUPnnLI5EbfL6t5XKVA/bzLYlCVNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iYutqEe5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OUiODDVL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9984EC433F1;
-	Wed, 27 Mar 2024 09:04:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iYutqEe5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E52E3C43390;
+	Wed, 27 Mar 2024 12:13:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711530286;
-	bh=bMyARdE0JIrslD3mQvkVUjwAyfKxGRyE+PhZMbxwV2U=;
+	s=k20201202; t=1711541590;
+	bh=6nzb64oC/aS+38eYkHxWrJnO/Ec/5COHzsOHpbHjwq8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OUiODDVLlw4kp8sQulM7X6Hhe6ixfPzarvVsc7FWgAUc7kh2mmGKkENXDNuSprxfE
-	 b8fxvRCDeTPEkJZJMMdp1Io+HtWbIPc6S/VKVIaayx/ZRAInsaB3j9TBcVcdQndByt
-	 2gSFIkieb64+pqM2BzlTXk3v4Do6CTKTRVWFfQ5LdYhdjW3tUZ0AFCsGjJF0uPUf+U
-	 ItQYq3XPVkiN0X5VhuuagyerDUeiP/upfOp1lF4AtagKUNA5GaRnJgmfsaIJzNHAwq
-	 8+ARNORJ3ypUZEtOS0l/dtYDke35La6swAlQfNn8JZzemYiBdZVZtita3bKOdJb/5w
-	 nTdvjIxRm4Yrw==
-Received: from 213-229-0-18.static.upcbusiness.at ([213.229.0.18] helo=wait-a-minute.misterjones.org)
+	b=iYutqEe5s0N9gvqdYsI1i59tc58latUbZgDX0+SbW82UFYr6MrNmzMRo7wACyvb7T
+	 DeHYGvTc8P1teXK1vtA0zmcQnp/3o+jMFUsAHinGhBHgQ81ebMqkoeWBDXCDCYQcsZ
+	 QGqrxYvnlRfSjvflGkmodVfCCHNPwaXxwyRyhUvOylTvTpqSV26GH8GwTjeO6PiDjt
+	 mDzTByGBUWz16Ja1pwIvm9yBf8uPgmymQ/cJmUvSkVNCtAmZP9cbHCsowYebcxImZZ
+	 S69O/cz21T+WpcKOtQsuyGDnlm38KPeYjL7eLslJr3Z5EnMoOvXBgwRKXcP5Xp0DVb
+	 Thlxr2JmBSx/g==
+Received: from 82-132-225-99.dab.02.net ([82.132.225.99] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rpPD9-00GDv7-Sj;
-	Wed, 27 Mar 2024 09:04:44 +0000
-Date: Wed, 27 Mar 2024 09:04:42 +0000
-Message-ID: <87a5mkrqol.wl-maz@kernel.org>
+	id 1rpS9U-00GHA1-83;
+	Wed, 27 Mar 2024 12:13:08 +0000
+Date: Wed, 27 Mar 2024 12:12:55 +0000
+Message-ID: <87ttkrswjc.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	James Clark <james.clark@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Dongli Zhang <dongli.zhang@oracle.com>
-Subject: Re: [PATCH v2 5/5] KVM: arm64: Exclude FP ownership from kvm_vcpu_arch
-In-Reply-To: <55f2f1f7-6f23-45f2-ae6c-a1111e3271db@sirena.org.uk>
-References: <20240322170945.3292593-1-maz@kernel.org>
-	<20240322170945.3292593-6-maz@kernel.org>
-	<fe5edef8-e61d-42b3-b4da-6f6bebd60013@sirena.org.uk>
-	<87edc0sr7z.wl-maz@kernel.org>
-	<252bc993-e93d-4412-bfc6-13930b80dbd8@sirena.org.uk>
-	<87cyrism0p.wl-maz@kernel.org>
-	<55f2f1f7-6f23-45f2-ae6c-a1111e3271db@sirena.org.uk>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: kvmarm@lists.linux.dev,	kvm@vger.kernel.org,	linux-arm-kernel@lists.infradead.org,	linux-kernel@vger.kernel.org,	oliver.upton@linux.dev,	darren@os.amperecomputing.com,	d.scott.phillips@amperecomputing.com
+Subject: Re: [RFC PATCH] kvm: nv: Optimize the unmapping of shadow S2-MMU tables.
+In-Reply-To: <92117ba1-54ff-4752-b446-0ed09bde7201@os.amperecomputing.com>
+References: <20240305054606.13261-1-gankulkarni@os.amperecomputing.com>
+	<86sf150w4t.wl-maz@kernel.org>
+	<6685c3a6-2017-4bc2-ad26-d11949097050@os.amperecomputing.com>
+	<86r0go201z.wl-maz@kernel.org>
+	<92117ba1-54ff-4752-b446-0ed09bde7201@os.amperecomputing.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -65,54 +54,66 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 213.229.0.18
-X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, james.clark@arm.com, anshuman.khandual@arm.com, dongli.zhang@oracle.com
+X-SA-Exim-Connect-IP: 82.132.225.99
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, darren@os.amperecomputing.com, d.scott.phillips@amperecomputing.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 25 Mar 2024 14:57:27 +0000,
-Mark Brown <broonie@kernel.org> wrote:
+On Tue, 26 Mar 2024 11:33:27 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
-> [1  <text/plain; us-ascii (quoted-printable)>]
-> On Mon, Mar 25, 2024 at 09:23:18AM +0000, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
 > 
-> > > This was referring to the fact that currently when SVE is enabled access
-> > > to the V registers as V registers via _CORE_REG() is blocked and they
-> > > can only be accessed as a subset of the Z registers (see the check at
-> > > the end of core_reg_size_from_offset() in guest.c).
+> Hi Marc,
 > 
-> > But what behaviour do you expect from allowing such a write? Insert in
-> > place? Or zero the upper bits of the vector, as per R_WKYLB? One is
-> > wrong, and the other wrecks havoc on unsuspecting userspace.
+> On 05-03-2024 08:33 pm, Marc Zyngier wrote:
+> > On Tue, 05 Mar 2024 13:29:08 +0000,
+> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >> 
+> >> 
+> >> 
+> >> What are the core issues (please forgive me if you mentioned already)?
+> >> certainly we will prioritise them than this.
+> > 
+> > AT is a big one. Maintenance interrupts are more or less broken. I'm
+> > slowly plugging PAuth, but there's no testing whatsoever (running
+> > Linux doesn't count). Lack of SVE support is also definitely a
+> > blocker.
+> > 
 > 
-> It would have to be the former due to the ABI issue I think.
+> I am debugging an issue where EDK2(ArmVirtPkg) boot hangs when tried
+> to boot from L1 using QEMU.
+> 
+> The hang is due to failure of AT instruction and resulting in
+> immediate return to Guest(L2) and the loop continues...
+>
+> AT instruction is executed in function of
+> __get_fault_info(__translate_far_to_hpfar) in L1 when data abort is
+> forwarded. Then AT instruction is trapped and executed/emulated in L0
+> in function "__kvm_at_s1e01" is failing and resulting in the return to
+> guest.
+> 
+> Is this also the manifestation of the issue of AT that you are referring to?
 
-No, that's an architecture violation.
+It's possible, but you are looking at the symptom and not necessarily
+the problem.
 
-> > My take on this is that when a VM is S*E aware, only the writes to the
-> > largest *enabled* registers should take place. This is similar to what
-> > we do for FP/SIMD: we only allow writes to the V registers, and not to
-> > Q, D, S, H or B, although that happens by construction. For S*E,
-> > dropping the write on the floor (or return some error that userspace
-> > will understand as benign) is the least bad option.
-> 
-> OK, this does mean that in the case of a SME only guest we'll end up
-> with registers not just changing size but appearing and disappearing
-> depending on SVCR.SM.  It wasn't clear to me that this was a good idea
-> from an ABI point of view, it's a level up beyond the size changing
-> thing and there's a tradeoff with the "model what the architecture does"
-> model.
+FWIW, I can boot EDK2 as built by debian as an L2 using QEMU without
+any problem, but I'm not using QEMU for L1 (it shouldn't have much of
+an impact anyway).
 
-The registers don't have to disappear, they just have to become WI,
-just like it is the case today with SVE. Yes, the ABI becomes
-contextual, but we're past the point where we can treat the various
-register files as a bag of bits that can be save/restored without any
-ordering.
+I expect AT S1E1R to fail if any of the following are true:
 
-We already have similar requirements for complex parts of KVM where
-ordering is required, such as GICv3 and the ITS, and we follow what
-the architecture requires. The same thing applies for the CPU.
+- the guest S1 page tables have been swapped out in the interval
+  between the fault and the AT emulation
+
+- the shadow S2 page tables do not have a translation for the output
+  of the S1 page tables yet
+
+You will need to work out which of these two are true. It is perfectly
+possible that there are more edge cases that need addressing, as what
+you describe just works with my setup. It could also be that 4kB page
+support at L1 is broken (as I have no way to test it and only run with
+a 16kB L1).
 
 	M.
 
