@@ -1,55 +1,55 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC79014D6EE
-	for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 17:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0257014EC40
+	for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 17:36:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711560988; cv=none; b=a13CBrTUHhs95HDvnoGcoWqEv0QfvuQbTfXqvUQiVvfkN5dF+7rTeAKHcP1WeRHBBUf0v35c2i/2d4jAxntlMevikqT5ckC14a4DkFDuKT1zT4f9MXfOpZh3Ayv4WRS0GXNgWRw3UUY+bSLGWTZsugJVKLQltjINd0+Bw5NugeA=
+	t=1711560989; cv=none; b=MVp7qczJUqPF9oXtZ9uBwawkMylY4S7RWCE0EP8ggQRS9qqWLbgaZeBDSVVm/dO7l3kFydZwciZKwA6XAbmnAC1UKeQJ8IRIPdMebrzX0gC4vdTTPhyzDunO5SU9H0rsMpoEWhvFhcRivo20yxk8+04YdYAzFfZ2EAZ3qxG8nws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711560988; c=relaxed/simple;
-	bh=rZRBKCgv056DXWMS3QIFJfh4k5iz9h8Qz1AILB9aRso=;
+	s=arc-20240116; t=1711560989; c=relaxed/simple;
+	bh=Mp08rRFxbl7YCd7B4FHXv7atmiw5f4JEVIuCa92utQw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lSt6iSxoIOTAi0jueHy7huJrmCoFCuR9S6WkoCU2j1gujwzJwPBC5wW4igGU5kOLen28GuX1FIlC2dQHYQ9CjPaOonWNHbMbTPvPKR+jfDI1kaEFVvjI6WP28arjebUt+FqkwJUNrlPtZjBYUUrmBQVebYaXuy4YIdMQA2FEI1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ECFFP8pv; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=W7JSE/QOzNjewB6jt9I2d8SdG2iZff6et2EKIBgYjuUNLFjhhSp9fW3e1Q9hd3wrFRPba7J8QgKQ1jlJHVdobKx6a/e6/qmNu4drccOV86Hy7w+Wao1JDUGjUFInlQdsDOyw2yZ07+Y4C7orx3IlH4Bw8CPgZlESZvjGopn5Qy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LU41sfEK; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ECFFP8pv"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-41495e1c1e9so180065e9.2
-        for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 10:36:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LU41sfEK"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60cd041665bso1901227b3.0
+        for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 10:36:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711560985; x=1712165785; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1711560987; x=1712165787; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gf27lyI8HZ1SSa6nC8AMOUxMXF7+J0R52t1GAGG5yk0=;
-        b=ECFFP8pvzqN6in3mV7nKPRFmpfsvwxyXJ37xpdEad9axBoIxs9WPH/Re4StAbUmp5V
-         ozWet01KXfir/jNtOT2FRUIBIrDkkUFytzKilR6DP3MfKs3bXWPKsMwjtg5zXP2IR2tW
-         7Sk5bMPii1OZ9foZ3yV9mzcIVBWhJeRhjDM50CUYx55qZMsopLiVBsd73uPYqOfxQvXG
-         2q/WTTT74WLgWEldQizfzREonWPbpy26djTDDoSUVdgy9yhOeBIrGRm0g6Emzcy6u3Wl
-         P3tc9kj7L6xZSKS9A47ffctbKchUl35yUFX2B8vmxHJV5jnbF1r0hceJ5bn/cVdziwG1
-         3yHg==
+        bh=mLImnFonwMkXaGq9YZhAJ29c7Vai4lnQOH9Ys3CxoUI=;
+        b=LU41sfEKwwe/4fdMOtNwD2BVd9sBhWHTwPld3r31eP2JlDeifEkwhlcSWvJWtZA+D8
+         iqzc1YIonwkKVetKcMdPSWM0djQP04mG8/QEckDpfwOLURTl6Rij3/O3nFk83yzauIJH
+         pt0gHlF9gWVso5UjqQzdsK+cUeI6pvMyojOiyGjV2v2oMMI7rTZ/Dp2G1jzN6cdaZrk9
+         Qb2B6qzjVEG4pWagfQPxlyjrvsn4FxvF3t7bunIctnVSFJq6Ovu7L7xxGYqOy+dgBwro
+         YQUrpAsvGtqF15hCaQAxkDBRPrXNNVGLZVwCygZ03TlLZg0GiC2NvGOAEJyAG/nTFbgO
+         mp6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711560985; x=1712165785;
+        d=1e100.net; s=20230601; t=1711560987; x=1712165787;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gf27lyI8HZ1SSa6nC8AMOUxMXF7+J0R52t1GAGG5yk0=;
-        b=PxEqKSPu/SFC0yB/9v0yLD5iJwbiOdx4iqQfOd1q2zonODufh9XCMhymqhuyjUIHwe
-         Fl6XsnuOD8VbZ5rnlZ+MWHJikJ14AexUi8wZlImKcYSXIR85w7tGNiwX4t1AnEO4BuMP
-         lrIeyuK9XUka2WbNM1R2d3+7HEI1N6OqDbg4bcHJA6wOiGMJU79pmRIB8vD2hLFUcqeB
-         e+JH60KBWiRDj9bqCZFs1+8GhZhulSfwioOG5nBu+VtSQHTwsdct2Oq7kTuwUuOejzci
-         quxsxwzze9oSz5Sjb9dlweHzqcVQJqoa1xa8cEAqxJRGpaOgVJqFLqxrXFtxf+VCdryo
-         3UsA==
-X-Gm-Message-State: AOJu0YzOJ1W16NJXNM+Wap7q6kkji3TiWwz3oB2zS/IOPZExgmh3vjwV
-	1/VL3hyceSfIAoD/bj9FPIeYkuLZiADIUoNclC83WSXJDfnb/vBK+Vfg+x1ULuFAGoCIMgDhKpA
-	49bobNutYb6qTGmvAikhNWMKEZRjbSoo4c9CjXtHIkaTx4HjuilOpX9ryth6zzzd+VVu1sMBdr6
-	LBSghQb4Cpq9hUmUUl9Ch2C/aMgm8=
-X-Google-Smtp-Source: AGHT+IFbZDCQRopXCXJ51tMtcMkZq8f0Hxe5/Zjf7oZzmhskSMt//uSvVu1LA1EeA1UzOirQB8cKtYydxQ==
+        bh=mLImnFonwMkXaGq9YZhAJ29c7Vai4lnQOH9Ys3CxoUI=;
+        b=Cgh54cw1hhX+MJRzEqzWMVelScaIPUS6dHf9x2YVSVnejXGPOrnzWm7YUEqfyY9p3n
+         VdFJ0eECtgUVg0m2zPmqgOR55DQLCU82nzQvZ1vTnvoxeWXa9USO42HUru4D9R3Y/6Pa
+         u5VERpWFjFs+VhkQiMbrerloB4RdUMaCTuPZjIN5fGvWp8pdookPMvCoYbiOQKn8R43B
+         p7G2QQnM/jJSdDGPt26KVTvymwmU9Czyn9QuyUsaXTLyhmZ2s/J7x0t5TIF9CnXqXf08
+         hcZ5iyhwmfrG1Or/tbBs8i+mXhnt3XV5xEJFi2im1byX5UkzVVJKdlFk3X0BDcsJcIXO
+         yxIQ==
+X-Gm-Message-State: AOJu0Ywh1bVjR/uNvNT6t3r20sc3iCrrDjIzQu89CUegVybY5Did1pjs
+	4gjF0D3EglYFKe2A7qIQnTaVuE7qCP8c5zfSNlDCosZxiQxV9Mx27+ZVAyqC7s8d+o+BW4bD4Dp
+	TzwuVqiIWwhMXufEiQJNG2n4uCZ5/QqroY/6NGUyf53BzSkvuokkbg+otMgTrMNgxhCIt3h3lKm
+	lqZxAi3Syuv4/+yGdR5OoEIho3SFw=
+X-Google-Smtp-Source: AGHT+IG/h1jXGZ5fvx9VTc+A3k0Hjoel10zEI8YlPodNyN+XTwNYwkHACJnWY2XDwJ7NIxXkG+mCYiVrnA==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:19cc:b0:414:1181:3845 with SMTP id
- u12-20020a05600c19cc00b0041411813845mr73wmq.6.1711560984706; Wed, 27 Mar 2024
- 10:36:24 -0700 (PDT)
-Date: Wed, 27 Mar 2024 17:35:09 +0000
+ (user=tabba job=sendgmr) by 2002:a05:6902:1b11:b0:dda:eee6:8e52 with SMTP id
+ eh17-20020a0569021b1100b00ddaeee68e52mr151169ybb.7.1711560987094; Wed, 27 Mar
+ 2024 10:36:27 -0700 (PDT)
+Date: Wed, 27 Mar 2024 17:35:10 +0000
 In-Reply-To: <20240327173531.1379685-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240327173531.1379685-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240327173531.1379685-23-tabba@google.com>
-Subject: [PATCH v1 22/44] KVM: arm64: Add vcpu flag copy primitive
+Message-ID: <20240327173531.1379685-24-tabba@google.com>
+Subject: [PATCH v1 23/44] KVM: arm64: Introduce gfn_to_memslot_prot()
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -70,51 +70,66 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-From: Marc Zyngier <maz@kernel.org>
+Returns the memslot and whether it's writable without requiring a
+userspace address at the host.
 
-Contrary to vanilla KVM, pKVM not only deals with flags in a vcpu,
-but also synchronises them across host and hypervisor views of the same
-vcpu.
+The userspace address isn't needed to get this information.
+Future patches, where the userspace address might not be known,
+would need access to the memslot and whether it's writeable.
 
-Most of the time, this is about copying flags from one vcpu structure
-to another, so let's offer a primitive that does this.
+No functional change intended.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ include/linux/kvm_host.h |  1 +
+ virt/kvm/kvm_main.c      | 22 ++++++++++++++++++++++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 3c0fefb1dd73..da5fc300d691 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -764,9 +764,25 @@ struct kvm_vcpu_arch {
- 		__vcpu_flags_preempt_enable();			\
- 	} while (0)
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 48f31dcd318a..94f0e8e00d0c 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1292,6 +1292,7 @@ int kvm_gfn_to_hva_cache_init(struct kvm *kvm, struct gfn_to_hva_cache *ghc,
  
-+#define __vcpu_copy_flag(vt, vs, flagset, f, m)			\
-+	do {							\
-+		typeof(vs->arch.flagset) tmp, val;		\
-+								\
-+		__build_check_flag(vs, flagset, f, m);		\
-+								\
-+		val = READ_ONCE(vs->arch.flagset);		\
-+		val &= (m);					\
-+		tmp = READ_ONCE(vt->arch.flagset);		\
-+		tmp &= ~(m);					\
-+		tmp |= val;					\
-+		WRITE_ONCE(vt->arch.flagset, tmp);		\
-+	} while (0)
-+
-+
- #define vcpu_get_flag(v, ...)	__vcpu_get_flag((v), __VA_ARGS__)
- #define vcpu_set_flag(v, ...)	__vcpu_set_flag((v), __VA_ARGS__)
- #define vcpu_clear_flag(v, ...)	__vcpu_clear_flag((v), __VA_ARGS__)
-+#define vcpu_copy_flag(vt, vs, ...) __vcpu_copy_flag((vt), (vs), __VA_ARGS__)
+ int kvm_clear_guest(struct kvm *kvm, gpa_t gpa, unsigned long len);
+ struct kvm_memory_slot *gfn_to_memslot(struct kvm *kvm, gfn_t gfn);
++struct kvm_memory_slot *gfn_to_memslot_prot(struct kvm *kvm, gfn_t gfn, bool *writable);
+ bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn);
+ bool kvm_vcpu_is_visible_gfn(struct kvm_vcpu *vcpu, gfn_t gfn);
+ unsigned long kvm_host_page_size(struct kvm_vcpu *vcpu, gfn_t gfn);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index fb49c2a60200..8757c8f7808b 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2709,6 +2709,28 @@ static bool memslot_is_readonly(const struct kvm_memory_slot *slot)
+ 	return slot->flags & KVM_MEM_READONLY;
+ }
  
- /* SVE exposed to guest */
- #define GUEST_HAS_SVE		__vcpu_single_flag(cflags, BIT(0))
++/*
++ * Return the memslot of a @gfn and the R/W attribute if slot is valid, or NULL
++ * if slot is not valid.
++ *
++ * @slot: the kvm_memory_slot which contains @gfn
++ * @gfn: the gfn to be translated
++ * @writable: used to return the read/write attribute of the @slot if the hva
++ * is valid and @writable is not NULL
++ */
++struct kvm_memory_slot *gfn_to_memslot_prot(struct kvm *kvm, gfn_t gfn, bool *writable)
++{
++	struct kvm_memory_slot *slot = gfn_to_memslot(kvm, gfn);
++
++	if (!slot || slot->flags & KVM_MEMSLOT_INVALID)
++		return NULL;
++
++	if (writable)
++		*writable = !memslot_is_readonly(slot);
++
++	return slot;
++}
++
+ static unsigned long __gfn_to_hva_many(const struct kvm_memory_slot *slot, gfn_t gfn,
+ 				       gfn_t *nr_pages, bool write)
+ {
 -- 
 2.44.0.478.gd926399ef9-goog
 
