@@ -1,55 +1,55 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945B5F4E2
-	for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 17:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903C6F4E2
+	for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 17:35:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711560941; cv=none; b=JU+CWq7CXrNn8wYuAQnhXCmImZZNIIKNZDXlVpOy8Z/ipXU42yd+9aLI+3yVOpznfyfYd/BH2j5d+54bFIy0nv5BhFLe7EuQaEh0wjtowxmIFtFAqpsMx5dHw0TFnUBUi4oLStI1S/TGa76IrDnUbdkHzAuYJ5SgakY/V7ZkAD4=
+	t=1711560943; cv=none; b=ncGZvmLCW5wI1ITAG6BYQUv0taZC5PO7hIpdcPscFmPVnTUVqTiRpwSGnMfieoP2ah72mSESKciE+MJ+xs55Z6C7592CmjB7fLgjayv2dNURApFESLku/jlppMl6b8bI0uH7XyGLNeG3JrK1gYXaTKrvpu+87KWbmArzX8J++ZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711560941; c=relaxed/simple;
-	bh=Mjyl6m0ZPxQLo7f+KWqCmulgaboejtjxvawOVa5pD7w=;
+	s=arc-20240116; t=1711560943; c=relaxed/simple;
+	bh=4Ymmtjoojb1QAY0LNWRi72DAdBNQV2ORGdwEpCNcYMg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=n4dqUhPRkgHPaJocvFS/3F4f9ez1nY5yopXomd5gwTaPC7arX/6Bdb5DP/qPk6W2wSz/oz5ZGggO1Kk77RRCwsR/pWsCtrKAkR0i9zV9YMObDunmA9cW0vMwAPz/4/6+OkjhpEW0iKvZDOSOFwnAwtLrl5tvttb976w0baVMnkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xZNOIYRS; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=i1Vv99xPkBm9jvgO58mRZ7N0aMYFBW2teY8Md5h1yghHq5/GcPr7OVFgJMay0JLr/U+q+5SP6jzDIZTUxBiYsqZuBy85mVoDFhfbWCtCFo44VkizzgtPPc1KVzQQYPsth+MD1vZfInkZwX+qK8GzFk4rN+dBAxJabEUhXy0q8fM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qloMOwm9; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xZNOIYRS"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4140d2917e6so292565e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 10:35:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qloMOwm9"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc746178515so47793276.2
+        for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 10:35:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711560938; x=1712165738; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1711560940; x=1712165740; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NUzKcYrrG9GVcJ2vQ+rL1jGLyHzQALHGWx/8oAcLBPo=;
-        b=xZNOIYRS9v6I3IHdH4eVH0ROh6TPdyw0dXspbFdxabFGucGjDAFSDkxu933R/WSHP5
-         uOpruCYIy1OHQL92C0ZUff/UAazY6LN196JdS0S9ASfwBEKIxoLNfPgqIdy+VgtYn/Zg
-         gAY/nFdvLM0BKpkyLzy9vuQzqHsoqxLCtzBm/et3VKo+m7lTWie92JIXfva0a04i7yod
-         tXDQu3CBRn57aWFO3BP557L7KhZJKUIL/K1s34ECpC9VajJ1/oXWLe79qMFU/k4ySL7N
-         SZlzPEGi9hkHUGyHlaH1iBGitmp0vty7cTS4w7oocZrH8zFBhSlfjU9EqIIhedWWyuk5
-         hAfw==
+        bh=y7loAMCX5pjbp6Hb6CYPv3LRzLItnBOCiY1g2k8wkn0=;
+        b=qloMOwm92vH4uxgDHxzn+/g51otY/r4DD+enG7XzEZSPt0WuhbSC8/d5KJ5TSps/Ie
+         J8Ecu9xD+19S7FwtuzU8gB2c/LVrytAgIW43Rzfv3lB7XraONpKF7SUGzjhIkj1mqpEU
+         UwS7vo/l86LelQmb2yDrzpJTv1/molFjoLyC/LFvVWbeQdZGobSBBUjtkvAeliTpT6TM
+         kQKzTXhftouwF1itvz8drdnjEIBbZMlhZXMjN/3y0qvIgEzNLAhhIcCXlsvrS/uieeuJ
+         z32uOqwJP3+aAtneo5ow4vXxzMS7pR29GkmGcE6u+dMw3qiuwM7mx8dpsZU2yV0l0z19
+         jSSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711560938; x=1712165738;
+        d=1e100.net; s=20230601; t=1711560940; x=1712165740;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NUzKcYrrG9GVcJ2vQ+rL1jGLyHzQALHGWx/8oAcLBPo=;
-        b=uHrRZoxhvWfCy/G/I7sd+M0G7tkWaiTHiAWj0L8WxDkN2LNrw4OIuosyQZTwokVFmn
-         8dk+gbl6iwzPq/+iKMHXJd7n9vhMlBur9Y7WxsUMkJtDZms6txNHMf0YLAl8DxzmkC/S
-         5/DBiMIZVIhfEig5VAq65fBo4FitmIJly8bGj7lu3hO1tXkQf+D/wrfMlFvVaW24xMTY
-         IxcSZdUgyUBCAuBwpbLgG+2GtLlC6ljiYSVfODzFhw9lqV5mWtpp7d5029CqMZbByXg5
-         /hr4mLE3DNBUSpVzbiMifHhIqOLb/jvVWfo8Oy1t95cq+61Yp5vANNBwkAQs4ZlY7Ouv
-         4+iw==
-X-Gm-Message-State: AOJu0Yy+Ak4IpDe6bs8fcQjIVT+Vf81Gw1inPcQ9tAF+hEot1n7c3/Zq
-	JDTqZQfqZ/vp2cDSUe5OBs7XPjtoerMEenaZVILFlnFXEPgceNBL6q2wa7Wk2OdKpsJxsI5G6jq
-	aChToL7ZTnxPvLXB4KR2CJPN7t6cEZlYr0IPuKyibq1QcKuTsvLIjfGMYPcYiD6KA62cj0NLJPh
-	fThPVUtM6hPG/siILNw9rAxtSIBBQ=
-X-Google-Smtp-Source: AGHT+IFnh+YJoXTF/ddcOJzmAC5tyPFA4uaqNRelpY/UTPu4VWuCrmQyszMHGVttJANobHzxGMzkaqGa+w==
+        bh=y7loAMCX5pjbp6Hb6CYPv3LRzLItnBOCiY1g2k8wkn0=;
+        b=aEBvlBaSQ//kH3Mgpp5fJsg55pa1uE5F34mQAsHhEUZyjcBRnOI+dg9KQuaCGisbMB
+         ywtqyqgEo+gXAnTTo1g7YRB9hzGE/mMjlhnQinLLak2iWiRHSVlsX9R+KPgEZXARNDsv
+         q+9zjzUbjalI7IzbyIDZGaEzxyawkwIXt38Q7CFPtRKROFaAAKMBVQQxnHrMHzOoDHt+
+         d9UPiTbne4bbNZr0nS3HxJwHmnvX7HQmrNHqinG9HeFWTGEArM1L8VPogZ+HMCVtOXx0
+         RfnwWGDCoJAqiKhxjyXxFRcRH9vW/C1clXdz+PHn8/HrhLIYHI7Jl4V6/DJcZ9HsO0Tt
+         qinQ==
+X-Gm-Message-State: AOJu0YznXrDCChlXzejKVthUak8yrYyoMRFKwNsUDYppQMZ5sOWeMUHu
+	bgk8YErmKZsI28C9CMJPn7whAkqsq576P2RY3r7EbKxfnk32JHk4N+rcxttb+kSV8Fs9Pm5Fg3Q
+	l96xuWAITHiJbG9bpsVd1mHOh8R/pcDoIeM1zpoR/nRcmticR2h9BKavo7ezZfkggkJoT66h7d0
+	LU+d2DhvapGyO6tx6VLZvn1EUPaWY=
+X-Google-Smtp-Source: AGHT+IF0Bo2vFBObMMkjE8fZmzmDiVzJAhWkFQR/K1BPeHuJpV1qyrKFZVhlMNprIO2KiHDwFQCt3BaBTg==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:1d1f:b0:414:21c:fb13 with SMTP id
- l31-20020a05600c1d1f00b00414021cfb13mr109wms.2.1711560938083; Wed, 27 Mar
- 2024 10:35:38 -0700 (PDT)
-Date: Wed, 27 Mar 2024 17:34:49 +0000
+ (user=tabba job=sendgmr) by 2002:a05:6902:230b:b0:dc6:f877:ea7b with SMTP id
+ do11-20020a056902230b00b00dc6f877ea7bmr141163ybb.9.1711560940515; Wed, 27 Mar
+ 2024 10:35:40 -0700 (PDT)
+Date: Wed, 27 Mar 2024 17:34:50 +0000
 In-Reply-To: <20240327173531.1379685-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240327173531.1379685-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240327173531.1379685-3-tabba@google.com>
-Subject: [PATCH v1 02/44] KVM: arm64: Use enum instead of helper for checking FP-state
+Message-ID: <20240327173531.1379685-4-tabba@google.com>
+Subject: [PATCH v1 03/44] KVM: arm64: Move setting the page as dirty out of
+ the critical section
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -70,64 +71,49 @@ Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
 	joey.gouly@arm.com, rananta@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Before the conversion of the various FP-state booleans into an
-enum representing the state, this helper may have clarified
-things. Since the introduction of the enum, the helper obfuscates
-rather than clarifies. This also makes the code consistent with
-other parts that check the FP-state.
-
-No functional change intended.
+Move the unlock earlier in user_mem_abort() to shorten the
+critical section. This also helps for future refactoring and
+reuse of similar code.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 6 ------
- arch/arm64/kvm/hyp/nvhe/switch.c        | 2 +-
- arch/arm64/kvm/hyp/vhe/switch.c         | 2 +-
- 3 files changed, 2 insertions(+), 8 deletions(-)
+ arch/arm64/kvm/mmu.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index e3fcf8c4d5b4..1a6dfd035531 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -39,12 +39,6 @@ struct kvm_exception_table_entry {
- extern struct kvm_exception_table_entry __start___kvm_ex_table;
- extern struct kvm_exception_table_entry __stop___kvm_ex_table;
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 18680771cdb0..3afc42d8833e 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1522,8 +1522,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
  
--/* Check whether the FP regs are owned by the guest */
--static inline bool guest_owns_fp_regs(struct kvm_vcpu *vcpu)
--{
--	return vcpu->arch.fp_state == FP_STATE_GUEST_OWNED;
--}
--
- /* Save the 32-bit only FPSIMD system register state */
- static inline void __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
- {
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index c50f8459e4fc..2a0b0d6da7c7 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -53,7 +53,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 			val |= CPTR_EL2_TSM;
+ 	read_lock(&kvm->mmu_lock);
+ 	pgt = vcpu->arch.hw_mmu->pgt;
+-	if (mmu_invalidate_retry(kvm, mmu_seq))
++	if (mmu_invalidate_retry(kvm, mmu_seq)) {
++		ret = -EAGAIN;
+ 		goto out_unlock;
++	}
+ 
+ 	/*
+ 	 * If we are not forced to use page mapping, check if we are
+@@ -1581,6 +1583,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 					     memcache,
+ 					     KVM_PGTABLE_WALK_HANDLE_FAULT |
+ 					     KVM_PGTABLE_WALK_SHARED);
++out_unlock:
++	read_unlock(&kvm->mmu_lock);
+ 
+ 	/* Mark the page dirty only if the fault is handled successfully */
+ 	if (writable && !ret) {
+@@ -1588,8 +1592,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		mark_page_dirty_in_slot(kvm, memslot, gfn);
  	}
  
--	if (!guest_owns_fp_regs(vcpu)) {
-+	if (vcpu->arch.fp_state != FP_STATE_GUEST_OWNED) {
- 		if (has_hvhe())
- 			val &= ~(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
- 				 CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN);
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 1581df6aec87..e9197f086137 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -75,7 +75,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 
- 	val |= CPTR_EL2_TAM;
- 
--	if (guest_owns_fp_regs(vcpu)) {
-+	if (vcpu->arch.fp_state == FP_STATE_GUEST_OWNED) {
- 		if (vcpu_has_sve(vcpu))
- 			val |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
- 	} else {
+-out_unlock:
+-	read_unlock(&kvm->mmu_lock);
+ 	kvm_release_pfn_clean(pfn);
+ 	return ret != -EAGAIN ? ret : 0;
+ }
 -- 
 2.44.0.478.gd926399ef9-goog
 
