@@ -1,55 +1,55 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D78D14D6EA
-	for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 17:36:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A7812D748
+	for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 17:36:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711560998; cv=none; b=pwSNaAVICtzGIMbxUbgja6/k+vDjZHZKilwIH9gkbkNL/338ENOqFXvaAg8ORaLxnGyOwYTwiiOnLLRdvf8TZrCQAIqPy2Zv9Dcn3e6hHOgtSgt2AQmzTM+vfLlf/KUEKxIik+yKLzpUpCQd1ZfxtMgNWb2G5s5EQ3JGsdVnbVo=
+	t=1711561001; cv=none; b=F+jqRP64iml5uYTAYdk+jYHpB7QAZcs9QbJfPiq7/9E2/hUtbdN2M7NW/lGJlNKUP3rUPX/edyEa1FPqjYduBdAfUDm5a7asaoMOv7zFzGGjZMJMNXAQPt4rs5yyGS7nJCitGA58UxWSHbay8cknhFtDhxAzgJ4SK8KS79muYSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711560998; c=relaxed/simple;
-	bh=P9IKXyO6rkyXeaSXI9dKnXDXpizkiFdwg0At6L7lD28=;
+	s=arc-20240116; t=1711561001; c=relaxed/simple;
+	bh=eM/y9n6oAhq3GdEWeO5WEdE1IHmMYMGEHly+Oa5YZB8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=N6WJUVzh7a4YzsfmwFbFp31ZcFXv2XN0JlQo4xvsqEoxuawtYmDdjnVIRiTIhPe5uNd3xpmOg8+7ovHu7vtDSBnEcqkdpXuYOei5IeqUc6cf14Dub0xy9zShekag8z8i7V4WQdTl9XVdMUatLT5DOgqlW8SV+kSWQGme+VP8aSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dIniaXjq; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=j9Pip0ShckExfVbpUjqKt8I8BQroic1iawORpRVwSmatICduhvKJOJoxGl+3Bfu54p6I2061Bb/gr8+7UdiAaU03iXlNukkm8dakQsZXkUwlYyC48U2jMHcykxCd8Zq3/A84s5oSdRLO1wk7nSBxKO3KBCsx8lsDNVY+IdAf3Kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PkZLbVEJ; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dIniaXjq"
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6b269686aso57583276.1
-        for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 10:36:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PkZLbVEJ"
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-ddaf2f115f2so36092276.3
+        for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 10:36:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711560996; x=1712165796; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1711560999; x=1712165799; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ts6R12WsLFfWMAbvD8rwF80LsLTc6S4wMUX9wsxsdjI=;
-        b=dIniaXjqw2fAGaPVLEJ2MXB0AyEzNHDgUgWmVtH5AV7EZH3AeFc9RAGnFzjHUdU0am
-         KvS8lblPZQ8H3fvTjN7fL/CWHdE1YHy3eEkJkb/tIglN47/qi5ZXaJGk4ApYPfzNA0q5
-         PZd4TdX9RwE6svcXUsIkFYD8JgaQSRnnqnmhduXo2aqJP5OncfMAc0cq9A06I2glbGE5
-         dvuHBjVXDpN5m9kwztsUhKad8DvgaScLpt8UmE5dmsWSOqOAdkf7CcHktljX2ahwXTd4
-         CwWUc7zknHR9I8vYcDCHBg0McugDPo9yWUCvq6mxoDpOHA5HImcxhLtTSu+5rZ7BNgTU
-         zMkQ==
+        bh=qC9nJYgq3KADrJVHmOmGn/dJpO571FX+lr6dw4HsnMs=;
+        b=PkZLbVEJHJ1DlzXUsl+dNqfm82rSRqF5P8eEdwrK76yHLYkP6kGu4IP6dnzHl+UEVv
+         u/zPCOT21v3svDVK52dATXzTuoiXQswF44KEqM8nfIcWRroT/Gsm6gyBUjjgZRe7WfuT
+         LydziMTM0TFPWbC1uZTGXjVvGHhy8TuCDA4GMvJlhjX4v3hh7sWP8sujF/+hDOC9fc+v
+         Y9hu39bqSkrC7zx+nZJENj6xukKFMxRrTtTjGzAMStds2nMBC5Kh7vcFxbNwPo5X7nZ8
+         I8ID606M2I9oy7R8t5OGyPLkvRKP3C6A5FgGR6bHhNsrmGj+gGAW9A0HEi5JNF/X8xA7
+         tJvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711560996; x=1712165796;
+        d=1e100.net; s=20230601; t=1711560999; x=1712165799;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ts6R12WsLFfWMAbvD8rwF80LsLTc6S4wMUX9wsxsdjI=;
-        b=aA7vGOjh6RNNpjH2TN8MXcE1+2PTCQKWP+CJQ55B7Qke3X1aqSqJsA2jd2mLyyH53C
-         Q27ehXSavSw9/a2qF7OaObqfrS81HVxcGQOoG4aSXpv9y9llrOMG7yCHA48RzK8vysX8
-         L/nRqxUi87VHA4/5H6Z3ogHALXJ7xOeEXrid3iU5EEujOAy6GGsxNYiN3BX212a49+BZ
-         ykTpyVy9l7d1rjbVG7kf4xa5KFLBuz+lrw8Ml26GMw+oyES5w+RdwKXdXoGrM4gq5DHa
-         /bZiw3+O/qAUbba/X7jk30HVequHOJYSHlAZ3Aaq+z/SS6lwF84Zd1yziwrbRolpTAzd
-         SYtg==
-X-Gm-Message-State: AOJu0Yzo4U+LrqzEQFdKPz6yIbV1fjzexpCgi0ImnMLoJOpZtxZpz0xt
-	J3nQV3l4io0vWU+bvuoZMJ7urHCw0aFkHg5gPKOKd6FZvur8k9K0fJ69GRMJx/73sHwTv7E7DfV
-	Pr+WUt0iYX6/5fNfLoukSSzc10osS2AYnzxFiQvwZE5E/+wU+0405cgz5SDCinNEUivrFkZ2MTJ
-	gtgv7indog3JiRk8Oz/XxeGasc4RU=
-X-Google-Smtp-Source: AGHT+IF4TnjjAff2u1Dn04QuhY8OJz9ZUpZR3MBL//vlMW2IHCorNHwY6XV26wdzPRE66/lq75ROQO5nLA==
+        bh=qC9nJYgq3KADrJVHmOmGn/dJpO571FX+lr6dw4HsnMs=;
+        b=Y79R/jh7roezYzstCb+laEyGwtIoqg79bVy7g6umLi3IXEPY6wC9Ouh9mD44p6Fl9m
+         9HNrffdD1T91LAuR1ltRnqPr0UExx5gw33XP+/YQM9/o1S4G4VEBGEs1L10JS1kQF5Ba
+         RapSiwgLD0suGlEXF2PsSV7miXJUiNffN+jyUe4OVcJS7c190YqZANWmFsIW28CIt5tK
+         nKmpygQLP7AxfobPgUmrZlS+xHn6m2XR+bNOHHbeEROLf4BtR1ODrXVYW9zlflqg5CRS
+         MtoqqxehqbLx3RgGNNamDBrAYgtLXI1CxeNCA/AtDpzTHsv6VUuoV9tT17psE9rHFj19
+         WjdA==
+X-Gm-Message-State: AOJu0Ywdo/f1KtOonOx/s+QnRKfBWIBsIg/fbGFUuZxtFDuzQj+VL/Jb
+	Cnfpe9GvFgeBndK+YNv21BtOGizFgJ6oG8cqNsQ2MgqFHyKAZiCSVay4xx82ULqBJUPbOdOJtKG
+	KQs8BBlrPaB+BOxuvxKQtL7ItptuC5Mb75IixVK+6ZS5DfRl5EHAzZ/ihBvHkHkgHQtuujuK5Jd
+	WLbiBJ/xgnQv9K4KtkQBXnwjfmrLI=
+X-Google-Smtp-Source: AGHT+IEXWdpsCtaYjLi7tn3rWBuFz72NBm6vuHAp5tTw4sVoNOvnpnu3FuWufcEcihoTAGBvglJ72kW1+A==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:6902:2206:b0:dcb:fb69:eadc with SMTP id
- dm6-20020a056902220600b00dcbfb69eadcmr63701ybb.6.1711560996195; Wed, 27 Mar
- 2024 10:36:36 -0700 (PDT)
-Date: Wed, 27 Mar 2024 17:35:14 +0000
+ (user=tabba job=sendgmr) by 2002:a05:6902:1009:b0:dc6:b768:2994 with SMTP id
+ w9-20020a056902100900b00dc6b7682994mr64868ybt.0.1711560998756; Wed, 27 Mar
+ 2024 10:36:38 -0700 (PDT)
+Date: Wed, 27 Mar 2024 17:35:15 +0000
 In-Reply-To: <20240327173531.1379685-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20240327173531.1379685-1-tabba@google.com>
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240327173531.1379685-28-tabba@google.com>
-Subject: [PATCH v1 27/44] KVM: arm64: Use atomic refcount helpers for 'struct hyp_page::refcount'
+Message-ID: <20240327173531.1379685-29-tabba@google.com>
+Subject: [PATCH v1 28/44] KVM: arm64: Remove locking from EL2 allocation fast-paths
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev
 Cc: maz@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com, 
@@ -72,104 +72,83 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Will Deacon <will@kernel.org>
 
-Convert the 'struct hyp_page' refcount manipulation functions over to
-the new atomic refcount helpers. For now, this will make absolutely no
-difference because the 'struct hyp_pool' locking is still serialising
-everything. One step at a time...
+hyp_{get,put}_page() are called extensively from the page-table code
+to adjust reference counts on page-table pages. As a small step towards
+removing reader serialisation on these paths, drop the 'hyp_pool' lock
+in the case where the refcount remains positive, only taking the lock
+if the page is to be freed back to the allocator.
+
+Remove a misleading comment at the same time, which implies that a page
+with a refcount of zero and which is not attached to a freelist is
+unsafe whereas in practice it's the other way around which can lead to
+problems.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/include/nvhe/memory.h | 18 +++++++-----------
- arch/arm64/kvm/hyp/nvhe/mem_protect.c    |  2 +-
- arch/arm64/kvm/hyp/nvhe/page_alloc.c     |  5 ++++-
- 3 files changed, 12 insertions(+), 13 deletions(-)
+ arch/arm64/kvm/hyp/include/nvhe/gfp.h |  6 +-----
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c  | 16 ++++------------
+ 2 files changed, 5 insertions(+), 17 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-index ab205c4d6774..74474c82667b 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-@@ -6,6 +6,7 @@
- #include <asm/page.h>
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/gfp.h b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+index 97c527ef53c2..24eb7840d98e 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/gfp.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+@@ -10,11 +10,7 @@
+ #define HYP_NO_ORDER	USHRT_MAX
  
- #include <linux/types.h>
-+#include <nvhe/refcount.h>
+ struct hyp_pool {
+-	/*
+-	 * Spinlock protecting concurrent changes to the memory pool as well as
+-	 * the struct hyp_page of the pool's pages until we have a proper atomic
+-	 * API at EL2.
+-	 */
++	/* lock protecting concurrent changes to the memory pool. */
+ 	hyp_spinlock_t lock;
+ 	struct list_head free_area[NR_PAGE_ORDERS];
+ 	phys_addr_t range_start;
+diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+index 169cdb43b4b8..96b52f545af0 100644
+--- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
++++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+@@ -155,33 +155,25 @@ static struct hyp_page *__hyp_extract_page(struct hyp_pool *pool,
  
- struct hyp_page {
- 	unsigned short refcount;
-@@ -39,37 +40,32 @@ static inline phys_addr_t hyp_virt_to_phys(void *addr)
- #define hyp_page_to_pool(page)	(((struct hyp_page *)page)->pool)
+ static void __hyp_put_page(struct hyp_pool *pool, struct hyp_page *p)
+ {
+-	if (hyp_page_ref_dec_and_test(p))
++	if (hyp_page_ref_dec_and_test(p)) {
++		hyp_spin_lock(&pool->lock);
+ 		__hyp_attach_page(pool, p);
++		hyp_spin_unlock(&pool->lock);
++	}
+ }
  
- /*
-- * Refcounting for 'struct hyp_page'.
-- * hyp_pool::lock must be held if atomic access to the refcount is required.
-+ * Refcounting wrappers for 'struct hyp_page'.
-  */
- static inline int hyp_page_count(void *addr)
+-/*
+- * Changes to the buddy tree and page refcounts must be done with the hyp_pool
+- * lock held. If a refcount change requires an update to the buddy tree (e.g.
+- * hyp_put_page()), both operations must be done within the same critical
+- * section to guarantee transient states (e.g. a page with null refcount but
+- * not yet attached to a free list) can't be observed by well-behaved readers.
+- */
+ void hyp_put_page(struct hyp_pool *pool, void *addr)
  {
  	struct hyp_page *p = hyp_virt_to_page(addr);
  
--	return p->refcount;
-+	return hyp_refcount_get(p->refcount);
+-	hyp_spin_lock(&pool->lock);
+ 	__hyp_put_page(pool, p);
+-	hyp_spin_unlock(&pool->lock);
  }
  
- static inline void hyp_page_ref_inc(struct hyp_page *p)
+ void hyp_get_page(struct hyp_pool *pool, void *addr)
  {
--	BUG_ON(p->refcount == USHRT_MAX);
--	p->refcount++;
-+	hyp_refcount_inc(p->refcount);
+ 	struct hyp_page *p = hyp_virt_to_page(addr);
+ 
+-	hyp_spin_lock(&pool->lock);
+ 	hyp_page_ref_inc(p);
+-	hyp_spin_unlock(&pool->lock);
  }
  
- static inline void hyp_page_ref_dec(struct hyp_page *p)
- {
--	BUG_ON(!p->refcount);
--	p->refcount--;
-+	hyp_refcount_dec(p->refcount);
- }
- 
- static inline int hyp_page_ref_dec_and_test(struct hyp_page *p)
- {
--	hyp_page_ref_dec(p);
--	return (p->refcount == 0);
-+	return hyp_refcount_dec(p->refcount) == 0;
- }
- 
- static inline void hyp_set_page_refcounted(struct hyp_page *p)
- {
--	BUG_ON(p->refcount);
--	p->refcount = 1;
-+	hyp_refcount_set(p->refcount, 1);
- }
- #endif /* __KVM_HYP_MEMORY_H */
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index d48990eae1ef..4b20bf553312 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -202,7 +202,7 @@ static void *guest_s2_zalloc_page(void *mc)
- 	memset(addr, 0, PAGE_SIZE);
- 	p = hyp_virt_to_page(addr);
- 	memset(p, 0, sizeof(*p));
--	p->refcount = 1;
-+	hyp_set_page_refcounted(p);
- 
- 	return addr;
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-index e691290d3765..169cdb43b4b8 100644
---- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-+++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-@@ -55,7 +55,10 @@ static struct hyp_page *__find_buddy_avail(struct hyp_pool *pool,
- {
- 	struct hyp_page *buddy = __find_buddy_nocheck(pool, p, order);
- 
--	if (!buddy || buddy->order != order || buddy->refcount)
-+	if (!buddy)
-+		return NULL;
-+
-+	if (buddy->order != order || hyp_refcount_get(buddy->refcount))
- 		return NULL;
- 
- 	return buddy;
+ void hyp_split_page(struct hyp_page *p)
 -- 
 2.44.0.478.gd926399ef9-goog
 
