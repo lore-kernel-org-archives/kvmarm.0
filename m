@@ -1,66 +1,66 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E33E12B75
-	for <kvmarm@lists.linux.dev>; Thu, 28 Mar 2024 02:48:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125C821364
+	for <kvmarm@lists.linux.dev>; Thu, 28 Mar 2024 02:48:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711594094; cv=none; b=UVgkQzEfL8GXJ0jy6X/Bj8YD0NBcF1EfVDKVM+rDHENQeUDXBDcmfKCgFXluJbOGnU1k3qK3QoV9AR26lG3wu2Qg43amNnY2umlRFreJFAv1HzXjRQv13Kayf0lJdMXu24AidziSOIa/RJHPioNu87bG2mbHu50B/TWmrDFlG4E=
+	t=1711594113; cv=none; b=rZhg6NHGQZPbN5B6xxjPeIFj2bj8w1MK9PbSHGTA0SRuyuOhuBxrteLuSi3ancD1hlwZSHUOEPtqhxjmf00/tPzKyAlPD0/ls0AC56VLj3GiewH+SiIeuq48eyIao+Lx1IIP1vuw+6bFMkTMcsPtgemN5ly92SovSD7PE/o2Ye0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711594094; c=relaxed/simple;
-	bh=/KyhZGeFs7mqMAPIrQoMos8Sdnyodq3lxJbPFquzhP8=;
+	s=arc-20240116; t=1711594113; c=relaxed/simple;
+	bh=5eGGDSk4BD3UY2fAfn703dVtF9ub3OwUFQVO9EkJFY8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OSutEZXktS+/wNBaMv6Fm9oPoLuhHrF+N82fj3hneSX8LnCuf76S7gTQNF96ZUB4i3K1LbjbZ6BH1CkIDWkr6Phax19d+9vn2QQAe7BQOOOCb69SLB+DZ03ABgqAmpCB1cUWAAYA5uLNLE2gpVAc7jWTdb33jvk92POa3/G0RLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1Tq0xjWX; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=S1J/BR8IN4/ljWwhFQ3dNcPA1m4lni1Ub+yVynFqt4GZNf8joyk1xHRU5cCfDe5DNTuS/N2JrYNzCCG3998imVMtbGJUlkFtvYDpZ8kEMgb7YMm5kG7zslHyDh8mnVNtCT5n5WJ/bSJX5F8dNsDt5FxYAjendGzg2M+9K3ECXwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FjwtJyUC; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1Tq0xjWX"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc647f65573so866215276.2
-        for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 19:48:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FjwtJyUC"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcbee93a3e1so728981276.3
+        for <kvmarm@lists.linux.dev>; Wed, 27 Mar 2024 19:48:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711594092; x=1712198892; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1711594111; x=1712198911; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=X53owM0AXy0w40k+CXCDsz/LIA36JplY64ayboW/axQ=;
-        b=1Tq0xjWXHktJ4kEH21Frxa2vnni6ieYoWcrBOLWpcJbXFv6HYK6KCR2V+oDTmRIoiT
-         pBi3dQJgslLRUGWTVESg8xYL8VxRpld9xAC4/B3yhkSnqTqE8iD5CL9gVxIh3XQLo+HB
-         lEjKGpJZUmdqkivFHgKORTb51Kinj14VETUsGWtS0IDZvni82io1N1kHOfzEpD9OHvdu
-         VnvDCHhMUuElEBBiI4HPHFblH8guwqEX6yz7DPpz3EPTvWGUvCdR+1A//N4JF1fc+jrF
-         WEEqWCegL07z1coZ5Yv489T8p9/D5TCPH23XzlayEoQs6B0dIoFTUSQD6wWFIJErn8iB
-         L2bg==
+        bh=9X/k4Ur7ktRAsFVEZTgADbEiXncvofPy+APEnCk0Uuc=;
+        b=FjwtJyUC9fMcrohbzRFycGQESTFy0m1fNJjBeoRvq3s9N3igYU82evUqhopkDMqPdn
+         X5prEniFsi2dXEravXnodxW695Oj3mMOH99zPYfXO25DXAgd7iXz3p9+mbwfjOjBvVDw
+         pzb+TAYjqQHWyUvcRa8AhW8iu+c5tlxLejLgbZz365EsSngvjFWIru+PjKzrgw1ltwDW
+         gkRc/k6iTEF3hpy/ODzs1IDnuu8pieRtjYxwE8eBN02nLQ4MyJCMHimazRsDcZJGiPgJ
+         +I9owpdDrOz0mpRy3qN1xJOTwIHVJIsa49aGWJSdLOsZbHI6Ud4BP8rdR2iDfFFLM5IB
+         bazA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711594092; x=1712198892;
+        d=1e100.net; s=20230601; t=1711594111; x=1712198911;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X53owM0AXy0w40k+CXCDsz/LIA36JplY64ayboW/axQ=;
-        b=fpHca4jriHpV1rnbcY6LO2WQU6nwqLbwl8GIbUsjZ+7BuvkVRUSKyA1u+T16poqsfT
-         rn2IlhKm0/A4gKoH6GCKyi1LaZ8fgMPja9tPTPXjYDuWMouIYMGNI1RxOTGB84JCzT0h
-         JhOiZiuUZwYURa9ps+lgsdFXc+FijNQm2WwsyT/7pbVLV/bZkYaUIQP0/Xh5KiJDRegF
-         TzIMd/wtgfKIPeMnsJ68Op1bkxfrMMD9os/najJhkzy4CwAQwW+v1Gk4EnAxmgUFA2+J
-         p2iPtHaji48ZJaNlXWxwTpmu+RurDmlebILVwtEkYhE1U6hSwi69Q0BIw1B+yrMJr7Ud
-         GFkA==
-X-Forwarded-Encrypted: i=1; AJvYcCVTqBcWUnn0YVGKxa9IX4I+7PTYfSSZXFA85YMUHFL8v4oCZon2ICoCd7Wfth+E/CNli5y8IDDpDxn6Wek+icQeh7EDX+Xf
-X-Gm-Message-State: AOJu0YyrWNeefM/2JVnrzADF6zsbmOXO/TWNvddkz10O6v5PR3iOO1k1
-	7NdFUhQ7RSvBe2VwH0XU06AfeTTLqhLxjitirxNC3pPdix+/xIW0QpH4YrNNU6k8fpozqOKwhfQ
-	R3nSqyWL1YCbT+2sot6dZhw==
-X-Google-Smtp-Source: AGHT+IHemBOmZzBj11UU0KC0nluKXTSfglIgOeQ+gPV+l80SSzWOVj5Tc0CUw88owyE2SFGESkvSyqXJHEPRm8GAYg==
+        bh=9X/k4Ur7ktRAsFVEZTgADbEiXncvofPy+APEnCk0Uuc=;
+        b=nMNBU+0PY01VttMKqTXCNbVKXrqBOqbRlXArfHkkuv8FaRV76suRW4ZQBJc19F8IxK
+         oJ7WF2yYz8ohtMYlgd1dkI3v3V8ga+pVRNjKB3PYv7fiGFsWURMJUuKTOQmKFxI3XT1K
+         jGjbEy8Q9Z2piQzssF0MPFIdQCld9AmVd3xj/m7uA5K/3Mu7AGStY1EVn3M2x88Xhrhb
+         3+Ryc3zRvhJn2bB+Fy4sWxuGrWY8NgLZHsQACi/U733q34zCsp+bshQN9PFZDLvCjlMJ
+         i2cB6g1ONy15TKvDZvn5mghQVbnc5gNx2K8R8Iyss9VpRuLhhQfmc9/yYF4SkgocyVar
+         YNyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUAuPCX/P0y96J4EexLRG196Q22BzqC1ZZDOSh93amI4H4M8v45vOPPLe3ZyAA+lWWJiXXnPCjwTTEh3DhzhcXWPGc7TA3y
+X-Gm-Message-State: AOJu0Yzxj+7L+VTvnDLdynF0bt0v/u2Y0hnaVibBFK50G0RI++BcAvC2
+	ciEeqeZ32TJpxO6pXbpqbHxjB2AU7WlfuIgRh0r0D/LD3Kseyx9SZ7AT2aPjf/BxlEEu3SL/4kn
+	aI3WKts+jgEJNqEW69hGuFg==
+X-Google-Smtp-Source: AGHT+IHCBcXGdwnKOw373UKcOQTGGrOXXtILBB7knODDR6g2De9IJeAdRjNIMJCvIjU14tTQdEZAyXnNc8ki3rX1vA==
 X-Received: from ctop-sg.c.googlers.com ([fda3:e722:ac3:cc00:4f:4b78:c0a8:1223])
- (user=ackerleytng job=sendgmr) by 2002:a05:6902:2290:b0:dc7:48ce:d17f with
- SMTP id dn16-20020a056902229000b00dc748ced17fmr499185ybb.10.1711594092566;
- Wed, 27 Mar 2024 19:48:12 -0700 (PDT)
-Date: Thu, 28 Mar 2024 02:48:08 +0000
-In-Reply-To: <20240314232637.2538648-4-seanjc@google.com>
+ (user=ackerleytng job=sendgmr) by 2002:a05:6902:260b:b0:dc8:27e6:cde1 with
+ SMTP id dw11-20020a056902260b00b00dc827e6cde1mr124693ybb.5.1711594111169;
+ Wed, 27 Mar 2024 19:48:31 -0700 (PDT)
+Date: Thu, 28 Mar 2024 02:48:27 +0000
+In-Reply-To: <20240314232637.2538648-3-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20240314232637.2538648-1-seanjc@google.com> <20240314232637.2538648-4-seanjc@google.com>
-Message-ID: <diqzo7azkr6f.fsf@ctop-sg.c.googlers.com>
-Subject: Re: [PATCH 03/18] KVM: selftests: Move GDT, IDT, and TSS fields to
- x86's kvm_vm_arch
+References: <20240314232637.2538648-1-seanjc@google.com> <20240314232637.2538648-3-seanjc@google.com>
+Message-ID: <diqzle63kr5w.fsf@ctop-sg.c.googlers.com>
+Subject: Re: [PATCH 02/18] KVM: sefltests: Add kvm_util_types.h to hold common
+ types, e.g. vm_vaddr_t
 From: Ackerley Tng <ackerleytng@google.com>
 To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
@@ -75,147 +75,79 @@ Content-Type: text/plain; charset="UTF-8"
 
 Sean Christopherson <seanjc@google.com> writes:
 
-> Now that kvm_vm_arch exists, move the GDT, IDT, and TSS fields to x86's
-> implementation, as the structures are firmly x86-only.
+> Move the base types unique to KVM selftests out of kvm_util.h and into a
+> new header, kvm_util_types.h.  This will allow kvm_util_arch.h, i.e. core
+> arch headers, to reference common types, e.g. vm_vaddr_t and vm_paddr_t.
+>
+> No functional change intended.
 >
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  .../testing/selftests/kvm/include/kvm_util.h  |  3 ---
->  .../kvm/include/x86_64/kvm_util_arch.h        |  6 +++++
->  .../selftests/kvm/lib/x86_64/processor.c      | 22 +++++++++----------
->  .../kvm/x86_64/svm_nested_shutdown_test.c     |  2 +-
->  .../kvm/x86_64/svm_nested_soft_inject_test.c  |  2 +-
->  5 files changed, 19 insertions(+), 16 deletions(-)
+>  .../testing/selftests/kvm/include/kvm_util.h  | 16 +--------------
+>  .../selftests/kvm/include/kvm_util_types.h    | 20 +++++++++++++++++++
+>  2 files changed, 21 insertions(+), 15 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/include/kvm_util_types.h
 >
 > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index acdcddf78e3f..58d6a4d6ce4f 100644
+> index 95baee5142a7..acdcddf78e3f 100644
 > --- a/tools/testing/selftests/kvm/include/kvm_util.h
 > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -94,9 +94,6 @@ struct kvm_vm {
->  	bool pgd_created;
->  	vm_paddr_t ucall_mmio_addr;
->  	vm_paddr_t pgd;
-> -	vm_vaddr_t gdt;
-> -	vm_vaddr_t tss;
-> -	vm_vaddr_t idt;
->  	vm_vaddr_t handlers;
->  	uint32_t dirty_ring_size;
->  	uint64_t gpa_tag_mask;
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/kvm_util_arch.h b/tools/testing/selftests/kvm/include/x86_64/kvm_util_arch.h
-> index 9f1725192aa2..b14ff3a88b4a 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/kvm_util_arch.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/kvm_util_arch.h
-> @@ -5,7 +5,13 @@
->  #include <stdbool.h>
->  #include <stdint.h>
+> @@ -21,28 +21,14 @@
+>  #include <sys/ioctl.h>
 >  
+>  #include "kvm_util_arch.h"
 > +#include "kvm_util_types.h"
+>  #include "sparsebit.h"
+>  
+> -/*
+> - * Provide a version of static_assert() that is guaranteed to have an optional
+> - * message param.  If _ISOC11_SOURCE is defined, glibc (/usr/include/assert.h)
+> - * #undefs and #defines static_assert() as a direct alias to _Static_assert(),
+> - * i.e. effectively makes the message mandatory.  Many KVM selftests #define
+> - * _GNU_SOURCE for various reasons, and _GNU_SOURCE implies _ISOC11_SOURCE.  As
+> - * a result, static_assert() behavior is non-deterministic and may or may not
+> - * require a message depending on #include order.
+> - */
+> -#define __kvm_static_assert(expr, msg, ...) _Static_assert(expr, msg)
+> -#define kvm_static_assert(expr, ...) __kvm_static_assert(expr, ##__VA_ARGS__, #expr)
+> -
+>  #define KVM_DEV_PATH "/dev/kvm"
+>  #define KVM_MAX_VCPUS 512
+>  
+>  #define NSEC_PER_SEC 1000000000L
+>  
+> -typedef uint64_t vm_paddr_t; /* Virtual Machine (Guest) physical address */
+> -typedef uint64_t vm_vaddr_t; /* Virtual Machine (Guest) virtual address */
+> -
+>  struct userspace_mem_region {
+>  	struct kvm_userspace_memory_region2 region;
+>  	struct sparsebit *unused_phy_pages;
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_types.h b/tools/testing/selftests/kvm/include/kvm_util_types.h
+> new file mode 100644
+> index 000000000000..764491366eb9
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_types.h
+> @@ -0,0 +1,20 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +#ifndef SELFTEST_KVM_UTIL_TYPES_H
+> +#define SELFTEST_KVM_UTIL_TYPES_H
 > +
->  struct kvm_vm_arch {
-> +	vm_vaddr_t gdt;
-> +	vm_vaddr_t tss;
-> +	vm_vaddr_t idt;
+> +/*
+> + * Provide a version of static_assert() that is guaranteed to have an optional
+> + * message param.  If _ISOC11_SOURCE is defined, glibc (/usr/include/assert.h)
+> + * #undefs and #defines static_assert() as a direct alias to _Static_assert(),
+> + * i.e. effectively makes the message mandatory.  Many KVM selftests #define
+> + * _GNU_SOURCE for various reasons, and _GNU_SOURCE implies _ISOC11_SOURCE.  As
+> + * a result, static_assert() behavior is non-deterministic and may or may not
+> + * require a message depending on #include order.
+> + */
+> +#define __kvm_static_assert(expr, msg, ...) _Static_assert(expr, msg)
+> +#define kvm_static_assert(expr, ...) __kvm_static_assert(expr, ##__VA_ARGS__, #expr)
 > +
->  	uint64_t c_bit;
->  	uint64_t s_bit;
->  	int sev_fd;
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index 74a4c736c9ae..45f965c052a1 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -417,7 +417,7 @@ static void kvm_seg_set_unusable(struct kvm_segment *segp)
->  
->  static void kvm_seg_fill_gdt_64bit(struct kvm_vm *vm, struct kvm_segment *segp)
->  {
-> -	void *gdt = addr_gva2hva(vm, vm->gdt);
-> +	void *gdt = addr_gva2hva(vm, vm->arch.gdt);
->  	struct desc64 *desc = gdt + (segp->selector >> 3) * 8;
->  
->  	desc->limit0 = segp->limit & 0xFFFF;
-> @@ -518,21 +518,21 @@ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
->  
->  static void kvm_setup_gdt(struct kvm_vm *vm, struct kvm_dtable *dt)
->  {
-> -	if (!vm->gdt)
-> -		vm->gdt = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
-> +	if (!vm->arch.gdt)
-> +		vm->arch.gdt = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
->  
-> -	dt->base = vm->gdt;
-> +	dt->base = vm->arch.gdt;
->  	dt->limit = getpagesize();
->  }
->  
->  static void kvm_setup_tss_64bit(struct kvm_vm *vm, struct kvm_segment *segp,
->  				int selector)
->  {
-> -	if (!vm->tss)
-> -		vm->tss = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
-> +	if (!vm->arch.tss)
-> +		vm->arch.tss = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
->  
->  	memset(segp, 0, sizeof(*segp));
-> -	segp->base = vm->tss;
-> +	segp->base = vm->arch.tss;
->  	segp->limit = 0x67;
->  	segp->selector = selector;
->  	segp->type = 0xb;
-> @@ -1091,7 +1091,7 @@ static void set_idt_entry(struct kvm_vm *vm, int vector, unsigned long addr,
->  			  int dpl, unsigned short selector)
->  {
->  	struct idt_entry *base =
-> -		(struct idt_entry *)addr_gva2hva(vm, vm->idt);
-> +		(struct idt_entry *)addr_gva2hva(vm, vm->arch.idt);
->  	struct idt_entry *e = &base[vector];
->  
->  	memset(e, 0, sizeof(*e));
-> @@ -1144,7 +1144,7 @@ void vm_init_descriptor_tables(struct kvm_vm *vm)
->  	extern void *idt_handlers;
->  	int i;
->  
-> -	vm->idt = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
-> +	vm->arch.idt = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
->  	vm->handlers = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
->  	/* Handlers have the same address in both address spaces.*/
->  	for (i = 0; i < NUM_INTERRUPTS; i++)
-> @@ -1158,9 +1158,9 @@ void vcpu_init_descriptor_tables(struct kvm_vcpu *vcpu)
->  	struct kvm_sregs sregs;
->  
->  	vcpu_sregs_get(vcpu, &sregs);
-> -	sregs.idt.base = vm->idt;
-> +	sregs.idt.base = vm->arch.idt;
->  	sregs.idt.limit = NUM_INTERRUPTS * sizeof(struct idt_entry) - 1;
-> -	sregs.gdt.base = vm->gdt;
-> +	sregs.gdt.base = vm->arch.gdt;
->  	sregs.gdt.limit = getpagesize() - 1;
->  	kvm_seg_set_kernel_data_64bit(NULL, DEFAULT_DATA_SELECTOR, &sregs.gs);
->  	vcpu_sregs_set(vcpu, &sregs);
-> diff --git a/tools/testing/selftests/kvm/x86_64/svm_nested_shutdown_test.c b/tools/testing/selftests/kvm/x86_64/svm_nested_shutdown_test.c
-> index d6fcdcc3af31..f4a1137e04ab 100644
-> --- a/tools/testing/selftests/kvm/x86_64/svm_nested_shutdown_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/svm_nested_shutdown_test.c
-> @@ -53,7 +53,7 @@ int main(int argc, char *argv[])
->  
->  	vcpu_alloc_svm(vm, &svm_gva);
->  
-> -	vcpu_args_set(vcpu, 2, svm_gva, vm->idt);
-> +	vcpu_args_set(vcpu, 2, svm_gva, vm->arch.idt);
->  
->  	vcpu_run(vcpu);
->  	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_SHUTDOWN);
-> diff --git a/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c b/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c
-> index 0c7ce3d4e83a..2478a9e50743 100644
-> --- a/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/svm_nested_soft_inject_test.c
-> @@ -166,7 +166,7 @@ static void run_test(bool is_nmi)
->  
->  		idt_alt_vm = vm_vaddr_alloc_page(vm);
->  		idt_alt = addr_gva2hva(vm, idt_alt_vm);
-> -		idt = addr_gva2hva(vm, vm->idt);
-> +		idt = addr_gva2hva(vm, vm->arch.idt);
->  		memcpy(idt_alt, idt, getpagesize());
->  	} else {
->  		idt_alt_vm = 0;
+> +typedef uint64_t vm_paddr_t; /* Virtual Machine (Guest) physical address */
+> +typedef uint64_t vm_vaddr_t; /* Virtual Machine (Guest) virtual address */
+> +
+> +#endif /* SELFTEST_KVM_UTIL_TYPES_H */
 > -- 
 > 2.44.0.291.gc1ea87d7ee-goog
 
