@@ -1,82 +1,94 @@
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8566B2B9C6
-	for <kvmarm@lists.linux.dev>; Thu, 28 Mar 2024 10:58:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516827EF0E
+	for <kvmarm@lists.linux.dev>; Thu, 28 Mar 2024 11:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711623526; cv=none; b=b0AnbSeL8EYCd7GZUPwTU2tcT+jfJRX4Yd4VJXjO90iEvjiMiiQClbijAM3H6CdAdeRfvZlymOkWWlOI3RjBIyJ4I/lypUCgl9FWzZpdeSFa7w0EDdDCjzGsXIIe/1aiFl+MCoxvx/EkCC1TaDKUG5U8NpZDPa26TDxuYtG4q20=
+	t=1711626103; cv=none; b=AsG2+r51lQE+M4lIcK8zd4pt6CbJy+yCJcYPQ/kIsokw3Xd9iU94tfJycowliW0yxiH2LmgnFbwGTO64U2IefMlzOt1/pfITmfc/66DmXVg5HIuk0GouCC3dfUUYCuRY3F1fTd9FgrUMvkCFjsne+kK7OgkTXEX3ua5czg3pao0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711623526; c=relaxed/simple;
-	bh=Hm8+oqaD0aS6PphUmLMmLxgajrQub18PdQJLQkOrJ1w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e7yAtXSeOHOiOl2Fn4MRFBn54wcXFj2PgkjEgV6kqUv0RYclOqRa/LEVi0hneo6b/s0Dl6efQCfBK36+CFWFECM/j8HPKeTfBtuJx7NrO/UkJ+WBoWOcv9y7Cx3BrvRF2rqyYFsWactKQQDS1lpPeKQA86IQK6j5keiLsLn47zw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h/I1vX9e; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1711626103; c=relaxed/simple;
+	bh=Yq/O+N+yqa18I/lF8R0JGR8+jWFJ6Ru38fREZO5/Fm4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qwkooREFoNyeBWCD+XGPpLlrEddRBTLoVtfs2eficmdBSJzQLvxJe8cesRBKXHxaiTTMaIIWpAbtY2cT/1S9rv28sQFQIinKj/7UMgS7NJE+ehxZr1YORUrNJXw7GDXGZHQuwRS/Yhc2Jv140arWo1qdTX3Cne6H1r/+S3xkYQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gAaE8s4z; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h/I1vX9e"
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-56890b533aaso862237a12.3
-        for <kvmarm@lists.linux.dev>; Thu, 28 Mar 2024 03:58:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711623523; x=1712228323; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=u8ZQFWzPDIrF3CuMM0f5B0XY6jp3IE2F7J7SSG90F6E=;
-        b=h/I1vX9e1uHStPRs12YPyvp0iRz+I6z/lYjPV7nFB7Zbo4DVcd+6oV9XKosgoNNTOs
-         NeacF4IAUzcs8r7Km0uGX1eKDg0xILzyqB9HXWiNVBWjb4SfEoO5fDvK6DqVvW7+Bii5
-         TV8p6Kgj2pe1Vayt5PUiiINBiQfmKlBzkT9q0o3KE4f6s18mzxiMhqY64HjmeBfEASP8
-         AKbjiGOlAnjbsa0xyD7yLM1ZDudDM+QfFxHBfIoeWUW1hOHvfWjhXlfzF2cNoHd2Rea/
-         vUSqFf2IEeF86BPnnTHMz+Xymz8iF7ldkZkbDcYjLvj624bb0kxAjwPXEaisReyP86eX
-         db2w==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gAaE8s4z"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711626101;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=qOxltAGzL5YHNCBV4L/K4cCMJLqQbuY/mLAFgQC3J9k=;
+	b=gAaE8s4zcJD9SGYi0MlAAy4FCL9bUzPPftSFzJWe1eiUsx1XssipJfp0rowDAUJhzNiCd8
+	H0dWbaeXVdqNCQeausZZEkoaXA9gLlgYnfcUTWDzpS7R5SRR3QL4zqlhmQ/8nSF/s/ej6r
+	BenKCM7wZ8k/gtWTL/Y/C4ZTpSkFR00=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-396-EG3q5TtGNuC-QdtmhAiJdA-1; Thu, 28 Mar 2024 07:41:40 -0400
+X-MC-Unique: EG3q5TtGNuC-QdtmhAiJdA-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-513dda67cbeso662236e87.3
+        for <kvmarm@lists.linux.dev>; Thu, 28 Mar 2024 04:41:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711623523; x=1712228323;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1711626098; x=1712230898;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=u8ZQFWzPDIrF3CuMM0f5B0XY6jp3IE2F7J7SSG90F6E=;
-        b=Pc7s5VaGcumbrGuAS+vn78Dm2gt0fH/ZYsHlwyegGSDLmbb+5yaloJTFry5YxNmGFy
-         Wu1dDp8cK+Fiidx48tAZIDcCrnhnwa8woB4iK9JxYAMEEvY1ABzuzXrc8R/RDMAGPNNz
-         Zrv2m64oYt0meNhwJgUtMwVRYZTAr6rqmMsh6tH2qd4ZdKtUlaGq2wT5H39bEeq5p/wl
-         rVPsiMDXVECbSom0f8VJ8GFcEJKX/VjAiFEsGIS9hSSSVNME0npIs1djLBokv0aTM+dw
-         D1DKRSsrPRqlMQggl9bOPN8Fn33rilJOwYRik4BJAy8s60fT+/BTkeTF74gCURXzfY7D
-         5z5A==
-X-Forwarded-Encrypted: i=1; AJvYcCVonzHOKchP8keBUkwU88IVf1/6NHuhL9f92SLUcNgD/kgpQ8FJZ0wFrCMOyQC0rx4vvZJPJQNvHo+wp2puoACbPyr12Cv/
-X-Gm-Message-State: AOJu0Yytily3l1rn9BwPrttyBLMo+zfDIhcrZHeNGs5fcB8v/Vn1uJv5
-	Eosc9RrxRMVJCWsUoqMfQ1fc09VQVljK6wg7AIfoW3VcHTEN9y/SALoQnKfpLA==
-X-Google-Smtp-Source: AGHT+IFz6L7DUIGFP2Hr6sv1erUlly4EFBC5ORIiQg+IMjzxvFI79NB3IXUA7dV5PbKsHLbd6MH8KA==
-X-Received: by 2002:a50:d5c8:0:b0:56b:a017:10e with SMTP id g8-20020a50d5c8000000b0056ba017010emr1602749edj.42.1711623522711;
-        Thu, 28 Mar 2024 03:58:42 -0700 (PDT)
-Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
-        by smtp.gmail.com with ESMTPSA id h7-20020a0564020e0700b00568e3d3337bsm686755edh.18.2024.03.28.03.58.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 03:58:42 -0700 (PDT)
-Date: Thu, 28 Mar 2024 10:58:38 +0000
-From: Quentin Perret <qperret@google.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: Will Deacon <will@kernel.org>, Sean Christopherson <seanjc@google.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
-	viro@zeniv.linux.org.uk, brauner@kernel.org,
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
-	dmatlack@google.com, yu.c.zhang@linux.intel.com,
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
-	ackerleytng@google.com, mail@maciej.szmigiero.name,
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
-	suzuki.poulose@arm.com, steven.price@arm.com,
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com,
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com,
-	oliver.upton@linux.dev, maz@kernel.org, keirf@google.com,
-	linux-mm@kvack.org
+        bh=qOxltAGzL5YHNCBV4L/K4cCMJLqQbuY/mLAFgQC3J9k=;
+        b=BuUMbCE/KHQ3/qHwAU15vr49VQfFhjzhes3+2MPGdgedb/gGVu8KCOOKrgY2aMAHcR
+         Njq3l/cyGs8Nc8Sa2pBNc1doRHlEwb+oydph6r4hLmMFO5ZhCQweCyRqx6bdTBB/qv2i
+         2jwpzZopyn/9DaJIugDHJXF3bvx4hNiOxB4ZrvZGZJa8qVxSAi9oRiAkrMK+3qHhe7H+
+         QAjmg/4PsteejhzAHJE2tsn/6wIcELMtgz9NiWFh9xns1DQ5IEk37J6psonbLuHFlOh0
+         TFYVSJyHLKhUjgI73P4PN188ezUYxOjUvbalPyHt204nB14SpnXUWvQVVVISlE4Tnz3R
+         Y5MQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU8NfzsXxhmGdOTw9CNJ/NKeZ3igK2ykJZYsOruABgFr1s9k1kQIz4jjH01G7b4Zse1dtbLUWiMZ0Rd2v9MmfQ5s4GZLFre
+X-Gm-Message-State: AOJu0YzaA2dCXTRfuXzV7xhTD9eMWG72RM00Ioivr4jY7ZWb3uYWqY/7
+	zVcmjXPnar8pbXxZwBMD/w5qT+xUCBj90R8dWieH4oELrd4oP2cK7B4R7bYYjnLbUrwN5ssjoSJ
+	TsumFzjkdsyWFsUwry+5XjF8qJiKw1jYtYho251xV1mGxfd3ixBlSBw==
+X-Received: by 2002:a05:6512:23a4:b0:515:c8da:c96d with SMTP id c36-20020a05651223a400b00515c8dac96dmr1443931lfv.19.1711626098457;
+        Thu, 28 Mar 2024 04:41:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEfFw/vYg0daTYcF9BK9aOAj78HRdidQpeANNUyp5rCWphcmB9hySzVeR81YP0LYioPyPCFEQ==
+X-Received: by 2002:a05:6512:23a4:b0:515:c8da:c96d with SMTP id c36-20020a05651223a400b00515c8dac96dmr1443888lfv.19.1711626098033;
+        Thu, 28 Mar 2024 04:41:38 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c714:3600:8033:4189:6bd4:ea29? (p200300cbc7143600803341896bd4ea29.dip0.t-ipconnect.de. [2003:cb:c714:3600:8033:4189:6bd4:ea29])
+        by smtp.gmail.com with ESMTPSA id bx6-20020a5d5b06000000b00341e67a7a90sm1581093wrb.19.2024.03.28.04.41.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Mar 2024 04:41:37 -0700 (PDT)
+Message-ID: <3448a9d6-58a8-475f-aff6-a39a62eee8c1@redhat.com>
+Date: Thu, 28 Mar 2024 12:41:35 +0100
+Precedence: bulk
+X-Mailing-List: kvmarm@lists.linux.dev
+List-Id: <kvmarm.lists.linux.dev>
+List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
+List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: folio_mmapped
-Message-ID: <ZgVNXpUS8Ku37BLp@google.com>
+To: Quentin Perret <qperret@google.com>
+Cc: Will Deacon <will@kernel.org>, Sean Christopherson <seanjc@google.com>,
+ Vishal Annapurve <vannapurve@google.com>,
+ Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+ chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
+ paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+ viro@zeniv.linux.org.uk, brauner@kernel.org, akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net,
+ vbabka@suse.cz, ackerleytng@google.com, mail@maciej.szmigiero.name,
+ michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
+ isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+ suzuki.poulose@arm.com, steven.price@arm.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ keirf@google.com, linux-mm@kvack.org
 References: <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
  <CAGtprH8B8y0Khrid5X_1twMce7r-Z7wnBiaNOi-QwxVj4D+L3w@mail.gmail.com>
  <ZfjYBxXeh9lcudxp@google.com>
@@ -87,42 +99,112 @@ References: <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
  <d0500f89-df3b-42cd-aa5a-5b3005f67638@redhat.com>
  <ZgVCDPoQbbXjTBQp@google.com>
  <5cec1f98-17a5-4120-bbf4-b487c2caf92c@redhat.com>
-Precedence: bulk
-X-Mailing-List: kvmarm@lists.linux.dev
-List-Id: <kvmarm.lists.linux.dev>
-List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
-List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5cec1f98-17a5-4120-bbf4-b487c2caf92c@redhat.com>
+ <ZgVNXpUS8Ku37BLp@google.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <ZgVNXpUS8Ku37BLp@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thursday 28 Mar 2024 at 11:32:21 (+0100), David Hildenbrand wrote:
-> ... does that mean that for pKVM with protected VMs, "shared" pages are also
-> never migratable/swappable?
-
-In our current implementation, yes, KVM keeps its longterm GUP pin on
-pages that are shared back. And we might want to retain this behaviour
-in the short term, even with guest_memfd or using the hybrid approach
-you suggested. But that could totally be relaxed in the future, it's
-"just" a matter of adding extra support to the hypervisor for that. That
-has not been prioritized yet since the number of shared pages in
-practice is relatively small for current use-cases, so ballooning was a
-better option (and in the case of ballooning, we do drop the GUP pin).
-But that's clearly on the TODO list!
-
-> The whole reason I brought up the guest_memfd+memfd pair idea is that you
-> would similarly be able to do the conversion in the kernel, BUT, you'd never
-> be able to mmap+GUP encrypted pages.
+On 28.03.24 11:58, Quentin Perret wrote:
+> On Thursday 28 Mar 2024 at 11:32:21 (+0100), David Hildenbrand wrote:
+>> ... does that mean that for pKVM with protected VMs, "shared" pages are also
+>> never migratable/swappable?
 > 
-> Essentially you're using guest_memfd for what it was designed for: private
-> memory that is inaccessible.
+> In our current implementation, yes, KVM keeps its longterm GUP pin on
+> pages that are shared back. And we might want to retain this behaviour
+> in the short term, even with guest_memfd or using the hybrid approach
+> you suggested. But that could totally be relaxed in the future, it's
+> "just" a matter of adding extra support to the hypervisor for that. That
+> has not been prioritized yet since the number of shared pages in
+> practice is relatively small for current use-cases, so ballooning was a
+> better option (and in the case of ballooning, we do drop the GUP pin).
+> But that's clearly on the TODO list!
 
-Ack, that sounds pretty reasonable to me. But I think we'd still want to
-make sure the other users of guest_memfd have the _desire_ to support
-huge pages,  migration, swap (probably longer term), and related
-features, otherwise I don't think a guest_memfd-based option will
-really work for us :-)
+Okay, so nothing "fundamental", good!
 
-Thanks,
-Quentin
+> 
+>> The whole reason I brought up the guest_memfd+memfd pair idea is that you
+>> would similarly be able to do the conversion in the kernel, BUT, you'd never
+>> be able to mmap+GUP encrypted pages.
+>>
+>> Essentially you're using guest_memfd for what it was designed for: private
+>> memory that is inaccessible.
+> 
+> Ack, that sounds pretty reasonable to me. But I think we'd still want to
+> make sure the other users of guest_memfd have the _desire_ to support
+> huge pages,  migration, swap (probably longer term), and related
+> features, otherwise I don't think a guest_memfd-based option will
+> really work for us :-)
+
+*Probably* some easy way to get hugetlb pages into a guest_memfd would 
+be by allocating them for an memfd and then converting/moving them into 
+the guest_memfd part of the "fd pair" on conversion to private :)
+
+(but the "partial shared, partial private" case is and remains the ugly 
+thing that is hard and I still don't think it makes sense. Maybe it 
+could be handles somehow in such a dual approach with some enlightment 
+in the fds ... hard to find solutions for things that don't make any 
+sense :P )
+
+I also do strongly believe that we want to see some HW-assisted 
+migration support for guest_memfd pages. Swap, as you say, maybe in the 
+long-term. After all, we're not interested in having MM features for 
+backing memory that you could similarly find under Windows 95. Wait, 
+that one did support swapping! :P
+
+But unfortunately, that's what the shiny new CoCo world currently 
+offers. Well, excluding s390x secure execution, as discussed.
+
+-- 
+Cheers,
+
+David / dhildenb
+
