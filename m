@@ -1,120 +1,83 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 512701DDF6
-	for <kvmarm@lists.linux.dev>; Thu, 28 Mar 2024 13:59:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97C92131E51
+	for <kvmarm@lists.linux.dev>; Thu, 28 Mar 2024 16:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711634347; cv=none; b=MyphtRoctHRvXPGt/ICBaSIS/uKcWntaYvFjiJnyATOYSzpJSvrzX1yc0gY51DVUzfQ4bv5qG+1qiU92HflLAxj5GZFSWWXEFDUsk6UbWtAW6cam5CglSYCMZA3XzaebJ14d18EDEmFvzuroihfDRyEpRySd8vnSdnNN+89jTlM=
+	t=1711642798; cv=none; b=oMAeB06Qee7ommoT2f+32QGx87TJbdzKxypoej+hbaArhum0nF3g5iBENQxJBk0iv7T77AH89dDNNvSHRoZADIvtulaYh03BKnfc8k9MjiwbccEvapc6ZWM7OPe68I2nathPmqKG5zSH8QKKUOH/PPJbhK85e697TYcTQnX9V1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711634347; c=relaxed/simple;
-	bh=NK7LET77latJxFetZ4zO1WlQhyaBRI6+mpEFOHPiO1k=;
+	s=arc-20240116; t=1711642798; c=relaxed/simple;
+	bh=tzB3gCV3GAmycRmk7KBoXhD75Eh7BQ8JSJL4EsS+iK4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SwlTMgoZJwMhj6QYLc6Lq5OOuc7XuQWu/mm/ki5HsDBoD3OVOYp+nHVLHYNPVsajSGzb3ykFjzo9rWQ2rNxf6vjPBOkecE9EUUXtXnK9WVJLjoaOxHqHi4U9bWFGh9NitzbkyQJzRtrSpAnaFmCp+ZvYHULNSie+inSZBS04EG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XPoIQ5MR; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=DwmyiWhqhYo55MSM9am7woYYAWi0AkTUtO9AFA6bJLvpjNiefxofYC+YxN3Hmn+QeqhqJJIussuh/ZuaFF2VroqRnEdWDKJiWCaNWYadAaroR+l+CQinky0aBo/9G8PkCV3ZCp2aTOWeomX9EcBzmVrxWwGnzLIYe0TQKrJlbRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b7ny+CY+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XPoIQ5MR"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-413f8c8192eso75045e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 28 Mar 2024 06:59:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711634343; x=1712239143; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UhSlWCplow3q0UiENwQXBqJUPqprxyAeOLjfYZq98Wg=;
-        b=XPoIQ5MRFyuOvTaSy/QPMT+AqORSvKy0CM0uua1GwexcIo57QwEgfgEyyuVCrgBnHZ
-         AI1KvOh/Zxc5cU695GZXTvc3AFAcx+j9PdyE7hcUL8QywwsU0zmYWLe6NrqJH1ATfERT
-         i3q1MMCgdJ3a8exAr42dzF/T/BRwdSYwOJDmvbaCJpqiUn+IofSM8bUBJhhA4y5yhhG9
-         +NLaOBDVtkPwGQAS+IgXQ+CeyF/BRTe78WxrvuP18wvuOoCEPCkI9GU1bh3dyWqfqPez
-         Vg5GmrzLkws8bf1bFGyWzDYuwQDHRYsSooYq/i28TCLjzToG2BOG6HGWodHXTL4i/L1R
-         koFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711634343; x=1712239143;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UhSlWCplow3q0UiENwQXBqJUPqprxyAeOLjfYZq98Wg=;
-        b=mCqE00wvjQ6sfn5+lp8mhxR2pJQ+10eOPC6/m10C3X+/wSEs6LXXYlR5sw66TBvEF+
-         VHAA1kZA1bogky+h+AWKHMTzqnMulyNP3gznXzfxBDsqKydpA5dBKc2MtbOFPk8k+/nc
-         xhuMVtWzeCUnHZO5Hysi7vMI+Syz44iayKLw2ULbCczBUR0IalhyXJ1LQlRC6pYkl6WG
-         9xAFCXxbyO4p4eLLXIT2Ya15DIbztutcWwZpFQ4Jw4zJCqwsypBOm9z5GyqYwiwEogZW
-         /zTJH1krZb4vZGYfakDMUjBT8H2VtFGKE3vs68HXRnNhpH4e+9tBdS1+gdVLdIVVRhpi
-         WFag==
-X-Forwarded-Encrypted: i=1; AJvYcCUoLh1fXMSzpaptDdhr7/wfCoXScRiS9IL0bNku1+q/FMz/V3bXLAR2YNjjoP4Z6amxEmPODTWobVUku0o++IpTlwnOmjql
-X-Gm-Message-State: AOJu0YwOnTYhnQB26hngZdUbTdS84rDgD57/a1Crl1Sx2bAZjn2oGQ+a
-	glYNBaDqczdT7o8PvqjTq69+QCsaQhx2jyDEOJhS2QCdDAjv109lkbmC0GKNhw==
-X-Google-Smtp-Source: AGHT+IFkjqEo9WYWh9uwV7qW8tTZm/X3G1itWmwY9D+9DsKXDmdQqm31owW8ZokBAn+BbbDZkcRWnw==
-X-Received: by 2002:a05:600c:3584:b0:414:daa3:c192 with SMTP id p4-20020a05600c358400b00414daa3c192mr213991wmq.0.1711634343417;
-        Thu, 28 Mar 2024 06:59:03 -0700 (PDT)
-Received: from google.com (248.199.140.34.bc.googleusercontent.com. [34.140.199.248])
-        by smtp.gmail.com with ESMTPSA id l6-20020a05600c4f0600b0041469869d11sm5499477wmq.47.2024.03.28.06.59.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 06:59:02 -0700 (PDT)
-Date: Thu, 28 Mar 2024 13:59:00 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org,
-	maz@kernel.org, qperret@google.com, qwandor@google.com,
-	suzuki.poulose@arm.com, tabba@google.com, will@kernel.org,
-	yuzenghui@huawei.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kernel-team@android.com
-Subject: Re: [PATCH 2/2] KVM: arm64: Allow only the specified FF-A calls to
- be forwarded to TZ
-Message-ID: <ZgV3pGvUhaK5otUL@google.com>
-References: <20240322124303.309423-1-sebastianene@google.com>
- <20240322124303.309423-2-sebastianene@google.com>
- <Zf45eDs8Bd1UQ94Z@linux.dev>
- <ZgFgI0Ky2m4MUbw-@google.com>
- <ZgKKcurtndJaIwAV@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b7ny+CY+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D7DBC43399;
+	Thu, 28 Mar 2024 16:19:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711642798;
+	bh=tzB3gCV3GAmycRmk7KBoXhD75Eh7BQ8JSJL4EsS+iK4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=b7ny+CY+RxfhTdVuiGmrvbvMTt6tSakNPmnmsK7cRnp2WUe/StLgYUFReSQc4xlLK
+	 uVb4TUByVQRx9gnVlGfxZ56uu9Pe0VAMzF8wTpb3i3s3e3H+WEjbszwDIA3lt+W/t1
+	 OwmD01fEmwwteWx/vliWMx9U4c04ZjF/xmq41tRzpT7nI7Yb8jpEj5dpbgFKppbFxH
+	 +BaZVlaAkw8MgkmQVaWA00vgaVo8jdwQDZoUq3N/aqWIXlxYkuvIDWmvWqusuUDGLv
+	 +SU0dWu89YFgOi2uql+zI7ovVpj78OUflvCn5e6Gen85NUexVg+tYRcKEGLhHsyOCL
+	 JWt6mS9/jyoZA==
+Date: Thu, 28 Mar 2024 16:19:52 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev, maz@kernel.org, will@kernel.org,
+	qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com,
+	catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com,
+	suzuki.poulose@arm.com, oliver.upton@linux.dev,
+	mark.rutland@arm.com, joey.gouly@arm.com, rananta@google.com
+Subject: Re: [PATCH v1 02/44] KVM: arm64: Use enum instead of helper for
+ checking FP-state
+Message-ID: <45204460-828b-4f06-9d1b-0faa355fbfdf@sirena.org.uk>
+References: <20240327173531.1379685-1-tabba@google.com>
+ <20240327173531.1379685-3-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="PEHlsddrpoNP21F1"
+Content-Disposition: inline
+In-Reply-To: <20240327173531.1379685-3-tabba@google.com>
+X-Cookie: Yes, but which self do you want to be?
+
+
+--PEHlsddrpoNP21F1
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZgKKcurtndJaIwAV@linux.dev>
 
-On Tue, Mar 26, 2024 at 01:42:26AM -0700, Oliver Upton wrote:
-> On Mon, Mar 25, 2024 at 11:29:39AM +0000, Sebastian Ene wrote:
-> > On Fri, Mar 22, 2024 at 07:07:52PM -0700, Oliver Upton wrote:
-> > > On Fri, Mar 22, 2024 at 12:43:03PM +0000, Sebastian Ene wrote:
-> > > > The previous logic used a deny list to filter the FF-A calls. Because of
-> > > > this, some of the calls escaped the check and they were forwarded by
-> > > > default to Trustzone. (eg. FFA_MSG_SEND_DIRECT_REQ was denied but the 64
-> > > > bit version of the call was not).
-> > > > Modify the logic to use an allowlist and allow only the calls specified in
-> > > > the filter function to be proxied to TZ from the hypervisor.
-> > 
-> > Hi Oliver,
-> > 
-> > > 
-> > > I had discussed this with Will back when the feature was upstreamed and
-> > > he said there's a lot of off-label calls that necessitate a denylist
-> > > implementation. Has anything changed to give us confidence that we can
-> > > be restrictive, at least on the FF-A range?
-> > > 
-> > 
-> > I remember your proposal for having an allowlist instead. The current change makes
-> > sense if we have https://lore.kernel.org/kvmarm/20240322124303.309423-1-sebastianene@google.com/
-> > which opens the window for more FF-A calls to be forwarded to TZ.
-> 
-> Got it. Last time I didn't catch the level of abuse we expect to endure
-> from vendors, but now it seems we will not support non-conforming calls
-> that appear in standardized SMC ranges.
-> 
-> Adding mention of this to the changelog might be a good idea then.
-> 
+On Wed, Mar 27, 2024 at 05:34:49PM +0000, Fuad Tabba wrote:
+> Before the conversion of the various FP-state booleans into an
+> enum representing the state, this helper may have clarified
+> things. Since the introduction of the enum, the helper obfuscates
+> rather than clarifies. This also makes the code consistent with
+> other parts that check the FP-state.
 
-That's a good point. I didn't create a changelog for this but I should
-add one and specify this.
+Reviewed-by: Mark Brown <broonie@kernel.org>
 
-> -- 
-> Thanks,
-> Oliver
+--PEHlsddrpoNP21F1
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks,
-Sebastian
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmYFmKcACgkQJNaLcl1U
+h9DJhQf8Cp2qUZ/xcagLrW+3gyD36Ux9jUEjYflx2LxMlEDSXgLmaETFvmETG16o
+vkIDS5SR/ryWLBwvNClEQZXWND+Fp5Nsbde+FbwoX9KPXoYeohGYre34lYpBCSE1
+ZQPRt9zOcKvsm3aUM/RlSARFJI15fuFBbaneQEYhuNWg/973T6EwqObQcshx4MPL
+XC1gqoHIy3UbQ37KL3Hvo7+MFzqdznQEPhZxjNynMwm3O7kDo0m4YJfsTzWJxjq9
+2AR38KrTRWgwvDNu4B7kOqTuQwR9EzopIUmMvj643mOpmmFeixBpZeRC5XtIaACB
+YCTQumzR6UpAiBTlyd3P8A5C79qUag==
+=/CHS
+-----END PGP SIGNATURE-----
+
+--PEHlsddrpoNP21F1--
