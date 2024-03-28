@@ -1,92 +1,72 @@
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED46E55E6C
-	for <kvmarm@lists.linux.dev>; Thu, 28 Mar 2024 10:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC14200DE
+	for <kvmarm@lists.linux.dev>; Thu, 28 Mar 2024 10:30:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711620628; cv=none; b=T/rKSes2gU1VY16NaRBNBkJGCUAvehksxfYq/YKkcys0rDwVd0X7Eo8hfPXS1NPpeazWmMq2+GyLD9IL+NFsMyMSps0onoinpu581pasICVYEDs+Lmb3/RohkTeHrV6ic6gTsj1FjmyKxp3S30bcaEWlXVcA7uqGkNuoaVNxnXc=
+	t=1711621820; cv=none; b=tPwtGCJpABIoC7wMdvl7QexVatlFk+fdci4H3SB4+8xEoTCqVdUrOlcwvZnRHY/PssFCNKP651GvxcHTbvYqEY+O0ty/97uvpo4rmfLYYqI3ey7Mol5dDIc7z3hQq5bk3opdAipkmbeqyisBZvgVxYVpPitsDppE8j4W0i2xXqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711620628; c=relaxed/simple;
-	bh=b/Wtm7QHudbi6Mcs0lI5n1QIOiQrRafrMMNW8RqO18s=;
+	s=arc-20240116; t=1711621820; c=relaxed/simple;
+	bh=IgHYWK2ExRPZDTN/hLBd6JLOwfML660stcDwa/LKV/Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LNDWViA6LQ3WGoG/32j9NJGP0955EdN9HOYGFilXep4v1qUUMlReLkN/pil0jeF6CSqzJfOlmlo8O6bcZU5WNI8daD1nmVOoewJW4MJBo+W643IXFeF5xmmwQatPLBg34hBlmyV9jN78Vvt4M4wHqUBOI/yQ2WeL8XpnObGox/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O7Rq86a8; arc=none smtp.client-ip=209.85.218.41
+	 Content-Type:Content-Disposition:In-Reply-To; b=ncTPDAnfldle3VCwrpVudwBxKCeclVxfxpuWwUKfAfIuMITXoJyQMWmkpeDyC0IPic5L432Vjz4Y9pNadYh6YM4k39T49NCz/HSCASb1p0GdLjjAeyKNNm54nYtwQ7fffIDdUMODzUouJ6eBQlaj17YzwW2Hdr/M1LpL7BE9EjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nDCsEmJ4; arc=none smtp.client-ip=209.85.208.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O7Rq86a8"
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a466a27d30aso87965366b.1
-        for <kvmarm@lists.linux.dev>; Thu, 28 Mar 2024 03:10:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nDCsEmJ4"
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-563cb3ba9daso752392a12.3
+        for <kvmarm@lists.linux.dev>; Thu, 28 Mar 2024 03:30:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711620625; x=1712225425; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1711621817; x=1712226617; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Puyk1VksZOZMOoSvwfN6vEXC/OypwIzDynZuRboVTDQ=;
-        b=O7Rq86a8dixwEPJDtllTIF2W3cQ9HFgcSDuxfqyRVVmof0SORoGqo3eU1qaJTV0Z/N
-         VYnrFPyLEU5YHV3UBKpcuDrYlxKJRy0m58QRpzysAh/S7Hur0CInn/xcmcARJONIn6bE
-         T0RMgxmz6YzetkVS8UnfXanR2tbKWa4co4tLhVv53mM8uhzRtmR/HFWrvY1YYnK0AkVy
-         p5SbU6kTNw9BtLrPANy84UOPUSN3QKpxKV6L0akbaGIRjNlzCijBbJQe+sB4zfhhiq5w
-         ZeJ84WGDK4qhceo8TOr9oB8x4QxGDt8iV9kzh6dyPoyzEYqj6iefmJyJN5wXUWkwi4Ez
-         yVFQ==
+        bh=zm7UhGPLU4UMFzlv9xAHTMrvOq2hNK4t2z9KZhDSxt0=;
+        b=nDCsEmJ4IUYTJQfphE8X6cKEWQZbgCjJAR/xH++DsNm0H8yUCCr439dQ13OTMHDQAP
+         Ygcr01kvifmbp9TGomxpTwpAoswCqdHRXCzaXWRiXYedGgJg3Ei7YjejdKyKWI2wOppS
+         gaAj04TUMl0Ld6PvpA+PMEaxGzfg8eME7enz8FPy3eRVu/0ZDa1C4jhfpDAMMjjcY07f
+         OXPSrZGVZCqt6NrrqplOPjdHFBbSWNsWgQeBxnlu4nZtc49YRH1yG+SeJ520WOKUcaJi
+         OWM+alzAoR9tJHR2xvHTAK+TtsTYxEdPWnaSeaSFUx+g6KmNPZ2BgXiWHqe/dekpFfZT
+         VCxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711620625; x=1712225425;
+        d=1e100.net; s=20230601; t=1711621817; x=1712226617;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Puyk1VksZOZMOoSvwfN6vEXC/OypwIzDynZuRboVTDQ=;
-        b=gSWoZIZpErY+9BlQM5CRuNVb4u1iGw560z7kaxYYEgH9asfrUnKAKIKmKeBwd+Fghg
-         nhWJDXxBv/nXyLhttru3zjU+YFlkJDXFTaiPp8F81Q0VFiUa/HJa5Ivz9251pa9CoS0s
-         MEE8eUHWqkgtwLZxZdnW+fAAeHHFr0ksJl4mIfmwHoYUSgFdvWReIjN7PXKErudma7Cr
-         fnsw5wFfDppAJDehMlkx10y2Fwp5Kt0DhI7ZmbIYaVsL3AAjwz1CGsoV82cEludliqyH
-         rQ3y3W+Ipux8YUSmHJchdzqoEIf+Djg3UAT5tiyQardmk7rsK0NhSUkkazVvoIixK2R7
-         Z+4g==
-X-Forwarded-Encrypted: i=1; AJvYcCW9w0SIkwm7hIYT25yFraUx4G755sBwvb+arVdG2JWwqbaArmVasoeGL65oKpaDTNCgIDXpTEMILspUtmn67V3X416UZBR6
-X-Gm-Message-State: AOJu0YwiX6qgSJQmAh0zxZPPx5VaNHvpH8xNHB7ucAK89RWItcUm9zW7
-	OH5CjafhsONQPpQgeC9quF7hHORctHM58D202gvm9zFVNRridnA3V2qfWlWrHw==
-X-Google-Smtp-Source: AGHT+IGXnI9D0/a/dDSyK30CUeRiI6B81YbRt4vqKAzIHpgoErhg2X2EKKArBQHecRRX/nEjQaIWXQ==
-X-Received: by 2002:a17:906:f0d0:b0:a4e:e20:df53 with SMTP id dk16-20020a170906f0d000b00a4e0e20df53mr1476586ejb.59.1711620624947;
-        Thu, 28 Mar 2024 03:10:24 -0700 (PDT)
+        bh=zm7UhGPLU4UMFzlv9xAHTMrvOq2hNK4t2z9KZhDSxt0=;
+        b=vJLsnAqgtkXoTyKU5WXPXmJ6zOk7dtLXqV+IzbD4lDbj2kZHXm3MkIKMbu5kIqkIIS
+         D6g29wa0Pws0TIrSGnV5lAdsc1GSvyEqUIH8KiObOJVm3GJTQTURl0Y5oGFG2t+078Ms
+         VT69SASXwEN3/nThLjsNlFAxn5LoKCxrdCgnJPAUzKWIsC1QEedBjnkD5ZUZlw7Ok2UZ
+         gdrR6EQQqNtOdnLyg8/9F+VrTHFPj6KOooNPArstXQDNOJzXpbIHpAcqLfaD8x+R7YJw
+         s9jGOsy7c1Ctb1+c23bPzoqBgok1wXs8/Qvxe05BMtMGWcy2LrrjPs3XuuUsy6r9fgS6
+         QVLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXmp2zyhQo/SCFtVGQf2hmbRll+EMrhTnBzbC3ItrsaEoZwOuYEVg8ncVo0Re4bdC4G4Y7CWP/Xxwm79ibMhouYP9JjhCyT
+X-Gm-Message-State: AOJu0Yw8ZyHPVvcYbwbiibME34qNspPbV89b1inT2dUme5LFsm3f0l6X
+	YIBSTx+yPXbOog+ckaTk87xHQGN2GP9/CuLtJRnOe7bS0TP0K/gveO0d3b96ng==
+X-Google-Smtp-Source: AGHT+IHrzxVcayJwAymJeYjWNVkfBVqo8DMj23IPGaMRV9u8xUSwyjBPTm+iXUeqd1BagXZOXD7/pA==
+X-Received: by 2002:a50:d503:0:b0:568:b95f:5398 with SMTP id u3-20020a50d503000000b00568b95f5398mr1875841edi.38.1711621816064;
+        Thu, 28 Mar 2024 03:30:16 -0700 (PDT)
 Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
-        by smtp.gmail.com with ESMTPSA id kg26-20020a17090776fa00b00a449026672esm571212ejc.81.2024.03.28.03.10.23
+        by smtp.gmail.com with ESMTPSA id x1-20020a056402414100b00568d7b0a21csm657536eda.61.2024.03.28.03.30.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Mar 2024 03:10:23 -0700 (PDT)
-Date: Thu, 28 Mar 2024 10:10:20 +0000
+        Thu, 28 Mar 2024 03:30:14 -0700 (PDT)
+Date: Thu, 28 Mar 2024 10:30:08 +0000
 From: Quentin Perret <qperret@google.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: Will Deacon <will@kernel.org>, Sean Christopherson <seanjc@google.com>,
-	Vishal Annapurve <vannapurve@google.com>,
-	Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
-	viro@zeniv.linux.org.uk, brauner@kernel.org,
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com,
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
-	dmatlack@google.com, yu.c.zhang@linux.intel.com,
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
-	ackerleytng@google.com, mail@maciej.szmigiero.name,
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com,
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
-	suzuki.poulose@arm.com, steven.price@arm.com,
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com,
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com,
-	oliver.upton@linux.dev, maz@kernel.org, keirf@google.com,
-	linux-mm@kvack.org
-Subject: Re: folio_mmapped
-Message-ID: <ZgVCDPoQbbXjTBQp@google.com>
-References: <ae187fa6-0bc9-46c8-b81d-6ef9dbd149f7@redhat.com>
- <CAGtprH-17s7ipmr=+cC6YuH-R0Bvr7kJS7Zo9a+Dc9VEt2BAcQ@mail.gmail.com>
- <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
- <CAGtprH8B8y0Khrid5X_1twMce7r-Z7wnBiaNOi-QwxVj4D+L3w@mail.gmail.com>
- <ZfjYBxXeh9lcudxp@google.com>
- <40f82a61-39b0-4dda-ac32-a7b5da2a31e8@redhat.com>
- <20240319143119.GA2736@willie-the-truck>
- <2d6fc3c0-a55b-4316-90b8-deabb065d007@redhat.com>
- <20240327193454.GB11880@willie-the-truck>
- <d0500f89-df3b-42cd-aa5a-5b3005f67638@redhat.com>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com,
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+	bristot@redhat.com, vschneid@redhat.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: arm64: Add KVM_CAP to control WFx trapping
+Message-ID: <ZgVGsKoAoW4YwQD_@google.com>
+References: <Zf2W-8duBlCk5LVm@google.com>
+ <gsntjzlqax63.fsf@coltonlewis-kvm.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -95,123 +75,97 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d0500f89-df3b-42cd-aa5a-5b3005f67638@redhat.com>
+In-Reply-To: <gsntjzlqax63.fsf@coltonlewis-kvm.c.googlers.com>
 
-Hey David,
+Hi Colton,
 
-I'll try to pick up the baton while Will is away :-)
-
-On Thursday 28 Mar 2024 at 10:06:52 (+0100), David Hildenbrand wrote:
-> On 27.03.24 20:34, Will Deacon wrote:
-> > I suppose the main thing is that the architecture backend can deal with
-> > these states, so the core code shouldn't really care as long as it's
-> > aware that shared memory may be pinned.
+On Monday 25 Mar 2024 at 20:12:04 (+0000), Colton Lewis wrote:
+> Thanks for the feedback.
 > 
-> So IIUC, the states are:
+> Quentin Perret <qperret@google.com> writes:
 > 
-> (1) Private: inaccesible by the host, accessible by the guest, "owned by
->     the guest"
+> > On Friday 22 Mar 2024 at 14:24:35 (+0000), Quentin Perret wrote:
+> > > On Tuesday 19 Mar 2024 at 16:43:41 (+0000), Colton Lewis wrote:
+> > > > Add a KVM_CAP to control WFx (WFI or WFE) trapping based on scheduler
+> > > > runqueue depth. This is so they can be passed through if the runqueue
+> > > > is shallow or the CPU has support for direct interrupt injection. They
+> > > > may be always trapped by setting this value to 0. Technically this
+> > > > means traps will be cleared when the runqueue depth is 0, but that
+> > > > implies nothing is running anyway so there is no reason to care. The
+> > > > default value is 1 to preserve previous behavior before adding this
+> > > > option.
 > 
-> (2) Host Shared: accessible by the host + guest, "owned by the host"
+> > > I recently discovered that this was enabled by default, but it's not
+> > > obvious to me everyone will want this enabled, so I'm in favour of
+> > > figuring out a way to turn it off (in fact we might want to make this
+> > > feature opt in as the status quo used to be to always trap).
 > 
-> (3) Guest Shared: accessible by the host, "owned by the guest"
+> Setting the introduced threshold to zero will cause it to trap whenever
+> something is running. Is there a problem with doing it that way?
 
-Yup.
+No problem per se, I was simply hoping we could set the default to zero
+to revert to the old behaviour. I don't think removing WFx traps was a
+universally desirable behaviour, so it prob should have been opt-in from
+the start.
 
-> Memory ballooning is simply transitioning from (3) to (2), and then
-> discarding the memory.
+> I'd also be interested to get more input before changing the current
+> default behavior.
 
-Well, not quite actually, see below.
+Ack, that is my personal opinion.
 
-> Any state I am missing?
-
-So there is probably state (0) which is 'owned only by the host'. It's a
-bit obvious, but I'll make it explicit because it has its importance for
-the rest of the discussion.
-
-And while at it, there are other cases (memory shared/owned with/by the
-hypervisor and/or TrustZone) but they're somewhat irrelevant to this
-discussion. These pages are usually backed by kernel allocations, so
-much less problematic to deal with. So let's ignore those.
-
-> Which transitions are possible?
-
-Basically a page must be in the 'exclusively owned' state for an owner
-to initiate a share or donation. So e.g. a shared page must be unshared
-before it can be donated to someone else (that is true regardless of the
-owner, host, guest, hypervisor, ...). That simplifies significantly the
-state tracking in pKVM.
-
-> (1) <-> (2) ? Not sure if the direct transition is possible.
-
-Yep, not possible.
-
-> (2) <-> (3) ? IIUC yes.
-
-Actually it's not directly possible as is. The ballooning procedure is
-essentially a (1) -> (0) transition. (We also tolerate (3) -> (0) in a
-single hypercall when doing ballooning, but it's technically just a
-(3) -> (1) -> (0) sequence that has been micro-optimized).
-
-Note that state (2) is actually never used for protected VMs. It's
-mainly used to implement standard non-protected VMs. The biggest
-difference in pKVM between protected and non-protected VMs is basically
-that in the former case, in the fault path KVM does a (0) -> (1)
-transition, but in the latter it's (0) -> (2). That implies that in the
-unprotected case, the host remains the page owner and is allowed to
-decide to unshare arbitrary pages, to restrict the guest permissions for
-the shared pages etc, which paves the way for implementing migration,
-swap, ... relatively easily.
-
-> (1) <-> (3) ? IIUC yes.
-
-Yep.
-
-<snip>
-> > I agree on all of these and, yes, (3) is the problem for us. We've also
-> > been thinking a bit about CoW recently and I suspect the use of
-> > vm_normal_page() in do_wp_page() could lead to issues similar to those
-> > we hit with GUP. There are various ways to approach that, but I'm not
-> > sure what's best.
+> > > There are a few potential issues I see with having this enabled:
 > 
-> Would COW be required or is that just the nasty side-effect of trying to use
-> anonymous memory?
-
-That'd qualify as an undesirable side effect I think.
-
-> > 
-> > > I'm curious, may there be a requirement in the future that shared memory
-> > > could be mapped into other processes? (thinking vhost-user and such things).
-> > 
-> > It's not impossible. We use crosvm as our VMM, and that has a
-> > multi-process sandbox mode which I think relies on just that...
-> > 
+> > >   - a lone vcpu thread on a CPU will completely screw up the host
+> > >     scheduler's load tracking metrics if the vCPU actually spends a
+> > >     significant amount of time in WFI (the PELT signal will no longer
+> > >     be a good proxy for "how much CPU time does this task need");
 > 
-> Okay, so basing the design on anonymous memory might not be the best choice
-> ... :/
+> > >   - the scheduler's decision will impact massively the behaviour of the
+> > >     vcpu task itself. Co-scheduling a task with a vcpu task (or not) will
+> > >     impact massively the perceived behaviour of the vcpu task in a way
+> > >     that is entirely unpredictable to the scheduler;
+> 
+> > >   - while the above problems might be OK for some users, I don't think
+> > >     this will always be true, e.g. when running on big.LITTLE systems the
+> > >     above sounds nightmare-ish;
+> 
+> > >   - the guest spending long periods of time in WFI prevents the host from
+> > >     being able to enter deeper idle states, which will impact power very
+> > >     negatively;
+> 
+> > > And probably a whole bunch of other things.
+> 
+> > > > Think about his option as a threshold. The instruction will be trapped
+> > > > if the runqueue depth is higher than the threshold.
+> 
+> > > So talking about the exact interface, I'm not sure exposing this to
+> > > userspace is really appropriate. The current rq depth is next to
+> > > impossible for userspace to control well.
+> 
+> Using runqueue depth is going off of a suggestion from Oliver [1], who I've
+> also talked to internally at Google a few times about this.
+> 
+> But hearing your comment makes me lean more towards having some
+> enumeration of behaviors like TRAP_ALWAYS, TRAP_NEVER,
+> TRAP_IF_MULTIPLE_TASKS.
 
-So, while we're at this stage, let me throw another idea at the wall to
-see if it sticks :-)
+Do you guys really expect to set this TRAP_IF_MULTIPLE_TASKS? Again, the
+rq depth is quite hard to reason about from userspace, so not sure
+anybody will really want that? A simpler on/off thing might be simpler.
 
-One observation is that a standard memfd would work relatively well for
-pKVM if we had a way to enforce that all mappings to it are MAP_SHARED.
-KVM would still need to take an 'exclusive GUP' from the fault path
-(which may fail in case of a pre-existing GUP, but that's fine), but
-then CoW and friends largely become a non-issue by construction I think.
-Is there any way we could enforce that cleanly? Perhaps introducing a
-sort of 'mmap notifier' would do the trick? By that I mean something a
-bit similar to an MMU notifier offered by memfd that KVM could register
-against whenever the memfd is attached to a protected VM memslot.
+> > > My gut feeling tells me we might want to gate all of this on
+> > > PREEMPT_FULL instead, since PREEMPT_FULL is pretty much a way to say
+> > > "I'm willing to give up scheduler tracking accuracy to gain throughput
+> > > when I've got a task running alone on a CPU". Thoughts?
+> 
+> > And obviously I meant s/PREEMPT_FULL/NOHZ_FULL, but hopefully that was
+> > clear :-)
+> 
+> Sounds good to me but I've not touched anything scheduling related before.
 
-One of the nice things here is that we could retain an entire mapping of
-the whole of guest memory in userspace, conversions wouldn't require any
-additional efforts from userspace. A bad thing is that a process that is
-being passed such a memfd may not expect the new semantic and the
-inability to map !MAP_SHARED. But I guess a process that receives a
-handle to private memory must be enlightened regardless of the type of
-fd, so maybe it's not so bad.
-
-Thoughts?
+Do you guys use NOHZ_FULL in prod? If not that idea might very well be a
+non-starter, because switching to NOHZ_FULL would be a big ask. So,
+yeah, I'm curious :)
 
 Thanks,
 Quentin
