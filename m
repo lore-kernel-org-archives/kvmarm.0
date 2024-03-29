@@ -1,166 +1,280 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from silver.cherry.relay.mailchannels.net (silver.cherry.relay.mailchannels.net [23.83.223.166])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C9238DD3
-	for <kvmarm@lists.linux.dev>; Fri, 29 Mar 2024 18:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711737546; cv=none; b=HREhZsCHfABGj616uBvhjS6Fs8LvRqgHtdhITjaD1hIP4QkQLuo8bO4nK9a+62yfaZrkNn/rde/dQ7S54kcPA/Py4DPCS3Jt+hb4ymgQYBYGDc3X4TG/8GJ1KWMgdB8dE4B9OlCQ9hpiiYnrRkF3+lfJu+5Yf2nF5VZmSphTUZ4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711737546; c=relaxed/simple;
-	bh=5ibrp1oeF0vrPYyOhZOAc9lDini/4uj3SGxdDGuzUEg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XM9Hpciul9TqYCnxFkvkDAH4uyjJEjhdmW+pyJjRv1GUGQz4dO0cvTWVx4bwbzYbUH2OkVIeR6Dq5KaU4GOXoTh6KFK+YB3GW/k9A1jdtOMGjhbGZGuspnAxMpI8F4BCFEYOBm9wWDGSxXOlbEYHUJXsV1Bao+0Z3RkPx5NzLlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qTLFsSIG; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A959613341C
+	for <kvmarm@lists.linux.dev>; Fri, 29 Mar 2024 19:15:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.223.166
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711739753; cv=pass; b=qxaVY1m8ZmJi0rFysDSxsZrUmZIKPB4OiOyH8HtcXvduoZJyTC5Qgs6pr6aJLYKjfTOVfaVunzaK5eOkUbkKDmFDttx44AWljlvwwsuQm+t49XYemMmKBhjJdpFXzkOTz12AvOSVGoRqSeq9Kdru6BfGu+77AWMJtMAq0GYcvVc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711739753; c=relaxed/simple;
+	bh=iOaS0dTkfcP+SU/f5iG3clrpiLMk4p12ElyX3Y4YXxI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YUe5pGTYodLrOQ7MuK3nv3otJtFgUKgXYWIkdtn3De/Hf/6Oxzs5zWZc6UdKx5oNW6/6mZzqrbBsGKIm2AZKzgf4eGcy1bOqsH0NPeTKe1cviJPzChXXzaVDpVtiiLVEB+XizN3frENgNW/P7F4wdSRmmvYZeO/TpJL/Ub1fOPI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=templeofstupid.com; spf=pass smtp.mailfrom=templeofstupid.com; dkim=pass (2048-bit key) header.d=templeofstupid.com header.i=@templeofstupid.com header.b=NQQc8MK0; arc=pass smtp.client-ip=23.83.223.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=templeofstupid.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=templeofstupid.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qTLFsSIG"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-690bff9d4a6so13321456d6.1
-        for <kvmarm@lists.linux.dev>; Fri, 29 Mar 2024 11:39:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711737543; x=1712342343; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YfjikohpzOAjLlRqO+6UBB6wPr/KvkMvVqtQCBtLFjM=;
-        b=qTLFsSIG83P6y6QvVNAj3hpOj7c6oG3zDVrdg82n/IaRQNdtz6Lo8O9IXIyMp8UbTf
-         8VsNSqN8HXtBM06Vep6QykSIdfJb9D9v5/c0cggfDIgYbf7XmtmmZoEMtlfr0LFgofgr
-         IAtUdQddHg2ctUYCoDDpxj+/Ph43NQViK5/HZT1VglSd5uFz2CubFABs+Ie+aK+p8nMP
-         rBYpLq+hDPkJ/HVWb6jp4usIVXvmrJf+r7xekF5NbRkprJH6rYYShGD2nTEmcFHBOve9
-         2KG8ZdEcbZ6Ac1f2VT06Yio1XjqJjf8EfhjArlIvOCVP+M3+/AKwoZunWJkqm8udeGpo
-         smFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711737543; x=1712342343;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YfjikohpzOAjLlRqO+6UBB6wPr/KvkMvVqtQCBtLFjM=;
-        b=qC6Hu2D8CtLNM27N+9JP1U5+akPgOyNsy680thWP/mooIi4v6BtByrnu3PEBYOfmdX
-         nle4AcIbDGyK6oYu7hzsuksN/pu4P6rY6k6v0BkScxx3lg5FAdgGVjb1l3zP7GM38JcG
-         YwJnBNbWlrmzGD9OtAYWn/67BHF32RlyDo+p5Z5ns09+YarjDsRa/dFIJFQNEa1UcXIC
-         GHFA8SCvWCk9QqUj9vIkVdcRYdQLh4ZpajoZnFX5upsUJfIdchRJRY+TctZMeFuKJOAV
-         5ZUqdsfgzGzZwbwtRyzgQqt7mdZ6+bPcpxgMYZXHOftME6Bxi/nReTof/5VImFMp8Yrk
-         FtBw==
-X-Forwarded-Encrypted: i=1; AJvYcCVTgrsITj1Y7g4E6m+R37rhXOivI/rIsLUiCncESqXuBh26bzGUJO+mimYccckKqsWOmAuBGN7SKS1q0nshXMHYtmpyQC9Z
-X-Gm-Message-State: AOJu0YzzWsUJWqVWHAqEa4UCDI8NVctY+3kOXLWdMS9s6RhY5bX/Ae5f
-	ck8VBu152vTAtF31+SnU+RU1rly473VduNIv6MRthNRNMJpKdAgEXGkBKc5A7w7BenIxZ0DMPJ7
-	Ki+DXF56HfbDhcoIlHHglpnGWbW1q+QuXEIzt
-X-Google-Smtp-Source: AGHT+IEGZkO07vUNWHTkATHpD6cSAfR3qyRiodjl+lF3pDCMbKLcZEvPgUlbFDmsNYBTPFujyi00g9r2gwkWpfIbMD0=
-X-Received: by 2002:a0c:f547:0:b0:696:2e0c:8b82 with SMTP id
- p7-20020a0cf547000000b006962e0c8b82mr3021116qvm.15.1711737543030; Fri, 29 Mar
- 2024 11:39:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=templeofstupid.com header.i=@templeofstupid.com header.b="NQQc8MK0"
+X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 962F02C3785
+	for <kvmarm@lists.linux.dev>; Fri, 29 Mar 2024 19:15:45 +0000 (UTC)
+Received: from pdx1-sub0-mail-a283.dreamhost.com (unknown [127.0.0.6])
+	(Authenticated sender: dreamhost)
+	by relay.mailchannels.net (Postfix) with ESMTPA id 33AA92C379D
+	for <kvmarm@lists.linux.dev>; Fri, 29 Mar 2024 19:15:45 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1711739745; a=rsa-sha256;
+	cv=none;
+	b=pESpZkq1RzIXYNLw4Anx957tEwDIDPTh/fA8XxN/mSqI193u7yEdQTaUGWUEL6cSoOC/cc
+	XTJrf0tx3+S7IhSAPDC0JQB4/c8Wl8mFNblqpHe6L/RZtyH8HJ9eZfpAbTWcQwrVGlzH+0
+	tDF6aTtA0xTXypw8afvhwCHZyymtlXgU2O9GkAR+yiplkFwQo9flK4d4EO1WIjZy05ocir
+	c80QcZnFNeFcteA+lpOHsJa+q9Yt/vNnlJpyAJnG52Bvs995tkaNBfc1KY1sjXWIR2uZm3
+	+VYyHryNNvlL4D+bRLf1vc/LqXYvq0wc6W2xxsS+2fWPqGTjE+du2URn5kZKeA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1711739745;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references:dkim-signature;
+	bh=EnlZ5bLVy+yCG0ojGQujTIq4MzqFgRZKmBSDVDyKsvw=;
+	b=X4waSwCPtNsp5fare4dWfk04kmrBuQY8SE4Vv2cO2gY1FXGuoBSmrCGGZ30VNX0PXAHZ8T
+	1Bn4t2/2pOTWS46ValAqTxpf8+mddVL8PWgnkumIid7r8MFbRAjx+9aH82+7+0abbqpBQh
+	f8lWlffkOniHtUaNz/12ZpfAGpyQHAdeSCvLbF6383FkJbXmzYP+7L6H42Xgd3nmq2/cwG
+	OP/dhPmIQupuGZTiXOFOCiFF7PfJXotPyKjb/fxVaEWk9CrdUOuRPxPqxsj8D7NcfRDiED
+	AmqWE+nVgzQHHVa7RErWSW0KlUWX6OtUp7mz0KRZ61fEIUsxRqkuLyNc+KllTA==
+ARC-Authentication-Results: i=1;
+	rspamd-699949c56f-m2pwj;
+	auth=pass smtp.auth=dreamhost smtp.mailfrom=kjlx@templeofstupid.com
+X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: dreamhost|x-authsender|kjlx@templeofstupid.com
+X-MailChannels-Auth-Id: dreamhost
+X-Trouble-Keen: 777a0c7347183a08_1711739745469_3469883448
+X-MC-Loop-Signature: 1711739745469:1993426649
+X-MC-Ingress-Time: 1711739745468
+Received: from pdx1-sub0-mail-a283.dreamhost.com (pop.dreamhost.com
+ [64.90.62.162])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.126.216.122 (trex/6.9.2);
+	Fri, 29 Mar 2024 19:15:45 +0000
+Received: from kmjvbox.templeofstupid.com (c-73-222-159-162.hsd1.ca.comcast.net [73.222.159.162])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kjlx@templeofstupid.com)
+	by pdx1-sub0-mail-a283.dreamhost.com (Postfix) with ESMTPSA id 4V5qr06zJQz3Q
+	for <kvmarm@lists.linux.dev>; Fri, 29 Mar 2024 12:15:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=templeofstupid.com;
+	s=dreamhost; t=1711739745;
+	bh=EnlZ5bLVy+yCG0ojGQujTIq4MzqFgRZKmBSDVDyKsvw=;
+	h=Date:From:To:Cc:Subject:Content-Type;
+	b=NQQc8MK0iSg8t46rKs0l7KChbqPJCT3UV27c+dIAnyjDkYes8WOqyLB4LKMcGaSFh
+	 aLtq/6IDeEDZesWoKYY8UXpgBSsA2aFLPemwD6WRqhTR8F5QNE4JIqtCyC9jFMXROA
+	 qe5qZ6DRT7IfQ3keIAbLB4IsRBJ/jsK/Yi4vGPycjtBdRFp48g+/XuPEx/dEC5W03D
+	 0jqqpTEbdgfwqmQANlsb8UK39J6eybUomYdkdTmcEffvQlTLm+MkwdLXslXUjSwzYF
+	 8M2FH/28q6nsnU40rH9ZoIhy2E1Rw0WgBPEhLiLVHCC4ioLmkWd0zz7lhELw8Mty5m
+	 tSCIX+Rx9lzcQ==
+Received: from johansen (uid 1000)
+	(envelope-from kjlx@templeofstupid.com)
+	id e0098
+	by kmjvbox.templeofstupid.com (DragonFly Mail Agent v0.12);
+	Fri, 29 Mar 2024 12:15:37 -0700
+Date: Fri, 29 Mar 2024 12:15:37 -0700
+From: Krister Johansen <kjlx@templeofstupid.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Ali Saidi <alisaidi@amazon.com>,
+	David Reaver <me@davidreaver.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Limit stage2_apply_range() batch size to
+ smallest block
+Message-ID: <20240329191537.GA2051@templeofstupid.com>
+References: <cover.1711649501.git.kjlx@templeofstupid.com>
+ <ebf0fac84cb1d19bdc6e73576e3cc40a9cab0635.1711649501.git.kjlx@templeofstupid.com>
+ <ZgbGtpj5mStTkAkn@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <7470390a-5a97-475d-aaad-0f6dfb3d26ea@redhat.com>
- <CAGtprH8B8y0Khrid5X_1twMce7r-Z7wnBiaNOi-QwxVj4D+L3w@mail.gmail.com>
- <ZfjYBxXeh9lcudxp@google.com> <40f82a61-39b0-4dda-ac32-a7b5da2a31e8@redhat.com>
- <20240319143119.GA2736@willie-the-truck> <2d6fc3c0-a55b-4316-90b8-deabb065d007@redhat.com>
- <20240327193454.GB11880@willie-the-truck> <d0500f89-df3b-42cd-aa5a-5b3005f67638@redhat.com>
- <ZgVCDPoQbbXjTBQp@google.com> <5cec1f98-17a5-4120-bbf4-b487c2caf92c@redhat.com>
- <ZgVNXpUS8Ku37BLp@google.com> <3448a9d6-58a8-475f-aff6-a39a62eee8c1@redhat.com>
-In-Reply-To: <3448a9d6-58a8-475f-aff6-a39a62eee8c1@redhat.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Fri, 29 Mar 2024 11:38:49 -0700
-Message-ID: <CAGtprH_cFxK3Wb0KVKMkVef8G=52aPiRonxee6+kqhmBqQbXYA@mail.gmail.com>
-Subject: Re: folio_mmapped
-To: David Hildenbrand <david@redhat.com>
-Cc: Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>, 
-	Sean Christopherson <seanjc@google.com>, Matthew Wilcox <willy@infradead.org>, Fuad Tabba <tabba@google.com>, 
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
-	suzuki.poulose@arm.com, steven.price@arm.com, quic_mnalajal@quicinc.com, 
-	quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, keirf@google.com, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZgbGtpj5mStTkAkn@linux.dev>
 
-On Thu, Mar 28, 2024 at 4:41=E2=80=AFAM David Hildenbrand <david@redhat.com=
-> wrote:
->
-> ....
-> >
-> >> The whole reason I brought up the guest_memfd+memfd pair idea is that =
-you
-> >> would similarly be able to do the conversion in the kernel, BUT, you'd=
- never
-> >> be able to mmap+GUP encrypted pages.
-> >>
-> >> Essentially you're using guest_memfd for what it was designed for: pri=
-vate
-> >> memory that is inaccessible.
-> >
-> > Ack, that sounds pretty reasonable to me. But I think we'd still want t=
-o
-> > make sure the other users of guest_memfd have the _desire_ to support
-> > huge pages,  migration, swap (probably longer term), and related
-> > features, otherwise I don't think a guest_memfd-based option will
-> > really work for us :-)
->
-> *Probably* some easy way to get hugetlb pages into a guest_memfd would
-> be by allocating them for an memfd and then converting/moving them into
-> the guest_memfd part of the "fd pair" on conversion to private :)
->
-> (but the "partial shared, partial private" case is and remains the ugly
-> thing that is hard and I still don't think it makes sense. Maybe it
-> could be handles somehow in such a dual approach with some enlightment
-> in the fds ... hard to find solutions for things that don't make any
-> sense :P )
->
+Hi Oliver,
+Thanks for the response.
 
-I would again emphasize that this usecase exists for Confidential VMs,
-whether we like it or not.
+On Fri, Mar 29, 2024 at 06:48:38AM -0700, Oliver Upton wrote:
+> On Thu, Mar 28, 2024 at 12:05:08PM -0700, Krister Johansen wrote:
+> > stage2_apply_range() for unmap operations can interfere with the
+> > performance of IO if the device's interrupts share the CPU where the
+> > unmap operation is occurring.  commit 5994bc9e05c2 ("KVM: arm64: Limit
+> > stage2_apply_range() batch size to largest block") improved this.  Prior
+> > to that commit, workloads that were unfortunate enough to have their IO
+> > interrupts pinned to the same CPU as the unmap operation would observe a
+> > complete stall.  With the switch to using the largest block size, it is
+> > possible for IO to make progress, albeit at a reduced speed.
+> 
+> Can you describe the workload a bit more? I'm having a hard time
+> understanding how you're unmapping that much memory on the fly in
+> your workload. Is guest memory getting swapped? Are VMs being torn
+> down?
 
-1) TDX hardware allows usage of 1G pages to back guest memory.
-2) Larger VM sizes benefit more with 1G page sizes, which would be a
-norm with VMs exposing GPU/TPU devices.
-3) Confidential VMs will need to share host resources with
-non-confidential VMs using 1G pages.
-4) When using normal shmem/hugetlbfs files to back guest memory, this
-usecase was achievable by just manipulating guest page tables
-(although at the cost of host safety which led to invention of guest
-memfd). Something equivalent "might be possible" with guest memfd.
+Sorry I wasn't clear here.  Yes, it's the VMs getting torn down that's
+causing the problems.  The container VMs don't have long lifetimes, but
+some may be up to 256Gb in size, depending on the user.  The workloads
+running the VMs aren't especially performance sensitive, but their users
+do notice when network connections time-out.  IOW, if the performance is
+bad enough to temporarily prevent new TCP connections from being
+established or requests / responses being recieved in a timely fashion,
+we'll hear about it.  Users deploy their services a lot, so there's a
+lot of container vm churn.  (Really it's automation redeploying the
+services on behalf of the users in response to new commits to their
+repos...)
 
-Without handling "partial shared, partial private", it is impractical
-to support 1G pages for Confidential VMs (discounting any long term
-efforts to tame the guest VMs to play nice).
+> Also, it seems a bit odd to steer interrupts *into* the workload you
+> care about...
 
-Maybe to handle this usecase, all the host side shared memory usage of
-guest memfd (userspace, IOMMU etc) should be associated with (or
-tracked via) file ranges rather than offsets within huge pages (like
-it's done for faulting in private memory pages when populating guest
-EPTs/NPTs). Given the current guest behavior, host MMU and IOMMU may
-have to be forced to map shared memory regions always via 4KB
-mappings.
+Ah, that was only intentionally done for the purposes of measuring the
+impact.  That's not done on purpose in production.
 
+Nevertheless, the example we tend to run into is that a box may have 2
+NICs and each NIC has 32 Tx-Rx queues.  This means we've got 64 NIC
+interrupts, each assigned to a different CPU.  Our systems have 64 CPUs.
+What happens in practice is that a VM will get torn down, and that has a
+1-in-64 chance of impacting the performance of the subset of the flows
+that are mapped via RSS to the interrupt that happens to be assigned to
+the CPU where the VM is being torn down.
 
+Of course, the obvious next question is why not just bind the VMs flows
+to the CPUs the VM is running on?  We don't have a 1:1 mapping of
+network device to VM, or VM to CPU right now, which frustrates this
+approach.
 
+> > Further reducing the stage2_apply_range() batch size has substantial
+> > performance improvements for IO that share a CPU performing an unmap
+> > operation.  By switching to a 2mb chunk, IO performance regressions were
+> > no longer observed in this author's tests.  E.g. it was possible to
+> > obtain the advertised device throughput despite an unmap operation
+> > occurring on the CPU where the interrupt was running.  There is a
+> > tradeoff, however.  No changes were observed in per-operation timings
+> > when running the kvm_pagetable_test without an interrupt load.  However,
+> > with a 64gb VM, 1 vcpu, and 4k pages and a IO load, map times increased
+> > by about 15% and unmap times increased by about 58%.  In essence, this
+> > trades slower map/unmap times for improved IO throughput.
+> 
+> There are other users of the range-based operations, like
+> write-protection. Live migration is especially sensitive to the latency
+> of page table updates as it can affect the VMM's ability to converge
+> with the guest.
 
-> I also do strongly believe that we want to see some HW-assisted
-> migration support for guest_memfd pages. Swap, as you say, maybe in the
-> long-term. After all, we're not interested in having MM features for
-> backing memory that you could similarly find under Windows 95. Wait,
-> that one did support swapping! :P
->
-> But unfortunately, that's what the shiny new CoCo world currently
-> offers. Well, excluding s390x secure execution, as discussed.
->
-> --
-> Cheers,
->
-> David / dhildenb
->
+To be clear, the reduction in performance was observed when I
+concurrently executed both the kvm_pagetable_test and a networking
+benchmark where the NIC's interrupts were assigned to the same CPU where
+the pagetable test was executing.  I didn't see a slowdown just running
+the pagetable test.
+
+> > Cc: <stable@vger.kernel.org> # 5.15.x: 3b5c082bbfa2: KVM: arm64: Work out supported block level at compile time
+> > Cc: <stable@vger.kernel.org> # 5.15.x: 5994bc9e05c2: KVM: arm64: Limit stage2_apply_range() batch size to largest block
+> > Cc: <stable@vger.kernel.org> # 5.15.x
+> 
+> This is a performance improvement, *not* a correctness fix. Please don't
+> cc stable for it.
+
+Apologies.  I consulted the Stable Rules[1] before applying these tags and
+the guidance it gave was just that "It must either fix a real bug that
+bothers people."
+
+In our case, the teardown causes TCP throughput to drop from 9.5Gbps to
+about 2Gbps during a teardown, which is something that does bother our
+users.
+
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h | 4 ++++
+> >  arch/arm64/kvm/mmu.c                 | 2 +-
+> >  2 files changed, 5 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index 19278dfe7978..b0c4651a4d9a 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -19,11 +19,15 @@
+> >   *  - 4K (level 1):	1GB
+> >   *  - 16K (level 2):	32MB
+> >   *  - 64K (level 2):	512MB
+> > + *
+> > + *  The max block level is the _smallest_ supported block size for KVM.
+> 
+> This feels like a non sequitur given the old comment is left in place...
+
+I'll fix if we keep this approach.  Is the objection to the name
+KVM_PGTABLE_MAX_BLOCK_LEVEL or just the comment?
+
+> >   */
+> >  #ifdef CONFIG_ARM64_4K_PAGES
+> >  #define KVM_PGTABLE_MIN_BLOCK_LEVEL	1
+> > +#define KVM_PGTABLE_MAX_BLOCK_LEVEL	2
+> >  #else
+> >  #define KVM_PGTABLE_MIN_BLOCK_LEVEL	2
+> > +#define KVM_PGTABLE_MAX_BLOCK_LEVEL	KVM_PGTABLE_MIN_BLOCK_LEVEL
+> >  #endif
+> >  
+> >  #define kvm_lpa2_is_enabled()		system_supports_lpa2()
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index dc04bc767865..1e927b306aee 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -41,7 +41,7 @@ static phys_addr_t __stage2_range_addr_end(phys_addr_t addr, phys_addr_t end,
+> >  
+> >  static phys_addr_t stage2_range_addr_end(phys_addr_t addr, phys_addr_t end)
+> >  {
+> > -	phys_addr_t size = kvm_granule_size(KVM_PGTABLE_MIN_BLOCK_LEVEL);
+> > +	phys_addr_t size = kvm_granule_size(KVM_PGTABLE_MAX_BLOCK_LEVEL);
+> >  
+> >  	return __stage2_range_addr_end(addr, end, size);
+> >  }
+> 
+> This doesn't feel right to me. A property that we had before is that
+> leaf entries are visited at most once, since every mapping size was
+> evenly divisible into KVM_PGTABLE_MIN_BLOCK_LEVEL.
+> 
+> Seems like we could wind up visiting a PUD mapping 512 times, at least
+> for 4K pages.
+
+I have an idea, but it seems to go against the current design of the
+pagtable walkers.  My sense was that they've been written to
+discourage passing mutable state to the function that calls
+kvm_pgtable_walk().  If we were willing to permit this, it seems like we
+could leverage __kvm_pgtable_visit()'s knowledge about the size of the
+mapping it walked to determine whether range_addr_end should be
+incremented by our BLOCK_LEVEL constant, or advanced to the end of the
+mapping that was already successfully walked.  (If I'm reading right,
+anyway)  Does that seem like a reasonable approach?
+
+If we do modify the walk to allow state to be passed back, I have a
+second patch I'd like to send you.  Ali found that there was a
+performance regression on the kvm_pagetable_test on the map creation
+step when a large number of threads operated on a comparatively small
+memory range.  (E.g. 64 cpus and 8g of RAM).  We debugged this a bit and
+found that there's an unmap in the map creation step if the test ends up
+instantiating a readable zero page that needs to be copied and made
+writable.  With the deferred TLBI logic, the tlb invalidation happens at
+the end of the unmap operation whether a PTE is cleared or not.  With so
+many threads, this doesn't always suceeed. The prior approach of just
+doing the invalidation in stage2_unmap_put_pte() outperforms the
+deferred invalidation, because stage2_unmap_put_pte() only calls
+__kvm_tlb_flush_vmid_ipa() if it clears a valid PTE.  If we modify the
+walk to keep state on whether any PTEs are successfully cleared, and
+condition the deferred invalidation on that state, we obtain performance
+that is equivalent to the pre range based deferred invalidation
+approach.
+
+Thanks,
+
+-K
