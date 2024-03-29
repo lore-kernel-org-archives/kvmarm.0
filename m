@@ -1,104 +1,153 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB02182CC;
-	Fri, 29 Mar 2024 00:14:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B2552F6F
+	for <kvmarm@lists.linux.dev>; Fri, 29 Mar 2024 13:48:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711671251; cv=none; b=cCOw/xhfhj8M8mUF9iEBXNf4IGZ4tyvTDtbifeIvIVfCttHagkAKUtlMxd03KVy/Y0t49StbPmbvRBgsv73xUkV7cpKx0CoKarDfYp0FTovUwEDDUGVMxZ8neKhCVUQNwQmiJnd4d73HKjsS3s6x6bDrV3o6hW8HYdaqzNvHiLs=
+	t=1711720135; cv=none; b=rK0pl7oViJ+w37aIpr4VZp1sa8ztlrizDZPPvMzfwwM9p6wQYbxca6h1cjT2SqW8GxjBRPYqQ6Vau55xa5nvpMf6rd8N/UvMbuXdlpLKgCy1XX5hvLP7ft5GVR7IJHpYSZys/qIQCRlO1RUouQK3DDZ0qLnquqQS9FKrB+dJGkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711671251; c=relaxed/simple;
-	bh=uwufjRPZpufB4WAKz4BvxO1YI+sO9dPrjMMi385iZbk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=cLQxU21nQ++e7XLPoiyXVkxQyFaXloi2Y4Akn+7Hs0tRQ8AIIwqdPwto4bf/HjXKwdi/YBVzKAUQIcuNt6API1rJLQNO84JLM6B7PGNBAc4vi+7IVdz4cCyTz4wQO6uR5wW3Ddfre30GpVsuMYpUgRp/hbyqTS5LWid8aF77+HQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cDpGxoRY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711720135; c=relaxed/simple;
+	bh=52dqCNI9p3eFaadsIeqWV2AssXHWOeb6nNHNaeqYjm4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IhUDqYQTChQTIIV2BNjmpZ44B+NcaDzE/0GundXy/MDqxFuiYwwh8GmXk6kvdiNmmwig5sLTAfHJ5eWw/RdZPejEWikCGOkWrGZvO1Iu3h6bruoQY7v6UskmxVgXFMHlTqVmJI67nYc3ncmaLGuq+udVVlqezOwRa70/GuR047c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lS36eUjZ; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cDpGxoRY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00DAEC433C7;
-	Fri, 29 Mar 2024 00:14:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711671250;
-	bh=uwufjRPZpufB4WAKz4BvxO1YI+sO9dPrjMMi385iZbk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=cDpGxoRYxLjokSzdjyr/XpeJME93UBt6tnftJZ4T9xOVKuDufBc1JIllQnvVnYmCq
-	 rx/lZqfrEU0z1yyRPMbiLf3iggfMot6kYdtd1sW6H4c/9Rvvc0R8JsV6hKHSo0H5uR
-	 ybcPFdq+49uL7I7a5fSGuun4iOvzrI+Xf7f0Y3+Kj4EAEayQAD6NjQ4fMdW1r4/Bbr
-	 jDpLucIYlLtlp0NSYXnDT+vRy3+eyJypFk7diu1AkXTOSAQWvuPNh7dKwMVFYaudJ+
-	 GDtKv9kJUrKjhJDjzg7vBbr4HJK9wBUHffXc3W0Xfu8/S84LBrzhQE2EwJqfwjRk6S
-	 VCmPu+AkdbDyA==
-From: Mark Brown <broonie@kernel.org>
-Date: Fri, 29 Mar 2024 00:13:46 +0000
-Subject: [PATCH v6 5/5] KVM: arm64: selftests: Teach get-reg-list about
- FPMR
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lS36eUjZ"
+Date: Fri, 29 Mar 2024 06:48:38 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1711720129;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eBD9yA2PcZQcS1CfmKPqxRlA80oGVgTIn7Autaav/oY=;
+	b=lS36eUjZ+5rnv5gHfj/ZZttGv/BuIVys767edLhgh3OcPBXFK6YChfGozlDquF0Y/xXPo9
+	mLzk7DrVslQuRFObOnhY/mkwbRVFQ2deBBsQAX904uoErgFftFU/6T9PA9iOzfrThPvvK+
+	C0y8Bqi7u6ZlV61gT0asFDYTnU7SLOo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Krister Johansen <kjlx@templeofstupid.com>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Ali Saidi <alisaidi@amazon.com>,
+	David Reaver <me@davidreaver.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Limit stage2_apply_range() batch size to
+ smallest block
+Message-ID: <ZgbGtpj5mStTkAkn@linux.dev>
+References: <cover.1711649501.git.kjlx@templeofstupid.com>
+ <ebf0fac84cb1d19bdc6e73576e3cc40a9cab0635.1711649501.git.kjlx@templeofstupid.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240329-arm64-2023-dpisa-v6-5-ba42db6c27f3@kernel.org>
-References: <20240329-arm64-2023-dpisa-v6-0-ba42db6c27f3@kernel.org>
-In-Reply-To: <20240329-arm64-2023-dpisa-v6-0-ba42db6c27f3@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <shuah@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.linux.dev, 
- linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.14-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1321; i=broonie@kernel.org;
- h=from:subject:message-id; bh=uwufjRPZpufB4WAKz4BvxO1YI+sO9dPrjMMi385iZbk=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmBge+eqk74AMtUMIBPiwGI+pi1wDTEcHLlC4p4q7p
- myPQfbeJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZgYHvgAKCRAk1otyXVSH0NW5B/
- 0TcU6VavkFfCBJ8vGg2RX9vZ4t77ShVUFmfqiEzDq+KrtNcMcCRhCD6mQXTT/JcxC1Fa6P/PPFjApS
- fFaHMzOG+YHH0ngniUKKS/oLfDAK0z++QRPzBKHLZPzeb3t0Amcim7X703CJdZLdN+bivsNFzkgcqD
- zVgJPTVIrRdEE68SOE/l2KZgFuNqa8YT4v2wEHHG942seRV3ovb6Nt3UmWz1P6w1YRgpxWq+xflPVb
- 1m4RMvSuUwHBEIOLmV4qA0QWlRPEE0gUF+hJIduSa8qLmxJEdxHN/0JRRR86TDzL82F3AJvX308o8V
- /lE+aiJZcM3rN2ebnTtAOrIAl8XjMQ
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ebf0fac84cb1d19bdc6e73576e3cc40a9cab0635.1711649501.git.kjlx@templeofstupid.com>
+X-Migadu-Flow: FLOW_OUT
 
-FEAT_FPMR defines a new register FMPR which is available at all ELs and is
-discovered via ID_AA64PFR2_EL1.FPMR, add this to the set of registers that
-get-reg-list knows to check for with the required identification register
-depdendency.
+Hi Krister,
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/aarch64/get-reg-list.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+On Thu, Mar 28, 2024 at 12:05:08PM -0700, Krister Johansen wrote:
+> stage2_apply_range() for unmap operations can interfere with the
+> performance of IO if the device's interrupts share the CPU where the
+> unmap operation is occurring.  commit 5994bc9e05c2 ("KVM: arm64: Limit
+> stage2_apply_range() batch size to largest block") improved this.  Prior
+> to that commit, workloads that were unfortunate enough to have their IO
+> interrupts pinned to the same CPU as the unmap operation would observe a
+> complete stall.  With the switch to using the largest block size, it is
+> possible for IO to make progress, albeit at a reduced speed.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index 71ea6ecec7ce..1e43511d1440 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -40,6 +40,12 @@ static struct feature_id_reg feat_id_regs[] = {
- 		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
- 		4,
- 		1
-+	},
-+	{
-+		ARM64_SYS_REG(3, 3, 4, 4, 2),	/* FPMR */
-+		ARM64_SYS_REG(3, 0, 0, 4, 2),	/* ID_AA64PFR2_EL1 */
-+		32,
-+		1
- 	}
- };
- 
-@@ -481,6 +487,7 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(3, 3, 14, 2, 1),	/* CNTP_CTL_EL0 */
- 	ARM64_SYS_REG(3, 3, 14, 2, 2),	/* CNTP_CVAL_EL0 */
- 	ARM64_SYS_REG(3, 4, 3, 0, 0),	/* DACR32_EL2 */
-+	ARM64_SYS_REG(3, 3, 4, 4, 2),	/* FPMR */
- 	ARM64_SYS_REG(3, 4, 5, 0, 1),	/* IFSR32_EL2 */
- 	ARM64_SYS_REG(3, 4, 5, 3, 0),	/* FPEXC32_EL2 */
- };
+Can you describe the workload a bit more? I'm having a hard time
+understanding how you're unmapping that much memory on the fly in
+your workload. Is guest memory getting swapped? Are VMs being torn
+down?
+
+Also, it seems a bit odd to steer interrupts *into* the workload you
+care about...
+
+> Further reducing the stage2_apply_range() batch size has substantial
+> performance improvements for IO that share a CPU performing an unmap
+> operation.  By switching to a 2mb chunk, IO performance regressions were
+> no longer observed in this author's tests.  E.g. it was possible to
+> obtain the advertised device throughput despite an unmap operation
+> occurring on the CPU where the interrupt was running.  There is a
+> tradeoff, however.  No changes were observed in per-operation timings
+> when running the kvm_pagetable_test without an interrupt load.  However,
+> with a 64gb VM, 1 vcpu, and 4k pages and a IO load, map times increased
+> by about 15% and unmap times increased by about 58%.  In essence, this
+> trades slower map/unmap times for improved IO throughput.
+
+There are other users of the range-based operations, like
+write-protection. Live migration is especially sensitive to the latency
+of page table updates as it can affect the VMM's ability to converge
+with the guest.
+
+> Cc: <stable@vger.kernel.org> # 5.15.x: 3b5c082bbfa2: KVM: arm64: Work out supported block level at compile time
+> Cc: <stable@vger.kernel.org> # 5.15.x: 5994bc9e05c2: KVM: arm64: Limit stage2_apply_range() batch size to largest block
+> Cc: <stable@vger.kernel.org> # 5.15.x
+
+This is a performance improvement, *not* a correctness fix. Please don't
+cc stable for it.
+
+> Suggested-by: Ali Saidi <alisaidi@amazon.com>
+> Signed-off-by: Krister Johansen <kjlx@templeofstupid.com>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h | 4 ++++
+>  arch/arm64/kvm/mmu.c                 | 2 +-
+>  2 files changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 19278dfe7978..b0c4651a4d9a 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -19,11 +19,15 @@
+>   *  - 4K (level 1):	1GB
+>   *  - 16K (level 2):	32MB
+>   *  - 64K (level 2):	512MB
+> + *
+> + *  The max block level is the _smallest_ supported block size for KVM.
+
+This feels like a non sequitur given the old comment is left in place...
+
+>   */
+>  #ifdef CONFIG_ARM64_4K_PAGES
+>  #define KVM_PGTABLE_MIN_BLOCK_LEVEL	1
+> +#define KVM_PGTABLE_MAX_BLOCK_LEVEL	2
+>  #else
+>  #define KVM_PGTABLE_MIN_BLOCK_LEVEL	2
+> +#define KVM_PGTABLE_MAX_BLOCK_LEVEL	KVM_PGTABLE_MIN_BLOCK_LEVEL
+>  #endif
+>  
+>  #define kvm_lpa2_is_enabled()		system_supports_lpa2()
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index dc04bc767865..1e927b306aee 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -41,7 +41,7 @@ static phys_addr_t __stage2_range_addr_end(phys_addr_t addr, phys_addr_t end,
+>  
+>  static phys_addr_t stage2_range_addr_end(phys_addr_t addr, phys_addr_t end)
+>  {
+> -	phys_addr_t size = kvm_granule_size(KVM_PGTABLE_MIN_BLOCK_LEVEL);
+> +	phys_addr_t size = kvm_granule_size(KVM_PGTABLE_MAX_BLOCK_LEVEL);
+>  
+>  	return __stage2_range_addr_end(addr, end, size);
+>  }
+
+This doesn't feel right to me. A property that we had before is that
+leaf entries are visited at most once, since every mapping size was
+evenly divisible into KVM_PGTABLE_MIN_BLOCK_LEVEL.
+
+Seems like we could wind up visiting a PUD mapping 512 times, at least
+for 4K pages.
 
 -- 
-2.30.2
-
+Thanks,
+Oliver
