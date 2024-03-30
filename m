@@ -1,54 +1,58 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376B8847E
-	for <kvmarm@lists.linux.dev>; Sat, 30 Mar 2024 10:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8CA11712;
+	Sat, 30 Mar 2024 10:17:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711792832; cv=none; b=gNhUo/q64rBZFFnSCD4EwXjGXMvRQrwt1ZdhxebDfMs8w6Jh9MWttzdczVVusyQDckQGkdp2l8tT57A1j/q9ttjMBTAQtjmcD2IHgjoCwzGZQU7q+GLQ/5eOnSsuywN7Ewy5oAAUF/Bc0GjwWSecn1f/1zTeFqMKVTZPlr3P+bk=
+	t=1711793866; cv=none; b=sxNflN3s/lK7VHgK5zvHCMJfsJl4sDNku8oSAFUmu/GypiBY8EEE34QudShihyY7FGtGjkVcqKBoFuTTvUEEQZe/Xt8MLZau1zoW2nhiT94ZFzubngng2wQFA2vqPWm1VdPIyFhQgplYXkmnYyFuodKa4eZE2Eh3U+QBLK5EqUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711792832; c=relaxed/simple;
-	bh=zo/3DRzXKKqeBaOIWmXXVTTGqEmL28/HYHA0OLqW6xc=;
+	s=arc-20240116; t=1711793866; c=relaxed/simple;
+	bh=A2FNrSJmLuvRr6yesI1TqFlfAMOp6Etj3K6TPkNlrQg=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qQTJ/EM/VzgrL15Ix4Ez8klZlk5IjbANBXevBdfWh9N5o0OpjRmDrClLNiLEPcwmozUdmzVDH3AObdyLZkAKOs2ThC8pd3ziYghbc6vziM63fwl+pauWV1o9EU8c0Lq29EY177Jo4WQcG7+qAFFP+NazCCxWWHL8YxqHie0OW+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MqqMSV2d; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=YScjXM5WLUOC7Nu2Y6YJzovpI44YMydVRhkubbT6ScglFmWQz1Yw6NcBhG2vH/vNMGpguD6tiPsz8KHXTwLSHjpEPC1NzcG34Y2hI9zVnZcQ7wJkFtR10dQ3n42QLB+Yeg4uNoqt5dvL4xzlorONwC3ry2vn8bNEFrFZUsHFfR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Df7YjMiU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MqqMSV2d"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 110CBC433F1;
-	Sat, 30 Mar 2024 10:00:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Df7YjMiU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CC1AC433F1;
+	Sat, 30 Mar 2024 10:17:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711792832;
-	bh=zo/3DRzXKKqeBaOIWmXXVTTGqEmL28/HYHA0OLqW6xc=;
+	s=k20201202; t=1711793866;
+	bh=A2FNrSJmLuvRr6yesI1TqFlfAMOp6Etj3K6TPkNlrQg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MqqMSV2dRq5lTqn+lOPoS38UlB/V04PPAfTVIKZYkwXhxSuEsjz5lGw4tmdi4XS5O
-	 u84fohfYPCoVbmmNcmLAGd6aMJSTJdqg/9BEZeF0+D3T1NtpNRBGawTohqbEqOdEta
-	 yRxDnGyMtkenW0b/gZVXOq86jMHwIQZaXp++GixWZ3Mq+Th91U7wxwHXO5OLRFsPN0
-	 zZLsj20ju1q50n8VyIEEAEcED2/f0sHukwNcVq8Rrmz3ZExYOFkTGumHWzaPpdRIow
-	 HccJrEOnU1RapxU0NzAhu9sNe3PzyAMijNGKLUewxOTsoirrBcEWeCaBlB8Ztix9Qm
-	 ifxMOVAx8wneA==
+	b=Df7YjMiUlon7HlgBHBV7e8i6E3yV6uJRUNJG2Pqt1EPY8jNv7iEHC8ZSE8Ghx4Sfp
+	 Q4D+VXWX8aPyxbkWjw23gLGLRPsrKX31dCwdy7ibEk6//yqCZa719tZLFl4ddRyHuG
+	 3JcjZUxGXdKuUkl5XbkAP5yJ7dRksuZ5SM+8xP3aeJiSDu3xZEIqLppee5ig7guhBq
+	 M1EZDrfSrdJrT7QQ/BGirY0nXC5ZAFFDqX9a3ls2I8ExeDqrKFBo3CupgwJ/mLePUk
+	 JrCq8Zp6jCeRpH4Uo4Leb5Fp7PQu2DHGXhLwfK2P4Ws9L2rK8T9CQF1rUo7tqHK+GA
+	 mpheABbJ85TyQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rqVVl-00HRDf-LG;
-	Sat, 30 Mar 2024 10:00:29 +0000
-Date: Sat, 30 Mar 2024 10:00:29 +0000
-Message-ID: <87sf08rqde.wl-maz@kernel.org>
+	id 1rqVmR-00HRXz-MY;
+	Sat, 30 Mar 2024 10:17:43 +0000
+Date: Sat, 30 Mar 2024 10:17:43 +0000
+Message-ID: <87r0fsrpko.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
+To: Krister Johansen <kjlx@templeofstupid.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Mostafa Saleh <smostafa@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Quentin Perret <qperret@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Shaoqin Huang <shahuang@redhat.com>
-Subject: Re: [PATCH v2 0/4] KVM: arm64: TLBI fixes for the pgtable code
-In-Reply-To: <20240327124853.11206-1-will@kernel.org>
-References: <20240327124853.11206-1-will@kernel.org>
+	Will Deacon <will@kernel.org>,
+	Ali Saidi <alisaidi@amazon.com>,
+	David Reaver <me@davidreaver.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Limit stage2_apply_range() batch size to smallest block
+In-Reply-To: <20240329191537.GA2051@templeofstupid.com>
+References: <cover.1711649501.git.kjlx@templeofstupid.com>
+	<ebf0fac84cb1d19bdc6e73576e3cc40a9cab0635.1711649501.git.kjlx@templeofstupid.com>
+	<ZgbGtpj5mStTkAkn@linux.dev>
+	<20240329191537.GA2051@templeofstupid.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,32 +64,103 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, gshan@redhat.com, smostafa@google.com, oliver.upton@linux.dev, qperret@google.com, rananta@google.com, ryan.roberts@arm.com, shahuang@redhat.com
+X-SA-Exim-Rcpt-To: kjlx@templeofstupid.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, alisaidi@amazon.com, me@davidreaver.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 27 Mar 2024 12:48:49 +0000,
-Will Deacon <will@kernel.org> wrote:
+On Fri, 29 Mar 2024 19:15:37 +0000,
+Krister Johansen <kjlx@templeofstupid.com> wrote:
 > 
-> Hi again,
+> Hi Oliver,
+> Thanks for the response.
 > 
-> This is version two of the series I previously posted on Monday:
+> On Fri, Mar 29, 2024 at 06:48:38AM -0700, Oliver Upton wrote:
+> > On Thu, Mar 28, 2024 at 12:05:08PM -0700, Krister Johansen wrote:
+> > > stage2_apply_range() for unmap operations can interfere with the
+> > > performance of IO if the device's interrupts share the CPU where the
+> > > unmap operation is occurring.  commit 5994bc9e05c2 ("KVM: arm64: Limit
+> > > stage2_apply_range() batch size to largest block") improved this.  Prior
+> > > to that commit, workloads that were unfortunate enough to have their IO
+> > > interrupts pinned to the same CPU as the unmap operation would observe a
+> > > complete stall.  With the switch to using the largest block size, it is
+> > > possible for IO to make progress, albeit at a reduced speed.
+> > 
+> > Can you describe the workload a bit more? I'm having a hard time
+> > understanding how you're unmapping that much memory on the fly in
+> > your workload. Is guest memory getting swapped? Are VMs being torn
+> > down?
 > 
->   https://lore.kernel.org/r/20240325185158.8565-1-will@kernel.org
-> 
-> We've got a long weekend coming up in the UK, so I wanted to get this
-> out before I chuck the laptop in the river.
-> 
-> Changes since v1 include:
-> 
->   * Add Ryan's Reviewed-by on the third patch
->   * Add an extra patch to ensure correct alignment of range TLBI address
->     argument
->   * Tweak commit messages
+> Sorry I wasn't clear here.  Yes, it's the VMs getting torn down that's
+> causing the problems.  The container VMs don't have long lifetimes, but
+> some may be up to 256Gb in size, depending on the user.  The workloads
+> running the VMs aren't especially performance sensitive, but their users
+> do notice when network connections time-out.  IOW, if the performance is
+> bad enough to temporarily prevent new TCP connections from being
+> established or requests / responses being recieved in a timely fashion,
+> we'll hear about it.  Users deploy their services a lot, so there's a
+> lot of container vm churn.  (Really it's automation redeploying the
+> services on behalf of the users in response to new commits to their
+> repos...)
 
-For the series,
+I think this advocates for a teardown-specific code path rather than
+just relying on the usual S2 unmapping which is really designed for
+eviction. There are two things to consider here:
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+- TLB invalidation: this should only take a single VMALLS12E1, rather
+  than iterating over the PTs
+
+- Cache maintenance: this could be elided with FWB, or *optionally*
+  elided if userspace buys in a "I don't need to see the memory of the
+  guest after teardown" type of behaviour
+
+> > Also, it seems a bit odd to steer interrupts *into* the workload you
+> > care about...
+> 
+> Ah, that was only intentionally done for the purposes of measuring the
+> impact.  That's not done on purpose in production.
+> 
+> Nevertheless, the example we tend to run into is that a box may have 2
+> NICs and each NIC has 32 Tx-Rx queues.  This means we've got 64 NIC
+> interrupts, each assigned to a different CPU.  Our systems have 64 CPUs.
+> What happens in practice is that a VM will get torn down, and that has a
+> 1-in-64 chance of impacting the performance of the subset of the flows
+> that are mapped via RSS to the interrupt that happens to be assigned to
+> the CPU where the VM is being torn down.
+> 
+> Of course, the obvious next question is why not just bind the VMs flows
+> to the CPUs the VM is running on?  We don't have a 1:1 mapping of
+> network device to VM, or VM to CPU right now, which frustrates this
+> approach.
+> 
+> > > Further reducing the stage2_apply_range() batch size has substantial
+> > > performance improvements for IO that share a CPU performing an unmap
+> > > operation.  By switching to a 2mb chunk, IO performance regressions were
+> > > no longer observed in this author's tests.  E.g. it was possible to
+> > > obtain the advertised device throughput despite an unmap operation
+> > > occurring on the CPU where the interrupt was running.  There is a
+> > > tradeoff, however.  No changes were observed in per-operation timings
+> > > when running the kvm_pagetable_test without an interrupt load.  However,
+> > > with a 64gb VM, 1 vcpu, and 4k pages and a IO load, map times increased
+> > > by about 15% and unmap times increased by about 58%.  In essence, this
+> > > trades slower map/unmap times for improved IO throughput.
+> > 
+> > There are other users of the range-based operations, like
+> > write-protection. Live migration is especially sensitive to the latency
+> > of page table updates as it can affect the VMM's ability to converge
+> > with the guest.
+> 
+> To be clear, the reduction in performance was observed when I
+> concurrently executed both the kvm_pagetable_test and a networking
+> benchmark where the NIC's interrupts were assigned to the same CPU where
+> the pagetable test was executing.  I didn't see a slowdown just running
+> the pagetable test.
+
+Any chance you could share more details about your HW configuration
+(what CPU is that?)  and the type of traffic? This is the sort of
+things I'd like to be able to reproduce in order to experiment various
+strategies.
+
+Thanks,
 
 	M.
 
