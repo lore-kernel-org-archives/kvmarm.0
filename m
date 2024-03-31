@@ -1,58 +1,58 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8CA11712;
-	Sat, 30 Mar 2024 10:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F5A1C33;
+	Sun, 31 Mar 2024 10:00:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711793866; cv=none; b=sxNflN3s/lK7VHgK5zvHCMJfsJl4sDNku8oSAFUmu/GypiBY8EEE34QudShihyY7FGtGjkVcqKBoFuTTvUEEQZe/Xt8MLZau1zoW2nhiT94ZFzubngng2wQFA2vqPWm1VdPIyFhQgplYXkmnYyFuodKa4eZE2Eh3U+QBLK5EqUs=
+	t=1711879249; cv=none; b=MYHpxZ2baLuuXk7FsGlgbEwUH+HAuPp9bbi7hbv7x/XUpDh68/74rZxiXEynQFIh5DFhLLVg7jnwKxSwlGUG/evRsjqJLt77mQT62Ch2KdJkgqGzpLqyJnC2eZxZ1JASoSAeRivoog4wQ2A1txbOaYZg1mf/v5qEWW7P60L9ur0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711793866; c=relaxed/simple;
-	bh=A2FNrSJmLuvRr6yesI1TqFlfAMOp6Etj3K6TPkNlrQg=;
+	s=arc-20240116; t=1711879249; c=relaxed/simple;
+	bh=8ZlEK5607Jk4tOKuXpJJJZbQBuqSIL7N3MY76VqKGds=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YScjXM5WLUOC7Nu2Y6YJzovpI44YMydVRhkubbT6ScglFmWQz1Yw6NcBhG2vH/vNMGpguD6tiPsz8KHXTwLSHjpEPC1NzcG34Y2hI9zVnZcQ7wJkFtR10dQ3n42QLB+Yeg4uNoqt5dvL4xzlorONwC3ry2vn8bNEFrFZUsHFfR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Df7YjMiU; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=tQq5PggapuYJ0UGG0JZQAfZD4QGTMlk6ZJqtF5xLRvsC/wnVcyqPLprYzKCbsnvIrdAwTZUM29Zy62dABUkYeSYjBkSczJ8FvIZZT32HoGhsz3k4bZMoUz0hsi/dTBecJdH/jy0v0T/I0jd9cP65b1yiAqJAjewNCzHSD86q830=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KmMMF4Fq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Df7YjMiU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CC1AC433F1;
-	Sat, 30 Mar 2024 10:17:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KmMMF4Fq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61394C433F1;
+	Sun, 31 Mar 2024 10:00:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711793866;
-	bh=A2FNrSJmLuvRr6yesI1TqFlfAMOp6Etj3K6TPkNlrQg=;
+	s=k20201202; t=1711879248;
+	bh=8ZlEK5607Jk4tOKuXpJJJZbQBuqSIL7N3MY76VqKGds=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Df7YjMiUlon7HlgBHBV7e8i6E3yV6uJRUNJG2Pqt1EPY8jNv7iEHC8ZSE8Ghx4Sfp
-	 Q4D+VXWX8aPyxbkWjw23gLGLRPsrKX31dCwdy7ibEk6//yqCZa719tZLFl4ddRyHuG
-	 3JcjZUxGXdKuUkl5XbkAP5yJ7dRksuZ5SM+8xP3aeJiSDu3xZEIqLppee5ig7guhBq
-	 M1EZDrfSrdJrT7QQ/BGirY0nXC5ZAFFDqX9a3ls2I8ExeDqrKFBo3CupgwJ/mLePUk
-	 JrCq8Zp6jCeRpH4Uo4Leb5Fp7PQu2DHGXhLwfK2P4Ws9L2rK8T9CQF1rUo7tqHK+GA
-	 mpheABbJ85TyQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	b=KmMMF4FqWijFeM4Mc1d+9Ubdwa3TgkbMdi6eJ6RH0MAB8zu2AokIMtuynk9zHpst7
+	 sjaOhpoiX/WY/rN5CHXvjADJSyWPVAk6E29IYeTIpMKQgGbS0bjQEdOxCPRzZrHqRo
+	 4I61gRbw7wBV0302LHrINBbf1Qu8jogvvPA2OPYB5Rda+tdjSWwlpUrBL94xa7zCyT
+	 sxQ3fdtYh4Ed+8k8UoLlhy5wUCDdk+g9Ee0f7ZkPcpfN1U2bUQTJtR0mIKbmN2Yu8J
+	 cWc12qcfmDEeapF4GLr3ETEj5czb7hk7mGI/Lk19OgAijibq+r+28/DKr5RV5kcQ3E
+	 ZsOTd8Sgq5fug==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rqVmR-00HRXz-MY;
-	Sat, 30 Mar 2024 10:17:43 +0000
-Date: Sat, 30 Mar 2024 10:17:43 +0000
-Message-ID: <87r0fsrpko.wl-maz@kernel.org>
+	id 1rqrzY-00013r-IH;
+	Sun, 31 Mar 2024 11:00:45 +0100
+Date: Sun, 31 Mar 2024 11:00:41 +0100
+Message-ID: <87msqesoty.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Krister Johansen <kjlx@templeofstupid.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Ali Saidi <alisaidi@amazon.com>,
-	David Reaver <me@davidreaver.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Dave Martin <Dave.Martin@arm.com>,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Limit stage2_apply_range() batch size to smallest block
-In-Reply-To: <20240329191537.GA2051@templeofstupid.com>
-References: <cover.1711649501.git.kjlx@templeofstupid.com>
-	<ebf0fac84cb1d19bdc6e73576e3cc40a9cab0635.1711649501.git.kjlx@templeofstupid.com>
-	<ZgbGtpj5mStTkAkn@linux.dev>
-	<20240329191537.GA2051@templeofstupid.com>
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v6 1/5] KVM: arm64: Share all userspace hardened thread data with the hypervisor
+In-Reply-To: <20240329-arm64-2023-dpisa-v6-1-ba42db6c27f3@kernel.org>
+References: <20240329-arm64-2023-dpisa-v6-0-ba42db6c27f3@kernel.org>
+	<20240329-arm64-2023-dpisa-v6-1-ba42db6c27f3@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,104 +63,65 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kjlx@templeofstupid.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, alisaidi@amazon.com, me@davidreaver.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, corbet@lwn.net, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Dave.Martin@arm.com, kvmarm@lists.linux.dev, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 29 Mar 2024 19:15:37 +0000,
-Krister Johansen <kjlx@templeofstupid.com> wrote:
+On Fri, 29 Mar 2024 00:13:42 +0000,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> Hi Oliver,
-> Thanks for the response.
-> 
-> On Fri, Mar 29, 2024 at 06:48:38AM -0700, Oliver Upton wrote:
-> > On Thu, Mar 28, 2024 at 12:05:08PM -0700, Krister Johansen wrote:
-> > > stage2_apply_range() for unmap operations can interfere with the
-> > > performance of IO if the device's interrupts share the CPU where the
-> > > unmap operation is occurring.  commit 5994bc9e05c2 ("KVM: arm64: Limit
-> > > stage2_apply_range() batch size to largest block") improved this.  Prior
-> > > to that commit, workloads that were unfortunate enough to have their IO
-> > > interrupts pinned to the same CPU as the unmap operation would observe a
-> > > complete stall.  With the switch to using the largest block size, it is
-> > > possible for IO to make progress, albeit at a reduced speed.
-> > 
-> > Can you describe the workload a bit more? I'm having a hard time
-> > understanding how you're unmapping that much memory on the fly in
-> > your workload. Is guest memory getting swapped? Are VMs being torn
-> > down?
-> 
-> Sorry I wasn't clear here.  Yes, it's the VMs getting torn down that's
-> causing the problems.  The container VMs don't have long lifetimes, but
-> some may be up to 256Gb in size, depending on the user.  The workloads
-> running the VMs aren't especially performance sensitive, but their users
-> do notice when network connections time-out.  IOW, if the performance is
-> bad enough to temporarily prevent new TCP connections from being
-> established or requests / responses being recieved in a timely fashion,
-> we'll hear about it.  Users deploy their services a lot, so there's a
-> lot of container vm churn.  (Really it's automation redeploying the
-> services on behalf of the users in response to new commits to their
-> repos...)
+> As part of the lazy FPSIMD state transitioning done by the hypervisor we
+> currently share the userpsace FPSIMD state in thread->uw.fpsimd_state with
+> the host. Since this struct is non-extensible userspace ABI we have to keep
 
-I think this advocates for a teardown-specific code path rather than
-just relying on the usual S2 unmapping which is really designed for
-eviction. There are two things to consider here:
+Using the same representation is just pure convenience, and nothing
+requires us to use the it in the kernel/hypervisor.
 
-- TLB invalidation: this should only take a single VMALLS12E1, rather
-  than iterating over the PTs
+> the definition as is but the addition of FPMR in the 2023 dpISA means that
+> we will want to share more storage with the host. To facilitate this
+> refactor the current code to share the entire thread->uw rather than just
+> the one field.
 
-- Cache maintenance: this could be elided with FWB, or *optionally*
-  elided if userspace buys in a "I don't need to see the memory of the
-  guest after teardown" type of behaviour
+So this increase the required sharing with EL2 from 528 bytes to
+560. Not a huge deal, but definitely moving in the wrong direction. Is
+there any plans to add more stuff to this structure that wouldn't be
+*directly* relevant to the hypervisor?
 
-> > Also, it seems a bit odd to steer interrupts *into* the workload you
-> > care about...
 > 
-> Ah, that was only intentionally done for the purposes of measuring the
-> impact.  That's not done on purpose in production.
+> The large number of references to fpsimd_state make it very inconvenient
+> to add an additional wrapper struct.
+>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h       |  3 ++-
+>  arch/arm64/include/asm/processor.h      |  2 +-
+>  arch/arm64/kvm/fpsimd.c                 | 13 ++++++-------
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  4 ++--
+>  5 files changed, 12 insertions(+), 12 deletions(-)
 > 
-> Nevertheless, the example we tend to run into is that a box may have 2
-> NICs and each NIC has 32 Tx-Rx queues.  This means we've got 64 NIC
-> interrupts, each assigned to a different CPU.  Our systems have 64 CPUs.
-> What happens in practice is that a VM will get torn down, and that has a
-> 1-in-64 chance of impacting the performance of the subset of the flows
-> that are mapped via RSS to the interrupt that happens to be assigned to
-> the CPU where the VM is being torn down.
-> 
-> Of course, the obvious next question is why not just bind the VMs flows
-> to the CPUs the VM is running on?  We don't have a 1:1 mapping of
-> network device to VM, or VM to CPU right now, which frustrates this
-> approach.
-> 
-> > > Further reducing the stage2_apply_range() batch size has substantial
-> > > performance improvements for IO that share a CPU performing an unmap
-> > > operation.  By switching to a 2mb chunk, IO performance regressions were
-> > > no longer observed in this author's tests.  E.g. it was possible to
-> > > obtain the advertised device throughput despite an unmap operation
-> > > occurring on the CPU where the interrupt was running.  There is a
-> > > tradeoff, however.  No changes were observed in per-operation timings
-> > > when running the kvm_pagetable_test without an interrupt load.  However,
-> > > with a 64gb VM, 1 vcpu, and 4k pages and a IO load, map times increased
-> > > by about 15% and unmap times increased by about 58%.  In essence, this
-> > > trades slower map/unmap times for improved IO throughput.
-> > 
-> > There are other users of the range-based operations, like
-> > write-protection. Live migration is especially sensitive to the latency
-> > of page table updates as it can affect the VMM's ability to converge
-> > with the guest.
-> 
-> To be clear, the reduction in performance was observed when I
-> concurrently executed both the kvm_pagetable_test and a networking
-> benchmark where the NIC's interrupts were assigned to the same CPU where
-> the pagetable test was executing.  I didn't see a slowdown just running
-> the pagetable test.
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 9e8a496fb284..8a251f0da900 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -27,6 +27,7 @@
+>  #include <asm/fpsimd.h>
+>  #include <asm/kvm.h>
+>  #include <asm/kvm_asm.h>
+> +#include <asm/processor.h>
+>  #include <asm/vncr_mapping.h>
+>  
+>  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+> @@ -640,7 +641,7 @@ struct kvm_vcpu_arch {
+>  	struct kvm_guest_debug_arch vcpu_debug_state;
+>  	struct kvm_guest_debug_arch external_debug_state;
+>  
+> -	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
+> +	struct thread_struct_uw *host_uw;	/* hyp VA */
+>  	struct task_struct *parent_task;
 
-Any chance you could share more details about your HW configuration
-(what CPU is that?)  and the type of traffic? This is the sort of
-things I'd like to be able to reproduce in order to experiment various
-strategies.
-
-Thanks,
+Well, this is going away, and you know it.
 
 	M.
 
