@@ -1,63 +1,66 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-vk1-f202.google.com (mail-vk1-f202.google.com [209.85.221.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A47E56B89
-	for <kvmarm@lists.linux.dev>; Mon,  1 Apr 2024 23:29:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A0A56B95
+	for <kvmarm@lists.linux.dev>; Mon,  1 Apr 2024 23:29:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712014199; cv=none; b=MQ4JB5Jpr5hTY5TMh0W/5GVkOC88Cj2atL3yex8ob0yyGvsis4LOPvlrvRRSPyKIgdbfFUfjt0flV3Xf54zIQjXmPLZYpteq1zTawbR0HQtT5QFfkXV1X+z8HeNqejAHZk08zVO+BFdvupn6oQM6JWF3dftFDTyZpPGV1YfSV7c=
+	t=1712014200; cv=none; b=D5fQXdgpIThh6WSTCED2xGmm+sNzDk9knqRkJuSrvU1+vCd89IUF6LYU8SZppyI5gC9K0kP3B1Y+YmjeKdMcG50cCirtsrM3IVcaTMh+26PXHHRD1rsCTWFg4/PzGaJBvibIoIXknAuXz/FqlIWzcyhXI/CRHhTp7stHMUewlDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712014199; c=relaxed/simple;
-	bh=LIU3srPkuAU2Il0Ayu4Wz3ZF0a3r6V03GyttaxoyE9Q=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=WAKSLWHGjbbCcaL2cgaznW14qdGZEAcmhLGU8lyhwn2NxFa/p7M1WllSRGHlDnAQprARgEuTGFzcwITD2t7q8KXJY0+aeavmfTbEHFbAXXkVq5qXXRGhD4N8c0bbPfHHpcX3sH8g3XlsNpJ4iybeL5QkUGvOWMKgWyUkDfYthM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZJ5k4KU1; arc=none smtp.client-ip=209.85.128.202
+	s=arc-20240116; t=1712014200; c=relaxed/simple;
+	bh=/sojkNHgAkXV2li3H4WMuqhMOGJZX+4+iRjYtJcWaOM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=PxW7/mTp+Fh5zr5e6TqFHfy2UY3hZ71pytmErcwJ070CkHDJ8eZNTdqA6THSAn4Jom1nPW1BZnCuP14S8ihnZboqj/i1MwsjHB/Udsl1bf+NRHH1mimKOoqeiNDk3fTrnmJYB1PAzq+UR7Il8sV+IgDY1xraP9qWuDzLgnfhbZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UyDInCgs; arc=none smtp.client-ip=209.85.221.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZJ5k4KU1"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60a4ee41269so83563807b3.0
-        for <kvmarm@lists.linux.dev>; Mon, 01 Apr 2024 16:29:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UyDInCgs"
+Received: by mail-vk1-f202.google.com with SMTP id 71dfb90a1353d-4d8a322b233so1782824e0c.2
+        for <kvmarm@lists.linux.dev>; Mon, 01 Apr 2024 16:29:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712014196; x=1712618996; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=3wg9CCGpIdLpfDRqh60QLQofCQe0biAtvSj1Gdo5bk8=;
-        b=ZJ5k4KU1kOYY0g55WDBNXkY7C9ttBj3FhiE5zv5QoOVMZwW/iR38VdOjdchVvUrvAU
-         ByrLKROKuXjmZq/bCy3r3tQB/HoEhL4ygCJHAlMfLf+iOy8T8AXoGJQHFqsJ/azaVW5C
-         ZdfZW9NzPva1JRLJPosN5H8+a7Eugq3e4H2MM7zuQlzIYYf2jcTAFudpkycJGznlCVwA
-         T+MivKmpBVYTACU8pwPJjJ9dE/79QC0Gml/Y8KgFpUVdXCAA6bASkkbbKJ8IgXDo4uzf
-         KWM2JANCci/JE6DIw25vi1XPN/SljVX/BIqw7P5cQMYCEHp5eT2L9hNepBJ1pJbTBAVU
-         +UzQ==
+        d=google.com; s=20230601; t=1712014197; x=1712618997; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XjV19huKRvwcv3bjf5GpogmLoEGdyfdviROgtmpM2BI=;
+        b=UyDInCgsd9kBh5AK1VjCk5K5h8lFZhFXDI088lZhqAHmzB+Akj+tzeN3rTA1udSsIK
+         g+zh76Dvhj2XT/EBbYgy5gCRfTcc1gCF+jIgQR4RLdqJveZ1w1/YGCt98fzZoexINFcX
+         rqJU/SKgmSRK8C7LHkBkcFO2b30xvofnJ6Cmd5viD0SRAJsJ7ztDAzMgjvZJcduWRmfP
+         a6+4frwJYF72UJNzFduoHka3+CW3DxnXje/NNFdhKpOlrx48BOwqStZSELBEUhwj/sny
+         hPp5FnUhxgBNkgL1TBcB1sBXi6MsiViCELQsQX62a4u7iprB4zXxGC5jnSm7ddCiNeyg
+         Myow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712014196; x=1712618996;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3wg9CCGpIdLpfDRqh60QLQofCQe0biAtvSj1Gdo5bk8=;
-        b=PwlbbeMaCjSnbJSeQ8/Ewtx4DXVr1xAFZNzva8h7OjaEa5bRrpU6k7uddMPIsEA4BP
-         nvZsYDnhF5YUrqv0pwkIZ6BSBNyrnhxkOs05n3CDxGZ2yI9PaeGyinQBknoqxH5G7CFs
-         o08hqm5272HFgW72PkgPOwoCFtRGRxdOXfSPi0sY90gk5Q4goxeI810r6wS8vGHLfHKG
-         S7i8vaa0N9QopALIMMgWpHNAOd8nV6GXtfxXLX0Uqj0jDTo+Zd7o9uy7fxbTd0y4sg/n
-         0dBLvMSDQMAC6aw7tWoJdYNxB/Egdzqid6gwZHQKOVmgOJn3/nbOiXqdrSZ8XQD6pzR0
-         fcVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXY2Uiyz2rqiCMvabzpkyUyEgoLaT0jSA8vL+6y1yYWRN4b8ESgoTtxISUfgBUP+tQrkGvKw05/2sQP+IuWlvJKg8CtasQd
-X-Gm-Message-State: AOJu0YzwLKrotxi1Exo7wnM+HQnusbT7/8wXRfTpTKEhpRV7cUxCOKzK
-	o+oduurDqffjArG43zIy5zw+Hbln9jodVRXf2EIOTQYT8AfWc43gkuuFYDvYHd/XwgE/dq3P5dF
-	YkP7RQb7KiHl+dIRyfA==
-X-Google-Smtp-Source: AGHT+IGQKV963bGOmZkg1qJdb4wkJ3JL7Okh/SQUhgB3vOnWcX/gauefdkact4kTuSTRZOisDp+cn6EF/9Mo2eKk
+        d=1e100.net; s=20230601; t=1712014197; x=1712618997;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XjV19huKRvwcv3bjf5GpogmLoEGdyfdviROgtmpM2BI=;
+        b=ledLZDTVAQpJ6JCxfEenFAXS98Jbf3ga0Ilb4IesJqYhriBcT9tfUFo8Nit3Z9l5UY
+         KLAuYFv4pFZcVUsWyEbTeBeGjs5bZBsWPzWWd5gK4OTJRiEOoggijkDjsd6tNpTGc0eQ
+         hZTIX9VED5o+ofUrcac93mwP5c781aqSCR7TAYH+pQcmhNYQPjDG5/ffUoW0uMZe1lDV
+         PUpAfTSra84LWC/YOxMbGMefRv3bOUAt6V6R10JZ4ps2fZ2MVdHmg6dhA86Q/jV09IoJ
+         ufgCBb4Az9tZBflQ4KLDs+C6op4y7XINBwLGrRyyYA3wB3NtmCrlZd7ZldtpoxODKrjv
+         5jmg==
+X-Forwarded-Encrypted: i=1; AJvYcCV5aREBTdX23DBC4LBnR3gcPzc++wAb3I1/riY0CPAQ4LqN1ilK/VvSYgixsQrWiDKn0mD29gMz5oAZ7p74/HFSwxIUEUNs
+X-Gm-Message-State: AOJu0Yxv2kTahT+Nh7QBl++/4xvDTG74JGZmU4dLCfyhok8GhU0PNei1
+	B1ldytH60RARfxYFVSQHQCu4Qz/0qiYoKdRnn0QJ3mzlRzT1lN5Ex91S89c2DmS6wVV7oXbBkoA
+	qcom3s4mcUsXL1DT4xw==
+X-Google-Smtp-Source: AGHT+IFUopEMKakeSmmDQQkpzKxlNJ65mvpQqylZZQK+yo+BzjzMVCQHtrhU8U2Q57twwQQQfTybPo3O3BawFKgE
 X-Received: from jthoughton.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:2a4f])
- (user=jthoughton job=sendgmr) by 2002:a05:690c:f83:b0:614:e20c:d423 with SMTP
- id df3-20020a05690c0f8300b00614e20cd423mr823185ywb.10.1712014196503; Mon, 01
- Apr 2024 16:29:56 -0700 (PDT)
-Date: Mon,  1 Apr 2024 23:29:39 +0000
+ (user=jthoughton job=sendgmr) by 2002:ac5:c281:0:b0:4d8:73c1:9ec7 with SMTP
+ id h1-20020ac5c281000000b004d873c19ec7mr84232vkk.0.1712014197363; Mon, 01 Apr
+ 2024 16:29:57 -0700 (PDT)
+Date: Mon,  1 Apr 2024 23:29:40 +0000
+In-Reply-To: <20240401232946.1837665-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20240401232946.1837665-1-jthoughton@google.com>
 X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240401232946.1837665-1-jthoughton@google.com>
-Subject: [PATCH v3 0/7] mm/kvm: Improve parallelism for access bit harvesting
+Message-ID: <20240401232946.1837665-2-jthoughton@google.com>
+Subject: [PATCH v3 1/7] mm: Add a bitmap into mmu_notifier_{clear,test}_young
 From: James Houghton <jthoughton@google.com>
 To: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: Yu Zhao <yuzhao@google.com>, David Matlack <dmatlack@google.com>, 
@@ -77,95 +80,320 @@ Cc: Yu Zhao <yuzhao@google.com>, David Matlack <dmatlack@google.com>,
 	linux-trace-kernel@vger.kernel.org, James Houghton <jthoughton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This patchset adds a fast path in KVM to test and clear access bits on
-sptes without taking the mmu_lock. It also adds support for using a
-bitmap to (1) test the access bits for many sptes in a single call to
-mmu_notifier_test_young, and to (2) clear the access bits for many ptes
-in a single call to mmu_notifier_clear_young.
+The bitmap is provided for secondary MMUs to use if they support it. For
+test_young(), after it returns, the bitmap represents the pages that
+were young in the interval [start, end). For clear_young, it represents
+the pages that we wish the secondary MMU to clear the accessed/young bit
+for.
 
-With Yu's permission, I'm now working on getting this series into a
-mergeable state.
+If a bitmap is not provided, the mmu_notifier_{test,clear}_young() API
+should be unchanged except that if young PTEs are found and the
+architecture supports passing in a bitmap, instead of returning 1,
+MMU_NOTIFIER_YOUNG_FAST is returned.
 
-I'm posting this as an RFC because I'm not sure if the arm64 bits are
-correct, and I haven't done complete performance testing. I want to do
-broader experimentation to see how much this improves VM performance in
-a cloud environment, but I want to be sure that the code is mergeable
-first.
+This allows MGLRU's look-around logic to work faster, resulting in a 4%
+improvement in real workloads[1]. Also introduce MMU_NOTIFIER_YOUNG_FAST
+to indicate to main mm that doing look-around is likely to be
+beneficial.
 
-Yu has posted other performance results[1], [2]. This v3 shouldn't
-significantly change the x86 results, but the arm64 results may have
-changed.
+If the secondary MMU doesn't support the bitmap, it must return
+an int that contains MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE.
 
-The most important changes since v2[3]:
+[1]: https://lore.kernel.org/all/20230609005935.42390-1-yuzhao@google.com/
 
-- Split the test_clear_young MMU notifier back into test_young and
-  clear_young. I did this because the bitmap passed in has a distinct
-  meaning for each of them, and I felt that this was cleaner.
+Suggested-by: Yu Zhao <yuzhao@google.com>
+Signed-off-by: James Houghton <jthoughton@google.com>
+---
+ include/linux/mmu_notifier.h | 93 +++++++++++++++++++++++++++++++++---
+ include/trace/events/kvm.h   | 13 +++--
+ mm/mmu_notifier.c            | 20 +++++---
+ virt/kvm/kvm_main.c          | 19 ++++++--
+ 4 files changed, 123 insertions(+), 22 deletions(-)
 
-- The return value of test_young / clear_young now indicates if the
-  bitmap was used.
-
-- Removed the custom spte walker to implement the lockless path. This
-  was important for arm64 to be functionally correct (thanks Oliver),
-  and it avoids a lot of problems brought up in review of v2 (for
-  example[4]).
-
-- Add kvm_arch_prepare_bitmap_age and kvm_arch_finish_bitmap_age to
-  allow for arm64 to implement its bitmap-based aging to grab the MMU
-  lock for reading while allowing x86 to be lockless.
-
-- The powerpc changes have been dropped.
-
-- The logic to inform architectures how to use the bitmap has been
-  cleaned up (kvm_should_clear_young has been split into
-  kvm_gfn_should_age and kvm_gfn_record_young) (thanks Nicolas).
-
-There were some smaller changes too:
-- Added test_clear_young_metadata (thanks Sean).
-- MMU_NOTIFIER_RANGE_LOCKLESS has been renamed to
-  MMU_NOTIFIER_YOUNG_FAST, to indicate to the caller that passing a
-  bitmap for MGLRU look-around is likely to be beneficial.
-- Cleaned up comments that describe the changes to
-  mmu_notifier_test_young / mmu_notifier_clear_young (thanks Nicolas).
-
-[1]: https://lore.kernel.org/all/20230609005943.43041-1-yuzhao@google.com/
-[2]: https://lore.kernel.org/all/20230609005935.42390-1-yuzhao@google.com/
-[3]: https://lore.kernel.org/kvmarm/20230526234435.662652-1-yuzhao@google.com/
-[4]: https://lore.kernel.org/all/ZItX64Bbx5vdjo9M@google.com/
-
-James Houghton (5):
-  mm: Add a bitmap into mmu_notifier_{clear,test}_young
-  KVM: Move MMU notifier function declarations
-  KVM: Add basic bitmap support into kvm_mmu_notifier_test/clear_young
-  KVM: x86: Participate in bitmap-based PTE aging
-  KVM: arm64: Participate in bitmap-based PTE aging
-
-Yu Zhao (2):
-  KVM: x86: Move tdp_mmu_enabled and shadow_accessed_mask
-  mm: multi-gen LRU: use mmu_notifier_test_clear_young()
-
- Documentation/admin-guide/mm/multigen_lru.rst |   6 +-
- arch/arm64/include/asm/kvm_host.h             |   5 +
- arch/arm64/include/asm/kvm_pgtable.h          |   4 +-
- arch/arm64/kvm/hyp/pgtable.c                  |  21 +-
- arch/arm64/kvm/mmu.c                          |  23 ++-
- arch/x86/include/asm/kvm_host.h               |  20 ++
- arch/x86/kvm/mmu.h                            |   6 -
- arch/x86/kvm/mmu/mmu.c                        |  16 +-
- arch/x86/kvm/mmu/spte.h                       |   1 -
- arch/x86/kvm/mmu/tdp_mmu.c                    |  10 +-
- include/linux/kvm_host.h                      | 101 ++++++++--
- include/linux/mmu_notifier.h                  |  93 ++++++++-
- include/linux/mmzone.h                        |   6 +-
- include/trace/events/kvm.h                    |  13 +-
- mm/mmu_notifier.c                             |  20 +-
- mm/rmap.c                                     |   9 +-
- mm/vmscan.c                                   | 183 ++++++++++++++----
- virt/kvm/kvm_main.c                           | 100 +++++++---
- 18 files changed, 509 insertions(+), 128 deletions(-)
-
-
-base-commit: 0cef2c0a2a356137b170c3cb46cb9c1dd2ca3e6b
+diff --git a/include/linux/mmu_notifier.h b/include/linux/mmu_notifier.h
+index f349e08a9dfe..daaa9db625d3 100644
+--- a/include/linux/mmu_notifier.h
++++ b/include/linux/mmu_notifier.h
+@@ -61,6 +61,10 @@ enum mmu_notifier_event {
+ 
+ #define MMU_NOTIFIER_RANGE_BLOCKABLE (1 << 0)
+ 
++#define MMU_NOTIFIER_YOUNG			(1 << 0)
++#define MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE	(1 << 1)
++#define MMU_NOTIFIER_YOUNG_FAST			(1 << 2)
++
+ struct mmu_notifier_ops {
+ 	/*
+ 	 * Called either by mmu_notifier_unregister or when the mm is
+@@ -106,21 +110,36 @@ struct mmu_notifier_ops {
+ 	 * clear_young is a lightweight version of clear_flush_young. Like the
+ 	 * latter, it is supposed to test-and-clear the young/accessed bitflag
+ 	 * in the secondary pte, but it may omit flushing the secondary tlb.
++	 *
++	 * If @bitmap is given but is not supported, return
++	 * MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE.
++	 *
++	 * If the walk is done "quickly" and there were young PTEs,
++	 * MMU_NOTIFIER_YOUNG_FAST is returned.
+ 	 */
+ 	int (*clear_young)(struct mmu_notifier *subscription,
+ 			   struct mm_struct *mm,
+ 			   unsigned long start,
+-			   unsigned long end);
++			   unsigned long end,
++			   unsigned long *bitmap);
+ 
+ 	/*
+ 	 * test_young is called to check the young/accessed bitflag in
+ 	 * the secondary pte. This is used to know if the page is
+ 	 * frequently used without actually clearing the flag or tearing
+ 	 * down the secondary mapping on the page.
++	 *
++	 * If @bitmap is given but is not supported, return
++	 * MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE.
++	 *
++	 * If the walk is done "quickly" and there were young PTEs,
++	 * MMU_NOTIFIER_YOUNG_FAST is returned.
+ 	 */
+ 	int (*test_young)(struct mmu_notifier *subscription,
+ 			  struct mm_struct *mm,
+-			  unsigned long address);
++			  unsigned long start,
++			  unsigned long end,
++			  unsigned long *bitmap);
+ 
+ 	/*
+ 	 * change_pte is called in cases that pte mapping to page is changed:
+@@ -388,10 +407,11 @@ extern int __mmu_notifier_clear_flush_young(struct mm_struct *mm,
+ 					  unsigned long start,
+ 					  unsigned long end);
+ extern int __mmu_notifier_clear_young(struct mm_struct *mm,
+-				      unsigned long start,
+-				      unsigned long end);
++				      unsigned long start, unsigned long end,
++				      unsigned long *bitmap);
+ extern int __mmu_notifier_test_young(struct mm_struct *mm,
+-				     unsigned long address);
++				     unsigned long start, unsigned long end,
++				     unsigned long *bitmap);
+ extern void __mmu_notifier_change_pte(struct mm_struct *mm,
+ 				      unsigned long address, pte_t pte);
+ extern int __mmu_notifier_invalidate_range_start(struct mmu_notifier_range *r);
+@@ -427,7 +447,25 @@ static inline int mmu_notifier_clear_young(struct mm_struct *mm,
+ 					   unsigned long end)
+ {
+ 	if (mm_has_notifiers(mm))
+-		return __mmu_notifier_clear_young(mm, start, end);
++		return __mmu_notifier_clear_young(mm, start, end, NULL);
++	return 0;
++}
++
++/*
++ * When @bitmap is not provided, clear the young bits in the secondary
++ * MMUs for all of the pages in the interval [start, end).
++ *
++ * If any subscribed secondary MMU does not support @bitmap, this function
++ * will return an integer containing MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE.
++ * Some work may have been done in the secondary MMU.
++ */
++static inline int mmu_notifier_clear_young_bitmap(struct mm_struct *mm,
++						  unsigned long start,
++						  unsigned long end,
++						  unsigned long *bitmap)
++{
++	if (mm_has_notifiers(mm))
++		return __mmu_notifier_clear_young(mm, start, end, bitmap);
+ 	return 0;
+ }
+ 
+@@ -435,7 +473,25 @@ static inline int mmu_notifier_test_young(struct mm_struct *mm,
+ 					  unsigned long address)
+ {
+ 	if (mm_has_notifiers(mm))
+-		return __mmu_notifier_test_young(mm, address);
++		return __mmu_notifier_test_young(mm, address, address + 1,
++						 NULL);
++	return 0;
++}
++
++/*
++ * When @bitmap is not provided, test the young bits in the secondary
++ * MMUs for all of the pages in the interval [start, end).
++ *
++ * If any subscribed secondary MMU does not support @bitmap, this function
++ * will return an integer containing MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE.
++ */
++static inline int mmu_notifier_test_young_bitmap(struct mm_struct *mm,
++						 unsigned long start,
++						 unsigned long end,
++						 unsigned long *bitmap)
++{
++	if (mm_has_notifiers(mm))
++		return __mmu_notifier_test_young(mm, start, end, bitmap);
+ 	return 0;
+ }
+ 
+@@ -644,12 +700,35 @@ static inline int mmu_notifier_clear_flush_young(struct mm_struct *mm,
+ 	return 0;
+ }
+ 
++static inline int mmu_notifier_clear_young(struct mm_struct *mm,
++					   unsigned long start,
++					   unsigned long end)
++{
++	return 0;
++}
++
++static inline int mmu_notifier_clear_young_bitmap(struct mm_struct *mm,
++						  unsigned long start,
++						  unsigned long end,
++						  unsigned long *bitmap)
++{
++	return 0;
++}
++
+ static inline int mmu_notifier_test_young(struct mm_struct *mm,
+ 					  unsigned long address)
+ {
+ 	return 0;
+ }
+ 
++static inline int mmu_notifier_test_young_bitmap(struct mm_struct *mm,
++						 unsigned long start,
++						 unsigned long end,
++						 unsigned long *bitmap)
++{
++	return 0;
++}
++
+ static inline void mmu_notifier_change_pte(struct mm_struct *mm,
+ 					   unsigned long address, pte_t pte)
+ {
+diff --git a/include/trace/events/kvm.h b/include/trace/events/kvm.h
+index 011fba6b5552..e4ace8cfdbba 100644
+--- a/include/trace/events/kvm.h
++++ b/include/trace/events/kvm.h
+@@ -490,18 +490,21 @@ TRACE_EVENT(kvm_age_hva,
+ );
+ 
+ TRACE_EVENT(kvm_test_age_hva,
+-	TP_PROTO(unsigned long hva),
+-	TP_ARGS(hva),
++	TP_PROTO(unsigned long start, unsigned long end),
++	TP_ARGS(start, end),
+ 
+ 	TP_STRUCT__entry(
+-		__field(	unsigned long,	hva		)
++		__field(	unsigned long,	start		)
++		__field(	unsigned long,	end		)
+ 	),
+ 
+ 	TP_fast_assign(
+-		__entry->hva		= hva;
++		__entry->start		= start;
++		__entry->end		= end;
+ 	),
+ 
+-	TP_printk("mmu notifier test age hva: %#016lx", __entry->hva)
++	TP_printk("mmu notifier test age hva: %#016lx -- %#016lx",
++		  __entry->start, __entry->end)
+ );
+ 
+ #endif /* _TRACE_KVM_MAIN_H */
+diff --git a/mm/mmu_notifier.c b/mm/mmu_notifier.c
+index ec3b068cbbe6..e70c6222944c 100644
+--- a/mm/mmu_notifier.c
++++ b/mm/mmu_notifier.c
+@@ -384,7 +384,8 @@ int __mmu_notifier_clear_flush_young(struct mm_struct *mm,
+ 
+ int __mmu_notifier_clear_young(struct mm_struct *mm,
+ 			       unsigned long start,
+-			       unsigned long end)
++			       unsigned long end,
++			       unsigned long *bitmap)
+ {
+ 	struct mmu_notifier *subscription;
+ 	int young = 0, id;
+@@ -395,7 +396,8 @@ int __mmu_notifier_clear_young(struct mm_struct *mm,
+ 				 srcu_read_lock_held(&srcu)) {
+ 		if (subscription->ops->clear_young)
+ 			young |= subscription->ops->clear_young(subscription,
+-								mm, start, end);
++								mm, start, end,
++								bitmap);
+ 	}
+ 	srcu_read_unlock(&srcu, id);
+ 
+@@ -403,7 +405,8 @@ int __mmu_notifier_clear_young(struct mm_struct *mm,
+ }
+ 
+ int __mmu_notifier_test_young(struct mm_struct *mm,
+-			      unsigned long address)
++			      unsigned long start, unsigned long end,
++			      unsigned long *bitmap)
+ {
+ 	struct mmu_notifier *subscription;
+ 	int young = 0, id;
+@@ -413,9 +416,14 @@ int __mmu_notifier_test_young(struct mm_struct *mm,
+ 				 &mm->notifier_subscriptions->list, hlist,
+ 				 srcu_read_lock_held(&srcu)) {
+ 		if (subscription->ops->test_young) {
+-			young = subscription->ops->test_young(subscription, mm,
+-							      address);
+-			if (young)
++			young |= subscription->ops->test_young(subscription, mm,
++							       start, end,
++							       bitmap);
++			if (young && !bitmap)
++				/*
++				 * We're not using a bitmap, so there is no
++				 * need to check any more secondary MMUs.
++				 */
+ 				break;
+ 		}
+ 	}
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index fb49c2a60200..ca4b1ef9dfc2 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -917,10 +917,15 @@ static int kvm_mmu_notifier_clear_flush_young(struct mmu_notifier *mn,
+ static int kvm_mmu_notifier_clear_young(struct mmu_notifier *mn,
+ 					struct mm_struct *mm,
+ 					unsigned long start,
+-					unsigned long end)
++					unsigned long end,
++					unsigned long *bitmap)
+ {
+ 	trace_kvm_age_hva(start, end);
+ 
++	/* We don't support bitmaps. Don't test or clear anything. */
++	if (bitmap)
++		return MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE;
++
+ 	/*
+ 	 * Even though we do not flush TLB, this will still adversely
+ 	 * affect performance on pre-Haswell Intel EPT, where there is
+@@ -939,11 +944,17 @@ static int kvm_mmu_notifier_clear_young(struct mmu_notifier *mn,
+ 
+ static int kvm_mmu_notifier_test_young(struct mmu_notifier *mn,
+ 				       struct mm_struct *mm,
+-				       unsigned long address)
++				       unsigned long start,
++				       unsigned long end,
++				       unsigned long *bitmap)
+ {
+-	trace_kvm_test_age_hva(address);
++	trace_kvm_test_age_hva(start, end);
++
++	/* We don't support bitmaps. Don't test or clear anything. */
++	if (bitmap)
++		return MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE;
+ 
+-	return kvm_handle_hva_range_no_flush(mn, address, address + 1,
++	return kvm_handle_hva_range_no_flush(mn, start, end,
+ 					     kvm_test_age_gfn);
+ }
+ 
 -- 
 2.44.0.478.gd926399ef9-goog
 
