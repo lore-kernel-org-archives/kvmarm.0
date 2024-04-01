@@ -1,133 +1,139 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3461442FC;
-	Sun, 31 Mar 2024 10:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D70867F
+	for <kvmarm@lists.linux.dev>; Mon,  1 Apr 2024 02:57:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711882750; cv=none; b=mE2QJmQaRFWpC77Zk86KzIytnIw+PmbOrvlk8N3YcLk+c+XNgsDunycRo7j5IFeg0w9AMT5OUVcdupkwW0KBWhCHtolZ+3Xs8hUY8ywR6awgCCx3CHjRvD/6z1M7luaVmNaDWqJxYexsNdHABCo7ZWIZ5P4liaLj9Ct522UZDWY=
+	t=1711940261; cv=none; b=SnuQPKZeBXpTqyaWwzwQzOZp/hb7KaFoHjFhTOb7aTNCiOWAu6qX6GrSO++Lqnk2CQT9FphR4BPz1q7sOsXvcVuxwLUpdnkZ+DK+MKVAndIWvMQIa2lR7I7sTY9Q46livql014Swa3BKYkxYTmkdEZ4TC91WjJ7x6tEUwHtTJf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711882750; c=relaxed/simple;
-	bh=E/mXO2r8N+mvHUjPMnvWB+Izzfu4L00THFiMK03lb68=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=unv5mOchm02l9EyaJgtpkb1SQA+F1m49zkocsKnJM5Y6EbCIW+wr6nAI1riJZwPNnO16iCP4qcQoXykclYVMnlaxWGWkrGEXq2H8QLzeN8VswQZLMv1i852ptQ4Iq+QGNpfXiWno2o9ZHFe8i40oAFi8ypqjsMOgBBjKBHnTcXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ERqxj6v8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711940261; c=relaxed/simple;
+	bh=PNMpCPHpcNVFc8b1OMUV+gC+F7IdrcOZrrRT6V9mqqU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nyKVs9dZbOy9y/uLul0Ef9SicM9aQZ7dwsJ4ByjRybDNVFE0E3Yo96jUrINMIQILkhy6tjaJhPf+w06haiBg8DAWXAZ4wltQCgjo/Tks8jwsUq56QIiW8kDELIwTyrKdjExYFFGTZqHacIX39KaYUn9waM1/7iWCEWat9PzXBmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QWZ7GBJo; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ERqxj6v8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B61FCC433F1;
-	Sun, 31 Mar 2024 10:59:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711882749;
-	bh=E/mXO2r8N+mvHUjPMnvWB+Izzfu4L00THFiMK03lb68=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ERqxj6v8X0bw8+Nn+UE7aUiWGYJc9LvPo4mBhsECJoHarVZLp3LXI7/62lAKBZap3
-	 GNdoJwAn6Q2oj9ABUEihq76OhmeRXXlifkDzaOieupHDMIgPrf6Nh0A1yBmWwQhBUn
-	 l2TjZW042YsgfyPN3wsh67WXvdLDSaIbF4tbVvMmFyPYjA2J4Rjv1Z9u8MqZPvJ1Lx
-	 iXuxOEjcbKO7F0h9mPEkG0ZtiMjbDBHzWcgFSzszSNJjsVo/HB9broW2NE45amyl4q
-	 Bh86kTlGq1jzIVKVFrodRfdnMv/V+mojH0BBsljrTxB1MEXkQYlFPXTj/wTPVyAUEl
-	 9+eBc973iZJyQ==
-Received: from 82-132-233-13.dab.02.net ([82.132.233.13] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rqsu3-0001gL-Ea;
-	Sun, 31 Mar 2024 11:59:07 +0100
-Date: Sun, 31 Mar 2024 11:59:06 +0100
-Message-ID: <87le5ysm4l.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Dave Martin <Dave.Martin@arm.com>,
-	kvmarm@lists.linux.dev,
-	linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v6 2/5] KVM: arm64: Add newly allocated ID registers to register descriptions
-In-Reply-To: <20240329-arm64-2023-dpisa-v6-2-ba42db6c27f3@kernel.org>
-References: <20240329-arm64-2023-dpisa-v6-0-ba42db6c27f3@kernel.org>
-	<20240329-arm64-2023-dpisa-v6-2-ba42db6c27f3@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QWZ7GBJo"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711940258;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fplxvg7N6UFj4xleZwjFgcDp/v13uGAUfKYdf7ZN9Kg=;
+	b=QWZ7GBJoRr8ukTtNMKtW2wJ6SiNJ/K4RIWJfxM0tITherzGmx3sEAOzmzSWl/yDDVVjnbU
+	wPbCkVtw+BhEG9z0lztxMLyTfxIsm05nt8GngB5SiHMW4A+kocLJ9l3e98WsBdKPDyplu1
+	4DB9+Kt0GUlJRV+BXAGbuu3VTq+Nym4=
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
+ [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-401-yGnk7_qRMzKK8iJlH7bzUQ-1; Sun, 31 Mar 2024 22:57:36 -0400
+X-MC-Unique: yGnk7_qRMzKK8iJlH7bzUQ-1
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-5ce9b15f4ccso226052a12.0
+        for <kvmarm@lists.linux.dev>; Sun, 31 Mar 2024 19:57:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711940255; x=1712545055;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fplxvg7N6UFj4xleZwjFgcDp/v13uGAUfKYdf7ZN9Kg=;
+        b=XOGbWGg7Z+/aYTbF9vPnTMfrJxWTzQBqLC59zgYxEE8Lmw3LMi/oTyR+3J+cNBneUv
+         LVJ+fyfb9K3YWVhqoSTY8/aFKL0HrqT1PILkEj2n6AvcPgAbNhw6CUfAPvM1DXXFVvH1
+         z+Vyg0rTPtBaofb0F5LiZZxql/ZdeddGgbbx2wwqlXp0HND1cEEG9zkg6DTctnBME41y
+         xeERXYUM1NyxoOSrDgi/+l5hB9qSAkvmvuL5lE3PMBz2Q7Sw43oy+xlZ47QQyvnV00qv
+         1bDOlg03VYajp/GCKbjkFWiv78csf/XSGcXZV1t0a8IbkbXzuSemPKyFD79YImn2axqB
+         oniQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWGK5Y0WTBmUlVm+bx6apLqdsCr6PiSv+dI9AtqZkQVjRrtNHvqXdtraYV58etvW+XQA+XyYfU2io1NgjC8p97rgjvDvC5N
+X-Gm-Message-State: AOJu0Ywn1PBE26/HQy7/hOYt0mpB6Hn/8IiPwQTLTXHqxnuQVKu6yPUt
+	LfWrqu8j5UNMD7rVyu3xb5AOoUm9I/SosCsUk7a2koHqXdBaYeFANSIbsq/mNWRpF6W0YUFHhRo
+	lckyNJhB3Qz2bwTJyE86vOssvAzGy/F21z5EAV4rrG0xY6m0TyJ+tyg==
+X-Received: by 2002:a05:6a20:a107:b0:1a7:c6d:5265 with SMTP id q7-20020a056a20a10700b001a70c6d5265mr6677858pzk.6.1711940255053;
+        Sun, 31 Mar 2024 19:57:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF4sz9GIyR5onR702ql2gG/7l94pnURClljJp6PeSjvGtvHyG2FUkOcXdGtBlcDk4qrN3G0CA==
+X-Received: by 2002:a05:6a20:a107:b0:1a7:c6d:5265 with SMTP id q7-20020a056a20a10700b001a70c6d5265mr6677848pzk.6.1711940254614;
+        Sun, 31 Mar 2024 19:57:34 -0700 (PDT)
+Received: from [10.66.61.39] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id x15-20020a170902820f00b001dddf29b6e8sm7598668pln.299.2024.03.31.19.57.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 31 Mar 2024 19:57:34 -0700 (PDT)
+Message-ID: <f3a1417b-6407-4c1a-bbb8-e411d773a718@redhat.com>
+Date: Mon, 1 Apr 2024 10:57:30 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.132.233.13
-X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, corbet@lwn.net, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Dave.Martin@arm.com, kvmarm@lists.linux.dev, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/4] KVM: arm64: TLBI fixes for the pgtable code
+To: Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev
+Cc: linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Gavin Shan <gshan@redhat.com>,
+ Marc Zyngier <maz@kernel.org>, Mostafa Saleh <smostafa@google.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Quentin Perret <qperret@google.com>,
+ Raghavendra Rao Ananta <rananta@google.com>,
+ Ryan Roberts <ryan.roberts@arm.com>
+References: <20240327124853.11206-1-will@kernel.org>
+From: Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20240327124853.11206-1-will@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, 29 Mar 2024 00:13:43 +0000,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> The 2023 architecture extensions have allocated some new ID registers, add
-> them to the KVM system register descriptions so that they are visible to
-> guests.
-> 
-> We make the newly introduced dpISA features writeable, as well as
-> allowing writes to ID_AA64ISAR3_EL1.CPA for FEAT_CPA which only
-> introduces straigforward new instructions with no additional
-> architectural state or traps.
 
-FPMR actively gets trapped by HCRX_EL2.
+
+On 3/27/24 20:48, Will Deacon wrote:
+> Hi again,
+> 
+> This is version two of the series I previously posted on Monday:
+> 
+>    https://lore.kernel.org/r/20240325185158.8565-1-will@kernel.org
+> 
+> We've got a long weekend coming up in the UK, so I wanted to get this
+> out before I chuck the laptop in the river.
+> 
+> Changes since v1 include:
+> 
+>    * Add Ryan's Reviewed-by on the third patch
+>    * Add an extra patch to ensure correct alignment of range TLBI address
+>      argument
+>    * Tweak commit messages
+> 
+> Cheers,
+> 
+> Will
+
+Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 
 > 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Gavin Shan <gshan@redhat.com>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Mostafa Saleh <smostafa@google.com>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Cc: Quentin Perret <qperret@google.com>
+> Cc: Raghavendra Rao Ananta <rananta@google.com>
+> Cc: Ryan Roberts <ryan.roberts@arm.com>
+> Cc: Shaoqin Huang <shahuang@redhat.com>
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index c9f4f387155f..a3c20d1a36aa 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2293,12 +2293,15 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  		   ID_AA64PFR0_EL1_AdvSIMD |
->  		   ID_AA64PFR0_EL1_FP), },
->  	ID_SANITISED(ID_AA64PFR1_EL1),
-> -	ID_UNALLOCATED(4,2),
-> +	ID_WRITABLE(ID_AA64PFR2_EL1, ~(ID_AA64PFR2_EL1_RES0 |
-> +				       ID_AA64PFR2_EL1_MTEFAR |
-> +				       ID_AA64PFR2_EL1_MTESTOREONLY |
-> +				       ID_AA64PFR2_EL1_MTEPERM)),
->  	ID_UNALLOCATED(4,3),
->  	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
->  	ID_HIDDEN(ID_AA64SMFR0_EL1),
->  	ID_UNALLOCATED(4,6),
-> -	ID_UNALLOCATED(4,7),
-> +	ID_WRITABLE(ID_AA64FPFR0_EL1, ~ID_AA64FPFR0_EL1_RES0),
->  
->  	/* CRm=5 */
->  	{ SYS_DESC(SYS_ID_AA64DFR0_EL1),
-> @@ -2325,7 +2328,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	ID_WRITABLE(ID_AA64ISAR2_EL1, ~(ID_AA64ISAR2_EL1_RES0 |
->  					ID_AA64ISAR2_EL1_APA3 |
->  					ID_AA64ISAR2_EL1_GPA3)),
-> -	ID_UNALLOCATED(6,3),
-> +	ID_WRITABLE(ID_AA64ISAR3_EL1, ~(ID_AA64ISAR2_EL1_RES0 |
-> +					ID_AA64ISAR3_EL1_PACM |
-> +					ID_AA64ISAR3_EL1_TLBIW)),
->  	ID_UNALLOCATED(6,4),
->  	ID_UNALLOCATED(6,5),
->  	ID_UNALLOCATED(6,6),
+> --->8
 > 
-
-Where is the code that enforces the lack of support for MTEFAR,
-MTESTOREONLY, and MTEPERM for SCTLR_ELx, EnPACM and EnFPM in HCRX_EL2?
-And I haven't checked whether TLBI VMALLWS2 can be trapped.
-
-	M.
+> Will Deacon (4):
+>    KVM: arm64: Don't defer TLB invalidation when zapping table entries
+>    KVM: arm64: Don't pass a TLBI level hint when zapping table entries
+>    KVM: arm64: Use TLBI_TTL_UNKNOWN in __kvm_tlb_flush_vmid_range()
+>    KVM: arm64: Ensure target address is granule-aligned for range TLBI
+> 
+>   arch/arm64/kvm/hyp/nvhe/tlb.c |  3 ++-
+>   arch/arm64/kvm/hyp/pgtable.c  | 23 +++++++++++++++--------
+>   arch/arm64/kvm/hyp/vhe/tlb.c  |  3 ++-
+>   3 files changed, 19 insertions(+), 10 deletions(-)
+> 
 
 -- 
-Without deviation from the norm, progress is not possible.
+Shaoqin
+
