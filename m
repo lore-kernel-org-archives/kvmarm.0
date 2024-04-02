@@ -1,119 +1,126 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05DE6168B1
-	for <kvmarm@lists.linux.dev>; Tue,  2 Apr 2024 04:07:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975E02BCE3
+	for <kvmarm@lists.linux.dev>; Tue,  2 Apr 2024 06:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712030857; cv=none; b=L3cze71ey15AtBOv45tsaRJ1pOF5uQo9+K5EooYZKgqnTY4j54BWfgfs+jJa0WCPtE+IELl2kexpvhSJsvsMt20OVvP/rSaQR05KDKJaxuukHF/hFgVSqIjngsJ+2JQ8XbaQVXjJ+tuyzpmQnOehHT45l+11QVT/yFsQkzdQDOs=
+	t=1712040321; cv=none; b=LQVBy2HM+yfDkXUAtDxjH/3cf9E2tzh9z/MXJBslmtQhPnzw2HRRyttWUFwtnk524NGLlG/+I/yYPsY//d+Ue4F09jGJoUUiyZ0x6PZ3WTQbajO+NzghEJaM+RvkX6hhmA6Ja9GAn+nQbuwoy/ypWGKB/Z8G+J3w+V+/5SRZ2IE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712030857; c=relaxed/simple;
-	bh=S5pOtFaXWTZ9drUl1IGdeRTY03Dh2DX28whh4K9thQA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aX6FhHmNayLLckWE1bdnJByDwXSlfty3tD/VaPvhe313qmZYFOfmERSgYhFdahvvKXy3OglKKiQTXXoBV0sd4b0NuDvpdp21h4nR6uwjGBIahnC5on1SU9nNKHhBZz9w0uOTr5D93SNFhtDsTpFFv1Hw5qExEbmvEpGZfQEIBg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2epidrYW; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1712040321; c=relaxed/simple;
+	bh=gzqz7q4r7z0bZ6DFUwqsA0eIefQX12YLOiC0yCy0EbQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OkZROSLlml7nUYYOO/SNzXcUgOw+hG95a/7WSFDogIH2rXSAfsHUxyibCy6d4Vvpb/D5iMNSv7QmPyFIykm62q9Sm/LlHtnMiAuGPu5JddSafkyA0h1X/8WUCzyEbczBlkGlGb8K05weqq7jJjw4XJ+c/pdmiEmo6qoKJEYAQfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=K2lF3pDG; arc=none smtp.client-ip=91.218.175.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2epidrYW"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4154d38ce9dso246445e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 01 Apr 2024 21:07:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712030854; x=1712635654; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DZBWjXNV+ukFYBM6SnOc07suCYCDWH2HqRzY2rUjBLg=;
-        b=2epidrYWhdD6tgoDlQDabbs736Y6ngqbnCvjKUck30qG9y3QU6wtOQNjF02v3qnHma
-         jFA6WC5BGNRX3aGcixI6PGzP83Yk/D9fjNz3PGC49qrhZH7kkWcLOVQDyYNPV3KqYhWB
-         NidU1kDZ91e1wKearBVxOtXE21HzQoYfaCG9bvvllT4KgXK2USu2O56i3rQ1t0nPeuZA
-         4S/g688uzA0Gmb1fUgju8J/dWcd91f3G1eZGvsuFgnjG+/EgkNQsu1Q2q1Vyq0q5mkHZ
-         jz1g//pfsfvqOmXCisV7Y0subSwBQPyK9XjiLwzkh5wCSLAiaSUnbB9I4DuuDNqsJ2FX
-         9SKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712030854; x=1712635654;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DZBWjXNV+ukFYBM6SnOc07suCYCDWH2HqRzY2rUjBLg=;
-        b=HzzAc3ZrP7MkknUhHhzWbN94BnMgdEixw41ihClpBtKj8wNeEsQvrfXxPq0qAJH7lM
-         qIGQoGHpXA5CgizE3PvKgGF0j5HWXDaBacF7E6LlsGGNINPQT+4M1jm2JdDsaeW4AL4z
-         UxpxAH8vY9e+Qg3/dt+l8Z9TwtuYxG9XY536muacpNgO6v6IrpmdWlXnQHm7SchbKwK0
-         o3Z7F545WP2iBqxYt3XV2sM8AEaEGeieLmBYRk+HKQg3VevchEd9u+qmEN0fk63DlnqI
-         p0fiFhTkqdxdvOkZGWT0hE2JWuxChXnEvygDHY2iveoCernYEB7SJ/i4elCTIHLl/5DO
-         87jw==
-X-Forwarded-Encrypted: i=1; AJvYcCVXKux71lB/XsMyOEuLFjdCD7jMYn/VT2dHlrAQb8AO2YXfItQf5Hpv1LCaK+5fBwEP9yCLPAHu5tyxirU/pUF2m7nYuFAH
-X-Gm-Message-State: AOJu0YweusmQ3vZGjMjuhF+rdt14v/SrO3suDYOhilMrC6oS4Pddchlo
-	ETo3GFHky7GedqGxnxCoVU3xW9cTDCdMjwBfxnE/o0MWd107V+yKpW2YWYGFoOgltdQ7tZXGsQp
-	emhqXnDlv5lUOBOxxZM0RAnv5CyokP6CPtIFt
-X-Google-Smtp-Source: AGHT+IFySGf8Ru8vCkM5wQVTeOgNnN+X2acwQrfk019Ub2hqyb57NNeXzO4CL4BJZpMyCPNeydNs/OxpDN34ONprOII=
-X-Received: by 2002:a05:600c:358d:b0:414:1ee:f375 with SMTP id
- p13-20020a05600c358d00b0041401eef375mr713615wmq.0.1712030854163; Mon, 01 Apr
- 2024 21:07:34 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="K2lF3pDG"
+Date: Mon, 1 Apr 2024 23:45:05 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1712040317;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mq9AuEi8/S5UYzDB5Bm6UzRBTBeITNOQlNgUFt/hCLA=;
+	b=K2lF3pDGykNJP+Odcxr6HVpWjmQPj6gwa7brhClqMg/6VKUv5dJLjc0uGwlIBEMzvpNksK
+	GI92H4xJXnZzVUSChZVGmD5pqHoT4rQ0Guqo8gwSYOqAXou00eCuwu4bskpI3l1A4oc3CO
+	RukxUi8EYtV2fn+IqGBbjnQXZ46Cjqk=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Shaoqin Huang <shahuang@redhat.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.9, part #1
+Message-ID: <ZgupcZjEGLTmed_5@linux.dev>
+References: <ZgtsA88wkIDaKEXk@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240401232946.1837665-1-jthoughton@google.com> <20240401232946.1837665-7-jthoughton@google.com>
-In-Reply-To: <20240401232946.1837665-7-jthoughton@google.com>
-From: Yu Zhao <yuzhao@google.com>
-Date: Tue, 2 Apr 2024 00:06:56 -0400
-Message-ID: <CAOUHufaQ-g6L5roB-3K0GamuS3p9ACpPj9XM-NF67GgrjoTj_A@mail.gmail.com>
-Subject: Re: [PATCH v3 6/7] KVM: arm64: Participate in bitmap-based PTE aging
-To: James Houghton <jthoughton@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	David Matlack <dmatlack@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Sean Christopherson <seanjc@google.com>, 
-	Jonathan Corbet <corbet@lwn.net>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Gavin Shan <gshan@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	David Rientjes <rientjes@google.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org, 
-	linux-trace-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZgtsA88wkIDaKEXk@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Apr 1, 2024 at 7:30=E2=80=AFPM James Houghton <jthoughton@google.co=
-m> wrote:
->
-> Participate in bitmap-based aging while grabbing the KVM MMU lock for
-> reading. Ideally we wouldn't need to grab this lock at all, but that
-> would require a more intrustive and risky change.
-                       ^^^^^^^^^^ intrusive
-This sounds subjective -- I'd just present the challenges and let
-reviewers make their own judgements.
++cc lists...
 
-> Also pass
-> KVM_PGTABLE_WALK_SHARED, as this software walker is safe to run in
-> parallel with other walkers.
->
-> It is safe only to grab the KVM MMU lock for reading as the kvm_pgtable
-> is destroyed while holding the lock for writing, and freeing of the page
-> table pages is either done while holding the MMU lock for writing or
-> after an RCU grace period.
->
-> When mkold =3D=3D false, record the young pages in the passed-in bitmap.
->
-> When mkold =3D=3D true, only age the pages that need aging according to t=
-he
-> passed-in bitmap.
->
-> Suggested-by: Yu Zhao <yuzhao@google.com>
-
-Thanks but I did not suggest this.
-
-What I have in v2 is RCU based. I hope Oliver or someone else can help
-make that work. Otherwise we can just drop this for now and revisit
-later.
-
-(I have no problems with this patch if the Arm folks think the
-RCU-based version doesn't have a good ROI.)
+On Mon, Apr 01, 2024 at 07:23:13PM -0700, Oliver Upton wrote:
+> Hi Paolo,
+> 
+> Here's the first set of fixes for 6.9. Several good fixes piled up here,
+> partly because I've had limited availability due to travel.
+> 
+> Details are in the tag. Please pull.
+> 
+> -- 
+> Best,
+> Oliver
+> 
+> The following changes since commit 4cece764965020c22cff7665b18a012006359095:
+> 
+>   Linux 6.9-rc1 (2024-03-24 14:10:05 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.9-1
+> 
+> for you to fetch changes up to d96c66ab9fb3ad8b243669cf6b41e68d0f7f9ecd:
+> 
+>   KVM: arm64: Rationalise KVM banner output (2024-04-01 01:33:52 -0700)
+> 
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for 6.9, part #1
+> 
+>  - Ensure perf events programmed to count during guest execution
+>    are actually enabled before entering the guest in the nVHE
+>    configuration.
+> 
+>  - Restore out-of-range handler for stage-2 translation faults.
+> 
+>  - Several fixes to stage-2 TLB invalidations to avoid stale
+>    translations, possibly including partial walk caches.
+> 
+>  - Fix early handling of architectural VHE-only systems to ensure E2H is
+>    appropriately set.
+> 
+>  - Correct a format specifier warning in the arch_timer selftest.
+> 
+>  - Make the KVM banner message correctly handle all of the possible
+>    configurations.
+> 
+> ----------------------------------------------------------------
+> Marc Zyngier (2):
+>       arm64: Fix early handling of FEAT_E2H0 not being implemented
+>       KVM: arm64: Rationalise KVM banner output
+> 
+> Oliver Upton (1):
+>       KVM: arm64: Fix host-programmed guest events in nVHE
+> 
+> Sean Christopherson (1):
+>       KVM: selftests: Fix __GUEST_ASSERT() format warnings in ARM's arch timer test
+> 
+> Will Deacon (4):
+>       KVM: arm64: Don't defer TLB invalidation when zapping table entries
+>       KVM: arm64: Don't pass a TLBI level hint when zapping table entries
+>       KVM: arm64: Use TLBI_TTL_UNKNOWN in __kvm_tlb_flush_vmid_range()
+>       KVM: arm64: Ensure target address is granule-aligned for range TLBI
+> 
+> Wujie Duan (1):
+>       KVM: arm64: Fix out-of-IPA space translation fault handling
+> 
+>  arch/arm64/kernel/head.S                         | 29 +++++++++++++-----------
+>  arch/arm64/kvm/arm.c                             | 13 ++++-------
+>  arch/arm64/kvm/hyp/nvhe/tlb.c                    |  3 ++-
+>  arch/arm64/kvm/hyp/pgtable.c                     | 23 ++++++++++++-------
+>  arch/arm64/kvm/hyp/vhe/tlb.c                     |  3 ++-
+>  arch/arm64/kvm/mmu.c                             |  2 +-
+>  include/kvm/arm_pmu.h                            |  2 +-
+>  tools/testing/selftests/kvm/aarch64/arch_timer.c |  2 +-
+>  8 files changed, 43 insertions(+), 34 deletions(-)
