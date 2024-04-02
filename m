@@ -1,39 +1,43 @@
-Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B2E74262
-	for <kvmarm@lists.linux.dev>; Tue,  2 Apr 2024 13:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B55684A48
+	for <kvmarm@lists.linux.dev>; Tue,  2 Apr 2024 13:27:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712064468; cv=none; b=b0RkuP9AZicdFQE0eKZRMLxBS5XeCBBeFAkRA6zNDAoJIqXKmGDA+iYdTf6BOxDV1hEbmL1Ix7P+DDqNX2h5il2dBzLHndLr9RQ6FFKI7pOrBG2rRw7JR73SgzXJGBHceyOFSH6lOG6FN2gCFu+c6cZx2vxkccc7Y71cWoEabtA=
+	t=1712064472; cv=none; b=kwAfVwd616WvOgPpq0Ve9+/HIaq4s1iCAe/T5tyQg5BABOQWrQabmoG5iXSzpia3SEBAUhGy0QPI04iPPTWXCfUR3uO+6AQHyBNzxyBhQdjbTvtnkyVi6RtBXVvizmnkZp3/A4g5W/D0ATNuTioXSF13rReqdovctIm5JoWnkDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712064468; c=relaxed/simple;
-	bh=A/rTTPqrCoyg36MgBTNf49qln1SSobbhglp59O+QlIY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-type; b=XMWewWYgUD3xhj9700jWt66BTTrSBvMHel2HDO6ajBP1c3rRtebByd2Aq5oYRu2en2w5VI6RGOpjhxnVY0bY7c8WEKyikn3XPcNNjiscR5Cl+jayU6/qYL8RRwJDjYVKchAo8McvF9zjZWAcNXuXcyOEMJQvk/wyM9NbJWjNpxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XWSA/VMJ; arc=none smtp.client-ip=95.215.58.184
+	s=arc-20240116; t=1712064472; c=relaxed/simple;
+	bh=8WoQMDX9PjkTiMoh/bKUl2t9/+IvRh90KSbDPkuMtJ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-type; b=auBddqyzj3Xnjj0/vWTah0sg65dyO23gyRGMvon1/rjZPPogjs0fA2Xau/qTq6rTNIlCQ39FbnxGueq/vlMC2XjtGnFp83DBsqnPOO7MsQWN+VatsYnFF13Do6W3U2LrnVoucRSjEJDKw9YmBNHaoUNQiGHauPWMuO023fn6nXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TUZ2p55q; arc=none smtp.client-ip=91.218.175.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XWSA/VMJ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TUZ2p55q"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1712064463;
+	t=1712064467;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=xzX+gZL9/KhMjnkbSvLboQKMddWxVBZs8UOodA2e+YA=;
-	b=XWSA/VMJatrVF8cw00TRLRNsa978tFZXcVspKcHTk5s12n7gExqyC1321+X9XAG1wgIrjx
-	v+N7WxYFeMwVaqMxVXD8NwJgc90jmlgauK9qvakT/wI1Oz3/za3MIHCyEnjaSDAKm5V6lq
-	lxlbG7dFt2Q5yW4f1Y/C224b+L28bvk=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rQ983P7mdXMBoWSGPXJK87yDU4col+MjJS8LnJtNt14=;
+	b=TUZ2p55qyp9/0VuxsP91G18OPfEQAwxbN/e3f5WdKJ1xSwcjqF6j3CLwhyOPSy1Jymu9GH
+	H7t2hWErBjf9JDdv3DZ5HbvjSfQS8LTaYP92mRdNZRjENHQgfPhBKa3jwFf2U5U1iy/L4L
+	3+fwFn0fdYofMnYzLxzPl2nfw50dTTc=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: alexandru.elisei@arm.com,
 	eric.auger@redhat.com,
 	nikos.nikoleris@arm.com,
 	shahuang@redhat.com
-Subject: [kvm-unit-tests PATCH v2 0/2] arm/arm64: Use 'max' cpu and gic types
-Date: Tue,  2 Apr 2024 15:27:40 +0200
-Message-ID: <20240402132739.201939-5-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v2 1/3] arm64: Prepare for LPA2
+Date: Tue,  2 Apr 2024 15:27:41 +0200
+Message-ID: <20240402132739.201939-6-andrew.jones@linux.dev>
+In-Reply-To: <20240402132739.201939-5-andrew.jones@linux.dev>
+References: <20240402132739.201939-5-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,28 +48,77 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The arm64 'max' CPU type enables all features, so it makes sense to use
-it for testing to ensure we're testing the latest models. The 'max' GIC
-is used to pick the latest GIC model by default which is better than
-defaulting to gicv2 since it tests a later model and, when more
-than 8 CPUs are configured, it'll actually work. We don't need to
-convert 'max' to 'host' with KVM/HVF since 'max' is an alias for
-'host' when those accelerators are enabled.
+When checking for supported granules also check for the values
+which indicate support when LPA2 is implemented.
 
-v2:
- - Forgot to test with efi on v1 and testing now found an issue.
-   Add a patch to allow '-cpu max', which has LPA2, to work with efi.
-
-Andrew Jones (3):
-  arm64: Prepare for LPA2
-  arm/arm64: Use 'max' gic type
-  arm64: Use 'max' cpu type
-
- arm/run                   |  8 +------
- configure                 |  2 +-
+Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
+---
  lib/arm64/asm/processor.h | 49 +++++++++++++++++++++------------------
- 3 files changed, 29 insertions(+), 30 deletions(-)
+ 1 file changed, 27 insertions(+), 22 deletions(-)
 
+diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+index 1c73ba32725a..bab9c26c2c9e 100644
+--- a/lib/arm64/asm/processor.h
++++ b/lib/arm64/asm/processor.h
+@@ -110,31 +110,36 @@ static inline unsigned long get_id_aa64mmfr0_el1(void)
+ #define ID_AA64MMFR0_TGRAN64_SHIFT	24
+ #define ID_AA64MMFR0_TGRAN16_SHIFT	20
+ 
+-#define ID_AA64MMFR0_TGRAN4_SUPPORTED	0x0
+-#define ID_AA64MMFR0_TGRAN64_SUPPORTED	0x0
+-#define ID_AA64MMFR0_TGRAN16_SUPPORTED	0x1
++#define ID_AA64MMFR0_TGRAN4_SUPPORTED(r)			\
++({								\
++	u64 __v = ((r) >> ID_AA64MMFR0_TGRAN4_SHIFT) & 0xf;	\
++	(__v) == 0 || (__v) == 1;				\
++})
++
++#define ID_AA64MMFR0_TGRAN64_SUPPORTED(r)			\
++({								\
++	u64 __v = ((r) >> ID_AA64MMFR0_TGRAN64_SHIFT) & 0xf;	\
++	(__v) == 0;						\
++})
++
++#define ID_AA64MMFR0_TGRAN16_SUPPORTED(r)			\
++({								\
++	u64 __v = ((r) >> ID_AA64MMFR0_TGRAN16_SHIFT) & 0xf;	\
++	(__v) == 1 || (__v) == 2;				\
++})
+ 
+ static inline bool system_supports_granule(size_t granule)
+ {
+-	u32 shift;
+-	u32 val;
+-	u64 mmfr0;
+-
+-	if (granule == SZ_4K) {
+-		shift = ID_AA64MMFR0_TGRAN4_SHIFT;
+-		val = ID_AA64MMFR0_TGRAN4_SUPPORTED;
+-	} else if (granule == SZ_16K) {
+-		shift = ID_AA64MMFR0_TGRAN16_SHIFT;
+-		val = ID_AA64MMFR0_TGRAN16_SUPPORTED;
+-	} else {
+-		assert(granule == SZ_64K);
+-		shift = ID_AA64MMFR0_TGRAN64_SHIFT;
+-		val = ID_AA64MMFR0_TGRAN64_SUPPORTED;
+-	}
+-
+-	mmfr0 = get_id_aa64mmfr0_el1();
+-
+-	return ((mmfr0 >> shift) & 0xf) == val;
++	u64 mmfr0 = get_id_aa64mmfr0_el1();
++
++	if (granule == SZ_4K)
++		return ID_AA64MMFR0_TGRAN4_SUPPORTED(mmfr0);
++
++	if (granule == SZ_16K)
++		return ID_AA64MMFR0_TGRAN16_SUPPORTED(mmfr0);
++
++	assert(granule == SZ_64K);
++	return ID_AA64MMFR0_TGRAN64_SUPPORTED(mmfr0);
+ }
+ 
+ #endif /* !__ASSEMBLY__ */
 -- 
 2.44.0
 
