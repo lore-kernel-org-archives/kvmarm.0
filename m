@@ -1,43 +1,39 @@
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945D86FE24
-	for <kvmarm@lists.linux.dev>; Tue,  2 Apr 2024 12:22:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B2E74262
+	for <kvmarm@lists.linux.dev>; Tue,  2 Apr 2024 13:27:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712060524; cv=none; b=n6+9USRm6ymtwwk9xvg0VWRzJ3XwrA2HXsBDwcP7+VAYEjFFtUvQHg5UlQ638/0HqN8Y+y093tpTpvslHmwOQIdKSzp4NWSNld+rbZ/M+PUVc4rR11MTMpcx5tuyP+EcyAqHbhIcgMkkC/nxDUI7hTUsJ/IAH8epgq6+qKarZZk=
+	t=1712064468; cv=none; b=b0RkuP9AZicdFQE0eKZRMLxBS5XeCBBeFAkRA6zNDAoJIqXKmGDA+iYdTf6BOxDV1hEbmL1Ix7P+DDqNX2h5il2dBzLHndLr9RQ6FFKI7pOrBG2rRw7JR73SgzXJGBHceyOFSH6lOG6FN2gCFu+c6cZx2vxkccc7Y71cWoEabtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712060524; c=relaxed/simple;
-	bh=qO+1kZ9z+wiqLzzL6/wv/zlJxuZvbU2fKRhakiTfi+c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=ewua/qkuXxyVZm7QSBLyxVHlu4syRuKCBWeMqwskEHM9cI05F0uLjRsw6MCiZelt8nYHXeHiY7tDt00thalLBYzN7BFWZEITZiTBDdFcqUZrRk9CxMVwoWKG0yfV90CBPtLRXB+tAlJ89/YNL4KGQFooCdZrILiSXCzDhbRpAok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CJvWgEZW; arc=none smtp.client-ip=95.215.58.172
+	s=arc-20240116; t=1712064468; c=relaxed/simple;
+	bh=A/rTTPqrCoyg36MgBTNf49qln1SSobbhglp59O+QlIY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-type; b=XMWewWYgUD3xhj9700jWt66BTTrSBvMHel2HDO6ajBP1c3rRtebByd2Aq5oYRu2en2w5VI6RGOpjhxnVY0bY7c8WEKyikn3XPcNNjiscR5Cl+jayU6/qYL8RRwJDjYVKchAo8McvF9zjZWAcNXuXcyOEMJQvk/wyM9NbJWjNpxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XWSA/VMJ; arc=none smtp.client-ip=95.215.58.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CJvWgEZW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XWSA/VMJ"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1712060520;
+	t=1712064463;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hAI/rR5u7QPYMiby7bfEdez/iaHCDgvC0CWKgnQup0M=;
-	b=CJvWgEZWgFF6UEwAxOj18AxnAp366dTiiu3I555I/kLcCrKSlnQ+A6Xl2VfEpe0LTXVpPs
-	OfMeJyKpwF2yYtrH8be6x2XEB1VtRdwoEkxO5lJDBy4NHUSO76oADLIHvNrPFTSALZfmuf
-	aA9UbTq4ac5EDbxIRTNpqd48BIuojmA=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=xzX+gZL9/KhMjnkbSvLboQKMddWxVBZs8UOodA2e+YA=;
+	b=XWSA/VMJatrVF8cw00TRLRNsa978tFZXcVspKcHTk5s12n7gExqyC1321+X9XAG1wgIrjx
+	v+N7WxYFeMwVaqMxVXD8NwJgc90jmlgauK9qvakT/wI1Oz3/za3MIHCyEnjaSDAKm5V6lq
+	lxlbG7dFt2Q5yW4f1Y/C224b+L28bvk=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: alexandru.elisei@arm.com,
 	eric.auger@redhat.com,
 	nikos.nikoleris@arm.com,
 	shahuang@redhat.com
-Subject: [kvm-unit-tests PATCH 2/2] arm64: Use 'max' cpu type
-Date: Tue,  2 Apr 2024 14:21:55 +0200
-Message-ID: <20240402122153.101931-6-andrew.jones@linux.dev>
-In-Reply-To: <20240402122153.101931-4-andrew.jones@linux.dev>
-References: <20240402122153.101931-4-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v2 0/2] arm/arm64: Use 'max' cpu and gic types
+Date: Tue,  2 Apr 2024 15:27:40 +0200
+Message-ID: <20240402132739.201939-5-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,32 +44,28 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The 'max' GIC type has been supported for six years (Mar. 2018).
-Ever since its introduction we've considered switching to it for the
-default in the run scripts in order to test more modern models by
-default. Let's finally do it!
+The arm64 'max' CPU type enables all features, so it makes sense to use
+it for testing to ensure we're testing the latest models. The 'max' GIC
+is used to pick the latest GIC model by default which is better than
+defaulting to gicv2 since it tests a later model and, when more
+than 8 CPUs are configured, it'll actually work. We don't need to
+convert 'max' to 'host' with KVM/HVF since 'max' is an alias for
+'host' when those accelerators are enabled.
 
-(HVF's support for '-cpu max' is younger (only 2 years), but that
-should also be old enough.)
+v2:
+ - Forgot to test with efi on v1 and testing now found an issue.
+   Add a patch to allow '-cpu max', which has LPA2, to work with efi.
 
-Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
----
- configure | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Andrew Jones (3):
+  arm64: Prepare for LPA2
+  arm/arm64: Use 'max' gic type
+  arm64: Use 'max' cpu type
 
-diff --git a/configure b/configure
-index 49f047cb2d7d..078271822b10 100755
---- a/configure
-+++ b/configure
-@@ -273,7 +273,7 @@ fi
- [ -z "$processor" ] && processor="$arch"
- 
- if [ "$processor" = "arm64" ]; then
--    processor="cortex-a57"
-+    processor="max"
- elif [ "$processor" = "arm" ]; then
-     processor="cortex-a15"
- fi
+ arm/run                   |  8 +------
+ configure                 |  2 +-
+ lib/arm64/asm/processor.h | 49 +++++++++++++++++++++------------------
+ 3 files changed, 29 insertions(+), 30 deletions(-)
+
 -- 
 2.44.0
 
