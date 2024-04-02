@@ -1,126 +1,105 @@
-Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975E02BCE3
-	for <kvmarm@lists.linux.dev>; Tue,  2 Apr 2024 06:45:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE72E2DF84
+	for <kvmarm@lists.linux.dev>; Tue,  2 Apr 2024 07:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712040321; cv=none; b=LQVBy2HM+yfDkXUAtDxjH/3cf9E2tzh9z/MXJBslmtQhPnzw2HRRyttWUFwtnk524NGLlG/+I/yYPsY//d+Ue4F09jGJoUUiyZ0x6PZ3WTQbajO+NzghEJaM+RvkX6hhmA6Ja9GAn+nQbuwoy/ypWGKB/Z8G+J3w+V+/5SRZ2IE=
+	t=1712041236; cv=none; b=YBLUvLaidfVwLjw1PX2hp1rjy5B/88pc1sgdQ2mD6dHNJrClx15GOb5TSuQzY9T0E1f4XoDd+RE0pef8sddYH2pUkzWzkTu20pHQ8FjsuAI7kkPpm8EiUqk08StK/a5HEwhYsiokLdkegeTmdptDMJ2eu16boCTCvqKCQ+1BTh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712040321; c=relaxed/simple;
-	bh=gzqz7q4r7z0bZ6DFUwqsA0eIefQX12YLOiC0yCy0EbQ=;
+	s=arc-20240116; t=1712041236; c=relaxed/simple;
+	bh=DWwpz4wCjpd3OHwoJNho95qF247VTvrYLLaNHUDRIQs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OkZROSLlml7nUYYOO/SNzXcUgOw+hG95a/7WSFDogIH2rXSAfsHUxyibCy6d4Vvpb/D5iMNSv7QmPyFIykm62q9Sm/LlHtnMiAuGPu5JddSafkyA0h1X/8WUCzyEbczBlkGlGb8K05weqq7jJjw4XJ+c/pdmiEmo6qoKJEYAQfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=K2lF3pDG; arc=none smtp.client-ip=91.218.175.175
+	 Content-Type:Content-Disposition:In-Reply-To; b=IgMPrhEkk7d8U//zGniJQw5g1DP2406iYI5BIAek4UaBOq4klxAA5n1V1slFSh39qw1qAh+V1c4BHkueH6X+LXwtwdZ6Rr7Dr+2Uf0UMmCH8T/ZaE38ZdbjvD1JEgYPBz14hZvQW+vnl7Rc9ICwmkWp3OszZW5OsBwtEdt9L0GY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KgJN+PKw; arc=none smtp.client-ip=91.218.175.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="K2lF3pDG"
-Date: Mon, 1 Apr 2024 23:45:05 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KgJN+PKw"
+Date: Tue, 2 Apr 2024 00:00:12 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1712040317;
+	t=1712041232;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mq9AuEi8/S5UYzDB5Bm6UzRBTBeITNOQlNgUFt/hCLA=;
-	b=K2lF3pDGykNJP+Odcxr6HVpWjmQPj6gwa7brhClqMg/6VKUv5dJLjc0uGwlIBEMzvpNksK
-	GI92H4xJXnZzVUSChZVGmD5pqHoT4rQ0Guqo8gwSYOqAXou00eCuwu4bskpI3l1A4oc3CO
-	RukxUi8EYtV2fn+IqGBbjnQXZ46Cjqk=
+	bh=jhuzyWXDmRkSGaUwWTpdDkWh7n7iwav7be8n1ReoOqg=;
+	b=KgJN+PKwUf4lvMCNNgRHnuy8Gq613K2HNrcIC+CQUk8Sf/7s4Hx+E56N6lZRoCSA0Dlm9q
+	gxlbMuDbSrzUHZgC90oQuyB0Kd8gPYgsVUsYB6BOdjK0DzwQ2E0WmDAtMn29DrZYMJC+lr
+	+c9QBLLVlmBOcBZkzESUyH9WEo8wfW4=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	James Morse <james.morse@arm.com>,
+To: Yu Zhao <yuzhao@google.com>
+Cc: James Houghton <jthoughton@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	David Matlack <dmatlack@google.com>, Marc Zyngier <maz@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Jonathan Corbet <corbet@lwn.net>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Shaoqin Huang <shahuang@redhat.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.9, part #1
-Message-ID: <ZgupcZjEGLTmed_5@linux.dev>
-References: <ZgtsA88wkIDaKEXk@linux.dev>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Shaoqin Huang <shahuang@redhat.com>, Gavin Shan <gshan@redhat.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	David Rientjes <rientjes@google.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org,
+	linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 6/7] KVM: arm64: Participate in bitmap-based PTE aging
+Message-ID: <Zgus_A_cJ68f6glV@linux.dev>
+References: <20240401232946.1837665-1-jthoughton@google.com>
+ <20240401232946.1837665-7-jthoughton@google.com>
+ <CAOUHufaQ-g6L5roB-3K0GamuS3p9ACpPj9XM-NF67GgrjoTj_A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZgtsA88wkIDaKEXk@linux.dev>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOUHufaQ-g6L5roB-3K0GamuS3p9ACpPj9XM-NF67GgrjoTj_A@mail.gmail.com>
 X-Migadu-Flow: FLOW_OUT
 
-+cc lists...
+On Tue, Apr 02, 2024 at 12:06:56AM -0400, Yu Zhao wrote:
+> On Mon, Apr 1, 2024 at 7:30 PM James Houghton <jthoughton@google.com> wrote:
+> > Suggested-by: Yu Zhao <yuzhao@google.com>
+> 
+> Thanks but I did not suggest this.
 
-On Mon, Apr 01, 2024 at 07:23:13PM -0700, Oliver Upton wrote:
-> Hi Paolo,
-> 
-> Here's the first set of fixes for 6.9. Several good fixes piled up here,
-> partly because I've had limited availability due to travel.
-> 
-> Details are in the tag. Please pull.
-> 
-> -- 
-> Best,
-> Oliver
-> 
-> The following changes since commit 4cece764965020c22cff7665b18a012006359095:
-> 
->   Linux 6.9-rc1 (2024-03-24 14:10:05 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.9-1
-> 
-> for you to fetch changes up to d96c66ab9fb3ad8b243669cf6b41e68d0f7f9ecd:
-> 
->   KVM: arm64: Rationalise KVM banner output (2024-04-01 01:33:52 -0700)
-> 
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 6.9, part #1
-> 
->  - Ensure perf events programmed to count during guest execution
->    are actually enabled before entering the guest in the nVHE
->    configuration.
-> 
->  - Restore out-of-range handler for stage-2 translation faults.
-> 
->  - Several fixes to stage-2 TLB invalidations to avoid stale
->    translations, possibly including partial walk caches.
-> 
->  - Fix early handling of architectural VHE-only systems to ensure E2H is
->    appropriately set.
-> 
->  - Correct a format specifier warning in the arch_timer selftest.
-> 
->  - Make the KVM banner message correctly handle all of the possible
->    configurations.
-> 
-> ----------------------------------------------------------------
-> Marc Zyngier (2):
->       arm64: Fix early handling of FEAT_E2H0 not being implemented
->       KVM: arm64: Rationalise KVM banner output
-> 
-> Oliver Upton (1):
->       KVM: arm64: Fix host-programmed guest events in nVHE
-> 
-> Sean Christopherson (1):
->       KVM: selftests: Fix __GUEST_ASSERT() format warnings in ARM's arch timer test
-> 
-> Will Deacon (4):
->       KVM: arm64: Don't defer TLB invalidation when zapping table entries
->       KVM: arm64: Don't pass a TLBI level hint when zapping table entries
->       KVM: arm64: Use TLBI_TTL_UNKNOWN in __kvm_tlb_flush_vmid_range()
->       KVM: arm64: Ensure target address is granule-aligned for range TLBI
-> 
-> Wujie Duan (1):
->       KVM: arm64: Fix out-of-IPA space translation fault handling
-> 
->  arch/arm64/kernel/head.S                         | 29 +++++++++++++-----------
->  arch/arm64/kvm/arm.c                             | 13 ++++-------
->  arch/arm64/kvm/hyp/nvhe/tlb.c                    |  3 ++-
->  arch/arm64/kvm/hyp/pgtable.c                     | 23 ++++++++++++-------
->  arch/arm64/kvm/hyp/vhe/tlb.c                     |  3 ++-
->  arch/arm64/kvm/mmu.c                             |  2 +-
->  include/kvm/arm_pmu.h                            |  2 +-
->  tools/testing/selftests/kvm/aarch64/arch_timer.c |  2 +-
->  8 files changed, 43 insertions(+), 34 deletions(-)
+Entirely up to you, but I would still want to credit everyone who
+contributed to a feature even if the underlying implementation has
+changed since the original attempt.
+
+> What I have in v2 is RCU based. I hope Oliver or someone else can help
+> make that work.
+
+Why? If there's data to show that RCU has a material benefit over taking
+the MMU lock for read then I'm all for it. Otherwise, the work required
+to support page-table walkers entirely outside of the MMU lock isn't
+justified.
+
+In addition to ensuring that page table teardown is always RCU-safe,
+we'd need to make sure all of the walkers that take the write lock are
+prepared to handle races.
+
+> Otherwise we can just drop this for now and revisit
+> later.
+
+I really wouldn't get hung up on the locking as the make-or-break for
+whether arm64 supports this MMU notifier.
+
+-- 
+Thanks,
+Oliver
