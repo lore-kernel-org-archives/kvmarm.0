@@ -1,124 +1,111 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8CD98595C;
-	Tue,  2 Apr 2024 14:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD6D414B077;
+	Tue,  2 Apr 2024 16:20:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712069617; cv=none; b=IQc5puMsMAKZO99uY5aqVJ+ExfzFV8QAetmlXBGMpR3bodV9UOrFNK1O0cR2i1MN+SlpTOyS2V5IPhVgeDvYUiVJtvw264Za+VnCN4oicacu+Cy9d9dobziRoEzjw6hE/piLuoNTdm2CBoiD34wCqb8aBwHDFl6zkoshzXU4s3Y=
+	t=1712074843; cv=none; b=Q5vM6WaGSz7TSYnMPh3v2KE2xvyMKZzthk6OJvFLaHWFGG8yHAenRLA6W6ezEnVDDAEMKqUF4dQ7r31cvhOY93aRcvTa+MfQxRmJg+Jstnkn3vPqgABXVjiT/3WTZSYWFrg/+1phIdIsVUW4rLEbYfIeo4hOKgjJCmZGtoV0Ewo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712069617; c=relaxed/simple;
-	bh=vhQsnvRHzwOy3ox3OvUmqvwn0itwQb57/FmYwbndCXU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tdhKOhAIJB09r6zXm66mKr7tPndtFmuX2mUgV6t7lsvvA4tCvhYdH6lpOcuCmWes+DYrUWhlY4sBxpm7LPCzWbFklpkx8DCfilIGIS5RzippkjiGbd20mDnpChP3MLrJpGaVbvJYaMtDbScXNrdE782nEfdejQanZYrIjwSGKwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u9wM5BM1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712074843; c=relaxed/simple;
+	bh=1nEuOFAWZ57fj7SwvMx9awMLbIaQIeYglVGlMpWXeQs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T89A9h7lOhawF0MmjI/cqXcZ4lR4P0uf6lce7GAlHeJ/Yjay/aUz/jsCaWp0wxBkKOja/qblxdO2poH9gZE92Gu4JTTMcP9rToljA8vrO5kTZEr1Cy5auMy3U8rK3EdY2oCIYAtqGP+WbMdvVZqxTqFaEXPdEitIktyfEjPpFa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sc1KfrtT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u9wM5BM1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 509FAC43390;
-	Tue,  2 Apr 2024 14:53:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sc1KfrtT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A64C1C433F1;
+	Tue,  2 Apr 2024 16:20:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712069616;
-	bh=vhQsnvRHzwOy3ox3OvUmqvwn0itwQb57/FmYwbndCXU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=u9wM5BM1zVlflI8QFJDAHZYDZYOnPeNYUCR981yXBTjIUiYAuk/3ukwrzYyE9RB94
-	 ggNYHgQ1aWLaJAIwPMuPzimCq9JWUddvfke5tuHoM0dsQKwtlwps5xe/l4EwBAzHDD
-	 rf1z2ocnPeEVj5O5c+AsMaSSwuS16ukcZIEKrjjEBxANfz4eCcf1IS4sLyBX7WGV4J
-	 X6bfAXGXEkMAukyHifrFowQ8fi42i71UHSa2nc5rdtHTyYs00rXjuHJJ55XSR2HdyJ
-	 0d0USc13F8w/JmKNxjLr8RyCue8Q7EheKu9KzyehW7omtUJefOH2yADQqrus5BNuSp
-	 yCsACeDACsJbQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rrfW1-000lX6-Ji;
-	Tue, 02 Apr 2024 15:53:33 +0100
-Date: Tue, 02 Apr 2024 15:53:33 +0100
-Message-ID: <86h6gju87m.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
+	s=k20201202; t=1712074842;
+	bh=1nEuOFAWZ57fj7SwvMx9awMLbIaQIeYglVGlMpWXeQs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sc1KfrtToUvAjh9YwNkASIEnW2mKzUNCuV7C5CoOKKA68BM1WZcr63qdMLRvbOfdn
+	 5tPViqvFFNvnb3yhZ4Yv9ijd8gFBfRuUtEvRKmid8CR8lq+kSkauZLdvnAMU52RPqZ
+	 QA1iZyLMa/qz7/mghKhjCpds4O4Zmyq/glyN/k6LYahZjcyImQ4A7OQkpQ1laZ7GgV
+	 ip7cPgWNZJIDGusABNuZLmquTrGlpNTGUA7G+PqxMl2PW0lIyPgEzNU3wqb9LmOjOF
+	 IoEZG8Iy1Z1eNOZbs707mv1vd593dmo3EPIF3nrywfERER2Jmk3aiDQaMldIz1kkz5
+	 g/yJlS9czCHmg==
+Date: Tue, 2 Apr 2024 17:20:36 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Dave Martin <Dave.Martin@arm.com>,
-	kvmarm@lists.linux.dev,
-	linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v6 1/5] KVM: arm64: Share all userspace hardened thread data with the hypervisor
-In-Reply-To: <fb54d7b0-9c83-4a0c-a08b-b722c9381ca7@sirena.org.uk>
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.linux.dev,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v6 1/5] KVM: arm64: Share all userspace hardened thread
+ data with the hypervisor
+Message-ID: <562e1ddb-75e5-4c02-83ea-b946b88d35c8@sirena.org.uk>
 References: <20240329-arm64-2023-dpisa-v6-0-ba42db6c27f3@kernel.org>
-	<20240329-arm64-2023-dpisa-v6-1-ba42db6c27f3@kernel.org>
-	<87msqesoty.wl-maz@kernel.org>
-	<fb54d7b0-9c83-4a0c-a08b-b722c9381ca7@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240329-arm64-2023-dpisa-v6-1-ba42db6c27f3@kernel.org>
+ <87msqesoty.wl-maz@kernel.org>
+ <fb54d7b0-9c83-4a0c-a08b-b722c9381ca7@sirena.org.uk>
+ <86h6gju87m.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, corbet@lwn.net, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Dave.Martin@arm.com, kvmarm@lists.linux.dev, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ZsRoYufVRq8HDIbM"
+Content-Disposition: inline
+In-Reply-To: <86h6gju87m.wl-maz@kernel.org>
+X-Cookie: Knowledge is power.
 
-On Tue, 02 Apr 2024 15:34:27 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> [1  <text/plain; us-ascii (quoted-printable)>]
-> On Sun, Mar 31, 2024 at 11:00:41AM +0100, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> 
-> > > As part of the lazy FPSIMD state transitioning done by the hypervisor we
-> > > currently share the userpsace FPSIMD state in thread->uw.fpsimd_state with
-> > > the host. Since this struct is non-extensible userspace ABI we have to keep
-> 
-> > Using the same representation is just pure convenience, and nothing
-> > requires us to use the it in the kernel/hypervisor.
-> 
-> Indeed, the additional data seemed contained enough that it was a
-> reasonable tradeoff.
-> 
-> > > the definition as is but the addition of FPMR in the 2023 dpISA means that
-> > > we will want to share more storage with the host. To facilitate this
-> > > refactor the current code to share the entire thread->uw rather than just
-> > > the one field.
-> 
-> > So this increase the required sharing with EL2 from 528 bytes to
-> > 560. Not a huge deal, but definitely moving in the wrong direction. Is
-> > there any plans to add more stuff to this structure that wouldn't be
-> > *directly* relevant to the hypervisor?
-> 
-> I'm not aware of any current plans to extend this.
-> 
-> > > @@ -640,7 +641,7 @@ struct kvm_vcpu_arch {
-> > >  	struct kvm_guest_debug_arch vcpu_debug_state;
-> > >  	struct kvm_guest_debug_arch external_debug_state;
-> > >  
-> > > -	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
-> > > +	struct thread_struct_uw *host_uw;	/* hyp VA */
-> > >  	struct task_struct *parent_task;
-> 
-> > Well, this is going away, and you know it.
-> 
-> Sure, those patches are still in flight though.  It does seem reasonable
-> to target the current code.
 
-Sure, if your intent is for this code not to be merged.
+--ZsRoYufVRq8HDIbM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Because it means this series assumes a different data life cycle, and
-the review effort spent on it will be invalidated once you move to the
-per-CPU state.
+On Tue, Apr 02, 2024 at 03:53:33PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-	M.
+> > Sure, those patches are still in flight though.  It does seem reasonable
+> > to target the current code.
 
--- 
-Without deviation from the norm, progress is not possible.
+> Sure, if your intent is for this code not to be merged.
+
+> Because it means this series assumes a different data life cycle, and
+> the review effort spent on it will be invalidated once you move to the
+> per-CPU state.
+
+I don't have any visibility on when those patches are likely to get
+merged or the general practices with in flight serieses here, last time
+around with some of the serieses that were in flight it was quite late
+which did make it unclear if things would go in during that release
+cycle at all.
+
+The amount of churn in KVM recently and long periods where the relevant
+patches are apparently pre accepted but for various not always clear
+reasons not actually merged is making it quite hard to target, you're
+obviously going to be a lot more in the loop so this is doubtless
+clearer to you than to me.  It's also been a little unclear what the
+expectations are for basing things on - some people do prefer to do
+their own merging for example, and while you have mentioned your in
+flight serieses your communication style means that it's not been
+entirely clear if you're just noting the overlap.  Is it just that
+refactoring series you want taking into account here or are there other
+in flight serieses that should be rolled into a base?
+
+--ZsRoYufVRq8HDIbM
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmYMMFQACgkQJNaLcl1U
+h9BDVQf/cg+fzd23KIrGiAWOOdVY4LvIfnSbQLI4D21tWm3gJlGZ6eImlJ62QQAU
+8JaTbACh3U8/tV6s/6g6FUKVobLvFA/iU1+n4VZEQ48Ff4f3o+TWJQVAwpGq2PXJ
+mkpNQmxOHLPIoE2oGDz3sSBu+6A888trmpCyidGfy8NA5+5N6JPAV8wlv57XBo/C
+tN+utUoWo9Kk4wQEcuimfo1hCIKWQDY/wtDLfCsgjTdEvelyGo/fdGQwmb4fskoV
+LIi/ZxVwlhrToV8IqnwYirKQLt0eeE5oy0ExSfR26SJP8d6uFzhEFzyhSPx3aCJd
+LcbhFstoGtpCqu90KCaYfleTeza12g==
+=lAvr
+-----END PGP SIGNATURE-----
+
+--ZsRoYufVRq8HDIbM--
