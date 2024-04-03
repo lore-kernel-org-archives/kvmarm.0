@@ -1,120 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C969D159915;
-	Tue,  2 Apr 2024 17:22:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B102C6EB6E
+	for <kvmarm@lists.linux.dev>; Wed,  3 Apr 2024 08:50:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712078521; cv=none; b=lZ8WfDYuC9kl+bOSgieuvlOVNc2HbgfCLWnb5pa+5X6vn+EMubyAXgJ5LdFAKwaNj8ASD939tEsUEiT6MuM4CIvdgSlJ5mfmyTBwtpcYvR/fT0CbjTyvEJ5pNlf8uMpPjisrea3rNs4hxQG+j5mTEuwbUd5sQK5yDK0HaKDnzGk=
+	t=1712134261; cv=none; b=S1sxBqHUHu3KHxxVFGg2CNb/HLUsjTxGCrFgISLo+rECS4QFgyUtF09N7doMSfjXcKR6qL/0XjubRGmkIDq4U2YQ6HnL+HW/Eo3X7JpgjrSzjTc8BOb+zGwWkC0FG2Q7QW/kv2Ju/QDJHVzUXbABCqt66M7JKo1h9xbZeLVe1qM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712078521; c=relaxed/simple;
-	bh=H8uWhCo1O/OYYi2drPcE1c99n/60JeLgX1yS8IFjOsk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JGjNJvIGiGFxZ35jwloiqOyX4lx1s7uKAagoiaDbI6kFisY5rIQHe7dCCwMtSZUPhlAN3SpNNa9DtWbtyJKI6VDlkLQyR+FzTMr6O+gYwE6uF83XOnsZrbys24cOTWffYgrkhfy7Lf/LKtdQsbcBFKiOpOh/O51Visq3xBA0CkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rUsFC7g0; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rUsFC7g0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A42F3C43390;
-	Tue,  2 Apr 2024 17:21:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712078521;
-	bh=H8uWhCo1O/OYYi2drPcE1c99n/60JeLgX1yS8IFjOsk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rUsFC7g0Q8/lx515dHicpBE0b06tm9dIdiVGdJrsr/6FaGJR6vinlLAZH9bgWuqvl
-	 f4m31h7gXvhkrs0Dl8t1ul36NFUo6zzgt3NSRwa3AZxkWbcqfLL+Vlm95Rdg+9Dv8C
-	 WROYbTvaWiWyVC7ninEYSu2rSblY5/Pb1IXjdYYsIFsuw49/0sFPUwVcyf5kdR92rr
-	 KYKKG/aeS2u88JSqQHabJxVZo6DzmwNi1Acf2aV65bvZp9NvABFZtzSW/dL1Dv87dL
-	 ybQ6VcrhQTLubmx+epTLdNltL5zoO8PwmeYkORVX/BkT3fbVJSo+kxqxJjejJooHH9
-	 FYkLS5oUeTWng==
-Date: Tue, 2 Apr 2024 18:21:55 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.linux.dev,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v6 2/5] KVM: arm64: Add newly allocated ID registers to
- register descriptions
-Message-ID: <73c6012f-adb0-470b-bd47-6093d28aea97@sirena.org.uk>
-References: <20240329-arm64-2023-dpisa-v6-0-ba42db6c27f3@kernel.org>
- <20240329-arm64-2023-dpisa-v6-2-ba42db6c27f3@kernel.org>
- <87le5ysm4l.wl-maz@kernel.org>
+	s=arc-20240116; t=1712134261; c=relaxed/simple;
+	bh=d1gqHPDU7mv+a2/4xNwGyTiXsOBnF5O9Ntsh1cq9LVw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WrJa/GwUELFYASjvlqxEJ8MDAbdcUttUYU7ru9k5RsXx9HReIjQH2vWjJAlzUr6j+/SxOHixHcWQFeho5TjknWVNEiwO35l4GJabAC17uqxqATI+oE8eG7ro7ADHaBo0/IZsyB6WATwPH3OzOiQ5ZfLsQ8rqcNF0Fuw/dRR//MY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0C71E1007;
+	Wed,  3 Apr 2024 01:51:30 -0700 (PDT)
+Received: from [172.20.10.4] (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D0FD23F7B4;
+	Wed,  3 Apr 2024 01:50:57 -0700 (PDT)
+Message-ID: <9e91a10a-a6a3-401d-a650-18a6893e3c5c@arm.com>
+Date: Wed, 3 Apr 2024 09:50:45 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="pwE/A28+XRVGQBHe"
-Content-Disposition: inline
-In-Reply-To: <87le5ysm4l.wl-maz@kernel.org>
-X-Cookie: Knowledge is power.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v2 1/3] arm64: Prepare for LPA2
+To: Andrew Jones <andrew.jones@linux.dev>, kvmarm@lists.linux.dev
+Cc: alexandru.elisei@arm.com, eric.auger@redhat.com, shahuang@redhat.com
+References: <20240402132739.201939-5-andrew.jones@linux.dev>
+ <20240402132739.201939-6-andrew.jones@linux.dev>
+Content-Language: en-GB
+From: Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <20240402132739.201939-6-andrew.jones@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 02/04/2024 14:27, Andrew Jones wrote:
+> When checking for supported granules also check for the values
+> which indicate support when LPA2 is implemented.
+> 
+> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 
---pwE/A28+XRVGQBHe
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 
-On Sun, Mar 31, 2024 at 11:59:06AM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
-
-> > The 2023 architecture extensions have allocated some new ID registers, add
-> > them to the KVM system register descriptions so that they are visible to
-> > guests.
-
-> > We make the newly introduced dpISA features writeable, as well as
-> > allowing writes to ID_AA64ISAR3_EL1.CPA for FEAT_CPA which only
-> > introduces straigforward new instructions with no additional
-> > architectural state or traps.
-
-> FPMR actively gets trapped by HCRX_EL2.
-
-Sure, I'm not clear what you're trying to say here?  The "no additional"
-bit is referring to FEAT_CPA.
-
-> > -	ID_UNALLOCATED(6,3),
-> > +	ID_WRITABLE(ID_AA64ISAR3_EL1, ~(ID_AA64ISAR2_EL1_RES0 |
-> > +					ID_AA64ISAR3_EL1_PACM |
-> > +					ID_AA64ISAR3_EL1_TLBIW)),
-> >  	ID_UNALLOCATED(6,4),
-> >  	ID_UNALLOCATED(6,5),
-> >  	ID_UNALLOCATED(6,6),
-
-> Where is the code that enforces the lack of support for MTEFAR,
-> MTESTOREONLY, and MTEPERM for SCTLR_ELx, EnPACM and EnFPM in HCRX_EL2?
-
-Could you please be more explicit regarding what you're expecting to see
-here?  Other than the writeability mask for the ID register I would have
-expected to need explicit code to enable new features rather than
-explicit code to keep currently unsupported features unsupported.  I'm
-sure what you're referencing will be obvious once I see it but I'm
-drawing a blank.
-
-> And I haven't checked whether TLBI VMALLWS2 can be trapped.
-
-I didn't see anything but I might not be aware of where to look, there
-doesn't seem to be anything for that specifically in HFGITR_EL2 or
-HFGITR2_EL2 which would be the main places I'd expect to find something.
-
---pwE/A28+XRVGQBHe
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmYMPrIACgkQJNaLcl1U
-h9CulwgAgH5V5RmaWYuHCCBQIUQDkouUTMklMpA9Df1ChBIBvmW1OZl0PeW56Sui
-640DAUobRml9J+gh6HsMUS3vnRLyGP11gEhxxTccwvoKuxH6ZsiBUaXkdN+f2Qfv
-R8XxRO7JYoC7un2DPg2IjgAuyEX9OB8XzPmnRnFj276YjsQHy/oYUkwqemOMCMvB
-3/rWpnLsoQ6/UC0RAfXCqN5jTPVG2fVBEFKcyiFi3eLqBxdDF/ugPgTIHtgP31Fz
-rPtAVmzDu6El/d+hpIqAtb70IH/mk8uqYzd1EoTuiTZlGnsIoZLjn5Yft89t0Ets
-B51k7JPujYgRrvFdBiC0WlPL3wYmjg==
-=Xh1Z
------END PGP SIGNATURE-----
-
---pwE/A28+XRVGQBHe--
+> ---
+>   lib/arm64/asm/processor.h | 49 +++++++++++++++++++++------------------
+>   1 file changed, 27 insertions(+), 22 deletions(-)
+> 
+> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+> index 1c73ba32725a..bab9c26c2c9e 100644
+> --- a/lib/arm64/asm/processor.h
+> +++ b/lib/arm64/asm/processor.h
+> @@ -110,31 +110,36 @@ static inline unsigned long get_id_aa64mmfr0_el1(void)
+>   #define ID_AA64MMFR0_TGRAN64_SHIFT	24
+>   #define ID_AA64MMFR0_TGRAN16_SHIFT	20
+>   
+> -#define ID_AA64MMFR0_TGRAN4_SUPPORTED	0x0
+> -#define ID_AA64MMFR0_TGRAN64_SUPPORTED	0x0
+> -#define ID_AA64MMFR0_TGRAN16_SUPPORTED	0x1
+> +#define ID_AA64MMFR0_TGRAN4_SUPPORTED(r)			\
+> +({								\
+> +	u64 __v = ((r) >> ID_AA64MMFR0_TGRAN4_SHIFT) & 0xf;	\
+> +	(__v) == 0 || (__v) == 1;				\
+> +})
+> +
+> +#define ID_AA64MMFR0_TGRAN64_SUPPORTED(r)			\
+> +({								\
+> +	u64 __v = ((r) >> ID_AA64MMFR0_TGRAN64_SHIFT) & 0xf;	\
+> +	(__v) == 0;						\
+> +})
+> +
+> +#define ID_AA64MMFR0_TGRAN16_SUPPORTED(r)			\
+> +({								\
+> +	u64 __v = ((r) >> ID_AA64MMFR0_TGRAN16_SHIFT) & 0xf;	\
+> +	(__v) == 1 || (__v) == 2;				\
+> +})
+>   
+>   static inline bool system_supports_granule(size_t granule)
+>   {
+> -	u32 shift;
+> -	u32 val;
+> -	u64 mmfr0;
+> -
+> -	if (granule == SZ_4K) {
+> -		shift = ID_AA64MMFR0_TGRAN4_SHIFT;
+> -		val = ID_AA64MMFR0_TGRAN4_SUPPORTED;
+> -	} else if (granule == SZ_16K) {
+> -		shift = ID_AA64MMFR0_TGRAN16_SHIFT;
+> -		val = ID_AA64MMFR0_TGRAN16_SUPPORTED;
+> -	} else {
+> -		assert(granule == SZ_64K);
+> -		shift = ID_AA64MMFR0_TGRAN64_SHIFT;
+> -		val = ID_AA64MMFR0_TGRAN64_SUPPORTED;
+> -	}
+> -
+> -	mmfr0 = get_id_aa64mmfr0_el1();
+> -
+> -	return ((mmfr0 >> shift) & 0xf) == val;
+> +	u64 mmfr0 = get_id_aa64mmfr0_el1();
+> +
+> +	if (granule == SZ_4K)
+> +		return ID_AA64MMFR0_TGRAN4_SUPPORTED(mmfr0);
+> +
+> +	if (granule == SZ_16K)
+> +		return ID_AA64MMFR0_TGRAN16_SUPPORTED(mmfr0);
+> +
+> +	assert(granule == SZ_64K);
+> +	return ID_AA64MMFR0_TGRAN64_SUPPORTED(mmfr0);
+>   }
+>   
+>   #endif /* !__ASSEMBLY__ */
