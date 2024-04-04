@@ -1,40 +1,66 @@
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00EE81D545
-	for <kvmarm@lists.linux.dev>; Thu,  4 Apr 2024 16:03:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD18C130AD7
+	for <kvmarm@lists.linux.dev>; Thu,  4 Apr 2024 18:52:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712246620; cv=none; b=N0XwL/kns7j7H2Ooka185B8zCJr3TlY5OHH8flnk+nbS1GcTRQUqCO77YStPGKTvLGJFlSEJ7pNLXkHU5LTurXSIJjI+R1wPI4XJvJCOrgHt2wGjuvLS5bqQpVAc+il7pdCpMFLr6nBVt3vS344P2BMEihdQIQYmPrt8wtskjzc=
+	t=1712256747; cv=none; b=jvVNa7zlkzF1ULPHP/7W8LQfjj6VLJ/VXK61/orRGSF/cZkfmuipUIhuU3hLaFRhnUZPQi/jwrr9mP8Ab3IS4zkaqeZRw1zEJ/f3yRvrb7cYtt3foio/73dtmuEeOp0UjxrQC9/GLQ+CKYNXNMm/MJXtVjQ2DoppX4vSTv3tVG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712246620; c=relaxed/simple;
-	bh=eUp921iF2Ni3+2GuUlziJBbNXocWXTpROaZ4SOL9tPg=;
+	s=arc-20240116; t=1712256747; c=relaxed/simple;
+	bh=FPZEwhXTwV9P7MPXtQTFINtpzaaPfSGiKgE4E8LQxiw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IjFGal1jZBNOMmoJ+8cjMvuJAh316oLANHzGFyla6WGTJjrF9eokCwTrQ4Ol6w/6sON1ymL0ksLHbHDa8rdjDZvlrzQ1FtCT3P5bxZ9Ukvx/W6H3Dk3Jo8jxHYETW+iVzOfPisA6/+xxxIgxEF80LIBHeiSRqWXonVvFkkrMgD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=SYBDOVFL; arc=none smtp.client-ip=46.235.227.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	 In-Reply-To:Content-Type; b=I7viT6RxFF1kuhHZTU8TbFEVZrfJpD2+Kr6Jn5bwqf3M7O1+0n+sU72iIuIlGiumUHs1rUGtWTh0YSEgE0gB3EcBTjUBSrF1MQUZPlb4+Z2Rgddq9pKdwCiVR5tFa9hUgYdU8mGC0qBEf2Iz3TNT3UoZR6/Fjvdy/djU18mr6o4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X7WsO7mQ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="SYBDOVFL"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1712246617;
-	bh=eUp921iF2Ni3+2GuUlziJBbNXocWXTpROaZ4SOL9tPg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SYBDOVFLk741a5OQ5y1Gg32de6U+d/kU0L4bZkUiliMMYWcLa4ngbnnyBBqx0rNKf
-	 4CQreXfppS223GWtwHvaAzBsS/oGTSf4+XKJ+2Wdwgrh70aoi3St2ylhFxoF4VjJx0
-	 7ClPLSm0WY4kxn3CxeslnioNDutGGIhkP19xVlLrpYhJAKv4DTLSGWvC0LH06aNPzv
-	 E4z0YWjpCzSkazlYVegkjGBBlwoY3Bk5/hBEuxW6/jckL7DcOrZYDRCDZhK4H3csLo
-	 0bFgvzW2roIP/xu+IjFP8zsEb8Qp690i8+koNDLHm7mneX+NhDp961K7wW4AHutRrr
-	 sJ19KTZyhxIeg==
-Received: from [100.109.49.129] (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: dmitry.osipenko)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 5C4A937813A4;
-	Thu,  4 Apr 2024 16:03:36 +0000 (UTC)
-Message-ID: <15865985-4688-4b7e-9f2d-89803adb8f5b@collabora.com>
-Date: Thu, 4 Apr 2024 19:03:33 +0300
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X7WsO7mQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712256745;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=HsIJIqXQx5iTxCcZjMDZR7ODPrcBQoix35NVqNr4t94=;
+	b=X7WsO7mQKwv107TntY5mMvzh23jjZSKHC+T5Wm9lndGPSrDhmA6uFN0bDdTr/aqJ01Cmvd
+	HibgmnhcxM/HVMveAATySQH4Dph59iBkiDdUv2ahzBbZREVNVkod+zXplHtb9Bb/wTKUcL
+	oFjwJaJ92F3cmcFMtJWy2OD6FnQtcBc=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-655-EnjAlnEeMJ6ae2DpVr0HsA-1; Thu, 04 Apr 2024 14:52:21 -0400
+X-MC-Unique: EnjAlnEeMJ6ae2DpVr0HsA-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2d84af71cddso10759701fa.0
+        for <kvmarm@lists.linux.dev>; Thu, 04 Apr 2024 11:52:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712256740; x=1712861540;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HsIJIqXQx5iTxCcZjMDZR7ODPrcBQoix35NVqNr4t94=;
+        b=dKMIvUJpQ/zoQnG/T2KQoxC/aNO3vS3uOdihb4KJAUCQT45uPE60X53QvpEqZdSjRS
+         +LTZPn+VQNiBU6YUWeo/4fEIv8i+E20WOHJYygfxd36pjzOqWgXJTQ9ld4hrzF4X1LOg
+         kE/5wd4zi5VksuAuPYOE75W2fvH9NB0Q5qkZw95qjHbByuy9khIUYJGK+jCRXY5EB2BN
+         2dgCRZOQ8clOsZ7vieDE9ile7GeBcSb0Tn9d+E/7HcV6lKwLVRkhB3r0ZycaSw4vCc1r
+         s+4za2Tm1iPWjhDwZi9hs/OWIPPW0AA7LmX8eREuUEc38JrDY54lJwIJGHss3f2/6/DZ
+         7c4g==
+X-Forwarded-Encrypted: i=1; AJvYcCXchy831Qz27S1DJHhEohu8lL4zF+MXQEB2dSrzHEgEzMFxw+nvDhBXRrLIVGQ7xHc4+I/CHSVbJ4/vidhXg2Zv7Sjl9SqM
+X-Gm-Message-State: AOJu0Yy2bGZPErI8UOJ5I8hQL8m2l903Ycl32YfZT2OD1wbftOmLx7Zi
+	MpkY0ITEdViJ61C4GfVl9fK7pEyqfjm6UVn1fz9Ahbn229h4b/z1LbaAkBoxk9UP0L1bfTl1I13
+	veH99m7m1ze4lTfULTK8jKE5kpf2OSzRdnpEb3UjnIacVSQoYXkEM8Q==
+X-Received: by 2002:a19:a414:0:b0:516:c099:e798 with SMTP id q20-20020a19a414000000b00516c099e798mr2117078lfc.31.1712256740141;
+        Thu, 04 Apr 2024 11:52:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHj9eaR07U0JSOkFX0EzNdegg4G8sDsUMV2VQeV+soXyshxKfjfN3PMDNow+YcHghymD9JNGw==
+X-Received: by 2002:a19:a414:0:b0:516:c099:e798 with SMTP id q20-20020a19a414000000b00516c099e798mr2117054lfc.31.1712256739585;
+        Thu, 04 Apr 2024 11:52:19 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c743:de00:7030:120f:d1c9:4c3c? (p200300cbc743de007030120fd1c94c3c.dip0.t-ipconnect.de. [2003:cb:c743:de00:7030:120f:d1c9:4c3c])
+        by smtp.gmail.com with ESMTPSA id wv11-20020a170907080b00b00a4503a78dd5sm9472229ejb.17.2024.04.04.11.52.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Apr 2024 11:52:19 -0700 (PDT)
+Message-ID: <cce476f7-2f52-428a-8ae4-fc5dec714666@redhat.com>
+Date: Thu, 4 Apr 2024 20:52:16 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -42,95 +68,183 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 8/8] KVM: x86/mmu: Handle non-refcounted pages
-To: David Stevens <stevensd@chromium.org>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>,
- Pierre-Eric Pelloux-Prayer <pierre-eric.pelloux-prayer@amd.com>
-Cc: Yu Zhang <yu.c.zhang@linux.intel.com>,
- Isaku Yamahata <isaku.yamahata@gmail.com>,
- Zhi Wang <zhi.wang.linux@gmail.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20240229025759.1187910-1-stevensd@google.com>
- <20240229025759.1187910-9-stevensd@google.com>
+Subject: Re: [PATCH v3 1/7] mm: Add a bitmap into
+ mmu_notifier_{clear,test}_young
+To: James Houghton <jthoughton@google.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: Yu Zhao <yuzhao@google.com>, David Matlack <dmatlack@google.com>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Sean Christopherson <seanjc@google.com>, Jonathan Corbet <corbet@lwn.net>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Steven Rostedt <rostedt@goodmis.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Shaoqin Huang <shahuang@redhat.com>, Gavin Shan <gshan@redhat.com>,
+ Ricardo Koller <ricarkol@google.com>,
+ Raghavendra Rao Ananta <rananta@google.com>,
+ Ryan Roberts <ryan.roberts@arm.com>, David Rientjes <rientjes@google.com>,
+ Axel Rasmussen <axelrasmussen@google.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
+References: <20240401232946.1837665-1-jthoughton@google.com>
+ <20240401232946.1837665-2-jthoughton@google.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20240401232946.1837665-2-jthoughton@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-From: Dmitry Osipenko <dmitry.osipenko@collabora.com>
-In-Reply-To: <20240229025759.1187910-9-stevensd@google.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi David,
-
-On 2/29/24 05:57, David Stevens wrote:
-> From: David Stevens <stevensd@chromium.org>
+On 02.04.24 01:29, James Houghton wrote:
+> The bitmap is provided for secondary MMUs to use if they support it. For
+> test_young(), after it returns, the bitmap represents the pages that
+> were young in the interval [start, end). For clear_young, it represents
+> the pages that we wish the secondary MMU to clear the accessed/young bit
+> for.
 > 
-> Handle non-refcounted pages in __kvm_faultin_pfn. This allows the
-> host to map memory into the guest that is backed by non-refcounted
-> struct pages - for example, the tail pages of higher order non-compound
-> pages allocated by the amdgpu driver via ttm_pool_alloc_page.
+> If a bitmap is not provided, the mmu_notifier_{test,clear}_young() API
+> should be unchanged except that if young PTEs are found and the
+> architecture supports passing in a bitmap, instead of returning 1,
+> MMU_NOTIFIER_YOUNG_FAST is returned.
 > 
-> Signed-off-by: David Stevens <stevensd@chromium.org>
+> This allows MGLRU's look-around logic to work faster, resulting in a 4%
+> improvement in real workloads[1]. Also introduce MMU_NOTIFIER_YOUNG_FAST
+> to indicate to main mm that doing look-around is likely to be
+> beneficial.
+> 
+> If the secondary MMU doesn't support the bitmap, it must return
+> an int that contains MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE.
+> 
+> [1]: https://lore.kernel.org/all/20230609005935.42390-1-yuzhao@google.com/
+> 
+> Suggested-by: Yu Zhao <yuzhao@google.com>
+> Signed-off-by: James Houghton <jthoughton@google.com>
+> ---
+>   include/linux/mmu_notifier.h | 93 +++++++++++++++++++++++++++++++++---
+>   include/trace/events/kvm.h   | 13 +++--
+>   mm/mmu_notifier.c            | 20 +++++---
+>   virt/kvm/kvm_main.c          | 19 ++++++--
+>   4 files changed, 123 insertions(+), 22 deletions(-)
+> 
+> diff --git a/include/linux/mmu_notifier.h b/include/linux/mmu_notifier.h
+> index f349e08a9dfe..daaa9db625d3 100644
+> --- a/include/linux/mmu_notifier.h
+> +++ b/include/linux/mmu_notifier.h
+> @@ -61,6 +61,10 @@ enum mmu_notifier_event {
+>   
+>   #define MMU_NOTIFIER_RANGE_BLOCKABLE (1 << 0)
+>   
+> +#define MMU_NOTIFIER_YOUNG			(1 << 0)
+> +#define MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE	(1 << 1)
 
-This patch has a problem on v6.8 kernel. Pierre-Eric of AMD found that
-Qemu crashes with "kvm bad address" error when booting Ubuntu 23.10 ISO
-with a disabled virtio-gpu and I was able to reproduce it. Pierre-Eric
-said this problem didn't exist with v6.7 kernel and using v10 kvm
-patches. Could you please take a look at this issue?
+Especially this one really deserves some documentation :)
 
-To reproduce the bug, run Qemu like this and load the Ubuntu installer:
+> +#define MMU_NOTIFIER_YOUNG_FAST			(1 << 2)
 
-  qemu-system-x86_64 -boot d -cdrom ubuntu-23.10.1-desktop-amd64.iso -m
-4G --enable-kvm -display gtk -smp 1 -machine q35
+And that one as well.
 
-Qemu fails with "error: kvm run failed Bad address"
+Likely best to briefly document all of them, and how they are
+supposed to be used (return value for X).
 
-On the host kernel there is this warning:
+> +
+>   struct mmu_notifier_ops {
+>   	/*
+>   	 * Called either by mmu_notifier_unregister or when the mm is
+> @@ -106,21 +110,36 @@ struct mmu_notifier_ops {
+>   	 * clear_young is a lightweight version of clear_flush_young. Like the
+>   	 * latter, it is supposed to test-and-clear the young/accessed bitflag
+>   	 * in the secondary pte, but it may omit flushing the secondary tlb.
+> +	 *
+> +	 * If @bitmap is given but is not supported, return
+> +	 * MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE.
+> +	 *
+> +	 * If the walk is done "quickly" and there were young PTEs,
+> +	 * MMU_NOTIFIER_YOUNG_FAST is returned.
+>   	 */
+>   	int (*clear_young)(struct mmu_notifier *subscription,
+>   			   struct mm_struct *mm,
+>   			   unsigned long start,
+> -			   unsigned long end);
+> +			   unsigned long end,
+> +			   unsigned long *bitmap);
+>   
+>   	/*
+>   	 * test_young is called to check the young/accessed bitflag in
+>   	 * the secondary pte. This is used to know if the page is
+>   	 * frequently used without actually clearing the flag or tearing
+>   	 * down the secondary mapping on the page.
+> +	 *
+> +	 * If @bitmap is given but is not supported, return
+> +	 * MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE.
+> +	 *
+> +	 * If the walk is done "quickly" and there were young PTEs,
+> +	 * MMU_NOTIFIER_YOUNG_FAST is returned.
+>   	 */
+>   	int (*test_young)(struct mmu_notifier *subscription,
+>   			  struct mm_struct *mm,
+> -			  unsigned long address);
+> +			  unsigned long start,
+> +			  unsigned long end,
+> +			  unsigned long *bitmap);
 
- ------------[ cut here ]------------
- WARNING: CPU: 19 PID: 11696 at mm/gup.c:229 try_grab_page+0x64/0x100
- Call Trace:
-  <TASK>
-  ? try_grab_page+0x64/0x100
-  ? __warn+0x81/0x130
-  ? try_grab_page+0x64/0x100
-  ? report_bug+0x171/0x1a0
-  ? handle_bug+0x3c/0x80
-  ? exc_invalid_op+0x17/0x70
-  ? asm_exc_invalid_op+0x1a/0x20
-  ? try_grab_page+0x64/0x100
-  follow_page_pte+0xfa/0x4b0
-  __get_user_pages+0xe5/0x6e0
-  get_user_pages_unlocked+0xe7/0x370
-  hva_to_pfn+0xa2/0x760 [kvm]
-  ? free_unref_page+0xf9/0x180
-  kvm_faultin_pfn+0x112/0x610 [kvm]
-  kvm_tdp_page_fault+0x104/0x150 [kvm]
-  kvm_mmu_page_fault+0x298/0x860 [kvm]
-  kvm_arch_vcpu_ioctl_run+0xc7d/0x16b0 [kvm]
-  ? srso_alias_return_thunk+0x5/0xfbef5
-  ? kvm_arch_vcpu_put+0x128/0x190 [kvm]
-  ? srso_alias_return_thunk+0x5/0xfbef5
-  kvm_vcpu_ioctl+0x199/0x700 [kvm]
-  __x64_sys_ioctl+0x94/0xd0
-  do_syscall_64+0x86/0x170
-  ? kvm_on_user_return+0x64/0x90 [kvm]
-  ? srso_alias_return_thunk+0x5/0xfbef5
-  ? fire_user_return_notifiers+0x37/0x70
-  ? srso_alias_return_thunk+0x5/0xfbef5
-  ? syscall_exit_to_user_mode+0x80/0x230
-  ? srso_alias_return_thunk+0x5/0xfbef5
-  ? do_syscall_64+0x96/0x170
-  ? srso_alias_return_thunk+0x5/0xfbef5
-  ? do_syscall_64+0x96/0x170
-  ? do_syscall_64+0x96/0x170
-  ? do_syscall_64+0x96/0x170
-  ? srso_alias_return_thunk+0x5/0xfbef5
-  ? do_syscall_64+0x96/0x170
-  ? srso_alias_return_thunk+0x5/0xfbef5
-  entry_SYSCALL_64_after_hwframe+0x6e/0x76
- ---[ end trace 0000000000000000 ]---
+What does "quickly" mean (why not use "fast")? What are the semantics, I 
+don't find any existing usage of that in this file.
+
+Further, what is MMU_NOTIFIER_YOUNG you introduce used for?
 
 -- 
-Best regards,
-Dmitry
+Cheers,
+
+David / dhildenb
 
