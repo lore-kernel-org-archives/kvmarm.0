@@ -1,286 +1,197 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18902146A70
-	for <kvmarm@lists.linux.dev>; Fri,  5 Apr 2024 08:00:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FAD715F304
+	for <kvmarm@lists.linux.dev>; Fri,  5 Apr 2024 08:38:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712304059; cv=none; b=Wjryx/FR0xO4s0I5YGSZoQVBhbRhyGJ3aBGWT12oenWvhOGjPPPHp/cB0/ZZMCu1M+8QboC9PMbzKCrlZhmGeVHEW3plmqHxL0ohGECng+LhfF3iXgWC+wEibCGw2URObhHUk8VIORUAe4juBa2224avIQZLiMk4rShSiGpb5iA=
+	t=1712306289; cv=none; b=I1KICNTOpdDWjvvF9XZuXA5gQrCClrHfMKVLNLEBDmWE0wKbY9blcmoC0pMJPvmRA0SK0G00J4j2ZKd2EnlbCotFQw6Yhr1ivm6V9MM/qq3VEm4Ex1Z9lSxlHneib1i3KV8kSzTkXaovbgcqYVTQAK/EPK/L5FvrDcvydqokqlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712304059; c=relaxed/simple;
-	bh=wBEVmiCkDaI5Vol2UGssVYNzoJHYg3E9s8eCO83WoW8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MwrwREuOoqPAmXkRDbPfPK4nCr/3Ow+FbEQTaAJxNFdufrGpc4Fhl2RoC+4AS7SXUst13siDLld77SoBcPKC2nCWbau/4ynp/i7mQIpkazYalkksBzKdlh9/8JTw26nZ2zepcjiYfJDUu/Rk6Vj+6yn+Qzu3DG1bNS605mdw/U4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4D6DAFEC;
-	Fri,  5 Apr 2024 01:01:28 -0700 (PDT)
-Received: from a077893.blr.arm.com (a077893.blr.arm.com [10.162.41.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id F05383F64C;
-	Fri,  5 Apr 2024 01:00:53 -0700 (PDT)
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-To: linux-arm-kernel@lists.infradead.org
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
+	s=arc-20240116; t=1712306289; c=relaxed/simple;
+	bh=7yO6yPDHGesSmeOkN/fR8ci49hsn9kz43K4p5e/8WBo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NPyp+ab04/PLA2TuCdlxf5tfmbkHmYsytSzVlFrSaxgNbv1avFXRE5DPiOce7ETg9OonSymviWyxkMACrMldioKcbTy7TXDiDVPXKHrOS7CHBexJ2aWYlpDIJKuwrOU4MPLOHHxR/o7X/xRXUKU3gQGVo/2BLupRC00KtYqwBy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O2Jzf5Zi; arc=none smtp.client-ip=209.85.166.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O2Jzf5Zi"
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-368c13003eeso8575625ab.0
+        for <kvmarm@lists.linux.dev>; Fri, 05 Apr 2024 01:38:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712306287; x=1712911087; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sGCyPgl3I2RhYB72u4qf5QL0i6/5w7xwNKgPUqw6zXE=;
+        b=O2Jzf5Zi8+cwLgzF98c/E7ThlRHUowFTi1A+clHMzDdfQ5b7zJq+cXg5DwJiN7hpZO
+         48t9u/sqU8Fu2nxJypKQPft6lq+gtTauknBfzjxD1wtUqMKEd1wIhJmt4Zdk2se29S6s
+         0WZEr+6gwJAQJReugDhFcpJ+LCTrZQhJhnOZXHGdBLBMvvyMzATKknef41cM+8/Tvh6L
+         TPPH3vGKqpQclvhpG4m8iOUvZm+N4hdrTM4wOhwvx1YHO/WmrPgpN+Kwl8rnnnmWrXSc
+         e/a4AtS6kBD+KTMgjRbZvm5a5HpMbDahiCUazX9SrdIanhDfoxSDjERdhrChNWnToyRf
+         efag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712306287; x=1712911087;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sGCyPgl3I2RhYB72u4qf5QL0i6/5w7xwNKgPUqw6zXE=;
+        b=iYcP3CYIgBnezZV7BGNkhYArIaYhaFWfA81M5wVpc+6pCoygla4uHfpW9XIal2LIaB
+         Id8CPDotXJ20/E0QOVh/WY6iffB8Q/e03NxZY/fN05mmqji3vuFsc2O4OCuV+omGURp9
+         1g/6oHr/KQgklmvaANpfgsXBrT1rI0TgSBV0u3Mng1YgMZ8or8URk7Yy73Ga4s7V4yNk
+         zkfw8z/qt3CVX+m0U4x7DyDr57uA4lZQhYI3p3FoNnZ9kPwPwDWTXOlnWpAVfnNjworW
+         50GIf8jkEJ4LRqia1r7EnJQ05u63DF0AiP8uvLo82BLZXQTNUKnPuna/MMoB4dvtWFbP
+         lQ0A==
+X-Forwarded-Encrypted: i=1; AJvYcCVxZSc5MG8o+LhXPsQ8zmEXJZp2vrCrKey9cP+wiKdrXNSB0J7gnF9UMA7ioVGfweTRspGRvebudhSJb6ETidMdqPg7kSaS
+X-Gm-Message-State: AOJu0YysKeRfH3Bve/L9Bj8/oSRkVLyjsq4DigRhKQl+i+UWs1iXBiIz
+	/+VYrxy6sKgugSQOEH2dKlLOfmhrP9h+bMY2gv1F71Ohwr7oGOTK
+X-Google-Smtp-Source: AGHT+IEXdRMMtpxkTXLY1QR9+bDc6JrDHOZHEaNaHrlHrdrhRUuA/h4JbDJfUfZ+VZMIfoOk2EDb4A==
+X-Received: by 2002:a05:6e02:219b:b0:368:a856:aa20 with SMTP id j27-20020a056e02219b00b00368a856aa20mr661890ila.20.1712306287401;
+        Fri, 05 Apr 2024 01:38:07 -0700 (PDT)
+Received: from wheely.local0.net (124-169-104-130.tpgi.com.au. [124.169.104.130])
+        by smtp.gmail.com with ESMTPSA id y7-20020a63de47000000b005e838b99c96sm808638pgi.80.2024.04.05.01.38.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Apr 2024 01:38:07 -0700 (PDT)
+From: Nicholas Piggin <npiggin@gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>,
+	Laurent Vivier <lvivier@redhat.com>,
+	Andrew Jones <andrew.jones@linux.dev>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	=?UTF-8?q?Nico=20B=C3=B6hr?= <nrb@linux.ibm.com>,
+	linux-s390@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [RFC 8/8] arm64/hw_breakpoint: Enable FEAT_Debugv8p9
-Date: Fri,  5 Apr 2024 13:30:08 +0530
-Message-Id: <20240405080008.1225223-9-anshuman.khandual@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240405080008.1225223-1-anshuman.khandual@arm.com>
-References: <20240405080008.1225223-1-anshuman.khandual@arm.com>
+	kvm-riscv@lists.infradead.org
+Subject: [kvm-unit-tests PATCH v8 33/35] configure: Make arch_libdir a first-class entity
+Date: Fri,  5 Apr 2024 18:35:34 +1000
+Message-ID: <20240405083539.374995-34-npiggin@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240405083539.374995-1-npiggin@gmail.com>
+References: <20240405083539.374995-1-npiggin@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Currently there can be maximum 16 breakpoints, and 16 watchpoints available
-on a given platform - as detected from ID_AA64DFR0_EL1.[BRPs|WRPs] register
-fields. But these breakpoint, and watchpoints can be extended further up to
-64 via a new arch feature FEAT_Debugv8p9.
+arch_libdir was brought in to improve the heuristic determination of
+the lib/ directory based on arch and testdir names, but it did not
+entirely clean that mess up.
 
-This first enables banked access for the breakpoint and watchpoint register
-set via MDSELR_EL1, extended exceptions via MDSCR_EL1.EMBWE and determining
-available breakpoints and watchpoints in the platform from ID_AA64DFR1_EL1,
-when FEAT_Debugv8p9 is enabled.
+Remove the arch_libdir->arch->testdir heuristic and just require
+everybody sets arch_libdir correctly. Fail if the lib/arch or
+lib/arch/asm directories can not be found.
 
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>
+Cc: Janosch Frank <frankja@linux.ibm.com>
+Cc: Laurent Vivier <lvivier@redhat.com>
+Cc: Nico Böhr <nrb@linux.ibm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org
+Cc: kvmarm@lists.linux.dev
+Cc: kvm-riscv@lists.infradead.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/arm64/include/asm/debug-monitors.h |  2 +-
- arch/arm64/include/asm/hw_breakpoint.h  | 46 +++++++++++++++++++------
- arch/arm64/kernel/debug-monitors.c      | 16 ++++++---
- arch/arm64/kernel/hw_breakpoint.c       | 33 ++++++++++++++++++
- 4 files changed, 82 insertions(+), 15 deletions(-)
+ Makefile  |  2 +-
+ configure | 18 +++++++++++++-----
+ 2 files changed, 14 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/include/asm/debug-monitors.h b/arch/arm64/include/asm/debug-monitors.h
-index 13d437bcbf58..75eedba2abbe 100644
---- a/arch/arm64/include/asm/debug-monitors.h
-+++ b/arch/arm64/include/asm/debug-monitors.h
-@@ -19,7 +19,7 @@
- /* MDSCR_EL1 enabling bits */
- #define DBG_MDSCR_KDE		(1 << 13)
- #define DBG_MDSCR_MDE		(1 << 15)
--#define DBG_MDSCR_MASK		~(DBG_MDSCR_KDE | DBG_MDSCR_MDE)
-+#define DBG_MDSCR_EMBWE		(1UL << 32)
+diff --git a/Makefile b/Makefile
+index 4f35fffc6..4e0f54543 100644
+--- a/Makefile
++++ b/Makefile
+@@ -10,7 +10,7 @@ include config.mak
+ VPATH = $(SRCDIR)
  
- #define	DBG_ESR_EVT(x)		(((x) >> 27) & 0x7)
+ libdirs-get = $(shell [ -d "lib/$(1)" ] && echo "lib/$(1) lib/$(1)/asm")
+-ARCH_LIBDIRS := $(call libdirs-get,$(ARCH_LIBDIR)) $(call libdirs-get,$(TEST_DIR))
++ARCH_LIBDIRS := $(call libdirs-get,$(ARCH_LIBDIR))
+ OBJDIRS := $(ARCH_LIBDIRS)
  
-diff --git a/arch/arm64/include/asm/hw_breakpoint.h b/arch/arm64/include/asm/hw_breakpoint.h
-index bd81cf17744a..6b9822140f71 100644
---- a/arch/arm64/include/asm/hw_breakpoint.h
-+++ b/arch/arm64/include/asm/hw_breakpoint.h
-@@ -79,8 +79,8 @@ static inline void decode_ctrl_reg(u32 reg,
-  * Limits.
-  * Changing these will require modifications to the register accessors.
-  */
--#define ARM_MAX_BRP		16
--#define ARM_MAX_WRP		16
-+#define ARM_MAX_BRP		64
-+#define ARM_MAX_WRP		64
+ DESTDIR := $(PREFIX)/share/kvm-unit-tests/
+diff --git a/configure b/configure
+index e19ba6f0c..a1308db8e 100755
+--- a/configure
++++ b/configure
+@@ -216,7 +216,6 @@ fi
+ arch_name=$arch
+ [ "$arch" = "aarch64" ] && arch="arm64"
+ [ "$arch_name" = "arm64" ] && arch_name="aarch64"
+-arch_libdir=$arch
  
- /* Virtual debug register bases. */
- #define AARCH64_DBG_REG_BVR	0
-@@ -135,22 +135,48 @@ static inline void ptrace_hw_copy_thread(struct task_struct *task)
- }
- #endif
+ if [ "$arch" = "riscv" ]; then
+     echo "riscv32 or riscv64 must be specified"
+@@ -286,8 +285,10 @@ fi
  
-+static inline bool is_debug_v8p9_enabled(void)
-+{
-+	u64 dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-+	int dver = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_DebugVer_SHIFT);
-+
-+	return dver == ID_AA64DFR0_EL1_DebugVer_V8P9;
-+}
-+
- /* Determine number of BRP registers available. */
- static inline int get_num_brps(void)
- {
--	u64 dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
--	return 1 +
--		cpuid_feature_extract_unsigned_field(dfr0,
--						ID_AA64DFR0_EL1_BRPs_SHIFT);
-+	u64 dfr0, dfr1;
-+	int dver, brps;
-+
-+	dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-+	dver = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_DebugVer_SHIFT);
-+	if (dver == ID_AA64DFR0_EL1_DebugVer_V8P9) {
-+		dfr1 = read_sanitised_ftr_reg(SYS_ID_AA64DFR1_EL1);
-+		brps = cpuid_feature_extract_unsigned_field_width(dfr1,
-+								  ID_AA64DFR1_EL1_BRPs_SHIFT, 8);
-+	} else {
-+		brps = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRPs_SHIFT);
-+	}
-+	return 1 + brps;
- }
+ if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
+     testdir=x86
++    arch_libdir=x86
+ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+     testdir=arm
++    arch_libdir=$arch
+     if [ "$target" = "qemu" ]; then
+         arm_uart_early_addr=0x09000000
+     elif [ "$target" = "kvmtool" ]; then
+@@ -336,6 +337,7 @@ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+     fi
+ elif [ "$arch" = "ppc64" ]; then
+     testdir=powerpc
++    arch_libdir=ppc64
+     firmware="$testdir/boot_rom.bin"
+     if [ "$endian" != "little" ] && [ "$endian" != "big" ]; then
+         echo "You must provide endianness (big or little)!"
+@@ -346,6 +348,7 @@ elif [ "$arch" = "riscv32" ] || [ "$arch" = "riscv64" ]; then
+     arch_libdir=riscv
+ elif [ "$arch" = "s390x" ]; then
+     testdir=s390x
++    arch_libdir=s390x
+ else
+     echo "arch $arch is not supported!"
+     arch=
+@@ -355,6 +358,10 @@ if [ ! -d "$srcdir/$testdir" ]; then
+     echo "$srcdir/$testdir does not exist!"
+     exit 1
+ fi
++if [ ! -d "$srcdir/lib/$arch_libdir" ]; then
++    echo "$srcdir/lib/$arch_libdir does not exist!"
++    exit 1
++fi
  
- /* Determine number of WRP registers available. */
- static inline int get_num_wrps(void)
- {
--	u64 dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
--	return 1 +
--		cpuid_feature_extract_unsigned_field(dfr0,
--						ID_AA64DFR0_EL1_WRPs_SHIFT);
-+	u64 dfr0, dfr1;
-+	int dver, wrps;
-+
-+	dfr0 = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-+	dver = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_DebugVer_SHIFT);
-+	if (dver == ID_AA64DFR0_EL1_DebugVer_V8P9) {
-+		dfr1 = read_sanitised_ftr_reg(SYS_ID_AA64DFR1_EL1);
-+		wrps = cpuid_feature_extract_unsigned_field_width(dfr1,
-+								  ID_AA64DFR1_EL1_WRPs_SHIFT, 8);
-+	} else {
-+		wrps = cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_WRPs_SHIFT);
-+	}
-+	return 1 + wrps;
- }
- 
- #ifdef CONFIG_CPU_PM
-diff --git a/arch/arm64/kernel/debug-monitors.c b/arch/arm64/kernel/debug-monitors.c
-index 64f2ecbdfe5c..3299d1e8dc61 100644
---- a/arch/arm64/kernel/debug-monitors.c
-+++ b/arch/arm64/kernel/debug-monitors.c
-@@ -23,6 +23,7 @@
- #include <asm/debug-monitors.h>
- #include <asm/system_misc.h>
- #include <asm/traps.h>
-+#include <asm/hw_breakpoint.h>
- 
- /* Determine debug architecture. */
- u8 debug_monitors_arch(void)
-@@ -34,7 +35,7 @@ u8 debug_monitors_arch(void)
- /*
-  * MDSCR access routines.
-  */
--static void mdscr_write(u32 mdscr)
-+static void mdscr_write(u64 mdscr)
- {
- 	unsigned long flags;
- 	flags = local_daif_save();
-@@ -43,7 +44,7 @@ static void mdscr_write(u32 mdscr)
- }
- NOKPROBE_SYMBOL(mdscr_write);
- 
--static u32 mdscr_read(void)
-+static u64 mdscr_read(void)
- {
- 	return read_sysreg(mdscr_el1);
- }
-@@ -76,10 +77,11 @@ early_param("nodebugmon", early_debug_disable);
-  */
- static DEFINE_PER_CPU(int, mde_ref_count);
- static DEFINE_PER_CPU(int, kde_ref_count);
-+static DEFINE_PER_CPU(int, embwe_ref_count);
- 
- void enable_debug_monitors(enum dbg_active_el el)
- {
--	u32 mdscr, enable = 0;
-+	u64 mdscr, enable = 0;
- 
- 	WARN_ON(preemptible());
- 
-@@ -90,6 +92,9 @@ void enable_debug_monitors(enum dbg_active_el el)
- 	    this_cpu_inc_return(kde_ref_count) == 1)
- 		enable |= DBG_MDSCR_KDE;
- 
-+	if (is_debug_v8p9_enabled() && this_cpu_inc_return(embwe_ref_count) == 1)
-+		enable |= DBG_MDSCR_EMBWE;
-+
- 	if (enable && debug_enabled) {
- 		mdscr = mdscr_read();
- 		mdscr |= enable;
-@@ -100,7 +105,7 @@ NOKPROBE_SYMBOL(enable_debug_monitors);
- 
- void disable_debug_monitors(enum dbg_active_el el)
- {
--	u32 mdscr, disable = 0;
-+	u64 mdscr, disable = 0;
- 
- 	WARN_ON(preemptible());
- 
-@@ -111,6 +116,9 @@ void disable_debug_monitors(enum dbg_active_el el)
- 	    this_cpu_dec_return(kde_ref_count) == 0)
- 		disable &= ~DBG_MDSCR_KDE;
- 
-+	if (is_debug_v8p9_enabled() && this_cpu_dec_return(embwe_ref_count) == 0)
-+		disable &= ~DBG_MDSCR_EMBWE;
-+
- 	if (disable) {
- 		mdscr = mdscr_read();
- 		mdscr &= disable;
-diff --git a/arch/arm64/kernel/hw_breakpoint.c b/arch/arm64/kernel/hw_breakpoint.c
-index 2f5755192c2b..7b9169535b76 100644
---- a/arch/arm64/kernel/hw_breakpoint.c
-+++ b/arch/arm64/kernel/hw_breakpoint.c
-@@ -103,10 +103,40 @@ int hw_breakpoint_slots(int type)
- 	WRITE_WB_REG_CASE(OFF, 14, REG, VAL);	\
- 	WRITE_WB_REG_CASE(OFF, 15, REG, VAL)
- 
-+static int set_bank_index(int n)
-+{
-+	int mdsel_bank;
-+	int bank = n / 16, index = n % 16;
-+
-+	switch (bank) {
-+	case 0:
-+		mdsel_bank = MDSELR_EL1_BANK_BANK_0;
-+		break;
-+	case 1:
-+		mdsel_bank = MDSELR_EL1_BANK_BANK_1;
-+		break;
-+	case 2:
-+		mdsel_bank = MDSELR_EL1_BANK_BANK_2;
-+		break;
-+	case 3:
-+		mdsel_bank = MDSELR_EL1_BANK_BANK_3;
-+		break;
-+	default:
-+		pr_warn("Unknown register bank %d\n", bank);
-+		return -EINVAL;
-+	}
-+	write_sysreg_s(mdsel_bank << MDSELR_EL1_BANK_SHIFT, SYS_MDSELR_EL1);
-+	isb();
-+	return index;
-+}
-+
- static u64 read_wb_reg(int reg, int n)
- {
- 	u64 val = 0;
- 
-+	if (is_debug_v8p9_enabled())
-+		n = set_bank_index(n);
-+
- 	switch (reg + n) {
- 	GEN_READ_WB_REG_CASES(AARCH64_DBG_REG_BVR, AARCH64_DBG_REG_NAME_BVR, val);
- 	GEN_READ_WB_REG_CASES(AARCH64_DBG_REG_BCR, AARCH64_DBG_REG_NAME_BCR, val);
-@@ -122,6 +152,9 @@ NOKPROBE_SYMBOL(read_wb_reg);
- 
- static void write_wb_reg(int reg, int n, u64 val)
- {
-+	if (is_debug_v8p9_enabled())
-+		n = set_bank_index(n);
-+
- 	switch (reg + n) {
- 	GEN_WRITE_WB_REG_CASES(AARCH64_DBG_REG_BVR, AARCH64_DBG_REG_NAME_BVR, val);
- 	GEN_WRITE_WB_REG_CASES(AARCH64_DBG_REG_BCR, AARCH64_DBG_REG_NAME_BCR, val);
+ if [ "$efi" = "y" ] && [ -f "$srcdir/$testdir/efi/run" ]; then
+     ln -fs "$srcdir/$testdir/efi/run" $testdir-run
+@@ -417,10 +424,11 @@ fi
+ # link lib/asm for the architecture
+ rm -f lib/asm
+ asm="asm-generic"
+-if [ -d "$srcdir/lib/$arch/asm" ]; then
+-	asm="$srcdir/lib/$arch/asm"
+-elif [ -d "$srcdir/lib/$testdir/asm" ]; then
+-	asm="$srcdir/lib/$testdir/asm"
++if [ -d "$srcdir/lib/$arch_libdir/asm" ]; then
++    asm="$srcdir/lib/$arch_libdir/asm"
++else
++    echo "$srcdir/lib/$arch_libdir/asm does not exist"
++    exit 1
+ fi
+ mkdir -p lib
+ ln -sf "$asm" lib/asm
 -- 
-2.25.1
+2.43.0
 
