@@ -1,48 +1,40 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CD7B22616
-	for <kvmarm@lists.linux.dev>; Fri,  5 Apr 2024 02:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E224A12F36F
+	for <kvmarm@lists.linux.dev>; Fri,  5 Apr 2024 08:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712285254; cv=none; b=breBz19KDHLDgj19DTPAgG9f2Hh3cplGeAtzO/5vPC+/DwBHB/i+isGZuRUyTfRV9WP6wox3vAxn+8aOW4hszcHQjWedIy6aMXWlp1fEVsCXUekcYX+kVXuHfddcaLWkF/LHFHSuiarF68HzEFH+uQKO4aWpjSoS39WfOg9tGX0=
+	t=1712304022; cv=none; b=tya/AgqWYuSA6BSt+zxFvcM8PVLfA9PPKiV/jB3m3n1q6WZfXKZRRCxgGC/WMLbYf669ZW36lVLemX5OJW54n03znDn5U1Z03dmS6ggSWhSUVsscb1O3CsYQcyLIzS06Lmefe51dWfkSVJta8EaESS9adfcJpZqOal1LCbf+NC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712285254; c=relaxed/simple;
-	bh=IY493TrxMfdZYIZQ/nCBveFwg5TIsBSQhfWvpNlqoqQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mK4aaMSAjbPTaZsZBbOti1DQvA8ao8A2vVAHcXT6lgmLZVNNdxg3GypK5mGHrKRiQKuh98R7i7IMg5UZ0siNEeXifcT9niO7oWbirP4wBuHRxRmWPrJhMpQGFw4VDeIbiPENKEIQF5DryijtK7MzPVsW45yuzdTYEsAP6PFGnFg=
+	s=arc-20240116; t=1712304022; c=relaxed/simple;
+	bh=K0jbqizd5zPHT9aXGkLOAN145XISiFK3wtDOu1N1MTo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=N8BS7mGcxTXmQaxRDaYyV/EmYicKTxNqVpsmGjlvSfRsah8vrSGb6gXEnXMtSF9bX+u+QxnOjniReFcQ4vKLOKOsgr2EOogibCCdGErCJphkq5d+3fPt72tll60B44APtMxLpdKEfmIG2DIYfHf1uBFKZPLTjYNoJlXIngSAZtI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 02418FEC;
-	Thu,  4 Apr 2024 19:48:03 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D362DFEC;
+	Fri,  5 Apr 2024 01:00:48 -0700 (PDT)
 Received: from a077893.blr.arm.com (a077893.blr.arm.com [10.162.41.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 6F08D3F766;
-	Thu,  4 Apr 2024 19:47:26 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 0B0C63F64C;
+	Fri,  5 Apr 2024 01:00:13 -0700 (PDT)
 From: Anshuman Khandual <anshuman.khandual@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	mark.rutland@arm.com
+To: linux-arm-kernel@lists.infradead.org
 Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
-	Mark Brown <broonie@kernel.org>,
-	James Clark <james.clark@arm.com>,
-	Rob Herring <robh@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
 	Marc Zyngier <maz@kernel.org>,
-	Suzuki Poulose <suzuki.poulose@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	linux-perf-users@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>,
 	James Morse <james.morse@arm.com>,
-	kvmarm@lists.linux.dev
-Subject: [PATCH V17 6/9] KVM: arm64: nvhe: Disable branch generation in nVHE guests
-Date: Fri,  5 Apr 2024 08:16:36 +0530
-Message-Id: <20240405024639.1179064-7-anshuman.khandual@arm.com>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [RFC 0/8] arm64/hw_breakpoint: Enable FEAT_Debugv8p9
+Date: Fri,  5 Apr 2024 13:30:00 +0530
+Message-Id: <20240405080008.1225223-1-anshuman.khandual@arm.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240405024639.1179064-1-anshuman.khandual@arm.com>
-References: <20240405024639.1179064-1-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -51,137 +43,48 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Disable the BRBE before we enter the guest, saving the status and enable it
-back once we get out of the guest. This avoids capturing branch records in
-the guest kernel or userspace, which would be confusing the host samples.
+This series enables FEAT_Debugv8p9 thus extending breakpoint and watchpoint
+support upto 64. This has been lightly tested and still work is in progress
+but would like to get some early feedback on the approach.
 
+Possible impact of context switches while tracing kernel addresses needs to
+be evaluated regarding MDSELR_EL1 access. This series is based on v6.9-rc2.
+
+Cc: Jonathan Corbet <corbet@lwn.net>
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Oliver Upton <oliver.upton@linux.dev>
 Cc: James Morse <james.morse@arm.com>
 Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev
+Cc: Mark Brown <broonie@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org
-CC: linux-kernel@vger.kernel.org
-Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
-----
-Changes in V17:
+Cc: kvmarm@lists.linux.dev
+Cc: linux-kernel@vger.kernel.org
 
-- Dropped isb() call sites in  __debug_[save|restore]_brbe()
-- Changed to [read|write]_sysreg_el1() accessors in __debug_[save|restore]_brbe()
+Anshuman Khandual (8):
+  arm64/sysreg: Add register fields for MDSELR_EL1
+  arm64/sysreg: Add register fields for HDFGRTR2_EL2
+  arm64/sysreg: Add register fields for HDFGWTR2_EL2
+  arm64/sysreg: Update ID_AA64MMFR0_EL1 register
+  KVM: arm64: Explicitly handle MDSELR_EL1 traps as UNDEFINED
+  arm64/cpufeature: Add field details for ID_AA64DFR1_EL1 register
+  arm64/boot: Enable EL2 requirements for FEAT_Debugv8p9
+  arm64/hw_breakpoint: Enable FEAT_Debugv8p9
 
- arch/arm64/include/asm/kvm_host.h  |  5 ++++-
- arch/arm64/kvm/debug.c             |  5 +++++
- arch/arm64/kvm/hyp/nvhe/debug-sr.c | 31 ++++++++++++++++++++++++++++++
- 3 files changed, 40 insertions(+), 1 deletion(-)
+ Documentation/arch/arm64/booting.rst    | 19 +++++++
+ arch/arm64/include/asm/debug-monitors.h |  2 +-
+ arch/arm64/include/asm/el2_setup.h      | 27 ++++++++++
+ arch/arm64/include/asm/hw_breakpoint.h  | 46 +++++++++++++----
+ arch/arm64/include/asm/kvm_arm.h        |  1 +
+ arch/arm64/kernel/cpufeature.c          | 21 ++++++--
+ arch/arm64/kernel/debug-monitors.c      | 16 ++++--
+ arch/arm64/kernel/hw_breakpoint.c       | 33 ++++++++++++
+ arch/arm64/kvm/sys_regs.c               |  1 +
+ arch/arm64/tools/sysreg                 | 68 +++++++++++++++++++++++++
+ 10 files changed, 214 insertions(+), 20 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 9e8a496fb284..a105bea8ecd0 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -609,7 +609,7 @@ struct kvm_vcpu_arch {
- 	u8 cflags;
- 
- 	/* Input flags to the hypervisor code, potentially cleared after use */
--	u8 iflags;
-+	u16 iflags;
- 
- 	/* State flags for kernel bookkeeping, unused by the hypervisor code */
- 	u8 sflags;
-@@ -650,6 +650,7 @@ struct kvm_vcpu_arch {
- 		u64 pmscr_el1;
- 		/* Self-hosted trace */
- 		u64 trfcr_el1;
-+		u64 brbcr_el1;
- 	} host_debug_state;
- 
- 	/* VGIC state */
-@@ -819,6 +820,8 @@ struct kvm_vcpu_arch {
- #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
- /* vcpu running in HYP context */
- #define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
-+/* Save BRBE context if active  */
-+#define DEBUG_STATE_SAVE_BRBE	__vcpu_single_flag(iflags, BIT(8))
- 
- /* SVE enabled for host EL0 */
- #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
-diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-index ce8886122ed3..8fa648943f0f 100644
---- a/arch/arm64/kvm/debug.c
-+++ b/arch/arm64/kvm/debug.c
-@@ -336,10 +336,15 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
- 	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_TraceBuffer_SHIFT) &&
- 	    !(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_P))
- 		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
-+
-+	/* Check if we have BRBE implemented and available at the host */
-+	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRBE_SHIFT))
-+		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
- }
- 
- void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu)
- {
- 	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_SPE);
- 	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_TRBE);
-+	vcpu_clear_flag(vcpu, DEBUG_STATE_SAVE_BRBE);
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-index 7746ea507b6f..a6dec3646afc 100644
---- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-@@ -79,6 +79,32 @@ static void __debug_restore_trace(u64 trfcr_el1)
- 	write_sysreg_el1(trfcr_el1, SYS_TRFCR);
- }
- 
-+static void __debug_save_brbe(u64 *brbcr_el1)
-+{
-+	*brbcr_el1 = 0;
-+
-+	/* Check if the BRBE is enabled */
-+	if (!(read_sysreg_el1(SYS_BRBCR) & (BRBCR_ELx_E0BRE | BRBCR_ELx_ExBRE)))
-+		return;
-+
-+	/*
-+	 * Prohibit branch record generation while we are in guest.
-+	 * Since access to BRBCR_EL1 is trapped, the guest can't
-+	 * modify the filtering set by the host.
-+	 */
-+	*brbcr_el1 = read_sysreg_el1(SYS_BRBCR);
-+	write_sysreg_el1(0, SYS_BRBCR);
-+}
-+
-+static void __debug_restore_brbe(u64 brbcr_el1)
-+{
-+	if (!brbcr_el1)
-+		return;
-+
-+	/* Restore BRBE controls */
-+	write_sysreg_el1(brbcr_el1, SYS_BRBCR);
-+}
-+
- void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
- {
- 	/* Disable and flush SPE data generation */
-@@ -87,6 +113,9 @@ void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
- 	/* Disable and flush Self-Hosted Trace generation */
- 	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
- 		__debug_save_trace(&vcpu->arch.host_debug_state.trfcr_el1);
-+	/* Disable BRBE branch records */
-+	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_BRBE))
-+		__debug_save_brbe(&vcpu->arch.host_debug_state.brbcr_el1);
- }
- 
- void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
-@@ -100,6 +129,8 @@ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
- 		__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
- 	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_TRBE))
- 		__debug_restore_trace(vcpu->arch.host_debug_state.trfcr_el1);
-+	if (vcpu_get_flag(vcpu, DEBUG_STATE_SAVE_BRBE))
-+		__debug_restore_brbe(vcpu->arch.host_debug_state.brbcr_el1);
- }
- 
- void __debug_switch_to_host(struct kvm_vcpu *vcpu)
 -- 
 2.25.1
 
