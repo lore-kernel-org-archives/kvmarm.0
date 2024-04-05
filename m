@@ -1,57 +1,57 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E7D15FA7C
-	for <kvmarm@lists.linux.dev>; Fri,  5 Apr 2024 09:01:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D101465B4
+	for <kvmarm@lists.linux.dev>; Fri,  5 Apr 2024 09:01:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712307703; cv=none; b=J2uDKtnDcsSwfbozhDz9xK9UwItpA7GACcHzTnuGwjEaPA59lG7t09ISQNSby8mN7Lv7CjLunOQPthYjsUEAPYA8A7/gPq2yz5aLq4YFvzqsV1BpeC6+c8drTjpqOd3Rsjj3/+Us5eOS/Jg80Ius9TDQepS4JeALqvweREqTvSs=
+	t=1712307712; cv=none; b=VT32a4P/MvD/jG7cZYQvL3guzzFckn+GpAjR4sHkTHfHeCGrWaT3OWa88A7ZzB0NU4w/UtX/EJUWT5zjf4Xfrffg2KpSZa8otp9g8YwK/HYYm7PSyo0vRBA9WDkzz7cK+sp4D5iykUKlcf+pO9rIag5zJiBed8OdHNWxFhxJ/m0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712307703; c=relaxed/simple;
-	bh=506MTEjbVPXF8Zt3kJ2sS8cgtechUEV91w1R5KBhWo0=;
+	s=arc-20240116; t=1712307712; c=relaxed/simple;
+	bh=4g1r/UsnPqbm9eIN4ayWeeOIX2i8p9mAV/a9qMDvTH8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hnsVyehVWm71/iZ1Pjht/DrvV73OLtuxTzGchBSJwVn9CBYM3/uOPWjZWgvmgtJVS148DlugAP94Mz1r4+ZK5eswMbKZsmJQpd9t6usePVcxN7xC68OVfH0CdUPcyqxNmzBQ0ikao8aB/jIHj1NnAFiJf0tLMmXGoI/jMgjSPm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h/Vmz2Gr; arc=none smtp.client-ip=209.85.210.176
+	 MIME-Version; b=o0vJAfGXlllJASp1IqRuYXrTLCm3u3GixrQq9FInaZzpMjCkKJ8e5YNLMz8+u3iYOPZOZ/idFaG4xBPtXETQY4ltxe/bqFVASsvOXOTOPuXDmfv0i8CYSLoiVWpHV2fWLtTIGxdyFx/Ykpisw5lq21mtirGYOF/dCSSJrO5eJoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OsCprRdw; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h/Vmz2Gr"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6ea9a60f7f5so1666920b3a.3
-        for <kvmarm@lists.linux.dev>; Fri, 05 Apr 2024 02:01:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OsCprRdw"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6eaf9565e6bso1439811b3a.2
+        for <kvmarm@lists.linux.dev>; Fri, 05 Apr 2024 02:01:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712307701; x=1712912501; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1712307710; x=1712912510; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jWkgTiRHnk4W4aXSUXKYIpIrbIJtMcwldZh7NhaIyxs=;
-        b=h/Vmz2GrqVG7XgZTS/dLm4ABSD+kyhEyQ8+cSWGeiOKGUN9VlKSh3T+rgj1oedLaep
-         Nsh/D8UiHCUUWmKvV7/eUR1UOtyzC5cUgER2K3nbBwyxwZCyd102o2SK6NvCASdGt84l
-         1twpzN+m8MGJgVhc3+Kav0XdwDe3sFiI/a+doTahR8UuwhdqrM6SmIP2QhSB6qEWSL6z
-         RZRGacEwDmhVDxFKkXtsB37v1jNK8is4PEyToxNKpNdu2PMnxcrijpL3BWNlW1myIoYP
-         MtYXZMUlY0gKP/mYGRGaSF7B1IVQPXiI1ogoH9lfNz3zVqiGmMQeg5oanyn9RaQIAcoC
-         QJqw==
+        bh=tE5LrHkhPWwsD1wVtesjtmAMJJFllrOtQDVtshSFCEA=;
+        b=OsCprRdwOAbztvRGLsWhnVYIlbGYwp+3BUznurKPBhpffW2qIcaGLbRqpo/IM94060
+         uFIRnQalfygHYe9fY61vF2hsvmk6UkkcmLlUkcdxLkftoBhKRuMdIO+vSBrsk4FOApAC
+         Qxz7V/RQXju4oHy7DhRHTY/cqzEF+pVAetj0XhwOjiIe7crwXEg5NfOiFEx+YSl66piQ
+         fUG0b6eg46mmkzR3RxL+ntk1c496yyQsQhgfX3StDdnJeAQegSmEQp0IUwRHeWsX8DXf
+         7+OtxjI8yFYE0XiHOSi8qvMtKye4m8OMP+3/NuLqzySs15pwD6y/VRJjKf3P0bQW2gFl
+         tWFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712307701; x=1712912501;
+        d=1e100.net; s=20230601; t=1712307710; x=1712912510;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jWkgTiRHnk4W4aXSUXKYIpIrbIJtMcwldZh7NhaIyxs=;
-        b=Ecrp/DlMoVIA3k/s2KGMXndlxC9VFL2SKSozTgGzuj3TIW3rG94zCHdGRinOgzx+Qq
-         zxu4TzUXa/Ik51meEQNFE/4TcV7qlyTwb3UelxIlUuv1zuir84r1NSkJ45gRDeNnqMJY
-         FeCfTelUvYGuSHIB7sHV80MyPq41E6o0n4p/kQbCrKyZ5xub2IifbNBZuiEvnhqhTzAH
-         EHBHqvEw9wZp/GCiYeeCV+pBr8Z81W0r9aMjY2fTydWcpCctZBFRMDu95FsMOpMmuQsu
-         L8PwqzXR4ZuzObm3Y0gufqhFIXMqHWssG8K4kGwVwaaNvuvB+q6bQijsj6AjYo0Urg4s
-         +/wg==
-X-Forwarded-Encrypted: i=1; AJvYcCU5l75LKpQ1kp2moqKXd9ab5Gvw2B5bwtIE2tv1o8YhcEM2e2t5Xu5BW0zCcLjuytN4q5hGO/ZXFAw9Cwe3h91huO36LjJ+
-X-Gm-Message-State: AOJu0Yz8JyrydZ78InKwJn0wVGUQkNF0a5bR0+MjHZUmhn3umxrEgbWm
-	tU0TArvQqTexDyhfkRSobTusJel/cmsxMP/Jg5Jvqz5hRYpwMkvo
-X-Google-Smtp-Source: AGHT+IFKRylcUQSeLpH891qpaLSwfOXby/ZCFByKbFqJhH6RagTfsZsaWuVIt0y3x2KTtKSKRijqgw==
-X-Received: by 2002:a05:6a20:5603:b0:1a3:69e9:2fc4 with SMTP id ir3-20020a056a20560300b001a369e92fc4mr759512pzc.22.1712307701154;
-        Fri, 05 Apr 2024 02:01:41 -0700 (PDT)
+        bh=tE5LrHkhPWwsD1wVtesjtmAMJJFllrOtQDVtshSFCEA=;
+        b=OGOLjbj+RyxJcUrQZujfB7aj7t7GGg+zvyjAkX150Th2jS4tfD4k5F3mgdxzDI2zm/
+         Tb0RwECfMv2T2jA9hFoZjEPkmAK/J2fKjodgJjk2UvwfMLCBCNdX6BFlgTu41BabMkTM
+         C4llkexjInLv+RUx84XiHoBhEv7uiCLj2acva2pBXFIgtU9joNG86P85O7302s+KnP14
+         MpC2VCcyxADlSPGilNQGT9fxTfGDvIbBTouO2bQJgOVGPAaR1ziR5dx9Mi00RgA5Ep83
+         mUS5cAdXO9PE21puO6sukzToo+uOQCPrnb8HpxgiUaY7Zr8+gjEo6BcFeizmKQ9mN15x
+         VOVw==
+X-Forwarded-Encrypted: i=1; AJvYcCXuE7tl2rN+MHu0+QCCokqplvBZaEnzPtX8j0Ok6QHjOHwR+jbHNWAhtSMECB+KrIkJszVcYpUaLeb9XuEBWaZgEW+vc0cx
+X-Gm-Message-State: AOJu0Yxl6rNVZ4uNzDAp3VqjOv3A3HKNcCkIaFun44QmKesVUDmCrpTj
+	blX7knBJV+sQrQuOQt83gdPJyzCDOYRmvgQsDA7TqTnbGNJK+1UQ
+X-Google-Smtp-Source: AGHT+IG8zRLKzBiTQEfRs0hBIeVmr7NK/SMycA7/nOPbTjd9DY0AzfGVwPzzqjCddECVKUaZg6xLKQ==
+X-Received: by 2002:a05:6a00:988:b0:6ec:da6c:fd42 with SMTP id u8-20020a056a00098800b006ecda6cfd42mr1095467pfg.5.1712307709981;
+        Fri, 05 Apr 2024 02:01:49 -0700 (PDT)
 Received: from wheely.local0.net (124-169-104-130.tpgi.com.au. [124.169.104.130])
-        by smtp.gmail.com with ESMTPSA id s12-20020a62e70c000000b006ecf25d0b8dsm995783pfh.184.2024.04.05.02.01.33
+        by smtp.gmail.com with ESMTPSA id s12-20020a62e70c000000b006ecf25d0b8dsm995783pfh.184.2024.04.05.02.01.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 02:01:40 -0700 (PDT)
+        Fri, 05 Apr 2024 02:01:49 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Andrew Jones <andrew.jones@linux.dev>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -76,9 +76,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	kvmarm@lists.linux.dev,
 	kvm-riscv@lists.infradead.org,
 	linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests RFC PATCH 04/17] shellcheck: Fix SC2094
-Date: Fri,  5 Apr 2024 19:00:36 +1000
-Message-ID: <20240405090052.375599-5-npiggin@gmail.com>
+Subject: [kvm-unit-tests RFC PATCH 05/17] shellcheck: Fix SC2006
+Date: Fri,  5 Apr 2024 19:00:37 +1000
+Message-ID: <20240405090052.375599-6-npiggin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240405090052.375599-1-npiggin@gmail.com>
 References: <20240405090052.375599-1-npiggin@gmail.com>
@@ -90,41 +90,56 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-  SC2094 (info): Make sure not to read and write the same file in the same
-  pipeline.
+  SC2006 (style): Use $(...) notation instead of legacy backticks `...`.
 
-This is not as clearly bad as overwriting an input file with >, but
-could appended characters possibly be read in from the input
-redirection?
+No bug identified.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- scripts/arch-run.bash | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ scripts/arch-run.bash | 6 +++---
+ scripts/runtime.bash  | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-index 1901a929f..472c31b08 100644
+index 472c31b08..f9d1fade9 100644
 --- a/scripts/arch-run.bash
 +++ b/scripts/arch-run.bash
-@@ -492,6 +492,8 @@ env_file ()
+@@ -271,16 +271,16 @@ do_migration ()
+ 	qmp ${src_qmp} '"migrate", "arguments": { "uri": "unix:'${dst_incoming}'" }' > ${src_qmpout}
  
- env_errata ()
- {
-+	local new_env
-+
- 	if [ "$ACCEL" = "tcg" ]; then
- 		export "ERRATA_FORCE=y"
- 	elif [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
-@@ -500,7 +502,8 @@ env_errata ()
- 	elif [ "$ERRATATXT" ]; then
- 		env_generate_errata
- 	fi
--	sort <(env | grep '^ERRATA_') <(grep '^ERRATA_' $KVM_UNIT_TESTS_ENV) | uniq -u >>$KVM_UNIT_TESTS_ENV
-+	new_env=$(sort <(env | grep '^ERRATA_') <(grep '^ERRATA_' $KVM_UNIT_TESTS_ENV) | uniq -u)
-+	echo "$new_env" >>$KVM_UNIT_TESTS_ENV
+ 	# Wait for the migration to complete
+-	migstatus=`qmp ${src_qmp} '"query-migrate"' | grep return`
++	migstatus=$(qmp ${src_qmp} '"query-migrate"' | grep return)
+ 	while ! grep -q '"completed"' <<<"$migstatus" ; do
+ 		sleep 0.1
+-		if ! migstatus=`qmp ${src_qmp} '"query-migrate"'`; then
++		if ! migstatus=$(qmp ${src_qmp} '"query-migrate"'); then
+ 			echo "ERROR: Querying migration state failed." >&2
+ 			echo > ${dst_infifo}
+ 			qmp ${dst_qmp} '"quit"'> ${dst_qmpout} 2>/dev/null
+ 			return 2
+ 		fi
+-		migstatus=`grep return <<<"$migstatus"`
++		migstatus=$(grep return <<<"$migstatus")
+ 		if grep -q '"failed"' <<<"$migstatus"; then
+ 			echo "ERROR: Migration failed." >&2
+ 			echo > ${dst_infifo}
+diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+index 2d7ff5baa..f79c4e281 100644
+--- a/scripts/runtime.bash
++++ b/scripts/runtime.bash
+@@ -61,9 +61,9 @@ function print_result()
+     local reason="$4"
+ 
+     if [ -z "$reason" ]; then
+-        echo "`$status` $testname $summary"
++        echo "$($status) $testname $summary"
+     else
+-        echo "`$status` $testname ($reason)"
++        echo "$($status) $testname ($reason)"
+     fi
  }
  
- env_generate_errata ()
 -- 
 2.43.0
 
