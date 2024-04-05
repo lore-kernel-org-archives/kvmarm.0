@@ -1,84 +1,153 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE86C16ABDE;
-	Fri,  5 Apr 2024 13:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D93B16D9C3
+	for <kvmarm@lists.linux.dev>; Fri,  5 Apr 2024 13:59:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712322981; cv=none; b=h4al9zmvIaVwzNZaUOQs0aRMv76HAnam/KkxdAK6NTRLpjf7+Lb2x5BPf8J/wkC8PSw5LuBNzlkSGWKr0/CjHrWvO5Yrad9blS6c7Fq6w39wCJefz2GVeDHVPtEZYGLOL/s4ZKZ5jcPGt2ZiNAd7hi1VEwE1ovE26wG8keTXvks=
+	t=1712325564; cv=none; b=fJGvs60MrXC9VZfa7mLeOcE/HVKNJ94ulMSgb8EBgrUEhi+LAjPk0SP6s2Prc6uuth6H/4unwmQlcfYN7zcpvQ6IJrouK+GUFcxMjWCbF8jX2lY7sOfhpAlgFkILDZMX5vawAwhENUx4ov6m23QwSO/hrNKGfwvTp421QqHftzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712322981; c=relaxed/simple;
-	bh=qwfaU0u0xLh5iRlmJggGU9Ltv3x47SknZooFmsA6W/g=;
+	s=arc-20240116; t=1712325564; c=relaxed/simple;
+	bh=4XLS0rq6izIRaRgceQ0GX/l4V0ZzhDGRBl8KjoQCv1E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IvVes0jb/sF/n+91EsyLPXs9VWrdHMFECQ0xWJ5Eqp6PaUwIiH/3wlsyJzR/qJXtbe7qfrzm2/qv2RSfGUtuUEfzaZIoNAd/Vzi9wIBo1RytYL4SlutUbL+h/pDOtGhBg8XNsrs0q3K+4mye3vzpY2RSIZZOGehaavoQAp8ECDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pSG6GGXi; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=dnywYb0RDv+9jXOUsaAKtJjic8dbBVCke9lqj4cJSw/UtnGsdl+59LuVXFWofHNzJx86wHt/lGTMB93ffHBfCIcLLutJZM+JI12troo60Kogyl34S0k8J/mZqOLrXz8jGIdGTiIkk6CZ0Sn6aYwn8XCIKXvwAwKOivVsQD/HAFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IoYJPoi0; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pSG6GGXi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65F88C433F1;
-	Fri,  5 Apr 2024 13:16:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712322979;
-	bh=qwfaU0u0xLh5iRlmJggGU9Ltv3x47SknZooFmsA6W/g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pSG6GGXii8+7JoNp3tmKY9va6KoB3da5HFxSg0oi0RPmdQ1WzZCCMTNExq8Ivbrq5
-	 ff2AGQrMSJkai/tsuPFBiNFZsmCxO6GT3EjEN6bAS8SqcTDVi4xyGJ4qDsA5dyWX/x
-	 bd4U/JVMTQ4jfhRqwH86pDgigmCM+PC/RRd+8R7oSkgwKecsg1H7tZWB+/Ey64Jrcx
-	 m7yluXVUKV7Ul4G0XR5lum6aOz7aKaxPDb0pOTIEIeHkOH8OfFsS/8aGFOu6TK3Acz
-	 AG/eWcODXNTFcSrxyzMYhPGVCv3mFfqhq+m/AdGk+7kT2s6EkLwJpFS2fPq8Oahxdc
-	 nYYywi8L9YHYw==
-Date: Fri, 5 Apr 2024 14:16:14 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [RFC 4/8] arm64/sysreg: Update ID_AA64MMFR0_EL1 register
-Message-ID: <9c7be563-7af9-42ef-a13e-d04493bf70a4@sirena.org.uk>
-References: <20240405080008.1225223-1-anshuman.khandual@arm.com>
- <20240405080008.1225223-5-anshuman.khandual@arm.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IoYJPoi0"
+Date: Fri, 5 Apr 2024 15:59:15 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1712325559;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0LGCxJo2e6ztj7xm+eeWNgiP8C9O8q6U3aglumrUQj4=;
+	b=IoYJPoi0M2ZT/ptqBymtJtBWfIQSQijqLK9xkDt+NMSivicre5g2p88jTlrKUd30MOzCt2
+	679b+aShBO+NK9CS8VTlqA/i3JeccFE9O5KlUUQYwxdjkOgjwnHd4CJRFOoB1308KkmSly
+	BiieO9JulNYjRqENoYIAeAVc22Jm0l8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Eric Auger <eric.auger@redhat.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Nico =?utf-8?B?QsO2aHI=?= <nrb@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
+	Shaoqin Huang <shahuang@redhat.com>, Nikos Nikoleris <nikos.nikoleris@arm.com>, 
+	Nadav Amit <namit@vmware.com>, David Woodhouse <dwmw@amazon.co.uk>, 
+	Ricardo Koller <ricarkol@google.com>, rminmin <renmm6@chinaunicom.cn>, Gavin Shan <gshan@redhat.com>, 
+	Nina Schoetterl-Glausch <nsg@linux.ibm.com>, Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests RFC PATCH 00/17] add shellcheck support
+Message-ID: <20240405-20fbe979a00acc8b9d161936@orel>
+References: <20240405090052.375599-1-npiggin@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="If4EORZDdzM3G+6G"
-Content-Disposition: inline
-In-Reply-To: <20240405080008.1225223-5-anshuman.khandual@arm.com>
-X-Cookie: Honk if you love peace and quiet.
-
-
---If4EORZDdzM3G+6G
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20240405090052.375599-1-npiggin@gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Apr 05, 2024 at 01:30:04PM +0530, Anshuman Khandual wrote:
-> This updates ID_AA64MMFR0_EL1.FGT and ID_AA64MMFR0_EL1.PARANGE register
-> fields as per the definitions based on DDI0601 2023-12.
+On Fri, Apr 05, 2024 at 07:00:32PM +1000, Nicholas Piggin wrote:
+> I foolishly promised Andrew I would look into shellcheck, so here
+> it is.
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+Thanks! I hope you only felt foolish since it was recently April
+Fool's day, though.
 
-against DDI0601 2024-03
+> 
+> https://gitlab.com/npiggin/kvm-unit-tests/-/tree/powerpc?ref_type=heads
+> 
+> This is on top of the "v8 migration, powerpc improvements" series. For
+> now the patches are a bit raw but it does get down to zero[*] shellcheck
+> warnings while still passing gitlab CI.
+> 
+> [*] Modulo the relatively few cases where they're disabled or
+> suppressed.
+> 
+> I'd like comments about what should be enabled and disabled? There are
+> quite a lot of options. Lots of changes don't fix real bugs AFAIKS, so
+> there's some taste involved.
 
---If4EORZDdzM3G+6G
-Content-Type: application/pgp-signature; name="signature.asc"
+Yes, Bash is like that. We should probably eventually have a Bash style
+guide as well as shellcheck and then tune shellcheck to the guide as
+best we can.
 
------BEGIN PGP SIGNATURE-----
+> 
+> Could possibly be a couple of bugs, including in s390x specific. Any
+> review of those to confirm or deny bug is appreciated. I haven't tried
+> to create reproducers for them.
+> 
+> I added a quick comment on each one whether it looks like a bug or
+> harmless but I'm not a bash guru so could easily be wrong. I would
+> possibly pull any real bug fixes to the front of the series and describe
+> them as proper fix patches, and leave the other style / non-bugfixes in
+> the brief format.  shellcheck has a very good wiki explaining each issue
+> so there is not much point in rehashing that in the changelog.
+> 
+> One big thing kept disabled for now is the double-quoting to prevent
+> globbing and splitting warning that is disabled. That touches a lot of
+> code and we're very inconsistent about quoting variables today, but it's
+> not completely trivial because there are quite a lot of places that does
+> rely on splitting for invoking commands with arguments. That would need
+> some rework to avoid sprinkling a lot of warning suppressions around.
+> Possibly consistently using arrays for argument lists would be the best
+> solution?
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmYP+Z0ACgkQJNaLcl1U
-h9BtPwf/QcCvhPN6NLz+qvvMBLRj2nmUSW8C0FH7z9QyQKLrx49JeMZjS6StTu3u
-GJI4l63r9QHQqAL1quOmAtBMbe+Nse67QZ+TcbB9p+8zmNaBRm6dE9GyY7oDqeVJ
-is2oss4rRINkDqsKSEPoPIiLTZsbnxz++uQzzIq0bOx/8mEg7+Vq7KxQqUT4T/jI
-4yKhMTTVafW3M5QxUQSJnCt1U2i7URgtn8OmZdmnyP/IkW+mclbOjOS66H2aA0ea
-uEYWf2oWPc8CelIKHr2g5mtZaEf1X8liM507yxEvna8FQ/gntuRrWqGVB76tdvuB
-v13frDL87dHoeRulgqC9SuoBBvv4zQ==
-=biW5
------END PGP SIGNATURE-----
+Yes, switching to arrays and using double-quoting would be good, but we
+can leave it for follow-on work after a first round of shellcheck
+integration.
 
---If4EORZDdzM3G+6G--
+Thanks,
+drew
+
+> 
+> Thanks,
+> Nick
+> 
+> Nicholas Piggin (17):
+>   Add initial shellcheck checking
+>   shellcheck: Fix SC2223
+>   shellcheck: Fix SC2295
+>   shellcheck: Fix SC2094
+>   shellcheck: Fix SC2006
+>   shellcheck: Fix SC2155
+>   shellcheck: Fix SC2235
+>   shellcheck: Fix SC2119, SC2120
+>   shellcheck: Fix SC2143
+>   shellcheck: Fix SC2013
+>   shellcheck: Fix SC2145
+>   shellcheck: Fix SC2124
+>   shellcheck: Fix SC2294
+>   shellcheck: Fix SC2178
+>   shellcheck: Fix SC2048
+>   shellcheck: Fix SC2153
+>   shellcheck: Suppress various messages
+> 
+>  .shellcheckrc           | 32 +++++++++++++++++++++++++
+>  Makefile                |  4 ++++
+>  README.md               |  2 ++
+>  arm/efi/run             |  4 ++--
+>  riscv/efi/run           |  4 ++--
+>  run_tests.sh            | 11 +++++----
+>  s390x/run               |  8 +++----
+>  scripts/arch-run.bash   | 52 ++++++++++++++++++++++++++++-------------
+>  scripts/common.bash     |  5 +++-
+>  scripts/mkstandalone.sh |  4 +++-
+>  scripts/runtime.bash    | 14 +++++++----
+>  scripts/s390x/func.bash |  2 +-
+>  12 files changed, 106 insertions(+), 36 deletions(-)
+>  create mode 100644 .shellcheckrc
+> 
+> -- 
+> 2.43.0
+> 
+> 
+> -- 
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
