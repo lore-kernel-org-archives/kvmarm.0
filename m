@@ -1,126 +1,191 @@
-Received: from toucan.tulip.relay.mailchannels.net (toucan.tulip.relay.mailchannels.net [23.83.218.254])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4038D82D90
-	for <kvmarm@lists.linux.dev>; Thu,  4 Apr 2024 22:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.218.254
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712268424; cv=pass; b=eHpACbvVtqFJrBhSVkryzmW5BcyS58+Uw6LGMyxuK3e8vAVuVDYGjQBlxHVyH/SPy1acDIE/QjpOcaYX3nfp6eofVjWn/Z9MVOn0/qIFCcDSYdO2+dzyQSSfwkIOoqQikdm6oFS2tMfx7MVt/Xo11+Didd1N9SfKZMwnH3bbMjQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712268424; c=relaxed/simple;
-	bh=M6DIshYVJQR0DO4VUKuLo4E19fWk1vmFQ2Kk6iCE5tk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k21WshQJX/+sGeIZCrXujx/2hM/1+wTN80J4BXoQhOlL9dHBBIbF0XXkRUCuo3fGBfmRUgr6XhcUT+bF4u22Q8+WUluSc6eXTwJmEGf7LQCoY3CPQSXb3rEg47isCSvI7+Hk0cMne9AAwR3ZrhdzWjtaQQCQmr6LyKb6zrYcbYo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=templeofstupid.com; spf=pass smtp.mailfrom=templeofstupid.com; dkim=pass (2048-bit key) header.d=templeofstupid.com header.i=@templeofstupid.com header.b=LMIK8Xyl; arc=pass smtp.client-ip=23.83.218.254
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=templeofstupid.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=templeofstupid.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=templeofstupid.com header.i=@templeofstupid.com header.b="LMIK8Xyl"
-X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 85637801143
-	for <kvmarm@lists.linux.dev>; Thu,  4 Apr 2024 21:41:58 +0000 (UTC)
-Received: from pdx1-sub0-mail-a264.dreamhost.com (unknown [127.0.0.6])
-	(Authenticated sender: dreamhost)
-	by relay.mailchannels.net (Postfix) with ESMTPA id F03E1801075
-	for <kvmarm@lists.linux.dev>; Thu,  4 Apr 2024 21:41:57 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1712266918; a=rsa-sha256;
-	cv=none;
-	b=vDvpixj1pgm0wmEFxEbQ3+uT8++B5c0FhMLmdK6etY5lmpz1Jt7I4v8Lw9pnQZBC9Fj1b7
-	VdN+TP2hFhVjy5w4vPC6QfF4EG+IvwJg6qFjqFJqwIZ/s7S9ZVwFTr28fn2dkKvtpkF4KP
-	WAsjEAIMe7gOZ2ToF0kse4OgzdD2x5HnYcZEtEkyuxQ6wBEAUwTb9gAfRC/nPXSjb1zQUY
-	4W3qKZ8GyWtRt4pdd/MZuqzU8J3nnDVHj+mNvIXZ1OePQMBEL6hISjKBe/IdNPv0uYe2YD
-	5cBWFkCCfAloK07eN4YH2umElrMckeulg/2JCS58wo/3cAAab7YKnsYK4qr4GA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1712266918;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references:dkim-signature;
-	bh=oiU215bQMRqMD25CrXr9YpvEHYCDhTpFJaAfQebstxE=;
-	b=nY0DjQdHDclxMtwSxuZQGF4xWborKIMbnHnjxy1o2bdyWgXitePHENmB/qW68b2mx7jMs1
-	vgeLICaeiBH4Zw+dV1u7vG745NEUjsSlRPd3FCTdsnZwlVlaxq4tnMBDxqRPALyFb+DDlI
-	gKMUX4av4RbHpuAR4aFPoyS91+i+kbjKpQ3f5wlZyaWCXQmegMHsl6ZzAwymNgw9nTQxsS
-	fwCNK65UaCAZtVFHheXJqWA0M/in4Su8iP+TsDM7w5bUgBbFqenq690g3IBxaeMQ95J8TY
-	JJU+rcnLTsV2UYo+LRwyTLA1vczusz5uSKYqlRfRuvxKk/CtkEt9BpIP5YuwVw==
-ARC-Authentication-Results: i=1;
-	rspamd-687b9dd446-qv82j;
-	auth=pass smtp.auth=dreamhost smtp.mailfrom=kjlx@templeofstupid.com
-X-Sender-Id: dreamhost|x-authsender|kjlx@templeofstupid.com
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: dreamhost|x-authsender|kjlx@templeofstupid.com
-X-MailChannels-Auth-Id: dreamhost
-X-Desert-Cooperative: 7194710d76c7d3cf_1712266918381_2700242363
-X-MC-Loop-Signature: 1712266918381:2520276560
-X-MC-Ingress-Time: 1712266918381
-Received: from pdx1-sub0-mail-a264.dreamhost.com (pop.dreamhost.com
- [64.90.62.162])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.112.72.244 (trex/6.9.2);
-	Thu, 04 Apr 2024 21:41:58 +0000
-Received: from kmjvbox.templeofstupid.com (c-73-222-159-162.hsd1.ca.comcast.net [73.222.159.162])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kjlx@templeofstupid.com)
-	by pdx1-sub0-mail-a264.dreamhost.com (Postfix) with ESMTPSA id 4V9Znx2P4bzgY
-	for <kvmarm@lists.linux.dev>; Thu,  4 Apr 2024 14:41:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=templeofstupid.com;
-	s=dreamhost; t=1712266917;
-	bh=oiU215bQMRqMD25CrXr9YpvEHYCDhTpFJaAfQebstxE=;
-	h=Date:From:To:Cc:Subject:Content-Type;
-	b=LMIK8Xyl6bHblGCtjWTDQm/b66eFVU/mhAWcAHTczX+sQgZ1d/KhhBYxz6YF+Nkl4
-	 M1dGy/oyIWRXRI7sABKox7pd2poOj0ID/nTA94ZDsFKHdc1NMncUVSndihX3qhEnRz
-	 sBnj9sIc/4MY3YVzcKHf62ucff/Y9coWWktaClQ2viyYp+AkHBdZArpAkWE5enIHK1
-	 pOG4qmGndYS0AmrVyjSrQfqcSPJN0KJoQpKGBzS6m2rskWbGPFKH6EFkH9XKsFoSge
-	 2WfajbRLfnG+l4pvGsQQT84OSRQgExQoNe5DHzQ6qPeQUscrC9wGcpCYUHM+lsrFZ7
-	 X9KWR0A5TFUHQ==
-Received: from johansen (uid 1000)
-	(envelope-from kjlx@templeofstupid.com)
-	id e0103
-	by kmjvbox.templeofstupid.com (DragonFly Mail Agent v0.12);
-	Thu, 04 Apr 2024 14:41:56 -0700
-Date: Thu, 4 Apr 2024 14:41:56 -0700
-From: Krister Johansen <kjlx@templeofstupid.com>
-To: Ali Saidi <alisaidi@amazon.com>
-Cc: catalin.marinas@arm.com, james.morse@arm.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	maz@kernel.org, me@davidreaver.com, oliver.upton@linux.dev,
-	suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com
-Subject: Re: [PATCH] KVM: arm64: Limit stage2_apply_range() batch size to
- smallest block
-Message-ID: <20240404214156.GF2178@templeofstupid.com>
-References: <20240404044028.GA1976@templeofstupid.com>
- <20240404212742.11248-1-alisaidi@amazon.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 317571CF92
+	for <kvmarm@lists.linux.dev>; Fri,  5 Apr 2024 02:47:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712285229; cv=none; b=YOGOGJvfS+MnOWWHSy9pdtdk/5Gak0sPxLIewYGshHqHglgXZQK1Rb8El/tURzqkilBnxBlevR0mYF3GONcbPe5chfxcFe8ZmJSZFnPjY+KCktVFdCGYkPOTeidO8fPhjIVIuobMDAEbZRlTDXyt9S+gnPgPjlf2WghynMO6fj8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712285229; c=relaxed/simple;
+	bh=6vvI6hOuobBDdHS5Iy4QavnhfJGHpfR5o8reRq3TQ3s=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=AyrzUjAUU9vvb6gFLK/uOyVIJfzw+YQa+TW9IT62Cbc/Ze8IxCbZVOxVfuYG5OILYK5Bf4Axc166F5hKLsaiqGGkSIk3fHb6rhMCTlLrSk15uoYSjqffMOl+bJ2zqX1PEQFarXGuib+SFT+ZzIOTVwjBQ2CnY6yihSRY2YGsdSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 12FE7FEC;
+	Thu,  4 Apr 2024 19:47:38 -0700 (PDT)
+Received: from a077893.blr.arm.com (a077893.blr.arm.com [10.162.41.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id BD77C3F766;
+	Thu,  4 Apr 2024 19:47:01 -0700 (PDT)
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	will@kernel.org,
+	catalin.marinas@arm.com,
+	mark.rutland@arm.com
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	James Clark <james.clark@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Suzuki Poulose <suzuki.poulose@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	linux-perf-users@vger.kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	kvmarm@lists.linux.dev
+Subject: [PATCH V17 2/9] KVM: arm64: Explicitly handle BRBE traps as UNDEFINED
+Date: Fri,  5 Apr 2024 08:16:32 +0530
+Message-Id: <20240405024639.1179064-3-anshuman.khandual@arm.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20240405024639.1179064-1-anshuman.khandual@arm.com>
+References: <20240405024639.1179064-1-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240404212742.11248-1-alisaidi@amazon.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 04, 2024 at 09:27:42PM +0000, Ali Saidi wrote:
-> > Just a quick followup that I did test Will's patches and didn't find
-> > that it changed the performance of the workload that I'd been testing.
-> > IOW, I wasn't able to discern a network performance difference between
-> > the baseline and those changes.
-> 
-> That is a bit unexpected that the performance wasn't worse with the patch Will
-> sent because it should have disabled the range invalidates since they these 
-> invalidates will be getting rid of blocks?  Which Graviton were you testing
-> this on? 
+The Branch Record Buffer Extension (BRBE) adds a number of system registers
+and instructions, which we don't currently intend to expose to guests. Our
+existing logic handles this safely, but this could be improved with some
+explicit handling of BRBE.
 
-Sorry I didn't mention it earlier.  This was on a Graviton 4 with
-FEAT_TLBIRANGE.  Due to the placement of the test machine and the client
-the max single flow rate was 5Gbps, and with both the baseline and
-Will's patches I wasn't able to discern any slowdown there, at least in
-terms of impact to the adjacent networking traffic.  I saw an approx 1%
-slowdown with multiple flows at 10Gbps, but didn't have a baseline for
-that test case so was hesitant to offer it as conclusive.  I should be
-clear that I _wasn't_ measuring the the teardown times in this test
--- just how the teardown itself impacted the networking performance.
+The presence of BRBE is currently hidden from guests as the cpufeature
+code's ftr_id_aa64dfr0[] table doesn't have an entry for the BRBE field,
+and so this will be zero in the sanitised value of ID_AA64DFR0 exposed to
+guests via read_sanitised_id_aa64dfr0_el1(). As the ftr_id_aa64dfr0[] table
+may gain an entry for the BRBE field in future, for robustness we should
+explicitly mask out the BRBE field in read_sanitised_id_aa64dfr0_el1().
 
--K
+The BRBE system registers and instructions are currently trapped by the
+existing configuration of the fine-grained traps. As neither the registers
+are not described in the sys_reg_descs[] nor the instructions are described
+in the sys_insn_descs[] table, emulate_sys_reg() will warn that these are
+unknown before injecting an UNDEFINED exception into the guest.
+Well-behaved guests shouldn't try to use the registers or instructions, but
+badly-behaved guests could use these, resulting in unnecessary warnings. To
+avoid those warnings, we should explicitly handle the BRBE registers, and
+instructions as UNDEFINED.
+
+Address the above by having read_sanitised_id_aa64dfr0_el1() mask out the
+ID_AA64DFR0.BRBE field, and by adding sys_reg_descs entries for all of the
+BRBE system registers, also by adding sys_insn_descs entries for all of the
+BRBE instructions, treating these all as UNDEFINED.
+
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+----
+Changes in V17:
+
+- Updated the commit message including about sys_insn_descs[]
+- Changed KVM to use existing SYS_BRBSRC/TGT/INF_EL1(n) format
+- Moved the BRBE instructions into sys_insn_descs[] array
+
+ arch/arm64/kvm/sys_regs.c | 56 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c9f4f387155f..3981aa32c5a3 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1304,6 +1304,11 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+ 	return 0;
+ }
+ 
++#define BRB_INF_SRC_TGT_EL1(n)				\
++	{ SYS_DESC(SYS_BRBINF_EL1(n)), undef_access },	\
++	{ SYS_DESC(SYS_BRBSRC_EL1(n)), undef_access },	\
++	{ SYS_DESC(SYS_BRBTGT_EL1(n)), undef_access }	\
++
+ /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+ #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+ 	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
+@@ -1708,6 +1713,9 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 	/* Hide SPE from guests */
+ 	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
+ 
++	/* Hide BRBE from guests */
++	val &= ~ID_AA64DFR0_EL1_BRBE_MASK;
++
+ 	return val;
+ }
+ 
+@@ -2226,6 +2234,52 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_DBGCLAIMCLR_EL1), trap_raz_wi },
+ 	{ SYS_DESC(SYS_DBGAUTHSTATUS_EL1), trap_dbgauthstatus_el1 },
+ 
++	/*
++	 * BRBE branch record sysreg address space is interleaved between
++	 * corresponding BRBINF<N>_EL1, BRBSRC<N>_EL1, and BRBTGT<N>_EL1.
++	 */
++	BRB_INF_SRC_TGT_EL1(0),
++	BRB_INF_SRC_TGT_EL1(16),
++	BRB_INF_SRC_TGT_EL1(1),
++	BRB_INF_SRC_TGT_EL1(17),
++	BRB_INF_SRC_TGT_EL1(2),
++	BRB_INF_SRC_TGT_EL1(18),
++	BRB_INF_SRC_TGT_EL1(3),
++	BRB_INF_SRC_TGT_EL1(19),
++	BRB_INF_SRC_TGT_EL1(4),
++	BRB_INF_SRC_TGT_EL1(20),
++	BRB_INF_SRC_TGT_EL1(5),
++	BRB_INF_SRC_TGT_EL1(21),
++	BRB_INF_SRC_TGT_EL1(6),
++	BRB_INF_SRC_TGT_EL1(22),
++	BRB_INF_SRC_TGT_EL1(7),
++	BRB_INF_SRC_TGT_EL1(23),
++	BRB_INF_SRC_TGT_EL1(8),
++	BRB_INF_SRC_TGT_EL1(24),
++	BRB_INF_SRC_TGT_EL1(9),
++	BRB_INF_SRC_TGT_EL1(25),
++	BRB_INF_SRC_TGT_EL1(10),
++	BRB_INF_SRC_TGT_EL1(26),
++	BRB_INF_SRC_TGT_EL1(11),
++	BRB_INF_SRC_TGT_EL1(27),
++	BRB_INF_SRC_TGT_EL1(12),
++	BRB_INF_SRC_TGT_EL1(28),
++	BRB_INF_SRC_TGT_EL1(13),
++	BRB_INF_SRC_TGT_EL1(29),
++	BRB_INF_SRC_TGT_EL1(14),
++	BRB_INF_SRC_TGT_EL1(30),
++	BRB_INF_SRC_TGT_EL1(15),
++	BRB_INF_SRC_TGT_EL1(31),
++
++	/* Remaining BRBE sysreg addresses space */
++	{ SYS_DESC(SYS_BRBCR_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBFCR_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTS_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBINFINJ_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBSRCINJ_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBTGTINJ_EL1), undef_access },
++	{ SYS_DESC(SYS_BRBIDR0_EL1), undef_access },
++
+ 	{ SYS_DESC(SYS_MDCCSR_EL0), trap_raz_wi },
+ 	{ SYS_DESC(SYS_DBGDTR_EL0), trap_raz_wi },
+ 	// DBGDTR[TR]X_EL0 share the same encoding
+@@ -2738,6 +2792,8 @@ static struct sys_reg_desc sys_insn_descs[] = {
+ 	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
+ 	{ SYS_DESC(SYS_DC_CIGSW), access_dcgsw },
+ 	{ SYS_DESC(SYS_DC_CIGDSW), access_dcgsw },
++	{ SYS_DESC(OP_BRB_IALL), undef_access },
++	{ SYS_DESC(OP_BRB_INJ), undef_access },
+ };
+ 
+ static const struct sys_reg_desc *first_idreg;
+-- 
+2.25.1
+
