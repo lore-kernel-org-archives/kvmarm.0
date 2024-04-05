@@ -1,57 +1,57 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912D31607BC
-	for <kvmarm@lists.linux.dev>; Fri,  5 Apr 2024 09:03:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A0F15FA95
+	for <kvmarm@lists.linux.dev>; Fri,  5 Apr 2024 09:03:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712307781; cv=none; b=iYCsSueJgYXhAdl/pK29Hh12DZ6/RRCIZQso68M0LUk4ZLCWwNTWxPgjI3OvloLKA1nTsUhw/3Vk6+x+b/eZvCtJXBp4ZcADGbDnGH8Of4J6dZIN84VcR0uXZbYC+Bpoe1/+5tBYX2769yrhnvu7bSjZNW62sxS85VK+8BfqIJg=
+	t=1712307792; cv=none; b=TdIb7LKGNtkQBJdnt7GFgY08AwKfvnuDWavaSiLfO2ITCGg3EVjq13CNSCYDRniiXOBf3IpRdzPLQBCyyNw4Ql62yOHY5UrslaQPUFYKSnTwC6L6jGc5yxtgIlV9aoPiDRck2BgYX4ZzxJljKrT6+gkRrQolZteQfZP0NfBRpZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712307781; c=relaxed/simple;
-	bh=EAtbJa1uGcSNumSfbYbK82PzgPPN/6qFy0k8JsSEh2o=;
+	s=arc-20240116; t=1712307792; c=relaxed/simple;
+	bh=6p41UD/Qlbix35q2GMWXKkxcjMPc3SCEBB08xXaduLo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bzwu9RdY/Dwn0KBoh4jI2TabmgOv+K561ka1eYVzEqXf6XfgTPW6pIbmtXrt6D1r0jkpQaYJUZ6z6+F1CkaeW41gUzVooPL5YtZ9HAi4irskDnlmRLFLNDODIfP8Bw3evUKwAyt5GaT0HG7XidzEwmhiz4Wu4T7RhacWeHcE0XU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WPMoHszR; arc=none smtp.client-ip=209.85.210.175
+	 MIME-Version; b=eBHVfsMFyZkiR+E/0S6kgK4eHiUp1EEdkVw0CLIsXAQ55Mu7hZPpZopPwLfeGkxKzkDZ/vY8gACuav19IooZ1xtzUuXME6IL+YCFwzolqOU2iUByLWyI6ierrZrJNI1LxzownYA/2NPquUp3en2B/9drdinyR0dezqPI8mIxaRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MO2HBXZl; arc=none smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WPMoHszR"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6ecec796323so1519670b3a.3
-        for <kvmarm@lists.linux.dev>; Fri, 05 Apr 2024 02:03:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MO2HBXZl"
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6ecf1bb7f38so1219804b3a.0
+        for <kvmarm@lists.linux.dev>; Fri, 05 Apr 2024 02:03:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712307780; x=1712912580; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1712307790; x=1712912590; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gmkt4qhFZhSEnd+pxfVPyRti/r9TlYGWMJpmXepb5wo=;
-        b=WPMoHszRF9HXm6SIvsYOGJ+wLCCcTpIZ3zd8+zLRtuhr6bSRCwS5kT78nY2XZ7sU1R
-         vhrzayBMCnqoo0k9pZuZ/JllA1pya+7Wth/+kyqjenvExn06jvIxFrJMjVbmEATW/hYy
-         EIIWrhJedgiyfzDW3YRrr+0SAyyr4UFkJrwJmidRmpiXI5hqYE911PGC5PMGkm2U/eIb
-         C0WF1Z458q92r+gTEJADUQXfAbfvWv9T5WcNwI2MR+xqd6XxQBL8HPYVbrtbIKjKKFBu
-         aRm5G7ZbXPTU6EGGwf1gHolrL7qd37O6GzjJ+F60kUZ06GCavqrcE9n3jCY88CjQ4vST
-         vB9Q==
+        bh=R9jePsdBCGcy8FOcE4Dl0oxWEJ48LRHCUA6lv3K1JxQ=;
+        b=MO2HBXZlGYKRs540ZBxEnzco5OrEX20k0yo47p8Mh/+vgdXWsymemeD2bw3M9QZY8U
+         x8p1x1yGb/F38oajcx4780S4jGDvA2OOwVDlPX9Tt91fq47imTyKXt3fs7ueKoFLvV5d
+         MfBqv59efaM5d1TcuTJN/rpms4jFEXWco4sjptuNu1MQCor8StTRv7xq0S2NME8vbjYB
+         38cP1WCzeEoZkU+7BSyBy315MeU0tqYoIZEtan1X5L4NpySX3hFF52SUDyKIN9eeyJyb
+         TruZMIryfm/TNaMgTjsBxBndDNnCfcxrCSM93+fvwXCiU6TknDTozWCmqFYafYoOQczZ
+         Ymxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712307780; x=1712912580;
+        d=1e100.net; s=20230601; t=1712307790; x=1712912590;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gmkt4qhFZhSEnd+pxfVPyRti/r9TlYGWMJpmXepb5wo=;
-        b=RmVmgNknTK+pawwaNsnIQPXLFVeEtSNLSh9Z4UQzyu6MjO6kG0eKapE+t2SPJ+rdMa
-         GgfogEqiXoYW779kOSk+HkuX0yjdHkJVWJ1kjtm87McNNHvEGABjvC7If2b/AzsbQYAZ
-         VBBOZTv4E+5z0dvQZJOE+tRpPLekS00Luxukei94sg+Tk2m6m3N7bd+wROLg0JNLwPd7
-         0lVzp8zwL/MrifP8jaMtxpIoEXZsIUMsL7CTZ46BiKS0cufDkws9A4o7X95xtmZoJqVU
-         bH+0TH3l8XzZsPhaiXsacED70X/K3azwyRuOuwFCtiWq/0DYJO98O/5FPnsVlcDFCX5i
-         fsfg==
-X-Forwarded-Encrypted: i=1; AJvYcCXgdqMNo1vB727Km0jbZrZcZ8OsFbqrl6aaIkJP2Kjdhnx8yDFGsXJSb/mwHNCP9f/ayDu4HV7gcr9ZLijLLitBNIj1vdVo
-X-Gm-Message-State: AOJu0YxnNeKKwUB4YGnBvR5sCGY1fh6o/FL1ZGzRDHIPjJxsNC945c+C
-	VAS/tVOxeM5srox7+HTJtvknx3cOtfmuZrkxxKIJOc2MqQq2aikG
-X-Google-Smtp-Source: AGHT+IGL+jM7I5Xj0jEMVbIu9IEgKgrsozrrThogKrmDVWc//cKRXd3PlSR8uLhql0Pf8HhB7qsklg==
-X-Received: by 2002:a05:6a00:98d:b0:6ea:d114:5ea1 with SMTP id u13-20020a056a00098d00b006ead1145ea1mr964542pfg.17.1712307779850;
-        Fri, 05 Apr 2024 02:02:59 -0700 (PDT)
+        bh=R9jePsdBCGcy8FOcE4Dl0oxWEJ48LRHCUA6lv3K1JxQ=;
+        b=ujwLmgqMJDn0oDdrigY/hYJirY0xo+7jMOc2ZQKxw7wOO77KSwGsPvUehctgA07RGC
+         6uM0mkd5VoBDADLEYLd7J3tt6Nr0nkQucM/ZLJGCBFLC7hRUEssFIq0PAcu6CpXUShUi
+         5DvFHnWyK77Brz28aETIf51xmG9WbaUMpGvGdMh59xTLWbpSBa8JuOuaqtLvURrE1yHE
+         pqnEYKZxg9GV7jLYCB1r8OnD9JLVRvkMX7z2yIdlhLkNyMRVQUWKINsw68ETtFxbvOLP
+         uP9BmOGbmrb0bctqtmL0BLMKSe2gkRpHLUc1apl5qDJGHeGz/eVG6USIEuxRer/IsYun
+         H9hw==
+X-Forwarded-Encrypted: i=1; AJvYcCX+gPWW7LeDtWEOR+3mOOb5qkZH/iov17kLWa2Vh3+fCwPWrAE7frd2pyga4grm2oWPlvQKnqipfzKKdRuq3mdy2VMqQWO1
+X-Gm-Message-State: AOJu0Yzd+mzaZWbQjz/5j9K/VCuG/kmOS+5nxnPbMDTvYskbsemDaIfK
+	6lpHvFVzu42+7Idu0Fm5SiBw0llKfYFP0Tl4VdvNX0Md9GbyZUD8
+X-Google-Smtp-Source: AGHT+IEMEJ3nCJeD++W+neSnwL46t0FBmKBloHUglg2zIiLw0F8GdaDYwaaevNYobN9Y4Al5iZ2kEQ==
+X-Received: by 2002:a05:6a00:4f89:b0:6ea:e31e:dc75 with SMTP id ld9-20020a056a004f8900b006eae31edc75mr827353pfb.5.1712307789932;
+        Fri, 05 Apr 2024 02:03:09 -0700 (PDT)
 Received: from wheely.local0.net (124-169-104-130.tpgi.com.au. [124.169.104.130])
-        by smtp.gmail.com with ESMTPSA id s12-20020a62e70c000000b006ecf25d0b8dsm995783pfh.184.2024.04.05.02.02.51
+        by smtp.gmail.com with ESMTPSA id s12-20020a62e70c000000b006ecf25d0b8dsm995783pfh.184.2024.04.05.02.03.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Apr 2024 02:02:59 -0700 (PDT)
+        Fri, 05 Apr 2024 02:03:09 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Andrew Jones <andrew.jones@linux.dev>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -76,9 +76,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	kvmarm@lists.linux.dev,
 	kvm-riscv@lists.infradead.org,
 	linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests RFC PATCH 13/17] shellcheck: Fix SC2294
-Date: Fri,  5 Apr 2024 19:00:45 +1000
-Message-ID: <20240405090052.375599-14-npiggin@gmail.com>
+Subject: [kvm-unit-tests RFC PATCH 14/17] shellcheck: Fix SC2178
+Date: Fri,  5 Apr 2024 19:00:46 +1000
+Message-ID: <20240405090052.375599-15-npiggin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240405090052.375599-1-npiggin@gmail.com>
 References: <20240405090052.375599-1-npiggin@gmail.com>
@@ -90,47 +90,43 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-  SC2294 (warning): eval negates the benefit of arrays. Drop eval to
-  preserve whitespace/symbols (or eval as string).
+  SC2178 (warning): Variable was used as an array but is now assigned a
+  string.
 
-No bug identified.
+Not sure if there's a real bug.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- scripts/arch-run.bash | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arm/efi/run   | 2 +-
+ riscv/efi/run | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-index 89a496014..ed440b4aa 100644
---- a/scripts/arch-run.bash
-+++ b/scripts/arch-run.bash
-@@ -179,7 +179,7 @@ run_migration ()
- 	exec {src_infifo_fd}<>${src_infifo}
- 	exec {dst_infifo_fd}<>${dst_infifo}
- 
--	eval "${migcmdline[@]}" \
-+	"${migcmdline[@]}" \
- 		-chardev socket,id=mon,path=${src_qmp},server=on,wait=off \
- 		-mon chardev=mon,mode=control \
- 		< ${src_infifo} > ${src_outfifo} &
-@@ -219,7 +219,7 @@ run_migration ()
- 
- do_migration ()
- {
--	eval "${migcmdline[@]}" \
-+	"${migcmdline[@]}" \
- 		-chardev socket,id=mon,path=${dst_qmp},server=on,wait=off \
- 		-mon chardev=mon,mode=control -incoming unix:${dst_incoming} \
- 		< ${dst_infifo} > ${dst_outfifo} &
-@@ -357,7 +357,7 @@ run_panic ()
- 	qmp=$(mktemp -u -t panic-qmp.XXXXXXXXXX)
- 
- 	# start VM stopped so we don't miss any events
--	eval "$@" -chardev socket,id=mon,path=${qmp},server=on,wait=off \
-+	"$@" -chardev socket,id=mon,path=${qmp},server=on,wait=off \
- 		-mon chardev=mon,mode=control -S &
- 
- 	panic_event_count=$(qmp_events ${qmp} | jq -c 'select(.event == "GUEST_PANICKED")' | wc -l)
+diff --git a/arm/efi/run b/arm/efi/run
+index cf6d34b0b..8f41fc02d 100755
+--- a/arm/efi/run
++++ b/arm/efi/run
+@@ -44,7 +44,7 @@ qemu_args=()
+ cmd_args=()
+ while (( "$#" )); do
+ 	if [ "$1" = "-append" ]; then
+-		cmd_args=$2
++		cmd_args=("$2")
+ 		shift 2
+ 	else
+ 		qemu_args+=("$1")
+diff --git a/riscv/efi/run b/riscv/efi/run
+index cce068694..5a72683a6 100755
+--- a/riscv/efi/run
++++ b/riscv/efi/run
+@@ -47,7 +47,7 @@ qemu_args=()
+ cmd_args=()
+ while (( "$#" )); do
+ 	if [ "$1" = "-append" ]; then
+-		cmd_args=$2
++		cmd_args=("$2")
+ 		shift 2
+ 	else
+ 		qemu_args+=("$1")
 -- 
 2.43.0
 
