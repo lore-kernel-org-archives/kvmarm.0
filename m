@@ -1,57 +1,57 @@
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA261BF40
-	for <kvmarm@lists.linux.dev>; Sat,  6 Apr 2024 12:40:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3EF42869B
+	for <kvmarm@lists.linux.dev>; Sat,  6 Apr 2024 12:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712407221; cv=none; b=hEiL2DfJ3WAY3bw9VTXdh6nhljFBgHp7joe+1j8sdQIGeLX+MuXegfv79Q0FYlbyIPXvZYDU9PAzaWuOYOb67KfP9WIzuvR+rgV7HJoLoVoxu3D3n2nY9UkynP4GDX5uUZxzgRuF8r+wLWDNmOtnLitrwaGiNdfWIJu6UlkXrvo=
+	t=1712407230; cv=none; b=Rs56o0T7N8I4nFSXUaf04QN+wfcP4AlmD2UAXNZCxP9jqebjEG3KCebPHI8c6fVUs9EVgWwAUYv116f+fBNWVUonqTMa+DwBGgJ0A7B07WwmZcunYlSP5Q/pRl/HcsY+KuNMAoREnP9uzX6YKsoKqaCqeEMN1r3CK6zi6+Cx9E8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712407221; c=relaxed/simple;
-	bh=SBC9goY0qyeWaqVZEk5sqx6PBhg4VTZbRSRTA2YHwJw=;
+	s=arc-20240116; t=1712407230; c=relaxed/simple;
+	bh=FFft7ygHb4sNew26D/dJgFST62xDvyHht1DMBSvtx6w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qL0h9thPiZLSdw0rdlne0JNpMHM1UgLY0KXZjMDCrhTNClEPM6t2I7y4lk9oopk1+6dszQDaDHcDy6VwGLIVH41/df1veu1DOTdFeX3zF3W9aqTr/9bFdm0kt37aNsqkZKAtifki8G+wTntmwXpaBptBInjW8/aHgkfRFZtaG8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fZRlhnU8; arc=none smtp.client-ip=209.85.216.45
+	 MIME-Version; b=qiiyn+CdW8+qDZTRzvO8PJpXKaWIBjCjIWKcowIzwVs+qIytzkTpO89S7CuQZVxf0goyeYhn2fhult6VoD+JWvldo3DJbfVLf/nNri76xLFAJA1obRZXC4qKGFr3T3WmBpeyXr4FrUId4MgmfXqCOXuvw4PRlEEA731HWafcIQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W35SyjVz; arc=none smtp.client-ip=209.85.216.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fZRlhnU8"
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2a07b092c4fso2314256a91.0
-        for <kvmarm@lists.linux.dev>; Sat, 06 Apr 2024 05:40:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W35SyjVz"
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-29f69710cbbso2135557a91.1
+        for <kvmarm@lists.linux.dev>; Sat, 06 Apr 2024 05:40:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712407220; x=1713012020; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1712407228; x=1713012028; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CWoWbY1l8dnEVRR/nSiK5WHJ8+U9imW08rrrMnGNnqQ=;
-        b=fZRlhnU8u/7cV2BDtvfLkdSZEx0zOtxa0svs05F9YA7M88+b0jzA+zGzylHlsoft74
-         8X59T/GJ1BFED8dVSbq0gh3DW/d7NouO2R8OS4xJ7sSbZYu6EawKwKW9MBzMtZmHxecd
-         sumFh19qhr7ttUeyjKw/DoNumKA4yLXs6BOzhNxtH5yAjkq4hAzkxmbWwCPZ9aQkIegb
-         aFvjoQBikoksGNUEH62v97BEiUGBVHEO9hoN+abXSR4RJdl01vz2nnht4tIxne6ge4ON
-         JFW2RdQcUiwYOLChBrANwg+8uexjYEooJSRV7GGqSV4kmT+VKkZCQhiTTN/B+PZLstLm
-         G9Vg==
+        bh=DtN3qRr/BJ5ghrfuBVmkjt4OGFVHY6H/GotGGIKP5Pw=;
+        b=W35SyjVzXrijj1BsjYyKAkRBRYp5W43BNZi1LuCdvkDmFhsAwCT4d1WP8WixdTYt2g
+         aLa1/K7vcosSaZqD5Zpd3TUKqTf6Z9czAZ8Jw1iwfNnLK3KNrvpVToEq4vNYDLNnfw5A
+         lx8omPgYyblijuDNBzq234YaleFQ5QaJpp1rEweCSxEj4kEdFz26lKzEyi44A9DFEiwy
+         wYmjsxOQtET2OoeCjgiLddtMVUQTyi1zCI8g+DHPRA1A7Qv82zueCaSrknFwdtcJkt5L
+         gqKedNHOki0kTZlz88J9mqv0nf79CpPVlQraMgDit3wnHHY6Fx26kfTcOikrA3bplLkd
+         F7GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712407220; x=1713012020;
+        d=1e100.net; s=20230601; t=1712407228; x=1713012028;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CWoWbY1l8dnEVRR/nSiK5WHJ8+U9imW08rrrMnGNnqQ=;
-        b=oGTIigAByknDF5TBbrcVkuIz404DBKXRHQUnsZuMAZBngFPvuFjLEMCi4WEmvn/KqS
-         oWnkFJdt+lmfq845MHTYC8LN6bnYOHqAfAkMubPuuzFOCzTzVL2o1s5oKO2lA7hMyh1J
-         a7qZ+PPHjSZyI8yKg6BG8erTb1IPcImQDNMhep9w/aqYG4N2wOMk+/kARLilI+WW0WjX
-         Wb2SqlNGVMH/VnrqAgG+EUKbv+pkNEGcJqSPkiaOUDrRcrN0Vpq88VY1Aojef4uinwIR
-         GT3pxmXuRJP/BnGuc24oDLS+RyMnhfq2M7K2O6Ua7J+Wd959JiF6Bk72qyj8g0FyGkVT
-         J4Ww==
-X-Forwarded-Encrypted: i=1; AJvYcCV1CBxh+U642Aj4Z/kijyP7/mPu1Lmyt7fj25UAQsH5BKhzPTEjh7ZNIlqvr0ecMDSIrFbWPBlA7vwX7MZuXapSniWpyTho
-X-Gm-Message-State: AOJu0YxudBwaGGc8ypAshzpPPIv32wweUiWKNM6f7JERNHmbfWwmYVHY
-	FtP/xWpbaojAIh/3mbR0+xtispyLcvD2mrjPOyDMZZKZHwRIGukS5hRKJgmp
-X-Google-Smtp-Source: AGHT+IFHZE4Fp2p4OLXDHn3qLZhQ0/SVNeTRqByuHLNxp4zQxBJuEy3e052DXS99usoJooGncv3JtA==
-X-Received: by 2002:a17:90a:c797:b0:29c:761e:3955 with SMTP id gn23-20020a17090ac79700b0029c761e3955mr3301807pjb.17.1712407219870;
-        Sat, 06 Apr 2024 05:40:19 -0700 (PDT)
+        bh=DtN3qRr/BJ5ghrfuBVmkjt4OGFVHY6H/GotGGIKP5Pw=;
+        b=hUC7m47o94xZ2uhzX6Lhhmn0i+7NfrzndrYpGzPB+OXjQnTZL79Qt2diBYGJlOZJ0P
+         xfMz/JMP4b6Z4a0Gk1smsyAoVvzrGC72rndr21xDL6NmoyXglUkYcxdA3t/ynOytQanz
+         o8lF3FzFMxEpTmhf7Up0T2/2hm5r1ksfmY388EO4tatDQ9l9s/QdZp5hJ6J+t1s7G0Ih
+         aKEGMF3cO9D5JzhZKxDo5bOy23G/sMYGJl3IRLrRXxy28VWgMs+L/VNiOgt8D68HCwo+
+         3Clz4pPrn8kr6oELG2jD89HBkpudXnCqamKG27O7v/e4X4I+9JjH5uhY1yGJGHI1bYjn
+         ffyg==
+X-Forwarded-Encrypted: i=1; AJvYcCW8h4y6hcHxpZlUvWshJAY7uPaU8AfIEJ93nUdIiEynBMDdqQtgiBD50559jHZ1+BS8zCfeRnCtxFCiipwMXymqwV8T3UsP
+X-Gm-Message-State: AOJu0YxPJfYg7Z3KsK9IZUh68cdfR6U0az+7A3m8wrLELQ9QT6YXccHX
+	kcDvyBzYQuu7Cm0IWjHVc8GgP6YlblaHnSpsm3phd3Gir7JqIFQu
+X-Google-Smtp-Source: AGHT+IE7xfGD09MIaUCfQ0PlF2nHZILjJWkZ4PfKwm4uXDYYCAtdwhtHcBBozUYIc7FVTGi7mIF6mw==
+X-Received: by 2002:a17:90a:4e06:b0:2a2:c812:9648 with SMTP id n6-20020a17090a4e0600b002a2c8129648mr6948766pjh.9.1712407228261;
+        Sat, 06 Apr 2024 05:40:28 -0700 (PDT)
 Received: from wheely.local0.net (124-169-104-130.tpgi.com.au. [124.169.104.130])
-        by smtp.gmail.com with ESMTPSA id nt5-20020a17090b248500b002a279a86e7asm5050576pjb.7.2024.04.06.05.40.11
+        by smtp.gmail.com with ESMTPSA id nt5-20020a17090b248500b002a279a86e7asm5050576pjb.7.2024.04.06.05.40.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Apr 2024 05:40:19 -0700 (PDT)
+        Sat, 06 Apr 2024 05:40:28 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Andrew Jones <andrew.jones@linux.dev>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -75,9 +75,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	kvmarm@lists.linux.dev,
 	kvm-riscv@lists.infradead.org,
 	linux-s390@vger.kernel.org
-Subject: [RFC kvm-unit-tests PATCH v2 10/14] shellcheck: Fix SC2124
-Date: Sat,  6 Apr 2024 22:38:19 +1000
-Message-ID: <20240406123833.406488-11-npiggin@gmail.com>
+Subject: [RFC kvm-unit-tests PATCH v2 11/14] shellcheck: Fix SC2294
+Date: Sat,  6 Apr 2024 22:38:20 +1000
+Message-ID: <20240406123833.406488-12-npiggin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240406123833.406488-1-npiggin@gmail.com>
 References: <20240406123833.406488-1-npiggin@gmail.com>
@@ -89,11 +89,10 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-  SC2124 (warning): Assigning an array to a string! Assign as array, or
-  use * instead of @ to concatenate.
+  SC2294 (warning): eval negates the benefit of arrays. Drop eval to
+  preserve whitespace/symbols (or eval as string).
 
-Shouldn't be a bug since bash concatenates with space and eval is
-used on the result.
+No bug identified.
 
 Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
@@ -102,24 +101,15 @@ Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-index 45ec8f57d..95b6fa64d 100644
+index 95b6fa64d..98d29b671 100644
 --- a/scripts/arch-run.bash
 +++ b/scripts/arch-run.bash
-@@ -150,7 +150,7 @@ run_migration ()
- 		return 77
- 	fi
- 
--	migcmdline=$@
-+	migcmdline=("$@")
- 
- 	trap 'trap - TERM ; kill 0 ; exit 2' INT TERM
- 	trap 'rm -f ${src_out} ${dst_out} ${src_outfifo} ${dst_outfifo} ${dst_incoming} ${src_qmp} ${dst_qmp} ${src_infifo} ${dst_infifo}' RETURN EXIT
 @@ -179,7 +179,7 @@ run_migration ()
  	exec {src_infifo_fd}<>${src_infifo}
  	exec {dst_infifo_fd}<>${dst_infifo}
  
--	eval "$migcmdline" \
-+	eval "${migcmdline[@]}" \
+-	eval "${migcmdline[@]}" \
++	"${migcmdline[@]}" \
  		-chardev socket,id=mon,path=${src_qmp},server=on,wait=off \
  		-mon chardev=mon,mode=control \
  		< ${src_infifo} > ${src_outfifo} &
@@ -127,11 +117,20 @@ index 45ec8f57d..95b6fa64d 100644
  
  do_migration ()
  {
--	eval "$migcmdline" \
-+	eval "${migcmdline[@]}" \
+-	eval "${migcmdline[@]}" \
++	"${migcmdline[@]}" \
  		-chardev socket,id=mon,path=${dst_qmp},server=on,wait=off \
  		-mon chardev=mon,mode=control -incoming unix:${dst_incoming} \
  		< ${dst_infifo} > ${dst_outfifo} &
+@@ -357,7 +357,7 @@ run_panic ()
+ 	qmp=$(mktemp -u -t panic-qmp.XXXXXXXXXX)
+ 
+ 	# start VM stopped so we don't miss any events
+-	eval "$@" -chardev socket,id=mon,path=${qmp},server=on,wait=off \
++	"$@" -chardev socket,id=mon,path=${qmp},server=on,wait=off \
+ 		-mon chardev=mon,mode=control -S &
+ 
+ 	panic_event_count=$(qmp_events ${qmp} | jq -c 'select(.event == "GUEST_PANICKED")' | wc -l)
 -- 
 2.43.0
 
