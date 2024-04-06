@@ -1,57 +1,57 @@
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F90BA55
-	for <kvmarm@lists.linux.dev>; Sat,  6 Apr 2024 12:40:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F7D34545
+	for <kvmarm@lists.linux.dev>; Sat,  6 Apr 2024 12:40:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712407204; cv=none; b=MveFcAMXS5GG1W1JgyMPcEGu67nSiTjrxjQYqqzdXj9lO9tgwbHGGtee2kmlRM6n8VMubg9ZXu2HenpOb++pYWEFw9nvFN8sVeq86rC2JtrsqBYOnsWFJR5FpLpf/1WYWa1ZgHUvUdhA1c5Q/FOXcKRYB6m0TWCp5cuAL0Njzic=
+	t=1712407212; cv=none; b=toQIyEF/Yf7x9Rx892lPWwQZYipv+NmznDgEESIkDhBv2Q2oti3WVNKLtxGft3YgxtBvG95N8Opmw7ziND86tWXV0/WMcfd64hyAKyR0A5j0VTuRPm972B5Q9Ki1E2OnXKMdmD4CmQV/bvVX1TjzwpFULvoIr/JAuV/NmTaROJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712407204; c=relaxed/simple;
-	bh=C9hhWnwCALdwqG5WyS4H7F9rVkRx8HCoDY3R0fruCbQ=;
+	s=arc-20240116; t=1712407212; c=relaxed/simple;
+	bh=BtK71PP95PMC4Hzbtxe4zhZtffb72GLFVB/PQAL00a0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=niNJbG9aa+dE9APtX/Cw1LQVDu3yldzkC1mc8vE4SG56R5rXH/Uz2CBdVWacHYrwS6r1V8++MT1ECyVSxa4zVAzX0teI8Pqh0xHFJAoR0Gsu9TJq8balvDg8cxEqtcQzDD/3onxe+OfJlVYUSq1GSPmFoUnP4fW/aMfZB1QnyC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lCMZ8epU; arc=none smtp.client-ip=209.85.215.175
+	 MIME-Version; b=ubG6KI9JruQD0J6ejg8zJeki/pPb/LOX8N1W229HTTGX/JliDsqe1h11X50saOdjwh76F9ipKbWbp3eMstvCfcJhcHB8mm1Mg5pXHLijkCyYZwk95I3lyXKfFiYx4NkyEb6GBp7/F80WWKnkJ25JjAH+93/hSJwI9YEA8ZgSUHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gLQ+POAw; arc=none smtp.client-ip=209.85.215.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lCMZ8epU"
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-5d4d15ec7c5so2451467a12.1
-        for <kvmarm@lists.linux.dev>; Sat, 06 Apr 2024 05:40:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gLQ+POAw"
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-5c66b093b86so3113642a12.0
+        for <kvmarm@lists.linux.dev>; Sat, 06 Apr 2024 05:40:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712407202; x=1713012002; darn=lists.linux.dev;
+        d=gmail.com; s=20230601; t=1712407211; x=1713012011; darn=lists.linux.dev;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jc9Ns5Gs4d6EQrXAeFAipEGyYWBXJXNznus1Vgd5gEY=;
-        b=lCMZ8epUckLZTBtQv+Jcm4cBghCnJqgE8zvw/gFPU7kaNbUZZPojhJhScJTJVpqAU8
-         tZr27Kb3iT9ZbXjkvE2p27rH5Y3IOT24Zf0R3Pe0qL53w4Qr0sw+3tf+X6sngbPFUiUa
-         d0Eym6uBFpUI0FknZBcmEFGPXbcAf/T5A9paB4WmHjCI8Keu9X3k0hgOguPwhYC4Tmal
-         LurFeUd9zDosOjGQIfhiBuZc/VNs0j5jNdYWNAuAgtQ18cIpUowzlQorbEvtGJhDG8s+
-         7aqhNBnmf6m7vIlQRgXTb+wfr1zkWnl0uBa0caTVoWlAGgKT6JeIjnMTHi0lUFcG7JTS
-         +WKQ==
+        bh=+DuXv8jLymFAc3dj84mPa+u6v5joW+GUy7CVoN0Mom8=;
+        b=gLQ+POAwBEtvazbDM4WyqzayVaMzOM37UakQv/dUeWz96qhfKwnLeG7gLIE91Hbb7J
+         /vsMApAWA+fVcizkUM25Pwml2PM+gth6lHf4yjm6rZVkJ1uAJHRlOKI9XdxZJS6gfhFI
+         zX9ycqjPk5tIQPujXBx76YYN8aApfNTuMk69LYlBFF3LWf5eruVVHMry5ZAJ8TtOQeBU
+         oGEnaRggiXmwIdeviibDuxSZ1fA3+cspxeghkUaygy3lm3tJPzPcfrfIO85tOkLwOAuf
+         qhvcg1E0DDUt+8f63et9TPNC4QYL0Y4/zOnAz6z80nYGeBSYsqcqUCYLJPxzCrciO2ya
+         u1RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712407202; x=1713012002;
+        d=1e100.net; s=20230601; t=1712407211; x=1713012011;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jc9Ns5Gs4d6EQrXAeFAipEGyYWBXJXNznus1Vgd5gEY=;
-        b=tXOG7QzERHf69pRYP8Nf0DthlO+pklEJc6KN+PFzIEj0kL3z/V9zXE+1fDCZm53DHD
-         Ti3oCZy8HND5mOQnbi9vD9PW1XC2ivNk8SoueYBFg/VyVvmsWYHtBnsN+A2vij5bhV0W
-         INbetgRnno9Kh3r82tYJsoRoIa+NTRXCooigoDI823Tq+CClctAIppRHm1yictzBBYr6
-         GxHhCaMylW9v1VHD0ahUqAi1wDPZi1qmQ1wEGl4R7vsGw+v3PBRq89/6mZKgN70RyjBU
-         q7p+p1D7mQeSzFuRpY74dAKBpil4ZJqzjGg8JVlsCKk7LYbTpgddX1X1TPiYazdU08Sk
-         HqEg==
-X-Forwarded-Encrypted: i=1; AJvYcCU6DH40CUGzMV1BppkhmI8mi1nphOhqYGYNGKNIgOkXKYW6wVv2YNTRRAe2ALz1mUljR5nsAz3bqlKfepd3S93TjXTYv9sQ
-X-Gm-Message-State: AOJu0YydW9dO9ExAXXCvTg90nt50Y/mZT1cfsrONhYFPk3RNRFs1BHJj
-	yU+8/KQES2wMIaa7fO8/oJGOgOQGNf0lmNHxMuPqBlfhX5EqcGsT
-X-Google-Smtp-Source: AGHT+IGFqwzSPVPQ9YT3jplB+7wqnHfvH8TCbOoaXrxURWMaPygGn8PVC/qsnNpJzSZ+kKAlRUuDBA==
-X-Received: by 2002:a05:6a20:12ca:b0:1a7:c63:add2 with SMTP id v10-20020a056a2012ca00b001a70c63add2mr5190444pzg.10.1712407202215;
-        Sat, 06 Apr 2024 05:40:02 -0700 (PDT)
+        bh=+DuXv8jLymFAc3dj84mPa+u6v5joW+GUy7CVoN0Mom8=;
+        b=j9aGfMM21tROm/j1oAToR0owFaqYFDWH1QGeO9u2mY7A09mC9Q92WfBmZv6zikw5NG
+         8UbRmZtGlWQtJ6lyXIl+CqNuX9QC2afj4nw01/ybrGRlRrz/dtlgVwBEujMtmBDPvK/N
+         9SezbV3M1N3XW5PFBnhxRwauSnErSIKIYeZrI62/3VhgHYbyE1VHvlNoS3xe3vKbFPgu
+         fSVvp5Uz4xjiC6Ed1bBb2bbFDOvcM+Kba31WAkO0S2OjyHNjSKjkOVHqI8TuKPgvA/aZ
+         k6N11TCnXK2VdcgIAYfOwaqPvphFMVWy8wA5rkyvxc0oI2HS+hpSt3UbQH4vmuLoZrRL
+         TGCw==
+X-Forwarded-Encrypted: i=1; AJvYcCWjm8fIEe25VvE1pc2gUoptMWZvmAnFHGYe+QWgRrdXVPuWaPlxXB6Mp4O7UbCm0sxTuTpMKBhSdDHble48qP3nLteJrIbs
+X-Gm-Message-State: AOJu0YxtLNOKLx47R5b3VTjICqa57t9GtBrkQfj4hJ62yjsDWMszVb9h
+	313fUZQYvgtWht9dcBzdDm7peK+O0floJHxZjjng00evxCQt5RST
+X-Google-Smtp-Source: AGHT+IEG5DwuJ6rWhrJoMat7kd4rj//Ns4BzAmacd0b/2q33I7gOlOkW3W7COJMdw+lJbq3lxrimmg==
+X-Received: by 2002:a17:90b:1b04:b0:2a0:4a82:5b05 with SMTP id nu4-20020a17090b1b0400b002a04a825b05mr7263902pjb.19.1712407210832;
+        Sat, 06 Apr 2024 05:40:10 -0700 (PDT)
 Received: from wheely.local0.net (124-169-104-130.tpgi.com.au. [124.169.104.130])
-        by smtp.gmail.com with ESMTPSA id nt5-20020a17090b248500b002a279a86e7asm5050576pjb.7.2024.04.06.05.39.54
+        by smtp.gmail.com with ESMTPSA id nt5-20020a17090b248500b002a279a86e7asm5050576pjb.7.2024.04.06.05.40.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Apr 2024 05:40:01 -0700 (PDT)
+        Sat, 06 Apr 2024 05:40:10 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Andrew Jones <andrew.jones@linux.dev>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -75,9 +75,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	kvmarm@lists.linux.dev,
 	kvm-riscv@lists.infradead.org,
 	linux-s390@vger.kernel.org
-Subject: [RFC kvm-unit-tests PATCH v2 08/14] shellcheck: Fix SC2013
-Date: Sat,  6 Apr 2024 22:38:17 +1000
-Message-ID: <20240406123833.406488-9-npiggin@gmail.com>
+Subject: [RFC kvm-unit-tests PATCH v2 09/14] shellcheck: Fix SC2145
+Date: Sat,  6 Apr 2024 22:38:18 +1000
+Message-ID: <20240406123833.406488-10-npiggin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240406123833.406488-1-npiggin@gmail.com>
 References: <20240406123833.406488-1-npiggin@gmail.com>
@@ -89,29 +89,59 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-  SC2013 (info): To read lines rather than words, pipe/redirect to a
-  'while read' loop.
+  SC2145 (error): Argument mixes string and array. Use * or separate
+  argument.
 
-Not a bug.
+Shouldn't be a bug, since the preceding string ends with a space and
+there aren't any succeeding strings.
 
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- scripts/arch-run.bash | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arm/efi/run             | 2 +-
+ riscv/efi/run           | 2 +-
+ scripts/mkstandalone.sh | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-index cd75405c8..45ec8f57d 100644
---- a/scripts/arch-run.bash
-+++ b/scripts/arch-run.bash
-@@ -487,7 +487,7 @@ env_file ()
+diff --git a/arm/efi/run b/arm/efi/run
+index f07a6e55c..cf6d34b0b 100755
+--- a/arm/efi/run
++++ b/arm/efi/run
+@@ -87,7 +87,7 @@ uefi_shell_run()
+ if [ "$EFI_DIRECT" = "y" ]; then
+ 	$TEST_DIR/run \
+ 		$KERNEL_NAME \
+-		-append "$(basename $KERNEL_NAME) ${cmd_args[@]}" \
++		-append "$(basename $KERNEL_NAME) ${cmd_args[*]}" \
+ 		-bios "$EFI_UEFI" \
+ 		"${qemu_args[@]}"
+ else
+diff --git a/riscv/efi/run b/riscv/efi/run
+index 982b8b9c4..cce068694 100755
+--- a/riscv/efi/run
++++ b/riscv/efi/run
+@@ -97,7 +97,7 @@ if [ "$EFI_DIRECT" = "y" ]; then
+ 	fi
+ 	$TEST_DIR/run \
+ 		$KERNEL_NAME \
+-		-append "$(basename $KERNEL_NAME) ${cmd_args[@]}" \
++		-append "$(basename $KERNEL_NAME) ${cmd_args[*]}" \
+ 		-machine pflash0=pflash0 \
+ 		-blockdev node-name=pflash0,driver=file,read-only=on,filename="$EFI_UEFI" \
+ 		"${qemu_args[@]}"
+diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
+index 86c7e5498..756647f29 100755
+--- a/scripts/mkstandalone.sh
++++ b/scripts/mkstandalone.sh
+@@ -76,7 +76,7 @@ generate_test ()
  
- 	[ ! -f "$KVM_UNIT_TESTS_ENV_OLD" ] && return
+ 	cat scripts/runtime.bash
  
--	for line in $(grep -E '^[[:blank:]]*[[:alpha:]_][[:alnum:]_]*=' "$KVM_UNIT_TESTS_ENV_OLD"); do
-+	grep -E '^[[:blank:]]*[[:alpha:]_][[:alnum:]_]*=' "$KVM_UNIT_TESTS_ENV_OLD" | while IFS= read -r line ; do
- 		var=${line%%=*}
- 		if ! grep -q "^$var=" $KVM_UNIT_TESTS_ENV; then
- 			eval export "$line"
+-	echo "run ${args[@]}"
++	echo "run ${args[*]}"
+ }
+ 
+ function mkstandalone()
 -- 
 2.43.0
 
