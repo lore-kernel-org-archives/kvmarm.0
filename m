@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1D24F8B1
-	for <kvmarm@lists.linux.dev>; Mon,  8 Apr 2024 07:41:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB40A48787
+	for <kvmarm@lists.linux.dev>; Mon,  8 Apr 2024 07:44:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712562114; cv=none; b=jh6p5bokOkpIZTfqRv+pOTBMxZwDBZ/86ka3HUN0C8Bf4AYODL7x61YrkiJuL0KxoANwtEOz+XTK+0iqNs/0cjjsZyGz1mT3oKUyMKzjmNUz0HnjmmCp8mdn9Hpg1kMOd41LJ37MXUg4v3I682PBPuAGmpLtP82UQl83I8b0BXk=
+	t=1712562293; cv=none; b=V6fIqdPd3tE0A9fAeY4ftIjfxDbn8lOspMGUC+96zv4SddZr1HP37RBsYPMnqLGE3p2kZLOzMeumrA1vC0L3JvTao30zVkKtuUPj7xSrsuN3C4fbabilu573lClChvr6Flt+72aN18a3DFqJp6nJyuV5JZdxFFzhmo+yF/IxvGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712562114; c=relaxed/simple;
-	bh=ERdr/5qhocvZ1CEaB6/iZw2BZjhNKUNS8UqnDQHfFtA=;
+	s=arc-20240116; t=1712562293; c=relaxed/simple;
+	bh=BhqydDivTl/yVN07GOY6+fkzNmn/QBlqiaQuLEzkW4k=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XBicrbZPZ1lXjxAt4WOjlqttgue4XzCoSHvxi3Db/N5x1MPE6BxJGIrcdBoM/bZbsGF0jGwZA3SRnWWwqPmpHLziMI1i+QNd5+BZ1vD6zMdyG0mXBRFaqdcoH3QMbD1kIcNQSXYCv8jydFm51rsNDbyV4/3T/enYsOSKbcWa0gU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uc0H6a1S; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=FpnMlIDaEGZm+9EOULdymZJ2TPKuPttP3vsKuc3odgAuMWVY+5WhFO81BhASMLYw68G3453ffepEXaT9+dxbT0F92rDvfMjE8rvOxGjgG2FYGjrI7xZu4qOcsnhLIRaGcsk9G02ov1I4959gM8Kjc+LOMTztOdx9g0AQ/rkoS5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sSXmtDiU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uc0H6a1S"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ADCBC433F1;
-	Mon,  8 Apr 2024 07:41:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sSXmtDiU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F9C1C433C7;
+	Mon,  8 Apr 2024 07:44:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712562114;
-	bh=ERdr/5qhocvZ1CEaB6/iZw2BZjhNKUNS8UqnDQHfFtA=;
+	s=k20201202; t=1712562293;
+	bh=BhqydDivTl/yVN07GOY6+fkzNmn/QBlqiaQuLEzkW4k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Uc0H6a1SfuMp7NZHPa91soI37aXhABAuxpdYAEHGdNWiwwvq0j43D0hV+RirXiUIz
-	 +N8vQ1IkyVZLQynq+Lpm20ACwp5RqsNnFYxzi12AtZt7GqslNZ2VKWMRjWJ7/bhXI/
-	 uSV0NnA/9lMyZqSMOFBUIgpAnbdD7MEgJTOMImo5KGW27LrQKv9u/UPATWqUBbWwLT
-	 mBLa2Dwqwn+e5sm9Gh9OntKkVOWWXDKzm1ai6mTCj8JOqzPwFYrcF4q1drTh9Japo/
-	 mkYaeYTfmB4dUHp1PfTDoN3LJJJJV+QTbiEA5738HQLkLcQXEy9LQmudvrtcPkt1ja
-	 Tl2lwmMZjYeig==
+	b=sSXmtDiUfYmXbpTTsCZGBwkf+cKn2HfeSNCySp2LoD/16rriFuKX1Qpewoqbp8k4u
+	 FYcFk5EuTmSfhSbPmLfva8E9eZ+8FmcU55cZMHza5SPDbVhe1sbAMF6EFaLq1YcUy6
+	 NQVl9OQw6D5leRTrQnH4QlSH1mGoy1Dzvp0diuucgULeu/MR7kQgw07UO2oJY3Wyob
+	 jEaPEiBzvXF5UVGajxkNPrcEpeIqxwjpvulAI21GWq08pI1qJLSXp4pAJeRgCMNMzI
+	 y/u0ZHoXT5PmECo82HWOG2BK4Z2Y6ki01JXjeXuMNuXJl9ruagY2UZYQVcnLm1rb13
+	 QT8R1vnbb1C7A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rtjdX-002OcU-Vd;
-	Mon, 08 Apr 2024 08:41:52 +0100
-Date: Mon, 08 Apr 2024 08:41:50 +0100
-Message-ID: <864jccti69.wl-maz@kernel.org>
+	id 1rtjgR-002Ohb-8K;
+	Mon, 08 Apr 2024 08:44:51 +0100
+Date: Mon, 08 Apr 2024 08:44:50 +0100
+Message-ID: <8634rwti19.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev,
@@ -50,10 +50,10 @@ Cc: kvmarm@lists.linux.dev,
 	broonie@kernel.org,
 	joey.gouly@arm.com,
 	rananta@google.com
-Subject: Re: [PATCH v1 03/44] KVM: arm64: Move setting the page as dirty out of the critical section
-In-Reply-To: <20240327173531.1379685-4-tabba@google.com>
+Subject: Re: [PATCH v1 04/44] KVM: arm64: Avoid BUG-ing from the host abort path
+In-Reply-To: <20240327173531.1379685-5-tabba@google.com>
 References: <20240327173531.1379685-1-tabba@google.com>
-	<20240327173531.1379685-4-tabba@google.com>
+	<20240327173531.1379685-5-tabba@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -69,57 +69,50 @@ X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, will@kernel.org, qp
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 27 Mar 2024 17:34:50 +0000,
+On Wed, 27 Mar 2024 17:34:51 +0000,
 Fuad Tabba <tabba@google.com> wrote:
 > 
-> Move the unlock earlier in user_mem_abort() to shorten the
-> critical section. This also helps for future refactoring and
-> reuse of similar code.
+> From: Quentin Perret <qperret@google.com>
 > 
+> Under certain circumstances __get_fault_info() may resolve the faulting
+> address using the AT instruction. Given that this is being done outside
+> of the host lock critical section, it is racy and the resolution via AT
+> may fail. We currently BUG() in this situation, which is obviously less
+> than ideal. Moving the address resolution to the critical section may
+> have a performance impact, so let's keep it where it is, but bail out
+> and return to the host to try a second time.
+> 
+> Signed-off-by: Quentin Perret <qperret@google.com>
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  arch/arm64/kvm/mmu.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 18680771cdb0..3afc42d8833e 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1522,8 +1522,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 861c76021a25..d48990eae1ef 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -533,7 +533,15 @@ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
+>  	int ret = 0;
 >  
->  	read_lock(&kvm->mmu_lock);
->  	pgt = vcpu->arch.hw_mmu->pgt;
-> -	if (mmu_invalidate_retry(kvm, mmu_seq))
-> +	if (mmu_invalidate_retry(kvm, mmu_seq)) {
-> +		ret = -EAGAIN;
->  		goto out_unlock;
+>  	esr = read_sysreg_el2(SYS_ESR);
+> -	BUG_ON(!__get_fault_info(esr, &fault));
+> +	if (!__get_fault_info(esr, &fault)) {
+> +		/* Setting the address to an invalid value for use in tracing. */
+> +		addr = (u64)-1;
+
+If this is relating to tracing, can this instead be added together with
+the tracing itself?
+
+> +		/*
+> +		 * We've presumably raced with a page-table change which caused
+> +		 * AT to fail, try again.
+> +		 */
+> +		return;
 > +	}
 >  
->  	/*
->  	 * If we are not forced to use page mapping, check if we are
-> @@ -1581,6 +1583,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  					     memcache,
->  					     KVM_PGTABLE_WALK_HANDLE_FAULT |
->  					     KVM_PGTABLE_WALK_SHARED);
-> +out_unlock:
-> +	read_unlock(&kvm->mmu_lock);
->  
->  	/* Mark the page dirty only if the fault is handled successfully */
->  	if (writable && !ret) {
-> @@ -1588,8 +1592,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		mark_page_dirty_in_slot(kvm, memslot, gfn);
->  	}
->  
-> -out_unlock:
-> -	read_unlock(&kvm->mmu_lock);
->  	kvm_release_pfn_clean(pfn);
->  	return ret != -EAGAIN ? ret : 0;
->  }
-
-It now means that things such as marking a page dirty happens outside
-of the lock, which may interact with the dirty log/bitmap stuff.
-
-Can you elaborate on *why* this is correct?
+>  	addr = (fault.hpfar_el2 & HPFAR_MASK) << 8;
+>  	ret = host_stage2_idmap(addr);
 
 Thanks,
 
