@@ -1,122 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB40A48787
-	for <kvmarm@lists.linux.dev>; Mon,  8 Apr 2024 07:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD6A469DF4;
+	Mon,  8 Apr 2024 11:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712562293; cv=none; b=V6fIqdPd3tE0A9fAeY4ftIjfxDbn8lOspMGUC+96zv4SddZr1HP37RBsYPMnqLGE3p2kZLOzMeumrA1vC0L3JvTao30zVkKtuUPj7xSrsuN3C4fbabilu573lClChvr6Flt+72aN18a3DFqJp6nJyuV5JZdxFFzhmo+yF/IxvGw=
+	t=1712576725; cv=none; b=LuAwq7ut+rnWH2TpzjJlZCLYwZuLv/JYQoKns1XJA4i1Y9fgtlDWbdF/xnLEUxnSFiRW9xGl5qgtO75/0BFOIXZf+9YvNWdyCyv/aUvPzwhqX657mT9y6azn79Rt2qWQ9Sg0y2hycs0fhHp9fWA89oVjPhMsWLIxg1gNi3hp9H0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712562293; c=relaxed/simple;
-	bh=BhqydDivTl/yVN07GOY6+fkzNmn/QBlqiaQuLEzkW4k=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FpnMlIDaEGZm+9EOULdymZJ2TPKuPttP3vsKuc3odgAuMWVY+5WhFO81BhASMLYw68G3453ffepEXaT9+dxbT0F92rDvfMjE8rvOxGjgG2FYGjrI7xZu4qOcsnhLIRaGcsk9G02ov1I4959gM8Kjc+LOMTztOdx9g0AQ/rkoS5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sSXmtDiU; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712576725; c=relaxed/simple;
+	bh=Lvr4Q9WQMTuj4LqkHya0HKL9JodxZNBHVeLenTpYopw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=oZRsklvg3GP6TqwF9CiN7/yUHBu9skR0megGTZ2XWhE1yW7hk6IFw1Obkd0BfzMzhC4zALfEEOF6VHZPlJChW40vVJbdrAhI5BOnPheqkoYNVtstLBrghR1VVk+txjEBizqVaDK0oIldtfShHecZ107SKnkmP+rC9INC7rk1sgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=h0ErTczH; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sSXmtDiU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F9C1C433C7;
-	Mon,  8 Apr 2024 07:44:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712562293;
-	bh=BhqydDivTl/yVN07GOY6+fkzNmn/QBlqiaQuLEzkW4k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sSXmtDiUfYmXbpTTsCZGBwkf+cKn2HfeSNCySp2LoD/16rriFuKX1Qpewoqbp8k4u
-	 FYcFk5EuTmSfhSbPmLfva8E9eZ+8FmcU55cZMHza5SPDbVhe1sbAMF6EFaLq1YcUy6
-	 NQVl9OQw6D5leRTrQnH4QlSH1mGoy1Dzvp0diuucgULeu/MR7kQgw07UO2oJY3Wyob
-	 jEaPEiBzvXF5UVGajxkNPrcEpeIqxwjpvulAI21GWq08pI1qJLSXp4pAJeRgCMNMzI
-	 y/u0ZHoXT5PmECo82HWOG2BK4Z2Y6ki01JXjeXuMNuXJl9ruagY2UZYQVcnLm1rb13
-	 QT8R1vnbb1C7A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rtjgR-002Ohb-8K;
-	Mon, 08 Apr 2024 08:44:51 +0100
-Date: Mon, 08 Apr 2024 08:44:50 +0100
-Message-ID: <8634rwti19.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	will@kernel.org,
-	qperret@google.com,
-	seanjc@google.com,
-	alexandru.elisei@arm.com,
-	catalin.marinas@arm.com,
-	philmd@linaro.org,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	oliver.upton@linux.dev,
-	mark.rutland@arm.com,
-	broonie@kernel.org,
-	joey.gouly@arm.com,
-	rananta@google.com
-Subject: Re: [PATCH v1 04/44] KVM: arm64: Avoid BUG-ing from the host abort path
-In-Reply-To: <20240327173531.1379685-5-tabba@google.com>
-References: <20240327173531.1379685-1-tabba@google.com>
-	<20240327173531.1379685-5-tabba@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="h0ErTczH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1712576721;
+	bh=taqzyuzUm+h1dAr9up1EmBlmxQ7Pw3TT7Dqle3r+vfk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=h0ErTczH+J8eOKMVXpItrHYKRUMh+pxxcV6/0CoHG40VtMk6SjHBicTMij8g0QPcl
+	 DqWHMNnSfi+fwP5HiCdifsYmHpkp4Xn+DbOgdxU7qWixZBXfw3jqmo2Mf9TSyh+dfR
+	 6VbzGd3EpRZksCPRiEZyrpuPnkVP77GEek1dnGxxPTCQfwlANrE42GRZMWo8lTHAps
+	 +9qTuFxiU3mHHBuAnio0EBxVUDdvEu22B/D31hrzTZyHyg754PmZ251qNdGHU6OTRk
+	 8cDtgXORRLDOqu5a0FunAuYei0U3LrNTqxk35BBWQCXaFVALq9JB3md16kAgiWqViN
+	 5wPghIA4bJBwA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VCnMf3rffz4wcF;
+	Mon,  8 Apr 2024 21:45:18 +1000 (AEST)
+From: Michael Ellerman <mpe@ellerman.id.au>
+To: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Nicholas Piggin
+ <npiggin@gmail.com>, Anup Patel <anup@brainfault.org>, Atish Patra
+ <atishp@atishpatra.org>, Sean Christopherson <seanjc@google.com>, Andrew
+ Morton <akpm@linux-foundation.org>, David Hildenbrand <david@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org,
+ linux-perf-users@vger.kernel.org
+Subject: Re: [PATCH 1/4] KVM: delete .change_pte MMU notifier callback
+In-Reply-To: <20240405115815.3226315-2-pbonzini@redhat.com>
+References: <20240405115815.3226315-1-pbonzini@redhat.com>
+ <20240405115815.3226315-2-pbonzini@redhat.com>
+Date: Mon, 08 Apr 2024 21:45:18 +1000
+Message-ID: <87h6gcaxip.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, joey.gouly@arm.com, rananta@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Wed, 27 Mar 2024 17:34:51 +0000,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> From: Quentin Perret <qperret@google.com>
-> 
-> Under certain circumstances __get_fault_info() may resolve the faulting
-> address using the AT instruction. Given that this is being done outside
-> of the host lock critical section, it is racy and the resolution via AT
-> may fail. We currently BUG() in this situation, which is obviously less
-> than ideal. Moving the address resolution to the critical section may
-> have a performance impact, so let's keep it where it is, but bail out
-> and return to the host to try a second time.
-> 
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
+Paolo Bonzini <pbonzini@redhat.com> writes:
+> The .change_pte() MMU notifier callback was intended as an
+> optimization. The original point of it was that KSM could tell KVM to flip
+> its secondary PTE to a new location without having to first zap it. At
+> the time there was also an .invalidate_page() callback; both of them were
+> *not* bracketed by calls to mmu_notifier_invalidate_range_{start,end}(),
+> and .invalidate_page() also doubled as a fallback implementation of
+> .change_pte().
+>
+> Later on, however, both callbacks were changed to occur within an
+> invalidate_range_start/end() block.
+>
+> In the case of .change_pte(), commit 6bdb913f0a70 ("mm: wrap calls to
+> set_pte_at_notify with invalidate_range_start and invalidate_range_end",
+> 2012-10-09) did so to remove the fallback from .invalidate_page() to
+> .change_pte() and allow sleepable .invalidate_page() hooks.
+>
+> This however made KVM's usage of the .change_pte() callback completely
+> moot, because KVM unmaps the sPTEs during .invalidate_range_start()
+> and therefore .change_pte() has no hope of finding a sPTE to change.
+> Drop the generic KVM code that dispatches to kvm_set_spte_gfn(), as
+> well as all the architecture specific implementations.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 861c76021a25..d48990eae1ef 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -533,7 +533,15 @@ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
->  	int ret = 0;
->  
->  	esr = read_sysreg_el2(SYS_ESR);
-> -	BUG_ON(!__get_fault_info(esr, &fault));
-> +	if (!__get_fault_info(esr, &fault)) {
-> +		/* Setting the address to an invalid value for use in tracing. */
-> +		addr = (u64)-1;
+>  arch/arm64/kvm/mmu.c                  | 34 -----------------
+>  arch/loongarch/include/asm/kvm_host.h |  1 -
+>  arch/loongarch/kvm/mmu.c              | 32 ----------------
+>  arch/mips/kvm/mmu.c                   | 30 ---------------
+>  arch/powerpc/include/asm/kvm_ppc.h    |  1 -
+>  arch/powerpc/kvm/book3s.c             |  5 ---
+>  arch/powerpc/kvm/book3s.h             |  1 -
+>  arch/powerpc/kvm/book3s_64_mmu_hv.c   | 12 ------
+>  arch/powerpc/kvm/book3s_hv.c          |  1 -
+>  arch/powerpc/kvm/book3s_pr.c          |  7 ----
+>  arch/powerpc/kvm/e500_mmu_host.c      |  6 ---
 
-If this is relating to tracing, can this instead be added together with
-the tracing itself?
+LGTM.
 
-> +		/*
-> +		 * We've presumably raced with a page-table change which caused
-> +		 * AT to fail, try again.
-> +		 */
-> +		return;
-> +	}
->  
->  	addr = (fault.hpfar_el2 & HPFAR_MASK) << 8;
->  	ret = host_stage2_idmap(addr);
+Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+cheers
