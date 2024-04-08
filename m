@@ -1,199 +1,150 @@
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2962A29CEC
-	for <kvmarm@lists.linux.dev>; Mon,  8 Apr 2024 07:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E5922BAF6
+	for <kvmarm@lists.linux.dev>; Mon,  8 Apr 2024 07:39:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712561857; cv=none; b=k6jzgmLfZZZTNTksqwKRVx7GcPuWVSmmV90nWynbrN4BlalUvk5liaYf09ehyNnZNT5PKyWUTU22WZydkjX5dUlL6xZG2yUj5u1LrV5SP4OmZoybe8GMb5avnf8yc85O9Baej/eIbSztCZGnOnmoDGI18P3XzmnykE3ZvqUti2I=
+	t=1712561955; cv=none; b=MuDc9yV2/WM2iAA3YaT2AxRfQckR19v20PYkHm4KhV7IGys5alvbdpr7O/oq/A5N9s5ZwTHvZVH3gOH/8SyFEEfrFyU63EK8ES9eo2hG/T8BcvKkGFX5b/7YS3WBA6I57suY+4i5v9fClaabq4mvJmrKlItg6e6qLjTsZjQKl4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712561857; c=relaxed/simple;
-	bh=4GiidcTTSsiYJWtZd4SF33IW/1FZ/QMl2f1QpKZ57Z4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hYwRGKZg/gsVNEWGJEmEiJvG+9utlOxpNoYCVL8UENDO5MaKtSi3FjMbjbz55GXoQkxgTRqng2ed+pw6GHtUk4d4UiAyqCZh/QaV6aX/DW0ITVsxrguXdfk+AAxtrkIBo9K1HAr6YdrBNO9+hOfyvovF92f+7uRt2PbbZKk5rjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U4d+S2DE; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1712561955; c=relaxed/simple;
+	bh=5bjPrKfh9w4wKcPXiDlG25dqJE8JGnmyMZyIhdFGfU0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KBcztEv1NJhhGiHMzug+eNTStZbTTE9zv3mY3R5Eymn+X2XyAubz6jBr6Sa+gvh2K5R3LHxggHsyMrcnQWbEChG/s94qIK8UFuYlBT7Q66r3EjmRj8qy34Svq8jMJ9kUhmprWTu5U/Mts+hEeq2Xapx5/15Nw1EiIQU2JQ9RJro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YpNxP64g; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U4d+S2DE"
-Date: Mon, 8 Apr 2024 09:37:29 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1712561853;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yUU/YNv1R3O6wJ4nE+rJs4XO4vBQk8D5yD3QxFFxfSc=;
-	b=U4d+S2DEtsYqcQsTCa3qReBqBiyZqXw5ScuELdnL0C+PZd8kbfNbmwmqGl3+xCsF1dj93f
-	7hTkLfye6VevHgpUYG7O4uxCjQYNIbFN4q55S4uPjOb0bnts+Qr9f75M2Fb6lAzC5lbWM1
-	VCPbVxB6Z/RZxbUBdpzNgGLyptDPe3Q=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Eric Auger <eric.auger@redhat.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Nico =?utf-8?B?QsO2aHI=?= <nrb@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Nikos Nikoleris <nikos.nikoleris@arm.com>, 
-	David Woodhouse <dwmw@amazon.co.uk>, Ricardo Koller <ricarkol@google.com>, 
-	rminmin <renmm6@chinaunicom.cn>, Gavin Shan <gshan@redhat.com>, 
-	Nina Schoetterl-Glausch <nsg@linux.ibm.com>, Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
-Subject: Re: [RFC kvm-unit-tests PATCH v2 14/14] shellcheck: Suppress various
- messages
-Message-ID: <20240408-c1fd647357babc836cf85914@orel>
-References: <20240406123833.406488-1-npiggin@gmail.com>
- <20240406123833.406488-15-npiggin@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YpNxP64g"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D4F3C433F1;
+	Mon,  8 Apr 2024 07:39:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712561955;
+	bh=5bjPrKfh9w4wKcPXiDlG25dqJE8JGnmyMZyIhdFGfU0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YpNxP64gBv0qXiuXi290XJEz4JpshWhyuzzsY6FyVCud59YuBlAcYdH4d3dUeISbc
+	 WD0GXHyFrH+HnW9vdL//v46GnCXtM6j90RMEjlmywhJ5oV2Hp30y5lnWAiuwDoEmbc
+	 mEswPPofVCLKrlD2FrFsyIaCGkKcME9hhKPfF+vS9Il7dSfSuliYu/Ay5oi4atLE0V
+	 SyaW2nKA0Tmb/xTur4qi/0xfaq8lkPjWLgRWAmRYj9yc2DXKnAThk+ox+CNI/yLFCO
+	 yLyRRVXFjd7/S7NK/bPTvjilZkzhWJWddYsipyAfVTPefkjXDQBqOVHqk2QH23/85K
+	 9L0Ef3pvrfy6g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rtjay-002OZT-UB;
+	Mon, 08 Apr 2024 08:39:13 +0100
+Date: Mon, 08 Apr 2024 08:39:11 +0100
+Message-ID: <865xwstiao.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	will@kernel.org,
+	qperret@google.com,
+	seanjc@google.com,
+	alexandru.elisei@arm.com,
+	catalin.marinas@arm.com,
+	philmd@linaro.org,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	oliver.upton@linux.dev,
+	mark.rutland@arm.com,
+	broonie@kernel.org,
+	joey.gouly@arm.com,
+	rananta@google.com
+Subject: Re: [PATCH v1 02/44] KVM: arm64: Use enum instead of helper for checking FP-state
+In-Reply-To: <20240327173531.1379685-3-tabba@google.com>
+References: <20240327173531.1379685-1-tabba@google.com>
+	<20240327173531.1379685-3-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240406123833.406488-15-npiggin@gmail.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, will@kernel.org, qperret@google.com, seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, joey.gouly@arm.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, Apr 06, 2024 at 10:38:23PM +1000, Nicholas Piggin wrote:
-> Various info and warnings are suppressed here, where circumstances
-> (commented) warrant.
+On Wed, 27 Mar 2024 17:34:49 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> Before the conversion of the various FP-state booleans into an
+> enum representing the state, this helper may have clarified
+> things. Since the introduction of the enum, the helper obfuscates
+> rather than clarifies. This also makes the code consistent with
+> other parts that check the FP-state.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  configure               |  2 ++
->  run_tests.sh            |  3 +++
->  scripts/arch-run.bash   | 15 +++++++++++++++
->  scripts/mkstandalone.sh |  2 ++
->  scripts/runtime.bash    |  2 ++
->  5 files changed, 24 insertions(+)
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 6 ------
+>  arch/arm64/kvm/hyp/nvhe/switch.c        | 2 +-
+>  arch/arm64/kvm/hyp/vhe/switch.c         | 2 +-
+>  3 files changed, 2 insertions(+), 8 deletions(-)
 > 
-> diff --git a/configure b/configure
-> index 8508396af..6ebac7e0a 100755
-> --- a/configure
-> +++ b/configure
-> @@ -437,6 +437,8 @@ ln -sf "$asm" lib/asm
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index e3fcf8c4d5b4..1a6dfd035531 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -39,12 +39,6 @@ struct kvm_exception_table_entry {
+>  extern struct kvm_exception_table_entry __start___kvm_ex_table;
+>  extern struct kvm_exception_table_entry __stop___kvm_ex_table;
 >  
->  # create the config
->  cat <<EOF > config.mak
-> +# Shellcheck does not see these are used
-> +# shellcheck disable=SC2034
->  SRCDIR=$srcdir
->  PREFIX=$prefix
->  HOST=$host
-> diff --git a/run_tests.sh b/run_tests.sh
-> index 938bb8edf..152323ffc 100755
-> --- a/run_tests.sh
-> +++ b/run_tests.sh
-> @@ -45,6 +45,9 @@ fi
->  only_tests=""
->  list_tests=""
->  args=$(getopt -u -o ag:htj:vl -l all,group:,help,tap13,parallel:,verbose,list,probe-maxsmp -- "$@")
-> +# Shellcheck likes to test commands directly rather than with $? but sometimes they
-> +# are too long to put in the same test.
-> +# shellcheck disable=SC2181
->  [ $? -ne 0 ] && exit 2;
->  set -- $args;
->  while [ $# -gt 0 ]; do
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index 98d29b671..7e5b2bdf1 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -44,6 +44,8 @@ run_qemu ()
->  	if [ "$errors" ]; then
->  		sig=$(grep 'terminating on signal' <<<"$errors")
->  		if [ "$sig" ]; then
-> +			# This is too complex for ${var/search/replace}
-> +			# shellcheck disable=SC2001
->  			sig=$(sed 's/.*terminating on signal \([0-9][0-9]*\).*/\1/' <<<"$sig")
->  		fi
->  	fi
-> @@ -174,9 +176,12 @@ run_migration ()
->  
->  	# Holding both ends of the input fifo open prevents opens from
->  	# blocking and readers getting EOF when a writer closes it.
-> +	# These fds appear to be unused to shellcheck so quieten the warning.
->  	mkfifo ${src_infifo}
->  	mkfifo ${dst_infifo}
-> +	# shellcheck disable=SC2034
->  	exec {src_infifo_fd}<>${src_infifo}
-> +	# shellcheck disable=SC2034
->  	exec {dst_infifo_fd}<>${dst_infifo}
->  
->  	"${migcmdline[@]}" \
-> @@ -184,6 +189,9 @@ run_migration ()
->  		-mon chardev=mon,mode=control \
->  		< ${src_infifo} > ${src_outfifo} &
->  	live_pid=$!
-> +	# Shellcheck complains about useless cat but it is clearer than a
-> +	# redirect in this case.
-> +	# shellcheck disable=SC2002
->  	cat ${src_outfifo} | tee ${src_out} | filter_quiet_msgs &
->  
->  	# Start the first destination QEMU machine in advance of the test
-> @@ -224,6 +232,9 @@ do_migration ()
->  		-mon chardev=mon,mode=control -incoming unix:${dst_incoming} \
->  		< ${dst_infifo} > ${dst_outfifo} &
->  	incoming_pid=$!
-> +	# Shellcheck complains about useless cat but it is clearer than a
-> +	# redirect in this case.
-> +	# shellcheck disable=SC2002
->  	cat ${dst_outfifo} | tee ${dst_out} | filter_quiet_msgs &
->  
->  	# The test must prompt the user to migrate, so wait for the
-> @@ -467,6 +478,8 @@ env_params ()
->  			[ -n "$ACCEL" ] && QEMU_ACCEL=$ACCEL
->  		fi
->  		QEMU_VERSION_STRING="$($qemu -h | head -1)"
-> +		# SC does not seee QEMU_MAJOR|MINOR|MICRO are used
-
-Shellcheck does not see
-
-> +		# shellcheck disable=SC2034
->  		IFS='[ .]' read -r _ _ _ QEMU_MAJOR QEMU_MINOR QEMU_MICRO rest <<<"$QEMU_VERSION_STRING"
->  	fi
->  	env_add_params QEMU_ACCEL QEMU_VERSION_STRING QEMU_MAJOR QEMU_MINOR QEMU_MICRO
-> @@ -597,6 +610,8 @@ hvf_available ()
->  
->  set_qemu_accelerator ()
+> -/* Check whether the FP regs are owned by the guest */
+> -static inline bool guest_owns_fp_regs(struct kvm_vcpu *vcpu)
+> -{
+> -	return vcpu->arch.fp_state == FP_STATE_GUEST_OWNED;
+> -}
+> -
+>  /* Save the 32-bit only FPSIMD system register state */
+>  static inline void __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
 >  {
-> +	# Shellcheck does not seee ACCEL_PROPS is used
-
-see
-
-> +	# shellcheck disable=SC2034
->  	ACCEL_PROPS=${ACCEL#"${ACCEL%%,*}"}
->  	ACCEL=${ACCEL%%,*}
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index c50f8459e4fc..2a0b0d6da7c7 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -53,7 +53,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+>  			val |= CPTR_EL2_TSM;
+>  	}
 >  
-> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
-> index 756647f29..2318a85f0 100755
-> --- a/scripts/mkstandalone.sh
-> +++ b/scripts/mkstandalone.sh
-> @@ -65,6 +65,8 @@ generate_test ()
->  	fi
+> -	if (!guest_owns_fp_regs(vcpu)) {
+> +	if (vcpu->arch.fp_state != FP_STATE_GUEST_OWNED) {
+>  		if (has_hvhe())
+>  			val &= ~(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
+>  				 CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN);
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 1581df6aec87..e9197f086137 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -75,7 +75,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
 >  
->  	temp_file bin "$kernel"
-> +	# Don't want to expand $bin but print it as-is.
-> +	# shellcheck disable=SC2016
->  	args[3]='$bin'
+>  	val |= CPTR_EL2_TAM;
 >  
->  	(echo "#!/usr/bin/env bash"
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index 3b76aec9e..6e712214d 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -137,6 +137,8 @@ function run()
->      # the check line can contain multiple files to check separated by a space
->      # but each check parameter needs to be of the form <path>=<value>
->      if [ "$check" ]; then
-> +        # There is no globbing or whitespace allowed in check parameters.
-> +        # shellcheck disable=SC2206
->          check=($check)
->          for check_param in "${check[@]}"; do
->              path=${check_param%%=*}
-> -- 
-> 2.43.0
->
+> -	if (guest_owns_fp_regs(vcpu)) {
+> +	if (vcpu->arch.fp_state == FP_STATE_GUEST_OWNED) {
+>  		if (vcpu_has_sve(vcpu))
+>  			val |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
+>  	} else {
 
-Other than comment fixes,
+I'm not sure this buys us much. If anything, it makes moving the data
+around more difficult (see [1]).
 
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Overall, asking whether the vcpu owns the FP state seems a natural
+question, and I would have expected this helper to be generalised
+instead of being dropped.
+
+Could you please elaborate on this?
+
+Thanks,
+
+	M.
+
+[1] https://lore.kernel.org/all/20240322170945.3292593-6-maz@kernel.org/
+
+-- 
+Without deviation from the norm, progress is not possible.
