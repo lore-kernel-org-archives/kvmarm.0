@@ -1,136 +1,155 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7347CF25
-	for <kvmarm@lists.linux.dev>; Mon,  8 Apr 2024 13:56:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB911411DD
+	for <kvmarm@lists.linux.dev>; Mon,  8 Apr 2024 15:41:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712584588; cv=none; b=A2m350JghXLUOyn9geZeg2DZKCdu/Gii4D7vSsWoruv7Ot0mCGe8Do/o/rYW6k74jPWmLht5zcICa2RdAA8PjHocaaRUSotCzKcjUhZkzUxq1oz/4s7/GY5pEfr0ShPQIede0hxG4ZWmLueOyWhzWfAsVVcxAe1n8b1J3HuAm1I=
+	t=1712590915; cv=none; b=QiPEJdoQrSbWYzsE7fAnX57ui2FgV5b18Q9fOfYU6jnFPCfSoWYSBuz8qf4a8nZtRD4CDu8ImTAAy/ao7URF3rkth0DHpLSv1AnuyNVObNk7a4uNhpyAGsT/YQbhY8xertQZ962/8v9Q05G51j5qJwGVblPHqbNsHc5yLAQ1rjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712584588; c=relaxed/simple;
-	bh=Sv1lonJMRVR+UVuirFpH2YmZNDikOQMGGjjjY3UJLc4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=INJCpkiif4mq7GoYezPWgNrahQODCrh4v02qu+CzEcpC6F1P0D05+tiaOjlhE1R79Se00tBLiMACDQr05LhbToWFNparPDBfyYmUr/pvNNssT+X/TNw7zkNt2B8a7Un6b+ELhnqufScn4uBzzy/LIzqb61rh1L7fCy5dLOXUUE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jSkc+D6j; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1712590915; c=relaxed/simple;
+	bh=SfdtFOR6aiML9ktv68TwRgaYdrwUy0rL0HHJq0xG14k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DmURcJWPcY0jK8NlS0Sa34A8sarypvtO64w7Jvg/yT2gzbvfTzU29Jfsb4JBhIfZLrqxQp/hx8YSe8VedE1MeyiG+vgwnuxoJ6rcH0R7iLxrQNQY57GUXFQ0xP+KFjUYrexFN9kCiYha7V0aLEs+nTefZXiu5vaqib7TZ01K2wI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o8EMSZot; arc=none smtp.client-ip=209.85.217.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jSkc+D6j"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712584586;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rmNJpHW5Hyb1elegWpLMoq/S1yVvTDK8DJLj5yKd5mI=;
-	b=jSkc+D6jQ67V96JT6DTwSNSLxH1rUBZFARNc5R/BSk3H3V2rn8hWEMn53rcmm7qECEhwzv
-	4DlNbLLRfAPjUgG4ztQxrrxWKNMTWd3TDmrn7o+jk2HQhR30ZhaNTPBH5Cvke1QkWwDuGc
-	aITJkULCtA6UgkkomweJs2wnjLj5alE=
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
- [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-604-XqOK1wTKOZGQP8as-YFUrg-1; Mon, 08 Apr 2024 09:56:24 -0400
-X-MC-Unique: XqOK1wTKOZGQP8as-YFUrg-1
-Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-6ea20a966b0so46684a34.0
-        for <kvmarm@lists.linux.dev>; Mon, 08 Apr 2024 06:56:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712584584; x=1713189384;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o8EMSZot"
+Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-47a0bebeacaso282149137.0
+        for <kvmarm@lists.linux.dev>; Mon, 08 Apr 2024 08:41:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712590913; x=1713195713; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rmNJpHW5Hyb1elegWpLMoq/S1yVvTDK8DJLj5yKd5mI=;
-        b=oNbXS8mRZGdoYgbjI9gGuJwnzC4TaK9JoPiPQBR8lA27KQsa5t3FJhdOqmUqYLkiFL
-         6w3sGsU7+OlZZ4lvxUiIWiEI9/9u6wDC23gmjpXGeFnsBor7B7C1jrH4FyJsCZcIeS1Y
-         /5sfqoKnoJfLzfUtA7NXNUjkzvLtOlM+LhOHYPm9rZgjErxkqe/3K5ClLO3YUKO8a95E
-         f9wAdHUs8ic7OawsqRJkMxowxgaavLUKW0O5GaDaqbKcrFA5nqIfIp+9JLjVFEz/dlIy
-         Cje8Q0BMXySDIpPsirC2q140skmmW/2BrBwI87S6ZyEfwYr19RKsUtxwqWSH250H5K4O
-         rCaw==
-X-Forwarded-Encrypted: i=1; AJvYcCXKPMd+ZiVMsXJOsXvOnKtsamWQqjB2Mzojp4rFhhPlNbSLJEKXOBbw+1+dShrjP1C3+rIgu42kbxWZKe04dUaCQYJHuxs+
-X-Gm-Message-State: AOJu0YxtGn3byTRXek6XsORsnIkoS3hMiYdSmZAbHh7gW/VwuRgOnkZW
-	SlqOJbvo8cKmSIShmC9MsGOqGDoJqs28FqETgYpruK2fQreTlvcXc8suELgzap47BmtChhqjnRf
-	uj4tNbZvm6L8l9J1pH63E0EsnNSxRBFjplajJfzA6IvXkFX4f6LVktQ==
-X-Received: by 2002:a05:6830:a5a:b0:6e7:592:87ab with SMTP id g26-20020a0568300a5a00b006e7059287abmr9702525otu.2.1712584583704;
-        Mon, 08 Apr 2024 06:56:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE/6cZVOu40ZE5XkeceEvB5GWIk5ESL9MdZGK/RmwIM5NG0Lyufyd1ejET8K1FRMeVweFzXgg==
-X-Received: by 2002:a05:6830:a5a:b0:6e7:592:87ab with SMTP id g26-20020a0568300a5a00b006e7059287abmr9702473otu.2.1712584583118;
-        Mon, 08 Apr 2024 06:56:23 -0700 (PDT)
-Received: from x1n ([99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id vw25-20020a05620a565900b0078d63baf516sm1301217qkn.129.2024.04.08.06.56.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Apr 2024 06:56:22 -0700 (PDT)
-Date: Mon, 8 Apr 2024 09:56:20 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	David Hildenbrand <david@redhat.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org,
-	Andrea Arcangeli <aarcange@redhat.com>
-Subject: Re: [PATCH 1/4] KVM: delete .change_pte MMU notifier callback
-Message-ID: <ZhP3hDhe2Qwo9oCL@x1n>
-References: <20240405115815.3226315-1-pbonzini@redhat.com>
- <20240405115815.3226315-2-pbonzini@redhat.com>
+        bh=0lZf0V5CbwYLrE9UF8J47ZuFhjBiyoWGeXKBNAjOLM4=;
+        b=o8EMSZot/lhhcUd6tPCKSNwpcm2nabxmBXqtlbh4ZfCBS/bvPP40X4X3lKwdK4x+fr
+         v3+27alVFpz5jJQPKLzrxk/8XNRNeTrI6Mn68cH2VAMNTOD2DABPG9gvdAJYxfvHj67b
+         cx4mCOt82FCugZmma0q6tWvmNVmZOnSjzsWNg2M2PWx78ovUIFiiv220PfwKG8UjUZIL
+         sUKwbGv0GwzD4s0V0i8E0uuI1LF8ZwVOXqaronfO+As2OrYDOGyJoc0XSiTYMCQADLm2
+         ry6G4I3ruvpz53FhzvG89ypGqsJ0SZqvHodIptgn0rp3fJwDkB5/XWhGhKGL7GfU/mdd
+         qabQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712590913; x=1713195713;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0lZf0V5CbwYLrE9UF8J47ZuFhjBiyoWGeXKBNAjOLM4=;
+        b=fE10ZRr8vGarJPNGLv66jv0FWIM93A6Vhu8PrnGxaJmnRuhiKT7ul8aBBEC0EWbz8S
+         lxEpBbNSQD6vDpOpQi/ETWlLe+TrkMa5A9yNKpgzmt96tRSRnZjGiK+HpBP1GLr/vDTb
+         GCrs2CP2pcuPmtz8xnwekMyCswKa7mX4n37ou4bexu3ev8MEK17lvod9+lW+1OVkX2aG
+         VN8r3akBBo1s+SB6cCUWysl/KpnYGPOUWqVIoHlvSaturRkma/II10VOTCFUehcTWeBK
+         2q9pysrANwZx+lZAPJvDF+q/XOwPP4QE+xeNL+lYRv/vIRU6bD2Mm1lu23Tk/p9cyn+Q
+         8GKw==
+X-Gm-Message-State: AOJu0Yw08tWgXWkkU3HCqtChnmjKD8iHdo8q1pJ/enCMolxQg0uqLhoS
+	x5hRNpA3OZGe2daNrQ1ji5npo3bLjYCuOKDlt5hRiFSbLS6XSCWRQdETQ8mLIU3uVI5PtF+NvXj
+	L0UOVcmWXGMF22AJyoq2PzjvSAVWutZNkQ/dA
+X-Google-Smtp-Source: AGHT+IFYS0tBiOuN5XLkVK7i27WsEUnu3LOikcFf/F1NBA8MZwNzHSSRrJi4swsU9/EuDcy+X+9ye9OtxJ5xSc6DzeE=
+X-Received: by 2002:a05:6102:cca:b0:479:f389:2a4a with SMTP id
+ g10-20020a0561020cca00b00479f3892a4amr4206253vst.1.1712590912576; Mon, 08 Apr
+ 2024 08:41:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20240405115815.3226315-2-pbonzini@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+References: <20240327173531.1379685-1-tabba@google.com> <20240327173531.1379685-4-tabba@google.com>
+ <864jccti69.wl-maz@kernel.org>
+In-Reply-To: <864jccti69.wl-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 8 Apr 2024 16:41:15 +0100
+Message-ID: <CA+EHjTxRSQdaKXpYd6GHEejZk0mpKwPz0CPmnAxPPneGijtSsw@mail.gmail.com>
+Subject: Re: [PATCH v1 03/44] KVM: arm64: Move setting the page as dirty out
+ of the critical section
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, will@kernel.org, qperret@google.com, 
+	seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, 
+	philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, 
+	oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, 
+	joey.gouly@arm.com, rananta@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 05, 2024 at 07:58:12AM -0400, Paolo Bonzini wrote:
-> The .change_pte() MMU notifier callback was intended as an
-> optimization. The original point of it was that KSM could tell KVM to flip
-> its secondary PTE to a new location without having to first zap it. At
-> the time there was also an .invalidate_page() callback; both of them were
-> *not* bracketed by calls to mmu_notifier_invalidate_range_{start,end}(),
-> and .invalidate_page() also doubled as a fallback implementation of
-> .change_pte().
-> 
-> Later on, however, both callbacks were changed to occur within an
-> invalidate_range_start/end() block.
-> 
-> In the case of .change_pte(), commit 6bdb913f0a70 ("mm: wrap calls to
-> set_pte_at_notify with invalidate_range_start and invalidate_range_end",
-> 2012-10-09) did so to remove the fallback from .invalidate_page() to
-> .change_pte() and allow sleepable .invalidate_page() hooks.
-> 
-> This however made KVM's usage of the .change_pte() callback completely
-> moot, because KVM unmaps the sPTEs during .invalidate_range_start()
-> and therefore .change_pte() has no hope of finding a sPTE to change.
-> Drop the generic KVM code that dispatches to kvm_set_spte_gfn(), as
-> well as all the architecture specific implementations.
+Hi Marc,
 
-Paolo,
+On Mon, Apr 8, 2024 at 8:41=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Wed, 27 Mar 2024 17:34:50 +0000,
+> Fuad Tabba <tabba@google.com> wrote:
+> >
+> > Move the unlock earlier in user_mem_abort() to shorten the
+> > critical section. This also helps for future refactoring and
+> > reuse of similar code.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/kvm/mmu.c | 8 +++++---
+> >  1 file changed, 5 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 18680771cdb0..3afc42d8833e 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1522,8 +1522,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu,=
+ phys_addr_t fault_ipa,
+> >
+> >       read_lock(&kvm->mmu_lock);
+> >       pgt =3D vcpu->arch.hw_mmu->pgt;
+> > -     if (mmu_invalidate_retry(kvm, mmu_seq))
+> > +     if (mmu_invalidate_retry(kvm, mmu_seq)) {
+> > +             ret =3D -EAGAIN;
+> >               goto out_unlock;
+> > +     }
+> >
+> >       /*
+> >        * If we are not forced to use page mapping, check if we are
+> > @@ -1581,6 +1583,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, =
+phys_addr_t fault_ipa,
+> >                                            memcache,
+> >                                            KVM_PGTABLE_WALK_HANDLE_FAUL=
+T |
+> >                                            KVM_PGTABLE_WALK_SHARED);
+> > +out_unlock:
+> > +     read_unlock(&kvm->mmu_lock);
+> >
+> >       /* Mark the page dirty only if the fault is handled successfully =
+*/
+> >       if (writable && !ret) {
+> > @@ -1588,8 +1592,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, =
+phys_addr_t fault_ipa,
+> >               mark_page_dirty_in_slot(kvm, memslot, gfn);
+> >       }
+> >
+> > -out_unlock:
+> > -     read_unlock(&kvm->mmu_lock);
+> >       kvm_release_pfn_clean(pfn);
+> >       return ret !=3D -EAGAIN ? ret : 0;
+> >  }
+>
+> It now means that things such as marking a page dirty happens outside
+> of the lock, which may interact with the dirty log/bitmap stuff.
+>
+> Can you elaborate on *why* this is correct?
 
-I may miss a bunch of details here (as I still remember some change_pte
-patches previously on the list..), however not sure whether we considered
-enable it?  Asked because I remember Andrea used to have a custom tree
-maintaining that part:
+The reason why I _think_ this is correct (something I am less certain
+about now judging by your reply :) is that this is a lock that
+protects the stage-2 page tables (struct kvm_vcpu_arch::hw_mmu), held
+in this case for read. As far as I can tell, kvm_set_pfn_dirty() and
+mark_page_dirty_in_slot() only access and modify (i.e., write to) the
+page without accessing the stage-2 page table. I think that the dirtly
+log is protected by the slots_lock.
 
-https://github.com/aagit/aa/commit/c761078df7a77d13ddfaeebe56a0f4bc128b1968
-
-Maybe it can't be enabled for some reason that I overlooked in the current
-tree, or we just decided to not to?
+Am I missing something?
 
 Thanks,
+/fuad
 
--- 
-Peter Xu
-
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
