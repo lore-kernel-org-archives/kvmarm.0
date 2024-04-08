@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E5922BAF6
-	for <kvmarm@lists.linux.dev>; Mon,  8 Apr 2024 07:39:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1D24F8B1
+	for <kvmarm@lists.linux.dev>; Mon,  8 Apr 2024 07:41:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712561955; cv=none; b=MuDc9yV2/WM2iAA3YaT2AxRfQckR19v20PYkHm4KhV7IGys5alvbdpr7O/oq/A5N9s5ZwTHvZVH3gOH/8SyFEEfrFyU63EK8ES9eo2hG/T8BcvKkGFX5b/7YS3WBA6I57suY+4i5v9fClaabq4mvJmrKlItg6e6qLjTsZjQKl4Q=
+	t=1712562114; cv=none; b=jh6p5bokOkpIZTfqRv+pOTBMxZwDBZ/86ka3HUN0C8Bf4AYODL7x61YrkiJuL0KxoANwtEOz+XTK+0iqNs/0cjjsZyGz1mT3oKUyMKzjmNUz0HnjmmCp8mdn9Hpg1kMOd41LJ37MXUg4v3I682PBPuAGmpLtP82UQl83I8b0BXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712561955; c=relaxed/simple;
-	bh=5bjPrKfh9w4wKcPXiDlG25dqJE8JGnmyMZyIhdFGfU0=;
+	s=arc-20240116; t=1712562114; c=relaxed/simple;
+	bh=ERdr/5qhocvZ1CEaB6/iZw2BZjhNKUNS8UqnDQHfFtA=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KBcztEv1NJhhGiHMzug+eNTStZbTTE9zv3mY3R5Eymn+X2XyAubz6jBr6Sa+gvh2K5R3LHxggHsyMrcnQWbEChG/s94qIK8UFuYlBT7Q66r3EjmRj8qy34Svq8jMJ9kUhmprWTu5U/Mts+hEeq2Xapx5/15Nw1EiIQU2JQ9RJro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YpNxP64g; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=XBicrbZPZ1lXjxAt4WOjlqttgue4XzCoSHvxi3Db/N5x1MPE6BxJGIrcdBoM/bZbsGF0jGwZA3SRnWWwqPmpHLziMI1i+QNd5+BZ1vD6zMdyG0mXBRFaqdcoH3QMbD1kIcNQSXYCv8jydFm51rsNDbyV4/3T/enYsOSKbcWa0gU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uc0H6a1S; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YpNxP64g"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D4F3C433F1;
-	Mon,  8 Apr 2024 07:39:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uc0H6a1S"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ADCBC433F1;
+	Mon,  8 Apr 2024 07:41:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712561955;
-	bh=5bjPrKfh9w4wKcPXiDlG25dqJE8JGnmyMZyIhdFGfU0=;
+	s=k20201202; t=1712562114;
+	bh=ERdr/5qhocvZ1CEaB6/iZw2BZjhNKUNS8UqnDQHfFtA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YpNxP64gBv0qXiuXi290XJEz4JpshWhyuzzsY6FyVCud59YuBlAcYdH4d3dUeISbc
-	 WD0GXHyFrH+HnW9vdL//v46GnCXtM6j90RMEjlmywhJ5oV2Hp30y5lnWAiuwDoEmbc
-	 mEswPPofVCLKrlD2FrFsyIaCGkKcME9hhKPfF+vS9Il7dSfSuliYu/Ay5oi4atLE0V
-	 SyaW2nKA0Tmb/xTur4qi/0xfaq8lkPjWLgRWAmRYj9yc2DXKnAThk+ox+CNI/yLFCO
-	 yLyRRVXFjd7/S7NK/bPTvjilZkzhWJWddYsipyAfVTPefkjXDQBqOVHqk2QH23/85K
-	 9L0Ef3pvrfy6g==
+	b=Uc0H6a1SfuMp7NZHPa91soI37aXhABAuxpdYAEHGdNWiwwvq0j43D0hV+RirXiUIz
+	 +N8vQ1IkyVZLQynq+Lpm20ACwp5RqsNnFYxzi12AtZt7GqslNZ2VKWMRjWJ7/bhXI/
+	 uSV0NnA/9lMyZqSMOFBUIgpAnbdD7MEgJTOMImo5KGW27LrQKv9u/UPATWqUBbWwLT
+	 mBLa2Dwqwn+e5sm9Gh9OntKkVOWWXDKzm1ai6mTCj8JOqzPwFYrcF4q1drTh9Japo/
+	 mkYaeYTfmB4dUHp1PfTDoN3LJJJJV+QTbiEA5738HQLkLcQXEy9LQmudvrtcPkt1ja
+	 Tl2lwmMZjYeig==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1rtjay-002OZT-UB;
-	Mon, 08 Apr 2024 08:39:13 +0100
-Date: Mon, 08 Apr 2024 08:39:11 +0100
-Message-ID: <865xwstiao.wl-maz@kernel.org>
+	id 1rtjdX-002OcU-Vd;
+	Mon, 08 Apr 2024 08:41:52 +0100
+Date: Mon, 08 Apr 2024 08:41:50 +0100
+Message-ID: <864jccti69.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev,
@@ -50,10 +50,10 @@ Cc: kvmarm@lists.linux.dev,
 	broonie@kernel.org,
 	joey.gouly@arm.com,
 	rananta@google.com
-Subject: Re: [PATCH v1 02/44] KVM: arm64: Use enum instead of helper for checking FP-state
-In-Reply-To: <20240327173531.1379685-3-tabba@google.com>
+Subject: Re: [PATCH v1 03/44] KVM: arm64: Move setting the page as dirty out of the critical section
+In-Reply-To: <20240327173531.1379685-4-tabba@google.com>
 References: <20240327173531.1379685-1-tabba@google.com>
-	<20240327173531.1379685-3-tabba@google.com>
+	<20240327173531.1379685-4-tabba@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -69,82 +69,61 @@ X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, will@kernel.org, qp
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 27 Mar 2024 17:34:49 +0000,
+On Wed, 27 Mar 2024 17:34:50 +0000,
 Fuad Tabba <tabba@google.com> wrote:
 > 
-> Before the conversion of the various FP-state booleans into an
-> enum representing the state, this helper may have clarified
-> things. Since the introduction of the enum, the helper obfuscates
-> rather than clarifies. This also makes the code consistent with
-> other parts that check the FP-state.
-> 
-> No functional change intended.
+> Move the unlock earlier in user_mem_abort() to shorten the
+> critical section. This also helps for future refactoring and
+> reuse of similar code.
 > 
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 6 ------
->  arch/arm64/kvm/hyp/nvhe/switch.c        | 2 +-
->  arch/arm64/kvm/hyp/vhe/switch.c         | 2 +-
->  3 files changed, 2 insertions(+), 8 deletions(-)
+>  arch/arm64/kvm/mmu.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index e3fcf8c4d5b4..1a6dfd035531 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -39,12 +39,6 @@ struct kvm_exception_table_entry {
->  extern struct kvm_exception_table_entry __start___kvm_ex_table;
->  extern struct kvm_exception_table_entry __stop___kvm_ex_table;
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 18680771cdb0..3afc42d8833e 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1522,8 +1522,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
 >  
-> -/* Check whether the FP regs are owned by the guest */
-> -static inline bool guest_owns_fp_regs(struct kvm_vcpu *vcpu)
-> -{
-> -	return vcpu->arch.fp_state == FP_STATE_GUEST_OWNED;
-> -}
-> -
->  /* Save the 32-bit only FPSIMD system register state */
->  static inline void __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
->  {
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index c50f8459e4fc..2a0b0d6da7c7 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -53,7 +53,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
->  			val |= CPTR_EL2_TSM;
+>  	read_lock(&kvm->mmu_lock);
+>  	pgt = vcpu->arch.hw_mmu->pgt;
+> -	if (mmu_invalidate_retry(kvm, mmu_seq))
+> +	if (mmu_invalidate_retry(kvm, mmu_seq)) {
+> +		ret = -EAGAIN;
+>  		goto out_unlock;
+> +	}
+>  
+>  	/*
+>  	 * If we are not forced to use page mapping, check if we are
+> @@ -1581,6 +1583,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  					     memcache,
+>  					     KVM_PGTABLE_WALK_HANDLE_FAULT |
+>  					     KVM_PGTABLE_WALK_SHARED);
+> +out_unlock:
+> +	read_unlock(&kvm->mmu_lock);
+>  
+>  	/* Mark the page dirty only if the fault is handled successfully */
+>  	if (writable && !ret) {
+> @@ -1588,8 +1592,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		mark_page_dirty_in_slot(kvm, memslot, gfn);
 >  	}
 >  
-> -	if (!guest_owns_fp_regs(vcpu)) {
-> +	if (vcpu->arch.fp_state != FP_STATE_GUEST_OWNED) {
->  		if (has_hvhe())
->  			val &= ~(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |
->  				 CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN);
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index 1581df6aec87..e9197f086137 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -75,7 +75,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
->  
->  	val |= CPTR_EL2_TAM;
->  
-> -	if (guest_owns_fp_regs(vcpu)) {
-> +	if (vcpu->arch.fp_state == FP_STATE_GUEST_OWNED) {
->  		if (vcpu_has_sve(vcpu))
->  			val |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
->  	} else {
+> -out_unlock:
+> -	read_unlock(&kvm->mmu_lock);
+>  	kvm_release_pfn_clean(pfn);
+>  	return ret != -EAGAIN ? ret : 0;
+>  }
 
-I'm not sure this buys us much. If anything, it makes moving the data
-around more difficult (see [1]).
+It now means that things such as marking a page dirty happens outside
+of the lock, which may interact with the dirty log/bitmap stuff.
 
-Overall, asking whether the vcpu owns the FP state seems a natural
-question, and I would have expected this helper to be generalised
-instead of being dropped.
-
-Could you please elaborate on this?
+Can you elaborate on *why* this is correct?
 
 Thanks,
 
 	M.
-
-[1] https://lore.kernel.org/all/20240322170945.3292593-6-maz@kernel.org/
 
 -- 
 Without deviation from the norm, progress is not possible.
