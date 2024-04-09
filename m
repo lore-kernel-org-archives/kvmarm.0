@@ -1,29 +1,29 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8124EB44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A4FC4F1F2
 	for <kvmarm@lists.linux.dev>; Tue,  9 Apr 2024 01:30:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712626208; cv=none; b=QVJYMvK1qj2A665CH0vVCfMkWyQ627ap/DNIdWS64LaaqCDXou/FPhbaljMaU6sk87Xe6QbjX+oAhkXEB44DnN5hgttb1v7q+ksAL+MeOkPPmgKsNFlgSrVQJF6NMucbNafQm2sgPSpuBTO4qJd9wYlA+6SiBwFuPxyVr6tnaaE=
+	t=1712626209; cv=none; b=uwSWE5G0U1Npe8GuOn04Qcy2Hc4+feQ7CE3IOtpFjNKh62bVO+8lwWAr5ywQirOqyGFlc0XabydgaQTeBw709OP7EBPQgbH6hkllr4lAxD0cuX1NpXj8xN+oIVZ6njckLdhk5W4AcNvrhuu+BEmlVGwlgsR8TvBJ8SJXdAKMDCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712626208; c=relaxed/simple;
-	bh=93ZY6fAk+/FoiMTXqVJsHI9FbD2ZdEAVGbJ8j10VmQE=;
+	s=arc-20240116; t=1712626209; c=relaxed/simple;
+	bh=5r+ijZQ5MH7I7vPvW7C5wUqEXvulF+LJcjAwi2rEDXg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ug4oEnL3GiQ5lonUvNKy1HHRT0XVgiuRPlq7WgRpnRicjWNGXvHjmjI0hMfPmW/zKbG4upALSTzY3rY+7Sp58iSt0X5Jsn+Q/oNNQv/mfRFFCVZBAyCUjLUw+3uE8ErG1bQP2txZDn6iworo4o0n5BKU0WKbF90XSLsictfxYJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+	 MIME-Version:Content-Type; b=Gcaql6DS3uiYwd2YAG0n1qcbKI7HronyPjaYFaxa+etL0HprHMp9XMbFRZjk8IMfuwHJ5gRdBqZ0XF7LKDI9zK431l3GIWwvq9aBwJezOZOPImoDTTfBE04k+xJ47MwO+qpKW5gWq7U0w2bTYCX51fjViWarhctyZAkrBRd9co8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VD7bx6q1hzwRN6;
-	Tue,  9 Apr 2024 09:27:09 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4VD7fP0gDRz1GG1Y;
+	Tue,  9 Apr 2024 09:29:17 +0800 (CST)
 Received: from kwepemd200013.china.huawei.com (unknown [7.221.188.133])
-	by mail.maildlp.com (Postfix) with ESMTPS id DD1EA14059C;
-	Tue,  9 Apr 2024 09:30:03 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id A071D140384;
+	Tue,  9 Apr 2024 09:30:01 +0800 (CST)
 Received: from huawei.com (10.67.174.28) by kwepemd200013.china.huawei.com
  (7.221.188.133) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.28; Tue, 9 Apr
- 2024 09:30:02 +0800
+ 2024 09:30:00 +0800
 From: Liao Chang <liaochang1@huawei.com>
 To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 	<oliver.upton@linux.dev>, <james.morse@arm.com>, <suzuki.poulose@arm.com>,
@@ -41,9 +41,9 @@ To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 	<reijiw@google.com>, <akihiko.odaki@daynix.com>, <ruanjinjie@huawei.com>
 CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
 	<kvmarm@lists.linux.dev>
-Subject: [PATCH 7/9] arm64: Unify exception masking at entry and exit of exception
-Date: Tue, 9 Apr 2024 01:23:42 +0000
-Message-ID: <20240409012344.3194724-8-liaochang1@huawei.com>
+Subject: [PATCH 5/9] arm64/cpufeature: Use alternatives to check enabled ARM64_HAS_NMI feature
+Date: Tue, 9 Apr 2024 01:23:40 +0000
+Message-ID: <20240409012344.3194724-6-liaochang1@huawei.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240409012344.3194724-1-liaochang1@huawei.com>
 References: <20240409012344.3194724-1-liaochang1@huawei.com>
@@ -58,468 +58,32 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
  kwepemd200013.china.huawei.com (7.221.188.133)
 
-Currently, different exception types require specific mask. For example:
-
-  - Interrupt handlers: Mask IRQ, FIQ, and NMI on entry.
-  - Synchronous handler: Restore exception masks to pre-exception value.
-  - Serror handler: Mask all interrupts and Serror on entry (strictest).
-  - Debug handler: Keep all exception masked as exception taken.
-
-This patch introduces new helper functions to unify exception masking
-behavior at the entry and exit of exceptions on arm64. This approach
-improves code clarity and maintainability.
+Due to the historical reasons, cpus_have_const_cap() is more complicated
+than it needs to be. When CONFIG_ARM64_NMI=y the ARM64_HAS_NMI cpucap is
+a strict boot cpu feature which is detected and patched early on the
+boot cpu, which means no code depends on ARM64_HAS_NMI cpucap run in the
+window between the ARM64_HAS_NMI cpucap is detected and alternative is
+patched. So it would be nice to migrate caller over to
+alternative_has_cap_likey().
 
 Signed-off-by: Liao Chang <liaochang1@huawei.com>
 ---
- arch/arm64/include/asm/daifflags.h | 81 ++++++++++++++++++-------
- arch/arm64/kernel/entry-common.c   | 96 ++++++++++++++----------------
- arch/arm64/kernel/entry.S          |  2 -
- 3 files changed, 105 insertions(+), 74 deletions(-)
+ arch/arm64/include/asm/cpufeature.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/daifflags.h b/arch/arm64/include/asm/daifflags.h
-index df4c4989babd..6d391d221432 100644
---- a/arch/arm64/include/asm/daifflags.h
-+++ b/arch/arm64/include/asm/daifflags.h
-@@ -121,28 +121,6 @@ static inline void local_daif_restore(unsigned long flags)
- 		trace_hardirqs_off();
- }
- 
--/*
-- * Called by synchronous exception handlers to restore the DAIF bits that were
-- * modified by taking an exception.
-- */
--static inline void local_daif_inherit(struct pt_regs *regs)
--{
--	unsigned long flags = regs->pstate & DAIF_MASK;
--
--	if (interrupts_enabled(regs))
--		trace_hardirqs_on();
--
--	if (system_uses_irq_prio_masking())
--		gic_write_pmr(regs->pmr_save);
--
--	/*
--	 * We can't use local_daif_restore(regs->pstate) here as
--	 * system_has_prio_mask_debugging() won't restore the I bit if it can
--	 * use the pmr instead.
--	 */
--	write_sysreg(flags, daif);
--}
--
- /*
-  * For Arm64 processor support Armv8.8 or later, kernel supports three types
-  * of irqflags, they used for corresponding configuration depicted as below:
-@@ -381,4 +359,63 @@ static inline void local_allint_inherit(struct pt_regs *regs)
- 			_allint_clear();
- 	}
- }
-+
-+/*
-+ * local_allint_disable - Disable IRQ, FIQ and NMI, with or without
-+ * superpriority.
-+ */
-+static inline void local_allint_disable(void)
-+{
-+	arch_irqflags_t irqflags;
-+
-+	irqflags.fields.daif = DAIF_PROCCTX_NOIRQ;
-+	irqflags.fields.pmr = GIC_PRIO_IRQON | GIC_PRIO_PSR_I_SET;
-+	irqflags.fields.allint = 1;
-+	local_allint_restore(irqflags);
-+}
-+
-+/*
-+ * local_allint_mark_enabled - When the kernel enables priority masking,
-+ * interrupts cannot be handled util ICC_PMR_EL1 is set to GIC_PRIO_IRQON
-+ * and PSTATE.IF is cleared. This helper function indicates that interrupts
-+ * remains in a semi-masked state, requring further clearing of PSTATE.IF.
-+ *
-+ * Kernel will give a warning, if some function try to enable semi-masked
-+ * interrupt via the arch_local_irq_enable() defined in <asm/irqflags.h>.
-+ *
-+ * This function is typically used before handling the Debug exception.
-+ */
-+static inline void local_allint_mark_enabled(void)
-+{
-+	if (system_uses_irq_prio_masking())
-+		gic_write_pmr(GIC_PRIO_IRQON | GIC_PRIO_PSR_I_SET);
-+}
-+
-+/*
-+ * local_errint_disable - Disable all types of interrupt including IRQ, FIQ,
-+ * Serror and NMI, with or without superpriority.
-+ */
-+static inline void local_errint_disable(void)
-+{
-+	arch_irqflags_t irqflags;
-+
-+	irqflags.fields.daif = DAIF_ERRCTX;
-+	irqflags.fields.pmr = GIC_PRIO_IRQON | GIC_PRIO_PSR_I_SET;
-+	irqflags.fields.allint = 1;
-+	local_allint_restore(irqflags);
-+}
-+
-+/*
-+ * local_errint_enable - Enable all types of interrupt including IRQ, FIQ,
-+ * Serror and NMI, with or without superpriority.
-+ */
-+static inline void local_errint_enable(void)
-+{
-+	arch_irqflags_t irqflags;
-+
-+	irqflags.fields.daif = DAIF_PROCCTX;
-+	irqflags.fields.pmr = GIC_PRIO_IRQON;
-+	irqflags.fields.allint = 0;
-+	local_allint_restore(irqflags);
-+}
- #endif
-diff --git a/arch/arm64/kernel/entry-common.c b/arch/arm64/kernel/entry-common.c
-index b77a15955f28..99168223508b 100644
---- a/arch/arm64/kernel/entry-common.c
-+++ b/arch/arm64/kernel/entry-common.c
-@@ -168,7 +168,7 @@ static __always_inline void exit_to_user_mode_prepare(struct pt_regs *regs)
- 	if (unlikely(flags & _TIF_WORK_MASK))
- 		do_notify_resume(regs, flags);
- 
--	local_daif_mask();
-+	local_allint_mask();
- 
- 	lockdep_sys_exit();
- }
-@@ -428,9 +428,9 @@ static void noinstr el1_abort(struct pt_regs *regs, unsigned long esr)
- 	unsigned long far = read_sysreg(far_el1);
- 
- 	enter_from_kernel_mode(regs);
--	local_daif_inherit(regs);
-+	local_allint_inherit(regs);
- 	do_mem_abort(far, esr, regs);
--	local_daif_mask();
-+	local_allint_mask();
- 	exit_to_kernel_mode(regs);
- }
- 
-@@ -439,33 +439,36 @@ static void noinstr el1_pc(struct pt_regs *regs, unsigned long esr)
- 	unsigned long far = read_sysreg(far_el1);
- 
- 	enter_from_kernel_mode(regs);
--	local_daif_inherit(regs);
-+	local_allint_inherit(regs);
- 	do_sp_pc_abort(far, esr, regs);
--	local_daif_mask();
-+	local_allint_mask();
- 	exit_to_kernel_mode(regs);
- }
- 
- static void noinstr el1_undef(struct pt_regs *regs, unsigned long esr)
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index dc8b2d0d3763..4c35565ad656 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -803,7 +803,7 @@ static __always_inline bool system_uses_irq_prio_masking(void)
+ static __always_inline bool system_uses_nmi(void)
  {
- 	enter_from_kernel_mode(regs);
--	local_daif_inherit(regs);
-+	local_allint_inherit(regs);
- 	do_el1_undef(regs, esr);
--	local_daif_mask();
-+	local_allint_mask();
- 	exit_to_kernel_mode(regs);
+ 	return IS_ENABLED(CONFIG_ARM64_NMI) &&
+-		cpus_have_const_cap(ARM64_USES_NMI);
++		alternative_has_cap_likely(ARM64_USES_NMI);
  }
  
- static void noinstr el1_bti(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_kernel_mode(regs);
--	local_daif_inherit(regs);
-+	local_allint_inherit(regs);
- 	do_el1_bti(regs, esr);
--	local_daif_mask();
-+	local_allint_mask();
- 	exit_to_kernel_mode(regs);
- }
- 
- static void noinstr el1_dbg(struct pt_regs *regs, unsigned long esr)
- {
--	unsigned long far = read_sysreg(far_el1);
-+	unsigned long far;
-+
-+	local_allint_mark_enabled();
-+	far = read_sysreg(far_el1);
- 
- 	arm64_enter_el1_dbg(regs);
- 	if (!cortex_a76_erratum_1463225_debug_handler(regs))
-@@ -476,9 +479,9 @@ static void noinstr el1_dbg(struct pt_regs *regs, unsigned long esr)
- static void noinstr el1_fpac(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_kernel_mode(regs);
--	local_daif_inherit(regs);
-+	local_allint_inherit(regs);
- 	do_el1_fpac(regs, esr);
--	local_daif_mask();
-+	local_allint_mask();
- 	exit_to_kernel_mode(regs);
- }
- 
-@@ -543,7 +546,7 @@ static __always_inline void __el1_irq(struct pt_regs *regs,
- static void noinstr el1_interrupt(struct pt_regs *regs,
- 				  void (*handler)(struct pt_regs *))
- {
--	write_sysreg(DAIF_PROCCTX_NOIRQ, daif);
-+	local_allint_disable();
- 
- 	if (IS_ENABLED(CONFIG_ARM64_PSEUDO_NMI) && !interrupts_enabled(regs))
- 		__el1_pnmi(regs, handler);
-@@ -565,7 +568,7 @@ asmlinkage void noinstr el1h_64_error_handler(struct pt_regs *regs)
- {
- 	unsigned long esr = read_sysreg(esr_el1);
- 
--	local_daif_restore(DAIF_ERRCTX);
-+	local_errint_disable();
- 	arm64_enter_nmi(regs);
- 	do_serror(regs, esr);
- 	arm64_exit_nmi(regs);
-@@ -576,7 +579,7 @@ static void noinstr el0_da(struct pt_regs *regs, unsigned long esr)
- 	unsigned long far = read_sysreg(far_el1);
- 
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_mem_abort(far, esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -594,7 +597,7 @@ static void noinstr el0_ia(struct pt_regs *regs, unsigned long esr)
- 		arm64_apply_bp_hardening();
- 
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_mem_abort(far, esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -602,7 +605,7 @@ static void noinstr el0_ia(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_fpsimd_acc(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_fpsimd_acc(esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -610,7 +613,7 @@ static void noinstr el0_fpsimd_acc(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_sve_acc(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_sve_acc(esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -618,7 +621,7 @@ static void noinstr el0_sve_acc(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_sme_acc(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_sme_acc(esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -626,7 +629,7 @@ static void noinstr el0_sme_acc(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_fpsimd_exc(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_fpsimd_exc(esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -634,7 +637,7 @@ static void noinstr el0_fpsimd_exc(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_sys(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_el0_sys(esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -647,7 +650,7 @@ static void noinstr el0_pc(struct pt_regs *regs, unsigned long esr)
- 		arm64_apply_bp_hardening();
- 
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_sp_pc_abort(far, esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -655,7 +658,7 @@ static void noinstr el0_pc(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_sp(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_sp_pc_abort(regs->sp, esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -663,7 +666,7 @@ static void noinstr el0_sp(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_undef(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_el0_undef(regs, esr);
- 	exit_to_user_mode(regs);
- }
-@@ -671,7 +674,7 @@ static void noinstr el0_undef(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_bti(struct pt_regs *regs)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_el0_bti(regs);
- 	exit_to_user_mode(regs);
- }
-@@ -679,7 +682,7 @@ static void noinstr el0_bti(struct pt_regs *regs)
- static void noinstr el0_mops(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_el0_mops(regs, esr);
- 	exit_to_user_mode(regs);
- }
-@@ -687,7 +690,7 @@ static void noinstr el0_mops(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_inv(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	bad_el0_sync(regs, 0, esr);
- 	exit_to_user_mode(regs);
- }
-@@ -695,11 +698,14 @@ static void noinstr el0_inv(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_dbg(struct pt_regs *regs, unsigned long esr)
- {
- 	/* Only watchpoints write FAR_EL1, otherwise its UNKNOWN */
--	unsigned long far = read_sysreg(far_el1);
-+	unsigned long far;
-+
-+	local_allint_mark_enabled();
-+	far = read_sysreg(far_el1);
- 
- 	enter_from_user_mode(regs);
- 	do_debug_exception(far, esr, regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	exit_to_user_mode(regs);
- }
- 
-@@ -708,7 +714,7 @@ static void noinstr el0_svc(struct pt_regs *regs)
- 	enter_from_user_mode(regs);
- 	cortex_a76_erratum_1463225_svc_handler();
- 	fp_user_discard();
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_el0_svc(regs);
- 	exit_to_user_mode(regs);
- }
-@@ -716,7 +722,7 @@ static void noinstr el0_svc(struct pt_regs *regs)
- static void noinstr el0_fpac(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_el0_fpac(regs, esr);
- 	exit_to_user_mode(regs);
- }
-@@ -785,7 +791,7 @@ static void noinstr el0_interrupt(struct pt_regs *regs,
- {
- 	enter_from_user_mode(regs);
- 
--	write_sysreg(DAIF_PROCCTX_NOIRQ, daif);
-+	local_allint_disable();
- 
- 	if (regs->pc & BIT(55))
- 		arm64_apply_bp_hardening();
-@@ -797,24 +803,14 @@ static void noinstr el0_interrupt(struct pt_regs *regs,
- 	exit_to_user_mode(regs);
- }
- 
--static void noinstr __el0_irq_handler_common(struct pt_regs *regs)
--{
--	el0_interrupt(regs, handle_arch_irq);
--}
--
- asmlinkage void noinstr el0t_64_irq_handler(struct pt_regs *regs)
- {
--	__el0_irq_handler_common(regs);
--}
--
--static void noinstr __el0_fiq_handler_common(struct pt_regs *regs)
--{
--	el0_interrupt(regs, handle_arch_fiq);
-+	el0_interrupt(regs, handle_arch_irq);
- }
- 
- asmlinkage void noinstr el0t_64_fiq_handler(struct pt_regs *regs)
- {
--	__el0_fiq_handler_common(regs);
-+	el0_interrupt(regs, handle_arch_fiq);
- }
- 
- static void noinstr __el0_error_handler_common(struct pt_regs *regs)
-@@ -822,11 +818,11 @@ static void noinstr __el0_error_handler_common(struct pt_regs *regs)
- 	unsigned long esr = read_sysreg(esr_el1);
- 
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_ERRCTX);
-+	local_errint_disable();
- 	arm64_enter_nmi(regs);
- 	do_serror(regs, esr);
- 	arm64_exit_nmi(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	exit_to_user_mode(regs);
- }
- 
-@@ -839,7 +835,7 @@ asmlinkage void noinstr el0t_64_error_handler(struct pt_regs *regs)
- static void noinstr el0_cp15(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_el0_cp15(esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -848,7 +844,7 @@ static void noinstr el0_svc_compat(struct pt_regs *regs)
- {
- 	enter_from_user_mode(regs);
- 	cortex_a76_erratum_1463225_svc_handler();
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_el0_svc_compat(regs);
- 	exit_to_user_mode(regs);
- }
-@@ -899,12 +895,12 @@ asmlinkage void noinstr el0t_32_sync_handler(struct pt_regs *regs)
- 
- asmlinkage void noinstr el0t_32_irq_handler(struct pt_regs *regs)
- {
--	__el0_irq_handler_common(regs);
-+	el0_interrupt(regs, handle_arch_irq);
- }
- 
- asmlinkage void noinstr el0t_32_fiq_handler(struct pt_regs *regs)
- {
--	__el0_fiq_handler_common(regs);
-+	el0_interrupt(regs, handle_arch_fiq);
- }
- 
- asmlinkage void noinstr el0t_32_error_handler(struct pt_regs *regs)
-diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
-index 7ef0e127b149..0b311fefedc2 100644
---- a/arch/arm64/kernel/entry.S
-+++ b/arch/arm64/kernel/entry.S
-@@ -316,8 +316,6 @@ alternative_else_nop_endif
- 
- 	mrs_s	x20, SYS_ICC_PMR_EL1
- 	str	x20, [sp, #S_PMR_SAVE]
--	mov	x20, #GIC_PRIO_IRQON | GIC_PRIO_PSR_I_SET
--	msr_s	SYS_ICC_PMR_EL1, x20
- 
- .Lskip_pmr_save\@:
- #endif
+ static inline bool system_supports_mte(void)
 -- 
 2.34.1
 
