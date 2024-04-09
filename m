@@ -1,66 +1,66 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9288A433A6
-	for <kvmarm@lists.linux.dev>; Tue,  9 Apr 2024 22:49:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 757BC158D8C
+	for <kvmarm@lists.linux.dev>; Tue,  9 Apr 2024 22:58:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712702969; cv=none; b=lGouRYLvBHhZJz2wYE5Fc2eByr9TGx/oSp4nFVdieP09fhr24XnDgaPCtSpZE8NOjXD7puwfhIO+TBvFgvzowigJWfaE7npK8TD8vNAhXxxRrH3luR+KnOL79JVxyPvmB6BlXsS6UfayLNWUR/2fMI4bxGif/0yE6STxXof6jec=
+	t=1712703519; cv=none; b=RBEZOUmD7qNphdXBsWXF6qi+hBmOn08pBdesJ74HrC75fnUWYyNDTCmYdWoo9MuCrOCf/CZN5cNEZbfaudXlTY56IC96bCb/cUMx8sLSmv9d9sZtQZ0MVeEiMg0TVzLVu64ObCWpuQ4ODw+8mAx1UJv10CzjB57wnOQ3LbjclKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712702969; c=relaxed/simple;
-	bh=pHkGzG7uY0hK1agTCuiDlZZKkMXpmtSgWgjAy8SNNHY=;
+	s=arc-20240116; t=1712703519; c=relaxed/simple;
+	bh=C4UUEPXQ7aNiC2MpIyrA52CI1Xak5d78Q0u4LEWdxtU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CUPbBTtlVng5JFWQw6u+QP+cOMJYCYa2v+n8NE7Jtr3aURCFPwvW62EpQwz82mCcPmLjPtS8sTvRRppD4YFIk8GksfCbwiRl3VUkVxpH+On28FsIhVcBdYUUCUQEBxX/2Ts9rBkjM82UZlXMbBc2SVmm9hOOHRYuk8xeax2NLZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M8s7KdCZ; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=OFIB09pg2WHrmJHgzdmc/hga41+AHoluQgmx2Zm8pUnnylgKriaLj9j2NaUs31793Icn8ToxnyGu/ALFifK4OQg8vhX1x6H0EKr1xnh2+ZgcwFzWjeGyd433tTw4NoNiCFKPMtHr3dmTWxYaoMN99RVgS8Jy4An2p23WArVB7Ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h/42kKvz; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M8s7KdCZ"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5e4df21f22dso4372361a12.0
-        for <kvmarm@lists.linux.dev>; Tue, 09 Apr 2024 15:49:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h/42kKvz"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-617bd0cf61fso97790447b3.3
+        for <kvmarm@lists.linux.dev>; Tue, 09 Apr 2024 15:58:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712702967; x=1713307767; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1712703517; x=1713308317; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=X7BDOAdXGb6PM9j/Ro0cuDsmudWi0lw4fAoXWjZNUDM=;
-        b=M8s7KdCZBHaN5qwwGGq0xnEDTiv+oNHZ4ny7o5sZJh724nI4icSHWSPrKuABRMMyAg
-         hVgOW8rEubzriV9B9GcVou9AFHj1M4ONIogellAuT/cBZRNpQ+5l4GqdJ3wOsC54hth7
-         D6LC+LQDhg+VbxUrTFDWyJsznJisYhNOdFCLMxrvRwAKkv3H8gjS0/cd1vicTRpFh3JQ
-         dB3spjxL2fOi040Tdt3sQbz2JvO7ALyD9/j1uynbvGe7tVP3OmI1URIj/1NxVZei9LJQ
-         jatJ1faHjoG6Eehw330BqVPDDzamk9IOHKDDU+DdFSEZgAINlQjHMJwbYLky6w1lrwn1
-         Pxqw==
+        bh=Y6Z88aYJTzgs0pbUWWKLdnj4AYHEigi0XdL5G85Xxlc=;
+        b=h/42kKvzg2pP6NEeesHVsrFKLFXE4YHy/CQEDPqr7qn/UdLT6pNZsMvpYjZfTqjLJ+
+         N9SvhCz0FOBGsmKykvag78kj2kFTmt402pOXRQqFYCPK8zE1RtyK0IwV3npPEPuSEfcb
+         NNlCV9OdYNnUC9ZqZUZhDgZn5ETFdp3twpODcEXCtfeabW3n8xoMNdYsyEgCxCEezgbE
+         zHHfM6HVubf1FQmYUfOVJ8yBJzG8fh6wRioRiCEWjb//CkOXtH6rdw21/dxU8IlsWiFZ
+         jthe2BT9d8uFu98Yu6ublgxyVY3bO+kgwZjeGSzBM4kscM68XkfFFIRGo1L87oy/xrS3
+         WnjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712702967; x=1713307767;
+        d=1e100.net; s=20230601; t=1712703517; x=1713308317;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X7BDOAdXGb6PM9j/Ro0cuDsmudWi0lw4fAoXWjZNUDM=;
-        b=bDL4hUH5Y60cs7uJmI8pcleVxipZHGu2kd4IysDNKMmWwREqRan99gPd+qp0OtyGtm
-         UOZ6x492Evvq0DLvYGtmiD6We9kEnoQ7lpATTw5XmuMsp5Vy2JR6T5Zml2ebbT5YAv3I
-         TM3TLDQPkXhAFvY1MQ+lJDdFgPIceIQFfUP6myE1M9WQ2OotRT3/3231K5AEsAcg8euD
-         4qTpwekEmvdKBNBkxQX3jrBqS5Uiq/MpUff3BJETDCG06eDwaJkv8IMhm5NNIAntRkog
-         zm4IVALoD4gponBb6bykzmWF274aN83/QB4tYDZ3sW6D+ZRBmd3AaKnIlRU465Gwe/tr
-         yxVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUiLV1u5NS1RUGHXTLo4EhJvs5ZklfZS1AXprRRWE/867BAgOjLIHOQUnr3lydkLMVKgcktBLSwjpouDtSU/7gyYiZLPnq1
-X-Gm-Message-State: AOJu0YzsUC4AqM/2iS73G+a81BUe+dwOnRxSqU6ZSUfrqLHTa8p0aVSp
-	uPn0ojbYC2rCgFljon98PnvGXaVCFsB2xkpRn0Ek9zl+1elHS80y+G5r+0SoVbDKwpJkybOlad6
-	SWA==
-X-Google-Smtp-Source: AGHT+IGuB80kepjVY6GU7N10vM5dzh4IgkERFfdumXmvvWAycN/WJPPjMEVepXbJZUSB39DoOq+2y2AV3HE=
+        bh=Y6Z88aYJTzgs0pbUWWKLdnj4AYHEigi0XdL5G85Xxlc=;
+        b=liI4aFRLCAom3I4NXsXV/ezo1U0f7bMXILOkSlnwvfrY5fr+REur/lKQF98gRapjjn
+         kT95yHq3ouq0rapFj43rM3LXJax+oFQeuHB3haMso6+nlDO8mGsBRIn/AHuoV/uKhQC8
+         ykILzyTWYv4nL4H08gKxqxpAXw1qZu0ARSvyCTcy2pXLYfUq85o9T6CJhgyjw+JWr1s/
+         taT0lVIb7+ZyK7V0damskJfXAWIhC4yefsQrMQrThY1zw5jIjs5iqmx8yvbFivwMeJt8
+         xdrcD3snTrW/wK4YJ3cxQVmXjhwmOfsfLTV2yTp1fYt6s/gFYik4KbBLOmHefmR79qyk
+         QXYg==
+X-Forwarded-Encrypted: i=1; AJvYcCU+HtabCM4VCZcfdKHDSBncPE3Ac/GqWTH1ZLG7tGJsLQBxa/G/4Mbo4VHhqRU6W0csCMXAyShp7LGUfGUWL8MulyXW9wXm
+X-Gm-Message-State: AOJu0YzE99ewu4W5UaAmBsOvoOmVkOd3AMDLQ0jvBINnOUis50jGtFUT
+	YO8X5h9nS91C7MeoXuvYgk+u18N86LUtjEc6JK+Tz7YS9LNrjqKoKc2vs5mDYypuVBXnZZ7wWvq
+	tzg==
+X-Google-Smtp-Source: AGHT+IGB7SGhpeqD/kjhTPt66yolVDX+BiT9lMP/+KM/dDzWT/nT5YV37XYXL4pSK7SGftosV6zkbKOS5uo=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:6c16:0:b0:5dc:4a5f:a5ee with SMTP id
- y22-20020a656c16000000b005dc4a5fa5eemr27846pgu.1.1712702966899; Tue, 09 Apr
- 2024 15:49:26 -0700 (PDT)
-Date: Tue, 9 Apr 2024 15:49:25 -0700
-In-Reply-To: <20240215235405.368539-11-amoorthy@google.com>
+ (user=seanjc job=sendgmr) by 2002:a81:4e50:0:b0:615:1579:8660 with SMTP id
+ c77-20020a814e50000000b0061515798660mr263035ywb.7.1712703517472; Tue, 09 Apr
+ 2024 15:58:37 -0700 (PDT)
+Date: Tue, 9 Apr 2024 15:58:35 -0700
+In-Reply-To: <20240215235405.368539-12-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20240215235405.368539-1-amoorthy@google.com> <20240215235405.368539-11-amoorthy@google.com>
-Message-ID: <ZhXF9QTBgKHVO0ay@google.com>
-Subject: Re: [PATCH v7 10/14] KVM: selftests: Report per-vcpu demand paging
- rate from demand paging test
+References: <20240215235405.368539-1-amoorthy@google.com> <20240215235405.368539-12-amoorthy@google.com>
+Message-ID: <ZhXIG6uISrC77BQ2@google.com>
+Subject: Re: [PATCH v7 11/14] KVM: selftests: Allow many vCPUs and reader
+ threads per UFFD in demand paging test
 From: Sean Christopherson <seanjc@google.com>
 To: Anish Moorthy <amoorthy@google.com>
 Cc: oliver.upton@linux.dev, maz@kernel.org, kvm@vger.kernel.org, 
@@ -70,56 +70,45 @@ Cc: oliver.upton@linux.dev, maz@kernel.org, kvm@vger.kernel.org,
 Content-Type: text/plain; charset="us-ascii"
 
 On Thu, Feb 15, 2024, Anish Moorthy wrote:
-> Using the overall demand paging rate to measure performance can be
-> slightly misleading when vCPU accesses are not overlapped. Adding more
-> vCPUs will (usually) increase the overall demand paging rate even
-> if performance remains constant or even degrades on a per-vcpu basis. As
-> such, it makes sense to report both the total and per-vcpu paging rates.
-> 
-> Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> ---
->  tools/testing/selftests/kvm/demand_paging_test.c | 15 +++++++++++----
->  1 file changed, 11 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-> index 09c116a82a84..6dc823fa933a 100644
-> --- a/tools/testing/selftests/kvm/demand_paging_test.c
-> +++ b/tools/testing/selftests/kvm/demand_paging_test.c
-> @@ -135,6 +135,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  	struct timespec ts_diff;
->  	struct kvm_vm *vm;
->  	int i;
-> +	double vcpu_paging_rate;
+> @@ -167,19 +187,30 @@ struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
+>  void uffd_stop_demand_paging(struct uffd_desc *uffd)
+>  {
+>  	char c = 0;
+> -	int ret;
+> +	int i, ret;
 >  
->  	vm = memstress_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1,
->  				 p->src_type, p->partition_vcpu_memory_access);
-> @@ -191,11 +192,17 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  			uffd_stop_demand_paging(uffd_descs[i]);
->  	}
+> -	ret = write(uffd->pipefds[1], &c, 1);
+> -	TEST_ASSERT(ret == 1, "Unable to write to pipefd");
+> +	for (i = 0; i < uffd->num_readers; ++i) {
+> +		ret = write(uffd->pipefds[i], &c, 1);
+> +		TEST_ASSERT(
+> +			ret == 1, "Unable to write to pipefd %i for uffd_desc %p", i, uffd);
+
+More coding style oddities.
+
+And storing the return code in "ret" is unnecessary, and arguably makes it more
+difficult to debug failures by not capturing the failing command in the assert
+message.
+
+> +	}
 >  
-> -	pr_info("Total guest execution time: %ld.%.9lds\n",
-> +	pr_info("Total guest execution time:\t%ld.%.9lds\n",
->  		ts_diff.tv_sec, ts_diff.tv_nsec);
-> -	pr_info("Overall demand paging rate: %f pgs/sec\n",
-> -		memstress_args.vcpu_args[0].pages * nr_vcpus /
-> -		((double)ts_diff.tv_sec + (double)ts_diff.tv_nsec / NSEC_PER_SEC));
-> +
-> +	vcpu_paging_rate =
-> +		memstress_args.vcpu_args[0].pages
-> +		/ ((double)ts_diff.tv_sec
-> +			+ (double)ts_diff.tv_nsec / NSEC_PER_SEC);
+> -	ret = pthread_join(uffd->thread, NULL);
+> -	TEST_ASSERT(ret == 0, "Pthread_join failed.");
+> +	for (i = 0; i < uffd->num_readers; ++i) {
+> +		ret = pthread_join(uffd->readers[i], NULL);
+> +		TEST_ASSERT(
+> +			ret == 0, "Pthread_join failed on reader %i for uffd_desc %p", i, uffd);
 
-*sigh*
+Preferred kernel style is "!ret", not "ret == 0".
 
-For the umpteenth time, please follow kernel coding style.  Either
+Putting it all together:
 
-	vcpu_paging_rate = memstress_args.vcpu_args[0].pages /
-			   ((double)ts_diff.tv_sec + (double)ts_diff.tv_nsec / NSEC_PER_SEC);
+	int i;
 
-or
+	for (i = 0; i < uffd->num_readers; ++i)
+		TEST_ASSERT(write(uffd->pipefds[i], &c, 1) == 1,
+			    "Unable to write to pipefd %i for uffd_desc %p", i, uffd);
 
-	vcpu_paging_rate = memstress_args.vcpu_args[0].pages /
-			   ((double)ts_diff.tv_sec +
-			    (double)ts_diff.tv_nsec / NSEC_PER_SEC);
-
-I don't have a strong preference, so I'll go with the first one when applying.
+	for (i = 0; i < uffd->num_readers; ++i)
+		TEST_ASSERT(!pthread_join(uffd->readers[i], NULL),
+			    "Pthread_join failed on reader %i for uffd_desc %p", i, uffd);
