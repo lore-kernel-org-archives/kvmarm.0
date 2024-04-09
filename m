@@ -1,29 +1,29 @@
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA9228379
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5DBC33994
 	for <kvmarm@lists.linux.dev>; Tue,  9 Apr 2024 01:30:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712626204; cv=none; b=rWbUSvhtC+J5yX/XaqoyvJAQwgqDh0GXXwz1yenqcELpXn+xFNuNxtwr3mmoITRshuKWRmElbr9ErxVwPW/uMIGzY6RT0kiMRd+ZG+w+6wNPTsJHmMeZWird5JeDpTiU3JFKG3HCfjrWy23x5rHN6jSWrf/ZzJf2OXU7Y4O/xCk=
+	t=1712626204; cv=none; b=leJFPoFspI2BjP705lmdyKfxhI4sX/AnjqFBBC6fbIPqFFgpHCVbchmPMka6m/XnC6JHnO0vQACTSgxkzsd5PNFKbqeiJuMsy2RQqu1NIdMLnVYmPx7ANhUIjNbxtxD+dVFZ2AFmRrqKUOg1IhdE8IJj1YWb/yrlm0QT6UCwbhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712626204; c=relaxed/simple;
-	bh=OjZmqpTC2ehTHN8Sd68worBXYXZg9Jpv/26xY6sXNS0=;
+	bh=j/XDKuUy7zqhSH3fzlV7mA/mrMxbF9db0YMik4qwT6A=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XWva5gEoNd39d6y/hrOhQ1oFhsG3feH2rXFkDAQxuVe5zNdZRsU6/uofIzNvGf9T0q94P0bmq0pG8eeRceiYcMsdFe57GFd7X4RqNiUeabSWUCXxZ+CnLfVjTg5B04pCRrSnSp/T47tcJxvpA/XdU+hfMgS93ptiyyezyeL86h8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+	 MIME-Version:Content-Type; b=WY8Jh1TrSps+qXgzBL6Cf8W2Vkq7k7TOt9xUTOgroS1O15gCkAPFS0D3sLA0vVV003wEV4Vuv9aYpj6zgkM2WuiwnZrRJV4lOeTUv3eWP9YPD3X04RkGRbbsGB2ll00AJOjTNoB2vqhd2Y4UuwccCjojFY6XjjgVUY7OzpLZ/Fw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4VD7cf02b2zNn6P;
-	Tue,  9 Apr 2024 09:27:46 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4VD7f84Q2wz21kfl;
+	Tue,  9 Apr 2024 09:29:04 +0800 (CST)
 Received: from kwepemd200013.china.huawei.com (unknown [7.221.188.133])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8CEAC18007D;
-	Tue,  9 Apr 2024 09:30:00 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 6B50F140413;
+	Tue,  9 Apr 2024 09:29:59 +0800 (CST)
 Received: from huawei.com (10.67.174.28) by kwepemd200013.china.huawei.com
  (7.221.188.133) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.28; Tue, 9 Apr
- 2024 09:29:59 +0800
+ 2024 09:29:58 +0800
 From: Liao Chang <liaochang1@huawei.com>
 To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 	<oliver.upton@linux.dev>, <james.morse@arm.com>, <suzuki.poulose@arm.com>,
@@ -41,9 +41,9 @@ To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 	<reijiw@google.com>, <akihiko.odaki@daynix.com>, <ruanjinjie@huawei.com>
 CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
 	<kvmarm@lists.linux.dev>
-Subject: [PATCH 4/9] arm64/cpufeature: Simplify detect PE support for FEAT_NMI
-Date: Tue, 9 Apr 2024 01:23:39 +0000
-Message-ID: <20240409012344.3194724-5-liaochang1@huawei.com>
+Subject: [PATCH 3/9] arm64/nmi: Add Kconfig for NMI
+Date: Tue, 9 Apr 2024 01:23:38 +0000
+Message-ID: <20240409012344.3194724-4-liaochang1@huawei.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240409012344.3194724-1-liaochang1@huawei.com>
 References: <20240409012344.3194724-1-liaochang1@huawei.com>
@@ -58,47 +58,44 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
  kwepemd200013.china.huawei.com (7.221.188.133)
 
-From: Jinjie Ruan <ruanjinjie@huawei.com>
+From: Mark Brown <broonie@kernel.org>
 
-Simplify the Non-maskable Interrupts feature implementation with
-ARM64_CPUID_FIELDS macro.
+Since NMI handling is in some fairly hot paths we provide a Kconfig option
+which allows support to be compiled out when not needed.
 
-Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/kernel/cpufeature.c | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+ arch/arm64/Kconfig | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index fb9e52c84fda..99c3bc74008d 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -2905,24 +2905,16 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.desc = "Non-maskable Interrupts present",
- 		.capability = ARM64_HAS_NMI,
- 		.type = ARM64_CPUCAP_BOOT_CPU_FEATURE,
--		.sys_reg = SYS_ID_AA64PFR1_EL1,
--		.sign = FTR_UNSIGNED,
--		.field_pos = ID_AA64PFR1_EL1_NMI_SHIFT,
--		.field_width = 4,
--		.min_field_value = ID_AA64PFR1_EL1_NMI_IMP,
- 		.matches = has_cpuid_feature,
-+		ARM64_CPUID_FIELDS(ID_AA64PFR1_EL1, NMI, IMP)
- 	},
- 	{
- 		.desc = "Non-maskable Interrupts enabled",
- 		.capability = ARM64_USES_NMI,
- 		.type = ARM64_CPUCAP_BOOT_CPU_FEATURE,
--		.sys_reg = SYS_ID_AA64PFR1_EL1,
--		.sign = FTR_UNSIGNED,
--		.field_pos = ID_AA64PFR1_EL1_NMI_SHIFT,
--		.field_width = 4,
--		.min_field_value = ID_AA64PFR1_EL1_NMI_IMP,
- 		.matches = use_nmi,
- 		.cpu_enable = nmi_enable,
-+		ARM64_CPUID_FIELDS(ID_AA64PFR1_EL1, NMI, IMP)
- 	},
- #endif
- 	{},
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 7b11c98b3e84..c7d00d0cae9e 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -2095,6 +2095,23 @@ config ARM64_EPAN
+ 	  if the cpu does not implement the feature.
+ endmenu # "ARMv8.7 architectural features"
+ 
++menu "ARMv8.8 architectural features"
++
++config ARM64_NMI
++	bool "Enable support for Non-maskable Interrupts (NMI)"
++	default y
++	help
++	  Non-maskable interrupts are an architecture and GIC feature
++	  which allow the system to configure some interrupts to be
++	  configured to have superpriority, allowing them to be handled
++	  before other interrupts and masked for shorter periods of time.
++
++	  The feature is detected at runtime, and will remain disabled
++	  if the cpu does not implement the feature. It will also be
++	  disabled if pseudo NMIs are enabled at runtime.
++
++endmenu # "ARMv8.8 architectural features"
++
+ config ARM64_SVE
+ 	bool "ARM Scalable Vector Extension support"
+ 	default y
 -- 
 2.34.1
 
