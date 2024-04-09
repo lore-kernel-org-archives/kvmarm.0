@@ -1,278 +1,112 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5301E89E
-	for <kvmarm@lists.linux.dev>; Tue,  9 Apr 2024 19:40:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB181DFE8
+	for <kvmarm@lists.linux.dev>; Tue,  9 Apr 2024 22:44:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712691618; cv=none; b=DTx1IVZIRnNzzxM2gV04wdkRJcK3J1cLm/Q1komdUO+seU/86zgfUSld6TRrf9te9HXfwZKEjOvnA/xCaLs6kK/XUyxw+ancYQd2HbSj4VOvv3Qv5j4EIZ5PfR5s8rcGVM76KPKV/qZjLGp66p16HLywXKaxTHb/LWjCpxEU50s=
+	t=1712702672; cv=none; b=R5iydKn/QoeY+USfjGh2gGoveNoo0u+8gYI5PsXsfgLxpU0zP3u7Ogo1+gtj8Upy7kQa4qCjQFXnv54n2j6gOik/3kB2iOQHpHw8mj+tpwDJPozBYDWVebcYVKW+BmS8cECtBYHSqVH6SGLUaTvzSx5oL7Hagw1wWM8lCoI++1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712691618; c=relaxed/simple;
-	bh=skYp5aRr2KhYDAGwT1PxdUTnvoEjTAwvzoHKlIEWxp0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e+WWOGChX0KZH2I9v+zuS2ta1qCUkhprTuy5xudI2gUVqTZj6iJmNER97EuqNubYWRYN4q0sqJlDLClAKcdskQ73MRIZ/tkoIL2TAGYvUKvSrltLOu4SoKndy8DeaEi7GMgi7Vq9XQnC36ZyFYS9KdLh/3p7rW8PtmuThd7SR+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UIoohevX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1712702672; c=relaxed/simple;
+	bh=qM29SkS5o2wfxy/5l80wfNAUyeavrf9BVcVfOkwKY/Y=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=EoLPdRdYhmG840TOfEpJWio28mQgBHLMln+BoG5nir7+53gQVkr179RAnw1MStFXcJVjLPBz9SlTrix8xKpZsYKWoYDkgLtr8vp5YoScVyvM/QnWvL9Ygd5KpoVRW5zuzvMS3pSay+umdwUTVTGnWSGHKzQaHn7UemLMBu4VlDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RX5GWl/d; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UIoohevX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712691615;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=U/UlR7zqufR1BMiNRAFjOCRhGVziWAD38sAXso6PqdU=;
-	b=UIoohevXibrc9MZJrO21izTBYib/QEPVdKAx0+dQrbdmRe7lTqofvf8BG80vBbpZZqwx04
-	bqxpnQXsrp3OY1rnWNWjY281NTkz9bIgsGJDRCLEXBg6prNmL7DREtOmykVOPkKkwzWghN
-	KrYcN8PcZWEaieXwAAAbo1BnUBSW22E=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-361-AYLFCywHNSSJaIjuhua5ig-1; Tue, 09 Apr 2024 15:40:14 -0400
-X-MC-Unique: AYLFCywHNSSJaIjuhua5ig-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-416b91d1328so3049425e9.0
-        for <kvmarm@lists.linux.dev>; Tue, 09 Apr 2024 12:40:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RX5GWl/d"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5d8dd488e09so5539583a12.2
+        for <kvmarm@lists.linux.dev>; Tue, 09 Apr 2024 15:44:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712702670; x=1713307470; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VH/UmEChwdyjZ/9aT/KUw9UQuyTiVzbfxn08LZ7BSrg=;
+        b=RX5GWl/daCJ63dLDhewmItzNAqkEcIy90UCjwE1za/PQVs29TuIhByjCKfqTrP4cQB
+         NpVKf4q1LyJlF2C3rBEcxa+HE5cQYLwbD4/qeu9taz3zzZAalVN9seCT1K15VH0zfNwW
+         MP6fhLQH4hDZPaexwWO2d3YaACijaok/kZ8tmcqZl0TlfjihBoUGwcgYA9rBJ+ZCFliP
+         m0JALTOmS0lu0/9ssf9CAbojmzdfZL/Nqv+jsSkKpKy36LGOB0zSY1sygQpumzYciqSD
+         o53eq0kpEI8HzLS5rz/hsk753op1xYW8XNfFfSwzrsGakkyg7eewoeHjL/DcWK0wp7f+
+         r/zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712691311; x=1713296111;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=U/UlR7zqufR1BMiNRAFjOCRhGVziWAD38sAXso6PqdU=;
-        b=D4fzW/MhFRRjbkXPGgkth+WhU0DHc/GkEl/iPZndK5IG4tFq6tcXaW6arNTF1XZUu5
-         ZFN1x1s3JfmorCTcZjPiZ9mOCF8eHPasVi705OPaX4+PHWGjpc6HCJJ7SqoWMKFTLw1a
-         VhpMievSQgYW5EaoZbCG0smKBbF6jhLm/2rbA7T3jtIDCwXAdeG52gm6xMtZ5SyYSF8q
-         6qAzZGr3sRb3hidv2/i+wL5MCbLATdBSdumarRbZTng2jdaLFM1xNwu8EHtxdsyH4ogv
-         KXkvjGTJ2qWqUJfRuIY0uzeSmtUQzSp0VTwKEIoE+PysaJBB1WB9MuVvpllBze/yb2l7
-         2WTA==
-X-Forwarded-Encrypted: i=1; AJvYcCWliiUJKStn1sBAfOLksr3/42XSCQyKb0/GvrEiCnbiiJ7qwohkSdP8+F90vVe4vgsHj6UVRMiIKEom2agG6ip2F99sTimb
-X-Gm-Message-State: AOJu0YymlgzvWvu8d+D/XO1vOuHPCzgfYIhddsgI+/dLTAbwzhxmAXBp
-	zYEWzb9NALC1HuazitJVLWzXIteT0/xx6wjDZ4f52YsKxacI0xFIgL59DCe7ZByLhte7SlYOLfp
-	9APTMn5lR33guklbdvOWCHDCCxvSq+TyqiaNmzQ7dJdiQWUziz6WZFA==
-X-Received: by 2002:a05:600c:1f92:b0:415:6dae:7759 with SMTP id je18-20020a05600c1f9200b004156dae7759mr434771wmb.19.1712691311523;
-        Tue, 09 Apr 2024 12:35:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGNK/MSHbN2SOo+EhWsKeacokFDTkm+sVzbxSuwMhF8cnl50vWF4+UkJdupyoUUGPHLwwFqbQ==
-X-Received: by 2002:a05:600c:1f92:b0:415:6dae:7759 with SMTP id je18-20020a05600c1f9200b004156dae7759mr434745wmb.19.1712691311075;
-        Tue, 09 Apr 2024 12:35:11 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c70a:be00:a285:bc76:307d:4eaa? (p200300cbc70abe00a285bc76307d4eaa.dip0.t-ipconnect.de. [2003:cb:c70a:be00:a285:bc76:307d:4eaa])
-        by smtp.gmail.com with ESMTPSA id je6-20020a05600c1f8600b0041496734318sm21939446wmb.24.2024.04.09.12.35.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Apr 2024 12:35:10 -0700 (PDT)
-Message-ID: <226a222d-4273-4304-ab73-39b2f8f060b5@redhat.com>
-Date: Tue, 9 Apr 2024 21:35:08 +0200
+        d=1e100.net; s=20230601; t=1712702670; x=1713307470;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VH/UmEChwdyjZ/9aT/KUw9UQuyTiVzbfxn08LZ7BSrg=;
+        b=xQ4GjlB7nc8yIYpjmuhFOiuaE3pUV2EEpj4id8K00e8nuOmmk2vNPrBGNL4WlQ01fk
+         5nF/pOsZJ4g0+W6oGIoWG9srETrs//1xL6sD/O2jYtwrmdsbGs7bzvXSSar6um+GMs8r
+         huJBV8UhMX2mLN5BxXuFzRx8+gsWO4B7ZWxuB416H7DQUywkfpelE3wrGiz1+35aLI9T
+         QnAQT7ExZNXZ03fnylCnaJUtkwX/prLGUVh9TZP3YoitcK4F+CfXYQuZfDpCiT+xhRz6
+         YAqJ4wS+2mEPWIkWNv13LHHChurcN76qXOmnYFermR4Q13xm2ZGlHn4nVqRS3DHb32o9
+         bc+g==
+X-Forwarded-Encrypted: i=1; AJvYcCVQ9+I8+L0etnXXgIUA8t/7WTAhtvYuKTLyJKJ1WHlolfELV/MGf7FL+P1KIYUtMOfMW9JKbwK7dhKCUDIXY/VER4AAONpi
+X-Gm-Message-State: AOJu0YzQQzVBxmii+X8EcENrPhaCcFaigsF65tXEDzyTnXDCPAPr8pNp
+	7AicxBWiuWOHTu7GvJ51Rz8zpXtkpXdGnnYFc2W+qIlQMT6ySoDwQVndaQ0JHgajlraZbcxUREz
+	eDA==
+X-Google-Smtp-Source: AGHT+IEKcTUQbJF7HcWLxaLFN0XfKlKXAruCoVy4SPhA/1+pHY/GIZSslF6K8fw3dj5zJXbZ707++dbd2JI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a65:5c88:0:b0:5dc:14c9:64aa with SMTP id
+ a8-20020a655c88000000b005dc14c964aamr2813pgt.3.1712702670100; Tue, 09 Apr
+ 2024 15:44:30 -0700 (PDT)
+Date: Tue, 9 Apr 2024 15:44:28 -0700
+In-Reply-To: <20240215235405.368539-5-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/7] mm: Add a bitmap into
- mmu_notifier_{clear,test}_young
-To: James Houghton <jthoughton@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Yu Zhao <yuzhao@google.com>,
- David Matlack <dmatlack@google.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>,
- Sean Christopherson <seanjc@google.com>, Jonathan Corbet <corbet@lwn.net>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>, Steven Rostedt <rostedt@goodmis.org>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Shaoqin Huang <shahuang@redhat.com>, Gavin Shan <gshan@redhat.com>,
- Ricardo Koller <ricarkol@google.com>,
- Raghavendra Rao Ananta <rananta@google.com>,
- Ryan Roberts <ryan.roberts@arm.com>, David Rientjes <rientjes@google.com>,
- Axel Rasmussen <axelrasmussen@google.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org
-References: <20240401232946.1837665-1-jthoughton@google.com>
- <20240401232946.1837665-2-jthoughton@google.com>
- <cce476f7-2f52-428a-8ae4-fc5dec714666@redhat.com>
- <CADrL8HVPEjdAs3PoTa3sPCvQpimZJG6pP9wbiLjnF5cROxfapA@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <CADrL8HVPEjdAs3PoTa3sPCvQpimZJG6pP9wbiLjnF5cROxfapA@mail.gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20240215235405.368539-1-amoorthy@google.com> <20240215235405.368539-5-amoorthy@google.com>
+Message-ID: <ZhXEzACz-Z2ruLaT@google.com>
+Subject: Re: [PATCH v7 04/14] KVM: Simplify error handling in __gfn_to_pfn_memslot()
+From: Sean Christopherson <seanjc@google.com>
+To: Anish Moorthy <amoorthy@google.com>
+Cc: oliver.upton@linux.dev, maz@kernel.org, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, robert.hoo.linux@gmail.com, jthoughton@google.com, 
+	dmatlack@google.com, axelrasmussen@google.com, peterx@redhat.com, 
+	nadav.amit@gmail.com, isaku.yamahata@gmail.com, kconsul@linux.vnet.ibm.com
+Content-Type: text/plain; charset="us-ascii"
 
-On 09.04.24 20:31, James Houghton wrote:
-> Ah, I didn't see this in my inbox, sorry David!
+On Thu, Feb 15, 2024, Anish Moorthy wrote:
+> KVM_HVA_ERR_RO_BAD satisfies kvm_is_error_hva(), so there's no need to
+> duplicate the "if (writable)" block. Fix this by bringing all
+> kvm_is_error_hva() cases under one conditional.
+> 
+> Signed-off-by: Anish Moorthy <amoorthy@google.com>
+> ---
+>  virt/kvm/kvm_main.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 7186d301d617..67ca580a18c5 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3031,15 +3031,13 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
+>  	if (hva)
+>  		*hva = addr;
+>  
+> -	if (addr == KVM_HVA_ERR_RO_BAD) {
+> -		if (writable)
+> -			*writable = false;
+> -		return KVM_PFN_ERR_RO_FAULT;
+> -	}
+> -
+>  	if (kvm_is_error_hva(addr)) {
+>  		if (writable)
+>  			*writable = false;
+> +
+> +		if (addr == KVM_HVA_ERR_RO_BAD)
+> +			return KVM_PFN_ERR_RO_FAULT;
+> +
+>  		return KVM_PFN_NOSLOT;
 
-No worries :)
+This would be a good use of a ternary operator, e.g. to make it super obvious
+that "if (kvm_is_error_hva(addr))" is terminal in all cases.  I'll fixup when
+applying.
 
+>  	}
+>  
+> -- 
+> 2.44.0.rc0.258.g7320e95886-goog
 > 
-> On Thu, Apr 4, 2024 at 11:52 AM David Hildenbrand <david@redhat.com> wrote:
->>
->> On 02.04.24 01:29, James Houghton wrote:
->>> diff --git a/include/linux/mmu_notifier.h b/include/linux/mmu_notifier.h
->>> index f349e08a9dfe..daaa9db625d3 100644
->>> --- a/include/linux/mmu_notifier.h
->>> +++ b/include/linux/mmu_notifier.h
->>> @@ -61,6 +61,10 @@ enum mmu_notifier_event {
->>>
->>>    #define MMU_NOTIFIER_RANGE_BLOCKABLE (1 << 0)
->>>
->>> +#define MMU_NOTIFIER_YOUNG                   (1 << 0)
->>> +#define MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE (1 << 1)
->>
->> Especially this one really deserves some documentation :)
-> 
-> Yes, will do. Something like
-> 
->      MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE indicates that the passed-in
-> bitmap either (1) does not accurately represent the age of the pages
-> (in the case of test_young), or (2) was not able to be used to
-> completely clear the age/access bit (in the case of clear_young).
-
-Make sense. I do wonder what the expected reaction from the caller is :)
-
-> 
->>
->>> +#define MMU_NOTIFIER_YOUNG_FAST                      (1 << 2)
->>
->> And that one as well.
-> 
-> Something like
-> 
->     Indicates that (1) passing a bitmap ({test,clear}_young_bitmap)
-> would have been supported for this address range.
-> 
-> The name MMU_NOTIFIER_YOUNG_FAST really comes from the fact that KVM
-> is able to harvest the access bit "fast" (so for x86, locklessly, and
-> for arm64, with the KVM MMU read lock), "fast" enough that using a
-> bitmap to do look-around is probably a good idea.
-
-Is that really the right way to communicate that ("would have been 
-supported") -- wouldn't we want to sense support differently?
-
-> 
->>
->> Likely best to briefly document all of them, and how they are
->> supposed to be used (return value for X).
-> 
-> Right. Will do.
-> 
->>
->>> +
->>>    struct mmu_notifier_ops {
->>>        /*
->>>         * Called either by mmu_notifier_unregister or when the mm is
->>> @@ -106,21 +110,36 @@ struct mmu_notifier_ops {
->>>         * clear_young is a lightweight version of clear_flush_young. Like the
->>>         * latter, it is supposed to test-and-clear the young/accessed bitflag
->>>         * in the secondary pte, but it may omit flushing the secondary tlb.
->>> +      *
->>> +      * If @bitmap is given but is not supported, return
->>> +      * MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE.
->>> +      *
->>> +      * If the walk is done "quickly" and there were young PTEs,
->>> +      * MMU_NOTIFIER_YOUNG_FAST is returned.
->>>         */
->>>        int (*clear_young)(struct mmu_notifier *subscription,
->>>                           struct mm_struct *mm,
->>>                           unsigned long start,
->>> -                        unsigned long end);
->>> +                        unsigned long end,
->>> +                        unsigned long *bitmap);
->>>
->>>        /*
->>>         * test_young is called to check the young/accessed bitflag in
->>>         * the secondary pte. This is used to know if the page is
->>>         * frequently used without actually clearing the flag or tearing
->>>         * down the secondary mapping on the page.
->>> +      *
->>> +      * If @bitmap is given but is not supported, return
->>> +      * MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE.
->>> +      *
->>> +      * If the walk is done "quickly" and there were young PTEs,
->>> +      * MMU_NOTIFIER_YOUNG_FAST is returned.
->>>         */
->>>        int (*test_young)(struct mmu_notifier *subscription,
->>>                          struct mm_struct *mm,
->>> -                       unsigned long address);
->>> +                       unsigned long start,
->>> +                       unsigned long end,
->>> +                       unsigned long *bitmap);
->>
->> What does "quickly" mean (why not use "fast")? What are the semantics, I
->> don't find any existing usage of that in this file.
-> 
-> "fast" means fast enough such that using a bitmap to scan adjacent
-> pages (e.g. with MGLRU) is likely to be beneficial. I'll write more in
-> this comment. Perhaps I should just rename it to
-> MMU_NOTIFIER_YOUNG_BITMAP_SUPPORTED and drop the whole "likely to be
-> beneficial" thing -- that's for MGLRU/etc. to decide really.
-
-Yes!
-
-> 
->>
->> Further, what is MMU_NOTIFIER_YOUNG you introduce used for?
-> 
-> MMU_NOTIFIER_YOUNG is the return value when the page was young, but we
-> (1) didn't use a bitmap, and (2) the "fast" access bit harvesting
-> wasn't possible. In this case we simply return 1, which is
-> MMU_NOTIFIER_YOUNG. I'll make kvm_mmu_notifier_test_clear_young()
-> properly return MMU_NOTIFIER_YOUNG instead of relying on the fact that
-> it will be 1.
-
-Yes, that will clarify it!
-
--- 
-Cheers,
-
-David / dhildenb
-
