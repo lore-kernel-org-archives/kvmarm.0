@@ -1,65 +1,66 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB181DFE8
-	for <kvmarm@lists.linux.dev>; Tue,  9 Apr 2024 22:44:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC83212F59D
+	for <kvmarm@lists.linux.dev>; Tue,  9 Apr 2024 22:47:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712702672; cv=none; b=R5iydKn/QoeY+USfjGh2gGoveNoo0u+8gYI5PsXsfgLxpU0zP3u7Ogo1+gtj8Upy7kQa4qCjQFXnv54n2j6gOik/3kB2iOQHpHw8mj+tpwDJPozBYDWVebcYVKW+BmS8cECtBYHSqVH6SGLUaTvzSx5oL7Hagw1wWM8lCoI++1w=
+	t=1712702827; cv=none; b=WxFvUnIdIxafAyPT2HPZ+PCIET2AUFOlsFrx0p/5arZzUCRexz/i6fpNkcpZgCo6IlHYjBYNqoL6oapKyrH+CMAWW4h5NfpYQBEtF/xWe7lorBl359odASIBuiwkyPnhrxVZPYplMylkBvKXwlIYLDqy6EwgIeJH7wE/ZQFngN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712702672; c=relaxed/simple;
-	bh=qM29SkS5o2wfxy/5l80wfNAUyeavrf9BVcVfOkwKY/Y=;
+	s=arc-20240116; t=1712702827; c=relaxed/simple;
+	bh=k51+5LsDbq2hvGlxfuH5BGJttTm71LkxCDDWSrA2sOY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EoLPdRdYhmG840TOfEpJWio28mQgBHLMln+BoG5nir7+53gQVkr179RAnw1MStFXcJVjLPBz9SlTrix8xKpZsYKWoYDkgLtr8vp5YoScVyvM/QnWvL9Ygd5KpoVRW5zuzvMS3pSay+umdwUTVTGnWSGHKzQaHn7UemLMBu4VlDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RX5GWl/d; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=ePdtoiFbJWV11vSAg93wEaUA+6Q6sCkEmd5Kz/mPyXk+TTxuoyeQvMOmfnYRi4M0IrmvPnVuhAyqdVAnuFvZTbgXSTQFTN09jARqGhbquqK5Z8BFd10pxZMRxeJnIsCRsCkmSMrFhFcMInL2bPBPNe+P12GaykztMynjNCSsh2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2vwhu9st; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RX5GWl/d"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5d8dd488e09so5539583a12.2
-        for <kvmarm@lists.linux.dev>; Tue, 09 Apr 2024 15:44:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2vwhu9st"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-610c23abd1fso114302897b3.0
+        for <kvmarm@lists.linux.dev>; Tue, 09 Apr 2024 15:47:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712702670; x=1713307470; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1712702825; x=1713307625; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VH/UmEChwdyjZ/9aT/KUw9UQuyTiVzbfxn08LZ7BSrg=;
-        b=RX5GWl/daCJ63dLDhewmItzNAqkEcIy90UCjwE1za/PQVs29TuIhByjCKfqTrP4cQB
-         NpVKf4q1LyJlF2C3rBEcxa+HE5cQYLwbD4/qeu9taz3zzZAalVN9seCT1K15VH0zfNwW
-         MP6fhLQH4hDZPaexwWO2d3YaACijaok/kZ8tmcqZl0TlfjihBoUGwcgYA9rBJ+ZCFliP
-         m0JALTOmS0lu0/9ssf9CAbojmzdfZL/Nqv+jsSkKpKy36LGOB0zSY1sygQpumzYciqSD
-         o53eq0kpEI8HzLS5rz/hsk753op1xYW8XNfFfSwzrsGakkyg7eewoeHjL/DcWK0wp7f+
-         r/zg==
+        bh=AlR3wd32J7CM7haAcioPhyocAIlp+PLTQ5N+UsXAt0M=;
+        b=2vwhu9stZTBr2Qdn/uitTwoCSS4P0S+StAa/1DKJ/vHYl1PXcd/k9Eowk9myLb1c9a
+         P+f9Y0zHi1JVS8xVCjsWfKoy0pqkca6b5izYa48WBuAZzq6nlZ2DSuHqtdywKPyTashR
+         PSdwU2yxNAdEKmNpzIKvU2sEDfer8I6Al7eI7FpLTYfqr5sCYRl0zF82ilyEKjfDLotL
+         4fdxksZlmgHIXqKxTjoxB6SznFPD1zf0ZtqoL9SLmPLuCPuMDjP92N3qr7tb8YoIyRzU
+         Z9DshnCfcHuIKJOwXwi4Zxp6T+aILEkiQq90/Ox/LRw/PrLtUk3dAeEHQ9k0mzGx+1/1
+         URNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712702670; x=1713307470;
+        d=1e100.net; s=20230601; t=1712702825; x=1713307625;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VH/UmEChwdyjZ/9aT/KUw9UQuyTiVzbfxn08LZ7BSrg=;
-        b=xQ4GjlB7nc8yIYpjmuhFOiuaE3pUV2EEpj4id8K00e8nuOmmk2vNPrBGNL4WlQ01fk
-         5nF/pOsZJ4g0+W6oGIoWG9srETrs//1xL6sD/O2jYtwrmdsbGs7bzvXSSar6um+GMs8r
-         huJBV8UhMX2mLN5BxXuFzRx8+gsWO4B7ZWxuB416H7DQUywkfpelE3wrGiz1+35aLI9T
-         QnAQT7ExZNXZ03fnylCnaJUtkwX/prLGUVh9TZP3YoitcK4F+CfXYQuZfDpCiT+xhRz6
-         YAqJ4wS+2mEPWIkWNv13LHHChurcN76qXOmnYFermR4Q13xm2ZGlHn4nVqRS3DHb32o9
-         bc+g==
-X-Forwarded-Encrypted: i=1; AJvYcCVQ9+I8+L0etnXXgIUA8t/7WTAhtvYuKTLyJKJ1WHlolfELV/MGf7FL+P1KIYUtMOfMW9JKbwK7dhKCUDIXY/VER4AAONpi
-X-Gm-Message-State: AOJu0YzQQzVBxmii+X8EcENrPhaCcFaigsF65tXEDzyTnXDCPAPr8pNp
-	7AicxBWiuWOHTu7GvJ51Rz8zpXtkpXdGnnYFc2W+qIlQMT6ySoDwQVndaQ0JHgajlraZbcxUREz
-	eDA==
-X-Google-Smtp-Source: AGHT+IEKcTUQbJF7HcWLxaLFN0XfKlKXAruCoVy4SPhA/1+pHY/GIZSslF6K8fw3dj5zJXbZ707++dbd2JI=
+        bh=AlR3wd32J7CM7haAcioPhyocAIlp+PLTQ5N+UsXAt0M=;
+        b=ezPXJ1YVrN82k0Yw+JIAOA7RjGk3oJVX4+RItUrXQ/ZBppXwWbhOMhZAfcr0yGsVdd
+         l1abIrt+XHYLic5JIqCaCf+H7RCcSpMdGBoe7oPXO46UbRQzz202n+fWMVpr0kENW1ny
+         RbvgVpfHcfbpqt/Q3LAnZXkQVwd4YOm3dcIG5+5G0mj5eZyP0GpC+L46i/XpXTqTyRLz
+         ZTpvjo1xSaAX97xTfjpwMDaSCh9WqtNFNv+ZMl/mqinfElJwmbobyZICJa8oLsWQeBxZ
+         D2zac50V9MSiVk8o3C6MMTgTTutNk2qwebMWWrrkPQf/6jAbZeSu9cwwbHRjFVKW5HQi
+         m7eA==
+X-Forwarded-Encrypted: i=1; AJvYcCWmoEZOWSw2bbUkuTOMBnR1Fq/t8gXpLCM0PPleB+WszbLR5jDwnSS01Df6jHJ6xGwfF8aw7ZTdwiIXgj01BXtfY1j/UMQQ
+X-Gm-Message-State: AOJu0YxnUlqw9s5xjjZFC2NfPqAvgfq45+u/4oYGe09k50cI53qf3uMG
+	1zUvuU7URYDJ/h5wbRM9tKPKBUskAIenVlBalit0KU6CesNANeClohwP6SzVaJodMuE+snMgj+B
+	IOQ==
+X-Google-Smtp-Source: AGHT+IFLTy5GkVD0E7U+RH9kzxgpp0i5nxbXyjxmK+s0+O6klcL95tqJryS7wnm2k8slKkIjiYxCm6loI+Y=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:5c88:0:b0:5dc:14c9:64aa with SMTP id
- a8-20020a655c88000000b005dc14c964aamr2813pgt.3.1712702670100; Tue, 09 Apr
- 2024 15:44:30 -0700 (PDT)
-Date: Tue, 9 Apr 2024 15:44:28 -0700
-In-Reply-To: <20240215235405.368539-5-amoorthy@google.com>
+ (user=seanjc job=sendgmr) by 2002:a05:690c:680a:b0:618:28ee:ea3b with SMTP id
+ id10-20020a05690c680a00b0061828eeea3bmr270722ywb.7.1712702825115; Tue, 09 Apr
+ 2024 15:47:05 -0700 (PDT)
+Date: Tue, 9 Apr 2024 15:47:03 -0700
+In-Reply-To: <20240215235405.368539-4-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20240215235405.368539-1-amoorthy@google.com> <20240215235405.368539-5-amoorthy@google.com>
-Message-ID: <ZhXEzACz-Z2ruLaT@google.com>
-Subject: Re: [PATCH v7 04/14] KVM: Simplify error handling in __gfn_to_pfn_memslot()
+References: <20240215235405.368539-1-amoorthy@google.com> <20240215235405.368539-4-amoorthy@google.com>
+Message-ID: <ZhXFZ1CLJazF9_k_@google.com>
+Subject: Re: [PATCH v7 03/14] KVM: Documentation: Make note of the
+ KVM_MEM_GUEST_MEMFD memslot flag
 From: Sean Christopherson <seanjc@google.com>
 To: Anish Moorthy <amoorthy@google.com>
 Cc: oliver.upton@linux.dev, maz@kernel.org, kvm@vger.kernel.org, 
@@ -69,44 +70,32 @@ Cc: oliver.upton@linux.dev, maz@kernel.org, kvm@vger.kernel.org,
 Content-Type: text/plain; charset="us-ascii"
 
 On Thu, Feb 15, 2024, Anish Moorthy wrote:
-> KVM_HVA_ERR_RO_BAD satisfies kvm_is_error_hva(), so there's no need to
-> duplicate the "if (writable)" block. Fix this by bringing all
-> kvm_is_error_hva() cases under one conditional.
-> 
-> Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> ---
->  virt/kvm/kvm_main.c | 10 ++++------
->  1 file changed, 4 insertions(+), 6 deletions(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 7186d301d617..67ca580a18c5 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3031,15 +3031,13 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
->  	if (hva)
->  		*hva = addr;
+>  This ioctl allows the user to create, modify or delete a guest physical
+>  memory slot.  Bits 0-15 of "slot" specify the slot id and this value
+> @@ -1382,12 +1383,16 @@ It is recommended that the lower 21 bits of guest_phys_addr and userspace_addr
+>  be identical.  This allows large pages in the guest to be backed by large
+>  pages in the host.
 >  
-> -	if (addr == KVM_HVA_ERR_RO_BAD) {
-> -		if (writable)
-> -			*writable = false;
-> -		return KVM_PFN_ERR_RO_FAULT;
-> -	}
-> -
->  	if (kvm_is_error_hva(addr)) {
->  		if (writable)
->  			*writable = false;
+> -The flags field supports two flags: KVM_MEM_LOG_DIRTY_PAGES and
+> -KVM_MEM_READONLY.  The former can be set to instruct KVM to keep track of
+> +The flags field supports three flags
 > +
-> +		if (addr == KVM_HVA_ERR_RO_BAD)
-> +			return KVM_PFN_ERR_RO_FAULT;
-> +
->  		return KVM_PFN_NOSLOT;
+> +1.  KVM_MEM_LOG_DIRTY_PAGES: can be set to instruct KVM to keep track of
+>  writes to memory within the slot.  See KVM_GET_DIRTY_LOG ioctl to know how to
 
-This would be a good use of a ternary operator, e.g. to make it super obvious
-that "if (kvm_is_error_hva(addr))" is terminal in all cases.  I'll fixup when
-applying.
+This formatting is funky.  I suspect you are trying to avoid touching lines that
+otherwise wouldn't be modified, but the end result is hard to read.  I would also
+opportunistically clean up the wording in general, e.g.
 
->  	}
->  
-> -- 
-> 2.44.0.rc0.258.g7320e95886-goog
-> 
+1. KVM_MEM_LOG_DIRTY_PAGES: can be set to instruct KVM to keep track of writes
+   to memory within the slot.  See KVM_GET_DIRTY_LOG ioctl for details.
+
+> -use it.  The latter can be set, if KVM_CAP_READONLY_MEM capability allows it,
+> +use it.
+> +2.  KVM_MEM_READONLY: can be set, if KVM_CAP_READONLY_MEM capability allows it,
+>  to make a new slot read-only.  In this case, writes to this memory will be
+>  posted to userspace as KVM_EXIT_MMIO exits.
+> +3.  KVM_MEM_GUEST_MEMFD: see KVM_SET_USER_MEMORY_REGION2. This flag is
+> +incompatible with KVM_SET_USER_MEMORY_REGION.
+
+This is now stale, as KVM_MEM_GUEST_MEMFD is also incompatible with READONLY.
