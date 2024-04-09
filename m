@@ -1,172 +1,132 @@
-Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A44F713E8AB
-	for <kvmarm@lists.linux.dev>; Mon,  8 Apr 2024 15:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D443A1A2
+	for <kvmarm@lists.linux.dev>; Tue,  9 Apr 2024 01:29:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712591873; cv=none; b=tFXKVZGS3eBP/cQqgZwzrg+aPmHzvjao9LythxNmYx5qkUY+GS7cV+hqLl8sDzgdnvXzfwV+zfjnJsaNCodCZpX8YGTuj25/ly0pyqCm2FE7Fhc5T96DMVVcA0b96BvjVxQaKNecHlMizQJvxYaTUMDhZeJjg2Y1iOP0Ba8+v40=
+	t=1712626201; cv=none; b=skSiw6g0WeudaxVn+Tv+TEm0oYqA9sFOc/x/Ty8DLdiV/I6BIr4pSTmg5lf9Ej0HrIgjwnbN/f6YThCLBM2XxZW6I+E18h2+giDqnkUv4wuK6kUzdbCjExgozrOgv59EjIRGhIk4I27Aebuk4Bmrt80UeeUbuEzlGpWm1zMTTU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712591873; c=relaxed/simple;
-	bh=Ad5C/UYhuvUhdMklJkieDNTRggO1HkgxtiVOtHU+lm4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b/bxwk9jsKh/+BPWn+A8Y4rCBhIThsMYYVv0qJjmF7Oy5IarrvqXdDQbrd3+YNHxLbV6RLd0PYyv2Wkz3mNF4mkK9Yo/qY1nLTxJ0o1FtaZ9B8eKCmAA6WsNwrYOlmIN8j0M+51Y9JOiXjAVKwXjUTPgqn1U2SYXOQ+01Ugky1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IASEGLAZ; arc=none smtp.client-ip=209.85.217.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IASEGLAZ"
-Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-47a0bebeacaso291878137.0
-        for <kvmarm@lists.linux.dev>; Mon, 08 Apr 2024 08:57:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712591870; x=1713196670; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YRMNNKeuxHrTajZrY5Q4P7nTCkdxS2+0xOMyH7RZT6Y=;
-        b=IASEGLAZN61FZO9xfZSlL03I8j1xCZybZFWWliQubuiXUK0rQJadiFviyHTePb7fVT
-         V4HSEXZ5pJaFZHwEwc0pt3wuZM5qN43sOq7FqONhPZ4S9DO7sUCW6RC6cxBc9f4TGfPG
-         lnrzfcPmXy/edvq/C4EqGjQLF43rXDtj1QzfstF+VVL2Y7EWS12ponjxl3SRj2woSbOo
-         FmfosnDAyYp8zsEFTehogL42ds2tkTkcWBAJyKaLs5BmtG4CrCNAZR+os9sr8lex6cqR
-         7AwFswBjf/SloYqsSCW8h4L1Pz/7/COxNRU4Fdr6Wp3wJQu+gHkmVztrvEZpdZ3clfut
-         rHuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712591870; x=1713196670;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YRMNNKeuxHrTajZrY5Q4P7nTCkdxS2+0xOMyH7RZT6Y=;
-        b=wmKok4DEU4athsYUpG1wAZEh0vkFwjK7/0T6jFWNaxfdxer5DWG++54KQC8WJEMIK+
-         k1PfdJSp354kg+bDcZfAWwPJWibMOCfEXRpWahqsN5EU40Di30mX+BS28a3UC++b5f7Z
-         /3H5KOn++oAXIjk7VgYlaXKmQdjTGHRAUmyrNBF3tIoH/G9mHHsfQcqrp480q35OsbUu
-         A2t7Qka/BsaR3Ip3F579c3FaXtk8lMnUDyRG8tMMcHVOxliB9N/hQIEFeI0NXafnKHYx
-         PW+xkCzIE7qPHkNcAyEFwP6UDpVa5Mta2p08R+G/7zHWsbZ/HQRhlIuvj/ALxuLEA/Sh
-         sEUA==
-X-Gm-Message-State: AOJu0YwTAzv+CsnrgDY7FUpLwqH3XlC8o4dKT2o31dh6B4UeCiTiKlG3
-	Z3AV+jJc7WtO3enC8r9JuZnAx08VdvFMqIrgOvUvoWcO3nFbg77XbrwhFYsd+2tRxrfeSo+v1NG
-	3HHjspcs8KuNqmeKSuk4VnMPUrzDuuO/QcSdq
-X-Google-Smtp-Source: AGHT+IFQnR+tKR996QvDJnP40U9B8iI0w8XtJJa2imquBNZDYtTItak0TUJ7+f10qZi9SGoeBvdQ/t86LJGMDmcItYM=
-X-Received: by 2002:a05:6102:38c6:b0:479:e3bd:8b2f with SMTP id
- k6-20020a05610238c600b00479e3bd8b2fmr7325573vst.12.1712591870450; Mon, 08 Apr
- 2024 08:57:50 -0700 (PDT)
+	s=arc-20240116; t=1712626201; c=relaxed/simple;
+	bh=EplAmGWlpEPUKAGd06/KPWoiuWne67+H/waOkDyvOBc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BK2A4MGdIA8nZ5woAWaoayGN6KIMUyrlKLeW8iaGMGH6AZwxUFHqKaIMD9/gJmSZd6yO7Dl7K5vNjS5Ktdr1qr5uoX7Vto1k5kAEnYPt9QtSsQScGilzGFGyWcJpAvjJWz+E9h+gZSJivW+u0RUJxfGY9vfskjGcckUFHNgkuFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4VD7cZ06Csz1ymVZ;
+	Tue,  9 Apr 2024 09:27:42 +0800 (CST)
+Received: from kwepemd200013.china.huawei.com (unknown [7.221.188.133])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2B2E818002D;
+	Tue,  9 Apr 2024 09:29:56 +0800 (CST)
+Received: from huawei.com (10.67.174.28) by kwepemd200013.china.huawei.com
+ (7.221.188.133) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.28; Tue, 9 Apr
+ 2024 09:29:54 +0800
+From: Liao Chang <liaochang1@huawei.com>
+To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
+	<oliver.upton@linux.dev>, <james.morse@arm.com>, <suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>, <tglx@linutronix.de>, <mark.rutland@arm.com>,
+	<ardb@kernel.org>, <broonie@kernel.org>, <liaochang1@huawei.com>,
+	<anshuman.khandual@arm.com>, <miguel.luis@oracle.com>, <joey.gouly@arm.com>,
+	<ryan.roberts@arm.com>, <jeremy.linton@arm.com>, <liwei391@huawei.com>,
+	<daniel.thompson@linaro.org>, <sumit.garg@linaro.org>,
+	<kristina.martsenko@arm.com>, <jpoimboe@kernel.org>, <ericchancf@google.com>,
+	<robh@kernel.org>, <scott@os.amperecomputing.com>,
+	<songshuaishuai@tinylab.org>, <shijie@os.amperecomputing.com>,
+	<bhe@redhat.com>, <akpm@linux-foundation.org>, <thunder.leizhen@huawei.com>,
+	<horms@kernel.org>, <rmk+kernel@armlinux.org.uk>, <takakura@valinux.co.jp>,
+	<dianders@chromium.org>, <swboyd@chromium.org>, <frederic@kernel.org>,
+	<reijiw@google.com>, <akihiko.odaki@daynix.com>, <ruanjinjie@huawei.com>
+CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>
+Subject: [PATCH 0/9] Rework the DAIF mask, unmask and track API
+Date: Tue, 9 Apr 2024 01:23:35 +0000
+Message-ID: <20240409012344.3194724-1-liaochang1@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20240327173531.1379685-1-tabba@google.com> <20240327173531.1379685-4-tabba@google.com>
- <864jccti69.wl-maz@kernel.org> <CA+EHjTxRSQdaKXpYd6GHEejZk0mpKwPz0CPmnAxPPneGijtSsw@mail.gmail.com>
- <86zfu3sveu.wl-maz@kernel.org>
-In-Reply-To: <86zfu3sveu.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 8 Apr 2024 16:57:13 +0100
-Message-ID: <CA+EHjTzbtUXXeNGTjRH0-TjSf2VP+574qGzZHJ40g12jkxUivQ@mail.gmail.com>
-Subject: Re: [PATCH v1 03/44] KVM: arm64: Move setting the page as dirty out
- of the critical section
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, will@kernel.org, qperret@google.com, 
-	seanjc@google.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, 
-	philmd@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, 
-	oliver.upton@linux.dev, mark.rutland@arm.com, broonie@kernel.org, 
-	joey.gouly@arm.com, rananta@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemd200013.china.huawei.com (7.221.188.133)
 
-On Mon, Apr 8, 2024 at 4:53=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Mon, 08 Apr 2024 16:41:15 +0100,
-> Fuad Tabba <tabba@google.com> wrote:
-> >
-> > Hi Marc,
-> >
-> > On Mon, Apr 8, 2024 at 8:41=E2=80=AFAM Marc Zyngier <maz@kernel.org> wr=
-ote:
-> > >
-> > > On Wed, 27 Mar 2024 17:34:50 +0000,
-> > > Fuad Tabba <tabba@google.com> wrote:
-> > > >
-> > > > Move the unlock earlier in user_mem_abort() to shorten the
-> > > > critical section. This also helps for future refactoring and
-> > > > reuse of similar code.
-> > > >
-> > > > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > > > ---
-> > > >  arch/arm64/kvm/mmu.c | 8 +++++---
-> > > >  1 file changed, 5 insertions(+), 3 deletions(-)
-> > > >
-> > > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > > index 18680771cdb0..3afc42d8833e 100644
-> > > > --- a/arch/arm64/kvm/mmu.c
-> > > > +++ b/arch/arm64/kvm/mmu.c
-> > > > @@ -1522,8 +1522,10 @@ static int user_mem_abort(struct kvm_vcpu *v=
-cpu, phys_addr_t fault_ipa,
-> > > >
-> > > >       read_lock(&kvm->mmu_lock);
-> > > >       pgt =3D vcpu->arch.hw_mmu->pgt;
-> > > > -     if (mmu_invalidate_retry(kvm, mmu_seq))
-> > > > +     if (mmu_invalidate_retry(kvm, mmu_seq)) {
-> > > > +             ret =3D -EAGAIN;
-> > > >               goto out_unlock;
-> > > > +     }
-> > > >
-> > > >       /*
-> > > >        * If we are not forced to use page mapping, check if we are
-> > > > @@ -1581,6 +1583,8 @@ static int user_mem_abort(struct kvm_vcpu *vc=
-pu, phys_addr_t fault_ipa,
-> > > >                                            memcache,
-> > > >                                            KVM_PGTABLE_WALK_HANDLE_=
-FAULT |
-> > > >                                            KVM_PGTABLE_WALK_SHARED)=
-;
-> > > > +out_unlock:
-> > > > +     read_unlock(&kvm->mmu_lock);
-> > > >
-> > > >       /* Mark the page dirty only if the fault is handled successfu=
-lly */
-> > > >       if (writable && !ret) {
-> > > > @@ -1588,8 +1592,6 @@ static int user_mem_abort(struct kvm_vcpu *vc=
-pu, phys_addr_t fault_ipa,
-> > > >               mark_page_dirty_in_slot(kvm, memslot, gfn);
-> > > >       }
-> > > >
-> > > > -out_unlock:
-> > > > -     read_unlock(&kvm->mmu_lock);
-> > > >       kvm_release_pfn_clean(pfn);
-> > > >       return ret !=3D -EAGAIN ? ret : 0;
-> > > >  }
-> > >
-> > > It now means that things such as marking a page dirty happens outside
-> > > of the lock, which may interact with the dirty log/bitmap stuff.
-> > >
-> > > Can you elaborate on *why* this is correct?
-> >
-> > The reason why I _think_ this is correct (something I am less certain
-> > about now judging by your reply :) is that this is a lock that
-> > protects the stage-2 page tables (struct kvm_vcpu_arch::hw_mmu), held
-> > in this case for read. As far as I can tell, kvm_set_pfn_dirty() and
-> > mark_page_dirty_in_slot() only access and modify (i.e., write to) the
-> > page without accessing the stage-2 page table. I think that the dirtly
-> > log is protected by the slots_lock.
-> >
-> > Am I missing something?
->
-> I'm just not sure, nothing more sinister than that. I was also
-> reviewing 20240402213656.3068504-1-dmatlack@google.com, which also
-> moves the access to the dirty bitmap outside of the critical section.
->
-> I haven't had a chance to page the whole thing in, unfortunately,
-> hence my question. In any case, it would be work documenting the
-> rationale for this relaxation.
+This patch series reworks the DAIF mask, unmask, and track API for the
+upcoming FEAT_NMI extension added in Armv8.8.
 
-Of course. I'll do that in the respin (if I'm still convinced it's correct =
-:)
+As platform and virtualization[1] supports for FEAT_NMI is emerging, and
+Mark Brown's FEAT_NMI patch series[2] highlighted the need for clean up
+the existing hacking style approach about DAIF management code before
+adding NMI functionality, furthermore, we discover some subtle bugs
+during 'perf' and 'ipi_backtrace' transition from PSEUDO_NMI to
+FEAT_NMI, in summary, all of these emphasize the importance of rework.
 
-/fuad
+This series of reworking patches follows the suggestion from Mark
+Rutland mentioned in Mark Brown's patchset. In summary, he think the
+better way for DAIF manangement look likes as following:
 
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+(a) Adding entry-specific helpers to manipulate abstract exception masks
+    covering DAIF + PMR + ALLINT. Those need unmask-at-entry and
+    mask-at-exit behaviour, and today only need to manage DAIF + PMR.
+
+    It should be possible to do this ahead of ALLINT / NMI support.
+
+(b) Adding new "logical exception mask" helpers that treat DAIF + PMR +
+    ALLINT as separate elements. 
+
+This patches cherry-pick a part of Mark Brown' FEAT_NMI series, in order
+to pass compilation and basic testing, includes perf and ipi_backtrace.
+
+[1] https://lore.kernel.org/all/20240407081733.3231820-1-ruanjinjie@huawei.com/
+[2] https://lore.kernel.org/linux-arm-kernel/Y4sH5qX5bK9xfEBp@lpieralisi/
+
+Jinjie Ruan (1):
+  arm64/cpufeature: Simplify detect PE support for FEAT_NMI
+
+Liao Chang (5):
+  arm64/cpufeature: Use alternatives to check enabled ARM64_HAS_NMI
+    feature
+  arm64: daifflags: Add logical exception masks covering DAIF + PMR +
+    ALLINT
+  arm64: Unify exception masking at entry and exit of exception
+  arm64: Deprecate old local_daif_{mask,save,restore}
+  irqchip/gic-v3: Improve the maintainability of NMI masking in GIC
+    driver
+
+Mark Brown (3):
+  arm64/sysreg: Add definitions for immediate versions of MSR ALLINT
+  arm64/cpufeature: Detect PE support for FEAT_NMI
+  arm64/nmi: Add Kconfig for NMI
+
+ arch/arm64/Kconfig                   |  17 ++
+ arch/arm64/include/asm/cpufeature.h  |   6 +
+ arch/arm64/include/asm/daifflags.h   | 296 ++++++++++++++++++++++-----
+ arch/arm64/include/asm/nmi.h         |  27 +++
+ arch/arm64/include/asm/sysreg.h      |   2 +
+ arch/arm64/include/uapi/asm/ptrace.h |   1 +
+ arch/arm64/kernel/acpi.c             |  10 +-
+ arch/arm64/kernel/cpufeature.c       |  58 +++++-
+ arch/arm64/kernel/debug-monitors.c   |   7 +-
+ arch/arm64/kernel/entry-common.c     |  96 +++++----
+ arch/arm64/kernel/entry.S            |   2 -
+ arch/arm64/kernel/hibernate.c        |   6 +-
+ arch/arm64/kernel/irq.c              |   2 +-
+ arch/arm64/kernel/machine_kexec.c    |   2 +-
+ arch/arm64/kernel/setup.c            |   2 +-
+ arch/arm64/kernel/smp.c              |   6 +-
+ arch/arm64/kernel/suspend.c          |   6 +-
+ arch/arm64/kvm/hyp/vgic-v3-sr.c      |   6 +-
+ arch/arm64/kvm/hyp/vhe/switch.c      |   4 +-
+ arch/arm64/mm/mmu.c                  |   6 +-
+ arch/arm64/tools/cpucaps             |   2 +
+ drivers/irqchip/irq-gic-v3.c         |   6 +-
+ 22 files changed, 438 insertions(+), 132 deletions(-)
+ create mode 100644 arch/arm64/include/asm/nmi.h
+
+-- 
+2.34.1
+
