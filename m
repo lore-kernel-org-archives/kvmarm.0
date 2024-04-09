@@ -1,29 +1,29 @@
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59348BE8
-	for <kvmarm@lists.linux.dev>; Tue,  9 Apr 2024 01:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA9228379
+	for <kvmarm@lists.linux.dev>; Tue,  9 Apr 2024 01:30:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712626202; cv=none; b=sJkctwNimHu0YEHbB3Z/OPfhJ+qadiDZhmzfNz5I2cbZuSPbh5omIaKYgiG7tnWOPxwrcYGRS25RpSxQag3Rl9EhlnXNPAmPU+l0Uoyn9lyvCOgUBdHp5lKEgzJtGUx719AUViuiNeeOe82CQ7scSHnna7JM4JXZpTjROXJ6guM=
+	t=1712626204; cv=none; b=rWbUSvhtC+J5yX/XaqoyvJAQwgqDh0GXXwz1yenqcELpXn+xFNuNxtwr3mmoITRshuKWRmElbr9ErxVwPW/uMIGzY6RT0kiMRd+ZG+w+6wNPTsJHmMeZWird5JeDpTiU3JFKG3HCfjrWy23x5rHN6jSWrf/ZzJf2OXU7Y4O/xCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712626202; c=relaxed/simple;
-	bh=nTnMqrGPAws22NuM6UdpUAlCpX/4nF6Z/m2kHbs1QrQ=;
+	s=arc-20240116; t=1712626204; c=relaxed/simple;
+	bh=OjZmqpTC2ehTHN8Sd68worBXYXZg9Jpv/26xY6sXNS0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AO/aKaUlKc1qQJfN9iPpdDI6qWhs8es38hK44lqABNhhU1aTWeEkYPoxaP1xm0QmoxnMaqeSQf4woS4LwFIZ87Sw3mkpRkXyE9hrNIvFufolgouWE3r2xGZi5meGzGoOScs+beMs0HVYoEVIlMGpF10X+txbJrvr78e0tNLMx1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+	 MIME-Version:Content-Type; b=XWva5gEoNd39d6y/hrOhQ1oFhsG3feH2rXFkDAQxuVe5zNdZRsU6/uofIzNvGf9T0q94P0bmq0pG8eeRceiYcMsdFe57GFd7X4RqNiUeabSWUCXxZ+CnLfVjTg5B04pCRrSnSp/T47tcJxvpA/XdU+hfMgS93ptiyyezyeL86h8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4VD7bv2W6Nz1RBg4;
-	Tue,  9 Apr 2024 09:27:07 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4VD7cf02b2zNn6P;
+	Tue,  9 Apr 2024 09:27:46 +0800 (CST)
 Received: from kwepemd200013.china.huawei.com (unknown [7.221.188.133])
-	by mail.maildlp.com (Postfix) with ESMTPS id 55E301A016C;
-	Tue,  9 Apr 2024 09:29:58 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 8CEAC18007D;
+	Tue,  9 Apr 2024 09:30:00 +0800 (CST)
 Received: from huawei.com (10.67.174.28) by kwepemd200013.china.huawei.com
  (7.221.188.133) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.28; Tue, 9 Apr
- 2024 09:29:57 +0800
+ 2024 09:29:59 +0800
 From: Liao Chang <liaochang1@huawei.com>
 To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 	<oliver.upton@linux.dev>, <james.morse@arm.com>, <suzuki.poulose@arm.com>,
@@ -41,9 +41,9 @@ To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 	<reijiw@google.com>, <akihiko.odaki@daynix.com>, <ruanjinjie@huawei.com>
 CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
 	<kvmarm@lists.linux.dev>
-Subject: [PATCH 2/9] arm64/cpufeature: Detect PE support for FEAT_NMI
-Date: Tue, 9 Apr 2024 01:23:37 +0000
-Message-ID: <20240409012344.3194724-3-liaochang1@huawei.com>
+Subject: [PATCH 4/9] arm64/cpufeature: Simplify detect PE support for FEAT_NMI
+Date: Tue, 9 Apr 2024 01:23:39 +0000
+Message-ID: <20240409012344.3194724-5-liaochang1@huawei.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240409012344.3194724-1-liaochang1@huawei.com>
 References: <20240409012344.3194724-1-liaochang1@huawei.com>
@@ -58,172 +58,47 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
  kwepemd200013.china.huawei.com (7.221.188.133)
 
-From: Mark Brown <broonie@kernel.org>
+From: Jinjie Ruan <ruanjinjie@huawei.com>
 
-Use of FEAT_NMI requires that all the PEs in the system and the GIC have
-NMI support. This patch implements the PE part of that detection.
+Simplify the Non-maskable Interrupts feature implementation with
+ARM64_CPUID_FIELDS macro.
 
-In order to avoid problematic interactions between real and pseudo NMIs
-we disable the architected feature if the user has enabled pseudo NMIs
-on the command line. If this is done on a system where support for the
-architected feature is detected then a warning is printed during boot in
-order to help users spot what is likely to be a misconfiguration.
-
-In order to allow KVM to offer the feature to guests even if pseudo NMIs
-are in use by the host we have a separate feature for the raw feature
-which is used in KVM.
-
-Signed-off-by: Mark Brown <broonie@kernel.org>
+Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
 ---
- arch/arm64/include/asm/cpufeature.h |  6 +++
- arch/arm64/kernel/cpufeature.c      | 66 ++++++++++++++++++++++++++++-
- arch/arm64/tools/cpucaps            |  2 +
- 3 files changed, 73 insertions(+), 1 deletion(-)
+ arch/arm64/kernel/cpufeature.c | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 8b904a757bd3..dc8b2d0d3763 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -800,6 +800,12 @@ static __always_inline bool system_uses_irq_prio_masking(void)
- 	return alternative_has_cap_unlikely(ARM64_HAS_GIC_PRIO_MASKING);
- }
- 
-+static __always_inline bool system_uses_nmi(void)
-+{
-+	return IS_ENABLED(CONFIG_ARM64_NMI) &&
-+		cpus_have_const_cap(ARM64_USES_NMI);
-+}
-+
- static inline bool system_supports_mte(void)
- {
- 	return alternative_has_cap_unlikely(ARM64_MTE);
 diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 56583677c1f2..fb9e52c84fda 100644
+index fb9e52c84fda..99c3bc74008d 100644
 --- a/arch/arm64/kernel/cpufeature.c
 +++ b/arch/arm64/kernel/cpufeature.c
-@@ -85,6 +85,7 @@
- #include <asm/kvm_host.h>
- #include <asm/mmu_context.h>
- #include <asm/mte.h>
-+#include <asm/nmi.h>
- #include <asm/processor.h>
- #include <asm/smp.h>
- #include <asm/sysreg.h>
-@@ -291,6 +292,7 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
- };
- 
- static const struct arm64_ftr_bits ftr_id_aa64pfr1[] = {
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_NMI_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SME),
- 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_SME_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_MPAM_frac_SHIFT, 4, 0),
-@@ -1076,9 +1078,11 @@ static void init_32bit_cpu_features(struct cpuinfo_32bit *info)
- 	init_cpu_ftr_reg(SYS_MVFR2_EL1, info->reg_mvfr2);
- }
- 
--#ifdef CONFIG_ARM64_PSEUDO_NMI
-+#if IS_ENABLED(CONFIG_ARM64_PSEUDO_NMI) || IS_ENABLED(CONFIG_ARM64_NMI)
- static bool enable_pseudo_nmi;
-+#endif
- 
-+#ifdef CONFIG_ARM64_PSEUDO_NMI
- static int __init early_enable_pseudo_nmi(char *p)
- {
- 	return kstrtobool(p, &enable_pseudo_nmi);
-@@ -2263,6 +2267,41 @@ static bool has_gic_prio_relaxed_sync(const struct arm64_cpu_capabilities *entry
- }
- #endif
- 
-+#ifdef CONFIG_ARM64_NMI
-+static bool use_nmi(const struct arm64_cpu_capabilities *entry, int scope)
-+{
-+	if (!has_cpuid_feature(entry, scope))
-+		return false;
-+
-+	/*
-+	 * Having both real and pseudo NMIs enabled simultaneously is
-+	 * likely to cause confusion.  Since pseudo NMIs must be
-+	 * enabled with an explicit command line option, if the user
-+	 * has set that option on a system with real NMIs for some
-+	 * reason assume they know what they're doing.
-+	 */
-+	if (IS_ENABLED(CONFIG_ARM64_PSEUDO_NMI) && enable_pseudo_nmi) {
-+		pr_info("Pseudo NMI enabled, not using architected NMI\n");
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+static void nmi_enable(const struct arm64_cpu_capabilities *__unused)
-+{
-+	/*
-+	 * Enable use of NMIs controlled by ALLINT, SPINTMASK should
-+	 * be clear by default but make it explicit that we are using
-+	 * this mode.  Ensure that ALLINT is clear first in order to
-+	 * avoid leaving things masked.
-+	 */
-+	_allint_clear();
-+	sysreg_clear_set(sctlr_el1, SCTLR_EL1_SPINTMASK, SCTLR_EL1_NMI);
-+	isb();
-+}
-+#endif
-+
- #ifdef CONFIG_ARM64_BTI
- static void bti_enable(const struct arm64_cpu_capabilities *__unused)
- {
-@@ -2861,6 +2900,31 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.matches = has_nv1,
- 		ARM64_CPUID_FIELDS_NEG(ID_AA64MMFR4_EL1, E2H0, NI_NV1)
+@@ -2905,24 +2905,16 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.desc = "Non-maskable Interrupts present",
+ 		.capability = ARM64_HAS_NMI,
+ 		.type = ARM64_CPUCAP_BOOT_CPU_FEATURE,
+-		.sys_reg = SYS_ID_AA64PFR1_EL1,
+-		.sign = FTR_UNSIGNED,
+-		.field_pos = ID_AA64PFR1_EL1_NMI_SHIFT,
+-		.field_width = 4,
+-		.min_field_value = ID_AA64PFR1_EL1_NMI_IMP,
+ 		.matches = has_cpuid_feature,
++		ARM64_CPUID_FIELDS(ID_AA64PFR1_EL1, NMI, IMP)
  	},
-+#ifdef CONFIG_ARM64_NMI
-+	{
-+		.desc = "Non-maskable Interrupts present",
-+		.capability = ARM64_HAS_NMI,
-+		.type = ARM64_CPUCAP_BOOT_CPU_FEATURE,
-+		.sys_reg = SYS_ID_AA64PFR1_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64PFR1_EL1_NMI_SHIFT,
-+		.field_width = 4,
-+		.min_field_value = ID_AA64PFR1_EL1_NMI_IMP,
-+		.matches = has_cpuid_feature,
-+	},
-+	{
-+		.desc = "Non-maskable Interrupts enabled",
-+		.capability = ARM64_USES_NMI,
-+		.type = ARM64_CPUCAP_BOOT_CPU_FEATURE,
-+		.sys_reg = SYS_ID_AA64PFR1_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64PFR1_EL1_NMI_SHIFT,
-+		.field_width = 4,
-+		.min_field_value = ID_AA64PFR1_EL1_NMI_IMP,
-+		.matches = use_nmi,
-+		.cpu_enable = nmi_enable,
-+	},
-+#endif
+ 	{
+ 		.desc = "Non-maskable Interrupts enabled",
+ 		.capability = ARM64_USES_NMI,
+ 		.type = ARM64_CPUCAP_BOOT_CPU_FEATURE,
+-		.sys_reg = SYS_ID_AA64PFR1_EL1,
+-		.sign = FTR_UNSIGNED,
+-		.field_pos = ID_AA64PFR1_EL1_NMI_SHIFT,
+-		.field_width = 4,
+-		.min_field_value = ID_AA64PFR1_EL1_NMI_IMP,
+ 		.matches = use_nmi,
+ 		.cpu_enable = nmi_enable,
++		ARM64_CPUID_FIELDS(ID_AA64PFR1_EL1, NMI, IMP)
+ 	},
+ #endif
  	{},
- };
- 
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 62b2838a231a..bb62c487ef99 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -43,6 +43,7 @@ HAS_LPA2
- HAS_LSE_ATOMICS
- HAS_MOPS
- HAS_NESTED_VIRT
-+HAS_NMI
- HAS_PAN
- HAS_S1PIE
- HAS_RAS_EXTN
-@@ -71,6 +72,7 @@ SPECTRE_BHB
- SSBS
- SVE
- UNMAP_KERNEL_AT_EL0
-+USES_NMI
- WORKAROUND_834220
- WORKAROUND_843419
- WORKAROUND_845719
 -- 
 2.34.1
 
