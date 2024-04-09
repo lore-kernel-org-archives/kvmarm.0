@@ -1,28 +1,29 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D443A1A2
-	for <kvmarm@lists.linux.dev>; Tue,  9 Apr 2024 01:29:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D818C3A1CF
+	for <kvmarm@lists.linux.dev>; Tue,  9 Apr 2024 01:29:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712626201; cv=none; b=skSiw6g0WeudaxVn+Tv+TEm0oYqA9sFOc/x/Ty8DLdiV/I6BIr4pSTmg5lf9Ej0HrIgjwnbN/f6YThCLBM2XxZW6I+E18h2+giDqnkUv4wuK6kUzdbCjExgozrOgv59EjIRGhIk4I27Aebuk4Bmrt80UeeUbuEzlGpWm1zMTTU0=
+	t=1712626202; cv=none; b=EG3c7iP4tc3Of6VcTNDV6DoadaOw3xeF/gRzxTWS/eyqOOeGV169LU5kfaqSAMaV0ehmZ8QB3hrbE+D5wAV6dBK9kg6byA3eg4zkBNzRNFNr/MOFTwXwG3gFDnrIKuuJHZ4tO4tALtBOFI/m+AqbXD5y9LVPo4/In8n6YRr+oB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712626201; c=relaxed/simple;
-	bh=EplAmGWlpEPUKAGd06/KPWoiuWne67+H/waOkDyvOBc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BK2A4MGdIA8nZ5woAWaoayGN6KIMUyrlKLeW8iaGMGH6AZwxUFHqKaIMD9/gJmSZd6yO7Dl7K5vNjS5Ktdr1qr5uoX7Vto1k5kAEnYPt9QtSsQScGilzGFGyWcJpAvjJWz+E9h+gZSJivW+u0RUJxfGY9vfskjGcckUFHNgkuFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+	s=arc-20240116; t=1712626202; c=relaxed/simple;
+	bh=xmdnB+OlH189zldRri5hZkoYzs160LsEOPCqB3tJe40=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Pd/ygqZp5MKNiqKjC+8e7DjG6uT2m/jadzXMkwQseuzBa9JlMNby/8Lw4eEnEqTmV2CqpyfOg+1iI9fhBxUvhrjLnbSVLxOI+klsEa5MG/B+i0Rj9oFmd9rYkDdZ7OAYqOXVHkJ4ZqHTHe9j3h8VY1kxXIxaG3a0qK96amoH/+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4VD7cZ06Csz1ymVZ;
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4VD7cZ4gqFzNnJb;
 	Tue,  9 Apr 2024 09:27:42 +0800 (CST)
 Received: from kwepemd200013.china.huawei.com (unknown [7.221.188.133])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2B2E818002D;
-	Tue,  9 Apr 2024 09:29:56 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 4240618007D;
+	Tue,  9 Apr 2024 09:29:57 +0800 (CST)
 Received: from huawei.com (10.67.174.28) by kwepemd200013.china.huawei.com
  (7.221.188.133) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.28; Tue, 9 Apr
- 2024 09:29:54 +0800
+ 2024 09:29:55 +0800
 From: Liao Chang <liaochang1@huawei.com>
 To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 	<oliver.upton@linux.dev>, <james.morse@arm.com>, <suzuki.poulose@arm.com>,
@@ -40,10 +41,12 @@ To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 	<reijiw@google.com>, <akihiko.odaki@daynix.com>, <ruanjinjie@huawei.com>
 CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
 	<kvmarm@lists.linux.dev>
-Subject: [PATCH 0/9] Rework the DAIF mask, unmask and track API
-Date: Tue, 9 Apr 2024 01:23:35 +0000
-Message-ID: <20240409012344.3194724-1-liaochang1@huawei.com>
+Subject: [PATCH 1/9] arm64/sysreg: Add definitions for immediate versions of MSR ALLINT
+Date: Tue, 9 Apr 2024 01:23:36 +0000
+Message-ID: <20240409012344.3194724-2-liaochang1@huawei.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240409012344.3194724-1-liaochang1@huawei.com>
+References: <20240409012344.3194724-1-liaochang1@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -55,78 +58,71 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
  kwepemd200013.china.huawei.com (7.221.188.133)
 
-This patch series reworks the DAIF mask, unmask, and track API for the
-upcoming FEAT_NMI extension added in Armv8.8.
+From: Mark Brown <broonie@kernel.org>
 
-As platform and virtualization[1] supports for FEAT_NMI is emerging, and
-Mark Brown's FEAT_NMI patch series[2] highlighted the need for clean up
-the existing hacking style approach about DAIF management code before
-adding NMI functionality, furthermore, we discover some subtle bugs
-during 'perf' and 'ipi_backtrace' transition from PSEUDO_NMI to
-FEAT_NMI, in summary, all of these emphasize the importance of rework.
+Encodings are provided for ALLINT which allow setting of ALLINT.ALLINT
+using an immediate rather than requiring that a register be loaded with
+the value to write. Since these don't currently fit within the scheme we
+have for sysreg generation add manual encodings like we currently do for
+other similar registers such as SVCR.
 
-This series of reworking patches follows the suggestion from Mark
-Rutland mentioned in Mark Brown's patchset. In summary, he think the
-better way for DAIF manangement look likes as following:
+Since it is required that these immediate versions be encoded with xzr
+as the source register provide asm wrapper which ensure this is the
+case.
 
-(a) Adding entry-specific helpers to manipulate abstract exception masks
-    covering DAIF + PMR + ALLINT. Those need unmask-at-entry and
-    mask-at-exit behaviour, and today only need to manage DAIF + PMR.
-
-    It should be possible to do this ahead of ALLINT / NMI support.
-
-(b) Adding new "logical exception mask" helpers that treat DAIF + PMR +
-    ALLINT as separate elements. 
-
-This patches cherry-pick a part of Mark Brown' FEAT_NMI series, in order
-to pass compilation and basic testing, includes perf and ipi_backtrace.
-
-[1] https://lore.kernel.org/all/20240407081733.3231820-1-ruanjinjie@huawei.com/
-[2] https://lore.kernel.org/linux-arm-kernel/Y4sH5qX5bK9xfEBp@lpieralisi/
-
-Jinjie Ruan (1):
-  arm64/cpufeature: Simplify detect PE support for FEAT_NMI
-
-Liao Chang (5):
-  arm64/cpufeature: Use alternatives to check enabled ARM64_HAS_NMI
-    feature
-  arm64: daifflags: Add logical exception masks covering DAIF + PMR +
-    ALLINT
-  arm64: Unify exception masking at entry and exit of exception
-  arm64: Deprecate old local_daif_{mask,save,restore}
-  irqchip/gic-v3: Improve the maintainability of NMI masking in GIC
-    driver
-
-Mark Brown (3):
-  arm64/sysreg: Add definitions for immediate versions of MSR ALLINT
-  arm64/cpufeature: Detect PE support for FEAT_NMI
-  arm64/nmi: Add Kconfig for NMI
-
- arch/arm64/Kconfig                   |  17 ++
- arch/arm64/include/asm/cpufeature.h  |   6 +
- arch/arm64/include/asm/daifflags.h   | 296 ++++++++++++++++++++++-----
- arch/arm64/include/asm/nmi.h         |  27 +++
- arch/arm64/include/asm/sysreg.h      |   2 +
- arch/arm64/include/uapi/asm/ptrace.h |   1 +
- arch/arm64/kernel/acpi.c             |  10 +-
- arch/arm64/kernel/cpufeature.c       |  58 +++++-
- arch/arm64/kernel/debug-monitors.c   |   7 +-
- arch/arm64/kernel/entry-common.c     |  96 +++++----
- arch/arm64/kernel/entry.S            |   2 -
- arch/arm64/kernel/hibernate.c        |   6 +-
- arch/arm64/kernel/irq.c              |   2 +-
- arch/arm64/kernel/machine_kexec.c    |   2 +-
- arch/arm64/kernel/setup.c            |   2 +-
- arch/arm64/kernel/smp.c              |   6 +-
- arch/arm64/kernel/suspend.c          |   6 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c      |   6 +-
- arch/arm64/kvm/hyp/vhe/switch.c      |   4 +-
- arch/arm64/mm/mmu.c                  |   6 +-
- arch/arm64/tools/cpucaps             |   2 +
- drivers/irqchip/irq-gic-v3.c         |   6 +-
- 22 files changed, 438 insertions(+), 132 deletions(-)
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+ arch/arm64/include/asm/nmi.h    | 27 +++++++++++++++++++++++++++
+ arch/arm64/include/asm/sysreg.h |  2 ++
+ 2 files changed, 29 insertions(+)
  create mode 100644 arch/arm64/include/asm/nmi.h
 
+diff --git a/arch/arm64/include/asm/nmi.h b/arch/arm64/include/asm/nmi.h
+new file mode 100644
+index 000000000000..0c566c649485
+--- /dev/null
++++ b/arch/arm64/include/asm/nmi.h
+@@ -0,0 +1,27 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2022 ARM Ltd.
++ */
++#ifndef __ASM_NMI_H
++#define __ASM_NMI_H
++
++#ifndef __ASSEMBLER__
++
++#include <linux/cpumask.h>
++
++extern bool arm64_supports_nmi(void);
++
++#endif /* !__ASSEMBLER__ */
++
++static __always_inline void _allint_clear(void)
++{
++	asm volatile(__msr_s(SYS_ALLINT_CLR, "xzr"));
++}
++
++static __always_inline void _allint_set(void)
++{
++	asm volatile(__msr_s(SYS_ALLINT_SET, "xzr"));
++}
++
++#endif
++
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 9e8999592f3a..b105773c57ca 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -167,6 +167,8 @@
+  * System registers, organised loosely by encoding but grouped together
+  * where the architected name contains an index. e.g. ID_MMFR<n>_EL1.
+  */
++#define SYS_ALLINT_CLR			sys_reg(0, 1, 4, 0, 0)
++#define SYS_ALLINT_SET			sys_reg(0, 1, 4, 1, 0)
+ #define SYS_SVCR_SMSTOP_SM_EL0		sys_reg(0, 3, 4, 2, 3)
+ #define SYS_SVCR_SMSTART_SM_EL0		sys_reg(0, 3, 4, 3, 3)
+ #define SYS_SVCR_SMSTOP_SMZA_EL0	sys_reg(0, 3, 4, 6, 3)
 -- 
 2.34.1
 
