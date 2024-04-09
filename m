@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A1D8156C46;
-	Tue,  9 Apr 2024 17:55:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972FB156C60;
+	Tue,  9 Apr 2024 17:55:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712685323; cv=none; b=smTw2cO44G2rHWAGV3wJHCmiTrYMfW/EfF/nl0TFxPKONEsyfrDd1YREXRCFjHV2iFSaPPsCmKCIhLp0MoZmXzSC6BLG1H6LDXKeZrd6OXUBHOKNotw19k6dc75LpmIUXmnrhkalHC46/RXcfvODJZzNMEpdhzonfyk69ZNyI1Y=
+	t=1712685323; cv=none; b=XzrN8OYOgd6HUXEyHSgUpyRRNUPrAnKFbrl0IgpsKd+yfXnb7DjuiRhWYFbCe/BFiHHs3XDAhLNYyOjFFYThVxA9QfiKXpLYQ1lz6nOdSJdnS/sJCzhgUjPaASEW01XAcqcE8PoOmx23CmmlYlAN6pGkEyXnEURtMTrG/PlixBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712685323; c=relaxed/simple;
-	bh=vM88FikSoeAlBCuunDGGgJ1XaOo25K8WHn0fzeF0mlM=;
+	bh=DtLBAgwPtWAKpf1EYrNmDi6hFVchmXk/wLqQRgI/s2g=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RvFYoqFc7FlqAw7VUoEgP3PCkXFll26b6n2vDRP3lk0rz1eWdHD0nIvCc98smbvIA1jC1hIGT/WNHstYvENNFm7LfUAp5eYbFQlz/PaD46/5Y8+lrpVOf00V7kRLRYE7Rj1zZcJXi5stDHNviK8NMUHVPda9Q6zMt1ol0/laaPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eLFWRUg5; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=scnxiM1peY7kwztbm8ObPRUB2w03MjI9czVk5Bd/PVjKdBhYTElVv8pM/AqrUD5f6+fucfQtgo45o79cGoyvGLSJFoEm+qpDviNo9tQR1IoE8CIat77YHlR9CP0ERIVJcGlVhjRNI2lN6WSDlvR9saW0vW6E/YNMWiBVGcdzc6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fIbgUKNI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eLFWRUg5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A45EEC433A6;
-	Tue,  9 Apr 2024 17:55:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fIbgUKNI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D08DC43394;
+	Tue,  9 Apr 2024 17:55:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712685322;
-	bh=vM88FikSoeAlBCuunDGGgJ1XaOo25K8WHn0fzeF0mlM=;
+	s=k20201202; t=1712685323;
+	bh=DtLBAgwPtWAKpf1EYrNmDi6hFVchmXk/wLqQRgI/s2g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eLFWRUg5fQvKTSCh3P2AFUD5sh/HBPWSzf/VIosbZkZkyLHOBs3dJ+O0ICIux0CPr
-	 J3/BWYVKhkkjZIqaBvTeemvKAlouRdIkZGg5TCUGY7I3sTxI1TRuZOkZrKY5D3QJm0
-	 mMphQq0fP+ACj3Umbm+a5RfmZto6ZPTGNxuILfSvEdFCLrLvJm3Bf6y1mQyVpqAWva
-	 S9sHllG3/TVYC2TvwmlJTkJC+XtVbRNycwFyJ4f8DFVh4tJ5k3DMry9/uv9XW53Po6
-	 DpC9pGBYbNWUmyEmyLHAjBJ87bH3/VwjMVsyGXUjHlXLoCaxbVouUzKF1a2wXXsXA7
-	 F4KSHZrIBBxxw==
+	b=fIbgUKNIQA+KGA10rpCp+/4ymvfgXBEybzXP5UNTUCWSioXEz5Z7cztk1ybeXfHMj
+	 arioX/oGaKcZy/5m61rg1uH1jY/NKBIrk2IsNXJp37l/qJvFbN2uEp4sp/SARGJmXk
+	 uKGKGscTwTilXiMMRZjK534p4s4RTIlI86PYFrfdYZQykjaPSUDdNiDP/1ZaMsahef
+	 Iz4c+tlnUj/t/zeOts9yHLs/OtEAKwASlDGwRKaL3i9C137J3WSBr6pn+g9Y6dgLxe
+	 OCCQgvUJS4y/RB0/vL9Wku+tx4iYDy0N439E+InRxyPlNSKiQcnlwjELl44euINlvW
+	 /ft+HPZYXdzZw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ruFgm-002szC-Uv;
+	id 1ruFgn-002szC-Dt;
 	Tue, 09 Apr 2024 18:55:21 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH 06/16] KVM: arm64: nv: Handle EL2 Stage-1 TLB invalidation
-Date: Tue,  9 Apr 2024 18:54:38 +0100
-Message-Id: <20240409175448.3507472-7-maz@kernel.org>
+Subject: [PATCH 08/16] KVM: arm64: nv: Handle TLBI VMALLS12E1{,IS} operations
+Date: Tue,  9 Apr 2024 18:54:40 +0100
+Message-Id: <20240409175448.3507472-9-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240409175448.3507472-1-maz@kernel.org>
 References: <20240409175448.3507472-1-maz@kernel.org>
@@ -61,23 +61,14 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Due to the way FEAT_NV2 suppresses traps when accessing EL2
-system registers, we can't track when the guest changes its
-HCR_EL2.TGE setting. This means we always trap EL1 TLBIs,
-even if they don't affect any L2 guest.
+Emulating TLBI VMALLS12E1* results in tearing down all the shadow
+S2 PTs that match the current VMID, since our shadow S2s are just
+some form of SW-managed TLBs. That teardown itself results in a
+full TLB invalidation for both S1 and S2.
 
-Given that invalidating the EL2 TLBs doesn't require any messing
-with the shadow stage-2 page-tables, we can simply emulate the
-instructions early and return directly to the guest.
-
-This is conditioned on the instruction being an EL1 one and
-the guest's HCR_EL2.{E2H,TGE} being {1,1} (indicating that
-the instruction targets the EL2 S1 TLBs), or the instruction
-being one of the EL2 ones (which are not ambiguous).
-
-EL1 TLBIs issued with HCR_EL2.{E2H,TGE}={1,0} are not handled
-here, and cause a full exit so that they can be handled in
-the context of a VMID.
+This can result in over-invalidation if two vcpus use the same VMID
+to tag private S2 PTs, but this is still correct from an architecture
+perspective.
 
 Co-developed-by: Jintack Lim <jintack.lim@linaro.org>
 Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
@@ -85,170 +76,85 @@ Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h | 55 +++++++++++++++++++++++++++++
- arch/arm64/include/asm/sysreg.h     | 17 +++++++++
- arch/arm64/kvm/hyp/vhe/switch.c     | 51 +++++++++++++++++++++++++-
- 3 files changed, 122 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 51 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index afb3d0689e17..136c878b742e 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -116,6 +116,61 @@ extern void kvm_nested_s2_wp(struct kvm *kvm);
- extern void kvm_nested_s2_unmap(struct kvm *kvm);
- extern void kvm_nested_s2_flush(struct kvm *kvm);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 4a0317883cd0..4be090ceb2ba 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2728,6 +2728,22 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
+ };
  
-+static inline bool kvm_supported_tlbi_s1e1_op(struct kvm_vcpu *vpcu, u32 instr)
++static bool kvm_supported_tlbi_s12_op(struct kvm_vcpu *vpcu, u32 instr)
 +{
 +	struct kvm *kvm = vpcu->kvm;
 +	u8 CRm = sys_reg_CRm(instr);
 +
-+	if (!(sys_reg_Op0(instr) == TLBI_Op0 &&
-+	      sys_reg_Op1(instr) == TLBI_Op1_EL1))
-+		return false;
-+
-+	if (!(sys_reg_CRn(instr) == TLBI_CRn_XS ||
-+	      (sys_reg_CRn(instr) == TLBI_CRn_nXS &&
-+	       kvm_has_feat(kvm, ID_AA64ISAR1_EL1, XS, IMP))))
++	if (sys_reg_CRn(instr) == TLBI_CRn_nXS &&
++	    !kvm_has_feat(kvm, ID_AA64ISAR1_EL1, XS, IMP))
 +		return false;
 +
 +	if (CRm == TLBI_CRm_nROS &&
 +	    !kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
 +		return false;
 +
-+	if ((CRm == TLBI_CRm_RIS || CRm == TLBI_CRm_ROS ||
-+	     CRm == TLBI_CRm_RNS) &&
-+	    !kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, RANGE))
++	return true;
++}
++
+ /* Only defined here as this is an internal "abstraction" */
+ union tlbi_info {
+ 	struct {
+@@ -2745,6 +2761,38 @@ union tlbi_info {
+ 	} va;
+ };
+ 
++static void s2_mmu_unmap_stage2_range(struct kvm_s2_mmu *mmu,
++				      const union tlbi_info *info)
++{
++	kvm_unmap_stage2_range(mmu, info->range.start, info->range.size);
++}
++
++static bool handle_vmalls12e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++				const struct sys_reg_desc *r)
++{
++	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
++	u64 limit, vttbr;
++
++	if (!kvm_supported_tlbi_s12_op(vcpu, sys_encoding)) {
++		kvm_inject_undefined(vcpu);
 +		return false;
++	}
++
++	vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
++	limit = BIT_ULL(kvm_get_pa_bits(vcpu->kvm));
++
++	kvm_s2_mmu_iterate_by_vmid(vcpu->kvm, get_vmid(vttbr),
++				   &(union tlbi_info) {
++					   .range = {
++						   .start = 0,
++						   .size = limit,
++					   },
++				   },
++				   s2_mmu_unmap_stage2_range);
 +
 +	return true;
 +}
 +
-+static inline bool kvm_supported_tlbi_s1e2_op(struct kvm_vcpu *vpcu, u32 instr)
-+{
-+	struct kvm *kvm = vpcu->kvm;
-+	u8 CRm = sys_reg_CRm(instr);
+ static void s2_mmu_tlbi_s1e1(struct kvm_s2_mmu *mmu,
+ 			     const union tlbi_info *info)
+ {
+@@ -2818,6 +2866,9 @@ static struct sys_reg_desc sys_insn_descs[] = {
+ 	SYS_INSN(TLBI_VAAE1, handle_tlbi_el1),
+ 	SYS_INSN(TLBI_VALE1, handle_tlbi_el1),
+ 	SYS_INSN(TLBI_VAALE1, handle_tlbi_el1),
 +
-+	if (!(sys_reg_Op0(instr) == TLBI_Op0 &&
-+	      sys_reg_Op1(instr) == TLBI_Op1_EL2))
-+		return false;
-+
-+	if (!(sys_reg_CRn(instr) == TLBI_CRn_XS ||
-+	      (sys_reg_CRn(instr) == TLBI_CRn_nXS &&
-+	       kvm_has_feat(kvm, ID_AA64ISAR1_EL1, XS, IMP))))
-+		return false;
-+
-+	if (CRm == TLBI_CRm_IPAIS || CRm == TLBI_CRm_IPAONS)
-+		return false;
-+
-+	if (CRm == TLBI_CRm_nROS &&
-+	    !kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
-+		return false;
-+
-+	if ((CRm == TLBI_CRm_RIS || CRm == TLBI_CRm_ROS ||
-+	     CRm == TLBI_CRm_RNS) &&
-+	    !kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, RANGE))
-+		return false;
-+
-+	return true;
-+}
-+
- int kvm_init_nv_sysregs(struct kvm *kvm);
++	SYS_INSN(TLBI_VMALLS12E1IS, handle_vmalls12e1is),
++	SYS_INSN(TLBI_VMALLS12E1, handle_vmalls12e1is),
+ };
  
- #endif /* __ARM64_KVM_NESTED_H */
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 9e8999592f3a..b15194f79273 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -654,6 +654,23 @@
- #define OP_AT_S12E0W	sys_insn(AT_Op0, 4, AT_CRn, 8, 7)
- 
- /* TLBI instructions */
-+#define TLBI_Op0	1
-+
-+#define TLBI_Op1_EL1	0	/* Accessible from EL1 or higher */
-+#define TLBI_Op1_EL2	4	/* Accessible from EL2 or higher */
-+
-+#define TLBI_CRn_XS	8	/* Extra Slow (the common one) */
-+#define TLBI_CRn_nXS	9	/* not Extra Slow (which nobody uses)*/
-+
-+#define TLBI_CRm_IPAIS	0	/* S2 Inner-Shareable */
-+#define TLBI_CRm_nROS	1	/* non-Range, Outer-Sharable */
-+#define TLBI_CRm_RIS	2	/* Range, Inner-Sharable */
-+#define TLBI_CRm_nRIS	3	/* non-Range, Inner-Sharable */
-+#define TLBI_CRm_IPAONS	4	/* S2 Outer and Non-Shareable */
-+#define TLBI_CRm_ROS	5	/* Range, Outer-Sharable */
-+#define TLBI_CRm_RNS	6	/* Range, Non-Sharable */
-+#define TLBI_CRm_nRNS	7	/* non-Range, Non-Sharable */
-+
- #define OP_TLBI_VMALLE1OS		sys_insn(1, 0, 8, 1, 0)
- #define OP_TLBI_VAE1OS			sys_insn(1, 0, 8, 1, 1)
- #define OP_TLBI_ASIDE1OS		sys_insn(1, 0, 8, 1, 2)
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 1581df6aec87..e3ded0ba8e9c 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -173,10 +173,59 @@ void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu)
- 	__vcpu_put_switch_sysregs(vcpu);
- }
- 
-+static bool kvm_hyp_handle_tlbi_el2(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	int ret = -EINVAL;
-+	u32 instr;
-+	u64 val;
-+
-+	/*
-+	 * Ideally, we would never trap on EL2 S1 TLB invalidations using
-+	 * the EL1 instructions when the guest's HCR_EL2.{E2H,TGE}=={1,1}.
-+	 * But "thanks" to FEAT_NV2, we don't trap writes to HCR_EL2,
-+	 * meaning that we can't track changes to the virtual TGE bit. So we
-+	 * have to leave HCR_EL2.TTLB set on the host. Oopsie...
-+	 *
-+	 * Try and handle these invalidation as quickly as possible, without
-+	 * fully exiting. Note that we don't need to consider any forwarding
-+	 * here, as having E2H+TGE set is the very definition of being
-+	 * InHost.
-+	 *
-+	 * For the lesser hypervisors out there that have failed to get on
-+	 * with the VHE program, we can also handle the nVHE style of EL2
-+	 * invalidation.
-+	 */
-+	if (!(is_hyp_ctxt(vcpu)))
-+		return false;
-+
-+	instr = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
-+	val = vcpu_get_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu));
-+
-+	if ((kvm_supported_tlbi_s1e1_op(vcpu, instr) &&
-+	     vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)) ||
-+	    kvm_supported_tlbi_s1e2_op (vcpu, instr))
-+		ret = __kvm_tlbi_s1e2(NULL, val, instr);
-+
-+	if (ret)
-+		return false;
-+
-+	__kvm_skip_instr(vcpu);
-+
-+	return true;
-+}
-+
-+static bool kvm_hyp_handle_sysreg_vhe(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	if (kvm_hyp_handle_tlbi_el2(vcpu, exit_code))
-+		return true;
-+
-+	return kvm_hyp_handle_sysreg(vcpu, exit_code);
-+}
-+
- static const exit_handler_fn hyp_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]		= NULL,
- 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
--	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg,
-+	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg_vhe,
- 	[ESR_ELx_EC_SVE]		= kvm_hyp_handle_fpsimd,
- 	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
- 	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
+ static const struct sys_reg_desc *first_idreg;
 -- 
 2.39.2
 
