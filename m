@@ -1,185 +1,156 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2213613D8BE
-	for <kvmarm@lists.linux.dev>; Tue,  9 Apr 2024 16:15:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A27156862;
+	Tue,  9 Apr 2024 17:55:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712679328; cv=none; b=e2lUd58h7spNMnVrVtU1w1/V91lmQJE+44LXiaIF3KOGkGBp0ED/AiGgIkkpAltcfRrMWnAWgAV9Jhw+y+0Fgga+ZNXYzUVDPJfcXOdhWLfMtpKDImowpYRjBXr7Os1ZhTvnpr5reMgDtPzDLPPTlmFToXleD4/nH/95RqzEfvw=
+	t=1712685322; cv=none; b=FHwQE0Y/mAV2UYRmCgCxsuSKYtqE10FEkolDDwXcVmWR0o5gN4kBKMmRyKfkjt38wAXSHFz2MofL1KD+qADtaEyJ2D3t0lKXQKjI00NSFR0hYGJ0TElVgoCg5ef+MBoNFdbZieUpsZJ8R4RFS/pEV7QPRFk9J4wWLhhIqtDOYik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712679328; c=relaxed/simple;
-	bh=X2xmHqO8gXKhPjxwaeID/utS/X/th0bZq4WUqjIW2sM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sliRqhR/A4nVTxC6XDaTOQ6xg711UD13GdIbyr29Bt4nK0TE7QUjpU9LSaWIwV6R5QQ7l85Nc/aGFl6ENI1q12oA7Mv9SgsLtYiFfFsMm1vSCfb7Lq1Ki4E2JOcLkajiEymVMOA2qNGjXgpLDlf4vbWG8SP7d+HPIJjihg0w/RU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dleumD3G; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1712685322; c=relaxed/simple;
+	bh=HiPI0zICqTXskNQRPdZZg9jSvoMGVkNmobN4r2vLjJw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XEex++lF9gu/YP8T/hH3tM8SDdFCPOKGB1aiAMaZdD2Agnb3N7fpx73LjCcXdGpcDkxbK5aeMMswxtxHNn3bhk0GK2QdjB6EpFMdA8VgVAoULsQ2VBNS4ZY4fYf4MJ1DtI0/goXBP/77K1o2oJDrpfuz5D5MIY5EJG6RjRkd+Dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i1JU6vVC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dleumD3G"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-416920b1a2aso11568795e9.2
-        for <kvmarm@lists.linux.dev>; Tue, 09 Apr 2024 09:15:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712679324; x=1713284124; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NdZtD6irNdlXhmhm1A43aB93TmxueujQEV4FlCrB2O0=;
-        b=dleumD3G+rf7ekRAhcRiuNcFoklkU6vAWdsSF96gZiNCaN6WLUNbq0FnNoCsB5PL4N
-         mr31rkp+ztPRYzQlK/nmGSsLrchuahXWqDAq+9DTcuxwNAaovCHggG8kIsTwV/CVbrXi
-         gQJ6COUqNp9XfqsgfoA+ilw8qXpruk57zuLtEvbiFk4jdUaS1E0IAKk0w7yobvouA1FO
-         dGel/e6srp4RGLuay28l4YQL4htWItpptt/4uWtCX92lf+RxfxQBYQznu78lxjP5SSYf
-         qjy5wpbHgKWsyQkUikEkf11dQSLCdNT8dcJz0I4n9aceCkpNR0KSscQ0sJ38e6j9Stv9
-         gklA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712679324; x=1713284124;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NdZtD6irNdlXhmhm1A43aB93TmxueujQEV4FlCrB2O0=;
-        b=anBD51/nlDb6WDCpDueZRpIjSXJescxvhdw7vYaeeAAEcIvAyg3h8niPRbRt8z4tAL
-         bCPVFsU+EkyUCIa0aZfLEX8ZQdwthVkcRSYn/jJGcp5qxQfipTU+vT7rhMRAskFMSvvn
-         97VdprM/Gftk98Hs0Rv5oqvfSZL1YIGww9E6ynmB3o9Z5Kn1rkaSPDTkOIo819o0Mp8L
-         PByG/shbheCMVz19z4aV/rx4BC+cDlTla9cIP1OBNHdRoWP8ucfm3pbaGdi6eijQBv6u
-         j3llbB5SIjjFQqRmOtFHwSrpfGlLr0PH21BRbBtE4kL4fHjp+V2ZBkM3+bqdu/kQwArF
-         xfZA==
-X-Forwarded-Encrypted: i=1; AJvYcCVEgkecDpw+B/rRkvlIecXVAyFnXBQHGD+ayeA0cSXSsJVDCcjPQLhQd3c/ncRpL7YAP0cVElnJbGoOfOZyoEca9LBQiU5D
-X-Gm-Message-State: AOJu0YynYzDg85Aw+OZrckxTiUOvFtqFEti8chBoKC7CxwiT7z65p3LT
-	xV2VNdCZiGkjq2EAv1iIPRIRxQyMqpqPYBuFEBUfJzhk3B+hSYfpDziew02ixw==
-X-Google-Smtp-Source: AGHT+IGGfIBhxH5DQCjXOXjwLQSpl49ieGPZM+MwVbQZknp7RGIYrhHK/YQcv5YCidu4HTjG9iIDmQ==
-X-Received: by 2002:a5d:5185:0:b0:33d:b376:8a07 with SMTP id k5-20020a5d5185000000b0033db3768a07mr118036wrv.8.1712679324100;
-        Tue, 09 Apr 2024 09:15:24 -0700 (PDT)
-Received: from google.com (161.126.77.34.bc.googleusercontent.com. [34.77.126.161])
-        by smtp.gmail.com with ESMTPSA id z13-20020a056000110d00b0034174875850sm11895914wrw.70.2024.04.09.09.15.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Apr 2024 09:15:23 -0700 (PDT)
-Date: Tue, 9 Apr 2024 17:15:20 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org,
-	maz@kernel.org, oliver.upton@linux.dev, qperret@google.com,
-	qwandor@google.com, sudeep.holla@arm.com, suzuki.poulose@arm.com,
-	tabba@google.com, will@kernel.org, yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH] KVM: arm64: Add support for FFA_PARTITION_INFO_GET
-Message-ID: <ZhVpmF2js1NJp1qF@google.com>
-References: <20240409151908.541589-1-sebastianene@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i1JU6vVC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5364C433C7;
+	Tue,  9 Apr 2024 17:55:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712685321;
+	bh=HiPI0zICqTXskNQRPdZZg9jSvoMGVkNmobN4r2vLjJw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=i1JU6vVCXTHZJxhU6f7rwfipguTAL21syy3MQ4uE3nxO4/AEp4TCgsoUPu//WCaBP
+	 UIl3cDqJ2bQtxG3U1cjh9Y9urK9h0UcTaWiMR0uxlzRcA3W/+yCY0Ks9jssgAJxhPO
+	 Ty63HVnABzUIgUykkgVsJV7+1Ayc0msfekwRfaq78kBfG7evSrMnulk1O/ixb26B6q
+	 tfGeqCFNVEm45XNcCDbmBm1aoWN8zau6vzSkDZJYVkKOEUZe0a77knQFcd2PnR0asB
+	 pfn2HgdtoB41QLNjgz/nL6sOhYArqr4LK8Vy88b763ev3gONGHEdn7/LKjFLN9nkBS
+	 yKCZbs5lv6roA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ruFgl-002szC-LF;
+	Tue, 09 Apr 2024 18:55:19 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>
+Subject: [PATCH 00/16] KVM: arm64: nv: Shadow stage-2 page table handling
+Date: Tue,  9 Apr 2024 18:54:32 +0100
+Message-Id: <20240409175448.3507472-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240409151908.541589-1-sebastianene@google.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Seb,
+Here's another instalment of everyone's favourite "arm64 nested virt,
+one headache at a time". This time, we deal with the shadowing of the
+guest's S2 page tables.
 
-On Tue, Apr 09, 2024 at 03:19:08PM +0000, Sebastian Ene wrote:
-> Handle the FFA_PARTITION_INFO_GET host call inside the pKVM hypervisor
-> and copy the response message back to the host buffers. Save the
-> returned FF-A version as we will need it later to interpret the response
-> from the TEE.
-> 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c | 49 +++++++++++++++++++++++++++++++++++
->  1 file changed, 49 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index 320f2eaa14a9..72fc365bc7a8 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -67,6 +67,7 @@ struct kvm_ffa_buffers {
->   */
->  static struct kvm_ffa_buffers hyp_buffers;
->  static struct kvm_ffa_buffers host_buffers;
-> +static u32 ffa_version;
->  
->  static void ffa_to_smccc_error(struct arm_smccc_res *res, u64 ffa_errno)
->  {
-> @@ -640,6 +641,49 @@ static bool do_ffa_features(struct arm_smccc_res *res,
->  	return true;
->  }
->  
-> +static void do_ffa_part_get(struct arm_smccc_res *res,
-> +			    struct kvm_cpu_context *ctxt)
-> +{
-> +	DECLARE_REG(u32, uuid0, ctxt, 1);
-> +	DECLARE_REG(u32, uuid1, ctxt, 2);
-> +	DECLARE_REG(u32, uuid2, ctxt, 3);
-> +	DECLARE_REG(u32, uuid3, ctxt, 4);
-> +	DECLARE_REG(u32, flags, ctxt, 5);
-> +	u32 off, count, sz, buf_sz;
-> +
-> +	hyp_spin_lock(&host_buffers.lock);
-> +	if (!host_buffers.rx) {
-> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> +		goto out_unlock;
-> +	}
-> +
-> +	arm_smccc_1_1_smc(FFA_PARTITION_INFO_GET, uuid0, uuid1,
-> +			  uuid2, uuid3, flags, 0, 0,
-> +			  res);
-> +
-> +	if (res->a0 != FFA_SUCCESS)
-> +		goto out_unlock;
-> +
-> +	count = res->a2;
-> +	if (!count)
-> +		goto out_unlock;
+So here's the 10000m (approximately 30000ft for those of you stuck
+with the wrong units) view of what this is doing:
 
-Looking at the table 13.34, it seems what's in "count" depends on the flag.
-Shouldn't we check its value, and only memcpy into the host buffers if the flag
-is 0?
+- for each {VMID,VTTBR,VTCR} tuple the guest uses, we use a separate
+  shadow s2_mmu context. This context has its own "real" VMID and a
+  set of page tables that are the combination of the guest's S2 and
+  the host S2, built dynamically one fault at a time.
 
-> +
-> +	if (ffa_version > FFA_VERSION_1_0) {
-> +		buf_sz = sz = res->a3;
-> +		if (sz > sizeof(struct ffa_partition_info))
-> +			buf_sz = sizeof(struct ffa_partition_info);
+- these shadow S2 contexts are ephemeral, and behave exactly as
+  TLBs. For all intent and purposes, they *are* TLBs, and we discard
+  them pretty often.
 
-What are you trying to protect against here? We have to trust EL3 anyway, (as
-other functions do).
+- TLB invalidation takes three possible paths:
 
-The WARN() could be kept though to make sure we won't overflow our buffer. But
-it could be transformed into an error? FFA_RET_ABORTED?
+  * either this is an EL2 S1 invalidation, and we directly emulate it
+    as early as possible
 
+  * or this is an EL1 S1 invalidation, and we need to apply it to the
+    shadow S2s (plural!) that match the VMID set by the L1 guest
 
-> +	} else {
-> +		/* FFA_VERSION_1_0 lacks the size in the response */
-> +		buf_sz = sz = 8;
-> +	}
-> +
-> +	WARN_ON((count - 1) * sz + buf_sz > PAGE_SIZE);
-> +	for (off = 0; off < count * sz; off += sz)
-> +		memcpy(host_buffers.rx + off, hyp_buffers.rx + off, buf_sz);
-> +out_unlock:
-> +	hyp_spin_unlock(&host_buffers.lock);
-> +}
-> +
->  bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
->  {
->  	struct arm_smccc_res res;
-> @@ -686,6 +730,9 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
->  	case FFA_MEM_FRAG_TX:
->  		do_ffa_mem_frag_tx(&res, host_ctxt);
->  		goto out_handled;
-> +	case FFA_PARTITION_INFO_GET:
-> +		do_ffa_part_get(&res, host_ctxt);
-> +		break;
->  	}
->  
->  	if (ffa_call_supported(func_id))
-> @@ -726,6 +773,8 @@ int hyp_ffa_init(void *pages)
->  	if (FFA_MAJOR_VERSION(res.a0) != 1)
->  		return -EOPNOTSUPP;
->  
-> +	ffa_version = res.a0;
-> +
->  	arm_smccc_1_1_smc(FFA_ID_GET, 0, 0, 0, 0, 0, 0, 0, &res);
->  	if (res.a0 != FFA_SUCCESS)
->  		return -EOPNOTSUPP;
-> -- 
-> 2.44.0.478.gd926399ef9-goog
-> 
+  * or finally, this is affecting S2, and we need to teardown the
+    corresponding part of the shadow S2s, which invalidates the TLBs
+
+From a quality of implementation, this series does the absolute
+minimum. In a lot of cases, we blow away all the shadow S2s without
+any discrimination. That's because we don't have a reverse mapping
+yet, so if something gets unmapped from the canonical S2 through a MMU
+notifier, things slow down significantly. At this stage, nobody should
+care.
+
+We also make some implementation choices:
+
+- no overhead for non-NV guests -- this is our #1 requirement
+
+- all the TLBIs are implemented as Inner-Shareable, no matter what the
+  guest says
+
+- we don't try to optimise for leaf invalidation at S2
+
+- we use a TTL-like mechanism to limit the over-invalidation when no
+  TTL is provided, but this is only a best effort process
+
+- range invalidation is supported
+
+- NXS operations are supported as well, and implemented as XS. Nobody
+  cares about them anyway
+
+Note that some of the patches used to carry review tags, but the
+series has had so many changes that they are not making sense anymore.
+This is based on 6.9-rc3, and has been tested on my usual M2 with the
+rest of the NV series.
+
+Christoffer Dall (2):
+  KVM: arm64: nv: Implement nested Stage-2 page table walk logic
+  KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
+
+Marc Zyngier (14):
+  KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+  KVM: arm64: nv: Handle shadow stage 2 page faults
+  KVM: arm64: nv: Add Stage-1 EL2 invalidation primitives
+  KVM: arm64: nv: Handle EL2 Stage-1 TLB invalidation
+  KVM: arm64: nv: Handle TLB invalidation targeting L2 stage-1
+  KVM: arm64: nv: Handle TLBI VMALLS12E1{,IS} operations
+  KVM: arm64: nv: Handle TLBI ALLE1{,IS} operations
+  KVM: arm64: nv: Handle TLBI IPAS2E1{,IS} operations
+  KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations
+  KVM: arm64: nv: Tag shadow S2 entries with guest's leaf S2 level
+  KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like
+    information
+  KVM: arm64: nv: Add handling of outer-shareable TLBI operations
+  KVM: arm64: nv: Add handling of range-based TLBI operations
+  KVM: arm64: nv: Add handling of NXS-flavoured TLBI operations
+
+ arch/arm64/include/asm/esr.h         |   1 +
+ arch/arm64/include/asm/kvm_asm.h     |   2 +
+ arch/arm64/include/asm/kvm_emulate.h |   1 +
+ arch/arm64/include/asm/kvm_host.h    |  41 ++
+ arch/arm64/include/asm/kvm_mmu.h     |  12 +
+ arch/arm64/include/asm/kvm_nested.h  | 127 +++++
+ arch/arm64/include/asm/sysreg.h      |  17 +
+ arch/arm64/kvm/arm.c                 |  11 +
+ arch/arm64/kvm/hyp/vhe/switch.c      |  51 +-
+ arch/arm64/kvm/hyp/vhe/tlb.c         | 147 +++++
+ arch/arm64/kvm/mmu.c                 | 219 ++++++--
+ arch/arm64/kvm/nested.c              | 767 ++++++++++++++++++++++++++-
+ arch/arm64/kvm/reset.c               |   6 +
+ arch/arm64/kvm/sys_regs.c            | 398 ++++++++++++++
+ 14 files changed, 1759 insertions(+), 41 deletions(-)
+
+-- 
+2.39.2
+
