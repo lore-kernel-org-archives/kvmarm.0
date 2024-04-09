@@ -1,163 +1,107 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D1617D094
-	for <kvmarm@lists.linux.dev>; Tue,  9 Apr 2024 11:54:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F2C1272B2;
+	Tue,  9 Apr 2024 12:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712663666; cv=none; b=sYpM3ErxzxxunpFDyHLlVWhXsydbjTAUgks6IHat3QDOCE4mSRNRHflo7fe5QAnwrXFABX7+SLXrgYFvC9sr38Bj9Q+MucJ8sYsGThXOOT3WnvC2VXjglaSvOb0HdY/kjNaFAUgdzDOF9RWgv6yl/+yJB6JAPKw1eWtxHkLYClI=
+	t=1712665733; cv=none; b=UchXxoGNuCUW79ddnLwBYXfqMzI0op/0a4N7jaoMi/AupltjiCecTMIIx+j31bQVNDjUm+/QiGeFBT14U6SwvFt63+T2sVF7JkqfOusaUmwfIU7y2mv4mUnbtlVgtbz1n1cYmRKfYcNgN5UlOe6IUqpTcLVtTP4EHTzZIopj5Pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712663666; c=relaxed/simple;
-	bh=GS8GvRJ6BaCt0o3AYCPs2XHK43ZxOxCcabg8AvfGy+U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hgXHlFFZMeguMWUwPhCpa0mI9YVq9kslYKl9792b0hplTTEBMaPVWCVyn1TjZ5Lkx4qHg4bCnKLtP7QG1oJSkB3yLjXchWeekSNFKf8l4iUHm4syxfO6EuTrRbFfuMa39oJCixOYbefqXasFliw+yHoYaqNEezOKMufaaNSgGa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SSbD7XUf; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1712665733; c=relaxed/simple;
+	bh=csEe0DfLDPV5CaaZIRbVodH4Vmp5Xy0oCrThn/A6c8k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JAU9UeliJ5OfP+ihzCUEJV6oQy6In+hbJSCg4rfcGrwXVB3rUSRUSqN34yuxkilgUi+PT8io0v+B+MYBTbvEhXaEut1wMfo/qX82MjHUeCoelNJ4fITqO0d1yMIedkPxBXtF95LL95FnG0lGk+Y4pvZfj2chitm6Wh7dM39uVcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ErMHuHY5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SSbD7XUf"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712663664;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=w0V7BJQPs63SCGjmjUhhHSoA26CNksn5Km/sWe0wY30=;
-	b=SSbD7XUfkJCviNZxIIf0P7b5s6ro2JYsDXw9fFo1KZO11Iy7VzGOgdTtLlUdsK20KE6PhY
-	dJ2e1swlsrUQujvpyyzjN9AofyRZ7zI8PIF+eHQwlN+ekStkQ0t6cmVOI3viVclavqpPK2
-	fWifqPbT/1DOOE9UYm90H2WLSI4hSjA=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-463-oz1uAZ_sP6uOTURP_PLU7w-1; Tue, 09 Apr 2024 07:54:23 -0400
-X-MC-Unique: oz1uAZ_sP6uOTURP_PLU7w-1
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-5aa22f4eab3so2453092eaf.3
-        for <kvmarm@lists.linux.dev>; Tue, 09 Apr 2024 04:54:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712663662; x=1713268462;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=w0V7BJQPs63SCGjmjUhhHSoA26CNksn5Km/sWe0wY30=;
-        b=C6HaqR6hcjmSyswrH/tKn6pl4KhyCVmtRHx/mvemAk3r48pQ91oMtY1zZiDV0/dKwK
-         Z+K6ghkm8yD9I+ppdCHlyqTNBll/IrQAzYbRySlJvZ9Up8UeJ/k3aYHla9yKkC3k1NQ5
-         PrFwoAKdoeamN9acZihpsBaHpCahcNP4KX6KTPjEGXp0759SYRSai99V4ydecUFzJI02
-         BOCreB3OJyVc2SWaZIij2DVx01FmTiLP18EHDzSbVBjoHrk+U0tRWQzT65apWqrKdfCJ
-         y+F3APa7MgMmIhdOQGwnhtCFo9X1GjjdvtGhsqVy/iZ4XW7RvOz9wx+u6OWuX7JcyftL
-         fYFw==
-X-Forwarded-Encrypted: i=1; AJvYcCXk+wHwbzO2CcLQw/g0d7grsTqelK/ijNPoE7SykJwLSk5sTQHZpA9oizFYFSgEwGuCi+arEF33tPayXG0LnY+AeONOgxo3
-X-Gm-Message-State: AOJu0Yw0kgIaRYK7CQv0YV3KYmjhNyo9QPUQYSVEu1xpzogfE0aBmyWN
-	CQn0WbQZUlB2BqS+satRWmGOKR5ZPHOEOJJfb7ppdQEO9UJdufJmfphoCMIy+T18kBxJrm7JBfb
-	ASy6Ki42H4Fgob4lJo0MwNQ7V0lbFn/8SJ61oa9dqnwDZXno+Wvn82w==
-X-Received: by 2002:a05:6820:1524:b0:5aa:377c:641d with SMTP id ay36-20020a056820152400b005aa377c641dmr6989382oob.1.1712663662290;
-        Tue, 09 Apr 2024 04:54:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEcvmCceRmvxzrkDTR2QRn8h2Ux/gr3wTqE6d0IiOiXyfjY1R5q5KrH++pZX5kiPrHqPFoJWQ==
-X-Received: by 2002:a05:6820:1524:b0:5aa:377c:641d with SMTP id ay36-20020a056820152400b005aa377c641dmr6989370oob.1.1712663662050;
-        Tue, 09 Apr 2024 04:54:22 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id bq24-20020a05622a1c1800b00434d5c93b1csm621293qtb.41.2024.04.09.04.54.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Apr 2024 04:54:21 -0700 (PDT)
-Message-ID: <9f533f4e-d703-4de7-af3f-828dc2e1be45@redhat.com>
-Date: Tue, 9 Apr 2024 13:54:18 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ErMHuHY5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A0C8C433C7;
+	Tue,  9 Apr 2024 12:28:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712665733;
+	bh=csEe0DfLDPV5CaaZIRbVodH4Vmp5Xy0oCrThn/A6c8k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ErMHuHY5IA6fjFu8AS1z7PfJmaZbZUO1TTkgjqQA+ZUw7ZRB+Rj4jOz3LRSSxS/Yq
+	 Cd/VtxRVGEaJJG2NmAYIe599HVWPbXw/+iNzh24JUp9L6Uc7C2X6CZdm7XcQBvVdN8
+	 mmcWyP+TI3bB4xjFGqUd1pmuiEwBvHg4b/ZjEdWq4lrR2ccXvhXeG9CTafyT6Prxix
+	 KDexim+1aK9ZYzK/sU2/J53d4Th5huRE5K8cVsSlJv/WOR6MNgMuOfHBaDMX1r/a98
+	 i3N1a0mg2e6guLS2P32NdZ1Z6GvjvCof1ZxuLt1QkYnptR6QT1/zoyOu1j6rGtwTwr
+	 ZeuIRrecRqwKA==
+Date: Tue, 9 Apr 2024 13:28:42 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Liao Chang <liaochang1@huawei.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, tglx@linutronix.de, mark.rutland@arm.com,
+	ardb@kernel.org, anshuman.khandual@arm.com, miguel.luis@oracle.com,
+	joey.gouly@arm.com, ryan.roberts@arm.com, jeremy.linton@arm.com,
+	liwei391@huawei.com, daniel.thompson@linaro.org,
+	sumit.garg@linaro.org, kristina.martsenko@arm.com,
+	jpoimboe@kernel.org, ericchancf@google.com, robh@kernel.org,
+	scott@os.amperecomputing.com, songshuaishuai@tinylab.org,
+	shijie@os.amperecomputing.com, bhe@redhat.com,
+	akpm@linux-foundation.org, thunder.leizhen@huawei.com,
+	horms@kernel.org, rmk+kernel@armlinux.org.uk,
+	takakura@valinux.co.jp, dianders@chromium.org, swboyd@chromium.org,
+	frederic@kernel.org, reijiw@google.com, akihiko.odaki@daynix.com,
+	ruanjinjie@huawei.com, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH 1/9] arm64/sysreg: Add definitions for immediate versions
+ of MSR ALLINT
+Message-ID: <5d06c9d8-a903-4cd9-be08-d7681e7928be@sirena.org.uk>
+References: <20240409012344.3194724-1-liaochang1@huawei.com>
+ <20240409012344.3194724-2-liaochang1@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 1/3] arm64: Prepare for LPA2
-To: Andrew Jones <andrew.jones@linux.dev>, kvmarm@lists.linux.dev
-Cc: alexandru.elisei@arm.com, nikos.nikoleris@arm.com, shahuang@redhat.com
-References: <20240402132739.201939-5-andrew.jones@linux.dev>
- <20240402132739.201939-6-andrew.jones@linux.dev>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20240402132739.201939-6-andrew.jones@linux.dev>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="tp/u02Ht/rALrZN+"
+Content-Disposition: inline
+In-Reply-To: <20240409012344.3194724-2-liaochang1@huawei.com>
+X-Cookie: Everything you know is wrong!
 
-Hi Drew,
 
-On 4/2/24 15:27, Andrew Jones wrote:
-> When checking for supported granules also check for the values
-> which indicate support when LPA2 is implemented.
->
-> Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+--tp/u02Ht/rALrZN+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Eric
+On Tue, Apr 09, 2024 at 01:23:36AM +0000, Liao Chang wrote:
+> From: Mark Brown <broonie@kernel.org>
+>=20
+> Encodings are provided for ALLINT which allow setting of ALLINT.ALLINT
+> using an immediate rather than requiring that a register be loaded with
+> the value to write. Since these don't currently fit within the scheme we
+> have for sysreg generation add manual encodings like we currently do for
+> other similar registers such as SVCR.
+>=20
+> Since it is required that these immediate versions be encoded with xzr
+> as the source register provide asm wrapper which ensure this is the
+> case.
+>=20
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->  lib/arm64/asm/processor.h | 49 +++++++++++++++++++++------------------
->  1 file changed, 27 insertions(+), 22 deletions(-)
->
-> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-> index 1c73ba32725a..bab9c26c2c9e 100644
-> --- a/lib/arm64/asm/processor.h
-> +++ b/lib/arm64/asm/processor.h
-> @@ -110,31 +110,36 @@ static inline unsigned long get_id_aa64mmfr0_el1(void)
->  #define ID_AA64MMFR0_TGRAN64_SHIFT	24
->  #define ID_AA64MMFR0_TGRAN16_SHIFT	20
->  
-> -#define ID_AA64MMFR0_TGRAN4_SUPPORTED	0x0
-> -#define ID_AA64MMFR0_TGRAN64_SUPPORTED	0x0
-> -#define ID_AA64MMFR0_TGRAN16_SUPPORTED	0x1
-> +#define ID_AA64MMFR0_TGRAN4_SUPPORTED(r)			\
-> +({								\
-> +	u64 __v = ((r) >> ID_AA64MMFR0_TGRAN4_SHIFT) & 0xf;	\
-> +	(__v) == 0 || (__v) == 1;				\
-> +})
-> +
-> +#define ID_AA64MMFR0_TGRAN64_SUPPORTED(r)			\
-> +({								\
-> +	u64 __v = ((r) >> ID_AA64MMFR0_TGRAN64_SHIFT) & 0xf;	\
-> +	(__v) == 0;						\
-> +})
-> +
-> +#define ID_AA64MMFR0_TGRAN16_SUPPORTED(r)			\
-> +({								\
-> +	u64 __v = ((r) >> ID_AA64MMFR0_TGRAN16_SHIFT) & 0xf;	\
-> +	(__v) == 1 || (__v) == 2;				\
-> +})
->  
->  static inline bool system_supports_granule(size_t granule)
->  {
-> -	u32 shift;
-> -	u32 val;
-> -	u64 mmfr0;
-> -
-> -	if (granule == SZ_4K) {
-> -		shift = ID_AA64MMFR0_TGRAN4_SHIFT;
-> -		val = ID_AA64MMFR0_TGRAN4_SUPPORTED;
-> -	} else if (granule == SZ_16K) {
-> -		shift = ID_AA64MMFR0_TGRAN16_SHIFT;
-> -		val = ID_AA64MMFR0_TGRAN16_SUPPORTED;
-> -	} else {
-> -		assert(granule == SZ_64K);
-> -		shift = ID_AA64MMFR0_TGRAN64_SHIFT;
-> -		val = ID_AA64MMFR0_TGRAN64_SUPPORTED;
-> -	}
-> -
-> -	mmfr0 = get_id_aa64mmfr0_el1();
-> -
-> -	return ((mmfr0 >> shift) & 0xf) == val;
-> +	u64 mmfr0 = get_id_aa64mmfr0_el1();
-> +
-> +	if (granule == SZ_4K)
-> +		return ID_AA64MMFR0_TGRAN4_SUPPORTED(mmfr0);
-> +
-> +	if (granule == SZ_16K)
-> +		return ID_AA64MMFR0_TGRAN16_SUPPORTED(mmfr0);
-> +
-> +	assert(granule == SZ_64K);
-> +	return ID_AA64MMFR0_TGRAN64_SUPPORTED(mmfr0);
->  }
->  
->  #endif /* !__ASSEMBLY__ */
+>  arch/arm64/include/asm/nmi.h    | 27 +++++++++++++++++++++++++++
 
+You've not provided a Signed-off-by for this so people can't do anything
+with it, please see Documentation/process/submitting-patches.rst for
+details on what this is and why it's important.
+
+--tp/u02Ht/rALrZN+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmYVNHkACgkQJNaLcl1U
+h9AMewf7BGhHshYucChT7VqSKvlOMDQSdvP978X26I7soUUjqGhKazks5r+3KXG1
+W6fSrfRGv//m7kHW9cALoJ0NI9L/fXxBM7blrjW0fM3KdLwzA+q/UW4wBxi9B1v7
+tFLtRVlwJKvdoODsVctC+fZqYodrGZZlROq5l6JwbzEKBISH9ON9J9H/Hn7uygnU
+33DuT0t5IdyQMRYDpksaLZgmDxY9IfUQpfYl9E9fPBgOugytXuUkaK0H/DX7grZV
+/4VrhwkMaVfv4/nDAWpS4SnUqdpKTfZQFBB/LTcY7YSmOobctXNCf8fPRx56dnpD
+9Ffj0HfMJOP2wdEeZIgF44nRzCYcUA==
+=BFwd
+-----END PGP SIGNATURE-----
+
+--tp/u02Ht/rALrZN+--
