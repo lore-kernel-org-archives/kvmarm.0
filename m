@@ -1,65 +1,65 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9597113D500
-	for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 08:30:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B7913FD64
+	for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 08:31:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712737828; cv=none; b=U12r4we01G2N2Oau0vTQs6enbvLH2ZdprMMCUSaXdUCrEOrgeKmNWGaXeN7dCQFmzmgyJ/YuHcjfDXN20cVSLhx1UXPb8aoBJkrVMcsv27+58MoZIu+J2HlnSJEWPjkQfcPevC1NLgA1TqDSFFYwCiRZ1w/BoUNGkWQpp7j1r6E=
+	t=1712737881; cv=none; b=IoH11NoYLSvs+34eSNBEGqQvMK/XkkmQzRiNYyuwvvTNxUCuXiTtksn26Ykl2/y8/YixRXQ6X0IbFBbZLEraq+sBb1hwZOH/AlDkxkT2zAjPU89qcQzaXw48Ccax6v42sffTxQriSu395BcstxBDgfpNDJC9pzq+MD5N4ChxXI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712737828; c=relaxed/simple;
-	bh=sjLo+2j08iLCyaP/ZrrXRs8M6s13hs4gKMe6/iy5SyA=;
+	s=arc-20240116; t=1712737881; c=relaxed/simple;
+	bh=cpzOqPqp2FWk5BTnYrCSS1LW18sAwwLHJ+v0bKY6LVk=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=FI0XFM9kSrLjIvWHPt7HHU9eh8FuiQkT6a/c+9dv6TQvDzRPlWnTdKJrwChrjb1AjmFnu0gHYhQwZ6klzKt+YZxkWlKs9J6zBWIrYdlgw1582yF9krwfbXWHVwgDpml5OppJ7RmHL7+WKDIPkdbwlbETFlDCYIQpy1jC+UZhk1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iMiB4t97; arc=none smtp.client-ip=209.85.218.52
+	 Content-Disposition; b=N21otRbxgQli1VzaHWvkVGkZYNYVoh0AN0jvHzxx0KCdqIyA9qNg42oYzeimsaRb+RbXhhJcsBIzdKsO0HaqhaTYELpomD0g2Yz6aDhX91fmMOINCvY3Vps0B9k8GHGbvqHbbzHH3nSPvMw7D3DwuLyM/Fq9dUzDh/XN/eJiQ0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mDxx5vgp; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iMiB4t97"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a46ea03c2a5so1070558466b.1
-        for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 01:30:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mDxx5vgp"
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a51969e780eso793487966b.3
+        for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 01:31:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712737825; x=1713342625; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1712737877; x=1713342677; darn=lists.linux.dev;
         h=content-transfer-encoding:content-disposition:mime-version
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=v6DrtWKL4HFIVL/Z+tlpZfy75B2ArHvwYVgq7qkQ5Eg=;
-        b=iMiB4t9751/1RF6ktbVecELsOlSXe0KBlyB3lRPKPgLYHBEa1RvdXzHgEmmIAlK68V
-         Oy7EjJFwZL13sb5yLCExikgLNGibyu5xNBqjpBV8vg2VyqFQFJgPXMrRw9i0whA2xuXc
-         deFHdBHAj7f18Z8A4mQ/pWAFz+XHgUrXVCeUcPvHRFVot4318pU472o3SpTLKkQ/K5lH
-         TT3PDS7Bet9Csy/3pDwLIuESNV3QhwLHi6w1b1qxAwzxRet2DFFUseJl5C2jGq6CMBEo
-         NdQc7ZKepOTnOqF2ckJg/fykrhEoSAZ70QeR4ZyR3N6Yr/dKx/kJ9oBNQB0YOElLdMGA
-         KzvQ==
+        bh=RG+NK3kQHpQlT1WXed325+BJ1wFsJ9Qvvp1+whP8THg=;
+        b=mDxx5vgpuDDh3uBXRVcwQJmBuOZJMowIW8hE/gAVe5E8l4uO1yeBskQPMBmjdMVfsp
+         PjD7bqpkWArUjVOIqcR20k6t/eIB+6Tv95MJ9jq7nfRF32qusEci3wZod0E4fAFcHmHB
+         rAniaSwCbodZUhPM54V93pbY0d8V01Be50YEVEXH5tpa2REAPiesKAYCT2Z9OpcBpR5I
+         dl0btq2JX6j2i1FtpAZb3xDgdmTIBIYW+dSC4aQ7QVw3qiQwxc9tDirDdI97nuQN2U8b
+         IjP+asVAWGg5ai8j+1caESjF1b/tXZovS5OD4wdvyF59wkd/ul3YT0ntt9DccWdMiLpe
+         DrjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712737825; x=1713342625;
+        d=1e100.net; s=20230601; t=1712737877; x=1713342677;
         h=content-transfer-encoding:content-disposition:mime-version
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=v6DrtWKL4HFIVL/Z+tlpZfy75B2ArHvwYVgq7qkQ5Eg=;
-        b=PBdeQ2LXcVM7DiHcmZK3HUxPoEdPGwcWoaZquvGy4A6uN/W8UAKzGIuv0Ve6d/4xBY
-         4dc378YYy3sln+/DzyYdgz0KL8ri3qwyRQxVwMDVjjR6kLo5IOi0ES6SXgjjXRRzed6T
-         rLPDnio8oibDEPUFMH520xQSswjVpPIcDnBduyCNvLp1dKrulhVCMsw7n1CtsXbo7I8G
-         iCNTLV6Q8OG6ERydhLQPympcRLWzUxwmDdUjrS+byFQkoZV0SILPq4KsxPY55H0e290k
-         F0tmKoyGiP9tKINBFnMl7LfcFdMXiuK+jzfHXQafo+aq2XpT5+XFOCjlbNDCvytedBVS
-         qdHQ==
-X-Gm-Message-State: AOJu0Yy67jOhTUk1QD4czot1vmlqwbXYVz8J3Hxf/3bjd7r9f6ZAdgsC
-	/teDReZTgT8f1ZFSZtxvSqsypGUIwynUKCFkOm9DdRds4HLlfvqaPubPbWbaS6FhwDTZc04d0Hd
-	mYQ==
-X-Google-Smtp-Source: AGHT+IE+3bFNql+D7KkAv08EKtihoMoVNO9YFCZha/FUwb6uG6uieK7br/du5MzzN0cCL5aBqVM6xQ==
-X-Received: by 2002:a17:907:8686:b0:a52:b70:454f with SMTP id qa6-20020a170907868600b00a520b70454fmr1429337ejc.15.1712737824552;
-        Wed, 10 Apr 2024 01:30:24 -0700 (PDT)
+        bh=RG+NK3kQHpQlT1WXed325+BJ1wFsJ9Qvvp1+whP8THg=;
+        b=Bx+cPlpXKrFZ2lvOzS9mLWTVpSPgiL0OjoP1hhSSX1X1YrmtRJCv1F7UUVHGBTsBuS
+         Ym8Jt1yD/VXcf5CFiWRacxwkJYuP7ZMdxOQ5vDUugTe4JBO1aFfqRzSFHoOcJ/3b5fsE
+         t5gSzA7cjrxslk8VoGfRU9IxBH/2q2gTwHE4kcQN53gCvh380sXlJNUgLCLvblSz1rPm
+         BcdTM7iRNjDUNwqrGf/MohYGfqFPmBchRjtJtjontX58IfnFj7r/ASB8iLk+OUyC5Tvr
+         qsSDmxcOM/S7TjfAwjwQncPPH/pdvjXC9EqnN6F/z5l1P4+dTD7UJFXG3iZJ1o/cRn8m
+         JBqA==
+X-Gm-Message-State: AOJu0YxvLdcS0NXxRMIhGJ1nMwT9cNFg2qGEWJTkS5VCw82xXW+DElTi
+	PAAuSsfoIA2GrCpDbxG0hqzW/ohjLBqaiYvWAmJme+P88owDPAOJz3Wyk7z8EqArwjazSxWsHyq
+	5AA==
+X-Google-Smtp-Source: AGHT+IHsVDjhqLYz4R4KRsAm/rlIfcBL0hwv/AlVUy4a35ojorEEOv6cI9kzisNnwpCqevT93PAxaQ==
+X-Received: by 2002:a17:907:968b:b0:a51:d235:74cf with SMTP id hd11-20020a170907968b00b00a51d23574cfmr1681270ejc.38.1712737876848;
+        Wed, 10 Apr 2024 01:31:16 -0700 (PDT)
 Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
-        by smtp.gmail.com with ESMTPSA id de26-20020a056402309a00b0056c1cca33bfsm6129511edb.6.2024.04.10.01.30.24
+        by smtp.gmail.com with ESMTPSA id ml16-20020a170906cc1000b00a4e670414ffsm6701933ejb.109.2024.04.10.01.31.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 01:30:24 -0700 (PDT)
-Date: Wed, 10 Apr 2024 09:30:20 +0100
+        Wed, 10 Apr 2024 01:31:16 -0700 (PDT)
+Date: Wed, 10 Apr 2024 09:31:12 +0100
 From: =?utf-8?Q?Pierre-Cl=C3=A9ment?= Tosi <ptosi@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Vincent Donnefort <vdonnefort@google.com>
-Subject: [PATCH v2 10/12] KVM: arm64: nVHE: Support CONFIG_CFI_CLANG at EL2
-Message-ID: <as6khq6ychznvsfhgcxb7ke6jkkqui5lddovd6qxz26fbjnjmb@lwzgdwx7aomk>
+Subject: [PATCH v2 11/12] KVM: arm64: nVHE: Support test module for hyp kCFI
+Message-ID: <gq2o2iwbb6likzsjko52ple62ub2l5ndwmy7hi23nrjxohusuw@x32vojnmuinr>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -70,120 +70,344 @@ Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-The compiler implements kCFI by adding type information (u32) above
-every function that might be indirectly called and, whenever a function
-pointer is called, injects a read-and-compare of that u32 against the
-value corresponding to the expected type. In case of a mismatch, a BRK
-instruction gets executed. When the hypervisor triggers such an
-exception in nVHE, it panics and triggers and exception return to EL1.
+Extend support for the kCFI test module to nVHE by replicating the hooks
+on the KVM_RUN handler path currently existing in VHE in the nVHE code,
+exporting the equivalent callback targets for triggering built-in hyp
+kCFI faults, and exposing a new CONFIG_HYP_CFI_TEST-only host HVC to
+implement callback registration with pKVM.
 
-Therefore, teach nvhe_hyp_panic_handler() to detect kCFI errors from the
-ESR and report them. If necessary, remind the user that EL2 kCFI is not
-affected by CONFIG_CFI_PERMISSIVE.
+Update the test module to register the nVHE equivalent callback for test
+case '1' (i.e. both EL2 hyp caller and callee are built-in) and document
+that other cases are not supported outside of VHE, as they require EL2
+symbols in the module, which is not currently supported for nVHE.
 
-Pass $(CC_FLAGS_CFI) to the compiler when building the nVHE hyp code.
+Note that a kernel in protected mode that doesn't support HYP_CFI_TEST
+will prevent the module from registering nVHE callbacks both by not
+exporting the necessary symbols (similar to VHE) but also by rejecting
+the corresponding HVC, if the module tries to issue it directly.
 
-Use SYM_TYPED_FUNC_START() for __pkvm_init_switch_pgd, as nVHE can't
-call it directly and must use a PA function pointer from C (because it
-is part of the idmap page), which would trigger a kCFI failure if the
-type ID wasn't present.
+Also note that the test module will run in pKVM (with HYP_CFI_TEST)
+independently of other debug Kconfig flags but that not stacktrace will
+be printed without PROTECTED_NVHE_STACKTRACE. This allows testing kCFI
+under conditions closer to release builds, if desired.
 
 Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
 ---
- arch/arm64/include/asm/esr.h       |  6 ++++++
- arch/arm64/kvm/handle_exit.c       | 11 +++++++++++
- arch/arm64/kvm/hyp/nvhe/Makefile   |  6 +++---
- arch/arm64/kvm/hyp/nvhe/hyp-init.S |  6 +++++-
- 4 files changed, 25 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h     |  3 ++
+ arch/arm64/include/asm/kvm_cfi.h     |  6 ++--
+ arch/arm64/kvm/Kconfig               |  2 --
+ arch/arm64/kvm/hyp/{vhe => }/cfi.c   |  0
+ arch/arm64/kvm/hyp/nvhe/Makefile     |  1 +
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c   | 19 ++++++++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c     |  7 +++++
+ arch/arm64/kvm/hyp/vhe/Makefile      |  2 +-
+ arch/arm64/kvm/hyp_cfi_test.c        | 44 ++++++++++++++++++++++++----
+ arch/arm64/kvm/hyp_cfi_test_module.c | 24 ++++++++-------
+ 10 files changed, 86 insertions(+), 22 deletions(-)
+ rename arch/arm64/kvm/hyp/{vhe => }/cfi.c (100%)
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index 2bcf216be376..9eb9e6aa70cf 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -391,6 +391,12 @@ static inline bool esr_is_data_abort(unsigned long esr)
- 	return ec == ESR_ELx_EC_DABT_LOW || ec == ESR_ELx_EC_DABT_CUR;
- }
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 24b5e6b23417..3256c91ff234 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -81,6 +81,9 @@ enum __kvm_host_smccc_func {
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_teardown_vm,
++#ifdef CONFIG_HYP_SUPPORTS_CFI_TEST
++	__KVM_HOST_SMCCC_FUNC___kvm_register_cfi_test_cb,
++#endif
+ };
  
-+static inline bool esr_is_cfi_brk(unsigned long esr)
-+{
-+	return ESR_ELx_EC(esr) == ESR_ELx_EC_BRK64 &&
-+	       (esr_brk_comment(esr) & ~CFI_BRK_IMM_MASK) == CFI_BRK_IMM_BASE;
-+}
-+
- static inline bool esr_fsc_is_translation_fault(unsigned long esr)
- {
- 	/* Translation fault, level -1 */
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 0bcafb3179d6..0db23a6304ce 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -383,6 +383,15 @@ void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
- 		kvm_handle_guest_serror(vcpu, kvm_vcpu_get_esr(vcpu));
- }
+ #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
+diff --git a/arch/arm64/include/asm/kvm_cfi.h b/arch/arm64/include/asm/kvm_cfi.h
+index 13cc7b19d838..ed6422eebce5 100644
+--- a/arch/arm64/include/asm/kvm_cfi.h
++++ b/arch/arm64/include/asm/kvm_cfi.h
+@@ -12,8 +12,8 @@
  
-+static void kvm_nvhe_report_cfi_failure(u64 panic_addr)
-+{
-+	kvm_err("nVHE hyp CFI failure at: [<%016llx>] %pB!\n", panic_addr,
-+		(void *)(panic_addr + kaslr_offset()));
-+
-+	if (IS_ENABLED(CONFIG_CFI_PERMISSIVE))
-+		kvm_err(" (CONFIG_CFI_PERMISSIVE ignored for hyp failures)\n");
-+}
-+
- void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
- 					      u64 elr_virt, u64 elr_phys,
- 					      u64 par, uintptr_t vcpu,
-@@ -413,6 +422,8 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
- 		else
- 			kvm_err("nVHE hyp BUG at: [<%016llx>] %pB!\n", panic_addr,
- 					(void *)(panic_addr + kaslr_offset()));
-+	} else if (IS_ENABLED(CONFIG_CFI_CLANG) && esr_is_cfi_brk(esr)) {
-+		kvm_nvhe_report_cfi_failure(panic_addr);
- 	} else {
- 		kvm_err("nVHE hyp panic at: [<%016llx>] %pB!\n", panic_addr,
- 				(void *)(panic_addr + kaslr_offset()));
+ #ifdef CONFIG_HYP_SUPPORTS_CFI_TEST
+ 
+-int kvm_cfi_test_register_host_ctxt_cb(void (*cb)(void));
+-int kvm_cfi_test_register_guest_ctxt_cb(void (*cb)(void));
++int kvm_cfi_test_register_host_ctxt_cb(void (*vhe_cb)(void), void *nvhe_cb);
++int kvm_cfi_test_register_guest_ctxt_cb(void (*vhe_cb)(void), void *nvhe_cb);
+ 
+ #else
+ 
+@@ -31,6 +31,8 @@ static inline int kvm_cfi_test_register_guest_ctxt_cb(void (*cb)(void))
+ 
+ /* Symbols which the host can register as hyp callbacks; see <hyp/cfi.h>. */
+ void hyp_trigger_builtin_cfi_fault(void);
++DECLARE_KVM_NVHE_SYM(hyp_trigger_builtin_cfi_fault);
+ void hyp_builtin_cfi_fault_target(int unused);
++DECLARE_KVM_NVHE_SYM(hyp_builtin_cfi_fault_target);
+ 
+ #endif /* __ARM64_KVM_CFI_H__ */
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 5daa8079a120..715c85088c06 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -75,8 +75,6 @@ config HYP_CFI_TEST
+ 	  Say M here to also build a module which registers callbacks triggering
+ 	  faults and selected by userspace through its parameters.
+ 
+-	  Note that this feature is currently only supported in VHE mode.
+-
+ 	  If unsure, say N.
+ 
+ config HYP_SUPPORTS_CFI_TEST
+diff --git a/arch/arm64/kvm/hyp/vhe/cfi.c b/arch/arm64/kvm/hyp/cfi.c
+similarity index 100%
+rename from arch/arm64/kvm/hyp/vhe/cfi.c
+rename to arch/arm64/kvm/hyp/cfi.c
 diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index 2250253a6429..2eb915d8943f 100644
+index 2eb915d8943f..09039d351726 100644
 --- a/arch/arm64/kvm/hyp/nvhe/Makefile
 +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -89,9 +89,9 @@ quiet_cmd_hyprel = HYPREL  $@
- quiet_cmd_hypcopy = HYPCOPY $@
-       cmd_hypcopy = $(OBJCOPY) --prefix-symbols=__kvm_nvhe_ $< $@
+@@ -25,6 +25,7 @@ hyp-obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o
+ 	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o
+ hyp-obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+ 	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
++hyp-obj-$(CONFIG_HYP_SUPPORTS_CFI_TEST) += ../cfi.o
+ hyp-obj-$(CONFIG_LIST_HARDENED) += list_debug.o
+ hyp-obj-y += $(lib-objs)
  
--# Remove ftrace, Shadow Call Stack, and CFI CFLAGS.
--# This is equivalent to the 'notrace', '__noscs', and '__nocfi' annotations.
--KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS) $(CC_FLAGS_CFI), $(KBUILD_CFLAGS))
-+# Remove ftrace and Shadow Call Stack CFLAGS.
-+# This is equivalent to the 'notrace' and '__noscs' annotations.
-+KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS), $(KBUILD_CFLAGS))
- # Starting from 13.0.0 llvm emits SHT_REL section '.llvm.call-graph-profile'
- # when profile optimization is applied. gen-hyprel does not support SHT_REL and
- # causes a build failure. Remove profile optimization flags.
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-index 5a15737b4233..33fb5732ab83 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 2385fd03ed87..431860e8a98d 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 @@ -5,6 +5,7 @@
   */
  
- #include <linux/arm-smccc.h>
-+#include <linux/cfi_types.h>
- #include <linux/linkage.h>
+ #include <hyp/adjust_pc.h>
++#include <hyp/cfi.h>
  
- #include <asm/alternative.h>
-@@ -268,8 +269,11 @@ SYM_CODE_END(__kvm_handle_stub_hvc)
- /*
-  * void __pkvm_init_switch_pgd(struct kvm_nvhe_init_params *params,
-  *                             void (*finalize_fn)(void));
-+ *
-+ * SYM_TYPED_FUNC_START() allows C to call this ID-mapped function indirectly
-+ * using a physical pointer without triggering a kCFI failure.
+ #include <asm/pgtable-types.h>
+ #include <asm/kvm_asm.h>
+@@ -13,6 +14,8 @@
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
+ 
++#include <linux/compiler.h>
++
+ #include <nvhe/ffa.h>
+ #include <nvhe/mem_protect.h>
+ #include <nvhe/mm.h>
+@@ -314,6 +317,19 @@ static void handle___pkvm_teardown_vm(struct kvm_cpu_context *host_ctxt)
+ 	cpu_reg(host_ctxt, 1) = __pkvm_teardown_vm(handle);
+ }
+ 
++#ifndef CONFIG_HYP_SUPPORTS_CFI_TEST
++__always_unused
++#endif
++static void handle___kvm_register_cfi_test_cb(struct kvm_cpu_context *host_ctxt)
++{
++	DECLARE_REG(phys_addr_t, cb_phys, host_ctxt, 1);
++	DECLARE_REG(bool, in_host_ctxt, host_ctxt, 2);
++
++	void (*cb)(void) = cb_phys ? __hyp_va(cb_phys) : NULL;
++
++	cpu_reg(host_ctxt, 1) = __kvm_register_cfi_test_cb(cb, in_host_ctxt);
++}
++
+ typedef void (*hcall_t)(struct kvm_cpu_context *);
+ 
+ #define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = (hcall_t)handle_##x
+@@ -348,6 +364,9 @@ static const hcall_t host_hcall[] = {
+ 	HANDLE_FUNC(__pkvm_init_vm),
+ 	HANDLE_FUNC(__pkvm_init_vcpu),
+ 	HANDLE_FUNC(__pkvm_teardown_vm),
++#ifdef CONFIG_HYP_SUPPORTS_CFI_TEST
++	HANDLE_FUNC(__kvm_register_cfi_test_cb),
++#endif
+ };
+ 
+ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index c50f8459e4fc..160311bf367b 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -4,6 +4,7 @@
+  * Author: Marc Zyngier <marc.zyngier@arm.com>
   */
--SYM_FUNC_START(__pkvm_init_switch_pgd)
-+SYM_TYPED_FUNC_START(__pkvm_init_switch_pgd)
- 	/* Load the inputs from the VA pointer before turning the MMU off */
- 	ldr	x5, [x0, #NVHE_INIT_PGD_PA]
- 	ldr	x0, [x0, #NVHE_INIT_STACK_HYP_VA]
+ 
++#include <hyp/cfi.h>
+ #include <hyp/switch.h>
+ #include <hyp/sysreg-sr.h>
+ 
+@@ -253,6 +254,9 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	bool pmu_switch_needed;
+ 	u64 exit_code;
+ 
++	if (IS_ENABLED(CONFIG_HYP_SUPPORTS_CFI_TEST) && unlikely(hyp_test_host_ctxt_cfi))
++		hyp_test_host_ctxt_cfi();
++
+ 	/*
+ 	 * Having IRQs masked via PMR when entering the guest means the GIC
+ 	 * will not signal the CPU of interrupts of lower priority, and the
+@@ -313,6 +317,9 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	__debug_switch_to_guest(vcpu);
+ 
++	if (IS_ENABLED(CONFIG_HYP_SUPPORTS_CFI_TEST) && unlikely(hyp_test_guest_ctxt_cfi))
++		hyp_test_guest_ctxt_cfi();
++
+ 	do {
+ 		/* Jump in the fire! */
+ 		exit_code = __guest_enter(vcpu);
+diff --git a/arch/arm64/kvm/hyp/vhe/Makefile b/arch/arm64/kvm/hyp/vhe/Makefile
+index 19ca584cc21e..951c8c00a685 100644
+--- a/arch/arm64/kvm/hyp/vhe/Makefile
++++ b/arch/arm64/kvm/hyp/vhe/Makefile
+@@ -9,4 +9,4 @@ ccflags-y := -D__KVM_VHE_HYPERVISOR__
+ obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o
+ obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+ 	 ../fpsimd.o ../hyp-entry.o ../exception.o
+-obj-$(CONFIG_HYP_SUPPORTS_CFI_TEST) += cfi.o
++obj-$(CONFIG_HYP_SUPPORTS_CFI_TEST) += ../cfi.o
+diff --git a/arch/arm64/kvm/hyp_cfi_test.c b/arch/arm64/kvm/hyp_cfi_test.c
+index da7b25ca1b1f..6a02b43c45f6 100644
+--- a/arch/arm64/kvm/hyp_cfi_test.c
++++ b/arch/arm64/kvm/hyp_cfi_test.c
+@@ -6,6 +6,7 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_cfi.h>
+ #include <asm/kvm_host.h>
++#include <asm/kvm_mmu.h>
+ #include <asm/virt.h>
+ 
+ #include <linux/export.h>
+@@ -15,29 +16,60 @@
+ /* For calling directly into the VHE hypervisor; see <hyp/cfi.h>. */
+ int __kvm_register_cfi_test_cb(void (*)(void), bool);
+ 
+-static int kvm_register_cfi_test_cb(void (*vhe_cb)(void), bool in_host_ctxt)
++static int kvm_register_nvhe_cfi_test_cb(void *cb, bool in_host_ctxt)
++{
++	extern void *kvm_nvhe_sym(hyp_test_host_ctxt_cfi);
++	extern void *kvm_nvhe_sym(hyp_test_guest_ctxt_cfi);
++
++	if (is_protected_kvm_enabled()) {
++		phys_addr_t cb_phys = cb ? virt_to_phys(cb) : 0;
++
++		/* Use HVC as only the hyp can modify its callback pointers. */
++		return kvm_call_hyp_nvhe(__kvm_register_cfi_test_cb, cb_phys,
++					 in_host_ctxt);
++	}
++
++	/*
++	 * In non-protected nVHE, the pKVM HVC is not available but the
++	 * hyp callback pointers can be accessed and modified directly.
++	 */
++	if (cb)
++		cb = kern_hyp_va(kvm_ksym_ref(cb));
++
++	if (in_host_ctxt)
++		kvm_nvhe_sym(hyp_test_host_ctxt_cfi) = cb;
++	else
++		kvm_nvhe_sym(hyp_test_guest_ctxt_cfi) = cb;
++
++	return 0;
++}
++
++static int kvm_register_cfi_test_cb(void (*vhe_cb)(void), void *nvhe_cb,
++				    bool in_host_ctxt)
+ {
+ 	if (!is_hyp_mode_available())
+ 		return -ENXIO;
+ 
+ 	if (is_hyp_nvhe())
+-		return -EOPNOTSUPP;
++		return kvm_register_nvhe_cfi_test_cb(nvhe_cb, in_host_ctxt);
+ 
+ 	return __kvm_register_cfi_test_cb(vhe_cb, in_host_ctxt);
+ }
+ 
+-int kvm_cfi_test_register_host_ctxt_cb(void (*cb)(void))
++int kvm_cfi_test_register_host_ctxt_cb(void (*vhe_cb)(void), void *nvhe_cb)
+ {
+-	return kvm_register_cfi_test_cb(cb, true);
++	return kvm_register_cfi_test_cb(vhe_cb, nvhe_cb, true);
+ }
+ EXPORT_SYMBOL(kvm_cfi_test_register_host_ctxt_cb);
+ 
+-int kvm_cfi_test_register_guest_ctxt_cb(void (*cb)(void))
++int kvm_cfi_test_register_guest_ctxt_cb(void (*vhe_cb)(void), void *nvhe_cb)
+ {
+-	return kvm_register_cfi_test_cb(cb, false);
++	return kvm_register_cfi_test_cb(vhe_cb, nvhe_cb, false);
+ }
+ EXPORT_SYMBOL(kvm_cfi_test_register_guest_ctxt_cb);
+ 
+ /* Hypervisor callbacks for the test module to register. */
+ EXPORT_SYMBOL(hyp_trigger_builtin_cfi_fault);
++EXPORT_SYMBOL(kvm_nvhe_sym(hyp_trigger_builtin_cfi_fault));
+ EXPORT_SYMBOL(hyp_builtin_cfi_fault_target);
++EXPORT_SYMBOL(kvm_nvhe_sym(hyp_builtin_cfi_fault_target));
+diff --git a/arch/arm64/kvm/hyp_cfi_test_module.c b/arch/arm64/kvm/hyp_cfi_test_module.c
+index eeda4be4d3ef..63a5e99cb164 100644
+--- a/arch/arm64/kvm/hyp_cfi_test_module.c
++++ b/arch/arm64/kvm/hyp_cfi_test_module.c
+@@ -20,9 +20,9 @@ static int set_guest_mode(const char *val, const struct kernel_param *kp);
+ #define M_DESC \
+ 	"\n\t0: none" \
+ 	"\n\t1: built-in caller & built-in callee" \
+-	"\n\t2: built-in caller & module callee" \
+-	"\n\t3: module caller & built-in callee" \
+-	"\n\t4: module caller & module callee"
++	"\n\t2: built-in caller & module callee (VHE only)" \
++	"\n\t3: module caller & built-in callee (VHE only)" \
++	"\n\t4: module caller & module callee (VHE only)"
+ 
+ static unsigned int host_mode;
+ module_param_call(host, set_host_mode, param_get_uint, &host_mode, 0644);
+@@ -40,7 +40,7 @@ static void hyp_cfi_module2module_test_target(int);
+ static void hyp_cfi_builtin2module_test_target(int);
+ 
+ static int set_param_mode(const char *val, const struct kernel_param *kp,
+-			 int (*register_cb)(void (*)(void)))
++			 int (*register_cb)(void (*)(void), void *))
+ {
+ 	unsigned int *mode = kp->arg;
+ 	int err;
+@@ -51,15 +51,17 @@ static int set_param_mode(const char *val, const struct kernel_param *kp,
+ 
+ 	switch (*mode) {
+ 	case 0:
+-		return register_cb(NULL);
++		return register_cb(NULL, NULL);
+ 	case 1:
+-		return register_cb(hyp_trigger_builtin_cfi_fault);
++		return register_cb(hyp_trigger_builtin_cfi_fault,
++				   kvm_nvhe_sym(hyp_trigger_builtin_cfi_fault));
+ 	case 2:
+-		return register_cb((void *)hyp_cfi_builtin2module_test_target);
++		return register_cb((void *)hyp_cfi_builtin2module_test_target,
++				   NULL);
+ 	case 3:
+-		return register_cb(trigger_module2builtin_cfi_fault);
++		return register_cb(trigger_module2builtin_cfi_fault, NULL);
+ 	case 4:
+-		return register_cb(trigger_module2module_cfi_fault);
++		return register_cb(trigger_module2module_cfi_fault, NULL);
+ 	default:
+ 		return -EINVAL;
+ 	}
+@@ -79,11 +81,11 @@ static void __exit exit_hyp_cfi_test(void)
+ {
+ 	int err;
+ 
+-	err = kvm_cfi_test_register_host_ctxt_cb(NULL);
++	err = kvm_cfi_test_register_host_ctxt_cb(NULL, NULL);
+ 	if (err)
+ 		pr_err("Failed to unregister host context trigger: %d\n", err);
+ 
+-	err = kvm_cfi_test_register_guest_ctxt_cb(NULL);
++	err = kvm_cfi_test_register_guest_ctxt_cb(NULL, NULL);
+ 	if (err)
+ 		pr_err("Failed to unregister guest context trigger: %d\n", err);
+ }
 -- 
 2.44.0.478.gd926399ef9-goog
 
