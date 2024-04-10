@@ -1,158 +1,291 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C1415217D;
-	Fri, 12 Apr 2024 23:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C6C1AAD3
+	for <kvmarm@lists.linux.dev>; Sat, 13 Apr 2024 03:22:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712964233; cv=none; b=HEuBLnCz5ho+C6Nr9p6HLdP9LFqDxEOyf+WomaDzzGinXeQ0G1RC+HTu6cDrLjC5GU2WXebPr/b7GtrIQN/zzBRUS1FuujgVM46aoNItevlgPg5+esm3EH8F9MqffPNUiD1CwEfn03wrwn+UC3Bf+cHlZBBMIAzd8Xzm2ST/w/Q=
+	t=1712978579; cv=none; b=m1Ij+UnebeETOJZJsj1SR3UXv+jum49IlbSmwLmZnyBF7gaCrmKj+s5ibxyJbI3Y98LstCSUIjot4+YrkjeywVj/1wxp/KV2mgDTUhXpFttGa70q9vvbooeci3WB9Hqdo0GRdXBQfIpdN7hjH7P2P8PRh1uhrWFr3OYfUHpPBgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712964233; c=relaxed/simple;
-	bh=CbK4jt4ZdUloJNuVh6KOM2ueno3wxztt8Qa5vgstwIQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=PwLx5P2uiQode9/rlPdVsm0S0/NihuwcKmScsrOnS6auK+GM+v2gT+8x+LzhNyWqQQyOxiJShttW9an50wNFXW5IPv2LesEi2zdeBr7A0WZhAYkkaKbhBUMByTIenVN3yFGwx7cI6ClQYsz20jaSSOhBEPnj60nPi4LtrRuQYtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=tW6ap+zQ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=C6bVqxHC; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1712978579; c=relaxed/simple;
+	bh=SCyDfC2Wmhsb4lLU3PzB0nKmdPQ0luzom0M5kYzTjIQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hm48HJEoPR9YN5EDmGwmnD+B7/tRPhJLWj87zVPi7l43Hfv+7gZT8ebfiZKicoMOJtQ+2AUW8WSXOUN2TR7peFIIKYzwFhnnkKeI9lQKTd2Iw/Fn8MEc8FWVq2FdyMILhyQ59jAixWWDX1ImP1K67taJcLBsXZe+o+yVbJh5OrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KTL2Evxv; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="tW6ap+zQ";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="C6bVqxHC"
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1712964230;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KTL2Evxv"
+Date: Thu, 11 Apr 2024 01:17:28 +0900
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1712978575;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=T5xu2FVtNRnOIqknb2Ux4D1eBvHtL7IvYUAUi+UDnWI=;
-	b=tW6ap+zQjCfPb0Iu5NRfFG9LND9NrDkPfEJWzzMV7FCLTiO/67DEBwqkhnToa6FAcP2EMM
-	6MUD2W5m6nuwV2lpFNG3h+9zzeXDVM+p+g58Cp/G+e4GRZcfa5YXlQCXsvhowZhIeayP0F
-	mX0bfZnV7zatQ27FSiwCVDCNzdKFDc9OqpMidB2qf2Cpn4vHrQKR1CDd5Jo0Vu7BskZTIr
-	zk34+SsJ8yxAruaTIUuw2IA0vIdHj/NMRshMO3Ypq0Afb5kNOeHECSYmsLQEyGEwXiqLV8
-	1HqLCmjoZ7R9k59MXcM+5pSKlvvx5MjGxECT/fcNGhgdh8TjLYqmzvmpqlulZQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1712964230;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T5xu2FVtNRnOIqknb2Ux4D1eBvHtL7IvYUAUi+UDnWI=;
-	b=C6bVqxHCPN+wfRrnH1w7K16dZrgwWFLb9vxFt3+t2PJptgUt5gh64ablXIU/tU1hN5ia0j
-	DVRgHQA0LBs0mhCA==
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Jonathan Cameron
- <Jonathan.Cameron@huawei.com>, linux-pm@vger.kernel.org,
- loongarch@lists.linux.dev, linux-acpi@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- x86@kernel.org, Miguel Luis <miguel.luis@oracle.com>, James Morse
- <james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, Jean-Philippe
- Brucker <jean-philippe@linaro.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- linuxarm@huawei.com, justin.he@arm.com, jianyong.wu@arm.com
-Subject: Re: [PATCH v5 03/18] ACPI: processor: Register deferred CPUs from
- acpi_processor_get_info()
-In-Reply-To: <ZhmtO6zBExkQGZLk@shell.armlinux.org.uk>
-References: <20240412143719.11398-1-Jonathan.Cameron@huawei.com>
- <20240412143719.11398-4-Jonathan.Cameron@huawei.com>
- <CAJZ5v0gNvy2e=hOGQQ2kLpnrDr8=QGBax-E5odEJ=7BA8qW-9A@mail.gmail.com>
- <ZhmWkE+fCEG/WFoi@shell.armlinux.org.uk> <87bk6ez4hj.ffs@tglx>
- <ZhmtO6zBExkQGZLk@shell.armlinux.org.uk>
-Date: Sat, 13 Apr 2024 01:23:48 +0200
-Message-ID: <878r1iyxkr.ffs@tglx>
+	bh=Oz320CoGCQmvXhdcOMPOAChCWDxikVcascNwYK/M4XM=;
+	b=KTL2Evxvxfc5FCbFnPNAbGBqGjKrOD/UpfxiF0vY3RjeOdegk0lmRP6iVcemmXwvpIq6bh
+	KfA16IHj8ExZ32rr2bMkDgYePCl7QC4Jbml8F0amHHdu5/XG6GRdFlvg6sXPQTSR8NLHMv
+	b/FGAYuulDfNYLfsN/jt0jtWOFb6BzQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Itaru Kitayama <itaru.kitayama@linux.dev>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+	alexandru.elisei@arm.com, joey.gouly@arm.com, steven.price@arm.com,
+	james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com,
+	andrew.jones@linux.dev, eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH 00/33] Support for Arm Confidential
+ Compute Architecture
+Message-ID: <Zha7mFYTPJk34+cO@vm3>
+References: <20240412103408.2706058-1-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240412103408.2706058-1-suzuki.poulose@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-Russell!
+Hi Suzuki,
 
-On Fri, Apr 12 2024 at 22:52, Russell King (Oracle) wrote:
-> On Fri, Apr 12, 2024 at 10:54:32PM +0200, Thomas Gleixner wrote:
->> > As for the cpu locking, I couldn't find anything in arch_register_cpu()
->> > that depends on the cpu_maps_update stuff nor needs the cpus_write_lock
->> > being taken - so I've no idea why the "make_present" case takes these
->> > locks.
->> 
->> Anything which updates a CPU mask, e.g. cpu_present_mask, after early
->> boot must hold the appropriate write locks. Otherwise it would be
->> possible to online a CPU which just got marked present, but the
->> registration has not completed yet.
->
-> Yes. As far as I've been able to determine, arch_register_cpu()
-> doesn't manipulate any of the CPU masks. All it seems to be doing
-> is initialising the struct cpu, registering the embedded struct
-> device, and setting up the sysfs links to its NUMA node.
->
-> There is nothing obvious in there which manipulates any CPU masks, and
-> this is rather my fundamental point when I said "I couldn't find
-> anything in arch_register_cpu() that depends on ...".
->
-> If there is something, then comments in the code would be a useful aid
-> because it's highly non-obvious where such a manipulation is located,
-> and hence why the locks are necessary.
+On Fri, Apr 12, 2024 at 11:33:35AM +0100, Suzuki K Poulose wrote:
+> This series adds support for running the kvm-unit-tests in the Arm CCA reference
+> software architecture.
+> 
+> 
+> The changes involve enlightening the boot/setup code with the Realm Service Interface
+> (RSI). The series also includes new test cases that exercise the RSI calls.
+> 
+> Currently we only support "kvmtool" as the VMM for running Realms. There was
+> an attempt to add support for running the test scripts using with kvmtool here [1],
+> which hasn't progressed. It would be good to have that resolved, so that we can
+> run all the tests without manually specifying the commandlines for each run.
+> 
+> For the purposes of running the Realm specific tests, we have added a "temporary"
+> script "run-realm-tests" until the kvmtool support is added. We do not expect
+> this to be merged.
+> 
+> 
+> Base Realm Support
+> -------------------
+> 
+> Realm IPA Space
+> ---------------
+> When running on in Realm world, the (Guest) Physical Address - aka Intermediate
+> Physical Address (IPA) in Arm terminology - space of the VM is split into two halves,
+> protected (lower half) and un-protected (upper half). A protected IPA will
+> always map pages in the "realm world" and  the contents are not accessible to
+> the host. An unprotected IPA on the other hand can be mapped to page in the
+> "normal world" and thus shared with the host. All host emulated MMIO ranges must
+> be in unprotected IPA space.
+> 
+> Realm can query the Realm Management Monitor for the configuration via RSI call
+> (RSI_REALM_CONFIG) and identify the "boundary" of the "IPA" split.
+> 
+> As far as the hyp/VMM is concerned, there is only one "IPA space" (the lower
+> half) of memory map. The "upper half" is "unprotected alias" of the memory map.
+> 
+> In the guest, this is achieved by "treating the MSB (1 << (IPA_WIDTH - 1))" as
+> a protection attribute (we call it - PTE_NS_SHARED), where the Realm applies this
+> to any address, it thinks is acccessed/managed by host (e.g., MMIO, shared pages).
+> Given that this is runtime variable (but fixed for a given Realm), uses a
+> variable to track the value.
+> 
+> All I/O regions are marked as "shared". Care is taken to ensure I/O access (uart)
+> with MMU off uses the "Unprotected Physical address".
+> 
+> 
+> Realm IPA State
+> ---------------
+> Additionally, each page (4K) in the protected IPA space has a state associated
+> (Realm IPA State - RIPAS) with it. It is either of :
+>    RIPAS_EMPTY
+>    RIPAS_RAM
+> 
+> Any IPA backed by RAM, must be marked as RIPAS_RAM before an access is made to
+> it. The hypervisor/VMM does this for the initial image loaded into the Realm
+> memory before the Realm starts execution. Given the kvm-unit-test flat files do
+> not contain a metadata header (e.g., like the arm64 Linux kernel Image),
+> indicating the "actual image size in memory", the VMM cannot transition the
+> area towards the end of the image (e.g., bss, stack) which are accessed very
+> early during boot. Thus the early boot assembly code will mark the area upto
+> the stack as RAM.
+> 
+> Once we land in the C code, we mark target relocation area for FDT and
+> initrd as RIPAS_RAM. At this point, we can scan the FDT and mark all RAM memory
+> blocks as RIPAS_RAM.
+> 
+> TODO: It would be good to add an image header to the flat files indicating the
+> size, which can take the burden off doing the early assembly boot code RSI calls.
+> 
+> Shared Memory support
+> ---------------------
+> Given the "default" memory of a VM is not accessible to host, we add new page
+> alloc/free routines for "memory shared" with the host. e.g., GICv3-ITS must use
+> shared pages for ITS emulation.
+> 
+> RSI Test suites
+> --------------
+> There are new testcases added to exercise the RSI interfaces and the RMM flows.
+> 
+> Attestation and measurement services related RSI tests require parsing tokens
+> and claims returned by the RMM. This is achieved with the help of QCBOR library
+> [2], which is added as a submodule to the project. We have also added a wrapper
+> library - libtokenverifier - around the QCBOR to parse the tokens according to
+> the RMM specifications.
+> 
+> Running Arm CCA Stack
+> -------------------
+> 
+> See more details on Arm CCA and how to build/run the entire stack here[0]
+> The easiest way to run the Arm CCA stack is using shrinkwrap and the details
+> are available in [0].
+> 
+> 
+> The patches are also available here :
+> 
+>  https://gitlab.arm.com/linux-arm/kvm-unit-tests-cca cca/v1
+> 
+> 
+> Changes since rfc:
+>   [ https://lkml.kernel.org/r/20230127114108.10025-1-joey.gouly@arm.com ]
+>   - Add support for RMM-v1.0-EAC5, changes to RSI ABIs
+>   - Some hardening checks (FDT overlapping the BSS sections)
+>   - Selftest for memory stress
+>   - Enable PMU/SVE tests for Realms
+> 
+>  [0] https://lkml.kernel.org/r/20240412084056.1733704-1-steven.price@arm.com
+>  [1] https://lkml.kernel.org/r/20210702163122.96110-1-alexandru.elisei@arm.com
+>  [2] https://github.com/laurencelundblade/QCBOR
+> 
+> Alexandru Elisei (3):
+>   arm64: Expand SMCCC arguments and return values
+>   arm: selftest: realm: skip pabt test when running in a realm
+>   NOT-FOR-MERGING: add run-realm-tests
+> 
+> Djordje Kovacevic (1):
+>   arm: realm: Add tests for in realm SEA
+> 
+> Gareth Stockwell (1):
+>   arm: realm: add hvc and RSI_HOST_CALL tests
+> 
+> Jean-Philippe Brucker (1):
+>   arm: Move io_init after vm initialization
+> 
+> Joey Gouly (10):
+>   arm: Make physical address mask dynamic
+>   arm64: Introduce NS_SHARED PTE attribute
+>   arm: realm: Add RSI interface header
+>   arm: realm: Make uart available before MMU is enabled
+>   arm: realm: Add RSI version test
+>   arm64: add ESR_ELx EC.SVE
+>   arm64: enable SVE at startup
+>   arm64: selftest: add realm SVE VL test
+>   lib/alloc_page: Add shared page allocation support
+>   arm: Add memtest support
+> 
+> Mate Toth-Pal (2):
+>   arm: Add a library to verify tokens using the QCBOR library
+>   arm: realm: Add Realm attestation tests
+> 
+> Subhasish Ghosh (1):
+>   arm: realm: Add test for FPU/SIMD context save/restore
+> 
+> Suzuki K Poulose (14):
+>   arm: Add necessary header files in asm/pgtable.h
+>   arm: Detect FDT overlap with uninitialised data
+>   arm: realm: Realm initialisation
+>   arm: realm: Add support for changing the state of memory
+>   arm: realm: Set RIPAS state for RAM
+>   arm: realm: Early memory setup
+>   arm: gic-v3-its: Use shared pages wherever needed
+>   arm: realm: Enable memory encryption
+>   qcbor: Add QCBOR as a submodule
+>   arm: Add build steps for QCBOR library
+>   arm: realm: add RSI interface for attestation measurements
+>   arm: realm: Add helpers to decode RSI return codes
+>   arm: realm: Add Realm attestation tests
+>   arm: realm: Add a test for shared memory
+> 
+>  .gitmodules                         |    3 +
+>  arm/Makefile.arm64                  |   25 +-
+>  arm/cstart.S                        |   49 +-
+>  arm/cstart64.S                      |  154 +++-
+>  arm/fpu.c                           |  424 +++++++++
+>  arm/realm-attest.c                  | 1251 +++++++++++++++++++++++++++
+>  arm/realm-ns-memory.c               |   86 ++
+>  arm/realm-rsi.c                     |  159 ++++
+>  arm/realm-sea.c                     |  143 +++
+>  arm/run-realm-tests                 |  112 +++
+>  arm/selftest.c                      |  138 ++-
+>  arm/unittests.cfg                   |   96 +-
+>  lib/alloc_page.c                    |   20 +-
+>  lib/alloc_page.h                    |   24 +
+>  lib/arm/asm/arm-smccc.h             |   44 +
+>  lib/arm/asm/io.h                    |    6 +
+>  lib/arm/asm/pgtable.h               |    9 +
+>  lib/arm/asm/psci.h                  |   13 +-
+>  lib/arm/asm/rsi.h                   |   21 +
+>  lib/arm/asm/sve-vl-test.h           |    9 +
+>  lib/arm/gic-v3.c                    |    6 +-
+>  lib/arm/io.c                        |   24 +-
+>  lib/arm/mmu.c                       |   80 +-
+>  lib/arm/psci.c                      |   19 +-
+>  lib/arm/setup.c                     |   26 +-
+>  lib/arm64/asm/arm-smccc.h           |    6 +
+>  lib/arm64/asm/esr.h                 |    1 +
+>  lib/arm64/asm/io.h                  |    6 +
+>  lib/arm64/asm/pgtable-hwdef.h       |    6 -
+>  lib/arm64/asm/pgtable.h             |   20 +
+>  lib/arm64/asm/processor.h           |   34 +
+>  lib/arm64/asm/rsi.h                 |   89 ++
+>  lib/arm64/asm/smc-rsi.h             |  173 ++++
+>  lib/arm64/asm/sve-vl-test.h         |   28 +
+>  lib/arm64/asm/sysreg.h              |    7 +
+>  lib/arm64/gic-v3-its.c              |    6 +-
+>  lib/arm64/processor.c               |    1 +
+>  lib/arm64/rsi.c                     |  188 ++++
+>  lib/asm-generic/io.h                |   12 +
+>  lib/libcflat.h                      |    1 +
+>  lib/qcbor                           |    1 +
+>  lib/token_verifier/attest_defines.h |   50 ++
+>  lib/token_verifier/token_dumper.c   |  157 ++++
+>  lib/token_verifier/token_dumper.h   |   15 +
+>  lib/token_verifier/token_verifier.c |  591 +++++++++++++
+>  lib/token_verifier/token_verifier.h |   77 ++
+>  46 files changed, 4355 insertions(+), 55 deletions(-)
+>  create mode 100644 .gitmodules
+>  create mode 100644 arm/fpu.c
+>  create mode 100644 arm/realm-attest.c
+>  create mode 100644 arm/realm-ns-memory.c
+>  create mode 100644 arm/realm-rsi.c
+>  create mode 100644 arm/realm-sea.c
+>  create mode 100755 arm/run-realm-tests
+>  create mode 100644 lib/arm/asm/arm-smccc.h
+>  create mode 100644 lib/arm/asm/rsi.h
+>  create mode 100644 lib/arm/asm/sve-vl-test.h
+>  create mode 100644 lib/arm64/asm/arm-smccc.h
+>  create mode 100644 lib/arm64/asm/rsi.h
+>  create mode 100644 lib/arm64/asm/smc-rsi.h
+>  create mode 100644 lib/arm64/asm/sve-vl-test.h
+>  create mode 100644 lib/arm64/rsi.c
+>  create mode 160000 lib/qcbor
+>  create mode 100644 lib/token_verifier/attest_defines.h
+>  create mode 100644 lib/token_verifier/token_dumper.c
+>  create mode 100644 lib/token_verifier/token_dumper.h
+>  create mode 100644 lib/token_verifier/token_verifier.c
+>  create mode 100644 lib/token_verifier/token_verifier.h
 
-acpi_processor_hotadd_init()
-...
-         acpi_map_cpu(pr->handle, pr->phys_id, pr->acpi_id, &pr->id);
-
-That ends up in fiddling with cpu_present_mask.
-
-I grant you that arch_register_cpu() is not, but it might rely on the
-external locking too. I could not be bothered to figure that out.
-
->> Define "real hotplug" :)
->> 
->> Real physical hotplug does not really exist. That's at least true for
->> x86, where the physical hotplug support was chased for a while, but
->> never ended up in production.
->> 
->> Though virtualization happily jumped on it to hot add/remove CPUs
->> to/from a guest.
->> 
->> There are limitations to this and we learned it the hard way on X86. At
->> the end we came up with the following restrictions:
->> 
->>     1) All possible CPUs have to be advertised at boot time via firmware
->>        (ACPI/DT/whatever) independent of them being present at boot time
->>        or not.
->> 
->>        That guarantees proper sizing and ensures that associations
->>        between hardware entities and software representations and the
->>        resulting topology are stable for the lifetime of a system.
->> 
->>        It is really required to know the full topology of the system at
->>        boot time especially with hybrid CPUs where some of the cores
->>        have hyperthreading and the others do not.
->> 
->> 
->>     2) Hot add can only mark an already registered (possible) CPU
->>        present. Adding non-registered CPUs after boot is not possible.
->> 
->>        The CPU must have been registered in #1 already to ensure that
->>        the system topology does not suddenly change in an incompatible
->>        way at run-time.
->> 
->> The same restriction would apply to real physical hotplug. I don't think
->> that's any different for ARM64 or any other architecture.
->
-> This makes me wonder whether the Arm64 has been barking up the wrong
-> tree then, and whether the whole "present" vs "enabled" thing comes
-> from a misunderstanding as far as a CPU goes.
->
-> However, there is a big difference between the two. On x86, a processor
-> is just a processor. On Arm64, a "processor" is a slice of the system
-> (includes the interrupt controller, PMUs etc) and we must enumerate
-> those even when the processor itself is not enabled. This is the whole
-> reason there's a difference between "present" and "enabled" and why
-> there's a difference between x86 cpu hotplug and arm64 cpu hotplug.
-> The processor never actually goes away in arm64, it's just prevented
-> from being used.
-
-It's the same on X86 at least in the physical world.
+Thanks for the update! I'll go through the series one by one in the
+coming weeks. Just curious one thing - do you guys wish to add Realm tests to the kvm-unit-test package, but not to kselftests?
 
 Thanks,
+Itaru.
 
-        tglx
-
+> 
+> -- 
+> 2.34.1
+> 
