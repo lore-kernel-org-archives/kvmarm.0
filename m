@@ -1,108 +1,166 @@
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA78116C848
-	for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 14:44:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DEE116EC1A;
+	Wed, 10 Apr 2024 14:57:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712760296; cv=none; b=Pm0hCyjfHzejTxRZLJSd9O9S7ZMu9uSsYA2MYIzgTcEgKftIM5NI8Bk8LAoZzK1FxrJiVrWo2SuV60kJnK5J6/zRHzpUiiXRxFnY4MqGmNYEax0nxNLoT40QPzOINUpldq+9k7ZtrzvbZM1tYMUfVdvyhK/4DMRhtqbwVU3yI+c=
+	t=1712761046; cv=none; b=WPMm7YDFlVrfhF+9m84DOlpWVItduaYqpTj1Q9FHDK+r/NHVj55yatd8ojYomCEElrR/xgDafMUQJgw4tEbw5GnQB88CF9oxB+hPBlKKaJt3KekBkgKjEYcpcihK6L/fTPD2VqtGQtQ0aQpAwZWezWS/IjYhIKjXwsrGAt9wLYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712760296; c=relaxed/simple;
-	bh=vdSS8oSfCOnVaZjt/jgZZmNqUFixNGmzq6ar9ljb28g=;
+	s=arc-20240116; t=1712761046; c=relaxed/simple;
+	bh=rgAigV0Mg7k37J0oxZCOZaSDtr64xfw5j/3UZIQubQM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=exNx0aNkKGV7JdfRvyrbODRqESXTa7H2E36+sQas/k/nPbzhx4bTLB3dL9aTjZffga5mZDxO1tTgInUC9DiHaWiI/iPnz2dRJEbjbG63hs1FSucefIO30wjn9zk0/Mq/UJ1dnA3ZlXDTryhMlrse410evs4RDyxpSfHPMk+0URU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NRPAk2ed; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=fibwHyOfu3E4lm1vY/itXkrCwozUA+3vDuBrZVvEy18DwppC5DjGxflrHyqyptk6YRtyMD2mBz9ZpUYI+xWEnu9nb6d50x0iF4s/26F53qoNog8JWDNAY4Z5nXFQ27/bq0uHGVsJGSLKYpZYm0ivIsAWcR2l5QbKoxT04QdIQxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RQfFcOP+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NRPAk2ed"
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-56e6a1edecfso4289687a12.1
-        for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 07:44:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712760293; x=1713365093; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=SorY6BMN4ofXw7AkV1BJGHD1ZDym8XWxLWPHdQQ4SL4=;
-        b=NRPAk2edrog01njm3mXq6RClCFrPnCMAcV86jZgXadg2i2HgusyFP6tEFoqWbjdK8u
-         7L54VvCYAZj6XRP3JIHvI6x+y4AHNv7xmJmwiE8T+ia0ocw0HDqr6EL1InNzZv/cCvZ8
-         8z5i3ruGwWHQPL0c3qj7dNtJwIvN6AUkF1pEpi/i97XTzTYZpVIz8toze+KNK9ifihmc
-         JlNsE/9yXMk8YJ+NZve/qofUtWrn7PUc3LASB1OPwwtTeY2661k1/rZX4qr8Xtf+S0rj
-         vYjkmArVaEMRwZmw/AnQ54ynRaUyVyhMLXl6kDywjIbe4QxOntGEuzE/hBg85MQw5onU
-         LxUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712760293; x=1713365093;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SorY6BMN4ofXw7AkV1BJGHD1ZDym8XWxLWPHdQQ4SL4=;
-        b=oSS1yS3T3NIw5WsVuqkdWhJJi53dd35RS7qmNP7mYhJamMvZBablJMTcL1dqgKnjVG
-         0aJ7tIctByzE/rda0HyhdY92VQEUM86fz/HiwHYkSTU/Di8sd9C1NYuB5O45wqCoCvZL
-         eyp0l0kVnA6B7M10eXxdeDWxmrPOYgl2T1Kv1NJ2jyfJ/9weW5o6YbkC+cmqF0niL+oR
-         I0dWhKovxo0mDvF7HaFpbxlsuZYjBLa3yieEdZICtyh7cm1Xe8UWS9utOocpUnJ+8cQe
-         NxHltDt8PwXcDFUMj1aKd5kGHpHSQMnodsvSudGDGlJcYLq9j3erZWrAXMF2u9eCy9tW
-         Xqsw==
-X-Gm-Message-State: AOJu0Yx5kIOKb3NLNx8PN3H1LrIWky1Y6YogyN5UyY9he3AhxwniTvq5
-	ZhyCM4Zk+BTIyTUhV7Fey7U4GSz3ZVuXODPS/JI9x03oIxVH64Qv858OU8pT1Q==
-X-Google-Smtp-Source: AGHT+IGxJ9gIqQrf+HvEjnspNjc7cdxKHlWD5YVIJkYKWhir2ZuLe/UJfbhkg/iRaUNh0SAoCgtxig==
-X-Received: by 2002:a17:906:ca91:b0:a4e:62b2:a09e with SMTP id js17-20020a170906ca9100b00a4e62b2a09emr1635742ejb.35.1712760293137;
-        Wed, 10 Apr 2024 07:44:53 -0700 (PDT)
-Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
-        by smtp.gmail.com with ESMTPSA id gz15-20020a170906f2cf00b00a51e9b299b9sm2402050ejb.55.2024.04.10.07.44.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 07:44:52 -0700 (PDT)
-Date: Wed, 10 Apr 2024 15:44:48 +0100
-From: =?utf-8?Q?Pierre-Cl=C3=A9ment?= Tosi <ptosi@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 05/10] KVM: arm64: nVHE: Add EL2 sync exception handler
-Message-ID: <seowwg3mfexvtif3vtaxkxttrsfdputkwcb7bfmjuqk25xdoz4@ez2dapcfsfe4>
-References: <cover.1710446682.git.ptosi@google.com>
- <cebafe40b170589d52e2ef66f3bfac7396fa1f56.1710446682.git.ptosi@google.com>
- <86bk7d13uz.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RQfFcOP+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A78DAC433B1;
+	Wed, 10 Apr 2024 14:57:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712761045;
+	bh=rgAigV0Mg7k37J0oxZCOZaSDtr64xfw5j/3UZIQubQM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RQfFcOP+qX85PmQnBPLvccqEywoUWIxkynIP914BonF6qpPr0WgGNqLRbviZLfGPD
+	 Bomu75zNlFrOE2Ke1UznjFkoNd9/pRLwGGHZlVwENl21OmBPEInkv8LqYfisZLOSpi
+	 XpAVCdsAW8pZSBx5AqH9adPA41I3sfdmbW8uDodY5wPxmdoc/6MCsRnfqTMLsTEUGE
+	 BKojfOFIlt2MvygHWzEUSXsdc6Ra7ZJRdThgiGOs+HFxFuaJ0/QalfSZXkTdF0ZDKJ
+	 gCrg8Ipm35MwoNSCvH0ollDCHBWxYJEEzKHXZHZaFeQY52ZlWeDs1+G2PLnfmmrNSm
+	 MUcRXbGTuWgKg==
+Date: Wed, 10 Apr 2024 16:57:19 +0200
+From: Lorenzo Pieralisi <lpieralisi@kernel.org>
+To: Sebastian Ene <sebastianene@google.com>
+Cc: catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org,
+	maz@kernel.org, oliver.upton@linux.dev, qperret@google.com,
+	qwandor@google.com, sudeep.holla@arm.com, suzuki.poulose@arm.com,
+	tabba@google.com, will@kernel.org, yuzenghui@huawei.com,
+	vdonnefort@google.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kernel-team@android.com
+Subject: Re: [PATCH] KVM: arm64: Add support for FFA_PARTITION_INFO_GET
+Message-ID: <Zhaoz9E/sw6jVnci@lpieralisi>
+References: <20240409151908.541589-1-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <86bk7d13uz.wl-maz@kernel.org>
+In-Reply-To: <20240409151908.541589-1-sebastianene@google.com>
 
-Hi Marc,
-
-On Sun, Mar 17, 2024 at 11:42:44AM +0000, Marc Zyngier wrote:
-> On Thu, 14 Mar 2024 20:24:31 +0000,
-> Pierre-Clément Tosi <ptosi@google.com> wrote:
-> > 
-> > Remove superfluous SP overflow check from the non-synchronous
-> > handlers.
+On Tue, Apr 09, 2024 at 03:19:08PM +0000, Sebastian Ene wrote:
+> Handle the FFA_PARTITION_INFO_GET host call inside the pKVM hypervisor
+> and copy the response message back to the host buffers. Save the
+> returned FF-A version as we will need it later to interpret the response
+> from the TEE.
 > 
-> Why are they superfluous? Because we are panic'ing? Detecting a stack
-> overflow is pretty valuable in any circumstances.
+> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/ffa.c | 49 +++++++++++++++++++++++++++++++++++
+>  1 file changed, 49 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> index 320f2eaa14a9..72fc365bc7a8 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> @@ -67,6 +67,7 @@ struct kvm_ffa_buffers {
+>   */
+>  static struct kvm_ffa_buffers hyp_buffers;
+>  static struct kvm_ffa_buffers host_buffers;
+> +static u32 ffa_version;
+>  
+>  static void ffa_to_smccc_error(struct arm_smccc_res *res, u64 ffa_errno)
+>  {
+> @@ -640,6 +641,49 @@ static bool do_ffa_features(struct arm_smccc_res *res,
+>  	return true;
+>  }
+>  
+> +static void do_ffa_part_get(struct arm_smccc_res *res,
+> +			    struct kvm_cpu_context *ctxt)
+> +{
+> +	DECLARE_REG(u32, uuid0, ctxt, 1);
+> +	DECLARE_REG(u32, uuid1, ctxt, 2);
+> +	DECLARE_REG(u32, uuid2, ctxt, 3);
+> +	DECLARE_REG(u32, uuid3, ctxt, 4);
+> +	DECLARE_REG(u32, flags, ctxt, 5);
+> +	u32 off, count, sz, buf_sz;
+> +
+> +	hyp_spin_lock(&host_buffers.lock);
+> +	if (!host_buffers.rx) {
+> +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
+> +		goto out_unlock;
+> +	}
+> +
+> +	arm_smccc_1_1_smc(FFA_PARTITION_INFO_GET, uuid0, uuid1,
+> +			  uuid2, uuid3, flags, 0, 0,
+> +			  res);
+> +
+> +	if (res->a0 != FFA_SUCCESS)
+> +		goto out_unlock;
+> +
+> +	count = res->a2;
+> +	if (!count)
+> +		goto out_unlock;
+> +
+> +	if (ffa_version > FFA_VERSION_1_0) {
+> +		buf_sz = sz = res->a3;
+> +		if (sz > sizeof(struct ffa_partition_info))
+> +			buf_sz = sizeof(struct ffa_partition_info);
 
-I've reverted to keeping these in v2.
+We are copying buf_sz but (correctly ?) returning res->a3 to the caller,
+which is allowed to expect res->a3 bytes to be filled since that's what
+firmware reported.
 
-However, the rationale was based on the assumption that the stack overflows into
-an invalid mapping so that accessing it post-overflow triggers a page fault. If
-that is correct, can't handlers of non-synchronous exceptions just blindly
-access SP and rely on the synchronous exception handler to catch any overflow
-(and somehow handle it or panic, this isn't really relevant)?
+Technically this is not a problem at present, because the caller
+(ie the FF-A driver) and the hypervisor rely on the same descriptor
+structures (and buf_sz can't be != sizeof(struct ffa_partition_info),
+anything else is a bug as we stand); they must be kept in sync though as
+the firmware version changes (*if* there are changes in the partition
+descriptor - eg fields are added).
 
-In particular, note that passing those checks doesn't guarantee that the SP
-won't actually overflow while the handler is running (as most push to the
-stack). In that case, they'll end up in the synchronous handler anyway, right?
+An option would consist in just copying res->a3 bytes as firmware reports
+(obviously keeping the RX buffer boundary checks for the memcpy).
 
-So, given that the checks seem (to me) to happen at completely arbitrary points
-in time (due to the nature of exceptions), it is therefore not clear how they
-make the code more robust than not having them?
+It is just a heads-up because I noticed it, no more, I will let Sudeep
+comment on this since he knows better.
 
-But I'm probably missing something?
+Lorenzo
 
--- 
-Pierre
+> +	} else {
+> +		/* FFA_VERSION_1_0 lacks the size in the response */
+> +		buf_sz = sz = 8;
+> +	}
+> +
+> +	WARN_ON((count - 1) * sz + buf_sz > PAGE_SIZE);
+> +	for (off = 0; off < count * sz; off += sz)
+> +		memcpy(host_buffers.rx + off, hyp_buffers.rx + off, buf_sz);
+> +out_unlock:
+> +	hyp_spin_unlock(&host_buffers.lock);
+> +}
+> +
+>  bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
+>  {
+>  	struct arm_smccc_res res;
+> @@ -686,6 +730,9 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
+>  	case FFA_MEM_FRAG_TX:
+>  		do_ffa_mem_frag_tx(&res, host_ctxt);
+>  		goto out_handled;
+> +	case FFA_PARTITION_INFO_GET:
+> +		do_ffa_part_get(&res, host_ctxt);
+> +		break;
+>  	}
+>  
+>  	if (ffa_call_supported(func_id))
+> @@ -726,6 +773,8 @@ int hyp_ffa_init(void *pages)
+>  	if (FFA_MAJOR_VERSION(res.a0) != 1)
+>  		return -EOPNOTSUPP;
+>  
+> +	ffa_version = res.a0;
+> +
+>  	arm_smccc_1_1_smc(FFA_ID_GET, 0, 0, 0, 0, 0, 0, 0, &res);
+>  	if (res.a0 != FFA_SUCCESS)
+>  		return -EOPNOTSUPP;
+> -- 
+> 2.44.0.478.gd926399ef9-goog
+> 
