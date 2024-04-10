@@ -1,205 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F3D15ADB0;
-	Wed, 10 Apr 2024 14:20:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA78116C848
+	for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 14:44:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712758803; cv=none; b=PtWMO6GN5B66wG/uqktFbu7Cqli9u+NYXHcO4RGslcFc4vd3QANvlNaZy9Cb/GBvIlgn9m4RQjqkb7dIRwZX9Zxz1Qj0pdnXrr/bi7kk80f4E4Vaphzc6c/u8JXiUP5ZwSP8FCeRLTTesZ5tFjTMRWjOyKzaeRH6BQiB3H6oMlA=
+	t=1712760296; cv=none; b=Pm0hCyjfHzejTxRZLJSd9O9S7ZMu9uSsYA2MYIzgTcEgKftIM5NI8Bk8LAoZzK1FxrJiVrWo2SuV60kJnK5J6/zRHzpUiiXRxFnY4MqGmNYEax0nxNLoT40QPzOINUpldq+9k7ZtrzvbZM1tYMUfVdvyhK/4DMRhtqbwVU3yI+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712758803; c=relaxed/simple;
-	bh=OvoVNaySrcXw62YX7UG0Hd2hLfS04EbJaAtBVkIIqd8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KEZ6/gold/9XgML9VlulN89X4WvxRHpKk1ClhQXsW77K8KMSIZYzDpuI+hJWjvSifIzm4PziVqpGjPn7a4sBp5RkSIiL2yafMVkym4ig/fcR3BBPIv6Bf49rNSFriVHS4kMoFEdEKAyAQMK9UTynmRmBwHgmoS/wd/Vff5PaCnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bq0wPQHa; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712760296; c=relaxed/simple;
+	bh=vdSS8oSfCOnVaZjt/jgZZmNqUFixNGmzq6ar9ljb28g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=exNx0aNkKGV7JdfRvyrbODRqESXTa7H2E36+sQas/k/nPbzhx4bTLB3dL9aTjZffga5mZDxO1tTgInUC9DiHaWiI/iPnz2dRJEbjbG63hs1FSucefIO30wjn9zk0/Mq/UJ1dnA3ZlXDTryhMlrse410evs4RDyxpSfHPMk+0URU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NRPAk2ed; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bq0wPQHa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDEEDC433F1;
-	Wed, 10 Apr 2024 14:20:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712758802;
-	bh=OvoVNaySrcXw62YX7UG0Hd2hLfS04EbJaAtBVkIIqd8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=bq0wPQHabbua9arIqw3F701K8BRZJG2kQMEYiPVjzVyt5X1hm2JIhv0oyPaL0Z7WH
-	 WnJUW94GzON0XgCAYkFDxCH666CJV7SIgQvPJu3oXOQorBLno2rOimI19nGJb1EmPF
-	 x5jWmIdV3MNTi9ZtnYN0u/2W42rqcKp+HIttHGPd1+11ax1d00/+7dqV6urZ7ha8U+
-	 DwrAOFxTxiQZ8YeV6fY7LttHFVUTGRDoF4K50+WjUfHIu8TWIJlel/BW0wlr4spXH5
-	 Z7iQ/XfKX/siNBS2EKyXH7y9p769CHijcjsjV+DdE0vTHWTdBI9alFTI7LI3G2yUmb
-	 4yyEqHPmF55Zw==
-Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-22ec8db3803so548189fac.1;
-        Wed, 10 Apr 2024 07:20:02 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUeiLksD+YXE+fbVsLU3Q9R3oLQGpVJhXlVTZW8u06cu0gy6uFiZtnidr3SKv4VSzUfu6Pk/sfADZ2miWvnYFdqgFFF9Vs7nEoQFBf/yTvyVZ4Wjg8Gm6H+NuYYqZ3zPcs0
-X-Gm-Message-State: AOJu0YyDmdu/y1gl+tlAGJI05wLVc4+opTeKunGRq4/3vFq/ilTfXVKC
-	F5DUlGU+DCsWkD9bLY0SyK9Kwi58NUcZG5cF2mkpGSkJn7wtPPyUzkxkkJ6YP6++FdO5aIjwTED
-	wAPGkZsYw5bMIq061kTdOlCP+8tE=
-X-Google-Smtp-Source: AGHT+IFUbYvctHLscpPyYTlJqJkvjz7Lv1BPzvm+G1krAlpB1R6DPKUMcWT+4z93yfQwfckyfvgV5dE3NAZ750FVX1Q=
-X-Received: by 2002:a05:6870:9e47:b0:22e:b175:3c22 with SMTP id
- pt7-20020a0568709e4700b0022eb1753c22mr3170425oab.1.1712758802087; Wed, 10 Apr
- 2024 07:20:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NRPAk2ed"
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-56e6a1edecfso4289687a12.1
+        for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 07:44:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712760293; x=1713365093; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=SorY6BMN4ofXw7AkV1BJGHD1ZDym8XWxLWPHdQQ4SL4=;
+        b=NRPAk2edrog01njm3mXq6RClCFrPnCMAcV86jZgXadg2i2HgusyFP6tEFoqWbjdK8u
+         7L54VvCYAZj6XRP3JIHvI6x+y4AHNv7xmJmwiE8T+ia0ocw0HDqr6EL1InNzZv/cCvZ8
+         8z5i3ruGwWHQPL0c3qj7dNtJwIvN6AUkF1pEpi/i97XTzTYZpVIz8toze+KNK9ifihmc
+         JlNsE/9yXMk8YJ+NZve/qofUtWrn7PUc3LASB1OPwwtTeY2661k1/rZX4qr8Xtf+S0rj
+         vYjkmArVaEMRwZmw/AnQ54ynRaUyVyhMLXl6kDywjIbe4QxOntGEuzE/hBg85MQw5onU
+         LxUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712760293; x=1713365093;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SorY6BMN4ofXw7AkV1BJGHD1ZDym8XWxLWPHdQQ4SL4=;
+        b=oSS1yS3T3NIw5WsVuqkdWhJJi53dd35RS7qmNP7mYhJamMvZBablJMTcL1dqgKnjVG
+         0aJ7tIctByzE/rda0HyhdY92VQEUM86fz/HiwHYkSTU/Di8sd9C1NYuB5O45wqCoCvZL
+         eyp0l0kVnA6B7M10eXxdeDWxmrPOYgl2T1Kv1NJ2jyfJ/9weW5o6YbkC+cmqF0niL+oR
+         I0dWhKovxo0mDvF7HaFpbxlsuZYjBLa3yieEdZICtyh7cm1Xe8UWS9utOocpUnJ+8cQe
+         NxHltDt8PwXcDFUMj1aKd5kGHpHSQMnodsvSudGDGlJcYLq9j3erZWrAXMF2u9eCy9tW
+         Xqsw==
+X-Gm-Message-State: AOJu0Yx5kIOKb3NLNx8PN3H1LrIWky1Y6YogyN5UyY9he3AhxwniTvq5
+	ZhyCM4Zk+BTIyTUhV7Fey7U4GSz3ZVuXODPS/JI9x03oIxVH64Qv858OU8pT1Q==
+X-Google-Smtp-Source: AGHT+IGxJ9gIqQrf+HvEjnspNjc7cdxKHlWD5YVIJkYKWhir2ZuLe/UJfbhkg/iRaUNh0SAoCgtxig==
+X-Received: by 2002:a17:906:ca91:b0:a4e:62b2:a09e with SMTP id js17-20020a170906ca9100b00a4e62b2a09emr1635742ejb.35.1712760293137;
+        Wed, 10 Apr 2024 07:44:53 -0700 (PDT)
+Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
+        by smtp.gmail.com with ESMTPSA id gz15-20020a170906f2cf00b00a51e9b299b9sm2402050ejb.55.2024.04.10.07.44.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 07:44:52 -0700 (PDT)
+Date: Wed, 10 Apr 2024 15:44:48 +0100
+From: =?utf-8?Q?Pierre-Cl=C3=A9ment?= Tosi <ptosi@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 05/10] KVM: arm64: nVHE: Add EL2 sync exception handler
+Message-ID: <seowwg3mfexvtif3vtaxkxttrsfdputkwcb7bfmjuqk25xdoz4@ez2dapcfsfe4>
+References: <cover.1710446682.git.ptosi@google.com>
+ <cebafe40b170589d52e2ef66f3bfac7396fa1f56.1710446682.git.ptosi@google.com>
+ <86bk7d13uz.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <Zbp5xzmFhKDAgHws@shell.armlinux.org.uk> <E1rVDmU-0027YP-Jz@rmk-PC.armlinux.org.uk>
- <CAJZ5v0iiJpUWq5GMSnKFWQTzn_bdwoQz9m=hDaXNg4Lj_ePF4g@mail.gmail.com>
- <20240322185327.00002416@Huawei.com> <20240410134318.0000193c@huawei.com>
- <CAJZ5v0ggD042sfz3jDXQVDUxQZu_AWaF2ox-Me8CvFeRB8nczw@mail.gmail.com> <20240410145005.00003050@Huawei.com>
-In-Reply-To: <20240410145005.00003050@Huawei.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Wed, 10 Apr 2024 16:19:50 +0200
-X-Gmail-Original-Message-ID: <CAJZ5v0hRPFd7jmhJdCu8jVCRc4hZRUt9sKm6iWfynZH1mX7rCg@mail.gmail.com>
-Message-ID: <CAJZ5v0hRPFd7jmhJdCu8jVCRc4hZRUt9sKm6iWfynZH1mX7rCg@mail.gmail.com>
-Subject: Re: [PATCH RFC v4 02/15] ACPI: processor: Register all CPUs from acpi_processor_get_info()
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Russell King <rmk+kernel@armlinux.org.uk>, 
-	linux-pm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, kvmarm@lists.linux.dev, x86@kernel.org, 
-	acpica-devel@lists.linuxfoundation.org, linux-csky@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-ia64@vger.kernel.org, 
-	linux-parisc@vger.kernel.org, Salil Mehta <salil.mehta@huawei.com>, 
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, jianyong.wu@arm.com, justin.he@arm.com, 
-	James Morse <james.morse@arm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <86bk7d13uz.wl-maz@kernel.org>
 
-On Wed, Apr 10, 2024 at 3:50=E2=80=AFPM Jonathan Cameron
-<Jonathan.Cameron@huawei.com> wrote:
->
-> On Wed, 10 Apr 2024 15:28:18 +0200
-> "Rafael J. Wysocki" <rafael@kernel.org> wrote:
->
-> > On Wed, Apr 10, 2024 at 2:43=E2=80=AFPM Jonathan Cameron
-> > <Jonathan.Cameron@huawei.com> wrote:
-> > >
-> > > > >
-> > > > > > diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
-> > > > > > index 47de0f140ba6..13d052bf13f4 100644
-> > > > > > --- a/drivers/base/cpu.c
-> > > > > > +++ b/drivers/base/cpu.c
-> > > > > > @@ -553,7 +553,11 @@ static void __init cpu_dev_register_generi=
-c(void)
-> > > > > >  {
-> > > > > >         int i, ret;
-> > > > > >
-> > > > > > -       if (!IS_ENABLED(CONFIG_GENERIC_CPU_DEVICES))
-> > > > > > +       /*
-> > > > > > +        * When ACPI is enabled, CPUs are registered via
-> > > > > > +        * acpi_processor_get_info().
-> > > > > > +        */
-> > > > > > +       if (!IS_ENABLED(CONFIG_GENERIC_CPU_DEVICES) || !acpi_di=
-sabled)
-> > > > > >                 return;
-> > > > >
-> > > > > Honestly, this looks like a quick hack to me and it absolutely
-> > > > > requires an ACK from the x86 maintainers to go anywhere.
-> > > > Will address this separately.
-> > > >
-> > >
-> > > So do people prefer this hack, or something along lines of the follow=
-ing?
-> > >
-> > > static int __init cpu_dev_register_generic(void)
-> > > {
-> > >         int i, ret =3D 0;
-> > >
-> > >         for_each_online_cpu(i) {
-> > >                 if (!get_cpu_device(i)) {
-> > >                         ret =3D arch_register_cpu(i);
-> > >                         if (ret)
-> > >                                 pr_warn("register_cpu %d failed (%d)\=
-n", i, ret);
-> > >                 }
-> > >         }
-> > >         //Probably just eat the error.
-> > >         return 0;
-> > > }
-> > > subsys_initcall_sync(cpu_dev_register_generic);
-> >
-> > I would prefer something like the above.
-> >
-> > I actually thought that arch_register_cpu() might return something
-> > like -EPROBE_DEFER when it cannot determine whether or not the CPU is
-> > really available.
->
-> Ok. That would end up looking much more like the original code I think.
-> So we wouldn't have this late registration at all, or keep it for DT
-> on arm64?  I'm not sure that's a clean solution though leaves
-> the x86 path alone.
+Hi Marc,
 
-I'm not sure why DT on arm64 would need to do late registration.
+On Sun, Mar 17, 2024 at 11:42:44AM +0000, Marc Zyngier wrote:
+> On Thu, 14 Mar 2024 20:24:31 +0000,
+> Pierre-Clément Tosi <ptosi@google.com> wrote:
+> > 
+> > Remove superfluous SP overflow check from the non-synchronous
+> > handlers.
+> 
+> Why are they superfluous? Because we are panic'ing? Detecting a stack
+> overflow is pretty valuable in any circumstances.
 
-There is this chain of calls in the mainline today:
+I've reverted to keeping these in v2.
 
-driver_init()
-  cpu_dev_init()
-    cpu_dev_register_generic()
+However, the rationale was based on the assumption that the stack overflows into
+an invalid mapping so that accessing it post-overflow triggers a page fault. If
+that is correct, can't handlers of non-synchronous exceptions just blindly
+access SP and rely on the synchronous exception handler to catch any overflow
+(and somehow handle it or panic, this isn't really relevant)?
 
-the last of which registers CPUs on arm64/DT systems IIUC. I don't see
-a need to change this behavior.
+In particular, note that passing those checks doesn't guarantee that the SP
+won't actually overflow while the handler is running (as most push to the
+stack). In that case, they'll end up in the synchronous handler anyway, right?
 
-On arm64/ACPI, though, arch_register_cpu() cannot make progress until
-it can look into the ACPI Namespace, so I would just make it return
--EPROBE_DEFER or equivalent then and the ACPI enumeration will find
-the CPU and basically treat it as one that has just appeared.
+So, given that the checks seem (to me) to happen at completely arbitrary points
+in time (due to the nature of exceptions), it is therefore not clear how they
+make the code more robust than not having them?
 
-> If we get rid of this catch all, solution would be to move the
-> !acpi_disabled check into the arm64 version of arch_cpu_register()
-> because we would only want the delayed registration path to be
-> used on ACPI cases where the question of CPU availability can't
-> yet be resolved.
+But I'm probably missing something?
 
-Exactly.
-
-This is similar (if not equivalent even) to a CPU becoming available
-between the cpu_dev_register_generic() call and the ACPI enumeration.
-
-> >
-> > Then, the ACPI processor enumeration path may take care of registering
-> > CPU that have not been registered so far and in the more-or-less the
-> > same way regardless of the architecture (modulo some arch-specific
-> > stuff).
->
-> If I understand correctly, in acpi_processor_get_info() we'd end up
-> with a similar check on whether it was already registered (the x86 path)
-> or had be deferred (arm64 / acpi).
->
-> >
-> > In the end, it should be possible to avoid changing the behavior of
-> > x86 and loongarch in this series.
->
-> Possible, yes, but result if I understand correctly is we end up with
-> very different flows and replication of functionality between the
-> early registration and the late one. I'm fine with that if you prefer it!
-
-But that's what is there today, isn't it?
-
-I think this can be changed to reduce the duplication, but I'd prefer
-to do that later, when the requisite functionality is in place and we
-just do the consolidation.  In that case, if anything goes wrong, we
-can take a step back and reconsider without deferring the arm64 CPU
-hotplug support.
-
-> >
-> > > Which may look familiar at it's effectively patch 3 from v3 which was=
- dealing
-> > > with CPUs missing from DSDT (something we think doesn't happen).
-> > >
-> > > It might be possible to elide the arch_register_cpu() in
-> > > make_present() but that will mean we use different flows in this patc=
-h set
-> > > for the hotplug and initially present cases which is a bit messy.
-> > >
-> > > I've tested this lightly on arm64 and x86 ACPI + DT booting and it "s=
-eems" fine.
-> >
-> > Sounds promising.
->
-> Possibly not that relevant though if proposal is to drop this approach. :=
-(
-> At least I now have test setups!
-
-Great!
+-- 
+Pierre
