@@ -1,282 +1,155 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C200816F0CC;
-	Wed, 10 Apr 2024 15:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C83EC3;
+	Wed, 10 Apr 2024 16:33:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712764746; cv=none; b=mWf5Wb8zfj0+bgKkCrlrGLuwAeBoPMsTMZqFFDjwxcBC/XbbaW/3TJ9SQp3534CMUKIImH3me3SrYUPXWQtWD4WGEaj7TiphFm+9Q1VlJ7VglG7UJ/l7XAOVEX+RHetiZOXYfhW/9uAt7jOOeIYX5/8VFS3Im4fk2i2+AeFxK/Y=
+	t=1712766838; cv=none; b=J56UdHAfglbfSCUDQPiqdyg8ENNMvAdWriOXTpIyRq7wT5lYW3ctkidyfIAVZm0jErhJbA/8UbdVnIPXxf63VV8E+dVjkFRMGB2mHxcYb8S0Al8nuKwOF51uD1DOyQK5jlAhVa6Ymq4Q7aDk7geqKA72Ocr29wyrdNmUN3JO0fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712764746; c=relaxed/simple;
-	bh=xfuJ3ry5n91qJc92j6kBa5Z9W5YhchcmI5daF8Z4UqY=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gWodbF89VDwjClFlv1eu872HpyxwMKoBskFi9yjOHxVCUz6w4m3R88yDxPb2edBN8BqVmTWHIJMf9vXWP1j8ej+Mt0FYsRRyVjfy/jWJjC9n8JxLVxScsUpG7Hc1lXI4l+6beefPl+J/iCWBXXrQGvV83CSaxEwRHWBc8mbOguU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VF6sR73psz6J9yF;
-	Wed, 10 Apr 2024 23:57:15 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 32165140DD4;
-	Wed, 10 Apr 2024 23:58:56 +0800 (CST)
-Received: from localhost (10.122.247.231) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Wed, 10 Apr
- 2024 16:58:55 +0100
-Date: Wed, 10 Apr 2024 16:58:54 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-CC: Russell King <rmk+kernel@armlinux.org.uk>, <linux-pm@vger.kernel.org>,
-	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <x86@kernel.org>,
-	<acpica-devel@lists.linuxfoundation.org>, <linux-csky@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <linux-ia64@vger.kernel.org>,
-	<linux-parisc@vger.kernel.org>, Salil Mehta <salil.mehta@huawei.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>, <jianyong.wu@arm.com>,
-	<justin.he@arm.com>, James Morse <james.morse@arm.com>, Miguel Luis
-	<miguel.luis@oracle.com>
-Subject: Re: [PATCH RFC v4 02/15] ACPI: processor: Register all CPUs from
- acpi_processor_get_info()
-Message-ID: <20240410165854.00002973@huawei.com>
-In-Reply-To: <CAJZ5v0hRPFd7jmhJdCu8jVCRc4hZRUt9sKm6iWfynZH1mX7rCg@mail.gmail.com>
-References: <Zbp5xzmFhKDAgHws@shell.armlinux.org.uk>
-	<E1rVDmU-0027YP-Jz@rmk-PC.armlinux.org.uk>
-	<CAJZ5v0iiJpUWq5GMSnKFWQTzn_bdwoQz9m=hDaXNg4Lj_ePF4g@mail.gmail.com>
-	<20240322185327.00002416@Huawei.com>
-	<20240410134318.0000193c@huawei.com>
-	<CAJZ5v0ggD042sfz3jDXQVDUxQZu_AWaF2ox-Me8CvFeRB8nczw@mail.gmail.com>
-	<20240410145005.00003050@Huawei.com>
-	<CAJZ5v0hRPFd7jmhJdCu8jVCRc4hZRUt9sKm6iWfynZH1mX7rCg@mail.gmail.com>
-Organization: Huawei Technologies R&D (UK) Ltd.
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.29; x86_64-w64-mingw32)
+	s=arc-20240116; t=1712766838; c=relaxed/simple;
+	bh=Lxk+nu1ElmHbPqbruGu7bsCZtblhfeKs04cJc3fu7sA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ajm76df1MDiwOh95ZARK3UXy6Ro92TM7ngggzpq1GTTcRPe9Z2HKM63j54JUiCnmv1Evea2wIgbxraG5v1KjIEun+sduztHGyGoZ5ftlxnAYn5Aqp/G69rmdzleHDWlxo280sge4Yx2nNyZbYGPI02iM1P4/5cW3dUCWYLnsJiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FW+Hl4No; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FW+Hl4No"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 967DBC433F1;
+	Wed, 10 Apr 2024 16:33:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712766837;
+	bh=Lxk+nu1ElmHbPqbruGu7bsCZtblhfeKs04cJc3fu7sA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FW+Hl4NofBz3bb9/GOCLtbNKqxiAn1TWdNN3GjRrqtJHwGxDcCubSNaWE3Do938+7
+	 aYHv6EhsuI1WuxI3jzD0kThrtlO+DLOapzjM5Ud+RcLxG6DP5ApxDtsBgrUUQ0xoHz
+	 Xby8GC2mEEs7sHmahMt0C6wK5ofCaZ/EOS0HnqmPoCY2K8o9zaYNFZFGIibeBECdu9
+	 40EJFHEYvUsFZHcyh49fWsvnAiOtA7CbvtS0r1tjn1WGlLFt6R+kOQNcnkwgcUw2N7
+	 T7yuLRbQ3/olqdsLWkWDmCabyw7d/wC+fmByyL8BU0gN0Da9H/2m01bMEHdylz6D5d
+	 OQldnWjCWBRRA==
+Date: Wed, 10 Apr 2024 17:33:49 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.linux.dev,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v6 2/5] KVM: arm64: Add newly allocated ID registers to
+ register descriptions
+Message-ID: <d7263b50-adda-44c0-90de-0e0890722b92@sirena.org.uk>
+References: <20240329-arm64-2023-dpisa-v6-0-ba42db6c27f3@kernel.org>
+ <20240329-arm64-2023-dpisa-v6-2-ba42db6c27f3@kernel.org>
+ <87le5ysm4l.wl-maz@kernel.org>
+ <73c6012f-adb0-470b-bd47-6093d28aea97@sirena.org.uk>
+ <86ttk9se3h.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="x4qkr4Sz7m9EvEWi"
+Content-Disposition: inline
+In-Reply-To: <86ttk9se3h.wl-maz@kernel.org>
+X-Cookie: A bachelor is an unaltared male.
+
+
+--x4qkr4Sz7m9EvEWi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Wed, 10 Apr 2024 16:19:50 +0200
-"Rafael J. Wysocki" <rafael@kernel.org> wrote:
+On Wed, Apr 10, 2024 at 11:32:02AM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
+> > On Sun, Mar 31, 2024 at 11:59:06AM +0100, Marc Zyngier wrote:
+> > > Mark Brown <broonie@kernel.org> wrote:
 
-> On Wed, Apr 10, 2024 at 3:50=E2=80=AFPM Jonathan Cameron
-> <Jonathan.Cameron@huawei.com> wrote:
-> >
-> > On Wed, 10 Apr 2024 15:28:18 +0200
-> > "Rafael J. Wysocki" <rafael@kernel.org> wrote:
-> > =20
-> > > On Wed, Apr 10, 2024 at 2:43=E2=80=AFPM Jonathan Cameron
-> > > <Jonathan.Cameron@huawei.com> wrote: =20
-> > > > =20
-> > > > > > =20
-> > > > > > > diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
-> > > > > > > index 47de0f140ba6..13d052bf13f4 100644
-> > > > > > > --- a/drivers/base/cpu.c
-> > > > > > > +++ b/drivers/base/cpu.c
-> > > > > > > @@ -553,7 +553,11 @@ static void __init cpu_dev_register_gene=
-ric(void)
-> > > > > > >  {
-> > > > > > >         int i, ret;
-> > > > > > >
-> > > > > > > -       if (!IS_ENABLED(CONFIG_GENERIC_CPU_DEVICES))
-> > > > > > > +       /*
-> > > > > > > +        * When ACPI is enabled, CPUs are registered via
-> > > > > > > +        * acpi_processor_get_info().
-> > > > > > > +        */
-> > > > > > > +       if (!IS_ENABLED(CONFIG_GENERIC_CPU_DEVICES) || !acpi_=
-disabled)
-> > > > > > >                 return; =20
-> > > > > >
-> > > > > > Honestly, this looks like a quick hack to me and it absolutely
-> > > > > > requires an ACK from the x86 maintainers to go anywhere. =20
-> > > > > Will address this separately.
-> > > > > =20
-> > > >
-> > > > So do people prefer this hack, or something along lines of the foll=
-owing?
-> > > >
-> > > > static int __init cpu_dev_register_generic(void)
-> > > > {
-> > > >         int i, ret =3D 0;
-> > > >
-> > > >         for_each_online_cpu(i) {
-> > > >                 if (!get_cpu_device(i)) {
-> > > >                         ret =3D arch_register_cpu(i);
-> > > >                         if (ret)
-> > > >                                 pr_warn("register_cpu %d failed (%d=
-)\n", i, ret);
-> > > >                 }
-> > > >         }
-> > > >         //Probably just eat the error.
-> > > >         return 0;
-> > > > }
-> > > > subsys_initcall_sync(cpu_dev_register_generic); =20
-> > >
-> > > I would prefer something like the above.
-> > >
-> > > I actually thought that arch_register_cpu() might return something
-> > > like -EPROBE_DEFER when it cannot determine whether or not the CPU is
-> > > really available. =20
-> >
-> > Ok. That would end up looking much more like the original code I think.
-> > So we wouldn't have this late registration at all, or keep it for DT
-> > on arm64?  I'm not sure that's a clean solution though leaves
-> > the x86 path alone. =20
->=20
-> I'm not sure why DT on arm64 would need to do late registration.
+> And when it comes to CPA, there are additional controls in SCTLR2_ELx,
+> which doesn't even gets context switched for EL1. What could possibly
+> go wrong?
 
-This was me falsely thinking better to do it close together for
-DT and ACPI. It definitely doesn't need to (or it wouldn't work today!)
+Yes, I'd missed those - they were rather buried in the XML
+unfortunately.  I'd already disabled CPA in my local code, and I've also
+refactored the exposure of FPMR to be in the patch that context switches
+it.
 
->=20
-> There is this chain of calls in the mainline today:
->=20
-> driver_init()
->   cpu_dev_init()
->     cpu_dev_register_generic()
->=20
-> the last of which registers CPUs on arm64/DT systems IIUC. I don't see
-> a need to change this behavior.
->=20
-> On arm64/ACPI, though, arch_register_cpu() cannot make progress until
-> it can look into the ACPI Namespace, so I would just make it return
-> -EPROBE_DEFER or equivalent then and the ACPI enumeration will find
-> the CPU and basically treat it as one that has just appeared.
+> > > > -	ID_UNALLOCATED(6,3),
+> > > > +	ID_WRITABLE(ID_AA64ISAR3_EL1, ~(ID_AA64ISAR2_EL1_RES0 |
+> > > > +					ID_AA64ISAR3_EL1_PACM |
 
-Ok so giving this a go...
+> > > >  	ID_UNALLOCATED(6,4),
+> > > >  	ID_UNALLOCATED(6,5),
+> > > >  	ID_UNALLOCATED(6,6),
 
-Arm 64 version of arch_register_cpu() ended up as the following
-(obviously needs cleaning up, bikeshedding of naming etc)
+> > > Where is the code that enforces the lack of support for MTEFAR,
+> > > MTESTOREONLY, and MTEPERM for SCTLR_ELx, EnPACM and EnFPM in HCRX_EL2?
 
-int arch_register_cpu(int cpu)
-{
-        struct cpu *c =3D &per_cpu(cpu_devices, cpu);
-        acpi_handle acpi_handle =3D ACPI_HANDLE(&c->dev);
-        int ret;
+> > Could you please be more explicit regarding what you're expecting to see
+> > here?
 
-	printk("!!!!! INTO arch_register_cpu() %px\n", ACPI_HANDLE(&c->dev));
+> I'm expecting you to add all the required masking and fine-grained
+> disabling of features that are not explicitly advertised to the guest.
 
-        if (!acpi_disabled && !acpi_handle)
-                return -EPROBE_DEFER;
-        if (acpi_handle) {
-                ret =3D acpi_sta_enabled(acpi_handle);
-                if (ret) {
-                        printk("Have handle, not enabled\n");
-                        /* Not enabled */
-                        return ret;
-                }
-        }
-        printk("!!!!! onwards arch_register_cpu()\n");
+> This should translate into additional init code in kvm_init_sysreg(),
+> kvm_init_nv_sysregs() and limit_nv_id_reg(). You also should update
 
-        c->hotpluggable =3D arch_cpu_is_hotpluggable(cpu);
+I see that in limit_nv_id_reg() I am missing updates to expose the new
+dpISA features to nested guests.  However from a first pass it looks
+like kvm_init_nv_sysregs() already handles everything I'd expect it to,
+AFAICT it's handling all known trap bits?  For kvm_init_sysreg() with
+HCRX AFAICT we default to having all bits 0 with explicit relaxations
+for supported features (currently FEAT_MOPS, also FEAT_FPMR with this
+series) meaning that I'm still unclear what exactly the updates you're
+looking for are.  For SCTLR unless I'm misunderstanding things we've got
+an existing issue with not initialising the res0 and res1 fields in
+kvm_init_nv_sysregs() but that doesn't seem right... =20
 
-        return register_cpu(c, cpu);
-}
+> the exception triaging infrastructure in emulate-nested.c.
 
-with new utility function in drivers/acpi/utils.c
+Again I am really struggling to identify which specific updates you are
+looking for here.
 
-int acpi_sta_enabled(acpi_handle handle)
-{
-       unsigned long long sta;
-       bool present, enabled;
-       acpi_status status;
+> > > And I haven't checked whether TLBI VMALLWS2 can be trapped.
 
-       if (acpi_has_method(handle, "_STA")) {
-               status =3D acpi_evaluate_integer(handle, "_STA", NULL, &sta);
-               if (ACPI_FAILURE(status))
-                       return -ENODEV;
+> > I didn't see anything but I might not be aware of where to look, there
+> > doesn't seem to be anything for that specifically in HFGITR_EL2 or
+> > HFGITR2_EL2 which would be the main places I'd expect to find
+> > something.
 
-               present =3D sta & ACPI_STA_DEVICE_PRESENT;
-               enabled =3D sta & ACPI_STA_DEVICE_ENABLED;
-               if (!present || !enabled) {
-                       return -EPROBE_DEFER;
-               }
-               return 0;
-       }
-       return 0; /* No _STA means always on! */
-}
-	struct cpu *c =3D &per_cpu(cpu_devices, pr->id);=09
-	ACPI_COMPANION_SET(&c->dev, device);
+> That's a really odd place to look. This is a S2 invalidation
+> primitive, which by definition is under the sole control of EL2, and
+> therefore cannot be trapped by any of the FGT registers, as they only
+> affect lesser-privileged ELs.
 
-in acpi_processor_get_info() and that calls
+> The instruction is described in the XML:
 
-static int acpi_processor_make_enabled(struct acpi_processor *pr)
-{
-        int ret;
+> https://developer.arm.com/documentation/ddi0601/2024-03/AArch64-Instructi=
+ons/TLBI-VMALLWS2E1--TLB-Invalidate-stage-2-dirty-state-by-VMID--EL1-0
 
-        if (invalid_phys_cpuid(pr->phys_id))
-                return -ENODEV;
+That's TLBI VMALLWSE1 which is a more specific instruction.  TBH I can't
+remember exactly what I was looking for, I did go into the instruction
+pseudocode a bit (I was going in via SYS at one point) but didn't find
+anything so was also trawling sysregs looking for something.  If I'm
+reading this right there are no traps?
 
-        cpus_write_lock();
-        ret =3D arch_register_cpu(pr->id);
-        cpus_write_unlock();
+--x4qkr4Sz7m9EvEWi
+Content-Type: application/pgp-signature; name="signature.asc"
 
-        return ret;
-}
+-----BEGIN PGP SIGNATURE-----
 
-I think setting the ACPI handle should be harmless on other architectures.
-It seems like the obvious one to set it to for cpu->dev.
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmYWv2wACgkQJNaLcl1U
+h9C8OQf/X+t5aQ5/nMQBNyVUWzuv0H4al1uPXrqHbjYcuaLB6extGWPsVnzhcikJ
+ejycYkszbTrF/28+Ix3QmYCqv5bNph/A8a2xAvtbhcqAmQ3m1NuH5aCfGNcGxOmk
+VWtSmljce1GeJh6xPOkCbTF8zwIoSp0cvubFxTTaZb4LnaiJdT+28TGVzpmc1vQl
+ZFrv/ZRyf8lxVu9IZuCRtSthRJOYyhkwC1GUcBnyrZ+4ViJE0qmzxDDTO9kvtoVu
+weHy/oBXNsfRdlkZubuQv2/zCqo2MVXkUhoxwGPXqPRgN0DFCgyFt70N841OjP4j
+hwQ0PKE5A4w3JRp+kM/DX0MURgxStg==
+=zSnw
+-----END PGP SIGNATURE-----
 
-Brief tests on same set of DT and ACPI on x86 and arm64 seem fine.
-
->=20
-> > If we get rid of this catch all, solution would be to move the
-> > !acpi_disabled check into the arm64 version of arch_cpu_register()
-> > because we would only want the delayed registration path to be
-> > used on ACPI cases where the question of CPU availability can't
-> > yet be resolved. =20
->=20
-> Exactly.
->=20
-> This is similar (if not equivalent even) to a CPU becoming available
-> between the cpu_dev_register_generic() call and the ACPI enumeration.
-
->=20
-> > >
-> > > Then, the ACPI processor enumeration path may take care of registering
-> > > CPU that have not been registered so far and in the more-or-less the
-> > > same way regardless of the architecture (modulo some arch-specific
-> > > stuff). =20
-> >
-> > If I understand correctly, in acpi_processor_get_info() we'd end up
-> > with a similar check on whether it was already registered (the x86 path)
-> > or had be deferred (arm64 / acpi).
-> > =20
-> > >
-> > > In the end, it should be possible to avoid changing the behavior of
-> > > x86 and loongarch in this series. =20
-> >
-> > Possible, yes, but result if I understand correctly is we end up with
-> > very different flows and replication of functionality between the
-> > early registration and the late one. I'm fine with that if you prefer i=
-t! =20
->=20
-> But that's what is there today, isn't it?
-
-Agreed - but I was previously thinking we could move everything late.
-I'm fine with just keeping the two flows separate.
-
->=20
-> I think this can be changed to reduce the duplication, but I'd prefer
-> to do that later, when the requisite functionality is in place and we
-> just do the consolidation.  In that case, if anything goes wrong, we
-> can take a step back and reconsider without deferring the arm64 CPU
-> hotplug support.
-
-Great. That plan certainly works for me :)
-
-Thanks for quick replies and help getting this headed in right direction.
-
-+CC Miguel who is also looking at some of this series. Sorry Miguel,
-was assuming you were on the thread and never checked :(
-
-Jonathan
-
-
+--x4qkr4Sz7m9EvEWi--
