@@ -1,150 +1,122 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DC8C157;
-	Wed, 10 Apr 2024 10:32:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823BC158DAF;
+	Wed, 10 Apr 2024 12:43:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712745125; cv=none; b=ZmKKzlG500g2ZsSrP94U/Va4UL+nuToYgUC0nRO/26hP7wHG7qKXLaeRlF3vIIUuci92GjEeltOxy8iHpMjYTIuQ8NSHvWrnxp7fveKi8XqJ0t6tIelxQ/8ZYtALFtQVEtoI4IcpYG1LXb7PRAWfxjBknJxcBRpDELVya8Uv6W0=
+	t=1712753005; cv=none; b=Kv5KSey7fbEA7lINMK/0jKFt5y0XGn/Vtm4FUTDGQDcuVWAeDBwFviwu2OY3e0y6IZl/rJvviA+qeMwq3G+AgiVNxFHf1LngDsxvr9h33ePyBgwMVZ04WdT3u49bpRrVj2ucLQSYNGFSnnYHMqcYfq/HOnJnMFjD1V3Y3iBZ26k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712745125; c=relaxed/simple;
-	bh=OzNxKoT6rtjavH+sSKdTA2aMIU0990lfBRRYYlSp7XA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=feKDrXhCCL6T2+UqZkQfZgeLH8Kmhaj4bifMXew/8xX5wRmwRpWhV1RvE8M25+evx6Gejpb5LI5+aVchC9n0mEkGhtMDo/X2vncczQTn7M86EqfvZJ33KFnvU3biKrdOk/BScaSNmWAYy4Ul3uMky5jVYD7zSJP1J7tyYazyupc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KzalsUOm; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KzalsUOm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C0D0C433F1;
-	Wed, 10 Apr 2024 10:32:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712745125;
-	bh=OzNxKoT6rtjavH+sSKdTA2aMIU0990lfBRRYYlSp7XA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KzalsUOmcblbIZ97GurA1rdPl9SC/8tq1vtLK++nVmvjVqR9HNbhdulCsgNlNpZUj
-	 NhO4HaeutbcfxdSMSiqUGFVU9mek+M+PfbLiaK11UZ2O3Pcm1Mc6zY7XAj8g8UbSaE
-	 6lkkhGnAxVFqTDIIrcjTnF3NVdW+jFwkEWP5fqybV7kidLwDueM6sPMB+OgxKrRLvV
-	 10I2eCvh2td9EFeowCycDH7ErIUGJUsVYaVx/+/g6ilmIJedkvHTmHYxFyRHGtKmvh
-	 hLtqtr2WwFmFYoQtdoA/57HlbU1WoYW7Bi6w8Te9JxTp9jOoVuF78A9vuezWC0U/rN
-	 DW7g6eiwYTL1A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ruVFK-0036qE-TU;
-	Wed, 10 Apr 2024 11:32:02 +0100
-Date: Wed, 10 Apr 2024 11:32:02 +0100
-Message-ID: <86ttk9se3h.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Dave Martin <Dave.Martin@arm.com>,
-	kvmarm@lists.linux.dev,
-	linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v6 2/5] KVM: arm64: Add newly allocated ID registers to register descriptions
-In-Reply-To: <73c6012f-adb0-470b-bd47-6093d28aea97@sirena.org.uk>
-References: <20240329-arm64-2023-dpisa-v6-0-ba42db6c27f3@kernel.org>
-	<20240329-arm64-2023-dpisa-v6-2-ba42db6c27f3@kernel.org>
-	<87le5ysm4l.wl-maz@kernel.org>
-	<73c6012f-adb0-470b-bd47-6093d28aea97@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1712753005; c=relaxed/simple;
+	bh=oNXkmJLZw0UUlzScvUERB+oZiwnYTzIkRhGzopuv6w0=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ws4Gg/1iiYHcMWWyCXeIKoFnJakhxlq4eYWtDxOfVNgVoYMQwv9BxOmIdkHJzHI7m+FED27wG8aNGjj9cxAeYhReUbsEAsp2pFxblYgph5wusGAmxS/0b3xKRUZhyH6ZrZUXOQk9jodkrcvEvRJ2LxBSCUxG1L+LVjXEQKPy9ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VF2Wn6z5Vz6K6Cs;
+	Wed, 10 Apr 2024 20:41:41 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id AB478140DD4;
+	Wed, 10 Apr 2024 20:43:19 +0800 (CST)
+Received: from localhost (10.122.247.231) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Wed, 10 Apr
+ 2024 13:43:19 +0100
+Date: Wed, 10 Apr 2024 13:43:18 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+CC: Russell King <rmk+kernel@armlinux.org.uk>, <linux-pm@vger.kernel.org>,
+	<loongarch@lists.linux.dev>, <linux-acpi@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <x86@kernel.org>,
+	<acpica-devel@lists.linuxfoundation.org>, <linux-csky@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-ia64@vger.kernel.org>,
+	<linux-parisc@vger.kernel.org>, Salil Mehta <salil.mehta@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, <jianyong.wu@arm.com>,
+	<justin.he@arm.com>, James Morse <james.morse@arm.com>
+Subject: Re: [PATCH RFC v4 02/15] ACPI: processor: Register all CPUs from
+ acpi_processor_get_info()
+Message-ID: <20240410134318.0000193c@huawei.com>
+In-Reply-To: <20240322185327.00002416@Huawei.com>
+References: <Zbp5xzmFhKDAgHws@shell.armlinux.org.uk>
+	<E1rVDmU-0027YP-Jz@rmk-PC.armlinux.org.uk>
+	<CAJZ5v0iiJpUWq5GMSnKFWQTzn_bdwoQz9m=hDaXNg4Lj_ePF4g@mail.gmail.com>
+	<20240322185327.00002416@Huawei.com>
+Organization: Huawei Technologies R&D (UK) Ltd.
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.29; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, corbet@lwn.net, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Dave.Martin@arm.com, kvmarm@lists.linux.dev, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Tue, 02 Apr 2024 18:21:55 +0100,
-Mark Brown <broonie@kernel.org> wrote:
+> >   
+> > > diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
+> > > index 47de0f140ba6..13d052bf13f4 100644
+> > > --- a/drivers/base/cpu.c
+> > > +++ b/drivers/base/cpu.c
+> > > @@ -553,7 +553,11 @@ static void __init cpu_dev_register_generic(void)
+> > >  {
+> > >         int i, ret;
+> > >
+> > > -       if (!IS_ENABLED(CONFIG_GENERIC_CPU_DEVICES))
+> > > +       /*
+> > > +        * When ACPI is enabled, CPUs are registered via
+> > > +        * acpi_processor_get_info().
+> > > +        */
+> > > +       if (!IS_ENABLED(CONFIG_GENERIC_CPU_DEVICES) || !acpi_disabled)
+> > >                 return;    
+> > 
+> > Honestly, this looks like a quick hack to me and it absolutely
+> > requires an ACK from the x86 maintainers to go anywhere.  
+> Will address this separately.
 > 
-> On Sun, Mar 31, 2024 at 11:59:06AM +0100, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
+
+So do people prefer this hack, or something along lines of the following?
+
+static int __init cpu_dev_register_generic(void)
+{
+        int i, ret = 0;
+
+        for_each_online_cpu(i) {
+                if (!get_cpu_device(i)) {
+                        ret = arch_register_cpu(i);
+                        if (ret)
+                                pr_warn("register_cpu %d failed (%d)\n", i, ret);
+                }
+        }
+	//Probably just eat the error.
+        return 0;
+}
+subsys_initcall_sync(cpu_dev_register_generic);
+
+Which may look familiar at it's effectively patch 3 from v3 which was dealing
+with CPUs missing from DSDT (something we think doesn't happen).
+
+It might be possible to elide the arch_register_cpu() in
+make_present() but that will mean we use different flows in this patch set
+for the hotplug and initially present cases which is a bit messy.
+
+I've tested this lightly on arm64 and x86 ACPI + DT booting and it "seems" fine.
+
+Jonathan
+
+> >   
+> > >
+> > >         for_each_present_cpu(i) {
+> > > --    
 > 
-> > > The 2023 architecture extensions have allocated some new ID registers, add
-> > > them to the KVM system register descriptions so that they are visible to
-> > > guests.
 > 
-> > > We make the newly introduced dpISA features writeable, as well as
-> > > allowing writes to ID_AA64ISAR3_EL1.CPA for FEAT_CPA which only
-> > > introduces straigforward new instructions with no additional
-> > > architectural state or traps.
-> 
-> > FPMR actively gets trapped by HCRX_EL2.
-> 
-> Sure, I'm not clear what you're trying to say here?
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
 
-I'm saying (and not trying to say) that there are traps implied by the
-features that you are adding.
-
-> The "no additional" bit is referring to FEAT_CPA.
-
-Well, that wasn't clear to me.
-
-And when it comes to CPA, there are additional controls in SCTLR2_ELx,
-which doesn't even gets context switched for EL1. What could possibly
-go wrong?
-
-> 
-> > > -	ID_UNALLOCATED(6,3),
-> > > +	ID_WRITABLE(ID_AA64ISAR3_EL1, ~(ID_AA64ISAR2_EL1_RES0 |
-> > > +					ID_AA64ISAR3_EL1_PACM |
-> > > +					ID_AA64ISAR3_EL1_TLBIW)),
-> > >  	ID_UNALLOCATED(6,4),
-> > >  	ID_UNALLOCATED(6,5),
-> > >  	ID_UNALLOCATED(6,6),
-> 
-> > Where is the code that enforces the lack of support for MTEFAR,
-> > MTESTOREONLY, and MTEPERM for SCTLR_ELx, EnPACM and EnFPM in HCRX_EL2?
-> 
-> Could you please be more explicit regarding what you're expecting to see
-> here?
-
-I'm expecting you to add all the required masking and fine-grained
-disabling of features that are not explicitly advertised to the guest.
-
-This should translate into additional init code in kvm_init_sysreg(),
-kvm_init_nv_sysregs() and limit_nv_id_reg(). You also should update
-the exception triaging infrastructure in emulate-nested.c.
-
-> Other than the writeability mask for the ID register I would have
-> expected to need explicit code to enable new features rather than
-> explicit code to keep currently unsupported features unsupported.  I'm
-> sure what you're referencing will be obvious once I see it but I'm
-> drawing a blank.
-> 
-> > And I haven't checked whether TLBI VMALLWS2 can be trapped.
-> 
-> I didn't see anything but I might not be aware of where to look, there
-> doesn't seem to be anything for that specifically in HFGITR_EL2 or
-> HFGITR2_EL2 which would be the main places I'd expect to find
-> something.
-
-That's a really odd place to look. This is a S2 invalidation
-primitive, which by definition is under the sole control of EL2, and
-therefore cannot be trapped by any of the FGT registers, as they only
-affect lesser-privileged ELs.
-
-The instruction is described in the XML:
-
-https://developer.arm.com/documentation/ddi0601/2024-03/AArch64-Instructions/TLBI-VMALLWS2E1--TLB-Invalidate-stage-2-dirty-state-by-VMID--EL1-0
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
