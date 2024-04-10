@@ -1,155 +1,161 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C83EC3;
-	Wed, 10 Apr 2024 16:33:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D314817B503
+	for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 17:10:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712766838; cv=none; b=J56UdHAfglbfSCUDQPiqdyg8ENNMvAdWriOXTpIyRq7wT5lYW3ctkidyfIAVZm0jErhJbA/8UbdVnIPXxf63VV8E+dVjkFRMGB2mHxcYb8S0Al8nuKwOF51uD1DOyQK5jlAhVa6Ymq4Q7aDk7geqKA72Ocr29wyrdNmUN3JO0fs=
+	t=1712769045; cv=none; b=fi43AQNYENysYHIkJVuXUCA67OeyfHx4IWKNX1IQSaI0ve6biMZwOc+IiuaQ9rQ+Q2U7gbEZJHYO/Pr5FfaBveQMbKw30uQYGCR42KBrzyduuLOOvpVmrTY0hH/T0VLvpmOCIxCTmiQfZ0lyWlFTBA5H+OZ8VKWfOMo5FwTRXy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712766838; c=relaxed/simple;
-	bh=Lxk+nu1ElmHbPqbruGu7bsCZtblhfeKs04cJc3fu7sA=;
+	s=arc-20240116; t=1712769045; c=relaxed/simple;
+	bh=BnpeD//y6Emyg6pwhX/1SvzsGe/D9scnMaicPrlWrg8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ajm76df1MDiwOh95ZARK3UXy6Ro92TM7ngggzpq1GTTcRPe9Z2HKM63j54JUiCnmv1Evea2wIgbxraG5v1KjIEun+sduztHGyGoZ5ftlxnAYn5Aqp/G69rmdzleHDWlxo280sge4Yx2nNyZbYGPI02iM1P4/5cW3dUCWYLnsJiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FW+Hl4No; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=d92tCpyG9kWN6sIE07iP7s58BQonHcKt2ju8uPFXfCoRHywj1/0cdWvy4kjCpcXvdwqE+9rJbbIafJ+ZYLzLasyVQmgKrWUSd+Tb2VxPxhjEbhlLDKrnQZeSYCy2TqxIdqe95vRnrc0PrsWvQGiQJm8q8hD/7/gvJLVAG90vZBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pyqY+TsA; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FW+Hl4No"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 967DBC433F1;
-	Wed, 10 Apr 2024 16:33:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712766837;
-	bh=Lxk+nu1ElmHbPqbruGu7bsCZtblhfeKs04cJc3fu7sA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FW+Hl4NofBz3bb9/GOCLtbNKqxiAn1TWdNN3GjRrqtJHwGxDcCubSNaWE3Do938+7
-	 aYHv6EhsuI1WuxI3jzD0kThrtlO+DLOapzjM5Ud+RcLxG6DP5ApxDtsBgrUUQ0xoHz
-	 Xby8GC2mEEs7sHmahMt0C6wK5ofCaZ/EOS0HnqmPoCY2K8o9zaYNFZFGIibeBECdu9
-	 40EJFHEYvUsFZHcyh49fWsvnAiOtA7CbvtS0r1tjn1WGlLFt6R+kOQNcnkwgcUw2N7
-	 T7yuLRbQ3/olqdsLWkWDmCabyw7d/wC+fmByyL8BU0gN0Da9H/2m01bMEHdylz6D5d
-	 OQldnWjCWBRRA==
-Date: Wed, 10 Apr 2024 17:33:49 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.linux.dev,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v6 2/5] KVM: arm64: Add newly allocated ID registers to
- register descriptions
-Message-ID: <d7263b50-adda-44c0-90de-0e0890722b92@sirena.org.uk>
-References: <20240329-arm64-2023-dpisa-v6-0-ba42db6c27f3@kernel.org>
- <20240329-arm64-2023-dpisa-v6-2-ba42db6c27f3@kernel.org>
- <87le5ysm4l.wl-maz@kernel.org>
- <73c6012f-adb0-470b-bd47-6093d28aea97@sirena.org.uk>
- <86ttk9se3h.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pyqY+TsA"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-416f04059beso5869665e9.1
+        for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 10:10:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712769042; x=1713373842; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jPAolQcDDgJY4OktndQFfIkIGL4ln6Jfg8j7dRhT7sM=;
+        b=pyqY+TsAbOTkMS3jxvT/lsMB7+v2cDWsnIVOAHDBIltBuogOpIYb3E7bGKS7RwLWrS
+         NcRV5b3Lw8HWZjaJwncG7bga4mErrudfuxQUqZq3OR1CYcfom1eSvH8RVDB5T9bjZya7
+         pFIZSKBNaU/mkABU+EOIhomwt6vPP4FXgN4/grA1OdaSFQjaDUoRYD4Dmy+bM8qmWsNe
+         pOOEzKAqqx51osAA/zdHMuFWKNp73iwY6Qsq0CyRurO8qrvVzZHGaUkCiY03CQ8FIbbT
+         dD1e7sPCBID8DO84gm2QQpE54o2RGBVcsbJf4Ecze6dsHddrzqHY9erofhEtRog9EpL+
+         L92g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712769042; x=1713373842;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jPAolQcDDgJY4OktndQFfIkIGL4ln6Jfg8j7dRhT7sM=;
+        b=JlNJVYwAqwGH9IK1yFKPWIJvelk3bjYiXsLE7P1Qud5y1MEsVNo6sjAiK4PiDJGbF4
+         wJlsXwOAWXqFEPuSwY8K96oysPNQz4b/SSNmk8xT4tB8rtTCGh1ev0IFDVP6rbHFmqEa
+         qVy3Rp+TD4w24dFs79fdSi5kMPrDn5U3rVWJrhWS5vAbeklAy69lFaPSTGrDe0O2a4fW
+         1HEZ1d5xNstbQVUJGElxtKGREiri9TT7XY3YMb9hSFMJPsvuHRDn/gUdxv7MHWGxJyiF
+         z0X+a6V4auYaF+gorcbUzCw2skpMjcPUEcCItdQiKpSN/gM6gFWLYKntLzm9HNFtueJX
+         9jJw==
+X-Forwarded-Encrypted: i=1; AJvYcCWxTf02Yha1/mEyYXjf+4ccxUQ93MzfaTeTnddr5shOPvsk+AT6jBl5FbDF08lePQNLNefj6fs4Nn8o5PlKbq0PfgcHTzkR
+X-Gm-Message-State: AOJu0YwoU1oxjEAa8ST+9RfflGdAlvEMeAC4NWR088T95w8xEPO3AtQQ
+	QXTBPm7QWJYtEXxLvBQHsczmspiYcw1C34rPfD+ovh8q3wy7bxRiSEEUJJHCOw==
+X-Google-Smtp-Source: AGHT+IFuiUBGc1CYJe0Ub3hOpD127J9JpZKYHIWmsNnnCQ5/iQn3KNoIGFXIGnRIbSfXm9fkSnUotg==
+X-Received: by 2002:a05:6000:225:b0:346:4d41:8d5a with SMTP id l5-20020a056000022500b003464d418d5amr1974050wrz.56.1712769041816;
+        Wed, 10 Apr 2024 10:10:41 -0700 (PDT)
+Received: from google.com (161.126.77.34.bc.googleusercontent.com. [34.77.126.161])
+        by smtp.gmail.com with ESMTPSA id j11-20020adff54b000000b003433bf6651dsm13429411wrp.75.2024.04.10.10.10.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 10:10:41 -0700 (PDT)
+Date: Wed, 10 Apr 2024 18:10:37 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Sebastian Ene <sebastianene@google.com>
+Cc: catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org,
+	maz@kernel.org, oliver.upton@linux.dev, qperret@google.com,
+	qwandor@google.com, sudeep.holla@arm.com, suzuki.poulose@arm.com,
+	tabba@google.com, will@kernel.org, yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kernel-team@android.com
+Subject: Re: [PATCH] KVM: arm64: Add support for FFA_PARTITION_INFO_GET
+Message-ID: <ZhbIDUO9BULaiSh3@google.com>
+References: <20240409151908.541589-1-sebastianene@google.com>
+ <ZhVpmF2js1NJp1qF@google.com>
+ <ZhZYsuqggl_Hzv8X@google.com>
+ <ZhZhm4UXyClAqXDM@google.com>
+ <ZhZnaibTBaa2J4a5@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="x4qkr4Sz7m9EvEWi"
-Content-Disposition: inline
-In-Reply-To: <86ttk9se3h.wl-maz@kernel.org>
-X-Cookie: A bachelor is an unaltared male.
-
-
---x4qkr4Sz7m9EvEWi
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <ZhZnaibTBaa2J4a5@google.com>
 
-On Wed, Apr 10, 2024 at 11:32:02AM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
-> > On Sun, Mar 31, 2024 at 11:59:06AM +0100, Marc Zyngier wrote:
-> > > Mark Brown <broonie@kernel.org> wrote:
+On Wed, Apr 10, 2024 at 10:18:18AM +0000, Sebastian Ene wrote:
+> On Wed, Apr 10, 2024 at 10:53:31AM +0100, Vincent Donnefort wrote:
+> > [...]
+> > 
+> > > > > +static void do_ffa_part_get(struct arm_smccc_res *res,
+> > > > > +			    struct kvm_cpu_context *ctxt)
+> > > > > +{
+> > > > > +	DECLARE_REG(u32, uuid0, ctxt, 1);
+> > > > > +	DECLARE_REG(u32, uuid1, ctxt, 2);
+> > > > > +	DECLARE_REG(u32, uuid2, ctxt, 3);
+> > > > > +	DECLARE_REG(u32, uuid3, ctxt, 4);
+> > > > > +	DECLARE_REG(u32, flags, ctxt, 5);
+> > > > > +	u32 off, count, sz, buf_sz;
+> > > > > +
+> > > > > +	hyp_spin_lock(&host_buffers.lock);
+> > > > > +	if (!host_buffers.rx) {
+> > > > > +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
+> > > > > +		goto out_unlock;
+> > > > > +	}
+> > > > > +
+> > > > > +	arm_smccc_1_1_smc(FFA_PARTITION_INFO_GET, uuid0, uuid1,
+> > > > > +			  uuid2, uuid3, flags, 0, 0,
+> > > > > +			  res);
+> > > > > +
+> > > > > +	if (res->a0 != FFA_SUCCESS)
+> > > > > +		goto out_unlock;
+> > > > > +
+> > > > > +	count = res->a2;
+> > > > > +	if (!count)
+> > > > > +		goto out_unlock;
+> > > > 
+> > > > Looking at the table 13.34, it seems what's in "count" depends on the flag.
+> > > > Shouldn't we check its value, and only memcpy into the host buffers if the flag
+> > > > is 0?
+> > > > 
+> > > 
+> > > When the flag is `1` the count referes to the number of partitions
+> > > deployed. In both cases we have to copy something unless count == 0.
+> > 
+> > I see "Return the count of partitions deployed in the system corresponding to
+> > the specified UUID in w2"
+> > 
+> > Which I believe means nothing has been copied in the buffer?
+> > 
+> 
+> When the flag in w5 is 1 the size argument stored in w3 will be zero and
+> the loop will not be executed, so nothing will be copied to the host
+> buffers.
 
-> And when it comes to CPA, there are additional controls in SCTLR2_ELx,
-> which doesn't even gets context switched for EL1. What could possibly
-> go wrong?
+Ha right, all good here then.
 
-Yes, I'd missed those - they were rather buried in the XML
-unfortunately.  I'd already disabled CPA in my local code, and I've also
-refactored the exposure of FPMR to be in the patch that context switches
-it.
+> 
+> > > 
+> > > > > +
+> > > > > +	if (ffa_version > FFA_VERSION_1_0) {
+> > > > > +		buf_sz = sz = res->a3;
+> > > > > +		if (sz > sizeof(struct ffa_partition_info))
+> > > > > +			buf_sz = sizeof(struct ffa_partition_info);
+> > > > 
+> > > > What are you trying to protect against here? We have to trust EL3 anyway, (as
+> > > > other functions do).
+> > > > 
+> > > > The WARN() could be kept though to make sure we won't overflow our buffer. But
+> > > > it could be transformed into an error? FFA_RET_ABORTED?
+> > > > 
+> > > >
+> > > 
+> > > I think we can keep it as a WARN_ON because it is not expected to have
+> > > a return code of FFA_SUCCESS but the buffer to be overflown. The TEE is
+> > > expected to return NO_MEMORY in w2 if the results cannot fit in the RX
+> > > buffer.
+> > 
+> > WARN() is crashing the hypervisor. It'd be a shame here as we can easily recover
+> > by just sending an error back to the caller.
+> 
+> I agree with you but this is not expected to happen unless TZ messes up
+> something/is not complaint with the spec, in which case I would like to
+> catch this.
 
-> > > > -	ID_UNALLOCATED(6,3),
-> > > > +	ID_WRITABLE(ID_AA64ISAR3_EL1, ~(ID_AA64ISAR2_EL1_RES0 |
-> > > > +					ID_AA64ISAR3_EL1_PACM |
-
-> > > >  	ID_UNALLOCATED(6,4),
-> > > >  	ID_UNALLOCATED(6,5),
-> > > >  	ID_UNALLOCATED(6,6),
-
-> > > Where is the code that enforces the lack of support for MTEFAR,
-> > > MTESTOREONLY, and MTEPERM for SCTLR_ELx, EnPACM and EnFPM in HCRX_EL2?
-
-> > Could you please be more explicit regarding what you're expecting to see
-> > here?
-
-> I'm expecting you to add all the required masking and fine-grained
-> disabling of features that are not explicitly advertised to the guest.
-
-> This should translate into additional init code in kvm_init_sysreg(),
-> kvm_init_nv_sysregs() and limit_nv_id_reg(). You also should update
-
-I see that in limit_nv_id_reg() I am missing updates to expose the new
-dpISA features to nested guests.  However from a first pass it looks
-like kvm_init_nv_sysregs() already handles everything I'd expect it to,
-AFAICT it's handling all known trap bits?  For kvm_init_sysreg() with
-HCRX AFAICT we default to having all bits 0 with explicit relaxations
-for supported features (currently FEAT_MOPS, also FEAT_FPMR with this
-series) meaning that I'm still unclear what exactly the updates you're
-looking for are.  For SCTLR unless I'm misunderstanding things we've got
-an existing issue with not initialising the res0 and res1 fields in
-kvm_init_nv_sysregs() but that doesn't seem right... =20
-
-> the exception triaging infrastructure in emulate-nested.c.
-
-Again I am really struggling to identify which specific updates you are
-looking for here.
-
-> > > And I haven't checked whether TLBI VMALLWS2 can be trapped.
-
-> > I didn't see anything but I might not be aware of where to look, there
-> > doesn't seem to be anything for that specifically in HFGITR_EL2 or
-> > HFGITR2_EL2 which would be the main places I'd expect to find
-> > something.
-
-> That's a really odd place to look. This is a S2 invalidation
-> primitive, which by definition is under the sole control of EL2, and
-> therefore cannot be trapped by any of the FGT registers, as they only
-> affect lesser-privileged ELs.
-
-> The instruction is described in the XML:
-
-> https://developer.arm.com/documentation/ddi0601/2024-03/AArch64-Instructi=
-ons/TLBI-VMALLWS2E1--TLB-Invalidate-stage-2-dirty-state-by-VMID--EL1-0
-
-That's TLBI VMALLWSE1 which is a more specific instruction.  TBH I can't
-remember exactly what I was looking for, I did go into the instruction
-pseudocode a bit (I was going in via SYS at one point) but didn't find
-anything so was also trawling sysregs looking for something.  If I'm
-reading this right there are no traps?
-
---x4qkr4Sz7m9EvEWi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmYWv2wACgkQJNaLcl1U
-h9C8OQf/X+t5aQ5/nMQBNyVUWzuv0H4al1uPXrqHbjYcuaLB6extGWPsVnzhcikJ
-ejycYkszbTrF/28+Ix3QmYCqv5bNph/A8a2xAvtbhcqAmQ3m1NuH5aCfGNcGxOmk
-VWtSmljce1GeJh6xPOkCbTF8zwIoSp0cvubFxTTaZb4LnaiJdT+28TGVzpmc1vQl
-ZFrv/ZRyf8lxVu9IZuCRtSthRJOYyhkwC1GUcBnyrZ+4ViJE0qmzxDDTO9kvtoVu
-weHy/oBXNsfRdlkZubuQv2/zCqo2MVXkUhoxwGPXqPRgN0DFCgyFt70N841OjP4j
-hwQ0PKE5A4w3JRp+kM/DX0MURgxStg==
-=zSnw
------END PGP SIGNATURE-----
-
---x4qkr4Sz7m9EvEWi--
+Hum, still I don't see the point in crashing anything here, nothing is
+compromised. The driver can then decide what to do based on that reported
+failure.
