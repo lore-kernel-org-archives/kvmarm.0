@@ -1,161 +1,172 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D314817B503
-	for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 17:10:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4B217F37D
+	for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 17:55:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712769045; cv=none; b=fi43AQNYENysYHIkJVuXUCA67OeyfHx4IWKNX1IQSaI0ve6biMZwOc+IiuaQ9rQ+Q2U7gbEZJHYO/Pr5FfaBveQMbKw30uQYGCR42KBrzyduuLOOvpVmrTY0hH/T0VLvpmOCIxCTmiQfZ0lyWlFTBA5H+OZ8VKWfOMo5FwTRXy0=
+	t=1712771722; cv=none; b=YEx3orUv62tZjGNjxTcd7RKfDUzh/kvKlEDkkJ5hUqIZBx8HEQB6l2XPbX3rhFQgTGO21LIovCEtKdtLnnRFSPlJ2guqqINaNve6gGdmd1QhWTwk6/H4Jow9fZV2BfixzNFWtyiu7je6CgAfvB5sQsQKJrCUpLRfF8RVXFDm7dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712769045; c=relaxed/simple;
-	bh=BnpeD//y6Emyg6pwhX/1SvzsGe/D9scnMaicPrlWrg8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d92tCpyG9kWN6sIE07iP7s58BQonHcKt2ju8uPFXfCoRHywj1/0cdWvy4kjCpcXvdwqE+9rJbbIafJ+ZYLzLasyVQmgKrWUSd+Tb2VxPxhjEbhlLDKrnQZeSYCy2TqxIdqe95vRnrc0PrsWvQGiQJm8q8hD/7/gvJLVAG90vZBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pyqY+TsA; arc=none smtp.client-ip=209.85.128.45
+	s=arc-20240116; t=1712771722; c=relaxed/simple;
+	bh=c5vOu3wln/bzFkI50zK54TLDDdF576q5OSt+R4RYCW0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=krVTRqHq8W3oAe85Vm8Le8/bE7kEP9ph39+VH2wV0ekHB7GxL2vH53BXCTEqZ+rmxjytfIPV7mrZxC0J91j4Kf5vtHODhDx1Ve5z5Rze+QXMGeJJPQInov9ksZmmGxbaWZp0fi1oX+oYYwloyYgEcO8yC3y3Jyn93fwCEm3bqOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XDVBsEmN; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pyqY+TsA"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-416f04059beso5869665e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 10:10:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XDVBsEmN"
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcdc3db67f0so118092276.1
+        for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 10:55:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712769042; x=1713373842; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jPAolQcDDgJY4OktndQFfIkIGL4ln6Jfg8j7dRhT7sM=;
-        b=pyqY+TsAbOTkMS3jxvT/lsMB7+v2cDWsnIVOAHDBIltBuogOpIYb3E7bGKS7RwLWrS
-         NcRV5b3Lw8HWZjaJwncG7bga4mErrudfuxQUqZq3OR1CYcfom1eSvH8RVDB5T9bjZya7
-         pFIZSKBNaU/mkABU+EOIhomwt6vPP4FXgN4/grA1OdaSFQjaDUoRYD4Dmy+bM8qmWsNe
-         pOOEzKAqqx51osAA/zdHMuFWKNp73iwY6Qsq0CyRurO8qrvVzZHGaUkCiY03CQ8FIbbT
-         dD1e7sPCBID8DO84gm2QQpE54o2RGBVcsbJf4Ecze6dsHddrzqHY9erofhEtRog9EpL+
-         L92g==
+        d=google.com; s=20230601; t=1712771718; x=1713376518; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=oTRds48YQAuzki9smTU0zbOfJX16SMcTfKd42zPqGTw=;
+        b=XDVBsEmN/FrQIJbANBYPdVYz8/FJeNoF3K7q1eBfjxv+F0NrWeF2oKq4Jxf5fC4OAC
+         aY87gBFFs9pIuHTAhYgc4bj513yGU7tGuNg6Uyw+bZrEfTEpFgeozqstQ0Sn3sbmD3VT
+         IqSNYQeYXVOhYq3c8nMyUbtipIwXiJzXUm4ID1toz381prTV0Q3DK/sgTI7lc42L94rs
+         RY/qTjj+xv56fO/93/l8Ma7N+81aIB6vfgbB0qbW9X/wCE6iiF4BhcPZjkMSWt7UnNnR
+         7s+faFzwxXgtwWptEd7CcuYIp91pKx38f9ApiipeZ8uDQSJmSYBYuLTiJXaKgJYsdXnW
+         mI5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712769042; x=1713373842;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jPAolQcDDgJY4OktndQFfIkIGL4ln6Jfg8j7dRhT7sM=;
-        b=JlNJVYwAqwGH9IK1yFKPWIJvelk3bjYiXsLE7P1Qud5y1MEsVNo6sjAiK4PiDJGbF4
-         wJlsXwOAWXqFEPuSwY8K96oysPNQz4b/SSNmk8xT4tB8rtTCGh1ev0IFDVP6rbHFmqEa
-         qVy3Rp+TD4w24dFs79fdSi5kMPrDn5U3rVWJrhWS5vAbeklAy69lFaPSTGrDe0O2a4fW
-         1HEZ1d5xNstbQVUJGElxtKGREiri9TT7XY3YMb9hSFMJPsvuHRDn/gUdxv7MHWGxJyiF
-         z0X+a6V4auYaF+gorcbUzCw2skpMjcPUEcCItdQiKpSN/gM6gFWLYKntLzm9HNFtueJX
-         9jJw==
-X-Forwarded-Encrypted: i=1; AJvYcCWxTf02Yha1/mEyYXjf+4ccxUQ93MzfaTeTnddr5shOPvsk+AT6jBl5FbDF08lePQNLNefj6fs4Nn8o5PlKbq0PfgcHTzkR
-X-Gm-Message-State: AOJu0YwoU1oxjEAa8ST+9RfflGdAlvEMeAC4NWR088T95w8xEPO3AtQQ
-	QXTBPm7QWJYtEXxLvBQHsczmspiYcw1C34rPfD+ovh8q3wy7bxRiSEEUJJHCOw==
-X-Google-Smtp-Source: AGHT+IFuiUBGc1CYJe0Ub3hOpD127J9JpZKYHIWmsNnnCQ5/iQn3KNoIGFXIGnRIbSfXm9fkSnUotg==
-X-Received: by 2002:a05:6000:225:b0:346:4d41:8d5a with SMTP id l5-20020a056000022500b003464d418d5amr1974050wrz.56.1712769041816;
-        Wed, 10 Apr 2024 10:10:41 -0700 (PDT)
-Received: from google.com (161.126.77.34.bc.googleusercontent.com. [34.77.126.161])
-        by smtp.gmail.com with ESMTPSA id j11-20020adff54b000000b003433bf6651dsm13429411wrp.75.2024.04.10.10.10.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 10:10:41 -0700 (PDT)
-Date: Wed, 10 Apr 2024 18:10:37 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org,
-	maz@kernel.org, oliver.upton@linux.dev, qperret@google.com,
-	qwandor@google.com, sudeep.holla@arm.com, suzuki.poulose@arm.com,
-	tabba@google.com, will@kernel.org, yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH] KVM: arm64: Add support for FFA_PARTITION_INFO_GET
-Message-ID: <ZhbIDUO9BULaiSh3@google.com>
-References: <20240409151908.541589-1-sebastianene@google.com>
- <ZhVpmF2js1NJp1qF@google.com>
- <ZhZYsuqggl_Hzv8X@google.com>
- <ZhZhm4UXyClAqXDM@google.com>
- <ZhZnaibTBaa2J4a5@google.com>
+        d=1e100.net; s=20230601; t=1712771718; x=1713376518;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oTRds48YQAuzki9smTU0zbOfJX16SMcTfKd42zPqGTw=;
+        b=QpvP1r66jqoOjb0vbIMonhlJBbujpXOT8ux+ITwbqallEcenRKtGlbbrHYN9CRbKJO
+         vvLDCQPeIUYKH37csnbFnmsqKQdORfyPf9iE4DyNH0yIM8xt9BD0cOqAujFFRkahRBCf
+         EmEE2bawQpFFMerpfL2ADoWK3c9325MDLmMWqOcX4H/eaiSmBiy6c103jAgsAjB6BYf+
+         /B2HlC28AVTtJB+zzzs1holIXOaDl8zFLWriJSzwwzZ2QsZ7PdcVxcF3eooJ8p1Qmko6
+         dSZj9wt+WaPPHF8o66Derf+vQVlxdD44RuyvZ7w0QvZMXH51KpGk1/lwwXZ2facRm4Zi
+         SkQA==
+X-Forwarded-Encrypted: i=1; AJvYcCX9LzfQ9SbRn8rm4pQd6eYaBYpQoNEOTrqOL3xwSzsbqPcO2Yr8RXTIjymuJw9LZ94yE+ZqfUhznF+oDvMDGBxxoxe6mQQm
+X-Gm-Message-State: AOJu0YzbQpPSLYAIiaufQnxU8n5Hv3HDnMuxIjIXCySyKR1yfpCuCQmZ
+	GTkKzEbxpU2NyAcoY6eAa78iM9rrZDBUEoHH7UNRetFXS8PbwP3pJtPoR/e5wxcEOYMynu4Euyu
+	AWhi80rk4YnXL5C5MeumHxA==
+X-Google-Smtp-Source: AGHT+IFGk/yictiXP/bmh1HJDKurTfI9OfoF/LDokYTgZALVerLy33LdKx5oD0s+3wIFHKHy3OTGRtA6WddrXew0Eg==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6902:1148:b0:dd9:20c1:85b6 with
+ SMTP id p8-20020a056902114800b00dd920c185b6mr109753ybu.2.1712771718281; Wed,
+ 10 Apr 2024 10:55:18 -0700 (PDT)
+Date: Wed, 10 Apr 2024 17:54:37 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZhZnaibTBaa2J4a5@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240410175437.793508-1-coltonlewis@google.com>
+Subject: [PATCH v3] KVM: arm64: Add early_param to control WFx trapping
+From: Colton Lewis <coltonlewis@google.com>
+To: kvm@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Apr 10, 2024 at 10:18:18AM +0000, Sebastian Ene wrote:
-> On Wed, Apr 10, 2024 at 10:53:31AM +0100, Vincent Donnefort wrote:
-> > [...]
-> > 
-> > > > > +static void do_ffa_part_get(struct arm_smccc_res *res,
-> > > > > +			    struct kvm_cpu_context *ctxt)
-> > > > > +{
-> > > > > +	DECLARE_REG(u32, uuid0, ctxt, 1);
-> > > > > +	DECLARE_REG(u32, uuid1, ctxt, 2);
-> > > > > +	DECLARE_REG(u32, uuid2, ctxt, 3);
-> > > > > +	DECLARE_REG(u32, uuid3, ctxt, 4);
-> > > > > +	DECLARE_REG(u32, flags, ctxt, 5);
-> > > > > +	u32 off, count, sz, buf_sz;
-> > > > > +
-> > > > > +	hyp_spin_lock(&host_buffers.lock);
-> > > > > +	if (!host_buffers.rx) {
-> > > > > +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> > > > > +		goto out_unlock;
-> > > > > +	}
-> > > > > +
-> > > > > +	arm_smccc_1_1_smc(FFA_PARTITION_INFO_GET, uuid0, uuid1,
-> > > > > +			  uuid2, uuid3, flags, 0, 0,
-> > > > > +			  res);
-> > > > > +
-> > > > > +	if (res->a0 != FFA_SUCCESS)
-> > > > > +		goto out_unlock;
-> > > > > +
-> > > > > +	count = res->a2;
-> > > > > +	if (!count)
-> > > > > +		goto out_unlock;
-> > > > 
-> > > > Looking at the table 13.34, it seems what's in "count" depends on the flag.
-> > > > Shouldn't we check its value, and only memcpy into the host buffers if the flag
-> > > > is 0?
-> > > > 
-> > > 
-> > > When the flag is `1` the count referes to the number of partitions
-> > > deployed. In both cases we have to copy something unless count == 0.
-> > 
-> > I see "Return the count of partitions deployed in the system corresponding to
-> > the specified UUID in w2"
-> > 
-> > Which I believe means nothing has been copied in the buffer?
-> > 
-> 
-> When the flag in w5 is 1 the size argument stored in w3 will be zero and
-> the loop will not be executed, so nothing will be copied to the host
-> buffers.
+Add an early_param to control WFx (WFI or WFE) trapping. This is so
+interrupts can be passed through if the CPU has support for direct
+interrupt injection, a feature of GICv4. This is described as an
+enumeration with three possible behaviors, always passthrough (never
+trap), never passthrough (always trap), or default (trap if more than
+one task is running. Default matches the current behavior.
 
-Ha right, all good here then.
+Signed-off-by: Colton Lewis <coltonlewis@google.com>
+---
+v3:
+* Changed control mechanism to an early_param on Marc's advice this should be
+  a system level decision and not exposed via uapi
+* Reduced behavior to an enum from an integer as there are only a few options
+  that make logical sense
+* Limit option for always passthrough to systems with GICv4 since the primary
+  case for always passthrough is systems with direct interrupt injection
 
-> 
-> > > 
-> > > > > +
-> > > > > +	if (ffa_version > FFA_VERSION_1_0) {
-> > > > > +		buf_sz = sz = res->a3;
-> > > > > +		if (sz > sizeof(struct ffa_partition_info))
-> > > > > +			buf_sz = sizeof(struct ffa_partition_info);
-> > > > 
-> > > > What are you trying to protect against here? We have to trust EL3 anyway, (as
-> > > > other functions do).
-> > > > 
-> > > > The WARN() could be kept though to make sure we won't overflow our buffer. But
-> > > > it could be transformed into an error? FFA_RET_ABORTED?
-> > > > 
-> > > >
-> > > 
-> > > I think we can keep it as a WARN_ON because it is not expected to have
-> > > a return code of FFA_SUCCESS but the buffer to be overflown. The TEE is
-> > > expected to return NO_MEMORY in w2 if the results cannot fit in the RX
-> > > buffer.
-> > 
-> > WARN() is crashing the hypervisor. It'd be a shame here as we can easily recover
-> > by just sending an error back to the caller.
-> 
-> I agree with you but this is not expected to happen unless TZ messes up
-> something/is not complaint with the spec, in which case I would like to
-> catch this.
+v2:
+https://lore.kernel.org/kvmarm/20240319164341.1674863-1-coltonlewis@google.com/
 
-Hum, still I don't see the point in crashing anything here, nothing is
-compromised. The driver can then decide what to do based on that reported
-failure.
+v1:
+https://lore.kernel.org/kvmarm/20240129213918.3124494-1-coltonlewis@google.com/
+
+arch/arm64/include/asm/kvm_host.h |  7 +++++++
+ arch/arm64/kvm/arm.c              | 30 +++++++++++++++++++++++++++++-
+ 2 files changed, 36 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 21c57b812569..e9225b1d0e9b 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -67,6 +67,13 @@ enum kvm_mode {
+ 	KVM_MODE_NV,
+ 	KVM_MODE_NONE,
+ };
++
++enum kvm_interrupt_passthrough {
++	KVM_INTERRUPT_PASSTHROUGH_DEFAULT,
++	KVM_INTERRUPT_PASSTHROUGH_ALWAYS,
++	KVM_INTERRUPT_PASSTHROUGH_NEVER,
++};
++
+ #ifdef CONFIG_KVM
+ enum kvm_mode kvm_get_mode(void);
+ #else
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index a25265aca432..5d0ea6b2c652 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -46,6 +46,7 @@
+ #include <kvm/arm_psci.h>
+
+ static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
++static enum kvm_interrupt_passthrough kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_DEFAULT;
+
+ DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+
+@@ -456,7 +457,10 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
+ 		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
+
+-	if (single_task_running())
++	if ((kvm_interrupt_passthrough == KVM_INTERRUPT_PASSTHROUGH_ALWAYS
++	     && kvm_vgic_global_state.has_gicv4) ||
++	    (kvm_interrupt_passthrough == KVM_INTERRUPT_PASSTHROUGH_DEFAULT
++	     && single_task_running()))
+ 		vcpu_clear_wfx_traps(vcpu);
+ 	else
+ 		vcpu_set_wfx_traps(vcpu);
+@@ -2654,6 +2658,30 @@ static int __init early_kvm_mode_cfg(char *arg)
+ }
+ early_param("kvm-arm.mode", early_kvm_mode_cfg);
+
++static int __init early_kvm_interrupt_passthrough_cfg(char *arg)
++{
++	if (!arg)
++		return -EINVAL;
++
++	if (strcmp(arg, "always") == 0) {
++		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_ALWAYS;
++		return 0;
++	}
++
++	if (strcmp(arg, "never") == 0) {
++		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_NEVER;
++		return 0;
++	}
++
++	if (strcmp(arg, "default") == 0) {
++		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_DEFAULT;
++		return 0;
++	}
++
++	return -EINVAL;
++}
++early_param("kvm-arm.interrupt-passthrough", early_kvm_interrupt_passthrough_cfg);
++
+ enum kvm_mode kvm_get_mode(void)
+ {
+ 	return kvm_mode;
+--
+2.44.0.478.gd926399ef9-goog
