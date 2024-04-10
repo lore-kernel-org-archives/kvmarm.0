@@ -1,317 +1,200 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5CF1448C0
-	for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 08:31:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9347D155733
+	for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 09:15:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712737898; cv=none; b=LiUQzxjqIMWnUyaOzJvIAPyQf8H5bQOXCphXLXd2Tm3Cgq0Dmo6v7L/xAtyWZzPpvGZ7wQXLOx4F7xyp+52KZuHOoqo+Rg6A3m2d4IGtWXiDYBfhopSK1ucg2ZN5x5tZ2517/OyPX3fqQuJ/0r/GkET0mxjryvuxXEiHCHMi3Dg=
+	t=1712740536; cv=none; b=ougyQI9v6Bt4V51Oj1OKFDEfcxnyvoCwWODQ5GD7dh5cCd8qsOvmQEPx9jbdh60ny9bJS897FR3Yg5h69FEq3533l/j+7AipyOns6kvDpT+BzB/So8Ff1GMEh72DUJUZWQbL0PJsNVGreFi4JwSiChIOusn4JW2eMl5+NL2nIHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712737898; c=relaxed/simple;
-	bh=MJ2amgtSwm20ugyZqCjsEgAnfyZd3gx1BXvTPXSiVfg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=hIcQvdOZ2yck+kGUvE4nugmp6vikz1oS/rVmTb7hL+P+kF5mmsz/H0C9BwAQuIzhEcKeqEOQ6QMWip1n0ebYCKjxXFAA32Sa18c5k2RMwHPRJI26cDlJOf+sBwXQcSAZIQMRtYh3DfXZ+zqkXGEXd/L6l0Jg9s3VYogCch/uApI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vzROWC3w; arc=none smtp.client-ip=209.85.218.49
+	s=arc-20240116; t=1712740536; c=relaxed/simple;
+	bh=8IGEkHVnTFNiTPePBcBdEHImxzk/mvEc8vQlWHZ3o24=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jvw2DQ69XGx3ZzmV1p+YikbC9ZcfBZWxYoZjD6XvOQ7VUTirc9flJLRsHFRBjA9dFhFTWQU/C8ZRD7qxKMeVL4YDLR/Pb4MUNAXy8DeFMvL/jPzwvcsfx3C9HnOGzZ6Li1tOMyTqshaM/VZAlImcGmepFkQ6aEG4MD+r6xO1WK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OBkFNG71; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vzROWC3w"
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a51fea60c0bso160216066b.3
-        for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 01:31:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OBkFNG71"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-41687826509so50425e9.1
+        for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 02:15:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712737894; x=1713342694; darn=lists.linux.dev;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ko/ldX1/RJm34/W6o5zxcM2yrIA8CZLIGcy8oSLFE1o=;
-        b=vzROWC3wtRPptyhDdOsST/B/UV2b277bg2TYZZu1ghoAzDUPqNKRty3MtQr590f+Xh
-         bYZy+ogmgb8Md2wDi5fYWTOWCip1rSuKCl6V6giknecqyUO9oL1/Nk6jilM7/lhZOlEp
-         80SXkb8InYLnyI6OAbnJqpwbFyleFwlbPlJs4Tdhi5ebG2krzgzxNyCkeXfUCxV+PJjQ
-         4J3Dgo4ETwin5M2rEsQI64Xyr3c9z/mf/cPlxaG/6Y71smTp7MoMXH2Usp9CXuBKp6KA
-         MW9dL7het9m/cquS2QzklPY+1m27QA/Lm5N1qD2YbNpPjK/1p1isf1tjpLarVJdivKQz
-         O+5A==
+        d=google.com; s=20230601; t=1712740533; x=1713345333; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mo5yUXNBd3ZqPlawfQyQwNue5di0stprqcnUautikic=;
+        b=OBkFNG714Usa/5iOEJA/NCDiIIrEzJqFicw8fczQvjYI3sCKqhB6BJyVcIQG910upA
+         XRwbSK9v+eLNB00ycdZqc+7Lv9b3c/kOcjjIV2TAPYd0tgFevO1jbkxGbWsyL1l81vCf
+         ZUJ4hJeZP4NDGBWMOin7d/xql/5sIRubrg/xkJWCIddQqtOJ/J61N61t2pBAl/lUrTbR
+         TD1Vqxwf6NKJoAz6aXTpPm36I+sNsaNDi8L1Fy0KZ4w4URG7sMZOTbjvb3BSVXwewESq
+         cLjRM4K/YexOuJ4OjKS2BVgr5VDbSUomcmcDrbiwMJl6CTA6s6rJBUaC2Q7/Vz0SIktc
+         UwLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712737894; x=1713342694;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ko/ldX1/RJm34/W6o5zxcM2yrIA8CZLIGcy8oSLFE1o=;
-        b=aeow/1IZG/RfMyPp8ETQJs4BH0w5DvCWA/5stIMqn+H6YeJEf3pWXREQkIRN3AmDwX
-         c7cb38UMYSJ8HxUcUnfZhS2Dzb2FKg3mzJRkCSaO7hBTD/0jgRtPxUBIZPtzgykBU0Zc
-         pqz4uwR++3Ft5tVsv8CgvXcFAsNXayun2iUxhr/GhtLCPrtOoE0VK98p0VprrdTS/fT0
-         Rcy43n6mCoV3jj7nS6NSOMsLPEzKEjPnOTXiY1Ah/IPS67bb6S6qyaCisc0Fl+MRz3SN
-         d29noEKjpnR4KBEQiLbZEm1SLTzA5OdPQBnbDGoX2IItor2/VvfB0P3V0TmCPtkzNiwJ
-         ms4Q==
-X-Gm-Message-State: AOJu0YzQx3IyU9ld6UUq9XHbJRqQDUjULX5rtDDqp0ileaLH5NuQCc+r
-	CBf6ZDjX1HhsTLHjqtLJUC6Eq0Gm/HdJYOVPbbIKlt1+5mtZMWYsV1jw48tIyhyg9/PTD1f5TaL
-	6ag==
-X-Google-Smtp-Source: AGHT+IF344zY9aJwSy1QipveS6rH/4iNUnhyO2rqBkRNHvzgRM8S3Vb6xHVKK57ErUTVz32k/JGZNw==
-X-Received: by 2002:a17:906:5786:b0:a51:e1a1:d127 with SMTP id k6-20020a170906578600b00a51e1a1d127mr1552281ejq.26.1712737893551;
-        Wed, 10 Apr 2024 01:31:33 -0700 (PDT)
-Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
-        by smtp.gmail.com with ESMTPSA id h12-20020a17090634cc00b00a46f95f5849sm6634813ejb.106.2024.04.10.01.31.32
+        d=1e100.net; s=20230601; t=1712740533; x=1713345333;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mo5yUXNBd3ZqPlawfQyQwNue5di0stprqcnUautikic=;
+        b=X53YGPanJ+FBfjKB8wkqm4EpEE/7a0mQYgdLu6lznjX5enu4Kx8WWAoRH2AuNciXxd
+         Bo4I4F3OlyIt19EOzDIrlbngalJudvGYcME3l1aae5HEu0WoNeqRT/uw1OXQNYPGrwcm
+         ZHmGH4GoreZnNvSB9CJJE8dUbyMGK6vbWWjbj+58OGOKFmh7i+WltN1jXIxLoQG7J3fG
+         /oVq5M9QB4N/NqolrccZoo3bl3njuqi4yLYsJP5wTlEdblJiLuoY3RsVqldBr7bu/QvD
+         C1+nYXrBiiPP3tMLlKz9WDQ5/jGYqoB3kozOBubhOPivil/YTh89EiV3sPtrsGW+uwzY
+         6agw==
+X-Forwarded-Encrypted: i=1; AJvYcCVz78QLXp4HQ7ucvIRWDUxqi5shV0QOAn0R1WloPgHt/W7pZ0CnYnUZP8GB7k4RnYyZV+bYpA8fwNuL0BTLtpGYIKRf378t
+X-Gm-Message-State: AOJu0Yy2I8rL2pUij/R1vb2IYZ9gBaQH/KzLosT9laiV1ZrCuCNh+Z99
+	4Fse6xOFOzw1WxbADK7wdlQDFpS8UIJXC7zXmSgZbV++K+X3oEQB6uWSK968wQ==
+X-Google-Smtp-Source: AGHT+IEBtQIBTBIKC8UbwL32JAPKT7O7PWWE97mAxwT/AQp+UyPWzOdg2/EhifcyhKX5pP1qVudzgw==
+X-Received: by 2002:a05:600c:5113:b0:414:daa3:c192 with SMTP id o19-20020a05600c511300b00414daa3c192mr161451wms.0.1712740532752;
+        Wed, 10 Apr 2024 02:15:32 -0700 (PDT)
+Received: from google.com (248.199.140.34.bc.googleusercontent.com. [34.140.199.248])
+        by smtp.gmail.com with ESMTPSA id di3-20020a0560000ac300b00341c7129e28sm13315653wrb.91.2024.04.10.02.15.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 01:31:33 -0700 (PDT)
-Date: Wed, 10 Apr 2024 09:31:29 +0100
-From: =?utf-8?Q?Pierre-Cl=C3=A9ment?= Tosi <ptosi@google.com>
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Vincent Donnefort <vdonnefort@google.com>
-Subject: [PATCH v2 12/12] KVM: arm64: Improve CONFIG_CFI_CLANG error message
-Message-ID: <ly2kzup6w6o4nzvjjfofmxchh5zrhkeb3paon3etkzjozpmwvb@fv4mv42pz6s7>
+        Wed, 10 Apr 2024 02:15:32 -0700 (PDT)
+Date: Wed, 10 Apr 2024 09:15:30 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org,
+	maz@kernel.org, oliver.upton@linux.dev, qperret@google.com,
+	qwandor@google.com, sudeep.holla@arm.com, suzuki.poulose@arm.com,
+	tabba@google.com, will@kernel.org, yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, kernel-team@android.com
+Subject: Re: [PATCH] KVM: arm64: Add support for FFA_PARTITION_INFO_GET
+Message-ID: <ZhZYsuqggl_Hzv8X@google.com>
+References: <20240409151908.541589-1-sebastianene@google.com>
+ <ZhVpmF2js1NJp1qF@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZhVpmF2js1NJp1qF@google.com>
 
-For kCFI, the compiler encodes in the immediate of the BRK (which the
-CPU places in ESR_ELx) the indices of the two registers it used to hold
-(resp.) the function pointer and expected type. Therefore, the kCFI
-handler must be able to parse the contents of the register file at the
-point where the exception was triggered.
+On Tue, Apr 09, 2024 at 05:15:20PM +0100, Vincent Donnefort wrote:
+> Hi Seb,
+> 
+> On Tue, Apr 09, 2024 at 03:19:08PM +0000, Sebastian Ene wrote:
+> > Handle the FFA_PARTITION_INFO_GET host call inside the pKVM hypervisor
+> > and copy the response message back to the host buffers. Save the
+> > returned FF-A version as we will need it later to interpret the response
+> > from the TEE.
+> > 
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/nvhe/ffa.c | 49 +++++++++++++++++++++++++++++++++++
+> >  1 file changed, 49 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > index 320f2eaa14a9..72fc365bc7a8 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > @@ -67,6 +67,7 @@ struct kvm_ffa_buffers {
+> >   */
+> >  static struct kvm_ffa_buffers hyp_buffers;
+> >  static struct kvm_ffa_buffers host_buffers;
+> > +static u32 ffa_version;
+> >  
+> >  static void ffa_to_smccc_error(struct arm_smccc_res *res, u64 ffa_errno)
+> >  {
+> > @@ -640,6 +641,49 @@ static bool do_ffa_features(struct arm_smccc_res *res,
+> >  	return true;
+> >  }
+> >  
+> > +static void do_ffa_part_get(struct arm_smccc_res *res,
+> > +			    struct kvm_cpu_context *ctxt)
+> > +{
+> > +	DECLARE_REG(u32, uuid0, ctxt, 1);
+> > +	DECLARE_REG(u32, uuid1, ctxt, 2);
+> > +	DECLARE_REG(u32, uuid2, ctxt, 3);
+> > +	DECLARE_REG(u32, uuid3, ctxt, 4);
+> > +	DECLARE_REG(u32, flags, ctxt, 5);
+> > +	u32 off, count, sz, buf_sz;
+> > +
+> > +	hyp_spin_lock(&host_buffers.lock);
+> > +	if (!host_buffers.rx) {
+> > +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
+> > +		goto out_unlock;
+> > +	}
+> > +
+> > +	arm_smccc_1_1_smc(FFA_PARTITION_INFO_GET, uuid0, uuid1,
+> > +			  uuid2, uuid3, flags, 0, 0,
+> > +			  res);
+> > +
+> > +	if (res->a0 != FFA_SUCCESS)
+> > +		goto out_unlock;
+> > +
+> > +	count = res->a2;
+> > +	if (!count)
+> > +		goto out_unlock;
+> 
+> Looking at the table 13.34, it seems what's in "count" depends on the flag.
+> Shouldn't we check its value, and only memcpy into the host buffers if the flag
+> is 0?
+> 
 
-To achieve this, introduce a new hypervisor panic path that first stores
-the CPU context in the per-CPU kvm_hyp_ctxt before calling (directly or
-indirectly) hyp_panic() and execute it from all EL2 synchronous
-exception handlers i.e.
+When the flag is `1` the count referes to the number of partitions
+deployed. In both cases we have to copy something unless count == 0.
 
-- call it directly in host_el2_sync_vect (__kvm_hyp_host_vector, EL2t&h)
-- call it directly in el2t_sync_invalid (__kvm_hyp_vector, EL2t)
-- set ELR_EL2 to it in el2_sync (__kvm_hyp_vector, EL2h), which ERETs
+> > +
+> > +	if (ffa_version > FFA_VERSION_1_0) {
+> > +		buf_sz = sz = res->a3;
+> > +		if (sz > sizeof(struct ffa_partition_info))
+> > +			buf_sz = sizeof(struct ffa_partition_info);
+> 
+> What are you trying to protect against here? We have to trust EL3 anyway, (as
+> other functions do).
+> 
+> The WARN() could be kept though to make sure we won't overflow our buffer. But
+> it could be transformed into an error? FFA_RET_ABORTED?
+> 
+>
 
-Teach hyp_panic() to decode the kCFI ESR and extract the target and type
-from the saved CPU context. In VHE, use that information to panic() with
-a specialized error message. In nVHE, only report it if the host (EL1)
-has access to the saved CPU context i.e. iff CONFIG_NVHE_EL2_DEBUG=y,
-which aligns with the behavior of CONFIG_PROTECTED_NVHE_STACKTRACE.
+I think we can keep it as a WARN_ON because it is not expected to have
+a return code of FFA_SUCCESS but the buffer to be overflown. The TEE is
+expected to return NO_MEMORY in w2 if the results cannot fit in the RX
+buffer.
 
-Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
----
- arch/arm64/kvm/handle_exit.c            | 30 +++++++++++++++++++++++--
- arch/arm64/kvm/hyp/entry.S              | 24 +++++++++++++++++++-
- arch/arm64/kvm/hyp/hyp-entry.S          |  2 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h |  4 ++--
- arch/arm64/kvm/hyp/nvhe/host.S          |  2 +-
- arch/arm64/kvm/hyp/vhe/switch.c         | 26 +++++++++++++++++++--
- 6 files changed, 79 insertions(+), 9 deletions(-)
+Thanks,
+Seb
 
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 0db23a6304ce..d76e41a07df1 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -26,6 +26,8 @@
- #define CREATE_TRACE_POINTS
- #include "trace_handle_exit.h"
- 
-+DECLARE_KVM_NVHE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
-+
- typedef int (*exit_handle_fn)(struct kvm_vcpu *);
- 
- static void kvm_handle_guest_serror(struct kvm_vcpu *vcpu, u64 esr)
-@@ -383,11 +385,35 @@ void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
- 		kvm_handle_guest_serror(vcpu, kvm_vcpu_get_esr(vcpu));
- }
- 
--static void kvm_nvhe_report_cfi_failure(u64 panic_addr)
-+static void kvm_nvhe_report_cfi_target(struct user_pt_regs *regs, u64 esr,
-+				       u64 hyp_offset)
-+{
-+	u64 va_mask = GENMASK_ULL(vabits_actual - 1, 0);
-+	u8 type_idx = FIELD_GET(CFI_BRK_IMM_TYPE, esr);
-+	u8 target_idx = FIELD_GET(CFI_BRK_IMM_TARGET, esr);
-+	u32 expected_type = (u32)regs->regs[type_idx];
-+	u64 target_addr = (regs->regs[target_idx] & va_mask) + hyp_offset;
-+
-+	kvm_err(" (target: [<%016llx>] %ps, expected type: 0x%08x)\n",
-+		target_addr, (void *)(target_addr + kaslr_offset()),
-+		expected_type);
-+}
-+
-+static void kvm_nvhe_report_cfi_failure(u64 panic_addr, u64 esr, u64 hyp_offset)
- {
-+	struct user_pt_regs *regs = NULL;
-+
- 	kvm_err("nVHE hyp CFI failure at: [<%016llx>] %pB!\n", panic_addr,
- 		(void *)(panic_addr + kaslr_offset()));
- 
-+	if (IS_ENABLED(CONFIG_NVHE_EL2_DEBUG) || !is_protected_kvm_enabled())
-+		regs = &this_cpu_ptr_nvhe_sym(kvm_hyp_ctxt)->regs;
-+
-+	if (regs)
-+		kvm_nvhe_report_cfi_target(regs, esr, hyp_offset);
-+	else
-+		kvm_err(" (no target information: !CONFIG_NVHE_EL2_DEBUG)\n");
-+
- 	if (IS_ENABLED(CONFIG_CFI_PERMISSIVE))
- 		kvm_err(" (CONFIG_CFI_PERMISSIVE ignored for hyp failures)\n");
- }
-@@ -423,7 +449,7 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
- 			kvm_err("nVHE hyp BUG at: [<%016llx>] %pB!\n", panic_addr,
- 					(void *)(panic_addr + kaslr_offset()));
- 	} else if (IS_ENABLED(CONFIG_CFI_CLANG) && esr_is_cfi_brk(esr)) {
--		kvm_nvhe_report_cfi_failure(panic_addr);
-+		kvm_nvhe_report_cfi_failure(panic_addr, esr, hyp_offset);
- 	} else {
- 		kvm_err("nVHE hyp panic at: [<%016llx>] %pB!\n", panic_addr,
- 				(void *)(panic_addr + kaslr_offset()));
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index 6a1ce9d21e5b..8838b453b9be 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -83,7 +83,7 @@ alternative_else_nop_endif
- 	eret
- 	sb
- 
--SYM_INNER_LABEL(__hyp_restore_elr_and_panic, SYM_L_GLOBAL)
-+SYM_INNER_LABEL(__hyp_restore_elr_save_context_and_panic, SYM_L_GLOBAL)
- 	// x0-x29,lr: hyp regs
- 
- 	stp	x0, x1, [sp, #-16]!
-@@ -92,6 +92,28 @@ SYM_INNER_LABEL(__hyp_restore_elr_and_panic, SYM_L_GLOBAL)
- 	msr	elr_el2, x0
- 	ldp	x0, x1, [sp], #16
- 
-+SYM_INNER_LABEL(__hyp_save_context_and_panic, SYM_L_GLOBAL)
-+	// x0-x29,lr: hyp regs
-+
-+	stp	x0, x1, [sp, #-16]!
-+
-+	adr_this_cpu x0, kvm_hyp_ctxt, x1
-+
-+	stp	x2, x3,   [x0, #CPU_XREG_OFFSET(2)]
-+
-+	ldp	x2, x3, [sp], #16
-+
-+	stp	x2, x3,   [x0, #CPU_XREG_OFFSET(0)]
-+	stp	x4, x5,   [x0, #CPU_XREG_OFFSET(4)]
-+	stp	x6, x7,   [x0, #CPU_XREG_OFFSET(6)]
-+	stp	x8, x9,   [x0, #CPU_XREG_OFFSET(8)]
-+	stp	x10, x11, [x0, #CPU_XREG_OFFSET(10)]
-+	stp	x12, x13, [x0, #CPU_XREG_OFFSET(12)]
-+	stp	x14, x15, [x0, #CPU_XREG_OFFSET(14)]
-+	stp	x16, x17, [x0, #CPU_XREG_OFFSET(16)]
-+
-+	save_callee_saved_regs x0
-+
- SYM_INNER_LABEL(__hyp_panic, SYM_L_GLOBAL)
- 	// x0-x29,lr: vcpu regs
- 
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 7e65ef738ec9..d0d90d598338 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -130,7 +130,7 @@ SYM_CODE_END(\label)
- .endm
- 
- 	/* None of these should ever happen */
--	invalid_vector	el2t_sync_invalid
-+	invalid_vector	el2t_sync_invalid, __hyp_save_context_and_panic
- 	invalid_vector	el2t_irq_invalid
- 	invalid_vector	el2t_fiq_invalid
- 	invalid_vector	el2t_error_invalid
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 9387e3a0b680..f3d8fbc7a77b 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -753,7 +753,7 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
- 
- static inline void __kvm_unexpected_el2_exception(void)
- {
--	extern char __hyp_restore_elr_and_panic[];
-+	extern char __hyp_restore_elr_save_context_and_panic[];
- 	unsigned long addr, fixup;
- 	struct kvm_exception_table_entry *entry, *end;
- 	unsigned long elr_el2 = read_sysreg(elr_el2);
-@@ -776,7 +776,7 @@ static inline void __kvm_unexpected_el2_exception(void)
- 
- 	/* Trigger a panic after restoring the hyp context. */
- 	this_cpu_ptr(&kvm_hyp_ctxt)->sys_regs[ELR_EL2] = elr_el2;
--	write_sysreg(__hyp_restore_elr_and_panic, elr_el2);
-+	write_sysreg(__hyp_restore_elr_save_context_and_panic, elr_el2);
- }
- 
- #endif /* __ARM64_KVM_HYP_SWITCH_H__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-index 0613b6e35137..ec3e4f5c28cc 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -213,7 +213,7 @@ SYM_FUNC_END(__host_hvc)
- .endm
- 
- .macro host_el2_sync_vect
--	__host_el2_vect __hyp_panic
-+	__host_el2_vect __hyp_save_context_and_panic
- .endm
- 
- .macro invalid_host_el1_vect
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index b3268933b093..17df57580c77 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -18,6 +18,7 @@
- 
- #include <asm/barrier.h>
- #include <asm/cpufeature.h>
-+#include <asm/esr.h>
- #include <asm/kprobes.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
-@@ -308,7 +309,24 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	return ret;
- }
- 
--static void __noreturn __hyp_call_panic(u64 spsr, u64 elr, u64 par)
-+static void __noreturn __hyp_call_panic_for_cfi(u64 elr, u64 esr)
-+{
-+	struct user_pt_regs *regs = &this_cpu_ptr(&kvm_hyp_ctxt)->regs;
-+	u8 type_idx = FIELD_GET(CFI_BRK_IMM_TYPE, esr);
-+	u8 target_idx = FIELD_GET(CFI_BRK_IMM_TARGET, esr);
-+	u32 expected_type = (u32)regs->regs[type_idx];
-+	u64 target = regs->regs[target_idx];
-+
-+	panic("VHE hyp CFI failure at: [<%016llx>] %pB (target: [<%016llx>] %ps, expected type: 0x%08x)\n"
-+#ifdef CONFIG_CFI_PERMISSIVE
-+	      " (CONFIG_CFI_PERMISSIVE ignored for hyp failures)\n"
-+#endif
-+	      ,
-+	      elr, (void *)elr, target, (void *)target, expected_type);
-+}
-+NOKPROBE_SYMBOL(__hyp_call_panic_for_cfi);
-+
-+static void __noreturn __hyp_call_panic(u64 spsr, u64 elr, u64 par, u64 esr)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_vcpu *vcpu;
-@@ -319,6 +337,9 @@ static void __noreturn __hyp_call_panic(u64 spsr, u64 elr, u64 par)
- 	__deactivate_traps(vcpu);
- 	sysreg_restore_host_state_vhe(host_ctxt);
- 
-+	if (IS_ENABLED(CONFIG_CFI_CLANG) && esr_is_cfi_brk(esr))
-+		__hyp_call_panic_for_cfi(elr, esr);
-+
- 	panic("HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n",
- 	      spsr, elr,
- 	      read_sysreg_el2(SYS_ESR), read_sysreg_el2(SYS_FAR),
-@@ -331,8 +352,9 @@ void __noreturn hyp_panic(void)
- 	u64 spsr = read_sysreg_el2(SYS_SPSR);
- 	u64 elr = read_sysreg_el2(SYS_ELR);
- 	u64 par = read_sysreg_par();
-+	u64 esr = read_sysreg_el2(SYS_ESR);
- 
--	__hyp_call_panic(spsr, elr, par);
-+	__hyp_call_panic(spsr, elr, par, esr);
- }
- 
- asmlinkage void kvm_unexpected_el2_exception(void)
--- 
-2.44.0.478.gd926399ef9-goog
-
-
--- 
-Pierre
+> > +	} else {
+> > +		/* FFA_VERSION_1_0 lacks the size in the response */
+> > +		buf_sz = sz = 8;
+> > +	}
+> > +
+> > +	WARN_ON((count - 1) * sz + buf_sz > PAGE_SIZE);
+> > +	for (off = 0; off < count * sz; off += sz)
+> > +		memcpy(host_buffers.rx + off, hyp_buffers.rx + off, buf_sz);
+> > +out_unlock:
+> > +	hyp_spin_unlock(&host_buffers.lock);
+> > +}
+> > +
+> >  bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
+> >  {
+> >  	struct arm_smccc_res res;
+> > @@ -686,6 +730,9 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
+> >  	case FFA_MEM_FRAG_TX:
+> >  		do_ffa_mem_frag_tx(&res, host_ctxt);
+> >  		goto out_handled;
+> > +	case FFA_PARTITION_INFO_GET:
+> > +		do_ffa_part_get(&res, host_ctxt);
+> > +		break;
+> >  	}
+> >  
+> >  	if (ffa_call_supported(func_id))
+> > @@ -726,6 +773,8 @@ int hyp_ffa_init(void *pages)
+> >  	if (FFA_MAJOR_VERSION(res.a0) != 1)
+> >  		return -EOPNOTSUPP;
+> >  
+> > +	ffa_version = res.a0;
+> > +
+> >  	arm_smccc_1_1_smc(FFA_ID_GET, 0, 0, 0, 0, 0, 0, 0, &res);
+> >  	if (res.a0 != FFA_SUCCESS)
+> >  		return -EOPNOTSUPP;
+> > -- 
+> > 2.44.0.478.gd926399ef9-goog
+> > 
