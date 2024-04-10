@@ -1,136 +1,177 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E22CDDC1;
-	Wed, 10 Apr 2024 07:27:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0AC13D53B
+	for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 08:28:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712734033; cv=none; b=L9d6LMaBAt1wWIJxnQlEJSdFmFS45CNigLzPvUCPMKbLBuIjB+8LeHJZvn5n2pmo2FXPXxoHzAWPa2rbU5UI0VTlZBi32Q4oVqhYi9+TpHGOBZZdeZS4zUbBKpAkUPwRFz8kzIcYUFy93lwU4Z6Pa6hfG+pvI2FrQqDbLdBGYEQ=
+	t=1712737682; cv=none; b=iRNUGYkKuQybOhy/wlT6YD6OoHp3la9Lb+I5obRjwKS+EqLg9MzqFWYRGbRo3DyCq3b+0k1x0eFchKRSaZjUd0RLL0NanlzJYSjdRGmiDSUA7KLLaKo0hdo8cLcAqB5vkJYl0noY23YgQIbqyab/x0j6bpRAuSvYVBkzt8y31Qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712734033; c=relaxed/simple;
-	bh=Nlv4greCsNCXD6xVDNfDR2Ichl1UewO2fmoorEV3bHM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Sobu7SdHn5Hre/AzqtJ8D5R3hPFtyIDLhTOIb6Wir8DltcoTOATRDqVZD+Jtpbw4Onr/Oryp50I4TJslOnS5SExP/+BLPfMMWebD35gCfWy76eAqcSXQFqCyNlyMCcjsW2pbdHQkJFVAFYHiOfsxCCDDp0DtxfmqiqdPvuhm2dQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U6opM9M0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712737682; c=relaxed/simple;
+	bh=kkuPA9LxaQ+TINL0zmJiUlzpNc4JChi60F/lcLNJ+/0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ZuUb2YreDbgJKBksyxzgXcWXIGXQgodPJr8q0Pwx4e/DhULOfK00erDWcXqDCIgJY5/XoZZE6edpnkYC9+H/SB15YbWl0S0IMHBT4b85dzBDGvCM6gCeaIv7H5+wd+9Ko7SelU2guCrn+Fnocazh9Cgcw7N7Rk6PUWAzjdLqbFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QXRFFNlY; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U6opM9M0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2CE3C433C7;
-	Wed, 10 Apr 2024 07:27:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712734032;
-	bh=Nlv4greCsNCXD6xVDNfDR2Ichl1UewO2fmoorEV3bHM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=U6opM9M0oVk3Jcvjud9swIeKHMJODpauPi3b83JrjVz2UH9LJv+U4EJjmdJ29TkOx
-	 Q2sjUJ6y/TFIzFk7+FPNleUGzi7qLJL761VtSoKIVSy/9ASdbchhfAjfd4VoiUVhra
-	 jqBUsSwwVVSxinEK7G/87PIgNRtTGyegbm1QR5P1rYG679Xt/+HPolCmuzxO+4qSgb
-	 sxPY6oC5Eqs2e/mGdC9XyR7fUo3hBQKMxXmjOVvdsagIsshUpxdgaXQ/+HztEXbMoR
-	 i3ZSdcqGbCuu2HhkiruwbQSKJjQ8DFU2w1BnC16exY2DDxyAcgJXqBxPXbS9PQTeja
-	 cuAub6PQhWMEw==
-Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ruSMQ-00333E-2I;
-	Wed, 10 Apr 2024 08:27:10 +0100
-Date: Wed, 10 Apr 2024 08:27:07 +0100
-Message-ID: <87a5m1smno.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Dave Martin <Dave.Martin@arm.com>,
-	kvmarm@lists.linux.dev,
-	linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v6 1/5] KVM: arm64: Share all userspace hardened thread data with the hypervisor
-In-Reply-To: <562e1ddb-75e5-4c02-83ea-b946b88d35c8@sirena.org.uk>
-References: <20240329-arm64-2023-dpisa-v6-0-ba42db6c27f3@kernel.org>
-	<20240329-arm64-2023-dpisa-v6-1-ba42db6c27f3@kernel.org>
-	<87msqesoty.wl-maz@kernel.org>
-	<fb54d7b0-9c83-4a0c-a08b-b722c9381ca7@sirena.org.uk>
-	<86h6gju87m.wl-maz@kernel.org>
-	<562e1ddb-75e5-4c02-83ea-b946b88d35c8@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QXRFFNlY"
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-563cb3ba9daso6427674a12.3
+        for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 01:28:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712737679; x=1713342479; darn=lists.linux.dev;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FXahQGtL2kR7RaZ5/ZHiSRpymPVFvDwsVVT/45XcUkI=;
+        b=QXRFFNlYR1IHhEX0mZowho5JOgY0guTJrRPjB7XXkLtWUILQhrcOUREBs6z4Ny3jPz
+         VibWIFTPh079AZnPr6Wt9EhSYUomBrMgu+uwU1jpe+TkY9dCMTwV1UB3zcfrgNdywkRO
+         Pz4vkUAlgZObCmnusTn2BzZFMJu/FOAIgez+GK+ZxydGTByVKGy/S2plu9f7yTnoceDm
+         f2oEUwJxH4z0D2rGdpSrDoaG2NZ7XhEMXWpxiljLUdAFgHiyyh6XAwFfb1eEJ/eCkKa4
+         G/X/Sa51LHhLl5qrhpZ2JfuFjYaC477kdaczYQyN5PpPUGs02VhPPQAHSQ2tOm+10eYK
+         aYZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712737679; x=1713342479;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FXahQGtL2kR7RaZ5/ZHiSRpymPVFvDwsVVT/45XcUkI=;
+        b=PP1VX8SurmUm+NvHI897onw2qAa0Vr+LV6YSsFMLBcDBp3rMEY3v40A4Sc0bOPkfwx
+         7JOfamsoS0Ojlqh6x8zmXZKk/fuGbseIroxFyHwB+cKr3QeXOC++cvtG2ruzb+Wz/0ID
+         Vvx2086lqKvy32zgPPbczqyA1wAkmzPn51ggBo5nBCSExEisFuNLKEPiFFDVteKECNQC
+         fx5EkOEjyMTafGCj0eP9j6W4Y8E5UWVpNj5SVADiSWsEzY+L52JhgzcYxHOmFx4uBvPf
+         a5LOJwjO8CJlwNNiV7DpOGXGjtUGv58oyxSiy5fYavNkns9A+uI2Vzau7SLbRMa9AlMv
+         wtQQ==
+X-Gm-Message-State: AOJu0YwrrlyiAvIPwtw9yXyKn5yK1d2mTURDd+NEfkfyJv7FmRWPqnn0
+	QyuAEqbDrHgzoRpjjB3rZVUlXScdHCYBexbtc/JQnhrUK7Yus2qeR5mVyNU1IlsU4EZGyXZSKLe
+	mKg==
+X-Google-Smtp-Source: AGHT+IGuwqYjsxdv8NyicLW4HPpH64SrOCoihZBd5dFprbj1OWTZUlHq52d4qC2EW/ed8P3sn92iCg==
+X-Received: by 2002:a50:c35d:0:b0:56e:441:8a94 with SMTP id q29-20020a50c35d000000b0056e04418a94mr1493844edb.22.1712737678636;
+        Wed, 10 Apr 2024 01:27:58 -0700 (PDT)
+Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
+        by smtp.gmail.com with ESMTPSA id dj16-20020a05640231b000b0056fc1288faasm443672edb.56.2024.04.10.01.27.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 01:27:58 -0700 (PDT)
+Date: Wed, 10 Apr 2024 09:27:53 +0100
+From: =?utf-8?Q?Pierre-Cl=C3=A9ment?= Tosi <ptosi@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Vincent Donnefort <vdonnefort@google.com>
+Subject: [PATCH v2 00/12] KVM: arm64: Add support for hypervisor kCFI
+Message-ID: <oub2waaiejfpwj7x76v4uutrbboejl4xs6n2q66jaontvsywp3@qofhulpet5ny>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, corbet@lwn.net, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Dave.Martin@arm.com, kvmarm@lists.linux.dev, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On Tue, 02 Apr 2024 17:20:36 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> On Tue, Apr 02, 2024 at 03:53:33PM +0100, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> 
-> > > Sure, those patches are still in flight though.  It does seem reasonable
-> > > to target the current code.
-> 
-> > Sure, if your intent is for this code not to be merged.
-> 
-> > Because it means this series assumes a different data life cycle, and
-> > the review effort spent on it will be invalidated once you move to the
-> > per-CPU state.
-> 
-> I don't have any visibility on when those patches are likely to get
-> merged or the general practices with in flight serieses here, last time
-> around with some of the serieses that were in flight it was quite late
-> which did make it unclear if things would go in during that release
-> cycle at all.
+CONFIG_CFI_CLANG ("kernel Control Flow Integrity") makes the compiler inject
+runtime type checks before any indirect function call. On AArch64, it generates
+a BRK instruction to be executed on type mismatch and encodes the indices of the
+registers holding the branch target and expected type in the immediate of the
+instruction. As a result, a synchronous exception gets triggered on kCFI failure
+and the fault handler can retrieve the immediate (and indices) from ESR_ELx.
 
-Here's a trick: you could ask. Other people do.
+This feature has been supported at EL1 ("host") since it was introduced by
+b26e484b8bb3 ("arm64: Add CFI error handling"), where cfi_handler() decodes
+ESR_EL1, giving informative panic messages such as
 
-> The amount of churn in KVM recently and long periods where the relevant
-> patches are apparently pre accepted but for various not always clear
+  [   21.885179] CFI failure at lkdtm_indirect_call+0x2c/0x44 [lkdtm]
+  (target: lkdtm_increment_int+0x0/0x1c [lkdtm]; expected type: 0x7e0c52a)
+  [   21.886593] Internal error: Oops - CFI: 0 [#1] PREEMPT SMP
 
-Nothing is "pre accepted". Everything gets discussed and reviewed.
-Specially when it comes to what you call "churn", which I call "crap
-removal".
+However, it is not or only partially supported at EL2: in nVHE (or pKVM),
+CONFIG_CFI_CLANG gets filtered out at build time, preventing the compiler from
+injecting the checks. In VHE, EL2 code gets compiled with the checks but the
+handlers in VBAR_EL2 are not aware of kCFI and will produce a generic and
+not-so-helpful panic message such as
 
-> reasons not actually merged is making it quite hard to target, you're
+  [   36.456088][  T200] Kernel panic - not syncing: HYP panic:
+  [   36.456088][  T200] PS:204003c9 PC:ffffffc080092310 ESR:f2008228
+  [   36.456088][  T200] FAR:0000000081a50000 HPFAR:000000000081a500 PAR:1de7ec7edbadc0de
+  [   36.456088][  T200] VCPU:00000000e189c7cf
 
-Things get merged when they are reviewed and ready. Not before.
+To address this,
 
-> obviously going to be a lot more in the loop so this is doubtless
-> clearer to you than to me.  It's also been a little unclear what the
-> expectations are for basing things on - some people do prefer to do
-> their own merging for example, and while you have mentioned your in
+- [01/12] fixes an existing bug where the ELR_EL2 was getting clobbered on
+  synchronous exceptions, causing the wrong "PC" to be reported by
+  nvhe_hyp_panic_handler() or __hyp_call_panic(). This is particularly limiting
+  for kCFI, as it would mask the location of the failed type check.
+- [02/12] & [03/12] (resp.) fix and improve __pkvm_init_switch_pgd for kCFI
+- [04/12] to [06/12] prepare nVHE for CONFIG_CFI_CLANG and [10/12] enables it
+- [12/12] improves kCFI error messages by saving then parsing the CPU context
+- [09/12] adds a kCFI test module for VHE and [11/12] extends it to nVHE & pKVM
 
-This isn't about resolving a simple conflict. This is a fundamental
-change in the way the state is tracked. We have argued about this for
-months now, you were Cc'd on the patches addressing this problem, and
-you even reviewed them. What other hint do you need?
+As a result, an informative kCFI panic message is printed by or on behalf of EL2
+giving the expected type and target address (possibly resolved to a symbol) for
+VHE, nVHE, and pKVM (iff CONFIG_NVHE_EL2_DEBUG=y).
 
-> flight serieses your communication style means that it's not been
-> entirely clear if you're just noting the overlap.
+Note that kCFI errors remain fatal at EL2, even when CONFIG_CFI_PERMISSIVE=y.
 
-Not clear? That's a first. I'm usually seen as "blunt and assertive".
-But I'll keep that in mind and aspire to greater clarity in the future.
+Changes in v2:
+  - Added 2 commits implementing a test module for hyp kCFI;
+  - For __kvm_hyp_host_vector, dropped changes to the sync EL2t handler and kept
+    the SP overflow checks;
+  - Used the names __guest_exit_restore_elr_and_panic, esr_brk_comment;
+  - Documented the use of SYM_TYPED_FUNC_START for __pkvm_init_switch_pgd;
+  - Fixed or clarified commit messages.
 
-> Is it just that
-> refactoring series you want taking into account here or are there other
-> in flight serieses that should be rolled into a base?
+Pierre-Clément Tosi (12):
+  KVM: arm64: Fix clobbered ELR in sync abort/SError
+  KVM: arm64: Fix __pkvm_init_switch_pgd C signature
+  KVM: arm64: Pass pointer to __pkvm_init_switch_pgd
+  KVM: arm64: nVHE: Simplify __guest_exit_panic path
+  KVM: arm64: nVHE: Add EL2h sync exception handler
+  KVM: arm64: nVHE: gen-hyprel: Skip R_AARCH64_ABS32
+  KVM: arm64: VHE: Mark __hyp_call_panic __noreturn
+  arm64: Move esr_comment() to <asm/esr.h>
+  KVM: arm64: VHE: Add test module for hyp kCFI
+  KVM: arm64: nVHE: Support CONFIG_CFI_CLANG at EL2
+  KVM: arm64: nVHE: Support test module for hyp kCFI
+  KVM: arm64: Improve CONFIG_CFI_CLANG error message
 
-That, and the already merged feature enforcement framework which you
-keep ignoring. I'll push out a rc3-based branch in to -next shortly so
-that it is crystal clear what you need to base things on.
 
-	M.
+ arch/arm64/include/asm/esr.h            |  11 ++
+ arch/arm64/include/asm/kvm_asm.h        |   3 +
+ arch/arm64/include/asm/kvm_cfi.h        |  38 +++++++
+ arch/arm64/include/asm/kvm_hyp.h        |   4 +-
+ arch/arm64/kernel/asm-offsets.c         |   1 +
+ arch/arm64/kernel/debug-monitors.c      |   4 +-
+ arch/arm64/kernel/traps.c               |   8 +-
+ arch/arm64/kvm/Kconfig                  |  20 ++++
+ arch/arm64/kvm/Makefile                 |   3 +
+ arch/arm64/kvm/handle_exit.c            |  39 ++++++-
+ arch/arm64/kvm/hyp/cfi.c                |  37 +++++++
+ arch/arm64/kvm/hyp/entry.S              |  43 +++++++-
+ arch/arm64/kvm/hyp/hyp-entry.S          |   4 +-
+ arch/arm64/kvm/hyp/include/hyp/cfi.h    |  47 +++++++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h |   5 +-
+ arch/arm64/kvm/hyp/nvhe/Makefile        |   7 +-
+ arch/arm64/kvm/hyp/nvhe/gen-hyprel.c    |   6 ++
+ arch/arm64/kvm/hyp/nvhe/host.S          |  20 ++--
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S      |  18 +++-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  19 ++++
+ arch/arm64/kvm/hyp/nvhe/setup.c         |   6 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c        |   7 ++
+ arch/arm64/kvm/hyp/vhe/Makefile         |   1 +
+ arch/arm64/kvm/hyp/vhe/switch.c         |  34 +++++-
+ arch/arm64/kvm/hyp_cfi_test.c           |  75 +++++++++++++
+ arch/arm64/kvm/hyp_cfi_test_module.c    | 135 ++++++++++++++++++++++++
+ 26 files changed, 553 insertions(+), 42 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_cfi.h
+ create mode 100644 arch/arm64/kvm/hyp/cfi.c
+ create mode 100644 arch/arm64/kvm/hyp/include/hyp/cfi.h
+ create mode 100644 arch/arm64/kvm/hyp_cfi_test.c
+ create mode 100644 arch/arm64/kvm/hyp_cfi_test_module.c
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.44.0.478.gd926399ef9-goog
+
+
+-- 
+Pierre
