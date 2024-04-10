@@ -1,152 +1,150 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4BC6155733
-	for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 10:18:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DC8C157;
+	Wed, 10 Apr 2024 10:32:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712744304; cv=none; b=lGYTXhHcEinNANz25p5Rre69pbkJyVlAkkK+xRUPYyNauusKwZ9Zyt/DZxg19A6wZRcpKrVHGS8r2If0HwODwHtDO2hZyz5TJu3MZL6u1HP0xjKB1sxnI4Nez5mLMUXAXGnOPHWaIhIjYeh35rzWjqekv7avGgq7bLP/Zcx+VFU=
+	t=1712745125; cv=none; b=ZmKKzlG500g2ZsSrP94U/Va4UL+nuToYgUC0nRO/26hP7wHG7qKXLaeRlF3vIIUuci92GjEeltOxy8iHpMjYTIuQ8NSHvWrnxp7fveKi8XqJ0t6tIelxQ/8ZYtALFtQVEtoI4IcpYG1LXb7PRAWfxjBknJxcBRpDELVya8Uv6W0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712744304; c=relaxed/simple;
-	bh=QNa9q7fl0QpNcL5PdvTdh8BoZUPCJ2zBMZ3FZ5JDDRQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OpnIYcn2nCKvjfSYDQzHDJh0GAUqZOxhcyswp3YaTwF0AezdXups4QGRDrQmwdO+ieioPODEmIsjguZV6JbhcEBx80egq0KnFhp/4HBnP6eDhGTrONtL2n8mVmn2r6G4kqwD84UVWDgIyghYPxDoPpPCpW67vtdfCkOY3CXUzYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aQmzY97C; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1712745125; c=relaxed/simple;
+	bh=OzNxKoT6rtjavH+sSKdTA2aMIU0990lfBRRYYlSp7XA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=feKDrXhCCL6T2+UqZkQfZgeLH8Kmhaj4bifMXew/8xX5wRmwRpWhV1RvE8M25+evx6Gejpb5LI5+aVchC9n0mEkGhtMDo/X2vncczQTn7M86EqfvZJ33KFnvU3biKrdOk/BScaSNmWAYy4Ul3uMky5jVYD7zSJP1J7tyYazyupc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KzalsUOm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aQmzY97C"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-41641a889ccso48845e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 10 Apr 2024 03:18:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712744301; x=1713349101; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vT68oS4RVQULaWAEFFaBC6rqDsXdkDc5eppWUMWD6Io=;
-        b=aQmzY97C9Be+KIy0kgyzPfA7kaL698z8f/e/zQllccqEBpGCF6u70D3tIS6EDpP/a7
-         B1CLJzuyOROTLUo+tHAqE2EaBXmDRxInWon5iqB7m67siEFP2wcCUFCZCzwf8SRCAD9L
-         s1qZNw3ddBPFoYIJLaDKGZiitnLMiBIM6L/bcI32zcXqjtTXl8V820gqWecMYDfKfEv/
-         hCeOcWDRc4yGLacQKuyE9JpTa12B5y4GL3ecJDzPcCamw5o9ZPs6GGHtex2D/i3l8fhF
-         ZzMk48P17OuqoTIYYN/LylFTe4XVFsXmN2sKVYQ2ULCplSKL3kG9ODQfXn2WOfIM2GDS
-         YC1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712744301; x=1713349101;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vT68oS4RVQULaWAEFFaBC6rqDsXdkDc5eppWUMWD6Io=;
-        b=P6yXB/jIVG/dqQM3jRTmlS50uR3RQu/4Ly+7h8RUJzOOJJFbydCve0q5uDRg3/mxbL
-         dDeaPuFaQtcK2maCLI3oQ+adN8WwDc9/aOBN1Rwe9wg/GQ9XuOmrva06xby/NPeTMUYS
-         0YS1yYXif5DjJ3qm9OLsjf39G5r38mdRAjeiYAoXuJMgC5FKfmLJb4adcJbUJzvJrYWt
-         i+GHGmGrTB+qPfi9MFLkeimYBcmYdw99ODCQxXFzIyIX2+ppHJATZFCRR0Yp7w2NRdee
-         4LYa8qXyzFckeIpfZpVykoNdkDZ9TymilLGfQ3dwNqJOL3UlerBWLxs7Agw8lTYqxesQ
-         4tNg==
-X-Forwarded-Encrypted: i=1; AJvYcCWdRUahXgZWm7Aef2aDWZNwE2Mr63b95gknba9tR+dUOw3LJlgkV3z1ZV+rnpNq8zbKzb2ZaR40iJDN8V17oQinvczVNihF
-X-Gm-Message-State: AOJu0YxFvIfjDMVyU09eeN1DsGdgjzKso92kR+jMxDWoOzr967Q2GqpK
-	d4G+ynzY6M9oGFbtJME1UcvVOaKcMrcuffRNrSDb0/CWBiXEMh5LWppUmEHVGQ==
-X-Google-Smtp-Source: AGHT+IF04oIgLfak4zpgaHX/QvWLj2Gry8uOBqaulhtF8YFr4xta0pvMXzu6sMK/eZd+mX/Vi1I/5w==
-X-Received: by 2002:a05:600c:5105:b0:414:1400:a776 with SMTP id o5-20020a05600c510500b004141400a776mr111247wms.5.1712744300762;
-        Wed, 10 Apr 2024 03:18:20 -0700 (PDT)
-Received: from google.com (248.199.140.34.bc.googleusercontent.com. [34.140.199.248])
-        by smtp.gmail.com with ESMTPSA id r6-20020a05600c458600b004162a9f03a6sm1832887wmo.7.2024.04.10.03.18.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 03:18:19 -0700 (PDT)
-Date: Wed, 10 Apr 2024 10:18:18 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org,
-	maz@kernel.org, oliver.upton@linux.dev, qperret@google.com,
-	qwandor@google.com, sudeep.holla@arm.com, suzuki.poulose@arm.com,
-	tabba@google.com, will@kernel.org, yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kernel-team@android.com
-Subject: Re: [PATCH] KVM: arm64: Add support for FFA_PARTITION_INFO_GET
-Message-ID: <ZhZnaibTBaa2J4a5@google.com>
-References: <20240409151908.541589-1-sebastianene@google.com>
- <ZhVpmF2js1NJp1qF@google.com>
- <ZhZYsuqggl_Hzv8X@google.com>
- <ZhZhm4UXyClAqXDM@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KzalsUOm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C0D0C433F1;
+	Wed, 10 Apr 2024 10:32:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712745125;
+	bh=OzNxKoT6rtjavH+sSKdTA2aMIU0990lfBRRYYlSp7XA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KzalsUOmcblbIZ97GurA1rdPl9SC/8tq1vtLK++nVmvjVqR9HNbhdulCsgNlNpZUj
+	 NhO4HaeutbcfxdSMSiqUGFVU9mek+M+PfbLiaK11UZ2O3Pcm1Mc6zY7XAj8g8UbSaE
+	 6lkkhGnAxVFqTDIIrcjTnF3NVdW+jFwkEWP5fqybV7kidLwDueM6sPMB+OgxKrRLvV
+	 10I2eCvh2td9EFeowCycDH7ErIUGJUsVYaVx/+/g6ilmIJedkvHTmHYxFyRHGtKmvh
+	 hLtqtr2WwFmFYoQtdoA/57HlbU1WoYW7Bi6w8Te9JxTp9jOoVuF78A9vuezWC0U/rN
+	 DW7g6eiwYTL1A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ruVFK-0036qE-TU;
+	Wed, 10 Apr 2024 11:32:02 +0100
+Date: Wed, 10 Apr 2024 11:32:02 +0100
+Message-ID: <86ttk9se3h.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Dave Martin <Dave.Martin@arm.com>,
+	kvmarm@lists.linux.dev,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v6 2/5] KVM: arm64: Add newly allocated ID registers to register descriptions
+In-Reply-To: <73c6012f-adb0-470b-bd47-6093d28aea97@sirena.org.uk>
+References: <20240329-arm64-2023-dpisa-v6-0-ba42db6c27f3@kernel.org>
+	<20240329-arm64-2023-dpisa-v6-2-ba42db6c27f3@kernel.org>
+	<87le5ysm4l.wl-maz@kernel.org>
+	<73c6012f-adb0-470b-bd47-6093d28aea97@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZhZhm4UXyClAqXDM@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, corbet@lwn.net, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Dave.Martin@arm.com, kvmarm@lists.linux.dev, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Apr 10, 2024 at 10:53:31AM +0100, Vincent Donnefort wrote:
-> [...]
+On Tue, 02 Apr 2024 18:21:55 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> > > > +static void do_ffa_part_get(struct arm_smccc_res *res,
-> > > > +			    struct kvm_cpu_context *ctxt)
-> > > > +{
-> > > > +	DECLARE_REG(u32, uuid0, ctxt, 1);
-> > > > +	DECLARE_REG(u32, uuid1, ctxt, 2);
-> > > > +	DECLARE_REG(u32, uuid2, ctxt, 3);
-> > > > +	DECLARE_REG(u32, uuid3, ctxt, 4);
-> > > > +	DECLARE_REG(u32, flags, ctxt, 5);
-> > > > +	u32 off, count, sz, buf_sz;
-> > > > +
-> > > > +	hyp_spin_lock(&host_buffers.lock);
-> > > > +	if (!host_buffers.rx) {
-> > > > +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> > > > +		goto out_unlock;
-> > > > +	}
-> > > > +
-> > > > +	arm_smccc_1_1_smc(FFA_PARTITION_INFO_GET, uuid0, uuid1,
-> > > > +			  uuid2, uuid3, flags, 0, 0,
-> > > > +			  res);
-> > > > +
-> > > > +	if (res->a0 != FFA_SUCCESS)
-> > > > +		goto out_unlock;
-> > > > +
-> > > > +	count = res->a2;
-> > > > +	if (!count)
-> > > > +		goto out_unlock;
-> > > 
-> > > Looking at the table 13.34, it seems what's in "count" depends on the flag.
-> > > Shouldn't we check its value, and only memcpy into the host buffers if the flag
-> > > is 0?
-> > > 
-> > 
-> > When the flag is `1` the count referes to the number of partitions
-> > deployed. In both cases we have to copy something unless count == 0.
+> On Sun, Mar 31, 2024 at 11:59:06AM +0100, Marc Zyngier wrote:
+> > Mark Brown <broonie@kernel.org> wrote:
 > 
-> I see "Return the count of partitions deployed in the system corresponding to
-> the specified UUID in w2"
+> > > The 2023 architecture extensions have allocated some new ID registers, add
+> > > them to the KVM system register descriptions so that they are visible to
+> > > guests.
 > 
-> Which I believe means nothing has been copied in the buffer?
+> > > We make the newly introduced dpISA features writeable, as well as
+> > > allowing writes to ID_AA64ISAR3_EL1.CPA for FEAT_CPA which only
+> > > introduces straigforward new instructions with no additional
+> > > architectural state or traps.
 > 
+> > FPMR actively gets trapped by HCRX_EL2.
+> 
+> Sure, I'm not clear what you're trying to say here?
 
-When the flag in w5 is 1 the size argument stored in w3 will be zero and
-the loop will not be executed, so nothing will be copied to the host
-buffers.
+I'm saying (and not trying to say) that there are traps implied by the
+features that you are adding.
 
-> > 
-> > > > +
-> > > > +	if (ffa_version > FFA_VERSION_1_0) {
-> > > > +		buf_sz = sz = res->a3;
-> > > > +		if (sz > sizeof(struct ffa_partition_info))
-> > > > +			buf_sz = sizeof(struct ffa_partition_info);
-> > > 
-> > > What are you trying to protect against here? We have to trust EL3 anyway, (as
-> > > other functions do).
-> > > 
-> > > The WARN() could be kept though to make sure we won't overflow our buffer. But
-> > > it could be transformed into an error? FFA_RET_ABORTED?
-> > > 
-> > >
-> > 
-> > I think we can keep it as a WARN_ON because it is not expected to have
-> > a return code of FFA_SUCCESS but the buffer to be overflown. The TEE is
-> > expected to return NO_MEMORY in w2 if the results cannot fit in the RX
-> > buffer.
+> The "no additional" bit is referring to FEAT_CPA.
+
+Well, that wasn't clear to me.
+
+And when it comes to CPA, there are additional controls in SCTLR2_ELx,
+which doesn't even gets context switched for EL1. What could possibly
+go wrong?
+
 > 
-> WARN() is crashing the hypervisor. It'd be a shame here as we can easily recover
-> by just sending an error back to the caller.
+> > > -	ID_UNALLOCATED(6,3),
+> > > +	ID_WRITABLE(ID_AA64ISAR3_EL1, ~(ID_AA64ISAR2_EL1_RES0 |
+> > > +					ID_AA64ISAR3_EL1_PACM |
+> > > +					ID_AA64ISAR3_EL1_TLBIW)),
+> > >  	ID_UNALLOCATED(6,4),
+> > >  	ID_UNALLOCATED(6,5),
+> > >  	ID_UNALLOCATED(6,6),
+> 
+> > Where is the code that enforces the lack of support for MTEFAR,
+> > MTESTOREONLY, and MTEPERM for SCTLR_ELx, EnPACM and EnFPM in HCRX_EL2?
+> 
+> Could you please be more explicit regarding what you're expecting to see
+> here?
 
-I agree with you but this is not expected to happen unless TZ messes up
-something/is not complaint with the spec, in which case I would like to
-catch this.
+I'm expecting you to add all the required masking and fine-grained
+disabling of features that are not explicitly advertised to the guest.
+
+This should translate into additional init code in kvm_init_sysreg(),
+kvm_init_nv_sysregs() and limit_nv_id_reg(). You also should update
+the exception triaging infrastructure in emulate-nested.c.
+
+> Other than the writeability mask for the ID register I would have
+> expected to need explicit code to enable new features rather than
+> explicit code to keep currently unsupported features unsupported.  I'm
+> sure what you're referencing will be obvious once I see it but I'm
+> drawing a blank.
+> 
+> > And I haven't checked whether TLBI VMALLWS2 can be trapped.
+> 
+> I didn't see anything but I might not be aware of where to look, there
+> doesn't seem to be anything for that specifically in HFGITR_EL2 or
+> HFGITR2_EL2 which would be the main places I'd expect to find
+> something.
+
+That's a really odd place to look. This is a S2 invalidation
+primitive, which by definition is under the sole control of EL2, and
+therefore cannot be trapped by any of the FGT registers, as they only
+affect lesser-privileged ELs.
+
+The instruction is described in the XML:
+
+https://developer.arm.com/documentation/ddi0601/2024-03/AArch64-Instructions/TLBI-VMALLWS2E1--TLB-Invalidate-stage-2-dirty-state-by-VMID--EL1-0
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
