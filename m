@@ -1,106 +1,61 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C60181BBF;
-	Wed, 10 Apr 2024 21:07:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CAB6181D19;
+	Wed, 10 Apr 2024 21:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712783241; cv=none; b=VQ6IksTT8/O8xAil77IXR4m/+ESi/umn+EX3uVLFwxx0C3ydccgyWryGMcm/YINH394pJbg/krcq+ky9AWBvnl5DQkvgvTpQYR+8lkamfJI77YxVaPdcbJLq4qYe84IxM6TWotHgBQx44pIUoCaZFWZkffYNrvJEszYwijyOdtY=
+	t=1712784622; cv=none; b=lTLgg42KzFAluHZid+Rnm+BAuLydkteZUiLtOgWEsgNkc7RWHvBmYWvQxp0e9HqS7PEvvFOv03XVjJcP5EhYd5wliLoQ9l3H+f4/XukV21+I0unlW1ANLeOfedgqNb33YiXvTZeosuz9fEDGsXjHoscuixJ6SqX2Z0WvSut/Dtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712783241; c=relaxed/simple;
-	bh=WUkQx3MHNfpPK223Za2QnwYdPQf2mwT7iuWRCuTCPQM=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mLN/P1nqVz2HkBVi+OS6NK976bTyLo8RMRsOuNHvo54V4kq39PcVNIAHjkfffgizcF9rMNmfOaetlVp1CH9JU6MUSkinlmGf70QTspUEKWJKKDH8s2/cy2IWPJlom1bqE0ejPQqeJxVmwVKUn3gupbooCV/Zfn/oSFLCfHAAYwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VFFjC372rz6K6DM;
-	Thu, 11 Apr 2024 05:05:35 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 403711402C7;
-	Thu, 11 Apr 2024 05:07:14 +0800 (CST)
-Received: from localhost (10.126.168.81) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Wed, 10 Apr
- 2024 22:07:13 +0100
-Date: Wed, 10 Apr 2024 22:07:12 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-CC: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	<linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-riscv@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<x86@kernel.org>, <acpica-devel@lists.linuxfoundation.org>,
-	<linux-csky@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-ia64@vger.kernel.org>, <linux-parisc@vger.kernel.org>, Salil Mehta
-	<salil.mehta@huawei.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	<jianyong.wu@arm.com>, <justin.he@arm.com>, James Morse
-	<james.morse@arm.com>, Miguel Luis <miguel.luis@oracle.com>
-Subject: Re: [PATCH RFC v4 02/15] ACPI: processor: Register all CPUs from
- acpi_processor_get_info()
-Message-ID: <20240410220712.0000726f@Huawei.com>
-In-Reply-To: <CAJZ5v0gG0xLajHsWXVM+-V+fQZAudvojechUa-DzFgwCs2q8Dg@mail.gmail.com>
-References: <Zbp5xzmFhKDAgHws@shell.armlinux.org.uk>
-	<E1rVDmU-0027YP-Jz@rmk-PC.armlinux.org.uk>
-	<CAJZ5v0iiJpUWq5GMSnKFWQTzn_bdwoQz9m=hDaXNg4Lj_ePF4g@mail.gmail.com>
-	<20240322185327.00002416@Huawei.com>
-	<20240410134318.0000193c@huawei.com>
-	<CAJZ5v0ggD042sfz3jDXQVDUxQZu_AWaF2ox-Me8CvFeRB8nczw@mail.gmail.com>
-	<20240410145005.00003050@Huawei.com>
-	<ZhbgwBBvh6ccdO7x@shell.armlinux.org.uk>
-	<CAJZ5v0gG0xLajHsWXVM+-V+fQZAudvojechUa-DzFgwCs2q8Dg@mail.gmail.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1712784622; c=relaxed/simple;
+	bh=14ZzdB+5ZJ89hfQO2P/iVaITshCuwOTD8j6Uc+CSv9s=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=RVKIiybVTk8YzfeObd1QnAs+wgJbs2i4F7jdHJK59qK6ZQOu+vlq6iPQjlcyUDhVpxNj2WqOY6mgZ48+FQ/QYL7HnTw5GVE1+m+AsljUvDIsV+E5Oj/hLSNdHsuEw59IobOB/5q+4m3sA5L6mS0L2MIwWPv54WGRomc59NV1QMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=JFp1xYoQ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="JFp1xYoQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44D19C433F1;
+	Wed, 10 Apr 2024 21:30:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1712784622;
+	bh=14ZzdB+5ZJ89hfQO2P/iVaITshCuwOTD8j6Uc+CSv9s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JFp1xYoQBbQ39g+uTbt4JLn3SBzgRbjqJ31eyFQf9/KYKQPg93LaIEw4AqO9qBCBd
+	 IaZLQJEvG3vUqIKZSLW207ouLZUCv3OzXKGTpgCVOAXkPkkakvzfiiajTuIeyu76gy
+	 L/McdS+iJHvTrIxiRy4HiJClm2JWS4c9rS0J95ME=
+Date: Wed, 10 Apr 2024 14:30:20 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, Marc Zyngier
+ <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
+ <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, Thomas
+ Bogendoerfer <tsbogend@alpha.franken.de>, Nicholas Piggin
+ <npiggin@gmail.com>, Anup Patel <anup@brainfault.org>, Atish Patra
+ <atishp@atishpatra.org>, Sean Christopherson <seanjc@google.com>, David
+ Hildenbrand <david@redhat.com>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, loongarch@lists.linux.dev,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ kvm-riscv@lists.infradead.org, linux-mm@kvack.org,
+ linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org
+Subject: Re: [PATCH 0/4] KVM, mm: remove the .change_pte() MMU notifier and
+ set_pte_at_notify()
+Message-Id: <20240410143020.420cafd47bf8af257b2e647a@linux-foundation.org>
+In-Reply-To: <20240405115815.3226315-1-pbonzini@redhat.com>
+References: <20240405115815.3226315-1-pbonzini@redhat.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: lhrpeml500002.china.huawei.com (7.191.160.78) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, 10 Apr 2024 21:08:06 +0200
-"Rafael J. Wysocki" <rafael@kernel.org> wrote:
+On Fri,  5 Apr 2024 07:58:11 -0400 Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-> On Wed, Apr 10, 2024 at 8:56=E2=80=AFPM Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
-> >
-> > On Wed, Apr 10, 2024 at 02:50:05PM +0100, Jonathan Cameron wrote: =20
-> > > If we get rid of this catch all, solution would be to move the
-> > > !acpi_disabled check into the arm64 version of arch_cpu_register()
-> > > because we would only want the delayed registration path to be
-> > > used on ACPI cases where the question of CPU availability can't
-> > > yet be resolved. =20
-> >
-> > Aren't we then needing two arch_register_cpu() implementations?
-> > I'm assuming that you're suggesting that the !acpi_disabled, then
-> > do nothing check is moved into arch_register_cpu() - or to put it
-> > another way, arch_register_cpu() does nothing if ACPI is enabled.
-> >
-> > If arch_register_cpu() does nothing if ACPI is enabled, how do
-> > CPUs get registered (and sysfs files get created to control them)
-> > on ACPI systems? ACPI wouldn't be able to call arch_register_cpu(),
-> > so I suspect you'll need an ACPI-specific version of this function. =20
->=20
-> arch_register_cpu() will do what it does, but it will check (upfront)
-> if ACPI is enabled and if so, if the ACPI Namespace is available.  In
-> the case when ACPI is enabled and the ACPI Namespace is not ready, it
-> will return -EPROBE_DEFER (say).
+> Please review!  Also feel free to take the KVM patches through the mm
+> tree, as I don't expect any conflicts.
 
-Exactly.  I oversimplified and wasn't clear enough.
-The check is there in the arch_register_cpu() and is one of the ways
-that function can decide to actually register the cpu but not the only one.
-
-I think we may later want to consider breaking it into 2 arch calls
-(check if ready to register + register) to reduce code duplication
-in with the hotplug path where there is a little extra to do
-inbetween.
-
-Hopefully that can wait though.
-
-Jonathan
+It's mainly a KVM thing and the MM changes are small and simple.
+I'd say that the KVM tree would be a better home?
