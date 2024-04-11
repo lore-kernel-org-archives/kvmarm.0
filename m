@@ -1,93 +1,127 @@
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5AD514C5BF
-	for <kvmarm@lists.linux.dev>; Thu, 11 Apr 2024 13:57:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ACCA4CB4A
+	for <kvmarm@lists.linux.dev>; Thu, 11 Apr 2024 16:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712843828; cv=none; b=doDLM6Rz9bzjQ8aHdLDT+OmdfBbcqyhfvtiL/J0y5IQlpiTPlhwJXC1dxFe0mTuLJrqhLKnBnht1bhBgCmIQJ52UBv++RLN8ZiB/HcdapO8MpWyWOEGyi1R2kChltyfA76AHQN7sQEwhrDlSoH8cmOSqxysR5MckQztyq+F+TBM=
+	t=1712854561; cv=none; b=h/3Yt/5kODVmyBXEYUFSIP3G+Xi/8xRCsmI5rvX1iBUhFQ3qErox+5/Vw9d5cQGst/z38tsNt5x6b2iifsz9bORtb8J922Nf7gXBbmoLO6SVTZeDURGaOeAUdHkXKmQv60NY2iXGXFECeN0iJT+OvPzjwi4e3dqkQ56RDHEQ9Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712843828; c=relaxed/simple;
-	bh=rj7jL0inBOSEZHgrBXiWcOt4NTfoLLf41Owd8e/QN1E=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=pIANlT4rBbhfe9mK/YSC+EdbJS+OGXiD15/bfQLGFtQqUJ305SLJAjFXU0kPnPr/8w/uR/zARbtK2nCYs4JXFN4ZcvyuYOCphmEfbjpkPAf6lWS5wxgs+Y4/m3+RYMw/fCb7CZKxQ1RekoRyYdjOFghaAk/+F6nUspAqXGu0uNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ITgBl0hh; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
+	s=arc-20240116; t=1712854561; c=relaxed/simple;
+	bh=mdyviDc2SZiHERUxq8FwGAUG2lksvejg1L3R6/TQq04=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=j1uB71UsmWpTXmnaDOAuvrqJGmWBV4Q7No41j5kmUxQjHLWeJ0kOHWSr4iowYPp1WG6wipjE9UNCP2aWyWMXy31PaESGMT955cYaAeSIGckxiSdHyFaAKL2+5dTyfpPzfiIZsRmcu3KOJPmNiuMneg1KfHWFqN/UVRHgGDfYcQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CEmduPtL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ITgBl0hh"
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dd1395fd1bfso13483026276.0
-        for <kvmarm@lists.linux.dev>; Thu, 11 Apr 2024 06:57:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712843826; x=1713448626; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=D+EIh4GaKjBC89iq3H7JjSUXThXK2r+ggs0qQY84omw=;
-        b=ITgBl0hhOU+PckV/W9+K7peAGGNNQLytFEsHX0lnhxYGmBrKoM08JjLDYHQdBrfp4z
-         FCINy5dn4S2tiohgd+ZrxxkE8wIMzUKvexp6FW4fLX6A6r4YbAdO6MbkGdi33HnGKKbF
-         y/PsIdRYjJwfJ7t0Eco7ORw7eIfUgU2fFRs6X2qPSrSuXQCn79v4y3GzF3TXx3dXlQrt
-         m0b7d47NB5pfXN0CtPoggt13/GXtboKzQULDPivYfAQR4gKPLkZNgU5EXQwvvsqWdAqk
-         BAsUA0zuZOtJgaBAm+50Si4ZvaOW7qRGhdHKGQDdZsoCQi/kYPdgsNcvunPKXR5LX8To
-         hEdw==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CEmduPtL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712854559;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zMWXkXzR0H7lOgn05ANda8bjR25lnib+pFQqcdAFtGw=;
+	b=CEmduPtL3NP5XNR+oFsDnVOJaZoVwlx7dy2SpDMkrYd+ByLjBPDNySLL9ouFDlwrBxagu3
+	BJkyt5CIUk3SQVwtjYimIGEWuF/N7Omn/wmbfHopdQCiAeWPKGQeIWT7U9sxB+ZjvYoz0W
+	M/50ajYZgsI8RUEvSFEfgE31ub9wAJI=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-192-W44f4SMmMCy1BGksaMIHOw-1; Thu, 11 Apr 2024 12:55:57 -0400
+X-MC-Unique: W44f4SMmMCy1BGksaMIHOw-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-346b8ef7e10so507353f8f.3
+        for <kvmarm@lists.linux.dev>; Thu, 11 Apr 2024 09:55:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712843826; x=1713448626;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=D+EIh4GaKjBC89iq3H7JjSUXThXK2r+ggs0qQY84omw=;
-        b=vh2USaeOGhofJBdSg6DvGFF1T582jp7MuuwFgBBqIPZ0Qya+aCGg9vusLuIkvFMGOp
-         3OBjSpKZq/Ng3xcfc8j2bN09lyYucW8HmRYisHCYiB7MSSEkbLaNFocOPs80imFw6duI
-         YXgk4Ime9b3NHdIsLEDrdBogHPWuRgQV3OtOIZa1aXWROmS8fyVbSsUoTWL22n7yZiJR
-         pzJCHIuMpGlxSApUNrYaS5SsKorJ8fnobXsR2a687f3eJZxv7Xn6KsuAnbd1vmzkSJ9y
-         mM622B85YY3yui9HA7F8P7IjY4HM9wsdSpxzLwxNfij4QuqZPu4renHJ5JVIGjSXUFWB
-         F87w==
-X-Gm-Message-State: AOJu0Yw3dRV0FV6TFbylL9Y4s01GQD9wsrSG0s1anY3jMqWfLyXppQt7
-	elqwvgtcIsvg3Z8CMtPlI7G/Bmevb8V2aWKhTd/39iUivCNqZ/PtM6fPPWuB7nlCUZv96MnHcQO
-	hxj/gHddyl8uAl95TWcmFeLH73Q==
-X-Google-Smtp-Source: AGHT+IEwnm375fG2EIsGyufwb0TdVTVsW3fmGnrbbBqhe480E3BRr8U08k6owLTh9FqdJqCEg0fO34CuUpQr+Fmo7L0=
-X-Received: from sebkvm.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:cd5])
- (user=sebastianene job=sendgmr) by 2002:a05:6902:2b83:b0:dd9:1db5:8348 with
- SMTP id fj3-20020a0569022b8300b00dd91db58348mr1560194ybb.8.1712843825763;
- Thu, 11 Apr 2024 06:57:05 -0700 (PDT)
-Date: Thu, 11 Apr 2024 13:56:59 +0000
+        d=1e100.net; s=20230601; t=1712854557; x=1713459357;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zMWXkXzR0H7lOgn05ANda8bjR25lnib+pFQqcdAFtGw=;
+        b=FN/qTvCBOPasuMzmK5st2K84fDTclr2adXDj7Lqyj4b8mshJODkL5kl5zL8+s5RIDu
+         /Iz84JUj2fSEXTQYZQPxW5JClRZ/qujn8+VrrpqF+w7tmRaJla86g0Kv/WOfM4zmZrqw
+         cHiiaojscMHzWimlo5ZDaW8EZi0FHzViWhLaRHMrPbcjmayAn6kVfef03yHYEMRPliEl
+         9DbSjr0n9djINIMzPvZUg3Jau39BpPft06HKj6GAhEu5rD4QU/Z+3LUgzSiLC0PUXkV/
+         AtL+4tEuAV1jaKTGe/zfrUwGPuxkx1y66WtQ0hqEMkWZu8etBky5ifg740Wq8TV1d5Vl
+         hVEg==
+X-Forwarded-Encrypted: i=1; AJvYcCXHn9+oqXcouMRuM7jnL8wzUC5hiyz1Ajx6vSlDJbLZq10Stmr+U8FmflIc6xK7ItjMYQz7X52Tm/BHXkL5/vKwVczSgSon
+X-Gm-Message-State: AOJu0YzLY3T0U8G7cJEmabd7KAUi/LCFhbY05Bh761lc1Po/7W5HRsN6
+	n6MGNgXSKxsAz99kB9NVAgoZoHhxgEeLkY4xacShQBv4g5W5I96UYQaqPMopJWPJDeJ7gLClQvW
+	1g16liYZU9mIzTf+upJxJp/GwVOtEqnLvViJjm2YaBtsIqfTBhSrUeCoJ88qWCFbFQ67ou+MiRe
+	xLDgK3X3GVDzW3rBHMAzmrOA2aZK9c
+X-Received: by 2002:a5d:5143:0:b0:346:67fd:beeb with SMTP id u3-20020a5d5143000000b0034667fdbeebmr125073wrt.13.1712854556792;
+        Thu, 11 Apr 2024 09:55:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGD8Twrk+pSap7dr/hOyNv9dE7sPb5xWfugil3Ej7FN6UJvArBpNQmyBrQbHxp3h5Btn4P+dbeRSa2EBSrKO98=
+X-Received: by 2002:a5d:5143:0:b0:346:67fd:beeb with SMTP id
+ u3-20020a5d5143000000b0034667fdbeebmr125049wrt.13.1712854556481; Thu, 11 Apr
+ 2024 09:55:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240411135700.2140550-1-sebastianene@google.com>
-Subject: [PATCH] KVM: arm64: Remove FFA_MSG_SEND_DIRECT_REQ from the denylist
-From: Sebastian Ene <sebastianene@google.com>
-To: catalin.marinas@arm.com, james.morse@arm.com, maz@kernel.org, 
-	oliver.upton@linux.dev, qperret@google.com, qwandor@google.com, 
-	suzuki.poulose@arm.com, tabba@google.com, will@kernel.org, 
-	yuzenghui@huawei.com, vdonnefort@google.com, lpieralisi@kernel.org
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kernel-team@android.com, 
-	Sebastian Ene <sebastianene@google.com>
+MIME-Version: 1.0
+References: <20240405115815.3226315-1-pbonzini@redhat.com> <20240405115815.3226315-2-pbonzini@redhat.com>
+ <ZhP3hDhe2Qwo9oCL@x1n>
+In-Reply-To: <ZhP3hDhe2Qwo9oCL@x1n>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 11 Apr 2024 18:55:44 +0200
+Message-ID: <CABgObfYwwXy9gQap-PJyOrVCcUr-VfK90AKNaRe0VO-G00G8SQ@mail.gmail.com>
+Subject: Re: [PATCH 1/4] KVM: delete .change_pte MMU notifier callback
+To: Peter Xu <peterx@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Nicholas Piggin <npiggin@gmail.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Sean Christopherson <seanjc@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	David Hildenbrand <david@redhat.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, Andrea Arcangeli <aarcange@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The denylist is blocking the 32 bit version of the call but is allowing
-the 64 bit version of it. There is no reason for blocking only one of
-them and the hypervisor should support these calls.
+On Mon, Apr 8, 2024 at 3:56=E2=80=AFPM Peter Xu <peterx@redhat.com> wrote:
+> Paolo,
+>
+> I may miss a bunch of details here (as I still remember some change_pte
+> patches previously on the list..), however not sure whether we considered
+> enable it?  Asked because I remember Andrea used to have a custom tree
+> maintaining that part:
+>
+> https://github.com/aagit/aa/commit/c761078df7a77d13ddfaeebe56a0f4bc128b19=
+68
 
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
----
- arch/arm64/kvm/hyp/nvhe/ffa.c | 1 -
- 1 file changed, 1 deletion(-)
+The patch enables it only for KSM, so it would still require a bunch
+of cleanups, for example I also would still use set_pte_at() in all
+the places that are not KSM. This would at least fix the issue with
+the poor documentation of where to use set_pte_at_notify() vs
+set_pte_at().
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 31ad740137fd..0df217bb2194 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -601,7 +601,6 @@ static bool ffa_call_supported(u64 func_id)
- 	case FFA_MSG_POLL:
- 	case FFA_MSG_WAIT:
- 	/* 32-bit variants of 64-bit calls */
--	case FFA_MSG_SEND_DIRECT_REQ:
- 	case FFA_MSG_SEND_DIRECT_RESP:
- 	case FFA_RXTX_MAP:
- 	case FFA_MEM_DONATE:
--- 
-2.44.0.478.gd926399ef9-goog
+With regard to the implementation, I like the idea of disabling the
+invalidation on the MMU notifier side, but I would rather have
+MMU_NOTIFIER_CHANGE_PTE as a separate field in the range instead of
+overloading the event field.
+
+> Maybe it can't be enabled for some reason that I overlooked in the curren=
+t
+> tree, or we just decided to not to?
+
+I have just learnt about the patch, nobody had ever mentioned it even
+though it's almost 2 years old... It's a lot of code though and no one
+has ever reported an issue for over 10 years, so I think it's easiest
+to just rip the code out.
+
+Paolo
+
+> Thanks,
+>
+> --
+> Peter Xu
+>
 
