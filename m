@@ -1,193 +1,205 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A3E913F01E;
-	Thu, 11 Apr 2024 07:53:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53569140394
+	for <kvmarm@lists.linux.dev>; Thu, 11 Apr 2024 08:52:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712821996; cv=none; b=l1IpQOs6i+s1M7CT/ov5oRzziBVB1gqmjG0y5izkjjjFU4lLCtazPyDS3z/mo5D6l3dZHLJC/TEu+aQ2rRIoW3/nfdeTHfysSt28HpMH9tLgC5qu1hoLf3sXHBruahtyhgRtlHDtbtAHgurANHLNPtLD5tEVNYjqVQgn2StdfIo=
+	t=1712825532; cv=none; b=XAL1coF5FZW9Eit3H1iPNUPqK8wlpzZj1kjXpINRD3pl6Jaw3TOYUWUuEYGs11+nZU3oZpa440yBromtKVhXKkuH+EU2dwU+3Y6+6kQrIXshHUW92nJVhMy+iWQDY6eA1dLgVIHDMvHfZ5GGeDKHx2fqz/w0nRtQ2L8K8UHaGyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712821996; c=relaxed/simple;
-	bh=6EKuB8e7IExalHGky8lWzM8XAP+mtM0/jtPeWY6Ff7w=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KNed5ByOjGtd5YBvbp4dJfY/RgKkcDTWntQqrOKO6bkjvmvzBtEmEXRLfW+eUUXauII8mzHCt7SHlD0CETL/e6YPk7sv+aqY7blo6o+7r5SqpOk9DOHYLfwZJqJvR7nh/HaWaPB7Pbb7qXOVe9KsKR1ttq64ZBTaMD7qHj4JWxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aeZ/v6pH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1712825532; c=relaxed/simple;
+	bh=pFn/mSbRjf0iy6p9eQifrjWfK/3Yqa/UGNvAao52vf4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fv5oOrHaE1YhkUZtq1bwvzV6Va6OH57EEv3814sJgQ83ZycNV03eeowiKj+pQ5ERqh65wK6GVBnSIidytuuRzlMZ7H8OcM06U/JsqeZMCWhi29Yl6dDhmXfT7TfV/FurRy26PwG+ERaF3WaHCFa7GpbKdrj0kY2XiDvr2+DOjU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hcoLS9Y4; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aeZ/v6pH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6F9EC433F1;
-	Thu, 11 Apr 2024 07:53:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712821995;
-	bh=6EKuB8e7IExalHGky8lWzM8XAP+mtM0/jtPeWY6Ff7w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aeZ/v6pH60KlfPIfvA+9/9CqjGnpSE1J5BHeGOcjxO4CPdb58eNlu7fuLSnW9YIMy
-	 suGPjs4pcEF5wYoqtEZ3ApXLLxG0UOfQpCe8nU5dGxYJUX7yc6Uq0mFH8EEc6dPgeU
-	 CgwQ0KKFuOWJD26kuD9vMJCRupdbnBPmSiOZ3m9W5clqwIVQVvjdkjiZiA/nJfOP+I
-	 rvMWv+aX8g4wrkA/9IGKZ7gesau/gW4WNY3SAN/p4Eud2JhCbd9iHX8suE+BPqvIeU
-	 xCMxLPAN99qIdbrztrsiNXpjRPXDjxQ1fwUF2otGBysSPrMHKM/0WCdBzc8xM4ePrE
-	 sE2JrrU/v6TIQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rupFB-003OqW-CZ;
-	Thu, 11 Apr 2024 08:53:13 +0100
-Date: Thu, 11 Apr 2024 08:53:13 +0100
-Message-ID: <86sezss5cm.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] KVM: arm64: Add early_param to control WFx trapping
-In-Reply-To: <20240410175437.793508-1-coltonlewis@google.com>
-References: <20240410175437.793508-1-coltonlewis@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hcoLS9Y4"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-41687826509so58415e9.1
+        for <kvmarm@lists.linux.dev>; Thu, 11 Apr 2024 01:52:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712825529; x=1713430329; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BmVuDao6rc6hBIHx5Ev3aZcNpyMOiHsa4Eq9hXFl4JM=;
+        b=hcoLS9Y4BcFrjZ0ye1OVPrmQZFympk8j+8QHg0ScLjzzfPn4Ga3GPF0Ins35QSgb1U
+         0f+vn/36yyu6Wr/OqmymtniiSKSrt1rAmO/krWLE/ylJFfHervRXh1iGYr2RpAYZLmpB
+         j5zHwDahIXCfBbr6RLFdUtrQdUDbWKbp4nNPdyACi0EZid2gxkvqg59T+wt0Ur7Tb68c
+         RRU17JwhCKvtrz0OJd2Otfm4Rc4jysNWl2vRIoNbzT5g+k0hQbRLzEd3zlM35zsAL1d1
+         qxzhZKfhS0cEawanD6xX5kaK7N91uTVHegoxIolTmS9ZqSvScNctAO6/E7CC0oxY3LaA
+         kXsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712825529; x=1713430329;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BmVuDao6rc6hBIHx5Ev3aZcNpyMOiHsa4Eq9hXFl4JM=;
+        b=d43XbA//E62v6EHmWTyVjt+X+8GFE5P9b/PLh+G5icKETNOHSudpETy7kxexMGO54l
+         jJE6oTXGsAYZC6wrKqQm4e/H25Ni6D2zh1kPw/Ye8DwYo+G7eYDj4VdpboSzbn+29HAi
+         sjah695Cva4p2ZynZ20CUukfMmLcMUOBRCCGF6IRWbTGs4y2iD9YlJ1+C+QVH5yJRXU8
+         R9Jc94AeU26R56h3Cn5evu1eURH9y2kXktTCK1RgyCYToy6FIAWu/R2IrU/DdU8DxicW
+         C/xTHPF2yy65fgdVcUvLK3QzkBtof4t80yoeJwkxpBnkZacXvg5QWBH7BNmGDbw4+0CA
+         rcFw==
+X-Forwarded-Encrypted: i=1; AJvYcCXP59ee9vko0ACJVuRmfAVC1eKgTjyUbPMWW0bwTGJw8Ehvd+Kc6RCtT+obJoAyGeynEJkTLsftmW0bn5vNTEsGO84ZSfE+
+X-Gm-Message-State: AOJu0YygoNIZ5fwpMSyc20ZmxETWms8RwDV2FitcLbe/t7Fpw6JlxTIA
+	cm2XEg6GgiRTL93hmdhQ76RvEw9mFJCt/RsFY31yrMt2II8rVROsBPJ1Fm4QDA==
+X-Google-Smtp-Source: AGHT+IEHyQAF1b0TC6DYctDGP2A1rpYsfzyhRAynoAl9y0PZ04YsPHHdl/c1/oosy8F6BWBGGSq7og==
+X-Received: by 2002:a05:600c:3d18:b0:417:d7a4:2a0e with SMTP id bh24-20020a05600c3d1800b00417d7a42a0emr88682wmb.5.1712825528471;
+        Thu, 11 Apr 2024 01:52:08 -0700 (PDT)
+Received: from google.com (248.199.140.34.bc.googleusercontent.com. [34.140.199.248])
+        by smtp.gmail.com with ESMTPSA id he8-20020a05600c540800b00416a08788a5sm4855277wmb.27.2024.04.11.01.52.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Apr 2024 01:52:07 -0700 (PDT)
+Date: Thu, 11 Apr 2024 08:52:05 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Lorenzo Pieralisi <lpieralisi@kernel.org>
+Cc: catalin.marinas@arm.com, james.morse@arm.com, jean-philippe@linaro.org,
+	maz@kernel.org, oliver.upton@linux.dev, qperret@google.com,
+	qwandor@google.com, sudeep.holla@arm.com, suzuki.poulose@arm.com,
+	tabba@google.com, will@kernel.org, yuzenghui@huawei.com,
+	vdonnefort@google.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kernel-team@android.com
+Subject: Re: [PATCH] KVM: arm64: Add support for FFA_PARTITION_INFO_GET
+Message-ID: <ZhektURnNMnIbSJG@google.com>
+References: <20240409151908.541589-1-sebastianene@google.com>
+ <Zhaoz9E/sw6jVnci@lpieralisi>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zhaoz9E/sw6jVnci@lpieralisi>
 
-On Wed, 10 Apr 2024 18:54:37 +0100,
-Colton Lewis <coltonlewis@google.com> wrote:
-> 
-> Add an early_param to control WFx (WFI or WFE) trapping. This is so
-> interrupts can be passed through if the CPU has support for direct
-> interrupt injection, a feature of GICv4. This is described as an
-> enumeration with three possible behaviors, always passthrough (never
-> trap), never passthrough (always trap), or default (trap if more than
-> one task is running. Default matches the current behavior.
-> 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> ---
-> v3:
-> * Changed control mechanism to an early_param on Marc's advice this should be
->   a system level decision and not exposed via uapi
-> * Reduced behavior to an enum from an integer as there are only a few options
->   that make logical sense
-> * Limit option for always passthrough to systems with GICv4 since the primary
->   case for always passthrough is systems with direct interrupt injection
-> 
-> v2:
-> https://lore.kernel.org/kvmarm/20240319164341.1674863-1-coltonlewis@google.com/
-> 
-> v1:
-> https://lore.kernel.org/kvmarm/20240129213918.3124494-1-coltonlewis@google.com/
-> 
-> arch/arm64/include/asm/kvm_host.h |  7 +++++++
->  arch/arm64/kvm/arm.c              | 30 +++++++++++++++++++++++++++++-
->  2 files changed, 36 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 21c57b812569..e9225b1d0e9b 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -67,6 +67,13 @@ enum kvm_mode {
->  	KVM_MODE_NV,
->  	KVM_MODE_NONE,
->  };
-> +
-> +enum kvm_interrupt_passthrough {
-> +	KVM_INTERRUPT_PASSTHROUGH_DEFAULT,
-> +	KVM_INTERRUPT_PASSTHROUGH_ALWAYS,
-> +	KVM_INTERRUPT_PASSTHROUGH_NEVER,
+On Wed, Apr 10, 2024 at 04:57:19PM +0200, Lorenzo Pieralisi wrote:
+> On Tue, Apr 09, 2024 at 03:19:08PM +0000, Sebastian Ene wrote:
+> > Handle the FFA_PARTITION_INFO_GET host call inside the pKVM hypervisor
+> > and copy the response message back to the host buffers. Save the
+> > returned FF-A version as we will need it later to interpret the response
+> > from the TEE.
+> > 
+> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/nvhe/ffa.c | 49 +++++++++++++++++++++++++++++++++++
+> >  1 file changed, 49 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > index 320f2eaa14a9..72fc365bc7a8 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> > @@ -67,6 +67,7 @@ struct kvm_ffa_buffers {
+> >   */
+> >  static struct kvm_ffa_buffers hyp_buffers;
+> >  static struct kvm_ffa_buffers host_buffers;
+> > +static u32 ffa_version;
+> >  
+> >  static void ffa_to_smccc_error(struct arm_smccc_res *res, u64 ffa_errno)
+> >  {
+> > @@ -640,6 +641,49 @@ static bool do_ffa_features(struct arm_smccc_res *res,
+> >  	return true;
+> >  }
+> >  
+> > +static void do_ffa_part_get(struct arm_smccc_res *res,
+> > +			    struct kvm_cpu_context *ctxt)
+> > +{
+> > +	DECLARE_REG(u32, uuid0, ctxt, 1);
+> > +	DECLARE_REG(u32, uuid1, ctxt, 2);
+> > +	DECLARE_REG(u32, uuid2, ctxt, 3);
+> > +	DECLARE_REG(u32, uuid3, ctxt, 4);
+> > +	DECLARE_REG(u32, flags, ctxt, 5);
+> > +	u32 off, count, sz, buf_sz;
+> > +
+> > +	hyp_spin_lock(&host_buffers.lock);
+> > +	if (!host_buffers.rx) {
+> > +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
+> > +		goto out_unlock;
+> > +	}
+> > +
+> > +	arm_smccc_1_1_smc(FFA_PARTITION_INFO_GET, uuid0, uuid1,
+> > +			  uuid2, uuid3, flags, 0, 0,
+> > +			  res);
+> > +
+> > +	if (res->a0 != FFA_SUCCESS)
+> > +		goto out_unlock;
+> > +
+> > +	count = res->a2;
+> > +	if (!count)
+> > +		goto out_unlock;
+> > +
+> > +	if (ffa_version > FFA_VERSION_1_0) {
+> > +		buf_sz = sz = res->a3;
+> > +		if (sz > sizeof(struct ffa_partition_info))
+> > +			buf_sz = sizeof(struct ffa_partition_info);
 
-What does this mean? This is not dealing with interrupts, this is
-supposed to deal with the behaviour of specific instructions
-(WFI/WFE). The notion of "passthrough" is really odd as well. Finally,
-both ALWAYS and NEVER are wrong -- the architecture makes no such
-guarantee.
+Hello Lorenzo,
 
-> +};
-> +
->  #ifdef CONFIG_KVM
->  enum kvm_mode kvm_get_mode(void);
->  #else
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index a25265aca432..5d0ea6b2c652 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -46,6 +46,7 @@
->  #include <kvm/arm_psci.h>
 > 
->  static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
-> +static enum kvm_interrupt_passthrough kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_DEFAULT;
+> We are copying buf_sz but (correctly ?) returning res->a3 to the caller,
+> which is allowed to expect res->a3 bytes to be filled since that's what
+> firmware reported.
 > 
->  DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+> Technically this is not a problem at present, because the caller
+> (ie the FF-A driver) and the hypervisor rely on the same descriptor
+> structures (and buf_sz can't be != sizeof(struct ffa_partition_info),
+> anything else is a bug as we stand); they must be kept in sync though as
+> the firmware version changes (*if* there are changes in the partition
+> descriptor - eg fields are added).
 > 
-> @@ -456,7 +457,10 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
->  		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
+> An option would consist in just copying res->a3 bytes as firmware reports
+> (obviously keeping the RX buffer boundary checks for the memcpy).
 > 
-> -	if (single_task_running())
-> +	if ((kvm_interrupt_passthrough == KVM_INTERRUPT_PASSTHROUGH_ALWAYS
-> +	     && kvm_vgic_global_state.has_gicv4) ||
-> +	    (kvm_interrupt_passthrough == KVM_INTERRUPT_PASSTHROUGH_DEFAULT
-> +	     && single_task_running()))
 
-Why is this affecting both WFI and WFE? They are very different and
-lumping them together makes little sense.
+Ack, let me fix this an spin up a new version.
 
->  		vcpu_clear_wfx_traps(vcpu);
->  	else
->  		vcpu_set_wfx_traps(vcpu);
-> @@ -2654,6 +2658,30 @@ static int __init early_kvm_mode_cfg(char *arg)
->  }
->  early_param("kvm-arm.mode", early_kvm_mode_cfg);
+
+> It is just a heads-up because I noticed it, no more, I will let Sudeep
+> comment on this since he knows better.
 > 
-> +static int __init early_kvm_interrupt_passthrough_cfg(char *arg)
-> +{
-> +	if (!arg)
-> +		return -EINVAL;
-> +
-> +	if (strcmp(arg, "always") == 0) {
-> +		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_ALWAYS;
-> +		return 0;
-> +	}
-> +
-> +	if (strcmp(arg, "never") == 0) {
-> +		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_NEVER;
-> +		return 0;
-> +	}
-> +
-> +	if (strcmp(arg, "default") == 0) {
-> +		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_DEFAULT;
-> +		return 0;
-> +	}
-> +
-> +	return -EINVAL;
-> +}
-> +early_param("kvm-arm.interrupt-passthrough", early_kvm_interrupt_passthrough_cfg);
-> +
+> Lorenzo
+> 
 
-Again, this is not dealing with interrupts. This is dealing with the
-*potential* trapping of instructions in certain circumstances.
+Thanks for having a look,
+Seb
 
->  enum kvm_mode kvm_get_mode(void)
->  {
->  	return kvm_mode;
 
-Finally, this needs to be documented.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> > +	} else {
+> > +		/* FFA_VERSION_1_0 lacks the size in the response */
+> > +		buf_sz = sz = 8;
+> > +	}
+> > +
+> > +	WARN_ON((count - 1) * sz + buf_sz > PAGE_SIZE);
+> > +	for (off = 0; off < count * sz; off += sz)
+> > +		memcpy(host_buffers.rx + off, hyp_buffers.rx + off, buf_sz);
+> > +out_unlock:
+> > +	hyp_spin_unlock(&host_buffers.lock);
+> > +}
+> > +
+> >  bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
+> >  {
+> >  	struct arm_smccc_res res;
+> > @@ -686,6 +730,9 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
+> >  	case FFA_MEM_FRAG_TX:
+> >  		do_ffa_mem_frag_tx(&res, host_ctxt);
+> >  		goto out_handled;
+> > +	case FFA_PARTITION_INFO_GET:
+> > +		do_ffa_part_get(&res, host_ctxt);
+> > +		break;
+> >  	}
+> >  
+> >  	if (ffa_call_supported(func_id))
+> > @@ -726,6 +773,8 @@ int hyp_ffa_init(void *pages)
+> >  	if (FFA_MAJOR_VERSION(res.a0) != 1)
+> >  		return -EOPNOTSUPP;
+> >  
+> > +	ffa_version = res.a0;
+> > +
+> >  	arm_smccc_1_1_smc(FFA_ID_GET, 0, 0, 0, 0, 0, 0, 0, &res);
+> >  	if (res.a0 != FFA_SUCCESS)
+> >  		return -EOPNOTSUPP;
+> > -- 
+> > 2.44.0.478.gd926399ef9-goog
+> > 
