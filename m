@@ -1,526 +1,187 @@
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21CB813E8A3
-	for <kvmarm@lists.linux.dev>; Thu, 11 Apr 2024 06:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 539B413DBAA
+	for <kvmarm@lists.linux.dev>; Thu, 11 Apr 2024 07:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712818528; cv=none; b=R5YA3KNbLkV5enellr39gJvsInCehfhOqb6CSFUXoFPx0NK+keT/URoiUJTTXzSmlBnlWnZzqN5AvZKpqEacdBEpSuAG9oBQS/foFWAlrOYwQydhh47ldTSYFH19tY4hdXCxGRGfkV9siYr0lyskG8sWzyY2tPK5tuMHmc7wylw=
+	t=1712819008; cv=none; b=OJ4ujEw4hPimpq+N/VehCI1++0vJ+apAl7a+eY+ZMe+YS0JdTnvQPMCkl1F8SgUmYPnLo+AgQIkbnQaw6T6XVg/j56cwkFnER0TNd9JfaEzOlMrONegS+uNp/nMYXN3UC5o/pXTewd+oGPe1p0LfAhNNI/5ZiYMTNC0TlHfObIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712818528; c=relaxed/simple;
-	bh=93ZY6fAk+/FoiMTXqVJsHI9FbD2ZdEAVGbJ8j10VmQE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mivF154RU3k9vcF1mrqV/lxD3K6UhOqPwZINhjkcBSDHrksH0l7ojFTWNPZtHu9DYFaONUsPG2QQM4raUlL13AcqSo5oeeydnu/FEROK6roYpfCXjEKDEXhRZIFT1sKXdTIBnaWj3F8/04dqejAKIKip/JUDwqTJpqQpWmJYhTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4VFVl55yY9zNncQ;
-	Thu, 11 Apr 2024 14:53:05 +0800 (CST)
-Received: from kwepemd200013.china.huawei.com (unknown [7.221.188.133])
-	by mail.maildlp.com (Postfix) with ESMTPS id C72ED18006B;
-	Thu, 11 Apr 2024 14:55:22 +0800 (CST)
-Received: from huawei.com (10.67.174.28) by kwepemd200013.china.huawei.com
- (7.221.188.133) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.28; Thu, 11 Apr
- 2024 14:55:21 +0800
-From: Liao Chang <liaochang1@huawei.com>
-To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
-	<oliver.upton@linux.dev>, <james.morse@arm.com>, <suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>, <tglx@linutronix.de>, <mark.rutland@arm.com>,
-	<ardb@kernel.org>, <broonie@kernel.org>, <liaochang1@huawei.com>,
-	<anshuman.khandual@arm.com>, <miguel.luis@oracle.com>, <joey.gouly@arm.com>,
-	<ryan.roberts@arm.com>, <jeremy.linton@arm.com>,
-	<daniel.thompson@linaro.org>, <sumit.garg@linaro.org>, <liwei391@huawei.com>,
-	<peterz@infradead.org>, <jpoimboe@kernel.org>, <ericchancf@google.com>,
-	<kristina.martsenko@arm.com>, <robh@kernel.org>,
-	<scott@os.amperecomputing.com>, <songshuaishuai@tinylab.org>,
-	<shijie@os.amperecomputing.com>, <bhe@redhat.com>,
-	<akpm@linux-foundation.org>, <horms@kernel.org>,
-	<rmk+kernel@armlinux.org.uk>, <Jonathan.Cameron@huawei.com>,
-	<takakura@valinux.co.jp>, <dianders@chromium.org>, <swboyd@chromium.org>,
-	<frederic@kernel.org>, <reijiw@google.com>, <ruanjinjie@huawei.com>
-CC: <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>
-Subject: [PATCH v2 7/9] arm64: Unify exception masking at entry and exit of exception
-Date: Thu, 11 Apr 2024 06:48:56 +0000
-Message-ID: <20240411064858.3232574-8-liaochang1@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240411064858.3232574-1-liaochang1@huawei.com>
-References: <20240411064858.3232574-1-liaochang1@huawei.com>
+	s=arc-20240116; t=1712819008; c=relaxed/simple;
+	bh=AubONOFaA+RUpGeBw5HQNnZdsscRirVIaGi7Lfko5X8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=crCmma7WWm9FAGerJuWxll37IlUlEdIuNFXkjU7GtZmd5sZvrmYcS67dpOL7KjMkILw4HXPAsW+eVmUkG8bSZsqAVfB/pBbraDLI9jpBrPNSjeQJLhjJce+DHo2xoO1N/h2Ue0z1qdRcR02I3iStFUBGECktuWhnMMy0bFtVFPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SKW1dsna; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SKW1dsna"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712819004;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=QtHuNib59Is1i1vCWC4Y3CGuwoHokuKi4jrm90ujf+8=;
+	b=SKW1dsnaKQOTzeSc7bt7LyZGxp9/sfXUih2yLf/N8NkF88s5/tIjVQndGTDwTs60BBFRxp
+	r56d39M0Ki8yuNP/w8BJlvT+338sE5/JZtCnsqUqSL4J+SgK2RoVofvxGvX/Sw0prYfQAc
+	qZ2U4trtixMR7Gr8mSKyL2qZ6AnHj7Q=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-6-HT3HhxYcOqqSTuH75JaA-Q-1; Thu, 11 Apr 2024 03:03:10 -0400
+X-MC-Unique: HT3HhxYcOqqSTuH75JaA-Q-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7885dd31632so895619885a.0
+        for <kvmarm@lists.linux.dev>; Thu, 11 Apr 2024 00:03:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712818989; x=1713423789;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QtHuNib59Is1i1vCWC4Y3CGuwoHokuKi4jrm90ujf+8=;
+        b=Wlv+s0vWIHWVIDN15fGZvSfkBjD79+YcVIpC28P9+2oGYIKdvHDdbAMgvlMKbCgj+V
+         J9FgqvdHaqR4tZkaCumT8NL+E41Tyn1GG/MbWCTc+U3VELxaHJJcZpKIwXGBlgaWxlnK
+         NzmXJ2YRgDf8NIK3XyxlW/ljE/1uxdHkmqNpgOGnKubWh0RQSdnoN9KhxSd9cHv3zDeJ
+         SSVk8xU7EtTiPbT0aetHQkyoKlQ9Eicl8TNCZgi+2ymZ2RkQEau6x8fdMQDkhFZ7EQDG
+         wDfLcNoVpVS0LyBxDtO4NMwAM7WgfJbO6QmcT3RSJlqRsRIrtt+97rz/aX1Ara6uN9OK
+         MtBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXfFUFHT6JNd1ca/Lpn7DiWevm/zpP0OVHU9XHG/IJe40y7hb9YRA0q6B7+ywcX+MXcxyJ/ajg54HP8rnrwNBov+b/0b2HN
+X-Gm-Message-State: AOJu0YwV9+FNEl+qNb7+cbX1BpCdR4nyWHYUtswsiHy7oJZlFDao62oE
+	gnzQC9XEYUF2Rr9j5+OvjnI7eF4lLnuYegCFgCugkl5KkNRt2I2iZeWC8FaxX7bLcz6VUoskj+E
+	/1GEGIWGZyDpaBugufuTZkYfmEZtmTQlxa7lvvlPtQwPcguoYq1RoRw==
+X-Received: by 2002:a05:620a:2725:b0:78d:6791:34d1 with SMTP id b37-20020a05620a272500b0078d679134d1mr6228748qkp.9.1712818989594;
+        Thu, 11 Apr 2024 00:03:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGau4WYtOsSPLHVhfKvR0HvdfS+y2KoW25hx7BRdsuJh5si8R2fP0b6I2mR4Dl5Kta6TgQKjg==
+X-Received: by 2002:a05:620a:2725:b0:78d:6791:34d1 with SMTP id b37-20020a05620a272500b0078d679134d1mr6228725qkp.9.1712818989317;
+        Thu, 11 Apr 2024 00:03:09 -0700 (PDT)
+Received: from [192.168.0.9] (ip-109-43-179-142.web.vodafone.de. [109.43.179.142])
+        by smtp.gmail.com with ESMTPSA id i22-20020a05620a145600b0078d68b23254sm628581qkl.107.2024.04.11.00.03.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Apr 2024 00:03:09 -0700 (PDT)
+Message-ID: <27ba7613-1344-40b8-bc4d-9a9903ebdcfa@redhat.com>
+Date: Thu, 11 Apr 2024 09:03:04 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemd200013.china.huawei.com (7.221.188.133)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC kvm-unit-tests PATCH v2 01/14] Add initial shellcheck
+ checking
+To: Nicholas Piggin <npiggin@gmail.com>, Andrew Jones <andrew.jones@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Eric Auger <eric.auger@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, =?UTF-8?Q?Nico_B=C3=B6hr?=
+ <nrb@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+ Shaoqin Huang <shahuang@redhat.com>,
+ Nikos Nikoleris <nikos.nikoleris@arm.com>,
+ David Woodhouse <dwmw@amazon.co.uk>, Ricardo Koller <ricarkol@google.com>,
+ rminmin <renmm6@chinaunicom.cn>, Gavin Shan <gshan@redhat.com>,
+ Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+ Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org
+References: <20240406123833.406488-1-npiggin@gmail.com>
+ <20240406123833.406488-2-npiggin@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20240406123833.406488-2-npiggin@gmail.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Currently, different exception types require specific mask. For example:
+On 06/04/2024 14.38, Nicholas Piggin wrote:
+> This adds a basic shellcheck sytle file, some directives to help
 
-  - Interrupt handlers: Mask IRQ, FIQ, and NMI on entry.
-  - Synchronous handler: Restore exception masks to pre-exception value.
-  - Serror handler: Mask all interrupts and Serror on entry (strictest).
-  - Debug handler: Keep all exception masked as exception taken.
+s/sytle/style/
 
-This patch introduces new helper functions to unify exception masking
-behavior at the entry and exit of exceptions on arm64. This approach
-improves code clarity and maintainability.
+> find scripts, and a make shellcheck target.
+> 
+> When changes settle down this could be made part of the standard
+> build / CI flow.
+> 
+> Suggested-by: Andrew Jones <andrew.jones@linux.dev>
+> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+...
+> diff --git a/README.md b/README.md
+> index 6e82dc225..03ff5994e 100644
+> --- a/README.md
+> +++ b/README.md
+> @@ -193,3 +193,6 @@ with `git config diff.orderFile scripts/git.difforder` enables it.
+>   
+>   We strive to follow the Linux kernels coding style so it's recommended
+>   to run the kernel's ./scripts/checkpatch.pl on new patches.
+> +
+> +Also run make shellcheck before submitting a patch which touches bash
 
-Signed-off-by: Liao Chang <liaochang1@huawei.com>
----
- arch/arm64/include/asm/daifflags.h | 81 ++++++++++++++++++-------
- arch/arm64/kernel/entry-common.c   | 96 ++++++++++++++----------------
- arch/arm64/kernel/entry.S          |  2 -
- 3 files changed, 105 insertions(+), 74 deletions(-)
+I'd maybe put "make shellcheck" in quotes to make the sentence more readable?
 
-diff --git a/arch/arm64/include/asm/daifflags.h b/arch/arm64/include/asm/daifflags.h
-index df4c4989babd..6d391d221432 100644
---- a/arch/arm64/include/asm/daifflags.h
-+++ b/arch/arm64/include/asm/daifflags.h
-@@ -121,28 +121,6 @@ static inline void local_daif_restore(unsigned long flags)
- 		trace_hardirqs_off();
- }
- 
--/*
-- * Called by synchronous exception handlers to restore the DAIF bits that were
-- * modified by taking an exception.
-- */
--static inline void local_daif_inherit(struct pt_regs *regs)
--{
--	unsigned long flags = regs->pstate & DAIF_MASK;
--
--	if (interrupts_enabled(regs))
--		trace_hardirqs_on();
--
--	if (system_uses_irq_prio_masking())
--		gic_write_pmr(regs->pmr_save);
--
--	/*
--	 * We can't use local_daif_restore(regs->pstate) here as
--	 * system_has_prio_mask_debugging() won't restore the I bit if it can
--	 * use the pmr instead.
--	 */
--	write_sysreg(flags, daif);
--}
--
- /*
-  * For Arm64 processor support Armv8.8 or later, kernel supports three types
-  * of irqflags, they used for corresponding configuration depicted as below:
-@@ -381,4 +359,63 @@ static inline void local_allint_inherit(struct pt_regs *regs)
- 			_allint_clear();
- 	}
- }
-+
-+/*
-+ * local_allint_disable - Disable IRQ, FIQ and NMI, with or without
-+ * superpriority.
-+ */
-+static inline void local_allint_disable(void)
-+{
-+	arch_irqflags_t irqflags;
-+
-+	irqflags.fields.daif = DAIF_PROCCTX_NOIRQ;
-+	irqflags.fields.pmr = GIC_PRIO_IRQON | GIC_PRIO_PSR_I_SET;
-+	irqflags.fields.allint = 1;
-+	local_allint_restore(irqflags);
-+}
-+
-+/*
-+ * local_allint_mark_enabled - When the kernel enables priority masking,
-+ * interrupts cannot be handled util ICC_PMR_EL1 is set to GIC_PRIO_IRQON
-+ * and PSTATE.IF is cleared. This helper function indicates that interrupts
-+ * remains in a semi-masked state, requring further clearing of PSTATE.IF.
-+ *
-+ * Kernel will give a warning, if some function try to enable semi-masked
-+ * interrupt via the arch_local_irq_enable() defined in <asm/irqflags.h>.
-+ *
-+ * This function is typically used before handling the Debug exception.
-+ */
-+static inline void local_allint_mark_enabled(void)
-+{
-+	if (system_uses_irq_prio_masking())
-+		gic_write_pmr(GIC_PRIO_IRQON | GIC_PRIO_PSR_I_SET);
-+}
-+
-+/*
-+ * local_errint_disable - Disable all types of interrupt including IRQ, FIQ,
-+ * Serror and NMI, with or without superpriority.
-+ */
-+static inline void local_errint_disable(void)
-+{
-+	arch_irqflags_t irqflags;
-+
-+	irqflags.fields.daif = DAIF_ERRCTX;
-+	irqflags.fields.pmr = GIC_PRIO_IRQON | GIC_PRIO_PSR_I_SET;
-+	irqflags.fields.allint = 1;
-+	local_allint_restore(irqflags);
-+}
-+
-+/*
-+ * local_errint_enable - Enable all types of interrupt including IRQ, FIQ,
-+ * Serror and NMI, with or without superpriority.
-+ */
-+static inline void local_errint_enable(void)
-+{
-+	arch_irqflags_t irqflags;
-+
-+	irqflags.fields.daif = DAIF_PROCCTX;
-+	irqflags.fields.pmr = GIC_PRIO_IRQON;
-+	irqflags.fields.allint = 0;
-+	local_allint_restore(irqflags);
-+}
- #endif
-diff --git a/arch/arm64/kernel/entry-common.c b/arch/arm64/kernel/entry-common.c
-index b77a15955f28..99168223508b 100644
---- a/arch/arm64/kernel/entry-common.c
-+++ b/arch/arm64/kernel/entry-common.c
-@@ -168,7 +168,7 @@ static __always_inline void exit_to_user_mode_prepare(struct pt_regs *regs)
- 	if (unlikely(flags & _TIF_WORK_MASK))
- 		do_notify_resume(regs, flags);
- 
--	local_daif_mask();
-+	local_allint_mask();
- 
- 	lockdep_sys_exit();
- }
-@@ -428,9 +428,9 @@ static void noinstr el1_abort(struct pt_regs *regs, unsigned long esr)
- 	unsigned long far = read_sysreg(far_el1);
- 
- 	enter_from_kernel_mode(regs);
--	local_daif_inherit(regs);
-+	local_allint_inherit(regs);
- 	do_mem_abort(far, esr, regs);
--	local_daif_mask();
-+	local_allint_mask();
- 	exit_to_kernel_mode(regs);
- }
- 
-@@ -439,33 +439,36 @@ static void noinstr el1_pc(struct pt_regs *regs, unsigned long esr)
- 	unsigned long far = read_sysreg(far_el1);
- 
- 	enter_from_kernel_mode(regs);
--	local_daif_inherit(regs);
-+	local_allint_inherit(regs);
- 	do_sp_pc_abort(far, esr, regs);
--	local_daif_mask();
-+	local_allint_mask();
- 	exit_to_kernel_mode(regs);
- }
- 
- static void noinstr el1_undef(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_kernel_mode(regs);
--	local_daif_inherit(regs);
-+	local_allint_inherit(regs);
- 	do_el1_undef(regs, esr);
--	local_daif_mask();
-+	local_allint_mask();
- 	exit_to_kernel_mode(regs);
- }
- 
- static void noinstr el1_bti(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_kernel_mode(regs);
--	local_daif_inherit(regs);
-+	local_allint_inherit(regs);
- 	do_el1_bti(regs, esr);
--	local_daif_mask();
-+	local_allint_mask();
- 	exit_to_kernel_mode(regs);
- }
- 
- static void noinstr el1_dbg(struct pt_regs *regs, unsigned long esr)
- {
--	unsigned long far = read_sysreg(far_el1);
-+	unsigned long far;
-+
-+	local_allint_mark_enabled();
-+	far = read_sysreg(far_el1);
- 
- 	arm64_enter_el1_dbg(regs);
- 	if (!cortex_a76_erratum_1463225_debug_handler(regs))
-@@ -476,9 +479,9 @@ static void noinstr el1_dbg(struct pt_regs *regs, unsigned long esr)
- static void noinstr el1_fpac(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_kernel_mode(regs);
--	local_daif_inherit(regs);
-+	local_allint_inherit(regs);
- 	do_el1_fpac(regs, esr);
--	local_daif_mask();
-+	local_allint_mask();
- 	exit_to_kernel_mode(regs);
- }
- 
-@@ -543,7 +546,7 @@ static __always_inline void __el1_irq(struct pt_regs *regs,
- static void noinstr el1_interrupt(struct pt_regs *regs,
- 				  void (*handler)(struct pt_regs *))
- {
--	write_sysreg(DAIF_PROCCTX_NOIRQ, daif);
-+	local_allint_disable();
- 
- 	if (IS_ENABLED(CONFIG_ARM64_PSEUDO_NMI) && !interrupts_enabled(regs))
- 		__el1_pnmi(regs, handler);
-@@ -565,7 +568,7 @@ asmlinkage void noinstr el1h_64_error_handler(struct pt_regs *regs)
- {
- 	unsigned long esr = read_sysreg(esr_el1);
- 
--	local_daif_restore(DAIF_ERRCTX);
-+	local_errint_disable();
- 	arm64_enter_nmi(regs);
- 	do_serror(regs, esr);
- 	arm64_exit_nmi(regs);
-@@ -576,7 +579,7 @@ static void noinstr el0_da(struct pt_regs *regs, unsigned long esr)
- 	unsigned long far = read_sysreg(far_el1);
- 
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_mem_abort(far, esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -594,7 +597,7 @@ static void noinstr el0_ia(struct pt_regs *regs, unsigned long esr)
- 		arm64_apply_bp_hardening();
- 
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_mem_abort(far, esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -602,7 +605,7 @@ static void noinstr el0_ia(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_fpsimd_acc(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_fpsimd_acc(esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -610,7 +613,7 @@ static void noinstr el0_fpsimd_acc(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_sve_acc(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_sve_acc(esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -618,7 +621,7 @@ static void noinstr el0_sve_acc(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_sme_acc(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_sme_acc(esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -626,7 +629,7 @@ static void noinstr el0_sme_acc(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_fpsimd_exc(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_fpsimd_exc(esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -634,7 +637,7 @@ static void noinstr el0_fpsimd_exc(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_sys(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_el0_sys(esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -647,7 +650,7 @@ static void noinstr el0_pc(struct pt_regs *regs, unsigned long esr)
- 		arm64_apply_bp_hardening();
- 
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_sp_pc_abort(far, esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -655,7 +658,7 @@ static void noinstr el0_pc(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_sp(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_sp_pc_abort(regs->sp, esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -663,7 +666,7 @@ static void noinstr el0_sp(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_undef(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_el0_undef(regs, esr);
- 	exit_to_user_mode(regs);
- }
-@@ -671,7 +674,7 @@ static void noinstr el0_undef(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_bti(struct pt_regs *regs)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_el0_bti(regs);
- 	exit_to_user_mode(regs);
- }
-@@ -679,7 +682,7 @@ static void noinstr el0_bti(struct pt_regs *regs)
- static void noinstr el0_mops(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_el0_mops(regs, esr);
- 	exit_to_user_mode(regs);
- }
-@@ -687,7 +690,7 @@ static void noinstr el0_mops(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_inv(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	bad_el0_sync(regs, 0, esr);
- 	exit_to_user_mode(regs);
- }
-@@ -695,11 +698,14 @@ static void noinstr el0_inv(struct pt_regs *regs, unsigned long esr)
- static void noinstr el0_dbg(struct pt_regs *regs, unsigned long esr)
- {
- 	/* Only watchpoints write FAR_EL1, otherwise its UNKNOWN */
--	unsigned long far = read_sysreg(far_el1);
-+	unsigned long far;
-+
-+	local_allint_mark_enabled();
-+	far = read_sysreg(far_el1);
- 
- 	enter_from_user_mode(regs);
- 	do_debug_exception(far, esr, regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	exit_to_user_mode(regs);
- }
- 
-@@ -708,7 +714,7 @@ static void noinstr el0_svc(struct pt_regs *regs)
- 	enter_from_user_mode(regs);
- 	cortex_a76_erratum_1463225_svc_handler();
- 	fp_user_discard();
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_el0_svc(regs);
- 	exit_to_user_mode(regs);
- }
-@@ -716,7 +722,7 @@ static void noinstr el0_svc(struct pt_regs *regs)
- static void noinstr el0_fpac(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_el0_fpac(regs, esr);
- 	exit_to_user_mode(regs);
- }
-@@ -785,7 +791,7 @@ static void noinstr el0_interrupt(struct pt_regs *regs,
- {
- 	enter_from_user_mode(regs);
- 
--	write_sysreg(DAIF_PROCCTX_NOIRQ, daif);
-+	local_allint_disable();
- 
- 	if (regs->pc & BIT(55))
- 		arm64_apply_bp_hardening();
-@@ -797,24 +803,14 @@ static void noinstr el0_interrupt(struct pt_regs *regs,
- 	exit_to_user_mode(regs);
- }
- 
--static void noinstr __el0_irq_handler_common(struct pt_regs *regs)
--{
--	el0_interrupt(regs, handle_arch_irq);
--}
--
- asmlinkage void noinstr el0t_64_irq_handler(struct pt_regs *regs)
- {
--	__el0_irq_handler_common(regs);
--}
--
--static void noinstr __el0_fiq_handler_common(struct pt_regs *regs)
--{
--	el0_interrupt(regs, handle_arch_fiq);
-+	el0_interrupt(regs, handle_arch_irq);
- }
- 
- asmlinkage void noinstr el0t_64_fiq_handler(struct pt_regs *regs)
- {
--	__el0_fiq_handler_common(regs);
-+	el0_interrupt(regs, handle_arch_fiq);
- }
- 
- static void noinstr __el0_error_handler_common(struct pt_regs *regs)
-@@ -822,11 +818,11 @@ static void noinstr __el0_error_handler_common(struct pt_regs *regs)
- 	unsigned long esr = read_sysreg(esr_el1);
- 
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_ERRCTX);
-+	local_errint_disable();
- 	arm64_enter_nmi(regs);
- 	do_serror(regs, esr);
- 	arm64_exit_nmi(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	exit_to_user_mode(regs);
- }
- 
-@@ -839,7 +835,7 @@ asmlinkage void noinstr el0t_64_error_handler(struct pt_regs *regs)
- static void noinstr el0_cp15(struct pt_regs *regs, unsigned long esr)
- {
- 	enter_from_user_mode(regs);
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_el0_cp15(esr, regs);
- 	exit_to_user_mode(regs);
- }
-@@ -848,7 +844,7 @@ static void noinstr el0_svc_compat(struct pt_regs *regs)
- {
- 	enter_from_user_mode(regs);
- 	cortex_a76_erratum_1463225_svc_handler();
--	local_daif_restore(DAIF_PROCCTX);
-+	local_errint_enable();
- 	do_el0_svc_compat(regs);
- 	exit_to_user_mode(regs);
- }
-@@ -899,12 +895,12 @@ asmlinkage void noinstr el0t_32_sync_handler(struct pt_regs *regs)
- 
- asmlinkage void noinstr el0t_32_irq_handler(struct pt_regs *regs)
- {
--	__el0_irq_handler_common(regs);
-+	el0_interrupt(regs, handle_arch_irq);
- }
- 
- asmlinkage void noinstr el0t_32_fiq_handler(struct pt_regs *regs)
- {
--	__el0_fiq_handler_common(regs);
-+	el0_interrupt(regs, handle_arch_fiq);
- }
- 
- asmlinkage void noinstr el0t_32_error_handler(struct pt_regs *regs)
-diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
-index 7ef0e127b149..0b311fefedc2 100644
---- a/arch/arm64/kernel/entry.S
-+++ b/arch/arm64/kernel/entry.S
-@@ -316,8 +316,6 @@ alternative_else_nop_endif
- 
- 	mrs_s	x20, SYS_ICC_PMR_EL1
- 	str	x20, [sp, #S_PMR_SAVE]
--	mov	x20, #GIC_PRIO_IRQON | GIC_PRIO_PSR_I_SET
--	msr_s	SYS_ICC_PMR_EL1, x20
- 
- .Lskip_pmr_save\@:
- #endif
--- 
-2.34.1
+> +scripts.
+> diff --git a/scripts/common.bash b/scripts/common.bash
+> index ee1dd8659..3aa557c8c 100644
+> --- a/scripts/common.bash
+> +++ b/scripts/common.bash
+> @@ -82,8 +82,11 @@ function arch_cmd()
+>   }
+>   
+>   # The current file has to be the only file sourcing the arch helper
+> -# file
+> +# file. Shellcheck can't follow this so help it out. There doesn't appear to be a
+> +# way to specify multiple alternatives, so we will have to rethink this if things
+> +# get more complicated.
+>   ARCH_FUNC=scripts/${ARCH}/func.bash
+>   if [ -f "${ARCH_FUNC}" ]; then
+> +# shellcheck source=scripts/s390x/func.bash
+>   	source "${ARCH_FUNC}"
+>   fi
+
+  Thomas
 
