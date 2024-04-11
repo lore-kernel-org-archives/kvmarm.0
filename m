@@ -1,137 +1,207 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85F151422C4
-	for <kvmarm@lists.linux.dev>; Thu, 11 Apr 2024 09:05:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A536113DBB6;
+	Thu, 11 Apr 2024 11:35:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712826330; cv=none; b=O6NkOecLH1kMbXPqFAeUdEsmJ2MAiXkOSONYHSYLVADF6QBkjPankSlNEDqDnx+CrqpKgW9jARhV664QrelICW4xrJ5+SQ//xEj+zowNquVBxa0jjqf6cfVhuQQRZKkFptdvCi97+05M06qJFLbz9On1WmWOslcG2JzK1ueL4iY=
+	t=1712835329; cv=none; b=J1S5KyFJSODCUevM+3AmhofVCei85Z6mEOQM/675jCIr26KOUVCxHFPm3p6SxJUTfjc7jpRHuXGtatGOhzR/VlXTTL+ivWlnVK7VIAybJBI4y19TjmgrceP2BUzEfFQNsj9wbQcmJLZqqz6bcwWsv+JVnNfR6gsilYOnIfnTjFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712826330; c=relaxed/simple;
-	bh=3J8VwlqSTyKVYZlEvnQs+5Q4mGuokIAZh0swPNLVISI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e0n3G7MtwNqqtxi3MnqkUCes9oKXzVXNr2qm1qKGc1EckRbuow4LL6P1rIN5X0ESZrXhq3RTVhApXmD5iInAYFPTawAKL3392RIjjE+4iUWgJh+hx51hR9ztI05wiKtOT1fxjbxOG+4737qqlrPN2N/OYjUXH69jtVeO4YYW3wk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D8DC7113E;
-	Thu, 11 Apr 2024 02:05:51 -0700 (PDT)
-Received: from bogus (e103737-lin.cambridge.arm.com [10.1.197.49])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 01D263F6C4;
-	Thu, 11 Apr 2024 02:05:19 -0700 (PDT)
-Date: Thu, 11 Apr 2024 10:05:17 +0100
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: Lorenzo Pieralisi <lpieralisi@kernel.org>
-Cc: Sebastian Ene <sebastianene@google.com>, catalin.marinas@arm.com,
-	james.morse@arm.com, jean-philippe@linaro.org, maz@kernel.org,
-	Sudeep Holla <sudeep.holla@arm.com>, oliver.upton@linux.dev,
-	qperret@google.com, qwandor@google.com, suzuki.poulose@arm.com,
-	tabba@google.com, will@kernel.org, yuzenghui@huawei.com,
-	vdonnefort@google.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kernel-team@android.com
-Subject: Re: [PATCH] KVM: arm64: Add support for FFA_PARTITION_INFO_GET
-Message-ID: <ZhenzfndkNwIehhj@bogus>
-References: <20240409151908.541589-1-sebastianene@google.com>
- <Zhaoz9E/sw6jVnci@lpieralisi>
+	s=arc-20240116; t=1712835329; c=relaxed/simple;
+	bh=2QoydNUa8ohr5BSqBTKFBG9DaUQmDb6Pl/IqqSheoek=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=h1bDt3/TxnUvF+UaX7AjztPI0izG2tTxSA3q27I86F8RN3AINW/w68XztNjjdW/kDuCsy+D1r2j+6skgtnGTD4IYbXN8XvRolxm1PwVXAibTZG4w4Jk9kKx1TlgHTQVEqYhfN6fUu97e3truCNJjDQZ106sm3dsvdrHPd98RMds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VFcyt3VLqz6JB2Q;
+	Thu, 11 Apr 2024 19:33:42 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 09DC51400E7;
+	Thu, 11 Apr 2024 19:35:25 +0800 (CST)
+Received: from localhost (10.122.247.231) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Thu, 11 Apr
+ 2024 12:35:24 +0100
+Date: Thu, 11 Apr 2024 12:35:23 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+CC: <linux-pm@vger.kernel.org>, <loongarch@lists.linux.dev>,
+	<linux-acpi@vger.kernel.org>, <linux-arch@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-riscv@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<x86@kernel.org>, <acpica-devel@lists.linuxfoundation.org>,
+	<linux-csky@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-ia64@vger.kernel.org>, <linux-parisc@vger.kernel.org>, Salil Mehta
+	<salil.mehta@huawei.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	<jianyong.wu@arm.com>, <justin.he@arm.com>, James Morse
+	<james.morse@arm.com>, "Rafael J. Wysocki" <rafael@kernel.org>, Miguel Luis
+	<miguel.luis@oracle.com>
+Subject: Re: [PATCH RFC v4 12/15] arm64: psci: Ignore DENIED CPUs
+Message-ID: <20240411123523.0000487a@huawei.com>
+In-Reply-To: <E1rVDnK-0027ZN-40@rmk-PC.armlinux.org.uk>
+References: <Zbp5xzmFhKDAgHws@shell.armlinux.org.uk>
+	<E1rVDnK-0027ZN-40@rmk-PC.armlinux.org.uk>
+Organization: Huawei Technologies R&D (UK) Ltd.
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.29; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zhaoz9E/sw6jVnci@lpieralisi>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100005.china.huawei.com (7.191.160.25) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Wed, Apr 10, 2024 at 04:57:19PM +0200, Lorenzo Pieralisi wrote:
-> On Tue, Apr 09, 2024 at 03:19:08PM +0000, Sebastian Ene wrote:
-> > Handle the FFA_PARTITION_INFO_GET host call inside the pKVM hypervisor
-> > and copy the response message back to the host buffers. Save the
-> > returned FF-A version as we will need it later to interpret the response
-> > from the TEE.
-> >
-> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/ffa.c | 49 +++++++++++++++++++++++++++++++++++
-> >  1 file changed, 49 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > index 320f2eaa14a9..72fc365bc7a8 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > @@ -67,6 +67,7 @@ struct kvm_ffa_buffers {
-> >   */
-> >  static struct kvm_ffa_buffers hyp_buffers;
-> >  static struct kvm_ffa_buffers host_buffers;
-> > +static u32 ffa_version;
-> >
-> >  static void ffa_to_smccc_error(struct arm_smccc_res *res, u64 ffa_errno)
-> >  {
-> > @@ -640,6 +641,49 @@ static bool do_ffa_features(struct arm_smccc_res *res,
-> >  	return true;
-> >  }
-> >
-> > +static void do_ffa_part_get(struct arm_smccc_res *res,
-> > +			    struct kvm_cpu_context *ctxt)
-> > +{
-> > +	DECLARE_REG(u32, uuid0, ctxt, 1);
-> > +	DECLARE_REG(u32, uuid1, ctxt, 2);
-> > +	DECLARE_REG(u32, uuid2, ctxt, 3);
-> > +	DECLARE_REG(u32, uuid3, ctxt, 4);
-> > +	DECLARE_REG(u32, flags, ctxt, 5);
-> > +	u32 off, count, sz, buf_sz;
-> > +
-> > +	hyp_spin_lock(&host_buffers.lock);
-> > +	if (!host_buffers.rx) {
-> > +		ffa_to_smccc_res(res, FFA_RET_INVALID_PARAMETERS);
-> > +		goto out_unlock;
-> > +	}
-> > +
-> > +	arm_smccc_1_1_smc(FFA_PARTITION_INFO_GET, uuid0, uuid1,
-> > +			  uuid2, uuid3, flags, 0, 0,
-> > +			  res);
-> > +
-> > +	if (res->a0 != FFA_SUCCESS)
-> > +		goto out_unlock;
-> > +
-> > +	count = res->a2;
-> > +	if (!count)
-> > +		goto out_unlock;
-> > +
-> > +	if (ffa_version > FFA_VERSION_1_0) {
-> > +		buf_sz = sz = res->a3;
-> > +		if (sz > sizeof(struct ffa_partition_info))
-> > +			buf_sz = sizeof(struct ffa_partition_info);
->
-> We are copying buf_sz but (correctly ?) returning res->a3 to the caller,
-> which is allowed to expect res->a3 bytes to be filled since that's what
-> firmware reported.
->
-> Technically this is not a problem at present, because the caller
-> (ie the FF-A driver) and the hypervisor rely on the same descriptor
-> structures (and buf_sz can't be != sizeof(struct ffa_partition_info),
-> anything else is a bug as we stand); they must be kept in sync though as
-> the firmware version changes (*if* there are changes in the partition
-> descriptor - eg fields are added).
->
+On Wed, 31 Jan 2024 16:50:38 +0000
+Russell King (Oracle) <rmk+kernel@armlinux.org.uk> wrote:
 
-Indeed, this will break if the size of the descriptor changes in the future
-and the kernel has not yet added the support for that though it is unlikely
-as we negotiate the version and the response for all the messages should
-be as per the negotiated version.
+> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> 
+> When a CPU is marked as disabled, but online capable in the MADT, PSCI
+> applies some firmware policy to control when it can be brought online.
+> PSCI returns DENIED to a CPU_ON request if this is not currently
+> permitted. The OS can learn the current policy from the _STA enabled bit.
+> 
+> Handle the PSCI DENIED return code gracefully instead of printing an
+> error.
+> 
+> See https://developer.arm.com/documentation/den0022/f/?lang=en page 58.
+> 
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> [ morse: Rewrote commit message ]
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Tested-by: Miguel Luis <miguel.luis@oracle.com>
+> Tested-by: Vishnu Pajjuri <vishnu@os.amperecomputing.com>
+> Tested-by: Jianyong Wu <jianyong.wu@arm.com>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
 
-> An option would consist in just copying res->a3 bytes as firmware reports
-> (obviously keeping the RX buffer boundary checks for the memcpy).
->
+This change to return failure from __cpu_up in non error cases exposes
+an possible issue with cpu_up() in kernel/cpu.c in that it brings the numa node
+before we try (and fail) to bring up CPUs that may be denied.
 
-Yes I prefer that.
+We could try offlining the numa node on error, or just register it later.
 
-> It is just a heads-up because I noticed it, no more, I will let Sudeep
-> comment on this since he knows better.
->
+Currently I'm testing this change which I think is harmless for cases that don't
+fail the cpu_up()
 
-I think you had it all covered, nothing much to add.
+For the cpu hotplug path note the node only comes online wiht the cpu online, not
+the earlier hotplug. Reasonable given there is nothing online in the node before
+that point.
 
---
-Regards,
-Sudeep
+diff --git a/kernel/cpu.c b/kernel/cpu.c
+index 537099bf5d02..a4730396ccea 100644
+--- a/kernel/cpu.c
++++ b/kernel/cpu.c
+@@ -1742,10 +1742,6 @@ static int cpu_up(unsigned int cpu, enum cpuhp_state target)
+                return -EINVAL;
+        }
+
+-       err = try_online_node(cpu_to_node(cpu));
+-       if (err)
+-               return err;
+-
+        cpu_maps_update_begin();
+
+        if (cpu_hotplug_disabled) {
+@@ -1760,7 +1756,10 @@ static int cpu_up(unsigned int cpu, enum cpuhp_state target)
+        err = _cpu_up(cpu, 0, target);
+ out:
+        cpu_maps_update_done();
+-       return err;
++       if (err)
++               return err;
++
++       return try_online_node(cpu_to_node(cpu));
+ }
+
+There is a kicker in the remove path where currently check_cpu_on_node()
+checks for_each_present_cpu() whereas to work for us we need to use
+for_each_online_cpu() or the node is never removed.
+
+Now my current view is that we should only show
+nodes in /sys/bus/nodes/devices/ if there is a CPU online (assuming no other
+reasons the node should be online such as memory).
+That's easy enough to make work but all I'm really learning is that the semantics
+of what is an online form a node point of view is not consistent.
+
+Fixing this will create a minor change on x86 but does anyone really care
+about what happens in the offline path wrt to 'when' the node disappears?
+I think the corner case is.
+
+1. Add 2 CPUs (A, B) in a CPU only node.
+2. Online CPU A - this brings /sys/bus/devices/nodeX online
+3. Remove CPU A - no effect because the check for try_remove is on presence and CPU B is
+   still present.
+4. Online CPU B - no change.
+5. Offline CPU B - no change.
+4. Remove CPU B - /sys/bus/device/nodeX offline (disappears)
+
+To make it work on arm64 where we never make CPUs not present.
+
+1. Add 2 CPUs (A, B) in a CPU only node.
+2. Online CPU A - this brings /sys/bus/devices/nodeX online
+3. Remove CPU A - /sys/bus/devices/nodeX offline (disappears)
+4. Online CPU B - this brings /sys/bus/device/nodeX online
+5. Offline CPU B - no change (node updates only happen in hotplug code)
+6. Remove CPU B - /sys/bus/device/nodeX offline (disappears).
+
+Step 5 may seem weird but I think we can't mess with nodes there because
+userspace may well rely on them still being around for some reason
+(it's a much more common situation).
+
+My assumption is that step3 removing the node isn't going to hurt anyone?
+
+If no one shouts, i'll go ahead with rolling a v5 patch set where this is done.
+
+
+Jonathan
+
+
+
+
+
+> Changes since RFC v2
+>  * Add specification reference
+>  * Use EPERM rather than EPROBE_DEFER
+> Changes since RFC v3:
+>  * Use EPERM everywhere
+>  * Drop unnecessary changes to drivers/firmware/psci/psci.c
+> ---
+>  arch/arm64/kernel/psci.c | 2 +-
+>  arch/arm64/kernel/smp.c  | 3 ++-
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/psci.c b/arch/arm64/kernel/psci.c
+> index 29a8e444db83..fabd732d0a2d 100644
+> --- a/arch/arm64/kernel/psci.c
+> +++ b/arch/arm64/kernel/psci.c
+> @@ -40,7 +40,7 @@ static int cpu_psci_cpu_boot(unsigned int cpu)
+>  {
+>  	phys_addr_t pa_secondary_entry = __pa_symbol(secondary_entry);
+>  	int err = psci_ops.cpu_on(cpu_logical_map(cpu), pa_secondary_entry);
+> -	if (err)
+> +	if (err && err != -EPERM)
+>  		pr_err("failed to boot CPU%d (%d)\n", cpu, err);
+>  
+>  	return err;
+> diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
+> index 4ced34f62dab..dc0e0b3ec2d4 100644
+> --- a/arch/arm64/kernel/smp.c
+> +++ b/arch/arm64/kernel/smp.c
+> @@ -132,7 +132,8 @@ int __cpu_up(unsigned int cpu, struct task_struct *idle)
+>  	/* Now bring the CPU into our world */
+>  	ret = boot_secondary(cpu, idle);
+>  	if (ret) {
+> -		pr_err("CPU%u: failed to boot: %d\n", cpu, ret);
+> +		if (ret != -EPERM)
+> +			pr_err("CPU%u: failed to boot: %d\n", cpu, ret);
+>  		return ret;
+>  	}
+>  
+
