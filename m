@@ -1,27 +1,27 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA9EC54777;
-	Fri, 12 Apr 2024 08:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6A986262;
+	Fri, 12 Apr 2024 08:44:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712911460; cv=none; b=OLcIQuFdMuBImZu026qFJ7Y2diCwZpzdL6rYJnHp0Bnx/WzJ3OvJvzs9uFPE1KQIzi8ugDIDIl3jKJuuAtP8/wxvCcHPcW8kIpCgQyM7VOhZVZai7ToVm23fn3hgdMjauB9MDB62vzbQhm4LfoxIBEEbb2XPtr+7ECaeMlUHZvA=
+	t=1712911463; cv=none; b=KJEt1vCOgsLSxVYOXaOHId72Sfli2Q3SpXLkMa/LDw/nfjJxNFG+ck+k95Cp2tC0zbeD7u7CnjB1vu3HANl1CH8zbn1qnTso7n7fOxSZQPmTB8y0eAx0pLjkPK4AJWTsW/eQrhWFK6KNwGmGAtp/NdyiNnZ8rQ4mpMvDFQihdoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712911460; c=relaxed/simple;
-	bh=AAZ7KwRadho06sOIvrpNoa0AgAyOkuF1mCTkwi4BTLE=;
+	s=arc-20240116; t=1712911463; c=relaxed/simple;
+	bh=ucLdm7kgiNH8UU6TZ/DFxWIYh8yzK/gwevoJN7XpD84=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=c8cJ7PV1FQ+zH/UbbY46pQYxbFDPyqoPLSKKmzewwzKZ8JuwRC6R/W3ge/aPL2saBqqBaSEDoNmuErMUjoe+vWeca0m3Qf9hvX/mssF6mLUgOg4NqQcBT14xB5BhYvizPKc/sfqDaKQekongtKVlvs1NvsAYedKAhzZrLG6rH80=
+	 MIME-Version; b=LzocRIzvMZa6TPFQzDds2azlJ9eIuZDdL2o1TMhZla4PkhIZmIXFkuBLfdoXmSl4sHgtAEaSkQeIqkunVNjkjtnMBuqiLCHJzITEKqgSpcw356dw+G2GzHoajTp2Flt2y8o1TXQoMeFjEEKNl1Duddl8psT6uJgn8SNT2oxZEaA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BF106339;
-	Fri, 12 Apr 2024 01:44:48 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 22534113E;
+	Fri, 12 Apr 2024 01:44:51 -0700 (PDT)
 Received: from e112269-lin.cambridge.arm.com (e112269-lin.cambridge.arm.com [10.1.194.51])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 634793F6C4;
-	Fri, 12 Apr 2024 01:44:17 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BA9CB3F6C4;
+	Fri, 12 Apr 2024 01:44:19 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Cc: Steven Price <steven.price@arm.com>,
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Marc Zyngier <maz@kernel.org>,
 	Will Deacon <will@kernel.org>,
@@ -31,15 +31,15 @@ Cc: Steven Price <steven.price@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: [PATCH v2 26/43] arm64: Don't expose stolen time for realm guests
-Date: Fri, 12 Apr 2024 09:42:52 +0100
-Message-Id: <20240412084309.1733783-27-steven.price@arm.com>
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Steven Price <steven.price@arm.com>
+Subject: [PATCH v2 27/43] arm64: rme: allow userspace to inject aborts
+Date: Fri, 12 Apr 2024 09:42:53 +0100
+Message-Id: <20240412084309.1733783-28-steven.price@arm.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240412084309.1733783-1-steven.price@arm.com>
 References: <20240412084056.1733704-1-steven.price@arm.com>
@@ -52,30 +52,66 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It doesn't make much sense and with the ABI as it is it's a footgun for
-the VMM which makes fatal granule protection faults easy to trigger.
+From: Joey Gouly <joey.gouly@arm.com>
 
+Extend KVM_SET_VCPU_EVENTS to support realms, where KVM cannot set the
+system registers, and the RMM must perform it on next REC entry.
+
+Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/kvm/arm.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ Documentation/virt/kvm/api.rst |  2 ++
+ arch/arm64/kvm/guest.c         | 24 ++++++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index a0dcae0391d0..f2279ab45add 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -339,7 +339,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = system_supports_mte();
- 		break;
- 	case KVM_CAP_STEAL_TIME:
--		r = kvm_arm_pvtime_supported();
-+		if (kvm && kvm_is_realm(kvm))
-+			r = 0;
-+		else
-+			r = kvm_arm_pvtime_supported();
- 		break;
- 	case KVM_CAP_ARM_EL1_32BIT:
- 		r = cpus_have_final_cap(ARM64_HAS_32BIT_EL1);
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index b4bd3d0928a2..0b2386ee4f15 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -1278,6 +1278,8 @@ User space may need to inject several types of events to the guest.
+ Set the pending SError exception state for this VCPU. It is not possible to
+ 'cancel' an Serror that has been made pending.
+ 
++User space cannot inject SErrors into Realms.
++
+ If the guest performed an access to I/O memory which could not be handled by
+ userspace, for example because of missing instruction syndrome decode
+ information or because there is no device mapped at the accessed IPA, then
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index a035689dc39b..5223a828a344 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -865,6 +865,30 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+ 	bool has_esr = events->exception.serror_has_esr;
+ 	bool ext_dabt_pending = events->exception.ext_dabt_pending;
+ 
++	if (vcpu_is_rec(vcpu)) {
++		/* Cannot inject SError into a Realm. */
++		if (serror_pending)
++			return -EINVAL;
++
++		/*
++		 * If a data abort is pending, set the flag and let the RMM
++		 * inject an SEA when the REC is scheduled to be run.
++		 */
++		if (ext_dabt_pending) {
++			/*
++			 * Can only inject SEA into a Realm if the previous exit
++			 * was due to a data abort of an Unprotected IPA.
++			 */
++			if (!(vcpu->arch.rec.run->entry.flags & RMI_EMULATED_MMIO))
++				return -EINVAL;
++
++			vcpu->arch.rec.run->entry.flags &= ~RMI_EMULATED_MMIO;
++			vcpu->arch.rec.run->entry.flags |= RMI_INJECT_SEA;
++		}
++
++		return 0;
++	}
++
+ 	if (serror_pending && has_esr) {
+ 		if (!cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
+ 			return -EINVAL;
 -- 
 2.34.1
 
