@@ -1,122 +1,103 @@
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A636114B065
-	for <kvmarm@lists.linux.dev>; Fri, 12 Apr 2024 16:52:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CDC14D2B7;
+	Fri, 12 Apr 2024 17:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712940737; cv=none; b=PQKCwQcbAlV4r3X+ynCPdWlcfW7I9AhVr57PDa/yM5Vs9H25CzpEB5Sb4Yhk7/oeUgLDDr1QprTfDZg1qzshId2xZV5iNHI0mTVJYYesLpDKSjRXV9dzg9Ptr3xfOJiPQ8bN42KbgBgNW8jWsyY9HPnFvd5SyZIwKZ47WTkuHUk=
+	t=1712943753; cv=none; b=dp6SD6jM7InRr0jZvzLiMlJiufYqpifqiUS45JBDCzJ7Y1sYn2xLKl1rSCy+xm7aRugBUrxK0tC8ETXnLLfVWJG0Zr30w0P7alujdRmX4eCjAjxiRz2Vo7jmLTLr12CaBqgf3zfF4T8+i2nDNrJSH4ewq6d4bDCELzsXZgmxqac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712940737; c=relaxed/simple;
-	bh=JEVa4ex2ZDcngKNJsXDeM2lwaJ7PKNt/9rGEMEiRKOI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=F1JoBJlawjMxsnXt2ly/wOfnb/qjPxBaVBuOu1abx44wXT8WVzlICl2lo+tt/9FkVEeo/70WQT99AGMztKnR+HOlDKMAv1xBQUMTvESJbc3GGV3cVjC4gMko9HVjo4CtQWBnFXcOeNmXjw7jwLxTGHhXucAO9tdNUpdAoPDTWCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=fcL6zmI2; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1712943753; c=relaxed/simple;
+	bh=/nAjwVyb6TKfp7Se1ZzwuZHLhLGc0ePlRQ+AGjPxbpo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=j8WMhv/WPGice/K0imOy1kZKjqMbJYibOcjhh7o5n+0n+Ivs4+cH0bANDPrcQVfqJPq+YaFhzBoxMHSj4Q65JhFJX8bnyJYYjEhd1ehys2ha6SfoJxHLZNgI/+W5Wu373h/Vb5dqV1p/v9AL/6czUuUfyfKFbE9LKNG/q8L4kF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TECRcDw+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fcL6zmI2"
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d895138ce6so12275631fa.0
-        for <kvmarm@lists.linux.dev>; Fri, 12 Apr 2024 09:52:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1712940733; x=1713545533; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=F129E/qMOIsRNJvcD537N8BPcYpqI13fs6vRxipyLXs=;
-        b=fcL6zmI2FlLP48ZuT1RKtR874hfdseaTHYqSd6KoqXMWxdALvgV31CaNLwVsdu+Vsm
-         3FN+UueMhQniPDWR8qDeY/vWXPP49jQ3jn+rHaZsnha7leqzXv6sxp1sIFadKRD9IE73
-         YfHvl3EEMjQASS+UC4YScQrvwhi5u5nZDuS/66W/cf4+cdu3YevjqY22bpVpHdTfS7RI
-         FCjVcqSzVl4RypbQnpDDGjX9T/etuit64A2DNJ1OxSoYWe4I7B3OEVQRjyUTCI8RTW7a
-         5dHZdKKE2mHiWWpe8GSpSLi5W2q2d2FxDPeNBrGNwZkuw+PTJCOCf0kkNlwqmc0eAcHG
-         RI7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712940733; x=1713545533;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=F129E/qMOIsRNJvcD537N8BPcYpqI13fs6vRxipyLXs=;
-        b=SSAiiDdY8VAEyve1/Y9EQ5yyf2ytuXh2wSxTSwpNHfcaDJZ77IIuvh6ub4RPZX/aDw
-         Pb3bWrLqiDg4Sb8mCusKc0V0jbvX1XaEpAcviafyBj+AWBdA1A0hg9tXcj82QvjZ73jF
-         XSJ1+VgyHSUXkxtJFHI+MkGYFdo5UnivPXmcKF/ip5KBXZlmOAl768S+gpEvdV7QnWuK
-         qVu33tVaKsKuRqBY5wF90crrNHGyzw6xf814Sh8NI0xvPreIEKPRa5R0bCJSFmQNvTbn
-         bp1zpEPjw81RaczobJppAkp3kAQhsA/1r12aug72mb0/EbMMDsWKQUpm3a0SH9vlFyAR
-         ZzMw==
-X-Forwarded-Encrypted: i=1; AJvYcCW35lzmWMYyBP2kfMnUkCTZywu5RQqH44yvJwFom+8rvB1koTfSka0Z6c6cVnPXMy3Ibzec+/KZKwCDyClbKVOZncbKdc5w
-X-Gm-Message-State: AOJu0YwTtlUXfH7l7Ng9Y+8fzZsgYeAZUjMAz5rJ4+BbLzUjQ74cF7Mv
-	agKyCmzbrZ9L1Llzbdxop21tSk7L3lp8nPbfUf0g9ik+bpTF0i8jRbu9FdReb2Y=
-X-Google-Smtp-Source: AGHT+IFM2/dXuGXELLLfc+flbBb9xsmkA1SIJGRaZWidPMq1PtFsBq8OiGD0hOU+ZU8oOVk804e3sg==
-X-Received: by 2002:a05:651c:93:b0:2d8:3e60:b9c9 with SMTP id 19-20020a05651c009300b002d83e60b9c9mr1767624ljq.33.1712940732768;
-        Fri, 12 Apr 2024 09:52:12 -0700 (PDT)
-Received: from myrica ([2.221.137.100])
-        by smtp.gmail.com with ESMTPSA id fc18-20020a05600c525200b0041563096e15sm9497631wmb.5.2024.04.12.09.52.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Apr 2024 09:52:12 -0700 (PDT)
-Date: Fri, 12 Apr 2024 17:52:24 +0100
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	Thomas Fossati <thomas.fossati@linaro.org>,
-	Kevin Zhao <kevin.zhao@linaro.org>,
-	Leonardo Augusto =?utf-8?Q?Guimar=C3=A3es?= Garcia <leonardo.garcia@linaro.org>
-Subject: Re: [v2] Support for Arm CCA VMs on Linux
-Message-ID: <20240412165224.GA357251@myrica>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TECRcDw+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CC07C3277B;
+	Fri, 12 Apr 2024 17:42:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712943753;
+	bh=/nAjwVyb6TKfp7Se1ZzwuZHLhLGc0ePlRQ+AGjPxbpo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=TECRcDw+dXBulhLRwfv++i443/tRB6tthncDN+3DL3HhBt2A4EDnpgO02vexkmcU3
+	 2LgDrH09+UuqO/u930N+XhYzdJ0aMZIze7JQkwfG1KzROQjoKkek6qm0y/IUGdbQ9D
+	 F8vr6x1yYO7OgFOmMnkRTaUp3uod5XkHD3zUx1HYhCAQ8FMrGjPdDPkvh/d0OzdRxe
+	 BZKbCDbT8f2pL+eu7SMtePgTaWadI5Ys+XN6vYTRMkrTHD1VpMXM+Sns5aaWkwNjOb
+	 3I2MNj8n3ObiRn2J9BttjJFP8l4gdtqnp2a0wvsBCNMoVGpCQfyGynPikfH1QTd6PT
+	 XIP7ufaACw6tQ==
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-22ede5f7e0fso66117fac.0;
+        Fri, 12 Apr 2024 10:42:33 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCX5rlMX8OtSM1vqwSwzuLJbGWJ/EFy2T86+8pH5Z2GOhX6EgbLSq3HX8Aotsi4asyFgScQcknXEYKVtukGT51fgikxnyJHg0WgMg8Ly8M3JivODmoTq4jCfdRFewU4WsmU+
+X-Gm-Message-State: AOJu0YxP/L8qxEmOoOG6jXhPqhYaKN6Xy3kprP3igEB8jFdWp0tMAzSg
+	z3nE2xmxvtcndQiOiIufzMYz2VcXvIkfKVl0WwJfipoCqO9aISpNbGRWSKfYSQM28CI2lKYOpK7
+	kgVHMBGHuqmBxUQawp0F56MUNQQc=
+X-Google-Smtp-Source: AGHT+IEJkeZDJTEL4cW0rpgNkzY06HXCYCu+TPlftZJzus+GEzgTu7rAYtLbl0X+S7TeyXUBRD7Q6k9BVLA6c/AYvs4=
+X-Received: by 2002:a05:6870:e9a9:b0:229:e46d:763a with SMTP id
+ r41-20020a056870e9a900b00229e46d763amr3647483oao.0.1712943752217; Fri, 12 Apr
+ 2024 10:42:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240412084056.1733704-1-steven.price@arm.com>
+References: <20240412143719.11398-1-Jonathan.Cameron@huawei.com> <20240412143719.11398-2-Jonathan.Cameron@huawei.com>
+In-Reply-To: <20240412143719.11398-2-Jonathan.Cameron@huawei.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Fri, 12 Apr 2024 19:42:20 +0200
+X-Gmail-Original-Message-ID: <CAJZ5v0gK1SjiHzUT05eWZ_G_43e7UzsimTdG_g+F=mVQ=812yA@mail.gmail.com>
+Message-ID: <CAJZ5v0gK1SjiHzUT05eWZ_G_43e7UzsimTdG_g+F=mVQ=812yA@mail.gmail.com>
+Subject: Re: [PATCH v5 01/18] cpu: Do not warn on arch_register_cpu()
+ returning -EPROBE_DEFER
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, x86@kernel.org, Russell King <linux@armlinux.org.uk>, 
+	"Rafael J . Wysocki" <rafael@kernel.org>, Miguel Luis <miguel.luis@oracle.com>, 
+	James Morse <james.morse@arm.com>, Salil Mehta <salil.mehta@huawei.com>, 
+	Jean-Philippe Brucker <jean-philippe@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, linuxarm@huawei.com, justin.he@arm.com, 
+	jianyong.wu@arm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 12, 2024 at 09:40:56AM +0100, Steven Price wrote:
-> We are happy to announce the second version of the Arm Confidential
-> Compute Architecture (CCA) support for the Linux stack. The intention is
-> to seek early feedback in the following areas:
->  * KVM integration of the Arm CCA;
->  * KVM UABI for managing the Realms, seeking to generalise the
->    operations where possible with other Confidential Compute solutions;
->  * Linux Guest support for Realms.
-> 
-> See the previous RFC[1] for a more detailed overview of Arm's CCA
-> solution, or visible the Arm CCA Landing page[2].
-> 
-> This series is based on the final RMM v1.0 (EAC5) specification[3].
+On Fri, Apr 12, 2024 at 4:37=E2=80=AFPM Jonathan Cameron
+<Jonathan.Cameron@huawei.com> wrote:
+>
+> For arm64 the CPU registration cannot complete until the ACPI intepretter
+> us up and running so in those cases the arch specific
+> arch_register_cpu() will return -EPROBE_DEFER at this stage and the
+> registration will be attempted later.
+>
+> Suggested-by: Rafael J. Wysocki <rafael@kernel.org>
+> Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-Instructions for building and running the CCA stack on QEMU, both as
-system emulation and VMM, are available here:
-https://linaro.atlassian.net/wiki/spaces/QEMU/pages/29051027459/Building+an+RME+stack+for+QEMU
+Acked-by: Rafael J. Wysocki <rafael@kernel.org>
 
-I'll send out the QEMU VMM patches shortly:
-https://git.codelinaro.org/linaro/dcap/qemu.git branch cca/v2
-
-Thanks,
-Jean
-
-> [1] Previous RFC
->     https://lore.kernel.org/r/20230127112248.136810-1-suzuki.poulose%40arm.com
-> [2] Arm CCA Landing page (See Key Resources section for various documentation)
->     https://www.arm.com/architecture/security-features/arm-confidential-compute-architecture
-> [3] RMM v1.0-EAC5 specification
->     https://developer.arm.com/documentation/den0137/1-0eac5/
-> [4] Shrinkwrap
->     https://git.gitlab.arm.com/tooling/shrinkwrap
-> [5] Linux support for Arm CCA RMM v1.0-EAC5
->     https://lore.kernel.org/r/fb259449-026e-4083-a02b-f8a4ebea1f87%40arm.com
-
-
-> 
+> ---
+> v5: New patch.
+>     Note that for now no arch_register_cpu() calls return -EPROBE_DEFER
+>     so it has no impact until the arm64 one is added later in this series=
+.
+> ---
+>  drivers/base/cpu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
+> index 56fba44ba391..b9d0d14e5960 100644
+> --- a/drivers/base/cpu.c
+> +++ b/drivers/base/cpu.c
+> @@ -558,7 +558,7 @@ static void __init cpu_dev_register_generic(void)
+>
+>         for_each_present_cpu(i) {
+>                 ret =3D arch_register_cpu(i);
+> -               if (ret)
+> +               if (ret !=3D -EPROBE_DEFER)
+>                         pr_warn("register_cpu %d failed (%d)\n", i, ret);
+>         }
+>  }
+> --
+> 2.39.2
+>
